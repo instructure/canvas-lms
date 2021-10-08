@@ -28,7 +28,7 @@ module DynamicSettings
       # first class data types
       @data[key]&.to_s
     end
-    alias_method :[], :fetch
+    alias [] fetch
 
     # Set multiple key value pairs
     #

@@ -150,12 +150,7 @@ module Lti
 
     def generate_lti_params
       if resource_type&.to_sym == :course_assignments_menu &&
-         !@context.root_account.feature_enabled?(:lti_multiple_assignment_deep_linking)
-        return resource_link_request.generate_post_payload
-      end
-
-      if resource_type&.to_sym == :module_index_menu &&
-         !@context.root_account.feature_enabled?(:lti_deep_linking_module_index_menu)
+         !Account.site_admin.feature_enabled?(:lti_multiple_assignment_deep_linking)
         return resource_link_request.generate_post_payload
       end
 

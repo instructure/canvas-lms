@@ -24,9 +24,9 @@ import polyfill from './polyfill'
 import getRCSProps from './getRCSProps'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 
-const RCELoader = {
-  loadingPromise: null,
+let loadingPromise
 
+const RCELoader = {
   preload(cb) {
     // since we are just preloading, let other stuff waiting to run go first so we don't slow pageload
     ;(window.requestIdleCallback || window.setTimeout)(() => this.loadRCE(cb))
@@ -53,6 +53,20 @@ const RCELoader = {
     })
   },
 
+  loadSidebarOnTarget(target, callback) {
+    if (ENV.RICH_CONTENT_SKIP_SIDEBAR) {
+      return
+    }
+
+    const props = getRCSProps()
+
+    this.loadRCE(RCE => {
+      RCE.renderSidebarIntoDiv(target, props, remoteSidebar => {
+        callback(polyfill.wrapSidebar(remoteSidebar))
+      })
+    })
+  },
+
   /**
    * properties for managing several requests to load
    * the module from various pieces of canvas code.
@@ -70,18 +84,24 @@ const RCELoader = {
    * @private
    */
   loadRCE(cb = () => {}) {
-    return import(/* webpackChunkName: "canvas-rce-async-chunk" */ './canvas-rce')
-      .then(RCE => {
+    if (!loadingPromise) {
+      loadingPromise = (
+        window.ENV.use_rce_enhancements
+          ? import(/* webpackChunkName: "canvas-rce-async-chunk" */ './canvas-rce')
+          : import(
+              /* webpackChunkName: "canvas-rce-old-async-chunk" */ './canvas-rce-old-and-a11y-checker'
+            )
+      ).then(RCE => {
         this.RCE = RCE
         loadEventListeners()
         return RCE
       })
-      .then(() => {
-        this.loadingCallbacks.forEach(loadingCallback => loadingCallback(this.RCE))
-        this.loadingCallbacks = []
-        // eslint-disable-next-line promise/no-callback-in-promise
-        cb(this.RCE)
-      })
+    }
+    return loadingPromise.then(() => {
+      this.loadingCallbacks.forEach(loadingCallback => loadingCallback(this.RCE))
+      this.loadingCallbacks = []
+      cb(this.RCE)
+    })
   },
 
   /**
@@ -176,10 +196,10 @@ const RCELoader = {
         }
       })
 
-    // TODO: let client pass autosave_enabled in as a prop from the outside
-    //       Assignmens2 student view is going to be doing their own autosave
+    // when rce_auto_save flag is removed, remember to default
+    // the autosave property in RCEWrapper to reasonable values
     const autosave = {
-      enabled: ENV.rce_auto_save,
+      enabled: ENV.use_rce_enhancements && ENV.rce_auto_save,
       maxAge: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms
     }
 

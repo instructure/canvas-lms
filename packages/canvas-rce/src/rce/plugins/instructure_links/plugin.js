@@ -213,7 +213,7 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
       onItemAction: (splitButtonApi, value) => doMenuItem(ed, value),
       onSetup(api) {
         function handleNodeChange(e) {
-          if (e?.element) {
+          if (e !== null) {
             api.setActive(!!getAnchorElement(ed, e.element))
           }
           api.setDisabled(!isOKToLink(ed.selection.getContent()))

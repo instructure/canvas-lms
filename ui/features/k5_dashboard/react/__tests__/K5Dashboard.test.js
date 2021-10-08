@@ -23,7 +23,7 @@ import {act, render, screen, waitFor} from '@testing-library/react'
 import {resetDashboardCards} from '@canvas/dashboard-card'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
-import {OBSERVER_COOKIE_PREFIX} from '@canvas/k5/ObserverGetObservee'
+import {SELECTED_OBSERVED_USER_COOKIE} from '@canvas/k5/react/ObserverOptions'
 
 import {MOCK_TODOS} from './mocks'
 import {
@@ -37,11 +37,8 @@ import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
 
-const currentUserId = '1'
-const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUserId}`
-
 const currentUser = {
-  id: currentUserId,
+  id: '1',
   display_name: 'Geoffrey Jellineck',
   avatar_image_url: 'http://avatar'
 }
@@ -182,9 +179,8 @@ const defaultProps = {
   canDisableElementaryDashboard: false,
   currentUser,
   currentUserRoles: ['admin'],
-  createPermissions: null,
+  createPermissions: 'none',
   plannerEnabled: false,
-  loadingOpportunities: false,
   loadAllOpportunities: () => {},
   timeZone: defaultEnv.TIMEZONE,
   hideGradesTabForStudents: false,
@@ -192,7 +188,6 @@ const defaultProps = {
   selectedContextCodes: ['course_1', 'course_3'],
   selectedContextsLimit: 2,
   parentSupportEnabled: false,
-  canAddObservee: false,
   observerList: MOCK_OBSERVER_LIST
 }
 
@@ -772,11 +767,11 @@ describe('K-5 Dashboard', () => {
 
   describe('Parent Support', () => {
     afterEach(() => {
-      document.cookie = `${observedUserCookieName}=`
+      document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=`
     })
 
     beforeEach(() => {
-      document.cookie = `${observedUserCookieName}=4;path=/`
+      document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=4;path=/`
     })
 
     const getLastRequest = async () => {
@@ -797,7 +792,6 @@ describe('K-5 Dashboard', () => {
         <K5Dashboard
           {...defaultProps}
           parentSupportEnabled
-          canAddObservee
           currentUserRoles={['user', 'observer']}
         />
       )
@@ -812,7 +806,6 @@ describe('K-5 Dashboard', () => {
           <K5Dashboard
             {...defaultProps}
             currentUserRoles={['user', 'observer', 'teacher']}
-            canAddObservee
             parentSupportEnabled
           />
         )
@@ -836,7 +829,6 @@ describe('K-5 Dashboard', () => {
             {...defaultProps}
             currentUserRoles={['user', 'observer', 'teacher']}
             parentSupportEnabled
-            canAddObservee
           />
         )
         const select = getByRole('combobox', {name: 'Select a student to view'})

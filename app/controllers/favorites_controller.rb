@@ -69,10 +69,8 @@ class FavoritesController < ApplicationController
   #
   def list_favorite_courses
     includes = Set.new(Array(params[:include]))
-    opts = {}
-    opts[:observee_user] = params[:observed_user].to_i if params.key?(:observed_user)
 
-    courses = @current_user.menu_courses(nil, opts)
+    courses = @current_user.menu_courses
     if courses.any? && value_to_boolean(params[:exclude_blueprint_courses])
       mc_ids = MasterCourses::MasterTemplate.active.where(:course_id => courses).pluck(:course_id)
       courses.reject! { |c| mc_ids.include?(c.id) }

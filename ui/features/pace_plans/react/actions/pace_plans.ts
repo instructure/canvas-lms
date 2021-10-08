@@ -93,9 +93,8 @@ const thunkActions = {
         publishForSectionIds,
         publishForEnrollmentIds
       )
-        .then(newDraftPlan => {
-          if (!newDraftPlan) throw new Error('Response body was empty')
-          dispatch(pacePlanActions.setPacePlan(newDraftPlan))
+        .then(response => {
+          dispatch(pacePlanActions.setPacePlan(response.new_draft_plan))
           dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.publishPlanFinished())
         })
@@ -119,9 +118,8 @@ const thunkActions = {
       )
 
       return Api.resetToLastPublished(contextType, contextId)
-        .then(pacePlan => {
-          if (!pacePlan) throw new Error('Response body was empty')
-          dispatch(pacePlanActions.setPacePlan(pacePlan))
+        .then(response => {
+          dispatch(pacePlanActions.setPacePlan(response.pace_plan))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {
@@ -142,9 +140,8 @@ const thunkActions = {
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
       return Api.getLatestDraftFor(contextType, contextId)
-        .then(pacePlan => {
-          if (!pacePlan) throw new Error('Response body was empty')
-          dispatch(afterAction(pacePlan))
+        .then(response => {
+          dispatch(afterAction(response.pace_plan))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {
@@ -161,9 +158,8 @@ const thunkActions = {
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
       return Api.relinkToParentPlan(getState().pacePlan.id)
-        .then(pacePlan => {
-          if (!pacePlan) throw new Error('Response body was empty')
-          dispatch(pacePlanActions.setPacePlan(pacePlan))
+        .then(response => {
+          dispatch(pacePlanActions.setPacePlan(response.pace_plan))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {

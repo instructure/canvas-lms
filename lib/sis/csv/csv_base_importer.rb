@@ -20,7 +20,7 @@
 
 require 'csv'
 
-require_dependency 'sis'
+require_dependency 'sis/common'
 
 module SIS
   module CSV
