@@ -862,7 +862,10 @@ module ApplicationHelper
     # from this account (or trusts, etc).
     return true unless @current_pseudonym
 
-    @current_pseudonym.works_for_account?(brand_config_account, ignore_types: [:site_admin])
+    @current_pseudonym.works_for_account?(
+      brand_config_account.root_account,
+      ignore_types: [:site_admin]
+    )
   end
 
   def include_account_js

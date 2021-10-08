@@ -404,6 +404,23 @@ describe ApplicationHelper do
           expect(helper.include_account_js).to be_nil
         end
 
+        it "renders for consortium admins in subaccounts" do
+          consortium_parent = account_model
+          root = account_model
+          sub = account_model(parent_account: root, root_account: root)
+
+          consortium_parent.settings[:consortium_parent_account] = true
+          consortium_parent.save!
+          consortium_parent.add_consortium_child(root)
+
+          @current_pseudonym = pseudonym_model(account: consortium_parent)
+          @brand_account = sub
+
+          allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(js_overrides: 'https://example.com/path/to/overrides.js')
+          output = helper.include_account_js
+          expect(output).to have_tag 'script', text: %r{https:\\/\\/example.com\\/path\\/to\\/overrides.js}
+        end
+
         context "sub-accounts" do
           before { set_up_subaccounts }
 
