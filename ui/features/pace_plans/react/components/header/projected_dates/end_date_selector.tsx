@@ -22,7 +22,7 @@ import {connect} from 'react-redux'
 import I18n from 'i18n!pace_plans_end_date_selector'
 import moment from 'moment-timezone'
 
-import {autoSavingActions as actions} from '../../../actions/pace_plans'
+import {pacePlanActions as actions} from '../../../actions/pace_plans'
 import PacePlanDateInput from '../../../shared/components/pace_plan_date_input'
 import {StoreState, PlanContextTypes} from '../../../types'
 import {BlackoutDate} from '../../../shared/types'
