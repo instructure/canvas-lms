@@ -196,10 +196,10 @@ module AccountReports
     end
 
     def account_query
-      accounts = root_account.all_accounts
-                             .select("accounts.*, pa.id AS parent_id,
-                pa.sis_source_id AS parent_sis_source_id")
-                             .joins("INNER JOIN #{Account.quoted_table_name} AS pa ON accounts.parent_account_id=pa.id")
+      root_account
+        .all_accounts
+        .select("accounts.*, pa.id AS parent_id, pa.sis_source_id AS parent_sis_source_id")
+        .joins("INNER JOIN #{Account.quoted_table_name} AS pa ON accounts.parent_account_id=pa.id")
     end
 
     def account_query_options(accounts)
@@ -333,7 +333,7 @@ module AccountReports
     end
 
     def course_query
-      courses = root_account.all_courses.preload(:account, :enrollment_term)
+      root_account.all_courses.preload(:account, :enrollment_term)
     end
 
     def course_query_options(courses)
@@ -349,7 +349,7 @@ module AccountReports
       end
 
       courses = add_course_sub_account_scope(courses)
-      courses = add_term_scope(courses)
+      add_term_scope(courses)
     end
 
     def course_row(c, course_state_sub, blueprint_map)
@@ -422,11 +422,12 @@ module AccountReports
     end
 
     def section_query
-      sections = root_account.course_sections
-                             .select("course_sections.*,
+      root_account
+        .course_sections
+        .select("course_sections.*,
                 rc.sis_source_id AS course_sis_id,
                 ra.id AS r_account_id, ra.sis_source_id AS r_account_sis_id")
-                             .joins("INNER JOIN #{Course.quoted_table_name} AS rc ON course_sections.course_id = rc.id
+        .joins("INNER JOIN #{Course.quoted_table_name} AS rc ON course_sections.course_id = rc.id
                INNER JOIN #{Account.quoted_table_name} AS ra ON rc.account_id = ra.id")
     end
 
@@ -448,7 +449,7 @@ module AccountReports
 
       sections = sections.where.not(course_sections: { sis_batch_id: nil }) if @created_by_sis
       sections = add_course_sub_account_scope(sections, 'rc')
-      sections = add_term_scope(sections, 'rc')
+      add_term_scope(sections, 'rc')
     end
 
     def section_row(s)
@@ -580,7 +581,7 @@ module AccountReports
                           .where("enrollments.type <> 'StudentViewEnrollment'")
       enrol = enrol.where.not(enrollments: { sis_batch_id: nil }) if @created_by_sis
       enrol = add_course_sub_account_scope(enrol)
-      enrol = add_term_scope(enrol)
+      add_term_scope(enrol)
     end
 
     def enrollment_headers(include_other_roots)
@@ -882,7 +883,7 @@ module AccountReports
       end
 
       xl = add_course_sub_account_scope(xl)
-      xl = add_term_scope(xl)
+      add_term_scope(xl)
     end
 
     def user_observers

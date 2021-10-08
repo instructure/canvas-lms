@@ -54,13 +54,13 @@ module RespondusSoapEndpoint
 
     protected
 
-    class BadAuthError < Exception; end
+    class BadAuthError < RuntimeError; end
 
-    class NeedDelegatedAuthError < Exception; end
+    class NeedDelegatedAuthError < RuntimeError; end
 
-    class CantReplaceError < Exception; end
+    class CantReplaceError < RuntimeError; end
 
-    class OtherError < Exception
+    class OtherError < RuntimeError
       attr_reader :errorStatus
 
       def initialize(errorStatus, msg = nil)
@@ -96,7 +96,7 @@ module RespondusSoapEndpoint
       @verifier.generate(session)
     end
 
-    def load_user_with_oauth(token, domain_root_account)
+    def load_user_with_oauth(token)
       token = AccessToken.authenticate(token)
       if !token.try(:user)
         raise(BadAuthError)
@@ -112,7 +112,7 @@ module RespondusSoapEndpoint
       domain_root_account = rack_env['canvas.domain_root_account'] || Account.default
       if userName == OAUTH_TOKEN_USERNAME
         # password is the oauth token
-        return load_user_with_oauth(password, domain_root_account)
+        return load_user_with_oauth(password)
       end
 
       Authlogic::Session::Base.controller = AuthlogicAdapter.new(self)
@@ -148,8 +148,8 @@ module RespondusSoapEndpoint
       load_session(context)
       return_args = send("_#{method}", userName, password, context, *args) || []
       ["Success", '', dump_session] + return_args
-    rescue Exception => ex
-      case ex
+    rescue => e
+      case e
       when NotImplementedError
         ["Function not implemented"]
       when BadAuthError
@@ -161,24 +161,28 @@ module RespondusSoapEndpoint
       when CantReplaceError
         ["Item cannot be replaced"]
       when OtherError
-        [ex.errorStatus, '']
+        [e.errorStatus, '']
       else
-        Rails.logger.error "Error in Respondus API call: #{ex.inspect}\n#{ex.backtrace.join("\n")}"
+        Rails.logger.error "Error in Respondus API call: #{e.inspect}\n#{e.backtrace.join("\n")}"
         ["Server failure"]
       end
     end
 
-    def self.wrap_api_call(*methods)
-      methods.each do |method|
-        alias_method "_#{method}", method
-        class_eval(<<-METHOD, __FILE__, __LINE__ + 1)
-        def #{method}(userName, password, context, *args)
-          ret = nil
-          ms = [Benchmark.ms { ret = make_call(:#{method}, userName, password, context, *args) }, 0.01].max
-          Rails.logger.debug "Completed in \#{ms}ms | \#{ret.first.inspect} [Respondus SOAP API]\\n"
-          ret
+    class << self
+      protected
+
+      def wrap_api_call(*methods)
+        methods.each do |method|
+          alias_method "_#{method}", method
+          class_eval(<<~RUBY, __FILE__, __LINE__ + 1)
+            def #{method}(userName, password, context, *args)
+              ret = nil
+              ms = [Benchmark.ms { ret = make_call(:#{method}, userName, password, context, *args) }, 0.01].max
+              Rails.logger.debug "Completed in \#{ms}ms | \#{ret.first.inspect} [Respondus SOAP API]\\n"
+              ret
+            end
+          RUBY
         end
-        METHOD
       end
     end
 
@@ -198,7 +202,7 @@ module RespondusSoapEndpoint
     #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
     #   identification  C_String - {http://www.w3.org/2001/XMLSchema}string
     #
-    def identifyServer(userName, password, context)
+    def identifyServer(_userName, _password, _context)
       return [%{
 Respondus Generic Server API
 Contract version: 1
@@ -219,7 +223,7 @@ Implemented for: Canvas LMS}]
     #   serverStatus    C_String - {http://www.w3.org/2001/XMLSchema}string
     #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
     #
-    def validateAuth(userName, password, context, institution)
+    def validateAuth(_userName, _password, _context, _institution)
       # The validation happens in load_user
       []
     end
@@ -239,7 +243,7 @@ Implemented for: Canvas LMS}]
     #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
     #   itemList        NVPairList - {urn:RespondusAPI}NVPairList
     #
-    def getServerItems(userName, password, context, itemType)
+    def getServerItems(_userName, _password, _context, itemType)
       selection_state = session['selection_state'] || []
 
       list = NVPairList.new
@@ -336,7 +340,7 @@ Implemented for: Canvas LMS}]
     #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
     #   itemID          C_String - {http://www.w3.org/2001/XMLSchema}string
     #
-    def publishServerItem(userName, password, context, itemType, itemName, uploadType, fileName, fileData)
+    def publishServerItem(_userName, _password, _context, itemType, _itemName, uploadType, fileName, fileData)
       do_import(nil, itemType, uploadType, fileName, fileData)
     end
 
@@ -377,7 +381,7 @@ Implemented for: Canvas LMS}]
     #   serverStatus    C_String - {http://www.w3.org/2001/XMLSchema}string
     #   context         C_String - {http://www.w3.org/2001/XMLSchema}string
     #
-    def replaceServerItem(userName, password, context, itemType, itemID, uploadType, fileName, fileData)
+    def replaceServerItem(_userName, _password, _context, itemType, itemID, uploadType, fileName, fileData)
       scope = get_scope(session, itemType)
       item = scope.where(id: itemID).first
       raise(CantReplaceError) unless item
@@ -526,7 +530,7 @@ Implemented for: Canvas LMS}]
 
     ATTACHMENT_FOLDER_NAME = 'imported qti files'
 
-    def do_import(item, itemType, uploadType, fileName, fileData)
+    def do_import(item, itemType, uploadType, _fileName, fileData)
       if fileData == "\x0" && session['pending_migration_id']
         return poll_for_completion()
       end
@@ -599,7 +603,7 @@ Implemented for: Canvas LMS}]
           loop do
             ret = poll_for_completion()
             if ret == ['pending']
-              sleep(Setting.get('respondus_endpoint.polling_time', '2').to_f)
+              sleep(Setting.get('respondus_endpoint.polling_time', '2').to_f) # rubocop:disable Lint/NoSleep
             else
               return ret
             end

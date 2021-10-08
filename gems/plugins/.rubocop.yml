@@ -1,0 +1,23 @@
+inherit_from:
+  ../../.rubocop.yml
+
+Lint:
+  Severity: error
+
+<%=
+
+# re-set individual cops to error
+require 'yaml'
+
+common_config = YAML.safe_load(File.read("../../.rubocop.common.yml"))
+
+config = {}
+
+common_config.each do |cop, cop_config|
+  next unless cop.start_with?("Lint/")
+  config[cop] = { "Severity" => "error" }
+  config[cop]["AutoCorrect"] = true if cop_config["AutoCorrect"]
+end
+
+config.to_yaml.sub(/^---\n/, "")
+%>

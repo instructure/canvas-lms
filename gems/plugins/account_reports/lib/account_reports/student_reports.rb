@@ -181,8 +181,6 @@ module AccountReports
                          .where("enrollments.type = 'StudentEnrollment'
                AND enrollments.workflow_state = 'active'")
 
-      param = {}
-
       if start_at
         data = data.where("enrollments.last_activity_at < ? OR enrollments.last_activity_at IS NULL", start_at)
         # Only select enrollments that have zero activity across an entire course.
