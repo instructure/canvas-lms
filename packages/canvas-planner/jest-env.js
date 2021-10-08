@@ -17,14 +17,12 @@
  */
 
 import '@instructure/canvas-theme'
-import generateId from 'format-message-generate-id/underscored_crc32'
 
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 
 import {filterUselessConsoleMessages} from '@instructure/js-utils'
-import translations from './src/i18n/indexLocales'
-import formatMessage from './src/format-message'
+import i18n from './src/i18n'
 
 filterUselessConsoleMessages(console)
 
@@ -33,10 +31,7 @@ Enzyme.configure({
   adapter: new Adapter()
 })
 
-formatMessage.setup({
-  generateId,
-  translations
-})
+i18n.init('en')
 
 document.documentElement.setAttribute('dir', 'ltr')
 
