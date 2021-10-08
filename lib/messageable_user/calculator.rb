@@ -837,13 +837,13 @@ class MessageableUser
                               .select("group_memberships.group_id AS group_id")
                               .distinct
                               .joins(:user, :group)
-                              .joins(<<~SQL)
+                              .joins(<<~SQL).
                                 INNER JOIN #{Enrollment.quoted_table_name} ON
                                   enrollments.user_id=users.id AND
                                   enrollments.course_id=groups.context_id
                                 INNER JOIN #{Course.quoted_table_name} ON courses.id=enrollments.course_id
                               SQL
-                              .where(:workflow_state => 'accepted')
+                              where(:workflow_state => 'accepted')
                               .where("groups.workflow_state<>'deleted'")
                               .where(MessageableUser::AVAILABLE_CONDITIONS)
                               .where(:groups => { :context_type => 'Course' })

@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_settings'
 import {connect} from 'react-redux'
 

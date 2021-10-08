@@ -234,14 +234,13 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = [
-    :cc_in_rce_video_tray, :featured_help_links, :rce_pretty_html_editor,
+    :cc_in_rce_video_tray, :featured_help_links, :rce_pretty_html_editor, :rce_better_file_previewing,
     :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons, :important_dates, :feature_flag_filters, :k5_parent_support,
-    :k5_homeroom_many_announcements, :conferencing_in_planner, :remember_settings_tab, :word_count_in_speed_grader
+    :k5_homeroom_many_announcements, :conferencing_in_planner
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :responsive_awareness, :responsive_misc, :product_tours, :files_dnd, :usage_rights_discussion_topics,
-    :inline_math_everywhere, :granular_permissions_manage_users, :rce_limit_init_render_on_page, :create_course_subaccount_picker,
-    :lti_deep_linking_module_index_menu, :lti_multiple_assignment_deep_linking
+    :inline_math_everywhere, :granular_permissions_manage_users, :rce_limit_init_render_on_page, :create_course_subaccount_picker
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes
@@ -772,7 +771,7 @@ class ApplicationController < ActionController::Base
     render_unauthorized_action unless can_do
     can_do
   end
-  alias_method :authorized_action?, :authorized_action
+  alias :authorized_action? :authorized_action
 
   def fix_ms_office_redirects
     if ms_office?
@@ -2473,7 +2472,7 @@ class ApplicationController < ActionController::Base
   helper_method :flash_notices
 
   def unsupported_browser
-    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', t(:'#community.basics_browser_requirements')))
+    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', t(:'community_link.basics_browser_requirements')))
   end
 
   def browser_supported?

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require_relative './concerns/deep_linking_spec_helper'
 
 module Lti
@@ -68,12 +68,12 @@ module Lti
 
         context 'create resource links' do
           let(:launch_url) { 'http://tool.url/launch' }
-          let(:content_items) do
+          let(:content_items) {
             [
               { type: 'ltiResourceLink', url: launch_url, title: 'Item 1' },
               { type: 'link', url: 'http://too.url/sample', title: 'Item 2' }
             ]
-          end
+          }
           let!(:tool) do
             tool = external_tool_model(
               context: account,
@@ -174,16 +174,20 @@ module Lti
           end
           let(:stubbed_response) { double(success?: true, parsed_response: public_jwk_url_response) }
 
-          before do
-            allow(HTTParty).to receive(:get).with(url).and_return(stubbed_response)
+          def expected_url_called(url, type, response)
+            expect(HTTParty).to receive(type).with(url).and_return(response)
           end
 
           context 'when there is no public jwk' do
             before do
+              public_jwk_url_response = { keys: [public_jwk] }
               developer_key.update!(public_jwk: nil, public_jwk_url: url)
             end
 
-            it { is_expected.to be_successful }
+            it do
+              expected_url_called(url, :get, stubbed_response)
+              is_expected.to be_successful
+            end
           end
 
           context 'when there is a public jwk' do
@@ -191,7 +195,10 @@ module Lti
               developer_key.update!(public_jwk_url: url)
             end
 
-            it { is_expected.to be_successful }
+            it do
+              expected_url_called(url, :get, stubbed_response)
+              is_expected.to be_successful
+            end
           end
 
           context 'when an empty object is returned' do
@@ -203,6 +210,7 @@ module Lti
             end
 
             it do
+              expected_url_called(url, :get, stubbed_response)
               subject
               expect(json_parse['errors'].to_s).to include response_message
             end
@@ -211,17 +219,19 @@ module Lti
           context 'when the url is not valid giving a 404' do
             let(:stubbed_response) { double(success?: false, parsed_response: public_jwk_url_response.to_json) }
             let(:response_message) { 'JWT verification failure' }
+
+            before do
+              developer_key.update!(public_jwk_url: url)
+            end
+
             let(:public_jwk_url_response) do
               {
                 success?: false, code: '404'
               }
             end
 
-            before do
-              developer_key.update!(public_jwk_url: url)
-            end
-
             it do
+              expected_url_called(url, :get, stubbed_response)
               subject
               expect(json_parse['errors'].to_s).to include response_message
             end
@@ -278,6 +288,7 @@ module Lti
 
         context 'when module item content items are received' do
           let(:course) { course_model }
+          let(:context_module) { course.context_modules.create!(:name => 'Test Module') }
           let(:developer_key) do
             key = DeveloperKey.create!(account: course.account)
             key.generate_rsa_keypair!
@@ -288,7 +299,7 @@ module Lti
             key
           end
 
-          let(:context_external_tool) do
+          let(:context_external_tool) {
             ContextExternalTool.create!(
               context: course.account,
               url: 'http://tool.url/login',
@@ -298,7 +309,9 @@ module Lti
               developer_key: developer_key,
               settings: { use_1_3: true }
             )
-          end
+          }
+
+          let(:params) { super().merge({ course_id: course.id, context_module_id: context_module.id }) }
           let(:launch_url) { 'http://tool.url/launch' }
 
           before do
@@ -307,146 +320,92 @@ module Lti
             context_external_tool
           end
 
-          context 'when context_module_id param is included' do
-            let(:context_module) { course.context_modules.create!(:name => 'Test Module') }
-            let(:params) { super().merge({ course_id: course.id, context_module_id: context_module.id }) }
-
-            context 'single item' do
-              let(:content_items) do
-                [{ type: 'ltiResourceLink', url: launch_url, title: 'Item 1', custom_params: { "a" => "b" } }]
-              end
-
-              it "doesn't create a resource link" do
-                # The resource links for these are rather created when the module item is created
-                expect { subject }.not_to change { course.lti_resource_links.count }
-              end
-
-              it "doesn't create a module item" do
-                expect { subject }.not_to change { context_module.content_tags.count }
-              end
+          context 'single item' do
+            let(:content_items) do
+              [{ type: 'ltiResourceLink', url: launch_url, title: 'Item 1', custom_params: { "a" => "b" } }]
             end
 
-            context 'multiple items' do
-              let(:content_items) do
-                [
-                  { type: 'ltiResourceLink', url: launch_url, title: 'Item 1' },
-                  { type: 'ltiResourceLink', url: launch_url, title: 'Item 2', custom: { mycustom: '123' } },
-                  { type: 'ltiResourceLink', url: launch_url, title: 'Item 3' }
-                ]
-              end
+            it "doesn't create a resource link" do
+              # The resource links for these are rather created when the module item is created
+              expect { subject }.not_to change { course.lti_resource_links.count }
+            end
 
-              it 'creates multiple module items' do
-                expect(subject).to be_successful
-                expect(context_module.content_tags.count).to eq(3)
-              end
-
-              it 'creates all resource links' do
-                expect(course.lti_resource_links).to be_empty
-                expect(subject).to be_successful
-                expect(course.lti_resource_links.size).to eq 3
-              end
-
-              it "adds the resource link as the content tag's associated asset" do
-                expect(subject).to be_successful
-
-                content_tags = context_module.content_tags
-                lti_resource_links = course.lti_resource_links
-
-                expect(content_tags.first.associated_asset).to eq(lti_resource_links.first)
-                expect(content_tags.second.associated_asset).to eq(lti_resource_links.second)
-                expect(content_tags.last.associated_asset).to eq(lti_resource_links.last)
-              end
-
-              it 'adds custom params to the resource links' do
-                expect(subject).to be_successful
-                expect(course.lti_resource_links.second.custom).to eq('mycustom' => '123')
-              end
-
-              it 'does not pass launch dimensions' do
-                expect(subject).to be_successful
-                expect(context_module.content_tags[0][:link_settings]).to be(nil)
-              end
-
-              context 'when content items have iframe property' do
-                let(:content_items) do
-                  [
-                    { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 1' },
-                    { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 2' },
-                    { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 3' }
-                  ]
-                end
-
-                it 'passes launch dimensions as link_settings' do
-                  expect(subject).to be_successful
-                  expect(context_module.content_tags[0][:link_settings]['selection_width']).to be(642)
-                  expect(context_module.content_tags[0][:link_settings]['selection_height']).to be(842)
-                end
-              end
-
-              context 'when the user is not authorized' do
-                before do
-                  u = User.create
-                  user_session u
-                end
-
-                it "returns 'unauthorized' (and doesn't render twice)" do
-                  subject
-                  expect(response).to have_http_status(:unauthorized)
-                end
-              end
+            it "doesn't create a module item" do
+              expect { subject }.not_to change { context_module.content_tags.count }
             end
           end
 
-          context 'when create_new_module param is included' do
-            let(:params) { super().merge({ course_id: course.id, create_new_module: true }) }
+          context 'multiple items' do
+            let(:content_items) {
+              [
+                { type: 'ltiResourceLink', url: launch_url, title: 'Item 1' },
+                { type: 'ltiResourceLink', url: launch_url, title: 'Item 2', custom: { mycustom: '123' } },
+                { type: 'ltiResourceLink', url: launch_url, title: 'Item 3' }
+              ]
+            }
 
-            context 'when feature flag is disabled' do
-              it 'does not change anything' do
-                expect { subject }.not_to change { course.context_modules.count }
-                expect { subject }.not_to change { course.lti_resource_links.count }
-                expect { subject }.not_to change { ContentTag.where(context: course).count }
+            it 'creates multiple modules items' do
+              subject
+              is_expected.to be_successful
+              expect(context_module.content_tags.count).to eq(3)
+            end
+
+            it 'creates all resource links' do
+              expect(course.lti_resource_links).to be_empty
+              subject
+              is_expected.to be_successful
+              expect(course.lti_resource_links.size).to eq 3
+            end
+
+            it "adds the resource link as the content tag's associated asset" do
+              subject
+              is_expected.to be_successful
+
+              content_tags = context_module.content_tags
+              lti_resource_links = course.lti_resource_links
+
+              expect(content_tags.first.associated_asset).to eq(lti_resource_links.first)
+              expect(content_tags.second.associated_asset).to eq(lti_resource_links.second)
+              expect(content_tags.last.associated_asset).to eq(lti_resource_links.last)
+            end
+
+            it 'adds custom params to the resource links' do
+              expect(subject).to be_successful
+              expect(course.lti_resource_links.second.custom).to eq('mycustom' => '123')
+            end
+
+            it 'does not pass launch dimensions' do
+              subject
+              is_expected.to be_successful
+              expect(context_module.content_tags[0][:link_settings]).to be(nil)
+            end
+
+            context 'when content items have iframe property' do
+              let(:content_items) {
+                [
+                  { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 1' },
+                  { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 2' },
+                  { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 3' }
+                ]
+              }
+
+              it 'passes launch dimensions as link_settings' do
+                subject
+                is_expected.to be_successful
+                expect(context_module.content_tags[0][:link_settings]['selection_width']).to be(642)
+                expect(context_module.content_tags[0][:link_settings]['selection_height']).to be(842)
               end
             end
 
-            context 'when feature flag is enabled' do
-              before :once do
-                course.root_account.enable_feature!(:lti_deep_linking_module_index_menu)
+            context 'when the user is not authorized' do
+              before do
+                u = User.create
+                user_session u
               end
 
-              it 'creates a new context module' do
-                expect { subject }.to change { course.context_modules.count }.by 1
-              end
-
-              context 'single item' do
-                let(:content_items) do
-                  [{ type: 'ltiResourceLink', url: launch_url, title: 'Item 1' }]
-                end
-
-                it "creates a resource link" do
-                  expect { subject }.to change { course.lti_resource_links.count }.by 1
-                end
-
-                it "creates a module item" do
-                  expect { subject }.to change { ContentTag.where(context: course).count }.by 1
-                end
-              end
-
-              context 'multiple items' do
-                let(:content_items) do
-                  [
-                    { type: 'ltiResourceLink', url: launch_url, title: 'Item 1' },
-                    { type: 'ltiResourceLink', url: launch_url, title: 'Item 2' },
-                    { type: 'ltiResourceLink', url: launch_url, title: 'Item 3' }
-                  ]
-                end
-
-                it 'creates one resource link per item' do
-                  expect { subject }.to change { course.lti_resource_links.count }.by 3
-                end
-
-                it 'creates one module item per item' do
-                  expect { subject }.to change { ContentTag.where(context: course).count }.by 3
-                end
+              it "returns 'unauthorized' (and doesn't render twice)" do
+                subject
+                expect(response).to have_http_status(:unauthorized)
               end
             end
           end

@@ -95,9 +95,8 @@ export enum PublishOptions {
 /* Redux state types */
 
 export type EnrollmentsState = Enrollments
-export type PacePlansState = PacePlan
 export type SectionsState = Sections
-export type ResponsiveSizes = 'small' | 'large'
+export type PacePlansState = PacePlan
 
 export interface UIState {
   readonly autoSaving: boolean
@@ -107,7 +106,6 @@ export interface UIState {
   readonly selectedContextType: PlanContextTypes
   readonly selectedContextId: string
   readonly loadingMessage: string
-  readonly responsiveSize: ResponsiveSizes
   readonly showLoadingOverlay: boolean
   readonly showProjections: boolean
   readonly editingBlackoutDates: boolean

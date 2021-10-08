@@ -113,15 +113,12 @@ export const handlers = [
       return res(
         ctx.data({
           legacyNode: DiscussionEntry.mock({
-            isolatedEntryId: '77',
-            parentId: '77',
             discussionSubentriesConnection: {
               nodes: [
                 DiscussionEntry.mock({
                   _id: '50',
                   id: '50',
-                  message: '<p>This is the child reply asc</p>',
-                  isolatedEntryId: '77'
+                  message: '<p>This is the child reply asc</p>'
                 })
               ],
               pageInfo: PageInfo.mock(),

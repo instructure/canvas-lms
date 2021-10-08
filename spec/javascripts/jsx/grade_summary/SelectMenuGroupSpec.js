@@ -29,7 +29,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
     const assignmentSortOptions = [
       ['Assignment Group', 'assignment_group'],
       ['Due Date', 'due_date'],
-      ['Name', 'title']
+      ['Title', 'title']
     ]
 
     const courses = [

@@ -47,7 +47,7 @@ class PlannerOverride < ActiveRecord::Base
     state :deleted
   end
 
-  alias_method :published?, :active?
+  alias published? active?
 
   def link_to_parent_topic
     return unless self.plannable_type == 'DiscussionTopic'
