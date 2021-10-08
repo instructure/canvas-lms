@@ -184,6 +184,7 @@ const defaultProps = {
   currentUserRoles: ['admin'],
   createPermissions: null,
   plannerEnabled: false,
+  loadingOpportunities: false,
   loadAllOpportunities: () => {},
   timeZone: defaultEnv.TIMEZONE,
   hideGradesTabForStudents: false,
@@ -191,6 +192,7 @@ const defaultProps = {
   selectedContextCodes: ['course_1', 'course_3'],
   selectedContextsLimit: 2,
   parentSupportEnabled: false,
+  canAddObservee: false,
   observerList: MOCK_OBSERVER_LIST
 }
 
@@ -795,6 +797,7 @@ describe('K-5 Dashboard', () => {
         <K5Dashboard
           {...defaultProps}
           parentSupportEnabled
+          canAddObservee
           currentUserRoles={['user', 'observer']}
         />
       )
@@ -809,6 +812,7 @@ describe('K-5 Dashboard', () => {
           <K5Dashboard
             {...defaultProps}
             currentUserRoles={['user', 'observer', 'teacher']}
+            canAddObservee
             parentSupportEnabled
           />
         )
@@ -832,6 +836,7 @@ describe('K-5 Dashboard', () => {
             {...defaultProps}
             currentUserRoles={['user', 'observer', 'teacher']}
             parentSupportEnabled
+            canAddObservee
           />
         )
         const select = getByRole('combobox', {name: 'Select a student to view'})
