@@ -24,7 +24,7 @@ module Lti
 
     def initialize(tool_proxy:, tool_consumer_profile:)
       @tool_proxy = tool_proxy
-      @validator = IMS::LTI::Services::ToolProxyValidator.new(tool_proxy)
+      @validator = ::IMS::LTI::Services::ToolProxyValidator.new(tool_proxy)
       @validator.tool_consumer_profile = tool_consumer_profile
     end
 

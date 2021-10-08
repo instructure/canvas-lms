@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require_dependency "lti/ims/tool_consumer_profile_controller"
 
 module Lti
-  module Ims
+  module IMS
     describe ToolConsumerProfileController, type: :request do
       describe "GET 'tool_consumer_profile'" do
         let(:account) { Account.create! }
@@ -40,7 +40,7 @@ module Lti
           get "/api/lti/accounts/#{account.id}/tool_consumer_profile/#{tool_consumer_profile_id}",
               params: { tool_consumer_profile_id: tool_consumer_profile_id,
                         account_id: account.id }
-          profile = IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
+          profile = ::IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
           expect(profile.type).to eq 'ToolConsumerProfile'
         end
 
@@ -51,7 +51,7 @@ module Lti
           get "/api/lti/accounts/#{account.id}/tool_consumer_profile/#{tool_consumer_profile_id}",
               params: { tool_consumer_profile_id: tool_consumer_profile_id,
                         account_id: account.id }
-          profile = IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
+          profile = ::IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
           expect(profile.services_offered.to_s).not_to include restricted_service
         end
 
@@ -62,7 +62,7 @@ module Lti
           get "/api/lti/accounts/#{account.id}/tool_consumer_profile/#{tool_consumer_profile_id}",
               params: { tool_consumer_profile_id: tool_consumer_profile_id,
                         account_id: account.id }
-          profile = IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
+          profile = ::IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
 
           expect(profile.capability_offered).not_to include restricted_cap
         end
@@ -92,7 +92,7 @@ module Lti
           get "/api/lti/accounts/#{account.id}/tool_consumer_profile",
               params: { account_id: account.id },
               headers: request_headers
-          profile = IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
+          profile = ::IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
 
           expect(profile.guid).to eq tcp.uuid
         end
@@ -102,7 +102,7 @@ module Lti
           get "/api/lti/accounts/#{account.id}/tool_consumer_profile/#{tcp.uuid}",
               params: { tool_consumer_profile_id: tcp.uuid, account_id: account.id },
               headers: request_headers
-          profile = IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
+          profile = ::IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
 
           expect(profile.services_offered.to_s).to include restricted_service
         end
@@ -112,7 +112,7 @@ module Lti
           get "/api/lti/accounts/#{account.id}/tool_consumer_profile/#{tcp.uuid}",
               params: { tool_consumer_profile_id: tcp.uuid, account_id: account.id },
               headers: request_headers
-          profile = IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
+          profile = ::IMS::LTI::Models::ToolConsumerProfile.new.from_json(response.body)
           expect(profile.capability_offered).to include restricted_cap
         end
       end

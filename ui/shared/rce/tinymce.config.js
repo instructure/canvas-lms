@@ -80,6 +80,14 @@ export default class EditorConfig {
 
       content_css: window.ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css,
 
+      style_formats: [
+        {title: 'Heading 2', format: 'h2'},
+        {title: 'Heading 3', format: 'h3'},
+        {title: 'Heading 4', format: 'h4'},
+        {title: 'Heading 5', format: 'h5'},
+        {title: 'Heading 6', format: 'h6'}
+      ],
+
       init_instance_callback: ed => {
         $(`#tinymce-parent-of-${ed.id}`) // eslint-disable-line no-undef
           .css('visibility', 'visible')

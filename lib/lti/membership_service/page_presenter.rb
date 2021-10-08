@@ -25,7 +25,7 @@ module Lti
       def initialize(context, user, base_url, opts = {})
         @membership_collator = MembershipCollatorFactory.collator_instance(context, user, opts)
         @base_url = base_url
-        @page = IMS::LTI::Models::MembershipService::Page.new(
+        @page = ::IMS::LTI::Models::MembershipService::Page.new(
           page_of: page_of,
           next_page: next_page
         )
@@ -53,13 +53,13 @@ module Lti
       end
 
       def page_of
-        IMS::LTI::Models::MembershipService::LISMembershipContainer.new(
+        ::IMS::LTI::Models::MembershipService::LISMembershipContainer.new(
           membership_subject: context
         )
       end
 
       def context
-        IMS::LTI::Models::MembershipService::Context.new(
+        ::IMS::LTI::Models::MembershipService::Context.new(
           name: @membership_collator.context.name,
           membership: @membership_collator.memberships,
           context_id: Lti::Asset.opaque_identifier_for(@membership_collator.context)

@@ -72,7 +72,7 @@ describe Lti::Messages::ResourceLinkRequest do
   end
 
   shared_examples 'assignment resource link id check' do
-    let(:launch_error) { Lti::Ims::AdvantageErrors::InvalidLaunchError }
+    let(:launch_error) { Lti::IMS::AdvantageErrors::InvalidLaunchError }
     let(:api_message) { raise 'set in example' }
     let(:course_jws) { jwt_message.generate_post_payload }
 

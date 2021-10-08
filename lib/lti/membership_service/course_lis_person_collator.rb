@@ -41,15 +41,15 @@ module Lti
         enrollments.map do |enrollment|
           case enrollment.type
           when 'TeacherEnrollment'
-            IMS::LIS::Roles::Context::URNs::Instructor
+            ::IMS::LIS::Roles::Context::URNs::Instructor
           when 'TaEnrollment'
-            IMS::LIS::Roles::Context::URNs::TeachingAssistant
+            ::IMS::LIS::Roles::Context::URNs::TeachingAssistant
           when 'DesignerEnrollment'
-            IMS::LIS::Roles::Context::URNs::ContentDeveloper
+            ::IMS::LIS::Roles::Context::URNs::ContentDeveloper
           when 'StudentEnrollment'
-            IMS::LIS::Roles::Context::URNs::Learner
+            ::IMS::LIS::Roles::Context::URNs::Learner
           when 'ObserverEnrollment'
-            IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner
+            ::IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner
           end
         end.compact.uniq
       end

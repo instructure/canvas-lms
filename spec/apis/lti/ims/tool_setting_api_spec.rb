@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require_dependency "lti/ims/tool_setting_controller"
 
 module Lti
-  module Ims
+  module IMS
     describe ToolSettingController, type: :request do
       let(:account) { Account.new }
       let(:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }

@@ -20,12 +20,12 @@
 require 'json/jwt'
 
 module Lti
-  module Ims
+  module IMS
     class DeepLinkingController < ApplicationController
       protect_from_forgery except: [:deep_linking_response], with: :exception
 
-      include Lti::Ims::Concerns::DeepLinkingServices
-      include Lti::Ims::Concerns::DeepLinkingModules
+      include Lti::IMS::Concerns::DeepLinkingServices
+      include Lti::IMS::Concerns::DeepLinkingModules
 
       before_action :require_context
       before_action :validate_jwt

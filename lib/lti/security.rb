@@ -34,7 +34,7 @@ module Lti
     # This is the correct way to sign the params, but in the name of not breaking things, we are using the
     # #generate_params_deprecated method by default
     def self.signed_post_params_frd(params, url, key, secret)
-      message = IMS::LTI::Models::Messages::Message.generate(params.merge({ oauth_consumer_key: key }))
+      message = ::IMS::LTI::Models::Messages::Message.generate(params.merge({ oauth_consumer_key: key }))
       message.launch_url = url
       signed_parameters = message.signed_post_params(secret).stringify_keys
 

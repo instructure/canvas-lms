@@ -77,7 +77,7 @@ module Lti
   #         }
   #
   class DataServicesController < ApplicationController
-    include Ims::Concerns::AdvantageServices
+    include ::Lti::IMS::Concerns::AdvantageServices
     MIME_TYPE = 'application/vnd.canvas.dataservices+json'.freeze
 
     ACTION_SCOPE_MATCHERS = {

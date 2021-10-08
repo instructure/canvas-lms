@@ -23,7 +23,7 @@ require_dependency "lti/ims/authorization_controller"
 require 'json/jwt'
 
 module Lti
-  module Ims
+  module IMS
     describe AuthorizationController, type: :request do
       let(:account) { Account.create! }
 

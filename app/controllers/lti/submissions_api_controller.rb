@@ -138,7 +138,7 @@ module Lti
   #       }
   #     }
   class SubmissionsApiController < ApplicationController
-    include Lti::Ims::AccessTokenHelper
+    include Lti::IMS::AccessTokenHelper
     include Api::V1::Submission
     include AttachmentHelper
 

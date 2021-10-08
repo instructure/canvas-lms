@@ -19,7 +19,7 @@
 
 require 'spec_helper'
 
-describe Lti::Ims::ResultsSerializer do
+describe Lti::IMS::ResultsSerializer do
   subject { described_class.new(result, url).as_json }
 
   let(:result) { lti_result_model result_score: 10, result_maximum: 10 }

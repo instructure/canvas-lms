@@ -21,10 +21,10 @@
 require 'ims/lti'
 
 module Lti
-  module Ims
+  module IMS
     class ToolSettingController < ApplicationController
       include Lti::ApiServiceHelper
-      include Lti::Ims::AccessTokenHelper
+      include Lti::IMS::AccessTokenHelper
 
       rescue_from ActiveRecord::RecordNotFound do
         render json: {
@@ -110,7 +110,7 @@ module Lti
 
           if request.headers['accept'].include?('application/vnd.ims.lti.v2.toolsettings+json')
             @content_type = 'application/vnd.ims.lti.v2.toolsettings+json'
-            IMS::LTI::Models::ToolSettingContainer.new(graph: graph)
+            ::IMS::LTI::Models::ToolSettingContainer.new(graph: graph)
           elsif bubble == 'distinct' && request.headers['accept'].include?('application/vnd.ims.lti.v2.toolsettings.simple+json')
             @content_type = 'application/vnd.ims.lti.v2.toolsettings.simple+json'
             custom = {}
@@ -120,7 +120,7 @@ module Lti
         else
           if request.headers['accept'].include?('application/vnd.ims.lti.v2.toolsettings+json')
             @content_type = 'application/vnd.ims.lti.v2.toolsettings+json'
-            IMS::LTI::Models::ToolSettingContainer.new(graph: [collect_tool_settings(tool_setting)])
+            ::IMS::LTI::Models::ToolSettingContainer.new(graph: [collect_tool_settings(tool_setting)])
           else
             @content_type = 'application/vnd.ims.lti.v2.toolsettings.simple+json'
             tool_setting.custom || {}
@@ -133,7 +133,7 @@ module Lti
         url = show_lti_tool_settings_url(tool_setting.id)
         custom = tool_setting.custom || {}
         custom.delete_if { |k, _| distinct.include? k } if distinct
-        IMS::LTI::Models::ToolSetting.new(custom: custom, type: type, id: url)
+        ::IMS::LTI::Models::ToolSetting.new(custom: custom, type: type, id: url)
       end
 
       def custom_settings(type, json)
