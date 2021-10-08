@@ -224,6 +224,10 @@ module SIS
             user.pronouns = (user_row.pronouns == '<delete>') ? nil : user_row.pronouns
           end
 
+          if user_row.declared_user_type.present?
+            pseudo.declared_user_type = user_row.declared_user_type == '<delete>' ? nil : user_row.declared_user_type
+          end
+
           if !status_is_active && !user.new_record?
             if user.id == @batch&.user_id
               message = "Can't remove yourself user_id '#{user_row.user_id}'"

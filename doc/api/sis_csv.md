@@ -274,6 +274,15 @@ recommended to omit this field over using fake email addresses for testing.</td>
 <td>User's preferred pronouns. Can pass "&lt;delete>" to remove the pronoun from the user.</td>
 </tr>
 <tr>
+<td>declared_user_type</td>
+<td>enum</td>
+<td></td>
+<td></td>
+<td>User's declared user type. Can be either administrative, observer, staff,
+student, student_other, or teacher. Can pass "&lt;delete>" to remove the
+declared user type from the user.</td>
+</tr>
+<tr>
 <td>status</td>
 <td>enum</td>
 <td>✓</td>

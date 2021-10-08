@@ -308,6 +308,45 @@ describe SIS::CSV::UserImporter do
     end
   end
 
+  describe 'declared_user_type' do
+    it "adds declared_user_type to users" do
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status,declared_user_type",
+        "user_1,user1,tom riddle,active,teacher"
+      )
+      user = Pseudonym.by_unique_id('user1').first.user
+      expect(user.pseudonym.declared_user_type).to eq 'teacher'
+    end
+
+    it "deletes users set declared_user_type when requested" do
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status,declared_user_type",
+        "user_1,user1,tom riddle,active,teacher"
+      )
+      user = Pseudonym.by_unique_id('user1').first.user
+      expect(user.pseudonym.declared_user_type).to eq 'teacher'
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status,declared_user_type",
+        "user_1,user1,tom riddle,active,<delete>"
+      )
+      expect(user.reload.pseudonym.declared_user_type).to be_nil
+    end
+
+    it "does not delete users set declared_user_type when not set" do
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status,declared_user_type",
+        "user_1,user1,tom riddle,active,teacher"
+      )
+      user = Pseudonym.by_unique_id('user1').first.user
+      expect(user.pseudonym.declared_user_type).to eq 'teacher'
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status",
+        "user_1,user1,tom riddle,active"
+      )
+      expect(user.reload.pseudonym.declared_user_type).to eq 'teacher'
+    end
+  end
+
   it "uses sortable_name if none of first_name/last_name/full_name is given" do
     process_csv_data_cleanly(
       "user_id,login_id,sortable_name,short_name,email,status",
