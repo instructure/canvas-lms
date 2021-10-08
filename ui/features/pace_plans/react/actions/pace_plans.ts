@@ -120,7 +120,7 @@ const thunkActions = {
 
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
-      return Api.getLatestDraftFor(contextType, contextId)
+      return Api.getNewPacePlanFor(getState().course.id, contextType, contextId)
         .then(pacePlan => {
           if (!pacePlan) throw new Error('Response body was empty')
           dispatch(afterAction(pacePlan))

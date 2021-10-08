@@ -2363,10 +2363,10 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :pace_plans) do
       post 'courses/:course_id/pace_plans', action: :create
+      get 'courses/:course_id/pace_plans/new', action: :new
       get 'courses/:course_id/pace_plans/:id', action: :api_show
       put 'courses/:course_id/pace_plans/:id', action: :update
       post 'courses/:course_id/pace_plans/:id/publish', action: :publish
-      get 'pace_plans/latest_draft_for', action: :latest_draft_for
     end
   end
 

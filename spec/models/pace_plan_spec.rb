@@ -107,11 +107,11 @@ describe PacePlan do
   end
 
   context "duplicate" do
-    it "returns a saved duplicate of the pace plan" do
+    it "returns an initialized duplicate of the pace plan" do
       duplicate_pace_plan = @pace_plan.duplicate
       expect(duplicate_pace_plan.class).to eq(PacePlan)
-      expect(duplicate_pace_plan.persisted?).to eq(true)
-      expect(duplicate_pace_plan.id).not_to eq(@pace_plan.id)
+      expect(duplicate_pace_plan.persisted?).to eq(false)
+      expect(duplicate_pace_plan.id).to eq(nil)
     end
 
     it "supports passing in options" do

@@ -228,22 +228,23 @@ describe PacePlansController, type: :controller do
     end
   end
 
-  describe "GET #latest_draft_for" do
+  describe "GET #new" do
     context "course" do
-      it "returns a draft pace plan" do
-        get :latest_draft_for, { params: { course_id: @course.id } }
+      it "returns a created pace plan if one already exists" do
+        get :new, { params: { course_id: @course.id } }
         expect(response).to be_successful
-        expect(JSON.parse(response.body)["pace_plan"]["id"]).not_to eq(@pace_plan.id)
-        expect(JSON.parse(response.body)["pace_plan"]["published_at"]).to eq(nil)
+        expect(JSON.parse(response.body)["pace_plan"]["id"]).to eq(@pace_plan.id)
+        expect(JSON.parse(response.body)["pace_plan"]["published_at"]).not_to be_nil
       end
 
-      it "creates a draft if one is not already available" do
-        expect(@course.pace_plans.unpublished.count).to eq(0)
-        get :latest_draft_for, { params: { course_id: @course.id } }
+      it "returns an instantiated pace plan if one is not already available" do
+        @pace_plan.destroy
+        expect(@course.pace_plans.not_deleted.count).to eq(0)
+        get :new, { params: { course_id: @course.id } }
         expect(response).to be_successful
-        expect(@course.pace_plans.unpublished.count).to eq(1)
+        expect(@course.pace_plans.not_deleted.count).to eq(0)
         json_response = JSON.parse(response.body)
-        expect(json_response["pace_plan"]["id"]).not_to eq(@pace_plan.id)
+        expect(json_response["pace_plan"]["id"]).to eq(nil)
         expect(json_response["pace_plan"]["published_at"]).to eq(nil)
         expect(json_response["pace_plan"]["modules"].count).to eq(2)
         m1 = json_response["pace_plan"]["modules"].first
@@ -252,28 +253,28 @@ describe PacePlansController, type: :controller do
         expect(m1["items"].first["published"]).to eq(true)
         m2 = json_response["pace_plan"]["modules"].second
         expect(m2["items"].count).to eq(2)
-        expect(m2["items"].first["duration"]).to eq(2)
+        expect(m2["items"].first["duration"]).to eq(0)
         expect(m2["items"].first["published"]).to eq(true)
-        expect(m2["items"].second["duration"]).to eq(4)
+        expect(m2["items"].second["duration"]).to eq(0)
         expect(m2["items"].second["published"]).to eq(true)
       end
     end
 
     context "course_section" do
       it "returns a draft pace plan" do
-        get :latest_draft_for, { params: { course_section_id: @course_section.id } }
+        get :new, { params: { course_id: @course.id, course_section_id: @course_section.id } }
         expect(response).to be_successful
-        expect(JSON.parse(response.body)["pace_plan"]["id"]).not_to eq(@pace_plan.id)
+        expect(JSON.parse(response.body)["pace_plan"]["id"]).to eq(nil)
         expect(JSON.parse(response.body)["pace_plan"]["published_at"]).to eq(nil)
       end
 
-      it "creates a draft if one is not already available" do
+      it "returns an instantiated pace plan if one is not already available" do
         expect(@course.pace_plans.unpublished.for_section(@course_section).count).to eq(0)
-        get :latest_draft_for, { params: { course_section_id: @course_section.id } }
+        get :new, { params: { course_id: @course.id, course_section_id: @course_section.id } }
         expect(response).to be_successful
-        expect(@course.pace_plans.unpublished.for_section(@course_section).count).to eq(1)
+        expect(@course.pace_plans.unpublished.for_section(@course_section).count).to eq(0)
         json_response = JSON.parse(response.body)
-        expect(json_response["pace_plan"]["id"]).not_to eq(@pace_plan.id)
+        expect(json_response["pace_plan"]["id"]).to eq(nil)
         expect(json_response["pace_plan"]["published_at"]).to eq(nil)
         expect(json_response["pace_plan"]["course_section_id"]).to eq(@course_section.id)
         expect(json_response["pace_plan"]["modules"].count).to eq(2)
@@ -292,20 +293,20 @@ describe PacePlansController, type: :controller do
 
     context "enrollment" do
       it "returns a draft pace plan" do
-        get :latest_draft_for, { params: { enrollment_id: @course.student_enrollments.first.id } }
+        get :new, { params: { course_id: @course.id, enrollment_id: @course.student_enrollments.first.id } }
         expect(response).to be_successful
-        expect(JSON.parse(response.body)["pace_plan"]["id"]).not_to eq(@pace_plan.id)
+        expect(JSON.parse(response.body)["pace_plan"]["id"]).to eq(nil)
         expect(JSON.parse(response.body)["pace_plan"]["published_at"]).to eq(nil)
         expect(JSON.parse(response.body)["pace_plan"]["user_id"]).to eq(@student.id)
       end
 
-      it "creates a draft if one is not already available" do
+      it "returns an instantiated pace plan if one is not already available" do
         expect(@course.pace_plans.unpublished.for_user(@student).count).to eq(0)
-        get :latest_draft_for, { params: { enrollment_id: @student_enrollment.id } }
+        get :new, { params: { course_id: @course.id, enrollment_id: @student_enrollment.id } }
         expect(response).to be_successful
-        expect(@course.pace_plans.unpublished.for_user(@student).count).to eq(1)
+        expect(@course.pace_plans.unpublished.for_user(@student).count).to eq(0)
         json_response = JSON.parse(response.body)
-        expect(json_response["pace_plan"]["id"]).not_to eq(@pace_plan.id)
+        expect(json_response["pace_plan"]["id"]).to eq(nil)
         expect(json_response["pace_plan"]["published_at"]).to eq(nil)
         expect(Time.zone.parse(json_response["pace_plan"]["start_date"])).to eq(@student_enrollment.created_at.to_date)
         expect(json_response["pace_plan"]["user_id"]).to eq(@student.id)

@@ -854,4 +854,28 @@ describe ContentTag do
       expect(tag.as_json["content_tag"]).to include('quiz_lti' => false)
     end
   end
+
+  describe 'can_have_assignment scope' do
+    it 'returns content tags that can have assignments' do
+      course_factory
+      tag = ContentTag.create!(context: @course)
+      expect(ContentTag.can_have_assignment).not_to include(tag)
+      ['Assignment', 'DiscussionTopic', 'Quizzes::Quiz', 'WikiPage'].each do |content_type|
+        tag.update(content_type: content_type)
+        expect(ContentTag.can_have_assignment).to include(tag)
+      end
+    end
+  end
+
+  describe '#can_have_assignment?' do
+    it 'true if content_type can have assignments' do
+      course_factory
+      tag = ContentTag.create!(context: @course)
+      expect(tag.can_have_assignment?).to eq(false)
+      ['Assignment', 'DiscussionTopic', 'Quizzes::Quiz', 'WikiPage'].each do |content_type|
+        tag.update(content_type: content_type)
+        expect(tag.can_have_assignment?).to eq(true)
+      end
+    end
+  end
 end

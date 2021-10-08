@@ -65,12 +65,13 @@ class PacePlan < ActiveRecord::Base
     }
     pace_plan = self.dup
     pace_plan.attributes = default_opts.merge(opts)
-    pace_plan.save!
 
-    self.pace_plan_module_items.each do |module_item|
-      pace_plan_module_item = module_item.dup
-      pace_plan_module_item.pace_plan_id = pace_plan
-      pace_plan_module_item.save
+    self.pace_plan_module_items.each do |pace_plan_module_item|
+      pace_plan.pace_plan_module_items.new(
+        module_item_id: pace_plan_module_item.module_item_id,
+        duration: pace_plan_module_item.duration,
+        root_account_id: pace_plan_module_item.root_account_id
+      )
     end
 
     pace_plan

@@ -616,6 +616,8 @@ class ContentTag < ActiveRecord::Base
       ", course_ids, course_ids, user_ids)
   }
 
+  scope :can_have_assignment, -> { where(content_type: ['Assignment', 'DiscussionTopic', 'Quizzes::Quiz', 'WikiPage']) }
+
   # only intended for learning outcome links
   def self.outcome_title_order_by_clause
     best_unicode_collation_key("learning_outcomes.short_description")
