@@ -39,6 +39,7 @@ const mapping = {
   'ru-RU': 'ru',
   'sv-SE': 'sv',
   'tr-TR': 'tr',
+  'uk': 'uk-UA',
   'zh-CN': 'zh-Hans',
   'zh-HK': 'zh-Hant'
 }
@@ -63,6 +64,7 @@ const recognized = [
   'en-GB-x-ukhe',
   'es',
   'fa-IR',
+  'fi',
   'fr',
   'fr-CA',
   'he',
@@ -89,7 +91,6 @@ const recognized = [
   'sv',
   'sv-x-k12',
   'tr',
-  'uk',
   'vi',
   'zh-Hans',
   'zh-Hant'

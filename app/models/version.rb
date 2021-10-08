@@ -1,5 +1,7 @@
-<%
-# Copyright (C) 2011 - present Instructure, Inc.
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,8 +16,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-unless @context.try(:feature_enabled?, :rce_enhancements) %>
-<div id="editor_tabs" style="display: none;">
-  <!-- this is just here so canvas-rce knows where to render the sidebar into -->
-</div>
-<% end %>
+#
+
+# this alias is just to make the "Version" constant
+# available in the global namespace so you can
+# do things like "Version.where(...)".
+Version = SimplyVersioned::Version

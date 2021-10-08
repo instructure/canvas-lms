@@ -42,6 +42,12 @@ if CANVAS_ZEITWERK
   require 'canvas_webex'
   require 'canvas_webex/version'
 
+  # we don't want zeitwerk to try to eager_load some
+  # "Version" constant from any plugins
+  Rails.autoloaders.main.ignore(
+    "#{__dir__}/../../gems/plugins/simply_versioned/lib/simply_versioned/gem_version.rb"
+  )
+
   Rails.autoloaders.each do |autoloader|
     autoloader.inflector.inflect(
       "api_array_serializer" => "APIArraySerializer",

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -17,6 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module AcademicBenchmark
-  VERSION = "1.1.0"
+module DataFixup::AddManageAccountBanksPermissionToQuizLtiTools
+  def self.run
+    ContextExternalTool.quiz_lti.find_each do |quiz_lti_tool|
+      permission_field = { "canvas_permissions" => "$Canvas.membership.permissions<manage_account_banks>" }
+      quiz_lti_tool.custom_fields = quiz_lti_tool.custom_fields.merge(permission_field)
+      quiz_lti_tool.save
+    end
+  end
 end

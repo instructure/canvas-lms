@@ -23,8 +23,6 @@
   css_bundle :tinymce, :grading_standards, :assignments_edit, :discussions_edit, :conditional_release_editor
 %>
 
-<% provide :right_side, render(:partial => 'shared/wiki_sidebar') %>
-
 <% if @context.is_a?(Course) %>
 <div id="edit_letter_grades_form" style="display: none;">
   <%= render partial: "shared/grading_standard", object: @topic.grading_standard_or_default, locals: {read_only: false} %>

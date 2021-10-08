@@ -22,7 +22,13 @@ class SubmissionVersion < ActiveRecord::Base
   belongs_to :assignment
   belongs_to :context, polymorphic: [:course]
   belongs_to :root_account, class_name: "Account"
-  belongs_to :version
+
+  # despite the fact that "Version" is aliased to "SimplyVersioned::Version"
+  # the classname inference here doesn't see that as an option and fails
+  # with a name error if you don't specify the class.
+  # Since "::Version" doesn't make it very clear WHY you have to
+  # specify the name, we might as well use the whole module/class name
+  belongs_to :version, class_name: "SimplyVersioned::Version"
 
   validates_presence_of :context_id, :version_id, :user_id, :assignment_id
 

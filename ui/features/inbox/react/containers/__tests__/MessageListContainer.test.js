@@ -82,7 +82,15 @@ describe('MessageListContainer', () => {
     it('should change list of messages when course and scope changes', async () => {
       const component = setup()
 
-      expect(await component.findByText('This is an inbox conversation')).toBeInTheDocument()
+      component.rerender(
+        <ApolloProvider client={mswClient}>
+          <MessageListContainer scope="inbox" />
+        </ApolloProvider>
+      )
+
+      await waitFor(() =>
+        expect(component.queryByText('This is an inbox conversation')).toBeInTheDocument()
+      )
 
       component.rerender(
         <ApolloProvider client={mswClient}>
@@ -115,7 +123,7 @@ describe('MessageListContainer', () => {
         })
       )
 
-      expect(mock.mock.calls.length).toBe(3)
+      expect(mock.mock.calls.length).toBe(4)
     })
   })
 })

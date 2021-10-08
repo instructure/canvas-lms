@@ -22,14 +22,13 @@
   @no_reply = @topic.homeroom_announcement?(@context)
 %>
 
-<% if (@headers || !@locked) && ((show_crs_graphs = can_do(@context, @current_user, :view_all_grades) && ConditionalRelease::Service.triggers_mastery_paths?(@topic.assignment, @current_user, session)) || !@context.try(:feature_enabled?, :rce_enhancements)) %>
+<% if (@headers || !@locked) && (show_crs_graphs = can_do(@context, @current_user, :view_all_grades) && ConditionalRelease::Service.triggers_mastery_paths?(@topic.assignment, @current_user, session)) %>
   <% provide :right_side do %>
     <div id="sidebar_content" class="rs-margin-bottom">
       <% if show_crs_graphs %>
         <div id="crs-graphs"></div>
       <% end %>
     </div>
-    <%= render :partial => "shared/wiki_sidebar" %>
   <% end %>
 <% else %>
   <% provide_blank :right_side %>
