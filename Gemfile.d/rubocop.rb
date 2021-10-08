@@ -36,7 +36,7 @@ group :test do
     gem 'unicode-display_width', '2.1.0', require: false
   gem 'rubocop-canvas', require: false, path: "#{'../' if dedicated_gemfile}gems/rubocop-canvas"
     gem 'rainbow', '3.0.0', require: false
-  gem 'rubocop-rails', '2.12.2', require: false
+  gem 'rubocop-rails', '2.12.3', require: false
   gem 'rubocop-rake', '0.6.0', require: false
   gem 'rubocop-rspec', '2.5.0', require: false
   gem 'rubocop-performance', '1.11.5', require: false
