@@ -18,9 +18,15 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
+
+import OutcomeContentBase from '@canvas/outcome-content-view/backbone/views/OutcomeContentBase'
 import Outcome from '@canvas/outcomes/backbone/models/Outcome.coffee'
 import OutcomeView from '@canvas/outcome-content-view/backbone/views/OutcomeView'
 import I18nStubber from 'helpers/I18nStubber'
+
+// stub function that creates the RCE to avoid
+// its async initializationa
+OutcomeContentBase.prototype.readyForm = () => {}
 
 const newOutcome = (outcomeOptions, outcomeLinkOptions) =>
   new Outcome(buildOutcome(outcomeOptions, outcomeLinkOptions), {parse: true})
@@ -77,7 +83,7 @@ function changeSelectedCalcMethod(view, calcMethod) {
 }
 
 function commonTests() {
-  test('outcome is created successfully', function() {
+  test('outcome is created successfully', function () {
     ok(this.outcome1.get('context_id'), 'upper context id')
     ok(this.outcome1.outcomeLink)
     ok(this.outcome1.outcomeLink.context_id)
@@ -334,7 +340,7 @@ function commonTests() {
     view.remove()
   })
 
-  test('validates title is present', function() {
+  test('validates title is present', function () {
     const view = createView({
       model: this.outcome1,
       state: 'edit'
@@ -346,7 +352,7 @@ function commonTests() {
     view.remove()
   })
 
-  test('validates title length', function() {
+  test('validates title length', function () {
     const long_name = 'X'.repeat(260)
     const view = createView({
       model: this.outcome1,
@@ -358,7 +364,7 @@ function commonTests() {
     view.remove()
   })
 
-  test('validates display_name length', function() {
+  test('validates display_name length', function () {
     const long_name = 'X'.repeat(260)
     const view = createView({
       model: this.outcome1,
@@ -376,20 +382,20 @@ QUnit.module('OutcomeView', {
     fakeENV.setup()
     // Sometimes TinyMCE has stuff on the dom that causes issues, likely from things that
     // don't clean up properly, we make sure that these run in a clean tiny state each time
-    tinymce.remove()
+    window.tinymce?.remove()
     ENV.PERMISSIONS = {manage_outcomes: true}
     this.outcome1 = outcome1()
   },
   teardown() {
     fakeENV.teardown()
-    tinymce.remove() // Don't leave anything hanging around
+    window.tinymce?.remove() // Don't leave anything hanging around
     document.getElementById('fixtures').innerHTML = ''
   }
 })
 
 commonTests()
 
-test('dropdown includes available calculation methods', function() {
+test('dropdown includes available calculation methods', function () {
   const view = createView({
     model: this.outcome1,
     state: 'edit'
@@ -399,7 +405,7 @@ test('dropdown includes available calculation methods', function() {
   view.remove()
 })
 
-test('calculation method of decaying_average is rendered properly on show', function() {
+test('calculation method of decaying_average is rendered properly on show', function () {
   const view = createView({
     model: this.outcome1,
     state: 'show'
@@ -642,7 +648,7 @@ test('it attempts a confirmation dialog when calculation is modified', assert =>
   })
 })
 
-test('validates mastery points', function() {
+test('validates mastery points', function () {
   const view = createView({
     model: this.outcome1,
     state: 'edit'
@@ -653,7 +659,7 @@ test('validates mastery points', function() {
   view.remove()
 })
 
-test('validates i18n mastery points', function() {
+test('validates i18n mastery points', function () {
   const view = createView({
     model: this.outcome1,
     state: 'edit'
@@ -796,14 +802,14 @@ QUnit.module('OutcomeView with mastery scales', {
     fakeENV.setup()
     // Sometimes TinyMCE has stuff on the dom that causes issues, likely from things that
     // don't clean up properly, we make sure that these run in a clean tiny state each time
-    tinymce.remove()
+    window.tinymce?.remove()
     ENV.PERMISSIONS = {manage_outcomes: true}
     ENV.ACCOUNT_LEVEL_MASTERY_SCALES = true
     this.outcome1 = outcome1()
   },
   teardown() {
     fakeENV.teardown()
-    tinymce.remove() // Don't leave anything hanging around
+    window.tinymce?.remove() // Don't leave anything hanging around
     document.getElementById('fixtures').innerHTML = ''
   }
 })

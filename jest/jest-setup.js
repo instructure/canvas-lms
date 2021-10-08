@@ -218,7 +218,6 @@ require('@instructure/ui-themes')
 if (process.env.DEPRECATION_SENTRY_DSN) {
   const Raven = require('raven-js')
   Raven.config(process.env.DEPRECATION_SENTRY_DSN, {
-    ignoreErrors: ['renderIntoDiv', 'renderSidebarIntoDiv'], // silence the `Cannot read property 'renderIntoDiv' of null` errors we get from the pre- rce_enhancements old rce code
     release: process.env.GIT_COMMIT,
     autoBreadcrumbs: {
       xhr: false

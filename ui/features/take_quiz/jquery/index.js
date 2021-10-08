@@ -27,7 +27,6 @@ import LDBLoginPopup from '../backbone/views/LDBLoginPopup'
 import quizTakingPolice from './quiz_taking_police'
 import QuizLogAuditing from '@canvas/quiz-log-auditing'
 import QuizLogAuditingEventDumper from '@canvas/quiz-log-auditing/jquery/dump_events'
-import KeyboardShortcuts from '@canvas/tinymce-keyboard-shortcuts'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/util/toJSON'
@@ -44,7 +43,7 @@ let lastAnswerSelected = null
 let lastSuccessfulSubmissionData = null
 let showDeauthorizedDialog
 
-const quizSubmission = (function() {
+const quizSubmission = (function () {
   let timeMod = 0,
     endAt = $('.end_at'),
     endAtParsed = endAt.text() && new Date(endAt.text()),
@@ -61,7 +60,7 @@ const quizSubmission = (function() {
     endAtWithoutTimeLimitParsed =
       $endAtWithoutTimeLimit.text() && new Date($endAtWithoutTimeLimit.text())
   // $('.time_running,.time_remaining') is probably not yet loaded at the time
-  const $timeRunningFunc = function() {
+  const $timeRunningFunc = function () {
     if ($timeRunningTimeRemaining.length > 0) return $timeRunningTimeRemaining
     return ($timeRunningTimeRemaining = $('.time_running,.time_remaining'))
   }
@@ -123,14 +122,14 @@ const quizSubmission = (function() {
       quizSubmission.lastSubmissionUpdate = new Date()
       const data = $('#submit_quiz_form').getFormData()
 
-      $('.question_holder .question').each(function() {
+      $('.question_holder .question').each(function () {
         const value = $(this).hasClass('marked') ? '1' : ''
         data[$(this).attr('id') + '_marked'] = value
       })
 
       $lastSaved.text(I18n.t('saving', 'Saving...'))
       const url = $('.backup_quiz_submission_url').attr('href')
-      ;(function(submissionData) {
+      ;(function (submissionData) {
         // Need a shallow clone of the data here because $.ajaxJSON modifies in place
         const thisSubmissionData = _.clone(submissionData)
         // If this is a timeout-based submission and the data is the same as last time,
@@ -193,9 +192,7 @@ const quizSubmission = (function() {
             }
             // if timer autosubmission is disabled, we need to know when the fallback autosubmission time is
             if (data && data.hard_end_at) {
-              quizSubmission.endAtWithoutTimeLimitParsed = Date.parse(
-                data.hard_end_at
-              )
+              quizSubmission.endAtWithoutTimeLimitParsed = Date.parse(data.hard_end_at)
             }
           },
           // Error callback
@@ -522,17 +519,13 @@ const quizSubmission = (function() {
     toggleActiveButtonState(selector, primary) {
       const addClass = primary ? 'btn-primary' : 'btn-secondary'
       const removeClass = primary ? 'btn-secondary' : 'btn-primary'
-      $(selector)
-        .addClass(addClass)
-        .removeClass(removeClass)
+      $(selector).addClass(addClass).removeClass(removeClass)
     },
     submitQuiz() {
       const button = $('#submit_quiz_button')
       button.prop('disabled', true)
       const action = button.data('action')
-      $('#submit_quiz_form')
-        .attr('action', action)
-        .submit()
+      $('#submit_quiz_form').attr('action', action).submit()
     }
   }
 })()
@@ -556,13 +549,11 @@ $(document)
 // fix screenreader focus for links to href="#target"
 $("a[href^='#']")
   .not("a[href='#']")
-  .click(function() {
-    $($(this).attr('href'))
-      .attr('tabindex', -1)
-      .focus()
+  .click(function () {
+    $($(this).attr('href')).attr('tabindex', -1).focus()
   })
 
-$(function() {
+$(function () {
   autoBlurActiveInput()
 
   if ($('#preview_mode_link').length == 0) {
@@ -611,7 +602,7 @@ $(function() {
       false
     )
 
-    $(document).delegate('a', 'click', function(event) {
+    $(document).delegate('a', 'click', function (event) {
       if ($(this).closest('.ui-dialog,.mceToolbar,.ui-selectmenu').length > 0) {
         return
       }
@@ -650,15 +641,12 @@ $(function() {
   }
   const $questions = $('#questions')
   $('#question_list')
-    .delegate('.jump_to_question_link', 'click', function(event) {
+    .delegate('.jump_to_question_link', 'click', function (event) {
       event.preventDefault()
       const $obj = $($(this).attr('href'))
       const scrollableSelector = ENV.MOBILE_UI ? '#content' : 'html,body'
       $(scrollableSelector).scrollTo($obj.parent())
-      $obj
-        .find(':input:first')
-        .focus()
-        .select()
+      $obj.find(':input:first').focus().select()
     })
     .find('.list_question')
     .bind({
@@ -709,7 +697,7 @@ $(function() {
   })
 
   $questions
-    .delegate(':checkbox,:radio', 'change', function(event) {
+    .delegate(':checkbox,:radio', 'change', function (event) {
       const $answer = $(this).parents('.answer')
       if (lastAnswerSelected == $answer[0]) {
         quizSubmission.updateSubmission()
@@ -718,7 +706,7 @@ $(function() {
     .delegate('label.upload-label', 'mouseup', event => {
       quizSubmission.updateSubmission()
     })
-    .delegate(':text,textarea,select', 'change', function(event, update) {
+    .delegate(':text,textarea,select', 'change', function (event, update) {
       const $this = $(this)
       if ($this.hasClass('numerical_question_input')) {
         const val = numberHelper.parse($this.val())
@@ -758,7 +746,7 @@ $(function() {
         }
       }
     })
-    .delegate('.flag_question', 'click', function(e) {
+    .delegate('.flag_question', 'click', function (e) {
       e.preventDefault()
       const $question = $(this).parents('.question')
       $question.toggleClass('marked')
@@ -780,7 +768,7 @@ $(function() {
 
       quizSubmission.updateSubmission()
     })
-    .delegate('.question_input', 'change', function(event, update, changedMap) {
+    .delegate('.question_input', 'change', function (event, update, changedMap) {
       let $this = $(this),
         tagName = this.tagName.toUpperCase(),
         id = $this.parents('.question').attr('id'),
@@ -798,27 +786,24 @@ $(function() {
         $this
           .siblings('.rce_links')
           .find('.toggle_question_content_views_link')
-          .click(function(event) {
+          .click(function (event) {
             event.preventDefault()
             RichContentEditor.callOnRCE($tagInstance, 'toggle')
             //  todo: replace .andSelf with .addBack when JQuery is upgraded.
-            $(this)
-              .siblings('.toggle_question_content_views_link')
-              .andSelf()
-              .toggle()
+            $(this).siblings('.toggle_question_content_views_link').andSelf().toggle()
           })
       } else if ($this.attr('type') == 'text' || $this.attr('type') == 'hidden') {
         val = $this.val()
       } else if (tagName == 'SELECT') {
         const $selects = $this.parents('.question').find('select.question_input')
-        val = !$selects.filter(function() {
+        val = !$selects.filter(function () {
           return !$(this).val()
         }).length
       } else {
         $this
           .parents('.question')
           .find('.question_input')
-          .each(function() {
+          .each(function () {
             if ($(this).attr('checked') || $(this).attr('selected')) {
               val = true
             }
@@ -832,7 +817,7 @@ $(function() {
 
   $questions.find('.question_input').trigger('change', [false, {}])
 
-  $('.hide_time_link').click(function(event) {
+  $('.hide_time_link').click(function (event) {
     event.preventDefault()
     if ($('.time_running').css('visibility') != 'hidden') {
       $('.time_running').css('visibility', 'hidden')
@@ -843,8 +828,8 @@ $(function() {
     }
   })
 
-  setTimeout(function() {
-    $('#question_list .list_question').each(function() {
+  setTimeout(function () {
+    $('#question_list .list_question').each(function () {
       const $this = $(this)
       if ($this.find('.jump_to_question_link').text() == 'Spacer') {
         $this.remove()
@@ -861,8 +846,8 @@ $(function() {
     quizSubmission.finalSubmitButtonClicked = true
   })
 
-  $('#submit_quiz_form').submit(function(event) {
-    $('.question_holder textarea.question_input').each(function() {
+  $('#submit_quiz_form').submit(function (event) {
+    $('.question_holder textarea.question_input').each(function () {
       $(this).change()
     })
 
@@ -899,8 +884,7 @@ $(function() {
           warningMessage = I18n.t(
             'confirms.unanswered_questions',
             {
-              one:
-                'You have 1 unanswered question (see the right sidebar for details).  Submit anyway?',
+              one: 'You have 1 unanswered question (see the right sidebar for details).  Submit anyway?',
               other:
                 'You have %{count} unanswered questions (see the right sidebar for details).  Submit anyway?'
             },
@@ -934,8 +918,8 @@ $(function() {
     $('#times_up_dialog').dialog('close')
   })
 
-  setTimeout(function() {
-    $('.question_holder textarea.question_input').each(function() {
+  setTimeout(function () {
+    $('.question_holder textarea.question_input').each(function () {
       $(this).attr('id', 'question_input_' + quizSubmission.contentBoxCounter++)
       RichContentEditor.loadNewEditor($(this), {
         manageParent: true,
@@ -967,7 +951,7 @@ $(function() {
   const $submit_buttons = $('#submit_quiz_form button[type=submit]')
 
   // set the form action depending on the button clicked
-  $submit_buttons.click(function(event) {
+  $submit_buttons.click(function (event) {
     quizSubmission.clearAccessCode = false
     const action = $(this).data('action')
     if (action != undefined) {
@@ -979,7 +963,7 @@ $(function() {
   $submit_buttons.removeAttr('disabled')
 })
 
-showDeauthorizedDialog = function() {
+showDeauthorizedDialog = function () {
   $('#deauthorized_dialog').dialog({
     modal: true,
     buttons: [
@@ -1050,7 +1034,3 @@ $(document).ready(() => {
   $('.loaded').show()
   $('.loading').hide()
 })
-
-if (!ENV.use_rce_enhancements) {
-  $('.essay_question .answers .rce_links').append(new KeyboardShortcuts().render().el)
-}

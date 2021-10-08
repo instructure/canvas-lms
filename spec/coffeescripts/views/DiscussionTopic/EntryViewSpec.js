@@ -68,37 +68,6 @@ test('renders', () => {
   ok(view)
 })
 
-test('two entries do not render keyboard shortcuts to the same place', () => {
-  const clock = sinon.useFakeTimers()
-  sandbox.stub(Reply.prototype, 'edit')
-  $('#fixtures').append($('<div />').attr('id', 'e1'))
-  $('#fixtures').append($('<div />').attr('id', 'e2'))
-  const entry1 = new Entry({
-    id: 1,
-    message: 'hi'
-  })
-  const entry2 = new Entry({
-    id: 2,
-    message: 'reply'
-  })
-  const view1 = new EntryView({
-    model: entry1,
-    el: '#e1'
-  })
-  view1.render()
-  view1.addReply()
-  const view2 = new EntryView({
-    model: entry2,
-    el: '#e2'
-  })
-  view2.render()
-  view2.addReply()
-  clock.tick(1)
-  equal(view1.$('.tinymce-keyboard-shortcuts-toggle').length, 1)
-  equal(view2.$('.tinymce-keyboard-shortcuts-toggle').length, 1)
-  return clock.restore()
-})
-
 test('should listen on model change:replies', () => {
   const entry = new Entry({
     id: 1,

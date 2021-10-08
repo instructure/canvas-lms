@@ -52,7 +52,7 @@ export default ValidatedMixin =
   # @return {jQuery Object} the relevant div that wraps the tinymce
   #   iframe related to this textarea
   findSiblingTinymce: ($el)->
-    $el.siblings('.mce-tinymce').find(".mce-edit-area")
+    $el.siblings('.tox-tinymce').find(".tox-edit-area")
 
   findField: (field, useGlobalSelector=false) ->
     selector = @fieldSelectors?[field] or "[name='#{field}']"
