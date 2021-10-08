@@ -333,6 +333,15 @@
                     </tr>
                   <% end %>
                 <% end %>
+
+                <% if Account.site_admin.feature_enabled?(:gradebook_show_first_last_names) %>
+                  <tr>
+                    <td colspan="2">
+                      <%= settings.check_box :allow_gradebook_show_first_last_names, checked: @account.allow_gradebook_show_first_last_names? %>
+                      <%= settings.label :allow_gradebook_show_first_last_names, t("Allow gradebook users to view and export student first and last names in separate columns") %>
+                    </td>
+                  </tr>
+                <% end %>
               <% end %>
             <% end %>
           </table>

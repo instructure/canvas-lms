@@ -451,3 +451,9 @@ wrap_calendar_event_titles:
     doesn't fit on a single line
   applies_to: RootAccount
   root_opt_in: true
+gradebook_show_first_last_names:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Separate columns for first/last names in Gradebook
+  description: Show account setting to allow viewing and exporting of student first and last names
+    in separate columns in the gradebook.

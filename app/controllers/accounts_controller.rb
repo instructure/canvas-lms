@@ -1707,7 +1707,7 @@ class AccountsController < ApplicationController
                                    :default_user_storage_quota, :default_user_storage_quota_mb, :default_time_zone,
                                    :disable_post_to_sis_when_grading_period_closed,
                                    :edit_institution_email, :enable_alerts, :enable_eportfolios, :enable_course_catalog,
-                                   :limit_parent_app_web_access,
+                                   :limit_parent_app_web_access, :allow_gradebook_show_first_last_names,
                                    { :enable_offline_web_export => [:value] }.freeze,
                                    { :disable_rce_media_uploads => [:value] }.freeze,
                                    :enable_profiles, :enable_gravatar, :enable_turnitin, :equella_endpoint,
