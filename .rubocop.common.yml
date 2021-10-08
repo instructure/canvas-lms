@@ -119,6 +119,8 @@ RSpec/NestedGroups:
   Enabled: false # legacy code
 RSpec/RepeatedDescription:
   Severity: error
+RSpec/SubjectStub:
+  Enabled: false # yes, canvas is big and complicated sometimes
 RSpec/StubbedMock:
   Enabled: false # this style goes along with spies
 
@@ -152,8 +154,10 @@ Style/WhileUntilModifier:
 # we correct all instances in the codebase first
 
 Lint/AmbiguousBlockAssociation: # TODO
-  Exclude:
-    - spec/**/*
+  IgnoredMethods:
+    - change
+    - not_change
+    - raise_error
 Lint/UnusedBlockArgument: # TODO manually fix these by removing the argument if possible
   Severity: warning
   AutoCorrect: false
@@ -167,10 +171,17 @@ Lint/UselessAssignment: # TODO
 Naming/VariableNumber: # TODO
   Enabled: false
 
+Rails/DynamicFindBy: # TODO; autocorrect (unsafe)
+  AllowedMethods:
+    - find_by_name # PluginSetting.find_by_name
+  AutoCorrect: false  
 Rails/ReadWriteAttribute: # TODO: autocorrect (unsafe)
   Enabled: false # accessors are often defined in terms of read_attribute
 Rails/TimeZone: # TODO: autocorrect (unsafe)
   Enabled: false
+Rails/WhereExists: # TODO: autocorrect(unsafe)
+  EnforcedStyle: where
+  AutoCorrect: false
 
 RSpec/ContextWording: # TODO
   Enabled: false
