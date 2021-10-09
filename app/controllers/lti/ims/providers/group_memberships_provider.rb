@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Lti::Ims::Providers
+module Lti::IMS::Providers
   class GroupMembershipsProvider < MembershipsProvider
     def context
       @_context ||= GroupContextDecorator.new(super)
@@ -72,7 +72,7 @@ module Lti::Ims::Providers
       enrollments.map { |e| GroupMembershipDecorator.new(e, tool) }
     end
 
-    # *Decorators fix up models to conforms to interface expected by Lti::Ims::NamesAndRolesSerializer
+    # *Decorators fix up models to conforms to interface expected by Lti::IMS::NamesAndRolesSerializer
     class GroupMembershipDecorator < SimpleDelegator
       def initialize(membership, tool)
         super(membership)

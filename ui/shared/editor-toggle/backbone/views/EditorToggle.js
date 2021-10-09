@@ -20,7 +20,6 @@ import I18n from 'i18n!EditorToggle'
 import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import preventDefault from 'prevent-default'
-import KeyboardShortcuts from '@canvas/tinymce-keyboard-shortcuts'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import SwitchEditorControl from '../../react/SwitchEditorControl'
@@ -100,19 +99,7 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
     this.textArea.val(this.getContent())
     this.textAreaContainer.insertBefore(this.el)
     this.el.detach()
-    if (!ENV.use_rce_enhancements) {
-      if (this.options.switchViews) {
-        this.switchViews = this.createSwitchViews()
-        this.switchViews.insertBefore(this.textAreaContainer)
-      }
-      if (!this.infoIcon) {
-        this.infoIcon = new KeyboardShortcuts().render().$el
-      }
-      this.infoIcon.insertBefore($('.switch-views__link'))
-      $('<div/>', {style: 'clear: both'}).insertBefore(this.textAreaContainer)
-    }
     this.done.insertAfter(this.textAreaContainer)
-    RichContentEditor.initSidebar()
     RichContentEditor.loadNewEditor(this.textArea, this.getRceOptions())
     this.textArea = RichContentEditor.freshNode(this.textArea)
     this.editing = true
@@ -143,7 +130,6 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
     if (this.options.switchViews) {
       this.switchViews.detach()
     }
-    if (!ENV.use_rce_enhancements) this.infoIcon.detach()
     this.done.detach()
     this.editing = false
     return this.trigger('display')

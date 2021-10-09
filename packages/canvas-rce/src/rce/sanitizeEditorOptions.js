@@ -28,30 +28,3 @@ export function sanitizePlugins(plugins) {
   }
   return plugins
 }
-
-const extPluginsToRemove = ['instructure_embed']
-
-function sanitizeExternalPlugins(external_plugins) {
-  if (external_plugins !== undefined) {
-    const cleanExternalPlugins = {}
-    Object.keys(external_plugins).forEach(key => {
-      if (external_plugins.hasOwnProperty(key)) {
-        if (extPluginsToRemove.indexOf(key) == -1) {
-          cleanExternalPlugins[key] = external_plugins[key]
-        }
-      }
-    })
-    return cleanExternalPlugins
-  }
-  return external_plugins
-}
-
-export default function sanitizeEditorOptions(options) {
-  const fixed = {...options}
-
-  fixed.plugins = sanitizePlugins(options.plugins)
-  fixed.external_plugins = sanitizeExternalPlugins(options.external_plugins)
-  fixed.toolbar = options.toolbar
-
-  return fixed
-}

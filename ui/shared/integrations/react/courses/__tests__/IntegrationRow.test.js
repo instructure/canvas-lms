@@ -46,10 +46,30 @@ describe('IntegrationRow', () => {
   })
 
   describe('when "enabled" is false', () => {
-    const propOverrides = {enabled: false}
+    const propOverrides = {enabled: false, expanded: true}
 
     it('shows the integration is not enabled', () => {
       expect(subject(propOverrides).getByLabelText('Toggle Microsoft Sync').checked).toBeFalsy()
+    })
+
+    it('shows a info box saying it is not enabled', () => {
+      expect(
+        subject(propOverrides).getByText(
+          'This integration is not enabled. Please enable it to interact with settings.'
+        )
+      ).toBeInTheDocument()
+    })
+  })
+
+  describe('when "enabled" is false and there is an error', () => {
+    const propOverrides = {enabled: false, error: 'Some error', expanded: true}
+
+    it('does not show the info bax saying it is not enabled', () => {
+      expect(
+        subject(propOverrides).queryByText(
+          'This integration is not enabled. Please enable it to interact with settings.'
+        )
+      ).not.toBeInTheDocument()
     })
   })
 

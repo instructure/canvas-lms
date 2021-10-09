@@ -159,6 +159,7 @@ module CanvasRails
 
     config.to_prepare do
       require_dependency 'canvas/plugins/default_plugins'
+      Canvas::Plugins::DefaultPlugins.apply_all
       ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
     end
 

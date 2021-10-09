@@ -90,6 +90,8 @@ class MicrosoftSync::GroupsController < ApplicationController
   before_action :require_integration_available
   before_action :require_cooldown, only: :sync
   before_action :require_currently_not_syncing, only: :sync
+  before_action :check_for_already_existing_group, only: :create
+  before_action :check_for_enrollment_limits, only: :create
 
   # Create a new MicrosoftSync::Group for
   # the specified course.
@@ -100,13 +102,9 @@ class MicrosoftSync::GroupsController < ApplicationController
   #
   # @returns MicrosoftSync::Group
   def create
-    # Check if a active group already exists
-    existing_group = MicrosoftSync::Group.find_by(course: course)
-    head :conflict and return if existing_group && !existing_group.deleted?
-
     # If a non-active group exists for the course, restore it.
     # Otherwise create a new group
-    new_group = (existing_group&.restore! && existing_group) ||
+    new_group = (already_existing_group&.restore! && already_existing_group) ||
                 MicrosoftSync::Group.create!(course: course)
 
     render json: group_json(new_group), status: :created
@@ -144,6 +142,29 @@ class MicrosoftSync::GroupsController < ApplicationController
   end
 
   private
+
+  def check_for_already_existing_group
+    head :conflict if already_existing_group && !already_existing_group.deleted?
+  end
+
+  def check_for_enrollment_limits
+    if MicrosoftSync::CanvasModelsHelpers.max_enrollment_owners_reached?(course)
+      error_msg = t(
+        'This course has too many teachers or other owner-type enrollments to ' \
+        'be synced. Microsoft 365 allows a maximum of %{max_allowed} owners ' \
+        'in a team.',
+        max_allowed: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS
+      )
+    elsif MicrosoftSync::CanvasModelsHelpers.max_enrollment_members_reached?(course)
+      error_msg = t(
+        'This course has too many enrolled users to be synced. Microsoft 365 ' \
+        'allows a maximum of %{max_allowed} members in a team.',
+        max_allowed: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
+      )
+    end
+
+    render json: { message: error_msg }, status: :unprocessable_entity if error_msg
+  end
 
   # Don't allow scheduling a new job
   # if one is already running
@@ -203,6 +224,12 @@ class MicrosoftSync::GroupsController < ApplicationController
     @context
   end
 
+  # Group, whether deleted or not.
+  def already_existing_group
+    @already_existing_group ||= MicrosoftSync::Group.find_by(course: course)
+  end
+
+  # The group, but only if not deleted.
   def group
     @group ||= MicrosoftSync::Group.not_deleted.find_by(course: course) ||
                (raise ActiveRecord::RecordNotFound)

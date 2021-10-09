@@ -603,6 +603,13 @@ describe CanvadocSessionsController do
         get :show, params: { blob: blob.to_json, hmac: hmac }
       end
 
+      it "marks unread annotations read" do
+        @student.mark_submission_annotations_unread!(@submission)
+        expect(@student.unread_submission_annotations?(@submission)).to eq true
+        get :show, params: { blob: blob.to_json, hmac: hmac }
+        expect(@student.unread_submission_annotations?(@submission)).to eq false
+      end
+
       it "passes use_cloudfront as true when feature flag is set to true" do
         Account.site_admin.enable_feature!(:use_cloudfront_for_docviewer)
         expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(use_cloudfront: true))

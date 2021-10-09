@@ -64,8 +64,9 @@ async function makeProps(overrides) {
     ...assignmentAndSubmission,
 
     // Make these return a promise that will resolve
-    createSubmissionDraft: jest.fn().mockResolvedValue({}),
-    updateUploadingFiles: jest.fn().mockResolvedValue({}),
+    onCanvasFileRequested: jest.fn(),
+    onUploadRequested: jest.fn(),
+    filesToUpload: [],
     uploadingFiles: false,
     focusOnInit: false
   }
@@ -201,14 +202,14 @@ describe('FileUpload', () => {
     uploadFiles(fileInput, [file, file2])
 
     await waitFor(() => {
-      expect(props.createSubmissionDraft).toHaveBeenCalledWith({
-        variables: {
-          id: '1',
-          activeSubmissionType: 'online_upload',
-          attempt: 1,
-          fileIds: ['1', '2']
-        }
-      })
+      expect(props.onUploadRequested).toHaveBeenCalledWith(
+        expect.objectContaining({
+          files: [
+            expect.objectContaining({preview: 'perry_preview'}),
+            expect.objectContaining({preview: 'perry_preview'})
+          ]
+        })
+      )
     })
   })
 
@@ -217,7 +218,9 @@ describe('FileUpload', () => {
     const setOnFailure = jest.fn()
     const setOnSuccess = jest.fn()
     const props = await makeProps()
-    uploadFileModule.uploadFile.mockRejectedValue(new Error('no'))
+    props.onUploadRequested.mockImplementation(({onError}) => {
+      onError(new Error('no'))
+    })
 
     const {container} = render(
       <MockedProvider mocks={mocks}>
@@ -268,14 +271,17 @@ describe('FileUpload', () => {
     )
 
     await waitFor(() => {
-      expect(props.createSubmissionDraft).toHaveBeenCalledWith({
-        variables: {
-          id: '1',
-          activeSubmissionType: 'online_upload',
-          attempt: 1,
-          fileIds: ['1']
-        }
-      })
+      expect(props.onUploadRequested).toHaveBeenCalledWith(
+        expect.objectContaining({
+          files: [
+            {
+              mediaType: 'plain/txt',
+              title: 'LemonRules.txt',
+              url: 'http://lemon.com'
+            }
+          ]
+        })
+      )
     })
   })
 
@@ -312,13 +318,17 @@ describe('FileUpload', () => {
     )
 
     await waitFor(() => {
-      const [, fileArgs] = uploadFileModule.uploadFile.mock.calls[0]
-      expect(fileArgs).toEqual({
-        content_type: '',
-        name: 'LemonRules.txt',
-        submit_assignment: false,
-        url: 'http://lemon.com'
-      })
+      expect(props.onUploadRequested).toHaveBeenCalledWith(
+        expect.objectContaining({
+          files: [
+            {
+              mediaType: '',
+              title: 'LemonRules.txt',
+              url: 'http://lemon.com'
+            }
+          ]
+        })
+      )
     })
   })
 
@@ -373,7 +383,7 @@ describe('FileUpload', () => {
     expect(setOnFailure).toHaveBeenCalledWith(errormsg)
   })
 
-  it('does not create a submission draft when there is an error message present in the Lti response', async () => {
+  it('does not call onUploadRequested when there is an error message present in the Lti response', async () => {
     const mocks = await createGraphqlMocks()
     const setOnFailure = jest.fn()
     const props = await makeProps()
@@ -403,71 +413,7 @@ describe('FileUpload', () => {
       })
     )
 
-    expect(props.createSubmissionDraft).not.toHaveBeenCalled()
-  })
-
-  // Byproduct of how the dummy submissions are being handled. Check out ViewManager
-  // for some context around this
-  it('creates a submission draft for the current attempt when not on attempt 0', async () => {
-    const mocks = await createGraphqlMocks()
-    const setOnSuccess = jest.fn()
-    const props = await makeProps({
-      Submission: {attempt: 2}
-    })
-    uploadFileModule.uploadFile.mockResolvedValueOnce({id: '1', name: 'file1.jpg'})
-
-    const {container} = render(
-      <MockedProvider mocks={mocks}>
-        <AlertManagerContext.Provider value={{setOnSuccess}}>
-          <FileUpload {...props} />
-        </AlertManagerContext.Provider>
-      </MockedProvider>
-    )
-    const fileInput = container.querySelector('input[type="file"]')
-    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
-    uploadFiles(fileInput, [file])
-
-    await waitFor(() => {
-      expect(props.createSubmissionDraft).toHaveBeenCalledWith({
-        variables: {
-          id: '1',
-          activeSubmissionType: 'online_upload',
-          attempt: 2,
-          fileIds: ['1']
-        }
-      })
-    })
-  })
-
-  it('creates a submission draft for attempt one when on attempt 0', async () => {
-    const mocks = await createGraphqlMocks()
-    const setOnSuccess = jest.fn()
-    const props = await makeProps({
-      Submission: {attempt: 0}
-    })
-    uploadFileModule.uploadFile.mockResolvedValueOnce({id: '1', name: 'file1.jpg'})
-
-    const {container} = render(
-      <MockedProvider mocks={mocks}>
-        <AlertManagerContext.Provider value={{setOnSuccess}}>
-          <FileUpload {...props} />
-        </AlertManagerContext.Provider>
-      </MockedProvider>
-    )
-    const fileInput = container.querySelector('input[type="file"]')
-    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
-    uploadFiles(fileInput, [file])
-
-    await waitFor(() => {
-      expect(props.createSubmissionDraft).toHaveBeenCalledWith({
-        variables: {
-          id: '1',
-          activeSubmissionType: 'online_upload',
-          attempt: 1,
-          fileIds: ['1']
-        }
-      })
-    })
+    expect(props.onUploadRequested).not.toHaveBeenCalled()
   })
 
   it('renders a button to remove the file', async () => {
@@ -672,36 +618,19 @@ describe('FileUpload', () => {
     expect(uploadRender).toContainElement(container.querySelector('svg[name="IconComplete"]'))
   })
 
-  it('renders a loading indicator for each file being uploaded', async () => {
+  it('renders a loading indicator for each file in the process of uploading', async () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps()
-
-    const progressHandlers = []
-
-    uploadFileModule.uploadFile
-      .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
-        progressHandlers.push(onProgress)
-        return Promise.resolve({id: '1', name: 'file1.pdf'})
-      })
-      .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
-        progressHandlers.push(onProgress)
-        return Promise.resolve({id: '2', name: 'file2.pdf'})
-      })
+    props.filesToUpload = [
+      {id: '1', name: 'file1.pdf', isLoading: true, loaded: 10, total: 100},
+      {id: '2', name: 'file2.pdf', isLoading: true, loaded: 50, total: 250}
+    ]
 
     const {getAllByRole} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
       </MockedProvider>
     )
-    const fileInput = document.getElementById('inputFileDrop')
-
-    uploadFiles(fileInput, [
-      new File(['asdf'], 'file1.pdf', {type: 'application/pdf'}),
-      new File(['sdfg'], 'file2.pdf', {type: 'application/pdf'})
-    ])
-
-    progressHandlers[0]({loaded: 10, total: 100})
-    progressHandlers[1]({loaded: 50, total: 250})
 
     const progressBars = getAllByRole('progressbar')
     expect(progressBars).toHaveLength(2)
@@ -721,36 +650,5 @@ describe('FileUpload', () => {
       'aria-label',
       'Upload progress for file2.pdf 20 percent'
     )
-  })
-
-  it('shows the URL of a file being uploaded if no title is given', async () => {
-    const mocks = await createGraphqlMocks()
-    const props = await makeProps()
-
-    const {getAllByRole} = render(
-      <MockedProvider mocks={mocks}>
-        <FileUpload {...props} />
-      </MockedProvider>
-    )
-
-    fireEvent(
-      window,
-      new MessageEvent('message', {
-        data: {
-          messageType: 'A2ExternalContentReady',
-          content_items: [
-            {
-              url: 'http://somefile.com',
-              mediaType: 'application/octet-stream'
-            }
-          ]
-        }
-      })
-    )
-
-    const tableRows = getAllByRole('row')
-    // The first row is the header, the second is the item we're uploading
-    expect(tableRows).toHaveLength(2)
-    expect(tableRows[1]).toHaveTextContent('http://somefile.com')
   })
 })

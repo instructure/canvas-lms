@@ -32,10 +32,10 @@ describe('doFetchApi', () => {
     return expect(doFetchApi({path})).resolves.toMatchObject({json: {key: 'value'}})
   })
 
-  it('resolves json to null when response is empty', () => {
+  it('resolves json to undefined when response is empty', () => {
     const path = '/api/v1/blah'
     fetchMock.mock(`path:${path}`, 200)
-    return expect(doFetchApi({path})).resolves.toMatchObject({json: null})
+    return expect(doFetchApi({path})).resolves.toMatchObject({json: undefined})
   })
 
   it('resolve includes response', () => {
@@ -48,8 +48,7 @@ describe('doFetchApi', () => {
     const path = '/api/v1/blah'
     fetchMock.mock(`path:${path}`, {
       headers: {
-        Link:
-          '<http://api?page=3>; rel="current",<http://api?page=1>; rel="first",<http://api?page=5>; rel="last", <http://api?page=4>; rel="next", <http://api?page=2>; rel="prev"'
+        Link: '<http://api?page=3>; rel="current",<http://api?page=1>; rel="first",<http://api?page=5>; rel="last", <http://api?page=4>; rel="next", <http://api?page=2>; rel="prev"'
       }
     })
     return expect(doFetchApi({path})).resolves.toMatchObject({
@@ -63,10 +62,10 @@ describe('doFetchApi', () => {
     })
   })
 
-  it('link is null when there is no link header', () => {
+  it('link is undefined when there is no link header', () => {
     const path = '/api/v1/blah'
     fetchMock.mock(`path:${path}`, 200)
-    return expect(doFetchApi({path})).resolves.toMatchObject({link: null})
+    return expect(doFetchApi({path})).resolves.toMatchObject({link: undefined})
   })
 
   it('rejects on network error', () => {

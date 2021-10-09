@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Lti::Ims::NamesAndRolesMatchers
+module Lti::IMS::NamesAndRolesMatchers
   def expected_lti_id(entity)
     entity.is_a?(User) ? entity.lti_id : Lti::Asset.opaque_identifier_for(entity)
   end
@@ -104,7 +104,7 @@ module Lti::Ims::NamesAndRolesMatchers
       'family_name' => (user.last_name if %w(public name_only).include?(privacy(opts))),
       'email' => (user.email if %w(public email_only).include?(privacy(opts))),
       'lis_person_sourcedid' => (expected_sourced_id(user) if %w(public name_only).include?(privacy(opts))),
-      'user_id' => expected_lti_id(Lti::Ims::Providers::MembershipsProvider.unwrap(user)),
+      'user_id' => expected_lti_id(Lti::IMS::Providers::MembershipsProvider.unwrap(user)),
       'lti11_legacy_user_id' => Lti::Asset.opaque_identifier_for(user)
     }.compact
   end

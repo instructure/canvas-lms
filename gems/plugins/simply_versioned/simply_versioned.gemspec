@@ -9,8 +9,8 @@ require "simply_versioned/gem_version"
 Gem::Specification.new do |s|
   s.name        = "simply_versioned"
   s.version     = SimplyVersioned::VERSION
-  s.authors     = ["Matt Mower", "Brian Palmer"]
-  s.email       = ["brianp@instructure.com"]
+  s.authors     = ["Ethan Vizitei"]
+  s.email       = ["evizitei@instructure.com"]
   s.homepage    = "http://www.instructure.com"
   s.summary     = "Instructure-maintained fork of simply_versioned"
 

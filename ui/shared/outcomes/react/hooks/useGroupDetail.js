@@ -61,12 +61,17 @@ const useGroupDetail = ({
   loadOutcomesIsImported = false,
   searchString = '',
   id,
-  rhsGroupIdsToRefetch = []
+  rhsGroupIdsToRefetch = [],
+  targetGroupId
 }) => {
   const {contextType, contextId, rootIds} = useCanvasContext()
   searchString = useSearchString(searchString)
   const abortController = useAbortController([id, searchString])
-  const queryVars = {outcomesContextType: contextType, outcomesContextId: contextId}
+  const queryVars = {
+    outcomesContextType: contextType,
+    outcomesContextId: contextId,
+    targetGroupId
+  }
   const client = useApolloClient()
   const allVariables = useRef([])
   const refetchGroupIds = useRef([])

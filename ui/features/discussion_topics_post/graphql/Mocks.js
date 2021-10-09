@@ -22,7 +22,10 @@ import {
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_ENTRY,
   SUBSCRIBE_TO_DISCUSSION_TOPIC,
-  CREATE_DISCUSSION_ENTRY
+  CREATE_DISCUSSION_ENTRY,
+  DELETE_DISCUSSION_TOPIC,
+  UPDATE_DISCUSSION_READ_STATE,
+  UPDATE_DISCUSSION_TOPIC
 } from './Mutations'
 import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
@@ -114,7 +117,8 @@ export const getDiscussionSubentriesQueryMock = ({
   last = null,
   relativeEntryId = null,
   rolePillTypes = ['TaEnrollment', 'TeacherEnrollment'],
-  sort = 'asc'
+  sort = 'asc',
+  shouldError = false
 } = {}) => [
   {
     request: {
@@ -129,7 +133,7 @@ export const getDiscussionSubentriesQueryMock = ({
         ...(includeRelativeEntry !== null && {includeRelativeEntry}),
         ...(last !== null && {last}),
         ...(relativeEntryId !== null && {relativeEntryId}),
-        rolePillTypes,
+        ...(rolePillTypes !== null && {rolePillTypes}),
         sort
       }
     },
@@ -168,7 +172,8 @@ export const getDiscussionSubentriesQueryMock = ({
                   DiscussionEntry.mock({
                     _id: '104',
                     id: 'RGlzY3Vzc2lvbkVudHJ5LTEwNAo=',
-                    message: '<p>This is the child reply asc</p>'
+                    message: '<p>This is the child reply asc</p>',
+                    rootEntryId: discussionEntryID
                   })
                 ],
                 pageInfo: PageInfo.mock(),
@@ -193,7 +198,8 @@ export const getDiscussionSubentriesQueryMock = ({
           })
         })()
       }
-    }
+    },
+    ...(shouldError && {error: new Error('graphql error')})
   }
 ]
 
@@ -223,7 +229,8 @@ export const updateDiscussionEntryParticipantMock = ({
   discussionEntryId = '1',
   read = null,
   rating = null,
-  forcedReadState = null
+  forcedReadState = null,
+  shouldError = false
 } = {}) => [
   {
     request: {
@@ -252,11 +259,15 @@ export const updateDiscussionEntryParticipantMock = ({
           __typename: 'UpdateDiscussionEntryParticipantPayload'
         }
       }
-    }
+    },
+    ...(shouldError && {error: new Error('graphql error')})
   }
 ]
 
-export const updateDiscussionEntryMock = ({discussionEntryId = '1', message = ''} = {}) => [
+export const updateDiscussionEntryMock = ({
+  discussionEntryId = '1',
+  message = '<p>This is the parent reply</p>'
+} = {}) => [
   {
     request: {
       query: UPDATE_DISCUSSION_ENTRY,
@@ -334,6 +345,74 @@ export const createDiscussionEntryMock = ({
             message
           }),
           __typename: 'CreateDiscussionEntryPayload'
+        }
+      }
+    }
+  }
+]
+
+export const deleteDiscussionTopicMock = ({id = '1'} = {}) => [
+  {
+    request: {
+      query: DELETE_DISCUSSION_TOPIC,
+      variables: {id}
+    },
+    result: {
+      data: {
+        deleteDiscussionTopic: {
+          discussionTopicId: id,
+          __typename: 'DeleteDiscussionTopicPayload'
+        }
+      }
+    }
+  }
+]
+
+export const updateDiscussionReadStateMock = ({discussionTopicId = '1', read = true} = {}) => [
+  {
+    request: {
+      query: UPDATE_DISCUSSION_READ_STATE,
+      variables: {
+        discussionTopicId,
+        read
+      }
+    },
+    result: {
+      data: {
+        updateDiscussionReadState: {
+          discussionTopic: Discussion.mock({
+            id: btoa(`Discussion-${discussionTopicId}`),
+            _id: discussionTopicId
+          }),
+          __typename: 'UpdateDiscussionReadStatePayload'
+        }
+      }
+    }
+  }
+]
+
+export const updateDiscussionTopicMock = ({
+  discussionTopicId = '1',
+  published = null,
+  locked = null
+} = {}) => [
+  {
+    request: {
+      query: UPDATE_DISCUSSION_TOPIC,
+      variables: {
+        discussionTopicId,
+        ...(published !== null && {published}),
+        ...(locked !== null && {locked})
+      }
+    },
+    result: {
+      data: {
+        updateDiscussionTopic: {
+          discussionTopic: Discussion.mock({
+            id: btoa(`Discussion-${discussionTopicId}`),
+            _id: discussionTopicId
+          }),
+          __typename: 'UpdateDiscussionTopicPayload'
         }
       }
     }

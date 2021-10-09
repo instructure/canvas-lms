@@ -62,7 +62,8 @@ const MessageListContainer = ({course, scope, onSelectMessage}) => {
   }
 
   const {loading, error, data} = useQuery(CONVERSATIONS_QUERY, {
-    variables: {userID, scope, course}
+    variables: {userID, scope, course},
+    fetchPolicy: 'cache-and-network'
   })
 
   if (loading) {

@@ -30,7 +30,12 @@ describe('ManageOutcomesView', () => {
   let onSearchClearHandler
   let loadMore
   const defaultProps = (props = {}) => ({
-    outcomeGroup,
+    outcomeGroup: {
+      _id: '1',
+      title: 'Group Title',
+      outcomesCount: 0,
+      outcomes: {edges: [], pageInfo: {hasNextPage: false}}
+    },
     selectedOutcomes: {1: true},
     searchString: 'abc',
     loading: false,
@@ -75,28 +80,17 @@ describe('ManageOutcomesView', () => {
   })
 
   it('renders group title if outcomeGroup prop provided with id and title only', () => {
-    const {queryByTestId} = render(
-      <ManageOutcomesView
-        {...defaultProps({
-          outcomeGroup: {
-            _id: '1',
-            title: 'Group Title',
-            outcomesCount: 0,
-            outcomes: {edges: [], pageInfo: {hasNextPage: false}}
-          }
-        })}
-      />
-    )
+    const {queryByTestId} = render(<ManageOutcomesView {...defaultProps()} />)
     expect(queryByTestId('outcome-group-container')).toBeInTheDocument()
   })
 
   it('renders outcomes count', () => {
-    const {getByText} = render(<ManageOutcomesView {...defaultProps()} />)
+    const {getByText} = render(<ManageOutcomesView {...defaultProps({outcomeGroup})} />)
     expect(getByText(`15 Outcomes`)).toBeInTheDocument()
   })
 
   it('renders list of outcomes', () => {
-    const {getAllByText} = render(<ManageOutcomesView {...defaultProps()} />)
+    const {getAllByText} = render(<ManageOutcomesView {...defaultProps({outcomeGroup})} />)
     expect(
       getAllByText(
         'Partition circles and rectangle into two, three, or four equal share. Partition circles and rectangle into two, three, or four equal share.'
@@ -111,93 +105,40 @@ describe('ManageOutcomesView', () => {
 
   describe('kebab menu', () => {
     it('is not rendered if canManage is false', () => {
-      const {queryByText} = renderWithContext(
-        <ManageOutcomesView
-          {...defaultProps({
-            outcomeGroup: {
-              _id: '1',
-              title: 'Group Title',
-              outcomesCount: 0,
-              outcomes: {edges: [], pageInfo: {hasNextPage: false}}
-            }
-          })}
-        />,
-        {canManage: false}
-      )
-      expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
+      const {queryByText} = renderWithContext(<ManageOutcomesView {...defaultProps()} />, {
+        canManage: false
+      })
+      expect(queryByText('Menu for group Group Title')).not.toBeInTheDocument()
     })
 
     it('is not rendered if isRootGroup is true', () => {
       const {queryByText} = render(<ManageOutcomesView {...defaultProps({isRootGroup: true})} />)
-      expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
+      expect(queryByText('Menu for group Group Title')).not.toBeInTheDocument()
     })
 
     it('rendered if canManage is true', () => {
-      const {getByText} = renderWithContext(
-        <ManageOutcomesView
-          {...defaultProps({
-            outcomeGroup: {
-              _id: '1',
-              title: 'Group Title',
-              outcomesCount: 0,
-              outcomes: {edges: [], pageInfo: {hasNextPage: false}}
-            }
-          })}
-        />,
-        {canManage: true}
-      )
-      expect(getByText('Outcome Group Menu')).toBeInTheDocument()
+      const {getByText} = renderWithContext(<ManageOutcomesView {...defaultProps()} />, {
+        canManage: true
+      })
+      expect(getByText('Menu for group Group Title')).toBeInTheDocument()
     })
   })
 
   it('render a message when the group has no outcomes', () => {
     const {getByText, getByTestId} = render(
-      <ManageOutcomesView
-        {...defaultProps({
-          outcomeGroup: {
-            _id: '1',
-            title: 'Group Title',
-            outcomesCount: 0,
-            outcomes: {edges: [], pageInfo: {hasNextPage: false}}
-          },
-          searchString: ''
-        })}
-      />
+      <ManageOutcomesView {...defaultProps({searchString: ''})} />
     )
     expect(getByTestId('no-outcomes-svg')).toBeInTheDocument()
     expect(getByText('There are no outcomes in this group.')).toBeInTheDocument()
   })
 
   it('render a message when search does not return any result', () => {
-    const {getByText} = render(
-      <ManageOutcomesView
-        {...defaultProps({
-          outcomeGroup: {
-            _id: '1',
-            title: 'Group Title',
-            outcomesCount: 0,
-            outcomes: {edges: [], pageInfo: {hasNextPage: false}}
-          }
-        })}
-      />
-    )
+    const {getByText} = render(<ManageOutcomesView {...defaultProps()} />)
     expect(getByText('The search returned no results.')).toBeInTheDocument()
   })
 
   it('does not render a message when does not have search when group does not have outcome', () => {
-    const {queryByText} = render(
-      <ManageOutcomesView
-        {...defaultProps({
-          searchString: '',
-          outcomeGroup: {
-            _id: '1',
-            title: 'Group Title',
-            outcomesCount: 0,
-            outcomes: {edges: [], pageInfo: {hasNextPage: false}}
-          }
-        })}
-      />
-    )
+    const {queryByText} = render(<ManageOutcomesView {...defaultProps({searchString: ''})} />)
     expect(queryByText('The search returned no results.')).not.toBeInTheDocument()
   })
 

@@ -26,7 +26,7 @@ module ConfigFile
       @yaml_cache = {}
       @object_cache = {}
     end
-    alias :reset_cache :unstub
+    alias_method :reset_cache, :unstub
 
     def stub(config_name, value)
       raise "config settings can only be set via config file" unless Rails.env.test?

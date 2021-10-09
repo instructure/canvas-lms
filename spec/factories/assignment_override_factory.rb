@@ -54,7 +54,7 @@ module Factories
     ao.save!
     ao
   end
-  alias create_section_override_for_quiz create_section_override_for_assignment
+  alias_method :create_section_override_for_quiz, :create_section_override_for_assignment
 
   def create_group_override_for_assignment(assignment, opts = {})
     group_category = group_category(context: assignment.context)

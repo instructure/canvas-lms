@@ -42,7 +42,7 @@ module Lti
   #     }
   #
   class FeatureFlagsController < ApplicationController
-    include Ims::Concerns::AdvantageServices
+    include ::Lti::IMS::Concerns::AdvantageServices
     MIME_TYPE = 'application/vnd.canvas.featureflags+json'.freeze
 
     ACTION_SCOPE_MATCHERS = {

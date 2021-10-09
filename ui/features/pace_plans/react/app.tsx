@@ -16,71 +16,102 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {connect} from 'react-redux'
+
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {Mask, Overlay} from '@instructure/ui-overlays'
+import {Responsive} from '@instructure/ui-responsive'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
+import {actions} from './actions/ui'
 import Header from './components/header/header'
 import Body from './components/body'
-import {StoreState, PacePlan} from './types'
+import {ResponsiveSizes, StoreState} from './types'
 import {getErrorMessage, getLoadingMessage, getShowLoadingOverlay} from './reducers/ui'
-import {getPacePlan} from './reducers/pace_plans'
 
 interface StoreProps {
   readonly errorMessage: string
   readonly loadingMessage: string
   readonly showLoadingOverlay: boolean
-  readonly pacePlan: PacePlan
 }
 
-export class App extends React.Component<StoreProps> {
-  renderErrorAlert() {
-    if (this.props.errorMessage) {
+interface DispatchProps {
+  readonly setResponsiveSize: typeof actions.setResponsiveSize
+}
+
+type ComponentProps = StoreProps & DispatchProps
+
+type ResponsiveComponentProps = ComponentProps & {
+  readonly responsiveSize: ResponsiveSizes
+}
+
+export const App: React.FC<ResponsiveComponentProps> = ({
+  errorMessage,
+  loadingMessage,
+  setResponsiveSize,
+  showLoadingOverlay,
+  responsiveSize
+}) => {
+  useEffect(() => {
+    setResponsiveSize(responsiveSize)
+  }, [responsiveSize, setResponsiveSize])
+
+  const renderErrorAlert = () => {
+    if (errorMessage) {
       return (
         <Alert variant="error" closeButtonLabel="Close" margin="small">
-          {this.props.errorMessage}
+          {errorMessage}
         </Alert>
       )
     }
   }
 
-  render() {
-    return (
-      <View>
-        <Overlay
-          open={this.props.showLoadingOverlay}
-          transition="fade"
-          label={this.props.loadingMessage}
-        >
-          <Mask>
-            <Spinner title="Loading" size="large" margin="0 0 0 medium" />
-          </Mask>
-        </Overlay>
-        <View overflowX="auto" width="100%">
-          <Flex as="div" direction="column">
-            <View>
-              {this.renderErrorAlert()}
-              <Header />
-            </View>
-            <Body />
-          </Flex>
-        </View>
+  return (
+    <View>
+      <Overlay open={showLoadingOverlay} transition="fade" label={loadingMessage}>
+        <Mask>
+          <Spinner title="Loading" size="large" margin="0 0 0 medium" />
+        </Mask>
+      </Overlay>
+      <View overflowX="auto" width="100%">
+        <Flex as="div" direction="column">
+          <View>
+            {renderErrorAlert()}
+            <Header />
+          </View>
+          <Body />
+        </Flex>
       </View>
-    )
-  }
+    </View>
+  )
 }
+
+export const ResponsiveApp: React.FC<ComponentProps> = props => (
+  <Responsive
+    query={{
+      small: {maxWidth: '40rem'},
+      large: {minWidth: '40rem'}
+    }}
+    props={{
+      small: {responsiveSize: 'small'},
+      large: {responsiveSize: 'large'}
+    }}
+  >
+    {({responsiveSize}) => <App responsiveSize={responsiveSize} {...props} />}
+  </Responsive>
+)
 
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
     errorMessage: getErrorMessage(state),
     loadingMessage: getLoadingMessage(state),
-    showLoadingOverlay: getShowLoadingOverlay(state),
-    pacePlan: getPacePlan(state)
+    showLoadingOverlay: getShowLoadingOverlay(state)
   }
 }
 
-export default connect(mapStateToProps)(App)
+export default connect(mapStateToProps, {
+  setResponsiveSize: actions.setResponsiveSize
+})(ResponsiveApp)

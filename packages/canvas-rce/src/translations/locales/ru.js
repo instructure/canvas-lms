@@ -17,7 +17,7 @@
  */
 
 import formatMessage from '../../format-message'
-import '../tinymce/ru_RU'
+import '../tinymce/ru'
 
 const locale = {
   "access_the_pretty_html_editor_37168efe": {

@@ -68,9 +68,9 @@ module Lti
     ].freeze
 
     DEFAULT_SERVICES = [
-      *Lti::Ims::ToolProxyController::SERVICE_DEFINITIONS,
-      *Lti::Ims::AuthorizationController::SERVICE_DEFINITIONS,
-      *Lti::Ims::ToolSettingController::SERVICE_DEFINITIONS
+      *Lti::IMS::ToolProxyController::SERVICE_DEFINITIONS,
+      *Lti::IMS::AuthorizationController::SERVICE_DEFINITIONS,
+      *Lti::IMS::ToolSettingController::SERVICE_DEFINITIONS
     ].freeze
 
     RESTRICTED_SERVICES = [

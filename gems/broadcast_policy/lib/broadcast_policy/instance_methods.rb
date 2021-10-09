@@ -131,7 +131,7 @@ module BroadcastPolicy
         saved_change_to_workflow_state?
       end
     end
-    alias :changed_state_to :changed_state
+    alias_method :changed_state_to, :changed_state
 
     def filter_asset_by_recipient(notification, recipient)
       policy = self.class.broadcast_policy_list.find_policy_for(notification.name)

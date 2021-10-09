@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class Canvas::Migration::Worker::CCWorker < Canvas::Migration::Worker::Base
+class CC::Importer::CCWorker < Canvas::Migration::Worker::Base
   def perform(cm = nil)
     cm ||= ContentMigration.where(id: migration_id).first
     cm.job_progress.start unless cm.skip_job_progress

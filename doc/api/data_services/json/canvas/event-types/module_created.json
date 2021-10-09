@@ -17,7 +17,7 @@
           "event_name": "module_created",
           "event_time": "2019-11-01T19:11:05.880Z",
           "job_id": "1020020528469291",
-          "job_tag": "Canvas::Migration::Worker::CCWorker#perform",
+          "job_tag": "CC::Importer::CCWorker#perform",
           "producer": "canvas",
           "root_account_id": "21070000000000001",
           "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",

@@ -18,7 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+require 'spec_helper'
+
+# rubcop:disable RSpec/MultipleMemoizedHelpers
 
 describe Lti::LtiOutboundAdapter do
   let(:url) { '/launch/url' }
@@ -405,3 +407,5 @@ describe Lti::LtiOutboundAdapter do
     end
   end
 end
+
+# rubcop:enable RSpec/MultipleMemoizedHelpers

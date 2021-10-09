@@ -36,6 +36,12 @@ export type DoFetchApiOpts = {
   fetchOpts?: RequestInit
 }
 
+export type DoFetchApiResults<T> = {
+  json?: T
+  response: Response
+  link?: parseLinkHeader.Links
+}
+
 // NOTE: we do NOT deep-merge customFetchOptions.headers, they should be passed
 // in the headers arg instead.
 export default async function doFetchApi<T = any>({
@@ -45,7 +51,7 @@ export default async function doFetchApi<T = any>({
   params = {},
   body,
   fetchOpts = {}
-}: DoFetchApiOpts) {
+}: DoFetchApiOpts): Promise<DoFetchApiResults<T>> {
   const finalFetchOptions = {...defaultFetchOptions}
   finalFetchOptions.headers['X-CSRF-Token'] = getCookie('_csrf_token')
 
@@ -66,8 +72,8 @@ export default async function doFetchApi<T = any>({
     throw err
   }
   const linkHeader = response.headers.get('Link')
-  const link = linkHeader ? parseLinkHeader(linkHeader) : null
+  const link = (linkHeader && parseLinkHeader(linkHeader)) || undefined
   const text = await response.text()
-  const json = text.length > 0 ? (JSON.parse(text) as T) : null
+  const json = text.length > 0 ? (JSON.parse(text) as T) : undefined
   return {json, response, link}
 }

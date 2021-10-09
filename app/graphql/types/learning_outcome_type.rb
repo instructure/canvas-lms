@@ -46,7 +46,7 @@ module Types
       end
     end
 
-    alias outcome object
+    alias_method :outcome, :object
     implements GraphQL::Types::Relay::Node
     implements Interfaces::LegacyIDInterface
     implements Interfaces::TimestampInterface

@@ -53,12 +53,6 @@ test('sets focus to the edit button when hide_edit occurs', () => {
   equal(document.activeElement, $('.edit_syllabus_link')[0])
 })
 
-test('initializes sidebar when edit link present', () => {
-  fixtures.create('<a href="#" class="edit_syllabus_link">Edit Link</a>')
-  SyllabusBehaviors.bindToEditSyllabus()
-  ok(Sidebar.init.called, 'foo')
-})
-
 test('skips initializing sidebar when edit link absent', () => {
   equal(fixtures.find('.edit_syllabus_link').length, 0)
   SyllabusBehaviors.bindToEditSyllabus()

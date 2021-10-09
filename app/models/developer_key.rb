@@ -345,6 +345,17 @@ class DeveloperKey < ActiveRecord::Base
     end
   end
 
+  def mobile_app?
+    false
+  end
+
+  def tokens_expire_in
+    return nil unless mobile_app?
+
+    sessions_settings = Canvas::Plugin.find('sessions').settings || {}
+    sessions_settings[:mobile_timeout]&.to_f&.minutes
+  end
+
   private
 
   def validate_lti_fields
