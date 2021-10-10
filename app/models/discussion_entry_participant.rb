@@ -70,6 +70,8 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   # DiscussionEntryParticipant object with errors for backwards compatability to
   # the previous method.
   def self.upsert_for_entries(entry_or_topic, user, batch: nil, new_state: nil, forced: nil, rating: nil)
+    return nil if entry_or_topic.nil? || user.nil?
+
     batch ||= [entry_or_topic]
     entry_or_topic.shard.activate do
       raise(ArgumentError) if batch.count > 1_000
