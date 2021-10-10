@@ -310,7 +310,7 @@ $('#access_token_form').formSubmit({
       .clone(true)
       .removeClass('blank')
     data.created = $.datetimeString(data.created_at) || '--'
-    data.expires = $.datetimeString(data.expires_at) || I18n.t('token_never_expires', 'never')
+    data.expires = $.datetimeString(data.permanent_expires_at) || I18n.t('token_never_expires', 'never')
     data.used = '--'
     $token.fillTemplateData({
       data,

@@ -171,7 +171,10 @@ class DeveloperKey < ActiveRecord::Base
 
         if Rails.env.test?
           # TODO: we have to do this because tests run in transactions
-          return @special_keys[default_key_name] = DeveloperKey.where(name: default_key_name).first_or_create
+          testkey = DeveloperKey.where(name: default_key_name).first_or_initialize
+          testkey.auto_expire_tokens = false if testkey.new_record?
+          testkey.save! if testkey.changed?
+          return @special_keys[default_key_name] = testkey
         end
 
         key = @special_keys[default_key_name]
@@ -184,6 +187,7 @@ class DeveloperKey < ActiveRecord::Base
 
         key = DeveloperKey.create!(:name => default_key_name)
         key.developer_key_account_bindings.update_all(workflow_state: 'on')
+        key.update(auto_expire_tokens: false)
         Setting.set("#{default_key_name}_developer_key_id", key.id)
         return @special_keys[default_key_name] = key
       end
