@@ -55,6 +55,7 @@ import PostPolicies from './PostPolicies/index'
 import GradebookMenu from '@canvas/gradebook-menu'
 import ViewOptionsMenu from './components/ViewOptionsMenu'
 import ActionMenu from './components/ActionMenu'
+import FilterNav from './components/FilterNav'
 import EnhancedActionMenu from './components/EnhancedActionMenu'
 import AssignmentGroupFilter from './components/content-filters/AssignmentGroupFilter'
 import GradingPeriodFilter from './components/content-filters/GradingPeriodFilter'
@@ -4330,6 +4331,11 @@ class Gradebook extends React.Component {
         <Portal node={this.props.gridColorNode}>
           <GridColor colors={this.state.gridColors} />
         </Portal>
+        {this.options.enhanced_gradebook_filters && (
+          <Portal node={this.props.filterNavNode}>
+            <FilterNav />
+          </Portal>
+        )}
       </>
     )
   }
