@@ -48,7 +48,7 @@ import {
   getPacePlanItemPosition,
   getDisabledDaysOfWeek
 } from '../../reducers/pace_plans'
-import {autoSavingActions as actions} from '../../actions/pace_plan_items'
+import {actions} from '../../actions/pace_plan_items'
 import {actions as uiActions} from '../../actions/ui'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 import {getAutoSaving, getAdjustingHardEndDatesAfter, getShowProjections} from '../../reducers/ui'
@@ -199,17 +199,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     const duration = parseInt(this.state.duration, 10)
 
     if (!Number.isNaN(duration)) {
-      let saveParams = {}
-
-      // If this is a student Hard End Date plan then we should recompress
-      // all items AFTER the modified item, so that we still hit the specified
-      // end date.
-      if (this.props.enrollmentHardEndDatePlan && duration !== this.props.pacePlanItem.duration) {
-        saveParams = {compress_items_after: this.props.pacePlanItemPosition}
-        this.props.setAdjustingHardEndDatesAfter(this.props.pacePlanItemPosition)
-      }
-
-      this.props.setPlanItemDuration(this.props.pacePlanItem.module_item_id, duration, saveParams)
+      this.props.setPlanItemDuration(this.props.pacePlanItem.module_item_id, duration)
     }
   }
 
