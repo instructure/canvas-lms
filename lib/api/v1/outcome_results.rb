@@ -218,8 +218,8 @@ module Api::V1::OutcomeResults
   end
 
   def outcome_results_rollups_csv(current_user, context, rollups, outcomes, outcome_paths)
-    options = CsvWithI18n.csv_i18n_settings(current_user)
-    CsvWithI18n.generate(**options) do |csv|
+    options = CSVWithI18n.csv_i18n_settings(current_user)
+    CSVWithI18n.generate(**options) do |csv|
       row = []
       row << I18n.t(:student_name, 'Student name')
       row << I18n.t(:student_id, 'Student ID')
