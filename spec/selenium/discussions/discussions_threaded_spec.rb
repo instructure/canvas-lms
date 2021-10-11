@@ -25,7 +25,6 @@ describe "threaded discussions" do
   include DiscussionsCommon
 
   before :once do
-    Account.default.enable_feature!(:rce_enhancements)
     course_with_teacher(active_course: true, active_all: true, name: 'teacher')
     @topic_title = 'threaded discussion topic'
     @topic = create_discussion(@topic_title, 'threaded')
