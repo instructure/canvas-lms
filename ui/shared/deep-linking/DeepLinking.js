@@ -29,6 +29,7 @@ export function isValidDeepLinkingEvent(event, env) {
 }
 
 export const addDeepLinkingListener = cb => {
+  window.removeEventListener('message', handleDeepLinking)
   window.addEventListener('message', handleDeepLinking(cb))
 }
 
@@ -39,4 +40,8 @@ export const handleDeepLinking = cb => async event => {
   }
 
   await cb(event)
+}
+
+export const reloadPage = () => {
+  window.location.reload()
 }

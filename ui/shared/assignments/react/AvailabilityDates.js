@@ -34,6 +34,7 @@ export default function AvailabilityDates({assignment, formatStyle}) {
         />
         <FriendlyDatetime
           prefix={longFmt ? I18n.t(' until') : I18n.t(' to')}
+          prefixMobile={I18n.t(' to')}
           dateTime={assignment.lockAt}
           format={longFmt ? I18n.t('#date.formats.full') : I18n.t('#date.formats.short')}
         />
