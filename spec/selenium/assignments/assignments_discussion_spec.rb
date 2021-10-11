@@ -32,7 +32,6 @@ describe "discussion assignments" do
   include RCENextPage
 
   before(:each) do
-    Account.default.enable_feature!(:rce_enhancements)
     stub_rcs_config
     @domain_root_account = Account.default
     course_with_teacher_logged_in

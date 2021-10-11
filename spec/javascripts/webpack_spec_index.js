@@ -43,7 +43,6 @@ if (process.env.SENTRY_DSN) {
   // "Script error"
   const Raven = require('raven-js')
   Raven.config(process.env.SENTRY_DSN, {
-    ignoreErrors: ['renderIntoDiv', 'renderSidebarIntoDiv'], // silence the `Cannot read property 'renderIntoDiv' of null` errors we get from the pre- rce_enhancements old rce code
     release: process.env.GIT_COMMIT
   }).install()
 
@@ -56,7 +55,6 @@ if (process.env.SENTRY_DSN) {
     // https://github.com/getsentry/sentry-javascript/blob/master/packages/raven-js/src/singleton.js#L33
     deprecationsReporter = new Raven.Client()
     deprecationsReporter.config(process.env.DEPRECATION_SENTRY_DSN, {
-      ignoreErrors: ['renderIntoDiv', 'renderSidebarIntoDiv'], // silence the `Cannot read property 'renderIntoDiv' of null` errors we get from the pre- rce_enhancements old rce code
       release: process.env.GIT_COMMIT
     })
 

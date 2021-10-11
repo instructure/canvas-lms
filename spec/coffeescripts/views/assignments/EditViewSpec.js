@@ -1121,7 +1121,7 @@ test('saves valid attributes to localstorage', function () {
   sandbox.stub(view, 'getFormData').returns({points_possible: 34})
   userSettings.contextSet('new_assignment_settings', {})
   view.cacheAssignmentSettings()
-  equal(34, userSettings.contextGet('new_assignment_settings').points_possible)
+  equal(userSettings.contextGet('new_assignment_settings').points_possible, 34)
 })
 
 test('rejects invalid attributes when caching', function () {

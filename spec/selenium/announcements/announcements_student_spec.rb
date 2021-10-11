@@ -25,7 +25,6 @@ describe "announcements" do
   include AnnouncementsCommon
 
   before(:each) do
-    Account.default.enable_feature!(:rce_enhancements)
     stub_rcs_config
   end
 
