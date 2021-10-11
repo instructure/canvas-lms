@@ -216,15 +216,14 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               position="relative"
               width="1%"
               height="calc(100vh - 8.75rem)"
+              tabIndex="0"
+              role="separator"
+              aria-orientation="vertical"
+              aria-hidden="true"
+              onKeyDown={onKeyDownHandler}
+              elementRef={setDelimiterRef}
             >
-              {/* eslint-disable jsx-a11y/no-noninteractive-tabindex */}
               <div
-                tabIndex="0"
-                role="separator"
-                aria-hidden="true"
-                aria-orientation="vertical"
-                onKeyDown={onKeyDownHandler}
-                ref={setDelimiterRef}
                 style={{
                   width: '1vw',
                   height: '100%',
@@ -233,7 +232,6 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
                     '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
                 }}
               />
-              {/* eslint-enable jsx-a11y/no-noninteractive-tabindex */}
             </Flex.Item>
             <Flex.Item
               as="div"
