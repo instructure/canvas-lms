@@ -87,19 +87,19 @@ describe OutcomeImport, type: :model do
 
   describe '.run handles outcome import' do
     def mock_importer(updates)
-      importer = instance_double(Outcomes::CsvImporter)
+      importer = instance_double(Outcomes::CSVImporter)
       expect(importer).to receive(:run) do |&block|
         updates.each do |up|
           block.call(up)
         end
       end
-      expect(Outcomes::CsvImporter).to receive(:new).and_return(importer)
+      expect(Outcomes::CSVImporter).to receive(:new).and_return(importer)
     end
 
     def mock_importer_error(msg)
-      importer = instance_double(Outcomes::CsvImporter)
+      importer = instance_double(Outcomes::CSVImporter)
       expect(importer).to receive(:run).and_raise(Outcomes::Import::DataFormatError, msg)
-      expect(Outcomes::CsvImporter).to receive(:new).and_return(importer)
+      expect(Outcomes::CSVImporter).to receive(:new).and_return(importer)
     end
 
     def fake_file
@@ -256,7 +256,7 @@ describe OutcomeImport, type: :model do
     end
 
     it 'has a catch-all for unexpected errors' do
-      expect(Outcomes::CsvImporter).to receive(:new).and_return(nil)
+      expect(Outcomes::CSVImporter).to receive(:new).and_return(nil)
 
       attachment = fake_attachment(fake_file)
       import = fake_import(attachment)

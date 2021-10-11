@@ -19,7 +19,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-describe Outcomes::CsvImporter do
+describe Outcomes::CSVImporter do
   def csv_file(name)
     path = File.expand_path(File.dirname(__FILE__) + "/fixtures/#{name}.csv")
     File.open(path, 'rb')
@@ -36,7 +36,7 @@ describe Outcomes::CsvImporter do
         rows.each { |r| csv << r }
       end
       tf.binmode
-      Outcomes::CsvImporter.new(import, tf).run(&updates)
+      Outcomes::CSVImporter.new(import, tf).run(&updates)
     end
   end
 
@@ -106,7 +106,7 @@ describe Outcomes::CsvImporter do
     end
 
     def expect_ok_import(path)
-      Outcomes::CsvImporter.new(import, path).run do |status|
+      Outcomes::CSVImporter.new(import, path).run do |status|
         expect(status[:errors]).to eq([])
       end
     end
@@ -194,7 +194,7 @@ describe Outcomes::CsvImporter do
     end
 
     it 'reports import progress' do
-      stub_const('Outcomes::CsvImporter::BATCH_SIZE', 2)
+      stub_const('Outcomes::CSVImporter::BATCH_SIZE', 2)
 
       increments = []
       import_fake_csv([headers] + (1..3).map { |ix| group_row(vendor_guid: ix) }.to_a) do |status|
@@ -244,7 +244,7 @@ describe Outcomes::CsvImporter do
     end
 
     context 'with optional headers' do
-      Outcomes::CsvImporter::OPTIONAL_FIELDS.each do |field|
+      Outcomes::CSVImporter::OPTIONAL_FIELDS.each do |field|
         it "does not require #{field}" do
           no_field = headers - [field]
           rows = [no_field] + (1..3).map do |ix|
