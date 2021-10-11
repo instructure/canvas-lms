@@ -212,7 +212,7 @@ class Course < ActiveRecord::Base
   has_many :sis_post_grades_statuses
 
   has_many :progresses, as: :context, inverse_of: :context
-  has_many :gradebook_csvs, inverse_of: :course
+  has_many :gradebook_csvs, inverse_of: :course, class_name: "GradebookCSV"
 
   has_many :master_course_templates, :class_name => "MasterCourses::MasterTemplate"
   # only valid if non-nil
