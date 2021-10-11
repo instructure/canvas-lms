@@ -226,6 +226,11 @@ class FileUpload extends Component {
       </>
     )
 
+    const {allowedExtensions} = this.props.assignment
+    const allowWebcamUploads =
+      allowedExtensions.length === 0 ||
+      allowedExtensions.some(extension => extension.toLowerCase() === 'png')
+
     return (
       <div data-testid="upload-box">
         <Flex direction="column" padding="xx-small">
@@ -234,7 +239,7 @@ class FileUpload extends Component {
               assignmentID={this.props.assignment._id}
               courseID={this.props.assignment.env.courseId}
               handleCanvasFiles={this.handleCanvasFiles}
-              handleWebcamPhotoUpload={this.handleWebcamPhotoUpload}
+              handleWebcamPhotoUpload={allowWebcamUploads ? this.handleWebcamPhotoUpload : null}
               renderCanvasFiles
               userID={this.props.assignment.env.currentUser.id}
             />
