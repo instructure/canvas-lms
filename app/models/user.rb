@@ -174,7 +174,7 @@ class User < ActiveRecord::Base
            as: :context, inverse_of: :context,
            class_name: 'UsageRights',
            dependent: :destroy
-  has_many :gradebook_csvs, dependent: :destroy
+  has_many :gradebook_csvs, dependent: :destroy, class_name: "GradebookCSV"
 
   has_one :profile, :class_name => 'UserProfile'
 

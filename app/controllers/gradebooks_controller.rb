@@ -381,7 +381,7 @@ class GradebooksController < ApplicationController
     per_page = Setting.get('api_max_per_page', '50').to_i
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
 
-    last_exported_gradebook_csv = GradebookCsv.last_successful_export(course: @context, user: @current_user)
+    last_exported_gradebook_csv = GradebookCSV.last_successful_export(course: @context, user: @current_user)
     last_exported_attachment = last_exported_gradebook_csv.try(:attachment)
 
     grading_standard = @context.grading_standard_or_default
@@ -481,7 +481,7 @@ class GradebooksController < ApplicationController
     teacher_notes = @context.custom_gradebook_columns.not_deleted.where(teacher_notes: true).first
     ag_includes = [:assignments, :assignment_visibility, :grades_published]
 
-    last_exported_gradebook_csv = GradebookCsv.last_successful_export(course: @context, user: @current_user)
+    last_exported_gradebook_csv = GradebookCSV.last_successful_export(course: @context, user: @current_user)
     last_exported_attachment = last_exported_gradebook_csv.try(:attachment)
 
     grading_standard = @context.grading_standard_or_default
