@@ -21,8 +21,7 @@ import React from 'react'
 import I18n from 'i18n!pace_plans_settings'
 import {connect} from 'react-redux'
 
-import {AccessibleContent} from '@instructure/ui-a11y-content'
-import {Button, CloseButton, CondensedButton, IconButton} from '@instructure/ui-buttons'
+import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Heading} from '@instructure/ui-heading'
 import {IconSettingsLine} from '@instructure/ui-icons'
@@ -168,31 +167,33 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
           withArrow={false}
         >
           <View as="div" padding="small">
-            <View as="div" margin="0 0 small 0">
+            <View as="div">
               <Checkbox
                 label={I18n.t('Skip Weekends')}
                 checked={this.props.excludeWeekends}
                 onChange={() => this.props.toggleExcludeWeekends()}
               />
             </View>
-            <View as="div" margin="0 0 small 0">
-              <Checkbox
-                label={I18n.t('Require Completion by Specified End Date')}
-                checked={this.props.pacePlan.hard_end_dates}
-                onChange={() => this.props.toggleHardEndDates()}
-                disabled={!this.props.pacePlan.end_date}
-              />
-            </View>
-            <CondensedButton
-              onClick={() => {
-                this.setState({showSettingsPopover: false})
-                this.showBlackoutDatesModal()
-              }}
-            >
-              <AccessibleContent alt={I18n.t('View Blackout Dates')}>
-                {I18n.t('Blackout Dates')}
-              </AccessibleContent>
-            </CondensedButton>
+            {/* Commented out since we're not implementing these features yet */}
+            {/* <View as="div" margin="small 0 0"> */}
+            {/*  <Checkbox */}
+            {/*    label={I18n.t('Require Completion by Specified End Date')} */}
+            {/*    checked={this.props.pacePlan.hard_end_dates} */}
+            {/*    onChange={() => this.props.toggleHardEndDates()} */}
+            {/*    disabled={!this.props.pacePlan.end_date} */}
+            {/*  /> */}
+            {/* </View> */}
+            {/* <CondensedButton */}
+            {/*  onClick={() => { */}
+            {/*    this.setState({showSettingsPopover: false}) */}
+            {/*    this.showBlackoutDatesModal() */}
+            {/*  }} */}
+            {/*  margin="small 0 0" */}
+            {/* > */}
+            {/*  <AccessibleContent alt={I18n.t('View Blackout Dates')}> */}
+            {/*    {I18n.t('Blackout Dates')} */}
+            {/*  </AccessibleContent> */}
+            {/* </CondensedButton> */}
           </View>
         </Popover>
       </div>
