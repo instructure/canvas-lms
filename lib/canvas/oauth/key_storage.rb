@@ -18,6 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Canvas::Oauth
+module Canvas::OAuth
   KeyStorage = CanvasSecurity::KeyStorage.new('oauth2-asymmetric')
 end

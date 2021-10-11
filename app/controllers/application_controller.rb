@@ -1316,8 +1316,8 @@ class ApplicationController < ActionController::Base
         return redirect_to return_to if return_to
 
         if (oauth = session[:oauth2])
-          provider = Canvas::Oauth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
-          return redirect_to Canvas::Oauth::Provider.confirmation_redirect(self, provider, pseudonym.user)
+          provider = Canvas::OAuth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
+          return redirect_to Canvas::OAuth::Provider.confirmation_redirect(self, provider, pseudonym.user)
         end
 
         # do one final redirect to get the token out of the URL

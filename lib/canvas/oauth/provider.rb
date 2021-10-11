@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Canvas::Oauth
+module Canvas::OAuth
   class Provider
     OAUTH2_OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
 
@@ -124,7 +124,7 @@ module Canvas::Oauth
 
     def self.final_redirect_params(oauth_session, current_user, real_user = nil, options = {})
       options = { :scopes => oauth_session&.dig(:scopes), :remember_access => options&.dig(:remember_access), :purpose => oauth_session&.dig(:purpose) }
-      code = Canvas::Oauth::Token.generate_code_for(current_user.global_id, real_user&.global_id, oauth_session[:client_id], options)
+      code = Canvas::OAuth::Token.generate_code_for(current_user.global_id, real_user&.global_id, oauth_session[:client_id], options)
       redirect_params = { :code => code }
       redirect_params[:state] = oauth_session[:state] if oauth_session[:state]
       redirect_params

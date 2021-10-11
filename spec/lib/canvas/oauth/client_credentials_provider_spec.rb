@@ -20,7 +20,7 @@
 require File.expand_path('../../../spec_helper', File.dirname(__FILE__))
 require_dependency "canvas/oauth/client_credentials_provider"
 
-module Canvas::Oauth
+module Canvas::OAuth
   describe ClientCredentialsProvider do
     let(:dev_key) { DeveloperKey.create! }
     let(:provider) { described_class.new dev_key.id, 'example.com' }

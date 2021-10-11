@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Login::Oauth2Controller < Login::OauthBaseController
+class Login::Oauth2Controller < Login::OAuthBaseController
   skip_before_action :verify_authenticity_token
 
   rescue_from Canvas::Security::TokenExpired, with: :handle_expired_token
@@ -62,7 +62,7 @@ class Login::Oauth2Controller < Login::OauthBaseController
       begin
         unique_id = @aac.unique_id(token)
         provider_attributes = @aac.provider_attributes(token)
-      rescue OauthValidationError => e
+      rescue OAuthValidationError => e
         unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
         flash[:delegated_message] = e.message
         return redirect_to unknown_user_url

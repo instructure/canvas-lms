@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Login::OauthBaseController < ApplicationController
+class Login::OAuthBaseController < ApplicationController
   include Login::Shared
 
   before_action :forbid_on_files_domain

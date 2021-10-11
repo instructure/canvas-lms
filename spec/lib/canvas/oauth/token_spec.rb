@@ -20,7 +20,7 @@
 require File.expand_path('../../../spec_helper', File.dirname(__FILE__))
 require_dependency "canvas/oauth/token"
 
-module Canvas::Oauth
+module Canvas::OAuth
   describe Token do
     let(:code) { 'code123code' }
     let(:key) { DeveloperKey.create! }

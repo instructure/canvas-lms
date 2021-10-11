@@ -39,7 +39,7 @@ class SecurityController < ApplicationController
                   when '/internal/services/jwks'
                     CanvasSecurity::ServicesJwt::KeyStorage
                   when '/login/oauth2/jwks'
-                    Canvas::Oauth::KeyStorage
+                    Canvas::OAuth::KeyStorage
                   when '/api/lti/security/jwks'
                     Lti::KeyStorage
                   end

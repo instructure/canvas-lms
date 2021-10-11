@@ -20,7 +20,7 @@
 require File.expand_path('../../../spec_helper', File.dirname(__FILE__))
 require_dependency "canvas/oauth/provider"
 
-module Canvas::Oauth
+module Canvas::OAuth
   describe Provider do
     let(:provider) { Provider.new('123') }
 
@@ -125,7 +125,7 @@ module Canvas::Oauth
 
       it 'ignores tokens for out of band requests ' do
         user.access_tokens.create!(:developer_key => developer_key, :scopes => ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"], :remember_access => true)
-        expect(Provider.new(developer_key.id, Canvas::Oauth::Provider::OAUTH2_OOB_URI, ['userinfo']).authorized_token?(user)).to eq false
+        expect(Provider.new(developer_key.id, Canvas::OAuth::Provider::OAUTH2_OOB_URI, ['userinfo']).authorized_token?(user)).to eq false
       end
     end
 

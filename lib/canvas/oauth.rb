@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,21 +16,14 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-module Canvas::OAuth
-  class InvalidRequestError < RequestError
-    def to_render_data
-      {
-        status: 400,
-        json: {
-          error: :invalid_request,
-          error_description: @message
-        }
-      }
-    end
-
-    def http_status
-      400
-    end
+module Canvas
+  module OAuth
   end
 end
+
+# TODO: this shim is just for renaming plugin references from Oauth to OAuth.
+# It should be removed once that transition is complete
+
+::Canvas::Oauth = ::Canvas::OAuth

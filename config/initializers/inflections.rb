@@ -25,4 +25,5 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym "GraphQL"
   inflect.acronym "IMS"
   inflect.acronym "CSV"
+  inflect.acronym "OAuth"
 end

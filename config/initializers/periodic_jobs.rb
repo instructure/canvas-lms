@@ -251,8 +251,8 @@ Rails.configuration.after_initialize do
     Lti::KeyStorage.rotate_keys
   end
 
-  Delayed::Periodic.cron 'Canvas::Oauth::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
-    Canvas::Oauth::KeyStorage.rotate_keys
+  Delayed::Periodic.cron 'Canvas::OAuth::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
+    Canvas::OAuth::KeyStorage.rotate_keys
   end
 
   Delayed::Periodic.cron 'CanvasSecurity::ServicesJwt::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do

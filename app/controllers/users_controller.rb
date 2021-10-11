@@ -267,7 +267,7 @@ class UsersController < ApplicationController
     elsif params[:service] == "twitter"
       success_url = oauth_success_url(:service => 'twitter')
       request_token = Twitter::Connection.request_token(success_url)
-      OauthRequest.create(
+      OAuthRequest.create(
         :service => 'twitter',
         :token => request_token.token,
         :secret => request_token.secret,
@@ -282,7 +282,7 @@ class UsersController < ApplicationController
   def oauth_success
     oauth_request = nil
     if params[:oauth_token]
-      oauth_request = OauthRequest.where(token: params[:oauth_token], service: params[:service]).first
+      oauth_request = OAuthRequest.where(token: params[:oauth_token], service: params[:service]).first
     elsif params[:code] && params[:state] && params[:service] == 'google_drive'
 
       begin
@@ -3070,8 +3070,8 @@ class UsersController < ApplicationController
 
         data['destination'] = uri.to_s
       elsif (oauth = session[:oauth2])
-        provider = Canvas::Oauth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
-        data['destination'] = Canvas::Oauth::Provider.confirmation_redirect(self, provider, @user).to_s
+        provider = Canvas::OAuth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
+        data['destination'] = Canvas::OAuth::Provider.confirmation_redirect(self, provider, @user).to_s
       end
 
       render(:json => data)

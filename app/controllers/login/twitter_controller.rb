@@ -19,5 +19,5 @@
 #
 
 module Login
-  TwitterController = OauthController
+  TwitterController = OAuthController
 end

@@ -21,7 +21,7 @@
 require 'oauth2'
 require 'canvas/core_ext/oauth2'
 
-class OauthValidationError < RuntimeError
+class OAuthValidationError < RuntimeError
 end
 
 class AuthenticationProvider::Oauth2 < AuthenticationProvider::Delegated

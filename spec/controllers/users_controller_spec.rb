@@ -611,7 +611,7 @@ describe UsersController do
           allow(redis).to receive(:del)
           allow(Canvas).to receive_messages(:redis => redis)
           key = DeveloperKey.create! :redirect_uri => 'https://example.com'
-          provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
+          provider = Canvas::OAuth::Provider.new(key.id, key.redirect_uri, [], nil)
 
           course_with_student
           @domain_root_account = @course.account
