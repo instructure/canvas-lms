@@ -50,7 +50,7 @@ describe('GradebookMenu', () => {
       const {getAllByRole, getByRole} = render(<GradebookMenu {...defaultProps} />)
       const menu = getByRole('button')
 
-      expect(menu).toHaveTextContent('Traditional Gradebook')
+      expect(menu).toHaveTextContent('Gradebook')
       fireEvent.click(menu)
 
       checkMenuItemContents(
@@ -89,7 +89,7 @@ describe('GradebookMenu', () => {
 
       checkMenuItemContents(
         getAllByRole('menuitem'),
-        ['Traditional Gradebook…', 'Individual Gradebook…', 'Gradebook History…'],
+        ['Gradebook…', 'Individual Gradebook…', 'Gradebook History…'],
         [
           '/courseUrl/gradebook?view=gradebook',
           '/courseUrl/gradebook/change_gradebook_version?version=individual',
@@ -111,7 +111,7 @@ describe('GradebookMenu', () => {
 
       checkMenuItemContents(
         getAllByRole('menuitem'),
-        ['Traditional Gradebook…', 'Individual Gradebook…', 'Learning Mastery…'],
+        ['Gradebook…', 'Individual Gradebook…', 'Learning Mastery…'],
         [
           '/courseUrl/gradebook?view=gradebook',
           '/courseUrl/gradebook/change_gradebook_version?version=individual',
@@ -131,10 +131,7 @@ describe('GradebookMenu', () => {
       const menu = getByRole('button')
       fireEvent.click(menu)
 
-      checkMenuItemContents(getAllByRole('menuitem'), [
-        'Traditional Gradebook…',
-        'Individual Gradebook…'
-      ])
+      checkMenuItemContents(getAllByRole('menuitem'), ['Gradebook…', 'Individual Gradebook…'])
     })
   })
 })
