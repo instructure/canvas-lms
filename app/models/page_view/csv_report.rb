@@ -19,7 +19,7 @@
 #
 
 class PageView
-  class CsvReport
+  class CSVReport
     attr_reader :user, :limit
 
     def initialize(user, viewer = nil, options = {})

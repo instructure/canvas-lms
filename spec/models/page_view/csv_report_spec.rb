@@ -20,7 +20,7 @@
 
 require_relative '../../spec_helper.rb'
 
-describe PageView::CsvReport do
+describe PageView::CSVReport do
   class PaginationStub < Array
     def next_page
       true
@@ -36,7 +36,7 @@ describe PageView::CsvReport do
       pv1 = page_view_model
       pv2 = page_view_model
 
-      report = PageView::CsvReport.new(@user)
+      report = PageView::CSVReport.new(@user)
 
       expect(report.records.map(&:id).sort).to eq [pv1.id, pv2.id].sort
     end
@@ -45,7 +45,7 @@ describe PageView::CsvReport do
       Setting.set('page_views_csv_export_rows', 2)
       pv1 = page_view_model
 
-      report = PageView::CsvReport.new(@user)
+      report = PageView::CSVReport.new(@user)
       allow(report).to receive(:page_views).and_return(PaginationStub.new([pv1]))
 
       expect(report.records.map(&:id).sort).to eq [pv1.id, pv1.id].sort
@@ -56,7 +56,7 @@ describe PageView::CsvReport do
       pv1 = page_view_model
       pv2 = page_view_model
 
-      report = PageView::CsvReport.new(@user)
+      report = PageView::CSVReport.new(@user)
       allow(report).to receive(:page_views).and_return(PaginationStub.new([pv1, pv2]))
 
       expect(report.records.map(&:id).sort).to eq [pv1.id, pv2.id, pv1.id].sort
@@ -68,7 +68,7 @@ describe PageView::CsvReport do
       pv1 = page_view_model
       pv2 = page_view_model
 
-      csv = PageView::CsvReport.new(@user).generate
+      csv = PageView::CSVReport.new(@user).generate
       rows = CSV.parse(csv, headers: true)
       expect(rows.length).to eq 2
       expect(rows.map { |x| x['request_id'] }.sort).to eq [pv1.id, pv2.id].sort
