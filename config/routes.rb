@@ -1070,6 +1070,14 @@ CanvasRails::Application.routes.draw do
       put "courses/:course_id/tabs/:tab_id", action: :update
     end
 
+    scope(controller: :gradebook_filters_api) do
+      get 'courses/:course_id/gradebook_filters', action: :index
+      post 'courses/:course_id/gradebook_filters', action: :create
+      get 'courses/:course_id/gradebook_filters/:id', action: :show
+      put 'courses/:course_id/gradebook_filters/:id', action: :update
+      delete 'courses/:course_id/gradebook_filters/:id', action: :destroy
+    end
+
     scope(controller: :scopes_api) do
       get "accounts/:account_id/scopes", action: :index
     end

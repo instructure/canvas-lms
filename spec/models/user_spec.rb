@@ -3812,4 +3812,11 @@ describe User do
       end
     end
   end
+
+  it "destroys associated gradebook filters when the user is soft-deleted" do
+    course_with_teacher(:active_all => true)
+    @course.gradebook_filters.create!(user: @teacher, course: @course, name: 'First filter', payload: { foo: :bar })
+    @teacher.destroy
+    expect(@teacher.gradebook_filters.count).to eq 0
+  end
 end
