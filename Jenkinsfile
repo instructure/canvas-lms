@@ -479,6 +479,10 @@ pipeline {
                     extendedStage(LINTERS_BUILD_IMAGE_STAGE)
                       .queue(stages, buildDockerImageStage.&lintersImage)
 
+                    extendedStage('Run i18n:generate')
+                      .required(configuration.isChangeMerged())
+                      .queue(stages, buildDockerImageStage.&i18nGenerate)
+
                     parallel(stages)
                   }
                 }
