@@ -63,7 +63,7 @@ module Types
 
     field :message, String, null: true
     def message
-      object.message unless object.locked_for?(current_user, check_policies: true)
+      object.message
     end
 
     field :locked_for_user, Boolean, null: false
