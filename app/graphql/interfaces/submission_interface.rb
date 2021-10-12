@@ -257,13 +257,10 @@ module Interfaces::SubmissionInterface
   def turnitin_data
     return nil if object.turnitin_data.empty?
 
-    promises = object.turnitin_data.keys
-                     .reject { |key| key == :last_processed_attempt }
-                     .map do |asset_string|
+    promises = object.turnitin_data.except(:last_processed_attempt, :webhook_info).map do |asset_string, data|
       Loaders::AssetStringLoader.load(asset_string).then do |turnitin_context|
         next if turnitin_context.nil?
 
-        data = object.turnitin_data[asset_string]
         {
           target: turnitin_context,
           score: data[:similarity_score],

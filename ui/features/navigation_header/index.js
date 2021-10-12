@@ -28,7 +28,7 @@ import ready from '@instructure/ready'
 // Handle user toggling of nav width
 let navCollapsed = window.ENV.SETTINGS && window.ENV.SETTINGS.collapse_global_nav
 
-$('body').on('click', '#primaryNavToggle', function() {
+$('body').on('click', '#primaryNavToggle', function () {
   let primaryNavToggleText
   navCollapsed = !navCollapsed
   if (navCollapsed) {
@@ -43,9 +43,7 @@ $('body').on('click', '#primaryNavToggle', function() {
       $('body').addClass('primary-nav-transitions')
     }, 300)
   } else {
-    $('body')
-      .removeClass('primary-nav-transitions')
-      .addClass('primary-nav-expanded')
+    $('body').removeClass('primary-nav-transitions').addClass('primary-nav-expanded')
     $.ajaxJSON('/api/v1/users/self/settings', 'PUT', {collapse_global_nav: false})
     primaryNavToggleText = I18n.t('Minimize global navigation')
     $(this).attr({title: primaryNavToggleText, 'aria-label': primaryNavToggleText})
@@ -55,22 +53,27 @@ $('body').on('click', '#primaryNavToggle', function() {
 ready(() => {
   const globalNavTrayContainer = document.getElementById('global_nav_tray_container')
   if (globalNavTrayContainer) {
-    let mobileNavigationComponent
-    function renderMobileNav() {
-      if (mobileNavigationComponent) mobileNavigationComponent.forceUpdate()
-    }
+    const DesktopNavComponent = React.createRef()
+    const mobileNavComponent = React.createRef()
 
-    const DesktopNavComponent = ReactDOM.render(
-      <Navigation onDataReceived={renderMobileNav} />,
-      globalNavTrayContainer
+    ReactDOM.render(
+      <Navigation
+        ref={DesktopNavComponent}
+        onDataReceived={() => mobileNavComponent.current?.forceUpdate()}
+      />,
+      globalNavTrayContainer,
+      () => {
+        const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
+        if (mobileContextNavContainer) {
+          ReactDOM.render(
+            <MobileNavigation
+              ref={mobileNavComponent}
+              DesktopNavComponent={DesktopNavComponent.current}
+            />,
+            mobileContextNavContainer
+          )
+        }
+      }
     )
-
-    const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
-    if (mobileContextNavContainer) {
-      mobileNavigationComponent = ReactDOM.render(
-        <MobileNavigation DesktopNavComponent={DesktopNavComponent} />,
-        mobileContextNavContainer
-      )
-    }
   }
 })

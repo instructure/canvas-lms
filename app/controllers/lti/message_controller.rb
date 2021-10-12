@@ -70,13 +70,13 @@ module Lti
     end
 
     def reregistration_message(mh, tp)
-      IMS::LTI::Models::Messages::ToolProxyUpdateRequest.new(
+      ::IMS::LTI::Models::Messages::ToolProxyUpdateRequest.new(
         launch_url: mh.launch_path,
         oauth_consumer_key: tp.guid,
-        lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
+        lti_version: ::IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
         tc_profile_url: polymorphic_url([@context, :tool_consumer_profile]),
         launch_presentation_return_url: polymorphic_url([@context, :registration_return]),
-        launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
+        launch_presentation_document_target: ::IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
       )
     end
     private :reregistration_message
@@ -176,7 +176,7 @@ module Lti
         launch_attrs = {
           launch_url: launch_url(lti_link&.resource_url, message_handler),
           oauth_consumer_key: tool_proxy.guid,
-          lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
+          lti_version: ::IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
           resource_link_id: resource_link_id
         }
         launch_attrs[:ext_lti_assignment_id] = lti_assignment_id if lti_assignment_id.present?
@@ -192,7 +192,7 @@ module Lti
                                                                              assignment: assignment))
         launch_attrs.merge! enabled_parameters(tool_proxy, message_handler, variable_expander)
 
-        message = IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(launch_attrs)
+        message = ::IMS::LTI::Models::Messages::BasicLTILaunchRequest.new(launch_attrs)
         message.user_id = Lti::Asset.opaque_identifier_for(@current_user, context: @context)
         set_active_tab message_handler.asset_string
         @lti_launch.resource_url = message.launch_url
@@ -212,7 +212,7 @@ module Lti
     end
 
     def enabled_parameters(tp, mh, variable_expander)
-      tool_proxy = IMS::LTI::Models::ToolProxy.from_json(tp.raw_data)
+      tool_proxy = ::IMS::LTI::Models::ToolProxy.from_json(tp.raw_data)
       enabled_capability = tool_proxy.enabled_capabilities
       enabled_capability = enabled_capability.concat(mh.capabilities).uniq if mh.capabilities.present?
       CapabilitiesHelper.capability_params_hash(enabled_capability, variable_expander)
@@ -235,8 +235,8 @@ module Lti
     end
 
     def custom_params(parameters, variable_expander)
-      params = IMS::LTI::Models::Parameter.from_json(parameters || [])
-      IMS::LTI::Models::Parameter.process_params(params, variable_expander)
+      params = ::IMS::LTI::Models::Parameter.from_json(parameters || [])
+      ::IMS::LTI::Models::Parameter.process_params(params, variable_expander)
     end
 
     def find_binding(tool_proxy)

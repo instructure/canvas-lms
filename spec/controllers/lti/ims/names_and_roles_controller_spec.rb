@@ -25,8 +25,8 @@ require_dependency "lti/ims/names_and_roles_controller.rb"
 require_dependency "lti/ims/providers/course_memberships_provider.rb"
 require_dependency "lti/ims/providers/group_memberships_provider.rb"
 
-describe Lti::Ims::NamesAndRolesController do
-  include Lti::Ims::NamesAndRolesMatchers
+describe Lti::IMS::NamesAndRolesController do
+  include Lti::IMS::NamesAndRolesMatchers
 
   include_context 'advantage services context'
 
@@ -473,7 +473,7 @@ describe Lti::Ims::NamesAndRolesController do
       let(:total_items) { enrollments.length }
       let(:rsp_page) { 1 }
       let(:rsp_page_size) { [total_items, effective_page_size].min }
-      let(:effective_page_size) { Lti::Ims::Providers::MembershipsProvider::MAX_PAGE_SIZE } # system default
+      let(:effective_page_size) { Lti::IMS::Providers::MembershipsProvider::MAX_PAGE_SIZE } # system default
       let(:pass_thru_params) { { pass: 'thru' } }
       let(:params_overrides) { super().merge(pass_thru_params) }
 
@@ -941,7 +941,7 @@ describe Lti::Ims::NamesAndRolesController do
       let(:total_items) { enrollments.length }
       let(:rsp_page) { 1 }
       let(:rsp_page_size) { [total_items, effective_page_size].min }
-      let(:effective_page_size) { Lti::Ims::Providers::MembershipsProvider::MAX_PAGE_SIZE } # system default
+      let(:effective_page_size) { Lti::IMS::Providers::MembershipsProvider::MAX_PAGE_SIZE } # system default
       let(:pass_thru_params) { { pass: 'thru' } }
       let(:params_overrides) { super().merge(pass_thru_params) }
 

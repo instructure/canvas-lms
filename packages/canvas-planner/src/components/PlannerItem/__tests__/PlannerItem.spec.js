@@ -867,4 +867,10 @@ describe('with isMissingItem', () => {
     const dateText = wrapper.find('.PlannerItem-styles__due PresentationContent')
     expect(dateText.childAt(0).text()).toBe('Due: Dec 17, 2011 at 3:30 AM')
   })
+
+  it('does not render date when there is no date', () => {
+    const wrapper = shallow(<PlannerItem {...props} date={null} />)
+    const dateText = wrapper.find('.PlannerItem-styles__due PresentationContent')
+    expect(dateText.children().isEmpty()).toBeTruthy()
+  })
 })

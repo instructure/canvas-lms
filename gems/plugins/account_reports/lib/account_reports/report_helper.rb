@@ -305,7 +305,7 @@ module AccountReports::ReportHelper
     file = AccountReports.generate_file(@account_report, extension)
     options = {}
     if enable_i18n_features
-      options = CsvWithI18n.csv_i18n_settings(@account_report.user)
+      options = CSVWithI18n.csv_i18n_settings(@account_report.user)
     end
     ExtendedCSV.open(file, "w", **options) do |csv|
       csv.instance_variable_set(:@account_report, @account_report)
@@ -527,7 +527,7 @@ module AccountReports::ReportHelper
     end
   end
 
-  class ExtendedCSV < CsvWithI18n
+  class ExtendedCSV < CSVWithI18n
     def <<(row)
       if lineno % 1_000 == 0
         GuardRail.activate(:primary) do

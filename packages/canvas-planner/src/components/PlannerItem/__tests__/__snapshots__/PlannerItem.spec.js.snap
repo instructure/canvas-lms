@@ -318,6 +318,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
         className="PlannerItem-styles__feedbackAvatar"
       >
         <Avatar
+          color="default"
           data-fs-exclude={true}
           display="inline-block"
           name="Dr. David Bowman"
@@ -3297,6 +3298,7 @@ exports[`renders Note correctly with everything 1`] = `
     }
   >
     <Avatar
+      color="default"
       data-fs-exclude={true}
       display="inline-block"
       name="Jane"
@@ -3488,6 +3490,7 @@ exports[`renders Note correctly without Course 1`] = `
     }
   >
     <Avatar
+      color="default"
       data-fs-exclude={true}
       display="inline-block"
       name="Jane"
@@ -5365,6 +5368,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
         className="PlannerItem-styles__feedbackAvatar"
       >
         <Avatar
+          color="default"
           data-fs-exclude={true}
           display="inline-block"
           name="?"
@@ -5542,6 +5546,7 @@ exports[`renders feedback if available 1`] = `
         className="PlannerItem-styles__feedbackAvatar"
       >
         <Avatar
+          color="default"
           data-fs-exclude={true}
           display="inline-block"
           name="Boyd Crowder"
@@ -5720,6 +5725,7 @@ exports[`renders media feedback if available 1`] = `
         className="PlannerItem-styles__feedbackAvatar"
       >
         <Avatar
+          color="default"
           data-fs-exclude={true}
           display="inline-block"
           name="Howard Stern"
@@ -6124,6 +6130,7 @@ exports[`renders user-created Todo correctly 1`] = `
     }
   >
     <Avatar
+      color="default"
       data-fs-exclude={true}
       display="inline-block"
       name="Jane"

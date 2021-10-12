@@ -16,24 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getInstance, setLocale} from 'tinymce-a11y-checker'
-import {beforeCheck, afterCheck} from './a11yCheckerHooks'
+import {setLocale} from 'tinymce-a11y-checker'
 
-if (ENV.use_rce_enhancements) {
-  console.error('We should not have gotten here')
-} else {
-  getInstance(c =>
-    c.setConfig({
-      beforeCheck,
-      afterCheck
-    })
-  )
-
-  if (ENV && ENV.LOCALE) {
-    let locale = ENV.LOCALE
-    if (locale === 'zh-Hant') {
-      locale = 'zh-HK'
-    }
-    setLocale(locale)
+if (ENV?.LOCALE) {
+  let locale = ENV.LOCALE
+  if (locale === 'zh-Hant') {
+    locale = 'zh-HK'
   }
+  setLocale(locale)
 }

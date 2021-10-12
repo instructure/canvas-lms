@@ -50,7 +50,6 @@ function renderInContext(overrides = {}, children) {
 
 describe('SubmissionManager', () => {
   beforeAll(() => {
-    window.ENV.use_rce_enhancements = true
     window.INST = window.INST || {}
     window.INST.editorButtons = []
   })
@@ -315,6 +314,7 @@ describe('SubmissionManager', () => {
       expect(confirmationDialog).toHaveTextContent('You are submitting a Text submission')
       expect(within(confirmationDialog).getByRole('button', {name: /Cancel/})).toBeInTheDocument()
       expect(within(confirmationDialog).getByRole('button', {name: /Okay/})).toBeInTheDocument()
+      fireEvent.click(within(confirmationDialog).getByRole('button', {name: /Cancel/}))
     })
   })
 

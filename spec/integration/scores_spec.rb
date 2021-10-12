@@ -21,7 +21,7 @@ require 'spec_helper'
 require 'apis/api_spec_helper'
 require_relative '../controllers/lti/ims/concerns/advantage_services_shared_context'
 
-module Lti::Ims
+module Lti::IMS
   RSpec.describe ScoresController, type: :request do
     include_context 'advantage services context'
 

@@ -23,8 +23,6 @@
 
 <% if editing_restricted?(@quiz, :content) %>
   <% provide_blank :right_side %>
-<% else %>
-  <% provide :right_side, render(:partial => 'shared/wiki_sidebar') %>
 <% end %>
 
 <h1 class="screenreader-only"><%= @quiz.quiz_title %></h1>

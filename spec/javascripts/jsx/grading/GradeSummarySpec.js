@@ -1447,7 +1447,7 @@ QUnit.module('GradeSummary', () => {
       ENV.assignment_sort_options = [
         ['Assignment Group', 'assignment_group'],
         ['Due Date', 'due_at'],
-        ['Title', 'title']
+        ['Name', 'title']
       ]
 
       deepEqual(

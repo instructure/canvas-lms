@@ -17,7 +17,6 @@
  */
 
 import $ from 'jquery'
-import IframesTableFix from './IframesTableFix'
 
 // mirror attributes onto tinymce editor (if this can be done
 // via tiny api, it is preferable, but I dont see a way)
@@ -31,20 +30,6 @@ export default function wrapInitCb(mirroredAttrs, editorOptions, MutationObserve
       Object.keys(attrs).forEach(attr => {
         el.setAttribute(attr, attrs[attr])
       })
-
-      if (!window.ENV?.use_rce_enhancements) {
-        // *** moved to RCEWrapper for new rce ***
-        // add data to textarea so it can be found by canvas
-        // (which unfortunately relies on this a lot)
-        el.dataset.rich_text = true
-      }
-    }
-
-    if (!window.ENV?.use_rce_enhancements) {
-      // *** no longer necessary with tinymce 5 ***
-      // hookAddVisual for hacky <td><iframe> fix
-      const ifr = new IframesTableFix()
-      ifr.hookAddVisual(ed, MutationObserver)
     }
 
     // *** moved from setupAndFocusTinyMCEConfig ***
@@ -70,26 +55,6 @@ export default function wrapInitCb(mirroredAttrs, editorOptions, MutationObserve
     // })
 
     $(window).triggerHandler('resize')
-
-    if (!window.ENV?.use_rce_enhancements) {
-      // this is a hack so that when you drag an image from the sidebar to the editor that it doesn't
-      // try to embed the thumbnail but rather the full size version of the image.
-      // so basically, to document why and how this works: in wiki_sidebar.js we add the
-      // _mce_src="http://path/to/the/fullsize/image" to the images whose src="path/to/thumbnail/of/image/"
-      // what this does is check to see if some DOM node that got inserted into the editor has the attribute _mce_src
-      // and if it does, use that instead.
-      $(ed.contentDocument).bind('DOMNodeInserted', e => {
-        const target = e.target
-        let mceSrc
-        if (
-          target.nodeType === 1 &&
-          target.nodeName === 'IMG' &&
-          (mceSrc = $(target).data('url'))
-        ) {
-          $(target).attr('src', tinymce.activeEditor.documentBaseURI.toAbsolute(mceSrc))
-        }
-      })
-    }
 
     // tiny sets a focusout event handler, which only IE supports
     // (Chrome/Safari/Opera support DOMFocusOut, FF supports neither)

@@ -41,6 +41,7 @@ module Api::V1::ExternalTools
     json['icon_url'] = tool.settings[:icon_url] if tool.settings.key? :icon_url
     json['not_selectable'] = tool.not_selectable
     json['version'] = tool.use_1_3? ? '1.3' : '1.1'
+    json['developer_key_id'] = tool.developer_key_id if tool.developer_key_id
     extension_types.each do |type|
       if json[type]
         json[type]['label'] = tool.label_for(type, I18n.locale)

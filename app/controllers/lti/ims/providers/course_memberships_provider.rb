@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Lti::Ims::Providers
+module Lti::IMS::Providers
   class CourseMembershipsProvider < MembershipsProvider
     def context
       @_context ||= CourseContextDecorator.new(super)
@@ -100,7 +100,7 @@ module Lti::Ims::Providers
         .map { |user_enrollments| CourseEnrollmentsDecorator.new(user_enrollments, tool) }
     end
 
-    # *Decorators fix up models to conforms to interfaces expected by Lti::Ims::NamesAndRolesSerializer
+    # *Decorators fix up models to conforms to interfaces expected by Lti::IMS::NamesAndRolesSerializer
     class CourseEnrollmentsDecorator
       attr_reader :enrollments
 

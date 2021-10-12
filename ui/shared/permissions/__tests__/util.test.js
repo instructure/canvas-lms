@@ -23,8 +23,8 @@ import {
   roleIsBaseRole,
   groupGranularPermissionsInRole
 } from '../util'
-
 import {ENABLED_FOR_NONE, ENABLED_FOR_PARTIAL, ENABLED_FOR_ALL} from '../react/propTypes'
+import stubEnv from '@canvas/stub-env'
 
 function makeGroupPermissions() {
   return {
@@ -37,12 +37,49 @@ function makeGroupPermissions() {
       g2a: {enabled: true, locked: true, readonly: true, explicit: true, group: 'g2'},
       g2b: {enabled: false, locked: true, readonly: true, explicit: true, group: 'g2'},
       g3a: {enabled: false, locked: false, readonly: false, explicit: false, group: 'g3'},
-      g3b: {enabled: false, locked: false, readonly: false, explicit: false, group: 'g3'}
+      g3b: {enabled: false, locked: false, readonly: false, explicit: false, group: 'g3'},
+      manage_courses_add: {
+        enabled: false,
+        locked: true,
+        readonly: true,
+        explicit: false,
+        group: 'manage_courses'
+      },
+      manage_courses_conclude: {
+        enabled: true,
+        locked: false,
+        readonly: false,
+        explicit: false,
+        group: 'manage_courses'
+      },
+      manage_courses_delete: {
+        enabled: true,
+        locked: false,
+        readonly: false,
+        explicit: false,
+        group: 'manage_courses'
+      },
+      manage_courses_publish: {
+        enabled: true,
+        locked: false,
+        readonly: false,
+        explicit: false,
+        group: 'manage_courses'
+      }
     }
   }
 }
 
 describe('permissions::utils', () => {
+  stubEnv({
+    ACCOUNT_PERMISSIONS: [
+      {
+        group_name: 'Account Permissions',
+        group_permissions: [{permission_name: 'manage_courses_add'}]
+      }
+    ]
+  })
+
   describe('getSortedRoles', () => {
     it('sorts roles properly based on base_role_type', () => {
       const UNORDERED_ROLES = [
@@ -377,19 +414,27 @@ describe('permissions::utils', () => {
   })
 
   describe('groupGranularPermissionsInRole', () => {
+    let accountRole
+    let courseRole
+    let groupPermissions
+
+    beforeEach(() => {
+      groupPermissions = makeGroupPermissions()
+      accountRole = {base_role_type: 'AccountAdmin', contextType: 'Account', ...groupPermissions}
+      courseRole = {base_role_type: 'TeacherEnrollment', contextType: 'Course', ...groupPermissions}
+    })
+
     it('transforms boolean enabled into enum value', () => {
-      const role = makeGroupPermissions()
-      groupGranularPermissionsInRole(role)
-      const {permissions} = role
+      groupGranularPermissionsInRole(courseRole)
+      const {permissions} = groupPermissions
       expect(permissions.p1.enabled).toBe(ENABLED_FOR_ALL)
       expect(permissions.p2.enabled).toBe(ENABLED_FOR_NONE)
       expect(permissions.p3.enabled).toBe(ENABLED_FOR_NONE)
     })
 
     it('creates new group permissions', () => {
-      const role = makeGroupPermissions()
-      groupGranularPermissionsInRole(role)
-      const {permissions} = role
+      groupGranularPermissionsInRole(courseRole)
+      const {permissions} = groupPermissions
       expect(permissions.g1).toBeDefined()
       expect(permissions.g2).toBeDefined()
       expect(permissions.g3).toBeDefined()
@@ -397,18 +442,16 @@ describe('permissions::utils', () => {
     })
 
     it('sets the right enabled enum for the group value', () => {
-      const role = makeGroupPermissions()
-      groupGranularPermissionsInRole(role)
-      const {g1, g2, g3} = role.permissions
+      groupGranularPermissionsInRole(courseRole)
+      const {g1, g2, g3} = groupPermissions.permissions
       expect(g1.enabled).toBe(ENABLED_FOR_ALL)
       expect(g2.enabled).toBe(ENABLED_FOR_PARTIAL)
       expect(g3.enabled).toBe(ENABLED_FOR_NONE)
     })
 
     it('does the right logic for the other group values', () => {
-      const role = makeGroupPermissions()
-      groupGranularPermissionsInRole(role)
-      const {g1, g2, g3} = role.permissions
+      groupGranularPermissionsInRole(courseRole)
+      const {g1, g2, g3} = groupPermissions.permissions
       expect(g1.locked).toBe(false) // locked is ANDed
       expect(g1.readonly).toBe(true) // readonly is ORed
       expect(g1.explicit).toBe(true) // explicit is ORed
@@ -416,6 +459,30 @@ describe('permissions::utils', () => {
       expect(g3.locked).toBe(false)
       expect(g3.readonly).toBe(false)
       expect(g3.explicit).toBe(false)
+    })
+
+    describe('course context', () => {
+      it('sets the right enabled enum given grouped course/account granular permissions', () => {
+        groupGranularPermissionsInRole(courseRole)
+        expect(courseRole.permissions.manage_courses.enabled).toBe(ENABLED_FOR_ALL)
+      })
+
+      it('sets the correct readonly bool given grouped course/account granular permissions', () => {
+        groupGranularPermissionsInRole(courseRole)
+        expect(courseRole.permissions.manage_courses.readonly).toBe(false)
+      })
+    })
+
+    describe('account context', () => {
+      it('sets the right enabled enum given grouped course/account granular permissions', () => {
+        groupGranularPermissionsInRole(accountRole)
+        expect(accountRole.permissions.manage_courses.enabled).toBe(ENABLED_FOR_PARTIAL)
+      })
+
+      it('sets the correct readonly bool given grouped course/account granular permissions', () => {
+        groupGranularPermissionsInRole(accountRole)
+        expect(accountRole.permissions.manage_courses.readonly).toBe(true)
+      })
     })
   })
 

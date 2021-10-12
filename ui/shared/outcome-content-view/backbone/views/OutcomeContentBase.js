@@ -20,7 +20,6 @@ import I18n from 'i18n!OutcomeContentBase'
 import $ from 'jquery'
 import _ from 'underscore'
 import ValidatedFormView from '@canvas/forms/backbone/views/ValidatedFormView.coffee'
-import RCEKeyboardShortcuts from '@canvas/tinymce-keyboard-shortcuts'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
@@ -245,39 +244,15 @@ export default class OutcomeContentBase extends ValidatedFormView {
     return this.model.set(this._modelAttributes)
   }
 
-  setupTinyMCEViewSwitcher() {
-    $('.rte_switch_views_link').click(e => {
-      e.preventDefault()
-      RichContentEditor.callOnRCE(this.$('textarea'), 'toggle')
-      // hide the clicked link, and show the other toggle link.
-      $(e.currentTarget)
-        .siblings('.rte_switch_views_link')
-        .andSelf()
-        .toggle()
-        .focus()
-    })
-  }
-
-  addTinyMCEKeyboardShortcuts() {
-    if (!ENV.use_rce_enhancements) {
-      const keyboardShortcutsView = new RCEKeyboardShortcuts()
-      return keyboardShortcutsView.render().$el.insertBefore($('.rte_switch_views_link:first'))
-    }
-  }
-
   // Called from subclasses in render.
   readyForm() {
     return setTimeout(() => {
       RichContentEditor.loadNewEditor(this.$('textarea'), {
         getRenderingTarget(t) {
-          const wrappedTextarea = $(t)
-            .wrap(`<div id='parent-of-${t.id}'></div>`)
-            .get(0)
+          const wrappedTextarea = $(t).wrap(`<div id='parent-of-${t.id}'></div>`).get(0)
           return wrappedTextarea.parentNode
         }
-      }) // tinymce initializer
-      this.setupTinyMCEViewSwitcher()
-      this.addTinyMCEKeyboardShortcuts()
+      })
       return this.$('input:first').focus()
     })
   }

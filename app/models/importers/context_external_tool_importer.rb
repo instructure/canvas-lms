@@ -69,6 +69,13 @@ module Importers
       item.shared_secret ||= hash[:shared_secret] || 'fake'
       item.developer_key_id ||= hash.dig(:settings, :client_id)
       item.settings = create_tool_settings(hash)
+
+      Lti::ResourcePlacement::PLACEMENTS.each do |placement|
+        next unless item.settings.key?(placement)
+
+        item.set_extension_setting(placement, item.settings[placement])
+      end
+
       if hash[:custom_fields].is_a? Hash
         item.settings[:custom_fields] ||= {}
         item.settings[:custom_fields].merge! hash[:custom_fields]

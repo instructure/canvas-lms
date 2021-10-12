@@ -29,7 +29,7 @@ class NotificationFinder
     notifications[name]
   end
 
-  alias :by_name :find_by_name
+  alias_method :by_name, :find_by_name
 
   def reset_cache
     @notifications = []

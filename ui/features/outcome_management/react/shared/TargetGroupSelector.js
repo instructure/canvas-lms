@@ -99,7 +99,7 @@ const TargetGroupSelector = ({groupId, starterGroupId, setTargetGroup}) => {
   const onCollectionClick = (_, selectedCollection) => {
     canCallSetTargetGroupWithStarterGroup.current = false
     queryCollections(selectedCollection)
-    const selectedGroupObject = collections[selectedCollection.id]
+    const selectedGroupObject = collections[selectedCollection.id] || selectedCollection
     setTargetGroup({
       targetGroup: selectedGroupObject,
       targetAncestorsIds: getAncestorsIds(selectedGroupObject, collections)

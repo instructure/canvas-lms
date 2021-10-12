@@ -109,6 +109,24 @@ describe('Integrations', () => {
       expect(subject.getByText('Sync Now')).toBeTruthy()
     })
 
+    it('expands the Microsoft Sync details when toggled on', () => {
+      useFetchApi.mockImplementationOnce(({error, loading}) => {
+        error({message: 'notfound', response: {status: 404}})
+        loading(false)
+      })
+      const subject = render(<Integrations />)
+      expect(subject.queryByText('Sync Now')).not.toBeInTheDocument()
+      useFetchApi.mockImplementationOnce(({success, loading}) => {
+        // Doesn't matter what the API returns, it just needs to return something
+        success({workflow_state: 'active'})
+        loading(false)
+      })
+      act(() => {
+        fireEvent.click(subject.getByLabelText('Toggle Microsoft Sync'))
+      })
+      expect(subject.getByText('Sync Now')).toBeTruthy()
+    })
+
     describe('when the integration is disabled', () => {
       beforeEach(() => {
         useFetchApi.mockImplementationOnce(({success, loading}) => {

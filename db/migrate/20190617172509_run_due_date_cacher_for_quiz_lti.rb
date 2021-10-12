@@ -24,7 +24,7 @@ class RunDueDateCacherForQuizLti < ActiveRecord::Migration[5.1]
 
   def change
     Course.find_ids_in_ranges(batch_size: 100_000) do |start_at, end_at|
-      DataFixup::RunDueDateCacherForQuizLTI.delay_if_production(priority: Delayed::LOW_PRIORITY,
+      DataFixup::RunDueDateCacherForQuizLti.delay_if_production(priority: Delayed::LOW_PRIORITY,
                                                                 n_strand: ["DataFixup::RunDueDateCacherForQuizLti", Shard.current.database_server.id]).run(start_at, end_at)
     end
   end

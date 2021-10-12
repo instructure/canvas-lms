@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-class GradebookCsv < ActiveRecord::Base
+class GradebookCSV < ActiveRecord::Base
   belongs_to :course, inverse_of: :gradebook_csvs
   belongs_to :user
   belongs_to :attachment
@@ -36,3 +36,7 @@ class GradebookCsv < ActiveRecord::Base
     progress.workflow_state == 'failed'
   end
 end
+
+# TODO: this shim is temporary while we rename
+# references in plugins.  It should then be removed.
+GradebookCsv = GradebookCSV

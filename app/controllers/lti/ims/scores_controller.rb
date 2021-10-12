@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Lti::Ims
+module Lti::IMS
   # @API Score
   #
   # Score API for IMS Assignment and Grade Services
@@ -64,7 +64,7 @@ module Lti::Ims
   #       }
   #     }
   class ScoresController < ApplicationController
-    include Lti::Ims::Concerns::GradebookServices
+    include Lti::IMS::Concerns::GradebookServices
     include Api::V1::Attachment
 
     before_action(

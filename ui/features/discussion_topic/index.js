@@ -79,13 +79,7 @@ ready(() => {
     !ENV.DISCUSSION.IS_ASSIGNMENT &&
     !ENV.DISCUSSION.IS_GROUP
   ) {
-    ReactDOM.render(
-      <SectionsTooltip
-        totalUserCount={ENV.TOTAL_USER_COUNT}
-        sections={ENV.DISCUSSION.TOPIC.COURSE_SECTIONS}
-      />,
-      container
-    )
+    ReactDOM.render(<SectionsTooltip sections={ENV.DISCUSSION.TOPIC.COURSE_SECTIONS} />, container)
   }
 
   const topicView = new TopicView({

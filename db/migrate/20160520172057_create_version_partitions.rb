@@ -21,12 +21,12 @@ class CreateVersionPartitions < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def up
-    partman = CanvasPartman::PartitionManager.create(Version)
-    partman.create_initial_partitions(Version::Partitioner.precreate_tables)
+    partman = CanvasPartman::PartitionManager.create(SimplyVersioned::Version)
+    partman.create_initial_partitions(SimplyVersioned::Partitioner.precreate_tables)
   end
 
   def down
-    partman = CanvasPartman::PartitionManager.create(Version)
+    partman = CanvasPartman::PartitionManager.create(SimplyVersioned::Version)
     partman.partition_tables.each do |partition|
       drop_table partition
     end

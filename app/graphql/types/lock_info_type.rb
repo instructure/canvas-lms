@@ -29,7 +29,7 @@ module Types
   class LockInfoType < ApplicationObjectType
     graphql_name "LockInfo"
 
-    alias lock_info object
+    alias_method :lock_info, :object
 
     field :is_locked, Boolean, null: false
     def is_locked

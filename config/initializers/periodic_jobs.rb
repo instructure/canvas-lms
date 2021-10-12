@@ -185,8 +185,8 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(Quizzes::QuizSubmissionEventPartitioner, :process, jitter: 30.minutes, local_offset: true)
   end
 
-  Delayed::Periodic.cron 'Version::Partitioner.process', '0 0 * * *' do
-    with_each_shard_by_database(Version::Partitioner, :process, jitter: 30.minutes, local_offset: true)
+  Delayed::Periodic.cron 'SimplyVersioned::Partitioner.process', '0 0 * * *' do
+    with_each_shard_by_database(SimplyVersioned::Partitioner, :process, jitter: 30.minutes, local_offset: true)
   end
 
   Delayed::Periodic.cron 'Messages::Partitioner.process', '0 0 * * *' do

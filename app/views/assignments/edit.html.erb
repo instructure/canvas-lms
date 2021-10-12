@@ -21,7 +21,6 @@
 <% else %>
   <% provide :page_title, t("Edit Assignment") %>
 <% end %>
-<% provide :right_side, render(:partial => 'shared/wiki_sidebar') %>
 
 <%
   js_env :assignment_attempts_enabled => !@assignment.quiz_lti?

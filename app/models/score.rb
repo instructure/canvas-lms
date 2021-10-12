@@ -46,21 +46,21 @@ class Score < ActiveRecord::Base
     can :read
   end
 
-  alias original_destroy destroy
+  alias_method :original_destroy, :destroy
   private :original_destroy
   def destroy
     score_metadata.destroy if score_metadata.present?
     original_destroy
   end
 
-  alias original_destroy_permanently! destroy_permanently!
+  alias_method :original_destroy_permanently!, :destroy_permanently!
   private :original_destroy_permanently!
   def destroy_permanently!
     ScoreMetadata.where(score: self).delete_all
     original_destroy_permanently!
   end
 
-  alias original_undestroy undestroy
+  alias_method :original_undestroy, :undestroy
   private :original_undestroy
   def undestroy
     score_metadata.undestroy if score_metadata.present?

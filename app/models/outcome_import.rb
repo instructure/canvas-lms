@@ -107,7 +107,7 @@ class OutcomeImport < ApplicationRecord
         I18n.locale = locale if locale.present?
         file = self.attachment.open(need_local_file: true)
 
-        Outcomes::CsvImporter.new(self, file).run do |status|
+        Outcomes::CSVImporter.new(self, file).run do |status|
           status[:errors].each do |row, error|
             add_error row, error
           end

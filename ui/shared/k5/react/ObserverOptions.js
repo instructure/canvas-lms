@@ -19,7 +19,7 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!observer_options'
-import getCookie from 'get-cookie'
+import {savedObservedId, saveObservedId} from '../ObserverGetObservee'
 
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
@@ -31,8 +31,6 @@ import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import AddStudentModal from './AddStudentModal'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-
-export const SELECTED_OBSERVED_USER_COOKIE = 'k5_observed_user_id'
 
 const ObserverOptions = ({
   observerList,
@@ -48,24 +46,32 @@ const ObserverOptions = ({
   const [newStudentModalOpen, setNewStudentModalOpen] = useState(false)
   const isOnlyObserver = currentUserRoles?.every(r => r === 'user' || r === 'observer')
 
-  const handleUserSelected = useCallback(
-    id => {
-      const user = observedUsers.find(u => u.id === id)
+  const updateObservedUser = useCallback(
+    user => {
       setSelectSearchValue(user.name)
       setSelectedUser(user)
       handleChangeObservedUser(user.id)
-      document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=${user.id};path=/`
+      saveObservedId(currentUser.id, user.id)
     },
-    [handleChangeObservedUser, observedUsers]
+    [currentUser.id, handleChangeObservedUser]
+  )
+
+  const handleUserSelected = useCallback(
+    id => {
+      const user = observedUsers.find(u => u.id === id)
+      updateObservedUser(user)
+    },
+    [observedUsers, updateObservedUser]
   )
 
   useEffect(() => {
     if (observedUsers.length > 0) {
-      const storedObservedUserId = getCookie(SELECTED_OBSERVED_USER_COOKIE)
-      const validUser = !!observedUsers.find(u => u.id === storedObservedUserId)
-      handleUserSelected(validUser ? storedObservedUserId : observedUsers[0].id)
+      const storedObservedUserId = savedObservedId(currentUser.id)
+      const validUser = observedUsers.find(u => u.id === storedObservedUserId)
+      updateObservedUser(validUser || observedUsers[0])
     }
-  }, [observedUsers, handleUserSelected])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const selectAvatar =
     /* don't show the default Canvas avatar */
@@ -87,8 +93,16 @@ const ObserverOptions = ({
           per_page: 100
         }
       })
-      const obseervees = parseObservedUsersResponse(json, isOnlyObserver, currentUser)
-      setObservedUsers(obseervees)
+      const observees = parseObservedUsersResponse(json, isOnlyObserver, currentUser)
+      const newObservee = observees.reduce((previous, current) => {
+        if (observedUsers.findIndex(ou => ou.id === current.id) < 0) {
+          return current
+        } else {
+          return previous
+        }
+      })
+      setObservedUsers(observees)
+      updateObservedUser(newObservee)
     } catch (ex) {
       showFlashAlert({
         message: I18n.t('Unable to get observed students'),
@@ -198,8 +212,6 @@ export const ObserverListShape = PropTypes.arrayOf(
 
 export const shouldShowObserverOptions = (observerList, currentUser) =>
   observerList.length > 1 || (observerList.length === 1 && observerList[0].id !== currentUser.id)
-
-export const defaultSelectedObserverId = () => getCookie(SELECTED_OBSERVED_USER_COOKIE)
 
 ObserverOptions.propTypes = {
   observerList: ObserverListShape.isRequired,

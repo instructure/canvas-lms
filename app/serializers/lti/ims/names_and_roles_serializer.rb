@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Lti::Ims
+module Lti::IMS
   class NamesAndRolesSerializer
     def initialize(page)
       @page = page
@@ -55,10 +55,10 @@ module Lti::Ims
     def variable_expander(enrollment)
       Lti::VariableExpander.new(
         page[:context].root_account,
-        Lti::Ims::Providers::MembershipsProvider.unwrap(page[:context]),
+        Lti::IMS::Providers::MembershipsProvider.unwrap(page[:context]),
         page[:controller],
         {
-          current_user: Lti::Ims::Providers::MembershipsProvider.unwrap(enrollment.user),
+          current_user: Lti::IMS::Providers::MembershipsProvider.unwrap(enrollment.user),
           tool: page[:tool],
           enrollment: enrollment,
           variable_whitelist: %w(
@@ -141,7 +141,7 @@ module Lti::Ims
     end
 
     def unwrap(wrapped)
-      Lti::Ims::Providers::MembershipsProvider.unwrap(wrapped)
+      Lti::IMS::Providers::MembershipsProvider.unwrap(wrapped)
     end
 
     attr_reader :page
