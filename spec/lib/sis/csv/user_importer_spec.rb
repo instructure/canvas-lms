@@ -1406,14 +1406,15 @@ describe SIS::CSV::UserImporter do
     g = c.groups.create(name: 'group1')
     u = Pseudonym.where(sis_user_id: 'user_1').first.user
     gm = g.group_memberships.create(user: u, workflow_state: 'accepted')
+    g.update!(leader_id: u.id)
     expect(gm.workflow_state).to eq 'accepted'
 
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "user_1,user1,User,Uno,user@example.com,deleted"
     )
-    gm.reload
-    expect(gm.workflow_state).to eq 'deleted'
+    expect(gm.reload.workflow_state).to eq 'deleted'
+    expect(g.reload.leader_id).to be_nil
   end
 
   it 'creates rollback data' do

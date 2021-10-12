@@ -475,8 +475,12 @@ module SIS
         @roll_back_data.push(*r_data) if r_data
 
         d = enrollments.count
-        d += @root_account.all_group_memberships.active.where(user_id: user)
+        gm = @root_account.all_group_memberships.active.where(user_id: user)
                           .update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
+        if gm > 0
+          d += gm
+          @root_account.all_groups.where(leader_id: user).update_all(leader_id: nil)
+        end
         d += user.account_users.active.shard(@root_account).where(account_id: @root_account.all_accounts)
                  .update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
         d += user.account_users.active.shard(@root_account).where(account_id: @root_account)
