@@ -134,11 +134,12 @@ export const PlanPicker: React.FC<ComponentProps> = ({
         onSelect={handleSelect}
       >
         {renderOption(createContextKey('Course', course.id), I18n.t('Course Pace Plan'))}
-        <Menu id="pace-plan-menu" label={I18n.t('Sections')}>
-          {sections.map(s =>
-            renderOption(createContextKey('Section', s.id), s.name, `section-${s.id}`)
-          )}
-        </Menu>
+        {/* Commenting out since we're not implementing sections yet */}
+        {/* <Menu id="pace-plan-menu" label={I18n.t('Sections')}> */}
+        {/*  {sections.map(s => */}
+        {/*    renderOption(createContextKey('Section', s.id), s.name, `section-${s.id}`) */}
+        {/*  )} */}
+        {/* </Menu> */}
         <Menu id="pace-plan-menu" label={I18n.t('Students')}>
           {enrollments.map(e =>
             renderOption(createContextKey('Enrollment', e.id), e.full_name, `student-${e.id}`)

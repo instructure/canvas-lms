@@ -33,16 +33,14 @@ const SlideTransition: React.FC<ComponentProps> = ({children, direction, expande
     direction === 'horizontal'
       ? {
           as: 'span',
-          width: expanded ? size : '0',
-          overflowX: 'hidden' as ViewOverflowX
+          width: expanded ? size : '0'
         }
       : {}
   const verticalProps =
     direction === 'vertical'
       ? {
           as: 'div',
-          height: expanded ? size : '0',
-          overflowY: 'hidden' as ViewOverflowY
+          height: expanded ? size : '0'
         }
       : {}
   return (
