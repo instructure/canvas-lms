@@ -103,9 +103,3 @@ test('renders "allow" if "allow" is set as the workflow state for site admin', (
   ok(allowRadioInput.checked)
 })
 
-test('renders "off" if "allow" is set as the workflow state for root account', () => {
-  const offRadioInput = componentNode(developerKey('allow'), rootAccountCTX).querySelector(
-    'input[value="off"]'
-  )
-  ok(offRadioInput.checked)
-})
