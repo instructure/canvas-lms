@@ -23,6 +23,7 @@ require_relative '../pages/k5_dashboard_common_page'
 require_relative '../pages/k5_grades_tab_page'
 require_relative '../../../helpers/k5_common'
 require_relative '../../grades/setup/gradebook_setup'
+require_relative '../shared_examples/k5_subject_grades_shared_examples'
 
 describe "student k5 course grades tab" do
   include_context "in-process server selenium tests"
@@ -40,63 +41,8 @@ describe "student k5 course grades tab" do
     user_session @student
   end
 
-  context 'grades tab' do
-    it 'shows panda image when no grades posted' do
-      get "/courses/#{@subject_course.id}#grades"
-
-      expect(empty_grades_image).to be_displayed
-    end
-  end
-
-  context 'course grades' do
-    before :once do
-      @assignment1 = create_assignment(@subject_course, "assignment 1", "assignment1 not submitted", 100)
-      @assignment2 = create_dated_assignment(@subject_course, "assignment 2 missing", 1.day.ago(Time.zone.now), 15)
-      @assignment3 = create_and_submit_assignment(@subject_course, "assignment 3", "assignment2 submitted", 100)
-      @assignment3.grade_student(@student, grader: @homeroom_teacher, score: "90", points_deducted: 0)
-    end
-
-    it 'shows 3 assignments in the list' do
-      get "/courses/#{@subject_course.id}#grades"
-
-      expect(grades_assignments_list.count).to eq(3)
-    end
-
-    it 'shows late assignment as Missing' do
-      get "/courses/#{@subject_course.id}#grades"
-
-      expect(grades_assignments_list[0].text).to include("Missing")
-    end
-
-    it 'shows submitted assignment with Submitted info' do
-      get "/courses/#{@subject_course.id}#grades"
-
-      expect(grades_assignments_list[2].text).to include("Submitted")
-    end
-
-    it 'shows graded assignment with points awarded' do
-      get "/courses/#{@subject_course.id}#grades"
-
-      expect(grades_assignments_list[2].text).to include("90 pts")
-    end
-
-    it 'shows ungraded assignment with no points awarded' do
-      get "/courses/#{@subject_course.id}#grades"
-
-      expect(grades_assignments_list[1].text).to include("\u2014 pts")
-    end
-
-    it 'shows the total points of graded assignments' do
-      get "/courses/#{@subject_course.id}#grades"
-
-      expect(grades_total.text).to include("90.00%")
-    end
-
-    it 'includes the total number of points' do
-      get "/courses/#{@subject_course.id}#grades"
-
-      expect(grades_assignments_list[0].text).to include("Out of 15")
-    end
+  context 'subject grades shared examples' do
+    it_behaves_like 'k5 subject grades'
   end
 
   context 'course grading differences' do

@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Bridge from '../../../bridge'
 
-export default function(ed, document) {
+export default function (ed, document) {
   return import('./components/Embed').then(({Embed}) => {
     let container = document.querySelector('.canvas-rce-embed-container')
     if (!container) {

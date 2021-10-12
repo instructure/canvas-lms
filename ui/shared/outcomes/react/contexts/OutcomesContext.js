@@ -26,7 +26,6 @@ export const ACCOUNT_GROUP_ID = '-1'
 export const getContext = isMobileView => {
   const [snakeContextType, contextId] = ENV.context_asset_string.split('_')
   const contextType = snakeContextType === 'course' ? 'Course' : 'Account'
-  const useRceEnhancements = ENV.use_rce_enhancements
   const rootOutcomeGroup = ENV.ROOT_OUTCOME_GROUP
   const friendlyDescriptionFF = ENV.OUTCOMES_FRIENDLY_DESCRIPTION
   const canManage = ENV.PERMISSIONS?.manage_outcomes
@@ -42,7 +41,6 @@ export const getContext = isMobileView => {
     env: {
       contextType,
       contextId,
-      useRceEnhancements,
       rootOutcomeGroup,
       friendlyDescriptionFF,
       isMobileView,

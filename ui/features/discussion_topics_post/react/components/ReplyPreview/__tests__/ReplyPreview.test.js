@@ -66,4 +66,9 @@ describe('Reply Preview', () => {
     const container = setup(mockProps({deleted: true}))
     expect(container.getByText('Deleted by Harry Potter')).toBeTruthy()
   })
+
+  it('read more button should be visible', () => {
+    const container = setup(mockProps())
+    expect(container.getByText('Read More')).toBeTruthy()
+  })
 })

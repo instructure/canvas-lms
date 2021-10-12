@@ -511,6 +511,30 @@ describe "/submissions/show" do
         classes = html.css('div.rubric_container').attribute('class').value.split(' ')
         expect(classes).not_to include('assessing')
       end
+
+      context "submission_feedback_indicators" do
+        before :once do
+          @course.root_account.enable_feature! :submission_feedback_indicators
+        end
+
+        it 'adds an indicator if unread comments are present' do
+          view_context(@course, @student)
+          @student.mark_rubric_comments_unread!(@submission)
+          assign(:assignment, @assignment)
+          assign(:submission, @submission)
+          render 'submissions/show'
+          expect(response.body).to include %{<span class="rubric_comment unread_indicator"}
+        end
+
+        it "does not show the indicator if unread comments aren't present" do
+          view_context(@course, @student)
+          @student.mark_rubric_comments_read!(@submission)
+          assign(:assignment, @assignment)
+          assign(:submission, @submission)
+          render 'submissions/show'
+          expect(response.body).not_to include %{<span class="rubric_comment unread_indicator"}
+        end
+      end
     end
 
     context 'when current_user is teacher' do

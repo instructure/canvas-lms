@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti
-  module Ims
+  module IMS
     class InvalidLaunch < StandardError; end
 
     # Contains actions to handle the second step of an LTI 1.3

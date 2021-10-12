@@ -159,6 +159,7 @@ export const GradeRow = ({
           <Badge
             type="notification"
             placement="start center"
+            margin={isStacked ? '0 small' : undefined}
             formatOutput={() => (
               <ScreenReaderContent data-testid="new-grade-indicator">
                 {I18n.t('New grade for %{assignmentName}', {assignmentName})}

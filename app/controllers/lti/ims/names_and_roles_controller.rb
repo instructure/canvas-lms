@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 # rubocop:disable Layout/LineLength
-module Lti::Ims
+module Lti::IMS
   # @API Names and Role
   #
   # API for IMS Names and Role Provisioning Service version 2 .

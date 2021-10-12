@@ -134,7 +134,6 @@ also found in the placements sub-menu in the left-navigation of this documentati
             "placements":[  
                {  
                   "text":"User Navigation Placement",
-                  "enabled":true,
                   "icon_url":"https://some.icon.url/my_dashboard.png",
                   "placement":"user_navigation",
                   "message_type":"LtiResourceLinkRequest",
@@ -146,7 +145,6 @@ also found in the placements sub-menu in the left-navigation of this documentati
                },
                {  
                   "text":"Editor Button Placement",
-                  "enabled":true,
                   "icon_url":"https://some.icon.url/editor_tool.png",
                   "placement":"editor_button",
                   "message_type":"LtiDeepLinkingRequest",
@@ -480,7 +478,7 @@ object for placement-specific target_link_uri's</p>
     <tr class="request-param ">
       <td>enabled</td>
       <td>
-          required, see notes
+
       </td>
       <td>boolean</td>
 
@@ -488,7 +486,7 @@ object for placement-specific target_link_uri's</p>
 
       <td class="param-desc">
 
-<p>Required for each placement. Set within the "placements" object to to determine if the placement is enabled.</p>
+<p>Optional, defaults to `true`. Set within the "placements" object to to determine if the placement is enabled.</p>
 
 
       </td>

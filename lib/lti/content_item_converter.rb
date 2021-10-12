@@ -58,18 +58,18 @@ module Lti
     def self.create_content_item(return_type, converted_opts)
       case return_type
       when 'file'
-        IMS::LTI::Models::ContentItems::FileItem.new(converted_opts)
+        ::IMS::LTI::Models::ContentItems::FileItem.new(converted_opts)
       when 'lti_launch_url'
-        IMS::LTI::Models::ContentItems::LtiLinkItem.new(converted_opts)
+        ::IMS::LTI::Models::ContentItems::LtiLinkItem.new(converted_opts)
       else
-        IMS::LTI::Models::ContentItems::ContentItem.new(converted_opts)
+        ::IMS::LTI::Models::ContentItems::ContentItem.new(converted_opts)
       end
     end
 
     private_class_method :create_content_item
 
     def self.placement_advice(return_type, opts = {})
-      IMS::LTI::Models::ContentItemPlacement.new(
+      ::IMS::LTI::Models::ContentItemPlacement.new(
         display_height: opts[:height],
         display_width: opts[:width],
         presentation_document_target: presentation_document_target(return_type),

@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'spec_helper'
+require 'microsoft_sync/membership_diff'
 
 describe MicrosoftSync::GroupsController, type: :controller do
   let!(:group) { MicrosoftSync::Group.create!(course: course, workflow_state: workflow_state) }
@@ -271,6 +272,34 @@ describe MicrosoftSync::GroupsController, type: :controller do
             )
           )
         )
+      end
+
+      context 'when too many owners are enrolled in the course' do
+        before { 3.times { teacher_in_course(course: course, active_enrollment: true) } }
+
+        before { stub_const('MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS', 2) }
+
+        it 'responds with "unprocessable_entity" and an error message' do
+          subject
+          expect(response.parsed_body['message']).to match(
+            /allows a maximum of 2 owners/
+          )
+          expect(response.status).to eq 422
+        end
+      end
+
+      context 'when too many members are enrolled in the course' do
+        before { 3.times { student_in_course(course: course, active_enrollment: true) } }
+
+        before { stub_const('MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS', 2) }
+
+        it 'responds with "unprocessable_entity" and an error message' do
+          subject
+          expect(response.parsed_body['message']).to match(
+            /allows a maximum of 2 members/
+          )
+          expect(response.status).to eq 422
+        end
       end
     end
   end

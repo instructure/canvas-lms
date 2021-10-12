@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+// @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_settings'
 import {connect} from 'react-redux'
 
@@ -34,7 +35,7 @@ import * as PacePlanApi from '../../../api/pace_plan_api'
 import {StoreState, PacePlan} from '../../../types'
 import {getCourse} from '../../../reducers/course'
 import {getExcludeWeekends, getPacePlan} from '../../../reducers/pace_plans'
-import {autoSavingActions, pacePlanActions} from '../../../actions/pace_plans'
+import {pacePlanActions} from '../../../actions/pace_plans'
 import {actions as uiActions} from '../../../actions/ui'
 import UpdateExistingPlansModal from '../../../shared/components/update_existing_plans_modal'
 
@@ -48,8 +49,8 @@ interface DispatchProps {
   readonly loadLatestPlanByContext: typeof pacePlanActions.loadLatestPlanByContext
   readonly setEditingBlackoutDates: typeof uiActions.setEditingBlackoutDates
   readonly showLoadingOverlay: typeof uiActions.showLoadingOverlay
-  readonly toggleExcludeWeekends: typeof autoSavingActions.toggleExcludeWeekends
-  readonly toggleHardEndDates: typeof autoSavingActions.toggleHardEndDates
+  readonly toggleExcludeWeekends: typeof pacePlanActions.toggleExcludeWeekends
+  readonly toggleHardEndDates: typeof pacePlanActions.toggleHardEndDates
 }
 
 type ComponentProps = StoreProps & DispatchProps
@@ -211,6 +212,6 @@ export default connect(mapStateToProps, {
   loadLatestPlanByContext: pacePlanActions.loadLatestPlanByContext,
   setEditingBlackoutDates: uiActions.setEditingBlackoutDates,
   showLoadingOverlay: uiActions.showLoadingOverlay,
-  toggleExcludeWeekends: autoSavingActions.toggleExcludeWeekends,
-  toggleHardEndDates: autoSavingActions.toggleHardEndDates
+  toggleExcludeWeekends: pacePlanActions.toggleExcludeWeekends,
+  toggleHardEndDates: pacePlanActions.toggleHardEndDates
 })(Settings)

@@ -30,6 +30,7 @@ import {
   IconArrowOpenDownSolid,
   IconAddSolid
 } from '@instructure/ui-icons'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!OutcomeManagement'
 import OutcomeDescription from './Management/OutcomeDescription'
 import {addZeroWidthSpace} from '@canvas/outcomes/addZeroWidthSpace'
@@ -82,7 +83,14 @@ const FindOutcomeItem = ({
             onClick={onAddHandler}
             data-testid="add-find-outcome-item"
           >
-            {isOutcomeImported ? I18n.t('Added') : I18n.t('Add')}
+            <PresentationContent>
+              {isOutcomeImported ? I18n.t('Added') : I18n.t('Add')}
+            </PresentationContent>
+            <ScreenReaderContent>
+              {isOutcomeImported
+                ? I18n.t('Added outcome %{title}', {title})
+                : I18n.t('Add outcome %{title}', {title})}
+            </ScreenReaderContent>
           </Button>
         )}
       </div>
@@ -107,8 +115,8 @@ const FindOutcomeItem = ({
                   size="small"
                   screenReaderLabel={
                     truncated
-                      ? I18n.t('Expand outcome description')
-                      : I18n.t('Collapse outcome description')
+                      ? I18n.t('Expand description for outcome %{title}', {title})
+                      : I18n.t('Collapse description for outcome %{title}', {title})
                   }
                   withBackground={false}
                   withBorder={false}

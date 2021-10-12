@@ -37,7 +37,6 @@ import MissingDateDialog from '@canvas/due-dates/backbone/views/MissingDateDialo
 import AssignmentGroupSelector from '@canvas/assignments/backbone/views/AssignmentGroupSelector.coffee'
 import GroupCategorySelector from '@canvas/groups/backbone/views/GroupCategorySelector.coffee'
 import toggleAccessibly from '@canvas/assignments/jquery/toggleAccessibly'
-import RCEKeyboardShortcuts from '@canvas/tinymce-keyboard-shortcuts'
 import ConditionalRelease from '@canvas/conditional-release-editor'
 import deparam from 'deparam'
 import SisValidationHelper from '@canvas/sis/SisValidationHelper'
@@ -650,7 +649,6 @@ export default class EditView extends ValidatedFormView
           parseInt(@assignment.id))
 
     @_attachEditorToDescription()
-    @addTinyMCEKeyboardShortcuts()
     @togglePeerReviewsAndGroupCategoryEnabled()
     @handleOnlineSubmissionTypeChange()
     @handleSubmissionTypeChange()
@@ -691,7 +689,6 @@ export default class EditView extends ValidatedFormView
     data = @assignment.toView()
 
     _.extend data,
-      use_rce_enhancements: ENV?.use_rce_enhancements
       assignment_attempts: ENV?.assignment_attempts_enabled
       kalturaEnabled: ENV?.KALTURA_ENABLED or false
       postToSISEnabled: ENV?.POST_TO_SIS or false
@@ -706,18 +703,7 @@ export default class EditView extends ValidatedFormView
   _attachEditorToDescription: =>
     return if @lockedItems.content
 
-    RichContentEditor.initSidebar()
     RichContentEditor.loadNewEditor(@$description, { focus: true, manageParent: true })
-
-    $('.rte_switch_views_link').click (e) =>
-      e.preventDefault()
-      RichContentEditor.callOnRCE(@$description, 'toggle')
-      # hide the clicked link, and show the other toggle link.
-      $(e.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle().focus()
-
-  addTinyMCEKeyboardShortcuts: =>
-    keyboardShortcutsView = new RCEKeyboardShortcuts()
-    keyboardShortcutsView.render().$el.insertBefore($(".rte_switch_views_link:first"))
 
   # -- Data for Submitting --
   _datesDifferIgnoringSeconds: (newDate, originalDate) =>

@@ -29,12 +29,14 @@ class FriendlyDatetime extends Component {
     dateTime: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]).isRequired,
     format: PropTypes.string,
     prefix: PropTypes.string,
+    prefixMobile: PropTypes.string,
     showTime: PropTypes.bool
   }
 
   static defaultProps = {
     format: null,
     prefix: '',
+    prefixMobile: null,
     showTime: false
   }
 
@@ -74,6 +76,10 @@ class FriendlyDatetime extends Component {
       if (fixedPrefix && !fixedPrefix.endsWith(' ')) {
         fixedPrefix += ' '
       }
+      let fixedPrefixMobile = this.props.prefixMobile
+      if (fixedPrefixMobile && !fixedPrefixMobile.endsWith(' ')) {
+        fixedPrefixMobile += ' '
+      }
 
       return (
         <span data-testid="friendly-date-time">
@@ -92,7 +98,7 @@ class FriendlyDatetime extends Component {
             </span>
             <span className="hidden-desktop">
               {/* something like: 3/3/2014 */}
-              {fudged.toLocaleDateString()}
+              {(fixedPrefixMobile || '') + fudged.toLocaleDateString()}
             </span>
           </time>
         </span>

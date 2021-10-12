@@ -11,7 +11,6 @@ window.ENV = window.ENV || {
     rce_pretty_html_editor: true,
     rce_auto_save: true
   },
-  use_rce_enhancements: true,
   // the RCE won't load w/o these yet
   context_asset_string: 'course_1',
   current_user_id: 2
@@ -22,7 +21,7 @@ window.INST = window.INST || {
 }
 
 export const parameters = {
-  actions: { argTypesRegex: "^on[A-Z].*" },
+  actions: {argTypesRegex: '^on[A-Z].*'}
 }
 
 export const globalTypes = {
@@ -59,7 +58,7 @@ const canvasThemeProvider = (Story, context) => {
   const canvasTheme = context.globals.canvasTheme
   return (
     <ApplyTheme theme={ApplyTheme.generateTheme(canvasTheme)}>
-      <Story {...context}/>
+      <Story {...context} />
     </ApplyTheme>
   )
 }
@@ -68,7 +67,7 @@ const bidirectionalProvider = (Story, context) => {
   const direction = context.globals.bidirectional
   return (
     <ApplyTextDirection dir={direction}>
-      <Story {...context}/>
+      <Story {...context} />
     </ApplyTextDirection>
   )
 }
@@ -78,9 +77,7 @@ const lolcalizeProvider = (Story, context) => {
   if (enableLolcalize === 'enable') {
     I18n.CallHelpers.normalizeDefault = i18nLolcalize
   }
-  return (
-    <Story {...context}/>
-  )
+  return <Story {...context} />
 }
 
 export const decorators = [canvasThemeProvider, bidirectionalProvider, lolcalizeProvider]

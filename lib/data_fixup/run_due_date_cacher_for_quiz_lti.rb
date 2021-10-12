@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module DataFixup::RunDueDateCacherForQuizLTI
+module DataFixup::RunDueDateCacherForQuizLti
   def self.run(start_at, end_at)
     # The migration will have us at most a range of 100,000 items,
     # we'll break it down to a thousand at a time here.

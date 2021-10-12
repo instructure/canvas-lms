@@ -4045,6 +4045,7 @@ describe CoursesController, type: :request do
                              'allow_student_discussion_topics' => true,
                              'allow_student_forum_attachments' => true,
                              'allow_student_discussion_editing' => true,
+                             'allow_student_discussion_reporting' => true,
                              'banner_image' => nil,
                              'banner_image_id' => nil,
                              'banner_image_url' => nil,
@@ -4090,6 +4091,7 @@ describe CoursesController, type: :request do
                           :allow_student_forum_attachments => true,
                           :allow_student_discussion_editing => false,
                           :allow_student_organized_groups => false,
+                          :allow_student_discussion_reporting => false,
                           :course_color => '#AABBCC',
                           :friendly_name => 'drama',
                           :filter_speed_grader_by_student_group => true,
@@ -4110,6 +4112,7 @@ describe CoursesController, type: :request do
                              'allow_student_discussion_topics' => false,
                              'allow_student_forum_attachments' => true,
                              'allow_student_discussion_editing' => false,
+                             'allow_student_discussion_reporting' => false,
                              'banner_image' => nil,
                              'banner_image_id' => nil,
                              'banner_image_url' => nil,
@@ -4141,6 +4144,7 @@ describe CoursesController, type: :request do
         expect(@course.allow_student_forum_attachments).to eq true
         expect(@course.allow_student_discussion_editing).to eq false
         expect(@course.allow_student_organized_groups).to eq false
+        expect(@course.allow_student_discussion_reporting).to eq false
         expect(@course.course_color).to eq '#AABBCC'
         expect(@course.friendly_name).to eq 'drama'
         expect(@course.hide_distribution_graphs).to eq true
@@ -4172,6 +4176,7 @@ describe CoursesController, type: :request do
                              'allow_student_discussion_topics' => true,
                              'allow_student_forum_attachments' => true,
                              'allow_student_discussion_editing' => true,
+                             'allow_student_discussion_reporting' => true,
                              'banner_image' => nil,
                              'banner_image_id' => nil,
                              'banner_image_url' => nil,

@@ -54,6 +54,10 @@ declare module '@instructure/ui-buttons' {
   export interface ToggleButtonProps extends MissingInputProps {}
 }
 
+declare module '@instructure/ui-motion' {
+  export interface TransitionProps extends MissingThemeableProps {}
+}
+
 declare module '@instructure/ui-text-input' {
   export interface TextInputProps extends MissingInputProps {}
 }
@@ -63,5 +67,7 @@ declare module '@instructure/ui-toggle-details' {
 }
 
 declare module '@instructure/ui-view' {
-  export interface ViewProps extends MissingElementProps, MissingThemeableProps {}
+  export interface ViewProps extends MissingElementProps, MissingThemeableProps {
+    className?: string
+  }
 }

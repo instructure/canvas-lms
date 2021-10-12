@@ -44,7 +44,7 @@ class IncomingMail::ReplyToAddress
     "#{address}+#{secure_id}-#{Shard.short_id_for(message.global_id)}-#{message.created_at.to_i}@#{domain}"
   end
 
-  alias :to_s :address
+  alias_method :to_s, :address
 
   # Public: Generate the unique, secure ID for this address' message.
   #

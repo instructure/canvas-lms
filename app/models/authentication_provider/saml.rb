@@ -222,7 +222,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
     !!settings['strip_domain_from_login_attribute']
   end
-  alias strip_domain_from_login_attribute strip_domain_from_login_attribute?
+  alias_method :strip_domain_from_login_attribute, :strip_domain_from_login_attribute?
 
   def strip_domain_from_login_attribute=(value)
     settings['strip_domain_from_login_attribute'] = ::Canvas::Plugin.value_to_boolean(value)
@@ -299,7 +299,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
     populate_from_metadata(entity)
   end
-  alias metadata= populate_from_metadata_xml
+  alias_method :metadata=, :populate_from_metadata_xml
 
   def populate_from_metadata_url(url)
     ::Canvas.timeout_protection("saml_metadata_fetch") do

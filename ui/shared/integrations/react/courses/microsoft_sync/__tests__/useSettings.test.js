@@ -63,13 +63,13 @@ describe('useSettings', () => {
   })
 
   describe('toggleEnabled', () => {
-    it('enables the integration when it is disabled', () => {
+    it('enables the integration when it is disabled', async () => {
       const {result} = subject()
       const toggleEnabled = result.current[4]
 
-      act(() => {
-        toggleEnabled()
-      })
+      axios.request.mockImplementationOnce(_req => Promise.resolve({status: 201, data: {}}))
+
+      await act(toggleEnabled)
 
       expect(axios.request).toHaveBeenLastCalledWith({
         method: 'post',
@@ -77,7 +77,7 @@ describe('useSettings', () => {
       })
     })
 
-    it('disables the integration when it is enabled', () => {
+    it('disables the integration when it is enabled', async () => {
       useFetchApi.mockImplementationOnce(({success}) => {
         success({workflow_state: 'active'})
       })
@@ -85,14 +85,41 @@ describe('useSettings', () => {
       const {result} = subject()
       const toggleEnabled = result.current[4]
 
-      act(() => {
-        toggleEnabled()
-      })
+      axios.request.mockImplementationOnce(_req => Promise.resolve({status: 201, data: {}}))
+
+      await act(toggleEnabled)
 
       expect(axios.request).toHaveBeenLastCalledWith({
         method: 'delete',
         url: `/api/v1/courses/${courseId}/microsoft_sync/group`
       })
+    })
+
+    it('uses the error message in the response if it exists', async () => {
+      const {result} = subject()
+      const toggleEnabled = result.current[4]
+      const e = new Error('422 error')
+      e.response = {status: 422, data: {message: 'Something bad happened, sorry'}}
+
+      axios.request.mockImplementationOnce(_req => Promise.reject(e))
+
+      await act(toggleEnabled)
+
+      expect(result.current[3]).toEqual({message: 'Something bad happened, sorry'})
+    })
+
+    it('uses the message in the Error object if no message is in the response', async () => {
+      const {result} = subject()
+      const toggleEnabled = result.current[4]
+
+      const e = new Error('400 error')
+      e.response = {status: 400}
+
+      axios.request.mockImplementationOnce(_req => Promise.reject(e))
+
+      await act(toggleEnabled)
+
+      expect(result.current[3]).toBe('400 error')
     })
   })
 })

@@ -29,6 +29,7 @@ export interface BlackoutDate {
 }
 
 export type CourseExternalToolStatus = 'OFF' | 'ON' | 'HIDE'
+export type InputInteraction = 'enabled' | 'disabled' | 'readonly'
 
 export interface Course {
   readonly id: string

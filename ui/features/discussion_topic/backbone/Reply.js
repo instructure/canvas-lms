@@ -23,7 +23,6 @@ import Entry from './models/Entry.coffee'
 import htmlEscape from 'html-escape'
 import replyAttachmentTemplate from '../jst/_reply_attachment.handlebars'
 import preventDefault from 'prevent-default'
-import KeyboardShortcuts from '@canvas/tinymce-keyboard-shortcuts'
 import stripTags from 'strip-tags'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {send} from '@canvas/rce/RceCommandShim'
@@ -37,14 +36,9 @@ class Reply {
   //
   // @param {view} an EntryView instance
   constructor(view, options = {}) {
-    ;[
-      'attachKeyboardShortcuts',
-      'hide',
-      'hideNotification',
-      'submit',
-      'onPostReplySuccess',
-      'onPostReplyError'
-    ].forEach(m => (this[m] = this[m].bind(this)))
+    ;['hide', 'hideNotification', 'submit', 'onPostReplySuccess', 'onPostReplyError'].forEach(
+      m => (this[m] = this[m].bind(this))
+    )
     this.view = view
     this.options = options
     this.el = this.view.$('.discussion-reply-action:first')
@@ -67,10 +61,7 @@ class Reply {
       RichContentEditor.callOnRCE(this.textArea, 'toggle')
       // hide the clicked link, and show the other toggle link.
       // todo: replace .andSelf with .addBack when JQuery is upgraded.
-      return $(e.currentTarget)
-        .siblings('a')
-        .andSelf()
-        .toggle()
+      return $(e.currentTarget).siblings('a').andSelf().toggle()
     })
     this.form.delegate('.alert .close', 'click', preventDefault(this.hideNotification))
     this.form.on('change', 'ul.discussion-reply-attachments input[type=file]', e => {
@@ -82,17 +73,6 @@ class Reply {
       }
     })
     this.editing = false
-
-    _.defer(this.attachKeyboardShortcuts)
-  }
-
-  attachKeyboardShortcuts() {
-    if (!ENV.use_rce_enhancements) {
-      return this.view
-        .$('.toggle-wrapper')
-        .first()
-        .before(new KeyboardShortcuts().render().$el)
-    }
   }
 
   // #
@@ -114,7 +94,6 @@ class Reply {
   edit() {
     this.form.addClass('replying')
     this.discussionEntry.addClass('replying')
-    RichContentEditor.initSidebar()
     RichContentEditor.loadNewEditor(this.textArea, {
       focus: true,
       manageParent: true,
@@ -127,10 +106,7 @@ class Reply {
   }
 
   createTextArea(id) {
-    return $('<textarea/>')
-      .addClass('reply-textarea')
-      .attr('id', id)
-      .attr('aria-hidden', 'true')
+    return $('<textarea/>').addClass('reply-textarea').attr('id', id).attr('aria-hidden', 'true')
   }
 
   replaceTextArea(textAreaId) {
@@ -169,12 +145,10 @@ class Reply {
     const rceInputs = this.discussionEntry.find('textarea[data-rich_text]').toArray()
 
     if (rceInputs.length > 0) {
-      if (window.ENV.use_rce_enhancements) {
-        const okayToContinue = rceInputs
-          .map(rce => send($(rce), 'checkReadyToGetCode', window.confirm))
-          .every(i => i)
-        if (!okayToContinue) return
-      }
+      const okayToContinue = rceInputs
+        .map(rce => send($(rce), 'checkReadyToGetCode', window.confirm))
+        .every(i => i)
+      if (!okayToContinue) return
     }
     RichContentEditor.closeRCE(this.textArea)
 
@@ -268,20 +242,14 @@ class Reply {
   // Removes an attachment
   removeAttachment($el) {
     $el.closest('ul.discussion-reply-attachments li').remove()
-    return this.form
-      .find('a.discussion-reply-add-attachment')
-      .show()
-      .focus()
+    return this.form.find('a.discussion-reply-add-attachment').show().focus()
   }
 
   // #
   // Removes all attachments
   removeAttachments() {
     this.form.find('ul.discussion-reply-attachments').empty()
-    return this.form
-      .find('a.discussion-reply-add-attachment')
-      .show()
-      .focus()
+    return this.form.find('a.discussion-reply-add-attachment').show().focus()
   }
 }
 

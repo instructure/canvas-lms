@@ -3536,6 +3536,49 @@ describe Assignment do
       submission = @a.submit_homework(@user, resource_link_lookup_uuid: resource_link_lookup_uuid)
       expect(submission.resource_link_lookup_uuid).to eq resource_link_lookup_uuid
     end
+
+    context 'with assignment_configuration_tool_lookups' do
+      include_context 'lti2_spec_helper'
+      let(:tool_proxy) { create_tool_proxy(@course.root_account, { add_subscription_id: true }) }
+
+      it 'adds webhook info on the turnitin_data hash' do
+        @a.tool_settings_tool = message_handler
+        submission = @a.submit_homework(@user)
+        expect(submission.turnitin_data[:webhook_info]).to eq(
+          {
+            product_code: product_family.product_code,
+            vendor_code: product_family.vendor_code,
+            resource_type_code: resource_handler.resource_type_code,
+            tool_proxy_id: tool_proxy.id,
+            tool_proxy_created_at: tool_proxy.created_at,
+            tool_proxy_updated_at: tool_proxy.updated_at,
+            tool_proxy_name: tool_proxy.name,
+            tool_proxy_context_type: tool_proxy.context_type,
+            tool_proxy_context_id: tool_proxy.context_id,
+            subscription_id: tool_proxy.subscription_id,
+          }
+        )
+      end
+
+      it 'clears webhook info if assignment_configuration_tool_lookup is removed and new submission' do
+        submission = @a.submit_homework(@user)
+        webhook_info = {
+          product_code: product_family.product_code,
+          vendor_code: product_family.vendor_code,
+          resource_type_code: resource_handler.resource_type_code,
+          tool_proxy_id: tool_proxy.id,
+          tool_proxy_created_at: tool_proxy.created_at,
+          tool_proxy_updated_at: tool_proxy.updated_at,
+          tool_proxy_name: tool_proxy.name,
+          tool_proxy_context_type: tool_proxy.context_type,
+          tool_proxy_context_id: tool_proxy.context_id,
+          subscription_id: tool_proxy.subscription_id,
+        }
+        submission.update(turnitin_data: { webhook_info: webhook_info })
+        submission = @a.submit_homework(@user)
+        expect(submission.turnitin_data[:webhook_info]).to be_nil
+      end
+    end
   end
 
   describe "muting" do

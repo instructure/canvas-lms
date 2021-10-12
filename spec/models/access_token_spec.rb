@@ -25,19 +25,19 @@ describe AccessToken do
   context "Authenticate" do
     shared_examples "#authenticate" do
       it "new access tokens shouldnt have an expiration" do
-        at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
+        at = AccessToken.create!(:user => user_model, :developer_key => @dk)
         expect(at.permanent_expires_at).to eq nil
       end
 
       it "authenticates valid token" do
-        at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
+        at = AccessToken.create!(:user => user_model, :developer_key => @dk)
         expect(AccessToken.authenticate(at.full_token)).to eq at
       end
 
       it "does not authenticate expired tokens" do
         at = AccessToken.create!(
           user: user_model,
-          developer_key: DeveloperKey.default,
+          developer_key: @dk,
           permanent_expires_at: 2.hours.ago
         )
         expect(AccessToken.authenticate(at.full_token)).to be nil
@@ -46,8 +46,7 @@ describe AccessToken do
 
     context "With auto expire" do
       before :once do
-        DeveloperKey.default.auto_expire_tokens = true
-        DeveloperKey.default.save!
+        @dk = DeveloperKey.create!
       end
 
       it "does not have auto expire tokens" do
@@ -59,13 +58,13 @@ describe AccessToken do
 
     context "Without auto expire" do
       before :once do
-        d = DeveloperKey.default
-        d.auto_expire_tokens = false
-        d.save!
+        @dk = DeveloperKey.create!
+        @dk.auto_expire_tokens = false
+        @dk.save!
       end
 
       it "does not have auto expire tokens" do
-        expect(DeveloperKey.default.auto_expire_tokens).to be false
+        expect(@dk.auto_expire_tokens).to be false
       end
 
       include_examples "#authenticate"

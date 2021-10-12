@@ -44,6 +44,7 @@ describe PacePlansController, type: :controller do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
     pace_plan_model(course: @course)
+    @student_enrollment = @student.enrollments.first
 
     @mod1 = @course.context_modules.create! name: 'M1'
     @a1 = @course.assignments.create! name: 'A1', workflow_state: 'unpublished'
@@ -140,14 +141,13 @@ describe PacePlansController, type: :controller do
                                                                                             }))
     end
 
-    it "creates a pace plan if no primary pace plans are available" do
+    it "does not create a pace plan if no primary pace plans are available" do
       @pace_plan.update(user_id: @student)
       expect(@course.pace_plans.count).to eq(1)
       expect(@course.pace_plans.primary).to be_empty
       get :index, params: { course_id: @course.id }
-      expect(@course.pace_plans.count).to eq(2)
-      expect(@course.pace_plans.primary.count).to eq(1)
-      expect(@course.pace_plans.primary.first.pace_plan_module_items.count).to eq(3)
+      expect(@course.pace_plans.count).to eq(1)
+      expect(@course.pace_plans.primary.count).to eq(0)
     end
 
     it "responds with not found if the pace_plans feature is disabled" do
@@ -300,12 +300,13 @@ describe PacePlansController, type: :controller do
 
       it "creates a draft if one is not already available" do
         expect(@course.pace_plans.unpublished.for_user(@student).count).to eq(0)
-        get :latest_draft_for, { params: { enrollment_id: @course.student_enrollments.first.id } }
+        get :latest_draft_for, { params: { enrollment_id: @student_enrollment.id } }
         expect(response).to be_successful
         expect(@course.pace_plans.unpublished.for_user(@student).count).to eq(1)
         json_response = JSON.parse(response.body)
         expect(json_response["pace_plan"]["id"]).not_to eq(@pace_plan.id)
         expect(json_response["pace_plan"]["published_at"]).to eq(nil)
+        expect(Time.zone.parse(json_response["pace_plan"]["start_date"])).to eq(@student_enrollment.created_at.to_date)
         expect(json_response["pace_plan"]["user_id"]).to eq(@student.id)
         expect(json_response["pace_plan"]["modules"].count).to eq(2)
         m1 = json_response["pace_plan"]["modules"].first

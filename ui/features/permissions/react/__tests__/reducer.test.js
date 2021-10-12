@@ -28,6 +28,7 @@ import {
 } from '@canvas/permissions/react/propTypes'
 import {PERMISSIONS, ROLES} from './examples'
 import reducer from '../reducer'
+import stubEnv from '@canvas/stub-env'
 
 const reduce = (action, state = {}) => reducer(state, action)
 
@@ -39,6 +40,15 @@ const reduce = (action, state = {}) => reducer(state, action)
 // over and over.
 
 describe('permissions::reducer', () => {
+  stubEnv({
+    ACCOUNT_PERMISSIONS: [
+      {
+        group_name: 'Account Permissions',
+        group_permissions: [{permission_name: 'manage_courses_add'}]
+      }
+    ]
+  })
+
   function verifyPermissionsDidntChange(oldPermissions, newPermissions) {
     expect(newPermissions).toHaveLength(oldPermissions.length)
     for (let i = 0; i < newPermissions.length; ++i) {
@@ -378,7 +388,7 @@ describe('permissions::reducer', () => {
   })
 
   it('UPDATE_PERMISSIONS groups granular permissions in roles', () => {
-    const originalState = {roles: [{id: '1', permissions: {}}]}
+    const originalState = {roles: [{id: '1', permissions: {}, contextType: ACCOUNT}]}
 
     const payload = {
       role: {
@@ -396,7 +406,8 @@ describe('permissions::reducer', () => {
             group: 'granular_permission_group',
             locked: false
           }
-        }
+        },
+        contextType: ACCOUNT
       }
     }
 
@@ -423,7 +434,8 @@ describe('permissions::reducer', () => {
             locked: false,
             readonly: false
           }
-        }
+        },
+        contextType: ACCOUNT
       }
     ]
 
@@ -554,7 +566,8 @@ describe('permissions::reducer', () => {
           group: 'granular_permission_group',
           locked: false
         }
-      }
+      },
+      contextType: COURSE
     }
 
     const expectedState = [

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Lti::Ims
+module Lti::IMS
   # @API Result
   #
   # Result API for IMS Assignment and Grade Services
@@ -90,7 +90,7 @@ module Lti::Ims
     #
     # @returns Result
     def show
-      render json: Lti::Ims::ResultsSerializer.new(result, line_item_url).as_json, content_type: MIME_TYPE
+      render json: Lti::IMS::ResultsSerializer.new(result, line_item_url).as_json, content_type: MIME_TYPE
     end
 
     private
@@ -116,7 +116,7 @@ module Lti::Ims
 
     def results_collection(results)
       results.map do |result|
-        Lti::Ims::ResultsSerializer.new(result, line_item_url).as_json
+        Lti::IMS::ResultsSerializer.new(result, line_item_url).as_json
       end
     end
   end

@@ -19,9 +19,9 @@
 #
 
 module Lti
-  module Ims
+  module IMS
     class ToolConsumerProfileController < ApplicationController
-      include Lti::Ims::AccessTokenHelper
+      include Lti::IMS::AccessTokenHelper
 
       TOOL_CONSUMER_PROFILE_SERVICE = 'ToolConsumerProfile'.freeze
 
@@ -47,5 +47,11 @@ module Lti
         TOOL_CONSUMER_PROFILE_SERVICE
       end
     end
+  end
+
+  # TODO: This alias only should exist while we're changing all the canvas plugins
+  # from "Ims" to "IMS" for zeitwerk. Afterwards this should go away.
+  module Ims
+    ToolConsumerProfileController = ::Lti::IMS::ToolConsumerProfileController
   end
 end

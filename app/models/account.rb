@@ -325,6 +325,7 @@ class Account < ActiveRecord::Base
   add_setting :app_center_access_token
   add_setting :enable_offline_web_export, boolean: true, default: false, inheritable: true
   add_setting :disable_rce_media_uploads, boolean: true, default: false, inheritable: true
+  add_setting :allow_gradebook_show_first_last_names, boolean: true, root_only: true, default: false
 
   add_setting :strict_sis_check, :boolean => true, :root_only => true, :default => false
   add_setting :lock_all_announcements, default: false, boolean: true, inheritable: true
@@ -1316,32 +1317,7 @@ class Account < ActiveRecord::Base
     given { |user| self.root_account? && self.cached_all_account_users_for(user).any? }
     can :read_terms
 
-    #################### Begin legacy permission block #########################
-    given do |user|
-      user && !root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        self.cached_account_users_for(user).any? do |au|
-          au.has_permission_to?(self, :manage_courses)
-        end
-    end
-    can :create_courses
-    ##################### End legacy permission block ##########################
-
-    given do |user|
-      result = false
-      next false if user&.fake_student?
-
-      if user && !root_account.site_admin?
-        scope = root_account.enrollments.active.where(user_id: user)
-        result = root_account.teachers_can_create_courses? &&
-                 scope.where(:type => ['TeacherEnrollment', 'DesignerEnrollment']).exists?
-        result ||= root_account.students_can_create_courses? &&
-                   scope.where(:type => ['StudentEnrollment', 'ObserverEnrollment']).exists?
-        result ||= root_account.no_enrollments_can_create_courses? &&
-                   !scope.exists?
-      end
-
-      result
-    end
+    given { |user| user&.create_courses_right(self).present? }
     can :create_courses
 
     # allow teachers to view term dates

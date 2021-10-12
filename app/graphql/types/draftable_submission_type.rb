@@ -20,6 +20,7 @@
 
 module Types
   DRAFTABLE_SUBMISSION_TYPES = %w[
+    basic_lti_launch
     media_recording
     online_text_entry
     online_upload

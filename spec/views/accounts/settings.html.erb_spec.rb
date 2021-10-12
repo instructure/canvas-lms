@@ -150,6 +150,70 @@ describe "accounts/settings.html.erb" do
     end
   end
 
+  describe "Admin setting allow_gradebook_show_first_last_names" do
+    context "site admin user" do
+      let_once(:account) { Account.site_admin }
+      let_once(:admin) { account_admin_user(account: account) }
+
+      before do
+        view_context(account, admin)
+        assign(:account, account)
+        assign(:context, account)
+        assign(:root_account, account)
+        assign(:current_user, admin)
+        assign(:announcements, AccountNotification.none.paginate)
+      end
+
+      it "does not show the setting when the gradebook_show_first_last_names feature is enabled" do
+        Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
+        render
+
+        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names")
+      end
+
+      it "does not show the setting when the gradebook_show_first_last_names feature is disabled" do
+        Account.site_admin.disable_feature!(:gradebook_show_first_last_names)
+        render
+
+        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names")
+      end
+    end
+
+    context "account admin user" do
+      let_once(:account) { Account.default }
+      let_once(:admin) { account_admin_user(account: account) }
+
+      before do
+        view_context(account, admin)
+        assign(:account, account)
+        assign(:context, account)
+        assign(:root_account, account)
+        assign(:current_user, admin)
+        assign(:announcements, AccountNotification.none.paginate)
+      end
+
+      it "shows the setting check box when the gradebook_show_first_last_names feature is enabled" do
+        Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
+        render
+
+        expect(response).to have_tag("input#account_settings_allow_gradebook_show_first_last_names")
+      end
+
+      it "does not show the setting by default" do
+        render
+
+        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names")
+      end
+
+      it "does not show the setting when the gradebook_show_first_last_names feature is disabled" do
+        Account.site_admin.disable_feature!(:gradebook_show_first_last_names)
+        render
+
+        expect(response).to_not have_tag("input#account_settings_allow_gradebook_show_first_last_names")
+      end
+    end
+  end
+
   describe "SIS Integration Settings" do
     before do
       assign(:account_users, [])

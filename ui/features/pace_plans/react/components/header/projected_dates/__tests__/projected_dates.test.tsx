@@ -36,9 +36,12 @@ describe('ProjectedDates', () => {
   })
 
   it('shows projected start and end date selectors when projections are shown', () => {
-    const {getByRole} = renderConnected(<ProjectedDates {...defaultProps} />)
-    expect(getByRole('combobox', {name: 'Projected Start Date'})).toBeInTheDocument()
-    expect(getByRole('combobox', {name: 'Projected End Date'})).toBeInTheDocument()
+    const {getByRole, getByText} = renderConnected(<ProjectedDates {...defaultProps} />)
+    const startDateInput = getByRole('combobox', {name: 'Projected Start Date'}) as HTMLInputElement
+    expect(startDateInput).toBeInTheDocument()
+    expect(startDateInput.value).toBe('September 1, 2021')
+    expect(getByText('Projected End Date')).toBeInTheDocument()
+    expect(getByText('September 15, 2021')).toBeInTheDocument()
   })
 
   it('shows the number of assignments and weeks in the plan when projections are shown', () => {

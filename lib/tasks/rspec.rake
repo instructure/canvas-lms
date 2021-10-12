@@ -87,7 +87,7 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
     desc "Run non-selenium files in a single thread"
     klass.new(:plugin_non_parallel) do |t|
       require File.expand_path(File.dirname(__FILE__) + '/parallel_exclude')
-      t.send(spec_files_attr, ParallelExclude::AVAILABLE_FILES)
+      t.send(spec_files_attr, Tasks::ParallelExclude::AVAILABLE_FILES)
     end
 
     klass.new(:selenium_non_parallel, :test_files) do |t, test_files|

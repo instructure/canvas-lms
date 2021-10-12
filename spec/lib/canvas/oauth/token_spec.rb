@@ -94,6 +94,7 @@ module Canvas::Oauth
         expect(token.access_token).to be_a AccessToken
         expect(user.access_tokens.reload.size).to eq 1
         expect(token.access_token.full_token).not_to be_empty
+        expect(token.access_token.permanent_expires_at).to be_nil
       end
 
       it 'creates a scoped access token' do
@@ -134,6 +135,12 @@ module Canvas::Oauth
         access_token = user.access_tokens.create!(:developer_key => key, :scopes => scopes)
         expect(token.access_token).to be_a AccessToken
         expect(token.access_token).not_to eq access_token
+      end
+
+      it 'sets token to expire if the key is set to expire' do
+        allow(key).to receive(:mobile_app?).and_return(true)
+        allow(Canvas::Plugin).to receive(:find).with("sessions").and_return(double(settings: { mobile_timeout: 30 }))
+        expect(token.access_token.permanent_expires_at).not_to be_nil
       end
     end
 

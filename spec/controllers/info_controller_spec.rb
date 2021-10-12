@@ -53,7 +53,7 @@ describe InfoController do
     it "works if partitions are up to date" do
       # just in case
       Quizzes::QuizSubmissionEventPartitioner.process
-      Version::Partitioner.process
+      SimplyVersioned::Partitioner.process
       Messages::Partitioner.process
 
       get "health_prognosis"

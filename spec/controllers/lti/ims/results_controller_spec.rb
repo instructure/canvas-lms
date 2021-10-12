@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_
 require File.expand_path(File.dirname(__FILE__) + '/concerns/lti_services_shared_examples')
 require_dependency "lti/ims/results_controller"
 
-describe Lti::Ims::ResultsController do
+describe Lti::IMS::ResultsController do
   include_context 'advantage services context'
 
   let(:assignment) do
