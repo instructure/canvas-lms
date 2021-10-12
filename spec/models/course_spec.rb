@@ -1611,6 +1611,13 @@ describe Course do
       expect(course.reload.default_post_policy).to be_post_manually
     end
   end
+
+  it 'destroys associated gradebook filters when the course is soft-deleted' do
+    course_with_teacher(active_all: true)
+    @course.gradebook_filters.create!(user: @teacher, course: @course, name: 'First filter', payload: { foo: :bar })
+    @course.destroy
+    expect(@course.gradebook_filters.count).to eq 0
+  end
 end
 
 describe Course do

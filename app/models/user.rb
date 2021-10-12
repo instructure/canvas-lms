@@ -209,6 +209,8 @@ class User < ActiveRecord::Base
   has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }
   has_many :microsoft_sync_partial_sync_changes, :class_name => 'MicrosoftSync::PartialSyncChange', dependent: :destroy, inverse_of: :user
 
+  has_many :gradebook_filters, inverse_of: :user, dependent: :destroy
+
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 
   belongs_to :merged_into_user, class_name: 'User'
@@ -1047,6 +1049,7 @@ class User < ActiveRecord::Base
     self.deleted_at = Time.now.utc
     if self.save
       eportfolios.active.in_batches.destroy_all
+      gradebook_filters.in_batches.destroy_all
     end
   end
 
