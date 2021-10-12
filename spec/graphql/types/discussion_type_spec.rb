@@ -383,16 +383,14 @@ describe Types::DiscussionType do
       end
     end
 
-    it "does not expose message when locked for user" do
+    it "locked_for_user is set correctly" do
       allow_any_instantiation_of(discussion).to receive(:locked_for?)
         .with(@teacher, check_policies: true)
         .and_return(true)
-      expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("message")).to be_nil
       expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("lockedForUser")).to be true
       allow_any_instantiation_of(discussion).to receive(:locked_for?)
         .with(@teacher, check_policies: true)
         .and_return(false)
-      expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("message")).to eq discussion.message
       expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("lockedForUser")).to be false
     end
   end
