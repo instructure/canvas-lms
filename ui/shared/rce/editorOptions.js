@@ -24,7 +24,16 @@ function editorOptions(width, id, tinyMCEInitOptions, enableBookmarkingOverride,
   const editorConfig = new EditorConfig(tinymce, INST, width, id)
 
   const config = {
-    ...editorConfig.defaultConfig()
+    ...editorConfig.defaultConfig(),
+    setup: ed => {
+      if (!ENV.use_rce_enhancements) {
+        ed.on('init', () => {
+          const getDefault = mod => (mod.default ? mod.default : mod)
+          const EditorAccessibility = getDefault(require('./jquery/editorAccessibility'))
+          new EditorAccessibility(ed).accessiblize()
+        })
+      }
+    }
   }
 
   return {

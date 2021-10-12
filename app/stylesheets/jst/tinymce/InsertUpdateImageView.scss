@@ -1,0 +1,57 @@
+/*
+ * Copyright (C) 2012 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import "base/environment";
+
+.insertUpdateImage {
+  .insertUpdateImageTabpane {
+    min-height: 265px;
+    overflow: auto;
+  }
+  .checkbox.inline { white-space: nowrap; }
+  // fix safari legend margin issue
+  legend {
+     margin-bottom: 0px;
+  }
+  legend + * {
+    margin-top: 20px;
+    -webkit-margin-collapse: separate;
+  }
+  fieldset {
+    min-width: 50%;
+  }
+}
+
+.image-upload__form {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.file-browser__tree {
+  height: 175px;
+  overflow: auto;
+  border: solid 1px $ic-border-color;
+  border-radius: $ic-border-radius;
+  margin: .5rem auto;
+  padding: .25rem;
+}
+
+.file-browser__container {
+  padding: .25rem;
+}

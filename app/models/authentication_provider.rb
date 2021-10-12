@@ -20,7 +20,6 @@
 
 require 'net-ldap'
 require 'net_ldap_extensions'
-NetLdapExtensions.apply
 
 class AuthenticationProvider < ActiveRecord::Base
   include Workflow
@@ -106,7 +105,7 @@ class AuthenticationProvider < ActiveRecord::Base
 
   scope :active, -> { where("workflow_state <> 'deleted'") }
   belongs_to :account
-  include ::Canvas::RootAccountCacher
+  include Canvas::RootAccountCacher
   has_many :pseudonyms, foreign_key: :authentication_provider_id, inverse_of: :authentication_provider
   acts_as_list scope: { account: self, workflow_state: [nil, 'active'] }
 
@@ -158,7 +157,7 @@ class AuthenticationProvider < ActiveRecord::Base
     delay_if_production.soft_delete_pseudonyms
     true
   end
-  alias_method :destroy_permanently!, :destroy
+  alias destroy_permanently! destroy
 
   def auth_password=(password)
     return if password.blank?
@@ -214,7 +213,7 @@ class AuthenticationProvider < ActiveRecord::Base
 
     !!settings['mfa_required']
   end
-  alias_method :mfa_required, :mfa_required?
+  alias mfa_required mfa_required?
 
   def mfa_required=(value)
     value = false if account.mfa_settings == :disabled

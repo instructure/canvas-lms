@@ -34,16 +34,14 @@ const defaultProps = {
   pacePlanItem: PRIMARY_PLAN.modules[0].items[0],
   pacePlanItemPosition: 0,
   blackoutDates: BLACKOUT_DATES,
+  planCompleted: false,
   autosaving: false,
   enrollmentHardEndDatePlan: false,
   adjustingHardEndDatesAfter: undefined,
   disabledDaysOfWeek: [],
   showProjections: true,
   setPlanItemDuration,
-  setAdjustingHardEndDatesAfter,
-  datesVisible: true,
-  hover: false,
-  isStacked: false
+  setAdjustingHardEndDatesAfter
 }
 
 describe('AssignmentRow', () => {
@@ -54,7 +52,7 @@ describe('AssignmentRow', () => {
 
   it('does not show the projected due date if projections are being hidden', async () => {
     const {queryByText} = renderConnected(
-      <AssignmentRow {...defaultProps} datesVisible={false} showProjections={false} />
+      <AssignmentRow {...defaultProps} showProjections={false} />
     )
     await waitFor(() => expect(queryByText('1/1/2020')).not.toBeInTheDocument())
   })

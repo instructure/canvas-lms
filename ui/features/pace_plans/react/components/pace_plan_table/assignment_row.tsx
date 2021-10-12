@@ -18,12 +18,10 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_assignment_row'
-import {debounce, pick} from 'lodash'
+import {debounce} from 'lodash'
 import moment from 'moment-timezone'
 
-import {ApplyTheme} from '@instructure/ui-themeable'
 import {Flex} from '@instructure/ui-flex'
 import {
   IconAssignmentLine,
@@ -34,7 +32,6 @@ import {
 } from '@instructure/ui-icons'
 import {NumberInput} from '@instructure/ui-number-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
@@ -46,22 +43,17 @@ import {
   getDueDate,
   getExcludeWeekends,
   getPacePlanItemPosition,
+  isPlanCompleted,
   getDisabledDaysOfWeek
 } from '../../reducers/pace_plans'
-import {actions} from '../../actions/pace_plan_items'
+import {autoSavingActions as actions} from '../../actions/pace_plan_items'
 import {actions as uiActions} from '../../actions/ui'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 import {getAutoSaving, getAdjustingHardEndDatesAfter, getShowProjections} from '../../reducers/ui'
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
-
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Cell, Row} = Table as any
+import SlideTransition from '../../utils/slide_transition'
 
 interface PassedProps {
-  readonly datesVisible: boolean
-  readonly headers?: object[]
-  readonly hover: boolean
-  readonly isStacked: boolean
   readonly pacePlanItem: PacePlanItem
 }
 
@@ -71,6 +63,7 @@ interface StoreProps {
   readonly excludeWeekends: boolean
   readonly pacePlanItemPosition: number
   readonly blackoutDates: BlackoutDate[]
+  readonly planCompleted: boolean
   readonly autosaving: boolean
   readonly enrollmentHardEndDatePlan: boolean
   readonly adjustingHardEndDatesAfter?: number
@@ -89,6 +82,21 @@ interface LocalState {
 }
 
 type ComponentProps = PassedProps & StoreProps & DispatchProps
+
+export const ColumnWrapper = ({children, center = false, ...props}) => {
+  const alignment = center ? 'center' : 'start'
+  return (
+    <Flex alignItems={alignment} justifyItems={alignment} margin="0 small" {...props}>
+      {children}
+    </Flex>
+  )
+}
+
+export const COLUMN_WIDTHS = {
+  DURATION: 90,
+  DATE: 90,
+  STATUS: 45
+}
 
 export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   state: LocalState = {
@@ -118,8 +126,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       nextProps.pacePlan.context_type !== this.props.pacePlan.context_type ||
       (nextProps.pacePlan.context_type === this.props.pacePlan.context_type &&
         nextProps.pacePlan.context_id !== this.props.pacePlan.context_id) ||
-      nextProps.showProjections !== this.props.showProjections ||
-      nextProps.datesVisible !== this.props.datesVisible
+      nextProps.showProjections !== this.props.showProjections
     )
   }
 
@@ -134,6 +141,13 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       false
     )
     return parseInt(this.state.duration, 10) + daysDiff
+  }
+
+  dateInputIsDisabled = (): boolean => {
+    return (
+      this.props.planCompleted ||
+      (this.props.enrollmentHardEndDatePlan && !!this.props.adjustingHardEndDatesAfter)
+    )
   }
 
   parsePositiveNumber = (value?: string): number | false => {
@@ -199,7 +213,17 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     const duration = parseInt(this.state.duration, 10)
 
     if (!Number.isNaN(duration)) {
-      this.props.setPlanItemDuration(this.props.pacePlanItem.module_item_id, duration)
+      let saveParams = {}
+
+      // If this is a student Hard End Date plan then we should recompress
+      // all items AFTER the modified item, so that we still hit the specified
+      // end date.
+      if (this.props.enrollmentHardEndDatePlan && duration !== this.props.pacePlanItem.duration) {
+        saveParams = {compress_items_after: this.props.pacePlanItemPosition}
+        this.props.setAdjustingHardEndDatesAfter(this.props.pacePlanItemPosition)
+      }
+
+      this.props.setPlanItemDuration(this.props.pacePlanItem.id, duration, saveParams)
     }
   }
 
@@ -235,9 +259,9 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
   renderPublishStatusBadge = () => {
     return this.props.pacePlanItem.published ? (
-      <IconPublishSolid color="success" size="x-small" title={I18n.t('Published')} />
+      <IconPublishSolid color="success" size="x-small" />
     ) : (
-      <IconUnpublishedLine size="x-small" title={I18n.t('Unpublished')} />
+      <IconUnpublishedLine size="x-small" />
     )
   }
 
@@ -248,21 +272,23 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       const value = this.state.duration
 
       return (
-        <NumberInput
-          interaction="enabled"
-          renderLabel={
-            <ScreenReaderContent>
-              Duration for module {this.props.pacePlanItem.assignment_title}
-            </ScreenReaderContent>
-          }
-          display="inline-block"
-          width="5.5rem"
-          value={value}
-          onChange={this.onChangeItemDuration}
-          onBlur={this.onBlur}
-          onDecrement={e => this.onDecrementOrIncrement(e, -1)}
-          onIncrement={e => this.onDecrementOrIncrement(e, 1)}
-        />
+        <ColumnWrapper center>
+          <NumberInput
+            interaction={this.props.planCompleted ? 'disabled' : 'enabled'}
+            renderLabel={
+              <ScreenReaderContent>
+                Duration for module {this.props.pacePlanItem.assignment_title}
+              </ScreenReaderContent>
+            }
+            display="inline-block"
+            width={`${COLUMN_WIDTHS.DURATION}px`}
+            value={value}
+            onChange={this.onChangeItemDuration}
+            onBlur={this.onBlur}
+            onDecrement={e => this.onDecrementOrIncrement(e, -1)}
+            onIncrement={e => this.onDecrementOrIncrement(e, 1)}
+          />
+        </ColumnWrapper>
       )
     }
   }
@@ -273,47 +299,68 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       this.props.pacePlanItemPosition > this.props.adjustingHardEndDatesAfter
         ? I18n.t('Adjusting due dates...')
         : moment(this.props.dueDate).format('l')
-    return <Text>{dateText}</Text>
+    return (
+      <SlideTransition
+        direction="horizontal"
+        expanded={this.props.showProjections}
+        size={COLUMN_WIDTHS.DATE}
+      >
+        <ColumnWrapper width={COLUMN_WIDTHS.DATE}>
+          <Text>{dateText}</Text>
+        </ColumnWrapper>
+      </SlideTransition>
+    )
   }
 
-  renderTitle() {
+  renderBody() {
     return (
-      <Flex alignItems="center">
-        <View margin="0 x-small 0 0">{this.renderAssignmentIcon()}</View>
-        <Text weight="bold">
-          <TruncateText>{this.props.pacePlanItem.assignment_title}</TruncateText>
-        </Text>
+      <Flex height="100%" width="100%" alignItems="center" justifyItems="space-between">
+        <Flex alignItems="center" justifyItems="center">
+          <View margin="0 x-small 0 0">{this.renderAssignmentIcon()}</View>
+          <Text weight="bold">
+            <TruncateText>{this.props.pacePlanItem.assignment_title}</TruncateText>
+          </Text>
+        </Flex>
+
+        <Flex alignItems="center" justifyItems="space-between">
+          {this.renderDurationInput()}
+          {this.renderDate()}
+          <ColumnWrapper center width={`${COLUMN_WIDTHS.STATUS}px`}>
+            {this.renderPublishStatusBadge()}
+          </ColumnWrapper>
+        </Flex>
       </Flex>
     )
   }
 
   render() {
-    const labelMargin = this.props.isStacked ? '0 0 0 small' : undefined
-    const themeOverrides = {background: this.state.hovering ? '#eef7ff' : '#fff'}
-
+    const hoverProps = this.state.hovering
+      ? {
+          background: 'secondary',
+          borderColor: 'brand',
+          borderWidth: '0 0 0 large',
+          padding: 'x-small small'
+        }
+      : {padding: 'x-small small x-small medium'}
     return (
-      <ApplyTheme theme={{[(Cell as any).theme]: themeOverrides}}>
-        <Row
-          onMouseEnter={() => this.setState({hovering: true})}
-          onMouseLeave={() => this.setState({hovering: false})}
-          {...pick(this.props, ['hover', 'isStacked', 'headers'])}
+      <View
+        as="div"
+        borderWidth="0 small small"
+        borderRadius="none"
+        onMouseEnter={() => this.setState({hovering: true})}
+        onMouseLeave={() => this.setState({hovering: false})}
+      >
+        <View
+          as="div"
+          {...hoverProps}
+          theme={{
+            backgroundSecondary: '#eef7ff',
+            paddingMedium: '1rem'
+          }}
         >
-          <Cell>
-            <View margin={labelMargin}>{this.renderTitle()}</View>
-          </Cell>
-          <Cell>
-            <View margin={labelMargin}>{this.renderDurationInput()}</View>
-          </Cell>
-          {(this.props.showProjections || this.props.datesVisible) && (
-            <Cell>
-              <View margin={labelMargin}>{this.renderDate()}</View>
-            </Cell>
-          )}
-          <Cell textAlign={this.props.isStacked ? 'start' : 'center'}>
-            <View margin={labelMargin}>{this.renderPublishStatusBadge()}</View>
-          </Cell>
-        </Row>
-      </ApplyTheme>
+          {this.renderBody()}
+        </View>
+      </View>
     )
   }
 }
@@ -327,6 +374,7 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
     excludeWeekends: getExcludeWeekends(state),
     pacePlanItemPosition: getPacePlanItemPosition(state, props),
     blackoutDates: getBlackoutDates(state),
+    planCompleted: isPlanCompleted(state),
     autosaving: getAutoSaving(state),
     enrollmentHardEndDatePlan: !!(
       pacePlan.hard_end_dates && pacePlan.context_type === 'Enrollment'
@@ -337,12 +385,7 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
   }
 }
 
-const ConnectedAssignmentRow = connect(mapStateToProps, {
+export default connect(mapStateToProps, {
   setPlanItemDuration: actions.setPlanItemDuration,
   setAdjustingHardEndDatesAfter: uiActions.setAdjustingHardEndDatesAfter
 })(AssignmentRow)
-
-// This hack allows AssignmentRow to be rendered inside an InstUI Table.Body
-ConnectedAssignmentRow.displayName = 'Row'
-
-export default ConnectedAssignmentRow

@@ -133,9 +133,9 @@ function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
               withBackground={false}
               withBorder={false}
               color={isEnabled ? 'success' : 'danger'}
-              screenReaderLabel={`${displayName}, ${I18n.t('current state:')} ${description}`}
+              screenReaderLabel={description}
             >
-              {isEnabled ? <IconPublishSolid /> : <IconTroubleLine />}
+              {isEnabled ? IconPublishSolid : IconTroubleLine}
             </IconButton>
           }
         >

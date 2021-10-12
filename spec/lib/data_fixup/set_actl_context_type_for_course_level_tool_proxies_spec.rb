@@ -21,7 +21,7 @@ require 'spec_helper'
 
 require_relative '../../lti2_spec_helper'
 
-describe DataFixup::SetActlContextTypeForCourseLevelToolProxies do
+describe DataFixup::SetACTLContextTypeForCourseLevelToolProxies do
   include_context 'lti2_spec_helper'
 
   subject do

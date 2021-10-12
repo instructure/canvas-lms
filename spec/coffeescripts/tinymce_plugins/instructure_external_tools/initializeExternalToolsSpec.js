@@ -20,12 +20,15 @@ import ExternalToolsPlugin from '@canvas/tinymce-external-tools'
 import $ from 'jquery'
 import 'jqueryui/dialog'
 
-const setUp = function () {
+const setUp = function(maxButtons) {
   const INST = {}
   INST.editorButtons = [{id: 'button_id'}]
+  INST.maxVisibleEditorButtons = maxButtons
+  this.commandSpy = sinon.spy()
+  this.buttonSpy = sinon.spy()
   this.fakeEditor = {
-    addCommand: sinon.spy(),
-    addButton: sinon.spy(),
+    addCommand: this.commandSpy,
+    addButton: this.buttonSpy,
     getContent() {},
     selection: {
       getContent() {}
@@ -42,40 +45,65 @@ const setUp = function () {
   this.INST = INST
 }
 
-QUnit.module('initializeExternalTools', {
+QUnit.module('initializeExternalTools: with 2 max maxVisibleEditorButtons', {
   setup() {
-    return setUp.call(this)
+    return setUp.call(this, 2)
   },
   teardown() {
     return $(window).off('beforeunload')
   }
 })
 
-test('adds lti button to the toolbar', function () {
+test('adds button directly to toolbar', function() {
   const initResult = ExternalToolsPlugin.init(this.fakeEditor, 'some.fake.url', this.INST)
   equal(initResult, null)
-  ok(this.fakeEditor.ui.registry.addButton.calledWith('lti_tool_dropdown'))
+  ok(this.buttonSpy.calledWith('instructure_external_button_button_id'))
+  ok(this.commandSpy.calledWith('instructureExternalButtonbutton_id'))
 })
 
-test('adds MRU menu button to the toolbar', function () {
+QUnit.module('initializeExternalTools: with 0 max maxVisibleEditorButtons', {
+  setup() {
+    return setUp.call(this, 0)
+  },
+  teardown() {}
+})
+
+test('adds button to clumped buttons', function() {
+  const initResult = ExternalToolsPlugin.init(this.fakeEditor, 'some.fake.url', this.INST)
+  equal(initResult, null)
+  ok(this.buttonSpy.calledWith('instructure_external_button_clump'))
+  ok(this.commandSpy.notCalled)
+})
+
+QUnit.module('with rce_enhancements', {
+  setup() {
+    window.ENV.use_rce_enhancements = true
+    return setUp.call(this, 2)
+  },
+  teardown() {
+    window.ENV.use_rce_enhancements = false
+  }
+})
+
+test('adds MRU menu button', function() {
   ExternalToolsPlugin.init(this.fakeEditor, undefined, this.INST)
   ok(this.fakeEditor.ui.registry.addMenuButton.calledWith('lti_mru_button'))
 })
 
-test('adds favorite buttons to the toolbar', function () {
+test('adds favorite buttons to the toolbar', function() {
   this.INST.editorButtons[0].favorite = true
   ExternalToolsPlugin.init(this.fakeEditor, undefined, this.INST)
   ok(this.fakeEditor.ui.registry.addButton.calledWith('instructure_external_button_button_id'))
 })
 
-test("creates the tool's icon", function () {
+test("creates the tool's icon", function() {
   this.INST.editorButtons[0].favorite = true
   this.INST.editorButtons[0].icon_url = 'tool_image'
   ExternalToolsPlugin.init(this.fakeEditor, undefined, this.INST)
   ok(this.fakeEditor.ui.registry.addIcon.calledWith('lti_tool_button_id'))
 })
 
-test('adds Apps to the Tools menubar menu', function () {
+test('adds Apps to the Tools menubar menu', function() {
   ExternalToolsPlugin.init(this.fakeEditor, undefined, this.INST)
   ok(this.fakeEditor.ui.registry.addNestedMenuItem.calledWith('lti_tools_menuitem'))
 })

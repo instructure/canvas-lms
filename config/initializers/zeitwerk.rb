@@ -30,47 +30,27 @@ if CANVAS_ZEITWERK
   # require 'canvas'
   # require 'canvas/plugins'
   # require 'canvas/plugins/validators'
-  # require 'canvas/plugins/adobe_connect'
-  require 'canvas_webex'
-  require 'canvas_webex/version'
 
-  # we don't want zeitwerk to try to eager_load some
-  # "Version" constant from any plugins
-  Rails.autoloaders.main.ignore(
-    "#{__dir__}/../../gems/plugins/simply_versioned/lib/simply_versioned/gem_version.rb",
-    "#{__dir__}/../../lib/cdc_migration_testing" # these aren't really modules we use in canvas runtime
-  )
+  # # TODO: Load things that are not being properly loaded by zeitwerk right now
+  # require 'canvas_connect'
+  # require 'canvas_connect/version'
+  # # in the canvas_connect gem, the "to_prepare"
+  # # block uses this.
+  # require 'canvas/plugins/adobe_connect'
+  # require 'canvas_webex'
+  # require 'canvas_webex/version'
+  # byebug
 
   Rails.autoloaders.each do |autoloader|
     autoloader.inflector.inflect(
-      "api_array_serializer" => "APIArraySerializer",
-      "api_serialization" => "APISerialization",
-      "api_serializer" => "APISerializer",
-      "aws" => "AWS",
-      "basic_lti" => "BasicLTI",
       "basic_lti_links" => "BasicLTILinks",
-      "brandable_css" => "BrandableCSS",
-      "cas" => "CAS",
       "cc" => "CC",
       "cc_helper" => "CCHelper",
       "cc_exporter" => "CCExporter",
       "cc_worker" => "CCWorker",
       "dynamo_db" => "DynamoDB",
-      "icu" => "ICU",
-      "id_loader" => "IDLoader",
-      "ims" => "IMS",
       "inst_fs" => "InstFS",
-      "ldap" => "LDAP",
-      "legacy_id_interface" => "LegacyIDInterface",
-      "open_id_connect" => "OpenIDConnect",
-      "saml" => "SAML",
-      "sis" => "SIS",
-      "sisid_loader" => "SISIDLoader",
-      "sms_presenter" => "SMSPresenter",
-      "ssl_common" => "SSLCommon",
       "turnitin_id" => "TurnitinID",
-      "uk_federation" => "UKFederation",
-      "vericite" => "VeriCite",
       "xml_helper" => "XMLHelper",
     )
   end

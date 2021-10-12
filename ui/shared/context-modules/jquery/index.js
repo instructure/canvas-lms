@@ -62,7 +62,6 @@ import '@canvas/rails-flash-notifications'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import mathml from 'mathml'
-import {addDeepLinkingListener} from '../../deep-linking/DeepLinking'
 
 function scrollTo($thing, time = 500) {
   if (!$thing || $thing.length === 0) return
@@ -980,7 +979,7 @@ const newPillMessage = function($module, requirement_count) {
   }
 }
 
-modules.initModuleManagement = function(duplicate) {
+modules.initModuleManagement = function() {
   // Create the context modules backbone view to manage the publish button.
   const context_modules_view = new ContextModulesView({
     el: $('#content'),
@@ -1445,7 +1444,7 @@ modules.initModuleManagement = function(duplicate) {
           $('.context_module')
             .find('.expand_module_link,.collapse_module_link')
             .bind('click keyclick', toggleModuleCollapse)
-          modules.initModuleManagement($newModule)
+          modules.initModuleManagement()
         })
         .catch(showFlashError(I18n.t('Error rendering duplicated module')))
     }
@@ -2255,9 +2254,7 @@ modules.initModuleManagement = function(duplicate) {
     moduleItems[contentKey].push({model, view})
   }
 
-  var parent = duplicate || $('#context_modules')
-
-  parent.find('.publish-icon').each((index, el) => {
+  $('.publish-icon').each((index, el) => {
     const $el = $(el)
     if ($el.data('id')) {
       const view = initPublishButton($el)
@@ -2597,7 +2594,7 @@ $(document).ready(function() {
   }
 
   if ($('#context_modules').hasClass('editable')) {
-    requestAnimationFrame(() => { modules.initModuleManagement() })
+    requestAnimationFrame(modules.initModuleManagement)
     modules.loadMasterCourseData()
   }
 
@@ -2734,10 +2731,6 @@ $(document).ready(function() {
 
   $('.menu_tray_tool_link').click(openExternalTool)
   monitorLtiMessages()
-  // listen for deep linking messages here, and probably just reload the page
-  addDeepLinkingListener(() => {
-    window.location.reload()
-  })
 
   function renderCopyToTray(open, contentSelection, returnFocusTo) {
     ReactDOM.render(

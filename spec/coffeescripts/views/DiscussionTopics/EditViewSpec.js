@@ -34,8 +34,6 @@ import 'helpers/jquery.simulate'
 
 const currentOrigin = window.location.origin
 
-EditView.prototype.loadNewEditor = () => {}
-
 const editView = function (opts = {}, discussOpts = {}) {
   const ModelClass = opts.isAnnouncement ? Announcement : DiscussionTopic
   if (opts.withAssignment) {
@@ -110,9 +108,10 @@ QUnit.module('EditView', {
   }
 })
 
+// eslint-disable-next-line qunit/resolve-async
 test('it should be accessible', function (assert) {
   const done = assert.async()
-  assertions.isAccessible(this.editView(), () => done(), {a11yReport: true})
+  assertions.isAccessible(this.editView(), done, {a11yReport: true})
 })
 
 test('renders', function () {
@@ -120,17 +119,14 @@ test('renders', function () {
   ok(view)
 })
 
-// EditView.loadNewEditor is stubbed since I can't figure out how
-// to cope with the async RCE initialization in QUnit
-//
-QUnit.skip('tells RCE to manage the parent', function () {
+test('tells RCE to manage the parent', function () {
   const lne = sandbox.stub(RichContentEditor, 'loadNewEditor')
   const view = this.editView()
   view.loadNewEditor()
   ok(lne.firstCall.args[1].manageParent, 'manageParent flag should be set')
 })
 
-QUnit.skip('does not tell RCE to manage the parent of locked content', function () {
+test('does not tell RCE to manage the parent of locked content', function () {
   const lne = sandbox.stub(RichContentEditor, 'loadNewEditor')
   const view = this.editView({lockedItems: {content: true}})
   view.loadNewEditor()

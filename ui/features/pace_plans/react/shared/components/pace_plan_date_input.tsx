@@ -30,13 +30,8 @@ import React from 'react'
 import moment from 'moment-timezone'
 import tz from '@canvas/timezone'
 
-import {Flex} from '@instructure/ui-flex'
-import {View} from '@instructure/ui-view'
-import {Text} from '@instructure/ui-text'
-
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
-import {InputInteraction} from '../types'
 
 export enum DateErrorMessages {
   INVALID_FORMAT = 'Invalid date entered. Date has been reset.',
@@ -55,8 +50,8 @@ interface PassedProps {
   readonly width?: string
   readonly layout?: 'inline' | 'stacked'
   readonly inline?: boolean
-  readonly interaction?: InputInteraction
   readonly id: string
+  readonly disabled?: boolean
   readonly placeholder?: string
   readonly locale?: string
 }
@@ -76,7 +71,7 @@ class PacePlanDateInput extends React.Component<PassedProps, LocalState> {
     width: '135',
     layout: 'stacked',
     inline: false,
-    interaction: 'enabled',
+    disabled: false,
     placeholder: 'Select a date',
     locale: window.ENV.LOCALE
   }
@@ -115,24 +110,12 @@ class PacePlanDateInput extends React.Component<PassedProps, LocalState> {
     this.setState({error})
   }
 
-  formatDate = date => tz.format(date, 'date.formats.long')
+  formatDate = date => tz.format(date, 'date.formats.medium')
 
   /* Renderers */
 
   render() {
     const {dateValue} = this.props
-    if (this.props.interaction === 'readonly') {
-      return (
-        <div style={{display: 'inline-block', lineHeight: '1.125rem'}}>
-          <View as="div" margin="0 0 small">
-            <Text weight="bold">{this.props.label}</Text>
-          </View>
-          <Flex as="div" height="2.25rem" alignItems="center">
-            {this.formatDate(dateValue)}
-          </Flex>
-        </div>
-      )
-    }
     return (
       <CanvasDateInput
         renderLabel={this.props.label}
@@ -141,7 +124,6 @@ class PacePlanDateInput extends React.Component<PassedProps, LocalState> {
         selectedDate={dateValue && moment(dateValue).isValid() ? dateValue : ''}
         width={this.props.width}
         messages={this.state.error ? [{type: 'error', text: this.state.error}] : []}
-        interaction={this.props.interaction}
       />
     )
   }

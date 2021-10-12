@@ -321,24 +321,17 @@
                   <% end %>
                 <% end %>
 
-                <%= settings.fields_for :disable_rce_media_uploads do |r| %>
-                  <% hash = @account.disable_rce_media_uploads %>
-                  <% disabled = hash[:locked] && hash[:inherited] %>
-                  <tr>
-                    <td colspan="2">
-                      <%= r.check_box :value, checked: hash[:value], disabled: disabled %>
-                      <%= r.label :value, t("Disable uploads to Canvas Media from the enhanced rich content editor") %>
-                    </td>
-                  </tr>
-                <% end %>
-
-                <% if Account.site_admin.feature_enabled?(:gradebook_show_first_last_names) %>
-                  <tr>
-                    <td colspan="2">
-                      <%= settings.check_box :allow_gradebook_show_first_last_names, checked: @account.allow_gradebook_show_first_last_names? %>
-                      <%= settings.label :allow_gradebook_show_first_last_names, t("Allow gradebook users to view and export student first and last names in separate columns") %>
-                    </td>
-                  </tr>
+                <% if @account.feature_allowed?(:rce_enhancements) %>
+                  <%= settings.fields_for :disable_rce_media_uploads do |r| %>
+                    <% hash = @account.disable_rce_media_uploads %>
+                    <% disabled = hash[:locked] && hash[:inherited] %>
+                    <tr>
+                      <td colspan="2">
+                        <%= r.check_box :value, checked: hash[:value], disabled: disabled %>
+                        <%= r.label :value, t("Disable uploads to Canvas Media from the enhanced rich content editor") %>
+                      </td>
+                    </tr>
+                  <% end %>
                 <% end %>
               <% end %>
             <% end %>

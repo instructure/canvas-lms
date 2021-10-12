@@ -212,7 +212,7 @@ class Course < ActiveRecord::Base
   has_many :sis_post_grades_statuses
 
   has_many :progresses, as: :context, inverse_of: :context
-  has_many :gradebook_csvs, inverse_of: :course, class_name: "GradebookCSV"
+  has_many :gradebook_csvs, inverse_of: :course
 
   has_many :master_course_templates, :class_name => "MasterCourses::MasterTemplate"
   # only valid if non-nil
@@ -1472,7 +1472,7 @@ class Course < ActiveRecord::Base
     super
   end
 
-  alias_method :destroy_permanently!, :destroy
+  alias destroy_permanently! destroy
   def destroy
     return false if template?
 
@@ -2626,7 +2626,7 @@ class Course < ActiveRecord::Base
      :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
      :hide_final_grade, :hide_distribution_graphs,
      :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements,
-     :allow_student_discussion_reporting, :organize_epub_by_content_type, :show_announcements_on_home_page,
+     :organize_epub_by_content_type, :show_announcements_on_home_page,
      :home_page_announcement_limit, :enable_offline_web_export, :usage_rights_required,
      :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates,
      :homeroom_course, :course_color, :alt_name]
@@ -3242,10 +3242,8 @@ class Course < ActiveRecord::Base
         delete_unless.call([TAB_RUBRICS], :read_rubrics, :manage_rubrics)
         delete_unless.call([TAB_FILES], :read, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
 
-        if item_banks_tab &&
-           !check_for_permission.call(:manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-          tabs.reject! { |tab| tab[:id] == item_banks_tab[:id] }
-        end
+        tabs -= [item_banks_tab] if item_banks_tab && !check_for_permission.call(:manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+
         # remove outcomes tab for logged-out users or non-students
         outcome_tab = tabs.detect { |t| t[:id] == TAB_OUTCOMES }
         tabs.delete(outcome_tab) if outcome_tab && (!user || !check_for_permission.call(:manage_content, :participate_as_student, :read_as_admin))
@@ -3368,7 +3366,6 @@ class Course < ActiveRecord::Base
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
   add_setting :allow_student_forum_attachments, :boolean => true, :default => true
-  add_setting :allow_student_discussion_reporting, :boolean => true, :default => true
   add_setting :show_total_grade_as_points, :boolean => true, :default => false
   add_setting :filter_speed_grader_by_student_group, boolean: true, default: false
   add_setting :lock_all_announcements, :boolean => true, :default => false, :inherited => true
@@ -3462,7 +3459,6 @@ class Course < ActiveRecord::Base
         course_enrollment.start_at = enrollment.start_at
         course_enrollment.end_at = enrollment.end_at
         course_enrollment.completed_at = enrollment.completed_at
-        course_enrollment.associated_user_id = enrollment.associated_user_id
         course_enrollment.save!
         progress.increment_completion!(1) if progress&.total
       end

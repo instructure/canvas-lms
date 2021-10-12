@@ -18,16 +18,21 @@
 
 import {Action} from 'redux'
 import {ThunkAction} from 'redux-thunk'
+import moment from 'moment-timezone'
 
 import {PacePlan, PlanContextTypes, StoreState, PublishOptions} from '../types'
-import {createAction, ActionsUnion} from '../shared/types'
+import {createAction, ActionsUnion, BlackoutDate} from '../shared/types'
 import {actions as uiActions} from './ui'
+import {createAutoSavingAction} from './autosaving'
+import * as DateHelpers from '../utils/date_stuff/date_helpers'
 import * as Api from '../api/pace_plan_api'
+import {getPacePlan} from '../reducers/pace_plans'
 
 export enum Constants {
   SET_END_DATE = 'PACE_PLAN/SET_END_DATE',
   SET_START_DATE = 'PACE_PLAN/SET_START_DATE',
   PUBLISH_PLAN = 'PACE_PLAN/PUBLISH_PLAN',
+  SET_PLAN_DAYS = 'PACE_PLAN/SET_PLAN_DAYS',
   TOGGLE_EXCLUDE_WEEKENDS = 'PACE_PLAN/TOGGLE_EXCLUDE_WEEKENDS',
   SET_PACE_PLAN = 'PACE_PLAN/SET_PACE_PLAN',
   PLAN_CREATED = 'PACE_PLAN/PLAN_CREATED',
@@ -51,7 +56,23 @@ const regularActions = {
   toggleHardEndDates: () => createAction(Constants.TOGGLE_HARD_END_DATES),
   setLinkedToParent: (linked: boolean) => createAction(Constants.SET_LINKED_TO_PARENT, linked),
   setUnpublishedChanges: (unpublishedChanges: boolean) =>
-    createAction(Constants.SET_UNPUBLISHED_CHANGES, unpublishedChanges)
+    createAction(Constants.SET_UNPUBLISHED_CHANGES, unpublishedChanges),
+  setPlanDays: (planDays: number, plan: PacePlan, blackoutDates: BlackoutDate[]): SetEndDate => {
+    // This calculates the new end date based off of the number of plan days specified and invokes
+    // a setEndDate action. This would potentially be better with a thunked action, but I'm not
+    // sure how to get that to work with a typesafe-actions createAction call.
+    let newEndDate: string | undefined
+
+    if (planDays === 0) {
+      newEndDate = plan.start_date
+    } else {
+      // Subtract one day from planDays to make it include the start date
+      const start = moment(plan.start_date).subtract(1, 'day')
+      newEndDate = DateHelpers.addDays(start, planDays, plan.exclude_weekends, blackoutDates)
+    }
+
+    return pacePlanActions.setEndDate(newEndDate)
+  }
 }
 
 const thunkActions = {
@@ -72,9 +93,8 @@ const thunkActions = {
         publishForSectionIds,
         publishForEnrollmentIds
       )
-        .then(newDraftPlan => {
-          if (!newDraftPlan) throw new Error('Response body was empty')
-          dispatch(pacePlanActions.setPacePlan(newDraftPlan))
+        .then(response => {
+          dispatch(pacePlanActions.setPacePlan(response.new_draft_plan))
           dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.publishPlanFinished())
         })
@@ -98,9 +118,8 @@ const thunkActions = {
       )
 
       return Api.resetToLastPublished(contextType, contextId)
-        .then(pacePlan => {
-          if (!pacePlan) throw new Error('Response body was empty')
-          dispatch(pacePlanActions.setPacePlan(pacePlan))
+        .then(response => {
+          dispatch(pacePlanActions.setPacePlan(response.pace_plan))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {
@@ -121,9 +140,8 @@ const thunkActions = {
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
       return Api.getLatestDraftFor(contextType, contextId)
-        .then(pacePlan => {
-          if (!pacePlan) throw new Error('Response body was empty')
-          dispatch(afterAction(pacePlan))
+        .then(response => {
+          dispatch(afterAction(response.pace_plan))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {
@@ -140,9 +158,8 @@ const thunkActions = {
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
       return Api.relinkToParentPlan(getState().pacePlan.id)
-        .then(pacePlan => {
-          if (!pacePlan) throw new Error('Response body was empty')
-          dispatch(pacePlanActions.setPacePlan(pacePlan))
+        .then(response => {
+          dispatch(pacePlanActions.setPacePlan(response.pace_plan))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {
@@ -150,6 +167,37 @@ const thunkActions = {
           dispatch(uiActions.setErrorMessage('There was an error linking plan.'))
           console.error(error) // eslint-disable-line no-console
         })
+    }
+  }
+}
+
+export const autoSavingActions = {
+  setStartDate: (date: string) => {
+    return createAutoSavingAction(pacePlanActions.setStartDate(date))
+  },
+  setEndDate: (date: string) => {
+    return createAutoSavingAction(pacePlanActions.setEndDate(date))
+  },
+  setPlanDays: (planDays: number, plan: PacePlan, blackoutDates: BlackoutDate[]) => {
+    return createAutoSavingAction(pacePlanActions.setPlanDays(planDays, plan, blackoutDates))
+  },
+  toggleExcludeWeekends: (extraSaveParams = {}) => {
+    return createAutoSavingAction(
+      pacePlanActions.toggleExcludeWeekends(),
+      true,
+      false,
+      extraSaveParams
+    )
+  },
+  toggleHardEndDates: (): ThunkAction<void, StoreState, void, Action> => {
+    return (dispatch, getState) => {
+      const plan = getPacePlan(getState())
+      // If we're an enrollment plan and we're setting hard end dates, we should block the UI until the backend
+      // re-adjusts the assignment due dates
+      const shouldWaitForSave = plan.context_type === 'Enrollment' && !plan.hard_end_dates
+      dispatch(
+        createAutoSavingAction(pacePlanActions.toggleHardEndDates(), true, shouldWaitForSave)
+      )
     }
   }
 }

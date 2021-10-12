@@ -66,14 +66,9 @@ export default class StudentDatastore {
     })
   }
 
-  listStudents({includePlaceholders = true} = {}) {
-    return this.studentIds.reduce((students, id) => {
-      const student =
-        this.userStudentMap[id] || this.testStudentMap[id] || createStudentPlaceholder(id)
-      if (includePlaceholders || !student.isPlaceholder) {
-        students.push(student)
-      }
-      return students
-    }, [])
+  listStudents() {
+    return this.studentIds.map(
+      id => this.userStudentMap[id] || this.testStudentMap[id] || createStudentPlaceholder(id)
+    )
   }
 }

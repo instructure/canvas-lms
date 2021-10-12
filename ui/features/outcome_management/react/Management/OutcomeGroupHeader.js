@@ -87,7 +87,7 @@ const OutcomeGroupHeader = ({
           <Flex.Item>
             <OutcomeKebabMenu
               canDestroy
-              menuTitle={I18n.t('Menu for group %{title}', {title})}
+              menuTitle={I18n.t('Outcome Group Menu')}
               onMenuHandler={onMenuHandler}
               groupDescription={description}
             />

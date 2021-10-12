@@ -21,7 +21,7 @@ module Types
   class AssignmentGroupType < ApplicationObjectType
     graphql_name "AssignmentGroup"
 
-    alias_method :assignment_group, :object
+    alias assignment_group object
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
