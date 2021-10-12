@@ -191,6 +191,6 @@ export const DEFAULT_STORE_STATE: DefaultStoreState = {
   blackoutDates: BLACKOUT_DATES,
   course: COURSE,
   enrollments: ENROLLMENTS,
-  pacePlan: PRIMARY_PLAN,
+  pacePlan: {...PRIMARY_PLAN, originalPlan: PRIMARY_PLAN},
   sections: SECTIONS
 }
