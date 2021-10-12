@@ -110,20 +110,27 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def extension_setting(type, property = nil)
-    val = calclulate_extension_setting(type, property)
+    val = calculate_extension_setting(type, property)
     if val && property == :icon_url
       val = nil if (URI.parse(val) rescue nil).nil? # make sure it's a valid url
     end
     val
   end
 
-  def calclulate_extension_setting(type, property = nil)
+  def calculate_extension_setting(type, property = nil)
     return settings[property] unless type
 
     type = type.to_sym
-    return settings[type] unless property && settings[type]
+    return setting_with_default_enabled(type) unless property && settings[type]
 
     settings[type][property] || settings[property] || extension_default_value(type, property)
+  end
+
+  def setting_with_default_enabled(type)
+    return nil unless settings[type]
+    return settings[type] unless Lti::ResourcePlacement::PLACEMENTS.include?(type)
+
+    { enabled: true }.with_indifferent_access.merge(settings[type])
   end
 
   def set_extension_setting(type, hash)
@@ -489,6 +496,8 @@ class ContextExternalTool < ActiveRecord::Base
 
   def extension_default_value(type, property)
     case property
+    when :enabled
+      true
     when :url
       url
     when :target_link_uri

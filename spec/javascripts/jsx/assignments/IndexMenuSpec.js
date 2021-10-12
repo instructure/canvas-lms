@@ -22,6 +22,7 @@ import {Modal} from '@instructure/ui-modal'
 import IndexMenu from 'ui/features/assignment_index/react/IndexMenu.js'
 import Actions from 'ui/features/assignment_index/react/actions/IndexMenuActions.js'
 import createFakeStore from './createFakeStore'
+import {handleDeepLinking} from '@canvas/deep-linking/DeepLinking'
 
 QUnit.module('AssignmentsIndexMenu')
 
@@ -201,6 +202,26 @@ testCase('renders a dropdown menu with one option when sync to sis conditions ar
   const options = TestUtils.scryRenderedDOMComponentsWithTag(component, 'li')
 
   equal(options.length, 1)
+  component.closeModal()
+  ReactDOM.unmountComponentAtNode(component.node.parentElement)
+})
+
+testCase('reloads the page when receiving a deep linking message', async () => {
+  ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = 'https://www.test.com'
+  ENV.FEATURES = {
+    lti_multiple_assignment_deep_linking: true
+  }
+  const message = overrides => ({
+    origin: 'https://www.test.com',
+    data: {messageType: 'LtiDeepLinkingResponse'},
+    ...overrides
+  })
+  const initialState = {modalIsOpen: true}
+  const component = renderComponent(generateProps({}, initialState))
+  const reloadPage = sinon.stub()
+  await handleDeepLinking(reloadPage)(message())
+
+  ok(reloadPage.calledOnce)
   component.closeModal()
   ReactDOM.unmountComponentAtNode(component.node.parentElement)
 })

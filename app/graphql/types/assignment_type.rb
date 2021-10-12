@@ -27,7 +27,7 @@ module Types
     implements Interfaces::ModuleItemInterface
     implements Interfaces::LegacyIDInterface
 
-    alias assignment object
+    alias_method :assignment, :object
 
     class AssignmentStateType < Types::BaseEnum
       graphql_name "AssignmentState"

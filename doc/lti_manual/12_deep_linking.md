@@ -79,7 +79,7 @@ When this process is complete, Canvas now knows about and is displaying the sele
 [`Lti::Messages::DeepLinkingRequest`](/lib/lti/messages/deep_linking_request.rb) builds the LTI message that gets sent during a deep linking request, and also houses the per-placement configuration for allowing deep linking.
 [`Placement` (UI)](/ui/features/developer_keys_v2/react/ManualConfigurationForm/Placement.js) contains a list of placements that can handle deep linking.
 [Deep Linking Shared Code (UI)](/ui/shared/deep-linking/) contains a few shared modules for interpreting deep linking postMessages in the UI. These are mostly used piecemeal by pages and placements that support deep linking.
-[`Lti::Ims::DeepLinkingController`](/app/controllers/lti/ims/deep_linking_controller.rb) controller for deep linking return url that creates Canvas records based on the content items from the deep linking response message.
-[`Lti::Ims::Concerns::DeepLinkingServices`](/app/controllers/lti/ims/concerns/deep_linking_services.rb) verifies JWT from deep linking response message, handles support functionality for the controller above.
-[`Lti::Ims::Concerns::DeepLinkingModules`](/app/controllers/lti/ims/concerns/deep_linking_modules.rb) specific logic for creating module items from the deep linking response message.
+[`Lti::IMS::DeepLinkingController`](/app/controllers/lti/ims/deep_linking_controller.rb) controller for deep linking return url that creates Canvas records based on the content items from the deep linking response message.
+[`Lti::IMS::Concerns::DeepLinkingServices`](/app/controllers/lti/ims/concerns/deep_linking_services.rb) verifies JWT from deep linking response message, handles support functionality for the controller above.
+[`Lti::IMS::Concerns::DeepLinkingModules`](/app/controllers/lti/ims/concerns/deep_linking_modules.rb) specific logic for creating module items from the deep linking response message.
 [`DeepLinkingResponse` (UI)](/ui/features/deep_linking_response/react/DeepLinkingResponse.js) UI rendered by the controller above that sends the content items in a postMessage to the main Canvas frame.

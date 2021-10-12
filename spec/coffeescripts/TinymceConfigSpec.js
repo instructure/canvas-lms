@@ -49,60 +49,11 @@ QUnit.module('EditorConfig', {
   }
 })
 
-test('buttons spread across rows for narrow windowing', () => {
-  const width = 100
-  const config = new EditorConfig(fake_tinymce, INST, width, dom_id)
-  const toolbar = config.toolbar()
-  strictEqual(toolbar[0], toolbar1)
-  strictEqual(toolbar[1], toolbar2)
-  strictEqual(toolbar[2], toolbar3)
-})
-
-test('buttons go on the first row for large windowing', () => {
-  const config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
-  const toolbar = config.toolbar()
-  equal(toolbar[0], `${toolbar1},${toolbar2},${toolbar3}`)
-  strictEqual(toolbar[1], '')
-  strictEqual(toolbar[2], '')
-})
-
-test('adding a few extra buttons', () => {
-  INST.editorButtons = [
-    {
-      id: 'example',
-      name: 'new_button'
-    }
-  ]
-  const config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
-  const toolbar = config.toolbar()
-  ok(toolbar[0].match(/instructure_external_button_example/))
-})
-
-test('calculating an external button clump', () => {
-  INST.editorButtons = [
-    {
-      id: 'example',
-      name: 'new_button'
-    }
-  ]
-  INST.maxVisibleEditorButtons = 0
-  const config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
-  const btns = config.external_buttons()
-  equal(btns, ' instructure_external_button_clump')
-})
-
 test('default config has static attributes', () => {
   INST.maxVisibleEditorButtons = 2
   const config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
   const schema = config.defaultConfig()
   equal(schema.skin, false)
-})
-
-test('default config includes toolbar', () => {
-  INST.maxVisibleEditorButtons = 2
-  const config = new EditorConfig(fake_tinymce, INST, largeScreenWidth, dom_id)
-  const schema = config.defaultConfig()
-  equal(schema.toolbar[0], config.toolbar()[0])
 })
 
 test('default config includes Lato font-family', () => {

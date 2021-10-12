@@ -567,7 +567,7 @@ module Lti
       it 'has substitution for Message.documentTarget' do
         exp_hash = { test: '$Message.documentTarget' }
         variable_expander.expand_variables!(exp_hash)
-        expect(exp_hash[:test]).to eq IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
+        expect(exp_hash[:test]).to eq ::IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME
       end
 
       it 'has substitution for Message.locale' do

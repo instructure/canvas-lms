@@ -223,7 +223,7 @@ module AttachmentFu # :nodoc:
       def s3_url(thumbnail = nil)
         s3object(thumbnail).public_url
       end
-      alias :public_filename :s3_url
+      alias_method :public_filename, :s3_url
 
       # All private objects are accessible via an authenticated GET request to the S3 servers. You can generate an
       # authenticated url for an object like this:

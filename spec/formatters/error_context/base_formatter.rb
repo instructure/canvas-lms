@@ -87,6 +87,8 @@ module ErrorContext
       def start(example)
         @summary ||= begin
           summary = new(example)
+          @errors_path = nil
+          @base_error_path = nil
           summary.start
           summary
         end
@@ -120,7 +122,7 @@ module ErrorContext
       end
 
       def base_error_path
-        @base_error_path ||= ENV.fetch("ERROR_CONTEXT_BASE_PATH", Rails.root.join("log", "spec_failures"))
+        @base_error_path ||= ENV.fetch("ERROR_CONTEXT_BASE_PATH", Rails.root.join("log", "spec_failures", "Initial"))
       end
     end
 

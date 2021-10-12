@@ -40,7 +40,7 @@
 <td>
   {{#each enrollments}}
     <div {{contextSensitiveDatetimeTitle last_activity_at }}>
-      {{datetimeFormatted last_activity_at}}
+      {{tEventToString last_activity_at 'short' 'tiny'}}
     </div>
   {{/each}}
 </td>

@@ -17,5 +17,13 @@
  */
 import formatMessage from 'format-message'
 
-const canvasPlannerNamespace = formatMessage.namespace()
-export default canvasPlannerNamespace
+const ns = formatMessage.namespace()
+
+ns.addLocale = ({locale, translations}) => {
+  ns.setup({
+    locale,
+    translations: {...ns.setup().translations, ...translations}
+  })
+}
+
+export default ns

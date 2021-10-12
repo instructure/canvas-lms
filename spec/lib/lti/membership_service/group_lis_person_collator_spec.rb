@@ -65,12 +65,12 @@ module Lti::MembershipService
           [@student1, @student2, @student3].each do |student|
             membership = memberships.find { |m| m.member.user_id == student.lti_context_id }
 
-            expect(membership.status).to eq(IMS::LIS::Statuses::SimpleNames::Active)
+            expect(membership.status).to eq(::IMS::LIS::Statuses::SimpleNames::Active)
             if student == @group.leader
-              expect(membership.role).to match_array([IMS::LIS::Roles::Context::URNs::Member,
-                                                      IMS::LIS::Roles::Context::URNs::Manager])
+              expect(membership.role).to match_array([::IMS::LIS::Roles::Context::URNs::Member,
+                                                      ::IMS::LIS::Roles::Context::URNs::Manager])
             else
-              expect(membership.role).to match_array([IMS::LIS::Roles::Context::URNs::Member])
+              expect(membership.role).to match_array([::IMS::LIS::Roles::Context::URNs::Member])
             end
             expect(membership.member.name).to eq(student.name)
             expect(membership.member.given_name).to eq(student.first_name)

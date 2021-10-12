@@ -148,7 +148,7 @@ module DynamicSettings
         proxy
       end
     end
-    alias kv_proxy find
+    alias_method :kv_proxy, :find
 
     def reset_cache!
       cache.delete_matched(/^#{CACHE_KEY_PREFIX}/)

@@ -19,7 +19,7 @@
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionPostToolbar} from '../../components/DiscussionPostToolbar/DiscussionPostToolbar'
 import React, {useContext, useEffect, useState} from 'react'
-import {SearchContext} from '../../utils/constants'
+import {SEARCH_TERM_DEBOUNCE_DELAY, SearchContext} from '../../utils/constants'
 import {View} from '@instructure/ui-view'
 
 export const DiscussionTopicToolbarContainer = props => {
@@ -31,7 +31,7 @@ export const DiscussionTopicToolbarContainer = props => {
       if (currentSearchValue !== searchTerm) {
         setSearchTerm(currentSearchValue)
       }
-    }, 500)
+    }, SEARCH_TERM_DEBOUNCE_DELAY)
 
     return () => clearInterval(interval)
   }, [currentSearchValue, searchTerm, setSearchTerm])

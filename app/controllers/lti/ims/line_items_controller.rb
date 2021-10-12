@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti
-  module Ims
+  module IMS
     # @API Line Items
     #
     # Line Item API for IMS Assignment and Grade Services

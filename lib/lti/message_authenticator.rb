@@ -45,7 +45,7 @@ module Lti
     private
 
     def lti_message_authenticator
-      @lti_message_authenticator ||= IMS::LTI::Services::MessageAuthenticator.new(@launch_url, @params, shared_secret)
+      @lti_message_authenticator ||= ::IMS::LTI::Services::MessageAuthenticator.new(@launch_url, @params, shared_secret)
     end
 
     def shared_secret

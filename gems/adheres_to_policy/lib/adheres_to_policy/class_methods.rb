@@ -30,7 +30,7 @@ module AdheresToPolicy # :nodoc:
       @_policy_blocks << block
     end
 
-    alias :set_permissions :set_policy
+    alias_method :set_permissions, :set_policy
 
     def policy
       return superclass.policy if @_policy_blocks.nil? || @_policy_blocks.empty?

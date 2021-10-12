@@ -25,10 +25,27 @@ import {MockedProvider} from '@apollo/react-testing'
 
 const render = (
   children,
-  {canManage = true, isAdmin = true, contextType = 'Account', renderer = rtlRender} = {}
+  {
+    canManage = true,
+    isAdmin = true,
+    contextId = '2',
+    contextType = 'Account',
+    friendlyDescriptionFF = true,
+    renderer = rtlRender
+  } = {}
 ) => {
   return renderer(
-    <OutcomesContext.Provider value={{env: {canManage, isAdmin, contextType}}}>
+    <OutcomesContext.Provider
+      value={{
+        env: {
+          canManage,
+          isAdmin,
+          contextId,
+          contextType,
+          friendlyDescriptionFF
+        }
+      }}
+    >
       <MockedProvider mocks={[]}>{children}</MockedProvider>
     </OutcomesContext.Provider>
   )
@@ -72,15 +89,13 @@ describe('ManageOutcomeItem', () => {
 
   it('handles click on checkbox', () => {
     const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
-    const checkbox = getByText('Select outcome')
-    fireEvent.click(checkbox)
+    fireEvent.click(getByText('Select outcome Outcome Title'))
     expect(onCheckboxHandlerMock).toHaveBeenCalledTimes(1)
   })
 
   it('passes selected outcome obj to checkbox onClick handler', () => {
     const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
-    const checkbox = getByText('Select outcome')
-    fireEvent.click(checkbox)
+    fireEvent.click(getByText('Select outcome Outcome Title'))
     expect(onCheckboxHandlerMock).toHaveBeenCalledWith({linkId: '2'})
   })
 
@@ -91,23 +106,20 @@ describe('ManageOutcomeItem', () => {
 
   it('displays down pointing caret when description is expanded', () => {
     const {queryByTestId, getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Expand outcome description'))
+    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
     expect(queryByTestId('icon-arrow-down')).toBeInTheDocument()
   })
 
   it('expands description when user clicks on button with right pointing caret', () => {
     const {queryByTestId, getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
-    const caretBtn = getByText('Expand outcome description')
-    fireEvent.click(caretBtn)
+    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
     expect(queryByTestId('description-expanded')).toBeInTheDocument()
   })
 
   it('collapses description when user clicks on button with down pointing caret', () => {
     const {queryByTestId, getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
-    const caretBtn = getByText('Expand outcome description')
-    fireEvent.click(caretBtn)
-    const caretDownBtn = getByText('Collapse outcome description')
-    fireEvent.click(caretDownBtn)
+    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+    fireEvent.click(getByText('Collapse description for outcome Outcome Title'))
     expect(queryByTestId('description-truncated')).toBeInTheDocument()
   })
 
@@ -122,52 +134,64 @@ describe('ManageOutcomeItem', () => {
 
   it('handles click on individual outcome -> kebab menu -> remove option', () => {
     const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Outcome Menu'))
+    fireEvent.click(getByText('Menu for outcome Outcome Title'))
     fireEvent.click(getByText('Remove'))
     expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
     expect(onMenuHandlerMock.mock.calls[0][0]).toBe('2')
     expect(onMenuHandlerMock.mock.calls[0][1]).toBe('remove')
   })
 
-  describe('when canManageOutcome is false', () => {
-    it('hides the kebab menu', () => {
+  it('hides checkbox if canManageOutcome is false', () => {
+    const {queryByText} = render(<ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />)
+    expect(queryByText('Select outcome Outcome Title')).not.toBeInTheDocument()
+  })
+
+  describe('Kebab menu -> edit option', () => {
+    it('enables option if Friendly Description FF is enabled', () => {
+      const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
+      fireEvent.click(getByText('Menu for outcome Outcome Title'))
+      fireEvent.click(getByText('Edit'))
+      expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
+      expect(onMenuHandlerMock.mock.calls[0][0]).toBe('2')
+      expect(onMenuHandlerMock.mock.calls[0][1]).toBe('edit')
+    })
+
+    it('enables option if user is admin within course context', () => {
+      const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />, {
+        contextType: 'Course',
+        friendlyDescriptionFF: false
+      })
+      fireEvent.click(getByText('Menu for outcome Outcome Title'))
+      fireEvent.click(getByText('Edit'))
+      expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
+      expect(onMenuHandlerMock.mock.calls[0][0]).toBe('2')
+      expect(onMenuHandlerMock.mock.calls[0][1]).toBe('edit')
+    })
+
+    it('enables option if outcome is created within the same context', () => {
+      const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />, {
+        contextId: '1',
+        friendlyDescriptionFF: false
+      })
+      fireEvent.click(getByText('Menu for outcome Outcome Title'))
+      fireEvent.click(getByText('Edit'))
+      expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
+      expect(onMenuHandlerMock.mock.calls[0][0]).toBe('2')
+      expect(onMenuHandlerMock.mock.calls[0][1]).toBe('edit')
+    })
+  })
+
+  describe('With manage_outcomes permisssion', () => {
+    it('displays kebab menu', () => {
+      const {queryByText} = render(<ManageOutcomeItem {...defaultProps()} />)
+      expect(queryByText('Menu for outcome Outcome Title')).toBeInTheDocument()
+    })
+
+    it('displays kebab menu even if canManageOutcome is false', () => {
       const {queryByText} = render(
         <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
       )
-      expect(queryByText('Outcome Menu')).not.toBeInTheDocument()
-    })
-
-    it('hides checkboxes', () => {
-      const {queryByText} = render(
-        <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
-      )
-      expect(queryByText('Select outcome')).not.toBeInTheDocument()
-    })
-
-    describe('with manage_outcomes permission', () => {
-      it('renders the kebab menu if the user is an admin within the course context', () => {
-        const {getByText} = render(
-          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />,
-          {
-            isAdmin: true,
-            canManage: true,
-            contextType: 'Course'
-          }
-        )
-        expect(getByText('Outcome Menu')).toBeInTheDocument()
-      })
-
-      it('does not render the kebab menu if the user is not an admin', () => {
-        const {queryByText} = render(
-          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />,
-          {
-            isAdmin: false,
-            canManage: true,
-            contextType: 'Course'
-          }
-        )
-        expect(queryByText('Outcome Menu')).not.toBeInTheDocument()
-      })
+      expect(queryByText('Menu for outcome Outcome Title')).toBeInTheDocument()
     })
   })
 })

@@ -17,14 +17,11 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {ApolloProvider} from 'react-apollo'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import {handlers} from '../../../../graphql/mswHandlers'
 import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer'
-import {mswClient} from '../../../../../../shared/msw/mswClient'
-import {mswServer} from '../../../../../../shared/msw/mswServer'
+import {MockedProvider} from '@apollo/react-testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
 
@@ -39,15 +36,10 @@ jest.mock('../../../utils', () => ({
 }))
 
 describe('IsolatedThreadsContainer', () => {
-  const server = mswServer(handlers)
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
 
   beforeAll(() => {
-    // eslint-disable-next-line no-undef
-    fetchMock.dontMock()
-    server.listen()
-
     window.ENV = {
       discussion_topic_id: '1',
       manual_mark_as_read: false,
@@ -71,15 +63,8 @@ describe('IsolatedThreadsContainer', () => {
   })
 
   afterEach(() => {
-    server.resetHandlers()
     setOnFailure.mockClear()
     setOnSuccess.mockClear()
-  })
-
-  afterAll(() => {
-    server.close()
-    // eslint-disable-next-line no-undef
-    fetchMock.enableMocks()
   })
 
   const defaultProps = overrides => ({
@@ -101,13 +86,13 @@ describe('IsolatedThreadsContainer', () => {
     ...overrides
   })
 
-  const setup = props => {
+  const setup = (props, mocks) => {
     return render(
-      <ApolloProvider client={mswClient}>
+      <MockedProvider mocks={mocks}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <IsolatedThreadsContainer {...props} />
         </AlertManagerContext.Provider>
-      </ApolloProvider>
+      </MockedProvider>
     )
   }
 

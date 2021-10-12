@@ -17,67 +17,40 @@
  */
 import initializeExternalTools from '@canvas/tinymce-external-tools'
 import INST from 'browser-sniffer'
-import Links from '@canvas/tinymce-links'
+import I18n from 'i18n!loadEventListeners'
+import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 export default function loadEventListeners(callbacks = {}) {
-  const validCallbacks = [
-    'equationCB',
-    'linksCB',
-    'imagePickerCB',
-    'equellaCB',
-    'externalToolCB',
-    'recordCB'
-  ]
+  const validCallbacks = ['equationCB', 'equellaCB', 'externalToolCB']
 
   validCallbacks.forEach(cbName => {
     if (callbacks[cbName] === undefined) {
-      callbacks[cbName] = function() {
+      callbacks[cbName] = function () {
         /* no-op */
       }
     }
   })
 
   document.addEventListener('tinyRCE/initEquation', ({detail}) => {
-    import('./backbone/views/EquationEditorView').then(({default: EquationEditorView}) => {
-      const view = new EquationEditorView(detail.ed)
-      callbacks.equationCB(view)
-    })
-  })
-
-  document.addEventListener('tinyRCE/initLinks', ({detail}) => {
-    Links.renderDialog(detail.ed)
-    callbacks.linksCB()
-  })
-
-  document.addEventListener('tinyRCE/initImagePicker', e => {
-    import('./backbone/views/InsertUpdateImageView').then(
-      ({default: InsertUpdateImageView}) => {
-        const view = new InsertUpdateImageView(e.detail.ed, e.detail.selectedNode)
-        callbacks.imagePickerCB(view)
-      }
-    )
+    import('./backbone/views/EquationEditorView')
+      .then(({default: EquationEditorView}) => {
+        const view = new EquationEditorView(detail.ed)
+        callbacks.equationCB(view)
+      })
+      .catch(showFlashError(I18n.t('Something went wrong loading the equation editor')))
   })
 
   document.addEventListener('tinyRCE/initEquella', e => {
-    import('@canvas/tinymce-equella').then(
-      ({default: initializeEquella}) => {
+    import('@canvas/tinymce-equella')
+      .then(({default: initializeEquella}) => {
         initializeEquella(e.detail.ed)
         callbacks.equellaCB()
-      }
-    )
+      })
+      .catch(showFlashError(I18n.t('Something went wrong loading Equella')))
   })
 
   document.addEventListener('tinyRCE/initExternalTools', e => {
     initializeExternalTools.init(e.detail.ed, e.detail.url, INST)
     callbacks.externalToolCB()
-  })
-
-  document.addEventListener('tinyRCE/initRecord', e => {
-    import('@canvas/tinymce-record').then(
-      ({default: mediaEditorLoader}) => {
-        mediaEditorLoader.insertEditor(e.detail.ed)
-        callbacks.recordCB()
-      }
-    )
   })
 }

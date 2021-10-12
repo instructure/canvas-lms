@@ -46,17 +46,17 @@ module Lti
       end
 
       def generate_member(group)
-        IMS::LTI::Models::MembershipService::Context.new(
+        ::IMS::LTI::Models::MembershipService::Context.new(
           name: group.name,
           context_id: Lti::Asset.opaque_identifier_for(group)
         )
       end
 
       def generate_membership(user)
-        IMS::LTI::Models::MembershipService::Membership.new(
-          status: IMS::LIS::Statuses::SimpleNames::Active,
+        ::IMS::LTI::Models::MembershipService::Membership.new(
+          status: ::IMS::LIS::Statuses::SimpleNames::Active,
           member: generate_member(user),
-          role: [IMS::LIS::ContextType::URNs::Group]
+          role: [::IMS::LIS::ContextType::URNs::Group]
         )
       end
     end

@@ -30,7 +30,7 @@ export default function getRCSProps() {
   // set in rich_content.rb if user has :manage_files_add right
   // though comment says it may (eventually) be in the jwt
   // TODO: look into that.
-  const canUploadFiles = !ENV.use_rce_enhancements || ENV.RICH_CONTENT_CAN_UPLOAD_FILES
+  const canUploadFiles = ENV.RICH_CONTENT_CAN_UPLOAD_FILES
   if (!canUploadFiles || contextType === 'account') {
     contextId = userId
     contextType = 'user'

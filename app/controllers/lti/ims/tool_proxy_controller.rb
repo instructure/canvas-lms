@@ -19,10 +19,10 @@
 #
 
 module Lti
-  module Ims
+  module IMS
     class ToolProxyController < ApplicationController
       include Lti::ApiServiceHelper
-      include Lti::Ims::AccessTokenHelper
+      include Lti::IMS::AccessTokenHelper
 
       TOOL_PROXY_COLLECTION = 'ToolProxy.collection'.freeze
       TOOL_PROXY_ITEM = 'ToolProxy.item'.freeze
@@ -49,7 +49,7 @@ module Lti
       before_action :require_context, :except => [:show]
       skip_before_action :load_user, only: [:create, :show, :re_reg]
 
-      rescue_from Lti::Errors::InvalidToolProxyError, IMS::LTI::Errors::InvalidToolConsumerProfile do |exception|
+      rescue_from Lti::Errors::InvalidToolProxyError, ::IMS::LTI::Errors::InvalidToolConsumerProfile do |exception|
         render json: exception.as_json, status: 400
       end
 
@@ -116,7 +116,7 @@ module Lti
         }
 
         tps = ToolProxyService.new
-        tps.create_secret(IMS::LTI::Models::ToolProxy.from_json(payload))
+        tps.create_secret(::IMS::LTI::Models::ToolProxy.from_json(payload))
 
         tp.update_payload = {
           acknowledgement_url: request.headers["VND-IMS-CONFIRM-URL"],
@@ -171,7 +171,7 @@ module Lti
           tcp_uuid: tcp_uuid,
           developer_key: developer_key
         ).create
-        tp_validator = IMS::LTI::Services::ToolProxyValidator.new(IMS::LTI::Models::ToolProxy.from_json(payload))
+        tp_validator = ::IMS::LTI::Services::ToolProxyValidator.new(::IMS::LTI::Models::ToolProxy.from_json(payload))
         tp_validator.tool_consumer_profile = profile
         tp_validator
       end

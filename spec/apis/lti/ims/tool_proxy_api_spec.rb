@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require_dependency "lti/ims/tool_proxy_controller"
 
 module Lti
-  module Ims
+  module IMS
     describe ToolProxyController, type: :request do
       include_context 'lti2_api_spec_helper'
 
@@ -108,7 +108,7 @@ module Lti
         it 'returns an error message' do
           course_with_teacher_logged_in(:active_all => true)
           tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
-          tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+          tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
           tp.tool_profile.resource_handlers.first.messages.first.enabled_capability = ['extra_capability']
           headers = { 'CONTENT_TYPE' => 'application/json', 'ACCEPT' => 'application/json' }.merge(oauth1_header)
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", params: tp.to_json, headers: headers
@@ -155,7 +155,7 @@ module Lti
           it 'supports using a specified custom TCP' do
             course_with_teacher_logged_in(:active_all => true)
             tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
-            tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+            tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
             tp.tool_profile.product_instance.product_info.product_family.vendor.code = vendor_code
             message = tp.tool_profile.resource_handlers.first.messages.first
             tp.tool_consumer_profile = tcp_url
@@ -184,7 +184,7 @@ module Lti
                                                            registration_url: 'http://example.com/register'
                                                          })
           tool_proxy_fixture = File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json'))
-          tp = IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
+          tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
           tp.tool_profile.product_instance.product_info.product_family.vendor.code = vendor_code
           response = post "/api/lti/accounts/#{@course.account.id}/tool_proxy.json", params: tp.to_json, headers: request_headers
           expect(response).to eq 201

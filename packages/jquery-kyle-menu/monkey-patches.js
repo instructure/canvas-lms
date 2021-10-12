@@ -37,12 +37,12 @@ $.extend(proto, {
     const items = this.element.find('li.ui-menu-item')
     let inputGroupLabeled = false
 
-    this.element.bind('click.menu', function(event) {
+    this.element.bind('click.menu', function (event) {
       if (!new RegExp(/^a$/i).test(event.target.tagName)) event.preventDefault()
     })
 
     let inputIDCount = 0
-    this.element.find("input[type='checkbox'], input[type='radio']").each(function() {
+    this.element.find("input[type='checkbox'], input[type='radio']").each(function () {
       const labelElement = $(this).closest('label')
       if (labelElement.length) {
         $(this).insertBefore(labelElement)
@@ -54,30 +54,26 @@ $.extend(proto, {
         labelElement.attr('for', $(this).attr('id'))
       }
     })
-    this.element.bind('menufocus', function(event) {
-      const textInput = $(event.target)
-        .find('a.ui-state-focus')
-        .children("input[type='text']")
+    this.element.bind('menufocus', function (event) {
+      const textInput = $(event.target).find('a.ui-state-focus').children("input[type='text']")
       if (textInput.length) textInput[0].focus()
     })
     // INSTRUCTURE
     this.element
-      .bind('popupopen', function(event) {
-        const selected = $(event.target)
-          .find('input[type=radio][checked]')
-          .closest('.ui-menu-item')
+      .bind('popupopen', function (event) {
+        const selected = $(event.target).find('input[type=radio][checked]').closest('.ui-menu-item')
         if (selected.length) {
-          setTimeout(function() {
+          setTimeout(function () {
             that.focus(event, selected)
           }, 0)
         }
       })
-      .bind('menublur', function(event) {
+      .bind('menublur', function (event) {
         const textInput = $(event.target).find("input[type='text']:focus")
         if (textInput.length) textInput[0].blur()
       })
 
-    items.children('a').each(function(index, item) {
+    items.children('a').each(function (index, item) {
       const current = $(item),
         parent = current.parent()
 
@@ -118,18 +114,14 @@ $.extend(proto, {
             .prev()
             .addClass('ui-state-disabled')
             .html("<span class='ui-menu-input-group'>" + parent.prev().html() + '</span>')
-            .bind('click.menu', function(event) {
+            .bind('click.menu', function (event) {
               return false
             })
             .after('<li><hr /></li>')
           inputGroupLabeled = true
         } else if (
           parent.prev().length &&
-          !parent
-            .prev()
-            .children('a')
-            .children()
-            .is("input[type='checkbox'], input[type='radio']")
+          !parent.prev().children('a').children().is("input[type='checkbox'], input[type='radio']")
         ) {
           parent.before('<li><hr /></li>')
         }
@@ -137,21 +129,13 @@ $.extend(proto, {
         if (
           inputGroupLabeled &&
           parent.next().length &&
-          !parent
-            .next()
-            .children('a')
-            .children()
-            .is("input[type='checkbox'], input[type='radio']")
+          !parent.next().children('a').children().is("input[type='checkbox'], input[type='radio']")
         ) {
           parent.after('<li><hr /></li>')
           inputGroupLabeled = false
         } else if (
           parent.next().length &&
-          !parent
-            .next()
-            .children('a')
-            .children()
-            .is("input[type='checkbox'], input[type='radio']")
+          !parent.next().children('a').children().is("input[type='checkbox'], input[type='radio']")
         ) {
           parent.after('<li><hr /></li>')
         }
@@ -160,13 +144,10 @@ $.extend(proto, {
       }
     })
 
-    items.bind('keydown.menu', function(event) {
+    items.bind('keydown.menu', function (event) {
       if (event.keyCode === $.ui.keyCode.SPACE) {
         if (
-          that.active
-            .children('a')
-            .children()
-            .is("input[type='checkbox'], input[type='radio']")
+          that.active.children('a').children().is("input[type='checkbox'], input[type='radio']")
         ) {
           that.select(event)
           event.stopImmediatePropagation()
@@ -177,30 +158,20 @@ $.extend(proto, {
 
     items
       .find("input[type='text']")
-      .bind('keydown', function(event) {
+      .bind('keydown', function (event) {
         event.stopPropagation()
         if (event.keyCode === $.ui.keyCode.UP) {
           that.element.trigger('focus')
           this.blur()
-          that.focus(
-            event,
-            $(this)
-              .closest('.ui-menu-item')
-              .prev()
-          )
+          that.focus(event, $(this).closest('.ui-menu-item').prev())
         }
         if (event.keyCode === $.ui.keyCode.DOWN) {
           that.element.trigger('focus')
           this.blur()
-          that.focus(
-            event,
-            $(this)
-              .closest('.ui-menu-item')
-              .next()
-          )
+          that.focus(event, $(this).closest('.ui-menu-item').next())
         }
       })
-      .bind('click', function(event) {
+      .bind('click', function (event) {
         event.stopPropagation()
       })
   },
@@ -211,12 +182,7 @@ $.extend(proto, {
       item: this.active || $(event.target).closest('.ui-menu-item')
     }
 
-    if (
-      ui.item
-        .children('a')
-        .children()
-        .is("input[type='checkbox']")
-    ) {
+    if (ui.item.children('a').children().is("input[type='checkbox']")) {
       if (ui.item.attr('aria-checked') === 'false') {
         ui.item.children('a').prepend('<span class="ui-icon ui-icon-check"></span>')
         ui.item.attr('aria-checked', 'true')
@@ -226,10 +192,7 @@ $.extend(proto, {
           .prop('checked', 'checked')
           .trigger('change')
       } else if (ui.item.attr('aria-checked') === 'true') {
-        ui.item
-          .children('a')
-          .children('span.ui-icon-check')
-          .remove()
+        ui.item.children('a').children('span.ui-icon-check').remove()
         ui.item.attr('aria-checked', 'false')
         ui.item
           .children('a')
@@ -239,12 +202,7 @@ $.extend(proto, {
       }
     }
 
-    if (
-      ui.item
-        .children('a')
-        .children()
-        .is("input[type='radio']")
-    ) {
+    if (ui.item.children('a').children().is("input[type='radio']")) {
       if (ui.item.attr('aria-checked') === 'false') {
         ui.item
           .children('a')
@@ -256,26 +214,18 @@ $.extend(proto, {
           .children("input[type='radio']")
           .prop('checked', 'checked')
           .trigger('change')
-        ui.item.siblings('[radio-group=' + $(ui.item).attr('radio-group') + ']').each(function() {
+        ui.item.siblings('[radio-group=' + $(ui.item).attr('radio-group') + ']').each(function () {
           $(this).attr('aria-checked', 'false')
           $(this)
             .children('a')
             .children('span.ui-icon-radio-on')
             .toggleClass('ui-icon-radio-on ui-icon-radio-off')
-          $(this)
-            .children('a')
-            .children("input[type='radio']")
-            .removeAttr('checked')
+          $(this).children('a').children("input[type='radio']").removeAttr('checked')
         })
       }
     }
 
-    if (
-      !ui.item
-        .children('a')
-        .children()
-        .is("input[type='checkbox'], input[type='radio']")
-    )
+    if (!ui.item.children('a').children().is("input[type='checkbox'], input[type='radio']"))
       this.collapseAll()
     this._trigger('select', event, ui)
   }

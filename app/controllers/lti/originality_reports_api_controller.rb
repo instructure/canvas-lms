@@ -111,7 +111,7 @@ module Lti
   #       }
   #     }
   class OriginalityReportsApiController < ApplicationController
-    include Lti::Ims::AccessTokenHelper
+    include Lti::IMS::AccessTokenHelper
 
     ORIGINALITY_REPORT_SERVICE = 'vnd.Canvas.OriginalityReport'.freeze
 

@@ -33,7 +33,6 @@ import * as OutcomesImporter from '@canvas/outcomes/react/OutcomesImporter'
 import {courseMocks, groupDetailMocks, groupMocks} from '@canvas/outcomes/mocks/Management'
 
 jest.mock('@canvas/outcomes/react/OutcomesImporter')
-jest.useFakeTimers()
 
 describe('OutcomeManagement', () => {
   let cache, showOutcomesImporterMock, showOutcomesImporterIfInProgressMock
@@ -45,10 +44,12 @@ describe('OutcomeManagement', () => {
       OutcomesImporter,
       'showOutcomesImporterIfInProgress'
     )
+    jest.useFakeTimers()
   })
 
   afterEach(() => {
     jest.clearAllMocks()
+    jest.useRealTimers()
   })
 
   const sharedExamples = () => {
@@ -331,28 +332,29 @@ describe('OutcomeManagement', () => {
         withMorePage: false
       })
     ]
-    const {getByText, getByTestId} = render(
+    const {findByText, findByTestId, getByTestId} = render(
       <MockedProvider cache={cache} mocks={mocks}>
         <OutcomeManagement breakpoints={{tablet: true}} />
       </MockedProvider>
     )
-    await act(async () => jest.runAllTimers())
+    jest.runAllTimers()
 
     // Select a group in the lsh
-    fireEvent.click(getByText('Course folder 0'))
-    await act(async () => jest.runAllTimers())
+    const cf0 = await findByText('Course folder 0')
+    fireEvent.click(cf0)
+    jest.runAllTimers()
 
     // The easy way to determine if lsh is passing to ManagementHeader is
     // to open the create outcome modal and check if the lhs group was loaded
     // by checking if the child of the lhs group is there
     fireEvent.click(within(getByTestId('managementHeader')).getByText('Create'))
-    await act(async () => jest.runAllTimers())
-    expect(
-      within(getByTestId('createOutcomeModal')).getByText('Course folder 0')
-    ).toBeInTheDocument()
-    expect(
-      within(getByTestId('createOutcomeModal')).getByText('Group 200 folder 0')
-    ).toBeInTheDocument()
+    jest.runAllTimers()
+    // there's something weird going on in the test here that while we find the modal
+    // .toBeInTheDocument() fails, even though a findBy for it fails before ^that click.
+    // We can test that the elements expected to be within it exist.
+    const modal = await findByTestId('createOutcomeModal')
+    expect(within(modal).getByText('Course folder 0')).not.toBeNull()
+    expect(within(modal).getByText('Group 200 folder 0')).not.toBeNull()
   })
 })
 

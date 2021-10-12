@@ -133,7 +133,7 @@ module Lti
   #       }
   #     }
   class PublicJwkController < ApplicationController
-    include Ims::Concerns::LtiServices
+    include ::Lti::IMS::Concerns::LtiServices
     include Api::V1::DeveloperKey
 
     MIME_TYPE = 'application/vnd.ims.lis.v2.publicjwk+json'.freeze

@@ -41,9 +41,7 @@ export default class EditorConfig {
    *  @return {EditorConfig}
    */
   constructor(tinymce, inst, width, domId) {
-    this.new_rce = window.ENV.use_rce_enhancements
     this.baseURL = tinymce.baseURL
-    this.maxButtons = inst.maxVisibleEditorButtons
     this.extraButtons = inst.editorButtons
     this.instConfig = inst
     this.viewportWidth = width
@@ -74,21 +72,21 @@ export default class EditorConfig {
           ? 'elementary-theme'
           : 'default-theme',
       selector: `#${this.idAttribute}`,
-      [!this.new_rce && 'toolbar']: this.toolbar(), // handled in RCEWrapper
-      [!this.new_rce && 'theme']: 'modern',
-      [!this.new_rce && 'skin']: false,
       directionality: getDirection(),
       // RCEWrapper includes instructure_equation, so it shouldn't be necessary here
       // but if I leave it out equation_spec.rb and new_ui_spec selenium specs fail
       // in jenkins (but not locally) and I can't explain why. Doesn't hurt to put it here
-      plugins: this.new_rce
-        ? 'instructure_equation'
-        : 'autolink,media,paste,table,lists,textcolor,link,directionality,a11y_checker,wordcount,' +
-          'instructure_image,instructure_links,instructure_equation,instructure_external_tools,instructure_record',
+      plugins: ['instructure_equation'],
 
       content_css: window.ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css,
 
-      menubar: this.new_rce ? undefined : true,
+      style_formats: [
+        {title: 'Heading 2', format: 'h2'},
+        {title: 'Heading 3', format: 'h3'},
+        {title: 'Heading 4', format: 'h4'},
+        {title: 'Heading 5', format: 'h5'},
+        {title: 'Heading 6', format: 'h6'}
+      ],
 
       init_instance_callback: ed => {
         $(`#tinymce-parent-of-${ed.id}`) // eslint-disable-line no-undef
@@ -98,107 +96,5 @@ export default class EditorConfig {
       // if present, user may have chosen to hide the button anyway.
       show_media_upload: !!INST.kalturaSettings && !INST.kalturaSettings.hide_rte_button
     }
-  }
-
-  /**
-   * builds the configuration information that decides whether to clump
-   * up external buttons or not based on the number of extras we
-   * want to add.
-   *
-   * @private
-   * @return {String} comma delimited set of external buttons
-   */
-  external_buttons() {
-    let externals = ''
-    for (let idx = 0; this.extraButtons && idx < this.extraButtons.length; idx++) {
-      if (this.extraButtons.length <= this.maxButtons || idx < this.maxButtons - 1) {
-        externals = `${externals} instructure_external_button_${this.extraButtons[idx].id}`
-      } else if (!externals.match(/instructure_external_button_clump/)) {
-        externals += ' instructure_external_button_clump'
-      }
-    }
-    return externals
-  }
-
-  /**
-   * uses externally provided settings to decide which instructure
-   * plugin buttons to enable, and returns that string of button names.
-   *
-   * @private
-   * @return {String} comma delimited set of non-core buttons
-   */
-  buildInstructureButtons() {
-    let instructure_buttons = ` instructure_image instructure_equation${
-      this.new_rce ? ' lti_tool_dropdown' : ''
-    }`
-    instructure_buttons += this.external_buttons()
-    if (
-      this.instConfig &&
-      this.instConfig.allowMediaComments &&
-      this.instConfig.kalturaSettings &&
-      !this.instConfig.kalturaSettings.hide_rte_button
-    ) {
-      instructure_buttons += ' instructure_record'
-    }
-    const equella_button =
-      this.instConfig && this.instConfig.equellaEnabled ? ' instructure_equella' : ''
-    instructure_buttons += equella_button
-    return instructure_buttons
-  }
-
-  /**
-   * groups of buttons that are always found together, so updating a config
-   * name doesn't need to happen 3 places or not work.
-   * @private
-   */
-  formatBtnGroup =
-    'bold italic underline forecolor backcolor removeformat alignleft aligncenter alignright'
-
-  positionBtnGroup = 'outdent indent superscript subscript bullist numlist'
-
-  fontBtnGroup = 'ltr rtl fontsizeselect formatselect check_a11y'
-
-  /**
-   * uses the width to decide how many lines of buttons to break
-   * up the toolbar over.
-   *
-   * @private
-   * @return {Array<String>} each element is a string of button names
-   *   representing the buttons to appear on the n-th line of the toolbar
-   */
-  balanceButtons(instructure_buttons) {
-    const instBtnGroup = `table media instructure_links unlink${instructure_buttons}`
-    let buttons1 = ''
-    let buttons2 = ''
-    let buttons3 = ''
-
-    if (this.viewportWidth < 359 && this.viewportWidth > 0) {
-      buttons1 = this.formatBtnGroup
-      buttons2 = `${this.positionBtnGroup} ${instBtnGroup}`
-      buttons3 = this.fontBtnGroup
-    } else if (this.viewportWidth < 1200) {
-      buttons1 = `${this.formatBtnGroup} ${this.positionBtnGroup}`
-      buttons2 = `${instBtnGroup} ${this.fontBtnGroup}`
-    } else {
-      buttons1 = `${this.formatBtnGroup} ${this.positionBtnGroup} ${instBtnGroup} ${this.fontBtnGroup}`
-    }
-    if (this.new_rce) {
-      return [buttons1, buttons2, buttons3]
-    } else {
-      return [buttons1, buttons2, buttons3].map(b => b.split(' ').join(','))
-    }
-  }
-
-  /**
-   * builds the custom buttons, and hands them off to be munged
-   * in with the core buttons and balanced across the toolbar.
-   *
-   * @private
-   * @return {Array<String>} each element is a string of button names
-   *   representing the buttons to appear on the n-th line of the toolbar
-   */
-  toolbar() {
-    const instructure_buttons = this.buildInstructureButtons()
-    return this.balanceButtons(instructure_buttons)
   }
 }

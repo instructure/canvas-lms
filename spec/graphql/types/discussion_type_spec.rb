@@ -134,7 +134,7 @@ RSpec.shared_examples "DiscussionType" do
     expect(discussion_type.resolve("_id")).to eq discussion.id.to_s
   end
 
-  it "returns if the current user requires an inital post" do
+  it "returns if the current user requires an initial post" do
     discussion.update!(require_initial_post: true)
     student_in_course(active_all: true)
     discussion.discussion_entries.create!(message: 'other student entry', user: @student)

@@ -49,13 +49,28 @@ export default class Placement extends React.Component {
     'conference_selection'
   ]
 
-  canBeEither = ['assignment_selection', 'link_selection', 'collaboration']
+  canBeEither = [
+    'assignment_selection',
+    'link_selection',
+    'collaboration',
+    'course_assignments_menu',
+    'module_index_menu'
+  ]
 
   isAlwaysDeeplinking(placementName) {
     return this.alwaysDeeplinking.includes(placementName)
   }
 
   messageTypeSelectable(placementName) {
+    if (
+      placementName === 'course_assignments_menu' &&
+      !ENV.FEATURES.lti_multiple_assignment_deep_linking
+    ) {
+      return false
+    }
+    if (placementName === 'module_index_menu' && !ENV.FEATURES.lti_deep_linking_module_index_menu) {
+      return false
+    }
     return this.canBeEither.includes(placementName)
   }
 

@@ -32,7 +32,7 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
 import actions from '../actions'
-import {GROUP_PERMISSION_DESCRIPTIONS} from '../templates'
+import {GROUP_PERMISSION_DESCRIPTIONS} from '../templates/groupPermissionDescriptions'
 import {ConnectedPermissionButton} from './PermissionButton'
 import {ConnectedGranularCheckbox} from './GranularCheckbox'
 import propTypes from '@canvas/permissions/react/propTypes'
@@ -194,7 +194,7 @@ export default class PermissionsTable extends Component {
       return [
         <br key="group-description-br" />,
         <Text key="group-description-text" weight="light" size="small">
-          {description()}
+          {description(perm.contextType)}
         </Text>
       ]
     }

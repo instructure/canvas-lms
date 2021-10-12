@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Lti::Ims::AccessTokenHelper
+module Lti::IMS::AccessTokenHelper
   def authorized_lti2_tool
     validate_access_token!
     true
@@ -55,7 +55,7 @@ module Lti::Ims::AccessTokenHelper
   end
 
   def validate_services!(tool_proxy)
-    ims_tp = IMS::LTI::Models::ToolProxy.from_json(tool_proxy.raw_data)
+    ims_tp = ::IMS::LTI::Models::ToolProxy.from_json(tool_proxy.raw_data)
     service_names = [*lti2_service_name]
     service = ims_tp.security_contract.tool_services.find(
       -> {

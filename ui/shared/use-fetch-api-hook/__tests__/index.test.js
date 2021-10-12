@@ -137,7 +137,7 @@ describe('useFetchApi', () => {
     expect(success).toHaveBeenCalledWith({bar: 'baz'})
   })
 
-  it('does not call convert if result is null', async () => {
+  it('does not call convert if result is falsey', async () => {
     const path = '/api/v1/blah'
     fetchMock.mock(`path:${path}`, 200)
     const convert = jest.fn()
@@ -145,7 +145,7 @@ describe('useFetchApi', () => {
     renderHook(() => useFetchApi({success, path, convert}))
     await fetchMock.flush(true)
     expect(convert).not.toHaveBeenCalled()
-    expect(success).toHaveBeenCalledWith(null)
+    expect(success).toHaveBeenCalledWith(undefined)
   })
 
   it('fetches again if path has changed', async () => {
@@ -288,7 +288,7 @@ describe('useFetchApi', () => {
     await fetchMock.flush(true)
     expect(success).toHaveBeenCalledWith({fetch: 'result'})
     expect(meta).toHaveBeenCalledWith(
-      expect.objectContaining({link: null, response: expect.anything()})
+      expect.objectContaining({link: undefined, response: expect.anything()})
     )
   })
 
@@ -325,7 +325,7 @@ describe('useFetchApi', () => {
     expect(success).toHaveBeenCalledTimes(1)
     expect(success).toHaveBeenCalledWith({second: 42})
     expect(meta).toHaveBeenCalledTimes(1)
-    expect(meta).toHaveBeenCalledWith(expect.objectContaining({link: null}))
+    expect(meta).toHaveBeenCalledWith(expect.objectContaining({link: undefined}))
     expect(error).not.toHaveBeenCalled()
   })
 
@@ -388,7 +388,7 @@ describe('useFetchApi', () => {
       expect(meta).toHaveBeenCalledTimes(3)
       expect(meta.mock.calls[0][0]).toMatchObject({link: {next: {page: '2'}}})
       expect(meta.mock.calls[1][0]).toMatchObject({link: {next: {page: '3'}}})
-      expect(meta.mock.calls[2][0]).toMatchObject({link: null})
+      expect(meta.mock.calls[2][0]).toMatchObject({link: undefined})
 
       expect(error).not.toHaveBeenCalled()
     })
