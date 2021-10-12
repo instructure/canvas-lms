@@ -24,4 +24,5 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.plural(/(criteri)on$/i, '\1a')
   inflect.acronym "GraphQL"
   inflect.acronym "IMS"
+  inflect.acronym "CSV"
 end
