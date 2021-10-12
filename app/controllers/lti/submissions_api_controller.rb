@@ -212,7 +212,7 @@ module Lti
       return yield if tool_shard == Shard.current
 
       tool_shard.activate(&block)
-    rescue Lti::Oauth2::InvalidTokenError
+    rescue Lti::OAuth2::InvalidTokenError
       render_unauthorized
     end
 

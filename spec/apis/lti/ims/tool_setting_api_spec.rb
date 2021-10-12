@@ -40,7 +40,7 @@ module Lti
       end
       let(:resource_handler) { ResourceHandler.create!(resource_type_code: 'code', name: 'name', tool_proxy: tool_proxy) }
       let(:message_handler) { MessageHandler.create(message_type: 'basic-lti-launch-request', launch_path: 'https://samplelaunch/blti', resource_handler: resource_handler) }
-      let(:access_token) { Lti::Oauth2::AccessToken.create_jwt(aud: nil, sub: tool_proxy.guid).to_s }
+      let(:access_token) { Lti::OAuth2::AccessToken.create_jwt(aud: nil, sub: tool_proxy.guid).to_s }
 
       before do
         allow_any_instance_of(ToolSettingController).to receive_messages(oauth_authenticated_request?: true)

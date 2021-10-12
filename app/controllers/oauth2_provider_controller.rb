@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Oauth2ProviderController < ApplicationController
+class OAuth2ProviderController < ApplicationController
   rescue_from Canvas::OAuth::RequestError, with: :oauth_error
   protect_from_forgery except: %i[token destroy], with: :exception
   before_action :run_login_hooks, only: %i[token]

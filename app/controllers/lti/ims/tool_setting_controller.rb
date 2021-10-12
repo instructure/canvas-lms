@@ -159,7 +159,7 @@ module Lti
         if oauth2_request?
           begin
             validate_access_token!
-          rescue Lti::Oauth2::InvalidTokenError
+          rescue Lti::OAuth2::InvalidTokenError
             render_unauthorized and return
           end
         elsif request.authorization.present?

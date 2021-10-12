@@ -19,5 +19,5 @@
 #
 
 module Login
-  OpenidConnectController = Oauth2Controller
+  OpenidConnectController = OAuth2Controller
 end

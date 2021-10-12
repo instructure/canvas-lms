@@ -146,7 +146,7 @@ module Lti
           let(:tcp_url) { polymorphic_url([account, :tool_consumer_profile], tool_consumer_profile_id: tcp.uuid) }
           let(:access_token) do
             aud = host rescue (@request || request).host
-            Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: developer_key.global_id, reg_key: 'reg_key')
+            Lti::OAuth2::AccessToken.create_jwt(aud: aud, sub: developer_key.global_id, reg_key: 'reg_key')
           end
           let(:request_headers) { { Authorization: "Bearer #{access_token}" } }
 
@@ -172,7 +172,7 @@ module Lti
         let(:access_token) do
           aud = host rescue (@request || request).host
           developer_key.update(vendor_code: vendor_code)
-          Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: developer_key.global_id, reg_key: 'reg_key')
+          Lti::OAuth2::AccessToken.create_jwt(aud: aud, sub: developer_key.global_id, reg_key: 'reg_key')
         end
         let(:request_headers) { { Authorization: "Bearer #{access_token}" } }
 
