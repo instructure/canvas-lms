@@ -101,12 +101,16 @@ export const resetToLastPublished = (contextType: PlanContextTypes, contextId: s
 export const load = (pacePlanId: string) =>
   doFetchApi<PacePlan>({path: `/api/v1/pace_plans/${pacePlanId}`}).then(({json}) => json)
 
-export const getLatestDraftFor = (context: PlanContextTypes, contextId: string) => {
-  let url = `/api/v1/pace_plans/latest_draft_for?course_id=${contextId}`
+export const getNewPacePlanFor = (
+  courseId: string,
+  context: PlanContextTypes,
+  contextId: string
+) => {
+  let url = `/api/v1/courses/${courseId}/pace_plans/new`
   if (context === 'Section') {
-    url = `/api/v1/pace_plans/latest_draft_for?course_section_id=${contextId}`
+    url = `/api/v1/courses/${courseId}/pace_plans/new?course_section_id=${contextId}`
   } else if (context === 'Enrollment') {
-    url = `/api/v1/pace_plans/latest_draft_for?enrollment_id=${contextId}`
+    url = `/api/v1/courses/${courseId}/pace_plans/new?enrollment_id=${contextId}`
   }
   return doFetchApi<{pace_plan: PacePlan}>({path: url}).then(({json}) => json?.pace_plan)
 }
