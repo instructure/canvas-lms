@@ -67,5 +67,13 @@ describe AuthenticationMethods::InstAccessToken do
       expect(ctx[:current_user]).to eq(@user)
       expect(ctx[:current_pseudonym]).to eq(@pseudonym)
     end
+
+    it "returns an empty hash when the user identified by the token does not exist" do
+      account = Account.default
+      token_obj = ::InstAccess::Token.for_user(user_uuid: 'inexplicably-untied-to-any-user', account_uuid: account.uuid)
+      ctx = ::AuthenticationMethods::InstAccessToken.load_user_and_pseudonym_context(token_obj, account)
+      expect(ctx[:current_user]).to be_nil
+      expect(ctx[:current_pseudonym]).to be_nil
+    end
   end
 end
