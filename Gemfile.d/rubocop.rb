@@ -26,15 +26,13 @@ gem 'parallel', '1.21.0', require: false # dependency of rubocop and canvas
 gem 'regexp_parser', '1.8.2', require: false # dependency of rubocop and several other gems
 
 group :test do
-  dedicated_gemfile = ENV['BUNDLE_GEMFILE']&.end_with?('rubocop.rb')
-
   gem 'gergich', '2.0.0', require: false
     gem 'mime-types-data', '3.2021.0901', require: false
 
   gem 'rubocop', '1.22.0', require: false
     gem 'rubocop-ast', '1.12.0', require: false
     gem 'unicode-display_width', '2.1.0', require: false
-  gem 'rubocop-canvas', require: false, path: "#{'../' if dedicated_gemfile}gems/rubocop-canvas"
+  gem 'rubocop-canvas', require: false, path: "gems/rubocop-canvas"
     gem 'rainbow', '3.0.0', require: false
   gem 'rubocop-rails', '2.12.3', require: false
   gem 'rubocop-rake', '0.6.0', require: false
