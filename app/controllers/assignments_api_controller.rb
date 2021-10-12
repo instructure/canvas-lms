@@ -640,6 +640,10 @@
 #           "description": "(Optional) If retrieving a single assignment and 'can_submit' is included in the 'include' parameter, flags whether user has the right to submit the assignment (i.e. checks enrollment dates, submission types, locked status, attempts remaining, etc...). Including 'can submit' automatically includes 'submission' in the include parameter. Not available when observed_users are included.",
 #           "example": true,
 #           "type": "boolean"
+#         },
+#         "annotatable_attachment_id": {
+#           "description": "The id of the attachment to be annotated by students. Relevant only if submission_types includes 'student_annotation'.",
+#           "type": "integer"
 #         }
 #       }
 #     }

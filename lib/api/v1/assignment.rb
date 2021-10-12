@@ -63,6 +63,7 @@ module Api::V1::Assignment
       anonymous_instructor_annotations
       anonymous_grading
       allowed_attempts
+      annotatable_attachment_id
     )
   }.freeze
 
@@ -75,6 +76,7 @@ module Api::V1::Assignment
       due_at
       assignment_group_id
       post_to_sis
+      annotatable_attachment_id
     )
   }.freeze
 
