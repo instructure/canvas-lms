@@ -21,7 +21,7 @@ import I18n from 'i18n!app_shared_components'
 import keycode from 'keycode'
 import {Select} from '@instructure/ui-select'
 import {Tag} from '@instructure/ui-tag'
-import {func, string, node, arrayOf, oneOf, oneOfType, bool} from 'prop-types'
+import {func, string, node, arrayOf, oneOfType, bool} from 'prop-types'
 import {matchComponentTypes} from '@instructure/ui-react-utils'
 import {compact, uniqueId} from 'lodash'
 import {Alert} from '@instructure/ui-alerts'
@@ -53,8 +53,6 @@ function CanvasMultiSelect(props) {
     selectedOptionIds,
     noOptionsLabel,
     disabled,
-    customRenderBeforeInput,
-    matchStrategy,
     ...otherProps
   } = props
 
@@ -75,7 +73,8 @@ function CanvasMultiSelect(props) {
     [children]
   )
 
-  const [filteredOptionIds, setFilteredOptionIds] = useState(null)
+  const allChildIds = childProps.map(x => x.id)
+  const [filteredOptionIds, setFilteredOptionIds] = useState(allChildIds)
 
   function getChildById(id) {
     return childProps.find(c => c.id === id)
@@ -109,7 +108,7 @@ function CanvasMultiSelect(props) {
       alwaysArray(children).map(child => {
         if (
           matchComponentTypes(child, [CanvasMultiSelectOption]) &&
-          (!filteredOptionIds || filteredOptionIds.includes(child.props.id)) &&
+          filteredOptionIds.includes(child.props.id) &&
           !selectedOptionIds.includes(child.props.id)
         ) {
           return renderOption(child)
@@ -150,18 +149,13 @@ function CanvasMultiSelect(props) {
     )
   }
 
-  function contentBeforeInput() {
-    const tags = selectedOptionIds.length > 0 ? renderTags() : null
-    return customRenderBeforeInput ? customRenderBeforeInput(tags) : tags
-  }
-
   function onInputChange(e) {
     const {value} = e.target
-    const matcher = new RegExp(`${matchStrategy === 'stringStart' ? '^' : ''}${value.trim()}`, 'i')
+    const matcher = new RegExp('^' + value.trim(), 'i')
     const filtered = childProps.filter(x => x.label.match(matcher))
     let message =
       // if number of options has changed, announce the new total.
-      filtered.length !== filteredOptionIds?.length
+      filtered.length !== filteredOptionIds.length
         ? I18n.t(
             {
               one: 'One option available.',
@@ -188,12 +182,12 @@ function CanvasMultiSelect(props) {
     setIsShowingOptions(false)
     if (!highlightedOptionId) return
     setInputValue('')
-    if (filteredOptionIds?.length === 1) {
+    if (filteredOptionIds.length === 1) {
       const option = getChildById(filteredOptionIds[0])
       setAnnouncement(I18n.t('%{label} selected. List collapsed.', {label: option.label}))
       onChange([...selectedOptionIds, filteredOptionIds[0]])
     }
-    setFilteredOptionIds(null)
+    setFilteredOptionIds(allChildIds)
   }
 
   function onRequestHighlightOption(e, {id}) {
@@ -208,7 +202,7 @@ function CanvasMultiSelect(props) {
   function onRequestSelectOption(_e, {id}) {
     const option = getChildById(id)
     setInputValue('')
-    setFilteredOptionIds(null)
+    setFilteredOptionIds(allChildIds)
     setIsShowingOptions(false)
     if (typeof option === 'undefined') return
     setAnnouncement(I18n.t('%{label} selected. List collapsed.', {label: option.label}))
@@ -250,7 +244,7 @@ function CanvasMultiSelect(props) {
     onKeyDown,
     onBlur,
     assistiveText: I18n.t('Type or use arrow keys to navigate. Multiple selections are allowed.'),
-    renderBeforeInput: contentBeforeInput()
+    renderBeforeInput: selectedOptionIds.length > 0 ? renderTags() : null
   }
 
   return (
@@ -269,22 +263,18 @@ function CanvasMultiSelect(props) {
 
 CanvasMultiSelect.propTypes = {
   id: string,
-  customRenderBeforeInput: func,
   disabled: bool,
   label: oneOfType([node, func]).isRequired,
   onChange: func.isRequired,
-  children: node.isRequired,
-  selectedOptionIds: arrayOf(string).isRequired,
-  noOptionsLabel: string,
-  matchStrategy: oneOf(['stringStart', 'substring'])
+  children: node,
+  selectedOptionIds: arrayOf(string),
+  noOptionsLabel: string
 }
 
 CanvasMultiSelect.defaultProps = {
-  customRenderBeforeInput: null,
   noOptionsLabel: '---',
   selectedOptionIds: [],
-  disabled: false,
-  matchStrategy: 'stringStart'
+  disabled: false
 }
 
 CanvasMultiSelect.Option = CanvasMultiSelectOption

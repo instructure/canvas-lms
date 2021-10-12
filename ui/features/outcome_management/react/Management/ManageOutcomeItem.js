@@ -44,8 +44,7 @@ const ManageOutcomeItem = ({
   onCheckboxHandler,
   canUnlink
 }) => {
-  const {contextType, contextId, friendlyDescriptionFF, canManage, isAdmin, isCourse} =
-    useCanvasContext()
+  const {contextType, contextId, friendlyDescriptionFF} = useCanvasContext()
   const [truncated, setTruncated] = useState(true)
   const onClickHandler = () => setTruncated(prevState => !prevState)
   const onChangeHandler = () => onCheckboxHandler({linkId})
@@ -53,11 +52,10 @@ const ManageOutcomeItem = ({
 
   // This allows account admins to edit global outcomes
   // within a course. See OUT-1415, OUT-1511
+  const {canManage, isAdmin, isCourse} = useCanvasContext()
   const allowAdminEdit = isCourse && canManage && isAdmin
   const canEdit =
-    friendlyDescriptionFF ||
-    (outcomeContextType === contextType && outcomeContextId === contextId) ||
-    allowAdminEdit
+    friendlyDescriptionFF || (outcomeContextType === contextType && outcomeContextId === contextId)
 
   if (!title) return null
 
@@ -75,11 +73,7 @@ const ManageOutcomeItem = ({
               {canManageOutcome && (
                 <Flex.Item>
                   <Checkbox
-                    label={
-                      <ScreenReaderContent>
-                        {I18n.t('Select outcome %{title}', {title})}
-                      </ScreenReaderContent>
-                    }
+                    label={<ScreenReaderContent>{I18n.t('Select outcome')}</ScreenReaderContent>}
                     value="medium"
                     checked={isChecked}
                     onChange={onChangeHandler}
@@ -91,8 +85,8 @@ const ManageOutcomeItem = ({
                   size="small"
                   screenReaderLabel={
                     truncated
-                      ? I18n.t('Expand description for outcome %{title}', {title})
-                      : I18n.t('Collapse description for outcome %{title}', {title})
+                      ? I18n.t('Expand outcome description')
+                      : I18n.t('Collapse outcome description')
                   }
                   withBackground={false}
                   withBorder={false}
@@ -118,12 +112,12 @@ const ManageOutcomeItem = ({
             </Heading>
           </div>
         </Flex.Item>
-        {canManage && (
+        {(canManageOutcome || allowAdminEdit) && (
           <Flex.Item>
             <OutcomeKebabMenu
               canDestroy={canUnlink}
               canEdit={canEdit}
-              menuTitle={I18n.t('Menu for outcome %{title}', {title})}
+              menuTitle={I18n.t('Outcome Menu')}
               onMenuHandler={onMenuHandlerWrapper}
             />
           </Flex.Item>

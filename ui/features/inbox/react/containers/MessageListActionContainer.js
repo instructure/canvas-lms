@@ -32,16 +32,8 @@ import {View} from '@instructure/ui-view'
 
 const MessageListActionContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const conversationsQuery = CONVERSATIONS_QUERY
   const userID = ENV.current_user_id?.toString()
-  const variables = {
-    userID,
-    scope: props.scope,
-    course: props.course
-  }
-  const options = {
-    query: CONVERSATIONS_QUERY,
-    variables: {...variables}
-  }
 
   const selectedReadStates = () => {
     const selectedStates =
@@ -64,7 +56,14 @@ const MessageListActionContainer = props => {
   const hasSelectedConversations = () => props.selectedConversations.length > 0
 
   const removeDeletedConversationsFromCache = (cache, result) => {
-    const conversationsFromCache = JSON.parse(JSON.stringify(cache.readQuery(options)))
+    const conversationsFromCache = JSON.parse(
+      JSON.stringify(
+        cache.readQuery({
+          query: conversationsQuery,
+          variables: {userID, scope: props.scope, course: props.course}
+        })
+      )
+    )
 
     const conversationIDsFromResult = result.data.deleteConversations.conversationIds
 
@@ -75,7 +74,11 @@ const MessageListActionContainer = props => {
     )
 
     conversationsFromCache.legacyNode.conversationsConnection.nodes = updatedCPs
-    cache.writeQuery({...options, data: conversationsFromCache})
+    cache.writeQuery({
+      query: conversationsQuery,
+      variables: {userID, scope: props.scope, course: props.course},
+      data: conversationsFromCache
+    })
   }
 
   const handleDeleteComplete = data => {
@@ -113,7 +116,15 @@ const MessageListActionContainer = props => {
       return
     }
 
-    const conversationsFromCache = JSON.parse(JSON.stringify(cache.readQuery(options)))
+    const conversationsFromCache = JSON.parse(
+      JSON.stringify(
+        cache.readQuery({
+          query: conversationsQuery,
+          variables: {userID, scope: props.scope, course: props.course}
+        })
+      )
+    )
+
     const conversationParticipantIDsFromResult =
       result.data.updateConversationParticipants.conversationParticipants.map(cp => cp._id)
 
@@ -121,8 +132,13 @@ const MessageListActionContainer = props => {
       conversationParticipant =>
         !conversationParticipantIDsFromResult.includes(conversationParticipant._id)
     )
+
     conversationsFromCache.legacyNode.conversationsConnection.nodes = updatedCPs
-    cache.writeQuery({...options, data: conversationsFromCache})
+    cache.writeQuery({
+      query: conversationsQuery,
+      variables: {userID, scope: props.scope, course: props.course},
+      data: conversationsFromCache
+    })
   }
 
   const handleArchiveComplete = data => {
@@ -144,25 +160,6 @@ const MessageListActionContainer = props => {
     }
   }
 
-  const handleUnarchiveComplete = data => {
-    const unarchiveSuccessMsg = I18n.t(
-      {
-        one: 'Message Unarchived!',
-        other: 'Messages Unarchived!'
-      },
-      {count: props.selectedConversations.length}
-    )
-    if (data.updateConversationParticipants.errors) {
-      // keep delete button enabled since deletion returned errors
-      props.archiveToggler(true)
-      setOnFailure(I18n.t('Unarchive operation failed'))
-    } else {
-      props.archiveToggler(false)
-      props.onConversationRemove(props.selectedConversations)
-      setOnSuccess(unarchiveSuccessMsg) // screenReaderOnly
-    }
-  }
-
   const [archiveConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
     update: removeOutOfScopeConversationsFromCache,
     onCompleted(data) {
@@ -170,16 +167,6 @@ const MessageListActionContainer = props => {
     },
     onError() {
       setOnFailure(I18n.t('Archive operation failed'))
-    }
-  })
-
-  const [unarchiveConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
-    update: removeOutOfScopeConversationsFromCache,
-    onCompleted(data) {
-      handleUnarchiveComplete(data)
-    },
-    onError() {
-      setOnFailure(I18n.t('Unarchive operation failed'))
     }
   })
 
@@ -310,7 +297,7 @@ const MessageListActionContainer = props => {
 
     const confirmResult = window.confirm(unarchiveConfirmMsg) // eslint-disable-line no-alert
     if (confirmResult) {
-      unarchiveConversationParticipants({
+      archiveConversationParticipants({
         variables: {
           conversationIds: props.selectedConversations.map(convo => convo._id),
           workflowState: 'read'

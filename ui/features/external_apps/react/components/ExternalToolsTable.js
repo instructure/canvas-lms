@@ -105,6 +105,7 @@ export default class ExternalToolsTable extends React.Component {
     })
   }
 
+  // Don't forget to change the tooltip text when the rce_enhancements flag goes away
   render() {
     // only in account settings (not course), but not site_admin, and with the feature on, and with permissions
     const show_lti_favorite_toggles =
@@ -136,7 +137,7 @@ export default class ExternalToolsTable extends React.Component {
                     {I18n.t('Add to RCE toolbar')}
                     <Tooltip
                       renderTip={I18n.t(
-                        'There is a 2 app limit for placement within the RCE toolbar.'
+                        'There is a 2 app limit for placement within the RCE toolbar. This setting only applies to the enhanced RCE.'
                       )}
                       placement="top"
                       on={['click', 'focus']}

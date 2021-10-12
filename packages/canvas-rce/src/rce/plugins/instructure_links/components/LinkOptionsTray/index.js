@@ -49,6 +49,7 @@ export default function LinkOptionsTray(props) {
   const [disablePreview, setDisablePreview] = useState(
     content.displayAs === DISPLAY_AS_EMBED_DISABLED
   )
+  const [rce_better_file_previewing] = useState(!!window?.ENV?.FEATURES?.rce_better_file_previewing)
 
   useEffect(() => {
     try {
@@ -89,6 +90,9 @@ export default function LinkOptionsTray(props) {
   function handleLinkChange(event) {
     setUrl(event.target.value)
   }
+  function handleDisablePreviewChange(event) {
+    setDisablePreview(event.target.checked)
+  }
   function handlePreviewChange(event) {
     setAutoOpenPreview(event.target.checked)
   }
@@ -97,30 +101,61 @@ export default function LinkOptionsTray(props) {
   }
 
   function renderDisplayOptions() {
+    if (rce_better_file_previewing) {
+      return (
+        <FormFieldGroup
+          description={formatMessage('Display Options')}
+          layout="stacked"
+          rowSpacing="small"
+        >
+          <RadioInputGroup
+            description=" " /* the FormFieldGroup is providing the label */
+            name="preview_option"
+            onChange={handlePreviewOptionChange}
+            value={disablePreview ? 'overlay' : 'inline'}
+          >
+            <RadioInput key="overlay" value="overlay" label={formatMessage('Preview in overlay')} />
+            <RadioInput key="inline" value="inline" label={formatMessage('Preview inline')} />
+          </RadioInputGroup>
+          {!disablePreview && (
+            <View as="div" margin="0 0 0 small">
+              <Checkbox
+                label={formatMessage('Expand preview by Default')}
+                name="auto-preview"
+                onChange={handlePreviewChange}
+                checked={autoOpenPreview}
+              />
+            </View>
+          )}
+        </FormFieldGroup>
+      )
+    } else {
+      return renderLegacyDisplayOptions()
+    }
+  }
+
+  function renderLegacyDisplayOptions() {
     return (
       <FormFieldGroup
         description={formatMessage('Display Options')}
         layout="stacked"
         rowSpacing="small"
       >
-        <RadioInputGroup
-          description=" " /* the FormFieldGroup is providing the label */
-          name="preview_option"
-          onChange={handlePreviewOptionChange}
-          value={disablePreview ? 'overlay' : 'inline'}
-        >
-          <RadioInput key="overlay" value="overlay" label={formatMessage('Preview in overlay')} />
-          <RadioInput key="inline" value="inline" label={formatMessage('Preview inline')} />
-        </RadioInputGroup>
+        <Checkbox
+          label={formatMessage('Disable in-line preview.')}
+          name="disable-preview"
+          onChange={handleDisablePreviewChange}
+          checked={disablePreview}
+        />
         {!disablePreview && (
-          <View as="div" margin="0 0 0 small">
-            <Checkbox
-              label={formatMessage('Expand preview by Default')}
-              name="auto-preview"
-              onChange={handlePreviewChange}
-              checked={autoOpenPreview}
-            />
-          </View>
+          <Checkbox
+            label={formatMessage(
+              'Automatically open an in-line preview. (Preview displays only after saving)'
+            )}
+            name="auto-preview"
+            onChange={handlePreviewChange}
+            checked={autoOpenPreview}
+          />
         )}
       </FormFieldGroup>
     )

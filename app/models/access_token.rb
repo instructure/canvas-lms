@@ -67,7 +67,7 @@ class AccessToken < ActiveRecord::Base
   before_create :generate_token
   before_create :generate_refresh_token
 
-  alias_method :destroy_permanently!, :destroy
+  alias destroy_permanently! destroy
   def destroy
     return true if deleted?
 

@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@instructure/brandable_css": "^3",
+    "@instructure/canvas-rce-old": "4.1.5",
     "@instructure/canvas-theme": "^7",
     "@instructure/debounce": "^7",
     "@instructure/js-utils": ">=1",
@@ -181,6 +182,7 @@
     "@apollo/react-hooks": "~3.0.1",
     "@apollo/react-ssr": "~3.0.1",
     "@apollo/react-testing": "~3.0.1",
+    "@apollo/rover": "^0.2.0",
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
     "@babel/parser": "^7",

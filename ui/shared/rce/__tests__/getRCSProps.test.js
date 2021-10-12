@@ -17,6 +17,9 @@
 import getRCSProps from '../getRCSProps'
 
 describe('getRCSProps', () => {
+  beforeEach(() => {
+    ENV.use_rce_enhancements = true
+  })
   it('returns null if there is no context_asset_string in the environment', () => {
     expect(getRCSProps()).toBeNull()
   })

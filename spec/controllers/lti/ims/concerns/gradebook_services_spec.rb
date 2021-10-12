@@ -22,10 +22,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper')
 require_dependency "lti/ims/concerns/gradebook_services"
 
 module Lti
-  module IMS::Concerns
+  module Ims::Concerns
     describe GradebookServices, type: :controller do
       controller(ApplicationController) do
-        include Lti::IMS::Concerns::GradebookServices
+        include Lti::Ims::Concerns::GradebookServices
         before_action :prepare_line_item_for_ags!, :verify_user_in_context, :verify_line_item_in_context
         skip_before_action(
           :verify_access_token,

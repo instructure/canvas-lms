@@ -43,6 +43,10 @@ describe "discussions" do
                                      assignment: assignment)
   end
 
+  before(:once) do
+    Account.default.enable_feature!(:rce_enhancements)
+  end
+
   context "on the edit page" do
     let(:url) { "/courses/#{course.id}/discussion_topics/#{topic.id}/edit" }
 

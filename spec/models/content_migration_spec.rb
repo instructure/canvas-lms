@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ContentMigration do
   before :once do
@@ -26,7 +26,7 @@ describe ContentMigration do
     @cm = ContentMigration.create!(context: @course, user: @teacher)
   end
 
-  describe '#trigger_live_events!' do
+  context '#trigger_live_events!' do
     subject do
       content_migration.instance_variable_set(:@imported_migration_items_hash, migration_items)
       content_migration
@@ -126,7 +126,7 @@ describe ContentMigration do
     end
   end
 
-  describe "#prepare_data" do
+  context "#prepare_data" do
     it "strips invalid utf8" do
       data = {
         'assessment_questions' => [{
@@ -180,11 +180,11 @@ describe ContentMigration do
 
   it "excludes user-hidden migration plugins" do
     ab = Canvas::Plugin.find(:academic_benchmark_importer)
-    expect(ContentMigration.migration_plugins(true)).not_to include(ab)
+    expect(ContentMigration.migration_plugins(true).include?(ab)).to be_falsey
   end
 
   context "zip file import" do
-    def setup_zip_import(context, filename = "file.zip", import_immediately: false)
+    def setup_zip_import(context, filename = "file.zip", import_immediately = false)
       zip_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/#{filename}")
       cm = ContentMigration.new(:context => context, :user => @user)
       cm.migration_type = 'zip_file_importer'
@@ -205,9 +205,9 @@ describe ContentMigration do
       cm
     end
 
-    def test_zip_import(context, content_migration, filecount = 1)
+    def test_zip_import(context, cm, filecount = 1)
       run_jobs
-      expect(content_migration.reload).to be_imported
+      expect(cm.reload).to be_imported
       expect(context.reload.attachments.count).to eq filecount
     end
 
@@ -254,7 +254,7 @@ describe ContentMigration do
     end
 
     it "updates unzip progress often with fast import" do
-      cm = setup_zip_import(@course, "macfile.zip", import_immediately: true)
+      cm = setup_zip_import(@course, "macfile.zip", true)
       expect_any_instantiation_of(cm).to receive(:update_import_progress).exactly(6).times
       run_jobs
     end
@@ -271,7 +271,7 @@ describe ContentMigration do
     expect_any_instance_of(Attachment).to receive(:clone_url).with(cm.migration_settings[:file_url], false, true, :quota_context => cm.context)
 
     cm.queue_migration
-    worker = CC::Importer::CCWorker.new
+    worker = Canvas::Migration::Worker::CCWorker.new
     worker.perform(cm)
   end
 
@@ -289,7 +289,7 @@ describe ContentMigration do
       cm.save!
       expect(cm.root_account_id).to eq account.id
 
-      package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/cc_default_qb_test.zip")
+      package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_default_qb_test.zip")
       attachment = Attachment.new
       attachment.context = cm
       attachment.uploaded_data = File.open(package_path, 'rb')
@@ -321,7 +321,7 @@ describe ContentMigration do
       cm.migration_settings['import_immediately'] = true
       cm.save!
 
-      package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/quiz_qti.zip")
+      package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/quiz_qti.zip")
       attachment = Attachment.new
       attachment.context = cm
       attachment.uploaded_data = File.open(package_path, 'rb')
@@ -353,7 +353,7 @@ describe ContentMigration do
       cm.migration_settings['import_immediately'] = true
       cm.save!
 
-      package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/quiz_qti.zip")
+      package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/quiz_qti.zip")
       attachment = Attachment.new
       attachment.context = cm
       attachment.uploaded_data = File.open(package_path, 'rb')
@@ -392,7 +392,7 @@ describe ContentMigration do
       cm.migration_settings['id_prepender'] = 'thisusedtobreakstuff'
       cm.save!
 
-      package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/quiz_qti.zip")
+      package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/quiz_qti.zip")
       attachment = Attachment.new
       attachment.context = cm
       attachment.uploaded_data = File.open(package_path, 'rb')
@@ -433,7 +433,7 @@ describe ContentMigration do
     cm.migration_settings['id_prepender'] = 'thisusedtobreakstuff'
     cm.save!
 
-    package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/quiz_qti.zip")
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/quiz_qti.zip")
     attachment = Attachment.new
     attachment.context = cm
     attachment.uploaded_data = File.open(package_path, 'rb')
@@ -491,7 +491,7 @@ describe ContentMigration do
     cm.migration_settings['import_immediately'] = true
     cm.save!
 
-    package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/quiz_qti.zip")
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/quiz_qti.zip")
     attachment = Attachment.new
     attachment.context = cm
     attachment.uploaded_data = File.open(package_path, 'rb')
@@ -513,7 +513,7 @@ describe ContentMigration do
     cm.save!
     cm.queue_migration
     run_jobs
-    expect(@course.quizzes.active.find_by(migration_id: "blah!_#{teh_quiz.migration_id}")).not_to be_nil
+    expect(@course.quizzes.active.find_by_migration_id("blah!_#{teh_quiz.migration_id}")).not_to be_nil
   end
 
   it "escapes html in plain text nodes into qti" do
@@ -524,7 +524,7 @@ describe ContentMigration do
     cm.migration_settings['import_immediately'] = true
     cm.save!
 
-    package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/plaintext_qti.zip")
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/plaintext_qti.zip")
     attachment = Attachment.create!(:context => cm, :uploaded_data => File.open(package_path, 'rb'), :filename => "file.zip")
     cm.attachment = attachment
     cm.save!
@@ -546,7 +546,7 @@ describe ContentMigration do
     cm.migration_settings['import_immediately'] = true
     cm.save!
 
-    package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/cc_default_qb_test.tar.gz")
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_default_qb_test.tar.gz")
     attachment = Attachment.new
     attachment.context = cm
     attachment.uploaded_data = File.open(package_path, 'rb')
@@ -570,7 +570,7 @@ describe ContentMigration do
     cm.migration_settings['import_immediately'] = true
     cm.save!
 
-    package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/canvas_cc_utf16_error.zip")
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/canvas_cc_utf16_error.zip")
     attachment = Attachment.new
     attachment.context = cm
     attachment.uploaded_data = File.open(package_path, 'rb')
@@ -594,7 +594,7 @@ describe ContentMigration do
     cm.migration_settings['import_immediately'] = true
     cm.save!
 
-    package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/canvas_quiz_media_comment.zip")
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/canvas_quiz_media_comment.zip")
     attachment = Attachment.new
     attachment.context = cm
     attachment.uploaded_data = File.open(package_path, 'rb')
@@ -637,7 +637,7 @@ describe ContentMigration do
       cm = create_ab_cm
       cm.queue_migration
       cm = create_ab_cm
-      expect(cm).to be_blocked_by_current_migration(nil, 0, nil)
+      expect(cm.blocked_by_current_migration?(nil, 0, nil)).to be_truthy
     end
 
     it "does not throw an error checking for blocked migrations on save" do
@@ -657,7 +657,7 @@ describe ContentMigration do
     cm.save!
     cm.queue_migration
 
-    expect_any_instance_of(CC::Importer::CCWorker).not_to receive(:perform)
+    expect_any_instance_of(Canvas::Migration::Worker::CCWorker).to receive(:perform).never
     Timecop.travel(50.hours.from_now) do
       run_jobs
     end
@@ -673,10 +673,10 @@ describe ContentMigration do
     cm.migration_type = 'common_cartridge_importer'
     cm.workflow_state = 'exported'
     cm.save!
-    expect(CC::Importer::CCWorker).not_to receive(:new)
+    expect(Canvas::Migration::Worker::CCWorker).to receive(:new).never
     cm.queue_migration
 
-    expect_any_instance_of(ContentMigration).not_to receive(:import_content)
+    expect_any_instance_of(ContentMigration).to receive(:import_content).never
     Timecop.travel(50.hours.from_now) do
       run_jobs
     end
@@ -689,7 +689,7 @@ describe ContentMigration do
 
   it "delays queueing imports if one in course is already running" do
     cms = []
-    Timecop.freeze(Time.zone.now) do
+    Timecop.freeze(Time.now) do
       2.times do
         cm = ContentMigration.new(:context => @course, :user => @teacher)
         cm.migration_type = 'common_cartridge_importer'
@@ -718,7 +718,7 @@ describe ContentMigration do
     cm.migration_settings['import_immediately'] = true
     cm.save!
 
-    package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/cc_nested.zip")
+    package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_nested.zip")
     attachment = Attachment.new(:context => cm, :filename => 'file.zip')
     attachment.uploaded_data = File.open(package_path, 'rb')
     attachment.save!
@@ -801,7 +801,7 @@ describe ContentMigration do
       cm.migration_settings['import_immediately'] = true
       cm.save!
 
-      package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/plaintext_qti.zip")
+      package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/plaintext_qti.zip")
       attachment = Attachment.create!(:context => cm, :uploaded_data => File.open(package_path, 'rb'), :filename => "file.zip")
       cm.attachment = attachment
       cm.save!
@@ -822,7 +822,7 @@ describe ContentMigration do
       cm.migration_settings['import_immediately'] = true
       cm.save!
 
-      package_path = File.join("#{File.dirname(__FILE__)}/../fixtures/migration/cc_nested.zip")
+      package_path = File.join(File.dirname(__FILE__) + "/../fixtures/migration/cc_nested.zip")
       attachment = Attachment.new(:context => cm, :filename => 'file.zip')
       attachment.uploaded_data = File.open(package_path, 'rb')
       attachment.save!

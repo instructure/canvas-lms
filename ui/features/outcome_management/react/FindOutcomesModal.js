@@ -40,7 +40,7 @@ import GroupActionDrillDown from './shared/GroupActionDrillDown'
 import useOutcomesImport from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
-  const {isMobileView, isCourse, rootOutcomeGroup, rootIds} = useCanvasContext()
+  const {isMobileView, isCourse, rootIds} = useCanvasContext()
   const [showOutcomesView, setShowOutcomesView] = useState(false)
   const [scrollContainer, setScrollContainer] = useState(null)
   const {
@@ -61,8 +61,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     id: selectedGroupId,
     query: FIND_GROUP_OUTCOMES,
     loadOutcomesIsImported: true,
-    searchString: debouncedSearchString,
-    targetGroupId: rootOutcomeGroup?.id
+    searchString: debouncedSearchString
   })
 
   useEffect(() => {
@@ -216,14 +215,14 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               position="relative"
               width="1%"
               height="calc(100vh - 8.75rem)"
-              tabIndex="0"
-              role="separator"
-              aria-orientation="vertical"
-              aria-hidden="true"
-              onKeyDown={onKeyDownHandler}
-              elementRef={setDelimiterRef}
             >
+              {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
               <div
+                tabIndex="0"
+                role="separator"
+                aria-orientation="vertical"
+                onKeyDown={onKeyDownHandler}
+                ref={setDelimiterRef}
                 style={{
                   width: '1vw',
                   height: '100%',
@@ -232,6 +231,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
                     '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
                 }}
               />
+              {/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
             </Flex.Item>
             <Flex.Item
               as="div"

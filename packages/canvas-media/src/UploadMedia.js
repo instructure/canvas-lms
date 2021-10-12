@@ -31,7 +31,6 @@ import {ACCEPTED_FILE_TYPES} from './acceptedMediaFileTypes'
 import LoadingIndicator from './shared/LoadingIndicator'
 import saveMediaRecording, {saveClosedCaptions} from './saveMediaRecording'
 import translationShape from './translationShape'
-import {RCS_MAX_BODY_SIZE, RCS_REQUEST_SIZE_BUFFER} from '@instructure/canvas-rce/src/rce/plugins/shared/Upload/constants'
 
 const ComputerPanel = React.lazy(() => import('./ComputerPanel'))
 const MediaRecorder = React.lazy(() => import('./MediaRecorder'))
@@ -163,8 +162,7 @@ export default class UploadMedia extends React.Component {
           await saveClosedCaptions(
             data.mediaObject.media_object.media_id,
             this.state.subtitles,
-            this.props.rcsConfig,
-            RCS_MAX_BODY_SIZE - RCS_REQUEST_SIZE_BUFFER
+            this.props.rcsConfig
           )
         }
         this.props.onUploadComplete && this.props.onUploadComplete(null, data)

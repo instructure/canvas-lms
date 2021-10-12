@@ -293,7 +293,7 @@ require 'csv'
 #     }
 
 class AccountsController < ApplicationController
-  before_action :require_user, :only => [:index, :help_links, :manually_created_courses_account]
+  before_action :require_user, :only => [:index, :help_links]
   before_action :reject_student_view_student
   before_action :get_context
   before_action :rce_js_env, only: [:settings]
@@ -514,15 +514,6 @@ class AccountsController < ApplicationController
       default_help_links: help_links[:DEFAULT_HELP_LINKS],
     }
     render :json => links
-  end
-
-  # @API Get the manually-created courses sub-account for the domain root account
-  #
-  # @returns Account
-  def manually_created_courses_account
-    account = @domain_root_account.manually_created_courses_account
-    read_only = !account.grants_right?(@current_user, session, :read)
-    render :json => account_json(account, @current_user, session, [], read_only)
   end
 
   include Api::V1::Course
@@ -1707,7 +1698,7 @@ class AccountsController < ApplicationController
                                    :default_user_storage_quota, :default_user_storage_quota_mb, :default_time_zone,
                                    :disable_post_to_sis_when_grading_period_closed,
                                    :edit_institution_email, :enable_alerts, :enable_eportfolios, :enable_course_catalog,
-                                   :limit_parent_app_web_access, :allow_gradebook_show_first_last_names,
+                                   :limit_parent_app_web_access,
                                    { :enable_offline_web_export => [:value] }.freeze,
                                    { :disable_rce_media_uploads => [:value] }.freeze,
                                    :enable_profiles, :enable_gravatar, :enable_turnitin, :equella_endpoint,

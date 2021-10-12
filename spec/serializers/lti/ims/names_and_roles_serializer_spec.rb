@@ -19,8 +19,8 @@
 
 require 'spec_helper'
 
-describe Lti::IMS::NamesAndRolesSerializer do
-  include Lti::IMS::NamesAndRolesMatchers
+describe Lti::Ims::NamesAndRolesSerializer do
+  include Lti::Ims::NamesAndRolesMatchers
 
   subject { described_class.new(page) }
 
@@ -183,9 +183,9 @@ describe Lti::IMS::NamesAndRolesSerializer do
       end
       let(:user) { enrollment.user }
       let(:decorated_enrollment) do
-        Lti::IMS::Providers::CourseMembershipsProvider::CourseEnrollmentsDecorator.new([enrollment], tool)
+        Lti::Ims::Providers::CourseMembershipsProvider::CourseEnrollmentsDecorator.new([enrollment], tool)
       end
-      let(:decorated_course) { Lti::IMS::Providers::CourseMembershipsProvider::CourseContextDecorator.new(course) }
+      let(:decorated_course) { Lti::Ims::Providers::CourseMembershipsProvider::CourseContextDecorator.new(course) }
       let(:page) do
         {
           url: url,
@@ -242,9 +242,9 @@ describe Lti::IMS::NamesAndRolesSerializer do
       end
       let(:user) { group_member.user }
       let(:decorated_group_member) do
-        Lti::IMS::Providers::GroupMembershipsProvider::GroupMembershipDecorator.new(group_member, tool)
+        Lti::Ims::Providers::GroupMembershipsProvider::GroupMembershipDecorator.new(group_member, tool)
       end
-      let(:decorated_group) { Lti::IMS::Providers::GroupMembershipsProvider::GroupContextDecorator.new(group_record) }
+      let(:decorated_group) { Lti::Ims::Providers::GroupMembershipsProvider::GroupContextDecorator.new(group_record) }
       let(:page) do
         {
           url: url,

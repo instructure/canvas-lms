@@ -21,7 +21,7 @@ require 'csv'
 require 'set'
 
 module Outcomes
-  class CSVImporter
+  class CsvImporter
     include Outcomes::Import
 
     class ParseError < RuntimeError; end
