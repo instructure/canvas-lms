@@ -47,7 +47,7 @@ describe PacePlansController, type: :controller do
     @student_enrollment = @student.enrollments.first
 
     @mod1 = @course.context_modules.create! name: 'M1'
-    @a1 = @course.assignments.create! name: 'A1', workflow_state: 'unpublished'
+    @a1 = @course.assignments.create! name: 'A1', workflow_state: 'active'
     @mod1.add_item id: @a1.id, type: 'assignment'
 
     @mod2 = @course.context_modules.create! name: 'M2'
@@ -97,48 +97,49 @@ describe PacePlansController, type: :controller do
 
       expect(response).to be_successful
       expect(assigns[:js_bundles].flatten).to include(:pace_plans)
-      expect(controller.js_env[:BLACKOUT_DATES]).to eq([])
-      expect(controller.js_env[:COURSE]).to match(hash_including({
-                                                                   id: @course.id,
-                                                                   name: @course.name,
-                                                                   start_at: @course.start_at,
-                                                                   end_at: @course.end_at
-                                                                 }))
-      expect(controller.js_env[:ENROLLMENTS].length).to be(1)
-      expect(controller.js_env[:ENROLLMENTS][@student_enrollment.id]).to match(hash_including({
-                                                                                                id: @student_enrollment.id,
-                                                                                                user_id: @student.id,
-                                                                                                course_id: @course.id,
-                                                                                                full_name: @student.name,
-                                                                                                sortable_name: @student.sortable_name
-                                                                                              }))
-      expect(controller.js_env[:SECTIONS].length).to be(1)
-      expect(controller.js_env[:SECTIONS][@section.id]).to match(hash_including({
-                                                                                  id: @section.id,
-                                                                                  course_id: @course.id,
-                                                                                  name: @section.name,
-                                                                                  start_at: @section.start_at,
-                                                                                  end_at: @section.end_at
-                                                                                }))
-      expect(controller.js_env[:PACE_PLAN]).to match(hash_including({
-                                                                      id: @pace_plan.id,
-                                                                      course_id: @course.id,
-                                                                      course_section_id: nil,
-                                                                      user_id: nil,
-                                                                      workflow_state: "active",
-                                                                      exclude_weekends: true,
-                                                                      hard_end_dates: true,
-                                                                      context_id: @course.id,
-                                                                      context_type: "Course"
-                                                                    }))
-      expect(controller.js_env[:PACE_PLAN][:modules].length).to be(2)
-      expect(controller.js_env[:PACE_PLAN][:modules][0][:items].length).to be(1)
-      expect(controller.js_env[:PACE_PLAN][:modules][1][:items].length).to be(2)
-      expect(controller.js_env[:PACE_PLAN][:modules][1][:items][1]).to match(hash_including({
-                                                                                              assignment_title: @a3.title,
-                                                                                              module_item_type: 'Assignment',
-                                                                                              duration: 4
-                                                                                            }))
+      js_env = controller.js_env
+      expect(js_env[:BLACKOUT_DATES]).to eq([])
+      expect(js_env[:COURSE]).to match(hash_including({
+                                                        id: @course.id,
+                                                        name: @course.name,
+                                                        start_at: @course.start_at,
+                                                        end_at: @course.end_at
+                                                      }))
+      expect(js_env[:ENROLLMENTS].length).to be(1)
+      expect(js_env[:ENROLLMENTS][@student_enrollment.id]).to match(hash_including({
+                                                                                     id: @student_enrollment.id,
+                                                                                     user_id: @student.id,
+                                                                                     course_id: @course.id,
+                                                                                     full_name: @student.name,
+                                                                                     sortable_name: @student.sortable_name
+                                                                                   }))
+      expect(js_env[:SECTIONS].length).to be(1)
+      expect(js_env[:SECTIONS][@section.id]).to match(hash_including({
+                                                                       id: @section.id,
+                                                                       course_id: @course.id,
+                                                                       name: @section.name,
+                                                                       start_at: @section.start_at,
+                                                                       end_at: @section.end_at
+                                                                     }))
+      expect(js_env[:PACE_PLAN]).to match(hash_including({
+                                                           id: @pace_plan.id,
+                                                           course_id: @course.id,
+                                                           course_section_id: nil,
+                                                           user_id: nil,
+                                                           workflow_state: "active",
+                                                           exclude_weekends: true,
+                                                           hard_end_dates: true,
+                                                           context_id: @course.id,
+                                                           context_type: "Course"
+                                                         }))
+      expect(js_env[:PACE_PLAN][:modules].length).to be(2)
+      expect(js_env[:PACE_PLAN][:modules][0][:items].length).to be(1)
+      expect(js_env[:PACE_PLAN][:modules][1][:items].length).to be(2)
+      expect(js_env[:PACE_PLAN][:modules][1][:items][1]).to match(hash_including({
+                                                                                   assignment_title: @a3.title,
+                                                                                   module_item_type: 'Assignment',
+                                                                                   duration: 4
+                                                                                 }))
     end
 
     it "does not create a pace plan if no primary pace plans are available" do
@@ -248,7 +249,7 @@ describe PacePlansController, type: :controller do
         m1 = json_response["pace_plan"]["modules"].first
         expect(m1["items"].count).to eq(1)
         expect(m1["items"].first["duration"]).to eq(0)
-        expect(m1["items"].first["published"]).to eq(false)
+        expect(m1["items"].first["published"]).to eq(true)
         m2 = json_response["pace_plan"]["modules"].second
         expect(m2["items"].count).to eq(2)
         expect(m2["items"].first["duration"]).to eq(2)
@@ -279,7 +280,7 @@ describe PacePlansController, type: :controller do
         m1 = json_response["pace_plan"]["modules"].first
         expect(m1["items"].count).to eq(1)
         expect(m1["items"].first["duration"]).to eq(0)
-        expect(m1["items"].first["published"]).to eq(false)
+        expect(m1["items"].first["published"]).to eq(true)
         m2 = json_response["pace_plan"]["modules"].second
         expect(m2["items"].count).to eq(2)
         expect(m2["items"].first["duration"]).to eq(2)
@@ -312,7 +313,7 @@ describe PacePlansController, type: :controller do
         m1 = json_response["pace_plan"]["modules"].first
         expect(m1["items"].count).to eq(1)
         expect(m1["items"].first["duration"]).to eq(0)
-        expect(m1["items"].first["published"]).to eq(false)
+        expect(m1["items"].first["published"]).to eq(true)
         m2 = json_response["pace_plan"]["modules"].second
         expect(m2["items"].count).to eq(2)
         expect(m2["items"].first["duration"]).to eq(2)
@@ -320,6 +321,16 @@ describe PacePlansController, type: :controller do
         expect(m2["items"].second["duration"]).to eq(4)
         expect(m2["items"].second["published"]).to eq(true)
       end
+    end
+  end
+
+  describe "POST #publish" do
+    it "starts a new background job to publish the pace plan" do
+      post :publish, params: { course_id: @course.id, id: @pace_plan.id }
+      expect(response).to be_successful
+      json_response = JSON.parse(response.body)
+      expect(json_response["context_type"]).to eq("PacePlan")
+      expect(json_response["workflow_state"]).to eq("queued")
     end
   end
 end
