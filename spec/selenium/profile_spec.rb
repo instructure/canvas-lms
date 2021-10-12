@@ -269,9 +269,7 @@ describe "profile" do
     it "generates a new access token without an expiration", priority: "2", test_id: 588918 do
       get "/profile/settings"
       generate_access_token('testing', true)
-      # some jquery replaces the expiration which makes it hard to select until refresh
-      driver.navigate.refresh
-      expect(f('.access_token .expires')).to include_text('never')
+      expect(fj('.access_token:visible .expires')).to include_text('never')
     end
 
     it "generates a new access token with an expiration", priority: "2", test_id: 588919 do
@@ -279,10 +277,8 @@ describe "profile" do
         get "/profile/settings"
         generate_access_token_with_expiration(format_date_for_view(2.days.from_now, :medium))
         close_visible_dialog
-        # some jquery replaces the 'never' with the expiration which makes it hard to select until refresh
-        driver.navigate.refresh
       end
-      expect(f('.access_token .expires')).to include_text(format_time_for_view(2.days.from_now.midnight))
+      expect(fj('.access_token:visible .expires')).to include_text(format_time_for_view(2.days.from_now.midnight))
     end
 
     it "regenerates a new access token", priority: "2", test_id: 588920 do
