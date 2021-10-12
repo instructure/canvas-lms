@@ -29,8 +29,7 @@ import {View} from '@instructure/ui-view'
 import {StoreState} from '../../../types'
 import {getPacePlanItems, getPlanWeeks} from '../../../reducers/pace_plans'
 import {getShowProjections} from '../../../reducers/ui'
-import StartDateSelector from './start_date_selector'
-import EndDateSelector from './end_date_selector'
+import PacePlanDateSelector from './date_selector'
 import SlideTransition from '../../../utils/slide_transition'
 
 interface StoreProps {
@@ -50,9 +49,9 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
     <SlideTransition expanded={showProjections} direction="vertical" size="7rem">
       <View as="div">
         <Flex as="section" alignItems="start" margin="0 0 small">
-          <StartDateSelector />
+          <PacePlanDateSelector type="start" />
           <View margin="0 0 0 medium">
-            <EndDateSelector />
+            <PacePlanDateSelector type="end" />
           </View>
         </Flex>
         <Flex as="section" margin="0 0 small">

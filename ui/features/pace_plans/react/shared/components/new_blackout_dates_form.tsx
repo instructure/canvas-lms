@@ -74,14 +74,6 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
     return this.state.eventTitle.length < 1 || !this.state.startDate || !this.state.endDate
   }
 
-  disabledStartDay = (date: moment.Moment) => {
-    return date > moment(this.state.endDate)
-  }
-
-  disabledEndDay = (date: moment.Moment) => {
-    return date < moment(this.state.startDate)
-  }
-
   /* Renderers */
 
   render() {
@@ -99,16 +91,14 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
             dateValue={this.state.startDate}
             label="Start Date"
             onDateChange={this.onChangeStartDate}
-            disabledDays={this.disabledStartDay}
-            id="blackout_start"
+            endDate={this.state.endDate}
             width="140px"
           />
           <PacePlanDateInput
             dateValue={this.state.endDate}
             label="End Date"
             onDateChange={this.onChangeEndDate}
-            disabledDays={this.disabledEndDay}
-            id="blackout_end"
+            startDate={this.state.startDate}
             width="140px"
           />
           <Button

@@ -42,6 +42,8 @@ import {getCourse} from './course'
 import {getEnrollments} from './enrollments'
 import {getSections} from './sections'
 import {getBlackoutDates} from '../shared/reducers/blackout_dates'
+import moment from 'moment-timezone'
+import {formatDate} from '../utils/date_stuff/date_helpers'
 
 export const initialState: PacePlansState = (window.ENV.PACE_PLAN || {}) as PacePlansState
 
@@ -192,13 +194,6 @@ export const getActivePlanContext = createSelector(
   }
 )
 
-export const getDisabledDaysOfWeek = createSelector(
-  getExcludeWeekends,
-  (excludeWeekends: boolean): number[] => {
-    return excludeWeekends ? weekendIntegers : []
-  }
-)
-
 /* Reducers */
 
 export default (
@@ -228,16 +223,7 @@ export default (
       if (state.exclude_weekends) {
         return {...state, exclude_weekends: false}
       } else {
-        return {
-          ...state,
-          exclude_weekends: true,
-          start_date: state.start_date
-            ? DateHelpers.adjustDateOnSkipWeekends(state.start_date)
-            : state.start_date,
-          end_date: state.end_date
-            ? DateHelpers.adjustDateOnSkipWeekends(state.end_date)
-            : state.end_date
-        }
+        return {...state, exclude_weekends: true}
       }
     case PacePlanConstants.TOGGLE_HARD_END_DATES:
       return {...state, hard_end_dates: !state.hard_end_dates}

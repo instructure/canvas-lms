@@ -229,7 +229,7 @@ const GradeDetails = ({
         {grades.map(assignment =>
           GradeRow({
             isStacked,
-            currentUserId: currentUser.id,
+            currentUserId: observedUserId || currentUser.id,
             ...assignment
           })
         )}

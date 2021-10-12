@@ -391,5 +391,14 @@ describe('GradesPage', () => {
       rerender(<GradesPage {...getProps({observedUserId: '5'})} />)
       expect(getByText('Assignments: 60.00%')).toBeInTheDocument()
     })
+
+    it('routes the user to the observee submissions when the "View feedback" link is clicked', async () => {
+      const {getByRole} = render(<GradesPage {...getProps({observedUserId: '5'})} />)
+      await waitFor(() => {
+        const link = getByRole('link', {name: 'View feedback'})
+        expect(link).toBeInTheDocument()
+        expect(link.href).toBe('http://localhost:3000/courses/30/assignments/9/submissions/5')
+      })
+    })
   })
 })

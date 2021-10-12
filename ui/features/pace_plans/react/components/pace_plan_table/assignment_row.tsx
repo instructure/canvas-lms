@@ -45,8 +45,7 @@ import {
   getPacePlan,
   getDueDate,
   getExcludeWeekends,
-  getPacePlanItemPosition,
-  getDisabledDaysOfWeek
+  getPacePlanItemPosition
 } from '../../reducers/pace_plans'
 import {actions} from '../../actions/pace_plan_items'
 import {actions as uiActions} from '../../actions/ui'
@@ -74,7 +73,6 @@ interface StoreProps {
   readonly autosaving: boolean
   readonly enrollmentHardEndDatePlan: boolean
   readonly adjustingHardEndDatesAfter?: number
-  readonly disabledDaysOfWeek: number[]
   readonly showProjections: boolean
 }
 
@@ -332,7 +330,6 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
       pacePlan.hard_end_dates && pacePlan.context_type === 'Enrollment'
     ),
     adjustingHardEndDatesAfter: getAdjustingHardEndDatesAfter(state),
-    disabledDaysOfWeek: getDisabledDaysOfWeek(state),
     showProjections: getShowProjections(state)
   }
 }

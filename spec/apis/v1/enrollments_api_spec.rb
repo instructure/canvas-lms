@@ -1030,11 +1030,8 @@ describe EnrollmentsApiController, type: :request do
           end
         end
 
-        it "returns grades for the requested grading period for courses" do
-          Timecop.freeze(@first_grading_period.end_date - 1.day) do
-            @assignment_in_first_period.grade_student(@student, grade: 10, grader: @teacher)
-          end
-          @assignment_in_last_period.grade_student(@student, grade: 0, grader: @teacher)
+        describe "grading period scores" do
+          let(:observer) { User.create! }
 
           student_grade = lambda do |json|
             student_json = json.find { |e|
@@ -1045,16 +1042,40 @@ describe EnrollmentsApiController, type: :request do
             end
           end
 
-          json = api_call(:get, @path, @params)
-          expect(student_grade.(json)).to eq 50
+          before :each do
+            Timecop.freeze(@first_grading_period.end_date - 1.day) do
+              @assignment_in_first_period.grade_student(@student, grade: 10, grader: @teacher)
+            end
+            @assignment_in_last_period.grade_student(@student, grade: 0, grader: @teacher)
+          end
 
-          @params[:grading_period_id] = @first_grading_period.id
-          json = api_call(:get, @path, @params)
-          expect(student_grade.(json)).to eq 100
+          it "returns grades for the requested grading period for courses" do
+            json = api_call(:get, @path, @params)
+            expect(student_grade.call(json)).to eq 50
 
-          @params[:grading_period_id] = @last_grading_period.id
-          json = api_call(:get, @path, @params)
-          expect(student_grade.(json)).to eq 0
+            @params[:grading_period_id] = @first_grading_period.id
+            json = api_call(:get, @path, @params)
+            expect(student_grade.call(json)).to eq 100
+
+            @params[:grading_period_id] = @last_grading_period.id
+            json = api_call(:get, @path, @params)
+            expect(student_grade.call(json)).to eq 0
+          end
+
+          it "includes observee grades when observed_users are requested" do
+            @course.enroll_user(observer, 'ObserverEnrollment', associated_user_id: @student.id)
+            @params[:include] = ["observed_users"]
+            json = api_call_as_user(observer, :get, @path, @params)
+            expect(student_grade.call(json)).to eq 50
+
+            @params[:grading_period_id] = @first_grading_period.id
+            json = api_call_as_user(observer, :get, @path, @params)
+            expect(student_grade.call(json)).to eq 100
+
+            @params[:grading_period_id] = @last_grading_period.id
+            json = api_call_as_user(observer, :get, @path, @params)
+            expect(student_grade.call(json)).to eq 0
+          end
         end
       end
     end

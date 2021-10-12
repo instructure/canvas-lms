@@ -16,18 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * A wrapper around the instructure-ui DateInput component
- *
- * This wrapper does the following:
- *
- * - Renders the DateInput with the passed in props
- * - Handles date changes and ensures the user doesn't manually enter a disabled date
- * - Includes a hack to make sure the DateInput's TextInput updates (see componentWillReceiveProps)
- */
-
-import React from 'react'
-import moment from 'moment-timezone'
+import React, {useState} from 'react'
+import moment, {Moment, MomentInput} from 'moment-timezone'
 import tz from '@canvas/timezone'
 
 import {Flex} from '@instructure/ui-flex'
@@ -35,116 +25,120 @@ import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
+import {BlackoutDate, InputInteraction} from '../types'
+import {weekendIntegers} from '../api/backend_serializer'
+// @ts-ignore: TS doesn't understand i18n scoped imports
+import I18n from 'i18n!pace_plan_date_input'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
-import {InputInteraction} from '../types'
 
-export enum DateErrorMessages {
-  INVALID_FORMAT = 'Invalid date entered. Date has been reset.',
-  DISABLED_WEEKEND = 'Weekends are disabled. Date has been shifted to the nearest weekday.',
-  DISABLED_OTHER = 'Disabled day entered. Date has been reset.'
+export type PacePlansDateInputProps = {
+  dateValue?: string
+  label: string | JSX.Element
+  onDateChange: (rawDate: string) => void
+  /**
+   * Callback that takes a date and returns a truthy error message if it is invalid (or a falsy value if it is valid).
+   */
+  validateDay?: (date: Moment) => string | undefined
+  interaction?: InputInteraction
+  width?: string
+  weekendsDisabled?: boolean
+  /**
+   * A list of blackout dates that may be provided. These dates will be disabled for selection (or will display an error
+   * if selected).
+   */
+  blackoutDates?: BlackoutDate[]
+  /**
+   * The earliest date that may be selected (any earlier dates will be disabled).
+   */
+  startDate?: MomentInput
+  /**
+   * The latest date that may be selected (any later dates will be disabled).
+   */
+  endDate?: MomentInput
 }
 
-interface PassedProps {
-  readonly dateValue?: string
-  readonly label: string | JSX.Element
-  readonly onDateChange: (rawDate: string) => any
-  // array representing the disabled days of the week (e.g., [0,6] for Saturday and Sunday)
-  readonly disabledDaysOfWeek?: number[]
-  // callback that takes a date and returns if it should be disabled or not
-  readonly disabledDays?: (date: moment.Moment) => boolean
-  readonly width?: string
-  readonly layout?: 'inline' | 'stacked'
-  readonly inline?: boolean
-  readonly interaction?: InputInteraction
-  readonly id: string
-  readonly placeholder?: string
-  readonly locale?: string
-}
+const formatDate = date => tz.format(date, 'date.formats.long')
 
-interface LocalState {
-  readonly error?: string
-}
+/**
+ * A wrapper around the `instructure-ui` `DateInput` component
+ *
+ * This wrapper does the following:
+ *
+ * - Renders the `DateInput` with the passed in props
+ * - Handles date changes and ensures the user doesn't manually enter a disabled date
+ */
+const PacePlanDateInput = ({
+  dateValue,
+  label,
+  onDateChange,
+  validateDay,
+  interaction = 'enabled',
+  width = '14rem',
+  weekendsDisabled = false,
+  blackoutDates = [],
+  startDate,
+  endDate
+}: PacePlansDateInputProps) => {
+  const [customErrors, setCustomErrors] = useState<string[]>([])
 
-class PacePlanDateInput extends React.Component<PassedProps, LocalState> {
-  state: LocalState = {
-    error: undefined
+  const calculateErrors = (date: Moment = moment(dateValue)): string[] => {
+    const errors: string[] = []
+
+    if (!date.isValid()) return [I18n.t('The date entered is invalid.')]
+
+    if (weekendsDisabled && weekendIntegers.includes(date.weekday()))
+      errors.push(I18n.t('The selected date is on a weekend. This pace plan skips weekends.'))
+    if (DateHelpers.inBlackoutDate(date, blackoutDates))
+      errors.push(I18n.t('The selected date is on a blackout day.'))
+    if (startDate && date.isBefore(startDate))
+      errors.push(I18n.t('The selected date is too early.'))
+    if (endDate && date.isAfter(endDate)) errors.push(I18n.t('The selected date is too late.'))
+
+    const parentValidationError = validateDay && validateDay(date)
+    if (parentValidationError) errors.push(parentValidationError)
+
+    return errors
   }
 
-  public static defaultProps: Partial<PassedProps> = {
-    disabledDaysOfWeek: [],
-    disabledDays: [] as any,
-    width: '135',
-    layout: 'stacked',
-    inline: false,
-    interaction: 'enabled',
-    placeholder: 'Select a date',
-    locale: window.ENV.LOCALE
-  }
+  const handleDateChange = (date: MomentInput) => {
+    const parsedDate = moment(date).startOf('day')
 
-  /* Callbacks */
-
-  onDateChange = newDate => {
-    let error: string | undefined
-    let parsedDate = moment(newDate).startOf('day')
-
-    const landsOnDisabledWeekend =
-      this.props.disabledDaysOfWeek && this.props.disabledDaysOfWeek.includes(parsedDate.weekday())
-    const landsOnDisabledDay = this.props.disabledDays && this.props.disabledDays(parsedDate)
-    const dateIsDisabled = landsOnDisabledWeekend || landsOnDisabledDay
-
-    if (!parsedDate.isValid()) {
-      parsedDate = moment(this.props.dateValue)
-      error = DateErrorMessages.INVALID_FORMAT
-    } else if (dateIsDisabled) {
-      if (landsOnDisabledDay) {
-        // If the date was disabled because of the disabledDays function, just reset it and don't try to shift
-        parsedDate = moment(this.props.dateValue)
-        error = DateErrorMessages.DISABLED_OTHER
-      } else if (landsOnDisabledWeekend) {
-        parsedDate = moment(DateHelpers.adjustDateOnSkipWeekends(newDate))
-        error = DateErrorMessages.DISABLED_WEEKEND
-      } else {
-        parsedDate = moment(this.props.dateValue)
-        error = DateErrorMessages.DISABLED_OTHER
-      }
+    if (parsedDate.isValid()) {
+      onDateChange(parsedDate.format('YYYY-MM-DD'))
+      setCustomErrors([])
+    } else {
+      setCustomErrors([I18n.t('The date entered is invalid.')])
     }
-
-    // Regardless of the displayed format, we should store it as YYYY-MM-DD
-    this.props.onDateChange(parsedDate.format('YYYY-MM-DD'))
-
-    this.setState({error})
   }
 
-  formatDate = date => tz.format(date, 'date.formats.long')
-
-  /* Renderers */
-
-  render() {
-    const {dateValue} = this.props
-    if (this.props.interaction === 'readonly') {
-      return (
-        <div style={{display: 'inline-block', lineHeight: '1.125rem'}}>
-          <View as="div" margin="0 0 small">
-            <Text weight="bold">{this.props.label}</Text>
-          </View>
-          <Flex as="div" height="2.25rem" alignItems="center">
-            {this.formatDate(dateValue)}
-          </Flex>
-        </div>
-      )
-    }
+  if (interaction === 'readonly') {
     return (
-      <CanvasDateInput
-        renderLabel={this.props.label}
-        formatDate={this.formatDate}
-        onSelectedDateChange={this.onDateChange}
-        selectedDate={dateValue && moment(dateValue).isValid() ? dateValue : ''}
-        width={this.props.width}
-        messages={this.state.error ? [{type: 'error', text: this.state.error}] : []}
-        interaction={this.props.interaction}
-      />
+      <div style={{display: 'inline-block', lineHeight: '1.125rem'}}>
+        <View as="div" margin="0 0 small">
+          <Text weight="bold">{label}</Text>
+        </View>
+        <Flex as="div" height="2.25rem" alignItems="center">
+          {formatDate(dateValue)}
+        </Flex>
+      </div>
     )
   }
+
+  return (
+    <CanvasDateInput
+      renderLabel={label}
+      formatDate={formatDate}
+      onSelectedDateChange={handleDateChange}
+      selectedDate={dateValue}
+      dateIsDisabled={d => !!calculateErrors(d).length}
+      width={width}
+      messages={(customErrors.length ? customErrors : calculateErrors()).map(e => ({
+        type: 'error',
+        text: e
+      }))}
+      interaction={interaction}
+    />
+  )
 }
 
 export default PacePlanDateInput
