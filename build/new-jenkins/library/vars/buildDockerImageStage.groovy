@@ -193,3 +193,41 @@ def patchsetImage() {
     """, label: 'upload cache images')
   }
 }
+
+def i18nGenerate() {
+  def dest = 's3://instructure-translations/sources/canvas-lms/en/en.yml'
+  def roleARN = 'arn:aws:iam::307761260553:role/translations-jenkins'
+
+  sh(
+    label: 'generate the source translations file (en.yml)',
+    script: """
+      docker run --name=transifreq \
+        -e RAILS_LOAD_ALL_LOCALES=1 \
+        -e COMPILE_ASSETS_CSS=0 \
+        -e COMPILE_ASSETS_STYLEGUIDE=0 \
+        -e COMPILE_ASSETS_BUILD_JS=0 \
+        $PATCHSET_TAG \
+          bundle exec rake canvas:compile_assets i18n:generate
+    """
+  )
+
+  sh(
+    label: 'stage the source translations file for uploading to s3',
+    script: ' \
+      docker cp \
+        transifreq:/usr/src/app/config/locales/generated/en.yml \
+        transifreq-en.yml \
+    '
+  )
+
+  sh(
+    label: 'upload the source translations file to s3',
+    script: """
+      aws configure set profile.transifreq.credential_source Ec2InstanceMetadata &&
+      aws configure set profile.transifreq.role_arn $roleARN &&
+      aws s3 cp --profile transifreq --acl bucket-owner-full-control \
+        ./transifreq-en.yml \
+        $dest
+    """
+  )
+}
