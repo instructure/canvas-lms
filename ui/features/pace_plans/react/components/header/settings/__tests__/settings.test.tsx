@@ -54,11 +54,10 @@ describe('Settings', () => {
     act(() => settingsButton.click())
 
     expect(screen.getByRole('checkbox', {name: 'Skip Weekends'})).toBeInTheDocument()
-    // Commented out since we're not implementing these features yet
-    // expect(
-    //   screen.getByRole('checkbox', {name: 'Require Completion by Specified End Date'})
-    // ).toBeInTheDocument()
-    // expect(screen.getByRole('button', {name: 'View Blackout Dates'})).toBeInTheDocument()
+    expect(
+      screen.getByRole('checkbox', {name: 'Require Completion by Specified End Date'})
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', {name: 'View Blackout Dates'})).toBeInTheDocument()
   })
 
   it('toggles the associated setting when the checkboxes are clicked', () => {
@@ -71,17 +70,15 @@ describe('Settings', () => {
     act(() => skipWeekendsToggle.click())
     expect(toggleExcludeWeekends).toHaveBeenCalled()
 
-    // Commented out since we're not implementing these features yet
-    // const hardEndDatesToggle = screen.getByRole('checkbox', {
-    //   name: 'Require Completion by Specified End Date'
-    // })
-    // expect(hardEndDatesToggle).not.toHaveAttribute('disabled')
-    // act(() => hardEndDatesToggle.click())
-    // expect(toggleHardEndDates).toHaveBeenCalled()
+    const hardEndDatesToggle = screen.getByRole('checkbox', {
+      name: 'Require Completion by Specified End Date'
+    })
+    expect(hardEndDatesToggle).not.toHaveAttribute('disabled')
+    act(() => hardEndDatesToggle.click())
+    expect(toggleHardEndDates).toHaveBeenCalled()
   })
 
-  // Skipped since we're not implementing this feature yet
-  it.skip('disables hard end dates toggle if the pace plan does not have an end date', () => {
+  it('disables hard end dates toggle if the pace plan does not have an end date', () => {
     const props = {...defaultProps, pacePlan: {...PRIMARY_PLAN, end_date: undefined}}
     const {getByRole} = render(<Settings {...props} />)
     const settingsButton = getByRole('button', {name: 'Modify Settings'})
@@ -93,8 +90,7 @@ describe('Settings', () => {
     expect(hardEndDatesToggle).toHaveAttribute('disabled')
   })
 
-  // Skipped since we're not implementing this feature yet
-  it.skip('shows and hides the blackout dates modal correctly', () => {
+  it('shows and hides the blackout dates modal correctly', () => {
     const {getByRole} = renderConnected(<Settings {...defaultProps} />)
     const settingsButton = getByRole('button', {name: 'Modify Settings'})
     act(() => settingsButton.click())

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Lti::IMS
+module Lti::Ims
   # @API Progress
   #
   # API for querying the progress of asynchronous API operations.

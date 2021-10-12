@@ -379,9 +379,7 @@ export const groupDetailMocks = ({
   searchQuery = '',
   withMorePage = true,
   groupDescription = 'Group Description',
-  numOfOutcomes = 2,
-  targetGroupId,
-  notImportedOutcomesCount = null
+  numOfOutcomes = 2
 } = {}) => [
   {
     request: {
@@ -390,8 +388,7 @@ export const groupDetailMocks = ({
         id: groupId,
         outcomesContextId: contextId,
         outcomesContextType: contextType,
-        outcomeIsImported,
-        targetGroupId
+        outcomeIsImported
       }
     },
     result: {
@@ -403,7 +400,6 @@ export const groupDetailMocks = ({
           contextType: outcomesGroupContextType,
           contextId: outcomesGroupContextId,
           outcomesCount: numOfOutcomes,
-          notImportedOutcomesCount,
           __typename: 'LearningOutcomeGroup',
           outcomes: {
             pageInfo: {
@@ -449,8 +445,7 @@ export const groupDetailMocks = ({
         outcomesContextId: contextId,
         outcomesContextType: contextType,
         outcomeIsImported,
-        searchQuery,
-        targetGroupId
+        searchQuery
       }
     },
     result: {
@@ -462,7 +457,6 @@ export const groupDetailMocks = ({
           contextType: outcomesGroupContextType,
           contextId: outcomesGroupContextId,
           outcomesCount: 0,
-          notImportedOutcomesCount,
           outcomes: {
             pageInfo: {
               hasNextPage: withMorePage,
@@ -509,8 +503,7 @@ export const groupDetailMocks = ({
         outcomeIsImported,
         outcomesContextId: contextId,
         outcomesContextType: contextType,
-        searchQuery,
-        targetGroupId
+        searchQuery
       }
     },
     result: {
@@ -522,7 +515,6 @@ export const groupDetailMocks = ({
           contextType: outcomesGroupContextType,
           contextId: outcomesGroupContextId,
           outcomesCount: 0,
-          notImportedOutcomesCount,
           outcomes: {
             pageInfo: {
               hasNextPage: false,
@@ -568,8 +560,7 @@ export const groupDetailMocks = ({
         id: groupId,
         outcomeIsImported,
         outcomesContextId: contextId,
-        outcomesContextType: contextType,
-        targetGroupId
+        outcomesContextType: contextType
       }
     },
     result: {
@@ -579,7 +570,6 @@ export const groupDetailMocks = ({
           description: `${groupDescription} 4`,
           title,
           outcomesCount: numOfOutcomes,
-          notImportedOutcomesCount,
           outcomes: {
             pageInfo: {
               hasNextPage: withMorePage,
@@ -608,7 +598,6 @@ export const groupDetailMocks = ({
           description: `${groupDescription} 4`,
           title: `Refetched ${title}`,
           outcomesCount: 3,
-          notImportedOutcomesCount,
           outcomes: {
             pageInfo: {
               hasNextPage: withMorePage,
@@ -695,8 +684,7 @@ export const groupDetailMocks = ({
         outcomesCursor: 'Mx',
         outcomeIsImported,
         outcomesContextId: contextId,
-        outcomesContextType: contextType,
-        targetGroupId
+        outcomesContextType: contextType
       }
     },
     result: {
@@ -706,7 +694,6 @@ export const groupDetailMocks = ({
           description: `${groupDescription} 5`,
           title,
           outcomesCount: 2,
-          notImportedOutcomesCount,
           outcomes: {
             pageInfo: {
               hasNextPage: false,
@@ -772,8 +759,7 @@ export const groupDetailMocks = ({
         outcomeIsImported,
         outcomesContextId: contextId,
         outcomesContextType: contextType,
-        searchQuery,
-        targetGroupId
+        searchQuery
       }
     },
     result: {
@@ -783,7 +769,6 @@ export const groupDetailMocks = ({
           description: `${groupDescription} 6`,
           title,
           outcomesCount: 1,
-          notImportedOutcomesCount,
           outcomes: {
             pageInfo: {
               hasNextPage: false,
@@ -831,9 +816,7 @@ export const groupDetailMocksFetchMore = ({
   contextId = '1',
   withMorePage = true,
   outcomeIsImported = false,
-  groupDescription = 'Group Description',
-  targetGroupId,
-  notImportedOutcomesCount = null
+  groupDescription = 'Group Description'
 } = {}) => [
   {
     request: {
@@ -842,8 +825,7 @@ export const groupDetailMocksFetchMore = ({
         id: groupId,
         outcomeIsImported,
         outcomesContextId: contextId,
-        outcomesContextType: contextType,
-        targetGroupId
+        outcomesContextType: contextType
       }
     },
     result: {
@@ -853,7 +835,6 @@ export const groupDetailMocksFetchMore = ({
           description: `${groupDescription} 4`,
           title,
           outcomesCount: 2,
-          notImportedOutcomesCount,
           outcomes: {
             pageInfo: {
               hasNextPage: withMorePage,
@@ -919,8 +900,7 @@ export const groupDetailMocksFetchMore = ({
         outcomesCursor: 'Mx',
         outcomeIsImported,
         outcomesContextId: contextId,
-        outcomesContextType: contextType,
-        targetGroupId
+        outcomesContextType: contextType
       }
     },
     result: {
@@ -930,7 +910,6 @@ export const groupDetailMocksFetchMore = ({
           description: `${groupDescription} 5`,
           title,
           outcomesCount: 2,
-          notImportedOutcomesCount,
           outcomes: {
             pageInfo: {
               hasNextPage: false,
@@ -999,9 +978,7 @@ export const findOutcomesMocks = ({
   outcomesGroupContextId = '1',
   outcomesGroupContextType = 'Account',
   searchQuery = 'mathematics',
-  outcomesCount = 25,
-  targetGroupId = '0',
-  notImportedOutcomesCount = 1
+  outcomesCount = 25
 } = {}) => [
   {
     request: {
@@ -1010,8 +987,7 @@ export const findOutcomesMocks = ({
         id: groupId,
         outcomeIsImported,
         outcomesContextId: contextId,
-        outcomesContextType: contextType,
-        targetGroupId
+        outcomesContextType: contextType
       }
     },
     result: {
@@ -1022,7 +998,6 @@ export const findOutcomesMocks = ({
           contextType: outcomesGroupContextType,
           contextId: outcomesGroupContextId,
           outcomesCount,
-          notImportedOutcomesCount,
           outcomes: {
             pageInfo: {
               hasNextPage: false,
@@ -1068,8 +1043,7 @@ export const findOutcomesMocks = ({
         outcomeIsImported,
         outcomesContextId: contextId,
         outcomesContextType: contextType,
-        searchQuery,
-        targetGroupId
+        searchQuery
       }
     },
     result: {
@@ -1080,7 +1054,6 @@ export const findOutcomesMocks = ({
           contextType: outcomesGroupContextType,
           contextId: outcomesGroupContextId,
           outcomesCount: 15,
-          notImportedOutcomesCount,
           outcomes: {
             pageInfo: {
               hasNextPage: false,

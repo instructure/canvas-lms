@@ -187,7 +187,7 @@ module AccountReports
 
     def outcome_results_scope
       students = account.learning_outcome_links.active
-                        .select(<<~SELECT)
+                        .select(<<~SELECT).
                           distinct on (#{outcome_order}, p.id, s.id, r.id, qr.id, q.id, a.id, subs.id, qs.id, aq.id)
                           u.sortable_name                             AS "student name",
                           p.user_id                                   AS "student id",
@@ -222,32 +222,32 @@ module AccountReports
                           acct.id                                     AS "account id",
                           acct.name                                   AS "account name"
                         SELECT
-                        .joins(<<~JOINS)
-                          INNER JOIN #{LearningOutcome.quoted_table_name} ON content_tags.content_id = learning_outcomes.id
-                            AND content_tags.content_type = 'LearningOutcome'
-                          INNER JOIN #{LearningOutcomeResult.quoted_table_name} r ON r.learning_outcome_id = learning_outcomes.id
-                          INNER JOIN #{ContentTag.quoted_table_name} ct ON r.content_tag_id = ct.id
-                          INNER JOIN #{User.quoted_table_name} u ON u.id = r.user_id
-                          INNER JOIN #{Pseudonym.quoted_table_name} p on p.user_id = r.user_id
-                          INNER JOIN #{Course.quoted_table_name} c ON r.context_id = c.id
-                          INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
-                          INNER JOIN #{Enrollment.quoted_table_name} e ON e.type = 'StudentEnrollment' and e.root_account_id = #{account.root_account.id}
-                            AND e.user_id = p.user_id AND e.course_id = c.id
-                            #{@include_deleted ? '' : "AND e.workflow_state <> 'deleted'"}
-                          INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id
-                          LEFT OUTER JOIN #{LearningOutcomeQuestionResult.quoted_table_name} qr on qr.learning_outcome_result_id = r.id
-                          LEFT OUTER JOIN #{Quizzes::Quiz.quoted_table_name} q ON q.id = r.association_id
-                           AND r.association_type IN ('Quiz', 'Quizzes::Quiz')
-                          LEFT OUTER JOIN #{Assignment.quoted_table_name} a ON (a.id = ct.content_id
-                           AND ct.content_type = 'Assignment') OR a.id = q.assignment_id
-                          LEFT OUTER JOIN #{Submission.quoted_table_name} subs ON subs.assignment_id = a.id
-                           AND subs.user_id = u.id AND subs.workflow_state <> 'deleted' AND subs.workflow_state <> 'unsubmitted'
-                          LEFT OUTER JOIN #{Quizzes::QuizSubmission.quoted_table_name} qs ON r.artifact_id = qs.id
-                           AND r.artifact_type IN ('QuizSubmission', 'Quizzes::QuizSubmission')
-                          LEFT OUTER JOIN #{AssessmentQuestion.quoted_table_name} aq ON aq.id = qr.associated_asset_id
-                           AND qr.associated_asset_type = 'AssessmentQuestion'
-                        JOINS
-                        .where("ct.workflow_state <> 'deleted' AND r.workflow_state <> 'deleted' AND r.artifact_type <> 'Submission'")
+                 joins(<<~JOINS).
+                   INNER JOIN #{LearningOutcome.quoted_table_name} ON content_tags.content_id = learning_outcomes.id
+                     AND content_tags.content_type = 'LearningOutcome'
+                   INNER JOIN #{LearningOutcomeResult.quoted_table_name} r ON r.learning_outcome_id = learning_outcomes.id
+                   INNER JOIN #{ContentTag.quoted_table_name} ct ON r.content_tag_id = ct.id
+                   INNER JOIN #{User.quoted_table_name} u ON u.id = r.user_id
+                   INNER JOIN #{Pseudonym.quoted_table_name} p on p.user_id = r.user_id
+                   INNER JOIN #{Course.quoted_table_name} c ON r.context_id = c.id
+                   INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
+                   INNER JOIN #{Enrollment.quoted_table_name} e ON e.type = 'StudentEnrollment' and e.root_account_id = #{account.root_account.id}
+                     AND e.user_id = p.user_id AND e.course_id = c.id
+                     #{@include_deleted ? '' : "AND e.workflow_state <> 'deleted'"}
+                   INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id
+                   LEFT OUTER JOIN #{LearningOutcomeQuestionResult.quoted_table_name} qr on qr.learning_outcome_result_id = r.id
+                   LEFT OUTER JOIN #{Quizzes::Quiz.quoted_table_name} q ON q.id = r.association_id
+                    AND r.association_type IN ('Quiz', 'Quizzes::Quiz')
+                   LEFT OUTER JOIN #{Assignment.quoted_table_name} a ON (a.id = ct.content_id
+                    AND ct.content_type = 'Assignment') OR a.id = q.assignment_id
+                   LEFT OUTER JOIN #{Submission.quoted_table_name} subs ON subs.assignment_id = a.id
+                    AND subs.user_id = u.id AND subs.workflow_state <> 'deleted' AND subs.workflow_state <> 'unsubmitted'
+                   LEFT OUTER JOIN #{Quizzes::QuizSubmission.quoted_table_name} qs ON r.artifact_id = qs.id
+                    AND r.artifact_type IN ('QuizSubmission', 'Quizzes::QuizSubmission')
+                   LEFT OUTER JOIN #{AssessmentQuestion.quoted_table_name} aq ON aq.id = qr.associated_asset_id
+                    AND qr.associated_asset_type = 'AssessmentQuestion'
+                 JOINS
+                 where("ct.workflow_state <> 'deleted' AND r.workflow_state <> 'deleted' AND r.artifact_type <> 'Submission'")
 
       unless @include_deleted
         students = students.where("p.workflow_state<>'deleted' AND c.workflow_state IN ('available', 'completed')")

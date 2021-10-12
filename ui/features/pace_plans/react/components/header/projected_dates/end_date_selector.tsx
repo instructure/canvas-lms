@@ -18,29 +18,22 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_end_date_selector'
 import moment from 'moment-timezone'
 
-import {pacePlanActions as actions} from '../../../actions/pace_plans'
+import {autoSavingActions as actions} from '../../../actions/pace_plans'
 import PacePlanDateInput from '../../../shared/components/pace_plan_date_input'
-import {StoreState, PlanContextTypes} from '../../../types'
+import {StoreState, PacePlan} from '../../../types'
 import {BlackoutDate} from '../../../shared/types'
-import {
-  getDisabledDaysOfWeek,
-  getPacePlanType,
-  getProjectedEndDate,
-  getStartDate
-} from '../../../reducers/pace_plans'
+import {getPacePlan, getDisabledDaysOfWeek, isPlanCompleted} from '../../../reducers/pace_plans'
 import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
 import * as DateHelpers from '../../../utils/date_stuff/date_helpers'
 
 interface StoreProps {
-  readonly blackoutDates: BlackoutDate[]
+  readonly pacePlan: PacePlan
   readonly disabledDaysOfWeek: number[]
-  readonly pacePlanType: PlanContextTypes
-  readonly projectedEndDate?: string
-  readonly startDate?: string
+  readonly blackoutDates: BlackoutDate[]
+  readonly planCompleted: boolean
 }
 
 interface DispatchProps {
@@ -50,31 +43,37 @@ interface DispatchProps {
 type ComponentProps = StoreProps & DispatchProps
 
 export class EndDateSelector extends React.Component<ComponentProps> {
+  /* Callbacks */
   onDateChange = (rawValue: string) => {
     this.props.setEndDate(rawValue)
   }
 
   isDayDisabled = (date: moment.Moment) => {
     return (
-      date < moment(this.props.startDate) ||
+      date < moment(this.props.pacePlan.start_date) ||
       DateHelpers.inBlackoutDate(date, this.props.blackoutDates)
     )
   }
+
+  disabled() {
+    return (
+      this.props.planCompleted ||
+      (this.props.pacePlan.context_type === 'Enrollment' && this.props.pacePlan.hard_end_dates)
+    )
+  }
+
+  /* Renderers */
 
   render() {
     return (
       <PacePlanDateInput
         id="end-date"
-        interaction="readonly"
-        dateValue={this.props.projectedEndDate}
+        disabled={this.disabled()}
+        dateValue={this.props.pacePlan.end_date}
         onDateChange={this.onDateChange}
         disabledDaysOfWeek={this.props.disabledDaysOfWeek}
         disabledDays={this.isDayDisabled}
-        label={
-          this.props.pacePlanType === 'Enrollment'
-            ? I18n.t('End Date')
-            : I18n.t('Projected End Date')
-        }
+        label={I18n.t('Projected End Date')}
         width="14rem"
       />
     )
@@ -83,11 +82,10 @@ export class EndDateSelector extends React.Component<ComponentProps> {
 
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
-    blackoutDates: getBlackoutDates(state),
+    pacePlan: getPacePlan(state),
     disabledDaysOfWeek: getDisabledDaysOfWeek(state),
-    pacePlanType: getPacePlanType(state),
-    projectedEndDate: getProjectedEndDate(state),
-    startDate: getStartDate(state)
+    blackoutDates: getBlackoutDates(state),
+    planCompleted: isPlanCompleted(state)
   }
 }
 

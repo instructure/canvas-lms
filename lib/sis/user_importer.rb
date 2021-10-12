@@ -224,10 +224,6 @@ module SIS
             user.pronouns = (user_row.pronouns == '<delete>') ? nil : user_row.pronouns
           end
 
-          if user_row.declared_user_type.present?
-            pseudo.declared_user_type = user_row.declared_user_type == '<delete>' ? nil : user_row.declared_user_type
-          end
-
           if !status_is_active && !user.new_record?
             if user.id == @batch&.user_id
               message = "Can't remove yourself user_id '#{user_row.user_id}'"
@@ -479,12 +475,8 @@ module SIS
         @roll_back_data.push(*r_data) if r_data
 
         d = enrollments.count
-        gm = @root_account.all_group_memberships.active.where(user_id: user)
+        d += @root_account.all_group_memberships.active.where(user_id: user)
                           .update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
-        if gm > 0
-          d += gm
-          @root_account.all_groups.where(leader_id: user).update_all(leader_id: nil)
-        end
         d += user.account_users.active.shard(@root_account).where(account_id: @root_account.all_accounts)
                  .update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
         d += user.account_users.active.shard(@root_account).where(account_id: @root_account)

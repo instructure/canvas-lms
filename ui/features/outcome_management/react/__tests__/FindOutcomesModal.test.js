@@ -78,7 +78,6 @@ describe('FindOutcomesModal', () => {
       mocks = findModalMocks(),
       renderer = rtlRender,
       globalRootId = '',
-      rootOutcomeGroup = {id: '0'},
       rootIds = [ACCOUNT_GROUP_ID, ROOT_GROUP_ID, globalRootId]
     } = {}
   ) => {
@@ -91,7 +90,6 @@ describe('FindOutcomesModal', () => {
             isMobileView,
             globalRootId,
             rootIds,
-            rootOutcomeGroup,
             treeBrowserRootGroupId: ROOT_GROUP_ID,
             treeBrowserAccountGroupId: ACCOUNT_GROUP_ID
           }

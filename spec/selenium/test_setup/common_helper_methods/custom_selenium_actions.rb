@@ -59,7 +59,7 @@ module CustomSeleniumActions
       (scope || driver).find_element :css, selector
     end
   end
-  alias_method :find, :f
+  alias find f
 
   # short for find with link
   def fln(link_text, scope = nil)
@@ -114,7 +114,7 @@ module CustomSeleniumActions
       (scope || driver).find_elements(:css, selector)
     end
   end
-  alias_method :find_all, :ff
+  alias find_all ff
 
   # same as `fj`, but returns all matching elements
   #

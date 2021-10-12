@@ -180,21 +180,6 @@ const OutcomeManagementPanel = ({
     [group]
   )
 
-  // set the initial target group as the lhs group
-  let outcomeMoveInitialTargetGroup = collections[selectedGroupId]
-
-  const singleOutcomeSelected =
-    selectedOutcome || (selectedOutcomes.length === 1 && selectedOutcomes[0])
-
-  // if only one outcome is selected (kebab or bulk action)
-  if (singleOutcomeSelected) {
-    // set the initial target group as the outcome parent group
-    outcomeMoveInitialTargetGroup = {
-      name: singleOutcomeSelected.parentGroupTitle,
-      id: singleOutcomeSelected.parentGroupId
-    }
-  }
-
   // After move outcomes, remove from list if the target group isn't
   // the selected group or isn't children of the selected group
   const onSuccessMoveOutcomes = ({movedOutcomeLinkIds, targetAncestorsIds}) => {
@@ -316,19 +301,16 @@ const OutcomeManagementPanel = ({
               </View>
             </View>
           </Flex.Item>
-          <Flex.Item
-            as="div"
-            position="relative"
-            width="1%"
-            display="inline-block"
-            tabIndex="0"
-            role="separator"
-            aria-hidden="true"
-            aria-orientation="vertical"
-            onKeyDown={onKeyDownHandler}
-            elementRef={setDelimiterRef}
-          >
+          <Flex.Item as="div" position="relative" width="1%" display="inline-block">
+            {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
             <div
+              tabIndex="0"
+              role="separator"
+              aria-orientation="vertical"
+              minHeight="calc(720px - 10.75rem)"
+              height="calc(100vh - 16.35rem)"
+              onKeyDown={onKeyDownHandler}
+              ref={setDelimiterRef}
               style={{
                 width: '1vw',
                 cursor: 'col-resize',
@@ -338,6 +320,7 @@ const OutcomeManagementPanel = ({
                   '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
               }}
             />
+            {/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
           </Flex.Item>
           <Flex.Item
             as="div"
@@ -420,7 +403,7 @@ const OutcomeManagementPanel = ({
                 onCloseHandler={onCloseOutcomeMoveModal}
                 onCleanupHandler={onCloseOutcomeMoveModal}
                 onSuccess={onSuccessMoveOutcomes}
-                initialTargetGroup={outcomeMoveInitialTargetGroup}
+                initialTargetGroup={collections[selectedGroupId]}
               />
             </>
           )}
@@ -463,7 +446,7 @@ const OutcomeManagementPanel = ({
             onCloseHandler={closeOutcomesMoveModal}
             onCleanupHandler={onCloseOutcomesMoveModal}
             onSuccess={onSuccessMoveOutcomes}
-            initialTargetGroup={outcomeMoveInitialTargetGroup}
+            initialTargetGroup={collections[selectedGroupId]}
           />
         </>
       )}

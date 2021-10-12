@@ -39,18 +39,14 @@ const defaultAppsResponse = [
     course_navigation: {
       text: 'Google Apps',
       icon_url: 'google.png'
-    },
-    context_id: '100',
-    context_name: 'new course'
+    }
   },
   {
     id: '4',
     course_navigation: {
       text: 'Attendance',
       icon_url: 'xyz123.png'
-    },
-    context_id: '100',
-    context_name: 'new course 2'
+    }
   }
 ]
 
@@ -164,9 +160,7 @@ describe('ResourcesPage', () => {
           course_navigation: {
             text: 'Google Apps'
           },
-          icon_url: '2.png',
-          context_id: '100',
-          context_name: 'new course'
+          icon_url: '2.png'
         }
       ]
       utils.fetchCourseApps.mockReturnValue(Promise.resolve(response))
@@ -178,14 +172,7 @@ describe('ResourcesPage', () => {
     })
 
     it("doesn't fail if course_navigation property is null", async () => {
-      const response = [
-        {
-          id: '3',
-          context_id: '100',
-          context_name: 'Biology',
-          name: 'App'
-        }
-      ]
+      const response = [{id: '3'}]
       utils.fetchCourseApps.mockReturnValue(Promise.resolve(response))
       const {getByText, queryByText} = render(<ResourcesPage {...getProps()} />)
       await waitFor(() => expect(getByText('Student Applications')).toBeInTheDocument())

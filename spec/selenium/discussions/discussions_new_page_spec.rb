@@ -44,6 +44,10 @@ describe "discussions" do
     )
   }
 
+  before(:once) do
+    Account.default.enable_feature!(:rce_enhancements)
+  end
+
   before(:each) do
     stub_rcs_config
   end

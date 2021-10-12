@@ -28,17 +28,12 @@ import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 
 jest.mock('@canvas/alerts/react/FlashAlert')
 
-const outcomeTitles = result => result.current.group.outcomes.edges.map(edge => edge.node.title)
+const outcomeTitles = result => {
+  return result.current.group.outcomes.edges.map(edge => edge.node.title)
+}
 
 describe('groupDetailHook', () => {
   let cache, mocks, showFlashAlertSpy
-  const searchMocks = [
-    ...groupDetailMocks(),
-    ...groupDetailMocks({
-      groupId: '1',
-      searchQuery: 'search'
-    })
-  ]
 
   beforeEach(() => {
     jest.useFakeTimers()
@@ -54,14 +49,7 @@ describe('groupDetailHook', () => {
   const wrapper = ({children}) => (
     <MockedProvider cache={cache} mocks={mocks}>
       <OutcomesContext.Provider
-        value={{
-          env: {
-            contextType: 'Account',
-            contextId: '1',
-            rootIds: [ACCOUNT_GROUP_ID]
-          }
-        }}
-        f
+        value={{env: {contextType: 'Account', contextId: '1', rootIds: [ACCOUNT_GROUP_ID]}}}
       >
         {children}
       </OutcomesContext.Provider>
@@ -123,6 +111,7 @@ describe('groupDetailHook', () => {
 
   describe('should flash a screenreader message when group has finshed loading', () => {
     it('shows pluralized info message when a group has more than 1 outcome', async () => {
+      mocks = [...groupDetailMocks()]
       const {result} = renderHook(id => useGroupDetail({id}), {wrapper, initialProps: '1'})
       await act(async () => jest.runAllTimers())
       expect(result.current.group.title).toBe('Group 1')
@@ -192,7 +181,8 @@ describe('groupDetailHook', () => {
   })
 
   it('should load group info if search length is equal to 0 or greater than 2', async () => {
-    mocks = searchMocks
+    mocks = [...groupDetailMocks(), ...groupDetailMocks({groupId: '1', searchQuery: 'search'})]
+
     const hook = renderHook(
       search =>
         useGroupDetail({
@@ -221,7 +211,7 @@ describe('groupDetailHook', () => {
   })
 
   it('should search for group outcomes correctly with pagination', async () => {
-    mocks = searchMocks
+    mocks = [...groupDetailMocks(), ...groupDetailMocks({groupId: '1', searchQuery: 'search'})]
     const {result} = renderHook(
       () =>
         useGroupDetail({
@@ -265,7 +255,8 @@ describe('groupDetailHook', () => {
   })
 
   it('if searching, should remove outcomes from not searching cache', async () => {
-    mocks = searchMocks
+    mocks = [...groupDetailMocks(), ...groupDetailMocks({groupId: '1', searchQuery: 'search'})]
+
     const hook = renderHook(
       search =>
         useGroupDetail({
