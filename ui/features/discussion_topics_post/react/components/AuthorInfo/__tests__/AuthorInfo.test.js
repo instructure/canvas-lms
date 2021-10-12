@@ -32,7 +32,8 @@ const setup = ({
   editedTimingDisplay = 'Feb 2 2:00pm',
   lastReplyAtDisplay = 'Mar 3 3:00pm',
   showCreatedAsTooltip = false,
-  searchTerm = ''
+  searchTerm = '',
+  isTopicAuthor = true
 } = {}) =>
   render(
     <SearchContext.Provider value={{searchTerm}}>
@@ -46,6 +47,7 @@ const setup = ({
         editedTimingDisplay={editedTimingDisplay}
         lastReplyAtDisplay={lastReplyAtDisplay}
         showCreatedAsTooltip={showCreatedAsTooltip}
+        isTopicAuthor={isTopicAuthor}
       />
     </SearchContext.Provider>
   )
@@ -63,6 +65,23 @@ describe('AuthorInfo', () => {
 
   it('renders the author roles when there is an author', () => {
     const container = setup()
+    expect(container.getByTestId('mobile-Author')).toBeInTheDocument()
+    expect(container.getByTestId('pill-container')).toBeInTheDocument()
+    expect(container.getByTestId('mobile-Student')).toBeInTheDocument()
+    expect(container.getByTestId('mobile-TA')).toBeInTheDocument()
+  })
+
+  it('renders the Author role pill even if the user does not have discussionRoles', () => {
+    const container = setup({author: User.mock()})
+    expect(container.getByTestId('mobile-Author')).toBeInTheDocument()
+    expect(container.queryByTestId('mobile-Student')).toBeNull()
+    expect(container.queryByTestId('mobile-teacher')).toBeNull()
+    expect(container.queryByTestId('mobile-TA')).toBeNull()
+  })
+
+  it('does not render the Author pill if isTopicAuthor is false', () => {
+    const container = setup({isTopicAuthor: false})
+    expect(container.queryByTestId('mobile-Author')).toBeNull()
     expect(container.getByTestId('pill-container')).toBeInTheDocument()
     expect(container.getByTestId('mobile-Student')).toBeInTheDocument()
     expect(container.getByTestId('mobile-TA')).toBeInTheDocument()
