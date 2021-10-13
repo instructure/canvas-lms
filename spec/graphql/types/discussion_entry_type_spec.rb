@@ -134,6 +134,7 @@ describe Types::DiscussionEntryType do
     expect(discussion_entry_type.resolve('entryParticipant { read }')).to eq true
     expect(discussion_entry_type.resolve('entryParticipant { forcedReadState }')).to be_nil
     expect(discussion_entry_type.resolve('entryParticipant { rating }')).to be_nil
+    expect(discussion_entry_type.resolve('entryParticipant { reportType }')).to be_nil
   end
 
   it 'does not allows querying for participant counts on non root_entries' do
