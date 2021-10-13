@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,19 +18,30 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {getProps} from './StudentColumnHeaderRenderer.utils'
+import StudentFirstNameColumnHeader from './StudentFirstNameColumnHeader'
 
-export default class StudentColumnHeaderRenderer {
-  constructor(gradebook, element, columnName) {
+function getProps(gradebook, options) {
+  const columnId = 'student_firstname'
+
+  return {
+    ref: options.ref,
+    addGradebookElement: gradebook.keyboardNav.addGradebookElement,
+    disabled: !gradebook.contentLoadStates.studentsLoaded,
+    removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
+    onHeaderKeyDown: event => {
+      gradebook.handleHeaderKeyDown(event, columnId)
+    }
+  }
+}
+
+export default class StudentFirstNameColumnHeaderRenderer {
+  constructor(gradebook) {
     this.gradebook = gradebook
-    this.element = element
-    this.columnName = columnName
   }
 
   render(_column, $container, _gridSupport, options) {
-    const Element = this.element
-    const props = getProps(this.gradebook, options, this.columnName)
-    ReactDOM.render(<Element {...props} />, $container)
+    const props = getProps(this.gradebook, options)
+    ReactDOM.render(<StudentFirstNameColumnHeader {...props} />, $container)
   }
 
   destroy(_column, $container, _gridSupport) {

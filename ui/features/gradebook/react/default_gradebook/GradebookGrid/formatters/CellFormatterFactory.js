@@ -20,6 +20,8 @@ import AssignmentCellFormatter from './AssignmentCellFormatter'
 import AssignmentGroupCellFormatter from './AssignmentGroupCellFormatter'
 import CustomColumnCellFormatter from './CustomColumnCellFormatter'
 import StudentCellFormatter from './StudentCellFormatter'
+import StudentLastNameCellFormatter from './StudentLastNameCellFormatter'
+import StudentFirstNameCellFormatter from './StudentFirstNameCellFormatter'
 import TotalGradeCellFormatter from './TotalGradeCellFormatter'
 import TotalGradeOverrideCellFormatter from './TotalGradeOverrideCellFormatter'
 
@@ -30,6 +32,8 @@ class CellFormatterFactory {
       assignment_group: new AssignmentGroupCellFormatter(),
       custom_column: new CustomColumnCellFormatter(),
       student: new StudentCellFormatter(gradebook),
+      student_lastname: new StudentLastNameCellFormatter(gradebook),
+      student_firstname: new StudentFirstNameCellFormatter(gradebook),
       total_grade: new TotalGradeCellFormatter(gradebook),
       total_grade_override: new TotalGradeOverrideCellFormatter(gradebook)
     }
