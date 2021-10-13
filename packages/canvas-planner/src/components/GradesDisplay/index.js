@@ -44,6 +44,7 @@ export class GradesDisplay extends React.Component {
 
   scoreString(score) {
     const fixedScore = parseFloat(score)
+    // eslint-disable-next-line no-restricted-globals
     if (isNaN(fixedScore)) return formatMessage('No Grade')
     return `${fixedScore.toFixed(2)}%`
   }
@@ -83,7 +84,7 @@ export class GradesDisplay extends React.Component {
             <Button
               variant="link"
               size="small"
-              theme={{smallPadding: '0', smallHeight: 'normal'}}
+              theme={{smallPaddingHorizontal: '0', smallHeight: 'normal'}}
               href={`${course.href}/grades`}
             >
               <Text transform="uppercase">{course.shortName}</Text>

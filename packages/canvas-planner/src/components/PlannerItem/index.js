@@ -59,7 +59,7 @@ import {assignmentType as getAssignmentType} from '../../utilities/contentUtils'
 import formatMessage from '../../format-message'
 import {animatable} from '../../dynamic-ui'
 
-export class PlannerItem extends Component {
+export class PlannerItem_raw extends Component {
   static propTypes = {
     color: string,
     id: string.isRequired,
@@ -336,7 +336,7 @@ export class PlannerItem extends Component {
         <Button
           variant="link"
           theme={{
-            mediumPadding: '0',
+            mediumPaddingHorizontal: '0',
             mediumHeight: 'normal',
             linkColor: this.props.simplifiedControls ? colors.licorice : undefined,
             linkHoverColor: this.props.simplifiedControls ? colors.licorice : undefined
@@ -664,7 +664,7 @@ export class PlannerItem extends Component {
   }
 }
 
-const ThemeablePlannerItem = themeable(theme, styles)(PlannerItem)
+const ThemeablePlannerItem = themeable(theme, styles)(PlannerItem_raw)
 const AnimatablePlannerItem = animatable(ThemeablePlannerItem)
 AnimatablePlannerItem.theme = ThemeablePlannerItem.theme
 export default AnimatablePlannerItem

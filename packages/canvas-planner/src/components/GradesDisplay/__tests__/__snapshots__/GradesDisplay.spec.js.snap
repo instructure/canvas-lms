@@ -76,7 +76,7 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
         theme={
           Object {
             "smallHeight": "normal",
-            "smallPadding": "0",
+            "smallPaddingHorizontal": "0",
           }
         }
         type="button"
@@ -297,7 +297,7 @@ exports[`renders some course grades 1`] = `
         theme={
           Object {
             "smallHeight": "normal",
-            "smallPadding": "0",
+            "smallPaddingHorizontal": "0",
           }
         }
         type="button"
@@ -360,7 +360,7 @@ exports[`renders some course grades 1`] = `
         theme={
           Object {
             "smallHeight": "normal",
-            "smallPadding": "0",
+            "smallPaddingHorizontal": "0",
           }
         }
         type="button"
@@ -423,7 +423,7 @@ exports[`renders some course grades 1`] = `
         theme={
           Object {
             "smallHeight": "normal",
-            "smallPadding": "0",
+            "smallPaddingHorizontal": "0",
           }
         }
         type="button"
