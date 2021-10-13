@@ -562,6 +562,18 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
               setCopyToOpen(false)
             }}
           />
+          {props.discussionTopic.permissions?.addRubric && (
+            /* 
+              HACK! this is here because edit_rubric.js expects there to be a #add_rubric_url on the page and sets it's <form action="..."> to it
+            */
+            // eslint-disable-next-line jsx-a11y/control-has-associated-label, jsx-a11y/anchor-has-content
+            <a
+              href={ENV.DISCUSSION?.CONTEXT_RUBRICS_URL}
+              id="add_rubric_url"
+              data-testid="add_rubric_url"
+              style={{display: 'none'}}
+            />
+          )}
         </>
       )}
     />

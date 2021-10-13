@@ -704,7 +704,10 @@ class DiscussionTopicsController < ApplicationController
                discussions_reporting: Account.site_admin.feature_enabled?(:discussions_reporting),
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
                # GRADED_RUBRICS_URL must be within DISCUSSION to avoid page error
-               DISCUSSION: { GRADED_RUBRICS_URL: @topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil },
+               DISCUSSION: {
+                 GRADED_RUBRICS_URL: (@topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil),
+                 CONTEXT_RUBRICS_URL: can_do(@topic.assignment, @current_user, :update) ? context_url(@topic.assignment.context, :context_rubrics_url) : ""
+               },
                apollo_caching: Account.site_admin.feature_enabled?(:apollo_caching),
                discussion_cache_key: Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_\=HUpgraqe;njalkhpvoiulkimmaqewg")
              })
