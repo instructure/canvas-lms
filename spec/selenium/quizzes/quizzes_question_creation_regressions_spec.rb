@@ -26,7 +26,6 @@ describe 'quizzes question creation' do
 
   before(:once) do
     course_with_teacher(active_all: true)
-    Account.default.enable_feature!(:rce_enhancements)
   end
 
   before(:each) do
