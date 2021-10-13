@@ -26,7 +26,7 @@ describe UserContent::FilesHandler do
     attachment_with_context(course, { filename: 'test.mp4', content_type: 'video' })
   end
   let(:match_url) do
-    [attachment.context_type.tableize, attachment.context_id, 'files', match_part].join('/')
+    [attachment.context_type.tableize, attachment.context_id, 'files', attachment.id, match_part].join('/')
   end
   let(:match_part) { 'download?wrap=1' }
   let(:uri_match) do
@@ -140,7 +140,7 @@ describe UserContent::FilesHandler do
         let(:current_user) { user_factory }
 
         it 'returns match_url with preview=1' do
-          expect(processed_url).to eq "#{match_url}&no_preview=1"
+          expect(processed_url).to eq "/#{match_url}&no_preview=1"
         end
 
         context 'but attachment is public' do
@@ -158,13 +158,13 @@ describe UserContent::FilesHandler do
             it 'returns match_url with hidden=1' do
               attachment.locked = true
               attachment.save
-              expect(processed_url).to eq "#{match_url}&hidden=1"
+              expect(processed_url).to eq "/#{match_url}&hidden=1"
             end
 
             it 'returns match_url with hidden=1 if within a locked time window' do
               attachment.unlock_at = 1.hour.from_now
               attachment.save
-              expect(processed_url).to eq "#{match_url}&hidden=1"
+              expect(processed_url).to eq "/#{match_url}&hidden=1"
             end
           end
         end
