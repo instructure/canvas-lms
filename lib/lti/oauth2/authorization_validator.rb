@@ -20,7 +20,7 @@
 require 'json/jwt'
 
 module Lti
-  module Oauth2
+  module OAuth2
     class AuthorizationValidator
       class InvalidSignature < StandardError
       end

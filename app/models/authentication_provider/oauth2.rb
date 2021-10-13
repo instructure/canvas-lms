@@ -24,7 +24,7 @@ require 'canvas/core_ext/oauth2'
 class OAuthValidationError < RuntimeError
 end
 
-class AuthenticationProvider::Oauth2 < AuthenticationProvider::Delegated
+class AuthenticationProvider::OAuth2 < AuthenticationProvider::Delegated
   SENSITIVE_PARAMS = [:client_secret].freeze
 
   # rename DB fields to something that makes sense for OAuth2
@@ -36,7 +36,7 @@ class AuthenticationProvider::Oauth2 < AuthenticationProvider::Delegated
   alias_attribute :scope, :requested_authn_context
 
   def client
-    @client ||= OAuth2::Client.new(client_id, client_secret, client_options)
+    @client ||= ::OAuth2::Client.new(client_id, client_secret, client_options)
   end
 
   def generate_authorize_url(redirect_uri, state)
@@ -68,3 +68,7 @@ class AuthenticationProvider::Oauth2 < AuthenticationProvider::Delegated
     {}
   end
 end
+
+# TODO: this shim is temporary while renaming referenves plugins
+# and should be removed after
+::AuthenticationProvider::Oauth2 = ::AuthenticationProvider::OAuth2

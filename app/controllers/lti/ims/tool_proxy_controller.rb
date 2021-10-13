@@ -74,7 +74,7 @@ module Lti
               dev_key: developer_key,
               registration_url: reg_info[:registration_url]
             ) and return if reg_info.present?
-          rescue Lti::Oauth2::InvalidTokenError
+          rescue Lti::OAuth2::InvalidTokenError
             render_unauthorized and return
           end
         elsif request.authorization.present?
@@ -94,7 +94,7 @@ module Lti
           begin
             validate_access_token!
             tp = ToolProxy.find_by guid: access_token.sub
-          rescue Lti::Oauth2::InvalidTokenError
+          rescue Lti::OAuth2::InvalidTokenError
             render_unauthorized and return
           end
         elsif request.authorization.present?

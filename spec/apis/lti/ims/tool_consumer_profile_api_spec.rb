@@ -84,7 +84,7 @@ module Lti
           )
         end
 
-        let(:access_token) { Lti::Oauth2::AccessToken.create_jwt(aud: 'www.example.com', sub: dev_key.global_id) }
+        let(:access_token) { Lti::OAuth2::AccessToken.create_jwt(aud: 'www.example.com', sub: dev_key.global_id) }
 
         let(:request_headers) { { Authorization: "Bearer #{access_token}" } }
 

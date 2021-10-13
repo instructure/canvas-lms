@@ -19,5 +19,5 @@
 #
 
 module Login
-  GoogleController = Oauth2Controller
+  GoogleController = OAuth2Controller
 end

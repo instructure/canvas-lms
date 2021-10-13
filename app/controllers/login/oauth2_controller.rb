@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Login::Oauth2Controller < Login::OAuthBaseController
+class Login::OAuth2Controller < Login::OAuthBaseController
   skip_before_action :verify_authenticity_token
 
   rescue_from Canvas::Security::TokenExpired, with: :handle_expired_token
@@ -42,7 +42,7 @@ class Login::Oauth2Controller < Login::OAuthBaseController
     return unless validate_request
 
     @aac = AuthenticationProvider.find(jwt['aac_id'])
-    raise ActiveRecord::RecordNotFound unless @aac.is_a?(AuthenticationProvider::Oauth2)
+    raise ActiveRecord::RecordNotFound unless @aac.is_a?(AuthenticationProvider::OAuth2)
 
     debugging = @aac.debugging? && jwt['nonce'] == @aac.debug_get(:nonce)
     if debugging
@@ -110,3 +110,6 @@ class Login::Oauth2Controller < Login::OAuthBaseController
              end
   end
 end
+
+# TODO: Shim until plugins are fully renamed
+::Login::Oauth2Controller = ::Login::OAuth2Controller

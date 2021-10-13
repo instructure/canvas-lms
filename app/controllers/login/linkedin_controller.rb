@@ -19,5 +19,5 @@
 #
 
 module Login
-  LinkedinController = Oauth2Controller
+  LinkedinController = OAuth2Controller
 end

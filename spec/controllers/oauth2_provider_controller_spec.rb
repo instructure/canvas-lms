@@ -20,7 +20,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe Oauth2ProviderController do
+describe OAuth2ProviderController do
   describe 'GET auth' do
     let_once(:key) do
       d = DeveloperKey.create! :redirect_uri => 'https://example.com'

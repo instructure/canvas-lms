@@ -21,23 +21,23 @@ module Lti::IMS::AccessTokenHelper
   def authorized_lti2_tool
     validate_access_token!
     true
-  rescue Lti::Oauth2::InvalidTokenError
+  rescue Lti::OAuth2::InvalidTokenError
     render_unauthorized_action
   end
 
   def validate_access_token!
     access_token.validate!
-    raise Lti::Oauth2::InvalidTokenError 'Developer Key is not active or available in this environment' if developer_key && !developer_key.usable?
-  rescue Lti::Oauth2::InvalidTokenError
+    raise Lti::OAuth2::InvalidTokenError 'Developer Key is not active or available in this environment' if developer_key && !developer_key.usable?
+  rescue Lti::OAuth2::InvalidTokenError
     raise
   rescue StandardError => e
-    raise Lti::Oauth2::InvalidTokenError, e
+    raise Lti::OAuth2::InvalidTokenError, e
   end
 
   def access_token
     @_access_token ||= begin
       access_token = AuthenticationMethods.access_token(request)
-      access_token && Lti::Oauth2::AccessToken.from_jwt(
+      access_token && Lti::OAuth2::AccessToken.from_jwt(
         aud: request.host,
         jwt: access_token
       )
@@ -59,7 +59,7 @@ module Lti::IMS::AccessTokenHelper
     service_names = [*lti2_service_name]
     service = ims_tp.security_contract.tool_services.find(
       -> {
-        raise Lti::Oauth2::InvalidTokenError,
+        raise Lti::OAuth2::InvalidTokenError,
               "The ToolProxy security contract doesn't include #{service_names.join(', or ')}"
       }
     ) do |s|
@@ -67,7 +67,7 @@ module Lti::IMS::AccessTokenHelper
     end
     unless service.actions.map(&:downcase).include? request.method.downcase
       msg = "#{s.service.split(':').last.split('#').last}.#{request.method} not included in ToolProxy security Contract"
-      raise Lti::Oauth2::InvalidTokenError, msg
+      raise Lti::OAuth2::InvalidTokenError, msg
     end
   end
 
@@ -75,7 +75,7 @@ module Lti::IMS::AccessTokenHelper
     @_developer_key ||= access_token && begin
       tp = Lti::ToolProxy.find_by(guid: access_token.sub)
       if tp.present?
-        raise Lti::Oauth2::InvalidTokenError, 'Tool Proxy is not active' if tp.workflow_state != 'active'
+        raise Lti::OAuth2::InvalidTokenError, 'Tool Proxy is not active' if tp.workflow_state != 'active'
 
         validate_services!(tp)
         tp.product_family.developer_key

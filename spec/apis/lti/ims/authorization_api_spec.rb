@@ -94,7 +94,7 @@ module Lti
 
         it 'returns an access_token' do
           post auth_endpoint, params: params
-          access_token = Lti::Oauth2::AccessToken.create_jwt(aud: @request.host, sub: tool_proxy.guid)
+          access_token = Lti::OAuth2::AccessToken.create_jwt(aud: @request.host, sub: tool_proxy.guid)
           expect { access_token.validate! }.not_to raise_error
         end
 

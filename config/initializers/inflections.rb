@@ -26,4 +26,5 @@ ActiveSupport::Inflector.inflections do |inflect|
   inflect.acronym "IMS"
   inflect.acronym "CSV"
   inflect.acronym "OAuth"
+  inflect.acronym "OAuth2"
 end

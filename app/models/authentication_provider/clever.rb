@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AuthenticationProvider::Clever < AuthenticationProvider::Oauth2
+class AuthenticationProvider::Clever < AuthenticationProvider::OAuth2
   include AuthenticationProvider::PluginSettings
   self.plugin = :clever
   plugin_settings :client_id, client_secret: :client_secret_dec
