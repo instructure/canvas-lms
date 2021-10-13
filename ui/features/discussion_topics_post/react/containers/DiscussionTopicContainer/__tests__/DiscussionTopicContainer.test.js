@@ -325,24 +325,6 @@ describe('DiscussionTopicContainer', () => {
     )
   })
 
-  it('Renders Add Rubric in the kabob menu if the user has permission', () => {
-    const {getByTestId, getByText} = setup({discussionTopic: Discussion.mock()})
-    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-    expect(getByText('Add Rubric')).toBeInTheDocument()
-  })
-
-  it('Renders Show Rubric in the kabob menu if the user has permission', () => {
-    const {getByTestId, getByText} = setup({
-      discussionTopic: Discussion.mock({
-        permissions: DiscussionPermissions.mock({
-          addRubric: false
-        })
-      })
-    })
-    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-    expect(getByText('Show Rubric')).toBeInTheDocument()
-  })
-
   it('Renders Open for Comments in the kabob menu if the user has permission', () => {
     const {getByTestId, getByText} = setup({discussionTopic: Discussion.mock()})
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
@@ -735,6 +717,60 @@ describe('DiscussionTopicContainer', () => {
       const {queryByText} = setup(props)
 
       expect(queryByText('eer review for Morty Smith Due: Mar 31 5:59am')).toBeNull()
+    })
+
+    describe('PodcastFeed Button', () => {
+      it('does not render when Discussion Podcast Feed is not present', () => {
+        const {queryByTestId} = setup({discussionTopic: Discussion.mock()})
+        expect(queryByTestId('post-rssfeed')).toBeNull()
+      })
+
+      it('renders when Discussion Podcast Feed is present', () => {
+        const ln = document.createElement('link')
+        ln.title = 'Discussion Podcast Feed'
+        ln.type = 'application/rss+xml'
+        ln.href = 'http://localhost:3000/feeds/topics/47/enrollment_mhumV2R51z5IsK.rss'
+        document.head.append(ln)
+
+        const {getByTestId} = setup({discussionTopic: Discussion.mock()})
+        expect(getByTestId('post-rssfeed')).toBeTruthy()
+      })
+    })
+
+    describe('Rubric', () => {
+      it('Renders Add Rubric in the kabob menu if the user has permission', () => {
+        const {getByTestId, getByText} = setup({discussionTopic: Discussion.mock()})
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(getByText('Add Rubric')).toBeInTheDocument()
+      })
+
+      it('Renders Show Rubric in the kabob menu if the user has permission', () => {
+        const {getByTestId, getByText} = setup({
+          discussionTopic: Discussion.mock({
+            permissions: DiscussionPermissions.mock({
+              addRubric: false
+            })
+          })
+        })
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(getByText('Show Rubric')).toBeInTheDocument()
+      })
+
+      it('Renders hidden add_rubric_url for form if the user has permission', () => {
+        const {getByTestId} = setup({discussionTopic: Discussion.mock()})
+        expect(getByTestId('add_rubric_url')).toBeTruthy()
+      })
+
+      it('Does Not Render hidden add_rubric_url for form if the user does not have permission', () => {
+        const {queryByTestId} = setup({
+          discussionTopic: Discussion.mock({
+            permissions: DiscussionPermissions.mock({
+              addRubric: false
+            })
+          })
+        })
+        expect(queryByTestId('add_rubric_url')).toBeNull()
+      })
     })
   })
 })
