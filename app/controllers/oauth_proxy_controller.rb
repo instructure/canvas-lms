@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class OauthProxyController < ApplicationController
+class OAuthProxyController < ApplicationController
   skip_before_action :load_user
 
   def redirect_proxy

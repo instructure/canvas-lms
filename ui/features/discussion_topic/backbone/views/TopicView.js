@@ -42,7 +42,6 @@ export default class TopicView extends Backbone.View {
       'click .add_root_reply': 'addRootReply',
       'click .discussion_locked_toggler': 'toggleLocked',
       'click .toggle_due_dates': 'toggleDueDates',
-      'click .rte_switch_views_link': 'toggleEditorMode',
       'click .topic-subscribe-button': 'subscribeTopic',
       'click .topic-unsubscribe-button': 'unsubscribeTopic',
       'click .mark_all_as_read': 'markAllAsRead',
@@ -145,13 +144,6 @@ export default class TopicView extends Backbone.View {
     event.preventDefault()
     event.stopPropagation()
     RceCommandShim.send(this.$textarea, 'toggle')
-    // hide the clicked link, and show the other toggle link.
-    // todo: replace .andSelf with .addBack when JQuery is upgraded.
-    $(event.currentTarget)
-      .siblings('.rte_switch_views_link')
-      .andSelf()
-      .toggle()
-      .focus()
   }
 
   subscribeTopic(event) {
@@ -241,7 +233,6 @@ export default class TopicView extends Backbone.View {
       modelData.root = true
       modelData.title = ENV.DISCUSSION.TOPIC.TITLE
       modelData.isForMainDiscussion = true
-      modelData.use_rce_enhancements = ENV.use_rce_enhancements
       const html = replyTemplate(modelData)
       this.$('#discussion_topic').append(html)
     }
@@ -308,7 +299,8 @@ export default class TopicView extends Backbone.View {
 
   handleKeyDown(e) {
     const nodeName = e.target.nodeName.toLowerCase()
-    if (nodeName === 'input' || nodeName === 'textarea' || window.ENV.disable_keyboard_shortcuts) return
+    if (nodeName === 'input' || nodeName === 'textarea' || window.ENV.disable_keyboard_shortcuts)
+      return
     if (e.which !== 78) return // n
     this.addRootReply(e)
     e.preventDefault()

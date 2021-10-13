@@ -53,7 +53,6 @@ describe 'Canvadoc' do
 
   context 'as an admin' do
     before :each do
-      Account.default.enable_feature!(:rce_enhancements)
       stub_rcs_config
       site_admin_logged_in
       allow_any_instance_of(Canvadocs::API).to receive(:upload).and_return "id" => 1234

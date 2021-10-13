@@ -189,18 +189,16 @@ module Api::V1::Submission
       hash['has_originality_report'] = true
     end
 
-    if attempt.originality_data.present? && attempt.grants_right?(@current_user, :view_turnitin_report)
-      turnitin_hash = attempt.originality_data.dup
-      turnitin_hash.delete(:last_processed_attempt)
-      hash['turnitin_data'] = turnitin_hash
+    if (includes.include?('webhook_info') || attempt.originality_data.present?) && attempt.grants_right?(@current_user, :view_turnitin_report)
+      hash['turnitin_data'] = attempt.originality_data
+      hash['turnitin_data']['webhook_info'] = attempt.turnitin_data[:webhook_info] if includes.include?('webhook_info')
     end
 
     if attempt.vericite_data(false).present? &&
        attempt.can_view_plagiarism_report('vericite', @current_user, session) &&
        attempt.assignment.vericite_enabled?
       vericite_hash = attempt.vericite_data(false).dup
-      vericite_hash.delete(:last_processed_attempt)
-      hash['vericite_data'] = vericite_hash
+      hash['vericite_data'] = vericite_hash.except(:last_processed_attempt, :webhook_info)
     end
 
     if other_fields.include?('attachments')

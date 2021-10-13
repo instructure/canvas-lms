@@ -22,7 +22,7 @@ require_relative '../../gems/plugins/account_reports/spec_canvas/report_spec_hel
 require 'csv'
 
 # These tests and a subset of tests in gradebook_exporter_spec collectively cover csv_i18n_settings
-describe CsvWithI18n do
+describe CSVWithI18n do
   before(:once) do
     @account = account_model
     @admin = account_admin_user(account: @account)
@@ -32,43 +32,43 @@ describe CsvWithI18n do
     describe "byte_order mark" do
       it "is included when the user has it enabled" do
         @admin.enable_feature!(:include_byte_order_mark_in_gradebook_exports)
-        expect(CsvWithI18n.csv_i18n_settings(@admin)).to include(include_bom: true)
+        expect(CSVWithI18n.csv_i18n_settings(@admin)).to include(include_bom: true)
       end
 
       it "is excluded when the user has it disabled" do
         @admin.disable_feature!(:include_byte_order_mark_in_gradebook_exports)
-        expect(CsvWithI18n.csv_i18n_settings(@admin)).to include(include_bom: false)
+        expect(CSVWithI18n.csv_i18n_settings(@admin)).to include(include_bom: false)
       end
     end
 
     describe "column_separator" do
       it "respects the semicolon feature flag" do
         @admin.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
-        expect(CsvWithI18n.csv_i18n_settings(@admin)).to include(col_sep: ';')
+        expect(CSVWithI18n.csv_i18n_settings(@admin)).to include(col_sep: ';')
       end
 
       it "can automatically determine the column separator to use when asked to autodetect" do
         @admin.enable_feature!(:autodetect_field_separators_for_gradebook_exports)
         I18n.locale = :is
-        expect(CsvWithI18n.csv_i18n_settings(@admin)).to include(col_sep: ';')
+        expect(CSVWithI18n.csv_i18n_settings(@admin)).to include(col_sep: ';')
       end
 
       it "uses comma as the column separator when not asked to autodetect" do
         @admin.disable_feature!(:autodetect_field_separators_for_gradebook_exports)
         I18n.locale = :is
-        expect(CsvWithI18n.csv_i18n_settings(@admin)).to include(col_sep: ',')
+        expect(CSVWithI18n.csv_i18n_settings(@admin)).to include(col_sep: ',')
       end
     end
 
     it 'passes through other options' do
-      expect(CsvWithI18n.csv_i18n_settings(@admin, foo: 'bar')).to include(foo: 'bar')
+      expect(CSVWithI18n.csv_i18n_settings(@admin, foo: 'bar')).to include(foo: 'bar')
     end
 
-    it 'works alongside CsvWithI18n' do
+    it 'works alongside CSVWithI18n' do
       @admin.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
       @admin.enable_feature!(:include_byte_order_mark_in_gradebook_exports)
-      options = CsvWithI18n.csv_i18n_settings(@admin)
-      output = CsvWithI18n.generate(**options) do |csv|
+      options = CSVWithI18n.csv_i18n_settings(@admin)
+      output = CSVWithI18n.generate(**options) do |csv|
         csv << [1, 2]
         csv << [3, 4]
       end
@@ -76,9 +76,9 @@ describe CsvWithI18n do
     end
   end
 
-  describe 'CsvWithI18n' do
+  describe 'CSVWithI18n' do
     it 'does not add a bom if not set as an option' do
-      output = CsvWithI18n.generate do |csv|
+      output = CSVWithI18n.generate do |csv|
         csv << [1, 2]
         csv << [3, 4]
       end
@@ -86,7 +86,7 @@ describe CsvWithI18n do
     end
 
     it 'does add a bom if set as an option' do
-      output = CsvWithI18n.generate(include_bom: true) do |csv|
+      output = CSVWithI18n.generate(include_bom: true) do |csv|
         csv << [1, 2]
         csv << [3, 4]
       end

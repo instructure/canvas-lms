@@ -118,19 +118,28 @@ describe QuizzesNext::ExportService do
     before do
       allow(new_course).to receive(:uuid).and_return('100006')
       allow(new_course).to receive(:lti_context_id).and_return('ctx-1234')
+      allow(new_course).to receive(:name).and_return('Course Name')
 
       allow(root_account).to receive(:domain).and_return('canvas.instructure.com')
       allow(new_course).to receive(:root_account).and_return(root_account)
     end
 
     it 'emits live events for each copied assignment' do
+      payload = {
+        original_course_uuid: '100005',
+        new_course_uuid: '100006',
+        new_course_resource_link_id: 'ctx-1234',
+        domain: 'canvas.instructure.com',
+        new_course_name: 'Course Name'
+      }
+
       basic_import_content[:assignments] << {
         original_resource_link_id: 'link-5678',
         '$canvas_assignment_id': new_assignment2.id,
         original_assignment_id: old_assignment2.id
       }
 
-      expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).once
+      expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(payload).once
       ExportService.send_imported_content(new_course, content_migration, basic_import_content)
     end
 

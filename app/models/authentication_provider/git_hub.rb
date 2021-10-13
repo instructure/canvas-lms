@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AuthenticationProvider::GitHub < AuthenticationProvider::Oauth2
+class AuthenticationProvider::GitHub < AuthenticationProvider::OAuth2
   include AuthenticationProvider::PluginSettings
   self.plugin = :github
   plugin_settings :domain, :client_id, client_secret: :client_secret_dec

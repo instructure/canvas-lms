@@ -21,7 +21,7 @@
 module Stats
   class Counter
     attr_reader :max, :min, :sum, :sum_of_squares
-    alias :total :sum
+    alias_method :total, :sum
 
     def initialize(enumerable = [])
       @items = []
@@ -54,16 +54,16 @@ module Stats
       @sum += item
       @sum_of_squares += item**2
     end
-    alias :push :<<
+    alias_method :push, :<<
 
     def size; @items.size; end
-    alias :count :size
+    alias_method :count, :size
     def empty?; @items.size == 0; end
 
     def sum_of_squares; @sum_of_squares; end
 
     def mean; @items.empty? ? nil : (sum.to_f / @items.size); end
-    alias :avg :mean
+    alias_method :avg, :mean
 
     # population variance
     def var
@@ -72,11 +72,11 @@ module Stats
       results = (sum_of_squares.to_f / @items.size) - (mean**2)
       [0, results].max
     end
-    alias :variance :var
+    alias_method :variance, :var
 
     # population standard deviation
     def stddev; @items.empty? ? nil : Math::sqrt(variance); end
-    alias :standard_deviation :stddev
+    alias_method :standard_deviation, :stddev
 
     def quartiles
       # returns the 1st quartile, 2nd quartile (median),

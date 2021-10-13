@@ -51,7 +51,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
       oauth_start(integration)
       expect(response).to redirect_to("http://oauth.example.com/start")
 
-      oreq = OauthRequest.last
+      oreq = OAuthRequest.last
       expect(oreq).to be_present
       expect(oreq.service).to eq integration.underscore
       expect(oreq.token).to eq "test_token"
@@ -62,7 +62,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
     describe "oauth_success" do
       before do
-        OauthRequest.create!({
+        OAuthRequest.create!({
                                :service => integration.underscore,
                                :token => "test_token",
                                :secret => "test_secret",
@@ -79,7 +79,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
       end
 
       it "fails with the wrong user" do
-        OauthRequest.last.update_attribute(:user, User.create!)
+        OAuthRequest.last.update_attribute(:user, User.create!)
         get "/oauth_success?service=#{integration.underscore}&oauth_token=test_token&oauth_verifier=test_verifier"
         expect(response).to redirect_to(user_profile_url(@user))
         expect(flash[:error]).to be_present

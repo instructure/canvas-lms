@@ -128,6 +128,7 @@ class CanvadocSessionsController < ApplicationController
       # either the context of the attachment or the attachments' user
       if (attachment.context == @current_user) || (attachment.user == @current_user)
         attachment.touch(:viewed_at)
+        @current_user&.mark_submission_annotations_read!(submission) if submission && opts[:enable_annotations]
       end
 
       redirect_to url

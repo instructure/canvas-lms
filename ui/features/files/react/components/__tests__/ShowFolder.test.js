@@ -59,7 +59,8 @@ describe('ShowFolder', () => {
       COURSE_ID: '101',
       FEATURES: {
         files_dnd: true
-      }
+      },
+      context_asset_string: 'course_17'
     }
     sandbox = sinon.createSandbox()
     sandbox.stub(Folder, 'resolvePath').returns(new Promise(() => {}))

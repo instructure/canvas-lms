@@ -91,17 +91,6 @@ describe('TextEntry', () => {
 
     describe('when the RCE has finished rendering', () => {
       describe('read-only mode', () => {
-        it('is enabled if the readOnly prop is true', async () => {
-          await renderEditor(
-            await makeProps({
-              readOnly: true
-            })
-          )
-          await waitFor(() => {
-            expect(fakeEditor.readonly).toBeTruthy()
-          })
-        })
-
         it('is not enabled if the readOnly prop is false', async () => {
           await renderEditor()
           await waitFor(() => {
@@ -168,6 +157,36 @@ describe('TextEntry', () => {
           const textarea = await findByDisplayValue('', {exact: true})
           expect(textarea).toBeInTheDocument()
         })
+
+        it('renders the content in the read-only-content div when readOnly is true', async () => {
+          const props = await makeProps({
+            readOnly: true,
+            submission: {
+              id: '1',
+              _id: '1',
+              body: '<p>HELLO WORLD</p>',
+              state: 'unsubmitted'
+            }
+          })
+          const {queryByTestId} = await renderEditor(props)
+          expect(await queryByTestId('read-only-content')).toBeInTheDocument()
+          expect(queryByTestId('text-editor')).not.toBeInTheDocument()
+        })
+
+        it('renders the content in the rce component when readOnly is false', async () => {
+          const props = await makeProps({
+            readOnly: false,
+            submission: {
+              id: '1',
+              _id: '1',
+              body: '<p>HELLO WORLD</p>',
+              state: 'unsubmitted'
+            }
+          })
+          const {queryByTestId} = await renderEditor(props)
+          expect(await queryByTestId('text-editor')).toBeInTheDocument()
+          expect(queryByTestId('read-only-content')).not.toBeInTheDocument()
+        })
       })
     })
   })
@@ -186,23 +205,6 @@ describe('TextEntry', () => {
       const result = await renderEditor(props)
       return result
     }
-
-    it('updates the mode of the editor if the readOnly prop has changed', async () => {
-      const {rerender} = await doInitialRender()
-      const newProps = await makeProps({
-        readOnly: true,
-        submission: initialSubmission
-      })
-      await waitFor(() => {
-        expect(fakeEditor.readonly).toStrictEqual(false)
-      })
-
-      rerender(<TextEntry {...newProps} />)
-
-      await waitFor(() => {
-        expect(fakeEditor.readonly).toStrictEqual(true)
-      })
-    })
 
     it('does not update the mode of the editor if the readOnly prop has not changed', async () => {
       const {rerender} = await doInitialRender()
@@ -356,10 +358,6 @@ describe('TextEntry', () => {
     it('is not called for any changes inexplicably emitted in read-only mode', async () => {
       const props = await makeProps({readOnly: true})
       await renderEditor(props)
-
-      fakeEditor.setContent('No')
-      jest.advanceTimersByTime(500)
-      fakeEditor.setContent('No way')
 
       jest.advanceTimersByTime(3000)
       expect(props.createSubmissionDraft).not.toHaveBeenCalled()

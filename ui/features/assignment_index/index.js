@@ -30,6 +30,11 @@ import splitAssetString from '@canvas/util/splitAssetString'
 import {getPrefetchedXHR} from '@instructure/js-utils'
 import {monitorLtiMessages} from '@canvas/lti/jquery/messages'
 import ready from '@instructure/ready'
+import {
+  addDeepLinkingListener,
+  handleDeepLinking,
+  reloadPage
+} from '@canvas/deep-linking/DeepLinking'
 
 const course = new Course({
   id: encodeURIComponent(splitAssetString(ENV.context_asset_string)[1]),
@@ -130,4 +135,8 @@ ready(() => {
     })
 
   monitorLtiMessages()
+
+  if (ENV.FEATURES?.lti_multiple_assignment_deep_linking) {
+    addDeepLinkingListener(reloadPage)
+  }
 })

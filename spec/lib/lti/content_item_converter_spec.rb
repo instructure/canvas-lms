@@ -48,9 +48,9 @@ module Lti
         file_selection
       end
 
-      it 'creates a IMS::LTI::Models::ContentItems::ContentItem' do
+      it 'creates a ::IMS::LTI::Models::ContentItems::ContentItem' do
         content_item = described_class.convert_resource_selection(fake_selection)
-        expect(content_item).to be_a IMS::LTI::Models::ContentItems::ContentItem
+        expect(content_item).to be_a ::IMS::LTI::Models::ContentItems::ContentItem
       end
 
       it 'converts url to id' do
@@ -101,9 +101,9 @@ module Lti
       end
 
       context 'file_selection' do
-        it 'creates a IMS::LTI::Models::ContentItems::FileItem' do
+        it 'creates a ::IMS::LTI::Models::ContentItems::FileItem' do
           content_item = described_class.convert_resource_selection(file_selection)
-          expect(content_item).to be_a IMS::LTI::Models::ContentItems::FileItem
+          expect(content_item).to be_a ::IMS::LTI::Models::ContentItems::FileItem
         end
 
         it 'sets the presentation_document_target to download' do
@@ -139,9 +139,9 @@ module Lti
       end
 
       context 'lti_link' do
-        it 'creates a IMS::LTI::Models::ContentItems::LtiLinkItem' do
+        it 'creates a ::IMS::LTI::Models::ContentItems::LtiLinkItem' do
           content_item = described_class.convert_resource_selection(lti_link)
-          expect(content_item).to be_a IMS::LTI::Models::ContentItems::LtiLinkItem
+          expect(content_item).to be_a ::IMS::LTI::Models::ContentItems::LtiLinkItem
         end
 
         it 'sets the media_type to application/vnd.ims.lti.v1.ltilink' do

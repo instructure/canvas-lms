@@ -521,6 +521,18 @@ describe Course do
     end
   end
 
+  describe 'allow_student_discussion_reporting' do
+    it 'defaults to true' do
+      expect(@course.allow_student_discussion_reporting).to eq true
+    end
+
+    it 'allows setting and getting' do
+      @course.allow_student_discussion_reporting = false
+      @course.save!
+      expect(@course.allow_student_discussion_reporting).to eq false
+    end
+  end
+
   describe "allow_student_discussion_topics" do
     it "defaults true" do
       expect(@course.allow_student_discussion_topics).to eq true
@@ -3054,6 +3066,34 @@ describe Course, "tabs_available" do
       expect(tabs).not_to be_include("Item Banks")
     end
 
+    context "when 'Item Banks' has been added to the course navigation links" do
+      let!(:quiz_lti_tool) do
+        @course.context_external_tools.create!(
+          :url => "http://example.com/ims/lti",
+          :consumer_key => "asdf",
+          :shared_secret => "hjkl",
+          :name => "external tool 1",
+          :course_navigation => {
+            :text => "Item Banks",
+            :url => "http://example.com/ims/lti",
+            :default => false,
+          }
+        )
+      end
+
+      before do
+        @course.update!(tab_configuration: [{ :id => "context_external_tool_#{quiz_lti_tool.id}" }])
+      end
+
+      it "does not make the item banks tab available for students" do
+        external_tool_tabs = @course.external_tool_tabs({}, @user).pluck(:label)
+        expect(external_tool_tabs).to include("Item Banks")
+
+        available_tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
+        expect(available_tabs).not_to include("Item Banks")
+      end
+    end
+
     it 'sets the target value on the tab if the external tool has a windowTarget' do
       tool = @course.context_external_tools.create!(
         :url => "http://example.com/ims/lti",
@@ -5136,7 +5176,9 @@ describe Course, "#sync_homeroom_enrollments" do
     @homeroom_course.enroll_user(@student, "StudentEnrollment").accept
 
     @observer = User.create
-    @homeroom_course.enroll_user(@observer, "ObserverEnrollment").accept
+    observer_enrollment = @homeroom_course.enroll_user(@observer, "ObserverEnrollment")
+    observer_enrollment.accept
+    observer_enrollment.update(associated_user_id: @student.id)
 
     @course = course_factory(active_course: true, account: @homeroom_course.account)
     @course.sync_enrollments_from_homeroom = true
@@ -5154,6 +5196,7 @@ describe Course, "#sync_homeroom_enrollments" do
     expect(@course.user_is_instructor?(@ta)).to eq(true)
     expect(@course.user_is_student?(@student)).to eq(true)
     expect(@course.user_has_been_observer?(@observer)).to eq(true)
+    expect(@course.observer_enrollments.first.associated_user_id).to eq(@student.id)
   end
 
   it "readds enrollments deleted on subject courses" do

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Canvas::Oauth
+module Canvas::OAuth
   class Token
     attr_reader :key, :code
 
@@ -93,6 +93,9 @@ module Canvas::Oauth
                                                  purpose: purpose
                                                })
         @access_token.real_user = real_user if real_user && real_user != user
+
+        expires_in = key.tokens_expire_in
+        @access_token.permanent_expires_at = Time.now.utc + expires_in if expires_in
 
         @access_token.save!
 

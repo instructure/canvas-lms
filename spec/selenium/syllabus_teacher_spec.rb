@@ -46,7 +46,6 @@ describe "course syllabus" do
 
   context "as a teacher" do
     before(:each) do
-      Account.default.enable_feature!(:rce_enhancements)
       stub_rcs_config
       course_with_teacher_logged_in
       @group = @course.assignment_groups.create!(:name => 'first assignment group')

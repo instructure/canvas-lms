@@ -37,7 +37,7 @@ module Lti::MembershipService
         it 'sets sane defaults when no options are set' do
           collator = CourseGroupCollator.new(@course)
 
-          # expect(collator.role).to eq(IMS::LIS::ContextType::URNs::Group)
+          # expect(collator.role).to eq(::IMS::LIS::ContextType::URNs::Group)
           expect(collator.per_page).to eq(Api.per_page)
           expect(collator.page).to eq(1)
         end
@@ -69,7 +69,7 @@ module Lti::MembershipService
           expect(collator.per_page).to eq(Api.max_per_page)
         end
 
-        it 'generates a list of IMS::LTI::Models::Membership objects' do
+        it 'generates a list of ::IMS::LTI::Models::Membership objects' do
           collator = CourseGroupCollator.new(@course)
           @teacher.reload
           memberships = collator.memberships
@@ -77,8 +77,8 @@ module Lti::MembershipService
 
           expect(memberships.size).to eq(10)
 
-          expect(membership.status).to eq(IMS::LIS::Statuses::SimpleNames::Active)
-          expect(membership.role).to match_array([IMS::LIS::ContextType::URNs::Group])
+          expect(membership.status).to eq(::IMS::LIS::Statuses::SimpleNames::Active)
+          expect(membership.role).to match_array([::IMS::LIS::ContextType::URNs::Group])
           expect(membership.member.name).to eq("Group 0")
         end
       end

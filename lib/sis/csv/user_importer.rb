@@ -59,6 +59,7 @@ module SIS
           last_name: row['last_name'],
           email: row['email'],
           pronouns: row['pronouns'],
+          declared_user_type: row['declared_user_type'],
           password: row['password'],
           ssha_password: row['ssha_password'],
           integration_id: row['integration_id'],

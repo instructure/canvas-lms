@@ -58,7 +58,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
           ce.save
 
           cm.save
-          worker = Canvas::Migration::Worker::CCWorker.new
+          worker = CC::Importer::CCWorker.new
           worker.migration_id = cm.id
           worker.perform
           cm.reload

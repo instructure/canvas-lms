@@ -64,15 +64,15 @@ module Lti::MembershipService
           expect(collator.per_page).to eq(Api.max_per_page)
         end
 
-        it 'generates a list of IMS::LTI::Models::Membership objects' do
+        it 'generates a list of ::IMS::LTI::Models::Membership objects' do
           collator = CourseLisPersonCollator.new(@course, @teacher)
           memberships = collator.memberships
           @teacher.reload
           membership = memberships[0]
 
           expect(memberships.size).to eq(1)
-          expect(membership.status).to eq(IMS::LIS::Statuses::SimpleNames::Active)
-          expect(membership.role).to match_array([IMS::LIS::Roles::Context::URNs::Instructor])
+          expect(membership.status).to eq(::IMS::LIS::Statuses::SimpleNames::Active)
+          expect(membership.role).to match_array([::IMS::LIS::Roles::Context::URNs::Instructor])
           expect(membership.member.name).to eq(@teacher.name)
           expect(membership.member.given_name).to eq(@teacher.first_name)
           expect(membership.member.family_name).to eq(@teacher.last_name)
@@ -112,7 +112,7 @@ module Lti::MembershipService
       Lti::Asset.opaque_identifier_for(@teacher, context: @course)
       course_with_student(user: @teacher)
       memberships = collator.memberships
-      expect(memberships.map(&:role)).to eq([[IMS::LIS::Roles::Context::URNs::Instructor]])
+      expect(memberships.map(&:role)).to eq([[::IMS::LIS::Roles::Context::URNs::Instructor]])
     end
 
     it 'does not show past_lti_ids from other contexts' do
@@ -141,11 +141,11 @@ module Lti::MembershipService
 
         expect(memberships.size).to eq(1)
         expect(membership.role).to match_array([
-                                                 IMS::LIS::Roles::Context::URNs::Instructor,
-                                                 IMS::LIS::Roles::Context::URNs::TeachingAssistant,
-                                                 IMS::LIS::Roles::Context::URNs::ContentDeveloper,
-                                                 IMS::LIS::Roles::Context::URNs::Learner,
-                                                 IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner
+                                                 ::IMS::LIS::Roles::Context::URNs::Instructor,
+                                                 ::IMS::LIS::Roles::Context::URNs::TeachingAssistant,
+                                                 ::IMS::LIS::Roles::Context::URNs::ContentDeveloper,
+                                                 ::IMS::LIS::Roles::Context::URNs::Learner,
+                                                 ::IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner
                                                ])
       end
 
@@ -158,10 +158,10 @@ module Lti::MembershipService
 
         expect(memberships.size).to eq(1)
         expect(membership.role).to match_array([
-                                                 IMS::LIS::Roles::Context::URNs::TeachingAssistant,
-                                                 IMS::LIS::Roles::Context::URNs::ContentDeveloper,
-                                                 IMS::LIS::Roles::Context::URNs::Learner,
-                                                 IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner
+                                                 ::IMS::LIS::Roles::Context::URNs::TeachingAssistant,
+                                                 ::IMS::LIS::Roles::Context::URNs::ContentDeveloper,
+                                                 ::IMS::LIS::Roles::Context::URNs::Learner,
+                                                 ::IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner
                                                ])
       end
     end
@@ -201,11 +201,11 @@ module Lti::MembershipService
         student = memberships.find { |m| m.member.user_id == @student.lti_context_id }
         observer = memberships.find { |m| m.member.user_id == @observer.lti_context_id }
 
-        expect(teacher.role).to match_array([IMS::LIS::Roles::Context::URNs::Instructor])
-        expect(ta.role).to match_array([IMS::LIS::Roles::Context::URNs::TeachingAssistant])
-        expect(designer.role).to match_array([IMS::LIS::Roles::Context::URNs::ContentDeveloper])
-        expect(student.role).to match_array([IMS::LIS::Roles::Context::URNs::Learner])
-        expect(observer.role).to match_array([IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner])
+        expect(teacher.role).to match_array([::IMS::LIS::Roles::Context::URNs::Instructor])
+        expect(ta.role).to match_array([::IMS::LIS::Roles::Context::URNs::TeachingAssistant])
+        expect(designer.role).to match_array([::IMS::LIS::Roles::Context::URNs::ContentDeveloper])
+        expect(student.role).to match_array([::IMS::LIS::Roles::Context::URNs::Learner])
+        expect(observer.role).to match_array([::IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner])
       end
 
       it 'adds the sis_id to the payload if present' do

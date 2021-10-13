@@ -128,6 +128,10 @@ module MicrosoftSync
 
     class TeamAlreadyExists < StandardError; end
 
+    class OwnersQuotaExceeded < StandardError; end
+
+    class MembersQuotaExceeded < StandardError; end
+
     # Makes public the status code but not anything about the response body.
     # The internal error message has the response body (truncated)
     # Use for() instead of new; this creates a subclass based on the status
@@ -137,7 +141,7 @@ module MicrosoftSync
       attr_reader :code
 
       def self.public_message
-        I18n.t 'Unexpected reponse from Microsoft API: got %{status_code} status code'
+        I18n.t 'Unexpected response from Microsoft API: got %{status_code} status code'
       end
 
       def public_interpolated_values

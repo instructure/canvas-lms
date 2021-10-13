@@ -68,7 +68,7 @@ actions.searchPermissions = function searchPermissions({permissionSearchString, 
   }
 }
 
-actions.createNewRole = function(label, baseRole, context) {
+actions.createNewRole = function (label, baseRole, context) {
   return (dispatch, getState) => {
     dispatch(actions.addTraySavingStart())
     const roleContext = context
@@ -94,7 +94,7 @@ actions.createNewRole = function(label, baseRole, context) {
   }
 }
 
-actions.updateRoleName = function(id, label, baseType) {
+actions.updateRoleName = function (id, label, baseType) {
   return (dispatch, getState) => {
     apiClient
       .updateRole(getState().contextId, id, {label, base_role_type: baseType})
@@ -107,21 +107,21 @@ actions.updateRoleName = function(id, label, baseType) {
   }
 }
 
-actions.setAndOpenRoleTray = function(role) {
+actions.setAndOpenRoleTray = function (role) {
   return dispatch => {
     dispatch(actions.hideAllTrays())
     dispatch(actions.displayRoleTray({role}))
   }
 }
 
-actions.setAndOpenAddTray = function() {
+actions.setAndOpenAddTray = function () {
   return dispatch => {
     dispatch(actions.hideAllTrays())
     dispatch(actions.displayAddTray())
   }
 }
 
-actions.setAndOpenPermissionTray = function(permission) {
+actions.setAndOpenPermissionTray = function (permission) {
   return dispatch => {
     dispatch(actions.hideAllTrays())
     dispatch(actions.displayPermissionTray({permission}))
@@ -176,7 +176,7 @@ actions.modifyPermissions = function modifyPermissions({
   }
 }
 
-actions.deleteRole = function(role, successCallback, failCallback) {
+actions.deleteRole = function (role, successCallback, failCallback) {
   return (dispatch, getState) => {
     const selectedRoles = getState().selectedRoles
     apiClient

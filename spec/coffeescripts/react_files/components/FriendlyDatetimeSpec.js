@@ -72,7 +72,7 @@ test('parses datetime from a Date', () => {
 
 test('renders the prefix if a prefix is supplied', () => {
   const fDT = React.createFactory(FriendlyDatetime)
-  const rendered = TestUtils.renderIntoDocument(fDT({dateTime: '1970-01-17', prefix: 'foobar '}))
+  const rendered = TestUtils.renderIntoDocument(fDT({dateTime: '1970-01-17', prefix: 'foobar ', prefixMobile: 'foobaz '}))
   equal(
     $(rendered.time)
       .find('.visible-desktop')
@@ -84,7 +84,7 @@ test('renders the prefix if a prefix is supplied', () => {
     $(rendered.time)
       .find('.hidden-desktop')
       .text(),
-    '1/17/1970',
+    'foobaz 1/17/1970',
     'converts to readable format'
   )
   ReactDOM.unmountComponentAtNode(rendered.time.parentNode)
@@ -92,7 +92,7 @@ test('renders the prefix if a prefix is supplied', () => {
 
 test('will automatically put a space on the prefix if necessary', () => {
   const fDT = React.createFactory(FriendlyDatetime)
-  const rendered = TestUtils.renderIntoDocument(fDT({dateTime: '1970-01-17', prefix: 'foobar'}))
+  const rendered = TestUtils.renderIntoDocument(fDT({dateTime: '1970-01-17', prefix: 'foobar', prefixMobile: 'foobaz'}))
   equal(
     $(rendered.time)
       .find('.visible-desktop')
@@ -104,7 +104,7 @@ test('will automatically put a space on the prefix if necessary', () => {
     $(rendered.time)
       .find('.hidden-desktop')
       .text(),
-    '1/17/1970',
+    'foobaz 1/17/1970',
     'converts to readable format'
   )
   ReactDOM.unmountComponentAtNode(rendered.time.parentNode)

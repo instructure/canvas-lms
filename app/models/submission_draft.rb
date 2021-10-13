@@ -30,11 +30,13 @@ class SubmissionDraft < ActiveRecord::Base
   validates :body, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
   validate :submission_attempt_matches_submission
   validates :url, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :lti_launch_url, length: { maximum: maximum_text_length, allow_blank: true }
   validate :media_object_id_matches_media_object
 
   sanitize_field :body, CanvasSanitize::SANITIZE
 
   before_save :validate_url
+  before_save :validate_lti_launch_url
 
   def validate_url
     if self.url.present?
@@ -47,6 +49,15 @@ class SubmissionDraft < ActiveRecord::Base
         return
       end
     end
+  end
+
+  def validate_lti_launch_url
+    return if lti_launch_url.blank?
+
+    value, = CanvasHttp.validate_url(lti_launch_url)
+    self.send("lti_launch_url=", value) if value
+  rescue
+    # we couldn't validate, just leave it
   end
 
   def media_object_id_matches_media_object
@@ -94,6 +105,17 @@ class SubmissionDraft < ActiveRecord::Base
     self.submission.annotation_context(in_progress: true).present?
   end
 
+  def meets_basic_lti_launch_criteria?
+    return false if lti_launch_url.blank?
+
+    begin
+      CanvasHttp.validate_url(lti_launch_url)
+      true
+    rescue
+      false
+    end
+  end
+
   # this checks if any type on the assignment is drafted
   def meets_assignment_criteria?
     submission_types = self.submission.assignment.submission_types.split(',')
@@ -104,7 +126,7 @@ class SubmissionDraft < ActiveRecord::Base
       when 'online_text_entry'
         return true if meets_text_entry_criteria?
       when 'online_upload'
-        return true if meets_upload_criteria?
+        return true if meets_upload_criteria? || meets_basic_lti_launch_criteria?
       when 'online_url'
         return true if meets_url_criteria?
       when 'student_annotation'

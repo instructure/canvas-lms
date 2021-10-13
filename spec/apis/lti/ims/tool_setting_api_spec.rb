@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require_dependency "lti/ims/tool_setting_controller"
 
 module Lti
-  module Ims
+  module IMS
     describe ToolSettingController, type: :request do
       let(:account) { Account.new }
       let(:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
@@ -40,7 +40,7 @@ module Lti
       end
       let(:resource_handler) { ResourceHandler.create!(resource_type_code: 'code', name: 'name', tool_proxy: tool_proxy) }
       let(:message_handler) { MessageHandler.create(message_type: 'basic-lti-launch-request', launch_path: 'https://samplelaunch/blti', resource_handler: resource_handler) }
-      let(:access_token) { Lti::Oauth2::AccessToken.create_jwt(aud: nil, sub: tool_proxy.guid).to_s }
+      let(:access_token) { Lti::OAuth2::AccessToken.create_jwt(aud: nil, sub: tool_proxy.guid).to_s }
 
       before do
         allow_any_instance_of(ToolSettingController).to receive_messages(oauth_authenticated_request?: true)

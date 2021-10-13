@@ -108,4 +108,14 @@ QUnit.module('StudentDatastore', hooks => {
       .find(student => student.id === '1102')
     strictEqual(placeholderStudent.isPlaceholder, true)
   })
+
+  test('optionally excludes placeholder students', () => {
+    const students = [{id: '1103'}, {id: '1101'}]
+    studentDatastore.addUserStudents(students)
+    studentDatastore.setStudentIds(['1101', '1102', '1103'])
+    const placeholderStudent = studentDatastore
+      .listStudents({includePlaceholders: false})
+      .find(student => student.id === '1102')
+    notOk(placeholderStudent)
+  })
 })

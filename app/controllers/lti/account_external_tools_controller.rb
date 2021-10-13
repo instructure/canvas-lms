@@ -27,7 +27,7 @@ module Lti
   # the account external tools scope on the LTI key.
 
   class AccountExternalToolsController < ApplicationController
-    include Ims::Concerns::AdvantageServices
+    include ::Lti::IMS::Concerns::AdvantageServices
     include Api::V1::ExternalTools
 
     before_action :verify_target_developer_key, only: [:create, :update]

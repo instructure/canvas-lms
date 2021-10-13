@@ -31,12 +31,14 @@ class DetailsToggle extends React.Component {
     detailItems: arrayOf(propTypes.permissionDetails).isRequired
   }
 
-  renderDetailGroup(item) {
+  renderDetailGroup(item, key) {
     return (
-      <View key={item.title} margin="small" padding="small">
-        <Text weight="bold" as="div">
-          {item.title}
-        </Text>
+      <View key={key} margin="none small none small" padding="small">
+        {item.title && (
+          <Text weight="bold" as="div">
+            {item.title}
+          </Text>
+        )}
         <Text weight="normal" as="div">
           {item.description}
         </Text>
@@ -51,12 +53,12 @@ class DetailsToggle extends React.Component {
     return (
       <ToggleDetails
         summary={
-          <Text weight="bold" as="h3">
+          <Text weight="bold" transform="uppercase" as="h3">
             {this.props.title}
           </Text>
         }
       >
-        {this.props.detailItems.map(item => this.renderDetailGroup(item))}
+        {this.props.detailItems.map((item, index) => this.renderDetailGroup(item, index))}
       </ToggleDetails>
     )
   }

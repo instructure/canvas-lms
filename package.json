@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@instructure/brandable_css": "^3",
-    "@instructure/canvas-rce-old": "4.1.5",
     "@instructure/canvas-theme": "^7",
     "@instructure/debounce": "^7",
     "@instructure/js-utils": ">=1",

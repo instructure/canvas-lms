@@ -51,6 +51,11 @@ const nameLengthHelper = function (
   ENV.MAX_NAME_LENGTH = maxNameLength
   return view.validateBeforeSave({name, post_to_sis: postToSis, grading_type: gradingType}, {})
 }
+
+// the async nature of RCE initialization makes it really hard to unit test
+// stub out the function that kicks it off
+EditView.prototype._attachEditorToDescription = () => {}
+
 const editView = function (assignmentOpts = {}) {
   const defaultAssignmentOpts = {
     name: 'Test Assignment',
@@ -138,7 +143,6 @@ QUnit.module('EditView', {
   teardown() {
     this.server.restore()
     fakeENV.teardown()
-    tinymce.remove() // Make sure we clean stuff up
     $('.ui-dialog').remove()
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()
@@ -152,7 +156,7 @@ QUnit.module('EditView', {
 test('should be accessible', function (assert) {
   const view = this.editView()
   const done = assert.async()
-  assertions.isAccessible(view, done, {a11yReport: true})
+  assertions.isAccessible(view, () => done(), {a11yReport: true})
 })
 
 test('renders', function () {
@@ -1117,7 +1121,7 @@ test('saves valid attributes to localstorage', function () {
   sandbox.stub(view, 'getFormData').returns({points_possible: 34})
   userSettings.contextSet('new_assignment_settings', {})
   view.cacheAssignmentSettings()
-  equal(34, userSettings.contextGet('new_assignment_settings').points_possible)
+  equal(userSettings.contextGet('new_assignment_settings').points_possible, 34)
 })
 
 test('rejects invalid attributes when caching', function () {
@@ -1125,7 +1129,7 @@ test('rejects invalid attributes when caching', function () {
   sandbox.stub(view, 'getFormData').returns({invalid_attribute_example: 30})
   userSettings.contextSet('new_assignment_settings', {})
   view.cacheAssignmentSettings()
-  equal(null, userSettings.contextGet('new_assignment_settings').invalid_attribute_example)
+  equal(userSettings.contextGet('new_assignment_settings').invalid_attribute_example, null)
 })
 
 QUnit.module('EditView: Conditional Release', {
@@ -1162,7 +1166,7 @@ QUnit.module('EditView: Conditional Release', {
 
 test('attaches conditional release editor', function () {
   const view = this.editView()
-  equal(1, view.$conditionalReleaseTarget.children().size())
+  equal(view.$conditionalReleaseTarget.children().size(), 1)
 })
 
 test('calls update on first switch', function () {
@@ -1192,9 +1196,9 @@ test('does not call update when not modified', function () {
 test('validates conditional release', function () {
   const view = this.editView()
   ENV.ASSIGNMENT = view.assignment
-  const stub = sandbox.stub(view.conditionalReleaseEditor, 'validateBeforeSave').returns('foo')
+  sandbox.stub(view.conditionalReleaseEditor, 'validateBeforeSave').returns('foo')
   const errors = view.validateBeforeSave(view.getFormData(), {})
-  ok(errors.conditional_release === 'foo')
+  strictEqual(errors.conditional_release, 'foo')
 })
 
 test('calls save in conditional release', function (assert) {
@@ -1395,7 +1399,8 @@ QUnit.module('EditView: Quizzes 2', {
     this.view = editView({
       html_url: 'http://foo',
       submission_types: ['external_tool'],
-      is_quiz_lti_assignment: true
+      is_quiz_lti_assignment: true,
+      frozen_attributes: ['submission_types']
     })
   },
   teardown() {
@@ -1428,6 +1433,18 @@ test('save routes to cancelLocation', function () {
 
 test('build adds full_width display param to normal route', function () {
   equal(this.view.locationAfterSave({}), 'http://foo?display=full_width')
+})
+
+test('does not allow user to change submission type', function () {
+  equal(this.view.$('#assignment_submission_type').prop('disabled'), true)
+})
+
+test('does not allow user to change external tool url', function () {
+  equal(this.view.$('#assignment_external_tool_tag_attributes_url').prop('disabled'), true)
+})
+
+test('does not allow user to choose a new external tool', function () {
+  equal(this.view.$('#assignment_external_tool_tag_attributes_url_find').prop('disabled'), true)
 })
 
 QUnit.module('EditView: anonymous grading', hooks => {
@@ -2022,7 +2039,6 @@ QUnit.module('EditView student annotation submission', hooks => {
   hooks.afterEach(() => {
     server.restore()
     fakeENV.teardown()
-    tinymce.remove() // Make sure we clean stuff up
     $('.ui-dialog').remove()
     $('ul[id^=ui-id-]').remove()
     $('.form-dialog').remove()

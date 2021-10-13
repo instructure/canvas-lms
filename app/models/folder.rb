@@ -499,7 +499,7 @@ class Folder < ActiveRecord::Base
   def currently_locked
     self.locked || (self.lock_at && Time.zone.now > self.lock_at) || (self.unlock_at && Time.zone.now < self.unlock_at) || self.workflow_state == 'hidden'
   end
-  alias currently_locked? currently_locked
+  alias_method :currently_locked?, :currently_locked
 
   set_policy do
     given { |user, session| self.visible? && self.context.grants_right?(user, session, :read) }

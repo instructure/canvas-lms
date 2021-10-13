@@ -38,6 +38,7 @@ export const CREATE_SUBMISSION = gql`
     $body: String
     $fileIds: [ID!]
     $mediaId: ID
+    $resourceLinkLookupUuid: String
     $url: String
   ) {
     createSubmission(
@@ -47,6 +48,7 @@ export const CREATE_SUBMISSION = gql`
         body: $body
         fileIds: $fileIds
         mediaId: $mediaId
+        resourceLinkLookupUuid: $resourceLinkLookupUuid
         url: $url
       }
     ) {
@@ -99,8 +101,11 @@ export const CREATE_SUBMISSION_DRAFT = gql`
     $activeSubmissionType: DraftableSubmissionType!
     $attempt: Int!
     $body: String
+    $externalToolId: ID
     $fileIds: [ID!]
+    $ltiLaunchUrl: String
     $mediaId: ID
+    $resourceLinkLookupUuid: String
     $url: String
   ) {
     createSubmissionDraft(
@@ -109,8 +114,11 @@ export const CREATE_SUBMISSION_DRAFT = gql`
         activeSubmissionType: $activeSubmissionType
         attempt: $attempt
         body: $body
+        externalToolId: $externalToolId
         fileIds: $fileIds
+        ltiLaunchUrl: $ltiLaunchUrl
         mediaId: $mediaId
+        resourceLinkLookupUuid: $resourceLinkLookupUuid
         url: $url
       }
     ) {

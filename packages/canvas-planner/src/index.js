@@ -198,7 +198,7 @@ export function initializePlanner(options) {
 
     externalPlannerActive = () => options.getActiveApp() === 'planner'
 
-    i18n.init(options.env.MOMENT_LOCALE)
+    i18n.init(options.env.LOCALE)
     moment.locale(options.env.MOMENT_LOCALE)
     moment.tz.setDefault(options.env.TIMEZONE)
     initializeAlerts({

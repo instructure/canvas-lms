@@ -257,13 +257,10 @@ module Interfaces::SubmissionInterface
   def turnitin_data
     return nil if object.turnitin_data.empty?
 
-    promises = object.turnitin_data.keys
-                     .reject { |key| key == :last_processed_attempt }
-                     .map do |asset_string|
+    promises = object.turnitin_data.except(:last_processed_attempt, :webhook_info).map do |asset_string, data|
       Loaders::AssetStringLoader.load(asset_string).then do |turnitin_context|
         next if turnitin_context.nil?
 
-        data = object.turnitin_data[asset_string]
         {
           target: turnitin_context,
           score: data[:similarity_score],
@@ -276,6 +273,9 @@ module Interfaces::SubmissionInterface
 
   field :submission_draft, Types::SubmissionDraftType, null: true
   def submission_draft
+    # Other users (e.g. Observers) should not be able to see submission drafts
+    return nil if submission.user != current_user
+
     load_association(:submission_drafts).then do |drafts|
       # Submission.attempt can be in either 0 or nil which mean the same thing
       target_attempt = (object.attempt || 0) + 1
@@ -318,6 +318,8 @@ module Interfaces::SubmissionInterface
   end
 
   field :url, Types::UrlType, null: true
+
+  field :resource_link_lookup_uuid, String, null: true
 
   field :extra_attempts, Integer, null: true
 end

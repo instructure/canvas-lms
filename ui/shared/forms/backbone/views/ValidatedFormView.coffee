@@ -81,8 +81,7 @@ export default class ValidatedFormView extends Backbone.View
 
     okayToContinue = true
     if rceInputs.length > 0
-      if window.ENV.use_rce_enhancements
-        okayToContinue = rceInputs.map((rce) => sendFunc($(rce), 'checkReadyToGetCode', window.confirm)).every((value) => value)
+      okayToContinue = rceInputs.map((rce) => sendFunc($(rce), 'checkReadyToGetCode', window.confirm)).every((value) => value)
 
     if !okayToContinue
       return

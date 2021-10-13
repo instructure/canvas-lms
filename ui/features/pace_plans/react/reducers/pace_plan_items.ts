@@ -25,7 +25,7 @@ const itemsReducer = (state: PacePlanItem[], action: PacePlanItemAction): PacePl
   switch (action.type) {
     case PacePlanItemConstants.SET_PLAN_ITEM_DURATION:
       return state.map(item => {
-        return item.id === action.payload.planItemId
+        return item.module_item_id === action.payload.planItemId
           ? {...item, duration: action.payload.duration}
           : item
       })

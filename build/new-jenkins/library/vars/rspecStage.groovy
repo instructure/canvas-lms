@@ -54,7 +54,7 @@ def createDistribution(nestedStages) {
     'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
     'EXCLUDE_TESTS=.*/(selenium/performance|instfs/selenium|contracts)',
     "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
-    "RERUNS_RETRY=${configuration.getInteger('rspec-rerun-retry')}",
+    "RERUNS_RETRY=${configuration.getInteger('rspecq-max-requeues')}",
     "RSPEC_PROCESSES=${configuration.getInteger('rspecq-processes')}",
     "RSPECQ_FILE_SPLIT_THRESHOLD=${configuration.fileSplitThreshold()}",
     "RSPECQ_MAX_REQUEUES=${configuration.getInteger('rspecq-max-requeues')}",
@@ -65,21 +65,21 @@ def createDistribution(nestedStages) {
   def rspecNodeRequirements = [label: 'canvas-docker']
 
   if (rspecqEnabled) {
+    extendedStage('RSpecQ Reporter for Rspec')
+          .envVars(rspecqEnvVars)
+          .hooks([onNodeAcquired: setupNodeHook])
+          .nodeRequirements(rspecNodeRequirements)
+          .timeout(15)
+          .queue(nestedStages, this.&runReporter)
+
     rspecqNodeTotal.times { index ->
       extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
-        .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
-        .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('spec') }])
-        .nodeRequirements(rspecNodeRequirements)
-        .timeout(15)
-        .queue(nestedStages, this.&runRspecqSuite)
+          .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
+          .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('spec') }])
+          .nodeRequirements(rspecNodeRequirements)
+          .timeout(15)
+          .queue(nestedStages, this.&runRspecqSuite)
     }
-
-    extendedStage('RSpecQ Reporter for Rspec')
-      .envVars(rspecqEnvVars)
-      .hooks([onNodeAcquired: setupNodeHook])
-      .nodeRequirements(rspecNodeRequirements)
-      .timeout(15)
-      .queue(nestedStages, this.&runReporter)
   } else {
     rspecNodeTotal.times { index ->
       extendedStage("RSpec Test Set ${(index + 1).toString().padLeft(2, '0')}")
@@ -104,8 +104,10 @@ def createDistribution(nestedStages) {
 def setupNode() {
   distribution.unstashBuildScripts()
   libraryScript.execute 'bash/print-env-excluding-secrets.sh'
-  def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
-  env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${TEST_QUEUE_HOST}:6379"
+  if (env.RSPECQ_ENABLED == '1') {
+    def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
+    env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${TEST_QUEUE_HOST}:6379"
+  }
   credentials.withStarlordCredentials { ->
     sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
   }
@@ -166,43 +168,12 @@ def tearDownNode(prefix) {
 
 def runRspecqSuite() {
   try {
-    def workers = [:]
-    def rspecProcesses = env.RSPEC_PROCESSES.toInteger()
-
-    rspecProcesses.times { index ->
-      env.WORKER_NAME = "${JOB_NAME}_worker${CI_NODE_INDEX}-${index}"
-      workers[env.WORKER_NAME] = { ->
-        def workerStartTime = System.currentTimeMillis()
-        sh(script: "docker-compose exec -e ENABLE_AXE_SELENIUM \
-                                        -e RSPECQ_ENABLED \
-                                        -e SENTRY_DSN \
-                                        -e RAILS_DB_NAME_TEST=canvas_test_${index} \
-                                        -e RSPECQ_UPDATE_TIMINGS \
-                                        -T canvas bundle exec rspecq \
-                                          --build ${JOB_NAME}_build${BUILD_NUMBER} \
-                                          --worker ${WORKER_NAME} \
-                                          --include-pattern '${TEST_PATTERN}'  \
-                                          --exclude-pattern '${EXCLUDE_TESTS}' \
-                                          --junit-output log/results/junit{{JOB_INDEX}}-${index}.xml \
-                                          --queue-wait-timeout 120 \
-                                          -- --require './spec/formatters/error_context/stderr_formatter.rb' \
-                                          --require './spec/formatters/error_context/html_page_formatter.rb' \
-                                          --format ErrorContext::HTMLPageFormatter \
-                                          --format ErrorContext::StderrFormatter .")
-        def workerEndTime = System.currentTimeMillis()
-
-        //To Do: remove once data gathering exercise is complete and RspecQ is enabled by default.
-        /* groovylint-disable-next-line GStringExpressionWithinString */
-        def specCount = sh(script: 'docker-compose exec -e $RSPECQ_REDIS_PASSWORD -T redis redis-cli -h $TEST_QUEUE_HOST -p 6379 llen ${JOB_NAME}_build${BUILD_NUMBER}:queue:jobs_per_worker:$WORKER_NAME', returnStdout: true).trim()
-
-        reportToSplunk('test_queue_worker_ended', [
-            'workerName': env.WORKER_NAME,
-            'workerRunTime': workerEndTime - workerStartTime,
-            'wokerSpecCount' : specCount,
-        ])
-      }
-    }
-    parallel(workers)
+    sh(script: 'docker-compose exec -T -e ENABLE_AXE_SELENIUM \
+                                       -e RSPECQ_ENABLED \
+                                       -e SENTRY_DSN \
+                                       -e RSPECQ_UPDATE_TIMINGS \
+                                       -e JOB_NAME \
+                                       -e BUILD_NUMBER canvas bash -c \'build/new-jenkins/rspecq-tests.sh\'', label: 'Run RspecQ Tests')
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
       /* groovylint-disable-next-line GStringExpressionWithinString */
@@ -259,19 +230,4 @@ def runReporter() {
 
     throw e
   }
-}
-
-def useRspecQ(percentage) {
-  if (configuration.isRspecqEnabled()) {
-    env.RSPECQ_ENABLED = '1'
-    return true
-  }
-
-  java.security.SecureRandom random = new java.security.SecureRandom()
-  if (!(env.RSPECQ_ENABLED == '1' && random.nextInt((100 / percentage).intValue()) == 0)) {
-    env.RSPECQ_ENABLED = '0'
-    return false
-  }
-
-  return true
 }

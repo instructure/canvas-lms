@@ -18,27 +18,33 @@
 
 import {Alert} from '@instructure/ui-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
+import axios from '@canvas/axios'
 import {bool, func, string} from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
+import {EXTERNAL_TOOLS_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {ExternalTool} from '@canvas/assignments/graphql/student/ExternalTool'
+import ExternalToolOptions from './ExternalToolOptions'
 import {Flex} from '@instructure/ui-flex'
 import {friendlyTypeName, isSubmitted} from '../helpers/SubmissionHelpers'
 import {
+  IconAnnotateLine,
   IconAttachMediaLine,
   IconLinkLine,
   IconUploadLine,
-  IconTextLine,
-  IconAnnotateLine
+  IconTextLine
 } from '@instructure/ui-icons'
 import I18n from 'i18n!assignments_2_attempt_tab'
 import LoadingIndicator from '@canvas/loading-indicator'
 import LockedAssignment from './LockedAssignment'
 import React, {Component, lazy, Suspense} from 'react'
-import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
 import StudentViewContext from './Context'
+import SubmissionTypeButton from './SubmissionTypeButton'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Text} from '@instructure/ui-text'
+import {uploadFile} from '@canvas/upload-file'
+import {useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
+const ExternalToolSubmission = lazy(() => import('./AttemptType/ExternalToolSubmission'))
 const FilePreview = lazy(() => import('./AttemptType/FilePreview'))
 const FileUpload = lazy(() => import('./AttemptType/FileUpload'))
 const MediaAttempt = lazy(() => import('./AttemptType/MediaAttempt'))
@@ -54,38 +60,60 @@ const iconsByType = {
   student_annotation: IconAnnotateLine
 }
 
-function SubmissionTypeButton({displayName, icon: Icon, selected, onSelected}) {
-  const foregroundColor = selected ? 'primary-inverse' : 'brand'
-  const screenReaderText = selected
-    ? I18n.t('Submission type %{displayName}, currently selected', {displayName})
-    : I18n.t('Select submission type %{displayName}', {displayName})
+function SubmissionTypeSelector({
+  assignment,
+  activeSubmissionType,
+  selectedExternalTool,
+  updateActiveSubmissionType
+}) {
+  const {data, loading: loadingExternalTools} = useQuery(EXTERNAL_TOOLS_QUERY, {
+    variables: {courseID: assignment.env.courseId}
+  })
+
+  const externalTools = data?.course?.externalToolsConnection.nodes || []
+  const externalToolOptions = loadingExternalTools ? (
+    <Flex.Item>
+      <LoadingIndicator />
+    </Flex.Item>
+  ) : (
+    <ExternalToolOptions
+      activeSubmissionType={activeSubmissionType}
+      externalTools={data?.course?.externalToolsConnection?.nodes || []}
+      selectedExternalTool={selectedExternalTool}
+      updateActiveSubmissionType={updateActiveSubmissionType}
+    />
+  )
+
+  const multipleSubmissionTypes =
+    assignment.submissionTypes.length > 1 ||
+    (assignment.submissionTypes.includes('online_upload') && externalTools.length > 0)
+
+  if (!multipleSubmissionTypes) {
+    return null
+  }
 
   return (
-    <View
-      as="div"
-      className="submission-type-icon-contents"
-      background={selected ? 'brand' : 'primary'}
-      borderColor="brand"
-      borderWidth="small"
-      borderRadius="medium"
-      height="80px"
-      minWidth="90px"
-    >
-      <Button
-        display="block"
-        interaction={selected ? 'readonly' : 'enabled'}
-        onClick={onSelected}
-        theme={{borderWidth: '0'}}
-        withBackground={false}
-      >
-        <Icon size="small" color={foregroundColor} />
-        <View as="div" margin="small 0 0">
-          <ScreenReaderContent>{screenReaderText}</ScreenReaderContent>
-          <Text color={foregroundColor} weight="normal" size="medium">
-            <PresentationContent>{displayName}</PresentationContent>
-          </Text>
-        </View>
-      </Button>
+    <View as="div" data-testid="submission-type-selector" margin="0 auto small">
+      <Text as="p" weight="bold">
+        {I18n.t('Choose a submission type')}
+      </Text>
+
+      <Flex wrap="wrap">
+        {assignment.submissionTypes.map(type => (
+          <Flex.Item as="div" key={type} margin="0 medium 0 0" data-testid={type}>
+            <SubmissionTypeButton
+              displayName={friendlyTypeName(type)}
+              icon={iconsByType[type]}
+              selected={activeSubmissionType === type}
+              onSelected={() => {
+                updateActiveSubmissionType(type)
+              }}
+            />
+          </Flex.Item>
+        ))}
+
+        {assignment.submissionTypes.includes('online_upload') && externalToolOptions}
+      </Flex>
     </View>
   )
 }
@@ -107,11 +135,16 @@ export default class AttemptTab extends Component {
     createSubmissionDraft: func,
     focusAttemptOnInit: bool.isRequired,
     onContentsChanged: func,
+    selectedExternalTool: ExternalTool.shape,
     submission: Submission.shape.isRequired,
     updateActiveSubmissionType: func,
     updateEditingDraft: func,
     updateUploadingFiles: func,
     uploadingFiles: bool
+  }
+
+  state = {
+    filesToUpload: []
   }
 
   renderFileUpload = () => {
@@ -120,13 +153,125 @@ export default class AttemptTab extends Component {
         <FileUpload
           assignment={this.props.assignment}
           createSubmissionDraft={this.props.createSubmissionDraft}
+          filesToUpload={this.state.filesToUpload}
           focusOnInit={this.props.focusAttemptOnInit}
           submission={this.props.submission}
-          updateUploadingFiles={this.props.updateUploadingFiles}
-          uploadingFiles={this.props.uploadingFiles}
+          onCanvasFileRequested={this.onCanvasFileRequested}
+          onUploadRequested={this.onUploadRequested}
         />
       </Suspense>
     )
+  }
+
+  onCanvasFileRequested = ({fileID, onError}) => {
+    this.updateUploadingFiles(async () => {
+      try {
+        await this.createFileUploadSubmissionDraft([fileID])
+      } catch (err) {
+        onError()
+      }
+    })
+  }
+
+  onUploadRequested = ({files, onSuccess, onError}) => {
+    this.setState(
+      {
+        filesToUpload: files.map((file, i) => {
+          const name = file.name || file.title || file.url
+          const _id = `${i}-${file.url || file.name}`
+
+          // As we receive progress events for this upload, we'll update the
+          // "loaded and "total" values. Set some placeholder values so that
+          // we start at 0%.
+          return {_id, index: i, isLoading: true, name, loaded: 0, total: 1}
+        })
+      },
+      onSuccess
+    )
+    this.updateUploadingFiles(async () => {
+      try {
+        const newFiles = await this.uploadFiles(files)
+        await this.createFileUploadSubmissionDraft(newFiles.map(file => file.id))
+      } catch (err) {
+        onError()
+      } finally {
+        this.setState({filesToUpload: []})
+      }
+    })
+  }
+
+  createFileUploadSubmissionDraft = async newFileIDs => {
+    const {submission} = this.props
+    const existingAttachments = submission?.submissionDraft?.attachments || []
+
+    await this.props.createSubmissionDraft({
+      variables: {
+        id: submission.id,
+        activeSubmissionType: 'online_upload',
+        attempt: submission.attempt || 1,
+        fileIds: existingAttachments.map(file => file._id).concat(newFileIDs)
+      }
+    })
+  }
+
+  updateUploadingFiles = async wrappedFunc => {
+    this.props.updateUploadingFiles(true)
+    await wrappedFunc()
+    this.props.updateUploadingFiles(false)
+  }
+
+  uploadFiles = async files => {
+    // This is taken almost verbatim from the uploadFiles method in the
+    // upload-file module.  Rather than calling that method, we call uploadFile
+    // for each file to track progress for the individual uploads.
+    const {assignment} = this.props
+    const uploadUrl = `/api/v1/courses/${assignment.env.courseId}/assignments/${assignment._id}/submissions/${assignment.env.currentUser.id}/files`
+
+    const uploadPromises = []
+    files.forEach((file, i) => {
+      const onProgress = event => {
+        const {loaded, total} = event
+        this.updateUploadProgress({index: i, loaded, total})
+      }
+
+      let promise
+      if (file.url) {
+        promise = uploadFile(
+          uploadUrl,
+          {
+            url: file.url,
+            name: file.title,
+            content_type: file.mediaType,
+            submit_assignment: false
+          },
+          null,
+          axios,
+          onProgress
+        )
+      } else {
+        promise = uploadFile(
+          uploadUrl,
+          {
+            name: file.name,
+            content_type: file.type
+          },
+          file,
+          axios,
+          onProgress
+        )
+      }
+      uploadPromises.push(promise)
+    })
+
+    return Promise.all(uploadPromises)
+  }
+
+  updateUploadProgress = ({index, loaded, total}) => {
+    this.setState(state => {
+      const filesToUpload = [...state.filesToUpload]
+      filesToUpload[index] = {...filesToUpload[index], loaded, total}
+      return {filesToUpload}
+    })
   }
 
   renderFileAttempt = () => {
@@ -200,7 +345,27 @@ export default class AttemptTab extends Component {
     )
   }
 
-  renderByType(submissionType, context) {
+  renderExternalToolAttempt = externalTool => (
+    <Suspense fallback={<LoadingIndicator />}>
+      <ExternalToolSubmission
+        createSubmissionDraft={this.props.createSubmissionDraft}
+        onFileUploadRequested={({files}) => {
+          this.onUploadRequested({
+            files,
+            onSuccess: () => {
+              // If an LTI returns a file attachment and not a link,
+              // switch to the upload panel to show it
+              this.props.updateActiveSubmissionType('online_upload')
+            }
+          })
+        }}
+        submission={this.props.submission}
+        tool={externalTool}
+      />
+    </Suspense>
+  )
+
+  renderByType(submissionType, context, externalTool) {
     switch (submissionType) {
       case 'media_recording':
         return this.renderMediaAttempt()
@@ -212,40 +377,11 @@ export default class AttemptTab extends Component {
         return this.renderUrlAttempt()
       case 'student_annotation':
         return this.renderStudentAnnotationAttempt()
+      case 'basic_lti_launch':
+        return this.renderExternalToolAttempt(externalTool)
       default:
         throw new Error('submission type not yet supported in A2')
     }
-  }
-
-  renderSubmissionTypeSelector() {
-    // because we are currently allowing only a single submission type
-    // you should never need to change types after submitting
-    if (isSubmitted(this.props.submission)) {
-      return null
-    }
-
-    return (
-      <View as="div" data-testid="submission-type-selector" margin="0 auto small">
-        <Text as="p" weight="bold">
-          {I18n.t('Choose a submission type')}
-        </Text>
-
-        <Flex wrap="wrap">
-          {this.props.assignment.submissionTypes.map(type => (
-            <Flex.Item as="div" key={type} margin="x-small medium x-small 0" data-testid={type}>
-              <SubmissionTypeButton
-                displayName={friendlyTypeName(type)}
-                icon={iconsByType[type]}
-                selected={this.props.activeSubmissionType === type}
-                onSelected={() => {
-                  this.props.updateActiveSubmissionType(type)
-                }}
-              />
-            </Flex.Item>
-          ))}
-        </Flex>
-      </View>
-    )
   }
 
   render() {
@@ -258,14 +394,13 @@ export default class AttemptTab extends Component {
       ? submission.submissionType
       : this.props.activeSubmissionType
 
-    const multipleSubmissionTypes = assignment.submissionTypes.length > 1
-
     let selectedType
-    if (multipleSubmissionTypes) {
-      if (submissionType != null && assignment.submissionTypes.includes(submissionType)) {
-        selectedType = submissionType
-      }
-    } else {
+    if (
+      submissionType != null &&
+      (assignment.submissionTypes.includes(submissionType) || submissionType === 'basic_lti_launch')
+    ) {
+      selectedType = submissionType
+    } else if (assignment.submissionTypes.length === 1) {
       selectedType = assignment.submissionTypes[0]
     }
 
@@ -282,11 +417,18 @@ export default class AttemptTab extends Component {
               <GroupSubmissionReminder groupSet={assignment.groupSet} />
             )}
 
-            {multipleSubmissionTypes &&
-              context.allowChangesToSubmission &&
-              this.renderSubmissionTypeSelector()}
+            {context.allowChangesToSubmission && !isSubmitted(submission) && (
+              <SubmissionTypeSelector
+                activeSubmissionType={this.props.activeSubmissionType}
+                assignment={assignment}
+                selectedExternalTool={this.props.selectedExternalTool}
+                submission={submission}
+                updateActiveSubmissionType={this.props.updateActiveSubmissionType}
+              />
+            )}
 
-            {selectedType != null && this.renderByType(selectedType, context)}
+            {selectedType != null &&
+              this.renderByType(selectedType, context, this.props.selectedExternalTool)}
           </div>
         )}
       </StudentViewContext.Consumer>

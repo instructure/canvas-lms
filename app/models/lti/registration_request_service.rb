@@ -26,9 +26,9 @@ module Lti
     end
 
     def self.create_request(context, tc_profile_url, return_url, registration_url, tool_proxy_service_url)
-      registration_request = IMS::LTI::Models::Messages::RegistrationRequest.new(
-        lti_version: IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
-        launch_presentation_document_target: IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME,
+      registration_request = ::IMS::LTI::Models::Messages::RegistrationRequest.new(
+        lti_version: ::IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
+        launch_presentation_document_target: ::IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME,
         tc_profile_url: tc_profile_url,
       )
       reg_key, reg_password = registration_request.generate_key_and_password

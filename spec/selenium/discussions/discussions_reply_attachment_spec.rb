@@ -25,7 +25,6 @@ describe "reply attachment" do
   include DiscussionsCommon
 
   before() do
-    Account.default.enable_feature!(:rce_enhancements)
     @topic_title = 'discussion topic'
     course_with_teacher_logged_in
     @topic = create_discussion(@topic_title, 'threaded')

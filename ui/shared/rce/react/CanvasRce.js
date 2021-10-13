@@ -119,9 +119,7 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
       languages={languages}
       liveRegion={() => document.getElementById('flash_screenreader_holder')}
       ltiTools={window.INST?.editorButtons}
-      maxInitRenderedRCEs={
-        window.ENV?.FEATURES?.rce_limit_init_render_on_page ? props.maxInitRenderedRCEs : -1
-      }
+      maxInitRenderedRCEs={props.maxInitRenderedRCEs}
       mirroredAttrs={mirroredAttrs}
       readOnly={readOnly}
       textareaClassName={textareaClassName}
@@ -152,8 +150,7 @@ CanvasRce.propTypes = {
   editorOptions: object,
   // height of the RCE. If a number, in px
   height: oneOfType([number, string]),
-  // if the rce_limit_init_render_on_page flag is on, this
-  // is the maximum number of RCEs that will render on page load.
+  // The maximum number of RCEs that will render on page load.
   // Any more than this will be deferred until it is nearly
   // scrolled into view.
   // if isNaN or <=0, render them all

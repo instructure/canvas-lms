@@ -186,16 +186,23 @@ export default class SubmissionManager extends Component {
   }
 
   getActiveSubmissionTypeFromProps() {
-    if (this.props.assignment.submissionTypes.length > 1) {
-      return this.props.submission?.submissionDraft?.activeSubmissionType || null
-    } else {
+    // use the draft's active type if one exists
+    if (this.props.submission?.submissionDraft != null) {
+      return this.props.submission?.submissionDraft.activeSubmissionType
+    }
+
+    // default to the assignment's submission type if there's only one
+    if (this.props.assignment.submissionTypes.length === 1) {
       return this.props.assignment.submissionTypes[0]
     }
+
+    // otherwise, don't stipulate an active submission type
+    return null
   }
 
-  updateActiveSubmissionType = activeSubmissionType => {
+  updateActiveSubmissionType = (activeSubmissionType, selectedExternalTool = null) => {
     const focusAttemptOnInit = this.props.assignment.submissionTypes.length > 1
-    this.setState({activeSubmissionType, focusAttemptOnInit})
+    this.setState({activeSubmissionType, focusAttemptOnInit, selectedExternalTool})
   }
 
   updateEditingDraft = editingDraft => {
@@ -214,7 +221,7 @@ export default class SubmissionManager extends Component {
   }
 
   updateCachedSubmissionDraft = (cache, newDraft) => {
-    const {assignment} = JSON.parse(
+    const {assignment, submission} = JSON.parse(
       JSON.stringify(
         cache.readQuery({
           query: STUDENT_VIEW_QUERY,
@@ -226,12 +233,14 @@ export default class SubmissionManager extends Component {
       )
     )
 
-    assignment.submissionsConnection.nodes[0].submissionDraft = newDraft
-
+    submission.submissionDraft = newDraft
     cache.writeQuery({
       query: STUDENT_VIEW_QUERY,
-      variables: {assignmentLid: this.props.assignment._id, submissionID: this.props.submission.id},
-      data: {assignment}
+      variables: {
+        assignmentLid: this.props.assignment._id,
+        submissionID: this.props.submission.id
+      },
+      data: {assignment, submission}
     })
   }
 
@@ -252,6 +261,15 @@ export default class SubmissionManager extends Component {
     this.setState({submittingAssignment: true})
 
     switch (this.state.activeSubmissionType) {
+      case 'basic_lti_launch':
+        if (this.props.submission.submissionDraft.ltiLaunchUrl) {
+          await this.submitToGraphql(submitMutation, {
+            resourceLinkLookupUuid: this.props.submission.submissionDraft.resourceLinkLookupUuid,
+            url: this.props.submission.submissionDraft.ltiLaunchUrl,
+            type: this.state.activeSubmissionType
+          })
+        }
+        break
       case 'media_recording':
         if (this.props.submission.submissionDraft.mediaObject?._id) {
           await this.submitToGraphql(submitMutation, {
@@ -394,6 +412,10 @@ export default class SubmissionManager extends Component {
               onContentsChanged={() => {
                 this.setState({draftStatus: 'saving'})
               }}
+              selectedExternalTool={
+                this.state.selectedExternalTool ||
+                this.props.submission?.submissionDraft?.externalTool
+              }
               submission={this.props.submission}
               updateActiveSubmissionType={this.updateActiveSubmissionType}
               updateEditingDraft={this.updateEditingDraft}
@@ -538,6 +560,11 @@ export default class SubmissionManager extends Component {
       case 'student_annotation':
         activeTypeMeetsCriteria =
           this.props.submission?.submissionDraft?.meetsStudentAnnotationCriteria
+        break
+      case 'basic_lti_launch':
+        activeTypeMeetsCriteria =
+          this.props.submission?.submissionDraft?.meetsBasicLtiLaunchCriteria
+        break
     }
 
     return (

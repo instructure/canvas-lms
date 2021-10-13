@@ -17,6 +17,7 @@
  */
 import {arrayOf, bool, shape, string} from 'prop-types'
 import gql from 'graphql-tag'
+import {ExternalTool} from './ExternalTool'
 import {MediaObject} from './MediaObject'
 import {SubmissionDraftFile} from './File'
 
@@ -29,17 +30,24 @@ export const SubmissionDraft = {
         ...SubmissionDraftFile
       }
       body(rewriteUrls: false)
+      externalTool {
+        ...ExternalTool
+      }
+      ltiLaunchUrl
       mediaObject {
         ...MediaObject
       }
       meetsMediaRecordingCriteria
       meetsAssignmentCriteria
+      meetsBasicLtiLaunchCriteria
       meetsTextEntryCriteria
       meetsUploadCriteria
       meetsUrlCriteria
       meetsStudentAnnotationCriteria
+      resourceLinkLookupUuid
       url
     }
+    ${ExternalTool.fragment}
     ${MediaObject.fragment}
     ${SubmissionDraftFile.fragment}
   `,
@@ -49,13 +57,17 @@ export const SubmissionDraft = {
     activeSubmissionType: string,
     attachments: arrayOf(SubmissionDraftFile.shape),
     body: string,
+    externalTool: ExternalTool.shape,
+    ltiLaunchUrl: string,
     mediaObject: MediaObject.shape,
     meetsMediaRecordingCriteria: bool.isRequired,
     meetsAssignmentCriteria: bool.isRequired,
+    meetsBasicLtiLaunchCriteria: bool.isRequired,
     meetsTextEntryCriteria: bool.isRequired,
     meetsUploadCriteria: bool.isRequired,
     meetsUrlCriteria: bool.isRequired,
     meetsStudentAnnotationCriteria: bool.isRequired,
+    resourceLinkLookupUuid: string,
     url: string
   })
 }
@@ -65,13 +77,17 @@ export const DefaultMocks = {
     activeSubmissionType: null,
     attachments: () => [],
     body: null,
+    externalTool: null,
+    ltiLaunchUrl: null,
     mediaObject: null,
     meetsMediaRecordingCriteria: false,
     meetsAssignmentCriteria: false,
+    meetsBasicLtiLaunchCriteria: false,
     meetsTextEntryCriteria: false,
     meetsUploadCriteria: false,
     meetsUrlCriteria: false,
     meetsStudentAnnotationCriteria: false,
+    resourceLinkLookupUuid: null,
     url: null
   })
 }

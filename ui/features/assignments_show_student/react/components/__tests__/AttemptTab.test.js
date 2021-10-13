@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import * as uploadFileModule from '@canvas/upload-file'
 import AttemptTab from '../AttemptTab'
+import {EXTERNAL_TOOLS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import TextEntry from '../AttemptType/TextEntry'
 import {act, fireEvent, render, waitFor} from '@testing-library/react'
 import {mockAssignmentAndSubmission} from '@canvas/assignments/graphql/studentMocks'
@@ -27,9 +28,20 @@ import React from 'react'
 import StudentViewContext from '../Context'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
+jest.mock('@canvas/upload-file')
+
+const defaultMocks = (result = {data: {}}) => [
+  {
+    request: {
+      query: EXTERNAL_TOOLS_QUERY,
+      variables: {courseID: '1'}
+    },
+    result
+  }
+]
+
 describe('ContentTabs', () => {
   beforeAll(() => {
-    window.ENV.use_rce_enhancements = true
     window.INST = window.INST || {}
     window.INST.editorButtons = []
   })
@@ -37,7 +49,11 @@ describe('ContentTabs', () => {
   let fakeEditor
 
   const renderAttemptTab = async props => {
-    const retval = render(<AttemptTab {...props} focusAttemptOnInit={false} />)
+    const retval = render(
+      <MockedProvider mocks={defaultMocks()}>
+        <AttemptTab {...props} focusAttemptOnInit={false} />
+      </MockedProvider>
+    )
 
     if (props.assignment.submissionTypes.includes('online_text_entry')) {
       await waitFor(
@@ -91,7 +107,7 @@ describe('ContentTabs', () => {
       })
 
       const {getByTestId} = render(
-        <MockedProvider>
+        <MockedProvider mocks={defaultMocks()}>
           <AttemptTab {...props} focusAttemptOnInit={false} />
         </MockedProvider>
       )
@@ -128,7 +144,7 @@ describe('ContentTabs', () => {
         })
 
         const {getAllByText} = render(
-          <MockedProvider>
+          <MockedProvider mocks={defaultMocks()}>
             <AttemptTab {...props} focusAttemptOnInit={false} />
           </MockedProvider>
         )
@@ -195,10 +211,9 @@ describe('ContentTabs', () => {
               state: 'submitted'
             }
           })
-          await renderAttemptTab(props)
-          await waitFor(() => {
-            expect(fakeEditor.readonly).toStrictEqual(true)
-          })
+
+          const {findByTestId} = await renderAttemptTab(props)
+          expect(await findByTestId('read-only-content')).toBeInTheDocument()
         })
 
         it('does not render as read-only if the submission has been graded pre-submission', async () => {
@@ -210,10 +225,8 @@ describe('ContentTabs', () => {
             }
           })
 
-          await renderAttemptTab(props)
-          await waitFor(() => {
-            expect(fakeEditor.readonly).toStrictEqual(false)
-          })
+          const {queryByTestId} = await renderAttemptTab(props)
+          expect(queryByTestId('read-only-content')).not.toBeInTheDocument()
         })
 
         it('renders as read-only if the submission has been graded post-submission', async () => {
@@ -225,10 +238,8 @@ describe('ContentTabs', () => {
             }
           })
 
-          await renderAttemptTab(props)
-          await waitFor(() => {
-            expect(fakeEditor.readonly).toStrictEqual(true)
-          })
+          const {findByTestId} = await renderAttemptTab(props)
+          expect(await findByTestId('read-only-content')).toBeInTheDocument()
         })
 
         it('renders as read-only if changes are not allowed to the submission', async () => {
@@ -239,14 +250,13 @@ describe('ContentTabs', () => {
             }
           })
 
-          render(
+          const {findByTestId} = render(
             <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
               <AttemptTab {...props} focusAttemptOnInit={false} />
             </StudentViewContext.Provider>
           )
-          await waitFor(() => {
-            expect(tinymce?.editors[0]?.readonly).toStrictEqual(true)
-          })
+
+          expect(await findByTestId('read-only-content')).toBeInTheDocument()
         })
 
         it('does not render as read-only if changes are allowed and the submission is not submitted', async () => {
@@ -257,10 +267,8 @@ describe('ContentTabs', () => {
             }
           })
 
-          await renderAttemptTab(props)
-          await waitFor(() => {
-            expect(fakeEditor.readonly).toStrictEqual(false)
-          })
+          const {queryByTestId} = await renderAttemptTab(props)
+          expect(queryByTestId('read-only-content')).not.toBeInTheDocument()
         })
       })
     })
@@ -272,7 +280,11 @@ describe('ContentTabs', () => {
         const props = await mockAssignmentAndSubmission({
           Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
         })
-        const {getByTestId} = render(<AttemptTab {...props} focusAttemptOnInit={false} />)
+        const {getByTestId} = render(
+          <MockedProvider mocks={defaultMocks()}>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        )
 
         expect(getByTestId('submission-type-selector')).toBeInTheDocument()
       })
@@ -281,7 +293,12 @@ describe('ContentTabs', () => {
         const props = await mockAssignmentAndSubmission({
           Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
         })
-        const {getAllByRole} = render(<AttemptTab {...props} focusAttemptOnInit={false} />)
+
+        const {getAllByRole} = render(
+          <MockedProvider mocks={defaultMocks()}>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </MockedProvider>
+        )
 
         const buttons = getAllByRole('button')
         expect(buttons).toHaveLength(2)
@@ -309,11 +326,13 @@ describe('ContentTabs', () => {
         Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
       })
       const {getByRole} = render(
-        <AttemptTab
-          {...props}
-          updateActiveSubmissionType={mockedUpdateActiveSubmissionType}
-          focusAttemptOnInit={false}
-        />
+        <MockedProvider mocks={defaultMocks()}>
+          <AttemptTab
+            {...props}
+            updateActiveSubmissionType={mockedUpdateActiveSubmissionType}
+            focusAttemptOnInit={false}
+          />
+        </MockedProvider>
       )
 
       const textButton = getByRole('button', {name: /Text/})
@@ -329,7 +348,7 @@ describe('ContentTabs', () => {
         Assignment: {submissionTypes: ['online_url']}
       })
       const {findByTestId} = render(
-        <MockedProvider>
+        <MockedProvider mocks={defaultMocks()}>
           <AttemptTab {...props} activeSubmissionType="online_url" focusAttemptOnInit={false} />
         </MockedProvider>
       )
@@ -344,7 +363,11 @@ describe('ContentTabs', () => {
           state: 'submitted'
         }
       })
-      const {queryByTestId} = render(<AttemptTab {...props} focusAttemptOnInit={false} />)
+      const {queryByTestId} = render(
+        <MockedProvider mocks={defaultMocks()}>
+          <AttemptTab {...props} focusAttemptOnInit={false} />
+        </MockedProvider>
+      )
 
       expect(queryByTestId('submission-type-selector')).not.toBeInTheDocument()
     })
@@ -357,7 +380,11 @@ describe('ContentTabs', () => {
           attempt: 1
         }
       })
-      const {queryByTestId} = render(<AttemptTab {...props} focusAttemptOnInit={false} />)
+      const {queryByTestId} = render(
+        <MockedProvider mocks={defaultMocks()}>
+          <AttemptTab {...props} focusAttemptOnInit={false} />
+        </MockedProvider>
+      )
 
       expect(queryByTestId('submission-type-selector')).not.toBeInTheDocument()
     })
@@ -370,7 +397,11 @@ describe('ContentTabs', () => {
           attempt: 0
         }
       })
-      const {queryByTestId} = render(<AttemptTab {...props} focusAttemptOnInit={false} />)
+      const {queryByTestId} = render(
+        <MockedProvider mocks={defaultMocks()}>
+          <AttemptTab {...props} focusAttemptOnInit={false} />
+        </MockedProvider>
+      )
 
       expect(queryByTestId('submission-type-selector')).toBeInTheDocument()
     })
@@ -409,9 +440,11 @@ describe('ContentTabs', () => {
       })
 
       const {getByText} = render(
-        <StudentViewContext.Provider value={{allowChangesToSubmission: true}}>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </StudentViewContext.Provider>
+        <MockedProvider mocks={defaultMocks()}>
+          <StudentViewContext.Provider value={{allowChangesToSubmission: true}}>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </StudentViewContext.Provider>
+        </MockedProvider>
       )
 
       expect(getByText(groupMatcher)).toBeInTheDocument()
@@ -428,9 +461,11 @@ describe('ContentTabs', () => {
       })
 
       const {queryByText} = render(
-        <StudentViewContext.Provider value={{allowChangesToSubmission: true}}>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </StudentViewContext.Provider>
+        <MockedProvider mocks={defaultMocks()}>
+          <StudentViewContext.Provider value={{allowChangesToSubmission: true}}>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </StudentViewContext.Provider>
+        </MockedProvider>
       )
 
       expect(queryByText(groupMatcher)).not.toBeInTheDocument()
@@ -452,9 +487,11 @@ describe('ContentTabs', () => {
       })
 
       const {queryByText} = render(
-        <StudentViewContext.Provider value={{allowChangesToSubmission: true}}>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </StudentViewContext.Provider>
+        <MockedProvider mocks={defaultMocks()}>
+          <StudentViewContext.Provider value={{allowChangesToSubmission: true}}>
+            <AttemptTab {...props} focusAttemptOnInit={false} />
+          </StudentViewContext.Provider>
+        </MockedProvider>
       )
 
       expect(queryByText(groupMatcher)).not.toBeInTheDocument()
@@ -506,6 +543,226 @@ describe('ContentTabs', () => {
       )
 
       expect(queryByText(groupMatcher)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('file upload handling', () => {
+    let uploadedFileCount
+
+    beforeEach(() => {
+      uploadedFileCount = 0
+      uploadFileModule.uploadFile.mockImplementation(_file => {
+        uploadedFileCount += 1
+        return {id: `${uploadedFileCount}`}
+      })
+    })
+
+    afterEach(() => {
+      uploadFileModule.uploadFile.mockReset()
+    })
+
+    async function submitFiles(container, files) {
+      await waitFor(() => expect(container.querySelector('input[type="file"]')).toBeInTheDocument())
+      const fileInput = container.querySelector('input[type="file"]')
+      fireEvent.change(fileInput, {target: {files}})
+    }
+
+    it('calls uploadFile once for each file received that needs uploading', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['online_upload']},
+        Submission: {attempt: 2}
+      })
+      props.focusAttemptOnInit = true
+      props.updateUploadingFiles = jest.fn()
+      props.createSubmissionDraft = jest.fn()
+
+      const {container} = render(
+        <MockedProvider>
+          <AttemptTab {...props} focusAttemptOnInit />
+        </MockedProvider>
+      )
+
+      await submitFiles(container, [
+        new File(['foo'], 'file1.pdf', {type: 'application/pdf'}),
+        new File(['foo2'], 'file2.pdf', {type: 'application/pdf'})
+      ])
+
+      const {calls} = uploadFileModule.uploadFile.mock
+      expect(calls).toHaveLength(2)
+      expect(calls[0][1]).toEqual({content_type: 'application/pdf', name: 'file1.pdf'})
+      expect(calls[1][1]).toEqual({content_type: 'application/pdf', name: 'file2.pdf'})
+    })
+
+    // Byproduct of how the dummy submissions are being handled. Check out ViewManager
+    // for some context around this
+    it('creates a submission draft for the current attempt when not on attempt 0', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['online_upload']},
+        Submission: {attempt: 2}
+      })
+      props.focusAttemptOnInit = true
+      props.updateUploadingFiles = jest.fn()
+      props.createSubmissionDraft = jest.fn()
+
+      const {container} = render(
+        <MockedProvider>
+          <AttemptTab {...props} focusAttemptOnInit />
+        </MockedProvider>
+      )
+
+      await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
+
+      await waitFor(() => {
+        expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+          variables: {
+            id: '1',
+            activeSubmissionType: 'online_upload',
+            attempt: 2,
+            fileIds: ['1']
+          }
+        })
+      })
+    })
+
+    it('creates a submission draft for attempt 1 when on attempt 0', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['online_upload']},
+        Submission: {attempt: 0}
+      })
+      props.focusAttemptOnInit = true
+      props.updateUploadingFiles = jest.fn()
+      props.createSubmissionDraft = jest.fn()
+
+      const {container} = render(
+        <MockedProvider>
+          <AttemptTab {...props} focusAttemptOnInit />
+        </MockedProvider>
+      )
+
+      await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
+
+      await waitFor(() => {
+        expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+          variables: {
+            id: '1',
+            activeSubmissionType: 'online_upload',
+            attempt: 1,
+            fileIds: ['1']
+          }
+        })
+      })
+    })
+
+    it('renders a progress bar with the name of each file being uploaded', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['online_upload']},
+        Submission: {attempt: 0}
+      })
+      props.focusAttemptOnInit = true
+      props.updateUploadingFiles = jest.fn()
+      props.createSubmissionDraft = jest.fn()
+
+      const progressHandlers = []
+
+      uploadFileModule.uploadFile.mockReset()
+      uploadFileModule.uploadFile
+        .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+          progressHandlers.push(onProgress)
+          return Promise.resolve({id: '1', name: 'file1.pdf'})
+        })
+        .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+          progressHandlers.push(onProgress)
+          return Promise.resolve({id: '2', name: 'file2.pdf'})
+        })
+
+      const {container, findAllByRole} = render(
+        <MockedProvider>
+          <AttemptTab {...props} />
+        </MockedProvider>
+      )
+      await submitFiles(container, [
+        new File(['asdf'], 'file1.pdf', {type: 'application/pdf'}),
+        new File(['sdfg'], 'file2.pdf', {type: 'application/pdf'})
+      ])
+
+      progressHandlers[0]({loaded: 10, total: 100})
+      progressHandlers[1]({loaded: 50, total: 250})
+
+      const progressBars = await findAllByRole('progressbar')
+      expect(progressBars).toHaveLength(2)
+
+      expect(progressBars[0]).toHaveAttribute('aria-valuenow', '10')
+      expect(progressBars[0]).toHaveAttribute('aria-valuemax', '100')
+      expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
+      expect(progressBars[0]).toHaveAttribute(
+        'aria-label',
+        'Upload progress for file1.pdf 10 percent'
+      )
+
+      expect(progressBars[1]).toHaveAttribute('aria-valuenow', '50')
+      expect(progressBars[1]).toHaveAttribute('aria-valuemax', '250')
+      expect(progressBars[1]).toHaveAttribute('aria-valuetext', '20 percent')
+      expect(progressBars[1]).toHaveAttribute(
+        'aria-label',
+        'Upload progress for file2.pdf 20 percent'
+      )
+    })
+
+    it('shows the URL of a file being uploaded if no name is present', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['online_upload']},
+        Submission: {attempt: 0}
+      })
+      props.focusAttemptOnInit = true
+      props.updateUploadingFiles = jest.fn()
+      props.createSubmissionDraft = jest.fn()
+
+      const progressHandlers = []
+
+      uploadFileModule.uploadFile.mockReset()
+      uploadFileModule.uploadFile
+        .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+          progressHandlers.push(onProgress)
+          return Promise.resolve({id: '1', name: 'file1.pdf'})
+        })
+        .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+          progressHandlers.push(onProgress)
+          return Promise.resolve({id: '2', name: 'file2.pdf'})
+        })
+
+      const {findAllByRole} = render(
+        <MockedProvider>
+          <AttemptTab {...props} />
+        </MockedProvider>
+      )
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            messageType: 'LtiDeepLinkingResponse',
+            content_items: [
+              {
+                url: 'http://localhost/some-lti-file',
+                mediaType: 'plain/txt'
+              }
+            ]
+          }
+        })
+      )
+
+      progressHandlers[0]({loaded: 10, total: 100})
+
+      const progressBars = await findAllByRole('progressbar')
+      expect(progressBars).toHaveLength(1)
+
+      expect(progressBars[0]).toHaveAttribute('aria-valuenow', '10')
+      expect(progressBars[0]).toHaveAttribute('aria-valuemax', '100')
+      expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
+      expect(progressBars[0]).toHaveAttribute(
+        'aria-label',
+        'Upload progress for http://localhost/some-lti-file 10 percent'
+      )
     })
   })
 })

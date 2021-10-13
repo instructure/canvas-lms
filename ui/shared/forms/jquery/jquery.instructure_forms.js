@@ -64,9 +64,9 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 //    onSubmit: A callback which will receive 1. a deferred object
 //      encompassing the request(s) triggered by the submit action and 2. the
 //      formData being posted
-$.fn.formSubmit = function(options) {
+$.fn.formSubmit = function (options) {
   $(this).markRequired(options)
-  this.submit(function(event) {
+  this.submit(function (event) {
     const $form = $(this) // this is to handle if bind to a template element, then it gets cloned the original this would not be the same as the this inside of here.
     // disableWhileLoading might need to wrap this, so we don't want to modify the original
     let onSubmit = options.onSubmit
@@ -116,7 +116,7 @@ $.fn.formSubmit = function(options) {
 
     if (options.disableWhileLoading) {
       const oldOnSubmit = onSubmit
-      onSubmit = function(loadingPromise) {
+      onSubmit = function (loadingPromise) {
         if (options.disableWhileLoading === 'spin_on_success') {
           // turn it into a false promise, i.e. never resolve
           const origPromise = loadingPromise
@@ -134,9 +134,9 @@ $.fn.formSubmit = function(options) {
       var loadingPromise = $.Deferred(),
         oldHandlers = {}
       onSubmit.call(this, loadingPromise, formData)
-      $.each(['success', 'error'], function(i, successOrError) {
+      $.each(['success', 'error'], function (i, successOrError) {
         oldHandlers[successOrError] = options[successOrError]
-        options[successOrError] = function() {
+        options[successOrError] = function () {
           loadingPromise[successOrError === 'success' ? 'resolve' : 'reject'].apply(
             loadingPromise,
             arguments
@@ -169,12 +169,12 @@ $.fn.formSubmit = function(options) {
     event.preventDefault()
     event.stopPropagation()
 
-    const xhrSuccess = function(data, request) {
+    const xhrSuccess = function (data, request) {
       if ($.isFunction(options.success)) {
         options.success.call($form, data, submitParam, request)
       }
     }
-    const xhrError = function(data, request) {
+    const xhrError = function (data, request) {
       let $formObj = $form,
         needValidForm = true
       if ($.isFunction(options.error)) {
@@ -217,7 +217,7 @@ $.fn.formSubmit = function(options) {
       })
     } else if (doUploadFile && $.handlesHTML5Files && $form.hasClass('handlingHTML5Files')) {
       const args = $.extend({}, formData)
-      $form.find("input[type='file']").each(function() {
+      $form.find("input[type='file']").each(function () {
         const $input = $(this),
           file_list = $input.data('file_list')
         if (file_list && file_list instanceof FileList) {
@@ -269,7 +269,7 @@ $.fn.formSubmit = function(options) {
       }
       $.ajaxJSON.storeRequest(request, action, method, formData)
 
-      $frame.bind('form_response_loaded', function() {
+      $frame.bind('form_response_loaded', function () {
         const i = $frame[0],
           doc = i.contentDocument || i.contentWindow.document
         if (doc.location.href == 'about:blank') return
@@ -290,10 +290,7 @@ $.fn.formSubmit = function(options) {
           $('#box_' + id).remove()
         }, 5000)
       })
-      $form
-        .data('submitting', true)
-        .submit()
-        .data('submitting', false)
+      $form.data('submitting', true).submit().data('submitting', false)
     } else {
       $.ajaxJSON(action, method, formData, xhrSuccess, xhrError)
     }
@@ -301,7 +298,7 @@ $.fn.formSubmit = function(options) {
   return this
 }
 
-$.ajaxJSONPreparedFiles = function(options) {
+$.ajaxJSONPreparedFiles = function (options) {
   const list = []
   const $this = this
   const pre_list = options.files || options.file_elements || []
@@ -314,7 +311,7 @@ $.ajaxJSONPreparedFiles = function(options) {
     list.push(item)
   }
   const attachments = []
-  const ready = function() {
+  const ready = function () {
     let data = options.formDataTarget == 'url' ? options.formData : {}
     if (options.handle_files) {
       let result = attachments
@@ -328,7 +325,7 @@ $.ajaxJSONPreparedFiles = function(options) {
     }
   }
   const uploadUrl = options.uploadDataUrl || '/files/pending'
-  const uploadFile = function(parameters, file) {
+  const uploadFile = function (parameters, file) {
     // we want the s3 success url in the preflight response, not embedded in
     // the upload_url. the latter doesn't work with the new ajax mechanism
     parameters.no_redirect = true
@@ -345,7 +342,7 @@ $.ajaxJSONPreparedFiles = function(options) {
         ;(options.upload_error || options.error).call($this, error)
       })
   }
-  var next = function() {
+  var next = function () {
     const item = list.shift()
     if (item) {
       const attrs = $.extend(
@@ -374,26 +371,23 @@ $.ajaxJSONPreparedFiles = function(options) {
   next.call($this)
 }
 
-$.ajaxJSONFiles = function(url, submit_type, formData, files, success, error, options) {
+$.ajaxJSONFiles = function (url, submit_type, formData, files, success, error, options) {
   const $newForm = $(document.createElement('form'))
   $newForm.attr('action', url).attr('method', submit_type)
   // TODO: remove me once we stop proxying file uploads
   formData.authenticity_token = authenticity_token()
   const fileNames = {}
-  files.each(function() {
+  files.each(function () {
     fileNames[$(this).attr('name')] = true
   })
   for (const idx in formData) {
     if (!fileNames[idx]) {
       const $input = $(document.createElement('input'))
-      $input
-        .attr('type', 'hidden')
-        .attr('name', idx)
-        .attr('value', formData[idx])
+      $input.attr('type', 'hidden').attr('name', idx).attr('value', formData[idx])
       $newForm.append($input)
     }
   }
-  files.each(function() {
+  files.each(function () {
     const $newFile = $(this).clone(true)
     $(this).after($newFile)
     $newForm.append($(this))
@@ -411,20 +405,18 @@ $.ajaxJSONFiles = function(url, submit_type, formData, files, success, error, op
 
 $.handlesHTML5Files = !!(window.File && window.FileReader && window.FileList && XMLHttpRequest)
 if ($.handlesHTML5Files) {
-  $("input[type='file']").live('change', function(event) {
+  $("input[type='file']").live('change', function (event) {
     const file_list = this.files
     if (file_list) {
       $(this).data('file_list', file_list)
-      $(this)
-        .parents('form')
-        .addClass('handlingHTML5Files')
+      $(this).parents('form').addClass('handlingHTML5Files')
     }
   })
 }
-$.ajaxFileUpload = function(options) {
+$.ajaxFileUpload = function (options) {
   // TODO: remove me once we stop proxying file uploads
   options.data.authenticity_token = authenticity_token()
-  $.toMultipartForm(options.data, function(params) {
+  $.toMultipartForm(options.data, function (params) {
     $.sendFormAsBinary(
       {
         url: options.url,
@@ -457,7 +449,7 @@ $.ajaxFileUpload = function(options) {
   })
 }
 
-$.httpSuccess = function(r) {
+$.httpSuccess = function (r) {
   try {
     return (
       (!r.status && location.protocol == 'file:') ||
@@ -470,7 +462,7 @@ $.httpSuccess = function(r) {
   return false
 }
 
-$.sendFormAsBinary = function(options, not_binary) {
+$.sendFormAsBinary = function (options, not_binary) {
   const body = options.body
   const url = options.url
   const method = options.method
@@ -478,7 +470,7 @@ $.sendFormAsBinary = function(options, not_binary) {
   if (xhr.upload) {
     xhr.upload.addEventListener(
       'progress',
-      function(event) {
+      function (event) {
         if (options.progress && $.isFunction(options.progress)) {
           options.progress.call(this, event)
         }
@@ -487,7 +479,7 @@ $.sendFormAsBinary = function(options, not_binary) {
     )
     xhr.upload.addEventListener(
       'error',
-      function(event) {
+      function (event) {
         if (options.error && $.isFunction(options.error)) {
           options.error.call(this, 'uploading error', xhr, event)
         }
@@ -496,7 +488,7 @@ $.sendFormAsBinary = function(options, not_binary) {
     )
     xhr.upload.addEventListener(
       'abort',
-      function(event) {
+      function (event) {
         if (options.error && $.isFunction(options.error)) {
           options.error.call(this, 'aborted by the user', xhr, event)
         }
@@ -504,7 +496,7 @@ $.sendFormAsBinary = function(options, not_binary) {
       false
     )
   }
-  xhr.onreadystatechange = function(event) {
+  xhr.onreadystatechange = function (event) {
     if (xhr.readyState == 4) {
       let json = null
       try {
@@ -543,7 +535,7 @@ $.sendFormAsBinary = function(options, not_binary) {
   }
 }
 
-$.fileData = function(file_object) {
+$.fileData = function (file_object) {
   return {
     name: file_object.name || file_object.fileName,
     size: file_object.size || file_object.fileSize,
@@ -552,7 +544,7 @@ $.fileData = function(file_object) {
   }
 }
 
-$.toMultipartForm = function(params, callback) {
+$.toMultipartForm = function (params, callback) {
   let boundary = '-----AaB03x' + _.uniqueId(),
     result = {content_type: 'multipart/form-data; boundary=' + boundary},
     body = '--' + boundary + '\r\n',
@@ -617,11 +609,11 @@ $.toMultipartForm = function(params, callback) {
       for (const jdx in value) {
         fileList.push(value)
       }
-      const finishedFiles = function() {
+      const finishedFiles = function () {
         body += '--' + innerBoundary + '--\r\n' + '--' + boundary + '\r\n'
         nextParam()
       }
-      var nextFile = function() {
+      var nextFile = function () {
         if (fileList.length === 0) {
           finishedFiles()
           return
@@ -630,7 +622,7 @@ $.toMultipartForm = function(params, callback) {
           fileData = $.fileData(file),
           reader = new FileReader()
 
-        reader.onloadend = function() {
+        reader.onloadend = function () {
           body +=
             '--' +
             innerBoundary +
@@ -652,7 +644,7 @@ $.toMultipartForm = function(params, callback) {
     } else if (window.File && value instanceof File) {
       const fileData = $.fileData(value),
         reader = new FileReader()
-      reader.onloadend = function() {
+      reader.onloadend = function () {
         body +=
           'Content-Disposition: file; name="' +
           sanitizeQuotedString(name) +
@@ -714,7 +706,7 @@ $.toMultipartForm = function(params, callback) {
 //    and "bad" and "assignment[bad]" with false.
 //  call_change: Specifies whether to trigger the onchange event
 //    for form elements that are set.
-$.fn.fillFormData = function(data, opts) {
+$.fn.fillFormData = function (data, opts) {
   if (this.length) {
     data = data || []
     const options = $.extend({}, $.fn.fillFormData.defaults, opts)
@@ -722,7 +714,7 @@ $.fn.fillFormData = function(data, opts) {
     if (options.object_name) {
       data = $._addObjectName(data, options.object_name, true)
     }
-    this.find(':input').each(function() {
+    this.find(':input').each(function () {
       const $obj = $(this)
       const name = $obj.attr('name')
       const inputType = $obj.attr('type')
@@ -757,14 +749,14 @@ $.fn.fillFormData.defaults = {object_name: null, call_change: true}
 //      the result will include both "assignment[good]" and "good"
 //    values: specify the set of values to retrieve (if they exist)
 //      by default retrieves all it can find.
-$.fn.getFormData = function(options) {
+$.fn.getFormData = function (options) {
   var options = $.extend({}, $.fn.getFormData.defaults, options),
     result = {},
     $form = this
   $form
     .find(':input')
     .not(':button')
-    .each(function() {
+    .each(function () {
       const $input = $(this),
         inputType = $input.attr('type')
       if ((inputType == 'radio' || inputType == 'checkbox') && !$input.attr('checked')) return
@@ -816,7 +808,7 @@ $.fn.getFormData.defaults = {object_name: null}
 // Used internally to prepend object_name to data key names
 // Supports nested names, e.g.
 //      assignment[id] => discussion_topic[assignment][id]
-$._addObjectName = function(data, object_name, include_original) {
+$._addObjectName = function (data, object_name, include_original) {
   if (!data) {
     return data
   }
@@ -866,7 +858,7 @@ $._addObjectName = function(data, object_name, include_original) {
 // Used internally to strip object_name from data key names
 // Supports nested names, e.g.
 //      discussion_topic[assignment][id] => assignment[id]
-$._stripObjectName = function(data, object_name, include_original) {
+$._stripObjectName = function (data, object_name, include_original) {
   let new_result = {}
   let short_name
   if (data instanceof Array) {
@@ -917,7 +909,7 @@ $._stripObjectName = function(data, object_name, include_original) {
 //  labels: map of element names to labels to be used in error reporting.  The validation
 //    will attempt to determine the appropriate label via HTML <label for="..."> elements
 //    if not specified
-$.fn.validateForm = function(options) {
+$.fn.validateForm = function (options) {
   if (this.length === 0) {
     return false
   }
@@ -1013,7 +1005,7 @@ $.fn.validateForm.defaults = {object_name: null, required: null, dates: null, ti
 // Takes in an errors object and creates little pop-up message boxes over
 // each errored form field displaying the error text.  Still needs some
 // css lovin'.
-$.fn.formErrors = function(data_errors, options) {
+$.fn.formErrors = function (data_errors, options) {
   if (this.length === 0) {
     return
   }
@@ -1094,11 +1086,7 @@ $.fn.formErrors = function(data_errors, options) {
         .filter(':not(:visible)')
         .first()
       if ($hiddenInput && $hiddenInput.length > 0) {
-        if (
-          $hiddenInput[0].tagName === 'TEXTAREA' &&
-          $hiddenInput.data('remoteEditor') &&
-          ENV.use_rce_enhancements
-        ) {
+        if ($hiddenInput[0].tagName === 'TEXTAREA' && $hiddenInput.data('remoteEditor')) {
           // this textarea is tied to the new rce
           $obj = $hiddenInput.next()
         } else {
@@ -1141,7 +1129,7 @@ $.fn.formErrors = function(data_errors, options) {
 
 // Pops up a small box containing the given message.  The box is connected to the given form element, and will
 // go away when the element is selected.
-$.fn.errorBox = function(message, scroll, override_position) {
+$.fn.errorBox = function (message, scroll, override_position) {
   if (this.length) {
     const $obj = this,
       $oldBox = $obj.data('associated_error_box')
@@ -1186,7 +1174,7 @@ $.fn.errorBox = function(message, scroll, override_position) {
       })
       .fadeIn('fast')
 
-    const cleanup = function() {
+    const cleanup = function () {
       const $screenReaderErrors = $('#flash_screenreader_holder').find('span')
       const srError = _.find($screenReaderErrors, node => $(node).text() == $box.text())
       $box.remove()
@@ -1197,7 +1185,7 @@ $.fn.errorBox = function(message, scroll, override_position) {
       $obj.removeData('associated_error_object')
     }
 
-    const fade = function() {
+    const fade = function () {
       $box.stop(true, true).fadeOut('slow', cleanup)
     }
 
@@ -1209,7 +1197,7 @@ $.fn.errorBox = function(message, scroll, override_position) {
       .click(fade)
       .keypress(fade)
 
-    $box.click(function() {
+    $box.click(function () {
       $(this).fadeOut('fast', cleanup)
     })
 
@@ -1224,7 +1212,7 @@ $.fn.errorBox = function(message, scroll, override_position) {
   }
 }
 $.fn.errorBox.errorBoxes = []
-$.moveErrorBoxes = function() {
+$.moveErrorBoxes = function () {
   const list = []
   const prevList = $.fn.errorBox.errorBoxes
   // ember does silly things with arrays
@@ -1263,7 +1251,7 @@ $.moveErrorBoxes = function() {
   }
 }
 // Hides all error boxes for the given form element and its input elements.
-$.fn.hideErrors = function(options) {
+$.fn.hideErrors = function (options) {
   if (this.length) {
     const $oldBox = this.data('associated_error_box')
     const $screenReaderErrors = $('#flash_screenreader_holder').find('span')
@@ -1271,7 +1259,7 @@ $.fn.hideErrors = function(options) {
       $oldBox.remove()
       this.data('associated_error_box', null)
     }
-    this.find(':input').each(function() {
+    this.find(':input').each(function () {
       const $obj = $(this),
         $oldBox = $obj.data('associated_error_box')
       if ($oldBox) {
@@ -1287,7 +1275,7 @@ $.fn.hideErrors = function(options) {
   return this
 }
 
-$.fn.markRequired = function(options) {
+$.fn.markRequired = function (options) {
   if (!options.required) {
     return
   }
@@ -1296,13 +1284,13 @@ $.fn.markRequired = function(options) {
     required = $._addObjectName(required, options.object_name)
   }
   const $form = $(this)
-  $.each(required, function(i, name) {
+  $.each(required, function (i, name) {
     const field = $form.find('[name="' + name + '"]')
     if (!field.length) {
       return
     }
     field.attr({'aria-required': 'true'})
-    field.each(function() {
+    field.each(function () {
       if (!this.id) {
         return
       }
@@ -1322,7 +1310,7 @@ $.fn.markRequired = function(options) {
   })
 }
 
-$.fn.getFieldLabelString = function(name) {
+$.fn.getFieldLabelString = function (name) {
   const field = $(this).find('[name="' + name + '"]')
   if (!field.length || !field[0].id) {
     return

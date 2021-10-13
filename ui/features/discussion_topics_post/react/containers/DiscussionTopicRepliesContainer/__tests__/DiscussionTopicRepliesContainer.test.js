@@ -17,14 +17,12 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {ApolloProvider} from 'react-apollo'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {DiscussionTopicRepliesContainer} from '../DiscussionTopicRepliesContainer'
 import {fireEvent, render} from '@testing-library/react'
-import {handlers} from '../../../../graphql/mswHandlers'
-import {mswClient} from '../../../../../../shared/msw/mswClient'
-import {mswServer} from '../../../../../../shared/msw/mswServer'
+import {getDiscussionSubentriesQueryMock} from '../../../../graphql/Mocks'
+import {MockedProvider} from '@apollo/react-testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
 
@@ -32,10 +30,17 @@ jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
 }))
+jest.mock('../../../utils/constants', () => ({
+  ...jest.requireActual('../../../utils/constants'),
+  AUTO_MARK_AS_READ_DELAY: 0
+}))
 
 describe('DiscussionTopicRepliesContainer', () => {
-  const server = mswServer(handlers)
   beforeAll(() => {
+    window.ENV = {
+      course_id: '1'
+    }
+
     window.matchMedia = jest.fn().mockImplementation(() => {
       return {
         matches: true,
@@ -45,20 +50,6 @@ describe('DiscussionTopicRepliesContainer', () => {
         removeListener: jest.fn()
       }
     })
-
-    // eslint-disable-next-line no-undef
-    fetchMock.dontMock()
-    server.listen()
-  })
-
-  afterEach(() => {
-    server.resetHandlers()
-  })
-
-  afterAll(() => {
-    server.close()
-    // eslint-disable-next-line no-undef
-    fetchMock.enableMocks()
   })
 
   const defaultProps = () => {
@@ -79,13 +70,13 @@ describe('DiscussionTopicRepliesContainer', () => {
     }
   }
 
-  const setup = props => {
+  const setup = (props, mocks) => {
     return render(
-      <ApolloProvider client={mswClient}>
+      <MockedProvider mocks={mocks}>
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <DiscussionTopicRepliesContainer {...props} />
         </AlertManagerContext.Provider>
-      </ApolloProvider>
+      </MockedProvider>
     )
   }
 
@@ -103,14 +94,17 @@ describe('DiscussionTopicRepliesContainer', () => {
   })
 
   it('renders discussion entries', async () => {
-    const {queryByText, getByTestId, findByText} = setup(defaultProps())
-    expect(await findByText('This is the parent reply')).toBeTruthy()
+    const {queryByText, getByTestId, findByText} = setup(
+      defaultProps(),
+      getDiscussionSubentriesQueryMock({first: 20, sort: ''})
+    )
+    expect(await findByText('This is the parent reply')).toBeInTheDocument()
     expect(queryByText('This is the child reply')).toBe(null)
 
     const expandButton = getByTestId('expand-button')
     fireEvent.click(expandButton)
 
-    expect(await findByText('This is the child reply', {}, {timeout: 4000})).toBeTruthy()
+    expect(await findByText('This is the child reply')).toBeInTheDocument()
   })
 
   it('renders the pagination component if there are more than 1 pages', () => {
@@ -123,28 +117,5 @@ describe('DiscussionTopicRepliesContainer', () => {
     props.discussionTopic.entriesTotalPages = 1
     const {queryByTestId} = setup(props)
     expect(queryByTestId('pagination')).toBeNull()
-  })
-
-  it('updates unread discussion entries read state to read', async () => {
-    const container = setup(defaultProps())
-
-    expect(container.getByTestId('is-unread')).toBeInTheDocument()
-    expect(container.getByTestId('is-unread').getAttribute('data-isforcedread')).toBe(null)
-
-    window.setTimeout(
-      () => expect(container.queryByTestId('is-unread')).not.toBeInTheDocument(),
-      3000
-    )
-  })
-
-  it('unread discussion entry does not update when forceReadState is true', async () => {
-    const props = defaultProps()
-    props.discussionTopic.discussionEntriesConnection.nodes[0].entryParticipant.forcedReadState = true
-
-    const container = setup(props)
-    expect(container.getByTestId('is-unread')).toBeInTheDocument()
-    expect(container.getByTestId('is-unread').getAttribute('data-isforcedread')).toBe('true')
-
-    window.setTimeout(() => expect(container.queryByTestId('is-unread')).toBeInTheDocument(), 3000)
   })
 })

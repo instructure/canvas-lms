@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {Assignment, AssignmentSubmissionsConnection} from '@canvas/assignments/graphql/student/Assignment'
+import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import AssignmentToggleDetails from '../AssignmentToggleDetails'
 import I18n from 'i18n!assignments_2_submission_histories_query'
 import Header from './Header'
@@ -24,6 +24,7 @@ import {Query} from 'react-apollo'
 import React, {Suspense, lazy} from 'react'
 import {shape} from 'prop-types'
 import {Spinner} from '@instructure/ui-spinner'
+import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import ViewManager from './ViewManager'
 
@@ -33,21 +34,12 @@ class SubmissionHistoriesQuery extends React.Component {
   static propTypes = {
     initialQueryData: shape({
       ...Assignment.shape.propTypes,
-      ...AssignmentSubmissionsConnection.shape.propTypes
+      ...Submission.shape.propTypes
     })
   }
 
-  getSubmission = () => {
-    const submissionsConnection = this.props.initialQueryData.assignment.submissionsConnection
-    if (submissionsConnection && submissionsConnection.nodes.length) {
-      return submissionsConnection.nodes[0]
-    } else {
-      return null
-    }
-  }
-
   render() {
-    const submission = this.getSubmission()
+    const {submission} = this.props.initialQueryData
     if (!submission) {
       // User hasn't accepted course invite
       return (

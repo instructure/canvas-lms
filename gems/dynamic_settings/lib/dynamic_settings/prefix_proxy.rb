@@ -181,7 +181,7 @@ module DynamicSettings
         raise
       end
     end
-    alias [] fetch
+    alias_method :[], :fetch
 
     # Extend the prefix from this instance returning a new one.
     #
@@ -210,7 +210,7 @@ module DynamicSettings
     # @return Consul txn response
     def set_keys(kvs, global: false)
       opts = @data_center.present? && global ? { dc: @data_center } : {}
-      Diplomat::Kv.txn(kvs.map do |k, v|
+      value = kvs.map do |k, v|
         {
           'KV' => {
             'Verb' => "set",
@@ -218,7 +218,8 @@ module DynamicSettings
             'Value' => v,
           }
         }
-      end)
+      end
+      Diplomat::Kv.txn(value, opts)
     end
 
     private

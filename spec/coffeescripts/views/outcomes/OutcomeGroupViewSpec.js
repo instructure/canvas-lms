@@ -18,11 +18,16 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
+import OutcomeContentBase from '@canvas/outcome-content-view/backbone/views/OutcomeContentBase'
 import OutcomeGroup from '@canvas/outcomes/backbone/models/OutcomeGroup.coffee'
 import OutcomeGroupView from '@canvas/outcome-content-view/backbone/views/OutcomeGroupView'
 import fixtures from 'helpers/fixtures'
 
-const createView = function(opts) {
+// stub function that creates the RCE to avoid
+// its async initializationa
+OutcomeContentBase.prototype.readyForm = () => {}
+
+const createView = function (opts) {
   const view = new OutcomeGroupView(opts)
   view.$el.appendTo($('#fixtures'))
   return view.render()
@@ -48,7 +53,7 @@ QUnit.module('OutcomeGroupView as a teacher', {
   }
 })
 
-test('placeholder text is rendered properly for new outcome groups', function() {
+test('placeholder text is rendered properly for new outcome groups', function () {
   const view = createView({
     state: 'add',
     model: this.outcomeGroup
@@ -57,7 +62,7 @@ test('placeholder text is rendered properly for new outcome groups', function() 
   view.remove()
 })
 
-test('validates title is present', function() {
+test('validates title is present', function () {
   const view = createView({
     state: 'add',
     model: this.outcomeGroup
@@ -68,7 +73,7 @@ test('validates title is present', function() {
   view.remove()
 })
 
-test('move, edit, and delete buttons appear', function() {
+test('move, edit, and delete buttons appear', function () {
   const view = createView({
     state: 'show',
     model: this.outcomeGroup
@@ -77,7 +82,7 @@ test('move, edit, and delete buttons appear', function() {
   view.remove()
 })
 
-test('move, edit, and delete buttons do not appear when read only', function() {
+test('move, edit, and delete buttons do not appear when read only', function () {
   const view = createView({
     state: 'show',
     model: this.outcomeGroup,
@@ -107,7 +112,7 @@ QUnit.module('OutcomeGroupView as a student', {
   }
 })
 
-test('move, edit, and delete buttons do not appear', function() {
+test('move, edit, and delete buttons do not appear', function () {
   const view = createView({
     state: 'show',
     model: this.outcomeGroup

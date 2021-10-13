@@ -20,7 +20,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-describe OauthProxyController do
+describe OAuthProxyController do
   it 'redirects to the url in the state' do
     get :redirect_proxy, params: { state: Canvas::Security.create_jwt({ redirect_uri: 'http://example.com' }) }
     expect(response.location).to match('example.com')

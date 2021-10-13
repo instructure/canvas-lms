@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createAutoSavingAction} from './autosaving'
 import {createAction, ActionsUnion} from '../shared/types'
 
 export enum Constants {
@@ -28,17 +27,6 @@ export enum Constants {
 export const actions = {
   setPlanItemDuration: (planItemId: string, duration: number) =>
     createAction(Constants.SET_PLAN_ITEM_DURATION, {planItemId, duration})
-}
-
-export const autoSavingActions = {
-  setPlanItemDuration: (planItemId: string, duration: number, extraSaveParams = {}) => {
-    return createAutoSavingAction(
-      actions.setPlanItemDuration(planItemId, duration),
-      true,
-      false,
-      extraSaveParams
-    )
-  }
 }
 
 export type PacePlanItemAction = ActionsUnion<typeof actions>

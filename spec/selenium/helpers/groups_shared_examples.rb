@@ -137,7 +137,6 @@ shared_examples 'announcements_page_v2' do
   include RCENextPage
 
   before(:each) do
-    Account.default.enable_feature!(:rce_enhancements)
     stub_rcs_config
   end
 

@@ -493,10 +493,10 @@ CanvasRails::Application.routes.draw do
   get 'quiz_statistics/:quiz_statistics_id/files/:file_id/download' => 'files#show', as: :quiz_statistics_download, download: '1'
 
   resources :page_views, only: :update
-  post 'media_objects' => 'context#create_media_object', as: :create_media_object
-  get 'media_objects/:id' => 'context#media_object_inline', as: :media_object
-  get 'media_objects/:id/redirect' => 'context#media_object_redirect', as: :media_object_redirect
-  get 'media_objects/:id/thumbnail' => 'context#media_object_thumbnail', as: :media_object_thumbnail
+  post 'media_objects' => 'media_objects#create_media_object', as: :create_media_object
+  get 'media_objects/:id' => 'media_objects#media_object_inline', as: :media_object
+  get 'media_objects/:id/redirect' => 'media_objects#media_object_redirect', as: :media_object_redirect
+  get 'media_objects/:id/thumbnail' => 'media_objects#media_object_thumbnail', as: :media_object_thumbnail
   get 'media_objects/:media_object_id/info' => 'media_objects#show', as: :media_object_info
   get 'media_objects_iframe/:media_object_id' => 'media_objects#iframe_media_player', as: :media_object_iframe
   get 'media_objects_iframe' => 'media_objects#iframe_media_player', as: :media_object_iframe_href
@@ -1197,6 +1197,10 @@ CanvasRails::Application.routes.draw do
         post "#{context.pluralize}/:#{context}_id/submissions/update_grades", action: :bulk_update
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_read, as: "#{context}_submission_mark_read"
         delete "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_unread, as: "#{context}_submission_mark_unread"
+        get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/document_annotations/read", action: :document_annotations_read_state, as: "#{path_prefix}_submission_document_annotations_read_state"
+        put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/document_annotations/read", action: :mark_document_annotations_read, as: "#{path_prefix}_submission_document_annotations_mark_read"
+        get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/rubric_comments/read", action: :rubric_comments_read_state, as: "#{path_prefix}_submission_rubric_comments_read_state"
+        put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/rubric_comments/read", action: :mark_rubric_comments_read, as: "#{path_prefix}_submission_rubric_comments_mark_read"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", action: :index, as: "#{path_prefix}_assignment_submissions"
         get "#{context.pluralize}/:#{context}_id/students/submissions", controller: :submissions_api, action: :for_students, as: "#{path_prefix}_student_submissions"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id", action: :show, as: "#{path_prefix}_assignment_submission"
@@ -1514,6 +1518,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/courses/:id', controller: :courses, action: :show, as: 'account_course_show'
       get 'accounts/:account_id/permissions', action: :permissions
       get 'accounts/:account_id/settings', action: :show_settings
+      get 'manually_created_courses_account', action: :manually_created_courses_account
       delete 'accounts/:account_id/users/:user_id', action: :remove_user
       put 'accounts/:account_id/users/:user_id/restore', action: :restore_user
     end
@@ -2320,7 +2325,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/csp_log", action: :csp_log
     end
 
-    scope(:controller => :context) do
+    scope(:controller => :media_objects) do
       post 'media_objects', action: 'create_media_object', as: :create_media_object
     end
 
@@ -2358,9 +2363,10 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :pace_plans) do
       post 'courses/:course_id/pace_plans', action: :create
+      get 'courses/:course_id/pace_plans/new', action: :new
       get 'courses/:course_id/pace_plans/:id', action: :api_show
       put 'courses/:course_id/pace_plans/:id', action: :update
-      get 'pace_plans/latest_draft_for', action: :latest_draft_for
+      post 'courses/:course_id/pace_plans/:id/publish', action: :publish
     end
   end
 

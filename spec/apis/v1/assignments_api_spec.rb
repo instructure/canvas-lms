@@ -2057,8 +2057,6 @@ describe AssignmentsApiController, type: :request do
     context 'LTI 2.x' do
       include_context 'lti2_spec_helper'
 
-      let(:root_account) { account.root_account }
-      let(:course) { Course.create!(name: 'test course', account: account) }
       let(:teacher) { teacher_in_course(course: course) }
 
       it "checks for tool installation in entire account chain" do
@@ -2102,10 +2100,32 @@ describe AssignmentsApiController, type: :request do
         let(:lookups) { assignment.assignment_configuration_tool_lookups }
 
         before do
-          allow_any_instance_of(AssignmentConfigurationToolLookup).to(
-            receive(:create_subscription).and_return(SecureRandom.uuid)
-          )
           user_session(@user)
+        end
+
+        it 'shows webhook subscription information on the assignment with ?include[]=include_webhook_info' do
+          tool_proxy.update(subscription_id: SecureRandom.uuid)
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{course.id}/assignments/#{assignment.id}.json",
+            { controller: "assignments_api", action: "show",
+              format: "json", course_id: course.id.to_s,
+              id: assignment.id.to_s, include: 'webhook_info' }
+          )
+          expect(json['webhook_info']).to eq(
+            {
+              'product_code' => product_family.product_code,
+              'vendor_code' => product_family.vendor_code,
+              'resource_type_code' => 'code',
+              'tool_proxy_id' => tool_proxy.id,
+              'tool_proxy_created_at' => tool_proxy.created_at.iso8601,
+              'tool_proxy_updated_at' => tool_proxy.updated_at.iso8601,
+              'tool_proxy_name' => tool_proxy.name,
+              'tool_proxy_context_type' => tool_proxy.context_type,
+              'tool_proxy_context_id' => tool_proxy.context_id,
+              'subscription_id' => tool_proxy.subscription_id,
+            }
+          )
         end
 
         context 'when changing the workflow state' do
@@ -5677,6 +5697,25 @@ describe AssignmentsApiController, type: :request do
     it "contains false for anonymize_students when the assignment is not anonymized for students" do
       @assignment.anonymous_grading = false
       expect(result['anonymize_students']).to be false
+    end
+
+    it "includes the assignment's annotatable_attachment_id for existing assignments" do
+      attachment = attachment_model(context: @course)
+      @assignment.update(
+        annotatable_attachment: attachment,
+        submission_types: "student_annotation"
+      )
+      expect(result['annotatable_attachment_id']).to eq attachment.id
+    end
+
+    it "includes the assignment's annotatable_attachment_id for new assignments" do
+      attachment = attachment_model(context: @course)
+      assignment = @course.assignments.build(
+        annotatable_attachment: attachment,
+        submission_types: 'student_annotation'
+      )
+      result = assignment_json(assignment, @user, {})
+      expect(result['annotatable_attachment_id']).to eq attachment.id
     end
 
     context 'can_submit value' do

@@ -40,31 +40,11 @@ describe('buttonConfig()', () => {
     }
   })
 
-  describe('with new RCE', () => {
-    beforeEach(() => {
-      window.ENV.use_rce_enhancements = true
-    })
-
-    it('does not set the custom icon class', () => {
-      expect(subject().icon).toBeUndefined()
-    })
-
-    it('uses the icon url', () => {
-      expect(subject().image).toEqual(button.icon_url)
-    })
+  it('does not set the custom icon class', () => {
+    expect(subject().icon).toBeUndefined()
   })
 
-  describe('without new RCE', () => {
-    beforeEach(() => {
-      window.ENV.use_rce_enhancements = false
-    })
-
-    it('sets the custom icon and "hack" class', () => {
-      expect(subject().icon).toEqual('hack-to-avoid-mce-prefix custom-class')
-    })
-
-    it('deso not use the icon url', () => {
-      expect(subject().image).toBeUndefined()
-    })
+  it('uses the icon url', () => {
+    expect(subject().image).toEqual(button.icon_url)
   })
 })

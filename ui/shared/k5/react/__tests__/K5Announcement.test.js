@@ -133,10 +133,6 @@ describe('K5Announcement', () => {
   })
 
   describe('with inter-announcement navigation enabled', () => {
-    beforeAll(() => {
-      window.ENV.FEATURES ||= {}
-      window.ENV.FEATURES.k5_homeroom_many_announcements = true
-    })
     afterEach(() => {
       fetchMock.restore()
     })
