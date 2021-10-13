@@ -60,15 +60,6 @@
     fast-json-stable-stringify "^2.0.0"
     tslib "^1.10.0"
 
-"@apollo/rover@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@apollo/rover/-/rover-0.2.0.tgz#2a34c9b1a55053cc5c42c59c84725b8322bbbd29"
-  integrity sha512-QHyOzV6sAYKV0kImHCqHMO7LPO9Z2LYAJcrI393MD8Ww31br1aABV5XHweyp8au0jMLrE5t6eZ7sH//LZfvusw==
-  dependencies:
-    binary-install "^0.1.1"
-    console.table "^0.10.0"
-    detect-libc "^1.0.3"
-
 "@babel/cli@^7", "@babel/cli@^7.0.0":
   version "7.14.5"
   resolved "https://registry.yarnpkg.com/@babel/cli/-/cli-7.14.5.tgz#9551b194f02360729de6060785bbdcce52c69f0a"
@@ -8280,15 +8271,6 @@ binary-extensions@^2.0.0:
   resolved "https://registry.yarnpkg.com/binary-extensions/-/binary-extensions-2.2.0.tgz#75f502eeaf9ffde42fc98829645be4ea76bd9e2d"
   integrity sha512-jDctJ/IVQbZoJykoeHbhXpOlNBqGNcwXJKJog42E5HDPUwQTSdjCHdihjj0DlnheQ7blbT6dHOafNAiS8ooQKA==
 
-binary-install@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/binary-install/-/binary-install-0.1.1.tgz#c1b22f174581764e5c52cd16664cf1d287e38bd4"
-  integrity sha512-DqED0D/6LrS+BHDkKn34vhRqOGjy5gTMgvYZsGK2TpNbdPuz4h+MRlNgGv5QBRd7pWq/jylM4eKNCizgAq3kNQ==
-  dependencies:
-    axios "^0.21.1"
-    rimraf "^3.0.2"
-    tar "^6.1.0"
-
 bindings@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/bindings/-/bindings-1.5.0.tgz#10353c9e945334bc0511a6d90b38fbc7c9c504df"
@@ -9367,11 +9349,6 @@ clone-stats@^1.0.0:
   resolved "https://registry.yarnpkg.com/clone-stats/-/clone-stats-1.0.0.tgz#b3782dff8bb5474e18b9b6bf0fdfe782f8777680"
   integrity sha1-s3gt/4u1R04Yuba/D9/ngvh3doA=
 
-clone@^1.0.2:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/clone/-/clone-1.0.4.tgz#da309cc263df15994c688ca902179ca3c7cd7c7e"
-  integrity sha1-2jCcwmPfFZlMaIypAheco8fNfH4=
-
 clone@^2.1.1:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
@@ -9726,13 +9703,6 @@ console-control-strings@^1.0.0, console-control-strings@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/console-control-strings/-/console-control-strings-1.1.0.tgz#3d7cf4464db6446ea644bf4b39507f9851008e8e"
   integrity sha1-PXz0Rk22RG6mRL9LOVB/mFEAjo4=
-
-console.table@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/console.table/-/console.table-0.10.0.tgz#0917025588875befd70cf2eff4bef2c6e2d75d04"
-  integrity sha1-CRcCVYiHW+/XDPLv9L7yxuLXXQQ=
-  dependencies:
-    easy-table "1.1.0"
 
 constant-case@^2.0.0:
   version "2.0.0"
@@ -10633,13 +10603,6 @@ default-resolution@^2.0.0:
   resolved "https://registry.yarnpkg.com/default-resolution/-/default-resolution-2.0.0.tgz#bcb82baa72ad79b426a76732f1a81ad6df26d684"
   integrity sha1-vLgrqnKtebQmp2cy8aga1t8m1oQ=
 
-defaults@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/defaults/-/defaults-1.0.3.tgz#c656051e9817d9ff08ed881477f3fe4019f3ef7d"
-  integrity sha1-xlYFHpgX2f8I7YgUd/P+QBnz730=
-  dependencies:
-    clone "^1.0.2"
-
 define-properties@^1.1.2, define-properties@^1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/define-properties/-/define-properties-1.1.3.tgz#cf88da6cbee26fe6db7094f61d870cbd84cee9f1"
@@ -10784,11 +10747,6 @@ detect-indent@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/detect-indent/-/detect-indent-5.0.0.tgz#3871cc0a6a002e8c3e5b3cf7f336264675f06b9d"
   integrity sha1-OHHMCmoALow+Wzz38zYmRnXwa50=
-
-detect-libc@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/detect-libc/-/detect-libc-1.0.3.tgz#fa137c4bd698edf55cd5cd02ac559f91a4c4ba9b"
-  integrity sha1-+hN8S9aY7fVc1c0CrFWfkaTEups=
 
 detect-newline@2.X, detect-newline@^2.1.0:
   version "2.1.0"
@@ -11135,13 +11093,6 @@ each-props@^1.3.2:
   dependencies:
     is-plain-object "^2.0.1"
     object.defaults "^1.1.0"
-
-easy-table@1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/easy-table/-/easy-table-1.1.0.tgz#86f9ab4c102f0371b7297b92a651d5824bc8cb73"
-  integrity sha1-hvmrTBAvA3G3KXuSplHVgkvIy3M=
-  optionalDependencies:
-    wcwidth ">=1.0.1"
 
 ebml-block@^1.1.0:
   version "1.1.2"
@@ -24920,7 +24871,7 @@ tapable@^1.0.0, tapable@^1.1.3:
   resolved "https://registry.yarnpkg.com/tapable/-/tapable-1.1.3.tgz#a1fccc06b58db61fd7a45da2da44f5f3a3e67ba2"
   integrity sha512-4WK/bYZmj8xLr+HUCODHGF1ZFzsYffasLUgEiMBY4fgtltdO6B4WJtlSbPaDTLpYTcGVwM2qLnFTICEcNxs3kA==
 
-tar@^6.0.2, tar@^6.1.0:
+tar@^6.0.2:
   version "6.1.11"
   resolved "https://registry.yarnpkg.com/tar/-/tar-6.1.11.tgz#6760a38f003afa1b2ffd0ffe9e9abbd0eab3d621"
   integrity sha512-an/KZQzQUkZCkuoAA64hM92X0Urb6VpRhAFllDzz44U2mcD5scmT3zBc4VgVpkugF580+DQn8eAFSyoQt0tznA==
@@ -26669,13 +26620,6 @@ wcag-element-contrast@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wcag-element-contrast/-/wcag-element-contrast-1.0.2.tgz#5a90cb7cdc252979cf3e2bd27161e1bf9ad4c2f6"
   integrity sha1-WpDLfNwlKXnPPivScWHhv5rUwvY=
-
-wcwidth@>=1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/wcwidth/-/wcwidth-1.0.1.tgz#f0b0dcf915bc5ff1528afadb2c0e17b532da2fe8"
-  integrity sha1-8LDc+RW8X/FSivrbLA4XtTLaL+g=
-  dependencies:
-    defaults "^1.0.3"
 
 web-namespaces@^1.0.0:
   version "1.1.4"
