@@ -26,8 +26,8 @@ require_relative '../pages/k5_schedule_tab_page'
 require_relative '../../../helpers/k5_common'
 require_relative '../shared_examples/k5_announcements_shared_examples'
 
-describe "teacher k5 dashboard" do
-  include_context "in-process server selenium tests"
+describe 'teacher k5 dashboard' do
+  include_context 'in-process server selenium tests'
   include K5DashboardPageObject
   include K5DashboardCommonPageObject
   include K5GradesTabPageObject
@@ -37,7 +37,6 @@ describe "teacher k5 dashboard" do
 
   before :once do
     teacher_setup
-    Account.site_admin.enable_feature!(:k5_homeroom_many_announcements)
   end
 
   before :each do
@@ -52,7 +51,7 @@ describe "teacher k5 dashboard" do
     end
 
     it 'provides the homeroom dashboard tabs on dashboard' do
-      get "/"
+      get '/'
 
       expect(retrieve_welcome_text).to match(/Welcome,/)
       expect(homeroom_tab).to be_displayed
@@ -62,7 +61,7 @@ describe "teacher k5 dashboard" do
     end
 
     it 'saves tab information for refresh' do
-      get "/"
+      get '/'
 
       select_schedule_tab
       refresh_page
@@ -72,7 +71,7 @@ describe "teacher k5 dashboard" do
     end
 
     it 'navigates to homeroom course when homeroom when homeroom title clicked' do
-      get "/"
+      get '/'
 
       click_homeroom_course_title(@course_name)
       wait_for_ajaximations
@@ -81,7 +80,7 @@ describe "teacher k5 dashboard" do
     end
 
     it 'does not show homeroom course on dashboard' do
-      get "/"
+      get '/'
 
       expect(element_exists?(course_card_selector(@course_name))).to eq(false)
       expect(element_exists?(course_card_selector(@subject_course_title))).to eq(true)
@@ -90,40 +89,46 @@ describe "teacher k5 dashboard" do
     it 'shows Important Info on the course navigation list' do
       get "/courses/#{@homeroom_course.id}"
 
-      expect(important_info_link).to include_text("Important Info")
+      expect(important_info_link).to include_text('Important Info')
     end
   end
 
   context 'homeroom announcements' do
     it 'navigates to homeroom course announcement edit when announcement button is clicked' do
-      get "/"
+      get '/'
 
       expect(announcement_button).to be_displayed
       click_announcement_button
       wait_for_ajaximations
 
-      expect(driver.current_url).to include("/courses/#{@homeroom_course.id}/discussion_topics/new?is_announcement=true")
+      expect(driver.current_url).to include(
+        "/courses/#{@homeroom_course.id}/discussion_topics/new?is_announcement=true"
+      )
     end
 
     it 'goes to the homeroom announcement for edit when clicked' do
       announcement_title = "K5 Let's do this"
-      announcement = new_announcement(@homeroom_course, announcement_title, "So happy to see all of you.")
+      announcement =
+        new_announcement(@homeroom_course, announcement_title, 'So happy to see all of you.')
 
-      get "/"
+      get '/'
 
       click_announcement_edit_pencil
       wait_for_ajaximations
 
-      expect(driver.current_url).to include("/courses/#{@homeroom_course.id}/discussion_topics/#{announcement.id}/edit")
+      expect(driver.current_url).to include(
+        "/courses/#{@homeroom_course.id}/discussion_topics/#{announcement.id}/edit"
+      )
     end
 
     it 'provides the +Announcement button along with no recent announcements' do
-      announcement_heading1 = "K5 Do this"
-      announcement_content1 = "So happy to see all of you."
-      announcement1 = new_announcement(@homeroom_course, announcement_heading1, announcement_content1)
+      announcement_heading1 = 'K5 Do this'
+      announcement_content1 = 'So happy to see all of you.'
+      announcement1 =
+        new_announcement(@homeroom_course, announcement_heading1, announcement_content1)
       announcement1.update!(posted_at: 15.days.ago)
 
-      get "/"
+      get '/'
 
       expect(no_recent_announcements).to be_displayed
       expect(announcement_button).to be_displayed
@@ -136,10 +141,10 @@ describe "teacher k5 dashboard" do
 
   context 'course cards' do
     it 'shows latest announcement on subject course card' do
-      new_announcement(@subject_course, "K5 Let's do this", "So happy to see all of you.")
-      announcement2 = new_announcement(@subject_course, "K5 Latest", "Let's get to work!")
+      new_announcement(@subject_course, "K5 Let's do this", 'So happy to see all of you.')
+      announcement2 = new_announcement(@subject_course, 'K5 Latest', "Let's get to work!")
 
-      get "/"
+      get '/'
 
       expect(course_card_announcement(announcement2.title)).to be_displayed
     end
@@ -148,7 +153,7 @@ describe "teacher k5 dashboard" do
       new_color = '#07AB99'
       @subject_course.update!(course_color: new_color)
 
-      get "/"
+      get '/'
 
       expect(hex_value_for_color(dashboard_card, 'background-color')).to eq(new_color)
     end
@@ -156,17 +161,17 @@ describe "teacher k5 dashboard" do
 
   context 'homeroom dashboard grades panel' do
     it 'shows the subjects the teacher is enrolled in' do
-      subject_title2 = "Social Studies"
+      subject_title2 = 'Social Studies'
       course_with_teacher(active_all: true, user: @homeroom_teacher, course_name: subject_title2)
 
-      get "/#grades"
+      get '/#grades'
 
       expect(subject_grades_title(@subject_course_title)).to be_displayed
       expect(subject_grades_title(subject_title2)).to be_displayed
     end
 
     it 'provides a button to the gradebook for subject teacher is enrolled in' do
-      get "/#grades"
+      get '/#grades'
 
       expect(view_grades_button(@subject_course.id)).to be_displayed
     end
@@ -174,32 +179,29 @@ describe "teacher k5 dashboard" do
     it 'shows the subjects the TA is enrolled in' do
       course_with_ta(active_all: true, course: @subject_course)
 
-      get "/#grades"
+      get '/#grades'
 
       expect(subject_grades_title(@subject_course_title)).to be_displayed
       expect(view_grades_button(@subject_course.id)).to be_displayed
     end
 
     it 'show teacher also as student on grades page' do
-      subject_title2 = "Teacher Training"
+      subject_title2 = 'Teacher Training'
       course_with_student(active_all: true, user: @homeroom_teacher, course_name: subject_title2)
 
-      get "/#grades"
+      get '/#grades'
 
       expect(subject_grades_title(@subject_course_title)).to be_displayed
       expect(subject_grades_title(subject_title2)).to be_displayed
-      expect(subject_grade("--")).to be_displayed
+      expect(subject_grade('--')).to be_displayed
     end
   end
 
   context 'homeroom dashboard resource panel' do
     it 'shows the resource panel staff contacts' do
-      course_with_ta(
-        course: @homeroom_course,
-        active_enrollment: 1
-      )
+      course_with_ta(course: @homeroom_course, active_enrollment: 1)
 
-      get "/"
+      get '/'
 
       select_resources_tab
 
@@ -223,24 +225,24 @@ describe "teacher k5 dashboard" do
       user_profile.title = title
       user_profile.save!
 
-      get "/#resources"
+      get '/#resources'
 
       expect(instructor_bio(bio)).to be_displayed
     end
 
     it 'shows the Important Info for the main resources tab' do
-      important_info_text = "Show me what you can do"
+      important_info_text = 'Show me what you can do'
       create_important_info_content(@homeroom_course, important_info_text)
 
-      get "/#resources"
+      get '/#resources'
       expect(important_info_content).to include_text(important_info_text)
     end
 
     it 'edits important info from via pencil on resource tab' do
-      important_info_text = "Show me what you can do"
+      important_info_text = 'Show me what you can do'
       create_important_info_content(@homeroom_course, important_info_text)
 
-      get "/#resources"
+      get '/#resources'
       expect(important_info_edit_pencil).to be_displayed
 
       click_important_info_edit_pencil
@@ -256,12 +258,13 @@ describe "teacher k5 dashboard" do
     end
 
     it 'shows the LTI resources for account and course on resources page' do
-      get "/#resources"
+      get '/#resources'
 
       expect(k5_app_buttons[0].text).to eq lti_resource_name
     end
 
-    it 'shows course modal to choose which LTI resource context when button clicked', ignore_js_errors: true do
+    it 'shows course modal to choose which LTI resource context when button clicked',
+       ignore_js_errors: true do
       second_course_title = 'Second Course'
       course_with_teacher(
         active_course: 1,
@@ -269,7 +272,7 @@ describe "teacher k5 dashboard" do
         course_name: second_course_title,
         user: @homeroom_teacher
       )
-      get "/#resources"
+      get '/#resources'
 
       click_k5_button(0)
 
@@ -280,7 +283,7 @@ describe "teacher k5 dashboard" do
     it 'shows the LTI resource scoped to the course', ignore_js_errors: true do
       create_lti_resource('New Commons')
 
-      get "/#resources"
+      get '/#resources'
 
       expect(k5_resource_button_names_list).to include 'New Commons'
     end
@@ -288,7 +291,7 @@ describe "teacher k5 dashboard" do
 
   context 'teacher schedule' do
     it 'shows a sample preview for teacher view of the schedule tab' do
-      get "/#schedule"
+      get '/#schedule'
 
       expect(teacher_preview).to be_displayed
     end
@@ -305,19 +308,19 @@ describe "teacher k5 dashboard" do
       @account.root_account.update!(settings: { teachers_can_create_courses: true })
     end
     it 'provides a new course button for teacher' do
-      get "/"
+      get '/'
       expect(new_course_button).to be_displayed
     end
 
     it 'provides a new course modal when new course button clicked' do
-      get "/"
+      get '/'
       click_new_course_button
 
       expect(new_course_modal).to be_displayed
     end
 
     it 'closes the course modal when x is clicked' do
-      get "/"
+      get '/'
 
       click_new_course_button
 
@@ -329,13 +332,13 @@ describe "teacher k5 dashboard" do
     end
 
     it 'closes the course modal when cancel is clicked' do
-      get "/"
+      get '/'
 
       click_new_course_button
 
       expect(new_course_modal_close_button).to be_displayed
 
-      course_name = "Awesome Course"
+      course_name = 'Awesome Course'
       enter_course_name(course_name)
       click_new_course_cancel
 
@@ -344,20 +347,22 @@ describe "teacher k5 dashboard" do
       expect(latest_course.name).not_to eq(course_name)
     end
 
-    it 'creates course with account name and course name', ignore_js_errors: true, custom_timeout: 30 do
+    it 'creates course with account name and course name',
+       ignore_js_errors: true,
+       custom_timeout: 30 do
       @sub_account = @account.sub_accounts.create!(name: 'test')
       course_with_teacher(
         account: @sub_account,
         active_course: 1,
         active_enrollment: 1,
-        course_name: "Amazing course",
+        course_name: 'Amazing course',
         user: @homeroom_teacher
       )
 
-      get "/"
+      get '/'
       click_new_course_button
 
-      course_name = "Amazing course 1"
+      course_name = 'Amazing course 1'
       fill_out_course_modal(@sub_account, course_name)
       click_new_course_create
       wait_for_ajaximations
@@ -366,28 +371,34 @@ describe "teacher k5 dashboard" do
       expect(driver.current_url).to include("/courses/#{latest_course.id}/settings")
     end
 
-    it 'allows for sync of course to selected homeroom', ignore_js_errors: true, custom_timeout: 30 do
-      second_homeroom_course_name = "Second homeroom course"
+    it 'allows for sync of course to selected homeroom',
+       ignore_js_errors: true,
+       custom_timeout: 30 do
+      second_homeroom_course_name = 'Second homeroom course'
 
-      new_course = course_with_teacher(
-        account: @account,
-        active_course: 1,
-        active_enrollment: 1,
-        course_name: second_homeroom_course_name,
-        user: @homeroom_teacher
-      )
+      new_course =
+        course_with_teacher(
+          account: @account,
+          active_course: 1,
+          active_enrollment: 1,
+          course_name: second_homeroom_course_name,
+          user: @homeroom_teacher
+        )
       Course.last.update!(homeroom_course: true)
 
-      get "/"
+      get '/'
       click_new_course_button
-      new_course_name = "Amazing Course One"
+      new_course_name = 'Amazing Course One'
       enter_course_name(new_course_name)
       click_sync_enrollments_checkbox
       click_option(homeroom_select_selector, second_homeroom_course_name)
       click_new_course_create
 
       expect(new_course_modal_exists?).to be_falsey
-      expect(course_homeroom_option(second_homeroom_course_name)).to have_attribute("selected", "true")
+      expect(course_homeroom_option(second_homeroom_course_name)).to have_attribute(
+        'selected',
+        'true'
+      )
     end
   end
 end
