@@ -315,24 +315,6 @@ describe('DiscussionTopicContainer', () => {
     )
   })
 
-  it('Renders Add Rubric in the kabob menu if the user has permission', () => {
-    const {getByTestId, getByText} = setup({discussionTopic: Discussion.mock()})
-    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-    expect(getByText('Add Rubric')).toBeInTheDocument()
-  })
-
-  it('Renders Show Rubric in the kabob menu if the user has permission', () => {
-    const {getByTestId, getByText} = setup({
-      discussionTopic: Discussion.mock({
-        permissions: DiscussionPermissions.mock({
-          addRubric: false
-        })
-      })
-    })
-    fireEvent.click(getByTestId('discussion-post-menu-trigger'))
-    expect(getByText('Show Rubric')).toBeInTheDocument()
-  })
-
   it('Renders Open for Comments in the kabob menu if the user has permission', () => {
     const {getByTestId, getByText} = setup({discussionTopic: Discussion.mock()})
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
@@ -748,6 +730,42 @@ describe('DiscussionTopicContainer', () => {
 
         const {getByTestId} = setup({discussionTopic: Discussion.mock()})
         expect(getByTestId('post-rssfeed')).toBeTruthy()
+      })
+    })
+
+    describe('Rubric', () => {
+      it('Renders Add Rubric in the kabob menu if the user has permission', () => {
+        const {getByTestId, getByText} = setup({discussionTopic: Discussion.mock()})
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(getByText('Add Rubric')).toBeInTheDocument()
+      })
+
+      it('Renders Show Rubric in the kabob menu if the user has permission', () => {
+        const {getByTestId, getByText} = setup({
+          discussionTopic: Discussion.mock({
+            permissions: DiscussionPermissions.mock({
+              addRubric: false
+            })
+          })
+        })
+        fireEvent.click(getByTestId('discussion-post-menu-trigger'))
+        expect(getByText('Show Rubric')).toBeInTheDocument()
+      })
+
+      it('Renders hidden add_rubric_url for form if the user has permission', () => {
+        const {getByTestId} = setup({discussionTopic: Discussion.mock()})
+        expect(getByTestId('add_rubric_url')).toBeTruthy()
+      })
+
+      it('Does Not Render hidden add_rubric_url for form if the user does not have permission', () => {
+        const {queryByTestId} = setup({
+          discussionTopic: Discussion.mock({
+            permissions: DiscussionPermissions.mock({
+              addRubric: false
+            })
+          })
+        })
+        expect(queryByTestId('add_rubric_url')).toBeNull()
       })
     })
   })
