@@ -100,4 +100,22 @@ describe Types::RubricAssessmentType do
       ).to eq [rubric_association.id.to_s]
     end
   end
+
+  describe "artifact_attempt" do
+    it "returns the value when artifact_attempt is non-nil" do
+      submission.update!(attempt: 2)
+      rubric_assessment.reload
+      rubric_assessment.update!(artifact_attempt: 2)
+      expect(
+        submission_type.resolve('rubricAssessmentsConnection { nodes { artifactAttempt } }')
+      ).to eq [2]
+    end
+
+    it "returns zero when artifact_attempt is nil" do
+      rubric_assessment.update!(artifact_attempt: nil)
+      expect(
+        submission_type.resolve('rubricAssessmentsConnection { nodes { artifactAttempt } }')
+      ).to eq [0]
+    end
+  end
 end
