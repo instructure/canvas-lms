@@ -37,16 +37,15 @@ module AuthenticationMethods
       return false unless InstAccess::Token.is_token?(token_string)
 
       begin
-        token = InstAccess::Token.from_token_string(token_string)
-        return token
+        InstAccess::Token.from_token_string(token_string)
       rescue InstAccess::InvalidToken, # token didn't pass signature verification
              InstAccess::TokenExpired # token passed signature verification, but is expired
         raise AccessTokenError
-      rescue InstAccess::ConfigError => exception
+      rescue InstAccess::ConfigError => e
         # InstAccess isn't configured. A human should fix that, but this method
         # should recover gracefully.
-        Canvas::Errors.capture_exception(:inst_access, exception, :warn)
-        return false
+        Canvas::Errors.capture_exception(:inst_access, e, :warn)
+        false
       end
     end
 
@@ -83,7 +82,7 @@ module AuthenticationMethods
           )
         end
       end
-      return auth_context
+      auth_context
     end
 
     # generally users should not share uuids.
@@ -91,7 +90,7 @@ module AuthenticationMethods
     # user or similar exists, the local user
     # gets preferred.
     def self.find_user_by_uuid_prefer_local(uuid)
-      User.where(uuid: uuid).order(:id).first
+      User.active.where(uuid: uuid).order(:id).first
     end
     private_class_method :find_user_by_uuid_prefer_local
   end
