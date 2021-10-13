@@ -21,6 +21,7 @@
 module Types
   SUBMISSION_TYPES = %w[
     attendance
+    basic_lti_launch
     discussion_topic
     external_tool
     media_recording

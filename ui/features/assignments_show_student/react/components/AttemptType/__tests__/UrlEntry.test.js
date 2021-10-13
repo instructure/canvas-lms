@@ -17,7 +17,7 @@
  */
 
 import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
-import {fireEvent, render, waitFor} from '@testing-library/react'
+import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
@@ -150,23 +150,6 @@ describe('UrlEntry', () => {
       expect(getByTestId('url-input')).not.toHaveFocus()
     })
 
-    it('renders an upload button for each external tool', async () => {
-      const props = await makeProps()
-      const overrides = {
-        ExternalToolConnection: {
-          nodes: [{_id: '1', name: 'Tool 1'}]
-        }
-      }
-      const mocks = await createGraphqlMocks(overrides)
-      const {findByRole} = render(
-        <MockedProvider mocks={mocks}>
-          <UrlEntry {...props} />
-        </MockedProvider>
-      )
-
-      expect(await findByRole('button', {name: /Tool 1/})).toBeInTheDocument()
-    })
-
     it('renders an error message when given an invalid url', async () => {
       const props = await makeProps({
         Submission: {
@@ -249,46 +232,6 @@ describe('UrlEntry', () => {
       const previewButton = getByTestId('preview-button')
       fireEvent.click(previewButton)
       expect(window.open).toHaveBeenCalledTimes(1)
-    })
-
-    it('updates the input and creates a draft from an LTI response', async () => {
-      const overrides = {
-        ExternalToolConnection: {
-          nodes: [{}]
-        }
-      }
-      const mocks = await createGraphqlMocks(overrides)
-      const props = await makeProps()
-      render(
-        <MockedProvider mocks={mocks}>
-          <UrlEntry {...props} />
-        </MockedProvider>
-      )
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {
-          data: {
-            messageType: 'LtiDeepLinkingResponse',
-            content_items: [
-              {
-                url: 'http://lemon.com'
-              }
-            ]
-          }
-        })
-      )
-
-      await waitFor(() => {
-        expect(props.createSubmissionDraft).toHaveBeenCalledWith({
-          variables: {
-            activeSubmissionType: 'online_url',
-            id: '1',
-            attempt: 1,
-            url: 'http://lemon.com'
-          }
-        })
-      })
     })
   })
 

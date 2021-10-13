@@ -57,6 +57,27 @@ export const SubmissionMocks = {
     }
   },
 
+  basicLtiLaunchReadyToSubmit: {
+    submissionDraft: {
+      activeSubmissionType: 'basic_lti_launch',
+      externalTool: {
+        _id: '1',
+        name: 'some external tool'
+      },
+      ltiLaunchUrl: '/lti-launch',
+      meetsBasicLtiLaunchCriteria: true,
+      resourceLinkLookupUuid: 'some_uuid'
+    }
+  },
+
+  basicLtiLaunchSubmitted: {
+    attempt: 1,
+    resourceLinkLookupUuid: 'some_uuid',
+    state: 'submitted',
+    submissionType: 'basic_lti_launch',
+    url: '/submitted-lti-launch'
+  },
+
   graded: {
     attempt: 1,
     deductedPoints: 0,

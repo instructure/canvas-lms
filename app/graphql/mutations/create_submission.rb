@@ -19,7 +19,14 @@
 #
 
 class OnlineSubmissionType < Types::BaseEnum
-  VALID_SUBMISSION_TYPES = %w[student_annotation media_recording online_text_entry online_upload online_url].freeze
+  VALID_SUBMISSION_TYPES = %w[
+    basic_lti_launch
+    student_annotation
+    media_recording
+    online_text_entry
+    online_upload
+    online_url
+  ].freeze
 
   graphql_name 'OnlineSubmissionType'
   description 'Types that can be submitted online'
@@ -42,6 +49,7 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
            [ID],
            required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
   argument :media_id, ID, required: false
+  argument :resource_link_lookup_uuid, String, required: false
   argument :submission_type, OnlineSubmissionType, required: true
   argument :url, String, required: false
 
@@ -66,6 +74,11 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     }
 
     case submission_type
+    when 'basic_lti_launch'
+      return validation_error(I18n.t('LTI submissions require a URL to submit')) if input[:url].blank?
+
+      submission_params[:url] = input[:url]
+      submission_params[:resource_link_lookup_uuid] = input[:resource_link_lookup_uuid]
     when 'student_annotation'
       if assignment.annotatable_attachment_id.blank?
         return validation_error(I18n.t('Student Annotation submissions require an annotatable_attachment_id to submit'))
