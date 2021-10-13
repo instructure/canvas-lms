@@ -611,7 +611,7 @@ describe UsersController do
           allow(redis).to receive(:del)
           allow(Canvas).to receive_messages(:redis => redis)
           key = DeveloperKey.create! :redirect_uri => 'https://example.com'
-          provider = Canvas::OAuth::Provider.new(key.id, key.redirect_uri, [], nil)
+          provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
 
           course_with_student
           @domain_root_account = @course.account
@@ -2131,7 +2131,7 @@ describe UsersController do
       expect(assigns[:enrollments].sort_by(&:id)).to eq [@enrollment1, @enrollment2]
     end
 
-    it "401s on a deleted user" do
+    it "404s on a deleted user" do
       course_with_teacher(:active_all => 1)
 
       account_admin_user
@@ -2139,7 +2139,7 @@ describe UsersController do
       @teacher.destroy
 
       get 'show', params: { id: @teacher.id }
-      expect(response.status).to eq 401
+      expect(response.status).to eq 404
       expect(response).not_to render_template('users/show')
     end
 
@@ -2165,34 +2165,6 @@ describe UsersController do
       expect(response).to be_successful
       user = json_parse
       expect(user['name']).to eq @student.name
-    end
-
-    it "redirects to login when not logged in, even if the user doesn't exist" do
-      get 'show', params: { id: 50 }
-      expect(response).to redirect_to("/login")
-    end
-
-    it "401s if the user doesn't exist when you are logged in" do
-      defunct_user = User.create!.destroy_permanently!
-      user_factory(active_all: true)
-      user_session(@user)
-      get 'show', params: { id: defunct_user.id }
-      expect(response.status).to eq 401
-    end
-
-    it "401s if the user exists but you don't have permission" do
-      user2 = user_factory(active_all: true)
-      user_factory(active_all: true)
-      user_session(@user)
-      get 'show', params: { id: user2.id }
-      expect(response.status).to eq 401
-    end
-
-    it "renders for an admin" do
-      account_admin_user(active_all: true)
-      user_session(@user)
-      get 'show', params: { id: @user.id }
-      expect(response.status).to eq 200
     end
   end
 
@@ -2685,6 +2657,37 @@ describe UsersController do
           end
         end
 
+        context "ENV.PERMISSIONS" do
+          it "sets :create_courses_as_admin to true if user is admin" do
+            account_admin_user
+            user_session @user
+            get 'user_dashboard'
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_truthy
+          end
+
+          it "sets only :create_courses_as_teacher to true if user is a teacher and teachers can create courses" do
+            Account.default.settings[:teachers_can_create_courses] = true
+            course_with_teacher_logged_in
+            get 'user_dashboard'
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_truthy
+          end
+
+          it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a teacher but teachers can't create courses" do
+            course_with_teacher_logged_in
+            get 'user_dashboard'
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
+          end
+
+          it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a student" do
+            course_with_student_logged_in
+            get 'user_dashboard'
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
+            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
+          end
+        end
+
         context "@cards_prefetch_observer_param" do
           before :once do
             Account.site_admin.enable_feature!(:k5_parent_support)
@@ -2711,15 +2714,6 @@ describe UsersController do
           end
         end
       end
-    end
-
-    it "sets ENV.CREATE_COURSES_PERMISSION to teacher if user is a teacher and can create courses" do
-      Account.default.settings[:teachers_can_create_courses] = true
-      Account.default.save!
-      course_with_teacher_logged_in(active_all: true)
-
-      get 'user_dashboard'
-      expect(assigns[:js_env][:CREATE_COURSES_PERMISSION]).to be(:teacher)
     end
   end
 

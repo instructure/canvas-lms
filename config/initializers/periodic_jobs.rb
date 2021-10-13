@@ -185,8 +185,8 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(Quizzes::QuizSubmissionEventPartitioner, :process, jitter: 30.minutes, local_offset: true)
   end
 
-  Delayed::Periodic.cron 'SimplyVersioned::Partitioner.process', '0 0 * * *' do
-    with_each_shard_by_database(SimplyVersioned::Partitioner, :process, jitter: 30.minutes, local_offset: true)
+  Delayed::Periodic.cron 'Version::Partitioner.process', '0 0 * * *' do
+    with_each_shard_by_database(Version::Partitioner, :process, jitter: 30.minutes, local_offset: true)
   end
 
   Delayed::Periodic.cron 'Messages::Partitioner.process', '0 0 * * *' do
@@ -251,8 +251,8 @@ Rails.configuration.after_initialize do
     Lti::KeyStorage.rotate_keys
   end
 
-  Delayed::Periodic.cron 'Canvas::OAuth::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
-    Canvas::OAuth::KeyStorage.rotate_keys
+  Delayed::Periodic.cron 'Canvas::Oauth::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
+    Canvas::Oauth::KeyStorage.rotate_keys
   end
 
   Delayed::Periodic.cron 'CanvasSecurity::ServicesJwt::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do

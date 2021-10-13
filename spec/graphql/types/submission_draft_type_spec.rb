@@ -36,24 +36,29 @@ RSpec.describe Types::SubmissionDraftType do
     unless body_rewrite_urls.nil?
       body_args = "(rewriteUrls: #{body_rewrite_urls})"
     end
-    result = CanvasSchema.execute(<<~GQL, context: { current_user: @student, request: ActionDispatch::TestRequest.create })
+
+    result = CanvasSchema.execute(<<~GQL, context: { current_user: @teacher, request: ActionDispatch::TestRequest.create })
       query {
-        submission(id: "#{@submission.id}") {
-          submissionDraft {
-            _id
-            activeSubmissionType
-            attachments {
-              _id
-              displayName
+        assignment(id: "#{@assignment.id}") {
+          submissionsConnection(filter: {states: [unsubmitted, graded, pending_review, submitted]}) {
+            nodes {
+              submissionDraft {
+                _id
+                activeSubmissionType
+                attachments {
+                  _id
+                  displayName
+                }
+                body#{body_args}
+                mediaObject {
+                  _id
+                  title
+                }
+                meetsAssignmentCriteria
+                submissionAttempt
+                url
+              }
             }
-            body#{body_args}
-            mediaObject {
-              _id
-              title
-            }
-            meetsAssignmentCriteria
-            submissionAttempt
-            url
           }
         }
       }
@@ -61,9 +66,10 @@ RSpec.describe Types::SubmissionDraftType do
 
     result.dig(
       'data',
-      'submission',
-      'submissionDraft'
-    )
+      'assignment',
+      'submissionsConnection',
+      'nodes'
+    ).first['submissionDraft']
   end
 
   it 'returns the submission attempt' do

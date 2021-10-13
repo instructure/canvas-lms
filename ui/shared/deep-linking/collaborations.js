@@ -17,13 +17,13 @@
  */
 
 import $ from 'jquery'
-import {addDeepLinkingListener as addOriginalListener} from './DeepLinking'
+import {isValidDeepLinkingEvent} from './DeepLinking'
 import processSingleContentItem from './processors/processSingleContentItem'
 import I18n from 'i18n!collaborations'
 
 export const addDeepLinkingListener = () => {
-  window.removeEventListener('message', handleDeepLinking)
-  addOriginalListener(handleDeepLinking)
+  removeDeepLinkingListener()
+  window.addEventListener('message', handleDeepLinking)
 }
 
 /*
@@ -48,6 +48,11 @@ export function onExternalContentReady(e, data) {
  * content item is supported
  */
 export const handleDeepLinking = async event => {
+  // Don't attempt to process invalid messages
+  if (!isValidDeepLinkingEvent(event, ENV)) {
+    return
+  }
+
   try {
     const item = await processSingleContentItem(event)
     onExternalContentReady(event, {
@@ -61,6 +66,10 @@ export const handleDeepLinking = async event => {
 
 export function collaborationUrl(id) {
   return window.location.toString() + '/' + id
+}
+
+const removeDeepLinkingListener = () => {
+  window.removeEventListener('message', handleDeepLinking)
 }
 
 function updateCollaboration(contentItem, collab_id) {

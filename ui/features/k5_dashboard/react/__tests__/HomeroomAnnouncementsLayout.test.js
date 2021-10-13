@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import {render, waitFor} from '@testing-library/react'
-import fetchMock from 'fetch-mock'
+import {render} from '@testing-library/react'
 import HomeroomAnnouncementsLayout from '../HomeroomAnnouncementsLayout'
 
 const homeroomAnnouncements = [
@@ -74,22 +73,8 @@ describe('HomeroomAnnouncementsLayout', () => {
     ...overrides
   })
 
-  beforeEach(() => {
-    fetchMock.get(
-      /\/api\/v1\/announcements/,
-      {
-        body: '[]',
-        headers: {
-          Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"'
-        }
-      },
-      {}
-    )
-  })
-
   afterEach(() => {
     localStorage.clear()
-    fetchMock.restore()
   })
 
   it('renders a view for each child passed', () => {
@@ -99,8 +84,8 @@ describe('HomeroomAnnouncementsLayout', () => {
     expect(getByText('New Homeroom')).toBeInTheDocument()
   })
 
-  it('shows text and button for homeroom courses with no announcements to users that can edit', async () => {
-    const {findByText, getByText} = render(
+  it('shows text and button for homeroom courses with no announcements to users that can edit', () => {
+    const {getByText} = render(
       <HomeroomAnnouncementsLayout
         {...getProps({
           homeroomAnnouncements: [
@@ -116,12 +101,12 @@ describe('HomeroomAnnouncementsLayout', () => {
       />
     )
     expect(
-      await findByText('New announcements show up in this area. Create a new announcement now.')
+      getByText('New announcements show up in this area. Create a new announcement now.')
     ).toBeInTheDocument()
     expect(getByText('Announcement')).toBeInTheDocument()
   })
 
-  it('does not show prompt to create announcement to students', async () => {
+  it('does not show prompt to create announcement to students', () => {
     const {queryByText} = render(
       <HomeroomAnnouncementsLayout
         {...getProps({
@@ -137,10 +122,6 @@ describe('HomeroomAnnouncementsLayout', () => {
         })}
       />
     )
-    // The Homeroom header is rendered by default, then removed
-    // if the request for old announcements returns nothing.
-    // Wait for the fetch to complete before continuing.
-    await waitFor(() => fetchMock.done())
     expect(queryByText('New Homeroom')).not.toBeInTheDocument()
     expect(
       queryByText('New announcements show up in this area. Create a new announcement now.')

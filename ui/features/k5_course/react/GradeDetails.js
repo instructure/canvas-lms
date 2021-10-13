@@ -48,30 +48,20 @@ const GradeDetails = ({
   showTotals,
   currentUser,
   loadingGradingPeriods,
-  userIsCourseAdmin,
-  observedUserId
+  userIsCourseAdmin
 }) => {
   const [loadingTotalGrade, setLoadingTotalGrade] = useState(true)
   const [loadingAssignmentGroups, setLoadingAssignmentGroups] = useState(true)
   const [error, setError] = useState(null)
+  const [totalGrade, setTotalGrade] = useState(null)
+  const [assignmentGroupTotals, setAssignmentGroupTotals] = useState(null)
+  const [grades, setGrades] = useState([])
   const [mqList] = useState(() => window.matchMedia('(max-width: 767px)')) // keep in sync with k5_theme.scss
   const [isStacked, setIsStacked] = useState(mqList.matches)
-  const [enrollments, setEnrollments] = useState([])
-  const [assignmentGroups, setAssignmentGroups] = useState([])
+
   const gradingPeriodParam = {}
-  const assignmentGroupTotals = getAssignmentGroupTotals(
-    assignmentGroups,
-    selectedGradingPeriodId,
-    observedUserId
-  )
-  const grades = getAssignmentGrades(assignmentGroups, observedUserId)
-  const totalGrade = getTotalGradeStringFromEnrollments(enrollments, currentUser.id, observedUserId)
-  const include = ['assignments', 'submission', 'read_state', 'submission_comments']
   if (selectedGradingPeriodId) {
     gradingPeriodParam.grading_period_id = selectedGradingPeriodId
-  }
-  if (observedUserId) {
-    include.push('observed_users')
   }
 
   useEffect(() => {
@@ -81,16 +71,19 @@ const GradeDetails = ({
   useFetchApi({
     path: `/api/v1/courses/${courseId}/assignment_groups`,
     loading: setLoadingAssignmentGroups,
-    success: useCallback(data => {
-      // filtering possible null values
-      setAssignmentGroups(data.filter(g => g))
-    }, []),
+    success: useCallback(
+      data => {
+        setAssignmentGroupTotals(getAssignmentGroupTotals(data, selectedGradingPeriodId))
+        setGrades(getAssignmentGrades(data))
+      },
+      [selectedGradingPeriodId]
+    ),
     error: setError,
     // wait until grading periods are loaded before firing this request, to prevent it from being immediately cancelled
     forceResult: loadingGradingPeriods ? [] : undefined,
     fetchAllPages: true,
     params: {
-      include,
+      include: ['assignments', 'submission', 'read_state', 'submission_comments'],
       ...gradingPeriodParam
     }
   })
@@ -98,15 +91,17 @@ const GradeDetails = ({
   useFetchApi({
     path: `/api/v1/courses/${courseId}/enrollments`,
     loading: setLoadingTotalGrade,
-    success: useCallback(data => {
-      setEnrollments(data.filter(e => e))
-    }, []),
+    success: useCallback(
+      data => {
+        setTotalGrade(getTotalGradeStringFromEnrollments(data, currentUser.id))
+      },
+      [currentUser]
+    ),
     error: setError,
     // wait until grading periods are loaded before firing this request, to prevent it from being immediately cancelled
     forceResult: loadingGradingPeriods ? [] : undefined,
     params: {
       user_id: currentUser.id,
-      ...(observedUserId && {include: 'observed_users'}),
       ...gradingPeriodParam
     }
   })
@@ -229,7 +224,7 @@ const GradeDetails = ({
         {grades.map(assignment =>
           GradeRow({
             isStacked,
-            currentUserId: observedUserId || currentUser.id,
+            currentUserId: currentUser.id,
             ...assignment
           })
         )}
@@ -245,8 +240,7 @@ GradeDetails.propTypes = {
   showTotals: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
   loadingGradingPeriods: PropTypes.bool.isRequired,
-  userIsCourseAdmin: PropTypes.bool.isRequired,
-  observedUserId: PropTypes.string
+  userIsCourseAdmin: PropTypes.bool.isRequired
 }
 
 export default GradeDetails

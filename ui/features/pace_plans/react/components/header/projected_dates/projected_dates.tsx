@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
-// @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_projected_dates'
 
 import {Flex} from '@instructure/ui-flex'
@@ -29,7 +28,8 @@ import {View} from '@instructure/ui-view'
 import {StoreState} from '../../../types'
 import {getPacePlanItems, getPlanWeeks} from '../../../reducers/pace_plans'
 import {getShowProjections} from '../../../reducers/ui'
-import PacePlanDateSelector from './date_selector'
+import StartDateSelector from './start_date_selector'
+import EndDateSelector from './end_date_selector'
 import SlideTransition from '../../../utils/slide_transition'
 
 interface StoreProps {
@@ -49,9 +49,9 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
     <SlideTransition expanded={showProjections} direction="vertical" size="7rem">
       <View as="div">
         <Flex as="section" alignItems="start" margin="0 0 small">
-          <PacePlanDateSelector type="start" />
-          <View margin="0 0 0 medium">
-            <PacePlanDateSelector type="end" />
+          <StartDateSelector />
+          <View margin="0 0 0 small">
+            <EndDateSelector />
           </View>
         </Flex>
         <Flex as="section" margin="0 0 small">

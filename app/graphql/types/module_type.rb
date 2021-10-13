@@ -41,7 +41,7 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
 
-    alias_method :context_module, :object
+    alias context_module object
 
     global_id_field :id
 

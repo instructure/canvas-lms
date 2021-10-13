@@ -19,5 +19,5 @@
 #
 
 module Login
-  AppleController = OAuth2Controller
+  AppleController = Oauth2Controller
 end

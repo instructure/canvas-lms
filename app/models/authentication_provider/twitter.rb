@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AuthenticationProvider::Twitter < AuthenticationProvider::OAuth
+class AuthenticationProvider::Twitter < AuthenticationProvider::Oauth
   include AuthenticationProvider::PluginSettings
   self.plugin = :twitter
   plugin_settings :consumer_key, consumer_secret: :consumer_secret_dec

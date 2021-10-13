@@ -20,7 +20,7 @@
 require 'json/jwt'
 
 module Lti
-  module OAuth2
+  module Oauth2
     class AuthorizationValidator
       class InvalidSignature < StandardError
       end
@@ -63,7 +63,7 @@ module Lti
           developer_key = tp.product_family.developer_key
           raise InvalidAuthJwt, "the Developer Key is not active or available in this environment" if developer_key.present? && !developer_key.usable?
 
-          ims_tool_proxy = ::IMS::LTI::Models::ToolProxy.from_json(tp.raw_data)
+          ims_tool_proxy = IMS::LTI::Models::ToolProxy.from_json(tp.raw_data)
           if (ims_tool_proxy.enabled_capabilities & ['Security.splitSecret', 'OAuth.splitSecret']).blank?
             raise InvalidAuthJwt, "the Tool Proxy must be using a split secret"
           end

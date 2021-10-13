@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti
-  module OAuth2
+  module Oauth2
     class AccessToken
       private_class_method :new
 

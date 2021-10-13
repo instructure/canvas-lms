@@ -30,8 +30,7 @@ export default {
     onDelete: {action: 'onDelete'},
     onMarkAllAsUnread: {action: 'onMarkAsUnread'},
     onToggleUnread: {action: 'onToggleUnread'},
-    openInSpeedGrader: {action: 'openInSpeedGrader'},
-    onReport: {action: 'onReport'}
+    openInSpeedGrader: {action: 'openInSpeedGrader'}
   }
 }
 
@@ -63,9 +62,4 @@ UnreadThread.args = {
 export const ReadThread = Template.bind({})
 ReadThread.args = {
   isUnread: false
-}
-
-export const Reported = Template.bind({})
-Reported.args = {
-  isReported: true
 }

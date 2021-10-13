@@ -334,11 +334,7 @@ quizzes_next:
   state: allowed
   display_name:
     features.quizzes.next: New Quizzes
-  description:
-    wrapper: <a href="https://community.canvaslms.com/t5/New-Quizzes-Users/gh-p/quizzes">\1</a>
-    new_quizzes_description: This feature enhances the Canvas experience for quizzing.
-      When this flag is enabled, the New Quizzes tool will be available. For full details,
-      please see the *New Quizzes user group* in the Canvas Community.
+  description: Create assessments with New Quizzes and migrate existing Canvas Quizzes.
   applies_to: Course
   visible_on: quizzes_next_visible_on_hook
 quizzes_next_submission_history:
@@ -451,9 +447,3 @@ wrap_calendar_event_titles:
     doesn't fit on a single line
   applies_to: RootAccount
   root_opt_in: true
-gradebook_show_first_last_names:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Separate columns for first/last names in Gradebook
-  description: Show account setting to allow viewing and exporting of student first and last names
-    in separate columns in the gradebook.

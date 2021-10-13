@@ -129,7 +129,7 @@ export default function K5Announcement({
             per_page: ANNOUNCEMENT_LOOKAHEAD_PAGE_SIZE
           }
         }))
-        setMoreHomeroomAnnouncementsURL(link?.next?.url)
+        setMoreHomeroomAnnouncementsURL(link.next?.url)
 
         const parsedAnnouncements = json
           .filter(a => a.id !== currentAnnouncement?.id)
@@ -201,7 +201,9 @@ export default function K5Announcement({
   useEffect(() => {
     if (loadFirstBatch) {
       setLoadFirstBatch(false)
-      fetchMoreAnnouncements(true)
+      if (ENV.FEATURES?.k5_homeroom_many_announcements) {
+        fetchMoreAnnouncements(true)
+      }
     }
   }, [fetchMoreAnnouncements, loadFirstBatch])
 

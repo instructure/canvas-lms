@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
+class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
   attr_accessor :instance_debugging
 
   def self.sti_name

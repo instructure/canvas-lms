@@ -52,6 +52,13 @@ k5_parent_support:
   display_name: 'Canvas for Elementary: Parent Support'
   description: Enables support for observers within Canvas for Elementary.
   applies_to: SiteAdmin
+k5_homeroom_many_announcements:
+  state: hidden
+  display_name: 'Canvas for Elementary: many announcements in homeroom'
+  description: |-
+    Provide navigation to navigate between all announcements available
+    in the homeroom course.
+  applies_to: SiteAdmin
 pace_plans:
   state: hidden
   display_name: 'Pace Plans'
@@ -98,35 +105,3 @@ conferencing_in_planner:
   environments:
     beta:
       enable_at: Date.new(2021, 10, 18)
-remember_settings_tab:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Remember your settings page tab
-  description: |-
-    Keep track of which Settings page tab you are on
-    so the browser's back button takes you to your previous
-    tab, and that refreshing the page will return you to
-    the current active tab.
-  environments:
-    development:
-      state: allowed_on
-    ci:
-      state: allowed_on
-submission_feedback_indicators:
-  state: allowed
-  applies_to: RootAccount
-  display_name: Submission feedback indicators
-  description: |-
-    Adds visual indicators to the submission details page to tell students that unread
-    document annotations or rubric comments exist
-word_count_in_speed_grader:
-  state: hidden
-  applies_to: RootAccount
-  display_name: 'Add word count to SpeedGrader'
-  description: |-
-    When enabled, this flag displays a word count in the speed grader for text
-    based submissions.
-  development:
-    state: allowed_on
-  ci:
-    state: allowed_on

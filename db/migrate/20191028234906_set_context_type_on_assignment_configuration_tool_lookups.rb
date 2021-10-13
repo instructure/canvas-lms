@@ -23,6 +23,6 @@ class SetContextTypeOnAssignmentConfigurationToolLookups < ActiveRecord::Migrati
   disable_ddl_transaction!
 
   def up
-    DataFixup::SetActlContextTypeForCourseLevelToolProxies.run
+    DataFixup::SetACTLContextTypeForCourseLevelToolProxies.run
   end
 end

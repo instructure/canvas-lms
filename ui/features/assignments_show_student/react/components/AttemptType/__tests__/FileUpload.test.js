@@ -64,9 +64,8 @@ async function makeProps(overrides) {
     ...assignmentAndSubmission,
 
     // Make these return a promise that will resolve
-    onCanvasFileRequested: jest.fn(),
-    onUploadRequested: jest.fn(),
-    filesToUpload: [],
+    createSubmissionDraft: jest.fn().mockResolvedValue({}),
+    updateUploadingFiles: jest.fn().mockResolvedValue({}),
     uploadingFiles: false,
     focusOnInit: false
   }
@@ -202,14 +201,14 @@ describe('FileUpload', () => {
     uploadFiles(fileInput, [file, file2])
 
     await waitFor(() => {
-      expect(props.onUploadRequested).toHaveBeenCalledWith(
-        expect.objectContaining({
-          files: [
-            expect.objectContaining({preview: 'perry_preview'}),
-            expect.objectContaining({preview: 'perry_preview'})
-          ]
-        })
-      )
+      expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+        variables: {
+          id: '1',
+          activeSubmissionType: 'online_upload',
+          attempt: 1,
+          fileIds: ['1', '2']
+        }
+      })
     })
   })
 
@@ -218,9 +217,7 @@ describe('FileUpload', () => {
     const setOnFailure = jest.fn()
     const setOnSuccess = jest.fn()
     const props = await makeProps()
-    props.onUploadRequested.mockImplementation(({onError}) => {
-      onError(new Error('no'))
-    })
+    uploadFileModule.uploadFile.mockRejectedValue(new Error('no'))
 
     const {container} = render(
       <MockedProvider mocks={mocks}>
@@ -271,17 +268,14 @@ describe('FileUpload', () => {
     )
 
     await waitFor(() => {
-      expect(props.onUploadRequested).toHaveBeenCalledWith(
-        expect.objectContaining({
-          files: [
-            {
-              mediaType: 'plain/txt',
-              title: 'LemonRules.txt',
-              url: 'http://lemon.com'
-            }
-          ]
-        })
-      )
+      expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+        variables: {
+          id: '1',
+          activeSubmissionType: 'online_upload',
+          attempt: 1,
+          fileIds: ['1']
+        }
+      })
     })
   })
 
@@ -318,17 +312,13 @@ describe('FileUpload', () => {
     )
 
     await waitFor(() => {
-      expect(props.onUploadRequested).toHaveBeenCalledWith(
-        expect.objectContaining({
-          files: [
-            {
-              mediaType: '',
-              title: 'LemonRules.txt',
-              url: 'http://lemon.com'
-            }
-          ]
-        })
-      )
+      const [, fileArgs] = uploadFileModule.uploadFile.mock.calls[0]
+      expect(fileArgs).toEqual({
+        content_type: '',
+        name: 'LemonRules.txt',
+        submit_assignment: false,
+        url: 'http://lemon.com'
+      })
     })
   })
 
@@ -383,7 +373,7 @@ describe('FileUpload', () => {
     expect(setOnFailure).toHaveBeenCalledWith(errormsg)
   })
 
-  it('does not call onUploadRequested when there is an error message present in the Lti response', async () => {
+  it('does not create a submission draft when there is an error message present in the Lti response', async () => {
     const mocks = await createGraphqlMocks()
     const setOnFailure = jest.fn()
     const props = await makeProps()
@@ -413,7 +403,71 @@ describe('FileUpload', () => {
       })
     )
 
-    expect(props.onUploadRequested).not.toHaveBeenCalled()
+    expect(props.createSubmissionDraft).not.toHaveBeenCalled()
+  })
+
+  // Byproduct of how the dummy submissions are being handled. Check out ViewManager
+  // for some context around this
+  it('creates a submission draft for the current attempt when not on attempt 0', async () => {
+    const mocks = await createGraphqlMocks()
+    const setOnSuccess = jest.fn()
+    const props = await makeProps({
+      Submission: {attempt: 2}
+    })
+    uploadFileModule.uploadFile.mockResolvedValueOnce({id: '1', name: 'file1.jpg'})
+
+    const {container} = render(
+      <MockedProvider mocks={mocks}>
+        <AlertManagerContext.Provider value={{setOnSuccess}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
+      </MockedProvider>
+    )
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
+    uploadFiles(fileInput, [file])
+
+    await waitFor(() => {
+      expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+        variables: {
+          id: '1',
+          activeSubmissionType: 'online_upload',
+          attempt: 2,
+          fileIds: ['1']
+        }
+      })
+    })
+  })
+
+  it('creates a submission draft for attempt one when on attempt 0', async () => {
+    const mocks = await createGraphqlMocks()
+    const setOnSuccess = jest.fn()
+    const props = await makeProps({
+      Submission: {attempt: 0}
+    })
+    uploadFileModule.uploadFile.mockResolvedValueOnce({id: '1', name: 'file1.jpg'})
+
+    const {container} = render(
+      <MockedProvider mocks={mocks}>
+        <AlertManagerContext.Provider value={{setOnSuccess}}>
+          <FileUpload {...props} />
+        </AlertManagerContext.Provider>
+      </MockedProvider>
+    )
+    const fileInput = container.querySelector('input[type="file"]')
+    const file = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
+    uploadFiles(fileInput, [file])
+
+    await waitFor(() => {
+      expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+        variables: {
+          id: '1',
+          activeSubmissionType: 'online_upload',
+          attempt: 1,
+          fileIds: ['1']
+        }
+      })
+    })
   })
 
   it('renders a button to remove the file', async () => {
@@ -504,6 +558,32 @@ describe('FileUpload', () => {
     expect(emptyRender).toContainElement(await findByRole('button', {name: /Files/}))
   })
 
+  it('displays buttons for uploading using external tools in the upload box', async () => {
+    const mocks = await createGraphqlMocks({
+      ExternalToolConnection: {
+        nodes: [
+          {
+            _id: '1',
+            description: 'just an external tool',
+            name: 'my external tool',
+            settings: {
+              iconUrl: 'http://localhost:3000/icon'
+            }
+          }
+        ]
+      }
+    })
+    const props = await makeProps()
+    const {getByTestId, findByRole} = render(
+      <MockedProvider mocks={mocks}>
+        <FileUpload {...props} />
+      </MockedProvider>
+    )
+    const emptyRender = getByTestId('upload-box')
+
+    expect(emptyRender).toContainElement(await findByRole('button', {name: /my external tool/}))
+  })
+
   it('displays allowed extensions in the upload box', async () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps({
@@ -592,19 +672,36 @@ describe('FileUpload', () => {
     expect(uploadRender).toContainElement(container.querySelector('svg[name="IconComplete"]'))
   })
 
-  it('renders a loading indicator for each file in the process of uploading', async () => {
+  it('renders a loading indicator for each file being uploaded', async () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps()
-    props.filesToUpload = [
-      {id: '1', name: 'file1.pdf', isLoading: true, loaded: 10, total: 100},
-      {id: '2', name: 'file2.pdf', isLoading: true, loaded: 50, total: 250}
-    ]
+
+    const progressHandlers = []
+
+    uploadFileModule.uploadFile
+      .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+        progressHandlers.push(onProgress)
+        return Promise.resolve({id: '1', name: 'file1.pdf'})
+      })
+      .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+        progressHandlers.push(onProgress)
+        return Promise.resolve({id: '2', name: 'file2.pdf'})
+      })
 
     const {getAllByRole} = render(
       <MockedProvider mocks={mocks}>
         <FileUpload {...props} />
       </MockedProvider>
     )
+    const fileInput = document.getElementById('inputFileDrop')
+
+    uploadFiles(fileInput, [
+      new File(['asdf'], 'file1.pdf', {type: 'application/pdf'}),
+      new File(['sdfg'], 'file2.pdf', {type: 'application/pdf'})
+    ])
+
+    progressHandlers[0]({loaded: 10, total: 100})
+    progressHandlers[1]({loaded: 50, total: 250})
 
     const progressBars = getAllByRole('progressbar')
     expect(progressBars).toHaveLength(2)
@@ -626,48 +723,34 @@ describe('FileUpload', () => {
     )
   })
 
-  describe('webcam photo upload', () => {
-    it('is available when the assignment has no file extension restrictions', async () => {
-      const mocks = await createGraphqlMocks()
-      const props = await makeProps()
+  it('shows the URL of a file being uploaded if no title is given', async () => {
+    const mocks = await createGraphqlMocks()
+    const props = await makeProps()
 
-      const {findByRole} = render(
-        <MockedProvider mocks={mocks}>
-          <FileUpload {...props} />
-        </MockedProvider>
-      )
-      fireEvent.click(await findByRole('button', {name: /Canvas Files/}))
-      expect(await findByRole('button', {name: /Webcam/})).toBeInTheDocument()
-    })
+    const {getAllByRole} = render(
+      <MockedProvider mocks={mocks}>
+        <FileUpload {...props} />
+      </MockedProvider>
+    )
 
-    it('is available when the assignment allows PNG files', async () => {
-      const mocks = await createGraphqlMocks()
-      const props = await makeProps({
-        Assignment: {allowedExtensions: ['jpg', 'png']}
+    fireEvent(
+      window,
+      new MessageEvent('message', {
+        data: {
+          messageType: 'A2ExternalContentReady',
+          content_items: [
+            {
+              url: 'http://somefile.com',
+              mediaType: 'application/octet-stream'
+            }
+          ]
+        }
       })
+    )
 
-      const {findByRole} = render(
-        <MockedProvider mocks={mocks}>
-          <FileUpload {...props} />
-        </MockedProvider>
-      )
-      fireEvent.click(await findByRole('button', {name: /Canvas Files/}))
-      expect(await findByRole('button', {name: /Webcam/})).toBeInTheDocument()
-    })
-
-    it('is not available when the assignment does not allow PNG files', async () => {
-      const mocks = await createGraphqlMocks()
-      const props = await makeProps({
-        Assignment: {allowedExtensions: ['xls']}
-      })
-
-      const {findByRole, queryByRole} = render(
-        <MockedProvider mocks={mocks}>
-          <FileUpload {...props} />
-        </MockedProvider>
-      )
-      fireEvent.click(await findByRole('button', {name: /Canvas Files/}))
-      expect(queryByRole('button', {name: /Webcam/})).not.toBeInTheDocument()
-    })
+    const tableRows = getAllByRole('row')
+    // The first row is the header, the second is the item we're uploading
+    expect(tableRows).toHaveLength(2)
+    expect(tableRows[1]).toHaveTextContent('http://somefile.com')
   })
 })

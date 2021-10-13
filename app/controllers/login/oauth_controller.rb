@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class Login::OAuthController < Login::OAuthBaseController
+class Login::OauthController < Login::OauthBaseController
   def new
     super
 
@@ -37,7 +37,7 @@ class Login::OAuthController < Login::OAuthBaseController
 
   def create
     @aac = @domain_root_account.authentication_providers.active.find(params[:id])
-    raise ActiveRecord::RecordNotFound unless @aac.is_a?(AuthenticationProvider::OAuth)
+    raise ActiveRecord::RecordNotFound unless @aac.is_a?(AuthenticationProvider::Oauth)
 
     oauth_state = session.delete(:oauth)
     request_token = OAuth::RequestToken.new(@aac.consumer,
@@ -69,6 +69,3 @@ class Login::OAuthController < Login::OAuthBaseController
     oauth_login_callback_url(id: @aac.global_id)
   end
 end
-
-# TODO: Shim until plugins are fully renamed
-::Login::OauthController = ::Login::OAuthController

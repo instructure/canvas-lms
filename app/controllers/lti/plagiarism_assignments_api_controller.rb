@@ -62,7 +62,7 @@ module Lti
   #       }
   #     }
   class PlagiarismAssignmentsApiController < ApplicationController
-    include Lti::IMS::AccessTokenHelper
+    include Lti::Ims::AccessTokenHelper
 
     skip_before_action :load_user
     before_action :authorized_lti2_tool, :tool_proxy_related_to_assignment?, :user_related_to_assignment?

@@ -22,8 +22,8 @@ import {act, render, screen} from '@testing-library/react'
 import {PlanPicker} from '../plan_picker'
 import {
   COURSE,
-  ENROLLMENT_1,
   ENROLLMENT_2,
+  SECTION_1,
   SORTED_ENROLLMENTS,
   SORTED_SECTIONS
 } from '../../../__tests__/fixtures'
@@ -50,12 +50,11 @@ describe('PlanPicker', () => {
     act(() => picker.click())
     expect(screen.getByRole('menuitem', {name: 'Course Pace Plan'})).toBeInTheDocument()
 
-    // Commented out since we're not implementing this feature yet
-    // const sections = screen.getByRole('button', {name: 'Sections'})
-    // expect(sections).toBeInTheDocument()
-    // act(() => sections.click())
-    // expect(screen.getByRole('menuitem', {name: 'Hackers'})).toBeInTheDocument()
-    // expect(screen.getByRole('menuitem', {name: 'Mercenaries'})).toBeInTheDocument()
+    const sections = screen.getByRole('button', {name: 'Sections'})
+    expect(sections).toBeInTheDocument()
+    act(() => sections.click())
+    expect(screen.getByRole('menuitem', {name: 'Hackers'})).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', {name: 'Mercenaries'})).toBeInTheDocument()
 
     const students = screen.getByRole('button', {name: 'Students'})
     expect(students).toBeInTheDocument()
@@ -72,11 +71,10 @@ describe('PlanPicker', () => {
     act(() => screen.getByRole('menuitem', {name: 'Course Pace Plan'}).click())
     expect(selectPlanContextFn).toHaveBeenCalledWith('Course', COURSE.id)
 
-    // Commented out since we're not implementing this feature yet
-    // act(() => picker.click())
-    // act(() => screen.getByRole('button', {name: 'Sections'}).click())
-    // act(() => screen.getByRole('menuitem', {name: 'Hackers'}).click())
-    // expect(selectPlanContextFn).toHaveBeenCalledWith('Section', SECTION_1.id)
+    act(() => picker.click())
+    act(() => screen.getByRole('button', {name: 'Sections'}).click())
+    act(() => screen.getByRole('menuitem', {name: 'Hackers'}).click())
+    expect(selectPlanContextFn).toHaveBeenCalledWith('Section', SECTION_1.id)
 
     act(() => picker.click())
     act(() => screen.getByRole('button', {name: 'Students'}).click())
@@ -88,11 +86,11 @@ describe('PlanPicker', () => {
     const {getByLabelText} = render(
       <PlanPicker
         {...defaultProps}
-        selectedContextType="Enrollment"
-        selectedContextId={ENROLLMENT_1.id}
+        selectedContextType="Section"
+        selectedContextId={SECTION_1.id}
       />
     )
     const picker = getByLabelText('Pace Plans') as HTMLInputElement
-    expect(picker.value).toBe('Henry Dorsett Case')
+    expect(picker.value).toBe('Hackers')
   })
 })

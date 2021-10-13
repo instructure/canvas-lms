@@ -19,7 +19,7 @@
 import {bool, element, func, shape, string} from 'prop-types'
 import CanvasFiles from './CanvasFiles/index'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
-import {USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {Flex} from '@instructure/ui-flex'
 import GenericErrorPage from '@canvas/generic-error-page'
 import {IconFolderLine, IconLtiLine} from '@instructure/ui-icons'
@@ -226,7 +226,7 @@ function CanvasFileChooser({courseID, onFileSelect, userID}) {
     <BaseUploadTool
       renderFooter={footerContents}
       icon={<IconFolderLine size="medium" color="brand" />}
-      label={I18n.t('Canvas Files')}
+      label={I18n.t('Files')}
     >
       {() => contents}
     </BaseUploadTool>
@@ -287,10 +287,42 @@ function WebcamPhotoUpload({onPhotoTaken}) {
   )
 }
 
-function MoreOptions({breakpoints, courseID, handleCanvasFiles, handleWebcamPhotoUpload, userID}) {
-  if (handleCanvasFiles == null && handleWebcamPhotoUpload == null) {
+function MoreOptions({
+  assignmentID,
+  breakpoints,
+  courseID,
+  handleCanvasFiles,
+  handleWebcamPhotoUpload,
+  userID
+}) {
+  const {loading, error, data} = useQuery(EXTERNAL_TOOLS_QUERY, {
+    variables: {courseID}
+  })
+
+  if (loading) return <LoadingIndicator />
+  if (error) {
+    return (
+      <GenericErrorPage
+        imageUrl={errorShipUrl}
+        errorSubject={I18n.t('Course external tools query error')}
+        errorCategory={I18n.t('Assignments 2 Student Error Page')}
+      />
+    )
+  }
+
+  const externalTools = data.course?.externalToolsConnection?.nodes || []
+  if (handleCanvasFiles == null && externalTools.length === 0) {
     return null
   }
+
+  const buildLaunchUrl = tool =>
+    `${window.location.origin}/courses/${encodeURIComponent(
+      courseID
+    )}/external_tools/${encodeURIComponent(
+      tool._id
+    )}/resource_selection?launch_type=homework_submission&assignment_id=${encodeURIComponent(
+      assignmentID
+    )}`
 
   const itemMargin = breakpoints.desktopOnly ? '0 x-small' : 'xx-small xxx-small'
 
@@ -306,11 +338,17 @@ function MoreOptions({breakpoints, courseID, handleCanvasFiles, handleWebcamPhot
           <CanvasFileChooser courseID={courseID} userID={userID} onFileSelect={handleCanvasFiles} />
         </Flex.Item>
       )}
+      {externalTools.map(tool => (
+        <Flex.Item key={tool._id} margin={itemMargin}>
+          <ExternalTool launchUrl={buildLaunchUrl(tool)} tool={tool} />
+        </Flex.Item>
+      ))}
     </Flex>
   )
 }
 
 MoreOptions.propTypes = {
+  assignmentID: string.isRequired,
   breakpoints: breakpointsShape,
   courseID: string.isRequired,
   handleCanvasFiles: func,

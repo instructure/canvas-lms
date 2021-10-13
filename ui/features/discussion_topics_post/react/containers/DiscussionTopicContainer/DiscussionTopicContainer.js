@@ -34,7 +34,6 @@ import {
   SUBSCRIBE_TO_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_READ_STATE
 } from '../../../graphql/Mutations'
-import {PodcastFeed} from '../../components/PodcastFeed/PodcastFeed'
 import {PostToolbar} from '../../components/PostToolbar/PostToolbar'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
@@ -219,8 +218,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     return rootEntryDraftMessage
   }
 
-  const podcast_url = document.querySelector("link[title='Discussion Podcast Feed']")
-
   return (
     <Responsive
       match="media"
@@ -243,11 +240,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           replyButton: {
             display: 'block'
           },
-          podcastButton: {
-            display: 'block',
-            padding: 'small none none',
-            textSize: 'small'
-          },
           RCE: {
             paddingClosed: 'none',
             paddingOpen: 'none none small'
@@ -269,11 +261,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
           },
           replyButton: {
             display: 'inline-block'
-          },
-          podcastButton: {
-            display: 'inline-block',
-            padding: 'small none none small',
-            textSize: 'medium'
           },
           RCE: {
             paddingClosed: 'none medium none xx-large',
@@ -458,47 +445,29 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                           attachment={props.discussionTopic.attachment}
                         >
                           {props.discussionTopic.permissions?.reply && !expandedReply && (
-                            <>
-                              <View
-                                as="div"
-                                padding="small none none"
+                            <View as="div" padding="small none none">
+                              <Button
                                 display={responsiveProps.replyButton.display}
+                                color="primary"
+                                onClick={() => {
+                                  setExpandedReply(!expandedReply)
+                                }}
+                                data-testid="discussion-topic-reply"
                               >
-                                <Button
-                                  display={responsiveProps.replyButton.display}
-                                  color="primary"
-                                  onClick={() => {
-                                    setExpandedReply(!expandedReply)
-                                  }}
-                                  data-testid="discussion-topic-reply"
-                                >
-                                  {findRootEntryDraftMessage() ? (
-                                    <Text weight="bold" size={responsiveProps.textSize}>
-                                      <View as="span" margin="0 small 0 0">
-                                        <IconEditLine size="x-small" />
-                                      </View>
-                                      {I18n.t('Continue draft')}
-                                    </Text>
-                                  ) : (
-                                    <Text weight="bold" size={responsiveProps.textSize}>
-                                      {I18n.t('Reply')}
-                                    </Text>
-                                  )}
-                                </Button>
-                              </View>
-                              {podcast_url?.href && (
-                                <View
-                                  as="div"
-                                  padding={responsiveProps.podcastButton.padding}
-                                  display={responsiveProps.podcastButton.display}
-                                >
-                                  <PodcastFeed
-                                    linkUrl={podcast_url.href}
-                                    responsiveProps={responsiveProps.podcastButton}
-                                  />
-                                </View>
-                              )}
-                            </>
+                                {findRootEntryDraftMessage() ? (
+                                  <Text weight="bold" size={responsiveProps.textSize}>
+                                    <View as="span" margin="0 small 0 0">
+                                      <IconEditLine size="x-small" />
+                                    </View>
+                                    {I18n.t('Continue draft')}
+                                  </Text>
+                                ) : (
+                                  <Text weight="bold" size={responsiveProps.textSize}>
+                                    {I18n.t('Reply')}
+                                  </Text>
+                                )}
+                              </Button>
+                            </View>
                           )}
                         </DiscussionEntryContainer>
                       </Flex.Item>

@@ -28,22 +28,18 @@ import {
   MOCK_COURSE_TABS,
   MOCK_GRADING_PERIODS_EMPTY,
   MOCK_ASSIGNMENT_GROUPS,
-  MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS,
   MOCK_ENROLLMENTS,
-  MOCK_ENROLLMENTS_WITH_OBSERVED_USERS,
   MOCK_GROUPS
 } from './mocks'
 import {TAB_IDS} from '@canvas/k5/react/utils'
 import {MOCK_OBSERVER_LIST} from '@canvas/k5/react/__tests__/fixtures'
 import sinon from 'sinon'
-import {OBSERVER_COOKIE_PREFIX} from '@canvas/k5/react/ObserverOptions'
 
 const currentUser = {
   id: '1',
   display_name: 'Geoffrey Jellineck',
   avatar_image_url: 'http://avatar'
 }
-const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUser.id}`
 const defaultEnv = {
   current_user: currentUser,
   course_id: '30',
@@ -100,7 +96,7 @@ const defaultProps = {
   pagesPath: '/courses/30/pages',
   hasWikiPages: true,
   hasSyllabusBody: true,
-  parentSupportEnabled: false,
+  parentSupportEnabled: true,
   observerList: MOCK_OBSERVER_LIST,
   selfEnrollment: {
     option: null,
@@ -117,17 +113,10 @@ const FETCH_TABS_URL = '/api/v1/courses/30/tabs'
 const GRADING_PERIODS_URL = encodeURI(
   '/api/v1/courses/30?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores'
 )
-const OBSERVER_GRADING_PERIODS_URL = encodeURI(
-  '/api/v1/courses/30?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores&include[]=observed_users'
-)
 const ASSIGNMENT_GROUPS_URL = encodeURI(
   '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments'
 )
-const OBSERVER_ASSIGNMENT_GROUPS_URL = encodeURI(
-  '/api/v1/courses/30/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments&include[]=observed_users'
-)
 const ENROLLMENTS_URL = '/api/v1/courses/30/enrollments?user_id=1'
-const OBSERVER_ENROLLMENTS_URL = '/api/v1/courses/30/enrollments?user_id=1&include=observed_users'
 
 const GROUPS_URL = encodeURI(
   '/api/v1/courses/30/groups?include[]=users&include[]=group_category&include[]=permissions&include_inactive_users=true'
@@ -195,7 +184,6 @@ afterEach(() => {
   moxios.uninstall()
   fetchMock.restore()
   fakeXhrServer.restore()
-  window.location.hash = ''
 })
 
 describe('K-5 Subject Course', () => {
@@ -338,6 +326,9 @@ describe('K-5 Subject Course', () => {
   })
 
   describe('Student View Button functionality', () => {
+    afterAll(() => {
+      window.location.hash = ''
+    })
     it('Shows the Student View button when the user has student view mode access', () => {
       const {queryByRole} = render(<K5Course {...defaultProps} showStudentView />)
       expect(queryByRole('link', {name: 'Student View'})).toBeInTheDocument()
@@ -694,9 +685,6 @@ describe('K-5 Subject Course', () => {
     })
 
     describe('apps section', () => {
-      afterEach(() => {
-        fetchMock.restore()
-      })
       it("displays user's apps", async () => {
         const {getByText} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.RESOURCES} />)
         await waitFor(() => {
@@ -736,49 +724,12 @@ describe('K-5 Subject Course', () => {
     })
   })
 
-  describe('Observer Support', () => {
-    beforeEach(() => {
-      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
-      fetchMock.get(
-        OBSERVER_ASSIGNMENT_GROUPS_URL,
-        JSON.stringify(MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS)
-      )
-      fetchMock.get(OBSERVER_ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS_WITH_OBSERVED_USERS))
-    })
-
-    afterEach(() => {
-      document.cookie = `${observedUserCookieName}=`
-    })
-
+  describe('Parent Support', () => {
     it('shows picker when user is an observer', () => {
-      const {getByRole} = render(<K5Course {...defaultProps} parentSupportEnabled />)
+      const {getByRole} = render(<K5Course {...defaultProps} />)
       const select = getByRole('combobox', {name: 'Select a student to view'})
       expect(select).toBeInTheDocument()
       expect(select.value).toBe('Zelda')
-    })
-
-    it('shows the observee grades on the Grades Tab', async () => {
-      const {getByRole, getByText} = render(
-        <K5Course {...defaultProps} parentSupportEnabled defaultTab={TAB_IDS.GRADES} />
-      )
-      const select = getByRole('combobox', {name: 'Select a student to view'})
-      act(() => select.click())
-      act(() => getByText('Student 5').click())
-      await waitFor(() => {
-        const formattedSubmittedDate = tz.format(
-          '2021-09-20T23:55:08Z',
-          'date.formats.full_with_weekday'
-        )
-        ;[
-          'Assignment 3',
-          `Submitted ${formattedSubmittedDate}`,
-          'Assignments',
-          '6 pts',
-          'Out of 10 pts'
-        ].forEach(label => {
-          expect(getByText(label)).toBeInTheDocument()
-        })
-      })
     })
   })
 })

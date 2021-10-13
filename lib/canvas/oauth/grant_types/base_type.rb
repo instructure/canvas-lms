@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-module Canvas::OAuth
+module Canvas::Oauth
   module GrantTypes
     class BaseType
       def initialize(client_id, secret, opts)
         @secret = secret
-        @provider = Canvas::OAuth::Provider.new(client_id)
+        @provider = Canvas::Oauth::Provider.new(client_id)
         @opts = opts
       end
 
@@ -22,8 +22,8 @@ module Canvas::OAuth
       private
 
       def validate_client_id_and_secret
-        raise Canvas::OAuth::RequestError, :invalid_client_id unless @provider.has_valid_key?
-        raise Canvas::OAuth::RequestError, :invalid_client_secret unless @provider.is_authorized_by?(@secret)
+        raise Canvas::Oauth::RequestError, :invalid_client_id unless @provider.has_valid_key?
+        raise Canvas::Oauth::RequestError, :invalid_client_secret unless @provider.is_authorized_by?(@secret)
       end
 
       def validate_type

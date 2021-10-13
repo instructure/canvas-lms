@@ -47,6 +47,14 @@ function makeDummyNextSubmission(submission) {
   }
 }
 
+function getInitialSubmission(initialQueryData) {
+  const submissionsConnection = initialQueryData.assignment.submissionsConnection
+  if (!submissionsConnection || submissionsConnection.nodes.length === 0) {
+    return null
+  }
+  return submissionsConnection.nodes[0]
+}
+
 function getSubmissionHistories(submissionHistoriesQueryData) {
   if (!submissionHistoriesQueryData) {
     return []
@@ -57,12 +65,12 @@ function getSubmissionHistories(submissionHistoriesQueryData) {
 }
 
 function getAllSubmissions({initialQueryData, submissionHistoriesQueryData}) {
-  const initialSubmission = initialQueryData.submission
+  const initialSubmission = getInitialSubmission(initialQueryData)
   if (!initialSubmission) {
     return []
   }
 
-  // submission histories don't have an id. We are going to add the initial
+  // submisison histories don't have an id. We are going to add the initial
   // submissions id to all of the histories that we can query submission
   // comments without having to pipe both the initial submission and
   // currently displayed submission to all components.
@@ -244,7 +252,7 @@ class ViewManager extends React.Component {
           cancelDraftAction: this.onCancelDraft,
           isLatestAttempt: !this.hasNextSubmission(),
           latestSubmission: this.getLatestSubmission(),
-          lastSubmittedSubmission: this.props.initialQueryData.submission,
+          lastSubmittedSubmission: getInitialSubmission(this.props.initialQueryData),
           showDraftAction: () => {
             this.onChangeSubmission(this.getLatestSubmission().attempt)
           },

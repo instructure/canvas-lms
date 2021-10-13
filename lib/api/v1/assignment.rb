@@ -63,7 +63,6 @@ module Api::V1::Assignment
       anonymous_instructor_annotations
       anonymous_grading
       allowed_attempts
-      annotatable_attachment_id
     )
   }.freeze
 
@@ -76,7 +75,6 @@ module Api::V1::Assignment
       due_at
       assignment_group_id
       post_to_sis
-      annotatable_attachment_id
     )
   }.freeze
 
@@ -125,8 +123,7 @@ module Api::V1::Assignment
       needs_grading_count_by_section: false,
       exclude_response_fields: [],
       include_planner_override: false,
-      include_can_edit: false,
-      include_webhook_info: false
+      include_can_edit: false
     )
 
     if opts[:override_dates] && !assignment.new_record?
@@ -235,12 +232,6 @@ module Api::V1::Assignment
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',
                                            :assignment_id => assignment.id)
-    end
-
-    # the webhook_info is for internal use only and is not intended to be used with
-    # multiple assignments, it will create difficult to fix n+1s
-    if opts[:include_webhook_info]
-      hash['webhook_info'] = assignment.assignment_configuration_tool_lookups[0]&.webhook_info
     end
 
     if assignment.automatic_peer_reviews? && assignment.peer_reviews?

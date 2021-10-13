@@ -19,7 +19,7 @@
 #
 
 module Login
-  class CleverController < OAuth2Controller
+  class CleverController < Oauth2Controller
     def create
       # Clever does an insecure half-flow OAuth2 for "Instant Login";
       # catch when they do this, and start the flow from the beginning.

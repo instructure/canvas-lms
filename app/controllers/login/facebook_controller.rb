@@ -19,5 +19,5 @@
 #
 
 module Login
-  FacebookController = OAuth2Controller
+  FacebookController = Oauth2Controller
 end

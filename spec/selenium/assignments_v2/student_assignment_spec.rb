@@ -184,8 +184,11 @@ describe 'as a student' do
 
         StudentAssignmentPageV2.submit_button_enabled
         StudentAssignmentPageV2.submit_assignment
+        wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
 
-        expect(f('body')).to include_text("Hello")
+        in_frame tiny_rce_ifr_id do
+          expect(f('body')).to include_text("Hello")
+        end
       end
 
       it 'is able to be saved as a draft', custom_timeout: 30 do

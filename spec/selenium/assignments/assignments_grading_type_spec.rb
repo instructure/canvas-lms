@@ -31,6 +31,7 @@ describe "assignments" do
   end
 
   before :each do
+    Account.default.enable_feature!(:rce_enhancements)
     create_session(@pseudonym)
   end
 

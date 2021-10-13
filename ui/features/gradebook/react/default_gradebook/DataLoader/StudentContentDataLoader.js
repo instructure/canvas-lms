@@ -71,7 +71,7 @@ function getStudentsChunk(courseId, studentIds, options) {
   const params = {
     enrollment_state: ['active', 'completed', 'inactive', 'invited'],
     enrollment_type: ['student', 'student_view'],
-    include: ['avatar_url', 'enrollments', 'group_ids', 'last_name', 'first_name'],
+    include: ['avatar_url', 'enrollments', 'group_ids'],
     per_page: studentIds.length,
     user_ids: studentIds
   }

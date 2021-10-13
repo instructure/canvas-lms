@@ -23,7 +23,7 @@ require_dependency "lti/ims/authorization_controller"
 require 'json/jwt'
 
 module Lti
-  module IMS
+  module Ims
     describe AuthorizationController, type: :request do
       let(:account) { Account.create! }
 
@@ -94,7 +94,7 @@ module Lti
 
         it 'returns an access_token' do
           post auth_endpoint, params: params
-          access_token = Lti::OAuth2::AccessToken.create_jwt(aud: @request.host, sub: tool_proxy.guid)
+          access_token = Lti::Oauth2::AccessToken.create_jwt(aud: @request.host, sub: tool_proxy.guid)
           expect { access_token.validate! }.not_to raise_error
         end
 

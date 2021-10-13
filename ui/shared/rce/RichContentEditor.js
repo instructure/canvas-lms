@@ -24,7 +24,10 @@
 
 import serviceRCELoader from './serviceRCELoader'
 import {RCELOADED_EVENT_NAME, send, destroy, focus} from './RceCommandShim'
+import deprecated from './util/deprecated'
 import $ from 'jquery'
+
+const Sidebar = !ENV.use_rce_enhancements && require('./Sidebar').default
 
 function loadServiceRCE(target, tinyMCEInitOptions, callback) {
   target.css('display', 'none')
@@ -32,6 +35,7 @@ function loadServiceRCE(target, tinyMCEInitOptions, callback) {
   const originalOnFocus = tinyMCEInitOptions.onFocus
 
   tinyMCEInitOptions.onFocus = (...args) => {
+    if (!ENV.use_rce_enhancements) RichContentEditor.showSidebar()
     if (originalOnFocus instanceof Function) {
       originalOnFocus(...args)
     }
@@ -108,10 +112,13 @@ function freshNode(target) {
   return newTarget
 }
 
+const deprecationMsg =
+  "with the new RCE you don't need to call this method, it is a no op since there is no sidebar"
+
 const RichContentEditor = {
   /**
    * start the remote module (if the feature flag is on) loading so that it's
-   * hopefully done by the time loadNewEditor is called.
+   * hopefully done by the time initSidebar and loadNewEditor are called.
    * should typically be called at the top of any source file that calls one
    * of those.
    *
@@ -122,11 +129,42 @@ const RichContentEditor = {
   },
 
   /**
+   * load the sidebar. can pass callbacks to execute any time the sidebar is
+   * shown (`show`) or hidden (`hide`).
+   *
+   * @public
+   */
+  initSidebar: deprecated(deprecationMsg, (subscriptions = {}) => {
+    if (!ENV.use_rce_enhancements) Sidebar.init(subscriptions)
+  }),
+
+  /**
+   * show the sidebar if it's around
+   *
+   * @public
+   */
+
+  showSidebar: deprecated(deprecationMsg, () => {
+    if (!ENV.use_rce_enhancements) Sidebar.show()
+  }),
+
+  /**
+   * hide the sidebar if it's around
+   *
+   * @public
+   */
+
+  hideSidebar: deprecated(deprecationMsg, () => {
+    if (!ENV.use_rce_enhancements) Sidebar.hide()
+  }),
+
+  /**
    * load an editor into the target element with the given options. most
    * options are passed on to tinymce, but locally:
    *
    *   focus (boolean)
    *     claim the new editor as active immediately after it's loaded
+   *     (including showing the sidebar if any)
    *
    *   manageParent (boolean)
    *     ensure the target element has a containing div that doesn't contain
@@ -203,7 +241,7 @@ const RichContentEditor = {
   },
 
   /**
-   * remove the target editor.
+   * remove the target editor. if there's a sidebar, hide it
    *
    * @public
    */
@@ -211,6 +249,7 @@ const RichContentEditor = {
     let $target = node2jquery(target)
     $target = this.freshNode($target)
     destroy($target)
+    if (!ENV.use_rce_enhancements) Sidebar.hide()
   },
 
   /**
@@ -219,11 +258,14 @@ const RichContentEditor = {
    * @public
    */
   closeRCE(target) {
-    this.callOnRCE(target, 'RCEClosed')
+    if (window.ENV.use_rce_enhancements) {
+      this.callOnRCE(target, 'RCEClosed')
+    }
   },
 
   /**
-   * make the target the active editor
+   * make the target the active editor, including to be recipient of sidebar
+   * events. if there's a sidebar, make sure it's showing
    *
    * @private
    */
@@ -231,6 +273,7 @@ const RichContentEditor = {
     let $target = node2jquery(target)
     $target = this.freshNode($target)
     focus($target)
+    if (!ENV.use_rce_enhancements) Sidebar.show()
   },
 
   freshNode,

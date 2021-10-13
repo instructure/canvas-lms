@@ -21,7 +21,7 @@ import {render, fireEvent} from '@testing-library/react'
 import GroupSelectionDrillDown from '../GroupSelectionDrillDown'
 
 describe('GroupSelectionDrillDown', () => {
-  let mockOnCollectionClick
+  const mockOnCollectionClick = jest.fn()
 
   const defaultProps = (props = {}) => ({
     collections: {
@@ -48,12 +48,6 @@ describe('GroupSelectionDrillDown', () => {
         name: 'Group 4',
         collections: [],
         parentGroupId: '3'
-      },
-      5: {
-        id: '5',
-        name: 'Group Without Parent',
-        collections: [],
-        parentGroupId: '999'
       }
     },
     rootId: '0',
@@ -61,10 +55,6 @@ describe('GroupSelectionDrillDown', () => {
     loadedGroups: ['1'],
     onCollectionClick: mockOnCollectionClick,
     ...props
-  })
-
-  beforeEach(() => {
-    mockOnCollectionClick = jest.fn()
   })
 
   afterEach(() => {
@@ -96,23 +86,5 @@ describe('GroupSelectionDrillDown', () => {
     const {name, id} = defaultProps().collections[2]
     const {queryByText} = render(<GroupSelectionDrillDown {...defaultProps({movingGroupId: id})} />)
     expect(queryByText(name)).not.toBeInTheDocument()
-  })
-
-  it('calls onCollectionClick properly when back button is clicked and the parent group isnt in the collections', () => {
-    const props = defaultProps({selectedGroupId: '5'})
-    const {getByText} = render(<GroupSelectionDrillDown {...props} />)
-    fireEvent.click(getByText('Back'))
-    expect(mockOnCollectionClick).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        id: '999'
-      })
-    )
-  })
-
-  it('works with passing selectedGroupId that is not in the collections', () => {
-    const props = defaultProps({selectedGroupId: '123'})
-    const {getByText} = render(<GroupSelectionDrillDown {...props} />)
-    expect(getByText('Loading')).toBeInTheDocument()
   })
 })

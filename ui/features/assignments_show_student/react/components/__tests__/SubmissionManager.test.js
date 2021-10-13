@@ -23,10 +23,7 @@ import {
   DELETE_SUBMISSION_DRAFT,
   SET_MODULE_ITEM_COMPLETION
 } from '@canvas/assignments/graphql/student/Mutations'
-import {
-  SUBMISSION_HISTORIES_QUERY,
-  USER_GROUPS_QUERY
-} from '@canvas/assignments/graphql/student/Queries'
+import {SUBMISSION_HISTORIES_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
@@ -53,6 +50,7 @@ function renderInContext(overrides = {}, children) {
 
 describe('SubmissionManager', () => {
   beforeAll(() => {
+    window.ENV.use_rce_enhancements = true
     window.INST = window.INST || {}
     window.INST.editorButtons = []
   })
@@ -317,7 +315,6 @@ describe('SubmissionManager', () => {
       expect(confirmationDialog).toHaveTextContent('You are submitting a Text submission')
       expect(within(confirmationDialog).getByRole('button', {name: /Cancel/})).toBeInTheDocument()
       expect(within(confirmationDialog).getByRole('button', {name: /Okay/})).toBeInTheDocument()
-      fireEvent.click(within(confirmationDialog).getByRole('button', {name: /Cancel/}))
     })
   })
 
@@ -343,11 +340,7 @@ describe('SubmissionManager', () => {
           module_id: '2'
         }
 
-        props = await mockAssignmentAndSubmission({
-          Assignment: {
-            submissionTypes: ['online_url']
-          }
-        })
+        props = await mockAssignmentAndSubmission()
       })
 
       afterEach(() => {
@@ -721,12 +714,10 @@ describe('SubmissionManager', () => {
     })
 
     describe('when clicked', () => {
-      const confirmationDialog = async () =>
-        screen.findByRole('dialog', {label: 'Delete your work?'})
-      const confirmButton = async () =>
-        within(await confirmationDialog()).getByRole('button', {name: 'Delete Work'})
-      const cancelButton = async () =>
-        within(await confirmationDialog()).getByRole('button', {name: 'Cancel'})
+      const confirmationDialog = () => screen.queryByRole('dialog', {label: 'Delete your work?'})
+      const confirmButton = () =>
+        within(confirmationDialog()).getByRole('button', {name: 'Delete Work'})
+      const cancelButton = () => within(confirmationDialog()).getByRole('button', {name: 'Cancel'})
 
       let cancelDraftAction
 
@@ -734,17 +725,7 @@ describe('SubmissionManager', () => {
         cancelDraftAction = jest.fn()
       })
 
-      afterEach(async () => {
-        const dialog = screen.queryByRole('dialog', {label: 'Delete your work?'})
-        if (dialog != null) {
-          fireEvent.click(await cancelButton())
-        }
-      })
-
-      // TODO (EVAL-2018): the confirmation dialog isn't playing nice with the
-      // rest of the tests.  Unskip in the aforementioned ticket, or in a future
-      // ticket when we redo the dialog.
-      describe.skip('when the current draft has actual content', () => {
+      describe('when the current draft has actual content', () => {
         const renderDraft = async () => {
           const props = await mockAssignmentAndSubmission({
             Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 2, id: '123'}
@@ -761,17 +742,6 @@ describe('SubmissionManager', () => {
             {
               request: {query: DELETE_SUBMISSION_DRAFT, variables},
               result: deleteSubmissionDraftResult
-            },
-            {
-              request: {query: USER_GROUPS_QUERY, variables: {userID: '1'}},
-              result: await mockQuery(
-                USER_GROUPS_QUERY,
-                {
-                  Node: {__typename: 'User'},
-                  User: {groups: []}
-                },
-                {userID: '1'}
-              )
             }
           ]
 
@@ -789,14 +759,21 @@ describe('SubmissionManager', () => {
           act(() => {
             fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
           })
-          expect(await confirmationDialog()).toBeInTheDocument()
+          expect(confirmationDialog()).toBeInTheDocument()
         })
 
         it('calls the cancelDraftAction function if the user confirms the modal', async () => {
           const {getByRole} = await renderDraft()
-          fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
-          fireEvent.click(await confirmButton())
-          await waitFor(() => {
+
+          act(() => {
+            fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
+          })
+
+          act(() => {
+            fireEvent.click(confirmButton())
+          })
+
+          waitFor(() => {
             expect(cancelDraftAction).toHaveBeenCalled()
           })
         })
@@ -804,8 +781,13 @@ describe('SubmissionManager', () => {
         it('does nothing if the user cancels the modal', async () => {
           const {getByRole} = await renderDraft()
 
-          fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
-          fireEvent.click(await cancelButton())
+          act(() => {
+            fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
+          })
+
+          act(() => {
+            fireEvent.click(cancelButton())
+          })
 
           expect(cancelDraftAction).not.toHaveBeenCalled()
         })
@@ -814,10 +796,6 @@ describe('SubmissionManager', () => {
       describe('when the current draft has no content', () => {
         const renderDraft = async () => {
           const props = await mockAssignmentAndSubmission({
-            Assignment: {
-              id: '1',
-              submissionTypes: ['online_url']
-            },
             Submission: {attempt: 2}
           })
 
@@ -835,7 +813,7 @@ describe('SubmissionManager', () => {
           act(() => {
             fireEvent.click(getByRole('button', {name: /Cancel Attempt/}))
           })
-          expect(screen.queryByRole('dialog', {label: 'Delete your work?'})).not.toBeInTheDocument()
+          expect(confirmationDialog()).not.toBeInTheDocument()
         })
 
         it('calls the cancelDraftAction function', async () => {

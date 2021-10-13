@@ -59,8 +59,6 @@ Lint/RedundantStringCoercion:
   Severity: error
 Lint/RedundantWithIndex:
   Severity: error
-Lint/SafeNavigationConsistency:
-  Enabled: false # https://github.com/rubocop/rubocop/issues/9816
 Lint/SendWithMixinArgument:
   Severity: error
 Lint/SymbolConversion:
@@ -95,8 +93,6 @@ Rails/ContentTag:
     - "**/db/migrate/*" # this cop is for views, not migrations, where it gets confused with outrigger
     - "doc/**/*"
 
-RSpec/AnyInstance:
-  Enabled: false # while using an instance double would be preferable, it's a pain
 RSpec/DescribedClass:
   Enabled: false # we haven't used it, and it seems antithetical to RSpec/NamedSubject
 RSpec/EmptyExampleGroup:
@@ -105,8 +101,6 @@ RSpec/ExampleLength:
   Enabled: false # this is a Metrics-style cop
 RSpec/ExampleWording:
   Severity: error
-RSpec/ExpectInHook:
-  Enabled: false # follows RSpec/MultipleExpectations
 RSpec/InstanceVariable:
   Enabled: false # legacy code
 RSpec/MessageSpies:
@@ -119,51 +113,36 @@ RSpec/NestedGroups:
   Enabled: false # legacy code
 RSpec/RepeatedDescription:
   Severity: error
-RSpec/SubjectStub:
-  Enabled: false # yes, canvas is big and complicated sometimes
-RSpec/StubbedMock:
-  Enabled: false # this style goes along with spies
 
 Specs/EnsureSpecExtension:
   Exclude:
     - spec/shared_examples/**/*
-Style/Alias:
-  EnforcedStyle: prefer_alias_method # https://github.com/rubocop/ruby-style-guide/issues/821
-  Severity: error
+Style/AsciiComments:
+  Enabled: false # we have comments in other languages
 Style/Documentation:
   Enabled: false # most things don't need to be documented
 Style/Encoding:
   Severity: error
 Style/FrozenStringLiteralComment:
   Severity: error
-Style/IfUnlessModifier:
-  # see also https://github.com/rubocop/rubocop/discussions/10048
-  Enabled: false # can obscure important decisions or put too much code in a line
-Style/NumericPredicate:
-  Enabled: false # `> 0` can be easier to read than `.positive?`
 Style/ParenthesesAroundCondition:
   Severity: error
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
-Style/WhileUntilModifier:
-  Enabled: false # nontrivial loops should look like loops
 
 # the following cops are currently silenced, but we may want to enable them IF
 # we correct all instances in the codebase first
 
 Lint/AmbiguousBlockAssociation: # TODO
-  IgnoredMethods:
-    - change
-    - not_change
-    - raise_error
-Lint/UnusedBlockArgument: # TODO manually fix these by removing the argument if possible
+  Exclude:
+    - spec/**/*
+Lint/UnusedBlockArgument: # TODO maually fix these by removing the argument if possible
   Severity: warning
   AutoCorrect: false
-Lint/UnusedMethodArgument: # TODO manually fix these by removing the argument if possible
+Lint/UnusedMethodArgument: # TODO maually fix these by removing the argument if possible
   Severity: warning
-  AllowUnusedKeywordArguments: true # there's no way to mark a kwarg as unused
   AutoCorrect: false
 Lint/UselessAssignment: # TODO
   Severity: warning
@@ -171,17 +150,10 @@ Lint/UselessAssignment: # TODO
 Naming/VariableNumber: # TODO
   Enabled: false
 
-Rails/DynamicFindBy: # TODO; autocorrect (unsafe)
-  AllowedMethods:
-    - find_by_name # PluginSetting.find_by_name
-  AutoCorrect: false  
 Rails/ReadWriteAttribute: # TODO: autocorrect (unsafe)
   Enabled: false # accessors are often defined in terms of read_attribute
 Rails/TimeZone: # TODO: autocorrect (unsafe)
   Enabled: false
-Rails/WhereExists: # TODO: autocorrect(unsafe)
-  EnforcedStyle: where
-  AutoCorrect: false
 
 RSpec/ContextWording: # TODO
   Enabled: false
@@ -212,9 +184,6 @@ Style/DoubleNegation: # TODO: autocorrect (unsafe)
   Enabled: false
 Style/Dir: # TODO: autocorrect
   Enabled: false
-Style/EmptyElse: # TODO: autocorrect
-  Enabled: false
-  EnforcedStyle: empty # explicit nil indicates programmer intent
 Style/FormatStringToken: # TODO: investigate if this complains about our i18n library
   Enabled: false
 Style/GuardClause: # TODO
@@ -222,6 +191,8 @@ Style/GuardClause: # TODO
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
   Enabled: false # TODO: autocorrect
+Style/IfUnlessModifier: # TODO: autocorrect
+  Enabled: false
 Style/Lambda: # TODO: autocorrect
   Enabled: false
 Style/MethodCallWithArgsParentheses: # TODO: autocorrect
@@ -229,6 +200,8 @@ Style/MethodCallWithArgsParentheses: # TODO: autocorrect
 Style/MethodCallWithoutArgsParentheses: # TODO: autocorrect
   Enabled: false
 Style/NumericLiterals: # TODO: autocorrect
+  Enabled: false
+Style/NumericPredicate: # TODO: autocorrect (unsafe)
   Enabled: false
 Style/ParallelAssignment: # TODO: autocorrect (with probable exceptions)
   Enabled: false
@@ -254,18 +227,16 @@ Style/StderrPuts: # TODO: autocorrect
   Enabled: false
 Style/StringLiterals:
   EnforcedStyle: double_quotes
-  Enabled: false # TODO: autocorrect
+  Enabled: false # TODO: auotcorrect
 Style/SymbolArray: # TODO: autocorrect
   Enabled: false
-Style/QuotedSymbols:
-  # once Style/StringLiterals is enabled, we can remove this since it will inherit
-  EnforcedStyle: double_quotes
-  AutoCorrect: false
 Style/TrailingCommaInArguments: # TODO: autocorrect
   Enabled: false
 Style/TrailingCommaInArrayLiteral: # TODO: autocorrect
   Enabled: false
 Style/TrailingCommaInHashLiteral: # TODO: autocorrect
+  Enabled: false
+Style/WhileUntilModifier: # TODO: autocorrect
   Enabled: false
 Style/WordArray: # TODO: autocorrect
   Enabled: false
