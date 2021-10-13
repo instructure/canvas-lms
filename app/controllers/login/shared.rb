@@ -85,8 +85,8 @@ module Login::Shared
 
     respond_to do |format|
       if (oauth = session[:oauth2])
-        provider = Canvas::Oauth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
-        return redirect_to Canvas::Oauth::Provider.confirmation_redirect(self, provider, user)
+        provider = Canvas::OAuth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
+        return redirect_to Canvas::OAuth::Provider.confirmation_redirect(self, provider, user)
       elsif session[:course_uuid] && user &&
             (course = Course.where(uuid: session[:course_uuid], workflow_state: "created").first)
         claim_session_course(course, user)

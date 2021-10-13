@@ -1086,7 +1086,7 @@ describe DeveloperKey do
 
     before {
       # set up assymetric key
-      allow(Canvas::Oauth::KeyStorage).to receive(:present_key).and_return(asymmetric_keypair)
+      allow(Canvas::OAuth::KeyStorage).to receive(:present_key).and_return(asymmetric_keypair)
     }
 
     it "defaults to internal symmetric encryption with no audience set" do

@@ -77,21 +77,21 @@ describe Oauth2ProviderController do
     it 'redirects to the login url' do
       get :auth,
           params: { client_id: key.id,
-                    redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
+                    redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
                     response_type: 'code' }
       expect(response).to redirect_to(login_url)
     end
 
     it 'passes on canvas_login if provided' do
       get :auth, params: { client_id: key.id,
-                           redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
+                           redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
                            canvas_login: 1,
                            response_type: 'code' }
       expect(response).to redirect_to(login_url(:canvas_login => 1))
     end
 
     it 'passes pseudonym_session[unique_id] to login to populate username textbox' do
-      get :auth, params: { :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI,
+      get :auth, params: { :client_id => key.id, :redirect_uri => Canvas::OAuth::Provider::OAUTH2_OOB_URI,
                            "unique_id" => "test", force_login: true, response_type: 'code' }
       expect(response).to redirect_to(login_url + '?force_login=true&pseudonym_session%5Bunique_id%5D=test')
     end
@@ -136,7 +136,7 @@ describe Oauth2ProviderController do
       it 'redirects to the confirm url if the user has no token' do
         get :auth,
             params: { client_id: key.id,
-                      redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
+                      redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
                       response_type: 'code' }
         expect(response).to redirect_to(oauth2_auth_confirm_url)
       end
@@ -144,7 +144,7 @@ describe Oauth2ProviderController do
       it 'redirects to login_url with ?force_login=1' do
         get :auth,
             params: { client_id: key.id,
-                      redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
+                      redirect_uri: Canvas::OAuth::Provider::OAUTH2_OOB_URI,
                       response_type: 'code',
                       force_login: 1 }
         expect(response).to redirect_to(login_url(:force_login => 1))
@@ -472,7 +472,7 @@ describe Oauth2ProviderController do
     context 'authorization_code' do
       let(:grant_type) { 'authorization_code' }
       let(:valid_code) { "thecode" }
-      let(:valid_code_redis_key) { "#{Canvas::Oauth::Token::REDIS_PREFIX}#{valid_code}" }
+      let(:valid_code_redis_key) { "#{Canvas::OAuth::Token::REDIS_PREFIX}#{valid_code}" }
       let(:redis) do
         redis = double('Redis')
         allow(redis).to receive(:get)
@@ -731,13 +731,13 @@ describe Oauth2ProviderController do
   describe 'POST accept' do
     let_once(:user) { User.create! }
     let_once(:key) { DeveloperKey.create! }
-    let(:session_hash) { { :oauth2 => { :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI } } }
+    let(:session_hash) { { :oauth2 => { :client_id => key.id, :redirect_uri => Canvas::OAuth::Provider::OAUTH2_OOB_URI } } }
     let(:oauth_accept) { post :accept, session: session_hash }
 
     before { user_session user }
 
     it 'uses the global id of the user for generating the code' do
-      expect(Canvas::Oauth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { :scopes => nil, :remember_access => nil, :purpose => nil }).and_return('code')
+      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { :scopes => nil, :remember_access => nil, :purpose => nil }).and_return('code')
       oauth_accept
       expect(response).to redirect_to(oauth2_auth_url(:code => 'code'))
     end
@@ -745,24 +745,24 @@ describe Oauth2ProviderController do
     it 'saves the requested scopes with the code' do
       scopes = 'userinfo'
       session_hash[:oauth2][:scopes] = scopes
-      expect(Canvas::Oauth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { :scopes => scopes, :remember_access => nil, :purpose => nil }).and_return('code')
+      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { :scopes => scopes, :remember_access => nil, :purpose => nil }).and_return('code')
       oauth_accept
     end
 
     it 'remembers the users access preference with the code' do
-      expect(Canvas::Oauth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { :scopes => nil, :remember_access => '1', :purpose => nil }).and_return('code')
+      expect(Canvas::OAuth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { :scopes => nil, :remember_access => '1', :purpose => nil }).and_return('code')
       post :accept, params: { :remember_access => '1' }, session: session_hash
     end
 
     it 'removes oauth session info after code generation' do
-      allow(Canvas::Oauth::Token).to receive_messages(:generate_code_for => 'code')
+      allow(Canvas::OAuth::Token).to receive_messages(:generate_code_for => 'code')
       oauth_accept
       expect(controller.session[:oauth2]).to be_nil
     end
 
     it 'forwards the oauth state if it was provided' do
       session_hash[:oauth2][:state] = '1234567890'
-      allow(Canvas::Oauth::Token).to receive_messages(:generate_code_for => 'code')
+      allow(Canvas::OAuth::Token).to receive_messages(:generate_code_for => 'code')
       oauth_accept
       expect(response).to redirect_to(oauth2_auth_url(:code => 'code', :state => '1234567890'))
     end
@@ -775,7 +775,7 @@ describe Oauth2ProviderController do
 
   describe 'GET deny' do
     let_once(:key) { DeveloperKey.create! }
-    let(:session_hash) { { :oauth2 => { :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI } } }
+    let(:session_hash) { { :oauth2 => { :client_id => key.id, :redirect_uri => Canvas::OAuth::Provider::OAUTH2_OOB_URI } } }
 
     it 'forwards the oauth state if it was provided' do
       session_hash[:oauth2][:state] = '1234567890'

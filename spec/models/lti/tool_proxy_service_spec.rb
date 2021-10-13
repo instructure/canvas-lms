@@ -364,7 +364,7 @@ module Lti
         end
       end
 
-      it 'creates a split secret whith the depricated Oauth.splitSecret' do
+      it 'creates a split secret whith the depricated OAuth.splitSecret' do
         tp_half_secret = SecureRandom.hex(64)
         tp = ::IMS::LTI::Models::ToolProxy.new.from_json(tool_proxy_fixture)
         tp.enabled_capability = ['OAuth.splitSecret']

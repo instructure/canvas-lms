@@ -121,10 +121,10 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
       jwk = LtiProviderStateHelper.jwk
       developer_key = LtiProviderStateHelper.developer_key(jwk)
 
-      allow_any_instance_of(Canvas::Oauth::Provider)
+      allow_any_instance_of(Canvas::OAuth::Provider)
         .to receive(:key).and_return(developer_key)
 
-      allow_any_instance_of(Canvas::Oauth::ClientCredentialsProvider)
+      allow_any_instance_of(Canvas::OAuth::ClientCredentialsProvider)
         .to receive(:get_jwk_from_url).and_return(jwk)
     end
   end
@@ -138,10 +138,10 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
       account = Pact::Canvas.base_state.account
       LtiProviderStateHelper.set_lti_context_id(account)
 
-      allow_any_instance_of(Canvas::Oauth::Provider)
+      allow_any_instance_of(Canvas::OAuth::Provider)
         .to receive(:key).and_return(developer_key)
 
-      allow_any_instance_of(Canvas::Oauth::ClientCredentialsProvider)
+      allow_any_instance_of(Canvas::OAuth::ClientCredentialsProvider)
         .to receive(:get_jwk_from_url).and_return(jwk)
 
       # The jwt_signing_key file is the same one used to sign the JWTs in the contract

@@ -340,7 +340,7 @@ class DeveloperKey < ActiveRecord::Base
     when "external"
       # asymmetric encryption signed with private key to be verified by third
       # party using public key fetched from /login/oauth2/jwks
-      key = Canvas::Oauth::KeyStorage.present_key
+      key = Canvas::OAuth::KeyStorage.present_key
       Canvas::Security.create_jwt(claims, nil, key, :autodetect).to_s
     else
       # default symmetric encryption to be verified when given right back to
