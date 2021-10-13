@@ -37,7 +37,7 @@ module MicrosoftSync
     delegate :request, :expand_options, :get_paginated_list, :run_batch, :quote_value, to: :http
 
     def initialize(tenant, extra_statsd_tags)
-      @http = GraphServiceHttp.new(tenant, extra_statsd_tags)
+      @http = MicrosoftSync::GraphService::Http.new(tenant, extra_statsd_tags)
     end
 
     # ENDPOINTS:
@@ -50,7 +50,7 @@ module MicrosoftSync
         'education/classes',
         quota: [1, 0],
         special_cases: [
-          GraphServiceHttp::SpecialCase.new(
+          SpecialCase.new(
             400, /Education_ObjectType.*does not exist as.*property/,
             result: Errors::NotEducationTenant
           )
@@ -86,15 +86,15 @@ module MicrosoftSync
     end
 
     BATCH_REMOVE_GROUP_USERS_SPECIAL_CASES = [
-      GraphServiceHttp::SpecialCase.new(
+      SpecialCase.new(
         404, /does not exist or one of its queried reference-property objects are not present/i,
         result: :ignored
       ),
-      GraphServiceHttp::SpecialCase.new(
+      SpecialCase.new(
         400, /One or more removed object references do not exist for the following modified/i,
         result: :ignored
       ),
-      GraphServiceHttp::SpecialCase.new(
+      SpecialCase.new(
         400, /must have at least one owner, hence this owner cannot be removed/i,
         result: Errors::MissingOwners
       ),
@@ -126,15 +126,15 @@ module MicrosoftSync
     end
 
     BATCH_ADD_USERS_TO_GROUP_SPECIAL_CASES = [
-      GraphServiceHttp::SpecialCase.new(
+      SpecialCase.new(
         400, /One or more added object references already exist/i,
         result: :ignored
       ),
-      GraphServiceHttp::SpecialCase.new(
+      SpecialCase.new(
         403, /would exceed the maximum quota count.*for forward-link.*owners/i,
         result: Errors::OwnersQuotaExceeded
       ),
-      GraphServiceHttp::SpecialCase.new(
+      SpecialCase.new(
         403, /would exceed the maximum quota count.*for forward-link.*members/i,
         result: Errors::MembersQuotaExceeded
       ),
@@ -156,15 +156,15 @@ module MicrosoftSync
     end
 
     ADD_USERS_TO_GROUP_SPECIAL_CASES = [
-      GraphServiceHttp::SpecialCase.new(
+      SpecialCase.new(
         400, /One or more added object references already exist/i,
         result: :duplicates
       ),
-      GraphServiceHttp::SpecialCase.new(
+      SpecialCase.new(
         403, /would exceed the maximum quota count.*for forward-link.*owners/i,
         result: Errors::OwnersQuotaExceeded
       ),
-      GraphServiceHttp::SpecialCase.new(
+      SpecialCase.new(
         403, /would exceed the maximum quota count.*for forward-link.*members/i,
         result: Errors::MembersQuotaExceeded
       ),
@@ -207,7 +207,7 @@ module MicrosoftSync
     # === Teams ===
 
     TEAM_EXISTS_SPECIAL_CASES = [
-      GraphServiceHttp::SpecialCase.new(404, result: :not_found)
+      SpecialCase.new(404, result: :not_found)
     ].freeze
 
     def team_exists?(team_id)
@@ -215,11 +215,11 @@ module MicrosoftSync
     end
 
     CREATE_EDUCATION_CLASS_TEAM_SPECIAL_CASES = [
-      GraphServiceHttp::SpecialCase.new(
+      SpecialCase.new(
         400, /have one or more owners in order to create a Team/i,
         result: MicrosoftSync::Errors::GroupHasNoOwners
       ),
-      GraphServiceHttp::SpecialCase.new(
+      SpecialCase.new(
         409, /group is already provisioned/i,
         result: MicrosoftSync::Errors::TeamAlreadyExists
       )

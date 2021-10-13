@@ -20,10 +20,10 @@
 
 require 'spec_helper'
 
-# GraphServiceHttp is meant to be used only through GraphService. Some things
+# GraphService::Http is meant to be used only through GraphService. Some things
 # are tested here but more are tested in the spec for GraphService (partially
-# for historical reasons since GraphServiceHttp was once part of GraphService).
-describe MicrosoftSync::GraphServiceHttp do
+# for historical reasons since GraphService::Http was once part of GraphService).
+describe MicrosoftSync::GraphService::Http do
   include WebMock::API
 
   subject { described_class.new('mytenant', extra_tag: 'abc') }
@@ -135,9 +135,9 @@ describe MicrosoftSync::GraphServiceHttp do
       let(:body) { { message: 'Hello, some text in the body.' } }
       let(:special_cases) do
         [
-          MicrosoftSync::GraphServiceHttp::SpecialCase.new(408, result: :bar),
-          MicrosoftSync::GraphServiceHttp::SpecialCase.new(*special_case_args,
-                                                           result: special_case_value)
+          MicrosoftSync::GraphService::SpecialCase.new(408, result: :bar),
+          MicrosoftSync::GraphService::SpecialCase.new(*special_case_args,
+                                                       result: special_case_value)
         ]
       end
       let(:special_case_value) { :foo }
@@ -231,10 +231,10 @@ describe MicrosoftSync::GraphServiceHttp do
           allow(Rails.logger).to receive(:info).and_call_original
           subject.request(:post, 'foo/bar')
           expect(Rails.logger).to have_received(:info).with(
-            "MicrosoftSync::GraphServiceHttp: post foo/bar -- #{status_code_statsd_tag}, retried"
+            "MicrosoftSync::GraphService::Http: post foo/bar -- #{status_code_statsd_tag}, retried"
           )
           expect(Rails.logger).to have_received(:info).with(
-            'MicrosoftSync::GraphServiceHttp: post foo/bar -- 200, success'
+            'MicrosoftSync::GraphService::Http: post foo/bar -- 200, success'
           )
         end
       end
@@ -260,16 +260,16 @@ describe MicrosoftSync::GraphServiceHttp do
           allow(Rails.logger).to receive(:info).and_call_original
           expect { subject.request(:post, 'foo/bar', body: { hello: 'world' }) }.to raise_error(error_class)
           expect(Rails.logger).to have_received(:info).with(
-            "MicrosoftSync::GraphServiceHttp: post foo/bar -- #{status_code_statsd_tag}, retried"
+            "MicrosoftSync::GraphService::Http: post foo/bar -- #{status_code_statsd_tag}, retried"
           )
           expect(Rails.logger).to have_received(:info).with(
-            "MicrosoftSync::GraphServiceHttp: post foo/bar -- #{status_code_statsd_tag}, intermittent"
+            "MicrosoftSync::GraphService::Http: post foo/bar -- #{status_code_statsd_tag}, intermittent"
           )
         end
       end
 
       it 'fails immediately if DEFAULT_N_INTERMITTENT_RETRIES is 0' do
-        stub_const('MicrosoftSync::GraphServiceHttp::DEFAULT_N_INTERMITTENT_RETRIES', 0)
+        stub_const('MicrosoftSync::GraphService::Http::DEFAULT_N_INTERMITTENT_RETRIES', 0)
         expect {
           subject.request(:post, 'foo/bar', body: { hello: 'world' })
         }.to raise_error(error_class)
@@ -380,7 +380,7 @@ describe MicrosoftSync::GraphServiceHttp do
 
     context 'when passed special_cases' do
       let(:cases) do
-        [MicrosoftSync::GraphServiceHttp::SpecialCase.new(400, result: StandardError)]
+        [MicrosoftSync::GraphService::SpecialCase.new(400, result: StandardError)]
       end
       let(:extra_opts) { { special_cases: cases } }
 
@@ -438,7 +438,7 @@ describe MicrosoftSync::GraphServiceHttp do
     context 'when the batch request itself fails' do
       let(:status_code) { 500 }
 
-      before { stub_const('MicrosoftSync::GraphServiceHttp::DEFAULT_N_INTERMITTENT_RETRIES', 0) }
+      before { stub_const('MicrosoftSync::GraphService::Http::DEFAULT_N_INTERMITTENT_RETRIES', 0) }
 
       it 'counts a statsd metric with error status=unknown' do
         expect { run_batch }.to raise_error(MicrosoftSync::Errors::HTTPInternalServerError)
@@ -461,7 +461,7 @@ describe MicrosoftSync::GraphServiceHttp do
         context 'when the special case value is an error class' do
           let(:special_cases) do
             [
-              MicrosoftSync::GraphServiceHttp::SpecialCase.new(400, /special.case/, result: custom_error_class)
+              MicrosoftSync::GraphService::SpecialCase.new(400, /special.case/, result: custom_error_class)
             ]
           end
 
@@ -475,7 +475,7 @@ describe MicrosoftSync::GraphServiceHttp do
 
         context 'when the special case value is not an error class' do
           let(:special_cases) do
-            [MicrosoftSync::GraphServiceHttp::SpecialCase.new(400, /special.case/, result: :special)]
+            [MicrosoftSync::GraphService::SpecialCase.new(400, /special.case/, result: :special)]
           end
 
           it 'increments the "ignored" counter' do
@@ -494,11 +494,11 @@ describe MicrosoftSync::GraphServiceHttp do
       context 'when there are special-cases and non-special-case failure responses' do
         let(:responses) { [resp('a', 400, 'bad error'), resp('b', 400, 'some special case')] }
         let(:special_cases) do
-          [MicrosoftSync::GraphServiceHttp::SpecialCase.new(400, /special.case/, result: custom_error_class)]
+          [MicrosoftSync::GraphService::SpecialCase.new(400, /special.case/, result: custom_error_class)]
         end
 
         it "raises a BatchRequestFailed error instead of the special case's error" do
-          expect { run_batch }.to raise_error(MicrosoftSync::GraphServiceHttp::BatchRequestFailed)
+          expect { run_batch }.to raise_error(MicrosoftSync::GraphService::Http::BatchRequestFailed)
         end
       end
 
