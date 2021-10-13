@@ -358,6 +358,43 @@ describe ContentMigrationsController, type: :request do
       expect(migration.copy_options).to eq({ 'assignments' => { key => '1' } })
     end
 
+    it "records both jobs involved with a selective import" do
+      # create the migration, specifying selective import
+      json = api_call(:post,
+                      @migration_url,
+                      @params,
+                      {
+                        :migration_type => 'canvas_cartridge_importer',
+                        :selective_import => '1',
+                        :pre_attachment => { :name => 'example.imscc' }
+                      })
+      expect(json['workflow_state']).to eq 'pre_processing'
+
+      # (pretend to) upload the file
+      cm = ContentMigration.find json['id']
+      file = Attachment.new(context: cm, display_name: 'example.imscc')
+      file.uploaded_data = fixture_file_upload('migration/canvas_cc_minimum.zip')
+      file.save!
+      cm.attachment = file
+      cm.save!
+      cm.queue_migration
+      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
+      run_jobs
+      expect(cm.reload.workflow_state).to eq 'exported'
+      expect(cm.migration_settings['job_ids']).to eq([123])
+
+      # update the migration with the selection
+      json = api_call(:put,
+                      "#{@migration_url}/#{cm.id}",
+                      @params.merge(:action => 'update', :id => cm.to_param),
+                      { :copy => { 'everything' => '1' } })
+      expect(json['workflow_state']).to eq 'running'
+      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 456))
+      run_jobs
+      expect(cm.reload.workflow_state).to eq 'imported'
+      expect(cm.migration_settings['job_ids']).to match_array([123, 456])
+    end
+
     it "queues for course copy on concluded courses" do
       source_course = Course.create(name: 'source course')
       source_course.enroll_teacher(@user)
