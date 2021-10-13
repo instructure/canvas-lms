@@ -5699,6 +5699,25 @@ describe AssignmentsApiController, type: :request do
       expect(result['anonymize_students']).to be false
     end
 
+    it "includes the assignment's annotatable_attachment_id for existing assignments" do
+      attachment = attachment_model(context: @course)
+      @assignment.update(
+        annotatable_attachment: attachment,
+        submission_types: "student_annotation"
+      )
+      expect(result['annotatable_attachment_id']).to eq attachment.id
+    end
+
+    it "includes the assignment's annotatable_attachment_id for new assignments" do
+      attachment = attachment_model(context: @course)
+      assignment = @course.assignments.build(
+        annotatable_attachment: attachment,
+        submission_types: 'student_annotation'
+      )
+      result = assignment_json(assignment, @user, {})
+      expect(result['annotatable_attachment_id']).to eq attachment.id
+    end
+
     context 'can_submit value' do
       before :each do
         course_with_student_logged_in(:course_name => "Course 1", :active_all => 1)

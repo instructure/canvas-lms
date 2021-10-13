@@ -79,6 +79,12 @@
 .intl_rates_may_apply {
   font-size: 0.8em
 }
+
+.contact_channel_path {
+  max-width: 12rem;
+  display: block;
+}
+
 .contact_channel_path {
   @include breakpoint(desktop) {
     max-width: 8.75rem;

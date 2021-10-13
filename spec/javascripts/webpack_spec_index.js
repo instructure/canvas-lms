@@ -15,22 +15,21 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+/* eslint-disable no-undef */
+/* because the undefined constants are defined in webpack.test.config */
+
 import Enzyme from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import {canvas} from '@instructure/ui-themes'
 import en_US from 'timezone/en_US'
 import './jsx/spec-support/specProtection'
-import setupRavenConsoleLoggingPlugin from '../../ui/boot/initializers/setupRavenConsoleLoggingPlugin.js'
+import setupRavenConsoleLoggingPlugin from '../../ui/boot/initializers/setupRavenConsoleLoggingPlugin'
 import {filterUselessConsoleMessages} from '@instructure/js-utils'
 import './jsx/spec-support/timezoneBackwardsCompatLayer'
-import {
-  up as configureDateTime
-} from 'ui/boot/initializers/configureDateTime'
+import {up as configureDateTime} from 'ui/boot/initializers/configureDateTime'
 
-import {
-  up as configureDateTimeMomentParser
-} from 'ui/boot/initializers/configureDateTimeMomentParser'
-
+import {up as configureDateTimeMomentParser} from 'ui/boot/initializers/configureDateTimeMomentParser'
 
 filterUselessConsoleMessages(console)
 configureDateTime()
@@ -100,6 +99,7 @@ const requireAll = context => {
   const keys = context.keys()
 
   if (process.env.JSPEC_VERBOSE === '1') {
+    // eslint-disable-next-line no-console
     console.log(`webpack_spec_index: running ${keys.length} files in ${process.env.JSPEC_PATH}`)
   }
 
@@ -110,15 +110,35 @@ if (process.env.JSPEC_PATH) {
   let isFile = false
   try {
     isFile = __webpack_modules__[require.resolveWeak(`../../${process.env.JSPEC_PATH}`)]
-  } catch (e) {}
+  } catch (e) {
+    // ignore
+  }
   if (isFile) {
+    // eslint-disable-next-line import/no-dynamic-require
     require(`../../${process.env.JSPEC_PATH}`)
   } else {
-    requireAll(require.context(`../../${process.env.JSPEC_PATH}`, process.env.JSPEC_RECURSE !== '0', /\.js$/))
+    requireAll(
+      require.context(`../../${process.env.JSPEC_PATH}`, process.env.JSPEC_RECURSE !== '0', /\.js$/)
+    )
   }
 } else {
-  requireAll(require.context(CONTEXT_COFFEESCRIPT_SPEC, process.env.JSPEC_RECURSE !== '0', RESOURCE_COFFEESCRIPT_SPEC))
-  requireAll(require.context(CONTEXT_EMBER_GRADEBOOK_SPEC, process.env.JSPEC_RECURSE !== '0', RESOURCE_EMBER_GRADEBOOK_SPEC))
-  requireAll(require.context(CONTEXT_JSX_SPEC, process.env.JSPEC_RECURSE !== '0', RESOURCE_JSX_SPEC))
+  requireAll(
+    require.context(
+      CONTEXT_COFFEESCRIPT_SPEC,
+      process.env.JSPEC_RECURSE !== '0',
+      RESOURCE_COFFEESCRIPT_SPEC
+    )
+  )
+  requireAll(
+    require.context(
+      CONTEXT_EMBER_GRADEBOOK_SPEC,
+      process.env.JSPEC_RECURSE !== '0',
+      RESOURCE_EMBER_GRADEBOOK_SPEC
+    )
+  )
+  requireAll(
+    require.context(CONTEXT_JSX_SPEC, process.env.JSPEC_RECURSE !== '0', RESOURCE_JSX_SPEC)
+  )
+  // eslint-disable-next-line import/no-dynamic-require
   require(WEBPACK_PLUGIN_SPECS)
 }
