@@ -22,15 +22,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/pseudonyms/confirm_change_password" do
-  it "should render" do
+  it "renders" do
     user_factory
     assign(:user, @user)
     assign(:current_user, @user)
     assign(:pseudonym, @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaabb", :password_confirmation => "asdfaabb"))
     assign(:password_pseudonyms, @user.pseudonyms)
-    assign(:cc, communication_channel(@user, {username: 'unique@example.com'}))
+    assign(:cc, communication_channel(@user, { username: 'unique@example.com' }))
     render "pseudonyms/confirm_change_password"
     expect(response).not_to be_nil
   end
 end
-

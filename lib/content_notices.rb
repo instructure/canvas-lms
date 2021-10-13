@@ -22,7 +22,7 @@ module ContentNotices
   NOTICE_ATTRIBUTES = [:tag, :text, :variant, :link_text, :link_target, :should_show]
 
   class ContentNotice
-    attr_accessor *NOTICE_ATTRIBUTES
+    attr_accessor(*NOTICE_ATTRIBUTES)
   end
 
   module ClassMethods
@@ -74,5 +74,4 @@ module ContentNotices
       Rails.cache.read(cn_cache_key(tag)) && (notice.should_show.nil? || notice.should_show.call(self, user))
     end.values
   end
-
 end

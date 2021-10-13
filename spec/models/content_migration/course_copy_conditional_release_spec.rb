@@ -30,10 +30,10 @@ describe ContentMigration do
     end
 
     def migrated_assignments(*original_assignments)
-      original_assignments.map{|a| @copy_to.assignments.where(:migration_id => mig_id(a)).take}
+      original_assignments.map { |a| @copy_to.assignments.where(:migration_id => mig_id(a)).take }
     end
 
-    it "should copy everything by default" do
+    it "copies everything by default" do
       run_course_copy
 
       rule_to = @copy_to.conditional_release_rules.first
@@ -41,14 +41,14 @@ describe ContentMigration do
       expect(rule_to.scoring_ranges.count).to eq 3
       expect(rule_to.scoring_ranges.map(&:upper_bound)).to eq [1.0, 0.7, 0.4]
       expect(rule_to.scoring_ranges.map(&:lower_bound)).to eq [0.7, 0.4, 0.0]
-      set1, set2, set3a, set3b = rule_to.scoring_ranges.map{|r| r.assignment_sets}.flatten
+      set1, set2, set3a, set3b = rule_to.scoring_ranges.map { |r| r.assignment_sets }.flatten
       expect(set1.assignment_set_associations.map(&:assignment)).to eq migrated_assignments(@set1_assmt1)
       expect(set2.assignment_set_associations.map(&:assignment)).to eq migrated_assignments(@set2_assmt1, @set2_assmt2)
       expect(set3a.assignment_set_associations.map(&:assignment)).to eq migrated_assignments(@set3a_assmt)
       expect(set3b.assignment_set_associations.map(&:assignment)).to eq migrated_assignments(@set3b_assmt)
     end
 
-    it "should be able to selectively copy rules via trigger assignments" do
+    it "is able to selectively copy rules via trigger assignments" do
       other_trigger = @copy_from.assignments.create!
       other_rule = @copy_from.conditional_release_rules.create!(:trigger_assignment => other_trigger)
       range = other_rule.scoring_ranges.create!(:lower_bound => 0.0, :upper_bound => 0.5)
@@ -56,7 +56,7 @@ describe ContentMigration do
       sets.assignment_set_associations.create!(:assignment_id => @set1_assmt1)
 
       @cm.copy_options = {
-        :assignments => {mig_id(other_trigger) => "1", mig_id(@set1_assmt1) => "1"} # only copy the trigger and released assignment
+        :assignments => { mig_id(other_trigger) => "1", mig_id(@set1_assmt1) => "1" } # only copy the trigger and released assignment
       }
       @cm.save!
       run_course_copy
@@ -68,7 +68,7 @@ describe ContentMigration do
       expect(rule_to.assignment_set_associations.first.assignment.migration_id).to eq mig_id(@set1_assmt1)
     end
 
-    it "should wipe and rewrite existing rule data on re-copy (for now)" do
+    it "wipes and rewrite existing rule data on re-copy (for now)" do
       run_course_copy
 
       rule_to = @copy_to.conditional_release_rules.first
@@ -84,23 +84,23 @@ describe ContentMigration do
       expect(set1_to.assignment_set_associations.map(&:assignment)).to eq migrated_assignments(@set1_assmt1, new_set1_assmt)
     end
 
-    it "should handle an export from the old service format into a natively enabled course" do
+    it "handles an export from the old service format into a natively enabled course" do
       old_account = Account.create!
       @copy_from.update(:account => old_account, :root_account => old_account)
 
       allow(ConditionalRelease::Service).to receive(:service_configured?).and_return(true)
-      allow(ConditionalRelease::MigrationService).to receive(:begin_export).and_return({:mock_data => true})
+      allow(ConditionalRelease::MigrationService).to receive(:begin_export).and_return({ :mock_data => true })
       allow(ConditionalRelease::MigrationService).to receive(:export_completed?).and_return(true)
 
       old_format_data = {
         "rules" => [{
-          "trigger_assignment" => {"$canvas_assignment_id" => @trigger_assmt.id},
+          "trigger_assignment" => { "$canvas_assignment_id" => @trigger_assmt.id },
           "scoring_ranges" =>
             [{
               "lower_bound" => 0.2,
               "upper_bound" => 0.6,
               "assignment_sets" =>
-                [{"assignments" =>[{"$canvas_assignment_id" => @set1_assmt1.id}]}]
+                [{ "assignments" => [{ "$canvas_assignment_id" => @set1_assmt1.id }] }]
             }]
         }]
       }

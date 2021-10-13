@@ -22,7 +22,7 @@ describe CanvasPartman::Concerns::Partitioned do
     subject { CanvasPartman::PartitionManager.create(Animal) }
 
     describe 'creating records' do
-      it 'should fail if the target partition does not exist' do
+      it 'fails if the target partition does not exist' do
         expect {
           Animal.create!
         }.to raise_error ActiveRecord::StatementInvalid, /PG::UndefinedTable/
@@ -53,15 +53,15 @@ describe CanvasPartman::Concerns::Partitioned do
           Time.zone = @original_tz
         end
 
-        it 'should locate the correct partition table' do
+        it 'locates the correct partition table' do
           subject.create_partition(Time.new(2014, 12))
           subject.create_partition(Time.new(2015, 1))
 
           expect {
             # this would be at new years of 2015 in UTC: 1/1/2015 00:00:00
             Animal.create({
-              created_at: Time.zone.local(2014, 12, 31, 17, 0, 0, 0)
-            })
+                            created_at: Time.zone.local(2014, 12, 31, 17, 0, 0, 0)
+                          })
           }.not_to raise_error
         end
       end
@@ -74,14 +74,14 @@ describe CanvasPartman::Concerns::Partitioned do
           zoo = Zoo.create!
 
           monkey = zoo.animals.create!({
-            race: 'monkey',
-            created_at: Time.new(2014, 11, 5)
-          })
+                                         race: 'monkey',
+                                         created_at: Time.new(2014, 11, 5)
+                                       })
 
           parrot = zoo.animals.create({
-            race: 'parrot',
-            created_at: Time.new(2014, 12, 5)
-          })
+                                        race: 'parrot',
+                                        created_at: Time.new(2014, 12, 5)
+                                      })
 
           expect(count_records('partman_animals')).to eq 2
           expect(count_records('partman_animals_2014_11')).to eq 1
@@ -133,9 +133,9 @@ describe CanvasPartman::Concerns::Partitioned do
         subject.create_partition(Time.new(2014, 11, 1))
 
         @pt = Animal.create({
-          created_at: Time.new(2014, 11, 8),
-          race: 'monkey'
-        })
+                              created_at: Time.new(2014, 11, 8),
+                              race: 'monkey'
+                            })
       end
 
       it 'works using #save' do
@@ -182,7 +182,7 @@ describe CanvasPartman::Concerns::Partitioned do
     let(:zoo) { Zoo.create! }
 
     describe 'creating records' do
-      it 'should fail if the target partition does not exist' do
+      it 'fails if the target partition does not exist' do
         expect {
           Trail.create!(zoo: zoo)
         }.to raise_error ActiveRecord::StatementInvalid, /PG::UndefinedTable/
@@ -198,7 +198,7 @@ describe CanvasPartman::Concerns::Partitioned do
 
         expect(count_records("partman_trails")).to eq 1
         expect(count_records("partman_trails_#{zoo.id / 5}")).to eq 1
-        expect(count_records("partman_trails_#{zoo.id / 5 + 1}")).to eq 0
+        expect(count_records("partman_trails_#{(zoo.id / 5) + 1}")).to eq 0
       end
 
       context 'via an association scope' do
@@ -210,7 +210,7 @@ describe CanvasPartman::Concerns::Partitioned do
 
           expect(count_records("partman_trails")).to eq 1
           expect(count_records("partman_trails_#{zoo.id / 5}")).to eq 1
-          expect(count_records("partman_trails_#{zoo.id / 5 + 1}")).to eq 0
+          expect(count_records("partman_trails_#{(zoo.id / 5) + 1}")).to eq 0
 
           expect(zoo.trails.count).to eq 1
           expect(south.zoo).to eq zoo

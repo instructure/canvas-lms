@@ -44,7 +44,7 @@ module Canvas
       # commands
       def clear(force: false)
         if force
-          GuardRail.activate(:deploy){ super }
+          GuardRail.activate(:deploy) { super }
         else
           # this makes sure only 1 process on a sighup'd box
           # will clear the cache, the others will find that the
@@ -61,7 +61,7 @@ module Canvas
       end
 
       def write_set(hash, ttl: nil)
-        opts = {expires_in: ttl}
+        opts = { expires_in: ttl }
         ms = 1000 * Benchmark.realtime do
           redis.pipelined do # send more commands before awaiting answer
             redis.multi do # make everything atomic in here

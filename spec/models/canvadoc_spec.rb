@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe 'Canvadoc' do
-
   def stub_upload
     expectation = receive(:upload).and_return "id" => 123456, "status" => "pending"
     allow_any_instance_of(Canvadocs::API).to expectation
@@ -30,12 +29,12 @@ describe 'Canvadoc' do
 
   before do
     PluginSetting.create! :name => 'canvadocs',
-                          :settings => {"api_key" => "blahblahblahblahblah",
-                                        "base_url" => "http://example.com",
-                                        "annotations_supported" => true}
+                          :settings => { "api_key" => "blahblahblahblahblah",
+                                         "base_url" => "http://example.com",
+                                         "annotations_supported" => true }
     stub_upload
     allow_any_instance_of(Canvadocs::API).to receive(:session).and_return "id" => "blah",
-      "status" => "pending"
+                                                                          "status" => "pending"
     @user = user_model
     @attachment = attachment_model(user: @user, content_type: "application/pdf")
     @doc = @attachment.create_canvadoc()
@@ -48,7 +47,7 @@ describe 'Canvadoc' do
   describe "#jwt_secret" do
     it "returns the secret stored in DynamicSettings, base64 decoded" do
       allow(Canvas::DynamicSettings).to receive(:find).with(service: "canvadoc", default_ttl: 5.minutes).and_return(
-        {"secret" => "c2Vrcml0"}
+        { "secret" => "c2Vrcml0" }
       )
       expect(Canvadoc.jwt_secret).to eq "sekrit"
     end
@@ -85,7 +84,7 @@ describe 'Canvadoc' do
 
     it "uses targeted exception for timeouts" do
       allow(Canvas).to receive(:timeout_protection).and_return(nil)
-      expect{ @doc.upload }.to raise_error(::Canvadoc::UploadTimeout)
+      expect { @doc.upload }.to raise_error(::Canvadoc::UploadTimeout)
     end
   end
 

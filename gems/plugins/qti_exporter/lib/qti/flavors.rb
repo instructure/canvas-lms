@@ -27,4 +27,4 @@ module Qti
     WEBCT = 'webct'
     COMMON_CARTRIDGE = 'common_cartridge'
   end
-end 
+end

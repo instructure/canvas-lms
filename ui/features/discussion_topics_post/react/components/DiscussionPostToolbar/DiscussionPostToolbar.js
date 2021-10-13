@@ -46,6 +46,9 @@ export const getMenuConfig = props => {
   if (props.enableDeleteFilter) {
     options.deleted = () => I18n.t('Deleted')
   }
+  if (ENV.draft_discussions) {
+    options.drafts = () => I18n.t('My Drafts')
+  }
 
   return options
 }

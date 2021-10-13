@@ -20,7 +20,6 @@
 require 'spec_helper'
 
 describe Mailer do
-
   describe 'create_message' do
     it 'passes through to address' do
       message = message_model(to: "someemail@example.com")
@@ -80,7 +79,7 @@ describe Mailer do
       expect(InstStatsd::Statsd).to have_received(:increment).with(
         "message.deliver",
         { short_stat: "message.deliver",
-        tags: { path_type: "mailer_emails", notification_name: 'mailer_delivery' } }
+          tags: { path_type: "mailer_emails", notification_name: 'mailer_delivery' } }
       )
     end
 

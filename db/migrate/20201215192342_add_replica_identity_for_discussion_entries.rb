@@ -32,5 +32,3 @@ class AddReplicaIdentityForDiscussionEntries < ActiveRecord::Migration[5.2]
     change_column_null :discussion_entries, :root_account_id, true
   end
 end
-
-

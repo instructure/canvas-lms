@@ -22,10 +22,9 @@ require 'turnitin_api'
 module Turnitin
   describe TiiClient do
     include_context "shared_tii_lti"
-    subject{described_class.new(lti_student, lti_assignment, tool, {})}
+    subject { described_class.new(lti_student, lti_assignment, tool, {}) }
 
     describe ".new" do
-
       it 'set the user_id to the opaque identifier' do
         expect(subject.lti_params['user_id']).to eq Lti::Asset.opaque_identifier_for(lti_student)
       end
@@ -41,10 +40,7 @@ module Turnitin
       it 'set the lis_person_contact_email_primary to the users email' do
         expect(subject.lti_params['lis_person_contact_email_primary']).to eq lti_student.email
       end
-
     end
-
-
 
     describe ".turnitin_data" do
       let(:originality_data) do
@@ -59,7 +55,7 @@ module Turnitin
           }
         }
       end
-      let(:originality_report_url) {"http://example.com/report"}
+      let(:originality_report_url) { "http://example.com/report" }
 
       before :each do
         allow(subject).to receive(:originality_data).and_return(originality_data)
@@ -94,8 +90,6 @@ module Turnitin
       it "sets the status to scored" do
         expect(subject.turnitin_data[:status]).to eq 'scored'
       end
-
     end
-
   end
 end

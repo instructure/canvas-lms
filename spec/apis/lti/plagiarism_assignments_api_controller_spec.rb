@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 require File.expand_path(File.dirname(__FILE__) + '/lti2_api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
@@ -40,7 +39,7 @@ module Lti
       let(:service_name) { PlagiarismAssignmentsApiController::ASSIGNMENT_SERVICE }
       let(:endpoint) { "/api/lti/assignments" }
       let(:authorized_services) do
-        [{"service"=>"vnd.Canvas.Assignment", "action"=>["GET"], "@type"=>"RestServiceProfile"}]
+        [{ "service" => "vnd.Canvas.Assignment", "action" => ["GET"], "@type" => "RestServiceProfile" }]
       end
       let(:student) do
         student = create_users_in_course(course, 2, return_type: :record).first
@@ -61,7 +60,7 @@ module Lti
           "description" => assignment.description,
           "due_at" => assignment.due_at.iso8601,
           "points_possible" => assignment.points_possible,
-          "lti_id" =>  assignment.lti_context_id,
+          "lti_id" => assignment.lti_context_id,
           "lti_course_id" => Lti::Asset.opaque_identifier_for(assignment.context),
           "course_id" => assignment.context.global_id
         }

@@ -20,7 +20,7 @@
 require 'spec_helper'
 
 describe "RequestContext::Session" do
-  it "should find the session_id from the rack session and add it a cookie" do
+  it "finds the session_id from the rack session and add it a cookie" do
     app_class = Class.new do
       def config
         self

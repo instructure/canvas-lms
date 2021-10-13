@@ -56,7 +56,6 @@ end
 
 ActionController::Base.include(DataStreamingContentLength)
 
-
 module FileAccessUserOnSession
   def self.included(klass)
     klass.attr_writer :file_access_user

@@ -92,9 +92,9 @@ class GradingPeriodsController < ApplicationController
       paginated_grading_periods, meta = paginate_for(grading_periods)
       respond_to do |format|
         format.json do
-          render json: serialize_json_api(paginated_grading_periods, meta).
-            merge(index_permissions).
-            merge(grading_periods_read_only: read_only)
+          render json: serialize_json_api(paginated_grading_periods, meta)
+            .merge(index_permissions)
+            .merge(grading_periods_read_only: read_only)
         end
       end
     end
@@ -139,7 +139,6 @@ class GradingPeriodsController < ApplicationController
 
     if authorized_action(grading_period(inherit: false), @current_user, :update)
       respond_to do |format|
-
         DueDateCacher.with_executing_user(@current_user) do
           if grading_period(inherit: false).update(grading_period_params)
             format.json { render json: serialize_json_api(grading_period(inherit: false)) }
@@ -183,6 +182,7 @@ class GradingPeriodsController < ApplicationController
     @grading_period ||= begin
       grading_period = GradingPeriod.for(@context, inherit: inherit).find_by(id: params[:id])
       fail ActionController::RoutingError.new('Not Found') if grading_period.blank?
+
       grading_period
     end
   end
@@ -196,12 +196,12 @@ class GradingPeriodsController < ApplicationController
 
     grading_period_group.grading_periods.transaction do
       errors = no_overlapping_for_new_periods_validation_errors(periods)
-        .concat(validation_errors(periods))
+               .concat(validation_errors(periods))
 
       respond_to do |format|
         if errors.present?
           format.json do
-            render json: {errors: errors}, status: :unprocessable_entity
+            render json: { errors: errors }, status: :unprocessable_entity
           end
         else
           periods.each(&:save!)
@@ -225,12 +225,12 @@ class GradingPeriodsController < ApplicationController
 
     @context.grading_periods.transaction do
       errors = no_overlapping_for_new_periods_validation_errors(periods)
-        .concat(validation_errors(periods))
+               .concat(validation_errors(periods))
 
       respond_to do |format|
         if errors.present?
           format.json do
-            render json: {errors: errors}, status: :unprocessable_entity
+            render json: { errors: errors }, status: :unprocessable_entity
           end
         else
           periods.each(&:save!)
@@ -248,7 +248,7 @@ class GradingPeriodsController < ApplicationController
 
     set_subquery = GradingPeriodGroup.active.select(:account_id).where(id: params[:set_id])
     @context = Account.active.where(id: set_subquery).take
-    render json: {message: t('Page not found')}, status: :not_found unless @context
+    render json: { message: t('Page not found') }, status: :not_found unless @context
   end
 
   # model level validations
@@ -310,30 +310,30 @@ class GradingPeriodsController < ApplicationController
     grading_periods = Array.wrap(grading_periods)
 
     Canvas::APIArraySerializer.new(grading_periods, {
-      each_serializer: GradingPeriodSerializer,
-      controller: self,
-      root: :grading_periods,
-      scope: @current_user,
-      include_root: false
-    }).as_json
+                                     each_serializer: GradingPeriodSerializer,
+                                     controller: self,
+                                     root: :grading_periods,
+                                     scope: @current_user,
+                                     include_root: false
+                                   }).as_json
   end
 
   def serialize_json_api(grading_periods, meta = {})
     grading_periods = Array.wrap(grading_periods)
 
     Canvas::APIArraySerializer.new(grading_periods, {
-      each_serializer: GradingPeriodSerializer,
-      controller: self,
-      root: :grading_periods,
-      meta: meta,
-      scope: @current_user,
-      include_root: false
-    }).as_json
+                                     each_serializer: GradingPeriodSerializer,
+                                     controller: self,
+                                     root: :grading_periods,
+                                     meta: meta,
+                                     scope: @current_user,
+                                     include_root: false
+                                   }).as_json
   end
 
   def index_permissions
     can_create_grading_periods = @context.is_a?(Account) &&
-      @context.root_account? && @context.grants_right?(@current_user, :manage)
-    {can_create_grading_periods: can_create_grading_periods}.as_json
+                                 @context.root_account? && @context.grants_right?(@current_user, :manage)
+    { can_create_grading_periods: can_create_grading_periods }.as_json
   end
 end

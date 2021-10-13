@@ -59,23 +59,23 @@ class GradebookUserIds
   end
 
   def sort_by_student_name
-    students.
-      order(Arel.sql("enrollments.type = 'StudentViewEnrollment'")).
-      order_by_sortable_name(direction: @direction.to_sym).
-      pluck(:id).
-      uniq
+    students
+      .order(Arel.sql("enrollments.type = 'StudentViewEnrollment'"))
+      .order_by_sortable_name(direction: @direction.to_sym)
+      .pluck(:id)
+      .uniq
   end
 
   def sort_by_pseudonym_field
     sort_column = Pseudonym.best_unicode_collation_key("pseudonyms.#{pseudonym_sort_field}")
 
-     students.joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=users.id AND
-                    pseudonyms.workflow_state <> 'deleted'").
-       order(Arel.sql("#{sort_column} #{sort_direction} NULLS LAST")).
-       order(Arel.sql("pseudonyms.id IS NULL")).
-       order(Arel.sql("users.id #{sort_direction}")).
-       pluck(:id).
-       uniq
+    students.joins("LEFT JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id=users.id AND
+                    pseudonyms.workflow_state <> 'deleted'")
+            .order(Arel.sql("#{sort_column} #{sort_direction} NULLS LAST"))
+            .order(Arel.sql("pseudonyms.id IS NULL"))
+            .order(Arel.sql("users.id #{sort_direction}"))
+            .pluck(:id)
+            .uniq
   end
 
   def pseudonym_sort_field
@@ -89,16 +89,16 @@ class GradebookUserIds
   end
 
   def sort_by_assignment_grade(assignment_id)
-    students.
-      joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id=users.id AND
+    students
+      .joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id=users.id AND
              submissions.workflow_state<>'deleted' AND
-             submissions.assignment_id=#{Submission.connection.quote(assignment_id)}").
-      order(Arel.sql("enrollments.type = 'StudentViewEnrollment'")).
-      order(Arel.sql("submissions.score #{sort_direction} NULLS LAST")).
-      order(Arel.sql("submissions.id IS NULL")).
-      order_by_sortable_name(direction: @direction.to_sym).
-      pluck(:id).
-      uniq
+             submissions.assignment_id=#{Submission.connection.quote(assignment_id)}")
+      .order(Arel.sql("enrollments.type = 'StudentViewEnrollment'"))
+      .order(Arel.sql("submissions.score #{sort_direction} NULLS LAST"))
+      .order(Arel.sql("submissions.id IS NULL"))
+      .order_by_sortable_name(direction: @direction.to_sym)
+      .pluck(:id)
+      .uniq
   end
 
   def sort_by_assignment_missing(assignment_id)
@@ -177,13 +177,13 @@ class GradebookUserIds
     # Because of AR internals (https://github.com/rails/rails/issues/32598),
     # we avoid using Arel left_joins here so that sort_by_scores will have
     # Enrollment defined.
-    students = User.
-      joins("LEFT JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=users.id").
-      merge(student_enrollments_scope)
+    students = User
+               .joins("LEFT JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id=users.id")
+               .merge(student_enrollments_scope)
 
     if student_group_id.present?
-      students.joins(group_memberships: :group).
-        where(group_memberships: {group: student_group_id, workflow_state: :accepted})
+      students.joins(group_memberships: :group)
+              .where(group_memberships: { group: student_group_id, workflow_state: :accepted })
     else
       students
     end
@@ -191,21 +191,21 @@ class GradebookUserIds
 
   def sort_by_scores(type = :total_grade, id = nil)
     score_scope = if type == :assignment_group
-      "scores.assignment_group_id=#{Score.connection.quote(id)}"
-    elsif type == :grading_period
-      "scores.grading_period_id=#{Score.connection.quote(id)}"
-    else
-      "scores.course_score IS TRUE"
-    end
+                    "scores.assignment_group_id=#{Score.connection.quote(id)}"
+                  elsif type == :grading_period
+                    "scores.grading_period_id=#{Score.connection.quote(id)}"
+                  else
+                    "scores.course_score IS TRUE"
+                  end
 
     # Without doing the score conditions in the join, we lose data. For
     # example, we might lose concluded enrollments who don't have a Score.
     students.joins("LEFT JOIN #{Score.quoted_table_name} ON scores.enrollment_id=enrollments.id AND
-                scores.workflow_state='active' AND #{score_scope}").
-      order(Arel.sql("enrollments.type = 'StudentViewEnrollment'")).
-      order(Arel.sql("scores.unposted_current_score #{sort_direction} NULLS LAST")).
-      order_by_sortable_name(direction: @direction.to_sym).
-      pluck(:id).uniq
+                scores.workflow_state='active' AND #{score_scope}")
+            .order(Arel.sql("enrollments.type = 'StudentViewEnrollment'"))
+            .order(Arel.sql("scores.unposted_current_score #{sort_direction} NULLS LAST"))
+            .order_by_sortable_name(direction: @direction.to_sym)
+            .pluck(:id).uniq
   end
 
   def sort_direction
@@ -225,11 +225,13 @@ class GradebookUserIds
 
   def section_id
     return nil if @selected_section_id.nil? || @selected_section_id == "null" || @selected_section_id == "0"
+
     @selected_section_id
   end
 
   def student_group_id
     return nil if @selected_student_group_id.nil? || ["0", "null"].include?(@selected_student_group_id)
+
     Group.active.exists?(id: @selected_student_group_id) ? @selected_student_group_id : nil
   end
 end

@@ -69,7 +69,7 @@ describe DataFixup::ReassociateGradingPeriodGroups do
     end
 
     it "root account enrollment terms belong to the root account's grading period group after the fixup " \
-    "(and not the sub account grading period group or course grading period group)" do
+       "(and not the sub account grading period group or course grading period group)" do
       expect(first_term.grading_period_group).to eq root_account_grading_period_group
       expect(second_term.grading_period_group).to eq root_account_grading_period_group
     end

@@ -73,7 +73,7 @@ describe 'UpdateCustomParams' do
     @tools = create_tools(@to_process_url, @unprocessed_url, @subdomain_url)
   end
 
-  it 'should update specified LTI tools, and subdomains, to include new config variables' do
+  it 'updates specified LTI tools, and subdomains, to include new config variables' do
     tool = @tools[@to_process_url]
     expect(tool.url).to include(@to_process_url)
     expect(tool.custom_fields.keys).not_to include(*additional_custom_fields.keys)
@@ -88,7 +88,7 @@ describe 'UpdateCustomParams' do
     expect(subdomain_tool.custom_fields.slice(*additional_custom_fields.keys)).to eq additional_custom_fields
   end
 
-  it 'should not update subdomains w/o that option' do
+  it 'does not update subdomains w/o that option' do
     DataFixup::Lti::UpdateCustomParams.run!([@to_process_url], additional_custom_fields, subdomain_matching: false)
 
     subdomain_tool = @tools[@subdomain_url]
@@ -96,7 +96,7 @@ describe 'UpdateCustomParams' do
     expect(subdomain_tool.custom_fields.slice(*additional_custom_fields.keys)).not_to eq additional_custom_fields
   end
 
-  it 'should not update unrelated LTI tools' do
+  it 'does not update unrelated LTI tools' do
     tool = @tools[@unprocessed_url]
     expect(tool.url).to include(@unprocessed_url)
     expect(tool.reload.custom_fields.keys).not_to include(*additional_custom_fields.keys)
@@ -107,7 +107,7 @@ describe 'UpdateCustomParams' do
     expect(tool.reload.custom_fields.keys).not_to include(*additional_custom_fields.keys)
   end
 
-  it 'should validate that valid domains are passed in' do
+  it 'validates that valid domains are passed in' do
     strings = %w|api.quiz.docker/lti/launch jdoe.quiz-api-dev-pdx.inseng.net t.t2.quiz-lti-prod-iad.instructure.com|
     results = DataFixup::Lti::UpdateCustomParams.validate_domains!(strings)
     expect(results.size).to eq(2) # no /lti/launch

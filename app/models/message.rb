@@ -44,6 +44,7 @@ class Message < ActiveRecord::Base
     # use this to queue messages for delivery so we find them using the created_at in the scope
     # instead of using id alone when reconstituting the AR object
     attr_accessor :id, :created_at
+
     def initialize(id, created_at)
       @id, @created_at = id, created_at
     end
@@ -58,8 +59,10 @@ class Message < ActiveRecord::Base
 
     def message
       return @message if @message.present?
+
       @message = Message.in_partition('id' => id, 'created_at' => @created_at).where(:id => @id, :created_at => @created_at).first || Message.where(:id => @id).first
       raise QueuedNotFound if @message.nil?
+
       @message
     end
   end
@@ -88,15 +91,15 @@ class Message < ActiveRecord::Base
 
   # Validations
   validate :prevent_updates
-  validates :body, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
-  validates :html_body, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
-  validates :transmission_errors, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
-  validates :to, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
-  validates :from, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
-  validates :url, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
-  validates :subject, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
-  validates :from_name, length: {maximum: maximum_text_length}, allow_nil: true, allow_blank: true
-  validates :reply_to_name, length: {maximum: maximum_string_length}, allow_nil: true, allow_blank: true
+  validates :body, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
+  validates :html_body, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
+  validates :transmission_errors, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
+  validates :to, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
+  validates :from, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
+  validates :url, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
+  validates :subject, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
+  validates :from_name, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
+  validates :reply_to_name, length: { maximum: maximum_string_length }, allow_nil: true, allow_blank: true
 
   def prevent_updates
     unless self.new_record?
@@ -193,7 +196,7 @@ class Message < ActiveRecord::Base
   def save_using_update_all
     self.shard.activate do
       self.updated_at = Time.now.utc
-      updates = Hash[self.changes_to_save.map{|k, v| [k, v.last]}]
+      updates = Hash[self.changes_to_save.map { |k, v| [k, v.last] }]
       self.class.in_partition(attributes).where(:id => self.id, :created_at => self.created_at).update_all(updates)
       self.clear_changes_information
     end
@@ -217,7 +220,7 @@ class Message < ActiveRecord::Base
 
   scope :before, lambda { |date| where("messages.created_at<?", date) }
 
-  scope :for_user, lambda { |user| where(:user_id => user)}
+  scope :for_user, lambda { |user| where(:user_id => user) }
 
   # messages that can be moved to the 'cancelled' state. dashboard messages
   # can be closed by calling 'cancel', but aren't included
@@ -256,8 +259,8 @@ class Message < ActiveRecord::Base
     end
   }
 
-  #Public: Helper methods for grabbing a user via the "from" field and using it to
-  #populate the avatar, name, and email in the conversation email notification
+  # Public: Helper methods for grabbing a user via the "from" field and using it to
+  # populate the avatar, name, and email in the conversation email notification
 
   def author
     @_author ||= begin
@@ -279,12 +282,14 @@ class Message < ActiveRecord::Base
 
   def avatar_enabled?
     return false unless author_account.present?
+
     author_account.service_enabled?(:avatars)
   end
 
   def author_account
     # Root account is populated during save
     return nil unless author.present?
+
     root_account_id ? Account.find(root_account_id) : author.account
   end
 
@@ -447,6 +452,7 @@ class Message < ActiveRecord::Base
   # Returns nothing.
   def stage_without_dispatch!
     return if state == :bounced
+
     self.dispatch_at = Time.now.utc + self.delay_for
     self.workflow_state = 'staged'
   end
@@ -492,7 +498,7 @@ class Message < ActiveRecord::Base
     yield
 
     instance_variable_set(:"@message_content_#{name}",
-      @output_buffer.to_s.strip)
+                          @output_buffer.to_s.strip)
     @output_buffer = old_output_buffer.sub(/\n\z/, '')
 
     if old_output_buffer.is_a?(ActiveSupport::SafeBuffer) && old_output_buffer.html_safe?
@@ -528,6 +534,7 @@ class Message < ActiveRecord::Base
 
     if !(File.exist?(path) rescue false)
       return false if filename.include?('slack')
+
       filename = self.notification.name.downcase.gsub(/\s/, '_') + ".email.erb"
       path = Canvas::MessageHelper.find_message_path(filename)
     end
@@ -546,7 +553,7 @@ class Message < ActiveRecord::Base
   # path_type - The path to send the message across, e.g, 'email'.
   #
   # Returns file name for erb template
-  def template_filename(path_type=nil)
+  def template_filename(path_type = nil)
     self.notification.name.parameterize.underscore + "." + path_type + ".erb"
   end
 
@@ -620,7 +627,7 @@ class Message < ActiveRecord::Base
   # path_type - The path to send the message across, e.g, 'email'.
   #
   # Returns nothing.
-  def parse!(path_type=nil, root_account: nil)
+  def parse!(path_type = nil, root_account: nil)
     raise StandardError, "Cannot parse without a context" unless self.context
 
     # set @root_account using our pre_loaded_account, because link_root_account
@@ -702,12 +709,12 @@ class Message < ActiveRecord::Base
 
     InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{notification_name}",
                                  short_stat: 'message.deliver',
-                                 tags: {path_type: path_type, notification_name: notification_name})
+                                 tags: { path_type: path_type, notification_name: notification_name })
 
     global_account_id = Shard.global_id_for(root_account_id, self.shard)
     InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{global_account_id}",
                                  short_stat: 'message.deliver_per_account',
-                                 tags: {path_type: path_type, root_account_id: global_account_id})
+                                 tags: { path_type: path_type, root_account_id: global_account_id })
 
     if check_acct.feature_enabled?(:notification_service)
       enqueue_to_sqs
@@ -737,11 +744,11 @@ class Message < ActiveRecord::Base
       # Log no_targets_specified error to DataDog
       InstStatsd::Statsd.increment("message.no_targets_specified",
                                    short_stat: 'message.no_targets_specified',
-                                   tags: {path_type: path_type})
+                                   tags: { path_type: path_type })
 
       self.transmission_errors = "No notification targets specified"
       self.set_transmission_error
-  else
+    else
       targets.each do |target|
         Services::NotificationService.process(
           notification_service_id,
@@ -799,15 +806,15 @@ class Message < ActiveRecord::Base
     when "twitter"
       twitter_service = user.user_services.where(service: 'twitter').first
       [
-        "access_token"=> twitter_service.token,
-        "access_token_secret"=> twitter_service.secret,
-        "user_id"=> twitter_service.service_user_id
+        "access_token" => twitter_service.token,
+        "access_token_secret" => twitter_service.secret,
+        "user_id" => twitter_service.service_user_id
       ]
     when 'slack'
       [
-        'recipient'=> to,
-        'access_token'=> Canvas::Security.decrypt_password(context_root_account.settings[:encrypted_slack_key],
-                                                           context_root_account.settings[:encrypted_slack_key_salt], 'instructure_slack_encrypted_key')
+        'recipient' => to,
+        'access_token' => Canvas::Security.decrypt_password(context_root_account.settings[:encrypted_slack_key],
+                                                            context_root_account.settings[:encrypted_slack_key_salt], 'instructure_slack_encrypted_key')
       ]
     else
       [to]
@@ -856,6 +863,7 @@ class Message < ActiveRecord::Base
     until current_context.respond_to?(:root_account)
       return nil if unbounded_loop_paranoia_counter <= 0 || current_context.nil?
       return nil unless current_context.respond_to?(:context)
+
       current_context = current_context.context
       unbounded_loop_paranoia_counter -= 1
     end
@@ -873,6 +881,7 @@ class Message < ActiveRecord::Base
       until current_context&.is_a_context?
         return nil if unbounded_loop_paranoia_counter <= 0 || current_context.nil?
         return nil unless current_context.respond_to?(:context)
+
         current_context = current_context.context
         unbounded_loop_paranoia_counter -= 1
       end
@@ -885,6 +894,7 @@ class Message < ActiveRecord::Base
     context = self.context
     context = context.context if context.respond_to?(:context)
     return context if context.is_a?(Course)
+
     context = (context.respond_to?(:course) && context.course) ? context.course : link_root_account
     context
   end
@@ -910,7 +920,7 @@ class Message < ActiveRecord::Base
   # Returns true.
   def infer_defaults
     if notification
-      self.notification_name     ||= notification.name
+      self.notification_name ||= notification.name
     end
 
     self.path_type ||= communication_channel.try(:path_type)
@@ -1074,6 +1084,7 @@ class Message < ActiveRecord::Base
         unless user.account.feature_enabled?(:international_sms)
           raise "International SMS is currently disabled for this user's account"
         end
+
         if Canvas::Twilio.enabled?
           Canvas::Twilio.deliver(
             to,
@@ -1121,8 +1132,10 @@ class Message < ActiveRecord::Base
   end
 
   private
+
   def infer_from_name
     return name_helper.from_name if name_helper.from_name.present?
+
     if name_helper.asset.is_a? AppointmentGroup
       if !name_helper.asset.contexts_for_user(user).nil?
         names = name_helper.asset.contexts_for_user(user).map(&:name).join(", ")
@@ -1157,14 +1170,13 @@ class Message < ActiveRecord::Base
 
   def apply_course_nickname_to_asset(asset, user)
     hacked_course = if asset.is_a?(Course)
-      asset
-    elsif asset.respond_to?(:context) && asset.context.is_a?(Course)
-      asset.context
-    elsif asset.respond_to?(:course) && asset.course.is_a?(Course)
-      asset.course
-    end
+                      asset
+                    elsif asset.respond_to?(:context) && asset.context.is_a?(Course)
+                      asset.context
+                    elsif asset.respond_to?(:course) && asset.course.is_a?(Course)
+                      asset.course
+                    end
     hacked_course.apply_nickname_for!(user) if hacked_course
     hacked_course
   end
-
 end

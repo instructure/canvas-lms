@@ -160,14 +160,14 @@ describe 'Excuse an Assignment' do
         course_with_teacher_logged_in
         group_test_setup 4, 1, 1
 
-        @students.each {|student| @testgroup[0].add_user student}
+        @students.each { |student| @testgroup[0].add_user student }
         @testgroup[0].save!
 
         assignment = @course.assignments.create!(
-            title: 'Group Assignment',
-            group_category_id: @group_category[0].id,
-            grade_group_students_individually: false,
-            points_possible: 20
+          title: 'Group Assignment',
+          group_category_id: @group_category[0].id,
+          grade_group_students_individually: false,
+          points_possible: 20
         )
 
         assignment.grade_student @students[1], excuse: true, grader: @teacher
@@ -197,14 +197,14 @@ describe 'Excuse an Assignment' do
         course_with_teacher_logged_in
         group_test_setup 2, 1, 1
 
-        @students.each {|student| @testgroup[0].add_user student}
+        @students.each { |student| @testgroup[0].add_user student }
         @testgroup[0].save!
 
         a1 = @course.assignments.create!(
-            title: 'Group Assignment',
-            group_category_id: @group_category[0].id,
-            grade_group_students_individually: false,
-            points_possible: 10
+          title: 'Group Assignment',
+          group_category_id: @group_category[0].id,
+          grade_group_students_individually: false,
+          points_possible: 10
         )
         a2 = @course.assignments.create! title: 'Assignment', points_possible: 20
 
@@ -239,7 +239,7 @@ describe 'Excuse an Assignment' do
 
       if view == 'srgb'
         skip "Skipped because this spec fails if not run in foreground\n"\
-          "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
+             "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
         get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
         click_option f('#assignment_select'), assignment.title
         click_option f('#student_select'), @student.name
@@ -259,7 +259,7 @@ describe 'Excuse an Assignment' do
       expect(grade_row).to have_class '.excused'
       expect(grade).to eq 'EX'
       expect(grade_row).to have_attribute('title', 'This assignment is excused ' \
-       'and will not be considered in the total calculation')
+                                                   'and will not be considered in the total calculation')
     end
 
     ['percent', 'letter_grade', 'gpa_scale', 'points'].each do |type|
@@ -278,7 +278,7 @@ describe 'Excuse an Assignment' do
         total = ''
         if view == 'srgb'
           skip "Skipped because this spec fails if not run in foreground\n"\
-          "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
+               "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
           get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
           click_option f('#student_select'), @student.name
           total = f('span.total-grade').text[/\d+(\.\d+)?%/]
@@ -317,7 +317,6 @@ describe 'Excuse an Assignment' do
         expect(ff('.ic-flash-error').length).to be i + 1
         expect(f('.ic-flash-error').text).to include 'Default grade cannot be set to EX'
       end
-
     end
 
     ['EX', 'ex', 'Ex', 'eX'].each do |ex|

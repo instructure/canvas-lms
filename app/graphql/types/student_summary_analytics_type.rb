@@ -23,16 +23,16 @@ module Types
     graphql_name "PageViewAnalysis"
 
     field :total, Integer,
-      "The number of views/participations this student has",
-      null: true
+          "The number of views/participations this student has",
+          null: true
 
     field :max, Integer,
-      "The maximum number of views/participations in this course",
-      null: true
+          "The maximum number of views/participations in this course",
+          null: true
 
     field :level, Integer,
-      "This number (0-3) is intended to give an idea of how the student is doing relative to others in the course",
-      null: true
+          "This number (0-3) is intended to give an idea of how the student is doing relative to others in the course",
+          null: true
   end
 
   class TardinessBreakdownType < ApplicationObjectType
@@ -53,5 +53,4 @@ module Types
     field :participations, PageViewAnalysisType, null: true
     field :tardiness_breakdown, TardinessBreakdownType, null: true
   end
-
 end

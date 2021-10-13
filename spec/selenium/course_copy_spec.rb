@@ -30,10 +30,10 @@ describe "course copy" do
     expect(header.text).to eq @course.course_code
   end
 
-  it "should copy the course" do
+  it "copies the course" do
     course_with_admin_logged_in
     @course.syllabus_body = "<p>haha</p>"
-    @course.tab_configuration = [{"id" => 0}, {"id" => 14}, {"id" => 8}, {"id" => 5}, {"id" => 6}, {"id" => 2}, {"id" => 3, "hidden" => true}]
+    @course.tab_configuration = [{ "id" => 0 }, { "id" => 14 }, { "id" => 8 }, { "id" => 5 }, { "id" => 6 }, { "id" => 2 }, { "id" => 3, "hidden" => true }]
     @course.default_view = 'modules'
     @course.wiki_pages.create!(:title => "hi", :body => "Whatever")
     @course.save!
@@ -53,7 +53,7 @@ describe "course copy" do
   # TODO reimplement per CNVS-29604, but make sure we're testing at the right level
   it "should copy the course with different settings"
 
-  it "should set the course name and code correctly" do
+  it "sets the course name and code correctly" do
     course_with_admin_logged_in
 
     get "/courses/#{@course.id}/copy"
@@ -70,7 +70,7 @@ describe "course copy" do
     expect(new_course.course_code).to eq "course code of testing"
   end
 
-  it "should adjust the dates" do
+  it "adjusts the dates" do
     course_with_admin_logged_in
 
     get "/courses/#{@course.id}/copy"
@@ -90,17 +90,17 @@ describe "course copy" do
 
     opts = ContentMigration.last.migration_settings["date_shift_options"]
     expect(opts['shift_dates']).to eq '1'
-    expect(opts['day_substitutions']).to eq({"1" => "2"})
+    expect(opts['day_substitutions']).to eq({ "1" => "2" })
     expected = {
-        "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
-        "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
+      "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
+      "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
     }
     expected.each do |k, v|
       expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)
     end
   end
 
-  it "should remove dates" do
+  it "removes dates" do
     course_with_admin_logged_in
 
     get "/courses/#{@course.id}/copy"
@@ -113,7 +113,7 @@ describe "course copy" do
     expect(opts['remove_dates']).to eq '1'
   end
 
-  it "should create the new course in the same sub-account" do
+  it "creates the new course in the same sub-account" do
     account_model
     subaccount = @account.sub_accounts.create!(:name => "subadubdub")
     course_with_admin_logged_in(:account => subaccount)
@@ -134,7 +134,7 @@ describe "course copy" do
     expect(@new_course.syllabus_body).to eq @course.syllabus_body
   end
 
-  it "should not be able to submit invalid course dates" do
+  it "is not able to submit invalid course dates" do
     course_with_admin_logged_in
 
     get "/courses/#{@course.id}/copy"
@@ -179,6 +179,7 @@ describe "course copy" do
       submit_form('#copy_course_form')
       run_jobs
       raise "progress bar is still there after waiting" unless wait_for_no_such_element(timeout: 10) { f('.bar') }
+
       expect(f('div.progressStatus span')).to include_text 'Completed'
       get "/calendar#view_name=week"
       quick_jump_to_date(@date_to_use)

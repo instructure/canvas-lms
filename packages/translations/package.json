@@ -10,11 +10,12 @@
   },
   "scripts": {
     "split": "node bin/cli.js",
-    "test": "jest --color",
+    "test": "jest --env jsdom-fourteen --color",
     "lint": "prettier bin/**/*.js lib/**/*.json --write"
   },
   "devDependencies": {
     "jest": "^24",
+    "jest-environment-jsdom-fourteen": "^0.1.0",
     "prettier": "^2"
   }
 }

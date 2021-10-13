@@ -33,28 +33,28 @@ class AddAssignmentGroupIdToScores < ActiveRecord::Migration[5.0]
               name: :index_enrollment_scores
 
     add_index :scores, %i(enrollment_id grading_period_id), unique: true,
-              where: "grading_period_id IS NOT NULL",
-              algorithm: :concurrently,
-              name: :index_grading_period_scores
+                                                            where: "grading_period_id IS NOT NULL",
+                                                            algorithm: :concurrently,
+                                                            name: :index_grading_period_scores
 
     add_index :scores, %i(enrollment_id assignment_group_id), unique: true,
-              where: "assignment_group_id IS NOT NULL",
-              algorithm: :concurrently,
-              name: :index_assignment_group_scores
+                                                              where: "assignment_group_id IS NOT NULL",
+                                                              algorithm: :concurrently,
+                                                              name: :index_assignment_group_scores
 
     add_index :scores, :enrollment_id, unique: true,
-              where: "course_score", # course_score is already boolean
-              algorithm: :concurrently,
-              name: :index_course_scores
+                                       where: "course_score", # course_score is already boolean
+                                       algorithm: :concurrently,
+                                       name: :index_course_scores
 
     if index_exists?(:scores, :enrollment_id, name: "index_scores_on_enrollment_id")
       remove_index :scores, column: :enrollment_id,
-                   name: :index_scores_on_enrollment_id
+                            name: :index_scores_on_enrollment_id
     end
 
     if index_exists?(:scores, [:enrollment_id, :grading_period_id], name: "index_scores_on_enrollment_id_and_grading_period_id")
       remove_index :scores, column: [:enrollment_id, :grading_period_id],
-                   name: :index_scores_on_enrollment_id_and_grading_period_id
+                            name: :index_scores_on_enrollment_id_and_grading_period_id
     end
 
     reversible do |direction|

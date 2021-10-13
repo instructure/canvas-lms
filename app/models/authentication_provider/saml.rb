@@ -65,18 +65,17 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
      -> { t("AuthnRequest sent to IdP") },
      -> { t("AuthnResponse from IdP") },
      -> { t("LogoutRequest sent to IdP") },
-     -> { t("LogoutResponse from IdP") },
-    ]
+     -> { t("LogoutResponse from IdP") },]
   end
 
   def self.debugging_keys
     [{
       debugging: -> { t("Testing state") },
-     }, {
+    }, {
       request_id: -> { t("Request ID") },
       to_idp_url: -> { t("LoginRequest encoded URL") },
       to_idp_xml: -> { t("LoginRequest XML sent to IdP") },
-     }, {
+    }, {
       idp_in_response_to: -> { t("IdP InResponseTo") },
       idp_login_destination: -> { t("IdP LoginResponse destination") },
       is_valid_login_response: -> { t("Canvas thinks response is valid") },
@@ -87,16 +86,16 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       idp_response_encoded: -> { t("IdP LoginResponse encoded") },
       idp_response_xml_encrypted: -> { t("IdP LoginResponse encrypted") },
       idp_response_xml_decrypted: -> { t("IdP LoginResponse Decrypted") },
-     }, {
+    }, {
       logout_request_id: -> { t("Logout request id") },
       logout_to_idp_url: -> { t("LogoutRequest encoded URL") },
       logout_to_idp_xml: -> { t("LogoutRequest XML sent to IdP") },
-     }, {
+    }, {
       idp_logout_in_response_to: -> { t("IdP Logout InResponseTo") },
       idp_logout_destination: -> { t("IdP LogoutResponse Destination") },
       idp_logout_response_encoded: -> { t("IdP LogoutResponse encoded") },
       idp_logout_response_xml_encrypted: -> { t("IdP LogoutResponse XML") },
-     }]
+    }]
   end
 
   SENSITIVE_PARAMS = [:metadata].freeze
@@ -109,7 +108,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   after_initialize do |ap|
     # default to the most secure signature we support, but only for new objects
     if ap.new_record?
-      ap.sig_alg ||= 'RSA-SHA256' 
+      ap.sig_alg ||= 'RSA-SHA256'
       ap.identifier_format ||= SAML2::NameID::Format::UNSPECIFIED
     end
   end
@@ -117,7 +116,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   def destroy
     super
     if account.settings[:saml_entity_id] &&
-      !account.authentication_providers.active.where(auth_type: 'saml').exists?
+       !account.authentication_providers.active.where(auth_type: 'saml').exists?
       account.settings.delete(:saml_entity_id)
       account.save!
     end
@@ -190,8 +189,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
   def self.login_attributes
     {
-        'NameID' => 'NameID',
-        'eduPersonPrincipalName' => 'eduPersonPrincipalName',
+      'NameID' => 'NameID',
+      'eduPersonPrincipalName' => 'eduPersonPrincipalName',
     }
   end
 
@@ -199,6 +198,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     unless account.settings[:saml_entity_id]
       new_entity_id = "http://#{HostUrl.context_host(account)}/saml2"
       return new_entity_id unless persist
+
       account.settings[:saml_entity_id] = new_entity_id
       account.save!
     end
@@ -207,16 +207,19 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
   def login_attribute
     return 'NameID' unless read_attribute(:login_attribute)
+
     result = super
     # backcompat
     return 'NameID' if result == 'nameid'
     return 'eduPersonPrincipalName' if result == 'eduPersonPrincipalName_stripped'
+
     result
   end
 
   def strip_domain_from_login_attribute?
     # backcompat
     return true if read_attribute(:login_attribute) == 'eduPersonPrincipalName_stripped'
+
     !!settings['strip_domain_from_login_attribute']
   end
   alias strip_domain_from_login_attribute strip_domain_from_login_attribute?
@@ -256,6 +259,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   def populate_from_metadata(entity)
     idps = entity.identity_providers
     raise "Must provide exactly one IDPSSODescriptor; found #{idps.length}" unless idps.length == 1
+
     idp = idps.first
     self.idp_entity_id = entity.entity_id
     self.log_in_url = idp.single_sign_on_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
@@ -266,7 +270,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     if recognized_formats.length == 1
       self.identifier_format = recognized_formats.first
     elsif identifier_format != SAML2::NameID::Format::UNSPECIFIED &&
-      !recognized_formats.include?(identifier_format)
+          !recognized_formats.include?(identifier_format)
       self.identifier_format = SAML2::NameID::Format::UNSPECIFIED
     end
 
@@ -287,10 +291,12 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   def populate_from_metadata_xml(xml)
     entity = SAML2::Entity.parse(xml)
     raise "Invalid schema" unless entity&.valid_schema?
+
     if entity.is_a?(SAML2::Entity::Group) && idp_entity_id.present?
       entity = entity.find { |e| e.entity_id == idp_entity_id }
     end
     raise "Must be a single Entity" unless entity.is_a?(SAML2::Entity)
+
     populate_from_metadata(entity)
   end
   alias metadata= populate_from_metadata_xml
@@ -309,28 +315,28 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   # TODO: eventually store the actual metadata we got from the IdP
   def idp_metadata
     @idp_metadata ||= begin
-       entity = SAML2::Entity.new
-       entity.entity_id = idp_entity_id
+      entity = SAML2::Entity.new
+      entity.entity_id = idp_entity_id
 
-       idp = SAML2::IdentityProvider.new
-       idp.single_sign_on_services << SAML2::Endpoint.new(log_in_url,
+      idp = SAML2::IdentityProvider.new
+      idp.single_sign_on_services << SAML2::Endpoint.new(log_in_url,
+                                                         SAML2::Bindings::HTTPRedirect::URN)
+      if log_out_url.present?
+        idp.single_logout_services << SAML2::Endpoint.new(log_out_url,
                                                           SAML2::Bindings::HTTPRedirect::URN)
-       if log_out_url.present?
-         idp.single_logout_services << SAML2::Endpoint.new(log_out_url,
-                                                           SAML2::Bindings::HTTPRedirect::URN)
-       end
-       idp.fingerprints = (certificate_fingerprint || '').split
-       Array.wrap(settings['signing_certificates']).each do |cert|
-         idp.keys << SAML2::KeyDescriptor.new(cert, SAML2::KeyDescriptor::Type::SIGNING)
-       end
-       Array.wrap(settings['signing_keys']).each do |key|
-         key_descriptor = SAML2::KeyDescriptor.new(nil, SAML2::KeyDescriptor::Type::SIGNING)
-         key_descriptor.key = OpenSSL::PKey.read(key)
-         idp.keys << key
-       end
+      end
+      idp.fingerprints = (certificate_fingerprint || '').split
+      Array.wrap(settings['signing_certificates']).each do |cert|
+        idp.keys << SAML2::KeyDescriptor.new(cert, SAML2::KeyDescriptor::Type::SIGNING)
+      end
+      Array.wrap(settings['signing_keys']).each do |key|
+        key_descriptor = SAML2::KeyDescriptor.new(nil, SAML2::KeyDescriptor::Type::SIGNING)
+        key_descriptor.key = OpenSSL::PKey.read(key)
+        idp.keys << key
+      end
 
-       entity.roles << idp
-       entity
+      entity.roles << idp
+      entity
     end
   end
 
@@ -353,8 +359,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
     hosts.each_with_index do |host, i|
       sp.assertion_consumer_services << SAML2::Endpoint::Indexed.new("#{HostUrl.protocol}://#{host}/login/saml",
-                          i,
-                          i == 0)
+                                                                     i,
+                                                                     i == 0)
     end
 
     encryption = app_config[:encryption]
@@ -426,6 +432,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       federated_attributes = ap.federated_attributes
       next if federated_attributes.empty?
       next if prior_configs.include?(federated_attributes)
+
       prior_configs << federated_attributes
 
       acs = SAML2::AttributeConsumingService.new(en: 'Canvas')
@@ -456,9 +463,11 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
 
   def self.private_keys
     return {} unless (encryption = config[:encryption])
+
     ([encryption[:private_key]] + Array(encryption[:additional_private_keys])).map do |key|
       path = resolve_saml_key_path(key)
       next unless path
+
       [path, File.read(path)]
     end.compact.to_h
   end
@@ -486,12 +495,12 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     return super if idp.single_logout_services.empty?
 
     logout_request = SAML2::LogoutRequest.initiate(idp,
-      SAML2::NameID.new(entity_id),
-      SAML2::NameID.new(session[:name_id],
-                        session[:name_identifier_format],
-                        name_qualifier: session[:name_qualifier],
-                        sp_name_qualifier: session[:sp_name_qualifier]),
-      session[:session_index])
+                                                   SAML2::NameID.new(entity_id),
+                                                   SAML2::NameID.new(session[:name_id],
+                                                                     session[:name_identifier_format],
+                                                                     name_qualifier: session[:name_qualifier],
+                                                                     sp_name_qualifier: session[:sp_name_qualifier]),
+                                                   session[:session_index])
 
     # sign the response
     private_key = AuthenticationProvider::SAML.private_key

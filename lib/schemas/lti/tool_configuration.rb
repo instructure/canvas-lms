@@ -149,7 +149,7 @@ module Schemas::Lti
                             "LtiResourceLinkRequest"
                           ].freeze
                         }.freeze,
-                        "canvas_icon_class": {
+                        "canvas_icon_class" => {
                           "type" => "string",
                           "enum" => [
                             "icon-lti"
@@ -185,9 +185,9 @@ module Schemas::Lti
           "type" => "string"
         }.freeze,
         "custom_fields" => {
-          "anyOf": [
-            {"type" => "string"}.freeze,
-            {"type" => "object"}.freeze
+          "anyOf" => [
+            { "type" => "string" }.freeze,
+            { "type" => "object" }.freeze
           ].freeze
         }.freeze
       }.freeze

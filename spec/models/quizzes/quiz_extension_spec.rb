@@ -20,11 +20,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizExtension do
-
   describe "#quiz_submission" do
-    it "should be initialized" do
+    it "is initialized" do
       qs = Quizzes::QuizSubmission.new
-      params = {user_id: 1, extra_attempts: 2}
+      params = { user_id: 1, extra_attempts: 2 }
       extension = Quizzes::QuizExtension.new(qs, params)
 
       expect(extension.quiz_submission).to eq qs
@@ -32,9 +31,9 @@ describe Quizzes::QuizExtension do
   end
 
   describe "#ext_params" do
-    it "should be initialized" do
+    it "is initialized" do
       qs = Quizzes::QuizSubmission.new
-      params = {user_id: 1, extra_attempts: 2}
+      params = { user_id: 1, extra_attempts: 2 }
       extension = Quizzes::QuizExtension.new(qs, params)
 
       expect(extension.ext_params).to eq params
@@ -42,7 +41,7 @@ describe Quizzes::QuizExtension do
   end
 
   describe "attributes" do
-    it "should be delegated to the quiz submission" do
+    it "is delegated to the quiz submission" do
       qs = Quizzes::QuizSubmission.new
       qs.quiz_id           = 123
       qs.user_id           = 456
@@ -73,11 +72,11 @@ describe Quizzes::QuizExtension do
       @course.enroll_student(@user2)
     end
 
-    it "should build a list of extensions from given hash" do
+    it "builds a list of extensions from given hash" do
       students = @course.students
       params = [
-        {user_id: @user1.id, extra_attempts: 2},
-        {user_id: @user2.id, extra_time: 20}
+        { user_id: @user1.id, extra_attempts: 2 },
+        { user_id: @user2.id, extra_time: 20 }
       ]
 
       yielded = []
@@ -104,21 +103,21 @@ describe Quizzes::QuizExtension do
       @qs = manager.find_or_create_submission(@user, nil, 'settings_only')
     end
 
-    it "should extend a submission's extra attempts" do
+    it "extends a submission's extra attempts" do
       extension = Quizzes::QuizExtension.new(@qs, extra_attempts: 2)
 
       extension.extend_submission!
       expect(extension.extra_attempts).to eq 2
     end
 
-    it "should extend a submission's extra time" do
+    it "extends a submission's extra time" do
       extension = Quizzes::QuizExtension.new(@qs, extra_time: 20)
 
       extension.extend_submission!
       expect(extension.extra_time).to eq 20
     end
 
-    it "should extend a submission being manually unlocked" do
+    it "extends a submission being manually unlocked" do
       extension = Quizzes::QuizExtension.new(@qs, manually_unlocked: true)
 
       extension.extend_submission!
@@ -130,7 +129,7 @@ describe Quizzes::QuizExtension do
       expect(extension.manually_unlocked).to be_falsey
     end
 
-    it "should extend a submission's end at using extend_from_now" do
+    it "extends a submission's end at using extend_from_now" do
       allow(@qs).to receive_messages(extendable?: true)
 
       time = 5.minutes.ago
@@ -141,7 +140,7 @@ describe Quizzes::QuizExtension do
       end
     end
 
-    it "should extend a submission's end at using extend_from_end_at" do
+    it "extends a submission's end at using extend_from_end_at" do
       end_at = 5.minutes.ago
       @qs.end_at = end_at
       @qs.save!
@@ -153,20 +152,20 @@ describe Quizzes::QuizExtension do
       expect(extension.end_at).to eq end_at + 20.minutes
     end
 
-    it "should have reasonable limits on extendable attributes" do
+    it "has reasonable limits on extendable attributes" do
       extension = Quizzes::QuizExtension.new(@qs,
-        extra_attempts: 99999999, extra_time: 99999999)
+                                             extra_attempts: 99999999, extra_time: 99999999)
 
       extension.extend_submission!
       expect(extension.extra_attempts).to eq 1000
       expect(extension.extra_time).to eq 10080
     end
 
-    it "should only allow numbers or bool for input" do
+    it "only allows numbers or bool for input" do
       extension = Quizzes::QuizExtension.new(@qs,
-        extra_attempts: "abc",
-        extra_time: "abc",
-        manually_unlocked: "abc")
+                                             extra_attempts: "abc",
+                                             extra_time: "abc",
+                                             manually_unlocked: "abc")
 
       extension.extend_submission!
 

@@ -24,7 +24,6 @@ class CourseGroups
     # elements
     def visit_course_groups(course_id)
       get "/courses/#{course_id}/groups"
-
     end
 
     def groupset_actions_button(groupset_id)
@@ -112,7 +111,7 @@ class CourseGroups
       group_detail_view_arrow_selector(group_name).click
     end
 
-    def move_unassigned_user_to_group(user_id, group_id=0)
+    def move_unassigned_user_to_group(user_id, group_id = 0)
       user_assign_to_group_button(user_id).click
       group_option_for_user_button(group_id).click
       wait_for_ajaximations

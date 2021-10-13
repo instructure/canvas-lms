@@ -21,16 +21,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe LiveEvents do
-
-  it 'should trigger a live event on login' do
+  it 'triggers a live event on login' do
     expect(Canvas::LiveEvents).to receive(:logged_in).once
     user_with_pseudonym(:username => 'jtfrd@instructure.com', :active_user => true, :password => 'qwertyuiop')
-    post '/login/canvas', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop'}}
+    post '/login/canvas', params: { :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop' } }
     expect(response).to be_redirect
   end
 
   context 'Courses' do
-
     before do
       course_with_teacher_logged_in(:active_all => true)
     end
@@ -38,12 +36,12 @@ describe LiveEvents do
     context 'Discussion Topics' do
       let(:discussion_topic) { DiscussionTopic.create!(context: @course) }
 
-      it 'should trigger a live event on topic created' do
+      it 'triggers a live event on topic created' do
         expect(Canvas::LiveEvents).to receive(:discussion_topic_created).once
         discussion_topic
       end
 
-      it 'should trigger a live event on topic updated' do
+      it 'triggers a live event on topic updated' do
         expect(Canvas::LiveEvents).to receive(:discussion_topic_updated).once
         discussion_topic.update!(title: 'New topic')
       end
@@ -52,44 +50,43 @@ describe LiveEvents do
     context 'Assignment Groups' do
       let(:assignment_group) { AssignmentGroup.create!(name: 'test', context: @course) }
 
-      it 'should trigger a live event on group created' do
+      it 'triggers a live event on group created' do
         expect(Canvas::LiveEvents).to receive(:assignment_group_created).once
         assignment_group
       end
 
-      it 'should trigger a live event on group updated' do
+      it 'triggers a live event on group updated' do
         expect(Canvas::LiveEvents).to receive(:assignment_group_updated).once
         assignment_group.update!(name: 'changed name')
       end
     end
 
     context 'Wiki Pages' do
-
       def create_page(attrs)
         page = @course.wiki_pages.create!(attrs)
         page.publish! if page.unpublished?
         page
       end
 
-      it 'should trigger a live event on page creation' do
+      it 'triggers a live event on page creation' do
         expect(Canvas::LiveEvents).to receive(:wiki_page_created).once
         create_page :title => 'a-page', :body => 'body'
       end
 
-      it 'should trigger a live event on page update' do
+      it 'triggers a live event on page update' do
         expect(Canvas::LiveEvents).to receive(:wiki_page_updated).twice
         page = create_page :title => 'a-page', :body => 'body'
 
         # Updating the page body should trigger a live event
-        put "/api/v1/courses/#{@course.id}/pages/#{page.url}", params: {:wiki_page => {body: 'UPDATED'}}
+        put "/api/v1/courses/#{@course.id}/pages/#{page.url}", params: { :wiki_page => { body: 'UPDATED' } }
         expect(response.code).to eq '200'
 
         # Updating the page title should trigger a live event
-        put "/api/v1/courses/#{@course.id}/pages/#{page.url}", params: {:wiki_page => {title: 'UPDATED'}}
+        put "/api/v1/courses/#{@course.id}/pages/#{page.url}", params: { :wiki_page => { title: 'UPDATED' } }
         expect(response.code).to eq '200'
       end
 
-      it 'should trigger a live event on page delete' do
+      it 'triggers a live event on page delete' do
         expect(Canvas::LiveEvents).to receive(:wiki_page_deleted).once
         page = create_page :title => 'a-page', :body => 'body'
 
@@ -97,7 +94,6 @@ describe LiveEvents do
         delete "/api/v1/courses/#{@course.id}/pages/#{page.url}"
         expect(response.code).to eq '200'
       end
-
     end
 
     context 'Files' do
@@ -106,19 +102,19 @@ describe LiveEvents do
         factory_with_protected_attributes(@course.attachments, :uploaded_data => data)
       end
 
-      it 'should trigger a live event on files being added to the course' do
+      it 'triggers a live event on files being added to the course' do
         expect(Canvas::LiveEvents).to receive(:attachment_created).once
         course_file
       end
 
-      it 'should trigger a live event on file updates' do
+      it 'triggers a live event on file updates' do
         expect(Canvas::LiveEvents).to receive(:attachment_updated).once
         file = course_file
-        put "/api/v1/files/#{file.id}", params: {:name => 'UPDATED'}
+        put "/api/v1/files/#{file.id}", params: { :name => 'UPDATED' }
         expect(response.code).to eq '200'
       end
 
-      it 'should trigger a live event on file deletes' do
+      it 'triggers a live event on file deletes' do
         expect(Canvas::LiveEvents).to receive(:attachment_deleted).once
         file = course_file
         delete "/api/v1/files/#{file.id}"
@@ -128,7 +124,7 @@ describe LiveEvents do
   end
 
   context 'Enrollments' do
-    it "should trigger a live event on limit_privileges_to_course_section!" do
+    it "triggers a live event on limit_privileges_to_course_section!" do
       course_with_student
       expect(Canvas::LiveEvents).to receive(:enrollment_updated).once
       Enrollment.limit_privileges_to_course_section!(@course, @user, true)

@@ -23,30 +23,30 @@ describe ModeratedGrading::NullProvisionalGrade do
   describe 'grade_attributes' do
     it 'returns the proper format' do
       expect(ModeratedGrading::NullProvisionalGrade.new(nil, 1, false).grade_attributes).to eq({
-        'provisional_grade_id' => nil,
-        'grade' => nil,
-        'score' => nil,
-        'graded_at' => nil,
-        'scorer_id' => 1,
-        'graded_anonymously' => nil,
-        'final' => false,
-        'grade_matches_current_submission' => true
-      })
+                                                                                                 'provisional_grade_id' => nil,
+                                                                                                 'grade' => nil,
+                                                                                                 'score' => nil,
+                                                                                                 'graded_at' => nil,
+                                                                                                 'scorer_id' => 1,
+                                                                                                 'graded_anonymously' => nil,
+                                                                                                 'final' => false,
+                                                                                                 'grade_matches_current_submission' => true
+                                                                                               })
 
       expect(ModeratedGrading::NullProvisionalGrade.new(nil, 2, true).grade_attributes).to eq({
-        'provisional_grade_id' => nil,
-        'grade' => nil,
-        'score' => nil,
-        'graded_at' => nil,
-        'scorer_id' => 2,
-        'graded_anonymously' => nil,
-        'final' => true,
-        'grade_matches_current_submission' => true
-      })
+                                                                                                'provisional_grade_id' => nil,
+                                                                                                'grade' => nil,
+                                                                                                'score' => nil,
+                                                                                                'graded_at' => nil,
+                                                                                                'scorer_id' => 2,
+                                                                                                'graded_anonymously' => nil,
+                                                                                                'final' => true,
+                                                                                                'grade_matches_current_submission' => true
+                                                                                              })
     end
   end
 
-  it "should return the original submission's submission comments" do
+  it "returns the original submission's submission comments" do
     sub = double
     comments = double
     expect(sub).to receive(:submission_comments).and_return(comments)

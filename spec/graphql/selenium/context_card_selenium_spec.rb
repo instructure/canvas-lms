@@ -29,13 +29,13 @@ describe "graphql student context cards" do
 
   def grade_assignment(course, student, grader)
     @ass = course.assignments.create!({
-      title: "some assignment",
-      submission_types: "online_url,online_upload"
-    })
+                                        title: "some assignment",
+                                        submission_types: "online_url,online_upload"
+                                      })
     @ass.submit_homework(student, {
-      submission_type: "online_url",
-      url: "http://www.google.com"
-    })
+                           submission_type: "online_url",
+                           url: "http://www.google.com"
+                         })
     @ass.grade_student(student, grade: 5, grader: grader)
   end
 
@@ -47,7 +47,7 @@ describe "graphql student context cards" do
       grade_assignment(@course, @student, @teacher)
     end
 
-    it "should pull student context card data from graphql", priority: "2", test_id: 3418826 do
+    it "pulls student context card data from graphql", priority: "2", test_id: 3418826 do
       get "/courses/#{@course.id}/gradebook"
       wait_for_ajaximations
       f("a[data-student_id='#{@student.id}']").click
@@ -57,7 +57,7 @@ describe "graphql student context cards" do
       expect(cool_link["href"]).to include("/courses/#{@course.id}/users/#{@student.id}")
     end
 
-    it "should link to student submissions page", priority: "2", test_id: 3431682 do
+    it "links to student submissions page", priority: "2", test_id: 3431682 do
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
       f("a[data-student_id='#{@student.id}']").click
@@ -67,7 +67,7 @@ describe "graphql student context cards" do
       expect(cool_link["href"]).to include("/courses/#{@course.id}/assignments/#{@ass.id}/submissions/#{@student.id}")
     end
 
-    it "should link to grades page", priority: "2", test_id: 3431710 do
+    it "links to grades page", priority: "2", test_id: 3431710 do
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
       f("a[data-student_id='#{@student.id}']").click
@@ -86,7 +86,7 @@ describe "graphql student context cards" do
       grade_assignment(@course, @student, @admin)
     end
 
-    it "should pull student context card data from graphql on gradebook page", priority: "2", test_id: 3418825 do
+    it "pulls student context card data from graphql on gradebook page", priority: "2", test_id: 3418825 do
       get "/courses/#{@course.id}/gradebook"
       wait_for_ajaximations
       f("a[data-student_id='#{@student.id}']").click
@@ -96,7 +96,7 @@ describe "graphql student context cards" do
       expect(cool_link["href"]).to include("/courses/#{@course.id}/users/#{@student.id}")
     end
 
-    it "should should pull student context card data from graphql on sections page", priority: "2", test_id: 3308084 do
+    it "shoulds pull student context card data from graphql on sections page", priority: "2", test_id: 3308084 do
       get "/courses/#{@course.id}/sections/#{@section.id}"
       wait_for_ajaximations
       f("a[data-student_id='#{@student.id}']").click
@@ -106,7 +106,7 @@ describe "graphql student context cards" do
       expect(cool_link["href"]).to include("/courses/#{@course.id}/users/#{@student.id}")
     end
 
-    it "should should pull student context card data from graphql on people page", priority: "2", test_id: 3308083 do
+    it "shoulds pull student context card data from graphql on people page", priority: "2", test_id: 3308083 do
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
       f("a[data-student_id='#{@student.id}']").click
@@ -116,23 +116,23 @@ describe "graphql student context cards" do
       expect(cool_link["href"]).to include("/courses/#{@course.id}/users/#{@student.id}")
     end
 
-    it "should link to student submissions page", priority: "2", test_id: 3431682 do
+    it "links to student submissions page", priority: "2", test_id: 3431682 do
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
       f("a[data-student_id='#{@student.id}']").click
       wait_for_ajaximations
       expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("User")
-      cool_link =f(".StudentContextTray-Progress__Bar a")
+      cool_link = f(".StudentContextTray-Progress__Bar a")
       expect(cool_link["href"]).to include("/courses/#{@course.id}/assignments/#{@ass.id}/submissions/#{@student.id}")
     end
 
-    it "should link to grades page", priority: "2", test_id: 3431710 do
+    it "links to grades page", priority: "2", test_id: 3431710 do
       get "/courses/#{@course.id}/users"
       wait_for_ajaximations
       f("a[data-student_id='#{@student.id}']").click
       wait_for_ajaximations
       expect(f(".StudentContextTray-Header__Name h2 a")).to include_text("User")
-      cool_link =f(".StudentContextTray-QuickLinks a")
+      cool_link = f(".StudentContextTray-QuickLinks a")
       expect(cool_link["href"]).to include("/courses/#{@course.id}/grades/#{@student.id}")
     end
   end

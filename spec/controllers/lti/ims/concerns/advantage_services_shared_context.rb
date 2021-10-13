@@ -34,23 +34,23 @@ shared_context 'advantage services context' do
   end
   let(:access_token_scopes) do
     %w(
-       https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
-       https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
-       https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
-       https://canvas.instructure.com/lti/public_jwk/scope/update
-       https://canvas.instructure.com/lti/data_services/scope/create
-       https://canvas.instructure.com/lti/data_services/scope/show
-       https://canvas.instructure.com/lti/data_services/scope/update
-       https://canvas.instructure.com/lti/data_services/scope/list
-       https://canvas.instructure.com/lti/data_services/scope/destroy
-       https://canvas.instructure.com/lti/data_services/scope/list_event_types
-       https://canvas.instructure.com/lti/account_lookup/scope/show
-       https://canvas.instructure.com/lti/feature_flags/scope/show
-       https://canvas.instructure.com/lti/account_external_tools/scope/create
-       https://canvas.instructure.com/lti/account_external_tools/scope/update
-       https://canvas.instructure.com/lti/account_external_tools/scope/list
-       https://canvas.instructure.com/lti/account_external_tools/scope/show
-       https://canvas.instructure.com/lti/account_external_tools/scope/destroy
+      https://purl.imsglobal.org/spec/lti-ags/scope/lineitem
+      https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly
+      https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly
+      https://canvas.instructure.com/lti/public_jwk/scope/update
+      https://canvas.instructure.com/lti/data_services/scope/create
+      https://canvas.instructure.com/lti/data_services/scope/show
+      https://canvas.instructure.com/lti/data_services/scope/update
+      https://canvas.instructure.com/lti/data_services/scope/list
+      https://canvas.instructure.com/lti/data_services/scope/destroy
+      https://canvas.instructure.com/lti/data_services/scope/list_event_types
+      https://canvas.instructure.com/lti/account_lookup/scope/show
+      https://canvas.instructure.com/lti/feature_flags/scope/show
+      https://canvas.instructure.com/lti/account_external_tools/scope/create
+      https://canvas.instructure.com/lti/account_external_tools/scope/update
+      https://canvas.instructure.com/lti/account_external_tools/scope/list
+      https://canvas.instructure.com/lti/account_external_tools/scope/show
+      https://canvas.instructure.com/lti/account_external_tools/scope/destroy
     ).join(' ')
   end
   let(:access_token_signing_key) { Canvas::Security.encryption_key }
@@ -70,6 +70,7 @@ shared_context 'advantage services context' do
   end
   let(:access_token_jwt) do
     return nil if access_token_jwt_hash.blank?
+
     JSON::JWT.new(access_token_jwt_hash).sign(access_token_signing_key, :HS256).to_s
   end
   let(:tool_context) { root_account }
@@ -92,7 +93,7 @@ shared_context 'advantage services context' do
   let(:context) { raise 'Override in spec' }
   let(:context_id) { context.id }
   let(:unknown_context_id) { raise 'Override in spec' }
-  let(:action) { raise 'Override in spec'}
+  let(:action) { raise 'Override in spec' }
   let(:params_overrides) { {} }
   let(:json) { JSON.parse(response.body).with_indifferent_access }
   let(:scope_to_remove) { raise 'Override in spec' }
@@ -123,9 +124,9 @@ shared_context 'advantage services context' do
 
   def remove_access_token_scope(default_scopes, to_remove)
     scopes_to_remove = [to_remove].flatten
-    default_scopes.
-      split(' ').
-      reject { |s| scopes_to_remove.include? s }.
-      join(' ')
+    default_scopes
+      .split(' ')
+      .reject { |s| scopes_to_remove.include? s }
+      .join(' ')
   end
 end

@@ -29,7 +29,7 @@ describe "CourseAudit API", type: :request do
       course_factory
     end
 
-    it "should 404" do
+    it "404s" do
       raw_api_call(:get, "/api/v1/audit/course/courses/#{@course.id}", controller: 'course_audit_api', action: "for_course", course_id: @course.id.to_s, format: 'json')
       assert_status(404)
     end
@@ -40,7 +40,7 @@ describe "CourseAudit API", type: :request do
 
     before do
       @request_id = SecureRandom.uuid
-      allow(RequestContextGenerator).to receive_messages( :request_id => @request_id )
+      allow(RequestContextGenerator).to receive_messages(:request_id => @request_id)
 
       @domain_root_account = Account.default
       @viewing_user = user_with_pseudonym(account: @domain_root_account)
@@ -56,28 +56,28 @@ describe "CourseAudit API", type: :request do
     end
 
     def fetch_for_context(context, id: nil, **options)
-      type = context.class.to_s.downcase unless type = options.delete(:type)
+      type = context.class.to_s.downcase unless (type = options.delete(:type))
       id ||= context.id.to_s
 
       arguments = { controller: 'course_audit_api', action: "for_#{type}", :"#{type}_id" => id, format: 'json' }
       query_string = []
 
-      if per_page = options.delete(:per_page)
+      if (per_page = options.delete(:per_page))
         arguments[:per_page] = per_page.to_s
         query_string << "per_page=#{arguments[:per_page]}"
       end
 
-      if start_time = options.delete(:start_time)
+      if (start_time = options.delete(:start_time))
         arguments[:start_time] = start_time.iso8601
         query_string << "start_time=#{arguments[:start_time]}"
       end
 
-      if end_time = options.delete(:end_time)
+      if (end_time = options.delete(:end_time))
         arguments[:end_time] = end_time.iso8601
         query_string << "end_time=#{arguments[:end_time]}"
       end
 
-      if account = options.delete(:account)
+      if (account = options.delete(:account))
         arguments[:account_id] = Shard.global_id_for(account).to_s
         query_string << "account_id=#{arguments[:account_id]}"
       end
@@ -90,21 +90,21 @@ describe "CourseAudit API", type: :request do
     def expect_event_for_context(context, event, **options)
       json = options.delete(:json)
       json ||= fetch_for_context(context, **options)
-      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
-                    .to include([event.id, event.event_type])
+      expect(json['events'].map { |e| [e['id'], e['event_type']] })
+        .to include([event.id, event.event_type])
       json
     end
 
     def forbid_event_for_context(context, event, **options)
       json = options.delete(:json)
       json ||= fetch_for_context(context, **options)
-      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
-                    .not_to include([event.id, event.event_type])
+      expect(json['events'].map { |e| [e['id'], e['event_type']] })
+        .not_to include([event.id, event.event_type])
       json
     end
 
     context "nominal cases" do
-      it "should include events at context endpoint" do
+      it "includes events at context endpoint" do
         expect_event_for_context(@course, @event)
         expect_event_for_context(@domain_root_account, @event)
 
@@ -130,12 +130,12 @@ describe "CourseAudit API", type: :request do
         @event2 = Auditors::Course::Stream.insert(record)
       end
 
-      it "should recognize :start_time" do
+      it "recognizes :start_time" do
         json = expect_event_for_context(@course, @event, start_time: 12.hours.ago)
         forbid_event_for_context(@course, @event2, start_time: 12.hours.ago, json: json)
       end
 
-      it "should recognize :end_time" do
+      it "recognizes :end_time" do
         json = forbid_event_for_context(@course, @event, end_time: 12.hours.ago)
         expect_event_for_context(@course, @event2, end_time: 12.hours.ago, json: json)
       end
@@ -147,28 +147,28 @@ describe "CourseAudit API", type: :request do
     end
 
     context "deleted entities" do
-      it "should 200 for inactive courses" do
+      it "200s for inactive courses" do
         @course.destroy
         fetch_for_context(@course, expected_status: 200)
       end
     end
 
     describe "permissions" do
-      it "should not authorize the endpoints with no permissions" do
+      it "does not authorize the endpoints with no permissions" do
         @user, @viewing_user = @user, user_model
 
         fetch_for_context(@course, expected_status: 401)
         fetch_for_context(@domain_root_account, expected_status: 401)
       end
 
-      it "should not authorize the endpoints with revoking the :view_course_changes permission" do
+      it "does not authorize the endpoints with revoking the :view_course_changes permission" do
         RoleOverride.manage_role_override(@account_user.account, @account_user.role, :view_course_changes.to_s, :override => false)
 
         fetch_for_context(@course, expected_status: 401)
         fetch_for_context(@domain_root_account, expected_status: 401)
       end
 
-      it "should not allow other account models" do
+      it "does not allow other account models" do
         new_root_account = Account.create!(name: 'New Account')
         allow(LoadAccount).to receive(:default_domain_root_account).and_return(new_root_account)
         @viewing_user = user_with_pseudonym(account: new_root_account)
@@ -184,11 +184,11 @@ describe "CourseAudit API", type: :request do
         @json = fetch_for_context(@course, per_page: 2)
       end
 
-      it "should only return one page of results" do
+      it "only returns one page of results" do
         expect(@json['events'].size).to eq 2
       end
 
-      it "should have pagination headers" do
+      it "has pagination headers" do
         expect(response.headers['Link']).to match(/rel="next"/)
       end
     end

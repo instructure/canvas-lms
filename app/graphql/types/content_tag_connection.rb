@@ -53,8 +53,8 @@ module Types
 
     def learning_outcome_link?
       object.tag_type == 'learning_outcome_association' &&
-      object.associated_asset_type == 'LearningOutcomeGroup' &&
-      object.content_type == 'LearningOutcome'
+        object.associated_asset_type == 'LearningOutcomeGroup' &&
+        object.content_type == 'LearningOutcome'
     end
 
     def can_manage_context_outcomes

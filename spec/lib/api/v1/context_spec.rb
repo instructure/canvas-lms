@@ -23,24 +23,24 @@ describe Api::V1::Context do
   include Api::V1::Context
 
   describe '.context_data' do
-    it 'should return effective context code data if use_effective_code is true' do
+    it 'returns effective context code data if use_effective_code is true' do
       student_in_course active_all: true
       appointment_participant_model participant: @student, course: @course
       context_data = context_data(@event, use_effective_code: true)
       expect(context_data).to eq({
-        'context_type' => 'Course',
-        'course_id' => @course.id
-      })
+                                   'context_type' => 'Course',
+                                   'course_id' => @course.id
+                                 })
     end
 
-    it 'should not return effective context code data if use_effective_code is false or not sent' do
+    it 'does not return effective context code data if use_effective_code is false or not sent' do
       student_in_course active_all: true
       appointment_participant_model participant: @student, course: @course
       context_data = context_data(@event)
       expect(context_data).to eq({
-        'context_type' => 'User',
-        'user_id' => @student.id
-      })
+                                   'context_type' => 'User',
+                                   'user_id' => @student.id
+                                 })
     end
   end
 end

@@ -32,7 +32,7 @@ describe Api::V1::Submission do
       private
 
       def default_url_options
-        {host: :localhost}
+        { host: :localhost }
       end
     end.new
   end
@@ -47,7 +47,7 @@ describe Api::V1::Submission do
   }
   let(:session) { {} }
   let(:context) { nil }
-  let(:params) { { includes: [field]} }
+  let(:params) { { includes: [field] } }
   let(:submission) { assignment.submissions.create!(user: user) }
   let(:provisional_grade) { submission.provisional_grades.create!(scorer: teacher) }
 
@@ -114,7 +114,7 @@ describe Api::V1::Submission do
       let(:field) { 'submission_status' }
       let(:submission) { assignment.submissions.build(user: user) }
       let(:submission_status) do
-        -> (submission) do
+        ->(submission) do
           json = fake_controller.submission_json(submission, assignment, user, session, context, [field], params)
           json.fetch(field)
         end
@@ -261,7 +261,7 @@ describe Api::V1::Submission do
             assignment.update!(due_at: 1.week.ago)
             submission.assignment = assignment
             submission.cached_due_date = assignment.due_at
-            submission.submission_type ='online_text_entry'
+            submission.submission_type = 'online_text_entry'
             submission.submitted_at = Time.zone.now
             expect(submission_status.call(submission)).to be :late
           end
@@ -273,7 +273,7 @@ describe Api::V1::Submission do
             assignment.update!(due_at: 1.week.ago)
             submission.assignment = assignment
             submission.cached_due_date = assignment.due_at
-            submission.submission_type ='online_text_entry'
+            submission.submission_type = 'online_text_entry'
             submission.submitted_at = Time.zone.now
             expect(submission_status.call(submission)).to be :late
           end
@@ -292,7 +292,7 @@ describe Api::V1::Submission do
     describe "grading status" do
       let(:field) { 'grading_status' }
       let(:grading_status) do
-        -> (submission) do
+        ->(submission) do
           json = fake_controller.submission_json(submission, assignment, user, session, context, [field], params)
           json.fetch(field)
         end

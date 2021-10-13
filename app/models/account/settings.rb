@@ -19,13 +19,13 @@
 
 module Account::Settings
   module ClassMethods
-    def add_setting(setting, opts=nil)
+    def add_setting(setting, opts = nil)
       if opts && opts[:inheritable]
         opts[:hash] = true
         opts[:values] = [:value, :locked]
 
         self.class_eval "def #{setting}; cached_inherited_setting(:#{setting}); end", __FILE__, __LINE__
-      elsif (opts && opts[:boolean] && opts.has_key?(:default))
+      elsif opts && opts[:boolean] && opts.has_key?(:default)
         if opts[:default]
           # if the default is true, we want a nil result to evaluate to true.
           # this prevents us from having to backfill true values into a
@@ -40,7 +40,7 @@ module Account::Settings
     end
 
     def inheritable_settings
-      self.account_settings_options.select{|k, v| v[:inheritable]}.keys
+      self.account_settings_options.select { |k, v| v[:inheritable] }.keys
     end
   end
 
@@ -63,15 +63,15 @@ module Account::Settings
   # should continue down the account chain until it reaches a locked value
   # otherwise use the last explicitly set value
   def calculate_inherited_setting(setting)
-    inherited_hash = {:locked => false, :value => self.class.account_settings_options[setting][:default]}
+    inherited_hash = { :locked => false, :value => self.class.account_settings_options[setting][:default] }
     self.account_chain.reverse_each do |acc|
       current_hash = acc.settings[setting]
       next if current_hash.nil?
 
       if !current_hash.is_a?(Hash)
-        current_hash = {:locked => false, :value => current_hash}
+        current_hash = { :locked => false, :value => current_hash }
       end
-      current_hash[:inherited] = true if (self != acc)
+      current_hash[:inherited] = true if self != acc
 
       if current_hash[:locked]
         return current_hash

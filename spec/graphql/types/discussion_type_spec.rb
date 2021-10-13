@@ -28,55 +28,55 @@ RSpec.shared_examples "DiscussionType" do
     [
       {
         value: 'attach',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :attach)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :attach) }
       },
       {
         value: 'create',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :create)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :create) }
       },
       {
         value: 'delete',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :delete) && !discussion.editing_restricted?(:any)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :delete) && !discussion.editing_restricted?(:any) }
       },
       {
         value: 'duplicate',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :duplicate)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :duplicate) }
       },
       {
         value: 'moderateForum',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :moderate_forum)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :moderate_forum) }
       },
       {
         value: 'rate',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :rate)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :rate) }
       },
       {
         value: 'read',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :read)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :read) }
       },
       {
         value: 'readAsAdmin',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :read_as_admin)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :read_as_admin) }
       },
       {
         value: 'manageContent',
-        allowed: -> (user) {discussion.context.grants_right?(user, :manage_content)}
+        allowed: ->(user) { discussion.context.grants_right?(user, :manage_content) }
       },
       {
         value: 'readReplies',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :read_replies)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :read_replies) }
       },
       {
         value: 'reply',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :reply)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :reply) }
       },
       {
         value: 'update',
-        allowed: -> (user) {discussion.grants_right?(user, nil, :update)}
+        allowed: ->(user) { discussion.grants_right?(user, nil, :update) }
       },
       {
         value: 'speedGrader',
-        allowed: -> (user) {
+        allowed: ->(user) {
           permission = !discussion.assignment.context.large_roster? && discussion.assignment_id && discussion.assignment.published?
           if discussion.assignment.context.concluded?
             return permission && discussion.assignment.context.grants_right?(user, :read_as_admin)
@@ -87,45 +87,45 @@ RSpec.shared_examples "DiscussionType" do
       },
       {
         value: 'peerReview',
-        allowed: -> (user) {
+        allowed: ->(user) {
           discussion.assignment_id &&
-          discussion.assignment.published? &&
-          discussion.assignment.has_peer_reviews? &&
-          discussion.assignment.grants_right?(user, :grade)
+            discussion.assignment.published? &&
+            discussion.assignment.has_peer_reviews? &&
+            discussion.assignment.grants_right?(user, :grade)
         }
       },
       {
         value: 'showRubric',
-        allowed: -> (user) {!discussion.assignment_id.nil? && !discussion.assignment.rubric.nil?}
+        allowed: ->(user) { !discussion.assignment_id.nil? && !discussion.assignment.rubric.nil? }
       },
       {
         value: 'addRubric',
-        allowed: -> (user) {
+        allowed: ->(user) {
           !discussion.assignment_id.nil? &&
-          discussion.assignment.rubric.nil? &&
-          discussion.assignment.grants_right?(user, :update)
+            discussion.assignment.rubric.nil? &&
+            discussion.assignment.grants_right?(user, :update)
         }
       },
       {
         value: 'openForComments',
-        allowed: -> (user) {
+        allowed: ->(user) {
           !discussion.comments_disabled? &&
-          discussion.locked &&
-          discussion.grants_right?(user, :moderate_forum)
+            discussion.locked &&
+            discussion.grants_right?(user, :moderate_forum)
         }
       },
       {
         value: 'closeForComments',
-        allowed: -> (user) {
+        allowed: ->(user) {
           discussion.can_lock? &&
-          !discussion.comments_disabled? &&
-          !discussion.locked &&
-          discussion.grants_right?(user, :moderate_forum)
+            !discussion.comments_disabled? &&
+            !discussion.locked &&
+            discussion.grants_right?(user, :moderate_forum)
         }
       },
       {
         value: 'copyAndSendTo',
-        allowed: -> (user) {discussion.context.grants_right?(user, :read_as_admin)}
+        allowed: ->(user) { discussion.context.grants_right?(user, :read_as_admin) }
       }
     ]
   }
@@ -188,6 +188,19 @@ RSpec.shared_examples "DiscussionType" do
     expect(discussion_type.resolve('discussionEntriesConnection(sortOrder: desc, rootEntries: true) { nodes { _id } }')).to eq [de2.id, de3.id, de.id].map(&:to_s)
     discussion.discussion_entries.create!(message: 'sub entry', user: @teacher, parent_id: de3.id)
     expect(discussion_type.resolve('discussionEntriesConnection(sortOrder: desc, rootEntries: true) { nodes { _id } }')).to eq [de3.id, de2.id, de.id].map(&:to_s)
+  end
+
+  it 'loads discussion_entry_drafts' do
+    de = discussion.discussion_entries.create!(message: 'root entry', user: @teacher)
+    dr = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: discussion, message: 'hey')
+    dr2 = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: discussion, message: 'hooo', parent: de)
+    dr3 = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: discussion, message: 'party now', entry: de)
+    # not going to be included cause other user
+    DiscussionEntryDraft.upsert_draft(user: user_model, topic: discussion, message: 'party now', entry: de)
+    ids = discussion_type.resolve('discussionEntryDraftsConnection { nodes { _id } }')
+    expect(ids).to match_array([dr, dr2, dr3].flatten.map(&:to_s))
+    messages = discussion_type.resolve('discussionEntryDraftsConnection { nodes { message } }')
+    expect(messages).to match_array(['hey', 'hooo', 'party now'])
   end
 
   it "allows querying root discussion entries" do
@@ -257,7 +270,7 @@ RSpec.shared_examples "DiscussionType" do
       @de2 = discussion.discussion_entries.create!(message: 'find me', user: @teacher)
     end
 
-    it "should only count entries that match the search term" do
+    it "only counts entries that match the search term" do
       entryCount = discussion_type.resolve('searchEntryCount(filter: all, searchTerm: "boo")')
       result = discussion_type.resolve('discussionEntriesConnection(searchTerm:"boo") { nodes { message } }')
       expect(result.count).to be 1
@@ -368,6 +381,17 @@ describe Types::DiscussionType do
       it 'finds lists the user' do
         expect(discussion_type.resolve('mentionableUsersConnection { nodes { _id } }')).to eq(discussion.context.users.map(&:id).map(&:to_s))
       end
+    end
+
+    it "locked_for_user is set correctly" do
+      allow_any_instantiation_of(discussion).to receive(:locked_for?)
+        .with(@teacher, check_policies: true)
+        .and_return(true)
+      expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("lockedForUser")).to be true
+      allow_any_instantiation_of(discussion).to receive(:locked_for?)
+        .with(@teacher, check_policies: true)
+        .and_return(false)
+      expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("lockedForUser")).to be false
     end
   end
 

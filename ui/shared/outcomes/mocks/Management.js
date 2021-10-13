@@ -975,7 +975,7 @@ export const findOutcomesMocks = ({
   outcomeIsImported = true,
   contextType = 'Account',
   contextId = '1',
-  outcomesGroupContextId = 1,
+  outcomesGroupContextId = '1',
   outcomesGroupContextType = 'Account',
   searchQuery = 'mathematics',
   outcomesCount = 25
@@ -1237,7 +1237,9 @@ export const updateOutcomeMocks = ({
     result: {
       data: {
         updateLearningOutcome: {
+          __typename: 'UpdateLearningOutcomePayload',
           learningOutcome: {
+            __typename: 'LearningOutcome',
             _id: '1',
             title,
             displayName,

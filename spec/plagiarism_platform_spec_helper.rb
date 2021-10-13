@@ -27,7 +27,7 @@ RSpec.shared_context "plagiarism_platform", :shared_context => :metadata do
   let(:assignment_two) { assignment_model(course: course) }
 
   def success_response
-    double(code: 200, parsed_response: {'Id' => SecureRandom.uuid}, ok?: true)
+    double(code: 200, parsed_response: { 'Id' => SecureRandom.uuid }, ok?: true)
   end
 
   before(:each) do

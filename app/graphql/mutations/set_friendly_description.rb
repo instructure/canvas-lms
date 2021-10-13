@@ -105,7 +105,7 @@ class Mutations::SetFriendlyDescription < Mutations::BaseMutation
     LearningOutcome.active.find_by(id: outcome_id).tap do |outcome|
       unless outcome
         raise GraphQL::ExecutionError, I18n.t(
-          "No such outcome for id %{id}", {id: outcome_id}
+          "No such outcome for id %{id}", { id: outcome_id }
         )
       end
     end

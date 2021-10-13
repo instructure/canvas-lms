@@ -53,12 +53,13 @@ module SendToStream
 
     def create_stream_items
       return if stream_item_inactive?
+
       block = self.class.send_to_stream_block
       stream_recipients = Array(self.instance_eval(&block)) if block
       generate_stream_items(stream_recipients) if stream_recipients
     rescue => e
       if Rails.env.production?
-        Canvas::Errors.capture(e, {message: "SendToStream failure" })
+        Canvas::Errors.capture(e, { message: "SendToStream failure" })
       else
         raise
       end
@@ -67,7 +68,7 @@ module SendToStream
     def generate_stream_items(stream_recipients)
       @generated_stream_items ||= []
       self.extend TextHelper
-      @stream_item_recipient_ids = stream_recipients.compact.map{|u| User.infer_id(u) }.compact.uniq
+      @stream_item_recipient_ids = stream_recipients.compact.map { |u| User.infer_id(u) }.compact.uniq
       @generated_stream_items = StreamItem.generate_all(self, @stream_item_recipient_ids)
     end
 
@@ -105,4 +106,3 @@ module SendToStream
     klass.extend SendToStreamClassMethods
   end
 end
-

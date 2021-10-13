@@ -27,12 +27,12 @@ module Lti
     let(:subscription) do
       {
         RootAccountUUID: account.uuid,
-        EventTypes:["submission_created"],
+        EventTypes: ["submission_created"],
         ContextType: "root_account",
         ContextId: account.uuid,
         Format: "live-event",
         TransportType: "sqs",
-        TransportMetadata: { Url: "http://sqs.docker"},
+        TransportMetadata: { Url: "http://sqs.docker" },
         UserId: "2"
       }
     end
@@ -47,11 +47,11 @@ module Lti
             product_family: product_family,
             product_version: '1',
             workflow_state: 'active',
-            raw_data: {'enabled_capability' => ['vnd.instructure.webhooks.root_account.all']},
+            raw_data: { 'enabled_capability' => ['vnd.instructure.webhooks.root_account.all'] },
             lti_version: '1'
           )
         end
-        let(:validator){ SubscriptionsValidator.new(subscription, tool_proxy) }
+        let(:validator) { SubscriptionsValidator.new(subscription, tool_proxy) }
 
         it 'allows all subscription types if installed in context' do
           expect { validator.check_required_capabilities! }.not_to raise_error
@@ -62,12 +62,12 @@ module Lti
         let(:subscription) do
           {
             RootAccountUUID: account.uuid,
-            EventTypes:["quiz_submitted"],
+            EventTypes: ["quiz_submitted"],
             ContextType: "root_account",
             ContextId: account.uuid,
             Format: "live-event",
             TransportType: "sqs",
-            TransportMetadata: { Url: "http://sqs.docker"},
+            TransportMetadata: { Url: "http://sqs.docker" },
             UserId: "2"
           }
         end
@@ -79,7 +79,7 @@ module Lti
             product_family: product_family,
             product_version: '1',
             workflow_state: 'active',
-            raw_data: {'enabled_capability' => ['vnd.instructure.webhooks.root_account.quiz_submitted']},
+            raw_data: { 'enabled_capability' => ['vnd.instructure.webhooks.root_account.quiz_submitted'] },
             lti_version: '1'
           )
         end
@@ -106,12 +106,12 @@ module Lti
         let(:subscription) do
           {
             RootAccountUUID: account.uuid,
-            EventTypes:["grade_change"],
+            EventTypes: ["grade_change"],
             ContextType: "root_account",
             ContextId: account.uuid,
             Format: "live-event",
             TransportType: "sqs",
-            TransportMetadata: { Url: "http://sqs.docker"},
+            TransportMetadata: { Url: "http://sqs.docker" },
             UserId: "2"
           }
         end
@@ -123,7 +123,7 @@ module Lti
             product_family: product_family,
             product_version: '1',
             workflow_state: 'active',
-            raw_data: {'enabled_capability' => ['vnd.instructure.webhooks.root_account.grade_change']},
+            raw_data: { 'enabled_capability' => ['vnd.instructure.webhooks.root_account.grade_change'] },
             lti_version: '1'
           )
         end
@@ -144,12 +144,12 @@ module Lti
         let(:subscription) do
           {
             RootAccountUUID: account.uuid,
-            EventTypes:["attachment_created"],
+            EventTypes: ["attachment_created"],
             ContextType: "root_account",
             ContextId: account.uuid,
             Format: "live-event",
             TransportType: "sqs",
-            TransportMetadata: { Url: "http://sqs.docker"},
+            TransportMetadata: { Url: "http://sqs.docker" },
             UserId: "2"
           }
         end
@@ -161,7 +161,7 @@ module Lti
             product_family: product_family,
             product_version: '1',
             workflow_state: 'active',
-            raw_data: {'enabled_capability' => ['vnd.instructure.webhooks.root_account.attachment_created']},
+            raw_data: { 'enabled_capability' => ['vnd.instructure.webhooks.root_account.attachment_created'] },
             lti_version: '1'
           )
         end
@@ -188,12 +188,12 @@ module Lti
         let(:subscription) do
           {
             RootAccountUUID: account.uuid,
-            EventTypes:["submission_created"],
+            EventTypes: ["submission_created"],
             ContextType: "root_account",
             ContextId: account.uuid,
             Format: "live-event",
             TransportType: "sqs",
-            TransportMetadata: { Url: "http://sqs.docker"},
+            TransportMetadata: { Url: "http://sqs.docker" },
             UserId: "2"
           }
         end
@@ -205,7 +205,7 @@ module Lti
             product_family: product_family,
             product_version: '1',
             workflow_state: 'active',
-            raw_data: {'enabled_capability' => ['vnd.instructure.webhooks.root_account.submission_created']},
+            raw_data: { 'enabled_capability' => ['vnd.instructure.webhooks.root_account.submission_created'] },
             lti_version: '1'
           )
         end
@@ -232,12 +232,12 @@ module Lti
         let(:subscription) do
           {
             RootAccountUUID: account.uuid,
-            EventTypes:["submission_updated"],
+            EventTypes: ["submission_updated"],
             ContextType: "root_account",
             ContextId: account.uuid,
             Format: "live-event",
             TransportType: "sqs",
-            TransportMetadata: { Url: "http://sqs.docker"},
+            TransportMetadata: { Url: "http://sqs.docker" },
             UserId: "2"
           }
         end
@@ -249,7 +249,7 @@ module Lti
             product_family: product_family,
             product_version: '1',
             workflow_state: 'active',
-            raw_data: {'enabled_capability' => ['vnd.instructure.webhooks.root_account.submission_updated']},
+            raw_data: { 'enabled_capability' => ['vnd.instructure.webhooks.root_account.submission_updated'] },
             lti_version: '1'
           )
         end
@@ -276,12 +276,12 @@ module Lti
         let(:subscription) do
           {
             RootAccountUUID: account.uuid,
-            EventTypes:["plagiarism_resubmit"],
+            EventTypes: ["plagiarism_resubmit"],
             ContextType: "root_account",
             ContextId: account.uuid,
             Format: "live-event",
             TransportType: "sqs",
-            TransportMetadata: { Url: "http://sqs.docker"},
+            TransportMetadata: { Url: "http://sqs.docker" },
             UserId: "2"
           }
         end
@@ -293,7 +293,7 @@ module Lti
             product_family: product_family,
             product_version: '1',
             workflow_state: 'active',
-            raw_data: {'enabled_capability' => ['vnd.instructure.webhooks.root_account.plagiarism_resubmit']},
+            raw_data: { 'enabled_capability' => ['vnd.instructure.webhooks.root_account.plagiarism_resubmit'] },
             lti_version: '1'
           )
         end
@@ -321,12 +321,12 @@ module Lti
       let(:subscription) do
         {
           RootAccountUUID: account.uuid,
-          EventTypes:["grade_changed"],
+          EventTypes: ["grade_changed"],
           ContextType: "root_account",
           ContextId: account.uuid,
           Format: "live-event",
           TransportType: "sqs",
-          TransportMetadata: { Url: "http://sqs.docker"},
+          TransportMetadata: { Url: "http://sqs.docker" },
           UserId: "2"
         }
       end
@@ -338,11 +338,11 @@ module Lti
           product_family: product_family,
           product_version: '1',
           workflow_state: 'active',
-          raw_data: {'enabled_capability' => ['vnd.instructure.webhooks.root_account.all']},
+          raw_data: { 'enabled_capability' => ['vnd.instructure.webhooks.root_account.all'] },
           lti_version: '1'
         )
       end
-      let(:validator){ SubscriptionsValidator.new(subscription, tool_proxy) }
+      let(:validator) { SubscriptionsValidator.new(subscription, tool_proxy) }
 
       it "does not raise error if ToolProxy::active_in_context? returns true" do
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)

@@ -33,7 +33,7 @@ class Quizzes::QuizQuestion::EssayQuestion < Quizzes::QuizQuestion::Base
 
   # TODO: remove once new stats is on for everybody
   def stats(responses)
-    stats = {:essay_responses => []}
+    stats = { :essay_responses => [] }
 
     responses.each do |response|
       stats[:essay_responses] << {

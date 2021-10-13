@@ -49,7 +49,7 @@ module ActiveRecord
         end
 
         def touch_and_clear_cache_keys(ids_or_records, *key_types)
-          unless key_types.all?{|type| self.skip_touch_for_type?(type)}
+          unless key_types.all? { |type| self.skip_touch_for_type?(type) }
             Array(ids_or_records).sort.each_slice(1000) do |slice|
               self.where(id: slice).touch_all
             end
@@ -58,17 +58,17 @@ module ActiveRecord
         end
 
         def clear_cache_keys(ids_or_records, *key_types)
-          return unless key_types.all?{|type| valid_cache_key_type?(type)} && Canvas::CacheRegister.enabled?
+          return unless key_types.all? { |type| valid_cache_key_type?(type) } && Canvas::CacheRegister.enabled?
 
-          multi_key_types, key_types = key_types.partition{|type| Canvas::CacheRegister.can_use_multi_cache_redis? && self.prefer_multi_cache_for_key_type?(type)}
+          multi_key_types, key_types = key_types.partition { |type| Canvas::CacheRegister.can_use_multi_cache_redis? && self.prefer_multi_cache_for_key_type?(type) }
 
           ::Shard.partition_by_shard(Array(ids_or_records)) do |sharded_ids_or_records|
-            base_keys = sharded_ids_or_records.map{|item| base_cache_register_key_for(item)}.compact
+            base_keys = sharded_ids_or_records.map { |item| base_cache_register_key_for(item) }.compact
             next if base_keys.empty?
 
             if key_types.any?
-              base_keys.group_by{|key| Canvas::CacheRegister.redis(key, ::Shard.current)}.each do |redis, node_base_keys|
-                node_base_keys.map{|k| key_types.map{|type| "#{k}/#{type}"}}.flatten.each_slice(1000) do |slice|
+              base_keys.group_by { |key| Canvas::CacheRegister.redis(key, ::Shard.current) }.each do |redis, node_base_keys|
+                node_base_keys.map { |k| key_types.map { |type| "#{k}/#{type}" } }.flatten.each_slice(1000) do |slice|
                   redis.del(*slice)
                 end
               end
@@ -111,9 +111,9 @@ module ActiveRecord
         self.class.clear_cache_keys(self, *key_types)
       end
 
-      def cache_key(key_type=nil)
+      def cache_key(key_type = nil)
         return super() if key_type.nil? || self.new_record? ||
-            !self.class.valid_cache_key_type?(key_type) || !Canvas::CacheRegister.enabled?
+                          !self.class.valid_cache_key_type?(key_type) || !Canvas::CacheRegister.enabled?
 
         self.class.cache_key_for_id(self.global_id, key_type, skip_check: true)
       end

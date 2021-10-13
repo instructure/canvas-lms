@@ -24,7 +24,7 @@ class Quizzes::QuizSubmissionEventPartitioner
     Setting.get('quiz_events_partitions_precreate_months', 2).to_i
   end
 
-  def self.process(in_migration=false)
+  def self.process(in_migration = false)
     GuardRail.activate(:deploy) do
       log '*' * 80
       log '-' * 80
@@ -33,7 +33,7 @@ class Quizzes::QuizSubmissionEventPartitioner
 
       partman.ensure_partitions(precreate_tables)
 
-      Shard.current.database_server.unguard {partman.prune_partitions(Setting.get("quiz_events_partitions_keep_months", 6).to_i)}
+      Shard.current.database_server.unguard { partman.prune_partitions(Setting.get("quiz_events_partitions_keep_months", 6).to_i) }
 
       log 'Done. Bye!'
       log '*' * 80

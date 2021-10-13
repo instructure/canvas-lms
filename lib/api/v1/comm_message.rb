@@ -27,5 +27,4 @@ module Api::V1::CommMessage
     result['from_name'] ||= HostUrl.outgoing_email_default_name
     result
   end
-
 end

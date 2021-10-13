@@ -113,7 +113,7 @@ describe MicrosoftSync::Group do
 
   describe '#update_unless_deleted' do
     def run_method!
-      subject.update_unless_deleted(workflow_state: 'errored', job_state: {abc: true})
+      subject.update_unless_deleted(workflow_state: 'errored', job_state: { abc: true })
     end
 
     context 'when state is deleted in the database' do
@@ -172,9 +172,9 @@ describe MicrosoftSync::Group do
   describe '#job_state' do
     it 'serializes TimeWithZone objects, symbols, and complex data structures' do
       time = 1.minute.from_now
-      subject.job_state = {a: {'b' => time}}
+      subject.job_state = { a: { 'b' => time } }
       subject.save
-      expect(described_class.find(subject.id).job_state).to eq(a: {'b' => time})
+      expect(described_class.find(subject.id).job_state).to eq(a: { 'b' => time })
     end
   end
 

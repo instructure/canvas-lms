@@ -24,9 +24,8 @@ require 'json/jwt'
 module Lti
   module Oauth2
     describe AccessToken do
-
-      let(:aud){'http://example.com'}
-      let(:sub) {'12084434-0c58-4058-b8c0-4af2da9c2ef8'}
+      let(:aud) { 'http://example.com' }
+      let(:sub) { '12084434-0c58-4058-b8c0-4af2da9c2ef8' }
       let(:body) do
         {
           iss: 'Canvas',
@@ -41,10 +40,10 @@ module Lti
       end
 
       describe "#to_s" do
-        let(:access_token) {Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: sub)}
+        let(:access_token) { Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: sub) }
 
         it "is signed by the canvas secret" do
-          expect{Canvas::Security.decode_jwt(access_token.to_s)}.to_not raise_error
+          expect { Canvas::Security.decode_jwt(access_token.to_s) }.to_not raise_error
         end
 
         it "has an 'iss' set to 'Canvas'" do
@@ -113,12 +112,12 @@ module Lti
       end
 
       describe ".from_jwt" do
-        let(:token) {Canvas::Security.create_jwt(body)}
-        let(:access_token) {Lti::Oauth2::AccessToken.from_jwt(aud: aud, jwt: token)}
+        let(:token) { Canvas::Security.create_jwt(body) }
+        let(:access_token) { Lti::Oauth2::AccessToken.from_jwt(aud: aud, jwt: token) }
 
         it "raises an InvalidTokenError if not signed by the correct secret" do
           invalid_token = Canvas::Security.create_jwt(body, nil, 'invalid')
-          expect{ Lti::Oauth2::AccessToken.from_jwt(aud: aud, jwt: invalid_token)}.to raise_error InvalidTokenError
+          expect { Lti::Oauth2::AccessToken.from_jwt(aud: aud, jwt: invalid_token) }.to raise_error InvalidTokenError
         end
 
         it "Sets the 'shard_id'" do
@@ -127,8 +126,8 @@ module Lti
       end
 
       describe "#validate!" do
-        let(:token) {Canvas::Security.create_jwt(body)}
-        let(:access_token) {Lti::Oauth2::AccessToken.from_jwt(aud: aud, jwt: token)}
+        let(:token) { Canvas::Security.create_jwt(body) }
+        let(:access_token) { Lti::Oauth2::AccessToken.from_jwt(aud: aud, jwt: token) }
 
         it "returns true if there are no errors" do
           expect(access_token.validate!).to eq true
@@ -141,36 +140,34 @@ module Lti
 
         it "raises an InvalidTokenError if 'iss' is not 'Canvas'" do
           body[:iss] = 'invalid iss'
-          expect{ access_token.validate! }.to raise_error InvalidTokenError, 'invalid iss'
+          expect { access_token.validate! }.to raise_error InvalidTokenError, 'invalid iss'
         end
 
         it "raises an InvalidTokenError if the 'exp' is in the past" do
           body[:exp] = 1.hour.ago
-          expect{ access_token.validate! }.to raise_error InvalidTokenError, 'token has expired'
+          expect { access_token.validate! }.to raise_error InvalidTokenError, 'token has expired'
         end
 
         it "raises an InvalidTokenError if the 'aud' is different than the passed in 'aud'" do
           body[:aud] = 'invalid aud'
-          expect{ access_token.validate! }.to raise_error InvalidTokenError, 'invalid aud'
+          expect { access_token.validate! }.to raise_error InvalidTokenError, 'invalid aud'
         end
 
         it "handles an array for aud" do
           body[:aud] = [aud, 'file_host']
-          expect{ access_token.validate!}.to_not raise_error
+          expect { access_token.validate! }.to_not raise_error
         end
 
         it "raises an InvalidTokenError if the 'iat' is in the future" do
           body[:iat] = 1.hour.from_now
-          expect{ access_token.validate! }.to raise_error InvalidTokenError, 'iat must be in the past'
+          expect { access_token.validate! }.to raise_error InvalidTokenError, 'iat must be in the past'
         end
 
         it "raises an InvalidTokenError if the 'nbf' is in the future" do
           body[:nbf] = 1.hour.from_now
-          expect{ access_token.validate! }.to raise_error InvalidTokenError
+          expect { access_token.validate! }.to raise_error InvalidTokenError
         end
-
       end
-
     end
   end
 end

@@ -38,30 +38,30 @@ module ConditionalRelease
       before :once do
         @rule = create :rule
         create :scoring_range_with_assignments,
-          rule: @rule,
-          lower_bound: 90,
-          upper_bound: nil,
-          assignment_set_count: 1
+               rule: @rule,
+               lower_bound: 90,
+               upper_bound: nil,
+               assignment_set_count: 1
         create :scoring_range_with_assignments,
-          rule: @rule,
-          lower_bound: 70,
-          upper_bound: 90,
-          assignment_set_count: 1
+               rule: @rule,
+               lower_bound: 70,
+               upper_bound: 90,
+               assignment_set_count: 1
         create :scoring_range_with_assignments,
-          rule: @rule,
-          lower_bound: 50,
-          upper_bound: 70,
-          assignment_set_count: 1
+               rule: @rule,
+               lower_bound: 50,
+               upper_bound: 70,
+               assignment_set_count: 1
       end
 
       it 'must apply all scoring ranges' do
         expect(@rule.assignment_sets_for_score(91).length).to eq(1)
         # create a range that crosses the ranges above
         create :scoring_range_with_assignments,
-          rule: @rule,
-          lower_bound: 80,
-          upper_bound: 95,
-          assignment_set_count: 2
+               rule: @rule,
+               lower_bound: 80,
+               upper_bound: 95,
+               assignment_set_count: 2
         expect(@rule.assignment_sets_for_score(91).length).to eq(3)
       end
 
@@ -82,9 +82,9 @@ module ConditionalRelease
         @rule2 = create :rule_with_scoring_ranges, assignment_set_count: 0
         @rule3 = create :rule_with_scoring_ranges, assignment_count: 0
         @rule4 = create :rule_with_scoring_ranges,
-          scoring_range_count: 1,
-          assignment_set_count: 1,
-          assignment_count: 1
+                        scoring_range_count: 1,
+                        assignment_set_count: 1,
+                        assignment_count: 1
         @rule5 = create :rule
       end
 
@@ -95,7 +95,7 @@ module ConditionalRelease
       end
 
       it 'returns complete rules when assignments are present' do
-        rule = rules.find{ |r| r.id == @rule1.id }
+        rule = rules.find { |r| r.id == @rule1.id }
         expect(rule.scoring_ranges.length).to eq @rule1.scoring_ranges.length
       end
     end

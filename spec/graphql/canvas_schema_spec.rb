@@ -37,8 +37,8 @@ describe CanvasSchema do
     GQL
   end
   let(:course_gql_id) { GraphQL::Schema::UniqueWithinType.encode("Course", @course.id) }
-  let(:variables) { {representations: [{ __typename: 'Course', id: course_gql_id }]} }
-  let(:gql_context) { {current_user: @student} }
+  let(:variables) { { representations: [{ __typename: 'Course', id: course_gql_id }] } }
+  let(:gql_context) { { current_user: @student } }
 
   let(:all_courses_query) do
     <<~GQL
@@ -52,7 +52,7 @@ describe CanvasSchema do
 
   it "exposes defined queries" do
     result = CanvasSchema.execute(all_courses_query, context: gql_context)
-    expect(result["data"]).to eq({"allCourses" => [{"name" => course_name}]})
+    expect(result["data"]).to eq({ "allCourses" => [{ "name" => course_name }] })
   end
 
   it "does not expose Apollo Federation special types" do
@@ -65,12 +65,12 @@ describe CanvasSchema do
   describe ".for_federation" do
     it "exposes defined queries" do
       result = CanvasSchema.for_federation.execute(all_courses_query, context: gql_context)
-      expect(result["data"]).to eq({"allCourses" => [{"name" => course_name}]})
+      expect(result["data"]).to eq({ "allCourses" => [{ "name" => course_name }] })
     end
 
     it "exposes Apollo Federation special types" do
       result = CanvasSchema.for_federation.execute(entities_query, variables: variables, context: gql_context)
-      expect(result["data"]).to eq({"_entities" => [{"name" => course_name}]})
+      expect(result["data"]).to eq({ "_entities" => [{ "name" => course_name }] })
     end
   end
 end

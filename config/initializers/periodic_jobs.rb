@@ -44,7 +44,7 @@ class PeriodicJobs
     end
 
     if jitter.present?
-      run_at = rand((run_at+10.seconds)..(run_at + jitter))
+      run_at = rand((run_at + 10.seconds)..(run_at + jitter))
     end
     run_at
   end
@@ -55,6 +55,7 @@ class PeriodicJobs
       strand = "#{klass}.#{method}:#{Shard.current.database_server.id}"
       # TODO: allow this to work with redis jobs
       next if Delayed::Job == Delayed::Backend::ActiveRecord::Job && Delayed::Job.where(strand: strand, shard_id: Shard.current.id, locked_by: nil).exists?
+
       dj_params = {
         strand: strand,
         priority: 40
@@ -200,8 +201,8 @@ Rails.configuration.after_initialize do
     AuthenticationProvider::SAML::Federation.descendants.each do |federation|
       Delayed::Periodic.cron "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers", '45 0 * * *' do
         DatabaseServer.send_in_each_region(federation,
-                                    :refresh_providers,
-                                    singleton: "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers")
+                                           :refresh_providers,
+                                           singleton: "AuthenticationProvider::SAML::#{federation.class_name}.refresh_providers")
       end
     end
   end
@@ -254,6 +255,10 @@ Rails.configuration.after_initialize do
     Canvas::Oauth::KeyStorage.rotate_keys
   end
 
+  Delayed::Periodic.cron 'CanvasSecurity::ServicesJwt::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
+    CanvasSecurity::KeyStorage.rotate_keys
+  end
+
   Delayed::Periodic.cron 'Purgatory.expire_old_purgatories', '0 0 * * *', priority: Delayed::LOWER_PRIORITY do
     with_each_shard_by_database(Purgatory, :expire_old_purgatories, local_offset: true)
   end
@@ -270,8 +275,8 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(ScheduledSmartAlert, :queue_current_jobs)
   end
 
-  Delayed::Periodic.cron 'Course.sync_homeroom_enrollments', '5 0 * * *' do
-    with_each_shard_by_database(Course, :sync_homeroom_enrollments)
+  Delayed::Periodic.cron 'Course.sync_with_homeroom', '5 0 * * *' do
+    with_each_shard_by_database(Course, :sync_with_homeroom)
   end
 
   # the default is hourly, and we picked a weird minute just to avoid
@@ -285,11 +290,10 @@ Rails.configuration.after_initialize do
   if MultiCache.cache.is_a?(ActiveSupport::Cache::HaStore) && MultiCache.cache.options[:consul_event] && InstStatsd.settings.present?
     Delayed::Periodic.cron 'HaStore.validate_consul_event', '5 * * * *' do
       DatabaseServer.send_in_each_region(MultiCache, :validate_consul_event,
-          {
-            run_current_region_asynchronously: true,
-            singleton: 'HaStore.validate_consul_event'
-          }
-        )
+                                         {
+                                           run_current_region_asynchronously: true,
+                                           singleton: 'HaStore.validate_consul_event'
+                                         })
     end
   end
 end

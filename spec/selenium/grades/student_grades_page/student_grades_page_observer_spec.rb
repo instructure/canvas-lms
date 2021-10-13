@@ -27,15 +27,15 @@ describe "gradebook" do
     before(:each) do
       user_with_pseudonym
       course_with_observer user: @user, active_all: true
-      @course.observers=[@observer]
+      @course.observers = [@observer]
       assignment_setup_defaults
       assignment_setup
-      @all_students.each {|s| add_linked_observer(s, @observer)}
+      @all_students.each { |s| add_linked_observer(s, @observer) }
 
       user_session(@teacher)
     end
 
-    it "should allow observer to see grade totals" do
+    it "allows observer to see grade totals" do
       get "/courses/#{@course.id}/grades/#{@student_2.id}"
       expect(f(".final_grade .grade")).to include_text("66.67")
       f("#only_consider_graded_assignments_wrapper").click

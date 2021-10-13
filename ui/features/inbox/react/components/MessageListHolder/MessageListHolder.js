@@ -16,15 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import I18n from 'i18n!conversations_2'
 import PropTypes from 'prop-types'
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useContext} from 'react'
+import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 import {MessageListItem, conversationProp} from './MessageListItem'
+import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../../graphql/Mutations'
 
 export const MessageListHolder = ({...props}) => {
   const [selectedMessages, setSelectedMessages] = useState([])
   const [rangeClickStart, setRangeClickStart] = useState()
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
   const provideConversationsForOnSelect = conversationIds => {
     const matchedConversations = props.conversations
@@ -118,6 +123,27 @@ export const MessageListHolder = ({...props}) => {
     provideConversationsForOnSelect([...updatedSelectedMessage])
   }
 
+  const [readStateChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
+    onCompleted(data) {
+      if (data.updateConversationParticipants.errors) {
+        setOnFailure(I18n.t('Read state change operation failed'))
+      } else {
+        setOnSuccess(
+          I18n.t(
+            {
+              one: 'Read state Changed!',
+              other: 'Read states Changed!'
+            },
+            {count: '1000'}
+          )
+        )
+      }
+    },
+    onError() {
+      setOnFailure(I18n.t('Read state change failed'))
+    }
+  })
+
   return (
     <View
       as="div"
@@ -139,6 +165,7 @@ export const MessageListHolder = ({...props}) => {
             onSelect={handleItemSelection}
             onStar={props.onStar}
             key={conversation._id}
+            readStateChangeConversationParticipants={readStateChangeConversationParticipants}
           />
         )
       })}
@@ -148,13 +175,15 @@ export const MessageListHolder = ({...props}) => {
 
 const conversationParticipantsProp = PropTypes.shape({
   id: PropTypes.string,
+  _id: PropTypes.string,
   workflowState: PropTypes.string,
-  conversation: conversationProp
+  conversation: conversationProp,
+  label: PropTypes.string
 })
 
 MessageListHolder.propTypes = {
   conversations: PropTypes.arrayOf(conversationParticipantsProp),
-  id: PropTypes.number,
+  id: PropTypes.string,
   onOpen: PropTypes.func,
   onSelect: PropTypes.func,
   onStar: PropTypes.func

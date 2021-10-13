@@ -54,12 +54,14 @@ module Lti
         unless parts.size == 5 && Canvas::Security.hmac_sha1(parts[0..-2].join('-'), key) == parts[-1]
           raise BasicLTI::BasicOutcomes::Unauthorized, "Invalid logout service token"
         end
+
         pseudonym = Pseudonym.find(parts[1].to_i)
         timestamp = parts[2].to_i
         nonce = parts[3]
         unless Time.now.to_i - timestamp < Lti::LogoutService::TOKEN_EXPIRATION
           raise BasicLTI::BasicOutcomes::Unauthorized, "Logout service token has expired"
         end
+
         Token.new(tool, pseudonym, timestamp, nonce)
       end
     end
@@ -82,16 +84,20 @@ module Lti
 
     def self.register_logout_callback(token, callback)
       return unless token.pseudonym && token.pseudonym.id && callback.present?
+
       callbacks = get_logout_callbacks(token.pseudonym)
       raise BasicLTI::BasicOutcomes::Unauthorized, 'Logout service token has already been used' if callbacks.has_key?(token.nonce)
+
       callbacks[token.nonce] = callback
       Rails.cache.write(cache_key(token.pseudonym), callbacks, :expires_in => 1.day)
     end
 
     def self.queue_callbacks(pseudonym)
       return unless pseudonym && pseudonym.id
+
       callbacks = get_logout_callbacks(pseudonym)
       return unless callbacks.any?
+
       clear_logout_callbacks(pseudonym)
       Delayed::Job.enqueue(Lti::LogoutService::Runner.new(callbacks))
     end

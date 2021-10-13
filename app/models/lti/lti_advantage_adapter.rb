@@ -20,7 +20,6 @@
 require 'lti_advantage'
 
 module Lti
-
   # Responsible for generating parameters for both Login requests
   # and Authentication Responses (ID token).
   #
@@ -145,12 +144,13 @@ module Lti
 
     def target_link_uri
       return @target_link_uri if @target_link_uri.present?
+
       resource_type ? @tool.extension_setting(resource_type, :target_link_uri) : @tool.url
     end
 
     def generate_lti_params
       if resource_type&.to_sym == :course_assignments_menu &&
-        !Account.site_admin.feature_enabled?(:lti_multiple_assignment_deep_linking)
+         !Account.site_admin.feature_enabled?(:lti_multiple_assignment_deep_linking)
         return resource_link_request.generate_post_payload
       end
 

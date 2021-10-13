@@ -97,6 +97,7 @@ def computeTestCount() {
       bash -c "bundle exec rspec --dry-run ${changedTestsArr.join(' ')} --require ./build/new-jenkins/rspec_location.rb --format RSpecLocationFormatter --out ${env.DOCKER_WORKDIR}/tmp/test_list_split"
   """
 
+  sh "sed -i '/shared_examples/d' $env.LOCAL_WORKDIR/tmp/test_list_split"
   changedTests = readFile("$env.LOCAL_WORKDIR/tmp/test_list_split").trim()
   changedTestsArr = changedTests.split('\n')
 

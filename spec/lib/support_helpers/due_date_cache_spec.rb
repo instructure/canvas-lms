@@ -21,7 +21,6 @@ require_relative '../../spec_helper'
 
 describe SupportHelpers::DueDateCache do
   describe "CourseFixer" do
-
     let(:course) { Account.default.courses.create!(name: 'ddc') }
     let(:user) { User.create! }
 

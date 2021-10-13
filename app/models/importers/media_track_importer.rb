@@ -21,11 +21,11 @@ require_dependency 'importers'
 
 module Importers
   class MediaTrackImporter < Importer
-
     self.item_class = MediaTrack
 
     def self.process_migration(data, migration)
       return unless data.present?
+
       data.each do |file_id, track_list|
         file = migration.context.attachments.where(migration_id: file_id).first
         if file && file.media_object
@@ -39,6 +39,7 @@ module Importers
     def self.import_from_migration(media_object, track, migration)
       file = migration.context.attachments.where(migration_id: track[:migration_id]).first
       return unless file
+
       mt = media_object.media_tracks.build
       mt.kind = track['kind']
       mt.locale = track['locale']
@@ -55,6 +56,5 @@ module Importers
       # remove temporary file
       file.destroy if file.full_path.starts_with?(File.join(Folder::ROOT_FOLDER_NAME, CC::CCHelper::MEDIA_OBJECTS_FOLDER) + '/')
     end
-
   end
 end

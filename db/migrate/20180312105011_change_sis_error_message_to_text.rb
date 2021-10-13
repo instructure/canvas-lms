@@ -22,11 +22,13 @@ class ChangeSisErrorMessageToText < ActiveRecord::Migration[5.0]
 
   def self.up
     return if column_exists?(:sis_batch_errors, :message, :text)
+
     change_column :sis_batch_errors, :message, :text
   end
 
   def self.down
     return if column_exists?(:sis_batch_errors, :message, :string)
+
     change_column :sis_batch_errors, :message, :string
   end
 end

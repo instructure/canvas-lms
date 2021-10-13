@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# coding: utf-8
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -41,29 +40,29 @@ describe Attachments::Verification do
   end
 
   context "creating a verifier" do
-    it "should create a verifier with the attachment id and ctx" do
+    it "creates a verifier with the attachment id and ctx" do
       expect(CanvasSecurity).to receive(:create_jwt).with({
-        id: attachment.global_id, user_id: student.global_id, ctx: course.asset_string
-      }, nil).and_return("thetoken")
+                                                            id: attachment.global_id, user_id: student.global_id, ctx: course.asset_string
+                                                          }, nil).and_return("thetoken")
 
       verifier = v.verifier_for_user(student, context: course.asset_string)
       expect(verifier).to eq("thetoken")
     end
 
-    it "should not include user id if one is not specified" do
+    it "does not include user id if one is not specified" do
       expect(CanvasSecurity).to receive(:create_jwt).with({
-        id: attachment.global_id, ctx: course.asset_string
-      }, nil).and_return("thetoken")
+                                                            id: attachment.global_id, ctx: course.asset_string
+                                                          }, nil).and_return("thetoken")
 
       verifier = v.verifier_for_user(nil, context: course.asset_string)
       expect(verifier).to eq("thetoken")
     end
 
-    it "should include the expiration if supplied" do
+    it "includes the expiration if supplied" do
       expires = 1.hour.from_now
       expect(CanvasSecurity).to receive(:create_jwt).with({
-        id: attachment.global_id, ctx: course.asset_string
-      }, expires).and_return("thetoken")
+                                                            id: attachment.global_id, ctx: course.asset_string
+                                                          }, expires).and_return("thetoken")
 
       verifier = v.verifier_for_user(nil, context: course.asset_string, expires: expires)
       expect(verifier).to eq("thetoken")
@@ -75,7 +74,7 @@ describe Attachments::Verification do
       allow(InstStatsd::Statsd).to receive(:increment)
     end
 
-    it "should verify a legacy verifier for read and download" do
+    it "verifies a legacy verifier for read and download" do
       expect(v.valid_verifier_for_permission?(attachment.uuid, :read)).to eq(true)
       expect(v.valid_verifier_for_permission?(attachment.uuid, :download)).to eq(true)
       expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.legacy_verifier_success").twice
@@ -91,27 +90,27 @@ describe Attachments::Verification do
       expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
-    it "should return false on an invalid verifier" do
+    it "returns false on an invalid verifier" do
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_raise(CanvasSecurity::InvalidToken)
       expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
       expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.token_verifier_invalid")
     end
 
-    it "should return false on token id mismatch" do
+    it "returns false on token id mismatch" do
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_return({
-        id: attachment.global_id + 1
-      })
+                                                                                id: attachment.global_id + 1
+                                                                              })
       expect(v.valid_verifier_for_permission?("token", :read)).to eq(false)
       expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.token_verifier_id_mismatch")
     end
 
-    it "should not let a student download an attachment that's locked" do
+    it "does not let a student download an attachment that's locked" do
       att2 = attachment_model(context: course)
       att2.update_attribute(:locked, true)
       v2 = Attachments::Verification.new(att2)
       expect(CanvasSecurity).to receive(:decode_jwt).with("token").and_return({
-        id: att2.global_id, user_id: student.global_id
-      }).twice
+                                                                                id: att2.global_id, user_id: student.global_id
+                                                                              }).twice
       expect(v2.valid_verifier_for_permission?("token", :read)).to eq(true)
       expect(v2.valid_verifier_for_permission?("token", :download)).to eq(false)
       expect(InstStatsd::Statsd).to have_received(:increment).with("attachments.token_verifier_success").twice
@@ -144,12 +143,12 @@ describe Attachments::Verification do
       expect(v2.valid_verifier_for_permission?(token, :read)).to eq(false)
       expect(v2.valid_verifier_for_permission?(token, :download)).to eq(false)
 
-      mock_session = {eportfolio_ids: [eportfolio.id], permissions_key: SecureRandom.uuid}
+      mock_session = { eportfolio_ids: [eportfolio.id], permissions_key: SecureRandom.uuid }
       expect(v2.valid_verifier_for_permission?(token, :read, mock_session)).to eq(true)
       expect(v2.valid_verifier_for_permission?(token, :download, mock_session)).to eq(true)
     end
 
-    it "should support custom permissions checks on nil (public) user" do
+    it "supports custom permissions checks on nil (public) user" do
       att2 = attachment_model(context: student)
       eportfolio = student.eportfolios.create! public: false
       v2 = Attachments::Verification.new(att2)
@@ -157,7 +156,7 @@ describe Attachments::Verification do
 
       expect(v2.valid_verifier_for_permission?(token, :read)).to eq(false)
       expect(v2.valid_verifier_for_permission?(token, :download)).to eq(false)
-      mock_session = {eportfolio_ids: [eportfolio.id], permissions_key: SecureRandom.uuid}
+      mock_session = { eportfolio_ids: [eportfolio.id], permissions_key: SecureRandom.uuid }
       expect(v2.valid_verifier_for_permission?(token, :read, mock_session)).to eq(true)
       expect(v2.valid_verifier_for_permission?(token, :download, mock_session)).to eq(true)
     end

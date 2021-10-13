@@ -35,17 +35,17 @@ module ConditionalRelease
     end
 
     scope :latest, -> {
-      select('DISTINCT ON (assignment_set_id, student_id) id').
-        order('assignment_set_id, student_id, created_at DESC')
+      select('DISTINCT ON (assignment_set_id, student_id) id')
+        .order('assignment_set_id, student_id, created_at DESC')
     }
 
-    def self.current_assignments(student_id_or_ids, sets=nil)
+    def self.current_assignments(student_id_or_ids, sets = nil)
       conditions = { student_id: student_id_or_ids }
       conditions[:assignment_set] = sets if sets
       self.where(id: self.latest.where(conditions), action: 'assign')
     end
 
-    def self.create_from_sets(assigned, unassigned, opts={})
+    def self.create_from_sets(assigned, unassigned, opts = {})
       opts[:actor_id] ||= opts[:student_id]
 
       [['assign', assigned], ['unassign', unassigned]].each do |action, sets|

@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'account_notification' do
   before :once do
-    account = Account.create!(:name => "some account", :settings => {:outgoing_email_default_name => "Custom From"})
+    account = Account.create!(:name => "some account", :settings => { :outgoing_email_default_name => "Custom From" })
     @announcement = account_notification(account: account)
   end
 
@@ -34,7 +34,7 @@ describe 'account_notification' do
   context ".email" do
     let(:path_type) { :email }
 
-    it "should use the custom From: setting" do
+    it "uses the custom From: setting" do
       msg = generate_message(notification_name, path_type, asset)
       msg.save
       expect(msg.from_name).to eq "Custom From"

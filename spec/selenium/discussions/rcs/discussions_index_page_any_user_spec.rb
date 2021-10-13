@@ -23,7 +23,7 @@ describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
 
-  let(:course) { course_model.tap{|course| course.offer!} }
+  let(:course) { course_model.tap { |course| course.offer! } }
   let(:student) { student_in_course(course: course, name: 'student', active_all: true).user }
   let(:teacher) { teacher_in_course(course: course, name: 'teacher', active_all: true).user }
   let(:somebody) { student_in_course(course: course, name: 'somebody', active_all: true).user }
@@ -44,7 +44,7 @@ describe "discussions" do
 
       let(:topic) { somebody_topic }
 
-      it "should start a new topic", priority: "1", test_id: 140669 do
+      it "starts a new topic", priority: "1", test_id: 140669 do
         get url
         expect_new_page_load { f('#add_discussion').click }
         edit('new topic title', 'new topic')

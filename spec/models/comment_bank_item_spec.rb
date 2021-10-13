@@ -21,7 +21,6 @@
 require_relative '../spec_helper'
 
 describe CommentBankItem, type: :model do
-
   let(:course) { course_model }
   let(:user) { user_model }
   let(:comment) { 'comment' }
@@ -36,7 +35,6 @@ describe CommentBankItem, type: :model do
     it { is_expected.to validate_length_of(:comment).is_at_most(ActiveRecord::Base.maximum_text_length) }
     it { is_expected.to validate_length_of(:comment).is_at_least(1) }
   end
-
 
   it_behaves_like "soft deletion" do
     subject { CommentBankItem }
@@ -82,7 +80,7 @@ describe CommentBankItem, type: :model do
 
       it 'requires manage_grades permissions' do
         expect(subject.grants_right?(user, :create)).to be(true)
-        user = account_admin_user_with_role_changes(user: user, role_changes: {manage_grades: false})
+        user = account_admin_user_with_role_changes(user: user, role_changes: { manage_grades: false })
         expect(subject.grants_right?(user, :create)).to be(false)
       end
     end

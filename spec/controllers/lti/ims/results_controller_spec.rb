@@ -27,7 +27,7 @@ describe Lti::Ims::ResultsController do
   include_context 'advantage services context'
 
   let(:assignment) do
-    opts = {course: course, points_possible: 5}
+    opts = { course: course, points_possible: 5 }
     if tool.present?
       opts[:submission_types] = 'external_tool'
       opts[:external_tool_tag_attributes] = {

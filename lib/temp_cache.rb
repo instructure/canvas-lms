@@ -40,7 +40,7 @@ class TempCache
   end
 
   def self.create_key(*args)
-    args.map{|arg| arg.is_a?(ActiveRecord::Base) ? arg.global_asset_string : arg.to_s }.join("/")
+    args.map { |arg| arg.is_a?(ActiveRecord::Base) ? arg.global_asset_string : arg.to_s }.join("/")
   end
 
   def self.cache(*args)

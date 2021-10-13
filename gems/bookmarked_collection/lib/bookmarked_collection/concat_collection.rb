@@ -21,8 +21,10 @@
 class BookmarkedCollection::ConcatCollection < BookmarkedCollection::CompositeCollection
   def validate(bookmark)
     return false unless super
+
     bookmark, index = decompose_bookmark(bookmark)
     return false if index.nil?
+
     return true
   end
 end

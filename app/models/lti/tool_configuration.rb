@@ -57,7 +57,7 @@ module Lti
 
     def self.create_tool_config_and_key!(account, tool_configuration_params)
       settings = if tool_configuration_params[:settings_url].present? && tool_configuration_params[:settings].blank?
-                  retrieve_and_extract_configuration(tool_configuration_params[:settings_url])
+                   retrieve_and_extract_configuration(tool_configuration_params[:settings_url])
                  elsif tool_configuration_params[:settings].present?
                    tool_configuration_params[:settings]&.try(:to_unsafe_hash) || tool_configuration_params[:settings]
                  end
@@ -130,12 +130,13 @@ module Lti
 
       tool = new_external_tool(developer_key.owner_account)
       unless tool.valid?
-        errors.add(:configuration, tool.errors.to_h.map {|k, v| "Tool #{k} #{v}" })
+        errors.add(:configuration, tool.errors.to_h.map { |k, v| "Tool #{k} #{v}" })
       end
     end
 
     def valid_placements
       return if disabled_placements.blank?
+
       invalid = disabled_placements.reject { |p| Lti::ResourcePlacement::PLACEMENTS.include?(p.to_sym) }
       errors.add(:disabled_placements, "Invalid placements: #{invalid.join(', ')}") if invalid.present?
     end
@@ -145,11 +146,12 @@ module Lti
     end
 
     def configuration_to_cet_settings_map
-      {url: configuration['target_link_uri']}
+      { url: configuration['target_link_uri'] }
     end
 
     def canvas_extensions
       return {} if configuration.blank?
+
       extension = configuration['extensions']&.find { |e| e['platform'] == CANVAS_EXTENSION_LABEL }&.deep_dup || { 'settings' => {} }
       # remove any placements at the root level
       extension['settings'].delete_if { |p| Lti::ResourcePlacement::PLACEMENTS.include?(p.to_sym) }

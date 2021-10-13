@@ -36,7 +36,7 @@ module CanvasQuizStatistics::Analyzers
 
       {}.tap do |stats|
         @metrics.map do |metric|
-          params = [ responses ]
+          params = [responses]
 
           if metric[:context].any?
             params += metric[:context].map { |var| context[var] }

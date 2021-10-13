@@ -19,11 +19,11 @@
 #
 
 module Factories
-  def collaboration_model(opts={})
+  def collaboration_model(opts = {})
     @collaboration = factory_with_protected_attributes(Collaboration, valid_collaboration_attributes.merge(opts))
   end
 
-  def google_docs_collaboration_model(opts={})
+  def google_docs_collaboration_model(opts = {})
     @collaboration = factory_with_protected_attributes(GoogleDocsCollaboration, valid_collaboration_attributes.merge(opts))
   end
 

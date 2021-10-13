@@ -21,7 +21,6 @@ require_dependency 'importers'
 
 module Importers
   class DiscussionTopicImporter < Importer
-
     self.item_class = DiscussionTopic
 
     attr_accessor :options, :context, :item, :migration
@@ -34,6 +33,7 @@ module Importers
     def self.process_announcements_migration(announcements, migration)
       announcements.each do |event|
         next unless migration.import_object?('announcements', event['migration_id'])
+
         event[:type] = 'announcement'
 
         begin
@@ -52,6 +52,7 @@ module Importers
                               migration_id: topic['group_id']).first if topic['group_id']
         context ||= migration.context
         next unless context && can_import_topic?(topic, migration)
+
         begin
           import_from_migration(topic.merge(topic_entries_to_import: topic_entries_to_import), context, migration)
         rescue
@@ -62,10 +63,10 @@ module Importers
 
     def self.can_import_topic?(topic, migration)
       migration.import_object?('discussion_topics', topic['migration_id']) ||
-          migration.import_object?("topics", topic['migration_id'])
+        migration.import_object?("topics", topic['migration_id'])
     end
 
-    def self.import_from_migration(hash, context, migration, item=nil)
+    def self.import_from_migration(hash, context, migration, item = nil)
       importer = self.new(hash, context, migration, item)
       importer.run
     end
@@ -74,14 +75,15 @@ module Importers
       self.options = DiscussionTopicOptions.new(hash)
       self.context = context
       self.migration = migration
-      self.item    = find_or_create_topic(item)
+      self.item = find_or_create_topic(item)
       self.item.mark_as_importing!(migration)
     end
 
     def find_or_create_topic(topic = nil)
       return topic if topic.is_a?(DiscussionTopic)
-      topic = DiscussionTopic.where(context_type: context.class.to_s, context_id: context.id).
-        where(['id = ? OR (migration_id IS NOT NULL AND migration_id = ?)', options[:id], options[:migration_id]]).first
+
+      topic = DiscussionTopic.where(context_type: context.class.to_s, context_id: context.id)
+                             .where(['id = ? OR (migration_id IS NOT NULL AND migration_id = ?)', options[:id], options[:migration_id]]).first
       topic ||= if options[:type] =~ /announcement/i
                   context.announcements.temp_record
                 else
@@ -93,10 +95,12 @@ module Importers
 
     def run
       return unless options.importable?
+
       [:migration_id, :title, :discussion_type, :position, :pinned,
        :require_initial_post, :allow_rating, :only_graders_can_rate,
        :sort_by_rating].each do |attr|
         next if options[attr].nil? && item.class.columns_hash[attr.to_s].type == :boolean
+
         item.send("#{attr}=", options[attr])
       end
 
@@ -112,7 +116,7 @@ module Importers
       if options[:assignment]
         options[:assignment][:lock_at] ||= options[:lock_at]
       else
-        item.lock_at         = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:lock_at])
+        item.lock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:lock_at])
       end
       item.todo_date       = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options[:todo_date])
       item.last_reply_at   = nil if item.new_record?
@@ -134,8 +138,8 @@ module Importers
         item.external_feed = context.external_feeds.where(migration_id: options[:external_feed_migration_id]).first
       end
       skip_assignment = migration.for_master_course_import? &&
-        migration.master_course_subscription.content_tag_for(item)&.downstream_changes&.include?("assignment_id") &&
-        !item.editing_restricted?(:settings)
+                        migration.master_course_subscription.content_tag_for(item)&.downstream_changes&.include?("assignment_id") &&
+                        !item.editing_restricted?(:settings)
       unless skip_assignment
         item.assignment = fetch_assignment
       end
@@ -171,14 +175,15 @@ module Importers
 
     def fetch_assignment
       return nil unless context.respond_to?(:assignments)
+
       if options[:assignment]
         Importers::AssignmentImporter.import_from_migration(options[:assignment], context, migration)
       elsif options[:grading]
         Importers::AssignmentImporter.import_from_migration({
-          grading: options[:grading], migration_id: options[:migration_id],
-          submission_format: 'discussion_topic', due_date: options.due_date,
-          title: options[:grading][:title]
-        }, context, migration)
+                                                              grading: options[:grading], migration_id: options[:migration_id],
+                                                              submission_format: 'discussion_topic', due_date: options.due_date,
+                                                              title: options[:grading][:title]
+                                                            }, context, migration)
       end
     end
 
@@ -193,7 +198,7 @@ module Importers
 
       def initialize(options = {})
         @options = options.with_indifferent_access
-        @options[:messages]    ||= @options[:posts]
+        @options[:messages] ||= @options[:posts]
       end
 
       def [](key)

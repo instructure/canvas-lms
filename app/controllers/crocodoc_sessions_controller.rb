@@ -51,7 +51,6 @@ class CrocodocSessionsController < ApplicationController
     else
       render :plain => "Not found", :status => :not_found
     end
-
   rescue HmacHelper::Error
     render :plain => 'unauthorized', :status => :unauthorized
   rescue Timeout::Error

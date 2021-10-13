@@ -21,7 +21,7 @@ module Canvas::Migration
   class Archive
     attr_reader :warnings
 
-    def initialize(settings={})
+    def initialize(settings = {})
       @settings = settings
       @warnings = []
     end
@@ -39,14 +39,15 @@ module Canvas::Migration
 
     def nested_dir
       return false unless zip_file
+
       unless defined?(@nested_dir)
         # sometimes people try to use packages that unzip to a folder containing the files we expect
         # so we should just try to handle it
         # see if there's only one directory at the root
         @nested_dir = nil
         base_entries = zip_file.glob("*")
-        unless base_entries.any?{|e| !e.directory?}
-          root_dirs = base_entries.reject{|e| e.name.split('/').any?{|p| p =~ UnzipAttachment::THINGS_TO_IGNORE_REGEX}}
+        unless base_entries.any? { |e| !e.directory? }
+          root_dirs = base_entries.reject { |e| e.name.split('/').any? { |p| p =~ UnzipAttachment::THINGS_TO_IGNORE_REGEX } }
           @nested_dir = root_dirs.first.name if root_dirs.count == 1
         end
       end
@@ -86,6 +87,7 @@ module Canvas::Migration
         _, uri = CanvasHttp.validate_url(@settings[:course_archive_download_url], check_host: true)
         CanvasHttp.get(@settings[:course_archive_download_url]) do |http_response|
           raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i) unless http_response.code.to_i == 200
+
           tmpfile = CanvasHttp.tempfile_for_uri(uri)
           http_response.read_body(tmpfile)
           tmpfile.rewind
@@ -121,6 +123,7 @@ module Canvas::Migration
 
     def unzip_archive
       return if @unzipped
+
       Rails.logger.debug "Extracting #{path} to #{unzipped_file_path}"
 
       warnings = CanvasUnzip.extract_archive(path, unzipped_file_path, nested_dir: nested_dir)
@@ -158,7 +161,7 @@ module Canvas::Migration
 
     # If the file is a zip file, unzip it, if it's an xml file, copy
     # it into the directory with the given file name
-    def prepare_cartridge_file(file_name='imsmanifest.xml')
+    def prepare_cartridge_file(file_name = 'imsmanifest.xml')
       if self.path.ends_with?('xml')
         FileUtils::cp(self.path, package_root.item_path(file_name))
       else

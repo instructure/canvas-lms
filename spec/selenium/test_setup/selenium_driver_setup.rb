@@ -91,6 +91,7 @@ module SeleniumDriverSetup
                   :server_port
 
     attr_reader :driver
+
     def reset!
       dump_browser_log if browser_log
       @driver = nil
@@ -245,7 +246,7 @@ module SeleniumDriverSetup
     # see https://github.com/SeleniumHQ/selenium/issues/2435#issuecomment-245458210
     def with_vanilla_json
       orig_options = Oj.default_options
-      Oj.default_options = {:escape_mode => :json}
+      Oj.default_options = { :escape_mode => :json }
       yield
     ensure
       Oj.default_options = orig_options
@@ -410,7 +411,6 @@ module SeleniumDriverSetup
       end
 
       puts "found available port: #{app_host_and_port}"
-
     ensure
       s.close() if s
     end
@@ -488,7 +488,7 @@ module SeleniumDriverSetup
       # with our shared conn and transactional fixtures (e.g. special
       # accounts and their caching)
       @allow_requests = false
-      request_mutex.synchronize { }
+      request_mutex.synchronize {}
     end
 
     def allow_requests!
@@ -522,7 +522,6 @@ Selenium::WebDriver::Firefox::Binary.class_eval do
     $DEBUG = nil
   end
 end
-
 
 # make Wait play nicely with Timecop
 module Selenium::WebDriver::Wait::Time

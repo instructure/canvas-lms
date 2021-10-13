@@ -29,9 +29,9 @@ class ScoreStatisticsGenerator
     min = Setting.get("minimum_seconds_wait_for_grade_statistics", 10).to_i
     max = Setting.get("maximum_seconds_wait_for_grade_statistics", 130).to_i
     delay_if_production(singleton: "ScoreStatisticsGenerator:#{course_id}",
-        run_at: rand(min..max).seconds.from_now,
-        on_conflict: :loose).
-      update_score_statistics(course_id)
+                        run_at: rand(min..max).seconds.from_now,
+                        on_conflict: :loose)
+      .update_score_statistics(course_id)
   end
 
   def self.update_score_statistics(course_id)
@@ -48,36 +48,36 @@ class ScoreStatisticsGenerator
     statistics = GuardRail.activate(:secondary) do
       connection = ScoreStatistic.connection
       connection.select_all(<<~SQL)
-      WITH want_assignments AS (
-        SELECT a.id, a.created_at
-        FROM #{Assignment.quoted_table_name} a
-        WHERE a.context_id = #{course_id} AND a.context_type = 'Course' AND a.workflow_state = 'published'
-      ), interesting_submissions AS (
-        SELECT s.assignment_id, s.user_id, s.score, a.created_at
-        FROM #{Submission.quoted_table_name} s
-        JOIN want_assignments a ON s.assignment_id = a.id
+        WITH want_assignments AS (
+          SELECT a.id, a.created_at
+          FROM #{Assignment.quoted_table_name} a
+          WHERE a.context_id = #{course_id} AND a.context_type = 'Course' AND a.workflow_state = 'published'
+        ), interesting_submissions AS (
+          SELECT s.assignment_id, s.user_id, s.score, a.created_at
+          FROM #{Submission.quoted_table_name} s
+          JOIN want_assignments a ON s.assignment_id = a.id
+          WHERE
+            s.excused IS NOT true
+            AND s.score IS NOT NULL
+            AND s.workflow_state = 'graded'
+        ), want_users AS (
+          SELECT e.user_id
+          FROM #{Enrollment.quoted_table_name} e
+          WHERE e.type = 'StudentEnrollment' AND e.course_id = #{course_id} AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')
+        )
+        SELECT
+          s.assignment_id AS id,
+          MAX(s.score) AS max,
+          MIN(s.score) AS min,
+          AVG(s.score) AS avg,
+          COUNT(*) AS count
+        FROM
+          interesting_submissions s
         WHERE
-          s.excused IS NOT true
-          AND s.score IS NOT NULL
-          AND s.workflow_state = 'graded'
-      ), want_users AS (
-        SELECT e.user_id
-        FROM #{Enrollment.quoted_table_name} e
-        WHERE e.type = 'StudentEnrollment' AND e.course_id = #{course_id} AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')
-      )
-      SELECT
-        s.assignment_id AS id,
-        MAX(s.score) AS max,
-        MIN(s.score) AS min,
-        AVG(s.score) AS avg,
-        COUNT(*) AS count
-      FROM
-        interesting_submissions s
-      WHERE
-        s.user_id IN (SELECT user_id FROM want_users)
-      GROUP BY s.assignment_id
-      ORDER BY MIN(s.created_at)
-SQL
+          s.user_id IN (SELECT user_id FROM want_users)
+        GROUP BY s.assignment_id
+        ORDER BY MIN(s.created_at)
+      SQL
     end
 
     connection = ScoreStatistic.connection
@@ -118,8 +118,8 @@ SQL
     current_scores = []
     enrollment_ids = []
     GuardRail.activate(:secondary) do
-      StudentEnrollment.select(:id, :user_id).not_fake.where(course_id: course_id, workflow_state: [:active, :invited]).
-        find_in_batches { |batch| enrollment_ids.concat(batch) }
+      StudentEnrollment.select(:id, :user_id).not_fake.where(course_id: course_id, workflow_state: [:active, :invited])
+                       .find_in_batches { |batch| enrollment_ids.concat(batch) }
       # The grade calculator ensures all enrollments for the same user have the same score, so we only need one
       # enrollment_id for our later score query
       enrollment_ids = enrollment_ids.uniq(&:user_id).map(&:id)

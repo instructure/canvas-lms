@@ -56,7 +56,7 @@
                   aria-label="<%= add_course_aria_label %>"
           >
                   <i class="icon-plus"></i> <%= course_label %></button>
-          <% if k5_user? %>
+          <% if k5_user? || @domain_root_account.feature_enabled?(:create_course_subaccount_picker) %>
             <div id="create_subject_modal_container"></div>
           <% else %>
             <%= render :partial => 'shared/new_course_form' %>

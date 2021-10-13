@@ -30,10 +30,10 @@ describe "assignments" do
       @student2 = student_in_course.user
 
       @assignment = assignment_model({
-        course: @course,
-        peer_reviews: true,
-        automatic_peer_reviews: false,
-      })
+                                       course: @course,
+                                       peer_reviews: true,
+                                       automatic_peer_reviews: false,
+                                     })
 
       @assignment.assign_peer_review(@student1, @student2)
       @assignment.assign_peer_review(@student2, @student1)
@@ -44,7 +44,7 @@ describe "assignments" do
       accept_alert
       wait_for_ajaximations
 
-      expect(fj('.student_reviews:first .peer_reviews').text()).to match /None Assigned/
+      expect(fj('.student_reviews:first .peer_reviews').text()).to match(/None Assigned/)
       keep_trying_until do
         expect(@assignment.reload.submissions.map(&:assessment_requests).flatten.length).to eq 1
       end
@@ -57,11 +57,11 @@ describe "assignments" do
       gc = GroupCategory.create(:name => "Inconceivable", :context => @course)
       @course.groups.create!(:group_category => gc)
       @assignment = assignment_model({
-        course: @course,
-        peer_reviews: true,
-        automatic_peer_reviews: true,
-        group_category_id: gc.id
-      })
+                                       course: @course,
+                                       peer_reviews: true,
+                                       automatic_peer_reviews: true,
+                                       group_category_id: gc.id
+                                     })
 
       submission = @assignment.submit_homework(student)
       submission.submission_type = "online_text_entry"
@@ -80,14 +80,14 @@ describe "assignments" do
         student_in_course(:user => @student1, :active_all => true)
         @student2 = student_in_course(:active_all => true).user
 
-        @assignment = assignment_model({course: @course, peer_reviews: true, automatic_peer_reviews: false})
+        @assignment = assignment_model({ course: @course, peer_reviews: true, automatic_peer_reviews: false })
       end
 
       before :each do
         user_session(@student1)
       end
 
-      it "should not let a student submit a rubric review if the request is completed" do
+      it "does not let a student submit a rubric review if the request is completed" do
         rubric_association_model(purpose: 'grading', association_object: @assignment)
         req = @assignment.assign_peer_review(@student1, @student2)
         req.complete!
@@ -99,7 +99,7 @@ describe "assignments" do
         expect(f("#rubric_holder")).to_not contain_css(".save_rubric_button")
       end
 
-      it "should let a student submit a rubric review even if already completed if a rubric is added afterwards" do
+      it "lets a student submit a rubric review even if already completed if a rubric is added afterwards" do
         req = @assignment.assign_peer_review(@student1, @student2)
         req.complete!
         rubric_association_model(purpose: 'grading', association_object: @assignment)
@@ -127,10 +127,10 @@ describe "assignments" do
       @student = student_in_course.user
 
       @assignment = assignment_model({
-        course: @course,
-        peer_reviews: true,
-        automatic_peer_reviews: false,
-      })
+                                       course: @course,
+                                       peer_reviews: true,
+                                       automatic_peer_reviews: false,
+                                     })
       rubric_association_model(purpose: 'grading', association_object: @assignment)
       @assignment.assign_peer_review(@admin, @student)
 
@@ -154,77 +154,77 @@ describe "assignments" do
     let!(:reviewer) { student_in_course(active_all: true).user }
     let!(:assignment) {
       @assignment = assignment_model({
-        course: review_course,
-        peer_reviews: true,
-        anonymous_peer_reviews: true
-      })
+                                       course: review_course,
+                                       peer_reviews: true,
+                                       anonymous_peer_reviews: true
+                                     })
       @assignment.unmute!
       @assignment
     }
     let!(:submission) {
       submission_model({
-        assignment: assignment,
-        body: 'submission body',
-        course: review_course,
-        grade: "5",
-        score: "5",
-        submission_type: 'online_text_entry',
-        user: reviewed
-      })
+                         assignment: assignment,
+                         body: 'submission body',
+                         course: review_course,
+                         grade: "5",
+                         score: "5",
+                         submission_type: 'online_text_entry',
+                         user: reviewed
+                       })
     }
     let!(:submissionReviewer) {
       submission_model({
-        assignment: assignment,
-        body: 'submission body reviewer',
-        course: review_course,
-        grade: "5",
-        score: "5",
-        submission_type: 'online_text_entry',
-        user: reviewer
-      })
+                         assignment: assignment,
+                         body: 'submission body reviewer',
+                         course: review_course,
+                         grade: "5",
+                         score: "5",
+                         submission_type: 'online_text_entry',
+                         user: reviewer
+                       })
     }
     let!(:comment) {
       submission_comment_model({
-        author: reviewer,
-        submission: submission
-      })
+                                 author: reviewer,
+                                 submission: submission
+                               })
     }
     let!(:rubric) { rubric_model }
     let!(:association) {
       rubric.associate_with(assignment, review_course, {
-        :purpose => 'grading', :use_for_grading => true
-      })
+                              :purpose => 'grading', :use_for_grading => true
+                            })
     }
     let!(:assessment) {
       association.assess({
-        :user => reviewed,
-        :assessor => reviewer,
-        :artifact => submission,
-        :assessment => {
-          :assessment_type => 'peer_review',
-          :criterion_crit1 => {
-            :points => 5,
-            :comments => "Hey, it's a comment."
-          }
-        }
-      })
+                           :user => reviewed,
+                           :assessor => reviewer,
+                           :artifact => submission,
+                           :assessment => {
+                             :assessment_type => 'peer_review',
+                             :criterion_crit1 => {
+                               :points => 5,
+                               :comments => "Hey, it's a comment."
+                             }
+                           }
+                         })
     }
     before(:each) { assignment.assign_peer_review(reviewer, reviewed) }
 
     context 'when reviewed is logged in' do
       before(:each) { user_logged_in(user: reviewed) }
 
-      it 'should block reviewer name on assignments page', priority: "1", test_id: 216384 do
+      it 'blocks reviewer name on assignments page', priority: "1", test_id: 216384 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}"
         expect(f("#comment-#{comment.id} .signature")).to include_text("Anonymous User")
       end
 
-      it 'should hide comment reviewer name on submission page', priority: "1", test_id: 216385 do
+      it 'hides comment reviewer name on submission page', priority: "1", test_id: 216385 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         expect(f("#submission_comment_#{comment.id} .author_name")).to include_text("Anonymous User")
       end
 
-      it 'should hide comment reviewer name on rubric popup', priority: "1", test_id: 216386 do
+      it 'hides comment reviewer name on rubric popup', priority: "1", test_id: 216386 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         f('.assess_submission_link').click
         wait_for_animations
@@ -235,7 +235,7 @@ describe "assignments" do
     context 'when reviewer is logged in' do
       before(:each) { user_logged_in(user: reviewer) }
 
-      it 'should show comment reviewer name on submission page', priority: "1", test_id: 216387 do
+      it 'shows comment reviewer name on submission page', priority: "1", test_id: 216387 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}"
         expect(f("#submission_comment_#{comment.id} .author_name")).to include_text(comment.author_name)
       end
@@ -244,12 +244,12 @@ describe "assignments" do
     context 'when teacher is logged in' do
       before(:each) { user_logged_in(user: teacher) }
 
-      it 'should show comment reviewer name on submission page', priority: "1", test_id: 216389 do
+      it 'shows comment reviewer name on submission page', priority: "1", test_id: 216389 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         expect(f("#submission_comment_#{comment.id} .author_name")).to include_text(comment.author_name)
       end
 
-      it 'should show comment reviewer name on rubric popup', priority: "1", test_id: 216391 do
+      it 'shows comment reviewer name on rubric popup', priority: "1", test_id: 216391 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
         f('.assess_submission_link').click
         wait_for_animations
@@ -291,7 +291,7 @@ describe "assignments" do
         submission.save!
       }
 
-      it 'should show the plagiarism report link for reviewer', priority: "1", test_id: 216392 do
+      it 'shows the plagiarism report link for reviewer', priority: "1", test_id: 216392 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}"
         expect(f(".turnitin_similarity_score")).to be_displayed
       end

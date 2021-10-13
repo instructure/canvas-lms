@@ -74,6 +74,7 @@ module Canvas::Twilio
   # assorted magic that goes into delivering text messages via Twilio.
   def self.deliver(recipient_number, body, from_recipient_country: true)
     raise "Twilio is not configured" unless enabled?
+
     # Figure out what country the recipient number is in
     country = from_recipient_country ? lookup_country(recipient_number) : DEFAULT_COUNTRY
 
@@ -90,11 +91,11 @@ module Canvas::Twilio
     # Ping StatsD about sending from this number
     InstStatsd::Statsd.increment("notifications.twilio.message_sent_from_number.#{outbound_country}.#{outbound_number}",
                                  short_stat: 'notifications.twilio.message_sent',
-                                 tags: {country: outbound_country, number: outbound_number})
+                                 tags: { country: outbound_country, number: outbound_number })
     unless country == outbound_country
       InstStatsd::Statsd.increment("notifications.twilio.no_outbound_numbers_for.#{country}",
                                    short_stat: 'notifications.twilio.no_outbound_numbers',
-                                   tags: {country: country})
+                                   tags: { country: country })
     end
 
     # Then send the message.

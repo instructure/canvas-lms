@@ -31,9 +31,9 @@ describe "context modules" do
       @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
       @assignment = @course.assignments.create!(:title => 'assignment 1', :submission_types => 'online_text_entry')
       @assignment2 = @course.assignments.create!(:title => 'assignment 2',
-        :submission_types => 'online_text_entry',
-        :due_at => 2.days.from_now,
-        :points_possible => 10)
+                                                 :submission_types => 'online_text_entry',
+                                                 :due_at => 2.days.from_now,
+                                                 :points_possible => 10)
       @assignment3 = @course.assignments.create!(:title => 'assignment 3', :submission_types => 'online_text_entry')
 
       @ag1 = @course.assignment_groups.create!(:name => "Assignment Group 1")
@@ -58,7 +58,7 @@ describe "context modules" do
       expect(tag.reload).to be_published
     end
 
-    it "should create a new module using enter key", priority: "2", test_id: 126705 do
+    it "creates a new module using enter key", priority: "2", test_id: 126705 do
       get "/courses/#{@course.id}/modules"
       add_form = new_module_form
       replace_content(add_form.find_element(:id, 'context_module_name'), "module 1")
@@ -70,7 +70,7 @@ describe "context modules" do
       expect(f('.name')).to be_present
     end
 
-    it "should focus close button on open edit modal" do
+    it "focuses close button on open edit modal" do
       get "/courses/#{@course.id}/modules"
 
       module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
@@ -106,7 +106,7 @@ describe "context modules" do
       check_element_has_focus(add_button)
     end
 
-    it "should add a title attribute to the text header" do
+    it "adds a title attribute to the text header" do
       text_header = 'This is a really long module text header that should be truncated to exactly 98 characters plus the ... part so 101 characters really'
       mod = @course.context_modules.create! name: 'TestModule'
       tag1 = mod.add_item(title: text_header, type: 'sub_header')
@@ -118,9 +118,8 @@ describe "context modules" do
     end
 
     context "module item cog focus management", priority: "1" do
-
       before :once do
-        create_modules(1)[0].add_item({id: @assignment.id, type: 'assignment'})
+        create_modules(1)[0].add_item({ id: @assignment.id, type: 'assignment' })
         @tag = ContentTag.last
       end
 
@@ -129,19 +128,19 @@ describe "context modules" do
         f("#context_module_item_#{@tag.id} .al-trigger").click
       end
 
-      it "should return focus to the cog menu when closing the edit dialog for an item" do
+      it "returns focus to the cog menu when closing the edit dialog for an item" do
         hover_and_click("#context_module_item_#{@tag.id} .edit_item_link")
         f('.cancel_button.ui-button').click
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 
-      it "should return focus to the module item cog when indenting" do
+      it "returns focus to the module item cog when indenting" do
         hover_and_click("#context_module_item_#{@tag.id} .indent_item_link")
         wait_for_ajaximations
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 
-      it "should return focus to the module item cog when outdenting" do
+      it "returns focus to the module item cog when outdenting" do
         hover_and_click("#context_module_item_#{@tag.id} .indent_item_link")
         f("#context_module_item_#{@tag.id} .al-trigger").click
         hover_and_click("#context_module_item_#{@tag.id} .outdent_item_link")
@@ -149,7 +148,7 @@ describe "context modules" do
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 
-      it "should return focus to the module item cog when cancelling a delete" do
+      it "returns focus to the module item cog when cancelling a delete" do
         hover_and_click("#context_module_item_#{@tag.id} .delete_item_link")
         expect(driver.switch_to.alert).not_to be_nil
         driver.switch_to.alert.dismiss
@@ -157,7 +156,7 @@ describe "context modules" do
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .al-trigger"))
       end
 
-      it "should return focus to the previous module item link when deleting a module item." do
+      it "returns focus to the previous module item link when deleting a module item." do
         add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
         @tag2 = ContentTag.last
         hover_and_click("#context_module_item_#{@tag2.id} .delete_item_link")
@@ -167,7 +166,7 @@ describe "context modules" do
         check_element_has_focus(fj("#context_module_item_#{@tag.id} .item_link"))
       end
 
-      it "should return focus to the parent module's cog when deleting the first module item." do
+      it "returns focus to the parent module's cog when deleting the first module item." do
         first_tag = ContentTag.first
         hover_and_click("#context_module_item_#{first_tag.id} .delete_item_link")
         expect(driver.switch_to.alert).not_to be_nil
@@ -180,9 +179,9 @@ describe "context modules" do
     context "Keyboard Accessibility", priority: "1" do
       before :once do
         modules = create_modules(2, true)
-        modules[0].add_item({:id => @assignment.id, :type => 'assignment'})
-        modules[0].add_item({:id => @assignment2.id, :type => 'assignment'})
-        modules[1].add_item({:id => @assignment3.id, :type => 'assignment'})
+        modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
+        modules[0].add_item({ :id => @assignment2.id, :type => 'assignment' })
+        modules[1].add_item({ :id => @assignment3.id, :type => 'assignment' })
       end
 
       before :each do
@@ -207,8 +206,7 @@ describe "context modules" do
       # i : Increase Indent
       # o : Decrease Indent
       # n : New Module
-      it "should navigate through modules and module items" do
-
+      it "navigates through modules and module items" do
         # Navigate through modules and module items
         check_element_has_focus(context_modules[0])
 
@@ -225,21 +223,17 @@ describe "context modules" do
         check_element_has_focus(context_modules[0])
       end
 
-      it "should edit modules" do
-
+      it "edits modules" do
         send_keys("e")
         expect(f('#add_context_module_form')).to be_displayed
       end
 
-      it "should create a module" do
-
+      it "creates a module" do
         send_keys("n")
         expect(f('#add_context_module_form')).to be_displayed
       end
 
-
-      it "should indent / outdent" do
-
+      it "indents / outdent" do
         send_keys(:arrow_down)
         check_element_has_focus(context_module_items[0])
 
@@ -255,8 +249,7 @@ describe "context modules" do
         expect(f('.context_module_item')).to have_class('indent_0')
       end
 
-      it "should delete" do
-
+      it "deletes" do
         # Test Delete key
         send_keys("d")
         driver.switch_to.alert.accept

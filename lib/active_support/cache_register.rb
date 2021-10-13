@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 module ActiveSupport
   module CacheRegister
     module Cache
@@ -38,14 +37,14 @@ module ActiveSupport
         # so you should just use clear_cache_key
         def fetch_with_batched_keys(key, batch_object:, batched_keys:, skip_cache_if_disabled: false, **opts, &block)
           batched_keys = Array(batched_keys)
-          multi_types = batched_keys.select{|type| batch_object&.class&.prefer_multi_cache_for_key_type?(type)}
+          multi_types = batched_keys.select { |type| batch_object&.class&.prefer_multi_cache_for_key_type?(type) }
           if multi_types.any? && !::Rails.env.production?
-           raise "fetch_with_batched_keys is not supported for multi-cache enabled key(s) - #{multi_types.join(", ")} on #{batch_object.class.name}"
+            raise "fetch_with_batched_keys is not supported for multi-cache enabled key(s) - #{multi_types.join(", ")} on #{batch_object.class.name}"
           end
 
           if batch_object && !opts[:force] &&
-            defined?(::ActiveSupport::Cache::RedisCacheStore) && self.is_a?(::ActiveSupport::Cache::RedisCacheStore) && Canvas::CacheRegister.enabled? &&
-            batched_keys.all?{|type| batch_object.class.valid_cache_key_type?(type)}
+             defined?(::ActiveSupport::Cache::RedisCacheStore) && self.is_a?(::ActiveSupport::Cache::RedisCacheStore) && Canvas::CacheRegister.enabled? &&
+             batched_keys.all? { |type| batch_object.class.valid_cache_key_type?(type) }
             fetch_with_cache_register(key, batch_object, batched_keys, opts, &block)
           else
             if skip_cache_if_disabled # use for new caches that we're not already using updated_at+touch for
@@ -53,10 +52,10 @@ module ActiveSupport
             else
               if batch_object # just fall back to the usual after appending to the key if needed
                 key += (Canvas::CacheRegister.enabled? ?
-                "/#{batched_keys&.map{|bk| batch_object.cache_key(bk)}.join("/")}" :
+                "/#{batched_keys&.map { |bk| batch_object.cache_key(bk) }.join("/")}" :
                 "/#{batch_object.cache_key}")
               end
-            fetch(key, opts, &block)
+              fetch(key, opts, &block)
             end
           end
         end
@@ -74,7 +73,7 @@ module ActiveSupport
           redis = Canvas::CacheRegister.redis(base_obj_key, batch_object.shard)
 
           instrument(:read, name, options) do |payload|
-            keys_to_batch = batched_keys.map{|type| "#{base_obj_key}/#{type}"}
+            keys_to_batch = batched_keys.map { |type| "#{base_obj_key}/#{type}" }
             now = Time.now.utc.to_s(batch_object.cache_timestamp_format)
             # pass in the base key, followed by the intermediate keys (that the script will pull and append to the base)
             keys = [key] + keys_to_batch

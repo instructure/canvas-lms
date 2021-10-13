@@ -24,21 +24,21 @@
 module Lti
   class SubstitutionsHelper
     LIS_ROLE_MAP = {
-        'user' => LtiOutbound::LTIRoles::System::USER,
-        'siteadmin' => LtiOutbound::LTIRoles::System::SYS_ADMIN,
+      'user' => LtiOutbound::LTIRoles::System::USER,
+      'siteadmin' => LtiOutbound::LTIRoles::System::SYS_ADMIN,
 
-        'teacher' => LtiOutbound::LTIRoles::Institution::INSTRUCTOR,
-        'student' => LtiOutbound::LTIRoles::Institution::STUDENT,
-        'admin' => LtiOutbound::LTIRoles::Institution::ADMIN,
-        'observer' => LtiOutbound::LTIRoles::Context::OBSERVER,
-        AccountUser => LtiOutbound::LTIRoles::Institution::ADMIN,
+      'teacher' => LtiOutbound::LTIRoles::Institution::INSTRUCTOR,
+      'student' => LtiOutbound::LTIRoles::Institution::STUDENT,
+      'admin' => LtiOutbound::LTIRoles::Institution::ADMIN,
+      'observer' => LtiOutbound::LTIRoles::Context::OBSERVER,
+      AccountUser => LtiOutbound::LTIRoles::Institution::ADMIN,
 
-        StudentEnrollment => LtiOutbound::LTIRoles::Context::LEARNER,
-        TeacherEnrollment => LtiOutbound::LTIRoles::Context::INSTRUCTOR,
-        TaEnrollment => LtiOutbound::LTIRoles::Context::TEACHING_ASSISTANT,
-        DesignerEnrollment => LtiOutbound::LTIRoles::Context::CONTENT_DEVELOPER,
-        ObserverEnrollment => LtiOutbound::LTIRoles::Context::OBSERVER,
-        StudentViewEnrollment => LtiOutbound::LTIRoles::Context::LEARNER
+      StudentEnrollment => LtiOutbound::LTIRoles::Context::LEARNER,
+      TeacherEnrollment => LtiOutbound::LTIRoles::Context::INSTRUCTOR,
+      TaEnrollment => LtiOutbound::LTIRoles::Context::TEACHING_ASSISTANT,
+      DesignerEnrollment => LtiOutbound::LTIRoles::Context::CONTENT_DEVELOPER,
+      ObserverEnrollment => LtiOutbound::LTIRoles::Context::OBSERVER,
+      StudentViewEnrollment => LtiOutbound::LTIRoles::Context::LEARNER
     }
 
     LIS_V2_ROLE_MAP = {
@@ -66,24 +66,24 @@ module Lti
     #   3. Has Group roles
     #   4. Has no Course role
     LIS_V2_LTI_ADVANTAGE_ROLE_MAP = {
-      'user' => [ 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User' ].freeze,
-      'siteadmin' => [ 'http://purl.imsglobal.org/vocab/lis/v2/system/person#SysAdmin' ].freeze,
-      'fake_student' => [ 'http://purl.imsglobal.org/vocab/lti/system/person#TestUser' ].freeze,
+      'user' => ['http://purl.imsglobal.org/vocab/lis/v2/system/person#User'].freeze,
+      'siteadmin' => ['http://purl.imsglobal.org/vocab/lis/v2/system/person#SysAdmin'].freeze,
+      'fake_student' => ['http://purl.imsglobal.org/vocab/lti/system/person#TestUser'].freeze,
 
-      'teacher' => [ 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor' ].freeze,
-      'student' => [ 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student' ].freeze,
-      'admin' => [ 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator' ].freeze,
-      AccountUser => [ 'http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator' ].freeze,
+      'teacher' => ['http://purl.imsglobal.org/vocab/lis/v2/institution/person#Instructor'].freeze,
+      'student' => ['http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student'].freeze,
+      'admin' => ['http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator'].freeze,
+      AccountUser => ['http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator'].freeze,
       TaEnrollment => [
         'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant',
         'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'
       ].freeze,
-      StudentEnrollment => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' ].freeze,
-      TeacherEnrollment => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor' ].freeze,
-      DesignerEnrollment => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper' ].freeze,
-      ObserverEnrollment => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor' ].freeze,
-      StudentViewEnrollment => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' ].freeze,
-      :group_member => [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Member' ].freeze,
+      StudentEnrollment => ['http://purl.imsglobal.org/vocab/lis/v2/membership#Learner'].freeze,
+      TeacherEnrollment => ['http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor'].freeze,
+      DesignerEnrollment => ['http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper'].freeze,
+      ObserverEnrollment => ['http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor'].freeze,
+      StudentViewEnrollment => ['http://purl.imsglobal.org/vocab/lis/v2/membership#Learner'].freeze,
+      :group_member => ['http://purl.imsglobal.org/vocab/lis/v2/membership#Member'].freeze,
       :group_leader => [
         'http://purl.imsglobal.org/vocab/lis/v2/membership#Member',
         'http://purl.imsglobal.org/vocab/lis/v2/membership#Manager'
@@ -99,7 +99,7 @@ module Lti
     #   }
     #
     # (Extra copy at the end is to undo the default value ([]))
-    INVERTED_LIS_V2_LTI_ADVANTAGE_ROLE_MAP = LIS_V2_LTI_ADVANTAGE_ROLE_MAP.each_with_object(Hash.new([])) do |(key,values), memo|
+    INVERTED_LIS_V2_LTI_ADVANTAGE_ROLE_MAP = LIS_V2_LTI_ADVANTAGE_ROLE_MAP.each_with_object(Hash.new([])) do |(key, values), memo|
       values.each { |value| memo[value] += [key] }
     end.reverse_merge({}).freeze
 
@@ -114,14 +114,14 @@ module Lti
 
     def account
       @account ||=
-          case @context
-            when Account
-              @context
-            when Course
-              @context.account
-            else
-              @root_account
-          end
+        case @context
+        when Account
+          @context
+        when Course
+          @context.account
+        else
+          @root_account
+        end
     end
 
     def enrollments_to_lis_roles(enrollments)
@@ -156,11 +156,13 @@ module Lti
 
     def course_enrollments
       return [] unless @context.is_a?(Course) && @user
+
       @current_course_enrollments ||= @context.current_enrollments.where(user_id: @user.id)
     end
 
     def course_sections
       return [] unless @context.is_a?(Course) && @user
+
       @current_course_sections ||= @context.course_sections.where(id: course_enrollments.map(&:course_section_id)).select("id, sis_source_id")
     end
 
@@ -182,7 +184,7 @@ module Lti
 
     def concluded_course_enrollments
       @concluded_course_enrollments ||=
-          @context.is_a?(Course) && @user ? @user.enrollments.concluded.where(course_id: @context.id).shard(@context.shard) : []
+        @context.is_a?(Course) && @user ? @user.enrollments.concluded.where(course_id: @context.id).shard(@context.shard) : []
     end
 
     def concluded_lis_roles
@@ -190,12 +192,12 @@ module Lti
     end
 
     def granted_permissions(permissions_to_check)
-      permissions_to_check.select{|p| @context.grants_right?(@user, p.to_sym) }.join(",")
+      permissions_to_check.select { |p| @context.grants_right?(@user, p.to_sym) }.join(",")
     end
 
     def current_canvas_roles
       roles = (course_enrollments + account_enrollments).map(&:role).map(&:name).uniq
-      roles = roles.map{|role| role == "AccountAdmin" ? "Account Admin" : role} # to maintain backwards compatibility
+      roles = roles.map { |role| role == "AccountAdmin" ? "Account Admin" : role } # to maintain backwards compatibility
       roles.join(',')
     end
 
@@ -208,6 +210,7 @@ module Lti
     def enrollment_state
       enrollments = @user ? @context.enrollments.where(user_id: @user.id).preload(:enrollment_state) : []
       return '' if enrollments.size == 0
+
       enrollments.any? { |membership| membership.state_based_on_date == :active } ? LtiOutbound::LTIUser::ACTIVE_STATE : LtiOutbound::LTIUser::INACTIVE_STATE
     end
 
@@ -279,8 +282,8 @@ module Lti
               SELECT x.context_id
               FROM all_contexts x))
             ORDER BY courses.lti_context_id, ct.finished_at DESC
-            ) as courses").
-            where.not(lti_context_id: nil).order(finished_at: :desc).limit(limit + 1).pluck(:lti_context_id)
+            ) as courses")
+                .where.not(lti_context_id: nil).order(finished_at: :desc).limit(limit + 1).pluck(:lti_context_id)
         end
 
         # We discovered that at around 3000 lti_context_ids, the form data gets too
@@ -301,6 +304,7 @@ module Lti
 
     def previous_course_ids_and_context_ids
       return [] unless @context.is_a?(Course)
+
       @previous_ids ||= Course.where(
         "EXISTS (?)", ContentMigration.where(context_id: @context.id, workflow_state: :imported).where("content_migrations.source_course_id = courses.id")
       ).pluck(:id, :lti_context_id)

@@ -20,19 +20,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../../models/quizzes/quiz_user_messager_spec_helper')
 
 describe Quizzes::QuizSubmissionUsersController, type: :request do
-
   before :once do
     course_with_teacher(active_all: true)
   end
 
   def controller_options(options)
     options.reverse_merge!({
-       controller: "quizzes/quiz_submission_users",
-       action: "message",
-       format: "json",
-       course_id: @course.id,
-       id: @quiz.id
-    })
+                             controller: "quizzes/quiz_submission_users",
+                             action: "message",
+                             format: "json",
+                             course_id: @course.id,
+                             id: @quiz.id
+                           })
   end
 
   describe "POST message" do
@@ -81,13 +80,13 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
       @user = @teacher
     end
 
-    def get_submitted_users(options={})
+    def get_submitted_users(options = {})
       options = controller_options(options.reverse_merge!(action: 'index'))
       raw_api_call(
         :get,
         "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submission_users",
         options,
-        { 'Accept' => 'application/json'}
+        { 'Accept' => 'application/json' }
       )
       JSON.parse(response.body) if response.successful?
     end
@@ -137,7 +136,7 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
         user_ids = json['users'].map { |h| h['id'] }
         expect(user_ids).not_to include @student2.id.to_s
 
-        create_section_override_for_quiz(@quiz, {course_section: @student2.enrollments.current.first.course_section})
+        create_section_override_for_quiz(@quiz, { course_section: @student2.enrollments.current.first.course_section })
 
         json = get_submitted_users(submitted: false)
         expect(response).to be_successful

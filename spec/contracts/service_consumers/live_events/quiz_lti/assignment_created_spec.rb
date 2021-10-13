@@ -22,7 +22,6 @@ require_relative '../live_events_pact_helper'
 
 RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
   describe 'assignment_created' do
-
     let(:live_event) do
       LiveEvents::PactHelper::Event.new(
         event_name: 'assignment_created',
@@ -44,7 +43,7 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
         Account.default.context_external_tools.create!(params)
 
         course = course_model
-        course.root_account.settings[:provision] = {'lti' => 'lti url'}
+        course.root_account.settings[:provision] = { 'lti' => 'lti url' }
         course.root_account.save!
         course.enable_feature!(:quizzes_next)
 

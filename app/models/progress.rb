@@ -50,7 +50,7 @@ class Progress < ActiveRecord::Base
     self.results = nil
     self.workflow_state = 'queued'
     self.completion = 0
-    GuardRail.activate(:primary) {self.save!}
+    GuardRail.activate(:primary) { self.save! }
   end
 
   def set_results(results)

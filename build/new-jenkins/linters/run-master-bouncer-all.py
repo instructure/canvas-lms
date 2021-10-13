@@ -22,7 +22,7 @@ def cmd_exec(command, **kwargs):
     fp("> {}".format(command))
     fetch_environment = os.environ.copy()
     if ssh_key_path and ssh_username:
-        fetch_environment['GIT_SSH_COMMAND'] = 'ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME"'
+        fetch_environment['GIT_SSH_COMMAND'] = 'ssh -i $SSH_KEY_PATH -l $SSH_USERNAME'
     code = subprocess.call(command, stderr=subprocess.STDOUT, shell=True, env=fetch_environment, **kwargs)
     if code != 0:
         exit(code)

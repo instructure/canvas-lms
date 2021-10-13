@@ -33,18 +33,18 @@ describe IncomingMailProcessor::DirectoryMailbox do
     @mailbox = IncomingMailProcessor::DirectoryMailbox.new(default_config)
   end
 
-  it "should connect if folder exists" do
+  it "connects if folder exists" do
     expect(@mailbox).to receive(:folder_exists?).with(default_config[:folder]).and_return(true)
     expect { @mailbox.connect }.to_not raise_error
   end
 
-  it "should raise on connect if folder does not exist" do
+  it "raises on connect if folder does not exist" do
     expect(@mailbox).to receive(:folder_exists?).with(default_config[:folder]).and_return(false)
     expect { @mailbox.connect }.to raise_error(/Folder .* does not exist/)
   end
 
   describe ".each_message" do
-    it "should iterate through and yield files in a directory" do
+    it "iterates through and yield files in a directory" do
       folder = default_config[:folder]
       folder_entries = %w(. .. foo bar baz)
       expect(@mailbox).to receive(:files_in_folder).with(folder).and_return(folder_entries)
@@ -60,7 +60,7 @@ describe IncomingMailProcessor::DirectoryMailbox do
       @mailbox.each_message do |*values|
         yielded_values << values
       end
-      expect(yielded_values).to eql [["foo", "foo body"], ["bar", "bar body"], ["baz", "baz body"], ]
+      expect(yielded_values).to eql [["foo", "foo body"], ["bar", "bar body"], ["baz", "baz body"],]
     end
 
     it "iterates with stride and offset" do
@@ -81,7 +81,7 @@ describe IncomingMailProcessor::DirectoryMailbox do
       @mailbox.each_message(stride: 2, offset: 0) do |*values|
         yielded_values << values
       end
-      expect(yielded_values).to eql [["bar", "bar body"], ["baz", "baz body"], ]
+      expect(yielded_values).to eql [["bar", "bar body"], ["baz", "baz body"],]
 
       yielded_values = []
       @mailbox.each_message(stride: 2, offset: 1) do |*values|
@@ -92,13 +92,12 @@ describe IncomingMailProcessor::DirectoryMailbox do
   end
 
   describe '#unprocessed_message_count' do
-    it "should return nil" do
+    it "returns nil" do
       expect(@mailbox.unprocessed_message_count).to be_nil
     end
   end
 
   context "with simple foo file" do
-
     before do
       expect(@mailbox).to receive(:file?).and_return(true)
       expect(@mailbox).to receive(:read_file).and_return("foo body")
@@ -107,14 +106,14 @@ describe IncomingMailProcessor::DirectoryMailbox do
       @mailbox.connect
     end
 
-    it "should delete files" do
+    it "deletes files" do
       expect(@mailbox).to receive(:delete_file).with(default_config[:folder], "foo")
       @mailbox.each_message do |id, body|
         @mailbox.delete_message(id)
       end
     end
 
-    it "should move files" do
+    it "moves files" do
       folder = default_config[:folder]
       expect(@mailbox).to receive(:move_file).with(folder, "foo", "aside")
       expect(@mailbox).to receive(:folder_exists?).with(folder, "aside").and_return(true)
@@ -124,7 +123,7 @@ describe IncomingMailProcessor::DirectoryMailbox do
       end
     end
 
-    it "should create target folder when moving file if target folder doesn't exist" do
+    it "creates target folder when moving file if target folder doesn't exist" do
       folder = default_config[:folder]
       expect(@mailbox).to receive(:move_file).with(folder, "foo", "aside")
       expect(@mailbox).to receive(:folder_exists?).with(folder, "aside").and_return(false)
@@ -133,6 +132,5 @@ describe IncomingMailProcessor::DirectoryMailbox do
         @mailbox.move_message(id, "aside")
       end
     end
-
   end
 end

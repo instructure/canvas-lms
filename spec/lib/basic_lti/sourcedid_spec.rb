@@ -21,19 +21,19 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe BasicLTI::Sourcedid do
-  subject(:sourcedid) {described_class.new(tool, course, assignment, user)}
+  subject(:sourcedid) { described_class.new(tool, course, assignment, user) }
 
   let(:tool) { external_tool_model(context: course) }
   let(:course) { course_model }
   let(:assignment) do
     course.assignments.create!(
       {
-          title: "value for title",
-          description: "value for description",
-          due_at: Time.zone.now,
-          points_possible: "1.5",
-          submission_types: 'external_tool',
-          external_tool_tag_attributes: {url: tool.url}
+        title: "value for title",
+        description: "value for description",
+        due_at: Time.zone.now,
+        points_possible: "1.5",
+        submission_types: 'external_tool',
+        external_tool_tag_attributes: { url: tool.url }
       }
     )
   end
@@ -65,13 +65,13 @@ describe BasicLTI::Sourcedid do
 
   describe ".load!" do
     it 'raises an exception for an invalid sourcedid' do
-      expect{ described_class.load!('invalid-sourcedid') }.to raise_error(
+      expect { described_class.load!('invalid-sourcedid') }.to raise_error(
         BasicLTI::Errors::InvalidSourceId, 'Invalid sourcedid'
       )
     end
 
     it 'raises an exception for a nil sourcedid' do
-      expect{ described_class.load!(nil) }.to raise_error(
+      expect { described_class.load!(nil) }.to raise_error(
         BasicLTI::Errors::InvalidSourceId, 'Invalid sourcedid'
       )
     end
@@ -79,14 +79,14 @@ describe BasicLTI::Sourcedid do
     context "legacy sourcedid" do
       it 'raises an exception when improperly signed' do
         sourcedid = "#{tool.id}-#{course.id}-#{assignment.id}-#{user.id}-badsignature"
-        expect{ described_class.load!(sourcedid) }.to raise_error(
+        expect { described_class.load!(sourcedid) }.to raise_error(
           BasicLTI::Errors::InvalidSourceId, 'Invalid signature'
         )
       end
 
       it 'raises an exception when the tool id is invalid' do
         sourcedid = "9876543210-#{course.id}-#{assignment.id}-#{user.id}-badsignature"
-        expect{ described_class.load!(sourcedid) }.to raise_error(
+        expect { described_class.load!(sourcedid) }.to raise_error(
           BasicLTI::Errors::InvalidSourceId, 'Tool is invalid'
         )
       end
@@ -107,7 +107,7 @@ describe BasicLTI::Sourcedid do
     it 'raises an exception when the course is invalid' do
       course.destroy!
 
-      expect{ described_class.load!(sourcedid.to_s) }.to raise_error(
+      expect { described_class.load!(sourcedid.to_s) }.to raise_error(
         BasicLTI::Errors::InvalidSourceId, 'Course is invalid'
       )
     end
@@ -115,7 +115,7 @@ describe BasicLTI::Sourcedid do
     it 'raises an exception when the user is not in the course' do
       user.enrollments.find_by(course_id: course.id).destroy!
 
-      expect{ described_class.load!(sourcedid.to_s) }.to raise_error(
+      expect { described_class.load!(sourcedid.to_s) }.to raise_error(
         BasicLTI::Errors::InvalidSourceId, 'User is no longer in course'
       )
     end
@@ -123,7 +123,7 @@ describe BasicLTI::Sourcedid do
     it 'raises an exception when the assignment is not valid' do
       assignment.destroy!
 
-      expect{ described_class.load!(sourcedid.to_s) }.to raise_error(
+      expect { described_class.load!(sourcedid.to_s) }.to raise_error(
         BasicLTI::Errors::InvalidSourceId, 'Assignment is invalid'
       )
     end
@@ -131,7 +131,7 @@ describe BasicLTI::Sourcedid do
     it 'raises an exception when the assignment is not associated with the tool' do
       assignment.external_tool_tag.update(url: 'http://invalidurl.com')
 
-      expect{ described_class.load!(sourcedid.to_s) }.to raise_error(
+      expect { described_class.load!(sourcedid.to_s) }.to raise_error(
         BasicLTI::Errors::InvalidSourceId, 'Assignment is no longer associated with this tool'
       )
     end

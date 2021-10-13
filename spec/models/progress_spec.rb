@@ -40,7 +40,7 @@ describe Progress do
 
     let(:progress) { Progress.create!(tag: "test", context: user_factory) }
 
-    it "should update the progress while running the job" do
+    it "updates the progress while running the job" do
       progress.process_job(Jerbs, :succeed, {}, :flag)
       expect(progress).to be_queued
       run_jobs
@@ -49,19 +49,19 @@ describe Progress do
       expect(Jerbs.flag).to eq :flag
     end
 
-    it "should fail the progress if the job fails" do
+    it "fails the progress if the job fails" do
       progress.process_job(Jerbs, :fail, {})
       run_jobs
       expect(progress.reload).to be_failed
     end
 
-    it "should default to low priority" do
+    it "defaults to low priority" do
       job = progress.process_job(Jerbs, :succeed, {}, :flag)
       expect(job.priority).to eq Delayed::LOW_PRIORITY
     end
 
     context "with high priority" do
-      it "should be set to high priortiy" do
+      it "is set to high priortiy" do
         job = progress.process_job(Jerbs, :succeed, { priority: Delayed::HIGH_PRIORITY }, :flag)
         expect(job.priority).to eq Delayed::HIGH_PRIORITY
       end

@@ -63,14 +63,14 @@ describe "moderated grading assignments" do
       AssignmentCreateEditPage.visit_assignment_edit_page(@course.id, @moderated_assignment.id)
     end
 
-    it "should allow user to select final moderator", priority: "1", test_id: 3482530 do
+    it "allows user to select final moderator", priority: "1", test_id: 3482530 do
       AssignmentCreateEditPage.select_moderate_checkbox
       AssignmentCreateEditPage.select_grader_dropdown.click
 
       expect(AssignmentCreateEditPage.select_grader_dropdown).to include_text(@teacher_two.name)
     end
 
-    it "should allow user to input number of graders", priority: "1", test_id: 3490818 do
+    it "allows user to input number of graders", priority: "1", test_id: 3490818 do
       # default value for the input is 2, or if the class has <= 2 active instructors the default is 1
       AssignmentCreateEditPage.select_moderate_checkbox
       AssignmentCreateEditPage.add_number_of_graders(2)

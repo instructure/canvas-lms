@@ -32,8 +32,8 @@ describe "Screenreader Gradebook" do
   let(:button_type_submit) { f('.button_type_submit') }
   let(:arrange_assignments) { f('#arrange_assignments') }
 
-  let(:assign1_default_points) {1}
-  let(:assignment_default_points) {20}
+  let(:assign1_default_points) { 1 }
+  let(:assignment_default_points) { 20 }
   let(:grading_value) { f('.grading_value') }
   let(:gradebook_cell_css) { '.gradebook-cell' }
   let(:view_grading_history) { f("a[href='/courses/#{@course.id}/gradebook/history']") }
@@ -42,7 +42,7 @@ describe "Screenreader Gradebook" do
     driver.switch_to.active_element
   end
 
-  def basic_percent_setup(num=1)
+  def basic_percent_setup(num = 1)
     init_course_with_students num
     user_session(@teacher)
     @course.assignments.create!(
@@ -53,7 +53,7 @@ describe "Screenreader Gradebook" do
     )
   end
 
-  def basic_point_setup(num=1)
+  def basic_point_setup(num = 1)
     init_course_with_students num
     user_session(@teacher)
     @curve_assignment = @course.assignments.create!(
@@ -199,7 +199,7 @@ describe "Screenreader Gradebook" do
 
   it 'displays/removes warning message for resubmitted assignments', priority: '1', test_id: 164000 do
     skip "Skipped because this spec fails if not run in foreground\n"\
-      "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
+         "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
     assignment = basic_percent_setup
     user_session @students[0]
     assignment.submit_homework @students[0], submission_type: 'online_text_entry', body: 'Hello!'
@@ -222,7 +222,7 @@ describe "Screenreader Gradebook" do
 
   it 'grades match default gradebook grades', priority: '1', test_id: 163994 do
     skip "Skipped because this spec fails if not run in foreground\n"\
-      "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
+         "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
     a1 = basic_percent_setup
     a2 = @course.assignments.create!(
       title: 'Test 2',
@@ -315,7 +315,7 @@ describe "Screenreader Gradebook" do
     end
 
     it "shows sections in drop-down", priority: '1', test_id: 615680 do
-      sections=[]
+      sections = []
       2.times do |i|
         sections << @course.course_sections.create!(name: "other section #{i}")
       end
@@ -353,7 +353,7 @@ describe "Screenreader Gradebook" do
       end
     end
 
-    it "should focus on accessible elements when setting default grades", priority: '1', test_id: 209991 do
+    it "focuses on accessible elements when setting default grades", priority: '1', test_id: 209991 do
       skip_if_safari(:alert)
       SRGB.visit(@course.id)
       SRGB.select_assignment(@second_assignment)
@@ -419,12 +419,12 @@ describe "Screenreader Gradebook" do
   end
 
   context "curving grades" do
-    it "curves grades", priority: '1',test_id: 615690 do
+    it "curves grades", priority: '1', test_id: 615690 do
       skip_if_safari(:alert)
       basic_point_setup 3
 
-      grades = [12,10,11]
-      (0..2).each {|num| @curve_assignment.grade_student(@students[num], grade: grades[num], grader: @teacher)}
+      grades = [12, 10, 11]
+      (0..2).each { |num| @curve_assignment.grade_student(@students[num], grade: grades[num], grader: @teacher) }
 
       SRGB.visit(@course.id)
       SRGB.select_assignment(@curve_assignment)
@@ -442,9 +442,8 @@ describe "Screenreader Gradebook" do
 
       assignment_score = SRGB.assignment_scores.text.split(' ')
       # assignment avg score, high score, low score
-      scores_as_string = ['13','20','8']
-      (0..2).each {|num| expect(assignment_score[num+1]).to eq(scores_as_string[num])}
+      scores_as_string = ['13', '20', '8']
+      (0..2).each { |num| expect(assignment_score[num + 1]).to eq(scores_as_string[num]) }
     end
   end
-
 end

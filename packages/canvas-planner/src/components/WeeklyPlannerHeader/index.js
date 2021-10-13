@@ -54,7 +54,7 @@ export const WEEKLY_PLANNER_ACTIVE_BTN_ID = 'weekly-header-active-button'
 // worth the complexity when another page needs the info.
 function findStickyOffset() {
   const dashboardTabs = document.querySelector('.ic-Dashboard-tabs')
-  return dashboardTabs?.getBoundingClientRect().bottom || 122
+  return dashboardTabs?.getBoundingClientRect().bottom || 0
 }
 
 export const processFocusTarget = () => {

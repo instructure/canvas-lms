@@ -31,8 +31,8 @@ class FilePreviewsController < ApplicationController
       @headers = false
       @show_left_side = false
       return render template: 'shared/errors/404_message',
-        status: :not_found,
-        formats: [:html]
+                    status: :not_found,
+                    formats: [:html]
     end
     if read_allowed(@file, @current_user, session, params)
       unless download_allowed(@file, @current_user, session, params)
@@ -47,7 +47,7 @@ class FilePreviewsController < ApplicationController
       if Canvas::Plugin.value_to_boolean(params[:annotate]) && (url = @file.crocodoc_url(@current_user))
         redirect_to url and return
       # canvadocs
-      elsif url = @file.canvadoc_url(@current_user)
+      elsif (url = @file.canvadoc_url(@current_user))
         redirect_to url and return
       # google docs
       elsif GoogleDocsPreview.previewable?(@domain_root_account, @file)

@@ -27,11 +27,11 @@ describe "context/undelete_index.html.erb" do
     assign(:context, @course)
   end
 
-  it "should render the undelete link correctly for quizzes" do
+  it "renders the undelete link correctly for quizzes" do
     quiz = @course.quizzes.create!
     assign(:deleted_items, [quiz])
     render
-    expect(response.body).not_to match /quizzes:quiz/
-    expect(response.body).to match /quiz_#{quiz.id}/
+    expect(response.body).not_to match(/quizzes:quiz/)
+    expect(response.body).to match(/quiz_#{quiz.id}/)
   end
 end

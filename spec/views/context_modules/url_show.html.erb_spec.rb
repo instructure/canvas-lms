@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/context_modules/url_show" do
-  it "should render" do
+  it "renders" do
     course_factory
     view_context(@course, @user)
     @module = @course.context_modules.create!(:name => 'teh module')
@@ -34,6 +34,6 @@ describe "/context_modules/url_show" do
     render 'context_modules/url_show'
     doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('iframe')['src']).to eq 'http://example.com/lolcats'
-    expect(doc.css('a').collect{ |a| [a['href'], a.inner_text] }).to be_include ['http://example.com/lolcats', 'pls view']
+    expect(doc.css('a').collect { |a| [a['href'], a.inner_text] }).to be_include ['http://example.com/lolcats', 'pls view']
   end
 end

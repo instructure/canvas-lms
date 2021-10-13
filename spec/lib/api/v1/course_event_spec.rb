@@ -43,7 +43,7 @@ describe Api::V1::CourseEvent do
     skip("needs auditors cassandra keyspace configured") unless Auditors::Course::Stream.available?
 
     @request_id = SecureRandom.uuid
-    allow(RequestContextGenerator).to receive_messages( :request_id => @request_id )
+    allow(RequestContextGenerator).to receive_messages(:request_id => @request_id)
 
     @domain_root_account = Account.default
 
@@ -51,14 +51,14 @@ describe Api::V1::CourseEvent do
 
     @page_view = PageView.new { |p|
       p.assign_attributes({
-        :request_id => @request_id,
-        :remote_ip => '10.10.10.10'
-      })
+                            :request_id => @request_id,
+                            :remote_ip => '10.10.10.10'
+                          })
     }
 
     allow(PageView).to receive_messages(
       :find_by_id => @page_view,
-      :find_all_by_id => [ @page_view ]
+      :find_all_by_id => [@page_view]
     )
 
     @events = []
@@ -72,7 +72,7 @@ describe Api::V1::CourseEvent do
     end
   end
 
-  it "should be formatted as a course content event hash" do
+  it "is formatted as a course content event hash" do
     event = course_event_json(@event, @student, @session)
 
     expect(event[:id]).to eq @event.id
@@ -88,20 +88,20 @@ describe Api::V1::CourseEvent do
     expect(event[:links][:user]).to eq Shard.relative_id_for(@teacher, Shard.current, Shard.current)
   end
 
-  it "should be formatted as an array of course content event hashes" do
+  it "is formatted as an array of course content event hashes" do
     expect(course_events_json(@events, @student, @session).size).to eql(@events.size)
   end
 
-  it "should be formatted as an array of compound course content event hashes" do
+  it "is formatted as an array of compound course content event hashes" do
     json_hash = course_events_compound_json(@events, @user, @session)
 
     expect(json_hash.keys.sort).to eq [:events, :linked, :links]
 
     expect(json_hash[:links]).to eq({
-      "events.course" => "#{url_root}/api/v1/courses/{events.course}",
-      "events.user" => nil,
-      "events.sis_batch" => nil
-    })
+                                      "events.course" => "#{url_root}/api/v1/courses/{events.course}",
+                                      "events.user" => nil,
+                                      "events.sis_batch" => nil
+                                    })
 
     expect(json_hash[:events]).to eq course_events_json(@events, @user, @session)
 
@@ -112,7 +112,7 @@ describe Api::V1::CourseEvent do
     expect(linked[:page_views].size).to eql(1)
   end
 
-  it "should handle an empty result set" do
+  it "handles an empty result set" do
     json_hash = course_events_compound_json([], @user, @session)
 
     expect(json_hash.keys.sort).to eq [:events, :linked, :links]

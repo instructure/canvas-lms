@@ -19,7 +19,7 @@
 #
 
 module GraphQLHelpers::ContextFetcher
-  def context_fetcher(input, valid_context_types=[])
+  def context_fetcher(input, valid_context_types = [])
     if valid_context_types.exclude?(input[:context_type])
       raise GraphQL::ExecutionError, I18n.t("invalid context type")
     end

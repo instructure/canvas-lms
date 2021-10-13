@@ -22,10 +22,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe ConferencesController, type: :request do
   before do
-    allow(WebConference).to receive(:plugins).and_return([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
+    allow(WebConference).to receive(:plugins).and_return([web_conference_plugin_mock("wimba", { :domain => "wimba.test" })])
   end
 
-  it "should notify participants" do
+  it "notifies participants" do
     notification_model(:name => "Web Conference Invitation")
     course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
     @teacher = @user
@@ -34,9 +34,9 @@ describe ConferencesController, type: :request do
     @student1.register!
     @student2 = student_in_course(:active_all => true, :user => user_with_pseudonym(:username => "student2@example.com")).user
     @student2.register!
-    [@teacher, @student1, @student2].each {|u| u.email_channel.confirm!}
+    [@teacher, @student1, @student2].each { |u| u.email_channel.confirm! }
 
-    post "/courses/#{@course.id}/conferences", params: { :web_conference => {"duration"=>"60", "conference_type"=>"Wimba", "title"=>"let's chat", "description"=>""}, :user => { "all" => "1" } }
+    post "/courses/#{@course.id}/conferences", params: { :web_conference => { "duration" => "60", "conference_type" => "Wimba", "title" => "let's chat", "description" => "" }, :user => { "all" => "1" } }
     expect(response).to be_redirect
     @conference = WebConference.first
     expect(Set.new(Message.all.map(&:user))).to eq Set.new([@teacher, @student1, @student2])
@@ -49,7 +49,7 @@ describe ConferencesController, type: :request do
     expect(Set.new(Message.all.map(&:user))).to eq Set.new([@teacher, @student1, @student2, @student3])
   end
 
-  it "should find the correct conferences for group news feed" do
+  it "finds the correct conferences for group news feed" do
     course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym)
     @group = @course.groups.create!(:name => "some group")
     @group.add_user(@user)
@@ -64,7 +64,7 @@ describe ConferencesController, type: :request do
     expect(assigns['current_conferences'].map(&:id)).to eq [group_conference.id]
   end
 
-  it "shouldn't show concluded users" do
+  it "does not show concluded users" do
     course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym(:username => "teacher@example.com"))
     @teacher = @user
     @teacher.register!
@@ -89,7 +89,7 @@ describe ConferencesController, type: :request do
   context 'sharding' do
     specs_require_sharding
 
-    it "should work with cross-shard invitees" do
+    it "works with cross-shard invitees" do
       @shard1.activate do
         @student = user_factory(active_all: true)
       end

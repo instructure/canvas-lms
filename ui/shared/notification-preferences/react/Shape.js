@@ -44,14 +44,18 @@ export const NotificationPreferencesShape = shape({
   channels: arrayOf(ChannelShape)
 })
 
-const CourseShape = shape({
-  id: string.isRequired,
+const TermShape = shape({
   _id: string.isRequired,
   name: string.isRequired
 })
 
+const CourseShape = shape({
+  _id: string.isRequired,
+  name: string.isRequired,
+  term: TermShape.isRequired
+})
+
 export const EnrollmentShape = shape({
   course: CourseShape.isRequired,
-  state: string.isRequired,
   type: string.isRequired
 })

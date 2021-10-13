@@ -76,7 +76,7 @@ class AnonymousOrModerationEvent < ApplicationRecord
   validates :submission_id, presence: true, if: ->(event) {
     SUBMISSION_ID_REQUIRED_EVENT_TYPES.include?(event.event_type)
   }
-  validates :submission_id, absence: true, unless: -> (event) {
+  validates :submission_id, absence: true, unless: ->(event) {
     SUBMISSION_ID_REQUIRED_EVENT_TYPES.include?(event.event_type)
   }
   validates :event_type, presence: true

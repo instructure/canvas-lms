@@ -104,14 +104,17 @@ class Lti::LineItem < ApplicationRecord
 
   def resource_link_id_has_one_assignment
     return if resource_link.blank?
+
     ids = resource_link.line_items.pluck(:assignment_id)
     return if ids.size.zero?
     return if ids.uniq.size == 1 && ids.first == assignment_id
+
     errors.add(:assignment, 'does not match ltiLink')
   end
 
   def set_client_id_if_possible
     return if client_id.present?
+
     self.client_id = resource_link.current_external_tool(assignment.context)&.developer_key&.global_id unless lti_resource_link_id.blank?
     self.client_id ||= assignment&.external_tool_tag&.content&.developer_key&.global_id
   end
@@ -129,6 +132,7 @@ class Lti::LineItem < ApplicationRecord
   # the API
   def destroy_assignment
     return unless assignment_line_item? && !coupled
+
     self.assignment.destroy
   end
 

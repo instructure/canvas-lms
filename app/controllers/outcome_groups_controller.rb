@@ -50,7 +50,7 @@ class OutcomeGroupsController < ApplicationController
         render :json => group.as_json(:include => :learning_outcomes),
                :as_text => true
       else
-        render :json => {:errors => {:base => t(:invalid_file, "Invalid outcome group file")}},
+        render :json => { :errors => { :base => t(:invalid_file, "Invalid outcome group file") } },
                :status => :bad_request,
                :as_text => true
       end

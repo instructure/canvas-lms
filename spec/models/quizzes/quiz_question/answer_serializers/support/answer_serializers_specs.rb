@@ -37,7 +37,7 @@ shared_examples_for 'Answer Serializers' do
     options = respond_to?(:factory_options) ? factory_options : {}
 
     # can't test for #arity directly since it might be an optional parameter
-    data = factory.parameters.include?([ :opt, :options ]) ?
+    data = factory.parameters.include?([:opt, :options]) ?
       factory.call(options) :
       factory.call
 
@@ -48,7 +48,7 @@ shared_examples_for 'Answer Serializers' do
     # so, we could just build a new Quiz, but it's unnecessary and this is
     # faster as we only need the #quiz_data set
     quiz = Object.new
-    allow(quiz).to receive(:quiz_data).and_return [ data ]
+    allow(quiz).to receive(:quiz_data).and_return [data]
 
     qq = Quizzes::QuizQuestion.new
     qq.id = question_id
@@ -69,8 +69,8 @@ shared_examples_for 'Answer Serializers' do
         raise 'missing :output or :outputs definition'
       end
 
-      @inputs = respond_to?(:inputs) ? inputs : [ input ]
-      @outputs = respond_to?(:outputs) ? outputs : [ output ]
+      @inputs = respond_to?(:inputs) ? inputs : [input]
+      @outputs = respond_to?(:outputs) ? outputs : [output]
     end
 
     it '[auto] should serialize' do

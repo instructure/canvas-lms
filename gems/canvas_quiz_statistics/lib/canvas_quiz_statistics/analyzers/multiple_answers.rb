@@ -88,10 +88,10 @@ module CanvasQuizStatistics::Analyzers
     metric :answers do |responses|
       answers = parse_answers do |_answer, answer_stats|
         answer_stats.merge!({
-          responses: 0,
-          user_ids: [],
-          user_names: []
-        })
+                              responses: 0,
+                              user_ids: [],
+                              user_names: []
+                            })
       end
 
       answers.tap { calculate_responses(responses, answers) }
@@ -132,7 +132,7 @@ module CanvasQuizStatistics::Analyzers
         choices = extract_chosen_choices(response, answers, *args)
 
         if choices.empty?
-          choices = [ generate_missing_answer(answers) ]
+          choices = [generate_missing_answer(answers)]
         end
         choices.each do |answer|
           answer[:responses] += 1

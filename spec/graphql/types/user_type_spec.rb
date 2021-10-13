@@ -22,7 +22,6 @@ require 'spec_helper'
 require_relative "../graphql_spec_helper"
 
 describe Types::UserType do
-
   before(:once) do
     student = student_in_course(active_all: true).user
     course = @course
@@ -39,12 +38,12 @@ describe Types::UserType do
   end
 
   let(:user_type) do
-     GraphQLTypeTester.new(
-        @student,
-        current_user: @teacher,
-        domain_root_account: @course.account.root_account,
-        request: ActionDispatch::TestRequest.create
-      )
+    GraphQLTypeTester.new(
+      @student,
+      current_user: @teacher,
+      domain_root_account: @course.account.root_account,
+      request: ActionDispatch::TestRequest.create
+    )
   end
 
   context "node" do
@@ -137,7 +136,7 @@ describe Types::UserType do
       let(:admin) { account_admin_user }
       let(:user_type_as_admin) do
         GraphQLTypeTester.new(@student, current_user: admin, domain_root_account: @course.account.root_account,
-          request: ActionDispatch::TestRequest.create)
+                                        request: ActionDispatch::TestRequest.create)
       end
 
       it "returns the sis user id if the user has permissions to read it" do
@@ -145,9 +144,9 @@ describe Types::UserType do
       end
 
       it "returns nil if the user does not have permission to read the sis user id" do
-        account_admin_user_with_role_changes(role_changes: {read_sis: false, manage_sis: false})
+        account_admin_user_with_role_changes(role_changes: { read_sis: false, manage_sis: false })
         admin_type = GraphQLTypeTester.new(@student, current_user: @admin, domain_root_account: @course.account.root_account,
-          request: ActionDispatch::TestRequest.create)
+                                                     request: ActionDispatch::TestRequest.create)
         expect(admin_type.resolve("sisId")).to be_nil
       end
     end
@@ -204,6 +203,33 @@ describe Types::UserType do
           current_user: @admin
         )
       ).to eq [@student.enrollments.first.to_param]
+    end
+
+    it "excludes unavailable courses when currentOnly is true" do
+      @course1.complete
+
+      expect(user_type.resolve("enrollments(currentOnly: true) { _id }")).to eq []
+    end
+
+    it "excludes concluded courses when currentOnly is true" do
+      @course1.start_at = 2.weeks.ago
+      @course1.conclude_at = 1.week.ago
+      @course1.restrict_enrollments_to_course_dates = true
+      @course1.save!
+
+      expect(user_type.resolve("enrollments(currentOnly: true) { _id }")).to eq []
+    end
+
+    it "sorts correctly when orderBy is provided" do
+      @course2.start_at = 1.week.ago
+      @course2.save!
+
+      expect(user_type.resolve('enrollments(orderBy: ["courses.start_at"]) {
+          _id
+          course {
+            _id
+          }
+        }', current_user: @student).map(&:to_i)).to eq [@course2.id, @course1.id]
     end
 
     it "doesn't return enrollments for courses the user doesn't have permission for" do
@@ -268,10 +294,10 @@ describe Types::UserType do
   context "groups" do
     before(:once) do
       @user_group_ids = (1..5).map {
-        group_with_user({user: @student, active_all: true}).group_id.to_s
+        group_with_user({ user: @student, active_all: true }).group_id.to_s
       }
       @deleted_user_group_ids = (1..3).map {
-        group = group_with_user({user: @student, active_all: true})
+        group = group_with_user({ user: @student, active_all: true })
         group.destroy
         group.group_id.to_s
       }
@@ -365,8 +391,8 @@ describe Types::UserType do
     end
 
     it 'filters the conversations' do
-      conversation(@student, @teacher, {body: 'Howdy Partner'})
-      conversation(@student, @random_person, {body: 'Not in course'})
+      conversation(@student, @teacher, { body: 'Howdy Partner' })
+      conversation(@student, @random_person, { body: 'Not in course' })
 
       type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
       result = type.resolve(
@@ -383,12 +409,12 @@ describe Types::UserType do
     end
 
     it 'scopes the conversations' do
-      conversation(@student, @teacher, {body: 'You get that thing I sent ya?'})
-      conversation(@teacher, @student, {body: 'oh yea =)'})
-      conversation(@student, @random_person, {body: 'Whats up?', starred: true})
+      conversation(@student, @teacher, { body: 'You get that thing I sent ya?' })
+      conversation(@teacher, @student, { body: 'oh yea =)' })
+      conversation(@student, @random_person, { body: 'Whats up?', starred: true })
 
       # used for the sent scope
-      conversation(@random_person, @teacher, {body: 'Help! Please make me non-random!'})
+      conversation(@random_person, @teacher, { body: 'Help! Please make me non-random!' })
       type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
       result = type.resolve(
         "conversationsConnection(scope: \"inbox\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
@@ -605,7 +631,7 @@ describe Types::UserType do
     end
 
     let(:user_ta_type) do
-      GraphQLTypeTester.new(@ta, current_user: @teacher, domain_root_account: @course.account.root_account,request: ActionDispatch::TestRequest.create)
+      GraphQLTypeTester.new(@ta, current_user: @teacher, domain_root_account: @course.account.root_account, request: ActionDispatch::TestRequest.create)
     end
 
     let(:user_teacher_type) do
@@ -613,15 +639,15 @@ describe Types::UserType do
     end
 
     let(:teacher_ta_type) do
-      GraphQLTypeTester.new(@teacher_with_multiple_roles, current_user: @teacher, domain_root_account: @course.account.root_account,request: ActionDispatch::TestRequest.create)
+      GraphQLTypeTester.new(@teacher_with_multiple_roles, current_user: @teacher, domain_root_account: @course.account.root_account, request: ActionDispatch::TestRequest.create)
     end
 
     let(:teacher_with_duplicate_role_types) do
-      GraphQLTypeTester.new(@teacher_with_duplicate_roles, current_user: @teacher, domain_root_account: @course.account.root_account,request: ActionDispatch::TestRequest.create)
+      GraphQLTypeTester.new(@teacher_with_duplicate_roles, current_user: @teacher, domain_root_account: @course.account.root_account, request: ActionDispatch::TestRequest.create)
     end
 
     let(:custom_teacher_type) do
-      GraphQLTypeTester.new(@custom_teacher, current_user: @teacher, domain_root_account: @course.account.root_account,request: ActionDispatch::TestRequest.create)
+      GraphQLTypeTester.new(@custom_teacher, current_user: @teacher, domain_root_account: @course.account.root_account, request: ActionDispatch::TestRequest.create)
     end
 
     it "correctly returns default teacher role" do
@@ -690,5 +716,4 @@ describe Types::UserType do
       ).to eq ["TeacherEnrollment"]
     end
   end
-
 end

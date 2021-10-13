@@ -45,6 +45,7 @@ class AccountReport < ActiveRecord::Base
 
   def write_report_runners
     return if runners.empty?
+
     self.class.bulk_insert_objects(runners)
     @runners = []
   end
@@ -120,8 +121,8 @@ class AccountReport < ActiveRecord::Base
     end
   end
   handle_asynchronously :run_report, priority: Delayed::LOW_PRIORITY,
-                        n_strand: proc {|ar| ['account_reports', ar.account.root_account.global_id]},
-                        on_permanent_failure: :mark_as_errored
+                                     n_strand: proc { |ar| ['account_reports', ar.account.root_account.global_id] },
+                                     on_permanent_failure: :mark_as_errored
 
   def mark_as_errored
     self.workflow_state = :error
@@ -140,5 +141,4 @@ class AccountReport < ActiveRecord::Base
     # check if there is a reports plugin for this account
     AccountReports.available_reports
   end
-
 end

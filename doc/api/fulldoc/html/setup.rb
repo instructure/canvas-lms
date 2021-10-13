@@ -23,13 +23,12 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'api_scopes'))
 require 'controller_list_view'
 require 'api_scope_mapping_writer'
 
-Dir.glob("#{Rails.root}/doc/api/data_services/*.rb").each { |file| require file }
+Dir.glob("#{Rails.root}/doc/api/data_services/*.rb").sort.each { |file| require file }
 
 include Helpers::ModuleHelper
 include Helpers::FilterHelper
 
 module YARD::Templates::Helpers::BaseHelper
-
   def linkify_with_api(*args)
     # References to controller actions
     #
@@ -50,7 +49,7 @@ module YARD::Templates::Helpers::BaseHelper
         html_file = "#{topicize topic.first}.html"
         action = $2
         name = controller.name.to_s
-        name = "#{controller.namespace.name.to_s}/#{name}" if controller.namespace.name != :root
+        name = "#{controller.namespace.name}/#{name}" if controller.namespace.name != :root
         link_url("#{html_file}#method.#{topicize(name).sub("_controller", "")}.#{action}", args[1])
       else
         raise "couldn't find API link for #{args.first}"
@@ -73,7 +72,7 @@ module YARD::Templates::Helpers::BaseHelper
     elsif args.first.is_a?(String) && args.first == 'Appendix:' && args.size > 1
       __errmsg = "unable to locate referenced appendix '#{args[1]}'"
 
-      unless appendix = lookup_appendix(args[1].to_s)
+      unless (appendix = lookup_appendix(args[1].to_s))
         raise __errmsg
       end
 
@@ -98,14 +97,14 @@ module YARD::Templates::Helpers::BaseHelper
 
   def lookup_topic(controller_path)
     controller = nil
-    topic = options[:resources].find { |r,cs|
+    topic = options[:resources].find { |r, cs|
       cs.any? { |c|
         controller = c if c.path.to_s == controller_path
         !controller.nil?
       }
     }
 
-    [ topic, controller ]
+    [topic, controller]
   end
 
   def lookup_appendix(title)
@@ -142,7 +141,7 @@ module YARD::Templates::Helpers::HtmlHelper
   def link_appendix(ref)
     __errmsg = "unable to locate referenced appendix '#{ref}'"
 
-    unless appendix = lookup_appendix(ref.to_s)
+    unless (appendix = lookup_appendix(ref.to_s))
       raise __errmsg
     end
 
@@ -160,9 +159,9 @@ end
 
 def init
   options[:objects] = run_verifier(options[:objects])
-  options[:resources] = options[:objects].
-    group_by { |o| o.tags('API').first.text }.
-    sort_by  { |o| o.first }
+  options[:resources] = options[:objects]
+                        .group_by { |o| o.tags('API').first.text }
+                        .sort_by  { |o| o.first }
   generate_swagger_json
   generate_data_services_markdown_pages
   scope_writer = ApiScopeMappingWriter.new(options[:resources])
@@ -263,17 +262,17 @@ end
 def serialize_redirect(filename)
   path = File.join(options[:serializer].basepath, filename)
   File.open(path, "wb") do |file|
-    file.write <<-HTML
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-<title>#{options[:page_title]}</title>
-<meta http-equiv="REFRESH" content="0;url=file.#{filename}"></HEAD>
-<BODY>
-This page has moved. You will be redirected automatically, or you can <a href="file.#{filename}">click here</a> to go to the new page.
-</BODY>
-</HTML>
-HTML
+    file.write <<~HTML
+      <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+      <html>
+      <head>
+      <title>#{options[:page_title]}</title>
+      <meta http-equiv="REFRESH" content="0;url=file.#{filename}"></HEAD>
+      <BODY>
+      This page has moved. You will be redirected automatically, or you can <a href="file.#{filename}">click here</a> to go to the new page.
+      </BODY>
+      </HTML>
+    HTML
   end
 end
 
@@ -298,7 +297,7 @@ end
 def build_json_objects_map
   obj_map = {}
   resource_obj_list = {}
-  options[:resources].each do |r,cs|
+  options[:resources].each do |r, cs|
     cs.each do |controller|
       (controller.tags(:object) + controller.tags(:model)).each do |obj|
         name, json = obj.text.split(%r{\n+}, 2).map(&:strip)

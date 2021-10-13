@@ -38,5 +38,13 @@ describe DiscussionEntryParticipant do
       expect { @entry.discussion_entry_participants.create!(user: user, workflow_state: 'read') }
         .to raise_error(ActiveRecord::RecordInvalid)
     end
+
+    it 'returns early if there is no entry' do
+      expect(DiscussionEntryParticipant.upsert_for_entries(nil, double)).to be_nil
+    end
+
+    it 'returns early if there is no user' do
+      expect(DiscussionEntryParticipant.upsert_for_entries(double, nil)).to be_nil
+    end
   end
 end

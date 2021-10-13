@@ -23,12 +23,7 @@ import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionPermissions} from '../../../../graphql/DiscussionPermissions'
 import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
 import {fireEvent, render} from '@testing-library/react'
-import {
-  getEditUrl,
-  getSpeedGraderUrl,
-  getPeerReviewsUrl,
-  responsiveQuerySizes
-} from '../../../utils'
+import {getSpeedGraderUrl, responsiveQuerySizes} from '../../../utils'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
@@ -55,6 +50,8 @@ describe('DiscussionTopicContainer', () => {
     window.location = {assign: assignMock}
     window.open = openMock
     window.ENV = {
+      EDIT_URL: 'this_is_the_edit_url',
+      PEER_REVIEWS_URL: 'this_is_the_peer_reviews_url',
       context_asset_string: 'course_1',
       course_id: '1',
       discussion_topic_menu_tools: [
@@ -209,7 +206,7 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(getByText('Edit'))
 
     await waitFor(() => {
-      expect(assignMock).toHaveBeenCalledWith(getEditUrl('1', '1'))
+      expect(assignMock).toHaveBeenCalledWith(window.ENV.EDIT_URL)
     })
   })
 
@@ -219,7 +216,7 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(getByText('Peer Reviews'))
 
     await waitFor(() => {
-      expect(assignMock).toHaveBeenCalledWith(getPeerReviewsUrl('1', '1'))
+      expect(assignMock).toHaveBeenCalledWith(window.ENV.PEER_REVIEWS_URL)
     })
   })
 
@@ -251,7 +248,7 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(getByText('Open in Speedgrader'))
 
     await waitFor(() => {
-      expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1'), '_blank')
+      expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl(), '_blank')
     })
   })
 
@@ -602,6 +599,40 @@ describe('DiscussionTopicContainer', () => {
     expect(container.getByText('Due Apr 5 1:40pm')).toBeTruthy()
   })
 
+  it('should show availability window for ungraded discussions', () => {
+    const container = setup({
+      discussionTopic: Discussion.mock({
+        assignment: null,
+        delayedPostAt: '2021-03-21T00:00:00-06:00',
+        lockAt: '2021-09-03T23:59:59-06:00'
+      })
+    })
+
+    expect(container.getByText('Available from Mar 21 6am until Sep 4 5:59am')).toBeTruthy()
+  })
+
+  it('should not show discussion topic description when read permission is false', () => {
+    const props = {
+      discussionTopic: Discussion.mock({
+        permissions: DiscussionPermissions.mock({read: false}),
+        message: 'This should not show until discussion is available'
+      })
+    }
+    const container = setup(props)
+
+    expect(container.queryByText('This should not show until discussion is available')).toBeNull()
+  })
+
+  it('should show discussion topic description when read permission is true', () => {
+    const container = setup({
+      discussionTopic: Discussion.mock({
+        message: 'This should not show until discussion is available'
+      })
+    })
+
+    expect(container.getByText('This should not show until discussion is available')).toBeTruthy()
+  })
+
   it('Renders an alert if initialPostRequiredForCurrentUser is true', () => {
     const props = {discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: true})}
     const container = setup(props)
@@ -611,18 +642,16 @@ describe('DiscussionTopicContainer', () => {
   })
 
   it('Renders an alert if announcement will post in the future', () => {
-    const farInTheFuture = {
-      property: '3000-01-01T13:40:50Z',
-      expectedText: 'This announcement will not be visible until Jan 1, 3000 1:40pm.'
-    } // change values in this object on the year 3000
     const props = {
       discussionTopic: Discussion.mock({
         isAnnouncement: true,
-        delayedPostAt: farInTheFuture.property
+        delayedPostAt: '3000-01-01T13:40:50-06:00'
       })
     }
     const container = setup(props)
-    expect(container.getByText(farInTheFuture.expectedText)).toBeTruthy()
+    expect(
+      container.getByText('This announcement will not be visible until Jan 1, 3000 7:40pm.')
+    ).toBeTruthy()
   })
 
   it('should not render author if author is null', async () => {

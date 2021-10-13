@@ -56,7 +56,7 @@ class OutcomeImport < ApplicationRecord
       context: context,
       progress: 0,
       workflow_state: :initializing,
-      data:  { import_type: import_type },
+      data: { import_type: import_type },
       user: user
     )
 
@@ -70,7 +70,7 @@ class OutcomeImport < ApplicationRecord
     import
   end
 
-  def as_json(_options={})
+  def as_json(_options = {})
     data = {
       "id" => self.id,
       "created_at" => self.created_at,
@@ -145,15 +145,15 @@ class OutcomeImport < ApplicationRecord
 
     subject, body = import_message_body
     message = Message.new({
-      to: user.email,
-      from: "notifications@instructure.com",
-      subject: subject,
-      body: body,
-      delay_for: 0,
-      context: nil,
-      path_type: 'email',
-      from_name: "Instructure Canvas"
-    })
+                            to: user.email,
+                            from: "notifications@instructure.com",
+                            subject: subject,
+                            body: body,
+                            delay_for: 0,
+                            context: nil,
+                            path_type: 'email',
+                            from_name: "Instructure Canvas"
+                          })
     message.communication_channel = user.email_channel
     message.user = user
     message.save
@@ -162,6 +162,7 @@ class OutcomeImport < ApplicationRecord
 
   def error_count
     return outcome_import_errors.count unless succeeded? || failed?
+
     @error_count ||= outcome_import_errors.loaded? ? outcome_import_errors.size : outcome_import_errors.count
   end
 

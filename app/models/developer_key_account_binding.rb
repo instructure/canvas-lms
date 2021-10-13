@@ -36,16 +36,16 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   after_update :update_tools!
   before_save :set_root_account
 
-  scope :active_in_account, -> (account) do
+  scope :active_in_account, ->(account) do
     where(account_id: account.account_chain_ids, workflow_state: 'on')
   end
 
   # run this once on the local shard and again on site_admin to get all avaiable dev_keys with
   # tool configurations
-  scope :lti_1_3_tools, -> (bindings) do
-    bindings.joins(developer_key: :tool_configuration).
-      where(developer_keys: { visible: true, workflow_state: 'active' }).
-      eager_load(developer_key: :tool_configuration)
+  scope :lti_1_3_tools, ->(bindings) do
+    bindings.joins(developer_key: :tool_configuration)
+            .where(developer_keys: { visible: true, workflow_state: 'active' })
+            .eager_load(developer_key: :tool_configuration)
   end
 
   # Find a DeveloperKeyAccountBinding in order of account_ids. The search for a binding will
@@ -70,9 +70,9 @@ class DeveloperKeyAccountBinding < ApplicationRecord
 
     account_ids_string = "{#{account_ids.join(',')}}"
     relation = DeveloperKeyAccountBinding
-      .joins("JOIN unnest('#{account_ids_string}'::int8[]) WITH ordinality AS i (id, ord) ON i.id=account_id")
-      .where(developer_key_id: developer_key_id)
-      .order(:ord)
+               .joins("JOIN unnest('#{account_ids_string}'::int8[]) WITH ordinality AS i (id, ord) ON i.id=account_id")
+               .where(developer_key_id: developer_key_id)
+               .order(:ord)
     relation = relation.where.not(workflow_state: 'allow') if explicitly_set
     relation.take
   end

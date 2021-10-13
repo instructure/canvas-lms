@@ -28,13 +28,13 @@ describe "Gradebook" do
     before :once do
       gradebook_data_setup
       @da_assignment = assignment_model({
-        course: @course,
-        name: 'DA assignment',
-        points_possible: @assignment_1_points,
-        submission_types: 'online_text_entry',
-        assignment_group: @group,
-        only_visible_to_overrides: true
-      })
+                                          course: @course,
+                                          name: 'DA assignment',
+                                          points_possible: @assignment_1_points,
+                                          submission_types: 'online_text_entry',
+                                          assignment_group: @group,
+                                          only_visible_to_overrides: true
+                                        })
       @override = create_section_override_for_assignment(@da_assignment, course_section: @other_section)
     end
 
@@ -42,7 +42,7 @@ describe "Gradebook" do
       user_session(@teacher)
     end
 
-    it "should gray out cells" do
+    it "grays out cells" do
       Gradebook.visit(@course)
       # student 3, assignment 4
       selector = '#gradebook_grid .container_1 .slick-row:nth-child(3) .b4'
@@ -55,7 +55,7 @@ describe "Gradebook" do
       expect(cell.find_element(:css, '.gradebook-cell')).not_to have_class('grayed-out')
     end
 
-    it "should gray out cells after removing an override which removes visibility" do
+    it "grays out cells after removing an override which removes visibility" do
       selector = '#gradebook_grid .container_1 .slick-row:nth-child(1) .b4'
       @da_assignment.grade_student(@student_1, grade: 42, grader: @teacher)
       @override.destroy

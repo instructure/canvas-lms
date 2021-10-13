@@ -68,7 +68,7 @@ describe('DiscussionTopicRepliesContainer', () => {
         discussionEntriesConnection: {
           nodes: [
             DiscussionEntry.mock({
-              entryParticipant: {read: false, forcedReadState: null, rating: null}
+              entryParticipant: {read: false, forcedReadState: null, rating: false}
             })
           ],
           pageInfo: PageInfo.mock(),

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# coding: utf-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -36,44 +35,44 @@ describe ApplicationHelper do
       @f_2 = Folder.create!(:name => 'f_2', :parent_folder => @f, :context => @course)
       @f_2_1 = Folder.create!(:name => 'f_2_1', :parent_folder => @f_2, :context => @course)
       @f_2_1_1 = Folder.create!(:name => 'f_2_1_1', :parent_folder => @f_2_1, :context => @course)
-      @all_folders = [ @f, @f_1, @f_2, @f_2_1, @f_2_1_1 ]
+      @all_folders = [@f, @f_1, @f_2, @f_2_1, @f_2_1_1]
     end
 
-    it "should work work recursively" do
+    it "works work recursively" do
       option_string = folders_as_options([@f], :all_folders => @all_folders)
 
       html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 5
       expect(html.css('option')[0].text).to eq @f.name
-      expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
-      expect(html.css('option')[4].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/
+      expect(html.css('option')[1].text).to match(/^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/)
+      expect(html.css('option')[4].text).to match(/^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/)
     end
 
-    it "should limit depth" do
+    it "limits depth" do
       option_string = folders_as_options([@f], :all_folders => @all_folders, :max_depth => 1)
 
       html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 3
       expect(html.css('option')[0].text).to eq @f.name
-      expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
-      expect(html.css('option')[2].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2.name}/
+      expect(html.css('option')[1].text).to match(/^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/)
+      expect(html.css('option')[2].text).to match(/^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2.name}/)
     end
 
-    it "should work without supplying all folders" do
+    it "works without supplying all folders" do
       option_string = folders_as_options([@f])
 
       html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 5
       expect(html.css('option')[0].text).to eq @f.name
-      expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
-      expect(html.css('option')[4].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/
+      expect(html.css('option')[1].text).to match(/^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/)
+      expect(html.css('option')[4].text).to match(/^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/)
     end
   end
 
   context 'show_user_create_course_button' do
     before(:once) { @domain_root_account = Account.default }
 
-    it 'should work (non-granular)' do
+    it 'works (non-granular)' do
       @domain_root_account.disable_feature!(:granular_permissions_manage_courses)
       @domain_root_account.update_attribute(
         :settings,
@@ -88,7 +87,7 @@ describe ApplicationHelper do
       expect(show_user_create_course_button(@admin)).to be_truthy
     end
 
-    it 'should work for no enrollments setting (granular permissions)' do
+    it 'works for no enrollments setting (granular permissions)' do
       @domain_root_account.enable_feature!(:granular_permissions_manage_courses)
       @domain_root_account.update(settings: { no_enrollments_can_create_courses: true })
       expect(show_user_create_course_button(nil)).to be_falsey
@@ -102,7 +101,7 @@ describe ApplicationHelper do
   end
 
   describe "tomorrow_at_midnight" do
-    it "should always return a time in the future" do
+    it "always returns a time in the future" do
       now = 1.day.from_now.midnight - 5.seconds
       expect(tomorrow_at_midnight).to be > now
     end
@@ -119,7 +118,7 @@ describe ApplicationHelper do
     end
 
     around do |example|
-      Timecop.freeze(Time.zone.local(2013,3,13,9,12), &example)
+      Timecop.freeze(Time.zone.local(2013, 3, 13, 9, 12), &example)
     end
 
     describe '#context_sensitive_datetime_title' do
@@ -144,7 +143,7 @@ describe ApplicationHelper do
       end
 
       it 'crosses date boundaries appropriately' do
-        Timecop.freeze(Time.utc(2013,3,13,7,12)) do
+        Timecop.freeze(Time.utc(2013, 3, 13, 7, 12)) do
           context = double(time_zone: ActiveSupport::TimeZone["America/Denver"])
           expect(context_sensitive_datetime_title(Time.now, context)).to eq "data-tooltip data-html-tooltip-title=\"Local: Mar 12 at 11:12pm<br>Course: Mar 13 at  1:12am\""
         end
@@ -161,18 +160,18 @@ describe ApplicationHelper do
 
       it 'builds a whole time tag with a useful title showing the timezone offset if theres a context' do
         tag = friendly_datetime(Time.now, context: context)
-        expect(tag).to match /^<time.*<\/time>$/
-        expect(tag).to match /data-html-tooltip-title=/
-        expect(tag).to match /Local: Mar 13 at  1:12am/
-        expect(tag).to match /Course: Mar 13 at  3:12am/
+        expect(tag).to match(/^<time.*<\/time>$/)
+        expect(tag).to match(/data-html-tooltip-title=/)
+        expect(tag).to match(/Local: Mar 13 at  1:12am/)
+        expect(tag).to match(/Course: Mar 13 at  3:12am/)
       end
 
       it 'can produce an alternate tag type' do
         tag = friendly_datetime(Time.now, context: context, tag_type: :span)
-        expect(tag).to match /^<span.*<\/span>$/
-        expect(tag).to match /data-html-tooltip-title=/
-        expect(tag).to match /Local: Mar 13 at  1:12am/
-        expect(tag).to match /Course: Mar 13 at  3:12am/
+        expect(tag).to match(/^<span.*<\/span>$/)
+        expect(tag).to match(/data-html-tooltip-title=/)
+        expect(tag).to match(/Local: Mar 13 at  1:12am/)
+        expect(tag).to match(/Course: Mar 13 at  3:12am/)
       end
 
       it 'produces no tooltip for a nil datetime' do
@@ -205,42 +204,40 @@ describe ApplicationHelper do
     end
 
     it "throws an argument error for a foolish format" do
-      expect{ accessible_date_format('nonsense') }.to raise_error(ArgumentError)
+      expect { accessible_date_format('nonsense') }.to raise_error(ArgumentError)
     end
   end
 
   describe "custom css/js includes" do
-
     def set_up_subaccounts
       @domain_root_account.settings[:global_includes] = true
       @domain_root_account.settings[:sub_account_includes] = true
       @domain_root_account.create_brand_config!({
-        css_overrides: 'https://example.com/root/account.css',
-        js_overrides: 'https://example.com/root/account.js'
-      })
+                                                  css_overrides: 'https://example.com/root/account.css',
+                                                  js_overrides: 'https://example.com/root/account.js'
+                                                })
       @domain_root_account.save!
 
       @child_account = account_model(root_account: @domain_root_account, name: 'child account')
       bc = @child_account.build_brand_config({
-        css_overrides: 'https://example.com/child/account.css',
-        js_overrides: 'https://example.com/child/account.js'
-      })
+                                               css_overrides: 'https://example.com/child/account.css',
+                                               js_overrides: 'https://example.com/child/account.js'
+                                             })
       bc.parent = @domain_root_account.brand_config
       bc.save!
       @child_account.save!
 
       @grandchild_account = @child_account.sub_accounts.create!(name: 'grandchild account')
       bc = @grandchild_account.build_brand_config({
-        css_overrides: 'https://example.com/grandchild/account.css',
-        js_overrides: 'https://example.com/grandchild/account.js'
-      })
+                                                    css_overrides: 'https://example.com/grandchild/account.css',
+                                                    js_overrides: 'https://example.com/grandchild/account.js'
+                                                  })
       bc.parent = @child_account.brand_config
       bc.save!
       @grandchild_account.save!
     end
 
     describe "include_account_css" do
-
       before :once do
         @site_admin = Account.site_admin
         @domain_root_account = Account.default
@@ -249,32 +246,32 @@ describe ApplicationHelper do
       end
 
       context "with no custom css" do
-        it "should be empty" do
+        it "is empty" do
           allow(helper).to receive(:active_brand_config).and_return(nil)
           expect(helper.include_account_css).to be_nil
         end
       end
 
       context "with custom css" do
-        it "should include account css" do
+        it "includes account css" do
           allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
           output = helper.include_account_css
           expect(output).to have_tag 'link'
           expect(output).to match %r{https://example.com/path/to/overrides.css}
         end
 
-        it "should include site_admin css even if there is no active brand" do
+        it "includes site_admin css even if there is no active brand" do
           allow(helper).to receive(:active_brand_config).and_return nil
           Account.site_admin.create_brand_config!({
-            css_overrides: 'https://example.com/site_admin/account.css',
-            js_overrides: 'https://example.com/site_admin/account.js'
-          })
+                                                    css_overrides: 'https://example.com/site_admin/account.css',
+                                                    js_overrides: 'https://example.com/site_admin/account.js'
+                                                  })
           output = helper.include_account_css
           expect(output).to have_tag 'link'
           expect(output).to match %r{https://example.com/site_admin/account.css}
         end
 
-        it "should not include anything if param is set to 0" do
+        it "does not include anything if param is set to 0" do
           allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
           params[:global_includes] = '0'
 
@@ -306,7 +303,7 @@ describe ApplicationHelper do
       context "sub-accounts" do
         before { set_up_subaccounts }
 
-        it "should include sub-account css when viewing the subaccount or any course or group in it" do
+        it "includes sub-account css when viewing the subaccount or any course or group in it" do
           course = @grandchild_account.courses.create!
           group = course.groups.create!
           [@grandchild_account, course, group].each do |context|
@@ -317,14 +314,14 @@ describe ApplicationHelper do
           end
         end
 
-        it "should not include sub-account css when root account is context" do
+        it "does not include sub-account css when root account is context" do
           @context = @domain_root_account
           output = helper.include_account_css
           expect(output).to have_tag 'link'
           expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root']]
         end
 
-        it "should use include sub-account css, if sub-account is lowest common account context" do
+        it "uses include sub-account css, if sub-account is lowest common account context" do
           @course = @grandchild_account.courses.create!
           @course.offer!
           student_in_course(active_all: true)
@@ -335,7 +332,7 @@ describe ApplicationHelper do
           expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root'], ['child'], ['grandchild']]
         end
 
-        it "should work using common_account_chain starting from lowest common account context with enrollments" do
+        it "works using common_account_chain starting from lowest common account context with enrollments" do
           course1 = @child_account.courses.create!
           course1.offer!
           course2 = @grandchild_account.courses.create!
@@ -349,14 +346,14 @@ describe ApplicationHelper do
           expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root'], ['child']]
         end
 
-        it "should fall-back to @domain_root_account's branding if I'm logged in but not enrolled in anything" do
+        it "fall-backs to @domain_root_account's branding if I'm logged in but not enrolled in anything" do
           @current_user = user_factory
           output = helper.include_account_css
           expect(output).to have_tag 'link'
           expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root']]
         end
 
-        it "should load custom css even for high contrast users" do
+        it "loads custom css even for high contrast users" do
           @current_user = user_factory
           user_factory.enable_feature!(:high_contrast)
           @context = @grandchild_account
@@ -364,7 +361,6 @@ describe ApplicationHelper do
           expect(output).to have_tag 'link'
           expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [["root"], ["child"], ["grandchild"]]
         end
-
       end
     end
 
@@ -377,25 +373,25 @@ describe ApplicationHelper do
       end
 
       context "with no custom js" do
-        it "should be empty" do
+        it "is empty" do
           allow(helper).to receive(:active_brand_config).and_return(nil)
           expect(helper.include_account_js).to be_nil
         end
       end
 
       context "with custom js" do
-        it "should include account javascript" do
+        it "includes account javascript" do
           allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(js_overrides: 'https://example.com/path/to/overrides.js')
           output = helper.include_account_js
           expect(output).to have_tag 'script', text: %r{https:\\/\\/example.com\\/path\\/to\\/overrides.js}
         end
 
-        it "should include site_admin javascript even if there is no active brand" do
+        it "includes site_admin javascript even if there is no active brand" do
           allow(helper).to receive(:active_brand_config).and_return nil
           Account.site_admin.create_brand_config!({
-            css_overrides: 'https://example.com/site_admin/account.css',
-            js_overrides: 'https://example.com/site_admin/account.js'
-          })
+                                                    css_overrides: 'https://example.com/site_admin/account.css',
+                                                    js_overrides: 'https://example.com/site_admin/account.js'
+                                                  })
 
           output = helper.include_account_js
           expect(output).to have_tag 'script', text: %r{https:\\/\\/example.com\\/site_admin\\/account.js}
@@ -411,7 +407,7 @@ describe ApplicationHelper do
         context "sub-accounts" do
           before { set_up_subaccounts }
 
-          it "should just include domain root account's when there is no context or @current_user" do
+          it "justs include domain root account's when there is no context or @current_user" do
             output = helper.include_account_js
             expect(output).to have_tag 'script'
             expect(output).to eq("<script>
@@ -427,7 +423,7 @@ describe ApplicationHelper do
 </script>")
           end
 
-          it "should load custom js even for high contrast users" do
+          it "loads custom js even for high contrast users" do
             @current_user = user_factory
             user_factory.enable_feature!(:high_contrast)
             output = helper.include_account_js
@@ -444,7 +440,7 @@ describe ApplicationHelper do
 </script>")
           end
 
-          it "should include granchild, child, and root when viewing the grandchild or any course or group in it" do
+          it "includes granchild, child, and root when viewing the grandchild or any course or group in it" do
             course = @grandchild_account.courses.create!
             group = course.groups.create!
             [@grandchild_account, course, group].each do |context|
@@ -468,12 +464,12 @@ describe ApplicationHelper do
   end
 
   describe "help link" do
-    it "should configure the help link to display the dialog by default" do
+    it "configures the help link to display the dialog by default" do
       expect(helper.help_link_url).to eq '#'
       expect(helper.help_link_classes).to eq 'help_dialog_trigger'
     end
 
-    it "should override default help link with the configured support url" do
+    it "overrides default help link with the configured support url" do
       support_url = 'http://instructure.com'
       Account.default.update_attribute(:settings, { :support_url => support_url })
       helper.instance_variable_set(:@domain_root_account, Account.default)
@@ -484,7 +480,7 @@ describe ApplicationHelper do
       expect(helper.help_link_classes).to eq 'support_url help_dialog_trigger'
     end
 
-    it "should return the configured icon" do
+    it "returns the configured icon" do
       icon = 'inbox'
       Account.default.update_attribute(:settings, { :help_link_icon => icon })
       helper.instance_variable_set(:@domain_root_account, Account.default)
@@ -492,7 +488,7 @@ describe ApplicationHelper do
       expect(helper.help_link_icon).to eq icon
     end
 
-    it "should return the configured help link name" do
+    it "returns the configured help link name" do
       link_name = 'Links'
       Account.default.update_attribute(:settings, { :help_link_name => link_name })
       helper.instance_variable_set(:@domain_root_account, Account.default)
@@ -502,7 +498,7 @@ describe ApplicationHelper do
   end
 
   describe "collection_cache_key" do
-    it "should generate a cache key, changing when an element cache_key changes" do
+    it "generates a cache key, changing when an element cache_key changes" do
       collection = [user_factory, user_factory, user_factory]
       key1 = collection_cache_key(collection)
       key2 = collection_cache_key(collection)
@@ -560,11 +556,11 @@ describe ApplicationHelper do
   end
 
   context "include_custom_meta_tags" do
-    it "should be nil if @meta_tags is not defined" do
+    it "is nil if @meta_tags is not defined" do
       expect(include_custom_meta_tags).to be_nil
     end
 
-    it "should include tags if present" do
+    it "includes tags if present" do
       @meta_tags = [{ :name => "hi", :content => "there" }]
       result = include_custom_meta_tags
       expect(result).to match(/meta/)
@@ -572,14 +568,14 @@ describe ApplicationHelper do
       expect(result).to match(/content="there"/)
     end
 
-    it "should html_safe-ify them" do
+    it "html_safe-ifies them" do
       @meta_tags = [{ :name => "hi", :content => "there" }]
       expect(include_custom_meta_tags).to be_html_safe
     end
   end
 
   describe "editor_buttons" do
-    it "should return hash of tools if in group" do
+    it "returns hash of tools if in group" do
       @course = course_model
       @group = @course.groups.create!(:name => "some group")
       tool = @course.context_external_tools.new(
@@ -589,47 +585,47 @@ describe ApplicationHelper do
         :url => "http://example.com",
         :description => "the description."
       )
-      tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com", :canvas_icon_class => 'icon-commons'}
+      tool.editor_button = { :url => "http://example.com", :icon_url => "http://example.com", :canvas_icon_class => 'icon-commons' }
       tool.save!
       @context = @group
 
       expect(editor_buttons).to eq([{
-        :name=>"bob",
-        :id=>tool.id,
-        :url=>"http://example.com",
-        :icon_url=>"http://example.com",
-        :canvas_icon_class => 'icon-commons',
-        :width=>800,
-        :height=>400,
-        :use_tray => false,
-        :description => "<p>the description.</p>\n",
-        :favorite => false
-      }])
+                                     :name => "bob",
+                                     :id => tool.id,
+                                     :url => "http://example.com",
+                                     :icon_url => "http://example.com",
+                                     :canvas_icon_class => 'icon-commons',
+                                     :width => 800,
+                                     :height => 400,
+                                     :use_tray => false,
+                                     :description => "<p>the description.</p>\n",
+                                     :favorite => false
+                                   }])
     end
 
-    it "should return hash of tools if in course" do
+    it "returns hash of tools if in course" do
       @course = course_model
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
-      tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com", :canvas_icon_class => 'icon-commons'}
+      tool.editor_button = { :url => "http://example.com", :icon_url => "http://example.com", :canvas_icon_class => 'icon-commons' }
       tool.save!
       allow(controller).to receive(:group_external_tool_path).and_return('http://dummy')
       @context = @course
 
       expect(editor_buttons).to eq([{
-        :name=>"bob",
-        :id=>tool.id,
-        :url=>"http://example.com",
-        :icon_url=>"http://example.com",
-        :canvas_icon_class => 'icon-commons',
-        :width=>800,
-        :height=>400,
-        :use_tray => false,
-        :description => "",
-        :favorite => false
-      }])
+                                     :name => "bob",
+                                     :id => tool.id,
+                                     :url => "http://example.com",
+                                     :icon_url => "http://example.com",
+                                     :canvas_icon_class => 'icon-commons',
+                                     :width => 800,
+                                     :height => 400,
+                                     :use_tray => false,
+                                     :description => "",
+                                     :favorite => false
+                                   }])
     end
 
-    it "should not include tools from the domain_root_account for users" do
+    it "does not include tools from the domain_root_account for users" do
       @domain_root_account = Account.default
       account_admin_user
       tool = @domain_root_account.context_external_tools.new(
@@ -638,7 +634,7 @@ describe ApplicationHelper do
         :shared_secret => "secret",
         :url => "http://example.com"
       )
-      tool.editor_button = {:url => "http://example.com", :icon_url => "http://example.com"}
+      tool.editor_button = { :url => "http://example.com", :icon_url => "http://example.com" }
       tool.save!
       @context = @admin
 
@@ -649,7 +645,7 @@ describe ApplicationHelper do
   describe "UI path checking" do
     describe "#active_path?" do
       context "when the request path is the course show page" do
-        let(:request){ double('request', :fullpath => '/courses/2')}
+        let(:request) { double('request', :fullpath => '/courses/2') }
 
         it "returns true for paths that match" do
           expect(active_path?('/courses')).to be_truthy
@@ -665,20 +661,20 @@ describe ApplicationHelper do
       end
 
       context "when the request path is the account external tools path" do
-        let(:request){ double('request', :fullpath => '/accounts/2/external_tools/27')}
+        let(:request) { double('request', :fullpath => '/accounts/2/external_tools/27') }
 
         before :each do
           @context = Account.default
           allow(controller).to receive(:controller_name).and_return('external_tools')
         end
 
-        it "it doesn't return true for '/accounts'" do
+        it "doesn't return true for '/accounts'" do
           expect(active_path?('/accounts')).to be_falsey
         end
       end
 
       context "when the request path is the course external tools path" do
-        let(:request){ double('request', :fullpath => '/courses/2/external_tools/27')}
+        let(:request) { double('request', :fullpath => '/courses/2/external_tools/27') }
 
         before :each do
           @context = Account.default.courses.create!
@@ -705,7 +701,6 @@ describe ApplicationHelper do
   end
 
   describe "active_brand_config" do
-
     it "returns nil if user prefers high contrast" do
       @current_user = user_factory
       @current_user.enable_feature!(:high_contrast)
@@ -727,7 +722,6 @@ describe ApplicationHelper do
 
       expect(helper.send(:active_brand_config)).to eq BrandConfig.k12_config
     end
-
   end
 
   describe "map_groups_for_planner" do
@@ -746,9 +740,9 @@ describe ApplicationHelper do
 
         @current_user = user
         course1.enroll_student(@current_user)
-        groups.each {|g| g.add_user(user, 'accepted', true)}
+        groups.each { |g| g.add_user(user, 'accepted', true) }
         user_account_groups = map_groups_for_planner(groups)
-        expect(user_account_groups.map {|g| g[:id]}).to eq [group1.id, group2.id, group3.id]
+        expect(user_account_groups.map { |g| g[:id] }).to eq [group1.id, group2.id, group3.id]
       end
     end
   end
@@ -801,7 +795,7 @@ describe ApplicationHelper do
         expect(planner_enabled?).to be true
       end
 
-       it "returns true for invited student enrollments" do
+      it "returns true for invited student enrollments" do
         enrollment = course_with_student
         enrollment.workflow_state = 'invited'
         enrollment.save!
@@ -860,7 +854,7 @@ describe ApplicationHelper do
 
       let(:logged_in_user) { user_model }
 
-      it "should return logged_in_user" do
+      it "returns logged_in_user" do
         expect(file_access_real_user).to be logged_in_user
       end
     end
@@ -870,20 +864,20 @@ describe ApplicationHelper do
         @files_domain = true
       end
 
-      it "should return real access user from session" do
+      it "returns real access user from session" do
         real_access_user = user_model
         session['file_access_real_user_id'] = real_access_user.id
         expect(file_access_real_user).to eql real_access_user
       end
 
-      it "should return access user from session if real access user not set" do
+      it "returns access user from session if real access user not set" do
         access_user = user_model
         session['file_access_user_id'] = access_user.id
         session['file_access_real_user_id'] = nil
         expect(file_access_real_user).to eql access_user
       end
 
-      it "should return real access user over access user if both set" do
+      it "returns real access user over access user if both set" do
         access_user = user_model
         real_access_user = user_model
         session['file_access_user_id'] = access_user.id
@@ -891,7 +885,7 @@ describe ApplicationHelper do
         expect(file_access_real_user).to eql real_access_user
       end
 
-      it "should return nil if neither set" do
+      it "returns nil if neither set" do
         expect(file_access_real_user).to be nil
       end
     end
@@ -903,14 +897,14 @@ describe ApplicationHelper do
         @files_domain = false
       end
 
-      it "should return token's developer_key with @access_token set" do
+      it "returns token's developer_key with @access_token set" do
         user = user_model
         developer_key = DeveloperKey.create!
         @access_token = user.access_tokens.where(developer_key_id: developer_key).create!
         expect(file_access_developer_key).to eql developer_key
       end
 
-      it "should return nil without @access_token set" do
+      it "returns nil without @access_token set" do
         expect(file_access_developer_key).to be nil
       end
     end
@@ -920,13 +914,13 @@ describe ApplicationHelper do
         @files_domain = true
       end
 
-      it "should return developer key from session" do
+      it "returns developer key from session" do
         developer_key = DeveloperKey.create!
         session['file_access_developer_key_id'] = developer_key.id
         expect(file_access_developer_key).to eql developer_key
       end
 
-      it "should return nil if developer key in session not set" do
+      it "returns nil if developer key in session not set" do
         expect(file_access_developer_key).to eql nil
       end
     end
@@ -939,7 +933,7 @@ describe ApplicationHelper do
         @files_domain = false
       end
 
-      it "should return @domain_root_account" do
+      it "returns @domain_root_account" do
         expect(file_access_root_account).to eql Account.default
       end
     end
@@ -949,12 +943,12 @@ describe ApplicationHelper do
         @files_domain = true
       end
 
-      it "should return root account from session" do
+      it "returns root account from session" do
         session['file_access_root_account_id'] = Account.default.id
         expect(file_access_root_account).to eql Account.default
       end
 
-      it "should return nil if root account in session not set" do
+      it "returns nil if root account in session not set" do
         expect(file_access_root_account).to eql nil
       end
     end
@@ -971,7 +965,7 @@ describe ApplicationHelper do
         @files_domain = false
       end
 
-      it "should return the request's host" do
+      it "returns the request's host" do
         expect(file_access_oauth_host).to eql host
       end
     end
@@ -983,12 +977,12 @@ describe ApplicationHelper do
         @files_domain = true
       end
 
-      it "should return the host from the session" do
+      it "returns the host from the session" do
         session['file_access_oauth_host'] = host
         expect(file_access_oauth_host).to eql host
       end
 
-      it "should return nil if no host in the session" do
+      it "returns nil if no host in the session" do
         expect(file_access_oauth_host).to eql nil
       end
     end
@@ -1111,8 +1105,8 @@ describe ApplicationHelper do
 
   describe "#prefetch_xhr" do
     it "inserts a script tag that will have a `fetch` call with the right id, url, and options" do
-      expect(prefetch_xhr('some_url', id: 'some_id', options: {headers: {"x-some-header": "some-value"}})).to eq(
-"<script>
+      expect(prefetch_xhr('some_url', id: 'some_id', options: { headers: { "x-some-header": "some-value" } })).to eq(
+        "<script>
 //<![CDATA[
 (window.prefetched_xhrs = (window.prefetched_xhrs || {}))[\"some_id\"] = fetch(\"some_url\", {\"credentials\":\"same-origin\",\"headers\":{\"Accept\":\"application/json+canvas-string-ids, application/json\",\"X-Requested-With\":\"XMLHttpRequest\",\"x-some-header\":\"some-value\"}})
 //]]>
@@ -1132,18 +1126,17 @@ describe ApplicationHelper do
     end
 
     it "returns the account short name when the logo is custom" do
-      Account.default.create_brand_config!(variables: {"ic-brand-Login-logo" => "test.jpg"})
+      Account.default.create_brand_config!(variables: { "ic-brand-Login-logo" => "test.jpg" })
       expect(alt_text_for_login_logo).to eql "Default Account"
     end
   end
 
   context "content security policy enabled" do
-
-    let(:account) { Account.create!(name: 'csp_account')}
+    let(:account) { Account.create!(name: 'csp_account') }
     let(:sub_account) { account.sub_accounts.create! }
     let(:sub_2_account) { sub_account.sub_accounts.create! }
-    let(:headers) {{}}
-    let(:js_env) {{}}
+    let(:headers) { {} }
+    let(:js_env) { {} }
 
     before do
       account.enable_feature!(:javascript_csp)
@@ -1233,10 +1226,10 @@ describe ApplicationHelper do
       @calculation_method = outcome_calculation_method_model(@course.root_account)
     end
 
-    let(:js_env) {{}}
+    let(:js_env) { {} }
 
     before do
-      allow(helper).to receive(:js_env) {|env| js_env.merge!(env)}
+      allow(helper).to receive(:js_env) { |env| js_env.merge!(env) }
     end
 
     it 'does not include mastery scales FF when account_level_mastery_scales disabled' do

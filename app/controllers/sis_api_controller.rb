@@ -375,12 +375,12 @@ class SisApiController < ApplicationController
   def published_course_ids
     if context.is_a?(Account)
       course_scope = Course.published.where(account_id: [context.id] + Account.sub_account_ids_recursive(context.id))
-      if starts_before = CanvasTime.try_parse(params[:starts_before])
+      if (starts_before = CanvasTime.try_parse(params[:starts_before]))
         course_scope = course_scope.where("
         (courses.start_at IS NULL AND enrollment_terms.start_at IS NULL)
         OR courses.start_at < ? OR enrollment_terms.start_at < ?", starts_before, starts_before)
       end
-      if ends_after = CanvasTime.try_parse(params[:ends_after])
+      if (ends_after = CanvasTime.try_parse(params[:ends_after]))
         course_scope = course_scope.where("
         (courses.conclude_at IS NULL AND enrollment_terms.end_at IS NULL)
         OR courses.conclude_at > ? OR enrollment_terms.end_at > ?", ends_after, ends_after)
@@ -400,11 +400,11 @@ class SisApiController < ApplicationController
   end
 
   def published_assignments
-    assignments = Assignment.published.
-      where(post_to_sis: true).
-      where(context_type: 'Course', context_id: published_course_ids).
-      preload(:assignment_group).
-      preload(context: {active_course_sections: [:nonxlist_course]})
+    assignments = Assignment.published
+                            .where(post_to_sis: true)
+                            .where(context_type: 'Course', context_id: published_course_ids)
+                            .preload(:assignment_group)
+                            .preload(context: { active_course_sections: [:nonxlist_course] })
 
     if include_student_overrides?
       assignments = assignments.preload(

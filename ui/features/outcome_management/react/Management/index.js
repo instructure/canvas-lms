@@ -372,17 +372,11 @@ const OutcomeManagementPanel = ({
       )}
       {selectedGroupId && (
         <>
-          <GroupRemoveModal
-            groupId={selectedGroupId}
-            isOpen={isGroupRemoveModalOpen}
-            onCloseHandler={closeGroupRemoveModal}
-            onCollectionToggle={queryCollections}
-            onSuccess={onSucessGroupRemove}
-          />
-          {!loading && selectedParentGroupId && (
+          {!loading && group && selectedParentGroupId && (
             <GroupMoveModal
               groupId={selectedGroupId}
-              groupTitle={group?.title}
+              groupTitle={group.title}
+              parentGroupId={selectedParentGroupId}
               isOpen={isGroupMoveModalOpen}
               onCloseHandler={closeGroupMoveModal}
               onSuccess={selectParentGroupInLhs}
@@ -417,6 +411,14 @@ const OutcomeManagementPanel = ({
       )}
       {group && (
         <>
+          <GroupRemoveModal
+            groupId={selectedGroupId}
+            groupTitle={group.title}
+            isOpen={isGroupRemoveModalOpen}
+            onCloseHandler={closeGroupRemoveModal}
+            onCollectionToggle={queryCollections}
+            onSuccess={onSucessGroupRemove}
+          />
           <GroupEditModal
             outcomeGroup={group}
             isOpen={isGroupEditModalOpen}

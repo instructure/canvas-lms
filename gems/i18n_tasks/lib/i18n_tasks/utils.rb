@@ -25,13 +25,13 @@ module I18nTasks
     def self.deep_compact(hash)
       res_hash = hash.map do |key, value|
         value = deep_compact(value) if value.is_a?(Hash)
-  
+
         value = nil if [{}, []].include?(value)
         [key, value]
       end
-  
+
       res_hash.to_h.compact
-    end  
+    end
 
     def self.dump_js(translations)
       <<-TRANSLATIONS.gsub(/^ {8}/, '')

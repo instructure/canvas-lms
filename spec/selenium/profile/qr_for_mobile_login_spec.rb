@@ -56,7 +56,7 @@ describe 'QR for mobile login' do
   before { user_logged_in }
 
   context 'from global nav account profile' do
-    it 'should bring up generated QR code when confirm modal is proceeded' do
+    it 'brings up generated QR code when confirm modal is proceeded' do
       get '/'
       f('#global_nav_profile_link').click
       fln('QR for Mobile Login').click
@@ -67,7 +67,7 @@ describe 'QR for mobile login' do
   end
 
   context 'from user profile' do
-    it 'should bring up generated QR code when confirm modal is proceeded' do
+    it 'brings up generated QR code when confirm modal is proceeded' do
       get '/profile'
       fln('QR for Mobile Login').click
       f("button[data-testid='qr-proceed-button']").click
@@ -75,7 +75,7 @@ describe 'QR for mobile login' do
       check_base64_encoded_png_image(qr_code)
     end
 
-    it 'should show message and no code when confirm modal is canceled' do
+    it 'shows message and no code when confirm modal is canceled' do
       get '/profile'
       fln('QR for Mobile Login').click
       login_container = f('#qr_login_container')

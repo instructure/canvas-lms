@@ -20,48 +20,46 @@
 require_relative '../../common'
 
 module StudentContextTray
-    #------------------------------ Selectors -----------------------------
+  #------------------------------ Selectors -----------------------------
 
-    #------------------------------ Elements ------------------------------
-    def student_tray_header
-      f(".StudentContextTray-Header")
-    end
+  #------------------------------ Elements ------------------------------
+  def student_tray_header
+    f(".StudentContextTray-Header")
+  end
 
-    def student_avatar_link
-      f(".StudentContextTray__Avatar a")
-    end
+  def student_avatar_link
+    f(".StudentContextTray__Avatar a")
+  end
 
-    def student_name_link
-      f(".StudentContextTray-Header__Name a")
-    end
+  def student_name_link
+    f(".StudentContextTray-Header__Name a")
+  end
 
-    def todo_tray_course_selector
-      f("#to-do-item-course-select")
-    end
+  def todo_tray_course_selector
+    f("#to-do-item-course-select")
+  end
 
-    def todo_tray_course_suggestions
-      fj("ul[role=listbox]:contains('Optional: Add Course')")
-    end
+  def todo_tray_course_suggestions
+    fj("ul[role=listbox]:contains('Optional: Add Course')")
+  end
 
-    def todo_tray_dropdown_select_course(course_name)
-      fj("li[role=none] span[role=option]:contains('#{course_name}')")
-    end
+  def todo_tray_dropdown_select_course(course_name)
+    fj("li[role=none] span[role=option]:contains('#{course_name}')")
+  end
 
-    def student_tray_quick_links
-      f('.StudentContextTray-QuickLinks')
-    end
+  def student_tray_quick_links
+    f('.StudentContextTray-QuickLinks')
+  end
 
-    #------------------------ Actions & Methods ---------------------------
-    def wait_for_student_tray
-      wait_for(method: nil, timeout: 1) { student_name_link.displayed? }
-      wait_for_ajaximations
-      wait_for(method: nil, timeout: 5) { ff(".StudentContextTray__Spinner").empty? }
-    end
+  #------------------------ Actions & Methods ---------------------------
+  def wait_for_student_tray
+    wait_for(method: nil, timeout: 1) { student_name_link.displayed? }
+    wait_for_ajaximations
+    wait_for(method: nil, timeout: 5) { ff(".StudentContextTray__Spinner").empty? }
+  end
 
-    def todo_tray_select_course_from_dropdown(course_name='Optional: Add Course')
-      todo_tray_course_selector.click
-      todo_tray_dropdown_select_course(course_name).click
-    end
-
-
+  def todo_tray_select_course_from_dropdown(course_name = 'Optional: Add Course')
+    todo_tray_course_selector.click
+    todo_tray_dropdown_select_course(course_name).click
+  end
 end

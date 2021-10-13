@@ -26,11 +26,11 @@ module Schemas::Lti
       'properties' => {
         'kty' => {
           'type' => 'string',
-          'const' => Canvas::Security::RSAKeyPair::KTY
+          'const' => CanvasSecurity::RSAKeyPair::KTY
         }.freeze,
         'alg' => {
           'type' => 'string',
-          'const' => Canvas::Security::RSAKeyPair::ALG
+          'const' => CanvasSecurity::RSAKeyPair::ALG
         }.freeze,
         'e' => {
           'type' => 'string'

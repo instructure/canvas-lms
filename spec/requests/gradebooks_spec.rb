@@ -72,7 +72,7 @@ describe 'Access Different Gradebooks Environments', type: :request do
 
       describe 'grading_role' do
         let(:js_env) do
-          get speed_grader_course_gradebook_path(course_id: @course.id), params: {assignment_id: @assignment.id }
+          get speed_grader_course_gradebook_path(course_id: @course.id), params: { assignment_id: @assignment.id }
           js_env_from_response(response)
         end
 

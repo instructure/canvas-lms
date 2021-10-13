@@ -45,6 +45,7 @@ class ReleaseNote
   include ActiveModel::Serializers::JSON
 
   attr_reader :id, :published, :created_at
+
   define_attribute_methods :id, :show_ats, :target_roles, :published
 
   def initialize(ddb_item = nil)
@@ -63,7 +64,7 @@ class ReleaseNote
   end
 
   def attributes
-    {'id' => nil, 'show_ats' => nil, 'target_roles' => nil, 'published' => nil, 'langs' => nil}
+    { 'id' => nil, 'show_ats' => nil, 'target_roles' => nil, 'published' => nil, 'langs' => nil }
   end
 
   def target_roles
@@ -286,13 +287,13 @@ class ReleaseNote
       return [] if ids_arr.length == 0
 
       res = ddb_client.batch_get_item(request_items: { ddb_table_name => {
-        keys: ids_arr.map do |id|
-          {
-            PartitionKey: id,
-            RangeKey: 'info'
-          }
-        end
-      }})
+                                        keys: ids_arr.map do |id|
+                                          {
+                                            PartitionKey: id,
+                                            RangeKey: 'info'
+                                          }
+                                        end
+                                      } })
 
       raise ActiveRecord::RecordNotFound unless res.responses[ddb_table_name].length == ids_arr.length
 
@@ -365,7 +366,7 @@ class ReleaseNote
         config[:endpoint] = settings['ddb_endpoint'] if settings['ddb_endpoint']
         config[:credentials] = Canvas::AwsCredentialProvider.new('release_notes_creds', settings['vault_credential_path'])
         aws_client = Aws::DynamoDB::Client.new(config)
-        CanvasDynamoDB::Database.new("release_notes:#{Rails.env}", client_opts: {client: aws_client}, logger: Rails.logger)
+        CanvasDynamoDB::Database.new("release_notes:#{Rails.env}", client_opts: { client: aws_client }, logger: Rails.logger)
       end
     end
 

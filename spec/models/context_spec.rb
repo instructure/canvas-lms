@@ -22,74 +22,74 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Context do
   context "find_by_asset_string" do
-    it "should find a valid course" do
+    it "finds a valid course" do
       course = Course.create!
       expect(Context.find_by_asset_string(course.asset_string)).to eql(course)
     end
 
-    it "should not find an invalid course" do
+    it "does not find an invalid course" do
       expect(Context.find_by_asset_string("course_0")).to be nil
     end
 
-    it "should find a valid group" do
+    it "finds a valid group" do
       group = Group.create!(:context => Account.default)
       expect(Context.find_by_asset_string(group.asset_string)).to eql(group)
     end
 
-    it "should not find an invalid group" do
+    it "does not find an invalid group" do
       expect(Context.find_by_asset_string("group_0")).to be nil
     end
 
-    it "should find a valid account" do
+    it "finds a valid account" do
       account = Account.create!(:name => "test")
       expect(Context.find_by_asset_string(account.asset_string)).to eql(account)
     end
 
-    it "should not find an invalid account" do
+    it "does not find an invalid account" do
       expect(Context.find_by_asset_string("account_#{Account.last.id + 9999}")).to be nil
     end
 
-    it "should find a valid user" do
+    it "finds a valid user" do
       user = User.create!
       expect(Context.find_by_asset_string(user.asset_string)).to eql(user)
     end
 
-    it "should not find an invalid user" do
+    it "does not find an invalid user" do
       expect(Context.find_by_asset_string("user_0")).to be nil
     end
 
-    it "should not find an invalid asset string" do
+    it "does not find an invalid asset string" do
       expect(Context.find_by_asset_string("")).to be nil
       expect(Context.find_by_asset_string("loser_5")).to be nil
     end
 
-    it "should not find a valid asset" do
+    it "does not find a valid asset" do
       assignment_model
       expect(Context.find_by_asset_string(@assignment.asset_string)).to be nil
     end
 
-    it "should not find a context with invalid type" do
+    it "does not find a context with invalid type" do
       expect(Context.find_by_asset_string("WRONG_1")).to be nil
     end
   end
 
   context "find_asset_by_asset_string" do
-    it "should find a valid assignment" do
+    it "finds a valid assignment" do
       assignment_model
       expect(@course.find_asset(@assignment.asset_string)).to eql(@assignment)
     end
-    it "should find a valid wiki page" do
+    it "finds a valid wiki page" do
       course_model
       page = @course.wiki_pages.create!(:title => 'test')
       expect(@course.find_asset(page.asset_string)).to eql(page)
       expect(@course.find_asset(page.asset_string, [:wiki_page])).to eql(page)
     end
-    it "should not find a valid wiki page if told to ignore wiki pages" do
+    it "does not find a valid wiki page if told to ignore wiki pages" do
       course_model
       page = @course.wiki_pages.create!(:title => 'test')
       expect(@course.find_asset(page.asset_string, [:assignment])).to be nil
     end
-    it "should not find an invalid assignment" do
+    it "does not find an invalid assignment" do
       assignment_model
       @course2 = Course.create!
       expect(@course2.find_asset(@assignment.asset_string)).to be nil
@@ -104,12 +104,12 @@ describe Context do
         attachment_model context: @course
       end
 
-      it "should scope to context if context is provided" do
+      it "scopes to context if context is provided" do
         expect(Context.find_asset_by_asset_string(@attachment.asset_string, @course)).to eq(@attachment)
         expect(Context.find_asset_by_asset_string(@attachment.asset_string, @course2)).to be_nil
       end
 
-      it "should find in any context if context is not provided" do
+      it "finds in any context if context is not provided" do
         expect(Context.find_asset_by_asset_string(@attachment.asset_string)).to eq(@attachment)
       end
     end
@@ -120,7 +120,7 @@ describe Context do
       course_factory
     end
 
-    it 'should find files' do
+    it 'finds files' do
       attachment_model(context: @course).update(locked: true)
       expect(Context.find_asset_by_url("/courses/#{@course.id}/files?preview=#{@attachment.id}")).to eq @attachment
       expect(Context.find_asset_by_url("/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1")).to eq @attachment
@@ -128,12 +128,12 @@ describe Context do
       expect(Context.find_asset_by_url("/courses/#{@course.id}/file_contents/course%20files//#{@attachment.name}")).to eq @attachment
     end
 
-    it 'should find assignments' do
+    it 'finds assignments' do
       assignment_model(course: @course)
       expect(Context.find_asset_by_url("/courses/#{@course.id}/assignments/#{@assignment.id}")).to eq @assignment
     end
 
-    it 'should find wiki pages' do
+    it 'finds wiki pages' do
       wiki_page_model(context: @course, title: 'hi')
       expect(Context.find_asset_by_url("/courses/#{@course.id}/pages/hi")).to eq @page
       expect(Context.find_asset_by_url("/courses/#{@course.id}/wiki/hi")).to eq @page
@@ -143,12 +143,12 @@ describe Context do
       expect(Context.find_asset_by_url("/groups/#{@group.id}/wiki/yo")).to eq @page
     end
 
-    it "should find weird wiki pages" do
+    it "finds weird wiki pages" do
       wiki_page_model(context: @course, title: 'pagewitha+init')
       expect(Context.find_asset_by_url("/courses/#{@course.id}/pages/pagewitha+init")).to eq @page
     end
 
-    it 'should find discussion_topics' do
+    it 'finds discussion_topics' do
       discussion_topic_model(context: @course)
       expect(Context.find_asset_by_url("/courses/#{@course.id}/discussion_topics/#{@topic.id}")).to eq @topic
       group_model
@@ -156,7 +156,7 @@ describe Context do
       expect(Context.find_asset_by_url("/groups/#{@group.id}/discussion_topics/#{@topic.id}")).to eq @topic
     end
 
-    it 'should find quizzes' do
+    it 'finds quizzes' do
       quiz_model(course: @course)
       expect(Context.find_asset_by_url("/courses/#{@course.id}/quizzes/#{@quiz.id}")).to eq @quiz
     end
@@ -168,28 +168,33 @@ describe Context do
       expect(Context.find_asset_by_url("/courses/#{@course.id}/modules/items/#{tag.id}")).to eq tag
     end
 
-    it 'should find media objects' do
+    it 'finds media objects' do
       at = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       data = {
         :entries => [
-            { :entryId => "test", :originalId => "#{at.id}" }
+          { :entryId => "test", :originalId => "#{at.id}" }
         ]
       }
       mo = MediaObject.create!(:context => @course, :media_id => "test")
       MediaObject.build_media_objects(data, Account.default.id)
       expect(Context.find_asset_by_url("/media_objects_iframe/test")).to eq mo
     end
+
+    it 'finds users' do
+      user = @course.enroll_student(User.create!).user
+      expect(Context.find_asset_by_url("/courses/#{@course.id}/users/#{user.id}")).to eq user
+    end
   end
 
   context "self.names_by_context_types_and_ids" do
-    it "should find context names" do
+    it "finds context names" do
       contexts = []
       contexts << course1 = Course.create!(:name => "a course")
       contexts << course2 = Course.create!(:name => "another course")
       contexts << group1 = Account.default.groups.create!(:name => "a group")
       contexts << group2 = Account.default.groups.create!(:name => "another group")
       contexts << user = User.create!(:name => "a user")
-      names = Context.names_by_context_types_and_ids(contexts.map{|c| [c.class.name, c.id]})
+      names = Context.names_by_context_types_and_ids(contexts.map { |c| [c.class.name, c.id] })
       contexts.each do |c|
         expect(names[[c.class.name, c.id]]).to eql(c.name)
       end
@@ -256,10 +261,10 @@ describe Context do
       enroll.conclude
       c2.enroll_user(user, "TeacherEnrollment", :enrollment_state => "active")
       expect(c2.rubric_contexts(user)).to eq([{
-        rubrics: 1,
-        context_code: c1.asset_string,
-        name: c1.name
-      }])
+                                               rubrics: 1,
+                                               context_code: c1.asset_string,
+                                               name: c1.name
+                                             }])
     end
 
     it 'excludes rubrics associated via soft-deleted rubric associations' do
@@ -283,16 +288,16 @@ describe Context do
 
       contexts = course.rubric_contexts(nil).map { |c| c.slice(:name, :rubrics) }
       expect(contexts).to eq([
-        { name: 'AAA', rubrics: 1},
-        { name: 'MMM', rubrics: 1},
-        { name: 'ZZZ', rubrics: 1}
-      ])
+                               { name: 'AAA', rubrics: 1 },
+                               { name: 'MMM', rubrics: 1 },
+                               { name: 'ZZZ', rubrics: 1 }
+                             ])
     end
 
     context "sharding" do
       specs_require_sharding
 
-      it "should retrieve rubrics from other shard courses the teacher belongs to" do
+      it "retrieves rubrics from other shard courses the teacher belongs to" do
         course1 = Course.create!(:name => 'c1')
         course2 = Course.create!(:name => 'c2')
         course3 = @shard1.activate do
@@ -307,11 +312,13 @@ describe Context do
             c.enroll_user(user, "TeacherEnrollment", :enrollment_state => "active")
           end
         end
-        expected = -> { [
-          { name: 'c1', rubrics: 1, context_code: course1.asset_string},
-          { name: 'c2', rubrics: 1, context_code: course2.asset_string},
-          { name: 'c3', rubrics: 1, context_code: course3.asset_string}
-        ] }
+        expected = -> {
+          [
+            { name: 'c1', rubrics: 1, context_code: course1.asset_string },
+            { name: 'c2', rubrics: 1, context_code: course2.asset_string },
+            { name: 'c3', rubrics: 1, context_code: course3.asset_string }
+          ]
+        }
         expect(course1.rubric_contexts(user)).to match_array(expected.call)
         @shard1.activate do
           expect(course2.rubric_contexts(user)).to match_array(expected.call)
@@ -324,33 +331,32 @@ describe Context do
     let(:course) { Course.create! }
 
     it "looks at the 'everything' cache if asking for just one thing and doesn't have a cache for that" do
-
       # it should look first for the cache for just the thing we are asking for
-      expect(Rails.cache).to receive(:read).
-        with(['active_record_types3', [:assignments], course].cache_key).
-        and_return(nil)
+      expect(Rails.cache).to receive(:read)
+        .with(['active_record_types3', [:assignments], course].cache_key)
+        .and_return(nil)
 
       # if that ^ returns nil, it should then look for for the "everything" cache
-      expect(Rails.cache).to receive(:read).
-        with(['active_record_types3', 'everything', course].cache_key).
-        and_return({
-          other_thing_we_are_not_asking_for: true,
-          assignments: "the cached value for :assignments from the 'everything' cache"
-        })
+      expect(Rails.cache).to receive(:read)
+        .with(['active_record_types3', 'everything', course].cache_key)
+        .and_return({
+                      other_thing_we_are_not_asking_for: true,
+                      assignments: "the cached value for :assignments from the 'everything' cache"
+                    })
 
       expect(course.active_record_types(only_check: [:assignments])).to eq({
-        assignments: "the cached value for :assignments from the 'everything' cache"
-      })
+                                                                             assignments: "the cached value for :assignments from the 'everything' cache"
+                                                                           })
     end
 
     it "raises an ArgumentError if you pass (only_check: [])" do
-      expect{
+      expect {
         course.active_record_types(only_check: [])
       }.to raise_exception ArgumentError
     end
 
     it "raises an ArgumentError if you pass bogus values as only_check" do
-      expect{
+      expect {
         course.active_record_types(only_check: [:bogus_type, :other_bogus_tab])
       }.to raise_exception ArgumentError
     end
@@ -369,12 +375,12 @@ describe Context do
     end
 
     it "raises an error if the class passed is not a context type" do
-      expect {Context.last_updated_at(Hash, [1])}.to raise_error ArgumentError
+      expect { Context.last_updated_at(Hash, [1]) }.to raise_error ArgumentError
     end
 
     it "returns the latest updated_at among multiple classes" do
       expect(Context.last_updated_at(Course => [@course1.id, @course2.id],
-        User => [@user1.id, @user2.id])).to eq @user2.updated_at
+                                     User => [@user1.id, @user2.id])).to eq @user2.updated_at
     end
 
     it "returns nil when no updated_at is found for the given contexts" do

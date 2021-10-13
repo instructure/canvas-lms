@@ -35,7 +35,7 @@ class Mutations::UpdateCommentBankItem < Mutations::BaseMutation
 
     return errors_for(record) unless record.save
 
-    {comment_bank_item: record}
+    { comment_bank_item: record }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, I18n.t('Record not found')
   end

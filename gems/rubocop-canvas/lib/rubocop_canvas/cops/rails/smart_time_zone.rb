@@ -39,7 +39,6 @@ module RuboCop
       #   DateTime.strptime(str, "%Y-%m-%d %H:%M %Z").in_time_zone
       #   Time.at(timestamp).in_time_zone
       class SmartTimeZone < Cop
-
         MSG = 'Do not use `%s` without zone. Use `%s` instead.'
 
         TIMECLASS = [:Time, :DateTime].freeze
@@ -65,9 +64,9 @@ module RuboCop
           safe_method_name = safe_method(method_name, node)
 
           add_offense(node,
-            location: :selector,
-            message: format(MSG, "#{klass}.#{method_name}", "Time.zone.#{safe_method_name}"),
-            severity: :warning)
+                      location: :selector,
+                      message: format(MSG, "#{klass}.#{method_name}", "Time.zone.#{safe_method_name}"),
+                      severity: :warning)
         end
 
         def extract_method_chain(node)

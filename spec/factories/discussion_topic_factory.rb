@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def discussion_topic_model(opts={})
+  def discussion_topic_model(opts = {})
     @context = opts[:context] || @context || course_model(:reusable => true)
     @topic = @context.discussion_topics.create!(valid_discussion_topic_attributes.merge(opts))
   end
@@ -65,7 +65,7 @@ module Factories
     @reply3 = @root2.reply_from(:user => @student, :html => "reply3")
     @reply1.destroy
     @all_entries = [@root1, @root2, @reply1, @reply2, @reply_reply1, @reply_reply2, @reply3]
-    @all_entries.each &:reload
+    @all_entries.each(&:reload)
     @topic.reload
   end
 

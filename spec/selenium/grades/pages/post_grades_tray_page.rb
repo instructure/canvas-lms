@@ -60,6 +60,7 @@ module PostGradesTray
 
   def self.select_sections(sections:)
     return if sections.empty?
+
     specific_sections_toggle.click
     sections.each do |section|
       section_checkbox(section_name: section.name).click

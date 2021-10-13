@@ -32,12 +32,13 @@ class PageView
     def filter(pv)
       return true if pv.account_id.nil?
       return @accounts[pv.account_id] if @accounts.key?(pv.account_id)
+
       # this weird chain is to efficiently check if the user has access to
       # view statistics in any sub account of the given root account
-      @accounts[pv.account_id] = pv.account.
-        cached_all_account_users_for(@viewer).
-        map(&:account).uniq.
-        any? { |au| au.grants_any_right?(@viewer, :view_statistics, :manage_students) }
+      @accounts[pv.account_id] = pv.account
+                                   .cached_all_account_users_for(@viewer)
+                                   .map(&:account).uniq
+                                   .any? { |au| au.grants_any_right?(@viewer, :view_statistics, :manage_students) }
     end
   end
 end

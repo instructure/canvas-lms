@@ -40,8 +40,8 @@ module LtiAdvantage::Messages
       lti1p1: LtiAdvantage::Claims::Lti1p1
     }.freeze
 
-    attr_accessor *(REQUIRED_CLAIMS + OPTIONAL_CLAIMS)
-    attr_accessor *TYPED_ATTRIBUTES.keys
+    attr_accessor(*(REQUIRED_CLAIMS + OPTIONAL_CLAIMS))
+    attr_accessor(*TYPED_ATTRIBUTES.keys)
     attr_accessor :address,
                   :birthdate,
                   :custom,

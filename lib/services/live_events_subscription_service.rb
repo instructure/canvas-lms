@@ -35,7 +35,7 @@ module Services
       def create_tool_proxy_subscription(tool_proxy, subscription)
         Rails.logger.info do
           "in: LiveEventsSubscriptionService::create_tool_proxy_subscription, "\
-          "tool_proxy_id: #{tool_proxy.id}, subscription: #{subscription}"
+            "tool_proxy_id: #{tool_proxy.id}, subscription: #{subscription}"
         end
         create(tool_proxy_jwt_body(tool_proxy), subscription)
       end
@@ -47,7 +47,7 @@ module Services
       def destroy_tool_proxy_subscription(tool_proxy, subscription_id)
         Rails.logger.info do
           "in: LiveEventsSubscriptionService::destroy_tool_proxy_subscription, "\
-          "tool_proxy_id: #{tool_proxy.id}, subscription_id: #{subscription_id}"
+            "tool_proxy_id: #{tool_proxy.id}, subscription_id: #{subscription_id}"
         end
         destroy(tool_proxy_jwt_body(tool_proxy), subscription_id)
       end
@@ -102,7 +102,7 @@ module Services
       end
 
       def headers(jwt_body, headers = {})
-        token = Canvas::Security::ServicesJwt.generate(jwt_body)
+        token = CanvasSecurity::ServicesJwt.generate(jwt_body, symmetric: true)
         headers['Authorization'] = "Bearer #{token}"
         headers
       end
@@ -113,11 +113,11 @@ module Services
 
       def tool_proxy_jwt_body(tool_proxy, options = {})
         options.merge({
-          sub: "ltiToolProxy:#{tool_proxy.guid}",
-          DeveloperKey: tool_proxy.product_family.developer_key.global_id.to_s,
-          RootAccountId: (tool_proxy.context.global_root_account_id || tool_proxy.context.global_id).to_s,
-          RootAccountUUID: tool_proxy.context.root_account.uuid
-        })
+                        sub: "ltiToolProxy:#{tool_proxy.guid}",
+                        DeveloperKey: tool_proxy.product_family.developer_key.global_id.to_s,
+                        RootAccountId: (tool_proxy.context.global_root_account_id || tool_proxy.context.global_id).to_s,
+                        RootAccountUUID: tool_proxy.context.root_account.uuid
+                      })
       end
     end
   end

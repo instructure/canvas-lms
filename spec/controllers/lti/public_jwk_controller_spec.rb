@@ -30,9 +30,9 @@ module Lti
       it_behaves_like 'lti services' do
         let(:action) { :update }
         let(:expected_mime_type) { described_class::MIME_TYPE }
-        let(:scope_to_remove) { "https://canvas.instructure.com/lti/public_jwk/scope/update"}
+        let(:scope_to_remove) { "https://canvas.instructure.com/lti/public_jwk/scope/update" }
         let(:new_public_jwk) do
-          key_hash = Canvas::Security::RSAKeyPair.new.public_jwk.to_h
+          key_hash = CanvasSecurity::RSAKeyPair.new.public_jwk.to_h
           key_hash['kty'] = key_hash['kty'].to_s
           key_hash
         end
@@ -43,11 +43,11 @@ module Lti
 
       context 'check public jwk' do
         let(:expected_mime_type) { described_class::MIME_TYPE }
-        let(:scope_to_remove) { "https://canvas.instructure.com/lti/public_jwk/scope/update"}
+        let(:scope_to_remove) { "https://canvas.instructure.com/lti/public_jwk/scope/update" }
         let(:action) { :update }
         let(:old_public_jwk) { developer_key.public_jwk }
         let(:new_public_jwk) do
-          key_hash = Canvas::Security::RSAKeyPair.new.public_jwk.to_h
+          key_hash = CanvasSecurity::RSAKeyPair.new.public_jwk.to_h
           key_hash['kty'] = key_hash['kty'].to_s
           key_hash
         end
@@ -74,7 +74,7 @@ module Lti
 
         context 'when pubic jwk is not valid' do
           let(:params_overrides) do
-            { developer_key: { public_jwk: {'hello': 'world'} } }
+            { developer_key: { public_jwk: { hello: 'world' } } }
           end
 
           before do

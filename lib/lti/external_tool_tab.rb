@@ -19,7 +19,6 @@
 #
 module Lti
   class ExternalToolTab
-
     attr_reader :context, :locale, :opts, :placement, :tools
 
     def initialize(context, placement, tools, locale = nil)
@@ -45,11 +44,10 @@ module Lti
         target = tool.extension_setting(placement, :windowTarget)
         if target && target == '_blank'
           tab[:target] = target
-          tab[:args] << {display: 'borderless'}
+          tab[:args] << { display: 'borderless' }
         end
         tab
       end
     end
-
   end
 end

@@ -45,7 +45,8 @@ class Quizzes::QuizQuestionBuilder
         break if sources.empty?
 
         duplicates = AssessmentQuestion.find_or_create_quiz_questions(
-          sources, quiz_id, quiz_group_id, duplicate_index)
+          sources, quiz_id, quiz_group_id, duplicate_index
+        )
         duplicate_index += 1
 
         @mark_picked.call(duplicates)

@@ -31,10 +31,10 @@ class PlannerNote < ActiveRecord::Base
   validates :todo_date, presence: true
   validates :workflow_state, presence: true
 
-  scope :for_user, -> (user) { where(user: user) }
-  scope :for_course, -> (course) { where(course: course) }
+  scope :for_user, ->(user) { where(user: user) }
+  scope :for_course, ->(course) { where(course: course) }
   scope :exclude_deleted_courses, -> { left_joins(:course).where("courses IS NULL OR courses.workflow_state <> 'deleted'") }
 
-  scope :before, -> (end_at) { where("todo_date <= ?", end_at) }
-  scope :after, -> (start_at) { where("todo_date >= ?", start_at) }
+  scope :before, ->(end_at) { where("todo_date <= ?", end_at) }
+  scope :after, ->(start_at) { where("todo_date >= ?", start_at) }
 end

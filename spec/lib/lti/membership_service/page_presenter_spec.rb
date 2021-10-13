@@ -23,7 +23,6 @@ require_dependency "lti/membership_service/page_presenter"
 
 module Lti::MembershipService
   describe PagePresenter do
-
     let(:base_url) { 'https://localhost:3000' }
     let(:presenter) { PagePresenter.new(@course, @teacher, base_url) }
     let(:hash) { presenter.as_json }

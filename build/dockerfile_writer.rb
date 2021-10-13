@@ -76,7 +76,7 @@ class DockerfileWriter
   end
 
   def run
-    contents = eval(Erubi::Engine.new(File.read(in_file), {:bufval => 'SuffixedStringWriter.new(self)'}).src + ";_buf.contents")
+    contents = eval(Erubi::Engine.new(File.read(in_file), { :bufval => 'SuffixedStringWriter.new(self)' }).src + ";_buf.contents")
 
     contents.each do |k, v|
       File.open(k.empty? ? out_file : "#{out_file}.#{k}", "w") do |f|
@@ -89,9 +89,10 @@ class DockerfileWriter
     paths = (docker_compose_config["services"]["web"]["volumes"] || []).map do |volume|
       name, path = volume.split(":")
       next unless name =~ /\A[a-z]/
+
       path.sub("/usr/src/app/", "")
     end.compact
-    paths.sort_by { |path| [path[0] == "/" ? 1 : 0, path]}
+    paths.sort_by { |path| [path[0] == "/" ? 1 : 0, path] }
   end
 
   def docker_compose_config

@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe I18nTimeZone do
   context "::all" do
-    it "should provide an array of i18n tz instances" do
+    it "provides an array of i18n tz instances" do
       tzs = I18nTimeZone.all
       expect(tzs.first.class).to eq I18nTimeZone
       expect(tzs.count).to eq ActiveSupport::TimeZone.all.count
@@ -29,7 +29,7 @@ describe I18nTimeZone do
   end
 
   context "#keyify" do
-    it "should provide a translation key for valid time zone name" do
+    it "provides a translation key for valid time zone name" do
       t_key = I18nTimeZone['International Date Line West'].keyify
       expect(t_key).to eq "time_zones.international_date_line_west"
     end
@@ -39,15 +39,15 @@ describe I18nTimeZone do
     before { I18n.locale = I18n.default_locale }
     after  { I18n.locale = I18n.default_locale }
 
-    it "should present a localized name with offset when responding to #to_s" do
+    it "presents a localized name with offset when responding to #to_s" do
       I18n.locale = :es
-      I18n.backend.stub({es: { time_zones: { international_date_line_west: "Línea de fecha internacional del oeste" }}}) do
+      I18n.backend.stub({ es: { time_zones: { international_date_line_west: "Línea de fecha internacional del oeste" } } }) do
         tz = I18nTimeZone['International Date Line West']
         expect(tz.to_s).to include "Línea de fecha internacional del oeste"
       end
     end
 
-    it "should have an entry in en locale for every time zone" do
+    it "has an entry in en locale for every time zone" do
       I18n.locale = :en
       I18nTimeZone.all.each do |zone|
         expect(zone.to_s).to_not include("translation missing")

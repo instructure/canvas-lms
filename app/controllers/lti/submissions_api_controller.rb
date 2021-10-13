@@ -18,125 +18,125 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti
-# @API Plagiarism Detection Submissions
-# **LTI API for Plagiarism Detection Submissions (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
-#
-# @model Submission
-#     {
-#       "id": "Submission",
-#       "description": "",
-#       "properties": {
-#         "lti_course_id": {
-#           "example": "66157096483e6b3a50bfedc6bac902c0b20a8241",
-#           "type": "string"
-#         },
-#         "course_id": {
-#           "example": 10000000000060,
-#           "type": "integer"
-#         },
-#         "assignment_id": {
-#           "description": "The submission's assignment id",
-#           "example": 23,
-#           "type": "integer"
-#         },
-#         "attempt": {
-#           "description": "This is the submission attempt number.",
-#           "example": 1,
-#           "type": "integer"
-#         },
-#         "body": {
-#           "description": "The content of the submission, if it was submitted directly in a text field.",
-#           "example": "There are three factors too...",
-#           "type": "string"
-#         },
-#         "submission_type": {
-#           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording'|'student_annotation')",
-#           "example": "online_text_entry",
-#           "type": "string",
-#           "allowableValues": {
-#             "values": [
-#               "online_text_entry",
-#               "online_url",
-#               "online_upload",
-#               "media_recording",
-#               "student_annotation"
-#             ]
-#           }
-#         },
-#         "submitted_at": {
-#           "description": "The timestamp when the assignment was submitted",
-#           "example": "2012-01-01T01:00:00Z",
-#           "type": "datetime"
-#         },
-#         "url": {
-#           "description": "The URL of the submission (for 'online_url' submissions).",
-#           "type": "string"
-#         },
-#         "user_id": {
-#           "description": "The id of the user who created the submission",
-#           "example": 134,
-#           "type": "integer"
-#         },
-#         "eula_agreement_timestamp": {
-#           "description": "UTC timestamp showing when the user agreed to the EULA (if given by the tool provider)",
-#           "example": "1508250487578",
-#           "type": "string"
-#         },
-#         "workflow_state": {
-#           "description": "The current state of the submission",
-#           "example": "submitted",
-#           "type": "string",
-#           "allowableValues": {
-#             "values": [
-#               "graded",
-#               "submitted",
-#               "unsubmitted",
-#               "pending_review"
-#             ]
-#           }
-#         },
-#         "attachments": {
-#           "description": "Files that are attached to the submission",
-#           "$ref": "File"
-#         }
-#       }
-#     }
-#
-# @model File
-#     {
-#       "id": "File",
-#       "description": "",
-#       "properties": {
-#         "size": {
-#           "example": 4,
-#           "type": "integer"
-#         },
-#         "content-type": {
-#           "example": "text/plain",
-#           "type": "string"
-#         },
-#         "url": {
-#           "example": "http://www.example.com/files/569/download?download_frd=1&verifier=c6HdZmxOZa0Fiin2cbvZeI8I5ry7yqD7RChQzb6P",
-#           "type": "string"
-#         },
-#         "id": {
-#           "example": 569,
-#           "type": "integer"
-#         },
-#         "display_name": {
-#           "example": "file.txt",
-#           "type": "string"
-#         },
-#         "created_at": {
-#           "example": "2012-07-06T14:58:50Z",
-#           "type": "datetime"
-#         },
-#         "updated_at": {
-#           "example": "2012-07-06T14:58:50Z",
-#           "type": "datetime"
-#         }
-#       }
-#     }
+  # @API Plagiarism Detection Submissions
+  # **LTI API for Plagiarism Detection Submissions (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
+  #
+  # @model Submission
+  #     {
+  #       "id": "Submission",
+  #       "description": "",
+  #       "properties": {
+  #         "lti_course_id": {
+  #           "example": "66157096483e6b3a50bfedc6bac902c0b20a8241",
+  #           "type": "string"
+  #         },
+  #         "course_id": {
+  #           "example": 10000000000060,
+  #           "type": "integer"
+  #         },
+  #         "assignment_id": {
+  #           "description": "The submission's assignment id",
+  #           "example": 23,
+  #           "type": "integer"
+  #         },
+  #         "attempt": {
+  #           "description": "This is the submission attempt number.",
+  #           "example": 1,
+  #           "type": "integer"
+  #         },
+  #         "body": {
+  #           "description": "The content of the submission, if it was submitted directly in a text field.",
+  #           "example": "There are three factors too...",
+  #           "type": "string"
+  #         },
+  #         "submission_type": {
+  #           "description": "The types of submission ex: ('online_text_entry'|'online_url'|'online_upload'|'media_recording'|'student_annotation')",
+  #           "example": "online_text_entry",
+  #           "type": "string",
+  #           "allowableValues": {
+  #             "values": [
+  #               "online_text_entry",
+  #               "online_url",
+  #               "online_upload",
+  #               "media_recording",
+  #               "student_annotation"
+  #             ]
+  #           }
+  #         },
+  #         "submitted_at": {
+  #           "description": "The timestamp when the assignment was submitted",
+  #           "example": "2012-01-01T01:00:00Z",
+  #           "type": "datetime"
+  #         },
+  #         "url": {
+  #           "description": "The URL of the submission (for 'online_url' submissions).",
+  #           "type": "string"
+  #         },
+  #         "user_id": {
+  #           "description": "The id of the user who created the submission",
+  #           "example": 134,
+  #           "type": "integer"
+  #         },
+  #         "eula_agreement_timestamp": {
+  #           "description": "UTC timestamp showing when the user agreed to the EULA (if given by the tool provider)",
+  #           "example": "1508250487578",
+  #           "type": "string"
+  #         },
+  #         "workflow_state": {
+  #           "description": "The current state of the submission",
+  #           "example": "submitted",
+  #           "type": "string",
+  #           "allowableValues": {
+  #             "values": [
+  #               "graded",
+  #               "submitted",
+  #               "unsubmitted",
+  #               "pending_review"
+  #             ]
+  #           }
+  #         },
+  #         "attachments": {
+  #           "description": "Files that are attached to the submission",
+  #           "$ref": "File"
+  #         }
+  #       }
+  #     }
+  #
+  # @model File
+  #     {
+  #       "id": "File",
+  #       "description": "",
+  #       "properties": {
+  #         "size": {
+  #           "example": 4,
+  #           "type": "integer"
+  #         },
+  #         "content-type": {
+  #           "example": "text/plain",
+  #           "type": "string"
+  #         },
+  #         "url": {
+  #           "example": "http://www.example.com/files/569/download?download_frd=1&verifier=c6HdZmxOZa0Fiin2cbvZeI8I5ry7yqD7RChQzb6P",
+  #           "type": "string"
+  #         },
+  #         "id": {
+  #           "example": 569,
+  #           "type": "integer"
+  #         },
+  #         "display_name": {
+  #           "example": "file.txt",
+  #           "type": "string"
+  #         },
+  #         "created_at": {
+  #           "example": "2012-07-06T14:58:50Z",
+  #           "type": "datetime"
+  #         },
+  #         "updated_at": {
+  #           "example": "2012-07-06T14:58:50Z",
+  #           "type": "datetime"
+  #         }
+  #       }
+  #     }
   class SubmissionsApiController < ApplicationController
     include Lti::Ims::AccessTokenHelper
     include Api::V1::Submission
@@ -188,10 +188,11 @@ module Lti
     def attachment
       attachment = Attachment.find(params[:attachment_id])
       render_unauthorized and return unless attachment_for_submission?(attachment)
-      render_or_redirect_to_stored_file(
-        attachment: attachment)
-    end
 
+      render_or_redirect_to_stored_file(
+        attachment: attachment
+      )
+    end
 
     def attachment_url(attachment)
       account = @domain_root_account || Account.default
@@ -206,8 +207,10 @@ module Lti
 
     def activate_tool_shard!
       render_unauthorized and return unless access_token
+
       tool_shard = Shard.lookup(access_token.shard_id)
       return if tool_shard == Shard.current
+
       tool_shard.activate!
     rescue Lti::Oauth2::InvalidTokenError
       render_unauthorized
@@ -254,6 +257,5 @@ module Lti
     def filtered_json(model:, allow_list:)
       model.as_json(include_root: false).select { |k, _| allow_list.include?(k) }
     end
-
   end
 end

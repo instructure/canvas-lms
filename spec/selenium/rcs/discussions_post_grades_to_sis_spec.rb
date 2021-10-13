@@ -59,7 +59,7 @@ describe "sync grades to sis" do
       @discussion_topic = DiscussionTopic.last
     end
 
-    it "should show post grades to sis box checked", priority: "1", test_id: 150520 do
+    it "shows post grades to sis box checked", priority: "1", test_id: 150520 do
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}/edit"
       expect(f('#assignment_post_to_sis')).to be_enabled
     end
@@ -88,7 +88,7 @@ describe "sync grades to sis" do
       expect(f('.post-grades-dialog')).to be_displayed
     end
 
-    it "should sync grades in a sync grades to SIS discussion", priority: "1", test_id: 150521 do
+    it "syncs grades in a sync grades to SIS discussion", priority: "1", test_id: 150521 do
       @assignment.due_at = Time.zone.now.advance(days: 3)
       @course.discussion_topics.create!(user: @admin,
                                         title: 'Sync to SIS discussion',
@@ -98,7 +98,7 @@ describe "sync grades to sis" do
       expect(f('.assignments-to-post-count').text).to include("You are ready to sync 1 assignment")
     end
 
-    it "should ask for due dates in gradebook if due date is not given", priority: "1", test_id: 244916, ignore_js_errors: true do
+    it "asks for due dates in gradebook if due date is not given", priority: "1", test_id: 244916, ignore_js_errors: true do
       @course.discussion_topics.create!(user: @admin,
                                         title: 'Sync to SIS discussion',
                                         message: 'Discussion topic message',

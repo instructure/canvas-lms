@@ -32,7 +32,7 @@ describe "BookmarkedCollection" do
     end
 
     def self.restrict_scope(scope, pager)
-      if bookmark = pager.current_bookmark
+      if (bookmark = pager.current_bookmark)
         comparison = (pager.include_bookmark ? 'id >= ?' : 'id > ?')
         scope = scope.where(comparison, bookmark)
       end
@@ -50,7 +50,7 @@ describe "BookmarkedCollection" do
     end
 
     def self.restrict_scope(scope, pager)
-      if bookmark = pager.current_bookmark
+      if (bookmark = pager.current_bookmark)
         comparison = (pager.include_bookmark ? 'name >= ?' : 'name > ?')
         scope = scope.where(comparison, bookmark)
       end
@@ -63,20 +63,20 @@ describe "BookmarkedCollection" do
       example_class = Class.new(ActiveRecord::Base) do
         self.table_name = 'examples'
       end
-      3.times{ example_class.create! }
+      3.times { example_class.create! }
       @scope = example_class
     end
 
-    it "should return a WrapProxy" do
+    it "returns a WrapProxy" do
       expect(BookmarkedCollection.wrap(IDBookmarker, @scope)).to be_a(PaginatedCollection::Proxy)
     end
 
-    it "should use the provided scope when executing pagination" do
+    it "uses the provided scope when executing pagination" do
       collection = BookmarkedCollection.wrap(IDBookmarker, @scope)
       expect(collection.paginate(:per_page => 1)).to eq([@scope.first])
     end
 
-    it "should use the bookmarker's bookmark generator to produce bookmarks" do
+    it "uses the bookmarker's bookmark generator to produce bookmarks" do
       bookmark = double
       allow(IDBookmarker).to receive(:bookmark_for) { bookmark }
 
@@ -84,7 +84,7 @@ describe "BookmarkedCollection" do
       expect(collection.paginate(:per_page => 1).next_bookmark).to eq(bookmark)
     end
 
-    it "should use the bookmarker's bookmark applicator to restrict by bookmark" do
+    it "uses the bookmarker's bookmark applicator to restrict by bookmark" do
       bookmark = @scope.order(:id).first.id
       bookmarked_scope = @scope.order(:id).where("id>?", bookmark)
       allow(IDBookmarker).to receive(:restrict_scope) { bookmarked_scope }
@@ -93,7 +93,7 @@ describe "BookmarkedCollection" do
       expect(collection.paginate(:per_page => 1)).to eq([bookmarked_scope.first])
     end
 
-    it "should apply any restriction block given to the scope" do
+    it "applies any restriction block given to the scope" do
       course = @scope.order(:id).last
       course.update(:name => 'Matching Name')
 
@@ -127,23 +127,23 @@ describe "BookmarkedCollection" do
       )
     end
 
-    it "should return a merge proxy" do
+    it "returns a merge proxy" do
       expect(@collection).to be_a(BookmarkedCollection::MergeProxy)
     end
 
-    it "should merge the given collections" do
+    it "merges the given collections" do
       expect(@collection.paginate(:per_page => 2)).to eq([@created_course1, @deleted_course1])
     end
 
-    it "should have a next page when there's a non-exhausted collection" do
+    it "has a next page when there's a non-exhausted collection" do
       expect(@collection.paginate(:per_page => 3).next_page).not_to be_nil
     end
 
-    it "should not have a next page when all collections are exhausted" do
+    it "does not have a next page when all collections are exhausted" do
       expect(@collection.paginate(:per_page => 4).next_page).to be_nil
     end
 
-    it "should pick up in the middle of a collection" do
+    it "picks up in the middle of a collection" do
       page = @collection.paginate(:per_page => 1)
       expect(page).to eq([@created_course1])
       expect(page.next_bookmark).not_to be_nil
@@ -169,7 +169,7 @@ describe "BookmarkedCollection" do
         ) do; end
       end
 
-      it "should collapse duplicates" do
+      it "collapses duplicates" do
         expect(@collection.paginate(:per_page => 2)).to eq([@created_course])
       end
     end
@@ -192,11 +192,11 @@ describe "BookmarkedCollection" do
         )
       end
 
-      it "should sort the ties by collection" do
+      it "sorts the ties by collection" do
         expect(@collection.paginate(:per_page => 2)).to eq([@created_course, @deleted_course])
       end
 
-      it "should pick up at the right place when a page break splits the tie" do
+      it "picks up at the right place when a page break splits the tie" do
         page = @collection.paginate(:per_page => 1)
         expect(page).to eq([@created_course])
         expect(page.next_bookmark).not_to be_nil
@@ -230,27 +230,27 @@ describe "BookmarkedCollection" do
       )
     end
 
-    it "should return a concat proxy" do
+    it "returns a concat proxy" do
       expect(@collection).to be_a(BookmarkedCollection::ConcatProxy)
     end
 
-    it "should concatenate the given collections" do
+    it "concatenates the given collections" do
       expect(@collection.paginate(:per_page => 3)).to eq([@created_course1, @created_course2, @deleted_course1])
     end
 
-    it "should have a next page when there's a non-exhausted collection" do
+    it "has a next page when there's a non-exhausted collection" do
       expect(@collection.paginate(:per_page => 3).next_page).not_to be_nil
     end
 
-    it "should have a next page on the border between an exhausted collection and a non-exhausted collection" do
+    it "has a next page on the border between an exhausted collection and a non-exhausted collection" do
       expect(@collection.paginate(:per_page => 2).next_page).not_to be_nil
     end
 
-    it "should not have a next page when all collections are exhausted" do
+    it "does not have a next page when all collections are exhausted" do
       expect(@collection.paginate(:per_page => 4).next_page).to be_nil
     end
 
-    it "should pick up in the middle of a collection" do
+    it "picks up in the middle of a collection" do
       page = @collection.paginate(:per_page => 1)
       expect(page).to eq([@created_course1])
       expect(page.next_bookmark).not_to be_nil
@@ -258,7 +258,7 @@ describe "BookmarkedCollection" do
       expect(@collection.paginate(:page => page.next_page, :per_page => 2)).to eq([@created_course2, @deleted_course1])
     end
 
-    it "should pick up from a break between collections" do
+    it "picks up from a break between collections" do
       page = @collection.paginate(:per_page => 2)
       expect(page).to eq([@created_course1, @created_course2])
       expect(page.next_bookmark).not_to be_nil
@@ -278,8 +278,8 @@ describe "BookmarkedCollection" do
       end
 
       @collection = BookmarkedCollection.concat(
-          ['created', created_collection],
-          ['deleted', @deleted_collection]
+        ['created', created_collection],
+        ['deleted', @deleted_collection]
       )
       expect(created_collection.paginate(per_page: 3)).to eq([@created_course1])
       expect(@collection.paginate(per_page: 3)).to eq([@created_course1, @created_course2, @deleted_course1])
@@ -297,15 +297,13 @@ describe "BookmarkedCollection" do
       end
 
       @collection = BookmarkedCollection.concat(
-          ['created', created_collection],
-          ['deleted', @deleted_collection]
+        ['created', created_collection],
+        ['deleted', @deleted_collection]
       )
 
       expect(@deleted_collection).to receive(:execute_pager).never
       expect(@collection.paginate(per_page: 1).next_page).not_to be_nil
     end
-
-
   end
 
   describe "nested compositions" do
@@ -332,7 +330,7 @@ describe "BookmarkedCollection" do
       @deleted_course2 = @deleted_scope.create!(:name => "Deleted 2")
     end
 
-    it "should handle concat(A, merge(B, C))" do
+    it "handles concat(A, merge(B, C))" do
       @user_collection = BookmarkedCollection.wrap(IDBookmarker, @user_scope)
       @created_collection = BookmarkedCollection.wrap(IDBookmarker, @created_scope)
       @deleted_collection = BookmarkedCollection.wrap(IDBookmarker, @deleted_scope)
@@ -356,7 +354,7 @@ describe "BookmarkedCollection" do
       expect(page.next_page).to be_nil
     end
 
-    it "should handle merge(A, merge(B, C))" do
+    it "handles merge(A, merge(B, C))" do
       # use NameBookmarker to make user/course merge interesting
       @user_collection = BookmarkedCollection.wrap(NameBookmarker, @user_scope)
       @created_collection = BookmarkedCollection.wrap(NameBookmarker, @created_scope)
@@ -381,18 +379,20 @@ describe "BookmarkedCollection" do
       expect(page.next_page).to be_nil
     end
 
-    it "should handle concat(A, concat(B, C))" do
+    it "handles concat(A, concat(B, C))" do
       @user_collection = BookmarkedCollection.wrap(IDBookmarker, @user_scope)
       @created_collection = BookmarkedCollection.wrap(IDBookmarker, @created_scope)
       @deleted_collection = BookmarkedCollection.wrap(IDBookmarker, @deleted_scope)
 
       @course_collection = BookmarkedCollection.concat(
         ['created', @created_collection],
-        ['deleted', @deleted_collection])
+        ['deleted', @deleted_collection]
+      )
 
       @collection = BookmarkedCollection.concat(
         ['users', @user_collection],
-        ['courses', @course_collection])
+        ['courses', @course_collection]
+      )
 
       page = @collection.paginate(:per_page => 3)
       expect(page).to eq([@user1, @user2, @created_course1])
@@ -403,30 +403,32 @@ describe "BookmarkedCollection" do
       expect(page.next_page).to be_nil
     end
 
-    it "should not allow merge(A, concat(B, C))" do
+    it "does not allow merge(A, concat(B, C))" do
       @user_collection = BookmarkedCollection.wrap(NameBookmarker, @user_scope)
       @created_collection = BookmarkedCollection.wrap(NameBookmarker, @created_scope)
       @deleted_collection = BookmarkedCollection.wrap(NameBookmarker, @deleted_scope)
 
       @course_collection = BookmarkedCollection.concat(
         ['created', @created_collection],
-        ['deleted', @deleted_collection])
+        ['deleted', @deleted_collection]
+      )
 
-      expect{
+      expect {
         @collection = BookmarkedCollection.merge(
           ['users', @user_collection],
-          ['courses', @course_collection])
+          ['courses', @course_collection]
+        )
       }.to raise_exception ArgumentError
     end
   end
 
   describe ".best_unicode_collation_key" do
-    it 'should return col if proc is not set' do
+    it 'returns col if proc is not set' do
       BookmarkedCollection.best_unicode_collation_key_proc = nil
       expect(BookmarkedCollection.best_unicode_collation_key('key_name')).to eq('key_name')
     end
 
-    it 'should use proc to calculate key' do
+    it 'uses proc to calculate key' do
       BookmarkedCollection.best_unicode_collation_key_proc = lambda { |col|
         return "lower(#{col})"
       }

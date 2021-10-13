@@ -61,14 +61,14 @@ module Lti::Ims::AccessTokenHelper
       -> {
         raise Lti::Oauth2::InvalidTokenError,
               "The ToolProxy security contract doesn't include #{service_names.join(', or ')}"
-      }) do |s|
+      }
+    ) do |s|
       service_names.include? s.service.split(':').last.split('#').last
     end
     unless service.actions.map(&:downcase).include? request.method.downcase
       msg = "#{s.service.split(':').last.split('#').last}.#{request.method} not included in ToolProxy security Contract"
       raise Lti::Oauth2::InvalidTokenError, msg
     end
-
   end
 
   def developer_key
@@ -76,6 +76,7 @@ module Lti::Ims::AccessTokenHelper
       tp = Lti::ToolProxy.find_by(guid: access_token.sub)
       if tp.present?
         raise Lti::Oauth2::InvalidTokenError, 'Tool Proxy is not active' if tp.workflow_state != 'active'
+
         validate_services!(tp)
         tp.product_family.developer_key
       else
@@ -91,7 +92,6 @@ module Lti::Ims::AccessTokenHelper
   end
 
   def render_unauthorized
-    render json: {error: 'unauthorized'}, status: :unauthorized
+    render json: { error: 'unauthorized' }, status: :unauthorized
   end
-
 end

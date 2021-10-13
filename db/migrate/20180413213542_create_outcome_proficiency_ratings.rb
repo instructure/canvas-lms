@@ -33,7 +33,7 @@ class CreateOutcomeProficiencyRatings < ActiveRecord::Migration[5.1]
     end
 
     add_index :outcome_proficiency_ratings,
-      [:outcome_proficiency_id, :points],
-      name: 'index_outcome_proficiency_ratings_on_proficiency_and_points'
+              [:outcome_proficiency_id, :points],
+              name: 'index_outcome_proficiency_ratings_on_proficiency_and_points'
   end
 end

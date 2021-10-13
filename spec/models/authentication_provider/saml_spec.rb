@@ -27,7 +27,7 @@ describe AuthenticationProvider::SAML do
     @file_that_exists = File.expand_path(__FILE__)
   end
 
-  it "should set the entity_id with the current domain" do
+  it "sets the entity_id with the current domain" do
     allow(HostUrl).to receive(:default_host).and_return('bob.cody.instructure.com')
     @aac = @account.authentication_providers.create!(:auth_type => "saml")
     expect(@aac.entity_id).to eq "http://bob.cody.instructure.com/saml2"
@@ -59,12 +59,12 @@ describe AuthenticationProvider::SAML do
     expect(@account.settings[:saml_entity_id]).to eq 'my_entity'
   end
 
-  it "should set requested_authn_context to nil if empty string" do
+  it "sets requested_authn_context to nil if empty string" do
     @aac = @account.authentication_providers.create!(:auth_type => "saml", :requested_authn_context => "")
     expect(@aac.requested_authn_context).to eq nil
   end
 
-  it "should allow requested_authn_context to be set to anything" do
+  it "allows requested_authn_context to be set to anything" do
     @aac = @account.authentication_providers.create!(:auth_type => "saml", :requested_authn_context => "anything")
     expect(@aac.requested_authn_context).to eq "anything"
   end
@@ -81,7 +81,7 @@ describe AuthenticationProvider::SAML do
   describe "download_metadata" do
     it 'requires an entity id for InCommon' do
       saml = Account.default.authentication_providers.new(auth_type: 'saml',
-        metadata_uri: AuthenticationProvider::SAML::InCommon::URN)
+                                                          metadata_uri: AuthenticationProvider::SAML::InCommon::URN)
       expect(saml).not_to be_valid
       expect(saml.errors.first.first).to eq :idp_entity_id
     end
@@ -212,8 +212,8 @@ describe AuthenticationProvider::SAML do
       allow(AuthenticationProvider::SAML).to receive(:private_keys).and_return({})
       entity = AuthenticationProvider::SAML.sp_metadata_for_account(@account)
       expect(entity.roles.last.attribute_consuming_services.length).to eq 1
-      expect(entity.roles.last.attribute_consuming_services.first.requested_attributes.length). to eq 1
-      expect(entity.roles.last.attribute_consuming_services.first.requested_attributes.first.name). to eq 'name'
+      expect(entity.roles.last.attribute_consuming_services.first.requested_attributes.length).to eq 1
+      expect(entity.roles.last.attribute_consuming_services.first.requested_attributes.first.name).to eq 'name'
     end
   end
 end

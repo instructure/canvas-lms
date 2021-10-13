@@ -45,14 +45,14 @@ module OutcomesService
 
     def outcome_attributes(learning_outcome)
       attrs = learning_outcome.attributes.transform_keys(&:to_sym)
-      attrs[:'$canvas_learning_outcome_id'] = attrs.delete(:id)
+      attrs[:$canvas_learning_outcome_id] = attrs.delete(:id)
       attrs[:rubric_criterion] = attrs.delete(:data)[:rubric_criterion]
       attrs.except(:migration_id_2, :vendor_guid_2, :root_account_id, :context_type, :context_id)
     end
 
     def group_attributes(learning_outcome_group)
       attrs = learning_outcome_group.attributes.transform_keys(&:to_sym)
-      attrs[:'$canvas_learning_outcome_group_id'] = attrs.delete(:id)
+      attrs[:$canvas_learning_outcome_group_id] = attrs.delete(:id)
       attrs[:parent_outcome_group_id] = attrs.delete(:learning_outcome_group_id)
       attrs.except(:root_learning_outcome_group_id, :root_account_id, :migration_id_2, :vendor_guid_2)
     end

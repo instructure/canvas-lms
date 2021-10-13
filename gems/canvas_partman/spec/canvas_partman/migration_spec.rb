@@ -24,7 +24,7 @@ describe CanvasPartman::Migration do
   require 'fixtures/db/20141103000003_add_another_thing_to_partman_animals'
   require 'fixtures/db/20141103000004_add_race_index_to_partman_animals'
 
-  it 'should do nothing with no partitions' do
+  it 'does nothing with no partitions' do
     Animal.transaction do
       AddFooToPartmanAnimals.new.migrate(:up)
 
@@ -36,7 +36,7 @@ describe CanvasPartman::Migration do
     end
   end
 
-  it 'should apply a migration on all partition tables' do
+  it 'applies a migration on all partition tables' do
     partman = CanvasPartman::PartitionManager.create(Animal)
     partman.create_partition(Time.new(2014, 11))
 
@@ -51,7 +51,7 @@ describe CanvasPartman::Migration do
     end
   end
 
-  it 'should apply multiple migrations' do
+  it 'applies multiple migrations' do
     partman = CanvasPartman::PartitionManager.create(Animal)
     partman.create_partition(Time.new(2014, 11))
 
@@ -88,7 +88,7 @@ describe CanvasPartman::Migration do
     end
   end
 
-  it 'should apply multiple migrations on multiple partitions' do
+  it 'applies multiple migrations on multiple partitions' do
     partman = CanvasPartman::PartitionManager.create(Animal)
     partman.create_partition(Time.new(2014, 11))
     partman.create_partition(Time.new(2014, 12))
@@ -144,7 +144,7 @@ describe CanvasPartman::Migration do
     end
   end
 
-  it 'should accept an explicitly specified base class' do
+  it 'accepts an explicitly specified base class' do
     partman = CanvasPartman::PartitionManager.create(CanvasPartmanTest::AnimalAlias)
     partman.create_partition(Time.new(2014, 11))
 
@@ -159,7 +159,7 @@ describe CanvasPartman::Migration do
     end
   end
 
-  it 'should add/remove indices just fine' do
+  it 'add/removes indices just fine' do
     partman = CanvasPartman::PartitionManager.create(Animal)
     partman.create_partition(Time.new(2014, 11))
 

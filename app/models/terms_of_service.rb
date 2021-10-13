@@ -44,7 +44,7 @@ class TermsOfService < ActiveRecord::Base
     self.terms_type == "custom"
   end
 
-  def self.ensure_terms_for_account(account, is_new_account=false)
+  def self.ensure_terms_for_account(account, is_new_account = false)
     return unless self.table_exists?
 
     passive = is_new_account || !(Setting.get('terms_required', 'true') == 'true' && account.account_terms_required?)
@@ -54,7 +54,7 @@ class TermsOfService < ActiveRecord::Base
     end
   end
 
-  DEFAULT_OPTIONS = {:terms_type => "default"}.freeze
+  DEFAULT_OPTIONS = { :terms_type => "default" }.freeze
   def self.term_options_for_account(account)
     DEFAULT_OPTIONS
   end
@@ -77,7 +77,7 @@ class TermsOfService < ActiveRecord::Base
         key = ["terms_of_service_content", owner._read_attribute(reflection.foreign_key)].cache_key
         MultiCache.fetch(key) { super }
       end
-    end  
+    end
   end
 
   reflections['terms_of_service_content'].instance_eval do

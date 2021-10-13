@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def announcement_model(opts={})
+  def announcement_model(opts = {})
     @context = opts[:context] || @context || course_model(:reusable => true)
     @a = @context.announcements.create!(valid_announcement_attributes.merge(opts))
   end

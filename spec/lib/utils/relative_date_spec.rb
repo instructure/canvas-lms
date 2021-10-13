@@ -36,7 +36,6 @@ require_dependency "utils/relative_date"
 
 module Utils
   describe RelativeDate do
-
     let(:today) { Date.parse("2014-10-1") }
 
     around do |example|
@@ -45,27 +44,27 @@ module Utils
 
     it 'can tell if its today' do
       expect(RelativeDate.new(today).today?).to be(true)
-      expect(RelativeDate.new(today+3).today?).to be(false)
+      expect(RelativeDate.new(today + 3).today?).to be(false)
     end
 
     it 'can tell if its tomorrow' do
       expect(RelativeDate.new(today).tomorrow?).to be(false)
-      expect(RelativeDate.new(today+1).tomorrow?).to be(true)
+      expect(RelativeDate.new(today + 1).tomorrow?).to be(true)
     end
 
     it 'can tell if its yesterday' do
       expect(RelativeDate.new(today).yesterday?).to be(false)
-      expect(RelativeDate.new(today-1).yesterday?).to be(true)
+      expect(RelativeDate.new(today - 1).yesterday?).to be(true)
     end
 
     it 'can tell if its this week' do
-      expect(RelativeDate.new(today-1).this_week?).to be(false)
-      expect(RelativeDate.new(today+4).this_week?).to be(true)
+      expect(RelativeDate.new(today - 1).this_week?).to be(false)
+      expect(RelativeDate.new(today + 4).this_week?).to be(true)
     end
 
     it 'can tell if its this year' do
-      expect(RelativeDate.new(today+365).this_year?).to be(false)
-      expect(RelativeDate.new(today+30).this_year?).to be(true)
+      expect(RelativeDate.new(today + 365).this_year?).to be(false)
+      expect(RelativeDate.new(today + 30).this_year?).to be(true)
     end
 
     it 'is resiliant against nil timezone override' do

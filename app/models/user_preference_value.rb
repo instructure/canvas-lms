@@ -37,7 +37,7 @@ class UserPreferenceValue < ActiveRecord::Base
     # e.g. :course_grades_assignment_order is always looking at data for one course at a time
     # so rather than just storing another big serialized blob somewhere else, actually break it apart into separate rows
     @preference_settings ||= {}
-    @preference_settings[key] = {use_sub_keys: use_sub_keys}
+    @preference_settings[key] = { use_sub_keys: use_sub_keys }
   end
 
   add_user_preference :closed_notifications
@@ -89,7 +89,7 @@ class UserPreferenceValue < ActiveRecord::Base
       end
     end
 
-    def get_preference(key, sub_key=nil)
+    def get_preference(key, sub_key = nil)
       value = self.preferences[key]
       if value == EXTERNAL
         id, value = self.user_preference_values.where(:key => key, :sub_key => sub_key).pluck(:id, :value).first
@@ -120,7 +120,9 @@ class UserPreferenceValue < ActiveRecord::Base
       migrate_preferences_if_needed
 
       if value.present? || sub_key
-        if preference_row_exists?(key, sub_key)
+        if value.nil?
+          remove_user_preference_value(key, sub_key)
+        elsif preference_row_exists?(key, sub_key)
           update_user_preference_value(key, sub_key, value)
         else
           create_user_preference_value(key, sub_key, value)
@@ -134,7 +136,8 @@ class UserPreferenceValue < ActiveRecord::Base
 
     def clear_all_preferences_for(key)
       if UserPreferenceValue.settings[key]&.[](:use_sub_keys)
-        self.user_preference_values.where(:key => key).update_all(:value => nil)
+        self.user_preference_values.where(:key => key).delete_all
+        @existing_preference_rows&.clear
         self.preferences[key] = {}
         self.save! if self.changed?
       else
@@ -166,6 +169,11 @@ class UserPreferenceValue < ActiveRecord::Base
       self.user_preference_values.where(:key => key, :sub_key => sub_key).update_all(:value => value)
     end
 
+    def remove_user_preference_value(key, sub_key)
+      self.user_preference_values.where(:key => key, :sub_key => sub_key).delete_all
+      @existing_preference_rows&.delete([key, sub_key])
+    end
+
     # --- here are some hacks so we can split up the gradebook column size setting better ---
     SHARED_GRADEBOOK_COLUMNS = %w{student secondary_identifier total_grade}.freeze
     # whether we can split the column size setting into a per-course hash or in a shared one
@@ -178,7 +186,7 @@ class UserPreferenceValue < ActiveRecord::Base
     def reorganize_gradebook_preferences
       sizes = preferences[:gradebook_column_size]
       if sizes.present? && sizes != EXTERNAL
-        new_sizes = {"shared" => {}}
+        new_sizes = { "shared" => {} }
         id_map = {}
 
         sizes.each do |key, value|
@@ -227,6 +235,7 @@ class UserPreferenceValue < ActiveRecord::Base
         current_gb_prefs = preferences[gb_pref_key]
         next unless current_gb_prefs.present?
         next if current_gb_prefs == EXTERNAL
+
         new_gb_prefs = {}
         current_gb_prefs.each do |local_course_id, value|
           # we don't know exactly which shard it was set for, so just set it for them all associated shards

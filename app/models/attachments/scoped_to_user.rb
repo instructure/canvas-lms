@@ -27,13 +27,14 @@ module Attachments
     end
 
     private
+
     def scope_from_context
       if can_view_hidden_files?(context, user)
         context.attachments.not_deleted
       else
         context.attachments.visible.not_hidden.not_locked.where({
-          folder_id: Folder.all_visible_folder_ids(context)
-        })
+                                                                  folder_id: Folder.all_visible_folder_ids(context)
+                                                                })
       end
     end
 

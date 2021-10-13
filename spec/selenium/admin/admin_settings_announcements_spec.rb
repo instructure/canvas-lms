@@ -79,7 +79,7 @@ describe "settings tabs" do
       course_with_admin_logged_in
     end
 
-    it "should add and delete an announcement" do
+    it "adds and delete an announcement" do
       get "/accounts/#{Account.default.id}/settings"
       add_announcement
       f(".delete_notification_link").click
@@ -88,7 +88,7 @@ describe "settings tabs" do
       expect(AccountNotification.count).to eq 0
     end
 
-    it "should check title length" do
+    it "checks title length" do
       get "/accounts/#{Account.default.id}/settings"
       wait_for_ajaximations
       f("#tab-announcements-link").click
@@ -100,7 +100,7 @@ describe "settings tabs" do
       assert_error_box("#account_notification_subject")
     end
 
-    it "should edit an announcement" do
+    it "edits an announcement" do
       skip_if_chrome('issue with edit_announcement method')
       notification = account_notification(user: @user)
       get "/accounts/#{Account.default.id}/settings"
@@ -116,7 +116,7 @@ describe "settings tabs" do
     end
 
     context "messages" do
-      it "should let you mark the checkbox to send messages for a new announcement" do
+      it "lets you mark the checkbox to send messages for a new announcement" do
         get "/accounts/#{Account.default.id}/settings"
         wait_for_ajaximations
         f("#tab-announcements-link").click
@@ -136,7 +136,7 @@ describe "settings tabs" do
         expect(job.run_at.to_i).to eq notification.start_at.to_i
       end
 
-      it "should not show option for site admins" do
+      it "does not show option for site admins" do
         user_session(site_admin_user)
         get "/accounts/#{Account.site_admin.id}/settings"
         wait_for_ajaximations
@@ -146,7 +146,7 @@ describe "settings tabs" do
         expect(f("#add_notification_form")).to_not contain_css("label[for=account_notification_send_message]")
       end
 
-      it "should be able to send messages for an existing announcement" do
+      it "is able to send messages for an existing announcement" do
         notification = account_notification(:start_at => 2.days.from_now, :end_at => 4.days.from_now)
 
         get "/accounts/#{Account.default.id}/settings"
@@ -165,7 +165,7 @@ describe "settings tabs" do
         expect(job.run_at.to_i).to eq notification.start_at.to_i
       end
 
-      it "should mark the checkbox already for a pending announcement already slated to send messages" do
+      it "marks the checkbox already for a pending announcement already slated to send messages" do
         old_start_at = 1.day.from_now
         notification = account_notification(:start_at => old_start_at, :end_at => 5.days.from_now, :send_message => true)
         job = Delayed::Job.where(:tag => "AccountNotification#broadcast_messages").last
@@ -179,7 +179,7 @@ describe "settings tabs" do
         expect(is_checked("#account_notification_send_message_#{notification.id}")).to be_truthy # checked still
       end
 
-      it "should be able to re-send messages for an announcement" do
+      it "is able to re-send messages for an announcement" do
         notification = account_notification(:start_at => 1.day.from_now, :end_at => 5.days.from_now)
         AccountNotification.where(:id => notification).update_all(:send_message => true, :messages_sent_at => 1.day.ago)
         get "/accounts/#{Account.default.id}/settings"

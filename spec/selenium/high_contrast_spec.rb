@@ -26,7 +26,6 @@ describe "high_contrast" do
     before { course_with_teacher_logged_in(:active_all => true) }
 
     context "WITHOUT high_contrast turned on" do
-
       it 'meets 3.5:1 contrast for buttons' do
         get "/courses/#{@course.id}/announcements"
 
@@ -34,7 +33,6 @@ describe "high_contrast" do
         # as a random example of an instUI component
         expect(flnpt("Add announcement")).to meet_contrast_ratio(3.5)
       end
-
     end
 
     context "WITH high_contrast turned on" do
@@ -45,7 +43,6 @@ describe "high_contrast" do
 
         expect(flnpt("Add announcement")).to meet_contrast_ratio(4.5)
       end
-
     end
   end
 end

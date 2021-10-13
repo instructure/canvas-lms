@@ -171,24 +171,6 @@ export const sendMessage = (recipientId, message, subject) =>
     body: {recipients: [recipientId], body: message, group_conversation: false, subject}
   })
 
-/* Creates a new course with name in provided account, and enrolls the user as a teacher */
-export const createNewCourse = (
-  accountId,
-  courseName,
-  syncHomeroomEnrollments = null,
-  homeroomCourseId = null
-) =>
-  doFetchApi({
-    path: `/api/v1/accounts/${accountId}/courses`,
-    method: 'POST',
-    params: {
-      'course[name]': courseName,
-      'course[sync_enrollments_from_homeroom]': syncHomeroomEnrollments,
-      'course[homeroom_course_id]': homeroomCourseId,
-      enroll_me: true
-    }
-  }).then(data => data.json)
-
 /* Takes raw response from assignment_groups API and returns an array of objects with each
    assignment group's id, name, and total score. If gradingPeriodId is passed, only return
    totals for assignment groups which have assignments in the provided grading period. */
@@ -253,22 +235,6 @@ export const getAssignmentGrades = data =>
       if (b.dueDate == null) return -1
       return moment(a.dueDate).diff(moment(b.dueDate))
     })
-
-/* Return array of objects containing id and name of accounts associated with each
-   enrollment. */
-export const getAccountsFromEnrollments = enrollments =>
-  enrollments
-    .filter(e => e.account)
-    .reduce((acc, e) => {
-      if (!acc.find(({id}) => id === e.account.id)) {
-        acc.push({
-          id: e.account.id,
-          name: e.account.name
-        })
-      }
-      return acc
-    }, [])
-    .sort((a, b) => a.name.localeCompare(b.name, ENV.LOCALE, {sensitivity: 'base'}))
 
 /* Formats course total score and grade (if applicable) into string from enrollments API
    response */

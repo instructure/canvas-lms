@@ -688,7 +688,7 @@ class AuthenticationProvidersController < ApplicationController
         end
         format.json do
           msg = "duplicate provider #{account_config.auth_type}"
-          render json: { errors: [ { message: msg } ] }, status: 422
+          render json: { errors: [{ message: msg }] }, status: 422
         end
       end
       return
@@ -739,8 +739,8 @@ class AuthenticationProvidersController < ApplicationController
     if aac.auth_type != data[:auth_type]
       render(json: {
                message: t('no_changing_auth_types',
-                           'Can not change type of authorization config, '\
-                           'please delete and create new config.')
+                          'Can not change type of authorization config, '\
+                          'please delete and create new config.')
              },
              status: 400)
       return
@@ -782,9 +782,11 @@ class AuthenticationProvidersController < ApplicationController
   def show
     aac = @account.authentication_providers.active.find(params[:id])
     return if aac.auth_type != 'canvas' && !require_root_account_management
+
     render json: aac_json(aac)
   rescue ActiveRecord::RecordNotFound
     return unless require_root_account_management
+
     raise
   end
 
@@ -854,9 +856,9 @@ class AuthenticationProvidersController < ApplicationController
   # @returns SSOSettings
   def update_sso_settings
     sets = params.require(:sso_settings).permit(:login_handle_name,
-                                                       :change_password_url,
-                                                       :auth_discovery_url,
-                                                       :unknown_user_url)
+                                                :change_password_url,
+                                                :auth_discovery_url,
+                                                :unknown_user_url)
     update_account_settings_from_hash(sets)
 
     respond_to do |format|
@@ -874,7 +876,7 @@ class AuthenticationProvidersController < ApplicationController
         :account_authorization_config_id => config.id,
         :ldap_connection_test => config.test_ldap_connection
       }
-      results << h.merge({:errors => config.errors.map {|attr,err| {attr => err.message}}})
+      results << h.merge({ :errors => config.errors.map { |attr, err| { attr => err.message } } })
     end
     render :json => results
   end
@@ -886,7 +888,7 @@ class AuthenticationProvidersController < ApplicationController
         :account_authorization_config_id => config.id,
         :ldap_bind_test => config.test_ldap_bind
       }
-      results << h.merge({:errors => config.errors.map {|attr,err| {attr => err.message}}})
+      results << h.merge({ :errors => config.errors.map { |attr, err| { attr => err.message } } })
     end
     render :json => results
   end
@@ -899,7 +901,7 @@ class AuthenticationProvidersController < ApplicationController
         :account_authorization_config_id => config.id,
         :ldap_search_test => res
       }
-      results << h.merge({:errors => config.errors.map {|attr,err| {attr => err.message}}})
+      results << h.merge({ :errors => config.errors.map { |attr, err| { attr => err.message } } })
     end
     render :json => results
   end
@@ -908,13 +910,13 @@ class AuthenticationProvidersController < ApplicationController
     results = []
     unless params[:username]
       return render(
-        :json => {:errors => {:login => t(:login_required, 'must be supplied')}},
+        :json => { :errors => { :login => t(:login_required, 'must be supplied') } },
         :status_code => 400
       )
     end
     unless params[:password]
       return render(
-        :json => {:errors => {:password => t(:password_required, 'must be supplied')}},
+        :json => { :errors => { :password => t(:password_required, 'must be supplied') } },
         :status_code => 400
       )
     end
@@ -924,12 +926,12 @@ class AuthenticationProvidersController < ApplicationController
         :account_authorization_config_id => config.id,
         :ldap_login_test => config.test_ldap_login(params[:username], params[:password])
       }
-      results << h.merge({:errors => config.errors.map {|attr,msg| {attr => msg}}})
+      results << h.merge({ :errors => config.errors.map { |attr, msg| { attr => msg } } })
     end
 
     if results.empty?
       return render(
-        :json => {:errors => {:account => t(:account_required, 'must be LDAP-authenticated')}},
+        :json => { :errors => { :account => t(:account_required, 'must be LDAP-authenticated') } },
         :status_code => 400
       )
     end
@@ -949,6 +951,7 @@ class AuthenticationProvidersController < ApplicationController
     ap = @account.authentication_providers.active.find(params[:authentication_provider_id])
 
     return render(status: 400, json: { errors: ["Unsupported authentication type"] }) unless ap.class.supports_debugging?
+
     ap.start_debugging
     debug_data(ap)
   end
@@ -984,6 +987,7 @@ class AuthenticationProvidersController < ApplicationController
   end
 
   protected
+
   def filter_data(data)
     auth_type = data.delete(:auth_type)
     klass = AuthenticationProvider.find_sti_class(auth_type)
@@ -1014,6 +1018,7 @@ class AuthenticationProvidersController < ApplicationController
 
   def update_account_settings_from_hash(data)
     return if data.empty?
+
     data.each do |setting, value|
       @account.public_send("#{setting}=".to_sym, value.presence)
     end

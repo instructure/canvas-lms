@@ -115,6 +115,7 @@ module GradingStandards
     def weight_input
       f('#weight')
     end
+
     def save_period_button
       f('button[aria-label="Save Grading Period"]')
     end
@@ -175,7 +176,7 @@ module GradingStandards
       edit_set_save_button.click
     end
 
-    def add_grading_period(title="Grading Period 1")
+    def add_grading_period(title = "Grading Period 1")
       expand_first_set
       add_grading_period_link.click
       replace_content(period_title_input, title)

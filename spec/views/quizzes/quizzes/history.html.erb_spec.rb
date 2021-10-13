@@ -40,14 +40,14 @@ describe "/quizzes/quizzes/history" do
       @student.preferences[:enable_speedgrader_grade_by_question] = true
       @student.save!
       render "quizzes/quizzes/history"
-      expect(response.body).to match /quiz-nav/
+      expect(response.body).to match(/quiz-nav/)
     end
 
     it "doesn't display when not enabled" do
       @student.preferences[:enable_speedgrader_grade_by_question] = nil
       @student.save!
       render "quizzes/quizzes/history"
-      expect(response.body).not_to match /quiz-nav/
+      expect(response.body).not_to match(/quiz-nav/)
     end
   end
 
@@ -66,7 +66,7 @@ describe "/quizzes/quizzes/history" do
       assign(:version_instances, sub.submitted_attempts)
 
       render "quizzes/quizzes/history"
-      expect(response.body).to match /grade-by-question-warning/
+      expect(response.body).to match(/grade-by-question-warning/)
     end
 
     it 'does not display when quiz has only questions' do
@@ -76,7 +76,7 @@ describe "/quizzes/quizzes/history" do
       assign(:version_instances, sub.submitted_attempts)
 
       render "quizzes/quizzes/history"
-      expect(response.body).not_to match /grade-by-question-warning/
+      expect(response.body).not_to match(/grade-by-question-warning/)
     end
   end
 

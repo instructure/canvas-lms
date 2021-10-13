@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 #
 # Canvas is Copyright (C) 2021 Instructure, Inc.
 #
@@ -16,7 +17,6 @@
 
 module MicrosoftSync::GraphService::SpecHelper
   class UrlLogger
-
     attr_reader :errors
 
     def initialize
@@ -30,7 +30,7 @@ module MicrosoftSync::GraphService::SpecHelper
     # Return an array of just the URLs in @stubbed_urls for
     # searching through them more easily.
     def stubbed_url_array
-      @stubbed_urls.map { |item| item[:url]}
+      @stubbed_urls.map { |item| item[:url] }
     end
 
     def stub_request(method, url, response, variables, request_params = {})
@@ -42,11 +42,11 @@ module MicrosoftSync::GraphService::SpecHelper
 
       unless stubbed_url_array.include?(url)
         @stubbed_urls.push({
-          url: url,
-          variables: variables,
-          requests: [],
-          responses: []
-        })
+                             url: url,
+                             variables: variables,
+                             requests: [],
+                             responses: []
+                           })
       end
     end
 
@@ -101,7 +101,7 @@ module MicrosoftSync::GraphService::SpecHelper
       schema_path = all_schema_paths.grep(path_regex).first
       schema = @openapi_schema.dig(*schema_dig_keys(schema_path, method, response))
 
-      JSON::Validator.validate({components: @openapi_schema['components']}.merge(schema), JSON.parse(response.body))
+      JSON::Validator.validate({ components: @openapi_schema['components'] }.merge(schema), JSON.parse(response.body))
     end
 
     def schema_dig_keys(schema_path, method, response)
@@ -116,7 +116,5 @@ module MicrosoftSync::GraphService::SpecHelper
         'schema',
       ]
     end
-
   end
 end
-

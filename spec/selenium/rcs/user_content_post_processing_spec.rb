@@ -43,9 +43,7 @@ describe 'user_content post processing' do
     wait_for_transient_element('.loading_image_holder') { yield }
   end
 
-  describe 'with rce_better_file_downloading flag on' do
-    before(:each) { Account.site_admin.enable_feature!(:rce_better_file_downloading) }
-
+  describe 'file downloads' do
     it 'adds a preview and download buttons' do
       create_wiki_page_with_content(
         'page',
@@ -138,30 +136,6 @@ describe 'user_content post processing' do
       expect(f('a#page')).to be_displayed
       expect(f('a#external')).to be_displayed
       expect(f('a#mailto')).to be_displayed
-      expect(f('body')).not_to contain_css('a.file_download_btn')
-    end
-  end
-
-  describe 'with rce_better_file_downloading flag off' do
-    before(:each) { Account.site_admin.disable_feature!(:rce_better_file_downloading) }
-
-    it 'adds a preview and download buttons' do
-      create_wiki_page_with_content(
-        'page',
-        "<a id='thelink' class='instructure_file_link instructure_scribd_file'
-          href='#{@file_url}?wrap=1&verifier=#{@file.uuid}'>file</a>"
-      )
-      get "/courses/#{@course.id}/pages/page"
-
-      # the file link
-      file_link = f('a#thelink')
-      expect(file_link).to be_displayed
-      expect(file_link.attribute('href')).to end_with "#{@file_url}?wrap=1&verifier=#{@file.uuid}"
-
-      # the file inline preview button
-      expect(f('a.file_preview_link')).to be_displayed
-
-      # the file download button
       expect(f('body')).not_to contain_css('a.file_download_btn')
     end
   end

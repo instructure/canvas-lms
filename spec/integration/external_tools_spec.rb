@@ -25,8 +25,8 @@ require 'nokogiri'
 describe "External Tools" do
   describe "Assignments" do
     before do
-      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
-      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
       course_factory(active_all: true)
       assignment_model(:course => @course, :submission_types => "external_tool", :points_possible => 25)
       @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
@@ -35,7 +35,7 @@ describe "External Tools" do
       @tag.save!
     end
 
-    it "should generate valid LTI parameters" do
+    it "generates valid LTI parameters" do
       student_in_course(:course => @course, :active_all => true)
       user_session(@user)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -53,7 +53,7 @@ describe "External Tools" do
       expect(form.at_css('input#roles')['value']).to eq "Learner"
     end
 
-    it "should include outcome service params when viewing as student" do
+    it "includes outcome service params when viewing as student" do
       allow_any_instance_of(Account).to receive(:feature_enabled?) { false }
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(true)
       allow(CanvasSecurity).to receive(:create_encrypted_jwt) { 'an.encrypted.jwt' }
@@ -69,7 +69,7 @@ describe "External Tools" do
       expect(doc.at_css('form#tool_form input#ext_ims_lis_basic_outcome_url')['value']).to eq blti_legacy_grade_passback_api_url(@tool)
     end
 
-    it "should not include outcome service sourcedid when viewing as teacher" do
+    it "does not include outcome service sourcedid when viewing as teacher" do
       @course.enroll_teacher(user_factory(:active_all => true))
       user_session(@user)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -79,7 +79,7 @@ describe "External Tools" do
       expect(doc.at_css('form#tool_form input#lis_outcome_service_url')).not_to be_nil
     end
 
-    it "should include time zone in LTI paramaters if included in custom fields" do
+    it "includes time zone in LTI paramaters if included in custom fields" do
       @tool.custom_fields = {
         "custom_time_zone" => "$Person.address.timezone",
       }
@@ -105,7 +105,7 @@ describe "External Tools" do
       expect(doc.at_css('form#tool_form input#custom_time_zone')['value']).to eq "Pacific/Honolulu"
     end
 
-    it "should redirect if the tool can't be configured" do
+    it "redirects if the tool can't be configured" do
       @tag.update_attribute(:url, "http://example.net")
 
       student_in_course(:active_all => true)
@@ -115,7 +115,7 @@ describe "External Tools" do
       expect(flash[:error]).to be_present
     end
 
-    it "should render inline external tool links with a full return url" do
+    it "renders inline external tool links with a full return url" do
       student_in_course(:active_all => true)
       user_session(@user)
       get "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape(@tag.url)}"
@@ -125,9 +125,9 @@ describe "External Tools" do
       expect(doc.at_css("input[name='launch_presentation_return_url']")['value']).to match(/^http/)
     end
 
-    it "should render user navigation tools with a full return url" do
+    it "renders user navigation tools with a full return url" do
       tool = @course.root_account.context_external_tools.build(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com', :privacy_level => 'public')
-      tool.user_navigation = {:url => "http://www.example.com", :text => "Example URL"}
+      tool.user_navigation = { :url => "http://www.example.com", :text => "Example URL" }
       tool.save!
 
       student_in_course(:active_all => true)
@@ -138,14 +138,13 @@ describe "External Tools" do
       expect(doc.at_css('#tool_form')).not_to be_nil
       expect(doc.at_css("input[name='launch_presentation_return_url']")['value']).to match(/^http/)
     end
-
   end
 
-  it "should highlight the navigation tab when using an external tool" do
+  it "highlights the navigation tab when using an external tool" do
     course_with_teacher_logged_in(:active_all => true)
 
     @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
-    @tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
+    @tool.course_navigation = { :url => "http://www.example.com", :text => "Example URL" }
     @tool.save!
 
     get "/courses/#{@course.id}/external_tools/#{@tool.id}"
@@ -156,14 +155,14 @@ describe "External Tools" do
     expect(tab['class'].split).to include("active")
   end
 
-  it "should prevent access for unverified users if account requires it" do
+  it "prevents access for unverified users if account requires it" do
     course_with_teacher_logged_in(:active_all => true)
 
     @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
-    @tool.course_navigation = {:url => "http://www.example.com", :text => "Example URL"}
+    @tool.course_navigation = { :url => "http://www.example.com", :text => "Example URL" }
     @tool.save!
 
-    Account.default.tap{|a| a.settings[:require_confirmed_email] = true; a.save!}
+    Account.default.tap { |a| a.settings[:require_confirmed_email] = true; a.save! }
     get "/courses/#{@course.id}/external_tools/#{@tool.id}"
     expect(response).to be_redirect
     expect(response.location).to eq root_url
@@ -173,18 +172,18 @@ describe "External Tools" do
   context 'global navigation' do
     before :once do
       @admin_tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @admin_tool.global_navigation = {:visibility => 'admins', :url => "http://www.example.com", :text => "Example URL"}
+      @admin_tool.global_navigation = { :visibility => 'admins', :url => "http://www.example.com", :text => "Example URL" }
       @admin_tool.save!
       @member_tool = Account.default.context_external_tools.new(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @member_tool.global_navigation = {:url => "http://www.example.com", :text => "Example URL 2"}
+      @member_tool.global_navigation = { :url => "http://www.example.com", :text => "Example URL 2" }
       @member_tool.save!
       @permissiony_tool = Account.default.context_external_tools.new(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      @permissiony_tool.global_navigation = {:required_permissions => "manage_assignments,manage_calendar",
-        :url => "http://www.example.com", :text => "Example URL 3"}
+      @permissiony_tool.global_navigation = { :required_permissions => "manage_assignments,manage_calendar",
+                                              :url => "http://www.example.com", :text => "Example URL 3" }
       @permissiony_tool.save!
     end
 
-    it "should show the admin level global navigation menu items to teachers" do
+    it "shows the admin level global navigation menu items to teachers" do
       course_with_teacher_logged_in(:account => @account, :active_all => true)
       get "/courses"
       expect(response).to be_successful
@@ -201,7 +200,7 @@ describe "External Tools" do
       expect(menu_link2.text).to match_ignoring_whitespace(@member_tool.label_for(:global_navigation))
     end
 
-    it "should only show the member level global navigation menu items to students" do
+    it "only shows the member level global navigation menu items to students" do
       course_with_student_logged_in(:account => @account, :active_all => true)
       get "/courses"
       expect(response).to be_successful
@@ -311,7 +310,7 @@ describe "External Tools" do
 
         # trigger the global_nav cache register clearing in a callback
         other_tool = Account.default.context_external_tools.new(:name => "b", :domain => "google.com",
-          :consumer_key => '12345', :shared_secret => 'secret')
+                                                                :consumer_key => '12345', :shared_secret => 'secret')
         new_secret_settings = @admin_tool.settings
         new_secret_settings[:global_navigation][:text] = "new text"
         # update the url secretly in the db but don't update the cache_key (updated_at)

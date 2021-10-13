@@ -25,6 +25,7 @@ module Api
     class Content
       def self.process_incoming(html, host: nil, port: nil)
         return html unless html.present?
+
         content = self.new(html, host: host, port: port)
         # shortcut html documents that definitely don't have anything we're interested in
         return html unless content.might_need_modification?
@@ -34,8 +35,9 @@ module Api
 
       def self.rewrite_outgoing(html, account, url_helper, include_mobile: false, rewrite_api_urls: true)
         return html if html.blank?
+
         self.new(html, account, include_mobile: include_mobile, rewrite_api_urls: rewrite_api_urls)
-          .rewritten_html(url_helper)
+            .rewritten_html(url_helper)
       end
 
       attr_reader :html
@@ -65,6 +67,7 @@ module Api
         parsed_html.css('audio.instructure_inline_media_comment, video.instructure_inline_media_comment, a.instructure_inline_media_comment').each do |node|
           tag = Html::MediaTag.new(node, parsed_html)
           next unless tag.has_media_comment?
+
           node.replace(tag.as_anchor_node)
         end
 
@@ -89,6 +92,7 @@ module Api
         parsed_html.css('a.instructure_inline_media_comment').each do |anchor|
           tag = Html::MediaTag.new(anchor, parsed_html)
           next unless tag.has_media_comment?
+
           anchor.replace(tag.as_html5_node(url_helper))
         end
 

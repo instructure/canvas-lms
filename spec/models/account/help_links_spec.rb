@@ -30,7 +30,7 @@ describe Account::HelpLinks do
 
   describe '.instantiate_links' do
     it 'calls procs' do
-      links = [{ text: -> { 'abc' }}]
+      links = [{ text: -> { 'abc' } }]
       expect(subject.instantiate_links(links)).to eq [{ text: 'abc' }]
     end
 
@@ -84,7 +84,7 @@ describe Account::HelpLinks do
     it 'coalesces boolean values' do
       links = [{ is_featured: '0', is_new: '1' }, { is_featured: 'true', is_new: '' }]
       processed = subject.process_links_before_save(links)
-      expect(processed).to eq [{is_featured: false, is_new: true}, {is_featured: true, is_new: false}]
+      expect(processed).to eq [{ is_featured: false, is_new: true }, { is_featured: true, is_new: false }]
     end
 
     it 'removes default values from default links' do
@@ -94,10 +94,10 @@ describe Account::HelpLinks do
         { url: 'this is a new url' },
         { feature_headline: 'this is a new headline', is_new: true }
       ]
-      links.zip(updates).each {|link, update| link.merge!(update)}
+      links.zip(updates).each { |link, update| link.merge!(update) }
 
       processed = subject.process_links_before_save(links)
-      non_trivial_text = processed.map {|link| link.slice(:text, :subtext, :url, :feature_headline, :is_new).compact}
+      non_trivial_text = processed.map { |link| link.slice(:text, :subtext, :url, :feature_headline, :is_new).compact }
       expect(non_trivial_text).to eq updates
     end
   end

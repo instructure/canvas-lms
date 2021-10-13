@@ -45,7 +45,7 @@ class Mutations::UpdateConversationParticipants < Mutations::BaseMutation
     # update_all cannot be used as the ConversationParticipant model
     # extends the methods used for updating attributes due to the
     # storage of data differing from what ActiveRecord expects
-    conversation_participants.map {|cp| cp.update(update_params) }
+    conversation_participants.map { |cp| cp.update(update_params) }
 
     response = {}
     response[:conversation_participants] = conversation_participants if conversation_participants.any?

@@ -27,7 +27,7 @@ describe "Gradebook" do
   include GradebookCommon
   include ColorCommon
 
-  let(:extra_setup) { }
+  let(:extra_setup) {}
   let(:students) { @course.students }
 
   before :once do
@@ -119,7 +119,6 @@ describe "Gradebook" do
   end
 
   context "return focus to view options menu when it closes" do
-
     before { Gradebook.visit(@course) }
 
     it 'returns focus to the view options menu after clicking the "Notes" option' do
@@ -280,7 +279,7 @@ describe "Gradebook" do
     # toggle to descending sort
     it 'toggles sort order on student column by name' do
       cell = Gradebook.student_cell
-      driver.action.move_to(cell, 0, cell.size.height / 2 - 2).click.perform
+      driver.action.move_to(cell, 0, (cell.size.height / 2) - 2).click.perform
 
       expect(Gradebook.student_grades_link(Gradebook.student_cell(0)).text).to eq(students[0].name)
       expect(Gradebook.student_grades_link(Gradebook.student_cell(1)).text).to eq(students[1].name)
@@ -395,7 +394,7 @@ describe "Gradebook" do
   end
 
   context "assignment header focus" do
-    before { Gradebook.visit(@course)}
+    before { Gradebook.visit(@course) }
     let(:assignment) { @course.assignments.first }
 
     it 'is placed on assignment header trigger upon sort' do

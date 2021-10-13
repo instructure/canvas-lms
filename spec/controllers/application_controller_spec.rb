@@ -112,14 +112,14 @@ RSpec.describe ApplicationController do
       allow(controller).to receive(:api_request?).and_return(false)
     end
 
-    it "should set items" do
+    it "sets items" do
       expect(HostUrl).to receive(:file_host).with(Account.default, "www.example.com").and_return("files.example.com")
       controller.js_env :FOO => 'bar'
       expect(controller.js_env[:FOO]).to eq 'bar'
       expect(controller.js_env[:files_domain]).to eq 'files.example.com'
     end
 
-    it "should auto-set timezone and locale" do
+    it "auto-sets timezone and locale" do
       I18n.locale = :fr
       Time.zone = 'Alaska'
       expect(@controller.js_env[:LOCALE]).to eq 'fr'
@@ -192,20 +192,20 @@ RSpec.describe ApplicationController do
       expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq 'America/Denver'
     end
 
-    it "should allow multiple items" do
+    it "allows multiple items" do
       controller.js_env :A => 'a', :B => 'b'
       expect(controller.js_env[:A]).to eq 'a'
       expect(controller.js_env[:B]).to eq 'b'
     end
 
-    it "should not allow overwriting a key" do
+    it "does not allow overwriting a key" do
       controller.js_env :REAL_SLIM_SHADY => 'please stand up'
       expect { controller.js_env(:REAL_SLIM_SHADY => 'poser') }.to raise_error("js_env key REAL_SLIM_SHADY is already taken")
     end
 
-    it "should overwrite a key if told explicitly to do so" do
+    it "overwrites a key if told explicitly to do so" do
       controller.js_env :REAL_SLIM_SHADY => 'please stand up'
-      controller.js_env({:REAL_SLIM_SHADY => 'poser'}, true)
+      controller.js_env({ :REAL_SLIM_SHADY => 'poser' }, true)
       expect(controller.js_env[:REAL_SLIM_SHADY]).to eq 'poser'
     end
 
@@ -232,7 +232,7 @@ RSpec.describe ApplicationController do
           controller.instance_variable_set(:@context, @course)
         end
 
-        it 'should populate js_env with elementary theme setting' do
+        it 'populates js_env with elementary theme setting' do
           expect(controller.js_env[:FEATURES]).to include(:canvas_k6_theme)
         end
       end
@@ -319,7 +319,7 @@ RSpec.describe ApplicationController do
       require_relative '../sharding_spec_helper'
       specs_require_sharding
 
-      it "should set the global id for the domain_root_account" do
+      it "sets the global id for the domain_root_account" do
         controller.instance_variable_set(:@domain_root_account, Account.default)
         expect(controller.js_env[:DOMAIN_ROOT_ACCOUNT_ID]).to eq Account.default.global_id
       end
@@ -364,7 +364,7 @@ RSpec.describe ApplicationController do
     end
 
     context "canvas for elementary" do
-      let(:course) {create_course}
+      let(:course) { create_course }
 
       before(:each) do
         controller.instance_variable_set(:@context, course)
@@ -374,7 +374,7 @@ RSpec.describe ApplicationController do
       describe "K5_HOMEROOM_COURSE" do
         describe "with canvas_for_elementary account setting on" do
           it "is true if the course is a homeroom course and in a K-5 account" do
-            course.account.settings[:enable_as_k5_account] = {value: true}
+            course.account.settings[:enable_as_k5_account] = { value: true }
             course.homeroom_course = true
             expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_truthy
           end
@@ -385,7 +385,7 @@ RSpec.describe ApplicationController do
           end
 
           it "is false if the course is not a homeroom course and in a K-5 account" do
-            course.account.settings[:enable_as_k5_account] = {value: true}
+            course.account.settings[:enable_as_k5_account] = { value: true }
             expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
           end
         end
@@ -397,7 +397,7 @@ RSpec.describe ApplicationController do
           expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
 
           course.homeroom_course = false
-          course.account.settings[:enable_as_k5_account] = {value: true}
+          course.account.settings[:enable_as_k5_account] = { value: true }
           expect(@controller.js_env[:K5_HOMEROOM_COURSE]).to be_falsy
         end
       end
@@ -411,18 +411,18 @@ RSpec.describe ApplicationController do
 
       it 'loads gateway uri from dynamic settings' do
         allow(Canvas::DynamicSettings).to receive(:find).and_return({
-          'api_gateway_enabled' => 'true',
-          'api_gateway_uri' => 'http://the-gateway/graphql'
-        })
+                                                                      'api_gateway_enabled' => 'true',
+                                                                      'api_gateway_uri' => 'http://the-gateway/graphql'
+                                                                    })
         jsenv = controller.js_env({})
         expect(jsenv[:API_GATEWAY_URI]).to eq('http://the-gateway/graphql')
       end
 
       it 'will not expose gateway uri from dynamic settings if not enabled' do
         allow(Canvas::DynamicSettings).to receive(:find).and_return({
-          'api_gateway_enabled' => 'false',
-          'api_gateway_uri' => 'http://the-gateway/graphql'
-        })
+                                                                      'api_gateway_enabled' => 'false',
+                                                                      'api_gateway_uri' => 'http://the-gateway/graphql'
+                                                                    })
         jsenv = controller.js_env({})
         expect(jsenv[:API_GATEWAY_URI]).to be_nil
       end
@@ -435,16 +435,16 @@ RSpec.describe ApplicationController do
       allow(controller).to receive(:request).and_return(req)
     end
 
-    it "should build from a simple path" do
+    it "builds from a simple path" do
       expect(controller.send(:clean_return_to, "/calendar")).to eq "https://canvas.example.com/calendar"
     end
 
-    it "should build from a full url" do
+    it "builds from a full url" do
       # ... but always use the request host/protocol, not the given
       expect(controller.send(:clean_return_to, "http://example.org/a/b?a=1&b=2#test")).to eq "https://canvas.example.com/a/b?a=1&b=2#test"
     end
 
-    it "should reject disallowed paths" do
+    it "rejects disallowed paths" do
       expect(controller.send(:clean_return_to, "ftp://example.com/javascript:hai")).to be_nil
     end
 
@@ -508,42 +508,42 @@ RSpec.describe ApplicationController do
       @common_params = { :only_path => true }
     end
 
-    it "should include inline=1 in url by default" do
-      expect(controller).to receive(:file_download_url).
-        with(@attachment, @common_params.merge(:inline => 1)).
-        and_return('')
+    it "includes inline=1 in url by default" do
+      expect(controller).to receive(:file_download_url)
+        .with(@attachment, @common_params.merge(:inline => 1))
+        .and_return('')
       expect(HostUrl).to receive(:file_host_with_shard).with(42, '').and_return(['myfiles', Shard.default])
       controller.instance_variable_set(:@domain_root_account, 42)
       url = controller.send(:safe_domain_file_url, @attachment)
-      expect(url).to match /myfiles/
+      expect(url).to match(/myfiles/)
     end
 
-    it "should include :download=>1 in inline urls for relative contexts" do
+    it "includes :download=>1 in inline urls for relative contexts" do
       controller.instance_variable_set(:@context, @attachment.context)
       allow(controller).to receive(:named_context_url).and_return('')
       url = controller.send(:safe_domain_file_url, @attachment)
       expect(url).to match(/[\?&]download=1(&|$)/)
     end
 
-    it "should not include :download=>1 in download urls for relative contexts" do
+    it "does not include :download=>1 in download urls for relative contexts" do
       controller.instance_variable_set(:@context, @attachment.context)
       allow(controller).to receive(:named_context_url).and_return('')
       url = controller.send(:safe_domain_file_url, @attachment, download: true)
       expect(url).not_to match(/[\?&]download=1(&|$)/)
     end
 
-    it "should include download_frd=1 and not include inline=1 in url when specified as for download" do
-      expect(controller).to receive(:file_download_url).
-        with(@attachment, @common_params.merge(:download_frd => 1)).
-        and_return('')
+    it "includes download_frd=1 and not include inline=1 in url when specified as for download" do
+      expect(controller).to receive(:file_download_url)
+        .with(@attachment, @common_params.merge(:download_frd => 1))
+        .and_return('')
       controller.send(:safe_domain_file_url, @attachment, download: true)
     end
 
     it "prepends a unique file subdomain if configured" do
       override_dynamic_settings(private: { canvas: { attachment_specific_file_domain: true } }) do
-        expect(controller).to receive(:file_download_url).
-          with(@attachment, @common_params.merge(:inline => 1)).
-          and_return("/files/#{@attachment.id}")
+        expect(controller).to receive(:file_download_url)
+          .with(@attachment, @common_params.merge(:inline => 1))
+          .and_return("/files/#{@attachment.id}")
         expect(controller.send(:safe_domain_file_url, @attachment, host_and_shard: ['canvasfiles.com', Shard.default])).to eq "a#{@attachment.shard.id}-#{@attachment.id}.canvasfiles.com/files/#{@attachment.id}"
       end
     end
@@ -554,24 +554,24 @@ RSpec.describe ApplicationController do
       I18n.localizer = nil
     end
 
-    it "should find user with api_find for api requests" do
+    it "finds user with api_find for api requests" do
       user_with_pseudonym
       @pseudonym.update_attribute(:sis_user_id, 'test1')
       controller.instance_variable_set(:@domain_root_account, Account.default)
       allow(controller).to receive(:named_context_url).with(@user, :context_url).and_return('')
-      allow(controller).to receive(:params).and_return({:user_id => 'sis_user_id:test1'})
+      allow(controller).to receive(:params).and_return({ :user_id => 'sis_user_id:test1' })
       allow(controller).to receive(:api_request?).and_return(true)
       controller.send(:get_context)
       expect(controller.instance_variable_get(:@context)).to eq @user
     end
 
-    it "should find course section with api_find for api requests" do
+    it "finds course section with api_find for api requests" do
       course_model
       @section = @course.course_sections.first
       @section.update_attribute(:sis_source_id, 'test1')
       controller.instance_variable_set(:@domain_root_account, Account.default)
       allow(controller).to receive(:named_context_url).with(@section, :context_url).and_return('')
-      allow(controller).to receive(:params).and_return({:course_section_id => 'sis_section_id:test1'})
+      allow(controller).to receive(:params).and_return({ :course_section_id => 'sis_section_id:test1' })
       allow(controller).to receive(:api_request?).and_return(true)
       controller.send(:get_context)
       expect(controller.instance_variable_get(:@context)).to eq @section
@@ -580,7 +580,7 @@ RSpec.describe ApplicationController do
     # this test is supposed to represent calling I18n.t before a context is set
     # and still having later localizations that depend on the locale of the
     # context work.
-    it "should reset the localizer" do
+    it "resets the localizer" do
       # emulate all the locale related work done before/around a request
       acct = Account.default
       acct.default_locale = "es"
@@ -591,7 +591,7 @@ RSpec.describe ApplicationController do
       expect(I18n.locale.to_s).to eq "es"
       course_model(:locale => "ru")
       allow(controller).to receive(:named_context_url).with(@course, :context_url).and_return('')
-      allow(controller).to receive(:params).and_return({:course_id => @course.id})
+      allow(controller).to receive(:params).and_return({ :course_id => @course.id })
       allow(controller).to receive(:api_request?).and_return(false)
       allow(controller).to receive(:session).and_return({})
       allow(controller).to receive(:js_env).and_return({})
@@ -606,7 +606,7 @@ RSpec.describe ApplicationController do
       ctrl = ApplicationController.new
       ctrl.send(:assign_localizer)
       locale = nil
-      expect{ locale = I18n.localizer.call }.to_not raise_error
+      expect { locale = I18n.localizer.call }.to_not raise_error
       expect(locale).to eq("en") # default locale
     end
   end
@@ -617,7 +617,7 @@ RSpec.describe ApplicationController do
       expect(controller.send(:require_account_context)).to be_truthy
       course_model
       controller.instance_variable_set(:@context, @course)
-      expect{controller.send(:require_account_context)}.to raise_error(ActiveRecord::RecordNotFound)
+      expect { controller.send(:require_account_context) }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "properly requires course context" do
@@ -625,7 +625,7 @@ RSpec.describe ApplicationController do
       controller.instance_variable_set(:@context, @course)
       expect(controller.send(:require_course_context)).to be_truthy
       controller.instance_variable_set(:@context, Account.default)
-      expect{controller.send(:require_course_context)}.to raise_error(ActiveRecord::RecordNotFound)
+      expect { controller.send(:require_course_context) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 
@@ -660,28 +660,28 @@ RSpec.describe ApplicationController do
       attachment_model(context: @course)
     end
 
-    it "should find file's context instead of user" do
+    it "finds file's context instead of user" do
       controller.instance_variable_set(:@domain_root_account, Account.default)
       controller.instance_variable_set(:@context, @student)
-      controller.instance_variable_set(:@accessed_asset, {level: 'participate', code: @attachment.asset_string, category: 'files'})
+      controller.instance_variable_set(:@accessed_asset, { level: 'participate', code: @attachment.asset_string, category: 'files' })
       allow(controller).to receive(:named_context_url).with(@attachment, :context_url).and_return("/files/#{@attachment.id}")
-      allow(controller).to receive(:params).and_return({file_id: @attachment.id, id: @attachment.id})
+      allow(controller).to receive(:params).and_return({ file_id: @attachment.id, id: @attachment.id })
       allow(controller.request).to receive(:path).and_return("/files/#{@attachment.id}")
       controller.send(:log_participation, @student)
       expect(AssetUserAccess.where(user: @student, asset_code: @attachment.asset_string).take.context).to eq @course
     end
 
-    it 'should not error on non-standard context for file' do
+    it 'does not error on non-standard context for file' do
       controller.instance_variable_set(:@domain_root_account, Account.default)
       controller.instance_variable_set(:@context, @student)
-      controller.instance_variable_set(:@accessed_asset, {level: 'participate', code: @attachment.asset_string, category: 'files'})
+      controller.instance_variable_set(:@accessed_asset, { level: 'participate', code: @attachment.asset_string, category: 'files' })
       allow(controller).to receive(:named_context_url).with(@attachment, :context_url).and_return("/files/#{@attachment.id}")
-      allow(controller).to receive(:params).and_return({file_id: @attachment.id, id: @attachment.id})
+      allow(controller).to receive(:params).and_return({ file_id: @attachment.id, id: @attachment.id })
       allow(controller.request).to receive(:path).and_return("/files/#{@attachment.id}")
       assignment_model(course: @course)
       @attachment.context = @assignment
       @attachment.save!
-      expect {controller.send(:log_participation, @student)}.not_to raise_error
+      expect { controller.send(:log_participation, @student) }.not_to raise_error
     end
   end
 
@@ -713,13 +713,13 @@ RSpec.describe ApplicationController do
       student_in_course
     end
 
-    it 'should update for HTTP PUT requests that are not generated by hand' do
+    it 'updates for HTTP PUT requests that are not generated by hand' do
       allow(controller.request).to receive(:xhr?).and_return(0)
       allow(controller.request).to receive(:put?).and_return(true)
       allow(RequestContextGenerator).to receive(:store_interaction_seconds_update).and_return(true)
       allow(CanvasSecurity::PageViewJwt).to receive(:decode).and_return(page_view_info)
       allow(PageView).to receive(:find_for_update).and_return(page_view)
-      expect {controller.send(:add_interaction_seconds)}.not_to raise_error
+      expect { controller.send(:add_interaction_seconds) }.not_to raise_error
     end
   end
 
@@ -734,7 +734,7 @@ RSpec.describe ApplicationController do
         end
       end
 
-      it 'should log error reports to the domain_root_accounts shard' do
+      it 'logs error reports to the domain_root_accounts shard' do
         report = ErrorReport.new
         allow(ErrorReport).to receive(:log_exception).and_return(report)
         allow(ErrorReport).to receive(:find).and_return(report)
@@ -776,23 +776,23 @@ RSpec.describe ApplicationController do
 
     it 'redirects for lti_message_handler' do
       tag = create_tag(content_type: 'Lti::MessageHandler')
-      expect(controller).to receive(:named_context_url).with(Account.default, :context_basic_lti_launch_request_url, 44, {module_item_id: 42, resource_link_fragment: 'ContentTag:42'}).and_return('nil')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_basic_lti_launch_request_url, 44, { module_item_id: 42, resource_link_fragment: 'ContentTag:42' }).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for an assignment' do
       tag = create_tag(content_type: 'Assignment')
-      expect(controller).to receive(:named_context_url).with(Account.default, :context_assignment_url, 44, {module_item_id: 42}).and_return('nil')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_assignment_url, 44, { module_item_id: 42 }).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     context 'when manage and new_quizzes_modules_support enabled' do
-      let(:course){ course_model }
+      let(:course) { course_model }
 
       before do
-        controller.instance_variable_set(:"@context", course)
+        controller.instance_variable_set(:@context, course)
         allow(course).to receive(:grants_right?).and_return true
         Account.site_admin.enable_feature!(:new_quizzes_modules_support)
       end
@@ -800,7 +800,7 @@ RSpec.describe ApplicationController do
       it 'redirects to edit for a quiz_lti assignment' do
         tag = create_tag(content_type: 'Assignment')
         allow(tag).to receive(:quiz_lti).and_return true
-        expect(controller).to receive(:named_context_url).with(Account.default, :edit_context_assignment_url, 44, {module_item_id: 42}).and_return('nil')
+        expect(controller).to receive(:named_context_url).with(Account.default, :edit_context_assignment_url, 44, { module_item_id: 42 }).and_return('nil')
         allow(controller).to receive(:redirect_to)
         controller.send(:content_tag_redirect, Account.default, tag, nil)
       end
@@ -810,7 +810,7 @@ RSpec.describe ApplicationController do
           tag = create_tag(content_type: 'Assignment')
           allow(tag).to receive(:quiz_lti).and_return true
           expect(controller).to receive(:named_context_url).with(
-            Account.default, :context_assignment_url, 44, {module_item_id: 42}
+            Account.default, :context_assignment_url, 44, { module_item_id: 42 }
           ).and_return('nil')
           allow(controller).to receive(:redirect_to)
           controller.params[:build] = true
@@ -821,42 +821,42 @@ RSpec.describe ApplicationController do
 
     it 'redirects for a quiz' do
       tag = create_tag(content_type: 'Quizzes::Quiz')
-      expect(controller).to receive(:named_context_url).with(Account.default, :context_quiz_url, 44, {module_item_id: 42}).and_return('nil')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_quiz_url, 44, { module_item_id: 42 }).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for a discussion topic' do
       tag = create_tag(content_type: 'DiscussionTopic')
-      expect(controller).to receive(:named_context_url).with(Account.default, :context_discussion_topic_url, 44, {module_item_id: 42}).and_return('nil')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_discussion_topic_url, 44, { module_item_id: 42 }).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for a wikipage' do
       tag = create_tag(content_type: 'WikiPage')
-      expect(controller).to receive(:polymorphic_url).with([Account.default, tag.content], {module_item_id: 42}).and_return('nil')
+      expect(controller).to receive(:polymorphic_url).with([Account.default, tag.content], { module_item_id: 42 }).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for a rubric' do
       tag = create_tag(content_type: 'Rubric')
-      expect(controller).to receive(:named_context_url).with(Account.default, :context_rubric_url, 44, {module_item_id: 42}).and_return('nil')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_rubric_url, 44, { module_item_id: 42 }).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for a question bank' do
       tag = create_tag(content_type: 'AssessmentQuestionBank')
-      expect(controller).to receive(:named_context_url).with(Account.default, :context_question_bank_url, 44, {module_item_id: 42}).and_return('nil')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_question_bank_url, 44, { module_item_id: 42 }).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
     it 'redirects for an attachment' do
       tag = create_tag(content_type: 'Attachment')
-      expect(controller).to receive(:named_context_url).with(Account.default, :context_file_url, 44, {module_item_id: 42}).and_return('nil')
+      expect(controller).to receive(:named_context_url).with(Account.default, :context_file_url, 44, { module_item_id: 42 }).and_return('nil')
       allow(controller).to receive(:redirect_to)
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
@@ -869,8 +869,7 @@ RSpec.describe ApplicationController do
     end
 
     context 'ContextExternalTool' do
-
-      let(:course){ course_model }
+      let(:course) { course_model }
       let_once(:dev_key) { DeveloperKey.create! }
 
       let(:tool) do
@@ -886,25 +885,26 @@ RSpec.describe ApplicationController do
         tool.resource_selection = {
           :url => "http://#{HostUrl.default_host}/selection_test",
           :selection_width => 400,
-          :selection_height => 400}
+          :selection_height => 400
+        }
         tool.settings[:selection_width] = 500
         tool.settings[:selection_height] = 300
-        tool.settings[:custom_fields] = {"test_token"=>"$com.instructure.PostMessageToken"}
+        tool.settings[:custom_fields] = { "test_token" => "$com.instructure.PostMessageToken" }
         tool.save!
         tool
       end
 
-      let(:content_tag) { ContentTag.create(content: tool, url: tool.url)}
+      let(:content_tag) { ContentTag.create(content: tool, url: tool.url) }
 
       context 'display type' do
         before do
           allow(controller).to receive(:named_context_url).and_return('wrong_url')
           allow(controller).to receive(:render)
-          allow(controller).to receive_messages(js_env:[])
-          controller.instance_variable_set(:"@context", course)
+          allow(controller).to receive_messages(js_env: [])
+          controller.instance_variable_set(:@context, course)
           allow(content_tag).to receive(:id).and_return(42)
           allow(controller).to receive(:require_user) { user_model }
-          allow(controller).to receive(:lti_launch_params) {{}}
+          allow(controller).to receive(:lti_launch_params) { {} }
           content_tag.update!(context: assignment_model)
         end
 
@@ -992,8 +992,8 @@ RSpec.describe ApplicationController do
           allow(controller).to receive(:lti_turnitin_outcomes_placement_url).and_return('wrong_url')
 
           allow(controller).to receive(:render)
-          allow(controller).to receive_messages(js_env:[])
-          controller.instance_variable_set(:"@context", course)
+          allow(controller).to receive_messages(js_env: [])
+          controller.instance_variable_set(:@context, course)
           allow(content_tag).to receive(:id).and_return(42)
           allow(controller).to receive(:require_user) { user_model }
           controller.instance_variable_set(:@current_user, user)
@@ -1132,7 +1132,6 @@ RSpec.describe ApplicationController do
               end
             end
           end
-          # rubocop:enable RSpec/NestedGroups
         end
 
         it 'creates a basic lti launch request when tool is not configured to use LTI 1.3' do
@@ -1148,7 +1147,7 @@ RSpec.describe ApplicationController do
 
       context 'return_url' do
         before do
-          controller.instance_variable_set(:"@context", course)
+          controller.instance_variable_set(:@context, course)
           content_tag.update!(context: assignment_model)
           allow(content_tag.context).to receive(:quiz_lti?).and_return(true)
           allow(controller).to receive(:render)
@@ -1222,7 +1221,6 @@ RSpec.describe ApplicationController do
           end
         end
 
-
         context 'is set to quizzes page when launched from quizzes page' do
           it 'for small id' do
             allow(controller.request).to receive(:referer).and_return('courses/1/quizzes')
@@ -1287,7 +1285,6 @@ RSpec.describe ApplicationController do
           end
         end
 
-
         it 'is set to quizzes page when launched from assignments/new' do
           allow(controller.request).to receive(:referer).and_return('assignments/new')
           controller.context.root_account.enable_feature! :newquizzes_on_quiz_page
@@ -1323,24 +1320,24 @@ RSpec.describe ApplicationController do
       end
 
       it 'returns the full path for the redirect url' do
-        expect(controller).to receive(:named_context_url).with(course, :context_url, {:include_host => true})
+        expect(controller).to receive(:named_context_url).with(course, :context_url, { :include_host => true })
         expect(controller).to receive(:named_context_url).with(
           course,
           :context_external_content_success_url,
           'external_tool_redirect',
-          {:include_host => true}
+          { :include_host => true }
         ).and_return('wrong_url')
         allow(controller).to receive(:render)
-        allow(controller).to receive_messages(js_env:[])
-        controller.instance_variable_set(:"@context", course)
+        allow(controller).to receive_messages(js_env: [])
+        controller.instance_variable_set(:@context, course)
         controller.send(:content_tag_redirect, course, content_tag, nil)
       end
 
       it 'sets the resource_link_id correctly' do
         allow(controller).to receive(:named_context_url).and_return('wrong_url')
         allow(controller).to receive(:render)
-        allow(controller).to receive_messages(js_env:[])
-        controller.instance_variable_set(:"@context", course)
+        allow(controller).to receive_messages(js_env: [])
+        controller.instance_variable_set(:@context, course)
         allow(content_tag).to receive(:id).and_return(42)
         controller.send(:content_tag_redirect, course, content_tag, nil)
         expect(assigns[:lti_launch].params["resource_link_id"]).to eq 'e62d81a8a1587cdf9d3bbc3de0ef303d6bc70d78'
@@ -1349,8 +1346,8 @@ RSpec.describe ApplicationController do
       it 'sets the post message token' do
         allow(controller).to receive(:named_context_url).and_return('wrong_url')
         allow(controller).to receive(:render)
-        allow(controller).to receive_messages(js_env:[])
-        controller.instance_variable_set(:"@context", course)
+        allow(controller).to receive_messages(js_env: [])
+        controller.instance_variable_set(:@context, course)
         allow(content_tag).to receive(:id).and_return(42)
         controller.send(:content_tag_redirect, course, content_tag, nil)
         expect(assigns[:lti_launch].params["custom_test_token"]).to be_present
@@ -1360,8 +1357,8 @@ RSpec.describe ApplicationController do
         before do
           allow(controller).to receive(:named_context_url).and_return(tool.url)
           allow(controller).to receive(:render)
-          allow(controller).to receive_messages(js_env:[])
-          controller.instance_variable_set(:"@context", course)
+          allow(controller).to receive_messages(js_env: [])
+          controller.instance_variable_set(:@context, course)
           allow(content_tag).to receive(:id).and_return(42)
         end
 
@@ -1373,7 +1370,7 @@ RSpec.describe ApplicationController do
         end
 
         it 'uses selection_width and selection_height from the ContentTag if provided' do
-          content_tag.update(link_settings: {selection_width: 543, selection_height: 321})
+          content_tag.update(link_settings: { selection_width: 543, selection_height: 321 })
           controller.send(:content_tag_redirect, course, content_tag, nil)
 
           expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq '543px'
@@ -1392,7 +1389,6 @@ RSpec.describe ApplicationController do
         end
       end
     end
-
   end
 
   describe 'external_tools_display_hashes' do
@@ -1400,7 +1396,7 @@ RSpec.describe ApplicationController do
       @course = course_model
       @group = @course.groups.create!(:name => "some group")
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
-      tool.account_navigation = {:url => "http://example.com", :icon_url => "http://example.com", :enabled => true}
+      tool.account_navigation = { :url => "http://example.com", :icon_url => "http://example.com", :enabled => true }
       tool.save!
 
       allow(controller).to receive(:polymorphic_url).and_return("http://example.com")
@@ -1412,13 +1408,13 @@ RSpec.describe ApplicationController do
     it 'returns array of tools if context is not group' do
       @course = course_model
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
-      tool.account_navigation = {:url => "http://example.com", :icon_url => "http://example.com", :enabled => true, :canvas_icon_class => 'icon-commons'}
+      tool.account_navigation = { :url => "http://example.com", :icon_url => "http://example.com", :enabled => true, :canvas_icon_class => 'icon-commons' }
       tool.save!
 
       allow(controller).to receive(:polymorphic_url).and_return("http://example.com")
       external_tools = controller.external_tools_display_hashes(:account_navigation, @course)
 
-      expect(external_tools).to eq([{:id=>tool.id, :title=>"bob", :base_url=>"http://example.com", :icon_url=>"http://example.com", :canvas_icon_class => 'icon-commons'}])
+      expect(external_tools).to eq([{ :id => tool.id, :title => "bob", :base_url => "http://example.com", :icon_url => "http://example.com", :canvas_icon_class => 'icon-commons' }])
     end
 
     it "doesn't return tools that are mapped to disabled feature flags" do
@@ -1427,23 +1423,23 @@ RSpec.describe ApplicationController do
 
       allow(controller).to receive(:polymorphic_url).and_return('http://example.com')
       external_tools = controller.external_tools_display_hashes(:course_navigation, @course)
-      expect(external_tools).not_to include({title: 'Analytics 2', base_url: 'http://example.com', icon_url: nil, canvas_icon_class: 'icon-analytics', tool_id: ContextExternalTool::ANALYTICS_2})
+      expect(external_tools).not_to include({ title: 'Analytics 2', base_url: 'http://example.com', icon_url: nil, canvas_icon_class: 'icon-analytics', tool_id: ContextExternalTool::ANALYTICS_2 })
 
       @course.enable_feature!(:analytics_2)
       external_tools = controller.external_tools_display_hashes(:course_navigation, @course)
-      expect(external_tools).to include({:id=>tool.id, title: 'Analytics 2', base_url: 'http://example.com', icon_url: nil, canvas_icon_class: 'icon-analytics', tool_id: ContextExternalTool::ANALYTICS_2})
+      expect(external_tools).to include({ :id => tool.id, title: 'Analytics 2', base_url: 'http://example.com', icon_url: nil, canvas_icon_class: 'icon-analytics', tool_id: ContextExternalTool::ANALYTICS_2 })
     end
   end
 
   describe 'external_tool_display_hash' do
-    def tool_settings(setting, include_class=false)
+    def tool_settings(setting, include_class = false)
       settings_hash = {
-        url: "http://example.com/?#{setting.to_s}",
-        icon_url: "http://example.com/icon.png?#{setting.to_s}",
+        url: "http://example.com/?#{setting}",
+        icon_url: "http://example.com/icon.png?#{setting}",
         enabled: true
       }
 
-      settings_hash[:canvas_icon_class] = "icon-#{setting.to_s}" if include_class
+      settings_hash[:canvas_icon_class] = "icon-#{setting}" if include_class
       settings_hash
     end
 
@@ -1480,8 +1476,8 @@ RSpec.describe ApplicationController do
     it 'all settings are correct' do
       @tool_settings.each do |setting|
         hash = controller.external_tool_display_hash(@tool, setting)
-        expect(hash[:base_url]).to eq "http://test.host/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=#{setting.to_s}"
-        expect(hash[:icon_url]).to eq "http://example.com/icon.png?#{setting.to_s}"
+        expect(hash[:base_url]).to eq "http://test.host/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=#{setting}"
+        expect(hash[:icon_url]).to eq "http://example.com/icon.png?#{setting}"
         expect(hash[:canvas_icon_class]).to be nil
       end
     end
@@ -1500,9 +1496,9 @@ RSpec.describe ApplicationController do
         @tool.save!
 
         hash = controller.external_tool_display_hash(@tool, setting)
-        expect(hash[:base_url]).to eq "http://test.host/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=#{setting.to_s}"
-        expect(hash[:icon_url]).to eq "http://example.com/icon.png?#{setting.to_s}"
-        expect(hash[:canvas_icon_class]).to eq "icon-#{setting.to_s}"
+        expect(hash[:base_url]).to eq "http://test.host/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=#{setting}"
+        expect(hash[:icon_url]).to eq "http://example.com/icon.png?#{setting}"
+        expect(hash[:canvas_icon_class]).to eq "icon-#{setting}"
       end
     end
   end
@@ -1522,26 +1518,26 @@ RSpec.describe ApplicationController do
       controller.request.headers['X-CSRF-Token'] = "bogus"
     end
 
-    it "should raise InvalidAuthenticityToken with invalid tokens" do
+    it "raises InvalidAuthenticityToken with invalid tokens" do
       allow(controller).to receive(:valid_request_origin?).and_return(true)
-      expect{ controller.send(:verify_authenticity_token) }.to raise_exception(ActionController::InvalidAuthenticityToken)
+      expect { controller.send(:verify_authenticity_token) }.to raise_exception(ActionController::InvalidAuthenticityToken)
     end
 
-    it "should not raise with valid token" do
+    it "does not raise with valid token" do
       controller.request.headers['X-CSRF-Token'] = controller.form_authenticity_token
-      expect{ controller.send(:verify_authenticity_token) }.not_to raise_exception
+      expect { controller.send(:verify_authenticity_token) }.not_to raise_exception
     end
 
-    it "should still raise on session-authenticated api request with invalid tokens" do
+    it "still raises on session-authenticated api request with invalid tokens" do
       allow(controller.request).to receive(:path).and_return('/api/endpoint')
       allow(controller).to receive(:valid_request_origin?).and_return(true)
-      expect{ controller.send(:verify_authenticity_token) }.to raise_exception(ActionController::InvalidAuthenticityToken)
+      expect { controller.send(:verify_authenticity_token) }.to raise_exception(ActionController::InvalidAuthenticityToken)
     end
 
-    it "should not raise on token-authenticated api request despite invalid tokens" do
+    it "does not raise on token-authenticated api request despite invalid tokens" do
       allow(controller.request).to receive(:path).and_return('/api/endpoint')
       controller.instance_variable_set(:@pseudonym_session, nil)
-      expect{ controller.send(:verify_authenticity_token) }.not_to raise_exception
+      expect { controller.send(:verify_authenticity_token) }.not_to raise_exception
     end
   end
 end
@@ -1550,23 +1546,23 @@ describe ApplicationController do
   include K5Common
 
   describe "flash_notices" do
-    it 'should return notice text for each type' do
+    it 'returns notice text for each type' do
       [:error, :warning, :info, :notice].each do |type|
         flash[type] = type.to_s
       end
       expect(controller.send(:flash_notices)).to match_array([
-         {type: 'error', content: 'error', icon: 'warning'},
-         {type: 'warning', content: 'warning', icon: 'warning'},
-         {type: 'info', content: 'info', icon: 'info'},
-         {type: 'success', content: 'notice', icon: 'check'}
-     ])
+                                                               { type: 'error', content: 'error', icon: 'warning' },
+                                                               { type: 'warning', content: 'warning', icon: 'warning' },
+                                                               { type: 'info', content: 'info', icon: 'info' },
+                                                               { type: 'success', content: 'notice', icon: 'check' }
+                                                             ])
     end
 
-    it 'should wrap html notification text in an object' do
+    it 'wraps html notification text in an object' do
       flash[:html_notice] = '<p>hello</p>'
       expect(controller.send(:flash_notices)).to match_array([
-        {type: 'success', content: {html: '<p>hello</p>'}, icon: 'check'}
-      ])
+                                                               { type: 'success', content: { html: '<p>hello</p>' }, icon: 'check' }
+                                                             ])
     end
   end
 
@@ -1588,9 +1584,8 @@ describe ApplicationController do
 
       controller.instance_variable_set(:@context, student)
       controller.send(:get_all_pertinent_contexts)
-      expect(controller.instance_variable_get(:@contexts).select{|c| c.is_a?(Course)}).to eq [c2]
+      expect(controller.instance_variable_get(:@contexts).select { |c| c.is_a?(Course) }).to eq [c2]
     end
-
 
     it "doesn't touch the database if there are no valid courses" do
       user_factory
@@ -1612,7 +1607,7 @@ describe ApplicationController do
       require_relative '../sharding_spec_helper'
       specs_require_sharding
 
-      it "should not asplode with cross-shard groups" do
+      it "does not asplode with cross-shard groups" do
         user_factory(active_all: true)
         controller.instance_variable_set(:@context, @user)
 
@@ -1624,10 +1619,10 @@ describe ApplicationController do
           @group.add_user(@user)
         end
         controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: "group_#{@other_group.id},group_#{@group.id}")
-        expect(controller.instance_variable_get(:@contexts).select{|c| c.is_a?(Group)}).to eq [@group]
+        expect(controller.instance_variable_get(:@contexts).select { |c| c.is_a?(Group) }).to eq [@group]
       end
 
-      it "should not include groups in courses the user doesn't have the ability to view yet" do
+      it "does not include groups in courses the user doesn't have the ability to view yet" do
         user_factory(active_all: true)
         controller.instance_variable_set(:@context, @user)
 
@@ -1640,7 +1635,7 @@ describe ApplicationController do
         @group.add_user(@user)
 
         controller.send(:get_all_pertinent_contexts, include_groups: true)
-        expect(controller.instance_variable_get(:@contexts).select{|c| c.is_a?(Group)}).to be_empty
+        expect(controller.instance_variable_get(:@contexts).select { |c| c.is_a?(Group) }).to be_empty
       end
 
       it 'must select all cross-shard courses the user belongs to' do
@@ -1677,9 +1672,9 @@ describe ApplicationController do
         course2 = enrollment2.course
 
         controller.send(:get_all_pertinent_contexts, {
-          cross_shard: true,
-          only_contexts: "Course_#{course2.id}",
-        })
+                          cross_shard: true,
+                          only_contexts: "Course_#{course2.id}",
+                        })
         contexts = controller.instance_variable_get(:@contexts)
         expect(contexts).to_not include course1
         expect(contexts).to include course2
@@ -1743,7 +1738,7 @@ describe ApplicationController do
       current_user = double(current_user_attributes)
       controller.instance_variable_set(:@current_user, current_user)
       controller.send(:setup_live_events_context)
-      expect(LiveEvents.get_context).to eq({user_id: '12345', time_zone: 'asdf'}.merge(non_conditional_values))
+      expect(LiveEvents.get_context).to eq({ user_id: '12345', time_zone: 'asdf' }.merge(non_conditional_values))
     end
 
     it 'sets the "context_sis_source_id"' do
@@ -1923,7 +1918,7 @@ describe ApplicationController do
       context 'when the context has a role' do
         it 'sets the correct attributes on the LiveEvent context' do
           stubbed_role = double({ name: 'name' })
-          context_membership = double({role: stubbed_role})
+          context_membership = double({ role: stubbed_role })
 
           controller.instance_variable_set(:@context_membership, context_membership)
           controller.send(:setup_live_events_context)
@@ -1987,35 +1982,35 @@ describe ApplicationController do
         controller.instance_variable_set(:@current_user, @user)
       end
 
-      it "should return true on course home page" do
+      it "returns true on course home page" do
         controller.params[:controller] = 'courses'
         controller.params[:action] = 'show'
         expect(controller.send(:show_student_view_button?)).to be_truthy
       end
 
-      it "should return true on modules page" do
+      it "returns true on modules page" do
         controller.params[:controller] = 'context_modules'
         controller.params[:action] = 'index'
         expect(controller.send(:show_student_view_button?)).to be_truthy
       end
 
-      it "should return false if context is not set" do
+      it "returns false if context is not set" do
         controller.instance_variable_set(:@context, nil)
         controller.params[:controller] = 'courses'
         controller.params[:action] = 'show'
         expect(controller.send(:show_student_view_button?)).to be_falsey
       end
 
-      it "should return false for pages index if pages tab is disabled" do
-        @course.update_attribute(:tab_configuration, [{'id'=>Course::TAB_PAGES, 'hidden'=>true}])
+      it "returns false for pages index if pages tab is disabled" do
+        @course.update_attribute(:tab_configuration, [{ 'id' => Course::TAB_PAGES, 'hidden' => true }])
         controller.instance_variable_set(:@context, @course)
         controller.params[:controller] = 'wiki_pages'
         controller.params[:action] = 'index'
         expect(controller.send(:show_student_view_button?)).to be_falsey
       end
 
-      it "should return true for pages page even if pages tab is disabled" do
-        @course.update_attribute(:tab_configuration, [{'id'=>Course::TAB_PAGES, 'hidden'=>true}])
+      it "returns true for pages page even if pages tab is disabled" do
+        @course.update_attribute(:tab_configuration, [{ 'id' => Course::TAB_PAGES, 'hidden' => true }])
         controller.instance_variable_set(:@context, @course)
         controller.params[:controller] = 'wiki_pages'
         controller.params[:action] = 'show'
@@ -2034,7 +2029,7 @@ describe ApplicationController do
         controller.instance_variable_set(:@current_user, @user)
       end
 
-      it "should return false regardless of page" do
+      it "returns false regardless of page" do
         controller.params[:controller] = 'courses'
         controller.params[:action] = 'show'
         expect(controller.send(:show_student_view_button?)).to be_falsey
@@ -2068,6 +2063,13 @@ describe ApplicationController do
         expect(controller.send(:show_immersive_reader?)).to be true
       end
 
+      it "is false when there is no logged in user" do
+        controller.instance_variable_set(:@current_user, nil)
+        controller.params[:controller] = "wiki_pages"
+        controller.params[:action] = "show"
+        expect(controller.send(:show_immersive_reader?)).to be false
+      end
+
       it "is false on pages where immersive reader is not supported" do
         controller.params[:controller] = "discussion_topics"
         controller.params[:action] = "index"
@@ -2094,6 +2096,12 @@ describe ApplicationController do
         it "is true for the syllabus page" do
           controller.params[:controller] = "assignments"
           controller.params[:action] = "syllabus"
+          expect(controller.send(:show_immersive_reader?)).to be true
+        end
+
+        it "is true for a wiki front page" do
+          controller.params[:controller] = "wiki_pages"
+          controller.params[:action] = "front_page"
           expect(controller.send(:show_immersive_reader?)).to be true
         end
       end
@@ -2147,26 +2155,26 @@ describe ApplicationController do
   end
 
   describe "new math equation handling feature" do
-    let(:root_account) {Account.default}
+    let(:root_account) { Account.default }
 
     before(:each) do
       controller.instance_variable_set(:@domain_root_account, root_account)
     end
 
-    it "should put false in ENV when disabled at site_admin" do
+    it "puts false in ENV when disabled at site_admin" do
       Account.site_admin.disable_feature!(:new_math_equation_handling)
       expect(@controller.use_new_math_equation_handling?).to be_falsey
       expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
     end
 
-    it "should put false in ENV when enabled at site_admin but disabled at the root account" do
+    it "puts false in ENV when enabled at site_admin but disabled at the root account" do
       Account.site_admin.enable_feature!(:new_math_equation_handling)
       root_account.disable_feature!(:new_math_equation_handling)
       expect(@controller.use_new_math_equation_handling?).to be_falsey
       expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
     end
 
-    it "should put true in ENV when enabled at site_admin and the root account" do
+    it "puts true in ENV when enabled at site_admin and the root account" do
       Account.site_admin.enable_feature!(:new_math_equation_handling)
       root_account.enable_feature!(:new_math_equation_handling)
       expect(@controller.use_new_math_equation_handling?).to be_truthy
@@ -2177,22 +2185,39 @@ describe ApplicationController do
   describe "k5_user? helper" do
     before :once do
       course_with_teacher :active_all => true
-      student_in_course :context => @course
+      @student1 = student_in_course(:context => @course).user
       toggle_k5_setting(@course.account)
     end
 
     before :each do
-      user_session(@student)
-      @controller.instance_variable_set(:@current_user, @student)
+      user_session(@student1)
+      @controller.instance_variable_set(:@current_user, @student1)
       @controller.instance_variable_set(:@domain_root_account, @course.root_account)
     end
 
     it "caches the result after computing" do
       enable_cache do
-        Rails.cache.fetch_with_batched_keys(["k5_user", Shard.current].cache_key, batch_object: @student, batched_keys: [:k5_user]) do
-          "cached :)"
-        end
-        expect(@controller.send(:k5_user?)).to eq "cached :)"
+        expect(@controller).to receive(:uncached_k5_user?).once
+        @controller.send(:k5_user?)
+        @controller.send(:k5_user?)
+      end
+    end
+
+    it "does not use cached value if enrollments have been invalidated" do
+      enable_cache(:redis_cache_store) do
+        expect(@controller).to receive(:uncached_k5_user?).twice
+        @controller.send(:k5_user?)
+        @student1.clear_cache_key(:enrollments)
+        @controller.send(:k5_user?)
+      end
+    end
+
+    it "does not use cached value if account_users have been invalidated" do
+      enable_cache(:redis_cache_store) do
+        expect(@controller).to receive(:uncached_k5_user?).twice
+        @controller.send(:k5_user?)
+        @student1.clear_cache_key(:account_users)
+        @controller.send(:k5_user?)
       end
     end
 
@@ -2217,12 +2242,12 @@ describe ApplicationController do
     end
 
     it "returns false if all k5 enrollments are concluded" do
-      @student.enrollments.where(course_id: @course.id).take.complete
+      @student1.enrollments.where(course_id: @course.id).take.complete
       expect(@controller.send(:k5_user?)).to eq false
     end
 
     it "returns false if not associated with a k5 account" do
-      @course.account.settings[:enable_as_k5_account] = {value: false}
+      @course.account.settings[:enable_as_k5_account] = { value: false }
       @course.account.save!
       @course.root_account.settings[:k5_accounts] = []
       @course.root_account.save!
@@ -2253,8 +2278,8 @@ describe ApplicationController do
     end
 
     it "returns true even if a student has opted-out of the k5 dashboard" do
-      @student.preferences[:elementary_dashboard_disabled] = true
-      @student.save!
+      @student1.preferences[:elementary_dashboard_disabled] = true
+      @student1.save!
       expect(@controller.send(:k5_user?)).to be_truthy
     end
 
@@ -2279,8 +2304,44 @@ describe ApplicationController do
         @controller.instance_variable_set(:@current_user, @student2)
       end
 
-      it "returns true for user on another shard if associated with a k5 account" do
+      it "returns true for user from another shard if associated with a k5 account on current shard" do
         expect(@controller.send(:k5_user?)).to be_truthy
+      end
+
+      it "returns true for a user with k5 enrollments on another shard" do
+        @shard2.activate do
+          expect(@controller.send(:k5_user?)).to be_truthy
+        end
+      end
+
+      it "returns true for a user with k5 enrollments on a subaccount of another shard" do
+        toggle_k5_setting(@course.account, false)
+        @shard2.activate do
+          subaccount = Account.default.sub_accounts.create!
+          toggle_k5_setting(subaccount)
+          @course2 = course_factory(account: subaccount)
+          @course2.enroll_student(@student1)
+          user_session(@student1)
+          @controller.instance_variable_set(:@current_user, @student1)
+          expect(@controller.send(:k5_user?)).to eq true
+        end
+      end
+
+      it "returns true for an admin with an AccountUser on another shard" do
+        admin = User.create!
+        @shard2.activate do
+          account_admin_user(user: admin)
+          user_session(admin)
+          @controller.instance_variable_set(:@current_user, admin)
+          expect(@controller.send(:k5_user?)).to eq true
+        end
+      end
+
+      it "returns false for users on multiple shards with no k5 enrollments" do
+        toggle_k5_setting(@course.account, false)
+        @shard2.activate do
+          expect(@controller.send(:k5_user?)).to be_falsey
+        end
       end
     end
   end
@@ -2288,13 +2349,13 @@ end
 
 describe WikiPagesController do
   describe "set_js_rights" do
-    it "should populate js_env with policy rights" do
+    it "populates js_env with policy rights" do
       allow(controller).to receive(:default_url_options).and_return({})
 
       course_with_teacher_logged_in :active_all => true
       controller.instance_variable_set(:@context, @course)
 
-      get 'index', params: {:course_id => @course.id}
+      get 'index', params: { :course_id => @course.id }
 
       expect(controller.js_env).to include(:WIKI_RIGHTS)
       expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eq Hash[@course.wiki.check_policy(@teacher).map { |right| [right, true] }]
@@ -2314,15 +2375,15 @@ describe CoursesController do
       @course.save!
     end
 
-    it "should populate js_env with course_home setting" do
+    it "populates js_env with course_home setting" do
       controller.instance_variable_set(:@context, @course)
-      get 'show', params: {id: @course.id}
+      get 'show', params: { id: @course.id }
       expect(controller.js_env).to include(:COURSE_HOME)
     end
 
-    it "should populate js_env with setting for show_announcements flag" do
+    it "populates js_env with setting for show_announcements flag" do
       controller.instance_variable_set(:@context, @course)
-      get 'show', params: {id: @course.id}
+      get 'show', params: { id: @course.id }
       expect(controller.js_env).to include(:SHOW_ANNOUNCEMENTS, :ANNOUNCEMENT_LIMIT)
       expect(controller.js_env[:SHOW_ANNOUNCEMENTS]).to be_truthy
       expect(controller.js_env[:ANNOUNCEMENT_LIMIT]).to eq(5)
@@ -2346,38 +2407,38 @@ describe CoursesController do
       @child_page = @child_course.wiki_pages.create!(:title => "bloo", :body => "bloo", :migration_id => @tag.migration_id)
     end
 
-    it "should populate master-side data (unrestricted)" do
+    it "populates master-side data (unrestricted)" do
       controller.set_master_course_js_env_data(@master_page, @master_course)
       data = controller.js_env[:MASTER_COURSE_DATA]
       expect(data['is_master_course_master_content']).to be_truthy
       expect(data['restricted_by_master_course']).to be_falsey
     end
 
-    it "should populate master-side data (restricted)" do
-      @tag.update_attribute(:restrictions, {:content => true})
+    it "populates master-side data (restricted)" do
+      @tag.update_attribute(:restrictions, { :content => true })
 
       controller.set_master_course_js_env_data(@master_page, @master_course)
       data = controller.js_env[:MASTER_COURSE_DATA]
       expect(data['is_master_course_master_content']).to be_truthy
       expect(data['restricted_by_master_course']).to be_truthy
-      expect(data['master_course_restrictions']).to eq({:content => true})
+      expect(data['master_course_restrictions']).to eq({ :content => true })
     end
 
-    it "should populate child-side data (unrestricted)" do
+    it "populates child-side data (unrestricted)" do
       controller.set_master_course_js_env_data(@child_page, @child_course)
       data = controller.js_env[:MASTER_COURSE_DATA]
       expect(data['is_master_course_child_content']).to be_truthy
       expect(data['restricted_by_master_course']).to be_falsey
     end
 
-    it "should populate child-side data (restricted)" do
-      @tag.update_attribute(:restrictions, {:content => true})
+    it "populates child-side data (restricted)" do
+      @tag.update_attribute(:restrictions, { :content => true })
 
       controller.set_master_course_js_env_data(@child_page, @child_course)
       data = controller.js_env[:MASTER_COURSE_DATA]
       expect(data['is_master_course_child_content']).to be_truthy
       expect(data['restricted_by_master_course']).to be_truthy
-      expect(data['master_course_restrictions']).to eq({:content => true})
+      expect(data['master_course_restrictions']).to eq({ :content => true })
     end
   end
 
@@ -2390,8 +2451,8 @@ describe CoursesController do
 
     it 'does not affect session based api requests' do
       allow(controller).to receive(:request).and_return(double({
-        params: {}
-      }))
+                                                                 params: {}
+                                                               }))
       expect(controller.send(:validate_scopes)).to be_nil
     end
 
@@ -2401,9 +2462,9 @@ describe CoursesController do
       token = AccessToken.create!(user: user, developer_key: developer_key)
       controller.instance_variable_set(:@access_token, token)
       allow(controller).to receive(:request).and_return(double({
-        params: {},
-        method: 'GET'
-      }))
+                                                                 params: {},
+                                                                 method: 'GET'
+                                                               }))
       expect(controller.send(:validate_scopes)).to be_nil
     end
 
@@ -2413,10 +2474,10 @@ describe CoursesController do
       token = AccessToken.create!(user: user, developer_key: developer_key)
       controller.instance_variable_set(:@access_token, token)
       allow(controller).to receive(:request).and_return(double({
-        params: {},
-        method: 'GET',
-        path: '/not_allowed_path'
-      }))
+                                                                 params: {},
+                                                                 method: 'GET',
+                                                                 path: '/not_allowed_path'
+                                                               }))
       expect { controller.send(:validate_scopes) }.to raise_error(AuthenticationMethods::AccessTokenScopeError)
     end
 
@@ -2428,10 +2489,10 @@ describe CoursesController do
         token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ['url:GET|/api/v1/accounts'])
         controller.instance_variable_set(:@access_token, token)
         allow(controller).to receive(:request).and_return(double({
-          params: {},
-          method: 'GET',
-          path: '/api/v1/accounts'
-        }))
+                                                                   params: {},
+                                                                   method: 'GET',
+                                                                   path: '/api/v1/accounts'
+                                                                 }))
         expect(controller.send(:validate_scopes)).to be_nil
       end
 
@@ -2440,10 +2501,10 @@ describe CoursesController do
         token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ['url:GET|/api/v1/accounts'])
         controller.instance_variable_set(:@access_token, token)
         allow(controller).to receive(:request).and_return(double({
-          params: {},
-          method: 'HEAD',
-          path: '/api/v1/accounts'
-        }))
+                                                                   params: {},
+                                                                   method: 'HEAD',
+                                                                   path: '/api/v1/accounts'
+                                                                 }))
         expect(controller.send(:validate_scopes)).to be_nil
       end
 
@@ -2452,10 +2513,10 @@ describe CoursesController do
         token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ['url:GET|/api/v1/accounts'])
         controller.instance_variable_set(:@access_token, token)
         allow(controller).to receive(:request).and_return(double({
-          method: 'GET',
-          path: '/api/v1/accounts'
-        }))
-        params = { include: ['a'], includes: ['uuid', 'b']}
+                                                                   method: 'GET',
+                                                                   path: '/api/v1/accounts'
+                                                                 }))
+        params = { include: ['a'], includes: ['uuid', 'b'] }
         allow(controller).to receive(:params).and_return(params)
         controller.send(:validate_scopes)
         expect(params).to eq(include: [], includes: ['uuid'])
@@ -2470,10 +2531,10 @@ describe CoursesController do
         token = AccessToken.create!(user: user, developer_key: developer_key, scopes: ['url:GET|/api/v1/accounts'])
         controller.instance_variable_set(:@access_token, token)
         allow(controller).to receive(:request).and_return(double({
-          method: 'GET',
-          path: '/api/v1/accounts'
-        }))
-        params = { include: ['a'], includes: ['uuid', 'b']}
+                                                                   method: 'GET',
+                                                                   path: '/api/v1/accounts'
+                                                                 }))
+        params = { include: ['a'], includes: ['uuid', 'b'] }
         allow(controller).to receive(:params).and_return(params)
         controller.send(:validate_scopes)
         expect(params).to eq(include: ['a'], includes: ['uuid', 'b'])
@@ -2589,6 +2650,7 @@ RSpec.describe ApplicationController, '#compute_http_cost' do
       if params[:do_error].to_i > 0
         raise StandardError, "Test Error Handling"
       end
+
       render json: [{}]
     end
   end
@@ -2601,8 +2663,8 @@ RSpec.describe ApplicationController, '#compute_http_cost' do
   end
 
   it "has some cost for http actions (in seconds)" do
-    stub_request(:get, "http://www.example.com/test").
-      to_return(status: 200, body: "", headers: {})
+    stub_request(:get, "http://www.example.com/test")
+      .to_return(status: 200, body: "", headers: {})
     start_time = Time.now
     get :index, params: { do_http: 1, do_error: 0 }
     expect(response).to have_http_status :success
@@ -2613,8 +2675,8 @@ RSpec.describe ApplicationController, '#compute_http_cost' do
   end
 
   it "tracks costs through errors" do
-    stub_request(:get, "http://www.example.com/test").
-      to_return(status: 200, body: "", headers: {})
+    stub_request(:get, "http://www.example.com/test")
+      .to_return(status: 200, body: "", headers: {})
     get :index, params: { do_http: 1, do_error: 1 }
     expect(response).to have_http_status 500
     expect(CanvasHttp.cost > 0).to be_truthy

@@ -35,10 +35,10 @@ module DataFixup::PopulateRootAccountIdsOnLearningOutcomes
         # its correct root account, use the ContentTag links.
 
         # get unique array of root_account_ids from associated ContentTags
-        subquery = ContentTag.learning_outcome_links.
-          where("content_id=learning_outcomes.id").
-          select("array_agg(DISTINCT root_account_id)").
-          to_sql
+        subquery = ContentTag.learning_outcome_links
+                             .where("content_id=learning_outcomes.id")
+                             .select("array_agg(DISTINCT root_account_id)")
+                             .to_sql
 
         # end up with a unique, sorted array of root_account_ids that already existed on the LearningOutcome
         # and that came from its associated ContentTags

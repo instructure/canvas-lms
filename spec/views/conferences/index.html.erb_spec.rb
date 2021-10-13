@@ -28,7 +28,7 @@ describe "/conferences/index" do
     @plugin.update_attribute(:settings, { :domain => 'www.example.com' })
   end
 
-  it "should render" do
+  it "renders" do
     course_with_teacher(:active_all => true)
     view_context(@course, @user)
     @conference = @course.web_conferences.build(:conference_type => "Wimba")
@@ -41,4 +41,3 @@ describe "/conferences/index" do
     expect(response).to have_tag("#new-conference-list")
   end
 end
-

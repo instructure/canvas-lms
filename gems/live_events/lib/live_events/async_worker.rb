@@ -18,10 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'thread'
-
 module LiveEvents
-
   # TODO: Consider refactoring out common functionality from this and
   # CanvasPandaPub::AsyncWorker. Their semantics are a bit different so
   # it may not make sense.
@@ -45,6 +42,7 @@ module LiveEvents
       if @queue.length >= LiveEvents.max_queue_size
         return false
       end
+
       event_json = event.to_json
       total_bytes = event_json.bytesize + partition_key.bytesize
       if total_bytes > KINESIS_RECORD_SIZE_LIMIT
@@ -77,6 +75,7 @@ module LiveEvents
 
     def start!
       return if @running
+
       @thread = Thread.new { self.run_thread }
       @running = true
       at_exit { stop! }
@@ -85,6 +84,7 @@ module LiveEvents
     def run_thread
       loop do
         return unless @running || @queue.size > 0
+
         # pause thread so it will allow main thread to run
         r = @queue.pop if @queue.size == 0
 

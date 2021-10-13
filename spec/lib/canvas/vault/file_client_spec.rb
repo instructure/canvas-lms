@@ -22,10 +22,10 @@ require 'spec_helper'
 describe Canvas::Vault::FileClient do
   it "loads creds from static hash" do
     creds_hash = {
-      "sts/testaccount/sts/canvas-shards-lookupper-test"=>{
-        "access_key"=>"fake-access-key",
-        "secret_key"=>"fake-secret-key",
-        "security_token"=>"fake-security-token"
+      "sts/testaccount/sts/canvas-shards-lookupper-test" => {
+        "access_key" => "fake-access-key",
+        "secret_key" => "fake-secret-key",
+        "security_token" => "fake-security-token"
       }
     }
     allow(ConfigFile).to receive(:load).with("vault_contents").and_return(creds_hash)

@@ -65,6 +65,7 @@ describe AuthenticationMethods do
 
     class MockLogger
       def info(*); end
+
       def warn(*); end
     end
 
@@ -76,9 +77,9 @@ describe AuthenticationMethods do
   describe "#load_user" do
     context "with active session" do
       before do
-        @request = double(:env => {'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago},
-                        :format => double(:json? => false),
-                        :host_with_port => "")
+        @request = double(:env => { 'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago },
+                          :format => double(:json? => false),
+                          :host_with_port => "")
         @controller = MockController.new(request: @request)
         allow(@controller).to receive(:load_pseudonym_from_access_token)
         allow(@controller).to receive(:api_request?).and_return(false)
@@ -87,13 +88,13 @@ describe AuthenticationMethods do
         allow(PseudonymSession).to receive(:find_with_validation).and_return(@pseudonym_session)
       end
 
-      it "should set the user and pseudonym" do
+      it "sets the user and pseudonym" do
         expect(@controller.send(:load_user)).to eq @user
         expect(@controller.instance_variable_get(:@current_user)).to eq @user
         expect(@controller.instance_variable_get(:@current_pseudonym)).to eq @pseudonym
       end
 
-      it "should destroy session if user was explicitly logged out" do
+      it "destroys session if user was explicitly logged out" do
         @user.stamp_logout_time!
         @pseudonym.reload
         expect(@controller).to receive(:destroy_session).once
@@ -109,10 +110,9 @@ describe AuthenticationMethods do
         expect(@controller.send(:load_user)).to be_nil
         expect(@controller.instance_variable_get(:@current_user)).to be_nil
         expect(@controller.instance_variable_get(:@current_pseudonym)).to be_nil
-
       end
 
-      it "should not destroy session if user was logged out in the future" do
+      it "does not destroy session if user was logged out in the future" do
         Timecop.freeze(5.minutes.from_now) do
           @user.stamp_logout_time!
         end
@@ -122,7 +122,7 @@ describe AuthenticationMethods do
         expect(@controller.instance_variable_get(:@current_pseudonym)).to eq @pseudonym
       end
 
-      it "should set the CSRF cookie" do
+      it "sets the CSRF cookie" do
         @controller.send(:load_user)
         expect(@controller.cookies['_csrf_token']).not_to be nil
       end
@@ -142,7 +142,7 @@ describe AuthenticationMethods do
       def build_encoded_token(user_id, real_user_id: nil)
         payload = { sub: user_id }
         payload[:masq_sub] = real_user_id if real_user_id
-        crypted_token = Canvas::Security::ServicesJwt.generate(payload, false)
+        crypted_token = CanvasSecurity::ServicesJwt.generate(payload, false, symmetric: true)
         payload = {
           iss: "some other service",
           user_token: crypted_token
@@ -266,7 +266,7 @@ describe AuthenticationMethods do
         token = AccessToken.create!(user: @user)
         controller = setup_with_token(token)
 
-        expect{controller.send(:load_user)}.to raise_error(AuthenticationMethods::AccessTokenError)
+        expect { controller.send(:load_user) }.to raise_error(AuthenticationMethods::AccessTokenError)
       end
 
       it "accepts as_user_id on a masquerading token if masquerade matches" do
@@ -300,34 +300,34 @@ describe AuthenticationMethods do
       expect(CanvasRails::Application.config).to receive(:session_options).at_least(:once).and_return(@session_options)
     end
 
-    it "should not set SSL-only explicitly if session_options doesn't specify" do
+    it "does not set SSL-only explicitly if session_options doesn't specify" do
       @controller.send(:masked_authenticity_token)
       expect(@controller.cookies['_csrf_token']).not_to be_has_key(:secure)
     end
 
-    it "should set SSL-only if session_options specifies" do
+    it "sets SSL-only if session_options specifies" do
       @session_options[:secure] = true
       @controller.send(:masked_authenticity_token)
       expect(@controller.cookies['_csrf_token'][:secure]).to be true
     end
 
-    it "should set httponly explicitly false on a non-files host" do
+    it "sets httponly explicitly false on a non-files host" do
       @controller.send(:masked_authenticity_token)
       expect(@controller.cookies['_csrf_token'][:httponly]).to be false
     end
 
-    it "should set httponly explicitly true on a files host" do
+    it "sets httponly explicitly true on a files host" do
       expect(HostUrl).to receive(:is_file_host?).once.with(@request.host_with_port).and_return(true)
       @controller.send(:masked_authenticity_token)
       expect(@controller.cookies['_csrf_token'][:httponly]).to be true
     end
 
-    it "should not set a cookie domain explicitly if session_options doesn't specify" do
+    it "does not set a cookie domain explicitly if session_options doesn't specify" do
       @controller.send(:masked_authenticity_token)
       expect(@controller.cookies['_csrf_token']).not_to be_has_key(:domain)
     end
 
-    it "should set a cookie domain explicitly if session_options specifies" do
+    it "sets a cookie domain explicitly if session_options specifies" do
       @session_options[:domain] = "cookie domain"
       @controller.send(:masked_authenticity_token)
       expect(@controller.cookies['_csrf_token'][:domain]).to eq @session_options[:domain]
@@ -335,11 +335,11 @@ describe AuthenticationMethods do
   end
 
   describe "#access_token_account" do
-    let(:account) {Account.create!}
-    let(:dev_key) {DeveloperKey.create!(account: account)}
-    let(:access_token) {AccessToken.create!(developer_key: dev_key)}
-    let(:request) {double(format: double(:json? => false), host_with_port:"")}
-    let(:controller) {MockController.new(request: request, root_account: account)}
+    let(:account) { Account.create! }
+    let(:dev_key) { DeveloperKey.create!(account: account) }
+    let(:access_token) { AccessToken.create!(developer_key: dev_key) }
+    let(:request) { double(format: double(:json? => false), host_with_port: "") }
+    let(:controller) { MockController.new(request: request, root_account: account) }
 
     it "doesn't call '#get_context' if the Dev key is owned by the domain root account" do
       expect(controller).not_to receive(:get_context)

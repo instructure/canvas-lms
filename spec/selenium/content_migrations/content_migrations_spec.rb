@@ -26,12 +26,12 @@ def visit_page
   get "/courses/#{@course.id}/content_migrations"
 end
 
-def select_migration_type(type=nil)
+def select_migration_type(type = nil)
   type ||= @type
   click_option('#chooseMigrationConverter', type, :value)
 end
 
-def select_migration_file(opts={})
+def select_migration_file(opts = {})
   filename = opts[:filename] || @filename
 
   new_filename, fullpath, data = get_file(filename, opts[:data])
@@ -39,7 +39,7 @@ def select_migration_file(opts={})
   return new_filename
 end
 
-def fill_migration_form(opts={})
+def fill_migration_form(opts = {})
   select_migration_type('none') unless opts[:type] == 'none'
   select_migration_type(opts[:type])
   select_migration_file(opts)
@@ -56,7 +56,7 @@ def submit
   end
 end
 
-def run_migration(cm=nil)
+def run_migration(cm = nil)
   cm ||= @course.content_migrations.last
   cm.reload
   cm.skip_job_progress = false
@@ -65,14 +65,14 @@ def run_migration(cm=nil)
   worker_class.new(cm.id).perform
 end
 
-def import(cm=nil)
+def import(cm = nil)
   cm ||= @course.content_migrations.last
   cm.reload
   cm.set_default_settings
   cm.import_content
 end
 
-def test_selective_content(source_course=nil)
+def test_selective_content(source_course = nil)
   visit_page
 
   # Open selective dialog
@@ -86,7 +86,6 @@ def test_selective_content(source_course=nil)
   f(".selectContentDialog input[type=submit]").click
   wait_for_ajaximations
 
-
   source_course ? run_migration : import
 
   visit_page
@@ -98,7 +97,7 @@ end
 describe "content migrations", :non_parallel do
   include_context "in-process server selenium tests"
 
-  def test_selective_outcome(source_course=nil)
+  def test_selective_outcome(source_course = nil)
     visit_page
 
     # Open selective dialog
@@ -131,8 +130,8 @@ describe "content migrations", :non_parallel do
     expect(@course.created_learning_outcomes.count).to eq 2
     outcome_links = subgroup1.child_outcome_links
     expect(outcome_links.map(&:learning_outcome_content).map(&:short_description)).to match_array([
-      'non-root2', 'non-root3'
-    ])
+                                                                                                    'non-root2', 'non-root3'
+                                                                                                  ])
   end
 
   context "canvas cartridge importing" do
@@ -147,7 +146,7 @@ describe "content migrations", :non_parallel do
         @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
       end
 
-      it "should selectively copy outcomes" do
+      it "selectivelies copy outcomes" do
         visit_page
 
         fill_migration_form
@@ -172,7 +171,7 @@ describe "content migrations", :non_parallel do
     # TODO reimplement per CNVS-29593, but make sure we're testing at the right level
     it "should import all content immediately by default"
 
-    it "should show each form" do
+    it "shows each form" do
       visit_page
 
       migration_types = ff('#chooseMigrationConverter option').map { |op| op['value'] } - ['none']
@@ -193,7 +192,7 @@ describe "content migrations", :non_parallel do
       expect(f("#content")).not_to contain_css('#migrationFileUpload')
     end
 
-    it "should submit, queue and list migrations" do
+    it "submit,s queue and list migrations" do
       visit_page
       fill_migration_form
       ff('[name=selective_import]')[0].click
@@ -233,7 +232,7 @@ describe "content migrations", :non_parallel do
     # TODO reimplement per CNVS-29595, but make sure we're testing at the right level
     it "should overwrite quizzes when option is checked and duplicate otherwise"
 
-    it "should shift dates" do
+    it "shifts dates" do
       visit_page
       fill_migration_form
       f('#dateAdjustCheckbox').click
@@ -250,7 +249,7 @@ describe "content migrations", :non_parallel do
       submit
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
       expect(opts["shift_dates"]).to eq '1'
-      expect(opts["day_substitutions"]).to eq({"1" => "2", "5" => "4"})
+      expect(opts["day_substitutions"]).to eq({ "1" => "2", "5" => "4" })
       expect(Date.parse(opts["old_start_date"])).to eq Date.new(2014, 7, 1)
       expect(Date.parse(opts["old_end_date"])).to eq Date.new(2014, 7, 11)
       expect(Date.parse(opts["new_start_date"])).to eq Date.new(2014, 8, 5)
@@ -274,7 +273,7 @@ describe "content migrations", :non_parallel do
 
   context "course copy" do
     before do
-      #the "true" param is important, it forces the cache clear
+      # the "true" param is important, it forces the cache clear
       #  without it this spec group fails if
       #  you run it with the whole suite
       #  because of a cached default account
@@ -285,8 +284,8 @@ describe "content migrations", :non_parallel do
       data = File.read(File.dirname(__FILE__) + '/../../fixtures/migration/cc_full_test_smaller.zip')
 
       cm = ContentMigration.new(:context => @copy_from, :migration_type => "common_cartridge_importer")
-      cm.migration_settings = {:import_immediately => true,
-                               :migration_ids_to_import => {:copy => {:everything => true}}}
+      cm.migration_settings = { :import_immediately => true,
+                                :migration_ids_to_import => { :copy => { :everything => true } } }
       cm.skip_job_progress = true
       cm.save!
 
@@ -307,7 +306,7 @@ describe "content migrations", :non_parallel do
       @copy_from.enroll_teacher(@user).accept
     end
 
-    it "should show warning before self-copy", priority: "1", test_id: 2889675 do
+    it "shows warning before self-copy", priority: "1", test_id: 2889675 do
       visit_page
       select_migration_type
       wait_for_ajaximations
@@ -324,7 +323,7 @@ describe "content migrations", :non_parallel do
       expect(f('#courseSelectWarning')).to_not be_displayed
     end
 
-    it "should select by drop-down or by search box", priority: "2", test_id: 2889684 do
+    it "selects by drop-down or by search box", priority: "2", test_id: 2889684 do
       visit_page
       select_migration_type
       wait_for_ajaximations
@@ -356,7 +355,7 @@ describe "content migrations", :non_parallel do
       expect(source_link['href']).to include("/courses/#{@copy_from.id}")
     end
 
-    it "should only show courses the user is authorized to see", priority: "1", test_id: 2889686 do
+    it "only shows courses the user is authorized to see", priority: "1", test_id: 2889686 do
       new_course = Course.create!(:name => "please don't see me")
       visit_page
       select_migration_type
@@ -376,7 +375,7 @@ describe "content migrations", :non_parallel do
       expect(f("option[value=\"#{new_course.id}\"]")).not_to be_nil
     end
 
-    it "should include completed courses when checked", priority: "1", test_id: 2889687 do
+    it "includes completed courses when checked", priority: "1", test_id: 2889687 do
       new_course = Course.create!(:name => "completed course")
       new_course.enroll_teacher(@user).accept
       new_course.complete!
@@ -392,7 +391,7 @@ describe "content migrations", :non_parallel do
       expect(f("#content")).not_to contain_css("option[value=\"#{new_course.id}\"]")
     end
 
-    it "should find courses in other accounts", priority: "1", test_id: 2890402 do
+    it "finds courses in other accounts", priority: "1", test_id: 2890402 do
       new_account1 = account_model
       enrolled_course = Course.create!(:name => "faraway course", :account => new_account1)
       enrolled_course.enroll_teacher(@user).accept
@@ -424,8 +423,8 @@ describe "content migrations", :non_parallel do
         data = File.read(File.dirname(__FILE__) + '/../../fixtures/migration/cc_full_test.zip')
 
         cm = ContentMigration.new(:context => @copy_from, :migration_type => "common_cartridge_importer")
-        cm.migration_settings = {:import_immediately => true,
-                                 :migration_ids_to_import => {:copy => {:everything => true}}}
+        cm.migration_settings = { :import_immediately => true,
+                                  :migration_ids_to_import => { :copy => { :everything => true } } }
         cm.skip_job_progress = true
         cm.save!
 
@@ -438,7 +437,7 @@ describe "content migrations", :non_parallel do
         worker_class.new(cm.id).perform
       end
 
-      it "should copy all content from a course", priority: "1", test_id: 126677 do
+      it "copies all content from a course", priority: "1", test_id: 126677 do
         skip unless Qti.qti_enabled?
         visit_page
 
@@ -459,7 +458,7 @@ describe "content migrations", :non_parallel do
         expect(@course.quizzes.first.quiz_questions.count).to eq 11
       end
 
-      it "should selectively copy content", priority: "1", test_id: 126682 do
+      it "selectivelies copy content", priority: "1", test_id: 126682 do
         skip unless Qti.qti_enabled?
         visit_page
 
@@ -492,7 +491,7 @@ describe "content migrations", :non_parallel do
         @course.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
       end
 
-      it "should selectively copy outcomes" do
+      it "selectivelies copy outcomes" do
         visit_page
 
         select_migration_type
@@ -506,7 +505,7 @@ describe "content migrations", :non_parallel do
       end
     end
 
-    it "should set day substitution and date adjustment settings", priority: "1", test_id: 2891737 do
+    it "sets day substitution and date adjustment settings", priority: "1", test_id: 2891737 do
       new_course = Course.create!(:name => "day sub")
       new_course.enroll_teacher(@user).accept
 
@@ -541,17 +540,17 @@ describe "content migrations", :non_parallel do
 
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
       expect(opts["shift_dates"]).to eq '1'
-      expect(opts["day_substitutions"]).to eq({"1" => "2", "2" => "3"})
+      expect(opts["day_substitutions"]).to eq({ "1" => "2", "2" => "3" })
       expected = {
-          "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
-          "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
+        "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
+        "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
       }
       expected.each do |k, v|
         expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)
       end
     end
 
-    it "should set pre-populate date adjustment settings" do
+    it "sets pre-populate date adjustment settings" do
       new_course = Course.create!(:name => "date adjust", :start_at => 'Jul 1, 2012', :conclude_at => 'Jul 11, 2012')
       new_course.enroll_teacher(@user).accept
 
@@ -573,15 +572,15 @@ describe "content migrations", :non_parallel do
       expect(opts["shift_dates"]).to eq '1'
       expect(opts["day_substitutions"]).to eq({})
       expected = {
-          "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
-          "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
+        "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
+        "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
       }
       expected.each do |k, v|
         expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)
       end
     end
 
-    it "should remove dates", priority: "1", test_id: 2891742 do
+    it "removes dates", priority: "1", test_id: 2891742 do
       new_course = Course.create!(:name => "date remove", :start_at => 'Jul 1, 2014', :conclude_at => 'Jul 11, 2014')
       new_course.enroll_teacher(@user).accept
 
@@ -600,7 +599,7 @@ describe "content migrations", :non_parallel do
       expect(opts["remove_dates"]).to eq '1'
     end
 
-    it "should retain announcement content settings after course copy", priority: "2", test_id: 403057 do
+    it "retains announcement content settings after course copy", priority: "2", test_id: 403057 do
       @announcement = @copy_from.announcements.create!(:title => 'Migration', :message => 'Here is my message')
       @copy_from.lock_all_announcements = true
       @copy_from.save!
@@ -618,7 +617,7 @@ describe "content migrations", :non_parallel do
       expect(@course.lock_all_announcements).to be_truthy
     end
 
-    it "should persist topic 'allow liking' settings across course copy", priority: "2", test_id: 1041950 do
+    it "persists topic 'allow liking' settings across course copy", priority: "2", test_id: 1041950 do
       @copy_from.discussion_topics.create!(
         title: 'Liking Allowed Here',
         message: 'Like I said, liking is allowed',
@@ -645,40 +644,40 @@ describe "content migrations", :non_parallel do
     }
     let(:import_tool) do
       tool = import_course.context_external_tools.new({
-                                                          name: "test lti import tool",
-                                                          consumer_key: "key",
-                                                          shared_secret: "secret",
-                                                          url: "http://www.example.com/ims/lti",
+                                                        name: "test lti import tool",
+                                                        consumer_key: "key",
+                                                        shared_secret: "secret",
+                                                        url: "http://www.example.com/ims/lti",
                                                       })
       tool.migration_selection = {
-          url: "http://#{HostUrl.default_host}/selection_test",
-          text: "LTI migration text",
-          selection_width: 500,
-          selection_height: 500,
-          icon_url: "/images/add.png",
+        url: "http://#{HostUrl.default_host}/selection_test",
+        text: "LTI migration text",
+        selection_width: 500,
+        selection_height: 500,
+        icon_url: "/images/add.png",
       }
       tool.save!
       tool
     end
     let(:other_tool) do
       tool = import_course.context_external_tools.new({
-                                                          name: "other lti tool",
-                                                          consumer_key: "key",
-                                                          shared_secret: "secret",
-                                                          url: "http://www.example.com/ims/lti",
+                                                        name: "other lti tool",
+                                                        consumer_key: "key",
+                                                        shared_secret: "secret",
+                                                        url: "http://www.example.com/ims/lti",
                                                       })
       tool.resource_selection = {
-          url: "http://#{HostUrl.default_host}/selection_test",
-          text: "other resource text",
-          selection_width: 500,
-          selection_height: 500,
-          icon_url: "/images/add.png",
+        url: "http://#{HostUrl.default_host}/selection_test",
+        text: "other resource text",
+        selection_width: 500,
+        selection_height: 500,
+        icon_url: "/images/add.png",
       }
       tool.save!
       tool
     end
 
-    it "should show LTI tools with migration_selection in the select control" do
+    it "shows LTI tools with migration_selection in the select control" do
       import_tool
       other_tool
       visit_page
@@ -691,7 +690,7 @@ describe "content migrations", :non_parallel do
       expect(migration_type_texts).not_to include(other_tool.name)
     end
 
-    it "should show LTI view when LTI tool selected" do
+    it "shows LTI view when LTI tool selected" do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)
@@ -699,7 +698,7 @@ describe "content migrations", :non_parallel do
       expect(f("#converter .selectContent")).to be_displayed
     end
 
-    it "should launch LTI tool on browse and get content link" do
+    it "launches LTI tool on browse and get content link" do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)
@@ -714,7 +713,7 @@ describe "content migrations", :non_parallel do
       expect(f("#converter .file_name")).to include_text "lti embedded link"
     end
 
-    it "should have content selection option" do
+    it "has content selection option" do
       import_tool
       visit_page
       select_migration_type(import_tool.asset_string)
@@ -722,7 +721,7 @@ describe "content migrations", :non_parallel do
     end
   end
 
-  it "should be able to selectively import common cartridge submodules" do
+  it "is able to selectively import common cartridge submodules" do
     course_with_teacher_logged_in
     cm = ContentMigration.new(:context => @course, :user => @user)
     cm.migration_type = 'common_cartridge_importer'

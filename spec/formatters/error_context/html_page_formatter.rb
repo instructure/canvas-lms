@@ -65,12 +65,12 @@ module ErrorContext
       errors = ErrorSummary.recent_spec_runs.reverse.map do |run|
         location = ERB::Util.html_escape(run[:location])
         contents = if run[:pending]
-          "bin/rspec #{location} (pending)"
-        elsif run[:exception]
-          "bin/rspec <a href=\"#{base_path + location}/index.html\">#{location}</a> (failed)"
-        else
-          "bin/rspec #{location}"
-        end
+                     "bin/rspec #{location} (pending)"
+                   elsif run[:exception]
+                     "bin/rspec <a href=\"#{base_path + location}/index.html\">#{location}</a> (failed)"
+                   else
+                     "bin/rspec #{location}"
+                   end
         "#{run[:recorded_at]}: #{contents}"
       end.join("<br>")
 

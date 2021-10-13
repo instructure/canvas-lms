@@ -35,7 +35,7 @@ describe DeveloperKeysController do
 
     describe "GET 'index'" do
       context 'with no session' do
-        it 'should require authorization' do
+        it 'requires authorization' do
           get 'index', params: { account_id: Account.site_admin.id }
           expect(response).to be_redirect
         end
@@ -54,21 +54,21 @@ describe DeveloperKeysController do
           it 'sets the scopes to empty' do
             dk = DeveloperKey.create!
             enable_developer_key_account_binding!(dk)
-            get 'index', params: { account_id: Account.site_admin.id, format: :json}
+            get 'index', params: { account_id: Account.site_admin.id, format: :json }
             expect(response).to be_successful
             developer_key = json_parse(response.body).first
-            expect(developer_key['scopes']).to eq( [] )
+            expect(developer_key['scopes']).to eq([])
           end
         end
 
-        it 'should return the list of developer keys' do
+        it 'returns the list of developer keys' do
           dk = DeveloperKey.create!
           get 'index', params: { account_id: Account.site_admin.id }, format: :json
           expect(response).to be_successful
           expect(expected_id).to eq(dk.global_id)
         end
 
-        it 'should not include non-siteadmin keys' do
+        it 'does not include non-siteadmin keys' do
           Account.site_admin.enable_feature!(:site_admin_keys_only)
 
           site_admin_key = DeveloperKey.create!
@@ -106,7 +106,7 @@ describe DeveloperKeysController do
           end
         end
 
-        it 'should not include deleted keys' do
+        it 'does not include deleted keys' do
           dk = DeveloperKey.create!
           dk.destroy
           get 'index', params: { account_id: Account.site_admin.id }, format: :json
@@ -114,21 +114,21 @@ describe DeveloperKeysController do
           expect(expected_id).not_to eq(dk.global_id)
         end
 
-        it 'should include inactive keys' do
+        it 'includes inactive keys' do
           dk = DeveloperKey.create!
           dk.deactivate!
           get 'index', params: { account_id: Account.site_admin.id }, format: :json
           expect(response).to be_successful
-          expect( json_parse(response.body).second['id']).to eq(dk.global_id)
+          expect(json_parse(response.body).second['id']).to eq(dk.global_id)
         end
 
-        it "should include the key's 'vendor_code'" do
+        it "includes the key's 'vendor_code'" do
           DeveloperKey.create!(vendor_code: 'test_vendor_code')
           get 'index', params: { account_id: Account.site_admin.id }, format: :json
           expect(json_parse(response.body).first['vendor_code']).to eq 'test_vendor_code'
         end
 
-        it "should include the key's 'visibility'" do
+        it "includes the key's 'visibility'" do
           key = DeveloperKey.create!
           enable_developer_key_account_binding! key
           get 'index', params: { account_id: Account.site_admin.id }, format: :json
@@ -182,7 +182,7 @@ describe DeveloperKeysController do
     end
 
     describe "POST 'create'" do
-      it 'should return the list of developer keys' do
+      it 'returns the list of developer keys' do
         user_session(@admin)
         create_params = {
           account_id: Account.site_admin.id,
@@ -235,21 +235,21 @@ describe DeveloperKeysController do
     end
 
     describe "PUT 'update'" do
-      it "should deactivate a key" do
+      it "deactivates a key" do
         user_session(@admin)
 
         dk = DeveloperKey.create!
-        put 'update', params: {id: dk.id, developer_key: { event: :deactivate }, account_id: Account.site_admin.id}
+        put 'update', params: { id: dk.id, developer_key: { event: :deactivate }, account_id: Account.site_admin.id }
         expect(response).to be_successful
         expect(dk.reload.state).to eq :inactive
       end
 
-      it "should reactivate a key" do
+      it "reactivates a key" do
         user_session(@admin)
 
         dk = DeveloperKey.create!
         dk.deactivate!
-        put 'update', params: {id: dk.id, developer_key: { event: :activate }, account_id: Account.site_admin.id}
+        put 'update', params: { id: dk.id, developer_key: { event: :activate }, account_id: Account.site_admin.id }
         expect(response).to be_successful
         expect(dk.reload.state).to eq :active
       end
@@ -301,11 +301,11 @@ describe DeveloperKeysController do
     end
 
     describe "DELETE 'destroy'" do
-      it "should soft delete a key" do
+      it "softs delete a key" do
         user_session(@admin)
 
         dk = DeveloperKey.create!
-        delete 'destroy', params: {id: dk.id, account_id: Account.site_admin.id}
+        delete 'destroy', params: { id: dk.id, account_id: Account.site_admin.id }
         expect(response).to be_successful
         expect(dk.reload.state).to eq :deleted
       end
@@ -332,37 +332,37 @@ describe DeveloperKeysController do
 
       it 'responds with not found if the account is a sub account' do
         allow(controller).to receive(:require_context_with_permission).and_return nil
-        get 'index', params: {account_id: sub_account.id}
+        get 'index', params: { account_id: sub_account.id }
         expect(response).to be_not_found
       end
 
       it 'does not inherit site admin keys if feature flag is off' do
         site_admin_key.update!(visible: true)
-        get 'index', params: {account_id: test_domain_root_account.id}, format: :json
+        get 'index', params: { account_id: test_domain_root_account.id }, format: :json
         expect(expected_id).to eq root_account_key.global_id
       end
 
       it 'does not include non-visible keys from site admin' do
-        get 'index', params: {account_id: test_domain_root_account.id}, format: :json
+        get 'index', params: { account_id: test_domain_root_account.id }, format: :json
         expect(expected_id).to eq root_account_key.global_id
       end
 
       it 'does not include visible keys from site admin' do
         site_admin_key.update!(visible: true)
-        get 'index', params: {account_id: test_domain_root_account.id}, format: :json
+        get 'index', params: { account_id: test_domain_root_account.id }, format: :json
         expect(expected_id).to eq root_account_key.global_id
       end
 
       it 'includes non-visible keys created in the current context' do
         root_account_key.update!(visible: false)
-        get 'index', params: {account_id: test_domain_root_account.id}, format: :json
+        get 'index', params: { account_id: test_domain_root_account.id }, format: :json
         expect(expected_id).to eq root_account_key.global_id
       end
 
       context 'with "inherited" parameter' do
         it 'does not include account developer keys' do
           root_account_key
-          get 'index', params: {account_id: test_domain_root_account.id, inherited: true}, format: :json
+          get 'index', params: { account_id: test_domain_root_account.id, inherited: true }, format: :json
           expect(json_parse(response.body)).to be_blank
         end
       end
@@ -397,7 +397,7 @@ describe DeveloperKeysController do
           user_session(root_account_admin)
 
           root_account_shard.activate do
-            get 'index', params: {account_id: root_account.id, inherited: true}, format: :json
+            get 'index', params: { account_id: root_account.id, inherited: true }, format: :json
           end
 
           expect(expected_id).to eq site_admin_key.global_id
@@ -405,8 +405,8 @@ describe DeveloperKeysController do
       end
     end
 
-    it 'Should be allowed to access their dev keys' do
-      get 'index', params: {account_id: test_domain_root_account.id}
+    it 'is allowed to access their dev keys' do
+      get 'index', params: { account_id: test_domain_root_account.id }
       expect(response).to be_successful
     end
 
@@ -434,36 +434,35 @@ describe DeveloperKeysController do
         }
       end
 
-      it 'should be allowed to create a dev key' do
+      it 'is allowed to create a dev key' do
         post "create", params: create_params
         expect(response).to be_successful
       end
 
-      it 'should be dev keys plus 1 key' do
+      it 'is dev keys plus 1 key' do
         post "create", params: create_params
         expect(test_domain_root_account.developer_keys.all.count).to be 1
       end
     end
 
-    it 'should be allowed update a dev key' do
+    it 'is allowed update a dev key' do
       dk = test_domain_root_account.developer_keys.create!(redirect_uri: 'http://asd.com/')
-      put 'update', params: {id: dk.id, developer_key: {
-          redirect_uri: "http://example.com/sdf"
-        }}
+      put 'update', params: { id: dk.id, developer_key: {
+        redirect_uri: "http://example.com/sdf"
+      } }
       expect(response).to be_successful
       dk.reload
       expect(dk.redirect_uri).to eq("http://example.com/sdf")
-
     end
 
-    it "Shouldn't be allowed access dev keys for a sub account" do
-      get 'index', params: {account_id: sub_account.id}
+    it "is not allowed access dev keys for a sub account" do
+      get 'index', params: { account_id: sub_account.id }
       expect(response).to be_redirect
       expect(flash[:error]).to eq "You don't have permission to access that page"
     end
 
-    it "Shouldn't be allowed to create dev keys for a sub account" do
-      post 'create', params: {account_id: sub_account.id}
+    it "is not allowed to create dev keys for a sub account" do
+      post 'create', params: { account_id: sub_account.id }
       expect(response).to be_redirect
       expect(flash[:error]).to eq "You don't have permission to access that page"
     end
@@ -474,36 +473,36 @@ describe DeveloperKeysController do
         @other_sub_account = @other_root_account.sub_accounts.create!(parent_account: @other_root_account, root_account: @other_root_account)
       end
 
-      it "Shouldn't be allowed access dev keys for a foreign account" do
-        get 'index', params: {account_id: @other_root_account.id}
+      it "is not allowed access dev keys for a foreign account" do
+        get 'index', params: { account_id: @other_root_account.id }
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
 
-      it "Shouldn't be allowed to create dev keys for a foreign account" do
-        post 'create', params: {account_id: @other_root_account.id}
+      it "is not allowed to create dev keys for a foreign account" do
+        post 'create', params: { account_id: @other_root_account.id }
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
 
-      it "Shouldn't be allowed to update dev keys for a foreign account" do
+      it "is not allowed to update dev keys for a foreign account" do
         dk = @other_root_account.developer_keys.create!
-        post 'update', params: {id: dk.id, account_id: test_domain_root_account_admin.id, developer_key: { event: :deactivate }}
+        post 'update', params: { id: dk.id, account_id: test_domain_root_account_admin.id, developer_key: { event: :deactivate } }
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
 
-      it "Shouldn't be allowed to update global dev keys" do
+      it "is not allowed to update global dev keys" do
         dk = DeveloperKey.create!
-        post 'update', params: {id: dk.id, account_id: test_domain_root_account_admin.id, developer_key: { event: :deactivate }}
+        post 'update', params: { id: dk.id, account_id: test_domain_root_account_admin.id, developer_key: { event: :deactivate } }
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end
 
-      it "Shouldn't be allowed to view foreign accounts dev_key" do
+      it "is not allowed to view foreign accounts dev_key" do
         dk = @other_root_account.developer_keys.create!(redirect_uri: 'http://asd.com/')
 
-        post 'update', params: {id: dk.id}
+        post 'update', params: { id: dk.id }
         expect(response).to be_redirect
         expect(flash[:error]).to eq "You don't have permission to access that page"
       end

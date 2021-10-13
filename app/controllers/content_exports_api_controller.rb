@@ -150,8 +150,10 @@ class ContentExportsApiController < ApplicationController
       valid_types = %w(zip)
       valid_types += %w(qti common_cartridge quizzes2) if @context.is_a?(Course)
       return render json: { message: 'invalid export_type' }, status: :bad_request unless valid_types.include?(params[:export_type])
+
       export = create_content_export_from_api(params, @context, @current_user)
       return unless export.class == ContentExport
+
       if export.id
         includes = Array(params[:include]) || []
         render json: content_export_json(export, @current_user, session, includes)
@@ -173,10 +175,10 @@ class ContentExportsApiController < ApplicationController
     if authorized_action(@context, @current_user, :read_as_admin)
       base_url = polymorphic_url([:api_v1, @context, :content_list])
       formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(nil, base_url,
-        global_identifiers: @context.content_exports.temp_record.can_use_global_identifiers?)
+                                                                            global_identifiers: @context.content_exports.temp_record.can_use_global_identifiers?)
 
       unless formatter.valid_type?(params[:type])
-        return render :json => {:message => "unsupported migration type"}, :status => :bad_request
+        return render :json => { :message => "unsupported migration type" }, :status => :bad_request
       end
 
       render :json => formatter.get_content_list(params[:type], @context)

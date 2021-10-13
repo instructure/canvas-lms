@@ -58,23 +58,20 @@ describe ContentShare do
   end
 
   EXPORT_SETTINGS = {
-    "assignment" => {"assignments" => {'blah' => '1'}},
-    "attachment" => {"attachments" => {"blah" => "1"}},
-    "discussion_topic" => {"discussion_topics" => {'blah' => '1'}},
-    "page" => {"wiki_pages" => {'blah' => '1'}},
-    "quiz" => {"quizzes" => {'blah' => '1'}},
-    "module_item" => {"wiki_pages" => {'bap' => '1'}, "content_tags" => {'blah' => '1'}},
-    "module" => {"content_tags" => {'bar' => '1', 'baz' => '1'}, "context_modules" => {'foo' => '1'},
-                 "assignments" => {'bip' => '1'}, "wiki_pages" => {'bap' => '1'}}
+    "assignment" => { "assignments" => { 'blah' => '1' } },
+    "attachment" => { "attachments" => { "blah" => "1" } },
+    "discussion_topic" => { "discussion_topics" => { 'blah' => '1' } },
+    "page" => { "wiki_pages" => { 'blah' => '1' } },
+    "quiz" => { "quizzes" => { 'blah' => '1' } },
+    "module_item" => { "wiki_pages" => { 'bap' => '1' }, "content_tags" => { 'blah' => '1' } },
+    "module" => { "content_tags" => { 'bar' => '1', 'baz' => '1' }, "context_modules" => { 'foo' => '1' },
+                  "assignments" => { 'bip' => '1' }, "wiki_pages" => { 'bap' => '1' } }
   }
 
   def detect_export(type)
-    @export.settings = {"selected_content" => EXPORT_SETTINGS[type]}
+    @export.settings = { "selected_content" => EXPORT_SETTINGS[type] }
     @export.save!
     thing = content_share_json(@cs, nil, {})
     expect(thing['content_type']).to eq type
   end
 end
-
-
-

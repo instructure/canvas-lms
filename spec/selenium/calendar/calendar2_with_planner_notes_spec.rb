@@ -28,19 +28,18 @@ describe "calendar2" do
     course_with_teacher(active_all: true, new_user: true)
     @student1 = User.create!(name: 'Student 1')
     @course.enroll_student(@student1).accept!
-    @student1.update!(preferences: {:selected_calendar_contexts => ["user_#{@student1.id}", "course_#{@course.id}"]})
-    @teacher.update!(preferences: {:selected_calendar_contexts => ["user_#{@teacher.id}", "course_#{@course.id}"]})
+    @student1.update!(preferences: { :selected_calendar_contexts => ["user_#{@student1.id}", "course_#{@course.id}"] })
+    @teacher.update!(preferences: { :selected_calendar_contexts => ["user_#{@teacher.id}", "course_#{@course.id}"] })
   end
 
   context "as the student" do
     before :each do
       # or some stuff we need to click is "below the fold"
 
-
       user_session(@student1)
     end
 
-    it "should show the student calendar todo" do
+    it "shows the student calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Student To Do")
       get '/calendar2'
       wait_for_ajax_requests
@@ -51,7 +50,7 @@ describe "calendar2" do
       expect(note).to include_text('Student To Do')
       expect(note).to contain_css('i.icon-note-light')
     end
-    it "should create a new student calendar todo" do
+    it "creates a new student calendar todo" do
       title = "new todo title"
       get '/calendar2'
       wait_for_ajax_requests
@@ -69,7 +68,7 @@ describe "calendar2" do
       expect(note).to include_text(title)
       expect(note).to contain_css('i.icon-note-light')
     end
-    it "should delete a student calendar todo" do
+    it "deletes a student calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Student To Do")
       get '/calendar2'
       wait_for_ajax_requests
@@ -79,7 +78,7 @@ describe "calendar2" do
       f('.btn-primary').click       # delete button in the confirmation dialog
       expect(f('.fc-view-container')).not_to contain_css('a.fc-event')
     end
-    it "should edit a student calendar todo" do
+    it "edits a student calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Student To Do")
       new_title = "new todo title"
       get '/calendar2'
@@ -92,7 +91,7 @@ describe "calendar2" do
       note = f('a.fc-event')
       expect(note).to include_text(new_title)
     end
-    it "should show course calendar todo" do
+    it "shows course calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
       get '/calendar2'
       wait_for_ajax_requests
@@ -103,7 +102,7 @@ describe "calendar2" do
       expect(note).to include_text('Course To Do')
       expect(note).to contain_css('i.icon-note-light')
     end
-    it "should edit a course calendar todo" do
+    it "edits a course calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
       new_title = "new course todo title"
       get '/calendar2'
@@ -116,7 +115,7 @@ describe "calendar2" do
       note = f('a.fc-event')
       expect(note).to include_text(new_title)
     end
-    it "should move a course calendar todo to the student calendar" do
+    it "moves a course calendar todo to the student calendar" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
       get '/calendar2'
       wait_for_ajax_requests
@@ -142,8 +141,8 @@ describe "calendar2" do
 
     it "creates a calendar event for non graded discussions with to do date" do
       discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
-                                        message: "somebody topic message",
-                                        todo_date: 30.seconds.from_now)
+                                                     message: "somebody topic message",
+                                                     todo_date: 30.seconds.from_now)
       get '/calendar2'
       wait_for_ajax_requests
       f('.fc-content').click
@@ -157,7 +156,6 @@ describe "calendar2" do
   context "as the teacher" do
     before :each do
       # or some stuff we need to click is "below the fold"
-
 
       user_session(@teacher)
     end
@@ -191,8 +189,8 @@ describe "calendar2" do
 
     it "edits a todo discussion" do
       discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
-                                        message: "somebody topic message",
-                                        todo_date: Date.today)
+                                                     message: "somebody topic message",
+                                                     todo_date: Date.today)
       get '/calendar2'
       wait_for_ajax_requests
       f('.fc-content').click
@@ -208,8 +206,8 @@ describe "calendar2" do
 
     it "deletes a todo discussion" do
       discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
-                                        message: "somebody topic message",
-                                        todo_date: Date.today)
+                                                     message: "somebody topic message",
+                                                     todo_date: Date.today)
       get '/calendar2'
       wait_for_ajax_requests
       f('.fc-content').click
@@ -229,7 +227,7 @@ describe "calendar2" do
 
     before :each do
       # or some stuff we need to click is "below the fold"
-      @user.update!(preferences: {:selected_calendar_contexts => ["user_#{@user.id}", "course_#{@course1.id}", "course_#{@course2.id}"]})
+      @user.update!(preferences: { :selected_calendar_contexts => ["user_#{@user.id}", "course_#{@course1.id}", "course_#{@course2.id}"] })
       user_session(@user)
     end
 

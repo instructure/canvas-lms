@@ -24,7 +24,7 @@ require 'nokogiri'
 
 describe UserContent do
   describe ".find_user_content" do
-    it "should not yield non-string width/height fields" do
+    it "does not yield non-string width/height fields" do
       doc = Nokogiri::HTML5.fragment('<object width="100%" />')
       UserContent.find_user_content(doc) do |_, uc|
         expect(uc.width).to eq '100%'
@@ -47,36 +47,36 @@ describe UserContent do
   end
 
   describe "css_size" do
-    it "should be nil for non-numbers" do
+    it "is nil for non-numbers" do
       expect(UserContent.css_size(nil)).to be_nil
       expect(UserContent.css_size('')).to be_nil
       expect(UserContent.css_size('non-number')).to be_nil
     end
 
-    it "should be nil for numbers that equate to 0" do
+    it "is nil for numbers that equate to 0" do
       expect(UserContent.css_size('0%')).to be_nil
       expect(UserContent.css_size('0px')).to be_nil
       expect(UserContent.css_size('0')).to be_nil
     end
 
-    it "should preserve percents" do
+    it "preserves percents" do
       expect(UserContent.css_size('100%')).to eq '100%'
     end
 
-    it "should preserve px" do
+    it "preserves px" do
       expect(UserContent.css_size('100px')).to eq '100px'
     end
 
     # TODO: these ones are questionable
-    it "should add 10 to raw numbers and make them px" do
+    it "adds 10 to raw numbers and make them px" do
       expect(UserContent.css_size('100')).to eq '110px'
     end
 
-    it "should be nil for numbers with an unrecognized prefix" do
+    it "is nil for numbers with an unrecognized prefix" do
       expect(UserContent.css_size('x-100')).to be_nil
     end
 
-    it "should keep just the raw number from numbers with an unrecognized suffix" do
+    it "keeps just the raw number from numbers with an unrecognized suffix" do
       expect(UserContent.css_size('100-x')).to eq '100'
     end
   end
@@ -107,7 +107,7 @@ describe UserContent do
       expect(called).to be_truthy
     end
 
-    it "should not grant public access to locked files" do
+    it "does not grant public access to locked files" do
       course_factory
       att1 = attachment_model(context: @course)
       att2 = attachment_model(context: @course)
@@ -124,46 +124,46 @@ describe UserContent do
 
       it "matches relative paths" do
         expect(regex.match("<a href='/courses/#{rewriter.context.id}/assignments/5'>").to_a).to eq([
-          "/courses/#{rewriter.context.id}/assignments/5",
-          nil,
-          "/courses/#{rewriter.context.id}",
-          "assignments",
-          "5",
-          ""
-        ])
+                                                                                                     "/courses/#{rewriter.context.id}/assignments/5",
+                                                                                                     nil,
+                                                                                                     "/courses/#{rewriter.context.id}",
+                                                                                                     "assignments",
+                                                                                                     "5",
+                                                                                                     ""
+                                                                                                   ])
       end
 
       it "matches relative paths with no content prefix" do
         expect(regex.match("<a href='/files/101/download?download_frd=1'>").to_a).to eq([
-          "/files/101/download?download_frd=1",
-          nil,
-          nil,
-          "files",
-          "101",
-          "/download?download_frd=1"
-        ])
+                                                                                          "/files/101/download?download_frd=1",
+                                                                                          nil,
+                                                                                          nil,
+                                                                                          "files",
+                                                                                          "101",
+                                                                                          "/download?download_frd=1"
+                                                                                        ])
       end
 
       it "matches absolute paths with http" do
         expect(regex.match(%Q{<img src="http://localhost:3000/files/110/preview">}).to_a).to eq([
-            "http://localhost:3000/files/110/preview",
-            "http://localhost:3000",
-            nil,
-            "files",
-            "110",
-            "/preview"
-          ])
+                                                                                                  "http://localhost:3000/files/110/preview",
+                                                                                                  "http://localhost:3000",
+                                                                                                  nil,
+                                                                                                  "files",
+                                                                                                  "110",
+                                                                                                  "/preview"
+                                                                                                ])
       end
 
       it "matches absolute paths with https" do
         expect(regex.match(%Q{<a href="https://this-is-terrible.example.com/courses/#{rewriter.context.id}/pages/whatever?srsly=0">}).to_a).to eq([
-            "https://this-is-terrible.example.com/courses/#{rewriter.context.id}/pages/whatever?srsly=0",
-            "https://this-is-terrible.example.com",
-            "/courses/#{rewriter.context.id}",
-            "pages",
-            "whatever",
-            "?srsly=0"
-          ])
+                                                                                                                                                    "https://this-is-terrible.example.com/courses/#{rewriter.context.id}/pages/whatever?srsly=0",
+                                                                                                                                                    "https://this-is-terrible.example.com",
+                                                                                                                                                    "/courses/#{rewriter.context.id}",
+                                                                                                                                                    "pages",
+                                                                                                                                                    "whatever",
+                                                                                                                                                    "?srsly=0"
+                                                                                                                                                  ])
       end
 
       it "doesn't match invalid hostnames" do
@@ -192,30 +192,30 @@ describe UserContent do
   describe ".escape" do
     it "stuffs mathml into a data attribute on equation images" do
       string = "<div><ul><li><img class='equation_image' data-equation-content='\int f(x)/g(x)'/></li>"\
-             "<li><img class='equation_image' data-equation-content='\\sum 1..n'/></li>"\
-             "<li><img class='nothing_special'></li></ul></div>"
+               "<li><img class='equation_image' data-equation-content='\\sum 1..n'/></li>"\
+               "<li><img class='nothing_special'></li></ul></div>"
       html = UserContent.escape(string)
       expected = "<div><ul>\n"\
-        "<li>\n"\
-        "<img class=\"equation_image\" data-equation-content=\"int f(x)/g(x)\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo><mo>/</mo><mi>g</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo></math></span>\n"\
-        "</li>\n"\
-        "<li>\n"\
-        "<img class=\"equation_image\" data-equation-content=\"\\sum 1..n\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mo lspace=\"thinmathspace\" rspace=\"thinmathspace\">∑</mo><mn>1</mn><mo>.</mo><mo>.</mo><mi>n</mi></math></span>\n"\
-        "</li>\n"\
-        "<li><img class=\"nothing_special\"></li>\n"\
-        "</ul></div>"
+                 "<li>\n"\
+                 "<img class=\"equation_image\" data-equation-content=\"int f(x)/g(x)\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo><mo>/</mo><mi>g</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo></math></span>\n"\
+                 "</li>\n"\
+                 "<li>\n"\
+                 "<img class=\"equation_image\" data-equation-content=\"\\sum 1..n\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mo lspace=\"thinmathspace\" rspace=\"thinmathspace\">∑</mo><mn>1</mn><mo>.</mo><mo>.</mo><mi>n</mi></math></span>\n"\
+                 "</li>\n"\
+                 "<li><img class=\"nothing_special\"></li>\n"\
+                 "</ul></div>"
       expect(html).to match_ignoring_whitespace(expected)
     end
 
     it "strips existing mathml before adding any new" do
       string = "<div><img class='equation_image' data-equation-content='\int f(x)/g(x)'/>"\
-        "<span class=\"hidden-readable\"><math>3</math></span>text node<span class=\"hidden-readable\"><math>4</math></span>"\
-        "</div>"
+               "<span class=\"hidden-readable\"><math>3</math></span>text node<span class=\"hidden-readable\"><math>4</math></span>"\
+               "</div>"
 
       html = UserContent.escape(string)
       expected = "<div>\n"\
-        "<img class=\"equation_image\" data-equation-content=\"int f(x)/g(x)\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo><mo>/</mo><mi>g</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo></math></span>text node"\
-        "</div>"
+                 "<img class=\"equation_image\" data-equation-content=\"int f(x)/g(x)\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo><mo>/</mo><mi>g</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo></math></span>text node"\
+                 "</div>"
       expect(html).to match_ignoring_whitespace(expected)
     end
   end

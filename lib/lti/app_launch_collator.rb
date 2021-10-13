@@ -25,7 +25,7 @@ module Lti
       LtiDeepLinkingRequest
     ).freeze
 
-    def self.external_tools_for(context, placements, options={})
+    def self.external_tools_for(context, placements, options = {})
       tools_options = {}
       if options[:current_user]
         tools_options[:current_user] = options[:current_user]
@@ -42,10 +42,10 @@ module Lti
 
     def self.message_handlers_for(context, placements)
       MessageHandler.for_context(context).has_placements(*placements)
-        .by_message_types('basic-lti-launch-request')
+                    .by_message_types('basic-lti-launch-request')
     end
 
-    def self.bookmarked_collection(context, placements, options={})
+    def self.bookmarked_collection(context, placements, options = {})
       external_tools = external_tools_for(context, placements, options)
       external_tools = BookmarkedCollection.wrap(ExternalToolNameBookmarker, external_tools)
 
@@ -67,10 +67,10 @@ module Lti
     def self.launch_definitions(collection, placements)
       collection.map do |o|
         case o
-          when ContextExternalTool
-            lti1_launch_definition(o, placements)
-          when MessageHandler
-            lti2_launch_definition(o, placements)
+        when ContextExternalTool
+          lti1_launch_definition(o, placements)
+        when MessageHandler
+          lti2_launch_definition(o, placements)
         end
       end
     end

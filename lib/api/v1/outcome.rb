@@ -101,7 +101,7 @@ module Api::V1::Outcome
   # abbreviated includes only id, title, url, subgroups_url, outcomes_url, and can_edit. full expands on
   # that by adding import_url, parent_outcome_group (if any),
   # context id and type, and description.
-  def outcome_group_json(outcome_group, user, session, style=:full)
+  def outcome_group_json(outcome_group, user, session, style = :full)
     path_context = outcome_group.context || :global
     api_json(outcome_group, user, session, :only => %w(id title vendor_guid)).tap do |hash|
       hash['url'] = polymorphic_path [:api_v1, path_context, :outcome_group], :id => outcome_group.id
@@ -123,7 +123,7 @@ module Api::V1::Outcome
     end
   end
 
-  def outcome_links_json(outcome_links, user, session, opts={})
+  def outcome_links_json(outcome_links, user, session, opts = {})
     return [] if outcome_links.empty?
 
     #
@@ -135,16 +135,16 @@ module Api::V1::Outcome
       learning_outcome_id: outcome_links.map(&:content_id)
     ).pluck(:learning_outcome_id)
 
-    outcome_links.map{ |ol| outcome_link_json(ol, user, session, opts) }
+    outcome_links.map { |ol| outcome_link_json(ol, user, session, opts) }
   end
 
-  def outcome_link_json(outcome_link, user, session, opts={})
+  def outcome_link_json(outcome_link, user, session, opts = {})
     opts[:outcome_style] ||= :abbrev
     opts[:outcome_group_style] ||= :abbrev
     api_json(outcome_link, user, session, :only => %w(context_type context_id)).tap do |hash|
       hash['url'] = polymorphic_path [:api_v1, outcome_link.context || :global, :outcome_link],
-        :id => outcome_link.associated_asset_id,
-        :outcome_id => outcome_link.content_id
+                                     :id => outcome_link.associated_asset_id,
+                                     :outcome_id => outcome_link.content_id
       hash['outcome_group'] = outcome_group_json(
         outcome_link.associated_asset,
         user,

@@ -222,5 +222,4 @@ class UpdateAsvEnrollmentFilterV2 < ActiveRecord::Migration[5.2]
         AND a.only_visible_to_overrides = 'true'
     SQL
   end
-
 end

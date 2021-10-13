@@ -33,5 +33,4 @@ describe Messages::SubmissionCommentForTeacher::AnnotationPresenter do
   it "uses author from provided data" do
     expect(presenter.body).to eq("bill smith just made a new annotation on the submission for Adam Jones for Introductions")
   end
-
 end

@@ -105,7 +105,7 @@ class EpubExport < ActiveRecord::Base
     can :download
 
     given do |user|
-      [ 'generated', 'failed' ].include?(workflow_state) &&
+      ['generated', 'failed'].include?(workflow_state) &&
         self.grants_right?(user, :create)
     end
     can :regenerate
@@ -113,12 +113,12 @@ class EpubExport < ActiveRecord::Base
 
   def export
     create_content_export!({
-      user: user,
-      export_type: ContentExport::COMMON_CARTRIDGE,
-      selected_content: { :everything => true },
-      progress: 0,
-      context: course
-    })
+                             user: user,
+                             export_type: ContentExport::COMMON_CARTRIDGE,
+                             selected_content: { :everything => true },
+                             progress: 0,
+                             context: course
+                           })
     job_progress.start
     update_attribute(:workflow_state, 'exporting')
     content_export.export
@@ -149,7 +149,7 @@ class EpubExport < ActiveRecord::Base
     update_attribute(:workflow_state, 'generated')
   end
 
-  def mark_as_failed(error=nil)
+  def mark_as_failed(error = nil)
     if error
       out = Canvas::Errors.capture_exception(:course_export, error)
       ::Rails.logger.debug("Created ErrorReport #{out[:error_report]}")
@@ -165,7 +165,7 @@ class EpubExport < ActiveRecord::Base
 
   def self.fail_stuck_epub_exports(exports)
     cutoff = Setting.get("epub_generation_expiration_minutes", "120").to_i.minutes.ago
-    exports.select{|e| (e.generating? || e.exporting?) && e.updated_at < cutoff }.each(&:mark_as_failed)
+    exports.select { |e| (e.generating? || e.exporting?) && e.updated_at < cutoff }.each(&:mark_as_failed)
   end
 
   def convert_to_epub
@@ -182,7 +182,7 @@ class EpubExport < ActiveRecord::Base
       create_attachment_from_path!(file_path)
     end
     mark_as_generated
-    file_paths.each {|file_path| cleanup_file_path!(file_path) }
+    file_paths.each { |file_path| cleanup_file_path!(file_path) }
   end
   handle_asynchronously :convert_to_epub, priority: Delayed::LOW_PRIORITY
 
@@ -217,8 +217,8 @@ class EpubExport < ActiveRecord::Base
 
   def set_locale
     I18n.locale = infer_locale(
-      context:      course,
-      user:         user,
+      context: course,
+      user: user,
       root_account: course.root_account
     )
   end

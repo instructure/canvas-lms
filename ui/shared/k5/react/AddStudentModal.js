@@ -20,7 +20,6 @@ import React, {useRef, useState} from 'react'
 import {Modal} from '@instructure/ui-modal'
 import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import PropTypes from 'prop-types'
 import {Text} from '@instructure/ui-text'
@@ -32,15 +31,8 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 const AddStudentModal = ({open, handleClose, currentUserId, onStudentPaired}) => {
   const pairingCodeInputRef = useRef(null)
   const [inputMessage, setInputMessage] = useState(null)
-  const canvasGuideUrl =
-    'https://community.canvaslms.com/t5/Student-Guide/How-do-I-generate-a-pairing-code-for-an-observer-as-a-student/ta-p/418'
-
-  const textWithLink = texts =>
-    texts.map((text, i) => (
-      <View key={i} as="div" display="inline-block" padding="0 xx-small 0 0">
-        {text}
-      </View>
-    ))
+  const canvasGuideLinkHtml =
+    '<a target="canvas_guides" href="https://community.canvaslms.com/t5/Student-Guide/How-do-I-generate-a-pairing-code-for-an-observer-as-a-student/ta-p/418">$1</a>'
 
   const showError = error => {
     setInputMessage(error)
@@ -111,13 +103,20 @@ const AddStudentModal = ({open, handleClose, currentUserId, onStudentPaired}) =>
               pairingCodeInputRef.current = el
             }}
             placeholder={I18n.t('Pairing code')}
+            onChange={() => {
+              if (inputMessage) setInputMessage([])
+            }}
           />
         </View>
-        {textWithLink([
-          I18n.t('Visit'),
-          <Link href={canvasGuideUrl}>{I18n.t('Canvas Guides')}</Link>,
-          I18n.t('to learn more.')
-        ])}
+        <View
+          as="div"
+          display="inline-block"
+          dangerouslySetInnerHTML={{
+            __html: I18n.t('Visit *Canvas Guides* to learn more.', {
+              wrappers: [canvasGuideLinkHtml]
+            })
+          }}
+        />
       </Modal.Body>
       <Modal.Footer>
         <Button data-testid="close-modal" onClick={handleClose} margin="0 x-small 0 0">

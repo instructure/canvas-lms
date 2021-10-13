@@ -31,14 +31,14 @@ class AssetUserAccess < ActiveRecord::Base
   # if you add any more callbacks, be sure to update #log
   before_save :infer_defaults
   before_save :infer_root_account_id
-  resolves_root_account through: ->(instance){ instance.infer_root_account_id }
+  resolves_root_account through: ->(instance) { instance.infer_root_account_id }
 
   scope :for_context, lambda { |context| where(:context_id => context, :context_type => context.class.to_s) }
   scope :for_user, lambda { |user| where(:user_id => user) }
   scope :participations, -> { where(:action_level => 'participate') }
   scope :most_recent, -> { order('updated_at DESC') }
 
-  def infer_root_account_id(asset_for_root_account_id=nil)
+  def infer_root_account_id(asset_for_root_account_id = nil)
     self.root_account_id ||= begin
       if context_type != 'User'
         context&.resolved_root_account_id || 0
@@ -79,6 +79,7 @@ class AssetUserAccess < ActiveRecord::Base
 
   def asset_display_name
     return nil unless asset
+
     if self.asset.respond_to?(:title) && !self.asset.title.nil?
       asset.title
     elsif self.asset.is_a? Enrollment
@@ -177,6 +178,7 @@ class AssetUserAccess < ActiveRecord::Base
   def asset
     unless @asset
       return nil unless asset_code
+
       asset_code, general = self.asset_code.split(":").reverse
       @asset = Context.find_asset_by_asset_string(asset_code, context)
       @asset ||= (match = asset_code.match(/enrollment_(\d+)/)) && Enrollment.where(:id => match[1]).first
@@ -214,7 +216,7 @@ class AssetUserAccess < ActiveRecord::Base
 
     GuardRail.activate(:secondary) do
       @access = AssetUserAccess.where(user: user, asset_code: accessed_asset[:code],
-        context: correct_context).first_or_initialize
+                                      context: correct_context).first_or_initialize
     end
     accessed_asset[:level] ||= 'view'
     @access.log correct_context, accessed_asset
@@ -252,6 +254,7 @@ class AssetUserAccess < ActiveRecord::Base
     updated_key_set = self.changes_to_save.keys.to_set
     return false unless updated_key_set.include?('view_score')
     return false unless (updated_key_set - Set.new(['updated_at', 'last_access', 'view_score'])).empty?
+
     # ASSUMPTION: All view_score updates are a single increment.
     # If this is violated, rather than failing to capture, we should accept the
     # write through the row update for now (by returning false from here).
@@ -259,12 +262,13 @@ class AssetUserAccess < ActiveRecord::Base
     # ^array with old and new value, which CAN be null, hence compact
     return false if view_delta.size < 1
     return view_delta[0] == 1.0 if view_delta.size == 1
+
     (view_delta[1] - view_delta[0]).abs == 1 # this is an increment, if true
   end
 
   def log_action(level)
-    increment(:view_score) if %w{view participate}.include?( level )
-    increment(:participate_score) if %w{participate submit}.include?( level )
+    increment(:view_score) if %w{view participate}.include?(level)
+    increment(:participate_score) if %w{participate submit}.include?(level)
 
     if self.action_level != 'participate'
       self.action_level = (level == 'submit') ? 'participate' : level

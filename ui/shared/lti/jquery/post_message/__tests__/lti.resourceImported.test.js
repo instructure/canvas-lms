@@ -17,7 +17,7 @@
  */
 
 import handler from '../lti.resourceImported'
-import {ltiState} from '../handleLtiPostMessage'
+import {ltiState} from '../../messages'
 
 const resourceImportedMessage = {
   messageType: 'lti.resourceImported',

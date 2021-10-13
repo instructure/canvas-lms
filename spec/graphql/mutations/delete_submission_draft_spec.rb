@@ -44,7 +44,7 @@ RSpec.describe Mutations::DeleteSubmissionDraft do
   def run_mutation(submission_id: submission.id, current_user: student)
     result = CanvasSchema.execute(
       mutation_str(submission_id: submission_id),
-      context: {current_user: current_user, request: ActionDispatch::TestRequest.create}
+      context: { current_user: current_user, request: ActionDispatch::TestRequest.create }
     )
     result.to_h.with_indifferent_access
   end

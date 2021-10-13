@@ -99,6 +99,9 @@ const changeTypeLabels = {
   },
   get deleted() {
     return I18n.t('Deleted')
+  },
+  get initial_sync() {
+    return I18n.t('Initial Sync Incomplete')
   }
 }
 

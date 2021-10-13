@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# Note: Indented gems are meant to indicate transient dependencies of parent gems
+# NOTE: Indented gems are meant to indicate transient dependencies of parent gems
 
 if CANVAS_RAILS6_0
   gem 'rails', '6.0.4.1'
@@ -57,7 +57,6 @@ gem 'barby', '0.6.8', require: false
   gem 'rqrcode', '1.2.0', require: false
   gem 'chunky_png', '1.3.14', require: false
 gem 'bcrypt', '3.1.16'
-gem 'brotli', '0.2.3', require: false
 gem 'browser', '5.1.0', require: false
 gem 'builder', '3.2.4'
 gem 'canvas_connect', '0.3.11'
@@ -113,8 +112,6 @@ gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
 gem 'oj', '3.10.16'
 gem 'outrigger', '3.0.0'
-gem 'parallel', '1.20.0', require: false
-  gem 'ruby-progressbar', '1.10.1', require: false # used to show progress of S3Uploader
 gem 'prawn-rails', '1.3.0'
 gem 'rack', '2.2.3'
 gem 'rack-brotli', '1.0.0'
@@ -139,7 +136,7 @@ gem 'twilio-ruby', '5.36.0', require: false
 gem 'vault', '0.15.0', require: false
 gem 'vericite_api', '1.5.3'
 gem 'week_of_month', '1.2.5',
-  github: 'instructure/week-of-month', ref: 'b3013639e9474f302b5a6f27e4e45313e8d24902'
+    github: 'instructure/week-of-month', ref: 'b3013639e9474f302b5a6f27e4e45313e8d24902'
 gem 'will_paginate', '3.3.0', require: false # required for folio-pagination
 
 # needs pin to satisfy varying requirements of google_drive and another gem

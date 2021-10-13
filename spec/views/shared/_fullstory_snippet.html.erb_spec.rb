@@ -40,7 +40,7 @@ describe 'shared/_fullstory_snippet.html.erb' do
     assign(:domain_root_account, @domain_root_account)
   end
 
-  it 'should render' do
+  it 'renders' do
     render partial: 'shared/fullstory_snippet', locals: {}
     expect(response).not_to be_nil
   end

@@ -22,9 +22,9 @@ require "spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Mutations::DeleteConversationMessages do
-  let(:sender) {user_model}
-  let(:conv) {conversation(sender, user_model).conversation}
-  let(:message) {ConversationMessage.find_by(conversation: conv, author: sender)}
+  let(:sender) { user_model }
+  let(:conv) { conversation(sender, user_model).conversation }
+  let(:message) { ConversationMessage.find_by(conversation: conv, author: sender) }
 
   def execute_with_input(delete_input, user_executing: sender)
     mutation_command = <<~GQL
@@ -40,7 +40,7 @@ describe Mutations::DeleteConversationMessages do
         }
       }
     GQL
-    context = {current_user: user_executing, request: ActionDispatch::TestRequest.create}
+    context = { current_user: user_executing, request: ActionDispatch::TestRequest.create }
     CanvasSchema.execute(mutation_command, context: context)
   end
 
@@ -83,7 +83,7 @@ describe Mutations::DeleteConversationMessages do
 
   context "batching" do
     context "all ids are valid" do
-      let(:message2) {ConversationParticipant.find_by(user: sender, conversation: conv).add_message('test')}
+      let(:message2) { ConversationParticipant.find_by(user: sender, conversation: conv).add_message('test') }
 
       it "removes messages from the view" do
         message.root_account_ids = [sender.account.id]
@@ -101,7 +101,7 @@ describe Mutations::DeleteConversationMessages do
     end
 
     context "one id doesn't exist" do
-      let(:invalid_id) {ConversationMessage.maximum(:id)&.next || 0}
+      let(:invalid_id) { ConversationMessage.maximum(:id)&.next || 0 }
 
       it "bails without deleting any messages" do
         query = <<~QUERY
@@ -116,8 +116,8 @@ describe Mutations::DeleteConversationMessages do
     end
 
     context "ids are part of different conversations" do
-      let(:conv2) {conversation(sender, user_model).conversation}
-      let(:message2) {ConversationMessage.find_by(conversation: conv2, author: sender)}
+      let(:conv2) { conversation(sender, user_model).conversation }
+      let(:message2) { ConversationMessage.find_by(conversation: conv2, author: sender) }
 
       it "bails without deleting any messages" do
         query = <<~QUERY

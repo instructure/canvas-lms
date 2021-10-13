@@ -47,7 +47,8 @@ describe('DiscussionThreadContainer', () => {
     delete window.location
     window.open = openMock
     window.ENV = {
-      course_id: '1'
+      course_id: '1',
+      SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id'
     }
 
     window.matchMedia = jest.fn().mockImplementation(() => {
@@ -245,7 +246,7 @@ describe('DiscussionThreadContainer', () => {
       fireEvent.click(getByTestId('inSpeedGrader'))
 
       await waitFor(() => {
-        expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1', '2'), `_blank`)
+        expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl('2'), `_blank`)
       })
     })
 
@@ -278,13 +279,25 @@ describe('DiscussionThreadContainer', () => {
   describe('Unread Badge', () => {
     describe('should find unread badge', () => {
       it('root is read and child reply is unread', () => {
-        const container = setup(defaultProps())
+        const container = setup(
+          defaultProps({
+            discussionEntryOverrides: {
+              rootEntryParticipantCounts: {
+                unreadCount: 1,
+                repliesCount: 1,
+                __typename: 'DiscussionEntryCounts'
+              }
+            }
+          })
+        )
         expect(container.getByTestId('is-unread')).toBeTruthy()
       })
 
       it('root is unread and child reply is unread', () => {
         const container = setup(
-          defaultProps({discussionEntryOverrides: {entryParticipant: {read: false}}})
+          defaultProps({
+            discussionEntryOverrides: {entryParticipant: {read: false, rating: false}}
+          })
         )
         expect(container.getByTestId('is-unread')).toBeTruthy()
       })
@@ -292,7 +305,7 @@ describe('DiscussionThreadContainer', () => {
         const container = setup(
           defaultProps({
             discussionEntryOverrides: {
-              entryParticipant: {read: false},
+              entryParticipant: {read: false, rating: false},
               rootEntryParticipantCounts: {
                 unreadCount: 0,
                 repliesCount: 1,
@@ -310,7 +323,7 @@ describe('DiscussionThreadContainer', () => {
         const container = setup(
           defaultProps({
             discussionEntryOverrides: {
-              entryParticipant: {read: true},
+              entryParticipant: {read: true, rating: false},
               rootEntryParticipantCounts: {
                 unreadCount: 0,
                 repliesCount: 1,
@@ -357,7 +370,17 @@ describe('DiscussionThreadContainer', () => {
     })
 
     it('pluralizes reply message correctly when there is only a single reply', async () => {
-      const {getAllByText} = setup(defaultProps())
+      const {getAllByText} = setup(
+        defaultProps({
+          discussionEntryOverrides: {
+            rootEntryParticipantCounts: {
+              unreadCount: 1,
+              repliesCount: 1,
+              __typename: 'DiscussionEntryCounts'
+            }
+          }
+        })
+      )
       expect(getAllByText('1 reply, 1 unread').length).toBe(2)
     })
 

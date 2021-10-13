@@ -62,7 +62,8 @@ module AssignmentOverridesSeleniumHelper
       title: 'due tomorrow',
       due_at: due_at,
       unlock_at: unlock_at,
-      lock_at: lock_at)
+      lock_at: lock_at
+    )
   end
 
   def visit_assignment_edit_page(assign)
@@ -119,15 +120,15 @@ module AssignmentOverridesSeleniumHelper
   end
 
   def assign_dates_for_first_override_section(opts = {})
-    first_due_at_element.send_keys(opts.fetch(:due_at, Time.zone.now.advance(days:3)))
-    first_unlock_at_element.send_keys(opts.fetch(:unlock_at, Time.zone.now.advance(days:-1)))
-    first_lock_at_element.send_keys(opts.fetch(:lock_at, Time.zone.now.advance(days:3)))
+    first_due_at_element.send_keys(opts.fetch(:due_at, Time.zone.now.advance(days: 3)))
+    first_unlock_at_element.send_keys(opts.fetch(:unlock_at, Time.zone.now.advance(days: -1)))
+    first_lock_at_element.send_keys(opts.fetch(:lock_at, Time.zone.now.advance(days: 3)))
   end
 
   def assign_dates_for_last_override_section(opts = {})
-    last_due_at_element.send_keys(opts.fetch(:due_at, Time.zone.now.advance(days:5)))
-    last_unlock_at_element.send_keys(opts.fetch(:unlock_at, Time.zone.now.advance(days:-1)))
-    last_lock_at_element.send_keys(opts.fetch(:lock_at, Time.zone.now.advance(days:5)))
+    last_due_at_element.send_keys(opts.fetch(:due_at, Time.zone.now.advance(days: 5)))
+    last_unlock_at_element.send_keys(opts.fetch(:unlock_at, Time.zone.now.advance(days: -1)))
+    last_lock_at_element.send_keys(opts.fetch(:lock_at, Time.zone.now.advance(days: 5)))
   end
 
   def find_vdd_time(override_context)
@@ -136,7 +137,7 @@ module AssignmentOverridesSeleniumHelper
     @unlock_at_time = format_time_for_view(override_context.unlock_at)
   end
 
-  def add_due_date_override(assignment, due_at = Time.zone.now.advance(days:1))
+  def add_due_date_override(assignment, due_at = Time.zone.now.advance(days: 1))
     user = @user
     new_section = @course.course_sections.create!(name: 'New Section')
     student_in_section(new_section)
@@ -154,11 +155,11 @@ module AssignmentOverridesSeleniumHelper
     student_in_section(new_section)
     override = assignment.assignment_overrides.build
     override.set = new_section
-    override.due_at = opts.fetch(:due_at, Time.zone.now.advance(days:3))
+    override.due_at = opts.fetch(:due_at, Time.zone.now.advance(days: 3))
     override.due_at_overridden = true
-    override.lock_at = opts.fetch(:lock_at, Time.zone.now.advance(days:3))
+    override.lock_at = opts.fetch(:lock_at, Time.zone.now.advance(days: 3))
     override.lock_at_overridden = true
-    override.unlock_at = opts.fetch(:unlock_at, Time.zone.now.advance(days:-1))
+    override.unlock_at = opts.fetch(:unlock_at, Time.zone.now.advance(days: -1))
     override.unlock_at_overridden = true
     override.save!
     @user = user
@@ -321,7 +322,7 @@ module AssignmentOverridesSeleniumHelper
     date
   end
 
-  def obtain_date_from_quiz_show_page(row_number, cell_number, load_page=false)
+  def obtain_date_from_quiz_show_page(row_number, cell_number, load_page = false)
     get "/accounts/#{@account.id}/courses/#{@course.id}/quizzes/#{@quiz.id}" if load_page
     f("tr:nth-child(#{row_number}) td:nth-child(#{cell_number}) .screenreader-only")
   end

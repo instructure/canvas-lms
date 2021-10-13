@@ -167,6 +167,7 @@ class GroupsController < ApplicationController
   def unassigned_members
     category = @context.group_categories.where(id: params[:category_id]).first
     return render :json => {}, :status => :not_found unless category
+
     page = (params[:page] || 1).to_i rescue 1
     per_page = Api.per_page_for(self, default: 15, max: 100)
     if category && !category.student_organized?
@@ -175,8 +176,8 @@ class GroupsController < ApplicationController
       groups = []
     end
 
-    users = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause('users')).
-      paginate(page: page, per_page: per_page)
+    users = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause('users'))
+                    .paginate(page: page, per_page: per_page)
 
     if authorized_action(@context, @current_user, :manage)
       json = {
@@ -209,9 +210,9 @@ class GroupsController < ApplicationController
   #
   # @returns [Group]
   def index
-
     return context_index if @context
-    includes = {:include => params[:include]}
+
+    includes = { :include => params[:include] }
     groups_scope = @current_user.current_groups
     respond_to do |format|
       format.html do
@@ -219,7 +220,7 @@ class GroupsController < ApplicationController
         groups_scope = groups_scope.preload(:group_category, :context, :root_account)
 
         groups = groups_scope.shard(@current_user).to_a
-        groups.select!{|group| group.context_type != 'Course' || group.context.grants_right?(@current_user, :read)}
+        groups.select! { |group| group.context_type != 'Course' || group.context.grants_right?(@current_user, :read) }
         groups.sort_by! { |group| Canvas::ICU.collation_key(group&.name) }
 
         # Split the groups out into those in concluded courses and those not in concluded courses
@@ -234,7 +235,7 @@ class GroupsController < ApplicationController
           scope.preload(:group_category, :context)
         end
         @groups = Api.paginate(@groups, self, api_v1_current_user_groups_url)
-        render :json => (@groups.map { |g| group_json(g, @current_user, session,includes) })
+        render :json => (@groups.map { |g| group_json(g, @current_user, session, includes) })
       end
     end
   end
@@ -257,9 +258,10 @@ class GroupsController < ApplicationController
   # @returns [Group]
   def context_index
     return unless authorized_action(@context, @current_user, :read_roster)
-    @groups = all_groups = @context.groups.active.
-                             order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by).
-                             eager_load(:group_category).preload(:root_account)
+
+    @groups = all_groups = @context.groups.active
+                                   .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
+                                   .eager_load(:group_category).preload(:root_account)
 
     unless api_request?
       # The Groups end-point relies on the People's tab configuration since it's a subsection of it.
@@ -290,11 +292,11 @@ class GroupsController < ApplicationController
         @user_groups = @current_user.group_memberships_for(@context) if @current_user
 
         if @context.grants_any_right?(@current_user, session, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
-          categories_json = @categories.map{ |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) }
+          categories_json = @categories.map { |cat| group_category_json(cat, @current_user, session, include: ["progress_url", "unassigned_users_count", "groups_count"]) }
           uncategorized = @context.groups.active.uncategorized.to_a
           if uncategorized.present?
             json = group_category_json(GroupCategory.uncategorized(context: @context), @current_user, session)
-            json["groups"] = uncategorized.map{ |group| group_json(group, @current_user, session) }
+            json["groups"] = uncategorized.map { |group| group_json(group, @current_user, session) }
             categories_json << json
           end
 
@@ -319,6 +321,7 @@ class GroupsController < ApplicationController
           render :context_manage_groups
         else
           return render_unauthorized_action if @context.is_a?(Account)
+
           @groups = @user_groups = @groups & (@user_groups || [])
           @available_groups = (all_groups - @user_groups).select do |group|
             group.grants_right?(@current_user, :join)
@@ -339,7 +342,7 @@ class GroupsController < ApplicationController
         render :json => @paginated_groups.map { |g|
           include_inactive_users = value_to_boolean(params[:include_inactive_users])
           group_json(g, @current_user, session, :include => Array(params[:include]),
-                     :include_inactive_users => include_inactive_users)
+                                                :include_inactive_users => include_inactive_users)
         }
       end
     end
@@ -382,8 +385,8 @@ class GroupsController < ApplicationController
           redirect_to dashboard_url
           return
         end
-        @current_conferences = @group.web_conferences.active.select{|c| c.active? && c.users.include?(@current_user) } rescue []
-        @scheduled_conferences = @context.web_conferences.active.select{|c| c.scheduled? && c.users.include?(@current_user)} rescue []
+        @current_conferences = @group.web_conferences.active.select { |c| c.active? && c.users.include?(@current_user) } rescue []
+        @scheduled_conferences = @context.web_conferences.active.select { |c| c.scheduled? && c.users.include?(@current_user) } rescue []
         @stream_items = @current_user.try(:cached_recent_stream_items, { :contexts => @context }) || []
         if params[:join] && @group.grants_right?(@current_user, :join)
           if @group.full?
@@ -416,11 +419,10 @@ class GroupsController < ApplicationController
         end
 
         if @context_membership
-          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_group_format_url(@context_membership.feed_code, :atom), {:title => t('group_atom_feed', "Group Atom Feed")})
+          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_group_format_url(@context_membership.feed_code, :atom), { :title => t('group_atom_feed', "Group Atom Feed") })
         elsif @context.available?
-          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_group_format_url(@context.feed_code, :atom), {:title => t('group_atom_feed', "Group Atom Feed")})
+          content_for_head helpers.auto_discovery_link_tag(:atom, feeds_group_format_url(@context.feed_code, :atom), { :title => t('group_atom_feed', "Group Atom Feed") })
         end
-
       end
       format.json do
         if authorized_action(@group, @current_user, :read)
@@ -476,6 +478,7 @@ class GroupsController < ApplicationController
       if params[:group_category_id]
         group_category = api_find(GroupCategory.active, params[:group_category_id])
         return render :json => {}, :status => bad_request unless group_category
+
         @context = group_category.context
         attrs[:group_category] = group_category
         return unless authorized_action(group_category.context, @current_user, [:manage_groups, :manage_groups_add])
@@ -488,6 +491,7 @@ class GroupsController < ApplicationController
       if group_category_id && @context.grants_any_right?(@current_user, session, :manage_groups, :manage_groups_add)
         group_category = @context.group_categories.where(id: group_category_id).first
         return render :json => {}, :status => :bad_request unless group_category
+
         attrs[:group_category] = group_category
       else
         attrs[:group_category] = nil
@@ -515,7 +519,7 @@ class GroupsController < ApplicationController
           @group.invitees = params[:invitees]
           flash[:notice] = t('notices.create_success', 'Group was successfully created.')
           format.html { redirect_to group_url(@group) }
-          format.json { render :json => group_json(@group, @current_user, session, {include: ['users', 'group_category', 'permissions']}) }
+          format.json { render :json => group_json(@group, @current_user, session, { include: ['users', 'group_category', 'permissions'] }) }
         else
           format.html { render :new }
           format.json { render :json => @group.errors, :status => :bad_request }
@@ -572,13 +576,14 @@ class GroupsController < ApplicationController
     find_group
     group_params = api_request? ? params : params.require(:group)
     attrs = group_params.permit(:name, :description, :join_level, :is_public, :avatar_id, :storage_quota_mb, :max_membership,
-      :leader => strong_anything, :members => strong_anything)
+                                :leader => strong_anything, :members => strong_anything)
     attrs[:leader] = nil if group_params.has_key?(:leader) && !group_params[:leader].present?
 
     if !api_request? && params[:group][:group_category_id]
       group_category_id = params[:group].delete :group_category_id
       group_category = @context.group_categories.where(id: group_category_id).first
       return render :json => {}, :status => :bad_request unless group_category
+
       attrs[:group_category] = group_category
     end
 
@@ -589,6 +594,7 @@ class GroupsController < ApplicationController
     if attrs[:leader]
       membership = @group.group_memberships.where(user_id: attrs[:leader][:id]).first
       return render :json => {}, :status => :bad_request unless membership
+
       attrs[:leader] = membership.user
     end
 
@@ -618,7 +624,7 @@ class GroupsController < ApplicationController
           @group.users.touch_all
           flash[:notice] = t('notices.update_success', 'Group was successfully updated.')
           format.html { redirect_to clean_return_to(params[:return_to]) || group_url(@group) }
-          format.json { render :json => group_json(@group, @current_user, session, {include: ['users', 'group_category', 'permissions']}) }
+          format.json { render :json => group_json(@group, @current_user, session, { include: ['users', 'group_category', 'permissions'] }) }
         else
           format.html { render :edit }
           format.json { render :json => @group.errors, :status => :bad_request }
@@ -679,8 +685,8 @@ class GroupsController < ApplicationController
                         search_method: :preferred,
                         current_user: @current_user)
       @memberships = []
-      ul.users.each{ |u| @memberships << @group.invite_user(u) }
-      render :json => @memberships.map{ |gm| group_membership_json(gm, @current_user, session) }
+      ul.users.each { |u| @memberships << @group.invite_user(u) }
+      render :json => @memberships.map { |gm| group_membership_json(gm, @current_user, session) }
     end
   end
 
@@ -756,9 +762,9 @@ class GroupsController < ApplicationController
     include_inactive = params[:exclude_inactive].present? ? !value_to_boolean(params[:exclude_inactive]) : true
 
     if search_term
-      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session, {include_inactive_enrollments: include_inactive})
+      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session, { include_inactive_enrollments: include_inactive })
     else
-      users = UserSearch.scope_for(@context, @current_user, {include_inactive_enrollments: include_inactive})
+      users = UserSearch.scope_for(@context, @current_user, { include_inactive_enrollments: include_inactive })
     end
 
     includes = Array(params[:include])
@@ -774,9 +780,9 @@ class GroupsController < ApplicationController
     end
 
     if (includes.include? 'active_status') && (@context.context.is_a? Course)
-      enrollments = Enrollment.where(user_id: json_users.map{|u| u[:id]}, course_id: @context.context_id)
+      enrollments = Enrollment.where(user_id: json_users.map { |u| u[:id] }, course_id: @context.context_id)
 
-      inactive_students = enrollments.group_by(&:user_id).select{|_id, enrollments| enrollments.all?(&:hard_inactive?)}.map(&:first)
+      inactive_students = enrollments.group_by(&:user_id).select { |_id, enrollments| enrollments.all?(&:hard_inactive?) }.map(&:first)
       json_users.each do |user|
         user[:is_inactive] = inactive_students.include?(user[:id])
       end
@@ -787,6 +793,7 @@ class GroupsController < ApplicationController
 
   def public_feed
     return unless get_feed_context(:only => [:group])
+
     feed = Atom::Feed.new do |f|
       f.title = t(:feed_title, "%{course_or_account_name} Feed", :course_or_account_name => @context.full_name)
       f.links << Atom::Link.new(:href => group_url(@context), :rel => 'self')
@@ -795,11 +802,11 @@ class GroupsController < ApplicationController
     end
     @entries = []
     @entries.concat @context.calendar_events.active
-    @entries.concat DiscussionTopic::ScopedToUser.new(@context, @current_user, @context.discussion_topics.published).scope.select{ |dt|
+    @entries.concat DiscussionTopic::ScopedToUser.new(@context, @current_user, @context.discussion_topics.published).scope.select { |dt|
       !dt.locked_for?(@current_user, :check_policies => true)
     }
     @entries.concat WikiPages::ScopedToUser.new(@context, @current_user, @context.wiki_pages.published).scope
-    @entries = @entries.sort_by{|e| e.updated_at}
+    @entries = @entries.sort_by { |e| e.updated_at }
     @entries.each do |entry|
       feed.entries << entry.to_atom(:context => @context)
     end
@@ -895,6 +902,7 @@ class GroupsController < ApplicationController
   def permissions
     get_context
     return unless authorized_action(@context, @current_user, :read)
+
     permissions = Array(params[:permissions]).map(&:to_sym)
     render json: @context.rights_status(@current_user, session, *permissions)
   end
@@ -909,6 +917,4 @@ class GroupsController < ApplicationController
       @group ||= api_find(@context ? @context.groups : Group, params[:id])
     end
   end
-
-
 end

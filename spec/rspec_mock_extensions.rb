@@ -28,7 +28,8 @@ module RspecMockAnyInstantiation
 
     def add_any_instantiation(ar_obj)
       raise(ArgumentError, "need to save first") if ar_obj.new_record?
-      @@any_instantiation[ [ar_obj.class.base_class, ar_obj.id] ] = ar_obj
+
+      @@any_instantiation[[ar_obj.class.base_class, ar_obj.id]] = ar_obj
       # calling any_instantiation is likely to be because you're stubbing it,
       # and to later be cached inadvertently from code that *thinks* it
       # has a non-stubbed object. So let it dump, but not load (i.e.
@@ -42,7 +43,7 @@ module RspecMockAnyInstantiation
     end
 
     def instantiate(record, column_types = {}, &block)
-      if obj = @@any_instantiation[[base_class, record['id'].to_i]]
+      if (obj = @@any_instantiation[[base_class, record['id'].to_i]])
         obj
       else
         super
@@ -50,7 +51,7 @@ module RspecMockAnyInstantiation
     end
 
     def instantiate_instance_of(klass, record, column_types = {}, &block)
-      if obj = @@any_instantiation[[klass, record['id'].to_i]]
+      if (obj = @@any_instantiation[[klass, record['id'].to_i]])
         obj
       else
         super

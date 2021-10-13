@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../file_uploads_spec_helper')
 
 describe Quizzes::QuizSubmissionFilesController, type: :request do
-
   context "quiz submissions file uploads" do
     before :once do
       course_with_student :active_all => true
@@ -37,15 +36,15 @@ describe Quizzes::QuizSubmissionFilesController, type: :request do
 
     def preflight(preflight_params)
       json = api_call :post,
-        "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/self/files",
-        {
-          :controller => "quizzes/quiz_submission_files",
-          :action => "create",
-          :format => "json",
-          :course_id => @course.to_param,
-          :quiz_id => @quiz.to_param
-        },
-        preflight_params
+                      "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/self/files",
+                      {
+                        :controller => "quizzes/quiz_submission_files",
+                        :action => "create",
+                        :format => "json",
+                        :course_id => @course.to_param,
+                        :quiz_id => @quiz.to_param
+                      },
+                      preflight_params
       # account for JSON API style return
       json['attachments'] ? json['attachments'][0] : json
     end
@@ -54,5 +53,4 @@ describe Quizzes::QuizSubmissionFilesController, type: :request do
       true
     end
   end
-
 end

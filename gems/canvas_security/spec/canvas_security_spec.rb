@@ -26,8 +26,8 @@ describe CanvasSecurity do
   describe "JWT tokens" do
     describe "encoding" do
       describe ".create_jwt" do
-        it "should generate a token with an expiration" do
-          Timecop.freeze(Time.utc(2013,3,13,9,12)) do
+        it "generates a token with an expiration" do
+          Timecop.freeze(Time.utc(2013, 3, 13, 9, 12)) do
             expires = 1.hour.from_now
             token = CanvasSecurity.create_jwt({ a: 1 }, expires)
 
@@ -38,7 +38,7 @@ describe CanvasSecurity do
           end
         end
 
-        it "should generate a token without expiration" do
+        it "generates a token without expiration" do
           token = CanvasSecurity.create_jwt({ a: 1 })
           expected_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9."\
                            "eyJhIjoxfQ."\
@@ -46,31 +46,31 @@ describe CanvasSecurity do
           expect(token).to eq(expected_token)
         end
 
-        it "should encode with configured encryption key" do
+        it "encodes with configured encryption key" do
           jwt = double
           expect(jwt).to receive(:sign).with(CanvasSecurity.encryption_key, :HS256).and_return("sometoken")
           allow(JSON::JWT).to receive_messages(new: jwt)
           CanvasSecurity.create_jwt({ a: 1 })
         end
 
-        it "should encode with the supplied key" do
+        it "encodes with the supplied key" do
           jwt = double
           expect(jwt).to receive(:sign).with("mykey", :HS256).and_return("sometoken")
           allow(JSON::JWT).to receive_messages(new: jwt)
           CanvasSecurity.create_jwt({ a: 1 }, nil, "mykey")
         end
 
-        it "should encode with supplied algorithm" do
+        it "encodes with supplied algorithm" do
           jwt = double
           expect(jwt).to receive(:sign).with("mykey", :HS512).and_return("sometoken")
           allow(JSON::JWT).to receive_messages(new: jwt)
-          CanvasSecurity.create_jwt({a: 1}, nil, "mykey", :HS512)
+          CanvasSecurity.create_jwt({ a: 1 }, nil, "mykey", :HS512)
         end
       end
 
       describe ".create_encrypted_jwt" do
-        let(:signing_secret){ "asdfasdfasdfasdfasdfasdfasdfasdf" }
-        let(:encryption_secret){ "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;" }
+        let(:signing_secret) { "asdfasdfasdfasdfasdfasdfasdfasdf" }
+        let(:encryption_secret) { "jkl;jkl;jkl;jkl;jkl;jkl;jkl;jkl;" }
         let(:payload) { { arbitrary: "data" } }
 
         it "builds up an encrypted token" do
@@ -92,7 +92,7 @@ describe CanvasSecurity do
 
         it "can unpack encrypted jwts again" do
           jwt = CanvasSecurity.create_encrypted_jwt(payload, signing_secret, encryption_secret)
-          original = CanvasSecurity.decrypt_services_jwt(jwt, signing_secret, encryption_secret)
+          original = CanvasSecurity.decrypt_encrypted_jwt(jwt, signing_secret, encryption_secret)
           expect(original[:arbitrary]).to eq("data")
         end
 
@@ -100,7 +100,7 @@ describe CanvasSecurity do
           different_secret = encryption_secret.upcase
           jwt = CanvasSecurity.create_encrypted_jwt(payload, signing_secret, different_secret)
           expect do
-            CanvasSecurity.decrypt_services_jwt(jwt, signing_secret, encryption_secret)
+            CanvasSecurity.decrypt_encrypted_jwt(jwt, signing_secret, encryption_secret)
           end.to raise_error(CanvasSecurity::InvalidToken)
         end
       end
@@ -109,7 +109,7 @@ describe CanvasSecurity do
     describe ".base64_encode" do
       it "trims off newlines" do
         input = "SuperSuperSuperSuperSuperSuperSuperSuper"\
-                 "SuperSuperSuperSuperSuperSuperSuperSuperLongString"
+                "SuperSuperSuperSuperSuperSuperSuperSuperLongString"
         output = "U3VwZXJTdXBlclN1cGVyU3VwZXJTdXBlclN1cGVy"\
                  "U3VwZXJTdXBlclN1cGVyU3VwZXJTdXBlclN1cGVy"\
                  "U3VwZXJTdXBlclN1cGVyU3VwZXJMb25nU3RyaW5n"
@@ -118,71 +118,70 @@ describe CanvasSecurity do
     end
 
     describe "decoding" do
-      let(:key){ "mykey" }
+      let(:key) { "mykey" }
 
-      def test_jwt(claims={})
+      def test_jwt(claims = {})
         JSON::JWT.new({ a: 1 }.merge(claims)).sign(key, :HS256).to_s
       end
 
       around(:example) do |example|
-        Timecop.freeze(Time.utc(2013,3,13,9,12)) do
+        Timecop.freeze(Time.utc(2013, 3, 13, 9, 12)) do
           example.run
         end
       end
 
-      it "should decode token" do
-        body = CanvasSecurity.decode_jwt(test_jwt, [ key ])
+      it "decodes token" do
+        body = CanvasSecurity.decode_jwt(test_jwt, [key])
         expect(body).to eq({ "a" => 1 })
       end
 
-      it "should return token body with indifferent access" do
-        body = CanvasSecurity.decode_jwt(test_jwt, [ key ])
+      it "returns token body with indifferent access" do
+        body = CanvasSecurity.decode_jwt(test_jwt, [key])
         expect(body[:a]).to eq(1)
         expect(body["a"]).to eq(1)
       end
 
-      it "should check using past keys" do
-        body = CanvasSecurity.decode_jwt(test_jwt, [ "newkey", key ])
+      it "checks using past keys" do
+        body = CanvasSecurity.decode_jwt(test_jwt, ["newkey", key])
         expect(body).to eq({ "a" => 1 })
       end
 
-      it "should raise on an expired token" do
+      it "raises on an expired token" do
         expired_jwt = test_jwt(exp: 1.hour.ago)
-        expect { CanvasSecurity.decode_jwt(expired_jwt, [ key ]) }.to(
+        expect { CanvasSecurity.decode_jwt(expired_jwt, [key]) }.to(
           raise_error(CanvasSecurity::TokenExpired)
         )
       end
 
-      it "should not raise an error on a token with expiration in the future" do
+      it "does not raise an error on a token with expiration in the future" do
         valid_jwt = test_jwt(exp: 1.hour.from_now)
-        body = CanvasSecurity.decode_jwt(valid_jwt, [ key ])
+        body = CanvasSecurity.decode_jwt(valid_jwt, [key])
         expect(body[:a]).to eq(1)
       end
 
       it "errors if the 'nbf' claim is in the future" do
         back_to_the_future_jwt = test_jwt(exp: 1.hour.from_now, nbf: 30.minutes.from_now)
-        expect { CanvasSecurity.decode_jwt(back_to_the_future_jwt, [ key ]) }.to(
+        expect { CanvasSecurity.decode_jwt(back_to_the_future_jwt, [key]) }.to(
           raise_error(CanvasSecurity::InvalidToken)
         )
       end
 
       it "allows 5 minutes of future clock skew" do
         back_to_the_future_jwt = test_jwt(exp: 1.hour.from_now, nbf: 1.minutes.from_now, iat: 1.minutes.from_now)
-        body = CanvasSecurity.decode_jwt(back_to_the_future_jwt, [ key ])
+        body = CanvasSecurity.decode_jwt(back_to_the_future_jwt, [key])
         expect(body[:a]).to eq 1
       end
 
       it "produces an InvalidToken error if string isn't a jwt (even if it looks like one)" do
         # this is an example token which base64_decodes to a thing that looks like a jwt because of the periods
         not_a_jwt = CanvasSecurity.base64_decode("1050~LvwezC5Dd3ZK9CR1lusJTRv24dN0263txia3KF3mU6pDjOv5PaoX8Jv4ikdcvoiy")
-        expect { CanvasSecurity.decode_jwt(not_a_jwt, [ key ]) }.to raise_error(CanvasSecurity::InvalidToken)
+        expect { CanvasSecurity.decode_jwt(not_a_jwt, [key]) }.to raise_error(CanvasSecurity::InvalidToken)
       end
-
     end
   end
 
   describe "hmac_sha512" do
-    let(:message){ "asdf1234"}
+    let(:message) { "asdf1234" }
     it "verifies items signed with the same secret" do
       shared_secret = "super-sekrit"
       signature = CanvasSecurity.sign_hmac_sha512(message, shared_secret)

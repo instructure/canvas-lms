@@ -30,13 +30,13 @@ describe "assignments list sidebar" do
     a.save!
   end
 
-  it "should render for non-students" do
+  it "renders for non-students" do
     view_context(@course, @teacher)
     render 'assignments/_assignments_list_right_side'
     expect(response).to have_tag("div.events_list")
   end
 
-  it "should not render anything for students" do
+  it "does not render anything for students" do
     course_with_student(active_all: true)
     view_context(@course, @student)
     render 'assignments/_assignments_list_right_side'

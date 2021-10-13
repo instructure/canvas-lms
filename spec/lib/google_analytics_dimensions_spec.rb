@@ -62,7 +62,7 @@ describe GoogleAnalyticsDimensions do
     expect(dims[:enrollments]).to eq('011')
   end
 
-  it "it tells when someone is superman (or woman, lest i get fired)" do
+  it "tells when someone is superman (or woman, lest i get fired)" do
     dims = subject[
       user: teacher_in_course(active_all: true).user.tap do |user|
         student_in_course(user: user, active_all: true)

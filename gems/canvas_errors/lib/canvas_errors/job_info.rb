@@ -39,6 +39,7 @@ module CanvasErrors
     end
 
     private
+
     def extras_hash
       # if the shape of a job changes, we don't want to hard-fail.
       # ATTEMPT to extract these values, but silently use nil
@@ -61,4 +62,3 @@ module CanvasErrors
     end
   end
 end
-

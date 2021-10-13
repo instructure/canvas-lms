@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 #
 # Copyright (C) 2021 - present Instructure, Inc.
 #
@@ -24,8 +25,8 @@ class PopulateRootAccountIdOnAttachmentsFromAssessmentQuestion < ActiveRecord::M
   disable_ddl_transaction!
 
   def up
-    DataFixup::PopulateFieldOnModelFromAssociation.delay_if_production(priority: Delayed::LOWER_PRIORITY).
-      run(Attachment, :assessment_question, :root_account_id, old_value: 0)
+    DataFixup::PopulateFieldOnModelFromAssociation.delay_if_production(priority: Delayed::LOWER_PRIORITY)
+                                                  .run(Attachment, :assessment_question, :root_account_id, old_value: 0)
   end
 
   def down; end

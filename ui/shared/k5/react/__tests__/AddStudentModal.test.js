@@ -25,7 +25,7 @@ const LINK_STUDENT_URL = '/api/v1/users/1/observees'
 
 const defaultProps = {
   open: true,
-  currentUserId: 1,
+  currentUserId: '1',
   handleClose: () => {},
   onStudentPaired: () => {}
 }
@@ -92,6 +92,30 @@ describe('Add Student Modal', () => {
       expect(getByText('Invalid pairing code.')).toBeInTheDocument()
       expect(onStudentPaired).not.toHaveBeenCalled()
     })
+  })
+
+  it('clears the error message once the user starts editing the pairing code', async () => {
+    fetchMock.mock(
+      LINK_STUDENT_URL,
+      {throws: new Error('422 Unprocessable Entity')},
+      {overwriteRoutes: true}
+    )
+    const onStudentPaired = jest.fn()
+    const {getByTestId, getByText, queryByText} = render(
+      <AddStudentModal {...defaultProps} onStudentPaired={onStudentPaired} />
+    )
+    const pairingCodeInput = getByTestId('pairing-code-input')
+    const addStudentButton = getByTestId('add-student-btn')
+    fireEvent.change(pairingCodeInput, {target: {value: '12121as'}})
+    act(() => addStudentButton.click())
+    expect(fetchMock.calls(url => url.match(LINK_STUDENT_URL))).toHaveLength(1)
+    await waitFor(() => {
+      expect(getByText('Invalid pairing code.')).toBeInTheDocument()
+      expect(onStudentPaired).not.toHaveBeenCalled()
+    })
+    // up to this point, same as the prior spec
+    fireEvent.change(pairingCodeInput, {target: {value: '12121a'}})
+    expect(queryByText('Invalid pairing code.')).toBeNull()
   })
 
   it('calls handleClose when close is clicked', () => {

@@ -28,7 +28,6 @@ shared_examples 'mime_type check' do
 end
 
 shared_examples_for "lti services" do
-
   let(:extra_tool_context) { raise 'Override in spec' }
 
   shared_examples 'extra developer key and account tool check' do
@@ -75,7 +74,7 @@ shared_examples_for "lti services" do
   describe 'common lti advantage request and response check' do
     # #around and #before(:context) don't have access to the right scope, #before(:example) runs too late,
     # so hack our own lifecycle hook
-    let(:before_send_request) { ->{} }
+    let(:before_send_request) { -> {} }
 
     before do
       before_send_request.call
@@ -106,7 +105,7 @@ shared_examples_for "lti services" do
 
     context 'with "canvas.instructure.com" aud' do
       let(:universal_grant_host) { 'http://canvas.instructure.com/login/oauth2/token' }
-      let(:access_token_jwt_hash) { super().merge('aud': universal_grant_host) }
+      let(:access_token_jwt_hash) { super().merge(aud: universal_grant_host) }
 
       it 'returns 200 success' do
         expect(response).to have_http_status http_success_status

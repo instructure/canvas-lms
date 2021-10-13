@@ -20,12 +20,19 @@
 module IncomingMail
   module Errors
     class ReplyFrom < StandardError; end
+
     class UnknownAddress < ReplyFrom; end
+
     class UnknownSender < ReplyFrom; end
+
     class ReplyToLockedTopic < ReplyFrom; end
+
     class ReplyToDeletedDiscussion < ReplyFrom; end
+
     class InvalidParticipant < ReplyFrom; end
+
     class BlankMessage < ReplyFrom; end
+
     class MessageTooLong < ReplyFrom; end
   end
 end

@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import ReactDOM from 'react-dom'
 import I18n from 'i18n!dashboard'
 import axios from '@canvas/axios'
 import classnames from 'classnames'
@@ -34,6 +35,7 @@ import loadCardDashboard from '@canvas/dashboard-card'
 import $ from 'jquery'
 import {asText, getPrefetchedXHR} from '@instructure/js-utils'
 import '@canvas/jquery/jquery.disableWhileLoading'
+import {CreateCourseModal} from '@canvas/create-course-modal/react/CreateCourseModal'
 
 const [show, hide] = ['block', 'none'].map(displayVal => id => {
   const el = document.getElementById(id)
@@ -265,6 +267,35 @@ function showTodoList() {
           // render the canvas-planner ToDo list into it
           const container = document.querySelector('.Sidebar__TodoListContainer')
           if (container) renderToDoSidebar(container)
+
+          const startButton = document.getElementById('start_new_course')
+          const modalContainer = document.getElementById('create_course_modal_container')
+          let role
+          if (ENV.current_user_roles.includes('admin')) {
+            role = 'admin'
+          } else if (ENV.current_user_roles.includes('teacher')) {
+            role = 'teacher'
+          }
+          if (
+            startButton &&
+            modalContainer &&
+            role &&
+            ENV.FEATURES?.create_course_subaccount_picker
+          ) {
+            startButton.addEventListener('click', () => {
+              ReactDOM.render(
+                <CreateCourseModal
+                  isModalOpen
+                  setModalOpen={isOpen => {
+                    if (!isOpen) ReactDOM.unmountComponentAtNode(modalContainer)
+                  }}
+                  permissions={role}
+                  isK5User={false} // can't be k5 user if classic dashboard is showing
+                />,
+                modalContainer
+              )
+            })
+          }
         }
       )
     )

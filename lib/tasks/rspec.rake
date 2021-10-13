@@ -17,13 +17,13 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
               require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
 
               # ... otherwise, do this:
-              raise <<-MSG
+              raise <<~MSG
 
-#{"*" * 80}
-*  You are trying to run an rspec rake task defined in
-*  #{__FILE__},
-*  but rspec can not be found in vendor/gems or system gems.
-#{"*" * 80}
+                #{"*" * 80}
+                *  You are trying to run an rspec rake task defined in
+                *  #{__FILE__},
+                *  but rspec can not be found in vendor/gems or system gems.
+                #{"*" * 80}
               MSG
             end
           end
@@ -50,8 +50,9 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
     spec_files = FileList['{gems,vendor}/plugins/*/spec_canvas/**/*_spec.rb'].exclude(%r'spec_canvas/selenium') + FileList['spec/**/*_spec.rb'].exclude(%r'spec/selenium')
     Gem.loaded_specs.values.each do |spec|
       path = spec.full_gem_path
-      spec_canvas_path = File.expand_path(path+"/spec_canvas")
+      spec_canvas_path = File.expand_path(path + "/spec_canvas")
       next unless File.directory?(spec_canvas_path)
+
       spec_files << spec_canvas_path
     end
     if ENV['IN_MEMORY_DB']
@@ -89,7 +90,7 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
       t.send(spec_files_attr, ParallelExclude::AVAILABLE_FILES)
     end
 
-    klass.new(:selenium_non_parallel, :test_files) do |t,test_files|
+    klass.new(:selenium_non_parallel, :test_files) do |t, test_files|
       t.rspec_opts = ["--format", "doc", "--tag non_parallel"]
       t.send(spec_files_attr, test_files)
     end
@@ -184,7 +185,7 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
         else
           $stderr.puts "Shutting down spec_server ..."
           system("kill", "-s", "TERM", File.read(daemonized_server_pid).strip) &&
-              File.delete(daemonized_server_pid)
+            File.delete(daemonized_server_pid)
         end
       end
 

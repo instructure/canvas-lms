@@ -22,7 +22,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   TABLED_CONTENT_TYPES = ['Attachment', 'Assignment', 'WikiPage', 'Quizzes::Quiz', 'LearningOutcome', 'DiscussionTopic',
-    'Rubric', 'ContextExternalTool', 'LearningOutcomeGroup', 'AssessmentQuestionBank', 'LiveAssessments::Assessment', 'Lti::MessageHandler'].freeze
+                          'Rubric', 'ContextExternalTool', 'LearningOutcomeGroup', 'AssessmentQuestionBank', 'LiveAssessments::Assessment', 'Lti::MessageHandler'].freeze
   TABLELESS_CONTENT_TYPES = ['ContextModuleSubHeader', 'ExternalUrl'].freeze
   CONTENT_TYPES = (TABLED_CONTENT_TYPES + TABLELESS_CONTENT_TYPES).freeze
 
@@ -38,7 +38,7 @@ class ContentTag < ActiveRecord::Base
       [:course, :learning_outcome_group, :assignment, :account,
        { quiz: 'Quizzes::Quiz' }]
   belongs_to :associated_asset, polymorphic: [:learning_outcome_group, lti_resource_link: 'Lti::ResourceLink'],
-             polymorphic_prefix: true
+                                polymorphic_prefix: true
   belongs_to :context_module
   belongs_to :learning_outcome
   # This allows doing a has_many_through relationship on ContentTags for linked LearningOutcomes. (see LearningOutcomeContext)
@@ -74,7 +74,7 @@ class ContentTag < ActiveRecord::Base
   acts_as_list :scope => :context_module
 
   set_policy do
-    given {|user, session| self.context && self.context.grants_right?(user, session, :manage_content)}
+    given { |user, session| self.context && self.context.grants_right?(user, session, :manage_content) }
     can :delete
   end
 
@@ -94,8 +94,10 @@ class ContentTag < ActiveRecord::Base
   scope :not_deleted, -> { where("content_tags.workflow_state<>'deleted'") }
 
   attr_accessor :skip_touch
+
   def touch_context_module
     return true if skip_touch.present? || self.context_module_id.nil?
+
     ContentTag.touch_context_modules([self.context_module_id])
   end
 
@@ -106,7 +108,7 @@ class ContentTag < ActiveRecord::Base
   end
   private :touch_context_module_after_transaction
 
-  def self.touch_context_modules(ids=[])
+  def self.touch_context_modules(ids = [])
     if ids.length == 1
       ContextModule.where(id: ids).not_recently_touched.update_all(updated_at: Time.now.utc)
     elsif ids.empty?
@@ -125,6 +127,7 @@ class ContentTag < ActiveRecord::Base
 
   def update_outcome_contexts
     return unless self.tag_type == 'learning_outcome_association'
+
     if self.context_type == 'Account' || self.context_type == 'Course'
       self.content.add_root_account_id_for_context!(self.context)
     end
@@ -132,6 +135,7 @@ class ContentTag < ActiveRecord::Base
 
   def associate_external_tool
     return if content.present? || content_type != 'ContextExternalTool' || context.blank? || url.blank?
+
     content = ContextExternalTool.find_external_tool(url, context)
     self.content = content if content
   end
@@ -160,7 +164,7 @@ class ContentTag < ActiveRecord::Base
     true
   end
 
-  def self.update_could_be_locked(tags=[])
+  def self.update_could_be_locked(tags = [])
     content_ids = {}
     tags.each do |t|
       (content_ids[t.content_type] ||= []) << t.content_id if t.content_type && t.content_id
@@ -169,6 +173,7 @@ class ContentTag < ActiveRecord::Base
       klass = type.constantize
       next unless klass < ActiveRecord::Base
       next if klass < Tableless
+
       if klass.new.respond_to?(:could_be_locked=)
         klass.where(id: ids).update_all_locked_in_order(could_be_locked: true)
       end
@@ -214,7 +219,7 @@ class ContentTag < ActiveRecord::Base
     direct_share_type.pluralize
   end
 
-  def content_type_class(is_student=false)
+  def content_type_class(is_student = false)
     if self.content_type == 'Assignment'
       if self.content && self.content.submission_types == 'online_quiz'
         is_student ? 'lti-quiz' : 'quiz'
@@ -300,7 +305,7 @@ class ContentTag < ActiveRecord::Base
     self.content && self.content.respond_to?(:context) && self.content.context == context
   end
 
-  def update_asset_name!(user=nil)
+  def update_asset_name!(user = nil)
     return unless self.sync_title_to_asset_title?
     return unless self.asset_context_matches?
 
@@ -334,8 +339,8 @@ class ContentTag < ActiveRecord::Base
   end
 
   def self.delete_for(asset)
-    ContentTag.where(content_id: asset, content_type: asset.class.to_s).each{|t| t.destroy }
-    ContentTag.where(context_id: asset, context_type: asset.class.to_s).each{|t| t.destroy }
+    ContentTag.where(content_id: asset, content_type: asset.class.to_s).each { |t| t.destroy }
+    ContentTag.where(context_id: asset, context_type: asset.class.to_s).each { |t| t.destroy }
   end
 
   def can_destroy?
@@ -343,9 +348,9 @@ class ContentTag < ActiveRecord::Base
     if self.tag_type == 'learning_outcome_association'
       # and there are no other links to the same outcome in the same context...
       outcome = self.content
-      other_link = ContentTag.learning_outcome_links.active.
-        where(:context_type => self.context_type, :context_id => self.context_id, :content_id => outcome).
-        where("id<>?", self).first
+      other_link = ContentTag.learning_outcome_links.active
+                             .where(:context_type => self.context_type, :context_id => self.context_id, :content_id => outcome)
+                             .where("id<>?", self).first
       if !other_link
         # and there are alignments to the outcome (in the link's context for
         # foreign links, in any context for native links)
@@ -393,13 +398,14 @@ class ContentTag < ActiveRecord::Base
     true
   end
 
-  def locked_for?(user, opts={})
+  def locked_for?(user, opts = {})
     return unless self.context_module && !self.context_module.deleted?
-    self.context_module.locked_for?(user, opts.merge({:tag => self}))
+
+    self.context_module.locked_for?(user, opts.merge({ :tag => self }))
   end
 
-  def available_for?(user, opts={})
-    self.context_module.available_for?(user, opts.merge({:tag => self}))
+  def available_for?(user, opts = {})
+    self.context_module.available_for?(user, opts.merge({ :tag => self }))
   end
 
   def send_items_to_stream
@@ -411,9 +417,9 @@ class ContentTag < ActiveRecord::Base
   def clear_discussion_stream_items
     if self.content_type == "DiscussionTopic"
       if self.saved_change_to_workflow_state? &&
-        ['active', nil].include?(self.workflow_state_before_last_save) &&
-        self.workflow_state == 'unpublished'
-          content.clear_stream_items
+         ['active', nil].include?(self.workflow_state_before_last_save) &&
+         self.workflow_state == 'unpublished'
+        content.clear_stream_items
       end
     end
   end
@@ -429,19 +435,20 @@ class ContentTag < ActiveRecord::Base
     tags = tags.where('content_tags.id<>?', exclude_tag.id) if exclude_tag
     tags = tags.select([:id, :tag_type, :content_type, :context_module_id]).to_a
     return if tags.empty?
+
     module_ids = tags.map(&:context_module_id).compact
 
     # update title
-    tag_ids = tags.select{|t| t.sync_title_to_asset_title? }.map(&:id)
-    attr_hash = {:updated_at => Time.now.utc}
-    {:display_name => :title, :name => :title, :title => :title}.each do |attr, val|
+    tag_ids = tags.select { |t| t.sync_title_to_asset_title? }.map(&:id)
+    attr_hash = { :updated_at => Time.now.utc }
+    { :display_name => :title, :name => :title, :title => :title }.each do |attr, val|
       attr_hash[val] = asset.send(attr) if asset.respond_to?(attr)
     end
     ContentTag.where(:id => tag_ids).update_all(attr_hash) unless tag_ids.empty?
 
     # update workflow_state
-    tag_ids = tags.select{|t| t.sync_workflow_state_to_asset? }.map(&:id)
-    attr_hash = {:updated_at => Time.now.utc}
+    tag_ids = tags.select { |t| t.sync_workflow_state_to_asset? }.map(&:id)
+    attr_hash = { :updated_at => Time.now.utc }
 
     workflow_state = asset_workflow_state(asset)
     attr_hash[:workflow_state] = workflow_state if workflow_state
@@ -467,7 +474,7 @@ class ContentTag < ActiveRecord::Base
     'DiscussionTopic' == self.content_type
   end
 
-  def context_module_action(user, action, points=nil)
+  def context_module_action(user, action, points = nil)
     GuardRail.activate(:primary) do
       self.context_module.update_for(user, action, self, points) if self.context_module
     end
@@ -520,10 +527,10 @@ class ContentTag < ActiveRecord::Base
   # Scopes For Differentiated Assignment Filtering:
 
   scope :visible_to_students_in_course_with_da, lambda { |user_ids, course_ids|
-    differentiable_classes = ['Assignment','DiscussionTopic', 'Quiz','Quizzes::Quiz', 'WikiPage']
+    differentiable_classes = ['Assignment', 'DiscussionTopic', 'Quiz', 'Quizzes::Quiz', 'WikiPage']
     scope = for_non_differentiable_classes(course_ids, differentiable_classes)
 
-    cyoe_courses, non_cyoe_courses = Course.where(id: course_ids).partition{|course| ConditionalRelease::Service.enabled_in_context?(course)}
+    cyoe_courses, non_cyoe_courses = Course.where(id: course_ids).partition { |course| ConditionalRelease::Service.enabled_in_context?(course) }
     if non_cyoe_courses.any?
       scope = scope.union(where(context_id: non_cyoe_courses, context_type: 'Course', content_type: 'WikiPage'))
     end
@@ -534,79 +541,79 @@ class ContentTag < ActiveRecord::Base
       )
     end
     scope.union(
-      for_non_differentiable_discussions(course_ids).
-        merge(DiscussionTopic.visible_to_student_sections(user_ids)),
+      for_non_differentiable_discussions(course_ids)
+        .merge(DiscussionTopic.visible_to_student_sections(user_ids)),
       for_differentiable_assignments(user_ids, course_ids),
-      for_differentiable_discussions(user_ids, course_ids).
-        merge(DiscussionTopic.visible_to_student_sections(user_ids)),
+      for_differentiable_discussions(user_ids, course_ids)
+        .merge(DiscussionTopic.visible_to_student_sections(user_ids)),
       for_differentiable_quizzes(user_ids, course_ids)
     )
   }
 
-  scope :for_non_differentiable_classes, lambda {|course_ids, differentiable_classes|
+  scope :for_non_differentiable_classes, lambda { |course_ids, differentiable_classes|
     where(context_id: course_ids, context_type: 'Course').where.not(content_type: differentiable_classes)
   }
 
-  scope :for_non_differentiable_discussions, lambda {|course_ids|
-    joins("JOIN #{DiscussionTopic.quoted_table_name} as discussion_topics ON discussion_topics.id = content_tags.content_id").
-      where("content_tags.context_id IN (?)
+  scope :for_non_differentiable_discussions, lambda { |course_ids|
+    joins("JOIN #{DiscussionTopic.quoted_table_name} as discussion_topics ON discussion_topics.id = content_tags.content_id")
+      .where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND content_tags.content_type = 'DiscussionTopic'
              AND discussion_topics.assignment_id IS NULL", course_ids)
   }
 
-  scope :for_non_differentiable_wiki_pages, lambda {|course_ids|
-    joins("JOIN #{WikiPage.quoted_table_name} as wp ON wp.id = content_tags.content_id").
-      where("content_tags.context_id IN (?)
+  scope :for_non_differentiable_wiki_pages, lambda { |course_ids|
+    joins("JOIN #{WikiPage.quoted_table_name} as wp ON wp.id = content_tags.content_id")
+      .where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND content_tags.content_type = 'WikiPage'
              AND wp.assignment_id IS NULL", course_ids)
   }
 
-  scope :for_differentiable_quizzes, lambda {|user_ids, course_ids|
-    joins("JOIN #{Quizzes::QuizStudentVisibility.quoted_table_name} as qsv ON qsv.quiz_id = content_tags.content_id").
-      where("content_tags.context_id IN (?)
+  scope :for_differentiable_quizzes, lambda { |user_ids, course_ids|
+    joins("JOIN #{Quizzes::QuizStudentVisibility.quoted_table_name} as qsv ON qsv.quiz_id = content_tags.content_id")
+      .where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND qsv.course_id IN (?)
              AND content_tags.content_type in ('Quiz', 'Quizzes::Quiz')
              AND qsv.user_id = ANY( '{?}'::INT8[] )
-        ",course_ids,course_ids,user_ids)
+        ", course_ids, course_ids, user_ids)
   }
 
-  scope :for_differentiable_assignments, lambda {|user_ids, course_ids|
-    joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv ON asv.assignment_id = content_tags.content_id").
-      where("content_tags.context_id IN (?)
+  scope :for_differentiable_assignments, lambda { |user_ids, course_ids|
+    joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv ON asv.assignment_id = content_tags.content_id")
+      .where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND asv.course_id IN (?)
              AND content_tags.content_type = 'Assignment'
              AND asv.user_id = ANY( '{?}'::INT8[] )
-        ",course_ids,course_ids,user_ids)
+        ", course_ids, course_ids, user_ids)
   }
 
-  scope :for_differentiable_discussions, lambda {|user_ids, course_ids|
+  scope :for_differentiable_discussions, lambda { |user_ids, course_ids|
     joins("JOIN #{DiscussionTopic.quoted_table_name} ON discussion_topics.id = content_tags.content_id
-           AND content_tags.content_type = 'DiscussionTopic'").
-      joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv ON asv.assignment_id = discussion_topics.assignment_id").
-      where("content_tags.context_id IN (?)
+           AND content_tags.content_type = 'DiscussionTopic'")
+      .joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv ON asv.assignment_id = discussion_topics.assignment_id")
+      .where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND asv.course_id IN (?)
              AND content_tags.content_type = 'DiscussionTopic'
              AND discussion_topics.assignment_id IS NOT NULL
              AND asv.user_id = ANY( '{?}'::INT8[] )
-      ",course_ids,course_ids,user_ids)
+      ", course_ids, course_ids, user_ids)
   }
 
-  scope :for_differentiable_wiki_pages, lambda{|user_ids, course_ids|
+  scope :for_differentiable_wiki_pages, lambda { |user_ids, course_ids|
     joins("JOIN #{WikiPage.quoted_table_name} as wp on wp.id = content_tags.content_id
-           AND content_tags.content_type = 'WikiPage'").
-      joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv on asv.assignment_id = wp.assignment_id").
-      where("content_tags.context_id IN (?)
+           AND content_tags.content_type = 'WikiPage'")
+      .joins("JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv on asv.assignment_id = wp.assignment_id")
+      .where("content_tags.context_id IN (?)
              AND content_tags.context_type = 'Course'
              AND asv.course_id in (?)
              AND content_tags.content_type = 'WikiPage'
              AND wp.assignment_id IS NOT NULL
              AND asv.user_id = ANY( '{?}'::INT8[] )
-      ",course_ids,course_ids,user_ids)
+      ", course_ids, course_ids, user_ids)
   }
 
   # only intended for learning outcome links
@@ -618,7 +625,7 @@ class ContentTag < ActiveRecord::Base
     eager_load(:learning_outcome_content).order(outcome_title_order_by_clause)
   end
 
-  def visible_to_user?(user, opts=nil, session=nil)
+  def visible_to_user?(user, opts = nil, session = nil)
     return unless self.context_module
 
     opts ||= self.context_module.visibility_for_user(user, session)
@@ -642,8 +649,8 @@ class ContentTag < ActiveRecord::Base
 
   def check_for_restricted_content_changes
     if !self.new_record? && self.title_changed? && !@importing_migration && self.content && self.content.respond_to?(:is_child_content?) &&
-      self.content.is_child_content? && self.content.editing_restricted?(:content)
-        self.errors.add(:title, "cannot change title - associated content locked by Master Course")
+       self.content.is_child_content? && self.content.editing_restricted?(:content)
+      self.errors.add(:title, "cannot change title - associated content locked by Master Course")
     end
   end
 
@@ -651,6 +658,7 @@ class ContentTag < ActiveRecord::Base
     # Quizzes next should ideally only ever be attached to an
     # assignment.  Let's ignore any other contexts.
     return unless context_type == "Assignment"
+
     DueDateCacher.recompute(context) if content.try(:quiz_lti?) && (force || workflow_state != 'deleted')
   end
 
@@ -669,12 +677,12 @@ class ContentTag < ActiveRecord::Base
     @quiz_lti ||= has_attribute?(:content_type) && content_type == 'Assignment' ? content&.quiz_lti? : false
   end
 
-  def to_json(options={})
-    super({:methods => :quiz_lti}.merge(options))
+  def to_json(options = {})
+    super({ :methods => :quiz_lti }.merge(options))
   end
 
-  def as_json(options={})
-    super({:methods => :quiz_lti}.merge(options))
+  def as_json(options = {})
+    super({ :methods => :quiz_lti }.merge(options))
   end
 
   def clear_total_outcomes_cache

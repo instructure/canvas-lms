@@ -39,8 +39,8 @@ describe Types::GroupType do
   it "works" do
     expect(group_type.resolve("_id")).to eq @group.id.to_s
     expect(group_type.resolve("name")).to eq @group.name
-    expect(group_type.resolve("membersConnection { edges { node { _id } } }")).
-      to eq @group.group_memberships.map(&:to_param)
+    expect(group_type.resolve("membersConnection { edges { node { _id } } }"))
+      .to eq @group.group_memberships.map(&:to_param)
   end
 
   it "requires read permission" do
@@ -84,8 +84,8 @@ describe Types::GroupType do
   end
 
   context "sis field" do
-    let(:manage_admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false })}
-    let(:read_admin) { account_admin_user_with_role_changes(role_changes: { manage_sis: false })}
+    let(:manage_admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
+    let(:read_admin) { account_admin_user_with_role_changes(role_changes: { manage_sis: false }) }
 
     it "returns sis_id if you have read_sis permissions" do
       tester = GraphQLTypeTester.new(@group, current_user: read_admin)

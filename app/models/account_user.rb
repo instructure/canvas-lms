@@ -62,6 +62,7 @@ class AccountUser < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     return if self.new_record?
+
     self.workflow_state = 'deleted'
     self.save!
   end
@@ -71,6 +72,7 @@ class AccountUser < ActiveRecord::Base
     if (self.saved_change_to_account_id? || self.saved_change_to_user_id?) || being_deleted
       if self.new_record?
         return if %w{creation_pending deleted}.include?(self.user.workflow_state)
+
         account_chain = self.account.account_chain
         associations = {}
         account_chain.each_with_index { |account, idx| associations[account.id] = idx }
@@ -103,16 +105,16 @@ class AccountUser < ActiveRecord::Base
 
   set_broadcast_policy do |p|
     p.dispatch :new_account_user
-    p.to {|record| record.account.users}
-    p.whenever {|record| record.just_created }
+    p.to { |record| record.account.users }
+    p.whenever { |record| record.just_created }
 
     p.dispatch :account_user_registration
-    p.to {|record| record.user }
-    p.whenever {|record| @account_user_registration }
+    p.to { |record| record.user }
+    p.whenever { |record| @account_user_registration }
 
     p.dispatch :account_user_notification
-    p.to {|record| record.user }
-    p.whenever {|record| @account_user_notification }
+    p.to { |record| record.user }
+    p.whenever { |record| @account_user_notification }
   end
 
   set_policy do
@@ -132,7 +134,7 @@ class AccountUser < ActiveRecord::Base
       # Create and destory are granted by the same conditions, no reason to do two
       # grants_right? checks here.
       permission = account_user.grants_right?(current_user, session, :destroy)
-      hash[[account_id, role_id]] = {create: permission, destroy: permission}
+      hash[[account_id, role_id]] = { create: permission, destroy: permission }
       hash
     end
   end
@@ -182,8 +184,10 @@ class AccountUser < ActiveRecord::Base
     target_permissions = AccountUser.all_permissions_for(user, account)
     needed_permissions.all? do |(permission, needed_permission)|
       next true unless needed_permission.present?
+
       target_permission = target_permissions[permission]
       next false unless target_permission.present?
+
       (needed_permission - target_permission).empty?
     end
   end

@@ -20,7 +20,6 @@
 require 'spec_helper'
 
 describe Lti::TokenController do
-
   let_once(:developer_key) do
     key = DeveloperKey.create!(
       account: root_account,
@@ -44,7 +43,7 @@ describe Lti::TokenController do
   end
   let(:root_account) { Account.create!(name: 'root account') }
   let(:parsed_body) { JSON.parse(response.body) }
-  let(:decoded_jwt) {JSON::JWT.decode parsed_body['access_token'], :skip_verification }
+  let(:decoded_jwt) { JSON::JWT.decode parsed_body['access_token'], :skip_verification }
   let(:params) { {} }
 
   def send_request
@@ -63,7 +62,7 @@ describe Lti::TokenController do
     before :each do
       user_session(account_admin_user(account: root_account))
     end
-    
+
     it 'returns unauthorized' do
       send_request
 
@@ -81,7 +80,7 @@ describe Lti::TokenController do
     shared_examples_for 'a normal LTI access token' do
       it 'uses all LTI scopes' do
         send_request
-  
+
         expect(decoded_jwt[:scopes]).to eq TokenScopes::LTI_SCOPES.keys.join(' ')
         expect(parsed_body['scope']).to eq TokenScopes::LTI_SCOPES.keys.join(' ')
       end
@@ -112,11 +111,11 @@ describe Lti::TokenController do
     end
 
     context 'when client_id is provided' do
-      let(:params) { {client_id: developer_key.global_id} }
+      let(:params) { { client_id: developer_key.global_id } }
 
       it 'uses client_id as sub claim' do
         send_request
-  
+
         expect(decoded_jwt[:sub]).to eq developer_key.global_id
       end
 
@@ -124,7 +123,7 @@ describe Lti::TokenController do
     end
 
     context 'when tool_id is provided' do
-      let(:params) { {tool_id: tool.global_id} }
+      let(:params) { { tool_id: tool.global_id } }
 
       it "uses tool's developer key id as sub claim" do
         send_request
@@ -141,7 +140,7 @@ describe Lti::TokenController do
         enable_developer_key_account_binding!(key)
         key
       end
-      let(:params) { {client_id: other_key.global_id} }
+      let(:params) { { client_id: other_key.global_id } }
 
       it 'returns 400' do
         send_request
@@ -168,7 +167,7 @@ describe Lti::TokenController do
           workflow_state: 'public'
         )
       end
-      let(:params) { {tool_id: other_tool.global_id} }
+      let(:params) { { tool_id: other_tool.global_id } }
 
       it 'returns 400' do
         send_request

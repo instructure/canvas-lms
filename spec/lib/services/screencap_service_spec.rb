@@ -44,9 +44,9 @@ module Services
 
     context ".snapshot_url_to_file" do
       it 'calls the provided url' do
-        @stub = stub_request(:get, config[:url]).
-          with(query: { url: 'https://www.example.com' }).
-          to_return(status: 200, body: "IMAGE_GOES_HERE")
+        @stub = stub_request(:get, config[:url])
+                .with(query: { url: 'https://www.example.com' })
+                .to_return(status: 200, body: "IMAGE_GOES_HERE")
 
         Tempfile.create('example.png') do |f|
           result = subject.snapshot_url_to_file("https://www.example.com", f)
@@ -56,9 +56,9 @@ module Services
       end
 
       it 'returns false if it gets a non-200' do
-        @stub = stub_request(:get, config[:url]).
-          with(query: { url: 'https://www.example.com' }).
-          to_return(status: 500, body: "IMAGE_GOES_HERE")
+        @stub = stub_request(:get, config[:url])
+                .with(query: { url: 'https://www.example.com' })
+                .to_return(status: 500, body: "IMAGE_GOES_HERE")
 
         Tempfile.create('example.png') do |f|
           result = subject.snapshot_url_to_file("https://www.example.com", f)

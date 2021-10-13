@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>
 
 module CustomSeleniumActions
-
   def skip_if_ie(additional_error_text)
     skip("skipping test, fails in IE : #{additional_error_text}") if driver.browser == :internet_explorer
   end
@@ -33,6 +32,7 @@ module CustomSeleniumActions
 
   def skip_if_safari(additional_error_text)
     return unless driver.browser == :safari
+
     case additional_error_text
     when :alert
       additional_error_text = "SafariDriver doesn't support alerts"
@@ -176,7 +176,7 @@ module CustomSeleniumActions
   # Find the parent of an element via xpath
   def parent_fxpath(element)
     stale_element_protection do
-      element.find_element(:xpath,"..")
+      element.find_element(:xpath, "..")
     end
   rescue Selenium::WebDriver::Error::NoSuchElementError
     raise "Parent node for given element was not found"
@@ -194,7 +194,7 @@ module CustomSeleniumActions
   # Find the grandparent of an element via xpath
   def grandparent_fxpath(element)
     stale_element_protection do
-      element.find_element(:xpath,"../..")
+      element.find_element(:xpath, "../..")
     end
   rescue Selenium::WebDriver::Error::NoSuchElementError
     raise "Grandparent node for given element was not found, please check if parent nodes are present"
@@ -250,7 +250,7 @@ module CustomSeleniumActions
     driver.execute_script("return $(#{selector.inspect}).val()")
   end
 
-  def get_options(selector, scope=nil)
+  def get_options(selector, scope = nil)
     Selenium::WebDriver::Support::Select.new(f(selector, scope)).options
   end
 
@@ -344,7 +344,7 @@ module CustomSeleniumActions
     force_click('[data-btn-id="rce-edit-btn"]')
   end
 
-  def clear_tiny(tiny_controlling_element, iframe_id=nil)
+  def clear_tiny(tiny_controlling_element, iframe_id = nil)
     if iframe_id
       in_frame iframe_id do
         tinymce_element = f("body")
@@ -425,17 +425,17 @@ module CustomSeleniumActions
 
   def set_value(input, value)
     case input.tag_name
-      when 'select'
-        input.find_element(:css, "option[value='#{value}']").click
-      when 'input'
-        case input.attribute(:type)
-          when 'checkbox'
-            input.click if (!input.selected? && value) || (input.selected? && !value)
-          else
-            replace_content(input, value)
-        end
+    when 'select'
+      input.find_element(:css, "option[value='#{value}']").click
+    when 'input'
+      case input.attribute(:type)
+      when 'checkbox'
+        input.click if (!input.selected? && value) || (input.selected? && !value)
       else
         replace_content(input, value)
+      end
+    else
+      replace_content(input, value)
     end
   end
 
@@ -525,6 +525,7 @@ module CustomSeleniumActions
       count = 0
       until el['value'] == value.to_s
         break if count > 1
+
         count += 1
         driver.execute_script("arguments[0].select();", el)
         el.send_keys(*keys)

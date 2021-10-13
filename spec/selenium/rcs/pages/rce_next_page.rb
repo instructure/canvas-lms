@@ -1077,6 +1077,7 @@ module RCENextPage
   def click_edit_equation
     edit_equation_button.click
   end
+
   def select_text_of_element_by_id(id)
     script = <<-JS
     const id = arguments[0]
@@ -1127,7 +1128,7 @@ module RCENextPage
     @root_folder = Folder.root_folders(@course).first
     @text_file =
       @root_folder
-        .attachments
-        .create!(filename: title, context: @course) { |a| a.content_type = 'text/plain' }
+      .attachments
+      .create!(filename: title, context: @course) { |a| a.content_type = 'text/plain' }
   end
 end

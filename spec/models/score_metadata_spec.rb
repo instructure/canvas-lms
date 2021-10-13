@@ -33,7 +33,7 @@ describe ScoreMetadata do
     let(:student) { student_in_course(course: course) }
     let(:score) { student.scores.create! }
     let(:calculation_details) do
-      {"current"=>{"dropped"=>[]}, "final"=>{"dropped"=>[]}}
+      { "current" => { "dropped" => [] }, "final" => { "dropped" => [] } }
     end
   end
 end

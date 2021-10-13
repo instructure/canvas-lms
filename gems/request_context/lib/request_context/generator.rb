@@ -59,8 +59,8 @@ module RequestContext
       session_id = ActionDispatch::Request.new(env).cookie_jar[:log_session_id]
       meta_headers = +""
       Thread.current[:context] = {
-        request_id:   request_id,
-        session_id:   session_id,
+        request_id: request_id,
+        session_id: session_id,
         meta_headers: meta_headers,
       }
 
@@ -77,7 +77,7 @@ module RequestContext
       headers['X-Request-Context-Id'] = request_id
       headers['X-Canvas-Meta'] = meta_headers if meta_headers.present?
 
-      [ status, headers, body ]
+      [status, headers, body]
     end
 
     def self.request_id
@@ -86,8 +86,10 @@ module RequestContext
 
     def self.add_meta_header(name, value)
       return if value.blank?
+
       meta_headers = Thread.current[:context].try(:[], :meta_headers)
       return if !meta_headers
+
       meta_headers << "#{name}=#{value};"
     end
 
@@ -151,12 +153,14 @@ module RequestContext
       end
 
       private
+
       def unsigned_context_allowed_paths
         @unsigned_context_allowlist ||= Set.new
       end
     end
 
     private
+
     def generate_request_id(env)
       if env['HTTP_X_REQUEST_CONTEXT_ID']
         request_context_id = CanvasSecurity.base64_decode(env['HTTP_X_REQUEST_CONTEXT_ID'])

@@ -53,9 +53,7 @@ const updatePacePlan = async (
     !persisted || shouldBlock || (plan.hard_end_dates && plan.context_type === 'Enrollment')
 
   return method(plan, extraSaveParams) // Hit the API to update
-    .then(response => {
-      const updatedPlan: PacePlan = response.data
-
+    .then(updatedPlan => {
       if (updateAfterRequest) {
         dispatch(pacePlanActions.planCreated(updatedPlan))
       }

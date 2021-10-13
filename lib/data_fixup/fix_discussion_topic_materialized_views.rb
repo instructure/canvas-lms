@@ -38,9 +38,10 @@ module DataFixup
                , matview.c as mat
             from matview,entries
            where matview.discussion_topic_id=entries.discussion_topic_id
-             and matview.c != entries.c;")
+             and matview.c != entries.c;"
+        )
 
-         topic_ids = result.map{|d| d['topic']}
+        topic_ids = result.map { |d| d['topic'] }
       end
 
       GuardRail.activate(:primary) do

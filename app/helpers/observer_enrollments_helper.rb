@@ -36,13 +36,13 @@ module ObserverEnrollmentsHelper
         has_own_enrollments = scope.not_of_observer_type.exists?
         users = User.where(
           id: scope.of_observer_type.where("associated_user_id IS NOT NULL").limit(MAX_OBSERVED_USERS).pluck(:associated_user_id)
-        ).order_by_sortable_name.to_a
+        ).sort_by { |u| Canvas::ICU.collation_key(u.sortable_name) }.to_a
         users.prepend(user) if has_own_enrollments
         users
       end
     end
 
     @selected_observed_user = users.detect { |u| u.id.to_s == cookies[SELECTED_OBSERVED_USER_COOKIE] } || users.first
-    users.map{ |u| user_json(u, @current_user, session, ['avatar_url'], @context, nil, ['pseudonym']) }
+    users.map { |u| user_json(u, @current_user, session, ['avatar_url'], @context, nil, ['pseudonym']) }
   end
 end

@@ -52,11 +52,11 @@ module Api::V1::Quiz
       disable_timer_autosubmission
       title
       unlock_at
-    ) + [{'hide_results' => ArbitraryStrongishParams::ANYTHING}] # because sometimes this is a hash :/
-    ).freeze
+    ) + [{ 'hide_results' => ArbitraryStrongishParams::ANYTHING }] # because sometimes this is a hash :/
+             ).freeze
   }.freeze
 
-  def quizzes_json(quizzes, context, user, session, options={})
+  def quizzes_json(quizzes, context, user, session, options = {})
     # bulk preload all description attachments to prevent N+1 query
     preloaded_attachments = api_bulk_load_user_content_attachments(quizzes.map(&:description), context)
     options[:description_formatter] = description_formatter(context, user, preloaded_attachments)
@@ -69,16 +69,16 @@ module Api::V1::Quiz
     end
   end
 
-  def quiz_json(quiz, context, user, session, options={}, serializer = nil)
+  def quiz_json(quiz, context, user, session, options = {}, serializer = nil)
     options.merge!(description_formatter: description_formatter(context, user)) unless options[:description_formatter]
     if accepts_jsonapi?
       Canvas::APIArraySerializer.new([quiz],
-                         scope: user,
-                         session: session,
-                         root: :quizzes,
-                         each_serializer: Quizzes::QuizApiSerializer,
-                         controller: self,
-                         serializer_options: options).as_json
+                                     scope: user,
+                                     session: session,
+                                     root: :quizzes,
+                                     each_serializer: Quizzes::QuizApiSerializer,
+                                     controller: self,
+                                     serializer_options: options).as_json
     else
       (serializer || Quizzes::QuizSerializer).new(quiz,
                                                   scope: user,
@@ -105,13 +105,13 @@ module Api::V1::Quiz
     meta[:primaryCollection] = 'quizzes'
     add_meta_permissions!(meta)
     Canvas::APIArraySerializer.new(@quizzes,
-                          scope: @current_user,
-                          controller: self,
-                          root: :quizzes,
-                          self_quiz_submissions: @quiz_submissions,
-                          meta: meta,
-                          each_serializer: Quizzes::QuizSerializer,
-                          include_root: false).as_json
+                                   scope: @current_user,
+                                   controller: self,
+                                   root: :quizzes,
+                                   self_quiz_submissions: @quiz_submissions,
+                                   meta: meta,
+                                   each_serializer: Quizzes::QuizSerializer,
+                                   include_root: false).as_json
   end
 
   def add_meta_permissions!(meta)
@@ -128,6 +128,7 @@ module Api::V1::Quiz
   def update_api_quiz(quiz, params, save = true)
     quiz_params = accepts_jsonapi? ? Array(params[:quizzes]).first : params[:quiz]
     return nil unless quiz.is_a?(Quizzes::Quiz) && quiz_params.is_a?(ActionController::Parameters)
+
     update_params = filter_params(quiz_params)
 
     if update_params.key?('description')
@@ -175,7 +176,7 @@ module Api::V1::Quiz
 
       # The following fields are valid only if `show_correct_answers` is true:
       if show_correct_answers == false
-        %w[ show_correct_answers_at hide_correct_answers_at ].each do |key|
+        %w[show_correct_answers_at hide_correct_answers_at].each do |key|
           update_params.delete(key) if update_params.has_key?(key)
         end
       end

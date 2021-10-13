@@ -43,6 +43,7 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
     if input[:media_object_id].present?
       media_objects = MediaObject.by_media_id(input[:media_object_id])
       raise GraphQL::ExecutionError, 'not found' if media_objects.empty?
+
       opts[:media_comment_id] = input[:media_object_id]
 
       if input[:media_object_type].present?
@@ -54,6 +55,7 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
     unless file_ids.empty?
       attachments = Attachment.where(id: file_ids).to_a
       raise GraphQL::ExecutionError, 'not found' unless attachments.length == file_ids.length
+
       attachments.each do |a|
         verify_authorized_action!(a, :attach_to_submission_comment)
         a.ok_for_submission_comment = true
@@ -64,7 +66,7 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
     assignment = submission.assignment
     comment = assignment.add_submission_comment(submission.user, opts).first
     comment.mark_read!(current_user)
-    {submission_comment: comment}
+    { submission_comment: comment }
   rescue ActiveRecord::RecordInvalid => invalid
     errors_for(invalid.record)
   rescue ActiveRecord::RecordNotFound

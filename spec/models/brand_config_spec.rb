@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# coding: utf-8
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -23,18 +22,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20150709205405_create_k12_theme.rb'
 
 describe BrandConfig do
-  it "should create an instance with a parent_md5" do
-    @bc = BrandConfig.create(variables: {"ic-brand-primary" => "#321"}, parent_md5: "123")
+  it "creates an instance with a parent_md5" do
+    @bc = BrandConfig.create(variables: { "ic-brand-primary" => "#321" }, parent_md5: "123")
     expect(@bc.valid?).to be_truthy
   end
 
   def setup_subaccount_with_config
     @parent_account = Account.default
-    @parent_config = BrandConfig.create(variables: {"ic-brand-primary" => "#321"})
+    @parent_config = BrandConfig.create(variables: { "ic-brand-primary" => "#321" })
 
     @subaccount = Account.create!(:parent_account => @parent_account)
     @subaccount_bc = BrandConfig.for(
-      variables: {"ic-brand-global-nav-bgd" => "#123"},
+      variables: { "ic-brand-global-nav-bgd" => "#123" },
       parent_md5: @parent_config.md5,
       js_overrides: nil,
       css_overrides: nil,
@@ -49,7 +48,7 @@ describe BrandConfig do
       setup_subaccount_with_config
     end
 
-    it "should inherit effective_variables from its parent" do
+    it "inherits effective_variables from its parent" do
       expect(@subaccount_bc.variables.keys.include?("ic-brand-global-nav-bgd")).to be_truthy
       expect(@subaccount_bc.variables.keys.include?("ic-brand-primary")).to be_falsey
 
@@ -57,9 +56,9 @@ describe BrandConfig do
       expect(@subaccount_bc.effective_variables["ic-brand-primary"]).to eq "#321"
     end
 
-    it "should overwrite parent variables if explicitly stated" do
+    it "overwrites parent variables if explicitly stated" do
       @new_sub_bc = BrandConfig.for(
-        variables: {"ic-brand-global-nav-bgd" => "#123", "ic-brand-primary" => "red"},
+        variables: { "ic-brand-global-nav-bgd" => "#123", "ic-brand-primary" => "red" },
         parent_md5: @parent_config.md5,
         js_overrides: nil,
         css_overrides: nil,
@@ -78,7 +77,7 @@ describe BrandConfig do
       setup_subaccount_with_config
     end
 
-    it "should properly find ancestors" do
+    it "properly finds ancestors" do
       expect(@subaccount_bc.chain_of_ancestor_configs.include?(@parent_config)).to be_truthy
       expect(@subaccount_bc.chain_of_ancestor_configs.include?(@subaccount_bc)).to be_truthy
       expect(@subaccount_bc.chain_of_ancestor_configs.length).to eq 2
@@ -124,7 +123,7 @@ describe BrandConfig do
     end
 
     it "defines right-looking css in the :root scope" do
-      expect(@subaccount_bc.to_css).to match /:root \{
+      expect(@subaccount_bc.to_css).to match(/:root \{
 [\s|\S]*--ic-brand-primary-darkened-5: #312111;
 --ic-brand-primary-darkened-10: #2E1F10;
 --ic-brand-primary-darkened-15: #2C1D0F;
@@ -137,7 +136,7 @@ describe BrandConfig do
 --ic-brand-button--secondary-bgd-darkened-15: #27333B;
 [\s|\S]*--ic-brand-primary: #321;
 [\s|\S]*--ic-brand-global-nav-bgd: #123;
-/
+/)
     end
   end
 
@@ -176,7 +175,6 @@ describe BrandConfig do
         @subaccount_bc.save_all_files!
         expect(@css_file.string).to eq @subaccount_bc.to_css
       end
-
     end
 
     describe "with cdn enabled" do
@@ -205,16 +203,19 @@ describe BrandConfig do
 
       it 'uploads json, css & js file to s3' do
         @upload_expectation.with(eq(
-          @subaccount_bc.public_json_path).or eq(
-          @subaccount_bc.public_css_path).or eq(
-          @subaccount_bc.public_js_path))
+          @subaccount_bc.public_json_path
+        ).or eq(
+          @subaccount_bc.public_css_path
+        ).or eq(
+          @subaccount_bc.public_js_path
+        ))
         @subaccount_bc.save_all_files!
       end
     end
   end
 
   it "doesn't let you update an existing brand config" do
-    bc = BrandConfig.create(variables: {"ic-brand-primary" => "#321"})
+    bc = BrandConfig.create(variables: { "ic-brand-primary" => "#321" })
     bc.variables = { "ic-brand-primary" => "#123" }
     expect { bc.save! }.to raise_error(/md5 digest/)
   end

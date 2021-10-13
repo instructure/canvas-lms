@@ -20,8 +20,8 @@
 require_relative "../spec_helper"
 
 describe NotificationFinder do
-  let(:notification){ Notification.create!(name: "test notification")}
-  let(:finder){ NotificationFinder.new([notification])}
+  let(:notification) { Notification.create!(name: "test notification") }
+  let(:finder) { NotificationFinder.new([notification]) }
 
   describe "#find_by_name and #by_name" do
     it 'finds a notification by name' do

@@ -23,13 +23,14 @@ class Feature
            :root_opt_in, :enable_at, :beta, :type, :pending_enforcement,
            :release_notes_url, :custom_transition_proc, :visible_on,
            :after_state_change_proc, :autoexpand, :touch_context].freeze
-  attr_reader *ATTRS
+  attr_reader(*ATTRS)
 
   def initialize(opts = {})
     @state = 'allowed'
     opts.each do |key, val|
       next unless ATTRS.include?(key)
       next if key == :state && !%w(hidden off allowed on allowed_on).include?(val)
+
       instance_variable_set "@#{key}", val
     end
     # for RootAccount features, "allowed" state is redundant; show "off" instead
@@ -45,7 +46,7 @@ class Feature
   end
 
   def locked?(query_context)
-    query_context.blank? || !can_override? && !hidden?
+    query_context.blank? || (!can_override? && !hidden?)
   end
 
   def enabled?
@@ -169,6 +170,7 @@ class Feature
     environments = feature_hash.delete(:environments)
     if environments
       raise "invalid environment tag for feature #{feature_name}: must be one of #{VALID_ENVS}" unless (environments.keys - VALID_ENVS).empty?
+
       env = self.environment
       if environments.key?(env)
         feature_hash.merge!(environments[env])
@@ -187,7 +189,7 @@ class Feature
     when 'Course'
       object.is_a?(Course) || object.is_a?(Account)
     when 'User'
-      object.is_a?(User) || object.is_a?(Account) && object.site_admin?
+      object.is_a?(User) || (object.is_a?(Account) && object.site_admin?)
     else
       false
     end
@@ -200,6 +202,7 @@ class Feature
   def self.feature_applies_to_object(feature, object)
     feature_def = definitions[feature.to_s]
     return false unless feature_def
+
     feature_def.applies_to_object(object)
   end
 
@@ -223,8 +226,8 @@ class Feature
     valid_states = [STATE_OFF, STATE_ON]
     valid_states += [STATE_DEFAULT_OFF, STATE_DEFAULT_ON] if context.is_a?(Account)
     (valid_states - [orig_state]).inject({}) do |transitions, state|
-      transitions[state] = { 'locked' => ([STATE_DEFAULT_OFF, STATE_DEFAULT_ON].include?(state) && (@applies_to == 'RootAccount' &&
-        context.is_a?(Account) && context.root_account? && !context.site_admin? || @applies_to == "SiteAdmin")) }
+      transitions[state] = { 'locked' => ([STATE_DEFAULT_OFF, STATE_DEFAULT_ON].include?(state) && ((@applies_to == 'RootAccount' &&
+        context.is_a?(Account) && context.root_account? && !context.site_admin?) || @applies_to == "SiteAdmin")) }
       transitions
     end
   end
@@ -240,6 +243,7 @@ class Feature
   def self.transitions(feature_name, user, context, orig_state)
     fd = definitions[feature_name.to_s]
     return nil unless fd
+
     fd.transitions(user, context, orig_state)
   end
 

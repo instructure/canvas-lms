@@ -61,22 +61,22 @@ class ContentExport < ActiveRecord::Base
 
   def send_notification?
     context_type == 'Course' &&
-            export_type != ZIP &&
-            content_migration.blank? &&
-            !settings[:skip_notifications] &&
-            !epub_export
+      export_type != ZIP &&
+      content_migration.blank? &&
+      !settings[:skip_notifications] &&
+      !epub_export
   end
 
   set_broadcast_policy do |p|
     p.dispatch :content_export_finished
     p.to { [user] }
-    p.whenever {|record|
+    p.whenever { |record|
       record.changed_state(:exported) && record.send_notification?
     }
 
     p.dispatch :content_export_failed
     p.to { [user] }
-    p.whenever {|record|
+    p.whenever { |record|
       record.changed_state(:failed) && record.send_notification?
     }
   end
@@ -85,7 +85,7 @@ class ContentExport < ActiveRecord::Base
     # file managers (typically course admins) can read all course exports (not zip or user-data exports)
     given do |user, session|
       self.context.grants_any_right?(user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS) &&
-      [ZIP, USER_DATA].exclude?(self.export_type)
+        [ZIP, USER_DATA].exclude?(self.export_type)
     end
     can :read
 
@@ -133,7 +133,7 @@ class ContentExport < ActiveRecord::Base
     quizzes_next? && root_account.feature_enabled?(:newquizzes_on_quiz_page)
   end
 
-  def export(opts={})
+  def export(opts = {})
     self.shard.activate do
       opts = opts.with_indifferent_access
       case export_type
@@ -143,6 +143,7 @@ class ContentExport < ActiveRecord::Base
         export_user_data(opts)
       when QUIZZES2
         return unless context.feature_enabled?(:quizzes_next)
+
         new_quizzes_page_enabled? ? quizzes2_export_complete : export_quizzes2
       else
         export_course(opts)
@@ -177,12 +178,12 @@ class ContentExport < ActiveRecord::Base
     save!
   end
 
-  def export_course(opts={})
+  def export_course(opts = {})
     mark_exporting
     begin
       reset_and_start_job_progress
 
-      @cc_exporter = CC::CCExporter.new(self, opts.merge({:for_course_copy => for_course_copy?}))
+      @cc_exporter = CC::CCExporter.new(self, opts.merge({ :for_course_copy => for_course_copy? }))
       if @cc_exporter.export
         self.progress = 100
         self.job_progress.try :complete!
@@ -221,7 +222,7 @@ class ContentExport < ActiveRecord::Base
     end
   end
 
-  def export_zip(opts={})
+  def export_zip(opts = {})
     mark_exporting
     begin
       self.job_progress.try :start!
@@ -407,7 +408,7 @@ class ContentExport < ActiveRecord::Base
     end
   end
 
-  def create_key(obj, prepend="")
+  def create_key(obj, prepend = "")
     self.shard.activate do
       if for_master_migration? && !is_external_object?(obj)
         master_migration.master_template.migration_id_for(obj, prepend) # because i'm too scared to use normal migration ids
@@ -426,7 +427,7 @@ class ContentExport < ActiveRecord::Base
   #   checked should be exported or not.
   #
   #   Returns: bool
-  def export_object?(obj, asset_type=nil)
+  def export_object?(obj, asset_type = nil)
     return false unless obj
     return true unless selective_export?
 
@@ -435,6 +436,7 @@ class ContentExport < ActiveRecord::Base
     # because Announcement.table_name == 'discussion_topics'
     if obj.is_a?(Announcement)
       return true if selected_content['discussion_topics'] && is_set?(selected_content['discussion_topics'][select_content_key(obj)])
+
       asset_type ||= 'announcements'
     end
 
@@ -458,7 +460,7 @@ class ContentExport < ActiveRecord::Base
     selected_content.empty? || is_set?(selected_content[symbol]) || is_set?(selected_content[:everything])
   end
 
-  def add_item_to_export(obj, type=nil)
+  def add_item_to_export(obj, type = nil)
     return unless obj && (type || obj.class.respond_to?(:table_name))
     return unless selective_export?
 
@@ -499,7 +501,7 @@ class ContentExport < ActiveRecord::Base
     end
   end
 
-  def add_error(user_message, exception_or_info=nil)
+  def add_error(user_message, exception_or_info = nil)
     self.settings[:errors] ||= []
     er = nil
     if exception_or_info.is_a?(Exception)
@@ -536,7 +538,7 @@ class ContentExport < ActiveRecord::Base
   def fast_update_progress(val)
     content_migration.update_conversion_progress(val) if content_migration
     self.progress = val
-    ContentExport.where(:id => self).update_all(:progress=>val)
+    ContentExport.where(:id => self).update_all(:progress => val)
     if EpubExport.exists?(content_export_id: self.id)
       self.epub_export.update_progress_from_content_export!(val)
     end
@@ -553,6 +555,7 @@ class ContentExport < ActiveRecord::Base
 
   def expired?
     return false unless ContentExport.expire?
+
     if self.user
       return false if self.user.content_shares.where(content_export: self).exists?
     end
@@ -568,15 +571,15 @@ class ContentExport < ActiveRecord::Base
   scope :running, -> { where(workflow_state: ['created', 'exporting']) }
   scope :admin, ->(user) {
     where("content_exports.export_type NOT IN (?) OR content_exports.user_id=?", [
-      ZIP, USER_DATA
-    ], user)
+            ZIP, USER_DATA
+          ], user)
   }
   scope :non_admin, ->(user) {
     where("content_exports.export_type IN (?) AND content_exports.user_id=?", [
-      ZIP, USER_DATA
-    ], user)
+            ZIP, USER_DATA
+          ], user)
   }
-  scope :without_epub, -> {eager_load(:epub_export).where(epub_exports: {id: nil})}
+  scope :without_epub, -> { eager_load(:epub_export).where(epub_exports: { id: nil }) }
   scope :expired, -> {
     if ContentExport.expire?
       where('created_at < ?', ContentExport.expire_days.days.ago)
@@ -586,8 +589,8 @@ class ContentExport < ActiveRecord::Base
   }
 
   private
+
   def is_set?(option)
     Canvas::Plugin::value_to_boolean option
   end
-
 end

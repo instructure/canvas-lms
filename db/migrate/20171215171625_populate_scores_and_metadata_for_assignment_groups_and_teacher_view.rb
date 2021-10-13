@@ -22,6 +22,6 @@ class PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView < ActiveRecord:
 
   def change
     DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView.delay_if_production(priority: Delayed::LOW_PRIORITY,
-      strand: "DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView::Migration").run
+                                                                                              strand: "DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView::Migration").run
   end
 end

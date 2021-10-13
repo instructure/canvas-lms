@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/courses/index" do
-  it "should render" do
+  it "renders" do
     course_with_student
     view_context
     assign(:current_enrollments, [@enrollment])
@@ -33,7 +33,7 @@ describe "/courses/index" do
     expect(response).not_to be_nil
   end
 
-  it "should show context name in groups table" do
+  it "shows context name in groups table" do
     course_with_student
     group_with_user(:user => @user, :group_context => @course)
     view_context
@@ -46,7 +46,7 @@ describe "/courses/index" do
     expect(doc.at_css('#my_groups_table td:nth-child(2) span.name').text).to eq @course.name
   end
 
-  it "should not show groups for restricted future courses" do
+  it "does not show groups for restricted future courses" do
     term = EnrollmentTerm.new(:name => "term", :start_at => 1.week.from_now, :end_at => 1.month.from_now)
     course_with_student
     @course.restrict_student_future_view = true

@@ -140,8 +140,8 @@ module Api::V1::Submission
   end
 
   SUBMISSION_JSON_FIELDS = %w(id user_id url score grade excused attempt submission_type submitted_at body
-    assignment_id graded_at grade_matches_current_submission grader_id workflow_state late_policy_status
-    points_deducted grading_period_id cached_due_date extra_attempts posted_at).freeze
+                              assignment_id graded_at grade_matches_current_submission grader_id workflow_state late_policy_status
+                              points_deducted grading_period_id cached_due_date extra_attempts posted_at).freeze
   SUBMISSION_JSON_METHODS = %w(late missing seconds_late entered_grade entered_score).freeze
   SUBMISSION_OTHER_FIELDS = %w(attachments discussion_entries).freeze
 
@@ -186,7 +186,7 @@ module Api::V1::Submission
     end
 
     if show_originality_reports?(attempt)
-       hash['has_originality_report'] = true
+      hash['has_originality_report'] = true
     end
 
     if attempt.originality_data.present? && attempt.grants_right?(@current_user, :view_turnitin_report)
@@ -196,8 +196,8 @@ module Api::V1::Submission
     end
 
     if attempt.vericite_data(false).present? &&
-      attempt.can_view_plagiarism_report('vericite', @current_user, session) &&
-      attempt.assignment.vericite_enabled?
+       attempt.can_view_plagiarism_report('vericite', @current_user, session) &&
+       attempt.assignment.vericite_enabled?
       vericite_hash = attempt.vericite_data(false).dup
       vericite_hash.delete(:last_processed_attempt)
       hash['vericite_data'] = vericite_hash
@@ -224,15 +224,17 @@ module Api::V1::Submission
 
     # include the discussion topic entries
     if other_fields.include?('discussion_entries') &&
-           assignment.submission_types =~ /discussion_topic/ &&
-           assignment.discussion_topic
+       assignment.submission_types =~ /discussion_topic/ &&
+       assignment.discussion_topic
       # group assignments will have a child topic for each group.
       # it's also possible the student posted in the main topic, as well as the
       # individual group one. so we search far and wide for all student entries.
 
       if assignment.discussion_topic.has_group_category?
-        entries = assignment.shard.activate { DiscussionEntry.active.where(:discussion_topic_id => assignment.discussion_topic.child_topics.select(:id)).
-          for_user(attempt.user_id).to_a.sort_by(&:created_at) }
+        entries = assignment.shard.activate {
+          DiscussionEntry.active.where(:discussion_topic_id => assignment.discussion_topic.child_topics.select(:id))
+                         .for_user(attempt.user_id).to_a.sort_by(&:created_at)
+        }
       else
         entries = assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id).to_a
       end
@@ -262,7 +264,7 @@ module Api::V1::Submission
 
   def quiz_submission_attempt_json(attempt, assignment, user, session, context = nil, params)
     hash = submission_attempt_json(attempt.submission, assignment, user, session, context, params, attempt.version_number)
-    hash.each_key{|k| hash[k] = attempt[k] if attempt[k]}
+    hash.each_key { |k| hash[k] = attempt[k] if attempt[k] }
     hash[:submission_data] = attempt[:submission_data]
     hash[:submitted_at] = attempt[:finished_at]
     hash[:body] = nil
@@ -291,10 +293,10 @@ module Api::V1::Submission
   # @return [Attachment] The attachment that contains the archive.
   def submission_zip(assignment, updated_at = nil)
     attachments = assignment.attachments.where({
-      display_name: 'submissions.zip',
-      workflow_state: %w[to_be_zipped zipping zipped errored unattached],
-      user_id: @current_user
-    }).order(:created_at).to_a
+                                                 display_name: 'submissions.zip',
+                                                 workflow_state: %w[to_be_zipped zipping zipped errored unattached],
+                                                 user_id: @current_user
+                                               }).order(:created_at).to_a
 
     attachment = attachments.pop
     attachments.each(&:destroy_permanently_plus)
@@ -392,10 +394,10 @@ module Api::V1::Submission
 
   def speed_grader_url(submission:, assignment:, current_user:)
     student_or_anonymous_id = if assignment.can_view_student_names?(current_user)
-      { student_id: submission.user_id }
-    else
-      { anonymous_id: submission.anonymous_id }
-    end
+                                { student_id: submission.user_id }
+                              else
+                                { anonymous_id: submission.anonymous_id }
+                              end
 
     speed_grader_course_gradebook_url({
       course_id: assignment.context_id,

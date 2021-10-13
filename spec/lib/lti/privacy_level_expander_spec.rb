@@ -24,14 +24,14 @@ describe Lti::PrivacyLevelExpander do
   include ExternalToolsSpecHelper
   let(:course) { course_model }
   let(:user) { course_with_student(course: course).user }
-  let(:placement) {'resource_selection'}
+  let(:placement) { 'resource_selection' }
   let(:tool) { new_valid_tool(course) }
   let(:launch_url) { 'http://www.test.com/launch' }
   let(:variable_expander) do
     Lti::VariableExpander.new(
       course.root_account,
       course,
-      double(request: {body: 'body content'}),
+      double(request: { body: 'body content' }),
       {
         current_user: user,
         current_pseudonym: user.pseudonyms.first,
@@ -41,7 +41,7 @@ describe Lti::PrivacyLevelExpander do
   end
 
   before do
-    tool.custom_fields = {context_id: '$Context.id'}
+    tool.custom_fields = { context_id: '$Context.id' }
     tool.save!
   end
 

@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
 describe Importers::ExternalFeedImporter do
-
   context ".import_from_migration" do
     it "creates a feed from the provided hash" do
       @course = course_factory
@@ -48,30 +47,29 @@ describe Importers::ExternalFeedImporter do
 
     it "finds a feed by migration id" do
       found = Importers::ExternalFeedImporter.find_or_initialize_from_migration({
-        migration_id: '12345'
-      }, @course)
+                                                                                  migration_id: '12345'
+                                                                                }, @course)
       expect(found.id).to eq @feed.id
     end
 
     it "finds by uniq attrs" do
       found = Importers::ExternalFeedImporter.find_or_initialize_from_migration({
-        migration_id: 'xyzyx',
-        url: @feed.url,
-        header_match: @feed.header_match,
-        verbosity: @feed.verbosity
-      }, @course)
+                                                                                  migration_id: 'xyzyx',
+                                                                                  url: @feed.url,
+                                                                                  header_match: @feed.header_match,
+                                                                                  verbosity: @feed.verbosity
+                                                                                }, @course)
       expect(found.id).to eq @feed.id
     end
 
     it "initializes if none found" do
       found = Importers::ExternalFeedImporter.find_or_initialize_from_migration({
-        migration_id: 'xyzyx',
-        url: @feed.url + "xxx",
-        header_match: @feed.header_match,
-        verbosity: @feed.verbosity
-      }, @course)
+                                                                                  migration_id: 'xyzyx',
+                                                                                  url: @feed.url + "xxx",
+                                                                                  header_match: @feed.header_match,
+                                                                                  verbosity: @feed.verbosity
+                                                                                }, @course)
       expect(found).to be_new_record
     end
   end
-
 end

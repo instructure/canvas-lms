@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def user_service_model(opts={})
+  def user_service_model(opts = {})
     @user_service = factory_with_protected_attributes(UserService, valid_user_service_attributes.merge(opts))
   end
 
@@ -27,7 +27,7 @@ module Factories
     {
       :user_id => User.create!.id,
       :token => 'value for token',
-      :secret => 'value for secret', 
+      :secret => 'value for secret',
       :protocol => 'value for protocol',
       :service => 'value for service',
       :service_user_url => 'value for service_user_url',

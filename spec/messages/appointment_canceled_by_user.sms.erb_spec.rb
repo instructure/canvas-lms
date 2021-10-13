@@ -24,19 +24,19 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'appointment_canceled_by_user.sms' do
   include MessagesCommon
 
-  it "should render" do
+  it "renders" do
     user = user_model
     appointment_participant_model(:participant => user)
 
     generate_message(:appointment_canceled_by_user, :sms, @event,
                      :data => { :updating_user_name => user.name,
-                                :cancel_reason => "just because"})
+                                :cancel_reason => "just because" })
 
     expect(@message.body).to include('some title')
     expect(@message.body).to include(user.name)
   end
 
-  it "should render for groups" do
+  it "renders for groups" do
     user = user_model
     @course = course_model
     cat = group_category
@@ -47,7 +47,7 @@ describe 'appointment_canceled_by_user.sms' do
 
     generate_message(:appointment_canceled_by_user, :sms, @event,
                      :data => { :updating_user_name => user.name,
-                                :cancel_reason => "just because"})
+                                :cancel_reason => "just because" })
 
     expect(@message.body).to include('some title')
     expect(@message.body).to include(user.name)

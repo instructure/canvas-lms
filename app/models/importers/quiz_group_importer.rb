@@ -21,7 +21,6 @@ require_dependency 'importers'
 
 module Importers
   class QuizGroupImporter < Importer
-
     self.item_class = Quizzes::QuizGroup
 
     def self.import_from_migration(hash, context, quiz, question_data, position = nil, migration = nil)
@@ -62,16 +61,16 @@ module Importers
             migration.add_warning(t('#quizzes.quiz_group.errors.no_bank', "Couldn't find the question bank for quiz group %{group_name}", :group_name => item.name))
           end
         else
-          if bank = context.assessment_question_banks.where(migration_id: hash[:question_bank_migration_id]).first
+          if (bank = context.assessment_question_banks.where(migration_id: hash[:question_bank_migration_id]).first)
             item.assessment_question_bank_id = bank.id
           end
         end
       end
       item.save!
       hash[:questions].each_with_index do |question, i|
-        if aq = (question_data[:aq_data][question[:migration_id]] || question_data[:aq_data][question[:assessment_question_migration_id]])
+        if (aq = question_data[:aq_data][question[:migration_id]] || question_data[:aq_data][question[:assessment_question_migration_id]])
           Importers::QuizQuestionImporter.import_from_migration(aq, question, i + 1,
-            question_data[:qq_ids][quiz.migration_id], context, migration, quiz, item)
+                                                                question_data[:qq_ids][quiz.migration_id], context, migration, quiz, item)
         end
       end
 

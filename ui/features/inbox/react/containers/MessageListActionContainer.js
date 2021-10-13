@@ -160,21 +160,6 @@ const MessageListActionContainer = props => {
     }
   }
 
-  const handleReadStateComplete = data => {
-    const readStateChangeSuccessMsg = I18n.t(
-      {
-        one: 'Read state Changed!',
-        other: 'Read states Changed!'
-      },
-      {count: props.selectedConversations.length}
-    )
-    if (data.updateConversationParticipants.errors) {
-      setOnFailure(I18n.t('Read state change operation failed'))
-    } else {
-      setOnSuccess(readStateChangeSuccessMsg)
-    }
-  }
-
   const [archiveConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
     update: removeOutOfScopeConversationsFromCache,
     onCompleted(data) {
@@ -187,7 +172,19 @@ const MessageListActionContainer = props => {
 
   const [readStateChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
     onCompleted(data) {
-      handleReadStateComplete(data)
+      if (data.updateConversationParticipants.errors) {
+        setOnFailure(I18n.t('Read state change operation failed'))
+      } else {
+        setOnSuccess(
+          I18n.t(
+            {
+              one: 'Read state Changed!',
+              other: 'Read states Changed!'
+            },
+            {count: props.selectedConversations.length}
+          )
+        )
+      }
     },
     onError() {
       setOnFailure(I18n.t('Read state change failed'))

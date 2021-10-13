@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/groups/show" do
-  it "should render" do
+  it "renders" do
     course_with_student
     @group = @course.groups.create!(:name => "some group")
     view_context(@group, @user)
@@ -35,4 +35,3 @@ describe "/groups/show" do
     expect(response).not_to be_nil
   end
 end
-

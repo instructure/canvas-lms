@@ -22,7 +22,6 @@ require_dependency "broadcast_policies/quiz_submission_policy"
 
 module BroadcastPolicies
   describe QuizSubmissionPolicy do
-
     let(:course) do
       instance_double("Course", available?: true, id: 1)
     end
@@ -55,8 +54,7 @@ module BroadcastPolicies
              posted?: true,
              submission: submission,
              user: user,
-             context: course
-      )
+             context: course)
     end
     let(:policy) do
       QuizSubmissionPolicy.new(quiz_submission).tap do |p|
@@ -67,8 +65,8 @@ module BroadcastPolicies
     describe '#should_dispatch_submission_graded?' do
       before do
         allow(quiz_submission).to receive(:changed_state_to).with(:complete).and_return true
-        allow(quiz_submission).to receive(:changed_in_state).
-          with(:pending_review, {:fields => [:fudge_points]}).and_return false
+        allow(quiz_submission).to receive(:changed_in_state)
+          .with(:pending_review, { :fields => [:fudge_points] }).and_return false
       end
 
       it 'is true when the dependent inputs are true' do
@@ -81,10 +79,10 @@ module BroadcastPolicies
       end
 
       specify { wont_send_when { allow(quiz).to receive(:assignment).and_return nil } }
-      specify { wont_send_when { allow(course).to receive(:available?).and_return false} }
+      specify { wont_send_when { allow(course).to receive(:available?).and_return false } }
       specify { wont_send_when { allow(quiz).to receive(:deleted?).and_return true } }
       specify { wont_send_when { allow(quiz_submission).to receive(:user).and_return nil } }
-      specify { wont_send_when { allow(user.not_removed_enrollments).to receive(:where).and_return([]) }}
+      specify { wont_send_when { allow(user.not_removed_enrollments).to receive(:where).and_return([]) } }
 
       specify do
         wont_send_when do
@@ -112,10 +110,10 @@ module BroadcastPolicies
       end
 
       specify { wont_send_when { allow(quiz).to receive(:assignment).and_return nil } }
-      specify { wont_send_when { allow(quiz).to receive(:survey?).and_return true} }
-      specify { wont_send_when { allow(course).to receive(:available?).and_return false} }
+      specify { wont_send_when { allow(quiz).to receive(:survey?).and_return true } }
+      specify { wont_send_when { allow(course).to receive(:available?).and_return false } }
       specify { wont_send_when { allow(quiz).to receive(:deleted?).and_return true } }
-      specify { wont_send_when { allow(policy).to receive(:user_has_visibility?).and_return(false) }}
+      specify { wont_send_when { allow(policy).to receive(:user_has_visibility?).and_return(false) } }
 
       specify do
         wont_send_when do
@@ -124,7 +122,6 @@ module BroadcastPolicies
       end
     end
 
-
     describe '#should_dispatch_submission_grade_changed?' do
       def wont_send_when
         yield
@@ -132,8 +129,8 @@ module BroadcastPolicies
       end
 
       before do
-        allow(quiz_submission).to receive(:changed_in_state).
-          with(:complete, :fields => [:score]).and_return true
+        allow(quiz_submission).to receive(:changed_in_state)
+          .with(:complete, :fields => [:score]).and_return true
       end
 
       it 'is true when the necessary inputs are true' do
@@ -141,16 +138,16 @@ module BroadcastPolicies
       end
 
       specify { wont_send_when { allow(quiz).to receive(:assignment).and_return nil } }
-      specify { wont_send_when { allow(course).to receive(:available?).and_return false} }
+      specify { wont_send_when { allow(course).to receive(:available?).and_return false } }
       specify { wont_send_when { allow(quiz).to receive(:deleted?).and_return true } }
-      specify { wont_send_when { allow(submission).to receive(:graded_at).and_return nil }}
-      specify { wont_send_when { allow(policy).to receive(:user_has_visibility?).and_return(false) }}
-      specify { wont_send_when { allow(user.not_removed_enrollments).to receive(:where).and_return([]) }}
+      specify { wont_send_when { allow(submission).to receive(:graded_at).and_return nil } }
+      specify { wont_send_when { allow(policy).to receive(:user_has_visibility?).and_return(false) } }
+      specify { wont_send_when { allow(user.not_removed_enrollments).to receive(:where).and_return([]) } }
 
       specify do
         wont_send_when do
-          allow(quiz_submission).to receive(:changed_in_state).
-            with(:complete, :fields => [:score]).and_return false
+          allow(quiz_submission).to receive(:changed_in_state)
+            .with(:complete, :fields => [:score]).and_return false
         end
       end
 
@@ -168,6 +165,5 @@ module BroadcastPolicies
       specify { expect(policy.should_dispatch_submission_graded?).to be_falsey }
       specify { expect(policy.should_dispatch_submission_grade_changed?).to be_falsey }
     end
-
   end
 end

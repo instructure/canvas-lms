@@ -45,21 +45,21 @@ message")
 
     it "doesnt have trailing erb closures" do
       allow(@message).to receive(:attachments).and_return([
-        double("attachment",
-             display_name: "FileName", readable_size: "1MB", id: 42,
-             context: @teacher_enrollment.course, uuid: "abcdef123456")
-      ])
+                                                            double("attachment",
+                                                                   display_name: "FileName", readable_size: "1MB", id: 42,
+                                                                   context: @teacher_enrollment.course, uuid: "abcdef123456")
+                                                          ])
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.html_body).not_to match(/%>/)
     end
 
-    it "should render correct footer if replys are enabled" do
+    it "renders correct footer if replys are enabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = true
       msg = generate_message(:conversation_created, :email, @message)
       expect(msg.body.include?("replying directly to this email")).to eq true
     end
 
-    it "should render correct footer if replys are disabled" do
+    it "renders correct footer if replys are disabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = false
       msg = generate_message(:conversation_created, :email, @message)
       expect(msg.body.include?("replying directly to this email")).to eq false

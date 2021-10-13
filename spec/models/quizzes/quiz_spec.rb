@@ -126,7 +126,7 @@ describe Quizzes::Quiz do
   end
 
   describe ".mark_quiz_edited" do
-    it "should mark a quiz as having unpublished changes" do
+    it "marks a quiz as having unpublished changes" do
       quiz = nil
       Timecop.freeze(5.minutes.ago) do
         quiz = @course.quizzes.create! :title => "hello"
@@ -141,7 +141,7 @@ describe Quizzes::Quiz do
   end
 
   describe "#mark_edited!" do
-    it "should mark a quiz as having unpublished changes" do
+    it "marks a quiz as having unpublished changes" do
       quiz = nil
       Timecop.freeze(5.minutes.ago) do
         quiz = @course.quizzes.create! :title => "hello"
@@ -199,7 +199,7 @@ describe Quizzes::Quiz do
       expect(quiz.workflow_state).to eq 'unpublished'
     end
 
-    it "should fail validation with student submissions" do
+    it "fails validation with student submissions" do
       quiz = @course.quizzes.build title: 'test quiz'
       quiz.publish!
       allow(quiz).to receive(:has_student_submissions?).and_return true
@@ -207,7 +207,7 @@ describe Quizzes::Quiz do
       expect { quiz.unpublish! }.to raise_exception(ActiveRecord::RecordInvalid)
     end
 
-    it "should pass validation without student submissions" do
+    it "passes validation without student submissions" do
       quiz = @course.quizzes.build title: 'test quiz'
       quiz.publish!
       allow(quiz).to receive(:has_student_submissions?).and_return false
@@ -269,7 +269,7 @@ describe Quizzes::Quiz do
 
   it_should_behave_like 'Canvas::DraftStateValidations'
 
-  it "should infer the times if none given" do
+  it "infers the times if none given" do
     q = factory_with_protected_attributes(@course.quizzes,
                                           :title => "new quiz",
                                           :due_at => "Sep 3 2008 12:00am",
@@ -295,14 +295,13 @@ describe Quizzes::Quiz do
     expect(q.assignment.unlock_at).to eq unlock_at.midnight
   end
 
-  it "should set the due time to 11:59pm if only given a date" do
+  it "sets the due time to 11:59pm if only given a date" do
     params = { :quiz => {
       :title => "Test Quiz",
       :due_at => Time.zone.today.to_s,
       :lock_at => Time.zone.today.to_s,
       :unlock_at => Time.zone.today.to_s
-      }
-    }
+    } }
     q = @course.quizzes.create!(params[:quiz])
     q.infer_times
     expect(q.due_at).to be_an_instance_of ActiveSupport::TimeWithZone
@@ -319,14 +318,14 @@ describe Quizzes::Quiz do
     expect(q.unlock_at.min).to eql 0
   end
 
-  it "should not set the due time to 11:59pm if passed a time of midnight" do
+  it "does not set the due time to 11:59pm if passed a time of midnight" do
     params = { :quiz => { :title => "Test Quiz", :due_at => "Jan 1 2011 12:00am" } }
     q = @course.quizzes.create!(params[:quiz])
     expect(q.due_at.hour).to eql 0
     expect(q.due_at.min).to eql 0
   end
 
-  it "should convert a date object to a time and set the time to 11:59pm" do
+  it "converts a date object to a time and set the time to 11:59pm" do
     Time.zone = 'Alaska'
     params = { :quiz => { :title => 'Test Quiz', :due_at => Time.zone.today } }
     quiz = @course.quizzes.create!(params[:quiz])
@@ -336,7 +335,7 @@ describe Quizzes::Quiz do
     expect(quiz.due_at.min).to eql 59
   end
 
-  it "should set the due date time correctly" do
+  it "sets the due date time correctly" do
     time_string = "Dec 30, 2011 12:00 pm"
     expected = "2011-12-30 19:00:00 #{Time.now.utc.strftime("%Z")}"
     Time.zone = "Mountain Time (US & Canada)"
@@ -347,7 +346,7 @@ describe Quizzes::Quiz do
     Time.zone = nil
   end
 
-  it "should initialize with default settings" do
+  it "initializes with default settings" do
     q = @course.quizzes.create!(:title => "new quiz")
     expect(q.shuffle_answers).to eql(false)
     expect(q.show_correct_answers).to eql(true)
@@ -355,7 +354,7 @@ describe Quizzes::Quiz do
     expect(q.scoring_policy).to eql('keep_highest')
   end
 
-  it "should update the assignment it is associated with" do
+  it "updates the assignment it is associated with" do
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 5, :only_visible_to_overrides => false)
     expect(a.points_possible).to eql(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
@@ -388,7 +387,7 @@ describe Quizzes::Quiz do
     expect(a.assignment_group).to eql(g2)
   end
 
-  it "shouldn't create a new assignment on every edit" do
+  it "does not create a new assignment on every edit" do
     a_count = Assignment.count
     a = @course.assignments.create!(:title => "some assignment")
     expect(a.submission_types).not_to eql("online_quiz")
@@ -409,7 +408,7 @@ describe Quizzes::Quiz do
     expect(Assignment.count).to eql(a_count + 1)
   end
 
-  it "should not send a message if notify_of_update is blank" do
+  it "does not send a message if notify_of_update is blank" do
     Notification.create!(:name => 'Assignment Changed')
     @course.offer
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
@@ -423,7 +422,7 @@ describe Quizzes::Quiz do
     expect(q.assignment.messages_sent).to be_empty
   end
 
-  it "should send a message if notify_of_update is set and grades are posted" do
+  it "sends a message if notify_of_update is set and grades are posted" do
     Notification.create!(:name => 'Assignment Changed')
     @course.offer
     student_in_course(active_all: true)
@@ -440,7 +439,7 @@ describe Quizzes::Quiz do
     expect(q.assignment.messages_sent).to include('Assignment Changed')
   end
 
-  it "should delete the assignment if the quiz is no longer graded" do
+  it "deletes the assignment if the quiz is no longer graded" do
     a = @course.assignments.create!(:title => "some assignment", :points_possible => 5)
     expect(a.points_possible).to eql(5.0)
     expect(a.submission_types).not_to eql("online_quiz")
@@ -467,7 +466,7 @@ describe Quizzes::Quiz do
     q.save
   end
 
-  it "should not create an assignment for ungraded quizzes" do
+  it "does not create an assignment for ungraded quizzes" do
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "survey", :assignment_group_id => g.id)
     q.workflow_state = 'available'
@@ -476,7 +475,7 @@ describe Quizzes::Quiz do
     expect(q.assignment_id).to be_nil
   end
 
-  it "should always have an assignment" do
+  it "always has an assignment" do
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
     q.save!
@@ -485,7 +484,7 @@ describe Quizzes::Quiz do
     expect(q.assignment_group_id).to eql(g.id)
   end
 
-  it "should update assignment published?" do
+  it "updates assignment published?" do
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
     q.save!
@@ -497,7 +496,7 @@ describe Quizzes::Quiz do
     expect(q.assignment.published?).to be true
   end
 
-  it "should send a message when quiz is published" do
+  it "sends a message when quiz is published" do
     Notification.create!(:name => 'Assignment Created')
     @course.offer
     student_in_course(active_all: true)
@@ -517,7 +516,7 @@ describe Quizzes::Quiz do
     expect(q.assignment.messages_sent).to include('Assignment Created')
   end
 
-  it "should create the assignment if created in published state" do
+  it "creates the assignment if created in published state" do
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
     q.workflow_state = 'available'
@@ -528,14 +527,14 @@ describe Quizzes::Quiz do
     expect(q.assignment.assignment_group_id).to eql(g.id)
   end
 
-  it "should return a zero question count but valid unpublished question count until the quiz is generated" do
+  it "returns a zero question count but valid unpublished question count until the quiz is generated" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1)
     q.quiz_questions.create!(:quiz_group => g)
     q.quiz_questions.create!(:quiz_group => g)
     q.quiz_questions.create!()
     q.quiz_questions.create!()
-    q.quiz_questions.create!(:question_data => {:question_type => "text_only_question"})
+    q.quiz_questions.create!(:question_data => { :question_type => "text_only_question" })
     # this is necessary because of some caching that happens on the quiz object, that is not a factor in production
     q.root_entries(true)
     q.save
@@ -543,7 +542,7 @@ describe Quizzes::Quiz do
     expect(q.unpublished_question_count).to eql(3)
   end
 
-  it "should return an available question count for unpublished questions" do
+  it "returns an available question count for unpublished questions" do
     q = @course.quizzes.create!(:title => "new quiz")
     q.quiz_questions.create!
     q.quiz_questions.create!
@@ -552,7 +551,7 @@ describe Quizzes::Quiz do
     expect(q.reload.available_question_count).to eql(2)
   end
 
-  it "should return an available question count for published questions" do
+  it "returns an available question count for published questions" do
     q = @course.quizzes.create!(:title => "new quiz")
     q.quiz_questions.create!
     q.quiz_questions.create!
@@ -561,7 +560,7 @@ describe Quizzes::Quiz do
     expect(q.reload.available_question_count).to eql(2)
   end
 
-  it "should return processed root entries for each question/group" do
+  it "returns processed root entries for each question/group" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
 
@@ -584,7 +583,7 @@ describe Quizzes::Quiz do
     expect(entries[2][:answers]).not_to be_nil
   end
 
-  it "should generate valid quiz data" do
+  it "generates valid quiz data" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
     q.quiz_questions.create!(:question_data => { :name => "test 1" }, :quiz_group => g)
@@ -599,7 +598,7 @@ describe Quizzes::Quiz do
     expect(data).not_to be_nil
   end
 
-  it "should return quiz data once the quiz is generated" do
+  it "returns quiz data once the quiz is generated" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
     q.quiz_questions.create!(:question_data => { :name => "test 1", }, :quiz_group => g)
@@ -617,12 +616,12 @@ describe Quizzes::Quiz do
     expect(data[2][:answers]).not_to be_nil
   end
 
-  it "should shuffle answers for the questions" do
+  it "shuffles answers for the questions" do
     q = @course.quizzes.create!(:title => "new quiz", :shuffle_answers => true)
-    q.quiz_questions.create!(:question_data => {:name => 'test 3', 'question_type' => 'multiple_choice_question',
-      'answers' => [{'answer_text' => '1'}, {'answer_text' => '2'}, {'answer_text' => '3'}, {'answer_text' => '4'},
-                    {'answer_text' => '5'}, {'answer_text' => '6'}, {'answer_text' => '7'}, {'answer_text' => '8'},
-                    {'answer_text' => '9'}, {'answer_text' => '10'}]})
+    q.quiz_questions.create!(:question_data => { :name => 'test 3', 'question_type' => 'multiple_choice_question',
+                                                 'answers' => [{ 'answer_text' => '1' }, { 'answer_text' => '2' }, { 'answer_text' => '3' }, { 'answer_text' => '4' },
+                                                               { 'answer_text' => '5' }, { 'answer_text' => '6' }, { 'answer_text' => '7' }, { 'answer_text' => '8' },
+                                                               { 'answer_text' => '9' }, { 'answer_text' => '10' }] })
     expect(q.quiz_data).to be_nil
     q.generate_quiz_data
     q.save
@@ -632,7 +631,7 @@ describe Quizzes::Quiz do
     expect(data[0][:answers]).not_to be_empty
     same = true
     found = []
-    data[0][:answers].each{|a| found << a[:text] }
+    data[0][:answers].each { |a| found << a[:text] }
     expect(found.uniq.length).to eql(10)
     same = false if data[0][:answers][0][:text] != '1'
     same = false if data[0][:answers][1][:text] != '2'
@@ -647,19 +646,19 @@ describe Quizzes::Quiz do
     expect(same).to eql(false)
   end
 
-  it "should shuffle questions for the quiz groups" do
+  it "shuffles questions for the quiz groups" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "some group", :pick_count => 10, :question_points => 10)
-    q.quiz_questions.create!(:question_data => { :name => "test 1", 'answers' => []}, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 2", 'answers' => []}, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 3", 'answers' => []}, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 4", 'answers' => []}, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 5", 'answers' => []}, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 6", 'answers' => []}, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 7", 'answers' => []}, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 8", 'answers' => []}, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 9", 'answers' => []}, :quiz_group => g)
-    q.quiz_questions.create!(:question_data => { :name => "test 10", 'answers' => []}, :quiz_group => g)
+    q.quiz_questions.create!(:question_data => { :name => "test 1", 'answers' => [] }, :quiz_group => g)
+    q.quiz_questions.create!(:question_data => { :name => "test 2", 'answers' => [] }, :quiz_group => g)
+    q.quiz_questions.create!(:question_data => { :name => "test 3", 'answers' => [] }, :quiz_group => g)
+    q.quiz_questions.create!(:question_data => { :name => "test 4", 'answers' => [] }, :quiz_group => g)
+    q.quiz_questions.create!(:question_data => { :name => "test 5", 'answers' => [] }, :quiz_group => g)
+    q.quiz_questions.create!(:question_data => { :name => "test 6", 'answers' => [] }, :quiz_group => g)
+    q.quiz_questions.create!(:question_data => { :name => "test 7", 'answers' => [] }, :quiz_group => g)
+    q.quiz_questions.create!(:question_data => { :name => "test 8", 'answers' => [] }, :quiz_group => g)
+    q.quiz_questions.create!(:question_data => { :name => "test 9", 'answers' => [] }, :quiz_group => g)
+    q.quiz_questions.create!(:question_data => { :name => "test 10", 'answers' => [] }, :quiz_group => g)
     expect(q.quiz_data).to be_nil
     q.reload
     q.generate_quiz_data
@@ -682,7 +681,7 @@ describe Quizzes::Quiz do
     expect(same).to eql(false)
   end
 
-  it "should consider the number of questions in a group when determining the question count" do
+  it "considers the number of questions in a group when determining the question count" do
     q = @course.quizzes.create!(:title => "new quiz")
     g = q.quiz_groups.create!(:name => "group 1", :pick_count => 10, :question_points => 2)
     q.quiz_questions.create!(:question_data => { :name => "test 1", }, :quiz_group => g)
@@ -700,10 +699,10 @@ describe Quizzes::Quiz do
     expect(data[2][:answers]).not_to be_nil
   end
 
-  it "should not lose precision when calculating points_possible from entries" do
+  it "does not lose precision when calculating points_possible from entries" do
     # These values create enough error to test comparison but more arithmetic is
     # necessary to persist error after roundtrip to storage.
-    expect(Array.new(3){ 3.3 }.sum).to be < 9.9
+    expect(Array.new(3) { 3.3 }.sum).to be < 9.9
 
     q = @course.quizzes.create!(title: "floaty quiz")
     question_data = { points_possible: 3.3, question_type: 'multiple_choice_question' }
@@ -727,14 +726,14 @@ describe Quizzes::Quiz do
       @quiz.reload
     end
 
-    it "should destroy results if the quiz_type becomes practice_quiz" do
+    it "destroys results if the quiz_type becomes practice_quiz" do
       @quiz.quiz_type = "practice_quiz"
       expect {
         @quiz.save!
       }.to change { LearningOutcomeResult.active.count }.by(-1)
     end
 
-    it "should restore results if the quiz_type changes from practice_quiz" do
+    it "restores results if the quiz_type changes from practice_quiz" do
       @quiz.quiz_type = "practice_quiz"
       @quiz.save!
       @quiz.quiz_type = "assignment"
@@ -745,7 +744,7 @@ describe Quizzes::Quiz do
   end
 
   describe "#generate_submission" do
-    it "should generate a valid submission for a given user" do
+    it "generates a valid submission for a given user" do
       u = User.create!(:name => "some user")
       q = @course.quizzes.create!(:title => "new quiz")
       g = q.quiz_groups.create!(:name => "group 1", :pick_count => 1, :question_points => 2)
@@ -786,7 +785,7 @@ describe Quizzes::Quiz do
       end
     end
 
-    it "should not set end_at to lock_at if a submission is manually unlocked" do
+    it "does not set end_at to lock_at if a submission is manually unlocked" do
       lock_at = 1.day.ago
       u = User.create!(:name => "Fred Colon")
       q = @course.quizzes.create!(:title => "locked yesterday", :lock_at => lock_at)
@@ -796,14 +795,14 @@ describe Quizzes::Quiz do
       sub2 = q.generate_submission(u)
       expect(sub2.end_at).to be_nil
     end
-    it 'should not set end_at to due_at' do
+    it 'does not set end_at to due_at' do
       due_at = 1.day.from_now
       u = User.create!(:name => "Fred Colon")
       q = @course.quizzes.create!(:title => "locked tomorrow", :due_at => due_at)
       sub2 = q.generate_submission(u)
       expect(sub2.end_at).not_to eq due_at
     end
-    it "should set end_at for course end dates" do
+    it "sets end_at for course end dates" do
       deadline = 1.day.from_now
       @course.restrict_enrollments_to_course_dates = true
       @course.conclude_at = deadline
@@ -813,7 +812,7 @@ describe Quizzes::Quiz do
       sub2 = q.generate_submission(@user)
       expect(sub2.end_at).to eq deadline
     end
-    it "should set end_at to nil" do
+    it "sets end_at to nil" do
       # when course.end_at doesn't exist
       deadline = 1.day.from_now
       @course.restrict_enrollments_to_course_dates = true
@@ -841,7 +840,7 @@ describe Quizzes::Quiz do
         @q = @course.quizzes.create!(:title => "locked tomorrow")
       end
 
-      it "should set end_at to the term end dates" do
+      it "sets end_at to the term end dates" do
         sub = @q.generate_submission(@user)
         expect(sub.end_at).to eq @deadline
       end
@@ -862,12 +861,12 @@ describe Quizzes::Quiz do
         @q = @course.quizzes.create!(:title => "locked tomorrow")
       end
 
-      it "should set end_at to the course end dates" do
+      it "sets end_at to the course end dates" do
         sub = @q.generate_submission(@user)
         expect(sub.end_at).to eq @deadline
       end
 
-      it "should allow nil course.end_at" do
+      it "allows nil course.end_at" do
         @course.conclude_at = nil
         @course.save!
 
@@ -894,14 +893,14 @@ describe Quizzes::Quiz do
         @q = @course.quizzes.create!(:title => "locked tomorrow")
       end
 
-      it "should set end_at to section end dates" do
+      it "sets end_at to section end dates" do
         sub = @q.generate_submission(@user)
         expect(sub.end_at).to eq @deadline
       end
 
-      it 'should set end_at to time limit, if shorter than section.end_at dates' do
-          @q.time_limit = 1
-          @q.save!
+      it 'sets end_at to time limit, if shorter than section.end_at dates' do
+        @q.time_limit = 1
+        @q.save!
 
         Timecop.freeze do
           sub = @q.generate_submission(@user)
@@ -910,7 +909,7 @@ describe Quizzes::Quiz do
       end
     end
 
-    it "should shuffle submission questions" do
+    it "shuffles submission questions" do
       u1 = User.create!(:name => "user 1")
       u2 = User.create!(:name => "user 2")
       u3 = User.create!(:name => "user 3")
@@ -933,10 +932,10 @@ describe Quizzes::Quiz do
       quiz.generate_quiz_data
       quiz.save
 
-      original = quiz.quiz_questions.map {|q| q.question_data["question_text"] }
+      original = quiz.quiz_questions.map { |q| q.question_data["question_text"] }
 
-      selected1 = quiz.generate_submission(u1).questions.map {|q| q["question_text"] }
-      selected2 = quiz.generate_submission(u2).questions.map {|q| q["question_text"] }
+      selected1 = quiz.generate_submission(u1).questions.map { |q| q["question_text"] }
+      selected2 = quiz.generate_submission(u2).questions.map { |q| q["question_text"] }
 
       # make sure at least one is shuffled
       is_shuffled1 = (original != selected1)
@@ -947,19 +946,19 @@ describe Quizzes::Quiz do
     end
   end
 
-  it "should return a default title if the quiz is untitled" do
+  it "returns a default title if the quiz is untitled" do
     q = @course.quizzes.create!
     expect(q.quiz_title).to eql("Unnamed Quiz")
   end
 
-  it "should return the assignment title if the quiz is linked to an assignment" do
+  it "returns the assignment title if the quiz is linked to an assignment" do
     a = @course.assignments.create!(:title => "some assignment")
     q = @course.quizzes.create!(:assignment_id => a.id)
     a.reload
     expect(q.quiz_title).to eql(a.title)
   end
 
-  it "should delete the associated assignment if it is deleted" do
+  it "deletes the associated assignment if it is deleted" do
     a = @course.assignments.create!(:title => "some assignment")
     q = @course.quizzes.create!(:assignment_id => a.id, :quiz_type => "assignment")
     expect(q.assignment_id).to eql(a.id)
@@ -972,7 +971,7 @@ describe Quizzes::Quiz do
     expect(a).to be_deleted
   end
 
-  it "should reattach existing graded quiz submissions to the new assignment after a graded -> ungraded -> graded transition" do
+  it "reattaches existing graded quiz submissions to the new assignment after a graded -> ungraded -> graded transition" do
     # create a quiz
     q = @course.quizzes.new
     q.quiz_type = "assignment"
@@ -1008,11 +1007,11 @@ describe Quizzes::Quiz do
   describe "Quiz with QuestionGroup pointing to QuestionBank" do
     before(:once) do
       course_with_student
-      @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
-      @bank.assessment_questions.create!(:question_data => {'name' => 'Group Question 1', :question_type=>'essay_question', :question_text=>'gq1', 'answers' => []})
-      @bank.assessment_questions.create!(:question_data => {'name' => 'Group Question 2', :question_type=>'essay_question', :question_text=>'gq2', 'answers' => []})
+      @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+      @bank.assessment_questions.create!(:question_data => { 'name' => 'Group Question 1', :question_type => 'essay_question', :question_text => 'gq1', 'answers' => [] })
+      @bank.assessment_questions.create!(:question_data => { 'name' => 'Group Question 2', :question_type => 'essay_question', :question_text => 'gq2', 'answers' => [] })
       @quiz = @course.quizzes.create!(:title => "i'm tired quiz")
-      @quiz.quiz_questions.create!(:question_data => { :name => "Quiz Question 1", :question_type=>'essay_question', :question_text=>'qq1', 'answers' => [], :points_possible=>5.0})
+      @quiz.quiz_questions.create!(:question_data => { :name => "Quiz Question 1", :question_type => 'essay_question', :question_text => 'qq1', 'answers' => [], :points_possible => 5.0 })
       @group = @quiz.quiz_groups.create!(:name => "question group", :pick_count => 3, :question_points => 5.0)
       @group.assessment_question_bank = @bank
       @group.save!
@@ -1021,10 +1020,10 @@ describe Quizzes::Quiz do
       @quiz.reload
     end
 
-    it "should create a submission" do
+    it "creates a submission" do
       submission = @quiz.generate_submission(@user)
       expect(submission.quiz_data.length).to eq 4
-      texts = submission.quiz_data.map{|q|q[:question_text]}
+      texts = submission.quiz_data.map { |q| q[:question_text] }
       # one of the bank questions should be duplicated, since the group
       # pick count is 3 and the bank only has 2 questions:
       expect(texts.uniq.count).to eq(3)
@@ -1033,11 +1032,11 @@ describe Quizzes::Quiz do
       expect(texts.member?('qq1')).to be_truthy
     end
 
-    it "should get the correct points possible" do
+    it "gets the correct points possible" do
       expect(@quiz.current_points_possible).to eq 20 # actual_pick_count wasn't so actual after all
     end
 
-    it "should omit top level questions when selecting from a question bank" do
+    it "omits top level questions when selecting from a question bank" do
       questions = @bank.assessment_questions
       # add the first question directly onto the quiz, so it shouldn't get "randomly" selected from the group
       linked_question = @quiz.quiz_questions.build(:question_data => questions[0].question_data)
@@ -1050,15 +1049,14 @@ describe Quizzes::Quiz do
 
       submission = @quiz.generate_submission(@user)
       expect(submission.quiz_data.length).to eq 3
-      texts = submission.quiz_data.map{|q|q[:question_text]}
+      texts = submission.quiz_data.map { |q| q[:question_text] }
       expect(texts.member?('gq1')).to be_truthy
       expect(texts.member?('gq2')).to be_truthy
       expect(texts.member?('qq1')).to be_truthy
     end
-
   end
 
-  it "should ignore lockdown-browser setting if that plugin is not enabled" do
+  it "ignores lockdown-browser setting if that plugin is not enabled" do
     q = @course.quizzes.build(:title => "some quiz")
     q1 = @course.quizzes.build(:title => "some quiz", :require_lockdown_browser => true, :require_lockdown_browser_for_results => false, :require_lockdown_browser_monitor => false)
     q2 = @course.quizzes.build(:title => "some quiz", :require_lockdown_browser => true, :require_lockdown_browser_for_results => true, :require_lockdown_browser_monitor => true)
@@ -1068,36 +1066,37 @@ describe Quizzes::Quiz do
 
     # nothing should be restricted
     expect(Quizzes::Quiz.lockdown_browser_plugin_enabled?).to be_falsey
-    [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]).
-        each { |qs| expect(qs[0].send(qs[1])).to be_falsey }
+    [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?])
+               .each { |qs| expect(qs[0].send(qs[1])).to be_falsey }
 
     # register a plugin
     Canvas::Plugin.register(:example_spec_lockdown_browser, :lockdown_browser, {
-        :settings => {:enabled => false}})
+                              :settings => { :enabled => false }
+                            })
 
     # nothing should change yet
     expect(Quizzes::Quiz.lockdown_browser_plugin_enabled?).to be_falsey
-    [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]).
-        each { |qs| expect(qs[0].send(qs[1])).to be_falsey }
+    [q, q1, q2].product([:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?])
+               .each { |qs| expect(qs[0].send(qs[1])).to be_falsey }
 
     # now actually enable the plugin
     setting = PluginSetting.create!(name: 'example_spec_lockdown_browser')
-    setting.settings = {:enabled => true}
+    setting.settings = { :enabled => true }
     setting.save!
 
     # now the restrictions should take effect
     expect(Quizzes::Quiz.lockdown_browser_plugin_enabled?).to be_truthy
-    [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?].
-        each { |s| expect(q.send(s)).to be_falsey }
-    [:require_lockdown_browser, :require_lockdown_browser?].
-        each { |s| expect(q1.send(s)).to be_truthy }
-    [:require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?].
-        each { |s| expect(q1.send(s)).to be_falsey }
-    [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?].
-        each { |s| expect(q2.send(s)).to be_truthy }
+    [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]
+      .each { |s| expect(q.send(s)).to be_falsey }
+    [:require_lockdown_browser, :require_lockdown_browser?]
+      .each { |s| expect(q1.send(s)).to be_truthy }
+    [:require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]
+      .each { |s| expect(q1.send(s)).to be_falsey }
+    [:require_lockdown_browser, :require_lockdown_browser?, :require_lockdown_browser_for_results, :require_lockdown_browser_for_results?, :require_lockdown_browser_monitor, :require_lockdown_browser_monitor?]
+      .each { |s| expect(q2.send(s)).to be_truthy }
   end
 
-  it 'should not report LDB to be required for viewing results if LDB is not required to take the quiz' do
+  it 'does not report LDB to be required for viewing results if LDB is not required to take the quiz' do
     expect(Quizzes::Quiz).to receive(:lockdown_browser_plugin_enabled?).twice.and_return(true)
 
     q = @course.quizzes.build
@@ -1140,7 +1139,7 @@ describe Quizzes::Quiz do
 
   describe "timer_autosubmit_disabled?" do
     let(:account) { Account.default }
-    let(:course){ Course.create!(root_account: account) }
+    let(:course) { Course.create!(root_account: account) }
 
     before do
       @quiz = course.quizzes.create!
@@ -1150,8 +1149,8 @@ describe Quizzes::Quiz do
       @quiz.context.root_account.set_feature_flag! 'timer_without_autosubmission', 'off'
       expect(@quiz.timer_autosubmit_disabled?).to be(false)
       @quiz.update({
-        disable_timer_autosubmission: true
-      })
+                     disable_timer_autosubmission: true
+                   })
       expect(@quiz.timer_autosubmit_disabled?).to be(false)
     end
 
@@ -1163,8 +1162,8 @@ describe Quizzes::Quiz do
     it "returns true when feature flag is on and disable_timer_autosubmission is true" do
       @quiz.context.root_account.set_feature_flag! 'timer_without_autosubmission', 'on'
       @quiz.update({
-        disable_timer_autosubmission: true
-      })
+                     disable_timer_autosubmission: true
+                   })
       expect(@quiz.timer_autosubmit_disabled?).to be(true)
     end
   end
@@ -1203,7 +1202,6 @@ describe Quizzes::Quiz do
   end
 
   describe "#group_category_id" do
-
     it "returns the assignment's group category id if it has an assignment" do
       quiz = Quizzes::Quiz.new(:title => "Assignment Group Category Quizzes::Quiz")
       expect(quiz).to receive(:assignment).and_return double(:group_category_id => 1)
@@ -1214,7 +1212,6 @@ describe Quizzes::Quiz do
       quiz = Quizzes::Quiz.new(:title => "Quizzes::Quiz w/o assignment")
       expect(quiz.group_category_id).to be_nil
     end
-
   end
 
   describe "linking overrides with assignments" do
@@ -1282,7 +1279,6 @@ describe Quizzes::Quiz do
         it "has the quiz's version number" do
           expect(override.quiz_version).to eq quiz.version_number
         end
-
       end
 
       context "override student" do
@@ -1322,7 +1318,7 @@ describe Quizzes::Quiz do
 
   context "custom validations" do
     context "changinging quiz points" do
-      it "should not allow quiz points higher than allowable by postgres" do
+      it "does not allow quiz points higher than allowable by postgres" do
         q = Quizzes::Quiz.new(:points_possible => 2000000001)
         expect(q.valid?).to eq false
         expect(Array(q.errors[:points_possible])).to eq ["must be less than or equal to 2,000,000,000"]
@@ -1330,14 +1326,14 @@ describe Quizzes::Quiz do
     end
 
     context "quiz_type" do
-      it "should not save an invalid quiz_type" do
+      it "does not save an invalid quiz_type" do
         quiz = @course.quizzes.create! :title => "test quiz"
         quiz.quiz_type = "totally_invalid_quiz_type"
         expect(quiz.save).to be_falsey
         expect(quiz.errors["invalid_quiz_type"]).to be_present
       end
 
-      it "should not validate quiz_type if not changed" do
+      it "does not validate quiz_type if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :quiz_type => 'invalid'
         quiz.workflow_state = 'created'
         expect(quiz.save(:validate => false)).to be_truthy  # save without validation
@@ -1349,14 +1345,14 @@ describe Quizzes::Quiz do
     end
 
     context "ip_filter" do
-      it "should not save an invalid ip_filter" do
+      it "does not save an invalid ip_filter" do
         quiz = @course.quizzes.create! :title => "test quiz"
         quiz.ip_filter = "999.999.1942.489"
         expect(quiz.save).to be_falsey
         expect(quiz.errors["invalid_ip_filter"]).to be_present
       end
 
-      it "should not validate ip_filter if not changed" do
+      it "does not validate ip_filter if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :ip_filter => '123.fourfivesix'
         quiz.workflow_state = 'created'
         expect(quiz.save(:validate => false)).to be_truthy  # save without validation
@@ -1390,14 +1386,14 @@ describe Quizzes::Quiz do
     end
 
     context "hide_results" do
-      it "should not save an invalid hide_results" do
+      it "does not save an invalid hide_results" do
         quiz = @course.quizzes.create! :title => "test quiz"
         quiz.hide_results = "totally_invalid_value"
         expect(quiz.save).to be_falsey
         expect(quiz.errors["invalid_hide_results"]).to be_present
       end
 
-      it "should not validate hide_results if not changed" do
+      it "does not validate hide_results if not changed" do
         quiz = @course.quizzes.build :title => "test quiz", :hide_results => 'invalid'
         quiz.workflow_state = 'created'
         expect(quiz.save(:validate => false)).to be_truthy  # save without validation
@@ -1421,15 +1417,14 @@ describe Quizzes::Quiz do
 
     it "returns quiz types of question in quiz groups" do
       allow(@quiz).to receive(:quiz_data).and_return([
-        {"question_type" => "foo"},
-        {"entry_type" => "quiz_group", "questions" => [{"question_type" => "bar"},{"question_type" => "baz"}]}
-      ])
+                                                       { "question_type" => "foo" },
+                                                       { "entry_type" => "quiz_group", "questions" => [{ "question_type" => "bar" }, { "question_type" => "baz" }] }
+                                                     ])
       expect(@quiz.question_types).to eq(["foo", "bar", "baz"])
     end
   end
 
   describe "#has_file_upload_question?" do
-
     let(:quiz) { @course.quizzes.build title: 'File Upload Quiz' }
 
     it "returns false unless there is quiz data for a quiz" do
@@ -1439,14 +1434,14 @@ describe Quizzes::Quiz do
 
     it "returns true when there is a file upload question" do
       allow(quiz).to receive(:quiz_data).and_return [
-        {question_type: 'file_upload_question'}
+        { question_type: 'file_upload_question' }
       ]
       expect(quiz.has_file_upload_question?).to be_truthy
     end
 
     it "returns false when there isn't a file upload question" do
       allow(quiz).to receive(:quiz_data).and_return [
-        {question_type: 'multiple_choice_question'}
+        { question_type: 'multiple_choice_question' }
       ]
       expect(quiz.has_file_upload_question?).to be_falsey
     end
@@ -1492,18 +1487,18 @@ describe Quizzes::Quiz do
     end
 
     it 'returns true when the quiz due_at is changed' do
-      expect { @quiz.due_at = 1.day.from_now }.to change { @quiz.update_cached_due_dates? }.
-        from(false).to(true)
+      expect { @quiz.due_at = 1.day.from_now }.to change { @quiz.update_cached_due_dates? }
+        .from(false).to(true)
     end
 
     it 'returns true when the quiz workflow_state is changed' do
-      expect { @quiz.workflow_state = 'deleted' }.to change { @quiz.update_cached_due_dates? }.
-        from(false).to(true)
+      expect { @quiz.workflow_state = 'deleted' }.to change { @quiz.update_cached_due_dates? }
+        .from(false).to(true)
     end
 
     it 'returns true when the quiz only_visible_to_overrides_changed is changed' do
-      expect { @quiz.only_visible_to_overrides = true }.
-        to change { @quiz.update_cached_due_dates? }.from(false).to(true)
+      expect { @quiz.only_visible_to_overrides = true }
+        .to change { @quiz.update_cached_due_dates? }.from(false).to(true)
     end
 
     it 'returns true when quiz was previously not an assignment, but about to become one' do
@@ -1527,7 +1522,6 @@ describe Quizzes::Quiz do
   end
 
   describe "#current_regrade" do
-
     before(:once) { @quiz = @course.quizzes.create! title: 'Test Quiz' }
 
     it "returns the regrade for the quiz and quiz version" do
@@ -1539,7 +1533,7 @@ describe Quizzes::Quiz do
       expect(@quiz.current_regrade).to eq regrade
     end
 
-    it "should not return disabled regrade options" do
+    it "does not return disabled regrade options" do
       course_with_teacher(active_all: true, course: @course)
       question = @quiz.quiz_questions.create(question_data: { question_text: "test 1" })
 
@@ -1550,7 +1544,6 @@ describe Quizzes::Quiz do
   end
 
   describe "#current_regrade_question_ids" do
-
     before { @quiz = @course.quizzes.create! title: 'Test Quiz' }
 
     it "returns the correct question ids" do
@@ -1563,7 +1556,6 @@ describe Quizzes::Quiz do
   end
 
   describe "#regrade_if_published" do
-
     it "queues a job to regrade if there are current question regrades" do
       course_with_teacher(course: @course, active_all: true)
       quiz = @course.quizzes.create!
@@ -1592,7 +1584,7 @@ describe Quizzes::Quiz do
       @quiz = @course.quizzes.create!
     end
 
-    it "should count how many questions have been regraded since the given date" do
+    it "counts how many questions have been regraded since the given date" do
       first_regrade_time = 1.hour.ago
       Timecop.freeze(first_regrade_time) do
         # regrade once
@@ -1614,7 +1606,7 @@ describe Quizzes::Quiz do
       expect(count).to eq 2
     end
 
-    it "should not count disabled questions regraded" do
+    it "does not count disabled questions regraded" do
       first_regrade_time = 1.hour.ago
       Timecop.freeze(first_regrade_time) do
         # regrade once
@@ -1638,7 +1630,7 @@ describe Quizzes::Quiz do
   end
 
   describe "#destroy" do
-    it "should logical delete published quiz" do
+    it "logicals delete published quiz" do
       quiz = @course.quizzes.create(title: 'test quiz')
       allow(quiz).to receive_messages(:has_student_submissions? => true)
       quiz.publish!
@@ -1648,7 +1640,7 @@ describe Quizzes::Quiz do
       expect(quiz.deleted?).to be_truthy
     end
 
-    it "should logical delete the published quiz's associated assignment" do
+    it "logicals delete the published quiz's associated assignment" do
       quiz = @course.quizzes.create(title: 'test quiz')
       allow(quiz).to receive(:has_student_submissions?).and_return true
       quiz.publish!
@@ -1659,12 +1651,12 @@ describe Quizzes::Quiz do
       expect(assignment.deleted?).to be_truthy
     end
 
-    it 'should raise an error on validation error' do
+    it 'raises an error on validation error' do
       quiz = Quizzes::Quiz.new
-      expect {quiz.destroy}.to raise_error(ActiveRecord::RecordInvalid)
+      expect { quiz.destroy }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
-    it "should not create a new assignment if one doesn't exist" do
+    it "does not create a new assignment if one doesn't exist" do
       quiz = @course.quizzes.create!(title: 'test quiz')
       quiz.destroy
       expect(quiz.assignment).to be_nil
@@ -1682,7 +1674,7 @@ describe Quizzes::Quiz do
 
   describe "#restrict_answers_for_concluded_course?" do
     let(:account) { Account.default }
-    let(:course){ Course.create!(root_account: account) }
+    let(:course) { Course.create!(root_account: account) }
     let(:quiz) { course.quizzes.create! }
 
     subject { quiz.restrict_answers_for_concluded_course? }
@@ -1733,7 +1725,8 @@ describe Quizzes::Quiz do
               course.course_sections.create!(
                 start_at: section_start_at,
                 end_at: section_end_at,
-                restrict_enrollments_to_section_dates: true)
+                restrict_enrollments_to_section_dates: true
+              )
             end
             let(:student) { student_in_section(section) }
 
@@ -1769,9 +1762,9 @@ describe Quizzes::Quiz do
   context "show_correct_answers" do
     it "totally hides the correct answers" do
       quiz = @course.quizzes.create!({
-        title: 'test quiz',
-        show_correct_answers: false
-      })
+                                       title: 'test quiz',
+                                       show_correct_answers: false
+                                     })
 
       quiz.publish!
 
@@ -1782,9 +1775,9 @@ describe Quizzes::Quiz do
 
     it "shows the correct answers immediately" do
       quiz = @course.quizzes.create!({
-        title: 'test quiz',
-        show_correct_answers: true
-      })
+                                       title: 'test quiz',
+                                       show_correct_answers: true
+                                     })
 
       quiz.publish!
 
@@ -1795,10 +1788,10 @@ describe Quizzes::Quiz do
 
     it "shows the correct answers after a certain date" do
       quiz = @course.quizzes.create!({
-        title: 'test quiz',
-        show_correct_answers: true,
-        show_correct_answers_at: 10.minutes.from_now
-      })
+                                       title: 'test quiz',
+                                       show_correct_answers: true,
+                                       show_correct_answers_at: 10.minutes.from_now
+                                     })
 
       quiz.publish!
 
@@ -1815,9 +1808,9 @@ describe Quizzes::Quiz do
 
     it "hides the correct answers after a certain date" do
       quiz = @course.quizzes.create!({
-        title: 'test quiz',
-        show_correct_answers: true
-      })
+                                       title: 'test quiz',
+                                       show_correct_answers: true
+                                     })
 
       quiz.publish!
 
@@ -1834,27 +1827,27 @@ describe Quizzes::Quiz do
 
     it "nullifies related fields when turned off" do
       quiz = @course.quizzes.create({
-        title: 'test quiz',
-        show_correct_answers: false,
-        show_correct_answers_at: 2.days.from_now,
-        hide_correct_answers_at: 5.days.from_now
-      })
+                                      title: 'test quiz',
+                                      show_correct_answers: false,
+                                      show_correct_answers_at: 2.days.from_now,
+                                      hide_correct_answers_at: 5.days.from_now
+                                    })
 
       expect(quiz.show_correct_answers_at).to be_nil
       expect(quiz.hide_correct_answers_at).to be_nil
 
       quiz.update({
-        show_correct_answers: true,
-        show_correct_answers_at: 2.days.from_now,
-        hide_correct_answers_at: 5.days.from_now
-      })
+                    show_correct_answers: true,
+                    show_correct_answers_at: 2.days.from_now,
+                    hide_correct_answers_at: 5.days.from_now
+                  })
 
       expect(quiz.show_correct_answers_at).not_to be_nil
       expect(quiz.hide_correct_answers_at).not_to be_nil
 
       quiz.update({
-        show_correct_answers: false
-      })
+                    show_correct_answers: false
+                  })
 
       expect(quiz.show_correct_answers_at).to be_nil
       expect(quiz.hide_correct_answers_at).to be_nil
@@ -1862,11 +1855,11 @@ describe Quizzes::Quiz do
 
     it "doesn't consider dates when one_time_results is on" do
       quiz = @course.quizzes.create!({
-        title: 'test quiz',
-        show_correct_answers: true,
-        show_correct_answers_at: 10.minutes.from_now,
-        one_time_results: false
-      })
+                                       title: 'test quiz',
+                                       show_correct_answers: true,
+                                       show_correct_answers_at: 10.minutes.from_now,
+                                       one_time_results: false
+                                     })
 
       quiz.publish!
 
@@ -1883,11 +1876,11 @@ describe Quizzes::Quiz do
 
       it "shows the correct answers on last attempt completed" do
         quiz = @course.quizzes.create!({
-          title: 'test quiz',
-          show_correct_answers: true,
-          show_correct_answers_last_attempt: true,
-          allowed_attempts: 2
-        })
+                                         title: 'test quiz',
+                                         show_correct_answers: true,
+                                         show_correct_answers_last_attempt: true,
+                                         allowed_attempts: 2
+                                       })
 
         quiz.publish!
 
@@ -1904,11 +1897,11 @@ describe Quizzes::Quiz do
 
       it "hides the correct answers on last attempt" do
         quiz = @course.quizzes.create!({
-          title: 'test quiz',
-          show_correct_answers: true,
-          show_correct_answers_last_attempt: true,
-          allowed_attempts: 2
-        })
+                                         title: 'test quiz',
+                                         show_correct_answers: true,
+                                         show_correct_answers_last_attempt: true,
+                                         allowed_attempts: 2
+                                       })
 
         quiz.publish!
 
@@ -1967,17 +1960,17 @@ describe Quizzes::Quiz do
       @quiz.reload
 
       @grading_period_group.grading_periods.create!({
-        title: "Closed Grading Period",
-        start_date: 5.weeks.ago,
-        end_date: 3.weeks.ago,
-        close_date: 1.week.ago
-      })
+                                                      title: "Closed Grading Period",
+                                                      start_date: 5.weeks.ago,
+                                                      end_date: 3.weeks.ago,
+                                                      close_date: 1.week.ago
+                                                    })
       @grading_period_group.grading_periods.create!({
-        title: "Open Grading Period",
-        start_date: 3.weeks.ago,
-        end_date: 1.week.ago,
-        close_date: 1.week.from_now
-      })
+                                                      title: "Open Grading Period",
+                                                      start_date: 3.weeks.ago,
+                                                      end_date: 1.week.ago,
+                                                      close_date: 1.week.from_now
+                                                    })
     end
 
     context "to delete" do
@@ -2154,7 +2147,7 @@ describe Quizzes::Quiz do
       course_factory
     end
 
-    it "should restore to published state if there are student submissions" do
+    it "restores to published state if there are student submissions" do
       @quiz = @course.quizzes.create!(title: 'Test Quiz')
       allow(@quiz).to receive(:has_student_submissions?).and_return true
 
@@ -2163,7 +2156,7 @@ describe Quizzes::Quiz do
       expect(@quiz.reload).to be_published
     end
 
-    it "should restore to unpublished state if no student submissions" do
+    it "restores to unpublished state if no student submissions" do
       @quiz = @course.quizzes.create!(title: 'Test Quiz')
       @quiz.destroy
       @quiz.restore
@@ -2183,13 +2176,13 @@ describe Quizzes::Quiz do
       Quizzes::QuizParticipant.new(User.new, 'foobar')
     end
 
-    it 'should link the generated QS to a user' do
+    it 'links the generated QS to a user' do
       expect(subject).to receive(:generate_submission).with(participant.user, false)
 
       subject.generate_submission_for_participant(participant)
     end
 
-    it 'should link the generated QS to a temporary user code' do
+    it 'links the generated QS to a temporary user code' do
       expect(subject).to receive(:generate_submission).with(participant.user_code, false)
 
       allow(participant).to receive(:anonymous?).and_return true
@@ -2331,12 +2324,12 @@ describe Quizzes::Quiz do
         @course_section = @course.course_sections.create
         @student1, @student2 = create_users(2, return_type: :record)
         @quiz = Quizzes::Quiz.create!({
-          context: @course,
-          description: 'descript foo',
-          only_visible_to_overrides: true,
-          points_possible: rand(1000),
-          title: "I am a quiz"
-        })
+                                        context: @course,
+                                        description: 'descript foo',
+                                        only_visible_to_overrides: true,
+                                        points_possible: rand(1000),
+                                        title: "I am a quiz"
+                                      })
         @quiz.publish
         @quiz.save!
         @assignment = @quiz.assignment
@@ -2344,15 +2337,15 @@ describe Quizzes::Quiz do
         @section = @course.course_sections.create!(name: "test section")
         @section2 = @course.course_sections.create!(name: "second test section")
         student_in_section(@section, user: @student1)
-        create_section_override_for_assignment(@assignment, {course_section: @section})
+        create_section_override_for_assignment(@assignment, { course_section: @section })
         @course.reload
       end
 
       context 'student with override' do
-        it 'should show the quiz if there is an override' do
+        it 'shows the quiz if there is an override' do
           expect(@quiz.visible_to_user?(@student1)).to be_truthy
         end
-        it "should grant submit rights" do
+        it "grants submit rights" do
           allow(@course).to receive(:grants_right?).with(@student1, nil, :participate_as_student).and_return(true)
           allow(@course).to receive(:grants_right?).with(@student1, nil, :manage_assignments).and_return(false)
           allow(@course).to receive(:grants_right?).with(@student1, nil, :read_as_admin).and_return(false)
@@ -2362,15 +2355,15 @@ describe Quizzes::Quiz do
       end
 
       context 'student without override' do
-        it 'should hide the quiz there is no override' do
+        it 'hides the quiz there is no override' do
           expect(@quiz.visible_to_user?(@student2)).to be_falsey
         end
-        it 'should show the quiz if it is not only visible to overrides' do
+        it 'shows the quiz if it is not only visible to overrides' do
           @quiz.only_visible_to_overrides = false
           @quiz.save!
           expect(@quiz.visible_to_user?(@student2)).to be_truthy
         end
-        it 'should not grant submit rights' do
+        it 'does not grant submit rights' do
           allow(@course).to receive(:grants_right?).with(@student2, nil, :participate_as_student).and_return(true)
           allow(@course).to receive(:grants_right?).with(@student2, nil, :manage_assignments).and_return(false)
           allow(@course).to receive(:grants_right?).with(@student2, nil, :read_as_admin).and_return(false)
@@ -2386,15 +2379,15 @@ describe Quizzes::Quiz do
         end
 
         context 'with students' do
-          it 'should show the quiz if there is an override' do
+          it 'shows the quiz if there is an override' do
             @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
             expect(@quiz.visible_to_user?(@observer)).to be_truthy
           end
-          it 'should hide the quiz there is no override' do
+          it 'hides the quiz there is no override' do
             @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
             expect(@quiz.visible_to_user?(@observer)).to be_falsey
           end
-          it 'should show the quiz if it is not only visible to overrides' do
+          it 'shows the quiz if it is not only visible to overrides' do
             @quiz.only_visible_to_overrides = false
             @quiz.save!
             @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
@@ -2403,16 +2396,16 @@ describe Quizzes::Quiz do
         end
 
         context 'without students' do
-          it 'should show the quiz if there is an override' do
+          it 'shows the quiz if there is an override' do
             expect(@quiz.visible_to_user?(@observer)).to be_truthy
           end
-          it 'should show the quiz even if there is no override' do
+          it 'shows the quiz even if there is no override' do
             expect(@quiz.visible_to_user?(@observer)).to be_truthy
           end
         end
 
         context 'teacher' do
-          it 'should show the quiz' do
+          it 'shows the quiz' do
             expect(@quiz.visible_to_user?(@teacher)).to be_truthy
           end
         end
@@ -2431,16 +2424,16 @@ describe Quizzes::Quiz do
       override.save!
     end
 
-    it 'should return quizzes due between the given dates' do
+    it 'returns quizzes due between the given dates' do
       expect(@course.quizzes.due_between_with_overrides(2.days.ago, Time.now)).to include(@quiz)
     end
 
-    it 'should return quizzes with overrides between the given dates' do
+    it 'returns quizzes with overrides between the given dates' do
       expect(@course.quizzes.due_between_with_overrides(Time.now, 2.days.from_now)).to include(@quiz)
     end
 
-    it "should exclude quizzes that don't meet either criterion" do
-      expect(@course.quizzes.due_between_with_overrides(1.hour.ago, 1.hour.from_now)).not_to include (@quiz)
+    it "excludes quizzes that don't meet either criterion" do
+      expect(@course.quizzes.due_between_with_overrides(1.hour.ago, 1.hour.from_now)).not_to include(@quiz)
     end
   end
 
@@ -2450,13 +2443,13 @@ describe Quizzes::Quiz do
       @quiz = @course.quizzes.create!(title: 'Ungraded Quiz with Overrides', quiz_type: 'practice_quiz')
     end
 
-    it 'should return correct due date when there are no overrides' do
+    it 'returns correct due date when there are no overrides' do
       @quiz.due_at = 1.day.from_now
       @quiz.save!
       expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq @quiz.due_at
     end
 
-    it 'should return correct due date when user does not have an override' do
+    it 'returns correct due date when user does not have an override' do
       @quiz.due_at = 1.day.from_now
       @quiz.save!
       section = @course.course_sections.create!
@@ -2469,7 +2462,7 @@ describe Quizzes::Quiz do
       expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq @quiz.due_at
     end
 
-    it 'should return correct due date when user has an override and there is an everyone else date' do
+    it 'returns correct due date when user has an override and there is an everyone else date' do
       @quiz.due_at = 1.day.from_now
       @quiz.save!
       section = @course.course_sections.create!
@@ -2483,7 +2476,7 @@ describe Quizzes::Quiz do
       expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq override.due_at
     end
 
-    it 'should return correct due date when user has an override and there is not an everyone else date' do
+    it 'returns correct due date when user has an override and there is not an everyone else date' do
       @quiz.due_at = 1.day.from_now
       @quiz.only_visible_to_overrides = true
       @quiz.save!
@@ -2498,7 +2491,7 @@ describe Quizzes::Quiz do
       expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq override.due_at
     end
 
-    it 'should return nil due date when an override has a nil due date that overrides the everyone else date' do
+    it 'returns nil due date when an override has a nil due date that overrides the everyone else date' do
       @quiz.due_at = 1.day.from_now
       @quiz.save!
       section = @course.course_sections.create!
@@ -2512,7 +2505,7 @@ describe Quizzes::Quiz do
       expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq nil
     end
 
-    it 'should return nil due date when an override has a nil due date and another override has a due date' do
+    it 'returns nil due date when an override has a nil due date and another override has a due date' do
       @quiz.due_at = 1.day.from_now
       @quiz.save!
       section = @course.course_sections.create!
@@ -2532,7 +2525,7 @@ describe Quizzes::Quiz do
       expect(@course.quizzes.ungraded_with_user_due_date(@student).find(@quiz)[:user_due_date]).to eq nil
     end
 
-    it 'should return latest due date when user has two (or more) overridden due dates' do
+    it 'returns latest due date when user has two (or more) overridden due dates' do
       @quiz.due_at = 1.day.from_now
       @quiz.save!
       section = @course.course_sections.create!

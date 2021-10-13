@@ -35,6 +35,7 @@ class EportfoliosController < ApplicationController
   def user_index
     @context = @current_user.profile
     return unless tab_enabled?(UserProfile::TAB_EPORTFOLIOS)
+
     rce_js_env
     set_active_tab "eportfolios"
     add_crumb(@current_user.short_name, user_profile_url(@current_user))
@@ -51,7 +52,7 @@ class EportfoliosController < ApplicationController
           @portfolio.ensure_defaults
           flash[:notice] = t('notices.created', "ePortfolio successfully created")
           format.html { redirect_to eportfolio_url(@portfolio) }
-          format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
+          format.json { render :json => @portfolio.as_json(:permissions => { :user => @current_user, :session => session }) }
         else
           format.html {
             rce_js_env
@@ -102,9 +103,9 @@ class EportfoliosController < ApplicationController
       end
 
       if can_do(@portfolio, @current_user, :update)
-        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom, :verifier => @portfolio.uuid), {:title => t('titles.feed', "Eportfolio Atom Feed") })
+        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom, :verifier => @portfolio.uuid), { :title => t('titles.feed', "Eportfolio Atom Feed") })
       elsif @portfolio.public
-        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom), {:title => t('titles.feed', "Eportfolio Atom Feed") })
+        content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom), { :title => t('titles.feed', "Eportfolio Atom Feed") })
       end
       js_env({ SECTION_COUNT_IDX: @page.content_sections.count })
     end
@@ -112,10 +113,10 @@ class EportfoliosController < ApplicationController
 
   def update
     update_params = if @portfolio.grants_right?(@current_user, session, :update)
-      eportfolio_params
-    elsif @portfolio.grants_right?(@current_user, :moderate)
-      eportfolio_moderation_params
-    end
+                      eportfolio_params
+                    elsif @portfolio.grants_right?(@current_user, :moderate)
+                      eportfolio_moderation_params
+                    end
 
     if update_params
       respond_to do |format|
@@ -123,7 +124,7 @@ class EportfoliosController < ApplicationController
           @portfolio.ensure_defaults
           flash[:notice] = t('notices.updated', "ePortfolio successfully updated")
           format.html { redirect_to eportfolio_url(@portfolio) }
-          format.json { render :json => @portfolio.as_json(:permissions => {:user => @current_user, :session => session}) }
+          format.json { render :json => @portfolio.as_json(:permissions => { :user => @current_user, :session => session }) }
         else
           format.html {
             rce_js_env
@@ -157,7 +158,7 @@ class EportfoliosController < ApplicationController
       order = []
       params[:order].split(",").each { |id| order << Shard.relative_id_for(id, Shard.current, @portfolio.shard) }
       @portfolio.eportfolio_categories.build.update_order(order)
-      render :json => @portfolio.eportfolio_categories.map{|c| [c.id, c.position]}, :status => :ok
+      render :json => @portfolio.eportfolio_categories.map { |c| [c.id, c.position] }, :status => :ok
     end
   end
 
@@ -167,17 +168,17 @@ class EportfoliosController < ApplicationController
       params[:order].split(",").each { |id| order << Shard.relative_id_for(id, Shard.current, @portfolio.shard) }
       @category = @portfolio.eportfolio_categories.find(params[:eportfolio_category_id])
       @category.eportfolio_entries.build.update_order(order)
-      render :json => @portfolio.eportfolio_entries.map{|c| [c.id, c.position]}, :status => :ok
+      render :json => @portfolio.eportfolio_entries.map { |c| [c.id, c.position] }, :status => :ok
     end
   end
 
   def export
     zip_filename = "eportfolio.zip"
     if authorized_action(@portfolio, @current_user, :update)
-      @attachments = @portfolio.attachments.not_deleted.
-        where(display_name: zip_filename,
-              workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached'],
-              user_id: @current_user)
+      @attachments = @portfolio.attachments.not_deleted
+                               .where(display_name: zip_filename,
+                                      workflow_state: ['to_be_zipped', 'zipping', 'zipped', 'unattached'],
+                                      user_id: @current_user)
       @attachment = @attachments.order(:created_at).last
       @attachments.where.not(id: @attachment).find_each(&:destroy_permanently_plus)
 

@@ -36,7 +36,7 @@ class EventStream::Record < Struct.new(:attributes)
   def initialize(*args)
     super(*args)
 
-    if request_id = attributes['request_id']
+    if (request_id = attributes['request_id'])
       attributes['request_id'] = request_id.to_s
     end
 

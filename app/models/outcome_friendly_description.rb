@@ -27,6 +27,6 @@ class OutcomeFriendlyDescription < ApplicationRecord
   resolves_root_account through: :context
 
   validates :context, presence: true
-  validates :learning_outcome_id, uniqueness: { scope: [:context_type, :context_id]}
-  validates :description, length: { maximum: maximum_string_length, allow_blank: false}
+  validates :learning_outcome_id, uniqueness: { scope: [:context_type, :context_id] }
+  validates :description, length: { maximum: maximum_string_length, allow_blank: false }
 end

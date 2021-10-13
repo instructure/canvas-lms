@@ -30,30 +30,30 @@ describe "site-wide" do
   let(:x_canvas_user_id) { 'X-Canvas-User-Id' }
   let(:x_canvas_real_user_id) { 'X-Canvas-Real-User-Id' }
 
-  it "should render 404 when user isn't logged in" do
+  it "renders 404 when user isn't logged in" do
     get "/dashbo"
     assert_status(404)
   end
 
-  it "should set no-cache headers for html requests" do
+  it "sets no-cache headers for html requests" do
     get "/login"
     expect(response['Pragma']).to match(/no-cache/)
     expect(response['Cache-Control']).to match(/no-store/)
   end
 
-  it "should NOT set no-cache headers for API/xhr requests" do
+  it "does not set no-cache headers for API/xhr requests" do
     get "/api/v1/courses"
     expect(response['Pragma']).to be_nil
     expect(response['Cache-Control']).not_to match(/no-store/)
   end
 
-  it "should set the x-frame-options http header" do
+  it "sets the x-frame-options http header" do
     get "/login"
     expect(assigns[:files_domain]).to be_falsey
     expect(response[x_frame_options]).to eq "SAMEORIGIN"
   end
 
-  it "should not set x-frame-options when on a files domain" do
+  it "does not set x-frame-options when on a files domain" do
     user_session user_factory(active_all: true)
     attachment_model(:context => @user)
     expect_any_instance_of(FilesController).to receive(:files_domain?).and_return(true)
@@ -62,13 +62,13 @@ describe "site-wide" do
   end
 
   context "x-canvas-meta header" do
-    it "should set action information in API requests" do
+    it "sets action information in API requests" do
       course_with_teacher_logged_in
       get "/api/v1/courses/#{@course.id}"
       expect(response[x_canvas_meta]).to match(%r{o=courses;n=show;})
     end
 
-    it "should set controller#action information in API requests on 500" do
+    it "sets controller#action information in API requests on 500" do
       course_with_teacher_logged_in
       allow_any_instance_of(CoursesController).to receive(:index).and_raise(ArgumentError)
       get "/api/v1/courses"
@@ -77,7 +77,7 @@ describe "site-wide" do
       expect(response[x_canvas_meta]).to match(%r{o=courses;n=index;})
     end
 
-    it "should set page view information in user requests" do
+    it "sets page view information in user requests" do
       course_with_teacher_logged_in
       Setting.set('enable_page_views', 'db')
       get "/courses/#{@course.id}"
@@ -99,20 +99,20 @@ describe "site-wide" do
       user_with_pseudonym :user => @admin, :username => 'admin@example.com', :password => 'password'
     end
 
-    it "should not set the logged in user headers when no one is logged in" do
+    it "does not set the logged in user headers when no one is logged in" do
       get "/"
       expect(response[x_canvas_user_id]).to be_nil
       expect(response[x_canvas_real_user_id]).to be_nil
     end
 
-    it "should set them when a user is logged in" do
+    it "sets them when a user is logged in" do
       user_session(@student, @student_pseudonym)
       get "/"
       expect(response[x_canvas_user_id]).to eq @student.global_id.to_s
       expect(response[x_canvas_real_user_id]).to be_nil
     end
 
-    it "should set them when masquerading" do
+    it "sets them when masquerading" do
       user_session(@admin, @admin.pseudonyms.first)
       post "/users/#{@student.id}/masquerade"
       get "/"
@@ -122,12 +122,12 @@ describe "site-wide" do
   end
 
   context "breadcrumbs" do
-    it "should be absent for error pages" do
+    it "is absent for error pages" do
       get "/apagethatdoesnotexist"
       expect(response.body).not_to match(%r{id="breadcrumbs"})
     end
 
-    it "should be absent for error pages with user info" do
+    it "is absent for error pages with user info" do
       course_with_teacher
       get "/users/#{@user.id}/files/apagethatdoesnotexist"
       expect(response.body.to_s).not_to match(%r{id="breadcrumbs"})
@@ -135,13 +135,13 @@ describe "site-wide" do
   end
 
   context "policy cache" do
-    it "should clear the in-process policy cache between requests" do
+    it "clears the in-process policy cache between requests" do
       expect(AdheresToPolicy::Cache).to receive(:clear).with(no_args).once
       get '/'
     end
   end
 
-  it "should use the real user's timezone and locale setting when masquerading as a fake student" do
+  it "uses the real user's timezone and locale setting when masquerading as a fake student" do
     @fake_user = course_factory(active_all: true).student_view_student
 
     user_with_pseudonym(:active_all => true)
@@ -160,7 +160,7 @@ describe "site-wide" do
     expect(I18n.locale).to eq :es
   end
 
-  it "should use the masqueree's timezone and locale setting when masquerading" do
+  it "uses the masqueree's timezone and locale setting when masquerading" do
     @other_user = user_with_pseudonym(:active_all => true)
     @other_user.time_zone = "Hawaii"
     @other_user.locale = "es"

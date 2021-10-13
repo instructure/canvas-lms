@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/answer_parser_spec_helper.rb')
 
 describe Quizzes::QuizQuestion::AnswerParsers::TrueFalse do
-
   context "#parse" do
     let(:raw_answers) do
       [
@@ -49,6 +48,5 @@ describe Quizzes::QuizQuestion::AnswerParsers::TrueFalse do
     let(:parser_class) { Quizzes::QuizQuestion::AnswerParsers::TrueFalse }
 
     include_examples "All answer parsers"
-
   end
 end

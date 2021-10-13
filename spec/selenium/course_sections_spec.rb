@@ -36,7 +36,7 @@ describe "course sections" do
     @section = @course.default_section
   end
 
-  it "should validate the display when multiple enrollments exist" do
+  it "validates the display when multiple enrollments exist" do
     add_enrollment('active', @section)
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
@@ -45,7 +45,7 @@ describe "course sections" do
     expect(table_rows[0]).to include_text('2 Active Enrollments')
   end
 
-  it "should validate the display when only 1 enrollment exists" do
+  it "validates the display when only 1 enrollment exists" do
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
     wait_for_ajaximations
@@ -53,7 +53,7 @@ describe "course sections" do
     expect(table_rows[0]).to include_text('1 Active Enrollment')
   end
 
-  it "should display the correct pending enrollments count" do
+  it "displays the correct pending enrollments count" do
     add_enrollment('pending', @section)
     add_enrollment('invited', @section)
     get "/courses/#{@course.id}/sections/#{@section.id}"
@@ -63,7 +63,7 @@ describe "course sections" do
     expect(table_rows[0]).to include_text('2 Pending Enrollments')
   end
 
-  it "should display the correct completed enrollments count" do
+  it "displays the correct completed enrollments count" do
     add_enrollment('completed', @section)
     @course.complete!
     get "/courses/#{@course.id}/sections/#{@section.id}"
@@ -73,7 +73,7 @@ describe "course sections" do
     expect(table_rows[0]).to include_text('2 Completed Enrollments')
   end
 
-  it "should edit the section" do
+  it "edits the section" do
     edit_name = 'edited section name'
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
@@ -85,7 +85,7 @@ describe "course sections" do
     expect(f('#section_name')).to include_text(edit_name)
   end
 
-  it "should parse dates" do
+  it "parses dates" do
     get "/courses/#{@course.id}/sections/#{@section.id}"
 
     f('.edit_section_link').click

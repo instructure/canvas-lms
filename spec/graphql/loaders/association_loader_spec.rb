@@ -57,7 +57,7 @@ describe Loaders::AssociationLoader do
           expect(course).to eq @c2
         }
       end
-    }.to change{@query_count}.by(1)
+    }.to change { @query_count }.by(1)
   end
 
   it "batch loads when the association is already loaded on first object" do
@@ -75,6 +75,6 @@ describe Loaders::AssociationLoader do
       GraphQL::Batch.batch do
         Loaders::AssociationLoader.for(Assignment, :context).load_many([a1, a2, a3])
       end
-    }.to change{@query_count}.by(1)
+    }.to change { @query_count }.by(1)
   end
 end

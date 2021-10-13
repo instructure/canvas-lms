@@ -20,10 +20,10 @@
 
 module DataFixup::FixGraderVisibilityData
   def self.run
-    Assignment.where("grader_comments_visible_to_graders IS NOT TRUE AND grader_names_visible_to_final_grader IS NOT TRUE").
-      in_batches.update_all(
-        grader_comments_visible_to_graders: true,
-        grader_names_visible_to_final_grader: true
-      )
+    Assignment.where("grader_comments_visible_to_graders IS NOT TRUE AND grader_names_visible_to_final_grader IS NOT TRUE")
+              .in_batches.update_all(
+                grader_comments_visible_to_graders: true,
+                grader_names_visible_to_final_grader: true
+              )
   end
 end

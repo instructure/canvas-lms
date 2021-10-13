@@ -25,6 +25,7 @@ class AuditorApiController < ApplicationController
 
   def check_configured
     return if Audits.configured?
+
     render json: { message: "Audits module is not configured" }, status: :not_found
   end
 

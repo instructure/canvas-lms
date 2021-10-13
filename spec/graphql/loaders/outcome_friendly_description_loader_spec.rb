@@ -32,26 +32,26 @@ describe Loaders::OutcomeFriendlyDescriptionLoader do
 
   def create_course_fd
     @course_fd = OutcomeFriendlyDescription.create!({
-      learning_outcome: @outcome,
-      context: @course,
-      description: "course's description"
-    })
+                                                      learning_outcome: @outcome,
+                                                      context: @course,
+                                                      description: "course's description"
+                                                    })
   end
 
   def create_account_fd
     @account_fd = OutcomeFriendlyDescription.create!({
-      learning_outcome: @outcome,
-      context: @course_account,
-      description: "account's description"
-    })
+                                                       learning_outcome: @outcome,
+                                                       context: @course_account,
+                                                       description: "account's description"
+                                                     })
   end
 
   def create_parent_account_fd
     @parent_account_fd = OutcomeFriendlyDescription.create!({
-      learning_outcome: @outcome,
-      context: @parent_account,
-      description: "parent account's description"
-    })
+                                                              learning_outcome: @outcome,
+                                                              context: @parent_account,
+                                                              description: "parent account's description"
+                                                            })
   end
 
   it "prioritizes course fd" do

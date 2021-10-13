@@ -22,11 +22,14 @@ module LtiAdvantage
     def validate_type(attr, value, record)
       expected_type = record.class::TYPED_ATTRIBUTES[attr]
       return if value.nil? || expected_type.nil?
+
       if expected_type.is_a? Array
         return if expected_type.any? { |t| valid_value?(t, value) }
+
         record.errors.add(attr, "#{attr} must be an instance of one of #{expected_type.join(', ')}")
       else
         return if valid_value?(expected_type, value)
+
         record.errors.add(attr, "#{attr} must be an instance of #{expected_type}")
       end
     end
@@ -38,6 +41,7 @@ module LtiAdvantage
     def validate_nested_models(attr, value, record)
       return validate_nested_array(attr, value, record) if value.instance_of? Array
       return unless value.respond_to?(:invalid?)
+
       if value.invalid?
         errors = value.errors.respond_to?(:as_json) ? value.errors.as_json[:errors] : value.errors
         record.errors.add(attr, errors)

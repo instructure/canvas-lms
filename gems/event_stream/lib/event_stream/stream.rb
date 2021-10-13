@@ -27,7 +27,7 @@ class EventStream::Stream
   attr_config :record_type, :default => EventStream::Record
   attr_config :time_to_live, :type => Integer, :default => 1.year # only honored for cassandra strategy
   attr_config :read_consistency_level, :default => nil # only honored for cassandra strategy
-  attr_config :backend_strategy, default: ->{ :cassandra } # one of [:cassandra, :active_record]
+  attr_config :backend_strategy, default: -> { :cassandra } # one of [:cassandra, :active_record]
   attr_config :active_record_type, default: nil # only needed if backend_strategy evaluates to :active_record
 
   attr_accessor :raise_on_error, :backend_override
@@ -54,7 +54,7 @@ class EventStream::Stream
     add_callback(:insert, callback)
   end
 
-  def insert(record, options={})
+  def insert(record, options = {})
     backend_for(options.fetch(:backend_strategy, backend_strategy)) do |backend|
       backend.execute(:insert, record)
     end
@@ -65,7 +65,7 @@ class EventStream::Stream
     add_callback(:update, callback)
   end
 
-  def update(record, options={})
+  def update(record, options = {})
     backend_for(options.fetch(:backend_strategy, backend_strategy)) do |backend|
       backend.execute(:update, record)
     end
@@ -167,5 +167,4 @@ class EventStream::Stream
   def add_callback(operation, callback)
     callbacks_for(operation) << callback
   end
-
 end

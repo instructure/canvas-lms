@@ -55,9 +55,9 @@ class FileAuthenticator
 
   def instfs_bearer_token
     InstFS.bearer_token({
-      user: @user,
-      acting_as: @acting_as
-    })
+                          user: @user,
+                          acting_as: @acting_as
+                        })
   end
 
   def download_url(attachment, options: {})
@@ -86,10 +86,11 @@ class FileAuthenticator
     end
   end
 
-  def thumbnail_url(attachment, options={})
+  def thumbnail_url(attachment, options = {})
     return nil unless attachment
+
     if !Attachment.skip_thumbnails && attachment.instfs_hosted? && attachment.thumbnailable?
-      options = instfs_options(attachment, {geometry: options[:size], original_url: options[:original_url]})
+      options = instfs_options(attachment, { geometry: options[:size], original_url: options[:original_url] })
       InstFS.authenticated_thumbnail_url(attachment, options)
     else
       attachment.thumbnail_url(options)
@@ -117,6 +118,7 @@ class FileAuthenticator
     # nil on a reload from master _shouldn't_ occur, and if it does just means
     # we delay re-importing until next time)
     return unless InstFS.migrate_attachment?(attachment)
+
     GuardRail.activate(:primary) do
       attachment.instfs_uuid = InstFS.export_reference(attachment)
       attachment.save!
@@ -127,7 +129,7 @@ class FileAuthenticator
     # interrupting what could be a successful redirect to s3
   end
 
-  def instfs_options(attachment, extras={})
+  def instfs_options(attachment, extras = {})
     {
       user: @user,
       acting_as: @acting_as,

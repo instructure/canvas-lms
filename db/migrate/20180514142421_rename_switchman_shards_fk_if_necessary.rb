@@ -10,6 +10,5 @@ class RenameSwitchmanShardsFkIfNecessary < ActiveRecord::Migration[5.1]
       remove_foreign_key :switchman_shards, column: :delayed_jobs_shard_id, if_exists: true
       add_foreign_key :switchman_shards, :switchman_shards, column: :delayed_jobs_shard_id
     end
-
   end
 end

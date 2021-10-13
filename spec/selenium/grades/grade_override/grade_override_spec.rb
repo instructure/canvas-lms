@@ -32,10 +32,10 @@ describe 'Final Grade Override' do
 
   before(:each) do
     # needed until Jenkins starts using active record and cassandra is killed
-    allow(Audits).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
+    allow(Audits).to receive(:config).and_return({ 'write_paths' => ['active_record'], 'read_path' => 'active_record' })
     allow(AuditLogFieldExtension).to receive(:enabled?).and_return(false)
 
-    course_with_teacher(course_name: "Grade Override", active_course: true,active_enrollment: true,name: "Dedicated Teacher1",active_user: true)
+    course_with_teacher(course_name: "Grade Override", active_course: true, active_enrollment: true, name: "Dedicated Teacher1", active_user: true)
     @course.update!(grading_standard_enabled: true)
     @students = create_users_in_course(@course, 5, return_type: :record, name_prefix: "Purple")
     @course.enable_feature!(:final_grades_override)
@@ -128,12 +128,10 @@ describe 'Final Grade Override' do
       end
 
       it 'displays checkbox to show final grade overrides only when final_grade_override_in_gradebook_history flag enabled' do
-
         expect(GradeBookHistory.final_grade_override_checkbox).to be_displayed
       end
 
       it 'displays final grade override grade changes when final_grade_override_in_gradebook_history flag is enabled' do
-
         expect(GradeBookHistory).to be_contains_final_grade_override_entries
       end
 
@@ -152,7 +150,6 @@ describe 'Final Grade Override' do
       end
 
       it 'does not display final grade override grade changes when final_grade_override_in_gradebook_history flag is disabled' do
-
         expect(GradeBookHistory).not_to be_contains_final_grade_override_entries
       end
     end

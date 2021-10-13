@@ -96,7 +96,7 @@ describe "speed grader - rubrics" do
     @association.use_for_grading = true
     @association.save!
 
-    @rubric.data.detect{ |row| row[:learning_outcome_id] == @outcome.id }[:ignore_for_scoring] = true
+    @rubric.data.detect { |row| row[:learning_outcome_id] == @outcome.id }[:ignore_for_scoring] = true
     @rubric.save!
 
     Speedgrader.visit(@course.id, @assignment.id)
@@ -119,7 +119,7 @@ describe "speed grader - rubrics" do
     expect(Speedgrader.rubric_comment_for_row("no outcome row")).to include_text to_comment
   end
 
-  it "should not convert invalid text to 0", priority: "2", test_id: 283751 do
+  it "does not convert invalid text to 0", priority: "2", test_id: 283751 do
     student_submission
     @association.save!
 
@@ -165,7 +165,7 @@ describe "speed grader - rubrics" do
         },
       ],
       learning_outcome_id: @ignored.id,
-      ignore_for_scoring:'1',
+      ignore_for_scoring: '1',
     }]
     @rubric.save!
 
@@ -198,7 +198,7 @@ describe "speed grader - rubrics" do
   end
 
   context "when rounding .rubric_total" do
-    it "should round to 2 decimal places", priority: "1", test_id: 283752 do
+    it "rounds to 2 decimal places", priority: "1", test_id: 283752 do
       setup_and_grade_rubric('1.001', '1.01')
 
       expect(fj("span[data-selenium='rubric_total']:visible")).to include_text('2.01') # while entering scores
@@ -214,7 +214,7 @@ describe "speed grader - rubrics" do
       expect(fj("span[data-selenium='rubric_total']:visible")).to include_text('2.01') # after opening the rubric up again to re-score
     end
 
-    it "should not display trailing zeros", priority: "1", test_id: 283753 do
+    it "does not display trailing zeros", priority: "1", test_id: 283753 do
       setup_and_grade_rubric('1', '1')
 
       expect(f("span[data-selenium='rubric_total']")).to include_text('2') # while entering scores

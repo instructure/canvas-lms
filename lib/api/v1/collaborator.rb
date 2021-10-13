@@ -26,9 +26,9 @@ module Api::V1::Collaborator
     api_json(collaborator, current_user, session, :only => %w{id}).tap do |hash|
       hash['type'] = collaborator.group_id.present? ? 'group' : 'user'
       hash['name'] = collaborator.user.try(:sortable_name) ||
-        collaborator.group.try(:name)
+                     collaborator.group.try(:name)
       hash['collaborator_id'] = collaborator.user.try(:id) ||
-        collaborator.group.id
+                                collaborator.group.id
 
       if includes.include?('collaborator_lti_id')
         hash['collaborator_lti_id'] = collaborator.user ? Lti::Asset.opaque_identifier_for(collaborator.user, context: context) :

@@ -60,6 +60,13 @@ module Types
       learning_outcome_group_children_service.total_outcomes(object.id, args)
     end
 
+    field :not_imported_outcomes_count, Integer, null: true do
+      argument :target_group_id, Integer, required: false
+    end
+    def not_imported_outcomes_count(**args)
+      learning_outcome_group_children_service.not_imported_outcomes(object.id, args)
+    end
+
     field :outcomes, Types::ContentTagConnection, null: false do
       argument :search_query, String, required: false
     end

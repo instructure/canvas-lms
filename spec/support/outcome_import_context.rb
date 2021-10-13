@@ -24,13 +24,13 @@ RSpec.shared_examples "outcome import context examples" do
     it { is_expected.to belong_to(:latest_outcome_import).class_name('OutcomeImport') }
   end
 
-  it "should not raise error when setting latest outcome import" do
+  it "does not raise error when setting latest outcome import" do
     a1 = described_class.create!
     oi = OutcomeImport.create!(context: a1)
     expect { a1.update!(latest_outcome_import: oi) }.not_to raise_error
   end
 
-  it "should raise error on invalid latest outcome import" do
+  it "raises error on invalid latest outcome import" do
     a1 = described_class.create!
     oi = OutcomeImport.create!(context: described_class.create!)
     expect { a1.update!(latest_outcome_import: oi) }.to raise_error(ActiveRecord::RecordInvalid)

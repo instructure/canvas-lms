@@ -17,13 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
-
 require_relative '../common'
 require_relative '../helpers/blueprint_common'
 
 describe "Blueprint association settings" do
-
   include_context "in-process server selenium tests"
   include BlueprintCourseCommon
 
@@ -39,7 +36,6 @@ describe "Blueprint association settings" do
     @minion4 = course_factory(course_name: "minion4", active_all: true)
 
     create_sub_account
-
   end
 
   def create_sub_account(name = 'sub account', number_to_create = 1, parent_account = Account.default)
@@ -57,7 +53,6 @@ describe "Blueprint association settings" do
   end
 
   context "in the blueprint association settings" do
-
     it "courses show in the 'To be Added' area", priority: "2", test_id: 3077486 do
       open_associations
       open_courses_list

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {act} from 'react-dom/test-utils'
-import {mount,render} from 'enzyme'
+import {mount} from 'enzyme'
 import LinkValidator from '../LinkValidator'
 import sinon from 'sinon'
 import $ from 'jquery'
@@ -55,7 +55,7 @@ describe('LinkValidator', () => {
       })
 
       it('renders confetti', () => {
-        const wrapper = mount(<LinkValidator />)
+        const wrapper = mount(<LinkValidator pollTimeout={0} pollTimeoutInitial={0} />)
         const promise = new Promise(resolve => {
           setTimeout(resolve, 1)
         })
@@ -78,7 +78,7 @@ describe('LinkValidator', () => {
         })
 
         it('does not render confetti', () => {
-          const wrapper = mount(<LinkValidator />)
+          const wrapper = mount(<LinkValidator pollTimeout={0} pollTimeoutInitial={0} />)
           const promise = new Promise(resolve => {
             setTimeout(resolve, 1)
           })
@@ -138,7 +138,7 @@ describe('LinkValidator', () => {
       })
 
       it('does not render confetti', () => {
-        const wrapper = mount(<LinkValidator />)
+        const wrapper = mount(<LinkValidator pollTimeout={0} pollTimeoutInitial={0} />)
         const promise = new Promise(resolve => {
           setTimeout(resolve, 1)
         })
@@ -153,7 +153,7 @@ describe('LinkValidator', () => {
       })
 
       it('sanitizes URLs', () => {
-        const wrapper = mount(<LinkValidator />)
+        const wrapper = mount(<LinkValidator pollTimeout={0} pollTimeoutInitial={0} />)
         const promise = new Promise(resolve => {
           setTimeout(resolve, 1)
         })

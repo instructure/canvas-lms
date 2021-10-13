@@ -19,10 +19,9 @@
 #
 module GoogleDrive
   class Entry
-
     attr_reader :document_id, :folder, :entry
 
-    def initialize(google_drive_entry, preferred_extensions=nil)
+    def initialize(google_drive_entry, preferred_extensions = nil)
       @entry = google_drive_entry
       @document_id = @entry['id']
       @preferred_extensions = preferred_extensions
@@ -55,11 +54,12 @@ module GoogleDrive
         :name => display_name,
         :document_id => @document_id,
         :extension => extension,
-        :alternate_url => {:href => alternate_url}
+        :alternate_url => { :href => alternate_url }
       }
     end
 
     private
+
     def file_data
       # First we check export links for our preferred formats
       # then we fail over to the file properties
@@ -79,7 +79,7 @@ module GoogleDrive
       }
     end
 
-    def preferred_export_link(preferred_extensions=nil)
+    def preferred_export_link(preferred_extensions = nil)
       preferred_urls = preferred_mime_types.map do |mime_type|
         next unless @entry['exportLinks'][mime_type]
 
@@ -91,11 +91,12 @@ module GoogleDrive
         [current_url, current_extension] if has_preferred_extension || !preferred_extensions
       end
 
-      url, extension = preferred_urls.find{ |i| i}
+      url, extension = preferred_urls.find { |i| i }
 
       # if we dont have any "preferred extension" just return the default.
       # they will be filtered out by the folderize method
       return preferred_export_link if url.nil? && preferred_extensions
+
       [url, extension]
     end
 

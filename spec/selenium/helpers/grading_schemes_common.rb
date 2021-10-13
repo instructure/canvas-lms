@@ -36,7 +36,7 @@ module GradingSchemesCommon
     )
   end
 
-  def should_add_a_grading_scheme(options = {name: "new grading standard"})
+  def should_add_a_grading_scheme(options = { name: "new grading standard" })
     new_standard_name = options[:name]
     f('.add_standard_button').click
     expect(f('.add_standard_button')).to have_class('disabled')
@@ -91,7 +91,6 @@ module GradingSchemesCommon
     expect(@grading_standard.data[1][0]).to eq 'Z'
     # TODO: check for change in upper limit of next row item
   end
-
 
   def grading_standard_rows
     ff('.grading_standard_row')

@@ -23,6 +23,7 @@ class DiscussionFilterType < Types::BaseEnum
   description 'Search types that can be associated with discussions'
   value 'all'
   value 'unread'
+  value 'drafts'
   value 'deleted'
 end
 
@@ -43,7 +44,6 @@ module Types
 
     global_id_field :id
     field :title, String, null: true
-    field :message, String, null: true
     field :context_id, ID, null: false
     field :context_type, String, null: false
     field :delayed_post_at, Types::DateTimeType, null: true
@@ -60,6 +60,11 @@ module Types
     field :is_announcement, Boolean, null: false
     field :is_section_specific, Boolean, null: true
     field :require_initial_post, Boolean, null: true
+
+    field :message, String, null: true
+    def message
+      object.message
+    end
 
     field :initial_post_required_for_current_user, Boolean, null: false
     def initial_post_required_for_current_user
@@ -94,6 +99,11 @@ module Types
     end
     def discussion_entries_connection(**args)
       get_entries(args)
+    end
+
+    field :discussion_entry_drafts_connection, Types::DiscussionEntryDraftType.connection_type, null: true
+    def discussion_entry_drafts_connection
+      Loaders::DiscussionEntryDraftLoader.for(current_user: current_user).load(object)
     end
 
     field :entry_counts, Types::DiscussionEntryCountsType, null: true
@@ -206,6 +216,7 @@ module Types
 
     def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false)
       return [] if object.initial_post_required?(current_user, session)
+
       Loaders::DiscussionEntryLoader.for(
         current_user: current_user,
         search_term: search_term,

@@ -53,6 +53,7 @@ module TimeZoneHelper
   # Returns a Rails named zone instead of tzinfo named zone, if one exists
   def self.rails_preferred_zone(zone)
     return nil unless zone
+
     @reverse_map ||= Hash[ActiveSupport::TimeZone.all.map do |z|
       # Rails allows several aliases that map to the same IANA zone; on the reverse
       # mapping, exclude the aliases so that America/Lima doesn't come back as Quito
@@ -61,6 +62,7 @@ module TimeZoneHelper
                "Islamabad", "Chennai", "Mumbai", "New Delhi", "Astana",
                "Hanoi", "Osaka", "Sapporo", "Canberra", "Solomon Is.",
                "Wellington"].include?(z.name)
+
       [z.tzinfo.name, z]
     end.compact]
     @reverse_map[zone.name] || zone

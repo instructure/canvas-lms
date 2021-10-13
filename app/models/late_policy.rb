@@ -24,14 +24,14 @@ class LatePolicy < ActiveRecord::Base
   belongs_to :course, inverse_of: :late_policy
 
   validates :course_id,
-    presence: true,
-    uniqueness: true
+            presence: true,
+            uniqueness: true
   validates :late_submission_minimum_percent, :missing_submission_deduction, :late_submission_deduction,
-    presence: true,
-    numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
+            presence: true,
+            numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
   validates :late_submission_interval,
-    presence: true,
-    inclusion: { in: %w(day hour) }
+            presence: true,
+            inclusion: { in: %w(day hour) }
 
   before_save :set_root_account_id
   after_save :update_late_submissions, if: :late_policy_attributes_changed?
@@ -50,6 +50,7 @@ class LatePolicy < ActiveRecord::Base
 
   def missing_points_deducted(points_possible, grading_type)
     return points_possible.to_f if grading_type == 'pass_fail'
+
     points_possible.to_f * missing_submission_deduction.to_f / 100
   end
 

@@ -30,7 +30,7 @@ describe 'assignments' do
       site_admin_logged_in
     end
 
-    it 'should not show google docs tab for masquerading admin' do
+    it 'does not show google docs tab for masquerading admin' do
       PluginSetting.create!(name: 'google_drive', settings: {})
       masquerade_url = "/users/#{@student.id}/masquerade"
       get masquerade_url
@@ -49,7 +49,7 @@ describe 'assignments' do
       driver.switch_to.default_content
     end
 
-    it 'should show the submit button if admin is enrolled as student' do
+    it 'shows the submit button if admin is enrolled as student' do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       wait_for_ajaximations
 
@@ -70,7 +70,7 @@ describe 'assignments' do
       assignment_model(course: @course, submission_types: 'online_upload', title: 'Assignment 1')
     end
 
-    it "shouldn't kersplode on the index without the `manage_courses` permission" do
+    it "does not kersplode on the index without the `manage_courses` permission" do
       @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       account_admin_user_with_role_changes(role_changes: { manage_courses: false })
       user_session(@user)
@@ -80,7 +80,7 @@ describe 'assignments' do
       expect(f("#assignment_#{@assignment.id}").text).to include(@assignment.title)
     end
 
-    it "shouldn't kersplode on the index without the `manage_courses_admin` permission (granular permissions)" do
+    it "does not kersplode on the index without the `manage_courses_admin` permission (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_courses)
       account_admin_user_with_role_changes(role_changes: { manage_courses_admin: false })
       user_session(@user)
@@ -90,7 +90,7 @@ describe 'assignments' do
       expect(f("#assignment_#{@assignment.id}").text).to include(@assignment.title)
     end
 
-    it "shouldn't kersplode on the index without the `manage_assignments` permission" do
+    it "does not kersplode on the index without the `manage_assignments` permission" do
       account_admin_user_with_role_changes(role_changes: { manage_assignments: false })
       user_session(@user)
 

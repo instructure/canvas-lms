@@ -52,8 +52,7 @@ describe ContentMigration do
                                    :unlock_at => @old_start + 1.days,
                                    :lock_at => @old_start + 5.days,
                                    :show_correct_answers_at => @old_start + 6.days,
-                                   :hide_correct_answers_at => @old_start + 7.days
-        )
+                                   :hide_correct_answers_at => @old_start + 7.days)
         @copy_from.discussion_topics.create!(:title => "some topic",
                                              :message => "<p>some text</p>",
                                              :delayed_post_at => @old_start + 3.days,
@@ -71,7 +70,7 @@ describe ContentMigration do
         cm2.save!
       end
 
-      it "should shift dates" do
+      it "shifts dates" do
         skip unless Qti.qti_enabled?
         options = {
           everything: true,
@@ -87,7 +86,7 @@ describe ContentMigration do
         run_course_copy
 
         new_asmnt = @copy_to.assignments.first
-        expect(new_asmnt.due_at.to_i).to  eq (@new_start + 1.day).to_i
+        expect(new_asmnt.due_at.to_i).to eq (@new_start + 1.day).to_i
         expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.day).to_i
         expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
         expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
@@ -101,7 +100,7 @@ describe ContentMigration do
         expect(new_folder.lock_at.to_i).to eq (@new_start + 2.day).to_i
 
         new_quiz = @copy_to.quizzes.first
-        expect(new_quiz.due_at.to_i).to  eq (@new_start + 4.day).to_i
+        expect(new_quiz.due_at.to_i).to eq (@new_start + 4.day).to_i
         expect(new_quiz.unlock_at.to_i).to eq (@new_start + 1.day).to_i
         expect(new_quiz.lock_at.to_i).to eq (@new_start + 5.day).to_i
         expect(new_quiz.show_correct_answers_at.to_i).to eq (@new_start + 6.day).to_i
@@ -119,10 +118,10 @@ describe ContentMigration do
         expect(new_event.end_at.to_i).to eq (@new_start + 4.day + 1.hour).to_i
 
         new_mod = @copy_to.context_modules.first
-        expect(new_mod.unlock_at.to_i).to  eq (@new_start + 1.day).to_i
+        expect(new_mod.unlock_at.to_i).to eq (@new_start + 1.day).to_i
 
         newer_mod = @copy_to.context_modules.last
-        expect(newer_mod.unlock_at.to_i).to  eq (@new_start + 1.day).to_i
+        expect(newer_mod.unlock_at.to_i).to eq (@new_start + 1.day).to_i
       end
 
       it "infers a sensible end date if not provided" do
@@ -141,7 +140,7 @@ describe ContentMigration do
         run_course_copy
 
         new_asmnt = @copy_to.assignments.first
-        expect(new_asmnt.due_at.to_i).to  eq (@new_start + 1.day).to_i
+        expect(new_asmnt.due_at.to_i).to eq (@new_start + 1.day).to_i
         expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.day).to_i
         expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
         expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
@@ -163,13 +162,13 @@ describe ContentMigration do
         run_course_copy
 
         new_asmnt = @copy_to.assignments.first
-        expect(new_asmnt.due_at.to_i).to  eq (@new_start + 1.day).to_i
+        expect(new_asmnt.due_at.to_i).to eq (@new_start + 1.day).to_i
         expect(new_asmnt.unlock_at.to_i).to eq (@new_start - 2.day).to_i
         expect(new_asmnt.lock_at.to_i).to eq (@new_start + 3.day).to_i
         expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
       end
 
-      it "should remove dates" do
+      it "removes dates" do
         skip unless Qti.qti_enabled?
         options = {
           everything: true,
@@ -220,7 +219,7 @@ describe ContentMigration do
         expect(newer_mod.unlock_at).to be_nil
       end
 
-      it "should not create broken assignments from unpublished quizzes" do
+      it "does not create broken assignments from unpublished quizzes" do
         options = {
           everything: true,
           remove_dates: true,
@@ -235,7 +234,7 @@ describe ContentMigration do
     end
 
     context "when crossing daylight saving shift" do
-      let(:local_time_zone) {ActiveSupport::TimeZone.new 'America/Denver'}
+      let(:local_time_zone) { ActiveSupport::TimeZone.new 'America/Denver' }
 
       def copy_assignment(options = {})
         account = @copy_to.account
@@ -271,12 +270,12 @@ describe ContentMigration do
       end
 
       context "when MST to MDT" do
-        let(:old_date) {local_time_zone.local(2012, 1, 6, 12, 0)} # 6 Jan 2012 12:00
-        let(:new_date) {local_time_zone.local(2012, 4, 6, 12, 0)} # 6 Apr 2012 12:00
-        let(:old_start_date) {'Jan 1, 2012'}
-        let(:old_end_date) {'Jan 15, 2012'}
-        let(:new_start_date) {'Apr 1, 2012'}
-        let(:new_end_date) {'Apr 15, 2012'}
+        let(:old_date) { local_time_zone.local(2012, 1, 6, 12, 0) } # 6 Jan 2012 12:00
+        let(:new_date) { local_time_zone.local(2012, 4, 6, 12, 0) } # 6 Apr 2012 12:00
+        let(:old_start_date) { 'Jan 1, 2012' }
+        let(:old_end_date) { 'Jan 15, 2012' }
+        let(:new_start_date) { 'Apr 1, 2012' }
+        let(:new_end_date) { 'Apr 15, 2012' }
 
         it "using an explicit time zone" do
           expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
@@ -292,12 +291,12 @@ describe ContentMigration do
       end
 
       context "when MDT to MST" do
-        let(:old_date) {local_time_zone.local(2012, 9, 6, 12, 0)} # 6 Sep 2012 12:00
-        let(:new_date) {local_time_zone.local(2012, 12, 6, 12, 0)} # 6 Dec 2012 12:00
-        let(:old_start_date) {'Sep 1, 2012'}
-        let(:old_end_date) {'Sep 15, 2012'}
-        let(:new_start_date) {'Dec 1, 2012'}
-        let(:new_end_date) {'Dec 15, 2012'}
+        let(:old_date) { local_time_zone.local(2012, 9, 6, 12, 0) } # 6 Sep 2012 12:00
+        let(:new_date) { local_time_zone.local(2012, 12, 6, 12, 0) } # 6 Dec 2012 12:00
+        let(:old_start_date) { 'Sep 1, 2012' }
+        let(:old_end_date) { 'Sep 15, 2012' }
+        let(:new_start_date) { 'Dec 1, 2012' }
+        let(:new_end_date) { 'Dec 15, 2012' }
 
         it "using an explicit time zone" do
           expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
@@ -314,12 +313,12 @@ describe ContentMigration do
 
       context "when parsing dates with times" do
         context "from MST to MDT" do
-          let(:old_date) {local_time_zone.local(2012, 1, 6, 12, 0)} # 6 Jan 2012 12:00
-          let(:new_date) {local_time_zone.local(2012, 4, 6, 12, 0)} # 6 Apr 2012 12:00
-          let(:old_start_date) {'2012-01-01T01:00:00'}
-          let(:old_end_date) {'2012-01-15T01:00:00'}
-          let(:new_start_date) {'2012-04-01T01:00:00'}
-          let(:new_end_date) {'2012-04-15T01:00:00'}
+          let(:old_date) { local_time_zone.local(2012, 1, 6, 12, 0) } # 6 Jan 2012 12:00
+          let(:new_date) { local_time_zone.local(2012, 4, 6, 12, 0) } # 6 Apr 2012 12:00
+          let(:old_start_date) { '2012-01-01T01:00:00' }
+          let(:old_end_date) { '2012-01-15T01:00:00' }
+          let(:new_start_date) { '2012-04-01T01:00:00' }
+          let(:new_end_date) { '2012-04-15T01:00:00' }
 
           it "using an explicit time zone" do
             expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
@@ -335,12 +334,12 @@ describe ContentMigration do
         end
 
         context "when MDT to MST" do
-          let(:old_date) {local_time_zone.local(2012, 9, 6, 12, 0)} # 6 Sep 2012 12:00
-          let(:new_date) {local_time_zone.local(2012, 12, 6, 12, 0)} # 6 Dec 2012 12:00
-          let(:old_start_date) {'2012-09-01T01:00:00'}
-          let(:old_end_date) {'2012-09-15T01:00:00'}
-          let(:new_start_date) {'2012-12-01T01:00:00'}
-          let(:new_end_date) {'2012-12-15T01:00:00'}
+          let(:old_date) { local_time_zone.local(2012, 9, 6, 12, 0) } # 6 Sep 2012 12:00
+          let(:new_date) { local_time_zone.local(2012, 12, 6, 12, 0) } # 6 Dec 2012 12:00
+          let(:old_start_date) { '2012-09-01T01:00:00' }
+          let(:old_end_date) { '2012-09-15T01:00:00' }
+          let(:new_start_date) { '2012-12-01T01:00:00' }
+          let(:new_end_date) { '2012-12-15T01:00:00' }
 
           it "using an explicit time zone" do
             expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
@@ -356,12 +355,12 @@ describe ContentMigration do
         end
 
         context "with UTC date_shift parameters" do
-          let(:old_date) {local_time_zone.local(2012, 9, 6, 12, 0)} # 6 Sep 2012 12:00
-          let(:new_date) {local_time_zone.local(2012, 12, 6, 12, 0)} # 6 Dec 2012 12:00
-          let(:old_start_date) {'2012-09-01T08:00:00Z'}
-          let(:old_end_date) {'2012-09-15T08:00:00Z'}
-          let(:new_start_date) {'2012-12-01T08:00:00Z'}
-          let(:new_end_date) {'2012-12-15T08:00:00Z'}
+          let(:old_date) { local_time_zone.local(2012, 9, 6, 12, 0) } # 6 Sep 2012 12:00
+          let(:new_date) { local_time_zone.local(2012, 12, 6, 12, 0) } # 6 Dec 2012 12:00
+          let(:old_start_date) { '2012-09-01T08:00:00Z' }
+          let(:old_end_date) { '2012-09-15T08:00:00Z' }
+          let(:new_start_date) { '2012-12-01T08:00:00Z' }
+          let(:new_end_date) { '2012-12-15T08:00:00Z' }
 
           it "using an explicit time zone" do
             expect(new_date).to eq copy_assignment(:time_zone => local_time_zone)
@@ -391,7 +390,7 @@ describe ContentMigration do
       end
     end
 
-    it "should perform day substitutions" do
+    it "performs day substitutions" do
       skip unless Qti.qti_enabled?
       @copy_from.require_assignment_group
       today = Time.now.utc
@@ -403,7 +402,7 @@ describe ContentMigration do
 
       @cm.copy_options = @cm.copy_options.merge(
         :shift_dates => true,
-        :day_substitutions => {today.wday.to_s => (today.wday + 1).to_s}
+        :day_substitutions => { today.wday.to_s => (today.wday + 1).to_s }
       )
       @cm.save!
 
@@ -415,7 +414,7 @@ describe ContentMigration do
       expect((new_assignment.due_at.to_i - (today + 1.day).to_i).abs).to be < 60
     end
 
-    it "should correctly copy all day dates for assignments and events" do
+    it "correctlies copy all day dates for assignments and events" do
       date = "Jun 21 2012 11:59pm"
       date2 = "Jun 21 2012 00:00am"
       asmnt = @copy_from.assignments.create!(:title => 'all day', :due_at => date)
@@ -442,7 +441,7 @@ describe ContentMigration do
       expect(cal_2.start_at.utc).to eq cal.start_at.utc
     end
 
-    it "should not clear destination course dates" do
+    it "does not clear destination course dates" do
       start_at = 1.day.ago
       conclude_at = 2.days.from_now
       @copy_to.start_at = start_at
@@ -462,7 +461,7 @@ describe ContentMigration do
       expect(@copy_to.conclude_at).to eq conclude_at
     end
 
-    it "should not break link resolution in quiz_data" do
+    it "does not break link resolution in quiz_data" do
       skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
 
       topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<p>some text</p>")
@@ -470,7 +469,7 @@ describe ContentMigration do
       html = "<a href='/courses/#{@copy_from.id}/discussion_topics/#{topic.id}'>link</a>"
 
       bank = @copy_from.assessment_question_banks.create!(title: 'bank')
-      data = {question_name: 'test question', question_type: 'essay_question', question_text: html}
+      data = { question_name: 'test question', question_type: 'essay_question', question_text: html }
       bank.assessment_questions.create!(question_data: data)
 
       quiz = @copy_from.quizzes.create!(due_at: "05 Jul 2012 06:00:00 UTC +00:00")
@@ -500,7 +499,7 @@ describe ContentMigration do
       expect(data).to include("courses/#{@copy_to.id}/discussion_topics/#{topic_to.id}")
     end
 
-    it "should work on all_day calendar events" do
+    it "works on all_day calendar events" do
       @old_start = Time.zone.parse("01 Jul 2012 06:00:00 UTC +00:00")
       @new_start = Time.zone.parse("05 Aug 2012 06:00:00 UTC +00:00")
 
@@ -529,7 +528,7 @@ describe ContentMigration do
       expect(new_event.all_day_date).to eq (@new_start + 4.days).to_date
     end
 
-    it "should remove dates for all-day events" do
+    it "removes dates for all-day events" do
       @old_start = Time.zone.parse("01 Jul 2012 06:00:00 UTC +00:00")
 
       all_day_event = @copy_from.calendar_events.create!(title: "an event",
@@ -549,7 +548,7 @@ describe ContentMigration do
       expect(new_event.all_day_date).to be_nil
     end
 
-    it "should trigger cached_due_date changes" do
+    it "triggers cached_due_date changes" do
       assmt = @copy_from.assignments.create!(title: "an event", :due_at => 1.day.from_now)
 
       run_course_copy

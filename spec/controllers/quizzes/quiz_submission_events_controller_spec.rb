@@ -41,14 +41,14 @@ describe Quizzes::QuizSubmissionEventsController do
       @quiz_submission = @quiz.generate_submission(@student, false)
     end
 
-    it "should require authorization" do
+    it "requires authorization" do
       subject()
 
       expect(response).to be_redirect
       expect(response).to redirect_to("/login")
     end
 
-    it "should let the teacher in" do
+    it "lets the teacher in" do
       user_session(@teacher)
 
       subject()
@@ -56,7 +56,7 @@ describe Quizzes::QuizSubmissionEventsController do
       expect(response).to be_successful
     end
 
-    it "should not let the student in" do
+    it "does not let the student in" do
       user_session(@student)
 
       subject()
@@ -73,7 +73,7 @@ describe Quizzes::QuizSubmissionEventsController do
         Account.default.enable_feature!(:quiz_log_auditing)
       end
 
-      it "should redirect away" do
+      it "redirects away" do
         user_session(@teacher)
 
         subject()

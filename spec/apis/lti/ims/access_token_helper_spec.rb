@@ -42,7 +42,6 @@ module Lti
         def lti2_service_name
           'vnd.Canvas.CustomSecurity'
         end
-
       end
 
       it 'requires an access token' do
@@ -112,22 +111,21 @@ module Lti
       end
 
       describe "#bearer_token" do
-        let(:access_token_helper){ subject }
+        let(:access_token_helper) { subject }
 
         it 'returns the bearer token for auth header' do
-          @request.headers['Authorization'] = "Bearer #{dev_key_access_token.to_s}"
+          @request.headers['Authorization'] = "Bearer #{dev_key_access_token}"
           expect(access_token_helper.oauth2_request?).to be_truthy
         end
       end
 
       describe "#tool_proxy" do
-        let(:access_token_helper){ subject }
+        let(:access_token_helper) { subject }
         it 'returns the bearer token for auth header' do
           @request.headers.merge!(request_headers)
           expect(access_token_helper.tool_proxy).to be_truthy
         end
       end
-
     end
   end
 end

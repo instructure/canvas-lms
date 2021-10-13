@@ -21,13 +21,13 @@ require_relative '../common'
 
 module SendToDialogPage
   # ------------------------------ Selectors -----------------------------
-  
+
   def send_to_dialog_css_selector
     "[role='dialog'][aria-label='Send To...']"
   end
 
   # ------------------------------ Elements ------------------------------
-  
+
   def send_to_dialog
     f(send_to_dialog_css_selector)
   end
@@ -49,5 +49,4 @@ module SendToDialogPage
   end
 
   # ------------------------------ Actions ------------------------------
-
 end

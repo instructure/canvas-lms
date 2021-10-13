@@ -43,7 +43,7 @@ module RSpec
     end
 
     def modified_specs
-      @modified_specs ||= ENV["RELEVANT_SPECS"] && ENV["RELEVANT_SPECS"].split("\n") || []
+      @modified_specs ||= (ENV["RELEVANT_SPECS"] && ENV["RELEVANT_SPECS"].split("\n")) || []
     end
   end
 end

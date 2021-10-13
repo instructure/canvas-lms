@@ -37,6 +37,7 @@ export default function CommentRow(props) {
     })
     mediaTracks = mediaObject?.mediaTracks.map(track => {
       return {
+        id: track._id,
         src: `/media_objects/${mediaObject._id}/media_tracks/${track._id}`,
         label: track.locale,
         type: track.kind,

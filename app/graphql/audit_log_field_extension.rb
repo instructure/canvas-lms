@@ -112,7 +112,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
     def truncate_params!(o)
       case o
       when Hash
-        o.each { |k,v| o[k] = truncate_params!(v) }
+        o.each { |k, v| o[k] = truncate_params!(v) }
       when Array
         o.map! { |x| truncate_params!(x) }
       when String
@@ -136,6 +136,10 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       next unless AuditLogFieldExtension.enabled?
 
       mutation = field.mutation
+      # DiscussionEntryDrafts are not objects that need audit logs, they are
+      # only allowed to be created by the user, and they have timestamps, so
+      # skip audit logs for this mutation.
+      next if mutation == Mutations::CreateDiscussionEntryDraft
 
       logger = Logger.new(mutation, context, arguments)
 
@@ -143,7 +147,8 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       # should make them on the arguments too???
       mutation.fields.each do |_, return_field|
         next if return_field.original_name == :errors
-        if entry = value[return_field.original_name]
+
+        if (entry = value[return_field.original_name])
           # technically we could be returning lists of lists but gosh dang i
           # hope we never do that
           if entry.respond_to?(:each)

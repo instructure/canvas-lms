@@ -25,10 +25,10 @@ module Gradebook
     end
 
     def to_h
-      scores = Score.
-        where(enrollment_id: enrollment_ids_to_user_ids.keys).
-        where.not(override_score: nil).
-        to_a
+      scores = Score
+               .where(enrollment_id: enrollment_ids_to_user_ids.keys)
+               .where.not(override_score: nil)
+               .to_a
 
       scores.each_with_object({}) do |score, map|
         user_id = enrollment_ids_to_user_ids[score.enrollment_id]
@@ -63,15 +63,15 @@ module Gradebook
         student_ids = score_update_batch.pluck(:student_id)
         visible_students_in_batch = visible_students_scope.where(id: student_ids)
 
-        enrollments_to_update = course.student_enrollments.
-          preload(:scores).
-          where(user_id: visible_students_in_batch.select(:id)).
-          group_by(&:user_id)
+        enrollments_to_update = course.student_enrollments
+                                      .preload(:scores)
+                                      .where(user_id: visible_students_in_batch.select(:id))
+                                      .group_by(&:user_id)
 
         score_update_batch.each do |score_update|
           student_id = score_update[:student_id].to_i
           if student_id <= 0
-            errors << {student_id: score_update[:student_id], error: :invalid_student_id}
+            errors << { student_id: score_update[:student_id], error: :invalid_student_id }
             next
           end
 
@@ -89,12 +89,12 @@ module Gradebook
           rescue ActiveRecord::RecordNotFound, ActiveRecord::RecordInvalid
             # Either we couldn't find a score for the requested grading period,
             # or there was a problem updating, maybe due to a malformed score
-            errors << {student_id: score_update[:student_id], error: :failed_to_update}
+            errors << { student_id: score_update[:student_id], error: :failed_to_update }
           end
         end
       end
 
-      progress&.set_results({errors: errors})
+      progress&.set_results({ errors: errors })
     end
 
     private

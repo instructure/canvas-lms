@@ -24,7 +24,7 @@ class AuthenticationProvider::Facebook < AuthenticationProvider::Oauth2
   self.plugin = :facebook
   plugin_settings :app_id, app_secret: :app_secret_dec
 
-  SENSITIVE_PARAMS = [ :app_secret ].freeze
+  SENSITIVE_PARAMS = [:app_secret].freeze
 
   alias_attribute :app_id, :client_id
   alias_attribute :app_secret, :client_secret
@@ -38,7 +38,7 @@ class AuthenticationProvider::Facebook < AuthenticationProvider::Oauth2
   end
 
   def self.recognized_params
-    super + [ :login_attribute, :jit_provisioning ].freeze
+    super + [:login_attribute, :jit_provisioning].freeze
   end
 
   def self.login_attributes

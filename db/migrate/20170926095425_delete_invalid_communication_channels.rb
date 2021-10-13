@@ -21,8 +21,8 @@ class DeleteInvalidCommunicationChannels < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def up
-    DataFixup::DeleteInvalidCommunicationChannels.
-      delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').
-      run
+    DataFixup::DeleteInvalidCommunicationChannels
+      .delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups')
+      .run
   end
 end

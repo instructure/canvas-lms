@@ -27,9 +27,9 @@ class SubmissionDraft < ActiveRecord::Base
   validates :submission, presence: true
   validates :submission_attempt, numericality: { only_integer: true }
   validates :submission, uniqueness: { scope: :submission_attempt }
-  validates :body, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
+  validates :body, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
   validate :submission_attempt_matches_submission
-  validates :url, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
+  validates :url, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
   validate :media_object_id_matches_media_object
 
   sanitize_field :body, CanvasSanitize::SANITIZE
@@ -81,6 +81,7 @@ class SubmissionDraft < ActiveRecord::Base
 
   def meets_url_criteria?
     return false if self.url.blank?
+
     begin
       CanvasHttp.validate_url(self.url)
       true

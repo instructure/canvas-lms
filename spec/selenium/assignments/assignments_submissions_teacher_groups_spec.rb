@@ -30,7 +30,7 @@ describe 'submissions' do
 
   context "Assignment" do
     it "Create an assignment as a teacher", priority: "1", test_id: 56751 do
-      group_test_setup(3,3,1)
+      group_test_setup(3, 3, 1)
       expect do
         create_assignment_with_group_category_preparation
         validate_and_submit_form
@@ -41,13 +41,13 @@ describe 'submissions' do
     it "Edit an assignment", priority: "1", test_id: 238864 do
       @assignment = @course.assignments.create!(title: 'assignment 1', name: 'assignment 1', due_at: Time.now.utc + 2.days,
                                                 points_possible: 50, submission_types: 'online_text_entry')
-      group_test_setup(3,3,1)
+      group_test_setup(3, 3, 1)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/edit"
       select_assignment_group_category(-2)
       validate_and_submit_form
     end
 
-    it 'Should be able to create a new student group category from the assignment edit page', priority: "1", test_id: 56752 do
+    it 'is able to create a new student group category from the assignment edit page', priority: "1", test_id: 56752 do
       original_number_of_assignment = Assignment.count
       original_number_of_group = Group.count
       create_assignment_preparation

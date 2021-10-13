@@ -317,9 +317,9 @@ class OutcomeResultsController < ApplicationController
     respond_to do |format|
       format.json do
         json = case params[:aggregate]
-          when 'course' then aggregate_rollups_json
-          else user_rollups_json
-        end
+               when 'course' then aggregate_rollups_json
+               else user_rollups_json
+               end
         json[:linked] = linked_include_collections if params[:include].present?
         render json: json if json
       end
@@ -371,7 +371,7 @@ class OutcomeResultsController < ApplicationController
     filters << 'inactive' if exclude_inactive
 
     ActiveRecord::Associations::Preloader.new.preload(@users, :enrollments)
-    @users = @users.reject {|u| u.enrollments.all? {|e| filters.include? e.workflow_state}}
+    @users = @users.reject { |u| u.enrollments.all? { |e| filters.include? e.workflow_state } }
   end
 
   def remove_users_with_no_results
@@ -384,7 +384,7 @@ class OutcomeResultsController < ApplicationController
 
     rollups = user_rollups
     @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
-    rollups = @users.map {|u| rollups.find {|r| r.context.id == u.id }}.compact if params[:sort_by] == 'student'
+    rollups = @users.map { |u| rollups.find { |r| r.context.id == u.id } }.compact if params[:sort_by] == 'student'
     json = outcome_results_rollups_json(rollups)
     json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
     json
@@ -398,7 +398,7 @@ class OutcomeResultsController < ApplicationController
     # only include rollups for those users
     missing_score_sort = params[:sort_order] == 'desc' ? CanvasSort::First : CanvasSort::Last
     rollups = user_rollups.sort_by do |r|
-      score = r.scores.find {|s| s.outcome.id.to_s == params[:sort_outcome_id]}&.score
+      score = r.scores.find { |s| s.outcome.id.to_s == params[:sort_outcome_id] }&.score
       [score || missing_score_sort, Canvas::ICU.collation_key(r.context.sortable_name)]
     end
     rollups.reverse! if params[:sort_order] == 'desc'
@@ -407,7 +407,7 @@ class OutcomeResultsController < ApplicationController
     @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
     # only include rollups for the paginated users
     user_ids = @users.map(&:id)
-    rollups = rollups.select {|r| user_ids.include? r.context.id }
+    rollups = rollups.select { |r| user_ids.include? r.context.id }
     json = outcome_results_rollups_json(rollups)
     json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
     json
@@ -479,6 +479,7 @@ class OutcomeResultsController < ApplicationController
     reject! "invalid context type" unless @context.is_a?(Course)
 
     return true if @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
+
     reject! "users not specified and no access to all grades", :forbidden unless params[:user_ids]
     user_id_params = Api.value_to_array(params[:user_ids])
     user_ids = Api.map_ids(user_id_params, users_for_outcome_context, @domain_root_account, @current_user)
@@ -499,6 +500,7 @@ class OutcomeResultsController < ApplicationController
 
   def verify_sort_parameters
     return true unless params[:sort_by]
+
     sort_by = params[:sort_by]
     reject! "invalid sort_by parameter value" if sort_by && !%w(student outcome).include?(sort_by)
     if sort_by == 'outcome'
@@ -549,8 +551,8 @@ class OutcomeResultsController < ApplicationController
         # from the query without rendering the reject! check moot
 
         @outcome_links = ContentTag.learning_outcome_links.active.preload(:learning_outcome_content)
-          .where(content_id: outcome_ids, context: @context)
-          .select('DISTINCT ON (content_tags.content_id) content_tags.*')
+                                   .where(content_id: outcome_ids, context: @context)
+                                   .select('DISTINCT ON (content_tags.content_id) content_tags.*')
         @outcomes = @outcome_links.map(&:learning_outcome_content)
         reject! "can only include id's of outcomes in the outcome context" if @outcomes.count != outcome_ids.count
       else
@@ -571,8 +573,8 @@ class OutcomeResultsController < ApplicationController
 
   def build_outcome_paths
     @outcome_paths = @outcome_links.map do |link|
-      parts = outcome_group_prefix(link.associated_asset).push({name: link.learning_outcome_content.title})
-      {id: link.learning_outcome_content.id, parts: parts}
+      parts = outcome_group_prefix(link.associated_asset).push({ name: link.learning_outcome_content.title })
+      { id: link.learning_outcome_content.id, parts: parts }
     end
   end
 
@@ -580,7 +582,8 @@ class OutcomeResultsController < ApplicationController
     if !group.parent_outcome_group
       return []
     end
-    outcome_group_prefix(group.parent_outcome_group).push({name: group.title})
+
+    outcome_group_prefix(group.parent_outcome_group).push({ name: group.title })
   end
 
   def require_users
@@ -588,14 +591,14 @@ class OutcomeResultsController < ApplicationController
     if params[:user_ids]
       user_ids = Api.value_to_array(params[:user_ids]).uniq
       @users = api_find_all(users_for_outcome_context, user_ids).distinct.to_a
-      reject!( "can only include id's of users in the outcome context") if @users.count != user_ids.count
+      reject!("can only include id's of users in the outcome context") if @users.count != user_ids.count
     elsif params[:section_id]
       @section = @context.course_sections.where(id: params[:section_id].to_i).first
       reject! "invalid section id" unless @section
       @users = apply_sort_order(@section.users).to_a
     end
     @users ||= users_for_outcome_context.to_a
-    @users.sort! {|a,b| a.id <=> b.id} unless params[:sort_by]
+    @users.sort! { |a, b| a.id <=> b.id } unless params[:sort_by]
     # cache all users, since pagination in #user_rollups_json may remove some
     # when we need all users when calculating rating percents
     @all_users = @users
@@ -605,10 +608,10 @@ class OutcomeResultsController < ApplicationController
     # this only works for courses; when other context types are added, this will
     # need to treat them differently.
     students = if @domain_root_account.feature_enabled?(:limit_section_visibility_in_lmgb)
-      @context.students_visible_to(@current_user, include: :priors)
-    else
-      @context.all_students
-    end
+                 @context.students_visible_to(@current_user, include: :priors)
+               else
+                 @context.all_students
+               end
 
     apply_sort_order(students).select("users.*, #{User.sortable_name_order_by_clause('users')}").distinct
   end

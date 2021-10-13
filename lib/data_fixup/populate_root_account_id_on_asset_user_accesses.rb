@@ -25,25 +25,25 @@ module DataFixup::PopulateRootAccountIdOnAssetUserAccesses
     asset_types = %w(attachment calendar_event group course)
 
     # find any other asset types besides these and "user" (which the backfill fills with 0)
-    types_string = [*asset_types, "user"].map{ |t| "'%#{t}%'" }.join(',')
-    other_asset_types = to_transform.where("asset_code NOT LIKE ALL (ARRAY[#{types_string}])").
-      distinct.
-      pluck(Arel.sql("regexp_matches(asset_user_accesses.asset_code, '(\\w+)_\\d+') AS asset_type")).
-      flatten
+    types_string = [*asset_types, "user"].map { |t| "'%#{t}%'" }.join(',')
+    other_asset_types = to_transform.where("asset_code NOT LIKE ALL (ARRAY[#{types_string}])")
+                                    .distinct
+                                    .pluck(Arel.sql("regexp_matches(asset_user_accesses.asset_code, '(\\w+)_\\d+') AS asset_type"))
+                                    .flatten
 
     unless other_asset_types.empty?
       Canvas::Errors.capture('new asset_user_accesses asset types', {
-        shard_id: Shard.current.id,
-        asset_types: other_asset_types
-      })
+                               shard_id: Shard.current.id,
+                               asset_types: other_asset_types
+                             })
     end
 
     asset_types.each do |type|
       qtn = type.classify.constantize.quoted_table_name
-      to_transform.where("asset_code like ?", "%#{type}%").
-        joins("INNER JOIN #{qtn} ON #{qtn}.id = cast(reverse(split_part(reverse(asset_user_accesses.asset_code), '_', 1)) as bigint)").
-        in_batches.
-        update_all("root_account_id=#{qtn}.root_account_id")
+      to_transform.where("asset_code like ?", "%#{type}%")
+                  .joins("INNER JOIN #{qtn} ON #{qtn}.id = cast(reverse(split_part(reverse(asset_user_accesses.asset_code), '_', 1)) as bigint)")
+                  .in_batches
+                  .update_all("root_account_id=#{qtn}.root_account_id")
     end
 
     # Context=user and asset=User records are unfillable. Fill with 0 (dummy root account ID)

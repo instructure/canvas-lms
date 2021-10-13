@@ -33,4 +33,3 @@ module DataFixup::SetExistingBindingState
     end
   end
 end
-

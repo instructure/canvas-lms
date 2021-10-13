@@ -35,10 +35,11 @@ class UserNotesController < ApplicationController
   def user_notes
     get_context
     return render_unauthorized_action unless @context.root_account.enable_user_notes
+
     if authorized_action(@context, @current_user, :manage_user_notes)
       if @context && @context.is_a?(Account)
         @users = @context.all_users.active.has_current_student_enrollments
-      else #it's a course
+      else # it's a course
         @users = @context.students_visible_to(@current_user).order_by_sortable_name
         @is_course = true
       end
@@ -52,7 +53,7 @@ class UserNotesController < ApplicationController
     if authorized_action(@user_note, @current_user, :read)
       respond_to do |format|
         format.html { redirect_to user_user_notes_path }
-        format.json { render :json => @user_note.as_json(:methods=>[:creator_name]), :status => :created }
+        format.json { render :json => @user_note.as_json(:methods => [:creator_name]), :status => :created }
         format.text { render :json => @user_note, :status => :created }
       end
     end
@@ -77,7 +78,7 @@ class UserNotesController < ApplicationController
         if @user_note.save
           flash[:notice] = t 'notices.created', "Journal Entry was successfully created."
           format.html { redirect_to user_user_notes_path }
-          format.json { render :json => @user_note.as_json(:methods=>[:creator_name, :formatted_note]), :status => :created }
+          format.json { render :json => @user_note.as_json(:methods => [:creator_name, :formatted_note]), :status => :created }
           format.text { render :json => @user_note, :status => :created }
         else
           format.html { redirect_to(user_user_notes_path) }
@@ -95,7 +96,7 @@ class UserNotesController < ApplicationController
 
       respond_to do |format|
         format.html { redirect_to user_user_notes_path }
-        format.json { render :json => @user_note.as_json(:methods=>[:creator_name]), :status => :ok }
+        format.json { render :json => @user_note.as_json(:methods => [:creator_name]), :status => :ok }
       end
     end
   end

@@ -25,7 +25,7 @@ describe LtiOutbound::LTIModel do
     proc_accessor :attribute
   end
 
-    describe '#proc_accessor' do
+  describe '#proc_accessor' do
     it 'acts as a regular attr_accessor for assigned values' do
       model = Dummy.new
       model.attribute = 'test_value'

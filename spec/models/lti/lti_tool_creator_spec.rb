@@ -26,7 +26,7 @@ describe(Lti::LtiToolCreator) do
       tool.name = "tool"
       tool.consumer_key = '12345'
       tool.shared_secret = 'secret'
-      tool.settings = {url: '/some/url'}
+      tool.settings = { url: '/some/url' }
     end
   end
 
@@ -35,7 +35,7 @@ describe(Lti::LtiToolCreator) do
     expect(lti_tool.name).to eq "tool"
     expect(lti_tool.consumer_key).to eq '12345'
     expect(lti_tool.shared_secret).to eq 'secret'
-    expect(lti_tool.settings).to eq({url: '/some/url'})
+    expect(lti_tool.settings).to eq({ url: '/some/url' })
   end
 
   describe "privacy level" do

@@ -61,102 +61,101 @@ describe "ApplicationController Token Scoping", type: :request do
 
       it "validates access token" do
         api_call(:get, "/api/v1/users/#{user.id}/profile", {
-          :controller => 'profile',
-          :action => 'settings',
-          :format => 'json',
-          :user_id => user.id.to_s
-        }, {}, { 'Authorization' => "Bearer #{access_token.full_token}" },
-        { expected_status: 200 })
+                   :controller => 'profile',
+                   :action => 'settings',
+                   :format => 'json',
+                   :user_id => user.id.to_s
+                 }, {}, { 'Authorization' => "Bearer #{access_token.full_token}" },
+                 { expected_status: 200 })
       end
 
       it "has access to course" do
         api_call(:get, "/api/v1/courses/#{course.id}", {
-          :controller => 'courses',
-          :action => 'show',
-          :format => 'json',
-          :id => course.id.to_s
-        }, {}, { 'Authorization' => "Bearer #{access_token.full_token}" },
-        { expected_status: 200 })
+                   :controller => 'courses',
+                   :action => 'show',
+                   :format => 'json',
+                   :id => course.id.to_s
+                 }, {}, { 'Authorization' => "Bearer #{access_token.full_token}" },
+                 { expected_status: 200 })
       end
 
       it "fetches quizzes" do
         api_call(:get, "/api/v1/courses/#{course.id}/quizzes", {
-          :controller => 'quizzes/quizzes_api',
-          :action => 'index',
-          :format => 'json',
-          :course_id => course.id.to_s
-        }, {}, { 'Authorization' => "Bearer #{access_token.full_token}" },
-        { expected_status: 200 })
+                   :controller => 'quizzes/quizzes_api',
+                   :action => 'index',
+                   :format => 'json',
+                   :course_id => course.id.to_s
+                 }, {}, { 'Authorization' => "Bearer #{access_token.full_token}" },
+                 { expected_status: 200 })
       end
 
       it "fetches quiz details" do
         api_call(:get, "/api/v1/courses/#{course.id}/quizzes/#{quiz.id}", {
-          :controller => 'quizzes/quizzes_api',
-          :action => 'show',
-          :format => 'json',
-          :course_id => course.id.to_s,
-          :id => quiz.id.to_s
-        }, {}, { 'Authorization' => "Bearer #{access_token.full_token}" },
-        { expected_status: 200 })
+                   :controller => 'quizzes/quizzes_api',
+                   :action => 'show',
+                   :format => 'json',
+                   :course_id => course.id.to_s,
+                   :id => quiz.id.to_s
+                 }, {}, { 'Authorization' => "Bearer #{access_token.full_token}" },
+                 { expected_status: 200 })
       end
 
       it "fetches user info from course" do
         api_call(:get, "/api/v1/courses/#{course.id}/users", {
-          :controller => 'courses',
-          :action => 'users',
-          :format => 'json',
-          :course_id => course.id.to_s
-        }, {}, { 'Authorization' => "Bearer #{access_token.full_token}" },
-        { expected_status: 200 })
+                   :controller => 'courses',
+                   :action => 'users',
+                   :format => 'json',
+                   :course_id => course.id.to_s
+                 }, {}, { 'Authorization' => "Bearer #{access_token.full_token}" },
+                 { expected_status: 200 })
       end
 
       it "has ability to create assignments" do
         api_call(:post, "/api/v1/courses/#{course.id}/assignments", {
-          :controller => 'assignments_api',
-          :action => 'create',
-          :format => 'json',
-          :course_id => course.id.to_s
-        },
-        { :assignment => { 'name' => 'Assignment Example'} },
-        { 'Authorization' => "Bearer #{access_token.full_token}" },
-        { expected_status: 201 })
+                   :controller => 'assignments_api',
+                   :action => 'create',
+                   :format => 'json',
+                   :course_id => course.id.to_s
+                 },
+                 { :assignment => { 'name' => 'Assignment Example' } },
+                 { 'Authorization' => "Bearer #{access_token.full_token}" },
+                 { expected_status: 201 })
       end
 
       it "has ability to create quizzes" do
         api_call(:post, "/api/v1/courses/#{course.id}/quizzes", {
-          :controller => 'quizzes/quizzes_api',
-          :action => 'create',
-          :format => 'json',
-          :course_id => course.id.to_s
-        },
-        { :quiz => { 'title' => 'Quiz Example', 'published' => true } },
-        { 'Authorization' => "Bearer #{access_token.full_token}" },
-        { expected_status: 200 })
+                   :controller => 'quizzes/quizzes_api',
+                   :action => 'create',
+                   :format => 'json',
+                   :course_id => course.id.to_s
+                 },
+                 { :quiz => { 'title' => 'Quiz Example', 'published' => true } },
+                 { 'Authorization' => "Bearer #{access_token.full_token}" },
+                 { expected_status: 200 })
       end
 
       it "has ability to update quizzes" do
         api_call(:put, "/api/v1/courses/#{course.id}/quizzes/#{quiz.id}", {
-          :controller => 'quizzes/quizzes_api',
-          :action => 'update',
-          :format => 'json',
-          :course_id => course.id.to_s,
-          :id => quiz.id.to_s
-        },
-        { :quiz => { 'published' => false } },
-        { 'Authorization' => "Bearer #{access_token.full_token}" },
-        { expected_status: 200 })
+                   :controller => 'quizzes/quizzes_api',
+                   :action => 'update',
+                   :format => 'json',
+                   :course_id => course.id.to_s,
+                   :id => quiz.id.to_s
+                 },
+                 { :quiz => { 'published' => false } },
+                 { 'Authorization' => "Bearer #{access_token.full_token}" },
+                 { expected_status: 200 })
       end
 
       it "is not permissible to use unscoped routes" do
         api_call(:get, "/api/v1/courses/#{course.id}/files", {
-          :controller => 'files',
-          :action => 'api_index',
-          :format => 'json',
-          :course_id => course.id.to_s
-        }, {}, { 'Authorization' => "Bearer #{access_token.full_token}" },
-        { expected_status: 401 })
+                   :controller => 'files',
+                   :action => 'api_index',
+                   :format => 'json',
+                   :course_id => course.id.to_s
+                 }, {}, { 'Authorization' => "Bearer #{access_token.full_token}" },
+                 { expected_status: 401 })
       end
     end
-
   end
 end

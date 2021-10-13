@@ -100,6 +100,7 @@ class SubmissionsController < SubmissionsBaseController
   def index
     @assignment = @context.assignments.active.find(params[:assignment_id])
     return render_unauthorized_action unless @assignment.user_can_read_grades?(@current_user, session)
+
     if params[:zip]
       generate_submission_zip(@assignment, @context)
     else
@@ -213,15 +214,16 @@ class SubmissionsController < SubmissionsBaseController
     params[:submission] ||= {}
     user_id = params[:submission].delete(:user_id)
     @submission_user = if user_id
-      get_user_considering_section(user_id)
-    else
-      @current_user
-    end
+                         get_user_considering_section(user_id)
+                       else
+                         @current_user
+                       end
 
     @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @submission_user)
 
     return unless authorized_action(@assignment, @submission_user, :submit)
+
     submit_at = params.dig(:submission, :submitted_at)
     user_sub = @assignment.submissions.find_by(user: user_id)
     return if (user_id || submit_at) && !authorized_action(user_sub, @current_user, :grade)
@@ -235,6 +237,7 @@ class SubmissionsController < SubmissionsBaseController
     @group = @assignment.group_category.group_for(@submission_user) if @assignment.has_group_category?
 
     return unless valid_text_entry?
+
     return unless process_api_submission_params if api_request?
 
     lookup_existing_attachments
@@ -303,13 +306,13 @@ class SubmissionsController < SubmissionsBaseController
         format.html do
           flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
           tardiness = case
-          when @submission.late?
-            2 # late
-          when @submission.cached_due_date.nil?
-            0 # don't know
-          else
-            1 # on time
-          end
+                      when @submission.late?
+                        2 # late
+                      when @submission.cached_due_date.nil?
+                        0 # don't know
+                      else
+                        1 # on time
+                      end
 
           if @submission.late? || !@domain_root_account&.feature_enabled?(:confetti_for_assignments)
             redirect_to course_assignment_url(@context, @assignment, submitted: tardiness)
@@ -322,11 +325,11 @@ class SubmissionsController < SubmissionsBaseController
             includes = %|submission_comments attachments|
             json = submission_json(@submission, @assignment, @current_user, session, @context, includes, params)
             render json: json,
-              status: :created,
-              location: api_v1_course_assignment_submission_url(@context, @assignment, @current_user)
+                   status: :created,
+                   location: api_v1_course_assignment_submission_url(@context, @assignment, @current_user)
           else
             render :json => @submission.as_json(:include => :submission_comments, :methods => :late), :status => :created,
-              :location => course_gradebook_url(@submission.assignment.context)
+                   :location => course_gradebook_url(@submission.assignment.context)
           end
         end
       else
@@ -357,6 +360,7 @@ class SubmissionsController < SubmissionsBaseController
 
   def audit_events
     return render_unauthorized_action unless @context.grants_right?(@current_user, :view_audit_trail)
+
     submission = Submission.find(params[:submission_id])
 
     audit_events = AnonymousOrModerationEvent.events_for_submission(
@@ -465,9 +469,9 @@ class SubmissionsController < SubmissionsBaseController
     params[:submission].slice!(*submission_params)
     if params[:submission].keys.sort != submission_params
       render(:json => {
-        :message => "Invalid parameters for submission_type #{submission_type}. " +
-          "Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ") }"
-      }, :status => 400)
+               :message => "Invalid parameters for submission_type #{submission_type}. " +
+                 "Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ")}"
+             }, :status => 400)
       return false
     end
     params[:submission][:comment] = params[:comment].try(:delete, :text_comment)
@@ -502,14 +506,14 @@ class SubmissionsController < SubmissionsBaseController
     # The first check here is for web interface submissions that contain only one file
     # The second check is for multiple submissions and API calls that use the uploaded_data parameter to pass a filename
     if @assignment.allowed_extensions.present?
-      if params[:submission][:attachments].any? {|a| !@assignment.allowed_extensions.include?((a.after_extension || '').downcase) } ||
+      if params[:submission][:attachments].any? { |a| !@assignment.allowed_extensions.include?((a.after_extension || '').downcase) } ||
          params[:attachments].values.any? do |a|
            !a[:uploaded_data].empty? &&
            !@assignment.allowed_extensions.include?((a[:uploaded_data].split('.').last || '').downcase)
          end
-      flash[:error] = t('errors.invalid_file_type', "Invalid file type")
-      redirect_to named_context_url(@context, :context_assignment_url, @assignment)
-      return false
+        flash[:error] = t('errors.invalid_file_type', "Invalid file type")
+        redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+        return false
       end
     end
     return true
@@ -540,7 +544,7 @@ class SubmissionsController < SubmissionsBaseController
     # fetch document from google
     # since google drive can have many different export types, we need to send along our preferred extensions
     document_response, display_name, file_extension, content_type = google_drive_connection.download(document_id,
-                                                                                        @assignment.allowed_extensions)
+                                                                                                     @assignment.allowed_extensions)
 
     unless document_response.try(:is_a?, Net::HTTPOK) || document_response.status == 200
       return nil, t('errors.assignment_submit_fail', 'Assignment failed to submit')
@@ -627,16 +631,16 @@ class SubmissionsController < SubmissionsBaseController
 
           format.html do
             send_file(attachment.full_filename, {
-              :type => attachment.content_type_with_encoding,
-              :disposition => 'inline'
-            })
+                        :type => attachment.content_type_with_encoding,
+                        :disposition => 'inline'
+                      })
           end
 
           format.zip do
             send_file(attachment.full_filename, {
-              :type => attachment.content_type_with_encoding,
-              :disposition => 'inline'
-            })
+                        :type => attachment.content_type_with_encoding,
+                        :disposition => 'inline'
+                      })
           end
         else
           inline_url = authenticated_inline_url(attachment)

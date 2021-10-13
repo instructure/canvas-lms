@@ -50,7 +50,7 @@ class DelayedMessage < ActiveRecord::Base
     if !val || val.length < self.class.maximum_text_length
       write_attribute(:summary, val)
     else
-      write_attribute(:summary, val[0,self.class.maximum_text_length])
+      write_attribute(:summary, val[0, self.class.maximum_text_length])
     end
   end
 
@@ -87,7 +87,6 @@ class DelayedMessage < ActiveRecord::Base
     state :sent
   end
 
-
   # This sets up a message and parses it internally.  Any template can
   # have these variables to build a message.  The most important one will
   # probably be delayed_messages, from which the right links and summaries
@@ -100,17 +99,21 @@ class DelayedMessage < ActiveRecord::Base
     delayed_messages.each do |m|
       uniqs[[m.context_id, m.context_type, m.notification_id]] = m
     end
-    delayed_messages = uniqs.map{|key, val| val}.compact
-    delayed_messages = delayed_messages.sort_by{|dm| [dm.notification.sort_order, dm.notification.category] }
-    first = delayed_messages.detect{|m| m.communication_channel &&
-                                    m.communication_channel.active? &&
-                                    !m.communication_channel.bouncing?}
+    delayed_messages = uniqs.map { |key, val| val }.compact
+    delayed_messages = delayed_messages.sort_by { |dm| [dm.notification.sort_order, dm.notification.category] }
+    first = delayed_messages.detect { |m|
+      m.communication_channel &&
+        m.communication_channel.active? &&
+        !m.communication_channel.bouncing?
+    }
     to = first.communication_channel rescue nil
     return nil unless to
     return nil if delayed_messages.empty?
+
     user = to.user rescue nil
-    context = delayed_messages.select{|m| m.context}.compact.first.try(:context)
+    context = delayed_messages.select { |m| m.context }.compact.first.try(:context)
     return nil unless context # the context for this message has already been deleted
+
     notification = BroadcastPolicy.notification_finder.by_name('Summaries')
     path = HostUrl.outgoing_email_address
     root_account_id = delayed_messages.first.try(:root_account_id)
@@ -134,31 +137,31 @@ class DelayedMessage < ActiveRecord::Base
   end
 
   protected
-    MINUTES_PER_DAY = 60 * 24
-    WEEKLY_ACCOUNT_BUCKETS = 4
-    MINUTES_PER_WEEKLY_ACCOUNT_BUCKET = MINUTES_PER_DAY / WEEKLY_ACCOUNT_BUCKETS
 
-    def set_send_at
-      # no cc yet = wait
-      return unless self.communication_channel and self.communication_channel.user
-      return if self.send_at
+  MINUTES_PER_DAY = 60 * 24
+  WEEKLY_ACCOUNT_BUCKETS = 4
+  MINUTES_PER_WEEKLY_ACCOUNT_BUCKET = MINUTES_PER_DAY / WEEKLY_ACCOUNT_BUCKETS
 
-      # I got tired of trying to figure out time zones in my head, and I realized
-      # if we do it this way, Rails will take care of it all for us!
-      if self.frequency == 'weekly'
-        target = self.communication_channel.user.weekly_notification_time
-      else
-        # Find the appropriate timezone. For weekly notifications, always use
-        # Eastern. For other notifications, try and user the user's time zone,
-        # defaulting to mountain. (Should be impossible to not find mountain, but
-        # default to system time if necessary.)
-        time_zone = self.communication_channel.user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone
-        target = time_zone.now.change(:hour => 18)
-        target += 1.day if target < time_zone.now
-      end
+  def set_send_at
+    # no cc yet = wait
+    return unless self.communication_channel and self.communication_channel.user
+    return if self.send_at
 
-      # Set the send_at value
-      self.send_at = target
+    # I got tired of trying to figure out time zones in my head, and I realized
+    # if we do it this way, Rails will take care of it all for us!
+    if self.frequency == 'weekly'
+      target = self.communication_channel.user.weekly_notification_time
+    else
+      # Find the appropriate timezone. For weekly notifications, always use
+      # Eastern. For other notifications, try and user the user's time zone,
+      # defaulting to mountain. (Should be impossible to not find mountain, but
+      # default to system time if necessary.)
+      time_zone = self.communication_channel.user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone
+      target = time_zone.now.change(:hour => 18)
+      target += 1.day if target < time_zone.now
     end
 
+    # Set the send_at value
+    self.send_at = target
+  end
 end

@@ -19,10 +19,8 @@
 require_relative '../../common'
 
 module EditExistingUserModalPage
-
   # ---------------------- Controls ----------------------
   def edit_full_name_input
     fj('label:contains("Full Name") input')
   end
-
 end

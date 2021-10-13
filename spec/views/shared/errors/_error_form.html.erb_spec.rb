@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "shared/errors/_error_form" do
-  it "should render" do
+  it "renders" do
     course_with_student
     view_context
     render :partial => "shared/errors/error_form"
@@ -30,4 +30,3 @@ describe "shared/errors/_error_form" do
     expect(response).to include("error[user_roles]")
   end
 end
-

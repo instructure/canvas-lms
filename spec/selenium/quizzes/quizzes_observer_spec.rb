@@ -37,17 +37,17 @@ describe 'quizzes observers' do
     before(:each) do
       quiz_with_submission
       @quiz.update(:show_correct_answers => true,
-        :show_correct_answers_last_attempt => true, :allowed_attempts => 2)
+                   :show_correct_answers_last_attempt => true, :allowed_attempts => 2)
       @quiz.save!
     end
 
-    it "should not show correct answers on first attempt", priority: "1", test_id: 474288 do
+    it "does not show correct answers on first attempt", priority: "1", test_id: 474288 do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@qsub.id}"
       expect(f("#content")).not_to contain_css('.correct_answer')
     end
   end
 
-  it "should show quiz descriptions" do
+  it "shows quiz descriptions" do
     @context = @course
     quiz = quiz_model
     description = "some description"
@@ -58,4 +58,3 @@ describe 'quizzes observers' do
     expect(f(".description")).to include_text(description)
   end
 end
-

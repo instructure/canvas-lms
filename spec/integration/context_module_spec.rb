@@ -29,7 +29,7 @@ describe ContextModule do
   end
 
   describe "index" do
-    it "should require manage_content permission before showing add controls" do
+    it "requires manage_content permission before showing add controls" do
       course_with_teacher_logged_in active_all: true
       get "/courses/#{@course.id}/modules"
       doc = Nokogiri::HTML5(response.body)
@@ -44,7 +44,7 @@ describe ContextModule do
     end
   end
 
-  it "should clear the page cache on individual tag change" do
+  it "clears the page cache on individual tag change" do
     enable_cache do
       course_with_teacher_logged_in(:active_all => true)
       context_module = @course.context_modules.create!
@@ -82,28 +82,28 @@ describe ContextModule do
       expect(@progression.current_position).to eql(@tag.position)
     end
 
-    it "should progress for discussions" do
+    it "progresses for discussions" do
       @discussion = @course.discussion_topics.create!(:title => "talk")
       @tag = @module.add_item(:type => 'discussion_topic', :id => @discussion.id)
       before_after do
-        post "/courses/#{@course.id}/discussion_entries", params: {:discussion_entry => { :message => 'ohai', :discussion_topic_id => @discussion.id }}
+        post "/courses/#{@course.id}/discussion_entries", params: { :discussion_entry => { :message => 'ohai', :discussion_topic_id => @discussion.id } }
         expect(response).to be_redirect
       end
     end
 
-    it "should progress for wiki pages" do
+    it "progresses for wiki pages" do
       @page = @course.wiki_pages.create!(:title => "talk page", :body => 'ohai', :editing_roles => 'teachers,students')
       @tag = @module.add_item(:type => 'wiki_page', :id => @page.id)
       before_after do
-        put "/api/v1/courses/#{@course.id}/pages/#{@page.url}", params: {:wiki_page => { :body => 'i agree', :title => 'talk page' }}
+        put "/api/v1/courses/#{@course.id}/pages/#{@page.url}", params: { :wiki_page => { :body => 'i agree', :title => 'talk page' } }
       end
     end
 
-    it "should progress for assignment discussions" do
+    it "progresses for assignment discussions" do
       @assignment = @course.assignments.create!(:title => 'talk assn', :submission_types => 'discussion_topic')
       @tag = @module.add_item(:type => 'assignment', :id => @assignment.id)
       before_after do
-        post "/courses/#{@course.id}/discussion_entries", params: {:discussion_entry => { :message => 'ohai', :discussion_topic_id => @assignment.discussion_topic.id }}
+        post "/courses/#{@course.id}/discussion_entries", params: { :discussion_entry => { :message => 'ohai', :discussion_topic_id => @assignment.discussion_topic.id } }
         expect(response).to be_redirect
       end
     end
@@ -123,7 +123,7 @@ describe ContextModule do
           @mod1.require_sequential_progress = true
           @mod1.save!
           @tag1 = @mod1.add_item(:type => 'quiz', :id => @quiz.id)
-          @mod1.completion_requirements = {@tag1.id => {:type => 'min_score', :min_score => 1}}
+          @mod1.completion_requirements = { @tag1.id => { :type => 'min_score', :min_score => 1 } }
           @mod1.save!
         end
 
@@ -185,7 +185,7 @@ describe ContextModule do
       end
     end
 
-    it "should progress to assignment" do
+    it "progresses to assignment" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
           asmnt = @course.assignments.create!(:title => 'assignment', :description => content)
@@ -196,7 +196,7 @@ describe ContextModule do
       end
     end
 
-    it "should progress to discussion topic" do
+    it "progresses to discussion topic" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
           discussion = @course.discussion_topics.create!(:title => "topic", :message => content)
@@ -207,7 +207,7 @@ describe ContextModule do
       end
     end
 
-    it "should progress to a quiz" do
+    it "progresses to a quiz" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
           quiz = @course.quizzes.create!(:title => "quiz", :description => content)
@@ -219,7 +219,7 @@ describe ContextModule do
       end
     end
 
-    it "should progress to a wiki page" do
+    it "progresses to a wiki page" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
           page = @course.wiki_pages.create!(:title => "wiki", :body => content)
@@ -231,7 +231,7 @@ describe ContextModule do
       end
     end
 
-    it "should progress to an attachment" do
+    it "progresses to an attachment" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
           @is_attachment = true
@@ -245,7 +245,7 @@ describe ContextModule do
   end
 
   describe "caching" do
-    it "should cache the view separately for each time zone" do
+    it "caches the view separately for each time zone" do
       enable_cache do
         course_factory active_all: true
 
@@ -271,8 +271,8 @@ describe ContextModule do
         expect(response).to be_successful
         body2 = Nokogiri::HTML5(response.body)
 
-        expect(body1.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match /4am/
-        expect(body2.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match /7am/
+        expect(body1.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match(/4am/)
+        expect(body2.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match(/7am/)
       end
     end
   end

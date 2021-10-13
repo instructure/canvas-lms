@@ -41,10 +41,9 @@ begin
 
     task 'api' do |t|
       puts "API Documentation successfully generated in #{DOC_DIR}\n" \
-          "See #{DOC_DIR}/index.html"
+           "See #{DOC_DIR}/index.html"
     end
   end
-
 rescue LoadError
   # tasks not enabled
   nil

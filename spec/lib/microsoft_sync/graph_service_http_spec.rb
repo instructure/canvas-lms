@@ -37,8 +37,8 @@ describe MicrosoftSync::GraphServiceHttp do
       responses = statuses.map do |stat|
         {
           status: stat,
-          body: {foo: 'bar'}.to_json,
-          headers: {'Content-type' => 'application/json'},
+          body: { foo: 'bar' }.to_json,
+          headers: { 'Content-type' => 'application/json' },
         }
       end
       WebMock.disable_net_connect!
@@ -59,7 +59,7 @@ describe MicrosoftSync::GraphServiceHttp do
       def expect_quota_counted(read_or_write, num)
         expect(InstStatsd::Statsd).to have_received(:count)
           .with("microsoft_sync.graph_service.quota_#{read_or_write}", num,
-                tags: {msft_endpoint: 'get_foo', extra_tag: 'abc'})
+                tags: { msft_endpoint: 'get_foo', extra_tag: 'abc' })
       end
 
       def expect_quota_not_counted(read_or_write)
@@ -105,12 +105,12 @@ describe MicrosoftSync::GraphServiceHttp do
         let(:url) { 'https://graph.microsoft.com/v1.0/foo/bar?$select=foo' }
 
         it 'decreases the read quota points by 1' do
-          subject.request(:get, 'foo/bar', quota: [2, 3], query: {'$select' => 'foo'})
+          subject.request(:get, 'foo/bar', quota: [2, 3], query: { '$select' => 'foo' })
           expect_quotas_counted(1, 3)
         end
 
         it "doesn't decrease read quota if it is already 1" do
-          subject.request(:get, 'foo/bar', quota: [1, 3], query: {'$select' => 'foo'})
+          subject.request(:get, 'foo/bar', quota: [1, 3], query: { '$select' => 'foo' })
           expect_quotas_counted(1, 3)
         end
       end
@@ -121,10 +121,10 @@ describe MicrosoftSync::GraphServiceHttp do
       subject.request(:get, 'https://graph.microsoft.com/v1.0/foo/bar', quota: [1, 0])
       expect(InstStatsd::Statsd).to have_received(:count)
         .with("microsoft_sync.graph_service.quota_read", 1,
-              tags: {msft_endpoint: 'get_foo', extra_tag: 'abc'})
+              tags: { msft_endpoint: 'get_foo', extra_tag: 'abc' })
       expect(InstStatsd::Statsd).to have_received(:increment)
         .with("microsoft_sync.graph_service.success",
-              tags: {msft_endpoint: 'get_foo', extra_tag: 'abc', status_code: '200'})
+              tags: { msft_endpoint: 'get_foo', extra_tag: 'abc', status_code: '200' })
     end
 
     context 'when a block is passed in' do
@@ -143,7 +143,7 @@ describe MicrosoftSync::GraphServiceHttp do
           result
           expect(InstStatsd::Statsd).to have_received(:increment)
             .with('microsoft_sync.graph_service.expected',
-                  tags: {extra_tag: 'abc', msft_endpoint: 'get_foo', status_code: '409'})
+                  tags: { extra_tag: 'abc', msft_endpoint: 'get_foo', status_code: '409' })
           expect(InstStatsd::Statsd).to_not have_received(:increment)
             .with('microsoft_sync.graph_service.error', anything)
         end
@@ -157,7 +157,7 @@ describe MicrosoftSync::GraphServiceHttp do
           expect { result }.to raise_error(err)
           expect(InstStatsd::Statsd).to have_received(:increment)
             .with('microsoft_sync.graph_service.expected',
-                  tags: {extra_tag: 'abc', msft_endpoint: 'get_foo', status_code: '409'})
+                  tags: { extra_tag: 'abc', msft_endpoint: 'get_foo', status_code: '409' })
           expect(InstStatsd::Statsd).to_not have_received(:increment)
             .with('microsoft_sync.graph_service.error', anything)
         end
@@ -174,7 +174,7 @@ describe MicrosoftSync::GraphServiceHttp do
           expect { result }.to raise_error(MicrosoftSync::Errors::HTTPConflict)
           expect(InstStatsd::Statsd).to have_received(:increment)
             .with('microsoft_sync.graph_service.error',
-                  tags: {extra_tag: 'abc', msft_endpoint: 'get_foo', status_code: '409'})
+                  tags: { extra_tag: 'abc', msft_endpoint: 'get_foo', status_code: '409' })
           expect(InstStatsd::Statsd).to_not have_received(:increment)
             .with('microsoft_sync.graph_service.expected', anything)
         end
@@ -193,21 +193,21 @@ describe MicrosoftSync::GraphServiceHttp do
         let(:requests) { [:bad, :good] }
 
         it 'tries again immediately' do
-          expect(subject.request(:post, 'foo/bar', body: {hello: 'world'})).to eq('foo' => 'bar')
+          expect(subject.request(:post, 'foo/bar', body: { hello: 'world' })).to eq('foo' => 'bar')
           expect(subject).to have_received(:request_without_metrics).exactly(2).times
-            .with(:post, 'foo/bar', body: {hello: 'world'})
+                                                                    .with(:post, 'foo/bar', body: { hello: 'world' })
         end
 
         it 'increments a "retried" statsd counter' do
-          subject.request(:post, 'foo/bar', body: {hello: 'world'})
+          subject.request(:post, 'foo/bar', body: { hello: 'world' })
           expect(InstStatsd::Statsd).to have_received(:increment).with(
             "microsoft_sync.graph_service.retried",
-            tags: {msft_endpoint: 'post_foo', extra_tag: 'abc',
-            status_code: status_code_statsd_tag}
+            tags: { msft_endpoint: 'post_foo', extra_tag: 'abc',
+                    status_code: status_code_statsd_tag }
           )
           expect(InstStatsd::Statsd).to have_received(:increment).with(
             "microsoft_sync.graph_service.success",
-            tags: {msft_endpoint: 'post_foo', extra_tag: 'abc', status_code: '200'}
+            tags: { msft_endpoint: 'post_foo', extra_tag: 'abc', status_code: '200' }
           )
         end
 
@@ -227,22 +227,22 @@ describe MicrosoftSync::GraphServiceHttp do
         let(:requests) { [:bad, :bad] }
 
         it 'fails and increments "retried" and "error" statsd counters' do
-          expect { subject.request(:post, 'foo/bar', body: {hello: 'world'}) }.to raise_error(error_class)
+          expect { subject.request(:post, 'foo/bar', body: { hello: 'world' }) }.to raise_error(error_class)
           expect(InstStatsd::Statsd).to have_received(:increment).with(
             "microsoft_sync.graph_service.retried",
-            tags: {msft_endpoint: 'post_foo', extra_tag: 'abc',
-            status_code: status_code_statsd_tag}
+            tags: { msft_endpoint: 'post_foo', extra_tag: 'abc',
+                    status_code: status_code_statsd_tag }
           )
           expect(InstStatsd::Statsd).to have_received(:increment).with(
             "microsoft_sync.graph_service.intermittent",
-            tags: {msft_endpoint: 'post_foo', extra_tag: 'abc',
-            status_code: status_code_statsd_tag}
+            tags: { msft_endpoint: 'post_foo', extra_tag: 'abc',
+                    status_code: status_code_statsd_tag }
           )
         end
 
         it 'logs the outcome of each request' do
           allow(Rails.logger).to receive(:info).and_call_original
-          expect { subject.request(:post, 'foo/bar', body: {hello: 'world'}) }.to raise_error(error_class)
+          expect { subject.request(:post, 'foo/bar', body: { hello: 'world' }) }.to raise_error(error_class)
           expect(Rails.logger).to have_received(:info).with(
             "MicrosoftSync::GraphServiceHttp: post foo/bar -- #{status_code_statsd_tag}, retried"
           )
@@ -255,13 +255,13 @@ describe MicrosoftSync::GraphServiceHttp do
       it 'fails immediately if DEFAULT_N_INTERMITTENT_RETRIES is 0' do
         stub_const('MicrosoftSync::GraphServiceHttp::DEFAULT_N_INTERMITTENT_RETRIES', 0)
         expect {
-          subject.request(:post, 'foo/bar', body: {hello: 'world'})
+          subject.request(:post, 'foo/bar', body: { hello: 'world' })
         }.to raise_error(error_class)
       end
 
       it 'fails immediately if retries: 0 is passed in' do
         expect {
-          subject.request(:post, 'foo/bar', retries: 0, body: {hello: 'world'})
+          subject.request(:post, 'foo/bar', retries: 0, body: { hello: 'world' })
         }.to raise_error(error_class)
       end
     end
@@ -290,7 +290,7 @@ describe MicrosoftSync::GraphServiceHttp do
     context "when the error is 502 Bad Gateway" do
       let(:error_class) { MicrosoftSync::Errors::HTTPBadGateway }
       let(:status_code_statsd_tag) { '502' }
-      let(:statuses) { requests.map{|bad_or_good| {bad: 502, good: 200}[bad_or_good] } }
+      let(:statuses) { requests.map { |bad_or_good| { bad: 502, good: 200 }[bad_or_good] } }
 
       it_behaves_like 'retrying an intermittent error'
     end
@@ -305,7 +305,7 @@ describe MicrosoftSync::GraphServiceHttp do
 
         it 'raises the error immediately and does not retry' do
           expect {
-            subject.request(:post, 'foo/bar', body: {hello: 'world'})
+            subject.request(:post, 'foo/bar', body: { hello: 'world' })
           }.to raise_error(error_class)
         end
       end
@@ -330,12 +330,12 @@ describe MicrosoftSync::GraphServiceHttp do
     let(:http) { described_class.new('mytenant', extra_tag: 'foo') }
     let(:initial_url) { 'https://graph.microsoft.com/v1.0/some/list' }
     let(:continue_url) { initial_url + '?cont=123' }
-    let(:continue_response) { json_200_response(value: {a: 1}, '@odata.nextLink' => continue_url) }
-    let(:finished_response) { json_200_response(value: {b: 2}) }
+    let(:continue_response) { json_200_response(value: { a: 1 }, '@odata.nextLink' => continue_url) }
+    let(:finished_response) { json_200_response(value: { b: 2 }) }
     let(:extra_opts) { {} }
 
     def json_200_response(body)
-      {status: 200, body: body.to_json, headers: {'Content-type' => 'application/json'}}
+      { status: 200, body: body.to_json, headers: { 'Content-type' => 'application/json' } }
     end
 
     before do
@@ -348,7 +348,7 @@ describe MicrosoftSync::GraphServiceHttp do
     after { WebMock.enable_net_connect! }
 
     it 'runs the block with the "value" from each response' do
-      expect(subject).to eq([{'a' => 1}, {'b' => 2}])
+      expect(subject).to eq([{ 'a' => 1 }, { 'b' => 2 }])
     end
 
     it 'passes in path and quota to the first request' do
@@ -363,13 +363,13 @@ describe MicrosoftSync::GraphServiceHttp do
     end
 
     context 'when passed an expected_error_block' do
-      let(:extra_opts) { {expected_error_block: block} }
+      let(:extra_opts) { { expected_error_block: block } }
 
       context 'when the block returns false' do
         let(:block) { lambda { |resp| resp.code == 400 } }
 
         it 'returns results as usual' do
-          expect(subject).to eq([{'a' => 1}, {'b' => 2}])
+          expect(subject).to eq([{ 'a' => 1 }, { 'b' => 2 }])
         end
       end
 
@@ -388,11 +388,11 @@ describe MicrosoftSync::GraphServiceHttp do
     before do
       WebMock.disable_net_connect!
       WebMock.stub_request(:post, 'https://graph.microsoft.com/v1.0/$batch')
-        .with(body: {requests: requests})
-        .and_return(
-          status: status_code, body: {responses:[]}.to_json,
-          headers: {'Content-type' => 'application/json'}
-        )
+             .with(body: { requests: requests })
+             .and_return(
+               status: status_code, body: { responses: [] }.to_json,
+               headers: { 'Content-type' => 'application/json' }
+             )
       allow(InstStatsd::Statsd).to receive(:count).and_call_original
     end
 
@@ -400,8 +400,8 @@ describe MicrosoftSync::GraphServiceHttp do
 
     let(:requests) do
       [
-        {id: 'a', method: 'GET', url: '/foo'},
-        {id: 'a', method: 'GET', url: '/bar'},
+        { id: 'a', method: 'GET', url: '/foo' },
+        { id: 'a', method: 'GET', url: '/bar' },
       ]
     end
     let(:status_code) { 200 }
@@ -411,10 +411,10 @@ describe MicrosoftSync::GraphServiceHttp do
       run_batch
       expect(InstStatsd::Statsd).to have_received(:count)
         .with("microsoft_sync.graph_service.quota_read", 3,
-              tags: {msft_endpoint: 'batch_wombat', extra_tag: 'abc'})
+              tags: { msft_endpoint: 'batch_wombat', extra_tag: 'abc' })
       expect(InstStatsd::Statsd).to have_received(:count)
         .with("microsoft_sync.graph_service.quota_write", 4,
-              tags: {msft_endpoint: 'batch_wombat', extra_tag: 'abc'})
+              tags: { msft_endpoint: 'batch_wombat', extra_tag: 'abc' })
     end
 
     context 'when the batch request itself fails' do
@@ -426,7 +426,7 @@ describe MicrosoftSync::GraphServiceHttp do
         expect { run_batch }.to raise_error(MicrosoftSync::Errors::HTTPInternalServerError)
         expect(InstStatsd::Statsd).to have_received(:count)
           .with("microsoft_sync.graph_service.batch.error", 2,
-                tags: {msft_endpoint: 'wombat', extra_tag: 'abc', status: 'unknown'})
+                tags: { msft_endpoint: 'wombat', extra_tag: 'abc', status: 'unknown' })
       end
     end
   end

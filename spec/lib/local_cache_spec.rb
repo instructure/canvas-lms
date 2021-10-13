@@ -58,7 +58,7 @@ describe LocalCache do
 
     it "will allow you to clear because it's local" do
       LocalCache.write("test_key", "test_value")
-      expect{ LocalCache.clear(force: true) }.to_not raise_error
+      expect { LocalCache.clear(force: true) }.to_not raise_error
       expect(LocalCache.read("test_key")).to be_nil
     end
 

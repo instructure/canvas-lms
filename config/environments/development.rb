@@ -50,6 +50,9 @@ environment_configuration(defined?(config) && config) do |config|
       puts "Byebug listening on 0.0.0.0:#{Byebug.actual_port}" # rubocop:disable Rails/Output
       byebug_port_file = File.join(Dir.tmpdir, 'byebug.port')
       File.write(byebug_port_file, Byebug.actual_port)
+
+      require 'debase'
+      require 'ruby-debug-ide'
     end
   end
 

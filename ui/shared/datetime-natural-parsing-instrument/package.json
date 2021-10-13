@@ -1,0 +1,9 @@
+{
+  "name": "@canvas/datetime-natural-parsing-instrument",
+  "description": "Instrument the use of natural parsing in datetime widgets.",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./index.ts",
+  "types": "./types.ts",
+  "author": "Ahmad Amireh <ahmad@instructure.com>"
+}

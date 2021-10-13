@@ -106,7 +106,7 @@ class GroupMembershipsController < ApplicationController
       scope = scope.preload(group: :root_account)
 
       @memberships = Api.paginate(scope, self, memberships_route)
-      render :json => @memberships.map{ |gm| group_membership_json(gm, @current_user, session) }
+      render :json => @memberships.map { |gm| group_membership_json(gm, @current_user, session) }
     end
   end
 

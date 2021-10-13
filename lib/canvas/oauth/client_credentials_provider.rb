@@ -89,12 +89,14 @@ module Canvas::Oauth
 
     def valid?
       return false if @invalid_key
+
       validator.valid?
     end
 
     def error_message
       return 'JWS signature invalid.' if @invalid_key
       return "JWK Error: #{errors.first.message}" if errors.present?
+
       validator.error_message
     end
 
@@ -114,10 +116,10 @@ module Canvas::Oauth
 
     def decoded_jwt(jwt = nil)
       @decoded_jwt ||= if key.public_jwk_url.present?
-          get_jwk_from_url(jwt)
-        else
-          JSON::JWT.decode(jwt, JSON::JWK.new(key.public_jwk), :RS256)
-        end
+                         get_jwk_from_url(jwt)
+                       else
+                         JSON::JWT.decode(jwt, JSON::JWK.new(key.public_jwk), :RS256)
+                       end
     rescue JSON::JWS::VerificationFailed, JSON::JWS::UnexpectedAlgorithm
       @invalid_key = true
     end

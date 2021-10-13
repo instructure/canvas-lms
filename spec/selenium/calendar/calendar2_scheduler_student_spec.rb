@@ -27,7 +27,6 @@ describe "scheduler" do
   include SchedulerCommon
 
   context "as a student" do
-
     before(:once) do
       Account.default.tap do |a|
         a.settings[:show_scheduler]   = true
@@ -39,7 +38,6 @@ describe "scheduler" do
 
     before(:each) do
       user_session(@student)
-
     end
 
     def reserve_appointment_manual(n, comment = nil)
@@ -103,13 +101,13 @@ describe "scheduler" do
           # causing fragile tests in Chrome
           participant_visibility: 'protected',
           new_appointments: [
-            [ earliest_appointment_time, 1.hour.from_now ]
+            [earliest_appointment_time, 1.hour.from_now]
           ]
         )
         AppointmentGroup.last.appointments.first.reserve_for(@student, @teacher)
       end
 
-      it "should let me do so from the month view", priority: "1", test_id: 140200 do
+      it "lets me do so from the month view", priority: "1", test_id: 140200 do
         load_month_view
 
         scheduler_event.click
@@ -120,7 +118,7 @@ describe "scheduler" do
         expect(f("#content")).not_to contain_css('.fc-event.scheduler-event')
       end
 
-      it "should let me do so from the week view", priority: "1", test_id: 502483 do
+      it "lets me do so from the week view", priority: "1", test_id: 502483 do
         # the setup creates an event 30 minutes from now, so if we're on Saturday
         # and next Sunday is in 30 minutes, this test will fail
         skip("too close to week rollover") if Time.now.saturday? && earliest_appointment_time.sunday?
@@ -135,7 +133,7 @@ describe "scheduler" do
         expect(f("#content")).not_to contain_css('.fc-event.scheduler-event')
       end
 
-      it "should let me do so from the agenda view", priority: "1", test_id: 502484 do
+      it "lets me do so from the agenda view", priority: "1", test_id: 502484 do
         load_agenda_view
 
         agenda_item.click
@@ -152,7 +150,7 @@ describe "scheduler" do
         max_appointments_per_participant: 1,
         new_appointments: [
           # this can fail if run in the first 2 seconds of the month.
-          [ 2.seconds.ago, 1.second.ago ]
+          [2.seconds.ago, 1.second.ago]
         ]
       )
       AppointmentGroup.last.appointments.first.reserve_for(@student, @teacher)

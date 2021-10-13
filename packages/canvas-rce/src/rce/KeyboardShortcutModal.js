@@ -37,6 +37,7 @@ export default function KeyboardShortcutModal(props) {
       shouldReturnFocus
       size="auto"
       onClose={props.onClose}
+      onExited={props.onExited}
       onDismiss={props.onDismiss}
     >
       <Modal.Header>
@@ -87,6 +88,7 @@ export default function KeyboardShortcutModal(props) {
 
 KeyboardShortcutModal.propTypes = {
   open: bool.isRequired,
-  onClose: func.isRequired,
-  onDismiss: func.isRequired
+  onClose: func,
+  onDismiss: func.isRequired,
+  onExited: func
 }

@@ -44,27 +44,27 @@ describe CollaborationsController, type: :request do
       @user = @student
     end
 
-    let(:url) { "/api/v1/courses/#{@course.id}/collaborations"}
+    let(:url) { "/api/v1/courses/#{@course.id}/collaborations" }
     let(:url_options) do
       {
         :controller => 'collaborations',
-        :action     => 'api_index',
-        :course_id  => @course.id,
-        :format     => 'json'
+        :action => 'api_index',
+        :course_id => @course.id,
+        :format => 'json'
       }
     end
 
-    let(:group_url) { "/api/v1/groups/#{@group.id}/collaborations"}
+    let(:group_url) { "/api/v1/groups/#{@group.id}/collaborations" }
     let(:group_url_options) do
       {
         :controller => 'collaborations',
-        :action     => 'api_index',
-        :group_id   => @group.id,
-        :format     => 'json'
+        :action => 'api_index',
+        :group_id => @group.id,
+        :format => 'json'
       }
     end
 
-    it 'should require authorization' do
+    it 'requires authorization' do
       user_factory
       raw_api_call(:get, url, url_options)
       expect(response.code).to eq '401'
@@ -124,7 +124,6 @@ describe CollaborationsController, type: :request do
       json = api_call(:get, group_url, group_url_options)
       expect(json.count).to eq 1
     end
-
   end
 
   context '/api/v1/collaborations/:id/members' do
@@ -140,28 +139,30 @@ describe CollaborationsController, type: :request do
     end
 
     let(:url) { "/api/v1/collaborations/#{@collaboration.to_param}/members.json" }
-    let(:url_options) { { :controller => 'collaborations',
-                          :action     => 'members',
-                          :id         => @collaboration.to_param,
-                          :format     => 'json' } }
+    let(:url_options) {
+      { :controller => 'collaborations',
+        :action => 'members',
+        :id => @collaboration.to_param,
+        :format => 'json' }
+    }
 
     describe 'a group member' do
-      it 'should see group members' do
+      it 'sees group members' do
         json = api_call(:get, url, url_options)
         expect(json.count).to eq 6
       end
 
-      it 'should receive a paginated response' do
+      it 'receives a paginated response' do
         json = api_call(:get, "#{url}?per_page=1", url_options.merge(:per_page => '1'))
         expect(json.count).to eq 1
       end
 
-      it 'should be formatted by collaborator_json' do
+      it 'is formatted by collaborator_json' do
         json = api_call(:get, url, url_options)
         expect(json.first.keys.sort).to eq %w{collaborator_id id name type}
       end
 
-      it 'should include groups' do
+      it 'includes groups' do
         group_model(:context => @course)
         Collaborator.create!(:user => nil, :group => @group, :collaboration => @collaboration)
         users, groups = api_call(:get, url, url_options).partition { |c| c['type'] == 'user' }
@@ -176,7 +177,7 @@ describe CollaborationsController, type: :request do
         user_factory
       end
 
-      it 'should receive a 401' do
+      it 'receives a 401' do
         raw_api_call(:get, url, url_options)
         expect(response.code).to eq '401'
       end
@@ -192,14 +193,14 @@ describe CollaborationsController, type: :request do
       user_factory
       api_call(:get, "/api/v1/courses/#{@course.id}/potential_collaborators",
                { :controller => 'collaborations', :action => 'potential_collaborators',
-                 :format => 'json', :course_id => @course.to_param},
+                 :format => 'json', :course_id => @course.to_param },
                {}, {}, expected_status: 401)
     end
 
     it 'returns course members for course collaborations' do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/potential_collaborators",
-               { :controller => 'collaborations', :action => 'potential_collaborators',
-                 :format => 'json', :course_id => @course.to_param })
+                      { :controller => 'collaborations', :action => 'potential_collaborators',
+                        :format => 'json', :course_id => @course.to_param })
       expect(json.map { |user| user['id'] }).to match_array(@course.users.pluck(:id))
     end
 
@@ -213,8 +214,8 @@ describe CollaborationsController, type: :request do
       @course.enroll_user(student2, 'StudentEnrollment', :section => second_section)
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/potential_collaborators",
-               { :controller => 'collaborations', :action => 'potential_collaborators',
-                 :format => 'json', :course_id => @course.to_param })
+                      { :controller => 'collaborations', :action => 'potential_collaborators',
+                        :format => 'json', :course_id => @course.to_param })
 
       users_map = json.map { |user| user['id'] }
 
@@ -231,8 +232,8 @@ describe CollaborationsController, type: :request do
       @group.add_user(@user)
       gc = collaboration_model(:user => @user, :context => @group)
       json = api_call(:get, "/api/v1/groups/#{@group.id}/potential_collaborators",
-               { :controller => 'collaborations', :action => 'potential_collaborators',
-                 :format => 'json', :group_id => @group.to_param })
+                      { :controller => 'collaborations', :action => 'potential_collaborators',
+                        :format => 'json', :group_id => @group.to_param })
       expect(json.map { |user| user['id'] }).to match_array(@course.admins.pluck(:id) + @group.users.pluck(:id))
     end
   end

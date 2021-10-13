@@ -35,8 +35,9 @@ describe Mutations::CreateSubmissionComment do
     )
   end
 
-  def value_or_null(value, stringify=true)
+  def value_or_null(value, stringify = true)
     return 'null' if value.nil?
+
     stringify ? "\"#{value}\"" : value
   end
 
@@ -72,7 +73,7 @@ describe Mutations::CreateSubmissionComment do
   end
 
   def run_mutation(opts = {}, current_user = @teacher)
-    result = CanvasSchema.execute(mutation_str(opts), context: {current_user: current_user})
+    result = CanvasSchema.execute(mutation_str(opts), context: { current_user: current_user })
     result.to_h.with_indifferent_access
   end
 
@@ -145,7 +146,7 @@ describe Mutations::CreateSubmissionComment do
 
   describe 'file_ids argument' do
     before(:once) do
-      opts = {user: @teacher, context: @assignment}
+      opts = { user: @teacher, context: @assignment }
       @attachment1 = create_attachment_for_file_upload_submission!(@submission, opts)
       @attachment2 = create_attachment_for_file_upload_submission!(@submission, opts)
     end
@@ -166,9 +167,9 @@ describe Mutations::CreateSubmissionComment do
     end
 
     it 'requires permissions for all files' do
-      opts = {user: @student, context: @assignment}
+      opts = { user: @student, context: @assignment }
       student_attachment = create_attachment_for_file_upload_submission!(@submission, opts)
-      result = run_mutation({file_ids: [@attachment1.id.to_s, student_attachment.id.to_s]})
+      result = run_mutation({ file_ids: [@attachment1.id.to_s, student_attachment.id.to_s] })
       expect(result[:errors].length).to eq 1
       expect(result[:errors][0][:message]).to eq 'not found'
     end

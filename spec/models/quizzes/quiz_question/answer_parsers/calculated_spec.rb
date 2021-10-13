@@ -22,16 +22,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/answer_parser_spec_helper.rb')
 
 describe Quizzes::QuizQuestion::AnswerParsers::Calculated do
-
   context "#parse" do
     let(:raw_answers) do
       [
         {
-          variables: {"variable_0" => {name: "x", value: "9"} },
+          variables: { "variable_0" => { name: "x", value: "9" } },
           answer_text: 14
         },
         {
-          variables: {"variable_2" => {name: "z", value: "7"}},
+          variables: { "variable_2" => { name: "z", value: "7" } },
           answer_text: 12
         }
       ]

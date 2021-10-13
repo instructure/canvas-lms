@@ -23,7 +23,7 @@ module AddressBook
   # shapes but no data -- while being separate from the original
   # MessageableUser strategy.
   class Empty < AddressBook::Base
-    def known_users(users, options={})
+    def known_users(users, options = {})
       []
     end
 
@@ -53,7 +53,7 @@ module AddressBook
       end
     end
 
-    def search_users(options={})
+    def search_users(options = {})
       BookmarkedCollection.build(Bookmarker) { |pager| pager }
     end
 

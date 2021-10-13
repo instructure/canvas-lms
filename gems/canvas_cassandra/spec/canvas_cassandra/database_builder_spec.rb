@@ -21,7 +21,6 @@
 require "spec_helper"
 
 describe CanvasCassandra::DatabaseBuilder do
-
   let(:logger_klass) do
     Class.new do
       attr_reader :logs
@@ -69,7 +68,7 @@ describe CanvasCassandra::DatabaseBuilder do
   describe ".read_consistency_setting" do
     it "loads setting from store" do
       store_klass = Class.new do
-        def initialize(data={})
+        def initialize(data = {})
           @settings = data
         end
 

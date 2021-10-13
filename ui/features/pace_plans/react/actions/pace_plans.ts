@@ -94,8 +94,7 @@ const thunkActions = {
         publishForEnrollmentIds
       )
         .then(response => {
-          const newDraft: PacePlan = response.data.new_draft_plan
-          dispatch(pacePlanActions.setPacePlan(newDraft))
+          dispatch(pacePlanActions.setPacePlan(response.new_draft_plan))
           dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.publishPlanFinished())
         })
@@ -120,8 +119,7 @@ const thunkActions = {
 
       return Api.resetToLastPublished(contextType, contextId)
         .then(response => {
-          const plan: PacePlan = response.data.pace_plan
-          dispatch(pacePlanActions.setPacePlan(plan))
+          dispatch(pacePlanActions.setPacePlan(response.pace_plan))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {
@@ -143,8 +141,7 @@ const thunkActions = {
 
       return Api.getLatestDraftFor(contextType, contextId)
         .then(response => {
-          const plan: PacePlan = response.data.pace_plan
-          dispatch(afterAction(plan))
+          dispatch(afterAction(response.pace_plan))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {
@@ -162,8 +159,7 @@ const thunkActions = {
 
       return Api.relinkToParentPlan(getState().pacePlan.id)
         .then(response => {
-          const plan: PacePlan = response.data.pace_plan
-          dispatch(pacePlanActions.setPacePlan(plan))
+          dispatch(pacePlanActions.setPacePlan(response.pace_plan))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {

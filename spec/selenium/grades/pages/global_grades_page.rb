@@ -73,7 +73,7 @@ class GlobalGrades
     end
 
     def report(course)
-      f('.report',course_row(course))
+      f('.report', course_row(course))
     end
 
     def click_report_link(course)

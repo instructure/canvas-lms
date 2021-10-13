@@ -50,7 +50,7 @@ module Importers
     end
 
     def add_unresolved_link(link, item_type, mig_id, field)
-      key = {:type => item_type, :migration_id => mig_id}
+      key = { :type => item_type, :migration_id => mig_id }
       @unresolved_link_map[key] ||= {}
       @unresolved_link_map[key][field] ||= []
       @unresolved_link_map[key][field] << link
@@ -64,7 +64,7 @@ module Importers
       return unless node[attr].present?
 
       if attr == 'value'
-        return unless node[attr] && node[attr] =~ %r{IMS(?:-|_)CC(?:-|_)FILEBASE} || node[attr] =~ %r{CANVAS_COURSE_REFERENCE}
+        return unless (node[attr] && node[attr] =~ %r{IMS(?:-|_)CC(?:-|_)FILEBASE}) || node[attr] =~ %r{CANVAS_COURSE_REFERENCE}
       end
 
       url = node[attr].dup
@@ -91,7 +91,7 @@ module Importers
                 uri.scheme = uri.host = uri.port = nil
                 new_url = uri.to_s
               end
-            rescue URI::InvalidURIError
+            rescue URI::InvalidURIError, URI::InvalidComponentError
             end
           end
         end
@@ -116,12 +116,12 @@ module Importers
       end
     end
 
-    def unresolved(type, data={})
-      {:resolved => false, :link_type => type}.merge(data)
+    def unresolved(type, data = {})
+      { :resolved => false, :link_type => type }.merge(data)
     end
 
-    def resolved(new_url=nil)
-      {:resolved => true, :new_url => new_url}
+    def resolved(new_url = nil)
+      { :resolved => true, :new_url => new_url }
     end
 
     # returns a hash with resolution status and data to hold onto if unresolved
@@ -134,7 +134,7 @@ module Importers
         unresolved(:module_item, :migration_id => $1, :query => $2)
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/file_ref/([^/\?#]+)(.*)}
         unresolved(:file_ref, :migration_id => $1, :rest => $2,
-                   :in_media_iframe => attr == 'src' && node.name == 'iframe' && node['data-media-id'])
+                              :in_media_iframe => attr == 'src' && node.name == 'iframe' && node['data-media-id'])
       elsif url =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/([^\?]*)(\?.*)?}
         unresolved(:object, :type => $1, :migration_id => $2, :query => $3)
 
@@ -143,14 +143,14 @@ module Importers
 
       elsif url =~ %r{\$IMS(?:-|_)CC(?:-|_)FILEBASE\$/(.*)}
         rel_path = URI.unescape($1)
-        if attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/ ||
-           attr == 'src' && node.name == 'iframe' && node['data-media-id']
+        if (attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/) ||
+           (attr == 'src' && node.name == 'iframe' && node['data-media-id'])
           unresolved(:media_object, :rel_path => rel_path)
         else
           unresolved(:file, :rel_path => rel_path)
         end
-      elsif attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/ ||
-            attr == 'src' && node.name == 'iframe' && node['data-media-id']
+      elsif (attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/) ||
+            (attr == 'src' && node.name == 'iframe' && node['data-media-id'])
         # Course copy media reference, leave it alone
         resolved
       elsif attr == 'src' && (info_match = url.match(/\Adata:(?<mime_type>[-\w]+\/[-\w\+\.]+)?;base64,(?<image>.*)/m))
@@ -183,8 +183,8 @@ module Importers
       image_data = Base64.decode64(info_match[:image])
       md5 = Digest::MD5.hexdigest image_data
       folder_name = I18n.t('embedded_images')
-      @folder ||= Folder.root_folders(context).first.sub_folders.
-        where(name: folder_name, workflow_state: 'hidden', context: context).first_or_create!
+      @folder ||= Folder.root_folders(context).first.sub_folders
+                        .where(name: folder_name, workflow_state: 'hidden', context: context).first_or_create!
       filename = "#{md5}.#{extension}"
       file = Tempfile.new([md5, ".#{extension}"])
       file.binmode

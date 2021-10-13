@@ -36,13 +36,13 @@ describe "reply attachment" do
     stub_rcs_config
   end
 
-  it "should create a discussion" do
+  it "creates a discussion" do
     Discussion.visit(@course, @topic)
 
     expect(f('.discussion-title').text).to eq @topic_title
   end
 
-  it "should allow reply after cancel" do
+  it "allows reply after cancel" do
     get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     f('.discussion-reply-box').click
     wait_for_tiny(f("#root_reply_message_for_#{@topic.id}"))
@@ -57,7 +57,7 @@ describe "reply attachment" do
     end
   end
 
-  it "should reply to the discussion with attachment" do
+  it "replies to the discussion with attachment" do
     file_attachment = "graded.png"
     entry_text = 'new entry'
     Discussion.visit(@course, @topic)
@@ -69,7 +69,7 @@ describe "reply attachment" do
     expect(@last_entry.find_element(:css, '.comment_attachments a.image')).to be_displayed
   end
 
-  it "should delete the attachment from the reply" do
+  it "deletes the attachment from the reply" do
     skip_if_chrome('Cancel button click does not reliably happen')
     file_attachment = "graded.png"
     entry_text = 'new entry'

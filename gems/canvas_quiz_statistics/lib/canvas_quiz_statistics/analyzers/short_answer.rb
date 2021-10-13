@@ -59,7 +59,7 @@ module CanvasQuizStatistics::Analyzers
     # true if any text was written, or a known answer_id is provided
     def answer_present?(response)
       response[:text].present? ||
-      locate_answer(response, question_data[:answers]).present?
+        locate_answer(response, question_data[:answers]).present?
     end
   end
 end

@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def planner_note_model(opts={})
+  def planner_note_model(opts = {})
     user = opts[:user] || @user || user_model
     attrs = { user_id: user.id }.merge(opts)
     @planner_note = PlannerNote.create!(valid_planner_note_attributes.merge(attrs))

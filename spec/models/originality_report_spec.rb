@@ -21,12 +21,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../lti2_spec_helper')
 
 describe OriginalityReport do
-
   let(:attachment) { attachment_model }
   let(:course) { course_model }
   let(:submission) { submission_model }
 
-  subject {OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission, workflow_state: 'pending')}
+  subject { OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission, workflow_state: 'pending') }
 
   it 'can have attachments associated with it' do
     expect(subject.attachment).to eq attachment
@@ -164,8 +163,8 @@ describe OriginalityReport do
   end
 
   describe 'workflow_state transitions' do
-    let(:report_no_score){ OriginalityReport.new(attachment: attachment, submission: submission) }
-    let(:report_with_score){ OriginalityReport.new(attachment: attachment, submission: submission, originality_score: 23.2) }
+    let(:report_no_score) { OriginalityReport.new(attachment: attachment, submission: submission) }
+    let(:report_with_score) { OriginalityReport.new(attachment: attachment, submission: submission, originality_score: 23.2) }
 
     it "updates state to 'scored' if originality_score is set on existing record" do
       report_no_score.update(originality_score: 23.0)
@@ -279,8 +278,8 @@ describe OriginalityReport do
 
   describe '#copy_to_group_submissions!' do
     let(:submission_one) { submission_model }
-    let(:submission_two) { submission_model({assignment: submission_one.assignment}) }
-    let(:submission_three) { submission_model({assignment: submission_one.assignment}) }
+    let(:submission_two) { submission_model({ assignment: submission_one.assignment }) }
+    let(:submission_three) { submission_model({ assignment: submission_one.assignment }) }
     let(:user_one) { submission_one.user }
     let(:user_two) { submission_two.user }
     let(:course) { submission_one.assignment.course }
@@ -415,4 +414,3 @@ describe OriginalityReport do
     end
   end
 end
-

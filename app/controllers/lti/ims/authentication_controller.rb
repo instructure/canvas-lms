@@ -114,6 +114,7 @@ module Lti
 
       def validate_launch_eligibility!
         return if @oidc_error
+
         id_token
       rescue InvalidLaunch => e
         Canvas::Errors.capture_exception(:lti, e, :info)
@@ -130,7 +131,7 @@ module Lti
 
       def public_course?
         # Is the context published and public?
-        context&.is_a?(Course) && context&.available? && context&.is_public?
+        context.is_a?(Course) && context&.available? && context&.is_public?
       end
 
       def verifier
@@ -150,17 +151,18 @@ module Lti
 
       def cached_launch_with_nonce
         @cached_launch_with_nonce ||= begin
-          launch_payload = fetch_and_delete_launch(context,verifier)
+          launch_payload = fetch_and_delete_launch(context, verifier)
           raise InvalidLaunch, "no payload found in cache" if launch_payload.nil?
-          JSON.parse(launch_payload).merge({nonce: oidc_params[:nonce]})
+
+          JSON.parse(launch_payload).merge({ nonce: oidc_params[:nonce] })
         end
       end
 
       def id_token
         @id_token ||= begin
           Lti::Messages::JwtMessage.generate_id_token(cached_launch_with_nonce).merge({
-            state: oidc_params[:state]
-          })
+                                                                                        state: oidc_params[:state]
+                                                                                      })
         end
       end
 

@@ -122,70 +122,81 @@ class Auditors::Course
 
     add_index :course do
       table :courses_by_course
-      entry_proc lambda{ |record| record.course }
-      key_proc lambda{ |course| course.global_id }
+      entry_proc lambda { |record| record.course }
+      key_proc lambda { |course| course.global_id }
       ar_scope_proc lambda { |course| course_ar_type.where(course_id: course.id) }
     end
 
     add_index :account do
       table :courses_by_account
-      entry_proc lambda{ |record| record.account }
-      key_proc lambda{ |account| account.global_id }
+      entry_proc lambda { |record| record.account }
+      key_proc lambda { |account| account.global_id }
       ar_scope_proc lambda { |account| course_ar_type.where(account_id: account.id) }
     end
   end
 
   def self.remove_empty_changes(changes)
     # courses may instantiate an empty hash for serialized attributes
-    changes.reject{|k, change| change.is_a?(Array) && change.all?(&:blank?) }
+    changes.reject { |k, change| change.is_a?(Array) && change.all?(&:blank?) }
   end
 
   def self.record_created(course, user, changes, opts = {})
     return unless course && changes
+
     changes = self.remove_empty_changes(changes)
     return if changes.empty?
+
     self.record(course, user, "created", changes, opts)
   end
 
   def self.record_updated(course, user, changes, opts = {})
     return unless course && changes
+
     changes = self.remove_empty_changes(changes)
     return if changes.empty?
+
     self.record(course, user, 'updated', changes, opts)
   end
 
   def self.record_concluded(course, user, opts = {})
     return unless course
+
     self.record(course, user, 'concluded', {}, opts)
   end
 
   def self.record_unconcluded(course, user, opts = {})
     return unless course
+
     self.record(course, user, 'unconcluded', {}, opts)
   end
 
   def self.record_deleted(course, user, opts = {})
     return unless course
+
     self.record(course, user, 'deleted', {}, opts)
   end
 
   def self.record_restored(course, user, opts = {})
     return unless course
+
     self.record(course, user, 'restored', {}, opts)
   end
 
   def self.record_published(course, user, opts = {})
     return unless course
+
     self.record(course, user, 'published', {}, opts)
   end
 
   def self.record_claimed(course, user, opts = {})
     return unless course
+
     self.record(course, user, 'claimed', {}, opts)
   end
 
   def self.record_copied(course, copy, user, opts = {})
     return unless course && copy
+
     copied_from = self.record(copy, user, 'copied_from', { copied_from: Shard.global_id_for(course) }, opts)
     copied_to = self.record(course, user, 'copied_to', { copied_to: Shard.global_id_for(copy) }, opts)
     return copied_from, copied_to
@@ -193,34 +204,36 @@ class Auditors::Course
 
   def self.record_reset(course, new_course, user, opts = {})
     return unless course && new_course
+
     reset_from = self.record(new_course, user, 'reset_from', { reset_from: Shard.global_id_for(course) }, opts)
     reset_to = self.record(course, user, 'reset_to', { reset_to: Shard.global_id_for(new_course) }, opts)
     return reset_from, reset_to
   end
 
-  def self.record(course, user, event_type, data={}, opts = {})
+  def self.record(course, user, event_type, data = {}, opts = {})
     return unless course
+
     data.each do |k, change|
-      if change.is_a?(Array) && change.any?{|v| v.is_a?(String) && v.length > 1000}
-        data[k] = change.map{|v| v.is_a?(String) ? CanvasTextHelper.truncate_text(v, :max_length => 1000) : v}
+      if change.is_a?(Array) && change.any? { |v| v.is_a?(String) && v.length > 1000 }
+        data[k] = change.map { |v| v.is_a?(String) ? CanvasTextHelper.truncate_text(v, :max_length => 1000) : v }
       end
     end
     event_record = nil
     course.shard.activate do
       event_record = Auditors::Course::Record.generate(course, user, event_type, data, opts)
-      Auditors::Course::Stream.insert(event_record, {backend_strategy: :cassandra}) if Audits.write_to_cassandra?
-      Auditors::Course::Stream.insert(event_record, {backend_strategy: :active_record}) if Audits.write_to_postgres?
+      Auditors::Course::Stream.insert(event_record, { backend_strategy: :cassandra }) if Audits.write_to_cassandra?
+      Auditors::Course::Stream.insert(event_record, { backend_strategy: :active_record }) if Audits.write_to_postgres?
     end
     event_record
   end
 
-  def self.for_course(course, options={})
+  def self.for_course(course, options = {})
     course.shard.activate do
       Auditors::Course::Stream.for_course(course, Audits.read_stream_options(options))
     end
   end
 
-  def self.for_account(account, options={})
+  def self.for_account(account, options = {})
     account.shard.activate do
       Auditors::Course::Stream.for_account(account, Audits.read_stream_options(options))
     end

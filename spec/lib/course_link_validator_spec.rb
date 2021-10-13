@@ -21,8 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CourseLinkValidator do
-
-  it "should validate all the links" do
+  it "validates all the links" do
     allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(false) # don't actually ping the links for the specs
 
     course_factory
@@ -45,8 +44,8 @@ describe CourseLinkValidator do
     @course.save!
 
     bank = @course.assessment_question_banks.create!(:title => 'bank')
-    aq = bank.assessment_questions.create!(:question_data => {'name' => 'test question',
-      'question_text' => html, 'answers' => [{'id' => 1}, {'id' => 2}]})
+    aq = bank.assessment_questions.create!(:question_data => { 'name' => 'test question',
+                                                               'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
 
     assmnt = @course.assignments.create!(:title => 'assignment', :description => html)
     event = @course.calendar_events.create!(:title => "event", :description => html)
@@ -65,15 +64,15 @@ describe CourseLinkValidator do
     issues.each do |issue|
       if issue[:type] == :course_card_image
         expect(issue[:content_url]).to eq "/courses/#{@course.id}/settings"
-        expect(issue[:invalid_links]).to include({:reason => :unreachable, :url => bad_url, :image => true})
+        expect(issue[:invalid_links]).to include({ :reason => :unreachable, :url => bad_url, :image => true })
       elsif issue[:type] == :module
         expect(issue[:content_url]).to eq "/courses/#{@course.id}/modules#module_#{mod.id}"
-        expect(issue[:invalid_links]).to include({:reason => :unreachable, :link_text => 'pls view', :url => bad_url})
+        expect(issue[:invalid_links]).to include({ :reason => :unreachable, :link_text => 'pls view', :url => bad_url })
       else
-        expect(issue[:invalid_links]).to include({:reason => :unreachable, :url => bad_url, :link_text => 'Bad absolute link'})
-        expect(issue[:invalid_links]).to include({:reason => :unpublished_item, :url => "/courses/#{@course.id}/assignments/#{@ua.id}", :link_text => "Unpublished thing"})
-        expect(issue[:invalid_links]).to include({:reason => :missing_item, :url => bad_url2, :image => true})
-        expect(issue[:invalid_links]).to include({:reason => :missing_item, :url => bad_media_object_url})
+        expect(issue[:invalid_links]).to include({ :reason => :unreachable, :url => bad_url, :link_text => 'Bad absolute link' })
+        expect(issue[:invalid_links]).to include({ :reason => :unpublished_item, :url => "/courses/#{@course.id}/assignments/#{@ua.id}", :link_text => "Unpublished thing" })
+        expect(issue[:invalid_links]).to include({ :reason => :missing_item, :url => bad_url2, :image => true })
+        expect(issue[:invalid_links]).to include({ :reason => :missing_item, :url => bad_media_object_url })
       end
     end
 
@@ -90,19 +89,19 @@ describe CourseLinkValidator do
       :wiki_page => page.title
     }
     type_names.each do |type, name|
-      expect(issues.select{|issue| issue[:type] == type}.count).to eq(1)
-      expect(issues.detect{|issue| issue[:type] == type}[:name]).to eq(name)
+      expect(issues.select { |issue| issue[:type] == type }.count).to eq(1)
+      expect(issues.detect { |issue| issue[:type] == type }[:name]).to eq(name)
     end
   end
 
-  it "should not run on assessment questions in deleted banks" do
+  it "does not run on assessment questions in deleted banks" do
     allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(false) # don't actually ping the links for the specs
     html = %{<a href='http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com'>linky</a>}
 
     course_factory
     bank = @course.assessment_question_banks.create!(:title => 'bank')
-    aq = bank.assessment_questions.create!(:question_data => {'name' => 'test question',
-      'question_text' => html, 'answers' => [{'id' => 1}, {'id' => 2}]})
+    aq = bank.assessment_questions.create!(:question_data => { 'name' => 'test question',
+                                                               'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
 
     CourseLinkValidator.queue_course(@course)
     run_jobs
@@ -119,14 +118,14 @@ describe CourseLinkValidator do
     expect(issues).to be_empty
   end
 
-  it "should not run on deleted quiz questions" do
+  it "does not run on deleted quiz questions" do
     allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(false) # don't actually ping the links for the specs
     html = %{<a href='http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com'>linky</a>}
 
     course_factory
     quiz = @course.quizzes.create!(:title => 'quiz1', :description => "desc")
-    qq = quiz.quiz_questions.create!(:question_data => {'name' => 'test question',
-      'question_text' => html, 'answers' => [{'id' => 1}, {'id' => 2}]})
+    qq = quiz.quiz_questions.create!(:question_data => { 'name' => 'test question',
+                                                         'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
     qq.destroy!
 
     CourseLinkValidator.queue_course(@course)
@@ -136,7 +135,7 @@ describe CourseLinkValidator do
     expect(issues.count).to eq 0
   end
 
-  it "should not care if it can reach it" do
+  it "does not care if it can reach it" do
     allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(true)
 
     course_factory
@@ -168,7 +167,7 @@ describe CourseLinkValidator do
     end
   end
 
-  it "should check for deleted/unpublished objects" do
+  it "checks for deleted/unpublished objects" do
     course_factory
     active = @course.assignments.create!(:title => "blah")
     unpublished = @course.assignments.create!(:title => "blah")
@@ -191,14 +190,14 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
     expect(links).to match_array [unpublished_link, deleted_link]
   end
 
-  it "should work more betterer with external_tools/retrieve" do
+  it "works more betterer with external_tools/retrieve" do
     course_factory
     tool = @course.context_external_tools.create!(name: 'blah',
-      url: 'https://blah.example.com', shared_secret: '123', consumer_key: '456')
+                                                  url: 'https://blah.example.com', shared_secret: '123', consumer_key: '456')
 
     active_link = "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape(tool.url)}"
     nonsense_link = "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape("https://lolwut.beep")}"
@@ -212,11 +211,11 @@ describe CourseLinkValidator do
 
     CourseLinkValidator.queue_course(@course)
     run_jobs
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
     expect(links).to eq([nonsense_link])
   end
 
-  it "should work with absolute links to local objects" do
+  it "works with absolute links to local objects" do
     course_factory
     deleted = @course.assignments.create!(:title => "blah")
     deleted.destroy
@@ -230,11 +229,11 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
     expect(links).to match_array [deleted_link]
   end
 
-  it "should find links to other courses" do
+  it "finds links to other courses" do
     other_course = course_factory
     course_factory
 
@@ -253,7 +252,7 @@ describe CourseLinkValidator do
     expect(links.first[:reason]).to eq :course_mismatch
   end
 
-  it "should find links to wiki pages" do
+  it "finds links to wiki pages" do
     course_factory
     active = @course.wiki_pages.create!(:title => "active and stuff")
     unpublished = @course.wiki_pages.create!(:title => "unpub")
@@ -278,11 +277,11 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
     expect(links).to match_array [unpublished_link, deleted_link]
   end
 
-  it "should ignore links to replaced wiki pages" do
+  it "ignores links to replaced wiki pages" do
     course_factory
     deleted = @course.wiki_pages.create!(:title => "baleeted")
     deleted.destroy
@@ -302,7 +301,7 @@ describe CourseLinkValidator do
     expect(issues).to be_empty
   end
 
-  it "should identify typo'd canvas links" do
+  it "identifies typo'd canvas links" do
     course_factory
     invalid_link1 = "/cupbopourses"
     invalid_link2 = "http://#{HostUrl.default_host}/courses/#{@course.id}/pon3s"
@@ -319,11 +318,11 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
     expect(links).to match_array [invalid_link1, invalid_link2]
   end
 
-  it "should not flag valid replaced attachments" do
+  it "does not flag valid replaced attachments" do
     course_factory
     att1 = attachment_with_context(@course, :display_name => "name")
     att2 = attachment_with_context(@course)
@@ -351,11 +350,11 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
     expect(links).to match_array [link]
   end
 
-  it "should not flag links to public paths" do
+  it "does not flag links to public paths" do
     course_factory
     @course.syllabus_body = %{<a href='/images/avatar-50.png'>link</a>}
     @course.save!
@@ -367,7 +366,7 @@ describe CourseLinkValidator do
     expect(issues).to be_empty
   end
 
-  it "should flag sneaky links" do
+  it "flags sneaky links" do
     course_factory
     @course.syllabus_body = %{<a href='/../app/models/user.rb'>link</a>}
     @course.save!
@@ -379,7 +378,7 @@ describe CourseLinkValidator do
     expect(issues.count).to eq 1
   end
 
-  it "should not flag wiki pages with url encoding" do
+  it "does not flag wiki pages with url encoding" do
     course_factory
     page = @course.wiki_pages.create!(:title => "semi;colon", :body => 'sutff')
 
@@ -400,15 +399,15 @@ describe CourseLinkValidator do
       assignment_model(course: @course)
     end
 
-    it "should return :missing_item if the link doesn't point to course content" do
+    it "returns :missing_item if the link doesn't point to course content" do
       expect(@course_link_validator.check_object_status("/test_error")).to eq :missing_item
     end
 
-    it "should return :missing_item if the referenced media_object doesn't exist" do
+    it "returns :missing_item if the referenced media_object doesn't exist" do
       expect(@course_link_validator.check_object_status("/media_objects_iframe/junk")).to eq :missing_item
     end
 
-    it 'should return :unpublished_item for unpublished content' do
+    it 'returns :unpublished_item for unpublished content' do
       @assignment.unpublish!
       expect(@course_link_validator.check_object_status("/courses/#{@course.id}/assignments/#{@assignment.id}")).to eq :unpublished_item
 
@@ -422,7 +421,7 @@ describe CourseLinkValidator do
       expect(@course_link_validator.check_object_status("/courses/#{@course.id}/files/#{@attachment.id}/download")).to eq :unpublished_item
     end
 
-    it 'should return :deleted for deleted content' do
+    it 'returns :deleted for deleted content' do
       @assignment.destroy
       expect(@course_link_validator.check_object_status("/courses/#{@course.id}/assignments/#{@assignment.id}")).to eq :deleted
 

@@ -20,7 +20,6 @@
 
 module SIS
   class UserImporter < BaseImporter
-
     def process(messages, login_only: false)
       importer = Work.new(@batch, @root_account, @logger, messages)
       User.skip_updating_account_associations do
@@ -33,19 +32,20 @@ module SIS
           end
         end
       end
-      User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => {@root_account.id => 0})
+      User.update_account_associations(importer.users_to_add_account_associations, :incremental => true, :precalculated_associations => { @root_account.id => 0 })
       User.update_account_associations(importer.users_to_update_account_associations)
-      importer.pseudos_to_set_sis_batch_ids.in_groups_of(1000, false) {|ids| Pseudonym.where(id: ids).update_all(sis_batch_id: @batch.id)}
+      importer.pseudos_to_set_sis_batch_ids.in_groups_of(1000, false) { |ids| Pseudonym.where(id: ids).update_all(sis_batch_id: @batch.id) }
       SisBatchRollBackData.bulk_insert_roll_back_data(importer.roll_back_data)
 
       importer.success_count
     end
 
-  private
+    private
+
     class Work
       attr_accessor :success_count, :users_to_set_sis_batch_ids,
-          :pseudos_to_set_sis_batch_ids, :users_to_add_account_associations,
-          :users_to_update_account_associations, :roll_back_data
+                    :pseudos_to_set_sis_batch_ids, :users_to_add_account_associations,
+                    :users_to_update_account_associations, :roll_back_data
 
       def initialize(batch, root_account, logger, messages)
         @batch = batch
@@ -114,6 +114,7 @@ module SIS
 
       def process_batch(login_only: false)
         return unless any_left_to_process?
+
         while !@batched_users.empty?
           user_row = @batched_users.shift
           pseudo = @root_account.pseudonyms.where(sis_user_id: user_row.user_id.to_s).take
@@ -138,7 +139,7 @@ module SIS
           if pseudo_by_integration && status_is_active && pseudo_by_integration != pseudo
             id_message = pseudo_by_integration.sis_user_id ? I18n.t('SIS ID') : I18n.t('Canvas ID')
             user_id = pseudo_by_integration.sis_user_id || pseudo_by_integration.user_id
-            message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
+            message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping", user_id: "#{id_message} #{user_id}", other_user_id: user_row.user_id)
             @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
             next
           end
@@ -158,11 +159,11 @@ module SIS
                 next
               end
             end
-            if pseudo_by_login && (pseudo != pseudo_by_login && status_is_active ||
+            if pseudo_by_login && ((pseudo != pseudo_by_login && status_is_active) ||
               !Pseudonym.where("LOWER(?)=LOWER(?)", pseudo.unique_id, user_row.login_id).exists?)
               id_message = pseudo_by_login.sis_user_id ? 'SIS ID' : 'Canvas ID'
               user_id = pseudo_by_login.sis_user_id || pseudo_by_login.user_id
-              message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
+              message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: "#{id_message} #{user_id}", other_user_id: user_row.user_id)
               @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
               next
             end
@@ -265,7 +266,7 @@ module SIS
 
           # if a password is provided, use it only if this is a new user, or the user hasn't changed the password in canvas *AND* the incoming password has changed
           # otherwise the persistence_token will change even though we're setting to the same password, logging the user out
-          if !user_row.password.blank? && (pseudo.new_record? || pseudo.password_auto_generated && !pseudo.valid_password?(user_row.password))
+          if !user_row.password.blank? && (pseudo.new_record? || (pseudo.password_auto_generated && !pseudo.valid_password?(user_row.password)))
             pseudo.password = user_row.password
             pseudo.password_confirmation = user_row.password
             pseudo.password_auto_generated = true
@@ -323,10 +324,10 @@ module SIS
               # as it is, this scope gets evaluated on the current shard instead of the user shard
               # and that can lead to failing to find the matching communication channel.
               cc_scope = if status_is_active
-                            CommunicationChannel.where("workflow_state='active' OR user_id=?", user)
-                        else
-                          user.communication_channels
-                        end
+                           CommunicationChannel.where("workflow_state='active' OR user_id=?", user)
+                         else
+                           user.communication_channels
+                         end
               cc_scope = cc_scope.email.by_path(user_row.email)
               limit = Setting.get("merge_candidate_search_limit", "100").to_i
               ccs = cc_scope.limit(limit + 1).to_a
@@ -343,7 +344,7 @@ module SIS
             # Have to explicitly load the old sis communication channel, in case it changed (should only happen if user_id got messed up)
             sis_cc ||= pseudo.sis_communication_channel
             # search for active/unconfirmed channels first, so we don't try to resurrect a conflicting cc
-            other_cc = ccs.find { |cc| cc.user_id == user.id && cc.id != sis_cc.try(:id) && (cc.active? || cc.unconfirmed?)}
+            other_cc = ccs.find { |cc| cc.user_id == user.id && cc.id != sis_cc.try(:id) && (cc.active? || cc.unconfirmed?) }
             other_cc ||= ccs.find { |cc| cc.user_id == user.id && cc.id != sis_cc.try(:id) }
             # Handle the case where the SIS CC changes to match an already existing CC
             if sis_cc && other_cc
@@ -440,8 +441,8 @@ module SIS
       def remove_enrollments_if_last_login(user, user_id)
         return false if @root_account.pseudonyms.active.where(user_id: user).where("sis_user_id != ? OR sis_user_id IS NULL", user_id).exists?
 
-        enrollments = @root_account.enrollments.active.where(user_id: user).
-          select(:id, :type, :course_id, :course_section_id, :user_id, :workflow_state).to_a
+        enrollments = @root_account.enrollments.active.where(user_id: user)
+                                   .select(:id, :type, :course_id, :course_section_id, :user_id, :workflow_state).to_a
         if enrollments.any?
           Enrollment.where(id: enrollments.map(&:id)).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
           EnrollmentState.where(enrollment_id: enrollments.map(&:id)).update_all(state: 'deleted', state_is_current: true, updated_at: Time.now.utc)
@@ -452,7 +453,7 @@ module SIS
         student_enrollments = enrollments.select(&:student?)
         if student_enrollments.any?
           observers = user.linked_observers.active.linked_through_root_account(@root_account).to_a
-          observer_enrollments = observers.map{|o| student_enrollments.map{|se| se.linked_enrollment_for(o) }}.flatten.compact
+          observer_enrollments = observers.map { |o| student_enrollments.map { |se| se.linked_enrollment_for(o) } }.flatten.compact
           if observer_enrollments.any?
             Enrollment.where(id: observer_enrollments.map(&:id)).update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
             EnrollmentState.where(enrollment_id: observer_enrollments.map(&:id)).update_all(state: 'deleted', state_is_current: true, updated_at: Time.now.utc)
@@ -474,12 +475,12 @@ module SIS
         @roll_back_data.push(*r_data) if r_data
 
         d = enrollments.count
-        d += @root_account.all_group_memberships.active.where(user_id: user).
-          update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
-        d += user.account_users.active.shard(@root_account).where(account_id: @root_account.all_accounts).
-          update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
-        d += user.account_users.active.shard(@root_account).where(account_id: @root_account).
-          update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
+        d += @root_account.all_group_memberships.active.where(user_id: user)
+                          .update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
+        d += user.account_users.active.shard(@root_account).where(account_id: @root_account.all_accounts)
+                 .update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
+        d += user.account_users.active.shard(@root_account).where(account_id: @root_account)
+                 .update_all(updated_at: Time.now.utc, workflow_state: 'deleted')
         if d > 0
           should_update_account_associations = true
         end
@@ -506,7 +507,7 @@ module SIS
         response = ERRORS_TO_REASONS.fetch(options[:message]) { DEFAULT_REASON }
         reason = format(response, options)
         result = "Could not save the user with user_id: '#{options[:user_id]}'." +
-          " #{reason}"
+                 " #{reason}"
         result
       end
     end

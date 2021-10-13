@@ -21,68 +21,68 @@ class SplitUsers
   class UnsafeSplitError < StandardError; end
 
   ENROLLMENT_DATA_UPDATES = [
-    {table: 'asset_user_accesses',
-     scope: -> { where(context_type: 'Course') }}.freeze,
-    {table: 'asset_user_accesses',
-     scope: -> { joins(:context_group).where(groups: {context_type: 'Course'}) }, context_id: 'groups.context_id'}.freeze,
-    {table: 'calendar_events',
-     scope: -> { where(context_type: 'Course') }}.freeze,
-    {table: 'calendar_events',
-     scope: -> { joins(:context_group).where(groups: {context_type: 'Course'}) },
-     context_id: 'groups.context_id'}.freeze,
-    {table: 'collaborations',
-     scope: -> { where(context_type: 'Course') }}.freeze,
-    {table: 'collaborations',
-     scope: -> { joins(:group).where(groups: {context_type: 'Course'}) },
-     context_id: 'groups.context_id'}.freeze,
-    {table: 'context_module_progressions',
-     scope: -> { joins(:context_module) },
-     context_id: 'context_modules.context_id'}.freeze,
-    {table: 'discussion_entries',
-     scope: -> { joins(:discussion_topic).where(discussion_topics: {context_type: 'Course'}) },
-     context_id: 'discussion_topics.context_id'}.freeze,
-    {table: 'discussion_entries',
-     scope: -> { joins({discussion_topic: :group}).where(groups: {context_type: 'Course'}) },
-     context_id: 'groups.context_id'}.freeze,
-    {table: 'discussion_entries', foreign_key: :editor_id,
-     scope: -> { joins(:discussion_topic).where(discussion_topics: {context_type: 'Course'}) },
-     context_id: 'discussion_topics.context_id'}.freeze,
-    {table: 'discussion_entries', foreign_key: :editor_id,
-     scope: -> { joins({discussion_topic: :group}).where(groups: {context_type: 'Course'}) },
-     context_id: 'groups.context_id'}.freeze,
-    {table: 'discussion_topics',
-     scope: -> { where(context_type: 'Course') }}.freeze,
-    {table: 'discussion_topics',
-     scope: -> { joins(:group).where(groups: {context_type: 'Course'}) },
-     context_id: 'groups.context_id'}.freeze,
-    {table: 'discussion_topics', foreign_key: :editor_id,
-     scope: -> { where(context_type: 'Course') }}.freeze,
-    {table: 'discussion_topics', foreign_key: :editor_id,
-     scope: -> { joins(:group).where(groups: {context_type: 'Course'}) },
-     context_id: 'groups.context_id'}.freeze,
-    {table: 'page_views',
-     scope: -> { where(context_type: 'Course') }}.freeze,
-    {table: 'rubric_assessments',
-     scope: -> { joins({submission: :assignment}) },
-     context_id: 'assignments.context_id'}.freeze,
-    {table: 'rubric_assessments', foreign_key: :assessor_id,
-     scope: -> { joins({submission: :assignment}) },
-     context_id: 'assignments.context_id'}.freeze,
-    {table: 'submission_comments', foreign_key: :author_id}.freeze,
-    {table: 'web_conference_participants',
-     scope: -> { joins(:web_conference).where(web_conferences: {context_type: 'Course'}) },
-     context_id: 'web_conferences.context_id'}.freeze,
-    {table: 'web_conference_participants',
-     scope: -> { joins({web_conference: :group}).where(web_conferences: {context_type: 'Course'}, groups: {context_type: 'Course'}) },
-     context_id: 'groups.context_id'}.freeze,
-    {table: 'web_conferences',
-     scope: -> { where(context_type: 'Course') }}.freeze,
-    {table: 'web_conferences',
-     scope: -> { joins(:group).where(web_conferences: {context_type: 'Course'}, groups: {context_type: 'Course'}) },
-     context_id: 'groups.context_id'}.freeze,
-    {table: 'wiki_pages',
-     scope: -> { joins({wiki: :course}) },
-     context_id: 'courses.id'}.freeze
+    { table: 'asset_user_accesses',
+      scope: -> { where(context_type: 'Course') } }.freeze,
+    { table: 'asset_user_accesses',
+      scope: -> { joins(:context_group).where(groups: { context_type: 'Course' }) }, context_id: 'groups.context_id' }.freeze,
+    { table: 'calendar_events',
+      scope: -> { where(context_type: 'Course') } }.freeze,
+    { table: 'calendar_events',
+      scope: -> { joins(:context_group).where(groups: { context_type: 'Course' }) },
+      context_id: 'groups.context_id' }.freeze,
+    { table: 'collaborations',
+      scope: -> { where(context_type: 'Course') } }.freeze,
+    { table: 'collaborations',
+      scope: -> { joins(:group).where(groups: { context_type: 'Course' }) },
+      context_id: 'groups.context_id' }.freeze,
+    { table: 'context_module_progressions',
+      scope: -> { joins(:context_module) },
+      context_id: 'context_modules.context_id' }.freeze,
+    { table: 'discussion_entries',
+      scope: -> { joins(:discussion_topic).where(discussion_topics: { context_type: 'Course' }) },
+      context_id: 'discussion_topics.context_id' }.freeze,
+    { table: 'discussion_entries',
+      scope: -> { joins({ discussion_topic: :group }).where(groups: { context_type: 'Course' }) },
+      context_id: 'groups.context_id' }.freeze,
+    { table: 'discussion_entries', foreign_key: :editor_id,
+      scope: -> { joins(:discussion_topic).where(discussion_topics: { context_type: 'Course' }) },
+      context_id: 'discussion_topics.context_id' }.freeze,
+    { table: 'discussion_entries', foreign_key: :editor_id,
+      scope: -> { joins({ discussion_topic: :group }).where(groups: { context_type: 'Course' }) },
+      context_id: 'groups.context_id' }.freeze,
+    { table: 'discussion_topics',
+      scope: -> { where(context_type: 'Course') } }.freeze,
+    { table: 'discussion_topics',
+      scope: -> { joins(:group).where(groups: { context_type: 'Course' }) },
+      context_id: 'groups.context_id' }.freeze,
+    { table: 'discussion_topics', foreign_key: :editor_id,
+      scope: -> { where(context_type: 'Course') } }.freeze,
+    { table: 'discussion_topics', foreign_key: :editor_id,
+      scope: -> { joins(:group).where(groups: { context_type: 'Course' }) },
+      context_id: 'groups.context_id' }.freeze,
+    { table: 'page_views',
+      scope: -> { where(context_type: 'Course') } }.freeze,
+    { table: 'rubric_assessments',
+      scope: -> { joins({ submission: :assignment }) },
+      context_id: 'assignments.context_id' }.freeze,
+    { table: 'rubric_assessments', foreign_key: :assessor_id,
+      scope: -> { joins({ submission: :assignment }) },
+      context_id: 'assignments.context_id' }.freeze,
+    { table: 'submission_comments', foreign_key: :author_id }.freeze,
+    { table: 'web_conference_participants',
+      scope: -> { joins(:web_conference).where(web_conferences: { context_type: 'Course' }) },
+      context_id: 'web_conferences.context_id' }.freeze,
+    { table: 'web_conference_participants',
+      scope: -> { joins({ web_conference: :group }).where(web_conferences: { context_type: 'Course' }, groups: { context_type: 'Course' }) },
+      context_id: 'groups.context_id' }.freeze,
+    { table: 'web_conferences',
+      scope: -> { where(context_type: 'Course') } }.freeze,
+    { table: 'web_conferences',
+      scope: -> { joins(:group).where(web_conferences: { context_type: 'Course' }, groups: { context_type: 'Course' }) },
+      context_id: 'groups.context_id' }.freeze,
+    { table: 'wiki_pages',
+      scope: -> { joins({ wiki: :course }) },
+      context_id: 'courses.id' }.freeze
   ].freeze
 
   attr_accessor :source_user, :restored_user, :merge_data
@@ -128,19 +128,19 @@ class SplitUsers
 
   private
 
-  MERGE_ITEM_TYPES = {access_token: :user_id,
-                      conversation_message: :author_id,
-                      favorite: :user_id,
-                      ignore: :user_id,
-                      user_past_lti_id: :user_id,
-                      'Polling::Poll': :user_id}.freeze
+  MERGE_ITEM_TYPES = { access_token: :user_id,
+                       conversation_message: :author_id,
+                       favorite: :user_id,
+                       ignore: :user_id,
+                       user_past_lti_id: :user_id,
+                       'Polling::Poll': :user_id }.freeze
 
   def restore_merge_items
     Shard.with_each_shard(restored_user.associated_shards + restored_user.associated_shards(:weak) + restored_user.associated_shards(:shadow)) do
       UserPastLtiId.where(user: source_user, user_lti_id: restored_user.lti_id).delete_all
     end
     source_user.shard.activate do
-      ConversationParticipant.where(id: merge_data.items.where(item_type: 'conversation_ids').take&.item).find_each {|c| c.move_to_user(restored_user)}
+      ConversationParticipant.where(id: merge_data.items.where(item_type: 'conversation_ids').take&.item).find_each { |c| c.move_to_user(restored_user) }
     end
     MERGE_ITEM_TYPES.each do |klass, user_attr|
       ids = merge_data.items.where(item_type: klass.to_s + '_ids').take&.item
@@ -184,8 +184,8 @@ class SplitUsers
   end
 
   def move_new_enrollments(enrollment_ids, pseudonyms)
-    new_enrollments = Enrollment.where.not(id: enrollment_ids).where.not(user: restored_user).
-      where(sis_pseudonym_id: pseudonyms).shard(pseudonyms.first.shard)
+    new_enrollments = Enrollment.where.not(id: enrollment_ids).where.not(user: restored_user)
+                                .where(sis_pseudonym_id: pseudonyms).shard(pseudonyms.first.shard)
     move_enrollments(new_enrollments)
   end
 
@@ -228,6 +228,7 @@ class SplitUsers
       # if this cc didn't get moved, we don't need to worry
       # about deconflicting it with the source users.
       next unless target_cc.user_id == source_user.id
+
       conflict_cc = restored_user.communication_channels.detect do |c|
         c.path.downcase == target_cc.path.downcase && c.path_type == target_cc.path_type
       end
@@ -313,9 +314,9 @@ class SplitUsers
     # we will leave the merged preferences on the user, most of them are for a
     # specific context that will not be there, but it will keep new
     # preferences except for terms_of_use.
-    source_user.preferences[:accepted_terms] = merge_data.items.
-      where(user_id: source_user).where(item_type: 'user_preferences').take&.item&.dig(:accepted_terms)
-    source_user.preferences = {} if source_user.preferences == {accepted_terms: nil}
+    source_user.preferences[:accepted_terms] = merge_data.items
+                                                         .where(user_id: source_user).where(item_type: 'user_preferences').take&.item&.dig(:accepted_terms)
+    source_user.preferences = {} if source_user.preferences == { accepted_terms: nil }
     source_user.save! if source_user.changed?
   end
 
@@ -328,17 +329,17 @@ class SplitUsers
   def transfer_enrollment_data(courses)
     # use a partition proc so that we only run on the actual course shard, not all
     # shards associated with the course
-    Shard.partition_by_shard(courses, ->(course) {course.shard}) do |shard_course|
+    Shard.partition_by_shard(courses, ->(course) { course.shard }) do |shard_course|
       source_user_id = source_user.id
       target_user_id = restored_user.id
       ENROLLMENT_DATA_UPDATES.each do |update|
         relation = update[:table].classify.constantize.all
         relation = relation.instance_exec(&update[:scope]) if update[:scope]
 
-        relation.
-          where((update[:context_id] || :context_id) => shard_course,
-                (update[:foreign_key] || :user_id) => source_user_id).
-          update_all((update[:foreign_key] || :user_id) => target_user_id)
+        relation
+          .where((update[:context_id] || :context_id) => shard_course,
+                 (update[:foreign_key] || :user_id) => source_user_id)
+          .update_all((update[:foreign_key] || :user_id) => target_user_id)
       end
     end
   end
@@ -351,12 +352,12 @@ class SplitUsers
     # there should be no conflicts here because this is only called for
     # enrollments that were updated which already excluded conflicts, but we
     # will add the scope to protect against a FK violation.
-    source_user.submissions.where(assignment_id: Assignment.where(context_id: enrollments.map(&:course_id))).
-      where.not(assignment_id: restored_user.all_submissions.select(:assignment_id)).shard(source_user).
-      update_all(user_id: restored_user.id)
-    source_user.quiz_submissions.where(quiz_id: Quizzes::Quiz.where(context_id: enrollments.map(&:course_id))).
-      where.not(quiz_id: restored_user.quiz_submissions.select(:quiz_id)).shard(source_user).
-      update_all(user_id: restored_user.id)
+    source_user.submissions.where(assignment_id: Assignment.where(context_id: enrollments.map(&:course_id)))
+               .where.not(assignment_id: restored_user.all_submissions.select(:assignment_id)).shard(source_user)
+               .update_all(user_id: restored_user.id)
+    source_user.quiz_submissions.where(quiz_id: Quizzes::Quiz.where(context_id: enrollments.map(&:course_id)))
+               .where.not(quiz_id: restored_user.quiz_submissions.select(:quiz_id)).shard(source_user)
+               .update_all(user_id: restored_user.id)
   end
 
   def handle_submissions(records)
@@ -364,8 +365,8 @@ class SplitUsers
      [:'quizzes/quiz_submissions', 'fk_rails_04850db4b4']].each do |table, foreign_key|
       model = table.to_s.classify.constantize
 
-      ids_by_shard = records.where(context_type: model.to_s, previous_user_id: restored_user).pluck(:context_id).group_by {|id| Shard.shard_for(id)}
-      other_ids_by_shard = records.where(context_type: model.to_s, previous_user_id: source_user).pluck(:context_id).group_by {|id| Shard.shard_for(id)}
+      ids_by_shard = records.where(context_type: model.to_s, previous_user_id: restored_user).pluck(:context_id).group_by { |id| Shard.shard_for(id) }
+      other_ids_by_shard = records.where(context_type: model.to_s, previous_user_id: source_user).pluck(:context_id).group_by { |id| Shard.shard_for(id) }
 
       (ids_by_shard.keys + other_ids_by_shard.keys).uniq.each do |shard|
         ids = ids_by_shard[shard] || []
@@ -393,6 +394,7 @@ class SplitUsers
     records.each do |r|
       c = r.context
       next unless c && c.class.columns_hash.key?('workflow_state')
+
       c.workflow_state = r.previous_workflow_state unless c.class == Attachment
       c.file_state = r.previous_workflow_state if c.class == Attachment
       c.save! if c.changed? && c.valid?

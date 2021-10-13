@@ -16,7 +16,8 @@ linter_options = {
     comments.each do |comment|
       comment[:severity] = 'warn'
     end
-  end
+  end,
+  severe_anywhere: false
 }
 
 eslint = Linter.new(linter_options)
@@ -26,7 +27,7 @@ puts "Linting sub-packages"
 
 linter_options[:command] = "yarn lint"
 linter_options[:base_dir] = "../../"
-package_dirs = `ls -1 packages/*/package.json 2> /dev/null`.split(/\n/).map { |d| d.sub("/package.json", "")}
+package_dirs = `ls -1 packages/*/package.json 2> /dev/null`.split(/\n/).map { |d| d.sub("/package.json", "") }
 cwd = Dir.pwd
 package_dirs.each do |d|
   puts "working sub-package dir #{d}"

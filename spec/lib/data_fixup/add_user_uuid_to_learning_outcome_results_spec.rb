@@ -39,10 +39,10 @@ describe DataFixup::AddUserUuidToLearningOutcomeResults do
 
     LearningOutcomeResult.new(
       alignment: ContentTag.create!({
-        title: 'content',
-        context: course,
-        learning_outcome: outcome
-      }),
+                                      title: 'content',
+                                      context: course,
+                                      learning_outcome: outcome
+                                    }),
       user: student
     ).tap do |lor|
       lor.association_object = quiz

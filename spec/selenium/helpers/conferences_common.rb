@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ConferencesCommon
-
   def conferences_index_page
     "/courses/#{@course.id}/conferences"
   end
@@ -111,7 +110,7 @@ module ConferencesCommon
     )
   end
 
-  def create_wimba_conference(title = 'Wimba Conference', duration=60)
+  def create_wimba_conference(title = 'Wimba Conference', duration = 60)
     WimbaConference.create!(
       title: title,
       user: @user,
@@ -131,7 +130,7 @@ module ConferencesCommon
     )
   end
 
-  def create_big_blue_button_conference(conference_key = 'instructure_web_conference_defaultkey', title = 'BigBlueButton Conference', duration=60, record=true)
+  def create_big_blue_button_conference(conference_key = 'instructure_web_conference_defaultkey', title = 'BigBlueButton Conference', duration = 60, record = true)
     BigBlueButtonConference.create!(
       conference_key: conference_key,
       title: title,
@@ -145,7 +144,7 @@ module ConferencesCommon
     )
   end
 
-  def delete_conference(opts={})
+  def delete_conference(opts = {})
     cog_menu_item = opts.fetch(:cog_menu_item, f('.icon-settings'))
     cancel_transaction = opts.fetch(:cancel, false)
 
@@ -164,7 +163,7 @@ module ConferencesCommon
     wait_for_ajaximations
   end
 
-  def edit_conference(opts={})
+  def edit_conference(opts = {})
     cog_menu_item = opts.fetch(:cog_menu_item, f('.icon-settings'))
     cancel_transaction = opts.fetch(:cancel, false)
 
@@ -177,7 +176,7 @@ module ConferencesCommon
     wait_for_ajaximations
   end
 
-  def create_conference(opts={})
+  def create_conference(opts = {})
     title = opts.fetch(:title, 'Test Conference')
     cancel_transaction = opts.fetch(:cancel, false)
     invite_all_users = opts.fetch(:invite_all_users, false)
@@ -200,7 +199,7 @@ module ConferencesCommon
     replace_content(f('#web_conference_title'), title)
   end
 
-  def invite_all_but_one_user(opts={})
+  def invite_all_but_one_user(opts = {})
     undo_form_default_invite_all_users
 
     users_to_invite = opts.fetch(:users_to_invite, possible_conference_attendees)
@@ -233,5 +232,4 @@ module ConferencesCommon
     filename += '.xml'
     File.read(File.expand_path(File.dirname(__FILE__) + '/../../fixtures/files/conferences/' + filename))
   end
-
 end

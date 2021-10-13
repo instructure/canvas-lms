@@ -8,29 +8,78 @@ require 'optparse'
 
 linter_options = {
   linter_name: "Rubocop",
-  file_regex: %r{(?:\.e?rb|\.rake|\.gemspec|/[^./]+)$},
+  file_regex: %r{(?:\.rb|\.rake|\.gemspec|/[^./]+)$},
   format: "rubocop",
-  command: "bin/rubocop",
+  command: +"bin/rubocop --force-exclusion",
+  auto_correct: false,
   campsite_mode: false,
   append_files_to_command: true,
-  severe_levels: [],
-  default_boyscout_mode: false,
-  heavy_mode_proc: proc do |ruby_files|
-    args = ruby_files
-    args_index = ARGV.index('--')
-    if args_index
-      args.concat(ARGV[(args_index + 1)..-1])
-    end
-    RuboCop::CLI.new.run(args)
-  end
+  boyscout_mode: false,
+  severe_levels: %w[error fatal].freeze
 }
 no_fail = false
 
+SEVERITIES = %w[info warn error fatal].freeze
+rlint = nil
+
 OptionParser.new do |opts|
+  # boy scout means treat everything as an error
+  opts.on("--boy-scout", "Treat all comments as errors") { linter_options[:boyscout_mode] = true }
+  # heavy means inspect entire files if a file was changed
   opts.on("--heavy") { linter_options[:heavy_mode] = true }
-  opts.on("--boy-scout") { linter_options[:boyscout_mode] = true }
-  opts.on("--plugin PLUGIN") { |v| linter_options[:plugin] = v }
-  opts.on("--no-fail-on-offense") { |v| no_fail = true }
+  opts.on("--plugin PLUGIN", "Inspect changes from the given plugin, instead of canvas-lms") do |v|
+    linter_options[:plugin] = v
+  end
+  opts.on("--no-fail-on-offense",
+          <<~TEXT.tr("\n", " ")) do |_v|
+            Don't fail (exit code) if you find an offense.
+            Use if you're processing the output elsewise, like in Jenkins+Gergich.
+          TEXT
+            no_fail = true
+          end
+  opts.on("--all", "Run RuboCop against all files, not just changed files") do
+    linter_options[:heavy_mode] = true
+    linter_options[:append_files_to_command] = false
+  end
+  opts.on("--summary", "Print a summary of offense counts by cop, instead of individual offenses") do
+    linter_options[:comment_post_processing] = proc do |comments|
+      grouped_comments = comments.group_by { |comment| comment[:rule] }
+
+      require 'pp'
+      pp grouped_comments.transform_values(&:length).to_a.sort_by(&:last).reverse.to_h
+      exit 0
+    end
+  end
+  opts.on("-a", "--auto-correct") do |_v|
+    linter_options[:auto_correct] = true
+    linter_options[:command] << " -a"
+  end
+  opts.on("-A", "--auto-correct-all") do |_v|
+    linter_options[:auto_correct] = true
+    linter_options[:command] << " -A"
+  end
+  opts.on("-x", "--fix-layout") do
+    linter_options[:auto_correct] = true
+    linter_options[:command] << " -x"
+  end
+  opts.on("-h", "--help", "Display this usage information") do
+    puts opts
+    exit 1
+  end
+  opts.on("-s", "--severe SEVERITY", "Configure which level is considered severe") do |v|
+    severity = SEVERITIES.find { |s| s[0...v.length].casecmp(v).zero? }
+    raise "Unknown severity #{v}" unless severity
+
+    linter_options[:severe_levels] = SEVERITIES[SEVERITIES.index(severity)..]
+  end
+  opts.on("--only-severe", "Filter non-severe comments out of results") do
+    linter_options[:comment_post_processing] = ->(comments) do
+      min_severity = SEVERITIES.index(rlint.severe_levels.first)
+      comments.select do |c|
+        c[:corrected] || SEVERITIES.index(c[:severity]) >= min_severity
+      end
+    end
+  end
 end.parse!
 
 rlint = Linter.new(linter_options)

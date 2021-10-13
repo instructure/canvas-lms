@@ -19,7 +19,8 @@
 module Utils
   class DatetimeRangePresenter
     attr_reader :start, :zone, :with_weekday
-    def initialize(datetime, end_datetime = nil, datetime_type=:event, zone=nil, with_weekday: false)
+
+    def initialize(datetime, end_datetime = nil, datetime_type = :event, zone = nil, with_weekday: false)
       zone ||= ::Time.zone
       @start = datetime.in_time_zone(zone) rescue datetime
       @_finish = end_datetime.in_time_zone(zone) rescue end_datetime
@@ -28,8 +29,9 @@ module Utils
       @with_weekday = with_weekday
     end
 
-    def as_string(options={})
+    def as_string(options = {})
       return nil unless start
+
       shorten_midnight = options.fetch(:shorten_midnight, false)
       if is_not_range?
         if shorten_midnight && should_display_as_date?
@@ -58,7 +60,7 @@ module Utils
 
     def should_display_as_date?
       (datetime_type == :due_date && start.hour == 23 && start.min == 59) ||
-      (datetime_type == :event && start.hour == 0 && start.min == 0)
+        (datetime_type == :event && start.hour == 0 && start.min == 0)
     end
 
     def is_not_range?
@@ -100,6 +102,7 @@ module Utils
 
     def finish
       return nil if datetime_type == :due_date || !valid_raw_type?
+
       @_finish
     end
 
@@ -116,12 +119,12 @@ module Utils
 
     def datetime_type
       return @_datetime_type if valid_raw_type?
+
       :event
     end
 
     def valid_raw_type?
       @_datetime_type.is_a?(Symbol)
     end
-
   end
 end

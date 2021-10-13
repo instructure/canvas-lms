@@ -94,9 +94,9 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         )
 
         # reload and preload stuff
-        conversations = ConversationParticipant.where(:id => batch.conversations).
-          preload(:conversation).
-          order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
+        conversations = ConversationParticipant.where(:id => batch.conversations)
+                                               .preload(:conversation)
+                                               .order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
         Conversation.preload_participants(conversations.map(&:conversation))
         ConversationParticipant.preload_latest_messages(conversations, @current_user)
         return { conversations: conversations }
@@ -117,7 +117,6 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         return { conversations: [conversation] }
       end
     end
-
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
   rescue ActiveRecord::RecordInvalid => e

@@ -19,13 +19,18 @@
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {CondensedButton} from '@instructure/ui-buttons'
-import {AccessibleContent} from '@instructure/ui-a11y-content'
-import {Text} from '@instructure/ui-text'
-import {Responsive} from '@instructure/ui-responsive'
 import {responsiveQuerySizes} from '../../utils'
 
+import {AccessibleContent} from '@instructure/ui-a11y-content'
+import {CondensedButton} from '@instructure/ui-buttons'
+import {IconEditLine} from '@instructure/ui-icons'
+import {Responsive} from '@instructure/ui-responsive'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
+
 export function Reply({...props}) {
+  let replyButtonText = I18n.t('Reply')
+  if (props.isIsolatedView) replyButtonText = I18n.t('Quote')
   return (
     <Responsive
       match="media"
@@ -53,7 +58,12 @@ export function Reply({...props}) {
             alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}
           >
             <Text weight="bold" size={responsiveProps.textSize}>
-              {props.isIsolatedView ? I18n.t('Quote') : I18n.t('Reply')}
+              {props.hasDraftEntry && (
+                <View margin="0 small 0 0">
+                  <IconEditLine size="x-small" />
+                </View>
+              )}
+              {replyButtonText}
             </Text>
           </AccessibleContent>
         </CondensedButton>
@@ -92,5 +102,6 @@ Reply.propTypes = {
   /**
    * True if rendered in isolated view
    */
-  isIsolatedView: PropTypes.bool
+  isIsolatedView: PropTypes.bool,
+  hasDraftEntry: PropTypes.bool
 }

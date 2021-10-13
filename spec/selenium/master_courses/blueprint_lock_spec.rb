@@ -16,13 +16,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 require_relative '../common'
 require_relative '../helpers/blueprint_common'
 require_relative '../../apis/api_spec_helper'
 
 shared_context "blueprint lock context" do
-
   def blueprint_lock_icon_label
     f('.bpc-lock-toggle__label')
   end
@@ -76,11 +74,11 @@ shared_context "blueprint lock context" do
   end
 
   def lock_index_tag
-    @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
+    @tag.update(restrictions: { content: true }) # lock the item. Does not require a migration.
   end
 
   def unlock_index_tag
-    @tag.update(restrictions: {content: false}) # unlock the item.
+    @tag.update(restrictions: { content: false }) # unlock the item.
   end
 
   def verify_unlocked(element)
@@ -94,7 +92,6 @@ describe "master courses - locked items" do
   include BlueprintCourseCommon
 
   before :once do
-
     @unlocked_button_css = ".lock-icon.btn-unlocked"
     @locked_button_css = ".lock-icon.lock-icon-locked"
 
@@ -114,7 +111,6 @@ describe "master courses - locked items" do
   end
 
   context "on the index page," do
-
     before :once do
       account_admin_user(active_all: true)
     end
@@ -124,7 +120,6 @@ describe "master courses - locked items" do
     end
 
     context "in the minion course" do
-
       it "assignments show a lock icon on the index page", priority: "2", test_id: 3137707 do
         @tag = @template.create_content_tag_for!(@assignment)
         lock_index_tag
@@ -171,7 +166,6 @@ describe "master courses - locked items" do
     end
 
     context "in the master course" do
-
       it "assignments show a working lock button on the index page", priority: "2", test_id: 3137707 do
         get "/courses/#{@master.id}/assignments"
         element = blueprint_index_assignment_icon
@@ -238,7 +232,6 @@ describe "master courses - locked items" do
   end
 
   context "on the show page," do
-
     before :once do
       account_admin_user(active_all: true)
     end
@@ -249,7 +242,7 @@ describe "master courses - locked items" do
 
     it "assignments show a lock icon on the show page", priority: "2", test_id: 3109490 do
       @tag = @template.create_content_tag_for!(@assignment)
-      @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
+      @tag.update(restrictions: { content: true }) # lock the item. Does not require a migration.
       get "/courses/#{@master.id}/assignments/#{@assignment.id}"
 
       verify_show_page_locked
@@ -265,7 +258,7 @@ describe "master courses - locked items" do
 
     it "discussions show a lock icon on the show page", priority: "2", test_id: 3127582 do
       @tag = @template.create_content_tag_for!(@discussion)
-      @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
+      @tag.update(restrictions: { content: true }) # lock the item. Does not require a migration.
       get "/courses/#{@master.id}/discussion_topics/#{@discussion.id}"
 
       verify_show_page_locked
@@ -281,7 +274,7 @@ describe "master courses - locked items" do
 
     it "pages show a lock icon on the show page", priority: "2", test_id: 3127583 do
       @tag = @template.create_content_tag_for!(@page)
-      @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
+      @tag.update(restrictions: { content: true }) # lock the item. Does not require a migration.
       get "/courses/#{@master.id}/pages/#{@page.id}"
 
       verify_show_page_locked
@@ -297,7 +290,7 @@ describe "master courses - locked items" do
 
     it "quizzes show a lock icon on the show page", priority: "2", test_id: 3127584 do
       @tag = @template.create_content_tag_for!(@quiz)
-      @tag.update(restrictions: {content: true}) # lock the item. Does not require a migration.
+      @tag.update(restrictions: { content: true }) # lock the item. Does not require a migration.
       get "/courses/#{@master.id}/quizzes/#{@quiz.id}"
 
       verify_show_page_locked

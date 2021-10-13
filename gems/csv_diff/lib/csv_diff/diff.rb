@@ -52,7 +52,7 @@ module CsvDiff
       @output.close
       io = @output_file.tap(&:rewind)
       if options[:return_count]
-        {:file_io => io, :row_count => @row_count}
+        { :file_io => io, :row_count => @row_count }
       else
         io
       end
@@ -80,7 +80,7 @@ module CsvDiff
             select current.data from current
             left join previous on previous.key = current.key
             where current.data <> previous.data or previous.key is null
-            SQL
+      SQL
         row = Marshal.load(data)
         @row_count += 1
         @output << row
@@ -92,7 +92,7 @@ module CsvDiff
             select previous.data from previous
             left join current on previous.key = current.key
             where current.key is null
-            SQL
+      SQL
         row = CSV::Row.new(headers, Marshal.load(data))
         # Allow the caller to munge the row to indicate deletion.
         cb.(row)

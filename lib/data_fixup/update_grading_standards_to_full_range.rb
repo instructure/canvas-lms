@@ -19,7 +19,7 @@
 
 module DataFixup::UpdateGradingStandardsToFullRange
   def self.run
-    GradingStandard.where(version: 2).find_ids_in_ranges do |min,max|
+    GradingStandard.where(version: 2).find_ids_in_ranges do |min, max|
       GradingStandard.where(version: 2, id: min..max).each do |grading_standard|
         next if grading_standard.valid?
 

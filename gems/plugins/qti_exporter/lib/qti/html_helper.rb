@@ -24,12 +24,12 @@ module Qti
   module HtmlHelper
     WEBCT_REL_REGEX = "/webct/RelativeResourceManager/Template/"
 
-    def sanitize_html_string(string, remove_extraneous_nodes=false)
+    def sanitize_html_string(string, remove_extraneous_nodes = false)
       string = escape_unmatched_brackets(string)
       sanitize_html!(Nokogiri::HTML5.fragment(string), remove_extraneous_nodes)
     end
 
-    def sanitize_html!(node, remove_extraneous_nodes=false)
+    def sanitize_html!(node, remove_extraneous_nodes = false)
       # root may not be an html element, so we just sanitize its children so we
       # don't blow away the whole thing
       node.children.each do |child|
@@ -54,7 +54,7 @@ module Qti
                 # So check for the file starting with the full relative path, going down to just the file name
                 paths = val.split("/")
                 paths.length.times do |i|
-                  if mig_id = find_best_path_match(paths[i..-1].join('/'))
+                  if (mig_id = find_best_path_match(paths[i..-1].join('/')))
                     subnode[attr] = "#{CC::CCHelper::OBJECT_TOKEN}/attachments/#{mig_id}"
                     break
                   end
@@ -62,7 +62,7 @@ module Qti
               else
                 val.gsub!(/\$[A-Z_]*\$/, '') # remove any path tokens like $TOKEN_EH$
                 # try to find the file by exact path match. If not found, try to find best match
-                if mig_id = find_best_path_match(val)
+                if (mig_id = find_best_path_match(val))
                   subnode[attr] = "#{CC::CCHelper::OBJECT_TOKEN}/attachments/#{mig_id}"
                 end
               end
@@ -74,12 +74,14 @@ module Qti
       if remove_extraneous_nodes
         while true
           node.children.each do |child|
-            break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
+            break unless (child.text? && child.text =~ /\A\s+\z/) || (child.element? && child.name.downcase == 'br')
+
             child.remove
           end
 
           node.children.reverse_each do |child|
-            break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
+            break unless (child.text? && child.text =~ /\A\s+\z/) || (child.element? && child.name.downcase == 'br')
+
             child.remove
           end
           break unless node.children.size == 1 && ['p', 'div', 'span'].include?(node.child.name)
@@ -97,11 +99,11 @@ module Qti
     end
 
     def clear_html(text)
-      text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| m[2..-1].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
+      text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) { |m| m[2..-1].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
     end
 
     def find_best_path_match(path)
-      @path_map[path] || @path_map[@sorted_paths.find{|k| k.end_with?(path)}]
+      @path_map[path] || @path_map[@sorted_paths.find { |k| k.end_with?(path) }]
     end
 
     # try to escape unmatched '<' and '>' characters because some people don't format their QTI correctly...
@@ -138,7 +140,7 @@ module Qti
     # returns a tuple of [text, html]
     # html is null if it's not an html blob
     def detect_html(node)
-      if text_node = node.at_css('div.text')
+      if (text_node = node.at_css('div.text'))
         return [text_node.text.strip, nil]
       end
 

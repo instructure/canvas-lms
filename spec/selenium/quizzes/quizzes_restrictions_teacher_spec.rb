@@ -40,13 +40,13 @@ describe 'quiz restrictions as a teacher' do
       quiz.reload
     end
 
-    it 'should have a checkbox on the quiz creation page', priority: "1", test_id: 474273 do
+    it 'has a checkbox on the quiz creation page', priority: "1", test_id: 474273 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
       expect('#enable_quiz_access_code').to be
     end
 
-    it 'should show a password field when checking the checkbox', priority: "1", test_id: 474274 do
+    it 'shows a password field when checking the checkbox', priority: "1", test_id: 474274 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
       expect(f('#quiz_access_code')).to have_attribute('tabindex', '-1')
@@ -54,18 +54,18 @@ describe 'quiz restrictions as a teacher' do
       expect(f('#quiz_access_code')).to have_attribute('tabindex', '0')
     end
 
-    it 'should not allow a blank restrict access code password', priority: "1", test_id: 474275 do
+    it 'does not allow a blank restrict access code password', priority: "1", test_id: 474275 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
       f('#enable_quiz_access_code').click
       wait_for_ajaximations
 
       # now try and save it and validate the validation text
-      wait_for_new_page_load{ f('button.save_quiz_button.btn.btn-primary').click }
+      wait_for_new_page_load { f('button.save_quiz_button.btn.btn-primary').click }
       expect(ffj('.error_text')[1]).to include_text('You must enter an access code')
     end
 
-    it 'should accept a valid password when creating a quiz', priority: "1", test_id: 474276 do
+    it 'accepts a valid password when creating a quiz', priority: "1", test_id: 474276 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
       f('#enable_quiz_access_code').click
@@ -73,11 +73,11 @@ describe 'quiz restrictions as a teacher' do
       f('#quiz_access_code').send_keys('guybrush')
 
       # save and verify that the show page comes up
-      wait_for_new_page_load{ f('button.save_quiz_button.btn.btn-primary').click }
+      wait_for_new_page_load { f('button.save_quiz_button.btn.btn-primary').click }
       expect(f('.unpublished_quiz_warning')).to include_text('This quiz is unpublished')
     end
 
-    it 'should show the access code on the show page', priority: "1", test_id: 474277 do
+    it 'shows the access code on the show page', priority: "1", test_id: 474277 do
       @quiz = quiz_with_access_code
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
       show_page = f('#quiz_show')
@@ -92,13 +92,13 @@ describe 'quiz restrictions as a teacher' do
   end
 
   context 'filter ip addresses' do
-    it 'should have a checkbox on the quiz creation page', priority: "1", test_id: 474278 do
+    it 'has a checkbox on the quiz creation page', priority: "1", test_id: 474278 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
       expect('#enable_quiz_ip_filter').to be
     end
 
-    it 'should show a password field when checking the checkbox', priority: "1", test_id: 474279 do
+    it 'shows a password field when checking the checkbox', priority: "1", test_id: 474279 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
       expect(f('#quiz_ip_filter')).to have_attribute('tabindex', '-1')
@@ -106,18 +106,18 @@ describe 'quiz restrictions as a teacher' do
       expect(f('#quiz_ip_filter')).to have_attribute('tabindex', '0')
     end
 
-    it 'should not allow a blank ip address', priority: "1", test_id: 474280 do
+    it 'does not allow a blank ip address', priority: "1", test_id: 474280 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
       f('#enable_quiz_ip_filter').click
       wait_for_ajaximations
 
       # now try and save it and validate the validation text
-      wait_for_new_page_load{ f('button.save_quiz_button.btn.btn-primary').click }
+      wait_for_new_page_load { f('button.save_quiz_button.btn.btn-primary').click }
       expect(ffj('.error_text')[1]).to include_text('You must enter a valid IP Address')
     end
 
-    it 'should accept a valid ipv4 address when creating a quiz', priority: "1", test_id: 474281 do
+    it 'accepts a valid ipv4 address when creating a quiz', priority: "1", test_id: 474281 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
       f('#enable_quiz_ip_filter').click
@@ -126,11 +126,11 @@ describe 'quiz restrictions as a teacher' do
 
       # save and verify that the page changes (passes validation)
       expect(f('#quiz_title')).to be
-      wait_for_new_page_load{ f('button.save_quiz_button.btn.btn-primary').click }
+      wait_for_new_page_load { f('button.save_quiz_button.btn.btn-primary').click }
       expect(f('.unpublished_quiz_warning')).to include_text('This quiz is unpublished')
     end
 
-    it 'should accept a valid ipv4 address with subnet mask when creating a quiz', priority: "1", test_id: 474282 do
+    it 'accepts a valid ipv4 address with subnet mask when creating a quiz', priority: "1", test_id: 474282 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
       f('#enable_quiz_ip_filter').click
@@ -139,11 +139,11 @@ describe 'quiz restrictions as a teacher' do
 
       # save and verify that the page changes (passes validation)
       expect(f('#quiz_title')).to be
-      wait_for_new_page_load{ f('button.save_quiz_button.btn.btn-primary').click }
+      wait_for_new_page_load { f('button.save_quiz_button.btn.btn-primary').click }
       expect(f('.unpublished_quiz_warning')).to include_text('This quiz is unpublished')
     end
 
-    it 'should accept a valid ipv6 address when creating a quiz', priority: "1", test_id: 474283 do
+    it 'accepts a valid ipv6 address when creating a quiz', priority: "1", test_id: 474283 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
       f('#enable_quiz_ip_filter').click
@@ -152,22 +152,22 @@ describe 'quiz restrictions as a teacher' do
 
       # save and verify that the page changes (passes validation)
       expect(f('#quiz_title')).to be
-      wait_for_new_page_load{ f('button.save_quiz_button.btn.btn-primary').click }
+      wait_for_new_page_load { f('button.save_quiz_button.btn.btn-primary').click }
       expect(f('.unpublished_quiz_warning')).to include_text('This quiz is unpublished')
     end
 
-    it 'should not accept an invalid ip address when creating a quiz', priority: "1", test_id: 474284 do
+    it 'does not accept an invalid ip address when creating a quiz', priority: "1", test_id: 474284 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
       f('#enable_quiz_ip_filter').click
       wait_for_ajaximations
       f('#quiz_ip_filter').send_keys('7')
 
-      wait_for_new_page_load{ f('button.save_quiz_button.btn.btn-primary').click }
+      wait_for_new_page_load { f('button.save_quiz_button.btn.btn-primary').click }
       expect(ffj('.error_text')[1]).to include_text('IP filter is not valid')
     end
 
-    it 'should have a working link to help with ip address filtering', priority: "1", test_id: 474285 do
+    it 'has a working link to help with ip address filtering', priority: "1", test_id: 474285 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
       f('#enable_quiz_ip_filter').click
@@ -179,7 +179,7 @@ describe 'quiz restrictions as a teacher' do
       expect(f('#ip_filters_dialog')).to be_displayed
     end
 
-    it 'should show filtered ip address on the show page', priority: "1", test_id: 474286 do
+    it 'shows filtered ip address on the show page', priority: "1", test_id: 474286 do
       # makes an assumption that your ip address is not '64.233.160.0' (google)
       @quiz = course_quiz
       @quiz.ip_filter = '64.233.160.0'
@@ -191,7 +191,7 @@ describe 'quiz restrictions as a teacher' do
     end
   end
 
-  it "should let a teacher preview a quiz even without management rights" do
+  it "lets a teacher preview a quiz even without management rights" do
     skip("Test is timing out at 10 sec max error")
     @context = @course
     quiz = quiz_model

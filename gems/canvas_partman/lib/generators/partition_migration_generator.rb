@@ -28,7 +28,7 @@ class PartitionMigrationGenerator < ActiveRecord::Generators::MigrationGenerator
 
   remove_argument :attributes
   argument :model, type: :string, required: false,
-    desc: 'Name of the model whose partitions will be modified.'
+                   desc: 'Name of the model whose partitions will be modified.'
 
   def create_migration_file
     unless file_name =~ /^[_a-z0-9]+$/
@@ -36,7 +36,7 @@ class PartitionMigrationGenerator < ActiveRecord::Generators::MigrationGenerator
     end
 
     migration_template 'migration.rb.erb',
-      "db/migrate/#{file_name}.#{CanvasPartman.migrations_scope}.rb"
+                       "db/migrate/#{file_name}.#{CanvasPartman.migrations_scope}.rb"
   end
 
   protected

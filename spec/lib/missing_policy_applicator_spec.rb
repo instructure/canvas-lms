@@ -88,7 +88,7 @@ describe MissingPolicyApplicator do
       grading_period_group.grading_periods.create!(
         title: 'A Grading Period',
         start_date: 10.days.ago(now),
-        end_date:   30.minutes.ago(now),
+        end_date: 30.minutes.ago(now),
         close_date: 30.minutes.ago(now)
       )
     end
@@ -235,7 +235,7 @@ describe MissingPolicyApplicator do
     end
 
     it 'applies deductions to assignments expecting on paper submissions if the ' \
-      'submission status has been set to "Missing"' do
+       'submission status has been set to "Missing"' do
       late_policy_missing_enabled
       create_recent_paper_assignment
       submission = @course.submissions.first

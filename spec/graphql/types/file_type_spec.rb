@@ -68,7 +68,7 @@ describe Types::FileType do
     f = attachment_with_context(course, uploaded_data: stub_png_data, content_type: 'image/png')
     f_type = GraphQLTypeTester.new(f, current_user: @teacher)
     expect(
-        f_type.resolve('thumbnailUrl', request: ActionDispatch::TestRequest.create, current_user: @student).start_with?("http://localhost/images/thumbnails/show")
+      f_type.resolve('thumbnailUrl', request: ActionDispatch::TestRequest.create, current_user: @student).start_with?("http://localhost/images/thumbnails/show")
     ).to be true
   end
 
@@ -77,7 +77,7 @@ describe Types::FileType do
     let(:type_tester) { GraphQLTypeTester.new(file, current_user: @student) }
 
     it "returns an https URL if the request was issued over SSL" do
-      request = ActionDispatch::TestRequest.create({"HTTPS" => "on"})
+      request = ActionDispatch::TestRequest.create({ "HTTPS" => "on" })
       expect(type_tester.resolve("url", request: request, current_user: @student)).to start_with("https:")
     end
 

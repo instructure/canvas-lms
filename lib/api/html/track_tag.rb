@@ -25,7 +25,7 @@ module Api
     class TrackTag
       include LocaleSelection
 
-      def initialize(media_track, doc, node_builder=Nokogiri::XML::Node)
+      def initialize(media_track, doc, node_builder = Nokogiri::XML::Node)
         @media_track = media_track
         @doc = doc
         @node_builder = node_builder
@@ -44,6 +44,7 @@ module Api
       end
 
       private
+
       def language_name
         available_locales[media_track.locale] || media_track.locale
       end

@@ -123,7 +123,7 @@ describe "course index" do
       expect(fj('h2:contains("Create Subject")')).to be_displayed
     end
 
-    it "launches new course dialog for non-k5 users" do
+    it "launches classic new course dialog for non-k5 users" do
       course_with_teacher_logged_in(:account => @classic_account)
       @teacher.account.settings[:teachers_can_create_courses] = true
       @teacher.account.save!
@@ -133,6 +133,19 @@ describe "course index" do
       expect(add_course_button).to include_text("Course")
       add_course_button.click
       expect(fj('.ui-dialog-title:contains("Start a New Course")')).to be_displayed
+    end
+
+    it "launches improved new course dialog for non-k5 users if create_course_subaccount_picker is enabled" do
+      @classic_account.root_account.enable_feature!(:create_course_subaccount_picker)
+      course_with_teacher_logged_in(:account => @classic_account)
+      @teacher.account.settings[:teachers_can_create_courses] = true
+      @teacher.account.save!
+
+      get "/courses"
+      add_course_button = f('#start_new_course')
+      expect(add_course_button).to include_text("Course")
+      add_course_button.click
+      expect(fj('h2:contains("Create Course")')).to be_displayed
     end
   end
 end
