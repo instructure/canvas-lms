@@ -1946,6 +1946,7 @@ mi:
   additional_comments_9aed10bb: "Ētahi atu Kōrero"
   additional_considerations_3ee46e5b: "Ētahi atu whakāro"
   additional_considerations_a36efeef: "ĒTAHI ATU WHAKĀRO"
+  additional_considerations_f3801683: "Ētahi atu whakāro"
   additional_occurrence_s_7b5b0173: "(Ngā) takanga atu"
   additional_outcomes_options_6df428f1: "Tāpiri kōwhiringa putanga atu"
   additional_settings_20362654: "Ngā tautuhinga neke atu"
@@ -1965,7 +1966,11 @@ mi:
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Ka tāpiri i te tātaritanga ki te kāri horopaki a te ākonga."
   adds_comment_bank_for_assignment_comments_within_s_1b69dc2: "Tāpiri kōrero pēke mo te whakataunga tākupu i roto i speedgrader"
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Tāpiri kiripaka whakaaetanga mo te tāpiri me te tango ia tūnga, ana me te whakaaetanga wehe atu mo ētahi atu whakahaere mahi"
+  adds_visual_indicators_to_the_submission_details_p_c7b9d191: |-
+      Tāpiri kaiwhakapae tirohanga ki te taipitopito tāpaetanga whārangi ki te whakātu ki ngā ākonga te kaore e pānui
+      pukapuka ngā tuhipoka ara rubric kōrerorero rānei e tiari ana
   adjust_final_grade_fa45e7e0: "Whakarite Kōeke Whakamautunga"
+  adjusting_due_dates_a5918b9c: "Whakarereke rā e tika ana..."
   admin_4d3ba42f: Whakahaere
   admin_csv_f8d1b3eb: "Kaiwhakahaere CSV"
   admin_manage_update_3fbef857: "Whakahaere - whakahaere/whakahou"
@@ -2135,6 +2140,7 @@ mi:
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tukua ngā kāri papatohu kia raupapatiamō ia kaiwhakamahi"
   allow_final_grade_override_8cf4336b: "Tukua kia whakakorea te kōeke whakamutunga"
   allow_final_grade_override_a21a79ee: "Tukuna ngā Kōeke Whakakorenga"
+  allow_for_apollo_to_cache_graphql_queries_on_a_use_bda8210d: "Whakaae mō Apollo ki cache inetohuQL ng~pātai i runga i te kaiwhakamahi tirotiro ki te whakatere ake i tā rātou wheako"
   allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: "Tukua te kawemai o QTI me te Common Cartridge ki roto i Quizzes Hou"
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Tukua te kawemai o QTI me te Common Cartridge ki roto i Quizzes.Next."
   allow_importing_of_third_party_packages_into_new_q_f6b8b1c7: "Tukua kawemai ana o te rōpū toru pākete i roto i Quizzes Hou"
@@ -2166,6 +2172,7 @@ mi:
   allow_students_to_see_who_was_signed_up_for_time_s_160ba252: "Tukua kia kite ngā ākonga ko wai kua hainatia mo ngā wā kāniwha "
   allow_students_to_see_who_was_signed_up_for_time_s_37f5cb01: "Tukua ngā ākonga ki te kite ko wai kua hainatia mo ngā taima wāhanga kei te wātea tonu."
   allow_students_to_submit_photo_using_their_webcam_5c18bf01: "Tukua ngā ākonga ki te tāpae whakaahua e mahi ana i tā rātou webcam."
+  allow_sub_account_selection_when_users_manually_cr_d0a6e2e6: "Whakaae pūkete- o raro tīpako i te wā kaiwhakamahi e hanga a ringa ana ngā akoranga"
   allow_switching_to_the_enhanced_rce_317e746f: "Tukuna te whakawhiti ki te RCE kua whakarei aketia"
   allow_switching_to_the_new_assignments_page_9ac0ad93: "Tukua kia huri ki te whārangi wāhanga hou"
   allow_teachers_to_change_the_dates_on_a_set_of_ass_4d48baec: "Tuku i ngā kaiako ki te huri i ngā rā i runga i te tau o ngā whakataunga i roto i te huarahi kotahi"
@@ -2374,6 +2381,7 @@ mi:
   allows_user_to_change_the_template_being_used_by_a_86f46490: "Ka whakāetia te kaiwhakamahi ki te huri i te tauira e whakamahia ana e tētahi pūkete. Ka whakāetia te kaiwhakamahi ki te tiro i ngā ingoa o ngā akoranga tauira i roto i te pae pūtake."
   allows_user_to_change_the_template_being_used_by_a_eab509a3: "Ka whakāetia te kaiwhakamahi ki te huri i te tauira e whakamahia ana e tētahi pūkete."
   allows_user_to_close_for_comments_move_pin_and_unp_2adb3d95: "Ka whakāetia te kaiwhakamahi ki te kati ngā kōrero, neke, pine/kaore e pine, whakatika, me te muku kōrerorero kaupapa kua hangaia e ētahi atu kaiwhakamahi."
+  allows_user_to_close_for_comments_move_pin_unpin_e_bf17f03c: "Ka whakāetia te kaiwhakamahi ki te kati ngā kōrero, neke, pine/kaore e pine, whakatika, me te muku kōrerorero kaupapai roto i te whārangi Kōrerorero."
   allows_user_to_configure_alerts_in_course_settings_38675b12: "Ka whakāetia te kaiwhakamahi ki te whirihora whakatūpato i roto i ngā akoranga tautuhinga. Ko ngā whakatūpatotanga he mahinga kore noa e whakamahia ana ki te tuku i te matāra ki ngā ākonga, ki ngā kaiako, ki ngā kaiwhakahaere hoki mo ngā kaitautoko taketake (hei tauira, kaore he ākonga / kaiako whakahoahoa mo te mahi mo ngā ra 7). Ka tirohia ia ra, ka tukuna he whakamöhiotanga ki te äkonga, ki te kaiako ränei ka whakatauhia te raruraru."
   allows_user_to_configure_alerts_in_course_settings_40a81b1d: "Ka whakāetia te kaiwhakamahi ki te whirihora whakatūpato i roto i ngā akoranga tautuhinga. Ko ngā whakatūpatotanga he mahinga kore noa e whakamahia ana ki te tuku i te matāra ki ngā ākonga, ki ngā kaiako, ki ngā kaiwhakahaere hoki mo ngā kaitautoko taketake (hei tauira, kaore he ākonga / kaiako whakahoahoa mo te mahi mo ngā ra 7). Ka tirohia ia ra, ka tukuna he whakamöhiotanga ki te äkonga, ki te kaiako ränei ka whakatauhia te raruraru."
   allows_user_to_configure_alerts_in_course_settings_806397b5: "Ka whakāetia te kaiwhakamahi ki te whirihora whakatūpato i roto i ngā akoranga tautuhinga. Ko ngā whakatūpatotanga he mahinga kore noa e whakamahia ana ki te tuku i te matāra ki ngā ākonga, ki ngā kaiako, ki ngā kaiwhakahaere hoki mo ngā kaitautoko taketake (hei tauira, kaore he ākonga / kaiako whakahoahoa mo te mahi mo ngā ra 7). Ka tirohia ia ra, ka tukuna he whakamöhiotanga ki te äkonga, ki te kaiako ränei ka whakatauhia te raruraru."
@@ -2488,6 +2496,7 @@ mi:
       Ka whakāetia te kaiwhakamahi ki te whakatika ngā wāhanga rārangi o te akoranga. Ka whakāetia te kaiwhakamahi ki te whakamārama ngā kaiwhakamahi kua tukua ki te whakatika i te whārangi Ka whakāetia te kaiwhakamahi ki te tāpiri Whārangi ki te ākonga hei mahi rārangi
               Ka whakāetia te kaiwhakamahi ki te whakaputa me te kore e whakaputa whārangi Ka whakāetia  te kaiwhakamahi ki te tiro hītori whārangi me te whakatau whārangi i mua.
               Ka whakāetia te kaiwhakamahi ki te whakatika Tātauira raka tautuhinga i roto i te Whakatau whārangi i mua. me te whārangi o ia i roto i te Tātauira Akoranga Matua.
+  allows_user_to_edit_discussion_topics_5576aeb1: "Ka whakāetia te kaiwhakamahi ki te whakatika kaupapa kōrerorero."
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Ka whakāetia te kaiwhakamahi ki te whakatika ngā kōeke me te tāpiri kōrero i roto i SpeedGrader."
   allows_user_to_edit_grades_in_the_gradebook_83fa5c4f: "Ka whakāetia te kaiwhakamahi ki te whakatika ngā kōeke i roto i te Kōekepuka."
   allows_user_to_edit_grades_in_the_gradebook_allows_432849ce: "Ka whakāetia te kaiwhakamahi ki te whakatika ngā kōeke i roto i te Kōekepuka. Ka whakāetia te kaiwhakamahi ki te uru Kōekepuka Hītori. Ka whakāetia te kaiwhakamahi ki te whakauru i te Akonga Matua Kōekepuka (mehemea kua whakahohetia)."
@@ -2646,6 +2655,7 @@ mi:
   allows_user_to_view_all_course_groups_not_just_whe_e107af44: "Ka whakāetia te kaiwhakamahi ki te tiro ngā rōpū akoranga katoa, ehara i te wāhi kua whakauruhia rātou, i roto i te Mahi Ngātahi Me te matapihi."
   allows_user_to_view_all_item_banks_in_a_course_3b603780: "Ka whakāetia te kaiwhakamahi ki te tiro ngā pēke i roto i te akoranga."
   allows_user_to_view_all_item_banks_in_the_account_36f5f214: "Ka whakāetia te kaiwhakamahi ki te tiro ngā pēke i roto i te pūkete."
+  allows_user_to_view_all_replies_within_a_discussio_fea861da: "Ka whakāetia te kaiwhakamahi ki te tiro i ngā whakautu katoa i roto i te kaupapa kōrerorero."
   allows_user_to_view_all_student_assignment_submiss_d8ee5830: "Ka whakāetia te kaiwhakamahi ki te tiro ngā ākonga whakataunga tāpaetanga me te tāpiri kōrero."
   allows_user_to_view_analytics_link_in_the_user_set_56867782: "Ka tukua te kaiwhakamahi ki te tiro i te hononga tātari i runga i te tahua tautuhinga."
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "Ka whakāetia te kaiwhakamahi ki te tiro me te tāpiri kaiwhakamahi i roto i te mahi ngātahi."
@@ -2880,10 +2890,14 @@ mi:
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "He hapa i te tautuhinga i te tika whakamahinga mō te %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "He hapa i te wā e ngana ana ki te whakapā atu Turnitin."
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "I puta he hapa i te wā e taki ana te tūnga hekenga"
+  an_error_occurred_while_creating_this_group_please_ec96f426: "He hapa i puta i te wā e hanga ana i tēnei roopu. Tēnā koa ngana anō."
   an_error_occurred_while_creating_this_outcome_54842fbd: "He hapa i puta i te wā e hanga ana i tēnei putanga."
   an_error_occurred_while_creating_this_outcome_mess_31cdd04: "He hapa i puta i te wā e hanga ana i tēnei putanga: %{message}"
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "He hapa i puta i te wā e hanga ana i tēnei putanga: %{message}."
+  an_error_occurred_while_creating_this_outcome_plea_f1c69d92: "He hapa i puta i te wā e hanga ana i tēnei putanga. Tēnā koa ngana anō."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "He hapa i te wā e muku ana i ngā pānui."
+  an_error_occurred_while_editing_this_group_please__8f4eeefe: "He hapa i puta i te wā e whakatika ana i tēnei rōpū. Tēnā koa ngana anō."
+  an_error_occurred_while_editing_this_outcome_pleas_f0e403a9: "He hapa i puta i te wā e whakatika ana i tēnei putanga. Tēnā koa ngana anō."
   an_error_occurred_while_importing_these_outcomes_d4e6f13e: "He hapa i puta i te wā e kawemai ana i ēnei putanga."
   an_error_occurred_while_importing_these_outcomes_m_6a8052d1: "He hapa i puta i te wā e kawemai ana i ēnei putanga: %{message}."
   an_error_occurred_while_importing_this_group_9aef7c30: "He hapa i puta i te wā e kawemai ana tēnei rōpū."
@@ -2910,6 +2924,10 @@ mi:
   an_error_occurred_while_locking_announcements_8115ccd7: "He hapa i te wā e raka ana i ngā pānui."
   an_error_occurred_while_making_a_network_request_544e2b7: "I puta he hapa i te wā e hanga ana i te tono whatunga."
   an_error_occurred_while_migrating_405ac0b5: "He hapa i te wā heke"
+  an_error_occurred_while_moving_these_outcomes_plea_208f372: 
+    one: "He hapa i puta i te wā e neke ana i tēnei putanga. Tēnā koa ngana anō."
+    other: "He hapa i puta i te wā e neke ana i ēnei putanga. Tēnā koa ngana anō."
+  an_error_occurred_while_moving_this_group_please_t_4f3baa9f: "He hapa i puta i te wā e whakatika ana i tēnei rōpū. Tēnā koa ngana anō."
   an_error_occurred_while_removing_count_outcomes_15db8ce8: 
     one: "He hapa i puta i te wā e tango ana i te putanga."
     other: "He hapa i puta i te wā e tango ana %{count} ngā putanga."
@@ -2918,9 +2936,14 @@ mi:
     other: "He hapa i puta i te wā e tango ana %{count} ngā putanga: %{errorMessage}."
   an_error_occurred_while_removing_the_outcome_e47c9553: "He hapa i puta i te wā e tango ana i te putanga."
   an_error_occurred_while_removing_the_outcome_messa_1c9674a: "He hapa i puta i te wā e tango ana i te putanga: %{message}"
+  an_error_occurred_while_removing_these_outcomes_pl_21f22da0: 
+    one: "He hapa i puta i te wā e tango ana i tēnei putanga. Tēnā koa ngana anō."
+    other: "He hapa i puta i te wā e tango ana i ēnei putanga. Tēnā koa ngana anō."
   an_error_occurred_while_removing_this_group_97c8a9c: "He hapa i puta i te wā e tango ana i tēnei rōpū."
+  an_error_occurred_while_removing_this_group_groupt_2c343304: "He hapa i puta i te wā e tango ana i tēnei rōpū: \"%{groupTitle}\" mau ai kotahi nui atu rānei ngā Putanga kai te rārangi i tēnei wā ki te ihirangi."
   an_error_occurred_while_removing_this_group_messag_19809d9a: "He hapa i puta i te wā e tango ana i tēnei rōpū: %{message}"
   an_error_occurred_while_removing_this_group_messag_c15e0830: "He hapa i puta i te wā e tango ana i tēnei rōpū: %{message}."
+  an_error_occurred_while_removing_this_group_please_bd9407ff: "He hapa i puta i te wā e tango ana i tēnei rōpū. Tēnā koa ngana anō."
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "He hapa i puta i te wā e tiki ana i tō QR waehere"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "He hapa i puta i te wā e tiaki ana ngā pūkete matatau tohu"
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "He hapa i puta i te wā e tiakina ana te pūkete mātatau whakatauranga: %{message}"
@@ -3140,6 +3163,7 @@ mi:
   api_token_scopes_67b11c16: "Ngā API Tohu Awhe"
   api_token_scoping_d4f30a1b: "API Tohu Tuhinga"
   api_url_3ee7cb0a: "API URL"
+  apollo_caching_185f0b09: "Apollo keteroki"
   app_b157c2b3: Taupānga
   app_center_will_appear_in_the_apps_tab_on_the_sett_1b9eb936: "Ka kitea te Pokapū Pūmanawa Tautono i te kono \"Ngā Tūpānga\"i runga i te whārangi whakaritenga o te kaupapa, o te pae rānei. I tōna tikanga ka hono te nohoanga o raro iho nei ki tētahi tongi Pokapū Pūmanawa Tautono (hei tauira, %{url} -- me muku e koe te tohu pato e piri ana ki te whiore"
   app_placements_6d877225: "he tūnga taupānga"
@@ -3302,6 +3326,7 @@ mi:
   are_you_sure_you_want_to_unarchive_your_copy_of_th_c961b520: 
     one: "E tino hiahia ana koe ki te kore pūranga tō kape o tēnei kōrero?"
     other: "E tino hiahia ana koe ki te kore pūranga ou kape o ēnei kōrero?"
+  are_you_sure_you_want_to_unenroll_in_this_course_y_9c8105c8: "E tino hiahia ana koe ki te kore whakauru ki roto i tēnei akoranga?  E kore ano e waiho e koe e taea ki te kite i te rārangi akoranga rānei te kōrero hāngai ki te kaiako, a heoi ano to koutou e kite i ngā akoranga i roto i to koutou awa, me te rite ki whakamōhiotanga."
   argentina_3257a200: Argentina
   argentina_54_375d6af4: "Argentina (+54)"
   armenian_12da6118: Āmenia
@@ -4213,6 +4238,7 @@ mi:
       filter: "Ngā whakamātau"
     submission_attempts: "Ngā whakamātau"
   assignments_2_e88d7a26: "Ngā Whakataunga 2"
+  assignments_2_student_description: "Ko tēnei āhuahira whakapiki te whakataunga tāpaetanga me te whakahoki kōrero reremahi mo ngā ākonga. I te`wā e whakahohetia ai te haki whakauru tata ki te haere tonu ka whakaatutia aunoa i te taha o ia tuku. Mo ngā taipitopito katoa tēnā koa titiro ki *Ngā Whakataunga Whakapiki Kaiwhakamahi Rōpū* i roto i te Hāpori Canvas."
   assignments_2_student_error_page_3ca3e0df: "Whakataunga 2 Ākoranga Hapa Whārangi"
   assignments_2_student_initial_query_error_52aa5ebd: "Whakataunga 2 Ākoranga pātai tuatahi hapa"
   assignments_2_student_submission_preview_query_err_877af754: "Whakataunga 2 Ākoranga tapaetanga arokite pātai hapa"
@@ -4582,6 +4608,7 @@ mi:
   between_1_and_99_d421a4c0: "I waenganui i te 1% me te 99%"
   between_2_and_5_c34f5152: "Between 2 and 5"
   big_blue_button_conference: 
+    create_time: "Hanga Wā"
     recording_setting: Hopukanga
     recording_setting_enabled_description: "Whakahohe ōrongo mō tēnei huinga"
   blackboard: 
@@ -6208,6 +6235,7 @@ mi:
   conferences_tutorial_tray_6f071ce2: "Ngā hui Ako Paepae"
   conferencing_6a6d9b55: Huihuinga
   conferencing_b69e2537: Huihuinga
+  conferencing_in_planner_2e7a24f0: "Huihuinga i roto i te mahere"
   confetti_for_on_time_submissions_394e16ce: "Confetti mo ngā Tukunga Tae Mai i Runga i te Wā"
   confetti_for_valid_links_7506df83: "Confetti mo ngā hono whaimana"
   config_url_e96ceaf3: "Whirihoranga URL"
@@ -6239,6 +6267,8 @@ mi:
   confirm_qr_code_display_49664fa3: "Whakatau QR Waehere whakātu"
   confirm_removal_a9bb889: "Whakaū Tango"
   confirm_reservation_removal_e6350e7c: "Whakaū Tango Rāhui"
+  confirm_submission_e3b43f1: "Whakatau Tapaetanga"
+  confirm_unenrollment_64333263: "Whakaū kaore e whakauru"
   confirm_unfavorite_course_fa01966d: "Whakaūngia kaore makau akoranga"
   confirmation_code_required_22984955: "Waehere whakaū (e hiahiatia ana)"
   confirmation_failed_please_try_again_ae566d37: "I rahua te whakaū Tēnā koa ngana anō."
@@ -6908,6 +6938,7 @@ mi:
   contextscount_more_66b2f99b: "+ %{contextsCount} ētahi atu"
   contexttype_notification_settings_d72acd58: "%{contextType} Whakamōhiotanga Tautuhinga"
   continue_ac067716: "Haere Tonu"
+  continue_draft_6166ea79: "Haere tonu tauira"
   continue_typing_to_find_additional_sections_or_stu_49786085: "Pātō tonu i ki te kitea atu wāhanga ākonga rānei."
   contributed_to_this_module_item_and_is_complete_2799d5c: "Wāhi ki tēnei tūemi kōwae me te oti"
   conversation_dialog: 
@@ -7141,6 +7172,9 @@ mi:
   count_alignments_7d98ee41: "*%{count}* Ngā Tīaroaro"
   count_announcements_found_b7b055b3: "%{count} kua kitea ngā pānui."
   count_apps_found_f4d86860: "%{count} Ngā taupānga kitea"
+  count_assignments_bce378d7: 
+    one: "1 whakataunga"
+    other: "%{count} ngā whakataunga"
   count_assignments_found_17520826: 
     one: "Kitea 1 whakataunga"
     other: "%{count} kitea whakataunga"
@@ -7246,6 +7280,9 @@ mi:
   count_outcomes_selected_55902958: 
     one: "1 Putanga tīpakohia"
     other: "%{count} Huanga tīpakohia"
+  count_outcomes_were_successfully_removed_ea0ca83e: 
+    one: "I tango paitia tēnei putanga."
+    other: "%{count} putanga pai te tangohia."
   count_outcomes_were_successfully_removed_from_this_ae093b07: 
     one: "I pai te tango o tēnei putanga mai i tēnei pūkete."
     other: "%{count} I pai te tango o ēnei putanga mai i tēnei pūkete."
@@ -7353,6 +7390,9 @@ mi:
   count_unsynced_changes_1fc147e5: "%{count} Huringa kāore e tukutahitia"
   count_unsynched_changes_3a1249ba: "%{count} Ngā huringa kaore i tukutahi"
   count_users_374d6e47: "(%{count} Ngā Kaiwhakamahi)"
+  count_weeks_11fbd2dc: 
+    one: "1 wiki"
+    other: "%{count} ngā wiki"
   country_is_required_b0afbf52: "Hiahiatia te Whenua"
   country_or_region_26ea046c: "Whenua Rohe rānei"
   country_or_region_is_required_86917b39: "Whenua Rohe rānei e hiahiatia ana"
@@ -8103,7 +8143,7 @@ mi:
         sis_source_id: "SIS ID"
         start_at: Tīmata
         storage_quota: "Kōnae Rokiroki"
-        sync_enrollments_from_homeroom: "Tukutahi whakaurunga mai i te kainga rūma"
+        sync_enrollments_from_homeroom: "Tukutahi me ngā whakaurunga me ngā rā timata/whakamutunga: o te akorangamai i te kainga rūma"
         template: "Whakamahi te akoranga hei Akoranga Tauira"
         time_zone: "Rohe Wā"
         turnitin_comments: "Turnitin Kōrerorero"
@@ -8759,6 +8799,7 @@ mi:
       year: Tau
   day_9d999bec: rā
   day_s_7cc1231f: "Ngā Rā"
+  days_af2ac87b: "Ngā rā"
   days_late_a3a721b0: "Ngā rā tureiti"
   deactivate_key_developername_65bb2736: "Taunoa kī %{developerName}"
   deactivate_this_key_3e79a2b5: "Wetehohe tēnei kī"
@@ -9184,6 +9225,7 @@ mi:
   discussion_opened_for_comments_successfully_b320dc39: "I huakina pai ngā kōrerorero mo ngā kōrero"
   discussion_pinned_successfully_f9c03d9f: "I tohua pai ngā kōrerorero"
   discussion_posts_c998c9ad: "Kōrerorero Whakairinga"
+  discussion_redesign_description: "Ko tēnei āhuahira whakanui ake te Canvas wheko i roto i ngā Kōrerorero me ngā Pānuitanga. I te`wā e whakahohetia ai te haki whakauru tata ki te haere tonu ka whakaatutia aunoa i te taha o ia tuku. Mo ngā taipitopito katoa tēnā koa tiro ki *Ngā Kōrerorero/Ngā Pānuitanga Whakahou kaiwhakamahi rōpū* i roto i te Hāpori Canvas"
   discussion_reply_sorting_6a14676e: "Kōrero whakautu kōmaka ana"
   discussion_settings_2fbf0b95: "Ngā Tautuhinga Kōrerorero"
   discussion_submission_781d5d33: "Kōrerorero Tukunga"
@@ -9641,6 +9683,7 @@ mi:
   downloading_course_content_allows_access_to_conten_164d9336: "Tikiake ana te ihirangi akoranga taea te uru ki te ihirangi ia tuimotu. Ihirangi kia ngā kōnae, whārangi, whakataunga ngā kaupapa kōrero rānei pātaitai. Pāwhiritia \"Hanga ePub\" mō ia akoranga me te tuwhera ki tētahi pūmanawa eReader ki tiro."
   draft_92507c72: (tauira)
   draft_comment_b2376ea4: "tauira kōrero"
+  draft_discussion_entries_98d93a9d: "Tauira Tāurunga Kōrerorero"
   draft_saved_eba9cfeb: "Tauira i tiakina"
   drag_a_file_here_39357b48: "Tō he Kōnae i konei"
   drag_a_file_here_or_1aaf19c1: "Tō he kōnae ki konei ara"
@@ -9652,14 +9695,17 @@ mi:
   drag_to_rearrange_sections_637efee3: "Tōia ki te whakatikatika i ngā wāhanga"
   drag_up_or_down_to_reorder_382126ff: "Tōia ki runga ki raro rānei, ki raupapa anō"
   dramatic_increases_in_usage_of_free_bigbluebutton__d93b784b: "Whakaari te pikinga o te whakamahi i te BigBlueButton koreutu tēnā pea ka puta he mahi raruraru."
+  drop_coursename_813d3162: "Whakataka %{courseName}"
   drop_files_here_to_add_to_module_236304f5: "Whakataka ngā kōnae ki konei ki te tāpiri ki ki te kōwae"
   drop_files_here_to_upload_ce0f50f9: "Kōnae whakataka kei konei ki te tukuake"
   drop_image_62a2a071: "Whakataka Āhua"
+  drop_this_course_53eb5370: "Whakataka tēnei akoranga"
   dropdown_changed_state_to_expanded_517689c2: "Kua huria te heke iho āhua kī %{expanded}."
   dropdown_option_1_e6ff2fc: "Kōwhiringa Whakataka 1"
   dropdown_option_2_9766a346: "Kōwhiringa Whakataka 2"
   dropped_38031953: tauwhāinga
   dropped_for_grading_purposes_46256461: "Maturuturu iho mō ngā take māka"
+  dropping_course_80aabb72: "E taka ana i tēnei akoranga"
   due_5d7267be: "E tika ana:"
   due_639f281d: "E tika ana: "
   due_a73610f6: "E tika ana"
@@ -12397,6 +12443,7 @@ mi:
   group_with_id_guid_already_exists_in_another_unrel_be1baf71: "Rōpū me te ID %{guid} kei te tīariari i roto i tētahi atu akoranga kaore e hangai ana pūkete rānei (%{name})"
   groupname_has_been_created_544938d6: "\"%{groupName}\" kua hangaia"
   groupname_score_75afe27: "%{groupName}: %{score}"
+  groupname_was_successfully_created_970dcc7d: "\"%{groupName}\" i momoho te hanga."
   groups: 
     add_group: "Tāpiri rōpū"
     add_group_category: 
@@ -12766,6 +12813,8 @@ mi:
   groups_tray_ef3e2649: "Rōpū pereki"
   groups_view_all_student_groups_39bd1b85: "Ngā rōpū – titiro ki ngā rōpū ākonga katoa"
   grouptitle_has_been_moved_to_newgrouptitle_de1f8c61: "\"%{groupTitle}\" kua nekehia ki \"%{newGroupTitle}\"."
+  grouptitle_was_moved_to_newgrouptitle_efabcda2: "\"%{groupTitle}\" i nekehia ki \"%{newGroupTitle}\"."
+  grouptitle_was_successfully_updated_658f725e: "\"%{groupTitle}\" I momoho te whakahōu."
   groupweight_of_total_9579ae8c: "%{groupWeight}% o Tapeke"
   guatemala_502_ae25c68f: "Guatemala (+502)"
   haitian_creole_7eb4195b: "Haitian Creole"
@@ -12869,11 +12918,13 @@ mi:
     accessible_date_only_format: YYYY-MM-DD
     accessible_date_prompt: "hōputu rite"
     accessible_time_only_format: "HH: mm"
+    account_time: Pūkete
     button: 
       create: "Waihanga %{model}"
       submit: "Whakaorangia %{model}"
       update: "Whakahōu %{model}"
     course: akoranga
+    course_time: Akoranga
     dashboard_helper: 
       announcement_details: "Taipitopito Pānuitanga"
       announcement_label: "Tirohia Pānuitanga akoranga"
@@ -12902,6 +12953,7 @@ mi:
         one: "*1* arotake hoa"
         other: "*%{count}* arotake hoa"
     local: Paetata
+    local_time: Paetata
     select: 
       prompt: "Tīpakohia koa"
     submit: 
@@ -12944,6 +12996,7 @@ mi:
   hide_notes_column_7749f408: "Huna Tīwae Tuhipoka "
   hide_outcomes_with_no_results_7e4ce06f: "Hunga ngā putanga kaore ngā hua"
   hide_params_eadf0961: "Huna params"
+  hide_projections_9d4ed1e1: "Huna ngā matapae"
   hide_score_total_for_assessment_results_d0ef117f: "Huna kaute katoa mō ngā hua aromatawai"
   hide_sidebar_2b5b3776: "Huna Paetaha"
   hide_student_names_3e59e862: "Huna Ākonga Ingoa"
@@ -13159,6 +13212,7 @@ mi:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Mehemea ka monokia, ka taea tonu e te kaiwhakamahi te uru ki te Akoranga Tautuhinga. Kaore e taea e te Kaiwhakamahi te whakahaere i te ihirangi akoranga takitahi me te kore e tika te whakāetanga mo taua ihirangi tuemi. Mehemea he iti noa te kitenga o te akoranga ki ngā kaiwhakamahi i whakaurua ki te akoranga, tēnei whakāetanga ka taea e te kaiwhakamahi te tiro i ngā akoranga ihirangi me te kore e whakauruhia ki te akoranga."
   if_disabled_user_will_still_have_access_to_course__fbf32c87: "Mehemea ka monokia, ka taea tonu e te kaiwhakamahi te uru ki te Akoranga Tautuhinga."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Mehemea ka whakahohetia te whakauru ki LTI 1.3 me LTI Painga ka whakahohetia"
+  if_enabled_allows_deep_linking_from_the_module_ind_f2dcbddb: "Mehemea whakahohe, tukua te hono hohonu mai i te kōwae taupū."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Mena kua whakahohea, ka taea te nui atu te kaute e taea ana ki runga i te Putanga ka hoatutia i runga i te rubric"
   if_enabled_allows_multiple_deep_link_support_for_a_5d2498ab: "Mehemea whakahohea, ka whakaaetia nui me te hohonu ngā hono tautoko mo ngā whakataunga me ngā kōwae."
   if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
@@ -13292,6 +13346,7 @@ mi:
   if_the_open_registration_account_setting_is_enable_b6fdaab4: "Mehemea kua whakahohehia te Huaki Rehitatanga pūkete tautuhinga, ka taea e ngā kaiwhakamahi me tēnei whakāetanga te tāpiri atu i ngā TAs ki te akoranga Tāngata whārangi mā te īmēra wāhitau me te ID takiuru rānei ahakoa mehemea te TA kaore he Canvas pūkete."
   if_the_open_registration_account_setting_is_enable_e7f97cf0: "Mehemea kua whakahohehia te Huaki Rehitatanga pūkete tautuhinga, ka taea e ngā kaiwhakamahi me tēnei whakāetanga te tāpiri atu i ngā kaiako ki te akoranga mai te Akoranga whārangi mā te īmēra wāhitau me te ID takiuru rānei ahakoa mehemea te kaitātai kaore he Canvas pūkete."
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "Mehemea kua whakahohehia te Huaki Rehitatanga pūkete tautuhinga, ka taea e ngā kaiwhakamahi me tēnei whakāetanga te tāpiri atu i ngā ākonga kaitirotiro rānei ki te akoranga mā te īmēra wāhitau me te ID takiuru rānei ahakoa mehemea te ākonga kaitirotiro rānei kaore he Canvas pūkete."
+  if_the_option_requiring_users_to_post_before_seein_a9274f5f: "Mehemea te kōwhiringa e hiahiatia ana ngā kaiwhakamahi ki te whakairi i mua i te kitenga o ngā whakautu kua tīpakohia i roto i te kōrerorero, ngā kaiwhakamahi me whakairi he whakautu ki te tiro i ngā whakairi katoa ki te kore Ngā Kōrerorero ngāwari noa me whakahohe hoki."
   if_the_pages_update_permission_is_disabled_the_use_3df16c25: "Mena kua monokia tēnei Whārangi Whakāetanga, ka taea e te kaiwhakamahi te whakatika i ngā tautuhinga kati ihirangi ki ngā whārangi takitahi i roto i te Tātauira Akoranga Matua."
   if_these_additional_permissions_are_enabled_but_as_d264879d: "Mehemea i whakahohea tēnei whakāetanga tāpiri atu , ēngari Whakataunga me ngā Kairoro- tāpiri / whakatika / muku kaore i whakahohe, Tātauira kati tautuhinga mo tētahi whakataunga ka taea te whakahaere mai i te whakataunga whārangi taipitopito."
   if_this_permission_is_disabled_and_courses_add_edi_5f31ce8f: "Mehemea kua monokia tēnei whakāetanga me ngā Akoranga – tāpiri / whakatika / muku kua whakahohehia, Ka taea e ngā kaiwhakamahi te tāpiri i tētahi akoranga hou me te Tāpiri i te Akoranga Hou pātene i roto i te Pūkete Tautuhinga."
@@ -13452,7 +13507,7 @@ mi:
   improved_learning_mastery_gradebook_8628d06a: "Whakapai ake Ako Mana Kōekepuka"
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Whakahou Quizzes Hou tautoko me ngā kōwae me te hanga Quizzes Hou mai i ngā kōwae"
   improved_outcomes_management_4692f886: "Whakapai ake ngā putanga Whakahaere"
-  improved_support_for_taking_new_quizzes_from_withi_4dbc794e: "Whakapiki ake tautoko mo te hari ngā kairoro Hou mai i roto i ngā Kōwae"
+  improved_support_for_taking_new_quizzes_from_withi_4dbc794e: "Whakapiki ake tautoko mo te hari ngā Kairoro Hou mai i roto i ngā Kōwae"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Whakapainga maumahara a kitea hei whakatenatena ngā kaitohutohu ki te pānui ngā akoranga"
   improvements_made_to_enhance_the_user_experience_w_5d07cd73: "Ngā whakapaitanga kua mahia hei whakarei  te wheako o te kaiwhakamahi i roto i te Ako Mana Kōekepuka."
   in_a_few_seconds_538ddff3: "i roto i te hekona iti e whai ake nei"
@@ -13523,6 +13578,7 @@ mi:
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "E tohu ana ko te āhua he whakapaipai anake, me te kore e pānuihia e ngā kaipānui"
   indigo_2035fc55: Indigo
   individual_assignment_grade_posting_d8322b99: "Kotahi Whakataunga Kōeke Whakairi"
+  individual_gradebook_c7de9821: "Takitahi Pukakōeke..."
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Ia putanga tatauranga wāriu kaore e taea te whakarerekē."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Ia putanga hinganga koinga kaore e taea te whakarerekē."
   individual_outcome_ratings_cannot_be_modified_9fcdfb90: "Ia putanga whakatauranga kaore e taea te whakarerekē."
@@ -13548,6 +13604,7 @@ mi:
   inherited_d4d0bc33: Whiwhi
   inherited_developer_keys_table_e4a65b67: "Whiwhi Ngā Kaihanga Matua Tuhinga"
   inherited_tool_from_parent_context_f4c1c8c7: "He taputapu kua whiwia mai i te matua horopaki"
+  initial_sync_incomplete_ec74fe8e: "Tuatahi Tukutahi Kaore i Oti"
   inner_box_background_6f9092f: "Papamuri Pouaka Inner"
   inner_box_border_d0524b03: "Inner Pouaka Taitapa"
   input_and_distribute_grades_for_students_display_g_95b9b6ee: |-
@@ -13783,6 +13840,8 @@ mi:
   is_an_lti_1_3_tool_770480a1: "He LTI 1 3 Taputapu"
   is_public_ca8561e8: is_public
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " kei te mahi wāhanga kore utu o te BigBlueButton ka hoatu 10 ataata huihuinga i te wā kotahi, ia me te 1 kaimanaaki ki te 24 ngā kaiuru. Ka penapenatia ngā hopukanga mo te 7 ngā rā."
+  isolated_entry_post_error_page_2a447d08: "Mokemoke Whakauru Whakairi Hapa Whārangi"
+  isolated_entry_query_error_f0bfae18: "Mokemoke Whakauru pātai hapa"
   israel_681bc5a5: Iharaira
   israel_972_e671df75: "Iharaira (+972)"
   it_divides_students_into_three_groups_based_on_the_1a107f5b: "\n\
@@ -13837,6 +13896,7 @@ mi:
       priority: matua
       run_at: "rere i"
       runtime: wāhaere
+      singleton: takirua
       strand: whenu
       tag: tūtohu
       worker: kaimahi
@@ -13878,6 +13938,7 @@ mi:
         priority: "Mana ake"
         run_at: "Whakahaere I"
         shard: shard
+        singleton: takirua
         source: mātāpuna
         strand: whenu
         tag: tūtohu
@@ -13893,6 +13954,7 @@ mi:
   join_group_group_name_871a5e3f: "Hono rōpū %{group_name}"
   join_the_conversation_using_the_link_below_54ab1f0e: "Hono ki ngā kōrerorero ma te whakamahi i te hononga i raro"
   join_the_conversation_using_this_link_link_9017499: "Hono ki ngā kōrerorero ma te whakamahi i te hononga: %{link}."
+  join_this_course_7d26a944: "Hono tēnei akoranga"
   joined_group_group_name_e3802c04: "Rōpū piri %{group_name}"
   joining_81f8b6c9: Hono
   jpg_903bacff: JPG
@@ -13923,6 +13985,11 @@ mi:
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "Kia maumahara, ka kautetia tēnei tāpaetanga mo te katoa i roto i to roopu %{groupType}."
   keep_students_informed_3f41a7e6: "Kia mau tonu te whakamōhio i ngā ākonga."
   keep_submissions_anonymous_5cbaf419: "Kia mau ki tāpaetanga ingoamuna"
+  keep_track_of_which_settings_page_tab_you_are_on_s_2424ab91: |-
+      Kia mau tonu te ara o ngā Tautuhinga whārangi ripanga kei runga koe
+      ko te tirotiro pātene o muri ka hari ia koe ki tō ripanga o muri
+      ana ma te whakahou i te whārangi ka hoki koe ki
+      te ripanga e mahi tonu ana.
   kenya_254_2945663a: "Kenya (+254)"
   key_api_key_68bf80ae: "Kī: *%{api_key}*"
   key_f2a919d5: Kī
@@ -14335,6 +14402,7 @@ mi:
   loading_grades_for_coursename_26784c2d: "Uta ana ngā kōeke mō %{courseName}"
   loading_grading_periods_c635d96: "Uta ana i ngā wā kōeke ..."
   loading_grading_periods_for_coursename_bbe46919: "Uta ana ngā wā kōeke mō %{courseName}."
+  loading_grouptitle_dba362d2: "E uta ana %{groupTitle}."
   loading_homeroom_announcement_content_1654f8c7: "Uta ana Kainga rūma Pānuitanga Ihirangi"
   loading_homeroom_announcement_title_34338f6d: "Uta ana Kainga rūma Pānuitanga Taitara"
   loading_homeroom_course_name_9f63923d: "Uta ana Kainga rūma Akoranga Ingoa"
@@ -14558,6 +14626,7 @@ mi:
   lti_add_and_edit_a359d8da: "LTI tapiri me te whakatika"
   lti_add_edit_delete_15905170: "LTI – tapiri/whakatika/muku"
   lti_advantage_services_c1746cb4: "LTI Ratonga Painga"
+  lti_deep_linking_for_module_index_menu_881feeee: "LTI Hono Hohonu mō Kōwae Tahua Taupū"
   lti_key_14ad02b1: "LTI Kī"
   lti_launch_error_41eac9a: "LTI Whakarewatanga Hapa"
   lti_multiple_assignment_deep_linking_b7d641d7: "LTI Nui atu Whakataunga Hohonu Hononga"
@@ -17142,6 +17211,7 @@ mi:
   muting_assignment_a9aeb5c7: "Whakangū whakataunga ana"
   my_dashboard_8983c283: "toku Papatohu"
   my_dashboard_b724020: "toku Papatohu"
+  my_drafts_4e4ac1a6: "Aku Tauira"
   my_files_2f621040: "Aku kōnae"
   my_settings_2ff35329: "Aku Tautuhinga"
   my_subjects_61936afb: "Aku Kaupapa"
@@ -17334,6 +17404,7 @@ mi:
   next_mastery_path_is_currently_processing_f044d7d8: "Ko te ara matua i muri atu kei te mahi ināianei"
   next_mastery_path_is_still_processing_please_perio_bb0121af: "Kei te mahia tonu te ara tohu e haere ake nei, tēnā koa whakaora i te whārangi i ia wā"
   next_message_780bcf24: "Karere o muri atu"
+  next_module_66f58e91: "Kōwae Panuku"
   next_module_item_19e835f3: "Kōwae i muri ake nei tūemi"
   next_module_item_9bb8a222: "Kōwae i muri ake nei / nama"
   next_month_749b1778: "Tērā marama"
@@ -17388,6 +17459,7 @@ mi:
   no_errors_1ac47724: "Kaore he hapa"
   no_evidence_75853352: "Kaore he taunakitanga"
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "Kaore he kaiwhakamahi tiariari e mahi ana mo te takiuru me SIS ID %{user_id}"
+  no_explainer_text_available_9d9a2f3c: "Kaore he whakamārama kuputuhi i te wātea"
   no_exports_to_display_7f1b630b: "Kaore ngā kaweake hei Whakātu"
   no_file_selected_92d2ac30: "Kāore he kōnae i tīpakohia"
   no_file_submitted_a879fa53: "Koare he konae i tukunga"
@@ -19230,6 +19302,8 @@ mi:
   preview_ungraded_as_0_e3b97df6: "Arokite kaore i kōeketia hei 0"
   preview_website_url_eb5b8a5f: "Arokite paetukutuku url"
   preview_your_changes_373557d8: "Arokitea tō Huringa"
+  preview_your_submission_and_view_teacher_feedback__28e5c3b4: "Arokitea tō urupare tāpaetanga, me te tirohanga kaiako. He kōrero ēnei kaore anō i pānuitia."
+  preview_your_submission_and_view_teacher_feedback__81a45279: "Arokitea tō urupare tāpaetanga, me te tirohanga kaiako, ki te wātea"
   previous_445ca243: "i muri nei"
   previous_announcement_7efc02d9: "Pānuitanga o muri"
   previous_announcements_page_79c0ada1: "Pānuitanga Whārangi o muri nei"
@@ -19239,6 +19313,7 @@ mi:
   previous_csv_timestamp_6673c69c: "Tōmua CSV (%{timestamp})"
   previous_export_c6a997f7: "Kaweake o mua"
   previous_message_8804f87e: "Karere o mua"
+  previous_module_8801a74b: "Kōwae mua"
   previous_module_item_2bb5e499: "Kōwae mua / tūemi"
   previous_module_item_a9e57348: "Kōwae mua/ tūemi"
   previous_month_7adf1380: "marama o muri nei"
@@ -19606,6 +19681,8 @@ mi:
   progress_loading_bar_a26b8861: "Ahunga pūkete uta"
   progress_percent_ae80cd55: "%{progress} ōrau"
   project_groups_1fa0320b: "Ngā kaupapa rōpū"
+  projected_end_date_bf3185fe: "Whakaarohia Rā Mutunga"
+  projected_start_date_9626c9d9: "Whakaarohia Rā Tīmata"
   pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "Kaor ete kupuiwi e ōrite ki te kupuiwi pūkete ara ngā kupuiwi rānei kaore e whakahohea mō tēnei pūkete %{user_id} pekepeke ana"
   pronouns_28bbef86: "ngā kupu iwi"
   pronouns_d1cd8dd0: "Ngā Kupu iwi"
@@ -21266,6 +21343,11 @@ mi:
   range_name_90614433: "ingoa whānui"
   rangestudents_out_of_totalstudents_students_click__21beede0: "%{rangeStudents} roto o %{totalStudents} ākonga, pāwhiri ki te tiro i kōrero ngā ākonga"
   rangestudents_out_of_totalstudents_students_e5ee60e1: "%{rangeStudents} I roto i %{totalStudents} ngā akonga"
+  rather_than_automatically_placing_manually_created_35195e72: |-
+      Engari te whakatau aunoa a ringa ngā akoranga kua hangaia ki roto i te
+      "Akoranga Hangaia A Ringa" pūkete- o raro, i te wā e whakahohea, tēnei āhuahira ka tukua
+      ngā tāngata ka taea te hanga akoranga a ringa ki te whakauru aua akoranga ki roto i ētahi pūkete
+      kei reira ngā whakaurunga.
   rating_description_db6adf39: "Whakatauranga Whakāhua"
   rating_max_score_eade1523: "Whakatauranga kōeke nui"
   rating_min_score_3d35a762: "Whakatauranga kōeke iti"
@@ -21502,6 +21584,7 @@ mi:
   releasing_grades_31a57dde: "E tukua ana ngā Kōeke"
   reload_the_page_or_navigate_to_a_new_page_for_this_e6335972: "Uta anō te whārangi ara whakatere ki te whārangi hou mo tēnei huringa ki te mahi."
   remember_my_choice_for_this_course_5a3b7206: "Kia mahara ki toku kōwhiringa mo tēnei akoranga"
+  remember_your_settings_page_tab_a081121d: "Maumahara ō tautuhinga whārangi ripanga"
   remind_me_next_time_6402eb7d: "Fakamanatu ki ahau wā i muri mai"
   reminder_ffd21289: Whakamaumahara
   remove_account_from_this_profile_c3095eb2: "Tangohia te pūkete i tēnei kōtaha"
@@ -21743,6 +21826,7 @@ mi:
   revert_date_changes_5105ce5: "Whakahuria ngā rā kua huria"
   revert_to_actual_score_f665eea9: "Hoki ki te kaute tūturu"
   revert_to_old_ui_3211da41: "Huri ki te UI tawhito"
+  reverts_the_visible_assignments_scope_to_its_origi_87eb35d: "Hoki te whakataunga kei te kitea whānui mai te āhua taketake"
   review_feedback_4b4abb38: "Arotake Whakahoki"
   review_now_318a6a3e: "Arotake ināianei"
   reviewer_b993ce28: kaiarotake
@@ -22025,6 +22109,7 @@ mi:
   save_this_comment_for_reuse_5eda0b70: "Tiakinga tēnei kōrero mō te whakamahi anō"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "Whakaorangia tō %{type} ki te timata te tauwhāiti ihirangi herenga."
   save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: "Tiaki ia koe he wā nui ma te tāpiri i ngā putanga anake e hāngai tōtika ana ki tō akoranga ihirangi."
+  saved_3cd67a7c: "Kua Ora"
   saved_comments_2f6ba95: "Ngā kōrerorero kua tiakina"
   saved_discussion_settings_successfully_ebd46a57: "I tiakina pai ngā tautuhinga kōrero"
   saving_2521e616: "E tiaki ana"
@@ -22362,6 +22447,7 @@ mi:
   sections_6d057c07: "ngā wāhanga"
   sections_94731e51: "Ngā Wāhanga"
   security_7a7e8808: Haumaru
+  security_setting_to_restrict_join_urls_to_a_confer_258d3605: "Ahuru tautuhinga ki te aukati te hono URLS ki te hui"
   security_tab_failed_to_load_2d2242a: "I rahua te Haumaru ripa ki te uta"
   see_example_below_to_see_how_different_calculation_618de98d: "Titiro ki te tauira i raro ki te kite i te rerekētanga o ngā tatauranga tāwha e pā ana ki ākonga rangatira tatauranga."
   see_more_in_canvas_guides_fc90a457: "Titiro ki nui atu ngā Canvas Āwhina"
@@ -23512,6 +23598,7 @@ mi:
   show_past_account_level_announcements_to_users_all_36b50d74: |-
       Whakātu taumata pūkete o mua pānui ki ngā kaiwhakamahi E tukuna ana
       he kaiwhakamahi ki te tiro pānui kua mutu ara kua whakakorea rānei
+  show_projections_32a3756: "Whakaatu Matapae"
   show_question_details_b059df00: "Whakātu Taipitopito Pātai"
   show_recent_activity_stream_2be4abc1: "Whakaaturia awa mahi tata"
   show_report_to_students_a07888a6: "Whakātu ngā pūrongo ki ngā ākonga"
@@ -23526,6 +23613,9 @@ mi:
   showing_all_announcements_36ff0cec: "Whakaatu fanongonongó katoa"
   showing_all_discussions_7e09f4b7: "Whakaatu kōrero katoa"
   showing_all_sets_of_grading_periods_6c160874: "Whakātu huinga katoa o wā kōeke."
+  showing_count_outcomes_for_grouptitle_32d7988b: 
+    one: "Whakaatu ana %{count} putanga mō %{groupTitle}"
+    other: "Whakaatu ana %{count} ngā putanga mō %{groupTitle}"
   shows_instructure_provided_release_notes_in_the_he_8e2bf5ee: "Whakātu Instructure whakaratohia tuhipoka tuku i roto i te tahua awhi mo ngā kaiwhakamahi katoa (tātaritia ma te tūranga kaiwhakamahi)"
   shrink_permission_74b01aed: "Whakaheke %{permission}"
   shuffle_answers_edb602b7: "Whakautu Riwhi"
@@ -24158,6 +24248,7 @@ mi:
   submission_draft_cannot_be_more_then_one_attempt_a_43f45197: "tāpaetanga tauira kaore e nui atu i te kotahi ngana o te tāpaetanga o nāianei"
   submission_draft_updated_e953166a: "Tauira tāpaetanga kua whakahoutia"
   submission_failed_to_submit_8de4efcd: "I hapa te tuku i te tāpaetanga"
+  submission_feedback_indicators_eb1d31ec: "Tāpaetanga kupu whakahoki tohu"
   submission_in_another_grading_period_e754b329: "Tukunga i roto i tetahi atu wā māka"
   submission_index_e960f9bf: "tāpaetanga %{index}"
   submission_is_being_processed_by_plagiarism_servic_df4aa603: "Kei te whakamahia te tāpaetanga e te ratonga whakaparahako."
@@ -24346,6 +24437,8 @@ mi:
   success_grades_have_been_hidden_for_assignmentname_4ed03c00: "Angitu! Kua hunahia ngā kōeke mo te %{assignmentName}."
   success_grades_have_been_hidden_for_the_selected_s_3ad5692: "Angitu! Kua hunahia ngā kōeke mo ngā wāhanga kua tīpakotia o te %{assignmentName}."
   success_grades_have_been_posted_for_the_selected_s_54c73ef0: "Angitu! Kua whakairitia ngā koeke mo ngā wāhanga kua tīpokatia o te %{assignmentName}."
+  success_grades_have_been_posted_to_everyone_for_as_f37ea031: "Angitu! Kua whakairia ngā koeke ki te katoa mo %{assignmentName}."
+  success_grades_have_been_posted_to_everyone_graded_70d15d1a: "Angitu! Kua whakairia ngā koeke ki te katoa kua kōeketia mo %{assignmentName}."
   success_grades_have_been_posted_to_postedto_for_as_255bc974: "Angitu! Kua whakairia ngā koeke ki te %{postedTo} mo %{assignmentName}."
   success_grades_were_published_to_the_grade_book_da3b4fba: "angitu! I whakaputaina ngā kōeke ki te pukapuka kōeke. "
   success_the_post_policy_for_name_has_been_updated_ea92283f: "Angitu! Te kaupapa whakairi mō %{name} kua whakahoutia."
@@ -24421,6 +24514,7 @@ mi:
   sync_auto_scheduled_by_enrollment_changes_bd96ff7f: "Tukutahi aunoa pūwhakarite ma te whakaurunga huringa"
   sync_completed_successfully_8f68b542: "Kua oti pai te tukutahi"
   sync_currently_running_2cd5114a: "He tukutahi kei te mahi ināianei"
+  sync_enrollments_and_course_start_end_dates_from_h_b2f9c3fc: "Tukutahi me ngā whakaurunga me ngā rā timata/whakamutunga: o te akoranga mai i te kainga rūma"
   sync_enrollments_from_homeroom_c75285f4: "Tukutahi whakaurunga mai i te kainga rūma"
   sync_grades_a16622ca: "Tukutahi ngā kōeke"
   sync_grades_to_sis_4e7fbc08: "Tukutahi ngā kōeke ki SIS"
@@ -24473,6 +24567,7 @@ mi:
     eportfolios: "e ngā pūkete"
     files: "Ngā Kōnae"
     grades: "Ngā Kōeke"
+    groups: Rōpū
     home: Kāinga
     item_banks: "Ngā Tūemi Pekē"
     logout: Takiputa
@@ -24663,6 +24758,14 @@ mi:
                      tae atu ki %{max_domains} ngā rohe e whkāetia Ngā Kāri mohoao e tūtohutia ana
                      (hei tauira. *.instructure.com). Canvas me Instructure rohe e whakaurutia ana
                      aunoa me te kore e kaute kī tō 50 rohe tepe
+  the_conversation_has_been_successfully_starred_ce079a12: "Kua whetūtia pai te kōrero"
+  the_conversation_has_been_successfully_unstarred_6514095d: "Kua kore e whetūtia pai te kōrero"
+  the_conversations_has_been_successfully_starred_315da1a: 
+    one: "Kua whetūtia pai te kōrero"
+    other: "Kua whetutia pai ngā kōrero"
+  the_conversations_has_been_successfully_unstarred_fb69c53d: 
+    one: "Kua kore e whetutia pai ngā kōrero"
+    other: "Kua kore e whetūtia pai ngā kōrero"
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       Te Ākoranga Kainga Wharangi ko te whārangi tuatahi ka kite ngā ākonga i te wā e huaki ai
             tzo akoranga. Te Kainga Whārangi ka taea te whakātu i te akoranga whai wāhitanga
@@ -24698,6 +24801,7 @@ mi:
   the_entry_was_successfully_marked_as_unread_177d264: "Te whakauru i pai te maaka kaore i pānuitia."
   the_entry_was_successfully_updated_e6eb3b86: "I whakahou pai te whakauru"
   the_error_stack_trace_if_there_is_one_b7e008a1: "Ko te tāpū kete arā hapa, ki te mea he kotahi"
+  the_external_tool_resource_link_including_any_poss_329f699d: "Te Taputapu o waho rauemi hono (whakauru atu taea tikanga tawhā) kaore e taea te whakatau mō te tūemi kōwae \"%{title}\""
   the_featured_link_was_moved_to_the_top_of_list_6cabcda9: "Te āhuatanga hono kua neketia ki te taumata o te rārangi."
   the_field_field_is_required_56512820: "Te \"%{field}\" whīra kei te hiahiatia"
   the_field_field_must_have_no_spaces_d1c2fc37: "Te \"%{field}\" kaore he wāhi mo ngā whīra"
@@ -24804,6 +24908,7 @@ mi:
   the_profile_picture_has_been_reported_d609d6dd: "Kua korerotia te pikitia kōtaha kua"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Ko te kōnae whakaratohia Benchmark Academic he hapa"
   the_question_text_for_the_question_question_name_w_3a68a2c7: "Ko te kuputuhi pātai mo te pātai \"%{question_name}\" i roa rawa."
+  the_quiz_is_unavailable_if_you_are_not_logged_in_554dcd43: "Te kairoro kaore i te wātea mehemea kaore koe i te takiuru"
   the_quiz_log_auditing_feature_option_must_be_enabl_77bf321e: "Ko te Quiz Takiuru Arotake ahua arotake me whakahohe i roto i ngā Tautuhinga Akoranga."
   the_quiz_log_auditing_feature_preview_must_be_enab_bd1f78f1: "Ko te Quiz Takiuru Arotake āhua arotake me whakahohe i roto i ngā Tautuhinga Akoranga."
   the_quiz_name_must_be_under_length_characters_68e7de3a: "Te ingoa Quiz me noho i raro i te %{length} ngā pūāhua"
@@ -24878,6 +24983,7 @@ mi:
   there_are_no_unsynced_changes_4e8f0838: "Kāore he huringa kāore tukutahitia"
   there_are_no_unsynched_changes_d208547c: "Kaore he huringa kore tukutahitia."
   there_are_no_user_accounts_to_split_from_this_user_4e132eb1: "Kaore he kaiwhakamahi pūkete hei wāwāhi mai i te kaiwhakamahi."
+  there_are_unread_rubric_comments_337270ca: "He kōrero rubric kaore anō i pānuitia."
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "He 2 taupānga aukati mo te whakatau i roto i te RCE taputapu paerewa Ka hāngai tēnei tautuhinga ki te whakanuia RCE anake."
   there_is_currently_1_available_grader_758e4a21: "Kotahi te kaikōeke e wātea ana i tēnei wā"
   there_was_a_failure_logging_out_at_your_idp_30070527: "He hapa i te wā e takiwaho atu i tō IdP"
@@ -24952,6 +25058,8 @@ mi:
   there_was_an_unexpected_error_loading_the_replies_578d9738: "He hapa ohorere i puta i te wā e uta ana ngā whakautu."
   there_was_an_unexpected_error_marking_all_as_read_117fe739: "He hapa ohorere i puta i te wā e tohua kua pānuihia katoa."
   there_was_an_unexpected_error_marking_all_as_unrea_e4658766: "He hapa ohorere i puta i te wā e tohua kaore i pānuitia katoa."
+  there_was_an_unexpected_error_updating_the_convers_a1a37400: "He hapa ohorere i puta i te wā e whakahou ana i te kōrero a ngā kaiwhaiwāhi"
+  there_was_an_unexpected_error_updating_the_convers_d44c9fde: "He hapa ohorere i puta i te wā e whakahou ana i te kōrero a ngā kaiwhakawāhi."
   there_was_an_unexpected_error_updating_the_discuss_6cd3489c: "He hapa ohorere i puta i te wā e whakahou ana i te kaupapa kōrero."
   there_was_an_unexpected_error_updating_the_entry_5333eb80: "He hapa ohorere i puta i te wā e whakahou ana i te whakauru."
   there_was_an_unexpected_error_updating_the_reply_a3eaf19f: "He hapa ohorere i puta i te wā e whakahou ana i te whakautu."
@@ -25092,6 +25200,7 @@ mi:
   this_grade_has_negative_points_496400d4: "He kino ngā kōinga mo tēnei kōeke"
   this_grade_is_invalid_8ab192c7: "He muhu tēnei kōinga"
   this_grade_is_unusually_high_60533c20: "He tino teitei rawa tēnei kōinga"
+  this_group_was_successfully_removed_81178d51: "I tango paitia tēnei roopu."
   this_group_was_successfully_removed_from_this_acco_63abf7f0: "I pai te tango o tēnei rōpū mai i tēnei pūkete."
   this_group_was_successfully_removed_from_this_cour_8db261c4: "I pai te tango o tēnei rōpū mai i tēnei akoranga."
   this_has_more_question_types_like_hotspot_categori_620e9df6: |-
@@ -25127,6 +25236,7 @@ mi:
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "Ko te kōeke i whiriwhiri i tēnei wā mō tēnei ākonga tēnei."
   this_is_the_default_email_address_f3c421fb: "Ko te wāhitau īmēra taunoa tēnei"
   this_is_the_new_feature_preview_ui_it_is_currently_9cb4b80e: "Koinei te Āhuatanga Arokite hou UI Keio te pānui anake i tēnei wā Ki te huri ki te UI tawhito pāwhiri te pātene Ka monokia Ngā Āhuatanga Haki hou āhua me te whakahou i te whārangio"
+  this_is_where_students_can_see_their_groups_7dd2dae3: "Kei konei ka kite ngā ākonga i ō rātou roopu."
   this_is_where_you_can_leave_a_comment_and_view_you_a2259ec8: "Kei konei ka taea e koe te waiho he kōrero me te tiro i tō kaitohutohu kupu whakahoki."
   this_is_where_you_ll_land_when_your_home_is_comple_8ab4d2b8: "Kei konei koe tau ai i te wā i oti ai tō kainga."
   this_is_your_course_landing_page_33d445ec: "Ko tēnei tō akoranga whakatau whārangi"
@@ -25195,6 +25305,7 @@ mi:
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Whakaturia ana tēnei rōpū pātai ki te tiki atu pātai atu e wātea ana."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "tēnei pātai ka Whakātu i te pouakataki muri ki ia whakautu."
   this_quiz_has_been_excused_d89d2b74: "Kua tēnei quiz kua tukua"
+  this_quiz_is_no_longer_available_as_your_enrollmen_a5fab8f7: "Kaore i te wātea tēnei kairoro na te mea kua whakamutua te akoranga."
   this_quiz_is_unpublished_only_teachers_can_see_the_51d281b1: "*Tēnei quiz ko kāore e taea te kite* anake kaiako te quiz whakaputaina noa te reira."
   this_quiz_needs_review_50e014e: "Me tēnei quiz arotake"
   this_rating_is_selected_ca68fce6: "Kua tīpakohia tēnei tohu"
@@ -25497,6 +25608,8 @@ mi:
   title_outcomes_7adbd9cc: "%{title} Nga Putanga"
   title_separator: ":"
   title_tray_ec9f7488: "%{title} pereki"
+  title_was_successfully_created_f2a07c56: "\"%{title}\" i momoho te hanga."
+  title_was_successfully_updated_14b78676: "\"%{title}\" I momoho te whakahōu."
   titles: 
     aligned_items: "Tūemi Kua tiaroarotia"
     announcement: Pānui
@@ -25541,7 +25654,7 @@ mi:
   to_access_the_manage_question_banks_link_in_a_cour_202b4cd8: "Ka taea e ngā kaiwhakamahi te uru atu ki te hono Whakahaere Pātai Kaute i runga i ngā Quizzes Taurangi Whārangi Akoranga ihirangi - te tiro me ngā Whakataunga me ngā Quizzes - tāpiri / whakatika / muku kua whakahohea."
   to_access_the_manage_question_banks_link_in_a_cour_cc26af7c: "Ki te whakauru i te Whakahaere Pātai Pēke hono i roto i te akoranga Kairoro Ihirangi - Whārangi Akoranga ihirangi - te tiro me ngā Whakataunga me ngā Kairoro - whakahaere / whakatika me whakahohe hoki."
   to_access_the_mastery_tab_the_outcome_mastery_scal_46ae1c5b: "Ki te whakauru te Mātatau ripa, te Putanga Mātatau Tauine - tāpiri / whakatika whakaaetanga me whakahohe hoki. Ki te whakauru te Whakahaere ripa, te Putanga Ako - tāpiri / whakatika / muku whakaaetanga me whakahohe hoki."
-  to_access_the_people_page_and_view_course_groups_u_e2dc13eb: "Ki te whakauru i te Tāngata whārangi me te tiro ngā akoranga rōpū, ngā Kaiwhakamahi - tiro rārangi me whakahohe hoki."
+  to_access_the_people_page_and_view_course_groups_u_e2dc13eb: "Ki te whakauru i te Tāngata whārangi me te tiro ngā akoranga rōpū, ngā Kaiwhakamahi - tiro rārangi me whakahohe hoki."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "Hei whakauru ki te Tāngata whārangi me te tiro ngā Rōpū, ngā Kaiwhakamahi- me whakahohe te rārangi tirohanga"
   to_access_the_people_page_users_view_list_must_be__1e9e5d75: "Hei whakauru ki te Tāngata whārangi, ngā Kaiwhakamahi- me whakahohe te rārangi tirohanga. Mehemea kua whakahohetia te Huaki Rehitatanga pūkete tautuhinga, ka taea e ngā kaiwhakamahi me tēnei whakāetanga te tāpiri i ngā ākonga ki te akoranga ma te wāhitau īmēra mehemea kāore i te kaiwhakamahi he pūkete Canvas. Hei tiro SIS IDs, SIS Raraunga – me whakahohe a pānui. Hei tāpiri i tētahi kaiwhakamahi ki te akoranga ma te SIS ID, SIS Raraunga- me whakahohetia hoki te whakahaere. Hei whakatika i te wāhanga o ngā ākonga, Ngā Kaiwhakamahi – tiro rārangi me ngā Kōrerorero - me whakahohe te tuku ngā karere ki ngā mema akoranga takitahi. Hei hono atu i tētahi kaitirotiro ki tētahi ākonga, Ngā Kōrerorero - me tuku ngā karere ki ngā mema o te akoranga takitahi kia whakahohetia hoki."
   to_access_the_people_page_users_view_list_must_be__2f01333b: "Hei whakauru ki te Tāngata whārangi, ngā Kaiwhakamahi- me whakahohe te rārangi tirohanga Mehemea kua whakahohetia te whakāetanga, a, mehemea ngā Kaiwhakamahi - tiro te wāhitau īmēra tuatahi kei te monokia, ka kite ngā kaiwhakamahi i ngā wāhitau īmēra whakamahia hei takiuru IDs. Hei tiro i ngā IDs takiuru, Kaiwhakamahi - tāpiri / tango i ngā ākonga i roto i ngā akoranga me ngā Kaiwhakamahi - me tāpiri / tango ngā kaiako, ngā kaitātai akoranga, ngā TAs rānei i roto i ngā akoranga me whakahohetia."
@@ -25869,6 +25982,7 @@ mi:
   to_publish_unpublish_module_content_course_content_efc294d4: "Hei whakaputa me te kaore i te whakaputa te kaupapa ihirangi, Akoranga Ihirangi- tāpiri / whakatika / muku me whakahohetia."
   to_remove_a_user_via_sis_id_sis_data_manage_must_a_5d0f4839: "Hei tango i tētahi kaiwhakamahi ki te akoranga ma te SIS ID, SIS Raraunga – me whakahohetia hoki te whakahaere."
   to_reply_to_a_discussion_discussions_post_must_als_c9654a9b: "Hei whakautu ki tētahi kōrero, ngā Kōrerorero - me whakahohe hoki a whakairi."
+  to_reply_to_a_discussion_discussions_post_must_be__a4cf502a: "Hei whakautu ki tētahi kōrero, ngā Kōrerorero - me whakahohe hoki a whakairi."
   to_restore_a_deleted_course_courses_delete_courses_83c7e64f: "Hei whakaora i tētahi akoranga kua mukua, Ngā Akoranga - muku Akoranga me kore e whakahohetia me Akoranga Ihirangi tiro me whakahohe anō hoki."
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "Hei whakaora i tētahi akoranga kua mukua, Ngā Akoranga - whakaheke me te Akoranga Ihirangi - me whakahohetia ngā mea e rua hoki. kia rua nga mahi."
   to_restore_a_deleted_course_in_an_account_manage_c_3ad933ee: "Hei whakaora i tētahi akoranga kua mukua i roto i te pūkete, Whakahaere ngā Akoranga - muku me te Akoranga Ihirangi - me whakahohetia hoki a tiro."
@@ -26117,6 +26231,8 @@ mi:
       got_it: "Ok, ka te reira "
   track_individual_student_and_class_progress_c13cf2d1: "Aroturuki ākonga takitahi me te anga whakamua o te whakarōpū"
   track_student_performance_and_activity_a92a2a8b: "Whaia ākonga mahi me te mahinga"
+  traditional_gradebook_d7ad59c6: "Tuku iho Pukakōeke..."
+  traditional_gradebook_d90461dc: "Tuku iho Pukakōeke"
   treat_ungraded_as_0_d38c2b41: "Hamani tē kore kōekehia rite 0"
   tree_browser: 
     folder_tree_instructions: "Whakamahia te pātuhi pere ki runga, me te ki raro, ki te whakatere i roto i te rakau. Tika Press ki te whakawhānui i ngā kōpaki, mahue ki te hinga, a tomo ki te whiriwhiri i te tūemi kua tīpakohia."
@@ -26234,6 +26350,7 @@ mi:
   unable_to_delete_assignment_abcf8d62: "Kaore e taea te muku i te whakataunga"
   unable_to_delete_commentbankitem_3a23dc24: "Kaore e taea te muku i te CommentBankItem"
   unable_to_dismiss_update_df1e32eb: "Kāore e taea te tonoa whakahōu"
+  unable_to_drop_the_course_67f112c4: "Kaore e taea te whakataka te akoranga"
   unable_to_fetch_current_microsoft_teams_sync_setti_3ad2f08b: "Kaore e taea te tiki Microsoft Teams Tukutahi o nāianei tautuhinga. Tēna koa kōwhiri i tō hono ipurangi. Mehemea ka haere tonu te raru, tēnā koa whakapā ki tō kaiāwhina."
   unable_to_find_clever_district_district_id_61deb1cb: "Kāore e taea te kitea Clever District %{district_id}"
   unable_to_find_commentbankitem_49a37a60: "Kaore e taea te kite i te CommentBankItem"
@@ -26254,6 +26371,7 @@ mi:
   unable_to_remove_outcomes_f682e68f: 
     one: "Kāore e taea te Tango Putanga"
     other: "Kāore e taea te Tango ngā Putanga"
+  unable_to_save_draft_message_db49a89d: "Kaore e taea te tiaki i te karere tauiria."
   unable_to_save_new_discussion_topic_99239f3f: "kaore e taea te whakaora i tētahi kaupapa kōrerorero hou"
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "Kaore e taea te tuku Karere ...ki ngā kaiwhakamahi i roto %{context_name}"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Kāore e taea te kōeke taunoa no te mea tēnei whakataunga e tika ana roto i te wā kōeke kua katia mō te iti rawa kotahi ākonga"
@@ -26404,6 +26522,7 @@ mi:
   unselected_course_course_89995a83: "Akoranga tīpako kore %{course}"
   unselected_external_tool_tool_1bd68403: "Taputapu ā waho kaore i tīpakohia %{tool}"
   unsplash_ee049fbf: Unsplash
+  unstar_b84daaef: Unstar
   unstar_conversation_45fc43d6: "whakahaere Unstar"
   unstarted_932f2990: "Koare i tīmata"
   unsubscribe_8be438ff: Whakakorea
@@ -27163,6 +27282,7 @@ mi:
   view_grades_8d3bae6c: "Tirohia ngā kōeke"
   view_grades_for_name_45aeb2f2: "Tiro i ngā kōeke mō %{name}"
   view_grading_history_e64bb8fe: "Tirohia hītori māka"
+  view_groups_47b5f60c: "Rōpū Tirohia"
   view_important_dates_173c7e1b: "Tiro Rā Nui"
   view_in_speedgrader_773b9d81: "Tirohia i roto i te SpeedGrader"
   view_learning_analytics_beta_1c98a397: "Titiro Ako Tātaritanga (Beta)"
@@ -27213,7 +27333,9 @@ mi:
   violation_log_491edd84: "Rātaki Takahitanga"
   violation_log_tray_d4eff9f4: "Rātaki Takahitanga Pereki"
   virtual_lectures_in_real_time_a1778dea: "Ngā Kauhau Mariko i roto i te wā-tūturu"
+  visible_assignments_scope_change_dbb84ebb: "Kitea Whakataunga Hōkai Huringa"
   visit_864b4060: Tirohia
+  visit_canvas_guides_to_learn_more_8c7361ad: "To *Canvas Kaiārahi* ki te ako nui atu."
   visit_google_meet_ebdaf94f: "Toro ki Google Hono"
   visit_group_group_name_7a816081: "Rōpū Tirohia %{group_name}"
   visit_zoom_14636084: "Toro Topa"
@@ -27322,6 +27444,7 @@ mi:
   what_assignment_types_can_i_create_in_a_course_1ed4eed4: "He aha ngā momo whakataunga ka taea e ahau te hunga i roto i te akoranga?"
   what_does_provisioning_only_mean_eac9a4a1: "E aha te tikanga Whakarato Anake?"
   what_happened_322d8259: "He aha te mahi?"
+  what_it_does_74ec1339: "He aha te mahi"
   what_it_does_c158cc83: "HE AHA TE MAHI"
   what_it_does_d4debc07: "He aha te Mahi"
   what_layout_options_are_available_in_the_course_ho_5d364ce3: "He aha ngā kōwhiringa whakatakoto e wātea ana i roto i te Akoranga Kainga Whārangi hei kaitohutohu?"
@@ -27339,6 +27462,9 @@ mi:
   when_disabled_students_can_still_send_individual_m_567a911c: "Ina monokia, ka taea tonu e ngā ākonga te tuku ngā karere ki ngā kaiako akoranga, ngā TAs akoranga, me ngā ākonga e hono ana ki ngā pūkete - taumata röpü."
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "A, no te whakahohea, ka taea e te tukuake ao kōnae JavaScript me CSS i roto i te *%{t_theme_editor} *."
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "I te wā e whakahohe ka whakahekeheke te Poto Karere Ratonga (SMS)."
+  when_enabled_this_flag_shows_a_join_button_on_canv_c6f162ea: |-
+      I te wā e whakahohea, ko tēnei haki ka whakaatu he "Hono" pātene i runga i Canvas maramat
+      tauwhāinga i roto i te ākonga maramataka
   when_enabled_turns_on_mention_functionality_in_cou_ae490b21: "I te wā e whakahohe whakakā i runga \"@mention\" whakamahi i roto i ngā kōrerorero akoranga."
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "I te wā e huna ana i ngā kōeke mo ngā whakataunga kore ingoa, ka hunaia ngā kōeke mō ngā tāngata katoa i roto i te akoranga Te kore ingoa ke tono anō"
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "Ki te tae mai he manuhiri ki te kaupapa, ko tēnei te whārangi ka kitea e rātou. Ka tāea e koe te whakarite kia wātea tā rātou kite i te au mahi, he rārangi ngohe-ā-kaupapa, te marautanga, ka tāea rānei e koe te whakarite i tētahi whārangi motuhake. Ko te au mahi kaupapa te whakaritenga aunoa."
@@ -27521,6 +27647,9 @@ mi:
     cannot_update_published: "E kore e whakāetia e koe ki te whakahou i te kāwanatanga whakaputaina o tēnei whārangi wiki"
     cannot_update_title: "E kore e whakāetia e koe ki te whakahou i te taitara o tēnei whārangi wiki"
     invalid_editing_roles: "He muhu te tūranga whakatika whakaratohia"
+  will_allow_for_saving_drafts_as_students_type_thei_aa08586: |-
+      Ka whakaae te tiaki tauira i te wā e mahi ai ngā ākonga i a rātou whakautu ki te kaupapa kōrero
+      i roto i ngā kōrerorero whakahou
   will_credentials_issued_by_this_key_be_presented_t_68faff8c: "Ka tukuna ngā taipitopito tuakiri i tēnei kī ki te Canvas ara ki te ratonga ōrite (hei tauira Canvas Raraunga)?"
   will_keep_the_average_of_all_your_scores_d7e6b733: "E mau ki te toharite o tō kaute katoa"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "E mau ki te rawa o tō kaute katoa"
@@ -27684,6 +27813,7 @@ mi:
   you_can_t_edit_this_rubric_either_because_you_don__5247d35d: "Kaore e taea te whakatika tēnei rubric, ngā te mea kaore koe e whakaaetia ara kei te whakamahia rānei i roto i te wāhi nui atu i te kotahi wāhi. He whakarerekētanga e mahia ana e koe ka puta he hua i roto i te rubric hou. He paearu putanga hoahoa ka whakamahia te akoranga rangatira tauine. Haere tonu?"
   you_can_t_edit_this_rubric_either_because_you_don__ab22f243: "Kaore e taea te whakatika tēnei rubric, ngā te mea kaore koe e whakaaetia ara kei te whakamahia rānei i roto i te wāhi nui atu i te kotahi wāhi. He whakarerekētanga e mahia ana e koe ka puta he hua i roto i te rubric hou. He paearu putanga hoahoa ka whakamahia te pūkete rangatira tauine Haere tonu?"
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Kaore e taea te whakatika tēnei rubric, ngā te mea kaore koe e whakaaetia ara kei te whakamahia rānei i roto i te wāhi nui atu i te kotahi wāhi. He whakarerekētanga e mahia ai e koe ka puta te hua i roto i te rubric hou i runga i te rubric tawhito. Haere tonu?"
+  you_can_t_submit_an_assignment_when_it_is_unpublis_6c2c0b2f: "E kore e taea e koe te tuku whakataunga kaore anō i pānuitia"
   you_can_try_to_log_in_again_2b23ef0f: "Ka taea e tamata e koe ki te * takiuru anō *."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Ka taea e koe te whakahou i etahi o ngā mōhiohio o tenei kaiwhakamahi, engari ka taea e ratou te huri i te reira hoki ki te whiriwhiri ratou."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Ka taea e koe te whakamahi i te 16x16, 32x32, kōnae 48x48 ico kotahi."
