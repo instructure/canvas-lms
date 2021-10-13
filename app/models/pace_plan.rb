@@ -50,6 +50,11 @@ class PacePlan < ActiveRecord::Base
     state :deleted
   end
 
+  set_policy do
+    given { |user, session| self.course.grants_right?(user, session, :manage) }
+    can :read
+  end
+
   def valid_secondary_context
     if course_section_id.present? && user_id.present?
       self.errors.add(:base, "Only one of course_section_id and user_id can be given")
