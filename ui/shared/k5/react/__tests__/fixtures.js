@@ -102,6 +102,7 @@ export const MOCK_CARDS = [
     isHomeroom: false,
     isK5Subject: true,
     canManage: true,
+    canReadAnnouncements: true,
     published: true
   },
   {
@@ -116,6 +117,7 @@ export const MOCK_CARDS = [
     isHomeroom: true,
     isK5Subject: false,
     canManage: true,
+    canReadAnnouncements: true,
     published: false
   },
   {
@@ -130,6 +132,7 @@ export const MOCK_CARDS = [
     isHomeroom: false,
     isK5Subject: true,
     canManage: true,
+    canReadAnnouncements: true,
     published: true
   }
 ]
