@@ -127,6 +127,10 @@ export const resolveAuthorRoles = (isAuthor, discussionRoles) => {
   if (isAuthor && discussionRoles) {
     return discussionRoles.concat('Author')
   }
+
+  if (isAuthor && !discussionRoles) {
+    return ['Author']
+  }
   return discussionRoles
 }
 
