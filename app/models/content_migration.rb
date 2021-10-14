@@ -280,6 +280,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def add_warning(user_message, opts = {})
+    Rails.logger.warn("Migration warning: #{user_message}: #{opts.inspect}")
     if !opts.is_a? Hash
       # convert deprecated behavior to new
       exception_or_info = opts
