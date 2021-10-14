@@ -126,6 +126,15 @@ describe('ComposeModalContainer', () => {
     })
   })
 
+  describe('Media', () => {
+    it('opens the media upload modal', async () => {
+      const container = setup()
+      const mediaButton = await container.findByTestId('media-upload')
+      fireEvent.click(mediaButton)
+      expect(await container.findByText('Upload Media')).toBeInTheDocument()
+    })
+  })
+
   describe('Subject', () => {
     it('allows setting the subject', async () => {
       const {findByTestId} = setup()
