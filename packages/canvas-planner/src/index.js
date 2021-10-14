@@ -32,7 +32,8 @@ import {
   loadFutureItems,
   loadThisWeekItems,
   startLoadingAllOpportunities,
-  toggleMissingItems
+  toggleMissingItems,
+  reloadWithObservee
 } from './actions'
 import {registerScrollEvents} from './utilities/scrollUtils'
 import {initialize as initializeAlerts} from './utilities/alertUtils'
@@ -363,4 +364,15 @@ export function preloadInitialItems() {
   if (store.getState().weeklyDashboard) {
     store.dispatch(preloadSurroundingWeeks())
   }
+}
+
+// Call with student id and student's context codes to load planner scoped to
+// one of an observer's students
+export function reloadPlannerForObserver(observeeId, contextCodes) {
+  if (!initializedOptions)
+    throw new Error('initializePlanner must be called before reloadPlannerForObserver')
+  if (!store.getState().weeklyDashboard)
+    throw new Error('reloadPlannerForObserver is only supported in weekly dashboard mode')
+
+  store.dispatch(reloadWithObservee(observeeId, contextCodes))
 }

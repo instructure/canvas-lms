@@ -71,6 +71,7 @@ import ObserverOptions, {
 import GroupsPage from '@canvas/k5/react/GroupsPage'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {savedObservedId} from '@canvas/k5/ObserverGetObservee'
 
 const HERO_ASPECT_RATIO = 5
 const HERO_STICKY_HEIGHT_PX = 100
@@ -418,8 +419,13 @@ export function K5Course({
   parentSupportEnabled,
   observerList,
   selfEnrollment,
-  tabContentOnly
+  tabContentOnly,
+  currentUserRoles
 }) {
+  const initialObservedId = observerList.find(o => o.id === savedObservedId(currentUser.id))
+    ? savedObservedId(currentUser.id)
+    : undefined
+
   const renderTabs = toRenderTabs(tabs, hasSyllabusBody)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, renderTabs)
   const [tabsRef, setTabsRef] = useState(null)
@@ -428,7 +434,9 @@ export function K5Course({
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
     focusFallback: tabsRef,
     callback: () => loadAllOpportunities(),
-    singleCourse: true
+    singleCourse: true,
+    observedUserId: initialObservedId,
+    isObserver: currentUserRoles.includes('observer')
   })
 
   /* Rails renders the modules partial into #k5-modules-container. After the first render, we hide that div and
@@ -440,7 +448,7 @@ export function K5Course({
   const tabsPaddingRef = useRef(null)
   const [modulesExist, setModulesExist] = useState(true)
   const [windowSize, setWindowSize] = useState(() => getWindowSize())
-  const [observedUserId, setObservedUserId] = useState(null)
+  const [observedUserId, setObservedUserId] = useState(initialObservedId)
   const showObserverOptions =
     parentSupportEnabled && shouldShowObserverOptions(observerList, currentUser)
   useEffect(() => {
@@ -591,6 +599,8 @@ export function K5Course({
           userHasEnrollments
           visible={currentTab === TAB_IDS.SCHEDULE}
           singleCourse
+          observedUserId={observedUserId}
+          contextCodes={[`course_${id}`]}
         />
         {currentTab === TAB_IDS.GRADES && (
           <GradesPage
@@ -661,7 +671,8 @@ K5Course.propTypes = {
   parentSupportEnabled: PropTypes.bool.isRequired,
   observerList: ObserverListShape.isRequired,
   selfEnrollment: PropTypes.object,
-  tabContentOnly: PropTypes.bool
+  tabContentOnly: PropTypes.bool,
+  currentUserRoles: PropTypes.array.isRequired
 }
 
 const WrappedK5Course = connect(mapStateToProps, {
