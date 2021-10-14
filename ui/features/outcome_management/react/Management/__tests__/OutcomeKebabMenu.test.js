@@ -63,11 +63,25 @@ describe('OutcomeKebabMenu', () => {
     expect(getByText('Move')).toBeInTheDocument()
   })
 
-  it('renders View Description in Kebab menu if a groupDescription is provided and menu button clicked', () => {
-    const {getByText} = render(<OutcomeKebabMenu {...defaultProps({groupDescription: ''})} />)
+  it('renders View Description in Kebab menu if a isGroup is provided and menu button clicked', () => {
+    const {getByText} = render(<OutcomeKebabMenu {...defaultProps({isGroup: true})} />)
     const menuButton = getByText(groupMenuTitle)
     fireEvent.click(menuButton)
     expect(getByText('View Description')).toBeInTheDocument()
+  })
+
+  it('does not render Add Outcomes in Kebab menu if a isGroup is not provided and menu button clicked', () => {
+    const {queryByText} = render(<OutcomeKebabMenu {...defaultProps()} />)
+    const menuButton = queryByText(groupMenuTitle)
+    fireEvent.click(menuButton)
+    expect(queryByText('Add Outcomes')).not.toBeInTheDocument()
+  })
+
+  it('renders Add Outcomes in Kebab menu if a isGroup is provided and menu button clicked', () => {
+    const {getByText} = render(<OutcomeKebabMenu {...defaultProps({isGroup: true})} />)
+    const menuButton = getByText(groupMenuTitle)
+    fireEvent.click(menuButton)
+    expect(getByText('Add Outcomes')).toBeInTheDocument()
   })
 
   describe('with Kebab menu open', () => {
@@ -101,8 +115,20 @@ describe('OutcomeKebabMenu', () => {
       expect(onMenuHandlerMock.mock.calls[0][1]).toBe('move')
     })
 
+    it('handles click on Add Outcomes item', () => {
+      const {getByText} = render(<OutcomeKebabMenu {...defaultProps({isGroup: true})} />)
+      const menuButton = getByText(groupMenuTitle)
+      fireEvent.click(menuButton)
+      const menuItem = getByText('Add Outcomes')
+      fireEvent.click(menuItem)
+      expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
+      expect(onMenuHandlerMock.mock.calls[0][1]).toBe('add_outcomes')
+    })
+
     it('handles click on View Description item', () => {
-      const {getByText} = render(<OutcomeKebabMenu {...defaultProps({groupDescription: 'desc'})} />)
+      const {getByText} = render(
+        <OutcomeKebabMenu {...defaultProps({isGroup: true, groupDescription: 'desc'})} />
+      )
       const menuButton = getByText(groupMenuTitle)
       fireEvent.click(menuButton)
       const menuItem = getByText('View Description')
@@ -112,14 +138,18 @@ describe('OutcomeKebabMenu', () => {
     })
 
     it('disables View Description if groupDescription is null', () => {
-      const {getByText} = render(<OutcomeKebabMenu {...defaultProps({groupDescription: null})} />)
+      const {getByText} = render(
+        <OutcomeKebabMenu {...defaultProps({isGroup: true, groupDescription: null})} />
+      )
       fireEvent.click(getByText(groupMenuTitle))
       fireEvent.click(getByText('View Description'))
       expect(onMenuHandlerMock).not.toHaveBeenCalled()
     })
 
     it('disables View Description if groupDescription is an empty string', () => {
-      const {getByText} = render(<OutcomeKebabMenu {...defaultProps({groupDescription: ''})} />)
+      const {getByText} = render(
+        <OutcomeKebabMenu {...defaultProps({isGroup: true, groupDescription: ''})} />
+      )
       fireEvent.click(getByText(groupMenuTitle))
       fireEvent.click(getByText('View Description'))
       expect(onMenuHandlerMock).not.toHaveBeenCalled()
@@ -127,7 +157,9 @@ describe('OutcomeKebabMenu', () => {
 
     it('disables View Description if groupDescription is an HTML with only spaces', () => {
       const {getByText} = render(
-        <OutcomeKebabMenu {...defaultProps({groupDescription: '<div><p>   </p></div>'})} />
+        <OutcomeKebabMenu
+          {...defaultProps({isGroup: true, groupDescription: '<div><p>   </p></div>'})}
+        />
       )
       fireEvent.click(getByText(groupMenuTitle))
       fireEvent.click(getByText('View Description'))
@@ -137,7 +169,10 @@ describe('OutcomeKebabMenu', () => {
     it('disables View Description if groupDescription is an HTML with only &nbsp;', () => {
       const {getByText} = render(
         <OutcomeKebabMenu
-          {...defaultProps({groupDescription: '<div><p>&nbsp;&nbsp;&nbsp;</p></div>'})}
+          {...defaultProps({
+            isGroup: true,
+            groupDescription: '<div><p>&nbsp;&nbsp;&nbsp;</p></div>'
+          })}
         />
       )
       fireEvent.click(getByText(groupMenuTitle))

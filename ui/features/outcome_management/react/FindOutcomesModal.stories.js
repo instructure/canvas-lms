@@ -76,3 +76,11 @@ Query.args = {
   // Allow control of only the result data
   response: findModalMocks()[0].result.data
 }
+
+export const withTargetGroup = Template.bind({})
+withTargetGroup.args = {
+  targetGroup: {
+    _id: '1',
+    title: 'Group Name'
+  }
+}

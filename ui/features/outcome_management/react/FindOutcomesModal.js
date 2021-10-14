@@ -39,7 +39,7 @@ import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import GroupActionDrillDown from './shared/GroupActionDrillDown'
 import useOutcomesImport from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
-const FindOutcomesModal = ({open, onCloseHandler}) => {
+const FindOutcomesModal = ({open, onCloseHandler, targetGroup}) => {
   const {isMobileView, isCourse, rootOutcomeGroup, rootIds} = useCanvasContext()
   const [showOutcomesView, setShowOutcomesView] = useState(false)
   const [scrollContainer, setScrollContainer] = useState(null)
@@ -106,6 +106,15 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
   }, [open, setHasAddedOutcomes])
 
   const onAddAllHandler = () => {
+    const callImportApiToGroup = () => {
+      importOutcomes({
+        targetGroupId: targetGroup?._id,
+        targetGroupTitle: targetGroup?.title,
+        outcomeOrGroupId: selectedGroupId,
+        groupTitle: group.title
+      })
+    }
+
     if (isCourse && !isConfirmBoxOpen && group.outcomesCount > 50) {
       blurAddAllBtn()
       blurDoneBtn()
@@ -113,7 +122,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       showImportConfirmBox({
         count: group.outcomesCount,
         onImportHandler: () => {
-          importOutcomes(selectedGroupId, group.title)
+          callImportApiToGroup()
           closeConfirmBox()
           focusDoneBtn()
         },
@@ -123,9 +132,28 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
         }
       })
     } else {
-      importOutcomes(selectedGroupId, group.title)
+      callImportApiToGroup()
     }
   }
+
+  const importSingleOutcomeHandler = (outcomeId, sourceContextId, sourceContextType) => {
+    importOutcomes({
+      outcomeOrGroupId: outcomeId,
+      isGroup: false,
+      targetGroupId: targetGroup?._id,
+      targetGroupTitle: targetGroup?.title,
+      sourceContextId,
+      sourceContextType
+    })
+  }
+
+  const modalLabel = targetGroup
+    ? I18n.t('Add Outcomes to "%{groupName}"', {
+        groupName: targetGroup.title
+      })
+    : isCourse
+    ? I18n.t('Add Outcomes to Course')
+    : I18n.t('Add Outcomes to Account')
 
   const findOutcomesView = (
     <FindOutcomesView
@@ -141,7 +169,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       loadMore={loadMore}
       mobileScrollContainer={scrollContainer}
       importOutcomesStatus={importOutcomesStatus}
-      importOutcomeHandler={importOutcomes}
+      importOutcomeHandler={importSingleOutcomeHandler}
       shouldFocusAddAllBtn={shouldFocusAddAllBtn}
     />
   )
@@ -184,8 +212,9 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       onDismiss={onCloseModalHandler}
       shouldReturnFocus
       size="fullscreen"
-      label={isCourse ? I18n.t('Add Outcomes to Course') : I18n.t('Add Outcomes to Account')}
+      label={modalLabel}
       shouldCloseOnDocumentClick={false}
+      data-testid="find-outcomes-modal"
     >
       <Modal.Body padding={isMobileView ? '0' : '0 small small'}>
         {!isMobileView ? (
@@ -283,7 +312,11 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
 
 FindOutcomesModal.propTypes = {
   open: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired,
+  targetGroup: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired
+  })
 }
 
 export default FindOutcomesModal
