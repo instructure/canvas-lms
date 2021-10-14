@@ -2343,6 +2343,7 @@ nn:
   an_auto_generated_chronological_summary_of_your_co_eeafee13: "Ein auto-generert kronologisk oppsummering av emnet ditt"
   an_error_occured_please_try_again_e59b65b: "Det oppstod ein feil. Prøv på nytt seinare."
   an_error_occured_saving_the_assignment_d71cb3d2: "Det oppstod ein feil under lagring av oppgåve"
+  an_error_occured_updating_the_flag_7df5de0a: "Ein feil oppstod ved oppdatering av flagget "
   an_error_occured_while_deleting_the_grading_period_81bb16e5: "Det oppstod eit problem under sletting av settet med karaktersetjingsperiodar"
   an_error_occured_while_deleting_the_grading_period_c8343484: "Det oppstod eit problem under sletting av karaktersetjingsperioden"
   an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "Det oppstod eit problem under importeringa av påmeldingssemester. "
@@ -2679,6 +2680,7 @@ nn:
   are_you_sure_you_want_to_display_grades_for_this_a_c1c618c6: "Er du sikker på at du vil vise vurderingane for denne oppgåva til studentane?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Er du sikker på at du vil gjennomføre dette? Det kan ikkje angrast og overstyrer eksisterande vurderingar i vurderingsoversikta."
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Er du sikker på at du vil vise vurderingane for denne oppgåva til studentane? "
+  are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Er du sikker på at du vil halde fram? Endringar du har gjort vil ikkje bli lagra."
   are_you_sure_you_want_to_publish_this_comment_26989c2f: "Er du sikker på at du vil publisere denne kommentaren?"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Er du sikker på at du vil fjerne karaktersetjingsperioden?"
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Er du sikker på at du vil fjerne dette elementet? "
@@ -6149,6 +6151,7 @@ nn:
   course_cards_6029a05c: Emnekort
   course_catalog_4cc7c8ce: Emnekatalog
   course_collaborations_dadb327e: Emnesamarbeid
+  course_concluded_unable_to_send_messages_b99b6b6d: "Emnet er avslutta, så du kan ikkje sende meldingar "
   course_conferences_3d914c96: Emnekonferansar
   course_content_a92eca20: Emneinnhald
   course_content_add_edit_delete_ea877eca: "Emneinnhald - legg til / rediger / slett"
@@ -8333,6 +8336,7 @@ nn:
   enabled_by_default_e530d6ed: "Slått på som standard"
   enabled_links_be110215: "Aktiverte lenker"
   enabled_locked_3cf7c256: "Aktivert (låst)"
+  enabled_unlocked_8d3a5df7: "Slått på (opplåst)"
   enabled_web_services_f620b2be: "Aktiverte nettenester"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Aktiverer vising av plagieringsrapportar for likskapsresultat i innleveringsmenyen til ny vurderingsoversikt."
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Aktiverer nye API-sluttpunkt for emne- og brukardata som kjem frå New Analytics."
@@ -9279,6 +9283,8 @@ nn:
   germany_49_fc5b8179: "Tyskland (+49)"
   germany_b02d91c9: Tyskland
   get_started_b9507525: "Kom i gang"
+  get_started_by_finding_importing_or_creating_your__380b6cfb: "Begynn med å finne, importere eller lage læringsmål for kontoen."
+  get_started_by_finding_importing_or_creating_your__6b62c1d9: "Begynn med å finne, importere eller lage læringsmål for emnet."
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Få følgande frå tilknytt Salesforce-app"
   get_the_sis_file_for_sections_98fcef03: "Hent SIS-fil for seksjonar"
   get_the_sis_file_for_users_36ba0cd: "Hent SIS-fil for brukarar"
@@ -11163,6 +11169,7 @@ nn:
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "Bildet har berre ein dekorativ funksjon og lesast ikkje av skjermlesarar"
   indigo_2035fc55: Indigo
   individual_assignment_grade_posting_d8322b99: "Postar vurderingar for individuelle oppgåver"
+  individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Kan ikkje endre poeng for individuelle meistringsmål."
   individual_view_81c2f124: "Individuell vising"
   individual_view_d60b9132: "Individuell vising..."
   indonesia_62_4c35bd62: "Indonesia (+62)"
@@ -11345,6 +11352,7 @@ nn:
   invalid_points_8e929c3f: "Ugyldige poeng"
   invalid_points_possible: "Verdien av moglege poeng for denne oppgåva må vere null eller høgare."
   invalid_recipient_name_56b22b86: "Ugyldig namn på mottakar."
+  invalid_recipients_5fd7c594: "Ugyldige mottakarar"
   invalid_restrictions_316cd740: "Ugyldig restriksjon"
   invalid_score_3d247da7: "Ugyldig resultat"
   invalid_sis_sync_status_b68db497: "Ugyldig SIS-synkroniseringsstatus"
@@ -14387,6 +14395,7 @@ nn:
   no_content_has_been_added_f36bab43: "* Innhald er ikkje lagt til"
   no_content_has_been_shared_with_you_667fde6c: "Ingen innhald er delt med deg."
   no_content_not_visible_to_students_b59f4867: "Utan innhald. Ikkje synleg for studentar"
+  no_context_found_for_the_following_context_code_co_a2f6a1a7: "Kan ikkje finne kontekst for denne koden: %{context_code}"
   no_courses_favorited_4e69fd63: "Ingen emne er favorittmerka"
   no_courses_found_12d68a74: "Finn ikkje emne"
   no_date_bfeb2df7: "Ingen dato"
@@ -15215,6 +15224,8 @@ nn:
   outcomes_csv_format_9005acfb: "Læringsmål CSV-format"
   outcomes_d1b18d33: Læringsmål
   outcomes_for_student_9f91d4d: "Læringsmål for student"
+  outcomes_have_not_been_added_to_this_account_yet_908ade88: "Det er ikkje lagt til læringsmål for denne kontoen enno."
+  outcomes_have_not_been_added_to_this_course_yet_7b761b8c: "Det er ikkje lagt til læringsmål for dette emnet enno."
   outcomes_import_completed_baff5cb0: "Import av læringsmål ferdig"
   outcomes_import_failed_77efcdf4: "Import av læringsmål mislukkast"
   outcomes_report_8887bd49: Læringsmålrapport
@@ -17872,6 +17883,7 @@ nn:
       one: "1 klasse"
       other: "%{count} seksjonar"
   recipients_a69b5e55: "Mottakarar:"
+  recipients_restricted_by_role_22c4c843: "Mottakarar avgrensa av rolle "
   record_7c9448b: "Spel inn"
   record_an_audio_or_video_comment_88425add: "Spel inn ein lyd- eller videokommentar"
   record_audio_14666880: "Spel inn lyd"
@@ -20042,6 +20054,7 @@ nn:
   student_context_cards_376d2072: Studentkontekstkort
   student_context_cards_must_be_enabled_for_an_accou_f194b7c4: "Studentkontekstkort må vere aktivert på kontonivå av ein admin. Dersom løyvet ikkje er slått på, kan brukarar framleis sjå studentkontekstkort i vurderingsoversikta. "
   student_context_cards_must_be_enabled_for_an_accou_f84169cb: "Studentkontekstkort må vere slått på for ein konto av ein admin."
+  student_course_progress_600f0b86: "Studenten sin framgang i emnet."
   student_current_grades_afec68c8: "Studenten sine vurderingar"
   student_current_grades_report_base_86b5962a: "Studenten sine vurderingar - rapportbase"
   student_details_49901ceb: Studentdetaljar
@@ -20241,10 +20254,12 @@ nn:
     errors: 
       assignment_submit_fail: "Kan ikkje levere oppgåve"
       can_not_submit_locked_assignment: "Du kan ikkje levere ei oppgåve når ho er låst"
+      googld_drive_timeout: "Google drive brukte for lang tid på å svare"
       invalid_file_type: "Ugyldig filtype"
       invalid_google_docs_domain: "Du kan ikkje levere oppgåver frå dette google_docs-domenet"
       media_file_attached: "Det var ingen medieopptak i innleveringa"
       no_attached_file: "Du må legge ved minst ei fil i oppgåva"
+      no_attachment_found: "Kunne ikkje finne eit vedlegg å sende til Google drive"
       no_report: "Finn ikkje ein rapport for innleveringa"
     errors_update_failed: "Oppdatering mislukkast"
     finished_redirecting: "Fullført.  Omdirigerer til fil..."
@@ -20649,6 +20664,7 @@ nn:
       til emnet ditt. På forsida kan du vise deltaking og aktivitetstraumen
       til emnet, moduloversikta, oppgåvelista, emneoversikta
       eller ei innhaldsside du sjølv har laga og definert som forside.
+  the_course_id_to_report_on_eb4ad5d2: "ID for emnet rapporten er for"
   the_course_link_validator_searches_course_content__563fa215: "Lenkesjekkeren søker gjennom alt emneinnhald etter ugyldige eller utilgjengelege lenker og bilder. "
   the_course_link_validator_searches_through_course__76f0bc63: "Emnekoplingsvalidatoren søker i emneinnhaldet og returnerer alle lenker som er ugyldige eller ikkje responderer. Merk at nokre av koblingane som merkast som ikkje responsive kun er utilgjengeleg frå våre serverar og vil fortsatt vere gyldig for studentar."
   the_course_state_manage_permission_allows_users_to_67e16652: "Løyvet 'Emnestatus - administrer' tillet brukarar å publisere emne som ikkje inneheld modular. For å publisere/avpublisere modulinnhald, må 'Emneinnhald - legg til / endre / slett' vere slått på."
@@ -20757,6 +20773,7 @@ nn:
       emnesamandrag. Emneoversikta kan òg vise alle oppgåvefristar og kalenderhendingar
       i emnet.
   the_term_for_grade_export_data_d55a6be7: "Semester for eksport av vurderingsdata"
+  the_term_id_to_report_on_4479d2fc: "ID for terminen rapporten er for."
   the_term_to_get_courses_from_f6af2678: "Semester å hente emne frå"
   the_term_to_report_on_5f586e7c: "Semesteret som rapporten gjeld for"
   the_term_to_report_on_needed_for_report_type_stude_623bffbc: "Semesteret som rapporten gjeld for (for rapporttype kun student)"
@@ -20766,6 +20783,7 @@ nn:
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "ID-en som blir brukt for å vise den spesifikke syklusen for førespurnad/respons som feilrapporten oppstod i"
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "URL-adressa ein privilegert brukar kan bruke til å opptre som rapporteringsbrukaren på same sida, for å prøve å gjenskape problemet"
   the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "URL-adressa til sida brukaren var på då feilen blei rapportert"
+  the_user_id_to_report_on_b1de2577: "ID for brukaren rapporten er for"
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "Brukaren må vere påmeld som faglærar i emna dei vil kryssliste."
   the_user_to_report_on_820dea8a: "Brukaren som rapporten gjeld for"
   the_value_of_possible_points_for_this_assignment_c_42396e3: "Verdien av moglege poeng for denne oppgåva kan ikkje vere meir enn 999999999 poeng."
@@ -21537,6 +21555,7 @@ nn:
   tolerance_value_9e96573c: Toleranseverdi
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "For mange påloggingsforsøk. Prøv på nytt seinare eller ta kontakt med systemadministrator."
   too_many_members_b8b15069: "For mange medlemmar"
+  too_many_recipients_for_group_conversation_906a4b69: "For mange mottakarar for ei gruppesamtale "
   tool_configuration_63cd43b0: Verktøykonfigurasjon
   tool_content_2924d18f: Verktøyinnhald
   tool_content_e699e813: Verktøyinnhald
@@ -21652,6 +21671,7 @@ nn:
   unable_to_load_lti_1_3_tools_cf169f9: "Kunne ikkje laste LTI 1.3-verktøy"
   unable_to_remove_app_4293cb53: "Kan ikkje fjerne app"
   unable_to_save_new_discussion_topic_99239f3f: "kan ikkje lagre nytt diskusjonsemne"
+  unable_to_send_messages_to_users_in_context_name_7d6997b6: "Kan ikkje sende meldingar til brukarar in %{context_name}"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Ikkje mogleg å sette standardkarakter fordi innleveringsfristen for oppgåva ligg innanfor ein lukka vurderingsperiode for minst ein student"
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Kunne ikkje aktivere dra-og-slipp for modular"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Kan ikkje overføre fil til lagringsteneste. Tenesta kan vere nede eller du må logge inn i Canvas på nytt."
