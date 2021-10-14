@@ -121,8 +121,13 @@ export const DiscussionPostToolbar = props => {
             <Flex.Item margin={responsiveProps.dividingMargin} shouldShrink>
               <Flex>
                 {/* Groups */}
-                {props.childTopics && (
-                  <Flex.Item margin="0 small 0 0" overflowY="hidden" overflowX="hidden">
+                {props.childTopics?.length && (
+                  <Flex.Item
+                    data-testid="groups-menu-button"
+                    margin="0 small 0 0"
+                    overflowY="hidden"
+                    overflowX="hidden"
+                  >
                     <GroupsMenu width="10px" childTopics={props.childTopics} />
                   </Flex.Item>
                 )}
