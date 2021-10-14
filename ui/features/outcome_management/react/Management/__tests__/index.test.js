@@ -23,6 +23,7 @@ import React from 'react'
 import {createCache} from '@canvas/apollo'
 import OutcomeManagementPanel from '../index'
 import OutcomesContext, {ACCOUNT_GROUP_ID} from '@canvas/outcomes/react/contexts/OutcomesContext'
+import {clickWithPending} from '@canvas/outcomes/react/helpers/testHelpers'
 import {
   accountMocks,
   courseMocks,
@@ -412,22 +413,6 @@ describe('OutcomeManagementPanel', () => {
     expect(queryByText('Move "Outcome 1 - Course folder 0"')).not.toBeInTheDocument()
   })
 
-  it('hides the Outcome Menu if the user doesnt have permission to edit the outcome', async () => {
-    const {getByText, queryByText} = render(<OutcomeManagementPanel />, {
-      contextType: 'Course',
-      contextId: '2',
-      mocks: [
-        ...courseMocks({childGroupsCount: 2}),
-        ...groupMocks({groupId: '200'}),
-        ...groupDetailMocks({groupId: '200', contextType: 'Course', contextId: '2', canEdit: false})
-      ]
-    })
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Course folder 0'))
-    await act(async () => jest.runOnlyPendingTimers())
-    expect(queryByText('Menu for outcome Outcome 1 - Course folder 0')).not.toBeInTheDocument()
-  })
-
   it('should not disable search input and clear search button (X) if there are no results', async () => {
     const {getByText, getByLabelText, queryByTestId} = render(<OutcomeManagementPanel />, {
       ...groupDetailDefaultProps
@@ -477,6 +462,84 @@ describe('OutcomeManagementPanel', () => {
     fireEvent.change(searchInput, {target: {value: 'Outcome 1'}})
     await act(async () => jest.advanceTimersByTime(500))
     expect(getByText('1 Outcome')).toBeInTheDocument()
+  })
+
+  describe('With manage_outcomes permission / canManage true', () => {
+    it('displays outcome kebab menues', async () => {
+      const {getByText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      await clickWithPending(getByText('Course folder 0'))
+      expect(getByText('Menu for outcome Outcome 1 - Course folder 0')).toBeInTheDocument()
+      expect(getByText('Menu for outcome Outcome 2 - Course folder 0')).toBeInTheDocument()
+    })
+
+    it('displays outcome checkboxes', async () => {
+      const {getByText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      await clickWithPending(getByText('Course folder 0'))
+      expect(getByText('Select outcome Outcome 1 - Course folder 0')).toBeInTheDocument()
+      expect(getByText('Select outcome Outcome 2 - Course folder 0')).toBeInTheDocument()
+    })
+
+    it('enables users to bulk select and move outcomes', async () => {
+      const {getByText, getByRole, getAllByText, queryByText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps,
+        mocks: [
+          ...defaultMocks,
+          moveOutcomeMock({
+            groupId: '201'
+          })
+        ]
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      await clickWithPending(getByText('Course folder 0'))
+      expect(getByText('Outcome 1 - Course folder 0')).toBeInTheDocument()
+      fireEvent.click(getByText('Select outcome Outcome 1 - Course folder 0'))
+      fireEvent.click(getByText('Select outcome Outcome 2 - Course folder 0'))
+      await clickWithPending(getAllByText('Move')[getAllByText('Move').length - 1])
+      // Move Outcomes Modal
+      await clickWithPending(within(getByRole('dialog')).getByText('Back'))
+      await clickWithPending(within(getByRole('dialog')).getByText('Course folder 1'))
+      await clickWithPending(within(getByRole('dialog')).getByText('Move'))
+      expect(queryByText('Outcome 1 - Course folder 0')).not.toBeInTheDocument()
+      expect(queryByText('Outcome 2 - Course folder 0')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Without manage_outcomes permission / canManage false', () => {
+    it('hides outcome kebab menues', async () => {
+      const {getByText, queryByText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps,
+        canManage: false
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      await clickWithPending(getByText('Course folder 0'))
+      expect(queryByText('Menu for outcome Outcome 1 - Course folder 0')).not.toBeInTheDocument()
+      expect(queryByText('Menu for outcome Outcome 2 - Course folder 0')).not.toBeInTheDocument()
+    })
+
+    it('hides outcome checkboxes', async () => {
+      const {getByText, queryByText} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps,
+        canManage: false
+      })
+      await act(async () => jest.runOnlyPendingTimers())
+      await clickWithPending(getByText('Course folder 0'))
+      expect(queryByText('Select outcome Outcome 1 - Course folder 0')).not.toBeInTheDocument()
+      expect(queryByText('Select outcome Outcome 2 - Course folder 0')).not.toBeInTheDocument()
+    })
+
+    it('hides ManageOutcomesFooter', async () => {
+      const {queryByTestId} = render(<OutcomeManagementPanel />, {
+        ...groupDetailDefaultProps,
+        canManage: false
+      })
+      expect(queryByTestId('manage-outcomes-footer')).not.toBeInTheDocument()
+    })
   })
 
   describe('Bulk remove outcomes', () => {
@@ -766,23 +829,6 @@ describe('OutcomeManagementPanel', () => {
       expect(selectedOutcomesLink).toBeDisabled()
       expect(selectedOutcomesLink.getAttribute('aria-expanded')).toBe('false')
       expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
-    })
-  })
-
-  describe('can_manage permissions are false', () => {
-    beforeEach(() => {
-      window.ENV = {
-        PERMISSIONS: {
-          manage_outcomes: false
-        }
-      }
-    })
-
-    it('ManageOutcomesFooter is not displayed', async () => {
-      const {queryByTestId} = render(<OutcomeManagementPanel />, {
-        ...groupDetailDefaultProps
-      })
-      expect(queryByTestId('manage-outcomes-footer')).not.toBeInTheDocument()
     })
   })
 

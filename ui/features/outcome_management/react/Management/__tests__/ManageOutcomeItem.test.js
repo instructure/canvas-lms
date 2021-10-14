@@ -61,7 +61,6 @@ describe('ManageOutcomeItem', () => {
     outcomeContextType: 'Account',
     outcomeContextId: '1',
     isChecked: false,
-    canManageOutcome: true,
     canUnlink: true,
     onMenuHandler: onMenuHandlerMock,
     onCheckboxHandler: onCheckboxHandlerMock,
@@ -141,11 +140,6 @@ describe('ManageOutcomeItem', () => {
     expect(onMenuHandlerMock.mock.calls[0][1]).toBe('remove')
   })
 
-  it('hides checkbox if canManageOutcome is false', () => {
-    const {queryByText} = render(<ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />)
-    expect(queryByText('Select outcome Outcome Title')).not.toBeInTheDocument()
-  })
-
   describe('Kebab menu -> edit option', () => {
     it('enables option if Friendly Description FF is enabled', () => {
       const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
@@ -181,17 +175,31 @@ describe('ManageOutcomeItem', () => {
     })
   })
 
-  describe('With manage_outcomes permisssion', () => {
+  describe('With manage_outcomes permission / canManage true', () => {
     it('displays kebab menu', () => {
       const {queryByText} = render(<ManageOutcomeItem {...defaultProps()} />)
       expect(queryByText('Menu for outcome Outcome Title')).toBeInTheDocument()
     })
 
-    it('displays kebab menu even if canManageOutcome is false', () => {
-      const {queryByText} = render(
-        <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
-      )
-      expect(queryByText('Menu for outcome Outcome Title')).toBeInTheDocument()
+    it('displays checkbox', () => {
+      const {queryByText} = render(<ManageOutcomeItem {...defaultProps()} />)
+      expect(queryByText('Select outcome Outcome Title')).toBeInTheDocument()
+    })
+  })
+
+  describe('Without manage_outcomes permission / canManage false', () => {
+    it('hides kebab menu', () => {
+      const {queryByText} = render(<ManageOutcomeItem {...defaultProps()} />, {
+        canManage: false
+      })
+      expect(queryByText('Menu for outcome Outcome Title')).not.toBeInTheDocument()
+    })
+
+    it('hides checkbox', () => {
+      const {queryByText} = render(<ManageOutcomeItem {...defaultProps()} />, {
+        canManage: false
+      })
+      expect(queryByText('Select outcome Outcome Title')).not.toBeInTheDocument()
     })
   })
 })
