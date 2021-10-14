@@ -220,23 +220,23 @@ module ConversationsHelper
         attachment_ids: attachment_ids,
         forwarded_message_ids: forwarded_message_ids,
         root_account_id: domain_root_account_id,
-        media_comment: infer_media_comment(media_comment_id, media_comment_type),
+        media_comment: infer_media_comment(media_comment_id, media_comment_type, domain_root_account_id, current_user),
         generate_user_note: user_note
       }
     ]
   end
 
-  def infer_media_comment(media_id, media_type)
+  def infer_media_comment(media_id, media_type, root_account_id, user)
     if media_id.present? && media_type.present?
       media_comment = MediaObject.by_media_id(media_id).first
       unless media_comment
         media_comment ||= MediaObject.new
         media_comment.media_type = media_type
         media_comment.media_id = media_id
-        media_comment.root_account_id = @domain_root_account.id
-        media_comment.user = @current_user
+        media_comment.root_account_id = root_account_id
+        media_comment.user = user
       end
-      media_comment.context = @current_user
+      media_comment.context = user
       media_comment.save
       media_comment
     end

@@ -28,7 +28,7 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
   argument :recipients, [String], required: true
   argument :included_messages, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('ConversationMessage')
   argument :attachment_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
-  argument :media_comment_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('MediaObject')
+  argument :media_comment_id, ID, required: false
   argument :media_comment_type, String, required: false
   argument :user_note, Boolean, required: false
 
