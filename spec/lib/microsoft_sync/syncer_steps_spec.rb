@@ -574,6 +574,7 @@ describe MicrosoftSync::SyncerSteps do
 
     context 'when the Microsoft API says there are too many members in a group' do
       before do
+        allow(graph_service).to receive(:remove_group_users_ignore_missing)
         allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
           .and_raise(MicrosoftSync::Errors::MembersQuotaExceeded)
       end
@@ -583,6 +584,7 @@ describe MicrosoftSync::SyncerSteps do
 
     context 'when the Microsoft API says there are too many owners in a group' do
       before do
+        allow(graph_service).to receive(:remove_group_users_ignore_missing)
         allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
           .and_raise(MicrosoftSync::Errors::OwnersQuotaExceeded)
       end
@@ -633,6 +635,25 @@ describe MicrosoftSync::SyncerSteps do
         expect(InstStatsd::Statsd).to have_received(:count).twice
                                                            .with("microsoft_sync.syncer_steps.skipped_total.remove", 2,
                                                                  tags: { sync_type: sync_type_statsd_tag })
+      end
+    end
+
+    context "when the last owner is removed but a new owner is added" do
+      it "adds the new owner but raises the error still" do
+        expect(graph_service).to receive(:remove_group_users_ignore_missing)
+          .and_raise(MicrosoftSync::Errors::MissingOwners)
+        expect(graph_service).to receive(:add_users_to_group_ignore_duplicates).twice
+        expect { subject }.to raise_error(MicrosoftSync::Errors::MissingOwners)
+      end
+    end
+
+    context 'when there is an error in adding classes (e.g. too many users)' do
+      it 'still removes users' do
+        err_class = Class.new(StandardError)
+        expect(graph_service).to receive(:remove_group_users_ignore_missing).twice
+        expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+          .and_raise(err_class)
+        expect { subject }.to raise_error(err_class)
       end
     end
   end
