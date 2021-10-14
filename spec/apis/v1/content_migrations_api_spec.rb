@@ -849,7 +849,7 @@ describe ContentMigrationsController, type: :request do
   describe 'content selection cross-shard' do
     specs_require_sharding
 
-    it "actuallies return local identifiers created from the correct shard if needed" do
+    it "actually returns local identifiers created from the correct shard if needed" do
       @migration_url = "/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}/selective_data"
       @params = { :controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param, :action => 'content_list', :id => @migration.id.to_param }
 
