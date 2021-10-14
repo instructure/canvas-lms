@@ -550,6 +550,22 @@ class DiscussionEntry < ActiveRecord::Base
     entry_participant
   end
 
+  def broadcast_report_notification(report_type)
+    return unless Account.site_admin.feature_enabled?(:discussions_reporting)
+
+    to_list = context.instructors_in_charge_of(user_id)
+
+    notification_type = "Reported Reply"
+    notification = BroadcastPolicy.notification_finder.by_name(notification_type)
+
+    data = course_broadcast_data
+    data[:report_type] = report_type
+
+    GuardRail.activate(:primary) do
+      BroadcastPolicy.notifier.send_notification(self, notification_type, notification, to_list, data)
+    end
+  end
+
   def update_aggregate_rating(old_rating, new_rating)
     count_delta = (new_rating.nil? ? 0 : 1) - (old_rating.nil? ? 0 : 1)
     sum_delta = new_rating.to_i - old_rating.to_i
