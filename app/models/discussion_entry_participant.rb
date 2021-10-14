@@ -29,6 +29,9 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   validates_presence_of :discussion_entry_id, :user_id, :workflow_state
   validate :prevent_creates
 
+  validates :report_type, inclusion: { in: %w(inappropriate offensive other),
+                                       message: "%{value} is not valid" }
+
   def prevent_creates
     if self.new_record?
       # e.g. DiscussionEntryParticipant.upsert_for_entries(entry, user, new_state: 'read')
@@ -69,7 +72,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   # returns the ids of records changed or inserted, or a
   # DiscussionEntryParticipant object with errors for backwards compatability to
   # the previous method.
-  def self.upsert_for_entries(entry_or_topic, user, batch: nil, new_state: nil, forced: nil, rating: nil)
+  def self.upsert_for_entries(entry_or_topic, user, batch: nil, new_state: nil, forced: nil, rating: nil, report_type: nil)
     return nil if entry_or_topic.nil? || user.nil?
 
     batch ||= [entry_or_topic]
@@ -92,6 +95,15 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       unless rating.nil?
         update_columns << 'rating'
         update_values << connection.quote(rating)
+      end
+
+      unless report_type.nil?
+        unless %w(inappropriate offensive other).include? report_type
+          raise(ArgumentError)
+        end
+
+        update_columns << 'report_type'
+        update_values << connection.quote(report_type)
       end
 
       insert_columns += update_columns
