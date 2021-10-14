@@ -40,12 +40,21 @@ export function determineSubmissionSelection(submission) {
   }
 }
 
-export function makeSubmissionUpdateRequest(submission, courseId, data) {
-  const requestData = {
+export function makeSubmissionUpdateRequest(submission, isAnonymous, courseId, updateData) {
+  const data = {}
+  const submissionData = {
     assignmentId: submission.assignment_id,
-    userId: submission.user_id,
-    ...data
+    ...updateData
   }
-  const url = `/api/v1/courses/${courseId}/assignments/${submission.assignment_id}/submissions/${submission.user_id}`
-  return axios.put(url, {submission: underscore(requestData)})
+
+  let url
+  if (isAnonymous) {
+    url = `/api/v1/courses/${courseId}/assignments/${submission.assignment_id}/anonymous_submissions/${submission.anonymous_id}`
+  } else {
+    submissionData.userId = submission.user_id
+    url = `/api/v1/courses/${courseId}/assignments/${submission.assignment_id}/submissions/${submission.user_id}`
+  }
+
+  data.submission = underscore(submissionData)
+  return axios.put(url, data)
 }
