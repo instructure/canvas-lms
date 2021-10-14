@@ -74,7 +74,15 @@ module InstAccess
     class << self
       private :new
 
-      def for_user(user_uuid: nil, account_uuid: nil, canvas_domain: nil, real_user_uuid: nil, real_user_shard_id: nil)
+      def for_user(
+        user_uuid: nil,
+        account_uuid: nil,
+        canvas_domain: nil,
+        real_user_uuid: nil,
+        real_user_shard_id: nil,
+        user_global_id: nil,
+        real_user_global_id: nil
+      )
         if user_uuid.blank? || account_uuid.blank?
           raise ArgumentError, "Must provide user uuid and account uuid"
         end
@@ -90,6 +98,8 @@ module InstAccess
         payload[:canvas_domain] = canvas_domain if canvas_domain
         payload[:masq_sub] = real_user_uuid if real_user_uuid
         payload[:masq_shard] = real_user_shard_id if real_user_shard_id
+        payload[:debug_user_global_id] = user_global_id.to_s if user_global_id
+        payload[:debug_masq_global_id] = real_user_global_id.to_s if real_user_global_id
 
         new(payload)
       end
