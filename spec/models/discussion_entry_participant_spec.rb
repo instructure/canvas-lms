@@ -39,6 +39,38 @@ describe DiscussionEntryParticipant do
         .to raise_error(ActiveRecord::RecordInvalid)
     end
 
+    it 'throws error on upsert_for_entries with invalid report_type' do
+      user = user_model
+      expect { DiscussionEntryParticipant.upsert_for_entries(@entry, user, report_type: 'wrong_type') }
+        .to raise_error(ArgumentError)
+    end
+
+    describe 'using upsert_for_entries with valid report_type' do
+      it 'when inappropriate' do
+        user = user_model
+        DiscussionEntryParticipant.upsert_for_entries(@entry, user, report_type: 'inappropriate')
+        discussion_entry_participant = DiscussionEntryParticipant.where(discussion_entry: @entry, user_id: user).take
+
+        expect(discussion_entry_participant.report_type).to eq('inappropriate')
+      end
+
+      it 'when offensive' do
+        user = user_model
+        DiscussionEntryParticipant.upsert_for_entries(@entry, user, report_type: 'offensive')
+        discussion_entry_participant = DiscussionEntryParticipant.where(discussion_entry: @entry, user_id: user).take
+
+        expect(discussion_entry_participant.report_type).to eq('offensive')
+      end
+
+      it 'when other' do
+        user = user_model
+        DiscussionEntryParticipant.upsert_for_entries(@entry, user, report_type: 'other')
+        discussion_entry_participant = DiscussionEntryParticipant.where(discussion_entry: @entry, user_id: user).take
+
+        expect(discussion_entry_participant.report_type).to eq('other')
+      end
+    end
+
     it 'returns early if there is no entry' do
       expect(DiscussionEntryParticipant.upsert_for_entries(nil, double)).to be_nil
     end
