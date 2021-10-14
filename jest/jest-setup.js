@@ -78,7 +78,6 @@ const ignoredErrors = [
   /The above error occurred in the <.*> component/,
   /The prop `activeMailbox` is marked as required in `MailboxSelectionDropdown`/,
   /The prop `avatarName` is marked as required in `UserLink`/,
-  /The prop `canReadAnnouncements` is marked as required in `(K5Announcement|K5Course)`/,
   /The prop `children` is marked as required in `TruncateText`/,
   /The prop `color` is marked as required in `StatusColorListItem`/,
   /The prop `conferenceTypes\[0\].name` is marked as required in `(AddConference|ConferenceButton)`/,

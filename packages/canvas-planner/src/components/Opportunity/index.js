@@ -22,7 +22,7 @@ import {Button} from '@instructure/ui-buttons'
 import {Pill} from '@instructure/ui-pill'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconXLine} from '@instructure/ui-icons'
-import {bool, string, number, func, object} from 'prop-types'
+import {string, number, func, object} from 'prop-types'
 import {getFullDateAndTime} from '../../utilities/dateUtils'
 import formatMessage from '../../format-message'
 import {animatable} from '../../dynamic-ui'
@@ -139,7 +139,7 @@ export class Opportunity extends Component {
           <div className={styles.title}>
             <Button
               variant="link"
-              theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+              theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
               href={this.props.url}
               buttonRef={this.linkRef}
             >

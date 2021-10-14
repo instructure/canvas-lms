@@ -19,7 +19,7 @@ import React from 'react'
 import {shallow, mount} from 'enzyme'
 import moment from 'moment-timezone'
 import MockDate from 'mockdate'
-import {PlannerItem} from '../index'
+import {PlannerItem_raw as PlannerItem} from '../index'
 
 const MY_TIMEZONE = 'America/Los_Angeles'
 const DEFAULT_DATE = moment.tz('2011-12-17T03:30:00', MY_TIMEZONE)
@@ -868,9 +868,9 @@ describe('with isMissingItem', () => {
     expect(dateText.childAt(0).text()).toBe('Due: Dec 17, 2011 at 3:30 AM')
   })
 
-  it('does not render date when there is no date', () => {
+  it('still renders even when there is no date', () => {
     const wrapper = shallow(<PlannerItem {...props} date={null} />)
     const dateText = wrapper.find('.PlannerItem-styles__due PresentationContent')
-    expect(dateText.children().isEmpty()).toBeTruthy()
+    expect(dateText.children().length).toEqual(0)
   })
 })

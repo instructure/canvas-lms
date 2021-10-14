@@ -52,6 +52,7 @@ const OutcomeManagementPanel = ({
   const {setContainerRef, setLeftColumnRef, setDelimiterRef, setRightColumnRef, onKeyDownHandler} =
     useResize()
   const [scrollContainer, setScrollContainer] = useState(null)
+  const [rhsGroupIdsToRefetch, setRhsGroupIdsToRefetch] = useState([])
   const {selectedOutcomeIds, selectedOutcomesCount, toggleSelectedOutcomes, clearSelectedOutcomes} =
     useSelectedOutcomes()
   const {
@@ -79,10 +80,14 @@ const OutcomeManagementPanel = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    setRhsGroupIdsToRefetch(ids => [...new Set([...ids, ...createdOutcomeGroupIds])])
+  }, [createdOutcomeGroupIds])
+
   const {group, loading, loadMore, removeLearningOutcomes, readLearningOutcomes} = useGroupDetail({
     id: selectedGroupId,
     searchString: debouncedSearchString,
-    rhsGroupIdsToRefetch: createdOutcomeGroupIds
+    rhsGroupIdsToRefetch
   })
 
   const selectedOutcomes = readLearningOutcomes(selectedOutcomeIds)
@@ -195,12 +200,15 @@ const OutcomeManagementPanel = ({
     }
   }
 
-  // After move outcomes, remove from list if the target group isn't
-  // the selected group or isn't children of the selected group
-  const onSuccessMoveOutcomes = ({movedOutcomeLinkIds, targetAncestorsIds}) => {
-    if (!targetAncestorsIds.includes(selectedGroupId)) {
-      removeLearningOutcomes(movedOutcomeLinkIds, false)
-    }
+  // After move outcomes, mark all loaded outcomes group to be refetch, since:
+  // 1 - If moving to the group in the LHS or some child, it'll probably change
+  //     its position, so refetch needed
+  // 2 - If moving to a group "outside" the LHS group, we need to remove from the list
+  //     So refetch is needed
+  const onSuccessMoveOutcomes = () => {
+    // we would clear the whole RHS cache.
+    const AllLhsGroupIds = Object.keys(collections)
+    setRhsGroupIdsToRefetch(AllLhsGroupIds)
   }
 
   const hideOutcomesViewHandler = () => {

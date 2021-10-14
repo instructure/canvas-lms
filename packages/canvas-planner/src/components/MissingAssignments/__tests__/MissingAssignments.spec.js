@@ -75,7 +75,9 @@ const defaultProps = (expanded = false) => ({
 
 describe('MissingAssignments', () => {
   it('Renders nothing if there are no opportunities', () => {
-    const {queryByRole} = render(<MissingAssignments {...defaultProps()} opportunities={[]} />)
+    const {queryByRole} = render(
+      <MissingAssignments {...defaultProps()} opportunities={{items: []}} />
+    )
     expect(queryByRole('button', {name: /missing items/})).not.toBeInTheDocument()
   })
 

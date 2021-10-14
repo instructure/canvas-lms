@@ -121,7 +121,7 @@ export default class ToDoItem extends React.Component {
     const titleComponent = this.props.item.html_url ? (
       <Button
         variant="link"
-        theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+        theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
         buttonRef={elt => {
           this.linkRef = elt
         }}
@@ -173,6 +173,5 @@ ToDoItem.propTypes = {
   }),
   courses: arrayOf(object).isRequired,
   handleDismissClick: func.isRequired,
-  timeZone: string,
-  locale: string
+  timeZone: string
 }

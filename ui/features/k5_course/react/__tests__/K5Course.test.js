@@ -70,6 +70,7 @@ const defaultProps = {
   id: '30',
   timeZone: defaultEnv.TIMEZONE,
   canManage: false,
+  canReadAnnouncements: true,
   canReadAsAdmin: false,
   courseOverview: '<h2>Time to learn!</h2>',
   hideFinalGrades: false,

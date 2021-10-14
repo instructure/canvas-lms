@@ -41,7 +41,7 @@ exports[`grouping contains link pointing to course url 1`] = `
     <li
       key="five"
     >
-      <Animatable(PlannerItem)
+      <Animatable(PlannerItem_raw)
         animatableIndex={101}
         color="#5678"
         context={
@@ -67,7 +67,7 @@ exports[`grouping contains link pointing to course url 1`] = `
     <li
       key="six"
     >
-      <Animatable(PlannerItem)
+      <Animatable(PlannerItem_raw)
         animatableIndex={102}
         color="#5678"
         context={
@@ -134,7 +134,7 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
     <li
       key="six"
     >
-      <Animatable(PlannerItem)
+      <Animatable(PlannerItem_raw)
         animatableIndex={101}
         color="#5678"
         context={
@@ -224,7 +224,7 @@ exports[`renders the base component with required props 1`] = `
     <li
       key="five"
     >
-      <Animatable(PlannerItem)
+      <Animatable(PlannerItem_raw)
         animatableIndex={101}
         color="#5678"
         context={
@@ -250,7 +250,7 @@ exports[`renders the base component with required props 1`] = `
     <li
       key="six"
     >
-      <Animatable(PlannerItem)
+      <Animatable(PlannerItem_raw)
         animatableIndex={102}
         color="#5678"
         context={
@@ -311,7 +311,7 @@ exports[`renders to do items correctly 1`] = `
     <li
       key="seven hundred"
     >
-      <Animatable(PlannerItem)
+      <Animatable(PlannerItem_raw)
         animatableIndex={101}
         color={null}
         context={Object {}}
