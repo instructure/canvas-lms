@@ -285,7 +285,7 @@ describe "submissions" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
       body_html = '<span style="width: 18rem; height: 1rem; vertical-align: middle;" aria-label="Loading" data-placeholder-for="filename">  </span>'
-      switch_new_editor_views # switch to html editor
+      switch_editor_views # switch to html editor
       tinymce = f("#submission_body")
       tinymce.click
       tinymce.send_keys(body_html)
