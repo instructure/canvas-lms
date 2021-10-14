@@ -414,7 +414,7 @@ describe ContentMigration do
       expect((new_assignment.due_at.to_i - (today + 1.day).to_i).abs).to be < 60
     end
 
-    it "correctlies copy all day dates for assignments and events" do
+    it "copies all day dates for assignments and events correctly" do
       date = "Jun 21 2012 11:59pm"
       date2 = "Jun 21 2012 00:00am"
       asmnt = @copy_from.assignments.create!(:title => 'all day', :due_at => date)

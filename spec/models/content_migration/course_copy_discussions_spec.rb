@@ -198,7 +198,7 @@ describe ContentMigration do
       expect(@copy_to.announcements.where(migration_id: mig_id(ann)).first).to be_nil
     end
 
-    it "implicitlies copy files attached to topics" do
+    it "implicitly copies files attached to topics" do
       att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt", :uploaded_data => StringIO.new('file'),
                                :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       topic = @copy_from.discussion_topics.new(:message => "howdy", :title => "title")

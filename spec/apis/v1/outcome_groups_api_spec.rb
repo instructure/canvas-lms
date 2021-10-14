@@ -481,7 +481,7 @@ describe "Outcome Groups API", type: :request do
         @account.enable_feature!(:account_level_mastery_scales)
       end
 
-      it 'correctlies serialize mastery scale data for each link' do
+      it 'serializes mastery scale data for each link correctly' do
         json = api_call(
           :get,
           "/api/v1/accounts/#{@account.id}/outcome_group_links",

@@ -134,7 +134,7 @@ describe IncomingMail::ReplyToAddress do
       }.to raise_error(IncomingMail::ReplyToAddress::EmptyReplyAddressPool)
     end
 
-    it 'randomlies select a pool address if the message has no id' do
+    it 'randomly selects a pool address if the message has no id' do
       message = double()
 
       expect(message).to receive(:id).and_return(nil)

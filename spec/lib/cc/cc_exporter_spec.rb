@@ -87,7 +87,7 @@ describe "Common Cartridge exporting" do
       end
     end
 
-    it "selectivelies export all object types" do
+    it "selectively exports all object types" do
       # create 2 of everything
       @dt1 = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
       @dt2 = @course.discussion_topics.create!(:message => "hey", :title => "discussion title 2")
@@ -272,7 +272,7 @@ describe "Common Cartridge exporting" do
       expect(selections[1].at_css("selection_extension sourcebank_context").text).to eq bank2.context.asset_string
     end
 
-    it "selectivelies create a quizzes-only export" do
+    it "selectively creates a quizzes-only export" do
       @q1 = @course.quizzes.create!(:title => 'quiz1')
       @q2 = @course.quizzes.create!(:title => 'quiz2')
 

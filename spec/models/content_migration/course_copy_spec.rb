@@ -274,7 +274,7 @@ describe ContentMigration do
       expect(dt_to.message).to include "/courses/#{@copy_to.id}/files/#{img_to.id}/preview"
     end
 
-    it "selectivelies copy items" do
+    it "selectively copies items" do
       dt1 = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       dt2 = @copy_from.discussion_topics.create!(:message => "hey", :title => "discussion title 2")
       dt3 = @copy_from.announcements.create!(:message => "howdy", :title => "announcement title")
