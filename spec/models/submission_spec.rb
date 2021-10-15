@@ -7825,4 +7825,69 @@ describe Submission do
       end
     end
   end
+
+  describe "#observer?" do
+    before do
+      @student = user_factory
+      course_with_observer(
+        course: @course,
+        associated_user_id: @student.id,
+        active_all: true,
+        active_cc: true
+      )
+      @submission = @assignment.submission_for_student(@student)
+    end
+
+    it "is true for observer" do
+      expect(@submission.observer?(@observer)).to eq true
+    end
+
+    it "is false for student" do
+      expect(@submission.observer?(@student)).to eq false
+    end
+
+    it "is false for teacher" do
+      expect(@submission.observer?(@teacher)).to eq false
+    end
+
+    it "is false for others" do
+      expect(@submission.observer?(user_factory)).to eq false
+    end
+  end
+
+  describe "#peer_reviewer?" do
+    before do
+      student_in_course(active_all: true)
+      @peer_reviewer = user_factory
+      @course.enroll_student(@peer_reviewer).accept!
+      @assignment = @course.assignments.build(
+        title: 'Peer Reviews',
+        submission_types: 'online_text_entry',
+        peer_reviews: true
+      )
+      @assignment.save!
+      @submission = @assignment.submission_for_student(@student)
+      @submission.assessment_requests.create!(
+        user: @student,
+        assessor: @peer_reviewer,
+        assessor_asset: @submission
+      )
+    end
+
+    it "is true for reviewer" do
+      expect(@submission.peer_reviewer?(@peer_reviewer)).to eq true
+    end
+
+    it "is false for student" do
+      expect(@submission.peer_reviewer?(@student)).to eq false
+    end
+
+    it "is false for teacher" do
+      expect(@submission.peer_reviewer?(@teacher)).to eq false
+    end
+
+    it "is false for others" do
+      expect(@submission.peer_reviewer?(user_factory)).to eq false
+    end
+  end
 end
