@@ -104,16 +104,7 @@ $(document).ready(function () {
       !$(this).is('#submit_online_text_entry_form') ||
       $(this).validateForm({
         object_name: 'submission',
-        required: ['body'],
-        property_validations: {
-          body(value) {
-            const bodyHtml = document.createElement('div')
-            bodyHtml.insertAdjacentHTML('beforeend', value)
-            if (bodyHtml.querySelector(`[data-placeholder-for]`)) {
-              return I18n.t('File has not finished uploading')
-            }
-          }
-        }
+        required: ['body']
       })
     if (!valid) return false
 
