@@ -1452,7 +1452,10 @@ class AssignmentsApiController < ApplicationController
 
   def needs_grading_permission?
     grading_attributes = [:points_possible, :grading_type, :grading_standard_id]
-    grading_attributes.any? { |attribute| params[:assignment][attribute] != @assignment[attribute] } && @assignment.submissions.graded.exists?
+    updating_grading_attribute = grading_attributes.any? do |attribute|
+      params[:assignment].key?(attribute) && params[:assignment][attribute] != @assignment[attribute]
+    end
+    updating_grading_attribute && @assignment.submissions.graded.exists?
   end
 
   # old_assignment is the assignement we want to copy from

@@ -3179,6 +3179,22 @@ describe AssignmentsApiController, type: :request do
       expect(@assignment.grading_type).to eq 'percent'
     end
 
+    it "allows user without grading rights to update non-grading attributes on a graded assignment" do
+      course_with_student(active_all: true)
+      @assignment = @course.assignments.create!(
+        name: "some assignment",
+        points_possible: 15,
+        grading_type: "points"
+      )
+      @assignment.grade_student(@student, grade: 15, grader: @teacher)
+      RoleOverride.create!(permission: 'manage_grades', enabled: false, context: @course.account, role: admin_role)
+      account_admin_user(active_all: true)
+
+      api_update_assignment_call(@course, @assignment, { name: 'some really cool assignment' })
+      expect(response).to be_successful
+      expect(@assignment.name).to eq 'some really cool assignment'
+    end
+
     it "allows user to update grading_type without grading rights when no submissions have been graded" do
       @assignment = @course.assignments.create!(
         name: "some assignment",
