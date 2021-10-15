@@ -159,10 +159,11 @@ RSpec.describe Mutations::AddConversationMessage do
   end
 
   it 'does not allow new messages in concluded courses for students' do
+    allow_any_instance_of(Conversation).to receive(:replies_locked_for?).and_return(false)
     conversation
     @course.update!(workflow_state: 'completed')
 
-    result = run_mutation(conversation_id: @conversation.conversation_id, body: 'uh uh uh', recipients: [@teacher.id.to_s])
+    result = run_mutation(conversation_id: @conversation.conversation_id, body: 'uh uh uh', recipients: [@student.id.to_s])
     expect(result.dig('errors')).to be nil
     expect(result.dig('data', 'addConversationMessage', 'conversationMessage')).to be nil
     expect(

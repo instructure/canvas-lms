@@ -679,7 +679,7 @@ describe Attachment do
         expect(att.instfs_uuid).to eq dup_uuid
       end
 
-      it "actuallies destroy the content" do
+      it "actually destroys the content" do
         uuid = "old-id"
         att = attachment_model(instfs_uuid: uuid)
         expect(InstFS).to receive(:delete_file).with(uuid)
@@ -985,7 +985,7 @@ describe Attachment do
       expect(a.grants_right?(nil, mock_session, :download)).to eql(true)
     end
 
-    it "correctlies deny user access based on 'file_access_user_id'" do
+    it "denies user access based on 'file_access_user_id' correctly" do
       a = attachment_model(context: user)
       other_user = user_model
       mock_session = ActionController::TestSession.new({
@@ -1344,7 +1344,7 @@ describe Attachment do
       expect(@a.root_account_id).to eq @account.id
     end
 
-    it "immediatelies infer the namespace if not yet set" do
+    it "immediately infers the namespace if not yet set" do
       Attachment.current_root_account = nil
       @a = Attachment.new(:context => @course)
       expect(@a).to be_new_record

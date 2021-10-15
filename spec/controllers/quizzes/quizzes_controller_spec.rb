@@ -110,7 +110,7 @@ describe Quizzes::QuizzesController do
       end
     end
 
-    it 'implicitlies grade outstanding submissions for user in course' do
+    it 'implicitly grades outstanding submissions for user in course' do
       user_session(@student)
       course_quiz(active = true)
 

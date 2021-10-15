@@ -43,7 +43,7 @@ describe "assignments" do
     override.save!
   end
 
-  it "correctlies list ungraded and total submissions for teacher" do
+  it "lists ungraded and total submissions for teacher correctly" do
     multiple_section_submissions
 
     course_with_teacher_logged_in(:course => @course, :active_all => true)
@@ -53,7 +53,7 @@ describe "assignments" do
     expect(Nokogiri::HTML5(response.body).at_css('.graded_count').text).to match(/0 out of 2/)
   end
 
-  it "correctlies list ungraded and total submissions for ta" do
+  it "lists ungraded and total submissions for ta correctly" do
     multiple_section_submissions
 
     @taenrollment = course_with_ta(:course => @course, :active_all => true)

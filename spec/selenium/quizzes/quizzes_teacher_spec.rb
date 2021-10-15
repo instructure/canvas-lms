@@ -64,7 +64,7 @@ describe "quizzes" do
       expect(tooltip).to include_text 'Everyone else'
     end
 
-    it "asynchronouslies load student quiz results", priority: "2", test_id: 210058 do
+    it "asynchronously loads student quiz results", priority: "2", test_id: 210058 do
       @context = @course
       q = quiz_model
       q.generate_quiz_data
