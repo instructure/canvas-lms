@@ -25,13 +25,12 @@ import {responsiveQuerySizes} from '../../utils'
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 import {CondensedButton} from '@instructure/ui-buttons'
 
 export const ReplyPreview = ({...props}) => {
   const [shouldShowTruncatedText, setShouldShowTruncatedText] = useState(true)
-  const TRUNCATE_LENGTH = 170
-
   const message = props.deleted
     ? I18n.t('Deleted by %{editor}', {editor: props.editor.shortName})
     : props.previewMessage
@@ -50,8 +49,10 @@ export const ReplyPreview = ({...props}) => {
       }}
       render={responsiveProps => {
         const showTruncatedText = () => {
-          return shouldShowTruncatedText && message.length > TRUNCATE_LENGTH ? (
-            <Text size={responsiveProps.textSize}>{`${message.slice(0, 165)} ...`}</Text>
+          return shouldShowTruncatedText ? (
+            <TruncateText maxLines={2} truncate="word" ellipsis=" ...">
+              <Text size={responsiveProps.textSize}>{message}</Text>
+            </TruncateText>
           ) : (
             <Text size={responsiveProps.textSize}>{message}</Text>
           )
@@ -86,16 +87,14 @@ export const ReplyPreview = ({...props}) => {
               <Flex.Item margin="small 0 0 0">
                 <Flex direction="column">
                   <Flex.Item>{showTruncatedText()}</Flex.Item>
-                  {message.length > TRUNCATE_LENGTH && (
-                    <Flex.Item>
-                      <CondensedButton
-                        margin="small"
-                        onClick={() => setShouldShowTruncatedText(!shouldShowTruncatedText)}
-                      >
-                        <Text size={responsiveProps.textSize}>{readMoreButtonText}</Text>
-                      </CondensedButton>
-                    </Flex.Item>
-                  )}
+                  <Flex.Item>
+                    <CondensedButton
+                      margin="small"
+                      onClick={() => setShouldShowTruncatedText(!shouldShowTruncatedText)}
+                    >
+                      <Text size={responsiveProps.textSize}>{readMoreButtonText}</Text>
+                    </CondensedButton>
+                  </Flex.Item>
                 </Flex>
               </Flex.Item>
             </Flex>
