@@ -21,7 +21,7 @@ import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_course'
 import PropTypes from 'prop-types'
 
-import {startLoadingAllOpportunities, store} from '@instructure/canvas-planner'
+import {store} from '@instructure/canvas-planner'
 import {
   IconAddLine,
   IconBankLine,
@@ -394,7 +394,6 @@ export function K5Course({
   courseOverview,
   defaultTab,
   id,
-  loadAllOpportunities,
   name,
   timeZone,
   canManage = false,
@@ -433,7 +432,6 @@ export function K5Course({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
     focusFallback: tabsRef,
-    callback: () => loadAllOpportunities(),
     singleCourse: true,
     observedUserId: initialObservedId,
     isObserver: currentUserRoles.includes('observer')
@@ -641,7 +639,6 @@ K5Course.propTypes = {
   assignmentsMissing: PropTypes.object.isRequired,
   assignmentsCompletedForToday: PropTypes.object.isRequired,
   id: PropTypes.string.isRequired,
-  loadAllOpportunities: PropTypes.func.isRequired,
   name: PropTypes.string.isRequired,
   timeZone: PropTypes.string.isRequired,
   bannerImageUrl: PropTypes.string,
@@ -675,9 +672,7 @@ K5Course.propTypes = {
   currentUserRoles: PropTypes.array.isRequired
 }
 
-const WrappedK5Course = connect(mapStateToProps, {
-  loadAllOpportunities: startLoadingAllOpportunities
-})(K5Course)
+const WrappedK5Course = connect(mapStateToProps)(K5Course)
 
 export default props => (
   <ApplyTheme theme={theme}>
