@@ -92,9 +92,6 @@
     "apply_781a2546": {
         "message": "申请"
     },
-    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-        "message": "将更改应用于课程中的此按钮和图标的所有实例"
-    },
     "apps_54d24a47": {
         "message": "应用程序"
     },
@@ -151,6 +148,9 @@
     },
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "存在自动保存的内容。是否要改为加载自动保存的内容？"
+    },
+    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+        "message": "自动打开在线预览。（预览仅在保存后显示）"
     },
     "available_folders_694d0436": {
         "message": "可用文件夹"
@@ -379,6 +379,9 @@
     },
     "directionality_26ae9e08": {
         "message": "方向"
+    },
+    "disable_in_line_preview_2a675175": {
+        "message": "禁用在线预览。"
     },
     "discussion_6719c51d": {
         "message": "讨论"
@@ -836,6 +839,9 @@
     "my_grades_98834476": {
         "message": "我的评分"
     },
+    "my_images_427f9b0c": {
+        "message": "我的图像"
+    },
     "name_1aed4a1b": {
         "message": "名称"
     },
@@ -1099,6 +1105,9 @@
     },
     "size_b30e1077": {
         "message": "大小"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "{ file }大于{ max } MB最大所允许的文件容量。"
     },
     "small_b070434a": {
         "message": "小"

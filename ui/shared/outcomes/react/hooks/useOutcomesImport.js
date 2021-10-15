@@ -70,23 +70,7 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
     })
 
   const trackProgress = useCallback(
-    async (progress, outcomeOrGroupId, isGroup, groupTitle, targetGroupTitle) => {
-      const message = targetGroupTitle
-        ? I18n.t(
-            'All outcomes from %{groupTitle} have been successfully added to %{targetGroupTitle}.',
-            {
-              groupTitle,
-              targetGroupTitle
-            }
-          )
-        : isCourse
-        ? I18n.t('All outcomes from %{groupTitle} have been successfully added to this course.', {
-            groupTitle
-          })
-        : I18n.t('All outcomes from %{groupTitle} have been successfully added to this account.', {
-            groupTitle
-          })
-
+    async (progress, outcomeOrGroupId, isGroup, groupTitle) => {
       try {
         await resolveProgress(
           {
@@ -99,7 +83,19 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
         )
         if (isGroup) {
           showFlashAlert({
-            message,
+            message: isCourse
+              ? I18n.t(
+                  'All outcomes from %{groupTitle} have been successfully added to this course.',
+                  {
+                    groupTitle
+                  }
+                )
+              : I18n.t(
+                  'All outcomes from %{groupTitle} have been successfully added to this account.',
+                  {
+                    groupTitle
+                  }
+                ),
             type: 'success'
           })
         }
@@ -113,22 +109,18 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
   )
 
   const importOutcomes = useCallback(
-    async ({
+    async (
       outcomeOrGroupId,
-      sourceContextId,
-      sourceContextType,
-      targetGroupId,
-      targetGroupTitle,
       groupTitle = null,
-      isGroup = true
-    }) => {
+      isGroup = true,
+      sourceContextId,
+      sourceContextType
+    ) => {
       try {
-        const input = targetGroupId
-          ? {targetGroupId}
-          : {
-              targetContextId,
-              targetContextType
-            }
+        const input = {
+          targetContextId,
+          targetContextType
+        }
         if (isGroup) {
           input.groupId = outcomeOrGroupId
         } else {
@@ -145,7 +137,7 @@ const useOutcomesImport = (outcomePollingInterval = 1000, groupPollingInterval =
         const importErrors = importResult.data?.importOutcomes?.errors
         if (importErrors !== null) throw new Error(importErrors?.[0]?.message)
 
-        trackProgress(progress, outcomeOrGroupId, isGroup, groupTitle, targetGroupTitle)
+        trackProgress(progress, outcomeOrGroupId, isGroup, groupTitle)
         setHasAddedOutcomes(true)
       } catch (err) {
         showFlashError(err, isGroup)
