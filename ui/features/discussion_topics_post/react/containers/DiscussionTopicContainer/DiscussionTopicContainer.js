@@ -41,8 +41,8 @@ import React, {useContext, useState} from 'react'
 import {SearchContext} from '../../utils/constants'
 import {useMutation, useApolloClient} from 'react-apollo'
 
-import {Alert} from '@instructure/ui-alerts'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {DiscussionTopicAlertManager} from '../../components/DiscussionTopicAlertManager/DiscussionTopicAlertManager'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconEditLine} from '@instructure/ui-icons'
@@ -68,11 +68,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   if (ENV.DISCUSSION?.GRADED_RUBRICS_URL) {
     rubricTriggers.initDialog()
   }
-
-  const isAnnouncementDelayed =
-    props.discussionTopic.isAnnouncement &&
-    props.discussionTopic.delayedPostAt &&
-    Date.parse(props.discussionTopic.delayedPostAt) > Date.now()
 
   const [deleteDiscussionTopic] = useMutation(DELETE_DISCUSSION_TOPIC, {
     onCompleted: () => {
@@ -283,35 +278,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
       }}
       render={responsiveProps => (
         <>
-          {props.discussionTopic.initialPostRequiredForCurrentUser && (
-            <Alert renderCloseButtonLabel="Close" margin="0 0 x-small">
-              <Text size={responsiveProps.alert.textSize}>
-                {I18n.t('You must post before seeing replies.')}
-              </Text>
-            </Alert>
-          )}
-          {props.discussionTopic.permissions?.readAsAdmin &&
-            props.discussionTopic.groupSet &&
-            props.discussionTopic.assignment?.onlyVisibleToOverrides && (
-              <Alert renderCloseButtonLabel="Close" margin="0 0 x-small">
-                <Text size={responsiveProps.alert.textSize}>
-                  {I18n.t(
-                    'Note: for differentiated group topics, some threads may not have any students assigned.'
-                  )}
-                </Text>
-              </Alert>
-            )}
-          {isAnnouncementDelayed && (
-            <Alert renderCloseButtonLabel="Close" margin="0 0 x-small">
-              <Text size={responsiveProps.alert.textSize}>
-                {I18n.t('This announcement will not be visible until %{delayedPostAt}.', {
-                  delayedPostAt: DateHelper.formatDatetimeForDiscussions(
-                    props.discussionTopic.delayedPostAt
-                  )
-                })}
-              </Text>
-            </Alert>
-          )}
+          <DiscussionTopicAlertManager discussionTopic={props.discussionTopic} />
           {!isSearch && filter !== 'drafts' && (
             <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
               <Flex as="div" direction="column" data-testid="discussion-topic-container">
