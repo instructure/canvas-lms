@@ -113,7 +113,7 @@ describe('FindOutcomeItem', () => {
   it('passes item id and sourceContextId/sourceContextType to add button handler', () => {
     const {getByText} = render(<FindOutcomeItem {...defaultProps()} />)
     fireEvent.click(getByText('Add'))
-    expect(onImportOutcomeHandlerMock).toHaveBeenCalledWith('1', 1, false, '100', 'Account')
+    expect(onImportOutcomeHandlerMock).toHaveBeenCalledWith('1', '100', 'Account')
   })
 
   it('displays right pointing caret when description is collapsed', () => {

@@ -118,7 +118,11 @@ const GradebookMenu: React.FC<Props> = ({courseUrl, learningMasteryEnabled, vari
   return (
     <Menu trigger={trigger}>
       {availableOptions.map(optionId =>
-        optionId === 'Separator' ? <Separator /> : renderMenuOption(variants[optionId])
+        optionId === 'Separator' ? (
+          <Separator key="separator" />
+        ) : (
+          renderMenuOption(variants[optionId])
+        )
       )}
     </Menu>
   )

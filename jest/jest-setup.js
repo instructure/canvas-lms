@@ -287,3 +287,33 @@ if (!('matchMedia' in window)) {
 if (!('scrollIntoView' in window.HTMLElement.prototype)) {
   window.HTMLElement.prototype.scrollIntoView = () => {}
 }
+
+// Suppress errors for APIs that exist in JSDOM but aren't implemented
+Object.defineProperty(window, 'scrollTo', {configurable: true, writable: true, value: () => {}})
+
+const locationProperties = Object.getOwnPropertyDescriptors(window.location)
+Object.defineProperty(window, 'location', {
+  configurable: true,
+  enumerable: true,
+  get: () =>
+    Object.defineProperties(
+      {},
+      {
+        ...locationProperties,
+        href: {
+          ...locationProperties.href,
+          // Prevents JSDOM errors from doing window.location.href = ...
+          set: () => {}
+        },
+        reload: {
+          configurable: true,
+          enumerable: true,
+          writeable: true,
+          // Prevents JSDOM errors from doing window.location.reload()
+          value: () => {}
+        }
+      }
+    ),
+  // Prevents JSDOM errors from doing window.location = ...
+  set: () => {}
+})

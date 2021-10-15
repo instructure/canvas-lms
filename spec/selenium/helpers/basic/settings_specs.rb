@@ -119,7 +119,7 @@ shared_examples_for "settings basic tests" do |account_type|
       expect(fj('[name="default_group_storage_quota_mb"]')).to have_value(group_quota.to_s) # fj to avoid selenium caching
     end
 
-    it "manuallies change a course quota", priority: "1", test_id: pick_test_id(account_type, sub_account: 250004, root_account: 251034) do
+    it "manually changes a course quota", priority: "1", test_id: pick_test_id(account_type, sub_account: 250004, root_account: 251034) do
       f('#tab-quotas-link').click
 
       # find the course by id
@@ -146,7 +146,7 @@ shared_examples_for "settings basic tests" do |account_type|
       expect(@course.storage_quota_mb).to eq 42
     end
 
-    it "manuallies change a group quota", priority: "1", test_id: pick_test_id(account_type, sub_account: 250005, root_account: 251035) do
+    it "manually changes a group quota", priority: "1", test_id: pick_test_id(account_type, sub_account: 250005, root_account: 251035) do
       f('#tab-quotas-link').click
 
       # find the course by id

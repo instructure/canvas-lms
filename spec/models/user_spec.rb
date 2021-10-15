@@ -80,12 +80,12 @@ describe User do
     expect(@user.name).to eql('bill')
   end
 
-  it "correctlies identify active courses when there are no active groups" do
+  it "identifies active courses correctly when there are no active groups" do
     user = User.create(:name => "longname1", :short_name => "shortname1")
     expect(user.current_active_groups?).to eql(false)
   end
 
-  it "correctlies identify active courses when there are active groups" do
+  it "identifies active courses correctly when there are active groups" do
     account1 = account_model
     course_with_student(:account => account1)
     group_model(:group_category => @communities, :is_public => true, :context => @course)
@@ -1351,13 +1351,13 @@ describe User do
     end
 
     context "weak_checks" do
-      it "optionallies show invited enrollments" do
+      it "optionally shows invited enrollments" do
         course_factory(active_all: true)
         student_in_course(:user_state => 'creation_pending')
         expect(search_messageable_users(@teacher, weak_checks: true).map(&:id)).to include @student.id
       end
 
-      it "optionallies show pending enrollments in unpublished courses" do
+      it "optionally shows pending enrollments in unpublished courses" do
         course_factory()
         teacher_in_course(:active_all => true)
         student_in_course()
@@ -3011,7 +3011,7 @@ describe User do
       expect(@user.conversation_context_codes).to include(@course.asset_string)
     end
 
-    it "optionallies not include concluded courses" do
+    it "optionally does not include concluded courses" do
       @enrollment.update_attribute(:workflow_state, 'completed')
       expect(@user.conversation_context_codes(false)).not_to include(@course.asset_string)
     end
@@ -3039,7 +3039,7 @@ describe User do
         expect(@user.conversation_context_codes).to include(@course.asset_string)
       end
 
-      it "optionallies not include concluded courses on other shards" do
+      it "optionally does not include concluded courses on other shards" do
         course_with_student(:account => @shard1_account, :user => @user, :active_all => true)
         @enrollment.update_attribute(:workflow_state, 'completed')
         expect(@user.conversation_context_codes(false)).not_to include(@course.asset_string)

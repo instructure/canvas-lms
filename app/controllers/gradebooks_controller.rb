@@ -391,6 +391,7 @@ class GradebooksController < ApplicationController
 
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
+      allow_separate_first_last_names: root_account.allow_gradebook_show_first_last_names? && Account.site_admin.feature_enabled?(:gradebook_show_first_last_names),
       allow_view_ungraded_as_zero: allow_view_ungraded_as_zero?,
       attachment: last_exported_attachment,
       attachment_url: authenticated_download_url(last_exported_attachment),

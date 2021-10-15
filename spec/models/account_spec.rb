@@ -909,7 +909,7 @@ describe Account do
     expect(manual.grants_right?(user, :create_courses)).to eq false
   end
 
-  it "correctlies return sub-accounts as options" do
+  it "returns sub-accounts as options correctly" do
     a = Account.default
     sub = Account.create!(:name => 'sub', :parent_account => a)
     sub2 = Account.create!(:name => 'sub2', :parent_account => a)
@@ -925,7 +925,7 @@ describe Account do
     )
   end
 
-  it "correctlies return sub-account_ids recursively" do
+  it "correctly returns sub-account_ids recursively" do
     a = Account.default
     subs = []
     sub = Account.create!(name: 'sub', parent_account: a)

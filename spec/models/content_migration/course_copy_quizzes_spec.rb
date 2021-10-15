@@ -496,7 +496,7 @@ describe ContentMigration do
       expect(aq.question_data['question_text']).to match_ignoring_whitespace(@question.question_data['question_text'])
     end
 
-    it "correctlies copy quiz question html file references" do
+    it "copies quiz question html file references correctly" do
       root = Folder.root_folders(@copy_from).first
       folder = root.sub_folders.create!(:context => @copy_from, :name => 'folder 1')
       att = Attachment.create!(:filename => 'first.jpg', :display_name => "first.jpg", :uploaded_data => StringIO.new('first'), :folder => root, :context => @copy_from)
@@ -539,7 +539,7 @@ describe ContentMigration do
       expect(qq_to.question_data[:answers][0][:html]).to match_ignoring_whitespace(%{File ref:<img src="/courses/#{@copy_to.id}/files/#{att3_2.id}/download">})
     end
 
-    it "correctlies copy quiz question mathml equation image references" do
+    it "copies quiz question mathml equation image references correctly" do
       qtext = <<-HTML.strip
         equation: <p>
           <img class="equation_image" title="\\sum" src="/equation_images/%255Csum"
@@ -629,7 +629,7 @@ describe ContentMigration do
       expect(aq.question_data[:answers][1][:left_html]).to eq data2[:answers][1][:left_html]
     end
 
-    it "correctlies copy matching question fields with html-lookalike text" do
+    it "copies matching question fields with html-lookalike text correctly" do
       @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
       data = { :question_type => "matching_question",
                :points_possible => 10,
@@ -1026,7 +1026,7 @@ describe ContentMigration do
       expect(quiz_to.quiz_groups.first.name).to eq 'group1'
     end
 
-    it "correctlies copy links to quizzes inside assessment questions" do
+    it "copies links to quizzes inside assessment questions correctly" do
       link_quiz = @copy_from.quizzes.create!(:title => "linked quiz")
 
       html = "<a href=\"/courses/%s/quizzes/%s\">linky</a>"
@@ -1057,7 +1057,7 @@ describe ContentMigration do
       expect(other_quiz2.quiz_data.first['question_text']).to eq expected_html
     end
 
-    it "correctlies copy links to quizzes inside standalone quiz questions" do
+    it "copies links to quizzes inside standalone quiz questions correctly" do
       # i.e. quiz questions imported independently from their original assessment question
       link_quiz = @copy_from.quizzes.create!(:title => "linked quiz")
 

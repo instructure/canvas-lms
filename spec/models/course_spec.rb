@@ -76,18 +76,18 @@ describe Course do
     @course.save!
   end
 
-  it "correctlies identify course as active" do
+  it "identifies a course as active correctly" do
     @course.enrollment_term = EnrollmentTerm.create!(root_account: Account.default, workflow_state: :active)
     expect(@course.inactive?).to eq false
   end
 
-  it "correctlies identify destroyed course as not active" do
+  it "identifies a destroyed course as not active" do
     @course.enrollment_term = EnrollmentTerm.create!(root_account: Account.default, workflow_state: :active)
     @course.destroy!
     expect(@course.inactive?).to eq true
   end
 
-  it "correctlies identify concluded course as not active" do
+  it "identifies concluded course as not active" do
     @course.complete!
     expect(@course.inactive?).to eq true
   end
@@ -2030,7 +2030,7 @@ describe Course, '#assignment_groups' do
 end
 
 describe Course, "score_to_grade" do
-  it "correctlies map scores to grades" do
+  it "maps scores to grades correctly" do
     default = GradingStandard.default_grading_standard
     expect(default.to_json).to eq([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0.0]].to_json)
     course_model
@@ -3410,12 +3410,12 @@ describe Course, 'grade_publishing' do
         ].sort_by(&:id)
       end
 
-      it 'correctlies figure out the overall status with no enrollments' do
+      it 'figures out the overall status with no enrollments correctly' do
         @course = course_factory
         expect(@course.grade_publishing_statuses).to eq [{}, "unpublished"]
       end
 
-      it 'correctlies figure out the overall status with invalid enrollment statuses' do
+      it 'figures out the overall status with invalid enrollment statuses correctly' do
         @student_enrollments.each do |e|
           e.grade_publishing_status = "invalid status"
           e.save!

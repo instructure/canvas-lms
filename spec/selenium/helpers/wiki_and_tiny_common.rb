@@ -33,9 +33,8 @@ module WikiAndTinyCommon
 
   def type_in_wiki_html(html)
     element = wiki_page_body
-    switch_editor_views(element)
+    switch_editor_views
     element.send_keys(html)
-    switch_editor_views(element)
   end
 
   def wiki_page_tools_file_tree_setup(skip_tree = false, skip_image_list = false)
@@ -198,7 +197,7 @@ module WikiAndTinyCommon
     in_frame wiki_page_body_ifr_id do
       expect(f('#tinymce a').attribute('href')).to include course_file_id_path(@text_file)
     end
-    switch_editor_views(wiki_page_body)
+    switch_editor_views
     expect(find_css_in_string(wiki_page_body[:value], '.instructure_file_link')).not_to be_empty
     force_click('form.edit-form button.submit')
     wait_for_ajax_requests
