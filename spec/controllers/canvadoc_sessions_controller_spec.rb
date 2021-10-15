@@ -118,6 +118,14 @@ describe CanvadocSessionsController do
       end
     end
 
+    it "renders OK response if the user observes the submission" do
+      observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
+      user_session(observer)
+
+      post :create, params: params
+      expect(response).to have_http_status(:ok)
+    end
+
     it "contains a canvadocs_session_url in the response" do
       post :create, params: params
       expect(json_parse(response.body)["canvadocs_session_url"]).not_to be_nil
@@ -187,6 +195,14 @@ describe CanvadocSessionsController do
       it "disables the annotation notifications" do
         post :create, params: params
         expect(blob["disable_annotation_notifications"]).to be true
+      end
+
+      it "disables annotations when observing draft" do
+        observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
+        user_session(observer)
+
+        post :create, params: params
+        expect(blob["enable_annotations"]).to be false
       end
     end
   end
