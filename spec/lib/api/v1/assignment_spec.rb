@@ -191,6 +191,28 @@ describe "Api::V1::Assignment" do
       expect(json).not_to have_key "needs_grading_count"
     end
 
+    describe "include_can_submit" do
+      it "includes can_submit when the flag is passed" do
+        json = api.assignment_json(assignment, user, session, { include_can_submit: true })
+        expect(json).to have_key "can_submit"
+      end
+
+      it "returns false when the assignment is in an unpublished module when checking as a student" do
+        assignment.update!(submission_types: 'online_text_entry', could_be_locked: true)
+        course = assignment.course
+        student = course.enroll_student(User.create!, enrollment_state: 'active').user
+        course.update(workflow_state: 'available')
+        context_module = ContextModule.create!(context: course, workflow_state: 'unpublished')
+        context_module.content_tags.create!(content: assignment, context: course, tag_type: 'context_module')
+
+        expect(context_module.published?).to eq false
+        expect(assignment.published?).to eq true
+        json = api.assignment_json(assignment, student, session, { include_can_submit: true })
+        expect(json).to have_key "can_submit"
+        expect(json[:can_submit]).to eq false
+      end
+    end
+
     context 'rubrics' do
       before do
         rubric_model({
