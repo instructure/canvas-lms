@@ -2327,6 +2327,37 @@ QUnit.module('Gradebook#getViewOptionsMenuProps', () => {
     consoleSpy.restore()
   })
 
+  test('showSeparateFirstLastNames is false', () => {
+    const {showSeparateFirstLastNames} = createGradebook().getViewOptionsMenuProps()
+    strictEqual(showSeparateFirstLastNames, false)
+  })
+
+  test('showSeparateFirstLastNames is true when settings.show_separate_first_last_names is "true"', () => {
+    const settings = {show_separate_first_last_names: 'true'}
+    const {showSeparateFirstLastNames} = createGradebook({settings}).getViewOptionsMenuProps()
+    strictEqual(showSeparateFirstLastNames, true)
+  })
+
+  test('showSeparateFirstLastNames is false when settings.show_separate_first_last_names is "false"', () => {
+    const settings = {show_separate_first_last_names: 'false'}
+    const {showSeparateFirstLastNames} = createGradebook({settings}).getViewOptionsMenuProps()
+    strictEqual(showSeparateFirstLastNames, false)
+  })
+
+  test('allowShowSeparateFirstLastNames is true when options.allow_separate_first_last_names is true', () => {
+    const {allowShowSeparateFirstLastNames} = createGradebook({
+      allow_separate_first_last_names: true
+    }).getViewOptionsMenuProps()
+    strictEqual(allowShowSeparateFirstLastNames, true)
+  })
+
+  test('allowShowSeparateFirstLastNames is false when options.allow_separate_first_last_names is false', () => {
+    const {allowShowSeparateFirstLastNames} = createGradebook({
+      allow_separate_first_last_names: false
+    }).getViewOptionsMenuProps()
+    strictEqual(allowShowSeparateFirstLastNames, false)
+  })
+
   test('showUnpublishedAssignments is true', () => {
     const {showUnpublishedAssignments} = createGradebook().getViewOptionsMenuProps()
     strictEqual(showUnpublishedAssignments, true)

@@ -230,6 +230,7 @@ export const updateDiscussionEntryParticipantMock = ({
   read = null,
   rating = null,
   forcedReadState = null,
+  reportType = null,
   shouldError = false
 } = {}) => [
   {
@@ -253,6 +254,7 @@ export const updateDiscussionEntryParticipantMock = ({
               rating: !!(rating !== null && rating === 'liked'),
               read: read !== null ? read : true,
               forcedReadState: forcedReadState !== null ? forcedReadState : false,
+              reportType: reportType !== null ? reportType : null,
               __typename: 'EntryParticipant'
             }
           }),

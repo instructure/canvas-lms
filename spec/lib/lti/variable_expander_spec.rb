@@ -1414,6 +1414,13 @@ module Lti
           expect(exp_hash[:test]).to eq 2015
         end
 
+        it 'has substitution for $Canvas.assignment.description' do
+          allow(assignment).to receive(:description).and_return('desc')
+          exp_hash = { test: '$Canvas.assignment.description' }
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'desc'
+        end
+
         it 'has substitution for $Canvas.assignment.title' do
           assignment.title = 'Buy as many ducks as you can'
           exp_hash = { test: '$Canvas.assignment.title' }

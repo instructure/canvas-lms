@@ -22,6 +22,9 @@ import {MessageDetailActions} from '../MessageDetailActions/MessageDetailActions
 import {MessageDetailParticipants} from '../MessageDetailParticipants/MessageDetailParticipants'
 import PropTypes from 'prop-types'
 import React from 'react'
+import {IconPaperclipLine} from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
+import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import I18n from 'i18n!conversations_2'
@@ -64,6 +67,19 @@ export const MessageDetailItem = ({...props}) => {
         </Flex.Item>
       </Flex>
       <Text>{props.conversationMessage.body}</Text>
+      {props.conversationMessage.attachmentsConnection?.nodes?.length > 0 && (
+        <List isUnstyled margin="medium auto small">
+          {props.conversationMessage.attachmentsConnection.nodes.map(attachment => {
+            return (
+              <List.Item as="div" key={attachment.id}>
+                <Link href={attachment.url} renderIcon={<IconPaperclipLine size="x-small" />}>
+                  {attachment.displayName}
+                </Link>
+              </List.Item>
+            )
+          })}
+        </List>
+      )}
     </>
   )
 }

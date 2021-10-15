@@ -206,7 +206,7 @@
 #
 class SubmissionsApiController < ApplicationController
   before_action :get_course_from_section, :require_context, :require_user
-  batch_jobs_in_actions :only => [:update], :batch => { :priority => Delayed::LOW_PRIORITY }
+  batch_jobs_in_actions :only => [:update, :update_anonymous], :batch => { :priority => Delayed::LOW_PRIORITY }
   before_action :ensure_submission, :only => [:show,
                                               :document_annotations_read_state,
                                               :mark_document_annotations_read,
@@ -611,12 +611,34 @@ class SubmissionsApiController < ApplicationController
          @submission.assignment_visible_to_user?(@current_user)
         includes = Array(params[:include])
         @submission.visible_to_user = includes.include?("visibility") ? @assignment.visible_to_user?(@submission.user) : true
-        render :json => submission_json(@submission, @assignment, @current_user, session, @context, includes, params)
+        render json: submission_json(
+          @submission,
+          @assignment,
+          @current_user,
+          session,
+          @context,
+          includes,
+          params.merge(anonymize_user_id: !!@anonymize_user_id)
+        )
       else
         @unauthorized_message = t('#application.errors.submission_unauthorized', "You cannot access this submission.")
         return render_unauthorized_action
       end
     end
+  end
+
+  # @API Get a single submission by anonymous id
+  #
+  # Get a single submission, based on the submission's anonymous id.
+  #
+  # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"full_rubric_assessment"|"visibility"|"course"|"user"|"read_status"]
+  #   Associations to include with the group.
+  def show_anonymous
+    @assignment = api_find(@context.assignments.active, params[:assignment_id])
+    @submission = @assignment.submissions.find_by!(anonymous_id: params[:anonymous_id])
+    @user = get_user_considering_section(@submission.user_id)
+    @anonymize_user_id = true
+    show
   end
 
   # @API Upload a file
@@ -785,7 +807,7 @@ class SubmissionsApiController < ApplicationController
   #   Then a possible set of values for rubric_assessment would be:
   #       rubric_assessment[crit1][points]=3&rubric_assessment[crit1][rating_id]=rat1&rubric_assessment[crit2][points]=5&rubric_assessment[crit2][rating_id]=rat2&rubric_assessment[crit2][comments]=Well%20Done.
   def update
-    @assignment = api_find(@context.assignments.active, params[:assignment_id])
+    @assignment ||= api_find(@context.assignments.active, params[:assignment_id])
 
     if params[:submission] && params[:submission][:posted_grade] && !params[:submission][:provisional] &&
        @assignment.moderated_grading && !@assignment.grades_published?
@@ -793,9 +815,8 @@ class SubmissionsApiController < ApplicationController
       return
     end
 
-    @user = get_user_considering_section(params[:user_id])
-
-    @submission = @assignment.all_submissions.find_or_create_by!(user: @user)
+    @user ||= get_user_considering_section(params[:user_id])
+    @submission ||= @assignment.all_submissions.find_or_create_by!(user: @user)
 
     authorized = if params[:submission] || params[:rubric_assessment]
                    authorized_action(@submission, @current_user, :grade)
@@ -917,7 +938,15 @@ class SubmissionsApiController < ApplicationController
         user_ids = @submissions.map(&:user_id)
         users_with_visibility = AssignmentStudentVisibility.where(course_id: @context, assignment_id: @assignment, user_id: user_ids).pluck(:user_id).to_set
       end
-      json = submission_json(@submission, @assignment, @current_user, session, @context, includes, params)
+      json = submission_json(
+        @submission,
+        @assignment,
+        @current_user,
+        session,
+        @context,
+        includes,
+        params.merge(anonymize_user_id: !!@anonymize_user_id)
+      )
 
       includes.delete("submission_comments")
       Version.preload_version_number(@submissions)
@@ -926,10 +955,139 @@ class SubmissionsApiController < ApplicationController
           submission.visible_to_user = users_with_visibility.include?(submission.user_id)
         end
 
-        submission_json(submission, @assignment, @current_user, session, @context, includes, params)
+        submission_json(
+          submission,
+          @assignment,
+          @current_user,
+          session,
+          @context,
+          includes,
+          params.merge(anonymize_user_id: !!@anonymize_user_id)
+        )
       end
       render :json => json
     end
+  end
+
+  # @API Grade or comment on a submission by anonymous id
+  #
+  # Comment on and/or update the grading for a student's assignment submission,
+  # fetching the submission by anonymous id (instead of user id). If any
+  # submission or rubric_assessment arguments are provided, the user must
+  # have permission to manage grades in the appropriate context (course or
+  # section).
+  #
+  # @argument comment[text_comment] [String]
+  #   Add a textual comment to the submission.
+  #
+  # @argument comment[group_comment] [Boolean]
+  #   Whether or not this comment should be sent to the entire group (defaults
+  #   to false). Ignored if this is not a group assignment or if no text_comment
+  #   is provided.
+  #
+  # @argument comment[media_comment_id] [String]
+  #   Add an audio/video comment to the submission. Media comments can be added
+  #   via this API, however, note that there is not yet an API to generate or
+  #   list existing media comments, so this functionality is currently of
+  #   limited use.
+  #
+  # @argument comment[media_comment_type] [String, "audio"|"video"]
+  #   The type of media comment being added.
+  #
+  # @argument comment[file_ids][] [Integer]
+  #   Attach files to this comment that were previously uploaded using the
+  #   Submission Comment API's files action
+  #
+  # @argument include[visibility] [String]
+  #   Whether this assignment is visible to the owner of the submission
+  #
+  # @argument submission[posted_grade] [String]
+  #   Assign a score to the submission, updating both the "score" and "grade"
+  #   fields on the submission record. This parameter can be passed in a few
+  #   different formats:
+  #
+  #   points:: A floating point or integral value, such as "13.5". The grade
+  #     will be interpreted directly as the score of the assignment.
+  #     Values above assignment.points_possible are allowed, for awarding
+  #     extra credit.
+  #   percentage:: A floating point value appended with a percent sign, such as
+  #      "40%". The grade will be interpreted as a percentage score on the
+  #      assignment, where 100% == assignment.points_possible. Values above 100%
+  #      are allowed, for awarding extra credit.
+  #   letter grade:: A letter grade, following the assignment's defined letter
+  #      grading scheme. For example, "A-". The resulting score will be the high
+  #      end of the defined range for the letter grade. For instance, if "B" is
+  #      defined as 86% to 84%, a letter grade of "B" will be worth 86%. The
+  #      letter grade will be rejected if the assignment does not have a defined
+  #      letter grading scheme. For more fine-grained control of scores, pass in
+  #      points or percentage rather than the letter grade.
+  #   "pass/complete/fail/incomplete":: A string value of "pass" or "complete"
+  #      will give a score of 100%. "fail" or "incomplete" will give a score of
+  #      0.
+  #
+  #   Note that assignments with grading_type of "pass_fail" can only be
+  #   assigned a score of 0 or assignment.points_possible, nothing inbetween. If
+  #   a posted_grade in the "points" or "percentage" format is sent, the grade
+  #   will only be accepted if the grade equals one of those two values.
+  #
+  # @argument submission[excuse] [Boolean]
+  #   Sets the "excused" status of an assignment.
+  #
+  # @argument submission[late_policy_status] [String]
+  #   Sets the late policy status to either "late", "missing", "none", or null.
+  #
+  # @argument submission[seconds_late_override] [Integer]
+  #   Sets the seconds late if late policy status is "late"
+  #
+  # @argument rubric_assessment [RubricAssessment]
+  #   Assign a rubric assessment to this assignment submission. The
+  #   sub-parameters here depend on the rubric for the assignment. The general
+  #   format is, for each row in the rubric:
+  #
+  #   The points awarded for this row.
+  #     rubric_assessment[criterion_id][points]
+  #
+  #   The rating id for the row.
+  #     rubric_assessment[criterion_id][rating_id]
+  #
+  #   Comments to add for this row.
+  #     rubric_assessment[criterion_id][comments]
+  #
+  #
+  #   For example, if the assignment rubric is (in JSON format):
+  #     !!!javascript
+  #     [
+  #       {
+  #         'id': 'crit1',
+  #         'points': 10,
+  #         'description': 'Criterion 1',
+  #         'ratings':
+  #         [
+  #           { 'id': 'rat1', 'description': 'Good', 'points': 10 },
+  #           { 'id': 'rat2', 'description': 'Poor', 'points': 3 }
+  #         ]
+  #       },
+  #       {
+  #         'id': 'crit2',
+  #         'points': 5,
+  #         'description': 'Criterion 2',
+  #         'ratings':
+  #         [
+  #           { 'id': 'rat1', 'description': 'Exemplary', 'points': 5 },
+  #           { 'id': 'rat2', 'description': 'Complete', 'points': 5 },
+  #           { 'id': 'rat3', 'description': 'Incomplete', 'points': 0 }
+  #         ]
+  #       }
+  #     ]
+  #
+  #   Then a possible set of values for rubric_assessment would be:
+  #       rubric_assessment[crit1][points]=3&rubric_assessment[crit1][rating_id]=rat1&rubric_assessment[crit2][points]=5&rubric_assessment[crit2][rating_id]=rat2&rubric_assessment[crit2][comments]=Well%20Done.
+  def update_anonymous
+    @assignment = api_find(@context.assignments.active, params[:assignment_id])
+    @submission = @assignment.submissions.find_by!(anonymous_id: params[:anonymous_id])
+    @user = get_user_considering_section(@submission.user_id)
+    @anonymize_user_id = true
+    update
   end
 
   # @API List gradeable students
