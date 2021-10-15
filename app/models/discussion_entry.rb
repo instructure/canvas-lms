@@ -490,6 +490,10 @@ class DiscussionEntry < ActiveRecord::Base
     !read?(current_user)
   end
 
+  def report_type?(current_user = nil)
+    find_existing_participant(current_user).report_type
+  end
+
   # Public: Change the workflow_state of the entry for the specified user.
   #
   # new_state    - The new workflow_state.
@@ -548,6 +552,13 @@ class DiscussionEntry < ActiveRecord::Base
     end
 
     entry_participant
+  end
+
+  def change_report_type(report_type, current_user)
+    return unless report_type && current_user
+
+    participant_id = self.update_or_create_participant(current_user: current_user, report_type: report_type).first
+    delay.broadcast_report_notification(report_type) if participant_id
   end
 
   def broadcast_report_notification(report_type)
