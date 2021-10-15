@@ -321,8 +321,12 @@ module CustomSeleniumActions
     raise 'switch views is not available!'
   end
 
-  def switch_editor_views
-    force_click('[data-btn-id="rce-edit-btn"]')
+  # controlling_element is a parent of the RCE you're interested in using.
+  # the default controlling_element works fine if there is only 1 RCE on the page
+  # or if you're interested in the first one of many
+  def switch_editor_views(controlling_element = f('.rce-wrapper'))
+    edit_btn = f("[data-btn-id='rce-edit-btn']", controlling_element)
+    edit_btn.click
   end
 
   def clear_tiny(tiny_controlling_element, iframe_id = nil)
@@ -337,13 +341,14 @@ module CustomSeleniumActions
       end
     else
       assert_can_switch_views!
-      switch_editor_views
+      switch_editor_views(tiny_controlling_element)
       tiny_controlling_element.clear
     end
   end
 
-  def type_in_tiny(tiny_controlling_element, text, clear: false)
-    selector = tiny_controlling_element.to_s.to_json
+  def type_in_tiny(tiny_controlling_element_selector, text, clear: false)
+    selector = tiny_controlling_element_selector.to_s.to_json
+    tiny_controlling_element = fj(tiny_controlling_element_selector)
     mce_class = '.tox-tinymce'
     keep_trying_until do
       driver.execute_script("return $(#{selector}).siblings('#{mce_class}').length > 0;")
@@ -356,7 +361,9 @@ module CustomSeleniumActions
     clear_tiny(tiny_controlling_element, iframe_id) if clear
 
     if text.length > 100 || text.lines.size > 1
-      switch_editor_views
+      switch_editor_views(
+        fxpath('./ancestor::div[contains(@class, "rce-wrapper")]', tiny_controlling_element)
+      )
       html = '<p>' + ERB::Util.html_escape(text).gsub("\n", '</p><p>') + '</p>'
       driver.execute_script("return $(#{selector}).val(#{html.inspect})")
     else
