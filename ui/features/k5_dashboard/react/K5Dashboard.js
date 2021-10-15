@@ -20,7 +20,7 @@ import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_dashboard'
 import PropTypes from 'prop-types'
 
-import {startLoadingAllOpportunities, responsiviser, store} from '@instructure/canvas-planner'
+import {responsiviser, store} from '@instructure/canvas-planner'
 import {
   IconBankLine,
   IconCalendarMonthLine,
@@ -130,8 +130,6 @@ export const K5Dashboard = ({
   createPermissions,
   currentUser,
   currentUserRoles,
-  loadingOpportunities,
-  loadAllOpportunities,
   timeZone,
   defaultTab = TAB_IDS.HOMEROOM,
   plannerEnabled = false,
@@ -163,7 +161,6 @@ export const K5Dashboard = ({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
     focusFallback: tabsRef,
-    callback: () => loadAllOpportunities(),
     observedUserId: initialObservedId,
     isObserver: currentUserRoles.includes('observer')
   })
@@ -314,7 +311,6 @@ export const K5Dashboard = ({
               assignmentsMissing,
               assignmentsCompletedForToday,
               loadingAnnouncements,
-              loadingOpportunities,
               isStudent: plannerEnabled,
               responsiveSize,
               subjectAnnouncements
@@ -402,8 +398,6 @@ K5Dashboard.propTypes = {
     avatar_image_url: PropTypes.string
   }).isRequired,
   currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired,
-  loadingOpportunities: PropTypes.bool.isRequired,
-  loadAllOpportunities: PropTypes.func.isRequired,
   timeZone: PropTypes.string.isRequired,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
@@ -417,14 +411,7 @@ K5Dashboard.propTypes = {
   canAddObservee: PropTypes.bool.isRequired
 }
 
-const mapDispatchToProps = {
-  loadAllOpportunities: startLoadingAllOpportunities
-}
-
-const WrappedK5Dashboard = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(responsiviser()(K5Dashboard))
+const WrappedK5Dashboard = connect(mapStateToProps)(responsiviser()(K5Dashboard))
 
 export default props => (
   <ApplyTheme theme={theme}>
