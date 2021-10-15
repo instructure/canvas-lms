@@ -234,6 +234,24 @@ module CustomWaitMethods
     tiny_frame
   end
 
+  # a slightly modified version of wait_for_tiny
+  # that's simpler for the normal case where
+  # there's only 1 RCE on  the pge
+  def wait_for_rce(element = nil)
+    element = f(element) if element.is_a? String
+    element ||= f('.rce-wrapper')
+    tiny_frame = nil
+    keep_trying_until do
+      begin
+        tiny_frame = disable_implicit_wait { element.find_element(:css, 'iframe') }
+      rescue => e
+        puts "#{e.inspect}"
+        false
+      end
+    end
+    tiny_frame
+  end
+
   def disable_implicit_wait
     ::SeleniumExtensions::FinderWaiting.disable do
       yield
