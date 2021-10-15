@@ -23,7 +23,6 @@ import Gradebook from './react/default_gradebook/Gradebook'
 import('@canvas/context-cards/react/StudentContextCardTrigger')
 
 const mountPoint = document.querySelector('#gradebook_app')
-const filterNavNode = document.querySelector('#gradebook-filter-nav')
 const gradebookMenuNode = document.querySelector('[data-component="GradebookMenu"]')
 const settingsModalButtonContainer = document.getElementById(
   'gradebook-settings-modal-button-container'
@@ -35,7 +34,6 @@ const props = {
   locale: ENV.LOCALE,
   gradebookMenuNode,
   gridColorNode,
-  filterNavNode,
   settingsModalButtonContainer,
   gradebookEnv: ENV.GRADEBOOK_OPTIONS
 }

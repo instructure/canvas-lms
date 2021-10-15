@@ -168,7 +168,7 @@ if Qti.migration_executable
       expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::JUMBLED_SENTENCE
     end
 
-    it "references associated files correctly" do
+    it "correctlies reference associated files" do
       import_into_course
 
       q = @course.assessment_questions.where(migration_id: "ID_81847332876966484848484950729496134337732113114455").first

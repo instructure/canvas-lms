@@ -57,7 +57,6 @@ describe('determineSubmissionSelection', () => {
 
 describe('makeSubmissionUpdateRequest', () => {
   let data
-  let isAnonymous
   let courseId
   let submission
 
@@ -70,7 +69,6 @@ describe('makeSubmissionUpdateRequest', () => {
 
   beforeEach(() => {
     data = {latePolicyStatus: 'none'}
-    isAnonymous = false
     courseId = 1
     submission = {
       assignment_id: 2,
@@ -86,23 +84,10 @@ describe('makeSubmissionUpdateRequest', () => {
   })
 
   it('makes a request to the proper endpoint', function (done) {
-    makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
+    makeSubmissionUpdateRequest(submission, courseId, data)
     moxios.wait(() => {
       const request = moxios.requests.mostRecent()
       expect(request.url).toEqual('/api/v1/courses/1/assignments/2/submissions/3')
-      done()
-    })
-  })
-
-  it('makes a request to the "anonymous" endpoint if the assignment is anonymous', function (done) {
-    isAnonymous = true
-    submission.anonymous_id = 'i9Z1a'
-    makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
-    moxios.wait(() => {
-      const request = moxios.requests.mostRecent()
-      expect(request.url).toEqual(
-        `/api/v1/courses/1/assignments/2/anonymous_submissions/${submission.anonymous_id}`
-      )
       done()
     })
   })
@@ -116,7 +101,7 @@ describe('makeSubmissionUpdateRequest', () => {
       }
     }
 
-    makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
+    makeSubmissionUpdateRequest(submission, courseId, data)
     moxios.wait(() => {
       const request = moxios.requests.mostRecent()
       expect(JSON.parse(request.config.data)).toEqual(expectedData)
@@ -135,7 +120,7 @@ describe('makeSubmissionUpdateRequest', () => {
       }
     }
 
-    makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
+    makeSubmissionUpdateRequest(submission, courseId, data)
     moxios.wait(() => {
       const request = moxios.requests.mostRecent()
       expect(JSON.parse(request.config.data)).toEqual(expectedData)
@@ -155,7 +140,7 @@ describe('makeSubmissionUpdateRequest', () => {
       }
     }
 
-    makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
+    makeSubmissionUpdateRequest(submission, courseId, data)
     moxios.wait(() => {
       const request = moxios.requests.mostRecent()
       expect(JSON.parse(request.config.data)).toEqual(expectedData)
@@ -174,7 +159,7 @@ describe('makeSubmissionUpdateRequest', () => {
       }
     }
 
-    makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
+    makeSubmissionUpdateRequest(submission, courseId, data)
     moxios.wait(() => {
       const request = moxios.requests.mostRecent()
       expect(JSON.parse(request.config.data)).toEqual(expectedData)

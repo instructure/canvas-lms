@@ -166,21 +166,28 @@ describe "course copy" do
     # this test requires jobs to run in the middle of it and course_copys
     # need to check a lot of things, a longer timeout is reasonable.
     it "shifts the dates a week later", priority: "2", test_id: 2953906, custom_timeout: 30 do
-      event = @course.calendar_events.create! title: 'Monday Event', start_at: @date_to_use
-
+      get "/calendar"
+      quick_jump_to_date(@date_to_use)
+      create_calendar_event('Monday Event', true, false, false, @date_to_use, true)
       get "/courses/#{@course.id}/copy"
       new_course_name = "copied course"
       replace_content(f("input[type=text][id=course_name]"), new_course_name)
       replace_content(f("input[type=text][id=course_course_code]"), "copied")
       f("input[type=checkbox][id=dateAdjustCheckbox]").click
       date = 1.week.from_now.strftime("%Y-%m-%d")
-      replace_content(f("input[type=text][id=newStartDate]"), date, tab_out: true)
-      expect_new_page_load { submit_form('#copy_course_form') }
+      replace_content(f("input[type=text][id=newStartDate]"), date)
+      submit_form('#copy_course_form')
       run_jobs
+      raise "progress bar is still there after waiting" unless wait_for_no_such_element(timeout: 10) { f('.bar') }
 
-      new_course = Course.where(name: new_course_name).last
-      new_event = new_course.calendar_events.where(title: 'Monday Event').last
-      expect(new_event.all_day_date).to eq event.all_day_date + 7.days
+      expect(f('div.progressStatus span')).to include_text 'Completed'
+      get "/calendar#view_name=week"
+      quick_jump_to_date(@date_to_use)
+      f('.fc-event').click
+      expect(f('.event-details-content')).to include_text("#{@course.name}")
+      f('.navigate_next').click
+      f('.fc-event').click
+      expect(f('.event-details-content')).to include_text("#{new_course_name}")
     end
   end
 end

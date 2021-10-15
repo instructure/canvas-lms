@@ -490,10 +490,6 @@ class DiscussionEntry < ActiveRecord::Base
     !read?(current_user)
   end
 
-  def report_type?(current_user = nil)
-    find_existing_participant(current_user).report_type
-  end
-
   # Public: Change the workflow_state of the entry for the specified user.
   #
   # new_state    - The new workflow_state.
@@ -552,29 +548,6 @@ class DiscussionEntry < ActiveRecord::Base
     end
 
     entry_participant
-  end
-
-  def change_report_type(report_type, current_user)
-    return unless report_type && current_user
-
-    participant_id = self.update_or_create_participant(current_user: current_user, report_type: report_type).first
-    delay.broadcast_report_notification(report_type) if participant_id
-  end
-
-  def broadcast_report_notification(report_type)
-    return unless Account.site_admin.feature_enabled?(:discussions_reporting)
-
-    to_list = context.instructors_in_charge_of(user_id)
-
-    notification_type = "Reported Reply"
-    notification = BroadcastPolicy.notification_finder.by_name(notification_type)
-
-    data = course_broadcast_data
-    data[:report_type] = report_type
-
-    GuardRail.activate(:primary) do
-      BroadcastPolicy.notifier.send_notification(self, notification_type, notification, to_list, data)
-    end
   end
 
   def update_aggregate_rating(old_rating, new_rating)
