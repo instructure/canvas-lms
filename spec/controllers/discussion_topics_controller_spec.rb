@@ -323,6 +323,19 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION][:TOPIC][:COURSE_SECTIONS].first[:user_count]).to eq(1)
     end
 
+    it "js_env requires user for apollo_caching" do
+      Account.site_admin.enable_feature! :react_discussions_post
+      Account.site_admin.enable_feature! :apollo_caching
+      @course.update(is_public: true)
+
+      @discussion = @course.discussion_topics.create!(user: @teacher, message: 'hello')
+      get 'show', params: { course_id: @course.id, id: @discussion.id }
+      expect(assigns[:js_env][:apollo_caching]).to be_nil
+      user_session @student
+      get 'show', params: { course_id: @course.id, id: @discussion.id }
+      expect(assigns[:js_env][:apollo_caching]).to be_truthy
+    end
+
     it "js_env disable_keyboard_shortcuts should follow feature flag" do
       @student.enable_feature! :disable_keyboard_shortcuts
       user_session @student
@@ -697,6 +710,7 @@ describe DiscussionTopicsController do
         get 'show', params: { :course_id => @course.id, :id => @topic.id }
         expect(assigns[:js_env][:EDIT_URL]).to eq "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
         expect(assigns[:js_env][:DISCUSSION][:GRADED_RUBRICS_URL]).to eq "/courses/#{@course.id}/assignments/#{@topic.assignment.id}/rubric"
+        expect(assigns[:js_env][:DISCUSSION][:CONTEXT_RUBRICS_URL]).to eq "/courses/#{@course.id}/rubrics"
         expect(assigns[:js_env][:SPEEDGRADER_URL_TEMPLATE])
           .to eq "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@topic.assignment.id}&student_id=%3Astudent_id"
         expect(assigns[:js_env][:PEER_REVIEWS_URL]).to eq "/courses/#{@course.id}/assignments/#{@topic.assignment.id}/peer_reviews"
