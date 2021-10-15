@@ -88,17 +88,17 @@ QUnit.module('GradebookExportManager - monitoringUrl', {
   }
 })
 
-test('returns an appropriate url if all relevant pieces are present', function() {
+test('returns an appropriate url if all relevant pieces are present', function () {
   equal(this.subject.monitoringUrl(), `${monitoringBase}/progressId`)
 })
 
-test('returns undefined if export is missing', function() {
+test('returns undefined if export is missing', function () {
   this.subject.export = undefined
 
   equal(this.subject.monitoringUrl(), undefined)
 })
 
-test('returns undefined if progressId is missing', function() {
+test('returns undefined if progressId is missing', function () {
   this.subject.export.progressId = undefined
 
   equal(this.subject.monitoringUrl(), undefined)
@@ -118,17 +118,17 @@ QUnit.module('GradebookExportManager - attachmentUrl', {
   }
 })
 
-test('returns an appropriate url if all relevant pieces are present', function() {
+test('returns an appropriate url if all relevant pieces are present', function () {
   equal(this.subject.attachmentUrl(), `${attachmentBase}/attachmentId`)
 })
 
-test('returns undefined if export is missing', function() {
+test('returns undefined if export is missing', function () {
   this.subject.export = undefined
 
   equal(this.subject.attachmentUrl(), undefined)
 })
 
-test('returns undefined if attachmentId is missing', function() {
+test('returns undefined if attachmentId is missing', function () {
   this.subject.export.attachmentId = undefined
 
   equal(this.subject.attachmentUrl(), undefined)
@@ -158,6 +158,32 @@ QUnit.module('GradebookExportManager - startExport', {
   }
 })
 
+test('sets show_student_first_last_name setting if requested', function () {
+  this.subject = new GradebookExportManager(exportingUrl, currentUserId)
+  this.subject.monitorExport = (resolve, _reject) => {
+    resolve('success')
+  }
+
+  const getAssignmentOrder = () => []
+  return this.subject.startExport(undefined, getAssignmentOrder, true).then(() => {
+    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
+    propEqual(postData.show_student_first_last_name, true)
+  })
+})
+
+test('does not set show_student_first_last_name setting by default', function () {
+  this.subject = new GradebookExportManager(exportingUrl, currentUserId)
+  this.subject.monitorExport = (resolve, _reject) => {
+    resolve('success')
+  }
+
+  const getAssignmentOrder = () => []
+  return this.subject.startExport(undefined, getAssignmentOrder).then(() => {
+    const postData = JSON.parse(moxios.requests.mostRecent().config.data)
+    propEqual(postData.show_student_first_last_name, false)
+  })
+})
+
 test('includes assignment_order if getAssignmentOrder returns some assignments', function () {
   this.subject = new GradebookExportManager(exportingUrl, currentUserId)
   this.subject.monitorExport = (resolve, _reject) => {
@@ -184,7 +210,7 @@ test('does not include assignment_order if getAssignmentOrder returns no assignm
   })
 })
 
-test('returns a rejected promise if the manager has no exportingUrl set', function() {
+test('returns a rejected promise if the manager has no exportingUrl set', function () {
   this.subject = new GradebookExportManager(exportingUrl, currentUserId)
   this.subject.exportingUrl = undefined
 
@@ -195,7 +221,7 @@ test('returns a rejected promise if the manager has no exportingUrl set', functi
     })
 })
 
-test('returns a rejected promise if the manager already has an export going', function() {
+test('returns a rejected promise if the manager already has an export going', function () {
   this.subject = new GradebookExportManager(exportingUrl, currentUserId, workingExport)
 
   return this.subject
@@ -205,7 +231,7 @@ test('returns a rejected promise if the manager already has an export going', fu
     })
 })
 
-test('sets a new existing export and returns a fulfilled promise', function() {
+test('sets a new existing export and returns a fulfilled promise', function () {
   const expectedExport = {
     progressId: 'newProgressId',
     attachmentId: 'newAttachmentId'
@@ -223,7 +249,7 @@ test('sets a new existing export and returns a fulfilled promise', function() {
     })
 })
 
-test('clears any new export and returns a rejected promise if no monitoring is possible', function() {
+test('clears any new export and returns a rejected promise if no monitoring is possible', function () {
   sandbox.stub(GradebookExportManager.prototype, 'monitoringUrl').returns(undefined)
   this.subject = new GradebookExportManager(exportingUrl, currentUserId)
 
@@ -235,7 +261,7 @@ test('clears any new export and returns a rejected promise if no monitoring is p
     })
 })
 
-test('starts polling for progress and returns a rejected promise on progress failure', function() {
+test('starts polling for progress and returns a rejected promise on progress failure', function () {
   const expectedMonitoringUrl = `${monitoringBase}/newProgressId`
 
   this.subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1)
@@ -255,7 +281,7 @@ test('starts polling for progress and returns a rejected promise on progress fai
     })
 })
 
-test('starts polling for progress and returns a rejected promise on unknown progress status', function() {
+test('starts polling for progress and returns a rejected promise on unknown progress status', function () {
   const expectedMonitoringUrl = `${monitoringBase}/newProgressId`
 
   this.subject = new GradebookExportManager(exportingUrl, currentUserId, null, 1)
@@ -275,7 +301,7 @@ test('starts polling for progress and returns a rejected promise on unknown prog
     })
 })
 
-test('starts polling for progress and returns a fulfilled promise on progress completion', function() {
+test('starts polling for progress and returns a fulfilled promise on progress completion', function () {
   const expectedMonitoringUrl = `${monitoringBase}/newProgressId`
   const expectedAttachmentUrl = `${attachmentBase}/newAttachmentId`
 
