@@ -538,9 +538,21 @@ class ContentMigration < ActiveRecord::Base
     Canvas::Plugin::value_to_boolean option
   end
 
+  def capture_job_id
+    job = Delayed::Worker.current_job
+    return false unless job
+
+    self.migration_settings[:job_ids] ||= []
+    return false if self.migration_settings[:job_ids].include?(job.id)
+
+    self.migration_settings[:job_ids] << job.id
+    true
+  end
+
   def import_content
     reset_job_progress(:running) if !import_immediately?
     self.workflow_state = :importing
+    capture_job_id
     self.save
 
     Lti::Asset.opaque_identifier_for(self.context)
