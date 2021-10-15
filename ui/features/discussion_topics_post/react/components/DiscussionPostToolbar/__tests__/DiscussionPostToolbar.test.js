@@ -19,6 +19,7 @@
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {DiscussionPostToolbar} from '../DiscussionPostToolbar'
+import {ChildTopic} from '../../../../graphql/ChildTopic'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -120,6 +121,22 @@ describe('DiscussionPostToolbar', () => {
       const button = getByTestId('sortButton')
       button.click()
       expect(onSortClickMock.mock.calls.length).toBe(1)
+    })
+  })
+
+  describe('Groups Menu Button', () => {
+    it('should not render when there are no child topics', () => {
+      const container = setup({
+        childTopics: []
+      })
+      expect(container.queryByTestId('groups-menu-button')).toBeNull()
+    })
+
+    it('should render when there are child topics', () => {
+      const container = setup({
+        childTopics: [ChildTopic.mock()]
+      })
+      expect(container.queryByTestId('groups-menu-button')).toBeTruthy()
     })
   })
 })
