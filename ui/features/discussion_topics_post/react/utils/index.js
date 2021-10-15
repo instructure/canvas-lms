@@ -174,6 +174,7 @@ export const getOptimisticResponse = (
           rating: false,
           read: true,
           forcedReadState: false,
+          reportType: null,
           __typename: 'EntryParticipant'
         },
         rootEntryParticipantCounts: {

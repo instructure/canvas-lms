@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Tildel"
     },
+    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+        "message": "Anvend ændringer på alle forekomster af denne knap og ikon i faget"
+    },
     "apps_54d24a47": {
         "message": "Apps"
     },
@@ -148,9 +151,6 @@
     },
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Der findes automatisk gemt indhold. Vil du indlæse det automatisk gemte indhold i stedet?"
-    },
-    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-        "message": "Åbn automatisk en in-line forhåndsvisning. (Forhåndsvisning vises kun, når filen er blevet gemt)"
     },
     "available_folders_694d0436": {
         "message": "Tilgængelige mapper"
@@ -379,9 +379,6 @@
     },
     "directionality_26ae9e08": {
         "message": "Retningsbestemthed"
-    },
-    "disable_in_line_preview_2a675175": {
-        "message": "Deaktiver in-line forhåndsvisning."
     },
     "discussion_6719c51d": {
         "message": "Diskussion"
@@ -839,9 +836,6 @@
     "my_grades_98834476": {
         "message": "Mine karakterer"
     },
-    "my_images_427f9b0c": {
-        "message": "Mine billeder"
-    },
     "name_1aed4a1b": {
         "message": "Navn"
     },
@@ -1105,9 +1099,6 @@
     },
     "size_b30e1077": {
         "message": "Størrelse"
-    },
-    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-        "message": "Størrelsen på { file } er større end maks. { max } MB tilladte filstørrelse."
     },
     "small_b070434a": {
         "message": "Lille"

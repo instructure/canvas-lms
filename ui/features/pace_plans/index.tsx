@@ -19,13 +19,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
-import k5Theme from '@canvas/k5/react/k5-theme'
 import ready from '@instructure/ready'
 
 import App from './react/app'
 import createStore from './react/shared/create_store'
-
-k5Theme.use({fontOnly: true})
 
 const CoursePage: React.FC = () => (
   <Provider store={createStore()}>

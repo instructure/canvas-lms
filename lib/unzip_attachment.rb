@@ -112,7 +112,7 @@ class UnzipAttachment
         # Hyphenate the path.  So, /some/file/path becomes some-file-path
         # Since Tempfile guarantees that the names are unique, we don't
         # have to worry about what this name actually is.
-        Tempfile.open(filename) do |f|
+        Tempfile.open do |f|
           begin
             file_size = 0
             md5 = entry.extract(f.path, true) do |bytes|

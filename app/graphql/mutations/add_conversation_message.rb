@@ -33,64 +33,33 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
   argument :user_note, Boolean, required: false
 
   field :conversation_message, Types::ConversationMessageType, null: true
-  # TODO: VICE-1037 logic is mostly duplicated in ConversationsController
+
   def resolve(input:)
     conversation = get_conversation(input[:conversation_id])
 
-    context = conversation.conversation.context
-    if context.is_a?(Course) && context.workflow_state == 'completed' && !context.grants_right?(current_user, session, :read_as_admin)
-      return validation_error(I18n.t('Course concluded, unable to send messages'))
-    end
-
-    if conversation.conversation.replies_locked_for?(current_user)
-      return validation_error(I18n.t('Unauthorized, unable to add messages to conversation'))
-    end
-
-    recipients = normalize_recipients(
+    message = process_response(
+      conversation: conversation,
+      context: conversation.conversation.context,
+      current_user: current_user,
+      session: session,
       recipients: input[:recipients],
       context_code: conversation.conversation.context.asset_string,
-      conversation_id: conversation.conversation_id,
-      current_user: current_user
-    )
-    if recipients && !conversation.conversation.can_add_participants?(recipients)
-      return validation_error(I18n.t('Too many participants for group conversation'))
-    end
-
-    tags = infer_tags(
-      recipients: conversation.conversation.participants.pluck(:id),
-      context_code: conversation.conversation.context.asset_string
-    )
-
-    message_ids = input[:included_messages]
-    validate_message_ids(message_ids, conversation, current_user: current_user)
-
-    message_args = build_message_args(
+      message_ids: input[:included_messages],
       body: input[:body],
       attachment_ids: input[:attachment_ids],
       domain_root_account_id: self.context[:domain_root_account].id,
       media_comment_id: input[:media_comment_id],
       media_comment_type: input[:media_comment_type],
-      user_note: input[:user_note],
-      current_user: current_user
+      user_note: input[:user_note]
     )
-    if conversation.should_process_immediately?
-      message = conversation.process_new_message(message_args, recipients, message_ids, tags)
-      return { conversation_message: message }
-    else
-      conversation.delay(strand: "add_message_#{conversation.global_conversation_id}")
-                  .process_new_message(message_args, recipients, message_ids, tags)
-      # The message is delayed and will be processed later so there is nothing to return
-      # right now. If there is no error, success can be assumed.
-      return { conversation_message: nil }
-    end
+
+    { conversation_message: message[:message] }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
   rescue ActiveRecord::RecordInvalid => e
     errors_for(e.record)
-  rescue ConversationsHelper::InvalidMessageForConversationError
-    validation_error(I18n.t('included_messages not for this conversation'))
-  rescue ConversationsHelper::InvalidMessageParticipantError
-    validation_error('Current user is not a participant of the included_messages')
+  rescue ConversationsHelper::Error => e
+    validation_error(e.message)
   end
 
   def get_conversation(id)

@@ -1625,7 +1625,7 @@ describe ConversationsController, type: :request do
       json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
                       { :controller => 'conversations', :action => 'add_message', :id => conversation.conversation_id.to_s, :format => 'json' },
                       { :body => "another", :recipients => [@billy.id] }, {}, { :expected_status => 400 })
-      expect(json.first["message"]).to include("too many participants")
+      expect(json.first["message"]).to include("Too many participants for group conversation")
     end
 
     it "adds participants for the given messages to the given recipients" do

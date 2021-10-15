@@ -45,7 +45,7 @@ describe "Gradebook - uploads" do
     expect(f("#content")).not_to contain_css('.right-highlight')
   end
 
-  it "correctlies update grades for assignments with GPA Scale grading type", priority: "1", test_id: 209969 do
+  it "updates grades for assignments with GPA Scale grading type correctly", priority: "1", test_id: 209969 do
     assignment = @course.assignments.create!(title: "GPA Scale Assignment",
                                              grading_type: "gpa_scale", points_possible: 5)
     assignment.grade_student(@student, grade: "D", grader: @teacher)

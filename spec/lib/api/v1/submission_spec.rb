@@ -92,8 +92,18 @@ describe Api::V1::Submission do
       end
 
       context 'when not an account user' do
-        it 'does not include anonymous_id' do
+        it 'does not include anonymous_id by default' do
           expect(json).not_to have_key 'anonymous_id'
+        end
+
+        it 'includes anonymous_id when passed anonymize_user_id: true' do
+          params[:anonymize_user_id] = true
+          expect(json['anonymous_id']).to eq submission.anonymous_id
+        end
+
+        it 'excludes user_id when passed anonymize_user_id: true' do
+          params[:anonymize_user_id] = true
+          expect(json).not_to have_key 'user_id'
         end
       end
 

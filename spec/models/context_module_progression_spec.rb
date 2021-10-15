@@ -56,7 +56,7 @@ describe ContextModuleProgression do
       setup_modules
     end
 
-    it "correctlies ignore already-calculated context_module_prerequisites" do
+    it "ignores already-calculated context_module_prerequisites correctly" do
       mp = @user.context_module_progressions.create!(:context_module => @module2)
       mp.workflow_state = 'locked'
       mp.save!

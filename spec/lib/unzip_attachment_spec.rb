@@ -134,6 +134,13 @@ describe UnzipAttachment do
       expect(@course.attachments.map(&:display_name)).to eq ['~tilde']
     end
 
+    it "does not fail when dealing with long filenames" do
+      filename = fixture_filename("zip_with_long_filename_inside.zip")
+      ua = UnzipAttachment.new(:course => @course, :filename => filename)
+      expect { ua.process }.not_to raise_exception
+      expect(@course.attachments.map(&:display_name)).to eq ["entry_#{(1..115).to_a.join}.txt"]
+    end
+
     describe 'validations' do
       let(:filename) { fixture_filename('huge_zip.zip') }
 
