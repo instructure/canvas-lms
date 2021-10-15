@@ -49,6 +49,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Список объявлений" },
   "announcements_a4b8ed4a": { "message": "Объявления" },
   "apply_781a2546": { "message": "Применить" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Применить изменения ко всем экземплярам этой кнопки и пиктограммы в курсе"
+  },
   "apps_54d24a47": { "message": "Приложения" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Соотношение сторон будет сохранено"
@@ -61,9 +64,6 @@ const locale = {
   "audio_player_for_title_20cc70d": { "message": "Аудиоплеер для { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Существует сохраненное в автоматическом режиме содержимое. Вы хотите загрузить сохраненное в автоматическом режиме содержимое?"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "Автоматически открывать встроенный предварительный просмотр. (Предварительный просмотр отображается только после сохранения)"
   },
   "available_folders_694d0436": { "message": "Доступные папки" },
   "below_81d4dceb": { "message": "Ниже" },
@@ -160,9 +160,6 @@ const locale = {
   "details_98a31b68": { "message": "Подробные сведения" },
   "dimensions_45ddb7b7": { "message": "Размеры" },
   "directionality_26ae9e08": { "message": "Направленность" },
-  "disable_in_line_preview_2a675175": {
-    "message": "Отключить встроенный предварительный просмотр."
-  },
   "discussions_a5f96392": { "message": "Обсуждения" },
   "discussions_index_6c36ced": { "message": "Индекс обсуждений" },
   "display_options_315aba85": { "message": "Опции отображения" },
@@ -308,7 +305,6 @@ const locale = {
     "message": "Должно быть как минимум { width } x { height }пикселов"
   },
   "my_files_2f621040": { "message": "Мои файлы" },
-  "my_images_427f9b0c": { "message": "Мои изображения" },
   "name_1aed4a1b": { "message": "Имя" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Навигация в меню или панели инструментов"
@@ -395,9 +391,6 @@ const locale = {
   "show_link_options_545338fd": { "message": "Показать параметры ссылки" },
   "show_video_options_6ed3721a": { "message": "Показать параметры видео" },
   "size_b30e1077": { "message": "Размер" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "Размер { file } больше допустимого максимального размера файла в { max } Мб."
-  },
   "small_b070434a": { "message": "Маленький" },
   "something_went_wrong_89195131": { "message": "Возникла проблема." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
