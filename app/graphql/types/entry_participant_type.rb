@@ -25,5 +25,6 @@ module Types
     field :rating, Boolean, null: true
     field :forced_read_state, Boolean, null: true
     field :read, Boolean, null: false
+    field :report_type, String, null: true
   end
 end
