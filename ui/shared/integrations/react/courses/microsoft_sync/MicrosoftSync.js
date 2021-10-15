@@ -55,6 +55,13 @@ const MicrosoftSync = ({group, loading, children}) => {
           'Note: Syncing is triggered by changes to course enrollments. The first time you enable Microsoft Sync, you may have to trigger a sync manually with the button below.'
         )}
       </Text>
+      <br />
+      <Text>
+        {I18n.t(
+          'Also note that Microsoft Teams is unable to support courses with greater than %{max_enrollments} enrollments or greater than %{max_owners} owners. If you have a large course you may experience sync issues if these thresholds are met.',
+          {max_enrollments: 25000, max_owners: 100}
+        )}
+      </Text>
       <Flex margin="small 0 0 0">
         <Flex.Item size="8rem" margin="0 medium 0 0">
           {children}

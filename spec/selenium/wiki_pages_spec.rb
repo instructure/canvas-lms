@@ -309,7 +309,7 @@ describe "Wiki Pages" do
     it "embeds vimeo video in the page", priority: "1", test_id: 126835 do
       get "/courses/#{@course.id}/pages/Page1/edit"
       element = f("#wiki_page_body")
-      switch_editor_views(element)
+      switch_editor_views
       html_contents = %q(
         <p>
           <iframe style="width: 640px; height: 480px;"

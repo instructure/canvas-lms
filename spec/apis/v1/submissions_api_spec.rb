@@ -2178,139 +2178,198 @@ describe 'Submissions API', type: :request do
     end
   end
 
-  context "show (differentiated_assignments)" do
-    before do
-      # set up course with DA and submit homework for an assignment
-      # that is only visible to overrides for @section1
-      # move student to a section that cannot see assignment by default
+  describe "#show_anonymous" do
+    before(:each) do
       @student = user_factory(active_all: true)
       course_with_teacher(:active_all => true)
-      @section1 = @course.course_sections.create!(name: "test section")
-      @section2 = @course.course_sections.create!(name: "test section")
-      student_in_section(@section1, user: @student)
-      @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, :only_visible_to_overrides => true)
-      create_section_override_for_assignment(@assignment, course_section: @section1)
-      submit_homework(@assignment, @student)
-      Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
-      @student.enrollments.each(&:destroy_permanently!)
-      student_in_section(@section2, user: @student)
-
-      user_session(@student)
+      section = @course.course_sections.create!(name: "test section")
+      student_in_section(section, user: @student)
+      @assignment = @course.assignments.create!(anonymous_grading: true)
     end
 
-    def call_to_submissions_show(opts = {})
-      includes = %w(submission_comments rubric_assessment)
-      includes.concat(opts[:includes]) if opts[:includes]
-      helper_method = opts[:as_student] ? [:api_call_as_user, @student] : [:api_call]
-      args = helper_method + [:get,
-                              "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
-                              { :controller => 'submissions_api', :action => 'show',
-                                :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
-                              { :include => includes }]
-      self.send(*args)
+    it "fetches the submission using the provided anonymous_id" do
+      submission = @assignment.submissions.find_by(user: @student)
+
+      api_call(
+        :get,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{submission.anonymous_id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'show_anonymous',
+          format: 'json',
+          course_id: @course.to_param,
+          assignment_id: @assignment.id.to_s,
+          anonymous_id: submission.anonymous_id.to_s
+        },
+        {},
+        {},
+        { expected_status: 200 }
+      )
     end
 
-    context "as teacher" do
-      context "with differentiated_assignments" do
-        it "returns the assignment" do
-          json = call_to_submissions_show(as_student: false)
+    it "anonymizes the results" do
+      submission = @assignment.submissions.find_by(user: @student)
+      submission.submission_comments.create!(author: @student, comment: 'hi')
 
-          expect(json["assignment_id"]).not_to be_nil
-        end
+      json = api_call(
+        :get,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{submission.anonymous_id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'show_anonymous',
+          format: 'json',
+          course_id: @course.to_param,
+          assignment_id: @assignment.id.to_s,
+          anonymous_id: submission.anonymous_id.to_s
+        },
+        { include: ['submission_comments', 'submission_history'], anonymize_user_id: true }
+      )
 
-        it "returns assignment_visible" do
-          json = call_to_submissions_show(as_student: false, includes: ["visibility"])
-          expect(json["assignment_visible"]).not_to be_nil
-        end
-      end
-    end
-
-    context "as student in a section without an override" do
-      context "with differentiated_assignments" do
-        it "returns an unauthorized error" do
-          api_call_as_user(@student, :get,
-                           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
-                           { :controller => 'submissions_api', :action => 'show',
-                             :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
-                           { :include => %w(submission_comments rubric_assessment) }, {}, expected_status: 401)
-        end
-
-        it "returns the submission if it is graded" do
-          @assignment.grade_student(@student, grade: 5, grader: @teacher)
-          json = call_to_submissions_show(as_student: true)
-
-          expect(json["assignment_id"]).not_to be_nil
-        end
-
-        it "returns assignment_visible false" do
-          json = call_to_submissions_show(as_student: false, includes: ["visibility"])
-          expect(json["assignment_visible"]).to eq(false)
-        end
+      aggregate_failures do
+        expect(json).not_to have_key 'user_id'
+        expect(json['anonymous_id']).to eq submission.anonymous_id
+        expect(json.dig('submission_history', 0)).not_to have_key 'user_id'
+        expect(json.dig('submission_history', 0, 'anonymous_id')).to eq submission.anonymous_id
+        expect(json.dig('submission_comments', 0, 'author_id')).to be nil
+        expect(json.dig('submission_comments', 0, 'author_name')).to eq 'Anonymous User'
       end
     end
   end
 
-  context "show full rubric assessments" do
-    before do
+  describe "#show" do
+    before(:each) do
       @student = user_factory(active_all: true)
-      course_with_teacher(active_all: true)
+      course_with_teacher(:active_all => true)
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @student)
-      @assignment1 = assignment_model(context: @course)
-      submit_homework(@assignment1, @student)
     end
 
-    it "fails when no rubric assessment is present" do
-      json = api_call(:get,
-                      "/api/v1/courses/#{@course.id}/assignments/#{@assignment1.id}/submissions/#{@student.id}.json",
-                      { :controller => 'submissions_api', :action => 'show',
-                        :format => 'json', :course_id => @course.id.to_s,
-                        :assignment_id => @assignment1.id.to_s, :user_id => @student.id.to_s },
-                      { :include => %w(full_rubric_assessment) })
-      expect(json).not_to have_key 'full_rubric_assessment'
-    end
-
-    context "if present" do
+    context "differentiated assignments" do
       before do
-        @assignment2 = assignment_model(context: @course)
-        rubric_assessment_model({ :purpose => "grading",
-                                  :association_object => @assignment2,
-                                  :user => @student,
-                                  :assessment_type => "grading" })
+        # set up course with DA and submit homework for an assignment
+        # that is only visible to overrides for @section
+        # move student to a section that cannot see assignment by default
+        @section2 = @course.course_sections.create!(name: "test section")
+        @assignment = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, :only_visible_to_overrides => true)
+        create_section_override_for_assignment(@assignment, course_section: @section)
+        submit_homework(@assignment, @student)
+        Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
+        @student.enrollments.each(&:destroy_permanently!)
+        student_in_section(@section2, user: @student)
+
+        user_session(@student)
       end
 
-      it "returns the correct data" do
-        json = api_call_as_user(@teacher, :get,
-                                "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/submissions/#{@student.id}.json",
+      def call_to_submissions_show(opts = {})
+        includes = %w(submission_comments rubric_assessment)
+        includes.concat(opts[:includes]) if opts[:includes]
+        helper_method = opts[:as_student] ? [:api_call_as_user, @student] : [:api_call]
+        args = helper_method + [:get,
+                                "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
                                 { :controller => 'submissions_api', :action => 'show',
-                                  :format => 'json', :course_id => @course.id.to_s,
-                                  :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
-                                { :include => %w(full_rubric_assessment) })
-        expect(json).to have_key 'full_rubric_assessment'
-        expect(json['full_rubric_assessment']).to have_key 'data'
-        expect(json['full_rubric_assessment']).to have_key 'assessor_name'
-        expect(json['full_rubric_assessment']).to have_key 'assessor_avatar_url'
+                                  :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
+                                { :include => includes }]
+        self.send(*args)
       end
 
-      it "is visible to student owning the assignment" do
-        json = api_call_as_user(@student, :get,
-                                "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/submissions/#{@student.id}.json",
-                                { :controller => 'submissions_api', :action => 'show',
-                                  :format => 'json', :course_id => @course.id.to_s,
-                                  :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
-                                { :include => %w(full_rubric_assessment) })
-        expect(json['full_rubric_assessment']).not_to be_nil
+      context "as teacher" do
+        context "with differentiated_assignments" do
+          it "returns the assignment" do
+            json = call_to_submissions_show(as_student: false)
+
+            expect(json["assignment_id"]).not_to be_nil
+          end
+
+          it "returns assignment_visible" do
+            json = call_to_submissions_show(as_student: false, includes: ["visibility"])
+            expect(json["assignment_visible"]).not_to be_nil
+          end
+        end
       end
 
-      it "is not visible to students that are not the owner of the assignment" do
-        @other_student = user_factory(active_all: true)
-        student_in_section(@section, user: @other_student)
-        api_call_as_user(@other_student, :get,
-                         "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/submissions/#{@student.id}.json",
-                         { :controller => 'submissions_api', :action => 'show',
-                           :format => 'json', :course_id => @course.id.to_s,
-                           :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
-                         { :include => %w(full_rubric_assessment) }, {}, expected_status: 401)
+      context "as student in a section without an override" do
+        context "with differentiated_assignments" do
+          it "returns an unauthorized error" do
+            api_call_as_user(@student, :get,
+                             "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+                             { :controller => 'submissions_api', :action => 'show',
+                               :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
+                             { :include => %w(submission_comments rubric_assessment) }, {}, expected_status: 401)
+          end
+
+          it "returns the submission if it is graded" do
+            @assignment.grade_student(@student, grade: 5, grader: @teacher)
+            json = call_to_submissions_show(as_student: true)
+
+            expect(json["assignment_id"]).not_to be_nil
+          end
+
+          it "returns assignment_visible false" do
+            json = call_to_submissions_show(as_student: false, includes: ["visibility"])
+            expect(json["assignment_visible"]).to eq(false)
+          end
+        end
+      end
+    end
+
+    context "full rubric assessments" do
+      before do
+        @assignment1 = assignment_model(context: @course)
+        submit_homework(@assignment1, @student)
+      end
+
+      it "fails when no rubric assessment is present" do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignments/#{@assignment1.id}/submissions/#{@student.id}.json",
+                        { :controller => 'submissions_api', :action => 'show',
+                          :format => 'json', :course_id => @course.id.to_s,
+                          :assignment_id => @assignment1.id.to_s, :user_id => @student.id.to_s },
+                        { :include => %w(full_rubric_assessment) })
+        expect(json).not_to have_key 'full_rubric_assessment'
+      end
+
+      context "if present" do
+        before do
+          @assignment2 = assignment_model(context: @course)
+          rubric_assessment_model({ :purpose => "grading",
+                                    :association_object => @assignment2,
+                                    :user => @student,
+                                    :assessment_type => "grading" })
+        end
+
+        it "returns the correct data" do
+          json = api_call_as_user(@teacher, :get,
+                                  "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/submissions/#{@student.id}.json",
+                                  { :controller => 'submissions_api', :action => 'show',
+                                    :format => 'json', :course_id => @course.id.to_s,
+                                    :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
+                                  { :include => %w(full_rubric_assessment) })
+          expect(json).to have_key 'full_rubric_assessment'
+          expect(json['full_rubric_assessment']).to have_key 'data'
+          expect(json['full_rubric_assessment']).to have_key 'assessor_name'
+          expect(json['full_rubric_assessment']).to have_key 'assessor_avatar_url'
+        end
+
+        it "is visible to student owning the assignment" do
+          json = api_call_as_user(@student, :get,
+                                  "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/submissions/#{@student.id}.json",
+                                  { :controller => 'submissions_api', :action => 'show',
+                                    :format => 'json', :course_id => @course.id.to_s,
+                                    :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
+                                  { :include => %w(full_rubric_assessment) })
+          expect(json['full_rubric_assessment']).not_to be_nil
+        end
+
+        it "is not visible to students that are not the owner of the assignment" do
+          @other_student = user_factory(active_all: true)
+          student_in_section(@section, user: @other_student)
+          api_call_as_user(@other_student, :get,
+                           "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/submissions/#{@student.id}.json",
+                           { :controller => 'submissions_api', :action => 'show',
+                             :format => 'json', :course_id => @course.id.to_s,
+                             :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
+                           { :include => %w(full_rubric_assessment) }, {}, expected_status: 401)
+        end
       end
     end
   end
@@ -2884,6 +2943,71 @@ describe 'Submissions API', type: :request do
                    :format => 'json', :course_id => @course.to_param },
                  { :student_ids => [@student1.id, @student2.id] },
                  {}, { :expected_status => 401 })
+      end
+    end
+  end
+
+  describe "#update_anonymous" do
+    before :once do
+      student_in_course(active_all: true)
+      teacher_in_course(active_all: true)
+      @assignment = @course.assignments.create!(
+        title: 'assignment1',
+        anonymous_grading: true,
+        grading_type: 'letter_grade',
+        points_possible: 15
+      )
+    end
+
+    it "fetches the submission using the provided anonymous_id" do
+      submission = @assignment.submission_for_student(@student)
+
+      expect {
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{submission.anonymous_id}.json",
+          {
+            controller: 'submissions_api',
+            action: 'update_anonymous',
+            format: 'json',
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            anonymous_id: submission.anonymous_id.to_s
+          }, {
+            submission: { posted_grade: 'B' }
+          }
+        )
+      }.to change {
+        submission.reload.grade
+      }.from(nil).to('B')
+    end
+
+    it "anonymizes the results" do
+      submission = @assignment.submission_for_student(@student)
+      submission.submission_comments.create!(author: @student, comment: 'hi')
+
+      json = api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/anonymous_submissions/#{submission.anonymous_id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update_anonymous',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          anonymous_id: submission.anonymous_id.to_s
+        }, {
+          submission: { posted_grade: 'B' }
+        }
+      )
+
+      aggregate_failures do
+        expect(json).not_to have_key 'user_id'
+        expect(json['anonymous_id']).to eq submission.anonymous_id
+        expect(json.dig('all_submissions', 0)).not_to have_key 'user_id'
+        expect(json.dig('all_submissions', 0, 'anonymous_id')).to eq submission.anonymous_id
+        expect(json.dig('submission_comments', 0, 'author_id')).to be nil
+        expect(json.dig('submission_comments', 0, 'author_name')).to eq 'Anonymous User'
       end
     end
   end

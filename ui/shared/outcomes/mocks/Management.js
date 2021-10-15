@@ -1309,7 +1309,8 @@ export const importOutcomeMocks = ({
   targetContextId = '1',
   targetContextType = 'Account',
   failResponse = false,
-  failMutationNoErrMsg = false
+  failMutationNoErrMsg = false,
+  targetGroupId
 } = {}) => {
   const successfulResponse = {
     data: {
@@ -1363,9 +1364,14 @@ export const importOutcomeMocks = ({
   }
 
   let input = {
-    targetContextId,
-    targetContextType,
     outcomeId
+  }
+
+  if (targetGroupId) {
+    input.targetGroupId = targetGroupId
+  } else {
+    input.targetContextId = targetContextId
+    input.targetContextType = targetContextType
   }
 
   if (sourceContextId && sourceContextType) {
@@ -1632,6 +1638,7 @@ export const moveOutcomeMock = ({
 export const updateOutcomeGroupMock = ({
   id = '100',
   title = 'Updated title',
+  returnTitle = 'Updated title',
   description = 'Updated description',
   vendorGuid = 'A001',
   parentOutcomeGroupId = '101',
@@ -1645,7 +1652,7 @@ export const updateOutcomeGroupMock = ({
       updateLearningOutcomeGroup: {
         learningOutcomeGroup: {
           _id: id,
-          title,
+          title: returnTitle,
           description,
           vendorGuid,
           parentOutcomeGroup: {
@@ -1736,6 +1743,7 @@ export const importGroupMocks = ({
   progressId = '111',
   targetContextId = '1',
   targetContextType = 'Account',
+  targetGroupId,
   failResponse = false,
   failMutationNoErrMsg = false
 } = {}) => {
@@ -1790,16 +1798,23 @@ export const importGroupMocks = ({
     result = failedMutationNoErrMsg
   }
 
+  const input = {
+    groupId
+  }
+
+  if (targetGroupId) {
+    input.targetGroupId = targetGroupId
+  } else {
+    input.targetContextType = targetContextType
+    input.targetContextId = targetContextId
+  }
+
   return [
     {
       request: {
         query: IMPORT_OUTCOMES,
         variables: {
-          input: {
-            groupId,
-            targetContextId,
-            targetContextType
-          }
+          input
         }
       },
       result
