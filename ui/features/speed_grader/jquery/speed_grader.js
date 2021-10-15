@@ -1032,11 +1032,9 @@ function refreshGrades(callback) {
   const courseId = ENV.course_id
   const assignmentId = EG.currentStudent.submission.assignment_id
   const studentId = EG.currentStudent.submission[anonymizableUserId]
-  const resourceSegment = isAnonymous ? 'anonymous_submissions' : 'submissions'
-  const params = {'include[]': 'submission_history'}
-  const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/${resourceSegment}/${studentId}.json`
+  const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}.json?include[]=submission_history`
   const currentStudentIDAsOfAjaxCall = EG.currentStudent[anonymizableId]
-  $.getJSON(url, params, submission => {
+  $.getJSON(url, submission => {
     const studentToRefresh = window.jsonData.studentMap[currentStudentIDAsOfAjaxCall]
     EG.setOrUpdateSubmission(submission)
 
@@ -1186,7 +1184,7 @@ function getLateMissingAndExcusedPills() {
 function updateSubmissionAndPageEffects(data) {
   const submission = EG.currentStudent.submission
 
-  makeSubmissionUpdateRequest(submission, isAnonymous, ENV.course_id, data)
+  makeSubmissionUpdateRequest(submission, ENV.course_id, data)
     .then(() => {
       refreshGrades(() => {
         EG.showSubmissionDetails()
