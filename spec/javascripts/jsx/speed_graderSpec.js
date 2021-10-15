@@ -550,12 +550,16 @@ QUnit.module('SpeedGrader', rootHooks => {
           {
             grade: 70,
             score: 7,
-            user_id: '4'
+            user_id: '4',
+            assignment_id: '1',
+            anonymous_id: 'i9Z1a'
           },
           {
             grade: 10,
             score: 1,
-            user_id: '5'
+            user_id: '5',
+            assignment_id: '1',
+            anonymous_id: 't4N2y'
           }
         ]
       }
@@ -579,7 +583,8 @@ QUnit.module('SpeedGrader', rootHooks => {
 
     test('makes request to API', () => {
       SpeedGrader.EG.refreshGrades()
-      ok($.getJSON.calledWithMatch('submission_history'))
+      const request = $.getJSON.lastCall
+      strictEqual(request.args[1]['include[]'], 'submission_history')
     })
 
     test('updates the submission for the requested student', () => {
@@ -600,7 +605,7 @@ QUnit.module('SpeedGrader', rootHooks => {
 
     test('does not call showGrade if a different student has been selected since the request', () => {
       $.getJSON.restore()
-      sinon.stub($, 'getJSON').callsFake((url, successCallback) => {
+      sinon.stub($, 'getJSON').callsFake((url, params, successCallback) => {
         SpeedGrader.EG.currentStudent = window.jsonData.studentMap['5']
         successCallback({user_id: '4', score: 2, grade: '20'})
       })
@@ -1768,7 +1773,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       }
       selectStatusMenuOption(optionsIndexes.Late)
 
-      const getJsonStub = sinon.stub($, 'getJSON').callsFake((_url, successCallback) => {
+      const getJsonStub = sinon.stub($, 'getJSON').callsFake((_url, _data, successCallback) => {
         successCallback(responseRefreshRequest)
 
         moxios.uninstall()
@@ -1839,7 +1844,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       }
       selectStatusMenuOption(optionsIndexes.Missing)
 
-      const getJsonStub = sinon.stub($, 'getJSON').callsFake((_url, successCallback) => {
+      const getJsonStub = sinon.stub($, 'getJSON').callsFake((_url, _data, successCallback) => {
         successCallback(responseRefreshRequest)
 
         moxios.uninstall()
@@ -1910,7 +1915,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       }
       selectStatusMenuOption(optionsIndexes.Excused)
 
-      const getJsonStub = sinon.stub($, 'getJSON').callsFake((_url, successCallback) => {
+      const getJsonStub = sinon.stub($, 'getJSON').callsFake((_url, _data, successCallback) => {
         successCallback(responseRefreshRequest)
 
         moxios.uninstall()

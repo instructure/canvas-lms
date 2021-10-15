@@ -124,7 +124,7 @@ describe('student view integration tests', () => {
     // This cannot be tested at the <AttemptTab> because the new file being
     // displayed happens as a result of a cache write and these higher level
     // components re-rendering
-    it('displays the new file after it has been uploaded', async () => {
+    it.skip('displays the new file after it has been uploaded', async () => {
       window.URL.createObjectURL = jest.fn()
       uploadFileModule.uploadFile = jest.fn()
       uploadFileModule.uploadFile.mockReturnValueOnce({id: '1', name: 'test.jpg'})

@@ -157,6 +157,10 @@ describe DiscussionEntry do
 
       n2 = Notification.create(:name => "Announcement Reply", :category => "TestImmediately")
       NotificationPolicy.create(:notification => n2, :communication_channel => @teacher.communication_channel, :frequency => "immediately")
+
+      @notification_reported_entry = "Reported Reply"
+      n = Notification.create(:name => @notification_reported_entry, :category => "TestImmediately")
+      NotificationPolicy.create(:notification => n, :communication_channel => @teacher.communication_channel, :frequency => "immediately")
     end
 
     it "sends them for course discussion topics" do
@@ -255,6 +259,15 @@ describe DiscussionEntry do
       expect(mention.messages_sent[@notification_name]).to be_blank
       expect(mention.messages_sent[@notification_mention]).not_to be_blank
       expect(mention.messages_sent["Announcement Reply"]).to be_blank
+    end
+
+    it "sends notification to teacher when a reply is reported" do
+      allow(Account.site_admin).to receive(:feature_enabled?).with(:discussions_reporting).and_return(true)
+      topic = @course.discussion_topics.create!(:user => @teacher, :message => "This is an important announcement")
+      topic.subscribe(@student)
+      entry = topic.discussion_entries.create!(:user => @teacher, :message => "Oh, and another thing...")
+      expect(BroadcastPolicy.notifier).to receive(:send_notification).once
+      entry.broadcast_report_notification('hello I have been reported')
     end
   end
 

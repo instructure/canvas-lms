@@ -35,7 +35,7 @@ describe Moodle::Converter do
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @cm)
   end
 
-  it "successfullies import the course" do
+  it "imports the course successfully" do
     allowed_warnings = ["Multiple Dropdowns question may have been imported incorrectly",
                         "Possible answers will need to be regenerated for Formula question",
                         "Missing links found in imported content",

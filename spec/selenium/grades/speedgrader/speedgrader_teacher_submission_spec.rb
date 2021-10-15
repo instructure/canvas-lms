@@ -366,7 +366,7 @@ describe "speed grader submissions" do
         expect(f('#submission_files_list .submission_pending')).not_to be_nil
       end
 
-      it "successfullies schedule resubmit when button is clicked", priority: "1", test_id: 283508 do
+      it "successfully schedules resubmit when button is clicked", priority: "1", test_id: 283508 do
         account = @assignment.context.account
         account.update(turnitin_account_id: 'test_account',
                        turnitin_shared_secret: 'skeret',

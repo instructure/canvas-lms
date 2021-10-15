@@ -351,7 +351,7 @@ export const K5Dashboard = ({
             <GradesPage
               visible={currentTab === TAB_IDS.GRADES}
               currentUserRoles={currentUserRoles}
-              observedUserId={observedUserId}
+              observedUserId={observerMode ? observedUserId : null}
               currentUser={currentUser}
             />
             {cards && (

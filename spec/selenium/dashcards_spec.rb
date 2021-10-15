@@ -196,7 +196,7 @@ describe 'dashcards' do
         enrollment.accept!
       end
 
-      it 'initiallies match color to the dashcard', priority: "1", test_id: 268713 do
+      it 'initially matches color to the dashcard', priority: "1", test_id: 268713 do
         get '/calendar'
         calendar_color = f(".context-list-toggle-box.group_course_#{@course1.id}").style('background-color')
         get '/'

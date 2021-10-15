@@ -237,6 +237,7 @@ module Canvas::LiveEvents
       updated_at: assignment.updated_at,
       points_possible: assignment.points_possible,
       lti_assignment_id: assignment.lti_context_id,
+      lti_assignment_description: assignment.description,
       lti_resource_link_id: assignment.lti_resource_link_id,
       lti_resource_link_id_duplicated_from: assignment.duplicate_of&.lti_resource_link_id,
       submission_types: assignment.submission_types

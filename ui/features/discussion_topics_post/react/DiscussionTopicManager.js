@@ -39,6 +39,7 @@ const DiscussionTopicManager = props => {
   const [filter, setFilter] = useState('all')
   const [sort, setSort] = useState('desc')
   const [pageNumber, setPageNumber] = useState(0)
+  const [searchPageNumber, setSearchPageNumber] = useState(0)
   const searchContext = {
     searchTerm,
     setSearchTerm,
@@ -47,7 +48,9 @@ const DiscussionTopicManager = props => {
     sort,
     setSort,
     pageNumber,
-    setPageNumber
+    setPageNumber,
+    searchPageNumber,
+    setSearchPageNumber
   }
 
   const goToTopic = () => {
@@ -66,6 +69,15 @@ const DiscussionTopicManager = props => {
   const [isTopicHighlighted, setIsTopicHighlighted] = useState(false)
   const [highlightEntryId, setHighlightEntryId] = useState(null)
   const [relativeEntryId, setRelativeEntryId] = useState(null)
+
+  // Reset search to 0 when inactive
+  useEffect(() => {
+    if (searchTerm && pageNumber !== 0) {
+      setPageNumber(0)
+    } else if (!searchTerm && searchPageNumber !== 0) {
+      setSearchPageNumber(0)
+    }
+  }, [pageNumber, searchPageNumber, searchTerm])
 
   useEffect(() => {
     if (isTopicHighlighted) {
@@ -99,7 +111,7 @@ const DiscussionTopicManager = props => {
   const variables = {
     discussionID: props.discussionTopicId,
     perPage: PER_PAGE,
-    page: btoa(pageNumber * PER_PAGE),
+    page: searchTerm ? btoa(searchPageNumber * PER_PAGE) : btoa(pageNumber * PER_PAGE),
     searchTerm,
     rootEntries: !searchTerm && filter === 'all',
     filter,
@@ -242,6 +254,7 @@ const DiscussionTopicManager = props => {
           }}
           goToTopic={goToTopic}
           highlightEntryId={highlightEntryId}
+          isSearchResults={!!searchTerm}
         />
       )}
       {ENV.isolated_view && isolatedEntryId && (

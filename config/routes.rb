@@ -1204,9 +1204,11 @@ CanvasRails::Application.routes.draw do
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", action: :index, as: "#{path_prefix}_assignment_submissions"
         get "#{context.pluralize}/:#{context}_id/students/submissions", controller: :submissions_api, action: :for_students, as: "#{path_prefix}_student_submissions"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id", action: :show, as: "#{path_prefix}_assignment_submission"
+        get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/anonymous_submissions/:anonymous_id", action: :show_anonymous
         post "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", action: :create, controller: :submissions
         post "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/files", action: :create_file
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id", action: :update
+        put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/anonymous_submissions/:anonymous_id", action: :update_anonymous
         post "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/update_grades", action: :bulk_update
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submission_summary", action: :submission_summary, as: "#{path_prefix}_assignment_submission_summary"
       end

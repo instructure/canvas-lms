@@ -2808,6 +2808,70 @@ describe "Users API", type: :request do
       json = api_call(:get, @path, @params)
       expect(json.map { |i| i["id"] }).not_to be_include a.id
     end
+
+    context "as observer" do
+      before :once do
+        @observer = user_factory(active_all: true)
+        @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
+        @path = "/api/v1/users/#{@observer.id}/missing_submissions"
+        @params = { controller: "users", action: "missing_submissions", user_id: @observer.id, format: "json" }
+      end
+
+      before :each do
+        user_session(@observer)
+      end
+
+      it "renders unauthorized if course_ids is not passed" do
+        api_call(:get, @path, @params.merge(observed_user_id: @student.id))
+        assert_unauthorized
+      end
+
+      it "renders unauthorized if course_ids is empty" do
+        api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: []))
+        assert_unauthorized
+      end
+
+      it "returns missing assignments data for observed student" do
+        json = api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: [@course.id]))
+        expect(json.length).to be(2)
+        expect(json[0]["course_id"]).to eq(@course.id)
+        expect(json[1]["course_id"]).to eq(@course.id)
+      end
+
+      it "renders unauthorized if the observer's enrollment is deleted" do
+        @observer.enrollments.first.destroy
+        api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: [@course.id]))
+        assert_unauthorized
+      end
+
+      it "renders unauthorized if the observer isn't observing the student in a passed course" do
+        course1 = @course
+        course2 = course_factory(active_all: true)
+        course2.enroll_student(@student, enrollment_state: "active")
+        course2.enroll_user(@observer, "ObserverEnrollment")
+        api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: [course1.id, course2.id]))
+        assert_unauthorized
+      end
+
+      it "returns missing assignments for all courses provided" do
+        course1 = @course
+        course2 = course_factory(active_all: true)
+        course3 = course_factory(active_all: true)
+        course2.assignments.create!(name: 'A2', due_at: 3.days.ago, workflow_state: 'published', submission_types: "online_text_entry")
+        course3.assignments.create!(name: 'A3', due_at: 3.days.ago, workflow_state: 'published', submission_types: "online_text_entry")
+        course2.enroll_student(@student, enrollment_state: "active")
+        course3.enroll_student(@student, enrollment_state: "active")
+        course2.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
+        course3.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
+
+        json = api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: [course1.id, course2.id]))
+        p json
+        expect(json.length).to be(3)
+        assignment_names = json.map { |a| a["name"] }
+        expect(assignment_names).to include("A2")
+        expect(assignment_names).not_to include("A3")
+      end
+    end
   end
 
   describe 'POST pandata_events_token' do

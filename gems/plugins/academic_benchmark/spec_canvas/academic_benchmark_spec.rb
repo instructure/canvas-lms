@@ -160,7 +160,7 @@ describe AcademicBenchmark do
     outcome.instance_variable_get('@children').each { |o| check_built_outcome(o) }
   end
 
-  it "successfullies import the standards" do
+  it "imports the standards successfully" do
     @cm.export_content
     run_jobs
     @cm.reload

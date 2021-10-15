@@ -82,7 +82,7 @@ describe "calendar2" do
         expect(CalendarEvent.last.location_address).to eq location_address
       end
 
-      it 'cosistentlies format date <input> value to what datepicker would set it as, even in langs that have funky formatting' do
+      it 'consistently formats date <input> value to what datepicker would set it as, even in langs that have funky formatting' do
         skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
         skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
         @user.locale = 'fr'
