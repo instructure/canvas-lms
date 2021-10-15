@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Applica"
     },
+    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+        "message": "Applica modifiche a tutte le istanze di questo pulsante e questa icona nel corso"
+    },
     "apps_54d24a47": {
         "message": "App"
     },
@@ -148,9 +151,6 @@
     },
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Contenuto salvataggio automatico esistente. Caricare al suo posto il contenuto salvato automaticamente?"
-    },
-    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-        "message": "Aprire automaticamente un’anteprima in linea. (L’anteprima viene visualizzata solo dopo il salvataggio)"
     },
     "available_folders_694d0436": {
         "message": "Cartelle disponibili"
@@ -379,9 +379,6 @@
     },
     "directionality_26ae9e08": {
         "message": "Direzionalità"
-    },
-    "disable_in_line_preview_2a675175": {
-        "message": "Disattivare l’anteprima in linea."
     },
     "discussion_6719c51d": {
         "message": "Discussione"
@@ -839,9 +836,6 @@
     "my_grades_98834476": {
         "message": "I miei voti"
     },
-    "my_images_427f9b0c": {
-        "message": "Le mi immagini"
-    },
     "name_1aed4a1b": {
         "message": "Nome"
     },
@@ -1105,9 +1099,6 @@
     },
     "size_b30e1077": {
         "message": "Dimensioni"
-    },
-    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-        "message": "La dimensione del file { file } è maggiore della dimensione massima consentita di { max } MB."
     },
     "small_b070434a": {
         "message": "Piccolo"
