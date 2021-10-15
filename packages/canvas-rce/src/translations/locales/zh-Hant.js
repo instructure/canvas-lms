@@ -468,4 +468,4 @@ const locale = {
 }
 
 
-formatMessage.addLocale({'zh-HK': locale})
+formatMessage.addLocale({'zh-Hant': locale})

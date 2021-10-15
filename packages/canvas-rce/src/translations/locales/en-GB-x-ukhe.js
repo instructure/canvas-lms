@@ -17,6 +17,7 @@
  */
 
 import formatMessage from '../../format-message'
+import '../tinymce/en_GB'
 
 const locale = {
   "access_the_pretty_html_editor_37168efe": {
@@ -505,4 +506,4 @@ const locale = {
 }
 
 
-formatMessage.addLocale({'en-CY': locale})
+formatMessage.addLocale({'en-GB-x-ukhe': locale})

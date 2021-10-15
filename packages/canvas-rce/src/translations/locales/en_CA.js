@@ -48,6 +48,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Announcement List" },
   "announcements_a4b8ed4a": { "message": "Announcements" },
   "apply_781a2546": { "message": "Apply" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Apply changes to all instances of this Button and Icon in the Course"
+  },
   "apps_54d24a47": { "message": "Apps" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Aspect ratio will be preserved"
@@ -60,9 +63,6 @@ const locale = {
   "audio_player_for_title_20cc70d": { "message": "Audio player for { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Auto-saved content exists. Would you like to load the auto-saved content instead?"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "Automatically open an in-line preview. (Preview displays only after saving)"
   },
   "available_folders_694d0436": { "message": "Available folders" },
   "below_81d4dceb": { "message": "Below" },
@@ -147,7 +147,6 @@ const locale = {
   "details_98a31b68": { "message": "Details" },
   "dimensions_45ddb7b7": { "message": "Dimensions" },
   "directionality_26ae9e08": { "message": "Directionality" },
-  "disable_in_line_preview_2a675175": { "message": "Disable in-line preview." },
   "discussions_a5f96392": { "message": "Discussions" },
   "discussions_index_6c36ced": { "message": "Discussions Index" },
   "display_options_315aba85": { "message": "Display Options" },
@@ -283,7 +282,6 @@ const locale = {
     "message": "Must be at least { width } x { height }px"
   },
   "my_files_2f621040": { "message": "My files" },
-  "my_images_427f9b0c": { "message": "My Images" },
   "name_1aed4a1b": { "message": "Name" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigate through the menu or toolbar"
@@ -360,9 +358,6 @@ const locale = {
   "show_link_options_545338fd": { "message": "Show link options" },
   "show_video_options_6ed3721a": { "message": "Show video options" },
   "size_b30e1077": { "message": "Size" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "Size of { file } is greater than the maximum { max } MB allowed file size."
-  },
   "small_b070434a": { "message": "Small" },
   "something_went_wrong_89195131": { "message": "Something went wrong." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

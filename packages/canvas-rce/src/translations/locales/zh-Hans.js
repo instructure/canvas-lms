@@ -466,4 +466,4 @@ const locale = {
 }
 
 
-formatMessage.addLocale({zh: locale})
+formatMessage.addLocale({'zh-Hans': locale})
