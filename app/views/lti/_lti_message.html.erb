@@ -71,20 +71,24 @@
     </div>
   </div>
 
-  <%= iframe(
-    "about:blank",
-    name: 'tool_content',
-    id: 'tool_content',
-    class: "tool_launch",
-    allowfullscreen: "true",
-    webkitallowfullscreen: "true",
-    mozallowfullscreen: "true",
-    tabindex:"0",
-    title: @lti_launch.link_text,
-    style: "height:#{@lti_launch.tool_dimensions[:selection_height]};width:#{@lti_launch.tool_dimensions[:selection_width]};",
-    allow: Lti::Launch.iframe_allowances.join('; '),
-    data: { 'lti-launch': true }
-  ) %>
+  <div class="ic-framed-lti-content">
+    <div class="ic-framed-lti-embed-container">
+      <%= iframe(
+        "about:blank",
+        name: 'tool_content',
+        id: 'tool_content',
+        class: "tool_launch",
+        allowfullscreen: "true",
+        webkitallowfullscreen: "true",
+        mozallowfullscreen: "true",
+        tabindex:"0",
+        title: @lti_launch.link_text,
+        style: "height:#{@lti_launch.tool_dimensions[:selection_height]};width:#{@lti_launch.tool_dimensions[:selection_width]};",
+        allow: Lti::Launch.iframe_allowances.join('; '),
+        data: { 'lti-launch': true }
+      ) %>
+    </div>
+  </div>
 
   <div class="after_external_content_info_alert screenreader-only-tool" tabindex="0">
     <div class="ic-flash-info">
