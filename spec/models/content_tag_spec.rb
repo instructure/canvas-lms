@@ -717,6 +717,22 @@ describe ContentTag do
 
       tag.destroy!
     end
+
+    it "deletes outcome link and the associated friendly description" do
+      account = Account.default
+      outcome = account.created_learning_outcomes.create!(:title => 'outcome', :description => 'standard outcome description')
+      description = OutcomeFriendlyDescription.create!(:context => account, :description => 'friendly outcome description', :learning_outcome => outcome)
+      outcome_link = ContentTag.create!(:content => outcome, :context => account)
+      outcome_links = ContentTag.for_context(account)
+      expect(outcome_links).not_to be_empty
+      expect(outcome_links.find { |link| link.id == outcome_link.id }).to_not be_nil
+
+      outcome_link.destroy
+      outcome_links = ContentTag.active.for_context(account)
+      description = OutcomeFriendlyDescription.where(:id => description.id).first
+      expect(outcome_links.find { |link| link.id == outcome_link.id }).to be_nil
+      expect(description.workflow_state).to eq('deleted')
+    end
   end
 
   context "Quizzes 2 calls backs" do
