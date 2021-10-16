@@ -397,6 +397,7 @@ nn:
   account_id_2c3b4f15: konto-ID
   account_id_73966078: konto_id
   account_id_f6e26867: Konto-ID
+  account_level_notification_preferences_require_an__66467cd7: "Innstillingar for kontovarsel krev ein konto_id for å oppdatere"
   account_level_notifications_apply_to_all_courses_n_8b99c5b0: "Innstillingar på konto-nivå vili gjelde for alle emne. Du kan stille inn varslingar på kvat enkelt emne, og då overstyre desse innstillingane."
   account_level_settings_manage_4fca6f8e: "Innstillingar på kontonivå - administrer"
   account_name_13ed649: "%{account_name}"
@@ -6260,6 +6261,7 @@ nn:
   course_image_settings_eba3ec55: "Innstillingar for emnebilde"
   course_implemented_apps_fa658f5a: "Emneimplementerte applikasjonar"
   course_is_already_associated_with_a_blueprint_4d9407cb: "Emnet har allereie kopling til eit Blueprint-emne"
+  course_level_notification_preferences_require_a_co_2f0a618: "Innstillingar for emnevarsel krev ein emne_id for å oppdatere"
   course_level_notifications_are_inherited_from_your_7ae3c0c2: "Innstillingar for varsel er arva frå innstillingane i kontoen din. Endringar du gjer her vil berre gjelde for dette emnet."
   course_list: 
     favorited_tooltip: "Klikk for å fjerne frå emnemenyen."
@@ -8528,6 +8530,7 @@ nn:
     click_through: "Klikk for å vise sideinnhald"
     default_content: "Det er ikkje lagt til innhald"
     default_name: Sidenamn
+  eportfolio_moderation_feb0ffd3: "ePortfolio administrasjon"
   eportfolio_settings_75ba1f9a: Porteføljeinnstillingar
   eportfolios: 
     _page_section: 
@@ -10257,6 +10260,7 @@ nn:
   group_assignments_can_t_be_anonymously_graded_2dd9be24: "Gruppeoppgåver kan ikkje vurderast anonymt"
   group_assignments_cannot_be_enabled_for_anonymousl_ed896b1c: "Gruppeinnlevering kan ikkje aktiverast for anonymt vurderte oppgåver."
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "Gruppeinnleveringar kan ikkje aktiverast for modererte oppgåver"
+  group_calendar_5410c6ae: "Gruppér kalender"
   group_categories: 
     notices: 
       create_category_success: "Kategori er oppretta."
@@ -10323,6 +10327,7 @@ nn:
   group_name_is_required_5547bc0b: "Gruppenamn er obligatorisk"
   group_newoptiongroup_entered_newoptioncontextname_9eaf1b13: "Gruppe %{newOptionGroup} la inn. %{newOptionContextName}"
   group_pages_656556f3: Gruppesider
+  group_people_50e9785b: "Gruppér personar"
   group_roster_1846bf84: Gruppeliste
   group_select_330df8bd: "Vel gruppevis"
   group_set_cloned_successfully_3e1a1497: "Gruppesett er klona"
@@ -11045,6 +11050,7 @@ nn:
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Ein får valet om å ha vurderingskriterium utan moglege poeng dersom dette er slått på."
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(Dersom ingen er markerte sender du til alle som tilhøyrer kontoen)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Dersom ingen er markerte sender du til alle som tilhøyrer underkontoen)"
+  if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Dersom ingen er vald, vis til alle i heile underkontoen)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Dersom ingen er markert viser du til alle som høyrer til kontoen)"
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Dersom forbetringane av den nye teksteditoren òg er aktivert,
@@ -12295,6 +12301,7 @@ nn:
   media_record_not_available_f78c16dd: "Media Ikkje tilgjengeleg"
   media_recording_77cddc52: Medieinnspeling
   media_recording_submission_b7fd1491: "Innsending av medieinnspeling"
+  media_recording_submissions_require_a_media_id_to__ff740090: "%{media_recording} innleveringar krev ein %{media_id} for å levere"
   media_recordings_749aef6d: Medieinnspelingar
   media_submission_464829f0: Medieinnlevering
   median_ed291842: Median
@@ -14808,6 +14815,7 @@ nn:
     submission_comment_description: "Kommentar til oppgåveinnlevering"
     submission_comment_display: "Kommentar til innlevering"
     web_conference_recording_ready: "Eit webkonferanseopptak er klart"
+  notification_policies_requires_the_communication_c_2e7ded08: "Varslingsretnignslinjer krev kommunikasjonskanal_id, varselkategori og oppdateringsfrekvens."
   notification_preferences: 
     communication: 
       email: 
@@ -16777,6 +16785,7 @@ nn:
       for å sjå loggføringa av desse hendingane når innleveringa er gjort.
   quiz_lti_plugin_a6256549: "LTI-programtillegg for quiz"
   quiz_menu_4fcd5e61: Quizmeny
+  quiz_not_assigned_to_student_4b1846d5: "Quiz ikkje tildelt til student"
   quiz_question_1da5198e: Quiz-spørsmål
   quiz_question_groups_bd0bb222: "Quiz spørsmålsgrupper"
   quiz_questions_ecea3c40: Quiz-spørsmål
@@ -20604,6 +20613,7 @@ nn:
     syllabus: Emneoversikt
     tab_location_error: "Faneplasseringa er ugyldig"
     tab_unmanagable_error: "%{css_class} kan ikkje behandlast"
+    trophy_case: Troféetui
   tabs_5605547e: Faner
   tagalog_74906db7: Tagalog
   taiwan_886_9a5b6bbf: "Taiwan (+886)"
@@ -20849,6 +20859,8 @@ nn:
   the_selected_group_was_cleared_because_the_student_656e4f1c: "Den valde gruppa vart nulla ut fordi studenten du søkte fram ikkje er medlem av ei gruppe. Du kan velje ny gruppe i vurderingsoversikta."
   the_severity_of_the_issue_as_selected_by_the_user__88db91d9: "Alvorsgrada til problemet, som brukaren har valt frå rullegardinmenyen."
   the_shortcut_icon_for_ios_android_devices_180x180__cc17b661: "Snarvegikonet for iOS- og Android-einingar. 180 x 180 .png"
+  the_specified_assignment_could_not_be_found_c5dc34ab: "Oppgåva vart ikkje funne"
+  the_specified_assignment_id_could_not_be_found_e4e64f5f: "Oppgåva (%{id}) vart ikkje funne"
   the_specified_file_with_file_id_already_has_an_ori_bd30758c: "den aktuelle filen med file_id har allereie ein originalitetsrapport"
   the_specified_user_id_is_not_a_student_in_this_cou_372573ca: "Denne brukaren (%{id})er ikkje student på dette emnet"
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "Denne brukaren er ikkje student på dette emnet"
@@ -20859,6 +20871,7 @@ nn:
       emnet. Bruk oversikta til å spesifisere måla til emnet, vise til kontaktinformasjon og andre detaljar, eller du kan laste opp ei PDF med eit eksisterande
       emnesamandrag. Emneoversikta kan òg vise alle oppgåvefristar og kalenderhendingar
       i emnet.
+  the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "Synkroniser til SIS innstillinga kunne ikkje skrus på for denne oppgåva \"%{assignment_name}\" utan innleveringsfrist."
   the_term_for_grade_export_data_d55a6be7: "Semester for eksport av vurderingsdata"
   the_term_id_to_report_on_4479d2fc: "ID for terminen rapporten er for."
   the_term_to_get_courses_from_f6af2678: "Semester å hente emne frå"
@@ -21703,6 +21716,7 @@ nn:
     thumbs_up_description: "Skildring av \"Tommel opp\""
     thumbs_up_display_name: "Tommel opp"
     trophy_description: Trophy-skildring
+  trophy_case_7a098a85: Troféetui
   trophy_case_da3b25bb: Troféetui
   truncated_56b1a661: Avkorta
   trusted_account_669ba397: "Godkjent konto"
@@ -21761,6 +21775,7 @@ nn:
   unable_to_find_extension_3fe61b3c: "kunne ikkje finne utviding"
   unable_to_find_filetype_7b620f02: "kunne ikkje finne filtype"
   unable_to_load_lti_1_3_tools_cf169f9: "Kunne ikkje laste LTI 1.3-verktøy"
+  unable_to_read_file_2d04b0c: "Kunne ikkje lese fil"
   unable_to_remove_app_4293cb53: "Kan ikkje fjerne app"
   unable_to_save_new_discussion_topic_99239f3f: "kan ikkje lagre nytt diskusjonsemne"
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "Kan ikkje sende meldingar til brukarar in %{context_name}"
@@ -22051,6 +22066,7 @@ nn:
   user_id_user_id_69a9e865: "Brukar-ID: %{user_id}"
   user_inactivity_report_70cae434: "Rapport over inaktive brukarar"
   user_information_6353d7e1: Brukarinformasjon
+  user_is_from_unacceptable_domain_domain_b4b6fd1b: "Brukar er frå eit ikkje-akseptert domene %{domain}."
   user_is_now_group_leader_60ec9b98: "%{user} er no gruppeleiar"
   user_isn_t_allowed_to_edit_global_outcomes_a7eb4a87: "Brukaren har ikkje løyve til å redigere globale læringsmål"
   user_just_accepted_their_invitation_to_participate_7a4b2ce4: "%{user} aksepterte nett no invitasjonen til å ta del på emnet %{course}. Emnerolle: %{role_type}"
