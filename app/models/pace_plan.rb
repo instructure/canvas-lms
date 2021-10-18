@@ -89,13 +89,6 @@ class PacePlan < ActiveRecord::Base
     assignments_to_refresh = Set.new
     Assignment.suspend_due_date_caching do
       Assignment.suspend_grading_period_grade_recalculation do
-        student_enrollments = if user_id
-                                course.student_enrollments.where(user_id: user_id)
-                              elsif course_section_id
-                                course_section.student_enrollments
-                              else
-                                course.student_enrollments
-                              end
         progress&.calculate_completion!(0, student_enrollments.size)
         student_enrollments.each do |enrollment|
           dates = PacePlanDueDatesCalculator.new(self).get_due_dates(pace_plan_module_items.active, enrollment)
@@ -154,5 +147,22 @@ class PacePlan < ActiveRecord::Base
 
     # Mark as published
     update(workflow_state: 'active', published_at: DateTime.current)
+  end
+
+  def student_enrollments
+    @student_enrollments ||= if user_id
+                               course.student_enrollments.where(user_id: user_id)
+                             elsif course_section_id
+                               student_pace_plan_user_ids = course.pace_plans.where.not(user_id: nil).pluck(:user_id)
+                               course_section.student_enrollments.where.not(user_id: student_pace_plan_user_ids)
+                             else
+                               student_pace_plan_user_ids = course.pace_plans.where.not(user_id: nil).pluck(:user_id)
+                               course_section_pace_plan_section_ids = course.pace_plans
+                                                                            .where.not(course_section: nil)
+                                                                            .pluck(:course_section_id)
+                               course.student_enrollments
+                                     .where.not(user_id: student_pace_plan_user_ids)
+                                     .where.not(course_section_id: course_section_pace_plan_section_ids)
+                             end
   end
 end
