@@ -60,6 +60,7 @@ const mapping = {
   sr: 'sr',
   sl: 'sl',
   sv: 'sv_SE',
+  th: 'th',
   tr: 'tr_TR',
   'uk-UA': 'uk_UA',
   uk: 'uk_UA',

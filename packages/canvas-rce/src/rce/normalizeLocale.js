@@ -91,6 +91,7 @@ const recognized = [
   'sl',
   'sv',
   'sv-x-k12',
+  'th',
   'tr',
   'vi',
   'zh-Hans',
