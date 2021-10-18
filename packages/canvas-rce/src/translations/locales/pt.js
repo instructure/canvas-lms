@@ -51,6 +51,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Lista de anúncio" },
   "announcements_a4b8ed4a": { "message": "Anúncios" },
   "apply_781a2546": { "message": "Aplicar" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Aplicar alterações a todas as instâncias deste Botão e Ícone na Disciplina"
+  },
   "apps_54d24a47": { "message": "Aplicativos" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "A relação de aspeto será preservada"
@@ -65,9 +68,6 @@ const locale = {
   },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "O conteúdo auto-salvamento existe. Você gostaria de carregar o conteúdo auto-salvamento em seu lugar?"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "Abra automaticamente uma pré-visualização em linha. (A pré-visualização é exibida somente após salvar)"
   },
   "available_folders_694d0436": { "message": "Pastas disponíveis" },
   "below_81d4dceb": { "message": "Abaixo" },
@@ -158,9 +158,6 @@ const locale = {
   "details_98a31b68": { "message": "Detalhes" },
   "dimensions_45ddb7b7": { "message": "Dimensões" },
   "directionality_26ae9e08": { "message": "Direcionalidade" },
-  "disable_in_line_preview_2a675175": {
-    "message": "Desativar visualização em linha."
-  },
   "discussions_a5f96392": { "message": "Discussões" },
   "discussions_index_6c36ced": { "message": "Índice de discussões" },
   "display_options_315aba85": { "message": "Opções de exibição" },
@@ -306,7 +303,6 @@ const locale = {
     "message": "Deve ter pelo menos { width } x { height }px"
   },
   "my_files_2f621040": { "message": "Os meus ficheiros" },
-  "my_images_427f9b0c": { "message": "Minhas Imagens" },
   "name_1aed4a1b": { "message": "Nome" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navegue pelo menu ou barra de ferramentas"
@@ -385,9 +381,6 @@ const locale = {
   "show_link_options_545338fd": { "message": "Mostrar opções de ligação" },
   "show_video_options_6ed3721a": { "message": "Mostrar opções de vídeo" },
   "size_b30e1077": { "message": "Tamanho" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "O tamanho { file } de é maior que o tamanho máximo { max } de ficheiro permitido pelo MB."
-  },
   "small_b070434a": { "message": "Pequeno" },
   "something_went_wrong_89195131": { "message": "Algo deu errado." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

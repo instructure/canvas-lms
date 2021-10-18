@@ -49,6 +49,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Ankündigungsliste" },
   "announcements_a4b8ed4a": { "message": "Announcements" },
   "apply_781a2546": { "message": "Anwenden" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Änderungen für alle Schaltflächen und Icons im Kurs übernehmen"
+  },
   "apps_54d24a47": { "message": "Apps" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Seitenverhältnis wird beibehalten"
@@ -61,9 +64,6 @@ const locale = {
   "audio_player_for_title_20cc70d": { "message": "Audioplayer für { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Automatisch gespeicherte Inhalte vorhanden. Möchten Sie lieber die automatisch gespeicherten Inhalte laden?"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "Eine Inline-Vorschau automatisch öffnen. (Vorschau wird erst nach dem Speichern angezeigt)"
   },
   "available_folders_694d0436": { "message": "Verfügbare Ordner" },
   "below_81d4dceb": { "message": "Unten" },
@@ -152,9 +152,6 @@ const locale = {
   "details_98a31b68": { "message": "Details" },
   "dimensions_45ddb7b7": { "message": "Abmessungen" },
   "directionality_26ae9e08": { "message": "Schreibrichtung" },
-  "disable_in_line_preview_2a675175": {
-    "message": "Inline-Vorschau deaktivieren"
-  },
   "discussions_a5f96392": { "message": "Diskussionen" },
   "discussions_index_6c36ced": { "message": "Diskussionsindex" },
   "display_options_315aba85": { "message": "Anzeigeoptionen" },
@@ -294,7 +291,6 @@ const locale = {
     "message": "Mindestgröße ist { width } x { height } px."
   },
   "my_files_2f621040": { "message": "Meine Dateien" },
-  "my_images_427f9b0c": { "message": "Meine Bilder" },
   "name_1aed4a1b": { "message": "Name" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigieren Sie durch das Menü oder die Symbolleiste"
@@ -375,9 +371,6 @@ const locale = {
   "show_link_options_545338fd": { "message": "Link-Optionen anzeigen" },
   "show_video_options_6ed3721a": { "message": "Videooptionen anzeigen" },
   "size_b30e1077": { "message": "Größe" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "{ file } ist größer als die maximal erlaubte Dateigröße von { max } MB."
-  },
   "small_b070434a": { "message": "Klein" },
   "something_went_wrong_89195131": { "message": "Etwas ging schief." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
