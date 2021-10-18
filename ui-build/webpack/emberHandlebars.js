@@ -27,6 +27,7 @@ const Handlebars = require('handlebars')
 const EmberHandlebars = require('ember-template-compiler').EmberHandlebars
 const ScopedHbsExtractor = require('i18nliner-canvas/js/scoped_hbs_extractor')
 const PreProcessor = require('@instructure/i18nliner-handlebars/dist/lib/pre_processor').default
+const { canvasDir } = require('#params')
 
 function compileHandlebars(data) {
   const {path, source} = data
@@ -65,8 +66,8 @@ function emitTemplate(path, name, result, dependencies) {
 }
 
 const withLeadingDotSlash = x => x.startsWith('.') ? x : `./${x}`
-const emberHelpers = path.resolve(__dirname, '../ui/features/screenreader_gradebook/ember/helpers/common.js')
-const emberJSTRoot = path.resolve(__dirname, '../ui/features/screenreader_gradebook/jst')
+const emberHelpers = path.resolve(canvasDir, 'ui/features/screenreader_gradebook/ember/helpers/common.js')
+const emberJSTRoot = path.resolve(canvasDir, 'ui/features/screenreader_gradebook/jst')
 
 module.exports = function(source) {
   this.cacheable()
