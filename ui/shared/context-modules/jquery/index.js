@@ -2640,14 +2640,14 @@ $(document).ready(function () {
       })
     }
     setExternalToolTray(tool, moduleData, launchType == 'module_index_menu', $('.al-trigger')[0])
+
+    addDeepLinkingListener(() => {
+      window.location.reload()
+    })
   }
 
   $('.menu_tray_tool_link').click(openExternalTool)
   monitorLtiMessages()
-  // listen for deep linking messages here, and probably just reload the page
-  addDeepLinkingListener(() => {
-    window.location.reload()
-  })
 
   function renderCopyToTray(open, contentSelection, returnFocusTo) {
     ReactDOM.render(
