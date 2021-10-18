@@ -17,18 +17,20 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 import {ComposeActionButtons} from '../../components/ComposeActionButtons/ComposeActionButtons'
 import {Conversation} from '../../../graphql/Conversation'
 import HeaderInputs from './HeaderInputs'
 import I18n from 'i18n!conversations_2'
+import {Modal} from '@instructure/ui-modal'
 import ModalBody from './ModalBody'
 import ModalHeader from './ModalHeader'
 import ModalSpinner from './ModalSpinner'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {uploadFiles} from '@canvas/upload-file'
-
-import {Modal} from '@instructure/ui-modal'
+import UploadMedia from '@instructure/canvas-media'
+import {MediaCaptureStrings, SelectStrings, UploadMediaStrings} from '../../../util/constants'
 
 const ComposeModalContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -40,6 +42,22 @@ const ComposeModalContainer = props => {
   const [bodyMessages, setBodyMessages] = useState([])
   const [sendIndividualMessages, setSendIndividualMessages] = useState(false)
   const [selectedContext, setSelectedContext] = useState()
+  const [mediaUploadOpen, setMediaUploadOpen] = useState(false)
+  const [uploadingMediaFile, setUploadingMediaFile] = useState(false)
+  const [mediaUploadFile, setMediaUploadFile] = useState(null)
+
+  const onMediaUploadComplete = (err, data) => {
+    if (err) {
+      setOnFailure(I18n.t('There was an error uploading the media.'))
+    } else {
+      setUploadingMediaFile(false)
+      setMediaUploadFile(data)
+    }
+  }
+
+  const onRemoveMedia = () => {
+    setMediaUploadFile(null)
+  }
 
   const fileUploadUrl = attachmentFolderId => {
     return `/api/v1/folders/${attachmentFolderId}/files`
@@ -126,7 +144,9 @@ const ComposeModalContainer = props => {
           body,
           includedMessages: props.pastConversation?.conversationMessagesConnection.nodes.map(
             c => c._id
-          )
+          ),
+          mediaCommentId: mediaUploadFile?.mediaObject?.media_object?.media_id,
+          mediaCommentType: mediaUploadFile?.mediaObject?.media_object?.media_type
         }
       })
     } else {
@@ -137,7 +157,9 @@ const ComposeModalContainer = props => {
           contextCode: selectedContext,
           recipients: ['5'], // TODO: replace this with selected users
           subject,
-          groupConversation: !sendIndividualMessages
+          groupConversation: !sendIndividualMessages,
+          mediaCommentId: mediaUploadFile?.mediaObject?.media_object?.media_id,
+          mediaCommentType: mediaUploadFile?.mediaObject?.media_object?.media_type
         }
       })
     }
@@ -154,6 +176,7 @@ const ComposeModalContainer = props => {
     props.setSendingMessage(false)
     setSubject(null)
     setSendIndividualMessages(false)
+    setMediaUploadFile(null)
   }
 
   return (
@@ -184,12 +207,14 @@ const ComposeModalContainer = props => {
             onSubjectChange={onSubjectChange}
             sendIndividualMessages={sendIndividualMessages}
             subject={props.isReply ? props.pastConversation?.subject : subject}
+            mediaAttachmentTitle={mediaUploadFile?.uploadedFile.name}
+            onRemoveMediaComment={onRemoveMedia}
           />
         </ModalBody>
         <Modal.Footer>
           <ComposeActionButtons
             onAttachmentUpload={addAttachment}
-            onMediaUpload={() => {}}
+            onMediaUpload={() => setMediaUploadOpen(true)}
             onCancel={props.onDismiss}
             onSend={() => {
               if (!validMessageFields()) {
@@ -202,19 +227,40 @@ const ComposeModalContainer = props => {
               props.setSendingMessage(true)
             }}
             isSending={false}
+            hasMediaComment={!!mediaUploadFile}
           />
         </Modal.Footer>
       </Modal>
+      <UploadMedia
+        onStartUpload={() => setUploadingMediaFile(true)}
+        onUploadComplete={onMediaUploadComplete}
+        onDismiss={() => setMediaUploadOpen(false)}
+        open={mediaUploadOpen}
+        tabs={{embed: false, record: true, upload: true}}
+        uploadMediaTranslations={{
+          UploadMediaStrings: UploadMediaStrings(),
+          MediaCaptureStrings: MediaCaptureStrings(),
+          SelectStrings: SelectStrings()
+        }}
+        liveRegion={() => document.getElementById('flash_screenreader_holder')}
+        languages={Object.keys(closedCaptionLanguages).map(key => {
+          return {id: key, label: closedCaptionLanguages[key]}
+        })}
+        rcsConfig={{
+          contextId: ENV.current_user_id,
+          contextType: 'user'
+        }}
+      />
       <ModalSpinner
         label={I18n.t('Sending Message')}
         message={I18n.t('Sending Message')}
-        open={props.sendingMessage && !attachmentsToUpload.length}
+        open={props.sendingMessage && !attachmentsToUpload.length && !uploadingMediaFile}
       />
       <ModalSpinner
         label={I18n.t('Uploading Files')}
-        message={I18n.t('Please wait while we upload attachments')}
+        message={I18n.t('Please wait while we upload attachments and media')}
         onExited={() => sendMessage()}
-        open={props.sendingMessage && !!attachmentsToUpload.length}
+        open={props.sendingMessage && !!attachmentsToUpload.length && uploadingMediaFile}
       />
     </>
   )

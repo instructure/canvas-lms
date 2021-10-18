@@ -86,7 +86,7 @@ class PacePlan < ActiveRecord::Base
     raise "A start_date is required to publish" unless start_date
 
     dates = PacePlanDueDatesCalculator.new(self).get_due_dates(pace_plan_module_items.active)
-    assignments_to_refresh = []
+    assignments_to_refresh = Set.new
     Assignment.suspend_due_date_caching do
       Assignment.suspend_grading_period_grade_recalculation do
         student_enrollments = if user_id
@@ -101,24 +101,26 @@ class PacePlan < ActiveRecord::Base
           dates = PacePlanDueDatesCalculator.new(self).get_due_dates(pace_plan_module_items.active, enrollment)
           pace_plan_module_items.each do |pace_plan_module_item|
             content_tag = pace_plan_module_item.module_item
-            content = content_tag.content
+            assignment = content_tag.assignment
+            next unless assignment
+
             due_at = dates[pace_plan_module_item.id]
             user_id = enrollment.user_id
 
             # Check for an old override
-            current_override = content.assignment_overrides.active
-                                      .where(set_type: 'ADHOC', due_at_overridden: true)
-                                      .joins(:assignment_override_students)
-                                      .find_by(assignment_override_students: { user_id: user_id })
+            current_override = assignment.assignment_overrides.active
+                                         .where(set_type: 'ADHOC', due_at_overridden: true)
+                                         .joins(:assignment_override_students)
+                                         .find_by(assignment_override_students: { user_id: user_id })
             next if current_override&.due_at&.to_date == due_at
 
             # See if there is already an assignment override with the correct date
             due_time = CanvasTime.fancy_midnight(due_at.to_datetime).to_time
             due_range = (due_time - 1.second).round..due_time.round
-            correct_date_override = content.assignment_overrides.active
-                                           .find_by(set_type: 'ADHOC',
-                                                    due_at_overridden: true,
-                                                    due_at: due_range)
+            correct_date_override = assignment.assignment_overrides.active
+                                              .find_by(set_type: 'ADHOC',
+                                                       due_at_overridden: true,
+                                                       due_at: due_range)
 
             # If it exists let's just add the student to it and remove them from the other
             if correct_date_override
@@ -128,18 +130,18 @@ class PacePlan < ActiveRecord::Base
               current_override.update(due_at: due_at.to_s)
             else
               current_override&.assignment_override_students&.find_by(user_id: user_id)&.destroy
-              content.assignment_overrides.create!(
+              assignment.assignment_overrides.create!(
                 set_type: 'ADHOC',
                 due_at_overridden: true,
                 due_at: due_at.to_s,
                 assignment_override_students: [
-                  AssignmentOverrideStudent.new(assignment: content, user_id: user_id, no_enrollment: false)
+                  AssignmentOverrideStudent.new(assignment: assignment, user_id: user_id, no_enrollment: false)
                 ]
               )
             end
 
             # Remember content to refresh cache
-            assignments_to_refresh << content unless assignments_to_refresh.include?(content)
+            assignments_to_refresh << assignment
           end
           progress.increment_completion!(1) if progress&.total
         end

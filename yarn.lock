@@ -11407,6 +11407,15 @@ esm@^3.2.25:
   resolved "https://registry.yarnpkg.com/esm/-/esm-3.2.25.tgz#342c18c29d56157688ba5ce31f8431fbb795cc10"
   integrity sha512-U1suiZ2oDVWv4zPO56S0NcR5QriEahGtdN2OR6FiOG4WJvcjBVFB0qI4+eKoWFH483PKGuLuu6V8Z4T5g63UVA==
 
+esmac@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/esmac/-/esmac-3.0.0.tgz#bf0703c19a51d8f3aca710314026b0f40ddf6362"
+  integrity sha512-7wLt2YVfTVUdO24Oh46D1b27pAOrpm488PMjiGzwwjslGFI5UoPzla8IqjS4H3dl54m25XTejv0xhXjbIsXZvw==
+  dependencies:
+    find-up "^5.0.0"
+    invariant "^2.2.4"
+    micromatch "^4.0.4"
+
 esotope-hammerhead@0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/esotope-hammerhead/-/esotope-hammerhead-0.6.1.tgz#3feca697baede6cc89ce387f1e0bfa246d6e256d"
@@ -26130,6 +26139,14 @@ webpack-dev-middleware@^3.7.0, webpack-dev-middleware@^3.7.3:
     mkdirp "^0.5.1"
     range-parser "^1.2.1"
     webpack-log "^2.0.0"
+
+webpack-encapsulation-plugin@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/webpack-encapsulation-plugin/-/webpack-encapsulation-plugin-2.0.0.tgz#c0b5a3ca7d938bfb6fba7d1afaf2fe98ef0acf69"
+  integrity sha512-M9OLCSHbD+TUCLHzPNuh0VdjLgqNAR5SnLymnjGUhkQrPGCA5tYc7woIU4+9r7rkm6UqzuPz5X96WA3jAImzvA==
+  dependencies:
+    esmac "^3.0.0"
+    invariant "^2.2.4"
 
 webpack-filter-warnings-plugin@^1.2.1:
   version "1.2.1"
