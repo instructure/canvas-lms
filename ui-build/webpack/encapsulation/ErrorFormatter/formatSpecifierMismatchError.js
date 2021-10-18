@@ -20,8 +20,6 @@ const micromatch = require('micromatch')
 const path = require('path')
 const t = require('./util')
 
-const root = path.resolve(__dirname, '..')
-
 module.exports = error => {
   const { rule, ruleIndex, request } = error
 
