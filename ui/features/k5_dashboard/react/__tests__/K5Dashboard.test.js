@@ -675,10 +675,10 @@ describe('K-5 Dashboard', () => {
     })
 
     it('displays a score summary for each non-homeroom course', async () => {
-      const {findByText, getByText, queryByText} = render(
+      const {getByText, queryByText, findByRole} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-grades" />
       )
-      expect(await findByText('Economics 101')).toBeInTheDocument()
+      expect(await findByRole('link', {name: 'Economics 101'})).toBeInTheDocument()
       expect(getByText('B-')).toBeInTheDocument()
       expect(queryByText('Homeroom Class')).not.toBeInTheDocument()
     })

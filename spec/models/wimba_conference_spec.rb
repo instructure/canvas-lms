@@ -73,7 +73,7 @@ describe WimbaConference do
     allow(@user).to receive(:email).and_return(email)
   end
 
-  it "correctlies retrieve a config hash" do
+  it "retrieves a config hash correctly" do
     conference = WimbaConference.new
     config = conference.config
     expect(config).not_to be_nil
@@ -109,7 +109,7 @@ describe WimbaConference do
     expect(conference.participant_join_url(@user)).to be_nil
   end
 
-  it "correctlies generate join urls" do
+  it "generates join urls correctly" do
     conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course_factory)
     conference.initiate_conference
     # join urls for admins and participants look the same (though token will vary by user), since
@@ -120,7 +120,7 @@ describe WimbaConference do
     expect(conference.participant_join_url(@user)).to eql(join_url)
   end
 
-  it "correctlies return archive urls" do
+  it "returns archive urls correctly" do
     conference = WimbaConference.create!(:title => "my conference", :user => @user, :context => course_factory)
     conference.initiate_conference
     conference.admin_join_url(@user)

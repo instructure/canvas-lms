@@ -95,7 +95,7 @@ export enum PublishOptions {
 /* Redux state types */
 
 export type EnrollmentsState = Enrollments
-export type PacePlansState = PacePlan
+export type PacePlansState = PacePlan & {originalPlan: PacePlan}
 export type SectionsState = Sections
 export type ResponsiveSizes = 'small' | 'large'
 

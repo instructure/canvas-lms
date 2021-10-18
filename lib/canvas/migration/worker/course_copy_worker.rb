@@ -20,6 +20,7 @@
 class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::Base
   def perform(cm = nil)
     cm ||= ContentMigration.find migration_id
+    cm.save if cm.capture_job_id
 
     cm.workflow_state = :pre_processing
     cm.reset_job_progress

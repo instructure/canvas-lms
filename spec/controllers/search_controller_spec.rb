@@ -55,7 +55,7 @@ describe SearchController do
       expect(response.body).not_to include('bob')
     end
 
-    it "optionallies show users who haven't finished registration" do
+    it "optionally shows users who haven't finished registration" do
       course_with_student_logged_in(:active_all => true)
       @user.update_attribute(:name, 'billy')
       other = User.create(:name => 'bob')

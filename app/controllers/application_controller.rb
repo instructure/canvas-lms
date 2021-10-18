@@ -159,6 +159,7 @@ class ApplicationController < ActionController::Base
           current_user_roles: @current_user&.roles(@domain_root_account),
           current_user_types: @current_user.try { |u| u.account_users.active.map { |au| au.role.name } },
           current_user_disabled_inbox: @current_user&.disabled_inbox?,
+          discussions_reporting: Account.site_admin.feature_enabled?(:discussions_reporting),
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           k12: k12?,

@@ -130,6 +130,30 @@ describe('MessageListActionContainer', () => {
     })
   })
 
+  describe('reply buttons', () => {
+    it('should disable replying when no conversations are selected', async () => {
+      const component = setup({
+        selectedConversations: []
+      })
+
+      const replyButton = await component.findByTestId('reply')
+      const replyAllButton = await component.findByTestId('reply-all')
+      expect(replyButton).toBeDisabled()
+      expect(replyAllButton).toBeDisabled()
+    })
+
+    it('should enable replying when conversations are selected', async () => {
+      const component = setup({
+        selectedConversations: [{}]
+      })
+
+      const replyButton = await component.findByTestId('reply')
+      const replyAllButton = await component.findByTestId('reply-all')
+      expect(replyButton).not.toBeDisabled()
+      expect(replyAllButton).not.toBeDisabled()
+    })
+  })
+
   it('should have buttons disabled when their disabled states are true', async () => {
     const component = setup({
       deleteDisabled: true,

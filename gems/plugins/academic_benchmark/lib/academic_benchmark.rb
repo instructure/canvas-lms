@@ -23,11 +23,11 @@ require 'cgi'
 
 require 'academic_benchmark/engine'
 
-require 'academic_benchmark/ab_gem_extensions/standard'
 require 'academic_benchmark/ab_gem_extensions/authority'
-require 'academic_benchmark/ab_gem_extensions/publication'
 require 'academic_benchmark/ab_gem_extensions/document'
+require 'academic_benchmark/ab_gem_extensions/publication'
 require 'academic_benchmark/ab_gem_extensions/section'
+require 'academic_benchmark/ab_gem_extensions/standard'
 
 module AcademicBenchmark
   # The authorities have changed from v3 to v4.1, namely:

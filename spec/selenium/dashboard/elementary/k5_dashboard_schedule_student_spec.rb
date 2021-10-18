@@ -22,6 +22,7 @@ require_relative '../pages/k5_dashboard_page'
 require_relative '../pages/k5_dashboard_common_page'
 require_relative '../pages/k5_schedule_tab_page'
 require_relative '../../../helpers/k5_common'
+require_relative '../shared_examples/k5_schedule_shared_examples'
 require_relative '../../grades/setup/gradebook_setup'
 
 describe "student k5 dashboard schedule" do
@@ -39,19 +40,6 @@ describe "student k5 dashboard schedule" do
   before :each do
     user_session @student
     @now = Time.zone.now
-  end
-
-  context 'entry' do
-    it 'navigates to planner when Schedule is clicked' do
-      create_dated_assignment(@subject_course, 'Today Assignment', @now)
-
-      get "/"
-
-      select_schedule_tab
-      wait_for_ajaximations
-
-      expect(today_header).to be_displayed
-    end
   end
 
   context 'student events and todos' do
@@ -108,41 +96,6 @@ describe "student k5 dashboard schedule" do
 
       click_close_calendar_event_modal
       expect(wait_for_no_such_element { calendar_event_modal }).to be_truthy
-    end
-  end
-
-  context 'navigation' do
-    it 'starts the current week on the schedule and navigates backwards and forwards' do
-      [
-        ["Today assignment", @now],
-        ["Previous Assignment", 7.days.ago(@now)],
-        ["Future Assignment", 7.days.from_now(@now)]
-      ].each do |assignment_info|
-        create_dated_assignment(@subject_course, assignment_info[0], assignment_info[1])
-      end
-
-      get "/#schedule"
-      wait_for_ajaximations
-      expect(beginning_of_week_date).to include(beginning_weekday_calculation(@now))
-      expect(end_of_week_date).to include(ending_weekday_calculation(@now))
-
-      click_previous_week_button
-      wait_for_ajaximations
-
-      expect(beginning_of_week_date).to include(beginning_weekday_calculation(1.week.ago(@now)))
-      expect(end_of_week_date).to include(ending_weekday_calculation(1.week.ago(@now)))
-
-      click_today_button
-      wait_for_ajaximations
-
-      expect(beginning_of_week_date).to include(beginning_weekday_calculation(@now))
-      expect(end_of_week_date).to include(ending_weekday_calculation(@now))
-
-      click_next_week_button
-      wait_for_ajaximations
-
-      expect(beginning_of_week_date).to include(beginning_weekday_calculation(1.week.from_now(@now)))
-      expect(end_of_week_date).to include(ending_weekday_calculation(1.week.from_now(@now)))
     end
   end
 
@@ -211,24 +164,7 @@ describe "student k5 dashboard schedule" do
     end
   end
 
-  context 'course-scoped schedule tab included items' do
-    it 'shows schedule info for course items' do
-      create_dated_assignment(@subject_course, 'today assignment1', @now)
-
-      get "/courses/#{@subject_course.id}#schedule"
-
-      expect(today_header).to be_displayed
-      expect(schedule_item.text).to include('today assignment1')
-    end
-
-    it 'shows course missing item in dropdown' do
-      create_dated_assignment(@subject_course, 'yesterday assignment1', 1.day.ago(@now))
-
-      get "/courses/#{@subject_course.id}#schedule"
-
-      expect(items_missing_exists?).to be_truthy
-    end
-
+  context 'course-scoped schedule tab included student-only items' do
     it 'has todo capabilities for specific student course', custom_timeout: 20 do
       title = "Student Course Todo"
       @student.planner_notes.create!(todo_date: Time.zone.now, title: title, course_id: @subject_course.id)
@@ -242,38 +178,7 @@ describe "student k5 dashboard schedule" do
     end
   end
 
-  context 'course-scoped schedule tab excluded items' do
-    before(:once) do
-      course_with_student(
-        active_all: true,
-        user: @student,
-        course_name: 'Social Studies'
-      )
-      create_dated_assignment(@course, 'assignment for other course', @now)
-    end
-
-    it 'does not show schedule info for non course item' do
-      get "/courses/#{@subject_course.id}#schedule"
-
-      expect(schedule_item_exists?).to be_falsey
-    end
-
-    it 'does not show non-course missing item in dropdown' do
-      get "/courses/#{@subject_course.id}#schedule"
-
-      expect(items_missing_exists?).to be_falsey
-    end
-  end
-
-  context 'course color' do
-    it 'shows the course color on the planner assignment listing' do
-      new_color = '#07AB99'
-      @subject_course.update!(course_color: new_color)
-      create_dated_assignment(@subject_course, 'assignment for other course', @now)
-
-      get "/#schedule"
-
-      expect(hex_value_for_color(planner_assignment_header, 'background-color')).to eq(new_color)
-    end
+  context 'schedule shared examples' do
+    it_behaves_like 'k5 schedule'
   end
 end

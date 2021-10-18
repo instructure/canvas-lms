@@ -717,7 +717,7 @@ describe TabsController, type: :request do
         json.each { |t| expect(t['position']).to eq tab_order.find_index(@tab_lookup[t['id']]) + 1 }
       end
 
-      it 'correctlies label navigation items as unused' do
+      it 'correctly labels navigation items as unused' do
         unused_tabs = %w{announcements assignments pages files outcomes quizzes modules}
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", { :controller => 'tabs', :action => 'index',
                                                                       :course_id => @course.to_param, :format => 'json' })

@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Appliquer"
     },
+    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+        "message": "Appliquer des modifications à toutes les instances de ce bouton et icône dans le cours"
+    },
     "apps_54d24a47": {
         "message": "Applications"
     },
@@ -148,9 +151,6 @@
     },
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Le contenu enregistré automatiquement existe. Désirez-vous charger le contenu enregistré automatiquement à la place?"
-    },
-    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-        "message": "Ouvrir automatiquement un aperçu en ligne. (L''aperçu ne s''affiche qu''après l''enregistrement)"
     },
     "available_folders_694d0436": {
         "message": "Dossiers disponibles"
@@ -379,9 +379,6 @@
     },
     "directionality_26ae9e08": {
         "message": "Directionnalité"
-    },
-    "disable_in_line_preview_2a675175": {
-        "message": "Désactiver l''aperçu en ligne."
     },
     "discussion_6719c51d": {
         "message": "Discussion"
@@ -839,9 +836,6 @@
     "my_grades_98834476": {
         "message": "Mes Notes"
     },
-    "my_images_427f9b0c": {
-        "message": "Mes Images"
-    },
     "name_1aed4a1b": {
         "message": "Nom"
     },
@@ -1105,9 +1099,6 @@
     },
     "size_b30e1077": {
         "message": "Taille"
-    },
-    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-        "message": "La taille de { file } est supérieure à { max } Mo, la taille maximale autorisée."
     },
     "small_b070434a": {
         "message": "Petit"

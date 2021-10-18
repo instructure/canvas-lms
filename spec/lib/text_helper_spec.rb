@@ -147,7 +147,7 @@ describe TextHelper do
       end
     end
     context "i18n" do
-      it "automaticallies escape Strings" do
+      it "automatically escapes Strings" do
         expect(th.mt(:foo, "We **do not** trust the following input: %{input}", :input => "`a` **b** _c_ ![d](e)\n# f\n + g\n - h"))
           .to eq "We <strong>do not</strong> trust the following input: `a` **b** _c_ ![d](e) # f + g - h"
       end

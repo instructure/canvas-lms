@@ -173,7 +173,7 @@ describe Pseudonym do
       )
     end
 
-    it "gracefullies handle unreachable LDAP servers" do
+    it "gracefully handles unreachable LDAP servers" do
       expect_any_instance_of(Net::LDAP).to receive(:bind_as).and_raise(Net::LDAP::LdapError, "no connection to server")
       expect(Canvas::Errors).to receive(:capture) do |ex, data, level|
         expect(ex.class).to eq(Net::LDAP::LdapError)

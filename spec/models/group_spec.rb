@@ -62,14 +62,14 @@ describe Group do
     expect(@group.time_zone.to_s).to match(/Mountain Time/)
   end
 
-  it "correctlies identify group as active" do
+  it "identifies a group as active correctly" do
     course_with_student(:active_all => true)
     group_model(:group_category => @communities, :is_public => true)
     group.add_user(@student)
     expect(@group.inactive?).to eq false
   end
 
-  it "correctlies identify destroyed course as not active" do
+  it "identifies a destroyed course as not active" do
     course_with_student(:active_all => true)
     group_model(:group_category => @communities, :is_public => true)
     group.add_user(@student)
@@ -78,7 +78,7 @@ describe Group do
     expect(@group.inactive?).to eq true
   end
 
-  it "correctlies identify concluded course as not active" do
+  it "identifies a concluded course as not active" do
     course_with_student(:active_all => true)
     group_model(:group_category => @communities, :is_public => true)
     group.add_user(@student)
@@ -87,7 +87,7 @@ describe Group do
     expect(@group.inactive?).to eq true
   end
 
-  it "correctlies identify account group as not active" do
+  it "identifies an account group as not active correctly" do
     @account = account_model
     group_model(:group_category => @communities, :is_public => true, :context => @account)
     group.add_user(@student)
@@ -95,7 +95,7 @@ describe Group do
     expect(@group.inactive?).to eq true
   end
 
-  it "correctlies identify account group as active" do
+  it "identifies an account group as active" do
     @account = account_model
     group_model(:group_category => @communities, :is_public => true, :context => @account)
     group.add_user(@student)
@@ -435,7 +435,7 @@ describe Group do
       expect(group3.allow_self_signup?(@student)).to be_falsey
     end
 
-    it "correctlies handle restricted course sections" do
+    it "handles restricted course sections correctly" do
       course_with_student
       @other_section = @course.course_sections.create!(:name => "Other Section")
       @other_student = @course.enroll_student(user_model, { :section => @other_section }).user

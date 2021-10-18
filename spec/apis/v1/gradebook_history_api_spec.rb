@@ -230,7 +230,7 @@ describe GradebookHistoryApiController, type: :request do
       expect(json["grader_id"]).to eq @other_grader.id
     end
 
-    it 'optionallies restrict by assignment_id' do
+    it 'optionally restricts by assignment_id' do
       @submission4.with_versioning(:explicit => true) {
         @submission4.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 70)
       }
@@ -247,7 +247,7 @@ describe GradebookHistoryApiController, type: :request do
       json.each { |entry| expect(entry["assignment_id"]).to eq @assignment2.id }
     end
 
-    it 'optionallies restrict by user_id' do
+    it 'optionally restricts by user_id' do
       @submission4.with_versioning(:explicit => true) {
         @submission4.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 70)
       }
@@ -264,7 +264,7 @@ describe GradebookHistoryApiController, type: :request do
       json.each { |entry| expect(entry["user_id"]).to eq @student1.id }
     end
 
-    it 'optionallies reverse ordering to oldest version first' do
+    it 'optionally reverses ordering to oldest version first' do
       @submission3.with_versioning(:explicit => true) {
         @submission3.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 80)
       }

@@ -34,7 +34,8 @@ describe('Notification Preferences Table', () => {
           label: 'Some Label Text'
         },
         allowed_push_categories: ['announcement']
-      }
+      },
+      current_user_roles: []
     }
   })
 
@@ -207,5 +208,65 @@ describe('Notification Preferences Table', () => {
 
     const dueDate = container.getByTestId('due_date_header')
     expect(dueDate.tabIndex).toBe(0)
+  })
+
+  describe('Reported Reply', () => {
+    it('does not show the notification preference', () => {
+      const container = render(
+        <NotificationPreferencesTable
+          preferences={mockedNotificationPreferences()}
+          updatePreference={jest.fn()}
+        />
+      )
+
+      const test = container.queryByTestId('reported_reply_header')
+      expect(test).toBeNull()
+    })
+
+    describe('when the user is a teacher', () => {
+      beforeEach(() => {
+        window.ENV.current_user_roles = ['teacher']
+      })
+
+      afterEach(() => {
+        window.ENV.current_user_roles = []
+      })
+
+      describe('when reporting is disabled', () => {
+        beforeEach(() => {
+          window.ENV.discussions_reporting = false
+        })
+
+        it('does not show the notification preference', () => {
+          const container = render(
+            <NotificationPreferencesTable
+              preferences={mockedNotificationPreferences()}
+              updatePreference={jest.fn()}
+            />
+          )
+
+          const test = container.queryByTestId('reported_reply_header')
+          expect(test).toBeNull()
+        })
+      })
+
+      describe('when reporting is enabled', () => {
+        beforeEach(() => {
+          window.ENV.discussions_reporting = true
+        })
+
+        it('shows the notification preference', () => {
+          const container = render(
+            <NotificationPreferencesTable
+              preferences={mockedNotificationPreferences()}
+              updatePreference={jest.fn()}
+            />
+          )
+
+          const test = container.getByTestId('reported_reply_header')
+          expect(test).toBeInTheDocument()
+        })
+      })
+    })
   })
 })
