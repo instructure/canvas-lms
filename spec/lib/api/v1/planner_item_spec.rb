@@ -513,4 +513,21 @@ describe Api::V1::PlannerItem do
       expect(api.planner_item_json(@topic.assignment, @student, session)[:html_url]).to eq 'course_assignment_submission_url'
     end
   end
+
+  describe 'sharding' do
+    specs_require_sharding
+
+    context 'discussion_topics' do
+      it 'returns true for unread other shard discussions' do
+        topic1 = discussion_topic_model
+        topic2 = @shard1.activate do
+          account = account_model
+          course = account.courses.create!
+          discussion_topic_model(context: course)
+        end
+        json = api.planner_items_json([topic1, topic2], @student, session)
+        expect(json.pluck(:plannable_id)).to match_array([topic1.id, topic2.id])
+      end
+    end
+  end
 end

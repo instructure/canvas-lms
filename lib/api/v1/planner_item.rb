@@ -203,18 +203,22 @@ module Api::V1::PlannerItem
     topics_status ||= {}
     unknown_topic_ids = Array(topic_ids) - topics_status.keys
     if unknown_topic_ids.any?
-      participant_info = DiscussionTopic.select("discussion_topics.id, COALESCE(dtp.unread_entry_count, COUNT(de.id)) AS unread_entry_count,
-        COALESCE(dtp.workflow_state, 'unread') AS unread_state")
-                                        .joins("LEFT JOIN #{DiscussionTopicParticipant.quoted_table_name} AS dtp
-                 ON dtp.discussion_topic_id = discussion_topics.id
-                AND dtp.user_id = #{User.connection.quote(user)}
-               LEFT JOIN #{DiscussionEntry.quoted_table_name} AS de
-                 ON de.discussion_topic_id = discussion_topics.id
-                AND dtp.id IS NULL")
-                                        .where(id: unknown_topic_ids)
-                                        .group("discussion_topics.id, dtp.id")
-      participant_info.each do |pi|
-        topics_status[pi[:id]] = [pi[:unread_entry_count], pi[:unread_state]]
+      Shard.partition_by_shard(unknown_topic_ids) do |u_topic_ids|
+        DiscussionTopic
+          .select("discussion_topics.id,
+                   COALESCE(dtp.unread_entry_count, COUNT(de.id)) AS unread_entry_count,
+                   COALESCE(dtp.workflow_state, 'unread') AS unread_state")
+          .joins("LEFT JOIN #{DiscussionTopicParticipant.quoted_table_name} AS dtp
+                    ON dtp.discussion_topic_id = discussion_topics.id
+                    AND dtp.user_id = #{User.connection.quote(user)}
+                  LEFT JOIN #{DiscussionEntry.quoted_table_name} AS de
+                    ON de.discussion_topic_id = discussion_topics.id
+                    AND dtp.id IS NULL")
+          .where(id: u_topic_ids)
+          .group("discussion_topics.id, dtp.id")
+          .each do |pi|
+          topics_status[pi[:id]] = [pi[:unread_entry_count], pi[:unread_state]]
+        end
       end
     end
     topics_status
