@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useEffect} from 'react'
 import {connect} from 'react-redux'
 
 import {Alert} from '@instructure/ui-alerts'
@@ -31,18 +31,11 @@ import Header from './components/header/header'
 import Body from './components/body'
 import {ResponsiveSizes, StoreState} from './types'
 import {getErrorMessage, getLoadingMessage, getShowLoadingOverlay} from './reducers/ui'
-import UnpublishedChangesTrayContents from './components/unpublished_changes_tray_contents'
-// @ts-ignore: TS doesn't understand i18n scoped imports
-import I18n from 'i18n!pace_plans_app'
-import {getSummarizedChanges} from './reducers/pace_plans'
-import {SummarizedChange} from './utils/change_tracking'
-import {Tray} from '@instructure/ui-tray'
 
 interface StoreProps {
   readonly errorMessage: string
   readonly loadingMessage: string
   readonly showLoadingOverlay: boolean
-  readonly unpublishedChanges: SummarizedChange[]
 }
 
 interface DispatchProps {
@@ -60,11 +53,8 @@ export const App: React.FC<ResponsiveComponentProps> = ({
   loadingMessage,
   setResponsiveSize,
   showLoadingOverlay,
-  responsiveSize,
-  unpublishedChanges
+  responsiveSize
 }) => {
-  const [trayOpen, setTrayOpen] = useState(false)
-
   useEffect(() => {
     setResponsiveSize(responsiveSize)
   }, [responsiveSize, setResponsiveSize])
@@ -86,27 +76,15 @@ export const App: React.FC<ResponsiveComponentProps> = ({
           <Spinner title="Loading" size="large" margin="0 0 0 medium" />
         </Mask>
       </Overlay>
-      <Flex as="div" direction="column" margin="small">
-        <View>
-          {renderErrorAlert()}
-          <Header handleDrawerToggle={() => setTrayOpen(!trayOpen)} />
-        </View>
-        <Body />
-        <Tray
-          label={I18n.t('Unpublished Changes tray')}
-          open={trayOpen}
-          onDismiss={() => setTrayOpen(false)}
-          placement={responsiveSize === 'small' ? 'bottom' : 'end'}
-          shouldContainFocus
-          shouldReturnFocus
-          shouldCloseOnDocumentClick
-        >
-          <UnpublishedChangesTrayContents
-            handleTrayDismiss={() => setTrayOpen(false)}
-            changes={unpublishedChanges}
-          />
-        </Tray>
-      </Flex>
+      <View overflowX="auto" width="100%">
+        <Flex as="div" direction="column">
+          <View>
+            {renderErrorAlert()}
+            <Header />
+          </View>
+          <Body />
+        </Flex>
+      </View>
     </View>
   )
 }
@@ -130,8 +108,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
   return {
     errorMessage: getErrorMessage(state),
     loadingMessage: getLoadingMessage(state),
-    showLoadingOverlay: getShowLoadingOverlay(state),
-    unpublishedChanges: getSummarizedChanges(state)
+    showLoadingOverlay: getShowLoadingOverlay(state)
   }
 }
 

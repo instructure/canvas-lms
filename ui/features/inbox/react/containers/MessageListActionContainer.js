@@ -391,7 +391,6 @@ const MessageListActionContainer = props => {
             markAsRead={handleMarkAsRead}
             reply={props.onReply}
             replyAll={props.onReplyAll}
-            replyDisabled={!hasSelectedConversations()}
             star={!firstConversationIsStarred ? () => handleStar(true) : null}
             unstar={firstConversationIsStarred ? () => handleStar(false) : null}
             settingsDisabled={!hasSelectedConversations()}

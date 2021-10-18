@@ -1350,7 +1350,7 @@ describe DiscussionTopic do
       discussion_topic_model(:user => @teacher)
     end
 
-    it "automatically includes the author" do
+    it "automaticallies include the author" do
       expect(@topic.subscribers).to include(@teacher)
     end
 
@@ -1359,7 +1359,7 @@ describe DiscussionTopic do
       expect(@topic.subscribers).not_to include(@teacher)
     end
 
-    it "automatically includes posters" do
+    it "automaticallies include posters" do
       @topic.reply_from(:user => @student, :text => "entry")
       expect(@topic.subscribers).to include(@student)
     end

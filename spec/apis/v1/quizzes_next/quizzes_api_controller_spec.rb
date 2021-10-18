@@ -132,7 +132,7 @@ describe QuizzesNext::QuizzesApiController, type: :request do
           end
         end
 
-        it "orders quizzes deterministically for pagination" do
+        it "deterministicallies order quizzes for pagination" do
           found_quiz_ids = []
           (quiz_count * 2).times do |i|
             page_num = i + 1

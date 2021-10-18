@@ -158,7 +158,7 @@ describe "courses" do
       end
     end
 
-    it "updates the course quota correctly" do
+    it "correctlies update the course quota" do
       course_with_admin_logged_in
 
       # first try setting the quota explicitly

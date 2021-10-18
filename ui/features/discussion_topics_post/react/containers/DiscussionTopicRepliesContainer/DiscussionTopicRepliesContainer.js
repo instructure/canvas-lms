@@ -32,7 +32,7 @@ import {View} from '@instructure/ui-view'
 
 export const DiscussionTopicRepliesContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const {filter, searchTerm, setPageNumber, setSearchPageNumber} = useContext(SearchContext)
+  const {filter, searchTerm, setPageNumber} = useContext(SearchContext)
 
   const [discussionEntriesToUpdate, setDiscussionEntriesToUpdate] = useState(new Set())
 
@@ -93,7 +93,7 @@ export const DiscussionTopicRepliesContainer = props => {
   }
 
   const setPage = pageNum => {
-    props.isSearchResults ? setSearchPageNumber(pageNum) : setPageNumber(pageNum)
+    setPageNumber(pageNum)
   }
 
   return (
@@ -133,8 +133,7 @@ DiscussionTopicRepliesContainer.propTypes = {
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
   removeDraftFromDiscussionCache: PropTypes.func,
-  updateDraftCache: PropTypes.func,
-  isSearchResults: PropTypes.bool
+  updateDraftCache: PropTypes.func
 }
 
 export default DiscussionTopicRepliesContainer

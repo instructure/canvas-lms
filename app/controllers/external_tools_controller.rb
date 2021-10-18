@@ -692,7 +692,9 @@ class ExternalToolsController < ApplicationController
 
     base_expander = variable_expander(
       tool: tool,
-      collaboration: collaboration
+      collaboration: collaboration,
+      editor_contents: params[:editor_contents],
+      editor_selection: params[:selection]
     )
 
     expander = Lti::PrivacyLevelExpander.new(placement, base_expander)
@@ -1450,9 +1452,7 @@ class ExternalToolsController < ApplicationController
     default_opts = {
       current_user: @current_user,
       current_pseudonym: @current_pseudonym,
-      tool: @tool,
-      editor_contents: params[:editor_contents],
-      editor_selection: params[:selection]
+      tool: @tool
     }
     Lti::VariableExpander.new(@domain_root_account, @context, self, default_opts.merge(opts))
   end
