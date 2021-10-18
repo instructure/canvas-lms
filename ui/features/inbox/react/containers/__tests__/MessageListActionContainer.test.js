@@ -70,6 +70,13 @@ describe('MessageListActionContainer', () => {
       expect(component.container).toBeTruthy()
     })
 
+    it('should render All Courses option', async () => {
+      const {findByTestId, queryByText} = setup()
+      const courseDropdown = await findByTestId('course-select')
+      fireEvent.click(courseDropdown)
+      expect(await queryByText('All Courses')).toBeInTheDocument()
+    })
+
     it('should call onCourseFilterSelect when course selected', async () => {
       const mock = jest.fn()
 
