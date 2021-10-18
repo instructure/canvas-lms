@@ -338,7 +338,8 @@ describe "calendar2" do
                      datetime.change({ day: 15 })
                    end
         replace_content(f('input[name=date]'), format_date_for_view(datetime, :short))
-        f('.validated-form-view').submit
+        f('button[type=submit]').click
+        wait_for_ajaximations
         refresh_page
         f('.fc-content .fc-title').click
         event_content = fj('.event-details-content:visible')
