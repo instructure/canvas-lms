@@ -138,18 +138,6 @@
         "request": "@canvas/datetime/changeTimezone"
     },
     {
-        "name": "AccessViolationError",
-        "source": "ui/shared/k5/react/GroupsPage.js",
-        "target": "ui/features/groups/react/index.js",
-        "request": "../../../features/groups/react"
-    },
-    {
-        "name": "AccessViolationError",
-        "source": "ui/shared/k5/react/GroupsPage.js",
-        "target": "ui/features/k5_course/react/TeacherGroupsPage.js",
-        "request": "../../../features/k5_course/react/TeacherGroupsPage"
-    },
-    {
         "name": "SpecifierMismatchError",
         "source": "ui/shared/lti/jquery/messages.js",
         "target": "ui/shared/rce/plugins/canvas_mentions/constants.js",
