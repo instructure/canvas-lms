@@ -178,6 +178,13 @@ describe('ComposeModalContainer', () => {
       const selectOptions = await component.findAllByText('Fighting Magneto 101')
       expect(selectOptions.length).toBeGreaterThan(0)
     })
+
+    it('does not render All Courses option', async () => {
+      const {findByTestId, queryByText} = setup()
+      const courseDropdown = await findByTestId('course-select')
+      fireEvent.click(courseDropdown)
+      expect(await queryByText('All Courses')).not.toBeInTheDocument()
+    })
   })
 
   describe('Create Conversation', () => {

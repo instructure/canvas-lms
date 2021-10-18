@@ -19,7 +19,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {COURSES_QUERY, CONVERSATIONS_QUERY} from '../../graphql/Queries'
 import {DELETE_CONVERSATIONS, UPDATE_CONVERSATION_PARTICIPANTS} from '../../graphql/Mutations'
-import {CourseSelect} from '../components/CourseSelect/CourseSelect'
+import {CourseSelect, ALL_COURSES_ID} from '../components/CourseSelect/CourseSelect'
 import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!conversations_2'
 import {MailboxSelectionDropdown} from '../components/MailboxSelectionDropdown/MailboxSelectionDropdown'
@@ -363,6 +363,13 @@ const MessageListActionContainer = props => {
           <CourseSelect
             mainPage
             options={{
+              allCourses: [
+                {
+                  _id: ALL_COURSES_ID,
+                  contextName: I18n.t('All Courses'),
+                  assetString: 'all_courses'
+                }
+              ],
               favoriteCourses: data?.legacyNode?.favoriteCoursesConnection?.nodes,
               moreCourses,
               concludedCourses: [],
