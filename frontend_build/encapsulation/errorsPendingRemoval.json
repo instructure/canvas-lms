@@ -102,18 +102,6 @@
         "request": "../../../../../shared/datetime/dateHelper"
     },
     {
-        "name": "SpecifierMismatchError",
-        "source": "ui/features/files/react/components/ShowFolder.js",
-        "target": "ui/shared/direct-sharing/react/components/DirectShareCourseTray.js",
-        "request": "../../../../shared/direct-sharing/react/components/DirectShareCourseTray"
-    },
-    {
-        "name": "SpecifierMismatchError",
-        "source": "ui/features/files/react/components/ShowFolder.js",
-        "target": "ui/shared/direct-sharing/react/components/DirectShareUserModal.js",
-        "request": "../../../../shared/direct-sharing/react/components/DirectShareUserModal"
-    },
-    {
         "name": "AccessViolationError",
         "source": "ui/features/gradebook/react/default_gradebook/Gradebook.js",
         "target": "ui/boot/initializers/activateKeyClicks.js",
@@ -139,18 +127,6 @@
     },
     {
         "name": "SpecifierMismatchError",
-        "source": "ui/features/syllabus/index.js",
-        "target": "ui/shared/immersive-reader/ImmersiveReader.js",
-        "request": "../../shared/immersive-reader/ImmersiveReader"
-    },
-    {
-        "name": "SpecifierMismatchError",
-        "source": "ui/features/wiki_page_show/backbone/views/WikiPageView.js",
-        "target": "ui/shared/immersive-reader/ImmersiveReader.js",
-        "request": "../../../../shared/immersive-reader/ImmersiveReader"
-    },
-    {
-        "name": "SpecifierMismatchError",
         "source": "ui/shared/apollo/index.js",
         "target": "ui/shared/encrypted-forage/index.js",
         "request": "../encrypted-forage"
@@ -172,24 +148,6 @@
         "source": "ui/shared/k5/react/GroupsPage.js",
         "target": "ui/features/k5_course/react/TeacherGroupsPage.js",
         "request": "../../../features/k5_course/react/TeacherGroupsPage"
-    },
-    {
-        "name": "SpecifierMismatchError",
-        "source": "ui/shared/k5/react/ImportantInfoLayout.js",
-        "target": "ui/shared/k5/react/LoadingSkeleton.js",
-        "request": "@canvas/k5/react/LoadingSkeleton"
-    },
-    {
-        "name": "SpecifierMismatchError",
-        "source": "ui/shared/k5/react/SchedulePage.js",
-        "target": "ui/shared/k5/react/EmptyDashboardState.js",
-        "request": "@canvas/k5/react/EmptyDashboardState"
-    },
-    {
-        "name": "SpecifierMismatchError",
-        "source": "ui/shared/k5/react/SchedulePage.js",
-        "target": "ui/shared/k5/react/k5-theme.js",
-        "request": "@canvas/k5/react/k5-theme"
     },
     {
         "name": "SpecifierMismatchError",
@@ -220,12 +178,6 @@
         "source": "ui/shared/outcomes/react/hooks/useOutcomesImport.js",
         "target": "ui/shared/outcomes/react/hooks/useCanvasContext.js",
         "request": "@canvas/outcomes/react/hooks/useCanvasContext"
-    },
-    {
-        "name": "SpecifierMismatchError",
-        "source": "ui/shared/context-modules/jquery/index.js",
-        "target": "ui/shared/deep-linking/DeepLinking.js",
-        "request": "../../deep-linking/DeepLinking"
     },
     {
         "name": "SpecifierMismatchError",
