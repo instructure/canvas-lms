@@ -156,8 +156,24 @@ export const getOptimisticResponse = (
   message,
   parentId = 'PLACEHOLDER',
   rootEntryId = null,
-  isolatedEntryId = null
+  isolatedEntryId = null,
+  quotedEntry = null
 ) => {
+  if (quotedEntry && Object.keys(quotedEntry).length !== 0) {
+    quotedEntry = {
+      createdAt: quotedEntry.createdAt,
+      previewMessage: quotedEntry.previewMessage,
+      author: {
+        shortName: quotedEntry.author.shortName,
+        __typename: 'User'
+      },
+      editor: null,
+      deleted: false,
+      __typename: 'DiscussionEntry'
+    }
+  } else {
+    quotedEntry = null
+  }
   return {
     createDiscussionEntry: {
       discussionEntry: {
@@ -206,7 +222,7 @@ export const getOptimisticResponse = (
         parentId,
         rootEntryId,
         isolatedEntryId,
-        quotedEntry: null,
+        quotedEntry,
         attachment: null,
         __typename: 'DiscussionEntry'
       },
