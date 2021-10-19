@@ -188,7 +188,11 @@ describe AssetUserAccessLog do
     def await_message_bus_queue!(target_depth: 0)
       # rubocop:disable Lint/NoSleep this is the best way I know of to give up thread priority
       while MessageBus.production_worker.queue_depth > target_depth
-        sleep 0.01 # give background thread a chance to make progress
+        # we need autoloading to not deadlock if the background thread is awaiting
+        # autoloading. https://guides.rubyonrails.org/threading_and_code_execution.html#permit-concurrent-loads
+        ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
+          sleep 0.01 # give background thread a chance to make progress
+        end
       end
       # rubocop:enable Lint/NoSleep
     end

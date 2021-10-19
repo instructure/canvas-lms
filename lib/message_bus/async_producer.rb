@@ -53,6 +53,13 @@ module MessageBus
         raise ::MessageBus::MemoryQueueFullError, "Pulsar throughput constrained, queue full"
       end
 
+      # although it's possible for Shard.current to take a db connection
+      # this action should be happening either inside the parent thread directly
+      # (in which case we're fine to checkout a connection for that thread)
+      # or as an error handler during processing, in which case we should already have
+      # a leased connection within this thread on the default shard and be inside an executor context.
+      # yes, that means multiple threads may address this data structure,
+      # but ruby queues are threadsafe (https://ruby-doc.org/core-2.5.0/Queue.html).
       @queue << [namespace, topic_name, message, Shard.current.id]
     end
 
@@ -62,7 +69,12 @@ module MessageBus
 
     def stop!
       @queue << :stop
-      @thread.join
+      # the background thread may block on autoloading constants
+      # in isolated dev/test cases in which case we need to not deadlock here.
+      # https://guides.rubyonrails.org/threading_and_code_execution.html#permit-concurrent-loads
+      ActiveSupport::Dependencies.interlock.permit_concurrent_loads do
+        @thread.join
+      end
     end
 
     def start!
@@ -75,7 +87,7 @@ module MessageBus
       loop do
         # We let push requests build up every interval, and then coalesce.
         # This gives us some cheap throttling.
-        sleep @interval
+        sleep @interval # rubocop:disable Lint/NoSleep
 
         # Block until an item shows up, and attempt
         # to process it.
@@ -106,6 +118,10 @@ module MessageBus
         end
 
         break if stop
+
+        # make sure we release any resources before
+        # the thread sleeps
+        MessageBus.on_work_unit_end&.call
       end
     end
 
@@ -115,24 +131,31 @@ module MessageBus
 
       status = :none
       namespace, topic_name, message, shard_id = *work_tuple
-      Shard.lookup(shard_id).activate do
-        begin
-          status = produce_message(namespace, topic_name, message)
-        rescue StandardError => e
-          # if we errored, we didn't actually process the message
-          # put it back on the queue to try to get to it later.
-          # Does this screw up ordering?  yes, absolutely, but ruby queues are one-way.
-          # If your messages within topics are required to be stricly ordered, you need to
-          # generate a producer and manage error handling yourself.
-          @queue.push(work_tuple)
-          # if this is NOT one of the known error types from pulsar
-          # then we actually need to know about it with a full ":error"
-          # level in sentry.
-          err_level = ::MessageBus.rescuable_pulsar_errors.include?(e.class) ? :warn : :error
-          CanvasErrors.capture_exception(:message_bus, e, err_level)
-          status = :error
-        ensure
-          MessageBus.on_work_unit_end&.call
+      # ensure any autoloading or other thread-aware operations
+      # in our framework invocations have the right hooks into the
+      # thread context.  If we make calls to rails framework items
+      # outside this block, the scope of the wrapping needs to be
+      # expanded. https://guides.rubyonrails.org/threading_and_code_execution.html#wrapping-application-code
+      Rails.application.executor.wrap do
+        Shard.lookup(shard_id).activate do
+          begin
+            status = produce_message(namespace, topic_name, message)
+          rescue StandardError => e
+            # if we errored, we didn't actually process the message
+            # put it back on the queue to try to get to it later.
+            # Does this screw up ordering?  yes, absolutely, but ruby queues are one-way.
+            # If your messages within topics are required to be stricly ordered, you need to
+            # generate a producer and manage error handling yourself.
+            @queue.push(work_tuple)
+            # if this is NOT one of the known error types from pulsar
+            # then we actually need to know about it with a full ":error"
+            # level in sentry.
+            err_level = ::MessageBus.rescuable_pulsar_errors.include?(e.class) ? :warn : :error
+            CanvasErrors.capture_exception(:message_bus, e, err_level)
+            status = :error
+          ensure
+            MessageBus.on_work_unit_end&.call
+          end
         end
       end
       status
