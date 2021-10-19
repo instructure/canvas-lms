@@ -42,7 +42,12 @@ export default function ConfirmationDialog({
       footer={
         <>
           <Button onClick={onReject}>{I18n.t('Cancel')}</Button>
-          <Button margin="0 0 0 small" variant={confirmColor || 'primary'} onClick={onConfirm}>
+          <Button
+            data-testid="confirm-button"
+            margin="0 0 0 small"
+            variant={confirmColor || 'primary'}
+            onClick={onConfirm}
+          >
             {confirmText || I18n.t('Confirm')}
           </Button>
         </>
