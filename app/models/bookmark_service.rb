@@ -36,7 +36,7 @@ class BookmarkService < UserService
       elsif self.service == 'diigo'
         Diigo::Connection.diigo_post_bookmark(self, url, title, description, tags)
       end
-    rescue => e
+    rescue
       # Should probably save the data to try again if it fails... at least one more try
     end
   end

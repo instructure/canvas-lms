@@ -438,7 +438,6 @@ class DiscussionTopicsController < ApplicationController
         add_body_class 'hide-content-while-scripts-not-loaded'
         @page_title = join_title(t('#titles.discussions', "Discussions"), @context.name)
 
-        feed_code = @context_enrollment.try(:feed_code) || (@context.available? && @context.feed_code)
         content_for_head helpers.auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), { :title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed") })
 
         js_bundle :discussion_topics_index

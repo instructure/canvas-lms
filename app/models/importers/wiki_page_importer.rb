@@ -74,7 +74,6 @@ module Importers
       item ||= context.wiki_pages.temp_record(:wiki => context.wiki)
       item.mark_as_importing!(migration)
 
-      new_record = item.new_record?
       # force the url to be the same as the url_name given, since there are
       # likely other resources in the import that link to that url
       if hash[:url_name].present?

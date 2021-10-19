@@ -1329,7 +1329,7 @@ class Enrollment < ActiveRecord::Base
   def self.cached_temporary_invitations(email)
     if Enrollment.cross_shard_invitations?
       Shard.birth.activate do
-        invitations = Rails.cache.fetch([email, 'all_invited_enrollments2'].cache_key) do
+        Rails.cache.fetch([email, 'all_invited_enrollments2'].cache_key) do
           Shard.with_each_shard(CommunicationChannel.associated_shards(email)) do
             Enrollment.invited.for_email(email).to_a
           end

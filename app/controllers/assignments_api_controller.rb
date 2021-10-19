@@ -877,8 +877,7 @@ class AssignmentsApiController < ApplicationController
         ActiveRecord::Associations::Preloader.new.preload(assignments, :score_statistic)
       end
 
-      hashes = []
-      hashes = assignments.map do |assignment|
+      assignments.map do |assignment|
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
         needs_grading_course_proxy = @context.grants_right?(user, session, :manage_grades) ?
@@ -897,7 +896,6 @@ class AssignmentsApiController < ApplicationController
                         include_can_edit: include_params.include?('can_edit'),
                         include_score_statistics: include_params.include?('score_statistics'))
       end
-      hashes
     end
   end
 

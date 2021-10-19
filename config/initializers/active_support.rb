@@ -53,8 +53,8 @@ module ActiveSupport::Cache
       if @value && Rails.env.test?
         begin
           super
-        rescue TypeError => e
-          return
+        rescue TypeError
+          nil
         end
       else
         super

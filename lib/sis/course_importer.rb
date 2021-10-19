@@ -222,9 +222,9 @@ module SIS
                 templated_course.save_without_broadcasting!
                 Auditors::Course.record_updated(templated_course, @batch_user, changes, source: :sis, sis_batch_id: @batch_id)
               else
-                msg = "A (templated) course did not pass validation "
-                msg += "(" + "course: #{course_id} / #{short_name}, error: " +
-                       msg += templated_course.errors.full_messages.join(",") + ")"
+                msg = "A (templated) course did not pass validation " \
+                      "(course: #{course_id} / #{short_name}, error: " \
+                      "#{templated_course.errors.full_messages.join(',')})"
                 raise ImportError, msg
               end
             end
@@ -236,9 +236,9 @@ module SIS
               data = SisBatchRollBackData.build_data(sis_batch: @batch, context: course)
               @roll_back_data << data if data
             else
-              msg = "A course did not pass validation "
-              msg += "(" + "course: #{course_id} / #{short_name}, error: " +
-                     msg += course.errors.full_messages.join(",") + ")"
+              msg = "A course did not pass validation " \
+                    "(course: #{course_id} / #{short_name}, error: " \
+                    "#{course.errors.full_messages.join(',')})"
               raise ImportError, msg
             end
             @course_ids_to_update_associations.add(course.id) if update_account_associations

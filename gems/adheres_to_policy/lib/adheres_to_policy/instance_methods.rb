@@ -242,7 +242,7 @@ module AdheresToPolicy
       # Check the cache for the sought_right.  If it exists in the cache its
       # state (true or false) will be returned.  Otherwise we calculate the
       # state and cache it.
-      value, how_it_got_it = Cache.fetch(
+      value, _how_it_got_it = Cache.fetch(
         permission_cache_key_for(user, session, sought_right),
         use_rails_cache: use_rails_cache
       ) do
@@ -252,7 +252,6 @@ module AdheresToPolicy
         # Loop through all the conditions until we find the first one that
         # grants us the sought_right.
         conditions.any? do |condition|
-          condition_applies = false
           start_time = Time.now
           condition_applies = condition.applies?(self, user, session)
           elapsed_time = Time.now - start_time

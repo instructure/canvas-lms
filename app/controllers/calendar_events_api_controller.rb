@@ -506,7 +506,6 @@ class CalendarEventsApiController < ApplicationController
       # Create duplicates if necessary
       events = []
       dup_options = get_duplicate_params(params[:calendar_event])
-      title = dup_options[:title]
       if dup_options[:count] > 0
         events += create_event_and_duplicates(dup_options)
       else

@@ -28,7 +28,7 @@ module Importers
       tools.each do |tool|
         if migration.import_object?("context_external_tools", tool['migration_id']) || migration.import_object?("external_tools", tool['migration_id'])
           begin
-            item = import_from_migration(tool, migration.context, migration)
+            import_from_migration(tool, migration.context, migration)
           rescue
             migration.add_import_warning(t('#migration.external_tool_type', "External Tool"), tool[:title], $!)
           end

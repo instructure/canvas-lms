@@ -998,13 +998,13 @@ class ContentMigration < ActiveRecord::Base
 
   def imported_migration_items_for_insert_type
     import_type = migration_settings[:insert_into_module_type]
-    imported_items = if import_type.present?
-                       class_name = self.class.import_class_name(import_type)
-                       imported_migration_items_hash[class_name] ||= {}
-                       imported_migration_items_hash[class_name].values
-                     else
-                       imported_migration_items
-                     end
+    if import_type.present?
+      class_name = self.class.import_class_name(import_type)
+      imported_migration_items_hash[class_name] ||= {}
+      imported_migration_items_hash[class_name].values
+    else
+      imported_migration_items
+    end
   end
 
   def self.import_class_name(import_type)

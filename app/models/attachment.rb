@@ -1016,7 +1016,7 @@ class Attachment < ActiveRecord::Base
   def thumbnail_for_size(geometry)
     if self.class.allows_thumbnails_of_size?(geometry)
       to_use = thumbnails.loaded? ? thumbnails.detect { |t| t.thumbnail == geometry } : thumbnails.where(thumbnail: geometry).first
-      to_use ||= create_dynamic_thumbnail(geometry)
+      to_use || create_dynamic_thumbnail(geometry)
     end
   end
 
@@ -1922,7 +1922,6 @@ class Attachment < ActiveRecord::Base
 
     return filename if attempts <= 1 && block.call(filename)
 
-    new_name = filename
     addition = attempts || 1
     dir = File.dirname(filename)
     dir = dir == "." ? "" : "#{dir}/"

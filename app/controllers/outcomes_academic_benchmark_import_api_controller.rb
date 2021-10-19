@@ -60,7 +60,7 @@ class OutcomesAcademicBenchmarkImportApiController < ApplicationController
       cmj = content_migration_json(cm, @current_user, session)
       cmj[:migration_issues] = migration_issues_json(cm_issues, cm, @current_user, session)
       render json: cmj
-    rescue ActiveRecord::RecordNotFound => e
+    rescue ActiveRecord::RecordNotFound
       render json: { error: "no content migration matching id #{params[:migration_id]}" }
     end
   end

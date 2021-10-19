@@ -338,9 +338,8 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
         logged_out = logged_out.where(user_id: user_ids)
       end
 
-      all_submissions = []
-      all_submissions = prep_submissions scope
-      all_submissions += prep_submissions logged_out
+      all_submissions = prep_submissions(scope)
+      all_submissions + prep_submissions(logged_out)
     end
   end
 

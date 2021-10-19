@@ -33,7 +33,7 @@ module CC::Exporter::Epub::Converters
           return flv_path unless mp4_url.present?
         # Maybe a weird exception to catch, but that's what ends up being thrown
         # if we pass a media_id that doesn't have a corresponding set of assets.
-        rescue NoMethodError => e
+        rescue NoMethodError
           return flv_path
         end
 

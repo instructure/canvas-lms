@@ -357,7 +357,7 @@ class SubmissionComment < ActiveRecord::Base
     return Attachment.none unless attachment_ids.present?
 
     ids = parse_attachment_ids
-    attachments = submission.assignment.attachments.where(id: ids)
+    submission.assignment.attachments.where(id: ids)
   end
 
   def self.preload_attachments(comments)

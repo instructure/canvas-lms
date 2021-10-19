@@ -71,7 +71,6 @@ module Quizzes::LogAuditing
     private
 
     def optimize(events)
-      answered_event_type = Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
       optimizer = Quizzes::LogAuditing::QuestionAnsweredEventOptimizer.new
 
       quiz_submission_events = events.group_by(&:quiz_submission_id)

@@ -315,7 +315,6 @@ class Quizzes::QuizzesController < ApplicationController
       @quiz.due_at = params[:due_at] if params[:due_at]
       @quiz.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
 
-      student_ids = @context.student_ids
       @banks_hash = get_banks(@quiz)
 
       if (@has_student_submissions = @quiz.has_student_submissions?)
@@ -437,7 +436,6 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def update
-    n = Time.now.to_f
     if authorized_action(@quiz, @current_user, :update)
       quiz_params = get_quiz_params
       params[:quiz] ||= {}

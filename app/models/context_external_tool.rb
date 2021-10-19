@@ -333,7 +333,7 @@ class ContextExternalTool < ActiveRecord::Base
     return if self.vendor_help_link.blank?
 
     begin
-      value, uri = CanvasHttp.validate_url(self.vendor_help_link)
+      _value, uri = CanvasHttp.validate_url(self.vendor_help_link)
       self.vendor_help_link = uri.to_s
     rescue URI::Error, ArgumentError
       self.vendor_help_link = nil
@@ -947,7 +947,7 @@ class ContextExternalTool < ActiveRecord::Base
     if !context.is_a?(Account) && context.respond_to?(:context_external_tools)
       tools += context.context_external_tools.having_setting(type.to_s)
     end
-    tools += ContextExternalTool.having_setting(type.to_s).where(context_type: 'Account', context_id: context.account_chain_ids)
+    tools + ContextExternalTool.having_setting(type.to_s).where(context_type: 'Account', context_id: context.account_chain_ids)
   end
 
   def self.serialization_excludes; [:shared_secret, :settings]; end

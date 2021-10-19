@@ -31,7 +31,7 @@ module AvatarHelper
       avatar_settings = (@domain_root_account && @domain_root_account.settings[:avatars]) || 'enabled'
       user_id = Shard.global_id_for(user_id)
       user_shard = Shard.shard_for(user_id)
-      image_url, alt_tag = user_shard.activate do
+      user_shard.activate do
         Rails.cache.fetch(Cacher.inline_avatar_cache_key(user_id, avatar_settings)) do
           if !user && user_id.to_i > 0
             user ||= User.find(user_id)

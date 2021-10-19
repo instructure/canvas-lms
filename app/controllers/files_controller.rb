@@ -498,7 +498,6 @@ class FilesController < ApplicationController
 
   def show
     GuardRail.activate(:secondary) do
-      original_params = params.dup
       params[:id] ||= params[:file_id]
       get_context
       # note that the /files/XXX URL implicitly uses the current user as the

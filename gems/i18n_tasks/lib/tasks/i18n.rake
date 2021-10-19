@@ -301,7 +301,6 @@ namespace :i18n do
           puts "Exported en.yml, current translations unmodified (check git log for last change)"
         else
           `git commit -a -m"generated en.yml for translation"`
-          remote_branch = `git remote-ref`.strip.sub(%r{\Aremotes/[^/]+/(.*)\z}, '\\1')
           local = current_branch || 'master'
           `remote=$(git config branch."#{local}".remote); \
            remote_ref=$(git config branch."#{local}".merge); \

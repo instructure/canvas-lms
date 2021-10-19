@@ -870,7 +870,7 @@ class GradeCalculator
     max_total = (submissions + cant_drop).map { |s| s[:total] }.max
 
     kept = keep_highest(submissions, cant_drop, n_highest, max_total)
-    kept = keep_lowest(kept, cant_drop, n_lowest, max_total)
+    keep_lowest(kept, cant_drop, n_lowest, max_total)
   end
 
   def keep_highest(submissions, cant_drop, keep, max_total)

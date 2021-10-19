@@ -406,7 +406,7 @@ class Rubric < ActiveRecord::Base
   end
 
   def update_assessments_for_new_criteria(new_criteria)
-    criteria = self.data
+    data
   end
 
   # undo innocuous changes introduced by migrations which break `will_change_with_update?`

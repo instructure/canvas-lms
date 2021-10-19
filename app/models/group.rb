@@ -322,6 +322,7 @@ class Group < ActiveRecord::Base
   def full_name
     res = before_label(self.name) + " "
     res += (self.context.course_code rescue self.context.name) if self.context
+    res
   end
 
   def to_atom

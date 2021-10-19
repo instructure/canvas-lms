@@ -266,7 +266,7 @@ module SIS
         parallel_importer.complete(rows_processed: count)
         # just update progress on completion - the parallel jobs should be short enough
         update_progress unless skip_progress
-      rescue ::CSV::MalformedCSVError => csv_err
+      rescue ::CSV::MalformedCSVError
         # sometimes the file we get from s3 is incomplete.
         # it would be really hard to get a true malformed csv error because
         # we parse the file in order to count the rows for splitting it up in the first place,

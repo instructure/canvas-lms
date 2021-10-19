@@ -334,7 +334,7 @@ module InstFS
 
     # floor_to rounds `number` down to a multiple of the chosen step.
     def floor_to(number, step)
-      whole, remainder = number.divmod(step)
+      whole, = number.divmod(step)
       whole * step
     end
 
