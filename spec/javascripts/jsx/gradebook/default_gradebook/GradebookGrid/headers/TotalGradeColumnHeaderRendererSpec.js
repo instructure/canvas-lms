@@ -20,8 +20,8 @@ import ReactDOM from 'react-dom'
 import {
   createGradebook,
   setFixtureHtml
-} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
-import TotalGradeColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/TotalGradeColumnHeaderRenderer.js'
+} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
+import TotalGradeColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/TotalGradeColumnHeaderRenderer'
 
 /* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookGrid TotalGradeColumnHeaderRenderer', suiteHooks => {
@@ -319,6 +319,22 @@ QUnit.module('GradebookGrid TotalGradeColumnHeaderRenderer', suiteHooks => {
       sinon.stub(gradebook, 'weightedGroups').returns(false)
       render()
       strictEqual(component.props.weightedGroups, false)
+    })
+
+    test('sets onApplyScoreToUngraded to a function calling the method in gradebook if gradebook allows it', () => {
+      sinon.stub(gradebook, 'allowApplyScoreToUngraded').returns(true)
+      sinon.stub(gradebook, 'onApplyScoreToUngradedRequested')
+
+      render()
+
+      component.props.onApplyScoreToUngraded()
+      ok(gradebook.onApplyScoreToUngradedRequested.calledOnce)
+    })
+
+    test('does not set onApplyScoreToUngraded if gradebook does not allow it', () => {
+      sinon.stub(gradebook, 'allowApplyScoreToUngraded').returns(false)
+      render()
+      notOk(component.props.onApplyScoreToUngraded)
     })
   })
 

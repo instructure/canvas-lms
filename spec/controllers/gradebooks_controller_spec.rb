@@ -1159,6 +1159,19 @@ describe GradebooksController do
           expect(returned_section_ids).to contain_exactly(@course.default_section.id)
         end
       end
+
+      describe "allow_apply_score_to_ungraded" do
+        it "is set to true if the feature is enabled on the account" do
+          @course.account.enable_feature!(:apply_score_to_ungraded)
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options[:allow_apply_score_to_ungraded]).to be true
+        end
+
+        it "is set to false if the feature is not enabled on the account" do
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options[:allow_apply_score_to_ungraded]).to be false
+        end
+      end
     end
 
     describe "csv" do

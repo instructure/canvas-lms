@@ -247,6 +247,22 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeaderRenderer', suiteHooks => 
       render()
       strictEqual(component.props.weightedGroups, false)
     })
+
+    test('sets onApplyScoreToUngraded to a function calling the method in gradebook if gradebook allows it', () => {
+      sinon.stub(gradebook, 'allowApplyScoreToUngraded').returns(true)
+      sinon.stub(gradebook, 'onApplyScoreToUngradedRequested')
+
+      render()
+
+      component.props.onApplyScoreToUngraded()
+      ok(gradebook.onApplyScoreToUngradedRequested.calledOnce)
+    })
+
+    test('does not set onApplyScoreToUngraded if gradebook does not allow it', () => {
+      sinon.stub(gradebook, 'allowApplyScoreToUngraded').returns(false)
+      render()
+      notOk(component.props.onApplyScoreToUngraded)
+    })
   })
 
   QUnit.module('#destroy()', () => {
