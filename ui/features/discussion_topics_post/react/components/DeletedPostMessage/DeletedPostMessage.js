@@ -20,11 +20,10 @@ import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {responsiveQuerySizes} from '../../utils'
-
-import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
+import {View} from '@instructure/ui-view'
 
 export function DeletedPostMessage({...props}) {
   return (
@@ -42,28 +41,28 @@ export function DeletedPostMessage({...props}) {
         }
       }}
       render={responsiveProps => (
-        <Flex direction="column" margin="0 xx-small small">
-          <Flex.Item>
-            <Text weight="bold" size={responsiveProps.deletedByTextSize}>
+        <>
+          <View as="div">
+            <Text size={responsiveProps.deletedByTextSize} weight="bold">
               {I18n.t('Deleted by %{deleterName}', {deleterName: props.deleterName})}
             </Text>
-          </Flex.Item>
-          <Flex.Item>
-            <Tooltip
-              renderTip={I18n.t('Created %{timingDisplay}', {timingDisplay: props.timingDisplay})}
+          </View>
+          <Tooltip
+            renderTip={I18n.t('Created %{timingDisplay}', {timingDisplay: props.timingDisplay})}
+          >
+            <span
+              // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+              tabIndex="0"
             >
-              {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
-              <span tabIndex="0">
-                <Text size={responsiveProps.timestampTextSize}>
-                  {I18n.t('Deleted %{deletedTimingDisplay}', {
-                    deletedTimingDisplay: props.deletedTimingDisplay
-                  })}
-                </Text>
-              </span>
-            </Tooltip>
-          </Flex.Item>
-          {props.children && <Flex.Item overflowY="hidden">{props.children}</Flex.Item>}
-        </Flex>
+              <Text size={responsiveProps.timestampTextSize}>
+                {I18n.t('Deleted %{deletedTimingDisplay}', {
+                  deletedTimingDisplay: props.deletedTimingDisplay
+                })}
+              </Text>
+            </span>
+          </Tooltip>
+          {props.children}
+        </>
       )}
     />
   )
