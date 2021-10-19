@@ -326,6 +326,17 @@ describe Types::CourseType do
           GQL
         ).to eq [@student2a1_submission.id.to_s]
       end
+
+      it "updated_since" do
+        @student2a1_submission.update_attribute(:updated_at, 1.week.from_now)
+        expect(
+          course_type.resolve(<<~GQL, current_user: @teacher)
+            submissionsConnection(
+              filter: { updatedSince: "#{1.day.from_now.iso8601}" }
+            ) { nodes { _id } }
+          GQL
+        ).to eq [@student2a1_submission.id.to_s]
+      end
     end
   end
 
