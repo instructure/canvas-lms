@@ -44,7 +44,7 @@ import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
-import K5Tabs from '@canvas/k5/react/K5Tabs'
+import K5Tabs, {scrollElementIntoViewIfCoveredByHeader} from '@canvas/k5/react/K5Tabs'
 import SchedulePage from '@canvas/k5/react/SchedulePage'
 import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
@@ -574,7 +574,12 @@ export function K5Course({
         isStudent: plannerEnabled
       }}
     >
-      <View as="section" data-testid="main-content" elementRef={e => (contentRef.current = e)}>
+      <View
+        as="section"
+        data-testid="main-content"
+        elementRef={e => (contentRef.current = e)}
+        onFocus={scrollElementIntoViewIfCoveredByHeader(tabsRef)}
+      >
         {!tabContentOnly && courseTabs}
         {!renderTabs?.length && <EmptyCourse name={name} id={id} canManage={canManage} />}
         {currentTab === renderTabs?.[0]?.id && (

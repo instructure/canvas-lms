@@ -39,7 +39,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 
-import K5Tabs from '@canvas/k5/react/K5Tabs'
+import K5Tabs, {scrollElementIntoViewIfCoveredByHeader} from '@canvas/k5/react/K5Tabs'
 import GradesPage from './GradesPage'
 import HomeroomPage from './HomeroomPage'
 import TodosPage from './TodosPage'
@@ -292,7 +292,12 @@ export const K5Dashboard = ({
   return (
     <>
       <Flex as="section" alignItems="start">
-        <Flex.Item shouldGrow shouldShrink padding="x-small medium medium medium">
+        <Flex.Item
+          shouldGrow
+          shouldShrink
+          padding="x-small medium medium medium"
+          onFocus={scrollElementIntoViewIfCoveredByHeader(tabsRef)}
+        >
           {observerMode && (
             <View as="div" maxWidth="16em">
               <ScreenReaderContent>
