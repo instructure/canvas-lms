@@ -177,7 +177,7 @@ export const getProjectedEndDate = createDeepEqualSelector(
     items: PacePlanItem[],
     startDate?: string
   ): string | undefined => {
-    if (!startDate || !Object.keys(dueDates)) return startDate
+    if (!startDate || !Object.keys(dueDates) || !items.length) return startDate
 
     // Get the due date associated with the last module item
     const lastDueDate = dueDates[items[items.length - 1].module_item_id]

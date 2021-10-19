@@ -22,6 +22,7 @@ require_relative '../spec_helper'
 describe PacePlan do
   before :once do
     course_with_student active_all: true
+    @course.update start_at: '2021-09-01'
     @module = @course.context_modules.create!
     @assignment = @course.assignments.create!
     @course_section = @course.course_sections.first
@@ -124,7 +125,7 @@ describe PacePlan do
 
   context "publish" do
     before :once do
-      @pace_plan.update! start_date: '2021-09-01', end_date: '2021-09-30'
+      @pace_plan.update! end_date: '2021-09-30'
     end
 
     it "creates an override for students" do
@@ -220,24 +221,11 @@ describe PacePlan do
       expect(assignment_override.due_at).to eq(Date.parse('2021-09-01').end_of_day)
       expect(@assignment.assignment_overrides.active.count).to eq(1)
 
-      student_pace_plan = @course.pace_plans.create!(user: @student, workflow_state: 'active', start_date: '2021-09-01')
+      student_pace_plan = @course.pace_plans.create!(user: @student, workflow_state: 'active')
       student_pace_plan.publish
       assignment_override.reload
       expect(assignment_override.due_at).to eq(Date.parse('2021-09-01').end_of_day)
       expect(@assignment.assignment_overrides.active.count).to eq(1)
-    end
-
-    it "throws an error if start_date is nil" do
-      expect { @pace_plan.publish }.not_to raise_error
-
-      @pace_plan.update start_date: nil, end_date: nil
-      expect { @pace_plan.publish }.to raise_error("A start_date is required to publish")
-
-      @pace_plan.update start_date: '2021-09-01', end_date: nil
-      expect { @pace_plan.publish }.not_to raise_error
-
-      @pace_plan.update start_date: nil, end_date: '2021-09-30'
-      expect { @pace_plan.publish }.to raise_error("A start_date is required to publish")
     end
 
     it "sets overrides for graded discussions" do
@@ -255,7 +243,8 @@ describe PacePlan do
       assignment_override = @assignment.assignment_overrides.active.first
       expect(assignment_override.due_at).to eq(Date.parse('2021-09-01').end_of_day)
       # Publish student specific pace plan and verify dates have changed
-      student_pace_plan = @course.pace_plans.create! user: @student, workflow_state: 'active', start_date: '2021-09-05'
+      student_pace_plan = @course.pace_plans.create! user: @student, workflow_state: 'active'
+      @course.student_enrollments.find_by(user: @student).update(start_at: '2021-09-05')
       student_pace_plan.pace_plan_module_items.create! module_item: @tag
       expect(student_pace_plan.publish).to eq(true)
       assignment_override.reload
@@ -273,7 +262,8 @@ describe PacePlan do
       assignment_override = @assignment.assignment_overrides.active.first
       expect(assignment_override.due_at).to eq(Date.parse('2021-09-01').end_of_day)
       # Publish course section specific pace plan and verify dates have changed
-      section_pace_plan = @course.pace_plans.create! course_section: @course_section, workflow_state: 'active', start_date: '2021-09-05'
+      @course_section.update(start_at: '2021-09-05')
+      section_pace_plan = @course.pace_plans.create! course_section: @course_section, workflow_state: 'active'
       section_pace_plan.pace_plan_module_items.create! module_item: @tag
       expect(section_pace_plan.publish).to eq(true)
       assignment_override.reload
@@ -292,7 +282,8 @@ describe PacePlan do
       assignment_override = @assignment.assignment_overrides.active.first
       expect(assignment_override.due_at).to eq(Date.parse('2021-09-01').end_of_day)
       # Publish student specific pace plan and verify dates have changed
-      student_pace_plan = @course.pace_plans.create! user: @student, workflow_state: 'active', start_date: '2021-09-05'
+      @course.student_enrollments.find_by(user: @student).update(start_at: '2021-09-05')
+      student_pace_plan = @course.pace_plans.create! user: @student, workflow_state: 'active'
       student_pace_plan.pace_plan_module_items.create! module_item: @tag
       expect(student_pace_plan.publish).to eq(true)
       assignment_override.reload

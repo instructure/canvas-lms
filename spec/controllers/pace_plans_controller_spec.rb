@@ -22,7 +22,6 @@ require 'spec_helper'
 describe PacePlansController, type: :controller do
   let(:valid_update_params) do
     {
-      start_date: 1.year.ago.strftime('%Y-%m-%d'),
       end_date: 1.year.from_now.strftime('%Y-%m-%d'),
       workflow_state: 'active',
       pace_plan_module_items_attributes: [
@@ -67,7 +66,6 @@ describe PacePlansController, type: :controller do
     @course_section = @course.course_sections.first
 
     @valid_params = {
-      start_date: 1.year.ago.strftime('%Y-%m-%d'),
       end_date: 1.year.from_now.strftime('%Y-%m-%d'),
       workflow_state: 'active',
       pace_plan_module_items_attributes: [
@@ -194,8 +192,7 @@ describe PacePlansController, type: :controller do
     it "updates the PacePlan" do
       put :update, params: { course_id: @course.id, id: @pace_plan.id, pace_plan: valid_update_params }
       expect(response).to be_successful
-      expect(@pace_plan.reload.start_date.to_s).to eq(valid_update_params[:start_date])
-      expect(@pace_plan.end_date.to_s).to eq(valid_update_params[:end_date])
+      expect(@pace_plan.reload.end_date.to_s).to eq(valid_update_params[:end_date])
       expect(@pace_plan.workflow_state).to eq(valid_update_params[:workflow_state])
       expect(
         @pace_plan.pace_plan_module_items.joins(:module_item).find_by(content_tags: { content_id: @a1.id }).duration
@@ -233,7 +230,6 @@ describe PacePlansController, type: :controller do
       response_body = JSON.parse(response.body)
       expect(response_body["pace_plan"]["id"]).to eq(pace_plan.id)
 
-      expect(pace_plan.start_date.to_s).to eq(valid_update_params[:start_date])
       expect(pace_plan.end_date.to_s).to eq(valid_update_params[:end_date])
       expect(pace_plan.workflow_state).to eq(valid_update_params[:workflow_state])
       expect(
@@ -331,7 +327,6 @@ describe PacePlansController, type: :controller do
         json_response = JSON.parse(response.body)
         expect(json_response["pace_plan"]["id"]).to eq(nil)
         expect(json_response["pace_plan"]["published_at"]).to eq(nil)
-        expect(Time.zone.parse(json_response["pace_plan"]["start_date"])).to eq(@student_enrollment.created_at.to_date)
         expect(json_response["pace_plan"]["user_id"]).to eq(@student.id)
         expect(json_response["pace_plan"]["modules"].count).to eq(2)
         m1 = json_response["pace_plan"]["modules"].first
