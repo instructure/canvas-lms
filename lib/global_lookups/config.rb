@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2013 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,17 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module GlobalLookups
-  unless singleton_class.method_defined?(:enabled?)
-    def self.enabled?
+  # This class is just a stub for overriding in
+  # plugins in cases where that's useful.
+  class Config
+    def enabled?
       false
-    end
-  end
-
-  module DevUtils
-    unless singleton_class.method_defined?(:initialize_ddb_for_development!)
-      def self.initialize_ddb_for_development!
-        puts("Nothing to do for global lookups stub")
-      end
     end
   end
 end
