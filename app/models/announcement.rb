@@ -49,7 +49,7 @@ class Announcement < DiscussionTopic
   }
 
   def validate_draft_state_change
-    old_draft_state, new_draft_state = self.changes['workflow_state']
+    _old_draft_state, new_draft_state = self.changes['workflow_state']
     self.errors.add :workflow_state, I18n.t('#announcements.error_draft_state', "This topic cannot be set to draft state because it is an announcement.") if new_draft_state == 'unpublished'
   end
 

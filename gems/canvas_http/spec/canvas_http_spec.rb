@@ -202,7 +202,6 @@ describe "CanvasHttp" do
     end
 
     it "checks host before running" do
-      res = nil
       stub_request(:get, "http://www.example.com/a/b")
         .to_return(body: "Hello", headers: { 'Content-Length' => 5 })
       expect(CanvasHttp).to receive(:insecure_host?).with("www.example.com").and_return(true)

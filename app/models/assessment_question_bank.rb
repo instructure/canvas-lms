@@ -142,8 +142,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
 
   def bookmark_for(user, do_bookmark = true)
     if do_bookmark
-      question_bank_user = self.assessment_question_bank_users.where(user_id: user).first
-      question_bank_user ||= self.assessment_question_bank_users.create(:user => user)
+      assessment_question_bank_users.where(user: user).first_or_create!
     else
       AssessmentQuestionBankUser.where(:user_id => user, :assessment_question_bank_id => self).delete_all
     end

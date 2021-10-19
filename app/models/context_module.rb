@@ -317,7 +317,6 @@ class ContextModule < ActiveRecord::Base
   end
 
   def update_downstreams(original_position = nil)
-    original_position ||= self.position || 0
     positions = ContextModule.module_positions(self.context).to_a.sort_by { |a| a[1] }
     downstream_ids = positions.select { |a| a[1] > (self.position || 0) }.map { |a| a[0] }
     downstreams = downstream_ids.empty? ? [] : self.context.context_modules.not_deleted.where(id: downstream_ids)
@@ -788,7 +787,6 @@ class ContextModule < ActiveRecord::Base
   end
 
   def update_for(user, action, tag, points = nil)
-    retry_count = 0
     return nil unless self.context.grants_right?(user, :participate_as_student)
     return nil unless (progression = self.evaluate_for(user))
     return nil if progression.locked?

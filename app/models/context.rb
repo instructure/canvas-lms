@@ -293,7 +293,7 @@ module Context
       object = context.try(params[:controller].sub(/^.+\//, ''))&.find_by(id: params[:id])
     end
     object
-  rescue => e
+  rescue
     nil
   end
 

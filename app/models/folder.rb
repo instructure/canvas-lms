@@ -166,7 +166,6 @@ class Folder < ActiveRecord::Base
     t :default_folder_name, 'New Folder'
     self.name = 'New Folder' if self.name.blank?
     self.name = self.name.strip.gsub(/\//, "_")
-    folder = self
     @update_sub_folders = false
     self.parent_folder_id = nil if !self.parent_folder || self.parent_folder.context != self.context || self.parent_folder_id == self.id
     self.context = self.parent_folder.context if self.parent_folder

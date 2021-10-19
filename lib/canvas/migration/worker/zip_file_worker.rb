@@ -62,7 +62,6 @@ class Canvas::Migration::Worker::ZipFileWorker < Canvas::Migration::Worker::Base
       )
 
       zipfile.close
-      zipfile = nil
 
       cm.workflow_state = :imported
       cm.save

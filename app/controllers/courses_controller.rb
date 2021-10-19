@@ -1529,8 +1529,6 @@ class CoursesController < ApplicationController
   end
 
   def update_user_engine_choice(course, selection_obj)
-    old_selection = course.settings[:engine_selected][:user_id]
-    new_settings = {}
     new_selections = {}
     new_selections[:user_id] = {
       newquizzes_engine_selected: selection_obj[:newquizzes_engine_selected],
@@ -1866,9 +1864,8 @@ class CoursesController < ApplicationController
     if session[:accepted_enrollment_uuid].present? &&
        (enrollment = @context.enrollments.where(uuid: session[:accepted_enrollment_uuid]).first)
 
-      success = false
       if enrollment.invited?
-        success = enrollment.accept!
+        enrollment.accept!
         flash[:notice] = t('notices.invitation_accepted', "Invitation accepted!  Welcome to %{course}!", :course => @context.name)
       end
 

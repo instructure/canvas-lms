@@ -80,7 +80,7 @@ module Turnitin
               elsif item.respond_to?(:turnitin_id)
                 "#{item.turnitin_asset_string}@null.instructure.example.com"
               end
-      email ||= "#{item.asset_string}@null.instructure.example.com"
+      email || "#{item.asset_string}@null.instructure.example.com"
     end
 
     TurnitinUser = Struct.new(:asset_string, :first_name, :last_name, :name)
@@ -211,7 +211,6 @@ module Turnitin
     end
 
     def generateReport(submission, asset_string)
-      user = submission.user
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
@@ -228,7 +227,6 @@ module Turnitin
     end
 
     def submissionReportUrl(submission, asset_string)
-      user = submission.user
       assignment = submission.assignment
       course = assignment.context
       object_id = submission.turnitin_data[asset_string][:object_id] rescue nil
@@ -357,8 +355,8 @@ module Turnitin
           req = Net::HTTP::Post.new(@endpoint, headers)
           con.read_timeout = 30
           begin
-            res = con.request(req, query)
-          rescue => e
+            con.request(req, query)
+          rescue
             Rails.logger.error("Turnitin API error for account_id #{@account_id}: POSTING FAILED")
             Rails.logger.error(params.to_json)
           end

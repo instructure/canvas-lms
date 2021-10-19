@@ -107,22 +107,20 @@ module ApplicationHelper
       name = name.sub(/context/, context_name)
       opts.unshift context.id
       opts.push({}) unless opts[-1].is_a?(Hash)
-      ajax =
-        begin
-          opts[-1].delete :ajax
-        rescue StandardError
-          nil
-        end
+      begin
+        opts[-1].delete :ajax
+      rescue
+        nil
+      end
       opts[-1][:only_path] = true unless opts[-1][:only_path] == false
       res = self.send name, *opts
     elsif opts[0].is_a? Hash
       opts = opts[0]
-      ajax =
-        begin
-          opts[0].delete :ajax
-        rescue StandardError
-          nil
-        end
+      begin
+        opts[0].delete :ajax
+      rescue
+        nil
+      end
       opts[:only_path] = true
       opts["#{context_name}_id"] = context.id
       res = self.url_for opts

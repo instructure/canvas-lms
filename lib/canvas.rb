@@ -230,7 +230,7 @@ module Canvas
 
     begin
       Timeout.timeout(timeout, &block)
-    rescue Timeout::Error => e
+    rescue Timeout::Error
       error_ttl = timeout_protection_error_ttl(service_name)
       redis.incrby(redis_key, 1)
       redis.expire(redis_key, error_ttl)

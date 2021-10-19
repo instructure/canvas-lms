@@ -86,7 +86,6 @@ module Importers
     end
 
     def self.import_content(course, data, params, migration)
-      params ||= { :copy => {} }
       logger.debug "starting import"
 
       Importers.disable_live_events! do
@@ -532,7 +531,6 @@ module Importers
       Time.use_zone time_zone do
         time = ActiveSupport::TimeWithZone.new(time.utc, Time.zone)
         old_date = time.to_date
-        new_date = old_date.clone
         old_start_date = options[:old_start_date]
         old_end_date = options[:old_end_date]
         new_start_date = options[:new_start_date]

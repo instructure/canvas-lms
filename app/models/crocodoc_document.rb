@@ -206,7 +206,6 @@ class CrocodocDocument < ActiveRecord::Base
           bulk_updates = {}
           error_uuids = []
           statuses.each do |status|
-            uuid, state = status['uuid'], status['status']
             bulk_updates[status['status']] ||= []
             bulk_updates[status['status']] << status['uuid']
             if status['status'] == 'ERROR'

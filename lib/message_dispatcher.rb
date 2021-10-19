@@ -80,12 +80,10 @@ class MessageDispatcher < Delayed::PerformableMethod
       raise ActiveRecord::RecordNotFound unless messages.length == queued.length
     end
     messages.each do |message|
-      begin
-        message.deliver
-      rescue Exception, Timeout::Error => e
-        # this delivery failed, we'll have to make an individual job to retry
-        self.dispatch(message)
-      end
+      message.deliver
+    rescue
+      # this delivery failed, we'll have to make an individual job to retry
+      self.dispatch(message)
     end
   end
 end

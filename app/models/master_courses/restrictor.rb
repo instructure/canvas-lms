@@ -88,7 +88,6 @@ module MasterCourses::Restrictor
     def check_for_restricted_column_changes
       return true if @importing_migration || !is_child_content? || !self.check_restrictions?
 
-      restrictions = nil
       locked_columns = []
       self.class.base_class.restricted_column_settings.each do |type, columns|
         changed_columns = (self.changes.keys & columns)
@@ -168,7 +167,6 @@ module MasterCourses::Restrictor
     child_tag = @importing_migration.master_course_subscription.content_tag_for(self) # find or create it
     return unless child_tag && child_tag.downstream_changes.present?
 
-    restrictions = nil
     columns_to_restore = []
     self.class.base_class.restricted_column_settings.each do |type, columns|
       changed_columns = (child_tag.downstream_changes & columns) # should unlink all changes if _any_ in the category has been changed

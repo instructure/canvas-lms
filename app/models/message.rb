@@ -53,7 +53,7 @@ class Message < ActiveRecord::Base
 
     def deliver
       message.deliver
-    rescue QueuedNotFound => e
+    rescue QueuedNotFound
       raise Delayed::RetriableError, "Message does not (yet?) exist"
     end
 
@@ -663,7 +663,6 @@ class Message < ActiveRecord::Base
         self.url     = @message_content_link || nil
       else
         # Message doesn't exist so we flag the message as an error
-        main_link    = eval(Erubi::Engine.new(self.notification.main_link || "").src)
         self.subject = eval(Erubi::Engine.new(subject).src)
         self.body    = eval(Erubi::Engine.new(body).src)
         self.transmission_errors = "couldn't find #{Canvas::MessageHelper.find_message_path(filename)}"
@@ -1125,7 +1124,6 @@ class Message < ActiveRecord::Base
       @exception = e
       error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
       logger.error error_string
-      transmission_errors = error_string
       cancel
       raise e
     end

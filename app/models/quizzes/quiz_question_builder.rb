@@ -114,7 +114,7 @@ class Quizzes::QuizQuestionBuilder
 
                   # just a question
                   else
-                    questions = [descriptor]
+                    [descriptor]
                   end
 
       questions.each do |question|

@@ -405,7 +405,7 @@ class WebConference < ActiveRecord::Base
       close
     end
     @conference_active
-  rescue Errno::ECONNREFUSED => ex
+  rescue Errno::ECONNREFUSED
     # Account credentials changed, server unreachable/down, bad stuff happened.
     @conference_active = false
     @conference_active
