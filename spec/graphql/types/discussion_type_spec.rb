@@ -59,6 +59,10 @@ RSpec.shared_examples "DiscussionType" do
         allowed: ->(user) { discussion.grants_right?(user, nil, :read_as_admin) }
       },
       {
+        value: 'studentReporting',
+        allowed: ->(user) { discussion.course.student_reporting? }
+      },
+      {
         value: 'manageContent',
         allowed: ->(user) { discussion.context.grants_right?(user, :manage_content) }
       },
