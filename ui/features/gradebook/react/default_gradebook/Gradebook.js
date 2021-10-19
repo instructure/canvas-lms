@@ -55,7 +55,6 @@ import PostPolicies from './PostPolicies/index'
 import GradebookMenu from '@canvas/gradebook-menu'
 import ViewOptionsMenu from './components/ViewOptionsMenu'
 import ActionMenu from './components/ActionMenu'
-import FilterNav from './components/FilterNav'
 import EnhancedActionMenu from './components/EnhancedActionMenu'
 import AssignmentGroupFilter from './components/content-filters/AssignmentGroupFilter'
 import GradingPeriodFilter from './components/content-filters/GradingPeriodFilter'
@@ -355,9 +354,7 @@ class Gradebook extends React.Component {
     this.setSubmissionCommentsLoaded = this.setSubmissionCommentsLoaded.bind(this)
     this.getSubmissionCommentsLoaded = this.getSubmissionCommentsLoaded.bind(this)
     // # Gradebook Application State Methods
-    this.initShowSeparateFirstLastNames = this.initShowSeparateFirstLastNames.bind(this)
     this.initShowUnpublishedAssignments = this.initShowUnpublishedAssignments.bind(this)
-    this.toggleShowSeparateFirstLastNames = this.toggleShowSeparateFirstLastNames.bind(this)
     this.toggleUnpublishedAssignments = this.toggleUnpublishedAssignments.bind(this)
     this.toggleViewUngradedAsZero = this.toggleViewUngradedAsZero.bind(this)
     this.setAssignmentsLoaded = this.setAssignmentsLoaded.bind(this)
@@ -545,7 +542,6 @@ class Gradebook extends React.Component {
       this.toggleEnrollmentFilter('inactive', true)
     }
     this.initShowUnpublishedAssignments(this.options.settings.show_unpublished_assignments)
-    this.initShowSeparateFirstLastNames(this.options.settings.show_separate_first_last_names)
     this.initSubmissionStateMap()
     this.gradebookColumnSizeSettings = this.options.gradebook_column_size_settings
     this.setColumnOrder({
@@ -1926,9 +1922,6 @@ class Gradebook extends React.Component {
       filterSettings: this.getFilterSettingsViewOptionsMenuProps(),
       showUnpublishedAssignments: this.gridDisplaySettings.showUnpublishedAssignments,
       onSelectShowUnpublishedAssignments: this.toggleUnpublishedAssignments,
-      allowShowSeparateFirstLastNames: this.options.allow_separate_first_last_names,
-      showSeparateFirstLastNames: this.gridDisplaySettings.showSeparateFirstLastNames,
-      onSelectShowSeparateFirstLastNames: this.toggleShowSeparateFirstLastNames,
       onSelectShowStatusesModal: () => {
         return this.statusesModal.open()
       },
@@ -2077,8 +2070,7 @@ class Gradebook extends React.Component {
     const columnSortProps = this.getColumnSortSettingsViewOptionsMenuProps()
     const {criterion, direction, modulesEnabled} = columnSortProps
 
-    const {viewUngradedAsZero, showUnpublishedAssignments, showSeparateFirstLastNames} =
-      this.gridDisplaySettings
+    const {viewUngradedAsZero, showUnpublishedAssignments} = this.gridDisplaySettings
 
     return {
       allowSortingByModules: modulesEnabled,
@@ -2089,7 +2081,6 @@ class Gradebook extends React.Component {
         columnSortSettings: {criterion, direction},
         showNotes: this.isTeacherNotesColumnShown(),
         showUnpublishedAssignments,
-        showSeparateFirstLastNames,
         statusColors: this.state.gridColors,
         viewUngradedAsZero
       }
@@ -2621,7 +2612,6 @@ class Gradebook extends React.Component {
       showConcludedEnrollments = this.getEnrollmentFilters().concluded,
       showInactiveEnrollments = this.getEnrollmentFilters().inactive,
       showUnpublishedAssignments = this.gridDisplaySettings.showUnpublishedAssignments,
-      showSeparateFirstLastNames = this.gridDisplaySettings.showSeparateFirstLastNames,
       studentColumnDisplayAs = this.getSelectedPrimaryInfo(),
       studentColumnSecondaryInfo = this.getSelectedSecondaryInfo(),
       sortRowsBy = this.getSortRowsBySetting(),
@@ -2642,7 +2632,6 @@ class Gradebook extends React.Component {
         show_concluded_enrollments: showConcludedEnrollments,
         show_inactive_enrollments: showInactiveEnrollments,
         show_unpublished_assignments: showUnpublishedAssignments,
-        show_separate_first_last_names: showSeparateFirstLastNames,
         student_column_display_as: studentColumnDisplayAs,
         student_column_secondary_info: studentColumnSecondaryInfo,
         filter_rows_by: underscore(this.gridDisplaySettings.filterRowsBy),
@@ -3472,27 +3461,6 @@ class Gradebook extends React.Component {
       () => {},
       toggleableAction
     ) // on success, do nothing since the render happened earlier
-  }
-
-  initShowSeparateFirstLastNames(showSeparateFirstLastNames = 'false') {
-    this.gridDisplaySettings.showSeparateFirstLastNames = showSeparateFirstLastNames === 'true'
-  }
-
-  toggleShowSeparateFirstLastNames() {
-    const toggleableAction = () => {
-      this.gridDisplaySettings.showSeparateFirstLastNames =
-        !this.gridDisplaySettings.showSeparateFirstLastNames
-      return this.updateColumnsAndRenderViewOptionsMenu()
-    }
-    toggleableAction()
-    return this.saveSettings(
-      {
-        showSeparateFirstLastNames: this.gridDisplaySettings.showSeparateFirstLastNames
-      },
-      () => {},
-      toggleableAction
-    ) // on success, do nothing since the render happened earlier
-    // this pattern keeps the ui snappier rather than waiting for ajax call to complete
   }
 
   toggleViewUngradedAsZero() {
@@ -4331,11 +4299,6 @@ class Gradebook extends React.Component {
         <Portal node={this.props.gridColorNode}>
           <GridColor colors={this.state.gridColors} />
         </Portal>
-        {this.options.enhanced_gradebook_filters && (
-          <Portal node={this.props.filterNavNode}>
-            <FilterNav />
-          </Portal>
-        )}
       </>
     )
   }

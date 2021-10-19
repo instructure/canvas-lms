@@ -17,9 +17,9 @@
  */
 
 import React from 'react'
-import StudentView from '@canvas/groups/react'
+import StudentView from '../../../features/groups/react'
 import {bool, string} from 'prop-types'
-import TeacherGroupsPage from './TeacherGroupsPage'
+import TeacherGroupsPage from '../../../features/k5_course/react/TeacherGroupsPage'
 
 const GroupsPage = ({canManageGroups, groupsPath, showTeacherPage}) => {
   if (showTeacherPage) {

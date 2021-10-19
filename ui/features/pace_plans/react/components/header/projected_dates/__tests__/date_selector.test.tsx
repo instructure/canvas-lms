@@ -34,8 +34,7 @@ describe('PacePlansDateSelector', () => {
       blackoutDates: BLACKOUT_DATES,
       setStartDate,
       setEndDate,
-      pacePlan: PRIMARY_PLAN,
-      planPublishing: false
+      pacePlan: PRIMARY_PLAN
     }
 
     it('renders an editable "Projected Start Date" selector for primary pace plans', () => {
@@ -97,13 +96,6 @@ describe('PacePlansDateSelector', () => {
         getByText('The start date for the pace plan must be after the end date.')
       ).toBeInTheDocument()
     })
-
-    it('renders as disabled while publishing', () => {
-      const {getByLabelText} = render(<PacePlanDateSelector {...defaultProps} planPublishing />)
-      const startDateInput = getByLabelText('Projected Start Date') as HTMLInputElement
-
-      expect(startDateInput).toHaveAttribute('disabled')
-    })
   })
 
   describe('of end type', () => {
@@ -111,7 +103,6 @@ describe('PacePlansDateSelector', () => {
       type: 'end',
       blackoutDates: BLACKOUT_DATES,
       pacePlan: PRIMARY_PLAN,
-      planPublishing: false,
       projectedEndDate: '2021-11-03',
       setStartDate,
       setEndDate

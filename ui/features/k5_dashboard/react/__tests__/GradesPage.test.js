@@ -21,7 +21,6 @@ import React from 'react'
 import {act, render, waitFor} from '@testing-library/react'
 
 import GradesPage, {getGradingPeriodsFromCourses, overrideCourseGradingPeriods} from '../GradesPage'
-import fetchMock from 'fetch-mock'
 
 jest.mock('@canvas/k5/react/utils')
 const utils = require('@canvas/k5/react/utils') // eslint-disable-line import/no-commonjs
@@ -230,34 +229,15 @@ const defaultProps = {
   }
 }
 
-const BASE_GRADES_URL =
-  '/api/v1/users/self/courses?enrollment_state=active&per_page=100&include[]=total_scores&include[]=current_grading_period_scores&include[]=grading_periods&include[]=course_image'
-const GRADING_PERIODS_URL = encodeURI(BASE_GRADES_URL)
-const OBSERVER_GRADING_PERIODS_URL = encodeURI(`${BASE_GRADES_URL}&include[]=observed_users`)
-
 describe('GradesPage', () => {
-  beforeEach(() => {
-    utils.transformGrades.mockImplementation(data => data)
-    fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(defaultCourses))
-  })
-
-  afterEach(() => {
-    fetchMock.restore()
-  })
-
   it('displays loading skeletons when grades are loading', async () => {
+    utils.fetchGrades.mockReturnValueOnce(Promise.resolve([]))
     const {getAllByText} = render(<GradesPage {...defaultProps} />)
     expect(getAllByText('Loading grades...')[0]).toBeInTheDocument()
   })
 
   it('displays an error message if there was an error fetching grades', async () => {
-    fetchMock.get(
-      GRADING_PERIODS_URL,
-      () => {
-        throw new Error('oh no!')
-      },
-      {overwriteRoutes: true}
-    )
+    utils.fetchGrades.mockReturnValueOnce(Promise.reject(new Error('oh no!')))
     const {getAllByText} = render(<GradesPage {...defaultProps} />)
     // showFlashError appears to create both a regular and a screen-reader only alert on the page
     await waitFor(() => getAllByText('Failed to load the grades tab'))
@@ -266,6 +246,7 @@ describe('GradesPage', () => {
   })
 
   it('renders fetched non-homeroom courses', async () => {
+    utils.fetchGrades.mockReturnValueOnce(Promise.resolve(defaultCourses))
     const {getByText, queryByText} = render(<GradesPage {...defaultProps} />)
     await waitFor(() => getByText('Testing 4 Dummies'))
     expect(getByText('ECON 500')).toBeInTheDocument()
@@ -273,19 +254,20 @@ describe('GradesPage', () => {
   })
 
   it('renders a grading period drop-down if the user has student role', async () => {
+    utils.fetchGrades.mockReturnValueOnce(Promise.resolve(defaultCourses))
     const {findByText} = render(<GradesPage {...defaultProps} />)
     expect(await findByText('Select Grading Period')).toBeInTheDocument()
   })
 
   it('displays a loading skeleton when the grading period drop-down is loading', () => {
+    utils.fetchGrades.mockReturnValueOnce(Promise.resolve(defaultCourses))
     const {getByText} = render(<GradesPage {...defaultProps} />)
     expect(getByText('Loading grading periods...')).toBeInTheDocument()
   })
 
   it('does not render a grading period drop-down if the user does not have student role', async () => {
-    fetchMock.get(
-      GRADING_PERIODS_URL,
-      JSON.stringify([
+    utils.fetchGrades.mockReturnValueOnce(
+      Promise.resolve([
         {
           courseId: '99',
           courseName: 'For Teachers Only',
@@ -302,8 +284,7 @@ describe('GradesPage', () => {
             }
           ]
         }
-      ]),
-      {overwriteRoutes: true}
+      ])
     )
     const {getByText, queryByText} = render(<GradesPage {...defaultProps} />)
     await waitFor(() => getByText('For Teachers Only'))
@@ -311,6 +292,7 @@ describe('GradesPage', () => {
   })
 
   it('updates shown courses and grades to match currently selected grading periods', async () => {
+    utils.fetchGrades.mockReturnValueOnce(Promise.resolve(defaultCourses))
     utils.fetchGradesForGradingPeriod.mockReturnValueOnce(
       Promise.resolve(defaultSpecificPeriodGrades)
     )
@@ -355,9 +337,7 @@ describe('GradesPage', () => {
         }
       ]
     }
-    fetchMock.get(GRADING_PERIODS_URL, JSON.stringify([courseWithoutGrades]), {
-      overwriteRoutes: true
-    })
+    utils.fetchGrades.mockReturnValueOnce(Promise.resolve([courseWithoutGrades]))
     const {getByText, queryByText} = render(<GradesPage {...defaultProps} />)
 
     await waitFor(() => expect(getByText('76%')).toBeInTheDocument())
@@ -365,66 +345,9 @@ describe('GradesPage', () => {
   })
 
   it('displays some text indicating how grades are calculated', () => {
+    utils.fetchGrades.mockReturnValueOnce(Promise.resolve(defaultCourses))
     const {getByText} = render(<GradesPage {...defaultProps} />)
     expect(getByText('Totals are calculated based only on graded assignments.')).toBeInTheDocument()
-  })
-
-  describe('Parent Support', () => {
-    beforeEach(() => {
-      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, JSON.stringify(defaultCourses))
-      utils.getCourseGrades.mockImplementation(c => c)
-    })
-
-    it('only shows courses of the observed user if provided', async () => {
-      const {getByText, queryByText} = render(
-        <GradesPage
-          {...defaultProps}
-          currentUserRoles={['observer', 'user']}
-          observedUserId="4"
-          currentUser={{id: '1'}}
-        />
-      )
-      await waitFor(() => {
-        expect(getByText('Mastering Canvas')).toBeInTheDocument()
-        expect(getByText('A+')).toBeInTheDocument()
-        expect(getByText('Canvas from zero to hero')).toBeInTheDocument()
-        expect(getByText('B+')).toBeInTheDocument()
-        expect(queryByText('Testing 4 Dummies')).not.toBeInTheDocument()
-        expect(queryByText('ECON 500')).not.toBeInTheDocument()
-        expect(queryByText('Mastering Grading Periods')).not.toBeInTheDocument()
-      })
-    })
-
-    it('filters out observer enrollments if the observed user is the current user', async () => {
-      const {getByText, queryByText} = render(
-        <GradesPage
-          {...defaultProps}
-          currentUserRoles={['observer', 'teacher', 'user']}
-          observedUserId="1"
-          currentUser={{id: '1'}}
-        />
-      )
-      await waitFor(() => {
-        expect(getByText('Testing 4 Dummies')).toBeInTheDocument()
-        expect(getByText('ECON 500')).toBeInTheDocument()
-        expect(getByText('Mastering Grading Periods')).toBeInTheDocument()
-        expect(queryByText('Mastering Canvas')).not.toBeInTheDocument()
-        expect(queryByText('A+')).not.toBeInTheDocument()
-        expect(queryByText('Canvas from zero to hero')).not.toBeInTheDocument()
-        expect(queryByText('B+')).not.toBeInTheDocument()
-      })
-    })
-
-    it('does not filter any course if the observedUserId is null', async () => {
-      const {getByText} = render(<GradesPage {...defaultProps} currentUser={{id: '1'}} />)
-      await waitFor(() => {
-        expect(getByText('Testing 4 Dummies')).toBeInTheDocument()
-        expect(getByText('ECON 500')).toBeInTheDocument()
-        expect(getByText('Mastering Grading Periods')).toBeInTheDocument()
-        expect(getByText('Mastering Canvas')).toBeInTheDocument()
-        expect(getByText('Canvas from zero to hero')).toBeInTheDocument()
-      })
-    })
   })
 })
 
@@ -556,5 +479,62 @@ describe('overrideCourseGradingPeriods', () => {
         ]
       }
     ])
+  })
+})
+
+describe('observed user', () => {
+  beforeEach(() => {
+    utils.fetchGrades.mockReturnValueOnce(Promise.resolve(defaultCourses))
+    utils.getCourseGrades.mockImplementation(c => c)
+  })
+  it('only shows courses of the observed user if provided', async () => {
+    const {getByText, queryByText} = render(
+      <GradesPage
+        {...defaultProps}
+        currentUserRoles={['observer', 'user']}
+        observedUserId="4"
+        currentUser={{id: '1'}}
+      />
+    )
+    await waitFor(() => {
+      expect(getByText('Mastering Canvas')).toBeInTheDocument()
+      expect(getByText('A+')).toBeInTheDocument()
+      expect(getByText('Canvas from zero to hero')).toBeInTheDocument()
+      expect(getByText('B+')).toBeInTheDocument()
+      expect(queryByText('Testing 4 Dummies')).not.toBeInTheDocument()
+      expect(queryByText('ECON 500')).not.toBeInTheDocument()
+      expect(queryByText('Mastering Grading Periods')).not.toBeInTheDocument()
+    })
+  })
+
+  it('filters out observer enrollments if the observed user is the current user', async () => {
+    const {getByText, queryByText} = render(
+      <GradesPage
+        {...defaultProps}
+        currentUserRoles={['observer', 'teacher', 'user']}
+        observedUserId="1"
+        currentUser={{id: '1'}}
+      />
+    )
+    await waitFor(() => {
+      expect(getByText('Testing 4 Dummies')).toBeInTheDocument()
+      expect(getByText('ECON 500')).toBeInTheDocument()
+      expect(getByText('Mastering Grading Periods')).toBeInTheDocument()
+      expect(queryByText('Mastering Canvas')).not.toBeInTheDocument()
+      expect(queryByText('A+')).not.toBeInTheDocument()
+      expect(queryByText('Canvas from zero to hero')).not.toBeInTheDocument()
+      expect(queryByText('B+')).not.toBeInTheDocument()
+    })
+  })
+
+  it('does not filter any course if the observedUserId is null', async () => {
+    const {getByText} = render(<GradesPage {...defaultProps} currentUser={{id: '1'}} />)
+    await waitFor(() => {
+      expect(getByText('Testing 4 Dummies')).toBeInTheDocument()
+      expect(getByText('ECON 500')).toBeInTheDocument()
+      expect(getByText('Mastering Grading Periods')).toBeInTheDocument()
+      expect(getByText('Mastering Canvas')).toBeInTheDocument()
+      expect(getByText('Canvas from zero to hero')).toBeInTheDocument()
+    })
   })
 })

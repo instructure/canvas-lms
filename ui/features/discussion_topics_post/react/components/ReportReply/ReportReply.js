@@ -26,7 +26,6 @@ import {Modal} from '@instructure/ui-modal'
 import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import LoadingIndicator from '@canvas/loading-indicator'
 
 const REPORT_TYPES = [
   {value: 'inappropriate', getLabel: () => I18n.t('Inappropriate')},
@@ -40,7 +39,7 @@ export const ReportReply = props => {
     <Modal
       open={props.showReportModal}
       onDismiss={props.onCloseReportModal}
-      size="medium"
+      size="auto"
       label={I18n.t('Report Reply')}
       shouldCloseOnDocumentClick
     >
@@ -54,39 +53,32 @@ export const ReportReply = props => {
         <Heading>{I18n.t('Report Reply')}</Heading>
       </Modal.Header>
       <Modal.Body>
-        {props.isLoading ? (
-          <LoadingIndicator />
-        ) : (
-          <>
-            <View as="div" margin="0 0 medium 0">
-              <Text>
-                {I18n.t(
-                  'Reported replies will be sent to your teacher for review. You will not be able to undo this action.'
-                )}
-              </Text>
-            </View>
-            <RadioInputGroup
-              name={I18n.t('Report Reply Options')}
-              onChange={inputType => setSelectedReportType(inputType)}
-              description={I18n.t('Please select a reason for reporting this reply')}
-            >
-              {REPORT_TYPES.map(reportType => (
-                <RadioInput
-                  key={reportType.value}
-                  value={reportType.value}
-                  label={reportType.getLabel()}
-                />
-              ))}
-            </RadioInputGroup>
-          </>
-        )}
+        <View as="div" margin="0 0 medium 0">
+          <Text>
+            {I18n.t(
+              'Reported replies will be sent to your teacher for review. You will not be able to undo this action.'
+            )}
+          </Text>
+        </View>
+        <RadioInputGroup
+          name={I18n.t('Report Reply Options')}
+          onChange={inputType => setSelectedReportType(inputType)}
+          description={I18n.t('Please select a reason for reporting this reply')}
+        >
+          {REPORT_TYPES.map(reportType => (
+            <RadioInput
+              key={reportType.value}
+              value={reportType.value}
+              label={reportType.getLabel()}
+            />
+          ))}
+        </RadioInputGroup>
       </Modal.Body>
       <Modal.Footer>
         <Button
           data-testid="report-reply-cancel-modal-button"
           onClick={props.onCloseReportModal}
           margin="0 x-small 0 0"
-          interaction={!props.isLoading ? 'enabled' : 'disabled'}
         >
           {I18n.t('Cancel')}
         </Button>
@@ -94,7 +86,7 @@ export const ReportReply = props => {
           data-testid="report-reply-submit-button"
           color="danger"
           onClick={() => props.onSubmit(selectedReportType)}
-          interaction={selectedReportType && !props.isLoading ? 'enabled' : 'disabled'}
+          interaction={selectedReportType ? 'enabled' : 'disabled'}
         >
           {I18n.t('Submit')}
         </Button>
@@ -106,11 +98,9 @@ export const ReportReply = props => {
 ReportReply.propTypes = {
   onCloseReportModal: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
-  showReportModal: PropTypes.bool,
-  isLoading: PropTypes.bool
+  showReportModal: PropTypes.bool
 }
 
 ReportReply.defaultProps = {
-  showReportModal: false,
-  isLoading: false
+  showReportModal: false
 }
