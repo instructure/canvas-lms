@@ -24,6 +24,8 @@ class VerySpecialAsycnMbTestError < StandardError
 end
 
 describe MessageBus::AsyncProducer do
+  let(:namespace) { "test-only" }
+
   before(:each) do
     skip("pulsar config required to test") unless MessageBus.enabled?
   end
@@ -75,7 +77,6 @@ describe MessageBus::AsyncProducer do
     end
 
     let(:producer) { MessageBus::AsyncProducer.new(start_thread: false) }
-    let(:namespace) { "test-only" }
 
     it "pushes onto the queue but does not execute" do
       topic_name = "lazily-created-topic-#{SecureRandom.hex(16)}"
@@ -111,6 +112,56 @@ describe MessageBus::AsyncProducer do
       MessageBus.max_mem_queue_size = -> { 5 }
       5.times { expect { producer.push(namespace, topic_name, msg) }.to_not raise_error }
       expect { producer.push(namespace, topic_name, msg) }.to raise_error(::MessageBus::MemoryQueueFullError)
+    end
+  end
+
+  describe "running thread" do
+    specs_require_sharding
+
+    before(:all) do
+      Bundler.require(:pulsar)
+    end
+
+    around(:each) do |example|
+      # let's not waste time with queue throttling in tests
+      MessageBus.worker_process_interval = -> { 0.01 }
+      example.run
+    ensure
+      Canvas::MessageBusConfig.apply # resets config changes made to interval and queue size
+    end
+
+    it "releases db connections appropriately" do
+      producer = ::MessageBus::AsyncProducer.new(start_thread: false)
+      # no residual connections should be in this thread at all
+      # we want to go from a clean slate every time
+      ActiveRecord::Base.connection_pool.current_pool.lock_thread = false
+      @shard2.activate do
+        producer.push(namespace, 'some-topic-12345', { key: "msg1" }.to_json)
+        producer.push(namespace, 'some-topic-12345', { key: "msg2" }.to_json)
+        producer.push(namespace, 'some-topic-12345', { key: "msg3" }.to_json)
+      end
+      # at this point the producer has some messages in it's queue but
+      # has not done anything to spark a connection.
+      #
+      Shard.clear_cache # force thread to pull a connection to default shard
+      producer.start!
+      # Now kick it off, and for each message it will have to perform
+      # a shard lookup so it should lease a connection on the default shard.
+      # quick sleep to give the thread a chance to pre-empt.
+      sleep(0.01) # rubocop:disable Lint/NoSleep
+
+      # clear idle connections to force switchman to do it's thing and
+      # simulate one of these events happening organically
+      ActiveRecord::Base.connection_pool.clear_idle_connections!(Time.zone.now - 60)
+      #
+      # at this point the thread will have a leased connection to
+      # the default shard and it should NOT have gone back to the queue,
+      # so we should be able to pull a connection in this thread.
+      expect do
+        conn = ActiveRecord::Base.connection_pool.current_pool.checkout
+        ActiveRecord::Base.connection_pool.current_pool.checkin(conn)
+      end.to_not raise_error
+      producer.stop!
     end
   end
 end
