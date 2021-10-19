@@ -17,7 +17,7 @@
  */
 
 import {Button, IconButton} from '@instructure/ui-buttons'
-import {IconMoreLine, IconReplyLine} from '@instructure/ui-icons'
+import {IconMiniArrowDownLine, IconReplyLine, IconSettingsLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import PropTypes from 'prop-types'
 import React from 'react'
@@ -45,8 +45,9 @@ export const MessageDetailActions = ({...props}) => {
         }}
         trigger={
           <Tooltip renderTip={I18n.t('More options')} on={['hover', 'focus']}>
-            <Button margin="0 x-small 0 0" size="small" renderIcon={IconMoreLine}>
+            <Button margin="0 x-small 0 0" size="small" renderIcon={IconSettingsLine}>
               <ScreenReaderContent>{I18n.t('More options')}</ScreenReaderContent>
+              <IconMiniArrowDownLine />
             </Button>
           </Tooltip>
         }

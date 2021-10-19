@@ -100,7 +100,7 @@ describe Quizzes::QuizzesApiController, type: :request do
         let(:quiz_count) { 10 }
         let(:quizzes) { (0..quiz_count).map { @course.quizzes.create! :title => "the same title" } }
 
-        it "orders quizzes deterministically for pagination" do
+        it "deterministicallies order quizzes for pagination" do
           found_quiz_ids = []
           quiz_count.times do |i|
             page_num = i + 1

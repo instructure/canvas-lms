@@ -144,7 +144,7 @@ const ManageOutcomesView = ({
             ({
               canUnlink,
               _id: linkId,
-              node: {_id, title, description, friendlyDescription, contextType, contextId}
+              node: {_id, title, description, friendlyDescription, contextType, contextId, canEdit}
             }) => (
               <ManageOutcomeItem
                 key={linkId}
@@ -155,6 +155,7 @@ const ManageOutcomesView = ({
                 friendlyDescription={friendlyDescription?.description}
                 outcomeContextType={contextType}
                 outcomeContextId={contextId}
+                canManageOutcome={canEdit}
                 canUnlink={canUnlink}
                 isChecked={!!selectedOutcomes[linkId]}
                 onMenuHandler={onOutcomeMenuHandler}

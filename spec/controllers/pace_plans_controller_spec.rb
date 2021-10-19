@@ -93,7 +93,6 @@ describe PacePlansController, type: :controller do
     it "populates js_env with course, enrollment, sections, and pace_plan details" do
       @section = @course.course_sections.first
       @student_enrollment = @course.enrollments.find_by(user_id: @student.id)
-      @progress = Progress.create!(context: @pace_plan, tag: 'pace_plan_publish')
       get :index, { params: { course_id: @course.id } }
 
       expect(response).to be_successful
@@ -141,14 +140,6 @@ describe PacePlansController, type: :controller do
                                                                                    module_item_type: 'Assignment',
                                                                                    duration: 4
                                                                                  }))
-
-      expect(js_env[:PACE_PLAN_PROGRESS]).to match(hash_including({
-                                                                    id: @progress.id,
-                                                                    context_id: @progress.context_id,
-                                                                    context_type: "PacePlan",
-                                                                    tag: "pace_plan_publish",
-                                                                    workflow_state: "queued"
-                                                                  }))
     end
 
     it "does not create a pace plan if no primary pace plans are available" do
@@ -205,13 +196,7 @@ describe PacePlansController, type: :controller do
       ).to eq(valid_update_params[:pace_plan_module_items_attributes][1][:duration])
 
       response_body = JSON.parse(response.body)
-      expect(response_body["pace_plan"]["id"]).to eq(@pace_plan.id)
-
-      # Pace plan's publish should be queued
-      progress = Progress.last
-      expect(progress.context).to eq(@pace_plan)
-      expect(progress.workflow_state).to eq('queued')
-      expect(response_body["progress"]["id"]).to eq(progress.id)
+      expect(response_body["id"]).to eq(@pace_plan.id)
     end
   end
 
@@ -230,9 +215,6 @@ describe PacePlansController, type: :controller do
 
       pace_plan = PacePlan.last
 
-      response_body = JSON.parse(response.body)
-      expect(response_body["pace_plan"]["id"]).to eq(pace_plan.id)
-
       expect(pace_plan.start_date.to_s).to eq(valid_update_params[:start_date])
       expect(pace_plan.end_date.to_s).to eq(valid_update_params[:end_date])
       expect(pace_plan.workflow_state).to eq(valid_update_params[:workflow_state])
@@ -243,11 +225,6 @@ describe PacePlansController, type: :controller do
         pace_plan.pace_plan_module_items.joins(:module_item).find_by(content_tags: { content_id: @a2.id }).duration
       ).to eq(valid_update_params[:pace_plan_module_items_attributes][1][:duration])
       expect(pace_plan.pace_plan_module_items.count).to eq(2)
-      # Pace plan's publish should be queued
-      progress = Progress.last
-      expect(progress.context).to eq(pace_plan)
-      expect(progress.workflow_state).to eq('queued')
-      expect(response_body["progress"]["id"]).to eq(progress.id)
     end
   end
 

@@ -1064,11 +1064,6 @@ class UsersController < ApplicationController
   # @argument user_id
   #   the student's ID
   #
-  # @argument observed_user_id [String]
-  #   Return missing submissions for the given observed user. Must be accompanied by course_ids[].
-  #   The user making the request must be observing the observed user in all the courses specified by
-  #   course_ids[].
-  #
   # @argument include[] [String, "planner_overrides"|"course"]
   #   "planner_overrides":: Optionally include the assignment's associated planner override, if it exists, for the current user.
   #                         These will be returned under a +planner_override+ key
@@ -1079,7 +1074,7 @@ class UsersController < ApplicationController
   #
   # @argument course_ids[] [String]
   #   Optionally restricts the list of past-due assignments to only those associated with the specified
-  #   course IDs. Required if observed_user_id is passed.
+  #   course IDs.
   #
   # @returns [Assignment]
   def missing_submissions
@@ -1087,23 +1082,14 @@ class UsersController < ApplicationController
       user = api_find(User, params[:user_id])
       return render_unauthorized_action unless @current_user && user.grants_right?(@current_user, :read)
 
-      included_course_ids = api_find_all(Course, Array(params[:course_ids])).pluck(:id)
-
-      if params.key?(:observed_user_id)
-        return render_unauthorized_action if included_course_ids.empty?
-
-        user = api_find(User, params[:observed_user_id])
-        valid_course_ids = @current_user.observer_enrollments.active.where(associated_user_id: params[:observed_user_id]).shard(@current_user).pluck(:course_id)
-        return render_unauthorized_action unless (included_course_ids - valid_course_ids).empty?
-      end
-
       submissions = []
 
       filter = Array(params[:filter])
       only_submittable = filter.include?('submittable')
 
       course_ids = user.participating_student_course_ids
-      course_ids = course_ids.select { |id| included_course_ids.include?(id) } unless included_course_ids.empty?
+      included_course_ids = Array(params[:course_ids])
+      course_ids = course_ids.select { |id| included_course_ids.include?(id.to_s) } unless included_course_ids.empty?
 
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
         subs = Submission.active.preload(:assignment)

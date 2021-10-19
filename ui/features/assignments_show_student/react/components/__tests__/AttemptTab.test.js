@@ -70,9 +70,9 @@ describe('ContentTabs', () => {
   }
 
   describe('the assignment is locked aka passed the until date', () => {
-    it('renders the availability dates if the assignment was not submitted', async () => {
+    it('renders the availability dates if the submission is unsubmitted', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {lockInfo: {isLocked: true}}
+        LockInfo: {isLocked: true}
       })
       const {findByText} = render(
         <MockedProvider>
@@ -97,50 +97,6 @@ describe('ContentTabs', () => {
         </MockedProvider>
       )
       expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
-    })
-
-    it('renders the last submission if the assignment was submitted and marked late', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {lockInfo: {isLocked: true}},
-        Submission: {
-          ...SubmissionMocks.late,
-          attachments: [{displayName: 'test.jpg'}]
-        }
-      })
-      const {findByTestId} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>
-      )
-      expect(await findByTestId('assignments_2_submission_preview')).toBeInTheDocument()
-    })
-
-    it('renders the availability dates if the assignment was not submitted and marked missing', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {lockInfo: {isLocked: true}},
-        Submission: {...SubmissionMocks.missing}
-      })
-      const {findByText} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>
-      )
-
-      expect(await findByText('Availability Dates')).toBeInTheDocument()
-    })
-
-    it('renders the availability dates if the assignment was not submitted and marked excused', async () => {
-      const props = await mockAssignmentAndSubmission({
-        Assignment: {lockInfo: {isLocked: true}},
-        Submission: {...SubmissionMocks.excused}
-      })
-      const {findByText} = render(
-        <MockedProvider>
-          <AttemptTab {...props} focusAttemptOnInit={false} />
-        </MockedProvider>
-      )
-
-      expect(await findByText('Availability Dates')).toBeInTheDocument()
     })
   })
 

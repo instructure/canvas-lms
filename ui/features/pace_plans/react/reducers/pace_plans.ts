@@ -17,12 +17,13 @@
  */
 
 import {createSelector, createSelectorCreator, defaultMemoize} from 'reselect'
-import {deepEqual} from '@instructure/ui-utils'
+import equal from 'fast-deep-equal'
 
 import {Constants as PacePlanConstants, PacePlanAction} from '../actions/pace_plans'
 import pacePlanItemsReducer from './pace_plan_items'
 import * as DateHelpers from '../utils/date_stuff/date_helpers'
 import * as PlanDueDatesCalculator from '../utils/date_stuff/plan_due_dates_calculator'
+import {weekendIntegers} from '../shared/api/backend_serializer'
 import {
   PacePlansState,
   PacePlan,
@@ -33,8 +34,7 @@ import {
   Enrollment,
   Sections,
   Enrollments,
-  Section,
-  Module
+  Section
 } from '../types'
 import {BlackoutDate, Course} from '../shared/types'
 import {Constants as UIConstants, SetSelectedPlanType} from '../actions/ui'
@@ -42,15 +42,10 @@ import {getCourse} from './course'
 import {getEnrollments} from './enrollments'
 import {getSections} from './sections'
 import {getBlackoutDates} from '../shared/reducers/blackout_dates'
-import {Change, summarizeChanges} from '../utils/change_tracking'
+import moment from 'moment-timezone'
+import {formatDate} from '../utils/date_stuff/date_helpers'
 
-export const initialState: PacePlansState = ({
-  ...window.ENV.PACE_PLAN,
-  originalPlan: window.ENV.PACE_PLAN
-} || {}) as PacePlansState
-
-const getModuleItems = (modules: Module[]) =>
-  ([] as PacePlanItem[]).concat(...modules.map(m => m.items))
+export const initialState: PacePlansState = (window.ENV.PACE_PLAN || {}) as PacePlansState
 
 /* Selectors */
 
@@ -61,64 +56,22 @@ const getModuleItems = (modules: Module[]) =>
 // The memoization equality check is potentially slower, but if the selector itself is computing
 // some complex data, it will ultimately be better to use this, otherwise you'll get unnecessary
 // calculations.
-const createDeepEqualSelector = createSelectorCreator(defaultMemoize, deepEqual)
+const createDeepEqualSelector = createSelectorCreator(defaultMemoize, equal)
 
 export const getExcludeWeekends = (state: StoreState): boolean => state.pacePlan.exclude_weekends
-export const getOriginalPlan = (state: StoreState) => state.pacePlan.originalPlan
-export const getPacePlan = (state: StoreState): PacePlansState => state.pacePlan
-export const getPacePlanModules = (state: StoreState) => state.pacePlan.modules
+export const getPacePlan = (state: StoreState): PacePlan => state.pacePlan
 export const getPacePlanType = (state: StoreState): PlanContextTypes => state.pacePlan.context_type
 export const getStartDate = (state: StoreState): string | undefined => state.pacePlan.start_date
 
-export const getPacePlanItems = createSelector(getPacePlanModules, getModuleItems)
-
-export const getSettingChanges = createDeepEqualSelector(
-  getExcludeWeekends,
-  getOriginalPlan,
-  (excludeWeekends, originalPlan) => {
-    const changes: Change[] = []
-
-    if (excludeWeekends !== originalPlan.exclude_weekends)
-      changes.push({
-        id: 'exclude_weekends',
-        oldValue: originalPlan.exclude_weekends,
-        newValue: excludeWeekends
-      })
-
-    return changes
+export const getPacePlanItems = createSelector(
+  getPacePlan,
+  (pacePlan: PacePlan): PacePlanItem[] => {
+    const pacePlanItems: PacePlanItem[] = []
+    pacePlan.modules.forEach(module => {
+      module.items.forEach(item => pacePlanItems.push(item))
+    })
+    return pacePlanItems
   }
-)
-
-export const getPacePlanItemChanges = createDeepEqualSelector(
-  getPacePlanItems,
-  getOriginalPlan,
-  (pacePlanItems, originalPlan) => {
-    const originalItems = getModuleItems(originalPlan.modules)
-    const changes: Change<PacePlanItem>[] = []
-
-    for (const i in pacePlanItems) {
-      const originalItem = originalItems[i]
-      const currentItem = pacePlanItems[i]
-
-      if (originalItem.duration !== currentItem.duration) {
-        changes.push({id: originalItem.id, oldValue: originalItem, newValue: currentItem})
-      }
-    }
-
-    return changes
-  }
-)
-
-export const getUnpublishedChangeCount = createSelector(
-  getSettingChanges,
-  getPacePlanItemChanges,
-  (settingChanges, pacePlanItemChanges) => settingChanges.length + pacePlanItemChanges.length
-)
-
-export const getSummarizedChanges = createSelector(
-  getSettingChanges,
-  getPacePlanItemChanges,
-  summarizeChanges
 )
 
 export const getPacePlanItemPosition = createDeepEqualSelector(
@@ -249,11 +202,13 @@ export default (
 ): PacePlansState => {
   switch (action.type) {
     case PacePlanConstants.SET_PACE_PLAN:
-      return {...state, ...action.payload}
+      return action.payload
     case PacePlanConstants.SET_START_DATE:
       return {...state, start_date: DateHelpers.formatDate(action.payload)}
     case PacePlanConstants.SET_END_DATE:
       return {...state, end_date: DateHelpers.formatDate(action.payload)}
+    case PacePlanConstants.SET_UNPUBLISHED_CHANGES:
+      return {...state, unpublished_changes: action.payload}
     case PacePlanConstants.PLAN_CREATED:
       // Could use a *REFACTOR* to better handle new plans and updating the ui properly
       return {
@@ -263,7 +218,7 @@ export default (
         published_at: action.payload.published_at
       }
     case UIConstants.SET_SELECTED_PLAN_CONTEXT:
-      return {...action.payload.newSelectedPlan, originalPlan: action.payload.newSelectedPlan}
+      return action.payload.newSelectedPlan
     case PacePlanConstants.TOGGLE_EXCLUDE_WEEKENDS:
       if (state.exclude_weekends) {
         return {...state, exclude_weekends: false}
@@ -272,8 +227,8 @@ export default (
       }
     case PacePlanConstants.TOGGLE_HARD_END_DATES:
       return {...state, hard_end_dates: !state.hard_end_dates}
-    case PacePlanConstants.RESET_PLAN:
-      return {...state.originalPlan, originalPlan: state.originalPlan}
+    case PacePlanConstants.SET_LINKED_TO_PARENT:
+      return {...state, linked_to_parent: action.payload}
     default:
       return {...state, modules: pacePlanItemsReducer(state.modules, action)}
   }

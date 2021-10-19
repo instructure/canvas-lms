@@ -28,8 +28,9 @@ export const MessageDetailContainer = props => {
     <>
       <MessageDetailHeader text={props.conversation.subject} />
       {props.conversation.conversationMessagesConnection.nodes.map(message => (
-        <View as="div" borderWidth="small none none none" padding="small" key={message.id}>
+        <View as="div" borderWidth="small none none none" padding="small">
           <MessageDetailItem
+            key={message.id}
             conversationMessage={message}
             context={props.conversation.contextName}
           />
