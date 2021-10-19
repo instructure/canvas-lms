@@ -39,7 +39,7 @@ import {Button, IconButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {AccessibleContent} from '@instructure/ui-a11y-content'
+import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 
@@ -209,7 +209,7 @@ ConfirmDropModal.propTypes = {
 }
 
 export const CourseHeaderHero = forwardRef(
-  ({backgroundColor, height, name, image, selfEnrollment, showingMobileNav}, ref) => {
+  ({backgroundColor, height, name, image, selfEnrollment, showingMobileNav, observerMode}, ref) => {
     const [isModalOpen, setModalOpen] = useState(false)
     return (
       <div
@@ -242,7 +242,7 @@ export const CourseHeaderHero = forwardRef(
             <Flex alignItems="center" margin="small medium">
               {!showingMobileNav && (
                 <Flex.Item shouldGrow shouldShrink margin="0 small 0 0">
-                  <Heading as="h1" color="primary-inverse">
+                  <Heading as="h1" aria-hidden={observerMode} color="primary-inverse">
                     {name}
                   </Heading>
                 </Flex.Item>
@@ -281,7 +281,8 @@ CourseHeaderHero.propTypes = {
   height: PropTypes.number.isRequired,
   image: PropTypes.string,
   selfEnrollment: PropTypes.object,
-  showingMobileNav: PropTypes.bool.isRequired
+  showingMobileNav: PropTypes.bool.isRequired,
+  observerMode: PropTypes.bool.isRequired
 }
 
 export function CourseHeaderOptions({
@@ -322,6 +323,9 @@ export function CourseHeaderOptions({
   const observerOptions = (
     <Flex.Item shouldGrow textAlign="center" key="course-header-observer-options">
       <View as="div" display="inline-block" width={showingMobileNav ? '100%' : '16em'}>
+        <ScreenReaderContent>
+          <Heading as="h1">{courseContext}</Heading>
+        </ScreenReaderContent>
         <ObserverOptions
           observerList={observerList}
           currentUser={currentUser}
@@ -532,6 +536,7 @@ export function K5Course({
           selfEnrollment={selfEnrollment}
           showingMobileNav={showingMobileNav}
           ref={headerRef}
+          observerMode={showObserverOptions}
         />
       </View>
     )

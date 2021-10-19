@@ -254,7 +254,7 @@ export const K5Dashboard = ({
     return (
       <Flex as="section" margin={`medium 0 ${sticky && showingIcons ? '0' : 'small'} 0`}>
         <Flex.Item shouldGrow shouldShrink margin="0 small 0 0">
-          <Heading as="h1" level={sticky ? 'h2' : 'h1'}>
+          <Heading as="h1" aria-hidden={observerMode} level={sticky ? 'h2' : 'h1'}>
             {I18n.t('Welcome, %{name}!', {name: currentUser.display_name})}
           </Heading>
         </Flex.Item>
@@ -293,8 +293,13 @@ export const K5Dashboard = ({
     <>
       <Flex as="section" alignItems="start">
         <Flex.Item shouldGrow shouldShrink padding="x-small medium medium medium">
-          {parentSupportEnabled && currentUserRoles.includes('observer') && (
+          {observerMode && (
             <View as="div" maxWidth="16em">
+              <ScreenReaderContent>
+                <Heading as="h1">
+                  {I18n.t('Welcome, %{name}!', {name: currentUser.display_name})}
+                </Heading>
+              </ScreenReaderContent>
               <ObserverOptions
                 observerList={observerList}
                 currentUser={currentUser}
