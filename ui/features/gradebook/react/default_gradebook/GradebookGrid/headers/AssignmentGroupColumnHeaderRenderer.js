@@ -30,6 +30,12 @@ function getProps(column, gradebook, options) {
     gradebook.contentLoadStates.studentsLoaded &&
     gradebook.contentLoadStates.submissionsLoaded
 
+  let onApplyScoreToUngraded
+  if (gradebook.allowApplyScoreToUngraded()) {
+    onApplyScoreToUngraded = () => {
+      gradebook.onApplyScoreToUngradedRequested(assignmentGroup)
+    }
+  }
   return {
     ref: options.ref,
     addGradebookElement: gradebook.keyboardNav.addGradebookElement,
@@ -39,6 +45,7 @@ function getProps(column, gradebook, options) {
       name: assignmentGroup.name
     },
 
+    onApplyScoreToUngraded,
     onHeaderKeyDown: event => {
       gradebook.handleHeaderKeyDown(event, columnId)
     },
