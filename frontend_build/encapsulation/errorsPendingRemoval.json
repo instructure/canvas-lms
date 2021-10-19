@@ -18,12 +18,6 @@
         "request": "@canvas/i18n/rtlHelper"
     },
     {
-        "name": "AccessViolationError",
-        "source": "ui/features/account_notification_settings/react/AccountNotificationSettingsView.js",
-        "target": "ui/features/course_notification_settings/react/CourseNotificationSettingsQuery.js",
-        "request": "../../course_notification_settings/react/CourseNotificationSettingsQuery"
-    },
-    {
         "name": "SpecifierMismatchError",
         "source": "ui/features/assignment_show/index.js",
         "target": "ui/shared/immersive-reader/ImmersiveReader.js",
