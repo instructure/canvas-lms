@@ -86,5 +86,33 @@ shared_examples_for 'k5 subject grades' do
 
       expect(grades_assignments_list[0].text).to include("Out of 15")
     end
+
+    it 'scrolls focusable elements into view if covered by the sticky header' do
+      assignments = create_assignments(
+        [@subject_course.id],
+        10,
+        points_possible: 10.0,
+        submission_types: "online_text_entry,online_upload",
+        due_at: 1.week.from_now(Time.zone.now),
+        assignment_group_id: @subject_course.assignment_groups.first.id
+      )
+      assignments.each { |a| @subject_course.submissions.create!(user: @student, assignment_id: a) }
+
+      get "/courses/#{@subject_course.id}#grades"
+
+      scroll_to(grades_assignments_links[-1])
+
+      # Find the first assignment link that is not overlapped by the K5 header
+      k5_header_bottom = k5_header.location.y + k5_header.size.height
+      first_visible_link = grades_assignments_links.find { |a| a.location.y > k5_header_bottom }
+      initial_scroll_height = scroll_height
+
+      # Tab backwards to focus the previous two assignment links hidden under the K5 header
+      first_visible_link.send_keys([:shift, :tab])
+      focused_element.send_keys([:shift, :tab])
+
+      # Assert that the viewport scrolled up to reveal the hidden links
+      expect(scroll_height).to be < initial_scroll_height
+    end
   end
 end
