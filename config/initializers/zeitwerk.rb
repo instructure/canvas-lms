@@ -26,14 +26,6 @@ if CANVAS_ZEITWERK
   # for badly-named ruby code.
   Rails.autoloaders.main.ignore(Rails.root.join('app', 'jsx'))
 
-  # # This one exists because we require plugins to be const get'd from Canvas::Plugins::Validators::
-  # require 'canvas'
-  # require 'canvas/plugins'
-  # require 'canvas/plugins/validators'
-  # require 'canvas/plugins/adobe_connect'
-  require 'canvas_webex'
-  require 'canvas_webex/version'
-
   Rails.autoloaders.main.ignore(
     # we don't want zeitwerk to try to eager_load some "Version" constant from any plugins
     "#{__dir__}/../../gems/plugins/simply_versioned/lib/simply_versioned/gem_version.rb",

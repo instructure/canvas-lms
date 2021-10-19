@@ -62,7 +62,7 @@ gem 'builder', '3.2.4'
 gem 'business_time', '0.10.0'
 gem 'canvas_connect', '0.3.14'
   gem 'adobe_connect', '1.0.9', require: false
-gem 'canvas_webex', '0.17'
+gem 'canvas_webex', '0.18.0'
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'ddtrace', '0.42.0', require: false
 gem 'encrypted_cookie_store-instructure', '1.2.11', require: 'encrypted_cookie_store'
