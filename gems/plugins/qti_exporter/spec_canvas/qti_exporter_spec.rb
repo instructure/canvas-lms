@@ -106,7 +106,7 @@ if Qti.migration_executable
         expect(quiz.assignment).to be_published
       end
 
-      it "correctlies set the assignment submission_type" do
+      it "sets the assignment submission_type correctly" do
         do_migration
         assign = @course.assignments.last
         expect(assign.submission_types).to eq 'online_quiz'

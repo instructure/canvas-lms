@@ -17,7 +17,7 @@
  */
 
 import ReactDOM from 'react-dom'
-import StudentView from './react/index'
+import StudentView from '@canvas/groups/react'
 import ready from '@instructure/ready'
 import React from 'react'
 

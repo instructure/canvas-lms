@@ -81,6 +81,19 @@ describe Lti::Security do
       end
     end
 
+    context '#decoded_lti_assignment_description' do
+      it 'returns nil if secure params are invalid' do
+        expect(Lti::Security.decoded_lti_assignment_description('banana')).to be_nil
+      end
+
+      it 'returns the lti assignment description if secure params are valid' do
+        assignment_id = 12
+        body = { lti_assignment_description: assignment_id }
+        secure_params = Canvas::Security.create_jwt(body).to_s
+        expect(Lti::Security.decoded_lti_assignment_description(secure_params)).to eq assignment_id
+      end
+    end
+
     context '.check_and_store_nonce' do
       it 'rejects a used nonce' do
         enable_cache do

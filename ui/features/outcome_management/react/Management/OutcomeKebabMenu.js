@@ -26,14 +26,21 @@ import {
   IconEditLine,
   IconTrashLine,
   IconMoveEndLine,
-  IconInfoLine
+  IconInfoLine,
+  IconSearchLine
 } from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import I18n from 'i18n!OutcomeManagement'
 import {stripHtmlTags} from '@canvas/outcomes/stripHtmlTags'
 
-const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canEdit, canDestroy, groupDescription}) => {
-  const isGroup = groupDescription !== undefined
+const OutcomeKebabMenu = ({
+  menuTitle,
+  onMenuHandler,
+  canEdit,
+  canDestroy,
+  isGroup,
+  groupDescription
+}) => {
   const hasDescription =
     typeof groupDescription === 'string' &&
     stripHtmlTags(groupDescription).replace(/[\n\r\t\s(&nbsp;)]+/g, '')
@@ -64,6 +71,12 @@ const OutcomeKebabMenu = ({menuTitle, onMenuHandler, canEdit, canDestroy, groupD
           {I18n.t('Move')}
         </View>
       </Menu.Item>
+      {isGroup && (
+        <Menu.Item value="add_outcomes">
+          <IconSearchLine size="x-small" />
+          <View padding="0 small">{I18n.t('Add Outcomes')}</View>
+        </Menu.Item>
+      )}
       {isGroup && <Menu.Separator />}
       {isGroup && (
         <Menu.Item value="description" disabled={!hasDescription}>
@@ -80,12 +93,14 @@ OutcomeKebabMenu.propTypes = {
   menuTitle: PropTypes.string,
   canDestroy: PropTypes.bool.isRequired,
   groupDescription: PropTypes.string,
+  isGroup: PropTypes.bool,
   canEdit: PropTypes.bool
 }
 
 OutcomeKebabMenu.defaultProps = {
   menuTitle: '',
-  canEdit: true
+  canEdit: true,
+  isGroup: false
 }
 
 export default OutcomeKebabMenu

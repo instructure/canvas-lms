@@ -50,7 +50,12 @@ import {
 import {actions} from '../../actions/pace_plan_items'
 import {actions as uiActions} from '../../actions/ui'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
-import {getAutoSaving, getAdjustingHardEndDatesAfter, getShowProjections} from '../../reducers/ui'
+import {
+  getAutoSaving,
+  getAdjustingHardEndDatesAfter,
+  getPlanPublishing,
+  getShowProjections
+} from '../../reducers/ui'
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
@@ -73,6 +78,7 @@ interface StoreProps {
   readonly autosaving: boolean
   readonly enrollmentHardEndDatePlan: boolean
   readonly adjustingHardEndDatesAfter?: number
+  readonly planPublishing: boolean
   readonly showProjections: boolean
 }
 
@@ -116,6 +122,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       nextProps.pacePlan.context_type !== this.props.pacePlan.context_type ||
       (nextProps.pacePlan.context_type === this.props.pacePlan.context_type &&
         nextProps.pacePlan.context_id !== this.props.pacePlan.context_id) ||
+      nextProps.planPublishing !== this.props.planPublishing ||
       nextProps.showProjections !== this.props.showProjections ||
       nextProps.datesVisible !== this.props.datesVisible
     )
@@ -247,7 +254,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
       return (
         <NumberInput
-          interaction="enabled"
+          interaction={this.props.planPublishing ? 'disabled' : 'enabled'}
           renderLabel={
             <ScreenReaderContent>
               Duration for module {this.props.pacePlanItem.assignment_title}
@@ -330,6 +337,7 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
       pacePlan.hard_end_dates && pacePlan.context_type === 'Enrollment'
     ),
     adjustingHardEndDatesAfter: getAdjustingHardEndDatesAfter(state),
+    planPublishing: getPlanPublishing(state),
     showProjections: getShowProjections(state)
   }
 }

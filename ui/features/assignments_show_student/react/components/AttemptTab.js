@@ -386,7 +386,7 @@ export default class AttemptTab extends Component {
 
   render() {
     const {assignment, submission} = this.props
-    if (assignment.lockInfo.isLocked && submission.state === 'unsubmitted') {
+    if (assignment.lockInfo.isLocked && !isSubmitted(submission)) {
       return <LockedAssignment assignment={assignment} />
     }
 

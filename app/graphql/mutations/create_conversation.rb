@@ -30,7 +30,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
   argument :force_new, Boolean, required: false
   argument :group_conversation, Boolean, required: false
   argument :attachment_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
-  argument :media_comment_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('MediaObject')
+  argument :media_comment_id, ID, required: false
   argument :media_comment_type, String, required: false
   argument :context_code, String, required: false
   argument :conversation_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Conversation')

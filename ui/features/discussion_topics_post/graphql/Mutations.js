@@ -41,6 +41,7 @@ export const UPDATE_DISCUSSION_ENTRY_PARTICIPANT = gql`
     $read: Boolean
     $rating: RatingInputType
     $forcedReadState: Boolean
+    $reportType: String
   ) {
     updateDiscussionEntryParticipant(
       input: {
@@ -48,6 +49,7 @@ export const UPDATE_DISCUSSION_ENTRY_PARTICIPANT = gql`
         read: $read
         rating: $rating
         forcedReadState: $forcedReadState
+        reportType: $reportType
       }
     ) {
       discussionEntry {

@@ -23,6 +23,44 @@ import * as actions from '../../../src/sidebar/actions/images'
 const sortBy = {sort: 'alphabetical', order: 'asc'}
 const searchString = 'hello'
 
+describe('Image dispatch shapes', () => {
+  describe('receiveImages', () => {
+    const contextType = 'course'
+    const response = {
+      bookmark: 'p2',
+      files: [],
+      searchString: 'panda'
+    }
+
+    it('returns a type of RECEIVE_IMAGES', () => {
+      const {type} = actions.receiveImages()
+      assert(type === actions.RECEIVE_IMAGES)
+    })
+
+    describe('returning a payload', () => {
+      it('includes contextType', () => {
+        const {payload} = actions.receiveImages({response, contextType})
+        assert(payload.contextType === 'course')
+      })
+
+      it('includes files', () => {
+        const {payload} = actions.receiveImages({response})
+        assert(payload.files === [])
+      })
+
+      it('includes bookmark', () => {
+        const {payload} = actions.receiveImages({response})
+        assert(payload.bookmark === 'p2')
+      })
+
+      it('includes searchString', () => {
+        const {payload} = actions.receiveImages({response})
+        assert(payload.searchString === 'panda')
+      })
+    })
+  })
+})
+
 describe('Image actions', () => {
   describe('createAddImage', () => {
     it('has the right action type', () => {

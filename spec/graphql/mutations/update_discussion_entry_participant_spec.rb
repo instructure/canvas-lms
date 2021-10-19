@@ -30,6 +30,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
     id: nil,
     read: nil,
     rating: nil,
+    report_type: nil,
     forcedReadState: nil
   )
     <<~GQL
@@ -38,6 +39,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
           discussionEntryId: #{id}
           #{"read: #{read}" unless read.nil?}
           #{"rating: #{rating}" if rating}
+          #{"reportType: #{report_type}" if report_type}
           #{"forcedReadState: #{forcedReadState}" unless forcedReadState.nil?}
         }) {
           discussionEntry {
@@ -45,6 +47,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
             entryParticipant {
               read
               rating
+              reportType
               forcedReadState
             }
           }
@@ -106,6 +109,23 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
       )
     ).to eq 1
     expect(@discussion_entry.rating(@discussion_entry.user)).to be_equal 1
+  end
+
+  it 'updates the report type' do
+    expect(@discussion_entry.report_type?(@discussion_entry.user)).to be nil
+    result = run_mutation({ id: @discussion_entry.id, report_type: 'other' })
+    expect(result.dig('errors')).to be nil
+    expect(
+      result.dig(
+        'data',
+        'updateDiscussionEntryParticipant',
+        'discussionEntry',
+        'entryParticipant',
+        'reportType'
+      )
+    ).to eq 'other'
+    @discussion_entry.reload
+    expect(@discussion_entry.report_type?(@discussion_entry.user)).to eq 'other'
   end
 
   describe "forcedReadState attribute mutations" do

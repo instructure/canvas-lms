@@ -17,16 +17,16 @@
  */
 
 import React from 'react'
+import {bool, string} from 'prop-types'
 import I18n from 'i18n!teacher_groups_page'
 
 import {Flex} from '@instructure/ui-flex'
 import {Img} from '@instructure/ui-img'
 import {Text} from '@instructure/ui-text'
-
-import EmptyGroups from '../images/empty-groups.svg'
 import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
-import {bool, string} from 'prop-types'
+
+import EmptyGroups from '../images/empty-groups.svg'
 
 const TeacherGroupsPage = props => (
   <Flex

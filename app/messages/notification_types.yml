@@ -125,6 +125,11 @@
     - name: Discussion Mention
       delay_for: <%= 2*60 %>
 
+- category: ReportedReply
+  notifications:
+    - name: Reported Reply
+      delay_for: <%= 2*60 %>
+
 - category: Due Date
   notifications:
     - name: Assignment Due Date Changed

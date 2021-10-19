@@ -57,6 +57,12 @@ describe('ComposeActionButtons', () => {
         expect(queryByTestId('media-upload')).toBe(null)
       })
     })
+
+    it('disables the media upload button if hasMediaComment is true', () => {
+      const props = createProps({hasMediaComment: true})
+      const container = render(<ComposeActionButtons {...props} />)
+      expect(container.getByTestId('media-upload')).toBeDisabled()
+    })
   })
 
   describe('message cancel button', () => {

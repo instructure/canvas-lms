@@ -56,8 +56,9 @@ const thunkActions = {
       dispatch(regularActions.addBlackoutDate(blackoutDateWithTempId))
 
       BlackoutDatesApi.create(blackoutDateWithTempId)
-        .then(response => {
-          dispatch(actions.addBackendId(tempId, response.blackout_date.id as number))
+        .then(newBlackoutDate => {
+          if (!newBlackoutDate) throw new Error('Response body was empty')
+          dispatch(actions.addBackendId(tempId, newBlackoutDate.id as number))
         })
         .catch(error => {
           console.error(error) // eslint-disable-line no-console

@@ -753,7 +753,7 @@ describe GroupsController do
       user_session(@user)
     end
 
-    it "successfullies create invitations" do
+    it "creates invitations" do
       get 'accept_invitation', params: { :group_id => @group.id, :uuid => @membership.uuid }
       @group.reload
       expect(@group.has_member?(@user)).to be_truthy

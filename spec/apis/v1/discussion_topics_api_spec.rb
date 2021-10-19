@@ -2306,7 +2306,7 @@ describe DiscussionTopicsController, type: :request do
       @reply = create_reply(@entry, :message => "first reply")
     end
 
-    it "immediatelies mark messages you write as 'read'" do
+    it "immediately marks messages you write as 'read'" do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
                       { :controller => 'discussion_topics', :action => 'index', :format => 'json',
                         :course_id => @course.id.to_s })

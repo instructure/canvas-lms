@@ -151,7 +151,7 @@ describe "CSP Settings API", type: :request do
         expect(@course.reload.csp_disabled?).to eq false
       end
 
-      it "explicitlies disable" do
+      it "disables explicitly" do
         json = set_csp_setting(@course, "disabled")
         expect(@course.reload.csp_disabled?).to eq true
       end
