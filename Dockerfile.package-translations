@@ -23,7 +23,9 @@ COPY --chown=docker:docker build/new-jenkins/package-translations/ /usr/src/app/
 
 USER docker
 
-RUN yarn \
-    && yarn-private -W add @inst/sync-format-message-translations
+RUN yarn install --network-concurrency 1 \
+      && DISABLE_POSTINSTALL=1 \
+        yarn-private --network-concurrency 1 -W \
+        add @inst/sync-format-message-translations
 
 CMD ["tail", "-f", "/dev/null"]
