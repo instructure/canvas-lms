@@ -158,15 +158,21 @@ module MicrosoftSync
     ADD_USERS_TO_GROUP_SPECIAL_CASES = [
       SpecialCase.new(
         400, /One or more added object references already exist/i,
-        result: :duplicates
+        result: :fallback_to_batch
       ),
+      # If a group has 81 owners, and we try to add 20 owners, but some or all
+      # of 20 owners are already in the group, Microsoft returns the "maximum
+      # quota count" error instead of the above "object references already
+      # exist" error -- even if adding only the non-duplicate users wouldn't
+      # push the total number over the maximum (100). In that case, fallback to
+      # batch requests, which do not have this problem.
       SpecialCase.new(
         403, /would exceed the maximum quota count.*for forward-link.*owners/i,
-        result: Errors::OwnersQuotaExceeded
+        result: :fallback_to_batch
       ),
       SpecialCase.new(
         403, /would exceed the maximum quota count.*for forward-link.*members/i,
-        result: Errors::MembersQuotaExceeded
+        result: :fallback_to_batch
       ),
     ].freeze
 
@@ -189,7 +195,7 @@ module MicrosoftSync
         special_cases: ADD_USERS_TO_GROUP_SPECIAL_CASES
       )
 
-      if response == :duplicates
+      if response == :fallback_to_batch
         add_users_to_group_via_batch(group_id, members, owners)
       end
     end
