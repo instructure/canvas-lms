@@ -589,28 +589,6 @@ describe('DiscussionTopicContainer', () => {
     expect(container.getByText('Available from Mar 21 6am until Sep 4 5:59am')).toBeTruthy()
   })
 
-  it('should not show discussion topic description when read permission is false', () => {
-    const props = {
-      discussionTopic: Discussion.mock({
-        permissions: DiscussionPermissions.mock({read: false}),
-        message: 'This should not show until discussion is available'
-      })
-    }
-    const container = setup(props)
-
-    expect(container.queryByText('This should not show until discussion is available')).toBeNull()
-  })
-
-  it('should show discussion topic description when read permission is true', () => {
-    const container = setup({
-      discussionTopic: Discussion.mock({
-        message: 'This should not show until discussion is available'
-      })
-    })
-
-    expect(container.getByText('This should not show until discussion is available')).toBeTruthy()
-  })
-
   it('Renders an alert if initialPostRequiredForCurrentUser is true', () => {
     const props = {discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: true})}
     const container = setup(props)

@@ -394,7 +394,7 @@ describe EnrollmentsApiController, type: :request do
                  })
       end
 
-      it "optionallies send notifications" do
+      it "optionally sends notifications" do
         expect_any_instance_of(StudentEnrollment).to receive(:save).at_least(:once)
 
         api_call(:post, @path, @path_options, {
@@ -850,7 +850,7 @@ describe EnrollmentsApiController, type: :request do
       @section = @course.course_sections.create!
     end
 
-    it "deterministicallies order enrollments for pagination" do
+    it "orders enrollments deterministically for pagination" do
       allow_any_instance_of(EnrollmentsApiController).to receive(:use_bookmarking?).and_return(true)
       enrollment_num = 10
       enrollment_num.times do
@@ -875,7 +875,7 @@ describe EnrollmentsApiController, type: :request do
       end
     end
 
-    it "deterministicallies order enrollments for pagination with bookmarking not enabled" do
+    it "orders enrollments deterministically for pagination with bookmarking not enabled" do
       allow_any_instance_of(EnrollmentsApiController).to receive(:use_bookmarking?).and_return(false)
       enrollment_num = 10
       enrollment_num.times do

@@ -321,7 +321,7 @@ module CustomSeleniumActions
     raise 'switch views is not available!'
   end
 
-  def switch_editor_views(tiny_controlling_element)
+  def switch_editor_views
     force_click('[data-btn-id="rce-edit-btn"]')
   end
 
@@ -337,9 +337,8 @@ module CustomSeleniumActions
       end
     else
       assert_can_switch_views!
-      switch_editor_views(tiny_controlling_element)
+      switch_editor_views
       tiny_controlling_element.clear
-      switch_editor_views(tiny_controlling_element)
     end
   end
 
@@ -357,10 +356,9 @@ module CustomSeleniumActions
     clear_tiny(tiny_controlling_element, iframe_id) if clear
 
     if text.length > 100 || text.lines.size > 1
-      switch_editor_views(tiny_controlling_element)
+      switch_editor_views
       html = '<p>' + ERB::Util.html_escape(text).gsub("\n", '</p><p>') + '</p>'
       driver.execute_script("return $(#{selector}).val(#{html.inspect})")
-      switch_editor_views(tiny_controlling_element)
     else
       in_frame iframe_id do
         tinymce_element = f('body')

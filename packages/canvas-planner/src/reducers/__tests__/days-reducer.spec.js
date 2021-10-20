@@ -185,3 +185,13 @@ describe('JUMP_TO_WEEK', () => {
     expect(newState).toMatchObject(weekData)
   })
 })
+
+describe('CLEAR_DAYS', () => {
+  const initialState = [
+    ['2017-04-27', [{uniqueId: '42'}, {uniqueId: '43'}]],
+    ['2017-04-28', [{uniqueId: '44'}]],
+    ['2017-04-29', [{uniqueId: '47'}, {uniqueId: '48'}]]
+  ]
+  const newState = daysReducer(initialState, {type: 'CLEAR_DAYS'})
+  expect(newState).toEqual([])
+})

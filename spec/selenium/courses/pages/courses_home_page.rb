@@ -47,6 +47,10 @@ module CoursesHomePage
     ".ic-notification button[name='accept']"
   end
 
+  def course_pace_plan_selector
+    ".pace_plans"
+  end
+
   #------------------------- Elements ---------------------------
   def secondary_content
     f(secondary_content_selector)
@@ -84,6 +88,10 @@ module CoursesHomePage
     f('#content')
   end
 
+  def course_pace_plan_link
+    f(course_pace_plan_selector)
+  end
+
   #----------------------- Actions/Methods ----------------------
   def visit_course(course)
     get "/courses/#{course.id}"
@@ -101,5 +109,9 @@ module CoursesHomePage
     visit_course(@course)
     open_course_wizard
     wait_for(method: nil, timeout: 2) { wizard_box.displayed? }
+  end
+
+  def click_pace_plans
+    course_pace_plan_link.click
   end
 end

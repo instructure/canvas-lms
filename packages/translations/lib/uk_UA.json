@@ -107,9 +107,6 @@
     "attributes_963ba262": {
         "message": "Атрибути"
     },
-    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-        "message": "Автоматично відкритий поточний попередній перегляд. \n(Попередній перегляд відображається лише після збереження)"
-    },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Початок вашої історії завдань"
     },
@@ -238,9 +235,6 @@
     },
     "dimensions_45ddb7b7": {
         "message": "Розміри"
-    },
-    "disable_in_line_preview_2a675175": {
-        "message": "Вимкнути поточний попередній перегляд."
     },
     "discussion_6719c51d": {
         "message": "Обговорення"

@@ -24,16 +24,18 @@ import moment from 'moment-timezone'
 
 import PacePlanDateInput from '../../../shared/components/pace_plan_date_input'
 import {StoreState, PacePlan} from '../../../types'
-import {BlackoutDate} from '../../../shared/types'
+import {BlackoutDate, InputInteraction} from '../../../shared/types'
 import {getPacePlan, getProjectedEndDate, getExcludeWeekends} from '../../../reducers/pace_plans'
 import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
 import {pacePlanActions as actions} from '../../../actions/pace_plans'
+import {getPlanPublishing} from '../../../reducers/ui'
 
 type StoreProps = {
   pacePlan: PacePlan
   projectedEndDate?: string
   weekendsDisabled?: boolean
   blackoutDates: BlackoutDate[]
+  planPublishing: boolean
 }
 
 type DispatchProps = {
@@ -70,7 +72,12 @@ export const PacePlanDateSelector = (props: PacePlanDateSelectorProps) => {
     [startType, props.pacePlan.start_date, props.pacePlan.end_date]
   )
 
-  const interaction = enrollmentType || !startType ? 'readonly' : 'enabled'
+  let interaction: InputInteraction = 'enabled'
+  if (enrollmentType || !startType) {
+    interaction = 'readonly'
+  } else if (props.planPublishing) {
+    interaction = 'disabled'
+  }
 
   const label = startType
     ? enrollmentType
@@ -99,7 +106,8 @@ const mapStateToProps = (state: StoreState) => {
     pacePlan: getPacePlan(state),
     weekendsDisabled: getExcludeWeekends(state),
     blackoutDates: getBlackoutDates(state),
-    projectedEndDate: getProjectedEndDate(state)
+    projectedEndDate: getProjectedEndDate(state),
+    planPublishing: getPlanPublishing(state)
   }
 }
 

@@ -22,3 +22,8 @@ export const clickEl = async el => {
   fireEvent.click(el)
   await act(async () => jest.runAllTimers())
 }
+
+export const clickWithPending = async el => {
+  fireEvent.click(el)
+  await act(async () => jest.runOnlyPendingTimers())
+}

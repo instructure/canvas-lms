@@ -2900,7 +2900,7 @@ describe Submission do
         expect(job.run_at).to be > Time.now.utc
       end
 
-      it "initiallies set turnitin submission to pending" do
+      it "initially sets turnitin submission to pending" do
         init_turnitin_api
         expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ :assignment_id => "1234" })
         expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => true))

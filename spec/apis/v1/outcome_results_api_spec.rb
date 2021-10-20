@@ -335,6 +335,10 @@ describe "Outcome Results API", type: :request do
             @no_results_student.register!
             @course.enroll_student(@no_results_student)
 
+            @observer = User.create!(:name => 'Observer')
+            @observer.register!
+            @course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @no_results_student.id, enrollment_state: 'active')
+
             outcome_result # Creates result for enrolled student outcome_student
           end
 

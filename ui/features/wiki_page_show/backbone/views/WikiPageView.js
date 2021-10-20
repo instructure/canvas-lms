@@ -114,7 +114,7 @@ export default class WikiPageView extends Backbone.View {
       'immersive_reader_mobile_mount_point'
     )
     if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
-      import('../../../../shared/immersive-reader/ImmersiveReader')
+      import('@canvas/immersive-reader/ImmersiveReader')
         .then(ImmersiveReader => {
           const content = document.querySelector('.show-content').innerHTML
           const title = document.querySelector('.page-title').textContent
@@ -144,7 +144,7 @@ export default class WikiPageView extends Backbone.View {
         assetID: this.model.get('url'),
         onFetchSuccess: () => {
           $('.module-sequence-footer-content').append($('#mark-as-done-container'))
-          $('#mark-as-done-container').css({'float': 'right', 'margin-right': '4px'})
+          $('#mark-as-done-container').css({float: 'right', 'margin-right': '4px'})
         }
       })
     } else if (this.$sequenceFooter != null) {

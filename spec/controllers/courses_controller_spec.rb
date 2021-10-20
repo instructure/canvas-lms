@@ -908,7 +908,7 @@ describe CoursesController do
   end
 
   describe "GET 'enrollment_invitation'" do
-    it "successfullies reject invitation for logged-in user" do
+    it "rejects invitation for logged-in user" do
       course_with_student_logged_in(:active_course => true)
       post 'enrollment_invitation', params: { :course_id => @course.id, :reject => '1', :invitation => @enrollment.uuid }
       expect(response).to be_redirect
@@ -917,7 +917,7 @@ describe CoursesController do
       expect(assigns[:pending_enrollment]).to be_rejected
     end
 
-    it "successfullies reject invitation for not-logged-in user" do
+    it "rejects invitation for not-logged-in user" do
       course_with_student(:active_course => true, :active_user => true)
       post 'enrollment_invitation', params: { :course_id => @course.id, :reject => '1', :invitation => @enrollment.uuid }
       expect(response).to be_redirect
@@ -926,7 +926,7 @@ describe CoursesController do
       expect(assigns[:pending_enrollment]).to be_rejected
     end
 
-    it "successfullies reject temporary invitation" do
+    it "rejects temporary invitation" do
       user_with_pseudonym(:active_all => 1)
       user_session(@user, @pseudonym)
       user = User.create! { |u| u.workflow_state = 'creation_pending' }
