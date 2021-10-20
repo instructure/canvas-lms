@@ -197,7 +197,7 @@ describe RubricAssessment do
 
     it "allows observers the ability to view rubric assessments with course association" do
       submission = @assignment.find_or_create_submission(@student)
-      assessment = @association.assess(
+      @association.assess(
         {
           :user => @student,
           :assessor => @teacher,
@@ -217,7 +217,7 @@ describe RubricAssessment do
     it "allows observers the ability to view rubric assessments with account association" do
       submission = @assignment.find_or_create_submission(@student)
       account_association = @rubric.associate_with(@assignment, @account, :purpose => 'grading', :use_for_grading => true)
-      assessment = account_association.assess(
+      account_association.assess(
         {
           :user => @student,
           :assessor => @teacher,
@@ -494,31 +494,31 @@ describe RubricAssessment do
 
       it "restores a deleted result" do
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
-        assessment = @association.assess({
-                                           :user => @student,
-                                           :assessor => @teacher,
-                                           :artifact => @assignment.find_or_create_submission(@student),
-                                           :assessment => {
-                                             :assessment_type => 'grading',
-                                             criterion_id => {
-                                               :points => "3"
-                                             }
-                                           }
-                                         })
+        @association.assess({
+                              :user => @student,
+                              :assessor => @teacher,
+                              :artifact => @assignment.find_or_create_submission(@student),
+                              :assessment => {
+                                :assessment_type => 'grading',
+                                criterion_id => {
+                                  :points => "3"
+                                }
+                              }
+                            })
         result = LearningOutcomeResult.last
         result.destroy
 
-        assessment = @association.assess({
-                                           :user => @student,
-                                           :assessor => @teacher,
-                                           :artifact => @assignment.find_or_create_submission(@student),
-                                           :assessment => {
-                                             :assessment_type => 'grading',
-                                             criterion_id => {
-                                               :points => "3"
-                                             }
-                                           }
-                                         })
+        @association.assess({
+                              :user => @student,
+                              :assessor => @teacher,
+                              :artifact => @assignment.find_or_create_submission(@student),
+                              :assessment => {
+                                :assessment_type => 'grading',
+                                criterion_id => {
+                                  :points => "3"
+                                }
+                              }
+                            })
         expect(result.reload).to be_active
       end
 

@@ -589,7 +589,7 @@ describe Course do
     end
 
     it "puts a new assignment into assignment group" do
-      other_assign = @course.assignments.create! title: 'other', assignment_group: @new_group
+      @course.assignments.create! title: 'other', assignment_group: @new_group
       Importers::CourseContentImporter.import_content(@course, @data, @params, @migration)
       new_assign = @course.assignments.where(migration_id: '1865116014002').take
       expect(new_assign.assignment_group_id).to eq @new_group.id

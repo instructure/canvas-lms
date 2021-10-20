@@ -150,7 +150,7 @@ describe ExternalFeed do
     require 'rss/1.0'
     require 'rss/2.0'
     rss = RSS::Parser.parse rss_example
-    res = @feed.add_rss_entries(rss)
+    @feed.add_rss_entries(rss)
 
     @feed.destroy
     @course.reload

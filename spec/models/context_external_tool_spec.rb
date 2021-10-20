@@ -542,7 +542,7 @@ describe ContextExternalTool do
     end
 
     it "prefers the extension url to the main config url" do
-      url_test(nav_url = "https://example.com/special_launch_of_death")
+      url_test("https://example.com/special_launch_of_death")
     end
 
     it "does not allow extension with no custom url and a domain match" do
@@ -1226,7 +1226,7 @@ describe ContextExternalTool do
     end
 
     it 'only returns a single requested placements' do
-      tool1 = @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
       tool2 = @course.context_external_tools.new(:name => "Another Tool", :consumer_key => "key", :shared_secret => "secret")
       tool2.settings[:editor_button] = { :url => "http://www.example.com", :icon_url => "http://www.example.com", :selection_width => 100, :selection_height => 100 }.with_indifferent_access
       tool2.save!
@@ -1322,7 +1322,7 @@ describe ContextExternalTool do
 
     it "returns nothing if a non-admin requests without specifying placement" do
       course_with_student(active_all: true, user: user_with_pseudonym, account: @account)
-      tool1 = @course.context_external_tools.create!(:name => "1", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      @course.context_external_tools.create!(:name => "1", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
       tool2 = @course.context_external_tools.new(:name => "2", :consumer_key => "key", :shared_secret => "secret")
       tool2.settings[:assignment_view] = { :url => "http://www.example.com" }.with_indifferent_access
       tool2.save!
@@ -1331,7 +1331,7 @@ describe ContextExternalTool do
 
     it "returns only tools with placements matching the requested placement" do
       course_with_student(active_all: true, user: user_with_pseudonym, account: @account)
-      tool1 = @course.context_external_tools.create!(:name => "1", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+      @course.context_external_tools.create!(:name => "1", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
       tool2 = @course.context_external_tools.new(:name => "2", :consumer_key => "key", :shared_secret => "secret")
       tool2.settings[:assignment_view] = { :url => "http://www.example.com" }.with_indifferent_access
       tool2.save!
@@ -1586,7 +1586,6 @@ describe ContextExternalTool do
         end
       end
     end
-
 
     describe "display_type" do
       it "is 'in_context' by default" do
@@ -1994,7 +1993,7 @@ describe ContextExternalTool do
       @course.lti_context_id = 'dummy_context_id'
       @course.save!
       @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      context_id = @tool.opaque_identifier_for(@course)
+      @tool.opaque_identifier_for(@course)
       @course.reload
       expect(@course.lti_context_id).to eq 'dummy_context_id'
     end

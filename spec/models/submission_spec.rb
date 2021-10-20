@@ -3981,7 +3981,7 @@ describe Submission do
     it "includes attachments to previous versions" do
       old_attachment_1 = attachment_model(context: @student)
       old_attachment_2 = attachment_model(context: @student)
-      sub = @assignment.submit_homework @student, attachments: [old_attachment_1, old_attachment_2]
+      @assignment.submit_homework @student, attachments: [old_attachment_1, old_attachment_2]
       attachment_model context: @student
       sub = @assignment.submit_homework @student, attachments: [@attachment]
       expect(sub.attachments.to_a).to eq([@attachment])

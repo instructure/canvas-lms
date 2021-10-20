@@ -231,7 +231,7 @@ describe PacePlan do
     it "sets overrides for graded discussions" do
       topic = graded_discussion_topic(context: @course)
       topic_tag = @module.add_item type: 'discussion_topic', id: topic.id
-      topic_item = @pace_plan.pace_plan_module_items.create! module_item: topic_tag
+      @pace_plan.pace_plan_module_items.create! module_item: topic_tag
       expect(topic.assignment.assignment_overrides.count).to eq 0
       expect(@pace_plan.publish).to eq(true)
       expect(topic.assignment.assignment_overrides.count).to eq 1

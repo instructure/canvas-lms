@@ -44,7 +44,7 @@ describe GroupLeadership do
         leader = user_model
         follower = user_model
         leader_membership = @group.group_memberships.create!(:user => leader, :workflow_state => 'accepted')
-        follower_membership = @group.group_memberships.create!(:user => follower, :workflow_state => 'accepted')
+        @group.group_memberships.create!(:user => follower, :workflow_state => 'accepted')
         expect(@group.reload.leader).to eq leader
         leader_membership.destroy
         expect(@group.reload.leader).to eq follower

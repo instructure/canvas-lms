@@ -1017,7 +1017,7 @@ describe User do
     end
 
     it "allows site admin when they don't otherwise qualify for :create_courses" do
-      user = user_with_pseudonym(:username => 'nobody1@example.com')
+      user_with_pseudonym(:username => 'nobody1@example.com')
       @admin = user_with_pseudonym(:username => 'nobody2@example.com')
       @site_admin = user_with_pseudonym(:username => 'nobody3@example.com', :account => Account.site_admin)
       Account.default.account_users.create!(user: @admin)
@@ -2092,7 +2092,6 @@ describe User do
         assignment.unpublish
         assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.days.from_now)
         assignment2.publish
-        events = []
         events = @user.upcoming_events(:end_at => 1.week.from_now)
         expect(events.first).to eq assignment2
       end
@@ -2428,7 +2427,7 @@ describe User do
       user = User.find(user.id)
       expect(user.mfa_settings).to eq :optional
 
-      p3 = user.pseudonyms.create!(:account => required_account, :unique_id => 'user')
+      user.pseudonyms.create!(:account => required_account, :unique_id => 'user')
       user = User.find(user.id)
       expect(user.mfa_settings).to eq :required
 

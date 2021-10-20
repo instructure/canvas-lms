@@ -1477,7 +1477,7 @@ describe Course do
     it "all_group_categories should include deleted categories" do
       expect(course.all_group_categories.count).to eq 0
       category1 = course.group_categories.create(:name => 'category 1')
-      category2 = course.group_categories.create(:name => 'category 2')
+      course.group_categories.create(:name => 'category 2')
       expect(course.all_group_categories.count).to eq 2
       category1.destroy
       course.reload
@@ -4459,7 +4459,6 @@ describe Course, 'grade_publishing' do
 
       getsection("S4").tap do |s|
         sec4 = s
-        sec4id = s.sis_source_id
         s.save
       end
 
@@ -5346,7 +5345,7 @@ describe Course, "user_has_been_instructor?" do
   end
 
   it "is true for tas" do
-    e = course_with_ta(:active_all => true)
+    course_with_ta(:active_all => true)
     expect(@course.user_has_been_instructor?(@ta)).to be_truthy
   end
 end
@@ -5365,12 +5364,12 @@ describe Course, "user_has_been_admin?" do
   end
 
   it "is true for tas" do
-    e = course_with_ta(:active_all => true)
+    course_with_ta(:active_all => true)
     expect(@course.user_has_been_admin?(@ta)).to be_truthy
   end
 
   it "is true for designers" do
-    e = course_with_designer(:active_all => true)
+    course_with_designer(:active_all => true)
     expect(@course.user_has_been_admin?(@designer)).to be_truthy
   end
 end
@@ -5391,12 +5390,12 @@ end
 
 describe Course, "user_has_been_observer?" do
   it "is false for teachers" do
-    e = course_with_teacher(:active_all => true)
+    course_with_teacher(:active_all => true)
     expect(@course.user_has_been_observer?(@teacher)).to be_falsey
   end
 
   it "is false for tas" do
-    e = course_with_ta(:active_all => true)
+    course_with_ta(:active_all => true)
     expect(@course.user_has_been_observer?(@ta)).to be_falsey
   end
 
