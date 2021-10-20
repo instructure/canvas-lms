@@ -28,6 +28,7 @@ describe ObserverAlertsApiController, type: :request do
     alerts = []
     before :once do
       @course = course_model
+      @course.offer!
       @assignment = assignment_model(context: @course)
 
       alerts << observer_alert_model(course: @course, alert_type: 'assignment_grade_high',
@@ -58,6 +59,7 @@ describe ObserverAlertsApiController, type: :request do
       expect(alert['alert_type']).to eq('assignment_grade_high')
       expect(alert['workflow_state']).to eq('unread')
       expect(alert['html_url']).to eq course_assignment_url(@course, @assignment)
+      expect(alert['locked_for_user']).to eq false
       expect(alert['user_id']).to eq @student.id
       expect(alert['observer_id']).to eq @observer.id
       expect(alert['observer_alert_threshold_id']).to eq @observer_alert_threshold.id
@@ -88,6 +90,23 @@ describe ObserverAlertsApiController, type: :request do
 
       json = api_call_as_user(@observer, :get, path, params)
       expect(json.length).to eq 0
+    end
+
+    it 'sets locked_for_user if the course is invisible' do
+      @course.destroy
+      expect(api_call_as_user(@observer, :get, @path, @params).map { |a| a['locked_for_user'] }).to all(eq true)
+    end
+
+    it 'sets locked_for_user if the assignment is deleted' do
+      @assignment.destroy
+      api_call_as_user(@observer, :get, @path, @params).each do |alert|
+        case alert['context_type']
+        when 'Course'
+          expect(alert['locked_for_user']).not_to eq true
+        when 'Assignment'
+          expect(alert['locked_for_user']).to eq true
+        end
+      end
     end
   end
 
