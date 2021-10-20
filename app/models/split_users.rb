@@ -227,7 +227,7 @@ class SplitUsers
       target_cc = cr.context
       # if this cc didn't get moved, we don't need to worry
       # about deconflicting it with the source users.
-      next unless target_cc.user_id == source_user.id
+      next unless target_cc&.user_id == source_user.id
 
       conflict_cc = restored_user.communication_channels.detect do |c|
         c.path.downcase == target_cc.path.downcase && c.path_type == target_cc.path_type
