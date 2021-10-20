@@ -613,7 +613,7 @@ class ApplicationController < ActionController::Base
     InstStatsd::Statsd.batch(&block)
   end
 
-  def compute_http_cost(&block)
+  def compute_http_cost
     CanvasHttp.reset_cost!
     yield
   ensure
@@ -1107,16 +1107,16 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def set_badge_counts_for(context, user, enrollment = nil)
+  def set_badge_counts_for(context, user)
     return if @js_env && @js_env[:badge_counts].present?
     return unless context.present? && user.present?
     return unless context.respond_to?(:content_participation_counts) # just Course and Group so far
 
-    js_env(:badge_counts => badge_counts_for(context, user, enrollment))
+    js_env(:badge_counts => badge_counts_for(context, user))
   end
   helper_method :set_badge_counts_for
 
-  def badge_counts_for(context, user, enrollment = nil)
+  def badge_counts_for(context, user)
     badge_counts = {}
     ['Submission'].each do |type|
       participation_count = context.content_participation_counts
@@ -2215,7 +2215,7 @@ class ApplicationController < ActionController::Base
   end
   helper_method :verified_file_download_url
 
-  def user_content(str, cache_key = nil)
+  def user_content(str)
     return nil unless str
     return str.html_safe unless str.match(/object|embed|equation_image/)
 

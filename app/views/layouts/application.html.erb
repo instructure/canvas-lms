@@ -23,7 +23,7 @@
   load_blueprint_courses_ui
   @has_content_notices = load_content_notices
   provide :head, include_common_stylesheets
-  set_badge_counts_for(@context, @current_user, @current_enrollment) if @set_badge_counts
+  set_badge_counts_for(@context, @current_user) if @set_badge_counts
   js_env notices: flash_notices()
 -%>
 <%= render :partial => "layouts/head" %>

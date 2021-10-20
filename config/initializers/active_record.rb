@@ -84,7 +84,7 @@ class ActiveRecord::Base
   alias_method :clone, :dup
 
   # See ActiveModel#serializable_add_includes
-  def serializable_add_includes(options = {}, &block)
+  def serializable_add_includes(options = {})
     super(options) do |association, records, opts|
       yield association, records, opts.reverse_merge(:include_root => options[:include_root])
     end
@@ -237,12 +237,12 @@ class ActiveRecord::Base
     CODE
   end
 
-  def export_columns(format = nil)
+  def export_columns
     self.class.content_columns.map(&:name)
   end
 
-  def to_row(format = nil)
-    export_columns(format).map { |c| self.send(c) }
+  def to_row
+    export_columns.map { |c| self.send(c) }
   end
 
   def is_a_context?
@@ -1197,10 +1197,6 @@ ActiveRecord::Relation.class_eval do
     super
   end
 
-  def uniq(*)
-    raise "use #distinct instead of #uniq on relations (Rails 5.1 will delegate uniq to to_a)"
-  end
-
   def not_recently_touched
     scope = self
     if (personal_space = Setting.get('touch_personal_space', 0).to_i) != 0
@@ -1445,10 +1441,6 @@ ActiveRecord::Associations::CollectionProxy.class_eval do
     record = klass.unscoped.merge(scope).new(*args)
     @association.set_inverse_instance(record)
     record
-  end
-
-  def uniq(*args)
-    raise "use #distinct instead of #uniq on relations (Rails 5.1 will delegate uniq to to_a)"
   end
 end
 
