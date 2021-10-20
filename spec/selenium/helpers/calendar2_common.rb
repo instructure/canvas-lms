@@ -169,7 +169,6 @@ module Calendar2Common
     click_option('.context_id', @course.name) if use_current_course_calendar
     date = middle_number if date.nil?
     add_date(date) if should_add_date
-    publish_toggle = edit_assignment_form.find('#assignment_published')
     move_to_click('label[for=assignment_published]') if publish
     submit_form(edit_assignment_form)
     expect(f('.fc-month-view .fc-event:not(.event_pending) .fc-title')).to include_text(assignment_title)

@@ -83,7 +83,6 @@ describe "assignments" do
     it "has group comment radio buttons for individually graded group assignments" do
       u1 = @user
       student_in_course(:course => @course)
-      u2 = @user
       assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload,online_text_entry", :group_category => GroupCategory.create!(:name => "groups", :context => @course), :grade_group_students_individually => true)
       group = assignment.group_category.groups.create!(:name => 'g1', :context => @course)
       group.users << u1
@@ -101,7 +100,6 @@ describe "assignments" do
     it "has hidden group comment input for group graded group assignments" do
       u1 = @user
       student_in_course(:course => @course)
-      u2 = @user
       assignment = @course.assignments.create!(
         :title => "some assignment",
         :submission_types => "online_url,online_upload,online_text_entry",
@@ -183,7 +181,6 @@ describe "assignments" do
         extend TextHelper
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
-        expected_lock_at = datetime_string(@override.lock_at).gsub(/\s+/, ' ')
         expect(f('#content')).to include_text "locked until #{expected_unlock}."
       end
 
@@ -230,8 +227,8 @@ describe "assignments" do
       end
 
       it "validates file upload restrictions" do
-        filename_txt, fullpath_txt, data_txt, tempfile_txt = get_file("testfile4.txt")
-        filename_zip, fullpath_zip, data_zip, tempfile_zip = get_file("testfile5.zip")
+        _filename_txt, fullpath_txt, _data_txt, _tempfile_txt = get_file("testfile4.txt")
+        _filename_zip, fullpath_zip, _data_zip, _tempfile_zip = get_file("testfile5.zip")
         @assignment.update(:submission_types => 'online_upload', :allowed_extensions => '.txt')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click

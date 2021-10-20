@@ -251,7 +251,7 @@ describe CoursesController do
                                                   name: 'Styx',
                                                   restrict_student_past_view: true
         course6.offer!
-        enrollment6 = course_with_student course: course6, user: @student, active_all: true
+        course_with_student course: course6, user: @student, active_all: true
 
         # past course date, restricted past view & enrollment dates not concluded
         course7 = Account.default.courses.create! start_at: 2.months.ago, conclude_at: 1.month.ago,
@@ -300,8 +300,8 @@ describe CoursesController do
         course1.default_section.update(:end_at => 1.month.ago)
         section2 = course1.course_sections.create!(:end_at => 1.week.ago)
         course1.offer!
-        enrollment1 = course_with_student course: course1, user: @student, active_all: true
-        enrollment2 = course_with_student course: course1, section: section2, user: @student, active_all: true, allow_multiple_enrollments: true
+        course_with_student course: course1, user: @student, active_all: true
+        course_with_student course: course1, section: section2, user: @student, active_all: true, allow_multiple_enrollments: true
 
         user_session(@student)
         get_index
@@ -526,12 +526,12 @@ describe CoursesController do
         # published course
         course1 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true, name: 'A'
         course1.offer!
-        enrollment1 = course_with_student course: course1
+        course_with_student course: course1
 
         # unpublished course
         course2 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true, name: 'B'
         expect(course2).to be_unpublished
-        enrollment2 = course_with_student user: @student, course: course2
+        course_with_student user: @student, course: course2
 
         user_session(@student)
         get_index
@@ -2286,7 +2286,7 @@ describe CoursesController do
     it "allows the course to be unpublished if it contains only graded student view submissions" do
       assignment = @course.assignments.create!(:workflow_state => 'published')
       sv_student = @course.student_view_student
-      sub = assignment.grade_student sv_student, { :grade => 1, :grader => @teacher }
+      assignment.grade_student sv_student, { :grade => 1, :grader => @teacher }
       user_session @teacher
       put 'update', params: { :id => @course.id, :course => { :event => 'claim' } }
       @course.reload

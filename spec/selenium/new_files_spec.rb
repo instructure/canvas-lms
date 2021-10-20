@@ -509,7 +509,7 @@ describe "better_file_browsing" do
 
     it "url-encodes sort header links" do
       course_with_teacher_logged_in
-      folder = Folder.root_folders(@course).first.sub_folders.create!(name: 'eh?', context: @course)
+      Folder.root_folders(@course).first.sub_folders.create!(name: 'eh?', context: @course)
       get "/courses/#{@course.id}/files/folder/eh%3F"
       expect(ff('.ef-plain-link').first.attribute('href')).to include '/files/folder/eh%3F?sort'
     end

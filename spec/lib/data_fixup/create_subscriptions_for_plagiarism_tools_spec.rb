@@ -121,7 +121,7 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
     end
 
     it 'creates a subscription if there are two tools, but one has a different SubmissionEvent endpoint' do
-      tool_proxy2 = Lti::ToolProxy.create!(
+      Lti::ToolProxy.create!(
         raw_data: {
           'enabled_capability' => [placement],
           'tool_profile' => { 'service_offered' => [{ 'endpoint' => 'yoyo.ma', '@id' => '#vnd.Canvas.SubmissionEvent' }] },

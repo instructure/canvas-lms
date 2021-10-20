@@ -51,9 +51,9 @@ describe GroupsController do
       user_session(user_factory) # logged in user_factory without course access
       category1 = @course.group_categories.create(:name => "category 1")
       category2 = @course.group_categories.create(:name => "category 2")
-      g1 = @course.groups.create(:name => "some group", :group_category => category1)
-      g2 = @course.groups.create(:name => "some other group", :group_category => category1)
-      g3 = @course.groups.create(:name => "some third group", :group_category => category2)
+      @course.groups.create(:name => "some group", :group_category => category1)
+      @course.groups.create(:name => "some other group", :group_category => category1)
+      @course.groups.create(:name => "some third group", :group_category => category2)
       get 'index', params: { :course_id => @course.id }
       assert_unauthorized
     end
@@ -410,7 +410,7 @@ describe GroupsController do
 
     it "fails when group[group_category_id] would be honored but doesn't exist" do
       user_session(@student)
-      group_category = @course.group_categories.create(:name => 'some category')
+      @course.group_categories.create(:name => 'some category')
       post 'create', params: { :course_id => @course.id, :group => { :name => "some group", :group_category_id => 11235 } }
       expect(response).not_to be_successful
     end
@@ -653,7 +653,6 @@ describe GroupsController do
     it "includes the users' sections when available" do
       user_session(@teacher)
       u1 = @student1
-      u2 = @student2
 
       group = @course.groups.create(:name => "Group 1", :group_category => GroupCategory.student_organized_for(@course))
       group.add_user(u1)

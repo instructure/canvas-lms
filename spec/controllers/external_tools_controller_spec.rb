@@ -1774,7 +1774,6 @@ describe ExternalToolsController do
     it "fails gracefully on invalid URL retrieval or timeouts" do
       allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
       user_session(@teacher)
-      xml = "bob"
       post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com" } }, :format => "json"
       expect(response).not_to be_successful
       expect(assigns[:tool]).to be_new_record
@@ -1785,7 +1784,6 @@ describe ExternalToolsController do
     it "fails gracefully trying to retrieve from localhost" do
       expect(CanvasHttp).to receive(:insecure_host?).with("localhost").and_return(true)
       user_session(@teacher)
-      xml = "bob"
       post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com",
                                                                              :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url",
                                                                              :config_url => "http://localhost:9001" } }, :format => "json"

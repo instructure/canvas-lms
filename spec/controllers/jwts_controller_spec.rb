@@ -103,7 +103,7 @@ describe JwtsController do
       end
 
       it "returns a different jwt when refresh is called" do
-        course = course_factory
+        course_factory
         original_jwt = CanvasSecurity::ServicesJwt.for_user(
           request.host_with_port,
           token_user,

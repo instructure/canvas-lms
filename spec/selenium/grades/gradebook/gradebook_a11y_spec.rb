@@ -112,7 +112,7 @@ describe "Gradebook" do
     before { Gradebook.visit(@course) }
 
     it "after arrange columns is clicked", priority: "2", test_id: 720462 do
-      view_menu = Gradebook.open_view_menu_and_arrange_by_menu
+      Gradebook.open_view_menu_and_arrange_by_menu
       Gradebook.select_gradebook_menu_option('Due Date - Oldest to Newest')
       expect(check_element_has_focus(Gradebook.view_options_menu_selector)).to be true
     end

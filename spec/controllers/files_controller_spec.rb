@@ -722,8 +722,8 @@ describe FilesController do
       it "prioritizes matches on display name vs. filename" do
         display_name = "file.txt"
         # make a file with an original filename matching the other file's display_name
-        file1 = Attachment.create!(:context => @course, :uploaded_data => StringIO.new("blah1"), :folder => Folder.root_folders(@course).first,
-                                   :filename => display_name, :display_name => "something_else.txt")
+        Attachment.create!(:context => @course, :uploaded_data => StringIO.new("blah1"), :folder => Folder.root_folders(@course).first,
+                           :filename => display_name, :display_name => "something_else.txt")
         file2 = Attachment.create!(:context => @course, :uploaded_data => StringIO.new("blah2"), :folder => Folder.root_folders(@course).first,
                                    :filename => "still_something_else.txt", :display_name => display_name)
         other_file = Attachment.create!(:context => @course, :uploaded_data => StringIO.new("blah3"), :folder => Folder.root_folders(@course).first,

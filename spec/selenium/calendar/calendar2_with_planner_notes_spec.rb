@@ -232,8 +232,8 @@ describe "calendar2" do
     end
 
     it "includes todo items from both" do
-      page1 = @course1.wiki_pages.create!(title: 'Page1', todo_date: Date.today, workflow_state: 'unpublished')
-      page2 = @course2.wiki_pages.create!(title: 'Page2', todo_date: Date.today, workflow_state: 'published')
+      @course1.wiki_pages.create!(title: 'Page1', todo_date: Time.zone.today, workflow_state: 'unpublished')
+      @course2.wiki_pages.create!(title: 'Page2', todo_date: Time.zone.today, workflow_state: 'published')
       get '/calendar2'
       wait_for_ajax_requests
       fj('.fc-title:contains("Page1")').click

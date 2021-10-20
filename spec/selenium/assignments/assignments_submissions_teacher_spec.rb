@@ -99,7 +99,7 @@ describe "submissions" do
 
       f('.submit_assignment_link').click
 
-      filename, fullpath, data = get_file("testfile1.txt")
+      _filename, fullpath, _data = get_file("testfile1.txt")
       f('.submission_attachment input').send_keys(fullpath)
       scroll_to(f('#submit_file_button'))
       expect_new_page_load { f('#submit_file_button').click }

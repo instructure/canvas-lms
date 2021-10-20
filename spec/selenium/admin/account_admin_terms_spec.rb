@@ -87,7 +87,7 @@ describe "account admin terms" do
 
     it "deletes a term" do
       term_name = "delete term"
-      term = @course.root_account.enrollment_terms.create!(:name => term_name)
+      @course.root_account.enrollment_terms.create!(:name => term_name)
       get "/accounts/#{Account.default.id}/terms"
 
       validate_term_display(0, term_name, 0, 0)

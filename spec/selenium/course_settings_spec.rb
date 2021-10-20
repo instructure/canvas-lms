@@ -370,7 +370,6 @@ describe "course settings" do
       section_name = 'new section'
       get "/courses/#{@course.id}/settings#tab-sections"
 
-      section_input = nil
       section_input = f('#course_section_name')
       expect(section_input).to be_displayed
       replace_content(section_input, section_name)
@@ -538,7 +537,7 @@ describe "course settings" do
       event = @course.calendar_events.create!(:title => "event", :description => html)
       topic = @course.discussion_topics.create!(:title => "discussion title", :message => html)
       mod = @course.context_modules.create!(:name => "some module")
-      tag = mod.add_item(:type => 'external_url', :url => bad_url, :title => 'pls view')
+      mod.add_item(:type => 'external_url', :url => bad_url, :title => 'pls view')
       page = @course.wiki_pages.create!(:title => "wiki", :body => html)
       quiz = @course.quizzes.create!(:title => 'quiz1', :description => html)
 
