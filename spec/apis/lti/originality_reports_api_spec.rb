@@ -18,14 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/lti2_api_spec_helper')
+require 'apis/lti/lti2_api_spec_helper'
 require 'sharding_spec_helper'
 require_dependency "lti/ims/access_token_helper"
 
 module Lti
   describe 'Originality Reports API', type: :request do
-    specs_require_sharding
-
     include_context 'lti2_api_spec_helper'
     let(:service_name) { OriginalityReportsApiController::ORIGINALITY_REPORT_SERVICE }
     let(:aud) { host }
@@ -764,38 +762,6 @@ module Lti
         expect(json_parse['error_message']).to eq 'error message'
       end
 
-      it 'allows creating reports for any attachment in submission history' do
-        shard_two = @shard1
-        a = @course.assignments.create!(
-          title: "some assignment",
-          assignment_group: @group,
-          points_possible: 12,
-          tool_settings_tool: @tool
-        )
-        a.tool_settings_tool = message_handler
-        a.save!
-
-        first_attachment = shard_two.activate { attachment_model(context: @student) }
-        Timecop.freeze(10.seconds.ago) do
-          a.submit_homework(@student, attachments: [first_attachment])
-        end
-
-        Timecop.freeze(5.seconds.ago) do
-          a.submit_homework(@student, attachments: [attachment_model(context: @student)])
-        end
-
-        post "/api/lti/assignments/#{a.id}/submissions/#{a.reload.submissions.first.id}/originality_report",
-             params: {
-               originality_report: {
-                 file_id: first_attachment.id,
-                 workflow_state: 'pending'
-               }
-             },
-             headers: request_headers
-
-        expect(response.status).to eq 201
-      end
-
       it 'sets the link_id resource_url' do
         score = 0.25
         launch_url = 'http://www.my-launch.com'
@@ -813,6 +779,42 @@ module Lti
              headers: request_headers
         response_body = JSON.parse(response.body)
         expect(response_body['tool_setting']['resource_url']).to eq launch_url
+      end
+
+      context 'with sharded attachments' do
+        specs_require_sharding
+
+        it 'allows creating reports for any attachment in submission history' do
+          shard_two = @shard1
+          a = @course.assignments.create!(
+            title: "some assignment",
+            assignment_group: @group,
+            points_possible: 12,
+            tool_settings_tool: @tool
+          )
+          a.tool_settings_tool = message_handler
+          a.save!
+
+          first_attachment = shard_two.activate { attachment_model(context: @student) }
+          Timecop.freeze(10.seconds.ago) do
+            a.submit_homework(@student, attachments: [first_attachment])
+          end
+
+          Timecop.freeze(5.seconds.ago) do
+            a.submit_homework(@student, attachments: [attachment_model(context: @student)])
+          end
+
+          post "/api/lti/assignments/#{a.id}/submissions/#{a.reload.submissions.first.id}/originality_report",
+               params: {
+                 originality_report: {
+                   file_id: first_attachment.id,
+                   workflow_state: 'pending'
+                 }
+               },
+               headers: request_headers
+
+          expect(response.status).to eq 201
+        end
       end
 
       context 'when the originality report already exists' do
@@ -840,6 +842,22 @@ module Lti
 
           response_body = JSON.parse(response.body)
           expect(response_body['originality_score']).to eq 50
+        end
+
+        it 'allows error_message to be cleared and workflow_state to not be errored' do
+          existing_report.update(workflow_state: "error", error_message: "the batteries are in backwards")
+          post @endpoints[:create],
+               params: {
+                 originality_report: {
+                   file_id: @attachment.id,
+                   workflow_state: "pending"
+                 }
+               },
+               headers: request_headers
+
+          response_body = JSON.parse(response.body)
+          expect(response_body['workflow_state']).to eq 'pending'
+          expect(response_body['error_message']).to be_nil
         end
 
         context 'when the attachment matches, but the submission does not' do
