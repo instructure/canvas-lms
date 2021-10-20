@@ -27,6 +27,10 @@ import moment from 'moment'
 const setStartDate = jest.fn()
 const setEndDate = jest.fn()
 
+afterEach(() => {
+  jest.clearAllMocks()
+})
+
 describe('PacePlansDateSelector', () => {
   describe('of start type', () => {
     const defaultProps: PacePlanDateSelectorProps = {
@@ -102,7 +106,7 @@ describe('PacePlansDateSelector', () => {
       const {getByLabelText} = render(<PacePlanDateSelector {...defaultProps} planPublishing />)
       const startDateInput = getByLabelText('Projected Start Date') as HTMLInputElement
 
-      expect(startDateInput).toHaveAttribute('disabled')
+      expect(startDateInput).toBeDisabled()
     })
   })
 

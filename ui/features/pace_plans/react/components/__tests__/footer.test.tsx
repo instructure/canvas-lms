@@ -33,6 +33,10 @@ const defaultProps = {
   unpublishedChanges: true
 }
 
+afterEach(() => {
+  jest.clearAllMocks()
+})
+
 describe('Footer', () => {
   it('renders cancel and publish buttons when there are unpublished changes', () => {
     const {getByRole} = render(<Footer {...defaultProps} />)

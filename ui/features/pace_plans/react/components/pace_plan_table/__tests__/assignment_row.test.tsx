@@ -48,6 +48,10 @@ const defaultProps = {
   isStacked: false
 }
 
+afterEach(() => {
+  jest.clearAllMocks()
+})
+
 describe('AssignmentRow', () => {
   it('renders the assignment title and icon of the module item', () => {
     const {getByText} = renderConnected(<AssignmentRow {...defaultProps} />)
@@ -102,6 +106,6 @@ describe('AssignmentRow', () => {
     const daysInput = getByRole('textbox', {
       name: 'Duration for module Basic encryption/decryption'
     })
-    expect(daysInput).toHaveAttribute('disabled')
+    expect(daysInput).toBeDisabled()
   })
 })
