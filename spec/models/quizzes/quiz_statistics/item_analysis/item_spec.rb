@@ -60,7 +60,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Item do
       expect(item.num_respondents(:bottom)).to eq 0 # there is a guy, but he didn't answer this question
     end
 
-    it "correctlies evaluate multiple filters" do
+    it "evaluates multiple filters correctly" do
       expect(item.num_respondents(:top, :correct)).to eq 1
       expect(item.num_respondents(:top, :incorrect)).to eq 0
       expect(item.num_respondents(:middle, :correct)).to eq 1

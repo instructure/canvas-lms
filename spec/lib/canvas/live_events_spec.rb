@@ -626,7 +626,7 @@ describe Canvas::LiveEvents do
           Canvas::LiveEvents.send(event_name.to_sym, submission)
         end
 
-        it 'temporarilies include multiple associated_integration_ids if there is an installed tool proxy' do
+        it 'temporarily includes multiple associated_integration_ids if there is an installed tool proxy' do
           submission.assignment.assignment_configuration_tool_lookups.create!(
             tool_product_code: 'turnitin-lti',
             tool_vendor_code: 'turnitin.com',
@@ -946,7 +946,7 @@ describe Canvas::LiveEvents do
         Canvas::LiveEvents.assignment_created(@assignment)
       end
 
-      it 'temporarilies include multiple associated_integration_ids if there is an installed tool proxy' do
+      it 'temporarily includes multiple associated_integration_ids if there is an installed tool proxy' do
         @assignment.assignment_configuration_tool_lookups.create!(
           tool_product_code: 'turnitin-lti',
           tool_vendor_code: 'turnitin.com',

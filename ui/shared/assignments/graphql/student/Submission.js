@@ -98,12 +98,27 @@ export const SubmissionMocks = {
   },
 
   excused: {
-    attempt: 1,
-    enteredGrade: null,
-    grade: null,
     gradingStatus: 'excused',
+    state: 'graded'
+  },
+
+  missing: {
+    deductedPoints: 0,
+    enteredGrade: '0',
+    grade: '0',
+    gradingStatus: 'graded',
     state: 'graded',
-    submissionStatus: 'submitted',
+    submissionStatus: 'missing'
+  },
+
+  late: {
+    attempt: 1,
+    deductedPoints: 0,
+    enteredGrade: '8',
+    grade: '8',
+    gradingStatus: 'graded',
+    state: 'graded',
+    submissionStatus: 'late',
     submittedAt: new Date().toISOString()
   }
 }

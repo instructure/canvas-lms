@@ -48,6 +48,9 @@ const locale = {
   "announcement_list_da155734": { "message": "รายการประกาศ" },
   "announcements_a4b8ed4a": { "message": "ประกาศ" },
   "apply_781a2546": { "message": "ปรับใช้" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "ปรับใช้การเปลี่ยนแปลงกับส่วนรายการทั้งหมดปุ่มและไอคอนนี้ในบทเรียนนี้"
+  },
   "apps_54d24a47": { "message": "แอพ" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "สัดส่วนจะถูกรักษาไว้ตามเดิม"
@@ -62,9 +65,6 @@ const locale = {
   },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "มีเนื้อหาบันทึกอัตโนมัติ ต้องการโหลดเนื้อหาบันทึกอัตโนมัติแทนหรือไม่"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "เปิดอัตโนมัติในการแสดงตัวอย่างแบบ in-line (แสดงตัวอย่างหลังจากบันทึกแล้วเท่านั้น)"
   },
   "available_folders_694d0436": { "message": "โฟลเดอร์ที่ใช้ได้" },
   "below_81d4dceb": { "message": "ด้านล่าง" },
@@ -149,9 +149,6 @@ const locale = {
   "details_98a31b68": { "message": "รายละเอียด" },
   "dimensions_45ddb7b7": { "message": "ขนาด" },
   "directionality_26ae9e08": { "message": "ทิศทาง" },
-  "disable_in_line_preview_2a675175": {
-    "message": "ปิดในส่วนแสดงตัวอย่างแบบ In-Line"
-  },
   "discussions_a5f96392": { "message": "การพูดคุย" },
   "discussions_index_6c36ced": { "message": "ดัชนีการพูดคุย" },
   "display_options_315aba85": { "message": "แสดงตัวเลือก" },
@@ -287,7 +284,6 @@ const locale = {
     "message": "จะต้องเท่ากับอย่างน้อย { width } x { height }px"
   },
   "my_files_2f621040": { "message": "ไฟล์ของฉัน" },
-  "my_images_427f9b0c": { "message": "ภาพของฉัน" },
   "name_1aed4a1b": { "message": "ชื่อ" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "ดูรายการเมนูหรือแถบเครื่องมือ"
@@ -366,9 +362,6 @@ const locale = {
   "show_link_options_545338fd": { "message": "แสดงตัวเลือกสำหรับลิงค์" },
   "show_video_options_6ed3721a": { "message": "แสดงตัวเลือกสำหรับวิดีโอ" },
   "size_b30e1077": { "message": "ขนาด" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "ขนาด { file } มากกว่าขนาดไฟล์สูงสุดที่ { max } MB"
-  },
   "small_b070434a": { "message": "เล็ก" },
   "something_went_wrong_89195131": { "message": "มีบางอย่างผิดปกติ" },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

@@ -130,7 +130,16 @@ module Lti
       secure_params = Canvas::Security.decode_jwt(secure_params)
       secure_params[:lti_assignment_id]
     rescue Canvas::Security::InvalidToken
-      return nil
+      nil
+    end
+
+    def self.decoded_lti_assignment_description(secure_params)
+      return if secure_params.blank?
+
+      secure_params = Canvas::Security.decode_jwt(secure_params)
+      secure_params[:lti_assignment_description]
+    rescue Canvas::Security::InvalidToken
+      nil
     end
   end
 end

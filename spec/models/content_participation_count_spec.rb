@@ -65,7 +65,7 @@ describe ContentParticipationCount do
       expect(cpc.reload.updated_at.to_i).to eq time.to_i
     end
 
-    it "correctlies set root_account_id from course" do
+    it "sets root_account_id from course correctly" do
       cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission")
       expect(cpc.root_account_id).to eq(@course.root_account_id)
     end

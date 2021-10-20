@@ -130,3 +130,9 @@ word_count_in_speed_grader:
     state: allowed_on
   ci:
     state: allowed_on
+observer_picker:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Filter observer dashboard by student
+  description: |-
+    When enabled, this flag shows a student picker for observers on the dashboard.

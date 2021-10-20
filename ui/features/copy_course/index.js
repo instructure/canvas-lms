@@ -76,12 +76,12 @@ function validateDates() {
   return $('#copy_course_form').hideErrors()
 }
 
-$start.on('change', function() {
-  validateDates()
+$start.on('change', function () {
   dateShiftView.$newStartDate.val($(this).val()).trigger('change')
+  validateDates()
 })
 
-$end.on('change', function() {
-  validateDates()
+$end.on('change', function () {
   dateShiftView.$newEndDate.val($(this).val()).trigger('change')
+  validateDates()
 })

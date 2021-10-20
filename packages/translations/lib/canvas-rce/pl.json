@@ -28,6 +28,9 @@
   "announcement_list_da155734": { "message": "Lista ogłoszeń" },
   "announcements_a4b8ed4a": { "message": "Ogłoszenia" },
   "apply_781a2546": { "message": "Zastosuj" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Zastosuj zmiany do wszystkich instancji tego przycisku oraz ikony w kursie"
+  },
   "apps_54d24a47": { "message": "Aplikacje" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Współczynnik proporcji zostanie zachowany"
@@ -42,9 +45,6 @@
   },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Istnieje automatycznie zapisana zawartość. Czy wolisz wczytać automatyczną zawartość?"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "Automatycznie otwórz pogląd w wierszu. (podgląd zostanie wyświetlony po zapisaniu)"
   },
   "available_folders_694d0436": { "message": "Dostępne foldery" },
   "below_81d4dceb": { "message": "Poniżej" },
@@ -135,9 +135,6 @@
   "details_98a31b68": { "message": "Szczegóły" },
   "dimensions_45ddb7b7": { "message": "Wymiary" },
   "directionality_26ae9e08": { "message": "Kierunkowość" },
-  "disable_in_line_preview_2a675175": {
-    "message": "Wyłącz podgląd w wierszu."
-  },
   "discussions_a5f96392": { "message": "Dyskusje" },
   "discussions_index_6c36ced": { "message": "Spis dyskusji" },
   "display_options_315aba85": { "message": "Opcje wyświetlania" },
@@ -275,7 +272,6 @@
     "message": "Wymagane co najmniej { width } x { height } px"
   },
   "my_files_2f621040": { "message": "Moje pliki" },
-  "my_images_427f9b0c": { "message": "Moje obrazy" },
   "name_1aed4a1b": { "message": "Nazwa" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Przejdź w menu lub na pasku narzędzi"
@@ -360,9 +356,6 @@
   "show_link_options_545338fd": { "message": "Pokaż opcje łącza" },
   "show_video_options_6ed3721a": { "message": "Pokaż opcje wideo" },
   "size_b30e1077": { "message": "Rozmiar" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "Rozmiar { file } przekracza maksymalną dozwoloną wielkość plików { max } MB."
-  },
   "small_b070434a": { "message": "Mały" },
   "something_went_wrong_89195131": { "message": "Coś poszło nie tak." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

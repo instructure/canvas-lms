@@ -167,7 +167,7 @@ describe SIS::CSV::ChangeSisIdImporter do
       expect(gc.sis_source_id).to eq('GC2')
     end
 
-    it 'cleanlies handle error if integration_id is given' do
+    it 'cleanly handles error if integration_id is given' do
       u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
 
       importer = process_csv_data(

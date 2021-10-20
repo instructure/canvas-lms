@@ -128,9 +128,6 @@
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Van automatikusan mentett tartalom. Szeretné inkább azt betölteni?"
     },
-    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-        "message": "Automatikusan megnyit egy beágyazott előnézetet. (Az előnézet csak mentés után jelenik meg.)"
-    },
     "available_folders_694d0436": {
         "message": "Elérhető mappák"
     },
@@ -319,9 +316,6 @@
     },
     "directionality_26ae9e08": {
         "message": "Irányítottság"
-    },
-    "disable_in_line_preview_2a675175": {
-        "message": "Letiltja a beágyazott előnézetet."
     },
     "discussion_6719c51d": {
         "message": "Fórum"
@@ -943,9 +937,6 @@
     },
     "size_b30e1077": {
         "message": "Méret"
-    },
-    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-        "message": "A { file } mérete nagyobb, mint a megengedett legnagyobb fájl méret: { max } MB."
     },
     "small_b070434a": {
         "message": "Kicsi"

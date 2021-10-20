@@ -595,6 +595,17 @@ describe('api actions', () => {
     })
   })
 
+  describe('clearItems', () => {
+    it('dispatches clearWeeklyItems and clearOpportunities actions', () => {
+      const mockDispatch = jest.fn()
+      Actions.clearItems()(mockDispatch, getBasicState)
+      expect(mockDispatch).toHaveBeenCalledTimes(3)
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_WEEKLY_ITEMS'})
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_OPPORTUNITIES'})
+      expect(mockDispatch).toHaveBeenCalledWith({type: 'CLEAR_DAYS'})
+    })
+  })
+
   describe('reloadWithObservee', () => {
     it('dispatches actions to reload planner if observeeId/contextCodes are present and have changed', () => {
       const mockDispatch = jest.fn()
@@ -603,13 +614,10 @@ describe('api actions', () => {
         selectedObservee: {id: '5', contextCodes: undefined}
       })
       Actions.reloadWithObservee('5', ['course_1'])(mockDispatch, getState)
-      expect(mockDispatch).toHaveBeenCalledTimes(4)
+      expect(mockDispatch).toHaveBeenCalledTimes(5)
       expect(mockDispatch).toHaveBeenCalledWith({
         payload: {id: '5', contextCodes: ['course_1']},
         type: 'SELECTED_OBSERVEE'
-      })
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: 'CLEAR_WEEKLY_ITEMS'
       })
     })
 
@@ -624,9 +632,6 @@ describe('api actions', () => {
       expect(mockDispatch).toHaveBeenCalledWith({
         payload: {id: '6', contextCodes: undefined},
         type: 'SELECTED_OBSERVEE'
-      })
-      expect(mockDispatch).toHaveBeenCalledWith({
-        type: 'CLEAR_WEEKLY_ITEMS'
       })
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'START_LOADING_ITEMS'

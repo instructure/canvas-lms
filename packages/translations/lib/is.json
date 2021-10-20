@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Virkja"
     },
+    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+        "message": "Notaðu breytingar á öll tilvik þessa hnapps og tákns í námskeiðinu"
+    },
     "apps_54d24a47": {
         "message": "Smáforrit"
     },
@@ -148,9 +151,6 @@
     },
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Sjálfvirkt vistað efni er til. Viltu hlaða inn sjálfvirkt vistuðu efni í staðinn?"
-    },
-    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-        "message": "Opna sjálfkrafa forskoðun í línu. (Forskoðun sést ekki fyrr en búið er að vista)"
     },
     "available_folders_694d0436": {
         "message": "Tiltækar möppur"
@@ -379,9 +379,6 @@
     },
     "directionality_26ae9e08": {
         "message": "Lestrarátt"
-    },
-    "disable_in_line_preview_2a675175": {
-        "message": "Afvirkja forskoðun í línu."
     },
     "discussion_6719c51d": {
         "message": "Umræða"
@@ -839,9 +836,6 @@
     "my_grades_98834476": {
         "message": "Einkunnir mínar"
     },
-    "my_images_427f9b0c": {
-        "message": "Mínar myndir"
-    },
     "name_1aed4a1b": {
         "message": "Nafn"
     },
@@ -1105,9 +1099,6 @@
     },
     "size_b30e1077": {
         "message": "Stærð"
-    },
-    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-        "message": "Stærð { file } er meiri en hámarkið { max } MB fyrir skráastærð"
     },
     "small_b070434a": {
         "message": "Lítil"
