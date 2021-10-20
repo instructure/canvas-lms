@@ -58,7 +58,7 @@ const FindOutcomeItem = ({
   const shouldShowSpinner =
     !isImported && importOutcomeStatus !== IMPORT_COMPLETED && importStatus.includes(IMPORT_PENDING)
   const isOutcomeImported = isImported || importStatus.includes(IMPORT_COMPLETED)
-  const onAddHandler = () => importOutcomeHandler(id, 1, false, sourceContextId, sourceContextType)
+  const onAddHandler = () => importOutcomeHandler(id, sourceContextId, sourceContextType)
 
   const checkbox = (
     <Flex.Item size={isMobileView ? '' : '6.75rem'} alignSelf="end">

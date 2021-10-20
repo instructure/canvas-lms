@@ -88,13 +88,6 @@ describe('usePlanner hook', () => {
     expect(result.current).toBe(false)
   })
 
-  it('calls the provided callback if initialization succeeds', async () => {
-    const callbackFn = jest.fn()
-    const {waitForNextUpdate} = renderHook(() => usePlanner({...defaults, callback: callbackFn}))
-    await waitForNextUpdate()
-    expect(callbackFn).toHaveBeenCalled()
-  })
-
   it('passes the provided focus fallback ref to the planner via initialization options', async () => {
     const dummyRef = 'test'
     const {result, waitForNextUpdate} = renderHook(() =>

@@ -49,6 +49,9 @@ const locale = {
   "announcement_list_da155734": { "message": "アナウンス リスト" },
   "announcements_a4b8ed4a": { "message": "発表" },
   "apply_781a2546": { "message": "適用" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "コース内のこのボタンとアイコンのすべてのインスタンスに変更を適用する"
+  },
   "apps_54d24a47": { "message": "アプリ" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "アスペクト比は維持されます"
@@ -63,9 +66,6 @@ const locale = {
   },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "自動保存されたコンテンツが存在します。自動保存されたコンテンツを代わりにロードしますか？"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "インラインプレビューが自動的に開きます。(プレビューが表示されるのは保存後のみです)"
   },
   "available_folders_694d0436": { "message": "使用可能なフォルダ" },
   "below_81d4dceb": { "message": "下の" },
@@ -156,9 +156,6 @@ const locale = {
   "details_98a31b68": { "message": "詳細" },
   "dimensions_45ddb7b7": { "message": "寸法" },
   "directionality_26ae9e08": { "message": "方向性" },
-  "disable_in_line_preview_2a675175": {
-    "message": "インラインプレビューを無効にします。"
-  },
   "discussions_a5f96392": { "message": "ディスカッション" },
   "discussions_index_6c36ced": { "message": "ディスカッションのインデックス" },
   "display_options_315aba85": { "message": "オプションを表示する" },
@@ -300,7 +297,6 @@ const locale = {
     "message": "少なくとも { width } x { height }px でなければなりません"
   },
   "my_files_2f621040": { "message": "マイ ファイル" },
-  "my_images_427f9b0c": { "message": "マイ画像" },
   "name_1aed4a1b": { "message": "名前" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "メニューまたはツールバーを移動する"
@@ -381,9 +377,6 @@ const locale = {
   "show_link_options_545338fd": { "message": "リンクオプションを表示する" },
   "show_video_options_6ed3721a": { "message": "ビデオオプションを表示する" },
   "size_b30e1077": { "message": "サイズ" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "{ file } のサイズが、最大許容ファイルサイズ { max } MB を超えています。"
-  },
   "small_b070434a": { "message": "小" },
   "something_went_wrong_89195131": { "message": "問題が発生しました。" },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

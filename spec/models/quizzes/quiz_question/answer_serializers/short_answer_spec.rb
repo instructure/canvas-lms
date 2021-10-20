@@ -38,7 +38,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::ShortAnswer do
     expect(subject.deserialize({})).to eq nil
   end
 
-  it 'degracefullies sanitize its text' do
+  it 'gracefully sanitizes its text' do
     expect(subject.serialize('Hello World!').answer).to eq({
       question_5: 'hello world!'
     }.with_indifferent_access)

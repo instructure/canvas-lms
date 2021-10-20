@@ -159,7 +159,7 @@ class ConversationsController < ApplicationController
   before_action :get_conversation, :only => [:show, :update, :destroy, :add_recipients, :remove_messages]
   before_action :infer_scope, :only => [:index, :show, :create, :update, :add_recipients, :add_message, :remove_messages]
   before_action :normalize_recipients, :only => [:create, :add_recipients]
-  before_action :infer_tags, :only => [:create, :add_message, :add_recipients]
+  before_action :infer_tags, :only => [:create, :add_recipients]
 
   # whether it's a bulk private message, or a big group conversation,
   # batch up all delayed jobs to make this more responsive to the user
@@ -890,49 +890,31 @@ class ConversationsController < ApplicationController
   #       ]
   #   }
   #
+
   def add_message
-    # TODO: VICE-1037 logic is mostly duplicated in AddConversationMessage
     get_conversation(true)
 
-    context = @conversation.conversation.context
-    if context.is_a?(Course) && context.workflow_state == 'completed' && !context.grants_right?(@current_user, session, :read_as_admin)
-      return render json: { message: "Unable to send messages in a concluded course" }, status: :unauthorized
-    end
+    message = process_response(
+      conversation: @conversation,
+      context: @conversation.conversation.context,
+      current_user: @current_user,
+      session: session,
+      recipients: params[:recipients],
+      context_code: params[:context_code],
+      message_ids: params[:included_messages],
+      body: params[:body],
+      attachment_ids: params[:attachment_ids],
+      domain_root_account_id: @domain_root_account.id,
+      media_comment_id: params[:media_comment_id],
+      media_comment_type: params[:media_comment_type],
+      user_note: params[:user_note]
+    )
 
-    if @conversation.conversation.replies_locked_for?(@current_user)
-      return render_unauthorized_action
-    end
-
-    if params[:body].present?
-      # allow responses to be sent to anyone who is already a conversation participant.
-      params[:from_conversation_id] = @conversation.conversation_id
-      # not a before_action because we need to set the above parameter.
-      normalize_recipients
-      if @recipients && !@conversation.conversation.can_add_participants?(@recipients)
-        return render_error('recipients', 'too many participants for group conversation')
-      end
-
-      # find included_messages
-      message_ids = params[:included_messages]
-      message_ids = message_ids.split(/,/) if message_ids.is_a?(String)
-      validate_message_ids(message_ids, @conversation)
-
-      message_args = build_message_args
-      if @conversation.should_process_immediately?
-        message = @conversation.process_new_message(message_args, @recipients, message_ids, @tags)
-        render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
-      else
-        @conversation.delay(strand: "add_message_#{@conversation.global_conversation_id}")
-                     .process_new_message(message_args, @recipients, message_ids, @tags)
-        return render :json => [], :status => :accepted
-      end
-    else
-      render :json => {}, :status => :bad_request
-    end
-  rescue ConversationsHelper::InvalidMessageForConversationError
-    render_error('included_messages', 'not for this conversation')
-  rescue ConversationsHelper::InvalidMessageParticipantError
-    render_error('included_messages', 'not a participant')
+    render json: message[:message].nil? ? [] : conversation_json(@conversation.reload, @current_user, session, messages: [message[:message]]), status: message[:status]
+  rescue ConversationsHelper::RepliesLockedForUser
+    render_unauthorized_action
+  rescue ConversationsHelper::Error => e
+    render_error(e.attribute, e.message, e.status)
   end
 
   # @API Delete a message
@@ -1077,12 +1059,12 @@ class ConversationsController < ApplicationController
 
   private
 
-  def render_error(attribute, message)
-    render :json => [{
-      :attribute => attribute,
-      :message => message,
+  def render_error(attribute, message, status = :bad_request)
+    render json: [{
+      attribute: attribute,
+      message: message,
     }],
-           :status => :bad_request
+           status: status
   end
 
   def infer_scope

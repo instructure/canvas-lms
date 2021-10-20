@@ -18,7 +18,7 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import React from 'react'
-import {CourseSelect} from './CourseSelect'
+import {CourseSelect, ALL_COURSES_ID} from './CourseSelect'
 
 export default {
   title: 'Examples/Canvas Inbox/Course Select',
@@ -38,6 +38,13 @@ const Template = args => (
 )
 
 const options = {
+  allCourses: [
+    {
+      _id: ALL_COURSES_ID,
+      contextName: 'All Courses',
+      assetString: 'all_courses'
+    }
+  ],
   favoriteCourses: [
     {_id: 1, contextName: 'Charms', assetString: 'course_1'},
     {_id: 2, contextName: 'Transfiguration', assetString: 'course_2'}

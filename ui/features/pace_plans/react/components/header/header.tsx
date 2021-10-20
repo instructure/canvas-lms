@@ -24,18 +24,24 @@ import PlanPicker from './plan_picker'
 import ProjectedDates from './projected_dates/projected_dates'
 import Settings from './settings/settings'
 import ShowProjectionsButton from './show_projections_button'
+import UnpublishedChangesIndicator from '../unpublished_changes_indicator'
 
-const Header: React.FC = () => (
+export type HeaderProps = {
+  handleDrawerToggle?: () => void
+}
+
+const Header = (props: HeaderProps) => (
   <View as="div">
     <View as="div" borderWidth="0 0 small 0" margin="0 0 medium">
-      <Flex as="section" alignItems="end" margin="0 0 medium">
+      <Flex as="section" alignItems="end" margin="0 0 medium" wrapItems>
         <PlanPicker />
         <View margin="0 0 0 small">
           <Settings />
         </View>
-        <View margin="0 0 0 small">
+        <View margin="0 auto 0 small">
           <ShowProjectionsButton />
         </View>
+        <UnpublishedChangesIndicator onClick={props.handleDrawerToggle} margin="medium 0 0" />
       </Flex>
     </View>
     <ProjectedDates />

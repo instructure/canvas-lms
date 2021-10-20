@@ -52,6 +52,7 @@ class Notification < Switchman::UnshardedRecord
     "conversation_message",
     "course_content",
     "discussion_mention",
+    "reported_reply",
     "due_date",
     "grading",
     "invitation",
@@ -76,6 +77,7 @@ class Notification < Switchman::UnshardedRecord
     "Collaboration Invitation",
     "Conversation Message",
     "Discussion Mention",
+    "Reported Reply",
     "Event Date Changed",
     "New Announcement",
     "New Event Created",
@@ -112,6 +114,7 @@ class Notification < Switchman::UnshardedRecord
     'Discussion',
     'DiscussionEntry',
     'DiscussionMention',
+    'ReportedReply',
 
     # Scheduling
     'Student Appointment Signups',
@@ -314,6 +317,7 @@ class Notification < Switchman::UnshardedRecord
   def default_frequency(user = nil)
     return FREQ_NEVER if user&.default_notifications_disabled?
 
+    # rubocop:disable Lint/DuplicateBranch
     case category
     when 'All Submissions'
       FREQ_NEVER
@@ -340,6 +344,8 @@ class Notification < Switchman::UnshardedRecord
     when 'DiscussionEntry'
       FREQ_DAILY
     when 'DiscussionMention'
+      FREQ_IMMEDIATELY
+    when 'ReportedReply'
       FREQ_IMMEDIATELY
     when 'Announcement Reply'
       FREQ_NEVER
@@ -388,6 +394,7 @@ class Notification < Switchman::UnshardedRecord
     else
       FREQ_DAILY
     end
+    # rubocop:enable Lint/DuplicateBranch
   end
 
   # TODO i18n: show the localized notification name in the dashboard (or
@@ -414,6 +421,7 @@ class Notification < Switchman::UnshardedRecord
     t 'names.content_export_failed', 'Content Export Failed'
     t 'names.content_export_finished', 'Content Export Finished'
     t 'Discussion Mention'
+    t 'Reported Reply'
     t 'names.enrollment_accepted', 'Enrollment Accepted'
     t 'names.enrollment_invitation', 'Enrollment Invitation'
     t 'names.enrollment_notification', 'Enrollment Notification'
@@ -488,6 +496,7 @@ class Notification < Switchman::UnshardedRecord
     t 'categories.discussion', 'Discussion'
     t 'categories.discussion_entry', 'DiscussionEntry'
     t 'DiscussionMention'
+    t 'ReportedReply'
     t 'categories.due_date', 'Due Date'
     t 'categories.files', 'Files'
     t 'categories.grading', 'Grading'
@@ -525,6 +534,8 @@ class Notification < Switchman::UnshardedRecord
       t(:discussion_post_display, 'New Reply')
     when 'DiscussionMention'
       t('New Mention')
+    when 'ReportedReply'
+      t('Reported Reply')
     when 'Due Date'
       t(:due_date_display, 'Due Date')
     when 'Grading'
@@ -599,6 +610,8 @@ class Notification < Switchman::UnshardedRecord
       t(:discussion_post_description, "New reply on a topic you're subscribed to")
     when 'DiscussionMention'
       t("New Mention in a Discussion")
+    when 'ReportedReply'
+      t('New reported reply in a Discussion')
     when 'Due Date'
       t(:due_date_description, 'Assignment due date change')
     when 'Grading'

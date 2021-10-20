@@ -82,7 +82,7 @@ describe LiveEvents::Client do
   describe ".aws_config" do
     before { prep_client_and_worker }
 
-    it "correctlies parse the endpoint" do
+    it "parses the endpoint correctly" do
       res = LiveEvents::Client.aws_config({
                                             "aws_endpoint" => "http://example.com:6543/"
                                           })

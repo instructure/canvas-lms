@@ -272,7 +272,7 @@ describe DiscussionTopic do
 
     it "does not grant moderate permissions without read permissions" do
       @course.account.role_overrides.create!(:role => teacher_role, :permission => 'read_forum', :enabled => false)
-      expect(@topic.reload.check_policy(@teacher2)).to eql [:create, :duplicate, :attach]
+      expect(@topic.reload.check_policy(@teacher2)).to eql [:create, :duplicate, :attach, :student_reporting]
     end
 
     it "grants permissions if it not locked" do
@@ -1350,7 +1350,7 @@ describe DiscussionTopic do
       discussion_topic_model(:user => @teacher)
     end
 
-    it "automaticallies include the author" do
+    it "automatically includes the author" do
       expect(@topic.subscribers).to include(@teacher)
     end
 
@@ -1359,7 +1359,7 @@ describe DiscussionTopic do
       expect(@topic.subscribers).not_to include(@teacher)
     end
 
-    it "automaticallies include posters" do
+    it "automatically includes posters" do
       @topic.reply_from(:user => @student, :text => "entry")
       expect(@topic.subscribers).to include(@student)
     end

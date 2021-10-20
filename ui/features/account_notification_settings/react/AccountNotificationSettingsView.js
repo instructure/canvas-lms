@@ -21,7 +21,7 @@ import {
   NotificationPreferencesContextProvider
 } from '@canvas/notification-preferences/react/NotificationPreferencesContextProvider'
 import AccountNotificationSettingsQuery from './AccountNotificationSettingsQuery'
-import CourseNotificationSettingsQuery from '../../course_notification_settings/react/CourseNotificationSettingsQuery'
+import CourseNotificationSettingsQuery from '@canvas/notification-preferences-course/react/CourseNotificationSettingsQuery'
 import React from 'react'
 import AlertManager from '@canvas/alerts/react/AlertManager'
 import {bool, string} from 'prop-types'

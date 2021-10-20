@@ -41,7 +41,7 @@ describe Canvas::CacheRegister do
   end
 
   context "reading" do
-    it "automaticallies set the key to the current time if it doesn't exist" do
+    it "automatically sets the key to the current time if it doesn't exist" do
       Timecop.freeze(time1) do
         @key = @user.cache_key(:enrollments)
         expect(@key).to include(to_stamp(time1))

@@ -65,6 +65,7 @@ const renderUploadButtons = props => {
             onClick={props.onMediaUpload}
             margin="xx-small"
             data-testid="media-upload"
+            interaction={props.hasMediaComment ? 'disabled' : 'enabled'}
           >
             <IconAttachMediaLine />
           </IconButton>
@@ -118,7 +119,11 @@ ComposeActionButtons.propTypes = {
   /**
    * Indicates that a message is currently being sent
    */
-  isSending: PropTypes.bool.isRequired
+  isSending: PropTypes.bool.isRequired,
+  /**
+   * Indicates whether or not there is a media comment already attached
+   */
+  hasMediaComment: PropTypes.bool
 }
 
 export default ComposeActionButtons

@@ -58,7 +58,7 @@ export default handleActions(
       newState.wayFutureItemDate = action.payload
       return newState
     },
-    CLEAR_WEEKLY_ITEMS: (state, action) => {
+    CLEAR_WEEKLY_ITEMS: state => {
       const newState = {...state}
       newState.weeks = {}
       return newState

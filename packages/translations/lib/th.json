@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "ปรับใช้"
     },
+    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+        "message": "ปรับใช้การเปลี่ยนแปลงกับส่วนรายการทั้งหมดปุ่มและไอคอนนี้ในบทเรียนนี้"
+    },
     "apps_54d24a47": {
         "message": "แอพ"
     },
@@ -148,9 +151,6 @@
     },
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "มีเนื้อหาบันทึกอัตโนมัติ ต้องการโหลดเนื้อหาบันทึกอัตโนมัติแทนหรือไม่"
-    },
-    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-        "message": "เปิดอัตโนมัติในการแสดงตัวอย่างแบบ in-line (แสดงตัวอย่างหลังจากบันทึกแล้วเท่านั้น)"
     },
     "available_folders_694d0436": {
         "message": "โฟลเดอร์ที่ใช้ได้"
@@ -379,9 +379,6 @@
     },
     "directionality_26ae9e08": {
         "message": "ทิศทาง"
-    },
-    "disable_in_line_preview_2a675175": {
-        "message": "ปิดในส่วนแสดงตัวอย่างแบบ In-Line"
     },
     "discussion_6719c51d": {
         "message": "การพูดคุย"
@@ -839,9 +836,6 @@
     "my_grades_98834476": {
         "message": "เกรดของฉัน"
     },
-    "my_images_427f9b0c": {
-        "message": "ภาพของฉัน"
-    },
     "name_1aed4a1b": {
         "message": "ชื่อ"
     },
@@ -1105,9 +1099,6 @@
     },
     "size_b30e1077": {
         "message": "ขนาด"
-    },
-    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-        "message": "ขนาด { file } มากกว่าขนาดไฟล์สูงสุดที่ { max } MB"
     },
     "small_b070434a": {
         "message": "เล็ก"

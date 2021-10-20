@@ -114,6 +114,25 @@ describe('SubmissionManager', () => {
     expect(getByText('Submit Assignment').closest('button')).toBeDisabled()
   })
 
+  it('renders a disabled submit button if data placeholders are still present', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: {
+        submissionDraft: {
+          meetsAssignmentCriteria: true,
+          activeSubmissionType: 'online_text_entry',
+          body: '<p><span aria-label="Loading" data-placeholder-for="filename"> </span></p>'
+        }
+      }
+    })
+    const {getByText} = render(
+      <MockedProvider>
+        <SubmissionManager {...props} />
+      </MockedProvider>
+    )
+
+    expect(getByText('Submit Assignment').closest('button')).toBeDisabled()
+  })
+
   it('does not render the submit button if we are not on the latest submission', async () => {
     const props = await mockAssignmentAndSubmission({
       Submission: SubmissionMocks.graded
