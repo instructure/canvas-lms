@@ -42,7 +42,7 @@ module Polling
       object.has_submission_from?(current_user)
     end
 
-    def filter(keys)
+    def filter(_keys)
       if can_view_results?
         student_keys + teacher_keys
       else

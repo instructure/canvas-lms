@@ -368,20 +368,6 @@ ActiveRecord::Base.class_eval do
   end
 end
 
-ActionMailer::Base.class_eval do
-  def i18nliner_scope
-    @i18nliner_scope ||= I18nliner::Scope.new("#{mailer_name}.#{action_name}")
-  end
-
-  def translate(key, default, options = {})
-    key, options = I18nliner::CallHelpers.infer_arguments(args)
-    options = inferpolate(options) if I18nliner.infer_interpolation_values
-    options[:i18nliner_scope] = i18nliner_scope
-    I18n.translate(key, options)
-  end
-  alias_method :t, :translate
-end
-
 require 'active_support/core_ext/array/conversions'
 
 module ToSentenceWithSimpleOr

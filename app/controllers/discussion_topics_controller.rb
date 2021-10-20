@@ -1251,7 +1251,7 @@ class DiscussionTopicsController < ApplicationController
     process_future_date_parameters(discussion_topic_hash)
     process_lock_parameters(discussion_topic_hash)
 
-    process_published_parameters(discussion_topic_hash)
+    process_published_parameters
     if is_new && @topic.published? && params[:assignment]
       @topic.unpublish
       @topic.root_topic.try(:unpublish)
@@ -1259,8 +1259,8 @@ class DiscussionTopicsController < ApplicationController
     end
 
     process_group_parameters(discussion_topic_hash)
-    process_pin_parameters(discussion_topic_hash)
-    process_todo_parameters()
+    process_pin_parameters
+    process_todo_parameters
 
     if @errors.present?
       render :json => { errors: @errors }, :status => :bad_request
@@ -1410,7 +1410,7 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
-  def process_published_parameters(discussion_topic_hash)
+  def process_published_parameters
     if params.has_key?(:published)
       should_publish = value_to_boolean(params[:published])
       if should_publish != @topic.published?
@@ -1461,7 +1461,7 @@ class DiscussionTopicsController < ApplicationController
 
   # TODO: upgrade acts_as_list after rails3
   # check_scope will probably handle this
-  def process_pin_parameters(discussion_topic_hash)
+  def process_pin_parameters
     return unless params.key?(:pinned)
 
     pinned = value_to_boolean(params[:pinned])

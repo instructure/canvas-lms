@@ -27,7 +27,7 @@ class CanvasSchema < GraphQL::Schema
   connections.add(Array, PatchedArrayConnection)
   connections.add(DynamoQuery, DynamoConnection)
 
-  def self.id_from_object(obj, type_def, ctx)
+  def self.id_from_object(obj, type_def, _ctx)
     case obj
     when MediaObject
       GraphQL::Schema::UniqueWithinType.encode(type_def.graphql_name, obj.media_id)
