@@ -240,7 +240,8 @@ export const updateDiscussionEntryParticipantMock = ({
         discussionEntryId,
         ...(read !== null && {read}),
         ...(rating !== null && {rating}),
-        ...(forcedReadState !== null && {forcedReadState})
+        ...(forcedReadState !== null && {forcedReadState}),
+        ...(reportType !== null && {reportType})
       }
     },
     result: {

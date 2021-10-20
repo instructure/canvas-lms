@@ -41,7 +41,7 @@ export const UPDATE_DISCUSSION_ENTRY_PARTICIPANT = gql`
     $read: Boolean
     $rating: RatingInputType
     $forcedReadState: Boolean
-    $reportType: String
+    $reportType: ReportType
   ) {
     updateDiscussionEntryParticipant(
       input: {

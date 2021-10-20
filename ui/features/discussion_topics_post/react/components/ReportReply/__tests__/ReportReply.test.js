@@ -65,6 +65,7 @@ describe('Report Reply', () => {
     expect(submitButton).toBeTruthy()
     fireEvent.click(submitButton)
     expect(onSubmitMock.mock.calls.length).toBe(1)
+    expect(onSubmitMock).toHaveBeenCalledWith('other')
   })
 
   it('submit button should be disabled unless an option is selected', async () => {
