@@ -858,7 +858,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(work).to receive(:root_account_from_id).once.and_return(nil)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
     # the enrollments
-    importer = process_csv_data_cleanly(
+    process_csv_data_cleanly(
       "course_id,root_account,user_id,role,status",
       "test_1,account2,user_1,teacher,active",
     )

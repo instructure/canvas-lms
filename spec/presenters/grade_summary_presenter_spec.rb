@@ -177,7 +177,7 @@ describe GradeSummaryPresenter do
     end
 
     it 'works' do
-      s1, s2, s3, s4 = all_students = n_students_in_course(4)
+      s1, s2, s3, s4 = n_students_in_course(4)
       a = @course.assignments.create! points_possible: 10
       a.grade_student s1, grade:  0, grader: @teacher
       a.grade_student s2, grade:  5, grader: @teacher
@@ -198,7 +198,7 @@ describe GradeSummaryPresenter do
     end
 
     it 'filters out test students and inactive enrollments' do
-      s1, s2, s3, removed_student = all_students = n_students_in_course(4, course: @course)
+      s1, s2, s3, removed_student = n_students_in_course(4, course: @course)
 
       fake_student = course_with_user('StudentViewEnrollment', { :course => @course }).user
       fake_student.preferences[:fake_student] = true
@@ -226,7 +226,7 @@ describe GradeSummaryPresenter do
     end
 
     it 'doesnt factor nil grades into the average or min' do
-      s1, s2, s3, s4 = all_students = n_students_in_course(4)
+      s1, s2, s3, s4 = n_students_in_course(4)
       a = @course.assignments.create! points_possible: 10
       a.grade_student s1, grade:  2, grader: @teacher
       a.grade_student s2, grade:  6, grader: @teacher
@@ -246,7 +246,7 @@ describe GradeSummaryPresenter do
     it 'returns a count of submissions ignoring test students and inactive enrollments' do
       @course = Course.create!
       teacher_in_course
-      s1, s2, s3, removed_student = all_students = n_students_in_course(4, course: @course)
+      s1, s2, s3, removed_student = n_students_in_course(4, course: @course)
 
       fake_student = course_with_user('StudentViewEnrollment', { :course => @course }).user
       fake_student.preferences[:fake_student] = true

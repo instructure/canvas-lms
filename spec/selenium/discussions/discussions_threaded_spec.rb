@@ -61,7 +61,7 @@ describe "threaded discussions" do
         user: @student,
         message: 'new threaded reply from student'
       )
-      child_entry = @topic.discussion_entries.create!(
+      @topic.discussion_entries.create!(
         user: @student,
         message: 'new threaded child reply from student',
         parent_entry: entry

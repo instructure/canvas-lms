@@ -624,7 +624,6 @@ describe "Common Cartridge exporting" do
       expect(variant_tag.name).to eq 'variant'
       expect(variant_tag.attribute('identifierref').value).to eql assignment_id
       expect(variant_tag.next_element.name).to eq 'file'
-      html_file = variant_tag.next_element.attribute('href').value
       expect(@zip_file.read("#{assignment_id}/test-assignment.html")).to be_include "what?"
     end
 

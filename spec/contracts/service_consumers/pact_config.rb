@@ -31,7 +31,6 @@ module PactConfig
 
   # Add new API consumers to this module
   module Consumers
-    my_broker_host = ENV.fetch('PACT_BROKER_HOST', 'pact-broker.docker')
     # common consumer
     CANVAS_API_VERSION = '1.0'
     CANVAS_LMS_API = 'Canvas LMS API'

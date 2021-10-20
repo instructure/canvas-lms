@@ -100,7 +100,7 @@ describe Quizzes::QuizzesController do
     it "filters out unpublished quizzes for student" do
       user_session(@student)
       course_quiz
-      course_quiz(active = true)
+      course_quiz(true)
 
       get 'index', params: { :course_id => @course.id }
 
@@ -112,7 +112,7 @@ describe Quizzes::QuizzesController do
 
     it 'implicitly grades outstanding submissions for user in course' do
       user_session(@student)
-      course_quiz(active = true)
+      course_quiz(true)
 
       expect(Quizzes::OutstandingQuizSubmissionManager).to receive(:grade_by_course)
 
@@ -599,7 +599,7 @@ describe Quizzes::QuizzesController do
 
     it "doesn't show unpublished quizzes to students with draft state" do
       user_session(@student)
-      course_quiz(active = true)
+      course_quiz(true)
       @quiz.unpublish!
       get 'show', params: { course_id: @course.id, id: @quiz.id }
       expect(response).not_to be_successful
@@ -1350,7 +1350,7 @@ describe Quizzes::QuizzesController do
 
     it "does not allow viewing other submissions if not a teacher" do
       user_session(@student)
-      s = @quiz.generate_submission(@student2)
+      @quiz.generate_submission(@student2)
       @submission = @quiz.generate_submission(@student)
       get 'history', params: { :course_id => @course.id, :quiz_id => @quiz.id, :user_id => @student2.id }
       expect(response).not_to be_successful
@@ -2695,7 +2695,7 @@ describe Quizzes::QuizzesController do
     it "renders nothing if quiz is muted" do
       user_session(@teacher)
 
-      submission = @quiz.generate_submission @teacher
+      @quiz.generate_submission @teacher
 
       assignment = @course.assignments.create(:title => "Test Assignment")
       assignment.workflow_state = "available"
@@ -2732,7 +2732,7 @@ describe Quizzes::QuizzesController do
       course_with_teacher(active_all: true)
       @student1, @student2 = n_students_in_course(2, :active_all => true, :course => @course)
       @course_section = @course.course_sections.create!
-      course_quiz(active = true)
+      course_quiz(true)
       @quiz.only_visible_to_overrides = true
       @quiz.save!
       student_in_section(@course_section, user: @student1)
@@ -2779,7 +2779,7 @@ describe Quizzes::QuizzesController do
 
     before do
       course_with_teacher
-      course_quiz(active = true)
+      course_quiz(true)
       @quiz.save!
       allow(@quiz).to receive(:grants_right?) do |user, sess, rights|
         if rights.nil?

@@ -130,7 +130,7 @@ describe SIS::CSV::GroupMembershipImporter do
     )
     group = @account.all_groups.where(sis_source_id: 'G001').take
     deleted_gm = GroupMembership.where(group_id: group, user_id: @user1).take
-    new_gm = group.group_memberships.create!(:workflow_state => 'accepted', :user => @user1)
+    group.group_memberships.create!(:workflow_state => 'accepted', :user => @user1)
     batch2.restore_states_for_batch
     expect(batch2.sis_batch_errors.last.message).to include("Couldn't rollback SIS batch data for row")
     expect(batch2.roll_back_data.where(context_type: "GroupMembership", context_id: deleted_gm.id).take.workflow_state).to eq 'failed'

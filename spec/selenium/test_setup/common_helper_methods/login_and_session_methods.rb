@@ -92,7 +92,7 @@ module LoginAndSessionMethods
 
   def enter_student_view(opts = {})
     course = opts[:course] || @course || course(opts)
-    get "/courses/#{@course.id}/users"
+    get "/courses/#{course.id}/users"
     driver.execute_script("$('#easy_student_view').click()")
     wait_for_ajaximations
   end

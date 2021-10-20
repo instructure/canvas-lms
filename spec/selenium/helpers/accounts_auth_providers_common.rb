@@ -69,7 +69,6 @@ module AuthenticationProvidersCommon
   def add_saml_config
     get "/accounts/#{Account.default.id}/authentication_providers"
     add_auth_type('SAML')
-    saml_form = f("#new_saml")
     set_value(f("#idp_entity_id_saml"), 'entity.example')
     set_value(f("#log_in_url_saml"), 'login.example')
     set_value(f("#log_out_url_saml"), 'logout.example')
@@ -96,7 +95,6 @@ module AuthenticationProvidersCommon
   def add_facebook_config
     get "/accounts/#{Account.default.id}/authentication_providers"
     add_auth_type('Facebook')
-    facebook_form = f("#new_facebook")
     set_value(f("#app_id_facebook"), '123')
     f("#new_facebook button[type='submit']").click
     wait_for_ajaximations

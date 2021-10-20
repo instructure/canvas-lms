@@ -34,7 +34,7 @@ describe SelfEnrollmentsController do
     end
 
     it "does the delegated auth dance" do
-      account = account_with_cas({ :account => Account.default })
+      account_with_cas({ :account => Account.default })
 
       get 'new', params: { :self_enrollment_code => @course.self_enrollment_code }
       expect(response).to redirect_to login_url

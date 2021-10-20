@@ -110,7 +110,6 @@ describe Canvas::APISerializer do
       end
       object = Foo.new(1, 'Bob')
       expect(object).to receive(:bar).and_return Foo.new(1, 'Alice')
-      url = "http://example.com/api/v1/bar/1"
       serializer = FooSerializer.new(object, { root: nil, controller: con })
       expect(serializer.as_json(root: nil)['links']['bar']).to eq "1"
       Object.send(:remove_const, :BarSerializer)

@@ -205,7 +205,6 @@ describe "assignment groups" do
 
   # Because of the way this feature was made, i recommend we keep this one
   it "moves assignments to another assignment group", priority: "2", test_id: 210001 do
-    before_count = @assignment_group.assignments.count
     @ag2 = @course.assignment_groups.create!(name: "2nd Group")
     @assignment = @course.assignments.create(name: "Test assignment", assignment_group: @ag2)
     get "/courses/#{@course.id}/assignments"

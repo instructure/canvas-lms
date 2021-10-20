@@ -110,7 +110,7 @@ describe "submissions" do
     it "allows you to submit a file", priority: "1", test_id: 237022 do
       @assignment.submission_types = 'online_upload'
       @assignment.save!
-      filename, fullpath, data = get_file("testfile1.txt")
+      _filename, fullpath, _data = get_file("testfile1.txt")
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
@@ -178,7 +178,7 @@ describe "submissions" do
       skip('flaky, will be fixed in ADMIN-3015')
       @assignment.submission_types = 'online_upload'
       @assignment.save!
-      filename, fullpath, data = get_file("empty_file.txt")
+      _filename, fullpath, _data = get_file("empty_file.txt")
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
@@ -204,7 +204,7 @@ describe "submissions" do
       f('.submit_assignment_link').click
 
       # Select an assignment that has a wrong file extension
-      filename, fullpath, data = get_file("testfile1.txt")
+      _filename, fullpath, _data = get_file("testfile1.txt")
       f('.submission_attachment input').send_keys(fullpath)
 
       # Check that the error is being reported
@@ -331,7 +331,7 @@ describe "submissions" do
       @student1 = @user
       @assignment.submission_types = 'online_upload'
       @assignment.save!
-      filename, fullpath, data = get_file("testfile1.txt")
+      _filename, fullpath, _data = get_file("testfile1.txt")
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
@@ -474,7 +474,7 @@ describe "submissions" do
 
     describe "using lti tool for submission" do
       def create_submission_tool
-        tool = @course.context_external_tools.create!(
+        @course.context_external_tools.create!(
           name: 'submission tool',
           url: 'https://example.com/lti',
           consumer_key: 'key',
