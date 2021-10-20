@@ -18,12 +18,6 @@
 import {handleActions} from 'redux-actions'
 import {cloneDeep} from 'lodash'
 
-const defaultState = {
-  items: [],
-  missingItemsExpanded: false,
-  nextUrl: null
-}
-
 function setOpportunityState(state, action) {
   // merge payload into state, ignoring duplicates
   // this approach favors the existing item over the new
@@ -59,10 +53,11 @@ export default handleActions(
         ? true
         : !state.missingItemsExpanded
       return stateCopy
-    },
-    CLEAR_OPPORTUNITIES: () => {
-      return defaultState
     }
   },
-  defaultState
+  {
+    items: [],
+    missingItemsExpanded: false,
+    nextUrl: null
+  }
 )

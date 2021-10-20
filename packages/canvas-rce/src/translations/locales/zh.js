@@ -49,9 +49,6 @@ const locale = {
   "announcement_list_da155734": { "message": "公告列表" },
   "announcements_a4b8ed4a": { "message": "公告" },
   "apply_781a2546": { "message": "申请" },
-  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "将更改应用于课程中的此按钮和图标的所有实例"
-  },
   "apps_54d24a47": { "message": "应用程序" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "保留长宽比" },
   "assignments_1e02582c": { "message": "作业" },
@@ -62,6 +59,9 @@ const locale = {
   "audio_player_for_title_20cc70d": { "message": "{ title }的音频播放器" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "存在自动保存的内容。是否要改为加载自动保存的内容？"
+  },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "自动打开在线预览。（预览仅在保存后显示）"
   },
   "available_folders_694d0436": { "message": "可用文件夹" },
   "below_81d4dceb": { "message": "下方" },
@@ -138,6 +138,7 @@ const locale = {
   "details_98a31b68": { "message": "详情" },
   "dimensions_45ddb7b7": { "message": "尺寸" },
   "directionality_26ae9e08": { "message": "方向" },
+  "disable_in_line_preview_2a675175": { "message": "禁用在线预览。" },
   "discussions_a5f96392": { "message": "讨论" },
   "discussions_index_6c36ced": { "message": "讨论索引" },
   "display_options_315aba85": { "message": "显示选项" },
@@ -257,6 +258,7 @@ const locale = {
     "message": "必须至少为 { width } x { height }px"
   },
   "my_files_2f621040": { "message": "我的文件" },
+  "my_images_427f9b0c": { "message": "我的图像" },
   "name_1aed4a1b": { "message": "名称" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "导航菜单或工具栏"
@@ -327,6 +329,9 @@ const locale = {
   "show_link_options_545338fd": { "message": "显示链接选项" },
   "show_video_options_6ed3721a": { "message": "显示视频选项" },
   "size_b30e1077": { "message": "大小" },
+  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+    "message": "{ file }大于{ max } MB最大所允许的文件容量。"
+  },
   "small_b070434a": { "message": "小" },
   "something_went_wrong_89195131": { "message": "出了些问题。" },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

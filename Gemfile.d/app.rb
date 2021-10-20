@@ -60,9 +60,9 @@ gem 'bcrypt', '3.1.16'
 gem 'browser', '5.1.0', require: false
 gem 'builder', '3.2.4'
 gem 'business_time', '0.10.0'
-gem 'canvas_connect', '0.3.14'
+gem 'canvas_connect', '0.3.13'
   gem 'adobe_connect', '1.0.9', require: false
-gem 'canvas_webex', '0.18.0'
+gem 'canvas_webex', '0.17'
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'ddtrace', '0.42.0', require: false
 gem 'encrypted_cookie_store-instructure', '1.2.11', require: 'encrypted_cookie_store'
@@ -86,7 +86,7 @@ gem 'inst_statsd', '2.2.0'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
   gem 'dogstatsd-ruby', '4.8.2'
-gem 'inst-jobs', '3.0.0'
+gem 'inst-jobs', '3.0.1'
   gem 'fugit', '1.4.0', require: false
     gem 'et-orbi', '1.2.4', require: false
 gem 'inst-jobs-autoscaling', '2.1.1'

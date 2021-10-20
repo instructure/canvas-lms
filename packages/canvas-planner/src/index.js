@@ -50,7 +50,7 @@ const WeeklyPlannerHeader = React.lazy(() => import('./components/WeeklyPlannerH
 
 export * from './components'
 
-export {loadThisWeekItems, toggleMissingItems}
+export {loadThisWeekItems, startLoadingAllOpportunities, toggleMissingItems}
 
 export {responsiviser}
 
@@ -253,14 +253,7 @@ export function createPlannerApp() {
 
     store.dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
   } else {
-    const waitingOnObserveeContextCodes =
-      store.getState().selectedObservee?.id && !store.getState().selectedObservee?.contextCodes
-    if (!waitingOnObserveeContextCodes) {
-      store.dispatch(
-        getWeeklyPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day'))
-      )
-      store.dispatch(startLoadingAllOpportunities())
-    }
+    store.dispatch(getWeeklyPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
   }
 
   return (

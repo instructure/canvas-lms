@@ -38,28 +38,20 @@ class PacePlansController < ApplicationController
       end
     end
 
-    progress = Progress.find_by(context: @pace_plan, workflow_state: ['queued', 'running'], tag: 'pace_plan_publish')
-    progress_json = progress_json(progress, @current_user, session) if progress
-
     js_env({
              BLACKOUT_DATES: [],
              COURSE: course_json(@context, @current_user, session, [], nil),
              ENROLLMENTS: enrollments_json(@context),
              SECTIONS: sections_json(@context),
-             PACE_PLAN: PacePlanPresenter.new(@pace_plan).as_json,
-             PACE_PLAN_PROGRESS: progress_json
+             PACE_PLAN: PacePlanPresenter.new(@pace_plan).as_json
            })
     js_bundle :pace_plans
     css_bundle :pace_plans
   end
 
   def api_show
-    progress = Progress.find_by(context: @pace_plan, workflow_state: ['queued', 'running'], tag: 'pace_plan_publish')
-    progress_json = progress_json(progress, @current_user, session) if progress
-    render json: {
-      pace_plan: PacePlanPresenter.new(@pace_plan).as_json,
-      progress: progress_json
-    }
+    plans_json = PacePlanPresenter.new(@pace_plan).as_json
+    render json: { pace_plan: plans_json }
   end
 
   def new
@@ -96,21 +88,18 @@ class PacePlansController < ApplicationController
   end
 
   def publish
-    publish_pace_plan
-    render json: progress_json(@progress, @current_user, session)
+    progress = Progress.create!(context: @pace_plan, tag: 'pace_plan_publish')
+    progress.process_job(@pace_plan, :publish, {})
+    render json: progress_json(progress, @current_user, session)
   end
 
   def create
-    @pace_plan = @context.pace_plans.new(create_params)
+    pace_plan = @context.pace_plans.new(create_params)
 
-    if @pace_plan.save
-      publish_pace_plan
-      render json: {
-        pace_plan: PacePlanPresenter.new(@pace_plan).as_json,
-        progress: progress_json(@progress, @current_user, session)
-      }
+    if pace_plan.save
+      render json: PacePlanPresenter.new(pace_plan).as_json
     else
-      render json: { success: false, errors: @pace_plan.errors.full_messages }, status: :unprocessable_entity
+      render json: { success: false, errors: pace_plan.errors.full_messages }, status: :unprocessable_entity
     end
   end
 
@@ -120,11 +109,7 @@ class PacePlansController < ApplicationController
       # updated_at doesn't get modified
       @pace_plan.touch
 
-      publish_pace_plan
-      render json: {
-        pace_plan: PacePlanPresenter.new(@pace_plan).as_json,
-        progress: progress_json(@progress, @current_user, session)
-      }
+      render json: PacePlanPresenter.new(@pace_plan).as_json
     else
       render json: { success: false, errors: @pace_plan.errors.full_messages }, status: :unprocessable_entity
     end
@@ -211,10 +196,5 @@ class PacePlansController < ApplicationController
       :workflow_state,
       pace_plan_module_items_attributes: [:duration, :module_item_id, :root_account_id]
     )
-  end
-
-  def publish_pace_plan
-    @progress = Progress.create!(context: @pace_plan, tag: 'pace_plan_publish')
-    @progress.process_job(@pace_plan, :publish, {})
   end
 end
