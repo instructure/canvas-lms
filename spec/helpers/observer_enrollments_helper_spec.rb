@@ -171,12 +171,15 @@ describe ObserverEnrollmentsHelper do
   context "sharding" do
     specs_require_sharding
 
-    it "includes and sorts observed users from multiple shards" do
+    before :once do
       @shard2.activate do
         @student3 = user_factory(active_all: true, name: "Student 3")
-        @student3.sortable_name = "0" # before student 1
-        @student3.save!
       end
+    end
+
+    it "includes and sorts observed users from multiple shards" do
+      @student3.sortable_name = "0" # before student 1
+      @student3.save!
       @course1.enroll_student(@student3)
       enroll_observer(@course1, @observer, @student3)
       enroll_observer(@course1, @observer, @student1)
@@ -185,6 +188,21 @@ describe ObserverEnrollmentsHelper do
       expect(users.length).to be(2)
       expect(users[0][:name]).to eq("Student 3")
       expect(users[1][:name]).to eq("Student 1")
+    end
+
+    it "includes observers with observer enrollments in courses on another shard" do
+      enroll_observer(@course1, @observer, @student1)
+      @shard2.activate do
+        account = Account.create!
+        @course3 = course_factory(active_all: true, account: account)
+        @course3.enroll_student(@student3)
+        enroll_observer(@course3, @observer, @student3)
+
+        users = observed_users(@observer, nil)
+        expect(users.length).to be(2)
+        expect(users[0][:name]).to eq("Student 1")
+        expect(users[1][:name]).to eq("Student 3")
+      end
     end
   end
 end
