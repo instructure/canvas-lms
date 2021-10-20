@@ -24,19 +24,12 @@ import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-select'
 
-export const ALL_COURSES_ID = 'all_courses'
-
 const filterOptions = (value, options) => {
   const filteredOptions = {}
   Object.keys(options).forEach(key => {
-    if (key === 'allCourses') {
-      // if provided, allCourses should always be present
-      filteredOptions[key] = options[key]
-    } else {
-      filteredOptions[key] = options[key]?.filter(option =>
-        option.contextName.toLowerCase().startsWith(value.toLowerCase())
-      )
-    }
+    filteredOptions[key] = options[key]?.filter(option =>
+      option.contextName.toLowerCase().startsWith(value.toLowerCase())
+    )
   })
   return filteredOptions
 }
@@ -45,13 +38,6 @@ export class CourseSelect extends React.Component {
   static propTypes = {
     mainPage: PropTypes.bool.isRequired,
     options: PropTypes.shape({
-      allCourses: PropTypes.arrayOf(
-        PropTypes.shape({
-          _id: PropTypes.oneOf([ALL_COURSES_ID]).isRequired,
-          contextName: PropTypes.string,
-          assetString: PropTypes.string
-        })
-      ),
       favoriteCourses: PropTypes.arrayOf(
         PropTypes.shape({
           _id: PropTypes.string,
@@ -167,12 +153,11 @@ export class CourseSelect extends React.Component {
     const option = this.getOptionById(id)
     const contextName = option.contextName
     if (!option) return // prevent selecting of empty options
-    if (id === 'all_courses') id = null
     this.props.onCourseFilterSelect(id)
     this.setState(
       {
         selectedOptionId: id,
-        inputValue: id === null ? '' : option.contextName,
+        inputValue: option.contextName,
         isShowingOptions: false,
         filteredOptions: this.props.options
       },
@@ -217,8 +202,6 @@ export class CourseSelect extends React.Component {
         return I18n.t('Concluded Courses')
       case 'groups':
         return I18n.t('Groups')
-      case 'allCourses':
-        return I18n.t('Courses')
     }
   }
 

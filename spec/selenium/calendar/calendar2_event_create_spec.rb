@@ -82,7 +82,7 @@ describe "calendar2" do
         expect(CalendarEvent.last.location_address).to eq location_address
       end
 
-      it 'consistently formats date <input> value to what datepicker would set it as, even in langs that have funky formatting' do
+      it 'cosistentlies format date <input> value to what datepicker would set it as, even in langs that have funky formatting' do
         skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
         skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
         @user.locale = 'fr'
@@ -338,8 +338,7 @@ describe "calendar2" do
                      datetime.change({ day: 15 })
                    end
         replace_content(f('input[name=date]'), format_date_for_view(datetime, :short))
-        f('button[type=submit]').click
-        wait_for_ajaximations
+        f('.validated-form-view').submit
         refresh_page
         f('.fc-content .fc-title').click
         event_content = fj('.event-details-content:visible')

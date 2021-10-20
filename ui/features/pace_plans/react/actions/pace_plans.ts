@@ -19,7 +19,7 @@
 import {Action} from 'redux'
 import {ThunkAction} from 'redux-thunk'
 
-import {PacePlan, PlanContextTypes, StoreState} from '../types'
+import {PacePlan, PlanContextTypes, StoreState, PublishOptions} from '../types'
 import {createAction, ActionsUnion} from '../shared/types'
 import {actions as uiActions} from './ui'
 import * as Api from '../api/pace_plan_api'
@@ -31,8 +31,9 @@ export enum Constants {
   TOGGLE_EXCLUDE_WEEKENDS = 'PACE_PLAN/TOGGLE_EXCLUDE_WEEKENDS',
   SET_PACE_PLAN = 'PACE_PLAN/SET_PACE_PLAN',
   PLAN_CREATED = 'PACE_PLAN/PLAN_CREATED',
+  SET_UNPUBLISHED_CHANGES = 'PACE_PLAN/SET_UNPUBLISHED_CHANGES',
   TOGGLE_HARD_END_DATES = 'PACE_PLAN/TOGGLE_HARD_END_DATES',
-  RESET_PLAN = 'PACE_PLAN/RESET_PLAN'
+  SET_LINKED_TO_PARENT = 'PACE_PLAN/SET_LINKED_TO_PARENT'
 }
 
 /* Action creators */
@@ -42,25 +43,38 @@ type LoadingAfterAction = (plan: PacePlan) => any
 type SetEndDate = {type: Constants.SET_END_DATE; payload: string}
 
 const regularActions = {
-  setPacePlan: (plan: PacePlan) =>
-    createAction(Constants.SET_PACE_PLAN, {...plan, originalPlan: plan}),
+  setPacePlan: (plan: PacePlan) => createAction(Constants.SET_PACE_PLAN, plan),
   setStartDate: (date: string) => createAction(Constants.SET_START_DATE, date),
   setEndDate: (date: string): SetEndDate => createAction(Constants.SET_END_DATE, date),
   planCreated: (plan: PacePlan) => createAction(Constants.PLAN_CREATED, plan),
   toggleExcludeWeekends: () => createAction(Constants.TOGGLE_EXCLUDE_WEEKENDS),
   toggleHardEndDates: () => createAction(Constants.TOGGLE_HARD_END_DATES),
-  resetPlan: () => createAction(Constants.RESET_PLAN)
+  setLinkedToParent: (linked: boolean) => createAction(Constants.SET_LINKED_TO_PARENT, linked),
+  setUnpublishedChanges: (unpublishedChanges: boolean) =>
+    createAction(Constants.SET_UNPUBLISHED_CHANGES, unpublishedChanges)
 }
 
 const thunkActions = {
-  publishPlan: (): ThunkAction<void, StoreState, void, Action> => {
+  publishPlan: (
+    publishForOption: PublishOptions,
+    publishForSectionIds: Array<string>,
+    publishForEnrollmentIds: Array<string>
+  ): ThunkAction<void, StoreState, void, Action> => {
     return (dispatch, getState) => {
+      dispatch(uiActions.showLoadingOverlay('Publishing...'))
       dispatch(uiActions.publishPlanStarted())
 
-      return Api.publish(getState().pacePlan)
-        .then(updatedPlan => {
-          if (!updatedPlan) throw new Error('Response body was empty')
-          dispatch(pacePlanActions.setPacePlan(updatedPlan))
+      Api.waitForActionCompletion(() => getState().ui.autoSaving)
+
+      return Api.publish(
+        getState().pacePlan,
+        publishForOption,
+        publishForSectionIds,
+        publishForEnrollmentIds
+      )
+        .then(newDraftPlan => {
+          if (!newDraftPlan) throw new Error('Response body was empty')
+          dispatch(pacePlanActions.setPacePlan(newDraftPlan))
           dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.publishPlanFinished())
         })
@@ -121,14 +135,11 @@ const thunkActions = {
   },
   relinkToParentPlan: (): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
-      const pacePlanId = getState().pacePlan.id
-      if (!pacePlanId) return Promise.reject(new Error('Cannot relink unsaved plans'))
-
       dispatch(uiActions.showLoadingOverlay('Relinking plans...'))
 
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
-      return Api.relinkToParentPlan(pacePlanId)
+      return Api.relinkToParentPlan(getState().pacePlan.id)
         .then(pacePlan => {
           if (!pacePlan) throw new Error('Response body was empty')
           dispatch(pacePlanActions.setPacePlan(pacePlan))

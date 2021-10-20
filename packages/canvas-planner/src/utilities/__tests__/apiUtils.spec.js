@@ -21,8 +21,7 @@ import {
   transformInternalToApiItem,
   transformInternalToApiOverride,
   transformPlannerNoteApiToInternalItem,
-  transformApiToInternalGrade,
-  observedUserId
+  transformApiToInternalGrade
 } from '../apiUtils'
 
 const courses = [
@@ -637,26 +636,5 @@ describe('transformApiToInternalGrade', () => {
         ]
       })
     ).toMatchSnapshot()
-  })
-})
-
-describe('observedUserId', () => {
-  const defaultState = {
-    currentUser: {id: '3'},
-    selectedObservee: null
-  }
-
-  it('returns undefined if selectedObservee.id does not exist', () => {
-    expect(observedUserId(defaultState)).toBeUndefined()
-  })
-
-  it('returns undefined if the selectedObservee is the same as the current user', () => {
-    const state = {...defaultState, selectedObservee: {id: '3'}}
-    expect(observedUserId(state)).toBeUndefined()
-  })
-
-  it('returns the observee id if present and not the current user', () => {
-    const state = {...defaultState, selectedObservee: {id: '2'}}
-    expect(observedUserId(state)).toBe('2')
   })
 })
