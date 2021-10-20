@@ -74,10 +74,14 @@ describe PacePlanModuleItem do
   end
 
   context "validation" do
-    it "requires the module item to be assignable" do
+    it "requires the module item to have an assignment" do
       quiz = @course.quizzes.create!
       quiz_tag = @mod2.add_item id: quiz.id, type: 'quiz'
       header_tag = @mod2.add_item type: 'context_module_sub_header', title: 'not an assignment'
+      expect(@pace_plan.pace_plan_module_items.build(module_item: quiz_tag)).not_to be_valid
+      expect(@pace_plan.pace_plan_module_items.build(module_item: header_tag)).not_to be_valid
+      quiz.save! # Save again to create associated assignment
+      quiz_tag.reload
       expect(@pace_plan.pace_plan_module_items.build(module_item: quiz_tag)).to be_valid
       expect(@pace_plan.pace_plan_module_items.build(module_item: header_tag)).not_to be_valid
     end

@@ -36,7 +36,7 @@ class PacePlanModuleItem < ActiveRecord::Base
                   }
 
   def assignable_module_item
-    unless module_item&.can_have_assignment?
+    unless module_item&.assignment
       self.errors.add(:module_item, 'is not assignable')
     end
   end
