@@ -59,7 +59,7 @@ describe LiveAssessments::ResultsController, type: :request do
         create_results(result_hashes)
         data = json_parse
         expect(data['results'].count).to eq 2
-        results = data['results'].map { |r| result = LiveAssessments::Result.find(r['id']) }
+        results = data['results'].map { |r| LiveAssessments::Result.find(r['id']) }
         results.each do |r|
           expect(r.assessor).to eq teacher
           expect(r.assessment).to eq assessment
@@ -97,7 +97,7 @@ describe LiveAssessments::ResultsController, type: :request do
 
     context 'as a teacher' do
       it 'returns all the results for the assessment' do
-        results = [student, another_student].map do |s|
+        [student, another_student].each do |s|
           assessment.results.create!(user: s, assessor: teacher, passed: true, assessed_at: assessed_at)
         end
         index_results({})
@@ -114,7 +114,7 @@ describe LiveAssessments::ResultsController, type: :request do
       end
 
       it 'filters the results by user' do
-        results = [student, another_student].map do |s|
+        [student, another_student].each do |s|
           assessment.results.create!(user: s, assessor: teacher, passed: true, assessed_at: assessed_at)
         end
         index_results({ user_id: another_student.id })

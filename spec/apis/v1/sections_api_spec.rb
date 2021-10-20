@@ -67,11 +67,10 @@ describe SectionsController, type: :request do
     end
 
     it "returns the count of active and invited students if 'total_students' flag is given" do
-      user1 = @user
       user2 = User.create!(:name => 'Bernard')
       user3 = User.create!(:name => 'Hoagie')
       user4 = User.create!(:name => 'Laverne')
-      section1 = @course2.default_section
+      @course2.default_section
       section2 = @course2.course_sections.create!(:name => 'Section 31')
 
       @course2.enroll_user(user2, 'StudentEnrollment', :section => section2).accept!
@@ -89,7 +88,7 @@ describe SectionsController, type: :request do
     end
 
     it "does not return deleted sections" do
-      section1 = @course2.default_section
+      @course2.default_section
       section2 = @course2.course_sections.create!(:name => 'Section B')
       section2.destroy
       section2.save!
@@ -283,7 +282,7 @@ describe SectionsController, type: :request do
 
       it "is not accessible if the associated course is not accessible" do
         @course.destroy
-        json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }), {}, {}, :expected_status => 404)
+        api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }), {}, {}, :expected_status => 404)
       end
     end
 
@@ -424,10 +423,10 @@ describe SectionsController, type: :request do
         old_section.sis_source_id = 'fail'
         old_section.save!
 
-        json = api_call(:post, @path_prefix, @path_params, { :course_section =>
+        api_call(:post, @path_prefix, @path_params, { :course_section =>
             { :name => 'Name', :start_at => '2011-01-01T01:00Z',
               :end_at => '2011-07-01T01:00Z', :sis_section_id => 'fail' },
-                                                             :enable_sis_reactivation => '1' }, {}, { :expected_status => 400 })
+                                                      :enable_sis_reactivation => '1' }, {}, { :expected_status => 400 })
       end
 
       it "carries on if there's no section to reactivate" do
@@ -927,8 +926,8 @@ describe SectionsController, type: :request do
 
       it "fails if the section is not crosslisted" do
         other_section = @course.course_sections.create! :name => 'other section'
-        json = api_call(:delete, "/api/v1/sections/#{other_section.id}/crosslist",
-                        @params.merge(:id => other_section.to_param), {}, {}, :expected_status => 400)
+        api_call(:delete, "/api/v1/sections/#{other_section.id}/crosslist",
+                 @params.merge(:id => other_section.to_param), {}, {}, :expected_status => 400)
       end
 
       it "fails if the section is deleted" do
@@ -957,8 +956,8 @@ describe SectionsController, type: :request do
       end
 
       it "disallows un-crosslisting" do
-        json = api_call(:delete, "/api/v1/sections/#{@section.id}/crosslist",
-                        @params.merge(:id => @section.to_param), {}, {}, :expected_status => 401)
+        api_call(:delete, "/api/v1/sections/#{@section.id}/crosslist",
+                 @params.merge(:id => @section.to_param), {}, {}, :expected_status => 401)
       end
     end
   end

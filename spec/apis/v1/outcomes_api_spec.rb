@@ -1063,11 +1063,11 @@ describe "Outcomes API", type: :request do
             new_title = "some new title"
             new_display_name = "some display name"
             new_desc = "some new description or something"
-            json = api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
-                            { :controller => 'outcomes_api', :action => 'update',
-                              :id => @outcome.id.to_s, :format => 'json' },
-                            { :title => new_title, :description => new_desc, :display_name => new_display_name },
-                            {}, { :expected_status => 200 })
+            api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
+                     { :controller => 'outcomes_api', :action => 'update',
+                       :id => @outcome.id.to_s, :format => 'json' },
+                     { :title => new_title, :description => new_desc, :display_name => new_display_name },
+                     {}, { :expected_status => 200 })
             @outcome.reload
             expect(@outcome.title).to eq new_title
             expect(@outcome.display_name).to eq new_display_name
@@ -1089,11 +1089,11 @@ describe "Outcomes API", type: :request do
             it "allows updating rating descriptions even when assessed" do
               new_ratings = [{ description: "some new desc1", points: 5 },
                              { description: "some new desc2", points: 1 }]
-              json = api_call(:put, "/api/v1/outcomes/#{@outcome2.id}",
-                              { :controller => 'outcomes_api', :action => 'update',
-                                :id => @outcome2.id.to_s, :format => 'json' },
-                              { :ratings => new_ratings },
-                              {}, { :expected_status => 200 })
+              api_call(:put, "/api/v1/outcomes/#{@outcome2.id}",
+                       { :controller => 'outcomes_api', :action => 'update',
+                         :id => @outcome2.id.to_s, :format => 'json' },
+                       { :ratings => new_ratings },
+                       {}, { :expected_status => 200 })
               @outcome2.reload
               expect(@outcome2.rubric_criterion[:ratings]).to eq new_ratings
             end
@@ -1101,21 +1101,21 @@ describe "Outcomes API", type: :request do
             it "allows updating rating points" do
               new_ratings = [{ description: "some new desc1", points: 5 },
                              { description: "some new desc2", points: 3 }]
-              json = api_call(:put, "/api/v1/outcomes/#{@outcome2.id}",
-                              { :controller => 'outcomes_api', :action => 'update',
-                                :id => @outcome2.id.to_s, :format => 'json' },
-                              { :ratings => new_ratings },
-                              {}, { :expected_status => 200 })
+              api_call(:put, "/api/v1/outcomes/#{@outcome2.id}",
+                       { :controller => 'outcomes_api', :action => 'update',
+                         :id => @outcome2.id.to_s, :format => 'json' },
+                       { :ratings => new_ratings },
+                       {}, { :expected_status => 200 })
               @outcome2.reload
               expect(@outcome2.rubric_criterion[:ratings]).to eq new_ratings
             end
 
             it "allows updating mastery points" do
-              json = api_call(:put, "/api/v1/outcomes/#{@outcome2.id}",
-                              { :controller => 'outcomes_api', :action => 'update',
-                                :id => @outcome2.id.to_s, :format => 'json' },
-                              { :mastery_points => 7 },
-                              {}, { :expected_status => 200 })
+              api_call(:put, "/api/v1/outcomes/#{@outcome2.id}",
+                       { :controller => 'outcomes_api', :action => 'update',
+                         :id => @outcome2.id.to_s, :format => 'json' },
+                       { :mastery_points => 7 },
+                       {}, { :expected_status => 200 })
               @outcome2.reload
               expect(@outcome2.rubric_criterion[:mastery_points]).to eq 7
             end

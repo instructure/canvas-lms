@@ -569,9 +569,9 @@ describe ConversationsController, type: :request do
       end
 
       it "adds a context to a private conversation" do
-        json = api_call(:post, "/api/v1/conversations",
-                        { :controller => 'conversations', :action => 'create', :format => 'json' },
-                        { :recipients => [@bob.id], :body => "test", :context_code => "course_#{@course.id}" })
+        api_call(:post, "/api/v1/conversations",
+                 { :controller => 'conversations', :action => 'create', :format => 'json' },
+                 { :recipients => [@bob.id], :body => "test", :context_code => "course_#{@course.id}" })
         expect(@bob.conversations.last.conversation.context).to eql(@course)
       end
 
@@ -708,10 +708,10 @@ describe ConversationsController, type: :request do
           # if they happen to be in another course it shouldn't use those tags - otherwise it will show up in the "sent" for other courses
           @course.account.role_overrides.where(permission: 'send_messages_all', role: teacher_role).update_all(enabled: true)
 
-          json = api_call(:post, "/api/v1/conversations",
-                          { :controller => 'conversations', :action => 'create', :format => 'json' },
-                          { :recipients => [@course.asset_string], :body => "test", :context_code => @course.asset_string,
-                            :bulk_message => "1", :group_conversation => "1" })
+          api_call(:post, "/api/v1/conversations",
+                   { :controller => 'conversations', :action => 'create', :format => 'json' },
+                   { :recipients => [@course.asset_string], :body => "test", :context_code => @course.asset_string,
+                     :bulk_message => "1", :group_conversation => "1" })
 
           @user.all_conversations.sent.each do |cp|
             expect(cp.tags).to eq [@course.asset_string]
@@ -1114,7 +1114,7 @@ describe ConversationsController, type: :request do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id], :body => "test", :subject => "a" * 256 },
-                        headers = {},
+                        {},
                         { expected_status: 400 })
         expect(json["errors"]).not_to be_nil
         expect(json["errors"]["subject"]).not_to be_nil
@@ -1124,7 +1124,7 @@ describe ConversationsController, type: :request do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id, @course.asset_string], :body => "test", :subject => "hey erryone" },
-                        headers = {},
+                        {},
                         { expected_status: 400 })
         expect(json[0]["attribute"]).to eql "recipients"
         expect(json[0]["message"]).to eql "restricted by role"
@@ -1134,7 +1134,7 @@ describe ConversationsController, type: :request do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id, "course_#{@course.id}_students"], :body => "test", :subject => "hey ho" },
-                        headers = {},
+                        {},
                         { expected_status: 400 })
         expect(json[0]["attribute"]).to eql "recipients"
         expect(json[0]["message"]).to eql "restricted by role"
@@ -1144,7 +1144,7 @@ describe ConversationsController, type: :request do
         api_call(:post, "/api/v1/conversations",
                  { :controller => 'conversations', :action => 'create', :format => 'json' },
                  { :recipients => [@bob.id, "course_#{@course.id}_teachers"], :body => "test", :subject => "halp" },
-                 headers = {},
+                 {},
                  { expected_status: 201 })
       end
 
@@ -1177,9 +1177,9 @@ describe ConversationsController, type: :request do
           end
 
           @user = @me
-          json = api_call(:post, "/api/v1/conversations",
-                          { :controller => 'conversations', :action => 'create', :format => 'json' },
-                          { :recipients => [@other_student.id], :body => "test", :context_code => "course_#{@other_course.id}" })
+          api_call(:post, "/api/v1/conversations",
+                   { :controller => 'conversations', :action => 'create', :format => 'json' },
+                   { :recipients => [@other_student.id], :body => "test", :context_code => "course_#{@other_course.id}" })
           expect(@other_student.conversations.last.conversation.shard).to eq @shard1
         end
 
@@ -1260,7 +1260,7 @@ describe ConversationsController, type: :request do
       media_object.user = @me
       media_object.title = "test title"
       media_object.save!
-      message = conversation.add_message("another", :attachment_ids => [attachment.id], :media_comment => media_object)
+      conversation.add_message("another", :attachment_ids => [attachment.id], :media_comment => media_object)
 
       conversation.reload
 
@@ -1410,7 +1410,7 @@ describe ConversationsController, type: :request do
     it "still includes attachment verifiers when using session auth" do
       conversation = conversation(@bob)
       attachment = @me.conversation_attachments_folder.attachments.create!(:context => @me, :filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('test'))
-      message = conversation.add_message("another", :attachment_ids => [attachment.id], :media_comment => media_object)
+      conversation.add_message("another", :attachment_ids => [attachment.id], :media_comment => media_object)
       conversation.reload
       user_session(@user)
       get "/api/v1/conversations/#{conversation.conversation_id}"
@@ -1728,9 +1728,9 @@ describe ConversationsController, type: :request do
       conversation = conversation(@bob, private: false)
       message = conversation.add_message("you're swell, @bob")
 
-      json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
-                      { :controller => 'conversations', :action => 'add_message', :id => conversation.conversation_id.to_s, :format => 'json' },
-                      { :body => "man, @bob sure does suck", :recipients => [@billy.id] })
+      api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
+               { :controller => 'conversations', :action => 'add_message', :id => conversation.conversation_id.to_s, :format => 'json' },
+               { :body => "man, @bob sure does suck", :recipients => [@billy.id] })
       # at this point, @billy can see ^^^ that message, but not the first one. @bob can't see ^^^ that one. everyone is a conversation participant now
       conversation.reload
       bob_sucks = conversation.conversation.conversation_messages.first
@@ -1791,9 +1791,9 @@ describe ConversationsController, type: :request do
       real_conversation.save!
 
       @user = @other
-      json = api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
-                      { :controller => 'conversations', :action => 'add_message', :id => real_conversation.id.to_s, :format => 'json' },
-                      { :body => "ok", :recipients => [@admin.id.to_s] })
+      api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
+               { :controller => 'conversations', :action => 'add_message', :id => real_conversation.id.to_s, :format => 'json' },
+               { :body => "ok", :recipients => [@admin.id.to_s] })
       real_conversation.reload
       new_message = real_conversation.conversation_messages.first
       expect(new_message.conversation_message_participants.size).to eq 2
@@ -1807,9 +1807,9 @@ describe ConversationsController, type: :request do
 
       @joe.enrollments.each { |e| e.destroy }
       @user = @billy
-      json = api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
-                      { :controller => 'conversations', :action => 'add_message', :id => real_conversation.id.to_s, :format => 'json' },
-                      { :body => "ok", :recipients => [@bob, @billy, @jane, @joe].map(&:id).map(&:to_s) })
+      api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
+               { :controller => 'conversations', :action => 'add_message', :id => real_conversation.id.to_s, :format => 'json' },
+               { :body => "ok", :recipients => [@bob, @billy, @jane, @joe].map(&:id).map(&:to_s) })
       real_conversation.reload
       new_message = real_conversation.conversation_messages.first
       expect(new_message.conversation_message_participants.size).to eq 4
@@ -2074,8 +2074,8 @@ describe ConversationsController, type: :request do
   context "batches" do
     it "returns all in-progress batches" do
       batch1 = ConversationBatch.generate(Conversation.build_message(@me, "hi all"), [@bob, @billy], :async)
-      batch2 = ConversationBatch.generate(Conversation.build_message(@me, "ohai"), [@bob, @billy], :sync)
-      batch3 = ConversationBatch.generate(Conversation.build_message(@bob, "sup"), [@me, @billy], :async)
+      ConversationBatch.generate(Conversation.build_message(@me, "ohai"), [@bob, @billy], :sync)
+      ConversationBatch.generate(Conversation.build_message(@bob, "sup"), [@me, @billy], :async)
 
       json = api_call(:get, "/api/v1/conversations/batches",
                       :controller => 'conversations',
@@ -2299,22 +2299,22 @@ describe ConversationsController, type: :request do
       expect(@joe.conversations.size).to eql 1
 
       account_admin_user_with_role_changes(:account => Account.site_admin, :role_changes => { :manage_students => false })
-      json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
-                          { :controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s },
-                          { :domain_root_account => Account.site_admin })
+      raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
+                   { :controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s },
+                   { :domain_root_account => Account.site_admin })
       assert_status(401)
 
       account_admin_user
-      p = Account.default.pseudonyms.create!(:unique_id => 'admin', :user => @user)
-      json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
-                          { :controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s },
-                          {})
+      Account.default.pseudonyms.create!(:unique_id => 'admin', :user => @user)
+      raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
+                   { :controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s },
+                   {})
       assert_status(401)
 
       @user = @me
-      json = raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
-                          { :controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s },
-                          {})
+      raw_api_call(:delete, "/api/v1/conversations/#{conv.id}/delete_for_all",
+                   { :controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => conv.id.to_s },
+                   {})
       assert_status(401)
 
       expect(@me.all_conversations.size).to eql 1
@@ -2323,9 +2323,9 @@ describe ConversationsController, type: :request do
 
     it "fails if conversation doesn't exist" do
       site_admin_user
-      json = raw_api_call(:delete, "/api/v1/conversations/0/delete_for_all",
-                          { :controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => "0" },
-                          {})
+      raw_api_call(:delete, "/api/v1/conversations/0/delete_for_all",
+                   { :controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => "0" },
+                   {})
       assert_status(404)
     end
 
@@ -2436,9 +2436,9 @@ describe ConversationsController, type: :request do
     end
 
     it 'returns a paginated response with proper link headers' do
-      json = api_call(:get, "/api/v1/conversations/deleted",
-                      { :controller => 'conversations', :action => 'deleted_index', :format => 'json',
-                        :user_id => @bob.id })
+      api_call(:get, "/api/v1/conversations/deleted",
+               { :controller => 'conversations', :action => 'deleted_index', :format => 'json',
+                 :user_id => @bob.id })
 
       links = response.headers['Link'].split(",")
       expect(links.all? { |l| l =~ /api\/v1\/conversations\/deleted/ }).to be_truthy
@@ -2534,9 +2534,9 @@ describe ConversationsController, type: :request do
     it 'restores the message' do
       message = @c1.all_messages.first()
 
-      json = api_call(:put, "/api/v1/conversations/restore",
-                      { :controller => "conversations", :action => "restore_message", :format => "json",
-                        :user_id => @bob.id, :message_id => message.id, :conversation_id => @c1.conversation_id })
+      api_call(:put, "/api/v1/conversations/restore",
+               { :controller => "conversations", :action => "restore_message", :format => "json",
+                 :user_id => @bob.id, :message_id => message.id, :conversation_id => @c1.conversation_id })
 
       expect(response.status).to eql 200
 
@@ -2551,9 +2551,9 @@ describe ConversationsController, type: :request do
 
       message = @c1.all_messages.first()
 
-      json = api_call(:put, "/api/v1/conversations/restore",
-                      { :controller => "conversations", :action => "restore_message", :format => "json",
-                        :user_id => @bob.id, :message_id => message.id, :conversation_id => @c1.conversation_id })
+      api_call(:put, "/api/v1/conversations/restore",
+               { :controller => "conversations", :action => "restore_message", :format => "json",
+                 :user_id => @bob.id, :message_id => message.id, :conversation_id => @c1.conversation_id })
 
       expect(response.status).to eql 200
 

@@ -152,7 +152,7 @@ describe "CSP Settings API", type: :request do
       end
 
       it "disables explicitly" do
-        json = set_csp_setting(@course, "disabled")
+        set_csp_setting(@course, "disabled")
         expect(@course.reload.csp_disabled?).to eq true
       end
     end
@@ -167,7 +167,7 @@ describe "CSP Settings API", type: :request do
       it "is not blocked when locked on self" do
         @sub.enable_csp!
         @sub.lock_csp!
-        json = set_csp_setting(@sub, "disabled")
+        set_csp_setting(@sub, "disabled")
         expect(Account.find(@sub.id).csp_enabled?).to eq false
       end
 
@@ -236,7 +236,7 @@ describe "CSP Settings API", type: :request do
     end
 
     it "tries to parse the domain" do
-      json = add_domain(@sub, "domain; default-src badexample.com", 400)
+      add_domain(@sub, "domain; default-src badexample.com", 400)
       expect(@sub.reload.csp_domains.active.pluck(:domain)).to be_empty
     end
   end
