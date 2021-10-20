@@ -71,6 +71,17 @@ module Types
       object.locked_for?(current_user, check_policies: true)
     end
 
+    field :available_for_user, Boolean, null: false
+    def available_for_user
+      locked_info = object.locked_for?(current_user, check_policies: true)
+
+      if locked_info
+        !locked_info[:unlock_at]
+      else
+        !locked_info
+      end
+    end
+
     field :initial_post_required_for_current_user, Boolean, null: false
     def initial_post_required_for_current_user
       object.initial_post_required?(current_user, session)
