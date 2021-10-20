@@ -67,7 +67,9 @@ export const ReportReply = props => {
             </View>
             <RadioInputGroup
               name={I18n.t('Report Reply Options')}
-              onChange={inputType => setSelectedReportType(inputType)}
+              onChange={event => {
+                setSelectedReportType(event.target.value)
+              }}
               description={I18n.t('Please select a reason for reporting this reply')}
             >
               {REPORT_TYPES.map(reportType => (
