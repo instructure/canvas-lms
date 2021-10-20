@@ -20,11 +20,7 @@ import {createActions, createAction} from 'redux-actions'
 import axios from 'axios'
 import buildURL from 'axios/lib/helpers/buildURL'
 import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
-import {
-  getContextCodesFromState,
-  transformApiToInternalItem,
-  observedUserId
-} from '../utilities/apiUtils'
+import {getContextCodesFromState, transformApiToInternalItem} from '../utilities/apiUtils'
 import {alert} from '../utilities/alertUtils'
 import formatMessage from '../format-message'
 import {itemsToDays} from '../utilities/daysUtils'
@@ -54,7 +50,8 @@ export const {
   jumpToWeek,
   jumpToThisWeek,
   gotWayPastItemDate,
-  gotWayFutureItemDate
+  gotWayFutureItemDate,
+  clearWeeklyItems
 } = createActions(
   'START_LOADING_ITEMS',
   'CONTINUE_LOADING_INITIAL_ITEMS',
@@ -80,7 +77,8 @@ export const {
   'JUMP_TO_WEEK',
   'JUMP_TO_THIS_WEEK',
   'GOT_WAY_FUTURE_ITEM_DATE',
-  'GOT_WAY_PAST_ITEM_DATE'
+  'GOT_WAY_PAST_ITEM_DATE',
+  'CLEAR_WEEKLY_ITEMS'
 )
 
 export const gettingPastItems = createAction(
@@ -197,12 +195,16 @@ export const loadPastUntilToday = () => dispatch => {
 // k5 week-at-a-time initial load
 export function getWeeklyPlannerItems(fromMoment) {
   return (dispatch, getState) => {
-    dispatch(startLoadingItems())
-    const weeklyState = getState().weeklyDashboard
-    dispatch(gettingInitWeekItems(weeklyState))
-    dispatch(getWayFutureItem(fromMoment))
-    dispatch(getWayPastItem(fromMoment))
-    loadWeekItems(dispatch, getState)
+    const waitingOnObserveeContextCodes =
+      getState().selectedObservee?.id && !getState().selectedObservee?.contextCodes
+    if (!waitingOnObserveeContextCodes) {
+      dispatch(startLoadingItems())
+      const weeklyState = getState().weeklyDashboard
+      dispatch(gettingInitWeekItems(weeklyState))
+      dispatch(getWayFutureItem(fromMoment))
+      dispatch(getWayPastItem(fromMoment))
+      loadWeekItems(dispatch, getState)
+    }
   }
 }
 
@@ -406,4 +408,10 @@ function transformItems(loadingOptions, items) {
       loadingOptions.getState().timeZone
     )
   )
+}
+
+function observedUserId(state) {
+  if (state.selectedObservee?.id && state.selectedObservee.id !== state.currentUser.id) {
+    return state.selectedObservee.id
+  }
 }

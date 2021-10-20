@@ -20,7 +20,7 @@ import fetchMock from 'fetch-mock'
 
 import {
   fetchCourseInstructors,
-  transformGrades,
+  fetchGrades,
   fetchGradesForGradingPeriod,
   fetchLatestAnnouncement,
   readableRoleName,
@@ -40,6 +40,7 @@ import {MOCK_ASSIGNMENTS, MOCK_EVENTS} from './fixtures'
 
 const ANNOUNCEMENT_URL =
   '/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1'
+const GRADES_URL = /\/api\/v1\/users\/self\/courses\?.*/
 const GRADING_PERIODS_URL = /\/api\/v1\/users\/self\/enrollments\?.*/
 const USERS_URL =
   '/api/v1/courses/test/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments'
@@ -117,7 +118,7 @@ describe('readableRoleName', () => {
   })
 })
 
-describe('transformGrades', () => {
+describe('fetchGrades', () => {
   const defaultCourse = {
     id: '1',
     name: 'Intro to Everything',
@@ -151,7 +152,8 @@ describe('transformGrades', () => {
   }
 
   it('translates courses to just course and grade-relevant properties', async () => {
-    const courseGrades = transformGrades([defaultCourse])
+    fetchMock.get(GRADES_URL, JSON.stringify([defaultCourse]))
+    const courseGrades = await fetchGrades()
     expect(courseGrades).toEqual([
       {
         courseId: '1',
@@ -196,7 +198,8 @@ describe('transformGrades', () => {
   })
 
   it("doesn't use current period score if the course has only one grading period", async () => {
-    const courseGrades = transformGrades([{...defaultCourse, has_grading_periods: false}])
+    fetchMock.get(GRADES_URL, JSON.stringify([{...defaultCourse, has_grading_periods: false}]))
+    const courseGrades = await fetchGrades()
     expect(courseGrades).toEqual([
       {
         courseId: '1',
@@ -232,25 +235,28 @@ describe('transformGrades', () => {
   })
 
   it('populates totalGradeForAllGradingPeriods and totalScoreForAllGradingPeriods if totals option is true', async () => {
-    const courseWithTotals = [
-      {
-        ...defaultCourse,
-        enrollments: [
-          {
-            current_grading_period_id: '1',
-            current_grading_period_title: 'The first one',
-            totals_for_all_grading_periods_option: true,
-            current_period_computed_current_score: 80,
-            current_period_computed_current_grade: 'B-',
-            computed_current_score: 89,
-            computed_current_grade: 'B+',
-            type: 'student'
-          }
-        ]
-      }
-    ]
+    fetchMock.get(
+      GRADES_URL,
+      JSON.stringify([
+        {
+          ...defaultCourse,
+          enrollments: [
+            {
+              current_grading_period_id: '1',
+              current_grading_period_title: 'The first one',
+              totals_for_all_grading_periods_option: true,
+              current_period_computed_current_score: 80,
+              current_period_computed_current_grade: 'B-',
+              computed_current_score: 89,
+              computed_current_grade: 'B+',
+              type: 'student'
+            }
+          ]
+        }
+      ])
+    )
 
-    const courseGrades = transformGrades(courseWithTotals)
+    const courseGrades = await fetchGrades()
     expect(courseGrades).toEqual([
       {
         courseId: '1',

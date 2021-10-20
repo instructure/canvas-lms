@@ -17,11 +17,11 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {mount, ReactWrapper, shallow} from 'enzyme'
 import merge from 'lodash/merge'
 import $ from 'jquery'
 
-import DiscussionSettings from 'ui/features/discussion_topics_index/react/components/DiscussionSettings'
+import DiscussionSettings from 'ui/features/discussion_topics_index/react/components/DiscussionSettings.js'
 
 QUnit.module('DiscussionSettings component', suiteHooks => {
   let tree
@@ -37,7 +37,6 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
           allow_student_discussion_topics: true,
           allow_student_forum_attachments: true,
           allow_student_discussion_editing: true,
-          allow_student_discussion_reporting: true,
           grading_standard_enabled: false,
           grading_standard_id: null,
           allow_student_organized_groups: true,
@@ -57,12 +56,6 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
       props
     )
 
-  suiteHooks.beforeEach(() => {
-    ENV = {
-      student_reporting_enabled: true
-    }
-  })
-
   test('should render discussion settings', () => {
     tree = mount(<DiscussionSettings {...makeProps()} />)
     const node = tree.find('#discussion_settings')
@@ -72,37 +65,11 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
   test('should call open modal when discussion settings is clicked', () => {
     const modalOpenSpy = sinon.spy()
     tree = mount(<DiscussionSettings {...makeProps({toggleModalOpen: modalOpenSpy})} />)
-    tree.find('Button').at(0).simulate('click')
+    tree
+      .find('Button')
+      .at(0)
+      .simulate('click')
     equal(modalOpenSpy.callCount, 1)
-  })
-
-  test('should find 4 checked boxes', () => {
-    tree = mount(
-      <DiscussionSettings
-        {...makeProps({
-          permissions: {change_settings: true}
-        })}
-      />
-    )
-    equal(document.querySelectorAll('[checked]').length, 4)
-  })
-
-  test('should find 0 checked boxes', () => {
-    tree = mount(
-      <DiscussionSettings
-        {...makeProps({
-          permissions: {change_settings: true},
-          courseSettings: {
-            allow_student_discussion_topics: false,
-            allow_student_forum_attachments: false,
-            allow_student_discussion_editing: false,
-            allow_student_discussion_reporting: false
-          }
-        })}
-      />
-    )
-
-    equal(document.querySelectorAll('[checked]').length, 0)
   })
 
   test('should render one checkbox if can not change settings', () => {
@@ -111,14 +78,14 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
     equal(checkboxes.length, 1)
   })
 
-  test('should render 5 checkbox if can change settings', () => {
+  test('should render 4 checkbox if can change settings', () => {
     tree = shallow(
       <DiscussionSettings
         {...makeProps({isSettingsModalOpen: true, permissions: {change_settings: true}})}
       />
     )
     const checkboxes = tree.find('Checkbox')
-    equal(checkboxes.length, 5)
+    equal(checkboxes.length, 4)
   })
 
   test('should set state correctly with all true settings', () => {
@@ -128,7 +95,7 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
       />
     )
     tree.setProps({isSavingSettings: false})
-    equal(tree.instance().state.studentSettings.length, 4)
+    equal(tree.instance().state.studentSettings.length, 3)
   })
 
   test('should set state correctly with false props', () => {
@@ -161,8 +128,7 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
     const courseSettings = {
       allow_student_discussion_topics: true,
       allow_student_forum_attachments: true,
-      allow_student_discussion_editing: true,
-      allow_student_discussion_reporting: true
+      allow_student_discussion_editing: true
     }
     const userSettings = {
       markAsRead: false,
@@ -187,8 +153,7 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
     const courseSettings = {
       allow_student_discussion_topics: true,
       allow_student_forum_attachments: false,
-      allow_student_discussion_editing: true,
-      allow_student_discussion_reporting: false
+      allow_student_discussion_editing: true
     }
     const userSettings = {
       markAsRead: false,

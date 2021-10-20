@@ -47,8 +47,7 @@ export class Day extends Component {
     simplifiedControls: bool,
     singleCourseView: bool,
     showMissingAssignments: bool,
-    responsiveSize: sizeShape,
-    isObserving: bool
+    responsiveSize: sizeShape
   }
 
   static defaultProps = {
@@ -56,8 +55,7 @@ export class Day extends Component {
     simplifiedControls: false,
     singleCourseView: false,
     showMissingAssignments: false,
-    responsiveSize: 'large',
-    isObserving: false
+    responsiveSize: 'large'
   }
 
   constructor(props) {
@@ -117,7 +115,6 @@ export class Day extends Component {
         simplifiedControls={this.props.simplifiedControls}
         singleCourseView={this.props.singleCourseView}
         responsiveSize={this.props.responsiveSize}
-        isObserving={this.props.isObserving}
       />
     )
   }

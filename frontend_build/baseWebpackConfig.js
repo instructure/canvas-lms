@@ -29,8 +29,6 @@ const StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin
 const I18nPlugin = require('./i18nPlugin')
 const WebpackHooks = require('./webpackHooks')
 const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
-const EncapsulationPlugin = require('webpack-encapsulation-plugin')
-const IgnoreErrorsPlugin = require('./IgnoreErrorsPlugin')
 const webpackPublicPath = require('./webpackPublicPath')
 
 require('./bundles')
@@ -310,28 +308,6 @@ module.exports = {
     new webpack.IgnorePlugin(/\.flow$/),
 
     new CleanWebpackPlugin(),
-
-    new EncapsulationPlugin({
-      test: /\.[tj]sx?$/,
-      include: [
-        path.resolve(__dirname, '../ui'),
-        path.resolve(__dirname, '../packages'),
-        path.resolve(__dirname, '../public/javascripts'),
-        path.resolve(__dirname, '../gems/plugins'),
-      ],
-      exclude: [
-        /\/node_modules\//,
-        path.resolve(__dirname, '../ui/shims/dummyI18nResource.js')
-      ],
-      formatter: require('./encapsulation/ErrorFormatter'),
-      rules: require('./encapsulation/moduleAccessRules')
-    }),
-
-    new IgnoreErrorsPlugin({
-      errors: require('./encapsulation/errorsPendingRemoval.json'),
-      warnOnUnencounteredErrors: process.env.WEBPACK_ENCAPSULATION_DEBUG === '1'
-    })
-
   ].concat(
     // return a non-zero exit code if there are any warnings so we don't continue compiling assets if webpack fails
     process.env.WEBPACK_PEDANTIC !== '0' ? function () {
