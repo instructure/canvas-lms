@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe DiscussionEntry do
-  let(:topic) { @course.discussion_topics.create! }
+  let(:topic) { discussion_topic_model }
 
   describe 'callback lifecycle' do
     before(:once) do
@@ -803,6 +803,23 @@ describe DiscussionEntry do
       sub_entry2.save!
       @student.reload
       expect(@student.cache_key).not_to eql(cache_key)
+    end
+  end
+
+  describe 'permissions' do
+    let(:user) { user_model }
+    let(:entry) { topic.discussion_entries.create!(message: "Hello!", user: user) }
+
+    describe 'reply' do
+      context 'when a user is no longer enrolled in the course' do
+        before do
+          create_enrollment(topic.course, user, { enrollment_state: "completed" })
+        end
+
+        it 'returns false for their own posts' do
+          expect(entry.grants_right?(user, :reply)).to eq false
+        end
+      end
     end
   end
 end
