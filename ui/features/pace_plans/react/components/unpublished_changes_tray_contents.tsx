@@ -25,6 +25,9 @@ import React from 'react'
 import I18n from 'i18n!unpublished_changes_tray_contents'
 import {SummarizedChange} from '../utils/change_tracking'
 
+// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
+const {Item} = List as any
+
 export type UnpublishedChangesTrayProps = {
   changes?: SummarizedChange[]
   handleTrayDismiss: () => void
@@ -48,7 +51,7 @@ const UnpublishedChangesTrayContents = ({
         </h4>
       </View>
       <List margin="none" isUnstyled itemSpacing="small">
-        {changes.map(c => c.summary && <List.Item key={c.id}>{c.summary}</List.Item>)}
+        {changes.map(c => c.summary && <Item key={c.id}>{c.summary}</Item>)}
       </List>
     </View>
   )

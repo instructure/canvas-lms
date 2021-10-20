@@ -21,11 +21,18 @@ import {UnpublishedChangesIndicator} from '../unpublished_changes_indicator'
 import React from 'react'
 import userEvent from '@testing-library/user-event'
 
+const onUnpublishedNavigation = jest.fn()
+
 const defaultProps = {
   changeCount: 2,
+  onUnpublishedNavigation,
   planPublishing: false,
   newPlan: false
 }
+
+afterEach(() => {
+  jest.clearAllMocks()
+})
 
 describe('UnpublishedChangesIndicator', () => {
   it('pluralizes and formats correctly', () => {
@@ -66,6 +73,22 @@ describe('UnpublishedChangesIndicator', () => {
 
       userEvent.click(getByText('All changes published'))
       expect(onClick).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('when leaving the page', () => {
+    it('should trigger a browser warning when there are unpublished changes', () => {
+      render(<UnpublishedChangesIndicator {...defaultProps} />)
+
+      window.dispatchEvent(new window.Event('beforeunload'))
+      expect(onUnpublishedNavigation).toHaveBeenCalled()
+    })
+
+    it('should not trigger a browser warning when there are no unpublished changes', () => {
+      render(<UnpublishedChangesIndicator {...defaultProps} changeCount={0} />)
+
+      window.dispatchEvent(new window.Event('beforeunload'))
+      expect(onUnpublishedNavigation).not.toHaveBeenCalled()
     })
   })
 
