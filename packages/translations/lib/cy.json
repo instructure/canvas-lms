@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Rhoi ar waith"
     },
+    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+        "message": "Gosod newidiadau i bob achos o’r Botymau a’r Eiconau hyn yn y Cwrs."
+    },
     "apps_54d24a47": {
         "message": "Apiau"
     },
@@ -148,9 +151,6 @@
     },
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Mae cynnwys sydd wedi’i gadw’n awtomatig yn bodoli. Hoffech chi lwytho’r cynnwys sydd wedi’i gadw’n awtomatig?"
-    },
-    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-        "message": "Agor rhagolwg mewn-llinell yn awtomatig. (Dim ond ar ôl cadw mae''r rhagolwg i''w weld)"
     },
     "available_folders_694d0436": {
         "message": "Ffolderi sydd ar gael"
@@ -379,9 +379,6 @@
     },
     "directionality_26ae9e08": {
         "message": "Cyfeirioldeb"
-    },
-    "disable_in_line_preview_2a675175": {
-        "message": "Analluogi''r rhagolwg mewn-llinell."
     },
     "discussion_6719c51d": {
         "message": "Trafodaeth"
@@ -839,9 +836,6 @@
     "my_grades_98834476": {
         "message": "Fy Ngraddau"
     },
-    "my_images_427f9b0c": {
-        "message": "Fy Nelweddau"
-    },
     "name_1aed4a1b": {
         "message": "Enw"
     },
@@ -1105,9 +1099,6 @@
     },
     "size_b30e1077": {
         "message": "Maint"
-    },
-    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-        "message": "Mae maint { file } yn fwy na’r { max } MB a ganiateir ar gyfer maint y ffeil."
     },
     "small_b070434a": {
         "message": "Bach"

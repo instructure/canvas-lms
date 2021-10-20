@@ -19,6 +19,8 @@
 import {handleActions} from 'redux-actions'
 import {mergeDays, deleteItemFromDays} from '../utilities/daysUtils'
 
+const defaultState = []
+
 function deletedPlannerItem(state, action) {
   if (action.error) return state
   return deleteItemFromDays(state, action.payload)
@@ -37,7 +39,10 @@ export default handleActions(
     },
     JUMP_TO_THIS_WEEK: (_state, action) => {
       return action.payload.weekDays
+    },
+    CLEAR_DAYS: () => {
+      return defaultState
     }
   },
-  []
+  defaultState
 )

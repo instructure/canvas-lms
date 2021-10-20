@@ -98,7 +98,7 @@ shared_examples 'announcements_page' do |context|
     expect(ff('.discussion-topic').size).to eq 5
   end
 
-  it "onlies list in-group announcements in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273621, teacher: 324934) do
+  it "only lists in-group announcements in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273621, teacher: 324934) do
     # create group and course announcements
     @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group', user: @teacher)
     @course.announcements.create!(title: 'Course Announcement', message: 'Course', user: @teacher)
@@ -111,7 +111,7 @@ shared_examples 'announcements_page' do |context|
     expect(f("#content")).not_to contain_link('Course Announcement')
   end
 
-  it "onlies access group files in announcements right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273624, teacher: 324931) do
+  it "only accesses group files in announcements right content pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273624, teacher: 324931) do
     add_test_files
     get announcements_page
     expect_new_page_load { f('#add_announcement').click }
@@ -160,7 +160,7 @@ shared_examples 'announcements_page_v2' do
     expect(ff('.ic-announcement-row').size).to eq 5
   end
 
-  it "onlies list in-group announcements in the content right pane" do
+  it "only lists in-group announcements in the content right pane" do
     # create group and course announcements
     @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group', user: @teacher)
     @course.announcements.create!(title: 'Course Announcement', message: 'Course', user: @teacher)
@@ -175,7 +175,7 @@ shared_examples 'announcements_page_v2' do
     expect(ff('div[data-testid="instructure_links-Link"]').size).to eq 1
   end
 
-  it "onlies access group files in announcements right content pane" do
+  it "only accesses group files in announcements right content pane" do
     add_test_files
     get announcements_page
     expect_new_page_load { f('#add_announcement').click }
@@ -215,7 +215,7 @@ shared_examples 'pages_page' do |context|
     expect(ff('.collectionViewItems .clickable').size).to eq 2
   end
 
-  it "onlies list in-group pages in pages list", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273620, teacher: 324928) do
+  it "only lists in-group pages in pages list", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273620, teacher: 324928) do
     # create group and course announcements
     group_page = @testgroup.first.wiki_pages.create!(user: @teacher,
                                                      title: 'Group Page')
@@ -229,7 +229,7 @@ shared_examples 'pages_page' do |context|
     expect(pages_list_item_exists?('Course Page')).to be_falsey
   end
 
-  it "onlies access group files in page file tray", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303700, teacher: 324932) do
+  it "only accesses group files in page file tray", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303700, teacher: 324932) do
     add_test_files
 
     get "/groups/#{@testgroup.first.id}/pages/test_page/edit"
@@ -268,7 +268,7 @@ shared_examples 'discussions_page' do |context|
     stub_rcs_config
   end
 
-  it "onlies list in-group discussions in RCE links tray", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273622, teacher: 324930) do
+  it "only lists in-group discussions in RCE links tray", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273622, teacher: 324930) do
     # create group and course announcements
     group_dt = DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
                                        title: 'Group Discussion', message: 'Group')
@@ -288,7 +288,7 @@ shared_examples 'discussions_page' do |context|
     expect(course_item_link_exists?(course_dt.title.to_s)).to be_falsey
   end
 
-  it "onlies access group files in discussions RCE links tray", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303701, teacher: 324933) do
+  it "only accesses group files in discussions RCE links tray", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 303701, teacher: 324933) do
     add_test_files
     get discussions_page
     expect_new_page_load { f('#add_discussion').click }

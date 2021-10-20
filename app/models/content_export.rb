@@ -134,6 +134,8 @@ class ContentExport < ActiveRecord::Base
   end
 
   def export(opts = {})
+    save if capture_job_id
+
     self.shard.activate do
       opts = opts.with_indifferent_access
       case export_type
@@ -151,6 +153,14 @@ class ContentExport < ActiveRecord::Base
     end
   end
   handle_asynchronously :export, :priority => Delayed::LOW_PRIORITY, :max_attempts => 1, :on_permanent_failure => :fail_with_error!
+
+  def capture_job_id
+    job = Delayed::Worker.current_job
+    return false unless job
+
+    self.settings[:job_id] = job.id
+    true
+  end
 
   def reset_and_start_job_progress
     self.job_progress.try :reset!

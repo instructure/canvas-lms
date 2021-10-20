@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, number, shape, string} from 'prop-types'
+import {arrayOf, shape, string} from 'prop-types'
 import {ConversationMessage} from './ConversationMessage'
 import {ConversationParticipant} from './ConversationParticipant'
 import gql from 'graphql-tag'
@@ -47,7 +47,7 @@ export const Conversation = {
 
   shape: shape({
     _id: string,
-    contextId: number,
+    contextId: string,
     contextType: string,
     contextName: string,
     subject: string,
@@ -61,7 +61,7 @@ export const Conversation = {
 
   mock: ({
     _id = '196',
-    contextId = 195,
+    contextId = '195',
     contextType = 'Course',
     contextName = 'XavierSchool',
     subject = 'testing 123',

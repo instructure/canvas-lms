@@ -44,6 +44,7 @@ import {daysToDaysHash} from '../../utilities/daysUtils'
 import {formatDayKey, isThisWeek} from '../../utilities/dateUtils'
 import {Animator} from '../../dynamic-ui/animator'
 import responsiviser from '../responsiviser'
+import {observedUserId} from '../../utilities/apiUtils'
 
 export class PlannerApp extends Component {
   static propTypes = {
@@ -82,7 +83,8 @@ export class PlannerApp extends Component {
     weekLoaded: bool,
     loadingOpportunities: bool,
     opportunityCount: number,
-    singleCourseView: bool
+    singleCourseView: bool,
+    isObserving: bool
   }
 
   static defaultProps = {
@@ -97,7 +99,8 @@ export class PlannerApp extends Component {
     focusFallback: () => {},
     isCompletelyEmpty: bool,
     k5Mode: false,
-    singleCourseView: false
+    singleCourseView: false,
+    isObserving: false
   }
 
   constructor(props) {
@@ -299,6 +302,7 @@ export class PlannerApp extends Component {
         singleCourseView={this.props.singleCourseView}
         showMissingAssignments={this.props.k5Mode}
         responsiveSize={this.props.responsiveSize}
+        isObserving={this.props.isObserving}
       />
     )
     workingDay.add(1, 'days')
@@ -518,7 +522,8 @@ export const mapStateToProps = state => {
     weekLoaded: weeks ? !!weeks[state.weeklyDashboard.weekStart.format()] : false,
     loadingOpportunities: !!state.loading.loadingOpportunities,
     opportunityCount: state.opportunities?.items?.length || 0,
-    singleCourseView: state.singleCourse
+    singleCourseView: state.singleCourse,
+    isObserving: !!observedUserId(state)
   }
 }
 

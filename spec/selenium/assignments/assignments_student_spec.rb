@@ -416,7 +416,7 @@ describe "assignments" do
       expect(f("#assignment_group_#{empty_ag.id}")).not_to be_nil
     end
 
-    it "correctlies categorize assignments by date" do
+    it "categorizes assignments by date correctly" do
       # assuming two undated and two future assignments created above
       undated, upcoming = @course.assignments.partition { |a| a.due_date.nil? }
 

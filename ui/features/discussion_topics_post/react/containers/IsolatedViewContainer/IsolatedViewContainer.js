@@ -76,7 +76,7 @@ export const IsolatedViewContainer = props => {
     update: updateCache,
     onCompleted: data => {
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
-      props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry.id)
+      props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
       if (
         props.discussionEntryId !== data.createDiscussionEntry.discussionEntry.rootEntryId ||
         props.relativeEntryId
@@ -200,7 +200,16 @@ export const IsolatedViewContainer = props => {
         message,
         includeReplyPreview
       },
-      optimisticResponse: getOptimisticResponse(message, replyId, props.discussionEntryId)
+      optimisticResponse: getOptimisticResponse(
+        message,
+        replyId,
+        props.discussionEntryId,
+        null,
+        buildQuotedReply(
+          isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection.nodes,
+          props.replyFromId
+        )
+      )
     })
   }
 

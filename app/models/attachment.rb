@@ -1939,6 +1939,12 @@ class Attachment < ActiveRecord::Base
     new_name
   end
 
+  def self.shorten_filename(filename)
+    return filename.truncate(175, omission: "...#{File.extname(filename)}") if filename.length > 180
+
+    filename
+  end
+
   # the list of thumbnail sizes to be pre-generated automatically
   def self.automatic_thumbnail_sizes
     attachment_options[:thumbnails].keys

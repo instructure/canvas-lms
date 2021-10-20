@@ -119,6 +119,24 @@ describe('FindOutcomesModal', () => {
       expect(getByText('Add Outcomes to Course')).toBeInTheDocument()
     })
 
+    it('renders component with "Add Outcomes to groupName" targetGroup is passed', async () => {
+      const {getByText} = render(
+        <FindOutcomesModal
+          {...defaultProps({
+            targetGroup: {
+              _id: '1',
+              title: 'The Group Title'
+            }
+          })}
+        />,
+        {
+          contextType: 'Course'
+        }
+      )
+      await act(async () => jest.runAllTimers())
+      expect(getByText('Add Outcomes to "The Group Title"')).toBeInTheDocument()
+    })
+
     it('shows modal if open prop true', async () => {
       const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
       await act(async () => jest.runAllTimers())
@@ -589,6 +607,38 @@ describe('FindOutcomesModal', () => {
         expect(
           getAllByText(
             'All outcomes from Group 300 have been successfully added to this account.'
+          )[0]
+        ).toBeInTheDocument()
+      })
+
+      it('displays flash confirmation with proper message if group import to targetGroup succeeds', async () => {
+        const {getByText, getAllByText} = render(
+          <FindOutcomesModal
+            {...defaultProps({
+              targetGroup: {
+                _id: '1',
+                title: 'The Group Title'
+              }
+            })}
+          />,
+          {
+            contextType: 'Account',
+            mocks: [
+              ...findModalMocks(),
+              ...groupMocks({groupId: '100'}),
+              ...findOutcomesMocks({groupId: '300'}),
+              ...importGroupMocks({groupId: '300', targetGroupId: '1'})
+            ]
+          }
+        )
+        await act(async () => jest.runAllTimers())
+        await clickEl(getByText('Account Standards'))
+        await clickEl(getByText('Root Account Outcome Group 0'))
+        await clickEl(getByText('Group 100 folder 0'))
+        await clickEl(getByText('Add All Outcomes').closest('button'))
+        expect(
+          getAllByText(
+            'All outcomes from Group 300 have been successfully added to The Group Title.'
           )[0]
         ).toBeInTheDocument()
       })
