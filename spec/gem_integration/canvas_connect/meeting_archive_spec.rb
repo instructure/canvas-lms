@@ -23,9 +23,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require 'nokogiri'
 
 describe CanvasConnect::MeetingArchive do
-  class MockClient
-    def sco_contents(*args)
-      Nokogiri::XML('<?xml version="1.0" encoding="utf-8"?>
+  subject { CanvasConnect::MeetingArchive.retrieve(38230, mock_client.new).first }
+
+  let(:mock_client) do
+    Class.new do
+      def sco_contents(*)
+        Nokogiri::XML(<<~XML)
+          <?xml version="1.0" encoding="utf-8"?>
           <results>
             <status code="ok"/>
             <scos>
@@ -40,14 +44,14 @@ describe CanvasConnect::MeetingArchive do
               <sco>
               </sco>
             </scos>
-          </results>')
+          </results>
+        XML
+      end
     end
   end
 
-  subject { CanvasConnect::MeetingArchive.retrieve(38230, MockClient.new).first }
-
   it "returns the correct number" do
-    expect(CanvasConnect::MeetingArchive.retrieve(38230, MockClient.new).count).to eq 2
+    expect(CanvasConnect::MeetingArchive.retrieve(38230, mock_client.new).count).to eq 2
   end
 
   it "returns the name" do

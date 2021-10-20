@@ -51,7 +51,7 @@ def get_import_data(sub_folder, hash_name)
   data
 end
 
-def import_example_questions(context)
+def import_example_questions
   questions = []
   QUESTIONS.each do |question|
     if import_data_exists?(['vista', 'quiz'], question[0])

@@ -20,7 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 module EportfoliosCommon
-  def create_eportfolio(is_public = false)
+  def create_eportfolio
     get "/dashboard/eportfolios"
     f(".add_eportfolio_link").click
     wait_for_animations

@@ -35,7 +35,7 @@ describe Api::V1::CourseEvent do
     "feed_calendar_url(#{feed_code.inspect})"
   end
 
-  def service_enabled?(type)
+  def service_enabled?(_type)
     false
   end
 

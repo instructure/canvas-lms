@@ -26,7 +26,7 @@ describe "account admin terms" do
     term_div.find_element(:css, action_link_css).click
   end
 
-  def validate_term_display(term_div_index = 0, title = 'Default Term', course_count = 1, user_count = 1)
+  def validate_term_display(term_div_index = 0, title = 'Default Term', course_count = 1)
     term_header = ff('.term .header')[term_div_index]
     expect(term_header).to include_text(title)
     expect(term_header).to include_text("#{course_count} Course")
@@ -90,7 +90,7 @@ describe "account admin terms" do
       @course.root_account.enrollment_terms.create!(:name => term_name)
       get "/accounts/#{Account.default.id}/terms"
 
-      validate_term_display(0, term_name, 0, 0)
+      validate_term_display(0, term_name, 0)
       click_term_action_link(ff('.term')[0], '.delete_term_link')
       driver.switch_to.alert.accept
       wait_for_ajaximations

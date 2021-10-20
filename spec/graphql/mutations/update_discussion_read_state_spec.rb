@@ -24,7 +24,7 @@ require_relative '../graphql_spec_helper'
 RSpec.describe Mutations::UpdateDiscussionReadState do
   before(:once) do
     course_with_teacher(active_all: true)
-    topic_with_nested_replies({ context: @course })
+    topic_with_nested_replies
   end
 
   def mutation_str(

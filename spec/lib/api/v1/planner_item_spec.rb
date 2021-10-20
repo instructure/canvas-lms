@@ -20,18 +20,6 @@
 require_relative '../../../spec_helper'
 
 describe Api::V1::PlannerItem do
-  class PlannerItemHarness
-    include Api::V1::PlannerItem
-
-    def submission_json(*args); end
-
-    def named_context_url(*args); "named_context_url"; end
-
-    def course_assignment_submission_url(*args); 'course_assignment_submission_url'; end
-
-    def calendar_url_for(*args); end
-  end
-
   before :once do
     course_factory active_all: true
 
@@ -50,7 +38,25 @@ describe Api::V1::PlannerItem do
     @student_override = planner_override_model(plannable: @assignment, user: @student, marked_complete: true)
   end
 
-  let(:api) { PlannerItemHarness.new }
+  let(:planner_item_harness) do
+    Class.new do
+      include Api::V1::PlannerItem
+
+      def submission_json(*); end
+
+      def named_context_url(*)
+        "named_context_url"
+      end
+
+      def course_assignment_submission_url(*)
+        'course_assignment_submission_url'
+      end
+
+      def calendar_url_for(*); end
+    end
+  end
+
+  let(:api) { planner_item_harness.new }
   let(:session) { double }
 
   describe '.planner_item_json' do
