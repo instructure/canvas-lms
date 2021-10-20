@@ -53,7 +53,7 @@ describe 'ProfileController', type: :request do
         course_with_teacher(:active_all => true)
         user = user_with_pseudonym
 
-        json = call_setting(as_user: @teacher, for_user: user, assert_unauthorized: true)
+        call_setting(as_user: @teacher, for_user: user, assert_unauthorized: true)
       end
     end
 
@@ -68,7 +68,7 @@ describe 'ProfileController', type: :request do
         user_one = user_with_pseudonym(:active_user => true)
         user_two = user_with_pseudonym(:active_user => true, :user => user_factory)
 
-        json = call_setting(as_user: user_one, for_user: user_two, assert_unauthorized: true)
+        call_setting(as_user: user_one, for_user: user_two, assert_unauthorized: true)
       end
     end
   end

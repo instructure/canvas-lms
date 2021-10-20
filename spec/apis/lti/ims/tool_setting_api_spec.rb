@@ -136,7 +136,7 @@ module Lti
           it 'finds the tool setting by "resource_link_id"' do
             resource_link_id = SecureRandom.uuid
             custom = { test: 'value' }.with_indifferent_access
-            tool_setting = Lti::ToolSetting.create!(
+            Lti::ToolSetting.create!(
               tool_proxy: tool_proxy,
               resource_link_id: resource_link_id,
               custom: custom,
@@ -278,7 +278,7 @@ module Lti
 
         it 'updates a tool_setting with a single graph element' do
           tool_setting = ToolSetting.create(tool_proxy: tool_proxy, context: account, resource_link_id: 'resource_link')
-          params = params = {
+          params = {
             "@context" => "http://purl.imsglobal.org/ctx/lti/v2/ToolSettings",
             "@graph" => [
               {

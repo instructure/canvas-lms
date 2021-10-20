@@ -342,10 +342,9 @@ describe "Accounts API", type: :request do
     end
 
     it "updates account settings" do
-      new_name = 'root2'
-      json = api_call(:put, "/api/v1/accounts/#{@a1.id}",
-                      { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
-                      { :account => { :settings => { :restrict_student_past_view => { :value => true, :locked => false } } } })
+      api_call(:put, "/api/v1/accounts/#{@a1.id}",
+               { :controller => 'accounts', :action => 'update', :id => @a1.to_param, :format => 'json' },
+               { :account => { :settings => { :restrict_student_past_view => { :value => true, :locked => false } } } })
 
       @a1.reload
       expect(@a1.restrict_student_past_view).to eq({ :value => true, :locked => false })
@@ -812,21 +811,21 @@ describe "Accounts API", type: :request do
       end
 
       it 'does not allow the default storage quota to be set' do
-        json = api_call(:put, "/api/v1/accounts/#{@a1.id}", @params, { :account => { :default_storage_quota_mb => 789 } }, {}, { :expected_status => 401 })
+        api_call(:put, "/api/v1/accounts/#{@a1.id}", @params, { :account => { :default_storage_quota_mb => 789 } }, {}, { :expected_status => 401 })
 
         @a1.reload
         expect(@a1.default_storage_quota_mb).to eq 123
       end
 
       it 'does not allow the default user quota to be set' do
-        json = api_call(:put, "/api/v1/accounts/#{@a1.id}", @params, { :account => { :default_user_storage_quota_mb => 678 } }, {}, { :expected_status => 401 })
+        api_call(:put, "/api/v1/accounts/#{@a1.id}", @params, { :account => { :default_user_storage_quota_mb => 678 } }, {}, { :expected_status => 401 })
 
         @a1.reload
         expect(@a1.default_user_storage_quota_mb).to eq 45
       end
 
       it 'does not allow the default group quota to be set' do
-        json = api_call(:put, "/api/v1/accounts/#{@a1.id}", @params, { :account => { :default_group_storage_quota_mb => 678 } }, {}, { :expected_status => 401 })
+        api_call(:put, "/api/v1/accounts/#{@a1.id}", @params, { :account => { :default_group_storage_quota_mb => 678 } }, {}, { :expected_status => 401 })
 
         @a1.reload
         expect(@a1.default_group_storage_quota_mb).to eq 42
@@ -1219,8 +1218,8 @@ describe "Accounts API", type: :request do
     describe "?with_enrollments" do
       before :once do
         @me = @user
-        c1 = course_model(:account => @a1, :name => 'c1')    # has a teacher
-        c2 = Course.create!(:account => @a1, :name => 'c2')  # has no enrollments
+        course_model(:account => @a1, :name => 'c1')    # has a teacher
+        Course.create!(:account => @a1, :name => 'c2')  # has no enrollments
         @user = @me
       end
 

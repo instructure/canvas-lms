@@ -86,13 +86,13 @@ module Lti
       end
 
       it 'returns 404 when the assignment cannot be found' do
-        user = user_model
+        user_model
         get "#{endpoint}/blah", headers: request_headers
         expect(response).to be_not_found
       end
 
       it 'returns 404 when the user cannot be found' do
-        user = user_model
+        user_model
         get "#{endpoint}/#{assignment.id}", params: { user_id: 'blah' }, headers: request_headers
         expect(response).to be_not_found
       end

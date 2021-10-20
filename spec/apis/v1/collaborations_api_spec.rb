@@ -71,7 +71,7 @@ describe CollaborationsController, type: :request do
     end
 
     it 'is unauthorized when trying to access a courses collaboration when they are not a member of the course' do
-      user = user_with_pseudonym(:active_all => true)
+      user_with_pseudonym(:active_all => true)
       raw_api_call(:get, url, url_options)
       expect(response.code).to eq '401'
     end
@@ -230,7 +230,7 @@ describe CollaborationsController, type: :request do
       user_with_pseudonym
       @course.enroll_student(@user).accept!
       @group.add_user(@user)
-      gc = collaboration_model(:user => @user, :context => @group)
+      collaboration_model(:user => @user, :context => @group)
       json = api_call(:get, "/api/v1/groups/#{@group.id}/potential_collaborators",
                       { :controller => 'collaborations', :action => 'potential_collaborators',
                         :format => 'json', :group_id => @group.to_param })

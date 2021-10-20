@@ -156,19 +156,19 @@ describe CustomGradebookColumnsApiController, type: :request do
     end
 
     it 'lets you toggle the hidden state' do
-      json = api_call :put,
-                      "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
-                      { course_id: @course.to_param, id: @col.to_param, action: "update",
-                        controller: "custom_gradebook_columns_api", format: "json" },
-                      "column[hidden]" => "yes"
+      api_call :put,
+               "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
+               { course_id: @course.to_param, id: @col.to_param, action: "update",
+                 controller: "custom_gradebook_columns_api", format: "json" },
+               "column[hidden]" => "yes"
       expect(response).to be_successful
       expect(@col.reload).to be_hidden
 
-      json = api_call :put,
-                      "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
-                      { course_id: @course.to_param, id: @col.to_param, action: "update",
-                        controller: "custom_gradebook_columns_api", format: "json" },
-                      "column[hidden]" => "no"
+      api_call :put,
+               "/api/v1/courses/#{@course.id}/custom_gradebook_columns/#{@col.id}",
+               { course_id: @course.to_param, id: @col.to_param, action: "update",
+                 controller: "custom_gradebook_columns_api", format: "json" },
+               "column[hidden]" => "no"
       expect(response).to be_successful
       expect(@col.reload).not_to be_hidden
     end

@@ -730,7 +730,7 @@ describe "Users API", type: :request do
         expect(response.headers['Link']).not_to match(/last/)
         response.headers['Link'].split(',').find { |l| l =~ /<([^>]+)>.+next/ }
         url = $1
-        path, querystring = url.split("?")
+        _path, querystring = url.split("?")
         page = Rack::Utils.parse_nested_query(querystring)['page']
         json = api_call(:get, url,
                         { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :page => page, :per_page => Setting.get('api_max_per_page', '2') })
@@ -1137,7 +1137,7 @@ describe "Users API", type: :request do
     it "does return a next header on the last page" do
       @account = Account.default
       u = User.create!(name: 'test user')
-      p = u.pseudonyms.create!(account: @account, unique_id: 'user')
+      u.pseudonyms.create!(account: @account, unique_id: 'user')
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, { search_term: u.id.to_s, per_page: '1', page: '1' })
       expect(json.length).to eq 1
@@ -1150,28 +1150,28 @@ describe "Users API", type: :request do
 
   describe "user account creation" do
     def create_user_skip_cc_confirm(admin_user)
-      json = api_call(:post, "/api/v1/accounts/#{admin_user.account.id}/users",
-                      { :controller => 'users', :action => 'create', :format => 'json', :account_id => admin_user.account.id.to_s },
-                      {
-                        :user => {
-                          :name => "Test User",
-                          :short_name => "Test",
-                          :sortable_name => "User, T.",
-                          :time_zone => "Mountain Time (US & Canada)",
-                          :locale => 'en'
-                        },
-                        :pseudonym => {
-                          :unique_id => "test@example.com",
-                          :password => "password123",
-                          :sis_user_id => "12345",
-                          :send_confirmation => 0
-                        },
-                        :communication_channel => {
-                          :type => "sms",
-                          :address => '8018888888',
-                          :skip_confirmation => 1
-                        }
-                      })
+      api_call(:post, "/api/v1/accounts/#{admin_user.account.id}/users",
+               { :controller => 'users', :action => 'create', :format => 'json', :account_id => admin_user.account.id.to_s },
+               {
+                 :user => {
+                   :name => "Test User",
+                   :short_name => "Test",
+                   :sortable_name => "User, T.",
+                   :time_zone => "Mountain Time (US & Canada)",
+                   :locale => 'en'
+                 },
+                 :pseudonym => {
+                   :unique_id => "test@example.com",
+                   :password => "password123",
+                   :sis_user_id => "12345",
+                   :send_confirmation => 0
+                 },
+                 :communication_channel => {
+                   :type => "sms",
+                   :address => '8018888888',
+                   :skip_confirmation => 1
+                 }
+               })
       users = User.where(name: "Test User").to_a
       expect(users.length).to eql 1
       user = users.first
@@ -1240,26 +1240,26 @@ describe "Users API", type: :request do
       end
 
       it "allows site admins to create users" do
-        json = api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
-                        { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },
-                        {
-                          :user => {
-                            :name => "Test User",
-                            :short_name => "Test",
-                            :sortable_name => "User, T.",
-                            :time_zone => "Mountain Time (US & Canada)",
-                            :locale => 'en'
-                          },
-                          :pseudonym => {
-                            :unique_id => "test@example.com",
-                            :password => "password123",
-                            :sis_user_id => "12345",
-                            :send_confirmation => 0
-                          },
-                          :communication_channel => {
-                            :confirmation_url => true
-                          }
-                        })
+        api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
+                 { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },
+                 {
+                   :user => {
+                     :name => "Test User",
+                     :short_name => "Test",
+                     :sortable_name => "User, T.",
+                     :time_zone => "Mountain Time (US & Canada)",
+                     :locale => 'en'
+                   },
+                   :pseudonym => {
+                     :unique_id => "test@example.com",
+                     :password => "password123",
+                     :sis_user_id => "12345",
+                     :send_confirmation => 0
+                   },
+                   :communication_channel => {
+                     :confirmation_url => true
+                   }
+                 })
         users = User.where(name: "Test User").to_a
         expect(users.length).to eql 1
         user = users.first
@@ -1364,22 +1364,22 @@ describe "Users API", type: :request do
         end
 
         it "raises an error trying to reactivate an active section" do
-          other_user = user_with_pseudonym(:active_all => true)
+          user_with_pseudonym(:active_all => true)
           @pseudonym.sis_user_id = "12345"
           @pseudonym.save!
 
           @user = @site_admin
-          json = api_call(:post, "/api/v1/accounts/#{Account.default.id}/users",
-                          { :controller => 'users', :action => 'create', :format => 'json', :account_id => Account.default.id.to_s },
-                          { :enable_sis_reactivation => '1', :user => { :name => "Test User" },
-                            :pseudonym => { :unique_id => "test@example.com", :password => "password123", :sis_user_id => "12345" },  }, {}, { :expected_status => 400 })
+          api_call(:post, "/api/v1/accounts/#{Account.default.id}/users",
+                   { :controller => 'users', :action => 'create', :format => 'json', :account_id => Account.default.id.to_s },
+                   { :enable_sis_reactivation => '1', :user => { :name => "Test User" },
+                     :pseudonym => { :unique_id => "test@example.com", :password => "password123", :sis_user_id => "12345" }, }, {}, { :expected_status => 400 })
         end
 
         it "carries on if there's no section to reactivate" do
           json = api_call(:post, "/api/v1/accounts/#{Account.default.id}/users",
                           { :controller => 'users', :action => 'create', :format => 'json', :account_id => Account.default.id.to_s },
                           { :enable_sis_reactivation => '1', :user => { :name => "Test User" },
-                            :pseudonym => { :unique_id => "test@example.com", :password => "password123", :sis_user_id => "12345" },  })
+                            :pseudonym => { :unique_id => "test@example.com", :password => "password123", :sis_user_id => "12345" }, })
 
           user = User.find(json['id'])
           expect(user.pseudonym.sis_user_id).to eq '12345'
@@ -1690,7 +1690,7 @@ describe "Users API", type: :request do
                           }
                         })
         user = User.find(json['id'])
-        avatar_url = json.delete("avatar_url")
+        json.delete("avatar_url")
         expect(json).to eq({
                              'name' => 'Tobias Funke',
                              'sortable_name' => 'Funke, Tobias',
@@ -1822,9 +1822,9 @@ describe "Users API", type: :request do
         expect(user.profile.bio).to eq new_bio
 
         another_title = 'another title'
-        json = api_call(:put, @path, @path_options, {
-                          :user => { :title => another_title }
-                        })
+        api_call(:put, @path, @path_options, {
+                   :user => { :title => another_title }
+                 })
         expect(user.profile.reload.title).to eq another_title
       end
 
@@ -1846,9 +1846,9 @@ describe "Users API", type: :request do
         another_title = 'another title'
         another_bio = 'another bio'
         another_email = 'duddett@example.com'
-        json = api_call(:put, @path, @path_options, {
-                          :user => { title: another_title, bio: another_bio, email: another_email }
-                        })
+        api_call(:put, @path, @path_options, {
+                   :user => { title: another_title, bio: another_bio, email: another_email }
+                 })
         expect(user.profile.reload.title).to eq another_title
       end
 

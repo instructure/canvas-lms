@@ -1861,7 +1861,7 @@ describe DiscussionTopicsController, type: :request do
       student_in_course(:active_all => true)
       expect(@user.submissions.not_placeholder).to be_empty
 
-      json = api_call(
+      api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries.json",
         { :controller => 'discussion_topics_api', :action => 'add_entry', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s },
@@ -1882,7 +1882,7 @@ describe DiscussionTopicsController, type: :request do
       student_in_course(:active_all => true)
       expect(@user.submissions.not_placeholder).to be_empty
 
-      json = api_call(
+      api_call(
         :post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{top_entry.id}/replies.json",
         { :controller => 'discussion_topics_api', :action => 'add_reply', :format => 'json',
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => top_entry.id.to_s },
@@ -2139,9 +2139,9 @@ describe DiscussionTopicsController, type: :request do
       end
 
       it "sees topic information before posting" do
-        json = api_call(:get, @url, controller: 'discussion_topics_api',
-                                    action: 'show', format: 'json', course_id: @course.to_param,
-                                    topic_id: @topic.to_param)
+        api_call(:get, @url, controller: 'discussion_topics_api',
+                             action: 'show', format: 'json', course_id: @course.to_param,
+                             topic_id: @topic.to_param)
         expect(response.code).to eq '200'
       end
 
@@ -2155,9 +2155,9 @@ describe DiscussionTopicsController, type: :request do
 
       it "sees entries after posting" do
         @topic.reply_from(:user => @student, :text => 'hai')
-        json = api_call(:get, "#{@url}/entries", controller: 'discussion_topics_api',
-                                                 action: 'entries', format: 'json', course_id: @course.to_param,
-                                                 topic_id: @topic.to_param)
+        api_call(:get, "#{@url}/entries", controller: 'discussion_topics_api',
+                                          action: 'entries', format: 'json', course_id: @course.to_param,
+                                          topic_id: @topic.to_param)
         expect(response.code).to eq '200'
       end
     end
@@ -2179,9 +2179,9 @@ describe DiscussionTopicsController, type: :request do
 
       it "sees entries after posting" do
         @topic.reply_from(user: @student, text: 'Lorem ipsum dolor')
-        json = api_call(:get, @url, controller: 'discussion_topics_api',
-                                    action: 'entries', format: 'json', course_id: @course.to_param,
-                                    topic_id: @topic.to_param)
+        api_call(:get, @url, controller: 'discussion_topics_api',
+                             action: 'entries', format: 'json', course_id: @course.to_param,
+                             topic_id: @topic.to_param)
         expect(response.code).to eq '200'
       end
     end
@@ -2672,9 +2672,9 @@ describe DiscussionTopicsController, type: :request do
         (DiscussionEntry.max_depth - 1).times do
           entry = create_reply(entry)
         end
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{entry.id}/replies",
-                        { :controller => "discussion_topics_api", :action => "add_reply", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => entry.id.to_s },
-                        { :message => "ohai" }, {}, { :expected_status => 400 })
+        api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{entry.id}/replies",
+                 { :controller => "discussion_topics_api", :action => "add_reply", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => entry.id.to_s },
+                 { :message => "ohai" }, {}, { :expected_status => 400 })
       end
     end
 

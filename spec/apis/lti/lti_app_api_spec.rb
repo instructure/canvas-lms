@@ -129,8 +129,8 @@ module Lti
       end
 
       it 'cannot get the definition of public stuff at the account level' do
-        json = api_call(:get, "/api/v1/accounts/self/lti_apps/launch_definitions",
-                        { controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', account_id: 'self', placements: %w(global_navigation) })
+        api_call(:get, "/api/v1/accounts/self/lti_apps/launch_definitions",
+                 { controller: 'lti/lti_apps', action: 'launch_definitions', format: 'json', account_id: 'self', placements: %w(global_navigation) })
         expect(response.status).to eq 401
       end
 

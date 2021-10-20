@@ -41,10 +41,10 @@ describe GradebookHistoryApiController, type: :request do
       assignment1 = @course.assignments.create!(:title => "some assignment")
       assignment2 = @course.assignments.create!(:title => "another assignment")
 
-      submission1 = bare_submission_model(assignment1, student, :graded_at => Time.now.in_time_zone, :grader_id => grader.id, :score => 100)
-      submission2 = bare_submission_model(assignment1, student2, :graded_at => Time.now.in_time_zone, :grader_id => super_grader.id, :score => 90)
-      submission3 = bare_submission_model(assignment1, student3, :graded_at => (Time.now - 24.hours).in_time_zone, :grader_id => other_grader.id, :score => 80)
-      submission4 = bare_submission_model(assignment2, student, :graded_at => (Time.now - 24.hours).in_time_zone, :grader_id => other_grader.id, :score => 70)
+      bare_submission_model(assignment1, student, :graded_at => Time.now.in_time_zone, :grader_id => grader.id, :score => 100)
+      bare_submission_model(assignment1, student2, :graded_at => Time.now.in_time_zone, :grader_id => super_grader.id, :score => 90)
+      bare_submission_model(assignment1, student3, :graded_at => (Time.zone.now - 24.hours).in_time_zone, :grader_id => other_grader.id, :score => 80)
+      bare_submission_model(assignment2, student, :graded_at => (Time.zone.now - 24.hours).in_time_zone, :grader_id => other_grader.id, :score => 70)
 
       json = api_call_as_user(@teacher, :get,
                               "/api/v1/courses/#{@course.id}/gradebook_history/days.json",
@@ -70,7 +70,7 @@ describe GradebookHistoryApiController, type: :request do
 
       assignment = @course.assignments.create!(:title => "some assignment")
 
-      submission = bare_submission_model(assignment, student, :graded_at => Time.now.in_time_zone, :grader_id => grader.id, :score => 100)
+      bare_submission_model(assignment, student, :graded_at => Time.now.in_time_zone, :grader_id => grader.id, :score => 100)
 
       date = Time.now.in_time_zone.strftime('%Y-%m-%d')
       json = api_call_as_user(@teacher, :get,
