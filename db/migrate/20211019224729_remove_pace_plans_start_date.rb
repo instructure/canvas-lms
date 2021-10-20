@@ -18,19 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Factories
-  def pace_plan_model(opts = {})
-    course = opts.delete(:course) || opts[:context] || course_model(reusable: true)
-    @pace_plan = factory_with_protected_attributes(course.pace_plans, valid_pace_plan_attributes.merge(opts))
+class RemovePacePlansStartDate < ActiveRecord::Migration[6.0]
+  tag :postdeploy
+
+  def up
+    remove_column :pace_plans, :start_date
   end
 
-  def valid_pace_plan_attributes
-    {
-      workflow_state: 'active',
-      end_date: '2021-09-30',
-      exclude_weekends: true,
-      hard_end_dates: true,
-      published_at: Time.current
-    }
+  def down
+    add_column :pace_plans, :start_date, :date
   end
 end

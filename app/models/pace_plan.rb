@@ -55,6 +55,8 @@ class PacePlan < ActiveRecord::Base
     can :read
   end
 
+  self.ignored_columns = %i[start_date]
+
   def valid_secondary_context
     if course_section_id.present? && user_id.present?
       self.errors.add(:base, "Only one of course_section_id and user_id can be given")
@@ -83,8 +85,6 @@ class PacePlan < ActiveRecord::Base
   end
 
   def publish(progress = nil)
-    raise "A start_date is required to publish" unless start_date
-
     dates = PacePlanDueDatesCalculator.new(self).get_due_dates(pace_plan_module_items.active)
     assignments_to_refresh = Set.new
     Assignment.suspend_due_date_caching do
@@ -164,5 +164,10 @@ class PacePlan < ActiveRecord::Base
                                      .where.not(user_id: student_pace_plan_user_ids)
                                      .where.not(course_section_id: course_section_pace_plan_section_ids)
                              end
+  end
+
+  def start_date
+    student_enrollment = course.student_enrollments.find_by(user_id: user_id) if user_id
+    (student_enrollment&.start_at || course_section&.start_at || course.start_at || course.created_at).to_date
   end
 end

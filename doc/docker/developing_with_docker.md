@@ -108,8 +108,33 @@ Ctrl-C your `docker-compose up` window and restart.
 Canvas supports [ruby-debug-ide](https://github.com/ruby-debug/ruby-debug-ide) to establish
 communication between the debugger engine and IDE (RubyMine or VS Code)
 
-For instructions on setting up RubyMine or VS Code to visually debug Canvas
+For full instructions on setting up RubyMine or VS Code to visually debug Canvas
 Please see [this page](https://instructure.atlassian.net/wiki/spaces/CE/pages/4287561732/Debugging+Dockerized+Canvas+with+RubyMine+or+Visual+Studio+Code).
+
+#### Example VS Code Configuration
+1. Add `docker-compose/rdebug-ide.override.yml` to the `COMPOSE_FILE` variable in the `.env` file. Example:
+```
+COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose/rdebug-ide.override.yml
+```
+2. Install the Ruby extension from [the Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=rebornix.Ruby)
+3. Create a .vscode/launch.json file at the repo root, with the following contents:
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Listen for rdebug-ide",
+      "type": "Ruby",
+      "request": "attach",
+      "remoteHost": "127.0.0.1",
+      "remotePort": "1234",
+      "remoteWorkspaceRoot": "/usr/src/app",
+      "cwd": "${workspaceRoot}"
+    }
+  ]
+}
+```
+4. Press F5, set breakpoints, and start debugging!
 
 ### Byebug
 

@@ -82,7 +82,6 @@ class PacePlansController < ApplicationController
                end
       # Duplicate a published plan if one exists for the plan or for the course
       published_pace_plan = @course.pace_plans.published.where(params).take || @course.pace_plans.primary.published.take
-      params[:start_date] = @context.start_at || @context.created_at
       if published_pace_plan
         @pace_plan = published_pace_plan.duplicate(params)
       else
@@ -190,7 +189,6 @@ class PacePlansController < ApplicationController
     params.require(:pace_plan).permit(
       :course_section_id,
       :user_id,
-      :start_date,
       :end_date,
       :exclude_weekends,
       :hard_end_dates,
@@ -204,7 +202,6 @@ class PacePlansController < ApplicationController
       :course_id,
       :course_section_id,
       :user_id,
-      :start_date,
       :end_date,
       :exclude_weekends,
       :hard_end_dates,
