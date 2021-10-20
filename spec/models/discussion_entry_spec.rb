@@ -229,10 +229,10 @@ describe DiscussionEntry do
       # make sure they all subscribed, somehow
       [teacher, student1, quitter, outsider].each { |user| topic.subscribe(user) }
 
-      entry = topic.discussion_entries.create!(:user => quitter, :message => "Hi, I'm going to drop this class")
+      topic.discussion_entries.create!(:user => quitter, :message => "Hi, I'm going to drop this class")
       quitter.enrollments.each { |e| e.destroy }
 
-      weird_entry = topic.discussion_entries.create!(:user => outsider, :message => "Hi I'm a student from another class")
+      topic.discussion_entries.create!(:user => outsider, :message => "Hi I'm a student from another class")
       entry = topic.discussion_entries.create!(:user => student1, :message => "Hi I'm a student")
 
       to_users = entry.messages_sent[@notification_name].map(&:user)
@@ -719,7 +719,7 @@ describe DiscussionEntry do
     end
 
     it "doesn't make stream items for students that aren't assigned" do
-      entry = @topic.reply_from(user: @teacher, text: "...")
+      @topic.reply_from(user: @teacher, text: "...")
       expect(@student.stream_item_instances).to be_empty
     end
   end

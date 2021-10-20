@@ -152,7 +152,7 @@ describe Group do
       context = course_model
       group_category = GroupCategory.student_organized_for(context)
       group1 = Group.create!(:name => "group1", :group_category => group_category, :context => context)
-      group2 = Group.create!(:name => "group2", :group_category => group_category, :context => context)
+      Group.create!(:name => "group2", :group_category => group_category, :context => context)
       expect(group1.peer_groups).to be_empty
     end
   end
@@ -354,7 +354,7 @@ describe Group do
 
   describe "root account" do
     it "gets the root account assigned" do
-      e = course_with_teacher
+      course_with_teacher
       group = @course.groups.create!
       expect(group.account).to eq Account.default
       expect(group.root_account).to eq Account.default

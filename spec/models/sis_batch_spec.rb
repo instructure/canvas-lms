@@ -299,7 +299,7 @@ describe SisBatch do
     it "processes all non-processed batches for the account" do
       b1 = create_csv_data(['old_id'])
       b2 = create_csv_data(['old_id'])
-      b3 = create_csv_data(['old_id'])
+      create_csv_data(['old_id'])
       b4 = create_csv_data(['old_id'])
       b2.update_attribute(:workflow_state, 'imported')
       @a1 = @account
@@ -921,11 +921,11 @@ test_1,TC 101,Test Course 101,,term1,active
     end
 
     it "joins the chain but doesn't apply the diff when baseline is set" do
-      b1 = process_csv_data([
-                              %{course_id,short_name,long_name,account_id,term_id,status
+      process_csv_data([
+                         %{course_id,short_name,long_name,account_id,term_id,status
 test_1,TC 101,Test Course 101,,term1,active
 }
-                            ], diffing_data_set_identifier: 'default')
+                       ], diffing_data_set_identifier: 'default')
 
       batch = process_csv_data([
                                  %{course_id,short_name,long_name,account_id,term_id,status
@@ -945,11 +945,11 @@ test_1,TC 101,Test Course 101,,term1,active
 }
                             ], diffing_data_set_identifier: 'default')
 
-      b2 = process_csv_data([
-                              %{course_id,short_name,long_name,account_id,term_id,status
+      process_csv_data([
+                         %{course_id,short_name,long_name,account_id,term_id,status
 test_2,TC 102,Test Course 102,,term1,active
 }
-                            ], diffing_data_set_identifier: 'other')
+                       ], diffing_data_set_identifier: 'other')
 
       # doesn't diff against failed imports on the chain
       b3 = process_csv_data([
@@ -1073,7 +1073,7 @@ test_4,TC 104,Test Course 104,,term1,active
     it "marks files separately when created for diffing" do
       f1 = %{course_id,short_name,long_name,account_id,term_id,status
         test_1,TC 101,Test Course 101,,term1,active}
-      b1 = process_csv_data([f1], diffing_data_set_identifier: 'default')
+      process_csv_data([f1], diffing_data_set_identifier: 'default')
 
       f2 = %{course_id,short_name,long_name,account_id,term_id,status
         test_1,TC 101,Test Course 101,,term1,active

@@ -47,7 +47,7 @@ describe UserObservationLink do
 
   it 'restores deleted observer enrollments on "restore" (even if nothing about the observee changed)' do
     # i'm like 66% sure someone will complain about this
-    student_enroll = student_in_course(:user => student)
+    student_in_course(:user => student)
 
     observer = user_with_pseudonym
     UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
@@ -80,9 +80,9 @@ describe UserObservationLink do
 
   it "enrolls the observer in all pending/active courses and restore them after destroy" do
     c1 = course_factory(active_all: true)
-    e1 = student_in_course(:course => c1, :user => student)
+    student_in_course(:course => c1, :user => student)
     c2 = course_factory(active_all: true)
-    e2 = student_in_course(:active_all => true, :course => c2, :user => student)
+    student_in_course(:active_all => true, :course => c2, :user => student)
     c3 = course_factory(active_all: true)
     e3 = student_in_course(:active_all => true, :course => c3, :user => student)
     e3.complete!
@@ -108,7 +108,7 @@ describe UserObservationLink do
 
   it "is able to preload observers" do
     c1 = course_factory(active_all: true)
-    e1 = student_in_course(:course => c1, :user => student)
+    student_in_course(:course => c1, :user => student)
 
     observer = user_with_pseudonym
     UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
@@ -151,7 +151,7 @@ describe UserObservationLink do
     student.reload
     expect(student.linked_observers).to be_empty
 
-    enroll = student_in_course(:course => c1, :user => student)
+    student_in_course(:course => c1, :user => student)
 
     expect(observer.observer_enrollments.first).to be_nil
   end
@@ -163,11 +163,11 @@ describe UserObservationLink do
 
     a1 = account_model
     c1 = course_factory(account: a1, active_all: true)
-    e1 = student_in_course(course: c1, user: student, active_all: true)
+    student_in_course(course: c1, user: student, active_all: true)
 
     a2 = account_model
     c2 = course_factory(account: a2, active_all: true)
-    e2 = student_in_course(course: c2, user: student, active_all: true)
+    student_in_course(course: c2, user: student, active_all: true)
 
     observer = user_with_pseudonym(account: a2)
     allow(@pseudonym).to receive(:works_for_account?).and_return(false)
@@ -272,8 +272,8 @@ describe UserObservationLink do
     end
 
     it "only adds the observer in courses on the same root account as the link when created" do
-      e1 = student_in_course(course: @c1, user: student, active_all: true)
-      e2 = student_in_course(course: @c2, user: student, active_all: true)
+      student_in_course(course: @c1, user: student, active_all: true)
+      student_in_course(course: @c2, user: student, active_all: true)
       UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
       expect(@observer.enrollments.pluck(:course_id)).to eq [@c1.id]
     end
@@ -282,16 +282,16 @@ describe UserObservationLink do
       @observer2 = user_with_pseudonym(account: @a2)
       UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
       UserObservationLink.create_or_restore(observer: @observer2, student: student, root_account: @a2)
-      e1 = student_in_course(course: @c1, user: student, active_all: true)
+      student_in_course(course: @c1, user: student, active_all: true)
       expect(@observer.enrollments.pluck(:course_id)).to eq [@c1.id]
       expect(@observer2.enrollments).to be_empty
     end
 
     it "only removes the observer in courses on the same root account as the link" do
-      e1 = student_in_course(course: @c1, user: student, active_all: true)
-      e2 = student_in_course(course: @c2, user: student, active_all: true)
+      student_in_course(course: @c1, user: student, active_all: true)
+      student_in_course(course: @c2, user: student, active_all: true)
       link1 = UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
-      link2 = UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a2)
+      UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a2)
       expect(@observer.enrollments.active.pluck(:course_id)).to match_array([@c1.id, @c2.id])
       link1.destroy
       expect(@observer.enrollments.active.pluck(:course_id)).to eq [@c2.id]
@@ -301,7 +301,7 @@ describe UserObservationLink do
       UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
       UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a2)
       e1 = student_in_course(course: @c1, user: student, active_all: true)
-      e2 = student_in_course(course: @c2, user: student, active_all: true)
+      student_in_course(course: @c2, user: student, active_all: true)
       e1.destroy
       expect(@observer.enrollments.active.pluck(:course_id)).to eq [@c2.id]
     end

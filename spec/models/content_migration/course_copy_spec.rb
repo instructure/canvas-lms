@@ -734,8 +734,8 @@ describe ContentMigration do
 
     it "is able to copy links to folders" do
       folder = Folder.root_folders(@copy_from).first.sub_folders.create!(:context => @copy_from, :name => 'folder_1')
-      att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt",
-                               :uploaded_data => StringIO.new('file'), :folder => folder, :context => @copy_from)
+      Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt",
+                         :uploaded_data => StringIO.new('file'), :folder => folder, :context => @copy_from)
 
       topic = @copy_from.discussion_topics.create!(:title => "some topic",
                                                    :message => "<a href='/courses/#{@copy_from.id}/files/folder/#{folder.name}'>an ill-advised link</a>")
@@ -777,8 +777,8 @@ describe ContentMigration do
       page = @copy_from.wiki_pages.create!(:title => "some page")
 
       mod = @copy_from.context_modules.create!(:name => "some module")
-      tag1 = mod.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })
-      tag2 = mod.add_item({ :id => page.id, :type => 'wiki_page', :indent => 1 })
+      mod.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })
+      mod.add_item({ :id => page.id, :type => 'wiki_page', :indent => 1 })
 
       run_course_copy
 

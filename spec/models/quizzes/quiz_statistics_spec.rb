@@ -49,7 +49,7 @@ describe Quizzes::QuizStatistics do
     Quizzes::SubmissionGrader.new(qs).grade_submission
 
     # and one in progress
-    qs = @quiz.generate_submission(@student)
+    @quiz.generate_submission(@student)
 
     stats = @quiz.statistics(false)
     expect(stats[:multiple_attempts_exist]).to be_falsey

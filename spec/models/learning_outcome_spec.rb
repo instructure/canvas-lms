@@ -427,7 +427,6 @@ describe LearningOutcome do
       expect(@result.original_score).to eql(2.0)
       expect(@result.original_possible).to eql(3.0)
       expect(@result.mastery).to eql(false)
-      n = @result.version_number
     end
 
     it "does not override rubric-based alignments with non-rubric-based alignments for the same assignment" do
@@ -1159,7 +1158,6 @@ describe LearningOutcome do
     end
 
     it 'de-dups outcomes linked multiple times' do
-      account = Account.default
       course_factory
       lo = LearningOutcome.create!(context: @course, title: "outcome",
                                    calculation_method: 'highest', workflow_state: 'active')

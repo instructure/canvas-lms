@@ -198,21 +198,18 @@ describe Quizzes::QuizQuestionBuilder do
 
         context 'when the pick count is higher than the available questions' do
           it 'duplicates as many questions as needed' do
-            aqs = [
-              @bank.assessment_questions.create!({
-                                                   question_data: {
-                                                     question_text: 'bq1',
-                                                     question_type: 'essay_question'
-                                                   }
-                                                 }),
-
-              @bank.assessment_questions.create!({
-                                                   question_data: {
-                                                     question_text: 'bq2',
-                                                     question_type: 'essay_question'
-                                                   }
-                                                 })
-            ]
+            @bank.assessment_questions.create!({
+                                                 question_data: {
+                                                   question_text: 'bq1',
+                                                   question_type: 'essay_question'
+                                                 }
+                                               })
+            @bank.assessment_questions.create!({
+                                                 question_data: {
+                                                   question_text: 'bq2',
+                                                   question_type: 'essay_question'
+                                                 }
+                                               })
 
             @group.update_attribute(:pick_count, 3)
 
@@ -243,19 +240,19 @@ describe Quizzes::QuizQuestionBuilder do
                                                    }
                                                  })
 
-        aq2 = @bank.assessment_questions.create!({
-                                                   question_data: {
-                                                     question_text: 'bank question 2',
-                                                     question_type: 'essay_question'
-                                                   }
-                                                 })
-
-        group1 = @quiz.quiz_groups.create!({
-                                             name: "linked group",
-                                             pick_count: 2,
-                                             question_points: 1,
-                                             assessment_question_bank_id: @bank.id
+        @bank.assessment_questions.create!({
+                                             question_data: {
+                                               question_text: 'bank question 2',
+                                               question_type: 'essay_question'
+                                             }
                                            })
+
+        @quiz.quiz_groups.create!({
+                                    name: "linked group",
+                                    pick_count: 2,
+                                    question_points: 1,
+                                    assessment_question_bank_id: @bank.id
+                                  })
 
         group2 = @quiz.quiz_groups.create!({
                                              name: "standalone group",
