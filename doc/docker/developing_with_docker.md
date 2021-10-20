@@ -102,7 +102,14 @@ all be done with one command:
 Changes you're making are not showing up? See the Caveats section below.
 Ctrl-C your `docker-compose up` window and restart.
 
-## Debugging
+##
+
+### With an IDE
+Canvas supports [ruby-debug-ide](https://github.com/ruby-debug/ruby-debug-ide) to establish
+communication between the debugger engine and IDE (RubyMine or VS Code)
+
+For instructions on setting up RubyMine or VS Code to visually debug Canvas
+Please see [this page](https://instructure.atlassian.net/wiki/spaces/CE/pages/4287561732/Debugging+Dockerized+Canvas+with+RubyMine+or+Visual+Studio+Code).
 
 ### Byebug
 
