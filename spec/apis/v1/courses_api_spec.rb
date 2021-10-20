@@ -26,7 +26,9 @@ class TestCourseApi
   include Api::V1::Course
   def feeds_calendar_url(feed_code); "feed_calendar_url(#{feed_code.inspect})"; end
 
-  def course_url(course, opts = {}); return "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"; end
+  def course_url(course, **)
+    "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"
+  end
 
   def api_user_content(syllabus, course); return "api_user_content(#{syllabus}, #{course.id})"; end
 end
@@ -396,8 +398,12 @@ describe Api::V1::Course do
     let(:result) do
       result_hash = api.add_helper_dependant_entries(hash, course, course_json)
       class << result_hash
-        def method_missing(method_name, *args)
-          self[method_name.to_s]
+        def method_missing(method, *)
+          self[method.to_s]
+        end
+
+        def respond_to_missing?(method, _include_private = false)
+          self[method.to_s]
         end
       end
       result_hash

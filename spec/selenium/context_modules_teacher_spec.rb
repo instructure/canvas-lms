@@ -291,11 +291,11 @@ describe "context modules" do
     it "validates locking a module item display functionality" do
       get "/courses/#{@course.id}/modules"
       add_form = new_module_form
-      lock_check_click(add_form)
+      lock_check_click
       wait_for_ajaximations
       expect(add_form.find_element(:css, '.unlock_module_at_details')).to be_displayed
       # verify unlock
-      lock_check_click(add_form)
+      lock_check_click
       wait_for_ajaximations
       expect(add_form.find_element(:css, '.unlock_module_at_details')).not_to be_displayed
     end

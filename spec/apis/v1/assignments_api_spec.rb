@@ -61,7 +61,7 @@ describe AssignmentsApiController, type: :request do
   end
 
   def create_override_for_assignment(assignment = @assignment)
-    override = @assignment.assignment_overrides.build
+    override = assignment.assignment_overrides.build
     override.title = "I am overridden and being returned in the API!"
     override.set = @section
     override.set_type = 'CourseSection'

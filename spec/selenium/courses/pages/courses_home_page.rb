@@ -98,7 +98,7 @@ module CoursesHomePage
   end
 
   def visit_course_people(course)
-    get "/courses/#{@course.id}/users"
+    get "/courses/#{course.id}/users"
   end
 
   def open_course_wizard

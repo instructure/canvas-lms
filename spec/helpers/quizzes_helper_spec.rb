@@ -32,7 +32,7 @@ describe QuizzesHelper do
     it "is false if quiz not manageable" do
       quiz = Quizzes::Quiz.new(:context => @course)
 
-      def can_publish(quiz); false; end
+      allow(self).to receive(:can_publish).and_return(false)
       expect(needs_unpublished_warning?(quiz)).to be_falsey
     end
 
@@ -42,7 +42,7 @@ describe QuizzesHelper do
       quiz.last_edited_at = 10.minutes.ago
       quiz.published_at   = Time.now
 
-      def can_publish(quiz); true; end
+      allow(self).to receive(:can_publish).and_return(true)
       expect(needs_unpublished_warning?(quiz)).to be_falsey
     end
 
@@ -50,7 +50,7 @@ describe QuizzesHelper do
       quiz = Quizzes::Quiz.new(:context => @course)
       quiz.workflow_state = 'created'
 
-      def can_publish(quiz); true; end
+      allow(self).to receive(:can_publish).and_return(true)
       expect(needs_unpublished_warning?(quiz)).to be_truthy
     end
 
@@ -60,7 +60,7 @@ describe QuizzesHelper do
       quiz.last_edited_at = Time.now
       quiz.published_at   = 10.minutes.ago
 
-      def can_publish(quiz); true; end
+      allow(self).to receive(:can_publish).and_return(true)
       expect(needs_unpublished_warning?(quiz)).to be_truthy
     end
   end

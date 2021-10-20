@@ -103,7 +103,7 @@ describe "Gradebook editing grades" do
     switch_to_section(@other_section)
 
     Gradebook.click_assignment_header_menu(@third_assignment.id)
-    set_default_grade(2, 13)
+    set_default_grade(13)
     @other_section.users.each { |u| expect(u.submissions.map(&:grade)).to include '13' }
     @course.default_section.users.each { |u| expect(u.submissions.map(&:grade)).not_to include '13' }
   end
@@ -243,7 +243,7 @@ describe "Gradebook editing grades" do
     expected_grade = "45"
     Gradebook.visit(@course)
     Gradebook.click_assignment_header_menu(@third_assignment.id)
-    set_default_grade(2, expected_grade)
+    set_default_grade(expected_grade)
     grade_grid = f('#gradebook_grid .container_1')
     StudentEnrollment.count.times do |n|
       expect(find_slick_cells(n, grade_grid)[2]).to include_text expected_grade

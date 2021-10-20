@@ -45,7 +45,7 @@ describe Quizzes::QuizzesController do
     end
   end
 
-  def logged_out_survey_with_submission(user, questions, &block)
+  def logged_out_survey_with_submission(user, questions)
     user_session(@teacher)
 
     @assignment = @course.assignments.create(:title => "Test Assignment")

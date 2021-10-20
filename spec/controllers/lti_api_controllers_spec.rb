@@ -690,7 +690,7 @@ describe LtiApiController, type: :request do
       xml
     end
 
-    def check_failure(failure_type = 'Failure', error_message = nil)
+    def check_failure(failure_type = 'Failure', _error_message = nil)
       expect(response).to be_successful
       expect(response.media_type).to eq 'application/xml'
       xml = Nokogiri::XML.parse(response.body)

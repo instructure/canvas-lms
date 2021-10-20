@@ -1667,7 +1667,7 @@ describe "Accounts API", type: :request do
 
   context "account api extension" do
     module MockPlugin
-      def self.extend_account_json(hash, account, user, session, includes)
+      def self.extend_account_json(hash, *)
         hash[:extra_thing] = "something"
       end
     end
