@@ -658,6 +658,9 @@ $.widget('ui.selectmenu', {
       self._refreshPosition()
 
       const link = selected.find('a')
+      // update focus classes to match whatever item is selected, since it
+      // may have changed since this menu was last open
+      this._focusItem(this._selectedOptionLi())
       if (link.length) link[0].focus()
 
       self.isOpen = true
@@ -764,11 +767,18 @@ $.widget('ui.selectmenu', {
   },
 
   _moveFocus(amt, recIndex) {
+    let newIndex
     if (!isNaN(amt)) {
       const currIndex = parseInt(this._focusedOptionLi().data('index') || 0, 10)
-      var newIndex = currIndex + amt
+      newIndex = currIndex + amt
+    } else if (amt === ':first') {
+      // Pressing the Home key attempts to take the user to the topmost item,
+      // which may be a section and not a student. If it's a section, navigation
+      // doesn't work at all, so just select the first student instead.
+      const firstStudent = this._optionLis.filter((_, el) => $(el).data('index') != null).first()
+      newIndex = firstStudent != null ? parseInt(firstStudent.data('index'), 10) : 0
     } else {
-      var newIndex = parseInt(this._optionLis.filter(amt).data('index'), 10)
+      newIndex = parseInt(this._optionLis.filter(amt).data('index'), 10)
     }
 
     if (newIndex < 0) {
@@ -793,9 +803,19 @@ $.widget('ui.selectmenu', {
       this._moveFocus(amt, newIndex)
     } else {
       this._optionLis.eq(newIndex).find('a:eq(0)').attr('id', activeID).focus()
+
+      this._focusItem(this._optionLis.eq(newIndex))
     }
 
     this.list.attr('aria-activedescendant', activeID)
+  },
+
+  _focusItem($item) {
+    // This function does not actually attempt to focus anything; it only
+    // updates CSS classes related to focused elements.
+    const classes = `${this.widgetBaseClass}-item-focus ui-state-hover`
+    this._focusedOptionLi().removeClass(classes)
+    $item.addClass(classes)
   },
 
   _scrollPage(direction) {

@@ -341,9 +341,10 @@ module QuizzesCommon
     @context = @course
     quiz_model
     open_quiz_edit_form
+    wait_for_rce
     click_questions_tab
     click_new_question_button
-    wait_for_ajaximations
+    wait_for_rce('.question .rce-wrapper')
     Quizzes::Quiz.last
   end
 
