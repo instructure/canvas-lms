@@ -22,7 +22,7 @@ require 'spec_helper'
 require 'aws-sdk-kinesis'
 
 describe LiveEvents::Client do
-  def stub_config(opts = {})
+  def stub_config
     allow(LiveEvents::Client).to receive(:config).and_return({
                                                                'kinesis_stream_name' => 'stream',
                                                                'aws_access_key_id' => 'access_key',
