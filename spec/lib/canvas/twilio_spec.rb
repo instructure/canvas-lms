@@ -104,8 +104,8 @@ describe 'Canvas::Twilio' do
       )
     end
 
-    it 'raises an exception when attempting to deliver without a config file' do
-      allow(Canvas::Twilio).to receive(:config).and_return({})
+    it 'raises an exception when attempting to deliver without config' do
+      allow(Rails.application.credentials).to receive(:twilio_creds).and_return(nil)
 
       expect { Canvas::Twilio.deliver('+18015550100', 'message text') }.to raise_error("Twilio is not configured")
     end
