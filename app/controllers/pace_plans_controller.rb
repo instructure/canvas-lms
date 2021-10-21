@@ -34,6 +34,8 @@ class PacePlansController < ApplicationController
     if @pace_plan.nil?
       @pace_plan = @context.pace_plans.new
       @context.context_module_tags.not_deleted.each do |module_item|
+        next unless module_item.assignment
+
         @pace_plan.pace_plan_module_items.new module_item: module_item, duration: 0
       end
     end
