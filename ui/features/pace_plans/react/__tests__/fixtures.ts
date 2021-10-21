@@ -175,6 +175,22 @@ export const STUDENT_PLAN: PacePlan = {
   modules: [PLAN_MODULE_1, PLAN_MODULE_2]
 }
 
+export const PROGRESS_RUNNING = {
+  id: '900',
+  completion: 25,
+  message: undefined,
+  workflow_state: 'running',
+  url: '/api/v1/progress/900'
+}
+
+export const PROGRESS_FAILED = {
+  id: '901',
+  completion: undefined,
+  message: 'Something went wrong!',
+  workflow_state: 'failed',
+  url: '/api/v1/progress/901'
+}
+
 export interface DefaultStoreState {
   readonly pacePlan?: PacePlansState
   readonly enrollments?: EnrollmentsState
