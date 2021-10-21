@@ -44,9 +44,12 @@ import {getSections} from './sections'
 import {getBlackoutDates} from '../shared/reducers/blackout_dates'
 import {Change, summarizeChanges} from '../utils/change_tracking'
 
+const initialProgress = window.ENV.PACE_PLAN_PROGRESS
+
 export const initialState: PacePlansState = ({
   ...window.ENV.PACE_PLAN,
-  originalPlan: window.ENV.PACE_PLAN
+  originalPlan: window.ENV.PACE_PLAN,
+  publishingProgress: initialProgress
 } || {}) as PacePlansState
 
 const getModuleItems = (modules: Module[]) =>
@@ -69,6 +72,16 @@ export const getPacePlan = (state: StoreState): PacePlansState => state.pacePlan
 export const getPacePlanModules = (state: StoreState) => state.pacePlan.modules
 export const getPacePlanType = (state: StoreState): PlanContextTypes => state.pacePlan.context_type
 export const getStartDate = (state: StoreState): string | undefined => state.pacePlan.start_date
+export const getPlanPublishing = (state: StoreState): boolean => {
+  const progress = state.pacePlan.publishingProgress
+  if (!progress) return false
+  return !!progress.id && ['queued', 'running'].includes(progress.workflow_state)
+}
+export const getPublishingError = (state: StoreState): string | undefined => {
+  const progress = state.pacePlan.publishingProgress
+  if (!progress || progress.workflow_state !== 'failed') return undefined
+  return progress.message
+}
 
 export const getPacePlanItems = createSelector(getPacePlanModules, getModuleItems)
 
@@ -274,6 +287,8 @@ export default (
       return {...state, hard_end_dates: !state.hard_end_dates}
     case PacePlanConstants.RESET_PLAN:
       return {...state.originalPlan, originalPlan: state.originalPlan}
+    case PacePlanConstants.SET_PROGRESS:
+      return {...state, publishingProgress: action.payload}
     default:
       return {...state, modules: pacePlanItemsReducer(state.modules, action)}
   }

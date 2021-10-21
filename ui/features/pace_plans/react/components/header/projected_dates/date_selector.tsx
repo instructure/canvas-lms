@@ -25,10 +25,14 @@ import moment from 'moment-timezone'
 import PacePlanDateInput from '../../../shared/components/pace_plan_date_input'
 import {StoreState, PacePlan} from '../../../types'
 import {BlackoutDate, InputInteraction} from '../../../shared/types'
-import {getPacePlan, getProjectedEndDate, getExcludeWeekends} from '../../../reducers/pace_plans'
+import {
+  getPacePlan,
+  getPlanPublishing,
+  getProjectedEndDate,
+  getExcludeWeekends
+} from '../../../reducers/pace_plans'
 import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
 import {pacePlanActions as actions} from '../../../actions/pace_plans'
-import {getPlanPublishing} from '../../../reducers/ui'
 
 type StoreProps = {
   pacePlan: PacePlan
