@@ -1736,9 +1736,7 @@ describe User do
       context "with mixed enrollment types" do
         it "returns favorited classic and all k5 courses where user is a student" do
           @classic1.enroll_student(@user, enrollment_state: "active")
-          @classic2.enroll_teacher(@user, enrollment_state: "active")
           @k51.enroll_student(@user, enrollment_state: "active")
-          @k52.enroll_teacher(@user, enrollment_state: "active")
           @user.favorites.create!(context: @classic1)
 
           assert_has_courses([@classic1, @k51])
@@ -1772,7 +1770,7 @@ describe User do
           @k52.enroll_student(@user, enrollment_state: "active")
           @user.favorites.create!(context: @classic2)
 
-          assert_has_courses([@classic2, @k52])
+          assert_has_courses([@classic2])
         end
       end
     end
