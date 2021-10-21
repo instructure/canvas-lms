@@ -58,7 +58,7 @@ const MicrosoftSync = ({group, loading, children}) => {
       <br />
       <Text>
         {I18n.t(
-          'Also note that Microsoft Teams is unable to support courses with greater than %{max_enrollments} enrollments or greater than %{max_owners} owners. If you have a large course you may experience sync issues if these thresholds are met.',
+          'Also note that Microsoft Teams is unable to support courses with greater than %{max_enrollments} enrollments or greater than %{max_owners} owners. If your course exceeds these limits, sync will likely be interrupted.',
           {max_enrollments: 25000, max_owners: 100}
         )}
       </Text>
