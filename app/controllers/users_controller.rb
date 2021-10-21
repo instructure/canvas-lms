@@ -2203,11 +2203,7 @@ class UsersController < ApplicationController
       end
     else
       if !session["reported_#{@user.id}".to_sym]
-        if params[:context_code]
-          @context = Context.find_by_asset_string(params[:context_code]) rescue nil
-          @context = nil unless context.respond_to?(:users) && context.users.where(id: @user).first
-        end
-        @user.report_avatar_image!(@context)
+        @user.report_avatar_image!
       end
       session["reports_#{@user.id}".to_sym] = true
       render :json => { :reported => true }

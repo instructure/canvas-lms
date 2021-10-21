@@ -794,7 +794,7 @@ class DiscussionTopicsController < ApplicationController
               :MARK_ALL_READ_URL => api_url.call('topic_mark_all_read'),
               :MARK_ALL_UNREAD_URL => api_url.call('topic_mark_all_unread'),
               :MANUAL_MARK_AS_READ => @current_user.try(:manual_mark_as_read?),
-              :CAN_SUBSCRIBE => !@topic.subscription_hold(@current_user, @context_enrollment, session),
+              :CAN_SUBSCRIBE => !@topic.subscription_hold(@current_user, session),
               :CURRENT_USER => user_display_json(@current_user),
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?,

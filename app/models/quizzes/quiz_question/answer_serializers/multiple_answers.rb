@@ -75,7 +75,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     #
     # @example output for no answers selected:
     #   []
-    def deserialize(submission_data, full = false)
+    def deserialize(submission_data, full: false)
       answers.each_with_object([]) do |answer_record, out|
         answer_id = answer_record[:id]
 

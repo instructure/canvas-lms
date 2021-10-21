@@ -442,11 +442,11 @@ class DiscussionEntry < ActiveRecord::Base
               :user => self.user,
               :unread_entry_count => new_count,
               :workflow_state => "unread",
-              :subscribed => !self.discussion_topic.subscription_hold(user, nil, nil)
+              :subscribed => !self.discussion_topic.subscription_hold(user, nil)
             )
           end
         end
-        if existing_topic_participant && !existing_topic_participant.subscribed? && !self.discussion_topic.subscription_hold(user, nil, nil)
+        if existing_topic_participant && !existing_topic_participant.subscribed? && !self.discussion_topic.subscription_hold(user, nil)
           existing_topic_participant.update!(:subscribed => true)
         end
       end

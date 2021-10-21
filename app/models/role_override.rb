@@ -1622,21 +1622,6 @@ class RoleOverride < ActiveRecord::Base
     end
   end
 
-  def self.css_class_for(context, permission, role, role_context = :role_account)
-    generated_permission = self.permission_for(context, permission, role, :role_account)
-
-    css = []
-    if generated_permission[:readonly]
-      css << "six-checkbox-disabled-#{generated_permission[:enabled] ? 'checked' : 'unchecked'}"
-    else
-      if generated_permission[:explicit]
-        css << "six-checkbox-default-#{generated_permission[:prior_default] ? 'checked' : 'unchecked'}"
-      end
-      css << "six-checkbox#{generated_permission[:explicit] ? '' : '-default'}-#{generated_permission[:enabled] ? 'checked' : 'unchecked'}"
-    end
-    css.join(' ')
-  end
-
   def self.readonly_for(context, permission, role, role_context = :role_account)
     self.permission_for(context, permission, role, role_context)[:readonly]
   end

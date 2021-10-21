@@ -1608,7 +1608,7 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def unenrolled_user_can_read?(user, session)
+  def unenrolled_user_can_read?(_user, session)
     self.is_public || (self.is_public_to_auth_users && session.present? && session.has_key?(:user_id))
   end
 
@@ -2494,18 +2494,6 @@ class Course < ActiveRecord::Base
     if vericite_enabled?
       Canvas::Plugin.find(:vericite).settings[:comments]
     end
-  end
-
-  attr_accessor :merge_results
-
-  def log_merge_result(text)
-    @merge_results ||= []
-    logger.debug text
-    @merge_results << text
-  end
-
-  def warn_merge_result(text)
-    log_merge_result(text)
   end
 
   def bool_res(val)
@@ -3480,7 +3468,7 @@ class Course < ActiveRecord::Base
     false
   end
 
-  def filter_attributes_for_user(hash, user, session)
+  def filter_attributes_for_user(hash, user, _session)
     hash.delete('hide_final_grades') if hash.key?('hide_final_grades') && !grants_right?(user, :update)
     hash
   end

@@ -211,7 +211,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
         calc.check_action!(req, req_met)
       elsif req[:type] == 'min_score'
-        calc.check_action!(req, evaluate_score_requirement_met(req, subs, tag))
+        calc.check_action!(req, evaluate_score_requirement_met(req, subs))
       end
     end
     calc.check_view_requirements
@@ -245,7 +245,7 @@ class ContextModuleProgression < ActiveRecord::Base
   private :get_submission_score
 
   def remove_incomplete_requirement(requirement_id)
-    self.incomplete_requirements.delete_if { |r| r[:id] == id }
+    self.incomplete_requirements.delete_if { |r| r[:id] == requirement_id }
   end
 
   # hold onto the status of the incomplete min_score requirement
@@ -264,7 +264,7 @@ class ContextModuleProgression < ActiveRecord::Base
     end
   end
 
-  def evaluate_score_requirement_met(requirement, subs, tag)
+  def evaluate_score_requirement_met(requirement, subs)
     return unless requirement[:type] == "min_score"
 
     remove_incomplete_requirement(requirement[:id]) # start from a fresh slate so we don't hold onto a max score that doesn't exist anymore

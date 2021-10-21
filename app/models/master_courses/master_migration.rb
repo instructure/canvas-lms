@@ -217,7 +217,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     end
     if ce.exported_for_course_copy? && is_primary
       detect_updated_attachments(type)
-      detect_updated_syllabus(type, ce)
+      detect_updated_syllabus(ce)
     end
     ce
   end
@@ -258,7 +258,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     end
   end
 
-  def detect_updated_syllabus(type, content_export)
+  def detect_updated_syllabus(content_export)
     selected_content = content_export.settings[:selected_content]
     @updates['syllabus'] = true if @updates && selected_content && selected_content[:syllabus_body]
   end

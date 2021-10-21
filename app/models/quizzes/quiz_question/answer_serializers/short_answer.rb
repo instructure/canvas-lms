@@ -45,7 +45,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     end
 
     # @return [String|NilClass] The textual answer, if any.
-    def deserialize(submission_data, full = false)
+    def deserialize(submission_data, full: false)
       text = submission_data[question_key]
 
       if text.nil? || text.empty?

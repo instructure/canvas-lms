@@ -175,7 +175,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   # moves an existing outcome group from the same context to be under this
   # group. cannot move an ancestor of the group.
-  def adopt_outcome_group(group, opts = {})
+  def adopt_outcome_group(group)
     # can only move within context, and no cycles!
     return unless group.context == self.context
     return if is_ancestor?(group.id)

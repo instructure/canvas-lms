@@ -55,7 +55,7 @@ class Attachments::S3Storage
     end
   end
 
-  def initialize_ajax_upload_params(local_upload_url, s3_success_url, options)
+  def initialize_ajax_upload_params(_local_upload_url, s3_success_url, options)
     {
       :upload_url => bucket.url,
       :file_param => 'file',
@@ -100,7 +100,7 @@ class Attachments::S3Storage
     ['x-amz-signature', signature]
   end
 
-  def open(opts, &block)
+  def open(opts)
     # TODO: !need_local_file -- net/http and thus AWS::S3::S3Object don't
     # natively support streaming the response, except when a block is given.
     # so without Fibers, there's not a great way to return an IO-like object

@@ -185,7 +185,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     true
   end
 
-  def clone_for(quiz, dup = nil, options = {})
+  def clone_for(quiz, dup = nil, **)
     dup ||= Quizzes::QuizQuestion.new
     self.attributes.except("id", "quiz_id", "quiz_group_id", "question_data").each do |key, val|
       dup.send("#{key}=", val)

@@ -98,7 +98,7 @@ module Api::V1::QuizSubmissionQuestion
 
     if qs.submission_data.is_a? Hash # ungraded
       data[:flagged] = to_boolean(qs.submission_data["question_#{qq.id}_marked"])
-      data[:answer] = answer_serializer.deserialize(qs.submission_data, true)
+      data[:answer] = answer_serializer.deserialize(qs.submission_data, full: true)
     else
       question_data = qs.submission_data.select { |h| h[:question_id] == qq.id }
       return data if question_data.empty?
