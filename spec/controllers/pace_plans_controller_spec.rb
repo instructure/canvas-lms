@@ -54,8 +54,11 @@ describe PacePlansController, type: :controller do
     @mod2.add_item id: @a2.id, type: 'assignment'
     @a3 = @course.assignments.create! name: 'A3', workflow_state: 'published'
     @mod2.add_item id: @a3.id, type: 'assignment'
+    @mod2.add_item type: 'external_url', title: 'External URL', url: 'http://localhost'
 
     @course.context_module_tags.each_with_index do |tag, i|
+      next unless tag.assignment
+
       @pace_plan.pace_plan_module_items.create! module_item: tag, duration: i * 2
     end
 
@@ -154,6 +157,9 @@ describe PacePlansController, type: :controller do
       expect(@course.pace_plans.count).to eq(1)
       expect(@course.pace_plans.primary).to be_empty
       get :index, params: { course_id: @course.id }
+      pace_plan = @controller.instance_variable_get(:@pace_plan)
+      expect(pace_plan).not_to be_nil
+      expect(pace_plan.pace_plan_module_items.size).to eq(3)
       expect(@course.pace_plans.count).to eq(1)
       expect(@course.pace_plans.primary.count).to eq(0)
     end
