@@ -344,6 +344,8 @@ module CanvasRails
 
     initializer "canvas.init_credentials", before: "active_record.initialize_database" do
       self.credentials = Canvas::Credentials.new(credentials)
+      # Ensure we load credentials at initailization time to avoid overloading vault
+      self.credentials.config
     end
 
     # we don't know what middleware to make SessionsTimeout follow until after
