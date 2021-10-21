@@ -223,14 +223,32 @@ module CustomWaitMethods
     # TODO: Better to wait for an event from tiny?
     parent = element.find_element(:xpath, '..')
     tiny_frame = nil
-    keep_trying_until {
+    keep_trying_until do
       begin
         tiny_frame = disable_implicit_wait { parent.find_element(:css, 'iframe') }
       rescue => e
         puts "#{e.inspect}"
         false
       end
-    }
+    end
+    tiny_frame
+  end
+
+  # a slightly modified version of wait_for_tiny
+  # that's simpler for the normal case where
+  # the RCE is created via serviceRCELoader, which
+  # adds the 'ic-RichContentEditor' class name
+  def wait_for_rce(element = nil)
+    element ||= f('.ic-RichContentEditor')
+    tiny_frame = nil
+    keep_trying_until do
+      begin
+        tiny_frame = disable_implicit_wait { element.find_element(:css, 'iframe') }
+      rescue => e
+        puts "#{e.inspect}"
+        false
+      end
+    end
     tiny_frame
   end
 

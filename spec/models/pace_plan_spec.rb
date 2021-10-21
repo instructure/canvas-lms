@@ -29,6 +29,9 @@ describe PacePlan do
     @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: 'context_module'
     @pace_plan = @course.pace_plans.create! workflow_state: 'active'
     @pace_plan_module_item = @pace_plan.pace_plan_module_items.create! module_item: @tag
+    @unpublished_assignment = @course.assignments.create! workflow_state: 'unpublished'
+    @unpublished_tag = @unpublished_assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: 'context_module', workflow_state: 'unpublished'
+    @pace_plan.pace_plan_module_items.create! module_item: @unpublished_tag
   end
 
   context "associations" do
@@ -38,7 +41,7 @@ describe PacePlan do
     end
 
     it "has functioning pace_plan_module_items association" do
-      expect(@pace_plan.pace_plan_module_items.map(&:module_item)).to match_array([@tag])
+      expect(@pace_plan.pace_plan_module_items.map(&:module_item)).to match_array([@tag, @unpublished_tag])
     end
   end
 
@@ -130,18 +133,21 @@ describe PacePlan do
 
     it "creates an override for students" do
       expect(@assignment.due_at).to eq(nil)
+      expect(@unpublished_assignment.due_at).to eq(nil)
       expect(@pace_plan.publish).to eq(true)
-      expect(@assignment.assignment_overrides.count).to eq(1)
+      expect(AssignmentOverride.count).to eq(2)
     end
 
     it "creates assignment overrides for the pace plan user" do
       @pace_plan.update(user_id: @student)
-      expect(@assignment.assignment_overrides.count).to eq(0)
+      expect(AssignmentOverride.count).to eq(0)
       expect(@pace_plan.publish).to eq(true)
-      expect(@assignment.assignment_overrides.count).to eq(1)
-      assignment_override = @assignment.assignment_overrides.first
-      expect(assignment_override.due_at).to eq(Date.parse('2021-09-01').end_of_day)
-      expect(assignment_override.assignment_override_students.first.user_id).to eq(@student.id)
+      expect(AssignmentOverride.count).to eq(2)
+      @course.assignments.each do |assignment|
+        assignment_override = assignment.assignment_overrides.first
+        expect(assignment_override.due_at).to eq(Date.parse('2021-09-01').end_of_day)
+        expect(assignment_override.assignment_override_students.first.user_id).to eq(@student.id)
+      end
     end
 
     it "removes the user from an adhoc assignment override if it includes other students" do
