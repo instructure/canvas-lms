@@ -271,7 +271,7 @@ describe NotificationPolicy do
       # Ensure no existing policies
       NotificationPolicy.delete_all
 
-      policies = NotificationPolicy.setup_with_default_policies(@user, [@announcement])
+      policies = NotificationPolicy.setup_with_default_policies(@user)
       expect(policies.length).to eq 1
       expect(policies.first.frequency).to eq @announcement.default_frequency
     end
@@ -284,7 +284,7 @@ describe NotificationPolicy do
                                   :frequency => Notification::FREQ_NEVER })
 
       expect(@announcement.default_frequency).not_to eq Notification::FREQ_NEVER # verify that it differs from the default
-      policies = NotificationPolicy.setup_with_default_policies(@user, [@announcement])
+      policies = NotificationPolicy.setup_with_default_policies(@user)
       expect(policies.length).to eq 1
       expect(policies.first.frequency).to eq Notification::FREQ_NEVER
     end
@@ -298,7 +298,7 @@ describe NotificationPolicy do
       expect(primary_channel.notification_policies.count).to eq 0
       expect(secondary_channel.notification_policies.count).to eq 0
       # Load data
-      NotificationPolicy.setup_with_default_policies(@user, [@announcement])
+      NotificationPolicy.setup_with_default_policies(@user)
       # Primary should have 1 created and secondary should be left alone.
       expect(primary_channel.notification_policies.count).to eq 1
       expect(secondary_channel.notification_policies.count).to eq 0
@@ -310,7 +310,7 @@ describe NotificationPolicy do
       primary_channel   = @user.communication_channel
       secondary_channel = communication_channel_model(:path => 'secondary@example.com')
       secondary_channel.notification_policies.create!(:notification => @notification, :frequency => Notification::FREQ_NEVER)
-      NotificationPolicy.setup_with_default_policies(@user, [@announcement])
+      NotificationPolicy.setup_with_default_policies(@user)
       # Primary should have 1 created and secondary should be left alone.
       expect(primary_channel.reload.notification_policies.count).to eq 1
       expect(secondary_channel.reload.notification_policies.count).to eq 1
@@ -319,7 +319,7 @@ describe NotificationPolicy do
     it "does not error if no channel exists" do
       NotificationPolicy.delete_all
       CommunicationChannel.delete_all
-      expect { NotificationPolicy.setup_with_default_policies(@user, [@announcement]) }.not_to raise_error
+      expect { NotificationPolicy.setup_with_default_policies(@user) }.not_to raise_error
     end
 
     context "across shards" do
@@ -331,7 +331,7 @@ describe NotificationPolicy do
           @channel = communication_channel_model(:user => @shard_user)
           NotificationPolicy.delete_all
           @policy = @channel.notification_policies.create!(:notification => @notification, :frequency => Notification::FREQ_NEVER)
-          NotificationPolicy.setup_with_default_policies(@shard_user, [@announcement])
+          NotificationPolicy.setup_with_default_policies(@shard_user)
           expect(@policy.reload.frequency).to eq Notification::FREQ_NEVER
         }
       end

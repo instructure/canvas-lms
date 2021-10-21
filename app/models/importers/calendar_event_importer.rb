@@ -75,7 +75,7 @@ module Importers
       suffix || ""
     end
 
-    def self.external_url_attachment_description(hash, context)
+    def self.external_url_attachment_description(hash, _context)
       return unless (url = hash[:attachment_value])
 
       import_migration_attachment_link(url, ERB::Util.h(t('#calendar_event.see_related_link', "See Related Link")))

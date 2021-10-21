@@ -1447,7 +1447,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def report_avatar_image!(associated_context = nil)
+  def report_avatar_image!
     if self.avatar_state == :approved || self.avatar_state == :locked
       self.avatar_state = 're_reported'
     else
@@ -1799,25 +1799,6 @@ class User < ActiveRecord::Base
       :otp_secret_key_salt,
       :collkey
     ]
-  end
-
-  attr_accessor :merge_mappings
-  attr_accessor :merge_results
-
-  def merge_mapped_id(*args)
-    nil
-  end
-
-  def map_merge(*args)
-  end
-
-  def log_merge_result(text)
-    @merge_results ||= []
-    @merge_results << text
-  end
-
-  def warn_merge_result(text)
-    record_merge_result(text)
   end
 
   def secondary_identifier

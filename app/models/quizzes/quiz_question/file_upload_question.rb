@@ -19,7 +19,7 @@
 #
 
 class Quizzes::QuizQuestion::FileUploadQuestion < Quizzes::QuizQuestion::Base
-  def requires_manual_scoring?(user_answer)
+  def requires_manual_scoring?(_user_answer)
     true
   end
 

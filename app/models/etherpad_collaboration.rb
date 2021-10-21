@@ -39,10 +39,6 @@ class EtherpadCollaboration < Collaboration
     self.url ||= "http://#{EtherpadCollaboration.config[:domain]}/i-#{self.uuid}"
   end
 
-  def user_can_access_document_type?(user)
-    true
-  end
-
   def self.config
     Canvas::Plugin.find(:etherpad).try(:settings) || (YAML.load_file(Rails.root + "config/etherpad.yml")[Rails.env] rescue nil)
   end

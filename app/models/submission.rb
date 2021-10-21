@@ -2165,7 +2165,7 @@ class Submission < ActiveRecord::Base
     if opts[:comment].present? || opts[:media_comment_id]
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end
-    opts[:assessment_request].comment_added(comment) if opts[:assessment_request] && comment
+    opts[:assessment_request].comment_added if opts[:assessment_request] && comment
 
     comment
   end

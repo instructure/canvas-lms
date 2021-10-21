@@ -289,7 +289,7 @@ class ContextModule < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
     ContentTag.where(:context_module_id => self).where.not(:workflow_state => 'deleted').update_all(:workflow_state => 'deleted', :updated_at => self.deleted_at)
-    delay_if_production(n_strand: "context_module_update_downstreams", priority: Delayed::LOW_PRIORITY).update_downstreams(self.position)
+    delay_if_production(n_strand: "context_module_update_downstreams", priority: Delayed::LOW_PRIORITY).update_downstreams
     save!
     true
   end
@@ -316,7 +316,9 @@ class ContextModule < ActiveRecord::Base
     self.save
   end
 
-  def update_downstreams(original_position = nil)
+  def update_downstreams(_original_position = nil)
+    # TODO: remove the unused argument; it's not sent anymore, but it was sent through a delayed job
+    # so compatibility was maintained when sender was updated to not send it
     positions = ContextModule.module_positions(self.context).to_a.sort_by { |a| a[1] }
     downstream_ids = positions.select { |a| a[1] > (self.position || 0) }.map { |a| a[0] }
     downstreams = downstream_ids.empty? ? [] : self.context.context_modules.not_deleted.where(id: downstream_ids)

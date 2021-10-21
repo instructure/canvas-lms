@@ -106,7 +106,7 @@ class NotificationPolicy < ActiveRecord::Base
   # ===== Returns
   # A list of NotificationPolicy entries for the user. May include newly
   # created entries if defaults were needed.
-  def self.setup_with_default_policies(user, full_category_list)
+  def self.setup_with_default_policies(user)
     if user.communication_channel
       user.communication_channel.user = user
       find_all_for(user.communication_channel)

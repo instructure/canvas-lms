@@ -292,7 +292,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     res
   end
 
-  def restore(from = nil)
+  def restore(_from = nil)
     self.workflow_state = if self.has_student_submissions?
                             "available"
                           else

@@ -93,9 +93,7 @@ class Quizzes::QuizQuestion::Base
   # if no answer is given at all, return nil
   #
   # (note this means nil != false in this return value)
-  def correct_answer_parts(user_answer)
-    nil
-  end
+  def correct_answer_parts(user_answer); end
 
   # Return the number of explicitly incorrect answer parts
   #
@@ -105,12 +103,12 @@ class Quizzes::QuizQuestion::Base
   # If this is > 0, the user will be docked for each answer part that they got
   # incorrect. Most question types leave this at 0, so the user isn't punished
   # extra for wrong answers.
-  def incorrect_answer_parts(user_answer)
+  def incorrect_answer_parts(_user_answer)
     0
   end
 
   # override and return true if the answer can't be auto-scored
-  def requires_manual_scoring?(user_answer)
+  def requires_manual_scoring?(_user_answer)
     false
   end
 

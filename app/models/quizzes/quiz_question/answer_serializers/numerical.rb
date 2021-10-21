@@ -46,7 +46,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
 
     # @param String
     # @return [BigDecimal|NilClass]
-    def deserialize(submission_data, full = false)
+    def deserialize(submission_data, full: false)
       answer = submission_data[question_key]
       if answer.present?
         answer.is_a?(String) ? Util.i18n_to_decimal(answer) : answer

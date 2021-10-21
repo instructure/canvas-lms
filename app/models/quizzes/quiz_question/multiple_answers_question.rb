@@ -25,7 +25,7 @@ class Quizzes::QuizQuestion::MultipleAnswersQuestion < Quizzes::QuizQuestion::Ba
     len
   end
 
-  def incorrect_answer_parts(user_answer)
+  def incorrect_answer_parts(_user_answer)
     @incorrect_answers
   end
 

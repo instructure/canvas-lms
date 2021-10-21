@@ -348,9 +348,6 @@ class Attachment < ActiveRecord::Base
     dup.write_attribute(:filename, self.filename) unless dup.read_attribute(:filename) || dup.root_attachment_id?
     dup.migration_id = options[:migration_id]
     dup.mark_as_importing!(options[:migration]) if options[:migration]
-    if context.respond_to?(:log_merge_result)
-      context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
-    end
     dup.shard.activate do
       if Attachment.s3_storage? && !instfs_hosted? && context.try(:root_account) && self.namespace != context.root_account.file_namespace
         dup.save_without_broadcasting!
@@ -1808,8 +1805,8 @@ class Attachment < ActiveRecord::Base
     res
   end
 
-  def mimetype(fn = nil)
-    res = Attachment.mimetype(filename)
+  def mimetype(_filename = nil)
+    res = Attachment.mimetype(filename) # use the object's filename, not the passed in filename
     res = File.mime_type?(self.uploaded_data) if (!res || res == 'unknown/unknown') && self.uploaded_data
     res ||= "unknown/unknown"
     res

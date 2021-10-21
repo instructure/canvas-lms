@@ -24,7 +24,7 @@ describe NotificationPreferencesController do
     @discussion_entry_notification = Notification.create!(name: 'New Discussion Entry', category: 'DiscussionEntry')
     user_model
     communication_channel_model
-    NotificationPolicy.setup_with_default_policies(@user, nil)
+    NotificationPolicy.setup_with_default_policies(@user)
   end
 
   before :each do

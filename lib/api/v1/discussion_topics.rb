@@ -113,7 +113,7 @@ module Api::V1::DiscussionTopics
 
     json.merge!(serialize_additional_topic_fields(topic, context, user, opts))
 
-    if (hold = topic.subscription_hold(user, @context_enrollment, session))
+    if (hold = topic.subscription_hold(user, session))
       json[:subscription_hold] = hold
     end
 

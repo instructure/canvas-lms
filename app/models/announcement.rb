@@ -142,11 +142,11 @@ class Announcement < DiscussionTopic
     []
   end
 
-  def subscription_hold(user, context_enrollment, session)
+  def subscription_hold(_user, _session)
     :topic_is_announcement
   end
 
-  def can_unpublish?(opts = nil)
+  def can_unpublish?(**)
     false
   end
 

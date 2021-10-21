@@ -38,7 +38,7 @@ class Attachments::LocalStorage
     FileUtils.mv old_full_filename, attachment.full_filename
   end
 
-  def initialize_ajax_upload_params(local_upload_url, s3_success_url, options)
+  def initialize_ajax_upload_params(local_upload_url, _s3_success_url, options)
     {
       :upload_url => local_upload_url,
       :file_param => options[:file_param] || 'attachment[uploaded_data]', # uploadify ignores this and uses 'file'
@@ -51,7 +51,7 @@ class Attachments::LocalStorage
     policy
   end
 
-  def shared_secret(datetime)
+  def shared_secret(_datetime)
     Attachment.shared_secret
   end
 
@@ -64,7 +64,7 @@ class Attachments::LocalStorage
     ['Signature', signature]
   end
 
-  def open(opts)
+  def open(**)
     if block_given?
       File.open(attachment.full_filename, 'rb') do |file|
         chunk = file.read(4096)

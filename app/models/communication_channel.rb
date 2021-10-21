@@ -474,7 +474,7 @@ class CommunicationChannel < ActiveRecord::Base
 
   def self.serialization_excludes; [:confirmation_code]; end
 
-  def self.associated_shards(path)
+  def self.associated_shards(_path)
     [Shard.default]
   end
 

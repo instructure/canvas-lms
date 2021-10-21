@@ -69,7 +69,7 @@ class Alert < ActiveRecord::Base
     self.repetition = nil if self.repetition.blank?
   end
 
-  def as_json(*args)
+  def as_json(**)
     converted_recipients = self.recipients.to_a.map do |recipient|
       if recipient.is_a?(String)
         find_role_by_name(recipient).id

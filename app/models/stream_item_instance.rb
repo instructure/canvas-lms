@@ -38,7 +38,7 @@ class StreamItemInstance < ActiveRecord::Base
     # Don't use update_all() because there is an observer
     # on StreamItemInstance to invalidate some cache keys.
     # Use update_all_with_invalidation() instead.
-    def update_all(*args)
+    def update_all(*)
       raise "Using update_all will break things, use update_all_with_invalidation instead."
     end
 

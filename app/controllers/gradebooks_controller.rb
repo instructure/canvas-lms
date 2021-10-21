@@ -219,7 +219,7 @@ class GradebooksController < ApplicationController
       if context
         @rubric_context = Context.find_by_asset_string(params[:context_code])
       end
-      @rubric_associations = @rubric_context.shard.activate { Context.sorted_rubrics(@current_user, @rubric_context) }
+      @rubric_associations = @rubric_context.shard.activate { Context.sorted_rubrics(@rubric_context) }
       data = @rubric_associations.map { |ra|
         json = ra.as_json(methods: [:context_name], include: { :rubric => { :include_root => false } })
         # return shard-aware context codes

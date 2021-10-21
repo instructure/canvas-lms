@@ -19,10 +19,8 @@
 
 module Quizzes::QuizQuestion::AnswerSerializers
   class Unknown < Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer
-    def serialize(*args)
-    end
+    def serialize(*); end
 
-    def deserialize(*args)
-    end
+    def deserialize(...); end
   end
 end

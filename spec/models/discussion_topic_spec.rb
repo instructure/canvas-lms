@@ -1968,38 +1968,38 @@ describe DiscussionTopic do
 
     it "holds when requiring an initial post" do
       discussion_topic_model(:user => @teacher, :require_initial_post => true)
-      expect(@topic.subscription_hold(@student, nil, nil)).to eql(:initial_post_required)
+      expect(@topic.subscription_hold(@student, nil)).to eq :initial_post_required
     end
 
     it "holds when the user is not in a group set" do
       # i.e. when you check holds on a root topic and no child topics are for groups
       # the user is in
       group_discussion_assignment
-      expect(@topic.subscription_hold(@student, nil, nil)).to eql(:not_in_group_set)
+      expect(@topic.subscription_hold(@student, nil)).to eq :not_in_group_set
     end
 
     it "does not fail for group discussion" do
       group = group_model(name: 'Project Group 1', group_category: @group_category, context: @course)
       topic = group.discussion_topics.create!(title: 'hi', message: 'hey')
-      expect(topic.subscription_hold(@student, nil, nil)).to eql(:not_in_group)
+      expect(topic.subscription_hold(@student, nil)).to eq :not_in_group
       expect(topic.child_topic_for(@student)).to be_nil
     end
 
     it "holds when the user is not in a group" do
       group_discussion_assignment
-      expect(@topic.child_topics.first.subscription_hold(@student, nil, nil)).to eql(:not_in_group)
+      expect(@topic.child_topics.first.subscription_hold(@student, nil)).to eq :not_in_group
     end
 
     it "handles nil user case" do
       group_discussion_assignment
-      expect(@topic.child_topics.first.subscription_hold(nil, nil, nil)).to be_nil
+      expect(@topic.child_topics.first.subscription_hold(nil, nil)).to be_nil
     end
 
     it "does not subscribe the author if there is a hold" do
       group_discussion_assignment
       @topic.user = @teacher
       @topic.save!
-      expect(@topic.subscription_hold(@teacher, nil, nil)).to eql(:not_in_group_set)
+      expect(@topic.subscription_hold(@teacher, nil)).to eq :not_in_group_set
       expect(@topic.subscribed?(@teacher)).to be_falsey
     end
 

@@ -214,7 +214,7 @@ class ContentExport < ActiveRecord::Base
     end
   end
 
-  def export_user_data(opts)
+  def export_user_data(**)
     mark_exporting
     begin
       self.job_progress.try :start!

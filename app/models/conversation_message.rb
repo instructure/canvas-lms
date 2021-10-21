@@ -316,12 +316,11 @@ class ConversationMessage < ActiveRecord::Base
     submission.nil?
   end
 
-  def as_json(options = {})
-    super(:only => [:id, :created_at, :body, :generated, :author_id])['conversation_message'].merge({
-                                                                                                      'forwarded_messages' => forwarded_messages,
-                                                                                                      'attachments' => attachments,
-                                                                                                      'media_comment' => media_comment
-                                                                                                    })
+  def as_json(**)
+    super(:only => [:id, :created_at, :body, :generated, :author_id])['conversation_message']
+      .merge('forwarded_messages' => forwarded_messages,
+             'attachments' => attachments,
+             'media_comment' => media_comment)
   end
 
   def to_atom(opts = {})
