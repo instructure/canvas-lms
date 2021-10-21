@@ -74,6 +74,10 @@ module Canvas::Vault
       config[:kv_mount] || 'app-canvas'
     end
 
+    def config
+      ConfigFile.load('vault').try(:symbolize_keys) || {}
+    end
+
     private
 
     def addr
@@ -91,10 +95,6 @@ module Canvas::Vault
       elsif config[:token]
         config[:token]
       end
-    end
-
-    def config
-      ConfigFile.load('vault').try(:symbolize_keys) || {}
     end
   end
 end
