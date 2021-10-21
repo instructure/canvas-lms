@@ -26,7 +26,7 @@ module Api::V1::PageView
   }
 
   def page_views_json(page_views, current_user, session)
-    page_views.map { |pv| page_view_json(pv, @current_user, session) }
+    page_views.map { |pv| page_view_json(pv, current_user, session) }
   end
 
   def page_view_json(page_view, current_user, session)

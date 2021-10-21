@@ -60,7 +60,7 @@ class UserList
 
   attr_reader :errors, :addresses, :duplicate_addresses
 
-  def as_json(*options)
+  def as_json(**)
     {
       :users => addresses.map { |a| a.reject { |k, v| k == :shard } },
       :duplicates => duplicate_addresses,

@@ -21,7 +21,7 @@
 module Api::V1::Progress
   include Api::V1::Json
 
-  def progress_json(progress, current_user, session, opts = {})
+  def progress_json(progress, current_user, session, **)
     api_json(progress, current_user, session, :only => %w(id context_id context_type user_id tag completion workflow_state created_at updated_at message)).tap do |hash|
       hash['url'] = polymorphic_url([:api_v1, progress])
       unless progress.pending? || progress.results.nil?

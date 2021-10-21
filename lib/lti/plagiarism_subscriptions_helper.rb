@@ -49,7 +49,7 @@ module Lti
       end
     end
 
-    def plagiarism_subscription(tool_proxy, product_family)
+    def plagiarism_subscription(tool_proxy, _product_family)
       {
         SystemEventTypes: EVENT_TYPES,
         UserEventTypes: EVENT_TYPES,

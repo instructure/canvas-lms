@@ -19,7 +19,7 @@
 #
 
 module Canvas::Migration::Validators::CourseCopyValidator
-  def self.has_error(options, user, course)
+  def self.has_error(options, user, _course)
     if !options || !options[:source_course_id]
       return I18n.t :course_copy_argument_error, 'A course copy requires a source course.'
     end

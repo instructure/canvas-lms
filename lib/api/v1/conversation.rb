@@ -126,7 +126,7 @@ module Api::V1::Conversation
     users.map { |user| conversation_user_json(user, current_user, session, options) }
   end
 
-  def conversation_user_json(user, current_user, session, options = {})
+  def conversation_user_json(user, current_user, _session, options = {})
     result = {
       :id => user.id,
       :name => user.short_name,
