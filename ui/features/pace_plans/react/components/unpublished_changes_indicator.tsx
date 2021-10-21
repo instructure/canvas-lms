@@ -96,7 +96,7 @@ export const UnpublishedChangesIndicator = ({
       {text(changeCount)}
     </CondensedButton>
   ) : (
-    <span>{text(changeCount)}</span>
+    <span data-testid="publish-status" >{text(changeCount)}</span>
   )
 }
 

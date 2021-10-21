@@ -21,13 +21,46 @@ require_relative '../../common'
 
 module PacePlansPageObject
   #------------------------- Selectors -------------------------------
+  def cancel_button_selector
+    "button:contains('Cancel')"
+  end
+
+  def module_items_selector
+    "[data-testid='pp-title-cell']"
+  end
+
   def pace_plan_table_module_selector
     'h2'
   end
 
+  def publish_button_selector
+    "button:contains('Publish')"
+  end
+
+  def publish_status_selector
+    "[data-testid='publish-status']"
+  end
+
   #------------------------- Elements --------------------------------
+
+  def cancel_button
+    fj(cancel_button_selector)
+  end
+
+  def module_items
+    ff(module_items_selector)
+  end
+
   def pace_plan_table_module_elements
     ff(pace_plan_table_module_selector)
+  end
+
+  def publish_button
+    fj(publish_button_selector)
+  end
+
+  def publish_status
+    f(publish_status_selector)
   end
 
   #----------------------- Actions & Methods -------------------------
@@ -37,8 +70,29 @@ module PacePlansPageObject
 
   #----------------------- Click Items -------------------------------
   #------------------------------Retrieve Text------------------------
-  def module_title_text(module_title_element)
-    module_title_element.text
+  #
+  def module_item_title_text(item_number)
+    module_items[item_number].text
+  end
+
+  def module_title_text(element_number)
+    pace_plan_table_module_elements[element_number].text
   end
   #----------------------------Element Management---------------------
+
+  def module_item_exists?
+    element_exists?(module_items_selector)
+  end
+
+  def publish_status_exists?
+    element_exists?(publish_status_selector)
+  end
+
+  def is_cancel_available?
+    element_value_for_attr(cancel_button, 'cursor') == 'pointer'
+  end
+
+  def is_publish_available?
+    element_value_for_attr(publish_button, 'cursor') == 'pointer'
+  end
 end
