@@ -1347,6 +1347,23 @@ module Lti
           expect(exp_hash[:test]).to eq 'W1 2017'
         end
 
+        it 'has substitution for $Canvas.externalTool.global_id' do
+          course.save!
+          tool = course.context_external_tools.create!(:domain => 'example.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
+          expander = VariableExpander.new(root_account, course, controller, current_user: user, tool: tool)
+          exp_hash = { test: '$Canvas.externalTool.global_id' }
+          expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq tool.global_id
+        end
+
+        it 'does not substitute $Canvas.externalTool.global_id when the controller is unset' do
+          variable_expander.instance_variable_set(:@controller, nil)
+          variable_expander.instance_variable_set(:@request, nil)
+          exp_hash = { test: '$Canvas.externalTool.global_id' }
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq '$Canvas.externalTool.global_id'
+        end
+
         it 'has substitution for $Canvas.externalTool.url' do
           course.save!
           tool = course.context_external_tools.create!(:domain => 'example.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
