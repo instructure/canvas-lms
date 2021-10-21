@@ -25,6 +25,7 @@ import {Popover} from '@instructure/ui-popover'
 import {IconArrowOpenDownLine, IconArrowOpenUpLine} from '@instructure/ui-icons'
 import {BaseButton, CloseButton, IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import PreviewIcon from './PreviewIcon'
 
 import formatMessage from '../../../format-message'
 
@@ -158,24 +159,9 @@ function ColorPreview({color, disabled, margin = 'xxx-small', onSelect}) {
           {color ? formatMessage('Color {color}', {color}) : formatMessage('None')}
         </ScreenReaderContent>
       )}
-      <span
-        data-testid={`colorPreview-${color}`}
-        style={{
-          background:
-            color ||
-            `
-            linear-gradient(
-              135deg,
-              rgba(255,255,255,1) 43%, rgba(255,0,0,1) 43%,
-              rgba(255,0,0,1) 57%, rgba(255,255,255,1) 57%
-            )
-          `,
-          border: '1px solid #73818C',
-          borderRadius: '3px',
-          display: 'block',
-          height: `25px`,
-          width: `25px`
-        }}
+      <PreviewIcon
+        color={color}
+        testId={`colorPreview-${color}`}
       />
     </BaseButton>
   )
