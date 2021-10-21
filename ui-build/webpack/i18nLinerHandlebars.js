@@ -27,8 +27,9 @@ const {EmberHandlebars} = require('ember-template-compiler')
 const ScopedHbsExtractor = require('i18nliner-canvas/js/scoped_hbs_extractor')
 const PreProcessor = require('@instructure/i18nliner-handlebars/dist/lib/pre_processor').default
 const nodePath = require('path')
-const { contriveId, config: brandableCSSConfig } = require('@instructure/brandable_css')
 const loaderUtils = require('loader-utils')
+const { canvasDir } = require('#params')
+const { contriveId, config: brandableCSSConfig } = requireBrandableCSS()
 require('i18nliner-canvas/js/scoped_hbs_pre_processor')
 
 // In this main file, we do a bunch of stuff to monkey-patch the default behavior of
@@ -37,7 +38,7 @@ require('i18nliner-canvas/js/scoped_hbs_pre_processor')
 // By requiring it here the code here will use that monkeypatched behavior.
 require('i18nliner-canvas/js/main')
 
-const rootDir = nodePath.resolve(__dirname, '..')
+
 const compileHandlebars = data => {
   const path = data.path
   const source = data.source
@@ -130,7 +131,7 @@ const findReferencedPartials = source => {
 const emitPartialRegistration = (path, resourceName) => {
   const baseName = path.split('/').pop()
   if (baseName.startsWith('_')) {
-    const virtualPath = path.slice(rootDir.length + 1)
+    const virtualPath = path.slice(canvasDir.length + 1)
     return `
       Handlebars.registerPartial('${virtualPath}', templates['${resourceName}']);
     `
@@ -152,7 +153,7 @@ function i18nLinerHandlebarsLoader(source) {
   ;
 
   const partials = findReferencedPartials(source)
-  const partialRequirements = partials.map(x => nodePath.resolve(rootDir, x))
+  const partialRequirements = partials.map(x => nodePath.resolve(canvasDir, x))
   partialRequirements.forEach(requirement => dependencies.push(requirement))
 
   const result = compileHandlebars({path: this.resourcePath, source})
@@ -177,6 +178,21 @@ function i18nLinerHandlebarsLoader(source) {
     partialRegistration
   )
   return compiledTemplate
+}
+
+function requireBrandableCSS() {
+  const { cwd, chdir } = require('process')
+  const oldCWD = cwd()
+
+  // it looks for "config/brandable_css.yml" from cwd
+  process.chdir(canvasDir)
+
+  try {
+    return require('@instructure/brandable_css')
+  }
+  finally {
+    process.chdir(oldCWD)
+  }
 }
 
 module.exports = i18nLinerHandlebarsLoader

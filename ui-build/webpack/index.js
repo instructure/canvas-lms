@@ -32,6 +32,7 @@ const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
 const EncapsulationPlugin = require('webpack-encapsulation-plugin')
 const IgnoreErrorsPlugin = require('./IgnoreErrorsPlugin')
 const webpackPublicPath = require('./webpackPublicPath')
+const { canvasDir } = require('#params')
 
 require('./bundles')
 
@@ -48,7 +49,6 @@ const skipSourcemaps = Boolean(
   process.env.SKIP_SOURCEMAPS || process.env.JS_BUILD_NO_UGLIFY === '1'
 )
 
-const root = path.resolve(__dirname, '..')
 const createBundleAnalyzerPlugin = (...args) => {
   const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
   return new BundleAnalyzerPlugin(...args)
@@ -144,7 +144,7 @@ module.exports = {
       ? 'source-map'
       : 'eval',
 
-  entry: {main: path.resolve(__dirname, '../ui/index.js')},
+  entry: {main: path.resolve(canvasDir, 'ui/index.js')},
 
   output: {
     // NOTE: hashSalt was added when HashedModuleIdsPlugin was installed, since
@@ -152,7 +152,7 @@ module.exports = {
     // if this plugin is reconfigured or removed, or if there is another reason to
     // prevent previously cached assets from being mixed with those from the new build
     hashSalt: '2019-04-19',
-    path: path.join(__dirname, '../public', webpackPublicPath),
+    path: path.join(canvasDir, 'public', webpackPublicPath),
 
     // Add /* filename */ comments to generated require()s in the output.
     pathinfo: true,
@@ -164,7 +164,7 @@ module.exports = {
   },
 
   resolveLoader: {
-    modules: ['node_modules', 'frontend_build']
+    modules: ['node_modules', path.resolve(__dirname)]
   },
 
   resolve: {
@@ -176,25 +176,25 @@ module.exports = {
       // the file is the same as the on published to npm but we added a
       // `require('newless')` to make it work
       './themeable$': path.resolve(
-        __dirname,
-        '../ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
+        canvasDir,
+        'ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
       ),
       '../themeable$': path.resolve(
-        __dirname,
-        '../ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
+        canvasDir,
+        'ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
       ),
       '@instructure/ui-themeable/es/themeable$': path.resolve(
-        __dirname,
-        '../ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
+        canvasDir,
+        'ui/ext/@instructure/ui-themeable/es/themeable-with-newless.js'
       ),
       'node_modules-version-of-backbone$': require.resolve('backbone'),
       'node_modules-version-of-react-modal$': require.resolve('react-modal')
     },
 
     modules: [
-      path.resolve(__dirname, '../ui/shims'),
-      path.resolve(__dirname, '../public/javascripts'),
-      path.resolve(__dirname, '../gems/plugins'),
+      path.resolve(canvasDir, 'ui/shims'),
+      path.resolve(canvasDir, 'public/javascripts'),
+      path.resolve(canvasDir, 'gems/plugins'),
       'node_modules'
     ],
 
@@ -215,17 +215,17 @@ module.exports = {
       {
         test: /\.(js|ts|tsx)$/,
         include: [
-          path.resolve(__dirname, '../ui'),
-          path.resolve(__dirname, '../packages/jquery-kyle-menu'),
-          path.resolve(__dirname, '../packages/jquery-sticky'),
-          path.resolve(__dirname, '../packages/jquery-popover'),
-          path.resolve(__dirname, '../packages/jquery-selectmenu'),
-          path.resolve(__dirname, '../packages/mathml'),
-          path.resolve(__dirname, '../packages/persistent-array'),
-          path.resolve(__dirname, '../packages/slickgrid'),
-          path.resolve(__dirname, '../packages/with-breakpoints'),
-          path.resolve(__dirname, '../spec/javascripts/jsx'),
-          path.resolve(__dirname, '../spec/coffeescripts'),
+          path.resolve(canvasDir, 'ui'),
+          path.resolve(canvasDir, 'packages/jquery-kyle-menu'),
+          path.resolve(canvasDir, 'packages/jquery-sticky'),
+          path.resolve(canvasDir, 'packages/jquery-popover'),
+          path.resolve(canvasDir, 'packages/jquery-selectmenu'),
+          path.resolve(canvasDir, 'packages/mathml'),
+          path.resolve(canvasDir, 'packages/persistent-array'),
+          path.resolve(canvasDir, 'packages/slickgrid'),
+          path.resolve(canvasDir, 'packages/with-breakpoints'),
+          path.resolve(canvasDir, 'spec/javascripts/jsx'),
+          path.resolve(canvasDir, 'spec/coffeescripts'),
           /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//
         ],
         exclude: [/bower\//, /node_modules/],
@@ -239,19 +239,19 @@ module.exports = {
       {
         test: /\.coffee$/,
         include: [
-          path.resolve(__dirname, '../ui'),
-          path.resolve(__dirname, '../spec/coffeescripts'),
-          path.resolve(__dirname, '../packages/backbone-input-filter-view/src'),
-          path.resolve(__dirname, '../packages/backbone-input-view/src'),
+          path.resolve(canvasDir, 'ui'),
+          path.resolve(canvasDir, 'spec/coffeescripts'),
+          path.resolve(canvasDir, 'packages/backbone-input-filter-view/src'),
+          path.resolve(canvasDir, 'packages/backbone-input-view/src'),
           /gems\/plugins\/.*\/(app|spec_canvas)\/coffeescripts\//
         ],
         loaders: ['coffee-loader']
       },
       {
         test: /\.handlebars$/,
-        include: [path.resolve(__dirname, '../ui'), /gems\/plugins\/.*\/app\/views\/jst\//],
+        include: [path.resolve(canvasDir, 'ui'), /gems\/plugins\/.*\/app\/views\/jst\//],
         loaders: [{
-          loader: 'i18nLinerHandlebars',
+          loader: require.resolve('./i18nLinerHandlebars'),
           options: {
             // brandable_css assets are not available in test
             injectBrandableStylesheet: process.env.NODE_ENV !== 'test'
@@ -260,8 +260,8 @@ module.exports = {
       },
       {
         test: /\.hbs$/,
-        include: [path.join(root, 'ui/features/screenreader_gradebook/jst')],
-        loaders: [path.join(root, 'frontend_build/emberHandlebars')]
+        include: [path.join(canvasDir, 'ui/features/screenreader_gradebook/jst')],
+        loaders: [require.resolve('./emberHandlebars')]
       },
       {
         test: /\.css$/,
@@ -297,9 +297,9 @@ module.exports = {
 
     // allow plugins to extend source files
     new SourceFileExtensionsPlugin({
-      context: root,
-      include: glob.sync(path.join(root, 'gems/plugins/*/package.json'), {absolute: true}),
-      tmpDir: path.join(root, 'tmp/webpack-source-file-extensions')
+      context: canvasDir,
+      include: glob.sync(path.join(canvasDir, 'gems/plugins/*/package.json'), {absolute: true}),
+      tmpDir: path.join(canvasDir, 'tmp/webpack-source-file-extensions')
     }),
 
     new WebpackHooks(),
@@ -314,14 +314,14 @@ module.exports = {
     new EncapsulationPlugin({
       test: /\.[tj]sx?$/,
       include: [
-        path.resolve(__dirname, '../ui'),
-        path.resolve(__dirname, '../packages'),
-        path.resolve(__dirname, '../public/javascripts'),
-        path.resolve(__dirname, '../gems/plugins'),
+        path.resolve(canvasDir, 'ui'),
+        path.resolve(canvasDir, 'packages'),
+        path.resolve(canvasDir, 'public/javascripts'),
+        path.resolve(canvasDir, 'gems/plugins'),
       ],
       exclude: [
         /\/node_modules\//,
-        path.resolve(__dirname, '../ui/shims/dummyI18nResource.js')
+        path.resolve(canvasDir, 'ui/shims/dummyI18nResource.js')
       ],
       formatter: require('./encapsulation/ErrorFormatter'),
       rules: require('./encapsulation/moduleAccessRules')
@@ -330,6 +330,10 @@ module.exports = {
     new IgnoreErrorsPlugin({
       errors: require('./encapsulation/errorsPendingRemoval.json'),
       warnOnUnencounteredErrors: process.env.WEBPACK_ENCAPSULATION_DEBUG === '1'
+    }),
+
+    new webpack.DefinePlugin({
+      CANVAS_WEBPACK_PUBLIC_PATH: JSON.stringify(webpackPublicPath)
     })
 
   ].concat(
@@ -352,7 +356,7 @@ module.exports = {
       reportFilename: process.env.WEBPACK_ANALYSIS_FILE ? (
         path.resolve(process.env.WEBPACK_ANALYSIS_FILE)
       ) : (
-        path.resolve(__dirname, '../tmp/webpack-bundle-analysis.html')
+        path.resolve(canvasDir, 'tmp/webpack-bundle-analysis.html')
       ),
       openAnalyzer: false,
       generateStatsFile: false,

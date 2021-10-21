@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,14 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const {transformSync} = require('@babel/core')
-const {compile} = require('../ui-build/webpack/i18nLinerHandlebars')
+const path = require('path')
 
-exports.process = (source, path) => {
-  const amd = compile(source, path, {
-    // brandable_css assets are not available in test
-    injectBrandableStylesheet: false
-  })
-  const cjs = transformSync(amd, {filename: path}).code
-  return cjs
-}
+exports.canvasDir = path.resolve(__dirname, '..')
+exports.buildDir = path.resolve(__dirname, '../public/dist')

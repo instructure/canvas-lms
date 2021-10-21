@@ -24,7 +24,7 @@ const path = require('path')
 const webpack = require('webpack')
 const glob = require('glob')
 const {promisify} = require('util')
-const testWebpackConfig = require('./frontend_build/baseWebpackConfig')
+const testWebpackConfig = require('./ui-build/webpack')
 
 const CONTEXT_COFFEESCRIPT_SPEC = 'spec/coffeescripts'
 const CONTEXT_EMBER_GRADEBOOK_SPEC = 'ui/features/screenreader_gradebook/ember'
