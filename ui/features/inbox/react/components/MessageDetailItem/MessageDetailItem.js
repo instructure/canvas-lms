@@ -19,6 +19,7 @@
 import {Avatar} from '@instructure/ui-avatar'
 import {Flex} from '@instructure/ui-flex'
 import {MessageDetailActions} from '../MessageDetailActions/MessageDetailActions'
+import {MessageDetailMediaAttachment} from '../MessageDetailMediaAttachment/MessageDetailMediaAttachment'
 import {MessageDetailParticipants} from '../MessageDetailParticipants/MessageDetailParticipants'
 import PropTypes from 'prop-types'
 import React from 'react'
@@ -79,6 +80,9 @@ export const MessageDetailItem = ({...props}) => {
             )
           })}
         </List>
+      )}
+      {props.conversationMessage.mediaComment && (
+        <MessageDetailMediaAttachment mediaComment={props.conversationMessage.mediaComment} />
       )}
     </>
   )
