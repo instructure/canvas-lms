@@ -27,6 +27,10 @@ const CHANGES = [
   {id: 'volume', summary: 'You changed the volume level from Palatable to Insanely High.'}
 ]
 
+afterEach(() => {
+  jest.clearAllMocks()
+})
+
 describe('UnpublishedChangesTrayContents', () => {
   it('renders the provided changes', () => {
     const {getByText} = render(

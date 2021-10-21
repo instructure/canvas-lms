@@ -68,7 +68,7 @@ describe('Settings', () => {
     act(() => settingsButton.click())
 
     const skipWeekendsToggle = screen.getByRole('checkbox', {name: 'Skip Weekends'})
-    expect(skipWeekendsToggle).not.toHaveAttribute('disabled')
+    expect(skipWeekendsToggle).not.toBeDisabled()
     act(() => skipWeekendsToggle.click())
     expect(toggleExcludeWeekends).toHaveBeenCalled()
 
@@ -76,7 +76,7 @@ describe('Settings', () => {
     // const hardEndDatesToggle = screen.getByRole('checkbox', {
     //   name: 'Require Completion by Specified End Date'
     // })
-    // expect(hardEndDatesToggle).not.toHaveAttribute('disabled')
+    // expect(hardEndDatesToggle).not.toBeDisabled
     // act(() => hardEndDatesToggle.click())
     // expect(toggleHardEndDates).toHaveBeenCalled()
   })
@@ -87,7 +87,7 @@ describe('Settings', () => {
     act(() => settingsButton.click())
 
     const skipWeekendsToggle = screen.getByRole('checkbox', {name: 'Skip Weekends'})
-    expect(skipWeekendsToggle).toHaveAttribute('disabled')
+    expect(skipWeekendsToggle).toBeDisabled()
   })
 
   // Skipped since we're not implementing this feature yet
@@ -100,7 +100,7 @@ describe('Settings', () => {
     const hardEndDatesToggle = screen.getByRole('checkbox', {
       name: 'Require Completion by Specified End Date'
     })
-    expect(hardEndDatesToggle).toHaveAttribute('disabled')
+    expect(hardEndDatesToggle).toBeDisabled()
   })
 
   // Skipped since we're not implementing this feature yet

@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React, {useEffect} from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
 // @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!unpublished_changes_button_props'
-import React from 'react'
 import {getPacePlan, getUnpublishedChangeCount} from '../reducers/pace_plans'
 import {StoreState} from '../types'
 import {connect} from 'react-redux'
@@ -37,6 +37,7 @@ type StateProps = {
 
 export type UnpublishedChangesIndicatorProps = StateProps & {
   onClick?: () => void
+  onUnpublishedNavigation?: (e: BeforeUnloadEvent) => void
   margin?: any // type from CondensedButtonProps; passed through
 }
 
@@ -53,13 +54,32 @@ const text = (changeCount: number) => {
   )
 }
 
+// Show browser warning about unsaved changes per
+// https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onbeforeunload
+const triggerBrowserWarning = (e: BeforeUnloadEvent) => {
+  // Preventing default triggers prompt in Firefox & Safari
+  e.preventDefault()
+  // Return value must be set to trigger prompt in Chrome & Edge
+  e.returnValue = ''
+}
+
 export const UnpublishedChangesIndicator = ({
   changeCount,
   margin,
+  newPlan,
   onClick,
   planPublishing,
-  newPlan
+  onUnpublishedNavigation = triggerBrowserWarning
 }: UnpublishedChangesIndicatorProps) => {
+  const hasChanges = changeCount > 0
+
+  useEffect(() => {
+    if (hasChanges) {
+      window.addEventListener('beforeunload', onUnpublishedNavigation)
+      return () => window.removeEventListener('beforeunload', onUnpublishedNavigation)
+    }
+  }, [hasChanges, onUnpublishedNavigation])
+
   if (newPlan) return null
   if (planPublishing) {
     return (
