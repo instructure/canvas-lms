@@ -142,7 +142,7 @@ describe "Outcomes API", type: :request do
     @rubric.reload
   end
 
-  def outcomes_json(outcomes = @outcomes, presets = {})
+  def outcomes_json(outcomes = @outcomes, _presets = {})
     outcomes.map { |o| outcome_json(o) }
   end
 

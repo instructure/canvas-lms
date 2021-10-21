@@ -31,9 +31,13 @@ class TestUserApi
 
   def avatar_image_url(*args); "avatar_image_url(#{args.first})"; end
 
-  def course_student_grades_url(course_id, user_id); ""; end
+  def course_student_grades_url(_course_id, _user_id)
+    ""
+  end
 
-  def course_user_url(course_id, user_id); ""; end
+  def course_user_url(_course_id, _user_id)
+    ""
+  end
 
   def initialize
     @domain_root_account = Account.default

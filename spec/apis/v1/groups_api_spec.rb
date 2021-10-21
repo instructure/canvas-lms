@@ -90,7 +90,7 @@ describe "Groups API", type: :request do
     users.map { |user| user_json(user, opts) }
   end
 
-  def user_json(user, opts)
+  def user_json(user, **)
     hash = {
       'id' => user.id,
       'created_at' => user.created_at.iso8601,

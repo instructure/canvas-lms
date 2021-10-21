@@ -98,7 +98,7 @@ module GradebookCommon
     end
   end
 
-  def set_default_grade(cell_index, points = "5")
+  def set_default_grade(points = "5")
     move_to_click('[data-menu-item-id="set-default-grade"]')
     dialog = find_with_jquery('.ui-dialog:visible')
     f('.grading_value').send_keys(points)

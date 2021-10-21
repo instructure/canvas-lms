@@ -314,7 +314,7 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user| self.user && self.user == user }
     can :read
 
-    given { |user| self.user && self.user == user && self.discussion_topic.available_for?(user) }
+    given { |user| self.user && self.user == user && self.discussion_topic.available_for?(user) && self.discussion_topic.can_participate_in_course?(user) }
     can :reply
 
     given { |user| self.user && self.user == user && self.discussion_topic.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) }

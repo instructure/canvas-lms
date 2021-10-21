@@ -128,7 +128,7 @@ describe "context modules" do
       f(".edit_module_link").click
       expect(f('#add_context_module_form')).to be_displayed
       edit_form = f('#add_context_module_form')
-      lock_check_click(edit_form)
+      lock_check_click
       wait_for_ajaximations
       unlock_date = edit_form.find_element(:id, 'context_module_unlock_at')
       unlock_date.send_keys(lock_until)

@@ -502,7 +502,25 @@ describe('OutcomeManagementPanel', () => {
       expect(getByText('Select outcome Outcome 2 - Course folder 0')).toBeInTheDocument()
     })
 
-    it.skip('enables users to bulk select and move outcomes', async () => {
+    it('enables users to bulk select and move outcomes', async () => {
+      defaultMocks = [
+        ...courseMocks({childGroupsCount: 2}),
+        ...groupMocks({
+          title: 'Course folder 0',
+          groupId: '200',
+          parentOutcomeGroupTitle: 'Root course folder',
+          parentOutcomeGroupId: '2'
+        }),
+        ...groupDetailMocks({
+          title: 'Course folder 0',
+          description: 'Course folder 0 group description',
+          groupId: '200',
+          contextType: 'Course',
+          contextId: '2',
+          withMorePage: false,
+          removeOnRefetch: true
+        })
+      ]
       const {getByText, getByRole, getAllByText, queryByText} = render(<OutcomeManagementPanel />, {
         ...groupDetailDefaultProps,
         mocks: [
@@ -522,6 +540,10 @@ describe('OutcomeManagementPanel', () => {
       await clickWithPending(within(getByRole('dialog')).getByText('Back'))
       await clickWithPending(within(getByRole('dialog')).getByText('Course folder 1'))
       await clickWithPending(within(getByRole('dialog')).getByText('Move'))
+      expect(
+        within(getByRole('alert')).getByText('2 outcomes have been moved to "Course folder 1".')
+      ).toBeInTheDocument()
+      await act(async () => jest.runOnlyPendingTimers())
       expect(queryByText('Outcome 1 - Course folder 0')).not.toBeInTheDocument()
       expect(queryByText('Outcome 2 - Course folder 0')).not.toBeInTheDocument()
     })

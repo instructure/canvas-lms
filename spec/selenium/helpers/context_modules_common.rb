@@ -378,7 +378,7 @@ module ContextModulesCommon
     expect(f('#content_tag_indent_select')).to be_displayed
   end
 
-  def lock_check_click(form)
+  def lock_check_click
     move_to_click('label[for=unlock_module_at]')
   end
 

@@ -16,12 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {fireEvent, render} from '@testing-library/react'
 import {IsolatedParent} from '../IsolatedParent'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
+import {updateDiscussionEntryParticipantMock} from '../../../../graphql/Mocks'
+import {waitFor} from '@testing-library/dom'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -41,6 +44,9 @@ beforeAll(() => {
 })
 
 describe('IsolatedParent', () => {
+  const onFailureStub = jest.fn()
+  const onSuccessStub = jest.fn()
+
   const defaultProps = ({discussionEntryOverrides = {}, overrides = {}} = {}) => ({
     discussionTopic: Discussion.mock(),
     discussionEntry: DiscussionEntry.mock(discussionEntryOverrides),
@@ -51,10 +57,19 @@ describe('IsolatedParent', () => {
   const setup = (props, mocks) => {
     return render(
       <MockedProvider mocks={mocks}>
-        <IsolatedParent {...props} />
+        <AlertManagerContext.Provider
+          value={{setOnFailure: onFailureStub, setOnSuccess: onSuccessStub}}
+        >
+          <IsolatedParent {...props} />
+        </AlertManagerContext.Provider>
       </MockedProvider>
     )
   }
+
+  afterEach(() => {
+    onFailureStub.mockClear()
+    onSuccessStub.mockClear()
+  })
 
   describe('thread actions menu', () => {
     it('allows toggling the unread state of an entry', () => {
@@ -164,5 +179,63 @@ describe('IsolatedParent', () => {
         'Deeply nested replies are no longer supported. Your reply will appear on the first page of this thread.'
       )
     ).toBeFalsy()
+  })
+
+  describe('Report Reply', () => {
+    it('does not show Report', () => {
+      const {getByTestId, queryByText} = setup(defaultProps())
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+
+      expect(queryByText('Report')).toBeNull()
+    })
+
+    describe('when feature flag and setting is enabled', () => {
+      beforeAll(() => {
+        window.ENV.student_reporting_enabled = true
+      })
+
+      it('show Report', () => {
+        const {getByTestId, queryByText} = setup(defaultProps())
+
+        fireEvent.click(getByTestId('thread-actions-menu'))
+
+        expect(queryByText('Report')).toBeTruthy()
+      })
+
+      it('show Reported', () => {
+        const {getByTestId, queryByText} = setup(
+          defaultProps({
+            discussionEntryOverrides: {
+              entryParticipant: {
+                reportType: 'other'
+              }
+            }
+          })
+        )
+
+        fireEvent.click(getByTestId('thread-actions-menu'))
+
+        expect(queryByText('Reported')).toBeTruthy()
+      })
+
+      it('can Report', async () => {
+        const {getByTestId, queryByText} = setup(
+          defaultProps(),
+          updateDiscussionEntryParticipantMock({
+            reportType: 'other'
+          })
+        )
+
+        fireEvent.click(getByTestId('thread-actions-menu'))
+        fireEvent.click(queryByText('Report'))
+        fireEvent.click(queryByText('Other'))
+        fireEvent.click(getByTestId('report-reply-submit-button'))
+
+        await waitFor(() => {
+          expect(onSuccessStub).toHaveBeenCalledWith('You have reported this reply.', false)
+        })
+      })
+    })
   })
 })
