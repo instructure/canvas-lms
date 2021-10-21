@@ -628,7 +628,7 @@ describe SIS::CSV::EnrollmentImporter do
       batch = Account.default.sis_batches.create!
       csv = double(root_account: Account.default, batch: batch, :[] => nil)
       importer = SIS::CSV::EnrollmentImporter.new(csv)
-      importer.persist_errors(csv, ['a string error message'], batch)
+      importer.persist_errors(csv, ['a string error message'])
       expect(batch.sis_batch_errors.count).to eq(1)
     end
   end

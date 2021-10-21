@@ -122,7 +122,7 @@ module SIS
         user
       end
 
-      def root_account_from_id(root_account_sis_id)
+      def root_account_from_id(_root_account_sis_id)
         nil
       end
 

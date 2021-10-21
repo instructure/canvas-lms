@@ -217,7 +217,7 @@ module Api::V1::OutcomeResults
     }
   end
 
-  def outcome_results_rollups_csv(current_user, context, rollups, outcomes, outcome_paths)
+  def outcome_results_rollups_csv(current_user, _context, rollups, outcomes, outcome_paths)
     options = CSVWithI18n.csv_i18n_settings(current_user)
     CSVWithI18n.generate(**options) do |csv|
       row = []

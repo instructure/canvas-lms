@@ -19,7 +19,7 @@
 #
 
 module Canvas::Migration::Validators::ZipImporterValidator
-  def self.has_error(options, user, course)
+  def self.has_error(options, _user, course)
     if !options || !options[:folder_id]
       return I18n.t :zip_argument_error, 'A .zip upload requires a folder to upload to.'
     end

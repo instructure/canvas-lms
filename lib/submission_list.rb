@@ -104,9 +104,7 @@ class SubmissionList
 
   # An iterator on a sorted and filtered list of submission versions.
   def each(&block)
-    self.submission_entries.each do |entry|
-      yield(entry)
-    end
+    self.submission_entries.each(&block)
   end
 
   # An iterator on the day only, not each submission

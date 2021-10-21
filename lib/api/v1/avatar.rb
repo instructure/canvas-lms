@@ -22,7 +22,7 @@ module Api::V1::Avatar
   include Api::V1::Json
   include Api::V1::Attachment
 
-  def avatars_json_for_user(user, includes = {})
+  def avatars_json_for_user(user)
     avatars = []
     avatars << avatar_json(user, user.gravatar_url(50, "/images/dotted_pic.png", request), {
                              :type => 'gravatar',

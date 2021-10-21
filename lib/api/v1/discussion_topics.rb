@@ -258,7 +258,7 @@ module Api::V1::DiscussionTopics
 
     json[:user] = user_display_json(entry.user, context) if includes.include?(:display_user)
 
-    json.merge!(discussion_entry_attachment(entry, user, context))
+    json.merge!(discussion_entry_attachment(entry, user))
     json.merge!(discussion_entry_read_state(entry, user))
     json.merge!(discussion_entry_subentries(entry, user, context, session, includes))
 
@@ -272,7 +272,7 @@ module Api::V1::DiscussionTopics
   # context - The current context.
   #
   # Returns a hash.
-  def discussion_entry_attachment(entry, user, context)
+  def discussion_entry_attachment(entry, user)
     return {} unless entry.attachment
 
     url_options = {}
