@@ -1501,7 +1501,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def allows_favoriting?
-    !(self.course.elementary_subject_course? || self.course.elementary_homeroom_course?) || teacher? || ta? || designer?
+    !(self.course.elementary_subject_course? || self.course.elementary_homeroom_course?) || teacher? || ta? || designer? || self.user.roles(self.root_account).include?('teacher')
   end
 
   private
