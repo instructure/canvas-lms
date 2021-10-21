@@ -36,12 +36,8 @@ module PacePlansCommonPageObject
     )
   end
 
-  def create_course_module(module_title, workflow_state = 'active', assignment_publish_status = 'published')
-    course_module = @course.context_modules.create!(:name => module_title, :workflow_state => workflow_state)
-    module_assignment_title = "Module Assignment"
-    assignment = create_assignment(@course, module_assignment_title, "Module Description", 10, assignment_publish_status)
-    course_module.add_item(:id => assignment.id, :type => 'assignment')
-    course_module
+  def create_course_module(module_title, workflow_state = 'active')
+    @course.context_modules.create!(:name => module_title, :workflow_state => workflow_state)
   end
 
   def create_dated_assignment(course, assignment_title, assignment_due_at, points_possible = 100)
@@ -54,13 +50,55 @@ module PacePlansCommonPageObject
     )
   end
 
-  def feature_setup
-    @account = Account.default
-    @account.enable_feature!(:pace_plans)
+  def create_graded_discussion(course, discussion_title, workflow_state = 'active')
+    assignment = course.assignments.create!(name: discussion_title)
+    course.discussion_topics.create!(user: @teacher,
+                                     title: discussion_title,
+                                     message: 'Discussion topic message',
+                                     assignment: assignment,
+                                     workflow_state: workflow_state)
+  end
+
+  def create_quiz(course, quiz_title)
+    due_at = 1.day.from_now(Time.zone.now)
+    unlock_at = Time.zone.now.advance(days: -2)
+    lock_at = Time.zone.now.advance(days: 4)
+    title = quiz_title
+    @context = course
+    quiz = quiz_model
+    quiz.generate_quiz_data
+    quiz.due_at = due_at
+    quiz.lock_at = lock_at
+    quiz.unlock_at = unlock_at
+    quiz.title = title
+    quiz.save!
+    quiz.quiz_questions.create!(
+      question_data: {
+        name: 'Quiz Questions',
+        question_type: 'fill_in_multiple_blanks_question',
+        question_text: '[color1]',
+        answers: [{ text: 'one', id: 1 }, { text: 'two', id: 2 }, { text: 'three', id: 3 }],
+        points_possible: 1
+      }
+    )
+    quiz.generate_quiz_data
+    quiz.workflow_state = 'available'
+    quiz.save
+    quiz.reload
+    quiz
+  end
+
+  def disable_pace_plans_in_course
+    @course.update(enable_pace_plans: false)
   end
 
   def enable_pace_plans_in_course
     @course.update(enable_pace_plans: true)
+  end
+
+  def feature_setup
+    @account = Account.default
+    @account.enable_feature!(:pace_plans)
   end
 
   def teacher_setup

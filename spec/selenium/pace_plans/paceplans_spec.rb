@@ -37,7 +37,25 @@ describe 'pace plan page' do
     user_session @teacher
   end
 
+  context 'pace plan not enabled' do
+    it 'does not include Pace Plans navigation element when disabled' do
+      disable_pace_plans_in_course
+      visit_course(@course)
+
+      expect(pace_plans_nav_exists?).to be_falsey
+    end
+  end
+
   context 'pace plans in course navigation' do
+    let(:module_title) { 'First Module' }
+    let(:module_assignment_title) { 'Module Assignment' }
+
+    before :once do
+      @course_module = create_course_module(module_title, 'active')
+      @assignment = create_assignment(@course, module_assignment_title, "Module Assignment Description", 10, 'published')
+      @course_module.add_item(:id => @assignment.id, :type => 'assignment')
+    end
+
     it 'navigates to the pace plans page when Pace Plans is clicked' do
       visit_course(@course)
 
@@ -46,13 +64,47 @@ describe 'pace plan page' do
       expect(driver.current_url).to include("/courses/#{@course.id}/pace_plans")
     end
 
-    it 'shows the module in the pace plan' do
-      module_title = 'First Module'
-      create_course_module(module_title, 'active', 'published')
+    it 'shows the module and module items in the pace plan' do
+      discussion_title = "Module Discussion"
+      discussion_assignment = create_graded_discussion(@course, discussion_title, 'published')
+      @course_module.add_item(:id => discussion_assignment.id, :type => 'discussion_topic')
+      quiz_title = "Quiz Title"
+      quiz = create_quiz(@course, quiz_title)
+      @course_module.add_item(:id => quiz.id, :type => 'quiz')
 
       visit_pace_plans_page
 
-      expect(module_title_text(pace_plan_table_module_elements[0])).to include(module_title)
+      expect(module_title_text(0)).to include(module_title)
+      expect(module_item_title_text(0)).to eq(module_assignment_title)
+      expect(module_item_title_text(1)).to eq(discussion_title)
+      expect(module_item_title_text(2)).to eq(quiz_title)
+    end
+
+    it 'does not show a module item that is not an assignment' do
+      page = @course.wiki_pages.create!(title: "New Page Title")
+      @course_module.add_item(id: page.id, type: 'wiki_page')
+      @course_module.add_item(:type => 'external_url',
+                              :url => 'http://example.com/lolcats',
+                              :title => 'pls view')
+      @course_module.add_item(:type => "sub_header", :title => "silly tag")
+
+      visit_pace_plans_page
+
+      expect(module_items.count).to eq(1)
+      expect(module_item_title_text(0)).to eq(module_assignment_title)
+    end
+
+    it 'does not show any publish status when no pace plan created yet' do
+      visit_pace_plans_page
+
+      expect(publish_status_exists?).to be_falsey
+    end
+
+    it 'has Publish and Cancel buttons initially disabled' do
+      visit_pace_plans_page
+
+      expect(is_cancel_available?).to be_falsey
+      expect(is_publish_available?).to be_falsey
     end
   end
 end

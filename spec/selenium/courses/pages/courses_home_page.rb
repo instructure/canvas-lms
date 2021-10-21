@@ -114,4 +114,8 @@ module CoursesHomePage
   def click_pace_plans
     course_pace_plan_link.click
   end
+
+  def pace_plans_nav_exists?
+    element_exists?(course_pace_plan_selector)
+  end
 end

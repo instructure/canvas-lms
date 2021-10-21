@@ -299,15 +299,16 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     return (
       <ApplyTheme theme={{[(Cell as any).theme]: themeOverrides}}>
         <Row
+          data-testid='pp-module-item-row'
           onMouseEnter={() => this.setState({hovering: true})}
           onMouseLeave={() => this.setState({hovering: false})}
           {...pick(this.props, ['hover', 'isStacked', 'headers'])}
         >
-          <Cell>
+          <Cell data-testid='pp-title-cell' >
             <View margin={labelMargin}>{this.renderTitle()}</View>
           </Cell>
           <Cell>
-            <View margin={labelMargin}>{this.renderDurationInput()}</View>
+            <View data-testid="duration-input" margin={labelMargin}>{this.renderDurationInput()}</View>
           </Cell>
           {(this.props.showProjections || this.props.datesVisible) && (
             <Cell>
