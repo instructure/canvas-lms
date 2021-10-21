@@ -57,20 +57,15 @@ class AssessmentRequest < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :rubric_assessment_submission_reminder
     p.to { self.assessor }
-    p.whenever { |record|
-      record.assigned? && @send_reminder && active_rubric_association?
+    p.whenever {
+      should_send_reminder? && active_rubric_association?
     }
     p.data { course_broadcast_data }
 
     p.dispatch :peer_review_invitation
     p.to { self.assessor }
-    p.whenever { |record|
-      send_notification = record.assigned? && @send_reminder && !active_rubric_association?
-      # Do not send notifications if the context is an unpublished course
-      # or if the asset is a submission and the assignment is unpublished
-      send_notification = false if self.context.is_a?(Course) && !self.context.workflow_state.in?(['available', 'completed'])
-      send_notification = false if self.asset.is_a?(Submission) && self.asset.assignment.workflow_state != "published"
-      send_notification
+    p.whenever {
+      should_send_reminder? && !active_rubric_association?
     }
     p.data { course_broadcast_data }
   end
@@ -112,6 +107,16 @@ class AssessmentRequest < ActiveRecord::Base
     self.save!
   ensure
     @send_reminder = nil
+  end
+
+  def should_send_reminder?
+    # Do not send notifications if the context is an unpublished course
+    return false if context.is_a?(Course) && !context.published?
+
+    # or if the asset is a submission and the assignment is unpublished
+    return false if asset.is_a?(Submission) && asset.assignment.workflow_state != "published"
+
+    @send_reminder && assigned?
   end
 
   def context
