@@ -157,7 +157,7 @@ module CanvasQuizStatistics::Analyzers
       answers.detect { |a| a[:id] == match_id }
     end
 
-    def answer_present_but_unknown?(*args)
+    def answer_present_but_unknown?(*)
       false
     end
   end
