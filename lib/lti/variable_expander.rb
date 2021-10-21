@@ -488,6 +488,16 @@ module Lti
     register_expansion 'Canvas.rootAccount.sisSourceId', [],
                        -> { @root_account.sis_source_id }
 
+    # returns the global ID for the external tool that was launched. Only available for LTI 1.
+    # @example
+    #   ```
+    #   1234
+    #   ```
+    register_expansion 'Canvas.externalTool.global_id', [],
+                       -> { @tool.global_id },
+                       CONTROLLER_GUARD,
+                       LTI1_GUARD
+
     # returns the URL for the external tool that was launched. Only available for LTI 1.
     # @example
     #   ```
