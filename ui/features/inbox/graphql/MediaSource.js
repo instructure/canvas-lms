@@ -21,45 +21,29 @@ import {shape, string} from 'prop-types'
 export const MediaSource = {
   fragment: gql`
     fragment MediaSource on MediaSource {
-      contentType
-      url
-      bitrate
-      fileExt
+      type: contentType
+      src: url
       height
-      isOriginal
-      size
       width
     }
   `,
 
   shape: shape({
-    contentType: string,
-    url: string,
-    bitrate: string,
-    fileExt: string,
+    type: string,
+    src: string,
     height: string,
-    isOriginal: string,
-    size: string,
     width: string
   }),
 
   mock: ({
-    contentType = 'video/mp4',
-    url = 'https://nv.instructuremedia.com/fetch/QkFoYkIxc0hhUVRndjZZU01Hd3JCOUd4WEdBPS0tNTU1MTlhMTMyOGI0MTFkMjVjNzkwNmEwZDYzOWJkYzVjM2U0OTBlZQ.mp4',
-    bitrate = '1515981',
-    fileExt = 'mp4',
+    type = 'video/mp4',
+    src = 'https://nv.instructuremedia.com/fetch/QkFoYkIxc0hhUVRndjZZU01Hd3JCOUd4WEdBPS0tNTU1MTlhMTMyOGI0MTFkMjVjNzkwNmEwZDYzOWJkYzVjM2U0OTBlZQ.mp4',
     height = '720',
-    isOriginal = '0',
-    size = '360',
     width = '1280'
   } = {}) => ({
-    contentType,
-    url,
-    bitrate,
-    fileExt,
+    type,
+    src,
     height,
-    isOriginal,
-    size,
     width,
     __typename: 'MediaSource'
   })
