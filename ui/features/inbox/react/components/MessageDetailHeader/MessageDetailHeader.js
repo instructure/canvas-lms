@@ -38,7 +38,7 @@ export const MessageDetailHeader = ({...props}) => {
           <IconButton
             margin="0 x-small 0 0"
             screenReaderLabel={I18n.t('Reply')}
-            onClick={() => props.handleOptionSelect('reply')}
+            onClick={() => props.onReply()}
           >
             <IconReplyLine />
           </IconButton>
@@ -71,7 +71,8 @@ export const MessageDetailHeader = ({...props}) => {
 
 MessageDetailHeader.propTypes = {
   text: PropTypes.string,
-  handleOptionSelect: PropTypes.func
+  handleOptionSelect: PropTypes.func,
+  onReply: PropTypes.func
 }
 
 MessageDetailHeader.defaultProps = {
