@@ -60,7 +60,7 @@ describe PluginSetting do
   end
 
   it "returns updated content if created" do
-    s = PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty" })
+    PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty" })
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     expect(settings).not_to be_nil
     expect(settings[:bar]).to eq "qwerty"

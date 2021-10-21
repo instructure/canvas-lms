@@ -349,8 +349,8 @@ describe OutcomeResultsController do
         end
 
         it 'ignores the outcome proficiency for points scaling' do
-          proficiency = outcome_proficiency_model(@course)
-          res = create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
+          outcome_proficiency_model(@course)
+          create_result(@student.id, @outcome, outcome_assignment, 2, { :possible => 5 })
           json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
           expect(json['rollups'][0]['scores'][0]['score']).to eq 1.2 # ( score of 2 / possible 5) * outcome.points_possible
         end

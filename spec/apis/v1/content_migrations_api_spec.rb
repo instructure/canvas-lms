@@ -741,7 +741,7 @@ describe ContentMigrationsController, type: :request do
       end
 
       it "sets the selective data" do
-        json = api_call(:put, @migration_url, @params, @post_params)
+        api_call(:put, @migration_url, @params, @post_params)
         @migration.reload
         copy_options = { 'all_assignments' => 'true', 'context_modules' => { '9000' => 'true' } }
         expect(@migration.migration_settings[:migration_ids_to_import]).to eq({ 'copy' => copy_options })

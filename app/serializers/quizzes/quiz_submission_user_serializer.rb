@@ -64,7 +64,7 @@ module Quizzes
       end
     end
 
-    def serializable_object(options = {})
+    def serializable_object(**)
       super.merge!(
         user_json(object, current_user, session, sideloads)
       )

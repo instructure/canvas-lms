@@ -100,7 +100,7 @@ describe "manage groups" do
     end
 
     it "allows a teacher to drag and drop a student among groups" do
-      students = groups_student_enrollment 5
+      groups_student_enrollment 5
       group_categories = create_categories(@course, 1)
       groups = add_groups_in_category(group_categories[0])
       get "/courses/#{@course.id}/groups"
@@ -173,7 +173,7 @@ describe "manage groups" do
 
     it "allows a teacher to reassign a student with an accessible modal dialog" do
       skip('KNO-190')
-      students = groups_student_enrollment 2
+      groups_student_enrollment 2
       group_categories = create_categories(@course, 1)
       groups = add_groups_in_category(group_categories[0], 2)
       get "/courses/#{@course.id}/groups"

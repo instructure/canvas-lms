@@ -79,7 +79,7 @@ module Canvas
             rescue RuntimeError
               raise ArgumentError, "Test Message"
             end
-          rescue ArgumentError => e
+          rescue ArgumentError
             raise StandardError, "TopException"
           end
         rescue StandardError => e

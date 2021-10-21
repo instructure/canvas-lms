@@ -697,7 +697,7 @@ describe Quizzes::QuizzesApiController, type: :request do
         @qq1 = @quiz.quiz_questions.create!(
           question_data: multiple_choice_question_data
         )
-        json = api_update_quiz({}, { published: true })
+        api_update_quiz({}, { published: true })
         expect(@quiz.reload).to be_published
         expect(@quiz.question_count).to eq 1
       end

@@ -186,7 +186,7 @@ describe ContentSharesController do
       it "paginates sent content shares" do
         Timecop.travel(1.hour.ago) do
           export2 = @course_1.content_exports.create!(settings: { "selected_content" => { "assignments" => { 'foo' => '1' }, "content_tags" => { 'bar' => '1' } } })
-          sent_share2 = @teacher_1.sent_content_shares.create! name: 'ooga', content_export: export2, read_state: 'read'
+          @teacher_1.sent_content_shares.create! name: 'ooga', content_export: export2, read_state: 'read'
         end
         user_session @teacher_1
 
@@ -238,7 +238,7 @@ describe ContentSharesController do
       it "paginates received content shares" do
         Timecop.travel(1.hour.ago) do
           export2 = @course_1.content_exports.create!(settings: { "selected_content" => { "quizzes" => { 'foo' => '1' }, "content_tags" => { 'bar' => '1' }, "context_modules" => { 'baz' => '1' } } })
-          received_share2 = @teacher_2.received_content_shares.create! name: 'ooga', content_export: export2, sender_id: user_with_pseudonym, read_state: 'unread'
+          @teacher_2.received_content_shares.create! name: 'ooga', content_export: export2, sender_id: user_with_pseudonym, read_state: 'unread'
         end
         user_session @teacher_2
 

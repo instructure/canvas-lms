@@ -23,7 +23,7 @@ if Qti.migration_executable
     before(:once) do
       archive_file_path = File.join(BASE_FIXTURE_DIR, 'qti', 'qti_2_1.zip')
       unzipped_file_path = create_temp_dir!
-      export_folder = create_temp_dir!
+      create_temp_dir!
       exporter = Qti::Converter.new(:export_archive_path => archive_file_path, :base_download_dir => unzipped_file_path)
       exporter.export
       @course_data = exporter.course.with_indifferent_access

@@ -565,7 +565,6 @@ describe CanvadocSessionsController do
 
       it "sends along the audit url when annotations are enabled and assignment is anonymous" do
         @assignment.update!(anonymous_grading: true)
-        domain = @assignment.course.root_account.domain
         url = submission_docviewer_audit_events_url(@submission.id)
         expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(audit_url: url))
 
@@ -574,7 +573,6 @@ describe CanvadocSessionsController do
 
       it "sends along the audit url when annotations are enabled and assignment is moderated" do
         @assignment.update!(moderated_grading: true, grader_count: 1, final_grader: @teacher)
-        domain = @assignment.course.root_account.domain
         url = submission_docviewer_audit_events_url(@submission.id)
         expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(audit_url: url))
 

@@ -491,7 +491,7 @@ class FilesController < ApplicationController
     params[:include] = Array(params[:include])
     if read_allowed(@attachment, @current_user, session, params)
       json = attachment_json(@attachment, @current_user, {}, { include: params[:include], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) })
-      json.merge!(doc_preview_json(@attachment, @current_user))
+      json.merge!(doc_preview_json(@attachment))
       render :json => json
     end
   end
@@ -633,7 +633,7 @@ class FilesController < ApplicationController
                          end
 
           [json[:attachment],
-           doc_preview_json(attachment, @current_user),
+           doc_preview_json(attachment),
            attachment_json(attachment, @current_user, {}, json_include)].reduce(&:merge!)
 
           log_asset_access(attachment, "files", "files")
@@ -738,7 +738,7 @@ class FilesController < ApplicationController
 
   # Is the user permitted to upload a file to the context with the given intent
   # and related asset?
-  def authorized_upload?(context, user, asset, intent)
+  def authorized_upload?(context, asset, intent)
     if asset.is_a?(Assignment) && intent == 'comment'
       authorized_action(asset, @current_user, :attach_submission_comment_files)
     elsif asset.is_a?(Assignment) && intent == 'submit'
@@ -817,7 +817,7 @@ class FilesController < ApplicationController
       @context = group || @current_user
     end
 
-    if authorized_upload?(@context, @asset, intent, @current_user)
+    if authorized_upload?(@context, @asset, intent)
       api_attachment_preflight(@context, request,
                                check_quota: check_quota?(@context, intent),
                                folder: default_folder(@context, @asset, intent),
@@ -1018,7 +1018,7 @@ class FilesController < ApplicationController
     end
 
     json = attachment_json(@attachment, @current_user, {}, json_params)
-    json.merge!(doc_preview_json(@attachment, @current_user))
+    json.merge!(doc_preview_json(@attachment))
 
     # render as_text for IE, otherwise it'll prompt
     # to download the JSON response

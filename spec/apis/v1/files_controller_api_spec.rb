@@ -372,13 +372,13 @@ describe "Files API", type: :request do
                                                                                :content_type => 'text/plain',
                                                                                :content_length => 1234,
                                                                              })
-        json = call_create_success
+        call_create_success
       end
 
       it "calls back for local storage" do
         local_storage!
         upload_data
-        json = call_create_success
+        call_create_success
       end
     end
   end
@@ -630,9 +630,9 @@ describe "Files API", type: :request do
 
     context "content_types" do
       before :once do
-        txt = attachment_model :display_name => 'thing.txt', :content_type => 'text/plain', :context => @course, :folder => @f1
-        png = attachment_model :display_name => 'thing.png', :content_type => 'image/png', :context => @course, :folder => @f1
-        gif = attachment_model :display_name => 'thing.gif', :content_type => 'image/gif', :context => @course, :folder => @f1
+        attachment_model :display_name => 'thing.txt', :content_type => 'text/plain', :context => @course, :folder => @f1
+        attachment_model :display_name => 'thing.png', :content_type => 'image/png', :context => @course, :folder => @f1
+        attachment_model :display_name => 'thing.gif', :content_type => 'image/gif', :context => @course, :folder => @f1
       end
 
       it "matches one content-type" do
@@ -877,9 +877,9 @@ describe "Files API", type: :request do
 
     context "content_types" do
       before :once do
-        txt = attachment_model :display_name => 'thing.txt', :content_type => 'text/plain', :context => @course, :folder => @f1
-        png = attachment_model :display_name => 'thing.png', :content_type => 'image/png', :context => @course, :folder => @f1
-        gif = attachment_model :display_name => 'thing.gif', :content_type => 'image/gif', :context => @course, :folder => @f1
+        attachment_model :display_name => 'thing.txt', :content_type => 'text/plain', :context => @course, :folder => @f1
+        attachment_model :display_name => 'thing.png', :content_type => 'image/png', :context => @course, :folder => @f1
+        attachment_model :display_name => 'thing.gif', :content_type => 'image/gif', :context => @course, :folder => @f1
       end
 
       it "matches one content-type" do

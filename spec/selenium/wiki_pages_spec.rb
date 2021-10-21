@@ -222,7 +222,7 @@ describe "Wiki Pages" do
       @course.tab_configuration = [{ :id => Course::TAB_PAGES, :hidden => true }]
       @course.save!
 
-      foo = @course.wiki_pages.create! title: 'foo'
+      @course.wiki_pages.create! title: 'foo'
       get "/courses/#{@course.id}/pages/foo"
 
       expect(f("#content")).not_to contain_css('.view_all_pages')
@@ -242,7 +242,7 @@ describe "Wiki Pages" do
       @course.save!
 
       title = "foo"
-      wiki_page = @course.wiki_pages.create!(:title => title, :body => "bar")
+      @course.wiki_pages.create!(:title => title, :body => "bar")
 
       get "/courses/#{@course.id}/pages/#{title}"
       expect(f('#wiki_page_show')).not_to be_nil

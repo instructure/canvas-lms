@@ -294,7 +294,7 @@ describe ContextModuleProgression do
     @assignment = @course.assignments.create!
     @tag1 = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
     @topic = @course.discussion_topics.create!
-    entry = @topic.discussion_entries.create!(:user => @user)
+    @topic.discussion_entries.create!(:user => @user)
     @module.completion_requirements = { @tag1.id => { :type => 'must_view' } }
 
     progression = @module.evaluate_for(@user)
@@ -386,7 +386,7 @@ describe ContextModuleProgression do
       progression = @module.evaluate_for(@user)
       expect(progression).to be_unlocked
 
-      entry = topic.reply_from(:user => @user, :text => "entry")
+      topic.reply_from(:user => @user, :text => "entry")
       expect(progression.reload).to be_started
       assignment.grade_student(@user, :score => 100, :grader => @teacher)
       expect(progression.reload).to be_started

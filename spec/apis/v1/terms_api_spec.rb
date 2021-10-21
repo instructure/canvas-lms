@@ -307,9 +307,9 @@ describe TermsController, type: :request do
       end
 
       it "rejects invalid sis ids" do
-        json = api_call(:post, "/api/v1/accounts/#{@account.id}/terms",
-                        { controller: 'terms', action: 'create', format: 'json', account_id: @account.to_param },
-                        { enrollment_term: { name: 'Term 2', sis_term_id: { :fail => true } } }, {}, { :expected_status => 400 })
+        api_call(:post, "/api/v1/accounts/#{@account.id}/terms",
+                 { controller: 'terms', action: 'create', format: 'json', account_id: @account.to_param },
+                 { enrollment_term: { name: 'Term 2', sis_term_id: { :fail => true } } }, {}, { :expected_status => 400 })
       end
 
       it "rejects non unique sis ids" do

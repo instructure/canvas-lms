@@ -28,7 +28,7 @@ if Qti.migration_executable
     end
 
     it "finds correct answer for multiple choice with zero point weights" do
-      hash = get_question_hash(RESPONDUS_FIXTURE_DIR, 'zero_point_mc', false, :flavor => Qti::Flavors::RESPONDUS)
+      hash = get_question_hash(RESPONDUS_FIXTURE_DIR, 'zero_point_mc', delete_answer_ids: false, flavor: Qti::Flavors::RESPONDUS)
       expect(hash[:import_error]).to eq nil
       expect(hash[:answers].first[:weight]).to eq 100
     end

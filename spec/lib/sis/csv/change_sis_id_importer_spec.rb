@@ -158,7 +158,7 @@ describe SIS::CSV::ChangeSisIdImporter do
       u1.pseudonym.integration_id = 'int1'
       u1.pseudonym.save!
 
-      importer = process_csv_data(
+      process_csv_data(
         'old_id,new_id,old_integration_id,new_integration_id,type',
         ',,int1,int2,user',
         'GC1,GC2,,,group_category'

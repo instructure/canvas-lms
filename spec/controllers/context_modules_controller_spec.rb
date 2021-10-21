@@ -192,10 +192,10 @@ describe ContextModulesController do
       assignment1 = ag.assignments.create!(:context => @course)
       assignment2 = ag.assignments.create!(:context => @course)
 
-      header1 = @module.add_item :type => 'context_module_sub_header'
+      @module.add_item :type => 'context_module_sub_header'
       assignmentTag1 = @module.add_item :type => 'assignment', :id => assignment1.id
       assignmentTag2 = @module.add_item :type => 'assignment', :id => assignment2.id
-      header2 = @module.add_item :type => 'context_module_sub_header'
+      @module.add_item :type => 'context_module_sub_header'
 
       get 'module_redirect', params: { :course_id => @course.id, :context_module_id => @module.id, :first => 1 }
       expect(response).to redirect_to course_assignment_url(@course.id, assignment1.id, :module_item_id => assignmentTag1.id)
@@ -806,7 +806,7 @@ describe ContextModulesController do
       2.times do
         student = student_in_course(:course => @course, :active_all => true).user
         override = assignment_override_model(:assignment => @assign)
-        os = override.assignment_override_students.create!(:user => student)
+        override.assignment_override_students.create!(:user => student)
       end
 
       expect(AssignmentOverrideApplicator).to receive(:overrides_for_assignment_and_user).never
@@ -830,7 +830,7 @@ describe ContextModulesController do
       2.times do
         student = student_in_course(:course => @course, :active_all => true).user
         override = assignment_override_model(:assignment => @assign)
-        os = override.assignment_override_students.create!(:user => student)
+        override.assignment_override_students.create!(:user => student)
       end
 
       get 'content_tag_assignment_data', params: { course_id: @course.id }, format: 'json' # precache
@@ -887,7 +887,7 @@ describe ContextModulesController do
       2.times do
         student = student_in_course(:course => @course, :active_all => true).user
         override = assignment_override_model(:quiz => @quiz)
-        os = override.assignment_override_students.create!(:user => student)
+        override.assignment_override_students.create!(:user => student)
       end
 
       get 'content_tag_assignment_data', params: { course_id: @course.id }, format: 'json' # precache
@@ -1166,8 +1166,8 @@ describe ContextModulesController do
     end
 
     it "redirects to the assignment edit mastery paths page for new quizzes" do
-      tool = @course.context_external_tools.create! tool_id: ContextExternalTool::QUIZ_LTI, name: 'Q.N',
-                                                    consumer_key: '1', shared_secret: '1', domain: 'quizzes.example.com'
+      @course.context_external_tools.create! tool_id: ContextExternalTool::QUIZ_LTI, name: 'Q.N',
+                                             consumer_key: '1', shared_secret: '1', domain: 'quizzes.example.com'
       assignment = @course.assignments.create!
       assignment.quiz_lti!
       assignment.save!

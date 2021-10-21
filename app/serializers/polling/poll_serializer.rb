@@ -32,7 +32,7 @@ module Polling
       api_v1_poll_choices_url(object)
     end
 
-    def filter(keys)
+    def filter(_keys)
       if object.grants_right?(current_user, session, :update)
         student_keys + teacher_keys
       else

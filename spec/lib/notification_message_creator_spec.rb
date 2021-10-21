@@ -118,8 +118,8 @@ describe NotificationMessageCreator do
       assignment_model
       user_model(:workflow_state => 'registered')
       a = communication_channel_model(:workflow_state => 'active')
-      b = communication_channel_model(:path => "path2@example.com")
-      c = communication_channel_model(:path => "path3@example.com")
+      communication_channel_model(:path => "path2@example.com")
+      communication_channel_model(:path => "path3@example.com")
       expect(a).to be_active
 
       @n = Notification.create(:name => "New Notification")
@@ -300,7 +300,7 @@ describe NotificationMessageCreator do
       @notification_policy.update_attribute(:frequency, 'daily')
 
       other_notification = Notification.create!(:subject => "yo", :name => "Test Not 2")
-      other_np = NotificationPolicy.create!(:notification => other_notification, :communication_channel => @communication_channel)
+      NotificationPolicy.create!(:notification => other_notification, :communication_channel => @communication_channel)
 
       NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
       expect(Message.where(:communication_channel_id => @communication_channel).exists?).to eq false # no immediate message
@@ -404,7 +404,7 @@ describe NotificationMessageCreator do
     it "creates stream items" do
       notification_set(:notification_opts => { :name => "Show In Feed" })
       expect(@user.stream_item_instances.count).to eq 0
-      messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
+      NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
       expect(@user.stream_item_instances.count).to eq 1
       si = @user.stream_item_instances.first.stream_item
       expect(si.asset_type).to eq 'Message'

@@ -245,8 +245,8 @@ describe "Canvas Cartridge importing" do
 
     mod1 = @copy_from.context_modules.create!(:name => "some module")
 
-    tag = mod1.add_item({ :title => "test", :type => 'context_external_tool', :url => "http://example.com.ims/lti", :new_tab => true })
-    tag = mod1.add_item({ :title => "test2", :type => 'context_external_tool', :url => "http://example.com.ims/lti" })
+    mod1.add_item({ :title => "test", :type => 'context_external_tool', :url => "http://example.com.ims/lti", :new_tab => true })
+    mod1.add_item({ :title => "test2", :type => 'context_external_tool', :url => "http://example.com.ims/lti" })
     mod1.save!
 
     expect(mod1.content_tags.count).to eq 2
@@ -437,7 +437,7 @@ describe "Canvas Cartridge importing" do
     rubric2.data = [{ :ratings => [{ :criterion_id => "309_6312", :points => 5, :description => "Full Marks", :id => "blank", :long_description => "" }, { :criterion_id => "309_6312", :points => 0, :description => "No Marks", :id => "blank_2", :long_description => "" }], :points => 5, :description => "Description of criterion", :id => "309_6312", :long_description => "" }, { :ignore_for_scoring => false, :mastery_points => 3, :learning_outcome_id => lo.id, :ratings => [{ :criterion_id => "309_343", :points => 5, :description => "Exceeds Expectations", :id => "309_6516", :long_description => "" }, { :criterion_id => "309_343", :points => 0, :description => "Does Not Meet Expectations", :id => "309_9962", :long_description => "" }], :points => 5, :description => "Learning Outcome", :id => "309_343", :long_description => "<p>Outcome</p>" }]
     rubric2.save!
 
-    assoc = RubricAssociation.create!(:context => @copy_from, :rubric => rubric2, :association_object => @copy_from, :title => rubric2.title, :purpose => 'bookmark')
+    RubricAssociation.create!(:context => @copy_from, :rubric => rubric2, :association_object => @copy_from, :title => rubric2.title, :purpose => 'bookmark')
 
     # export to xml
     builder = Builder::XmlMarkup.new(:indent => 2)
@@ -660,7 +660,6 @@ describe "Canvas Cartridge importing" do
   end
 
   it "translates media file links on import" do
-    media_id = 'm_mystiry'
     att = Attachment.create!(:filename => 'video.mp4',
                              :uploaded_data => StringIO.new('stuff'),
                              :folder => Folder.root_folders(@copy_to).first, :context => @copy_to)

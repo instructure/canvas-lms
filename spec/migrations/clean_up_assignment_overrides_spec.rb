@@ -25,7 +25,7 @@ describe 'CleanUpAssignmentOverrides' do
   it "cleans up invalid overrides and orphaned override students" do
     CleanUpAssignmentOverrides.down
 
-    student1 = course_with_student.user
+    course_with_student.user
     assignment_model context: @course
     override1 = @assignment.assignment_overrides.create! set_type: 'ADHOC'
     override2 = @assignment.assignment_overrides.create! set_type: 'ADHOC'

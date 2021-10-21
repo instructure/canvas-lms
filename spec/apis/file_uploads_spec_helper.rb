@@ -149,7 +149,6 @@ shared_examples_for "file uploads api" do
 
   it "uploads (s3 files)" do
     filename = "my_essay.doc"
-    content = "this is a test doc"
 
     s3_storage!
     # step 1, preflight
@@ -378,7 +377,7 @@ shared_examples_for "file uploads api with folders" do
     local_storage!
     @folder = Folder.assert_path("test", context)
     a1 = Attachment.create!(:folder => @folder, :context => context, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
-    json = preflight({ :name => "test.txt", :folder => "test", :url => "http://www.example.com/test" })
+    preflight({ :name => "test.txt", :folder => "test", :url => "http://www.example.com/test" })
     attachment = Attachment.order(:id).last
     expect(CanvasHttp).to receive(:get).with("http://www.example.com/test").and_yield(FakeHttpResponse.new(200, "second"))
     run_jobs
@@ -415,7 +414,7 @@ shared_examples_for "file uploads api with folders" do
     local_storage!
     @folder = Folder.assert_path("test", context)
     a1 = Attachment.create!(:folder => @folder, :context => context, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
-    json = preflight({ :name => "test.txt", :folder => "test", :on_duplicate => 'rename', :url => "http://www.example.com/test" })
+    preflight({ :name => "test.txt", :folder => "test", :on_duplicate => 'rename', :url => "http://www.example.com/test" })
     attachment = Attachment.order(:id).last
     expect(CanvasHttp).to receive(:get).with("http://www.example.com/test").and_yield(FakeHttpResponse.new(200, "second"))
     run_jobs
@@ -461,7 +460,7 @@ shared_examples_for "file uploads api with quotas" do
   it "returns successful preflight for files within quota limits" do
     @context.write_attribute(:storage_quota, 5.megabytes)
     @context.save!
-    json = preflight({ :name => "test.txt", :size => 3.megabytes })
+    preflight({ :name => "test.txt", :size => 3.megabytes })
     attachment = Attachment.order(:id).last
     expect(attachment.workflow_state).to eq 'unattached'
     expect(attachment.filename).to eq 'test.txt'

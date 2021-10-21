@@ -193,7 +193,7 @@ describe LtiApiController, type: :request do
       result_data_xml += "\n</resultData>\n"
     end
 
-    body = <<~XML
+    <<~XML
       <?xml version = "1.0" encoding = "UTF-8"?>
       <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
         <imsx_POXHeader>
@@ -222,7 +222,7 @@ describe LtiApiController, type: :request do
 
   def read_result(sourceid = nil)
     sourceid ||= source_id()
-    body = <<~XML
+    <<~XML
       <?xml version = "1.0" encoding = "UTF-8"?>
       <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
         <imsx_POXHeader>
@@ -246,7 +246,7 @@ describe LtiApiController, type: :request do
 
   def delete_result(sourceid = nil)
     sourceid ||= source_id()
-    body = <<~XML
+    <<~XML
       <?xml version = "1.0" encoding = "UTF-8"?>
       <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
         <imsx_POXHeader>
@@ -574,7 +574,7 @@ describe LtiApiController, type: :request do
   end
 
   it "rejects if the assignment doesn't use this tool" do
-    tool = @course.context_external_tools.create!(:shared_secret => 'test_secret_2', :consumer_key => 'test_key_2', :name => 'new tool', :domain => 'example.net')
+    @course.context_external_tools.create!(:shared_secret => 'test_secret_2', :consumer_key => 'test_key_2', :name => 'new tool', :domain => 'example.net')
     @assignment.external_tool_tag.destroy_permanently!
     @assignment.external_tool_tag = nil
     tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
@@ -585,7 +585,7 @@ describe LtiApiController, type: :request do
   end
 
   it "is unsupported if the assignment switched to a new tool with the same shared secret" do
-    tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'new tool', :domain => 'example.net')
+    @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'new tool', :domain => 'example.net')
     @assignment.external_tool_tag.destroy_permanently!
     @assignment.external_tool_tag = nil
     tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
@@ -658,7 +658,7 @@ describe LtiApiController, type: :request do
 
     def update_result(score, sourcedid = nil)
       sourcedid ||= source_id()
-      body = {
+      {
         'lti_message_type' => 'basic-lis-updateresult',
         'sourcedid' => sourcedid,
         'result_resultscore_textstring' => score.to_s,
@@ -667,7 +667,7 @@ describe LtiApiController, type: :request do
 
     def read_result(sourcedid = nil)
       sourcedid ||= source_id()
-      body = {
+      {
         'lti_message_type' => 'basic-lis-readresult',
         'sourcedid' => sourcedid,
       }
@@ -675,7 +675,7 @@ describe LtiApiController, type: :request do
 
     def delete_result(sourcedid = nil)
       sourcedid ||= source_id()
-      body = {
+      {
         'lti_message_type' => 'basic-lis-deleteresult',
         'sourcedid' => sourcedid,
       }
@@ -786,7 +786,7 @@ describe LtiApiController, type: :request do
     end
 
     it "rejects if the assignment doesn't use this tool" do
-      tool = @course.context_external_tools.create!(:shared_secret => 'test_secret_2', :consumer_key => 'test_key_2', :name => 'new tool', :domain => 'example.net')
+      @course.context_external_tools.create!(:shared_secret => 'test_secret_2', :consumer_key => 'test_key_2', :name => 'new tool', :domain => 'example.net')
       @assignment.external_tool_tag.destroy_permanently!
       @assignment.external_tool_tag = nil
       tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")
@@ -797,7 +797,7 @@ describe LtiApiController, type: :request do
     end
 
     it "is unsupported if the assignment switched to a new tool with the same shared secret" do
-      tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'new tool', :domain => 'example.net')
+      @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'new tool', :domain => 'example.net')
       @assignment.external_tool_tag.destroy_permanently!
       @assignment.external_tool_tag = nil
       tag = @assignment.build_external_tool_tag(:url => "http://example.net/one")

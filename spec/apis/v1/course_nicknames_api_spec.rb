@@ -122,9 +122,9 @@ describe 'Course Nicknames API', type: :request do
 
       it "doesn't create a nickname for a course the caller can't access" do
         other_course = Course.create!
-        json = api_call(:put, "/api/v1/users/self/course_nicknames/#{other_course.id}?nickname=blah",
-                        @params.merge(:action => 'update', :course_id => other_course.to_param, :nickname => 'blah'),
-                        {}, {}, { :expected_status => 401 })
+        api_call(:put, "/api/v1/users/self/course_nicknames/#{other_course.id}?nickname=blah",
+                 @params.merge(:action => 'update', :course_id => other_course.to_param, :nickname => 'blah'),
+                 {}, {}, { :expected_status => 401 })
       end
     end
 
@@ -143,8 +143,8 @@ describe 'Course Nicknames API', type: :request do
         other_course = Course.create!
         @student.set_preference(:course_nicknames, @course.id, 'nickname1')
         @student.set_preference(:course_nicknames, other_course.id, 'nickname2')
-        json = api_call(:delete, "/api/v1/users/self/course_nicknames",
-                        @params.merge(:action => 'clear'))
+        api_call(:delete, "/api/v1/users/self/course_nicknames",
+                 @params.merge(:action => 'clear'))
         expect(@student.reload.preferences[:course_nicknames]).to eq({})
       end
     end

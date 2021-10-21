@@ -96,7 +96,7 @@ module ActiveRecord
 
         it "doesnt obfuscate the error when it dies in a transaction" do
           account = Account.create!
-          course = account.courses.create!
+          account.courses.create!
           User.create!
           expect do
             ActiveRecord::Base.transaction do
@@ -182,7 +182,7 @@ module ActiveRecord
 
         it "doesnt obfuscate the error when it dies in a transaction" do
           account = Account.create!
-          course = account.courses.create!
+          account.courses.create!
           User.create!
           expect do
             ActiveRecord::Base.transaction do
@@ -447,7 +447,7 @@ module ActiveRecord
         fk_name = ActiveRecord::Migration.find_foreign_key(:notatable, :users)
         other_fk_name = ActiveRecord::Migration.find_foreign_key(:users, :notatable)
         expect(fk_name).to be_nil
-        expect(fk_name).to be_nil
+        expect(other_fk_name).to be_nil
       end
 
       it 'actually renames foreign keys' do

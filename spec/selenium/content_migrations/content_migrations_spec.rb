@@ -34,7 +34,7 @@ end
 def select_migration_file(opts = {})
   filename = opts[:filename] || @filename
 
-  new_filename, fullpath, data = get_file(filename, opts[:data])
+  new_filename, fullpath, _data = get_file(filename, opts[:data])
   f('#migrationFileUpload').send_keys(fullpath)
   return new_filename
 end

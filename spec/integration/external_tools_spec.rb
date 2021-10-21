@@ -309,8 +309,8 @@ describe "External Tools" do
         expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a")).to be_present
 
         # trigger the global_nav cache register clearing in a callback
-        other_tool = Account.default.context_external_tools.new(:name => "b", :domain => "google.com",
-                                                                :consumer_key => '12345', :shared_secret => 'secret')
+        Account.default.context_external_tools.new(:name => "b", :domain => "google.com",
+                                                   :consumer_key => '12345', :shared_secret => 'secret')
         new_secret_settings = @admin_tool.settings
         new_secret_settings[:global_navigation][:text] = "new text"
         # update the url secretly in the db but don't update the cache_key (updated_at)

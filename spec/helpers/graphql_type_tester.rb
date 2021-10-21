@@ -73,7 +73,6 @@ class GraphQLTypeTester
     field_context = @context.merge(context)
     type = CanvasSchema.resolve_type(nil, @obj, field_context) or
       raise "couldn't resolve type for #{@obj.inspect}"
-    field = extract_field(field_and_subfields, type)
     variables = {
       id: CanvasSchema.id_from_object(@obj, type, field_context)
     }

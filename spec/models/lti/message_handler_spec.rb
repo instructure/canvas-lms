@@ -56,9 +56,9 @@ module Lti
 
     describe 'scope #message_type' do
       it 'returns all message_handlers for a message_type' do
-        mh1 = create_message_handler
-        mh2 = create_message_handler
-        mh3 = create_message_handler(create_resource_handler, message_type: 'content_item')
+        create_message_handler
+        create_message_handler
+        create_message_handler(create_resource_handler, message_type: 'content_item')
 
         message_handlers = described_class.by_message_types('basic-lti-launch-request')
         expect(message_handlers.count).to eq 2
@@ -66,9 +66,9 @@ module Lti
 
       it 'returns all message_handlers for mutlipe message types' do
         rh = create_resource_handler
-        mh1 = create_message_handler(rh)
-        mh2 = create_message_handler(rh, message_type: 'other_type')
-        mh3 = create_message_handler(rh, message_type: 'content_item')
+        create_message_handler(rh)
+        create_message_handler(rh, message_type: 'other_type')
+        create_message_handler(rh, message_type: 'content_item')
 
         message_handlers = described_class.by_message_types('basic-lti-launch-request', 'other_type')
         expect(message_handlers.count).to eq 2

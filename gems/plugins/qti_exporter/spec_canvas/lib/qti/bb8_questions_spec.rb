@@ -61,7 +61,7 @@ if Qti.migration_executable
     end
 
     it "converts matching questions" do
-      hash = get_question_hash(bb8_question_dir, 'matching', false)
+      hash = get_question_hash(bb8_question_dir, 'matching', delete_answer_ids: false)
       matches = {}
       hash[:matches].each { |m| matches[m[:match_id]] = m[:text] }
       hash[:answers].each do |a|

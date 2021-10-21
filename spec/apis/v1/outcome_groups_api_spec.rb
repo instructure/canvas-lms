@@ -990,7 +990,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "paginates the links" do
-      links = 5.times.map { |i| create_outcome(:title => "#{i}".object_id) }
+      5.times { |i| create_outcome(title: i) }
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes?per_page=2",
                       :controller => 'outcome_groups_api',
@@ -1732,7 +1732,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "paginates the subgroups" do
-      subgroups = 5.times.map { |i| create_subgroup }
+      5.times { create_subgroup }
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups?per_page=2",
                       :controller => 'outcome_groups_api',

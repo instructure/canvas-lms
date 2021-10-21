@@ -59,7 +59,7 @@ describe ContentMigration do
 
       # account question bank in course quiz
       @bank = @account.assessment_question_banks.create!(:title => "account bank")
-      aq = @bank.assessment_questions.create!(:question_data =>
+      @bank.assessment_questions.create!(:question_data =>
         { 'question_name' => 'test question 1', 'question_type' => 'essay_question', 'question_text' => 'blah' })
       @quiz = @copy_from.quizzes.create!
       @quiz.quiz_groups.create! pick_count: 1, assessment_question_bank_id: @bank.id

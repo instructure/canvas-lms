@@ -41,7 +41,7 @@
 
 <div style="margin-bottom: 25px;">
   <%= before_label(:quiz_instructions, "Quiz Instructions") %>
-  <%= user_content(@quiz.description, @context.asset_string) %>
+  <%= user_content(@quiz.description) %>
 </div>
 <div style="margin-bottom: 5px;">
   <input type="checkbox" id="show_question_details"/> <label for="show_question_details"><%= t('labels.question_details', "Show Question Details") %></label>

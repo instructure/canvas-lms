@@ -390,12 +390,12 @@ class PageView < ActiveRecord::Base
   end
 
   # to_csv uses these methods, see lib/ext/array.rb
-  def export_columns(format = nil)
+  def export_columns
     PageView::EXPORTED_COLUMNS
   end
 
-  def to_row(format = nil)
-    export_columns(format).map { |c| self.send(c).presence }
+  def to_row
+    export_columns.map { |c| self.send(c).presence }
   end
 
   def app_name

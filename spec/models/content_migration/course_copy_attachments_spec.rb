@@ -26,7 +26,7 @@ describe ContentMigration do
     it "assigns the correct parent folder when the parent folder has already been created" do
       folder = Folder.root_folders(@copy_from).first
       folder = folder.sub_folders.create!(:context => @copy_from, :name => 'folder_1')
-      att = Attachment.create!(:filename => 'dummy.txt', :uploaded_data => StringIO.new('fakety'), :folder => folder, :context => @copy_from)
+      Attachment.create!(:filename => 'dummy.txt', :uploaded_data => StringIO.new('fakety'), :folder => folder, :context => @copy_from)
       folder = folder.sub_folders.create!(:context => @copy_from, :name => 'folder_2')
       folder = folder.sub_folders.create!(:context => @copy_from, :name => 'folder_3')
       old_attachment = Attachment.create!(:filename => 'merge.test', :uploaded_data => StringIO.new('ohey'), :folder => folder, :context => @copy_from)
@@ -106,7 +106,7 @@ describe ContentMigration do
     it "includes implied files for course exports" do
       att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att2 = Attachment.create!(:filename => 'second.jpg', :uploaded_data => StringIO.new('ohais'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
-      att3 = Attachment.create!(:filename => 'third.jpg', :uploaded_data => StringIO.new('3333'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+      Attachment.create!(:filename => 'third.jpg', :uploaded_data => StringIO.new('3333'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
 
       asmnt_des = %{<a href="/courses/%s/files/%s/preview">First file</a>}
       wiki_body = %{<img src="/courses/%s/files/%s/preview">}
@@ -201,7 +201,7 @@ describe ContentMigration do
       att.save!
 
       mod = @copy_from.context_modules.create!(:name => "some module")
-      tag = mod.add_item({ :id => att.id, :type => 'attachment' })
+      mod.add_item({ :id => att.id, :type => 'attachment' })
 
       run_course_copy
 

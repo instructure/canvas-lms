@@ -102,8 +102,8 @@ module AccountReports
     settings = Canvas::Plugin.find(:account_reports).settings
     return REPORTS.dup unless settings
 
-    enabled_reports = settings.select { |report, enabled| enabled }.map(&:first)
-    Hash[*REPORTS.select { |report, details| enabled_reports.include?(report) }.flatten]
+    enabled_reports = settings.select { |_report, enabled| enabled }.map(&:first)
+    REPORTS.select { |report, _details| enabled_reports.include?(report) }
   end
 
   def self.generate_report(account_report)

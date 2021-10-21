@@ -197,7 +197,6 @@ module QuizzesCommon
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
     c = bank.assessment_questions.create!
-    answers = [{ 'id' => 1 }, { 'id' => 2 }, { 'id' => 3 }]
 
     @quest1 = @quiz.quiz_questions.create!(
       question_data: {

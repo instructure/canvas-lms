@@ -126,13 +126,13 @@ describe Stats do
 
     it "works with strange bin widths in histogram" do
       c = Stats::Counter.new([-7, -3, 0, 1, 2, 3, 4, 5, 6])
-      h = c.histogram(bin_width = 2.5, bin_base = 0.0)
+      h = c.histogram(2.5, 0.0)
       expect(h).to eq({ :bin_width => 2.5, :bin_base => 0.0, :data => { 0.0 => 3, -5.0 => 1, 5.0 => 2, -7.5 => 1, 2.5 => 2 } })
     end
 
     it "works with strange bin bases in histogram" do
       c = Stats::Counter.new([-7, -3, 0, 1, 2, 3, 4, 5, 6])
-      h = c.histogram(bin_width = 2.5, bin_base = 1.5)
+      h = c.histogram(2.5, 1.5)
       expect(h).to eq({ :bin_width => 2.5, :bin_base => 1.5, :data => { 1.5 => 2, 4.0 => 3, -3.5 => 1, -8.5 => 1, -1.0 => 2 } })
     end
 

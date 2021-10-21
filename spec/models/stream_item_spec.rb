@@ -52,7 +52,7 @@ describe StreamItem do
     de = dt.root_discussion_entries.create!
     dt.generate_stream_items([@user])
     si = @user.stream_item_instances.first.stream_item
-    data = si.data(@user.id)
+    si.data(@user.id)
     expect(de.reload.discussion_topic_id).not_to be_nil
   end
 
@@ -75,7 +75,7 @@ describe StreamItem do
 
   describe "destroy_stream_items_using_setting" do
     it "has a default ttl" do
-      si1 = StreamItem.create! { |si| si.asset_type = 'Message'; si.data = { notification_id: nil } }
+      StreamItem.create!(asset_type: 'Message', data: { notification_id: nil })
       si2 = StreamItem.create! { |si| si.asset_type = 'Message'; si.data = { notification_id: nil } }
       StreamItem.where(:id => si2).update_all(:updated_at => 1.year.ago)
       # stub this out so that the vacuum is skipped (can't run in specs in a transaction)
@@ -159,9 +159,9 @@ describe StreamItem do
     users = (0..2).map { |x| user_factory }
     user1, user2, user3 = users
     convo = Conversation.initiate(users, false)
-    message = convo.add_message(user3, "hello")
+    convo.add_message(user3, "hello")
     si = StreamItem.where(:asset_type => "Conversation", :asset_id => convo).first
-    instance1, instance2 = [user1, user2].map { |u| si.stream_item_instances.where(:user_id => u).first }
+    instance1, _instance2 = [user1, user2].map { |u| si.stream_item_instances.where(:user_id => u).first }
     instance1.update_attribute(:hidden, true) # hide on user1's instance
     convo.conversation_participants.where(:user_id => user2).first.remove_messages(:all) # remove on user2's side
     expect(instance1.reload).to be_hidden # should leave user1's instance alone

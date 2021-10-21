@@ -132,7 +132,7 @@ describe "admin k5 dashboard" do
     it 'allows for sync of course to selected homeroom', ignore_js_errors: true, custom_timeout: 30 do
       second_homeroom_course_name = "Second homeroom course"
 
-      new_course = course_with_teacher(
+      course_with_teacher(
         account: @account,
         active_course: 1,
         active_enrollment: 1,

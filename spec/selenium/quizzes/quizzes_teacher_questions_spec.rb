@@ -162,7 +162,6 @@ describe "quizzes questions" do
 
     it "rounds numeric questions when creating a quiz", priority: "1", test_id: 209955 do
       start_quiz_question
-      question = fj(".question_form:visible")
       click_option('.question_form:visible .question_type', 'Numerical Answer')
 
       type_in_tiny '.question:visible textarea.question_content', 'This is a numerical question.'

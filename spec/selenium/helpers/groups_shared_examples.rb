@@ -217,10 +217,10 @@ shared_examples 'pages_page' do |context|
 
   it "only lists in-group pages in pages list", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273620, teacher: 324928) do
     # create group and course announcements
-    group_page = @testgroup.first.wiki_pages.create!(user: @teacher,
-                                                     title: 'Group Page')
-    course_page = @course.wiki_pages.create!(user: @teacher,
-                                             title: 'Course Page')
+    @testgroup.first.wiki_pages.create!(user: @teacher,
+                                        title: 'Group Page')
+    @course.wiki_pages.create!(user: @teacher,
+                               title: 'Course Page')
 
     get pages_page
 

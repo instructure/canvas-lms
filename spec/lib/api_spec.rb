@@ -398,9 +398,9 @@ describe Api do
       account1 = account_model
       account2 = account_model
       user1 = user_with_pseudonym :username => "sisuser1@example.com", :account => account1
-      user2 = user_with_pseudonym :username => "sisuser2@example.com", :account => account2
+      user_with_pseudonym :username => "sisuser2@example.com", :account => account2
       user3 = user_with_pseudonym :username => "sisuser3@example.com", :account => account1
-      user4 = user_with_pseudonym :username => "sisuser3@example.com", :account => account2
+      user_with_pseudonym :username => "sisuser3@example.com", :account => account2
       user5 = user_factory :account => account1
       user6 = user_factory :account => account2
       expect(Api.map_ids(["sis_login_id:sisuser1@example.com", "sis_login_id:sisuser2@example.com", "sis_login_id:sisuser3@example.com", user5.id, user6.id], User, account1).sort).to eq [user1.id, user3.id, user5.id, user6.id].sort
@@ -439,8 +439,6 @@ describe Api do
 
     it 'does not try and make params when no non-ar_id columns have returned without ar_id columns' do
       collection = double()
-      object1 = double()
-      object2 = double()
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({})

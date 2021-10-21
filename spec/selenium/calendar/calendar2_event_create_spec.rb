@@ -43,7 +43,6 @@ describe "calendar2" do
     end
     context "event creation" do
       it "creates an event by hitting the '+' in the top bar" do
-        event_title = 'new event'
         get "/calendar2"
 
         fj('#create_new_event_link').click
