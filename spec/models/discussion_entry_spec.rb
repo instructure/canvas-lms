@@ -821,5 +821,29 @@ describe DiscussionEntry do
         end
       end
     end
+
+    describe 'update' do
+      context 'when a user is no longer enrolled in the course' do
+        before do
+          create_enrollment(topic.course, user, { enrollment_state: "completed" })
+        end
+
+        it 'returns false for their own posts' do
+          expect(entry.grants_right?(user, :update)).to eq false
+        end
+      end
+    end
+
+    describe 'delete' do
+      context 'when a user is no longer enrolled in the course' do
+        before do
+          create_enrollment(topic.course, user, { enrollment_state: "completed" })
+        end
+
+        it 'returns false for their own posts' do
+          expect(entry.grants_right?(user, :delete)).to eq false
+        end
+      end
+    end
   end
 end

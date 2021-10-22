@@ -515,8 +515,18 @@ module QuizzesCommon
 
   def edit_first_question
     hover_first_question
-    f('.edit_question_link').click
-    wait_for_ajaximations
+    wait_for_animations
+    begin
+      # for some reason in flakey-spec-catcher this will fail 1/10 times
+      #  have a backup plan
+      f('.edit_question_link').click
+    rescue Selenium::WebDriver::Error::ElementNotInteractableError
+      # rubocop:disable Specs/NoExecuteScript
+      driver.execute_script "document.querySelector('.edit_question_link').click()"
+      # rubocop:enable Specs/NoExecuteScript
+    ensure
+      wait_for_ajaximations
+    end
   end
 
   def save_question
@@ -824,8 +834,9 @@ module QuizzesCommon
     get quiz_submission_speedgrader_url
   end
 
-  def open_quiz_edit_form
+  def open_quiz_edit_form(should_wait_for_rce = true)
     get quiz_edit_form_url
+    wait_for_rce if should_wait_for_rce
   end
 
   private

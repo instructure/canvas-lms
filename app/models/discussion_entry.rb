@@ -317,7 +317,7 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user| self.user && self.user == user && self.discussion_topic.available_for?(user) && self.discussion_topic.can_participate_in_course?(user) }
     can :reply
 
-    given { |user| self.user && self.user == user && self.discussion_topic.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) }
+    given { |user| self.user && self.user == user && self.discussion_topic.available_for?(user) && context.user_can_manage_own_discussion_posts?(user) && self.discussion_topic.can_participate_in_course?(user) }
     can :update and can :delete
 
     given { |user, session| self.discussion_topic.is_announcement && self.context.grants_right?(user, session, :read_announcements) && self.discussion_topic.visible_for?(user) }
