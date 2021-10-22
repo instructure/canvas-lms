@@ -89,6 +89,18 @@ describe "speed grader - grade display" do
 
       expect(Speedgrader.submission_status_pill("missing")).to be_displayed
     end
+
+    context "remove_missing_status_when_graded enabled" do
+      before do
+        Account.site_admin.enable_feature!(:remove_missing_status_when_graded)
+      end
+
+      it "removes missing pill" do
+        Speedgrader.visit(@course.id, @a2.id)
+
+        expect(find_all_with_jquery(".submission-missing-pill:contains('missing')").length).to eq 0
+      end
+    end
   end
 
   context "keyboard shortcuts" do

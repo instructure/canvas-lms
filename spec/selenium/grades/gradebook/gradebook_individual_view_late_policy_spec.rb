@@ -48,6 +48,20 @@ describe "Late Policies:" do
       expect(GradebookIndividualViewPage.status_pill("missing")).to be_displayed
     end
 
+    context "remove_missing_status_when_graded enabled" do
+      before do
+        Account.site_admin.enable_feature!(:remove_missing_status_when_graded)
+        GradebookIndividualViewPage.visit(@course.id)
+      end
+
+      it "missing submission has missing pill removed" do
+        GradebookIndividualViewPage.select_assignment(@a2)
+        GradebookIndividualViewPage.select_student(@course.students.first)
+
+        expect(find_all_with_jquery(".missing-pill:contains('missing')").length).to eq 0
+      end
+    end
+
     it "late submission has late pill" do
       GradebookIndividualViewPage.select_assignment(@a1)
       GradebookIndividualViewPage.select_student(@course.students.first)
