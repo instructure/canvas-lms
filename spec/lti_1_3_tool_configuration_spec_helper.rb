@@ -70,7 +70,7 @@ RSpec.shared_context "lti_1_3_tool_configuration_spec_helper", shared_context: :
               {
                 'placement' => 'course_navigation',
                 'message_type' => 'LtiResourceLinkRequest',
-                'canvas_icon_class' => 'icon-lti',
+                'canvas_icon_class' => 'icon-pdf',
                 'icon_url' => 'https://static.thenounproject.com/png/131630-211.png',
                 'text' => 'LTI 1.3 Test Tool Course Navigation',
                 'target_link_uri' =>
