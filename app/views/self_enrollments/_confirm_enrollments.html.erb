@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<% enrollment_cta_text = @course.elementary_enabled? ? t("Enroll in Subject") : t("buttons.enroll_in_course", "Enroll in Course") %>
+
 <form action="<%= self_enrollment_url %>" method="post" class="ic-Self-enrollment-form" id="enroll_form">
   <input type="hidden" name="initial_action" value="enroll">
   <%= registration_summary || content_tag(:div, mt(:getting_started, "You are enrolling in **%{course}**", :course => @course.name)) %>
@@ -27,7 +29,7 @@
       </div>
       <div class="ic-Self-enrollment-footer__Primary">
         <button class="btn btn-primary" type="submit">
-          <%= @confirm_enrollment_url ? t("buttons.next", "Next") : t("buttons.enroll_in_course", "Enroll in Course") %>
+          <%= @confirm_enrollment_url ? t("buttons.next", "Next") : enrollment_cta_text %>
         </button>
       </div>
     </div>
