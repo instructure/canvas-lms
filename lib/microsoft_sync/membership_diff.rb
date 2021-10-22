@@ -35,8 +35,6 @@ module MicrosoftSync
 
     OWNER_ENROLLMENT_TYPES = %w[TeacherEnrollment TaEnrollment DesignerEnrollment].freeze
 
-    # Note: if changing these numbers, grep for 25000 because it may duplicated in
-    # Javascript (currently once in microsoft_sync/MicrosoftSync.js)
     MAX_ENROLLMENT_MEMBERS = 25_000
     MAX_ENROLLMENT_OWNERS = 100
 

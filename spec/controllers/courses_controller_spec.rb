@@ -785,6 +785,16 @@ describe CoursesController do
       expect(controller.js_env[:MSFT_SYNC_ENABLED]).to eq false
     end
 
+    it 'sets MSFT enrollment limits in the JS ENV' do
+      subject
+      expect(controller.js_env[:MSFT_SYNC_MAX_ENROLLMENT_MEMBERS]).to eq(
+        MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
+      )
+      expect(controller.js_env[:MSFT_SYNC_MAX_ENROLLMENT_OWNERS]).to eq(
+        MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS
+      )
+    end
+
     it 'sets MSFT_SYNC_CAN_BYPASS_COOLDOWN in the JS ENV' do
       subject
       expect(controller.js_env[:MSFT_SYNC_CAN_BYPASS_COOLDOWN]).to eq false
