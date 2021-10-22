@@ -933,6 +933,56 @@ describe Submission do
       end
     end
 
+    it "remains missing when missing submission is graded" do
+      Timecop.freeze(1.day.from_now(@date)) do
+        expect(submission.missing?).to be true
+        @assignment.grade_student(@student, score: 500, grader: @teacher)
+        submission.reload
+        expect(submission.missing?).to be true
+      end
+    end
+
+    context "remove_missing_status_when_graded enabled" do
+      before do
+        Account.site_admin.enable_feature!(:remove_missing_status_when_graded)
+      end
+
+      context "past due date" do
+        it "removes missing status when missing submission is graded" do
+          Timecop.freeze(1.day.from_now(@date)) do
+            expect(submission.missing?).to be true
+            @assignment.grade_student(@student, score: 500, grader: @teacher)
+            submission.reload
+            expect(submission.missing?).to be false
+          end
+        end
+
+        it "does not remove missing status when missing status was given manually" do
+          Timecop.freeze(1.day.from_now(@date)) do
+            expect(submission.missing?).to be true
+            submission.update!(late_policy_status: "missing")
+            expect(submission.missing?).to be true
+            @assignment.grade_student(@student, score: 500, grader: @teacher)
+            submission.reload
+            expect(submission.missing?).to be true
+          end
+        end
+      end
+
+      it "does not remove missing status when missing status was given manually" do
+        @assignment.update!(due_at: 3.hours.from_now(@date), points_possible: 1000, submission_types: "online_text_entry")
+        submission.reload
+        Timecop.freeze(@date) do
+          expect(submission.missing?).to be false
+          submission.update!(late_policy_status: "missing")
+          expect(submission.missing?).to be true
+          @assignment.grade_student(@student, score: 500, grader: @teacher)
+          submission.reload
+          expect(submission.missing?).to be true
+        end
+      end
+    end
+
     it "sets grade_matches_current_submission to true when missing policy is applied" do
       Timecop.freeze(1.day.from_now(@date)) do
         submission.score = nil
