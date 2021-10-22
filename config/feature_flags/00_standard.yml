@@ -105,8 +105,8 @@ embedded_release_notes:
   state: allowed_on
   display_name: Embedded Release Notes
   description: Show Instructure-provided release notes filtered by user role in the
-       Help Menu. Available to users with admin, teacher (instructor), and observer
-       roles. Applicable features for student roles are included in observer notes.
+    Help Menu. Available to users with admin, teacher (instructor), and observer
+    roles. Applicable features for student roles are included in observer notes.
   pending_enforcement: true
   applies_to: Account
 encrypted_sourcedids:
@@ -348,19 +348,6 @@ quizzes_next_submission_history:
     separately.
   applies_to: RootAccount
   root_opt_in: true
-rce_enhancements:
-  state: allowed
-  display_name: RCE Enhancements
-  description: Allow switching to the enhanced RCE
-  applies_to: Course
-  root_opt_in: true
-  environments:
-    production:
-      state: hidden
-    development:
-      state: true
-    ci:
-      state: true
 responsive_layout:
   state: hidden
   display_name: Responsive Layout
