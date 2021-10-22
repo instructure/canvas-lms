@@ -180,7 +180,7 @@ def useRspecQ(percentage) {
   }
 
   java.security.SecureRandom random = new java.security.SecureRandom()
-  if (!(env.RSPECQ_ENABLED == '1' && random.nextInt((100 / percentage).intValue()) == 0)) {
+  if (!(env.RSPECQ_ENABLED == '1' && random.nextInt(100) < percentage)) {
     env.RSPECQ_ENABLED = '0'
     return false
   }
