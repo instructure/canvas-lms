@@ -441,9 +441,9 @@ class ProfileController < ApplicationController
       @profile.save!
 
       if params[:user_services]
-        visible, invisible = params[:user_services].to_unsafe_h.partition { |service, bool|
+        visible, invisible = params[:user_services].to_unsafe_h.partition do |_service, bool|
           value_to_boolean(bool)
-        }
+        end
         @user.user_services.where(:service => visible.map(&:first)).update_all(:visible => true)
         @user.user_services.where(:service => invisible.map(&:first)).update_all(:visible => false)
       end

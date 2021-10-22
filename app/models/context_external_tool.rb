@@ -1174,7 +1174,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.key_for_granted_permissions(granted_permissions)
-    Digest::MD5.hexdigest(granted_permissions.sort_by { |k, v| k.to_s }.flatten.join(",")) # for consistency's sake
+    Digest::MD5.hexdigest(granted_permissions.sort.flatten.join(",")) # for consistency's sake
   end
 
   # returns a key composed of the updated_at times for all the tools visible to someone with the granted_permissions

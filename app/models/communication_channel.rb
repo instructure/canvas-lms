@@ -189,9 +189,7 @@ class CommunicationChannel < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :forgot_password
     p.to { self }
-    p.whenever { |record|
-      @request_password
-    }
+    p.whenever { @request_password }
 
     p.dispatch :confirm_registration
     p.to { self }
@@ -218,10 +216,7 @@ class CommunicationChannel < ActiveRecord::Base
 
     p.dispatch :merge_email_communication_channel
     p.to { self }
-    p.whenever { |record|
-      @send_merge_notification and
-        self.path_type == TYPE_EMAIL
-    }
+    p.whenever { @send_merge_notification && self.path_type == TYPE_EMAIL }
 
     p.dispatch :confirm_sms_communication_channel
     p.to { self }

@@ -563,7 +563,7 @@ class Group < ActiveRecord::Base
       given { |user| user && self.leader == user }
       can :update
 
-      given { |user| self.group_category.try(:communities?) }
+      given { group_category.try(:communities?) }
       can :create
 
       given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) }

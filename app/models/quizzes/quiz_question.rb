@@ -187,7 +187,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   def clone_for(quiz, dup = nil, options = {})
     dup ||= Quizzes::QuizQuestion.new
-    self.attributes.delete_if { |k, v| [:id, :quiz_id, :quiz_group_id, :question_data].include?(k.to_sym) }.each do |key, val|
+    self.attributes.except("id", "quiz_id", "quiz_group_id", "question_data").each do |key, val|
       dup.send("#{key}=", val)
     end
     data = self.question_data || HashWithIndifferentAccess.new

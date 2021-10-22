@@ -215,7 +215,7 @@ class GradingStandard < ActiveRecord::Base
   def standard_data=(params = {})
     params ||= {}
     res = {}
-    params.each do |key, row|
+    params.each_value do |row|
       res[row[:name]] = (row[:value].to_f / 100.0) if row[:name] && row[:value]
     end
     self.data = res.to_a.sort_by { |_, lower_bound| lower_bound }.reverse

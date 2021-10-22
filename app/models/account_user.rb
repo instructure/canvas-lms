@@ -110,11 +110,11 @@ class AccountUser < ActiveRecord::Base
 
     p.dispatch :account_user_registration
     p.to { |record| record.user }
-    p.whenever { |record| @account_user_registration }
+    p.whenever { @account_user_registration }
 
     p.dispatch :account_user_notification
     p.to { |record| record.user }
-    p.whenever { |record| @account_user_notification }
+    p.whenever { @account_user_notification }
   end
 
   set_policy do

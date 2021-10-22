@@ -746,7 +746,7 @@ class Course < ActiveRecord::Base
           end
         end
 
-        to_delete += current_associations.map { |k, v| v.map { |k2, v2| v2[0] } }.flatten
+        to_delete += current_associations.map { |_k, v| v.map { |_k2, v2| v2[0] } }.flatten
         unless to_delete.empty?
           CourseAccountAssociation.where(:id => to_delete).delete_all
         end
@@ -1616,7 +1616,7 @@ class Course < ActiveRecord::Base
     given { |user, session| self.available? && unenrolled_user_can_read?(user, session) }
     can :read and can :read_outcomes and can :read_syllabus
 
-    given { |user, session| self.available? && (self.public_syllabus || (self.public_syllabus_to_auth && session.present? && session.has_key?(:user_id))) }
+    given { |_user, session| self.available? && (self.public_syllabus || (self.public_syllabus_to_auth && session.present? && session.key?(:user_id))) }
     can :read_syllabus
 
     RoleOverride.permissions.each do |permission, details|
@@ -1627,7 +1627,7 @@ class Course < ActiveRecord::Base
       can permission
     end
 
-    given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || (hash[:enrollment_state] == "active" && hash[:user_state].to_s == "pre_registered")) && (self.available? || self.completed? || (self.claimed? && hash[:is_admin])) }
+    given { |_user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || (hash[:enrollment_state] == "active" && hash[:user_state].to_s == "pre_registered")) && (self.available? || self.completed? || (self.claimed? && hash[:is_admin])) }
     can :read and can :read_outcomes
 
     given { |user| (self.available? || self.completed?) && user && fetch_on_enrollments("has_not_inactive_enrollment", user) { enrollments.for_user(user).not_inactive_by_date.exists? } }
