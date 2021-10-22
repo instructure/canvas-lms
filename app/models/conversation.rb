@@ -737,15 +737,13 @@ class Conversation < ActiveRecord::Base
       threshold ||= participants.size / 2
       preloaded_users_hash ||= preload_users_and_context_codes
 
-      participants.inject([]) { |ary, cp|
-        cp.user = preloaded_users_hash[cp.user_id]
-        cp.user ? ary.concat(cp.user.conversation_context_codes) : ary
-      }.sort.inject({}) { |hash, str|
-        hash[str] = (hash[str] || 0) + 1
-        hash
-      }.select { |key, value|
-        value > threshold
-      }.sort_by(&:last).map(&:first).reverse
+      participants.flat_map { |cp| (cp.user = preloaded_users_hash[cp.user_id])&.conversation_context_codes }
+                  .group_by { |code| code }
+                  .map { |code, dups| [code, dups.length] }
+                  .select { |_code, dups| dups > threshold }
+                  .sort_by(&:last)
+                  .map(&:first)
+                  .reverse
     end
   end
 

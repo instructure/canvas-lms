@@ -722,7 +722,7 @@ class User < ActiveRecord::Base
         end
       end
 
-      to_delete += current_associations.map { |k, v| v[0] }
+      to_delete += current_associations.map { |_k, v| v[0] }
       UserAccountAssociation.where(:id => to_delete).delete_all unless incremental || to_delete.empty?
     end
   end

@@ -26,8 +26,8 @@ module Importers
     end
 
     def resolve_links!(link_map)
-      link_map.each do |item_key, field_links|
-        field_links.each do |_field, links|
+      link_map.each_value do |field_links|
+        field_links.each_value do |links|
           links.each do |link|
             resolve_link!(link)
           end

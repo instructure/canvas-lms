@@ -54,7 +54,7 @@ class Quizzes::QuizQuestion::MatchingQuestion < Quizzes::QuizQuestion::Base
     answers = @question_data.answers
     matches = @question_data[:matches]
 
-    answers.each_with_index do |answer, i|
+    answers.each_index do |i|
       answers[i][:answer_matches] = []
       (matches || answers).each do |right|
         match_answer = answers.find { |a|

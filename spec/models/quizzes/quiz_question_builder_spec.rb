@@ -302,7 +302,7 @@ describe Quizzes::QuizQuestionBuilder do
         end
 
         it "shuffles" do
-          expect(answers).to receive(:sort_by)
+          expect(answers).to receive(:shuffle)
           quiz_question_builder.shuffle_answers(question)
         end
       end
@@ -321,13 +321,13 @@ describe Quizzes::QuizQuestionBuilder do
 
     it "shuffles matches for a matching question" do
       quiz_question_builder.options[:shuffle_answers] = true
-      expect(matches).to receive(:sort_by)
+      expect(matches).to receive(:shuffle)
       quiz_question_builder.shuffle_matches(question)
     end
 
     it "still shuffles even if shuffle_answers option is off" do
       quiz_question_builder.options[:shuffle_answers] = false
-      expect(matches).to receive(:sort_by)
+      expect(matches).to receive(:shuffle)
       quiz_question_builder.shuffle_matches(question)
     end
   end

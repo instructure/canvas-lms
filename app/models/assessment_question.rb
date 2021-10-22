@@ -333,7 +333,7 @@ class AssessmentQuestion < ActiveRecord::Base
                       {}
                     end.with_indifferent_access
 
-    data = previous_data.merge(qdata.delete_if { |k, v| !v }).slice(
+    data = previous_data.merge(qdata.compact).slice(
       :id, :regrade_option, :points_possible, :correct_comments, :incorrect_comments,
       :neutral_comments, :question_type, :question_name, :question_text, :answers,
       :formulas, :variables, :answer_tolerance, :formula_decimal_places,
@@ -363,7 +363,7 @@ class AssessmentQuestion < ActiveRecord::Base
 
   def clone_for(question_bank, dup = nil, options = {})
     dup ||= AssessmentQuestion.new
-    self.attributes.delete_if { |k, v| [:id, :question_data].include?(k.to_sym) }.each do |key, val|
+    self.attributes.except("id", "question_data").each do |key, val|
       dup.send("#{key}=", val)
     end
     dup.assessment_question_bank_id = question_bank
