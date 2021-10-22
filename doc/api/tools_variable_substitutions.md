@@ -445,6 +445,15 @@ returns the root account's sis source id for the current context.
 ```
 "sis_account_id_1234"
 ```
+## Canvas.externalTool.global_id
+returns the global ID for the external tool that was launched. Only available for LTI 1.
+
+**Availability**: *always and when in an LTI 1*  
+
+
+```
+1234
+```
 ## Canvas.externalTool.url
 returns the URL for the external tool that was launched. Only available for LTI 1.
 
