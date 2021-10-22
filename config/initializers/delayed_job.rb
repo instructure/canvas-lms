@@ -99,7 +99,7 @@ Rails.application.config.after_initialize do
   end
 end
 
-Delayed::Worker.on_max_failures = proc do |job, err|
+Delayed::Worker.on_max_failures = proc do |_job, err|
   # We don't want to keep around max_attempts failed jobs that failed because the
   # underlying AR object was destroyed.
   # All other failures are kept for inspection.

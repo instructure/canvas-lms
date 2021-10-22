@@ -161,7 +161,7 @@ class CourseLinkValidator
       end
     end
 
-    (question.question_data[:answers] || []).each_with_index do |answer, i|
+    (question.question_data[:answers] || []).each do |answer|
       [:html, :comments_html, :left_html].each do |field|
         find_invalid_links(answer[field]) do |field_links|
           links += field_links

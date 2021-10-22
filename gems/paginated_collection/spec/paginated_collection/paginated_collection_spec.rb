@@ -33,7 +33,7 @@ describe PaginatedCollection do
 
   describe '#paginate' do
     it 'uses the provided collection' do
-      expect { PaginatedCollection.build { |pager| [] }.paginate(:per_page => 5) }.to raise_error(ArgumentError)
+      expect { PaginatedCollection.build { [] }.paginate(:per_page => 5) }.to raise_error(ArgumentError)
       items = PaginatedCollection.build { |pager| pager.replace([1, 2]) }.paginate(:page => 1, :per_page => 5)
       expect(items).to eq [1, 2]
       expect(items.size).to eq 2

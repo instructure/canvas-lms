@@ -216,7 +216,7 @@ module AssignmentOverrideApplicator
   def self.observer_overrides(assignment_or_quiz, user)
     context = assignment_or_quiz.context
     observed_students = ObserverEnrollment.observed_students(context, user)
-    observed_student_overrides = observed_students.map do |student, enrollments|
+    observed_student_overrides = observed_students.each_key.map do |student|
       overrides_for_assignment_and_user(assignment_or_quiz, student)
     end
     observed_student_overrides.flatten.uniq

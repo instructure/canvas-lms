@@ -27,7 +27,7 @@ describe CanvasKaltura do
     end
 
     it "call timeout protector if set" do
-      CanvasKaltura.timeout_protector_proc = lambda { |options, &block| 27 }
+      CanvasKaltura.timeout_protector_proc = proc { 27 }
       expect(CanvasKaltura.with_timeout_protector).to be 27
     end
   end

@@ -21,8 +21,8 @@
 module EventStream::AttrConfig
   module ClassMethods
     CASTS = {
-      String => lambda { |name, value| value.to_s },
-      Integer => lambda { |name, value| value.to_i },
+      String => lambda { |_name, value| value.to_s },
+      Integer => lambda { |_name, value| value.to_i },
       Proc => lambda { |name, value|
                 return value if value.nil? || value.respond_to?(:call)
 

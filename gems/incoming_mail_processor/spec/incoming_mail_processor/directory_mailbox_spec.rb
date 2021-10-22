@@ -108,7 +108,7 @@ describe IncomingMailProcessor::DirectoryMailbox do
 
     it "deletes files" do
       expect(@mailbox).to receive(:delete_file).with(default_config[:folder], "foo")
-      @mailbox.each_message do |id, body|
+      @mailbox.each_message do |id, _body|
         @mailbox.delete_message(id)
       end
     end
@@ -118,7 +118,7 @@ describe IncomingMailProcessor::DirectoryMailbox do
       expect(@mailbox).to receive(:move_file).with(folder, "foo", "aside")
       expect(@mailbox).to receive(:folder_exists?).with(folder, "aside").and_return(true)
       expect(@mailbox).to receive(:create_folder).never
-      @mailbox.each_message do |id, body|
+      @mailbox.each_message do |id, _body|
         @mailbox.move_message(id, "aside")
       end
     end
@@ -128,7 +128,7 @@ describe IncomingMailProcessor::DirectoryMailbox do
       expect(@mailbox).to receive(:move_file).with(folder, "foo", "aside")
       expect(@mailbox).to receive(:folder_exists?).with(folder, "aside").and_return(false)
       expect(@mailbox).to receive(:create_folder).with(default_config[:folder], "aside")
-      @mailbox.each_message do |id, body|
+      @mailbox.each_message do |id, _body|
         @mailbox.move_message(id, "aside")
       end
     end

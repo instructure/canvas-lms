@@ -155,14 +155,14 @@ describe IncomingMailProcessor::Pop3Mailbox do
 
       it "deletes when asked" do
         expect(@foo).to receive(:delete)
-        @mailbox.each_message do |message_id, body|
+        @mailbox.each_message do |message_id, _body|
           @mailbox.delete_message(message_id)
         end
       end
 
       it "deletes when asked to move" do
         expect(@foo).to receive(:delete)
-        @mailbox.each_message do |message_id, body|
+        @mailbox.each_message do |message_id, _body|
           @mailbox.move_message(message_id, "anything")
         end
       end

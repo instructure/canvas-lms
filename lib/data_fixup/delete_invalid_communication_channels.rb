@@ -22,13 +22,13 @@ module DataFixup::DeleteInvalidCommunicationChannels
   def self.run
     scope = CommunicationChannel.where(path_type: CommunicationChannel::TYPE_EMAIL)
     scope.find_ids_in_ranges(batch_size: 10000) do |min_id, max_id|
-      records = scope.where(id: min_id..max_id).pluck(:id, :user_id, :path).reject do |id, user_id, path|
+      records = scope.where(id: min_id..max_id).pluck(:id, :user_id, :path).reject do |_id, _user_id, path|
         EmailAddressValidator.valid?(path)
       end
 
       # We have a number of email addresses in the system that are valid except
       # for leading or trailing whitespace.
-      r1, r2 = records.partition do |id, user_id, path|
+      r1, r2 = records.partition do |_id, _user_id, path|
         EmailAddressValidator.valid?(path.strip)
       end
 
