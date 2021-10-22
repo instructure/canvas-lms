@@ -47,7 +47,10 @@ describe ProgressRunner do
     progress_runner.completed_message { |completed| completed_message_value = completed; "foo" }
 
     error_callback_called = false
-    progress_runner.error_message { |message, error_ids| error_callback_called = true; "bar" }
+    progress_runner.error_message do
+      error_callback_called = true
+      "bar"
+    end
 
     process_callback_count = 0
     ids = (0..9).to_a
@@ -113,7 +116,7 @@ describe ProgressRunner do
 
     progress_runner = ProgressRunner.new(@progress)
     ids = (1..4).to_a
-    progress_runner.do_batch_update(ids) do |id|
+    progress_runner.do_batch_update(ids) do
       raise "processing error"
     end
 

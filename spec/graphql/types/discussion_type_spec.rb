@@ -59,7 +59,7 @@ RSpec.shared_examples "DiscussionType" do
       },
       {
         value: 'studentReporting',
-        allowed: ->(user) { discussion.course.student_reporting? }
+        allowed: ->(_user) { discussion.course.student_reporting? }
       },
       {
         value: 'manageContent',
@@ -99,7 +99,7 @@ RSpec.shared_examples "DiscussionType" do
       },
       {
         value: 'showRubric',
-        allowed: ->(user) { !discussion.assignment_id.nil? && !discussion.assignment.rubric.nil? }
+        allowed: ->(_user) { !discussion.assignment_id.nil? && !discussion.assignment.rubric.nil? }
       },
       {
         value: 'addRubric',

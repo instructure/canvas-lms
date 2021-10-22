@@ -334,7 +334,7 @@ describe Attachment do
         expect(canvadocable.canvadoc).not_to be_nil
         expect(canvadocable.canvadoc).to receive(:upload).and_raise(Canvadoc::UploadTimeout, "test timeout")
         captured = false
-        allow(Canvas::Errors).to receive(:capture) do |e, error_data, error_level|
+        allow(Canvas::Errors).to receive(:capture) do |e, _error_data, error_level|
           if e.is_a?(Canvadoc::UploadTimeout)
             captured = true
             expect(error_level).to eq(:warn)

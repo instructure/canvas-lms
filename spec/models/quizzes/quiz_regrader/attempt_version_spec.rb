@@ -75,9 +75,9 @@ describe Quizzes::QuizRegrader::AttemptVersion do
 
   describe "#regrade!" do
     it "assigns the model and saves the version" do
-      submission_data.each do |answer|
+      submission_data.length.times do
         answer_stub = double
-        expect(answer_stub).to receive(:regrade!).once.and_return(1)
+        expect(answer_stub).to receive(:regrade!).and_return(1)
         expect(Quizzes::QuizRegrader::Answer).to receive(:new).and_return answer_stub
       end
 

@@ -120,7 +120,7 @@ shared_examples_for "a differentiable_object" do
 
   describe "filter" do
     def call_filter
-      block = lambda { |collection, users| return :filtered }
+      block = lambda { |_collection, _users| return :filtered }
       DifferentiableAssignment.filter(:not_filtered, @user, @course, {}, &block)
     end
     it "filters for students" do

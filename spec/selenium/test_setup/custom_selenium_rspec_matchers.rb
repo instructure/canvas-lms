@@ -411,7 +411,7 @@ end
 #
 # # trigger some ajax
 # expect { User.count }.to become(1)
-RSpec::Matchers.define :become do |size|
+RSpec::Matchers.define :become do
   def supports_block_expectations?
     true
   end

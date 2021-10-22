@@ -3899,7 +3899,7 @@ describe Course, 'grade_publishing' do
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
-                                                                           :callback => lambda { |course, enrollments, publishiing_user, publishing_pseudonym|
+                                                                           :callback => lambda { |*|
                                                                              raise "waaah fail"
                                                                            }
                                                                          }
@@ -4296,7 +4296,7 @@ describe Course, 'grade_publishing' do
     def quick_sanity_check(user, expect_success = true)
       Course.valid_grade_export_types["test_export"] = {
         :name => "test export",
-        :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
+        :callback => lambda { |course, _enrollments, publishing_user, publishing_pseudonym|
                        expect(course).to eq @course
                        expect(publishing_pseudonym).to eq @pseudonym
                        expect(publishing_user).to eq @user
