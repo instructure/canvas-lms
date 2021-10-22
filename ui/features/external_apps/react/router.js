@@ -24,7 +24,6 @@ import AppList from './components/AppList'
 import AppDetails from './components/AppDetails'
 import Configurations from './components/Configurations'
 import AppCenterStore from './lib/AppCenterStore'
-import regularizePathname from './lib/regularizePathname'
 
 const currentPath = window.location.pathname
 const re = /(.*\/settings|.*\/details)/
@@ -32,46 +31,39 @@ const matches = re.exec(currentPath)
 const baseUrl = matches[0]
 
 let targetNodeToRenderIn = null
-let alreadyRendered = false
 
 /**
  * Route Handlers
  */
-const renderAppList = ctx => {
+const renderAppList = _ctx => {
   if (!window.ENV.APP_CENTER.enabled) {
     page.redirect('/configurations')
   } else {
     ReactDOM.render(
       <Root>
-        <AppList pathname={ctx.pathname} alreadyRendered={alreadyRendered} />
+        <AppList baseUrl={baseUrl} />
       </Root>,
       targetNodeToRenderIn
     )
-    alreadyRendered = true
   }
 }
 
 const renderAppDetails = ctx => {
   ReactDOM.render(
     <Root>
-      <AppDetails
-        shortName={ctx.params.shortName}
-        pathname={ctx.pathname}
-        baseUrl={baseUrl}
-        store={AppCenterStore}
-      />
+      <AppDetails shortName={ctx.params.shortName} baseUrl={baseUrl} store={AppCenterStore} />
     </Root>,
     targetNodeToRenderIn
   )
 }
 
-const renderConfigurations = ctx => {
+const renderConfigurations = _ctx => {
   // router.start is only called when loading the Apps tab
   // so we don't want to try anything here that hasn't happened.
   if (targetNodeToRenderIn) {
     ReactDOM.render(
       <Root>
-        <Configurations pathname={ctx.pathname} env={window.ENV} />
+        <Configurations pathname={baseUrl} env={window.ENV} />
       </Root>,
       targetNodeToRenderIn
     )
@@ -82,7 +74,6 @@ const renderConfigurations = ctx => {
  * Route Configuration
  */
 page.base(baseUrl)
-page('*', regularizePathname)
 page('/', renderAppList)
 page('/app/:shortName', renderAppDetails)
 page('/configurations', renderConfigurations)
@@ -95,6 +86,5 @@ export default {
   stop() {
     // we may not be the only thing using page on this page.
     page.stop()
-  },
-  regularizePathname
+  }
 }
