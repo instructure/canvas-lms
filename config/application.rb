@@ -280,7 +280,7 @@ module CanvasRails
     # don't wrap fields with errors with a <div class="fieldWithErrors" />,
     # since that could leak information (e.g. valid vs invalid username on
     # login page)
-    config.action_view.field_error_proc = Proc.new { |html_tag, instance| html_tag }
+    config.action_view.field_error_proc = proc { |html_tag, _instance| html_tag }
 
     class ExceptionsApp
       def call(env)

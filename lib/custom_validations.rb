@@ -33,7 +33,7 @@ module CustomValidations
     end
 
     def validates_as_readonly(*fields)
-      validates_each(fields) do |record, attr, value|
+      validates_each(fields) do |record, attr, _value|
         if !record.new_record? && record.send("#{attr}_changed?")
           record.errors.add attr, "cannot be changed"
         end

@@ -3,7 +3,7 @@
 namespace :canvas do
   namespace :quizzes do
     desc 'Generate events from snapshots for submissions to a quiz.'
-    task :generate_events_from_snapshots, [:quiz_id] => :environment do |t, args|
+    task :generate_events_from_snapshots, [:quiz_id] => :environment do |_t, args|
       quiz_id = Array(args[:quiz_id])
       quiz_submission_ids = Quizzes::QuizSubmission.where(quiz_id: quiz_id)
 
@@ -23,7 +23,7 @@ namespace :canvas do
     end # task :generate_events_from_snapshots
 
     desc "Generate a JSON dump of events in a single quiz submission."
-    task :dump_events, [:quiz_submission_id, :out] => :environment do |t, args|
+    task :dump_events, [:quiz_submission_id, :out] => :environment do |_t, args|
       require 'json'
       require 'benchmark'
 
@@ -61,7 +61,7 @@ namespace :canvas do
     end
 
     desc 'Create partition tables for the current and upcoming months.'
-    task :create_event_partitions => :environment do |t, args|
+    task :create_event_partitions => :environment do
       Shard.with_each_shard do
         Quizzes::QuizSubmissionEventPartitioner.logger = Logger.new(STDOUT)
         Quizzes::QuizSubmissionEventPartitioner.process

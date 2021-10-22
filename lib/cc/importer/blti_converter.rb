@@ -123,12 +123,12 @@ module CC::Importer
 
     def check_for_unescaped_url_properties(obj)
       # Recursively look for properties named 'url'
-      if obj.is_a?(Hash)
-        obj.select { |k, v| k.to_s == 'url' && v.is_a?(String) }.each do |k, v|
-          check_for_unescaped_url(v)
-        end
-        obj.each { |k, v| check_for_unescaped_url_properties(v) }
-      elsif obj.is_a?(Array)
+      case obj
+      when Hash
+        obj.select { |k, v| k.to_s == 'url' && v.is_a?(String) }
+           .each_value { |v| check_for_unescaped_url(v) }
+        obj.each_value { |v| check_for_unescaped_url_properties(v) }
+      when Array
         obj.each { |o| check_for_unescaped_url_properties(o) }
       end
     end

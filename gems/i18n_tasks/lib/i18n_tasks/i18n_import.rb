@@ -67,7 +67,7 @@ module I18nTasks
           when :abort then
             throw(:abort)
           when :discard then
-            @new_translations.delete_if do |k, v|
+            @new_translations.delete_if do |k, _v|
               mismatches.any? { |m| m.key == k }
             end
           when :accept then

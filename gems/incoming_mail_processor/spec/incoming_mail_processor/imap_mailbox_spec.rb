@@ -155,7 +155,7 @@ describe IncomingMailProcessor::ImapMailbox do
       expect(@imap_mock).to receive(:search).and_return([42])
       expect(@imap_mock).to receive(:fetch).and_return(mock_fetch_response("body"))
       expect(@imap_mock).to receive(:store).with(42, "+FLAGS", Net::IMAP::DELETED)
-      @mailbox.each_message do |id, body|
+      @mailbox.each_message do |id, _body|
         @mailbox.delete_message(id)
       end
     end
@@ -166,7 +166,7 @@ describe IncomingMailProcessor::ImapMailbox do
       expect(@imap_mock).to receive(:list).and_return([double.as_null_object])
       expect(@imap_mock).to receive(:copy).with(42, "other_folder")
       expect(@imap_mock).to receive(:store).with(42, "+FLAGS", Net::IMAP::DELETED)
-      @mailbox.each_message do |id, body|
+      @mailbox.each_message do |id, _body|
         @mailbox.move_message(id, "other_folder")
       end
     end
@@ -178,7 +178,7 @@ describe IncomingMailProcessor::ImapMailbox do
       expect(@imap_mock).to receive(:create).with("other_folder")
       expect(@imap_mock).to receive(:copy).with(42, "other_folder")
       expect(@imap_mock).to receive(:store).with(42, "+FLAGS", Net::IMAP::DELETED)
-      @mailbox.each_message do |id, body|
+      @mailbox.each_message do |id, _body|
         @mailbox.move_message(id, "other_folder")
       end
     end
@@ -190,7 +190,7 @@ describe IncomingMailProcessor::ImapMailbox do
       expect(@imap_mock).to receive(:create).with("other_folder")
       expect(@imap_mock).to receive(:copy).with(42, "other_folder")
       expect(@imap_mock).to receive(:store).with(42, "+FLAGS", Net::IMAP::DELETED)
-      @mailbox.each_message do |id, body|
+      @mailbox.each_message do |id, _body|
         @mailbox.move_message(id, "other_folder")
       end
     end

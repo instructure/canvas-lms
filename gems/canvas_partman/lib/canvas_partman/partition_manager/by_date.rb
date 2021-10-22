@@ -46,7 +46,7 @@ module CanvasPartman
                                .pluck(:id, base_class.partitioning_field)
           break if id_dates.empty?
 
-          id_dates.group_by { |id, date| generate_name_for_partition(date) }.each do |partition_table, part_id_dates|
+          id_dates.group_by { |_id, date| generate_name_for_partition(date) }.each do |partition_table, part_id_dates|
             base_class.connection.execute(<<-SQL)
               WITH x AS (
                 DELETE FROM ONLY #{base_class.quoted_table_name}

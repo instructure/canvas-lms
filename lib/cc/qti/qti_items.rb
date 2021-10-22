@@ -424,7 +424,7 @@ module CC
           unless answer['comments'].blank? && answer['comments_html'].blank?
             node.respcondition do |r_node|
               r_node.conditionvar do |c_node|
-                c_node.not do |n_node|
+                c_node.not do
                   c_node.varequal(answer['match_id'], :respident => "response_#{answer['id']}")
                 end
               end

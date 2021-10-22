@@ -116,7 +116,7 @@ describe CanvasHttp::CircuitBreaker do
   end
 
   it "uses default values if the configuration block is broken" do
-    CanvasHttp::CircuitBreaker.threshold = ->(domain) { nil }
+    CanvasHttp::CircuitBreaker.threshold = proc {}
     expect(CanvasHttp::CircuitBreaker.threshold("some.domain.com")).to eq(CanvasHttp::CircuitBreaker::DEFAULT_THRESHOLD)
   end
 end

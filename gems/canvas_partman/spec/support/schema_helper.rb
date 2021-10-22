@@ -46,6 +46,6 @@ module CanvasPartmanTest::SchemaHelper
   end
 end
 
-RSpec.configure do |config|
+RSpec.configure do
   SchemaHelper = CanvasPartmanTest::SchemaHelper
 end

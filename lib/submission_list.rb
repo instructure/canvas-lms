@@ -120,7 +120,7 @@ class SubmissionList
     # puts "----------------------------------------------"
     # puts "starting"
     # puts "---------------------------------------------------------------------------------"
-    self.list.map do |day, value|
+    self.list.map do |day, _value|
       # puts "-----------------------------------------------item #{Time.now - current}----------------------------"
       # current = Time.now
       OpenObject.new(:date => day, :graders => graders_for_day(day))
@@ -221,7 +221,7 @@ class SubmissionList
   # makes our final product much more yummy.
   def trim_keys(list)
     list.each do |hsh|
-      hsh.delete_if { |key, v| !VALID_KEYS.include?(key) }
+      hsh.slice!(*VALID_KEYS)
     end
   end
 

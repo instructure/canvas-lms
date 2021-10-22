@@ -211,7 +211,7 @@ module UserContent
     def translate_content(html)
       return html if html.blank?
 
-      asset_types = AssetTypes.reject { |k, v| !@allowed_types.include?(k) }
+      asset_types = AssetTypes.slice(*@allowed_types)
 
       html.gsub(@toplevel_regex) do |url|
         _absolute_part, prefix, type, obj_id, rest = [$1, $2, $3, $4, $5]

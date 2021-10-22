@@ -83,12 +83,12 @@ module LocaleSelection
     #   then i should get 'es' (en and en-US ranges both match en-US, and
     #                           en-US range is a longer match, so it loses)
 
-    best_locales = supported_locales.inject([]) { |ary, locale|
-      if (best_range = ranges.detect { |r, q| r + '-' == (locale.downcase + '-')[0..r.size] || r == '*' })
-        ary << [locale, best_range.last, ranges.index(best_range)] unless best_range.last == 0
+    best_locales = supported_locales.filter_map do |locale|
+      if (best_range = ranges.detect { |r, _q| "#{r}-" == ("#{locale.downcase}-")[0..r.size] || r == '*' }) &&
+         best_range.last != 0
+        [locale, best_range.last, ranges.index(best_range)]
       end
-      ary
-    }.sort_by { |l, q, pos| [-q, pos, l.count('-'), l] }
+    end.sort_by { |l, q, pos| [-q, pos, l.count('-'), l] }
     # wrt the sorting here, rfc2616 doesn't specify which tag is preferable
     # if there is a quality tie (due to prefix matching or otherwise).
     # technically they are equally acceptable.  we've decided to break ties
@@ -115,7 +115,7 @@ module LocaleSelection
   def available_locales
     result = {}
     settings = Canvas::Plugin.find(:i18n).settings || {}
-    enabled_custom_locales = settings.select { |locale, enabled| enabled }.map(&:first).map(&:to_sym)
+    enabled_custom_locales = settings.select { |_locale, enabled| enabled }.keys.map(&:to_sym)
     I18n.available_locales.each do |locale|
       name = I18n.send(:t, :locales, :locale => locale)[locale]
       custom = I18n.send(:t, :custom, locale: locale) == true
