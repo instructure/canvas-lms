@@ -151,7 +151,7 @@ const ConfirmDropModal = ({isModalOpen, closeModal, courseName, dropLink}) => {
         closeModal()
         window.location.reload()
       })
-      .catch(err => showFlashError(I18n.t('Unable to drop the course'))(err))
+      .catch(err => showFlashError(I18n.t('Unable to drop the subject'))(err))
       .finally(() => setPosting(false))
   }
 
@@ -165,7 +165,7 @@ const ConfirmDropModal = ({isModalOpen, closeModal, courseName, dropLink}) => {
       <Modal.Body>
         {isPosting ? (
           <View as="div" textAlign="center" margin="medium 0">
-            <Spinner renderTitle={I18n.t('Dropping course')} />
+            <Spinner renderTitle={I18n.t('Dropping subject')} />
           </View>
         ) : (
           <>
@@ -174,7 +174,7 @@ const ConfirmDropModal = ({isModalOpen, closeModal, courseName, dropLink}) => {
             </Heading>
             <Text>
               {I18n.t(
-                'Are you sure you want to unenroll in this course?  You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications.'
+                'Are you sure you want to unenroll in this subject?  You will no longer be able to see the subject roster or communicate directly with the teachers, and you will no longer see subject events in your stream and as notifications.'
               )}
             </Text>
           </>
@@ -194,7 +194,7 @@ const ConfirmDropModal = ({isModalOpen, closeModal, courseName, dropLink}) => {
           onClick={handleConfirm}
           interaction={!isPosting ? 'enabled' : 'disabled'}
         >
-          {I18n.t('Drop this Course')}
+          {I18n.t('Drop this Subject')}
         </Button>
       </Modal.Footer>
     </Modal>
@@ -250,13 +250,13 @@ export const CourseHeaderHero = forwardRef(
               <Flex.Item>
                 {selfEnrollment?.option === 'enroll' && (
                   <Button color="primary" renderIcon={IconAddLine} href={selfEnrollment.url}>
-                    {I18n.t('Join this Course')}
+                    {I18n.t('Join this Subject')}
                   </Button>
                 )}
                 {selfEnrollment?.option === 'unenroll' && (
                   <>
                     <Button renderIcon={IconXLine} onClick={() => setModalOpen(true)}>
-                      {I18n.t('Drop this Course')}
+                      {I18n.t('Drop this Subject')}
                     </Button>
                     <ConfirmDropModal
                       isModalOpen={isModalOpen}
