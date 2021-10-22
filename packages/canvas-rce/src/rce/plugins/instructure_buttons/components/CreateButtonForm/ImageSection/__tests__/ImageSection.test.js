@@ -18,8 +18,25 @@
 
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
-
 import {ImageSection} from '../ImageSection'
+
+jest.mock('../../../../../shared/StoreContext', () => {
+  return {
+    useStoreProps: () => ({
+      images: {
+        Course: {
+          files: [],
+          bookmark: 'bookmark',
+          isLoading: false,
+          hasMore: false
+        }
+      },
+      contextType: 'Course',
+      fetchInitialImages: jest.fn(),
+      fetchNextImages: jest.fn()
+    })
+  }
+})
 
 describe('ImageSection', () => {
   const defaultProps = {editor: {}}
@@ -57,7 +74,7 @@ describe('ImageSection', () => {
     })
 
     it('renders the course images component', () => {
-      expect(getByTestId('course-images')).toBeInTheDocument()
+      expect(getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
     })
   })
 })
