@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -25,7 +25,7 @@ import {
   getOptions,
   renderCell} from './StudentCellFormatter.utils'
 
-export default class StudentCellFormatter {
+export default class StudentLastNameCellFormatter {
   constructor(gradebook) {
     this.options = getOptions(gradebook)
   }
@@ -35,12 +35,11 @@ export default class StudentCellFormatter {
       return ''
     }
 
-    const primaryInfo = this.options.getSelectedPrimaryInfo()
     const secondaryInfo = this.options.getSelectedSecondaryInfo()
 
     const options = {
       courseId: this.options.courseId,
-      displayName: primaryInfo === 'last_first' ? student.sortable_name : student.name,
+      displayName: student.last_name,
       enrollmentLabel: getEnrollmentLabel(student),
       secondaryInfo: getSecondaryDisplayInfo(student, secondaryInfo, this.options),
       studentId: student.id,
