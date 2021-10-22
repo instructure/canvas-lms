@@ -2779,7 +2779,7 @@ describe Quizzes::QuizzesController do
       course_with_teacher
       course_quiz(true)
       @quiz.save!
-      allow(@quiz).to receive(:grants_right?) do |user, sess, rights|
+      allow(@quiz).to receive(:grants_right?) do |_user, sess, rights|
         if rights.nil?
           rights = sess
         end

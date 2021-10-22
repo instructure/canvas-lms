@@ -71,7 +71,7 @@ module Canvas
             sleep(0.025)
           end
           # once any data is there, it should all be there
-          data_set.each do |k, v|
+          data_set.each_key do |k|
             val = @fast_cache.read(k)
             read_set[k] = val unless val.nil?
           end

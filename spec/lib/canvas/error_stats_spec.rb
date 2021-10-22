@@ -56,7 +56,7 @@ module Canvas
       it "increments the inner exception too" do
         got_inner = false
         got_outer = false
-        allow(InstStatsd::Statsd).to receive(:increment) do |key, data|
+        allow(InstStatsd::Statsd).to receive(:increment) do |_key, data|
           cat = data[:tags][:category]
           got_inner = true if cat == "Canvas::FakeErrorStatsError"
           got_outer = true if cat == "Canvas::OuterErrorStatsError"

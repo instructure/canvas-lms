@@ -659,12 +659,12 @@ describe "Outcome Results API", type: :request do
 
     describe "outcomes" do
       before :once do
-        @outcomes = 0.upto(3).map do |i|
+        @outcomes = Array.new(4) do
           create_outcome_assessment(new: true)
           @outcome
         end
         @outcome_group = @course.learning_outcome_groups.create!(:title => 'groupage')
-        @outcomes += 0.upto(2).map do |i|
+        @outcomes += Array.new(3) do
           create_outcome_assessment(new: true)
           @outcome
         end

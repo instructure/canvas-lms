@@ -4294,7 +4294,7 @@ describe Assignment do
         @a.peer_review_count = 2
         srand(1) # this isn't really necessary but given the random nature i wanted to make it fail consistently without the code fix
         res = @a.assign_peer_reviews
-        expect(res.group_by(&:user_id).map { |k, v| v.count }.uniq).to eq [2] # everybody should get 2 reviews
+        expect(res.group_by(&:user_id).values.map(&:count).uniq).to eq [2] # everybody should get 2 reviews
       end
 
       it "assigns peer reviews to members of the same group when enabled" do
@@ -6415,7 +6415,7 @@ describe Assignment do
       end
 
       it "does not flag attributes as frozen for admin" do
-        @att_map.each_pair do |att, setting|
+        @att_map.each_key do |att|
           expect(@asmnt.att_frozen?(att, @admin)).to eq false
         end
       end

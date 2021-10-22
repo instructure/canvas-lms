@@ -155,7 +155,7 @@ describe StreamItem do
   end
 
   it "does not unhide stream item instances when someone 'deletes' a message" do
-    users = (0..2).map { |x| user_factory }
+    users = Array.new(3) { user_factory }
     user1, user2, user3 = users
     convo = Conversation.initiate(users, false)
     convo.add_message(user3, "hello")

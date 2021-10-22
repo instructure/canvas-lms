@@ -29,7 +29,7 @@ describe Polling::PollSessionsController, type: :request do
   describe 'GET index' do
     before :once do
       @poll = @teacher.polls.create!(question: "Example Poll")
-      3.times do |n|
+      3.times do
         @poll.poll_sessions.create!(course: @course, course_section: @section)
       end
     end
@@ -48,7 +48,7 @@ describe Polling::PollSessionsController, type: :request do
       session_ids = @poll.poll_sessions.pluck(:id)
       expect(poll_sessions_json.size).to eq 3
 
-      poll_sessions_json.each_with_index do |session, i|
+      poll_sessions_json.each do |session|
         expect(session_ids).to include(session['id'].to_i)
         expect(session['is_published']).to be_falsey
       end
@@ -61,7 +61,7 @@ describe Polling::PollSessionsController, type: :request do
 
       expect(poll_sessions_json.size).to eq 3
 
-      poll_sessions_json.each_with_index do |session, i|
+      poll_sessions_json.each do |session|
         expect(session_ids).to include(session['id'].to_i)
         expect(session['is_published']).to be_falsey
       end

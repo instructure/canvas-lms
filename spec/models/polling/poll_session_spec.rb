@@ -84,7 +84,7 @@ describe Polling::PollSession do
       student1_sessions = []
       student2_sessions = []
 
-      3.times do |n|
+      3.times do
         student1_sessions << Polling::PollSession.create(poll: @poll1, course: @course1)
       end
 
@@ -92,7 +92,7 @@ describe Polling::PollSession do
       expect(Polling::PollSession.available_for(@student2).size).to eq 0
       expect(Polling::PollSession.available_for(@student1)).to match_array student1_sessions
 
-      2.times do |n|
+      2.times do
         student2_sessions << Polling::PollSession.create(poll: @poll2, course: @course2)
       end
 

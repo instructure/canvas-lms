@@ -98,7 +98,7 @@ module ActiveRecord
           User.create!
           expect do
             ActiveRecord::Base.transaction do
-              User.all.find_each do |batch|
+              User.all.find_each do
                 # to force a foreign key error
                 Account.where(id: account).delete_all
               end
@@ -120,7 +120,7 @@ module ActiveRecord
         it "uses a temp table when you select without an id" do
           expect do
             User.create!
-            User.select(:name).find_in_batches do |batch|
+            User.select(:name).find_in_batches do
               User.connection.select_value("SELECT COUNT(*) FROM users_in_batches_temp_table_#{User.select(:name).to_sql.hash.abs.to_s(36)}")
             end
           end.to_not raise_error
@@ -184,7 +184,7 @@ module ActiveRecord
           User.create!
           expect do
             ActiveRecord::Base.transaction do
-              User.all.find_in_batches(strategy: :temp_table) do |batch|
+              User.all.find_in_batches(strategy: :temp_table) do
                 # to force a foreign key error
                 Account.where(id: account).delete_all
               end

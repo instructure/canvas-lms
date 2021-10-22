@@ -529,7 +529,7 @@ describe "Accounts API", type: :request do
         }
       end
       let(:expected_settings) do
-        update_sync_settings_params[:account][:settings].filter { |key, value| !value.nil? && value != '' }
+        update_sync_settings_params[:account][:settings].filter { |_key, value| !value.nil? && value != '' }
       end
 
       let(:account) { @a1 }
