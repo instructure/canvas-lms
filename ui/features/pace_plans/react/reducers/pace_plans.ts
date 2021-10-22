@@ -71,7 +71,7 @@ export const getOriginalPlan = (state: StoreState) => state.pacePlan.originalPla
 export const getPacePlan = (state: StoreState): PacePlansState => state.pacePlan
 export const getPacePlanModules = (state: StoreState) => state.pacePlan.modules
 export const getPacePlanType = (state: StoreState): PlanContextTypes => state.pacePlan.context_type
-export const getStartDate = (state: StoreState): string | undefined => state.pacePlan.start_date
+export const getHardEndDates = (state: StoreState): boolean => state.pacePlan.hard_end_dates
 export const getPlanPublishing = (state: StoreState): boolean => {
   const progress = state.pacePlan.publishingProgress
   if (!progress) return false
@@ -82,13 +82,16 @@ export const getPublishingError = (state: StoreState): string | undefined => {
   if (!progress || progress.workflow_state !== 'failed') return undefined
   return progress.message
 }
+export const getEndDate = (state: StoreState): string | undefined => state.pacePlan.end_date
 
 export const getPacePlanItems = createSelector(getPacePlanModules, getModuleItems)
 
 export const getSettingChanges = createDeepEqualSelector(
   getExcludeWeekends,
+  getHardEndDates,
   getOriginalPlan,
-  (excludeWeekends, originalPlan) => {
+  getEndDate,
+  (excludeWeekends, hardEndDates, originalPlan, endDate) => {
     const changes: Change[] = []
 
     if (excludeWeekends !== originalPlan.exclude_weekends)
@@ -96,6 +99,24 @@ export const getSettingChanges = createDeepEqualSelector(
         id: 'exclude_weekends',
         oldValue: originalPlan.exclude_weekends,
         newValue: excludeWeekends
+      })
+
+    // we want to validate that if hardEndDates is true that the endDate is a valid date
+    if (
+      hardEndDates !== originalPlan.hard_end_dates &&
+      (!hardEndDates || (hardEndDates && endDate))
+    )
+      changes.push({
+        id: 'hard_end_dates',
+        oldValue: originalPlan.hard_end_dates,
+        newValue: hardEndDates
+      })
+
+    if (endDate && endDate !== originalPlan.end_date)
+      changes.push({
+        id: 'end_date',
+        oldValue: originalPlan.end_date,
+        newValue: endDate
       })
 
     return changes
@@ -155,6 +176,15 @@ export const getPacePlanDurationTotal = createDeepEqualSelector(
   getPacePlanItems,
   (pacePlanItems: PacePlanItem[]): number =>
     pacePlanItems.reduce((total, item) => total + item.duration, 0)
+)
+
+export const getStartDate = createDeepEqualSelector(
+  getPacePlan,
+  getOriginalPlan,
+  (pacePlan: PacePlan, originalPacePlan: PacePlan): string | undefined => {
+    if (pacePlan.hard_end_dates) return originalPacePlan.start_date
+    return pacePlan.start_date
+  }
 )
 
 // Wrapping this in a selector makes sure the result is memoized
@@ -284,7 +314,12 @@ export default (
         return {...state, exclude_weekends: true}
       }
     case PacePlanConstants.TOGGLE_HARD_END_DATES:
-      return {...state, hard_end_dates: !state.hard_end_dates}
+      if (state.hard_end_dates) {
+        return {...state, hard_end_dates: false, end_date: ''}
+      } else {
+        return {...state, hard_end_dates: true, end_date: state.originalPlan.end_date}
+      }
+
     case PacePlanConstants.RESET_PLAN:
       return {...state.originalPlan, originalPlan: state.originalPlan}
     case PacePlanConstants.SET_PROGRESS:
