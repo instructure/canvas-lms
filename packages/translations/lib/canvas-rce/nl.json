@@ -87,6 +87,9 @@
     "message": "Sluit een menu of dialoogvenster. Hierdoor keert u bovendien terug naar het editorgebied"
   },
   "close_d634289d": { "message": "Sluiten" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Ondertitelingsbestand moet kleiner zijn dan { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "Bijschriften/ondertiteling"
   },
@@ -120,6 +123,7 @@
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-licentie:"
   },
+  "current_image_f16c249c": { "message": "Huidige afbeelding" },
   "custom_6979cd81": { "message": "Aangepast" },
   "date_added_ed5ad465": { "message": "Datum toegevoegd" },
   "decorative_image_3c28aa7d": { "message": "Decoratieve afbeelding" },
@@ -280,6 +284,7 @@
   "middle_27dc1d5": { "message": "Midden" },
   "miscellaneous_e9818229": { "message": "Diversen" },
   "modules_c4325335": { "message": "Modules" },
+  "multi_color_image_63d7372f": { "message": "Veelkleurige afbeelding" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Moet minstens { width } x { height }px zijn"
   },
@@ -363,7 +368,11 @@
   "show_image_options_1e2ecc6b": { "message": "Afbeeldingsopties weergeven" },
   "show_link_options_545338fd": { "message": "Linkopties weergeven" },
   "show_video_options_6ed3721a": { "message": "Video-opties weergeven" },
+  "single_color_image_4e5d4dbc": { "message": "Enkelkleurige afbeelding" },
   "size_b30e1077": { "message": "Grootte" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Ondertitelingsbestand is groter dan de maximaal toegestane { max } kb bestandsgrootte."
+  },
   "small_b070434a": { "message": "Klein" },
   "something_went_wrong_89195131": { "message": "Er is iets misgegaan." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

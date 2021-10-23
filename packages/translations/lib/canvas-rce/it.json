@@ -93,6 +93,9 @@
     "message": "Chiudere un menu o una finestra di dialogo. Consente anche di tornare all’area dell’editor"
   },
   "close_d634289d": { "message": "Chiudi" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Il file dei sottotitoli chiusi deve essere inferiore a { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "Didascalie/Sottotitoli chiusi"
   },
@@ -126,6 +129,7 @@
   "creative_commons_license_725584ae": {
     "message": "Licenza Creative Commons:"
   },
+  "current_image_f16c249c": { "message": "Immagine attuale" },
   "custom_6979cd81": { "message": "Personalizzato" },
   "date_added_ed5ad465": { "message": "Data aggiunta" },
   "decorative_image_3c28aa7d": { "message": "Immagine decorativa" },
@@ -282,6 +286,7 @@
   "middle_27dc1d5": { "message": "Centro" },
   "miscellaneous_e9818229": { "message": "Varie" },
   "modules_c4325335": { "message": "Moduli" },
+  "multi_color_image_63d7372f": { "message": "Immagine multicolore" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Deve essere almeno { width } x { height }px"
   },
@@ -365,7 +370,11 @@
   "show_image_options_1e2ecc6b": { "message": "Mostra opzioni immagine" },
   "show_link_options_545338fd": { "message": "Mostra opzioni link" },
   "show_video_options_6ed3721a": { "message": "Mostra opzioni video" },
+  "single_color_image_4e5d4dbc": { "message": "Immagine monocolore" },
   "size_b30e1077": { "message": "Dimensioni" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "La dimensione del file dei sottotitoli è superiore alla dimensione massima consentita di { max } kb."
+  },
   "small_b070434a": { "message": "Piccolo" },
   "something_went_wrong_89195131": { "message": "Si è verificato un errore." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

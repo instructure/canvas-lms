@@ -85,6 +85,9 @@
     "message": "Luk en menu eller dialog. Sender dig også tilbage til redigeringsområdet"
   },
   "close_d634289d": { "message": "Luk" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Filen med undertekster skal være mindre end { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "Billedtekster / undertekster"
   },
@@ -116,6 +119,7 @@
   "creative_commons_license_725584ae": {
     "message": "Creative Commons licens:"
   },
+  "current_image_f16c249c": { "message": "Nuværende billede" },
   "custom_6979cd81": { "message": "Brugerdefineret" },
   "date_added_ed5ad465": { "message": "Dato tilføjet" },
   "decorative_image_3c28aa7d": { "message": "Dekorativt billede" },
@@ -266,6 +270,7 @@
   "middle_27dc1d5": { "message": "I midten" },
   "miscellaneous_e9818229": { "message": "Diverse" },
   "modules_c4325335": { "message": "Forløb" },
+  "multi_color_image_63d7372f": { "message": "Billede i flere farver" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Skal være mindst { width } x { height } px"
   },
@@ -345,7 +350,11 @@
   "show_image_options_1e2ecc6b": { "message": "Vis billedindstillinger" },
   "show_link_options_545338fd": { "message": "Vis linkindstillinger" },
   "show_video_options_6ed3721a": { "message": "Vis videoindstillinger" },
+  "single_color_image_4e5d4dbc": { "message": "Enkeltfarvet billede" },
   "size_b30e1077": { "message": "Størrelse" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Tekstfilens størrelse er større end den tilladte filstørrelse på maks. { max } kb."
+  },
   "small_b070434a": { "message": "Lille" },
   "something_went_wrong_89195131": { "message": "Noget gik galt." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
