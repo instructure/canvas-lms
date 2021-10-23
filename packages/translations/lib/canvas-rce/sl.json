@@ -93,6 +93,9 @@
     "message": "Zapri meni ali pogovorno okno Prav tako vas vrne v območje urejevalnika"
   },
   "close_d634289d": { "message": "Zapri" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Datoteka z razširjenimi podnapisi mora biti manjša od { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "Razširjeni podnapisi/podnapisi"
   },
@@ -126,6 +129,7 @@
   "creative_commons_license_725584ae": {
     "message": "Licenca Creative Commons:"
   },
+  "current_image_f16c249c": { "message": "Trenutna slika" },
   "custom_6979cd81": { "message": "Po meri" },
   "date_added_ed5ad465": { "message": "Datum dodajanja" },
   "decorative_image_3c28aa7d": { "message": "Dekorativna slika" },
@@ -274,6 +278,7 @@
   "middle_27dc1d5": { "message": "Sredina" },
   "miscellaneous_e9818229": { "message": "Drugo" },
   "modules_c4325335": { "message": "Moduli" },
+  "multi_color_image_63d7372f": { "message": "Večbarvna slika" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Mora biti vsaj { width } x { height } px."
   },
@@ -361,7 +366,11 @@
   "show_video_options_6ed3721a": {
     "message": "Prikaži možnosti videoposnetka"
   },
+  "single_color_image_4e5d4dbc": { "message": "Enobarvna slika" },
   "size_b30e1077": { "message": "Velikost" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Velikost je večja od največje dovoljene velikosti datoteke { max } kB."
+  },
   "small_b070434a": { "message": "Majhna" },
   "something_went_wrong_89195131": { "message": "Prišlo je do težav." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

@@ -89,6 +89,9 @@
     "message": "Закройте меню или диалог. Также возвращает вас в область редактора"
   },
   "close_d634289d": { "message": "Закрыть" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Размер закрытого файла субтитров должен быть меньше { maxKb } Кб"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "Закрытые надписи/субтитры"
   },
@@ -124,6 +127,7 @@
   "creative_commons_license_725584ae": {
     "message": "Лицензионное соглашение Creative Commons:"
   },
+  "current_image_f16c249c": { "message": "Текущее изображение" },
   "custom_6979cd81": { "message": "Пользовательская" },
   "date_added_ed5ad465": { "message": "Дата добавления" },
   "decorative_image_3c28aa7d": { "message": "Декоративное изображение" },
@@ -280,6 +284,7 @@
   "middle_27dc1d5": { "message": "Середина" },
   "miscellaneous_e9818229": { "message": "Разное" },
   "modules_c4325335": { "message": "Модули" },
+  "multi_color_image_63d7372f": { "message": "Многоцветное изображение" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Должно быть как минимум { width } x { height }пикселов"
   },
@@ -369,7 +374,11 @@
   "show_image_options_1e2ecc6b": { "message": "Показать варианты изображения" },
   "show_link_options_545338fd": { "message": "Показать параметры ссылки" },
   "show_video_options_6ed3721a": { "message": "Показать параметры видео" },
+  "single_color_image_4e5d4dbc": { "message": "Одноцветное изображение" },
   "size_b30e1077": { "message": "Размер" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Размер файла субтитров больше допустимого максимального размера в { max } Кб."
+  },
   "small_b070434a": { "message": "Маленький" },
   "something_went_wrong_89195131": { "message": "Возникла проблема." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
