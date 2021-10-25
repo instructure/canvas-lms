@@ -112,7 +112,7 @@ shared_examples_for 'k5 subject grades' do
       focused_element.send_keys([:shift, :tab])
 
       # Assert that the viewport scrolled up to reveal the hidden links
-      expect(scroll_height).to be < initial_scroll_height
+      keep_trying_until { expect(scroll_height).to be < initial_scroll_height }
     end
   end
 end
