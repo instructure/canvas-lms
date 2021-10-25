@@ -29,6 +29,7 @@ const CanvasInbox = () => {
   const [scope, setScope] = useState('inbox')
   const [courseFilter, setCourseFilter] = useState()
   const [selectedConversations, setSelectedConversations] = useState([])
+  const [selectedConversationMessage, setSelectedConversationMessage] = useState()
   const [composeModal, setComposeModal] = useState(false)
   const [deleteDisabled, setDeleteDisabled] = useState(true)
   const [archiveDisabled, setArchiveDisabled] = useState(true)
@@ -41,6 +42,7 @@ const CanvasInbox = () => {
     setSelectedConversations(conversations)
     setDeleteDisabled(conversations.length === 0)
     setArchiveDisabled(conversations.length === 0)
+    setSelectedConversationMessage(null)
   }
 
   const removeFromSelectedConversations = conversations => {
@@ -86,6 +88,7 @@ const CanvasInbox = () => {
             selectedConversations={selectedConversations}
             onCompose={() => setComposeModal(true)}
             onReply={() => {
+              setSelectedConversationMessage(null)
               setIsReply(true)
               setComposeModal(true)
             }}
@@ -112,7 +115,14 @@ const CanvasInbox = () => {
             </Flex.Item>
             <Flex.Item shouldGrow shouldShrink height="100%" overflowY="auto">
               {selectedConversations.length > 0 ? (
-                <MessageDetailContainer conversation={selectedConversations[0]} />
+                <MessageDetailContainer
+                  conversation={selectedConversations[0]}
+                  onReply={conversationMessage => {
+                    setSelectedConversationMessage(conversationMessage)
+                    setIsReply(true)
+                    setComposeModal(true)
+                  }}
+                />
               ) : (
                 <View padding="small">
                   <NoSelectedConversation />
@@ -124,6 +134,7 @@ const CanvasInbox = () => {
       </Flex>
       <ComposeModalManager
         conversation={selectedConversations[0]}
+        conversationMessage={selectedConversationMessage}
         isReply={isReply}
         isReplyAll={isReplyAll}
         onDismiss={() => {

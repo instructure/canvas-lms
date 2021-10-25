@@ -17,13 +17,13 @@
  */
 
 import {Button, IconButton} from '@instructure/ui-buttons'
+import I18n from 'i18n!conversations_2'
 import {IconMoreLine, IconReplyLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
-import I18n from 'i18n!conversations_2'
 
 export const MessageDetailActions = ({...props}) => {
   return (
@@ -33,7 +33,7 @@ export const MessageDetailActions = ({...props}) => {
           size="small"
           margin="0 x-small 0 0"
           screenReaderLabel={I18n.t('Reply')}
-          onClick={() => props.handleOptionSelect('reply')}
+          onClick={props.onReply}
         >
           <IconReplyLine />
         </IconButton>
@@ -60,5 +60,6 @@ export const MessageDetailActions = ({...props}) => {
 }
 
 MessageDetailActions.propTypes = {
-  handleOptionSelect: PropTypes.func
+  handleOptionSelect: PropTypes.func,
+  onReply: PropTypes.func
 }
