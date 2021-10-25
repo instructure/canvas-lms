@@ -21,15 +21,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
-describe 'discussion_entry_reported' do
+describe 'reported_reply' do
   before :once do
     discussion_topic_model
-    entry = @topic.discussion_entries.create!(user: user_model)
-    @object = entry.mentions.create!(user: @user, root_account: entry.root_account)
+    @object = @topic.discussion_entries.create!(user: user_model)
   end
 
   let(:asset) { @object }
-  let(:notification_name) { :new_discussion_mention }
+  let(:notification_name) { :reported_reply }
 
   include_examples "a message"
 
