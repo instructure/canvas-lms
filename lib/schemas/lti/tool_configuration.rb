@@ -150,10 +150,7 @@ module Schemas::Lti
                           ].freeze
                         }.freeze,
                         "canvas_icon_class" => {
-                          "type" => "string",
-                          "enum" => [
-                            "icon-lti"
-                          ].freeze
+                          "type" => "string"
                         }.freeze,
                         "selection_width" => {
                           "type" => "number"
