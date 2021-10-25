@@ -189,7 +189,7 @@ class UsersController < ApplicationController
                                          :user_dashboard, :toggle_hide_dashcard_color_overlays,
                                          :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
                                          :activity_stream_summary, :pandata_events_token, :dashboard_cards,
-                                         :user_graded_submissions, :show]
+                                         :user_graded_submissions, :show, :terminate_sessions]
   before_action :require_registered_user, :only => [:delete_user_service,
                                                     :create_user_service]
   before_action :reject_student_view_student, :only => [:delete_user_service,
@@ -2088,6 +2088,25 @@ class UsersController < ApplicationController
         format.json { render :json => @user.errors, :status => :bad_request }
       end
     end
+  end
+
+  # @API Terminate all user sessions
+  #
+  # Terminates all sessions for a user. This includes all browser-based
+  # sessions and all access tokens, including manually generated ones.
+  # The user can immediately re-authenticate to access Canvas again if
+  # they have the current credentials. All integrations will need to
+  # be re-authorized.
+  def terminate_sessions
+    user = api_find(User, params[:id])
+
+    return unless authorized_action(user, @current_user, :terminate_sessions)
+
+    now = Time.zone.now
+    user.update!(last_logged_out: now)
+    user.access_tokens.active.update_all(updated_at: now, permanent_expires_at: now)
+
+    render json: "ok"
   end
 
   def media_download

@@ -2732,4 +2732,36 @@ describe UsersController do
       expect(json['message']).to eq "Access token required"
     end
   end
+
+  describe "DELETE 'sessions'" do
+    let(:user) { user_with_pseudonym(active_all: true)  }
+    let(:user2) { user_with_pseudonym(active_all: true) }
+    let(:admin) { account_admin_user(active_all: true)  }
+
+    before do
+      user.access_tokens.create!
+    end
+
+    it "rejects unauthenticated users" do
+      delete 'terminate_sessions', params: { id: user.id }, format: :json
+      expect(response.status).to eq 401
+    end
+
+    it "rejects one person from terminating someone else" do
+      user_session(user2)
+
+      delete 'terminate_sessions', params: { id: user.id }, format: :json
+      expect(response.status).to eq 401
+    end
+
+    it "allows admin to terminate sessions" do
+      user_session(admin)
+
+      delete 'terminate_sessions', params: { id: user.id }, format: :json
+      expect(response.status).to eq 200
+
+      expect(user.reload.last_logged_out).not_to be_nil
+      expect(user.access_tokens.take.permanent_expires_at).to be <= Time.zone.now
+    end
+  end
 end
