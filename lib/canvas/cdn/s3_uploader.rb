@@ -17,18 +17,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'benchmark'
 require 'parallel'
 
 module Canvas
   module Cdn
     class S3Uploader
-      attr_accessor :bucket, :config, :mutex, :verbose
+      attr_accessor :bucket, :config, :mutex
 
-      def initialize(folder = 'dist', verbose: false)
+      def initialize(folder = 'dist')
         require 'aws-sdk-s3'
         @folder = folder
-        @verbose = verbose
         @config = Canvas::Cdn.config
         @s3 = Aws::S3::Resource.new(access_key_id: config.aws_access_key_id,
                                     secret_access_key: config.aws_secret_access_key,
@@ -107,11 +105,7 @@ module Canvas
         s3_object = mutex.synchronize { bucket.object(remote_path) }
         return log("skipping already existing #{remote_path}") if s3_object.exists?
 
-        time = Benchmark.measure do
-          s3_object.put(options_for(local_path).merge(body: local_path.binread))
-        end
-
-        log("uploaded #{remote_path} (#{local_path.size}) in #{time.real}s") if @verbose
+        s3_object.put(options_for(local_path).merge(body: local_path.binread))
       end
 
       def log(msg)

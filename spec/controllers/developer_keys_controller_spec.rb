@@ -72,7 +72,7 @@ describe DeveloperKeysController do
           Account.site_admin.enable_feature!(:site_admin_keys_only)
 
           site_admin_key = DeveloperKey.create!
-          DeveloperKey.create!(account: Account.default)
+          root_account_key = DeveloperKey.create!(account: Account.default)
 
           get 'index', params: { account_id: Account.site_admin.id }, format: :json
 

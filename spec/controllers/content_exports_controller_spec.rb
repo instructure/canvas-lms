@@ -25,7 +25,7 @@ describe ContentExportsController do
   include K5Common
 
   describe "POST 'create'" do
-    it "exports everything explicitly" do
+    it "explicitlies export everything" do
       course_with_teacher_logged_in(:active_all => true)
       post 'create', params: { :course_id => @course.id }
       expect(response).to be_successful

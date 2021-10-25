@@ -181,10 +181,6 @@ module K5DashboardPageObject
     "[role='tablist']"
   end
 
-  def k5_header_selector
-    ".ic-Dashboard-tabs"
-  end
-
   def leave_student_view_selector
     "#masquerade_bar .leave_student_view"
   end
@@ -461,10 +457,6 @@ module K5DashboardPageObject
 
   def k5_tablist
     f(k5_tablist_selector)
-  end
-
-  def k5_header
-    f(k5_header_selector)
   end
 
   def leave_student_view

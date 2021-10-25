@@ -28,7 +28,7 @@ module Polling
     def_delegators :object, :poll
     def_delegators :@controller, :api_v1_poll_url
 
-    def filter(_keys)
+    def filter(keys)
       if is_teacher?
         student_keys + teacher_keys
       else

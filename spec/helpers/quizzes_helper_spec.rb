@@ -32,8 +32,8 @@ describe QuizzesHelper do
     it "is false if quiz not manageable" do
       quiz = Quizzes::Quiz.new(:context => @course)
 
-      allow(self).to receive(:can_publish).and_return(false)
-      expect(needs_unpublished_warning?(quiz)).to be_falsey
+      def can_publish(quiz); false; end
+      expect(needs_unpublished_warning?(quiz, User.new)).to be_falsey
     end
 
     it "is false if quiz is available with no unpublished changes" do
@@ -42,16 +42,16 @@ describe QuizzesHelper do
       quiz.last_edited_at = 10.minutes.ago
       quiz.published_at   = Time.now
 
-      allow(self).to receive(:can_publish).and_return(true)
-      expect(needs_unpublished_warning?(quiz)).to be_falsey
+      def can_publish(quiz); true; end
+      expect(needs_unpublished_warning?(quiz, User.new)).to be_falsey
     end
 
     it "is true if quiz is not available" do
       quiz = Quizzes::Quiz.new(:context => @course)
       quiz.workflow_state = 'created'
 
-      allow(self).to receive(:can_publish).and_return(true)
-      expect(needs_unpublished_warning?(quiz)).to be_truthy
+      def can_publish(quiz); true; end
+      expect(needs_unpublished_warning?(quiz, User.new)).to be_truthy
     end
 
     it "is true if quiz has unpublished changes" do
@@ -60,8 +60,8 @@ describe QuizzesHelper do
       quiz.last_edited_at = Time.now
       quiz.published_at   = 10.minutes.ago
 
-      allow(self).to receive(:can_publish).and_return(true)
-      expect(needs_unpublished_warning?(quiz)).to be_truthy
+      def can_publish(quiz); true; end
+      expect(needs_unpublished_warning?(quiz, User.new)).to be_truthy
     end
   end
 

@@ -39,10 +39,6 @@ const defaultProps = {
   setSelectedPlanContext: selectPlanContextFn
 }
 
-afterEach(() => {
-  jest.clearAllMocks()
-})
-
 describe('PlanPicker', () => {
   it('renders a drop-down with all plan types represented', () => {
     const {getByLabelText} = render(<PlanPicker {...defaultProps} />)

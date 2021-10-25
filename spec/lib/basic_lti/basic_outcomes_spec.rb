@@ -420,7 +420,7 @@ describe BasicLTI::BasicOutcomes do
             "<submissionDetails><submittedAt>#{timestamp}</submittedAt></submissionDetails>"
           )
           Timecop.freeze(2.minutes.ago) do
-            BasicLTI::BasicOutcomes.process_request(tool, xml)
+            request = BasicLTI::BasicOutcomes.process_request(tool, xml)
             expect(assignment.submissions.where(user_id: @user.id).first.submitted_at).to be_blank
           end
         end
@@ -443,7 +443,7 @@ describe BasicLTI::BasicOutcomes do
           xml.at_css('imsx_POXBody > replaceResultRequest').add_child(
             "<submissionDetails><submittedAt>#{timestamp}</submittedAt></submissionDetails>"
           )
-          BasicLTI::BasicOutcomes.process_request(tool, xml)
+          request = BasicLTI::BasicOutcomes.process_request(tool, xml)
           expect(assignment.submissions.where(user_id: @user.id).first.submitted_at).to be_blank
         end
       end

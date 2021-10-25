@@ -61,10 +61,6 @@ module K5GradesTabPageObject
     "[data-testid='grades-table-row']"
   end
 
-  def grades_assignments_links_selector
-    "[data-testid='grades-table-row'] a"
-  end
-
   def grade_title_selector(title)
     "div:contains('#{title}')"
   end
@@ -121,10 +117,6 @@ module K5GradesTabPageObject
 
   def grades_assignments_list
     ff(grades_table_row_selector)
-  end
-
-  def grades_assignments_links
-    ff(grades_assignments_links_selector)
   end
 
   def grading_period_dropdown

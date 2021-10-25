@@ -22,20 +22,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Progress do
   describe '#process_job' do
-    before do
-      stub_const("Jerbs", Class.new do
-        cattr_accessor :flag
-        extend RSpec::Matchers
+    class Jerbs
+      cattr_accessor :flag
+      extend RSpec::Matchers
 
-        def self.succeed(progress, flag)
-          expect(progress.state).to eq :running
-          self.flag = flag
-        end
+      def self.succeed(progress, flag)
+        expect(progress.state).to eq :running
+        self.flag = flag
+      end
 
-        def self.fail(_progress)
-          raise "fail!"
-        end
-      end)
+      def self.fail(progress)
+        raise "fail!"
+      end
     end
 
     before { Jerbs.flag = nil }

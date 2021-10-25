@@ -588,7 +588,7 @@ describe AppointmentGroup do
       @users, @sections = [], []
       2.times do
         @sections << section = @course.course_sections.create!
-        student_in_course(:active_all => true)
+        enrollment = student_in_course(:active_all => true)
         @enrollment.course_section = section
         @enrollment.save!
         @users << @user
@@ -665,7 +665,7 @@ describe AppointmentGroup do
       student = student_in_course(:course => @course, :active_all => true).user
       expect(ag.requiring_action?(student)).to be_truthy
       # when
-      ag.appointments.first.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
+      res = ag.appointments.first.reserve_for(student_in_course(:course => @course, :active_all => true).user, @teacher)
       # expect
       expect(ag.requiring_action?(student)).to be_falsey
     end
@@ -693,7 +693,7 @@ describe AppointmentGroup do
       @users = []
       section = @course.course_sections.create!
       2.times do
-        student_in_course(:active_all => true)
+        enrollment = student_in_course(:active_all => true)
         @enrollment.course_section = section
         @enrollment.save!
         @users << @user

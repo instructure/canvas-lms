@@ -42,7 +42,6 @@ import OutcomeMoveModal from './OutcomeMoveModal'
 import ManageOutcomesBillboard from './ManageOutcomesBillboard'
 import GroupActionDrillDown from '../shared/GroupActionDrillDown'
 import useLhsTreeBrowserSelectParentGroup from '@canvas/outcomes/react/hooks/useLhsTreeBrowserSelectParentGroup'
-import FindOutcomesModal from '../FindOutcomesModal'
 
 const OutcomeManagementPanel = ({
   importNumber,
@@ -112,7 +111,6 @@ const OutcomeManagementPanel = ({
   const [isOutcomesMoveModalOpen, openOutcomesMoveModal, closeOutcomesMoveModal] = useModal()
   const [isGroupDescriptionModalOpen, openGroupDescriptionModal, closeGroupDescriptionModal] =
     useModal()
-  const [isFindOutcomesModalOpen, openFindOutcomesModal, closeFindOutcomesModal] = useModal()
   const [selectedOutcome, setSelectedOutcome] = useState(null)
   const selectedOutcomeObj = selectedOutcome ? {[selectedOutcome.linkId]: selectedOutcome} : {}
   const onCloseOutcomeRemoveModal = () => {
@@ -149,36 +147,19 @@ const OutcomeManagementPanel = ({
     clearSelectedOutcomes()
   }
 
-  const handleCloseFindOutcomesModal = hasAddedOutcomes => {
-    if (hasAddedOutcomes) {
-      // TODO: refetch the group in LHS and RHS.
-      // For RHS, we need OUT-4634 to set rhsGroupIdsToRefetch variable
-      // For LHS, we need to figure out the correct solution
-      // This will be handled in OUT-4798
-    }
-    closeFindOutcomesModal()
-  }
-
   const groupMenuHandler = useCallback(
     (_arg, action) => {
-      const actions = {
-        move: openGroupMoveModal,
-        remove: openGroupRemoveModal,
-        edit: openGroupEditModal,
-        description: openGroupDescriptionModal,
-        add_outcomes: openFindOutcomesModal
+      if (action === 'move') {
+        openGroupMoveModal()
+      } else if (action === 'remove') {
+        openGroupRemoveModal()
+      } else if (action === 'edit') {
+        openGroupEditModal()
+      } else if (action === 'description') {
+        openGroupDescriptionModal()
       }
-
-      const callback = actions[action] || function () {}
-      callback()
     },
-    [
-      openFindOutcomesModal,
-      openGroupDescriptionModal,
-      openGroupEditModal,
-      openGroupMoveModal,
-      openGroupRemoveModal
-    ]
+    [openGroupDescriptionModal, openGroupEditModal, openGroupMoveModal, openGroupRemoveModal]
   )
 
   const outcomeMenuHandler = useCallback(
@@ -472,11 +453,6 @@ const OutcomeManagementPanel = ({
             outcomeGroup={group}
             isOpen={isGroupDescriptionModalOpen}
             onCloseHandler={closeGroupDescriptionModal}
-          />
-          <FindOutcomesModal
-            open={isFindOutcomesModalOpen}
-            onCloseHandler={handleCloseFindOutcomesModal}
-            targetGroup={group}
           />
         </>
       )}

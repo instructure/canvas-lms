@@ -111,7 +111,7 @@ describe NotificationEndpoint do
     expect(ne.reload.workflow_state).to eq "deleted"
     expect(@user.notification_endpoints.count).to eq 0
 
-    @at.notification_endpoints.create!(token: 'token')
+    ne2 = @at.notification_endpoints.create!(token: 'token')
     AccessToken.where(:id => @at).update_all(:workflow_state => 'deleted')
     expect(@user.notification_endpoints.count).to eq 0
   end

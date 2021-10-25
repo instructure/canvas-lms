@@ -216,9 +216,6 @@ module Types
       if filter[:graded_since]
         submissions = submissions.where("graded_at > ?", filter[:graded_since])
       end
-      if filter[:updated_since]
-        submissions = submissions.where("submissions.updated_at > ?", filter[:updated_since])
-      end
 
       (order_by || []).each { |order|
         direction = order[:direction] == 'descending' ? "DESC NULLS LAST" : "ASC"
