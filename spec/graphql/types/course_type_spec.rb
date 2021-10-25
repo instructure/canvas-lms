@@ -418,6 +418,39 @@ describe Types::CourseType do
           other_teacher.enrollments.first.id.to_s,
         ]
       end
+
+      describe "filtering" do
+        it "returns only enrollments of the specified types if included" do
+          ta_enrollment = course.enroll_ta(User.create!, enrollment_state: :active)
+
+          expect(
+            course_type.resolve(
+              "enrollmentsConnection(filter: {types: [TeacherEnrollment, TaEnrollment]}) { nodes { _id } }",
+              current_user: @teacher
+            )
+          ).to match_array([
+                             @teacher.enrollments.first.id.to_s,
+                             other_teacher.enrollments.first.id.to_s,
+                             ta_enrollment.id.to_s
+                           ])
+        end
+
+        it "returns only enrollments with the specified associated_user_ids if included" do
+          observer = User.create!
+          observer_enrollment = observer_in_course(course: @course, user: observer)
+          observer_enrollment.update!(associated_user: @student1)
+
+          other_observer_enrollment = observer_in_course(course: @course, user: observer)
+          other_observer_enrollment.update!(associated_user: @student2)
+
+          expect(
+            course_type.resolve(
+              "enrollmentsConnection(filter: {associatedUserIds: [#{@student1.id}]}) { nodes { _id } }",
+              current_user: @teacher
+            )
+          ).to eq [observer_enrollment.id.to_s]
+        end
+      end
     end
   end
 
