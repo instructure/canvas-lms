@@ -43,6 +43,26 @@ describe "conversations new" do
       @convo.add_message(@s2, "I need the homework too.")
     end
 
+    context "when react_inbox feature flag is on" do
+      before do
+        Account.default.set_feature_flag! :react_inbox, 'on'
+      end
+
+      it "show record / upload media ui when kaltura is enabled" do
+        stub_kaltura
+        get '/conversations'
+        f("div[data-testid='conversation']").click
+        f("button[data-testid='reply']").click
+        # need to wait for background stuff to load not easily caught by wait_for_ajaximations
+        # rubocop:disable Lint/NoSleep
+        sleep 1
+        # rubocop:enable Lint/NoSleep
+        f("button[data-testid='media-upload']").click
+        # make sure upload input exists
+        expect(f("input[type='file']")).to be_truthy
+      end
+    end
+
     context "when react_inbox feature flag is off" do
       before do
         Account.default.set_feature_flag! :react_inbox, 'off'
