@@ -51,8 +51,7 @@ export class Grouping extends Component {
     currentUser: shape(userShape),
     responsiveSize: sizeShape,
     simplifiedControls: bool,
-    singleCourseView: bool,
-    isObserving: bool
+    singleCourseView: bool
   }
 
   static defaultProps = {
@@ -60,8 +59,7 @@ export class Grouping extends Component {
     deregisterAnimatable: () => {},
     responsiveSize: 'large',
     simplifiedControls: false,
-    singleCourseView: false,
-    isObserving: false
+    singleCourseView: false
   }
 
   constructor(props) {
@@ -189,7 +187,6 @@ export class Grouping extends Component {
           readOnly={item.readOnly}
           responsiveSize={this.props.responsiveSize}
           onlineMeetingURL={item.onlineMeetingURL}
-          isObserving={this.props.isObserving}
         />
       </li>
     ))

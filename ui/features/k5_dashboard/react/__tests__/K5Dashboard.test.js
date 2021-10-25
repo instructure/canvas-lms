@@ -200,7 +200,7 @@ const defaultProps = {
 }
 
 beforeAll(() => {
-  jest.setTimeout(15000)
+  jest.setTimeout(10000)
 })
 
 afterAll(() => {
@@ -628,7 +628,7 @@ describe('K-5 Dashboard', () => {
         }
       ]
 
-      const {findByText, findByRole, getByRole, getByText} = render(
+      const {findByText, getByRole, getByText} = render(
         <K5Dashboard
           {...defaultProps}
           defaultTab="tab-schedule"
@@ -640,12 +640,6 @@ describe('K-5 Dashboard', () => {
         />
       )
       expect(await findByText('Assignment 15')).toBeInTheDocument()
-      expect(
-        await findByRole('button', {
-          name: 'Show 2 missing items',
-          timeout: 5000
-        })
-      ).toBeInTheDocument()
 
       moxios.uninstall()
       moxios.install()
@@ -658,25 +652,15 @@ describe('K-5 Dashboard', () => {
         headers: {link: 'url; rel="current"'},
         response: observerPlannerItem
       })
-      moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submissions\?.*observed_user_id=2.*/, {
-        status: 200,
-        headers: {link: 'url; rel="current"'},
-        response: [opportunities[0]]
-      })
 
       const observerSelect = getByRole('combobox', {name: 'Select a student to view'})
       act(() => observerSelect.click())
       act(() => getByText('Student 2').click())
       expect(await findByText('Assignment for Observee')).toBeInTheDocument()
-      expect(
-        await findByRole('button', {
-          name: 'Show 1 missing item',
-          timeout: 10000
-        })
-      ).toBeInTheDocument()
       moxios.wait(() => {
         const request = moxios.requests.mostRecent()
         expect(request.url).toContain('observed_user_id=2')
+        expect(request.url).toContain('context_codes[]=course_23')
         done()
       })
     })
@@ -691,10 +675,10 @@ describe('K-5 Dashboard', () => {
     })
 
     it('displays a score summary for each non-homeroom course', async () => {
-      const {getByText, queryByText, findByRole} = render(
+      const {findByText, getByText, queryByText} = render(
         <K5Dashboard {...defaultProps} defaultTab="tab-grades" />
       )
-      expect(await findByRole('link', {name: 'Economics 101'})).toBeInTheDocument()
+      expect(await findByText('Economics 101')).toBeInTheDocument()
       expect(getByText('B-')).toBeInTheDocument()
       expect(queryByText('Homeroom Class')).not.toBeInTheDocument()
     })

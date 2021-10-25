@@ -19,7 +19,6 @@
 import {Conversation} from '../../../graphql/Conversation'
 import {MessageDetailHeader} from '../../components/MessageDetailHeader/MessageDetailHeader'
 import {MessageDetailItem} from '../../components/MessageDetailItem/MessageDetailItem'
-import PropTypes from 'prop-types'
 import React from 'react'
 
 import {View} from '@instructure/ui-view'
@@ -27,13 +26,13 @@ import {View} from '@instructure/ui-view'
 export const MessageDetailContainer = props => {
   return (
     <>
-      <MessageDetailHeader text={props.conversation.subject} onReply={props.onReply} />
+      <MessageDetailHeader text={props.conversation.subject} />
       {props.conversation.conversationMessagesConnection.nodes.map(message => (
-        <View as="div" borderWidth="small none none none" padding="small" key={message.id}>
+        <View as="div" borderWidth="small none none none" padding="small">
           <MessageDetailItem
+            key={message.id}
             conversationMessage={message}
             context={props.conversation.contextName}
-            onReply={props.onReply}
           />
         </View>
       ))}
@@ -42,6 +41,5 @@ export const MessageDetailContainer = props => {
 }
 
 MessageDetailContainer.propTypes = {
-  conversation: Conversation.shape,
-  onReply: PropTypes.func
+  conversation: Conversation.shape
 }

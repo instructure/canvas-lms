@@ -159,7 +159,7 @@ describe WikiPage do
 
   it "makes the title/url unique" do
     course_with_teacher(:active_all => true)
-    @course.wiki_pages.create(:title => "Asdf")
+    p1 = @course.wiki_pages.create(:title => "Asdf")
     p2 = @course.wiki_pages.create(:title => "Asdf")
     expect(p2.title).to eql('Asdf-2')
     expect(p2.url).to eql('asdf-2')
@@ -626,15 +626,15 @@ describe WikiPage do
   describe "locked_for?" do
     it "locks by preceding item and sequential progress" do
       course_with_student active_all: true
-      page_b = @course.wiki_pages.create! title: 'B'
-      page_c = @course.wiki_pages.create! title: 'C'
+      pageB = @course.wiki_pages.create! title: 'B'
+      pageC = @course.wiki_pages.create! title: 'C'
       mod = @course.context_modules.create name: 'teh module'
-      tag_b = mod.add_item type: 'wiki_page', id: page_b.id
-      mod.add_item type: 'wiki_page', id: page_c.id
-      mod.completion_requirements = { tag_b.id => { type: 'must_view' } }
+      tagB = mod.add_item type: 'wiki_page', id: pageB.id
+      tagC = mod.add_item type: 'wiki_page', id: pageC.id
+      mod.completion_requirements = { tagB.id => { type: 'must_view' } }
       mod.require_sequential_progress = true
       mod.save
-      expect(page_c.reload).to be_locked_for @student
+      expect(pageC.reload).to be_locked_for @student
     end
 
     it "includes a future unlock date" do

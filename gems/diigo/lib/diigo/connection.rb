@@ -71,7 +71,7 @@ module Diigo
       ActiveSupport::JSON.decode(response.body)
     end
 
-    def self.key
+    def self.key(key = nil)
       self.config['api_key']
     end
 

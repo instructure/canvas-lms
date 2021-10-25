@@ -19,7 +19,7 @@
 
 module RespondusSoapEndpoint
   class Railtie < ::Rails::Engine
-    initializer "respondus_soap_endpoint.canvas_plugin" do
+    initializer "respondus_soap_endpoint.canvas_plugin" do |app|
       require 'respondus_soap_endpoint/plugin_validator'
       Canvas::Plugin.register :respondus_soap_endpoint, nil, {
         name: -> { t :name, 'Respondus SOAP Endpoint' },

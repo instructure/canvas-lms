@@ -23,12 +23,10 @@
 # jsx attribute type warnings
 #
 
-require_relative '../helpers/quizzes_common'
+require_relative "../helpers/quizzes_common"
 require_relative '../helpers/wiki_and_tiny_common'
 require_relative 'pages/rce_next_page'
 require_relative 'pages/rcs_sidebar_page'
-
-# rubocop:disable Specs/NoNoSuchElementError
 
 # while there's a mix of instui 6 and 7 in canvas we're getting
 # "Warning: [themeable] A theme registry has already been initialized." js errors
@@ -43,6 +41,7 @@ describe 'RCE next tests', ignore_js_errors: true do
   context 'WYSIWYG generic as a teacher' do
     before(:each) do
       course_with_teacher_logged_in
+      Account.default.enable_feature!(:rce_enhancements)
       stub_rcs_config
     end
 
@@ -102,6 +101,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       create_wiki_page(title, unpublished, edit_roles)
 
       visit_front_page_edit(@course)
+      wait_for_tiny(edit_wiki_css)
 
       click_links_toolbar_menu_button
       click_course_links
@@ -116,7 +116,8 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     context 'links' do
-      it 'respects selected text when creating a course link in body', ignore_js_errors: true do
+      it 'respects selected text when creating a course link in body',
+         ignore_js_errors: true do
         title = 'test_page'
         unpublished = false
         edit_roles = 'public'
@@ -124,6 +125,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         create_wiki_page(title, unpublished, edit_roles)
 
         visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
         insert_tiny_text('select me')
 
         select_all_in_tiny(f('#wiki_page_body'))
@@ -140,7 +142,8 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'respects selected text when creating an external link in body', ignore_js_errors: true do
+      it 'respects selected text when creating an external link in body',
+         ignore_js_errors: true do
         title = 'test_page'
         unpublished = false
         edit_roles = 'public'
@@ -148,6 +151,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         create_wiki_page(title, unpublished, edit_roles)
 
         visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
         insert_tiny_text('select me')
 
         select_all_in_tiny(f('#wiki_page_body'))
@@ -160,7 +164,8 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'updates selected text when creating an external link in body', ignore_js_errors: true do
+      it 'updates selected text when creating an external link in body',
+         ignore_js_errors: true do
         title = 'test_page'
         unpublished = false
         edit_roles = 'public'
@@ -168,6 +173,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         create_wiki_page(title, unpublished, edit_roles)
 
         visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
         insert_tiny_text('select me')
 
         select_all_in_tiny(f('#wiki_page_body'))
@@ -188,30 +194,24 @@ describe 'RCE next tests', ignore_js_errors: true do
         create_wiki_page(title, unpublished, edit_roles)
 
         visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
 
         switch_to_html_view
-        switch_to_raw_html_editor
         html_view = f('textarea#wiki_page_body')
         html_view.send_keys('<a href="http://example.com">edit me</a>')
         switch_to_editor_view
 
-        begin
-          click_link_for_options
-          click_link_options_button
+        click_link_for_options
+        click_link_options_button
 
-          wait_for_ajaximations
-          expect(link_options_tray).to be_displayed
+        expect(link_options_tray).to be_displayed
 
-          link_text_textbox = f('input[type="text"][value="edit me"]')
-          link_text_textbox.send_keys(' please')
-          click_link_options_done_button
+        link_text_textbox = f('input[type="text"][value="edit me"]')
+        link_text_textbox.send_keys(' please')
+        click_link_options_done_button
 
-          in_frame rce_page_body_ifr_id do
-            expect(wiki_body_anchor.text).to eq 'edit me please'
-          end
-        rescue Selenium::WebDriver::Error::NoSuchElementError
-          puts 'Failed finding the link options button. Bailing out on this spec.'
-          expect(true).to be_truthy
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.text).to eq 'edit me please'
         end
       end
 
@@ -221,6 +221,7 @@ describe 'RCE next tests', ignore_js_errors: true do
           body: "<p id='para'><a id='lnk' href='http://example.com'>delete me</a></p>"
         )
         visit_existing_wiki_edit(@course, 'title')
+        wait_for_tiny(edit_wiki_css)
 
         f("##{rce_page_body_ifr_id}").click
         f("##{rce_page_body_ifr_id}").send_keys(
@@ -252,6 +253,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         create_course_text_file(title)
 
         visit_existing_wiki_edit(@course, 'title')
+        wait_for_tiny(edit_wiki_css)
 
         in_frame rce_page_body_ifr_id do
           f('#lnk').send_keys(%i[end return])
@@ -275,23 +277,19 @@ describe 'RCE next tests', ignore_js_errors: true do
             "<p id='para'><a id='lnk' href='http://example.com/'><img src='some/image'/></a></p>"
         )
         visit_existing_wiki_edit(@course, 'title')
+        wait_for_tiny(edit_wiki_css)
 
-        begin
-          click_link_for_options
-          click_link_options_button
+        click_link_for_options
+        click_link_options_button
 
-          expect(link_options_tray).to be_displayed
+        expect(link_options_tray).to be_displayed
 
-          link_text_textbox = f('input[type="text"][value="http://example.com/"]')
-          link_text_textbox.send_keys([:end, 'x'])
-          click_link_options_done_button
+        link_text_textbox = f('input[type="text"][value="http://example.com/"]')
+        link_text_textbox.send_keys([:end, 'x'])
+        click_link_options_done_button
 
-          in_frame rce_page_body_ifr_id do
-            expect(wiki_body_anchor).to be_displayed
-          end
-        rescue Selenium::WebDriver::Error::NoSuchElementError
-          puts 'Failed finding the link options button. Bailing out on this spec.'
-          expect(true).to be_truthy
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor).to be_displayed
         end
       end
 
@@ -303,6 +301,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         create_wiki_page(title, unpublished, edit_roles)
 
         visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
 
         create_external_link('youtube', 'https://youtu.be/17oCQakzIl8')
 
@@ -526,6 +525,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       it 'closes links tray if open when opening link options' do
         skip('still flakey. Needs to be addressed in LS-1814')
         visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
 
         switch_to_html_view
         html_view = f('textarea#wiki_page_body')
@@ -538,20 +538,15 @@ describe 'RCE next tests', ignore_js_errors: true do
           wait_for_ajaximations
           expect(course_links_tray).to be_displayed
 
-          begin
-            click_link_for_options
-            click_link_options_button
+          click_link_for_options
+          click_link_options_button
 
-            expect(link_options_tray).to be_displayed
-            validate_course_links_tray_closed
-          rescue Selenium::WebDriver::Error::NoSuchElementError
-            puts 'Failed finding the link options button. Bailing out on this spec.'
-            expect(true).to be_truthy
-          ensure
-            driver.switch_to.frame('wiki_page_body_ifr')
-            f('h2').click
-            driver.switch_to.default_content
-          end
+          expect(link_options_tray).to be_displayed
+          validate_course_links_tray_closed
+
+          driver.switch_to.frame('wiki_page_body_ifr')
+          f('h2').click
+          driver.switch_to.default_content
         end
 
         # Duplicate trays only appear sporadically, so repeat this several times to make sure
@@ -637,6 +632,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         create_wiki_page(title2, unpublished, edit_roles)
 
         visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
 
         click_links_toolbar_menu_button
         click_course_links
@@ -703,7 +699,8 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'searches for items when different accordian section opened', ignore_js_errors: true do
+      it 'searches for items when different accordian section opened',
+         ignore_js_errors: true do
         # Add two pages
         title = 'test_page'
         title2 = 'icon_page'
@@ -780,6 +777,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
       @course.wiki_pages.create!(title: 'title', body: "<p id='para'>select me</p>")
       visit_existing_wiki_edit(@course, 'title')
+      wait_for_tiny(edit_wiki_css)
 
       f("##{rce_page_body_ifr_id}").click
       select_text_of_element_by_id('para')
@@ -801,14 +799,10 @@ describe 'RCE next tests', ignore_js_errors: true do
 
       visit_existing_wiki_edit(@course, page_title)
 
-      begin
-        click_embedded_image_for_options
-        click_image_options_button
-        expect(image_options_tray).to be_displayed
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-        puts 'Failed finding the image options button. Bailing out on this spec.'
-        expect(true).to be_truthy
-      end
+      click_embedded_image_for_options
+      click_image_options_button
+
+      expect(image_options_tray).to be_displayed
     end
 
     it 'closes links tray if open when opening image options' do
@@ -828,20 +822,15 @@ describe 'RCE next tests', ignore_js_errors: true do
         wait_for_ajaximations
         expect(course_links_tray).to be_displayed
 
-        begin
-          click_embedded_image_for_options
-          click_image_options_button
+        click_embedded_image_for_options
+        click_image_options_button
 
-          expect(image_options_tray).to be_displayed
-          validate_course_links_tray_closed
-        rescue Selenium::WebDriver::Error::NoSuchElementError
-          puts 'Failed finding the image options button. Bailing out on this spec.'
-          expect(true).to be_truthy
-        ensure
-          driver.switch_to.frame('wiki_page_body_ifr')
-          f('h2').click
-          driver.switch_to.default_content
-        end
+        expect(image_options_tray).to be_displayed
+        validate_course_links_tray_closed
+
+        driver.switch_to.frame('wiki_page_body_ifr')
+        f('h2').click
+        driver.switch_to.default_content
       end
 
       # Duplicate trays only appear sporadically, so run this several times to make sure
@@ -855,19 +844,14 @@ describe 'RCE next tests', ignore_js_errors: true do
 
       visit_existing_wiki_edit(@course, page_title)
 
-      begin
-        click_embedded_image_for_options
-        click_image_options_button
+      click_embedded_image_for_options
+      click_image_options_button
 
-        click_display_text_link_option
-        click_image_options_done_button
+      click_display_text_link_option
+      click_image_options_done_button
 
-        in_frame tiny_rce_ifr_id do
-          expect(wiki_body_anchor).not_to contain_css('src')
-        end
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-        puts 'Failed finding the image options button. Bailing out on this spec.'
-        expect(true).to be_truthy
+      in_frame tiny_rce_ifr_id do
+        expect(wiki_body_anchor).not_to contain_css('src')
       end
     end
 
@@ -878,19 +862,14 @@ describe 'RCE next tests', ignore_js_errors: true do
 
       visit_existing_wiki_edit(@course, page_title)
 
-      begin
-        click_embedded_image_for_options
-        click_image_options_button
+      click_embedded_image_for_options
+      click_image_options_button
 
-        alt_text_textbox.send_keys(alt_text)
-        click_image_options_done_button
+      alt_text_textbox.send_keys(alt_text)
+      click_image_options_done_button
 
-        in_frame rce_page_body_ifr_id do
-          expect(wiki_body_image.attribute('alt')).to include alt_text
-        end
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-        puts 'Failed finding the image options button. Bailing out on this spec.'
-        expect(true).to be_truthy
+      in_frame rce_page_body_ifr_id do
+        expect(wiki_body_image.attribute('alt')).to include alt_text
       end
     end
 
@@ -901,20 +880,15 @@ describe 'RCE next tests', ignore_js_errors: true do
 
       visit_existing_wiki_edit(@course, page_title)
 
-      begin
-        click_embedded_image_for_options
-        click_image_options_button
+      click_embedded_image_for_options
+      click_image_options_button
 
-        click_decorative_options_checkbox
-        click_image_options_done_button
+      click_decorative_options_checkbox
+      click_image_options_done_button
 
-        in_frame rce_page_body_ifr_id do
-          expect(wiki_body_image.attribute('alt')).to eq('')
-          expect(wiki_body_image.attribute('role')).to eq('presentation')
-        end
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-        puts 'Failed finding the image options button. Bailing out on this spec.'
-        expect(true).to be_truthy
+      in_frame rce_page_body_ifr_id do
+        expect(wiki_body_image.attribute('alt')).to eq('')
+        expect(wiki_body_image.attribute('role')).to eq('presentation')
       end
     end
 
@@ -946,17 +920,17 @@ describe 'RCE next tests', ignore_js_errors: true do
       it 'with the rce_a11y_checker_notifications flag on should show notification badge' do
         Account.site_admin.enable_feature! :rce_a11y_checker_notifications
         visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
 
         switch_to_html_view
-        switch_to_raw_html_editor
         html_view = f('textarea#wiki_page_body')
         html_view.send_keys('<img src="image.jpg" alt="image.jpg" />')
         switch_to_editor_view
 
-        wait_for(method: nil, timeout: 5) do
+        wait_for(method: nil, timeout: 5) {
           badge_element = fxpath('//button[@data-btn-id="rce-a11y-btn"]/following-sibling::span')
           expect(badge_element.text).to eq '1'
-        end
+        }
 
         switch_to_html_view
         html_view = f('textarea#wiki_page_body')
@@ -964,28 +938,24 @@ describe 'RCE next tests', ignore_js_errors: true do
         html_view.send_keys('test text')
         switch_to_editor_view
 
-        expect(
-          wait_for_no_such_element(method: nil, timeout: 5) {
-            fxpath('//button[@data-btn-id="rce-a11y-btn"]/following-sibling::span')
-          }
-        ).to be_truthy
+        expect(wait_for_no_such_element(method: nil, timeout: 5) {
+          fxpath('//button[@data-btn-id="rce-a11y-btn"]/following-sibling::span')
+        }).to be_truthy
       end
 
       it 'with the rce_a11y_checker_notifications flag off should show not notification badge' do
         Account.site_admin.disable_feature! :rce_a11y_checker_notifications
         visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
 
         switch_to_html_view
-        switch_to_raw_html_editor
         html_view = f('textarea#wiki_page_body')
         html_view.send_keys('<img src="image.jpg" alt="image.jpg" />')
         switch_to_editor_view
 
-        expect(
-          wait_for_no_such_element(method: nil, timeout: 5) {
-            fxpath('//button[@data-btn-id="rce-a11y-btn"]/following-sibling::span')
-          }
-        ).to be_truthy
+        expect(wait_for_no_such_element(method: nil, timeout: 5) {
+          fxpath('//button[@data-btn-id="rce-a11y-btn"]/following-sibling::span')
+        }).to be_truthy
       end
 
       it 'opens keyboard shortcut modal when clicking button in status bar' do
@@ -1467,97 +1437,120 @@ describe 'RCE next tests', ignore_js_errors: true do
         driver.execute_script('if (document.fullscreenElement) document.exitFullscreen()')
       end
 
-      it 'switches between wysiwyg and pretty html view' do
-        skip('Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-29')
-        rce_wysiwyg_state_setup(@course)
-        expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
+      describe 'with the use_rce_pretty_html_editor flag off' do
+        before(:each) { Account.site_admin.disable_feature! :rce_pretty_html_editor }
 
-        # click edit button -> fancy editor
-        click_editor_view_button
+        it 'switches between wysiwyg and raw html view' do
+          rce_wysiwyg_state_setup(@course)
+          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
 
-        # it's lazy loaded
-        expect(f('.RceHtmlEditor')).to be_displayed
+          click_editor_view_button
+          expect(f('textarea#wiki_page_body')).to be_displayed
 
-        # click edit button -> back to the rce
-        click_editor_view_button
-        expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
+          click_editor_view_button
+          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
+        end
 
-        # shift-o edit button -> raw editor
-        shift_O_combination('[data-btn-id="rce-edit-btn"]')
-        expect(f('textarea#wiki_page_body')).to be_displayed
+        it 'displays the editor in fullscreen' do
+          rce_wysiwyg_state_setup(@course)
 
-        # click "Pretty HTML Editor" status bar button -> fancy editor
-        fj('button:contains("Pretty HTML Editor")').click
-        expect(f('.RceHtmlEditor')).to be_displayed
+          click_editor_view_button
+          expect(f('textarea#wiki_page_body')).to be_displayed
+
+          click_full_screen_button
+          expect(fullscreen_element).to eq(f('textarea#wiki_page_body'))
+        end
       end
 
-      it 'displays the editor in fullscreen' do
-        skip('Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-29')
-        rce_wysiwyg_state_setup(@course)
+      describe 'with the use_rce_pretty_html_editor flag on' do
+        before(:each) { Account.site_admin.enable_feature! :rce_pretty_html_editor }
 
-        click_editor_view_button
-        expect(f('.RceHtmlEditor')).to be_displayed
+        it 'switches between wysiwyg and pretty html view' do
+          skip('Cannot get this to pass flakey spec catcher in jenkins, though is fine locally')
+          rce_wysiwyg_state_setup(@course)
+          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
 
-        click_full_screen_button
-        expect(fullscreen_element).to eq(f('.RceHtmlEditor'))
-      end
+          # click edit button -> fancy editor
+          click_editor_view_button
 
-      it 'gets default html editor from the rce.htmleditor cookie' do
-        get '/'
-        driver.manage.add_cookie(name: 'rce.htmleditor', value: 'RAW', path: '/')
+          # it's lazy loaded
+          expect(f('.RceHtmlEditor')).to be_displayed
 
-        rce_wysiwyg_state_setup(@course)
+          # click edit button -> back to the rce
+          click_editor_view_button
+          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
 
-        # clicking opens raw editor
-        click_editor_view_button
-        expect(f('textarea#wiki_page_body')).to be_displayed
-      ensure
-        driver.manage.delete_cookie('rce.htmleditor')
-      end
+          # shift-o edit button -> raw editor
+          shift_O_combination('[data-btn-id="rce-edit-btn"]')
+          expect(f('textarea#wiki_page_body')).to be_displayed
 
-      it 'saves pretty HTML editor text on submit' do
-        skip(
-          'Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-35'
-        )
-        quiz_content = '<p>test</p>'
-        @quiz = @course.quizzes.create!
-        open_quiz_edit_form
-        click_questions_tab
-        click_new_question_button
-        create_essay_question
-        expect_new_page_load { f('.save_quiz_button').click }
-        open_quiz_show_page
-        expect_new_page_load { f('#preview_quiz_button').click }
-        switch_to_html_view
-        expect(f('.RceHtmlEditor')).to be_displayed
-        f('.RceHtmlEditor .CodeMirror textarea').send_keys(quiz_content)
-        expect_new_page_load { submit_quiz }
-        expect(f("#questions .essay_question .quiz_response_text").attribute("innerHTML")).to eq(
-          quiz_content
-        )
-      end
+          # click "Pretty HTML Editor" status bar button -> fancy editor
+          fj('button:contains("Pretty HTML Editor")').click
+          expect(f('.RceHtmlEditor')).to be_displayed
+        end
 
-      it 'sanitizes the HTML set in the HTML editor' do
-        skip 'still flakey. Needs to be addressed in MAT-386'
-        get '/'
+        it 'displays the editor in fullscreen' do
+          skip('Cannot get this to pass flakey spec catcher in jenkins, though is fine locally')
+          rce_wysiwyg_state_setup(@course)
 
-        html = <<~HTML
-          <img src="/" id="test-image" onerror="alert('hello')" />
-        HTML
+          click_editor_view_button
+          expect(f('.RceHtmlEditor')).to be_displayed
 
-        rce_wysiwyg_state_setup(
-          @course,
-          html,
-          html: true,
-          new_rce: true
-        )
+          click_full_screen_button
+          expect(fullscreen_element).to eq(f('.RceHtmlEditor'))
+        end
 
-        in_frame rce_page_body_ifr_id do
-          expect(f('#test-image').attribute('onerror')).to be_nil
+        it 'gets default html editor from the rce.htmleditor cookie' do
+          get '/'
+          driver.manage.add_cookie(name: 'rce.htmleditor', value: 'RAW', path: '/')
+
+          rce_wysiwyg_state_setup(@course)
+
+          # clicking opens raw editor
+          click_editor_view_button
+          expect(f('textarea#wiki_page_body')).to be_displayed
+        ensure
+          driver.manage.delete_cookie('rce.htmleditor')
+        end
+
+        it 'saves pretty HTML editor text on submit' do
+          skip('Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-35')
+          quiz_content = '<p>test</p>'
+          @quiz = @course.quizzes.create!
+          open_quiz_edit_form
+          click_questions_tab
+          click_new_question_button
+          create_essay_question
+          expect_new_page_load { f('.save_quiz_button').click }
+          open_quiz_show_page
+          expect_new_page_load { f('#preview_quiz_button').click }
+          switch_to_html_view
+          expect(f('.RceHtmlEditor')).to be_displayed
+          f('.RceHtmlEditor .CodeMirror textarea').send_keys(quiz_content)
+          expect_new_page_load { submit_quiz }
+          expect(f("#questions .essay_question .quiz_response_text").attribute("innerHTML")).to eq(quiz_content)
+        end
+
+        it 'sanitizes the HTML set in the HTML editor' do
+          skip 'still flakey. Needs to be addressed in MAT-386'
+          get '/'
+
+          html = <<~HTML
+            <img src="/" id="test-image" onerror="alert('hello')" />
+          HTML
+
+          rce_wysiwyg_state_setup(
+            @course,
+            html,
+            html: true,
+            new_rce: true
+          )
+
+          in_frame rce_page_body_ifr_id do
+            expect(f('#test-image').attribute('onerror')).to be_nil
+          end
         end
       end
     end
   end
 end
-
-# rubocop:enable Specs/NoNoSuchElementError

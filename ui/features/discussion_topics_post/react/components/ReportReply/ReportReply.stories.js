@@ -35,11 +35,3 @@ Default.args = {
   onSubmit: () => {},
   showReportModal: true
 }
-
-export const Loading = Template.bind({})
-Loading.args = {
-  onCloseReportModal: () => {},
-  onSubmit: () => {},
-  showReportModal: true,
-  isLoading: true
-}

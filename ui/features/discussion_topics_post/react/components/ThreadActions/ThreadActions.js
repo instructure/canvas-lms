@@ -178,7 +178,6 @@ const getMenuConfigs = props => {
   }
   if (props.onReport) {
     options.push({
-      key: 'separator',
       separator: true
     })
     options.push({
@@ -198,7 +197,7 @@ const renderMenuItem = (
   id
 ) => {
   return separator ? (
-    <Menu.Separator key={key} />
+    <Menu.Separator />
   ) : (
     <Menu.Item
       key={`${key}-${id}`}

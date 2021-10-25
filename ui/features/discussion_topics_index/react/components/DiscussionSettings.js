@@ -32,8 +32,7 @@ import propTypes from '../propTypes'
 const STUDENT_SETTINGS = [
   'allow_student_forum_attachments',
   'allow_student_discussion_editing',
-  'allow_student_discussion_topics',
-  'allow_student_discussion_reporting'
+  'allow_student_discussion_topics'
 ]
 
 export default class DiscussionSettings extends Component {
@@ -131,14 +130,6 @@ export default class DiscussionSettings extends Component {
               label={I18n.t('Attach files to discussions')}
               value="allow_student_forum_attachments"
             />
-            {ENV.student_reporting_enabled && (
-              <Checkbox
-                id="allow_student_discussion_reporting"
-                disabled={this.props.isSavingSettings}
-                label={I18n.t('Report replies')}
-                value="allow_student_discussion_reporting"
-              />
-            )}
           </CheckboxGroup>
         </div>
       )

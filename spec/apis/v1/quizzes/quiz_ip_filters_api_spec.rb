@@ -72,7 +72,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
     it 'restricts access to itself' do
       student_in_course
 
-      get_index(true)
+      json = get_index(true)
       assert_status(401)
     end
 

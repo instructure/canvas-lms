@@ -20,7 +20,7 @@ require 'inst_access'
 
 class InstAccessSupport
   def self.configure_inst_access!
-    conf = Rails.application.credentials.inst_access_signature
+    conf = ConfigFile.load("inst_access_signature")
     if conf
       InstAccess.configure(
         signing_key: Base64.decode64(conf[:private_key]),

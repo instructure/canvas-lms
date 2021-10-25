@@ -203,22 +203,18 @@ module Api::V1::PlannerItem
     topics_status ||= {}
     unknown_topic_ids = Array(topic_ids) - topics_status.keys
     if unknown_topic_ids.any?
-      Shard.partition_by_shard(unknown_topic_ids) do |u_topic_ids|
-        DiscussionTopic
-          .select("discussion_topics.id,
-                   COALESCE(dtp.unread_entry_count, COUNT(de.id)) AS unread_entry_count,
-                   COALESCE(dtp.workflow_state, 'unread') AS unread_state")
-          .joins("LEFT JOIN #{DiscussionTopicParticipant.quoted_table_name} AS dtp
-                    ON dtp.discussion_topic_id = discussion_topics.id
-                    AND dtp.user_id = #{User.connection.quote(user)}
-                  LEFT JOIN #{DiscussionEntry.quoted_table_name} AS de
-                    ON de.discussion_topic_id = discussion_topics.id
-                    AND dtp.id IS NULL")
-          .where(id: u_topic_ids)
-          .group("discussion_topics.id, dtp.id")
-          .each do |pi|
-          topics_status[pi[:id]] = [pi[:unread_entry_count], pi[:unread_state]]
-        end
+      participant_info = DiscussionTopic.select("discussion_topics.id, COALESCE(dtp.unread_entry_count, COUNT(de.id)) AS unread_entry_count,
+        COALESCE(dtp.workflow_state, 'unread') AS unread_state")
+                                        .joins("LEFT JOIN #{DiscussionTopicParticipant.quoted_table_name} AS dtp
+                 ON dtp.discussion_topic_id = discussion_topics.id
+                AND dtp.user_id = #{User.connection.quote(user)}
+               LEFT JOIN #{DiscussionEntry.quoted_table_name} AS de
+                 ON de.discussion_topic_id = discussion_topics.id
+                AND dtp.id IS NULL")
+                                        .where(id: unknown_topic_ids)
+                                        .group("discussion_topics.id, dtp.id")
+      participant_info.each do |pi|
+        topics_status[pi[:id]] = [pi[:unread_entry_count], pi[:unread_state]]
       end
     end
     topics_status
@@ -260,13 +256,13 @@ module Api::V1::PlannerItem
   def online_meeting_url(event_description, event_location)
     config = Canvas::DynamicSettings.find('canvas', tree: 'config', service: 'canvas')
     default_regex = <<~'REGEX'
-      https:\/\/[\w-]+\.zoom\.us\/\d+(\?[\w\/\-=%]*)?
-      https:\/\/[\w-]+\.zoom\.us\/my\/[\w.]+(\?[\w\/\-=%]*)?
-      https:\/\/[\w-]+\.zoom\.us\/j\/\d+(\?[\w\/\-=%]*)?
+      https:\/\/\w+\.zoom\.us\/\d+(\?[\w\/\-=%]*)?
+      https:\/\/\w+\.zoom\.us\/my\/[\w.]+(\?[\w\/\-=%]*)?
+      https:\/\/\w+\.zoom\.us\/j\/\d+(\?[\w\/\-=%]*)?
       https:\/\/teams\.microsoft\.com\/l\/meetup-join\/[\w.\/\-=%]+(\?[\w\/\-=%]*)?
       https:\/\/teams\.live\.com\/meet\/\d+(\?[\w\/\-=%]*)?
-      https:\/\/[\w-]+\.webex\.com\/meet\/[\w.\/\-=%]+(\?[\w\/\-=%]*)?
-      https:\/\/[\w-]+\.webex\.com\/\w+\/j\.php(\?[\w\/\-=%]*)?
+      https:\/\/\w+\.webex\.com\/meet\/[\w.\/\-=%]+(\?[\w\/\-=%]*)?
+      https:\/\/\w+\.webex\.com\/\w+\/j\.php(\?[\w\/\-=%]*)?
       https:\/\/meet\.google\.com\/[\w\/\-=%]+(\?[\w\/\-=%]*)?
     REGEX
     url_regex_str = config["online-meeting-url-regex"] || default_regex

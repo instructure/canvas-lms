@@ -22,7 +22,7 @@ require 'spec_helper'
 require 'aws-sdk-kinesis'
 
 describe LiveEvents::Client do
-  def stub_config
+  def stub_config(opts = {})
     allow(LiveEvents::Client).to receive(:config).and_return({
                                                                'kinesis_stream_name' => 'stream',
                                                                'aws_access_key_id' => 'access_key',
@@ -82,7 +82,7 @@ describe LiveEvents::Client do
   describe ".aws_config" do
     before { prep_client_and_worker }
 
-    it "parses the endpoint correctly" do
+    it "correctlies parse the endpoint" do
       res = LiveEvents::Client.aws_config({
                                             "aws_endpoint" => "http://example.com:6543/"
                                           })

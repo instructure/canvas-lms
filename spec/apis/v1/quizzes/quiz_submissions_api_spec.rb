@@ -256,7 +256,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
     it 'restricts access to itself' do
       student_in_course
-      qs_api_index(true)
+      json = qs_api_index(true)
       assert_status(401)
     end
 
@@ -646,7 +646,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         @quiz_submission.mark_completed
         Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
 
-        qs_api_complete true, {
+        json = qs_api_complete true, {
           attempt: 1
         }
 
@@ -655,14 +655,14 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       end
 
       it 'requires the attempt index' do
-        qs_api_complete true
+        json = qs_api_complete true
 
         assert_status(400)
         expect(response.body).to match(/invalid attempt/)
       end
 
       it 'requires the current attempt index' do
-        qs_api_complete true, {
+        json = qs_api_complete true, {
           attempt: 123123123
         }
 
@@ -671,7 +671,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       end
 
       it 'requires a valid validation token' do
-        qs_api_complete true, {
+        json = qs_api_complete true, {
           validation_token: 'aaaooeeeee'
         }
 
@@ -735,7 +735,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
 
     it 'sets a comment' do
-      qs_api_update false, {
+      json = qs_api_update false, {
         quiz_submissions: [{
           attempt: @quiz_submission.attempt,
           questions: {
@@ -777,13 +777,13 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     end
     it "rejects a teacher other student" do
       @user = @teacher
-      qs_api_time(true)
+      json = qs_api_time(true)
       assert_status(401)
     end
     it "rejects another student" do
       enroll_student
       @user = @student
-      qs_api_time(true)
+      json = qs_api_time(true)
       assert_status(401)
     end
   end

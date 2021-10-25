@@ -86,12 +86,12 @@ module CanvasQuizStatistics::Analyzers
 
     # Can't have the UnknownAnswer for this question type since students only
     # get to pick one of the pre-defined choices.
-    def answer_present_but_unknown?(*)
+    def answer_present_but_unknown?(*args)
       false
     end
 
-    def locate_answer(response, answers, *)
-      answers.detect { |a| a[:id].to_s == response[:answer_id].to_s }
+    def locate_answer(response, answers, *args)
+      answers.detect { |a| "#{a[:id]}" == "#{response[:answer_id]}" }
     end
 
     def answer_present?(response)

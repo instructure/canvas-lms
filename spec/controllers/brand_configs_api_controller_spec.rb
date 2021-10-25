@@ -33,7 +33,7 @@ describe BrandConfigsApiController do
     end
 
     it "sets CORS headers" do
-      Account.default.create_brand_config!(variables: { "ic-brand-primary" => "#321" })
+      brand_config = Account.default.create_brand_config!(variables: { "ic-brand-primary" => "#321" })
       get :show
       expect(response.header["Access-Control-Allow-Origin"]).to eq "*"
     end

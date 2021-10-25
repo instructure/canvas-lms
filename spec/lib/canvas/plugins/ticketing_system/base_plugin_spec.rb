@@ -38,7 +38,7 @@ module Canvas::Plugins::TicketingSystem
   class FakeTicketing
     attr_reader :callback
 
-    def register_plugin(_id, _settings, &callback)
+    def register_plugin(id, settings, &callback)
       @callback = callback
     end
   end

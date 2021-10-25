@@ -165,6 +165,7 @@ module ConferencesCommon
 
   def edit_conference(opts = {})
     cog_menu_item = opts.fetch(:cog_menu_item, f('.icon-settings'))
+    cancel_transaction = opts.fetch(:cancel, false)
 
     cog_menu_item.click
     wait_for_ajaximations

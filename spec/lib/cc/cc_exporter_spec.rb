@@ -87,7 +87,7 @@ describe "Common Cartridge exporting" do
       end
     end
 
-    it "selectively exports all object types" do
+    it "selectivelies export all object types" do
       # create 2 of everything
       @dt1 = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
       @dt2 = @course.discussion_topics.create!(:message => "hey", :title => "discussion title 2")
@@ -272,7 +272,7 @@ describe "Common Cartridge exporting" do
       expect(selections[1].at_css("selection_extension sourcebank_context").text).to eq bank2.context.asset_string
     end
 
-    it "selectively creates a quizzes-only export" do
+    it "selectivelies create a quizzes-only export" do
       @q1 = @course.quizzes.create!(:title => 'quiz1')
       @q2 = @course.quizzes.create!(:title => 'quiz2')
 
@@ -624,6 +624,7 @@ describe "Common Cartridge exporting" do
       expect(variant_tag.name).to eq 'variant'
       expect(variant_tag.attribute('identifierref').value).to eql assignment_id
       expect(variant_tag.next_element.name).to eq 'file'
+      html_file = variant_tag.next_element.attribute('href').value
       expect(@zip_file.read("#{assignment_id}/test-assignment.html")).to be_include "what?"
     end
 

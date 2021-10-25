@@ -60,7 +60,7 @@ describe PluginSetting do
   end
 
   it "returns updated content if created" do
-    PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty" })
+    s = PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty" })
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     expect(settings).not_to be_nil
     expect(settings[:bar]).to eq "qwerty"
@@ -78,7 +78,7 @@ describe PluginSetting do
     expect(settings[:bar]).to eq "asdf"
   end
 
-  it "immediately uncaches on save" do
+  it "immediatelies uncache on save" do
     enable_cache do
       s = PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty" })
       # cache it

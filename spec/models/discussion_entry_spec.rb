@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe DiscussionEntry do
-  let(:topic) { discussion_topic_model }
+  let(:topic) { @course.discussion_topics.create! }
 
   describe 'callback lifecycle' do
     before(:once) do
@@ -157,10 +157,6 @@ describe DiscussionEntry do
 
       n2 = Notification.create(:name => "Announcement Reply", :category => "TestImmediately")
       NotificationPolicy.create(:notification => n2, :communication_channel => @teacher.communication_channel, :frequency => "immediately")
-
-      @notification_reported_entry = "Reported Reply"
-      n = Notification.create(:name => @notification_reported_entry, :category => "TestImmediately")
-      NotificationPolicy.create(:notification => n, :communication_channel => @teacher.communication_channel, :frequency => "immediately")
     end
 
     it "sends them for course discussion topics" do
@@ -229,10 +225,10 @@ describe DiscussionEntry do
       # make sure they all subscribed, somehow
       [teacher, student1, quitter, outsider].each { |user| topic.subscribe(user) }
 
-      topic.discussion_entries.create!(:user => quitter, :message => "Hi, I'm going to drop this class")
+      entry = topic.discussion_entries.create!(:user => quitter, :message => "Hi, I'm going to drop this class")
       quitter.enrollments.each { |e| e.destroy }
 
-      topic.discussion_entries.create!(:user => outsider, :message => "Hi I'm a student from another class")
+      weird_entry = topic.discussion_entries.create!(:user => outsider, :message => "Hi I'm a student from another class")
       entry = topic.discussion_entries.create!(:user => student1, :message => "Hi I'm a student")
 
       to_users = entry.messages_sent[@notification_name].map(&:user)
@@ -259,15 +255,6 @@ describe DiscussionEntry do
       expect(mention.messages_sent[@notification_name]).to be_blank
       expect(mention.messages_sent[@notification_mention]).not_to be_blank
       expect(mention.messages_sent["Announcement Reply"]).to be_blank
-    end
-
-    it "sends notification to teacher when a reply is reported" do
-      allow(Account.site_admin).to receive(:feature_enabled?).with(:discussions_reporting).and_return(true)
-      topic = @course.discussion_topics.create!(:user => @teacher, :message => "This is an important announcement")
-      topic.subscribe(@student)
-      entry = topic.discussion_entries.create!(:user => @teacher, :message => "Oh, and another thing...")
-      expect(BroadcastPolicy.notifier).to receive(:send_notification).once
-      entry.broadcast_report_notification('hello I have been reported')
     end
   end
 
@@ -719,7 +706,7 @@ describe DiscussionEntry do
     end
 
     it "doesn't make stream items for students that aren't assigned" do
-      @topic.reply_from(user: @teacher, text: "...")
+      entry = @topic.reply_from(user: @teacher, text: "...")
       expect(@student.stream_item_instances).to be_empty
     end
   end
@@ -803,47 +790,6 @@ describe DiscussionEntry do
       sub_entry2.save!
       @student.reload
       expect(@student.cache_key).not_to eql(cache_key)
-    end
-  end
-
-  describe 'permissions' do
-    let(:user) { user_model }
-    let(:entry) { topic.discussion_entries.create!(message: "Hello!", user: user) }
-
-    describe 'reply' do
-      context 'when a user is no longer enrolled in the course' do
-        before do
-          create_enrollment(topic.course, user, { enrollment_state: "completed" })
-        end
-
-        it 'returns false for their own posts' do
-          expect(entry.grants_right?(user, :reply)).to eq false
-        end
-      end
-    end
-
-    describe 'update' do
-      context 'when a user is no longer enrolled in the course' do
-        before do
-          create_enrollment(topic.course, user, { enrollment_state: "completed" })
-        end
-
-        it 'returns false for their own posts' do
-          expect(entry.grants_right?(user, :update)).to eq false
-        end
-      end
-    end
-
-    describe 'delete' do
-      context 'when a user is no longer enrolled in the course' do
-        before do
-          create_enrollment(topic.course, user, { enrollment_state: "completed" })
-        end
-
-        it 'returns false for their own posts' do
-          expect(entry.grants_right?(user, :delete)).to eq false
-        end
-      end
     end
   end
 end

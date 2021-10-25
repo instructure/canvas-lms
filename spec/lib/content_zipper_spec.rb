@@ -223,6 +223,7 @@ describe ContentZipper do
       attachment.save!
 
       ContentZipper.process_attachment(attachment, @teacher)
+      sub_count = 0
       expected_file_names = [/group0/, /group1/]
       Zip::File.foreach(attachment.full_filename) do |f|
         expect {
@@ -288,7 +289,7 @@ describe ContentZipper do
     it "still downloads the content" do
       course_with_teacher
       @assignment = assignment_model(course: @course)
-      5.times do |i|
+      submissions = 5.times do |i|
         attachment = attachment_model(uploaded_data: stub_png_data("file_#{i}.png"), content_type: 'image/png')
         submission_model(course: @course, assignment: @assignment, submission_type: 'online_upload', attachments: [attachment])
       end

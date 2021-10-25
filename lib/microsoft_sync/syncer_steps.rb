@@ -136,9 +136,10 @@ module MicrosoftSync
     # yet replicated.)
     def step_full_sync_prerequisites(_mem_data, _job_state_data)
       if CanvasModelsHelpers.max_enrollment_members_reached?(course)
-        raise_and_disable_group(MaxMemberEnrollmentsReached)
-      elsif CanvasModelsHelpers.max_enrollment_owners_reached?(course)
-        raise_and_disable_group(MaxOwnerEnrollmentsReached)
+        raise MaxMemberEnrollmentsReached
+      end
+      if CanvasModelsHelpers.max_enrollment_owners_reached?(course)
+        raise MaxOwnerEnrollmentsReached
       end
 
       PartialSyncChange.delete_all_replicated_to_secondary_for_course(course.id)
@@ -252,8 +253,8 @@ module MicrosoftSync
       # remove the group on the Microsoft side (INTEROP-6672)
       raise Errors::MissingOwners if diff.local_owners.empty?
 
-      raise_and_disable_group(MaxMemberEnrollmentsReached) if diff.max_enrollment_members_reached?
-      raise_and_disable_group(MaxOwnerEnrollmentsReached) if diff.max_enrollment_owners_reached?
+      raise MaxMemberEnrollmentsReached if diff.max_enrollment_members_reached?
+      raise MaxOwnerEnrollmentsReached if diff.max_enrollment_owners_reached?
 
       execute_diff(diff)
 
@@ -262,51 +263,21 @@ module MicrosoftSync
       retry_object_for_error(e, step: :step_generate_diff)
     end
 
-    def raise_and_disable_group(error_class)
-      err = error_class.new
-      # Need to manually update last_error; StateMachineJob won't do it since the group
-      # will be in a 'deleted' state
-      group.update last_error: MicrosoftSync::Errors.serialize(err)
-      group.destroy
-      raise err
-    end
-
     # Execute a MembershipDiff or PartialMembershipDiff -- add and remove
     # users in batches
     def execute_diff(diff)
-      execute_diff_remove_users(diff)
-      execute_diff_add_users(diff)
-    rescue Errors::MissingOwners
-      # If the group is close to the max number of users, we might need to
-      # remove users first to make room for new users.
-      # e.g.: group has 25000 users, course has 100 removed but 1 added. Need
-      # to remove at least 1 user before we can add 1.
-      #
-      # However, Microsoft will not let you remove the last owner in a group.
-      # So if a course has 1 owner and it is swapped out for a different owner,
-      # we should add the new one first. This is a rare scenario and because
-      # the Microsoft API is eventually consistent, we'd have to wait a bit to
-      # remove the old owner. So just add the new owners, raise the error and
-      # have them manually re-sync.
-      execute_diff_add_users(diff)
-      raise
-    end
-
-    def execute_diff_add_users(diff)
-      diff.additions_in_slices_of(GraphService::GROUP_USERS_BATCH_SIZE) do |members_and_owners|
+      batch_size = GraphService::GROUP_USERS_BATCH_SIZE
+      diff.additions_in_slices_of(batch_size) do |members_and_owners|
         skipped = graph_service.add_users_to_group_ignore_duplicates(
           group.ms_group_id, **members_and_owners
         )
         log_batch_skipped(:add, skipped)
       end
-    rescue Errors::MembersQuotaExceeded
-      raise_and_disable_group(MaxMemberEnrollmentsReached)
-    rescue Errors::OwnersQuotaExceeded
-      raise_and_disable_group(MaxOwnerEnrollmentsReached)
-    end
 
-    def execute_diff_remove_users(diff)
-      diff.removals_in_slices_of(GraphService::GROUP_USERS_BATCH_SIZE) do |members_and_owners|
+      # Microsoft will not let you remove the last owner in a group, so it's
+      # slightly safer to remove users last in case we need to completely
+      # change owners.
+      diff.removals_in_slices_of(batch_size) do |members_and_owners|
         skipped = graph_service.remove_group_users_ignore_missing(
           group.ms_group_id, **members_and_owners
         )

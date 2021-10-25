@@ -70,24 +70,13 @@ function createCache() {
   return new InMemoryCache({
     addTypename: true,
     dataIdFromObject: object => {
-      let cacheKey
-
       if (object.id) {
-        cacheKey = object.id
+        return object.id
       } else if (object._id && object.__typename) {
-        cacheKey = object.__typename + object._id
+        return object.__typename + object._id
       } else {
         return null
       }
-
-      // Multiple distinct RubricAssessments (and likely other versionable
-      // objects) may be represented by the same ID and type. Add the
-      // artifactAttempt field to the cache key to assessments for different
-      // attempts don't collide.
-      if (object.__typename === 'RubricAssessment' && object.artifactAttempt != null) {
-        cacheKey = `${cacheKey}:${object.artifactAttempt}`
-      }
-      return cacheKey
     },
     fragmentMatcher: new IntrospectionFragmentMatcher({
       introspectionQueryResultData

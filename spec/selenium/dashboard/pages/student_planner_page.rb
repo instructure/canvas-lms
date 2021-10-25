@@ -452,6 +452,10 @@ module PlannerPageObject
     dashboard_options_menu_container.click
   end
 
+  def scroll_height
+    driver.execute_script("return window.pageYOffset")
+  end
+
   def item_top_position(index)
     items_displayed[index].location.y
   end

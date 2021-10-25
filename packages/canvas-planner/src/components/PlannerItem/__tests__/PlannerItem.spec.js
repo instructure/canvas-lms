@@ -545,11 +545,6 @@ it('disables the checkbox when toggleAPIPending is true', () => {
   expect(wrapper.find('Checkbox').prop('disabled')).toBe(true)
 })
 
-it('renders the checkbox as disabled when isObserving', () => {
-  const wrapper = shallow(<PlannerItem {...defaultProps()} isObserving />)
-  expect(wrapper.find('Checkbox').prop('disabled')).toBe(true)
-})
-
 it('registers itself as animatable', () => {
   const fakeRegister = jest.fn()
   const fakeDeregister = jest.fn()

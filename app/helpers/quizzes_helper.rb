@@ -23,7 +23,7 @@ require 'nokogiri'
 module QuizzesHelper
   RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/
 
-  def needs_unpublished_warning?(quiz = @quiz)
+  def needs_unpublished_warning?(quiz = @quiz, user = @current_user)
     return false unless can_publish(quiz)
 
     !quiz.available? || quiz.unpublished_changes?
