@@ -42,13 +42,16 @@ module Canvas
       end
 
       def upload!
-        return if (local_files - previous_manifest).empty? # nothing to change
+        upload_files = local_files - previous_manifest
+
+        return if upload_files.empty? # nothing to change
 
         opts = { in_threads: 16, progress: 'uploading to S3' }
         if block_given?
-          opts[:finish] = ->(_, i, _) { yield (100.0 * i / local_files.count) }
+          opts[:finish] = ->(_, i, _) { yield (100.0 * i / upload_files.count) }
         end
-        Parallel.each(local_files, opts) { |file| upload_file(file) }
+        log("will upload #{upload_files.count} / #{local_files.count} files") if @verbose
+        Parallel.each(upload_files, opts) { |file| upload_file(file) }
         # success - we can push the manifest
         push_manifest
       end
