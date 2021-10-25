@@ -63,7 +63,7 @@ if Qti.migration_executable
     end
 
     it "converts matching questions where the answers are given out of order" do
-      hash = get_question_hash(bb9_question_dir, 'matching2', false)
+      hash = get_question_hash(bb9_question_dir, 'matching2', delete_answer_ids: false)
       matches = {}
       hash[:matches].each { |m| matches[m[:match_id]] = m[:text] }
       hash[:answers].each do |a|
@@ -76,12 +76,12 @@ if Qti.migration_executable
     end
 
     it "converts true/false questions using identifiers, not mattext" do
-      hash = get_question_hash(bb9_question_dir, 'true_false', false, :flavor => Qti::Flavors::BBLEARN)
+      hash = get_question_hash(bb9_question_dir, 'true_false', delete_answer_ids: false, flavor: Qti::Flavors::BBLEARN)
       hash[:answers].each { |m| expect(m[:migration_id]).to eq m[:text].downcase }
     end
 
     it "replaces negative points possible with zero" do
-      hash = get_question_hash(bb9_question_dir, 'minus_one', false, :flavor => Qti::Flavors::BBLEARN)
+      hash = get_question_hash(bb9_question_dir, 'minus_one', delete_answer_ids: false, flavor: Qti::Flavors::BBLEARN)
       expect(hash[:points_possible]).to eq 0.0
     end
   end

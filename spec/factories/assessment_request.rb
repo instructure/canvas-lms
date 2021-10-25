@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def assessment_request_model(opts = {})
+  def assessment_request_model
     @user = user_model
     @user2 = user_model
     @submission = submission_model

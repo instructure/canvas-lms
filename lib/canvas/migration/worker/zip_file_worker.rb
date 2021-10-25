@@ -20,6 +20,7 @@
 class Canvas::Migration::Worker::ZipFileWorker < Canvas::Migration::Worker::Base
   def perform(cm = nil)
     cm ||= ContentMigration.find migration_id
+    cm.save if cm.capture_job_id
 
     cm.workflow_state = :importing
     cm.migration_settings[:skip_import_notification] = true

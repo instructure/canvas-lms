@@ -172,7 +172,6 @@ describe "add_people" do
       option_list_id = roleselect.attribute('aria-controls')
       expect(f('body')).to contain_css("##{option_list_id}")
 
-      optionList = f("##{option_list_id}")
       roleselect.send_keys(:escape)
       expect(f('body')).not_to contain_css("##{option_list_id}")
 

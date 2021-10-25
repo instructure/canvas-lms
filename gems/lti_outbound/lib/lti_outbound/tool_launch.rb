@@ -56,7 +56,7 @@ module LtiOutbound
       hash['ext_outcome_submission_submitted_at_accepted'] = true
       hash['ext_outcomes_tool_placement_url'] = lti_turnitin_outcomes_placement_url
 
-      add_assignment_substitutions!(assignment)
+      add_assignment_substitutions!
     end
 
     def for_homework_submission!(assignment)
@@ -66,7 +66,7 @@ module LtiOutbound
       hash['ext_content_return_types'] = assignment.return_types.join(',')
       hash['ext_content_file_extensions'] = assignment.allowed_extensions.join(',') if assignment.allowed_extensions
 
-      add_assignment_substitutions!(assignment)
+      add_assignment_substitutions!
     end
 
     def generate(overrides = {})
@@ -141,7 +141,7 @@ module LtiOutbound
 
     private
 
-    def add_assignment_substitutions!(assignment)
+    def add_assignment_substitutions!
       if tool.public?
         hash['custom_canvas_assignment_id'] = '$Canvas.assignment.id'
         if @include_module_context

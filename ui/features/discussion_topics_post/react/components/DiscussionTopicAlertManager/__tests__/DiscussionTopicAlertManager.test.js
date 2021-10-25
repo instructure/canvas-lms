@@ -1,0 +1,63 @@
+/*
+ * Copyright (C) 2021 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import {render} from '@testing-library/react'
+import React from 'react'
+import {DiscussionTopicAlertManager} from '../DiscussionTopicAlertManager'
+
+import {Discussion} from '../../../../graphql/Discussion'
+import {Assignment} from '../../../../graphql/Assignment'
+
+jest.mock('../../../utils', () => ({
+  ...jest.requireActual('../../../utils'),
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+}))
+
+const setup = props => {
+  return render(<DiscussionTopicAlertManager {...props} />)
+}
+
+describe('DiscussionTopicAlertManager', () => {
+  it('should render post required alert', () => {
+    const container = setup({
+      discussionTopic: Discussion.mock({
+        initialPostRequiredForCurrentUser: true
+      })
+    })
+    expect(container.getByTestId('post-required')).toBeTruthy()
+  })
+
+  it('should render differentiated group topics alert', () => {
+    const container = setup({
+      discussionTopic: Discussion.mock({
+        assignment: Assignment.mock({onlyVisibleToOverrides: true})
+      })
+    })
+    expect(container.queryByTestId('differentiated-group-topics')).toBeTruthy()
+  })
+
+  it('should render delayed until alert', () => {
+    const container = setup({
+      discussionTopic: Discussion.mock({
+        delayedPostAt: '3020-11-23T11:40:44-07:00',
+        isAnnouncement: true
+      })
+    })
+    expect(container.queryByTestId('delayed-until')).toBeTruthy()
+  })
+})

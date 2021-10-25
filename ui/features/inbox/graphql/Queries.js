@@ -75,13 +75,17 @@ export const COURSES_QUERY = gql`
 `
 
 export const REPLY_CONVERSATION_QUERY = gql`
-  query ReplyConversationQuery($conversationID: ID!, $participants: [ID!]) {
+  query ReplyConversationQuery(
+    $conversationID: ID!
+    $participants: [ID!]
+    $createdBefore: DateTime
+  ) {
     legacyNode(_id: $conversationID, type: Conversation) {
       ... on Conversation {
         _id
         contextName
         subject
-        conversationMessagesConnection(participants: $participants) {
+        conversationMessagesConnection(participants: $participants, createdBefore: $createdBefore) {
           nodes {
             ...ConversationMessage
           }

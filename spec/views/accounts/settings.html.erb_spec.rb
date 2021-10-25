@@ -556,7 +556,7 @@ describe "accounts/settings.html.erb" do
     let(:site_admin) { site_admin_user }
     let(:sub_account) { account_model(root_account: account) }
 
-    def render_for(target_account, target_user, &block)
+    def render_for(target_account, target_user)
       assign(:context, target_account)
       assign(:account, target_account)
       assign(:root_account, target_account)

@@ -193,7 +193,7 @@ module Canvas
         it "respects the lease duration for expiration" do
           cache_key = ::Canvas::Vault::CACHE_KEY_PREFIX + credential_path
           expect(LocalCache.fetch(cache_key)).to be_nil
-          result = described_class.read(credential_path)
+          described_class.read(credential_path)
           cache_entry = LocalCache.cache.send(:read_entry, LocalCache.cache.send(:normalize_key, cache_key, {}), {})
           expiry_approximate = Time.now.utc.to_i + (lease_duration / 2)
           expiry_delta = (cache_entry.expires_at - expiry_approximate).abs

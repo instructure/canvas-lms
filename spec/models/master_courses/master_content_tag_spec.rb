@@ -47,7 +47,7 @@ describe MasterCourses::MasterContentTag do
     end
 
     it "does not touch when the tag is created" do
-      tag = @template.create_content_tag_for!(@topic, :restrictions => { :content => true })
+      @template.create_content_tag_for!(@topic, :restrictions => { :content => true })
       expect(@topic.reload.updated_at.to_i).to eq @time.to_i
     end
 
@@ -95,10 +95,10 @@ describe MasterCourses::MasterContentTag do
       @copy_from = course_factory
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       topic = @copy_from.discussion_topics.create!
-      topic_master_tag = @template.create_content_tag_for!(topic)
+      @template.create_content_tag_for!(topic)
       assmt = @copy_from.assignments.create!
       restrictions = { :content => true }
-      assmt_master_tag = @template.create_content_tag_for!(assmt, { :restrictions => restrictions })
+      @template.create_content_tag_for!(assmt, { :restrictions => restrictions })
 
       mod = @copy_from.context_modules.create!(:name => "something")
       tag1 = mod.add_item(:id => topic.id, :type => "discussion_topic")

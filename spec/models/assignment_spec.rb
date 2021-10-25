@@ -7136,7 +7136,7 @@ describe Assignment do
       gc = @course.group_categories.create! name: "Homework Groups"
       @assignment.update group_category_id: gc.id,
                          grade_group_students_individually: false
-      g1, g2 = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
+      g1, _g2 = Array.new(2) { |i| gc.groups.create! name: "Group #{i}", context: @course }
       g1.add_user(s1)
       g1.add_user(s2)
 

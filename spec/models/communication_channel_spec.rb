@@ -276,7 +276,7 @@ describe CommunicationChannel do
     expect(@cc3.position).to eql(1)
   end
 
-  it "correctlies count the number of confirmations sent" do
+  it "counts the number of confirmations sent correctly" do
     account = Account.create!
     @u1 = User.create!
     @cc1 = communication_channel(@u1, { username: 'landong@instructure.com' })

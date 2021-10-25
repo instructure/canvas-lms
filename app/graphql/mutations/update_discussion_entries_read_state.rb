@@ -24,8 +24,10 @@ class Mutations::UpdateDiscussionEntriesReadState < Mutations::BaseMutation
   argument :discussion_entry_ids, [ID], required: true, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('DiscussionEntry')
   argument :read, Boolean, required: true
 
-  field :discussion_entries, [Types::DiscussionEntryType], null: false
+  field :discussion_entries, [Types::DiscussionEntryType], null: true
   def resolve(input:)
+    return validation_error(I18n.t('Discussion entry ids must have at least one id')) if input[:discussion_entry_ids].blank?
+
     entries = DiscussionEntry.where(id: input[:discussion_entry_ids])
     raise GraphQL::ExecutionError, 'not found' if entries.count != input[:discussion_entry_ids].count
 

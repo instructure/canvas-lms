@@ -205,14 +205,14 @@ describe RoleOverride do
       end
 
       it "only updates the parts that are specified" do
-        new_override = RoleOverride.manage_role_override(@account, @role, @permission, :override => false)
+        RoleOverride.manage_role_override(@account, @role, @permission, :override => false)
         @existing_override.reload
         expect(@existing_override.locked).to be_falsey
 
         @existing_override.enabled = true
         @existing_override.save
 
-        new_override = RoleOverride.manage_role_override(@account, @role, @permission, :locked => true)
+        RoleOverride.manage_role_override(@account, @role, @permission, :locked => true)
         @existing_override.reload
         expect(@existing_override.enabled).to be_truthy
       end
@@ -438,7 +438,7 @@ describe RoleOverride do
       it "grants permissions on root accounts to custom site admins" do
         custom_role = custom_account_role("somerole", :account => Account.site_admin)
         Account.site_admin.role_overrides.create!(role: custom_role, enabled: true, permission: :manage_site_settings)
-        custom_site_admin = account_admin_user(account: Account.site_admin, role: custom_role)
+        account_admin_user(account: Account.site_admin, role: custom_role)
         expect(Account.default.grants_right?(@site_admin, :manage_site_settings)).to be_truthy
       end
 
@@ -721,7 +721,7 @@ describe RoleOverride do
       cache_key = "role_override_calculation/#{Shard.global_id_for(role)}"
       expect(RoleOverride).to receive(:uncached_permission_for).once.and_call_original
       expect(RequestCache).not_to receive(:cache).with(cache_key, account)
-      permissions = RoleOverride.permission_for(account, :moderate_forum, role, account, true)
+      RoleOverride.permission_for(account, :moderate_forum, role, account, true)
     end
   end
 end

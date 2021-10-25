@@ -53,11 +53,10 @@ describe Quizzes::OutstandingQuizSubmissionManager do
       sub_count = @outstanding.find_by_quiz.size
       student_count = 2
       students = student_count.times.map { student_in_course(active_all: true).user }
-      submissions = students.map do |student|
+      students.each do |student|
         submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(student, false)
         submission.end_at = 20.minutes.ago
         submission.save
-        submission
       end
       subs = @outstanding.find_by_quiz
       expect(subs.size).to eq(sub_count + student_count)
@@ -92,7 +91,6 @@ describe Quizzes::OutstandingQuizSubmissionManager do
     it 'does not grade ungraded quizzes for concluded students' do
       student = student_in_course(active_all: true)
       student.conclude
-      user = student.user
       quizzes = 2.times.map { @course.quizzes.create! }
 
       ungraded_qs = quizzes[0].generate_submission(student).tap do |qs|

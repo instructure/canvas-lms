@@ -105,14 +105,6 @@ module IgnoreMonkeyPatchesInDeprecations
 end
 ActiveSupport::Deprecation.prepend(IgnoreMonkeyPatchesInDeprecations)
 
-module RaiseErrorOnDurationCoercion
-  def coerce(other)
-    ::Rails.logger.error("Implicit numeric calculations on a duration are getting changed in Rails 5.1 - e.g. `240 / 2.minutes` will return `120` instead of `2` - so please make the duration explicit with to_i")
-    raise # i'd raise the message but it gets swallowed up in a TypeError
-  end
-end
-ActiveSupport::Duration.prepend(RaiseErrorOnDurationCoercion)
-
 module Enumerable
   def pluck(*keys)
     if keys.many?

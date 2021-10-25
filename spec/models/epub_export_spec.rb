@@ -342,10 +342,10 @@ describe EpubExport do
 
   it "escapes html characters in titles" do
     course_with_student(active_all: true)
-    assignment = @course.assignments.create!({
-                                               title: 'here you go </html> lol',
-                                               description: "beep beep"
-                                             })
+    @course.assignments.create!({
+                                  title: 'here you go </html> lol',
+                                  description: "beep beep"
+                                })
 
     EpubExports::CreateService.new(@course, @student, :epub_export).save
     run_jobs

@@ -139,4 +139,12 @@ module OtherHelperMethods
   def clear_local_storage
     driver.execute_script 'localStorage.clear();'
   end
+
+  def scroll_height
+    driver.execute_script 'return window.pageYOffset'
+  end
+
+  def focused_element
+    driver.execute_script 'return document.activeElement'
+  end
 end

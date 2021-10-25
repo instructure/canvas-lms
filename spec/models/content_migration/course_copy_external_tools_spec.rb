@@ -93,7 +93,7 @@ describe ContentMigration do
     it "copies account-level external tool assignments" do
       account_tool = @copy_from.account.context_external_tools.build name: 'blah', url: 'https://blah.example.com', shared_secret: '123', consumer_key: '456'
       assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
-      tag_from = @assignment.create_external_tool_tag(:url => "http://blah.example.com/one", :new_tab => true, :content => account_tool)
+      @assignment.create_external_tool_tag(:url => "http://blah.example.com/one", :new_tab => true, :content => account_tool)
 
       run_course_copy
 
@@ -141,8 +141,8 @@ describe ContentMigration do
 
     it "keeps reference to ContextExternalTool by id for courses" do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
-      tag = mod1.add_item :type => 'context_external_tool', :id => @tool_from.id,
-                          :url => "https://www.example.com/launch"
+      mod1.add_item :type => 'context_external_tool', :id => @tool_from.id,
+                    :url => "https://www.example.com/launch"
       run_course_copy
 
       tool_copy = @copy_to.context_external_tools.where(migration_id: mig_id(@tool_from)).first

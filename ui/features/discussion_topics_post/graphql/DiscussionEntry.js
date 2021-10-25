@@ -42,6 +42,7 @@ export const DiscussionEntry = {
         rating
         read
         forcedReadState
+        reportType
       }
       rootEntryParticipantCounts {
         unreadCount
@@ -88,7 +89,8 @@ export const DiscussionEntry = {
     entryParticipant: shape({
       rating: bool,
       read: bool,
-      forcedReadState: bool
+      forcedReadState: bool,
+      reportType: string
     }),
     rootEntryParticipantCounts: shape({
       unreadCount: number,
@@ -131,6 +133,7 @@ export const DiscussionEntry = {
       rating: false,
       read: true,
       forcedReadState: false,
+      reportType: null,
       __typename: 'EntryParticipant'
     },
     rootEntryParticipantCounts = {

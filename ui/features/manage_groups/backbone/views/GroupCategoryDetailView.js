@@ -20,12 +20,12 @@ import ReactDOM from 'react-dom'
 import I18n from 'i18n!groups'
 import $ from 'jquery'
 import {View} from '@canvas/backbone'
-import MessageStudentsDialog from '@canvas/message-students-dialog'
 import RandomlyAssignMembersView from './RandomlyAssignMembersView'
 import GroupCategoryEditView from '@canvas/groups/backbone/views/GroupCategoryEditView.coffee'
 import template from '../../jst/groupCategoryDetail.handlebars'
 import GroupModal from '@canvas/group-modal'
 import GroupCategoryCloneModal from '../../react/GroupCategoryCloneModal'
+import GroupCategoryMessageAllUnassignedModal from '../../react/GroupCategoryMessageAllUnassignedModal'
 import GroupImportModal from '../../react/GroupImportModal'
 
 export default class GroupCategoryDetailView extends View {
@@ -177,8 +177,8 @@ export default class GroupCategoryDetailView extends View {
     )
   }
 
-  messageAllUnassigned(e) {
-    e.preventDefault()
+  messageAllUnassigned(e, open = true) {
+    if (e) e.preventDefault()
     const disabler = $.Deferred()
     this.parentView.$el.disableWhileLoading(disabler)
     disabler.done(() => {
@@ -186,20 +186,21 @@ export default class GroupCategoryDetailView extends View {
       const students = this.model
         .unassignedUsers()
         .map(user => ({id: user.get('id'), short_name: user.get('short_name')}))
-      const dialog = new MessageStudentsDialog({
-        trigger: this.$messageAllUnassignedLink,
-        context: this.model.get('name'),
-        recipientGroups: [
-          {
-            name: I18n.t(
-              'students_who_have_not_joined_a_group',
-              'Students who have not joined a group'
-            ),
-            recipients: students
-          }
-        ]
-      })
-      return dialog.open()
+      const dialog = () => {
+        ReactDOM.render(
+          <GroupCategoryMessageAllUnassignedModal
+            groupCategory={{name: this.model.get('name')}}
+            recipients={students}
+            open={open}
+            onDismiss={() => {
+              this.messageAllUnassigned(null, false)
+              this.$messageAllUnassignedLink.focus()
+            }}
+          />,
+          document.getElementById('group-category-message-all-unassigned-mount-point')
+        )
+      }
+      return dialog()
     })
     const users = this.model.unassignedUsers()
     // get notified when last page is fetched and then open the dialog

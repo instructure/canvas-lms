@@ -53,8 +53,23 @@ describe('MessageDetailItem', () => {
     expect(getByText(createdAt)).toBeInTheDocument()
   })
 
+  it('shows attachment links if they exist', () => {
+    const props = {
+      conversationMessage: {
+        author: {name: 'Tom Thompson'},
+        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+        createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
+        body: 'This is the body text for the message.',
+        attachmentsConnection: {nodes: [{displayName: 'attachment1.jpeg', url: 'testingurl'}]}
+      },
+      contextName: 'Fake Course 1'
+    }
+
+    const {getByText} = render(<MessageDetailItem {...props} />)
+    expect(getByText('attachment1.jpeg')).toBeInTheDocument()
+  })
+
   it('sends the selected option to the provided callback function', () => {
-    const handleOptionSelectMock = jest.fn()
     const props = {
       conversationMessage: {
         author: {name: 'Tom Thompson'},
@@ -63,7 +78,8 @@ describe('MessageDetailItem', () => {
         body: 'This is the body text for the message.'
       },
       contextName: 'Fake Course 1',
-      handleOptionSelect: handleOptionSelectMock
+      handleOptionSelect: jest.fn(),
+      onReply: jest.fn()
     }
 
     const {getByRole, getByText} = render(<MessageDetailItem {...props} />)
@@ -72,13 +88,13 @@ describe('MessageDetailItem', () => {
       (role, element) => role === 'button' && element.textContent === 'Reply'
     )
     fireEvent.click(replyButton)
-    expect(handleOptionSelectMock).toHaveBeenLastCalledWith('reply')
+    expect(props.onReply).toHaveBeenLastCalledWith(props.conversationMessage)
 
     const moreOptionsButton = getByRole(
       (role, element) => role === 'button' && element.textContent === 'More options'
     )
     fireEvent.click(moreOptionsButton)
     fireEvent.click(getByText('Forward'))
-    expect(handleOptionSelectMock).toHaveBeenLastCalledWith('forward')
+    expect(props.handleOptionSelect).toHaveBeenLastCalledWith('forward')
   })
 })

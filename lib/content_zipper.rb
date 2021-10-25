@@ -255,10 +255,15 @@ class ContentZipper
 
     attachments = attachments.select { |a| opts[:exporter].export_object?(a) } if opts[:exporter]
     attachments.select { |a| !@check_user || a.grants_right?(@user, :download) }.each do |attachment|
+      attachment.display_name = Attachment.shorten_filename(attachment.display_name)
+      # Preventing further unwanted filename alterations during the rest of the process,
+      # namely, in the callback further below. Also, we want to avoid accidental saving of the file
+      # with the shortened name
+      attachment.readonly!
+      path = folder_names.empty? ? attachment.display_name : File.join(folder_names, attachment.display_name)
       callback.call(attachment, folder_names) if callback
       @context = folder.context
       @logger.debug("  found attachment: #{attachment.unencoded_filename}")
-      path = folder_names.empty? ? attachment.display_name : File.join(folder_names, attachment.display_name)
       if add_attachment_to_zip(attachment, zipfile, path)
         @files_added ||= 0
         @files_added += 1

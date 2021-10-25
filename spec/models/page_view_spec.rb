@@ -135,7 +135,7 @@ describe PageView do
 
     it "halts pagination after a set time period" do
       p1 = page_view_model(:user => @user)
-      p2 = page_view_model(:user => @user, :created_at => 13.months.ago)
+      page_view_model(:user => @user, :created_at => 13.months.ago)
       coll = @user.page_views.paginate(:per_page => 3)
       expect(coll).to eq [p1]
       expect(coll.next_page).to be_blank

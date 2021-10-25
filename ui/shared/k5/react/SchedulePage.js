@@ -29,8 +29,8 @@ import {
 } from '@instructure/canvas-planner'
 import {ApplyTheme} from '@instructure/ui-themeable'
 
-import EmptyDashboardState from '@canvas/k5/react/EmptyDashboardState'
-import {plannerTheme} from '@canvas/k5/react/k5-theme'
+import EmptyDashboardState from './EmptyDashboardState'
+import {plannerTheme} from './k5-theme'
 
 const SchedulePage = ({
   plannerEnabled,

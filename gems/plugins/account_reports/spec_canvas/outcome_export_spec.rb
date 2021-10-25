@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
 describe "Outcome Reports" do
   include ReportSpecHelper
 
-  RATING_INDEX = AccountReports::OutcomeExport::OUTCOME_EXPORT_HEADERS.find_index('ratings')
+  let(:rating_index) { AccountReports::OutcomeExport::OUTCOME_EXPORT_HEADERS.find_index('ratings') }
 
   describe 'outcome export' do
     def match_row(attrs)
@@ -50,7 +50,7 @@ describe "Outcome Reports" do
 
     def n_ratings?(n)
       satisfy("have #{n} ratings") do |row|
-        row.length - RATING_INDEX == 2 * n
+        row.length - rating_index == 2 * n
       end
     end
 
@@ -289,10 +289,10 @@ describe "Outcome Reports" do
 
         it 'includes all ratings' do
           expect(first_outcome).to n_ratings?(2)
-          expect(first_outcome[RATING_INDEX]).to eq '3.0'
-          expect(first_outcome[RATING_INDEX + 1]).to eq 'Rockin'
-          expect(first_outcome[RATING_INDEX + 2]).to eq '0.0'
-          expect(first_outcome[RATING_INDEX + 3]).to eq 'Lame'
+          expect(first_outcome[rating_index]).to eq '3.0'
+          expect(first_outcome[rating_index + 1]).to eq 'Rockin'
+          expect(first_outcome[rating_index + 2]).to eq '0.0'
+          expect(first_outcome[rating_index + 3]).to eq 'Lame'
         end
 
         it 'includes different number of fields depending on how many ratings are present' do
@@ -308,19 +308,19 @@ describe "Outcome Reports" do
           }
           @root_outcome_1.save!
           expect(first_outcome).to n_ratings?(6)
-          expect(first_outcome[RATING_INDEX]).to eq '10.0'
-          expect(first_outcome[RATING_INDEX + 1]).to eq 'a fly'
-          expect(first_outcome[RATING_INDEX + 10]).to eq '0.0'
-          expect(first_outcome[RATING_INDEX + 11]).to eq 'I know'
-          expect(first_outcome[RATING_INDEX + 12]).to be_nil
-          expect(first_outcome[RATING_INDEX + 13]).to be_nil
+          expect(first_outcome[rating_index]).to eq '10.0'
+          expect(first_outcome[rating_index + 1]).to eq 'a fly'
+          expect(first_outcome[rating_index + 10]).to eq '0.0'
+          expect(first_outcome[rating_index + 11]).to eq 'I know'
+          expect(first_outcome[rating_index + 12]).to be_nil
+          expect(first_outcome[rating_index + 13]).to be_nil
         end
 
         it 'exports successfully with no ratings' do
           @root_outcome_1.data = nil
           @root_outcome_1.save!
           default_count = LearningOutcome.default_rubric_criterion[:ratings].length
-          expect(first_outcome.length).to eq RATING_INDEX + (default_count * 2)
+          expect(first_outcome.length).to eq rating_index + (default_count * 2)
         end
       end
 
@@ -334,7 +334,7 @@ describe "Outcome Reports" do
         end
 
         it 'formats rating points' do
-          expect(report[0][RATING_INDEX]).to eq '3,0'
+          expect(report[0][rating_index]).to eq '3,0'
         end
       end
     end

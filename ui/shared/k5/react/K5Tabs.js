@@ -26,6 +26,16 @@ import {AccessibleContent} from '@instructure/ui-a11y-content'
 
 import k5Theme from './k5-theme'
 
+export const scrollElementIntoViewIfCoveredByHeader = tabsRef => e => {
+  const elementY = e.target.getBoundingClientRect().y
+  const headerHeight = tabsRef.getBoundingClientRect().y + tabsRef.getBoundingClientRect().height
+  // If the focused element is positioned higher than the sticky header, scroll the window by
+  // the difference in height (plus a little extra for legibility)
+  if (headerHeight && elementY && elementY < headerHeight) {
+    window.scrollBy(0, elementY - headerHeight - 30)
+  }
+}
+
 const K5IconTab = ({icon: Icon, label, selected, courseContext}) => (
   <span className={classnames('ic-Dashboard-tabs__tab', {selected})}>
     <Icon />

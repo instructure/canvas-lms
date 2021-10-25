@@ -66,18 +66,18 @@ def createDistribution(nestedStages) {
 
   if (rspecqEnabled) {
     extendedStage('RSpecQ Reporter for Rspec')
-          .envVars(rspecqEnvVars)
-          .hooks([onNodeAcquired: setupNodeHook])
-          .nodeRequirements(rspecNodeRequirements)
-          .timeout(15)
-          .queue(nestedStages, this.&runReporter)
+        .envVars(rspecqEnvVars)
+        .hooks([onNodeAcquired: setupNodeHook])
+        .nodeRequirements(rspecNodeRequirements)
+        .timeout(10)
+        .queue(nestedStages, this.&runReporter)
 
     rspecqNodeTotal.times { index ->
       extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
           .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
           .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('spec') }])
           .nodeRequirements(rspecNodeRequirements)
-          .timeout(15)
+          .timeout(10)
           .queue(nestedStages, this.&runRspecqSuite)
     }
   } else {
@@ -102,6 +102,14 @@ def createDistribution(nestedStages) {
 }
 
 def setupNode() {
+  env.AUTO_CANCELLED = 'false'
+  if (queue_empty()) {
+    catchError([buildResult: 'SUCCESS', stageResult: 'ABORTED']) {
+      env.AUTO_CANCELLED = 'true'
+      error 'Test queue is empty, releasing node.'
+    }
+    return
+  }
   distribution.unstashBuildScripts()
   libraryScript.execute 'bash/print-env-excluding-secrets.sh'
   if (env.RSPECQ_ENABLED == '1') {
@@ -116,6 +124,9 @@ def setupNode() {
 }
 
 def tearDownNode(prefix) {
+  if (env.AUTO_CANCELLED.toBoolean()) {
+    return
+  }
   sh 'rm -rf ./tmp && mkdir -p tmp'
   sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
   sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
@@ -168,6 +179,9 @@ def tearDownNode(prefix) {
 
 def runRspecqSuite() {
   try {
+    if (env.AUTO_CANCELLED.toBoolean()) {
+      return
+    }
     sh(script: 'docker-compose exec -T -e ENABLE_AXE_SELENIUM \
                                        -e RSPECQ_ENABLED \
                                        -e SENTRY_DSN \
@@ -230,4 +244,12 @@ def runReporter() {
 
     throw e
   }
+}
+
+def queue_empty() {
+  env.REGISTRY_BASE = 'starlord.inscloudgate.net/jenkins'
+  sh "docker pull $REGISTRY_BASE/redis:alpine"
+  def queueSize = sh(script: "docker run -e REDISCLI_AUTH=${RSPECQ_REDIS_PASSWORD} -e TEST_QUEUE_HOST -t $REGISTRY_BASE/redis:alpine redis-cli -h $TEST_QUEUE_HOST -p 6379 llen ${JOB_NAME}_build${BUILD_NUMBER}:queue:unprocessed", returnStdout: true).split(' ')[1].trim()
+  def queueStatus = sh(script: "docker run -e REDISCLI_AUTH=${RSPECQ_REDIS_PASSWORD} -e TEST_QUEUE_HOST -t $REGISTRY_BASE/redis:alpine redis-cli -h $TEST_QUEUE_HOST -p 6379 get  ${JOB_NAME}_build${BUILD_NUMBER}:queue:status", returnStdout: true).trim()
+  queueStatus == '\"ready\"' && queueSize.toInteger() == 0
 }

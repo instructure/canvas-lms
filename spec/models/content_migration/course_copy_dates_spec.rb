@@ -44,9 +44,9 @@ describe ContentMigration do
         folder = @copy_from.folders.create!(name: 'shifty',
                                             unlock_at: @old_start - 3.days,
                                             lock_at: @old_start + 2.days)
-        dummy_file = @copy_from.attachments.create!(filename: 'blah',
-                                                    uploaded_data: StringIO.new('blah'),
-                                                    folder: folder)
+        @copy_from.attachments.create!(filename: 'blah',
+                                       uploaded_data: StringIO.new('blah'),
+                                       folder: folder)
 
         @copy_from.quizzes.create!(:due_at => "05 Jul 2012 06:00:00 UTC +00:00",
                                    :unlock_at => @old_start + 1.days,
@@ -414,7 +414,7 @@ describe ContentMigration do
       expect((new_assignment.due_at.to_i - (today + 1.day).to_i).abs).to be < 60
     end
 
-    it "correctlies copy all day dates for assignments and events" do
+    it "copies all day dates for assignments and events correctly" do
       date = "Jun 21 2012 11:59pm"
       date2 = "Jun 21 2012 00:00am"
       asmnt = @copy_from.assignments.create!(:title => 'all day', :due_at => date)

@@ -63,7 +63,7 @@ module IncomingMailProcessor
       with_timeout { pop_message.delete }
     end
 
-    def move_message(pop_message, target_folder)
+    def move_message(pop_message, _target_folder)
       # pop can't do this -- just delete the message
       delete_message(pop_message)
     end

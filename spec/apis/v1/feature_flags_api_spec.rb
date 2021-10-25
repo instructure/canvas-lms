@@ -290,9 +290,9 @@ describe "Feature Flags API", type: :request do
 
     describe "hidden" do
       it "does not find a hidden feature if the caller is an account admin" do
-        json = api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features/flags/hidden_feature",
-                                { controller: 'feature_flags', action: 'show', format: 'json', account_id: t_root_account.to_param, feature: 'hidden_feature' },
-                                {}, {}, { expected_status: 404 })
+        api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features/flags/hidden_feature",
+                         { controller: 'feature_flags', action: 'show', format: 'json', account_id: t_root_account.to_param, feature: 'hidden_feature' },
+                         {}, {}, { expected_status: 404 })
       end
 
       it "finds a hidden feature on a root account if the caller is site admin" do

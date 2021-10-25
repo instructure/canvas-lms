@@ -912,7 +912,7 @@ describe Quizzes::Quiz do
     it "shuffles submission questions" do
       u1 = User.create!(:name => "user 1")
       u2 = User.create!(:name => "user 2")
-      u3 = User.create!(:name => "user 3")
+      User.create!(:name => "user 3")
 
       quiz = @course.quizzes.create!(:title => "some quiz")
 

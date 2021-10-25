@@ -232,7 +232,7 @@ describe ActiveRecord::Base do
       @orig_user_count = User.count
     end
 
-    it "normallies run once" do
+    it "normally runs once" do
       User.unique_constraint_retry do
         User.create!
       end

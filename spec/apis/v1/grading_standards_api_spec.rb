@@ -107,7 +107,7 @@ describe GradingStandardsApiController, type: :request do
       end
 
       it "returns a 404 if the grading standard does not exist" do
-        res = api_call(:get, "#{course_resources_path}/5", course_resource_params.merge(grading_standard_id: "5"), {}, {}, { expected_status: 404 })
+        api_call(:get, "#{course_resources_path}/5", course_resource_params.merge(grading_standard_id: "5"), {}, {}, { expected_status: 404 })
       end
     end
 

@@ -201,7 +201,7 @@ describe Login::CanvasController do
   end
 
   it "rejects canvas auth if Canvas auth is disabled" do
-    aac = Account.default.authentication_providers.create!(:auth_type => 'ldap')
+    Account.default.authentication_providers.create!(:auth_type => 'ldap')
     Account.default.canvas_authentication_provider.destroy
     get 'new'
     assert_status(404)

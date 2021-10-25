@@ -32,6 +32,11 @@ module Types
 
     implements Interfaces::LegacyIDInterface
 
+    field :artifact_attempt, Integer, null: false
+    def artifact_attempt
+      object.artifact_attempt || 0
+    end
+
     field :assessment_type, AssessmentType, null: false
 
     field :score, Float, null: true

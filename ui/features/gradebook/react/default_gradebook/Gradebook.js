@@ -55,6 +55,7 @@ import PostPolicies from './PostPolicies/index'
 import GradebookMenu from '@canvas/gradebook-menu'
 import ViewOptionsMenu from './components/ViewOptionsMenu'
 import ActionMenu from './components/ActionMenu'
+import FilterNav from './components/FilterNav'
 import EnhancedActionMenu from './components/EnhancedActionMenu'
 import AssignmentGroupFilter from './components/content-filters/AssignmentGroupFilter'
 import GradingPeriodFilter from './components/content-filters/GradingPeriodFilter'
@@ -320,6 +321,7 @@ class Gradebook extends React.Component {
     this.removeHeaderComponentRef = this.removeHeaderComponentRef.bind(this)
     // # React Grid Component Rendering Methods
     this.updateColumnHeaders = this.updateColumnHeaders.bind(this)
+    this.updateStudentColumnHeaders = this.updateStudentColumnHeaders.bind(this)
     // Column Header Helpers
     this.handleHeaderKeyDown = this.handleHeaderKeyDown.bind(this)
     // Total Grade Column Header
@@ -354,7 +356,9 @@ class Gradebook extends React.Component {
     this.setSubmissionCommentsLoaded = this.setSubmissionCommentsLoaded.bind(this)
     this.getSubmissionCommentsLoaded = this.getSubmissionCommentsLoaded.bind(this)
     // # Gradebook Application State Methods
+    this.initShowSeparateFirstLastNames = this.initShowSeparateFirstLastNames.bind(this)
     this.initShowUnpublishedAssignments = this.initShowUnpublishedAssignments.bind(this)
+    this.toggleShowSeparateFirstLastNames = this.toggleShowSeparateFirstLastNames.bind(this)
     this.toggleUnpublishedAssignments = this.toggleUnpublishedAssignments.bind(this)
     this.toggleViewUngradedAsZero = this.toggleViewUngradedAsZero.bind(this)
     this.setAssignmentsLoaded = this.setAssignmentsLoaded.bind(this)
@@ -542,6 +546,7 @@ class Gradebook extends React.Component {
       this.toggleEnrollmentFilter('inactive', true)
     }
     this.initShowUnpublishedAssignments(this.options.settings.show_unpublished_assignments)
+    this.initShowSeparateFirstLastNames(this.options.settings.show_separate_first_last_names)
     this.initSubmissionStateMap()
     this.gradebookColumnSizeSettings = this.options.gradebook_column_size_settings
     this.setColumnOrder({
@@ -1922,6 +1927,9 @@ class Gradebook extends React.Component {
       filterSettings: this.getFilterSettingsViewOptionsMenuProps(),
       showUnpublishedAssignments: this.gridDisplaySettings.showUnpublishedAssignments,
       onSelectShowUnpublishedAssignments: this.toggleUnpublishedAssignments,
+      allowShowSeparateFirstLastNames: this.options.allow_separate_first_last_names,
+      showSeparateFirstLastNames: this.gridDisplaySettings.showSeparateFirstLastNames,
+      onSelectShowSeparateFirstLastNames: this.toggleShowSeparateFirstLastNames,
       onSelectShowStatusesModal: () => {
         return this.statusesModal.open()
       },
@@ -2070,7 +2078,8 @@ class Gradebook extends React.Component {
     const columnSortProps = this.getColumnSortSettingsViewOptionsMenuProps()
     const {criterion, direction, modulesEnabled} = columnSortProps
 
-    const {viewUngradedAsZero, showUnpublishedAssignments} = this.gridDisplaySettings
+    const {viewUngradedAsZero, showUnpublishedAssignments, showSeparateFirstLastNames} =
+      this.gridDisplaySettings
 
     return {
       allowSortingByModules: modulesEnabled,
@@ -2081,6 +2090,7 @@ class Gradebook extends React.Component {
         columnSortSettings: {criterion, direction},
         showNotes: this.isTeacherNotesColumnShown(),
         showUnpublishedAssignments,
+        showSeparateFirstLastNames,
         statusColors: this.state.gridColors,
         viewUngradedAsZero
       }
@@ -2224,9 +2234,14 @@ class Gradebook extends React.Component {
 
   setVisibleGridColumns() {
     let assignmentGroupId, ref1
-    const parentColumnIds = this.gridData.columns.frozen.filter(function (columnId) {
-      return !/^custom_col_/.test(columnId)
+    let parentColumnIds = this.gridData.columns.frozen.filter(function (columnId) {
+      return !/^custom_col_/.test(columnId) && !/^student/.test(columnId)
     })
+    if (this.gridDisplaySettings.showSeparateFirstLastNames) {
+      parentColumnIds = ['student_lastname', 'student_firstname'].concat(parentColumnIds)
+    } else {
+      parentColumnIds = ['student'].concat(parentColumnIds)
+    }
     const customColumnIds = this.listVisibleCustomColumns().map(column => {
       return getCustomColumnId(column.id)
     })
@@ -2267,18 +2282,14 @@ class Gradebook extends React.Component {
 
   // # Grid Column Definitions
 
-  // Student Column
-  buildStudentColumn() {
-    let studentColumnWidth
-    studentColumnWidth = 150
-    if (this.gradebookColumnSizeSettings) {
-      if (this.gradebookColumnSizeSettings.student) {
-        studentColumnWidth = parseInt(this.gradebookColumnSizeSettings.student, 10)
-      }
-    }
+  // Student Columns
+  buildStudentColumn(columnId, gradebookColumnSizeSetting, defaultWidth) {
+    const studentColumnWidth = gradebookColumnSizeSetting
+      ? parseInt(gradebookColumnSizeSetting, 10)
+      : defaultWidth
     return {
-      id: 'student',
-      type: 'student',
+      id: columnId,
+      type: columnId,
       width: studentColumnWidth,
       cssClass: 'meta-cell primary-column student',
       headerCssClass: 'primary-column student',
@@ -2420,9 +2431,28 @@ class Gradebook extends React.Component {
   initGrid() {
     let assignmentGroup, assignmentGroupColumn, id
     this.updateFilteredContentInfo()
-    const studentColumn = this.buildStudentColumn()
+    const studentColumn = this.buildStudentColumn(
+      'student',
+      this.gradebookColumnSizeSettings?.student,
+      150
+    )
     this.gridData.columns.definitions[studentColumn.id] = studentColumn
     this.gridData.columns.frozen.push(studentColumn.id)
+    const studentColumnLastName = this.buildStudentColumn(
+      'student_lastname',
+      this.gradebookColumnSizeSettings?.student_lastname,
+      155
+    )
+    this.gridData.columns.definitions[studentColumnLastName.id] = studentColumnLastName
+    this.gridData.columns.frozen.push(studentColumnLastName.id)
+    const studentColumnFirstName = this.buildStudentColumn(
+      'student_firstname',
+      this.gradebookColumnSizeSettings?.student_firstname,
+      155
+    )
+    this.gridData.columns.definitions[studentColumnFirstName.id] = studentColumnFirstName
+    this.gridData.columns.frozen.push(studentColumnFirstName.id)
+
     const ref2 = this.assignmentGroups
     for (id in ref2) {
       assignmentGroup = ref2[id]
@@ -2462,7 +2492,10 @@ class Gradebook extends React.Component {
     })
     this.gradebookGrid.gridSupport.initialize()
     this.gradebookGrid.gridSupport.events.onActiveLocationChanged.subscribe((event, location) => {
-      if (location.columnId === 'student' && location.region === 'body') {
+      if (
+        ['student', 'student_lastname'].includes(location.columnId) &&
+        location.region === 'body'
+      ) {
         // In IE11, if we're navigating into the student column from a grade
         // input cell with no text, this focus() call will select the <body>
         // instead of the grades link.  Delaying the call (even with no actual
@@ -2612,6 +2645,7 @@ class Gradebook extends React.Component {
       showConcludedEnrollments = this.getEnrollmentFilters().concluded,
       showInactiveEnrollments = this.getEnrollmentFilters().inactive,
       showUnpublishedAssignments = this.gridDisplaySettings.showUnpublishedAssignments,
+      showSeparateFirstLastNames = this.gridDisplaySettings.showSeparateFirstLastNames,
       studentColumnDisplayAs = this.getSelectedPrimaryInfo(),
       studentColumnSecondaryInfo = this.getSelectedSecondaryInfo(),
       sortRowsBy = this.getSortRowsBySetting(),
@@ -2632,6 +2666,7 @@ class Gradebook extends React.Component {
         show_concluded_enrollments: showConcludedEnrollments,
         show_inactive_enrollments: showInactiveEnrollments,
         show_unpublished_assignments: showUnpublishedAssignments,
+        show_separate_first_last_names: showSeparateFirstLastNames,
         student_column_display_as: studentColumnDisplayAs,
         student_column_secondary_info: studentColumnSecondaryInfo,
         filter_rows_by: underscore(this.gridDisplaySettings.filterRowsBy),
@@ -3041,6 +3076,13 @@ class Gradebook extends React.Component {
     return (ref1 = this.gradebookGrid.gridSupport) != null
       ? ref1.columns.updateColumnHeaders(columnIds)
       : undefined
+  }
+
+  updateStudentColumnHeaders() {
+    const columnIds = this.gridDisplaySettings.showSeparateFirstLastNames
+      ? ['student_lastname', 'student_firstname']
+      : ['student']
+    return this.updateColumnHeaders(columnIds)
   }
 
   handleHeaderKeyDown(e, columnId) {
@@ -3463,6 +3505,27 @@ class Gradebook extends React.Component {
     ) // on success, do nothing since the render happened earlier
   }
 
+  initShowSeparateFirstLastNames(showSeparateFirstLastNames = 'false') {
+    this.gridDisplaySettings.showSeparateFirstLastNames = showSeparateFirstLastNames === 'true'
+  }
+
+  toggleShowSeparateFirstLastNames() {
+    const toggleableAction = () => {
+      this.gridDisplaySettings.showSeparateFirstLastNames =
+        !this.gridDisplaySettings.showSeparateFirstLastNames
+      return this.updateColumnsAndRenderViewOptionsMenu()
+    }
+    toggleableAction()
+    return this.saveSettings(
+      {
+        showSeparateFirstLastNames: this.gridDisplaySettings.showSeparateFirstLastNames
+      },
+      () => {},
+      toggleableAction
+    ) // on success, do nothing since the render happened earlier
+    // this pattern keeps the ui snappier rather than waiting for ajax call to complete
+  }
+
   toggleViewUngradedAsZero() {
     const toggleableAction = () => {
       this.gridDisplaySettings.viewUngradedAsZero = !this.gridDisplaySettings.viewUngradedAsZero
@@ -3698,7 +3761,7 @@ class Gradebook extends React.Component {
     this.saveSettings()
     if (!skipRedraw) {
       this.buildRows()
-      return this.gradebookGrid.gridSupport.columns.updateColumnHeaders(['student'])
+      return this.updateStudentColumnHeaders()
     }
   }
 
@@ -3727,7 +3790,7 @@ class Gradebook extends React.Component {
     this.saveSettings()
     if (!skipRedraw) {
       this.buildRows()
-      return this.gradebookGrid.gridSupport.columns.updateColumnHeaders(['student'])
+      return this.updateStudentColumnHeaders()
     }
   }
 
@@ -3792,7 +3855,7 @@ class Gradebook extends React.Component {
   }
 
   updateStudentHeadersAndReloadData() {
-    this.gradebookGrid.gridSupport.columns.updateColumnHeaders(['student'])
+    this.updateStudentColumnHeaders()
     return this.dataLoader.reloadStudentDataForEnrollmentFilterChange()
   }
 
@@ -4299,6 +4362,11 @@ class Gradebook extends React.Component {
         <Portal node={this.props.gridColorNode}>
           <GridColor colors={this.state.gridColors} />
         </Portal>
+        {this.options.enhanced_gradebook_filters && (
+          <Portal node={this.props.filterNavNode}>
+            <FilterNav />
+          </Portal>
+        )}
       </>
     )
   }

@@ -131,7 +131,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
     Setting.get("graphql_mutations_ddb_table_name", "graphql_mutations")
   end
 
-  def resolve(object:, arguments:, context:, **rest)
+  def resolve(object:, arguments:, context:, **)
     yield(object, arguments).tap do |value|
       next unless AuditLogFieldExtension.enabled?
 

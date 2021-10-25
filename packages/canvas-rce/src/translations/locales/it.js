@@ -49,6 +49,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Elenco annuncio" },
   "announcements_a4b8ed4a": { "message": "Annunci" },
   "apply_781a2546": { "message": "Applica" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Applica modifiche a tutte le istanze di questo pulsante e questa icona nel corso"
+  },
   "apps_54d24a47": { "message": "App" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Le proporzioni verranno mantenute"
@@ -63,9 +66,6 @@ const locale = {
   },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Contenuto salvataggio automatico esistente. Caricare al suo posto il contenuto salvato automaticamente?"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "Aprire automaticamente un’anteprima in linea. (L’anteprima viene visualizzata solo dopo il salvataggio)"
   },
   "available_folders_694d0436": { "message": "Cartelle disponibili" },
   "below_81d4dceb": { "message": "Sotto" },
@@ -162,9 +162,6 @@ const locale = {
   "details_98a31b68": { "message": "Dettagli" },
   "dimensions_45ddb7b7": { "message": "Dimensioni" },
   "directionality_26ae9e08": { "message": "Direzionalità" },
-  "disable_in_line_preview_2a675175": {
-    "message": "Disattivare l’anteprima in linea."
-  },
   "discussions_a5f96392": { "message": "Discussioni" },
   "discussions_index_6c36ced": { "message": "Indice discussioni" },
   "display_options_315aba85": { "message": "Visualizza opzioni" },
@@ -310,7 +307,6 @@ const locale = {
     "message": "Deve essere almeno { width } x { height }px"
   },
   "my_files_2f621040": { "message": "I miei file" },
-  "my_images_427f9b0c": { "message": "Le mi immagini" },
   "name_1aed4a1b": { "message": "Nome" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Naviga attraverso il menu o la barra degli strumenti"
@@ -391,9 +387,6 @@ const locale = {
   "show_link_options_545338fd": { "message": "Mostra opzioni link" },
   "show_video_options_6ed3721a": { "message": "Mostra opzioni video" },
   "size_b30e1077": { "message": "Dimensioni" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "La dimensione del file { file } è maggiore della dimensione massima consentita di { max } MB."
-  },
   "small_b070434a": { "message": "Piccolo" },
   "something_went_wrong_89195131": { "message": "Si è verificato un errore." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

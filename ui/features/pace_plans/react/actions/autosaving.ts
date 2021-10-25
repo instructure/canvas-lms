@@ -19,7 +19,7 @@
 import _ from 'lodash'
 import {Action, Dispatch} from 'redux'
 import {ThunkAction} from 'redux-thunk'
-import equal from 'fast-deep-equal'
+import {deepEqual} from '@instructure/ui-utils'
 
 import {getPacePlan} from '../reducers/pace_plans'
 import {StoreState, PacePlan} from '../types'
@@ -101,13 +101,11 @@ export const createAutoSavingAction = (
     dispatch(action) // Dispatch the original action
 
     // Don't autosave if no changes have occured
-    if (equal(planBefore, getPacePlan(getState()))) {
+    if (deepEqual(planBefore, getPacePlan(getState()))) {
       return
     }
 
-    dispatch(pacePlanActions.setUnpublishedChanges(true))
     dispatch(uiActions.startAutoSave())
-    dispatch(pacePlanActions.setLinkedToParent(false))
 
     if (debounce) {
       return debouncedUpdatePacePlan(dispatch, getState, planBefore, shouldBlock, extraSaveParams)

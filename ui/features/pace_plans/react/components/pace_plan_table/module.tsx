@@ -73,7 +73,10 @@ export const Module: React.FC<PassedProps> = props => {
   const renderDateColHeader = () => {
     if (!props.showProjections && !actuallyExpanded && !datesVisible) return null
     return (
-      <ColHeader width={actuallyExpanded ? '6rem' : '0'} id={`module-${props.module.id}-duration`}>
+      <ColHeader
+        width={actuallyExpanded ? '6.5rem' : '0'}
+        id={`module-${props.module.id}-duration`}
+      >
         <Flex as="div" alignItems="end" padding={headerPadding}>
           {I18n.t('Due Date')}
         </Flex>
@@ -86,7 +89,7 @@ export const Module: React.FC<PassedProps> = props => {
     // status changes or the pace plan changes. This is necessary because the AssignmentRow maintains the duration in local state,
     // and applying updates with componentWillReceiveProps makes it buggy (because the Redux updates can be slow, causing changes to
     // get reverted as you type).
-    const key = `${item.id}|${item.module_item_id}|${props.pacePlan.hard_end_dates}`
+    const key = `${item.id}|${item.module_item_id}|${item.duration}|${props.pacePlan.hard_end_dates}`
     return (
       <AssignmentRow
         key={key}
@@ -143,7 +146,7 @@ export const Module: React.FC<PassedProps> = props => {
                       {I18n.t('Assignments')}
                     </Flex>
                   </ColHeader>
-                  <ColHeader id={`module-${props.module.id}-days`} width="8rem">
+                  <ColHeader id={`module-${props.module.id}-days`} width="7.5rem">
                     <Flex as="div" alignItems="end" padding={headerPadding}>
                       {I18n.t('Days')}
                     </Flex>

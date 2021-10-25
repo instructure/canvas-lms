@@ -33,15 +33,15 @@ unless defined? BASE_FIXTURE_DIR
 end
 require 'pp'
 
-def get_question_hash(dir, name, delete_answer_ids = true, opts = {})
+def get_question_hash(dir, name, delete_answer_ids: true, **opts)
   hash = get_quiz_data(dir, name, opts).first.first
   hash[:answers].each { |a| a.delete(:id) } if delete_answer_ids
   hash
 end
 
-def get_quiz_data(dir, name, opts = {})
+def get_quiz_data(dir, name, **opts)
   File.open(File.join(dir, '%s.xml' % name), 'r') do |file|
-    Qti.convert_xml(file.read, opts)
+    Qti.convert_xml(file.read, **opts)
   end
 end
 

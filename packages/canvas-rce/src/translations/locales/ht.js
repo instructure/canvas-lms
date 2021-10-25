@@ -48,6 +48,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Lis Anons" },
   "announcements_a4b8ed4a": { "message": "Anons" },
   "apply_781a2546": { "message": "Aplike" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Aplike chanjman yo a tout reprezantasyon Bouton sa a ak Ikòn sa a nan Kou a"
+  },
   "apps_54d24a47": { "message": "Apps" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "Fòma ap konsève" },
   "assignments_1e02582c": { "message": "Sesyon" },
@@ -58,9 +61,6 @@ const locale = {
   "audio_player_for_title_20cc70d": { "message": "Lektè odyo pou { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Anrejistreman otomatik kontni egziste. Èske w t ap pefere chaje kontni ki te anrejistre otomatikman yo pito?"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "Ovri otomatikman nan apèsi an liy. (Apèsi a ap afiche sèlman aprè anrejistreman an)"
   },
   "available_folders_694d0436": { "message": "Dosye disponib" },
   "below_81d4dceb": { "message": "Anba" },
@@ -141,7 +141,6 @@ const locale = {
   "details_98a31b68": { "message": "Detay" },
   "dimensions_45ddb7b7": { "message": "Dimansyon" },
   "directionality_26ae9e08": { "message": "Direksyonalite" },
-  "disable_in_line_preview_2a675175": { "message": "Dezaktive apèsi an liy." },
   "discussions_a5f96392": { "message": "Diskisyon" },
   "discussions_index_6c36ced": { "message": "Endis Diskisyon" },
   "display_options_315aba85": { "message": "Opsyon Afichaj" },
@@ -273,7 +272,6 @@ const locale = {
     "message": "Dwe omwen { width } x { height }px"
   },
   "my_files_2f621040": { "message": "Fichye Mwen" },
-  "my_images_427f9b0c": { "message": "Imaj Mwen" },
   "name_1aed4a1b": { "message": "Non" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navige atravè meni oswa ba zouti a"
@@ -354,9 +352,6 @@ const locale = {
   "show_link_options_545338fd": { "message": "Afiche opsyon lyen" },
   "show_video_options_6ed3721a": { "message": "Afiche opsyon videyo" },
   "size_b30e1077": { "message": "Dimansyon" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "Dimansyon { file } siperyè a maksimòm fichye { max } MB yo otorize a."
-  },
   "small_b070434a": { "message": "Piti" },
   "something_went_wrong_89195131": { "message": "Gen yon bagay ki mal fèt." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
