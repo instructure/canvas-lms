@@ -63,10 +63,7 @@ export const MessageDetailItem = ({...props}) => {
           <View as="div" margin="none none x-small">
             <Text weight="light">{createdAt}</Text>
           </View>
-          <MessageDetailActions
-            handleOptionSelect={props.handleOptionSelect}
-            onReply={() => props.onReply(props.conversationMessage)}
-          />
+          <MessageDetailActions onReply={props.onReply} onReplyAll={props.onReplyAll} />
         </Flex.Item>
       </Flex>
       <Text>{props.conversationMessage.body}</Text>
@@ -91,8 +88,8 @@ MessageDetailItem.propTypes = {
   // TODO: not sure yet the exact shape of the data that will be fetched, so these will likely change
   conversationMessage: PropTypes.object,
   contextName: PropTypes.string,
-  handleOptionSelect: PropTypes.func,
-  onReply: PropTypes.func
+  onReply: PropTypes.func,
+  onReplyAll: PropTypes.func
 }
 
 MessageDetailItem.defaultProps = {

@@ -27,13 +27,18 @@ import {View} from '@instructure/ui-view'
 export const MessageDetailContainer = props => {
   return (
     <>
-      <MessageDetailHeader text={props.conversation.subject} onReply={props.onReply} />
+      <MessageDetailHeader
+        text={props.conversation.subject}
+        onReply={props.onReply}
+        onReplyAll={props.onReplyAll}
+      />
       {props.conversation.conversationMessagesConnection.nodes.map(message => (
         <View as="div" borderWidth="small none none none" padding="small" key={message.id}>
           <MessageDetailItem
             conversationMessage={message}
             context={props.conversation.contextName}
-            onReply={props.onReply}
+            onReply={() => props.onReply(message)}
+            onReplyAll={() => props.onReplyAll(message)}
           />
         </View>
       ))}
@@ -43,5 +48,6 @@ export const MessageDetailContainer = props => {
 
 MessageDetailContainer.propTypes = {
   conversation: Conversation.shape,
-  onReply: PropTypes.func
+  onReply: PropTypes.func,
+  onReplyAll: PropTypes.func
 }

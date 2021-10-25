@@ -78,23 +78,19 @@ describe('MessageDetailItem', () => {
         body: 'This is the body text for the message.'
       },
       contextName: 'Fake Course 1',
-      handleOptionSelect: jest.fn(),
-      onReply: jest.fn()
+      onReply: jest.fn(),
+      onReplyAll: jest.fn()
     }
 
-    const {getByRole, getByText} = render(<MessageDetailItem {...props} />)
+    const {getByTestId, getByText} = render(<MessageDetailItem {...props} />)
 
-    const replyButton = getByRole(
-      (role, element) => role === 'button' && element.textContent === 'Reply'
-    )
+    const replyButton = getByTestId('message-reply')
     fireEvent.click(replyButton)
-    expect(props.onReply).toHaveBeenLastCalledWith(props.conversationMessage)
+    expect(props.onReply).toHaveBeenCalled()
 
-    const moreOptionsButton = getByRole(
-      (role, element) => role === 'button' && element.textContent === 'More options'
-    )
+    const moreOptionsButton = getByTestId('message-more-options')
     fireEvent.click(moreOptionsButton)
-    fireEvent.click(getByText('Forward'))
-    expect(props.handleOptionSelect).toHaveBeenLastCalledWith('forward')
+    fireEvent.click(getByText('Reply All'))
+    expect(props.onReplyAll).toHaveBeenCalled()
   })
 })

@@ -55,6 +55,13 @@ const CanvasInbox = () => {
     })
   }
 
+  const onReply = ({conversationMessage = null, replyAll = false} = {}) => {
+    setSelectedConversationMessage(conversationMessage)
+    setIsReplyAll(replyAll)
+    setIsReply(!replyAll)
+    setComposeModal(true)
+  }
+
   useEffect(() => {
     setDeleteDisabled(selectedConversations.length === 0)
     setArchiveDisabled(selectedConversations.length === 0)
@@ -87,15 +94,8 @@ const CanvasInbox = () => {
             }}
             selectedConversations={selectedConversations}
             onCompose={() => setComposeModal(true)}
-            onReply={() => {
-              setSelectedConversationMessage(null)
-              setIsReply(true)
-              setComposeModal(true)
-            }}
-            onReplyAll={() => {
-              setIsReplyAll(true)
-              setComposeModal(true)
-            }}
+            onReply={() => onReply()}
+            onReplyAll={() => onReply({replyAll: true})}
             deleteDisabled={deleteDisabled}
             deleteToggler={setDeleteDisabled}
             archiveDisabled={archiveDisabled}
@@ -117,11 +117,8 @@ const CanvasInbox = () => {
               {selectedConversations.length > 0 ? (
                 <MessageDetailContainer
                   conversation={selectedConversations[0]}
-                  onReply={conversationMessage => {
-                    setSelectedConversationMessage(conversationMessage)
-                    setIsReply(true)
-                    setComposeModal(true)
-                  }}
+                  onReply={conversationMessage => onReply({conversationMessage})}
+                  onReplyAll={conversationMessage => onReply({conversationMessage, replyAll: true})}
                 />
               ) : (
                 <View padding="small">
@@ -141,6 +138,7 @@ const CanvasInbox = () => {
           setComposeModal(false)
           setIsReply(false)
           setIsReplyAll(false)
+          setSelectedConversationMessage(null)
         }}
         open={composeModal}
       />

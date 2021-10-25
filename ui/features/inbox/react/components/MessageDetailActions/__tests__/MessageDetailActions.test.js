@@ -23,8 +23,8 @@ import {MessageDetailActions} from '../MessageDetailActions'
 describe('MessageDetailItem', () => {
   it('sends the selected option to the provided callback function', () => {
     const props = {
-      handleOptionSelect: jest.fn(),
-      onReply: jest.fn()
+      onReply: jest.fn(),
+      onReplyAll: jest.fn()
     }
     const {getByRole, getByText} = render(<MessageDetailActions {...props} />)
 
@@ -39,6 +39,6 @@ describe('MessageDetailItem', () => {
     )
     fireEvent.click(moreOptionsButton)
     fireEvent.click(getByText('Reply All'))
-    expect(props.handleOptionSelect).toHaveBeenLastCalledWith('reply-all')
+    expect(props.onReplyAll).toHaveBeenCalled()
   })
 })
