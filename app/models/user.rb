@@ -2748,7 +2748,7 @@ class User < ActiveRecord::Base
   def menu_courses(enrollment_uuid = nil, opts = {})
     return @menu_courses if @menu_courses
 
-    can_favorite = proc { |c| !(c.elementary_subject_course? || c.elementary_homeroom_course?) || c.user_is_admin?(self) }
+    can_favorite = proc { |c| !(c.elementary_subject_course? || c.elementary_homeroom_course?) || c.user_is_admin?(self) || self.roles(c.root_account).include?('teacher') }
     # this terribleness is so we try to make sure that the newest courses show up in the menu
     courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid, opts)
                   .sort_by { |c| [c.primary_enrollment_rank, Time.now - (c.primary_enrollment_date || Time.now)] }
