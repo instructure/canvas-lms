@@ -81,7 +81,7 @@ describe "announcements" do
 
     it "does not allow a student to close/open announcement for comments or delete an announcement", priority: "1", test_id: 220377 do
       announcement_title = "Announcement 1"
-      announcement = @course.announcements.create!(:title => announcement_title, :message => "Hey")
+      @course.announcements.create!(:title => announcement_title, :message => "Hey")
       get "/courses/#{@course.id}/announcements"
       wait_for_ajaximations
 

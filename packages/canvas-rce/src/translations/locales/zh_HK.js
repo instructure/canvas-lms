@@ -49,6 +49,9 @@ const locale = {
   "announcement_list_da155734": { "message": "通告清單" },
   "announcements_a4b8ed4a": { "message": "通告" },
   "apply_781a2546": { "message": "應用" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "在課程中套用變更到此按鈕和圖示的所有執行個體"
+  },
   "apps_54d24a47": { "message": "應用程式" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": { "message": "外觀比例將被保留" },
   "assignments_1e02582c": { "message": "作業列表" },
@@ -59,9 +62,6 @@ const locale = {
   "audio_player_for_title_20cc70d": { "message": "{ title } 的音訊播放器" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "自動儲存內容已存在。是否要改為載入自動儲存的內容？"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "自動開啟行中預覽。（僅在儲存後顯示預覽）"
   },
   "available_folders_694d0436": { "message": "可用資料夾" },
   "below_81d4dceb": { "message": "以下" },
@@ -136,7 +136,6 @@ const locale = {
   "details_98a31b68": { "message": "詳細資料" },
   "dimensions_45ddb7b7": { "message": "尺寸" },
   "directionality_26ae9e08": { "message": "方向" },
-  "disable_in_line_preview_2a675175": { "message": "停用行中預覽。" },
   "discussions_a5f96392": { "message": "討論區" },
   "discussions_index_6c36ced": { "message": "討論索引" },
   "display_options_315aba85": { "message": "顯示選項" },
@@ -256,7 +255,6 @@ const locale = {
     "message": "必須至少為 { width } x { height } px"
   },
   "my_files_2f621040": { "message": "我的檔案" },
-  "my_images_427f9b0c": { "message": "我的影像" },
   "name_1aed4a1b": { "message": "名稱" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "導航整個選單或工具欄"
@@ -329,9 +327,6 @@ const locale = {
   "show_link_options_545338fd": { "message": "顯示連結選項" },
   "show_video_options_6ed3721a": { "message": "顯示影片選項" },
   "size_b30e1077": { "message": "大小" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "{ file } 的大小超過允許的最大檔案大小 { max } MB。"
-  },
   "small_b070434a": { "message": "小" },
   "something_went_wrong_89195131": { "message": "出現問題。" },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

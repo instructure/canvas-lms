@@ -26,6 +26,12 @@ describe ContentExport do
     @ce = @course.content_exports.create!
   end
 
+  it "records the job id" do
+    allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
+    @ce.export(synchronous: true)
+    expect(@ce.reload.settings[:job_id]).to eq(123)
+  end
+
   context "export_object?" do
     it "returns true for everything if there are no copy options" do
       expect(@ce.export_object?(@ce)).to eq true

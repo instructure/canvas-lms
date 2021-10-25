@@ -376,14 +376,13 @@ describe 'teacher k5 dashboard' do
        custom_timeout: 30 do
       second_homeroom_course_name = 'Second homeroom course'
 
-      new_course =
-        course_with_teacher(
-          account: @account,
-          active_course: 1,
-          active_enrollment: 1,
-          course_name: second_homeroom_course_name,
-          user: @homeroom_teacher
-        )
+      course_with_teacher(
+        account: @account,
+        active_course: 1,
+        active_enrollment: 1,
+        course_name: second_homeroom_course_name,
+        user: @homeroom_teacher
+      )
       Course.last.update!(homeroom_course: true)
 
       get '/'

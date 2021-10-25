@@ -185,8 +185,6 @@ describe ConversationMessage do
     end
 
     it "does not create a conversation stream item for a submission comment" do
-      old_count = StreamItem.count
-
       assignment_model(:course => @course)
       @assignment.workflow_state = 'published'
       @assignment.save
@@ -215,8 +213,6 @@ describe ConversationMessage do
       conversation = @teacher.initiate_conversation([@user])
       conversation.add_message("initial message")
       message = conversation.add_message("second message")
-
-      stream_item = StreamItem.last
 
       message.destroy
       expect(StreamItem.count).to eql(old_count + 1)
@@ -323,7 +319,7 @@ describe ConversationMessage do
     it "replies only to the message author on conversations2 conversations" do
       users = 3.times.map { course_with_student(course: @course).user }
       conversation = Conversation.initiate(users, false, :context_type => 'Course', :context_id => @course.id)
-      cm1 = conversation.add_message(users[0], "initial message", :root_account_id => Account.default.id)
+      conversation.add_message(users[0], "initial message", :root_account_id => Account.default.id)
       cm2 = conversation.add_message(users[1], "subsequent message", :root_account_id => Account.default.id)
       expect(cm2.conversation_message_participants.size).to eq 3
       cm3 = cm2.reply_from({

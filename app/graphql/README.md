@@ -65,11 +65,11 @@ In deployed environments, only an Apollo API Gateway will be able to query the f
 0. Generate two RSA keypairs and designate one your signing key, the other your
    encryption key.
 
-1. Copy `config/inst_access_signature.yml.example` to
-   `config/inst_access_signature.yml`, then replace the
-   `development.private_key` with the base64-encoded representation of the
+1. Copy `config/vault_contents.yml.example` to
+   `config/vault_contents.yml`, then replace the
+   `development.'app-canvas/data/secrets'.data.inst_access_signature.private_key` with the base64-encoded representation of the
    private key of your signing keypair, and the
-   `development.encryption_public_key` with the base64-encoded representation
+   `development.'app-canvas/data/secrets'.data.inst_access_signature.encryption_public_key` with the base64-encoded representation
    of the public key of your encryption keypair.
 
 2. Start up your Canvas server and get yourself an API access token, e.g. by

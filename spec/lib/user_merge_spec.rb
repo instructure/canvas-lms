@@ -513,8 +513,8 @@ describe UserMerge do
     end
 
     it "moves appointments" do
-      enrollment1 = course1.enroll_user(user1, 'StudentEnrollment', :enrollment_state => 'active')
-      enrollment2 = course1.enroll_user(user2, 'StudentEnrollment', :enrollment_state => 'active')
+      course1.enroll_user(user1, 'StudentEnrollment', :enrollment_state => 'active')
+      course1.enroll_user(user2, 'StudentEnrollment', :enrollment_state => 'active')
       ag = AppointmentGroup.create(:title => "test",
                                    :contexts => [course1],
                                    :participants_per_appointment => 1,
@@ -524,7 +524,7 @@ describe UserMerge do
                                      ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]
                                    ])
       res1 = ag.appointments.first.reserve_for(user1, @teacher)
-      res2 = ag.appointments.last.reserve_for(user2, @teacher)
+      ag.appointments.last.reserve_for(user2, @teacher)
       UserMerge.from(user1).into(user2)
       res1.reload
       expect(res1.context_id).to eq user2.id
@@ -569,7 +569,7 @@ describe UserMerge do
 
     it "freshens topics with moved entries" do
       topic = course1.discussion_topics.create!(user: user1)
-      entry = topic.discussion_entries.create!(user: user2)
+      topic.discussion_entries.create!(user: user2)
       now = Time.at(5.minutes.from_now.to_i) # truncate milliseconds
       Timecop.freeze(now) do
         UserMerge.from(user2).into(user1)
@@ -816,8 +816,8 @@ describe UserMerge do
       course = course_factory
       course.enroll_user(user1)
       course.enroll_user(user2)
-      fav1 = user1.favorites.create!(context: course)
-      fav2 = user2.favorites.create!(context: course)
+      user1.favorites.create!(context: course)
+      user2.favorites.create!(context: course)
 
       @shard1.activate do
         UserMerge.from(user2).into(user1)
@@ -834,8 +834,8 @@ describe UserMerge do
       course = course_factory
       course.enroll_user(user1)
       course.enroll_user(user2)
-      fav1 = user1.favorites.create!(context: course)
-      fav2 = user2.favorites.create!(context: course)
+      user1.favorites.create!(context: course)
+      user2.favorites.create!(context: course)
 
       @shard1.activate do
         UserMerge.from(user1).into(user2)
@@ -888,7 +888,6 @@ describe UserMerge do
     it "associates the user with all shards" do
       user1 = user_with_pseudonym(:username => 'user1@example.com', :active_all => 1)
       p1 = @pseudonym
-      cc1 = @cc
       @shard1.activate do
         account = Account.create!
         @p2 = account.pseudonyms.create!(:unique_id => 'user1@exmaple.com', :user => user1)
@@ -1088,7 +1087,6 @@ describe UserMerge do
       c2 = user1.initiate_conversation([user_factory]) # private conversation
       c2.add_message("hello")
       c2.update_attribute(:workflow_state, 'unread')
-      old_private_hash = c2.conversation.private_hash
 
       @shard1.activate do
         new_account = Account.create!

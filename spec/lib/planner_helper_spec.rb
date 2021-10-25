@@ -61,7 +61,7 @@ describe PlannerHelper do
       end
 
       it "completes an autograded quiz override" do
-        qsub = graded_submission(@quiz2, @student)
+        graded_submission(@quiz2, @student)
         @quiz2_po.reload
         expect(@quiz2_po.marked_complete).to be_truthy
       end

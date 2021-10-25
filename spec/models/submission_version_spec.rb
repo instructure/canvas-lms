@@ -71,7 +71,6 @@ describe SubmissionVersion do
       n = 5
 
       submissions = n.times.map { unversioned_submission }
-      contexts = submissions.map { |submission| submission.assignment.context }
       versions = submissions.map { |submission| Version.create(:versionable => submission, :yaml => submission.attributes.to_yaml) }
 
       expect {

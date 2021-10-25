@@ -424,12 +424,65 @@ describe "profile" do
       Account.default.settings[:enable_profiles] = true
       Account.default.save!
       get "/courses/#{@course.id}/users/#{@other_student.id}"
-      f('.report_avatar_link').click
-      expect(alert_present?).to be_truthy
-      accept_alert
+      f('#report_avatar_link').click
+      expect(f('span[aria-label="Report Profile Picture"]')).to be_truthy
+      f('button[data-testid="confirm-button"]').click
       wait_for_ajaximations
+      assert_flash_notice_message('The profile picture has been reported.')
       @other_student.reload
       expect(@other_student.avatar_state).to eq :reported
+    end
+
+    it "shows a message when the profile picture has already been reported" do
+      Account.default.settings[:enable_profiles] = true
+      Account.default.save!
+      get "/courses/#{@course.id}/users/#{@other_student.id}"
+      f('#report_avatar_link').click
+      expect(f('span[aria-label="Report Profile Picture"]')).to be_truthy
+      f('button[data-testid="confirm-button"]').click
+      wait_for_ajaximations
+      assert_flash_notice_message('The profile picture has been reported.')
+      get "/courses/#{@course.id}/users/#{@other_student.id}"
+      reported = f('#avatar_is_reported')
+      expect(reported).to be_truthy
+      expect(reported.attribute(:innerHTML)).to eq 'This image has been reported.'
+    end
+  end
+
+  describe 'avatar removing' do
+    before :each do
+      Account.default.enable_service(:avatars)
+      Account.default.settings[:avatars] = 'enabled_pending'
+      Account.default.save!
+
+      course_with_teacher_logged_in(:active_all => true)
+      @other_student = user_factory
+      @other_student.avatar_state = "submitted"
+      @other_student.save!
+      student_in_course(:course => @course, :user => @other_student, :active_all => true)
+    end
+
+    it 'is able to remove inappropriate pictures without profiles enabled' do
+      get "/courses/#{@course.id}/users/#{@other_student.id}"
+      f('.remove_avatar_picture_link').click
+      expect(f('span[aria-label="Confirm Removal"]')).to be_truthy
+      f('button[data-testid="confirm-button"]').click
+      wait_for_ajaximations
+      @other_student.reload
+      expect(@other_student.avatar_image_url?).to be(false)
+    end
+
+    it 'is able to remove inappropriate pictures with profiles enabled' do
+      Account.default.settings[:enable_profiles] = true
+      Account.default.save!
+      get "/courses/#{@course.id}/users/#{@other_student.id}"
+      f('#remove_avatar_link').click
+      expect(f('span[aria-label="Confirm Removal"]')).to be_truthy
+      f('button[data-testid="confirm-button"]').click
+      wait_for_ajaximations
+      assert_flash_notice_message('The profile picture has been removed.')
+      @other_student.reload
+      expect(@other_student.avatar_image_url?).to be(false)
     end
   end
 end

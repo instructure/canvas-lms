@@ -27,7 +27,7 @@ class SamesiteTransitionCookieStore < ActionDispatch::Session::EncryptedCookieSt
     @legacy_key = options[:legacy_key]
   end
 
-  def set_cookie(request, session_id, cookie)
+  def set_cookie(request, _session_id, cookie)
     if cookie[:same_site]
       legacy_cookie = cookie.dup
       legacy_cookie[:same_site] = nil

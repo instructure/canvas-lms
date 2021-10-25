@@ -19,95 +19,15 @@
 import $ from 'jquery'
 import I18n from 'i18n!gradebook'
 import '@canvas/jquery/jquery.instructure_misc_helpers' // $.toSentence
-import htmlEscape from 'html-escape'
-
-function getSecondaryDisplayInfo(student, secondaryInfo, options) {
-  if (options.shouldShowSections() && secondaryInfo === 'section') {
-    const sectionNames = student.sections
-      .filter(options.isVisibleSection)
-      .map(sectionId => options.getSection(sectionId).name)
-    return $.toSentence(sectionNames.sort())
-  }
-
-  if (options.shouldShowGroups() && secondaryInfo === 'group') {
-    const groupNames = student.group_ids.map(groupId => options.getGroup(groupId).name)
-    return $.toSentence(groupNames.sort())
-  }
-
-  return {
-    login_id: student.login_id,
-    sis_id: student.sis_user_id,
-    integration_id: student.integration_id
-  }[secondaryInfo]
-}
-
-function getEnrollmentLabel(student) {
-  if (student.isConcluded) {
-    return I18n.t('concluded')
-  }
-  if (student.isInactive) {
-    return I18n.t('inactive')
-  }
-
-  return null
-}
-
-// xsslint safeString.property enrollmentLabel secondaryInfo studentId courseId url displayName
-function render(options) {
-  let enrollmentStatus = ''
-  let secondaryInfo = ''
-
-  if (options.enrollmentLabel) {
-    const title = I18n.t('This user is currently not able to access the course')
-    // xsslint safeString.identifier title
-    enrollmentStatus = `&nbsp;<span title="${title}" class="label">${options.enrollmentLabel}</span>`
-  }
-
-  if (options.secondaryInfo) {
-    secondaryInfo = `<div class="secondary-info">${options.secondaryInfo}</div>`
-  }
-
-  // xsslint safeString.identifier enrollmentStatus secondaryInfo
-  return `
-    <div class="student-name">
-      <a
-        class="student-grades-link student_context_card_trigger"
-        data-student_id="${options.studentId}"
-        data-course_id="${options.courseId}"
-        href="${options.url}"
-      >${htmlEscape(options.displayName)}</a>
-      ${enrollmentStatus}
-    </div>
-    ${secondaryInfo}
-  `
-}
+import {
+  getSecondaryDisplayInfo,
+  getEnrollmentLabel,
+  getOptions,
+  renderCell} from './StudentCellFormatter.utils'
 
 export default class StudentCellFormatter {
   constructor(gradebook) {
-    this.options = {
-      courseId: gradebook.options.context_id,
-      getSection(sectionId) {
-        return gradebook.sections[sectionId]
-      },
-      getGroup(groupId) {
-        return gradebook.studentGroups[groupId]
-      },
-      getSelectedPrimaryInfo() {
-        return gradebook.getSelectedPrimaryInfo()
-      },
-      getSelectedSecondaryInfo() {
-        return gradebook.getSelectedSecondaryInfo()
-      },
-      isVisibleSection(sectionId) {
-        return gradebook.sections[sectionId] != null
-      },
-      shouldShowSections() {
-        return gradebook.showSections()
-      },
-      shouldShowGroups() {
-        return gradebook.showStudentGroups()
-      }
-    }
+    this.options = getOptions(gradebook)
   }
 
   render = (_row, _cell, _value, _columnDef, student /* dataContext */) => {
@@ -127,6 +47,6 @@ export default class StudentCellFormatter {
       url: `${student.enrollments[0].grades.html_url}#tab-assignments`
     }
 
-    return render(options)
+    return renderCell(options)
   }
 }

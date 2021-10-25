@@ -34,6 +34,7 @@ export const DiscussionPermissions = {
       reply
       update
       speedGrader
+      studentReporting
       peerReview
       showRubric
       addRubric
@@ -57,6 +58,7 @@ export const DiscussionPermissions = {
     reply: bool,
     update: bool,
     speedGrader: bool,
+    studentReporting: bool,
     peerReview: bool,
     showRubric: bool,
     addRubric: bool,
@@ -79,6 +81,7 @@ export const DiscussionPermissions = {
     reply = true,
     update = true,
     speedGrader = true,
+    studentReporting = true,
     peerReview = true,
     showRubric = true,
     addRubric = true,
@@ -99,6 +102,7 @@ export const DiscussionPermissions = {
     reply,
     update,
     speedGrader,
+    studentReporting,
     peerReview,
     showRubric,
     addRubric,

@@ -16,8 +16,23 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+/* eslint-disable no-undef */
+
 // this is the first module loaded by webpack (in the vendor bundle). It tells it
 // to load chunks from the CDN url configured in config/canvas_cdn.yml
-import webpackPublicPath from '../../../frontend_build/webpackPublicPath'
 
-__webpack_public_path__ = ((window.ENV && window.ENV.ASSET_HOST) || '') + webpackPublicPath
+// to make better sense of this:
+//
+// - __webpack_public_path__ is a magic variable[1] by webpack and only
+//   available to modules bundled by webpack
+//
+// - CANVAS_WEBPACK_PUBLIC_PATH is injected by Webpack through a DefinePlugin[2]
+//   whose value is known at compile-time (see webpack config)
+//
+// [1]: https://webpack.js.org/guides/public-path/#on-the-fly
+// [2]: https://webpack.js.org/plugins/define-plugin/
+if (typeof __webpack_public_path__ !== 'undefined') {
+  __webpack_public_path__ = ((window.ENV && window.ENV.ASSET_HOST) || '') + CANVAS_WEBPACK_PUBLIC_PATH
+}
+
+/* eslint-enable no-undef */

@@ -86,7 +86,6 @@ describe SisImportsApiController, type: :request do
   end
 
   it 'kicks off a sis import via multipart attachment' do
-    json = nil
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { :controller => 'sis_imports_api', :action => 'create',
@@ -710,39 +709,39 @@ describe SisImportsApiController, type: :request do
   end
 
   it "allows raw post without charset" do
-    json = api_call(:post,
-                    "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
-                    { :controller => 'sis_imports_api', :action => 'create',
-                      :format => 'json', :account_id => @account.id.to_s,
-                      :import_type => 'instructure_csv', :attachment => 'blah' },
-                    {},
-                    { 'CONTENT_TYPE' => 'text/csv' })
+    api_call(:post,
+             "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
+             { :controller => 'sis_imports_api', :action => 'create',
+               :format => 'json', :account_id => @account.id.to_s,
+               :import_type => 'instructure_csv', :attachment => 'blah' },
+             {},
+             { 'CONTENT_TYPE' => 'text/csv' })
     batch = SisBatch.last
     expect(batch.attachment.filename).to eq "sis_import.csv"
     expect(batch.attachment.content_type).to eq "text/csv"
   end
 
   it "handles raw post content-types with attributes" do
-    json = api_call(:post,
-                    "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
-                    { :controller => 'sis_imports_api', :action => 'create',
-                      :format => 'json', :account_id => @account.id.to_s,
-                      :import_type => 'instructure_csv', :attachment => 'blah' },
-                    {},
-                    { 'CONTENT_TYPE' => 'text/csv; charset=utf-8' })
+    api_call(:post,
+             "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
+             { :controller => 'sis_imports_api', :action => 'create',
+               :format => 'json', :account_id => @account.id.to_s,
+               :import_type => 'instructure_csv', :attachment => 'blah' },
+             {},
+             { 'CONTENT_TYPE' => 'text/csv; charset=utf-8' })
     batch = SisBatch.last
     expect(batch.attachment.filename).to eq "sis_import.csv"
     expect(batch.attachment.content_type).to eq "text/csv"
   end
 
   it "rejects non-utf-8 encodings on content-type" do
-    json = raw_api_call(:post,
-                        "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
-                        { :controller => 'sis_imports_api', :action => 'create',
-                          :format => 'json', :account_id => @account.id.to_s,
-                          :import_type => 'instructure_csv' },
-                        {},
-                        { 'CONTENT_TYPE' => 'text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1' })
+    raw_api_call(:post,
+                 "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
+                 { :controller => 'sis_imports_api', :action => 'create',
+                   :format => 'json', :account_id => @account.id.to_s,
+                   :import_type => 'instructure_csv' },
+                 {},
+                 { 'CONTENT_TYPE' => 'text/csv; charset=ISO-8859-1-Windows-3.0-Latin-1' })
     assert_status(400)
     expect(SisBatch.count).to eq 0
   end
@@ -864,7 +863,7 @@ describe SisImportsApiController, type: :request do
   end
 
   it "filters sis imports by date if requested" do
-    batch = @account.sis_batches.create
+    @account.sis_batches.create
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { :controller => 'sis_imports_api', :action => 'index',
                       :format => 'json', :account_id => @account.id.to_s, :created_since => 1.day.from_now.iso8601 })
@@ -879,7 +878,7 @@ describe SisImportsApiController, type: :request do
   end
 
   it "filters sis imports by an end date" do
-    batch = @account.sis_batches.create
+    @account.sis_batches.create
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { :controller => 'sis_imports_api', :action => 'index',
                       :format => 'json', :account_id => @account.id.to_s, :created_before => 1.day.from_now.iso8601 })
@@ -894,9 +893,9 @@ describe SisImportsApiController, type: :request do
   it "does not fail when options are empty" do
     batch = @account.sis_batches.create
     expect(batch.options).to be_empty
-    json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
-                    { :controller => 'sis_imports_api', :action => 'index',
-                      :format => 'json', :account_id => @account.id.to_s })
+    api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
+             { :controller => 'sis_imports_api', :action => 'index',
+               :format => 'json', :account_id => @account.id.to_s })
     assert_status(200)
   end
 

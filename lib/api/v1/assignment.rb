@@ -419,6 +419,7 @@ module Api::V1::Assignment
 
     if opts[:include_can_submit] && !assignment.quiz? && !submission.is_a?(Array)
       hash['can_submit'] = assignment.expects_submission? &&
+                           !assignment.locked_for?(user) &&
                            assignment.rights_status(user, :submit)[:submit] &&
                            (submission.nil? || submission.attempts_left.nil? || submission.attempts_left > 0)
     end

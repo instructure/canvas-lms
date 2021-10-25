@@ -19,7 +19,10 @@
 import AssignmentColumnHeaderRenderer from './AssignmentColumnHeaderRenderer'
 import AssignmentGroupColumnHeaderRenderer from './AssignmentGroupColumnHeaderRenderer'
 import CustomColumnHeaderRenderer from './CustomColumnHeaderRenderer'
+import StudentColumnHeader from './StudentColumnHeader'
 import StudentColumnHeaderRenderer from './StudentColumnHeaderRenderer'
+import StudentLastNameColumnHeader from './StudentLastNameColumnHeader'
+import StudentFirstNameColumnHeaderRenderer from './StudentFirstNameColumnHeaderRenderer'
 import TotalGradeColumnHeaderRenderer from './TotalGradeColumnHeaderRenderer'
 import TotalGradeOverrideColumnHeaderRenderer from './TotalGradeOverrideColumnHeaderRenderer'
 
@@ -30,7 +33,13 @@ export default class ColumnHeaderRenderer {
       assignment: new AssignmentColumnHeaderRenderer(gradebook),
       assignment_group: new AssignmentGroupColumnHeaderRenderer(gradebook),
       custom_column: new CustomColumnHeaderRenderer(gradebook),
-      student: new StudentColumnHeaderRenderer(gradebook),
+      student: new StudentColumnHeaderRenderer(gradebook, StudentColumnHeader, 'student'),
+      student_lastname: new StudentColumnHeaderRenderer(
+        gradebook,
+        StudentLastNameColumnHeader,
+        'student_lastname'
+      ),
+      student_firstname: new StudentFirstNameColumnHeaderRenderer(gradebook),
       total_grade: new TotalGradeColumnHeaderRenderer(gradebook),
       total_grade_override: new TotalGradeOverrideColumnHeaderRenderer(gradebook)
     }

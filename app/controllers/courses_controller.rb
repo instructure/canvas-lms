@@ -1499,7 +1499,9 @@ class CoursesController < ApplicationController
                PREVENT_COURSE_AVAILABILITY_EDITING_BY_TEACHERS: @context.root_account.settings[:prevent_course_availability_editing_by_teachers],
                MANUAL_MSFT_SYNC_COOLDOWN: MicrosoftSync::Group.manual_sync_cooldown,
                MSFT_SYNC_ENABLED: !!@context.root_account.settings[:microsoft_sync_enabled],
-               MSFT_SYNC_CAN_BYPASS_COOLDOWN: Account.site_admin.account_users_for(@current_user).present?
+               MSFT_SYNC_CAN_BYPASS_COOLDOWN: Account.site_admin.account_users_for(@current_user).present?,
+               MSFT_SYNC_MAX_ENROLLMENT_MEMBERS: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS,
+               MSFT_SYNC_MAX_ENROLLMENT_OWNERS: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS,
              })
 
       set_tutorial_js_env
@@ -1526,7 +1528,7 @@ class CoursesController < ApplicationController
     end
   end
 
-  def update_user_engine_choice(course, selection_obj, user_id)
+  def update_user_engine_choice(course, selection_obj)
     old_selection = course.settings[:engine_selected][:user_id]
     new_settings = {}
     new_selections = {}
@@ -1543,7 +1545,6 @@ class CoursesController < ApplicationController
     if @course.root_account.feature_enabled?(:newquizzes_on_quiz_page)
       old_settings = @course.settings
       key_exists = old_settings.key?(:engine_selected)
-      user_id = @current_user.id
       selection_obj = {
         newquizzes_engine_selected: params[:newquizzes_engine_selected],
         expiration: Time.zone.today + 30.days
@@ -1552,7 +1553,7 @@ class CoursesController < ApplicationController
       new_settings = {}
 
       if key_exists
-        new_settings[:engine_selected] = update_user_engine_choice(@course, selection_obj, user_id)
+        new_settings[:engine_selected] = update_user_engine_choice(@course, selection_obj)
       else
         new_settings[:engine_selected] = { user_id: selection_obj }
       end
@@ -2114,7 +2115,7 @@ class CoursesController < ApplicationController
           add_crumb(@context.nickname_for(@current_user, :short_name), url_for(@context), :id => "crumb_#{@context.asset_string}")
         end
         GuardRail.activate(:primary) do
-          set_badge_counts_for(@context, @current_user, @current_enrollment)
+          set_badge_counts_for(@context, @current_user)
         end
 
         set_tutorial_js_env

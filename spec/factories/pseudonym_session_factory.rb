@@ -46,6 +46,7 @@ module Factories
 
     session = double('PseudonymSession',
                      :record => pseudonym)
+    allow(session).to receive(:[]).with(anything).and_return(nil)
 
     @session_stubbed = true
     allow(PseudonymSession).to receive(:find).and_wrap_original do |original|

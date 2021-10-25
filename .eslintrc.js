@@ -209,6 +209,7 @@ module.exports = {
     ],
     'no-unused-expressions': 'off', // the babel version allows optional chaining a?.b
     'babel/no-unused-expressions': ['error', {allowShortCircuit: true, allowTernary: true}],
+    'prettier/prettier': 'warn',
 
     // Some rules need to be replaced with typescript versions to work with TS
     'no-redeclare': 'off',
@@ -279,7 +280,6 @@ module.exports = {
       rules: {
         'react/prop-types': 'off',
         'prefer-const': 'warn',
-        'prettier/prettier': 'off',
         'react/no-string-refs': 'warn'
       }
     }

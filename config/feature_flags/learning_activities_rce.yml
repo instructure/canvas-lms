@@ -11,8 +11,3 @@ cc_in_rce_video_tray:
   display_name: RCE Edit Closed Captions
   description: Edit closed captions/subtitles to videos from the video options tray in the RCE
   applies_to: SiteAdmin
-rce_pretty_html_editor:
-  state: hidden
-  display_name: RCE Pretty HTML Editor
-  description: A much better HTML code editor for the RCE, though it suffers from being inaccessible to screenreader users.
-  applies_to: SiteAdmin

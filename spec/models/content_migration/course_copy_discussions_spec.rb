@@ -49,7 +49,7 @@ describe ContentMigration do
     end
 
     it "copies locked state for announcements" do
-      topic = @copy_from.announcements.create!(:title => "topic", :message => "<p>bloop</p>", :locked => true)
+      @copy_from.announcements.create!(:title => "topic", :message => "<p>bloop</p>", :locked => true)
 
       run_course_copy
 
@@ -91,7 +91,7 @@ describe ContentMigration do
     it "assigns group discussions to a group with a matching name in the destination course" do
       group_category = @copy_from.group_categories.create!(name: 'blah')
       topic = @copy_from.discussion_topics.create! group_category: group_category
-      target_group = @copy_to.group_categories.create!(name: 'blah')
+      @copy_to.group_categories.create!(name: 'blah')
 
       run_course_copy
 
@@ -198,7 +198,7 @@ describe ContentMigration do
       expect(@copy_to.announcements.where(migration_id: mig_id(ann)).first).to be_nil
     end
 
-    it "implicitlies copy files attached to topics" do
+    it "implicitly copies files attached to topics" do
       att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt", :uploaded_data => StringIO.new('file'),
                                :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       topic = @copy_from.discussion_topics.new(:message => "howdy", :title => "title")

@@ -71,7 +71,6 @@ describe SIS::CSV::UserObserverImporter do
     @account.save!
     observer = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
-    before_count = UserObservationLink.active.count
     process_csv_data_cleanly(
       "observer_id,student_id,status",
       "U001,U002,ACTIVE"

@@ -22,7 +22,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
-import {IconMiniArrowDownLine, IconReplyLine, IconSettingsLine} from '@instructure/ui-icons'
+import {IconMoreLine, IconReplyLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Tooltip} from '@instructure/ui-tooltip'
 import I18n from 'i18n!conversations_2'
@@ -52,9 +52,8 @@ export const MessageDetailHeader = ({...props}) => {
           }}
           trigger={
             <Tooltip renderTip={I18n.t('More options')} on={['hover', 'focus']}>
-              <Button margin="0 x-small 0 0" renderIcon={IconSettingsLine}>
+              <Button margin="0 x-small 0 0" renderIcon={IconMoreLine}>
                 <ScreenReaderContent>{I18n.t('More options')}</ScreenReaderContent>
-                <IconMiniArrowDownLine />
               </Button>
             </Tooltip>
           }
@@ -65,7 +64,7 @@ export const MessageDetailHeader = ({...props}) => {
           <Menu.Item value="delete">{I18n.t('Delete')}</Menu.Item>
         </Menu>
       </Flex.Item>
-      <Flex.Item></Flex.Item>
+      <Flex.Item />
     </Flex>
   )
 }

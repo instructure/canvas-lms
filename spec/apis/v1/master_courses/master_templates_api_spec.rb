@@ -130,12 +130,12 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
     it "requires account-level authorization" do
       course_with_teacher(:course => @course, :active_all => true)
-      json = api_call(:put, @url, @params, {}, {}, { :expected_status => 401 })
+      api_call(:put, @url, @params, {}, {}, { :expected_status => 401 })
     end
 
     it "requires account-level blueprint permissions" do
       Account.default.role_overrides.create!(:role => admin_role, :permission => "manage_master_courses", :enabled => false)
-      json = api_call(:put, @url, @params, {}, {}, { :expected_status => 401 })
+      api_call(:put, @url, @params, {}, {}, { :expected_status => 401 })
     end
 
     it "does not try to add other blueprint courses" do
@@ -166,7 +166,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
     it "is able to add and remove courses" do
       existing_child = course_factory
-      existing_sub = @template.add_child_course!(existing_child)
+      @template.add_child_course!(existing_child)
 
       subaccount1 = Account.default.sub_accounts.create!
       subaccount2 = subaccount1.sub_accounts.create!
@@ -181,7 +181,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
 
     it "is able to add and remove courses by sis_source_id" do
       existing_child = course_factory(:sis_source_id => "bleep")
-      existing_sub = @template.add_child_course!(existing_child)
+      @template.add_child_course!(existing_child)
 
       subaccount1 = Account.default.sub_accounts.create!
       subaccount2 = subaccount1.sub_accounts.create!
@@ -302,7 +302,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         other_master_course = course_model
         other_template = MasterCourses::MasterTemplate.set_as_master_course(other_master_course)
         other_sub = other_template.add_child_course!(@child_course)
-        other_migration = MasterCourses::MasterMigration.start_new_migration!(other_template, @admin, :comment => 'Blah!')
+        MasterCourses::MasterMigration.start_new_migration!(other_template, @admin, :comment => 'Blah!')
         run_jobs
 
         json = api_call_as_user(me, :get, "/api/v1/courses/#{@child_course.id}/blueprint_subscriptions/default/migrations",

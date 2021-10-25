@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 describe "sis imports ui" do
   include_context "in-process server selenium tests"
 
-  def account_with_admin_logged_in(opts = {})
+  def account_with_admin_logged_in
     @account = Account.default
     account_admin_user
     user_session(@admin)

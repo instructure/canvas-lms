@@ -110,7 +110,7 @@ describe "Favorites API", type: :request do
 
       # add some new courses, and fave one
       course6 = course_with_student(:course_name => "Course 6", :user => @user, :active_all => true).course
-      course7 = course_with_student(:course_name => "Course 7", :user => @user, :active_all => true).course
+      course_with_student(:course_name => "Course 7", :user => @user, :active_all => true).course
       json = api_call(:post, "/api/v1/users/self/favorites/courses/#{course6.id}",
                       { :controller => "favorites", :action => "add_favorite_course", :format => "json", :id => "#{course6.id}" })
       expect(json["context_id"]).to eql(course6.id)

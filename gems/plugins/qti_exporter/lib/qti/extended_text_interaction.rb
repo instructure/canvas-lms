@@ -23,10 +23,6 @@ module Qti
   class ExtendedTextInteraction < AssessmentItemConverter
     include Canvas::Migration::XMLHelper
 
-    def initialize(opts)
-      super(opts)
-    end
-
     def parse_question_data
       process_response_conditions
       if @question[:answers].present?

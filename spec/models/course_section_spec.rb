@@ -123,7 +123,7 @@ describe CourseSection, "moving to new course" do
     expect(cs.nonxlist_course_id).to be_nil
     u = User.create!
     u.register!
-    e = course1.enroll_user(u, 'StudentEnrollment', :section => cs)
+    course1.enroll_user(u, 'StudentEnrollment', :section => cs)
     u.update_account_associations
 
     expect(course1.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id].sort
@@ -252,7 +252,7 @@ describe CourseSection, "moving to new course" do
 
     cs = course1.course_sections.create!
     u = user_factory(:active_all => true)
-    e = course1.enroll_user(u, 'StudentEnrollment', :section => cs, :enrollment_state => 'active')
+    course1.enroll_user(u, 'StudentEnrollment', :section => cs, :enrollment_state => 'active')
     u.favorites.where(:context_type => 'Course', :context_id => course1).first_or_create!
 
     cs.crosslist_to_course(course2)

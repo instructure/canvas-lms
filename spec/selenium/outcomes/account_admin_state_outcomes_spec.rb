@@ -168,9 +168,9 @@ describe "account admin outcomes" do
       it "does not fail while filtering the common core group", priority: "2", test_id: 250010 do
         # setup fake state data, so that it has to paginate
         root_group = LearningOutcomeGroup.global_root_outcome_group
-        fake_cc = root_group.child_outcome_groups.create!(:title => "Fake Common Core")
+        root_group.child_outcome_groups.create!(:title => "Fake Common Core")
         11.times { root_group.child_outcome_groups.create!(:title => "G is after F") }
-        last_group = root_group.child_outcome_groups.create!(:title => "Z is last")
+        root_group.child_outcome_groups.create!(:title => "Z is last")
 
         # go to the find panel
         get outcome_url

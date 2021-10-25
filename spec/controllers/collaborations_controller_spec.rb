@@ -100,7 +100,7 @@ describe CollaborationsController do
 
     it "only returns collaborations that the user has access to read" do
       user_session(@student)
-      collab1 = @course.collaborations.create!(
+      @course.collaborations.create!(
         title: "inaccessible",
         user: @teacher
       ).tap { |c| c.update_attribute :url, 'http://www.example.com' }

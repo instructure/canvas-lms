@@ -35,10 +35,12 @@ import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {
   UPDATE_DISCUSSION_ENTRIES_READ_STATE,
-  UPDATE_DISCUSSION_ENTRY
+  UPDATE_DISCUSSION_ENTRY,
+  UPDATE_DISCUSSION_ENTRY_PARTICIPANT
 } from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
+import {ReportReply} from '../../components/ReportReply/ReportReply'
 
 export const IsolatedThreadsContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -180,6 +182,9 @@ export default IsolatedThreadsContainer
 const IsolatedThreadContainer = props => {
   const threadActions = []
   const [isEditing, setIsEditing] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [reportModalIsLoading, setReportModalIsLoading] = useState(false)
+
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {filter} = useContext(SearchContext)
 
@@ -221,6 +226,21 @@ const IsolatedThreadContainer = props => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
+    }
+  })
+
+  const [updateDiscussionEntryReported] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
+    onCompleted: data => {
+      if (!data || !data.updateDiscussionEntryParticipant) {
+        return null
+      }
+      setReportModalIsLoading(false)
+      setShowReportModal(false)
+      setOnSuccess(I18n.t('You have reported this reply.'), false)
+    },
+    onError: () => {
+      setReportModalIsLoading(false)
+      setOnFailure(I18n.t('We experienced an issue. This reply was not reported.'))
     }
   })
 
@@ -332,6 +352,15 @@ const IsolatedThreadContainer = props => {
                           )
                         }}
                         goToTopic={props.goToTopic}
+                        onReport={
+                          ENV?.student_reporting_enabled &&
+                          props.discussionTopic.permissions?.studentReporting
+                            ? () => {
+                                setShowReportModal(true)
+                              }
+                            : null
+                        }
+                        isReported={props.discussionEntry?.entryParticipant?.reportType != null}
                       />
                     }
                     author={props.discussionEntry.author}
@@ -367,6 +396,22 @@ const IsolatedThreadContainer = props => {
                       </ThreadingToolbar>
                     </View>
                   </DiscussionEntryContainer>
+                  <ReportReply
+                    onCloseReportModal={() => {
+                      setShowReportModal(false)
+                    }}
+                    onSubmit={reportType => {
+                      updateDiscussionEntryReported({
+                        variables: {
+                          discussionEntryId: props.discussionEntry._id,
+                          reportType
+                        }
+                      })
+                      setReportModalIsLoading(true)
+                    }}
+                    showReportModal={showReportModal}
+                    isLoading={reportModalIsLoading}
+                  />
                 </Flex.Item>
               </Flex>
             </Highlight>

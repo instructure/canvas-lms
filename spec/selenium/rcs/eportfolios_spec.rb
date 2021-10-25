@@ -35,7 +35,7 @@ describe "eportfolios" do
   end
 
   it "creates an eportfolio that is public", priority: "2", test_id: 114348 do
-    create_eportfolio(true)
+    create_eportfolio
     validate_eportfolio(true)
   end
 

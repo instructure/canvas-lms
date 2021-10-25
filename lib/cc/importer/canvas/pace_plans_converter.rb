@@ -29,7 +29,6 @@ module CC::Importer::Canvas
         pace_plan = {}
         pace_plan[:migration_id] = pace_plan_node['identifier']
         pace_plan[:workflow_state] = get_node_val(pace_plan_node, 'workflow_state')
-        pace_plan[:start_date] = get_time_val(pace_plan_node, 'start_date')
         pace_plan[:end_date] = get_time_val(pace_plan_node, 'end_date')
         pace_plan[:published_at] = get_time_val(pace_plan_node, 'published_at')
         pace_plan[:exclude_weekends] = get_bool_val(pace_plan_node, 'exclude_weekends')

@@ -159,6 +159,7 @@ class ApplicationController < ActionController::Base
           current_user_roles: @current_user&.roles(@domain_root_account),
           current_user_types: @current_user.try { |u| u.account_users.active.map { |au| au.role.name } },
           current_user_disabled_inbox: @current_user&.disabled_inbox?,
+          discussions_reporting: Account.site_admin.feature_enabled?(:discussions_reporting),
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           k12: k12?,
@@ -233,9 +234,9 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = [
-    :cc_in_rce_video_tray, :featured_help_links, :rce_pretty_html_editor,
+    :cc_in_rce_video_tray, :featured_help_links,
     :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons, :important_dates, :feature_flag_filters, :k5_parent_support,
-    :conferencing_in_planner, :remember_settings_tab, :word_count_in_speed_grader
+    :conferencing_in_planner, :remember_settings_tab, :word_count_in_speed_grader, :observer_picker
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :responsive_awareness, :responsive_misc, :product_tours, :files_dnd, :usage_rights_discussion_topics,
@@ -612,7 +613,7 @@ class ApplicationController < ActionController::Base
     InstStatsd::Statsd.batch(&block)
   end
 
-  def compute_http_cost(&block)
+  def compute_http_cost
     CanvasHttp.reset_cost!
     yield
   ensure
@@ -1106,16 +1107,16 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def set_badge_counts_for(context, user, enrollment = nil)
+  def set_badge_counts_for(context, user)
     return if @js_env && @js_env[:badge_counts].present?
     return unless context.present? && user.present?
     return unless context.respond_to?(:content_participation_counts) # just Course and Group so far
 
-    js_env(:badge_counts => badge_counts_for(context, user, enrollment))
+    js_env(:badge_counts => badge_counts_for(context, user))
   end
   helper_method :set_badge_counts_for
 
-  def badge_counts_for(context, user, enrollment = nil)
+  def badge_counts_for(context, user)
     badge_counts = {}
     ['Submission'].each do |type|
       participation_count = context.content_participation_counts
@@ -2214,7 +2215,7 @@ class ApplicationController < ActionController::Base
   end
   helper_method :verified_file_download_url
 
-  def user_content(str, cache_key = nil)
+  def user_content(str)
     return nil unless str
     return str.html_safe unless str.match(/object|embed|equation_image/)
 

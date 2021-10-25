@@ -431,17 +431,17 @@ describe "Module Items API", type: :request do
       end
 
       it "requires valid page_url" do
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                        { :controller => "context_module_items_api", :action => "create", :format => "json",
-                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
-                        { :module_item => { :title => 'Blah', :type => 'Page' } },
-                        {}, { :expected_status => 400 })
+        api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                 { :controller => "context_module_items_api", :action => "create", :format => "json",
+                   :course_id => @course.id.to_s, :module_id => @module1.id.to_s },
+                 { :module_item => { :title => 'Blah', :type => 'Page' } },
+                 {}, { :expected_status => 400 })
 
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                        { :controller => "context_module_items_api", :action => "create", :format => "json",
-                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
-                        { :module_item => { :title => 'Blah', :type => 'Page', :page_url => 'invalidpageurl' } },
-                        {}, { :expected_status => 400 })
+        api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                 { :controller => "context_module_items_api", :action => "create", :format => "json",
+                   :course_id => @course.id.to_s, :module_id => @module1.id.to_s },
+                 { :module_item => { :title => 'Blah', :type => 'Page', :page_url => 'invalidpageurl' } },
+                 {}, { :expected_status => 400 })
       end
 
       it "requires a non-deleted page_url" do
@@ -449,11 +449,11 @@ describe "Module Items API", type: :request do
         page.workflow_state = 'deleted'
         page.save!
 
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
-                        { :controller => "context_module_items_api", :action => "create", :format => "json",
-                          :course_id => "#{@course.id}", :module_id => "#{@module1.id}" },
-                        { :module_item => { :title => 'Deleted Page', :type => 'Page', :page_url => page.url } },
-                        {}, { :expected_status => 400 })
+        api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
+                 { :controller => "context_module_items_api", :action => "create", :format => "json",
+                   :course_id => @course.id.to_s, :module_id => @module1.id.to_s },
+                 { :module_item => { :title => 'Deleted Page', :type => 'Page', :page_url => page.url } },
+                 {}, { :expected_status => 400 })
       end
 
       it "creates with new_tab for external tool items" do
@@ -576,10 +576,10 @@ describe "Module Items API", type: :request do
 
       it "updates the user for a wiki page sync" do
         expect(@wiki_page.user).to be_nil
-        json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@wiki_page_tag.id}",
-                        { :controller => "context_module_items_api", :action => "update", :format => "json",
-                          :course_id => "#{@course.id}", :module_id => "#{@module2.id}", :id => "#{@wiki_page_tag.id}" },
-                        { :module_item => { :title => 'New title' } })
+        api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@wiki_page_tag.id}",
+                 { :controller => "context_module_items_api", :action => "update", :format => "json",
+                   :course_id => @course.id.to_s, :module_id => @module2.id.to_s, :id => @wiki_page_tag.id.to_s },
+                 { :module_item => { :title => 'New title' } })
         expect(@wiki_page.reload.user).to eq(@user)
       end
 
@@ -1455,10 +1455,10 @@ describe "Module Items API", type: :request do
 
     it "does not show unpublished items" do
       @assignment_tag.unpublish
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
-                      { :controller => "context_module_items_api", :action => "show", :format => "json",
-                        :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
-                        :id => "#{@assignment_tag.id}" }, {}, {}, { :expected_status => 404 })
+      api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
+               { :controller => "context_module_items_api", :action => "show", :format => "json",
+                 :course_id => @course.id.to_s, :module_id => @module1.id.to_s,
+                 :id => @assignment_tag.id.to_s }, {}, {}, { :expected_status => 404 })
     end
 
     it "marks viewed and redirect external URLs" do
@@ -1671,32 +1671,32 @@ describe "Module Items API", type: :request do
       end
 
       it 'allows a mastery path' do
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}/select_mastery_path",
-                        { controller: "context_module_items_api", action: 'select_mastery_path', format: 'json',
-                          course_id: "#{@course.id}", module_id: "#{@module1.id}", id: "#{@assignment_tag.id}" },
-                        { assignment_set_id: 100 },
-                        {},
-                        { :expected_status => 200 })
+        api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}/select_mastery_path",
+                 { controller: "context_module_items_api", action: 'select_mastery_path', format: 'json',
+                   course_id: @course.id.to_s, module_id: @module1.id.to_s, id: @assignment_tag.id.to_s },
+                 { assignment_set_id: 100 },
+                 {},
+                 { :expected_status => 200 })
       end
 
       it 'allows specifying own student id' do
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}/select_mastery_path",
-                        { controller: "context_module_items_api", action: 'select_mastery_path', format: 'json',
-                          course_id: "#{@course.id}", module_id: "#{@module1.id}", id: "#{@assignment_tag.id}" },
-                        { student_id: @student.id, assignment_set_id: 100 },
-                        {},
-                        { :expected_status => 200 })
+        api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}/select_mastery_path",
+                 { controller: "context_module_items_api", action: 'select_mastery_path', format: 'json',
+                   course_id: @course.id.to_s, module_id: @module1.id.to_s, id: @assignment_tag.id.to_s },
+                 { student_id: @student.id, assignment_set_id: 100 },
+                 {},
+                 { :expected_status => 200 })
       end
 
       it 'does not allow selecting another student' do
         other_student = @student
         student_in_course(course: @course) # reassigns @student, @user
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}/select_mastery_path",
-                        { controller: "context_module_items_api", action: 'select_mastery_path', format: 'json',
-                          course_id: "#{@course.id}", module_id: "#{@module1.id}", id: "#{@assignment_tag.id}" },
-                        { student_id: other_student.id, assignment_set_id: 100 },
-                        {},
-                        { :expected_status => 401 })
+        api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}/select_mastery_path",
+                 { controller: "context_module_items_api", action: 'select_mastery_path', format: 'json',
+                   course_id: @course.id.to_s, module_id: @module1.id.to_s, id: @assignment_tag.id.to_s },
+                 { student_id: other_student.id, assignment_set_id: 100 },
+                 {},
+                 { :expected_status => 401 })
       end
 
       context 'in a course that is public to auth users' do

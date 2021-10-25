@@ -47,6 +47,10 @@ describe "threaded discussions" do
       f('#discussion_topic').find_element(:css, '.discussion-reply-action').click
       wait_for_ajaximations
       f('[data-btn-id="rce-edit-btn"]').click
+      editor_switch_button = f('[data-btn-id="rce-editormessage-btn"]')
+      if editor_switch_button.text == 'Raw HTML Editor'
+        editor_switch_button.click
+      end
       wait_for_ajaximations
       f("textarea[data-rich_text='true']").send_keys entry_text
       fj("button:contains('Post Reply')").click
@@ -61,7 +65,7 @@ describe "threaded discussions" do
         user: @student,
         message: 'new threaded reply from student'
       )
-      child_entry = @topic.discussion_entries.create!(
+      @topic.discussion_entries.create!(
         user: @student,
         message: 'new threaded child reply from student',
         parent_entry: entry
@@ -256,6 +260,10 @@ describe "threaded discussions" do
       f("button[data-testid='discussion-topic-reply']").click
       wait_for_ajaximations
       f('[data-btn-id="rce-edit-btn"]').click
+      editor_switch_button = f('[data-btn-id="rce-editormessage-btn"]')
+      if editor_switch_button.text == 'Raw HTML Editor'
+        editor_switch_button.click
+      end
       wait_for_ajaximations
       f("textarea[data-rich_text='true']").send_keys entry_text
       fj("button:contains('Reply')").click

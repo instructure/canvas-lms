@@ -217,6 +217,13 @@ describe ContentMigration do
       test_zip_import(@course, cm)
     end
 
+    it "records the job id" do
+      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
+      cm = setup_zip_import(@course)
+      test_zip_import(@course, cm)
+      expect(cm.reload.migration_settings[:job_ids]).to eq([123])
+    end
+
     it "goes through instfs if enabled" do
       cm = setup_zip_import(@course)
       allow(InstFS).to receive(:enabled?).and_return(true)
