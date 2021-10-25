@@ -343,5 +343,36 @@ describe "threaded discussions" do
       entry.reload
       expect(entry.workflow_state).to eq 'deleted'
     end
+
+    context "replies reporting" do
+      before :once do
+        Account.site_admin.enable_feature! :discussions_reporting
+      end
+
+      it "lets users report replies" do
+        @topic.discussion_entries.create!(
+          user: @student,
+          message: 'this is offensive content'
+        )
+
+        get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+        f("button[data-testid='thread-actions-menu']").click
+        fj("li:contains('Report')").click
+        expect(fj("h2:contains('Report Reply')")).to be_present
+
+        # side test, click away from modal and make sure it closes
+        force_click("button[data-testid='discussion-topic-reply']")
+        expect(f("body")).not_to contain_jqcss("h2:contains('Report Reply')")
+
+        # resume main test
+        f("button[data-testid='thread-actions-menu']").click
+        fj("li:contains('Report')").click
+        force_click("input[value='offensive']")
+        f("button[data-testid='report-reply-submit-button']").click
+        wait_for_ajaximations
+        f("button[data-testid='thread-actions-menu']").click
+        expect(fj("li:contains('Reported')")).to be_present
+      end
+    end
   end
 end
