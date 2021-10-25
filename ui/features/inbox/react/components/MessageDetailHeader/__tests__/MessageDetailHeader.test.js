@@ -29,8 +29,8 @@ describe('MessageDetailHeader', () => {
   it('sends the selected option to the provided callback function', () => {
     const props = {
       text: 'Button Test',
-      handleOptionSelect: jest.fn(),
-      onReply: jest.fn()
+      onReply: jest.fn(),
+      onReplyAll: jest.fn()
     }
     const {getByRole, getByText} = render(<MessageDetailHeader {...props} />)
 
@@ -44,7 +44,7 @@ describe('MessageDetailHeader', () => {
       (role, element) => role === 'button' && element.textContent === 'More options'
     )
     fireEvent.click(moreOptionsButton)
-    fireEvent.click(getByText('Forward'))
-    expect(props.handleOptionSelect).toHaveBeenLastCalledWith('forward')
+    fireEvent.click(getByText('Reply All'))
+    expect(props.onReplyAll).toHaveBeenCalled()
   })
 })

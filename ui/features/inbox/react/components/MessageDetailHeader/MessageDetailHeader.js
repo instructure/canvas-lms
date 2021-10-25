@@ -47,9 +47,6 @@ export const MessageDetailHeader = ({...props}) => {
       <Flex.Item>
         <Menu
           placement="bottom"
-          onSelect={(event, value) => {
-            props.handleOptionSelect(value)
-          }}
           trigger={
             <Tooltip renderTip={I18n.t('More options')} on={['hover', 'focus']}>
               <Button margin="0 x-small 0 0" renderIcon={IconMoreLine}>
@@ -58,7 +55,9 @@ export const MessageDetailHeader = ({...props}) => {
             </Tooltip>
           }
         >
-          <Menu.Item value="reply-all">{I18n.t('Reply All')}</Menu.Item>
+          <Menu.Item value="reply-all" onSelect={() => props.onReplyAll()}>
+            {I18n.t('Reply All')}
+          </Menu.Item>
           <Menu.Item value="forward">{I18n.t('Forward')}</Menu.Item>
           <Menu.Item value="star">{I18n.t('Star')}</Menu.Item>
           <Menu.Item value="delete">{I18n.t('Delete')}</Menu.Item>
@@ -71,11 +70,10 @@ export const MessageDetailHeader = ({...props}) => {
 
 MessageDetailHeader.propTypes = {
   text: PropTypes.string,
-  handleOptionSelect: PropTypes.func,
-  onReply: PropTypes.func
+  onReply: PropTypes.func,
+  onReplyAll: PropTypes.func
 }
 
 MessageDetailHeader.defaultProps = {
-  text: null,
-  handleOptionSelect: undefined
+  text: null
 }
