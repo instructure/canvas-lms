@@ -70,7 +70,8 @@ async function ltiMessageHandler(e) {
     targetWindow: e.source,
     origin: e.origin,
     subject,
-    message_id: message.message_id
+    message_id: message.message_id,
+    sendMessages: ENV?.FEATURES?.lti_platform_storage
   })
 
   if (SUBJECT_IGNORE_LIST.includes(subject)) {
