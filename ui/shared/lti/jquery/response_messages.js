@@ -21,8 +21,18 @@ const UNSUPPORTED_SUBJECT_ERROR_CODE = 'unsupported_subject'
 const WRONG_ORIGIN_ERROR_CODE = 'wrong_origin'
 const BAD_REQUEST_ERROR_CODE = 'bad_request'
 
-const buildResponseMessages = ({targetWindow, origin, subject, message_id}) => {
+const buildResponseMessages = ({
+  targetWindow,
+  origin,
+  subject,
+  message_id,
+  sendMessages = true
+}) => {
   const sendResponse = (contents = {}) => {
+    if (!sendMessages) {
+      return
+    }
+
     const message = {subject: `${subject}.response`}
     if (message_id) {
       message.message_id = message_id
