@@ -273,8 +273,6 @@ class RCEWrapper extends React.Component {
     instRecordDisabled: PropTypes.bool,
     highContrastCSS: PropTypes.arrayOf(PropTypes.string),
     maxInitRenderedRCEs: PropTypes.number,
-    // feature flag related props
-    use_rce_pretty_html_editor: PropTypes.bool,
     use_rce_buttons_and_icons: PropTypes.bool,
     use_rce_a11y_checker_notifications: PropTypes.bool
   }
@@ -681,11 +679,7 @@ class RCEWrapper extends React.Component {
     let newState
     switch (this.state.editorView) {
       case WYSIWYG_VIEW:
-        if (this.props.use_rce_pretty_html_editor) {
-          newState = {editorView: newView || PRETTY_HTML_EDITOR_VIEW}
-        } else {
-          newState = {editorView: RAW_HTML_EDITOR_VIEW}
-        }
+        newState = {editorView: newView || PRETTY_HTML_EDITOR_VIEW}
         break
       case PRETTY_HTML_EDITOR_VIEW:
         newState = {editorView: newView || WYSIWYG_VIEW}
@@ -1708,8 +1702,6 @@ class RCEWrapper extends React.Component {
   }
 
   renderHtmlEditor() {
-    if (!this.props.use_rce_pretty_html_editor) return null
-
     // the div keeps the editor from collapsing while the code editor is downloaded
     return (
       <Suspense
@@ -1811,7 +1803,6 @@ class RCEWrapper extends React.Component {
           onKBShortcutModalOpen={this.openKBShortcutModal}
           onA11yChecker={this.onA11yChecker}
           onFullscreen={this.handleClickFullscreen}
-          use_rce_pretty_html_editor={this.props.use_rce_pretty_html_editor}
           use_rce_a11y_checker_notifications={this.props.use_rce_a11y_checker_notifications}
           a11yBadgeColor={this.theme.canvasBadgeBackgroundColor}
           a11yErrorsCount={this.state.a11yErrorsCount}

@@ -29,23 +29,9 @@ describe 'quiz taking' do
     @quiz = quiz_with_new_questions(!:goto_edit)
   end
 
-  it 'allows toggling between RCE and HTML entry on essay questions', custom_timeout: 25 do
-    @quiz = quiz_with_multiple_type_questions
-    get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-    expect_new_page_load { f('#take_quiz_link').click }
-    wait_for_ajaximations
-    html_link = f('[data-btn-id="rce-edit-btn"]')
-    expect(html_link.text).to include('Switch to the html editor')
-    expect(html_link).to be_displayed
-    html_link.click
-    rce_editor_link = f('[data-btn-id="rce-edit-btn"]')
-    expect(rce_editor_link.text).to include('Switch to the rich text editor')
-    expect(rce_editor_link).to be_displayed
-  end
-
   it 'toggles only the essay question that was toggled leaving others on the page alone',
      custom_timeout: 30 do
-    @quiz = quiz_with_essay_questions
+    @quiz = quiz_with_essay_questions(false)
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load { f('#take_quiz_link').click }
     wait_for_ajaximations

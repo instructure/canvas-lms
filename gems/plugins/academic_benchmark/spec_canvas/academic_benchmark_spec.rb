@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-
 describe AcademicBenchmark do
   before(:each) do
     @root_account = Account.site_admin
@@ -160,7 +158,7 @@ describe AcademicBenchmark do
     outcome.instance_variable_get('@children').each { |o| check_built_outcome(o) }
   end
 
-  it "successfullies import the standards" do
+  it "imports the standards successfully" do
     @cm.export_content
     run_jobs
     @cm.reload
@@ -256,9 +254,7 @@ describe AcademicBenchmark do
   end
 
   describe '.queue_migration_for' do
-    # rubocop:disable RSpec/AnyInstance
     before { allow_any_instance_of(ContentMigration).to receive(:export_content) }
-    # rubocop:enable RSpec/AnyInstance
 
     it 'sets context with user' do
       cm = AcademicBenchmark.queue_migration_for(

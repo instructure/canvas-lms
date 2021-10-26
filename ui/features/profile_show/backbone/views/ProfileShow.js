@@ -16,12 +16,13 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 //
 
-import I18n from 'i18n!user_profile'
-import Backbone from '@canvas/backbone'
 import $ from 'jquery'
 import addLinkRow from '../../jst/addLinkRow.handlebars'
 import AvatarWidget from '@canvas/avatar-dialog-view'
+import Backbone from '@canvas/backbone'
 import '@canvas/forms/jquery/jquery.instructure_forms'
+import I18n from 'i18n!user_profile'
+import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
 
 export default class ProfileShow extends Backbone.View {
   static initClass() {
@@ -30,7 +31,8 @@ export default class ProfileShow extends Backbone.View {
     this.prototype.events = {
       'click [data-event]': 'handleDeclarativeClick',
       'submit #edit_profile_form': 'validateForm',
-      'click .report_avatar_link': 'reportAvatarLink'
+      'click #report_avatar_link': 'reportAvatarLink',
+      'click #remove_avatar_link': 'removeAvatarLink'
     }
 
     this.prototype.attemptedDependencyLoads = 0
@@ -41,13 +43,50 @@ export default class ProfileShow extends Backbone.View {
     return new AvatarWidget('.profile-link')
   }
 
-  reportAvatarLink(e) {
+  async removeAvatarLink(e) {
     e.preventDefault()
-    if (!confirm(I18n.t('Are you sure you want to report this profile picture?'))) return
     const link = $(e.currentTarget)
-    $('.avatar').hide()
-    return $.ajaxJSON(link.attr('href'), 'POST', {}, data =>
-      $.flashMessage(I18n.t('The profile picture has been reported'))
+    const result = await showConfirmationDialog({
+      label: I18n.t('Confirm Removal'),
+      body: I18n.t("Are you sure you want to remove this user's profile picture?")
+    })
+    if (!result) {
+      return
+    }
+    $.ajaxJSON(
+      link.attr('href'),
+      'PUT',
+      {'avatar[state]': 'none'},
+      _data => {
+        $.flashMessage(I18n.t('The profile picture has been removed.'))
+        $('.avatar').css('background-image', 'url()')
+        link.remove()
+      },
+      _data => $.flashError(I18n.t('Failed to remove the image, please try again.'))
+    )
+  }
+
+  async reportAvatarLink(e) {
+    e.preventDefault()
+    const link = $(e.currentTarget)
+    const result = await showConfirmationDialog({
+      label: I18n.t('Report Profile Picture'),
+      body: I18n.t(
+        'Reported profile pictures will be sent to administrators for review. You will not be able to undo this action.'
+      )
+    })
+    if (!result) {
+      return
+    }
+    $.ajaxJSON(
+      link.attr('href'),
+      'POST',
+      {},
+      _data => {
+        $.flashMessage(I18n.t('The profile picture has been reported.'))
+        link.remove()
+      },
+      _data => $.flashError(I18n.t('Failed to report the image, please try again.'))
     )
   }
 
@@ -121,17 +160,17 @@ export default class ProfileShow extends Backbone.View {
   validateForm(event) {
     const validations = {
       property_validations: {
-        'user_profile[title]': function(value) {
+        'user_profile[title]': function (value) {
           if (value && value.length > 255) {
             return I18n.t('profile_title_too_long', 'Title is too long')
           }
         },
-        'user_profile[bio]': function(value) {
+        'user_profile[bio]': function (value) {
           if (value && value.length > 65536) {
             return I18n.t('profile_bio_too_long', 'Bio is too long')
           }
         },
-        'link_urls[]': function(value) {
+        'link_urls[]': function (value) {
           if (value && /\s/.test(value)) {
             return I18n.t('invalid_url', 'Invalid URL')
           }

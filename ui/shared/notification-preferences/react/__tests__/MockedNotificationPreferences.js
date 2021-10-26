@@ -77,6 +77,17 @@ const mockedNotificationPreferences = overrides => ({
             name: 'Submission Needs Grading',
             _id: '4'
           }
+        },
+        {
+          communicationChannelId: '1',
+          frequency: 'immediately',
+          notification: {
+            _id: '112',
+            category: 'ReportedReply',
+            categoryDescription: 'New reported reply in a Discussion',
+            categoryDisplayName: 'Reported Reply',
+            name: 'Reported Reply'
+          }
         }
       ],
       notificationPolicyOverrides: [

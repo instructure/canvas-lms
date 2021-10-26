@@ -288,7 +288,7 @@ describe UserList do
 
     it "detects duplicates, even from different CCs" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => 1)
-      cc = communication_channel(@user, { username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true })
+      communication_channel(@user, { username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true })
       ul = UserList.new 'jt@instructure.com, (801) 555-5555'
       expect(ul.addresses).to eq [{ :address => 'jt@instructure.com', :type => :pseudonym, :user_id => @user.id, :name => 'JT', :shard => Shard.default }]
       expect(ul.errors).to eq []

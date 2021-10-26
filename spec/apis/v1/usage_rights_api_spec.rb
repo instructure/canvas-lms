@@ -208,9 +208,9 @@ describe UsageRightsController, type: :request do
     end
 
     it "sets usage rights" do
-      json = api_call(:put, "/api/v1/users/#{@user.id}/usage_rights",
-                      { controller: 'usage_rights', action: 'set_usage_rights', user_id: @user.to_param, format: 'json' },
-                      { file_ids: [@attachment.id], usage_rights: { use_justification: 'own_copyright', legal_copyright: '(C) 2014 XYZ Corp' } })
+      api_call(:put, "/api/v1/users/#{@user.id}/usage_rights",
+               { controller: 'usage_rights', action: 'set_usage_rights', user_id: @user.to_param, format: 'json' },
+               { file_ids: [@attachment.id], usage_rights: { use_justification: 'own_copyright', legal_copyright: '(C) 2014 XYZ Corp' } })
       expect(@attachment.reload.usage_rights.use_justification).to eq('own_copyright')
     end
   end
@@ -229,9 +229,9 @@ describe UsageRightsController, type: :request do
     end
 
     it "sets usage rights" do
-      json = api_call(:put, "/api/v1/groups/#{@group.id}/usage_rights",
-                      { controller: 'usage_rights', action: 'set_usage_rights', group_id: @group.to_param, format: 'json' },
-                      { file_ids: [@attachment.id], usage_rights: { use_justification: 'fair_use', legal_copyright: '(C) 2014 XYZ Corp' } })
+      api_call(:put, "/api/v1/groups/#{@group.id}/usage_rights",
+               { controller: 'usage_rights', action: 'set_usage_rights', group_id: @group.to_param, format: 'json' },
+               { file_ids: [@attachment.id], usage_rights: { use_justification: 'fair_use', legal_copyright: '(C) 2014 XYZ Corp' } })
       expect(@attachment.reload.usage_rights.use_justification).to eq('fair_use')
     end
   end

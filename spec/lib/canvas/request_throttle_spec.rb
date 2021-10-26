@@ -203,8 +203,8 @@ describe 'RequestThrottle' do
       end
 
       it "weights the cost by settings" do
-        cpu_cost = Setting.set("request_throttle.cpu_cost_weight", "2.0")
-        db_cost = Setting.set("request_throttle.db_cost_weight", "0.5")
+        Setting.set("request_throttle.cpu_cost_weight", "2.0")
+        Setting.set("request_throttle.db_cost_weight", "0.5")
         cost = throttle.calculate_cost(20, 4, {})
         expect(cost).to eq(42)
       end
@@ -227,7 +227,7 @@ describe 'RequestThrottle' do
       it "does not skip if no client_identifier found" do
         expect(strip_variable_headers(throttler.call(request_no_session))).to eq response
         bucket = RequestThrottle::LeakyBucket.new("ip:#{request_no_session['REMOTE_ADDR']}")
-        count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
+        _count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
         expect(last_touched.to_f).to be > 0.0
       end
     end
@@ -285,7 +285,7 @@ describe 'RequestThrottle' do
       it "increments the bucket" do
         expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
         bucket = RequestThrottle::LeakyBucket.new("user:1")
-        count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
+        _count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
         expect(last_touched.to_f).to be > 0.0
       end
     end

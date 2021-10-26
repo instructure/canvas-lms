@@ -37,6 +37,11 @@ module Types
       object[:loader].load(:reply)
     end
 
+    field :student_reporting, Boolean, null: true
+    def student_reporting
+      object[:loader].load(:student_reporting)
+    end
+
     field :update, Boolean, null: true
     def update
       object[:loader].load(:update)

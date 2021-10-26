@@ -34,7 +34,7 @@ describe Switchman::Shard do
       s1 = Shard.create!(database_server_id: "jobs1")
       s2 = Shard.create!(database_server_id: "jobs2")
       s3 = Shard.create!(database_server_id: "jobs3")
-      s4 = Shard.create!(database_server_id: "jobs4")
+      Shard.create!(database_server_id: "jobs4")
 
       expect(Shard.in_region('us-east-1')).to eq([s1, s2])
       expect(Shard.in_region('eu-west-1')).to eq([s3])

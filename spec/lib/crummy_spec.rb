@@ -28,18 +28,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 # name would only be evaluated once, preventing translation of a
 # crumb, among other things
 describe "CrummyController" do
-  CrummyController = Class.new(super_class = ActionController::Base) do
-    def self.filter_blocks
-      @filter_blocks ||= []
-    end
+  let(:crummy_controller) do
+    Class.new(ActionController::Base) do # rubocop:disable Rails/ApplicationController
+      def self.filter_blocks
+        @filter_blocks ||= []
+      end
 
-    def self.before_action(*filters, &block)
-      filter_blocks.push block
-    end
+      def self.before_action(*_filters, &block)
+        filter_blocks.push block
+      end
 
-    def run_filter_blocks
-      self.class.filter_blocks.each do |filter_block|
-        filter_block.call self
+      def run_filter_blocks
+        self.class.filter_blocks.each do |filter_block|
+          filter_block.call self
+        end
       end
     end
   end
@@ -55,19 +57,21 @@ describe "CrummyController" do
       end
     }
 
-    CrummyNameController = Class.new(super_class = CrummyController) do
-      add_crumb(name_run_proc, "http://")
+    let(:crummy_name_controller) do
+      Class.new(crummy_controller) do
+        add_crumb(name_run_proc, "http://")
+      end
     end
 
     it "reevaluates the proc on each run" do
       # first run should add crumb "A"
-      a = CrummyNameController.new
+      a = crummy_name_controller.new
       a.run_filter_blocks
       expect(a.crumbs.length).to eq 1
       expect(a.crumbs[0][0]).to eq "A"
 
       # second run should add crumb "B"
-      b = CrummyNameController.new
+      b = crummy_name_controller.new
       b.run_filter_blocks
       expect(b.crumbs.length).to eq 1
       expect(b.crumbs[0][0]).to eq "B"
@@ -85,19 +89,21 @@ describe "CrummyController" do
       end
     }
 
-    CrummyUrlController = Class.new(super_class = CrummyController) do
-      add_crumb("Name", &url_run_proc)
+    let(:crummy_url_controller) do
+      Class.new(crummy_controller) do
+        add_crumb("Name", &url_run_proc)
+      end
     end
 
     it "reevaluates the proc on each run" do
       # first run should add crumb "A"
-      a = CrummyUrlController.new
+      a = crummy_url_controller.new
       a.run_filter_blocks
       expect(a.crumbs.length).to eq 1
       expect(a.crumbs[0][1]).to eq "http://a"
 
       # second run should add crumb "B"
-      b = CrummyUrlController.new
+      b = crummy_url_controller.new
       b.run_filter_blocks
       expect(b.crumbs.length).to eq 1
       expect(b.crumbs[0][1]).to eq "http://b"

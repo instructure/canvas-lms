@@ -20,7 +20,7 @@ import {connect, Provider} from 'react-redux'
 import I18n from 'i18n!k5_dashboard'
 import PropTypes from 'prop-types'
 
-import {startLoadingAllOpportunities, responsiviser, store} from '@instructure/canvas-planner'
+import {responsiviser, store} from '@instructure/canvas-planner'
 import {
   IconBankLine,
   IconCalendarMonthLine,
@@ -39,7 +39,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 
-import K5Tabs from '@canvas/k5/react/K5Tabs'
+import K5Tabs, {scrollElementIntoViewIfCoveredByHeader} from '@canvas/k5/react/K5Tabs'
 import GradesPage from './GradesPage'
 import HomeroomPage from './HomeroomPage'
 import TodosPage from './TodosPage'
@@ -130,8 +130,6 @@ export const K5Dashboard = ({
   createPermissions,
   currentUser,
   currentUserRoles,
-  loadingOpportunities,
-  loadAllOpportunities,
   timeZone,
   defaultTab = TAB_IDS.HOMEROOM,
   plannerEnabled = false,
@@ -163,7 +161,6 @@ export const K5Dashboard = ({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
     focusFallback: tabsRef,
-    callback: () => loadAllOpportunities(),
     observedUserId: initialObservedId,
     isObserver: currentUserRoles.includes('observer')
   })
@@ -257,7 +254,7 @@ export const K5Dashboard = ({
     return (
       <Flex as="section" margin={`medium 0 ${sticky && showingIcons ? '0' : 'small'} 0`}>
         <Flex.Item shouldGrow shouldShrink margin="0 small 0 0">
-          <Heading as="h1" level={sticky ? 'h2' : 'h1'}>
+          <Heading as="h1" aria-hidden={observerMode} level={sticky ? 'h2' : 'h1'}>
             {I18n.t('Welcome, %{name}!', {name: currentUser.display_name})}
           </Heading>
         </Flex.Item>
@@ -295,9 +292,19 @@ export const K5Dashboard = ({
   return (
     <>
       <Flex as="section" alignItems="start">
-        <Flex.Item shouldGrow shouldShrink padding="x-small medium medium medium">
-          {parentSupportEnabled && currentUserRoles.includes('observer') && (
+        <Flex.Item
+          shouldGrow
+          shouldShrink
+          padding="x-small medium medium medium"
+          onFocus={scrollElementIntoViewIfCoveredByHeader(tabsRef)}
+        >
+          {observerMode && (
             <View as="div" maxWidth="16em">
+              <ScreenReaderContent>
+                <Heading as="h1">
+                  {I18n.t('Welcome, %{name}!', {name: currentUser.display_name})}
+                </Heading>
+              </ScreenReaderContent>
               <ObserverOptions
                 observerList={observerList}
                 currentUser={currentUser}
@@ -314,7 +321,6 @@ export const K5Dashboard = ({
               assignmentsMissing,
               assignmentsCompletedForToday,
               loadingAnnouncements,
-              loadingOpportunities,
               isStudent: plannerEnabled,
               responsiveSize,
               subjectAnnouncements
@@ -351,7 +357,7 @@ export const K5Dashboard = ({
             <GradesPage
               visible={currentTab === TAB_IDS.GRADES}
               currentUserRoles={currentUserRoles}
-              observedUserId={observedUserId}
+              observedUserId={observerMode ? observedUserId : null}
               currentUser={currentUser}
             />
             {cards && (
@@ -402,8 +408,6 @@ K5Dashboard.propTypes = {
     avatar_image_url: PropTypes.string
   }).isRequired,
   currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired,
-  loadingOpportunities: PropTypes.bool.isRequired,
-  loadAllOpportunities: PropTypes.func.isRequired,
   timeZone: PropTypes.string.isRequired,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
@@ -417,14 +421,7 @@ K5Dashboard.propTypes = {
   canAddObservee: PropTypes.bool.isRequired
 }
 
-const mapDispatchToProps = {
-  loadAllOpportunities: startLoadingAllOpportunities
-}
-
-const WrappedK5Dashboard = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(responsiviser()(K5Dashboard))
+const WrappedK5Dashboard = connect(mapStateToProps)(responsiviser()(K5Dashboard))
 
 export default props => (
   <ApplyTheme theme={theme}>

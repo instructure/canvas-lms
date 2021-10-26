@@ -90,12 +90,12 @@ RUN --mount=target=/tmp/src \
     bin \
     config/environments \
     config/locales \
-    frontend_build \
     lib/canvas/cdn \
     lib/rake \
     lib/tasks \
     public \
     ui \
+    ui-build \
     \
     config/application.rb \
     config/boot.rb \

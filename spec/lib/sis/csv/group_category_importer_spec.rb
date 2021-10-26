@@ -50,7 +50,7 @@ describe SIS::CSV::GroupCategoryImporter do
   end
 
   it "ensures group_category_id is unique" do
-    importer = process_csv_data(
+    process_csv_data(
       "group_category_id,category_name,status",
       "gc1,Some Category,active",
       "gc1,Other Category,active",

@@ -49,6 +49,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Anslagslista" },
   "announcements_a4b8ed4a": { "message": "Anslag" },
   "apply_781a2546": { "message": "Tillämpa" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Tillämpa ändringar på alla instanser för den här knappen och ikonen i kursen"
+  },
   "apps_54d24a47": { "message": "Appar" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Bildförhållande kommer att behållas"
@@ -61,9 +64,6 @@ const locale = {
   "audio_player_for_title_20cc70d": { "message": "Ljudspelare för { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Automatiskt sparat innehåll finns. Vill du läsa in det automatiskt sparade innehållet istället?"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "Öppna automatiskt en infogad förhandsvisning (Förhandsvisningen visas endast efter att den sparats)"
   },
   "available_folders_694d0436": { "message": "Tillgängliga mappar" },
   "below_81d4dceb": { "message": "Nedan" },
@@ -108,6 +108,9 @@ const locale = {
     "message": "Stäng en meny eller dialogruta Tar dig också tillbaka till redigerarområdet"
   },
   "close_d634289d": { "message": "Stäng" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Undertextfilen får inte vara större än { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": { "message": "Undertexter" },
   "collaborations_5c56c15f": { "message": "Samarbeten" },
   "collapse_to_hide_types_1ab46d2e": {
@@ -139,6 +142,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-licens:"
   },
+  "current_image_f16c249c": { "message": "Aktuell bild" },
   "custom_6979cd81": { "message": "Anpassa" },
   "date_added_ed5ad465": { "message": "Tillagt datum" },
   "decorative_image_3c28aa7d": { "message": "Dekorativ bild" },
@@ -154,9 +158,6 @@ const locale = {
   "details_98a31b68": { "message": "Detaljer" },
   "dimensions_45ddb7b7": { "message": "Dimensioner" },
   "directionality_26ae9e08": { "message": "Textens riktning" },
-  "disable_in_line_preview_2a675175": {
-    "message": "Inaktivera infogad förhandsvisning."
-  },
   "discussions_a5f96392": { "message": "Diskussioner" },
   "discussions_index_6c36ced": { "message": "Diskussionsindex" },
   "display_options_315aba85": { "message": "Visa alternativ" },
@@ -296,11 +297,11 @@ const locale = {
   "middle_27dc1d5": { "message": "Mitten" },
   "miscellaneous_e9818229": { "message": "Blandat" },
   "modules_c4325335": { "message": "Moduler" },
+  "multi_color_image_63d7372f": { "message": "Flerfärgsbild" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Måste vara minst { width } x { height }pixlar"
   },
   "my_files_2f621040": { "message": "Mina filer" },
-  "my_images_427f9b0c": { "message": "Mina bilder" },
   "name_1aed4a1b": { "message": "Namn" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigera via menyn eller verktygsfältet"
@@ -382,9 +383,10 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "Visa bildalternativ" },
   "show_link_options_545338fd": { "message": "Visa länkalternativ" },
   "show_video_options_6ed3721a": { "message": "Visa videoalternativ" },
+  "single_color_image_4e5d4dbc": { "message": "Enfärgsbild" },
   "size_b30e1077": { "message": "Storlek" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "Storleken på { file } är större än den maximalt tillåtna storleken { max } MB för en fil."
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Storleken på undertextfilen överstiger maxstorleken på { max } kb."
   },
   "small_b070434a": { "message": "Liten" },
   "something_went_wrong_89195131": { "message": "Någonting gick fel." },

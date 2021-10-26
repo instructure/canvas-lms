@@ -557,10 +557,10 @@ describe "Modules API", type: :request do
         # surreptitiously set up a terrible pre-DS => post-DS transition state
         ContentTag.where(:id => @wiki_page_tag.id).update_all(:workflow_state => 'active')
 
-        json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
-                        { :controller => "context_modules_api", :action => "update", :format => "json",
-                          :course_id => "#{@course.id}", :id => "#{@module1.id}" },
-                        { :module => { :published => '1' } })
+        api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
+                 { :controller => "context_modules_api", :action => "update", :format => "json",
+                   :course_id => @course.id.to_s, :id => @module1.id.to_s },
+                 { :module => { :published => '1' } })
 
         @wiki_page.reload
         expect(@wiki_page.active?).to eq true
@@ -597,19 +597,19 @@ describe "Modules API", type: :request do
         new_module.reload
         expect(new_module.prerequisites.map { |m| m[:id] }.sort).to eq [@module1.id, @module2.id].sort
 
-        json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{new_module.id}",
-                        { :controller => "context_modules_api", :action => "update", :format => "json",
-                          :course_id => "#{@course.id}", :id => "#{new_module.id}" },
-                        { :module => { :name => 'new name',
-                                       :require_sequential_progress => true } })
+        api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{new_module.id}",
+                 { :controller => "context_modules_api", :action => "update", :format => "json",
+                   :course_id => @course.id.to_s, :id => new_module.id.to_s },
+                 { :module => { :name => 'new name',
+                                :require_sequential_progress => true } })
         new_module.reload
         expect(new_module.prerequisites.map { |m| m[:id] }.sort).to eq [@module1.id, @module2.id].sort
 
-        json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{new_module.id}",
-                        { :controller => "context_modules_api", :action => "update", :format => "json",
-                          :course_id => "#{@course.id}", :id => "#{new_module.id}" },
-                        { :module => { :name => 'new name',
-                                       :prerequisite_module_ids => '' } })
+        api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{new_module.id}",
+                 { :controller => "context_modules_api", :action => "update", :format => "json",
+                   :course_id => @course.id.to_s, :id => new_module.id.to_s },
+                 { :module => { :name => 'new name',
+                                :prerequisite_module_ids => '' } })
         new_module.reload
         expect(new_module.prerequisites.map { |m| m[:id] }.sort).to be_empty
       end
@@ -641,10 +641,10 @@ describe "Modules API", type: :request do
       end
 
       it "requires a name" do
-        json = api_call(:post, "/api/v1/courses/#{@course.id}/modules",
-                        { :controller => "context_modules_api", :action => "create", :format => "json",
-                          :course_id => "#{@course.id}" },
-                        { :module => { :name => '' } }, {}, { :expected_status => 400 })
+        api_call(:post, "/api/v1/courses/#{@course.id}/modules",
+                 { :controller => "context_modules_api", :action => "create", :format => "json",
+                   :course_id => @course.id.to_s },
+                 { :module => { :name => '' } }, {}, { :expected_status => 400 })
 
         expect(@course.context_modules.count).to eq 0
       end
@@ -840,9 +840,9 @@ describe "Modules API", type: :request do
     end
 
     it "does not show a single unpublished module" do
-      json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module3.id}",
-                      { :controller => "context_modules_api", :action => "show", :format => "json",
-                        :course_id => "#{@course.id}", :id => @module3.id.to_param }, {}, {}, { :expected_status => 404 })
+      api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module3.id}",
+               { :controller => "context_modules_api", :action => "show", :format => "json",
+                 :course_id => @course.id.to_s, :id => @module3.id.to_param }, {}, {}, { :expected_status => 404 })
     end
 
     describe "batch update" do

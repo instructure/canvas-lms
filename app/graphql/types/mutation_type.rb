@@ -19,7 +19,7 @@
 #
 
 class PostgresTimeoutFieldExtension < GraphQL::Schema::FieldExtension
-  def resolve(object:, arguments:, context:, **rest)
+  def resolve(object:, arguments:, context:, **)
     GraphQLPostgresTimeout.wrap(context.query) do
       yield(object, arguments)
     end

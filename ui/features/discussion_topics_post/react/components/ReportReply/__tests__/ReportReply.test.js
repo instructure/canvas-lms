@@ -23,8 +23,9 @@ import {ReportReply} from '../ReportReply'
 const mockProps = ({
   onCloseReportModal = jest.fn(),
   onSubmit = jest.fn(),
-  showReportModal = true
-} = {}) => ({onCloseReportModal, onSubmit, showReportModal})
+  showReportModal = true,
+  isLoading = false
+} = {}) => ({onCloseReportModal, onSubmit, showReportModal, isLoading})
 
 const setup = props => {
   return render(<ReportReply {...props} />)
@@ -64,6 +65,7 @@ describe('Report Reply', () => {
     expect(submitButton).toBeTruthy()
     fireEvent.click(submitButton)
     expect(onSubmitMock.mock.calls.length).toBe(1)
+    expect(onSubmitMock).toHaveBeenCalledWith('other')
   })
 
   it('submit button should be disabled unless an option is selected', async () => {
@@ -73,5 +75,16 @@ describe('Report Reply', () => {
     expect(option).toBeTruthy()
     fireEvent.click(option)
     expect(container.getByText('Submit').closest('button').hasAttribute('disabled')).toBeFalsy()
+  })
+
+  it('when loading should show loading indicator and buttons be disabled', async () => {
+    const container = setup(mockProps({isLoading: true}))
+
+    const loadingTexts = container.getAllByText(/loading/i)
+    const loadingSpinner = loadingTexts.find(loading => loading.closest('svg'))
+    expect(loadingSpinner).toBeInTheDocument()
+
+    expect(container.getByText('Submit').closest('button').hasAttribute('disabled')).toBeTruthy()
+    expect(container.getByText('Cancel').closest('button').hasAttribute('disabled')).toBeTruthy()
   })
 })

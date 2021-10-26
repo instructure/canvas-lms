@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
+require_relative 'report_spec_helper'
 
 describe "Default Account Reports" do
   include ReportSpecHelper
@@ -57,6 +57,9 @@ describe "Default Account Reports" do
     @user8 = user_with_pseudonym(:active_all => true, :username => 'steve@apple.com',
                                  :name => 'Steve Jobs', :account => @account)
     @user8.destroy
+    @user9 = user_with_pseudonym(:active_all => true, :username => 'tim@apple.com',
+                                 :name => 'Tim Cook', :account => @account)
+    @user9.pseudonym.update!(workflow_state: 'suspended')
   end
 
   def create_an_account
@@ -332,7 +335,7 @@ describe "Default Account Reports" do
     name_parts = User.name_parts(user.sortable_name, likely_already_surname_first: true)
     first_name = name_parts[0]
     last_name = name_parts[1]
-    state = user.workflow_state == 'registered' ? 'active' : user.workflow_state
+    state = pseudonym.workflow_state
     @report ||= AccountReports::SisExporter.new(@account.account_reports.new(user: @admin), {})
     row = case format
           when 'sis'
@@ -449,8 +452,8 @@ describe "Default Account Reports" do
 
         headers = parsed.shift
         expect(headers).to eq user_headers(format: 'provisioning')
-        expect(parsed.length).to eq 6
-        expect(parsed).to eq([@user6, @user7, @user1, @user2, @user3, @user4].map { |u| expected_user(u, format: 'provisioning') })
+        expect(parsed.length).to eq 7
+        expect(parsed).to eq([@user6, @user7, @user9, @user1, @user2, @user3, @user4].map { |u| expected_user(u, format: 'provisioning') })
       end
 
       it "runs provisioning report including deleted users for course" do
@@ -1534,7 +1537,7 @@ describe "Default Account Reports" do
 
       users_report = parsed["users.csv"][1..-1].sort_by { |r| r[0] }
       expect(users_report.length).to eq 4
-      expect(users_report).to eq [@user1, @user2, @user3, @user4].map { |u| expected_user(u) }
+      expect(users_report).to eq([@user1, @user2, @user3, @user4].map { |u| expected_user(u) })
     end
 
     it "runs the SIS Export reports with no data" do

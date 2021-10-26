@@ -249,8 +249,6 @@ describe "account admin question bank" do
 
     it "aligns an outcome" do
       skip_if_chrome('issue with add_outcome_to_bank method')
-      mastery_points, possible_points = @outcome.data[:rubric_criterion].values_at(:mastery_points, :points_possible)
-      percentage = mastery_points.to_f / possible_points.to_f
       add_outcome_to_bank(@outcome)
       expect(fj("[data-id=#{@outcome.id}]:visible")).to include_text("60%")
       expect(@question_bank.reload.learning_outcome_alignments.count).to be > 0

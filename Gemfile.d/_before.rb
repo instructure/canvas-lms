@@ -30,7 +30,7 @@ if RUBY_ENGINE == 'truffleruby'
 elsif RUBY_VERSION >= "3.0.0" && RUBY_VERSION < "3.1"
   warn "Ruby 3.0+ support is experimental" unless ENV['SUPPRESS_RUBY_WARNING']
 end
-ruby '>= 2.6.0', '< 3.1'
+ruby '>= 2.7.0', '< 3.1'
 
 # force a different lockfile for next rails
 unless CANVAS_RAILS6_0

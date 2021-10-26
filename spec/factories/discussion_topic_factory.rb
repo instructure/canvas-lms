@@ -45,7 +45,7 @@ module Factories
     @topic = @group.discussion_topics.where(root_topic_id: @root_topic).first
   end
 
-  def topic_with_nested_replies(opts = {})
+  def topic_with_nested_replies
     course_with_teacher(:active_all => true)
     student_in_course(:course => @course, :active_all => true)
     @topic = @course.discussion_topics.create!(:title => "title", :message => "message", :user => @teacher, :discussion_type => 'threaded')

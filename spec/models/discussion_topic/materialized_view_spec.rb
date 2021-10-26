@@ -53,14 +53,14 @@ describe DiscussionTopic::MaterializedView do
       expect(DiscussionTopic::MaterializedView.materialized_view_for(@topic)).to be_present
       reply = @topic.reply_from(:user => @user, :text => "new message!")
       Delayed::Job.find_available(100).each(&:destroy)
-      json, participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
+      json, _participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
       expect(json).to be_present
       expect(entries).not_to be_include(reply.id)
       # since the view was out of date, it's returned but a job is queued
       expect(Delayed::Job.where(singleton: "materialized_discussion:#{@topic.id}").count).to eq 1
       # after updating, the view should include the new entry
       @view.update_materialized_view(synchronous: true)
-      json, participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
+      json, _participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
       expect(json).to be_present
       expect(entries).to be_include(reply.id)
     end
@@ -126,11 +126,11 @@ describe DiscussionTopic::MaterializedView do
     obj = @course.media_objects.create! media_id: '0_deadbeef'
     track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
 
-    bad_entry = @topic.reply_from(:user => @student, :html => %Q{<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>})
+    @topic.reply_from(:user => @student, :html => '<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>')
 
     view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
     view.update_materialized_view(synchronous: true)
-    structure, participant_ids, entry_ids = @topic.materialized_view
+    structure, _participant_ids, _entry_ids = @topic.materialized_view
     entry_json = JSON.parse(structure).last
     html = Nokogiri::HTML5.fragment(entry_json['message'])
     expect(html.at_css('video track')['src']).to eq "https://placeholder.invalid/media_objects/#{obj.id}/media_tracks/#{track.id}.json"

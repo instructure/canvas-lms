@@ -49,6 +49,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Beskedliste" },
   "announcements_a4b8ed4a": { "message": "Beskeder" },
   "apply_781a2546": { "message": "Tildel" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Anvend ændringer på alle forekomster af denne knap og ikon i faget"
+  },
   "apps_54d24a47": { "message": "Apps" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Dimensionsforhold bevares"
@@ -63,9 +66,6 @@ const locale = {
   },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Der findes automatisk gemt indhold. Vil du indlæse det automatisk gemte indhold i stedet?"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "Åbn automatisk en in-line forhåndsvisning. (Forhåndsvisning vises kun, når filen er blevet gemt)"
   },
   "available_folders_694d0436": { "message": "Tilgængelige mapper" },
   "below_81d4dceb": { "message": "Under" },
@@ -106,6 +106,9 @@ const locale = {
     "message": "Luk en menu eller dialog. Sender dig også tilbage til redigeringsområdet"
   },
   "close_d634289d": { "message": "Luk" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Filen med undertekster skal være mindre end { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "Billedtekster / undertekster"
   },
@@ -137,6 +140,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Creative Commons licens:"
   },
+  "current_image_f16c249c": { "message": "Nuværende billede" },
   "custom_6979cd81": { "message": "Brugerdefineret" },
   "date_added_ed5ad465": { "message": "Dato tilføjet" },
   "decorative_image_3c28aa7d": { "message": "Dekorativt billede" },
@@ -152,9 +156,6 @@ const locale = {
   "details_98a31b68": { "message": "Nærmere oplysninger" },
   "dimensions_45ddb7b7": { "message": "Dimensioner" },
   "directionality_26ae9e08": { "message": "Retningsbestemthed" },
-  "disable_in_line_preview_2a675175": {
-    "message": "Deaktiver in-line forhåndsvisning."
-  },
   "discussions_a5f96392": { "message": "Diskussioner" },
   "discussions_index_6c36ced": { "message": "Diskussionsoversigt" },
   "display_options_315aba85": { "message": "Visningsindstillinger" },
@@ -290,11 +291,11 @@ const locale = {
   "middle_27dc1d5": { "message": "I midten" },
   "miscellaneous_e9818229": { "message": "Diverse" },
   "modules_c4325335": { "message": "Moduler" },
+  "multi_color_image_63d7372f": { "message": "Billede i flere farver" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Skal være mindst { width } x { height } px"
   },
   "my_files_2f621040": { "message": "Mine filer" },
-  "my_images_427f9b0c": { "message": "Mine billeder" },
   "name_1aed4a1b": { "message": "Navn" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Naviger gennem menuen eller værktøjslinjen"
@@ -370,9 +371,10 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "Vis billedindstillinger" },
   "show_link_options_545338fd": { "message": "Vis linkindstillinger" },
   "show_video_options_6ed3721a": { "message": "Vis videoindstillinger" },
+  "single_color_image_4e5d4dbc": { "message": "Enkeltfarvet billede" },
   "size_b30e1077": { "message": "Størrelse" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "Størrelsen på { file } er større end maks. { max } MB tilladte filstørrelse."
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Tekstfilens størrelse er større end den tilladte filstørrelse på maks. { max } kb."
   },
   "small_b070434a": { "message": "Lille" },
   "something_went_wrong_89195131": { "message": "Noget gik galt." },

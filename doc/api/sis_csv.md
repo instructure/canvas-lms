@@ -287,7 +287,7 @@ declared user type from the user.</td>
 <td>enum</td>
 <td>✓</td>
 <td>✓</td>
-<td>active, deleted</td>
+<td>active, suspended, deleted</td>
 </tr>
 </table>
 
@@ -299,7 +299,8 @@ the login_id will be used as the name.</p>
 If the login is the last one, all of the users enrollments will also be deleted
 and they won't be able to log in to the school's account. If you still want the
 student to be able to log in but just not participate, leave the student
-'active' but set the enrollments to 'completed'.</p>
+'active' but set the enrollments to 'completed'. If you want to leave a student's
+enrollments intact, but not allow them to login, use the 'suspended' status.</p>
 
 Sample:
 

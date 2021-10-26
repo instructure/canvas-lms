@@ -97,6 +97,7 @@ module Lti
     ORIGINALITY_REPORT_GUARD = -> { @originality_report.present? }
     ORIGINALITY_REPORT_ATTACHMENT_GUARD = -> { @originality_report&.attachment.present? }
     LTI_ASSIGN_ID = -> { @assignment.present? || @originality_report.present? || @secure_params.present? }
+    LTI_ASSIGN_DESCRIPTION = -> { @assignment.present? || @originality_report.present? || @secure_params.present? }
     EDITOR_GUARD = -> { @editor_contents.present? }
     STUDENT_ASSIGNMENT_GUARD = -> { @context.is_a?(Course) && @context.user_is_student?(@current_user) && @assignment }
 
@@ -264,6 +265,25 @@ module Lti
                        end,
                        LTI_ASSIGN_ID,
                        default_name: 'com_instructure_assignment_lti_id'
+
+    # The LTI assignment description of an assignment.
+    # @launch_parameter com_instructure_assignment_lti_description
+    # @example
+    #   ```
+    #   "Example Description"
+    #   ```
+    register_expansion 'com.instructure.Assignment.description', [],
+                       -> do
+                         if @assignment
+                           @assignment.description
+                         elsif @originality_report
+                           @originality_report.submission.assignment.description
+                         elsif @secure_params.present?
+                           Lti::Security.decoded_lti_assignment_description(@secure_params)
+                         end
+                       end,
+                       LTI_ASSIGN_DESCRIPTION,
+                       default_name: 'com_instructure_assignment_description'
 
     # A comma separated list of the file extensions that are allowed for submitting to this
     # assignment. If there are no limits on what files can be uploaded, an empty string will be
@@ -467,6 +487,16 @@ module Lti
     #   ```
     register_expansion 'Canvas.rootAccount.sisSourceId', [],
                        -> { @root_account.sis_source_id }
+
+    # returns the global ID for the external tool that was launched. Only available for LTI 1.
+    # @example
+    #   ```
+    #   1234
+    #   ```
+    register_expansion 'Canvas.externalTool.global_id', [],
+                       -> { @tool.global_id },
+                       CONTROLLER_GUARD,
+                       LTI1_GUARD
 
     # returns the URL for the external tool that was launched. Only available for LTI 1.
     # @example
@@ -1194,6 +1224,16 @@ module Lti
     #   ```
     register_expansion 'Canvas.assignment.id', [],
                        -> { @assignment.id },
+                       ASSIGNMENT_GUARD
+
+    # Returns the assignment_description of the assignment that was launched.
+    #
+    # @example
+    #   ```
+    #   "Example Description"
+    #   ```
+    register_expansion 'Canvas.assignment.description', [],
+                       -> { @assignment.description },
                        ASSIGNMENT_GUARD
 
     # Returns the Canvas id of the group the current user is in if launching

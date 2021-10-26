@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
-
 describe Moodle::Converter do
   before(:once) do
     fixture_dir = File.dirname(__FILE__) + '/fixtures'
@@ -34,7 +32,7 @@ describe Moodle::Converter do
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @cm)
   end
 
-  it "successfullies import the course" do
+  it "imports the course successfully" do
     allowed_warnings = [
       "Multiple Dropdowns question may have been imported incorrectly",
       "There are 3 Formula questions in this bank that will need to have their possible answers regenerated",

@@ -333,7 +333,7 @@ describe LearningOutcomeResult do
     describe "with account_level_mastery_scales FF disabled" do
       before do
         course.root_account.disable_feature!(:account_level_mastery_scales)
-        proficiency = outcome_proficiency_model(course)
+        outcome_proficiency_model(course)
       end
 
       it "properly calculates percent based on result.possible, if it exists" do

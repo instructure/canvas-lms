@@ -86,7 +86,7 @@ const immersive_reader_mobile_mount_point = document.getElementById(
   'immersive_reader_mobile_mount_point'
 )
 if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
-  import('../../shared/immersive-reader/ImmersiveReader')
+  import('@canvas/immersive-reader/ImmersiveReader')
     .then(ImmersiveReader => {
       const courseSyllabusText = document.querySelector('#course_syllabus').innerHTML
       const title = I18n.t('Course Syllabus')

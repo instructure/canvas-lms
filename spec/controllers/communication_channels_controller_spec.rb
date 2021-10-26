@@ -65,7 +65,7 @@ describe CommunicationChannelsController do
     end
 
     it "does not allow duplicate active CCs for a single user" do
-      cc = @user.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+      @user.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
       user_session(@user)
       post 'create', params: { :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' } }
       expect(response).not_to be_successful
@@ -205,7 +205,7 @@ describe CommunicationChannelsController do
         u1 = user_with_communication_channel(:username => 'asdf@qwerty.com', :user_state => 'creation_pending')
         cc1 = @cc
         # another user claimed the pseudonym
-        u2 = user_with_pseudonym(:username => 'asdf@qwerty.com', :active_user => true)
+        user_with_pseudonym(:username => 'asdf@qwerty.com', :active_user => true)
 
         post 'confirm', params: { :nonce => cc1.confirmation_code, :register => 1, :pseudonym => { :password => 'asdfasdf', :password_confirmation => 'asdfasdf' } }
         assert_status(400)
