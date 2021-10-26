@@ -19,7 +19,6 @@
 #
 
 require_relative '../api_spec_helper'
-require_relative '../../sharding_spec_helper'
 
 describe EnrollmentsApiController, type: :request do
   describe "enrollment creation" do

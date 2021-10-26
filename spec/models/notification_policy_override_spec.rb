@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-
 describe 'Notification Policy Override' do
   context 'Multi Shard User' do
     specs_require_sharding

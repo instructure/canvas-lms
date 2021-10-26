@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
 require_relative '../lti2_spec_helper'
 
 describe AssignmentsController do

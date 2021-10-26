@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-
 describe DiscussionTopicPresenter do
   let(:topic)      { DiscussionTopic.new(:title => 'Test Topic', :assignment => assignment) }
   let(:user)       { user_model }

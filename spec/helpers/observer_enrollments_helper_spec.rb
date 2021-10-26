@@ -20,7 +20,6 @@
 #
 
 require_relative '../spec_helper'
-require_relative '../sharding_spec_helper'
 
 describe ObserverEnrollmentsHelper do
   include ObserverEnrollmentsHelper

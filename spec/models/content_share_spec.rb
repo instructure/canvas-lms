@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-
 describe ContentShare do
   describe 'record create' do
     it 'correctly sets the root_account_id from context' do

@@ -20,7 +20,6 @@
 
 # require 'rails_helper'
 
-require_relative '../sharding_spec_helper'
 require_relative '../selenium/helpers/groups_common'
 require_relative '../lti2_spec_helper'
 

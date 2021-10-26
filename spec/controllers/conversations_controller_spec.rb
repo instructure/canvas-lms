@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-
 describe ConversationsController do
   def conversation(opts = {})
     num_other_users = opts[:num_other_users] || 1

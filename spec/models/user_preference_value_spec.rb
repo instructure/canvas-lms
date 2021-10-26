@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative "../sharding_spec_helper"
-
 describe UserPreferenceValue do
   let(:regular_key) { :custom_colors }
   let(:subbed_key) { :course_nicknames }

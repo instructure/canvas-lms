@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-
 describe AccountReport do
   describe ".delete_old_rows_and_runners" do
     let(:account) { account_model }

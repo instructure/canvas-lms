@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../../sharding_spec_helper'
-
 describe Api::V1::AssignmentOverride do
   let(:test_class) do
     Class.new do

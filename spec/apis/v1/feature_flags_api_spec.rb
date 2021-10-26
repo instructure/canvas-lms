@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'apis/api_spec_helper'
-require 'sharding_spec_helper'
 require 'feature_flag_helper'
 
 describe "Feature Flags API", type: :request do

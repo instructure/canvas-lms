@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require_relative '../../sharding_spec_helper'
 require_relative 'course_copy_helper'
 
 describe ContentMigration do

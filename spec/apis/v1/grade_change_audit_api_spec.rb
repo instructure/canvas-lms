@@ -20,7 +20,6 @@
 
 require_relative '../api_spec_helper'
 require_relative '../../cassandra_spec_helper'
-require_relative '../../sharding_spec_helper'
 
 describe "GradeChangeAudit API", type: :request do
   context "not configured" do

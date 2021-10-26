@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../sharding_spec_helper"
-
 describe SisPseudonym do
   let_once(:course1) { course_factory active_all: true, account: Account.default }
   let_once(:course2) { course_factory active_all: true, account: account2 }

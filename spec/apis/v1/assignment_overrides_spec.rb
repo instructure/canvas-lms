@@ -19,7 +19,6 @@
 #
 
 require_relative '../api_spec_helper'
-require_relative '../../sharding_spec_helper'
 
 describe AssignmentOverridesController, type: :request do
   def validate_override_json(override, json)

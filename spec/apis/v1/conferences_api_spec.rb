@@ -19,7 +19,6 @@
 #
 
 require_relative '../api_spec_helper'
-require_relative '../../sharding_spec_helper'
 
 describe "Conferences API", type: :request do
   include Api::V1::Conferences

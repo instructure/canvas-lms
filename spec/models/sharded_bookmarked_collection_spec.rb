@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-
 describe ShardedBookmarkedCollection do
   before(:each) do
     @user = user_factory(active_user: true)

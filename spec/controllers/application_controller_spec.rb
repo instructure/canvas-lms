@@ -316,7 +316,6 @@ RSpec.describe ApplicationController do
     end
 
     context "sharding" do
-      require_relative '../sharding_spec_helper'
       specs_require_sharding
 
       it "sets the global id for the domain_root_account" do
@@ -725,7 +724,6 @@ RSpec.describe ApplicationController do
 
   describe 'rescue_action_in_public' do
     context 'sharding' do
-      require_relative '../sharding_spec_helper'
       specs_require_sharding
 
       before do
@@ -1604,7 +1602,6 @@ describe ApplicationController do
     end
 
     context "sharding" do
-      require_relative '../sharding_spec_helper'
       specs_require_sharding
 
       it "does not asplode with cross-shard groups" do
@@ -2289,7 +2286,6 @@ describe ApplicationController do
     end
 
     context "with sharding" do
-      require_relative '../sharding_spec_helper'
       specs_require_sharding
 
       before :once do

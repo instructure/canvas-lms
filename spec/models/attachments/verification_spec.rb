@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../sharding_spec_helper'
-
 describe Attachments::Verification do
   let_once(:user) { user_model }
   let_once(:course) do
