@@ -124,11 +124,14 @@ def create_assignment(course, title, points_possible = 10)
   )
 end
 
-def create_discussion(course, creator)
+def create_discussion(course, creator, workflow_state = 'published')
+  discussion_assignment = create_assignment(@course, "Discussion Assignment", 10)
   course.discussion_topics.create!(
     user: creator,
-    title: "topic #{SecureRandom.alphanumeric(10)}",
-    message: "topic message",
+    title: "Discussion Topic #{SecureRandom.alphanumeric(10)}",
+    message: "Discussion topic message",
+    assignment: discussion_assignment,
+    workflow_state: workflow_state,
     todo_date: 1.day.from_now(Time.zone.now)
   )
 end
@@ -173,10 +176,8 @@ def create_wiki_page(course)
   course.wiki_pages.create!(:title => "New Wiki Page #{SecureRandom.alphanumeric(10)}", :body => "Here's where we have content")
 end
 
-def create_module(course)
-  course_module1 = course.context_modules.create!(:name => "Module #{SecureRandom.alphanumeric(10)}")
-  assignment = create_assignment(course, "Module Assignment")
-  course_module1.add_item(:id => assignment.id, :type => 'assignment')
+def create_module(course, workflow_state = 'active')
+  course.context_modules.create!(:name => "Module #{SecureRandom.alphanumeric(10)}", :workflow_state => workflow_state)
 end
 
 def create_outcome(course, outcome_description, outcome__short_description = "Another Outcome")
@@ -204,7 +205,9 @@ def generate_fully_loaded_course(number_of_items = 2)
     create_quiz(@course)
     create_announcement(@course, 'new announcement', 'new message')
     create_wiki_page(@course)
-    create_module(@course)
+    course_module1 = create_module(@course)
+    assignment = create_assignment(course, "Module Assignment")
+    course_module1.add_item(:id => assignment.id, :type => 'assignment')
   end
 end
 
@@ -257,8 +260,7 @@ def generate_mastery_path_course
   @set3a_assmt = create_assignment(@course, "Set 3a Assessment", 10)
   @set3b_assmt = create_assignment(@course, "Set 3b Assessment", 10)
 
-  disc_assignment = create_assignment(@course, "Discussion Assignment", 10)
-  graded_discussion = @course.discussion_topics.create!(:title => 'Graded Discussion', :assignment => disc_assignment)
+  graded_discussion = create_discussion(@course, @teacher)
 
   course_module = @course.context_modules.create!(:name => "Mastery Path Module")
   course_module.add_item(:id => @trigger_assignment.id, :type => 'assignment')
@@ -273,7 +275,7 @@ def generate_mastery_path_course
     ConditionalRelease::ScoringRange.new(:lower_bound => 0.7, :upper_bound => 1.0, :assignment_sets => [
                                            ConditionalRelease::AssignmentSet.new(:assignment_set_associations => [
                                                                                    ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @set1_assmt1.id),
-                                                                                   ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => disc_assignment.id)
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => graded_discussion.assignment_id)
                                                                                  ])
                                          ]),
     ConditionalRelease::ScoringRange.new(:lower_bound => 0.4, :upper_bound => 0.7, :assignment_sets => [
@@ -346,6 +348,25 @@ def generate_course_with_dated_assignments
   end
 end
 
+def generate_pace_plan_course
+  puts "Generate a pace plan course with module and assignments"
+  course_with_teacher_enrolled
+  course_with_students_enrolled
+
+  @root_account.enable_feature!(:pace_plans)
+  @course.update(enable_pace_plans: true)
+
+  module1 = create_module(@course)
+  assignment1 = create_assignment(@course, "Assignment 1")
+  assignment2 = create_assignment(@course, "Assignment 2")
+  discussion1 = create_discussion(@course, @teacher)
+  quiz1 = create_quiz(@course)
+  module1.add_item(:id => assignment1.id, :type => 'assignment')
+  module1.add_item(:id => assignment2.id, :type => 'assignment')
+  module1.add_item(:id => discussion1.id, :type => 'discussion_topic')
+  module1.add_item(:id => quiz1.id, :type => 'quiz')
+end
+
 def create_all_the_available_data
   save_course_name = @course_name
   @course_name = save_course_name + " (course with students)"
@@ -374,10 +395,11 @@ end
 options = {}
 ARGV << '-h' if ARGV.empty?
 option_parser = OptionParser.new do |opts|
-  opts.banner = "Usage: script/rails runner generate_data.rb [-abdgklmprsth] [-c course_name] [-n number_of_students]"
+  opts.banner = "Usage: bin/rails runner spec/fixtures/data_generation/generate_data.rb [-abdgklmprsth] [-c course_name] [-n number_of_students]"
   opts.on("-a", "--all_data", "Create all the available data with defaults")
   opts.on("-b", "--basic_course", "Course with teacher and students")
   opts.on("-c", "--course_name=COURSENAME", "Course Name")
+  opts.on("-e", "--pace_plan", "Place Plan Course")
   opts.on("-d", "--dated_assignments", "Course with Dated Assignments")
   opts.on("-g", "--assignment_groups", "Course with Assignments in assignment groups")
   opts.on("-i", "--account_id=ACCOUNTID", "Id Number of the root account")
@@ -445,6 +467,8 @@ options.each_key do |key|
     generate_course_and_submissions
   when :sections
     generate_sections
+  when :pace_plan
+    generate_pace_plan_course
   else raise 'should never get here -- BIG FAIL'
   end
 end
