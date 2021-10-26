@@ -49,7 +49,7 @@ export const ImageSection = () => {
             <Flex.Item shouldGrow>
               <Flex>
                 <Flex.Item margin="0 small 0 0">
-                  <PreviewIcon variant="large" testId="selected-image-preview" />
+                  <PreviewIcon variant="large" testId="selected-image-preview" image={state.currentImage}/>
                 </Flex.Item>
                 <Flex.Item>
                   <Text>{!state.currentImage && formatMessage('None Selected')}</Text>
