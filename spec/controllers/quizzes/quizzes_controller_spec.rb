@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-
 describe Quizzes::QuizzesController do
   def course_quiz(active = false, title = nil)
     @quiz = @course.quizzes.create

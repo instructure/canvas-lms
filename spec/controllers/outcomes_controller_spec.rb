@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe OutcomesController do
   def context_outcome(context)
     @outcome_group ||= context.root_outcome_group

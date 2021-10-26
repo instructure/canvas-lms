@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe ScoreMetadata do
   it { is_expected.to belong_to(:score).required }
   it { is_expected.to validate_presence_of(:score) }

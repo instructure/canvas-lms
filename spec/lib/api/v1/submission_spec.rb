@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe Api::V1::Submission do
   subject(:fake_controller) do
     Class.new do

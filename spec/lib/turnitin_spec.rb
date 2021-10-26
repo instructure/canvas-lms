@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe Turnitin::Client do
   def turnitin_assignment
     @assignment = @course.assignments.new(:title => "some assignment")

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 RSpec.describe Lti::IMS::LineItemsSerializer do
   let(:resource_link) { resource_link_model(overrides: { resource_link_uuid: assignment.lti_context_id }) }
   let_once(:course) { course_model }

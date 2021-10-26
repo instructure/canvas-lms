@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe GraphQLHelpers do
   context "relay_or_legacy_id_prepare_func" do
     let(:relay_user_id) { "VXNlci0xMjM0" }

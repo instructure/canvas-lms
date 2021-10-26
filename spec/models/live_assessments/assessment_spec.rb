@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 describe LiveAssessments::Assessment do
   let_once(:assessment_context) { course_factory(active_all: true) }
   let_once(:assessment_user) { course_with_student(course: assessment_context, active_all: true).user }

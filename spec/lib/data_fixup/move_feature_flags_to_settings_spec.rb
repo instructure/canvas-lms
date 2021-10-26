@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe DataFixup::MoveFeatureFlagsToSettings do
   before :once do
     Account.add_setting :some_root_only_setting, :boolean => true, :root_only => true, :default => false

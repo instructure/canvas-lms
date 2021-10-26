@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 describe Lti::Logging do
   describe '.lti_1_api_signature_verification_failed' do
     it 'logs an info message' do

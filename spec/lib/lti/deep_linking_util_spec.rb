@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 describe Lti::DeepLinkingUtil do
   describe '.validate_custom_params' do
     it 'returns nil if not a hash or JSON string of a hash' do

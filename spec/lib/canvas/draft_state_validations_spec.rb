@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 shared_examples_for "Canvas::DraftStateValidations" do
   describe ":validate_draft_state_change" do
     it "works" do

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe "rubrics" do
   it "doesn't render edit links for outcome criterion rows" do
     course_with_teacher_logged_in(active_all: true)

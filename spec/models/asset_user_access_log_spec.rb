@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe AssetUserAccessLog do
   around(:each) do |example|
     old_compaction_recv_timeout = Setting.get("aua_compaction_receive_timeout_ms", "1000")

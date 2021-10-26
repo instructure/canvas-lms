@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe ErrorReport do
   describe ".log_exception_from_canvas_errors" do
     it "does not fail with invalid UTF-8" do

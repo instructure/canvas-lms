@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'tmpdir'
-require 'spec_helper'
 
 describe GroupAndMembershipImporter do
   let_once(:account) { Account.default }

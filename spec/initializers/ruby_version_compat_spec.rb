@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path('../spec_helper', File.dirname(__FILE__))
-
 describe 'ruby_version_compat' do
   # from minitest, MIT licensed
   def capture_io

@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
 
 RSpec.describe DeveloperKeyAccountBinding, type: :model do

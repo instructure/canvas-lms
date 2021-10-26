@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe 'ScheduledSmartAlert' do
   context 'due_date_reminder alert' do
     before(:once) do

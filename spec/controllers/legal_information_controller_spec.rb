@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe LegalInformationController do
   describe "GET 'terms_of_use'" do
     it "redirects to terms_of_use_url, no authorization required" do

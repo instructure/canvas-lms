@@ -20,8 +20,6 @@
 
 require 'nokogiri'
 
-require 'spec_helper'
-
 class HashWithDupCheck < Hash
   def []=(k, v)
     if self.key?(k)

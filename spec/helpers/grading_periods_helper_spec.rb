@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe GradingPeriodsHelper do
   describe '#grading_period_set_title' do
     it 'uses the grading period set title when present' do

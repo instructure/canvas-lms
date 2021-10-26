@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe ActiveRecord::Base do
   describe "count_by_date" do
     let_once(:account) { Account.create! }
