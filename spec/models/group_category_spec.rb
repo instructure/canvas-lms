@@ -177,8 +177,8 @@ describe GroupCategory do
     it "destroys dependent groups" do
       course = @course
       category = group_category
-      group1 = category.groups.create(:context => course)
-      group2 = category.groups.create(:context => course)
+      category.groups.create(:context => course)
+      category.groups.create(:context => course)
       course.reload
       expect(course.groups.active.count).to eq 2
       category.destroy
@@ -206,7 +206,7 @@ describe GroupCategory do
   context "has_heterogenous_group?" do
     it "is false for accounts" do
       category = group_category(context: account)
-      group = category.groups.create(:context => account)
+      category.groups.create(:context => account)
       expect(category).not_to have_heterogenous_group
     end
 
@@ -259,13 +259,13 @@ describe GroupCategory do
 
     it "returns nil if no active groups in category" do
       group = @category.groups.create(:context => @course)
-      gm = group.add_user(@student)
+      group.add_user(@student)
       group.destroy
       expect(@category.group_for(@student)).to be_nil
     end
 
     it "returns the group the student is in" do
-      group1 = @category.groups.create(:context => @course)
+      @category.groups.create(:context => @course)
       group2 = @category.groups.create(:context => @course)
       group2.add_user(@student)
       expect(@category.group_for(@student)).to eq group2
@@ -312,7 +312,7 @@ describe GroupCategory do
 
     it "updates cached due dates for affected assignments" do
       category = @course.group_categories.create(:name => "Group Category")
-      assignment1 = @course.assignments.create!
+      @course.assignments.create!
       assignment2 = @course.assignments.create! group_category: category
       group = category.groups.create(:name => "Group 1", :context => @course)
       student = @course.enroll_student(user_model).user
@@ -325,9 +325,9 @@ describe GroupCategory do
   context "#assign_unassigned_members_in_background" do
     it "uses the progress object" do
       category = @course.group_categories.create(:name => "Group Category")
-      group1 = category.groups.create(:name => "Group 1", :context => @course)
+      category.groups.create(:name => "Group 1", :context => @course)
       group2 = category.groups.create(:name => "Group 2", :context => @course)
-      student1, student2 = create_users_in_course(@course, 2, return_type: :record)
+      student1, = create_users_in_course(@course, 2, return_type: :record)
       group2.add_user(student1)
 
       category.assign_unassigned_members_in_background
@@ -345,7 +345,7 @@ describe GroupCategory do
     end
 
     it "does not assign inactive users to groups" do
-      group1 = @category.groups.create(:name => "Group 1", :context => @course)
+      @category.groups.create(:name => "Group 1", :context => @course)
       student1 = @course.enroll_student(user_model).user
       inactive_en = @course.enroll_student(user_model)
       inactive_en.deactivate
@@ -362,7 +362,7 @@ describe GroupCategory do
       group1 = @category.groups.create(:name => "Group 1", :context => @course)
       group2 = @category.groups.create(:name => "Group 2", :context => @course)
       student1 = @course.enroll_student(user_model).user
-      student2 = @course.enroll_student(user_model).user
+      @course.enroll_student(user_model).user
       group2.add_user(student1)
       group1.destroy
 
@@ -375,10 +375,10 @@ describe GroupCategory do
     end
 
     it "does not assign users already in group in the @category" do
-      group1 = @category.groups.create(:name => "Group 1", :context => @course)
+      @category.groups.create(:name => "Group 1", :context => @course)
       group2 = @category.groups.create(:name => "Group 2", :context => @course)
       student1 = @course.enroll_student(user_model).user
-      student2 = @course.enroll_student(user_model).user
+      @course.enroll_student(user_model).user
       group2.add_user(student1)
 
       # student1 shouldn't get assigned, already being in a group
@@ -387,7 +387,7 @@ describe GroupCategory do
     end
 
     it "otherwises assign ungrouped users to groups in the @category" do
-      group1 = @category.groups.create(:name => "Group 1", :context => @course)
+      @category.groups.create(:name => "Group 1", :context => @course)
       group2 = @category.groups.create(:name => "Group 2", :context => @course)
       student1 = @course.enroll_student(user_model).user
       student2 = @course.enroll_student(user_model).user
@@ -407,7 +407,7 @@ describe GroupCategory do
 
     it "does not overassign to groups" do
       groups = (2..4).map { |i| @category.groups.create(name: "Group #{i}", max_membership: i, context: @course) }
-      students = (1..10).map { |i| @course.enroll_student(user_model).user }
+      10.times { @course.enroll_student(user_model).user }
       memberships = @category.assign_unassigned_members
       expect(memberships.size).to be 9
       groups.each(&:reload)

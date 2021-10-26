@@ -208,7 +208,7 @@ describe DiscussionTopicsController do
       )
 
       group_category(context: @course)
-      membership = group_with_user(group_category: @group_category, user: @student, context: @course)
+      group_with_user(group_category: @group_category, user: @student, context: @course)
       @topic = @group.discussion_topics.create(:title => "group topic")
       @topic.context = @group
       @topic.save!
@@ -293,7 +293,7 @@ describe DiscussionTopicsController do
     it "js_env TOTAL_USER_COUNT and IS_ANNOUNCEMENT are set correctly for section specific announcements" do
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
-      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.course_sections.create!(name: "Section 2")
       ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
       ann.save!
       get 'show', params: { :course_id => @course.id, :id => ann }
@@ -1031,7 +1031,7 @@ describe DiscussionTopicsController do
     it "js_env SECTION_LIST is set correctly for section specific announcements on a limited privileges user" do
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
-      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.course_sections.create!(name: "Section 2")
       @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept!
       Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
       ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
@@ -1045,7 +1045,7 @@ describe DiscussionTopicsController do
     it "js_env SECTION_LIST is set correctly for section specific announcements on a not limited privileges user" do
       user_session(@teacher)
       section1 = @course.course_sections.create!(name: "Section 1")
-      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.course_sections.create!(name: "Section 2")
       @course.enroll_teacher(@teacher, section: section1, allow_multiple_enrollments: true).accept!
       Enrollment.limit_privileges_to_course_section!(@course, @teacher, false)
       ann = @course.announcements.create!(message: "testing", is_section_specific: true, course_sections: [section1])
@@ -1566,7 +1566,7 @@ describe DiscussionTopicsController do
     end
 
     it 'does not dispatch new topic notification when hidden by selective release' do
-      notification = Notification.create(name: 'New Discussion Topic', category: 'TestImmediately')
+      Notification.create(name: 'New Discussion Topic', category: 'TestImmediately')
       @student.communication_channels.create!(path: 'student@example.com') { |cc| cc.workflow_state = 'active' }
       new_section = @course.course_sections.create!
       obj_params = topic_params(@course, published: true).merge(assignment_params(@course, only_visible_to_overrides: true, assignment_overrides: [{ course_section_id: new_section.id }]))
@@ -1581,7 +1581,7 @@ describe DiscussionTopicsController do
     end
 
     it 'does dispatch new topic notification when not hidden' do
-      notification = Notification.create(name: 'New Discussion Topic', category: 'TestImmediately')
+      Notification.create(name: 'New Discussion Topic', category: 'TestImmediately')
       @student.communication_channels.create!(path: 'student@example.com') { |cc| cc.workflow_state = 'active' }
       obj_params = topic_params(@course, published: true)
       user_session(@teacher)
@@ -1593,7 +1593,7 @@ describe DiscussionTopicsController do
     end
 
     it 'does dispatch new topic notification when published' do
-      notification = Notification.create(name: 'New Discussion Topic', category: 'TestImmediately')
+      Notification.create(name: 'New Discussion Topic', category: 'TestImmediately')
       @student.communication_channels.create!(path: 'student@example.com') { |cc| cc.workflow_state = 'active' }
       obj_params = topic_params(@course, published: false)
       user_session(@teacher)
@@ -1781,7 +1781,7 @@ describe DiscussionTopicsController do
     end
 
     it "triggers module progression recalculation if needed after changing sections" do
-      section1 = @course.course_sections.create!(name: "Section")
+      @course.course_sections.create!(name: "Section")
       section2 = @course.course_sections.create!(name: "Section2")
       topic = @course.discussion_topics.create!(title: "foo", message: "bar", user: @teacher)
       mod = @course.context_modules.create!
@@ -1799,7 +1799,7 @@ describe DiscussionTopicsController do
     end
 
     it "triggers module progression recalculation if undoing section specificness" do
-      section1 = @course.course_sections.create!(name: "Section")
+      @course.course_sections.create!(name: "Section")
       section2 = @course.course_sections.create!(name: "Section2")
       topic = @course.discussion_topics.create!(title: "foo", message: "bar", user: @teacher,
                                                 is_section_specific: true, course_sections: [section2])
@@ -1817,7 +1817,7 @@ describe DiscussionTopicsController do
       user_session(@teacher)
       assign = @course.assignments.create!(title: 'Graded Topic 1', submission_types: 'discussion_topic')
       section1 = @course.course_sections.create!(name: "Section 1")
-      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.course_sections.create!(name: "Section 2")
       topic = assign.discussion_topic
       put('update', params: {
             course_id: @course.id,

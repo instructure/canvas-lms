@@ -29,7 +29,7 @@ describe Quizzes::QuizSubmissionFilesController, type: :request do
       @quiz.did_edit!
       @quiz.offer!
 
-      s = @quiz.generate_submission(@student)
+      @quiz.generate_submission(@student)
     end
 
     include_examples "file uploads api"

@@ -48,6 +48,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Tilkynningaskrá" },
   "announcements_a4b8ed4a": { "message": "Tilkynningar" },
   "apply_781a2546": { "message": "Virkja" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Notaðu breytingar á öll tilvik þessa hnapps og tákns í námskeiðinu"
+  },
   "apps_54d24a47": { "message": "Smáforrit" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Útlitshlutfall verður varðveitt"
@@ -62,9 +65,6 @@ const locale = {
   },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Sjálfvirkt vistað efni er til. Viltu hlaða inn sjálfvirkt vistuðu efni í staðinn?"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "Opna sjálfkrafa forskoðun í línu. (Forskoðun sést ekki fyrr en búið er að vista)"
   },
   "available_folders_694d0436": { "message": "Tiltækar möppur" },
   "below_81d4dceb": { "message": "Undir" },
@@ -151,9 +151,6 @@ const locale = {
   "details_98a31b68": { "message": "Upplýsingar" },
   "dimensions_45ddb7b7": { "message": "Mál" },
   "directionality_26ae9e08": { "message": "Lestrarátt" },
-  "disable_in_line_preview_2a675175": {
-    "message": "Afvirkja forskoðun í línu."
-  },
   "discussions_a5f96392": { "message": "Umræður" },
   "discussions_index_6c36ced": { "message": "Umræðuskrá" },
   "display_options_315aba85": { "message": "Sýningar valkostir" },
@@ -289,7 +286,6 @@ const locale = {
     "message": "Verður að vera að minnsta kosti { width } x { height }pt"
   },
   "my_files_2f621040": { "message": "Mínar skrár" },
-  "my_images_427f9b0c": { "message": "Mínar myndir" },
   "name_1aed4a1b": { "message": "Nafn" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Notaðu valmyndina eða verkfæraslánna til að komast á réttan stað"
@@ -366,9 +362,6 @@ const locale = {
   "show_link_options_545338fd": { "message": "Sýna tengla valkosti" },
   "show_video_options_6ed3721a": { "message": "Sýna myndbandsvalkosti" },
   "size_b30e1077": { "message": "Stærð" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "Stærð { file } er meiri en hámarkið { max } MB fyrir skráastærð"
-  },
   "small_b070434a": { "message": "Lítil" },
   "something_went_wrong_89195131": { "message": "Eitthvað fór úrskeiðis." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

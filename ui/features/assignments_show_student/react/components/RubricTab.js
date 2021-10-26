@@ -57,7 +57,7 @@ export default function RubricTab(props) {
     <div data-testid="rubric-tab">
       <View as="div" margin="none none medium">
         <ToggleDetails
-          defaultExpanded={displayedAssessment != null}
+          defaultExpanded
           fluidWidth
           summary={<Text weight="bold">{I18n.t('View Rubric')}</Text>}
         >

@@ -49,7 +49,7 @@ describe Plannable do
 
     it "prefers the associated object's override if both have an override" do
       assignment = assignment_model()
-      assignment_override = assignment.planner_overrides.create!(user: @student)
+      assignment.planner_overrides.create!(user: @student)
       assignment.submission_types = "discussion_topic"
       assignment.save!
       discussion_override = assignment.discussion_topic.planner_overrides.create!(user: @student)

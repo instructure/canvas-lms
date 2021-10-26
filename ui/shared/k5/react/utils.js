@@ -19,7 +19,6 @@
 import I18n from 'i18n!k5_utils'
 import moment from 'moment-timezone'
 import PropTypes from 'prop-types'
-import buildURL from 'axios/lib/helpers/buildURL'
 
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
@@ -36,38 +35,23 @@ export const countByCourseId = arr =>
     return acc
   }, {})
 
-export const fetchGrades = (includeObservedUsers, userId = 'self') => {
-  const include = [
-    'total_scores',
-    'current_grading_period_scores',
-    'grading_periods',
-    'course_image'
-  ]
-  if (includeObservedUsers) {
-    include.push('observed_users')
-  }
-  const coursesURL = buildURL(`/api/v1/users/${userId}/courses`, {
-    enrollment_state: 'active',
-    include
+export const transformGrades = courses =>
+  courses.map(course => {
+    const hasGradingPeriods = course.has_grading_periods
+    const basicCourseInfo = {
+      courseId: course.id,
+      courseName: course.name,
+      courseImage: course.image_download_url,
+      courseColor: course.course_color,
+      finalGradesHidden: course.hide_final_grades,
+      gradingPeriods: hasGradingPeriods ? course.grading_periods : [],
+      hasGradingPeriods,
+      isHomeroom: course.homeroom_course,
+      enrollments: course.enrollments
+    }
+    return getCourseGrades(basicCourseInfo)
   })
-  return asJson(window.fetch(coursesURL, defaultFetchOptions)).then(courses =>
-    courses.map(course => {
-      const hasGradingPeriods = course.has_grading_periods
-      const basicCourseInfo = {
-        courseId: course.id,
-        courseName: course.name,
-        courseImage: course.image_download_url,
-        courseColor: course.course_color,
-        finalGradesHidden: course.hide_final_grades,
-        gradingPeriods: hasGradingPeriods ? course.grading_periods : [],
-        hasGradingPeriods,
-        isHomeroom: course.homeroom_course,
-        enrollments: course.enrollments
-      }
-      return getCourseGrades(basicCourseInfo)
-    })
-  )
-}
+
 export const getCourseGrades = (course, observedUserId) => {
   const hasGradingPeriods = course.hasGradingPeriods
   // Getting the observee enrollment if observedUserId is provided, as the observer enrollment

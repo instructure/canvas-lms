@@ -31,7 +31,7 @@ describe CutyCapt do
   end
 
   context "configuration" do
-    it "correctlies look up parameters specified by string keys in the config" do
+    it "looks up parameters specified by string keys in the config correctly" do
       ConfigFile.stub('cutycapt', { "path" => 'not used', 'timeout' => 1000 })
       expect(CutyCapt.config[:path]).to eq "not used"
       expect(CutyCapt.config[:timeout]).to eq 1000

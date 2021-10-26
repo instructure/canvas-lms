@@ -115,7 +115,8 @@ module MicrosoftSync
       def self.public_message
         I18n.t 'A Microsoft 365 Group must have owners, and no users ' \
                'corresponding to the instructors of the Canvas course could be found on the ' \
-               'Microsoft side.'
+               'Microsoft side. If you recently added and removed course owners, a re-sync ' \
+               'may resolve the issue.'
       end
     end
 

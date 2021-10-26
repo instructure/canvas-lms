@@ -30,7 +30,7 @@ describe DiscussionTopic do
     opts.reverse_merge!(:active_all => true, :section => section, :enrollment_state => 'active')
     user = user_factory(opts)
     user.save!
-    course.enroll_user(user, type = opts[:enrollment_type], opts)
+    course.enroll_user(user, opts[:enrollment_type], opts)
     return user
   end
 
@@ -272,7 +272,7 @@ describe DiscussionTopic do
 
     it "does not grant moderate permissions without read permissions" do
       @course.account.role_overrides.create!(:role => teacher_role, :permission => 'read_forum', :enabled => false)
-      expect(@topic.reload.check_policy(@teacher2)).to eql [:create, :duplicate, :attach]
+      expect(@topic.reload.check_policy(@teacher2)).to eql [:create, :duplicate, :attach, :student_reporting]
     end
 
     it "grants permissions if it not locked" do
@@ -415,7 +415,7 @@ describe DiscussionTopic do
 
     it "is visible to teachers locked to the same section in a course" do
       section1 = @course.course_sections.create!(name: "Section 1")
-      section2 = @course.course_sections.create!(name: "Section 2")
+      @course.course_sections.create!(name: "Section 2")
       new_teacher = user_factory
       @course.enroll_teacher(new_teacher, section: section1, allow_multiple_enrollments: true).accept!
       Enrollment.limit_privileges_to_course_section!(@course, new_teacher, true)
@@ -526,7 +526,7 @@ describe DiscussionTopic do
         end
 
         it "works when ungraded and context is a course" do
-          group_category = @course.group_categories.create(:name => "new cat")
+          @course.group_categories.create(:name => "new cat")
           @topic = @course.discussion_topics.create(:title => "group topic")
           @topic.save!
 
@@ -1350,7 +1350,7 @@ describe DiscussionTopic do
       discussion_topic_model(:user => @teacher)
     end
 
-    it "automaticallies include the author" do
+    it "automatically includes the author" do
       expect(@topic.subscribers).to include(@teacher)
     end
 
@@ -1359,7 +1359,7 @@ describe DiscussionTopic do
       expect(@topic.subscribers).not_to include(@teacher)
     end
 
-    it "automaticallies include posters" do
+    it "automatically includes posters" do
       @topic.reply_from(:user => @student, :text => "entry")
       expect(@topic.subscribers).to include(@student)
     end
@@ -1433,7 +1433,7 @@ describe DiscussionTopic do
 
         it "doesnt filter for observers with no student" do
           @observer = user_factory(active_all: true)
-          observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active')
+          @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section, :enrollment_state => 'active')
           @topic.subscribe(@observer)
           expect(@topic.subscribers).to include(@observer)
         end
@@ -2531,7 +2531,7 @@ describe DiscussionTopic do
 
     it 'returns student entries for group discussions even if not specified' do
       group_category
-      membership = group_with_user(group_category: @group_category, user: @student)
+      group_with_user(group_category: @group_category, user: @student)
       @topic = @group.discussion_topics.create(title: "group topic", user: @teacher)
       @topic.discussion_entries.create(message: "some message", user: @student)
       @topic.update(podcast_has_student_posts: false)

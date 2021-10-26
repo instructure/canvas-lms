@@ -146,7 +146,7 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
       child_reply = @topic.discussion_entries.create!(message: 'I am the child reply', user: @student, attachment: @attachment, parent_id: parent_entry.id)
       entry = @topic.discussion_entries.create!(message: 'Howdy', user: @student, attachment: @attachment, parent_id: child_reply.id, include_reply_preview: true)
       expect(entry.reload.include_reply_preview).to be true
-      result = run_mutation(discussion_entry_id: entry.id, include_reply_preview: false)
+      run_mutation(discussion_entry_id: entry.id, include_reply_preview: false)
       expect(entry.reload.include_reply_preview).to be false
     end
   end

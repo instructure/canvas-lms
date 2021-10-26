@@ -91,7 +91,7 @@ describe "speed grader" do
     end
 
     it 'displays attachments', test_id: 3058055, priority: "1" do
-      filename, fullpath, _data = get_file("amazing_file.txt")
+      _filename, fullpath, _data = get_file("amazing_file.txt")
       Speedgrader.visit(@course.id, @assignment.id)
       Speedgrader.add_comment_attachment(fullpath)
       Speedgrader.add_comment_and_submit("commenting")

@@ -220,7 +220,7 @@ describe "site admin jobs ui" do
     end
 
     it "sorts by runtime by default" do
-      j1 = Delayed::Job.get_and_lock_next_available('my test worker 1')
+      Delayed::Job.get_and_lock_next_available('my test worker 1')
       j2 = Delayed::Job.get_and_lock_next_available('my test worker 2')
       j2.update_attribute(:locked_at, 48.hours.ago)
 

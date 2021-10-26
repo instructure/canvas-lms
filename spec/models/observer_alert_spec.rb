@@ -292,7 +292,7 @@ describe ObserverAlert do
       # course with just the student
       course_with_teacher
       course_with_student(course: @course)
-      assignment = assignment_model(context: @course, due_at: 5.minutes.ago, submission_types: 'online_text_entry', points_possible: 100)
+      assignment_model(context: @course, due_at: 5.minutes.ago, submission_types: 'online_text_entry', points_possible: 100)
 
       # course with the student and observer
       course_with_student(user: @student)

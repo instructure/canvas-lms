@@ -42,7 +42,7 @@ module Qti
         node.search("*").each do |subnode|
           attrs.each do |attr|
             if subnode[attr]
-              val = URI.unescape(subnode[attr])
+              val = CGI.unescape(subnode[attr])
               if val.start_with?(WEBCT_REL_REGEX)
                 # It's from a webct package so the references may not be correct
                 # Take a path like: /webct/RelativeResourceManager/Template/Imported_Resources/qti web/f11g3_r.jpg

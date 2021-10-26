@@ -291,11 +291,11 @@ describe "context modules" do
     it "validates locking a module item display functionality" do
       get "/courses/#{@course.id}/modules"
       add_form = new_module_form
-      lock_check_click(add_form)
+      lock_check_click
       wait_for_ajaximations
       expect(add_form.find_element(:css, '.unlock_module_at_details')).to be_displayed
       # verify unlock
-      lock_check_click(add_form)
+      lock_check_click
       wait_for_ajaximations
       expect(add_form.find_element(:css, '.unlock_module_at_details')).not_to be_displayed
     end
@@ -377,7 +377,7 @@ describe "context modules" do
         modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
 
         cs1 = @course.default_section
-        cs2 = @course.course_sections.create!
+        @course.course_sections.create!
 
         due_at = 3.days.from_now
         create_section_override(cs1, due_at)
@@ -466,7 +466,7 @@ describe "context modules" do
 
     it "renders publish buttons in collapsed modules" do
       @module = @course.context_modules.create! name: "collapsed"
-      tag = @module.add_item(type: 'assignment', id: @assignment2.id)
+      @module.add_item(type: 'assignment', id: @assignment2.id)
       @progression = @module.evaluate_for(@user)
       @progression.collapsed = true
       @progression.save!

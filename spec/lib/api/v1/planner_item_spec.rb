@@ -20,18 +20,6 @@
 require_relative '../../../spec_helper'
 
 describe Api::V1::PlannerItem do
-  class PlannerItemHarness
-    include Api::V1::PlannerItem
-
-    def submission_json(*args); end
-
-    def named_context_url(*args); "named_context_url"; end
-
-    def course_assignment_submission_url(*args); 'course_assignment_submission_url'; end
-
-    def calendar_url_for(*args); end
-  end
-
   before :once do
     course_factory active_all: true
 
@@ -50,7 +38,25 @@ describe Api::V1::PlannerItem do
     @student_override = planner_override_model(plannable: @assignment, user: @student, marked_complete: true)
   end
 
-  let(:api) { PlannerItemHarness.new }
+  let(:planner_item_harness) do
+    Class.new do
+      include Api::V1::PlannerItem
+
+      def submission_json(*); end
+
+      def named_context_url(*)
+        "named_context_url"
+      end
+
+      def course_assignment_submission_url(*)
+        'course_assignment_submission_url'
+      end
+
+      def calendar_url_for(*); end
+    end
+  end
+
+  let(:api) { planner_item_harness.new }
   let(:session) { double }
 
   describe '.planner_item_json' do
@@ -129,10 +135,13 @@ describe Api::V1::PlannerItem do
             https://instructure.zoom.us/j/9585021282
             https://us01.zoom.us/j/9585001282?
             https://instructure.zoom.us/j/9585021282?pwd=NlRIRURaRlRmTC9kVUU2QnIwQkJZZz09
+            https://instr-ucture.zoom.us/my/12345
+            https://instr-ucture.zoom.us/j/9585021282
             https://teams.microsoft.com/l/meetup-join/19%3ameeting_MjAyMjU4Y2QtZTc0Mi00OTI1LTllYTUtNjEzNTBhMjY3OTZi%40thread.v2/0?context=%7B%22Tid%22%3A%22b8e866dc-ae4d-482d-8ebb-6ef626b97a42%22%2C%22Oid%22%3A%22ac200842-2ec5-494e-83db-dfddc8939907%22%7D
             https://teams.live.com/meet/93298311589140
             https://meet146.webex.com/meet/pr-._25535050184
             https://meet146.webex.com/meet146/j.php?MTID=mb0f63c6586178c903f161b109886066b
+            https://meet-146.webex.com/meet/pr-._25535050184
             https://meet.google.com/sbs-ycbe-yhu
           )
         end
@@ -151,6 +160,10 @@ describe Api::V1::PlannerItem do
             .
             zoom
             http://example.com/124?pwd=1234
+            https://me-et.google.com/sbs-ycbe-yhu
+            https://tea-ms.microsoft.com/l/meetup-join/19%3ameeting_MjAyMjU4Y2QtZTc0Mi00OTI1LTllYTUtNjEzNTBhMjY3OTZi%40thread.v2/0?context=%7B%22Tid%22%3A%22b8e866dc-ae4d-482d-8ebb-6ef626b97a42%22%2C%22Oid%22%3A%22ac200842-2ec5-494e-83db-dfddc8939907%22%7D
+            https://teams.micro-soft.com/l/meetup-join/19%3ameeting_MjAyMjU4Y2QtZTc0Mi00OTI1LTllYTUtNjEzNTBhMjY3OTZi%40thread.v2/0?context=%7B%22Tid%22%3A%22b8e866dc-ae4d-482d-8ebb-6ef626b97a42%22%2C%22Oid%22%3A%22ac200842-2ec5-494e-83db-dfddc8939907%22%7D
+            https://tea-ms.live.com/meet/93298311589140
           )
         end
 
@@ -511,6 +524,23 @@ describe Api::V1::PlannerItem do
       expect(api.planner_item_json(@topic.assignment, @student, session)[:html_url]).to eq 'named_context_url'
       graded_submission_model(assignment: @topic.assignment, user: @student).update(score: 5)
       expect(api.planner_item_json(@topic.assignment, @student, session)[:html_url]).to eq 'course_assignment_submission_url'
+    end
+  end
+
+  describe 'sharding' do
+    specs_require_sharding
+
+    context 'discussion_topics' do
+      it 'returns true for unread other shard discussions' do
+        topic1 = discussion_topic_model
+        topic2 = @shard1.activate do
+          account = account_model
+          course = account.courses.create!
+          discussion_topic_model(context: course)
+        end
+        json = api.planner_items_json([topic1, topic2], @student, session)
+        expect(json.pluck(:plannable_id)).to match_array([topic1.id, topic2.id])
+      end
     end
   end
 end

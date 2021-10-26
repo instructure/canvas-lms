@@ -34,6 +34,7 @@ module MicrosoftSync
     end
 
     OWNER_ENROLLMENT_TYPES = %w[TeacherEnrollment TaEnrollment DesignerEnrollment].freeze
+
     MAX_ENROLLMENT_MEMBERS = 25_000
     MAX_ENROLLMENT_OWNERS = 100
 

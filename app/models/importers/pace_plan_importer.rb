@@ -38,7 +38,6 @@ module Importers
       pace_plan ||= context.pace_plans.create
 
       pace_plan.workflow_state = hash[:workflow_state]
-      pace_plan.start_date = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:start_date])
       pace_plan.end_date = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:end_date])
       pace_plan.published_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:published_at])
       pace_plan.exclude_weekends = hash[:exclude_weekends]

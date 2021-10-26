@@ -55,7 +55,6 @@ const RCE = forwardRef(function RCE(props, rceRef) {
     textareaId,
     textareaClassName,
     rcsProps,
-    use_rce_pretty_html_editor,
     use_rce_buttons_and_icons,
     use_rce_a11y_checker_notifications,
     onFocus,
@@ -97,7 +96,6 @@ const RCE = forwardRef(function RCE(props, rceRef) {
       textareaId,
       textareaClassName,
       trayProps: rcsProps,
-      use_rce_pretty_html_editor,
       use_rce_buttons_and_icons,
       use_rce_a11y_checker_notifications,
       editorOptions: Object.assign(editorOptions, editorOptions, {
@@ -192,8 +190,6 @@ RCE.propTypes = {
   // properties necessary for the RCE to us the RCS
   // if missing, RCE features that require the RCS are omitted
   rcsProps: trayPropTypes,
-  // enable the pretty html editor (temporary until the feature is forced on)
-  use_rce_pretty_html_editor: bool,
   // enable the custom buttons feature (temporary until the feature is forced on)
   use_rce_buttons_and_icons: bool,
   // enable the a11y checker notifications (temporary until the feature is forced on)
@@ -217,7 +213,6 @@ RCE.defaultProps = {
   maxInitRenderedRCEs: -1,
   mirroredAttrs: {},
   readOnly: false,
-  use_rce_pretty_html_editor: true,
   use_rce_buttons_and_icons: true,
   use_rce_a11y_checker_notifications: true,
   onFocus: () => {},

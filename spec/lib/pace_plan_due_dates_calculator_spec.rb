@@ -22,10 +22,11 @@ require 'spec_helper'
 describe PacePlanDueDatesCalculator do
   before :once do
     course_with_student active_all: true
+    @course.update start_at: '2021-09-01'
     @module = @course.context_modules.create!
     @assignment = @course.assignments.create!
     @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: 'context_module'
-    @pace_plan = @course.pace_plans.create! workflow_state: 'active', start_date: '2021-09-01', end_date: '2021-09-30'
+    @pace_plan = @course.pace_plans.create! workflow_state: 'active', end_date: '2021-09-30'
     @pace_plan_module_item = @pace_plan.pace_plan_module_items.create! module_item: @tag
     @pace_plan_module_items = @pace_plan.pace_plan_module_items.active
     @calculator = PacePlanDueDatesCalculator.new(@pace_plan)

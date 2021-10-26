@@ -721,7 +721,7 @@ describe SIS::CSV::CourseImporter do
 
     it "gives a warning when trying to associate an existing blueprint course" do
       mc2 = @account.courses.create!(:sis_source_id => "anothermastercourse")
-      template2 = MasterCourses::MasterTemplate.set_as_master_course(mc2)
+      MasterCourses::MasterTemplate.set_as_master_course(mc2)
       importer = process_csv_data(
         "course_id,short_name,long_name,status,blueprint_course_id",
         "#{mc2.sis_source_id},shortname,long name,active,#{@mc.sis_source_id}"
@@ -744,7 +744,7 @@ describe SIS::CSV::CourseImporter do
     it "gives a warning when trying to associate to a course not in the account chain" do
       sub_account = @account.sub_accounts.create!
       mc2 = sub_account.courses.create!(:sis_source_id => "otheraccountmastercourse")
-      template2 = MasterCourses::MasterTemplate.set_as_master_course(mc2)
+      MasterCourses::MasterTemplate.set_as_master_course(mc2)
 
       ac = @account.courses.create!(:sis_source_id => "otheraccountcoursetoassociate")
 

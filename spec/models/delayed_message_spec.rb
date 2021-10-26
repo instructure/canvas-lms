@@ -68,7 +68,7 @@ describe DelayedMessage do
     end
 
     it "has a scope to filter by the state" do
-      notification = notification_model :name => 'New Stuff'
+      notification_model :name => 'New Stuff'
       delayed_message_model(:workflow_state => 'pending')
       delayed_message_model(:workflow_state => 'cancelled')
       delayed_message_model(:workflow_state => 'sent')

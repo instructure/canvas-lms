@@ -67,8 +67,23 @@ describe('Reply Preview', () => {
     expect(container.getByText('Deleted by Harry Potter')).toBeTruthy()
   })
 
-  it('read more button should be visible', () => {
-    const container = setup(mockProps())
+  it('read more button should be visible when message length is greater than 170 characters', () => {
+    const container = setup(
+      mockProps({
+        previewMessage:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec lectus neque. Sed eu molestie purus. Phasellus laoreet ante eget augue mollis sollicitudin. Quisque congue'
+      })
+    )
     expect(container.getByText('Read More')).toBeTruthy()
+  })
+
+  it('read more button should not be visible when message length is less than 170 characters', () => {
+    const container = setup(
+      mockProps({
+        previewMessage:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec lectus neque. Sed eu molestie purus.'
+      })
+    )
+    expect(container.queryByText('Read More')).toBeNull()
   })
 })

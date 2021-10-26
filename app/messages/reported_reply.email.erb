@@ -1,0 +1,13 @@
+<% define_content :link do %>
+  <%= polymorphic_url([asset.context, :discussion_topic], id: asset.discussion_topic_id, anchor: "entry-#{asset.id}") %>
+<% end %>
+
+<% define_content :subject do %>
+  <%= t :subject, "Reported reply in %{discussion_topic}, %{course}", discussion_topic: asset.discussion_topic.title, course: asset.context.name %>
+<% end %>
+
+<%= t :body, "Reported as %{report_type}: %{user}, %{course}", report_type: data[:report_type], user: asset.user.short_name, course: asset.context.name %>
+
+<%= html_to_text(asset.message, :base_url => dashboard_url) %>
+
+<%= t("View the discussion: %{link}.", link: content(:link)) %>

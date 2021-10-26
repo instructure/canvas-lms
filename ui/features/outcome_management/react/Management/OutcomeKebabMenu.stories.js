@@ -45,12 +45,14 @@ withoutEditPermission.args = {
   canEdit: false
 }
 
-export const withGroupDescription = Template.bind({})
-withGroupDescription.args = {
+export const groupWithDescription = Template.bind({})
+groupWithDescription.args = {
+  isGroup: true,
   groupDescription: 'Group description'
 }
 
-export const withEmptyGroupDescription = Template.bind({})
-withEmptyGroupDescription.args = {
+export const groupWithoutDescription = Template.bind({})
+groupWithoutDescription.args = {
+  isGroup: true,
   groupDescription: ''
 }

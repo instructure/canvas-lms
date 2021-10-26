@@ -181,7 +181,7 @@ describe PlannerController do
       it "only shows section specific announcements to students who can view them" do
         a1 = @course.announcements.create!(:message => "for the defaults", :is_section_specific => true, :course_sections => [@course.default_section])
         sec2 = @course.course_sections.create!
-        a2 = @course.announcements.create!(:message => "for my favorites", :is_section_specific => true, :course_sections => [sec2])
+        @course.announcements.create!(:message => "for my favorites", :is_section_specific => true, :course_sections => [sec2])
 
         get :index
         response_json = json_parse(response.body)
@@ -1185,8 +1185,8 @@ describe PlannerController do
             get :index
             topic_json = json_parse(response.body).first
             expect(topic_json['plannable']['unread_count']).to be 0
-            reply = entry.reply_from(user: @student, text: 'wat?')
-            reply = entry.reply_from(user: @teacher, text: "ohai!")
+            entry.reply_from(user: @student, text: 'wat?')
+            entry.reply_from(user: @teacher, text: "ohai!")
             get :index
             topic_json = json_parse(response.body).first
             expect(topic_json['plannable']['unread_count']).to be 1

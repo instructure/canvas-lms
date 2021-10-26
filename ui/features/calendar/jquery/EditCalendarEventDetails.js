@@ -262,16 +262,15 @@ export default class EditCalendarEventDetails {
     const $start = this.$form.find('.time_field.start_time')
     const $end = this.$form.find('.time_field.end_time')
 
+    const start = fcUtil.unwrap(this.event.startDate())
+    const end = fcUtil.unwrap(this.event.endDate())
+
     // set them up as appropriate variants of datetime_field
     $date.date_field({
       datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))}
     })
-    $start.time_field()
-    $end.time_field()
-
-    // fill initial values of each field according to @event
-    const start = fcUtil.unwrap(this.event.startDate())
-    const end = fcUtil.unwrap(this.event.endDate())
+    $start.time_field({time: start})
+    $end.time_field({time: end})
 
     $start.data('instance').setTime(this.event.allDay ? null : start)
     $end.data('instance').setTime(this.event.allDay ? null : end)

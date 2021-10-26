@@ -104,7 +104,7 @@ describe DeveloperKeysController, type: :request do
 
     it 'does not include `test_cluster_only` by default' do
       admin_session
-      key = DeveloperKey.create!
+      DeveloperKey.create!
       json = api_call(:get, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
                         controller: 'developer_keys',
                         action: 'index',
@@ -117,7 +117,7 @@ describe DeveloperKeysController, type: :request do
     it 'does include `test_cluster_only` when enabled' do
       Setting.set("dev_key_test_cluster_checks_enabled", true)
       admin_session
-      key = DeveloperKey.create!
+      DeveloperKey.create!
       json = api_call(:get, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
                         controller: 'developer_keys',
                         action: 'index',

@@ -155,10 +155,10 @@ module Api
         it "includes brand_config css & js from site admin even if no account in chain have a brand_config" do
           string = "<div>stuff</div>"
 
-          site_admin_bc = Account.site_admin.create_brand_config!({
-                                                                    mobile_css_overrides: 'https://example.com/site_admin/account.css',
-                                                                    mobile_js_overrides: 'https://example.com/site_admin/account.js'
-                                                                  })
+          Account.site_admin.create_brand_config!({
+                                                    mobile_css_overrides: 'https://example.com/site_admin/account.css',
+                                                    mobile_js_overrides: 'https://example.com/site_admin/account.js'
+                                                  })
 
           child_account = Account.default.sub_accounts.create!(name: 'child account')
           child_account.save!

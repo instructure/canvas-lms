@@ -36,6 +36,7 @@ import FilterCalendarsModal from './FilterCalendarsModal'
 import ImportantDatesEmpty from './ImportantDatesEmpty'
 import ImportantDateSection from './ImportantDateSection'
 import {groupImportantDates} from '@canvas/k5/react/utils'
+import _ from 'lodash'
 
 const ImportantDates = ({
   contexts,
@@ -52,10 +53,18 @@ const ImportantDates = ({
   const [events, setEvents] = useState([])
   const [selectedContextCodes, setSelectedContextCodes] = useState(null)
   const previousContextsRef = useRef(null)
+  const [fetchEventsPath, setFetchEventsPath] = useState('/api/v1/calendar_events')
+  const observerMode = !!(ENV.FEATURES?.k5_parent_support && observedUserId)
+  const isObservingUser = observerMode && observedUserId !== ENV.current_user_id
 
   useEffect(() => {
-    // Only run this effect the first time we load contexts
-    if (!previousContextsRef.current && contexts) {
+    // Only run this effect the first time we load contexts or if the user
+    // is in observer mode and the contexts have changed
+    if (
+      contexts &&
+      (!previousContextsRef.current ||
+        (observerMode && !_.isEqual(previousContextsRef.current, contexts)))
+    ) {
       previousContextsRef.current = contexts
       // If the user has no selected contexts saved already, default them to the first X contexts
       // as defined by the `calendar_contexts_limit` setting once the cards have loaded
@@ -67,6 +76,13 @@ const ImportantDates = ({
       )
       const contextCodes = savedSelected?.length ? savedSelected : defaultSelected
       setSelectedContextCodes(contextCodes)
+      // Calendar events are requested every time that the observedUserId and selectedContextCodes
+      // change, so let's use this effect to also calculate the events request path and avoid
+      // duplicated requests
+      const fetchPath = isObservingUser
+        ? `/api/v1/users/${observedUserId}/calendar_events`
+        : '/api/v1/calendar_events'
+      setFetchEventsPath(fetchPath)
       if (contextCodes?.length === 0) {
         // useFetchApi does not execute the loading callback if the result is forced
         // so, we need to stop the loading effect manually when there are no contexts
@@ -74,15 +90,19 @@ const ImportantDates = ({
         setLoadingEvents(false)
       }
     }
-  }, [contexts, initialSelectedContextCodes, selectedContextsLimit])
+  }, [
+    contexts,
+    initialSelectedContextCodes,
+    isObservingUser,
+    observedUserId,
+    observerMode,
+    selectedContextsLimit
+  ])
 
   const contextsLoaded = !!contexts && !!selectedContextCodes
-  const tooManyContexts = contextsLoaded && contexts.length > selectedContextsLimit
+  const tooManyContexts =
+    !isObservingUser && contextsLoaded && contexts.length > selectedContextsLimit
 
-  const fetchPath =
-    ENV.FEATURES?.k5_parent_support && observedUserId && observedUserId !== ENV.current_user_id
-      ? `/api/v1/users/${observedUserId}/calendar_events`
-      : '/api/v1/calendar_events'
   const fetchParams = {
     important_dates: true,
     context_codes: [...(selectedContextCodes || [])], // need to clone this list so the fetchApi effect will trigger on change
@@ -92,7 +112,7 @@ const ImportantDates = ({
   }
 
   useFetchApi({
-    path: fetchPath,
+    path: fetchEventsPath,
     success: setAssignments,
     error: useCallback(
       showFlashError(I18n.t('Failed to load assignments in important dates.')),
@@ -107,7 +127,7 @@ const ImportantDates = ({
   })
 
   useFetchApi({
-    path: fetchPath,
+    path: fetchEventsPath,
     success: setEvents,
     error: useCallback(showFlashError(I18n.t('Failed to load events in important dates.')), []),
     loading: setLoadingEvents,

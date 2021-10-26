@@ -174,7 +174,7 @@ describe AccessToken do
     it "only displays integrations from non-internal developer keys" do
       user = User.create!
       trustedkey = DeveloperKey.create!(internal_service: true)
-      trusted_access_token = user.access_tokens.create!({ developer_key: trustedkey })
+      user.access_tokens.create!({ developer_key: trustedkey })
 
       untrustedkey = DeveloperKey.create!()
       third_party_access_token = user.access_tokens.create!({ developer_key: untrustedkey })
@@ -194,7 +194,7 @@ describe AccessToken do
 
       @shard2.activate do
         user = User.create!
-        trusted_access_token = user.access_tokens.create!({ developer_key: trustedkey })
+        user.access_tokens.create!({ developer_key: trustedkey })
         third_party_access_token = user.access_tokens.create!({ developer_key: untrustedkey })
         user.save!
 

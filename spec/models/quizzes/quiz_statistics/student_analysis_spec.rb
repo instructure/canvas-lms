@@ -258,14 +258,14 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
                                                          :allow_multiple_enrollments => true, :section => section2)
       @student.save!
 
-      question = @quiz.quiz_questions.create!({
-                                                question_data: {
-                                                  name: 'q1',
-                                                  points_possible: 30,
-                                                  question_type: 'essay_question',
-                                                  question_text: 'ohai mark'
-                                                }
-                                              })
+      @quiz.quiz_questions.create!({
+                                     question_data: {
+                                       name: 'q1',
+                                       points_possible: 30,
+                                       question_type: 'essay_question',
+                                       question_text: 'ohai mark'
+                                     }
+                                   })
       @quiz.generate_quiz_data
       @quiz.save!
 

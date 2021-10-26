@@ -589,7 +589,7 @@ describe Mutations::UpdateAssignment do
 
   it "cannot update without correct permissions" do
     # bad student! dont delete the assignment
-    result = execute_with_input(<<~GQL, user_executing = @student)
+    result = execute_with_input(<<~GQL, @student)
       id: "#{@assignment_id}"
       state: deleted
     GQL

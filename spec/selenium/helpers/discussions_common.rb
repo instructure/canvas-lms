@@ -83,7 +83,7 @@ module DiscussionsCommon
     type_in_tiny 'textarea', message
 
     if attachment.present?
-      filename, fullpath, data = get_file(attachment)
+      _filename, fullpath, _data = get_file(attachment)
       scroll_to(@last_entry.find_element(:css, '.discussion-reply-add-attachment'))
       @last_entry.find_element(:css, '.discussion-reply-add-attachment').click
       wait_for_ajaximations

@@ -528,7 +528,6 @@ describe InstFS do
       end
 
       it "wraps network errors in a service exception" do
-        instfs_uuid = "1234-abcd"
         allow(CanvasHttp).to receive(:post).and_raise(Net::ReadTimeout)
         expect do
           InstFS.direct_upload(file_name: "a.png", file_object: File.open("public/images/a.png"))

@@ -40,7 +40,7 @@ describe LiveAssessments::Submission do
       # possible, but we don't now so that's what we test
       submission.possible = 0
       submission.create_outcome_result(alignment)
-      result = expect(alignment.learning_outcome_results.count).to eq 0
+      expect(alignment.learning_outcome_results.count).to eq 0
     end
 
     it 'creates an outcome result' do

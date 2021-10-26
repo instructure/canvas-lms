@@ -370,7 +370,7 @@ describe AssetUserAccess do
 
       it "loads root account id from asset_for_root_account_id when context is a User and asset has a resolved_root_account_id but not a root_account_id" do
         # Not sure if this really ever happens but handle it on the safe side
-        assignment = @course.assignments.create!(:title => 'My Assignment2')
+        @course.assignments.create!(:title => 'My Assignment2')
         AssetUserAccess.log @user, @user, { level: 'view', code: @user.asset_string, asset_for_root_account_id: @course.root_account }
         expect(AssetUserAccess.last.root_account_id).to eq(@course.root_account_id)
       end

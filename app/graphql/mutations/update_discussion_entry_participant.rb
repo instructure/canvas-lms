@@ -23,6 +23,13 @@ class RatingInputType < Types::BaseEnum
   value 'liked', value: 1
 end
 
+class ReportType < Types::BaseEnum
+  graphql_name 'ReportType'
+  value 'inappropriate', value: 'inappropriate'
+  value 'offensive', value: 'offensive'
+  value 'other', value: 'other'
+end
+
 class Mutations::UpdateDiscussionEntryParticipant < Mutations::BaseMutation
   graphql_name 'UpdateDiscussionEntryParticipant'
 
@@ -30,6 +37,7 @@ class Mutations::UpdateDiscussionEntryParticipant < Mutations::BaseMutation
   argument :read, Boolean, required: false
   argument :rating, RatingInputType, required: false
   argument :forced_read_state, Boolean, required: false
+  argument :report_type, ReportType, required: false
 
   field :discussion_entry, Types::DiscussionEntryType, null: false
   def resolve(input:)
@@ -45,6 +53,10 @@ class Mutations::UpdateDiscussionEntryParticipant < Mutations::BaseMutation
       raise GraphQL::ExecutionError, "insufficient permissions" unless discussion_entry.grants_right?(current_user, session, :rate)
 
       discussion_entry.change_rating(input[:rating], current_user)
+    end
+
+    unless input[:report_type].nil?
+      discussion_entry.change_report_type(input[:report_type], current_user)
     end
 
     # TODO: VICE-1321

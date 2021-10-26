@@ -26,10 +26,11 @@ import {reduceDuplicateCourses} from '../../../util/courses_helper'
 import {SubjectInput} from '../../components/SubjectInput/SubjectInput'
 
 import {Flex} from '@instructure/ui-flex'
+import {MediaAttachment} from '../../components/MediaAttachment/MediaAttachment'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 
-const HeaderInputs = (props) => {
+const HeaderInputs = props => {
   let moreCourses
   if (!props.isReply) {
     moreCourses = reduceDuplicateCourses(
@@ -57,7 +58,7 @@ const HeaderInputs = (props) => {
                   favoriteCourses: props.courses?.favoriteCoursesConnection.nodes,
                   moreCourses,
                   concludedCourses: [],
-                  groups: props.courses?.favoriteGroupsConnection.nodes,
+                  groups: props.courses?.favoriteGroupsConnection.nodes
                 }}
                 onCourseFilterSelect={props.onContextSelect}
               />
@@ -91,6 +92,19 @@ const HeaderInputs = (props) => {
           />
         </Flex.Item>
       )}
+      {props.mediaAttachmentTitle && (
+        <Flex.Item data-testid="media-attachment">
+          <ComposeInputWrapper
+            shouldGrow
+            input={
+              <MediaAttachment
+                mediaTitle={props.mediaAttachmentTitle}
+                onRemoveMedia={props.onRemoveMediaComment}
+              />
+            }
+          />
+        </Flex.Item>
+      )}
     </Flex>
   )
 }
@@ -104,6 +118,8 @@ HeaderInputs.propTypes = {
   onSubjectChange: PropTypes.func,
   sendIndividualMessages: PropTypes.bool,
   subject: PropTypes.string,
+  mediaAttachmentTitle: PropTypes.string,
+  onRemoveMediaComment: PropTypes.func
 }
 
 export default HeaderInputs

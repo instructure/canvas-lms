@@ -20,6 +20,7 @@ import {ADD_CONVERSATION_MESSAGE, CREATE_CONVERSATION} from '../../../graphql/Mu
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import ComposeModalContainer from './ComposeModalContainer'
 import {Conversation} from '../../../graphql/Conversation'
+import {ConversationMessage} from '../../../graphql/ConversationMessage'
 import {
   CONVERSATIONS_QUERY,
   COURSES_QUERY,
@@ -43,20 +44,25 @@ const ComposeModalManager = props => {
   })
 
   const getParticipants = () => {
-    const lastAuthorId = props.conversation?.conversationMessagesConnection.nodes[0].author._id.toString()
+    const lastAuthorId = props.conversationMessage
+      ? props.conversationMessage?.author._id.toString()
+      : props.conversation?.conversationMessagesConnection.nodes[0].author._id.toString()
+
     if (props.isReply && lastAuthorId !== ENV.current_user_id.toString()) {
       return [lastAuthorId]
     } else {
-      return props.conversation?.conversationMessagesConnection.nodes[0].recipients.map(r =>
-        r._id.toString()
-      )
+      const recipients = props.conversationMessage
+        ? props.conversationMessage?.recipients
+        : props.conversation?.conversationMessagesConnection?.nodes[0]?.recipients
+      return recipients?.map(r => r._id.toString())
     }
   }
 
   const replyConversationQuery = useQuery(REPLY_CONVERSATION_QUERY, {
     variables: {
       conversationID: props.conversation?._id,
-      participants: getParticipants()
+      participants: getParticipants(),
+      ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt})
     },
     skip: !(props.isReply || props.isReplyAll)
   })
@@ -112,7 +118,8 @@ const ComposeModalManager = props => {
             query: REPLY_CONVERSATION_QUERY,
             variables: {
               conversationID: props.conversation?._id,
-              participants: getParticipants()
+              participants: getParticipants(),
+              ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt})
             }
           })
         )
@@ -126,7 +133,8 @@ const ComposeModalManager = props => {
         query: REPLY_CONVERSATION_QUERY,
         variables: {
           conversationID: props.conversation?._id,
-          participants: getParticipants()
+          participants: getParticipants(),
+          ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt})
         },
         data: {legacyNode: replyQueryResult.legacyNode}
       })
@@ -214,6 +222,7 @@ const ComposeModalManager = props => {
 
 ComposeModalManager.propTypes = {
   conversation: Conversation.shape,
+  conversationMessage: ConversationMessage.shape,
   isReply: PropTypes.bool,
   isReplyAll: PropTypes.bool,
   onDismiss: PropTypes.func,

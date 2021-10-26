@@ -49,7 +49,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
     end
 
     it 'denies unprivileged access' do
-      json = api_index(raw: true)
+      api_index(raw: true)
       assert_status(401)
     end
 
@@ -98,7 +98,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
 
     it 'denies unprivileged access' do
       student_in_course
-      json = api_grade({ raw: true }, { quiz_submission_ids: [@submission.id] })
+      api_grade({ raw: true }, { quiz_submission_ids: [@submission.id] })
       assert_status 401
     end
 

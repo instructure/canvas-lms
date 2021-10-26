@@ -194,10 +194,10 @@ describe AssignmentOverrideApplicator do
 
       it "distinguishes cache by assignment" do
         enable_cache do
-          overrides1 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
+          AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           assignment = create_assignment
           expect(Rails.cache).to receive(:write_entry)
-          overrides2 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, @student)
+          AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, @student)
         end
       end
 
@@ -739,8 +739,7 @@ describe AssignmentOverrideApplicator do
             expect(override.versions[0].model.assignment_version).not_to be_nil
             # Assert that it won't call the "<=" method on nil
             expect do
-              overrides = AssignmentOverrideApplicator
-                          .overrides_for_assignment_and_user(quiz.assignment, @student)
+              AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz.assignment, @student)
             end.to_not raise_error
           end
         end
@@ -771,8 +770,7 @@ describe AssignmentOverrideApplicator do
             expect(override.versions[0].model.assignment_version).not_to be_nil
             # Assert that it won't call the "<=" method on nil
             expect do
-              overrides = AssignmentOverrideApplicator
-                          .overrides_for_assignment_and_user(quiz.assignment, @student)
+              AssignmentOverrideApplicator.overrides_for_assignment_and_user(quiz.assignment, @student)
             end.to_not raise_error
           end
         end
@@ -869,10 +867,10 @@ describe AssignmentOverrideApplicator do
       @assignment = create_assignment
       @override = assignment_override_model(:assignment => @assignment)
       enable_cache do
-        overrides1 = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
+        AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
         expect(Rails.cache).to receive(:write_entry).never
         Timecop.freeze(5.seconds.from_now) do
-          overrides2 = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
+          AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
         end
       end
     end

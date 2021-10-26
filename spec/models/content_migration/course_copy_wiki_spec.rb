@@ -126,7 +126,7 @@ describe ContentMigration do
 
     context "wiki front page" do
       it "copies wiki front page setting if there is no front page" do
-        fake_front_page = @copy_from.wiki_pages.create!(:title => "Front Page")
+        @copy_from.wiki_pages.create!(:title => "Front Page")
         real_front_page = @copy_from.wiki_pages.create!(:title => "actual front page")
         @copy_from.wiki.set_front_page_url!(real_front_page.url)
 
@@ -137,7 +137,7 @@ describe ContentMigration do
       end
 
       it "does not set 'Front Page' as the front page" do
-        fake_front_page = @copy_from.wiki_pages.create!(:title => "Front Page")
+        @copy_from.wiki_pages.create!(:title => "Front Page")
 
         run_course_copy
 

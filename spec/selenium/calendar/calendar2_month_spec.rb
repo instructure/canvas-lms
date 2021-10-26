@@ -293,7 +293,7 @@ describe "calendar2" do
         expect(f('body')).not_to contain_css('.delete_event_link')
       end
 
-      it "correctlies display next month on arrow press", priority: "1", test_id: 197555 do
+      it "displays next month on arrow press", priority: "1", test_id: 197555 do
         load_month_view
         quick_jump_to_date('Jan 1, 2012')
         change_calendar(:next)
@@ -308,7 +308,7 @@ describe "calendar2" do
         expect(fj(last_thursday)).to have_attribute('data-date', '2012-03-01')
       end
 
-      it "correctlies display previous month on arrow press", priority: "1", test_id: 419290 do
+      it "displays previous month on arrow press", priority: "1", test_id: 419290 do
         load_month_view
         quick_jump_to_date('Jan 1, 2012')
         change_calendar(:prev)
