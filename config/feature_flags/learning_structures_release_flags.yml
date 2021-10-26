@@ -136,3 +136,9 @@ observer_picker:
   display_name: Filter observer dashboard by student
   description: |-
     When enabled, this flag shows a student picker for observers on the dashboard.
+calendar_series:
+  applies_to: SiteAdmin
+  state: hidden
+  display_name: Calendar Series
+  description: |-
+    This flag allows calendar event series to be created from the Canvas Calendar.
