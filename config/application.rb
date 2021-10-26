@@ -72,6 +72,7 @@ module CanvasRails
 
     log_config = File.exist?(Rails.root+"config/logging.yml") && YAML.load_file(Rails.root+"config/logging.yml")[Rails.env]
     log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
+    log_config = log_config.merge({'log_level' => ENV['LOG_LEVEL'] || log_config['log_level']})
     opts = {}
     require 'canvas_logger'
 
