@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {bool, func, objectOf, shape, string} from 'prop-types'
+import {bool, func, shape, string} from 'prop-types'
 import _ from 'underscore'
 import {Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
@@ -108,6 +108,7 @@ export default class GradebookSettingsModal extends React.Component {
     onEntered: func,
     gradebookIsEditable: bool.isRequired,
     gradedLateSubmissionsExist: bool.isRequired,
+    loadCurrentViewOptions: func,
     onCourseSettingsUpdated: func.isRequired,
     onLatePolicyUpdate: func.isRequired,
     onViewOptionsUpdated: func.isRequired,
@@ -117,17 +118,6 @@ export default class GradebookSettingsModal extends React.Component {
       }),
       setAssignmentPostPolicies: func.isRequired,
       setCoursePostPolicy: func.isRequired
-    }),
-    viewOptions: shape({
-      columnSortSettings: shape({
-        criterion: string.isRequired,
-        direction: string.isRequired
-      }).isRequired,
-      showNotes: bool.isRequired,
-      showUnpublishedAssignments: bool.isRequired,
-      showSeparateFirstLastNames: bool.isRequired,
-      statusColors: objectOf(string).isRequired,
-      viewUngradedAsZero: bool.isRequired
     })
   }
 
@@ -146,8 +136,8 @@ export default class GradebookSettingsModal extends React.Component {
     },
     processingRequests: false,
     selectedTab: 'tab-panel-late',
-    viewOptions: _.cloneDeep(this.props.viewOptions),
-    viewOptionsLastSaved: _.cloneDeep(this.props.viewOptions)
+    viewOptions: this.props.loadCurrentViewOptions?.(),
+    viewOptionsLastSaved: this.props.loadCurrentViewOptions?.()
   }
 
   onFetchLatePolicySuccess = ({data}) => {
@@ -271,12 +261,13 @@ export default class GradebookSettingsModal extends React.Component {
   }
 
   open = () => {
-    this.setState(state => ({
+    this.setState(_state => ({
       isOpen: true,
       // We reset the View Options settings to their last-saved state here,
       // instead of on close, because doing the latter causes the reverted
       // settings to be briefly visible.
-      viewOptions: _.cloneDeep(state.viewOptionsLastSaved)
+      viewOptions: this.props.loadCurrentViewOptions?.(),
+      viewOptionsLastSaved: this.props.loadCurrentViewOptions?.()
     }))
   }
 
@@ -362,7 +353,7 @@ export default class GradebookSettingsModal extends React.Component {
                 </Tabs.Panel>
               )}
 
-              {this.props.viewOptions && (
+              {this.props.loadCurrentViewOptions && (
                 <Tabs.Panel
                   renderTitle={I18n.t('View Options')}
                   id="tab-panel-view-options"
