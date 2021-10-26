@@ -103,6 +103,7 @@ def createDistribution(nestedStages) {
 
 def setupNode() {
   env.AUTO_CANCELLED = 'false'
+  distribution.unstashBuildScripts()
   if (queue_empty()) {
     catchError([buildResult: 'SUCCESS', stageResult: 'ABORTED']) {
       env.AUTO_CANCELLED = 'true'
@@ -110,7 +111,6 @@ def setupNode() {
     }
     return
   }
-  distribution.unstashBuildScripts()
   libraryScript.execute 'bash/print-env-excluding-secrets.sh'
   if (env.RSPECQ_ENABLED == '1') {
     def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
@@ -248,7 +248,7 @@ def runReporter() {
 
 def queue_empty() {
   env.REGISTRY_BASE = 'starlord.inscloudgate.net/jenkins'
-  sh "docker pull $REGISTRY_BASE/redis:alpine"
+  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $REGISTRY_BASE/redis:alpine"
   def queueSize = sh(script: "docker run -e REDISCLI_AUTH=${RSPECQ_REDIS_PASSWORD} -e TEST_QUEUE_HOST -t $REGISTRY_BASE/redis:alpine redis-cli -h $TEST_QUEUE_HOST -p 6379 llen ${JOB_NAME}_build${BUILD_NUMBER}:queue:unprocessed", returnStdout: true).split(' ')[1].trim()
   def queueStatus = sh(script: "docker run -e REDISCLI_AUTH=${RSPECQ_REDIS_PASSWORD} -e TEST_QUEUE_HOST -t $REGISTRY_BASE/redis:alpine redis-cli -h $TEST_QUEUE_HOST -p 6379 get  ${JOB_NAME}_build${BUILD_NUMBER}:queue:status", returnStdout: true).trim()
   queueStatus == '\"ready\"' && queueSize.toInteger() == 0
