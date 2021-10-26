@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!filter_calendars_modal'
 
@@ -70,10 +70,6 @@ const FilterCalendarsModal = ({
   updateSelectedContextCodes
 }) => {
   const [pendingSelectedContexts, setPendingSelectedContexts] = useState([...selectedContextCodes])
-
-  useEffect(() => {
-    setPendingSelectedContexts([...selectedContextCodes])
-  }, [selectedContextCodes])
 
   const cancelModal = () => {
     setPendingSelectedContexts([...selectedContextCodes])

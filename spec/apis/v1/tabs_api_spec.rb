@@ -717,7 +717,7 @@ describe TabsController, type: :request do
         json.each { |t| expect(t['position']).to eq tab_order.find_index(@tab_lookup[t['id']]) + 1 }
       end
 
-      it 'correctly labels navigation items as unused' do
+      it 'correctlies label navigation items as unused' do
         unused_tabs = %w{announcements assignments pages files outcomes quizzes modules}
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", { :controller => 'tabs', :action => 'index',
                                                                       :course_id => @course.to_param, :format => 'json' })
@@ -892,7 +892,7 @@ describe TabsController, type: :request do
     it 'allows updating new tabs not in the configuration yet' do
       course_with_teacher(:active_all => true)
       tab_ids = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 4, 10, 13]
-      @course.tab_configuration = tab_ids.map { |id| { 'id' => id } }
+      @course.tab_configuration = tab_ids.map { |id| hash = { 'id' => id } }
       @course.save!
 
       @tool = @course.context_external_tools.new({

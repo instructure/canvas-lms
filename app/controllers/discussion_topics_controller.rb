@@ -701,7 +701,7 @@ class DiscussionTopicsController < ApplicationController
                rce_mentions_in_discussions: Account.site_admin.feature_enabled?(:rce_mentions_in_discussions),
                isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
-               student_reporting_enabled: Account.site_admin.feature_enabled?(:discussions_reporting),
+               discussions_reporting: Account.site_admin.feature_enabled?(:discussions_reporting),
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
                # GRADED_RUBRICS_URL must be within DISCUSSION to avoid page error
                DISCUSSION: {
@@ -1251,7 +1251,7 @@ class DiscussionTopicsController < ApplicationController
     process_future_date_parameters(discussion_topic_hash)
     process_lock_parameters(discussion_topic_hash)
 
-    process_published_parameters
+    process_published_parameters(discussion_topic_hash)
     if is_new && @topic.published? && params[:assignment]
       @topic.unpublish
       @topic.root_topic.try(:unpublish)
@@ -1259,8 +1259,8 @@ class DiscussionTopicsController < ApplicationController
     end
 
     process_group_parameters(discussion_topic_hash)
-    process_pin_parameters
-    process_todo_parameters
+    process_pin_parameters(discussion_topic_hash)
+    process_todo_parameters()
 
     if @errors.present?
       render :json => { errors: @errors }, :status => :bad_request
@@ -1410,7 +1410,7 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
-  def process_published_parameters
+  def process_published_parameters(discussion_topic_hash)
     if params.has_key?(:published)
       should_publish = value_to_boolean(params[:published])
       if should_publish != @topic.published?
@@ -1461,7 +1461,7 @@ class DiscussionTopicsController < ApplicationController
 
   # TODO: upgrade acts_as_list after rails3
   # check_scope will probably handle this
-  def process_pin_parameters
+  def process_pin_parameters(discussion_topic_hash)
     return unless params.key?(:pinned)
 
     pinned = value_to_boolean(params[:pinned])

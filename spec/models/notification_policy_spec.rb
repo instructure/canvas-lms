@@ -161,6 +161,11 @@ describe NotificationPolicy do
 
       NotificationPolicy.delete_all
 
+      trifecta_opts = {
+        :communication_channel => @communication_channel,
+        :notification => @notification
+      }
+
       n1 = notification_policy_model
 
       policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by_frequency([:daily, :weekly])
@@ -184,7 +189,7 @@ describe NotificationPolicy do
     it "does not fail when params does not include a user, and the account doesn't allow scores in e-mails" do
       user_model
       communication_channel_model
-      notification_model(:name => 'Setting 1', :category => 'MultiCategory')
+      notify1 = notification_model(:name => 'Setting 1', :category => 'MultiCategory')
       params = { :channel_id => @communication_channel.id }
       params[:root_account] = Account.default
       params[:root_account].settings[:allow_sending_scores_in_emails] = false
@@ -280,9 +285,9 @@ describe NotificationPolicy do
     it "does not overwrite an existing setting with a default" do
       # Create an existing policy entry
       NotificationPolicy.delete_all
-      notification_policy_model({ :communication_channel => @communication_channel,
-                                  :notification => @announcement,
-                                  :frequency => Notification::FREQ_NEVER })
+      n1 = notification_policy_model({ :communication_channel => @communication_channel,
+                                       :notification => @announcement,
+                                       :frequency => Notification::FREQ_NEVER })
 
       expect(@announcement.default_frequency).not_to eq Notification::FREQ_NEVER # verify that it differs from the default
       policies = NotificationPolicy.setup_with_default_policies(@user, [@announcement])

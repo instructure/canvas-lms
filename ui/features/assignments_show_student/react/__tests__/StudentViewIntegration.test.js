@@ -124,7 +124,7 @@ describe('student view integration tests', () => {
     // This cannot be tested at the <AttemptTab> because the new file being
     // displayed happens as a result of a cache write and these higher level
     // components re-rendering
-    it.skip('displays the new file after it has been uploaded', async () => {
+    it('displays the new file after it has been uploaded', async () => {
       window.URL.createObjectURL = jest.fn()
       uploadFileModule.uploadFile = jest.fn()
       uploadFileModule.uploadFile.mockReturnValueOnce({id: '1', name: 'test.jpg'})
@@ -232,9 +232,7 @@ describe('student view integration tests', () => {
     })
   })
 
-  // Skipping these tests as logged out user is not currently handled
-  // properly in Assignments2 due to graphql issues
-  describe.skip('logged out user on a public assignment', () => {
+  describe('logged out user on a public assignment', () => {
     async function createPublicAssignmentMocks(overrides = {}) {
       const query = LOGGED_OUT_STUDENT_VIEW_QUERY
       const variables = {assignmentLid: '1'}

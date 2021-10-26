@@ -155,7 +155,7 @@ describe MicrosoftSync::SyncerSteps do
 
       context 'when the Microsoft API returns a BatchRequestThrottled with a retry-after time' do
         it 'returns a Retry object with that retry-after time' do
-          err = MicrosoftSync::GraphService::Http::BatchRequestThrottled.new('foo', [])
+          err = MicrosoftSync::GraphServiceHttp::BatchRequestThrottled.new('foo', [])
           expect(err).to receive(:retry_after_seconds).and_return(1.23)
           expect(graph_service.http).to receive(:request).and_raise(err)
           expect_retry(subject, error_class: err.class, **retry_args.merge(delay_amount: 1.23))
@@ -172,34 +172,21 @@ describe MicrosoftSync::SyncerSteps do
     end
   end
 
-  shared_examples_for 'max user enrollments reached' do |owners_or_members, max|
-    let(:err_class) do
-      if owners_or_members == 'owners'
-        MicrosoftSync::SyncerSteps::MaxOwnerEnrollmentsReached
-      else
-        MicrosoftSync::SyncerSteps::MaxMemberEnrollmentsReached
-      end
-    end
-    let(:max_default) { owners_or_members == 'owners' ? 100 : 25000 }
-    let(:err_msg) do
-      "Microsoft 365 allows a maximum of #{(max || max_default).to_s(:delimited)} " \
-        "#{owners_or_members} in a team."
-    end
-
+  shared_examples_for 'max of members enrollment reached' do |max_members|
     it 'raises a graceful exit error informing the user' do
-      expect { subject }.to raise_microsoft_sync_graceful_cancel_error(err_class, err_msg)
+      klass = MicrosoftSync::SyncerSteps::MaxMemberEnrollmentsReached
+      msg =
+        "Microsoft 365 allows a maximum of #{(max_members || 25000).to_s(:delimited)} " \
+        'members in a team.'
+      expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
     end
+  end
 
-    it 'disables the group' do
-      expect { subject }.to raise_error(err_class)
-      expect(group.reload.workflow_state).to eq('deleted')
-    end
-
-    it 'sets the last_error on the group' do
-      expect { subject }.to raise_error(err_class)
-      serialized_err = group.reload.last_error
-      expect(serialized_err).to match(/^{/)
-      expect(MicrosoftSync::Errors.deserialize_and_localize(serialized_err)).to eq(err_msg)
+  shared_examples_for 'max of owners enrollment reached' do |max_owners|
+    it 'raises a graceful exit error informing the user' do
+      klass = MicrosoftSync::SyncerSteps::MaxOwnerEnrollmentsReached
+      msg = "Microsoft 365 allows a maximum of #{max_owners || 100} owners in a team."
+      expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
     end
   end
 
@@ -238,7 +225,7 @@ describe MicrosoftSync::SyncerSteps do
         stub_const('MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS', 3)
       end
 
-      it_behaves_like 'max user enrollments reached', 'members', 3
+      it_should_behave_like 'max of members enrollment reached', 3
     end
 
     context 'when max owners enrollments was reached in a course' do
@@ -246,7 +233,7 @@ describe MicrosoftSync::SyncerSteps do
         stub_const('MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS', 1)
       end
 
-      it_behaves_like 'max user enrollments reached', 'owners', 1
+      it_behaves_like 'max of owners enrollment reached', 1
     end
 
     it 'deletes the partial sync changes for the course' do
@@ -572,26 +559,6 @@ describe MicrosoftSync::SyncerSteps do
       subject
     end
 
-    context 'when the Microsoft API says there are too many members in a group' do
-      before do
-        allow(graph_service).to receive(:remove_group_users_ignore_missing)
-        allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
-          .and_raise(MicrosoftSync::Errors::MembersQuotaExceeded)
-      end
-
-      it_behaves_like 'max user enrollments reached', 'members'
-    end
-
-    context 'when the Microsoft API says there are too many owners in a group' do
-      before do
-        allow(graph_service).to receive(:remove_group_users_ignore_missing)
-        allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
-          .and_raise(MicrosoftSync::Errors::OwnersQuotaExceeded)
-      end
-
-      it_behaves_like 'max user enrollments reached', 'owners'
-    end
-
     context 'when some users to be added already exist in the group' do
       it 'logs and increments statsd metrics' do
         expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
@@ -637,25 +604,6 @@ describe MicrosoftSync::SyncerSteps do
                                                                  tags: { sync_type: sync_type_statsd_tag })
       end
     end
-
-    context "when the last owner is removed but a new owner is added" do
-      it "adds the new owner but raises the error still" do
-        expect(graph_service).to receive(:remove_group_users_ignore_missing)
-          .and_raise(MicrosoftSync::Errors::MissingOwners)
-        expect(graph_service).to receive(:add_users_to_group_ignore_duplicates).twice
-        expect { subject }.to raise_error(MicrosoftSync::Errors::MissingOwners)
-      end
-    end
-
-    context 'when there is an error in adding classes (e.g. too many users)' do
-      it 'still removes users' do
-        err_class = Class.new(StandardError)
-        expect(graph_service).to receive(:remove_group_users_ignore_missing).twice
-        expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
-          .and_raise(err_class)
-        expect { subject }.to raise_error(err_class)
-      end
-    end
   end
 
   describe '#step_execute_diff' do
@@ -696,7 +644,7 @@ describe MicrosoftSync::SyncerSteps do
         allow(diff).to receive(:max_enrollment_members_reached?).and_return true
       end
 
-      it_behaves_like 'max user enrollments reached', 'members'
+      it_behaves_like 'max of members enrollment reached'
     end
 
     context 'when there are more than `MAX_ENROLLMENT_OWNERS` owner enrollments in a course' do
@@ -704,7 +652,7 @@ describe MicrosoftSync::SyncerSteps do
         allow(diff).to receive(:max_enrollment_owners_reached?).and_return true
       end
 
-      it_behaves_like 'max user enrollments reached', 'owners'
+      it_behaves_like 'max of owners enrollment reached'
     end
   end
 

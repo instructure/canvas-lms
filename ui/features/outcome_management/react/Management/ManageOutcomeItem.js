@@ -38,6 +38,7 @@ const ManageOutcomeItem = ({
   friendlyDescription,
   outcomeContextType,
   outcomeContextId,
+  canManageOutcome,
   isChecked,
   onMenuHandler,
   onCheckboxHandler,
@@ -71,7 +72,7 @@ const ManageOutcomeItem = ({
         <Flex.Item as="div" size="4.125rem">
           <div style={{padding: '0.3125rem 0'}}>
             <Flex alignItems="center">
-              {canManage && (
+              {canManageOutcome && (
                 <Flex.Item>
                   <Checkbox
                     label={
@@ -156,7 +157,8 @@ ManageOutcomeItem.propTypes = {
   isChecked: PropTypes.bool.isRequired,
   onMenuHandler: PropTypes.func.isRequired,
   onCheckboxHandler: PropTypes.func.isRequired,
-  canUnlink: PropTypes.bool.isRequired
+  canUnlink: PropTypes.bool.isRequired,
+  canManageOutcome: PropTypes.bool.isRequired
 }
 
 export default memo(ManageOutcomeItem)

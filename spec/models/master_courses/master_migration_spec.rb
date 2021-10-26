@@ -123,7 +123,7 @@ describe MasterCourses::MasterMigration do
 
     it "does two exports if needed" do
       new_course = course_factory
-      @template.add_child_course!(new_course)
+      new_sub = @template.add_child_course!(new_course)
       old_course = course_factory
       sel_sub = @template.add_child_course!(old_course)
       sel_sub.update_attribute(:use_selective_copy, true)
@@ -227,7 +227,7 @@ describe MasterCourses::MasterMigration do
       quiz = @copy_from.quizzes.create!
       quiz2 = @copy_from.quizzes.create!
       bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
-      bank.assessment_questions.create!(:question_data => { 'question_name' => 'test question', 'question_type' => 'essay_question' })
+      aq = bank.assessment_questions.create!(:question_data => { 'question_name' => 'test question', 'question_type' => 'essay_question' })
       file = @copy_from.attachments.create!(:filename => 'blah', :uploaded_data => default_uploaded_data)
       event = @copy_from.calendar_events.create!(:title => 'thing', :description => 'blargh', :start_at => 1.day.from_now)
       tool = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key",
@@ -363,7 +363,7 @@ describe MasterCourses::MasterMigration do
 
     it "syncs deleted quiz questions (unless changed downstream)" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       quiz = @copy_from.quizzes.create!
       qq1 = quiz.quiz_questions.create!(:question_data => { 'question_name' => 'test question', 'question_type' => 'essay_question' })
@@ -399,7 +399,7 @@ describe MasterCourses::MasterMigration do
 
     it "does not restore quiz questions deleted downstream (unless locked)" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       quiz = @copy_from.quizzes.create!
       qq = quiz.quiz_questions.create!(:question_data => { 'question_name' => 'test question', 'question_type' => 'essay_question' })
@@ -426,11 +426,11 @@ describe MasterCourses::MasterMigration do
 
     it "syncs deleted quiz groups (unless changed downstream)" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       quiz = @copy_from.quizzes.create!
       qgroup1 = quiz.quiz_groups.create!(:name => "group", :pick_count => 1)
-      qgroup1.quiz_questions.create!(:quiz => quiz, :question_data => { 'question_name' => 'test group question', 'question_type' => 'essay_question' })
+      qq1 = qgroup1.quiz_questions.create!(:quiz => quiz, :question_data => { 'question_name' => 'test group question', 'question_type' => 'essay_question' })
       qgroup2 = quiz.quiz_groups.create!(:name => "group2", :pick_count => 1)
       qq2 = qgroup2.quiz_questions.create!(:quiz => quiz, :question_data => { 'question_name' => 'test group question', 'question_type' => 'essay_question' })
       run_master_migration
@@ -457,7 +457,7 @@ describe MasterCourses::MasterMigration do
 
     it 'syncs deleted quiz groups linked to question banks after the quiz has been published and submitted' do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
       student = user_factory(active_all: true)
       @copy_to.enroll_student(student, enrollment_state: 'active')
 
@@ -472,6 +472,7 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
+      qgroup1_to = quiz_to.quiz_groups.where(migration_id: mig_id(qgroup1.asset_string)).first
 
       Timecop.freeze(4.minutes.from_now) do
         quiz_to.publish!
@@ -488,13 +489,13 @@ describe MasterCourses::MasterMigration do
 
     it 'syncs deleted quiz groups with quiz questions after the quiz has been published and submitted' do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
       student = user_factory(active_all: true)
       @copy_to.enroll_student(student, enrollment_state: 'active')
 
       quiz = @copy_from.quizzes.create!
       qgroup1 = quiz.quiz_groups.create!(name: "group", pick_count: 1)
-      qgroup1.quiz_questions.create!(quiz: quiz, question_data: { 'question_name' => 'test group question', 'question_type' => 'essay_question' })
+      qq1 = qgroup1.quiz_questions.create!(quiz: quiz, question_data: { 'question_name' => 'test group question', 'question_type' => 'essay_question' })
       qgroup1.save
       Timecop.freeze(2.minutes.from_now) do
         @template.content_tag_for(quiz).update_attribute(:restrictions, { :content => true })
@@ -502,6 +503,7 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
+      qgroup1_to = quiz_to.quiz_groups.where(migration_id: mig_id(qgroup1.asset_string)).first
 
       Timecop.freeze(4.minutes.from_now) do
         quiz_to.publish!
@@ -518,7 +520,7 @@ describe MasterCourses::MasterMigration do
 
     it "syncs deleted assessment bank questions (unless changed downstream)" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
       aq1 = bank1.assessment_questions.create!(:question_data => { 'question_name' => 'test question', 'question_type' => 'essay_question' })
@@ -551,7 +553,7 @@ describe MasterCourses::MasterMigration do
 
     it "preserves all answer ids on re-copy" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       q = @copy_from.quizzes.create!(:title => "q")
       datas = [
@@ -586,11 +588,11 @@ describe MasterCourses::MasterMigration do
 
     it "syncs quiz group attributes (unless changed downstream)" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       quiz = @copy_from.quizzes.create!
       qgroup = quiz.quiz_groups.create!(:name => "group", :pick_count => 1)
-      qgroup.quiz_questions.create!(:quiz => quiz, :question_data => { 'question_name' => 'test group question', 'question_type' => 'essay_question' })
+      qq = qgroup.quiz_questions.create!(:quiz => quiz, :question_data => { 'question_name' => 'test group question', 'question_type' => 'essay_question' })
       run_master_migration
 
       quiz_to = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
@@ -618,7 +620,7 @@ describe MasterCourses::MasterMigration do
     it "creates submissions for assignments without due dates on initial sync" do
       course_with_student(:active_all => true)
       @copy_to = @course
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       assmt = @copy_from.assignments.create!(:title => "assmt")
       run_master_migration
@@ -629,14 +631,14 @@ describe MasterCourses::MasterMigration do
 
     it "does not delete an assignment group if it's not empty downstream" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       ag1 = @copy_from.assignment_groups.create!(:name => "group1")
-      @copy_from.assignments.create!(:title => "assmt1", :assignment_group => ag1)
+      a1 = @copy_from.assignments.create!(:title => "assmt1", :assignment_group => ag1)
       ag2 = @copy_from.assignment_groups.create!(:name => "group2")
-      @copy_from.assignments.create!(:title => "assmt2", :assignment_group => ag2)
+      a2 = @copy_from.assignments.create!(:title => "assmt2", :assignment_group => ag2)
       ag3 = @copy_from.assignment_groups.create!(:name => "group3")
-      @copy_from.assignments.create!(:title => "assmt3", :assignment_group => ag3)
+      a3 = @copy_from.assignments.create!(:title => "assmt3", :assignment_group => ag3)
 
       run_master_migration
 
@@ -666,10 +668,10 @@ describe MasterCourses::MasterMigration do
 
     it "deletes an assignment group when all assignments are moved out in the same sync" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       ag1 = @copy_from.assignment_groups.create!(:name => "group1")
-      @copy_from.assignments.create!(:title => "assmt1", :assignment_group => ag1)
+      a1 = @copy_from.assignments.create!(:title => "assmt1", :assignment_group => ag1)
       ag2 = @copy_from.assignment_groups.create!(:name => "group2")
       a2 = @copy_from.assignments.create!(:title => "assmt2", :assignment_group => ag2)
 
@@ -693,10 +695,10 @@ describe MasterCourses::MasterMigration do
 
     it "does not import into a deleted downstream assignment group" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       ag1 = @copy_from.assignment_groups.create!(:name => "group1")
-      @copy_from.assignments.create!(:title => "assmt1", :assignment_group => ag1)
+      a1 = @copy_from.assignments.create!(:title => "assmt1", :assignment_group => ag1)
 
       run_master_migration
 
@@ -715,7 +717,7 @@ describe MasterCourses::MasterMigration do
 
     it "does not change assignment group weights and rules if changed downstream" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       ag1 = @copy_from.assignment_groups.create!(:name => "group1", :group_weight => 50)
       a1 = @copy_from.assignments.create!(:title => "assmt1", :assignment_group => ag1)
@@ -748,7 +750,7 @@ describe MasterCourses::MasterMigration do
 
     it "doesn't overwrite weights and rules of an assignment group with a similar name on initial sync" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       ag1 = @copy_from.assignment_groups.create!(:name => "group1", :group_weight => 50)
       a1 = @copy_from.assignments.create!(:title => "assmt1", :assignment_group => ag1)
@@ -769,7 +771,7 @@ describe MasterCourses::MasterMigration do
 
     it "syncs unpublished quiz points possible" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       quiz = @copy_from.quizzes.create!(:workflow_state => "unpublished")
       qq = quiz.quiz_questions.create!(:question_data => { 'question_name' => 'test question', 'question_type' => 'essay_question', 'points_possible' => 1 })
@@ -782,6 +784,7 @@ describe MasterCourses::MasterMigration do
       expect(quiz_to.points_possible).to eq 1
       qq_to = quiz_to.quiz_questions.where(:migration_id => mig_id(qq)).first
 
+      new_text = "new text"
       Timecop.freeze(2.minutes.from_now) do
         qq.update_attribute(:question_data, qq.question_data.merge(:points_possible => 2))
         quiz.root_entries(true)
@@ -800,7 +803,7 @@ describe MasterCourses::MasterMigration do
       @template.add_child_course!(@copy_to)
 
       assmt = @copy_from.assignments.create!
-      @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
+      topic = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       page = nil
       file = nil
 
@@ -938,7 +941,7 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       account = @copy_from.account
-      account.root_outcome_group
+      a_group = account.root_outcome_group
       lo = account.created_learning_outcomes.create!({ :title => 'new outcome' })
 
       root = @copy_from.root_outcome_group
@@ -1253,7 +1256,7 @@ describe MasterCourses::MasterMigration do
     it "updates links correctly when creating an assignment and moving a file" do
       @copy_to = course_factory
 
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       folder1 = @copy_from.folders.create!(:name => "folder1")
       folder2 = folder1.sub_folders.create!(:name => "folder2", :context => @copy_from)
@@ -1288,11 +1291,11 @@ describe MasterCourses::MasterMigration do
 
     it "removing an assignment from one module to another and deleting module should not make assignments disappear" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       from_module_1 = @copy_from.context_modules.create!(:name => "module 1 yo")
       from_assignment_1 = @copy_from.assignments.create!(:title => "assignment 1 yo")
-      from_module_1.add_item({ :id => from_assignment_1.id, :type => 'assignment', :indent => 1 })
+      from_tag_1 = from_module_1.add_item({ :id => from_assignment_1.id, :type => 'assignment', :indent => 1 })
       from_module_1.save!
       from_module_2 = @copy_from.context_modules.create!(:name => "module 2 B")
       from_assignment_2 = @copy_from.assignments.create!(:title => "assignment 2 B")
@@ -1336,7 +1339,7 @@ describe MasterCourses::MasterMigration do
 
     it "does not restore content tags in a deleted module" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       mod = @copy_from.context_modules.create!(:name => "module")
       assmt = @copy_from.assignments.create!(:title => "assignment")
@@ -1361,7 +1364,7 @@ describe MasterCourses::MasterMigration do
 
     it "overwrites/removes availability dates and settings when pushing a locked quiz" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
       dates1 = [1.day.ago, 1.day.from_now, 2.days.from_now].map(&:beginning_of_day)
       dates2 = [2.days.ago, 3.days.from_now, 5.days.from_now].map(&:beginning_of_day)
 
@@ -1399,7 +1402,7 @@ describe MasterCourses::MasterMigration do
 
     it "removes due/available dates from locked assignments in sync" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
       assmt = @copy_from.assignments.create!(:due_at => 1.day.from_now, :unlock_at => 1.day.ago, :lock_at => 1.day.from_now)
       run_master_migration
 
@@ -1607,7 +1610,7 @@ describe MasterCourses::MasterMigration do
 
     it "does not copy only_visible_to_overrides for quizzes by default" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       quiz_assmt = @copy_from.assignments.create!(:submission_types => 'online_quiz').reload
       quiz = quiz_assmt.quiz
@@ -1621,7 +1624,7 @@ describe MasterCourses::MasterMigration do
 
     it "allows a minion course's change of the graded status of a discussion topic to stick" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       topic = @copy_from.discussion_topics.new
       topic.assignment = @copy_from.assignments.build(:due_at => 1.month.from_now)
@@ -1652,7 +1655,7 @@ describe MasterCourses::MasterMigration do
     it "allows a minion course's change of the graded status of a discussion topic to stick in the opposite direction too" do
       # should be able to make it graded downstream
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       topic = @copy_from.discussion_topics.create!
       run_master_migration
@@ -1963,11 +1966,12 @@ describe MasterCourses::MasterMigration do
 
     it "baleets assignment overrides when an admin pulls a bait-n-switch with date restrictions" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       topic = @copy_from.discussion_topics.new
       topic.assignment = @copy_from.assignments.build
       topic.save!
+      topic_assmt = topic.assignment
       normal_assmt = @copy_from.assignments.create!
 
       run_master_migration
@@ -2004,7 +2008,7 @@ describe MasterCourses::MasterMigration do
     it "works with a single full export for a new association" do
       @copy_to1 = course_factory
       sub1 = @template.add_child_course!(@copy_to1)
-      @copy_from.discussion_topics.create!(:title => "some title")
+      topic = @copy_from.discussion_topics.create!(:title => "some title")
 
       run_master_migration
 
@@ -2019,7 +2023,7 @@ describe MasterCourses::MasterMigration do
     it "is able to unset group discussions (unless posted to already)" do
       @copy_to1 = course_factory
       @copy_to2 = course_factory(:active_all => true)
-      @template.add_child_course!(@copy_to1)
+      sub1 = @template.add_child_course!(@copy_to1)
       sub2 = @template.add_child_course!(@copy_to2)
 
       group_category = @copy_from.group_categories.create!(:name => 'a set')
@@ -2116,7 +2120,7 @@ describe MasterCourses::MasterMigration do
 
     it "does not delete module items in associated courses" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
       mod = @copy_from.context_modules.create!(:name => "module")
 
       run_master_migration
@@ -2133,7 +2137,7 @@ describe MasterCourses::MasterMigration do
 
     it "syncs module item positions properly" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
       mod = @copy_from.context_modules.create!(:name => "module")
       tag1 = mod.add_item(type: 'context_module_sub_header', title: 'header')
       tag2 = mod.add_item(type: 'context_module_sub_header', title: 'header2')
@@ -2157,10 +2161,10 @@ describe MasterCourses::MasterMigration do
 
     it "tries to properly append on the end even if the destination module item positions are lying" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
       mod = @copy_from.context_modules.create!(:name => "module")
-      mod.add_item(type: 'context_module_sub_header', title: 'header')
-      mod.add_item(type: 'context_module_sub_header', title: 'header2')
+      tag1 = mod.add_item(type: 'context_module_sub_header', title: 'header')
+      tag2 = mod.add_item(type: 'context_module_sub_header', title: 'header2')
 
       run_master_migration
       @copy_to.context_modules.first.content_tags.update_all(:position => 1)
@@ -2176,7 +2180,7 @@ describe MasterCourses::MasterMigration do
 
     it "is able to delete modules" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
       mod = @copy_from.context_modules.create!(:name => "module")
 
       run_master_migration
@@ -2193,7 +2197,7 @@ describe MasterCourses::MasterMigration do
 
     it "copies outcomes in selective copies" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       default = @copy_from.root_outcome_group
       log = @copy_from.learning_outcome_groups.create!(:context => @copy_from, :title => "outcome groupd")
@@ -2217,7 +2221,7 @@ describe MasterCourses::MasterMigration do
 
     it "copies a question bank alignment even if the outcome and bank have already been synced" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       default = @copy_from.root_outcome_group
       @lo = @copy_from.created_learning_outcomes.new(:context => @copy_from, :short_description => "whee", :workflow_state => 'active')
@@ -2227,7 +2231,7 @@ describe MasterCourses::MasterMigration do
       default.add_outcome(@lo)
 
       @bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
-      @bank.assessment_questions.create!(:question_data => { 'question_name' => 'test question', 'question_type' => 'essay_question' })
+      aq = @bank.assessment_questions.create!(:question_data => { 'question_name' => 'test question', 'question_type' => 'essay_question' })
 
       run_master_migration
 
@@ -2247,7 +2251,7 @@ describe MasterCourses::MasterMigration do
 
     it "copies a question bank alignment even if the outcome and bank have already been synced and the outcome is nested in another group" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       @og = @copy_from.learning_outcome_groups.create!({ :title => 'outcome group' })
       @copy_from.root_outcome_group.adopt_outcome_group(@og)
@@ -2262,7 +2266,7 @@ describe MasterCourses::MasterMigration do
 
       Timecop.freeze(2.minutes.from_now) do
         @bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
-        @bank.assessment_questions.create!(:question_data => { 'question_name' => 'test question', 'question_type' => 'essay_question' })
+        aq = @bank.assessment_questions.create!(:question_data => { 'question_name' => 'test question', 'question_type' => 'essay_question' })
         @lo.align(@bank, @copy_from)
       end
 
@@ -2273,7 +2277,7 @@ describe MasterCourses::MasterMigration do
 
     it "preserves account question bank references" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       quiz = @copy_from.quizzes.create!(:title => 'quiz')
       bank = @copy_from.account.assessment_question_banks.create!(:title => 'bank')
@@ -2292,7 +2296,7 @@ describe MasterCourses::MasterMigration do
 
     it "resets generated quiz questions on assessment question re-import" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       quiz = @copy_from.quizzes.create!(:title => 'quiz')
       bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
@@ -2322,13 +2326,13 @@ describe MasterCourses::MasterMigration do
 
     it "preserves assessment question links for quiz question re-import" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
       data = { 'question_name' => 'test question', 'question_type' => 'essay_question', 'question_text' => "text" }
       aq = bank.assessment_questions.create!(:question_data => data)
       quiz = @copy_from.quizzes.create!(:title => 'quiz')
-      quiz.quiz_questions.create!(:question_data => data, :assessment_question => aq)
+      qq = quiz.quiz_questions.create!(:question_data => data, :assessment_question => aq)
       quiz.publish!
 
       run_master_migration
@@ -2346,15 +2350,15 @@ describe MasterCourses::MasterMigration do
 
     it "syncs quiz_groups with points locked" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       quiz = @copy_from.quizzes.create!(:title => 'quiz')
       bank = @copy_from.assessment_question_banks.create!(:title => 'bank')
-      bank.assessment_questions.create!(:question_data => { 'question_name' => 'test question', 'question_type' => 'essay_question' })
+      aq = bank.assessment_questions.create!(:question_data => { 'question_name' => 'test question', 'question_type' => 'essay_question' })
       group = quiz.quiz_groups.create!(:name => "group", :pick_count => 1, :question_points => 2.0)
       group.assessment_question_bank = bank
       group.save
-      @template.create_content_tag_for!(quiz, restrictions: { content: false, points: true })
+      tag = @template.create_content_tag_for!(quiz, restrictions: { content: false, points: true })
 
       mm = run_master_migration
       expect(mm.migration_results.first.content_migration.warnings).to be_empty
@@ -2377,7 +2381,7 @@ describe MasterCourses::MasterMigration do
       @copy_from.save!
 
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       run_master_migration
       expect(@copy_to.reload.tab_configuration).to eq @copy_from.tab_configuration
@@ -2401,7 +2405,7 @@ describe MasterCourses::MasterMigration do
       @template2 = MasterCourses::MasterTemplate.set_as_master_course(@copy_from2)
       att2 = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'),
                                 :folder => Folder.unfiled_folder(@copy_from2), :context => @copy_from2, :cloned_item_id => att1.cloned_item_id)
-      @template2.add_child_course!(@copy_to)
+      sub2 = @template2.add_child_course!(@copy_to)
 
       MasterCourses::MasterMigration.start_new_migration!(@template2, @admin)
       run_jobs
@@ -2413,7 +2417,7 @@ describe MasterCourses::MasterMigration do
 
     it "links to existing outcomes even when some weird migration_id thing happens" do
       @copy_to = course_factory
-      @template.add_child_course!(@copy_to)
+      sub = @template.add_child_course!(@copy_to)
 
       lo = @copy_from.created_learning_outcomes.new(:context => @copy_from, :short_description => "whee", :workflow_state => 'active')
       lo.data = { :rubric_criterion => { :mastery_points => 2, :ratings => [{ :description => "e", :points => 50 }, { :description => "me", :points => 2 },

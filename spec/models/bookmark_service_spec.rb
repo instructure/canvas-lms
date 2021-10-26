@@ -77,7 +77,9 @@ describe BookmarkService do
     end
 
     it "rescues silently if something happens during the process" do
-      allow(@bookmark_service).to receive(:diigo_post_bookmark).and_raise(ArgumentError)
+      def @bookmark_service.diigo_post_bookmark(*args)
+        raise ArgumentError
+      end
 
       expect {
         @bookmark_service.post_bookmark(

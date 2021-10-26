@@ -130,8 +130,7 @@ class RceApiSource {
         bookmark: null,
         isLoading: false,
         hasMore: true
-      },
-      searchString: ''
+      }
     }
   }
 
@@ -350,8 +349,7 @@ class RceApiSource {
     return this.apiFetch(uri, headers).then(({bookmark, files}) => {
       return {
         bookmark,
-        files: files.map(f => fixupFileUrl(props.contextType, props.contextId, f)),
-        searchString: props.searchString
+        files: files.map(f => fixupFileUrl(props.contextType, props.contextId, f))
       }
     })
   }

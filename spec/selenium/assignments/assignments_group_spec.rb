@@ -205,6 +205,7 @@ describe "assignment groups" do
 
   # Because of the way this feature was made, i recommend we keep this one
   it "moves assignments to another assignment group", priority: "2", test_id: 210001 do
+    before_count = @assignment_group.assignments.count
     @ag2 = @course.assignment_groups.create!(name: "2nd Group")
     @assignment = @course.assignments.create(name: "Test assignment", assignment_group: @ag2)
     get "/courses/#{@course.id}/assignments"
@@ -315,7 +316,7 @@ describe "assignment groups" do
     expect(f("#ag_#{ag.id}_assignment_name")).to be_displayed
   end
 
-  it "adds group weights correctly", priority: "2", test_id: 237014 do
+  it "correctlies add group weights", priority: "2", test_id: 237014 do
     @course.update_attribute(:group_weighting_scheme, 'percent')
     ag1 = @course.assignment_groups.create!(name: 'Group 1')
     ag2 = @course.assignment_groups.create!(name: 'Group 2')

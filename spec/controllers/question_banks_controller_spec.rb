@@ -35,7 +35,7 @@ describe QuestionBanksController do
     it "only includes active question banks" do
       @bank3 = @course.account.assessment_question_banks.create!
       @bank3.destroy
-      get 'index', params: { controller: :question_banks, inherited: '1', course_id: @course.id }, format: 'json'
+      res = get 'index', params: { controller: :question_banks, inherited: '1', course_id: @course.id }, format: 'json'
       expect(response).to be_successful
       json = json_parse(response.body)
       expect(json.size).to eq 2

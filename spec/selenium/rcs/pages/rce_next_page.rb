@@ -972,13 +972,6 @@ module RCENextPage
     click_editor_view_button
   end
 
-  def switch_to_raw_html_editor
-    button = f('button[data-btn-id="rce-editormessage-btn"]')
-    if button.text == 'Raw HTML Editor'
-      button.click
-    end
-  end
-
   def switch_to_editor_view
     click_editor_view_button
   end

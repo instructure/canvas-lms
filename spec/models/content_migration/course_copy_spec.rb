@@ -62,12 +62,6 @@ describe ContentMigration do
       expect(@cm.finished_at.to_i).to eq time.to_i
     end
 
-    it "records the job id" do
-      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
-      run_course_copy
-      expect(@cm.reload.migration_settings[:job_ids]).to eq([123])
-    end
-
     it "migrates syllabus links on copy" do
       course_model
 
@@ -274,7 +268,7 @@ describe ContentMigration do
       expect(dt_to.message).to include "/courses/#{@copy_to.id}/files/#{img_to.id}/preview"
     end
 
-    it "selectively copies items" do
+    it "selectivelies copy items" do
       dt1 = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       dt2 = @copy_from.discussion_topics.create!(:message => "hey", :title => "discussion title 2")
       dt3 = @copy_from.announcements.create!(:message => "howdy", :title => "announcement title")
@@ -734,8 +728,8 @@ describe ContentMigration do
 
     it "is able to copy links to folders" do
       folder = Folder.root_folders(@copy_from).first.sub_folders.create!(:context => @copy_from, :name => 'folder_1')
-      Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt",
-                         :uploaded_data => StringIO.new('file'), :folder => folder, :context => @copy_from)
+      att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt",
+                               :uploaded_data => StringIO.new('file'), :folder => folder, :context => @copy_from)
 
       topic = @copy_from.discussion_topics.create!(:title => "some topic",
                                                    :message => "<a href='/courses/#{@copy_from.id}/files/folder/#{folder.name}'>an ill-advised link</a>")
@@ -777,8 +771,8 @@ describe ContentMigration do
       page = @copy_from.wiki_pages.create!(:title => "some page")
 
       mod = @copy_from.context_modules.create!(:name => "some module")
-      mod.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })
-      mod.add_item({ :id => page.id, :type => 'wiki_page', :indent => 1 })
+      tag1 = mod.add_item({ :title => 'Example 1', :type => 'external_url', :url => 'http://derp.derp/something' })
+      tag2 = mod.add_item({ :id => page.id, :type => 'wiki_page', :indent => 1 })
 
       run_course_copy
 

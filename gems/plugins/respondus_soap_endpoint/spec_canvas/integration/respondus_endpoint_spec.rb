@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../../spec/spec_hel
 require 'soap/rpc/driver'
 
 class SpecStreamHandler < SOAP::StreamHandler
-  def send(_url, conn_data, _soapaction = nil, _charset = nil)
+  def send(url, conn_data, soapaction = nil, charset = nil)
     response = @capture_block.call(conn_data.send_string, {})
     conn_data.receive_string = response.body
     conn_data.receive_contenttype = response['Content-Type']
@@ -34,7 +34,7 @@ class SpecStreamHandler < SOAP::StreamHandler
     obj.send(method, *args)
   end
 
-  def self.create(*)
+  def self.create(*a)
     new
   end
 end
@@ -143,20 +143,20 @@ Implemented for: Canvas LMS}
                                    ['Institution', ''])
       expect(soap_response.first).to eq "Success"
 
-      status, _details, context, list = soap_request('GetServerItems',
-                                                     uname, @token.full_token,
-                                                     '', ['itemType', 'course'])
+      status, details, context, list = soap_request('GetServerItems',
+                                                    uname, @token.full_token,
+                                                    '', ['itemType', 'course'])
       expect(status).to eq "Success"
       pair = list.item
       expect(pair.name).to eq "value for name"
       expect(pair.value).to eq @course.to_param
 
       # verify that the respondus api session works with token auth
-      status, _details, _context = soap_request('SelectServerItem',
-                                                uname, @token.full_token,
-                                                context, ['itemType', 'course'],
-                                                ['itemID', @course.to_param],
-                                                ['clearState', ''])
+      status, details, context = soap_request('SelectServerItem',
+                                              uname, @token.full_token,
+                                              context, ['itemType', 'course'],
+                                              ['itemID', @course.to_param],
+                                              ['clearState', ''])
       expect(status).to eq "Success"
     end
 
@@ -170,63 +170,64 @@ Implemented for: Canvas LMS}
   end
 
   it "rejects a session created for a different user" do
+    user1 = @user
     user2 = user_with_pseudonym :active_user => true,
                                 :username => "nobody2@example.com",
                                 :password => "test1234"
     user2.save!
 
-    status, _details, context = soap_request('ValidateAuth',
-                                             'nobody@example.com', 'asdfasdf',
+    status, details, context = soap_request('ValidateAuth',
+                                            'nobody@example.com', 'asdfasdf',
+                                            '',
+                                            ['Institution', ''])
+    expect(status).to eq "Success"
+    status, details, context = soap_request('ValidateAuth',
+                                            'nobody@example.com', 'asdfasdf',
+                                            context,
+                                            ['Institution', ''])
+    expect(status).to eq "Success"
+    status, details, context2 = soap_request('ValidateAuth',
+                                             'nobody2@example.com', 'test1234',
                                              '',
                                              ['Institution', ''])
     expect(status).to eq "Success"
-    status, _details, context = soap_request('ValidateAuth',
-                                             'nobody@example.com', 'asdfasdf',
+    status, details, context2 = soap_request('ValidateAuth',
+                                             'nobody2@example.com', 'test1234',
                                              context,
                                              ['Institution', ''])
-    expect(status).to eq "Success"
-    status, _details, _context2 = soap_request('ValidateAuth',
-                                               'nobody2@example.com', 'test1234',
-                                               '',
-                                               ['Institution', ''])
-    expect(status).to eq "Success"
-    status, _details, _context2 = soap_request('ValidateAuth',
-                                               'nobody2@example.com', 'test1234',
-                                               context,
-                                               ['Institution', ''])
     expect(status).to eq "Invalid context"
   end
 
   it "allows selecting a course" do
-    status, _details, context, list = soap_request('GetServerItems',
-                                                   'nobody@example.com', 'asdfasdf',
-                                                   '', ['itemType', 'course'])
+    status, details, context, list = soap_request('GetServerItems',
+                                                  'nobody@example.com', 'asdfasdf',
+                                                  '', ['itemType', 'course'])
     expect(status).to eq "Success"
     pair = list.item
     expect(pair.name).to eq "value for name"
     expect(pair.value).to eq @course.to_param
 
     # select the course
-    status, _details, context = soap_request('SelectServerItem',
-                                             'nobody@example.com', 'asdfasdf',
-                                             context, ['itemType', 'course'],
-                                             ['itemID', @course.to_param],
-                                             ['clearState', ''])
+    status, details, context = soap_request('SelectServerItem',
+                                            'nobody@example.com', 'asdfasdf',
+                                            context, ['itemType', 'course'],
+                                            ['itemID', @course.to_param],
+                                            ['clearState', ''])
     expect(status).to eq "Success"
 
     # list the existing quizzes
-    status, _details, context, list = soap_request('GetServerItems',
-                                                   'nobody@example.com', 'asdfasdf',
-                                                   context, ['itemType', 'quiz'])
+    status, details, context, list = soap_request('GetServerItems',
+                                                  'nobody@example.com', 'asdfasdf',
+                                                  context, ['itemType', 'quiz'])
     expect(status).to eq "Success"
     pair = list.item
     expect(pair.name).to eq "quiz1"
     expect(pair.value).to eq @quiz.to_param
 
     # list the existing question banks
-    status, _details, context, list = soap_request('GetServerItems',
-                                                   'nobody@example.com', 'asdfasdf',
-                                                   context, ['itemType', 'qdb'])
+    status, details, context, list = soap_request('GetServerItems',
+                                                  'nobody@example.com', 'asdfasdf',
+                                                  context, ['itemType', 'qdb'])
     expect(status).to eq "Success"
     pair = list.item
     expect(pair.name).to eq "questionbank1"
@@ -240,11 +241,11 @@ Implemented for: Canvas LMS}
   it "queues QTI quiz uploads for processing" do
     Setting.set('respondus_endpoint.polling_api', 'false')
 
-    status, _details, context = soap_request('SelectServerItem',
-                                             'nobody@example.com', 'asdfasdf',
-                                             '', ['itemType', 'course'],
-                                             ['itemID', @course.to_param],
-                                             ['clearState', ''])
+    status, details, context = soap_request('SelectServerItem',
+                                            'nobody@example.com', 'asdfasdf',
+                                            '', ['itemType', 'course'],
+                                            ['itemID', @course.to_param],
+                                            ['clearState', ''])
     expect(status).to eq "Success"
 
     mock_migration = ContentMigration.create!(context: @course)
@@ -255,7 +256,7 @@ Implemented for: Canvas LMS}
     allow(ContentMigration).to receive(:new).and_return(mock_migration)
     allow(ContentMigration).to receive(:find).with(mock_migration.id).and_return(mock_migration)
 
-    status, _details, _context, item_id = soap_request(
+    status, details, context, item_id = soap_request(
       'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,
       ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
       ['fileName', 'import.zip'], ['fileData', 'pretend this is a zip file']
@@ -272,11 +273,11 @@ Implemented for: Canvas LMS}
 
   describe "polling publish" do
     before do
-      _status, _details, context = soap_request('SelectServerItem',
-                                                'nobody@example.com', 'asdfasdf',
-                                                '', ['itemType', 'course'],
-                                                ['itemID', @course.to_param],
-                                                ['clearState', ''])
+      status, details, context = soap_request('SelectServerItem',
+                                              'nobody@example.com', 'asdfasdf',
+                                              '', ['itemType', 'course'],
+                                              ['itemID', @course.to_param],
+                                              ['clearState', ''])
       @mock_migration = ContentMigration.create!(context: @course)
       def @mock_migration.export_content
         self.workflow_state = 'importing'
@@ -284,7 +285,7 @@ Implemented for: Canvas LMS}
       allow(ContentMigration).to receive(:new).and_return(@mock_migration)
       allow(ContentMigration).to receive(:find).with(@mock_migration.id).and_return(@mock_migration)
 
-      _status, _details, context, _item_id = soap_request(
+      status, details, context, item_id = soap_request(
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,
         ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
         ['fileName', 'import.zip'], ['fileData', 'pretend this is a zip file']
@@ -293,7 +294,7 @@ Implemented for: Canvas LMS}
     end
 
     it "responds immediately and allow polling for completion" do
-      status, _details, context, item_id = soap_request(
+      status, details, context, item_id = soap_request(
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', @token,
         ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
         ['fileName', 'import.zip'], ['fileData', "\x0"]
@@ -305,7 +306,7 @@ Implemented for: Canvas LMS}
       @mock_migration.migration_settings[:imported_assets] = ["quizzes:quiz_xyz"]
       @mock_migration.workflow_state = 'imported'
 
-      status, _details, _context, item_id = soap_request(
+      status, details, context, item_id = soap_request(
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', @token,
         ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
         ['fileName', 'import.zip'], ['fileData', "\x0"]
@@ -318,7 +319,7 @@ Implemented for: Canvas LMS}
       @mock_migration.migration_settings[:imported_assets] = []
       @mock_migration.workflow_state = 'failed'
 
-      status, _details, _context, item_id = soap_request(
+      status, details, context, item_id = soap_request(
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', @token,
         ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
         ['fileName', 'import.zip'], ['fileData', "\x0"]
