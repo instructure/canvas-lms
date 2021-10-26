@@ -15,8 +15,8 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import actions from 'ui/features/developer_keys_v2/react/actions/developerKeysActions.js'
-import store from 'ui/features/developer_keys_v2/react/store/store.js'
+import actions from 'ui/features/developer_keys_v2/react/actions/developerKeysActions'
+import store from 'ui/features/developer_keys_v2/react/store/store'
 import axios from '@canvas/axios'
 
 QUnit.module('Developer key actions')
@@ -64,28 +64,40 @@ test('listInheritedDeveloperKeysFailed returns a error', () => {
 
 test('getDeveloperKeys retrieves account key data', () => {
   const getStub = sinon.stub(axios, 'get').returns(thenStub())
-  actions.getDeveloperKeys('http://www.test.com', {})(() => {}, () => {})
+  actions.getDeveloperKeys('http://www.test.com', {})(
+    () => {},
+    () => {}
+  )
   ok(getStub.calledWith('http://www.test.com'))
   axios.get.restore()
 })
 
-test('getDeveloperKeys retrieves account key data', () => {
+test('getDeveloperKeys retrieves inherited account key data', () => {
   const getStub = sinon.stub(axios, 'get').returns(thenStub())
-  actions.getDeveloperKeys('http://www.test.com', {})(() => {}, () => {})
+  actions.getDeveloperKeys('http://www.test.com', {})(
+    () => {},
+    () => {}
+  )
   ok(getStub.calledWith('http://www.test.com?inherited=true'))
   axios.get.restore()
 })
 
 test('getRemainingDeveloperKeys requests keys from the specified URL', () => {
   const getStub = sinon.stub(axios, 'get').returns(thenStub())
-  actions.getRemainingDeveloperKeys('http://www.test.com', [])(() => {}, () => {})
+  actions.getRemainingDeveloperKeys('http://www.test.com', [])(
+    () => {},
+    () => {}
+  )
   ok(getStub.calledWith('http://www.test.com'))
   axios.get.restore()
 })
 
 test('getRemainingInheritedDeveloperKeys requests keys from the specified URL with inherited param', () => {
   const getStub = sinon.stub(axios, 'get').returns(thenStub())
-  actions.getRemainingInheritedDeveloperKeys('http://www.test.com', [])(() => {}, () => {})
+  actions.getRemainingInheritedDeveloperKeys('http://www.test.com', [])(
+    () => {},
+    () => {}
+  )
   ok(getStub.calledWith('http://www.test.com?inherited=true'))
   axios.get.restore()
 })

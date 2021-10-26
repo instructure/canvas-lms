@@ -20,7 +20,7 @@ import $ from 'jquery'
 import axios from '@canvas/axios'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
 
-const actions = {}
+const actions: any = {}
 
 actions.LIST_DEVELOPER_KEYS_START = 'LIST_DEVELOPER_KEYS_START'
 actions.listDeveloperKeysStart = payload => ({type: actions.LIST_DEVELOPER_KEYS_START, payload})
@@ -331,6 +331,7 @@ function retrieveRemainingDevKeys(
         const payload = {next, developerKeys}
         dispatch(success(payload))
         if (callback) {
+          // eslint-disable-next-line promise/no-callback-in-promise
           callback(payload.developerKeys)
         }
         return payload
@@ -449,37 +450,34 @@ actions.ltiKeysSetLtiKey = payload => ({
 actions.RESET_LTI_STATE = 'RESET_LTI_STATE'
 actions.resetLtiState = () => ({type: actions.RESET_LTI_STATE})
 
-actions.saveLtiToolConfiguration = ({
-  account_id,
-  settings,
-  settings_url,
-  developer_key
-}) => dispatch => {
-  dispatch(actions.setEditingDeveloperKey(developer_key))
+actions.saveLtiToolConfiguration =
+  ({account_id, settings, settings_url, developer_key}) =>
+  dispatch => {
+    dispatch(actions.setEditingDeveloperKey(developer_key))
 
-  const url = `/api/lti/accounts/${account_id}/developer_keys/tool_configuration`
+    const url = `/api/lti/accounts/${account_id}/developer_keys/tool_configuration`
 
-  return axios
-    .post(url, {
-      tool_configuration: {
-        settings,
-        ...(settings_url ? {settings_url} : {})
-      },
-      developer_key
-    })
-    .then(response => {
-      const newKey = response.data.developer_key
-      newKey.tool_configuration = response.data.tool_configuration.settings
-      dispatch(actions.setEditingDeveloperKey(newKey))
-      dispatch(actions.listDeveloperKeysPrepend(newKey))
-      return response.data
-    })
-    .catch(error => {
-      dispatch(actions.setEditingDeveloperKey(false))
-      $.flashError(error.message)
-      throw error
-    })
-}
+    return axios
+      .post(url, {
+        tool_configuration: {
+          settings,
+          ...(settings_url ? {settings_url} : {})
+        },
+        developer_key
+      })
+      .then(response => {
+        const newKey = response.data.developer_key
+        newKey.tool_configuration = response.data.tool_configuration.settings
+        dispatch(actions.setEditingDeveloperKey(newKey))
+        dispatch(actions.listDeveloperKeysPrepend(newKey))
+        return response.data
+      })
+      .catch(error => {
+        dispatch(actions.setEditingDeveloperKey(false))
+        $.flashError(error.message)
+        throw error
+      })
+  }
 
 actions.updateLtiKey = (
   developerKey,
