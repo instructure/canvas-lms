@@ -108,6 +108,9 @@ const locale = {
     "message": "メニューまたはダイアログを閉じます。またエディタエリアに戻ります"
   },
   "close_d634289d": { "message": "閉じる" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "クローズドキャプションファイルは { maxKb } kb未満であること"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "クローズドキャプション/字幕"
   },
@@ -141,6 +144,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "クリエイティブ コモンズ ライセンス:"
   },
+  "current_image_f16c249c": { "message": "現在の画像" },
   "custom_6979cd81": { "message": "カスタム" },
   "date_added_ed5ad465": { "message": "追加された日付" },
   "decorative_image_3c28aa7d": { "message": "装飾的なイメージ" },
@@ -293,6 +297,7 @@ const locale = {
   "middle_27dc1d5": { "message": "中位" },
   "miscellaneous_e9818229": { "message": "その他" },
   "modules_c4325335": { "message": "モジュール" },
+  "multi_color_image_63d7372f": { "message": "マルチカラー画像" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "少なくとも { width } x { height }px でなければなりません"
   },
@@ -376,7 +381,11 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "画像オプションを表示" },
   "show_link_options_545338fd": { "message": "リンクオプションを表示する" },
   "show_video_options_6ed3721a": { "message": "ビデオオプションを表示する" },
+  "single_color_image_4e5d4dbc": { "message": "単色画像" },
   "size_b30e1077": { "message": "サイズ" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "キャプションファイルのサイズが最大 { max } kb の許容ファイルサイズを超えている。"
+  },
   "small_b070434a": { "message": "小" },
   "something_went_wrong_89195131": { "message": "問題が発生しました。" },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

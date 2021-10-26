@@ -108,6 +108,9 @@ const locale = {
     "message": "Zamknij menu lub okno dialogowe. Przywraca do obszaru edytora"
   },
   "close_d634289d": { "message": "Zamknij" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Plik z napisami musi być mniejszy niż { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "Napisy / napisy dla niesłyszących"
   },
@@ -141,6 +144,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Licencja Creative Commons:"
   },
+  "current_image_f16c249c": { "message": "Bieżący obraz" },
   "custom_6979cd81": { "message": "Niestandardowe" },
   "date_added_ed5ad465": { "message": "Data dodania" },
   "decorative_image_3c28aa7d": { "message": "Obraz dekoracyjny" },
@@ -289,6 +293,7 @@ const locale = {
   "middle_27dc1d5": { "message": "Środkowy" },
   "miscellaneous_e9818229": { "message": "Różne" },
   "modules_c4325335": { "message": "Moduły" },
+  "multi_color_image_63d7372f": { "message": "Obraz wielokolorowy" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Wymagane co najmniej { width } x { height } px"
   },
@@ -376,7 +381,11 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "Pokaż opcje obrazów" },
   "show_link_options_545338fd": { "message": "Pokaż opcje łącza" },
   "show_video_options_6ed3721a": { "message": "Pokaż opcje wideo" },
+  "single_color_image_4e5d4dbc": { "message": "Obraz jednokolorowy" },
   "size_b30e1077": { "message": "Rozmiar" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Rozmiar pliku z napisami przekracza maksymalną dozwoloną wartość { max } kb."
+  },
   "small_b070434a": { "message": "Mały" },
   "something_went_wrong_89195131": { "message": "Coś poszło nie tak." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

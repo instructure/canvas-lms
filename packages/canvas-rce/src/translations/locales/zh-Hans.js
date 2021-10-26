@@ -96,6 +96,9 @@ const locale = {
     "message": "关闭菜单或对话框。并带您返回至编辑器区域"
   },
   "close_d634289d": { "message": "关闭" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "关闭字幕的文件必须小于 { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": { "message": "关闭了字幕/说明" },
   "collaborations_5c56c15f": { "message": "协作" },
   "collapse_to_hide_types_1ab46d2e": { "message": "折叠以隐藏 { types }" },
@@ -125,6 +128,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Creative Commons 许可证："
   },
+  "current_image_f16c249c": { "message": "当前图像" },
   "custom_6979cd81": { "message": "自定义" },
   "date_added_ed5ad465": { "message": "按添加日期排序" },
   "decorative_image_3c28aa7d": { "message": "装饰图" },
@@ -253,6 +257,7 @@ const locale = {
   "middle_27dc1d5": { "message": "中间" },
   "miscellaneous_e9818229": { "message": "其他" },
   "modules_c4325335": { "message": "单元" },
+  "multi_color_image_63d7372f": { "message": "彩色图像" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "必须至少为 { width } x { height }px"
   },
@@ -326,7 +331,11 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "显示图像选项" },
   "show_link_options_545338fd": { "message": "显示链接选项" },
   "show_video_options_6ed3721a": { "message": "显示视频选项" },
+  "single_color_image_4e5d4dbc": { "message": "单色图像" },
   "size_b30e1077": { "message": "大小" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "字幕文件的大小必须大于允许的文件大小最大值 { max } kb。"
+  },
   "small_b070434a": { "message": "小" },
   "something_went_wrong_89195131": { "message": "出了些问题。" },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

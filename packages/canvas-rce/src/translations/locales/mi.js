@@ -113,6 +113,9 @@ const locale = {
     "message": "Kati he tāhua kōrero rānei. Ka whakahoki anō ki te wāhi etita"
   },
   "close_d634289d": { "message": "Katia" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Katia ngā tapanga kōnae me iti ake i te { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "Kua katia Ngā Tapanga/Ngā Tuhinga"
   },
@@ -144,6 +147,7 @@ const locale = {
   "course_navigation_dd035109": { "message": "Whakaterenga Akoranga" },
   "create_button_and_icon_5c089934": { "message": "Hanga Pātene me te Ata" },
   "creative_commons_license_725584ae": { "message": "Auaha ngā Raihana Noa:" },
+  "current_image_f16c249c": { "message": "Whakapakoko o Nāianei" },
   "custom_6979cd81": { "message": "Tikanga" },
   "date_added_ed5ad465": { "message": "Rā kua tāpiritia" },
   "decorative_image_3c28aa7d": { "message": "Āhua whakapaipai" },
@@ -296,6 +300,7 @@ const locale = {
   "middle_27dc1d5": { "message": "Waenganui" },
   "miscellaneous_e9818229": { "message": "Momo kē" },
   "modules_c4325335": { "message": "Kōwae" },
+  "multi_color_image_63d7372f": { "message": "Whakapakoko nui ngā Tae" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Me kia i te iti rawa { width } x { height }px"
   },
@@ -375,7 +380,11 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "Whakātu wāhanga āhua" },
   "show_link_options_545338fd": { "message": "Whakātu Hono Kōwhiringa" },
   "show_video_options_6ed3721a": { "message": "Whakātu ataata kōwhiringa" },
+  "single_color_image_4e5d4dbc": { "message": "Whakapakoko kotahi te Tae" },
   "size_b30e1077": { "message": "Rahi" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Te rahi o te tapanga kōnae nui ake i te mōrahi { max } kb tukua rahi kōnae rahi."
+  },
   "small_b070434a": { "message": "Iti" },
   "something_went_wrong_89195131": { "message": "I hē tētahi mea." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

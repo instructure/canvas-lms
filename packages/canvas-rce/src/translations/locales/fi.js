@@ -110,6 +110,9 @@ const locale = {
     "message": "Sulje valikko tai valintaikkuna Palauttaa sinut myös editorialueelle"
   },
   "close_d634289d": { "message": "Sulje" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Suljetun tekstitystiedoston täytyy olla alle { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "Suljetut kuvatekstit/Tekstitykset"
   },
@@ -143,6 +146,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Creative Commons -lisenssi:"
   },
+  "current_image_f16c249c": { "message": "Nykyinen kuva" },
   "custom_6979cd81": { "message": "Mukauta" },
   "date_added_ed5ad465": { "message": "Lisäyspäivämäärä" },
   "decorative_image_3c28aa7d": { "message": "Koristeellinen kuva" },
@@ -295,6 +299,7 @@ const locale = {
   "middle_27dc1d5": { "message": "Kohtalainen" },
   "miscellaneous_e9818229": { "message": "Muut asiat" },
   "modules_c4325335": { "message": "Moduulit" },
+  "multi_color_image_63d7372f": { "message": "Monivärinen kuva" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Täytyy olla vähintään { width } x { height }px."
   },
@@ -376,7 +381,11 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "Näytä kuva-asetukset" },
   "show_link_options_545338fd": { "message": "Näytä linkin asetukset" },
   "show_video_options_6ed3721a": { "message": "Näytä videoasetukset" },
+  "single_color_image_4e5d4dbc": { "message": "Yksivärinen kuva" },
   "size_b30e1077": { "message": "Koko" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Tekstitystiedosto on kooltaan suurempi kuin suurin sallittu tiedostokoko { max } kb."
+  },
   "small_b070434a": { "message": "Pieni" },
   "something_went_wrong_89195131": { "message": "Jotakin meni pieleen." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

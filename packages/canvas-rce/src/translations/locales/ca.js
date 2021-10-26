@@ -112,6 +112,9 @@ const locale = {
     "message": "Tanca un menú o un quadre de diàleg També us torna a l''àrea d''editor"
   },
   "close_d634289d": { "message": "Tanca" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "El fitxer de subtítols tancats ha de tenir menys de { maxKb } kB"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "Llegendes/subtítols tancats"
   },
@@ -145,6 +148,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Llicència de Creative Commons:"
   },
+  "current_image_f16c249c": { "message": "Imatge actual" },
   "custom_6979cd81": { "message": "Personalitzat" },
   "date_added_ed5ad465": { "message": "Data afegida" },
   "decorative_image_3c28aa7d": { "message": "Imatge decorativa" },
@@ -301,6 +305,7 @@ const locale = {
   "middle_27dc1d5": { "message": "Centre" },
   "miscellaneous_e9818229": { "message": "Diversos" },
   "modules_c4325335": { "message": "Mòduls" },
+  "multi_color_image_63d7372f": { "message": "Imatge multicolor" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Ha de ser de { width } × { height }píxels com a mínim"
   },
@@ -390,7 +395,11 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "Mostra les opcions d''imatge" },
   "show_link_options_545338fd": { "message": "Mostra les opcions d''enllaç" },
   "show_video_options_6ed3721a": { "message": "Mostra les opcions de vídeo" },
+  "single_color_image_4e5d4dbc": { "message": "Imatge d’un sol color" },
   "size_b30e1077": { "message": "Mida" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "La mida del fitxer de subtítols és superior a la mida màxima de { max } kB permesa per als fitxers."
+  },
   "small_b070434a": { "message": "Petita" },
   "something_went_wrong_89195131": { "message": "Alguna cosa no ha anat bé." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

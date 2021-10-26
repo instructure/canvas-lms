@@ -110,6 +110,9 @@ const locale = {
     "message": "Feche um menu ou diálogo. Também lhe retorna para a área do editor"
   },
   "close_d634289d": { "message": "Fechar" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "O arquivo de legenda oculta deve ter menos de { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": { "message": "Legendas" },
   "collaborations_5c56c15f": { "message": "Colaborações" },
   "collapse_to_hide_types_1ab46d2e": {
@@ -141,6 +144,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Licença do Creative Commons:"
   },
+  "current_image_f16c249c": { "message": "Imagem atual" },
   "custom_6979cd81": { "message": "Personalizar" },
   "date_added_ed5ad465": { "message": "Data adicionada" },
   "decorative_image_3c28aa7d": { "message": "Imagem decorativa" },
@@ -293,6 +297,7 @@ const locale = {
   "middle_27dc1d5": { "message": "Meio" },
   "miscellaneous_e9818229": { "message": "Diversos" },
   "modules_c4325335": { "message": "Módulos" },
+  "multi_color_image_63d7372f": { "message": "Imagem multicolorida" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Deve ter ao menos { width } x { height }px"
   },
@@ -376,7 +381,11 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "Exibir opções de imagem" },
   "show_link_options_545338fd": { "message": "Exibir opções de link" },
   "show_video_options_6ed3721a": { "message": "Exibir opções de vídeo" },
+  "single_color_image_4e5d4dbc": { "message": "Imagem de cor única" },
   "size_b30e1077": { "message": "Tamanho" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "O tamanho do arquivo de legenda é maior do que o tamanho máximo de arquivo permitido em { max } kb."
+  },
   "small_b070434a": { "message": "Pequena" },
   "something_went_wrong_89195131": { "message": "Algo deu errado." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

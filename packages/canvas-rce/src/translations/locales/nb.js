@@ -104,6 +104,9 @@ const locale = {
     "message": "Lukk en meny eller dialog. Returnerer deg også til redigeringsområdet"
   },
   "close_d634289d": { "message": "Lukk" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Fil med teksting må være mindre enn { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": { "message": "Undertekster" },
   "collaborations_5c56c15f": { "message": "Samarbeid" },
   "collapse_to_hide_types_1ab46d2e": {
@@ -135,6 +138,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-lisens:"
   },
+  "current_image_f16c249c": { "message": "Nåværende bilde" },
   "custom_6979cd81": { "message": "Tilpasset" },
   "date_added_ed5ad465": { "message": "Lagt til dato" },
   "decorative_image_3c28aa7d": { "message": "Dekorativt Bilde" },
@@ -283,6 +287,7 @@ const locale = {
   "middle_27dc1d5": { "message": "Midten" },
   "miscellaneous_e9818229": { "message": "Diverse" },
   "modules_c4325335": { "message": "Moduler" },
+  "multi_color_image_63d7372f": { "message": "Bilde i flere farger" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Det må være minst { width } x { height }px"
   },
@@ -366,7 +371,11 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "Vis bildemuligheter" },
   "show_link_options_545338fd": { "message": "Vis lenkevalg" },
   "show_video_options_6ed3721a": { "message": "Vis videovalg" },
+  "single_color_image_4e5d4dbc": { "message": "Enkeltfargebilde" },
   "size_b30e1077": { "message": "Størrelse" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Størrelsen på bildetekstfilen er større en maksimalt tillatt størrelse på { max } kb."
+  },
   "small_b070434a": { "message": "Liten" },
   "something_went_wrong_89195131": { "message": "Noe gikk galt." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

@@ -102,6 +102,9 @@ const locale = {
     "message": "إغلاق قائمة أو مربع حوار. يعيدك أيضًا إلى مساحة المحرر"
   },
   "close_d634289d": { "message": "إغلاق" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "يجب أن يقل حجم ملف التسمية التوضيحية المغلقة عن { maxKb } كيلوبايت"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "تسميات توضيحية مغلقة/ترجمات مباشرة"
   },
@@ -131,6 +134,7 @@ const locale = {
   "course_navigation_dd035109": { "message": "التنقل عبر المساق" },
   "create_button_and_icon_5c089934": { "message": "إنشاء زر وأيقونة" },
   "creative_commons_license_725584ae": { "message": "ترخيص المشاع الإبداعي:" },
+  "current_image_f16c249c": { "message": "الصورة الحالية" },
   "custom_6979cd81": { "message": "مخصص" },
   "date_added_ed5ad465": { "message": "تاريخ الإضافة" },
   "decorative_image_3c28aa7d": { "message": "صورة تزيين" },
@@ -277,6 +281,7 @@ const locale = {
   "middle_27dc1d5": { "message": "الأوسط" },
   "miscellaneous_e9818229": { "message": "متنوعات" },
   "modules_c4325335": { "message": "الوحدات النمطية" },
+  "multi_color_image_63d7372f": { "message": "صورة متعددة الألوان" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "يجب أن تكون { width } x { height } بكسل على الأقل."
   },
@@ -356,7 +361,11 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "إظهار خيارات الصورة" },
   "show_link_options_545338fd": { "message": "إظهار خيارات الارتباطات" },
   "show_video_options_6ed3721a": { "message": "إظهار خيارات الفيديو" },
+  "single_color_image_4e5d4dbc": { "message": "صورة بلون واحد" },
   "size_b30e1077": { "message": "الحجم" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "حجم ملف التسمية التوضيحية يتجاوز الحد الأقصى المسموح به من { max } كيلوبايت."
+  },
   "small_b070434a": { "message": "صغير" },
   "something_went_wrong_89195131": { "message": "حدث خطأ ما." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
