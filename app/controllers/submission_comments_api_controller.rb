@@ -130,7 +130,7 @@ class SubmissionCommentsApiController < ApplicationController
                         status: :bad_request
         end
 
-        user.mark_submission_annotations_unread!(submission) unless user == author
+        GuardRail.activate(:primary) { user.mark_submission_annotations_unread!(submission) } unless user == author
 
         instructors = @context.instructors_in_charge_of(user)
 
