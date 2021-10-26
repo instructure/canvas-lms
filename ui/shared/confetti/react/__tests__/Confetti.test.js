@@ -48,7 +48,7 @@ describe('Confetti', () => {
       render(<Confetti />)
       jest.advanceTimersByTime(2500)
       expect(showFlashAlert).toHaveBeenCalledWith({
-        message: 'Great work! From the Canvas developers',
+        message: 'Great work! From the Canvas Developers',
         srOnly: true
       })
     })
