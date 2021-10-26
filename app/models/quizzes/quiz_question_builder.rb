@@ -189,7 +189,7 @@ class Quizzes::QuizQuestionBuilder
       # and you should be able to treat it like a numerical_answer
       # question for all intents and purposes
       text = q[:question_text]
-      q[:answers] = [q[:answers].sort_by { |a| rand }.first].compact
+      q[:answers] = [q[:answers].sample].compact
       if q[:answers].first
         q[:answers].first[:variables].each do |variable|
           re = Regexp.new("\\[#{variable[:name]}\\]")
@@ -205,7 +205,7 @@ class Quizzes::QuizQuestionBuilder
 
   def shuffle_answers(question)
     if @options[:shuffle_answers] && shuffleable_question_type?(question[:question_type])
-      question[:answers].sort_by { |a| rand }
+      question[:answers].shuffle
     else
       question[:answers]
     end
@@ -214,7 +214,7 @@ class Quizzes::QuizQuestionBuilder
   def shuffle_matches(question)
     # question matches should always be shuffled, regardless of the
     # shuffle_answers option
-    question[:matches].sort_by { |m| rand }
+    question[:matches].shuffle
   end
 
   protected

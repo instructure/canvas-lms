@@ -282,7 +282,7 @@ class Folder < ActiveRecord::Base
 
     dup ||= Folder.new
     dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if { |k, v| [:id, :full_name, :parent_folder_id].include?(k.to_sym) }.each do |key, val|
+    self.attributes.except("id", "full_name", "parent_folder_id").each do |key, val|
       dup.send("#{key}=", val)
     end
     if self.unique_type && context.folders.active.where(:unique_type => self.unique_type).exists?

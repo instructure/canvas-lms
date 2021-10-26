@@ -2554,10 +2554,8 @@ class ApplicationController < ActionController::Base
 
   def self.batch_jobs_in_actions(opts = {})
     batch_opts = opts.delete(:batch)
-    around_action(opts) do |controller, action|
-      Delayed::Batch.serial_batch(batch_opts || {}) do
-        action.call
-      end
+    around_action(opts) do |_controller, action|
+      Delayed::Batch.serial_batch(batch_opts || {}, &action)
     end
   end
 

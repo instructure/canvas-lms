@@ -329,7 +329,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
         end
 
         data = MasterCourses::ChildSubscription.active.where(:child_course_id => valid_ids_to_add).pluck(:master_template_id, :child_course_id)
-        template_pairs, other_pairs = data.partition { |template_id, c_id| template_id == @template.id }
+        template_pairs, other_pairs = data.partition { |template_id, _c_id| template_id == @template.id }
         if other_pairs.any?
           # i still think there's a case for multiple inheritance but for now...
           return render :json => { :message => "cannot add courses already associated with other templates (#{other_pairs.map(&:last).join(", ")})" }, :status => :bad_request

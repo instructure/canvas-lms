@@ -32,12 +32,14 @@ module Exporters
       if content_export.selected_content.empty? || content_export.export_symbol?('all_attachments')
         folders = Folder.root_folders(context)
       else
-        folders = (content_export.selected_content['folders'] || {}).select { |tag, included| Canvas::Plugin::value_to_boolean(included) }.keys.map do |folder_tag|
-          context.folders.active.find_by_asset_string(folder_tag, %w(Folder))
-        end.compact
-        files = (content_export.selected_content['attachments'] || {}).select { |tag, included| Canvas::Plugin::value_to_boolean(included) }.keys.map do |att_tag|
-          context.attachments.not_deleted.find_by_asset_string(att_tag, %w(Attachment))
-        end.compact
+        folders = (content_export.selected_content['folders'] || {})
+                  .select { |_tag, included| Canvas::Plugin.value_to_boolean(included) }
+                  .keys
+                  .filter_map { |folder_tag| context.folders.active.find_by_asset_string(folder_tag, %w(Folder)) }
+        files = (content_export.selected_content['attachments'] || {})
+                .select { |_tag, included| Canvas::Plugin.value_to_boolean(included) }
+                .keys
+                .filter_map { |att_tag| context.attachments.not_deleted.find_by_asset_string(att_tag, %w(Attachment)) }
       end
       [folders, files]
     end

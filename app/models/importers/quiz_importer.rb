@@ -89,10 +89,10 @@ module Importers
                                                     'question_bank_id', 'is_quiz_question_bank', 'question_bank_name']
 
     def self.check_question_equality(question1, question2)
-      stripped_q1 = question1.reject { |k, v| IGNORABLE_QUESTION_KEYS.include?(k) }
-      stripped_q2 = question2.reject { |k, v| IGNORABLE_QUESTION_KEYS.include?(k) }
-      stripped_q1_answers = (question1['answers'] || []).map { |ans| ans.reject { |k, v| k == 'id' } }
-      stripped_q2_answers = (question2['answers'] || []).map { |ans| ans.reject { |k, v| k == 'id' } }
+      stripped_q1 = question1.except(*IGNORABLE_QUESTION_KEYS)
+      stripped_q2 = question2.except(*IGNORABLE_QUESTION_KEYS)
+      stripped_q1_answers = (question1['answers'] || []).map { |ans| ans.reject { |k, _v| k == 'id' } }
+      stripped_q2_answers = (question2['answers'] || []).map { |ans| ans.reject { |k, _v| k == 'id' } }
 
       stripped_q1 == stripped_q2 && stripped_q1_answers == stripped_q2_answers
     end

@@ -111,7 +111,7 @@ module ConversationsHelper
       memberships = Shard.partition_by_shard(result[:groups].keys) do |group_ids|
         next unless audience.first.associated_shards.include?(Shard.current)
 
-        GroupMembership.where(group_id: result[:groups].keys, user_id: audience.first.id, workflow_state: 'accepted').select(:group_id).to_a
+        GroupMembership.where(group_id: group_ids, user_id: audience.first.id, workflow_state: 'accepted').select(:group_id).to_a
       end
       memberships.each do |membership|
         result[:groups][membership.group_id] = ['Member']

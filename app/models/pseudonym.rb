@@ -109,9 +109,7 @@ class Pseudonym < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :confirm_registration
     p.to { self.communication_channel || self.user.communication_channel }
-    p.whenever { |record|
-      @send_confirmation
-    }
+    p.whenever { @send_confirmation }
 
     p.dispatch :pseudonym_registration
     p.to { self.communication_channel || self.user.communication_channel }

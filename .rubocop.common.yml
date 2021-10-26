@@ -176,7 +176,8 @@ Naming/VariableNumber: # TODO
 Rails/DynamicFindBy: # TODO; autocorrect (unsafe)
   AllowedMethods:
     - find_by_name # PluginSetting.find_by_name
-  AutoCorrect: false  
+    - find_by_asset_string # ApplicationRecord.find_by_asset_string
+  AutoCorrect: false
 Rails/ReadWriteAttribute: # TODO: autocorrect (unsafe)
   Enabled: false # accessors are often defined in terms of read_attribute
 Rails/TimeZone: # TODO: autocorrect (unsafe)

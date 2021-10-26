@@ -173,7 +173,7 @@ class ConversationParticipant < ActiveRecord::Base
     end
   end
 
-  tagged_scope_handler(/\A(course|group|section)_(\d+)\z/) do |tags, options|
+  tagged_scope_handler(/\A(course|group|section)_(\d+)\z/) do |tags, _|
     tags.map do |tag|
       # tags in the database use the id relative to the default shard. ids in
       # the filters are assumed relative to the current shard and need to be
