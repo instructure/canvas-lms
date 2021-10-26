@@ -86,6 +86,11 @@ async function ltiMessageHandler(e, platformStorageFeatureFlag = false) {
     return false
   }
 
+  // temporary: ignore LTI Platform Storage messages when feature flag is off
+  if (!platformStorageFeatureFlag && subject.includes('org.imsglobal.lti')) {
+    return false
+  }
+
   try {
     const handlerModule = await import(`./subjects/${subject}.js`)
     const hasSentResponse = handlerModule.default({
