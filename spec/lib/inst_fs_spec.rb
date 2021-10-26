@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 describe InstFS do
   context "settings are set" do
     let(:app_host) { 'http://test.host' }
@@ -526,6 +528,7 @@ describe InstFS do
       end
 
       it "wraps network errors in a service exception" do
+        instfs_uuid = "1234-abcd"
         allow(CanvasHttp).to receive(:post).and_raise(Net::ReadTimeout)
         expect do
           InstFS.direct_upload(file_name: "a.png", file_object: File.open("public/images/a.png"))

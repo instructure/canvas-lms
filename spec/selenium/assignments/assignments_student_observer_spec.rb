@@ -46,6 +46,7 @@ describe "assignments" do
         extend TextHelper
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
+        expected_lock_at = datetime_string(@override.lock_at).gsub(/\s+/, ' ')
         expect(f('#content')).to include_text "locked until #{expected_unlock}."
       end
 
@@ -56,6 +57,7 @@ describe "assignments" do
           extend TextHelper
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
+          expected_lock_at = datetime_string(@assignment.lock_at).gsub(/\s+/, ' ')   # later than section2
           expect(f('#content')).to include_text "locked until #{expected_unlock}."
         end
       end
@@ -72,6 +74,7 @@ describe "assignments" do
         extend TextHelper
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
+        expected_lock_at = datetime_string(@override.lock_at).gsub(/\s+/, ' ')
         expect(f('#content')).to include_text "locked until #{expected_unlock}."
       end
 
@@ -85,6 +88,7 @@ describe "assignments" do
           extend TextHelper
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
+          expected_lock_at = datetime_string(@override.lock_at).gsub(/\s+/, ' ')
           expect(f('#content')).to include_text "locked until #{expected_unlock}."
         end
       end

@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'active_support'
+require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizRegrader::Answer do
   let(:points) { 15 }
@@ -108,9 +109,10 @@ describe Quizzes::QuizRegrader::Answer do
     end
 
     it 'does not raise an error if question has recognized regrade_option' do
+      question_regrade = double(:quiz_question => question,
+                                :regrade_option => "current_correct_only")
+
       Quizzes::QuizRegrader::Answer::REGRADE_OPTIONS.each do |regrade_option|
-        question_regrade = double(:quiz_question => question,
-                                  :regrade_option => regrade_option)
         expect { Quizzes::QuizRegrader::Answer.new(answer, question_regrade) }.to_not raise_error
       end
     end

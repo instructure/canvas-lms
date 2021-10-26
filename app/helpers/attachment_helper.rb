@@ -60,7 +60,7 @@ module AttachmentHelper
     attrs.inject(+"") { |s, (attr, val)| s << "data-#{attr}=#{val} " }
   end
 
-  def doc_preview_json(attachment)
+  def doc_preview_json(attachment, user)
     {
       canvadoc_session_url: attachment.canvadoc_url(@current_user),
       crocodoc_session_url: attachment.crocodoc_url(@current_user),

@@ -51,9 +51,6 @@ const locale = {
   "announcement_list_da155734": { "message": "Lista de anúncio" },
   "announcements_a4b8ed4a": { "message": "Anúncios" },
   "apply_781a2546": { "message": "Aplicar" },
-  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-    "message": "Aplicar alterações a todas as instâncias deste Botão e Ícone na Disciplina"
-  },
   "apps_54d24a47": { "message": "Aplicativos" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "A relação de aspeto será preservada"
@@ -68,6 +65,9 @@ const locale = {
   },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "O conteúdo auto-salvamento existe. Você gostaria de carregar o conteúdo auto-salvamento em seu lugar?"
+  },
+  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+    "message": "Abra automaticamente uma pré-visualização em linha. (A pré-visualização é exibida somente após salvar)"
   },
   "available_folders_694d0436": { "message": "Pastas disponíveis" },
   "below_81d4dceb": { "message": "Abaixo" },
@@ -112,9 +112,6 @@ const locale = {
     "message": "Feche um menu ou diálogo. Também retorna para a área do editor"
   },
   "close_d634289d": { "message": "Fechar" },
-  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
-    "message": "O ficheiro de legendagem deve ser inferior a { maxKb } kb"
-  },
   "closed_captions_subtitles_e6aaa016": { "message": "Legendas/subtítulos" },
   "collaborations_5c56c15f": { "message": "Colaborações" },
   "collapse_to_hide_types_1ab46d2e": {
@@ -146,7 +143,6 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Licença Creative Commons:"
   },
-  "current_image_f16c249c": { "message": "Imagem atual" },
   "custom_6979cd81": { "message": "Personalizadas" },
   "date_added_ed5ad465": { "message": "Data adicionada" },
   "decorative_image_3c28aa7d": { "message": "Imagem decorativa" },
@@ -162,6 +158,9 @@ const locale = {
   "details_98a31b68": { "message": "Detalhes" },
   "dimensions_45ddb7b7": { "message": "Dimensões" },
   "directionality_26ae9e08": { "message": "Direcionalidade" },
+  "disable_in_line_preview_2a675175": {
+    "message": "Desativar visualização em linha."
+  },
   "discussions_a5f96392": { "message": "Discussões" },
   "discussions_index_6c36ced": { "message": "Índice de discussões" },
   "display_options_315aba85": { "message": "Opções de exibição" },
@@ -303,11 +302,11 @@ const locale = {
   "middle_27dc1d5": { "message": "Médio" },
   "miscellaneous_e9818229": { "message": "Diversos" },
   "modules_c4325335": { "message": "Módulos" },
-  "multi_color_image_63d7372f": { "message": "Imagem Multi-Cor" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Deve ter pelo menos { width } x { height }px"
   },
   "my_files_2f621040": { "message": "Os meus ficheiros" },
+  "my_images_427f9b0c": { "message": "Minhas Imagens" },
   "name_1aed4a1b": { "message": "Nome" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navegue pelo menu ou barra de ferramentas"
@@ -385,10 +384,9 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "Mostrar opções de imagem" },
   "show_link_options_545338fd": { "message": "Mostrar opções de ligação" },
   "show_video_options_6ed3721a": { "message": "Mostrar opções de vídeo" },
-  "single_color_image_4e5d4dbc": { "message": "Imagem a uma cor" },
   "size_b30e1077": { "message": "Tamanho" },
-  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
-    "message": "O tamanho do ficheiro de legendagem é maior do que o tamanho máximo de ficheiro { max } kb permitido."
+  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+    "message": "O tamanho { file } de é maior que o tamanho máximo { max } de ficheiro permitido pelo MB."
   },
   "small_b070434a": { "message": "Pequeno" },
   "something_went_wrong_89195131": { "message": "Algo deu errado." },

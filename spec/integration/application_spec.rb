@@ -18,15 +18,17 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
 describe "site-wide" do
   around do |example|
     consider_all_requests_local(false, &example)
   end
 
+  let(:x_frame_options) { 'X-Frame-Options' }
   let(:x_canvas_meta) { 'X-Canvas-Meta' }
   let(:x_canvas_user_id) { 'X-Canvas-User-Id' }
   let(:x_canvas_real_user_id) { 'X-Canvas-Real-User-Id' }
-  let(:content_security_policy) { 'Content-Security-Policy' }
 
   it "renders 404 when user isn't logged in" do
     get "/dashbo"
@@ -45,32 +47,18 @@ describe "site-wide" do
     expect(response['Cache-Control']).not_to match(/no-store/)
   end
 
-  it "sets the content-security-policy http header" do
+  it "sets the x-frame-options http header" do
     get "/login"
     expect(assigns[:files_domain]).to be_falsey
-    expect(response[content_security_policy]).to eq "frame-ancestors 'self' ;"
+    expect(response[x_frame_options]).to eq "SAMEORIGIN"
   end
 
-  it "does not set content-security-policy when on a files domain" do
+  it "does not set x-frame-options when on a files domain" do
     user_session user_factory(active_all: true)
     attachment_model(:context => @user)
     expect_any_instance_of(FilesController).to receive(:files_domain?).and_return(true)
     get "http://files-test.host/files/#{@attachment.id}/download"
-    expect(response[content_security_policy]).to be_nil
-  end
-
-  describe "with javascript_csp flag enabled" do
-    before :once do
-      Account.default.enable_feature! :javascript_csp
-      Account.default.enable_csp!
-    end
-
-    it "does not override the existing content-security-policy header" do
-      course_with_teacher_logged_in
-
-      get "/"
-      expect(response[content_security_policy]).to eq "frame-src 'self' localhost; frame-ancestors 'self' ;"
-    end
+    expect(response[x_frame_options]).to be_nil
   end
 
   context "x-canvas-meta header" do

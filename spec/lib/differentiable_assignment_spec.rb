@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+
 shared_examples_for "a differentiable_object" do
   before do
     teacher_in_course(active_all: true, course: differentiable.context)
@@ -120,7 +122,7 @@ shared_examples_for "a differentiable_object" do
 
   describe "filter" do
     def call_filter
-      block = lambda { |_collection, _users| return :filtered }
+      block = lambda { |collection, users| return :filtered }
       DifferentiableAssignment.filter(:not_filtered, @user, @course, {}, &block)
     end
     it "filters for students" do

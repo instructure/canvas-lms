@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require File.expand_path(File.dirname(__FILE__) + '/../../../../spec/spec_helper')
+
 unless defined? BASE_FIXTURE_DIR
   BASE_FIXTURE_DIR = File.expand_path(File.dirname(__FILE__)) + '/fixtures/'
   CANVAS_FIXTURE_DIR = BASE_FIXTURE_DIR + 'canvas/'
@@ -31,15 +33,15 @@ unless defined? BASE_FIXTURE_DIR
 end
 require 'pp'
 
-def get_question_hash(dir, name, delete_answer_ids: true, **opts)
+def get_question_hash(dir, name, delete_answer_ids = true, opts = {})
   hash = get_quiz_data(dir, name, opts).first.first
   hash[:answers].each { |a| a.delete(:id) } if delete_answer_ids
   hash
 end
 
-def get_quiz_data(dir, name, **opts)
+def get_quiz_data(dir, name, opts = {})
   File.open(File.join(dir, '%s.xml' % name), 'r') do |file|
-    Qti.convert_xml(file.read, **opts)
+    Qti.convert_xml(file.read, opts)
   end
 end
 

@@ -197,6 +197,7 @@ module QuizzesCommon
     a = bank.assessment_questions.create!
     b = bank.assessment_questions.create!
     c = bank.assessment_questions.create!
+    answers = [{ 'id' => 1 }, { 'id' => 2 }, { 'id' => 3 }]
 
     @quest1 = @quiz.quiz_questions.create!(
       question_data: {
@@ -341,10 +342,9 @@ module QuizzesCommon
     @context = @course
     quiz_model
     open_quiz_edit_form
-    wait_for_rce
     click_questions_tab
     click_new_question_button
-    wait_for_rce('.question .rce-wrapper')
+    wait_for_ajaximations
     Quizzes::Quiz.last
   end
 
@@ -515,18 +515,8 @@ module QuizzesCommon
 
   def edit_first_question
     hover_first_question
-    wait_for_animations
-    begin
-      # for some reason in flakey-spec-catcher this will fail 1/10 times
-      #  have a backup plan
-      f('.edit_question_link').click
-    rescue Selenium::WebDriver::Error::ElementNotInteractableError
-      # rubocop:disable Specs/NoExecuteScript
-      driver.execute_script "document.querySelector('.edit_question_link').click()"
-      # rubocop:enable Specs/NoExecuteScript
-    ensure
-      wait_for_ajaximations
-    end
+    f('.edit_question_link').click
+    wait_for_ajaximations
   end
 
   def save_question
@@ -834,9 +824,8 @@ module QuizzesCommon
     get quiz_submission_speedgrader_url
   end
 
-  def open_quiz_edit_form(should_wait_for_rce = true)
+  def open_quiz_edit_form
     get quiz_edit_form_url
-    wait_for_rce if should_wait_for_rce
   end
 
   private

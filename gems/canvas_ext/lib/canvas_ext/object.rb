@@ -31,7 +31,7 @@ class Object
 end
 
 class NilClass
-  def try_rescue(*)
+  def try_rescue(*args)
     self
   end
 end

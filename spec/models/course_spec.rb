@@ -76,18 +76,18 @@ describe Course do
     @course.save!
   end
 
-  it "identifies a course as active correctly" do
+  it "correctlies identify course as active" do
     @course.enrollment_term = EnrollmentTerm.create!(root_account: Account.default, workflow_state: :active)
     expect(@course.inactive?).to eq false
   end
 
-  it "identifies a destroyed course as not active" do
+  it "correctlies identify destroyed course as not active" do
     @course.enrollment_term = EnrollmentTerm.create!(root_account: Account.default, workflow_state: :active)
     @course.destroy!
     expect(@course.inactive?).to eq true
   end
 
-  it "identifies concluded course as not active" do
+  it "correctlies identify concluded course as not active" do
     @course.complete!
     expect(@course.inactive?).to eq true
   end
@@ -1477,7 +1477,7 @@ describe Course do
     it "all_group_categories should include deleted categories" do
       expect(course.all_group_categories.count).to eq 0
       category1 = course.group_categories.create(:name => 'category 1')
-      course.group_categories.create(:name => 'category 2')
+      category2 = course.group_categories.create(:name => 'category 2')
       expect(course.all_group_categories.count).to eq 2
       category1.destroy
       course.reload
@@ -2030,7 +2030,7 @@ describe Course, '#assignment_groups' do
 end
 
 describe Course, "score_to_grade" do
-  it "maps scores to grades correctly" do
+  it "correctlies map scores to grades" do
     default = GradingStandard.default_grading_standard
     expect(default.to_json).to eq([["A", 0.94], ["A-", 0.90], ["B+", 0.87], ["B", 0.84], ["B-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0.0]].to_json)
     course_model
@@ -3410,12 +3410,12 @@ describe Course, 'grade_publishing' do
         ].sort_by(&:id)
       end
 
-      it 'figures out the overall status with no enrollments correctly' do
+      it 'correctlies figure out the overall status with no enrollments' do
         @course = course_factory
         expect(@course.grade_publishing_statuses).to eq [{}, "unpublished"]
       end
 
-      it 'figures out the overall status with invalid enrollment statuses correctly' do
+      it 'correctlies figure out the overall status with invalid enrollment statuses' do
         @student_enrollments.each do |e|
           e.grade_publishing_status = "invalid status"
           e.save!
@@ -3899,7 +3899,7 @@ describe Course, 'grade_publishing' do
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
-                                                                           :callback => lambda { |*|
+                                                                           :callback => lambda { |course, enrollments, publishiing_user, publishing_pseudonym|
                                                                              raise "waaah fail"
                                                                            }
                                                                          }
@@ -4296,7 +4296,7 @@ describe Course, 'grade_publishing' do
     def quick_sanity_check(user, expect_success = true)
       Course.valid_grade_export_types["test_export"] = {
         :name => "test export",
-        :callback => lambda { |course, _enrollments, publishing_user, publishing_pseudonym|
+        :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
                        expect(course).to eq @course
                        expect(publishing_pseudonym).to eq @pseudonym
                        expect(publishing_user).to eq @user
@@ -4459,6 +4459,7 @@ describe Course, 'grade_publishing' do
 
       getsection("S4").tap do |s|
         sec4 = s
+        sec4id = s.sis_source_id
         s.save
       end
 
@@ -5345,7 +5346,7 @@ describe Course, "user_has_been_instructor?" do
   end
 
   it "is true for tas" do
-    course_with_ta(:active_all => true)
+    e = course_with_ta(:active_all => true)
     expect(@course.user_has_been_instructor?(@ta)).to be_truthy
   end
 end
@@ -5364,12 +5365,12 @@ describe Course, "user_has_been_admin?" do
   end
 
   it "is true for tas" do
-    course_with_ta(:active_all => true)
+    e = course_with_ta(:active_all => true)
     expect(@course.user_has_been_admin?(@ta)).to be_truthy
   end
 
   it "is true for designers" do
-    course_with_designer(:active_all => true)
+    e = course_with_designer(:active_all => true)
     expect(@course.user_has_been_admin?(@designer)).to be_truthy
   end
 end
@@ -5390,12 +5391,12 @@ end
 
 describe Course, "user_has_been_observer?" do
   it "is false for teachers" do
-    course_with_teacher(:active_all => true)
+    e = course_with_teacher(:active_all => true)
     expect(@course.user_has_been_observer?(@teacher)).to be_falsey
   end
 
   it "is false for tas" do
-    course_with_ta(:active_all => true)
+    e = course_with_ta(:active_all => true)
     expect(@course.user_has_been_observer?(@ta)).to be_falsey
   end
 

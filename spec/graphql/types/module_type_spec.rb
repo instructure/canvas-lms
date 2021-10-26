@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require_relative "../graphql_spec_helper"
 
 describe Types::ModuleType do
@@ -43,7 +44,7 @@ describe Types::ModuleType do
     a2 = assignment_model({ context: course })
     a1.workflow_state = "unpublished"
     a1.save!
-    mod.add_item({ type: 'Assignment', id: a1.id }, nil, position: 1)
+    item1 = mod.add_item({ type: 'Assignment', id: a1.id }, nil, position: 1)
     item2 = mod.add_item({ type: 'Assignment', id: a2.id }, nil, position: 2)
     expect(module_type.resolve("moduleItems { _id }")).to eq [item2.id.to_s]
   end

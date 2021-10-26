@@ -18,16 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+
 describe ContentExport do
   before :once do
     course_with_teacher(:active_all => true)
     @ce = @course.content_exports.create!
-  end
-
-  it "records the job id" do
-    allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
-    @ce.export(synchronous: true)
-    expect(@ce.reload.settings[:job_id]).to eq(123)
   end
 
   context "export_object?" do

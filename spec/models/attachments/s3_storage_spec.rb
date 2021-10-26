@@ -17,6 +17,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+
 describe Attachments::S3Storage do
   describe "#sign_policy" do
     # example values from http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-post-example.html
@@ -50,9 +52,10 @@ describe Attachments::S3Storage do
     end
 
     it "follows the v4 signing example from AWS" do
+      client = double("client", client: config)
       expect(attachment).to receive(:bucket).and_return(bucket)
       store = Attachments::S3Storage.new(attachment)
-      _sig_key, sig_val = store.sign_policy(string_to_sign, datetime)
+      sig_key, sig_val = store.sign_policy(string_to_sign, datetime)
       expect(sig_val).to eq signature
     end
   end

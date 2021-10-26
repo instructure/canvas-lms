@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
 require_dependency "lti/membership_service/course_lis_person_collator"
 
 module Lti::MembershipService
@@ -214,6 +215,7 @@ module Lti::MembershipService
         @teacher.reload
         @student.reload
 
+        teacher = memberships.find { |m| m.member.user_id == @teacher.lti_context_id }
         student = memberships.find { |m| m.member.user_id == @student.lti_context_id }
 
         expect(student.member.sourced_id).to eq user_sis_id

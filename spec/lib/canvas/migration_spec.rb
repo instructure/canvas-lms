@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+
 describe "Migration package importers" do
   context "Detecting content package type" do
     def get_settings(name)
@@ -63,7 +65,7 @@ describe "Migration package importers" do
     end
 
     unsupported.each_pair do |key, val|
-      it "identifies package type for #{key} correctly" do
+      it "correctlies identify package type for #{key}" do
         settings = get_settings(val.first)
         archive = Canvas::Migration::Archive.new(settings)
         expect(Canvas::Migration::PackageIdentifier.new(archive).identify_package).to eq val.last

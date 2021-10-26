@@ -48,6 +48,17 @@ describe('response_messages', () => {
       expectPostMessageContents({subject: 'subject.response'})
     })
 
+    describe('when sendMessages is false', () => {
+      beforeEach(() => {
+        resetBuilder({sendMessages: false})
+      })
+
+      it('does not send message', () => {
+        builder.sendResponse()
+        expect(postMessageMock).not.toHaveBeenCalled()
+      })
+    })
+
     describe('when message_id is present', () => {
       const message_id = 'message_id'
 

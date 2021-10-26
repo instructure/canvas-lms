@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
 require 'nokogiri'
 
 describe "assignments" do
@@ -41,7 +43,7 @@ describe "assignments" do
     override.save!
   end
 
-  it "lists ungraded and total submissions for teacher correctly" do
+  it "correctlies list ungraded and total submissions for teacher" do
     multiple_section_submissions
 
     course_with_teacher_logged_in(:course => @course, :active_all => true)
@@ -51,7 +53,7 @@ describe "assignments" do
     expect(Nokogiri::HTML5(response.body).at_css('.graded_count').text).to match(/0 out of 2/)
   end
 
-  it "lists ungraded and total submissions for ta correctly" do
+  it "correctlies list ungraded and total submissions for ta" do
     multiple_section_submissions
 
     @taenrollment = course_with_ta(:course => @course, :active_all => true)

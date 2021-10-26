@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/common.rb')
 
 describe Quizzes::QuizStatistics::ItemAnalysis::Item do
@@ -59,7 +60,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Item do
       expect(item.num_respondents(:bottom)).to eq 0 # there is a guy, but he didn't answer this question
     end
 
-    it "evaluates multiple filters correctly" do
+    it "correctlies evaluate multiple filters" do
       expect(item.num_respondents(:top, :correct)).to eq 1
       expect(item.num_respondents(:top, :incorrect)).to eq 0
       expect(item.num_respondents(:middle, :correct)).to eq 1

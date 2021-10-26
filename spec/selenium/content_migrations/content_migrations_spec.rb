@@ -34,7 +34,7 @@ end
 def select_migration_file(opts = {})
   filename = opts[:filename] || @filename
 
-  new_filename, fullpath, _data = get_file(filename, opts[:data])
+  new_filename, fullpath, data = get_file(filename, opts[:data])
   f('#migrationFileUpload').send_keys(fullpath)
   return new_filename
 end
@@ -146,7 +146,7 @@ describe "content migrations", :non_parallel do
         @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
       end
 
-      it "selectively copies outcomes" do
+      it "selectivelies copy outcomes" do
         visit_page
 
         fill_migration_form
@@ -458,7 +458,7 @@ describe "content migrations", :non_parallel do
         expect(@course.quizzes.first.quiz_questions.count).to eq 11
       end
 
-      it "selectively copies content", priority: "1", test_id: 126682 do
+      it "selectivelies copy content", priority: "1", test_id: 126682 do
         skip unless Qti.qti_enabled?
         visit_page
 
@@ -491,7 +491,7 @@ describe "content migrations", :non_parallel do
         @course.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
       end
 
-      it "selectively copies outcomes" do
+      it "selectivelies copy outcomes" do
         visit_page
 
         select_migration_type

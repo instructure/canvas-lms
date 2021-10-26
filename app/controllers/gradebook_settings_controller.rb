@@ -53,7 +53,6 @@ class GradebookSettingsController < ApplicationController
       :show_concluded_enrollments,
       :show_inactive_enrollments,
       :show_unpublished_assignments,
-      :show_separate_first_last_names,
       :student_column_display_as,
       :student_column_secondary_info,
       :sort_rows_by_column_id,

@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 describe InstAccessSupport do
   let(:signing_keypair) { OpenSSL::PKey::RSA.new(2048) }
   let(:encryption_keypair) { OpenSSL::PKey::RSA.new(2048) }
@@ -28,7 +30,7 @@ describe InstAccessSupport do
 
   describe ".configure" do
     it "does not choke on base64 values" do
-      allow(Rails.application.credentials).to receive(:inst_access_signature).and_return(
+      allow(ConfigFile).to receive(:load).with("inst_access_signature").and_return(
         {
           private_key: Base64.encode64(signing_priv_key),
           encryption_public_key: Base64.encode64(encryption_pub_key)

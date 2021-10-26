@@ -17,9 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'spec_helper'
+
 describe PacePlansController, type: :controller do
   let(:valid_update_params) do
     {
+      start_date: 1.year.ago.strftime('%Y-%m-%d'),
       end_date: 1.year.from_now.strftime('%Y-%m-%d'),
       workflow_state: 'active',
       pace_plan_module_items_attributes: [
@@ -52,11 +55,8 @@ describe PacePlansController, type: :controller do
     @mod2.add_item id: @a2.id, type: 'assignment'
     @a3 = @course.assignments.create! name: 'A3', workflow_state: 'published'
     @mod2.add_item id: @a3.id, type: 'assignment'
-    @mod2.add_item type: 'external_url', title: 'External URL', url: 'http://localhost'
 
     @course.context_module_tags.each_with_index do |tag, i|
-      next unless tag.assignment
-
       @pace_plan.pace_plan_module_items.create! module_item: tag, duration: i * 2
     end
 
@@ -67,6 +67,7 @@ describe PacePlansController, type: :controller do
     @course_section = @course.course_sections.first
 
     @valid_params = {
+      start_date: 1.year.ago.strftime('%Y-%m-%d'),
       end_date: 1.year.from_now.strftime('%Y-%m-%d'),
       workflow_state: 'active',
       pace_plan_module_items_attributes: [
@@ -92,7 +93,6 @@ describe PacePlansController, type: :controller do
     it "populates js_env with course, enrollment, sections, and pace_plan details" do
       @section = @course.course_sections.first
       @student_enrollment = @course.enrollments.find_by(user_id: @student.id)
-      @progress = Progress.create!(context: @pace_plan, tag: 'pace_plan_publish')
       get :index, { params: { course_id: @course.id } }
 
       expect(response).to be_successful
@@ -140,14 +140,6 @@ describe PacePlansController, type: :controller do
                                                                                    module_item_type: 'Assignment',
                                                                                    duration: 4
                                                                                  }))
-
-      expect(js_env[:PACE_PLAN_PROGRESS]).to match(hash_including({
-                                                                    id: @progress.id,
-                                                                    context_id: @progress.context_id,
-                                                                    context_type: "PacePlan",
-                                                                    tag: "pace_plan_publish",
-                                                                    workflow_state: "queued"
-                                                                  }))
     end
 
     it "does not create a pace plan if no primary pace plans are available" do
@@ -155,9 +147,6 @@ describe PacePlansController, type: :controller do
       expect(@course.pace_plans.count).to eq(1)
       expect(@course.pace_plans.primary).to be_empty
       get :index, params: { course_id: @course.id }
-      pace_plan = @controller.instance_variable_get(:@pace_plan)
-      expect(pace_plan).not_to be_nil
-      expect(pace_plan.pace_plan_module_items.size).to eq(3)
       expect(@course.pace_plans.count).to eq(1)
       expect(@course.pace_plans.primary.count).to eq(0)
     end
@@ -196,7 +185,8 @@ describe PacePlansController, type: :controller do
     it "updates the PacePlan" do
       put :update, params: { course_id: @course.id, id: @pace_plan.id, pace_plan: valid_update_params }
       expect(response).to be_successful
-      expect(@pace_plan.reload.end_date.to_s).to eq(valid_update_params[:end_date])
+      expect(@pace_plan.reload.start_date.to_s).to eq(valid_update_params[:start_date])
+      expect(@pace_plan.end_date.to_s).to eq(valid_update_params[:end_date])
       expect(@pace_plan.workflow_state).to eq(valid_update_params[:workflow_state])
       expect(
         @pace_plan.pace_plan_module_items.joins(:module_item).find_by(content_tags: { content_id: @a1.id }).duration
@@ -206,13 +196,7 @@ describe PacePlansController, type: :controller do
       ).to eq(valid_update_params[:pace_plan_module_items_attributes][1][:duration])
 
       response_body = JSON.parse(response.body)
-      expect(response_body["pace_plan"]["id"]).to eq(@pace_plan.id)
-
-      # Pace plan's publish should be queued
-      progress = Progress.last
-      expect(progress.context).to eq(@pace_plan)
-      expect(progress.workflow_state).to eq('queued')
-      expect(response_body["progress"]["id"]).to eq(progress.id)
+      expect(response_body["id"]).to eq(@pace_plan.id)
     end
   end
 
@@ -231,9 +215,7 @@ describe PacePlansController, type: :controller do
 
       pace_plan = PacePlan.last
 
-      response_body = JSON.parse(response.body)
-      expect(response_body["pace_plan"]["id"]).to eq(pace_plan.id)
-
+      expect(pace_plan.start_date.to_s).to eq(valid_update_params[:start_date])
       expect(pace_plan.end_date.to_s).to eq(valid_update_params[:end_date])
       expect(pace_plan.workflow_state).to eq(valid_update_params[:workflow_state])
       expect(
@@ -243,11 +225,6 @@ describe PacePlansController, type: :controller do
         pace_plan.pace_plan_module_items.joins(:module_item).find_by(content_tags: { content_id: @a2.id }).duration
       ).to eq(valid_update_params[:pace_plan_module_items_attributes][1][:duration])
       expect(pace_plan.pace_plan_module_items.count).to eq(2)
-      # Pace plan's publish should be queued
-      progress = Progress.last
-      expect(progress.context).to eq(pace_plan)
-      expect(progress.workflow_state).to eq('queued')
-      expect(response_body["progress"]["id"]).to eq(progress.id)
     end
   end
 
@@ -331,6 +308,7 @@ describe PacePlansController, type: :controller do
         json_response = JSON.parse(response.body)
         expect(json_response["pace_plan"]["id"]).to eq(nil)
         expect(json_response["pace_plan"]["published_at"]).to eq(nil)
+        expect(Time.zone.parse(json_response["pace_plan"]["start_date"])).to eq(@student_enrollment.created_at.to_date)
         expect(json_response["pace_plan"]["user_id"]).to eq(@student.id)
         expect(json_response["pace_plan"]["modules"].count).to eq(2)
         m1 = json_response["pace_plan"]["modules"].first

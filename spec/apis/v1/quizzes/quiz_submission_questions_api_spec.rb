@@ -172,7 +172,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
     end
 
     it 'is authorized for student' do
-      api_index({}, { raw: true })
+      json = api_index({}, { raw: true })
       assert_status(200)
     end
 
@@ -267,7 +267,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
     it 'is unauthorized' do
       skip
-      api_show({}, { raw: true })
+      json = api_show({}, { raw: true })
       assert_status(401)
     end
 

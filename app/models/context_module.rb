@@ -565,9 +565,9 @@ class ContextModule < ActiveRecord::Base
   end
 
   def filter_tags_for_da(tags, user, opts = {})
-    filter = proc do |inner_tags, user_ids|
+    filter = Proc.new do |tags, user_ids, course_id, opts|
       visible_item_ids = {}
-      inner_tags.select do |tag|
+      tags.select do |tag|
         item_type =
           case tag.content_type
           when 'Assignment'

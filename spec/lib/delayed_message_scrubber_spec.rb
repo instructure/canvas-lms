@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+
 describe DelayedMessageScrubber do
   # Helpers
   def delayed_message(send_at)
@@ -65,8 +67,8 @@ describe DelayedMessageScrubber do
     end
 
     it 'logs predicted results if passed dry_run=true' do
-      logger = double
-      old_messages(2)
+      logger   = double
+      messages = old_messages(2)
       scrubber = DelayedMessageScrubber.new(logger: logger)
 
       expect(logger).to receive(:info).with("DelayedMessageScrubber: 2 records would be deleted (older than #{scrubber.limit})")

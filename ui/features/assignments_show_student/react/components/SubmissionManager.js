@@ -346,16 +346,12 @@ export default class SubmissionManager extends Component {
     )
   }
 
-  handleDraftComplete(success, body) {
+  handleDraftComplete(success) {
     this.updateUploadingFiles(false)
-    const element = document.createElement('div')
-    element.insertAdjacentHTML('beforeend', body)
 
     if (success) {
-      if (!element.querySelector(`[data-placeholder-for]`)) {
-        this.setState({draftStatus: 'saved'})
-        this.context.setOnSuccess(I18n.t('Submission draft updated'))
-      }
+      this.setState({draftStatus: 'saved'})
+      this.context.setOnSuccess(I18n.t('Submission draft updated'))
     } else {
       this.setState({draftStatus: 'error'})
       this.context.setOnFailure(I18n.t('Error updating submission draft'))
@@ -401,12 +397,7 @@ export default class SubmissionManager extends Component {
     return (
       <Mutation
         mutation={CREATE_SUBMISSION_DRAFT}
-        onCompleted={data =>
-          this.handleDraftComplete(
-            !data.createSubmissionDraft.errors,
-            data.createSubmissionDraft.submissionDraft.body
-          )
-        }
+        onCompleted={data => this.handleDraftComplete(!data.createSubmissionDraft.errors)}
         onError={() => this.handleDraftComplete(false)}
         update={this.updateSubmissionDraftCache}
       >

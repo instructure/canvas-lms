@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'spec_helper'
+
 describe DataFixup::PopulateRootAccountIdOnCalendarEvents do
   before(:once) do
     Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)

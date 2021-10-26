@@ -26,7 +26,7 @@ class CanvasTwitterConfig
         secret_key: settings[:consumer_secret_dec]
       }.with_indifferent_access
     else
-      Rails.application.credentials.twitter_creds&.with_indifferent_access || {}
+      ConfigFile.load('twitter').dup
     end
   end
 end

@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+
 describe ActiveRecord::Base do
   describe "count_by_date" do
     let_once(:account) { Account.create! }
@@ -230,7 +232,7 @@ describe ActiveRecord::Base do
       @orig_user_count = User.count
     end
 
-    it "normally runs once" do
+    it "normallies run once" do
       User.unique_constraint_retry do
         User.create!
       end

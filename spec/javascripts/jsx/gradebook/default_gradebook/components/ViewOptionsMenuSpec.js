@@ -45,11 +45,8 @@ function defaultProps({props, filterSettings} = {}) {
     },
     onSelectShowStatusesModal() {},
     onSelectShowUnpublishedAssignments() {},
-    onSelectShowSeparateFirstLastNames() {},
     onSelectViewUngradedAsZero() {},
     showUnpublishedAssignments: false,
-    allowShowSeparateFirstLastNames: true,
-    showSeparateFirstLastNames: false,
     viewUngradedAsZero: false,
     allowViewUngradedAsZero: false,
     finalGradeOverrideEnabled: false,
@@ -131,33 +128,33 @@ QUnit.module('ViewOptionsMenu - notes', {
   }
 })
 
-test('teacher notes are optionally enabled', function () {
+test('teacher notes are optionally enabled', function() {
   this.wrapper = mountAndOpenOptions(this.props)
   const menuItem = getMenuItem(this.wrapper.instance().menuContent, 'Notes')
   strictEqual(menuItem.getAttribute('aria-disabled'), null)
 })
 
-test('teacher notes are optionally disabled', function () {
+test('teacher notes are optionally disabled', function() {
   this.props.teacherNotes.disabled = true
   this.wrapper = mountAndOpenOptions(this.props)
   const menuItem = getMenuItem(this.wrapper.instance().menuContent, 'Notes')
   strictEqual(menuItem.getAttribute('aria-disabled'), 'true')
 })
 
-test('triggers the onSelect when the "Notes" option is clicked', function () {
+test('triggers the onSelect when the "Notes" option is clicked', function() {
   sandbox.stub(this.props.teacherNotes, 'onSelect')
   this.wrapper = mountAndOpenOptions(this.props)
   getMenuItem(this.wrapper.instance().menuContent, 'Notes').click()
   equal(this.props.teacherNotes.onSelect.callCount, 1)
 })
 
-test('the "Notes" option is optionally selected', function () {
+test('the "Notes" option is optionally selected', function() {
   this.wrapper = mountAndOpenOptions(this.props)
   const menuItem = getMenuItem(this.wrapper.instance().menuContent, 'Notes')
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('the "Notes" option is optionally deselected', function () {
+test('the "Notes" option is optionally deselected', function() {
   this.props.teacherNotes.selected = false
   this.wrapper = mountAndOpenOptions(this.props)
   const menuItem = getMenuItem(this.wrapper.instance().menuContent, 'Notes')
@@ -187,14 +184,14 @@ QUnit.module('ViewOptionsMenu - Filters', {
   }
 })
 
-test('includes each available filter', function () {
+test('includes each available filter', function() {
   this.wrapper = mountAndOpenOptions(defaultProps())
   ;['Assignment Groups', 'Grading Periods', 'Modules', 'Sections'].forEach(label => {
     ok(getMenuItem(this.wrapper.instance().menuContent, 'Filters', label), `'${label}' is present`)
   })
 })
 
-test('includes only available filters', function () {
+test('includes only available filters', function() {
   const props = defaultProps({filterSettings: {available: ['gradingPeriods', 'modules']}})
   this.wrapper = mountAndOpenOptions(props)
   ;['Assignment Groups', 'Sections'].forEach(label => {
@@ -205,13 +202,13 @@ test('includes only available filters', function () {
   })
 })
 
-test('does not display filters group when no filters are available', function () {
+test('does not display filters group when no filters are available', function() {
   const props = defaultProps({filterSettings: {available: []}})
   this.wrapper = mountAndOpenOptions(props)
   notOk(getMenuItem(this.wrapper.instance().menuContent, 'Filters'))
 })
 
-test('onSelect is called when a filter is selected', function () {
+test('onSelect is called when a filter is selected', function() {
   const onSelect = sinon.stub()
   const props = defaultProps({filterSettings: {onSelect}})
   this.wrapper = mountAndOpenOptions(props)
@@ -219,7 +216,7 @@ test('onSelect is called when a filter is selected', function () {
   strictEqual(onSelect.callCount, 1)
 })
 
-test('onSelect is called with the selected filter', function () {
+test('onSelect is called with the selected filter', function() {
   const onSelect = sinon.stub()
   const props = defaultProps({filterSettings: {onSelect}})
   this.wrapper = mountAndOpenOptions(props)
@@ -227,7 +224,7 @@ test('onSelect is called with the selected filter', function () {
   strictEqual(onSelect.calledWithExactly(['modules']), true)
 })
 
-test('onSelect is called with list of selected filters upon any selection change', function () {
+test('onSelect is called with list of selected filters upon any selection change', function() {
   const onSelect = sinon.stub()
   const props = defaultProps({
     filterSettings: {
@@ -264,19 +261,19 @@ QUnit.module('ViewOptionsMenu - view ungraded as 0', {
   }
 })
 
-test('"View Ungraded As 0" is shown when allowViewUngradedAsZero is true', function () {
+test('"View Ungraded As 0" is shown when allowViewUngradedAsZero is true', function() {
   this.wrapper = this.mountViewOptionsMenu({allowViewUngradedAsZero: true})
   this.wrapper.find('button').simulate('click')
   ok(getMenuItem(this.wrapper.instance().menuContent, 'View Ungraded as 0'))
 })
 
-test('"View Ungraded As 0" is not shown when allowViewUngradedAsZero is false', function () {
+test('"View Ungraded As 0" is not shown when allowViewUngradedAsZero is false', function() {
   this.wrapper = this.mountViewOptionsMenu({allowViewUngradedAsZero: false})
   this.wrapper.find('button').simulate('click')
   notOk(getMenuItem(this.wrapper.instance().menuContent, 'View Ungraded as 0'))
 })
 
-test('"View Ungraded As 0" is selected when viewUngradedAsZero is true', function () {
+test('"View Ungraded As 0" is selected when viewUngradedAsZero is true', function() {
   this.wrapper = this.mountViewOptionsMenu({
     viewUngradedAsZero: true,
     allowViewUngradedAsZero: true
@@ -286,7 +283,7 @@ test('"View Ungraded As 0" is selected when viewUngradedAsZero is true', functio
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('"View Ungraded As 0" is not selected when viewUngradedAsZero is false', function () {
+test('"View Ungraded As 0" is not selected when viewUngradedAsZero is false', function() {
   this.wrapper = this.mountViewOptionsMenu({
     viewUngradedAsZero: false,
     allowViewUngradedAsZero: true
@@ -296,7 +293,7 @@ test('"View Ungraded As 0" is not selected when viewUngradedAsZero is false', fu
   strictEqual(menuItem.getAttribute('aria-checked'), 'false')
 })
 
-test('onSelectViewUngradedAsZero is called when selected', function () {
+test('onSelectViewUngradedAsZero is called when selected', function() {
   const onSelectViewUngradedAsZeroStub = sinon.stub()
   this.wrapper = this.mountViewOptionsMenu({
     viewUngradedAsZero: false,
@@ -330,21 +327,21 @@ QUnit.module('ViewOptionsMenu - unpublished assignments', {
   }
 })
 
-test('Unpublished Assignments is selected when showUnpublishedAssignments is true', function () {
+test('Unpublished Assignments is selected when showUnpublishedAssignments is true', function() {
   this.wrapper = this.mountViewOptionsMenu({showUnpublishedAssignments: true})
   this.wrapper.find('button').simulate('click')
   const menuItem = getMenuItem(this.wrapper.instance().menuContent, 'Unpublished Assignments')
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('Unpublished Assignments is not selected when showUnpublishedAssignments is false', function () {
+test('Unpublished Assignments is not selected when showUnpublishedAssignments is false', function() {
   this.wrapper = this.mountViewOptionsMenu({showUnpublishedAssignments: false})
   this.wrapper.find('button').simulate('click')
   const menuItem = getMenuItem(this.wrapper.instance().menuContent, 'Unpublished Assignments')
   strictEqual(menuItem.getAttribute('aria-checked'), 'false')
 })
 
-test('onSelectShowUnpublishedAssignment is called when selected', function () {
+test('onSelectShowUnpublishedAssignment is called when selected', function() {
   const onSelectShowUnpublishedAssignmentsStub = sinon.stub()
   this.wrapper = this.mountViewOptionsMenu({
     onSelectShowUnpublishedAssignments: onSelectShowUnpublishedAssignmentsStub
@@ -352,48 +349,6 @@ test('onSelectShowUnpublishedAssignment is called when selected', function () {
   this.wrapper.find('button').simulate('click')
   getMenuItem(this.wrapper.instance().menuContent, 'Unpublished Assignments').click()
   strictEqual(onSelectShowUnpublishedAssignmentsStub.callCount, 1)
-})
-
-QUnit.module('ViewOptionsMenu - show student last and first names separately', {
-  mountViewOptionsMenu({
-    showSeparateFirstLastNames = true,
-    allowShowSeparateFirstLastNames = true
-  } = {}) {
-    const props = defaultProps()
-    return mount(
-      <ViewOptionsMenu
-        {...props}
-        showSeparateFirstLastNames={showSeparateFirstLastNames}
-        allowShowSeparateFirstLastNames={allowShowSeparateFirstLastNames}
-      />
-    )
-  },
-
-  teardown() {
-    if (this.wrapper) {
-      this.wrapper.unmount()
-    }
-  }
-})
-
-test('Split student names is not show shown when allowShowSeparateFirstLastNames is false', function () {
-  this.wrapper = this.mountViewOptionsMenu({allowShowSeparateFirstLastNames: false})
-  this.wrapper.find('button').simulate('click')
-  notOk(getMenuItem(this.wrapper.instance().menuContent, 'Split Student Names'))
-})
-
-test('Split student names is selected when showSeparateFirstLastNames is true', function () {
-  this.wrapper = this.mountViewOptionsMenu({showSeparateFirstLastNames: true})
-  this.wrapper.find('button').simulate('click')
-  const menuItem = getMenuItem(this.wrapper.instance().menuContent, 'Split Student Names')
-  strictEqual(menuItem.getAttribute('aria-checked'), 'true')
-})
-
-test('Split student names is unselected when showSeparateFirstLastNames is false', function () {
-  this.wrapper = this.mountViewOptionsMenu({showSeparateFirstLastNames: false})
-  this.wrapper.find('button').simulate('click')
-  const menuItem = getMenuItem(this.wrapper.instance().menuContent, 'Split Student Names')
-  strictEqual(menuItem.getAttribute('aria-checked'), 'false')
 })
 
 QUnit.module('ViewOptionsMenu - Column Sorting', {
@@ -419,19 +374,19 @@ QUnit.module('ViewOptionsMenu - Column Sorting', {
   }
 })
 
-test('Default Order is selected when criterion is default and direction is ascending', function () {
+test('Default Order is selected when criterion is default and direction is ascending', function() {
   const wrapper = mountAndOpenOptions(this.props('default', 'ascending'))
   const menuItem = getMenuItem(wrapper.instance().menuContent, 'Arrange By', 'Default Order')
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('Default Order is selected when criterion is default and direction is descending', function () {
+test('Default Order is selected when criterion is default and direction is descending', function() {
   const wrapper = mountAndOpenOptions(this.props('default', 'descending'))
   const menuItem = getMenuItem(wrapper.instance().menuContent, 'Arrange By', 'Default Order')
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('Assignment Name - A-Z is selected when criterion is name and direction is ascending', function () {
+test('Assignment Name - A-Z is selected when criterion is name and direction is ascending', function() {
   const wrapper = mountAndOpenOptions(this.props('name', 'ascending'))
   const menuItem = getMenuItem(
     wrapper.instance().menuContent,
@@ -441,7 +396,7 @@ test('Assignment Name - A-Z is selected when criterion is name and direction is 
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('Assignment Name - Z-A is selected when criterion is name and direction is ascending', function () {
+test('Assignment Name - Z-A is selected when criterion is name and direction is ascending', function() {
   const wrapper = mountAndOpenOptions(this.props('name', 'descending'))
   const menuItem = getMenuItem(
     wrapper.instance().menuContent,
@@ -451,7 +406,7 @@ test('Assignment Name - Z-A is selected when criterion is name and direction is 
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('Due Date - Oldest to Newest is selected when criterion is due_date and direction is ascending', function () {
+test('Due Date - Oldest to Newest is selected when criterion is due_date and direction is ascending', function() {
   const wrapper = mountAndOpenOptions(this.props('due_date', 'ascending'))
   const menuItem = getMenuItem(
     wrapper.instance().menuContent,
@@ -461,7 +416,7 @@ test('Due Date - Oldest to Newest is selected when criterion is due_date and dir
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('Due Date - Newest to Oldest is selected when criterion is due_date and direction is descending', function () {
+test('Due Date - Newest to Oldest is selected when criterion is due_date and direction is descending', function() {
   const wrapper = mountAndOpenOptions(this.props('due_date', 'descending'))
   const menuItem = getMenuItem(
     wrapper.instance().menuContent,
@@ -471,7 +426,7 @@ test('Due Date - Newest to Oldest is selected when criterion is due_date and dir
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('Points - Lowest to Highest is selected when criterion is points and direction is ascending', function () {
+test('Points - Lowest to Highest is selected when criterion is points and direction is ascending', function() {
   const wrapper = mountAndOpenOptions(this.props('points', 'ascending'))
   const menuItem = getMenuItem(
     wrapper.instance().menuContent,
@@ -481,7 +436,7 @@ test('Points - Lowest to Highest is selected when criterion is points and direct
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('Points - Highest to Lowest is selected when criterion is points and direction is descending', function () {
+test('Points - Highest to Lowest is selected when criterion is points and direction is descending', function() {
   const wrapper = mountAndOpenOptions(this.props('points', 'descending'))
   const menuItem = getMenuItem(
     wrapper.instance().menuContent,
@@ -491,7 +446,7 @@ test('Points - Highest to Lowest is selected when criterion is points and direct
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('Module - First to Last is selected when criterion is module_position and direction is ascending', function () {
+test('Module - First to Last is selected when criterion is module_position and direction is ascending', function() {
   const wrapper = mountAndOpenOptions(this.props('module_position', 'ascending'))
   const menuItem = getMenuItem(
     wrapper.instance().menuContent,
@@ -501,7 +456,7 @@ test('Module - First to Last is selected when criterion is module_position and d
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('Module - Last to First is selected when criterion is module_position and direction is ascending', function () {
+test('Module - Last to First is selected when criterion is module_position and direction is ascending', function() {
   const wrapper = mountAndOpenOptions(this.props('module_position', 'descending'))
   const menuItem = getMenuItem(
     wrapper.instance().menuContent,
@@ -511,17 +466,17 @@ test('Module - Last to First is selected when criterion is module_position and d
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('Module - First to Last is not shown when modules are not enabled', function () {
+test('Module - First to Last is not shown when modules are not enabled', function() {
   const wrapper = mountAndOpenOptions(this.props('default', 'ascending', false, false))
   notOk(getMenuItem(wrapper.instance().menuContent, 'Arrange By', 'Module - First to Last'))
 })
 
-test('Module - Last to First is not shown when modules are not enabled', function () {
+test('Module - Last to First is not shown when modules are not enabled', function() {
   const wrapper = mountAndOpenOptions(this.props('default', 'ascending', false, false))
   notOk(getMenuItem(wrapper.instance().menuContent, 'Arrange By', 'Module - Last to First'))
 })
 
-test('Default Order is disabled when column ordering settings are disabled', function () {
+test('Default Order is disabled when column ordering settings are disabled', function() {
   const props = this.props()
   props.columnSortSettings.disabled = true
   const wrapper = mountAndOpenOptions(props)
@@ -529,7 +484,7 @@ test('Default Order is disabled when column ordering settings are disabled', fun
   strictEqual(menuItem.getAttribute('aria-disabled'), 'true')
 })
 
-test('Assignment Name - A-Z is disabled when column ordering settings are disabled', function () {
+test('Assignment Name - A-Z is disabled when column ordering settings are disabled', function() {
   const props = this.props()
   props.columnSortSettings.disabled = true
   const wrapper = mountAndOpenOptions(props)
@@ -541,7 +496,7 @@ test('Assignment Name - A-Z is disabled when column ordering settings are disabl
   strictEqual(menuItem.getAttribute('aria-disabled'), 'true')
 })
 
-test('Assignment Name - Z-A is disabled when column ordering settings are disabled', function () {
+test('Assignment Name - Z-A is disabled when column ordering settings are disabled', function() {
   const props = this.props()
   props.columnSortSettings.disabled = true
   const wrapper = mountAndOpenOptions(props)
@@ -553,7 +508,7 @@ test('Assignment Name - Z-A is disabled when column ordering settings are disabl
   strictEqual(menuItem.getAttribute('aria-disabled'), 'true')
 })
 
-test('Due Date - Oldest to Newest is disabled when column ordering settings are disabled', function () {
+test('Due Date - Oldest to Newest is disabled when column ordering settings are disabled', function() {
   const props = this.props()
   props.columnSortSettings.disabled = true
   const wrapper = mountAndOpenOptions(props)
@@ -565,7 +520,7 @@ test('Due Date - Oldest to Newest is disabled when column ordering settings are 
   strictEqual(menuItem.getAttribute('aria-disabled'), 'true')
 })
 
-test('Due Date - Newest to Oldest is disabled when column ordering settings are disabled', function () {
+test('Due Date - Newest to Oldest is disabled when column ordering settings are disabled', function() {
   const props = this.props()
   props.columnSortSettings.disabled = true
   const wrapper = mountAndOpenOptions(props)
@@ -577,7 +532,7 @@ test('Due Date - Newest to Oldest is disabled when column ordering settings are 
   strictEqual(menuItem.getAttribute('aria-disabled'), 'true')
 })
 
-test('Points - Lowest to Highest is disabled when column ordering settings are disabled', function () {
+test('Points - Lowest to Highest is disabled when column ordering settings are disabled', function() {
   const props = this.props()
   props.columnSortSettings.disabled = true
   const wrapper = mountAndOpenOptions(props)
@@ -589,7 +544,7 @@ test('Points - Lowest to Highest is disabled when column ordering settings are d
   strictEqual(menuItem.getAttribute('aria-disabled'), 'true')
 })
 
-test('Points - Highest to Lowest is disabled when column ordering settings are disabled', function () {
+test('Points - Highest to Lowest is disabled when column ordering settings are disabled', function() {
   const props = this.props()
   props.columnSortSettings.disabled = true
   const wrapper = mountAndOpenOptions(props)
@@ -601,7 +556,7 @@ test('Points - Highest to Lowest is disabled when column ordering settings are d
   strictEqual(menuItem.getAttribute('aria-disabled'), 'true')
 })
 
-test('Module - First to Last is disabled when column ordering settings are disabled', function () {
+test('Module - First to Last is disabled when column ordering settings are disabled', function() {
   const props = this.props()
   props.columnSortSettings.disabled = true
   const wrapper = mountAndOpenOptions(props)
@@ -613,7 +568,7 @@ test('Module - First to Last is disabled when column ordering settings are disab
   strictEqual(menuItem.getAttribute('aria-disabled'), 'true')
 })
 
-test('Module - Last to First is disabled when column ordering settings are disabled', function () {
+test('Module - Last to First is disabled when column ordering settings are disabled', function() {
   const props = this.props()
   props.columnSortSettings.disabled = true
   const wrapper = mountAndOpenOptions(props)
@@ -625,49 +580,49 @@ test('Module - Last to First is disabled when column ordering settings are disab
   strictEqual(menuItem.getAttribute('aria-disabled'), 'true')
 })
 
-test('clicking on "Default Order" triggers onSortByDefault', function () {
+test('clicking on "Default Order" triggers onSortByDefault', function() {
   const props = this.props()
   const wrapper = mountAndOpenOptions(props)
   getMenuItem(wrapper.instance().menuContent, 'Arrange By', 'Default Order').click()
   ok(props.columnSortSettings.onSortByDefault.calledOnce)
 })
 
-test('clicking on "Assignments - A-Z" triggers onSortByNameAscending', function () {
+test('clicking on "Assignments - A-Z" triggers onSortByNameAscending', function() {
   const props = this.props()
   const wrapper = mountAndOpenOptions(props)
   getMenuItem(wrapper.instance().menuContent, 'Arrange By', 'Assignment Name - A-Z').click()
   ok(props.columnSortSettings.onSortByNameAscending.calledOnce)
 })
 
-test('clicking on "Assignments - Z-A" triggers onSortByNameDescending', function () {
+test('clicking on "Assignments - Z-A" triggers onSortByNameDescending', function() {
   const props = this.props()
   const wrapper = mountAndOpenOptions(props)
   getMenuItem(wrapper.instance().menuContent, 'Arrange By', 'Assignment Name - Z-A').click()
   ok(props.columnSortSettings.onSortByNameDescending.calledOnce)
 })
 
-test('clicking on "Due Date - Oldest to Newest" triggers onSortByDueDateAscending', function () {
+test('clicking on "Due Date - Oldest to Newest" triggers onSortByDueDateAscending', function() {
   const props = this.props()
   const wrapper = mountAndOpenOptions(props)
   getMenuItem(wrapper.instance().menuContent, 'Arrange By', 'Due Date - Oldest to Newest').click()
   ok(props.columnSortSettings.onSortByDueDateAscending.calledOnce)
 })
 
-test('clicking on "Due Date - Newest to Oldest" triggers onSortByDueDateDescending', function () {
+test('clicking on "Due Date - Newest to Oldest" triggers onSortByDueDateDescending', function() {
   const props = this.props()
   const wrapper = mountAndOpenOptions(props)
   getMenuItem(wrapper.instance().menuContent, 'Arrange By', 'Due Date - Newest to Oldest').click()
   ok(props.columnSortSettings.onSortByDueDateDescending.calledOnce)
 })
 
-test('clicking on "Points - Lowest to Highest" triggers onSortByPointsAscending', function () {
+test('clicking on "Points - Lowest to Highest" triggers onSortByPointsAscending', function() {
   const props = this.props()
   const wrapper = mountAndOpenOptions(props)
   getMenuItem(wrapper.instance().menuContent, 'Arrange By', 'Points - Lowest to Highest').click()
   ok(props.columnSortSettings.onSortByPointsAscending.calledOnce)
 })
 
-test('clicking on "Points - Highest to Lowest" triggers onSortByPointsDescending', function () {
+test('clicking on "Points - Highest to Lowest" triggers onSortByPointsDescending', function() {
   const props = this.props()
   const wrapper = mountAndOpenOptions(props)
   getMenuItem(wrapper.instance().menuContent, 'Arrange By', 'Points - Highest to Lowest').click()

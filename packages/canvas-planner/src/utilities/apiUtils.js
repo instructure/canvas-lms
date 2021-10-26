@@ -258,9 +258,3 @@ function isComplete(apiResponse) {
   }
   return complete
 }
-
-export function observedUserId(state) {
-  if (state.selectedObservee?.id && state.selectedObservee.id !== state.currentUser.id) {
-    return state.selectedObservee.id
-  }
-}

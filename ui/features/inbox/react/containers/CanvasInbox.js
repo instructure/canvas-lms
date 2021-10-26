@@ -29,7 +29,6 @@ const CanvasInbox = () => {
   const [scope, setScope] = useState('inbox')
   const [courseFilter, setCourseFilter] = useState()
   const [selectedConversations, setSelectedConversations] = useState([])
-  const [selectedConversationMessage, setSelectedConversationMessage] = useState()
   const [composeModal, setComposeModal] = useState(false)
   const [deleteDisabled, setDeleteDisabled] = useState(true)
   const [archiveDisabled, setArchiveDisabled] = useState(true)
@@ -42,7 +41,6 @@ const CanvasInbox = () => {
     setSelectedConversations(conversations)
     setDeleteDisabled(conversations.length === 0)
     setArchiveDisabled(conversations.length === 0)
-    setSelectedConversationMessage(null)
   }
 
   const removeFromSelectedConversations = conversations => {
@@ -53,13 +51,6 @@ const CanvasInbox = () => {
       setArchiveDisabled(updated.length === 0)
       return updated
     })
-  }
-
-  const onReply = ({conversationMessage = null, replyAll = false} = {}) => {
-    setSelectedConversationMessage(conversationMessage)
-    setIsReplyAll(replyAll)
-    setIsReply(!replyAll)
-    setComposeModal(true)
   }
 
   useEffect(() => {
@@ -94,8 +85,14 @@ const CanvasInbox = () => {
             }}
             selectedConversations={selectedConversations}
             onCompose={() => setComposeModal(true)}
-            onReply={() => onReply()}
-            onReplyAll={() => onReply({replyAll: true})}
+            onReply={() => {
+              setIsReply(true)
+              setComposeModal(true)
+            }}
+            onReplyAll={() => {
+              setIsReplyAll(true)
+              setComposeModal(true)
+            }}
             deleteDisabled={deleteDisabled}
             deleteToggler={setDeleteDisabled}
             archiveDisabled={archiveDisabled}
@@ -115,11 +112,7 @@ const CanvasInbox = () => {
             </Flex.Item>
             <Flex.Item shouldGrow shouldShrink height="100%" overflowY="auto">
               {selectedConversations.length > 0 ? (
-                <MessageDetailContainer
-                  conversation={selectedConversations[0]}
-                  onReply={conversationMessage => onReply({conversationMessage})}
-                  onReplyAll={conversationMessage => onReply({conversationMessage, replyAll: true})}
-                />
+                <MessageDetailContainer conversation={selectedConversations[0]} />
               ) : (
                 <View padding="small">
                   <NoSelectedConversation />
@@ -131,14 +124,12 @@ const CanvasInbox = () => {
       </Flex>
       <ComposeModalManager
         conversation={selectedConversations[0]}
-        conversationMessage={selectedConversationMessage}
         isReply={isReply}
         isReplyAll={isReplyAll}
         onDismiss={() => {
           setComposeModal(false)
           setIsReply(false)
           setIsReplyAll(false)
-          setSelectedConversationMessage(null)
         }}
         open={composeModal}
       />

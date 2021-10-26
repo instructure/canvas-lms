@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useReducer, useState} from 'react'
+import React, {useReducer} from 'react'
 
 import formatMessage from '../../../../../../format-message'
 import reducer, {initialState, modes} from '../../../reducers/imageSection'
@@ -26,15 +26,8 @@ import {Text} from '@instructure/ui-text'
 import {Group} from '../Group'
 import ModeSelect from './ModeSelect'
 import Course from './Course'
-import PreviewIcon from '../../../../shared/PreviewIcon'
-import {ImageCropper} from '../ImageCropper'
-import {IconCropSolid} from '@instructure/ui-icons'
-import {Modal} from '@instructure/ui-modal'
-import {Heading} from '@instructure/ui-heading'
-import {Button, CloseButton} from '@instructure/ui-buttons'
 
-export const ImageSection = () => {
-  const [openCropModal, setOpenCropModal] = useState(false)
+export const ImageSection = ({editor}) => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const allowedModes = {[modes.courseImages.type]: Course}
 
@@ -46,16 +39,7 @@ export const ImageSection = () => {
         </Flex.Item>
         <Flex.Item>
           <Flex>
-            <Flex.Item shouldGrow>
-              <Flex>
-                <Flex.Item margin="0 small 0 0">
-                  <PreviewIcon variant="large" testId="selected-image-preview" />
-                </Flex.Item>
-                <Flex.Item>
-                  <Text>{!state.currentImage && formatMessage('None Selected')}</Text>
-                </Flex.Item>
-              </Flex>
-            </Flex.Item>
+            <Flex.Item shouldGrow>Preview Placeholder</Flex.Item>
             <Flex.Item>
               <ModeSelect dispatch={dispatch} />
             </Flex.Item>
@@ -63,52 +47,6 @@ export const ImageSection = () => {
         </Flex.Item>
         <Flex.Item>
           {!!allowedModes[state.mode] && React.createElement(allowedModes[state.mode])}
-        </Flex.Item>
-        <Flex.Item>
-          <Button
-            renderIcon={IconCropSolid}
-            onClick={() => {
-              setOpenCropModal(true)
-            }}
-          />
-          {openCropModal && (
-            <Modal
-              size="large"
-              open={openCropModal}
-              onDismiss={() => {
-                setOpenCropModal(false)
-              }}
-              shouldCloseOnDocumentClick={false}
-            >
-              <Modal.Header>
-                <CloseButton
-                  placement="end"
-                  offset="small"
-                  onClick={() => {
-                    setOpenCropModal(false)
-                  }}
-                  screenReaderLabel="Close"
-                />
-                <Heading>{formatMessage('Crop Image')}</Heading>
-              </Modal.Header>
-              <Modal.Body>
-                <ImageCropper />
-              </Modal.Body>
-              <Modal.Footer>
-                <Button
-                  onClick={() => {
-                    setOpenCropModal(false)
-                  }}
-                  margin="0 x-small 0 0"
-                >
-                  {formatMessage('Cancel')}
-                </Button>
-                <Button color="primary" type="submit">
-                  {formatMessage('Save')}
-                </Button>
-              </Modal.Footer>
-            </Modal>
-          )}
         </Flex.Item>
       </Flex>
     </Group>

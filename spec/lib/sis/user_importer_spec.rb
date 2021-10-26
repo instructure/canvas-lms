@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+
 describe SIS::UserImporter do
   context "when the unique_id is invalid the error message reported to the user" do
     before(:once) do

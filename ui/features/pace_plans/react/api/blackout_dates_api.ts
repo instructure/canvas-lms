@@ -22,12 +22,14 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 
 /* API methods */
 
-export const create = (blackoutDate: BlackoutDate) =>
-  doFetchApi<{blackout_date: BlackoutDate}>({
-    path: '/api/v1/blackout_dates',
-    method: 'POST',
-    body: transformBlackoutDateForApi(blackoutDate)
-  }).then(({json}) => json?.blackout_date)
+export const create = async (blackoutDate: BlackoutDate) =>
+  (
+    await doFetchApi<{blackout_date: BlackoutDate}>({
+      path: '/api/v1/blackout_dates',
+      method: 'POST',
+      body: transformBlackoutDateForApi(blackoutDate)
+    })
+  ).json
 
 export const deleteBlackoutDate = async (id: number | string) =>
   (await doFetchApi({path: `/api/v1/blackout_dates/${id}`, method: 'DELETE'})).json

@@ -18,9 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+
 describe(Lti::LtiToolCreator) do
   let(:context_external_tool) do
-    ContextExternalTool.new.tap do |tool|
+    context_external_tool = ContextExternalTool.new.tap do |tool|
       tool.name = "tool"
       tool.consumer_key = '12345'
       tool.shared_secret = 'secret'

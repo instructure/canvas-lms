@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+
 describe Lti::LtiUserCreator do
   describe '#convert' do
     let(:tool) do
@@ -258,7 +260,7 @@ describe Lti::LtiUserCreator do
 
       describe "#concluded_enrollments" do
         it "correctly collects concluded student enrollments" do
-          student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true).conclude
+          enrollment = student_in_course(user: canvas_user, course: canvas_course, active_enrollment: true).conclude
           course_with_designer(user: canvas_user, course: canvas_course, active_enrollment: true)
           account_admin_user(user: canvas_user, account: canvas_course.account)
 

@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+
 describe LiveAssessments::Submission do
   let_once(:assessment_context) { course_factory(active_all: true) }
   let(:outcome) do
@@ -38,7 +40,7 @@ describe LiveAssessments::Submission do
       # possible, but we don't now so that's what we test
       submission.possible = 0
       submission.create_outcome_result(alignment)
-      expect(alignment.learning_outcome_results.count).to eq 0
+      result = expect(alignment.learning_outcome_results.count).to eq 0
     end
 
     it 'creates an outcome result' do

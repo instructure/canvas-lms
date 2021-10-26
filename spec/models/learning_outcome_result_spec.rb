@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe LearningOutcomeResult do
   before :once do
@@ -332,7 +333,7 @@ describe LearningOutcomeResult do
     describe "with account_level_mastery_scales FF disabled" do
       before do
         course.root_account.disable_feature!(:account_level_mastery_scales)
-        outcome_proficiency_model(course)
+        proficiency = outcome_proficiency_model(course)
       end
 
       it "properly calculates percent based on result.possible, if it exists" do

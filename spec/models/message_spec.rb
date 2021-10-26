@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../messages/messages_helper')
 
 describe Message do
@@ -253,7 +254,7 @@ describe Message do
       Message.workflow_spec.states.each do |state_symbol, state|
         Message.destroy_all
         message = message_model(:workflow_state => state_symbol.to_s, :user => user_factory, :to => 'nobody')
-        if state.events.any? { |_event_symbol, event| event.transitions_to == :cancelled }
+        if state.events.any? { |event_symbol, event| event.transitions_to == :cancelled }
           expect(Message.cancellable).to eq [message]
         else
           expect(Message.cancellable).to eq []

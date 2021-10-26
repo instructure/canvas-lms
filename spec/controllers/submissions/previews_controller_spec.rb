@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 describe Submissions::PreviewsController do
   describe 'GET :show' do
     before do

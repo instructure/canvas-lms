@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
 describe SelfEnrollmentsController do
   describe "GET 'new'" do
     before do
@@ -32,7 +34,7 @@ describe SelfEnrollmentsController do
     end
 
     it "does the delegated auth dance" do
-      account_with_cas({ :account => Account.default })
+      account = account_with_cas({ :account => Account.default })
 
       get 'new', params: { :self_enrollment_code => @course.self_enrollment_code }
       expect(response).to redirect_to login_url

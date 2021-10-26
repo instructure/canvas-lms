@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require_relative "../graphql_spec_helper"
 
 describe Types::CourseType do
@@ -321,17 +322,6 @@ describe Types::CourseType do
           course_type.resolve(<<~GQL, current_user: @teacher)
             submissionsConnection(
               filter: { gradedSince: "#{1.day.from_now.iso8601}" }
-            ) { nodes { _id } }
-          GQL
-        ).to eq [@student2a1_submission.id.to_s]
-      end
-
-      it "updated_since" do
-        @student2a1_submission.update_attribute(:updated_at, 1.week.from_now)
-        expect(
-          course_type.resolve(<<~GQL, current_user: @teacher)
-            submissionsConnection(
-              filter: { updatedSince: "#{1.day.from_now.iso8601}" }
             ) { nodes { _id } }
           GQL
         ).to eq [@student2a1_submission.id.to_s]

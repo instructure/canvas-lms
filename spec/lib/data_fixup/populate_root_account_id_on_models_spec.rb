@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'spec_helper'
+
 describe DataFixup::PopulateRootAccountIdOnModels do
   before :once do
     course_model
@@ -1039,14 +1041,14 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
     it 'restarts the table fixup job if there are no other delayed jobs of this type still running' do
       lo = LearningOutcome.create!(context: @course, short_description: 'test')
-      LearningOutcome.create!(context: @course, short_description: 'test2')
+      lo2 = LearningOutcome.create!(context: @course, short_description: 'test2')
 
       expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:run).once
       DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids_override(LearningOutcome, DataFixup::PopulateRootAccountIdsOnLearningOutcomes, lo.id, lo.id)
     end
 
     it 'does not restart the table fixup job if there are items in this table that do not have root_account_id' do
-      LearningOutcome.create!(context: @course, short_description: 'test')
+      lo = LearningOutcome.create!(context: @course, short_description: 'test')
       lo2 = LearningOutcome.create!(context: @course, short_description: 'test2')
       lo2.update_columns(root_account_ids: nil)
 

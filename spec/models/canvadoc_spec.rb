@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
 describe 'Canvadoc' do
   def stub_upload
     expectation = receive(:upload).and_return "id" => 123456, "status" => "pending"

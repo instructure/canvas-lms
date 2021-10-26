@@ -82,7 +82,7 @@ module StreamingContentChecks
     super
   end
 
-  def append(key, _value)
+  def append(key, value)
     raise "Streaming template used `content_for` with #{key.inspect} instead of `provide`,
       which is preferred (`provide` unblocks the rendering)"
   end

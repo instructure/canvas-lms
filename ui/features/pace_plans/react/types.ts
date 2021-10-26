@@ -80,12 +80,22 @@ export interface PacePlan {
   readonly context_type: PlanContextTypes
   readonly context_id: string
   readonly published_at?: string
+  readonly unpublished_changes?: boolean
+  readonly linked_to_parent: boolean
+}
+
+export enum PublishOptions {
+  FUTURE_ONLY = 'future_only',
+  ALL = 'all',
+  SELECTED_SECTIONS = 'selected_sections',
+  SELECTED_STUDENTS = 'selected_students',
+  SINGLE_STUDENT = 'single_student'
 }
 
 /* Redux state types */
 
 export type EnrollmentsState = Enrollments
-export type PacePlansState = PacePlan & {originalPlan: PacePlan}
+export type PacePlansState = PacePlan
 export type SectionsState = Sections
 export type ResponsiveSizes = 'small' | 'large'
 

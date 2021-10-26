@@ -32,6 +32,5 @@ module Types
 
     argument :submitted_since, DateTimeType, required: false
     argument :graded_since, DateTimeType, required: false
-    argument :updated_since, DateTimeType, required: false
   end
 end

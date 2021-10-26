@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'spec_helper'
+
 describe DataFixup::PopulateMissingRootAccountIdsIfSingleRootAccountInstall do
   describe '#run' do
     context 'when there is more than one non-site-admin root account' do

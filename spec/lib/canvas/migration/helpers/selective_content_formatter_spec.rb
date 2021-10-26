@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../../../../lti2_course_spec_helper')
 
 describe Canvas::Migration::Helpers::SelectiveContentFormatter do

@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 describe DataFixup::BackfillNewDefaultHelpLink do
   let(:new_default_link) do
     {

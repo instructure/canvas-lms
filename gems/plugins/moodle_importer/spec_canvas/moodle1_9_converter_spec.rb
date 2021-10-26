@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+
 require 'nokogiri'
 
 describe Moodle::Converter do
@@ -33,7 +35,7 @@ describe Moodle::Converter do
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @cm)
   end
 
-  it "imports the course successfully" do
+  it "successfullies import the course" do
     allowed_warnings = ["Multiple Dropdowns question may have been imported incorrectly",
                         "Possible answers will need to be regenerated for Formula question",
                         "Missing links found in imported content",

@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+
 describe CalendarEvent do
   before(:once) do
     Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
@@ -576,14 +578,14 @@ describe CalendarEvent do
       end
 
       it "notifies participants if teacher deletes the appointment time slot", priority: "1", test_id: 193148 do
-        @appointment2.reserve_for(@group, @student1)
+        reservation = @appointment2.reserve_for(@group, @student1)
         @appointment2.updating_user = @teacher
         @appointment2.destroy
         expect(message_recipients_for('Appointment Deleted For User')).to eq @expected_users - [@teacher.id]
       end
 
       it "notifies all participants when the the time slot is canceled", priority: "1", test_id: 502005 do
-        @appointment2.reserve_for(@group, @student1)
+        reservation = @appointment2.reserve_for(@group, @student1)
         @appointment2.updating_user = @teacher
         user_evt = CalendarEvent.where(context_type: 'Group').first
         user_evt.updating_user = @teacher
@@ -1008,7 +1010,7 @@ describe CalendarEvent do
 
       it "deletes all child events" do
         s2 = @course.course_sections.create!
-        @course.course_sections.create!
+        s3 = @course.course_sections.create!
         e1 = @course.calendar_events.build :title => "ohai",
                                            :child_event_data => [
                                              { :start_at => "2012-01-01 12:00:00", :end_at => "2012-01-01 13:00:00", :context_code => @course.default_section.asset_string },

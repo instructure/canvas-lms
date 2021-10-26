@@ -37,7 +37,7 @@ describe GradeCalculator do
 
     def set_grades(grades, group = @group1)
       @grades = grades
-      @assignments = @grades.map do |_score, possible|
+      @assignments = @grades.map do |score, possible|
         @course.assignments.create! :title => 'homework',
                                     :points_possible => possible,
                                     :assignment_group => group
@@ -192,7 +192,7 @@ describe GradeCalculator do
       check_grades(74.64, 63.41)
     end
 
-    it "really supports drop_lowest" do
+    it "reallies support drop_lowest" do
       set_grades [[30, nil], [30, nil], [30, nil], [31, 31], [21, 21],
                   [30, 30], [30, 30], [30, 30], [30, 30], [30, 30], [30, 30],
                   [30, 30], [30, 30], [30, 30], [30, 30], [29.3, 30], [30, 30],
@@ -213,7 +213,7 @@ describe GradeCalculator do
       check_grades(7.89, 0.29)
     end
 
-    it "really supports drop_highest" do
+    it "reallies support drop_highest" do
       grades = [[0, 10], [10, 20], [28, 50], [91, 100]]
       set_grades(grades)
 

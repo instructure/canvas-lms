@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper.rb')
 module Lti
   RSpec.describe Link, type: :model do

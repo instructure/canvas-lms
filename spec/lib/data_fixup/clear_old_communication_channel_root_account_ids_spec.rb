@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 describe DataFixup::ClearOldCommunicationChannelRootAccountIds do
   it "clears out root_account_ids" do
     a = account_model

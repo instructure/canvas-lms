@@ -25,7 +25,7 @@ module GraphQLHelpers
   # standard canvas ids. the resolve function for fields using this preparer
   # will get a standard canvas id
   def self.relay_or_legacy_id_prepare_func(expected_type)
-    proc do |relay_or_legacy_id|
+    Proc.new do |relay_or_legacy_id, ctx|
       begin
         self.parse_relay_or_legacy_id(relay_or_legacy_id, expected_type)
       rescue InvalidIDError => e
@@ -35,11 +35,11 @@ module GraphQLHelpers
   end
 
   def self.relay_or_legacy_ids_prepare_func(expected_type)
-    proc do |relay_or_legacy_ids|
+    Proc.new do |relay_or_legacy_ids, ctx|
       begin
-        relay_or_legacy_ids.map do |relay_or_legacy_id|
+        relay_or_legacy_ids.map { |relay_or_legacy_id, ctx|
           self.parse_relay_or_legacy_id(relay_or_legacy_id, expected_type)
-        end
+        }
       rescue InvalidIDError => e
         GraphQL::ExecutionError.new(e.message)
       end

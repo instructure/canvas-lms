@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+
 describe Course do
   before(:once) do
     Account.site_admin.enable_feature!(:visible_assignments_scope_change)

@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'spec_helper'
+
 describe MicrosoftSync::GraphService do
   include WebMock::API
 
@@ -55,8 +57,8 @@ describe MicrosoftSync::GraphService do
     allow(InstStatsd::Statsd).to receive(:count).and_call_original
 
     # Test retry on intermittent errors without internal retry
-    MicrosoftSync::GraphService::Http # need to load before stubbing
-    stub_const('MicrosoftSync::GraphService::Http::DEFAULT_N_INTERMITTENT_RETRIES', 0)
+    MicrosoftSync::GraphServiceHttp # need to load before stubbing
+    stub_const('MicrosoftSync::GraphServiceHttp::DEFAULT_N_INTERMITTENT_RETRIES', 0)
   end
 
   after { WebMock.enable_net_connect! }
@@ -155,7 +157,7 @@ describe MicrosoftSync::GraphService do
       end
 
       it 'raises an ApplicationNotAuthorizedForTenant error' do
-        klass = MicrosoftSync::GraphService::Http::ApplicationNotAuthorizedForTenant
+        klass = MicrosoftSync::GraphServiceHttp::ApplicationNotAuthorizedForTenant
         message = /make sure your admin has granted access/
 
         expect { subject }.to raise_microsoft_sync_graceful_cancel_error(klass, message)
@@ -175,7 +177,7 @@ describe MicrosoftSync::GraphService do
 
       it 'raises an ApplicationNotAuthorizedForTenant error' do
         expect { subject }.to raise_error do |e|
-          expect(e).to be_a(MicrosoftSync::GraphService::Http::ApplicationNotAuthorizedForTenant)
+          expect(e).to be_a(MicrosoftSync::GraphServiceHttp::ApplicationNotAuthorizedForTenant)
           expect(e).to be_a(MicrosoftSync::Errors::GracefulCancelError)
         end
         expect(InstStatsd::Statsd).to have_received(:increment)
@@ -305,7 +307,7 @@ describe MicrosoftSync::GraphService do
   end
 
   shared_examples_for 'an endpoint that uses up quota' do |read_and_write_points_array|
-    it 'sends the quota to GraphService::Http#request' do
+    it 'sends the quota to GraphServiceHttp#request' do
       expect(service.http).to receive(:request)
         .with(anything, anything, hash_including(quota: read_and_write_points_array))
         .and_call_original
@@ -359,7 +361,7 @@ describe MicrosoftSync::GraphService do
 
   shared_examples_for 'a members/owners batch request that can fail' do
     let(:ignored_code) { ignored_members_m1_response[:status] }
-    let(:expected_error) { MicrosoftSync::GraphService::Http::BatchRequestFailed }
+    let(:expected_error) { MicrosoftSync::GraphServiceHttp::BatchRequestFailed }
 
     context 'a batch request with an errored subrequest' do
       it_behaves_like 'a batch request that fails' do
@@ -399,7 +401,7 @@ describe MicrosoftSync::GraphService do
         let(:bad_codes) { [429, 429] }
         let(:bad_bodies) { %w[badthrottled badthrottled] }
         let(:codes) { { success: 204, throttled: [429, 429], ignored: ignored_code } }
-        let(:expected_error) { MicrosoftSync::GraphService::Http::BatchRequestThrottled }
+        let(:expected_error) { MicrosoftSync::GraphServiceHttp::BatchRequestThrottled }
       end
 
       context 'when no response has a retry delay' do
@@ -438,7 +440,7 @@ describe MicrosoftSync::GraphService do
           err('members_m2'), throttled('owners_o1'), succ('owners_o2')
         ]
       end
-      let(:expected_error) { MicrosoftSync::GraphService::Http::BatchRequestThrottled }
+      let(:expected_error) { MicrosoftSync::GraphServiceHttp::BatchRequestThrottled }
 
       it_behaves_like 'a batch request that fails'
 
@@ -591,23 +593,30 @@ describe MicrosoftSync::GraphService do
       end
     end
 
-    %w[members owners].each do |members_or_owners|
-      context "when the PATCH endpoint returns a '#{members_or_owners} quota exceeded' error" do
-        let(:response) do
-          {
-            status: 403,
-            body: {
-              code: "Directory_QuotaExceeded",
-              message: "Unable to perform operation as '121' would exceed the maximum quota count '100' for forward-link '#{members_or_owners}'.",
-            }.to_json
-          }
-        end
+    shared_examples_for 'a call which raises a quota exceeded error' do |members_or_owners|
+      let(:msft_api_error_body) do
+        {
+          code: "Directory_QuotaExceeded",
+          message: "Unable to perform operation as '121' would exceed the maximum quota count '100' for forward-link '#{members_or_owners}'.",
+        }
+      end
 
-        it 'falls back to the batch api' do
-          expect(service).to receive(:add_users_to_group_via_batch)
-            .with('msgroupid', members, owners).and_return('foo')
-          expect(subject).to eq('foo')
-        end
+      it "raises an Errors::#{members_or_owners.capitalize}QuotaExceeded error" do
+        expect { subject }.to raise_error(
+          "MicrosoftSync::Errors::#{members_or_owners.capitalize}QuotaExceeded".constantize
+        )
+      end
+    end
+
+    context 'when the API returns a "quota exceeded" error' do
+      let(:response) { json_response(403, { error: msft_api_error_body }) }
+
+      context '(owners quota exceeded)' do
+        it_behaves_like 'a call which raises a quota exceeded error', 'owners'
+      end
+
+      context '(members quota exceeded)' do
+        it_behaves_like 'a call which raises a quota exceeded error', 'members'
       end
     end
 
@@ -705,29 +714,22 @@ describe MicrosoftSync::GraphService do
         end
       end
 
-      %w[members owners].each do |members_or_owners|
-        context "when the API returns a '#{members_or_owners} quota exceeded' error" do
-          let(:batch_responses) do
-            [
-              dupe('members_m1'),
-              succ('members_m2'),
-              succ('owners_m1'),
-              { id: 'owners_m2', status: 403, body: msft_api_error_body }
-            ]
-          end
+      context 'when the API returns a "quota exceeded" error' do
+        let(:batch_responses) do
+          [
+            dupe('members_m1'),
+            succ('members_m2'),
+            succ('owners_m1'),
+            { id: 'owners_m2', status: 403, body: msft_api_error_body }
+          ]
+        end
 
-          let(:msft_api_error_body) do
-            {
-              code: "Directory_QuotaExceeded",
-              message: "Unable to perform operation as '121' would exceed the maximum quota count '100' for forward-link '#{members_or_owners}'.",
-            }
-          end
+        context '(owners quota exceeded)' do
+          it_behaves_like 'a call which raises a quota exceeded error', 'owners'
+        end
 
-          it "raises an Errors::#{members_or_owners.capitalize}QuotaExceeded error" do
-            expect { subject }.to raise_error(
-              "MicrosoftSync::Errors::#{members_or_owners.capitalize}QuotaExceeded".constantize
-            )
-          end
+        context '(members quota exceeded)' do
+          it_behaves_like 'a call which raises a quota exceeded error', 'members'
         end
       end
 

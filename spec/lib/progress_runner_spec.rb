@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
 describe ProgressRunner do
   before do
     @progress = double("progress").as_null_object
@@ -47,10 +49,7 @@ describe ProgressRunner do
     progress_runner.completed_message { |completed| completed_message_value = completed; "foo" }
 
     error_callback_called = false
-    progress_runner.error_message do
-      error_callback_called = true
-      "bar"
-    end
+    progress_runner.error_message { |message, error_ids| error_callback_called = true; "bar" }
 
     process_callback_count = 0
     ids = (0..9).to_a
@@ -116,7 +115,7 @@ describe ProgressRunner do
 
     progress_runner = ProgressRunner.new(@progress)
     ids = (1..4).to_a
-    progress_runner.do_batch_update(ids) do
+    progress_runner.do_batch_update(ids) do |id|
       raise "processing error"
     end
 

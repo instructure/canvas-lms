@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 describe SIS::CSV::ImportRefactored do
   before { account_model }
 
@@ -431,6 +433,7 @@ describe SIS::CSV::ImportRefactored do
       csv_string = "term_id,name,status\n" +
                    "\"T001\",\"Winter13\",active"
       fake_attachment = flakey_attachment_cls.new(csv_string)
+      input_csv = nil
       root_account = account_model
       user = user_model
       batch = root_account.sis_batches.create!(user_id: user.id)

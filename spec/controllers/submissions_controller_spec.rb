@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 describe SubmissionsController do
   it_behaves_like 'a submission update action', :submissions
   it_behaves_like 'a submission redo_submission action', :submissions

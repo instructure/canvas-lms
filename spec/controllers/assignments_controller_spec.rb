@@ -19,6 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../lti2_spec_helper')
 
 describe AssignmentsController do

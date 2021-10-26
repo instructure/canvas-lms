@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 describe PseudonymSession do
   before(:each) do
     fake_controller_cls = Class.new do

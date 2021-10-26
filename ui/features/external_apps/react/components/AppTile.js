@@ -19,16 +19,10 @@
 import I18n from 'i18n!external_tools'
 import $ from 'jquery'
 import React from 'react'
-import PropTypes from 'prop-types'
 import page from 'page'
 
 export default class extends React.Component {
   static displayName = 'AppTile'
-
-  static propTypes = {
-    app: PropTypes.object,
-    baseUrl: PropTypes.string.isRequired
-  }
 
   state = {
     isHidingDetails: true
@@ -59,7 +53,7 @@ export default class extends React.Component {
 
   handleClick = e => {
     e.preventDefault()
-    page(`${this.props.baseUrl}/app/${this.props.app.short_name}`)
+    page(`${this.props.pathname}/app/${this.props.app.short_name}`)
   }
 
   installedRibbon = () => {

@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'spec_helper'
 require_dependency "canvas/plugins/ticketing_system/base_plugin"
 
 module Canvas::Plugins::TicketingSystem
@@ -37,7 +38,7 @@ module Canvas::Plugins::TicketingSystem
   class FakeTicketing
     attr_reader :callback
 
-    def register_plugin(_id, _settings, &callback)
+    def register_plugin(id, settings, &callback)
       @callback = callback
     end
   end

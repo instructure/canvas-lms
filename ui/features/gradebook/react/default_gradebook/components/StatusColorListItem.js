@@ -22,7 +22,7 @@ import I18n from 'i18n!gradebook'
 import {Button} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
 import {Text} from '@instructure/ui-text'
-import {IconEditSolid} from '@instructure/ui-icons'
+import {IconMoreSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Grid} from '@instructure/ui-grid'
 import ColorPicker from '@canvas/color-picker'
@@ -101,7 +101,7 @@ class StatusColorListItem extends React.Component {
                       <ScreenReaderContent>
                         {I18n.t('%{status} Color Picker', {status})}
                       </ScreenReaderContent>
-                      <IconEditSolid />
+                      <IconMoreSolid />
                     </Text>
                   </Button>
                 </Popover.Trigger>

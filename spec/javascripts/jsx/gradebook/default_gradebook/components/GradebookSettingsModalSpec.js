@@ -96,20 +96,20 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       courseSettings: new CourseSettings(gradebook, {allowFinalGradeOverride: false}),
       gradebookIsEditable: true,
       gradedLateSubmissionsExist: true,
-      loadCurrentViewOptions: () => ({
-        columnSortSettings: {criterion: 'points', direction: 'ascending'},
-        showNotes: true,
-        showUnpublishedAssignments: true,
-        statusColors: {...defaultColors},
-        viewUngradedAsZero: true
-      }),
       locale: 'en',
       onClose: sinon.spy(),
       onCourseSettingsUpdated: sinon.spy(),
       onEntered: sinon.spy(),
       onLatePolicyUpdate() {},
       onViewOptionsUpdated: sinon.stub().resolves(),
-      postPolicies: new PostPolicies(gradebook)
+      postPolicies: new PostPolicies(gradebook),
+      viewOptions: {
+        columnSortSettings: {criterion: 'points', direction: 'ascending'},
+        showNotes: true,
+        showUnpublishedAssignments: true,
+        statusColors: {...defaultColors},
+        viewUngradedAsZero: true
+      }
     }
 
     fetchLatePolicyPromise = {}
@@ -368,13 +368,13 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
   })
 
   QUnit.module('"View Options" tab', () => {
-    test('is present when the loadCurrentViewOptions prop is present', async () => {
+    test('is present when the viewOptions prop is present', async () => {
       await mountOpenAndLoad()
       ok(getViewOptionsTab())
     })
 
-    test('is not present when the loadCurrentViewOptions prop is not present', async () => {
-      delete props.loadCurrentViewOptions
+    test('is not present when the viewOptions prop is not present', async () => {
+      delete props.viewOptions
       await mountOpenAndLoad()
       notOk(getViewOptionsTab())
     })
@@ -887,13 +887,18 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
         strictEqual(props.onViewOptionsUpdated.callCount, 1)
       })
 
-      test('includes the updated settings when calling onViewOptionsUpdated', () => {
+      test('includes the updated settings when calling onCourseSettingsUpdated', () => {
         const [viewOptions] = props.onViewOptionsUpdated.lastCall.args
-        strictEqual(viewOptions.showNotes, false)
+        deepEqual(viewOptions, {...props.viewOptions, showNotes: false})
       })
 
       test('closes the modal', () => {
         notOk(getModalElement())
+      })
+
+      test('retains the view options in their saved state when the modal opens again', async () => {
+        await mountOpenLoadAndSelectTab('View Options')
+        strictEqual(getShowNotesCheckbox().checked, false)
       })
     })
 
@@ -933,13 +938,14 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       })
 
       test('restores the View Options settings to a pristine state', async () => {
+        props.viewOptions.showNotes = false
         await mountOpenLoadAndSelectTab('View Options')
         getShowNotesCheckbox().click()
         getCancelButton().click()
         await waitForModalClosed()
 
         await mountOpenLoadAndSelectTab('View Options')
-        strictEqual(getShowNotesCheckbox().checked, true)
+        strictEqual(getShowNotesCheckbox().checked, false)
       })
     })
   })

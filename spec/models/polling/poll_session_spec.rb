@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+
 describe Polling::PollSession do
   before :once do
     course_factory
@@ -84,7 +86,7 @@ describe Polling::PollSession do
       student1_sessions = []
       student2_sessions = []
 
-      3.times do
+      3.times do |n|
         student1_sessions << Polling::PollSession.create(poll: @poll1, course: @course1)
       end
 
@@ -92,7 +94,7 @@ describe Polling::PollSession do
       expect(Polling::PollSession.available_for(@student2).size).to eq 0
       expect(Polling::PollSession.available_for(@student1)).to match_array student1_sessions
 
-      2.times do
+      2.times do |n|
         student2_sessions << Polling::PollSession.create(poll: @poll2, course: @course2)
       end
 

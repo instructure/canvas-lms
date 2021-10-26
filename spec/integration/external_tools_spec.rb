@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
 require 'nokogiri'
 
 describe "External Tools" do
@@ -307,8 +309,8 @@ describe "External Tools" do
         expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a")).to be_present
 
         # trigger the global_nav cache register clearing in a callback
-        Account.default.context_external_tools.new(:name => "b", :domain => "google.com",
-                                                   :consumer_key => '12345', :shared_secret => 'secret')
+        other_tool = Account.default.context_external_tools.new(:name => "b", :domain => "google.com",
+                                                                :consumer_key => '12345', :shared_secret => 'secret')
         new_secret_settings = @admin_tool.settings
         new_secret_settings[:global_navigation][:text] = "new text"
         # update the url secretly in the db but don't update the cache_key (updated_at)

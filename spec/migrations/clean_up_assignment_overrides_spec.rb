@@ -18,13 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20180611205754_clean_up_assignment_overrides.rb'
 
 describe 'CleanUpAssignmentOverrides' do
   it "cleans up invalid overrides and orphaned override students" do
     CleanUpAssignmentOverrides.down
 
-    course_with_student.user
+    student1 = course_with_student.user
     assignment_model context: @course
     override1 = @assignment.assignment_overrides.create! set_type: 'ADHOC'
     override2 = @assignment.assignment_overrides.create! set_type: 'ADHOC'

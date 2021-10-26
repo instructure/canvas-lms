@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
 require 'lti_1_3_tool_configuration_spec_helper'
 
 shared_context 'advantage services context' do

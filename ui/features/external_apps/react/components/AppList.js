@@ -18,7 +18,6 @@
 
 import I18n from 'i18n!external_tools'
 import React from 'react'
-import PropTypes from 'prop-types'
 import store from '../lib/AppCenterStore'
 import extStore from '../lib/ExternalAppsStore'
 import AppTile from './AppTile'
@@ -28,10 +27,6 @@ import ManageAppListButton from './ManageAppListButton'
 import splitAssetString from '@canvas/util/splitAssetString'
 
 export default class AppList extends React.Component {
-  static propTypes = {
-    baseUrl: PropTypes.string.isRequired
-  }
-
   state = store.getState()
 
   onChange = () => {
@@ -72,7 +67,7 @@ export default class AppList extends React.Component {
     } else {
       return store
         .filteredApps()
-        .map(app => <AppTile key={app.app_id} app={app} baseUrl={this.props.baseUrl} />)
+        .map(app => <AppTile key={app.app_id} app={app} pathname={this.props.pathname} />)
     }
   }
 
@@ -84,7 +79,7 @@ export default class AppList extends React.Component {
         <Header>
           {this.manageAppListButton()}
           <a
-            href={`${this.props.baseUrl}/configurations`}
+            href={`${this.props.pathname}/configurations`}
             className="btn view_tools_link lm pull-right"
           >
             {I18n.t('View App Configurations')}

@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
 describe PlannerHelper do
   context "on a submission" do
     before(:once) do
@@ -59,7 +61,7 @@ describe PlannerHelper do
       end
 
       it "completes an autograded quiz override" do
-        graded_submission(@quiz2, @student)
+        qsub = graded_submission(@quiz2, @student)
         @quiz2_po.reload
         expect(@quiz2_po.marked_complete).to be_truthy
       end

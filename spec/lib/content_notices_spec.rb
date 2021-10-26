@@ -18,29 +18,26 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-describe ContentNotices do
-  let(:thing_class) do
-    Class.new do
-      def asset_string
-        "thing_1"
-      end
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
-      include ContentNotices
-      define_content_notice :foo, text: 'foo!'
-      define_content_notice :bar, text: 'baz', should_show: ->(_thing, user) { user == 'bob' }
-    end
+describe ContentNotices do
+  class Thing
+    def asset_string; "thing_1"; end
+    include ContentNotices
+    define_content_notice :foo, text: 'foo!'
+    define_content_notice :bar, text: 'baz', should_show: ->(thing, user) { user == 'bob' }
   end
 
   describe "content_notices" do
     it "returns [] if no notices are active" do
       enable_cache do
-        expect(thing_class.new.content_notices('user')).to eql([])
+        expect(Thing.new.content_notices('user')).to eql([])
       end
     end
 
     it "adds and remove a content notice" do
       enable_cache do
-        thing = thing_class.new
+        thing = Thing.new
         thing.add_content_notice :foo
         notices = thing.content_notices('user')
         expect(notices.size).to eql(1)
@@ -53,7 +50,7 @@ describe ContentNotices do
 
     it "checks the show condition of a notice" do
       enable_cache do
-        thing = thing_class.new
+        thing = Thing.new
         thing.add_content_notice :foo
         thing.add_content_notice :bar
         expect(thing.content_notices('alice').map(&:tag)).to eql([:foo])
@@ -63,7 +60,7 @@ describe ContentNotices do
 
     it "creates expiring notices" do
       enable_cache do
-        thing = thing_class.new
+        thing = Thing.new
         thing.add_content_notice :foo, 1.hour
         expect(thing.content_notices('user').map(&:tag)).to eql([:foo])
         Timecop.freeze(2.hours.from_now) do

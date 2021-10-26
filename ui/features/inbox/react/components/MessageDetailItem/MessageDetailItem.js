@@ -19,13 +19,9 @@
 import {Avatar} from '@instructure/ui-avatar'
 import {Flex} from '@instructure/ui-flex'
 import {MessageDetailActions} from '../MessageDetailActions/MessageDetailActions'
-import {MessageDetailMediaAttachment} from '../MessageDetailMediaAttachment/MessageDetailMediaAttachment'
 import {MessageDetailParticipants} from '../MessageDetailParticipants/MessageDetailParticipants'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {IconPaperclipLine} from '@instructure/ui-icons'
-import {Link} from '@instructure/ui-link'
-import {List} from '@instructure/ui-list'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import I18n from 'i18n!conversations_2'
@@ -64,26 +60,10 @@ export const MessageDetailItem = ({...props}) => {
           <View as="div" margin="none none x-small">
             <Text weight="light">{createdAt}</Text>
           </View>
-          <MessageDetailActions onReply={props.onReply} onReplyAll={props.onReplyAll} />
+          <MessageDetailActions handleOptionSelect={props.handleOptionSelect} />
         </Flex.Item>
       </Flex>
       <Text>{props.conversationMessage.body}</Text>
-      {props.conversationMessage.attachmentsConnection?.nodes?.length > 0 && (
-        <List isUnstyled margin="medium auto small">
-          {props.conversationMessage.attachmentsConnection.nodes.map(attachment => {
-            return (
-              <List.Item as="div" key={attachment.id}>
-                <Link href={attachment.url} renderIcon={<IconPaperclipLine size="x-small" />}>
-                  {attachment.displayName}
-                </Link>
-              </List.Item>
-            )
-          })}
-        </List>
-      )}
-      {props.conversationMessage.mediaComment && (
-        <MessageDetailMediaAttachment mediaComment={props.conversationMessage.mediaComment} />
-      )}
     </>
   )
 }
@@ -92,8 +72,7 @@ MessageDetailItem.propTypes = {
   // TODO: not sure yet the exact shape of the data that will be fetched, so these will likely change
   conversationMessage: PropTypes.object,
   contextName: PropTypes.string,
-  onReply: PropTypes.func,
-  onReplyAll: PropTypes.func
+  handleOptionSelect: PropTypes.func
 }
 
 MessageDetailItem.defaultProps = {

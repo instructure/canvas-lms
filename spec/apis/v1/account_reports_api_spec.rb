@@ -48,10 +48,10 @@ describe 'Account Reports API', type: :request do
         expect(report.key?('parameters')).to be_truthy
         expect(report.key?('report')).to be_truthy
 
-        report[:parameters]&.each_value do |parameter|
+        report[:parameters].each do |key, parameter|
           expect(parameter.key?('required')).to be_truthy
           expect(parameter.key?('description')).to be_truthy
-        end
+        end unless report[:parameters].nil?
       end
     end
   end

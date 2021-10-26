@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
 
 describe ContentTag do
@@ -523,7 +524,7 @@ describe ContentTag do
     yesterday = 1.day.ago
     ContextModule.where(:id => mod).update_all(:updated_at => yesterday)
     ContextModule.transaction do
-      mod.add_item :type => 'context_module_sub_header', :title => 'blah'
+      tag = mod.add_item :type => 'context_module_sub_header', :title => 'blah'
       expect(mod.reload.updated_at.to_i).to eq yesterday.to_i
     end
     expect(mod.reload.updated_at).to be > 5.seconds.ago

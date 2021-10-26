@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+
 describe Group do
   before :once do
     course_model
@@ -60,14 +62,14 @@ describe Group do
     expect(@group.time_zone.to_s).to match(/Mountain Time/)
   end
 
-  it "identifies a group as active correctly" do
+  it "correctlies identify group as active" do
     course_with_student(:active_all => true)
     group_model(:group_category => @communities, :is_public => true)
     group.add_user(@student)
     expect(@group.inactive?).to eq false
   end
 
-  it "identifies a destroyed course as not active" do
+  it "correctlies identify destroyed course as not active" do
     course_with_student(:active_all => true)
     group_model(:group_category => @communities, :is_public => true)
     group.add_user(@student)
@@ -76,7 +78,7 @@ describe Group do
     expect(@group.inactive?).to eq true
   end
 
-  it "identifies a concluded course as not active" do
+  it "correctlies identify concluded course as not active" do
     course_with_student(:active_all => true)
     group_model(:group_category => @communities, :is_public => true)
     group.add_user(@student)
@@ -85,7 +87,7 @@ describe Group do
     expect(@group.inactive?).to eq true
   end
 
-  it "identifies an account group as not active correctly" do
+  it "correctlies identify account group as not active" do
     @account = account_model
     group_model(:group_category => @communities, :is_public => true, :context => @account)
     group.add_user(@student)
@@ -93,7 +95,7 @@ describe Group do
     expect(@group.inactive?).to eq true
   end
 
-  it "identifies an account group as active" do
+  it "correctlies identify account group as active" do
     @account = account_model
     group_model(:group_category => @communities, :is_public => true, :context => @account)
     group.add_user(@student)
@@ -150,7 +152,7 @@ describe Group do
       context = course_model
       group_category = GroupCategory.student_organized_for(context)
       group1 = Group.create!(:name => "group1", :group_category => group_category, :context => context)
-      Group.create!(:name => "group2", :group_category => group_category, :context => context)
+      group2 = Group.create!(:name => "group2", :group_category => group_category, :context => context)
       expect(group1.peer_groups).to be_empty
     end
   end
@@ -352,7 +354,7 @@ describe Group do
 
   describe "root account" do
     it "gets the root account assigned" do
-      course_with_teacher
+      e = course_with_teacher
       group = @course.groups.create!
       expect(group.account).to eq Account.default
       expect(group.root_account).to eq Account.default
@@ -433,7 +435,7 @@ describe Group do
       expect(group3.allow_self_signup?(@student)).to be_falsey
     end
 
-    it "handles restricted course sections correctly" do
+    it "correctlies handle restricted course sections" do
       course_with_student
       @other_section = @course.course_sections.create!(:name => "Other Section")
       @other_student = @course.enroll_student(user_model, { :section => @other_section }).user

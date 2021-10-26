@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
 require_relative '../graphql_spec_helper'
 
 RSpec.describe Mutations::UpdateIsolatedViewDeeplyNestedAlert do
