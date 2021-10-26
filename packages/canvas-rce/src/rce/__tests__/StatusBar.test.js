@@ -95,6 +95,7 @@ describe('RCE StatusBar', () => {
     it('defaults to pretty html editor', async () => {
       const onChangeView = jest.fn()
       const {container, getByText} = renderStatusBar({
+        use_rce_pretty_html_editor: true,
         onChangeView
       })
 
@@ -111,6 +112,7 @@ describe('RCE StatusBar', () => {
     it('prefers raw html editor if specified', async () => {
       const onChangeView = jest.fn()
       const {container, getByText} = renderStatusBar({
+        use_rce_pretty_html_editor: true,
         preferredHtmlEditor: RAW_HTML_EDITOR_VIEW,
         onChangeView
       })
@@ -177,7 +179,7 @@ describe('RCE StatusBar', () => {
       const {container, getByTestId} = renderStatusBar({editorView: RAW_HTML_EDITOR_VIEW})
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('[tabindex]')
-      expect(buttons.length).toEqual(3)
+      expect(buttons.length).toEqual(2)
 
       buttons[0].focus()
       expect(document.activeElement).toBe(buttons[0])
@@ -193,7 +195,7 @@ describe('RCE StatusBar', () => {
       const {container, getByTestId} = renderStatusBar({editorView: RAW_HTML_EDITOR_VIEW})
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('[tabindex]')
-      expect(buttons.length).toEqual(3)
+      expect(buttons.length).toEqual(2)
 
       buttons[buttons.length - 1].focus()
       expect(document.activeElement).toBe(buttons[buttons.length - 1])
@@ -211,7 +213,8 @@ describe('RCE StatusBar', () => {
   describe('in pretty HTML mode', () => {
     it('cycles focus with right arrow keys', () => {
       const {container, getByTestId} = renderStatusBar({
-        editorView: PRETTY_HTML_EDITOR_VIEW
+        editorView: PRETTY_HTML_EDITOR_VIEW,
+        use_rce_pretty_html_editor: true
       })
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('[tabindex]')
@@ -229,7 +232,8 @@ describe('RCE StatusBar', () => {
 
     it('cycles focus with left arrow keys', async () => {
       const {container, getByTestId} = renderStatusBar({
-        editorView: PRETTY_HTML_EDITOR_VIEW
+        editorView: PRETTY_HTML_EDITOR_VIEW,
+        use_rce_pretty_html_editor: true
       })
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('[tabindex]')

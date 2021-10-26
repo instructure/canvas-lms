@@ -481,7 +481,7 @@ describe "Outcome Groups API", type: :request do
         @account.enable_feature!(:account_level_mastery_scales)
       end
 
-      it 'serializes mastery scale data for each link correctly' do
+      it 'correctlies serialize mastery scale data for each link' do
         json = api_call(
           :get,
           "/api/v1/accounts/#{@account.id}/outcome_group_links",
@@ -990,7 +990,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "paginates the links" do
-      5.times { |i| create_outcome(title: i) }
+      links = 5.times.map { |i| create_outcome(:title => "#{i}".object_id) }
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes?per_page=2",
                       :controller => 'outcome_groups_api',
@@ -1732,7 +1732,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "paginates the subgroups" do
-      5.times { create_subgroup }
+      subgroups = 5.times.map { |i| create_subgroup }
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups?per_page=2",
                       :controller => 'outcome_groups_api',

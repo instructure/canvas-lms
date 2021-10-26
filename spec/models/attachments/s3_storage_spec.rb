@@ -52,9 +52,10 @@ describe Attachments::S3Storage do
     end
 
     it "follows the v4 signing example from AWS" do
+      client = double("client", client: config)
       expect(attachment).to receive(:bucket).and_return(bucket)
       store = Attachments::S3Storage.new(attachment)
-      _sig_key, sig_val = store.sign_policy(string_to_sign, datetime)
+      sig_key, sig_val = store.sign_policy(string_to_sign, datetime)
       expect(sig_val).to eq signature
     end
   end

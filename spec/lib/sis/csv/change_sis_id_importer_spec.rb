@@ -158,7 +158,7 @@ describe SIS::CSV::ChangeSisIdImporter do
       u1.pseudonym.integration_id = 'int1'
       u1.pseudonym.save!
 
-      process_csv_data(
+      importer = process_csv_data(
         'old_id,new_id,old_integration_id,new_integration_id,type',
         ',,int1,int2,user',
         'GC1,GC2,,,group_category'
@@ -167,7 +167,7 @@ describe SIS::CSV::ChangeSisIdImporter do
       expect(gc.sis_source_id).to eq('GC2')
     end
 
-    it 'cleanly handles error if integration_id is given' do
+    it 'cleanlies handle error if integration_id is given' do
       u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
 
       importer = process_csv_data(

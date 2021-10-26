@@ -67,7 +67,7 @@ describe "courses" do
     before(:each) do
       course_with_teacher(:active_all => true, :name => 'discussion course')
       @student = User.create!(:name => "First Student")
-      @course.enroll_student(@student)
+      en = @course.enroll_student(@student)
       user_session(@student)
     end
 

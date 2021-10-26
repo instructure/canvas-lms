@@ -126,7 +126,7 @@ describe 'Account Notification API', type: :request do
     end
 
     it "closes notifications" do
-      api_call(:delete, @path, @api_params)
+      json = api_call(:delete, @path, @api_params)
       @admin.reload
       expect(@admin.get_preference(:closed_notifications)).to eq [@a.id]
 

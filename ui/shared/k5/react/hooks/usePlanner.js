@@ -48,6 +48,7 @@ export default function usePlanner({
   plannerEnabled,
   isPlannerActive,
   focusFallback,
+  callback = () => {},
   singleCourse = false,
   observedUserId,
   isObserver = false
@@ -69,6 +70,7 @@ export default function usePlanner({
         observedUserId
       })
         .then(setPlannerInitialized)
+        .then(callback)
         .catch(showFlashError(I18n.t('Failed to load the schedule tab')))
     }
     // The rest of the dependencies don't change

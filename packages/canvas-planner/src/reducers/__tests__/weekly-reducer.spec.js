@@ -108,6 +108,6 @@ it('clears week data', () => {
       [thisWeekStart.format()]: ['first week data']
     }
   })
-  const newState = weeklyReducer(initState, {type: 'CLEAR_WEEKLY_ITEMS'})
+  const newState = weeklyReducer(initState, Actions.clearWeeklyItems())
   expect(newState.weeks).toEqual({})
 })

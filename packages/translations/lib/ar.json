@@ -92,9 +92,6 @@
     "apply_781a2546": {
         "message": "تطبيق"
     },
-    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
-        "message": "تطبيق التغييرات على كافة مثيلات هذا الزر والأيقونة في المساق"
-    },
     "apps_54d24a47": {
         "message": "التطبيق"
     },
@@ -151,6 +148,9 @@
     },
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "المحتوى المحفوظ تلقائياً موجود. هل ترغب في تحميل المحتوى المحفوظ تلقائياً بدلاً من ذلك؟"
+    },
+    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
+        "message": "افتح تلقائيًا معاينة داخلية. (لا تظهر المعاينة إلا بعد الحفظ)"
     },
     "available_folders_694d0436": {
         "message": "المجلدات المتاحة"
@@ -245,9 +245,6 @@
     "close_opportunity_center_popup_9907d981": {
         "message": "إغلاق النافذة المنبثقة لمركز الفرص"
     },
-    "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
-        "message": "يجب أن يقل حجم ملف التسمية التوضيحية المغلقة عن { maxKb } كيلوبايت"
-    },
     "closed_captions_subtitles_e6aaa016": {
         "message": "تسميات توضيحية مغلقة/ترجمات مباشرة"
     },
@@ -329,9 +326,6 @@
     "creative_commons_license_725584ae": {
         "message": "ترخيص المشاع الإبداعي:"
     },
-    "current_image_f16c249c": {
-        "message": "الصورة الحالية"
-    },
     "custom_6979cd81": {
         "message": "مخصص"
     },
@@ -385,6 +379,9 @@
     },
     "directionality_26ae9e08": {
         "message": "الاتجاهية"
+    },
+    "disable_in_line_preview_2a675175": {
+        "message": "تعطيل المعاينة الداخلية."
     },
     "discussion_6719c51d": {
         "message": "النقاش"
@@ -833,9 +830,6 @@
     "modules_c4325335": {
         "message": "الوحدات النمطية"
     },
-    "multi_color_image_63d7372f": {
-        "message": "صورة متعددة الألوان"
-    },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "يجب أن تكون { width } x { height } بكسل على الأقل."
     },
@@ -844,6 +838,9 @@
     },
     "my_grades_98834476": {
         "message": "درجاتي"
+    },
+    "my_images_427f9b0c": {
+        "message": "صوري"
     },
     "name_1aed4a1b": {
         "message": "الاسم"
@@ -1106,14 +1103,11 @@
     "show_video_options_6ed3721a": {
         "message": "إظهار خيارات الفيديو"
     },
-    "single_color_image_4e5d4dbc": {
-        "message": "صورة بلون واحد"
-    },
     "size_b30e1077": {
         "message": "الحجم"
     },
-    "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
-        "message": "حجم ملف التسمية التوضيحية يتجاوز الحد الأقصى المسموح به من { max } كيلوبايت."
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "حجم الملف { file } يفوق الحد الأقصى المسموح به من { max } ميغابايت."
     },
     "small_b070434a": {
         "message": "صغير"

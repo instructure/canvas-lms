@@ -38,8 +38,7 @@ class Loaders::AssociationLoader < GraphQL::Batch::Loader
   #
   # +associations+ are the associations to preload (this can anything that
   # +ActiveRecord::Associations::Preloader+ accepts)
-  def initialize(_model, association)
-    super()
+  def initialize(model, association)
     @association = association
   end
 

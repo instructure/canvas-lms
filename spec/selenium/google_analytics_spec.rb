@@ -64,7 +64,7 @@ describe "google analytics" do
       end
     end
 
-    def start_with
+    def start_with(&block)
       yield if block_given?
       get '/'
       wait_for_ajaximations

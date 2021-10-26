@@ -253,7 +253,7 @@ describe "Standard Common Cartridge importing" do
   end
 
   context "selective import" do
-    it "selectively imports files" do
+    it "selectivelies import files" do
       @course = course_factory
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {

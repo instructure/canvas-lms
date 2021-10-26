@@ -110,7 +110,7 @@ describe "submissions" do
     it "allows you to submit a file", priority: "1", test_id: 237022 do
       @assignment.submission_types = 'online_upload'
       @assignment.save!
-      _filename, fullpath, _data = get_file("testfile1.txt")
+      filename, fullpath, data = get_file("testfile1.txt")
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
@@ -178,7 +178,7 @@ describe "submissions" do
       skip('flaky, will be fixed in ADMIN-3015')
       @assignment.submission_types = 'online_upload'
       @assignment.save!
-      _filename, fullpath, _data = get_file("empty_file.txt")
+      filename, fullpath, data = get_file("empty_file.txt")
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
@@ -204,7 +204,7 @@ describe "submissions" do
       f('.submit_assignment_link').click
 
       # Select an assignment that has a wrong file extension
-      _filename, fullpath, _data = get_file("testfile1.txt")
+      filename, fullpath, data = get_file("testfile1.txt")
       f('.submission_attachment input').send_keys(fullpath)
 
       # Check that the error is being reported
@@ -280,32 +280,6 @@ describe "submissions" do
       expect(submission.reload.body).to eq "<p>#{body_text}</p>"
     end
 
-    it "does not allow submissions that contain placeholders for unfinished file uploads" do
-      @assignment.update(:submission_types => "online_text_entry")
-      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-      f('.submit_assignment_link').click
-      body_html = '<span style="width: 18rem; height: 1rem; vertical-align: middle;" aria-label="Loading" data-placeholder-for="filename">  </span>'
-      switch_editor_views # switch to html editor
-      switch_to_raw_html_editor
-      tinymce = f("#submission_body")
-      tinymce.click
-      tinymce.send_keys(body_html)
-      assignment_form = f('#submit_online_text_entry_form')
-      wait_for_tiny(assignment_form)
-      submission = @assignment.submissions.find_by!(user_id: @student)
-      # it should not actually submit and pop up an error message
-      expect { submit_form(assignment_form) }.not_to change { submission.reload.updated_at }
-      expect(ff('.error_box')[1]).to include_text('File has not finished uploading')
-
-      # now make sure it works with finished upload
-      tinymce.clear
-      body_html = '<a title="filename" href="fileref" target="_blank" data-canvas-previewable="false">filename</a>&nbsp;'
-      tinymce.click
-      tinymce.send_keys(body_html)
-      expect { submit_form(assignment_form) }.to change { submission.reload.updated_at }
-      expect(submission.reload.body).to eq "<p>#{body_html}</p>"
-    end
-
     it "does not allow a submission with only comments", priority: "1", test_id: 237027 do
       skip_if_safari(:alert)
       skip('flash alert is fragile, will be addressed in ADMIN-3015')
@@ -332,7 +306,7 @@ describe "submissions" do
       @student1 = @user
       @assignment.submission_types = 'online_upload'
       @assignment.save!
-      _filename, fullpath, _data = get_file("testfile1.txt")
+      filename, fullpath, data = get_file("testfile1.txt")
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
@@ -475,7 +449,7 @@ describe "submissions" do
 
     describe "using lti tool for submission" do
       def create_submission_tool
-        @course.context_external_tools.create!(
+        tool = @course.context_external_tools.create!(
           name: 'submission tool',
           url: 'https://example.com/lti',
           consumer_key: 'key',

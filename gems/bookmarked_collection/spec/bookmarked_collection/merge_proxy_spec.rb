@@ -21,23 +21,21 @@
 require 'spec_helper'
 
 describe "BookmarkedCollection::MergeProxy" do
-  let(:my_bookmarker) do
-    Class.new do
-      def self.bookmark_for(course)
-        course.id
-      end
+  class MyBookmarker
+    def self.bookmark_for(course)
+      course.id
+    end
 
-      def self.validate(_bookmark)
-        true
-      end
+    def self.validate(bookmark)
+      true
+    end
 
-      def self.restrict_scope(scope, pager)
-        if (bookmark = pager.current_bookmark)
-          comparison = (pager.include_bookmark ? 'id >= ?' : 'id > ?')
-          scope = scope.where(comparison, bookmark)
-        end
-        scope.order("id ASC")
+    def self.restrict_scope(scope, pager)
+      if (bookmark = pager.current_bookmark)
+        comparison = (pager.include_bookmark ? 'id >= ?' : 'id > ?')
+        scope = scope.where(comparison, bookmark)
       end
+      scope.order("id ASC")
     end
   end
 
@@ -50,7 +48,7 @@ describe "BookmarkedCollection::MergeProxy" do
       @scope = @example_class.order(:id)
 
       3.times { @scope.create! }
-      @collection = BookmarkedCollection.wrap(my_bookmarker, @scope)
+      @collection = BookmarkedCollection.wrap(MyBookmarker, @scope)
       @proxy = BookmarkedCollection::MergeProxy.new([['label', @collection]])
     end
 
@@ -85,7 +83,7 @@ describe "BookmarkedCollection::MergeProxy" do
     end
 
     it "sets next_bookmark if the page wasn't the last" do
-      expect(@proxy.paginate(:per_page => 1).next_bookmark).to eq(['label', my_bookmarker.bookmark_for(@scope.first)])
+      expect(@proxy.paginate(:per_page => 1).next_bookmark).to eq(['label', MyBookmarker.bookmark_for(@scope.first)])
     end
 
     it "does not set next_bookmark if the page was the last" do
@@ -108,8 +106,8 @@ describe "BookmarkedCollection::MergeProxy" do
           @deleted_scope.create!
         ]
 
-        @created_collection = BookmarkedCollection.wrap(my_bookmarker, @created_scope)
-        @deleted_collection = BookmarkedCollection.wrap(my_bookmarker, @deleted_scope)
+        @created_collection = BookmarkedCollection.wrap(MyBookmarker, @created_scope)
+        @deleted_collection = BookmarkedCollection.wrap(MyBookmarker, @deleted_scope)
         @proxy = BookmarkedCollection::MergeProxy.new([
                                                         ['created', @created_collection],
                                                         ['deleted', @deleted_collection]
@@ -185,8 +183,8 @@ describe "BookmarkedCollection::MergeProxy" do
         @scope1 = @example_class.select("id, '1' as scope").where("id<?", @courses[4].id).order(:id)
         @scope2 = @example_class.select("id, '2' as scope").where("id>?", @courses[1].id).order(:id)
 
-        @collection1 = BookmarkedCollection.wrap(my_bookmarker, @scope1)
-        @collection2 = BookmarkedCollection.wrap(my_bookmarker, @scope2)
+        @collection1 = BookmarkedCollection.wrap(MyBookmarker, @scope1)
+        @collection2 = BookmarkedCollection.wrap(MyBookmarker, @scope2)
         collections = [['1', @collection1], ['2', @collection2]]
 
         @yield = double(:tally => nil)
