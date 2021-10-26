@@ -25,6 +25,10 @@ module PacePlansPageObject
     "button:contains('Cancel')"
   end
 
+  def duration_field_selector
+    "[data-testid='duration-number-input']"
+  end
+
   def module_items_selector
     "[data-testid='pp-title-cell']"
   end
@@ -45,6 +49,10 @@ module PacePlansPageObject
 
   def cancel_button
     fj(cancel_button_selector)
+  end
+
+  def duration_field
+    f(duration_field_selector)
   end
 
   def module_items
@@ -88,11 +96,7 @@ module PacePlansPageObject
     element_exists?(publish_status_selector)
   end
 
-  def is_cancel_available?
-    element_value_for_attr(cancel_button, 'cursor') == 'pointer'
-  end
-
-  def is_publish_available?
-    element_value_for_attr(publish_button, 'cursor') == 'pointer'
+  def update_module_item_duration(duration)
+    duration_field.send_keys([:control, 'a'], :backspace, duration, :tab)
   end
 end

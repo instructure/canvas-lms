@@ -103,8 +103,25 @@ describe 'pace plan page' do
     it 'has Publish and Cancel buttons initially disabled' do
       visit_pace_plans_page
 
-      expect(is_cancel_available?).to be_falsey
-      expect(is_publish_available?).to be_falsey
+      expect(publish_button).to be_disabled
+      expect(cancel_button).to be_disabled
+    end
+
+    it 'updates duration to make Publish and Cancel buttons enabled' do
+      visit_pace_plans_page
+
+      update_module_item_duration(2)
+
+      expect(publish_button).to be_enabled
+      expect(cancel_button).to be_enabled
+    end
+
+    it 'does not allow duration to be set to negative number' do
+      visit_pace_plans_page
+
+      update_module_item_duration('-1')
+
+      expect(duration_field.text).not_to eq('-1')
     end
   end
 end
