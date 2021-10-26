@@ -173,24 +173,17 @@ def maybeSlackSendRetrigger() {
   }
 }
 
-def useRspecQ(percentage) {
+def useRspecQ() {
   if (configuration.isRspecqEnabled()) {
     env.RSPECQ_ENABLED = '1'
     return true
   }
-
-  java.security.SecureRandom random = new java.security.SecureRandom()
-  if (!(env.RSPECQ_ENABLED == '1' && random.nextInt(100) < percentage)) {
-    env.RSPECQ_ENABLED = '0'
-    return false
-  }
-
-  return true
+  return env.RSPECQ_ENABLED == '1'
 }
 
 def getRspecProcesses() {
   // Determine if this build is using RSpecQ and set RSPEC_PROCESSES
-  if (useRspecQ(50)) {
+  if (useRspecQ()) {
     configuration.getInteger('rspecq-processes')
   } else {
     configuration.getInteger('rspec-processes')
