@@ -69,7 +69,7 @@ def createDistribution(nestedStages) {
         .envVars(rspecqEnvVars)
         .hooks([onNodeAcquired: setupNodeHook])
         .nodeRequirements(rspecNodeRequirements)
-        .timeout(10)
+        .timeout(15)
         .queue(nestedStages, this.&runReporter)
 
     rspecqNodeTotal.times { index ->
@@ -77,7 +77,7 @@ def createDistribution(nestedStages) {
           .envVars(rspecqEnvVars + ["CI_NODE_INDEX=$index"])
           .hooks([onNodeAcquired: setupNodeHook, onNodeReleasing: { tearDownNode('spec') }])
           .nodeRequirements(rspecNodeRequirements)
-          .timeout(10)
+          .timeout(15)
           .queue(nestedStages, this.&runRspecqSuite)
     }
   } else {
