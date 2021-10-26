@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../messages/messages_helper')
+require_relative '../messages/messages_helper'
 
 describe Message do
   describe "#get_template" do

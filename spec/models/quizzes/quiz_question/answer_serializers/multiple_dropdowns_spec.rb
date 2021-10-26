@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_specs.rb')
-require File.expand_path(File.dirname(__FILE__) + '/support/id_answer_serializers_specs.rb')
+require_relative 'support/answer_serializers_specs'
+require_relative 'support/id_answer_serializers_specs'
 
 describe Quizzes::QuizQuestion::AnswerSerializers::MultipleDropdowns do
   include_examples 'Answer Serializers'

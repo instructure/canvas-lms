@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../locked_spec')
-require File.expand_path(File.dirname(__FILE__) + '/../../../file_upload_helper')
+require_relative '../../api_spec_helper'
+require_relative '../../locked_spec'
+require_relative '../../../file_upload_helper'
 
 describe QuizzesNext::QuizzesApiController, type: :request do
   describe "GET /courses/:course_id/all_quizzes (index)" do

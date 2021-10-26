@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require_relative '../sharding_spec_helper'
 
 describe RoleOverride do
   it "retains the prior permission when it encounters the first explicit override" do

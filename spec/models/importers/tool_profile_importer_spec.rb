@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
-require File.expand_path(File.dirname(__FILE__) + '../../../lti2_course_spec_helper')
+require_relative '../../import_helper'
+require_relative '../../lti2_course_spec_helper'
 
 describe Importers::ToolProfileImporter do
   describe '#process_migration' do

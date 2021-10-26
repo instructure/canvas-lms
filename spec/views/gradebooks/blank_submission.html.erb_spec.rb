@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
+require_relative '../views_helper'
 
 describe "/gradebooks/blank_submission" do
   it "renders" do

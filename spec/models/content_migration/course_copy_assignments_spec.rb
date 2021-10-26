@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/course_copy_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper')
+require_relative 'course_copy_helper'
+require_relative '../../lti2_spec_helper'
 
 describe ContentMigration do
   context "course copy assignments" do

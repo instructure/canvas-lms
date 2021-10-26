@@ -19,7 +19,7 @@
 #
 
 require_relative '../../conditional_release_spec_helper'
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require_relative '../../sharding_spec_helper'
 
 describe ConditionalRelease::Service do
   before :once do

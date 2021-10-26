@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/basic/settings_specs')
+require_relative '../common'
+require_relative '../helpers/basic/settings_specs'
 
 describe "root account basic settings" do
   let(:account) { Account.default }

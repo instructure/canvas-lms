@@ -228,7 +228,7 @@ end
 RSpec::Rails::ViewExampleGroup::ExampleMethods.prepend(RenderWithHelpers)
 
 require_relative 'rspec_mock_extensions'
-require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
+require_relative 'ams_spec_helper'
 
 require 'i18n_tasks'
 require_relative 'factories'

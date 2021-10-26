@@ -135,7 +135,6 @@ describe DiscussionTopic::MaterializedView do
   end
 
   context "sharding" do
-    require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
     specs_require_sharding
 
     it "users local ids when accessed from the same shard" do

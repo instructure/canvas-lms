@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../lib/data_fixup/fix_planner_overrides_marked_complete_data')
+require_relative '../../../lib/data_fixup/fix_planner_overrides_marked_complete_data'
 
 describe DataFixup::FixPlannerOverridesMarkedCompleteData do
   subject do

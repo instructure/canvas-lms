@@ -19,7 +19,7 @@
 #
 
 require_relative '../spec_helper'
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require_relative '../sharding_spec_helper'
 
 describe SubmissionDraftAttachment do
   before :once do

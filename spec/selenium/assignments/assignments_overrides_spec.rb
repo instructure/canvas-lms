@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../common'
-require_relative '../helpers/assignment_overrides.rb'
+require_relative '../helpers/assignment_overrides'
 
 describe "assignment groups" do
   include AssignmentOverridesSeleniumHelper

@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../apis/api_spec_helper')
+require_relative '../sharding_spec_helper'
+require_relative '../apis/api_spec_helper'
 
 describe CommunicationChannelsController do
   before :once do

@@ -20,10 +20,10 @@
 require_relative '../common'
 require_relative 'pages/new_user_search_page'
 require_relative 'pages/new_course_search_page'
-require_relative 'pages/new_user_edit_modal_page.rb'
-require_relative 'pages/edit_existing_user_modal_page.rb'
-require_relative 'pages/masquerade_page.rb'
-require_relative '../conversations/conversations_new_message_modal_page.rb'
+require_relative 'pages/new_user_edit_modal_page'
+require_relative 'pages/edit_existing_user_modal_page'
+require_relative 'pages/masquerade_page'
+require_relative '../conversations/conversations_new_message_modal_page'
 
 describe "new account user search" do
   include_context "in-process server selenium tests"

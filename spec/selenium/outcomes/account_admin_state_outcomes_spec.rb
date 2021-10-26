@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/outcome_common')
+require_relative '../common'
+require_relative '../helpers/outcome_common'
 
 describe "account admin outcomes" do
   include_examples "in-process server selenium tests"
@@ -104,7 +104,7 @@ describe "account admin outcomes" do
     end
 
     describe 'with improved_outcome_management enabled' do
-      require File.expand_path(File.dirname(__FILE__) + '/pages/improved_outcome_management_page')
+      require_relative 'pages/improved_outcome_management_page'
       include ImprovedOutcomeManagementPage
 
       before(:each) do

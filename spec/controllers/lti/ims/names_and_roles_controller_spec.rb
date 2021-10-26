@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_context')
-require File.expand_path(File.dirname(__FILE__) + '/concerns/advantage_services_shared_examples')
-require File.expand_path(File.dirname(__FILE__) + '/concerns/lti_services_shared_examples')
+require_relative 'concerns/advantage_services_shared_context'
+require_relative 'concerns/advantage_services_shared_examples'
+require_relative 'concerns/lti_services_shared_examples'
 require_dependency "lti/ims/names_and_roles_controller.rb"
 require_dependency "lti/ims/providers/course_memberships_provider.rb"
 require_dependency "lti/ims/providers/group_memberships_provider.rb"

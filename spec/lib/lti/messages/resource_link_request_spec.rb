@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/lti_advantage_shared_examples')
+require_relative 'lti_advantage_shared_examples'
 
 describe Lti::Messages::ResourceLinkRequest do
   include_context 'lti_advantage_shared_examples'

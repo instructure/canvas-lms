@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
+require_relative '../lib/validates_as_url'
 
 describe ContentTag do
   describe "::asset_workflow_state" do

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../../spec_helper.rb'
+require_relative '../../../spec_helper'
 
 class ObserverAlertApiHarness
   include Api::V1::ObserverAlert

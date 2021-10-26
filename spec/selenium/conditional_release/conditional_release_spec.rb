@@ -19,7 +19,7 @@
 
 require_relative '../common'
 require_relative '../../conditional_release_spec_helper'
-require_relative '../assignments/page_objects/assignments_index_page.rb'
+require_relative '../assignments/page_objects/assignments_index_page'
 require_relative 'page_objects/conditional_release_objects'
 
 describe 'native canvas conditional release' do

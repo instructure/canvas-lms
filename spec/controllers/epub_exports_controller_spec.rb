@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../apis/api_spec_helper')
+require_relative '../apis/api_spec_helper'
 
 describe EpubExportsController do
   before :once do

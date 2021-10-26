@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../api_spec_helper'
 
 describe SisApiController, type: :request do
   def install_post_grades_tool

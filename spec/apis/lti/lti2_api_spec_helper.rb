@@ -19,7 +19,7 @@
 #
 
 require 'lti2_spec_helper'
-require File.expand_path(File.dirname(__FILE__) + '/../../apis/api_spec_helper')
+require_relative '../../apis/api_spec_helper'
 
 RSpec.shared_context "lti2_api_spec_helper", :shared_context => :metadata do
   include_context 'lti2_spec_helper'

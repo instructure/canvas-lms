@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
+require_relative '../../sharding_spec_helper'
+require_relative '../../cassandra_spec_helper'
 
 describe Auditors::Course do
   let(:request_id) { 42 }
