@@ -67,8 +67,8 @@ module SIS
       def add_user(user, login_only: false)
         raise ImportError, "No user_id given for a user" if user.user_id.blank?
         raise ImportError, "No login_id given for user #{user.user_id}" if user.login_id.blank?
-        raise ImportError, "Improper status for user #{user.user_id}" unless user.status =~ /\A(active|deleted)/i
-        return if @batch.skip_deletes? && user.status =~ /deleted/i
+        raise ImportError, "Improper status for user #{user.user_id}" unless user.status.match?(/\A(active|suspended|deleted)/i)
+        return if @batch.skip_deletes? && user.status.match?(/deleted/i)
 
         if login_only && user.existing_user_id.blank? && user.existing_integration_id.blank? && user.existing_canvas_user_id.blank?
           raise ImportError, I18n.t("No existing user provided for login with SIS ID %{user_id}", user_id: user.user_id)
@@ -112,10 +112,13 @@ module SIS
         end
       end
 
+      VALID_STATUSES = %w[active suspended deleted].freeze
+      private_constant :VALID_STATUSES
+
       def process_batch(login_only: false)
         return unless any_left_to_process?
 
-        while !@batched_users.empty?
+        until @batched_users.empty?
           user_row = @batched_users.shift
           pseudo = @root_account.pseudonyms.where(sis_user_id: user_row.user_id.to_s).take
           if user_row.authentication_provider_id.present?
@@ -133,10 +136,11 @@ module SIS
           end
           pseudo_by_integration = nil
           pseudo_by_integration = @root_account.pseudonyms.where(integration_id: user_row.integration_id.to_s).take if user_row.integration_id.present?
-          status_is_active = !(user_row.status =~ /\Adeleted/i)
+          status = user_row.status.downcase
+          status = 'active' unless VALID_STATUSES.include?(status)
           pseudo ||= pseudo_by_login
 
-          if pseudo_by_integration && status_is_active && pseudo_by_integration != pseudo
+          if pseudo_by_integration && status != 'deleted' && pseudo_by_integration != pseudo
             id_message = pseudo_by_integration.sis_user_id ? I18n.t('SIS ID') : I18n.t('Canvas ID')
             user_id = pseudo_by_integration.sis_user_id || pseudo_by_integration.user_id
             message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping", user_id: "#{id_message} #{user_id}", other_user_id: user_row.user_id)
@@ -159,7 +163,7 @@ module SIS
                 next
               end
             end
-            if pseudo_by_login && ((pseudo != pseudo_by_login && status_is_active) ||
+            if pseudo_by_login && ((pseudo != pseudo_by_login && status != 'deleted') ||
               !Pseudonym.where("LOWER(?)=LOWER(?)", pseudo.unique_id, user_row.login_id).exists?)
               id_message = pseudo_by_login.sis_user_id ? 'SIS ID' : 'Canvas ID'
               user_id = pseudo_by_login.sis_user_id || pseudo_by_login.user_id
@@ -228,7 +232,7 @@ module SIS
             pseudo.declared_user_type = user_row.declared_user_type == '<delete>' ? nil : user_row.declared_user_type
           end
 
-          if !status_is_active && !user.new_record?
+          if status == 'deleted' && !user.new_record?
             if user.id == @batch&.user_id
               message = "Can't remove yourself user_id '#{user_row.user_id}'"
               @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
@@ -257,14 +261,14 @@ module SIS
           pseudo.sis_user_id = user_row.user_id
           pseudo.integration_id = user_row.integration_id if user_row.integration_id.present?
           pseudo.account = @root_account
-          pseudo.workflow_state = status_is_active ? 'active' : 'deleted' unless pseudo.stuck_sis_fields.include?(:workflow_state)
-          if pseudo.new_record? && status_is_active
+          pseudo.workflow_state = status unless pseudo.stuck_sis_fields.include?(:workflow_state)
+          if pseudo.new_record? && status != 'deleted'
             should_add_account_associations = true
           elsif pseudo.workflow_state_changed?
-            if status_is_active
-              should_add_account_associations = true
-            else
+            if status == 'deleted'
               should_update_account_associations = true
+            else
+              should_add_account_associations = true
             end
           end
 
@@ -327,10 +331,10 @@ module SIS
               # ^ maybe after switchman supports OR conditions we can not do this?
               # as it is, this scope gets evaluated on the current shard instead of the user shard
               # and that can lead to failing to find the matching communication channel.
-              cc_scope = if status_is_active
-                           CommunicationChannel.where("workflow_state='active' OR user_id=?", user)
-                         else
+              cc_scope = if status == 'deleted'
                            user.communication_channels
+                         else
+                           CommunicationChannel.where("workflow_state='active' OR user_id=?", user)
                          end
               cc_scope = cc_scope.email.by_path(user_row.email)
               limit = Setting.get("merge_candidate_search_limit", "100").to_i
@@ -360,7 +364,7 @@ module SIS
             cc.pseudonym_id = pseudo.id
             cc.path = user_row.email
             cc.bounce_count = 0 if cc.path_changed?
-            cc.workflow_state = status_is_active ? 'active' : 'retired'
+            cc.workflow_state = status == 'deleted' ? 'retired' : 'active'
             newly_active = cc.path_changed? || (cc.active? && cc.workflow_state_changed?)
             if cc.changed?
               if cc.valid? && cc.save_without_broadcasting
