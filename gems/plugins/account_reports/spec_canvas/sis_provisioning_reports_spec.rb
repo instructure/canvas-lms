@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/report_spec_helper')
+require_relative 'report_spec_helper'
 
 describe "Default Account Reports" do
   include ReportSpecHelper

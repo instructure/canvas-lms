@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
+require_relative '../../qti_helper'
 if Qti.migration_executable
   describe "Converting Blackboard Vista qti" do
     let(:keys_to_ignore) { %w[is_quiz_question_bank question_bank_migration_id] }
