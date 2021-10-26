@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 RSpec.describe ScoreStatistic, type: :model do
   describe 'relationships' do
     it { is_expected.to belong_to(:assignment).required }

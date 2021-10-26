@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 describe AuthenticationProvider::Google do
   it 'has valid recognized_params' do
     expect(AuthenticationProvider::Google.recognized_params).to match_array(

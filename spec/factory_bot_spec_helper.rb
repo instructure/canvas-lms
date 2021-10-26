@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative 'spec_helper'
-
 # NOTE/RANT: bringing this in should not be construed as an endorsement of FactoryBot
 # i honestly have no idea how to use it
 # but for whatever reason the conditional_release peeps liked it

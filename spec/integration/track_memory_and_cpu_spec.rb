@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec/spec_helper')
-
 describe "memory and cpu tracking", type: :request do
   it "passes cpu info to statsd" do
     account = Account.default

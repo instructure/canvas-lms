@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe BasicLTI do
   it "xml converter should use raise an error when unescaped ampersands are used in launch url" do
     xml = <<-XML

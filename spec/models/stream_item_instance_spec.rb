@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe StreamItemInstance do
   describe ".update_all" do
     it "raises an exception to warn about necessary cache invalidation" do

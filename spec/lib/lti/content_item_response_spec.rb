@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 describe Lti::ContentItemResponse do
   let_once(:context) { course_factory(active_all: true) }
   let_once(:teacher) { course_with_teacher(course: context, active_all: true).user }

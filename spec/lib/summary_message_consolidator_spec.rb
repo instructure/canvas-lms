@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe "SummaryMessageConsolidator" do
   it "processes in batches" do
     Setting.set('summary_message_consolidator_batch_size', '2')

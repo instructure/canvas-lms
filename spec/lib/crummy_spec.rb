@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 # add_crumb would only execute the proc once, making the crumb
 # first crumb name returned stick, even when the crumb name
 # should have been re-evaluated

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 shared_examples_for "a differentiable_object" do
   before do
     teacher_in_course(active_all: true, course: differentiable.context)

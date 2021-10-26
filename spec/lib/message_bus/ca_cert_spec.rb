@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 describe MessageBus::CaCert do
   let(:cert_location) { "/tmp/fake_pulsar_cert_#{SecureRandom.hex(3)}.pem" }
   let(:fake_vault_path) { 'fake/vault/path' }

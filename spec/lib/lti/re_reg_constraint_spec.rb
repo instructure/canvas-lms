@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 describe Lti::ReRegConstraint do
   describe '#matches?' do
     it 'returns true if the header VND-IMS-CONFIRM-URL is present' do

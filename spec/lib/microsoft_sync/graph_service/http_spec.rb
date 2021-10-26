@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 # GraphService::Http is meant to be used only through GraphService. Some things
 # are tested here but more are tested in the spec for GraphService (partially
 # for historical reasons since GraphService::Http was once part of GraphService).

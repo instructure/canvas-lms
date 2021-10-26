@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 CC_XML_EXPORT_DIR = File.dirname(__FILE__) + '/../../fixtures/cc/cc_export'
 
 def get_cc_converter

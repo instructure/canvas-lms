@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 describe 'RequestThrottle' do
   let(:base_req) { { 'QUERY_STRING' => '', 'PATH_INFO' => '/', 'REQUEST_METHOD' => 'GET' } }
   let(:request_user_1) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4', 'rack.session' => { user_id: 1 } }) }

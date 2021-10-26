@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe InstAccessSupport do
   let(:signing_keypair) { OpenSSL::PKey::RSA.new(2048) }
   let(:encryption_keypair) { OpenSSL::PKey::RSA.new(2048) }

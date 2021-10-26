@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe MediaSourceFetcher do
   let(:api_client) do
     instance_double(CanvasKaltura::ClientV3)

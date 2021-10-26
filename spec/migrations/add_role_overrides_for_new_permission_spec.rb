@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe 'DataFixup::AddRoleOverridesForNewPermission' do
   it "makes new role overrides" do
     RoleOverride.create!(:context => Account.default, :permission => 'read_forum',

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 describe BasicLTI::Sourcedid do
   subject(:sourcedid) { described_class.new(tool, course, assignment, user) }
 

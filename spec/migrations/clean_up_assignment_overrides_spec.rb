@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20180611205754_clean_up_assignment_overrides.rb'
 
 describe 'CleanUpAssignmentOverrides' do
