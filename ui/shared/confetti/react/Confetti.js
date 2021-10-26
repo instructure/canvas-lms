@@ -63,7 +63,7 @@ export default function Confetti() {
     confetti.render()
     setTimeout(() => {
       showFlashAlert({
-        message: I18n.t('Great work! From the Canvas developers'),
+        message: I18n.t('Great work! From the Canvas Developers'),
         srOnly: true
       })
     }, 2500)
