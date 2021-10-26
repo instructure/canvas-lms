@@ -92,7 +92,7 @@ module Canvas
 
         # if we have an oauth1 header lets get the appropriate info from it
         if req.authorization && req.authorization.match(/^OAuth/)
-          headers.merge!(OAuth::Helper.parse_header(req.authorization))
+          headers.merge!(::OAuth::Helper.parse_header(req.authorization))
         end
 
         headers
