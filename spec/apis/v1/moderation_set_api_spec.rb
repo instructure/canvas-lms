@@ -19,7 +19,7 @@
 # <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../api_spec_helper'
 
 describe 'Moderated Grades API', type: :request do
   shared_examples 'assignment moderation permissions' do

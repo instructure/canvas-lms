@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../lib/canvas/draft_state_validations_spec.rb')
+require_relative '../../lib/canvas/draft_state_validations_spec'
 
 describe Quizzes::Quiz do
   before :once do

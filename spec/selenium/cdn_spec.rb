@@ -24,7 +24,7 @@
 # By putting them in spec/selenium, our build server will run them with the rest
 # of the browser specs, after it has compiled assets.
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative 'common'
 
 RE_SHORT_MD5 = /\A[a-f0-9]{10}\z/ # 10 chars of an MD5
 

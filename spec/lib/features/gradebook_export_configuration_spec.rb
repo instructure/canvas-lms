@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper.rb'
+require_relative '../../spec_helper'
 
 describe 'Gradebook Export User-level Feature Flags' do
   describe 'use_semi_colon_field_separators_in_gradebook_exports' do

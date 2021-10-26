@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/course_copy_helper.rb')
+require_relative '../../sharding_spec_helper'
+require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "course copy across shards" do

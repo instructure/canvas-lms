@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../lti_spec_helper')
+require_relative '../lti_spec_helper'
 
 describe ExternalToolsController do
   include ExternalToolsSpecHelper

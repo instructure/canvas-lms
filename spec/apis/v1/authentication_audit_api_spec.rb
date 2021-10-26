@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
+require_relative '../api_spec_helper'
+require_relative '../../sharding_spec_helper'
+require_relative '../../cassandra_spec_helper'
 
 describe "AuthenticationAudit API", type: :request do
   context "not configured" do

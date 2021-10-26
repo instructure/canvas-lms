@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path('../sharding_spec_helper', File.dirname(__FILE__))
+require_relative '../sharding_spec_helper'
 
 describe 'PeriodicJobs' do
   describe ".with_each_shard_by_database_in_region" do

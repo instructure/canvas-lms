@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
+require_relative '../../cassandra_spec_helper'
 
 describe DataFixup::InitAccountIndexForCourseAuditLog do
   include_examples 'cassandra audit logs'

@@ -19,8 +19,8 @@
 
 # bk test
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/eportfolios_common')
+require_relative 'common'
+require_relative 'helpers/eportfolios_common'
 
 describe "eportfolios" do
   include_context "in-process server selenium tests"

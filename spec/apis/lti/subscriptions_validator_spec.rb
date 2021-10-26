@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '../../../lti2_spec_helper')
+require_relative '../../lti2_spec_helper'
 require_dependency "lti/subscriptions_validator"
 module Lti
   describe SubscriptionsValidator do

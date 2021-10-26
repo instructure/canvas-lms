@@ -17,7 +17,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 require_relative '../common'
 require_relative '../../spec_helper'
-require_relative 'page_objects/quizzes_index_page.rb'
+require_relative 'page_objects/quizzes_index_page'
 
 describe 'quiz index menu tool placement' do
   include_context 'in-process server selenium tests'

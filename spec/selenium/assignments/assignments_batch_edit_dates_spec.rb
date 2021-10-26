@@ -19,7 +19,7 @@
 
 require_relative '../common'
 require_relative '../helpers/assignments_common'
-require_relative 'page_objects/assignments_index_page.rb'
+require_relative 'page_objects/assignments_index_page'
 
 describe "assignment batch edit" do
   include_context "in-process server selenium tests"

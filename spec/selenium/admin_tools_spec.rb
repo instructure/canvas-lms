@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/calendar2_common')
-require File.expand_path(File.dirname(__FILE__) + '/../cassandra_spec_helper')
+require_relative 'common'
+require_relative 'helpers/calendar2_common'
+require_relative '../cassandra_spec_helper'
 
 describe "admin_tools" do
   include_context "in-process server selenium tests"

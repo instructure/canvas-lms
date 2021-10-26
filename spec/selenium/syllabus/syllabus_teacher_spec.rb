@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common.rb'
-require_relative '../helpers/public_courses_context.rb'
-require_relative '../helpers/files_common.rb'
-require_relative 'pages/syllabus_page.rb'
+require_relative '../common'
+require_relative '../helpers/public_courses_context'
+require_relative '../helpers/files_common'
+require_relative 'pages/syllabus_page'
 
 describe "course syllabus" do
   include_context "in-process server selenium tests"

@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require_relative '../api_spec_helper'
+require_relative '../../sharding_spec_helper'
 
 describe "Outcome Results API", type: :request do
   let_once(:outcome_course) do
