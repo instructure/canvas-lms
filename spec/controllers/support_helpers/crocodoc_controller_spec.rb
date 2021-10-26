@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 describe SupportHelpers::CrocodocController do
   describe 'require_site_admin' do
     it 'redirects to root url if current user is not a site admin' do

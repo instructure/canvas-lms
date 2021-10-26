@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe QuestionBanksController do
   def create_course_with_two_question_banks!
     course_with_teacher(active_all: true)

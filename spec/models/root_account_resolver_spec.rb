@@ -85,7 +85,7 @@ describe RootAccountResolver do
 
   describe "resolution via proc" do
     before do
-      test_class.resolves_root_account through: ->(instance) { 9000 }
+      test_class.resolves_root_account through: proc { 9000 }
     end
 
     it 'assigns it on save if it is not set' do

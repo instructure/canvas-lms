@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 # add_crumb would only execute the proc once, making the crumb
 # first crumb name returned stick, even when the crumb name
 # should have been re-evaluated
@@ -48,14 +46,14 @@ describe "CrummyController" do
 
   context "name proc" do
     name_run = false
-    name_run_proc = proc { |instance|
-      if !name_run
+    name_run_proc = proc do
+      if name_run
+        "B"
+      else
         name_run = true
         "A"
-      else
-        "B"
       end
-    }
+    end
 
     let(:crummy_name_controller) do
       Class.new(crummy_controller) do
@@ -80,14 +78,14 @@ describe "CrummyController" do
 
   context "url proc" do
     url_run = false
-    url_run_proc = proc { |instance|
-      if !url_run
+    url_run_proc = proc do
+      if url_run
+        "http://b"
+      else
         url_run = true
         "http://a"
-      else
-        "http://b"
       end
-    }
+    end
 
     let(:crummy_url_controller) do
       Class.new(crummy_controller) do

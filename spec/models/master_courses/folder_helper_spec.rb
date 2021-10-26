@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 describe MasterCourses::FolderHelper do
   it "is able to fetch a list of folder ids with restricted files (even recursively via sub-folders)" do
     @copy_from = course_factory

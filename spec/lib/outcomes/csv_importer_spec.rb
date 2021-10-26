@@ -17,8 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 describe Outcomes::CSVImporter do
   def csv_file(name)
     path = File.expand_path(File.dirname(__FILE__) + "/fixtures/#{name}.csv")

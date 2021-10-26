@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 if Canvas.redis_enabled?
 
   # TODO: When CanvasCache::Redis has replaced all callsites,

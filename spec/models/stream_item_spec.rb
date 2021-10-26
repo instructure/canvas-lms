@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe StreamItem do
@@ -156,7 +155,7 @@ describe StreamItem do
   end
 
   it "does not unhide stream item instances when someone 'deletes' a message" do
-    users = (0..2).map { |x| user_factory }
+    users = Array.new(3) { user_factory }
     user1, user2, user3 = users
     convo = Conversation.initiate(users, false)
     convo.add_message(user3, "hello")

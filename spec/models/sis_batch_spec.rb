@@ -19,7 +19,6 @@
 #
 
 require 'tmpdir'
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe SisBatch do
   before :once do

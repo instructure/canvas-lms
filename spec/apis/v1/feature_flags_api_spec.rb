@@ -556,7 +556,7 @@ describe "Feature Flags API", type: :request do
     before do
       allow(Feature).to receive(:definitions).and_return({
                                                            'custom_feature' => Feature.new(feature: 'custom_feature', applies_to: 'Course', state: 'allowed',
-                                                                                           custom_transition_proc: ->(user, context, from_state, transitions) do
+                                                                                           custom_transition_proc: ->(_user, _context, from_state, transitions) do
                                                                                                                      transitions['off'] = { 'locked' => true, 'message' => "don't ever turn this off" } if from_state == 'on'
                                                                                                                      transitions['on'] = { 'locked' => false, 'message' => "this is permanent?!" } if transitions.has_key?('on')
                                                                                                                    end),

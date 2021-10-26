@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe GroupCategory do
   let_once(:account) { Account.default }
   before(:once) { course_with_teacher(active_all: true) }
@@ -541,7 +539,7 @@ describe GroupCategory do
         calc.user_count = section_counts.sum
         calc.groups = double(:count => group_count)
         dist = calc.determine_group_distribution
-        dist.sort_by { |k, v| k }.map(&:last)
+        dist.sort_by(&:first).map(&:last)
       end
 
       it "handles small sections" do

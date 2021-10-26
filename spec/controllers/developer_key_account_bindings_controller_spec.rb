@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 RSpec.describe DeveloperKeyAccountBindingsController, type: :controller do
   let(:root_account) { account_model }
   let(:root_account_admin) { account_admin_user(account: root_account) }

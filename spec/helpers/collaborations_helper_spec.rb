@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe CollaborationsHelper do
   let(:user) { double('user') }
   let(:course) { Course.new(name: "my course").tap { |t| allow(t).to receive_messages(id: 1) } }

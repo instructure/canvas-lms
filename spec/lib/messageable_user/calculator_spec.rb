@@ -652,7 +652,7 @@ describe "MessageableUser::Calculator" do
         Enrollment.limit_privileges_to_course_section!(@course, @viewing_user, true)
         group(:group_context => @course)
         result = @calculator.fully_visible_group_ids_by_shard
-        result.each { |k, v| expect(v).to be_empty }
+        result.each_value { |v| expect(v).to be_empty }
       end
 
       it "partitions groups by shard" do
@@ -682,7 +682,7 @@ describe "MessageableUser::Calculator" do
       it "does not include fully visible groups" do
         group(:user => @viewing_user)
         result = @calculator.section_visible_group_ids_by_shard
-        result.each { |k, v| expect(v).to be_empty }
+        result.each_value { |v| expect(v).to be_empty }
       end
 
       it "partitions groups by shard" do

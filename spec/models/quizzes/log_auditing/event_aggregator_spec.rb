@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
-
 describe Quizzes::LogAuditing::EventAggregator do
   def build_course_quiz_qs
     teacher_in_course

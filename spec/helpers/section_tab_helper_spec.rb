@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 shared_examples 'allow Quiz LTI placement when the correct Feature Flags are enabled' do
   let(:available_section_tabs) do
     SectionTabHelperSpec::AvailableSectionTabs.new(

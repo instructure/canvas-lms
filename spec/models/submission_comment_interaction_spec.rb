@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe SubmissionCommentInteraction do
   context '.in_course_between' do
     it 'finds the date of the latest submission comment' do

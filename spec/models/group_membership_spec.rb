@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe GroupMembership do
   it "ensures a mutually exclusive relationship" do
     category = Account.default.group_categories.create!(:name => "blah")

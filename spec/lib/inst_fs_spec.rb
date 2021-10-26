@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe InstFS do
   context "settings are set" do
     let(:app_host) { 'http://test.host' }

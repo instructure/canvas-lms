@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-
 describe Quizzes::QuizzesController do
   def course_quiz(active = false, title = nil)
     @quiz = @course.quizzes.create
@@ -2781,7 +2779,7 @@ describe Quizzes::QuizzesController do
       course_with_teacher
       course_quiz(true)
       @quiz.save!
-      allow(@quiz).to receive(:grants_right?) do |user, sess, rights|
+      allow(@quiz).to receive(:grants_right?) do |_user, sess, rights|
         if rights.nil?
           rights = sess
         end

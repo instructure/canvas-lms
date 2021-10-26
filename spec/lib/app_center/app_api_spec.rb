@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 # Manually stubbing the actual API request
 describe AppCenter::AppApi do
   let(:api) { AppCenter::AppApi.new(@account) }

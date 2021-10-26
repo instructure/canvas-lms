@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe DelayedNotification do
   describe '#process' do
     let(:group_user) { user_with_communication_channel(active_all: true) }

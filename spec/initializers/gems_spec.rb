@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path('../spec_helper', File.dirname(__FILE__))
-
 describe 'Gemfile' do
   it 'does not include libxml-ruby' do
     libxml = Bundler.locked_gems.specs.find { |s| s.name == 'libxml-ruby' }

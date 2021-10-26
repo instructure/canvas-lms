@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe Canvas::PasswordPolicy do
   describe "validations" do
     def pseudonym_with_policy(policy)

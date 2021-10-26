@@ -711,7 +711,7 @@ describe Account do
 
   it "sets up access policy correctly" do
     # double out any "if" permission conditions
-    RoleOverride.permissions.each do |k, v|
+    RoleOverride.permissions.each_value do |v|
       next unless v[:if]
 
       allow_any_instance_of(Account).to receive(v[:if]).and_return(true)
@@ -752,8 +752,8 @@ describe Account do
                   limited_access - disabled_by_default - conditional_access +
                   [:create_courses, :create_tool_manually]
 
-    full_root_access = full_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :site_admin }.map(&:first)
-    full_sub_access = full_root_access - RoleOverride.permissions.select { |k, v| v[:account_only] == :root }.map(&:first)
+    full_root_access = full_access - RoleOverride.permissions.select { |_k, v| v[:account_only] == :site_admin }.map(&:first)
+    full_sub_access = full_root_access - RoleOverride.permissions.select { |_k, v| v[:account_only] == :root }.map(&:first)
     # site admin has access to everything everywhere
     hash.each do |k, v|
       account = v[:account]
@@ -1105,8 +1105,7 @@ describe Account do
     end
 
     it "includes active external tools if configured on the account" do
-      tools = []
-      2.times do |n|
+      tools = Array.new(2) do
         t = @account.context_external_tools.new(
           :name => "bob",
           :consumer_key => "bob",
@@ -1117,8 +1116,7 @@ describe Account do
           :text => "Example URL",
           :url => "http://www.example.com",
         }
-        t.save!
-        tools << t
+        t.tap(&:save!)
       end
       tool1, tool2 = tools
       tool2.destroy

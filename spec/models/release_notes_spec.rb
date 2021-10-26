@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 # A lot of these specs will seem like they are testing things that are handled by rails
 # If release_note was an active record model, you would be right.  However, it is
 # a dynamo model that handles its own persistence, and so it is much more important

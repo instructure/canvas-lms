@@ -19,7 +19,6 @@
 #
 
 require File.expand_path('../../sharding_spec_helper.rb', File.dirname(__FILE__))
-require File.expand_path('../../spec_helper.rb', File.dirname(__FILE__))
 
 describe IncomingMail::ReplyToAddress do
   let(:expect_secure_id) { Canvas::Security.hmac_sha1(Shard.short_id_for(@shard1.global_id_for(42))) }

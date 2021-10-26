@@ -17,8 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 describe Attachments::S3Storage do
   describe "#sign_policy" do
     # example values from http://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-post-example.html

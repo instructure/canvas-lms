@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe SubAccountsController do
   describe "POST 'create'" do
     it "creates sub-accounts with the right root account when inside the root account" do

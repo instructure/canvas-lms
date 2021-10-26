@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe GoogleDocsCollaboration do
   def stub_service
     google_drive_connection = double(retrieve_access_token: "asdf123", acl_add: nil, acl_remove: nil)

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 shared_examples_for 'a learning outcome context' do
   let_once(:outcome_context) { described_class.create name: 'Foo' }
 

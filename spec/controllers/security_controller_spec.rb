@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 RSpec.describe SecurityController, type: :request do
   # This uses the lti keyset, but it doesn't really matter which one
   let(:url) { Rails.application.routes.url_helpers.jwks_show_path }

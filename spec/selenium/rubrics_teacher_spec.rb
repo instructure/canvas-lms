@@ -123,7 +123,7 @@ describe "course rubrics" do
 
       get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
 
-      2.times { |n| f('#right-side .edit_rubric_link').click }
+      2.times { f('#right-side .edit_rubric_link').click }
       expect(ff('.rubric .ic-Action-header').length).to eq 1
     end
 

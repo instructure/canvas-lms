@@ -37,7 +37,7 @@ describe GradeCalculator do
 
     def set_grades(grades, group = @group1)
       @grades = grades
-      @assignments = @grades.map do |score, possible|
+      @assignments = @grades.map do |_score, possible|
         @course.assignments.create! :title => 'homework',
                                     :points_possible => possible,
                                     :assignment_group => group

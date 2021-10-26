@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe "User Content" do
   describe "ContextController#object_snippet" do
     it "rejects object_snippet on non-safefiles domain" do

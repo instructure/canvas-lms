@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe DataFixup::BackfillNulls do
   before(:once) do
     @account1 = Account.create!(show_section_name_as_course_name: nil, allow_sis_import: nil)

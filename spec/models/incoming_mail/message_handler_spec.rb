@@ -19,7 +19,6 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe IncomingMail::MessageHandler do
   specs_require_sharding

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 RSpec.describe GradebookSettingsController, type: :controller do
   let(:teacher) { course_with_teacher.user }
 
