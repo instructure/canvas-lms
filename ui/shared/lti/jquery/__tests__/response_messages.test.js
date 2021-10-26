@@ -16,28 +16,27 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  sendResponse,
-  sendErrorResponse,
-  sendGenericErrorResponse,
-  sendBadRequestResponse,
-  sendWrongOriginResponse,
-  sendUnsupportedSubjectResponse,
-  sendSuccess
-} from '../response_messages'
+import buildResponseMessages from '../response_messages'
 
 describe('response_messages', () => {
   const postMessageMock = jest.fn()
   let params
+  let builder
 
   beforeEach(() => {
+    resetBuilder()
+    postMessageMock.mockRestore()
+  })
+
+  function resetBuilder(overrides = {}) {
     params = {
       targetWindow: {postMessage: postMessageMock},
       origin: 'http://tool.test',
-      subject: 'subject'
+      subject: 'subject',
+      ...overrides
     }
-    postMessageMock.mockRestore()
-  })
+    builder = buildResponseMessages(params)
+  }
 
   function expectPostMessageContents(contents, origin = expect.any(String)) {
     expect(postMessageMock).toHaveBeenCalledWith(expect.objectContaining(contents), origin)
@@ -45,7 +44,7 @@ describe('response_messages', () => {
 
   describe('sendResponse', () => {
     it('appends .response to the subject', () => {
-      sendResponse(params)
+      builder.sendResponse()
       expectPostMessageContents({subject: 'subject.response'})
     })
 
@@ -53,18 +52,18 @@ describe('response_messages', () => {
       const message_id = 'message_id'
 
       beforeEach(() => {
-        params.message_id = message_id
+        resetBuilder({message_id})
       })
 
       it('includes message_id in response', () => {
-        sendResponse(params)
+        builder.sendResponse()
         expectPostMessageContents({message_id})
       })
     })
 
     describe('when targetWindow does not exist', () => {
       beforeEach(() => {
-        delete params.targetWindow
+        resetBuilder({targetWindow: null})
         jest.spyOn(console, 'error').mockImplementation()
       })
 
@@ -74,25 +73,22 @@ describe('response_messages', () => {
       })
 
       it('logs an error to the console', () => {
-        sendResponse(params)
+        builder.sendResponse()
         // eslint-disable-next-line no-console
         expect(console.error).toHaveBeenCalled()
       })
     })
 
     it('sends response to the given origin', () => {
-      sendResponse(params)
+      builder.sendResponse()
       expectPostMessageContents({}, 'http://tool.test')
     })
 
     describe('when contents parameter is passed', () => {
       const contents = {hello: 'world'}
-      beforeEach(() => {
-        params.contents = contents
-      })
 
       it('merges contents into response', () => {
-        sendResponse(params)
+        builder.sendResponse(contents)
         expectPostMessageContents(contents)
       })
     })
@@ -100,27 +96,18 @@ describe('response_messages', () => {
 
   describe('sendSuccess', () => {
     beforeEach(() => {
-      params.message_id = 'message_id'
+      resetBuilder({message_id: 'message_id'})
     })
 
     it('only sends subject and message_id', () => {
-      sendSuccess(params)
+      builder.sendSuccess()
       expect(Object.keys(postMessageMock.mock.calls[0][0])).toEqual(['subject', 'message_id'])
     })
   })
 
   function expectCodeAndMessageInError({subject, code, message}) {
-    beforeEach(() => {
-      if (code) {
-        params.code = code
-      }
-      if (message) {
-        params.message = message
-      }
-    })
-
     it('includes code and message in error', () => {
-      subject(params)
+      subject(builder)
       const response = {}
       if (code) {
         response.code = code
@@ -132,40 +119,46 @@ describe('response_messages', () => {
     })
   }
 
-  describe('sendErrorResponse', () => {
+  describe('sendError', () => {
+    const code = 'error_code'
+    const message = 'error message'
+
     expectCodeAndMessageInError({
-      subject: sendErrorResponse,
-      code: 'error_code',
-      message: 'error message'
+      subject: builder => builder.sendError(code, message),
+      code,
+      message
     })
   })
 
-  describe('sendGenericErrorResponse', () => {
+  describe('sendGenericError', () => {
+    const message = 'generic error message'
+
     expectCodeAndMessageInError({
-      subject: sendGenericErrorResponse,
-      code: 'error',
-      message: 'generic error message'
+      subject: builder => builder.sendGenericError(message),
+      code: 'error'
     })
   })
 
-  describe('sendBadRequestResponse', () => {
+  describe('sendBadRequestError', () => {
+    const message = 'bad request error message'
+
     expectCodeAndMessageInError({
-      subject: sendBadRequestResponse,
+      subject: builder => builder.sendBadRequestError(message),
       code: 'bad_request',
-      message: 'error message'
+      message
     })
   })
 
-  describe('sendWrongOriginResponse', () => {
+  describe('sendWrongOriginError', () => {
     expectCodeAndMessageInError({
-      subject: sendWrongOriginResponse,
+      subject: builder => builder.sendWrongOriginError(),
       code: 'wrong_origin'
     })
   })
 
-  describe('sendUnsupportedSubjectResponse', () => {
+  describe('sendUnsupportedSubjectError', () => {
     expectCodeAndMessageInError({
-      subject: sendUnsupportedSubjectResponse,
+      subject: builder => builder.sendUnsupportedSubjectError(),
       code: 'unsupported_subject'
     })
   })

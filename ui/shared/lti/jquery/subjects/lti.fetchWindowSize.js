@@ -18,15 +18,13 @@
 
 import $ from 'jquery'
 
-export default function fetchWindowSize({message, iframe}) {
-  if (iframe) {
-    message.height = window.innerHeight
-    message.width = window.innerWidth
-    message.offset = $('.tool_content_wrapper').offset()
-    message.footer = $('#fixed_bottom').height() || 0
-    message.scrollY = window.scrollY
-    const strMessage = JSON.stringify(message)
-
-    iframe.contentWindow.postMessage(strMessage, '*')
-  }
+export default function fetchWindowSize({responseMessages}) {
+  responseMessages.sendResponse({
+    height: window.innerHeight,
+    width: window.innerWidth,
+    offset: $('.tool_content_wrapper').offset(),
+    footer: $('#fixed_bottom').height() || 0,
+    scrollY: window.scrollY
+  })
+  return true
 }
