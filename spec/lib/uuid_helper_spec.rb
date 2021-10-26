@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 describe UuidHelper do
   describe ".valid_format?" do
     it { expect(described_class.valid_format?(nil)).to be false }

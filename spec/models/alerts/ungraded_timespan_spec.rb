@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '../../../spec_helper.rb')
 require_dependency "alerts/ungraded_timespan"
 
 module Alerts
@@ -39,7 +38,7 @@ module Alerts
       end
 
       it 'returns true when the student submission is not past the threshold' do
-        submission = @assignment.submit_homework(@user, @opts)
+        @assignment.submit_homework(@user, @opts)
 
         ungraded_timespan = Alerts::UngradedTimespan.new(@course, [@student.id])
         expect(ungraded_timespan.should_not_receive_message?(@student.id, 2)).to eq true

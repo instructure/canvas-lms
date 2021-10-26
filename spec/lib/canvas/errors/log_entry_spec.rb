@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
 require_dependency "canvas/errors/log_entry"
 
 module Canvas
@@ -79,7 +78,7 @@ module Canvas
             rescue RuntimeError
               raise ArgumentError, "Test Message"
             end
-          rescue ArgumentError => e
+          rescue ArgumentError
             raise StandardError, "TopException"
           end
         rescue StandardError => e

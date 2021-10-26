@@ -33,14 +33,18 @@ module Lti
       before_action :require_tool
 
       def deep_linking_response
+        # any content items that contain line items should be handled here, and create
+        # assignments, content tags, line items, and resource links
+        add_assignments if add_assignment?
+
         # content items not meant for creating module items should have resource links
         # associated with them here before passing them to the UI for further processing
-        create_lti_resource_links unless adding_module_item? || create_new_module?
+        create_lti_resource_links unless add_item_to_existing_module? || create_new_module?
 
         # multiple content items meant for creating module items, or module items destined
         # for a new module should create the module items and associate resource links here
         # before passing them to the UI and reloading the modules page
-        add_module_items if should_add_module_items?
+        add_module_items if add_module_items?
 
         # one content item meant for creating a module item in an existing module
         # should be ignored, since the add module item modal in the UI will handle it
@@ -55,12 +59,10 @@ module Lti
           error_message: messaging_value('errormsg'),
           error_log: messaging_value('errorlog'),
           lti_endpoint: polymorphic_url([:retrieve, @context, :external_tools]),
-          reload_page: multiple_module_items?
+          reload_page: multiple_items_for_existing_module?
         }.compact)
 
         render layout: 'bare'
-      rescue InvalidContentItem => e
-        render json: e.errors, status: :bad_request
       end
     end
   end

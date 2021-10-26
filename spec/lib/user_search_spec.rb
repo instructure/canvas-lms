@@ -70,7 +70,7 @@ describe UserSearch do
         end
 
         it 'will not pickup students outside the course' do
-          out_of_course_student = User.create!(:name => 'Stewart Stewart')
+          User.create!(:name => 'Stewart Stewart')
           # names is evaluated lazily from the 'let' block so ^ user is still being
           # created before the query executes
           expect(names).not_to include('Stewart Stewart')
@@ -132,7 +132,7 @@ describe UserSearch do
 
             before do
               newstudent = User.create!(:name => 'Tyler Student')
-              e = StudentEnrollment.create!(:user => newstudent, :course => course, :workflow_state => 'active')
+              StudentEnrollment.create!(:user => newstudent, :course => course, :workflow_state => 'active')
             end
 
             it { should include('Rose Tyler') }
@@ -146,7 +146,7 @@ describe UserSearch do
 
             before do
               newstudent = User.create!(:name => 'Tyler Student')
-              e = StudentEnrollment.create!(:user => newstudent, :course => course, :workflow_state => 'active')
+              StudentEnrollment.create!(:user => newstudent, :course => course, :workflow_state => 'active')
             end
 
             it { should include('Rose Tyler') }

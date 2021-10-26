@@ -8,7 +8,6 @@ import '@instructure/canvas-theme'
 
 window.ENV = window.ENV || {
   FEATURES: {
-    rce_pretty_html_editor: true,
     rce_auto_save: true
   },
   // the RCE won't load w/o these yet

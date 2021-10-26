@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 require 'simple_oauth'
 
 describe Lti::Security do
@@ -78,6 +77,19 @@ describe Lti::Security do
         body = { lti_assignment_id: assignment_id }
         secure_params = Canvas::Security.create_jwt(body).to_s
         expect(Lti::Security.decoded_lti_assignment_id(secure_params)).to eq assignment_id
+      end
+    end
+
+    context '#decoded_lti_assignment_description' do
+      it 'returns nil if secure params are invalid' do
+        expect(Lti::Security.decoded_lti_assignment_description('banana')).to be_nil
+      end
+
+      it 'returns the lti assignment description if secure params are valid' do
+        assignment_id = 12
+        body = { lti_assignment_description: assignment_id }
+        secure_params = Canvas::Security.create_jwt(body).to_s
+        expect(Lti::Security.decoded_lti_assignment_description(secure_params)).to eq assignment_id
       end
     end
 

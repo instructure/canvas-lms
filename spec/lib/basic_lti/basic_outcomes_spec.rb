@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
 require 'nokogiri'
 require 'webmock/rspec'
 
@@ -420,7 +419,7 @@ describe BasicLTI::BasicOutcomes do
             "<submissionDetails><submittedAt>#{timestamp}</submittedAt></submissionDetails>"
           )
           Timecop.freeze(2.minutes.ago) do
-            request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+            BasicLTI::BasicOutcomes.process_request(tool, xml)
             expect(assignment.submissions.where(user_id: @user.id).first.submitted_at).to be_blank
           end
         end
@@ -443,7 +442,7 @@ describe BasicLTI::BasicOutcomes do
           xml.at_css('imsx_POXBody > replaceResultRequest').add_child(
             "<submissionDetails><submittedAt>#{timestamp}</submittedAt></submissionDetails>"
           )
-          request = BasicLTI::BasicOutcomes.process_request(tool, xml)
+          BasicLTI::BasicOutcomes.process_request(tool, xml)
           expect(assignment.submissions.where(user_id: @user.id).first.submitted_at).to be_blank
         end
       end

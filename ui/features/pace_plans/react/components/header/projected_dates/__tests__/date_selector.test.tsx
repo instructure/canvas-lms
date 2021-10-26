@@ -27,6 +27,10 @@ import moment from 'moment'
 const setStartDate = jest.fn()
 const setEndDate = jest.fn()
 
+afterEach(() => {
+  jest.clearAllMocks()
+})
+
 describe('PacePlansDateSelector', () => {
   describe('of start type', () => {
     const defaultProps: PacePlanDateSelectorProps = {
@@ -34,7 +38,8 @@ describe('PacePlansDateSelector', () => {
       blackoutDates: BLACKOUT_DATES,
       setStartDate,
       setEndDate,
-      pacePlan: PRIMARY_PLAN
+      pacePlan: PRIMARY_PLAN,
+      planPublishing: false
     }
 
     it('renders an editable "Projected Start Date" selector for primary pace plans', () => {
@@ -96,6 +101,13 @@ describe('PacePlansDateSelector', () => {
         getByText('The start date for the pace plan must be after the end date.')
       ).toBeInTheDocument()
     })
+
+    it('renders as disabled while publishing', () => {
+      const {getByLabelText} = render(<PacePlanDateSelector {...defaultProps} planPublishing />)
+      const startDateInput = getByLabelText('Projected Start Date') as HTMLInputElement
+
+      expect(startDateInput).toBeDisabled()
+    })
   })
 
   describe('of end type', () => {
@@ -103,6 +115,7 @@ describe('PacePlansDateSelector', () => {
       type: 'end',
       blackoutDates: BLACKOUT_DATES,
       pacePlan: PRIMARY_PLAN,
+      planPublishing: false,
       projectedEndDate: '2021-11-03',
       setStartDate,
       setEndDate

@@ -20,6 +20,7 @@
 class CC::Importer::CCWorker < Canvas::Migration::Worker::Base
   def perform(cm = nil)
     cm ||= ContentMigration.where(id: migration_id).first
+    cm.save if cm.capture_job_id
     cm.job_progress.start unless cm.skip_job_progress
     begin
       cm.update_conversion_progress(1)

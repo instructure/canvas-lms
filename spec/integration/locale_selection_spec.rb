@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe "locale_selection" do
   before do
     allow(I18n).to receive(:available_locales).and_return([:en, :es, :fr])

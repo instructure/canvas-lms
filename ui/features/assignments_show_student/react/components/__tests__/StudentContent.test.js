@@ -19,6 +19,7 @@
 import {fireEvent, render, waitFor, within} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
+import {initializeReaderButton} from '../../../../../shared/immersive-reader/ImmersiveReader'
 import React from 'react'
 import StudentContent from '../StudentContent'
 import {AssignmentMocks} from '@canvas/assignments/graphql/student/Assignment'
@@ -28,6 +29,12 @@ import {RUBRIC_QUERY, SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphq
 jest.mock('../AttemptSelect')
 
 jest.mock('../../apis/ContextModuleApi')
+
+jest.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
+  return {
+    initializeReaderButton: jest.fn()
+  }
+})
 
 describe('Assignment Student Content View', () => {
   beforeEach(() => {
@@ -403,6 +410,74 @@ describe('Assignment Student Content View', () => {
       expect(
         getByText('This assignment is part of an unpublished module and is not available yet.')
       ).toBeInTheDocument()
+    })
+  })
+
+  describe('Immersive Reader', () => {
+    let element
+    let props
+
+    beforeEach(async () => {
+      props = await mockAssignmentAndSubmission({
+        Assignment: {
+          description: 'description',
+          name: 'name'
+        }
+      })
+    })
+
+    afterEach(() => {
+      element?.remove()
+      initializeReaderButton.mockClear()
+    })
+
+    it('sets up Immersive Reader if it finds the mount point', async () => {
+      element = document.createElement('div')
+      element.id = 'immersive_reader_mount_point'
+      document.documentElement.append(element)
+
+      render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+
+      await waitFor(() =>
+        expect(initializeReaderButton).toHaveBeenCalledWith(element, {
+          content: 'description',
+          title: 'name'
+        })
+      )
+    })
+
+    it('sets up Immersive Reader if it finds the mobile mount point', async () => {
+      element = document.createElement('div')
+      element.id = 'immersive_reader_mobile_mount_point'
+      document.documentElement.append(element)
+
+      render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+
+      await waitFor(() =>
+        expect(initializeReaderButton).toHaveBeenCalledWith(element, {
+          content: 'description',
+          title: 'name'
+        })
+      )
+    })
+
+    it('does not set up Immersive Reader if neither mount point is present', async () => {
+      render(
+        <MockedProvider>
+          <StudentContent {...props} />
+        </MockedProvider>
+      )
+
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(initializeReaderButton).not.toHaveBeenCalled()
     })
   })
 })

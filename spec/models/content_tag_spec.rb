@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../lib/validates_as_url.rb')
 
 describe ContentTag do
@@ -524,7 +523,7 @@ describe ContentTag do
     yesterday = 1.day.ago
     ContextModule.where(:id => mod).update_all(:updated_at => yesterday)
     ContextModule.transaction do
-      tag = mod.add_item :type => 'context_module_sub_header', :title => 'blah'
+      mod.add_item :type => 'context_module_sub_header', :title => 'blah'
       expect(mod.reload.updated_at.to_i).to eq yesterday.to_i
     end
     expect(mod.reload.updated_at).to be > 5.seconds.ago
@@ -717,6 +716,22 @@ describe ContentTag do
       expect(DueDateCacher).to_not receive(:recompute).with(assignment)
 
       tag.destroy!
+    end
+
+    it "deletes outcome link and the associated friendly description" do
+      account = Account.default
+      outcome = account.created_learning_outcomes.create!(:title => 'outcome', :description => 'standard outcome description')
+      description = OutcomeFriendlyDescription.create!(:context => account, :description => 'friendly outcome description', :learning_outcome => outcome)
+      outcome_link = ContentTag.create!(:content => outcome, :context => account)
+      outcome_links = ContentTag.for_context(account)
+      expect(outcome_links).not_to be_empty
+      expect(outcome_links.find { |link| link.id == outcome_link.id }).to_not be_nil
+
+      outcome_link.destroy
+      outcome_links = ContentTag.active.for_context(account)
+      description = OutcomeFriendlyDescription.where(:id => description.id).first
+      expect(outcome_links.find { |link| link.id == outcome_link.id }).to be_nil
+      expect(description.workflow_state).to eq('deleted')
     end
   end
 

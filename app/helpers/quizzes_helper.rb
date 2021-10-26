@@ -23,7 +23,7 @@ require 'nokogiri'
 module QuizzesHelper
   RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/
 
-  def needs_unpublished_warning?(quiz = @quiz, user = @current_user)
+  def needs_unpublished_warning?(quiz = @quiz)
     return false unless can_publish(quiz)
 
     !quiz.available? || quiz.unpublished_changes?
@@ -462,7 +462,7 @@ module QuizzesHelper
     end
 
     if answer_list.empty?
-      answers.delete_if { |k, v| !k.match(/^question_#{hash_get(question, :id)}/) }
+      answers.delete_if { |k, _v| !k.match?(/^question_#{hash_get(question, :id)}/) }
       answers.each { |k, v| res.sub!(/\{\{#{k}\}\}/, h(v)) }
       res.gsub!(/\{\{question_[^}]+\}\}/, "")
     end

@@ -106,7 +106,6 @@ module Lti::Messages
     }.freeze
 
     MODAL_PLACEMENTS = %w(editor_button assignment_selection link_selection migration_selection course_assignments_menu).freeze
-    CREATE_MODULE_PLACEMENTS = %w(course_assignments_menu module_index_menu).freeze
 
     def initialize(tool:, context:, user:, expander:, return_url:, opts: {})
       super
@@ -138,7 +137,7 @@ module Lti::Messages
         [@context, :deep_linking_response],
         {
           modal: MODAL_PLACEMENTS.include?(placement),
-          create_new_module: CREATE_MODULE_PLACEMENTS.include?(placement),
+          placement: placement,
           context_module_id: @opts[:context_module_id]
         }.compact
       )

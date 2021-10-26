@@ -21,12 +21,11 @@ require_relative '../common'
 require_relative '../helpers/quizzes_common'
 
 describe 'quizzes question with html answers' do
-  include_context "in-process server selenium tests"
+  include_context 'in-process server selenium tests'
   include QuizzesCommon
 
   before(:each) do
     course_with_teacher_logged_in
-    Account.default.enable_feature!(:rce_enhancements)
     stub_rcs_config
   end
 
@@ -44,10 +43,10 @@ describe 'quizzes question with html answers' do
   def check_for_no_edit_button(option)
     click_option('.question_form:visible .question_type', option)
     driver.execute_script "$('.answer').addClass('hover');"
-    expect(f("#content")).not_to contain_jqcss('.edit_html:visible')
+    expect(f('#content')).not_to contain_jqcss('.edit_html:visible')
   end
 
-  it 'allows HTML answers for multiple choice', priority: "1", test_id: 209356 do
+  it 'allows HTML answers for multiple choice', priority: '1', test_id: 209_356 do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer
@@ -64,13 +63,21 @@ describe 'quizzes question with html answers' do
     expect(html).to eq '<p>HTML</p>'
   end
 
-  it 'preserves HTML image answers for multiple choice', priority: "2", test_id: 3103797 do
-    img_url = "http://invalid.nowhere.test/nothing.jpg"
-    img_alt = "sample alt text"
-    img_cls = "sample_image"
-    quiz_with_new_questions(true, { id: 1 }, { id: 2 },
-                            { id: 3, answer_html: %|<img src="#{img_url}" alt="#{img_alt}" class="#{img_cls}">| })
-    dismiss_flash_messages rescue nil # in non-prod environments images that fail to load will cause a flash message
+  it 'preserves HTML image answers for multiple choice', priority: '2', test_id: 3_103_797 do
+    img_url = 'http://invalid.nowhere.test/nothing.jpg'
+    img_alt = 'sample alt text'
+    img_cls = 'sample_image'
+    quiz_with_new_questions(
+      true,
+      { id: 1 },
+      { id: 2 },
+      { id: 3, answer_html: "<img src=\"#{img_url}\" alt=\"#{img_alt}\" class=\"#{img_cls}\">" }
+    )
+    begin
+      dismiss_flash_messages
+    rescue StandardError
+      nil
+    end # in non-prod environments images that fail to load will cause a flash message
     click_questions_tab
     edit_first_question
     alt_before = fj(".#{img_cls}", question_answers[2]).attribute('alt')
@@ -79,7 +86,7 @@ describe 'quizzes question with html answers' do
     expect(alt_after).to eq alt_before
   end
 
-  it 'sets focus back to the edit button after editing', priority: "1", test_id: 209357 do
+  it 'sets focus back to the edit button after editing', priority: '1', test_id: 209_357 do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer
@@ -88,7 +95,9 @@ describe 'quizzes question with html answers' do
     check_element_has_focus(fj('.edit_html:visible'))
   end
 
-  it 'doesn\'t show the edit html button for question types besides multiple choice and multiple answers', priority: "1", test_id: 209358 do
+  it 'doesn\'t show the edit html button for question types besides multiple choice and multiple answers',
+     priority: '1',
+     test_id: 209_358 do
     quiz_with_new_questions
     click_questions_tab
     edit_first_question
@@ -101,7 +110,7 @@ describe 'quizzes question with html answers' do
     check_for_no_edit_button 'Numerical Answer'
   end
 
-  it 'restores normal input when html answer is empty', priority: "1", test_id: 209359 do
+  it 'restores normal input when html answer is empty', priority: '1', test_id: 209_359 do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer
@@ -110,11 +119,12 @@ describe 'quizzes question with html answers' do
     # clear tiny
     driver.execute_script "tinyMCE.activeEditor.setContent('')"
     close_first_html_answer
-    input_length = driver.execute_script "return $('.answer:eq(3) input[name=answer_text]:visible').length"
+    input_length =
+      driver.execute_script "return $('.answer:eq(3) input[name=answer_text]:visible').length"
     expect(input_length).to eq 1
   end
 
-  it 'populates the editor and input elements properly', priority: "1", test_id: 209360 do
+  it 'populates the editor and input elements properly', priority: '1', test_id: 209_360 do
     quiz_with_new_questions
     click_questions_tab
 
@@ -129,7 +139,7 @@ describe 'quizzes question with html answers' do
     # open it up in the editor, make sure the text matches the input
     edit_first_html_answer
     keep_trying_until do
-      content = driver.execute_script "return tinyMCE.activeEditor.getContent()"
+      content = driver.execute_script 'return tinyMCE.activeEditor.getContent()'
       expect(content).to eq '<p>ohai</p>'
     end
 
@@ -140,7 +150,9 @@ describe 'quizzes question with html answers' do
     expect(value).to eq ''
   end
 
-  it 'saves open html answers when the question is submitted for multiple choice', priority: "1", test_id: 209361 do
+  it 'saves open html answers when the question is submitted for multiple choice',
+     priority: '1',
+     test_id: 209_361 do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer
@@ -153,7 +165,10 @@ describe 'quizzes question with html answers' do
     expect(html).to eq '<p>HTML</p>'
   end
 
-  it 'saves open html answers when the question is submitted for multiple answers', priority: "1", test_id: 209362 do
+  it 'saves open html answers when the question is submitted for multiple answers',
+     priority: '1',
+     test_id: 209_362,
+     custom_timeout: 30 do
     quiz_with_new_questions
     click_questions_tab
     edit_first_html_answer 'Multiple Answers'

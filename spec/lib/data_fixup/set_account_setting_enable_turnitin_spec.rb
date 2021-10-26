@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe DataFixup::SetAccountSettingEnableTurnitin do
   let(:account) do
     Account.create!(name: 'turnitin tester', turnitin_account_id: '1234',

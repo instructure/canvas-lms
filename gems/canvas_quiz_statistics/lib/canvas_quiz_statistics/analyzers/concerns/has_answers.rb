@@ -37,7 +37,7 @@ module CanvasQuizStatistics::Analyzers::Concerns
     #   "text": "Answer text.",
     #   "correct": true // based on weight
     # }
-    def parse_answers(source = @question_data[:answers], &formatter)
+    def parse_answers(source = @question_data[:answers])
       return [] if source.blank?
 
       source.map do |answer|
@@ -91,7 +91,7 @@ module CanvasQuizStatistics::Analyzers::Concerns
     #   answers.detect { |a| a[:id] == "#{response[:answer_id]}" }
     #
     # @return [Hash|NilClass]
-    def locate_answer(response, answers, *args)
+    def locate_answer(response, answers, *)
       raise NotImplementedError
     end
 
@@ -105,7 +105,7 @@ module CanvasQuizStatistics::Analyzers::Concerns
     # pre-defined answer in #locate_answer.
     #
     # @return [Boolean]
-    def answer_present_but_unknown?(response, *args)
+    def answer_present_but_unknown?(response, *)
       answer_present?(response)
     end
 

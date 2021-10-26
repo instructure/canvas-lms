@@ -17,8 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe Attachments::GarbageCollector do
   describe 'FolderContextType' do
     let_once(:course) { Account.default.courses.create! }

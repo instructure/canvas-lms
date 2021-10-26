@@ -96,7 +96,8 @@ export class PlannerItem_raw extends Component {
     simplifiedControls: bool,
     isMissingItem: bool,
     readOnly: bool,
-    onlineMeetingURL: string
+    onlineMeetingURL: string,
+    isObserving: bool
   }
 
   static defaultProps = {
@@ -104,7 +105,8 @@ export class PlannerItem_raw extends Component {
     responsiveSize: 'large',
     allDay: false,
     simplifiedControls: false,
-    isMissingItem: false
+    isMissingItem: false,
+    isObserving: false
   }
 
   constructor(props) {
@@ -594,7 +596,7 @@ export class PlannerItem_raw extends Component {
             label={<ScreenReaderContent>{checkboxLabel}</ScreenReaderContent>}
             checked={this.props.toggleAPIPending ? !this.state.completed : this.state.completed}
             onChange={this.props.toggleCompletion}
-            disabled={this.props.toggleAPIPending}
+            disabled={this.props.toggleAPIPending || this.props.isObserving}
             readOnly={this.props.readOnly}
           />
         </ApplyTheme>

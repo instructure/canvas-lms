@@ -111,7 +111,7 @@ module Qti
       next if resource_nodes.any? { |node| node['href'] == file['href'] }
 
       # anything left is a file that needs to become an attachment on the context
-      attachments << URI.unescape(file['href'])
+      attachments << CGI.unescape(file['href'])
     end
     attachments
   end

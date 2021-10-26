@@ -47,8 +47,8 @@ export function requestImages(contextType) {
 }
 
 export function receiveImages({response, contextType}) {
-  const {files, bookmark} = response
-  return {type: RECEIVE_IMAGES, payload: {files, bookmark, contextType}}
+  const {files, bookmark, searchString} = response
+  return {type: RECEIVE_IMAGES, payload: {files, bookmark, contextType, searchString}}
 }
 
 export function failImagesLoad({error, contextType}) {

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe Latex do
   describe '.to_math_ml' do
     it 'is blank if latex: is blank or nil' do

@@ -1429,8 +1429,9 @@ CanvasRails::Application.routes.draw do
       get 'users/:id', action: :api_show
       put 'users/:id', action: :update
       delete 'users/:id', action: :destroy, as: 'destroy_user'
-      post 'users/:user_id/files', action: :create_file
+      delete 'users/:id/sessions', action: :terminate_sessions
 
+      post 'users/:user_id/files', action: :create_file
       get  'users/:user_id/files', controller: :files, action: :api_index, as: 'user_files'
       get 'users/:user_id/folders', controller: :folders, action: :list_all_folders, as: 'user_folders'
       post 'users/:user_id/folders', controller: :folders, action: :create

@@ -27,7 +27,7 @@ require 'securerandom'
 require 'tmpdir'
 
 ENV["RAILS_ENV"] = 'test'
-require File.expand_path('../../config/environment', __FILE__)
+require_relative '../config/environment'
 
 if ENV['COVERAGE'] == "1"
   puts "Code Coverage enabled"

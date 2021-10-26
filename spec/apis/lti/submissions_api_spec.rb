@@ -249,7 +249,6 @@ module Lti
       it "returns a 401 if the attachment isn't associated to the assignment" do
         get "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}", headers: request_headers
         attachment1 = Attachment.create!(context: Account.create!, filename: "test.txt", content_type: "text/plain")
-        endpoint = "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}/attachment/#{attachment1.id}"
         get controller.attachment_url(attachment1), headers: request_headers
         expect(response.code).to eq "401"
       end

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
-
 describe SIS::CSV::UserObserverImporter do
   before { account_model }
 
@@ -71,7 +69,6 @@ describe SIS::CSV::UserObserverImporter do
     @account.save!
     observer = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
-    before_count = UserObservationLink.active.count
     process_csv_data_cleanly(
       "observer_id,student_id,status",
       "U001,U002,ACTIVE"

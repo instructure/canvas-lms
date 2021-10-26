@@ -34,6 +34,7 @@ import * as PacePlanApi from '../../../api/pace_plan_api'
 import {StoreState, PacePlan} from '../../../types'
 import {getCourse} from '../../../reducers/course'
 import {getExcludeWeekends, getPacePlan} from '../../../reducers/pace_plans'
+import {getPlanPublishing} from '../../../reducers/ui'
 import {pacePlanActions} from '../../../actions/pace_plans'
 import {actions as uiActions} from '../../../actions/ui'
 import UpdateExistingPlansModal from '../../../shared/components/update_existing_plans_modal'
@@ -42,6 +43,7 @@ interface StoreProps {
   readonly courseId: string
   readonly excludeWeekends: boolean
   readonly pacePlan: PacePlan
+  readonly planPublishing: boolean
 }
 
 interface DispatchProps {
@@ -171,6 +173,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
               <Checkbox
                 label={I18n.t('Skip Weekends')}
                 checked={this.props.excludeWeekends}
+                disabled={this.props.planPublishing}
                 onChange={() => this.props.toggleExcludeWeekends()}
               />
             </View>
@@ -205,7 +208,8 @@ const mapStateToProps = (state: StoreState): StoreProps => {
   return {
     courseId: getCourse(state).id,
     excludeWeekends: getExcludeWeekends(state),
-    pacePlan: getPacePlan(state)
+    pacePlan: getPacePlan(state),
+    planPublishing: getPlanPublishing(state)
   }
 }
 

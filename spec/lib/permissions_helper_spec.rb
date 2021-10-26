@@ -494,8 +494,8 @@ describe PermissionsHelper do
           RoleOverride.create!(permission: 'moderate_forum', enabled: true,
                                role: student_role(root_account_id: @another_account.id), account: @another_account)
         end
-        student_enrollment2 = course_with_student(user: @user, active_all: true)
-        teacher_enrollment2 = course_with_teacher(user: @user, active_all: true)
+        course_with_student(user: @user, active_all: true)
+        course_with_teacher(user: @user, active_all: true)
         AccountUser.create!(user: @user, account: Account.default, role: admin_role)
         RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: teacher_role, account: Account.default)
 

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe ContentMigration do
   before :once do
     course_with_teacher
@@ -215,6 +213,13 @@ describe ContentMigration do
       cm = setup_zip_import(@course)
       expect(cm.root_account).to eq @course.root_account
       test_zip_import(@course, cm)
+    end
+
+    it "records the job id" do
+      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
+      cm = setup_zip_import(@course)
+      test_zip_import(@course, cm)
+      expect(cm.reload.migration_settings[:job_ids]).to eq([123])
     end
 
     it "goes through instfs if enabled" do

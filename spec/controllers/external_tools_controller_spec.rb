@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
 require 'lti_1_3_spec_helper'
 
 describe ExternalToolsController do
@@ -1274,6 +1273,101 @@ describe ExternalToolsController do
       expect(assigns[:tool]).to eq tool
       expect(assigns[:lti_launch].params['custom_canvas_enrollment_state']).to eq 'inactive'
     end
+
+    context 'with RCE parameters' do
+      subject do
+        user_session(@student)
+        get 'resource_selection', params: {
+          course_id: @course.id,
+          external_tool_id: tool.id,
+          editor: '1',
+          selection: selection,
+          editor_contents: contents
+        }
+      end
+
+      let(:message_type) { raise 'override in examples' }
+      let(:contents) { 'hello world!' }
+      let(:selection) { 'world!' }
+      let(:tool) do
+        t = new_valid_tool(@course)
+        t.editor_button = { message_type: message_type, icon_url: 'http://example.com/icon' }
+        t.custom_fields = { contents: '$com.instructure.Editor.contents', selection: '$com.instructure.Editor.selection' }
+        t.save
+        t
+      end
+
+      shared_examples_for 'includes editor variables' do
+        let(:selection_launch_param) { raise 'override' }
+        let(:contents_launch_param) { raise 'override' }
+
+        it 'includes editor selection' do
+          subject
+          expect(selection_launch_param).to eq selection
+        end
+
+        it 'includes editor contents' do
+          subject
+          expect(contents_launch_param).to eq contents
+        end
+      end
+
+      context 'when tool is 1.1' do
+        context 'during a basic launch' do
+          let(:message_type) { 'basic-lti-launch-request' }
+
+          it_behaves_like 'includes editor variables' do
+            let(:selection_launch_param) { assigns[:lti_launch].params['custom_selection'] }
+            let(:contents_launch_param) { assigns[:lti_launch].params['custom_contents'] }
+          end
+        end
+
+        context 'during a content item launch' do
+          let(:message_type) { 'ContentItemSelectionRequest' }
+
+          it_behaves_like 'includes editor variables' do
+            let(:selection_launch_param) { assigns[:lti_launch].params['custom_selection'] }
+            let(:contents_launch_param) { assigns[:lti_launch].params['custom_contents'] }
+          end
+        end
+      end
+
+      context 'when tool is 1.3' do
+        let(:tool) do
+          t = super()
+          t.use_1_3 = true
+          t.developer_key = DeveloperKey.create!
+          t.save
+          t
+        end
+        let(:launch_params) do
+          JSON.parse(
+            fetch_and_delete_launch(
+              @course,
+              JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)['verifier']
+            )
+          )
+        end
+
+        context 'during a basic launch' do
+          let(:message_type) { 'LtiResourceLinkRequest' }
+
+          it_behaves_like 'includes editor variables' do
+            let(:selection_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", 'selection') }
+            let(:contents_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", 'contents') }
+          end
+        end
+
+        context 'during a deep linking launch' do
+          let(:message_type) { 'LtiDeepLinkingRequest' }
+
+          it_behaves_like 'includes editor variables' do
+            let(:selection_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", 'selection') }
+            let(:contents_launch_param) { launch_params.dig("https://purl.imsglobal.org/spec/lti/claim/custom", 'contents') }
+          end
+        end
+      end
+    end
   end
 
   describe "POST 'create'" do
@@ -1679,7 +1773,6 @@ describe ExternalToolsController do
     it "fails gracefully on invalid URL retrieval or timeouts" do
       allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
       user_session(@teacher)
-      xml = "bob"
       post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url", :config_url => "http://config.example.com" } }, :format => "json"
       expect(response).not_to be_successful
       expect(assigns[:tool]).to be_new_record
@@ -1690,7 +1783,6 @@ describe ExternalToolsController do
     it "fails gracefully trying to retrieve from localhost" do
       expect(CanvasHttp).to receive(:insecure_host?).with("localhost").and_return(true)
       user_session(@teacher)
-      xml = "bob"
       post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com",
                                                                              :consumer_key => "key", :shared_secret => "secret", :config_type => "by_url",
                                                                              :config_url => "http://localhost:9001" } }, :format => "json"

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe OAuthProxyController do
   it 'redirects to the url in the state' do
     get :redirect_proxy, params: { state: Canvas::Security.create_jwt({ redirect_uri: 'http://example.com' }) }

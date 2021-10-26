@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe 'UpdateCustomParams' do
   def generic_lti_config(launch_url)
     <<-HEREDOC

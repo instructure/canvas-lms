@@ -409,7 +409,7 @@ describe 'quizzes question creation' do
       start_quiz_question
       chars = [*('a'..'z')]
       value = (0..16385).map { chars.sample }.join
-      type_in_tiny '.question:visible textarea.question_content', value
+      type_in_tiny 'textarea#question_content_0', value
       wait_for_ajaximations
       f('.submit_button').click
       wait_for_ajaximations

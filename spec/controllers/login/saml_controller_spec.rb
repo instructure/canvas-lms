@@ -76,7 +76,7 @@ describe Login::SamlController do
     unique_id = 'foo@example.com'
 
     account1 = account_with_saml
-    user1 = user_with_pseudonym({ :active_all => true, :username => unique_id })
+    user_with_pseudonym({ :active_all => true, :username => unique_id })
     @pseudonym.account = account1
     @pseudonym.save!
 
@@ -125,7 +125,7 @@ describe Login::SamlController do
     unique_id = 'foo@example.com'
 
     account1 = account_with_saml
-    user1 = user_with_pseudonym({ :active_all => true, :username => unique_id })
+    user_with_pseudonym({ :active_all => true, :username => unique_id })
     @pseudonym.account = account1
     @pseudonym.save!
 
@@ -251,7 +251,7 @@ describe Login::SamlController do
       parent_registration: true,
       saml_log_out_url: "http://example.com/logout"
     )
-    user1 = user_with_pseudonym({ :active_all => true, :username => unique_id })
+    user_with_pseudonym({ :active_all => true, :username => unique_id })
     @pseudonym.account = account1
     @pseudonym.save!
 
@@ -913,7 +913,7 @@ describe Login::SamlController do
     end
 
     it "does persist the entity id if a saml provider exists" do
-      ap = Account.default.authentication_providers.create!(auth_type: 'saml')
+      Account.default.authentication_providers.create!(auth_type: 'saml')
       expect(Account.default.reload.settings).not_to have_key(:saml_entity_id)
       get :metadata
       expect(Account.default.reload.settings[:saml_entity_id]).not_to be_blank

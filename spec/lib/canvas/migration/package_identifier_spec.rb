@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
-
 describe Canvas::Migration::PackageIdentifier do
   it "errors if you try to get it to parse a package it has no setting for" do
     archive = double(path: "archive.zip", find_entry: true)

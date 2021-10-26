@@ -53,15 +53,15 @@ describe "Rubrics API", type: :request do
     submission = assignment1.find_or_create_submission(@student)
     ra_params = rubric_association_params_for_assignment(submission.assignment)
     rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
-    rubric_assessment = RubricAssessment.create!({
-                                                   artifact: submission,
-                                                   assessment_type: assessment_type,
-                                                   assessor: @teacher,
-                                                   rubric: @rubric,
-                                                   user: submission.user,
-                                                   rubric_association: rubric_assoc,
-                                                   data: [{ points: 3.0, description: "hello", comments: opts[:comments] }]
-                                                 })
+    RubricAssessment.create!({
+                               artifact: submission,
+                               assessment_type: assessment_type,
+                               assessor: @teacher,
+                               rubric: @rubric,
+                               user: submission.user,
+                               rubric_association: rubric_assoc,
+                               data: [{ points: 3.0, description: "hello", comments: opts[:comments] }]
+                             })
   end
 
   def rubric_data_hash(opts = {})

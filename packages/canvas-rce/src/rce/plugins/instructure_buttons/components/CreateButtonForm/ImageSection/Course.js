@@ -19,9 +19,43 @@
 import React from 'react'
 
 import {View} from '@instructure/ui-view'
+import ImageList from '../../../../instructure_image/Images'
+import {useStoreProps} from '../../../../shared/StoreContext'
 
 const Course = () => {
-  return <View data-testid="course-images">Course Image Placeholder</View>
+  const storeProps = useStoreProps()
+  const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
+
+  const fetchInitial = () => {
+    setIsLoading(true)
+    storeProps.fetchInitialImages()
+  }
+
+  return (
+    <View>
+      <ImageList
+        fetchInitialImages={storeProps.fetchInitialImages}
+        fetchNextImages={storeProps.fetchNextImages}
+        contextType={storeProps.contextType}
+        images={{
+          [storeProps.contextType]: {
+            files,
+            bookmark,
+            hasMore,
+            isLoading
+          }
+        }}
+        sortBy={{
+          sort: 'date_added',
+          order: 'desc'
+        }}
+        onImageEmbed={(a, b, c) => {
+          // TODO: in next commit, handle image selection
+          console.log('Selected Image', a)
+        }}
+      />
+    </View>
+  )
 }
 
 export default Course

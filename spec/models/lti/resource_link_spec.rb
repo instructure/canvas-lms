@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 RSpec.describe Lti::ResourceLink, type: :model do
   let(:tool) { external_tool_model }
   let(:course) { Course.create!(name: 'Course') }

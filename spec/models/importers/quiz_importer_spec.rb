@@ -28,7 +28,7 @@ describe "Importers::QuizImporter" do
 
   it "gets the quiz properties" do
     context = course_model
-    question_data = import_example_questions context
+    question_data = import_example_questions
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
     Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
     quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
@@ -48,7 +48,7 @@ describe "Importers::QuizImporter" do
 
     it "does not set the description field for the classic quiz" do
       context = course_model
-      question_data = import_example_questions context
+      question_data = import_example_questions
       data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
       Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
       quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
@@ -59,7 +59,7 @@ describe "Importers::QuizImporter" do
 
   it "completes a quiz question reference" do
     context = course_model
-    question_data = import_example_questions context
+    question_data = import_example_questions
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
     Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
     quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
@@ -70,7 +70,7 @@ describe "Importers::QuizImporter" do
 
   it "imports a text only question" do
     context = get_import_context
-    question_data = import_example_questions context
+    question_data = import_example_questions
     data = get_import_data ['vista', 'quiz'], 'text_only_quiz_data'
     Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
     quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
@@ -83,7 +83,7 @@ describe "Importers::QuizImporter" do
 
   it "imports a question group" do
     context = get_import_context
-    question_data = import_example_questions context
+    question_data = import_example_questions
     data = get_import_data ['vista', 'quiz'], 'group_quiz_data'
     Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
     quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
@@ -95,7 +95,7 @@ describe "Importers::QuizImporter" do
 
   it "is practice if it's not for an assignment" do
     context = get_import_context
-    question_data = import_example_questions context
+    question_data = import_example_questions
     data = get_import_data ['vista', 'quiz'], 'text_only_quiz_data'
     data["quiz_type"] = "practice_quiz"
     Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
@@ -162,7 +162,7 @@ describe "Importers::QuizImporter" do
 
   it "converts relative file references to course-relative file references" do
     context = @course
-    import_example_questions context
+    import_example_questions
     @migration.resolve_content_links!
 
     question = AssessmentQuestion.where(migration_id: '4393906433391').first
@@ -173,7 +173,7 @@ describe "Importers::QuizImporter" do
 
   it "updates quiz question on re-import" do
     context = get_import_context
-    question_data = import_example_questions context
+    question_data = import_example_questions
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
     Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
     quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
@@ -188,7 +188,7 @@ describe "Importers::QuizImporter" do
 
   it "updates quiz question on re-import even if the associated quiz is published" do
     context = get_import_context
-    question_data = import_example_questions context
+    question_data = import_example_questions
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
     Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
     quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first
@@ -224,7 +224,7 @@ describe "Importers::QuizImporter" do
 
   it 'sets root_account_id correctly' do
     context = course_model
-    question_data = import_example_questions context
+    question_data = import_example_questions
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
     Importers::QuizImporter.import_from_migration(data, context, @migration, question_data)
     quiz = Quizzes::Quiz.where(migration_id: data[:migration_id]).first

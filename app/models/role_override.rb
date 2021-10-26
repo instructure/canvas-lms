@@ -1594,19 +1594,19 @@ class RoleOverride < ActiveRecord::Base
 
   # permissions that apply to concluded courses/enrollments
   def self.concluded_permission_types
-    self.permissions.select { |k, p| !!p[:applies_to_concluded] }
+    self.permissions.select { |_k, p| p[:applies_to_concluded] }
   end
 
   def self.manageable_permissions(context, base_role_type = nil)
     permissions = self.permissions.dup
-    permissions.reject! { |k, p| p[:account_only] == :site_admin } unless context.site_admin?
-    permissions.reject! { |k, p| p[:account_only] == :root } unless context.root_account?
-    permissions.reject! { |k, p| !p[:available_to].include?(base_role_type) } unless base_role_type.nil?
-    permissions.reject! { |k, p| p[:account_allows] && !p[:account_allows].call(context) }
-    permissions.reject! { |k, p|
+    permissions.reject! { |_k, p| p[:account_only] == :site_admin } unless context.site_admin?
+    permissions.reject! { |_k, p| p[:account_only] == :root } unless context.root_account?
+    permissions.reject! { |_k, p| p[:available_to].exclude?(base_role_type) } unless base_role_type.nil?
+    permissions.reject! { |_k, p| p[:account_allows] && !p[:account_allows].call(context) }
+    permissions.reject! do |_k, p|
       p[:enabled_for_plugin] &&
         !((plugin = Canvas::Plugin.find(p[:enabled_for_plugin])) && plugin.enabled?)
-    }
+    end
     permissions
   end
 

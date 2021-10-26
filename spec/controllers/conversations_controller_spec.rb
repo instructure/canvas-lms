@@ -425,7 +425,7 @@ describe ConversationsController do
       end
     end
 
-    it "correctlies infer context tags" do
+    it "infers context tags correctly" do
       course_with_teacher_logged_in(:active_all => true)
       @course1 = @course
       @course2 = course_factory(active_all: true)
@@ -661,7 +661,7 @@ describe ConversationsController do
       expect(@conversation.reload.participants.size).to eq 4 # includes @user
     end
 
-    it "correctlies infer context tags" do
+    it "infers context tags correctly" do
       a = Account.default
       @group = a.groups.create!
       @conversation.participants.each { |user| @group.users << user }

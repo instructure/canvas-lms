@@ -81,7 +81,7 @@ describe Pseudonym do
   it "finds the correct pseudonym for logins" do
     user = User.create!
     p1 = Pseudonym.create!(:unique_id => 'Cody@instructure.com', :user => user)
-    p2 = Pseudonym.create!(:unique_id => 'codY@instructure.com', :user => user) { |p| p.workflow_state = 'deleted' }
+    Pseudonym.create!(:unique_id => 'codY@instructure.com', :user => user) { |p| p.workflow_state = 'deleted' }
     expect(Pseudonym.active.by_unique_id('cody@instructure.com').first).to eq p1
     account = Account.create!
     p3 = Pseudonym.create!(:unique_id => 'cOdy@instructure.com', :account => account, :user => user)
@@ -112,7 +112,7 @@ describe Pseudonym do
     account_model
     user_model
     account1 = account_model
-    account2 = account_model
+    account_model
     expect(@user.user_account_associations.length).to eql(0)
 
     pseudonym_model(:user => @user, :account => account1)
@@ -173,7 +173,7 @@ describe Pseudonym do
       )
     end
 
-    it "gracefullies handle unreachable LDAP servers" do
+    it "gracefully handles unreachable LDAP servers" do
       expect_any_instance_of(Net::LDAP).to receive(:bind_as).and_raise(Net::LDAP::LdapError, "no connection to server")
       expect(Canvas::Errors).to receive(:capture) do |ex, data, level|
         expect(ex.class).to eq(Net::LDAP::LdapError)

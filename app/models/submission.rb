@@ -415,7 +415,7 @@ class Submission < ActiveRecord::Base
 
   simply_versioned :explicit => true,
                    :when => lambda { |model| model.new_version_needed? },
-                   :on_create => lambda { |model, version| SubmissionVersion.index_version(version) },
+                   :on_create => lambda { |_model, version| SubmissionVersion.index_version(version) },
                    :on_load => lambda { |model, version| model&.cached_due_date = version.versionable&.cached_due_date }
 
   # This needs to be after simply_versioned because the grade change audit uses
@@ -2686,7 +2686,7 @@ class Submission < ActiveRecord::Base
           scope = scope.where(:enrollments => { :course_section_id => section })
         end
 
-        user_ids = user_grades.map { |id, data| id }
+        user_ids = user_grades.keys
         preloaded_users = scope.where(:id => user_ids)
         preloaded_submissions = assignment.submissions.where(user_id: user_ids).group_by(&:user_id)
 

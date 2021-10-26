@@ -156,7 +156,6 @@ describe "speed grader" do
 
     it "locks a provisional grader out if graded by someone else while switching students" do
       other_ta = course_with_ta(course: @course, active_all: true).user
-      original_sub = @submission
       student_submission
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"

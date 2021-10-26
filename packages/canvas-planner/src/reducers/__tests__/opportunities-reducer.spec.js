@@ -138,3 +138,17 @@ it('TOGGLE_MISSING_ITEMS always expands when forceExpanded is true', () => {
   })
   expect(finalState.missingItemsExpanded).toBeTruthy()
 })
+
+it('CLEAR_OPPORTUNITIES returns state to default state', () => {
+  const initialState = {
+    items: [basicOpportunity()],
+    missingItemsExpanded: true,
+    nextUrl: 'not null'
+  }
+  const newState = opportunitiesReducer(initialState, {
+    type: 'CLEAR_OPPORTUNITIES'
+  })
+  expect(newState.items).toEqual([])
+  expect(newState.missingItemsExpanded).toBeFalsy()
+  expect(newState.nextUrl).toBeNull()
+})

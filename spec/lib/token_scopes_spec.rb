@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path('../spec_helper', File.dirname(__FILE__))
-
 # We want to force the usage of the fallback scope mapper here, not the generated version
 Object.const_set("ApiScopeMapper", ApiScopeMapperLoader.api_scope_mapper_fallback)
 

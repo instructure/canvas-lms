@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe ExternalFeed do
   it "adds rss entries" do
     @feed = external_feed_model
@@ -150,7 +148,7 @@ describe ExternalFeed do
     require 'rss/1.0'
     require 'rss/2.0'
     rss = RSS::Parser.parse rss_example
-    res = @feed.add_rss_entries(rss)
+    @feed.add_rss_entries(rss)
 
     @feed.destroy
     @course.reload

@@ -131,7 +131,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
     if self.default_restrictions_by_type_changed?
       if (self.default_restrictions_by_type.keys - MasterCourses::RESTRICTED_OBJECT_TYPES).any?
         self.errors.add(:default_restrictions_by_type, "Invalid content type")
-      elsif self.default_restrictions_by_type.values.any? { |k, v| (k.keys - MasterCourses::LOCK_TYPES).any? }
+      elsif self.default_restrictions_by_type.values.any? { |k, _v| (k.keys - MasterCourses::LOCK_TYPES).any? }
         self.errors.add(:default_restrictions_by_type, "Invalid settings")
       end
     end
@@ -214,7 +214,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def add_child_course!(child_course_or_id)
-    MasterCourses::ChildSubscription.unique_constraint_retry do |retry_count|
+    MasterCourses::ChildSubscription.unique_constraint_retry do
       child_sub = self.child_subscriptions.where(:child_course_id => child_course_or_id).first_or_create!
       child_sub.undestroy if child_sub.deleted?
       child_sub

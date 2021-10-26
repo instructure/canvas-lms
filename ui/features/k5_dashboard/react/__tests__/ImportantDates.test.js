@@ -19,17 +19,29 @@
 import React from 'react'
 import fetchMock from 'fetch-mock'
 import moment from 'moment-timezone'
-import {act, render, waitForElementToBeRemoved} from '@testing-library/react'
+import {act, render, waitForElementToBeRemoved, waitFor} from '@testing-library/react'
 
 import ImportantDates from '../ImportantDates'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import tz from '@canvas/timezone'
-import {MOCK_ASSIGNMENTS, MOCK_CARDS, MOCK_EVENTS} from '@canvas/k5/react/__tests__/fixtures'
+import {
+  MOCK_ASSIGNMENTS,
+  MOCK_CARDS,
+  MOCK_EVENTS,
+  MOCK_OBSERVEE_EVENTS,
+  MOCK_OBSERVEE_ASSIGNMENTS
+} from '@canvas/k5/react/__tests__/fixtures'
 
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
 const EVENTS_URL = /\/api\/v1\/calendar_events\?type=event&important_dates=true&.*/
 
+const OBSERVER_ASSIGNMENTS_URL =
+  /\/api\/v1\/users\/5\/calendar_events\?type=assignment&important_dates=true&.*/
+const OBSERVER_EVENTS_URL =
+  /\/api\/v1\/users\/5\/calendar_events\?type=event&important_dates=true&.*/
+
 describe('ImportantDates', () => {
+  const currentUserId = '1'
   const getProps = (overrides = {}) => ({
     timeZone: 'UTC',
     contexts: MOCK_CARDS,
@@ -212,5 +224,47 @@ describe('ImportantDates', () => {
     expect(
       queryByRole('button', {name: 'Select calendars to retrieve important dates from'})
     ).not.toBeInTheDocument()
+  })
+
+  describe('Parent Support', () => {
+    beforeEach(() => {
+      global.ENV = {
+        current_user_id: currentUserId,
+        FEATURES: {
+          k5_parent_support: true
+        }
+      }
+      fetchMock.get(OBSERVER_ASSIGNMENTS_URL, JSON.stringify(MOCK_OBSERVEE_ASSIGNMENTS))
+      fetchMock.get(OBSERVER_EVENTS_URL, JSON.stringify(MOCK_OBSERVEE_EVENTS))
+    })
+
+    afterEach(() => {
+      global.ENV = {}
+    })
+
+    it('requests observee calendar events when observing a student', async () => {
+      const {getByText} = render(<ImportantDates {...getProps()} observedUserId="5" />)
+      await waitFor(() => {
+        expect(getByText('Number theory')).toBeInTheDocument()
+        expect(getByText('Dynamics')).toBeInTheDocument()
+        expect(getByText('First Quiz')).toBeInTheDocument()
+      })
+      expect(fetchMock.called(OBSERVER_ASSIGNMENTS_URL)).toBe(true)
+      expect(fetchMock.called(OBSERVER_EVENTS_URL)).toBe(true)
+    })
+
+    it('doest not show the calendar select modal when observing a student', () => {
+      const {queryByRole} = render(<ImportantDates {...getProps()} observedUserId="5" />)
+      expect(
+        queryByRole('button', {name: 'Select calendars to retrieve important dates from'})
+      ).not.toBeInTheDocument()
+    })
+
+    it('shows the calendar select modal if the user is observing his own enrollments', () => {
+      const {getByRole} = render(<ImportantDates {...getProps()} observedUserId={currentUserId} />)
+      expect(
+        getByRole('button', {name: 'Select calendars to retrieve important dates from'})
+      ).toBeInTheDocument()
+    })
   })
 })

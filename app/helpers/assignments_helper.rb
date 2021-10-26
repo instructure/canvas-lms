@@ -31,7 +31,7 @@ module AssignmentsHelper
     }
   end
 
-  def multiple_due_dates(assignment)
+  def multiple_due_dates
     # can use this method as the single source of rendering multiple due dates
     # for now, just text, but eventually, a bubble/dialog/link/etc, rendering
     # the information contained in the varied_due_date parameter
@@ -55,7 +55,7 @@ module AssignmentsHelper
 
   def due_at(assignment, user)
     if assignment.multiple_due_dates_apply_to?(user)
-      multiple_due_dates(assignment)
+      multiple_due_dates
     else
       assignment = assignment.overridden_for(user)
       due_date = assignment.due_at || assignment.applied_overrides.map(&:due_at).compact.first

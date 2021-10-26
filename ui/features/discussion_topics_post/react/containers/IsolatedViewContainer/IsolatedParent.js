@@ -27,7 +27,7 @@ import I18n from 'i18n!discussion_posts'
 import {isTopicAuthor, responsiveQuerySizes} from '../../utils'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
-import React, {useState} from 'react'
+import React, {useContext, useState} from 'react'
 import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
@@ -35,10 +35,13 @@ import {ThreadActions} from '../../components/ThreadActions/ThreadActions'
 import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolbar'
 import {
   UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT,
-  UPDATE_DISCUSSION_THREAD_READ_STATE
+  UPDATE_DISCUSSION_THREAD_READ_STATE,
+  UPDATE_DISCUSSION_ENTRY_PARTICIPANT
 } from '../../../graphql/Mutations'
 import {useMutation, useApolloClient} from 'react-apollo'
 import {View} from '@instructure/ui-view'
+import {ReportReply} from '../../components/ReportReply/ReportReply'
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 
 export const IsolatedParent = props => {
   const [updateIsolatedViewDeeplyNestedAlert] = useMutation(
@@ -54,8 +57,26 @@ export const IsolatedParent = props => {
     update: resetDiscussionCache
   })
 
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [isEditing, setIsEditing] = useState(false)
+  const [showReportModal, setShowReportModal] = useState(false)
+  const [reportModalIsLoading, setReportModalIsLoading] = useState(false)
   const threadActions = []
+
+  const [updateDiscussionEntryReported] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
+    onCompleted: data => {
+      if (!data || !data.updateDiscussionEntryParticipant) {
+        return null
+      }
+      setReportModalIsLoading(false)
+      setShowReportModal(false)
+      setOnSuccess(I18n.t('You have reported this reply.'), false)
+    },
+    onError: () => {
+      setReportModalIsLoading(false)
+      setOnFailure(I18n.t('We experienced an issue. This reply was not reported.'))
+    }
+  })
 
   if (props.discussionEntry.permissions.reply) {
     threadActions.push(
@@ -196,6 +217,15 @@ export const IsolatedParent = props => {
                             }
                           })
                         }
+                        onReport={
+                          ENV?.student_reporting_enabled &&
+                          props.discussionTopic.permissions?.studentReporting
+                            ? () => {
+                                setShowReportModal(true)
+                              }
+                            : null
+                        }
+                        isReported={props.discussionEntry?.entryParticipant?.reportType != null}
                       />
                     }
                     author={props.discussionEntry.author}
@@ -237,6 +267,22 @@ export const IsolatedParent = props => {
                       </View>
                     )}
                   </DiscussionEntryContainer>
+                  <ReportReply
+                    onCloseReportModal={() => {
+                      setShowReportModal(false)
+                    }}
+                    onSubmit={reportType => {
+                      updateDiscussionEntryReported({
+                        variables: {
+                          discussionEntryId: props.discussionEntry._id,
+                          reportType
+                        }
+                      })
+                      setReportModalIsLoading(true)
+                    }}
+                    showReportModal={showReportModal}
+                    isLoading={reportModalIsLoading}
+                  />
                 </Flex.Item>
               </Flex>
               {props.children}

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe DataFixup::BackfillDevKeyAccountBindings do
   describe "#run" do
     let(:key) { DeveloperKey.create! }

@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + "/../../spec_helper")
 require_relative "../graphql_spec_helper"
 
 describe Types::AssignmentType do
@@ -537,7 +536,7 @@ describe Types::AssignmentType do
       gc = assignment.group_category = GroupCategory.create! name: "asdf", context: course
       group = gc.groups.create! name: "group", context: course
       assignment.update group_category: gc
-      group_override = assignment.assignment_overrides.create!(set: group)
+      assignment.assignment_overrides.create!(set: group)
       expect(
         assignment_type.resolve(<<~GQL, current_user: teacher)
           assignmentOverrides { edges { node { set {
@@ -551,7 +550,7 @@ describe Types::AssignmentType do
 
     it "works for sections" do
       section = course.course_sections.create! name: "section"
-      section_override = assignment.assignment_overrides.create!(set: section)
+      assignment.assignment_overrides.create!(set: section)
       expect(
         assignment_type.resolve(<<~GQL, current_user: teacher)
           assignmentOverrides { edges { node { set {

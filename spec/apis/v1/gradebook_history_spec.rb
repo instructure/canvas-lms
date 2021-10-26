@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path('../../spec_helper', File.dirname(__FILE__))
-
 class GradebookHistoryHarness
   include Api::V1::GradebookHistory
 

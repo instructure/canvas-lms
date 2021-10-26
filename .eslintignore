@@ -1,5 +1,5 @@
 /doc/*
-/frontend_build/**
+/ui-build/**
 /gems/canvas_i18nliner/*
 /packages/*/node_modules/**
 /spec/javascripts/support/jquery.mockjax.js

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe AssignmentUtil do
   before :once do
     course_with_teacher(active_all: true)
@@ -244,8 +242,8 @@ describe AssignmentUtil do
       section_a_ao = create_section_override_for_assignment(assignment, course_section: section_a)
 
       section_b = @course.course_sections.create!
-      section_b_user_1 = student_in_course(active_all: true, section: section_b).student
-      section_b_ao = create_section_override_for_assignment(assignment, course_section: section_b)
+      student_in_course(active_all: true, section: section_b).student
+      create_section_override_for_assignment(assignment, course_section: section_b)
 
       expect(described_class).to receive(:alert_unaware_student).with(anything, assignment: assignment, submission: submission_for[section_a_user_1])
 

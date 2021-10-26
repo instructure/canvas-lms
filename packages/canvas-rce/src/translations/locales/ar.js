@@ -51,6 +51,9 @@ const locale = {
   "announcement_list_da155734": { "message": "قائمة الإعلانات" },
   "announcements_a4b8ed4a": { "message": "الإعلانات" },
   "apply_781a2546": { "message": "تطبيق" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "تطبيق التغييرات على كافة مثيلات هذا الزر والأيقونة في المساق"
+  },
   "apps_54d24a47": { "message": "التطبيق" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "سيتم الاحتفاظ بنسبة العرض إلى الارتفاع"
@@ -63,9 +66,6 @@ const locale = {
   "audio_player_for_title_20cc70d": { "message": "مشغل الصوت لـ { title }" },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "المحتوى المحفوظ تلقائياً موجود. هل ترغب في تحميل المحتوى المحفوظ تلقائياً بدلاً من ذلك؟"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "افتح تلقائيًا معاينة داخلية. (لا تظهر المعاينة إلا بعد الحفظ)"
   },
   "available_folders_694d0436": { "message": "المجلدات المتاحة" },
   "below_81d4dceb": { "message": "الأسفل" },
@@ -102,6 +102,9 @@ const locale = {
     "message": "إغلاق قائمة أو مربع حوار. يعيدك أيضًا إلى مساحة المحرر"
   },
   "close_d634289d": { "message": "إغلاق" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "يجب أن يقل حجم ملف التسمية التوضيحية المغلقة عن { maxKb } كيلوبايت"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "تسميات توضيحية مغلقة/ترجمات مباشرة"
   },
@@ -131,6 +134,7 @@ const locale = {
   "course_navigation_dd035109": { "message": "التنقل عبر المساق" },
   "create_button_and_icon_5c089934": { "message": "إنشاء زر وأيقونة" },
   "creative_commons_license_725584ae": { "message": "ترخيص المشاع الإبداعي:" },
+  "current_image_f16c249c": { "message": "الصورة الحالية" },
   "custom_6979cd81": { "message": "مخصص" },
   "date_added_ed5ad465": { "message": "تاريخ الإضافة" },
   "decorative_image_3c28aa7d": { "message": "صورة تزيين" },
@@ -146,7 +150,6 @@ const locale = {
   "details_98a31b68": { "message": "التفاصيل" },
   "dimensions_45ddb7b7": { "message": "الأبعاد" },
   "directionality_26ae9e08": { "message": "الاتجاهية" },
-  "disable_in_line_preview_2a675175": { "message": "تعطيل المعاينة الداخلية." },
   "discussions_a5f96392": { "message": "النقاشات" },
   "discussions_index_6c36ced": { "message": "فهرس المناقشات" },
   "display_options_315aba85": { "message": "عرض الخيارات" },
@@ -278,11 +281,11 @@ const locale = {
   "middle_27dc1d5": { "message": "الأوسط" },
   "miscellaneous_e9818229": { "message": "متنوعات" },
   "modules_c4325335": { "message": "الوحدات النمطية" },
+  "multi_color_image_63d7372f": { "message": "صورة متعددة الألوان" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "يجب أن تكون { width } x { height } بكسل على الأقل."
   },
   "my_files_2f621040": { "message": "ملفاتي" },
-  "my_images_427f9b0c": { "message": "صوري" },
   "name_1aed4a1b": { "message": "الاسم" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "تنقل من خلال القائمة أو شريط الأدوات"
@@ -358,9 +361,10 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "إظهار خيارات الصورة" },
   "show_link_options_545338fd": { "message": "إظهار خيارات الارتباطات" },
   "show_video_options_6ed3721a": { "message": "إظهار خيارات الفيديو" },
+  "single_color_image_4e5d4dbc": { "message": "صورة بلون واحد" },
   "size_b30e1077": { "message": "الحجم" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "حجم الملف { file } يفوق الحد الأقصى المسموح به من { max } ميغابايت."
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "حجم ملف التسمية التوضيحية يتجاوز الحد الأقصى المسموح به من { max } كيلوبايت."
   },
   "small_b070434a": { "message": "صغير" },
   "something_went_wrong_89195131": { "message": "حدث خطأ ما." },

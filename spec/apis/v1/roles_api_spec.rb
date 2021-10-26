@@ -35,7 +35,7 @@ describe "Roles API", type: :request do
     end
 
     def api_call_with_settings(settings = {})
-      admin = settings.delete(:admin) || @admin
+      settings.delete(:admin)
       account = settings.delete(:account) || @admin.account
       role = settings.delete(:role) || @role_name
       base_role_type = settings.delete(:base_role_type)
@@ -59,7 +59,7 @@ describe "Roles API", type: :request do
       end
 
       it "adds the role to the account" do
-        json = api_call_with_settings(:explicit => '1', :enabled => '1')
+        api_call_with_settings(:explicit => '1', :enabled => '1')
         @account.reload
         expect(@account.available_account_roles).to include(@role)
       end
@@ -235,9 +235,9 @@ describe "Roles API", type: :request do
       it "is not able to deactivate a role from a sub-account" do
         sub_account = @account.sub_accounts.create!
 
-        json = api_call(:delete, "/api/v1/accounts/#{sub_account.id}/roles/#{@role.id}",
-                        { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => sub_account.id.to_param, :id => @role.id }, {},
-                        {}, { :expected_status => 404 })
+        api_call(:delete, "/api/v1/accounts/#{sub_account.id}/roles/#{@role.id}",
+                 { :controller => 'role_overrides', :action => 'remove_role', :format => 'json', :account_id => sub_account.id.to_param, :id => @role.id }, {},
+                 {}, { :expected_status => 404 })
 
         @role.reload
         expect(@role.workflow_state).to eq 'active'

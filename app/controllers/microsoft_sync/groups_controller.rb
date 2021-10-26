@@ -152,13 +152,13 @@ class MicrosoftSync::GroupsController < ApplicationController
       error_msg = t(
         'This course has too many teachers or other owner-type enrollments to ' \
         'be synced. Microsoft 365 allows a maximum of %{max_allowed} owners ' \
-        'in a team.',
+        'in a Team.',
         max_allowed: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS
       )
     elsif MicrosoftSync::CanvasModelsHelpers.max_enrollment_members_reached?(course)
       error_msg = t(
         'This course has too many enrolled users to be synced. Microsoft 365 ' \
-        'allows a maximum of %{max_allowed} members in a team.',
+        'allows a maximum of %{max_allowed} members in a Team.',
         max_allowed: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
       )
     end

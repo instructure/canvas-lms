@@ -41,10 +41,10 @@ describe GradebookHistoryApiController, type: :request do
       assignment1 = @course.assignments.create!(:title => "some assignment")
       assignment2 = @course.assignments.create!(:title => "another assignment")
 
-      submission1 = bare_submission_model(assignment1, student, :graded_at => Time.now.in_time_zone, :grader_id => grader.id, :score => 100)
-      submission2 = bare_submission_model(assignment1, student2, :graded_at => Time.now.in_time_zone, :grader_id => super_grader.id, :score => 90)
-      submission3 = bare_submission_model(assignment1, student3, :graded_at => (Time.now - 24.hours).in_time_zone, :grader_id => other_grader.id, :score => 80)
-      submission4 = bare_submission_model(assignment2, student, :graded_at => (Time.now - 24.hours).in_time_zone, :grader_id => other_grader.id, :score => 70)
+      bare_submission_model(assignment1, student, :graded_at => Time.now.in_time_zone, :grader_id => grader.id, :score => 100)
+      bare_submission_model(assignment1, student2, :graded_at => Time.now.in_time_zone, :grader_id => super_grader.id, :score => 90)
+      bare_submission_model(assignment1, student3, :graded_at => (Time.zone.now - 24.hours).in_time_zone, :grader_id => other_grader.id, :score => 80)
+      bare_submission_model(assignment2, student, :graded_at => (Time.zone.now - 24.hours).in_time_zone, :grader_id => other_grader.id, :score => 70)
 
       json = api_call_as_user(@teacher, :get,
                               "/api/v1/courses/#{@course.id}/gradebook_history/days.json",
@@ -70,7 +70,7 @@ describe GradebookHistoryApiController, type: :request do
 
       assignment = @course.assignments.create!(:title => "some assignment")
 
-      submission = bare_submission_model(assignment, student, :graded_at => Time.now.in_time_zone, :grader_id => grader.id, :score => 100)
+      bare_submission_model(assignment, student, :graded_at => Time.now.in_time_zone, :grader_id => grader.id, :score => 100)
 
       date = Time.now.in_time_zone.strftime('%Y-%m-%d')
       json = api_call_as_user(@teacher, :get,
@@ -230,7 +230,7 @@ describe GradebookHistoryApiController, type: :request do
       expect(json["grader_id"]).to eq @other_grader.id
     end
 
-    it 'optionallies restrict by assignment_id' do
+    it 'optionally restricts by assignment_id' do
       @submission4.with_versioning(:explicit => true) {
         @submission4.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 70)
       }
@@ -247,7 +247,7 @@ describe GradebookHistoryApiController, type: :request do
       json.each { |entry| expect(entry["assignment_id"]).to eq @assignment2.id }
     end
 
-    it 'optionallies restrict by user_id' do
+    it 'optionally restricts by user_id' do
       @submission4.with_versioning(:explicit => true) {
         @submission4.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 70)
       }
@@ -264,7 +264,7 @@ describe GradebookHistoryApiController, type: :request do
       json.each { |entry| expect(entry["user_id"]).to eq @student1.id }
     end
 
-    it 'optionallies reverse ordering to oldest version first' do
+    it 'optionally reverses ordering to oldest version first' do
       @submission3.with_versioning(:explicit => true) {
         @submission3.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 80)
       }

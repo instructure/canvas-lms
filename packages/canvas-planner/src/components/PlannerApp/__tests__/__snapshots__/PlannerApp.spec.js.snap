@@ -37,6 +37,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
   <Animatable(Day)
     animatableIndex={1}
     day="2017-04-24"
+    isObserving={false}
     itemsForDay={Array []}
     key="2017-04-24"
     responsiveSize="large"
@@ -48,6 +49,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
   <Animatable(Day)
     animatableIndex={2}
     day="2017-04-25"
+    isObserving={false}
     itemsForDay={Array []}
     key="2017-04-25"
     responsiveSize="large"
@@ -67,6 +69,7 @@ exports[`PlannerApp always renders today and tomorrow when only items are in the
   <Animatable(Day)
     animatableIndex={4}
     day="2017-04-29"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -130,6 +133,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
   <Animatable(Day)
     animatableIndex={1}
     day="2017-04-19"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -147,6 +151,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
   <Animatable(Day)
     animatableIndex={2}
     day="2017-04-23"
+    isObserving={false}
     itemsForDay={Array []}
     key="2017-04-23"
     responsiveSize="large"
@@ -158,6 +163,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
   <Animatable(Day)
     animatableIndex={3}
     day="2017-04-24"
+    isObserving={false}
     itemsForDay={Array []}
     key="2017-04-24"
     responsiveSize="large"
@@ -169,6 +175,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
   <Animatable(Day)
     animatableIndex={4}
     day="2017-04-25"
+    isObserving={false}
     itemsForDay={Array []}
     key="2017-04-25"
     responsiveSize="large"
@@ -188,6 +195,7 @@ exports[`PlannerApp empty day calculation always renders yesterday, today and to
   <Animatable(Day)
     animatableIndex={6}
     day="2017-04-29"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -251,6 +259,7 @@ exports[`PlannerApp empty day calculation does not render an empty tomorrow when
   <Animatable(Day)
     animatableIndex={1}
     day="2017-04-24"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -314,6 +323,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
   <Animatable(Day)
     animatableIndex={1}
     day="2017-04-24"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -331,6 +341,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
   <Animatable(Day)
     animatableIndex={2}
     day="2017-04-25"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -356,6 +367,7 @@ exports[`PlannerApp empty day calculation merges 3 consecutive empty days in the
   <Animatable(Day)
     animatableIndex={4}
     day="2017-04-29"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -419,6 +431,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
   <Animatable(Day)
     animatableIndex={1}
     day="2017-04-18"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -436,6 +449,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
   <Animatable(Day)
     animatableIndex={2}
     day="2017-04-20"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -453,6 +467,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
   <Animatable(Day)
     animatableIndex={3}
     day="2017-04-23"
+    isObserving={false}
     itemsForDay={Array []}
     key="2017-04-23"
     responsiveSize="large"
@@ -464,6 +479,7 @@ exports[`PlannerApp empty day calculation only renders days with items in the pa
   <Animatable(Day)
     animatableIndex={4}
     day="2017-04-24"
+    isObserving={false}
     itemsForDay={Array []}
     key="2017-04-24"
     responsiveSize="large"
@@ -521,6 +537,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
   <Animatable(Day)
     animatableIndex={1}
     day="2017-04-24"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -538,6 +555,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
   <Animatable(Day)
     animatableIndex={2}
     day="2017-04-25"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -555,6 +573,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
   <Animatable(Day)
     animatableIndex={3}
     day="2017-04-26"
+    isObserving={false}
     itemsForDay={Array []}
     key="2017-04-26"
     responsiveSize="large"
@@ -566,6 +585,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
   <Animatable(Day)
     animatableIndex={4}
     day="2017-04-27"
+    isObserving={false}
     itemsForDay={Array []}
     key="2017-04-27"
     responsiveSize="large"
@@ -577,6 +597,7 @@ exports[`PlannerApp empty day calculation renders 2 consecutive empty days in th
   <Animatable(Day)
     animatableIndex={5}
     day="2017-04-28"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -640,6 +661,7 @@ exports[`PlannerApp only renders today when the only item is today 1`] = `
   <Animatable(Day)
     animatableIndex={1}
     day="2017-04-24"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -703,6 +725,7 @@ exports[`PlannerApp renders base component 1`] = `
   <Animatable(Day)
     animatableIndex={1}
     day="2017-04-24"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -720,6 +743,7 @@ exports[`PlannerApp renders base component 1`] = `
   <Animatable(Day)
     animatableIndex={2}
     day="2017-04-25"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -737,6 +761,7 @@ exports[`PlannerApp renders base component 1`] = `
   <Animatable(Day)
     animatableIndex={3}
     day="2017-04-26"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -936,6 +961,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
   <Animatable(Day)
     animatableIndex={1}
     day="2017-04-24"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -953,6 +979,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
   <Animatable(Day)
     animatableIndex={2}
     day="2017-04-25"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {
@@ -970,6 +997,7 @@ exports[`PlannerApp shows the loading past indicator when loadingPast prop is tr
   <Animatable(Day)
     animatableIndex={3}
     day="2017-04-26"
+    isObserving={false}
     itemsForDay={
       Array [
         Object {

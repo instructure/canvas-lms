@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 describe MicrosoftSync::PartialMembershipDiff do
   # We test this by adding users for every possible combination:
   # Mapping of change type (m, o) and enrollment state (X=none, M, O) to actions to take:

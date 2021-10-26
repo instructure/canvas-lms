@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 describe Quizzes::QuizGroup do
   describe "saving a group" do
     it "marks its quiz as having unpublished changes when updated" do
