@@ -106,6 +106,9 @@ const locale = {
     "message": "Menü oder Dialogfeld schließen. Bringt Sie zurück zum Editor-Bereich"
   },
   "close_d634289d": { "message": "Schließen" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Die Untertiteldatei muss kleiner als { maxKb } KB sein."
+  },
   "closed_captions_subtitles_e6aaa016": { "message": "Untertitel" },
   "collaborations_5c56c15f": { "message": "Collaborations" },
   "collapse_to_hide_types_1ab46d2e": { "message": "{ types } ausblenden" },
@@ -137,6 +140,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-Lizenz:"
   },
+  "current_image_f16c249c": { "message": "Aktuelles Bild" },
   "custom_6979cd81": { "message": "Angepasst" },
   "date_added_ed5ad465": { "message": "Datum hinzugefügt" },
   "decorative_image_3c28aa7d": { "message": "Dekoratives Bild" },
@@ -287,6 +291,7 @@ const locale = {
   "middle_27dc1d5": { "message": "Mitte" },
   "miscellaneous_e9818229": { "message": "Verschiedenes" },
   "modules_c4325335": { "message": "Module" },
+  "multi_color_image_63d7372f": { "message": "Mehrfarbiges Bild" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Mindestgröße ist { width } x { height } px."
   },
@@ -370,7 +375,11 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "Bildoptionen anzeigen" },
   "show_link_options_545338fd": { "message": "Link-Optionen anzeigen" },
   "show_video_options_6ed3721a": { "message": "Videooptionen anzeigen" },
+  "single_color_image_4e5d4dbc": { "message": "Einfarbiges Bild" },
   "size_b30e1077": { "message": "Größe" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Die Größe der Untertiteldatei ist größer als die maximal zulässige Dateigröße von { max } KB."
+  },
   "small_b070434a": { "message": "Klein" },
   "something_went_wrong_89195131": { "message": "Etwas ging schief." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

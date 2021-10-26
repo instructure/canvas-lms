@@ -108,6 +108,9 @@ const locale = {
     "message": "Cau dewislen neu ddeialog. Hefyd yn mynd a chi''n ôl i''r ardal olygu"
   },
   "close_d634289d": { "message": "Cau" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Rhaid i ffeiliau capsiynau caeedig fod yn llai na { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "Capsiynau Caeedig/Isdeitlau"
   },
@@ -141,6 +144,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Trwydded Creative Commons:"
   },
+  "current_image_f16c249c": { "message": "Delwedd Bresennol" },
   "custom_6979cd81": { "message": "Personol" },
   "date_added_ed5ad465": { "message": "Dyddiad Ychwanegu" },
   "decorative_image_3c28aa7d": { "message": "Delwedd addurniadol" },
@@ -293,6 +297,7 @@ const locale = {
   "middle_27dc1d5": { "message": "Canol" },
   "miscellaneous_e9818229": { "message": "Amrywiol" },
   "modules_c4325335": { "message": "Modiwlau" },
+  "multi_color_image_63d7372f": { "message": "Delwedd mwy nag un lliw" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Yn gorfod bod o leiaf { width } x { height }px"
   },
@@ -374,7 +379,11 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "Dangos opsiynau delwedd" },
   "show_link_options_545338fd": { "message": "Dangos opsiynau dolen" },
   "show_video_options_6ed3721a": { "message": "Dangos opsiynau fideo" },
+  "single_color_image_4e5d4dbc": { "message": "Delwedd un lliw" },
   "size_b30e1077": { "message": "Maint" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Mae maint y ffeil capsiynau’n fwy na’r { max } kb a ganiateir ar gyfer maint y ffeil."
+  },
   "small_b070434a": { "message": "Bach" },
   "something_went_wrong_89195131": { "message": "Aeth rhywbeth o’i le." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

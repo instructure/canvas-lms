@@ -74,6 +74,9 @@ export default function getTranslations(locale) {
           case 'es':
             p = import('./translations/locales/es')
             break
+          case 'es-ES':
+            p = import('./translations/locales/es_ES')
+            break
           case 'fa-IR':
             p = import('./translations/locales/fa_IR')
             break
@@ -199,6 +202,7 @@ export function getLocaleList() {
     'en-CY',
     'en-GB',
     'es',
+    'es-ES',
     'fa-IR',
     'fi',
     'fr',

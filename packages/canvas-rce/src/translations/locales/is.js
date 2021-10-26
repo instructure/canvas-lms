@@ -107,6 +107,9 @@ const locale = {
     "message": "Loka valmynd eða svarglugga. Fer líka með þig aftur í ritilssvæðið"
   },
   "close_d634289d": { "message": "Loka" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Skjátextaskrá verður að vera minni en { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": { "message": "Skjátextar" },
   "collaborations_5c56c15f": { "message": "Samvinnutól" },
   "collapse_to_hide_types_1ab46d2e": {
@@ -136,6 +139,7 @@ const locale = {
   "course_navigation_dd035109": { "message": "Leiðarnet námskeiðs" },
   "create_button_and_icon_5c089934": { "message": "Búa til hnapp og tákn" },
   "creative_commons_license_725584ae": { "message": "Creative Commons leyfi:" },
+  "current_image_f16c249c": { "message": "Núverandi mynd" },
   "custom_6979cd81": { "message": "Sérsníða" },
   "date_added_ed5ad465": { "message": "Dagsetning bætt við" },
   "decorative_image_3c28aa7d": { "message": "Myndskreyting" },
@@ -282,6 +286,7 @@ const locale = {
   "middle_27dc1d5": { "message": "Miðja" },
   "miscellaneous_e9818229": { "message": "Ýmislegt" },
   "modules_c4325335": { "message": "Námsefni" },
+  "multi_color_image_63d7372f": { "message": "Fjöllita mynd" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Verður að vera að minnsta kosti { width } x { height }pt"
   },
@@ -361,7 +366,11 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "Sýna valkosti myndar" },
   "show_link_options_545338fd": { "message": "Sýna tengla valkosti" },
   "show_video_options_6ed3721a": { "message": "Sýna myndbandsvalkosti" },
+  "single_color_image_4e5d4dbc": { "message": "Einlita mynd" },
   "size_b30e1077": { "message": "Stærð" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Stærð skjátextaskrár er stærri en { max } kb leyfileg mesta skráarstærð."
+  },
   "small_b070434a": { "message": "Lítil" },
   "something_went_wrong_89195131": { "message": "Eitthvað fór úrskeiðis." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

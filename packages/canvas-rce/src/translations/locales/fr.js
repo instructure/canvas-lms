@@ -116,6 +116,9 @@ const locale = {
     "message": "Fermer un menu ou une boîte de dialogue. Permet également de revenir à la zone d''édition."
   },
   "close_d634289d": { "message": "Fermer" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Le fichier de sous-titres doit faire moins de { maxKb } Ko."
+  },
   "closed_captions_subtitles_e6aaa016": { "message": "Sous-titres" },
   "collaborations_5c56c15f": { "message": "Collaborations" },
   "collapse_to_hide_types_1ab46d2e": {
@@ -147,6 +150,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Licence Creative Commons :"
   },
+  "current_image_f16c249c": { "message": "Image actuelle" },
   "custom_6979cd81": { "message": "Personnalisé" },
   "date_added_ed5ad465": { "message": "Date ajoutée" },
   "decorative_image_3c28aa7d": { "message": "Image décorative" },
@@ -305,6 +309,7 @@ const locale = {
   "middle_27dc1d5": { "message": "Milieu" },
   "miscellaneous_e9818229": { "message": "Divers" },
   "modules_c4325335": { "message": "Modules" },
+  "multi_color_image_63d7372f": { "message": "Image multicolore" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Doit faire au moins { width } x { height } px"
   },
@@ -394,7 +399,11 @@ const locale = {
   },
   "show_link_options_545338fd": { "message": "Afficher les options de lien" },
   "show_video_options_6ed3721a": { "message": "Afficher les options vidéo" },
+  "single_color_image_4e5d4dbc": { "message": "Image monocolore" },
   "size_b30e1077": { "message": "Taille" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "La taille du fichier de sous-titres est supérieur au maximum de { max } Ko autorisés."
+  },
   "small_b070434a": { "message": "Petit" },
   "something_went_wrong_89195131": { "message": "Un problème est survenu." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

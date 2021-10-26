@@ -105,6 +105,9 @@ const locale = {
     "message": "ปิดเมนูหรือกล่องโต้ตอบ และนำคุณกลับไปที่โปรแกรมแก้ไข"
   },
   "close_d634289d": { "message": "ปิด" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "ไฟล์คำบรรยายแบบปิดได้จะต้องมีขนาดน้อยกว่า { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": { "message": "คำบรรยายแบบซ่อนได้" },
   "collaborations_5c56c15f": { "message": "การประสานความร่วมมือ" },
   "collapse_to_hide_types_1ab46d2e": { "message": "ย่อเพื่อซ่อน { types }" },
@@ -134,6 +137,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "สิทธิ์ใช้งาน Creative Commons:"
   },
+  "current_image_f16c249c": { "message": "ภาพปัจจุบัน" },
   "custom_6979cd81": { "message": "กำหนดเอง" },
   "date_added_ed5ad465": { "message": "วันที่ที่เพิ่ม" },
   "decorative_image_3c28aa7d": { "message": "ภาพตกแต่ง" },
@@ -280,6 +284,7 @@ const locale = {
   "middle_27dc1d5": { "message": "ตรงกลาง" },
   "miscellaneous_e9818229": { "message": "เบ็ดเตล็ด" },
   "modules_c4325335": { "message": "หน่วยการเรียน" },
+  "multi_color_image_63d7372f": { "message": "ภาพหลายสี" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "จะต้องเท่ากับอย่างน้อย { width } x { height }px"
   },
@@ -361,7 +366,11 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "แสดงตัวเลือกสำหรับภาพ" },
   "show_link_options_545338fd": { "message": "แสดงตัวเลือกสำหรับลิงค์" },
   "show_video_options_6ed3721a": { "message": "แสดงตัวเลือกสำหรับวิดีโอ" },
+  "single_color_image_4e5d4dbc": { "message": "ภาพสีเดียว" },
   "size_b30e1077": { "message": "ขนาด" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "ขนาดของไฟล์คำบรรยายจะต้องมากกว่าขนาดสูงสุดที่อนุญาตที่ { max } kb"
+  },
   "small_b070434a": { "message": "เล็ก" },
   "something_went_wrong_89195131": { "message": "มีบางอย่างผิดปกติ" },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {
