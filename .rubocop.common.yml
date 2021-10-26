@@ -185,6 +185,8 @@ Rails/WhereExists: # TODO: autocorrect(unsafe)
   EnforcedStyle: where
   AutoCorrect: false
 
+RSpec/BeEql: # TODO: autocorrect
+  Enabled: false
 RSpec/ContextWording: # TODO
   Enabled: false
 RSpec/DescribeClass: # TODO
@@ -196,6 +198,8 @@ RSpec/HookArgument: # TODO: autocorrect
 RSpec/NamedSubject: # TODO
   Enabled: false
 RSpec/NotToNot: # TODO: autocorrect
+  Enabled: false
+RSpec/PredicateMatcher: # TODO: autocorrect (unsafe)
   Enabled: false
 RSpec/ScatteredSetup: # TODO: investigate if these are required
   Enabled: false
@@ -253,6 +257,8 @@ Style/ReturnNil: # TODO: autocorrect (investigate violations)
 Style/SignalException: # TODO: autocorrect
   Enabled: false
 Style/StderrPuts: # TODO: autocorrect
+  Enabled: false
+Style/StringConcatenation: # TODO: autocorrect (maybe)
   Enabled: false
 Style/StringLiterals:
   EnforcedStyle: double_quotes
