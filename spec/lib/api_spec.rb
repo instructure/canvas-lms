@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-
 class TestApiInstance
   include Api
   def initialize(root_account, current_user)

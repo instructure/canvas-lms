@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'sharding_spec_helper'
-
 describe PermissionsHelper do
   describe '#manageable_enrollments_by_permission' do
     before :once do

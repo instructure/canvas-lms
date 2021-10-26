@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-
 describe UserLearningObjectScopes do
   describe "assignments_visible_in_course" do
     before do

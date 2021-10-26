@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-
 describe EportfolioEntriesController do
   def eportfolio_category
     @category = @portfolio.eportfolio_categories.create

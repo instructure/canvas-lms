@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-
 describe AttachmentAssociation do
   context 'create' do
     it 'sets the root_account_id using course context' do

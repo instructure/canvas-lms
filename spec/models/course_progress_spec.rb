@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-
 describe CourseProgress do
   let(:progress_error) { { :error => { :message => 'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course' } } }
 

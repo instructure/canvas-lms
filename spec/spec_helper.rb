@@ -51,7 +51,7 @@ module WebMock::API
 end
 
 Dir[Rails.root.join("spec/support/**/*.rb")].sort.each { |f| require f }
-require_relative 'sharding_spec_helper'
+require 'sharding_spec_helper'
 
 # nuke the db (say, if `rake db:migrate RAILS_ENV=test` created records),
 # and then ensure people aren't creating records outside the rspec
@@ -227,11 +227,11 @@ module RenderWithHelpers
 end
 RSpec::Rails::ViewExampleGroup::ExampleMethods.prepend(RenderWithHelpers)
 
-require_relative 'rspec_mock_extensions'
-require_relative 'ams_spec_helper'
+require 'rspec_mock_extensions'
+require 'ams_spec_helper'
 
 require 'i18n_tasks'
-require_relative 'factories'
+require 'factories'
 
 Dir[File.dirname(__FILE__) + "/shared_examples/**/*.rb"].sort.each { |f| require f }
 
@@ -247,9 +247,6 @@ if defined?(Spec::DSL::Main)
 end
 
 RSpec::Mocks.configuration.allow_message_expectations_on_nil = false
-
-# Require all custom matchers
-Dir[Rails.root.join('spec', 'support', 'custom_matchers', '*.rb')].sort.each { |f| require f }
 
 module RSpec::Matchers::Helpers
   # allows for matchers to use symbols and literals even though URIs are always strings.

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-
 describe Conversation do
   let_once(:sender) { user_factory }
   let_once(:recipient) { user_factory }

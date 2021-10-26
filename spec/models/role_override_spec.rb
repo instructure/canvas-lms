@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-
 describe RoleOverride do
   it "retains the prior permission when it encounters the first explicit override" do
     @account = account_model(:parent_account => Account.default)

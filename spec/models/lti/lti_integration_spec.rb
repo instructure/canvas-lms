@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../sharding_spec_helper'
-
 describe "LTI integration tests" do
   let(:canvas_tool) {
     ContextExternalTool.new.tap do |canvas_tool|

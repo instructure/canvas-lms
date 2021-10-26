@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../api_spec_helper'
-require_relative '../../sharding_spec_helper'
 
 describe "Rubrics API", type: :request do
   include Api::V1::Rubric

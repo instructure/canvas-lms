@@ -21,7 +21,6 @@
 require_relative '../api_spec_helper'
 require_relative '../file_uploads_spec_helper'
 require_relative '../../cassandra_spec_helper'
-require_relative '../../sharding_spec_helper'
 
 class TestUserApi
   include Api::V1::User

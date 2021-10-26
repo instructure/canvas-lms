@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../sharding_spec_helper'
-
 describe GradesPresenter do
   let(:presenter) { GradesPresenter.new(enrollments) }
   let(:shard) { FakeShard.new }

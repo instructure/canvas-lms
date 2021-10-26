@@ -19,7 +19,6 @@
 #
 
 require_relative '../api_spec_helper'
-require_relative '../../sharding_spec_helper'
 
 describe UserObserveesController, type: :request do
   let_once(:parent)             { user_with_pseudonym(name: 'Parent Smith', active_all: true) }

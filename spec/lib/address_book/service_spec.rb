@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../sharding_spec_helper'
-
 describe AddressBook::Service do
   before do
     allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original

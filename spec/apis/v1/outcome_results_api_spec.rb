@@ -19,7 +19,6 @@
 #
 
 require_relative '../api_spec_helper'
-require_relative '../../sharding_spec_helper'
 
 describe "Outcome Results API", type: :request do
   let_once(:outcome_course) do

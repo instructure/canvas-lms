@@ -19,7 +19,6 @@
 #
 
 require_relative '../api_spec_helper'
-require_relative '../../sharding_spec_helper'
 require_relative '../../cassandra_spec_helper'
 
 describe "AuthenticationAudit API", type: :request do

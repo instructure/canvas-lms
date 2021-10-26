@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../sharding_spec_helper'
 require 'rotp'
 
 describe Login::CanvasController do

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../sharding_spec_helper'
-
 describe SplitUsers do
   describe 'user splitting' do
     let!(:restored_user) { user_model } # user will be merged into source_user and then restored on split

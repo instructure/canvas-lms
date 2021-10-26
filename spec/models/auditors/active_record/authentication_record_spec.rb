@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../../sharding_spec_helper'
-
 describe Auditors::ActiveRecord::AuthenticationRecord do
   let(:request_id) { 'abcde-12345' }
 
