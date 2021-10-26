@@ -19,6 +19,7 @@
 import {Avatar} from '@instructure/ui-avatar'
 import {Flex} from '@instructure/ui-flex'
 import {MessageDetailActions} from '../MessageDetailActions/MessageDetailActions'
+import {MessageDetailMediaAttachment} from '../MessageDetailMediaAttachment/MessageDetailMediaAttachment'
 import {MessageDetailParticipants} from '../MessageDetailParticipants/MessageDetailParticipants'
 import PropTypes from 'prop-types'
 import React from 'react'
@@ -63,10 +64,7 @@ export const MessageDetailItem = ({...props}) => {
           <View as="div" margin="none none x-small">
             <Text weight="light">{createdAt}</Text>
           </View>
-          <MessageDetailActions
-            handleOptionSelect={props.handleOptionSelect}
-            onReply={() => props.onReply(props.conversationMessage)}
-          />
+          <MessageDetailActions onReply={props.onReply} onReplyAll={props.onReplyAll} />
         </Flex.Item>
       </Flex>
       <Text>{props.conversationMessage.body}</Text>
@@ -83,6 +81,9 @@ export const MessageDetailItem = ({...props}) => {
           })}
         </List>
       )}
+      {props.conversationMessage.mediaComment && (
+        <MessageDetailMediaAttachment mediaComment={props.conversationMessage.mediaComment} />
+      )}
     </>
   )
 }
@@ -91,8 +92,8 @@ MessageDetailItem.propTypes = {
   // TODO: not sure yet the exact shape of the data that will be fetched, so these will likely change
   conversationMessage: PropTypes.object,
   contextName: PropTypes.string,
-  handleOptionSelect: PropTypes.func,
-  onReply: PropTypes.func
+  onReply: PropTypes.func,
+  onReplyAll: PropTypes.func
 }
 
 MessageDetailItem.defaultProps = {
