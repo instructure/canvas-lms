@@ -36,7 +36,7 @@ module Quizzes
     # By including this module in the root quizzes module, we'll fire off explicit
     # loading for each of the constants we care about as soon as we start referencing the Quizzes module
     # anywhere, which should be early enough to prevent FS read order confusion.
-    def self.included(base)
+    def self.included(_base)
       Preloader.preload_quiz_questions
     end
   end
