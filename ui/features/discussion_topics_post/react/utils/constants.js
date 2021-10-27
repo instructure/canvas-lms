@@ -18,7 +18,7 @@
 import React from 'react'
 
 export const ISOLATED_VIEW_INITIAL_PAGE_SIZE = 5
-export const PER_PAGE = 20
+export const PER_PAGE = parseInt(window.localStorage.getItem('DISCUSSION_PER_PAGE'), 10) || 20
 export const HIGHLIGHT_TIMEOUT = 6000
 export const AUTO_MARK_AS_READ_DELAY = 3000
 export const SEARCH_TERM_DEBOUNCE_DELAY = 500
