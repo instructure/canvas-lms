@@ -260,6 +260,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
               Duration for module {this.props.pacePlanItem.assignment_title}
             </ScreenReaderContent>
           }
+          data-testid="duration-number-input"
           display="inline-block"
           width="5.5rem"
           value={value}
