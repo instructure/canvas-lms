@@ -27,7 +27,6 @@
 ###########################################################################################
 
 class ApiScopeMapper
-
   SCOPE_MAP = {
   <% mapping.each_with_index do |(controller, children), i| -%>
   <%="#{controller}: {" %>
@@ -39,9 +38,9 @@ class ApiScopeMapper
 }.freeze
 
   RESOURCE_NAMES = {
-    oauth2: -> {I18n.t('OAuth 2')},
-    peer_services: -> {I18n.t('Peer Services')},
-    <%=resource_lookup.map { |k, v| "#{k}: -> {I18n.t('#{v}')}"}.join(",\n    " ) %>
+    oauth2: -> { I18n.t('OAuth 2') },
+    peer_services: -> { I18n.t('Peer Services') },
+    <%=resource_lookup.map { |k, v| "#{k}: -> { I18n.t('#{v}') }"}.join(",\n    " ) %>
   }.freeze
 
   def self.lookup_resource(controller, action)
@@ -52,5 +51,4 @@ class ApiScopeMapper
   def self.name_for_resource(resource)
     RESOURCE_NAMES[resource]&.call
   end
-
 end
