@@ -31,7 +31,6 @@ class CanvadocSessionsController < ApplicationController
       return render_unauthorized_action
     end
 
-    return render_unauthorized_action unless Account.site_admin.feature_enabled?(:annotated_document_submissions)
     # Denying graders from this endpoint for now because graders should be
     # grading in SpeedGrader. This also simplifies the enable_annotations opt now
     # that we don't have to consider grading roles or peer reviewers.
