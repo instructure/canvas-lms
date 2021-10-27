@@ -41,7 +41,7 @@ class OutcomeGroupsController < ApplicationController
       data = JSON.parse(params[:file].read).with_indifferent_access rescue nil
       if data && data[:category] && data[:title] && data[:description] && data[:outcomes]
         group = @context.learning_outcome_groups.create
-        data[:outcomes].each do |outcome_hash|
+        data[:outcomes].each do
           group.learning_outcomes.create
         end
         render :json => group.as_json(:include => :learning_outcomes),
