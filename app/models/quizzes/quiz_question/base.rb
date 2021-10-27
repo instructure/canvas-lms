@@ -34,6 +34,9 @@ class Quizzes::QuizQuestion::Base
     type_name = klass.question_type
     raise("question type #{type_name} already exists") if question_types.key?(type_name)
 
+    # because this is where subclass registration happens, we need this to be populated
+    # before we start trying to load any question data.
+    # This is taken care of by the Quizzes::Preloader
     question_types[type_name] = klass
   end
 
@@ -163,5 +166,3 @@ class Quizzes::QuizQuestion::Base
     @question_data.to_hash
   end
 end
-
-Dir[Rails.root + "app/models/quizzes/quiz_question/*_question.rb"].each { |f| require_dependency f }
