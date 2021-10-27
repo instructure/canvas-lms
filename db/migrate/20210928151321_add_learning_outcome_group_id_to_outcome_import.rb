@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,11 +16,12 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+class AddLearningOutcomeGroupIdToOutcomeImport < ActiveRecord::Migration[6.0]
+  tag :predeploy
+  disable_ddl_transaction!
 
-module Quizzes::QuizQuestion::AnswerSerializers
-  class TextOnly < Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer
-    def serialize(*); end
-
-    def deserialize(...); end
+  def change
+    add_reference :outcome_imports, :learning_outcome_group, index: { algorithm: :concurrently }, if_not_exists: true
   end
 end

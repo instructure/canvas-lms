@@ -63,7 +63,7 @@ module Api::V1::WikiPage
     wiki_pages.map { |page| wiki_page_json(page, current_user, session, false, opts) }
   end
 
-  def wiki_page_revision_json(version, current_user, current_session, include_content = true, latest_version = nil)
+  def wiki_page_revision_json(version, _current_user, _session, include_content = true, latest_version = nil)
     page = version.model
     hash = {
       'revision_id' => version.number,

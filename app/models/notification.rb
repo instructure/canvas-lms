@@ -172,7 +172,7 @@ class Notification < Switchman::UnshardedRecord
                                 .map { |c| c.gsub(/\s/, "_") } - NON_CONFIGURABLE_TYPES
   end
 
-  def self.find(id, options = {})
+  def self.find(id)
     (@all_by_id ||= all_cached.index_by(&:id))[id.to_i] or raise ActiveRecord::RecordNotFound
   end
 

@@ -41,7 +41,7 @@ class MessageDispatcher < Delayed::PerformableMethod
   end
 
   # Called by delayed_job when a job fails to reschedule it.
-  def reschedule_at(now, num_attempts)
+  def reschedule_at(_now, _num_attempts)
     object.dispatch_at
   end
 

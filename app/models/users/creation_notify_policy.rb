@@ -31,7 +31,7 @@ module Users
 
     def dispatch!(user, pseudonym, channel)
       if is_self_registration?
-        send_self_registration_email(user, pseudonym)
+        send_self_registration_email(pseudonym)
         return true
       elsif send_confirmation
         send_confirmation_email(user, pseudonym)
@@ -46,7 +46,7 @@ module Users
 
     attr_reader :is_manager
 
-    def send_self_registration_email(user, pseudonym)
+    def send_self_registration_email(pseudonym)
       pseudonym.send_confirmation!
     end
 

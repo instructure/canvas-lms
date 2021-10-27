@@ -136,7 +136,7 @@ module Importers
       question_data
     end
 
-    def self.import_from_migration(hash, context, migration, bank, options = {})
+    def self.import_from_migration(hash, context, migration, bank, **)
       hash = hash.with_indifferent_access
       hash.delete(:question_bank_migration_id) if hash.has_key?(:question_bank_migration_id)
 

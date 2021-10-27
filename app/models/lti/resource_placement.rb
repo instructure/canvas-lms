@@ -90,7 +90,7 @@ module Lti
 
     validates_inclusion_of :placement, :in => PLACEMENT_LOOKUP.values
 
-    def self.valid_placements(root_account)
+    def self.valid_placements(_root_account)
       PLACEMENTS.dup.tap do |p|
         p.delete(:conference_selection) unless Account.site_admin.feature_enabled?(:conference_selection_lti_placement)
       end

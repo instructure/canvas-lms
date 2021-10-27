@@ -304,7 +304,6 @@ class Folder < ActiveRecord::Base
         end
       end
     end
-    context.log_merge_result(t :folder_created, "Folder \"%{name}\" created", :name => dup.full_name)
     dup.updated_at = Time.now
     dup.clone_updated = true
     dup

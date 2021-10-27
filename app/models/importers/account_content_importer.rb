@@ -24,7 +24,7 @@ module Importers
     self.item_class = Account
     Importers.register_content_importer(self)
 
-    def self.import_content(account, data, params, migration)
+    def self.import_content(account, data, _params, migration)
       Importers::ContentImporterHelper.add_assessment_id_prepend(account, data, migration)
 
       Importers::AssessmentQuestionImporter.process_migration(data, migration)

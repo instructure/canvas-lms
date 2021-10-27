@@ -56,7 +56,7 @@ module Canvas::Security
       return :too_many_attempts unless allow_login_attempt?(pseudonym, remote_ip)
 
       if valid_password
-        successful_login!(pseudonym, remote_ip)
+        successful_login!(pseudonym)
       else
         failed_login!(pseudonym, remote_ip)
       end
@@ -74,7 +74,7 @@ module Canvas::Security
     end
 
     # log a successful login, resetting the failed login attempts counter
-    def self.successful_login!(pseudonym, ip)
+    def self.successful_login!(pseudonym)
       return unless Canvas.redis_enabled? && pseudonym
 
       Canvas.redis.del(login_attempts_key(pseudonym))

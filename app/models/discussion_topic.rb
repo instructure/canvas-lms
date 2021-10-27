@@ -396,7 +396,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def create_participant
-    self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0, :subscribed => !subscription_hold(self.user, nil, nil)) if self.user
+    self.discussion_topic_participants.create(:user => self.user, :workflow_state => "read", :unread_entry_count => 0, :subscribed => !subscription_hold(self.user, nil)) if self.user
   end
 
   def update_materialized_view
@@ -594,7 +594,7 @@ class DiscussionTopic < ActiveRecord::Base
   #  - it's an announcement
   #  - this is a root level graded group discussion and you aren't in any of the groups
   #  - this is group level discussion and you aren't in the group
-  def subscription_hold(user, context_enrollment, session)
+  def subscription_hold(user, session)
     return nil unless user
 
     case
@@ -624,12 +624,12 @@ class DiscussionTopic < ActiveRecord::Base
       if participant.subscribed.nil?
         # if there is no explicit subscription, assume the author and posters
         # are subscribed, everyone else is not subscribed
-        (current_user == user || participant.discussion_topic.posters.include?(current_user)) && !participant.discussion_topic.subscription_hold(current_user, nil, nil)
+        (current_user == user || participant.discussion_topic.posters.include?(current_user)) && !participant.discussion_topic.subscription_hold(current_user, nil)
       else
         participant.subscribed
       end
     else
-      current_user == user && !subscription_hold(current_user, nil, nil)
+      current_user == user && !subscription_hold(current_user, nil)
     end
   end
 
@@ -683,7 +683,7 @@ class DiscussionTopic < ActiveRecord::Base
           topic_participant ||= self.discussion_topic_participants.build(:user => current_user,
                                                                          :unread_entry_count => self.unread_count(current_user, lock: true),
                                                                          :workflow_state => "unread",
-                                                                         :subscribed => current_user == user && !subscription_hold(current_user, nil, nil))
+                                                                         :subscribed => current_user == user && !subscription_hold(current_user, nil))
           topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
           topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
           topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
@@ -1617,7 +1617,7 @@ class DiscussionTopic < ActiveRecord::Base
     to_podcast(attachments + media_objects.compact)
   end
 
-  def self.to_podcast(elements, opts = {})
+  def self.to_podcast(elements)
     require 'rss/2.0'
     elements.map do |elem|
       asset = elem.podcast_associated_asset

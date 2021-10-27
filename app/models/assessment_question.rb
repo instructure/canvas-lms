@@ -361,7 +361,7 @@ class AssessmentQuestion < ActiveRecord::Base
     Digest::MD5.hexdigest(["dropdown", variable, "instructure-key"].join(","))
   end
 
-  def clone_for(question_bank, dup = nil, options = {})
+  def clone_for(question_bank, dup = nil, **)
     dup ||= AssessmentQuestion.new
     self.attributes.except("id", "question_data").each do |key, val|
       dup.send("#{key}=", val)

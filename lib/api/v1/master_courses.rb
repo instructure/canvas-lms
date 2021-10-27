@@ -20,7 +20,7 @@
 module Api::V1::MasterCourses
   include Api::V1::User
 
-  def master_template_json(template, user, session, opts = {})
+  def master_template_json(template, user, session, **)
     hash = api_json(template, user, session, :only => %w(id course_id), :methods => %w{last_export_completed_at associated_course_count})
     migration = template.active_migration
     hash[:latest_migration] = master_migration_json(migration, user, session) if migration

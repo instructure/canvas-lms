@@ -53,7 +53,7 @@ module Api::V1::QuizGroup
     end
   end
 
-  def quiz_group_json(quiz_group, context, user, session)
+  def quiz_group_json(quiz_group, _context, user, session)
     api_json(quiz_group, user, session, API_ALLOWED_QUIZ_GROUP_OUTPUT_FIELDS)
   end
 

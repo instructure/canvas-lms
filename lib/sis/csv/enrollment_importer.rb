@@ -43,11 +43,11 @@ module SIS
             end
           end
         end
-        persist_errors(csv, messages, @batch)
+        persist_errors(csv, messages)
         count
       end
 
-      def persist_errors(csv, messages, batch)
+      def persist_errors(csv, messages)
         errors = messages.map do |message|
           (message.is_a? SisBatchError) ? message : SisBatch.build_error(csv, message, sis_batch: @batch)
         end

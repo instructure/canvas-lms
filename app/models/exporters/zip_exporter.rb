@@ -20,7 +20,7 @@
 
 module Exporters
   class ZipExporter
-    def self.create_zip_export(content_export, opts = {})
+    def self.create_zip_export(content_export, **)
       exporter = ZipExporter.new(content_export)
       exporter.export
     end

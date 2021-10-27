@@ -485,10 +485,9 @@ class Message < ActiveRecord::Base
   # Public: Store content in a message_content_... instance variable.
   #
   # name  - The symbol name of the content.
-  # block - ?
   #
   # Returns an empty string.
-  def define_content(name, &block)
+  def define_content(name)
     if name == :subject || name == :user_name
       old_output_buffer, @output_buffer = [@output_buffer, UnescapedBuffer.new]
     else
@@ -999,7 +998,7 @@ class Message < ActiveRecord::Base
   # flattened appropriately.
   #
   # Returns json hash.
-  def as_json(options = {})
+  def as_json(**)
     super(:only => [:id, :created_at, :sent_at, :workflow_state, :from, :from_name, :to, :reply_to, :subject, :body, :html_body])['message']
   end
 

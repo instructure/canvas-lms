@@ -24,7 +24,7 @@ module Importers
     self.item_class = Course
     Importers.register_content_importer(self)
 
-    def self.process_migration_files(course, data, migration)
+    def self.process_migration_files(data, migration)
       data['all_files_export'] ||= {}
       data['all_files_export']['file_path'] ||= data['all_files_zip']
       return unless data['all_files_export']['file_path'] && File.exist?(data['all_files_export']['file_path'])
@@ -85,7 +85,7 @@ module Importers
       end
     end
 
-    def self.import_content(course, data, params, migration)
+    def self.import_content(course, data, _params, migration)
       logger.debug "starting import"
 
       Importers.disable_live_events! do
@@ -108,7 +108,8 @@ module Importers
           Importers::GradingStandardImporter.select_course_grading_standard(data, migration)
           # These only need to be processed once
           Attachment.skip_media_object_creation do
-            self.process_migration_files(course, data, migration); migration.update_import_progress(18)
+            process_migration_files(data, migration)
+            migration.update_import_progress(18)
             Importers::AttachmentImporter.process_migration(data, migration); migration.update_import_progress(20)
             mo_attachments = migration.imported_migration_items_by_class(Attachment).find_all { |i| i.media_entry_id.present? }
             begin

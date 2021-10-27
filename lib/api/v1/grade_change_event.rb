@@ -26,7 +26,7 @@ module Api::V1::GradeChangeEvent
   include Api::V1::Submission
   include Api::V1::PageView
 
-  def grade_change_event_json(event, user, session)
+  def grade_change_event_json(event, _user, _session)
     links = {
       course: Shard.relative_id_for(event.course_id, Shard.current, Shard.current),
       student: Shard.relative_id_for(event.student_id, Shard.current, Shard.current)&.to_s,
