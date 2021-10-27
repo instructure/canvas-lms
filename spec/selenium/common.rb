@@ -51,6 +51,7 @@ module SeleniumDependencies
   include SeleniumDriverSetup
   include OtherHelperMethods
   include CustomSeleniumActions
+  include CustomSeleniumRSpecMatchers
   include CustomAlertActions
   include CustomPageLoaders
   include CustomScreenActions
