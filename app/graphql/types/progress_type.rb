@@ -38,7 +38,7 @@ module Types
 
     description "Returns completion status and progress information about an asynchronous job"
 
-    alias progress object
+    alias_method :progress, :object
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface

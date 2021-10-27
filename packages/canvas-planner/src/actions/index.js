@@ -17,12 +17,19 @@
  */
 import {createActions, createAction} from 'redux-actions'
 import axios from 'axios'
+import moment from 'moment-timezone'
 import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
 import parseLinkHeader from 'parse-link-header'
 import configureAxios from '../utilities/configureAxios'
 import {alert} from '../utilities/alertUtils'
 import formatMessage from '../format-message'
 import {maybeUpdateTodoSidebar} from './sidebar-actions'
+import {
+  clearWeeklyItems,
+  getWeeklyPlannerItems,
+  preloadSurroundingWeeks,
+  startLoadingItems
+} from './loading-actions'
 
 import {
   transformInternalToApiItem,
@@ -50,7 +57,8 @@ export const {
   setNaiAboveScreen,
   scrollToNewActivity,
   scrollToToday,
-  toggleMissingItems
+  toggleMissingItems,
+  selectedObservee
 } = createActions(
   'INITIAL_OPTIONS',
   'ADD_OPPORTUNITIES',
@@ -69,7 +77,8 @@ export const {
   'SET_NAI_ABOVE_SCREEN',
   'SCROLL_TO_NEW_ACTIVITY',
   'SCROLL_TO_TODAY',
-  'TOGGLE_MISSING_ITEMS'
+  'TOGGLE_MISSING_ITEMS',
+  'SELECTED_OBSERVEE'
 )
 
 export * from './loading-actions'
@@ -271,5 +280,26 @@ function getOverrideDataOnItem(plannerItem) {
   return {
     id: plannerItem.overrideId,
     marked_complete: plannerItem.completed
+  }
+}
+
+export const reloadWithObservee = (observeeId, contextCodes) => {
+  return (dispatch, getState) => {
+    if (
+      getState().selectedObservee?.id !== observeeId ||
+      (observeeId &&
+        JSON.stringify(getState().selectedObservee?.contextCodes) !== JSON.stringify(contextCodes))
+    ) {
+      if (observeeId && !contextCodes) {
+        dispatch(selectedObservee({id: observeeId, contextCodes}))
+        dispatch(clearWeeklyItems())
+        dispatch(startLoadingItems())
+      } else {
+        dispatch(selectedObservee({id: observeeId, contextCodes}))
+        dispatch(clearWeeklyItems())
+        dispatch(getWeeklyPlannerItems(moment.tz(getState().timeZone).startOf('day')))
+        dispatch(preloadSurroundingWeeks())
+      }
+    }
   }
 }

@@ -97,6 +97,16 @@ require 'atom'
 #           "example": "Cooper, Sheldon",
 #           "type": "string"
 #         },
+#         "last_name": {
+#           "description": "The last name of the user.",
+#           "example": "Cooper",
+#           "type": "string"
+#         },
+#         "first_name": {
+#           "description": "The first name of the user.",
+#           "example": "Sheldon",
+#           "type": "string"
+#         },
 #         "short_name": {
 #           "description": "A short name the user has selected, for use in conversations or other less formal places through the site.",
 #           "example": "Shelly",
@@ -179,7 +189,7 @@ class UsersController < ApplicationController
                                          :user_dashboard, :toggle_hide_dashcard_color_overlays,
                                          :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
                                          :activity_stream_summary, :pandata_events_token, :dashboard_cards,
-                                         :user_graded_submissions]
+                                         :user_graded_submissions, :show]
   before_action :require_registered_user, :only => [:delete_user_service,
                                                     :create_user_service]
   before_action :reject_student_view_student, :only => [:delete_user_service,
@@ -257,7 +267,7 @@ class UsersController < ApplicationController
     elsif params[:service] == "twitter"
       success_url = oauth_success_url(:service => 'twitter')
       request_token = Twitter::Connection.request_token(success_url)
-      OauthRequest.create(
+      OAuthRequest.create(
         :service => 'twitter',
         :token => request_token.token,
         :secret => request_token.secret,
@@ -272,7 +282,7 @@ class UsersController < ApplicationController
   def oauth_success
     oauth_request = nil
     if params[:oauth_token]
-      oauth_request = OauthRequest.where(token: params[:oauth_token], service: params[:service]).first
+      oauth_request = OAuthRequest.where(token: params[:oauth_token], service: params[:service]).first
     elsif params[:code] && params[:state] && params[:service] == 'google_drive'
 
       begin
@@ -503,7 +513,8 @@ class UsersController < ApplicationController
              STUDENT_PLANNER_ENABLED: planner_enabled?,
              STUDENT_PLANNER_COURSES: planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment),
              STUDENT_PLANNER_GROUPS: planner_enabled? && map_groups_for_planner(@current_user.current_groups),
-             CAN_ENABLE_K5_DASHBOARD: k5_disabled && k5_user
+             CAN_ENABLE_K5_DASHBOARD: k5_disabled && k5_user,
+             CREATE_COURSES_PERMISSION: @current_user.create_courses_right(@domain_root_account)
            })
 
     if k5_user?
@@ -517,10 +528,6 @@ class UsersController < ApplicationController
                SELECTED_CONTEXT_CODES: @current_user.get_preference(:selected_calendar_contexts),
                SELECTED_CONTEXTS_LIMIT: @domain_root_account.settings[:calendar_contexts_limit] || 10,
                INITIAL_NUM_K5_CARDS: Rails.cache.read(['last_known_k5_cards_count', @current_user.global_id].cache_key) || 5,
-               PERMISSIONS: {
-                 create_courses_as_admin: @current_user.roles(@domain_root_account).include?('admin'),
-                 create_courses_as_teacher: @domain_root_account.grants_right?(@current_user, session, :create_courses)
-               },
                CAN_ADD_OBSERVEE: @current_user
                           .profile
                           .tabs_available(@current_user, :root_account => @domain_root_account)
@@ -1241,16 +1248,17 @@ class UsersController < ApplicationController
 
   def show
     GuardRail.activate(:secondary) do
-      get_context(include_deleted: true)
-      @context_account = @context.is_a?(Account) ? @context : @domain_root_account
-      @user = if @context.is_a?(User)
-                @context
-              else
-                api_find(@context.all_users, params[:id])
-              end
-      allowed = @user.grants_right?(@current_user, session, :read_full_profile)
+      # we _don't_ want to get context if the user is the context
+      # so that for missing user context we can 401, but for others we can 404
+      get_context(include_deleted: true) if params[:account_id] || params[:course_id] || params[:group_id]
 
-      raise ActiveRecord::RecordNotFound unless allowed
+      @context_account = @context.is_a?(Account) ? @context : @domain_root_account
+      @user = api_find_all(@context&.all_users || User, [params[:id]]).first
+      allowed = @user&.grants_right?(@current_user, session, :read_full_profile)
+
+      return render_unauthorized_action unless allowed
+
+      @context ||= @user
 
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user))
 
@@ -3062,8 +3070,8 @@ class UsersController < ApplicationController
 
         data['destination'] = uri.to_s
       elsif (oauth = session[:oauth2])
-        provider = Canvas::Oauth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
-        data['destination'] = Canvas::Oauth::Provider.confirmation_redirect(self, provider, @user).to_s
+        provider = Canvas::OAuth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
+        data['destination'] = Canvas::OAuth::Provider.confirmation_redirect(self, provider, @user).to_s
       end
 
       render(:json => data)

@@ -77,11 +77,7 @@ const ignoredErrors = [
   /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
   /The above error occurred in the <.*> component/,
   /The prop `activeMailbox` is marked as required in `MailboxSelectionDropdown`/,
-  /The prop `app.courses\[0\].id` is marked as required in `K5AppLink`/,
-  /The prop `apps\[0\].courses\[0\].id` is marked as required in `AppsList`/,
   /The prop `avatarName` is marked as required in `UserLink`/,
-  /The prop `canAddObservee` is marked as required in `(K5Dashboard|ObserverOptions|ResponsiveK5Dashboard)`/,
-  /The prop `canReadAnnouncements` is marked as required in `(K5Announcement|K5Course)`/,
   /The prop `children` is marked as required in `TruncateText`/,
   /The prop `color` is marked as required in `StatusColorListItem`/,
   /The prop `conferenceTypes\[0\].name` is marked as required in `(AddConference|ConferenceButton)`/,
@@ -221,7 +217,6 @@ require('@instructure/ui-themes')
 if (process.env.DEPRECATION_SENTRY_DSN) {
   const Raven = require('raven-js')
   Raven.config(process.env.DEPRECATION_SENTRY_DSN, {
-    ignoreErrors: ['renderIntoDiv', 'renderSidebarIntoDiv'], // silence the `Cannot read property 'renderIntoDiv' of null` errors we get from the pre- rce_enhancements old rce code
     release: process.env.GIT_COMMIT,
     autoBreadcrumbs: {
       xhr: false

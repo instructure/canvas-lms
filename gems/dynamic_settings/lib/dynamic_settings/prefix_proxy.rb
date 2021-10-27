@@ -181,7 +181,7 @@ module DynamicSettings
         raise
       end
     end
-    alias [] fetch
+    alias_method :[], :fetch
 
     # Extend the prefix from this instance returning a new one.
     #

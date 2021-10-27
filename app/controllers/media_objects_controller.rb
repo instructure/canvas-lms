@@ -73,8 +73,9 @@
 class MediaObjectsController < ApplicationController
   include Api::V1::MediaObject
 
-  before_action :load_media_object, except: %i[index update_media_object]
-  before_action :require_user, except: %i[show iframe_media_player]
+  before_action :load_media_object, only: %i[show iframe_media_player]
+  before_action :require_user, only: %i[index update_media_object]
+  protect_from_forgery :only => %i[create_media_object media_object_redirect media_object_inline media_object_thumbnail], with: :exception
 
   # @{not an}API Show Media Object Details
   # This isn't an API because it needs to work for non-logged in users (video in public course)
@@ -189,6 +190,76 @@ class MediaObjectsController < ApplicationController
         CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255)
       @media_object.save!
       render json: media_object_api_json(@media_object, @current_user, session, %w[sources tracks])
+    end
+  end
+
+  def create_media_object
+    @context = Context.find_by_asset_string(params[:context_code])
+
+    if authorized_action(@context, @current_user, :read)
+      if params[:id] && params[:type] && @context.respond_to?(:media_objects)
+        self.extend TextHelper
+
+        # The MediaObject will be created on the current shard,
+        # not the @context's shard.
+        @media_object = MediaObject.where(
+          media_id: params[:id],
+          media_type: params[:type],
+          context: @context
+        ).first_or_initialize
+
+        @media_object.title = CanvasTextHelper.truncate_text(params[:title], :max_length => 255) if params[:title]
+        @media_object.user = @current_user
+        @media_object.media_type = params[:type]
+        @media_object.root_account_id = @domain_root_account.id if @domain_root_account && @media_object.respond_to?(:root_account_id)
+        @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title] && !params[:user_entered_title].empty?
+        @media_object.save
+      end
+      render :json => @media_object.as_json.merge(:embedded_iframe_url => media_object_iframe_url(@media_object.media_id))
+      # render :json => media_object_api_json(@media_object, @current_user, session, %w[sources tracks])
+    end
+  end
+
+  def media_object_inline
+    @show_embedded_chat = false
+    @show_left_side = false
+    @show_right_side = false
+    @media_object = MediaObject.by_media_id(params[:id]).first
+    js_env(MEDIA_OBJECT_ID: params[:id],
+           MEDIA_OBJECT_TYPE: @media_object ? @media_object.media_type.to_s : 'video')
+    render
+  end
+
+  def media_object_redirect
+    mo = MediaObject.by_media_id(params[:id]).first
+    mo.viewed! if mo
+    config = CanvasKaltura::ClientV3.config
+    if config
+      redirect_to CanvasKaltura::ClientV3.new.assetSwfUrl(params[:id])
+    else
+      render :plain => t(:media_objects_not_configured, "Media Objects not configured")
+    end
+  end
+
+  def media_object_thumbnail
+    media_id = params[:id]
+    # we prefer using the MediaObject if it exists (so that it can give us
+    # a different media_id if it wants to), but we will also use the provided
+    # media id directly if we can't find a MediaObject. (They don't always get
+    # created yet.)
+    mo = MediaObject.by_media_id(media_id).first
+    width = params[:width]
+    height = params[:height]
+    type = (params[:type].presence || 2).to_i
+    config = CanvasKaltura::ClientV3.config
+    if config
+      redirect_to CanvasKaltura::ClientV3.new.thumbnail_url(mo.try(:media_id) || media_id,
+                                                            :width => width,
+                                                            :height => height,
+                                                            :type => type),
+                  :status => 301
+    else
+      render :plain => t(:media_objects_not_configured, "Media Objects not configured")
     end
   end
 

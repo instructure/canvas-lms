@@ -22,14 +22,14 @@ require 'spec_helper'
 
 describe AssetUserAccessLog do
   around(:each) do |example|
-    old_interval = MessageBus.worker_process_interval_lambda
     old_compaction_recv_timeout = Setting.get("aua_compaction_receive_timeout_ms", "1000")
     # let's not waste time with queue throttling in tests
     MessageBus.worker_process_interval = -> { 0.01 }
+    MessageBus.max_mem_queue_size = -> { 1000 }
     Setting.set("aua_compaction_receive_timeout_ms", "50")
     example.run
   ensure
-    MessageBus.worker_process_interval = old_interval unless old_interval.nil?
+    Canvas::MessageBusConfig.apply # resets config changes made to interval and queue size
     Setting.set("aua_compaction_receive_timeout_ms", old_compaction_recv_timeout)
   end
 

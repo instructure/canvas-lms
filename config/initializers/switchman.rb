@@ -73,10 +73,20 @@ Rails.application.config.after_initialize do
         s
       end
     end
+
+    module DisableActivateBang
+      if ::Rails.env.test?
+        def activate!(*)
+          raise NotImplementedError # if you're getting this, you really should be using activate instead of activate!
+        end
+      end
+    end
   end
 
   Switchman::Shard.prepend(Canvas::Shard)
   Switchman::Shard.singleton_class.include(Canvas::Shard::IncludedClassMethods)
+  Switchman::Shard.prepend(Canvas::DisableActivateBang)
+  Switchman::DefaultShard.prepend(Canvas::DisableActivateBang)
 
   Switchman::Shard.class_eval do
     self.primary_key = "id"

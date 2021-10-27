@@ -100,3 +100,14 @@ it('sets way future date', () => {
   const newState = weeklyReducer(initState, Actions.gotWayPastItemDate('3000-01-01'))
   expect(newState.wayPastItemDate).toEqual('3000-01-01')
 })
+
+it('clears week data', () => {
+  const thisWeekStart = moment.tz(TZ).startOf('week')
+  const initState = initialState({
+    weeks: {
+      [thisWeekStart.format()]: ['first week data']
+    }
+  })
+  const newState = weeklyReducer(initState, Actions.clearWeeklyItems())
+  expect(newState.weeks).toEqual({})
+})

@@ -141,19 +141,14 @@ export default class OutcomeView extends OutcomeContentBase {
 
   editRating(e) {
     e.preventDefault()
-    const childIdx = $(e.currentTarget)
-      .closest('.rating')
-      .index()
+    const childIdx = $(e.currentTarget).closest('.rating').index()
     const $th = $(`.criterion thead tr > th:nth-child(${childIdx + 1})`)
     const $showWrapper = $(e.currentTarget).parents('.show:first')
     const $editWrapper = $showWrapper.next()
 
     $showWrapper.attr('aria-expanded', 'false').hide()
     $editWrapper.attr('aria-expanded', 'true').show()
-    $th
-      .find('h5')
-      .attr('aria-expanded', 'false')
-      .hide()
+    $th.find('h5').attr('aria-expanded', 'false').hide()
     return $editWrapper.find('.outcome_rating_description').focus()
   }
 
@@ -164,15 +159,9 @@ export default class OutcomeView extends OutcomeContentBase {
       const deleteBtn = $(e.currentTarget)
       const childIdx = deleteBtn.closest('.rating').index()
       const $th = $(`.criterion thead tr > th:nth-child(${childIdx + 1})`)
-      let focusTarget = deleteBtn
-        .closest('.rating')
-        .prev()
-        .find('.insert_rating')
+      let focusTarget = deleteBtn.closest('.rating').prev().find('.insert_rating')
       if (focusTarget.length === 0) {
-        focusTarget = deleteBtn
-          .closest('.rating')
-          .next()
-          .find('.edit_rating')
+        focusTarget = deleteBtn.closest('.rating').next().find('.edit_rating')
       }
       $th.remove()
       deleteBtn.closest('td').remove()
@@ -183,9 +172,7 @@ export default class OutcomeView extends OutcomeContentBase {
 
   saveRating(e) {
     e.preventDefault()
-    const childIdx = $(e.currentTarget)
-      .closest('.rating')
-      .index()
+    const childIdx = $(e.currentTarget).closest('.rating').index()
     const $th = $(`.criterion thead tr > th:nth-child(${childIdx + 1})`)
     const $editWrapper = $(e.currentTarget).parents('.edit:first')
     const $showWrapper = $editWrapper.prev()
@@ -199,10 +186,7 @@ export default class OutcomeView extends OutcomeContentBase {
     $showWrapper.find('.points').text(points)
     $editWrapper.attr('aria-expanded', 'false').hide()
     $showWrapper.attr('aria-expanded', 'true').show()
-    $th
-      .find('h5')
-      .attr('aria-expanded', 'true')
-      .show()
+    $th.find('h5').attr('aria-expanded', 'true').show()
     $showWrapper.find('.edit_rating').focus()
     return this.updateRatings()
   }
@@ -210,20 +194,12 @@ export default class OutcomeView extends OutcomeContentBase {
   insertRating(e) {
     e.preventDefault()
     const $rating = $(criterionTemplate({description: '', points: '', _index: 99}))
-    const childIdx = $(e.currentTarget)
-      .closest('.rating-header')
-      .index()
+    const childIdx = $(e.currentTarget).closest('.rating-header').index()
     const $ratingHeader = $(criterionHeaderTemplate({description: '', _index: 99}))
     const $tr = $('.criterion tbody tr')
-    $(e.currentTarget)
-      .closest('.rating-header')
-      .after($ratingHeader)
+    $(e.currentTarget).closest('.rating-header').after($ratingHeader)
     $tr.find(`> td:nth-child(${childIdx + 1})`).after($rating)
-    $rating
-      .find('.show')
-      .hide()
-      .next()
-      .show(200)
+    $rating.find('.show').hide().next().show(200)
     $ratingHeader.hide().show(200)
     $rating.find('.edit input:first').focus()
     return this.updateRatings()
@@ -260,10 +236,7 @@ export default class OutcomeView extends OutcomeContentBase {
     const iterable = this.$('.rating')
     for (let index = 0; index < iterable.length; index++) {
       const r = iterable[index]
-      const rating =
-        $(r)
-          .find('.outcome_rating_points')
-          .val() || 0
+      const rating = $(r).find('.outcome_rating_points').val() || 0
       total = _.max([total, numberHelper.parse(rating)])
       for (const i of Array.from($(r).find('input'))) {
         // reset indices
@@ -298,7 +271,6 @@ export default class OutcomeView extends OutcomeContentBase {
           outcomeFormTemplate(
             _.extend(data, {
               calculationMethods: this.model.calculationMethods(),
-              use_rce_enhancements: ENV.use_rce_enhancements,
               hideMasteryScale: ENV.ACCOUNT_LEVEL_MASTERY_SCALES
             })
           )

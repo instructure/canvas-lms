@@ -36,7 +36,6 @@ describe 'creating a quiz' do
 
   context 'as a teacher' do
     before(:each) do
-      Account.default.enable_feature!(:rce_enhancements)
       stub_rcs_config
       course_with_teacher_logged_in(course_name: 'Test Course', active_all: true)
     end

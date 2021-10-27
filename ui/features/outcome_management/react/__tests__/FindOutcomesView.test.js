@@ -20,7 +20,7 @@ import React from 'react'
 import FindOutcomesView from '../FindOutcomesView'
 import {createCache} from '@canvas/apollo'
 import {MockedProvider} from '@apollo/react-testing'
-import {render as realRender, fireEvent, within} from '@testing-library/react'
+import {render as realRender, fireEvent} from '@testing-library/react'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {findOutcomesMocks} from '@canvas/outcomes/mocks/Management'
 import {
@@ -50,6 +50,7 @@ describe('FindOutcomesView', () => {
       contextId: '1',
       contextType: 'Account',
       outcomesCount: 3,
+      notImportedOutcomesCount: 1,
       outcomes: {
         edges: [
           {
@@ -251,6 +252,22 @@ describe('FindOutcomesView', () => {
             ...defaultProps().outcomesGroup,
             outcomesCount: 0
           }
+        })}
+      />
+    )
+    expect(getByText('Add All Outcomes').closest('button')).toBeDisabled()
+  })
+
+  it('enables "Add All Outcomes" button if there are outcomes in selected group that are not imported into context', () => {
+    const {getByText} = render(<FindOutcomesView {...defaultProps()} />)
+    expect(getByText('Add All Outcomes').closest('button')).toBeEnabled()
+  })
+
+  it('disables "Add All Outcomes" button if all outcomes from selected group are imported into context', () => {
+    const {getByText} = render(
+      <FindOutcomesView
+        {...defaultProps({
+          outcomesGroup: {...defaultProps().outcomesGroup, notImportedOutcomesCount: 0}
         })}
       />
     )

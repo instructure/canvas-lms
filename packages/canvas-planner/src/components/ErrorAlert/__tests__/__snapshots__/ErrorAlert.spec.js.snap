@@ -2,6 +2,7 @@
 
 exports[`renders 1`] = `
 <Alert
+  hasShadow={true}
   isLiveRegionAtomic={false}
   liveRegionPoliteness="assertive"
   margin="small"
@@ -17,6 +18,7 @@ exports[`renders 1`] = `
 
 exports[`renders with Error details 1`] = `
 <Alert
+  hasShadow={true}
   isLiveRegionAtomic={false}
   liveRegionPoliteness="assertive"
   margin="small"
@@ -41,6 +43,7 @@ exports[`renders with Error details 1`] = `
 
 exports[`renders with string details 1`] = `
 <Alert
+  hasShadow={true}
   isLiveRegionAtomic={false}
   liveRegionPoliteness="assertive"
   margin="small"

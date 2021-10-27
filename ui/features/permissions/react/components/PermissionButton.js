@@ -34,7 +34,11 @@ import {IconButton} from '@instructure/ui-buttons'
 import {Spinner} from '@instructure/ui-spinner'
 
 import actions from '../actions'
-import propTypes, {ENABLED_FOR_NONE, ENABLED_FOR_ALL, ENABLED_FOR_PARTIAL} from '@canvas/permissions/react/propTypes'
+import propTypes, {
+  ENABLED_FOR_NONE,
+  ENABLED_FOR_ALL,
+  ENABLED_FOR_PARTIAL
+} from '@canvas/permissions/react/propTypes'
 
 // let's cinch up that large margin around the IconButtons so that their
 // decorations snuggle up a little closer and are more obviously a part

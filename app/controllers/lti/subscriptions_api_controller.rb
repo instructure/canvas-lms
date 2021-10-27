@@ -44,7 +44,7 @@ module Lti
   # to your application, you must check the "event_time" attribute in the
   # "metadata" hash to determine sequence.
   class SubscriptionsApiController < ApplicationController
-    include Lti::Ims::AccessTokenHelper
+    include Lti::IMS::AccessTokenHelper
 
     WEBHOOK_SUBSCRIPTION_SERVICE = 'vnd.Canvas.webhooksSubscription'.freeze
 

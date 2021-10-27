@@ -18,6 +18,7 @@
 
 import axios from 'axios'
 import K5Uploader from '@instructure/k5uploader'
+import FileSizeError from './shared/FileSizeError'
 
 export const VIDEO_SIZE_OPTIONS = {height: '432px', width: '768px'}
 const STARTING_PROGRESS_VALUE = 33
@@ -132,13 +133,19 @@ export default async function saveMediaRecording(file, rcsConfig, done, onProgre
  * @media_object_id: id of the media_object we're assigning CC to
  * @subtitles: [{locale: string locale, file: JS File object}]
  * @rcsConfig: {origin, headers, method} where method=PUT for update or POST for create
+ * @maxBytes: The max bytes allowed for the caption file
  */
-export async function saveClosedCaptions(media_object_id, subtitles, rcsConfig) {
+export async function saveClosedCaptions(media_object_id, subtitles, rcsConfig, maxBytes) {
   // read all the subtitle files' contents
   const file_promises = []
+
   subtitles.forEach(st => {
     if (st.isNew) {
       const p = new Promise((resolve, reject) => {
+        if (maxBytes && st.file.size > maxBytes) {
+          reject(new FileSizeError({maxBytes, actualBytes: st.file.size}))
+        }
+
         const reader = new FileReader()
         reader.onload = function (e) {
           resolve({locale: st.locale, content: e.target.result})

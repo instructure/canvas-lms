@@ -59,10 +59,8 @@ import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import ImportantDates from './ImportantDates'
-import ObserverOptions, {
-  ObserverListShape,
-  defaultSelectedObserverId
-} from '@canvas/k5/react/ObserverOptions'
+import ObserverOptions, {ObserverListShape} from '@canvas/k5/react/ObserverOptions'
+import {savedObservedId} from '@canvas/k5/ObserverGetObservee'
 
 const DASHBOARD_TABS = [
   {
@@ -146,6 +144,10 @@ export const K5Dashboard = ({
   observerList,
   canAddObservee
 }) => {
+  const initialObservedId = observerList.find(o => o.id === savedObservedId(currentUser.id))
+    ? savedObservedId(currentUser.id)
+    : undefined
+
   const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, availableTabs)
   const [cards, setCards] = useState(null)
@@ -155,13 +157,15 @@ export const K5Dashboard = ({
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
   const [tabsRef, setTabsRef] = useState(null)
   const [trayOpen, setTrayOpen] = useState(false)
-  const [observedUserId, setObservedUserId] = useState(defaultSelectedObserverId)
+  const [observedUserId, setObservedUserId] = useState(initialObservedId)
   const [observedUsersCards, setObservedUsersCards] = useState([])
   const plannerInitialized = usePlanner({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
     focusFallback: tabsRef,
-    callback: () => loadAllOpportunities()
+    callback: () => loadAllOpportunities(),
+    observedUserId: initialObservedId,
+    isObserver: currentUserRoles.includes('observer')
   })
   const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
   const useImportantDatesTray = responsiveSize !== 'large'
@@ -284,6 +288,7 @@ export const K5Dashboard = ({
       handleClose={useImportantDatesTray ? () => setTrayOpen(false) : undefined}
       selectedContextCodes={selectedContextCodes}
       selectedContextsLimit={selectedContextsLimit}
+      observedUserId={observedUserId}
     />
   )
 
@@ -340,6 +345,8 @@ export const K5Dashboard = ({
               userHasEnrollments={!!cards?.length}
               visible={currentTab === TAB_IDS.SCHEDULE}
               singleCourse={false}
+              observedUserId={observedUserId}
+              contextCodes={observedUsersCards[observedUserId]?.map(c => c.assetString)}
             />
             <GradesPage
               visible={currentTab === TAB_IDS.GRADES}
@@ -388,7 +395,7 @@ K5Dashboard.propTypes = {
   assignmentsDueToday: PropTypes.object.isRequired,
   assignmentsMissing: PropTypes.object.isRequired,
   assignmentsCompletedForToday: PropTypes.object.isRequired,
-  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'none']).isRequired,
+  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']),
   currentUser: PropTypes.shape({
     id: PropTypes.string,
     display_name: PropTypes.string,

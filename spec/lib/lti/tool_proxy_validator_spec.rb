@@ -53,7 +53,7 @@ module Lti
     before :each do
       allow(tp_validator).to receive(:tool_consumer_profile=)
       allow(tp_validator).to receive(:errors)
-      allow(IMS::LTI::Services::ToolProxyValidator).to receive(:new).and_return(tp_validator)
+      allow(::IMS::LTI::Services::ToolProxyValidator).to receive(:new).and_return(tp_validator)
     end
 
     describe '#errors' do

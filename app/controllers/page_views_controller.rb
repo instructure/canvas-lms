@@ -210,7 +210,7 @@ class PageViewsController < ApplicationController
       format.csv do
         cancel_cache_buster
 
-        csv = PageView::CsvReport.new(@user, @current_user, date_options).generate
+        csv = PageView::CSVReport.new(@user, @current_user, date_options).generate
 
         options = {
           type: 'text/csv',

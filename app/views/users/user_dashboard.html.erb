@@ -26,7 +26,8 @@
 
 <% provide :page_title do %><%= dashboard_title %><% end %>
 <%
-  if show_planner?
+  is_observer = Account.site_admin.feature_enabled?(:k5_parent_support) && @current_user&.roles(@domain_root_account)&.include?('observer')
+  if show_planner? && !is_observer
     # fire off these `fetch` requests now so they are ready sooner
     six_months_ago = Time.now.utc.at_beginning_of_day.months_ago(6).iso8601(3)
     beginning_of_day = Time.zone.now.at_beginning_of_day.utc.iso8601(3)
@@ -46,6 +47,9 @@
     <%= prefetch_xhr("/api/v1/planner/items?start_date=#{beginning_of_day}") %>
     <%= prefetch_xhr('/api/v1/users/self/missing_submissions?include[]=planner_overrides&filter[]=submittable') %>
   <% end %>
+<% end %>
+
+<% if show_planner? %>
   <%= prefetch_xhr("/api/v1/dashboard/dashboard_cards#{@cards_prefetch_observer_param.present? ? "?observed_user=#{@cards_prefetch_observer_param}" : ""}") %>
 <% end %>
 

@@ -19,7 +19,7 @@
 
 require 'spec_helper'
 
-RSpec.describe Lti::Ims::LineItemsSerializer do
+RSpec.describe Lti::IMS::LineItemsSerializer do
   let(:resource_link) { resource_link_model(overrides: { resource_link_uuid: assignment.lti_context_id }) }
   let_once(:course) { course_model }
   let(:tool) {

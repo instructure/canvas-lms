@@ -75,6 +75,65 @@ describe Importers::ContextExternalToolImporter do
     end
   end
 
+  context 'placement configuration' do
+    subject do
+      Importers::ContextExternalToolImporter.import_from_migration(
+        tool_hash,
+        course.account,
+        migration,
+        tool
+      )
+    end
+
+    let(:course) { course_model }
+    let(:migration) { course.content_migrations.create! }
+    let(:tool) { external_tool_model(context: course) }
+    let(:tool_hash) do
+      {
+        title: 'test tool',
+        settings: {
+          oauth_compliant: true,
+          course_navigation: {
+            text: 'Course Nav'
+          }
+        }
+      }
+    end
+
+    before do
+      allow(tool).to receive(:settings=).and_call_original
+      allow(tool).to receive(:set_extension_setting).and_call_original
+    end
+
+    context 'for placement tool has defined' do
+      let(:placement) { :course_navigation }
+
+      it 'uses tool setter method' do
+        subject
+        expect(tool).to have_received(:settings=)
+        expect(tool).to have_received(:set_extension_setting).with(:course_navigation, any_args)
+      end
+    end
+
+    context 'for placement tool does not have defined' do
+      let(:placement) { :global_navigation }
+
+      it 'does not use tool setter method' do
+        subject
+        expect(tool).to have_received(:settings=)
+      end
+    end
+
+    context 'for settings attribute that is not a placement' do
+      let(:placement) { :oauth_compliant }
+
+      it 'does not change' do
+        subject
+        expect(tool).to have_received(:settings=)
+      end
+    end
+  end
+
   context "combining imported external tools" do
     before :once do
       course_model

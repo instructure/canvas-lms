@@ -22,18 +22,19 @@ class PacePlansController < ApplicationController
   before_action :load_course
   before_action :require_feature_flag
   before_action :authorize_action
-  before_action :load_pace_plan, only: [:api_show, :update]
+  before_action :load_pace_plan, only: [:api_show, :update, :publish]
 
   include Api::V1::Course
+  include Api::V1::Progress
   include K5Mode
 
   def index
     @pace_plan = @context.pace_plans.primary.first
 
     if @pace_plan.nil?
-      @pace_plan = @context.pace_plans.create!
-      @context.context_module_tags.each do |module_item|
-        @pace_plan.pace_plan_module_items.create module_item: module_item, duration: 0
+      @pace_plan = @context.pace_plans.new
+      @context.context_module_tags.not_deleted.each do |module_item|
+        @pace_plan.pace_plan_module_items.new module_item: module_item, duration: 0
       end
     end
 
@@ -51,6 +52,45 @@ class PacePlansController < ApplicationController
   def api_show
     plans_json = PacePlanPresenter.new(@pace_plan).as_json
     render json: { pace_plan: plans_json }
+  end
+
+  def new
+    @pace_plan = case @context
+                 when Course
+                   @context.pace_plans.primary.not_deleted.take
+                 when CourseSection
+                   @course.pace_plans.for_section(@context).not_deleted.take
+                 when Enrollment
+                   @course.pace_plans.for_user(@context.user).not_deleted.take
+                 end
+    if @pace_plan.nil?
+      params = case @context
+               when Course
+                 { course_section_id: nil, user_id: nil }
+               when CourseSection
+                 { course_section_id: @context }
+               when Enrollment
+                 { user_id: @context.user }
+               end
+      # Duplicate a published plan if one exists for the plan or for the course
+      published_pace_plan = @course.pace_plans.published.where(params).take || @course.pace_plans.primary.published.take
+      params[:start_date] = @context.start_at || @context.created_at
+      if published_pace_plan
+        @pace_plan = published_pace_plan.duplicate(params)
+      else
+        @pace_plan = @course.pace_plans.new(params)
+        @course.context_module_tags.can_have_assignment.not_deleted.each do |module_item|
+          @pace_plan.pace_plan_module_items.new module_item: module_item, duration: 0
+        end
+      end
+    end
+    render json: { pace_plan: PacePlanPresenter.new(@pace_plan).as_json }
+  end
+
+  def publish
+    progress = Progress.create!(context: @pace_plan, tag: 'pace_plan_publish')
+    progress.process_job(@pace_plan, :publish, {})
+    render json: progress_json(progress, @current_user, session)
   end
 
   def create
@@ -73,38 +113,6 @@ class PacePlansController < ApplicationController
     else
       render json: { success: false, errors: @pace_plan.errors.full_messages }, status: :unprocessable_entity
     end
-  end
-
-  def latest_draft_for
-    @pace_plan = case @context
-                 when Course
-                   @context.pace_plans.primary.unpublished.take
-                 when CourseSection
-                   @course.pace_plans.unpublished.for_section(@context).take
-                 when Enrollment
-                   @course.pace_plans.unpublished.for_user(@context.user).take
-                 end
-    if @pace_plan.nil?
-      params = case @context
-               when Course
-                 { course_section_id: nil, user_id: nil }
-               when CourseSection
-                 { course_section_id: @context }
-               when Enrollment
-                 { user_id: @context.user }
-               end
-      # Duplicate a published plan if one exists for the plan or for the course
-      published_pace_plan = @course.pace_plans.published.where(params).take || @course.pace_plans.primary.published.take
-      if published_pace_plan
-        @pace_plan = published_pace_plan.duplicate(params)
-      else
-        @pace_plan = @course.pace_plans.create!(params)
-        @course.context_module_tags.not_deleted.each do |module_item|
-          @pace_plan.pace_plan_module_items.create module_item: module_item, duration: 0
-        end
-      end
-    end
-    render json: { pace_plan: PacePlanPresenter.new(@pace_plan).as_json }
   end
 
   private
@@ -152,6 +160,8 @@ class PacePlansController < ApplicationController
   def load_context
     if params[:enrollment_id]
       @context = Enrollment.find(params[:enrollment_id])
+    elsif params[:course_section_id]
+      @context = CourseSection.find(params[:course_section_id])
     else
       require_context
     end

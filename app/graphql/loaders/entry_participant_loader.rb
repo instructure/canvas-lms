@@ -28,7 +28,7 @@ class Loaders::EntryParticipantLoader < GraphQL::Batch::Loader
 
     objects.each do |object|
       unless deps[object.id]
-        fulfill(object, { read: false, rating: nil, forced_read_state: nil })
+        fulfill(object, { read: false, rating: nil, forced_read_state: nil, report_type: nil })
         next
       end
 
@@ -36,6 +36,7 @@ class Loaders::EntryParticipantLoader < GraphQL::Batch::Loader
       participant["rating"] = deps[object.id].rating
       participant["forced_read_state"] = deps[object.id].forced_read_state
       participant["read"] = deps[object.id].workflow_state == 'read'
+      participant["report_type"] = deps[object.id].report_type
       fulfill(object, participant)
     end
   end

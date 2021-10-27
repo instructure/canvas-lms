@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-class AuthenticationProvider::Facebook < AuthenticationProvider::Oauth2
+class AuthenticationProvider::Facebook < AuthenticationProvider::OAuth2
   include AuthenticationProvider::PluginSettings
 
   self.plugin = :facebook

@@ -20,7 +20,7 @@
 
 require_relative '../../spec_helper'
 
-describe Login::Oauth2Controller do
+describe Login::OAuth2Controller do
   let(:aac) { Account.default.authentication_providers.create!(auth_type: 'facebook') }
   before do
     aac

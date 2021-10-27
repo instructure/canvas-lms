@@ -171,7 +171,10 @@ class DeveloperKey < ActiveRecord::Base
 
         if Rails.env.test?
           # TODO: we have to do this because tests run in transactions
-          return @special_keys[default_key_name] = DeveloperKey.where(name: default_key_name).first_or_create
+          testkey = DeveloperKey.where(name: default_key_name).first_or_initialize
+          testkey.auto_expire_tokens = false if testkey.new_record?
+          testkey.save! if testkey.changed?
+          return @special_keys[default_key_name] = testkey
         end
 
         key = @special_keys[default_key_name]
@@ -184,6 +187,7 @@ class DeveloperKey < ActiveRecord::Base
 
         key = DeveloperKey.create!(:name => default_key_name)
         key.developer_key_account_bindings.update_all(workflow_state: 'on')
+        key.update(auto_expire_tokens: false)
         Setting.set("#{default_key_name}_developer_key_id", key.id)
         return @special_keys[default_key_name] = key
       end
@@ -336,13 +340,24 @@ class DeveloperKey < ActiveRecord::Base
     when "external"
       # asymmetric encryption signed with private key to be verified by third
       # party using public key fetched from /login/oauth2/jwks
-      key = Canvas::Oauth::KeyStorage.present_key
+      key = Canvas::OAuth::KeyStorage.present_key
       Canvas::Security.create_jwt(claims, nil, key, :autodetect).to_s
     else
       # default symmetric encryption to be verified when given right back to
       # canvas
       Canvas::Security.create_jwt(claims).to_s
     end
+  end
+
+  def mobile_app?
+    false
+  end
+
+  def tokens_expire_in
+    return nil unless mobile_app?
+
+    sessions_settings = Canvas::Plugin.find('sessions').settings || {}
+    sessions_settings[:mobile_timeout]&.to_f&.minutes
   end
 
   private

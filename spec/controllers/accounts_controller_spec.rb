@@ -1180,6 +1180,33 @@ describe AccountsController do
     end
   end
 
+  describe "manually_created_courses_account" do
+    it "returns unauthorized if there's no user" do
+      get 'manually_created_courses_account'
+      assert_unauthorized
+    end
+
+    it "returns the account with lots of detail if user has :read on the account" do
+      account_with_admin_logged_in(active_all: true)
+
+      get 'manually_created_courses_account'
+      expect(response).to be_successful
+      account = json_parse(response.body)
+      expect(account['name']).to eq('Manually-Created Courses')
+      expect(account['default_storage_quota_mb']).to be(500)
+    end
+
+    it "returns limited details about the account to students" do
+      course_with_student_logged_in(active_all: true)
+
+      get 'manually_created_courses_account'
+      expect(response).to be_successful
+      account = json_parse(response.body)
+      expect(account['name']).to eq('Manually-Created Courses')
+      expect(account['default_storage_quota_mb']).to be_nil
+    end
+  end
+
   describe "#account_courses" do
     before do
       @account = Account.create!

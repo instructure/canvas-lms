@@ -17,12 +17,13 @@
  */
 import gql from 'graphql-tag'
 
-import {Assignment, AssignmentSubmissionsConnection} from './Assignment'
+import {Assignment} from './Assignment'
 import {ExternalTool} from './ExternalTool'
 import {ProficiencyRating} from './ProficiencyRating'
 import {Rubric} from './Rubric'
 import {RubricAssessment} from './RubricAssessment'
 import {RubricAssociation} from './RubricAssociation'
+import {Submission} from './Submission'
 import {SubmissionComment} from './SubmissionComment'
 import {SubmissionHistory} from './SubmissionHistory'
 import {UserGroups} from './UserGroups'
@@ -58,6 +59,7 @@ export const RUBRIC_QUERY = gql`
       }
     }
     submission(id: $submissionID) {
+      id
       rubricAssessmentsConnection(filter: {forAttempt: $submissionAttempt}) {
         nodes {
           ...RubricAssessment
@@ -86,15 +88,17 @@ export const STUDENT_VIEW_QUERY = gql`
   query GetAssignment($assignmentLid: ID!, $submissionID: ID!) {
     assignment(id: $assignmentLid) {
       ...Assignment
-      ...AssignmentSubmissionsConnection
       rubric {
         ...Rubric
       }
     }
+    submission(id: $submissionID) {
+      ...Submission
+    }
   }
   ${Assignment.fragment}
-  ${AssignmentSubmissionsConnection.fragment}
   ${Rubric.fragment}
+  ${Submission.fragment}
 `
 
 export const LOGGED_OUT_STUDENT_VIEW_QUERY = gql`

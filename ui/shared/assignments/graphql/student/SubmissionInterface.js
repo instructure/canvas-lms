@@ -43,6 +43,7 @@ export const SubmissionInterface = {
       mediaObject {
         ...MediaObject
       }
+      resourceLinkLookupUuid
       state
       submissionDraft {
         ...SubmissionDraft
@@ -72,6 +73,7 @@ export const SubmissionInterface = {
     gradingStatus: oneOf(['needs_grading', 'excused', 'needs_review', 'graded']),
     latePolicyStatus: string,
     mediaObject: MediaObject.shape,
+    resourceLinkLookupUuid: string,
     state: string.isRequired,
     submissionDraft: SubmissionDraft.shape,
     submissionStatus: string,
@@ -97,6 +99,7 @@ export const DefaultMocks = {
     gradingStatus: null,
     latePolicyStatus: null,
     mediaObject: null,
+    resourceLinkLookupUuid: null,
     state: 'unsubmitted',
     submissionDraft: null,
     submissionStatus: 'unsubmitted',

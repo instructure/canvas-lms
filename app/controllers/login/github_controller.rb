@@ -19,5 +19,5 @@
 #
 
 module Login
-  GithubController = Oauth2Controller
+  GithubController = OAuth2Controller
 end

@@ -17,15 +17,13 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {ApolloProvider} from 'react-apollo'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import {graphql} from 'msw'
-import {handlers} from '../../../../graphql/mswHandlers'
+import {getDiscussionSubentriesQueryMock} from '../../../../graphql/Mocks'
+import {ISOLATED_VIEW_INITIAL_PAGE_SIZE, PER_PAGE} from '../../../utils/constants'
 import {IsolatedViewContainer} from '../IsolatedViewContainer'
-import {mswClient} from '../../../../../../shared/msw/mswClient'
-import {mswServer} from '../../../../../../shared/msw/mswServer'
+import {MockedProvider} from '@apollo/react-testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
 
@@ -35,7 +33,6 @@ jest.mock('../../../utils', () => ({
 }))
 
 describe('IsolatedViewContainer', () => {
-  const server = mswServer(handlers)
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
   const onOpenIsolatedView = jest.fn()
@@ -43,10 +40,6 @@ describe('IsolatedViewContainer', () => {
   const onClose = jest.fn()
 
   beforeAll(() => {
-    // eslint-disable-next-line no-undef
-    fetchMock.dontMock()
-    server.listen()
-
     window.ENV = {
       discussion_topic_id: '1',
       manual_mark_as_read: false,
@@ -70,24 +63,16 @@ describe('IsolatedViewContainer', () => {
   })
 
   afterEach(() => {
-    mswClient.resetStore()
-    server.resetHandlers()
     jest.clearAllMocks()
   })
 
-  afterAll(() => {
-    server.close()
-    // eslint-disable-next-line no-undef
-    fetchMock.enableMocks()
-  })
-
-  const setup = props => {
+  const setup = (props, mocks) => {
     return render(
-      <ApolloProvider client={mswClient}>
+      <MockedProvider mocks={mocks}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <IsolatedViewContainer {...props} />
         </AlertManagerContext.Provider>
-      </ApolloProvider>
+      </MockedProvider>
     )
   }
 
@@ -108,7 +93,13 @@ describe('IsolatedViewContainer', () => {
   })
 
   it('should render a back button', async () => {
-    const {findByTestId} = setup(defaultProps())
+    const mocks = getDiscussionSubentriesQueryMock({
+      last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+      includeRelativeEntry: false
+    })
+    mocks[0].result.data.legacyNode.parentId = '77'
+    mocks[0].result.data.legacyNode.isolatedEntryId = '77'
+    const {findByTestId} = setup(defaultProps(), mocks)
 
     const backButton = await findByTestId('back-button')
     expect(backButton).toBeInTheDocument()
@@ -119,30 +110,13 @@ describe('IsolatedViewContainer', () => {
   })
 
   it('should go to root reply when clicking Go To Parent', async () => {
-    server.use(
-      graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
-        return res(
-          ctx.data({
-            legacyNode: DiscussionEntry.mock({
-              discussionSubentriesConnection: {
-                nodes: [
-                  DiscussionEntry.mock({
-                    _id: '50',
-                    id: '50',
-                    message: '<p>This is the child reply</p>',
-                    rootEntryId: '70'
-                  })
-                ],
-                pageInfo: PageInfo.mock(),
-                __typename: 'DiscussionSubentriesConnection'
-              }
-            })
-          })
-        )
+    const {findAllByTestId, findByText} = setup(
+      defaultProps(),
+      getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: false
       })
     )
-
-    const {findAllByTestId, findByText} = setup(defaultProps())
 
     const threadActionsMenus = await findAllByTestId('thread-actions-menu')
     expect(threadActionsMenus[1]).toBeInTheDocument()
@@ -152,11 +126,17 @@ describe('IsolatedViewContainer', () => {
     expect(goToParentButton).toBeInTheDocument()
     fireEvent.click(goToParentButton)
 
-    expect(onOpenIsolatedView).toHaveBeenCalledWith('70', '70', false)
+    expect(onOpenIsolatedView).toHaveBeenCalledWith('1', '1', false)
   })
 
   it('calls the goToTopic callback when clicking Go To Topic (from parent)', async () => {
-    const {findAllByTestId, findByText} = setup(defaultProps())
+    const {findAllByTestId, findByText} = setup(
+      defaultProps(),
+      getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: false
+      })
+    )
 
     const threadActionsMenus = await findAllByTestId('thread-actions-menu')
     expect(threadActionsMenus[0]).toBeInTheDocument()
@@ -170,7 +150,13 @@ describe('IsolatedViewContainer', () => {
   })
 
   it('calls the goToTopic callback when clicking Go To Topic (from child)', async () => {
-    const {findAllByTestId, findByText} = setup(defaultProps())
+    const {findAllByTestId, findByText} = setup(
+      defaultProps(),
+      getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: false
+      })
+    )
 
     const threadActionsMenus = await findAllByTestId('thread-actions-menu')
     expect(threadActionsMenus[1]).toBeInTheDocument()
@@ -194,7 +180,13 @@ describe('IsolatedViewContainer', () => {
     })
 
     it('does not call "onClose"', async () => {
-      const {findAllByTestId, findByTestId} = setup(defaultProps())
+      const {findAllByTestId, findByTestId} = setup(
+        defaultProps(),
+        getDiscussionSubentriesQueryMock({
+          last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+          includeRelativeEntry: false
+        })
+      )
 
       const threadActionsMenus = await findAllByTestId('thread-actions-menu')
       expect(threadActionsMenus[1]).toBeInTheDocument()
@@ -209,49 +201,47 @@ describe('IsolatedViewContainer', () => {
   })
 
   it('should not render a back button', async () => {
-    server.use(
-      graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
-        return res(
-          ctx.data({
-            legacyNode: DiscussionEntry.mock({parentId: null})
-          })
-        )
+    const {findByText, queryByTestId} = setup(
+      defaultProps(),
+      getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: false
       })
     )
-
-    const {findByText, queryByTestId} = setup(defaultProps())
     expect(await findByText('This is the parent reply')).toBeInTheDocument()
     expect(queryByTestId('back-button')).toBeNull()
   })
 
   it('allows fetching older discussion entries', async () => {
-    const {findByText, queryByText} = setup(defaultProps())
+    const mocks = [
+      ...getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: false
+      }),
+      ...getDiscussionSubentriesQueryMock({
+        last: PER_PAGE,
+        before: 'MQ',
+        includeRelativeEntry: false
+      })
+    ]
+    mocks[1].result.data.legacyNode = DiscussionEntry.mock({
+      discussionSubentriesConnection: {
+        nodes: [
+          DiscussionEntry.mock({
+            id: '1337',
+            _id: '1337',
+            message: '<p>Get riggity riggity wrecked son</p>'
+          })
+        ],
+        pageInfo: PageInfo.mock({hasPreviousPage: false}),
+        __typename: 'DiscussionSubentriesConnection'
+      }
+    })
+    const {findByText, queryByText} = setup(defaultProps(), mocks)
 
     const showOlderRepliesButton = await findByText('Show older replies')
     expect(showOlderRepliesButton).toBeInTheDocument()
     expect(queryByText('Get riggity riggity wrecked son')).toBe(null)
-
-    server.use(
-      graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
-        return res.once(
-          ctx.data({
-            legacyNode: DiscussionEntry.mock({
-              discussionSubentriesConnection: {
-                nodes: [
-                  DiscussionEntry.mock({
-                    id: '1337',
-                    _id: '1337',
-                    message: '<p>Get riggity riggity wrecked son</p>'
-                  })
-                ],
-                pageInfo: PageInfo.mock({hasPreviousPage: false}),
-                __typename: 'DiscussionSubentriesConnection'
-              }
-            })
-          })
-        )
-      })
-    )
 
     fireEvent.click(showOlderRepliesButton)
 
@@ -261,33 +251,44 @@ describe('IsolatedViewContainer', () => {
   })
 
   it('allows fetching newer discussion entries', async () => {
-    const {findByText, queryByText} = setup(defaultProps({relativeEntryId: '10'}))
+    const mocks = [
+      ...getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: true,
+        relativeEntryId: '10'
+      }),
+      ...getDiscussionSubentriesQueryMock({
+        first: 0,
+        includeRelativeEntry: false,
+        beforeRelativeEntry: false,
+        relativeEntryId: '10'
+      }),
+      ...getDiscussionSubentriesQueryMock({
+        first: PER_PAGE,
+        after: 'MjA',
+        includeRelativeEntry: false,
+        beforeRelativeEntry: false,
+        relativeEntryId: '10'
+      })
+    ]
+    mocks[2].result.data.legacyNode = DiscussionEntry.mock({
+      discussionSubentriesConnection: {
+        nodes: [
+          DiscussionEntry.mock({
+            id: '1337',
+            _id: '1337',
+            message: '<p>Get riggity riggity wrecked son</p>'
+          })
+        ],
+        pageInfo: PageInfo.mock({hasNextPage: false}),
+        __typename: 'DiscussionSubentriesConnection'
+      }
+    })
+    const {findByText, queryByText} = setup(defaultProps({relativeEntryId: '10'}), mocks)
 
     const showNewerRepliesButton = await findByText('Show newer replies')
     expect(showNewerRepliesButton).toBeInTheDocument()
     expect(queryByText('Get riggity riggity wrecked son')).toBe(null)
-
-    server.use(
-      graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
-        return res.once(
-          ctx.data({
-            legacyNode: DiscussionEntry.mock({
-              discussionSubentriesConnection: {
-                nodes: [
-                  DiscussionEntry.mock({
-                    id: '1337',
-                    _id: '1337',
-                    message: '<p>Get riggity riggity wrecked son</p>'
-                  })
-                ],
-                pageInfo: PageInfo.mock({hasNextPage: false}),
-                __typename: 'DiscussionSubentriesConnection'
-              }
-            })
-          })
-        )
-      })
-    )
 
     fireEvent.click(showNewerRepliesButton)
 
@@ -297,67 +298,96 @@ describe('IsolatedViewContainer', () => {
   })
 
   it('should not show "Show older replies" button initially if hasPreviousPage is false', async () => {
-    server.use(
-      graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
-        return res.once(
-          ctx.data({
-            legacyNode: DiscussionEntry.mock({
-              discussionSubentriesConnection: {
-                nodes: [
-                  DiscussionEntry.mock({
-                    id: '1337',
-                    _id: '1337',
-                    message: '<p>Get riggity riggity wrecked son</p>'
-                  })
-                ],
-                pageInfo: PageInfo.mock({hasPreviousPage: false}),
-                __typename: 'DiscussionSubentriesConnection'
-              }
-            })
-          })
-        )
-      })
-    )
+    const mocks = getDiscussionSubentriesQueryMock({
+      last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+      includeRelativeEntry: false
+    })
+    mocks[0].result.data.legacyNode.discussionSubentriesConnection.pageInfo = PageInfo.mock({
+      hasPreviousPage: false
+    })
 
-    const {findByText, queryByText} = setup(defaultProps())
+    const {findByText, queryByText} = setup(defaultProps(), mocks)
 
-    await waitFor(() => expect(queryByText('Show older replies')).toBeNull())
-
-    expect(await findByText('Get riggity riggity wrecked son')).toBeInTheDocument()
+    expect(await findByText('This is the parent reply')).toBeInTheDocument()
+    expect(queryByText('Show older replies')).not.toBeInTheDocument()
   })
 
   it('should call query with relative id params', async () => {
-    const {findByText} = setup(defaultProps({relativeEntryId: '10'}))
+    const mocks = [
+      ...getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: true,
+        relativeEntryId: '10'
+      }),
+      ...getDiscussionSubentriesQueryMock({
+        first: 0,
+        includeRelativeEntry: false,
+        beforeRelativeEntry: false,
+        relativeEntryId: '10'
+      })
+    ]
+    const {findByText} = setup(defaultProps({relativeEntryId: '10'}), mocks)
 
     expect(await findByText('This is the search result child reply')).toBeInTheDocument()
   })
 
   it('show newer button should be visible when relativeEntryId is present', async () => {
-    const {queryByText} = setup(defaultProps({relativeEntryId: '10'}))
+    const mocks = [
+      ...getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: true,
+        relativeEntryId: '10'
+      }),
+      ...getDiscussionSubentriesQueryMock({
+        first: 0,
+        includeRelativeEntry: false,
+        beforeRelativeEntry: false,
+        relativeEntryId: '10'
+      })
+    ]
+    const {queryByText} = setup(defaultProps({relativeEntryId: '10'}), mocks)
     await waitFor(() => expect(queryByText('Show newer replies')).toBeInTheDocument())
   })
 
   it('show newer button should not be visible when reativeEntryId is not present', async () => {
-    const {queryByText} = setup(defaultProps({relativeEntryId: null}))
+    const {queryByText} = setup(
+      defaultProps({relativeEntryId: null}),
+      getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: false
+      })
+    )
     await waitFor(() => expect(queryByText('Show newer replies')).toBeNull())
   })
 
   it('calls the onOpenIsolatedView callback when clicking View Replies', async () => {
-    const {findByText} = setup(defaultProps())
+    const {findByText} = setup(
+      defaultProps(),
+      getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: false
+      })
+    )
 
     const viewRepliesButton = await findByText('View Replies')
     fireEvent.click(viewRepliesButton)
 
-    expect(onOpenIsolatedView).toHaveBeenCalledWith('50', null, false)
+    expect(onOpenIsolatedView).toHaveBeenCalledWith('104', null, false)
   })
 
   it('calls the onOpenIsolatedView callback when clicking reply', async () => {
-    const {findAllByText} = setup(defaultProps())
+    const {findAllByText} = setup(
+      defaultProps(),
+      getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: false
+      })
+    )
 
     const replyButton = await findAllByText('Quote')
     fireEvent.click(replyButton[0])
 
-    expect(onOpenIsolatedView).toHaveBeenCalledWith('50', '77', true)
+    expect(onOpenIsolatedView).toHaveBeenCalledWith('104', null, true)
   })
 
   describe('replying', () => {
@@ -365,7 +395,13 @@ describe('IsolatedViewContainer', () => {
       const props = defaultProps({RCEOpen: true})
 
       it('should not display children', () => {
-        const {queryByTestId} = setup(props)
+        const {queryByTestId} = setup(
+          props,
+          getDiscussionSubentriesQueryMock({
+            last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+            includeRelativeEntry: false
+          })
+        )
         expect(queryByTestId('isolated-view-children')).toBeFalsy()
       })
     })
@@ -373,16 +409,28 @@ describe('IsolatedViewContainer', () => {
     describe('RCE is closed', () => {
       const props = defaultProps({RCEOpen: false})
 
-      it.skip('should display children', async () => {
-        const {findByTestId} = setup(props)
+      it('should display children', async () => {
+        const {findByTestId} = setup(
+          props,
+          getDiscussionSubentriesQueryMock({
+            last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+            includeRelativeEntry: false
+          })
+        )
         expect(await findByTestId('isolated-view-children')).toBeTruthy()
       })
     })
   })
 
-  it.skip('disables the reply and enables the expand buttons if the RCE is open', async () => {
+  it('disables the reply and enables the expand buttons if the RCE is open', async () => {
     const setRCEOpen = jest.fn()
-    const {findByTestId} = setup(defaultProps({RCEOpen: true, setRCEOpen}))
+    const {findByTestId} = setup(
+      defaultProps({RCEOpen: true, setRCEOpen}),
+      getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: false
+      })
+    )
 
     expect(await findByTestId('DiscussionEdit-container')).toBeInTheDocument()
     expect(await findByTestId('threading-toolbar-reply')).toBeDisabled()
@@ -391,7 +439,13 @@ describe('IsolatedViewContainer', () => {
 
   it('disables the expand and enables the reply buttons if the RCE is closed', async () => {
     const setRCEOpen = jest.fn()
-    const {findAllByTestId, queryByTestId} = setup(defaultProps({RCEOpen: false, setRCEOpen}))
+    const {findAllByTestId, queryByTestId} = setup(
+      defaultProps({RCEOpen: false, setRCEOpen}),
+      getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: false
+      })
+    )
 
     const replyButtons = await findAllByTestId('threading-toolbar-reply')
     expect(replyButtons[0]).toBeEnabled()
@@ -402,7 +456,13 @@ describe('IsolatedViewContainer', () => {
 
   it('calls the setRCEOpen callback with false when clicking the expand button', async () => {
     const setRCEOpen = jest.fn()
-    const {findByTestId} = setup(defaultProps({RCEOpen: true, setRCEOpen}))
+    const {findByTestId} = setup(
+      defaultProps({RCEOpen: true, setRCEOpen}),
+      getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: false
+      })
+    )
 
     fireEvent.click(await findByTestId('expand-button'))
     expect(setRCEOpen).toHaveBeenCalledWith(false)
@@ -410,7 +470,13 @@ describe('IsolatedViewContainer', () => {
 
   it('calls the setRCEOpen callback with true when clicking the reply button', async () => {
     const setRCEOpen = jest.fn()
-    const {findAllByTestId} = setup(defaultProps({RCEOpen: false, setRCEOpen}))
+    const {findAllByTestId} = setup(
+      defaultProps({RCEOpen: false, setRCEOpen}),
+      getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: false
+      })
+    )
 
     const replyButtons = await findAllByTestId('threading-toolbar-reply')
     fireEvent.click(replyButtons[0])
@@ -418,26 +484,27 @@ describe('IsolatedViewContainer', () => {
   })
 
   it('highlights an entry', async () => {
-    const {findByTestId} = setup(defaultProps({highlightEntryId: '50'}))
+    const {findByTestId} = setup(
+      defaultProps({highlightEntryId: '104'}),
+      getDiscussionSubentriesQueryMock({
+        last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+        includeRelativeEntry: false
+      })
+    )
 
     expect(await findByTestId('isHighlighted')).toBeInTheDocument()
   })
 
   describe('graphql error', () => {
     it('should render generic error page when DISCUSSION_SUBENTRIES_QUERY returns errors', async () => {
-      server.use(
-        graphql.query('GetDiscussionSubentriesQuery', (req, res, ctx) => {
-          return res.once(
-            ctx.errors([
-              {
-                message: 'generic error'
-              }
-            ])
-          )
+      const container = setup(
+        defaultProps({highlightEntryId: '104'}),
+        getDiscussionSubentriesQueryMock({
+          last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
+          includeRelativeEntry: false,
+          shouldError: true
         })
       )
-
-      const container = setup(defaultProps())
       await waitFor(() => expect(container.getAllByText('Sorry, Something Broke')).toBeTruthy())
     })
   })

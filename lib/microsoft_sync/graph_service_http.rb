@@ -91,15 +91,16 @@ module MicrosoftSync
     # if $selected query param is used.)
     # Options except for quota are passed thru to HTTParty.
     #
-    # If check_for_expected_response is given, a block can be passed to check for expected
-    # responses before raising an error based on the code. If the block returns non-falsey,
-    # the value is returned, and an "expected" statsd metric is incremented. If some
-    # StandardError is returned, the error is raised (and counted as "expected", not
-    # "error"). This is useful if there are non-200s expected and you don't want to raise
-    # an HTTP error / count those these as errors in the stats.
+    # If special_cases is given, it should be an array of SpecialCase objects.
+    # If any match, the "expected" statsd metrics is incremented and that value
+    # is returned. If the SpecialCase result is an error class, instead of
+    # returning, a new error of that class is raised (and counted as
+    # "expected", not "error"). This is useful if there are non-200s expected
+    # and you don't want to raise an HTTP error / count those these as errors
+    # in the stats.
     def request(method, path,
-                quota: nil, retries: DEFAULT_N_INTERMITTENT_RETRIES, **options,
-                &check_for_expected_response)
+                quota: nil, retries: DEFAULT_N_INTERMITTENT_RETRIES,
+                special_cases: [], **options)
       statsd_tags = statsd_tags_for_request(method, path)
       increment_statsd_quota_points(quota, options, statsd_tags)
 
@@ -109,11 +110,13 @@ module MicrosoftSync
         end
       end
 
-      if check_for_expected_response && (result = check_for_expected_response.call(response))
+      if (special_case_value = SpecialCase.match(special_cases, response.code, response.body))
         log_and_increment(method, path, statsd_tags, :expected, response.code)
-        raise ExpectedErrorWrapper.new(result) if result.is_a?(StandardError)
-
-        return result
+        if special_case_value.is_a?(StandardError)
+          raise ExpectedErrorWrapper, special_case_value
+        else
+          return special_case_value
+        end
       end
 
       raise_error_if_bad_response(response)
@@ -149,9 +152,10 @@ module MicrosoftSync
     # multiple pages of results.
     # @param [Hash] options_to_be_expanded: sent to expand_options
     # @param [Array] quota array of [read_quota_used, write_quota_used] for each page/request
-    def get_paginated_list(endpoint, quota:, expected_error_block: nil, **options_to_be_expanded)
+    # @param [Hash] special_cases passed on to request()
+    def get_paginated_list(endpoint, quota:, special_cases: {}, **options_to_be_expanded)
       request_options = expand_options(**options_to_be_expanded)
-      response = request(:get, endpoint, query: request_options, quota: quota, &expected_error_block)
+      response = request(:get, endpoint, query: request_options, quota: quota, special_cases: special_cases)
       return response[PAGINATED_VALUE_KEY] unless block_given?
 
       loop do
@@ -161,15 +165,29 @@ module MicrosoftSync
 
         break if next_link.nil?
 
-        response = request(:get, next_link, quota: quota)
+        response = request(:get, next_link, quota: quota, special_cases: special_cases)
       end
     end
 
     # Uses Microsoft API's JSON batching to run requests in parallel with one
-    # HTTP request. Expected failures can be ignored by passing in a block which checks
-    # the response. Other non-2xx responses cause a BatchRequestFailed error.
-    # Returns a list of ids of the requests that were ignored.
-    def run_batch(endpoint_name, requests, quota:, &response_should_be_ignored)
+    # HTTP request. Any throttled responses will cause a BatchRequestThrottled to be raised.
+    # Othe non-2xx responses which are not caught by any special_cases will
+    # cause a BatchRequestFailed error. special_cases is a array of SpecialCase objects that can
+    # be used to handle semi-expected (often non-2xx) responses, very similar to special_cases
+    # in request().
+    #
+    # The subresponses from Microsoft are checked in this order:
+    # * If there any "throttled" subresponses, BatchRequestThrottled is raised.
+    # * If there are any non-2xx status codes that are _not_ covered by any special_cases, a
+    #   BatchRequestFailed error is raised.
+    # * If any responses are covered by special cases with a StandardError "result", that error
+    #   will be raised (the first errored response as returned by Microsoft)
+    # * Otherwise, this returns a hash from (request_id) -> (SpecialCase result) for each
+    #   subrequest that matched a special case.
+    #
+    # Regardless of the above, individual counters (ignored [any special case], throttled, success,
+    # error) will be incremented for each subresponse.
+    def run_batch(endpoint_name, requests, quota:, special_cases: {})
       Rails.logger.info("MicrosoftSync::GraphService: batch of #{requests.count} #{endpoint_name}")
       tags = extra_statsd_tags.merge(msft_endpoint: "batch_#{endpoint_name}")
       increment_statsd_quota_points(quota, {}, tags)
@@ -186,7 +204,7 @@ module MicrosoftSync
           raise
         end
 
-      grouped = group_batch_subresponses_by_type(response['responses'], &response_should_be_ignored)
+      grouped, special_vals = group_batch_subresponses_by_type(response['responses'], special_cases)
 
       increment_batch_statsd_counters(endpoint_name, grouped)
 
@@ -201,7 +219,10 @@ module MicrosoftSync
         raise BatchRequestFailed, msg
       end
 
-      grouped[:ignored]&.map { |r| r['id'] } || []
+      special_case_error = special_vals.values.find { |v| v.is_a?(StandardError) }
+      raise special_case_error if special_case_error
+
+      special_vals
     end
 
     # Used mostly internally but can be useful for endpoint specifics
@@ -299,6 +320,28 @@ module MicrosoftSync
       )
     end
 
+    class SpecialCase
+      attr_reader :status_code, :body_regex, :result
+
+      def initialize(status_code, body_regex = nil, result:)
+        @status_code = status_code
+        @body_regex = body_regex
+        @result = result
+      end
+
+      def test(code, body)
+        if code == status_code && (body_regex.nil? || body =~ body_regex)
+          result.is_a?(Class) ? result.new : result
+        end
+      end
+
+      def self.match(special_cases, code, body)
+        special_cases.reduce(nil) do |result, sc|
+          result || sc.test(code, body)
+        end
+      end
+    end
+
     # -- Helpers for expand_options():
 
     def filter_clause(filter)
@@ -314,11 +357,19 @@ module MicrosoftSync
 
     # -- Helpers for run_batch()
 
-    # Returns a hash with possible keys (:ignored, :throttled, :success:, :error) and values
-    # being arrays of responses. e.g. {ignored: [subresp1, subresp2], success: [subresp3]}
-    def group_batch_subresponses_by_type(responses, &response_should_be_ignored)
-      responses.group_by do |subresponse|
-        if response_should_be_ignored[subresponse]
+    # Returns two things:
+    # * a hash with possible keys (:ignored, :throttled, :success:, :error) and values
+    #   being arrays of responses. e.g. {ignored: [subresp1, subresp2], success: [subresp3]}
+    # * a hash of special case results returned by matching special cases (keys are request ids)
+    def group_batch_subresponses_by_type(responses, special_cases)
+      special_cases_values = {}
+      grouped = responses.group_by do |subresponse|
+        special_case_value = SpecialCase.match(
+          special_cases, subresponse['status'], subresponse['body'].to_json
+        )
+
+        if special_case_value
+          special_cases_values[subresponse['id']] = special_case_value
           :ignored
         elsif subresponse['status'] == 429
           :throttled
@@ -328,6 +379,8 @@ module MicrosoftSync
           :error
         end
       end
+
+      [grouped, special_cases_values]
     end
 
     def increment_batch_statsd_counters(endpoint_name, responses_grouped_by_type)

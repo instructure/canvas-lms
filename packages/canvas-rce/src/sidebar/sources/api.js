@@ -22,6 +22,7 @@ import {saveClosedCaptions} from '@instructure/canvas-media'
 import {downloadToWrap, fixupFileUrl} from '../../common/fileUrl'
 import formatMessage from '../../format-message'
 import alertHandler from '../../rce/alertHandler'
+import {RCS_MAX_BODY_SIZE, RCS_REQUEST_SIZE_BUFFER} from '../../rce/plugins/shared/Upload/constants'
 
 export function headerFor(jwt) {
   return {Authorization: 'Bearer ' + jwt}
@@ -228,14 +229,25 @@ class RceApiSource {
 
   // PUT to //RCS/api/media_objects/:mediaId/media_tracks [{locale, content}, ...]
   // receive back a 200 with the new subtitles, or a 4xx error
-  updateClosedCaptions(apiProps, {media_object_id, subtitles}) {
-    return saveClosedCaptions(media_object_id, subtitles, {
-      origin: originFromHost(apiProps.host),
-      headers: headerFor(apiProps.jwt)
-    }).catch(e => {
+  updateClosedCaptions(apiProps, {media_object_id, subtitles}, maxBytes) {
+    return saveClosedCaptions(
+      media_object_id,
+      subtitles,
+      {
+        origin: originFromHost(apiProps.host),
+        headers: headerFor(apiProps.jwt)
+      },
+      maxBytes || (RCS_MAX_BODY_SIZE - RCS_REQUEST_SIZE_BUFFER)
+    ).catch(e => {
       console.error('Failed saving CC', e)
+      const errorMessage = e.name === 'FileSizeError'
+        ? formatMessage('Closed caption file must be less than {maxKb} kb', {
+            maxKb: e.maxBytes / 1000 // bytes to kb
+          })
+        : formatMessage('Uploading closed captions/subtitles failed.')
+
       this.alertFunc({
-        text: formatMessage('Uploading closed captions/subtitles failed.'),
+        text: errorMessage,
         variant: 'error'
       })
     })

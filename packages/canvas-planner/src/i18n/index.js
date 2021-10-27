@@ -16,16 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import formatMessage from '../format-message'
-import locales from './indexLocales'
+import getTranslations from './getTranslations'
+
+// eslint-disable-next-line import/no-extraneous-dependencies
+const generateId = require('format-message-generate-id/underscored_crc32')
 
 export default {
   init: function init(locale) {
-    document.documentElement.lang = locale
     formatMessage.setup({
-      locale,
       missingTranslation: 'ignore',
-      translations: locales,
-      generateId: require('format-message-generate-id/underscored_crc32')
+      generateId
     })
+
+    return getTranslations(locale)
+      .then(translations => {
+        document.documentElement.lang = locale
+        formatMessage.addLocale({
+          locale,
+          translations: {[locale]: translations}
+        })
+      })
+      .catch(err => {
+        /* eslint-disable no-console */
+        console.error(err)
+        console.warn('Falied loading locale "%s". Falling back to English', locale)
+        formatMessage.addLocale({
+          locale: 'en'
+        })
+        /* eslint-enable no-console */
+      })
   }
 }

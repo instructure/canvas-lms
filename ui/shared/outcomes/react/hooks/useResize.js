@@ -41,8 +41,22 @@ const useResize = ({minWidth = 100, margin = 12, smallStep = 5, largeStep = 25} 
   }
   let isHandlerDragging = false
 
+  // recursivelly check if the element of mousemove start event is the
+  // delimiter. This will handle clicking in a element inside the delimiter
+  // and handle correctly the start of mousemove eent
   const onMouseDown = e => {
-    if (e.target === delimiterRef.current) isHandlerDragging = true
+    let el = e.target
+
+    while (el) {
+      if (el === delimiterRef.current) {
+        isHandlerDragging = true
+        return
+      }
+
+      el = el.parentNode
+    }
+
+    isHandlerDragging = false
   }
 
   const onMouseUp = _e => {

@@ -55,13 +55,14 @@ group :test do
   gem 'escape_code', '0.2', require: false
   gem 'luminosity_contrast', '0.2.1'
   gem 'pact', '1.57.0', require: false
+    gem 'pact-support', '1.16.8', require: false
   gem 'pact-messages', '0.2.0'
   gem 'pact_broker-client', '1.40.0'
   gem 'database_cleaner', '~> 1.5', '>= 1.5.3'
   gem 'json-schema', '~> 2.8.1'
 
   gem 'parallel_tests'
-  gem 'rspecq', github: 'kyler-instructure/rspecq', ref: 'b5a638f114fe66521fc46826e0afe5bd41258b0f'
+  gem 'rspecq', github: 'kyler-instructure/rspecq', ref: 'a49343fa7eab3329cd5dd86d059b33fc6fee0ce3'
   gem 'flakey_spec_catcher', require: false
   gem 'factory_bot', '6.1.0', require: false
   gem 'rspec_junit_formatter', require: false
@@ -69,7 +70,7 @@ group :test do
   gem 'axe-core-selenium', '~> 4.1.0', require: false
   gem 'axe-core-rspec', '~> 4.1.0', require: false
   gem 'axe-core-api', '~> 4.1.0', require: false
-  gem 'stormbreaker', '0.0.4', require: false
+  gem 'stormbreaker', '0.0.5', require: false
 
   # performance tools for instrumenting rspec tests
   gem 'stackprof'

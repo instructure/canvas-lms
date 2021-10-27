@@ -583,7 +583,8 @@ class DiscussionEntry < ActiveRecord::Base
       current_user,
       new_state: opts[:new_state],
       forced: opts[:forced],
-      rating: opts[:rating]
+      rating: opts[:rating],
+      report_type: opts[:report_type]
     ).first
   end
 

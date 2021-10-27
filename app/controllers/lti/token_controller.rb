@@ -31,7 +31,7 @@ class Lti::TokenController < ApplicationController
   # Why advantage_access_token? LTI Advantage is the suite of grade passback
   # and other communication services for 1.3 tools, and is the main use case for these tokens.
   def advantage_access_token
-    provider = Canvas::Oauth::SiteAdminClientCredentialsProvider.new(
+    provider = Canvas::OAuth::SiteAdminClientCredentialsProvider.new(
       key.global_id,
       request.host_with_port,
       TokenScopes::LTI_SCOPES.keys,

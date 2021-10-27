@@ -23,7 +23,6 @@ import $ from 'jquery'
 import axios from '@canvas/axios'
 import GoogleDocsTreeView from '../backbone/views/GoogleDocsTreeView.coffee'
 import HomeworkSubmissionLtiContainer from '../backbone/HomeworkSubmissionLtiContainer'
-import RCEKeyboardShortcuts from '@canvas/tinymce-keyboard-shortcuts' /* TinyMCE Keyboard Shortcuts for a11y */
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import {recordEulaAgreement, verifyPledgeIsChecked} from './helper'
 import '@canvas/rails-flash-notifications'
@@ -52,12 +51,6 @@ $(document).ready(function () {
   const submissionForm = $('.submit_assignment_form')
 
   const homeworkSubmissionLtiContainer = new HomeworkSubmissionLtiContainer()
-
-  // Add the Keyboard shortcuts info button
-  if (!ENV.use_rce_enhancements) {
-    const keyboardShortcutsView = new RCEKeyboardShortcuts()
-    keyboardShortcutsView.render().$el.insertBefore($('.switch_text_entry_submission_views:first'))
-  }
 
   // Add screen reader message for student annotation assignments
   const accessibilityAlert = I18n.t(

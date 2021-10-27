@@ -88,7 +88,7 @@ class InfoController < ApplicationController
     checks = {
       'messages_partition' => Messages::Partitioner.processed?,
       'quizzes_submission_events_partition' => Quizzes::QuizSubmissionEventPartitioner.processed?,
-      'versions_partition' => Version::Partitioner.processed?,
+      'versions_partition' => SimplyVersioned::Partitioner.processed?,
     }
     failed = checks.reject { |_k, v| v }.map(&:first)
     if failed.any?

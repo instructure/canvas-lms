@@ -63,7 +63,7 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
         # this check is just an extra precaution
         raise "Google Apps user not received, but required"
       elsif hosted_domain != '*' && !hosted_domains.include?(id_token['hd'])
-        raise OauthValidationError, t("User is from unacceptable domain %{domain}.", domain: id_token['hd'].inspect)
+        raise OAuthValidationError, t("User is from unacceptable domain %{domain}.", domain: id_token['hd'].inspect)
       end
     end
     super

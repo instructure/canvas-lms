@@ -19,5 +19,5 @@
 #
 
 module Login
-  MicrosoftController = Oauth2Controller
+  MicrosoftController = OAuth2Controller
 end

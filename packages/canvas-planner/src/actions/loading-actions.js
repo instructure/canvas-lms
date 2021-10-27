@@ -50,7 +50,8 @@ export const {
   jumpToWeek,
   jumpToThisWeek,
   gotWayPastItemDate,
-  gotWayFutureItemDate
+  gotWayFutureItemDate,
+  clearWeeklyItems
 } = createActions(
   'START_LOADING_ITEMS',
   'CONTINUE_LOADING_INITIAL_ITEMS',
@@ -76,7 +77,8 @@ export const {
   'JUMP_TO_WEEK',
   'JUMP_TO_THIS_WEEK',
   'GOT_WAY_FUTURE_ITEM_DATE',
-  'GOT_WAY_PAST_ITEM_DATE'
+  'GOT_WAY_PAST_ITEM_DATE',
+  'CLEAR_WEEKLY_ITEMS'
 )
 
 export const gettingPastItems = createAction(
@@ -193,12 +195,16 @@ export const loadPastUntilToday = () => dispatch => {
 // k5 week-at-a-time initial load
 export function getWeeklyPlannerItems(fromMoment) {
   return (dispatch, getState) => {
-    dispatch(startLoadingItems())
-    const weeklyState = getState().weeklyDashboard
-    dispatch(gettingInitWeekItems(weeklyState))
-    dispatch(getWayFutureItem(fromMoment))
-    dispatch(getWayPastItem(fromMoment))
-    loadWeekItems(dispatch, getState)
+    const waitingOnObserveeContextCodes =
+      getState().selectedObservee?.id && !getState().selectedObservee?.contextCodes
+    if (!waitingOnObserveeContextCodes) {
+      dispatch(startLoadingItems())
+      const weeklyState = getState().weeklyDashboard
+      dispatch(gettingInitWeekItems(weeklyState))
+      dispatch(getWayFutureItem(fromMoment))
+      dispatch(getWayPastItem(fromMoment))
+      loadWeekItems(dispatch, getState)
+    }
   }
 }
 
@@ -278,9 +284,16 @@ function getWayFutureItem(fromMoment) {
   // first item so we know what the most distant item is
   return (dispatch, getState) => {
     const state = getState()
-    const context_codes = state.singleCourse ? getContextCodesFromState(state) : undefined
+    const observed_user_id = observedUserId(state)
+    let context_codes
+    if (observed_user_id) {
+      context_codes = state.selectedObservee.contextCodes
+    } else {
+      context_codes = state.singleCourse ? getContextCodesFromState(state) : undefined
+    }
     const futureMoment = fromMoment.clone().add(1, 'year')
     const url = buildURL('/api/v1/planner/items', {
+      observed_user_id,
       context_codes,
       end_date: futureMoment.format(),
       order: 'desc',
@@ -302,9 +315,16 @@ function getWayFutureItem(fromMoment) {
 function getWayPastItem(fromMoment) {
   return (dispatch, getState) => {
     const state = getState()
-    const context_codes = state.singleCourse ? getContextCodesFromState(state) : undefined
+    const observed_user_id = observedUserId(state)
+    let context_codes
+    if (observed_user_id) {
+      context_codes = state.selectedObservee.contextCodes
+    } else {
+      context_codes = state.singleCourse ? getContextCodesFromState(state) : undefined
+    }
     const pastMoment = fromMoment.clone().add(-1, 'year')
     const url = buildURL('/api/v1/planner/items', {
+      observed_user_id,
       context_codes,
       start_date: pastMoment.format(),
       order: 'asc',
@@ -324,6 +344,7 @@ function getWayPastItem(fromMoment) {
       })
   }
 }
+
 // --------------------------------------------
 export function sendBasicFetchRequest(baseUrl, params = {}) {
   const url = buildURL(baseUrl, params)
@@ -363,6 +384,11 @@ function fetchParams(loadingOptions) {
     if (loadingOptions.extraParams) {
       Object.assign(params, loadingOptions.extraParams)
     }
+    const observeeId = observedUserId(loadingOptions.getState())
+    if (observeeId) {
+      params.observed_user_id = observeeId
+      params.context_codes = loadingOptions.getState().selectedObservee.contextCodes
+    }
 
     return ['/api/v1/planner/items', {params}]
   }
@@ -382,4 +408,10 @@ function transformItems(loadingOptions, items) {
       loadingOptions.getState().timeZone
     )
   )
+}
+
+function observedUserId(state) {
+  if (state.selectedObservee?.id && state.selectedObservee.id !== state.currentUser.id) {
+    return state.selectedObservee.id
+  }
 }

@@ -107,7 +107,7 @@ module Lti
         tool_proxy.raw_data['tool_profile'] = tool_profile
         tool_proxy.raw_data['security_contract'] = security_contract
         tool_proxy.save!
-        token = Lti::Oauth2::AccessToken.create_jwt(aud: aud, sub: other_tool_proxy.guid)
+        token = Lti::OAuth2::AccessToken.create_jwt(aud: aud, sub: other_tool_proxy.guid)
         other_helpers = { Authorization: "Bearer #{token}" }
         allow_any_instance_of(Lti::ToolProxy).to receive(:active_in_context?).and_return(true)
         get endpoint, headers: other_helpers

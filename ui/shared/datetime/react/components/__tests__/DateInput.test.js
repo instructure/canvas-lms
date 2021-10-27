@@ -279,6 +279,25 @@ describe('messages', () => {
   })
 })
 
+describe('disabled dates', () => {
+  it('renders disabled dates as disabled', () => {
+    const {getByText, getInput} = renderInput({dateIsDisabled: () => true})
+    fireEvent.click(getInput())
+    const button12 = getByText('12').closest('button')
+    const button22 = getByText('22').closest('button')
+
+    ;[button12, button22].forEach(b => expect(b).toBeDisabled())
+  })
+
+  it('does not select a disabled date when clicked', () => {
+    const {props, getByText, getInput} = renderInput({dateIsDisabled: () => true})
+    fireEvent.click(getInput())
+    const button15 = getByText('15').closest('button')
+    fireEvent.click(button15)
+    expect(props.onSelectedDateChange).not.toHaveBeenCalledWith(new Date('2020-05-15'))
+  })
+})
+
 describe('locales', () => {
   it('renders the month string according to the locale', () => {
     moment.locale('fr')

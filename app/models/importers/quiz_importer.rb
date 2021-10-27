@@ -324,7 +324,10 @@ module Importers
 
     def self.import_questions(item, hash, context, migration, question_data, new_record)
       if migration.for_master_course_import? && !new_record
-        return if item.edit_types_locked_for_overwrite_on_import.include?(:content)
+        if item.edit_types_locked_for_overwrite_on_import.include?(:content)
+          migration.add_skipped_item(item.migration_id)
+          return
+        end
 
         if hash[:questions]
           # either the quiz hasn't been changed downstream or we've re-locked it - delete all the questions/question_groups we're not going to (re)import in

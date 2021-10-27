@@ -156,7 +156,11 @@
             <div class="unread-grade">&nbsp;</div>
           <% end %>
           <% if assignment_presenter.show_submission_details? %>
-            <a href="<%= context_url(@context, :context_assignment_submission_url, assignment, @presenter.student_id) %>"><%= assignment.title %></a>
+            <% if assignment.a2_enabled? %>
+              <a href="<%= context_url(@context, :context_assignment_url, assignment) %>"><%= assignment.title %></a>
+            <% else %>
+              <a href="<%= context_url(@context, :context_assignment_submission_url, assignment, @presenter.student_id) %>"><%= assignment.title %></a>
+            <% end %>
           <% else %>
             <%= assignment.title %>
           <% end %>

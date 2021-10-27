@@ -127,6 +127,10 @@ export const resolveAuthorRoles = (isAuthor, discussionRoles) => {
   if (isAuthor && discussionRoles) {
     return discussionRoles.concat('Author')
   }
+
+  if (isAuthor && !discussionRoles) {
+    return ['Author']
+  }
   return discussionRoles
 }
 
@@ -165,11 +169,13 @@ export const getOptimisticResponse = (
         message,
         ratingCount: null,
         ratingSum: null,
-        rating: false,
-        read: true,
-        replyPreview: '',
-        forcedReadState: false,
         subentriesCount: null,
+        entryParticipant: {
+          rating: false,
+          read: true,
+          forcedReadState: false,
+          __typename: 'EntryParticipant'
+        },
         rootEntryParticipantCounts: {
           unreadCount: 0,
           repliesCount: 0,

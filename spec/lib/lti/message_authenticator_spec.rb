@@ -36,7 +36,7 @@ module Lti
     end
 
     let(:message) do
-      m = IMS::LTI::Models::Messages::ContentItemSelection.new(
+      m = ::IMS::LTI::Models::Messages::ContentItemSelection.new(
         {
           lti_message_type: 'ContentItemSelection',
           lti_version: 'LTI-1p0',

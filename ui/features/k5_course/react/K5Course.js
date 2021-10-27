@@ -71,6 +71,7 @@ import ObserverOptions, {
 import GroupsPage from '@canvas/k5/react/GroupsPage'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import {savedObservedId} from '@canvas/k5/ObserverGetObservee'
 
 const HERO_ASPECT_RATIO = 5
 const HERO_STICKY_HEIGHT_PX = 100
@@ -289,11 +290,11 @@ export function CourseHeaderOptions({
   studentViewPath,
   canReadAsAdmin,
   courseContext,
-  parentSupportEnabled,
   observerList,
   currentUser,
   handleChangeObservedUser,
-  showingMobileNav
+  showingMobileNav,
+  showObserverOptions
 }) {
   const buttonProps = {
     id: 'manage-subject-btn',
@@ -302,8 +303,7 @@ export function CourseHeaderOptions({
     renderIcon: <IconEditSolid />
   }
   const altText = I18n.t('Manage Subject: %{courseContext}', {courseContext})
-  const showObserverOptions =
-    parentSupportEnabled && shouldShowObserverOptions(observerList, currentUser)
+
   const collapseManageButton = showingMobileNav && showObserverOptions
   const sideItemsWidth = '200px'
 
@@ -377,11 +377,11 @@ CourseHeaderOptions.propTypes = {
   studentViewPath: PropTypes.string.isRequired,
   canReadAsAdmin: PropTypes.bool.isRequired,
   courseContext: PropTypes.string.isRequired,
-  parentSupportEnabled: PropTypes.bool.isRequired,
   observerList: ObserverListShape.isRequired,
   handleChangeObservedUser: PropTypes.func.isRequired,
   currentUser: PropTypes.object.isRequired,
-  showingMobileNav: PropTypes.bool.isRequired
+  showingMobileNav: PropTypes.bool.isRequired,
+  showObserverOptions: PropTypes.bool.isRequired
 }
 
 export function K5Course({
@@ -419,8 +419,13 @@ export function K5Course({
   parentSupportEnabled,
   observerList,
   selfEnrollment,
-  tabContentOnly
+  tabContentOnly,
+  currentUserRoles
 }) {
+  const initialObservedId = observerList.find(o => o.id === savedObservedId(currentUser.id))
+    ? savedObservedId(currentUser.id)
+    : undefined
+
   const renderTabs = toRenderTabs(tabs, hasSyllabusBody)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, renderTabs)
   const [tabsRef, setTabsRef] = useState(null)
@@ -429,7 +434,9 @@ export function K5Course({
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
     focusFallback: tabsRef,
     callback: () => loadAllOpportunities(),
-    singleCourse: true
+    singleCourse: true,
+    observedUserId: initialObservedId,
+    isObserver: currentUserRoles.includes('observer')
   })
 
   /* Rails renders the modules partial into #k5-modules-container. After the first render, we hide that div and
@@ -441,7 +448,9 @@ export function K5Course({
   const tabsPaddingRef = useRef(null)
   const [modulesExist, setModulesExist] = useState(true)
   const [windowSize, setWindowSize] = useState(() => getWindowSize())
-  const [observedUserId, setObservedUserId] = useState(null)
+  const [observedUserId, setObservedUserId] = useState(initialObservedId)
+  const showObserverOptions =
+    parentSupportEnabled && shouldShowObserverOptions(observerList, currentUser)
   useEffect(() => {
     modulesRef.current = document.getElementById('k5-modules-container')
     contentRef.current.appendChild(modulesRef.current)
@@ -515,6 +524,7 @@ export function K5Course({
           currentUser={currentUser}
           handleChangeObservedUser={setObservedUserId}
           showingMobileNav={showingMobileNav}
+          showObserverOptions={showObserverOptions}
         />
         <CourseHeaderHero
           name={name}
@@ -589,6 +599,8 @@ export function K5Course({
           userHasEnrollments
           visible={currentTab === TAB_IDS.SCHEDULE}
           singleCourse
+          observedUserId={observedUserId}
+          contextCodes={[`course_${id}`]}
         />
         {currentTab === TAB_IDS.GRADES && (
           <GradesPage
@@ -600,6 +612,7 @@ export function K5Course({
             userIsCourseAdmin={canReadAsAdmin}
             showLearningMasteryGradebook={showLearningMasteryGradebook}
             outcomeProficiency={outcomeProficiency}
+            observedUserId={showObserverOptions ? observedUserId : null}
           />
         )}
         <ResourcesPage
@@ -658,7 +671,8 @@ K5Course.propTypes = {
   parentSupportEnabled: PropTypes.bool.isRequired,
   observerList: ObserverListShape.isRequired,
   selfEnrollment: PropTypes.object,
-  tabContentOnly: PropTypes.bool
+  tabContentOnly: PropTypes.bool,
+  currentUserRoles: PropTypes.array.isRequired
 }
 
 const WrappedK5Course = connect(mapStateToProps, {

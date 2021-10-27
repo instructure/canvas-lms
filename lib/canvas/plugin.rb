@@ -138,7 +138,7 @@ module Canvas
       key = "canvas.plugins.#{@id}.#{key}" unless key =~ /\A#/
       I18n.translate(key, default, options)
     end
-    alias :t :translate
+    alias_method :t, :translate
 
     # Let the plugin do any validations necessary.
     # If the plugin has defined a validator, call

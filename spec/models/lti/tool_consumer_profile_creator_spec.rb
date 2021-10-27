@@ -35,14 +35,14 @@ module Lti
       it 'creates the tool consumer profile' do
         profile = tcp_creator.create
         expect(profile.lti_version).to eq 'LTI-2p0'
-        expect(profile.product_instance).to be_an_instance_of IMS::LTI::Models::ProductInstance
+        expect(profile.product_instance).to be_an_instance_of ::IMS::LTI::Models::ProductInstance
         expect(profile.guid).to eq Lti::ToolConsumerProfile::DEFAULT_TCP_UUID
       end
 
       it 'creates the product instance' do
         product_instance = tcp_creator.create.product_instance
         expect(product_instance.guid).to eq 'my_guid'
-        expect(product_instance.product_info).to be_an IMS::LTI::Models::ProductInfo
+        expect(product_instance.product_info).to be_an ::IMS::LTI::Models::ProductInfo
       end
 
       it 'creates the service owner' do
@@ -55,13 +55,13 @@ module Lti
         product_info = tcp_creator.create.product_instance.product_info
         expect(product_info.product_name.default_value).to eq 'Canvas by Instructure'
         expect(product_info.product_version).to eq 'none'
-        expect(product_info.product_family).to be_a IMS::LTI::Models::ProductFamily
+        expect(product_info.product_family).to be_a ::IMS::LTI::Models::ProductFamily
       end
 
       it 'creates the product family' do
         product_family = tcp_creator.create.product_instance.product_info.product_family
         expect(product_family.code).to eq 'canvas'
-        expect(product_family.vendor).to be_a IMS::LTI::Models::Vendor
+        expect(product_family.vendor).to be_a ::IMS::LTI::Models::Vendor
       end
 
       it 'creates the vendor' do
@@ -192,7 +192,7 @@ module Lti
         it 'adds the ToolProxyUpdateRequest capability if the feature flag is on' do
           allow(root_account).to receive(:feature_enabled?).and_return(true)
 
-          expected_capability = IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE
+          expected_capability = ::IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE
           expect(tcp_creator.create.capability_offered).to include expected_capability
         end
 

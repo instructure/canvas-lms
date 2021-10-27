@@ -108,6 +108,7 @@ exports[`ActAsModal renders with panda svgs, user avatar, table, and proceed but
               withVisualDebug={false}
             >
               <Avatar
+                color="default"
                 data-fs-exclude={true}
                 display="inline-block"
                 margin="medium 0 x-small 0"

@@ -46,7 +46,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # we prefer using parent_outcome_group over learning_outcome_group,
   # but when I tried naming the association parent_outcome_group, things
   # didn't quite work.
-  alias :parent_outcome_group :learning_outcome_group
+  alias_method :parent_outcome_group, :learning_outcome_group
 
   workflow do
     state :active

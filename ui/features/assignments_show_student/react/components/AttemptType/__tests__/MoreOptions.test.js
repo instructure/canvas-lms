@@ -17,8 +17,8 @@
  */
 
 import axios from '@canvas/axios'
-import {EXTERNAL_TOOLS_QUERY, USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
-import {act, fireEvent, render, waitFor} from '@testing-library/react'
+import {USER_GROUPS_QUERY} from '@canvas/assignments/graphql/student/Queries'
+import {act, fireEvent, render} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import MoreOptions from '../MoreOptions/index'
@@ -28,23 +28,8 @@ async function createGraphqlMocks(overrides = {}) {
   const userGroupOverrides = [{Node: () => ({__typename: 'User'})}]
   userGroupOverrides.push(overrides)
 
-  const externalToolsResult = await mockQuery(EXTERNAL_TOOLS_QUERY, overrides, {courseID: '1'})
   const userGroupsResult = await mockQuery(USER_GROUPS_QUERY, userGroupOverrides, {userID: '1'})
   return [
-    {
-      request: {
-        query: EXTERNAL_TOOLS_QUERY,
-        variables: {courseID: '1'}
-      },
-      result: externalToolsResult
-    },
-    {
-      request: {
-        query: EXTERNAL_TOOLS_QUERY,
-        variables: {courseID: '1'}
-      },
-      result: externalToolsResult
-    },
     {
       request: {
         query: USER_GROUPS_QUERY,
@@ -113,13 +98,7 @@ beforeEach(() => {
 
 describe('MoreOptions', () => {
   it('renders a button for selecting Canvas files when handleCanvasFiles is not null', async () => {
-    const overrides = {
-      ExternalToolConnection: {
-        nodes: [{}]
-      }
-    }
-
-    const mocks = await createGraphqlMocks(overrides)
+    const mocks = await createGraphqlMocks()
     const {findByRole} = render(
       <MockedProvider mocks={mocks}>
         <MoreOptions assignmentID="1" courseID="1" userID="1" handleCanvasFiles={() => {}} />
@@ -129,179 +108,13 @@ describe('MoreOptions', () => {
   })
 
   it('does not render a button for selecting Canvas files when handleCanvasFiles is null', async () => {
-    const overrides = {
-      ExternalToolConnection: {
-        nodes: [{}]
-      }
-    }
-
-    const mocks = await createGraphqlMocks(overrides)
+    const mocks = await createGraphqlMocks()
     const {queryByRole} = render(
       <MockedProvider mocks={mocks}>
         <MoreOptions assignmentID="1" courseID="1" userID="1" />
       </MockedProvider>
     )
     expect(queryByRole('button', {name: /Files/})).not.toBeInTheDocument()
-  })
-
-  it('renders a button for each external tool that belongs to the course', async () => {
-    const overrides = {
-      ExternalToolConnection: {
-        nodes: [
-          {_id: '1', name: 'Tool 1'},
-          {_id: '2', name: 'Tool 2'}
-        ]
-      }
-    }
-
-    const mocks = await createGraphqlMocks(overrides)
-    const {findByRole} = render(
-      <MockedProvider mocks={mocks}>
-        <MoreOptions assignmentID="1" courseID="1" userID="1" handleCanvasFiles={() => {}} />
-      </MockedProvider>
-    )
-    expect(await findByRole('button', {name: /Tool 1/})).toBeInTheDocument()
-    expect(await findByRole('button', {name: /Tool 2/})).toBeInTheDocument()
-  })
-
-  it('places the button for Canvas files before any external tools', async () => {
-    const overrides = {
-      ExternalToolConnection: {
-        nodes: [
-          {_id: '1', name: 'Tool 1'},
-          {_id: '2', name: 'Tool 2'}
-        ]
-      }
-    }
-
-    const mocks = await createGraphqlMocks(overrides)
-    const {findAllByRole} = render(
-      <MockedProvider mocks={mocks}>
-        <MoreOptions assignmentID="1" courseID="1" userID="1" handleCanvasFiles={() => {}} />
-      </MockedProvider>
-    )
-
-    const buttons = await findAllByRole('button')
-    expect(buttons[0]).toHaveTextContent('Files')
-    expect(buttons[1]).toHaveTextContent('Tool 1')
-    expect(buttons[2]).toHaveTextContent('Tool 2')
-  })
-
-  describe('LTI Tools', () => {
-    it('renders a modal for an external tool when its button is clicked', async () => {
-      const overrides = {
-        ExternalToolConnection: {
-          nodes: [
-            {_id: '1', name: 'Tool 1'},
-            {_id: '2', name: 'Tool 2'}
-          ]
-        }
-      }
-
-      const mocks = await createGraphqlMocks(overrides)
-      const {findByRole} = render(
-        <MockedProvider mocks={mocks}>
-          <MoreOptions assignmentID="1" courseID="1" userID="1" handleCanvasFiles={() => {}} />
-        </MockedProvider>
-      )
-
-      const tool1 = await findByRole('button', {name: /Tool 1/})
-      fireEvent.click(tool1)
-
-      const modal = await findByRole('dialog')
-      expect(modal).toContainHTML('Tool 1')
-    })
-
-    it('closes the modal when it receives the "LtiDeepLinkingResponse" event', async () => {
-      const overrides = {
-        ExternalToolConnection: {
-          nodes: [
-            {_id: '1', name: 'Tool 1'},
-            {_id: '2', name: 'Tool 2'}
-          ]
-        }
-      }
-      const mocks = await createGraphqlMocks(overrides)
-      const {findByRole, queryByTestId} = render(
-        <MockedProvider mocks={mocks}>
-          <MoreOptions assignmentID="1" courseID="1" userID="1" handleCanvasFiles={() => {}} />
-        </MockedProvider>
-      )
-
-      const tool1 = await findByRole('button', {name: /Tool 1/})
-      fireEvent.click(tool1)
-
-      const modal = await findByRole('dialog')
-      expect(modal).toBeInTheDocument()
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {data: {messageType: 'LtiDeepLinkingResponse'}})
-      )
-
-      await waitFor(() => {
-        expect(queryByTestId('upload-file-modal')).not.toBeInTheDocument()
-      })
-    })
-
-    it('closes the modal when it receives the "A2ExternalContentReady" event', async () => {
-      const overrides = {
-        ExternalToolConnection: {
-          nodes: [
-            {_id: '1', name: 'Tool 1'},
-            {_id: '2', name: 'Tool 2'}
-          ]
-        }
-      }
-      const mocks = await createGraphqlMocks(overrides)
-      const {findByRole, queryByTestId} = render(
-        <MockedProvider mocks={mocks}>
-          <MoreOptions assignmentID="1" courseID="1" userID="1" handleCanvasFiles={() => {}} />
-        </MockedProvider>
-      )
-
-      const tool1 = await findByRole('button', {name: /Tool 1/})
-      fireEvent.click(tool1)
-
-      const modal = await findByRole('dialog')
-      expect(modal).toBeInTheDocument()
-
-      fireEvent(
-        window,
-        new MessageEvent('message', {data: {messageType: 'A2ExternalContentReady'}})
-      )
-
-      await waitFor(() => {
-        expect(queryByTestId('upload-file-modal')).not.toBeInTheDocument()
-      })
-    })
-
-    it('does not close the modal when it receives a different event', async () => {
-      const overrides = {
-        ExternalToolConnection: {
-          nodes: [
-            {_id: '1', name: 'Tool 1'},
-            {_id: '2', name: 'Tool 2'}
-          ]
-        }
-      }
-      const mocks = await createGraphqlMocks(overrides)
-      const {findByRole, queryByTestId} = render(
-        <MockedProvider mocks={mocks}>
-          <MoreOptions assignmentID="1" courseID="1" userID="1" handleCanvasFiles={() => {}} />
-        </MockedProvider>
-      )
-
-      const tool1 = await findByRole('button', {name: /Tool 1/})
-      fireEvent.click(tool1)
-
-      const modal = await findByRole('dialog')
-      expect(modal).toBeInTheDocument()
-
-      fireEvent(window, new MessageEvent('message', {data: {messageType: 'whatever'}}))
-
-      expect(queryByTestId('upload-file-modal')).toBeInTheDocument()
-    })
   })
 
   describe('Canvas Files', () => {
@@ -315,12 +128,7 @@ describe('MoreOptions', () => {
     })
 
     it('renders user and group folders', async () => {
-      const overrides = {
-        ExternalToolConnection: {
-          nodes: [{}]
-        }
-      }
-      const mocks = await createGraphqlMocks(overrides)
+      const mocks = await createGraphqlMocks()
       const {findAllByText, findByRole} = render(
         <MockedProvider mocks={mocks}>
           <MoreOptions
@@ -336,17 +144,12 @@ describe('MoreOptions', () => {
 
       expect((await findAllByText('my files'))[0]).toBeInTheDocument()
       expect(
-        (await findAllByText(mocks[2].result.data.legacyNode.groups[0].name))[0]
+        (await findAllByText(mocks[0].result.data.legacyNode.groups[0].name))[0]
       ).toBeInTheDocument()
     })
 
     it('renders the folder contents when a folder is selected', async () => {
-      const overrides = {
-        ExternalToolConnection: {
-          nodes: [{}]
-        }
-      }
-      const mocks = await createGraphqlMocks(overrides)
+      const mocks = await createGraphqlMocks()
       const {findAllByText, findByRole, findByTestId} = render(
         <MockedProvider mocks={mocks}>
           <MoreOptions
@@ -371,12 +174,7 @@ describe('MoreOptions', () => {
     }, 10000)
 
     it('allows folder navigation through breadcrumbs', async () => {
-      const overrides = {
-        ExternalToolConnection: {
-          nodes: [{}]
-        }
-      }
-      const mocks = await createGraphqlMocks(overrides)
+      const mocks = await createGraphqlMocks()
       const {findAllByText, findByRole, findByTestId} = render(
         <MockedProvider mocks={mocks}>
           <MoreOptions
@@ -401,17 +199,12 @@ describe('MoreOptions', () => {
 
       expect((await findAllByText('my files'))[0]).toBeInTheDocument()
       expect(
-        (await findAllByText(mocks[2].result.data.legacyNode.groups[0].name))[0]
+        (await findAllByText(mocks[0].result.data.legacyNode.groups[0].name))[0]
       ).toBeInTheDocument()
     })
 
     it('hides the upload button until a file has been selected', async () => {
-      const overrides = {
-        ExternalToolConnection: {
-          nodes: [{}]
-        }
-      }
-      const mocks = await createGraphqlMocks(overrides)
+      const mocks = await createGraphqlMocks()
       const {findAllByText, findByRole, findByText, queryByText} = render(
         <MockedProvider mocks={mocks}>
           <MoreOptions
@@ -438,12 +231,7 @@ describe('MoreOptions', () => {
     })
 
     it('calls the handleCanvasFiles prop function when the upload button is clicked', async () => {
-      const overrides = {
-        ExternalToolConnection: {
-          nodes: [{}]
-        }
-      }
-      const mocks = await createGraphqlMocks(overrides)
+      const mocks = await createGraphqlMocks()
       const {findAllByText, findByRole} = render(
         <MockedProvider mocks={mocks}>
           <MoreOptions
@@ -474,12 +262,7 @@ describe('MoreOptions', () => {
     let handleWebcamPhotoUpload
 
     const renderComponent = async () => {
-      const overrides = {
-        ExternalToolConnection: {
-          nodes: [{}]
-        }
-      }
-      const mocks = await createGraphqlMocks(overrides)
+      const mocks = await createGraphqlMocks()
 
       return render(
         <MockedProvider mocks={mocks}>

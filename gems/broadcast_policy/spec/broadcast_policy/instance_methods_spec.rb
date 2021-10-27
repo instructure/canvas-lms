@@ -32,7 +32,7 @@ describe BroadcastPolicy::InstanceMethods do
     def attribute_changed?(method)
       changed_attributes.key?(method)
     end
-    alias saved_change_to_attribute? attribute_changed?
+    alias_method :saved_change_to_attribute?, :attribute_changed?
 
     def new_record?
       false

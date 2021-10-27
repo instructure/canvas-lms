@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Canvas::Oauth
+module Canvas::OAuth
   class InvalidScopeError < RequestError
     def initialize(missing_scopes)
       super("A requested scope is invalid, unknown, malformed, or exceeds the scope granted by the resource owner. "\

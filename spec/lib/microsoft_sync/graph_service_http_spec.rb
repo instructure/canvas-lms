@@ -32,12 +32,14 @@ describe MicrosoftSync::GraphServiceHttp do
     allow(MicrosoftSync::LoginService).to receive(:token).with('mytenant').and_return('mytoken')
   end
 
+  let(:custom_error_class) { Class.new(StandardError) }
+
   describe '#request' do
     before do
       responses = statuses.map do |stat|
         {
           status: stat,
-          body: { foo: 'bar' }.to_json,
+          body: body.to_json,
           headers: { 'Content-type' => 'application/json' },
         }
       end
@@ -50,6 +52,7 @@ describe MicrosoftSync::GraphServiceHttp do
 
     let(:http_method) { :get }
     let(:url) { 'https://graph.microsoft.com/v1.0/foo/bar' }
+    let(:body) { { foo: 'bar' } }
     let(:statuses) { [status] }
     let(:status) { 200 }
 
@@ -127,15 +130,21 @@ describe MicrosoftSync::GraphServiceHttp do
               tags: { msft_endpoint: 'get_foo', extra_tag: 'abc', status_code: '200' })
     end
 
-    context 'when a block is passed in' do
+    context 'when special_cases is passed in' do
       let(:status) { 409 }
+      let(:body) { { message: 'Hello, some text in the body.' } }
+      let(:special_cases) do
+        [
+          MicrosoftSync::GraphServiceHttp::SpecialCase.new(408, result: :bar),
+          MicrosoftSync::GraphServiceHttp::SpecialCase.new(*special_case_args,
+                                                           result: special_case_value)
+        ]
+      end
+      let(:special_case_value) { :foo }
+      let(:result) { subject.request(:get, url, special_cases: special_cases) }
 
-      context 'when the response is non-200 and the block returns truthy' do
-        let(:result) do
-          subject.request(:get, url) { |resp| resp.code == 409 && :foo }
-        end
-
-        it 'returns the value the block returned' do
+      shared_examples_for 'when a special case is matched' do
+        it "returns the special case's value" do
           expect(result).to eq(:foo)
         end
 
@@ -147,28 +156,35 @@ describe MicrosoftSync::GraphServiceHttp do
           expect(InstStatsd::Statsd).to_not have_received(:increment)
             .with('microsoft_sync.graph_service.error', anything)
         end
-      end
 
-      context 'when the block returns a StandardError' do
-        let(:err) { StandardError.new('hello') }
-        let(:result) { subject.request(:get, url) { err } }
+        context "when the special case's value is a class descending from StandardError" do
+          let(:special_case_value) { custom_error_class }
 
-        it 'raises that exception and increments an "expected" counter, not an "error" counter' do
-          expect { result }.to raise_error(err)
-          expect(InstStatsd::Statsd).to have_received(:increment)
-            .with('microsoft_sync.graph_service.expected',
-                  tags: { extra_tag: 'abc', msft_endpoint: 'get_foo', status_code: '409' })
-          expect(InstStatsd::Statsd).to_not have_received(:increment)
-            .with('microsoft_sync.graph_service.error', anything)
-        end
-      end
-
-      context 'when the response is non-200 and the block returns falsey' do
-        let(:result) do
-          subject.request(:get, 'https://graph.microsoft.com/v1.0/foo/bar') do |resp|
-            resp.code == 408 && :foo
+          it 'increments "expected" counters and raises an new error of the class' do
+            expect { result }.to raise_error(custom_error_class)
+            expect(InstStatsd::Statsd).to have_received(:increment)
+              .with('microsoft_sync.graph_service.expected',
+                    tags: { extra_tag: 'abc', msft_endpoint: 'get_foo', status_code: '409' })
+            expect(InstStatsd::Statsd).to_not have_received(:increment)
+              .with('microsoft_sync.graph_service.error', anything)
           end
         end
+      end
+
+      context 'when a special case matches on status code and regex' do
+        let(:special_case_args) { [409, /text in the body/] }
+
+        it_behaves_like 'when a special case is matched'
+      end
+
+      context 'when a special case matches on status code' do
+        let(:special_case_args) { [409] }
+
+        it_behaves_like 'when a special case is matched'
+      end
+
+      context 'when no special case matches and the response is non-200' do
+        let(:special_case_args) { [409, /something not in body/] }
 
         it 'raises an error and increments an "error" counter' do
           expect { result }.to raise_error(MicrosoftSync::Errors::HTTPConflict)
@@ -362,24 +378,22 @@ describe MicrosoftSync::GraphServiceHttp do
         have_received(:request).with(:get, continue_url, hash_including(quota: [2, 3]))
     end
 
-    context 'when passed an expected_error_block' do
-      let(:extra_opts) { { expected_error_block: block } }
+    context 'when passed special_cases' do
+      let(:cases) do
+        [MicrosoftSync::GraphServiceHttp::SpecialCase.new(400, result: StandardError)]
+      end
+      let(:extra_opts) { { special_cases: cases } }
 
-      context 'when the block returns false' do
-        let(:block) { lambda { |resp| resp.code == 400 } }
-
-        it 'returns results as usual' do
-          expect(subject).to eq([{ 'a' => 1 }, { 'b' => 2 }])
-        end
+      it 'passes it on to the first request' do
+        subject
+        expect(http).to \
+          have_received(:request).with(:get, 'some/list', hash_including(special_cases: cases))
       end
 
-      context 'when the block returns an error' do
-        let(:err) { StandardError.new }
-        let(:block) { lambda { |resp| resp.code == 200 && err } }
-
-        it 'raises that error' do
-          expect { subject }.to raise_error(err)
-        end
+      it 'passes it on to subsequent requests' do
+        subject
+        expect(http).to \
+          have_received(:request).with(:get, continue_url, hash_including(special_cases: cases))
       end
     end
   end
@@ -390,7 +404,7 @@ describe MicrosoftSync::GraphServiceHttp do
       WebMock.stub_request(:post, 'https://graph.microsoft.com/v1.0/$batch')
              .with(body: { requests: requests })
              .and_return(
-               status: status_code, body: { responses: [] }.to_json,
+               status: status_code, body: { responses: responses }.to_json,
                headers: { 'Content-type' => 'application/json' }
              )
       allow(InstStatsd::Statsd).to receive(:count).and_call_original
@@ -401,11 +415,15 @@ describe MicrosoftSync::GraphServiceHttp do
     let(:requests) do
       [
         { id: 'a', method: 'GET', url: '/foo' },
-        { id: 'a', method: 'GET', url: '/bar' },
+        { id: 'b', method: 'GET', url: '/bar' },
       ]
     end
     let(:status_code) { 200 }
-    let(:run_batch) { subject.run_batch('wombat', requests, quota: [3, 4]) }
+    let(:run_batch) do
+      subject.run_batch('wombat', requests, quota: [3, 4], special_cases: special_cases)
+    end
+    let(:special_cases) { [] }
+    let(:responses) { [] }
 
     it 'counts statsd metrics with the quota' do
       run_batch
@@ -427,6 +445,69 @@ describe MicrosoftSync::GraphServiceHttp do
         expect(InstStatsd::Statsd).to have_received(:count)
           .with("microsoft_sync.graph_service.batch.error", 2,
                 tags: { msft_endpoint: 'wombat', extra_tag: 'abc', status: 'unknown' })
+      end
+    end
+
+    context 'when special_cases is passed in' do
+      def resp(id, status, text_in_body = '')
+        { 'id' => id, 'status' => status, 'body' => { 'foo' => text_in_body } }
+      end
+
+      context 'when only successful and special-case responses are returned' do
+        let(:responses) do
+          [resp('a', 200), resp('b', 400, 'some special case')]
+        end
+
+        context 'when the special case value is an error class' do
+          let(:special_cases) do
+            [
+              MicrosoftSync::GraphServiceHttp::SpecialCase.new(400, /special.case/, result: custom_error_class)
+            ]
+          end
+
+          it 'raises a new error of that class and increments the "ignored" counter' do
+            expect { run_batch }.to raise_error(custom_error_class)
+            expect(InstStatsd::Statsd).to have_received(:count)
+              .with("microsoft_sync.graph_service.batch.ignored", 1,
+                    tags: { msft_endpoint: 'wombat', extra_tag: 'abc', status: 400 })
+          end
+        end
+
+        context 'when the special case value is not an error class' do
+          let(:special_cases) do
+            [MicrosoftSync::GraphServiceHttp::SpecialCase.new(400, /special.case/, result: :special)]
+          end
+
+          it 'increments the "ignored" counter' do
+            run_batch
+            expect(InstStatsd::Statsd).to have_received(:count)
+              .with("microsoft_sync.graph_service.batch.ignored", 1,
+                    tags: { msft_endpoint: 'wombat', extra_tag: 'abc', status: 400 })
+          end
+
+          it 'returns the special case values in a hash' do
+            expect(run_batch).to eq('b' => :special)
+          end
+        end
+      end
+
+      context 'when there are special-cases and non-special-case failure responses' do
+        let(:responses) { [resp('a', 400, 'bad error'), resp('b', 400, 'some special case')] }
+        let(:special_cases) do
+          [MicrosoftSync::GraphServiceHttp::SpecialCase.new(400, /special.case/, result: custom_error_class)]
+        end
+
+        it "raises a BatchRequestFailed error instead of the special case's error" do
+          expect { run_batch }.to raise_error(MicrosoftSync::GraphServiceHttp::BatchRequestFailed)
+        end
+      end
+
+      context "when only successful responses that don't match special cases are returned" do
+        let(:responses) { [resp('a', 200), resp('b', 202)] }
+
+        it 'returns an empty hash' do
+          expect(run_batch).to eq({})
+        end
       end
     end
   end

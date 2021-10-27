@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module ExternalAuthObservation
-  class Saml
+  class SAML
     attr_accessor :request, :response, :account_auth_config
 
     def initialize(account, request, response)

@@ -28,7 +28,7 @@ exports[`renders the base component correctly 1`] = `
         theme={
           Object {
             "mediumHeight": "normal",
-            "mediumPadding": "0",
+            "mediumPaddingHorizontal": "0",
           }
         }
         type="button"
@@ -138,7 +138,7 @@ exports[`renders the base component correctly with 0 points 1`] = `
         theme={
           Object {
             "mediumHeight": "normal",
-            "mediumPadding": "0",
+            "mediumPaddingHorizontal": "0",
           }
         }
         type="button"
@@ -248,7 +248,7 @@ exports[`renders the base component correctly without points 1`] = `
         theme={
           Object {
             "mediumHeight": "normal",
-            "mediumPadding": "0",
+            "mediumPaddingHorizontal": "0",
           }
         }
         type="button"

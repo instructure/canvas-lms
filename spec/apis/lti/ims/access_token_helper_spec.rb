@@ -24,7 +24,7 @@ require_dependency "lti/ims/access_token_helper"
 require 'json/jwt'
 
 module Lti
-  module Ims
+  module IMS
     describe AccessTokenHelper, type: :controller do
       specs_require_sharding
       include_context 'lti2_api_spec_helper'
@@ -32,7 +32,7 @@ module Lti
       let(:service_name) { 'vnd.Canvas.CustomSecurity' }
 
       controller(ApplicationController) do
-        include Lti::Ims::AccessTokenHelper
+        include Lti::IMS::AccessTokenHelper
         before_action :authorized_lti2_tool
 
         def index
@@ -91,7 +91,7 @@ module Lti
 
       it 'requires the defined service to be in the ToolProxy security contract' do
         @request.headers.merge!(request_headers)
-        ims_tp = IMS::LTI::Models::ToolProxy.from_json(tool_proxy.raw_data)
+        ims_tp = ::IMS::LTI::Models::ToolProxy.from_json(tool_proxy.raw_data)
         ims_tp.security_contract.tool_service = nil
         tool_proxy.raw_data = ims_tp.to_json
         tool_proxy.save!
@@ -101,7 +101,7 @@ module Lti
 
       it 'requires the http method to be in the security contract' do
         @request.headers.merge!(request_headers)
-        ims_tp = IMS::LTI::Models::ToolProxy.from_json(tool_proxy.raw_data)
+        ims_tp = ::IMS::LTI::Models::ToolProxy.from_json(tool_proxy.raw_data)
         service = ims_tp.security_contract.tool_services.first
         service.action = nil
         tool_proxy.raw_data = ims_tp.to_json

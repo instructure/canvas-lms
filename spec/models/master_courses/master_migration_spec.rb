@@ -1487,6 +1487,32 @@ describe MasterCourses::MasterMigration do
       expect(copied_qq.reload.question_data['question_text']).to eq new_master_text
     end
 
+    it "records a sync exception when downstream question data changes" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      quiz = @copy_from.quizzes.create!
+      qq = quiz.quiz_questions.create!(:question_data => { 'question_name' => 'test question', 'question_type' => 'essay_question' })
+
+      run_master_migration
+
+      qd = qq.question_data
+      qd['question_text'] = 'foo'
+      qq.question_data = qd
+      qq.save!
+
+      copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
+      copied_qq = copied_quiz.quiz_questions.where(:migration_id => mig_id(qq)).first
+      copied_qd = copied_qq.question_data
+      copied_qd['question_text'] = 'bar'
+      copied_qq.question_data = copied_qd
+      copied_qq.save!
+
+      mm = run_master_migration
+      results = mm.migration_results.find_by(child_subscription_id: sub.id).results
+      expect(results).to eq({ skipped: [copied_quiz.migration_id] })
+    end
+
     it "uses current version of quiz after import if quiz was published on the copy_to" do
       @copy_to = course_factory
       @copy_to.enroll_student(User.create!, enrollment_state: 'active')

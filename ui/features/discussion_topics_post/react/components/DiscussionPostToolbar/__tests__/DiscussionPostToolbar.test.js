@@ -19,6 +19,7 @@
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import {DiscussionPostToolbar} from '../DiscussionPostToolbar'
+import {ChildTopic} from '../../../../graphql/ChildTopic'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -82,6 +83,17 @@ describe('DiscussionPostToolbar', () => {
       expect(onViewFilterMock.mock.calls.length).toBe(1)
       expect(onViewFilterMock.mock.calls[0][1].id).toBe('unread')
     })
+
+    it('"My Drafts" filter should be visible', () => {
+      window.ENV = {
+        draft_discussions: true
+      }
+      const onViewFilterMock = jest.fn()
+      const {getByText, getByLabelText} = setup({onViewFilter: onViewFilterMock})
+      const simpleSelect = getByLabelText('Filter by')
+      fireEvent.click(simpleSelect)
+      expect(getByText('My Drafts')).toBeTruthy()
+    })
   })
 
   describe('Sort control', () => {
@@ -109,6 +121,22 @@ describe('DiscussionPostToolbar', () => {
       const button = getByTestId('sortButton')
       button.click()
       expect(onSortClickMock.mock.calls.length).toBe(1)
+    })
+  })
+
+  describe('Groups Menu Button', () => {
+    it('should not render when there are no child topics', () => {
+      const container = setup({
+        childTopics: []
+      })
+      expect(container.queryByTestId('groups-menu-button')).toBeNull()
+    })
+
+    it('should render when there are child topics', () => {
+      const container = setup({
+        childTopics: [ChildTopic.mock()]
+      })
+      expect(container.queryByTestId('groups-menu-button')).toBeTruthy()
     })
   })
 })

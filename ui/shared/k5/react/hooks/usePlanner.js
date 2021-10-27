@@ -49,12 +49,14 @@ export default function usePlanner({
   isPlannerActive,
   focusFallback,
   callback = () => {},
-  singleCourse = false
+  singleCourse = false,
+  observedUserId,
+  isObserver = false
 }) {
   const [plannerInitialized, setPlannerInitialized] = useState(false)
 
   useEffect(() => {
-    if (plannerEnabled) {
+    if (plannerEnabled && !plannerInitialized && (!isObserver || !!observedUserId)) {
       initializePlanner({
         getActiveApp: () => (isPlannerActive() ? 'planner' : ''),
         flashError: message => showFlashAlert({message, type: 'error'}),
@@ -64,15 +66,16 @@ export default function usePlanner({
         dateTimeFormatters: {dateString, timeString, datetimeString},
         externalFallbackFocusable: focusFallback,
         env: window.ENV,
-        singleCourse
+        singleCourse,
+        observedUserId
       })
         .then(setPlannerInitialized)
         .then(callback)
         .catch(showFlashError(I18n.t('Failed to load the schedule tab')))
     }
-    // This should only run on mount/unmount, so it shouldn't depend on anything
+    // The rest of the dependencies don't change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [isObserver, observedUserId])
 
   return plannerInitialized
 }

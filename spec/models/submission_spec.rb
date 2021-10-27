@@ -1223,6 +1223,20 @@ describe Submission do
 
     let(:submission) { @assignment.submissions.find_by(user_id: @student) }
 
+    it "applies the missing policy to the score when changing from excused to missing" do
+      @assignment.grade_student(@student, grader: @teacher, excused: true)
+      expect { submission.update!(late_policy_status: "missing") }.to change {
+        submission.score
+      }.from(nil).to(200)
+    end
+
+    it "applies the missing policy to the grade when changing from excused to missing" do
+      @assignment.grade_student(@student, grader: @teacher, excused: true)
+      expect { submission.update!(late_policy_status: "missing") }.to change {
+        submission.grade
+      }.from(nil).to('200')
+    end
+
     it "applies the late policy when score changes" do
       Timecop.freeze(2.days.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")
@@ -2303,15 +2317,20 @@ describe Submission do
       it "generates the originality data" do
         originality_report.originality_report_url = 'http://example.com'
         originality_report.save!
-        expect(submission.originality_data).to eq({
-                                                    attachment.asset_string => {
-                                                      similarity_score: originality_report.originality_score,
-                                                      state: originality_report.state,
-                                                      report_url: originality_report.originality_report_url,
-                                                      status: originality_report.workflow_state,
-                                                      error_message: nil
-                                                    }
-                                                  })
+        expect(submission.originality_data).to eq(
+          {
+            attachment.asset_string => {
+              similarity_score: originality_report.originality_score,
+              state: originality_report.state,
+              attachment_id: originality_report.attachment_id,
+              report_url: originality_report.originality_report_url,
+              status: originality_report.workflow_state,
+              error_message: nil,
+              created_at: originality_report.created_at,
+              updated_at: originality_report.updated_at
+            }
+          }
+        )
       end
 
       context 'multiple originality reports for the same attachment' do
@@ -2411,15 +2430,20 @@ describe Submission do
           status: 'pending'
         }
         submission.turnitin_data[attachment.asset_string] = tii_data
-        expect(submission.originality_data).to eq({
-                                                    attachment.asset_string => {
-                                                      similarity_score: originality_report.originality_score,
-                                                      state: originality_report.state,
-                                                      report_url: originality_report.originality_report_url,
-                                                      status: originality_report.workflow_state,
-                                                      error_message: nil
-                                                    }
-                                                  })
+        expect(submission.originality_data).to eq(
+          {
+            attachment.asset_string => {
+              similarity_score: originality_report.originality_score,
+              attachment_id: attachment.id,
+              state: originality_report.state,
+              report_url: originality_report.originality_report_url,
+              status: originality_report.workflow_state,
+              error_message: nil,
+              created_at: originality_report.created_at,
+              updated_at: originality_report.updated_at
+            }
+          }
+        )
       end
 
       it 'does not cause error if originality score is nil' do
@@ -2453,10 +2477,13 @@ describe Submission do
         expect(submission.originality_data).to eq({
                                                     OriginalityReport.submission_asset_key(submission) => {
                                                       similarity_score: originality_report.originality_score,
+                                                      attachment_id: nil,
                                                       state: originality_report.state,
                                                       report_url: originality_report.originality_report_url,
                                                       status: originality_report.workflow_state,
-                                                      error_message: nil
+                                                      error_message: nil,
+                                                      created_at: originality_report.created_at,
+                                                      updated_at: originality_report.updated_at,
                                                     }
                                                   })
       end
@@ -7677,6 +7704,32 @@ describe Submission do
     it "redo request is reset on an updated submission" do
       submission.update!(attempt: 2)
       expect(submission.redo_request).to eq false
+    end
+  end
+
+  describe "word_count" do
+    it "returns the word count" do
+      submission.update(body: 'test submission')
+      expect(submission.word_count).to eq 2
+    end
+
+    it "returns nil if there is no body" do
+      expect(submission.body).to eq nil
+      expect(submission.word_count).to eq nil
+    end
+
+    it "returns 0 if the body is empty" do
+      submission.update(body: '')
+      expect(submission.word_count).to eq 0
+    end
+
+    it "ignores HTML tags" do
+      submission.update(body: '<span>test <div></div>submission</span> <p></p>')
+      expect(submission.word_count).to eq 2
+      submission.instance_variable_set :@word_count, nil
+      submission.update(body: '<p>This is my submission, which has&nbsp;<strong>some bold&nbsp;<em>italic text</em> in</strong> it.</p>
+        <p>A couple paragraphs, and maybe super<sup>script</sup>.&nbsp;</p>')
+      expect(submission.word_count).to eq 18
     end
   end
 

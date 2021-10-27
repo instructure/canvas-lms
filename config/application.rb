@@ -159,6 +159,7 @@ module CanvasRails
 
     config.to_prepare do
       require_dependency 'canvas/plugins/default_plugins'
+      Canvas::Plugins::DefaultPlugins.apply_all
       ActiveSupport::JSON::Encoding.escape_html_entities_in_json = true
     end
 
@@ -202,7 +203,7 @@ module CanvasRails
 
             configure_connection
 
-            raise "Canvas requires PostgreSQL 9.5 or newer" unless postgresql_version >= 90500
+            raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00
 
             break
           rescue ::PG::Error => error

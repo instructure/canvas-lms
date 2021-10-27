@@ -23,7 +23,7 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::LegacyIDInterface
 
-    alias account object
+    alias_method :account, :object
 
     global_id_field :id
 

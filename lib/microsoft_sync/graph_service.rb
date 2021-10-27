@@ -46,16 +46,16 @@ module MicrosoftSync
 
     # Yields (results, next_link) for each page, or returns first page of results if no block given.
     def list_education_classes(options = {}, &blk)
-      check_for_expected_errors = lambda do |resp|
-        if resp.code == 400 && resp.body =~ /Education_ObjectType.*does not exist as.*property/
-          Errors::NotEducationTenant.new
-        end
-      end
-
       get_paginated_list(
-        'education/classes', quota: [1, 0],
-                             expected_error_block: check_for_expected_errors,
-                             **options, &blk
+        'education/classes',
+        quota: [1, 0],
+        special_cases: [
+          GraphServiceHttp::SpecialCase.new(
+            400, /Education_ObjectType.*does not exist as.*property/,
+            result: Errors::NotEducationTenant
+          )
+        ],
+        **options, &blk
       )
     end
 
@@ -85,6 +85,21 @@ module MicrosoftSync
       get_paginated_list("groups/#{group_id}/owners", quota: [2, 0], **options, &blk)
     end
 
+    BATCH_REMOVE_GROUP_USERS_SPECIAL_CASES = [
+      GraphServiceHttp::SpecialCase.new(
+        404, /does not exist or one of its queried reference-property objects are not present/i,
+        result: :ignored
+      ),
+      GraphServiceHttp::SpecialCase.new(
+        400, /One or more removed object references do not exist for the following modified/i,
+        result: :ignored
+      ),
+      GraphServiceHttp::SpecialCase.new(
+        400, /must have at least one owner, hence this owner cannot be removed/i,
+        result: Errors::MissingOwners
+      ),
+    ].freeze
+
     # Returns nil if all removed, or a hash with a list of :members and/or :owners that did
     # not exist in the group (e.g. {owners: ['a', 'b'], members: ['c']} or {owners: ['a']}
     # NOTE: Microsoft API does not distinguish between a group not existing, a
@@ -101,27 +116,29 @@ module MicrosoftSync
 
       expected_error = nil
 
-      failed_req_ids = run_batch('group_remove_users', reqs, quota: quota) do |resp|
-        (
-          resp['status'] == 404 && resp['body'].to_s =~
-            /does not exist or one of its queried reference-property objects are not present/i
-        ) || (
-          # This variant seems to happen right after removing a user with the UI
-          resp['status'] == 400 && resp['body'].to_s =~
-            /One or more removed object references do not exist for the following modified/i
-        ) || (
-          # Check for this here so run_batch doesn't increment error counters. Record
-          # the failure in expected_error and raise below.
-          resp['status'] == 400 && resp['body'].to_s =~
-            /must have at least one owner, hence this owner cannot be removed./ &&
-          (expected_error = :missing_owners)
-        )
-      end
-
-      raise Errors::MissingOwners if expected_error == :missing_owners
-
-      split_request_ids_to_hash(failed_req_ids)
+      ignored_request_ids = run_batch(
+        'group_remove_users',
+        reqs,
+        quota: quota,
+        special_cases: BATCH_REMOVE_GROUP_USERS_SPECIAL_CASES
+      ).keys
+      split_request_ids_to_hash(ignored_request_ids)
     end
+
+    BATCH_ADD_USERS_TO_GROUP_SPECIAL_CASES = [
+      GraphServiceHttp::SpecialCase.new(
+        400, /One or more added object references already exist/i,
+        result: :ignored
+      ),
+      GraphServiceHttp::SpecialCase.new(
+        403, /would exceed the maximum quota count.*for forward-link.*owners/i,
+        result: Errors::OwnersQuotaExceeded
+      ),
+      GraphServiceHttp::SpecialCase.new(
+        403, /would exceed the maximum quota count.*for forward-link.*members/i,
+        result: Errors::MembersQuotaExceeded
+      ),
+    ].freeze
 
     # Returns {owners: ['a', 'b', 'c'], members: ['d', 'e', 'f']} if there are owners
     # or members not added. If all were added successfully, returns nil.
@@ -129,30 +146,48 @@ module MicrosoftSync
       reqs =
         group_add_user_requests(group_id, members, 'members') +
         group_add_user_requests(group_id, owners, 'owners')
-      failed_req_ids = run_batch('group_add_users', reqs, quota: [reqs.count, reqs.count]) do |r|
-        r['status'] == 400 && r['body'].to_s =~ /One or more added object references already exist/i
-      end
-      split_request_ids_to_hash(failed_req_ids)
+      ignored_request_ids = run_batch(
+        'group_add_users',
+        reqs,
+        quota: [reqs.count, reqs.count],
+        special_cases: BATCH_ADD_USERS_TO_GROUP_SPECIAL_CASES
+      ).keys
+      split_request_ids_to_hash(ignored_request_ids)
     end
+
+    ADD_USERS_TO_GROUP_SPECIAL_CASES = [
+      GraphServiceHttp::SpecialCase.new(
+        400, /One or more added object references already exist/i,
+        result: :duplicates
+      ),
+      GraphServiceHttp::SpecialCase.new(
+        403, /would exceed the maximum quota count.*for forward-link.*owners/i,
+        result: Errors::OwnersQuotaExceeded
+      ),
+      GraphServiceHttp::SpecialCase.new(
+        403, /would exceed the maximum quota count.*for forward-link.*members/i,
+        result: Errors::MembersQuotaExceeded
+      ),
+    ].freeze
 
     # Returns nil if all added, or a hash with a list of :members and/or :owners that already
     # existed in the group (e.g. {owners: ['a', 'b'], members: ['c']} or {owners: ['a']}
     def add_users_to_group_ignore_duplicates(group_id, members: [], owners: [])
       check_group_users_args(members, owners)
 
-      body = {}
-      unless members.empty?
-        body['members@odata.bind'] = members.map { |m| DIRECTORY_OBJECT_PREFIX + m }
-      end
-      unless owners.empty?
-        body['owners@odata.bind'] = owners.map { |o| DIRECTORY_OBJECT_PREFIX + o }
-      end
+      body = {
+        'members@odata.bind' => members.map { |m| DIRECTORY_OBJECT_PREFIX + m },
+        'owners@odata.bind' => owners.map { |o| DIRECTORY_OBJECT_PREFIX + o }
+      }.reject { |_k, users| users.empty? }
 
       # Irregular write cost of adding members, about users_added/3, according to Microsoft.
       write_quota = ((members.length + owners.length) / 3.0).ceil
-      response = request(:patch, "groups/#{group_id}", quota: [1, write_quota], body: body) do |resp|
-        :duplicates if resp.code == 400 && resp.body =~ /One or more added object references already exist/i
-      end
+      response = request(
+        :patch, "groups/#{group_id}",
+        body: body,
+        quota: [1, write_quota],
+        special_cases: ADD_USERS_TO_GROUP_SPECIAL_CASES
+      )
 
       if response == :duplicates
         add_users_to_group_via_batch(group_id, members, owners)
@@ -170,9 +205,25 @@ module MicrosoftSync
     end
 
     # === Teams ===
+
+    TEAM_EXISTS_SPECIAL_CASES = [
+      GraphServiceHttp::SpecialCase.new(404, result: :not_found)
+    ].freeze
+
     def team_exists?(team_id)
-      request(:get, "teams/#{team_id}") { |resp| :not_found if resp.code == 404 } != :not_found
+      request(:get, "teams/#{team_id}", special_cases: TEAM_EXISTS_SPECIAL_CASES) != :not_found
     end
+
+    CREATE_EDUCATION_CLASS_TEAM_SPECIAL_CASES = [
+      GraphServiceHttp::SpecialCase.new(
+        400, /have one or more owners in order to create a Team/i,
+        result: MicrosoftSync::Errors::GroupHasNoOwners
+      ),
+      GraphServiceHttp::SpecialCase.new(
+        409, /group is already provisioned/i,
+        result: MicrosoftSync::Errors::TeamAlreadyExists
+      )
+    ].freeze
 
     def create_education_class_team(group_id)
       body = {
@@ -182,14 +233,8 @@ module MicrosoftSync
           "https://graph.microsoft.com/v1.0/groups(#{quote_value(group_id)})"
       }
 
-      # Use block form instead of rescuing HTTP exceptions so they use statsd "expected" counters
-      response = request(:post, 'teams', body: body) do |resp|
-        if resp.code == 400 && resp.body =~ /have one or more owners in order to create a Team/i
-          MicrosoftSync::Errors::GroupHasNoOwners.new
-        elsif resp.code == 409 && resp.body =~ /group is already provisioned/i
-          MicrosoftSync::Errors::TeamAlreadyExists.new
-        end
-      end
+      # Use special_cases exceptions so they use statsd "expected" counters
+      request(:post, 'teams', body: body, special_cases: CREATE_EDUCATION_CLASS_TEAM_SPECIAL_CASES)
     end
 
     # === Users ===

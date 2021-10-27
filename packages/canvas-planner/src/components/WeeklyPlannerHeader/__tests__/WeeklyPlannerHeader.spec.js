@@ -38,6 +38,14 @@ function defaultProps(options) {
     weekLoaded: true,
     wayPastItemDate: '2021-01-01',
     wayFutureItemDate: '2021-12-31',
+    toggleMissiong: () => {},
+    locale: 'en',
+    timeZone: 'America/Denver',
+    savePlannerItem: () => {},
+    deletePlannerItem: () => {},
+    cancelEditingPlannerItem: () => {},
+    openEditingPlannerItem: () => {},
+    courses: [],
     ...options
   }
 }

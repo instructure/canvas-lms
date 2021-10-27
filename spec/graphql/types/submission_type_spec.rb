@@ -283,7 +283,7 @@ describe Types::SubmissionType do
       @submission.update_columns(attempt: nil) # bypass #infer_details for test
       SubmissionDraft.create!(submission: @submission, submission_attempt: 1)
       expect(
-        submission_type.resolve('submissionDraft { submissionAttempt }')
+        submission_type.resolve('submissionDraft { submissionAttempt }', current_user: @student)
       ).to eq 1
     end
 
@@ -293,12 +293,23 @@ describe Types::SubmissionType do
       @submission2 = assignment.submit_homework(@student, body: 'Attempt 2', submitted_at: 1.hour.ago)
       SubmissionDraft.create!(submission: @submission1, submission_attempt: @submission1.attempt + 1)
       SubmissionDraft.create!(submission: @submission2, submission_attempt: @submission2.attempt + 1)
-      resolver = GraphQLTypeTester.new(@submission2, current_user: @teacher)
+      resolver = GraphQLTypeTester.new(@submission2, current_user: @student)
       expect(
         resolver.resolve(
           'submissionHistoriesConnection { nodes { submissionDraft { submissionAttempt }}}'
         )
       ).to eq [nil, @submission2.attempt + 1]
+    end
+
+    it 'returns nil for a submission draft not belonging to current user' do
+      observer = course_with_observer(course: @course, associated_user_id: @student.id, active_all: true).user
+      @submission.submission_drafts.create!(submission_attempt: 1)
+      resolver = GraphQLTypeTester.new(@submission, current_user: observer)
+      expect(
+        resolver.resolve(
+          'submissionHistoriesConnection { nodes { submissionDraft { _id }}}'
+        )
+      ).to eq [nil]
     end
   end
 

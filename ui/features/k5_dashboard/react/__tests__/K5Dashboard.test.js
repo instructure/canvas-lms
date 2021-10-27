@@ -23,22 +23,28 @@ import {act, render, screen, waitFor} from '@testing-library/react'
 import {resetDashboardCards} from '@canvas/dashboard-card'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
-import {SELECTED_OBSERVED_USER_COOKIE} from '@canvas/k5/react/ObserverOptions'
+import {OBSERVER_COOKIE_PREFIX} from '@canvas/k5/ObserverGetObservee'
+import {cloneDeep} from 'lodash'
 
 import {MOCK_TODOS} from './mocks'
 import {
   MOCK_ASSIGNMENTS,
   MOCK_CARDS,
+  MOCK_CARDS_2,
   MOCK_EVENTS,
-  MOCK_OBSERVER_LIST
+  MOCK_OBSERVER_LIST,
+  MOCK_PLANNER_ITEM
 } from '@canvas/k5/react/__tests__/fixtures'
 import K5Dashboard from '../K5Dashboard'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
 
+const currentUserId = '1'
+const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUserId}`
+
 const currentUser = {
-  id: '1',
+  id: currentUserId,
   display_name: 'Geoffrey Jellineck',
   avatar_image_url: 'http://avatar'
 }
@@ -179,8 +185,9 @@ const defaultProps = {
   canDisableElementaryDashboard: false,
   currentUser,
   currentUserRoles: ['admin'],
-  createPermissions: 'none',
+  createPermissions: null,
   plannerEnabled: false,
+  loadingOpportunities: false,
   loadAllOpportunities: () => {},
   timeZone: defaultEnv.TIMEZONE,
   hideGradesTabForStudents: false,
@@ -188,6 +195,7 @@ const defaultProps = {
   selectedContextCodes: ['course_1', 'course_3'],
   selectedContextsLimit: 2,
   parentSupportEnabled: false,
+  canAddObservee: false,
   observerList: MOCK_OBSERVER_LIST
 }
 
@@ -208,37 +216,7 @@ beforeEach(() => {
   moxios.stubRequest(/api\/v1\/planner\/items\?start_date=.*end_date=.*/, {
     status: 200,
     headers: {link: 'url; rel="current"'},
-    response: [
-      {
-        context_name: 'Course2',
-        context_type: 'Course',
-        course_id: '1',
-        html_url: '/courses/2/assignments/15',
-        new_activity: false,
-        plannable: {
-          created_at: '2021-03-16T17:17:17Z',
-          due_at: moment().toISOString(),
-          id: '15',
-          points_possible: 10,
-          title: 'Assignment 15',
-          updated_at: '2021-03-16T17:31:52Z'
-        },
-        plannable_date: moment().toISOString(),
-        plannable_id: '15',
-        plannable_type: 'assignment',
-        planner_override: null,
-        submissions: {
-          excused: false,
-          graded: false,
-          has_feedback: false,
-          late: false,
-          missing: true,
-          needs_grading: false,
-          redo_request: false,
-          submitted: false
-        }
-      }
-    ]
+    response: MOCK_PLANNER_ITEM
   })
   moxios.stubRequest(/api\/v1\/planner\/items\?start_date=.*per_page=1/, {
     status: 200,
@@ -320,6 +298,7 @@ afterEach(() => {
   sessionStorage.clear()
   window.location.hash = ''
   destroyContainer()
+  document.cookie = `${observedUserCookieName}=`
 })
 
 describe('K-5 Dashboard', () => {
@@ -629,6 +608,62 @@ describe('K-5 Dashboard', () => {
         done()
       })
     })
+
+    it('reloads the planner with correct data when the selected observee is updated', async done => {
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=1', {
+        status: 200,
+        response: MOCK_CARDS
+      })
+
+      const observerPlannerItem = cloneDeep(MOCK_PLANNER_ITEM)
+      observerPlannerItem[0].plannable.title = 'Assignment for Observee'
+      const observerList = [
+        {
+          id: currentUserId,
+          name: 'Self'
+        },
+        {
+          id: '2',
+          name: 'Student 2'
+        }
+      ]
+
+      const {findByText, getByRole, getByText} = render(
+        <K5Dashboard
+          {...defaultProps}
+          defaultTab="tab-schedule"
+          plannerEnabled
+          parentSupportEnabled
+          canAddObservee
+          currentUserRoles={['user', 'observer']}
+          observerList={observerList}
+        />
+      )
+      expect(await findByText('Assignment 15')).toBeInTheDocument()
+
+      moxios.uninstall()
+      moxios.install()
+      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user=2', {
+        status: 200,
+        response: MOCK_CARDS_2
+      })
+      moxios.stubRequest(/api\/v1\/planner\/items\?.*observed_user_id=2.*/, {
+        status: 200,
+        headers: {link: 'url; rel="current"'},
+        response: observerPlannerItem
+      })
+
+      const observerSelect = getByRole('combobox', {name: 'Select a student to view'})
+      act(() => observerSelect.click())
+      act(() => getByText('Student 2').click())
+      expect(await findByText('Assignment for Observee')).toBeInTheDocument()
+      moxios.wait(() => {
+        const request = moxios.requests.mostRecent()
+        expect(request.url).toContain('observed_user_id=2')
+        expect(request.url).toContain('context_codes[]=course_23')
+        done()
+      })
+    })
   })
 
   describe('Grades Section', () => {
@@ -766,12 +801,8 @@ describe('K-5 Dashboard', () => {
   })
 
   describe('Parent Support', () => {
-    afterEach(() => {
-      document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=`
-    })
-
     beforeEach(() => {
-      document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=4;path=/`
+      document.cookie = `${observedUserCookieName}=4;path=/`
     })
 
     const getLastRequest = async () => {
@@ -792,6 +823,7 @@ describe('K-5 Dashboard', () => {
         <K5Dashboard
           {...defaultProps}
           parentSupportEnabled
+          canAddObservee
           currentUserRoles={['user', 'observer']}
         />
       )
@@ -806,6 +838,7 @@ describe('K-5 Dashboard', () => {
           <K5Dashboard
             {...defaultProps}
             currentUserRoles={['user', 'observer', 'teacher']}
+            canAddObservee
             parentSupportEnabled
           />
         )
@@ -829,6 +862,7 @@ describe('K-5 Dashboard', () => {
             {...defaultProps}
             currentUserRoles={['user', 'observer', 'teacher']}
             parentSupportEnabled
+            canAddObservee
           />
         )
         const select = getByRole('combobox', {name: 'Select a student to view'})

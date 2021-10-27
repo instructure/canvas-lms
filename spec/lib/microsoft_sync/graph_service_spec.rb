@@ -593,6 +593,33 @@ describe MicrosoftSync::GraphService do
       end
     end
 
+    shared_examples_for 'a call which raises a quota exceeded error' do |members_or_owners|
+      let(:msft_api_error_body) do
+        {
+          code: "Directory_QuotaExceeded",
+          message: "Unable to perform operation as '121' would exceed the maximum quota count '100' for forward-link '#{members_or_owners}'.",
+        }
+      end
+
+      it "raises an Errors::#{members_or_owners.capitalize}QuotaExceeded error" do
+        expect { subject }.to raise_error(
+          "MicrosoftSync::Errors::#{members_or_owners.capitalize}QuotaExceeded".constantize
+        )
+      end
+    end
+
+    context 'when the API returns a "quota exceeded" error' do
+      let(:response) { json_response(403, { error: msft_api_error_body }) }
+
+      context '(owners quota exceeded)' do
+        it_behaves_like 'a call which raises a quota exceeded error', 'owners'
+      end
+
+      context '(members quota exceeded)' do
+        it_behaves_like 'a call which raises a quota exceeded error', 'members'
+      end
+    end
+
     context 'when using JSON batching because some users already exist' do
       let(:response) { { status: 400, body: 'One or more added object references already exist' } }
       let(:batch_overall_response_code) { 200 }
@@ -644,7 +671,8 @@ describe MicrosoftSync::GraphService do
 
         it 'passes along the quota used to run_batch' do
           expect(service.http).to \
-            receive(:run_batch).with(anything, anything, quota: [4, 4]).and_call_original
+            receive(:run_batch).with(anything, anything, hash_including(quota: [4, 4]))
+                               .and_call_original
           subject
         end
 
@@ -683,6 +711,25 @@ describe MicrosoftSync::GraphService do
 
         it 'returns a hash with arrays with those users' do
           expect(subject.transform_values(&:sort)).to eq(members: %w[m1], owners: %w[o1 o2])
+        end
+      end
+
+      context 'when the API returns a "quota exceeded" error' do
+        let(:batch_responses) do
+          [
+            dupe('members_m1'),
+            succ('members_m2'),
+            succ('owners_m1'),
+            { id: 'owners_m2', status: 403, body: msft_api_error_body }
+          ]
+        end
+
+        context '(owners quota exceeded)' do
+          it_behaves_like 'a call which raises a quota exceeded error', 'owners'
+        end
+
+        context '(members quota exceeded)' do
+          it_behaves_like 'a call which raises a quota exceeded error', 'members'
         end
       end
 
@@ -786,7 +833,8 @@ describe MicrosoftSync::GraphService do
 
       it 'passes along the quota used to run_batch' do
         expect(service.http).to \
-          receive(:run_batch).with(anything, anything, quota: [4, 4]).and_call_original
+          receive(:run_batch).with(anything, anything, hash_including(quota: [4, 4]))
+                             .and_call_original
         subject
       end
     end
