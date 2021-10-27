@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_specs.rb')
 require File.expand_path(File.dirname(__FILE__) + '/support/textual_answer_serializers_specs.rb')
 
@@ -64,7 +65,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
         "question_5_#{AssessmentQuestion.variable_id 'answer4'}" => 'blue',
         "question_5_#{AssessmentQuestion.variable_id 'answer5'}" => nil,
         "question_5_#{AssessmentQuestion.variable_id 'answer6'}" => nil,
-      }.as_json, full: true)
+      }.as_json, true)
 
       expect(output).to eq({
         answer1: 'red',

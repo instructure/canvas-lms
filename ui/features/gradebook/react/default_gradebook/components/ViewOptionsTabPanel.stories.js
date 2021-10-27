@@ -25,8 +25,8 @@ export default {
   args: {
     columnSort: {
       currentValue: {
-        criterion: 'name',
-        direction: 'ascending'
+        criterion: '',
+        direction: ''
       },
       modulesEnabled: true,
       onChange: () => {}

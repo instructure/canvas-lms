@@ -27,10 +27,9 @@ module BasicLTI
       :excused, :points_deducted, :grading_period_id, :late, :missing, :url
     ].freeze
 
-    def initialize(assignment, user, prioritize_non_tool_grade: false)
+    def initialize(assignment, user)
       @assignment = assignment
       @user = user
-      @prioritize_non_tool_grade = prioritize_non_tool_grade
     end
 
     def commit_history(launch_url, grade, grader_id)
@@ -132,16 +131,13 @@ module BasicLTI
     end
 
     def grade_submission(launch_url, grade, score, grader_id)
-      BasicOutcomes::LtiResponse.ensure_score_update_possible(submission: submission, prioritize_non_tool_grade: prioritize_non_tool_grade?) do
-        submission.grade = grade
-        submission.score = score
-        submission.graded_at = params[:graded_at] || Time.zone.now
-        submission.grade_matches_current_submission = true
-        submission.grader_id = grader_id
-        submission.posted_at = submission.submitted_at unless submission.posted? || @assignment.post_manually?
-      end
+      submission.grade = grade
+      submission.score = score
+      submission.graded_at = params[:graded_at] || Time.zone.now
+      submission.grade_matches_current_submission = true
+      submission.grader_id = grader_id
+      submission.posted_at = submission.submitted_at unless submission.posted? || @assignment.post_manually?
       clear_cache
-      # We always want to update the launch_url to match what new quizzes is laying down.
       submission.url = launch_url
       submission.save!
     end
@@ -189,10 +185,6 @@ module BasicLTI
         end
         sorted_list.each_with_object({}) { |k, a| a[k] = attempts[k] }
       end
-    end
-
-    def prioritize_non_tool_grade?
-      @prioritize_non_tool_grade
     end
   end
 end

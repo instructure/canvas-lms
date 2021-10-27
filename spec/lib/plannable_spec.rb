@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 describe Plannable do
   context 'planner_override_for' do
     before :once do
@@ -47,7 +49,7 @@ describe Plannable do
 
     it "prefers the associated object's override if both have an override" do
       assignment = assignment_model()
-      assignment.planner_overrides.create!(user: @student)
+      assignment_override = assignment.planner_overrides.create!(user: @student)
       assignment.submission_types = "discussion_topic"
       assignment.save!
       discussion_override = assignment.discussion_topic.planner_overrides.create!(user: @student)

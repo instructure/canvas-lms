@@ -24,7 +24,7 @@ module Api::V1::CourseEvent
   include Api::V1::PageView
   include Api::V1::User
 
-  def course_event_json(event, _user, _session)
+  def course_event_json(event, user, session)
     links = {
       :course => Shard.relative_id_for(event.course_id, Shard.current, Shard.current),
       :page_view => event.request_id && PageView.find_by_id(event.request_id).try(:id),
@@ -64,7 +64,7 @@ module Api::V1::CourseEvent
 
   def course_events_compound_json(events, user, session)
     {
-      links: links_json,
+      links: links_json(events, user, session),
       events: course_events_json(events, user, session),
       linked: linked_json(events, user, session)
     }
@@ -72,7 +72,7 @@ module Api::V1::CourseEvent
 
   private
 
-  def links_json
+  def links_json(events, user, session)
     {
       "events.course" => templated_url(:api_v1_course_url, "{events.course}"),
       "events.user" => nil,

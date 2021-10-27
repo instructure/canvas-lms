@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 describe LatePolicy do
   describe 'relationships' do
     it { is_expected.to belong_to(:course).inverse_of(:late_policy) }

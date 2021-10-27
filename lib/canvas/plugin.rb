@@ -47,7 +47,7 @@ module Canvas
     end
 
     # custom serialization, since the meta can containt procs
-    def _dump(_depth)
+    def _dump(depth)
       self.id.to_s
     end
 

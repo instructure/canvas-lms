@@ -17,7 +17,6 @@
  */
 
 import assert from 'assert'
-import {CHANGE_SEARCH_STRING} from '../../../src/sidebar/actions/filter'
 import images from '../../../src/sidebar/reducers/images'
 import * as actions from '../../../src/sidebar/actions/images'
 
@@ -32,8 +31,7 @@ describe('Images reducer', () => {
         hasMore: false,
         isLoading: false
       },
-      contextType: 'course',
-      searchString: ''
+      contextType: 'course'
     }
   })
 
@@ -95,32 +93,15 @@ describe('Images reducer', () => {
   })
 
   describe('RECEIVE_IMAGES', () => {
-    it('appends new records to the existing array when the payload searchString matches state', () => {
+    it('appends new records to the existing array', () => {
       const action = {
         type: actions.RECEIVE_IMAGES,
         payload: {
           files: [{id: 1}, {id: 2}],
-          contextType: 'course',
-          searchString: 'panda'
+          contextType: 'course'
         }
       }
-
-      state.searchString = 'panda'
       assert.equal(images(state, action).course.files.length, 2)
-    })
-
-    it('does not append new records to the existing array when the payload searchString does not match state', () => {
-      const action = {
-        type: actions.RECEIVE_IMAGES,
-        payload: {
-          files: [{id: 1}, {id: 2}],
-          contextType: 'course',
-          searchString: 'panda'
-        }
-      }
-
-      state.searchString = 'cat'
-      assert.equal(images(state, action).course.files.length, 0)
     })
 
     it("hasMore if there's a bookmark", () => {
@@ -170,13 +151,6 @@ describe('Images reducer', () => {
       state.course.files = ['one', 'two']
       const action = {type: actions.REQUEST_INITIAL_IMAGES, payload: {contextType: 'course'}}
       assert.equal(images(state, action).course.files.length, 0)
-    })
-  })
-
-  describe('CHANGE_SEARCH_STRING', () => {
-    it('sets the searchString to the payload', () => {
-      const action = {type: CHANGE_SEARCH_STRING, payload: 'panda'}
-      assert.strictEqual(images(state, action).searchString, 'panda')
     })
   })
 })

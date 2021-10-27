@@ -58,7 +58,9 @@ describe Api::V1::QuizSubmissionQuestion do
     subject { api.quiz_submission_questions_json(quiz_questions, @quiz_submission) }
 
     let(:quiz_questions) do
-      Array.new(3) { create_question "multiple_choice" }
+      1.upto(3).map do |i|
+        create_question "multiple_choice"
+      end
     end
 
     let(:submission_data) do

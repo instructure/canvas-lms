@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'spec_helper'
 require 'rake/task_graph'
 
 describe Rake::TaskGraph do

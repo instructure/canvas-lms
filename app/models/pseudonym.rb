@@ -109,7 +109,9 @@ class Pseudonym < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :confirm_registration
     p.to { self.communication_channel || self.user.communication_channel }
-    p.whenever { @send_confirmation }
+    p.whenever { |record|
+      @send_confirmation
+    }
 
     p.dispatch :pseudonym_registration
     p.to { self.communication_channel || self.user.communication_channel }
@@ -228,7 +230,7 @@ class Pseudonym < ActiveRecord::Base
     :email_login
   end
 
-  def works_for_account?(_account, _allow_implicit = false, ignore_types: [:implicit])
+  def works_for_account?(account, allow_implicit = false, ignore_types: [:implicit])
     true
   end
 
@@ -536,7 +538,7 @@ class Pseudonym < ActiveRecord::Base
 
   def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
 
-  def self.associated_shards(_unique_id_or_sis_user_id)
+  def self.associated_shards(unique_id_or_sis_user_id)
     [Shard.default]
   end
 
@@ -580,7 +582,7 @@ class Pseudonym < ActiveRecord::Base
     pseudonyms = []
     begin
       pseudonyms = find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
-    rescue ImpossibleCredentialsError
+    rescue ImpossibleCredentialsError => e
       Rails.logger.info("Impossible pseudonym credentials: #{credentials[:unique_id]}, invalidating session")
       return :impossible_credentials
     end

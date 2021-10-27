@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
+
 class GradeChangeEventTestHarness
   include Api::V1::GradeChangeEvent
 
@@ -29,7 +31,7 @@ class GradeChangeEventTestHarness
     "feed_calendar_url(#{feed_code.inspect})"
   end
 
-  def course_assignment_url(_course, _assignment)
+  def course_assignment_url(course, assignment)
     url_root
   end
 
@@ -41,7 +43,7 @@ class GradeChangeEventTestHarness
     URI.encode("#{url_root}/api/v1/courses/#{course}/assignments/#{assignment}")
   end
 
-  def service_enabled?(_type)
+  def service_enabled?(type)
     false
   end
 

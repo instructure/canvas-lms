@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper')
 require_dependency "lti/ims/concerns/gradebook_services"
 
 module Lti

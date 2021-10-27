@@ -42,7 +42,8 @@ module CC::Importer::Canvas
     end
 
     # exports the package into the intermediary json
-    def export(_to_export = SCRAPE_ALL_HASH)
+    def export(to_export = SCRAPE_ALL_HASH)
+      to_export = SCRAPE_ALL_HASH.merge to_export if to_export
       unzip_archive
       set_progress(5)
 

@@ -245,15 +245,6 @@ the `ext_lti_assignment_id` send in various launches and webhooks.
 ```
 "9ae4170c-6b64-444d-9246-0b7dedd5f560"
 ```
-## com.instructure.Assignment.description
-The LTI assignment description of an assignment.
-
-**Availability**: *always*  
-**Launch Parameter**: *com_instructure_assignment_description*  
-
-```
-"Example Description"
-```
 ## com.instructure.Assignment.allowedFileExtensions
 A comma separated list of the file extensions that are allowed for submitting to this
 assignment. If there are no limits on what files can be uploaded, an empty string will be
@@ -444,15 +435,6 @@ returns the root account's sis source id for the current context.
 
 ```
 "sis_account_id_1234"
-```
-## Canvas.externalTool.global_id
-returns the global ID for the external tool that was launched. Only available for LTI 1.
-
-**Availability**: *always and when in an LTI 1*  
-
-
-```
-1234
 ```
 ## Canvas.externalTool.url
 returns the URL for the external tool that was launched. Only available for LTI 1.
@@ -1094,15 +1076,6 @@ Returns the assignment_id of the assignment that was launched.
 
 ```
 1234
-```
-## Canvas.assignment.description
-Returns the assignment_description of the assignment that was launched.
-
-**Availability**: *when launched as an assignment*  
-
-
-```
-"Example Description"
 ```
 ## com.instructure.Group.id
 Returns the Canvas id of the group the current user is in if launching

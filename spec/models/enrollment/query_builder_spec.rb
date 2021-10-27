@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+
 describe "Enrollment::QueryBuilder" do
   describe "#conditions" do
     let(:conditions)     { Enrollment::QueryBuilder.new(state, options).conditions }
@@ -29,7 +31,7 @@ describe "Enrollment::QueryBuilder" do
     # each item corresponds to a unique course the user is enrolled in
     def create_enrollments(*matrix)
       now = Time.now.utc
-      course_ids = create_records(Course, matrix.map do |_e_state, c_state, _type|
+      course_ids = create_records(Course, matrix.map { |e_state, c_state, type|
         {
           name: "Course",
           account_id: account_id,
@@ -39,9 +41,9 @@ describe "Enrollment::QueryBuilder" do
           created_at: now,
           updated_at: now,
         }
-      end)
+      })
 
-      section_ids = create_records(CourseSection, course_ids.each_index.map do |i|
+      section_ids = create_records(CourseSection, course_ids.each_with_index.map { |course_id, i|
         {
           course_id: course_ids[i],
           root_account_id: account_id,
@@ -49,7 +51,7 @@ describe "Enrollment::QueryBuilder" do
           created_at: now,
           updated_at: now,
         }
-      end)
+      })
 
       enrollment_ids = create_records(Enrollment, matrix.each_with_index.map { |(e_state, _, type), i|
         {

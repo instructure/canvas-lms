@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_specs.rb')
 
 describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
@@ -51,7 +52,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
         "question_5_answer_7397" => nil,
         "question_5_answer_7398" => nil,
         "question_5_answer_7399" => nil,
-      }.as_json, full: true).as_json.sort_by { |v| v['answer_id'] }
+      }.as_json, true).as_json.sort_by { |v| v['answer_id'] }
 
       expect(output).to eq([
         { answer_id: '4224', match_id: '3855' },

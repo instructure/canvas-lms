@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 describe Importers do
   describe 'disable_live_events!' do
     it 'disables the live event observer' do

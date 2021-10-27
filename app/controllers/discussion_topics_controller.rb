@@ -438,6 +438,7 @@ class DiscussionTopicsController < ApplicationController
         add_body_class 'hide-content-while-scripts-not-loaded'
         @page_title = join_title(t('#titles.discussions', "Discussions"), @context.name)
 
+        feed_code = @context_enrollment.try(:feed_code) || (@context.available? && @context.feed_code)
         content_for_head helpers.auto_discovery_link_tag(:atom, feeds_forum_format_path(@context.feed_code, :atom), { :title => t(:course_discussions_atom_feed_title, "Course Discussions Atom Feed") })
 
         js_bundle :discussion_topics_index
@@ -700,7 +701,7 @@ class DiscussionTopicsController < ApplicationController
                rce_mentions_in_discussions: Account.site_admin.feature_enabled?(:rce_mentions_in_discussions),
                isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
-               student_reporting_enabled: Account.site_admin.feature_enabled?(:discussions_reporting),
+               discussions_reporting: Account.site_admin.feature_enabled?(:discussions_reporting),
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
                # GRADED_RUBRICS_URL must be within DISCUSSION to avoid page error
                DISCUSSION: {
@@ -794,7 +795,7 @@ class DiscussionTopicsController < ApplicationController
               :MARK_ALL_READ_URL => api_url.call('topic_mark_all_read'),
               :MARK_ALL_UNREAD_URL => api_url.call('topic_mark_all_unread'),
               :MANUAL_MARK_AS_READ => @current_user.try(:manual_mark_as_read?),
-              :CAN_SUBSCRIBE => !@topic.subscription_hold(@current_user, session),
+              :CAN_SUBSCRIBE => !@topic.subscription_hold(@current_user, @context_enrollment, session),
               :CURRENT_USER => user_display_json(@current_user),
               :INITIAL_POST_REQUIRED => @initial_post_required,
               :THREADED => @topic.threaded?,
@@ -1250,7 +1251,7 @@ class DiscussionTopicsController < ApplicationController
     process_future_date_parameters(discussion_topic_hash)
     process_lock_parameters(discussion_topic_hash)
 
-    process_published_parameters
+    process_published_parameters(discussion_topic_hash)
     if is_new && @topic.published? && params[:assignment]
       @topic.unpublish
       @topic.root_topic.try(:unpublish)
@@ -1258,8 +1259,8 @@ class DiscussionTopicsController < ApplicationController
     end
 
     process_group_parameters(discussion_topic_hash)
-    process_pin_parameters
-    process_todo_parameters
+    process_pin_parameters(discussion_topic_hash)
+    process_todo_parameters()
 
     if @errors.present?
       render :json => { errors: @errors }, :status => :bad_request
@@ -1409,7 +1410,7 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
-  def process_published_parameters
+  def process_published_parameters(discussion_topic_hash)
     if params.has_key?(:published)
       should_publish = value_to_boolean(params[:published])
       if should_publish != @topic.published?
@@ -1460,7 +1461,7 @@ class DiscussionTopicsController < ApplicationController
 
   # TODO: upgrade acts_as_list after rails3
   # check_scope will probably handle this
-  def process_pin_parameters
+  def process_pin_parameters(discussion_topic_hash)
     return unless params.key?(:pinned)
 
     pinned = value_to_boolean(params[:pinned])

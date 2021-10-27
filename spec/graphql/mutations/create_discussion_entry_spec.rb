@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require_relative '../graphql_spec_helper'
 
 RSpec.describe Mutations::CreateDiscussionEntry do
@@ -159,7 +160,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     it 'does set on reply to a child reply' do
       root_entry = @topic.discussion_entries.create!(message: 'root entry', user: @teacher, discussion_topic: @topic)
       parent_entry = @topic.discussion_entries.create!(message: 'parent entry', user: @teacher, discussion_topic: @topic, parent_entry: root_entry)
-      run_mutation(discussion_topic_id: @topic.id, message: 'child entry', parent_entry_id: parent_entry.id, include_reply_preview: true)
+      result = run_mutation(discussion_topic_id: @topic.id, message: 'child entry', parent_entry_id: parent_entry.id, include_reply_preview: true)
 
       entry = @topic.discussion_entries.last
       expect(entry.include_reply_preview?).to be true
@@ -168,7 +169,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     it 'allows creating with include reply preview as false' do
       root_entry = @topic.discussion_entries.create!(message: 'root entry', user: @teacher, discussion_topic: @topic)
       parent_entry = @topic.discussion_entries.create!(message: 'parent entry', user: @teacher, discussion_topic: @topic, parent_entry: root_entry)
-      run_mutation(discussion_topic_id: @topic.id, message: 'child entry', parent_entry_id: parent_entry.id, include_reply_preview: false)
+      result = run_mutation(discussion_topic_id: @topic.id, message: 'child entry', parent_entry_id: parent_entry.id, include_reply_preview: false)
 
       entry = @topic.discussion_entries.last
       expect(entry.include_reply_preview?).to be false

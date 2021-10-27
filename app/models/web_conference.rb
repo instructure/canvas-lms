@@ -169,7 +169,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def external_urls
-    @external_urls ||= self.class.external_urls.dup.delete_if { |_key, info| info[:restricted_to] && !info[:restricted_to].call(self) }
+    @external_urls ||= self.class.external_urls.dup.delete_if { |key, info| info[:restricted_to] && !info[:restricted_to].call(self) }
   end
 
   # #{key}_external_url should return an array of hashes with url information (:name, :id, and :url).
@@ -405,7 +405,7 @@ class WebConference < ActiveRecord::Base
       close
     end
     @conference_active
-  rescue Errno::ECONNREFUSED
+  rescue Errno::ECONNREFUSED => ex
     # Account credentials changed, server unreachable/down, bad stuff happened.
     @conference_active = false
     @conference_active
@@ -462,6 +462,9 @@ class WebConference < ActiveRecord::Base
 
     given { |user, session| self.users.include?(user) && self.context.grants_right?(user, session, :read) && long_running? && active? }
     can :resume
+
+    given { |user| (self.respond_to?(:is_public) && self.is_public rescue false) }
+    can :read and can :join
 
     given { |user, session| self.context.grants_right?(user, session, :create_conferences) }
     can :create

@@ -381,8 +381,7 @@ export const groupDetailMocks = ({
   groupDescription = 'Group Description',
   numOfOutcomes = 2,
   targetGroupId,
-  notImportedOutcomesCount = null,
-  removeOnRefetch = false
+  notImportedOutcomesCount = null
 } = {}) => [
   {
     request: {
@@ -602,94 +601,91 @@ export const groupDetailMocks = ({
       }
     },
     // for testing graphqls refetch in index.js
-    newData: jest.fn(() => {
-      const outcome1 = {
-        canUnlink,
-        _id: '1',
-        node: {
-          _id: '1',
-          description: '',
-          title: `Refetched Outcome 1 - ${title}`,
-          displayName: '',
-          canEdit,
-          contextId,
-          contextType,
-          friendlyDescription: null,
-          __typename: 'LearningOutcome'
-        },
+    newData: jest.fn(() => ({
+      data: {
         group: {
           _id: groupId,
+          description: `${groupDescription} 4`,
           title: `Refetched ${title}`,
-          __typename: 'LearningOutcomeGroup'
-        },
-        __typename: 'ContentTag'
-      }
-      const outcome2 = {
-        canUnlink,
-        _id: '2',
-        node: {
-          _id: '2',
-          description: '',
-          title: `Refetched Outcome 2 - ${title}`,
-          displayName: '',
-          canEdit,
-          contextId,
-          contextType,
-          friendlyDescription: null,
-          __typename: 'LearningOutcome'
-        },
-        group: {
-          _id: groupId,
-          title: `Refetched ${title}`,
-          __typename: 'LearningOutcomeGroup'
-        },
-        __typename: 'ContentTag'
-      }
-      const outcome3 = {
-        canUnlink,
-        _id: '11',
-        node: {
-          _id: '11',
-          description: '',
-          title: `Newly Created Outcome - ${title}`,
-          displayName: '',
-          canEdit,
-          contextId,
-          contextType,
-          friendlyDescription: null,
-          __typename: 'LearningOutcome'
-        },
-        group: {
-          _id: groupId,
-          title: `Refetched ${title}`,
-          __typename: 'LearningOutcomeGroup'
-        },
-        __typename: 'ContentTag'
-      }
-      const edges = [outcome1, outcome2, outcome3]
-      const afterRemoveEdges = [outcome3]
-      return {
-        data: {
-          group: {
-            _id: groupId,
-            description: `${groupDescription} 4`,
-            title: `Refetched ${title}`,
-            outcomesCount: removeOnRefetch ? afterRemoveEdges.length : edges.length,
-            notImportedOutcomesCount,
-            outcomes: {
-              pageInfo: {
-                hasNextPage: withMorePage,
-                endCursor: 'Mx',
-                __typename: 'PageInfo'
-              },
-              edges: removeOnRefetch ? afterRemoveEdges : edges,
-              __typename: 'ContentTagConnection'
+          outcomesCount: 3,
+          notImportedOutcomesCount,
+          outcomes: {
+            pageInfo: {
+              hasNextPage: withMorePage,
+              endCursor: 'Mx',
+              __typename: 'PageInfo'
             },
-            __typename: 'LearningOutcomeGroup'
-          }
+            edges: [
+              {
+                canUnlink,
+                _id: '1',
+                node: {
+                  _id: '1',
+                  description: '',
+                  title: `Refetched Outcome 1 - ${title}`,
+                  displayName: '',
+                  canEdit,
+                  contextId,
+                  contextType,
+                  friendlyDescription: null,
+                  __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: groupId,
+                  title: `Refetched ${title}`,
+                  __typename: 'LearningOutcomeGroup'
+                },
+                __typename: 'ContentTag'
+              },
+              {
+                canUnlink,
+                _id: '2',
+                node: {
+                  _id: '2',
+                  description: '',
+                  title: `Refetched Outcome 2 - ${title}`,
+                  displayName: '',
+                  canEdit,
+                  contextId,
+                  contextType,
+                  friendlyDescription: null,
+                  __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: groupId,
+                  title: `Refetched ${title}`,
+                  __typename: 'LearningOutcomeGroup'
+                },
+                __typename: 'ContentTag'
+              },
+              {
+                canUnlink,
+                _id: '11',
+                node: {
+                  _id: '11',
+                  description: '',
+                  title: `Newly Created Outcome - ${title}`,
+                  displayName: '',
+                  canEdit,
+                  contextId,
+                  contextType,
+                  friendlyDescription: null,
+                  __typename: 'LearningOutcome'
+                },
+                group: {
+                  _id: groupId,
+                  title: `Refetched ${title}`,
+                  __typename: 'LearningOutcomeGroup'
+                },
+                __typename: 'ContentTag'
+              }
+            ],
+            __typename: 'ContentTagConnection'
+          },
+          __typename: 'LearningOutcomeGroup'
         }
       }
-    })
+    }))
   },
   {
     request: {
@@ -1313,8 +1309,7 @@ export const importOutcomeMocks = ({
   targetContextId = '1',
   targetContextType = 'Account',
   failResponse = false,
-  failMutationNoErrMsg = false,
-  targetGroupId
+  failMutationNoErrMsg = false
 } = {}) => {
   const successfulResponse = {
     data: {
@@ -1368,14 +1363,9 @@ export const importOutcomeMocks = ({
   }
 
   let input = {
+    targetContextId,
+    targetContextType,
     outcomeId
-  }
-
-  if (targetGroupId) {
-    input.targetGroupId = targetGroupId
-  } else {
-    input.targetContextId = targetContextId
-    input.targetContextType = targetContextType
   }
 
   if (sourceContextId && sourceContextType) {
@@ -1642,7 +1632,6 @@ export const moveOutcomeMock = ({
 export const updateOutcomeGroupMock = ({
   id = '100',
   title = 'Updated title',
-  returnTitle = 'Updated title',
   description = 'Updated description',
   vendorGuid = 'A001',
   parentOutcomeGroupId = '101',
@@ -1656,7 +1645,7 @@ export const updateOutcomeGroupMock = ({
       updateLearningOutcomeGroup: {
         learningOutcomeGroup: {
           _id: id,
-          title: returnTitle,
+          title,
           description,
           vendorGuid,
           parentOutcomeGroup: {
@@ -1747,7 +1736,6 @@ export const importGroupMocks = ({
   progressId = '111',
   targetContextId = '1',
   targetContextType = 'Account',
-  targetGroupId,
   failResponse = false,
   failMutationNoErrMsg = false
 } = {}) => {
@@ -1802,23 +1790,16 @@ export const importGroupMocks = ({
     result = failedMutationNoErrMsg
   }
 
-  const input = {
-    groupId
-  }
-
-  if (targetGroupId) {
-    input.targetGroupId = targetGroupId
-  } else {
-    input.targetContextType = targetContextType
-    input.targetContextId = targetContextId
-  }
-
   return [
     {
       request: {
         query: IMPORT_OUTCOMES,
         variables: {
-          input
+          input: {
+            groupId,
+            targetContextId,
+            targetContextType
+          }
         }
       },
       result

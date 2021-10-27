@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
 require_relative('web_conference_spec_helper')
 
 describe LtiConference do

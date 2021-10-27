@@ -219,7 +219,7 @@ module CC
         end
       end
 
-      def short_answer_response_str(node, _question)
+      def short_answer_response_str(node, question)
         node.response_str(
           :ident => "response1",
           :rcardinality => 'Single'
@@ -258,7 +258,7 @@ module CC
         end
       end
 
-      def calculated_response_str(node, _question)
+      def calculated_response_str(node, question)
         node.response_str(
           :ident => 'response1',
           :rcardinality => 'Single'
@@ -403,7 +403,7 @@ module CC
         end
       end
 
-      def essay_resprocessing(node, _question)
+      def essay_resprocessing(node, question)
         other_respcondition(node)
       end
 
@@ -451,7 +451,7 @@ module CC
         end
       end
 
-      def calculated_resprocessing(node, _question)
+      def calculated_resprocessing(node, question)
         node.respcondition(:title => 'correct') do |r_node|
           r_node.conditionvar do |c_node|
             c_node.other

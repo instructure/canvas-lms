@@ -283,7 +283,7 @@ module CC
         @rewriter.set_handler('items') do |match|
           item = ContentTag.find(match.obj_id)
           migration_id = @key_generator.create_key(item)
-          "#{COURSE_TOKEN}/modules/#{match.type}/#{migration_id}#{match.query}"
+          new_url = "#{COURSE_TOKEN}/modules/#{match.type}/#{migration_id}#{match.query}"
         end
         @rewriter.set_default_handler do |match|
           new_url = match.url
@@ -347,24 +347,24 @@ module CC
 
           media_id = anchor['id'].gsub(/^media_comment_/, '')
           obj = MediaObject.active.by_media_id(media_id).first
-          next unless obj && @key_generator.create_key(obj)
-
-          @used_media_objects << obj
-          info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
-          @media_object_infos[obj.id] = info
-          anchor['href'] = File.join(WEB_CONTENT_TOKEN, info[:path])
+          if obj && (migration_id = @key_generator.create_key(obj))
+            @used_media_objects << obj
+            info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
+            @media_object_infos[obj.id] = info
+            anchor['href'] = File.join(WEB_CONTENT_TOKEN, info[:path])
+          end
         end
 
         # process new RCE media iframes too
         doc.css('iframe[data-media-id]').each do |iframe|
           media_id = iframe['data-media-id']
           obj = MediaObject.active.by_media_id(media_id).take
-          next unless obj && @key_generator.create_key(obj)
-
-          @used_media_objects << obj
-          info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
-          @media_object_infos[obj.id] = info
-          iframe['src'] = File.join(WEB_CONTENT_TOKEN, info[:path])
+          if obj && (migration_id = @key_generator.create_key(obj))
+            @used_media_objects << obj
+            info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
+            @media_object_infos[obj.id] = info
+            iframe['src'] = File.join(WEB_CONTENT_TOKEN, info[:path])
+          end
         end
 
         # prepend the Canvas domain to remaining absolute paths that are missing the host
@@ -380,7 +380,7 @@ module CC
                 if !url.host && url_str[0] == '/'[0]
                   element[attribute] = "#{@url_prefix}#{url_str}"
                 end
-              rescue URI::Error
+              rescue URI::Error => e
                 # leave it as is
               end
             end
@@ -432,7 +432,7 @@ module CC
         Rack::Utils.parse_query(uri.query).each do |k, v|
           qs << "canvas_qs_#{Rack::Utils.escape(k)}=#{Rack::Utils.escape(v)}"
         end
-      rescue URI::Error
+      rescue URI::Error => e
         # if we can't parse the url, we can't preserve canvas query params
       end
       return nil if qs.blank?

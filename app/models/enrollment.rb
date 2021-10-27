@@ -1329,7 +1329,7 @@ class Enrollment < ActiveRecord::Base
   def self.cached_temporary_invitations(email)
     if Enrollment.cross_shard_invitations?
       Shard.birth.activate do
-        Rails.cache.fetch([email, 'all_invited_enrollments2'].cache_key) do
+        invitations = Rails.cache.fetch([email, 'all_invited_enrollments2'].cache_key) do
           Shard.with_each_shard(CommunicationChannel.associated_shards(email)) do
             Enrollment.invited.for_email(email).to_a
           end
@@ -1501,7 +1501,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def allows_favoriting?
-    !(self.course.elementary_subject_course? || self.course.elementary_homeroom_course?) || teacher? || ta? || designer? || self.user.roles(self.root_account).include?('teacher')
+    !(self.course.elementary_subject_course? || self.course.elementary_homeroom_course?) || teacher? || ta? || designer?
   end
 
   private

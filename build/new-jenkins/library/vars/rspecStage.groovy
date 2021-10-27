@@ -66,11 +66,11 @@ def createDistribution(nestedStages) {
 
   if (rspecqEnabled) {
     extendedStage('RSpecQ Reporter for Rspec')
-        .envVars(rspecqEnvVars)
-        .hooks([onNodeAcquired: setupNodeHook])
-        .nodeRequirements(rspecNodeRequirements)
-        .timeout(15)
-        .queue(nestedStages, this.&runReporter)
+          .envVars(rspecqEnvVars)
+          .hooks([onNodeAcquired: setupNodeHook])
+          .nodeRequirements(rspecNodeRequirements)
+          .timeout(15)
+          .queue(nestedStages, this.&runReporter)
 
     rspecqNodeTotal.times { index ->
       extendedStage("RSpecQ Test Set ${(index + 1).toString().padLeft(2, '0')}")
@@ -102,15 +102,7 @@ def createDistribution(nestedStages) {
 }
 
 def setupNode() {
-  env.AUTO_CANCELLED = 'false'
   distribution.unstashBuildScripts()
-  if (queue_empty()) {
-    catchError([buildResult: 'SUCCESS', stageResult: 'ABORTED']) {
-      env.AUTO_CANCELLED = 'true'
-      error 'Test queue is empty, releasing node.'
-    }
-    return
-  }
   libraryScript.execute 'bash/print-env-excluding-secrets.sh'
   if (env.RSPECQ_ENABLED == '1') {
     def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
@@ -124,10 +116,6 @@ def setupNode() {
 }
 
 def tearDownNode(prefix) {
-  if (env.AUTO_CANCELLED.toBoolean()) {
-    println 'Test queue is empty, releasing node.'
-    return
-  }
   sh 'rm -rf ./tmp && mkdir -p tmp'
   sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
   sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
@@ -180,10 +168,6 @@ def tearDownNode(prefix) {
 
 def runRspecqSuite() {
   try {
-    if (env.AUTO_CANCELLED.toBoolean()) {
-      println 'Test queue is empty, releasing node.'
-      return
-    }
     sh(script: 'docker-compose exec -T -e ENABLE_AXE_SELENIUM \
                                        -e RSPECQ_ENABLED \
                                        -e SENTRY_DSN \
@@ -246,17 +230,4 @@ def runReporter() {
 
     throw e
   }
-}
-
-def queue_empty() {
-  env.REGISTRY_BASE = 'starlord.inscloudgate.net/jenkins'
-  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $REGISTRY_BASE/redis:alpine"
-  def queueInfo = sh(script: "docker run -e REDISCLI_AUTH=${env.RSPECQ_REDIS_PASSWORD} -e TEST_QUEUE_HOST -t --rm $REGISTRY_BASE/redis:alpine /bin/sh -c '\
-                                      redis-cli -h $TEST_QUEUE_HOST -p 6379 llen ${JOB_NAME}_build${BUILD_NUMBER}:queue:unprocessed;\
-                                      redis-cli -h $TEST_QUEUE_HOST -p 6379 scard ${JOB_NAME}_build${BUILD_NUMBER}:queue:processed;\
-                                      redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}:queue:status'", returnStdout: true).split('\n')
-  def queueUnprocessed = queueInfo[0].split(' ')[1].trim()
-  def queueProcessed = queueInfo[1].split(' ')[1].trim()
-  def queueStatus = queueInfo[2].trim()
-  return queueStatus == '\"ready\"' && queueUnprocessed.toInteger() == 0 && queueProcessed.toInteger() > 1
 }

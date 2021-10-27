@@ -222,7 +222,7 @@ describe "Wiki Pages" do
       @course.tab_configuration = [{ :id => Course::TAB_PAGES, :hidden => true }]
       @course.save!
 
-      @course.wiki_pages.create! title: 'foo'
+      foo = @course.wiki_pages.create! title: 'foo'
       get "/courses/#{@course.id}/pages/foo"
 
       expect(f("#content")).not_to contain_css('.view_all_pages')
@@ -242,7 +242,7 @@ describe "Wiki Pages" do
       @course.save!
 
       title = "foo"
-      @course.wiki_pages.create!(:title => title, :body => "bar")
+      wiki_page = @course.wiki_pages.create!(:title => title, :body => "bar")
 
       get "/courses/#{@course.id}/pages/#{title}"
       expect(f('#wiki_page_show')).not_to be_nil
@@ -308,8 +308,8 @@ describe "Wiki Pages" do
 
     it "embeds vimeo video in the page", priority: "1", test_id: 126835 do
       get "/courses/#{@course.id}/pages/Page1/edit"
-      switch_editor_views
-      switch_to_raw_html_editor
+      element = f("#wiki_page_body")
+      switch_editor_views(element)
       html_contents = %q(
         <p>
           <iframe style="width: 640px; height: 480px;"
@@ -323,7 +323,6 @@ describe "Wiki Pages" do
           </iframe>
         </p>
       )
-      element = f('#wiki_page_body')
       element.send_keys(html_contents)
       wait_for_new_page_load { f(".btn-primary").click }
       expect(f("iframe")).to be_present

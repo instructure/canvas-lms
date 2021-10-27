@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 describe CanvasMetadatum do
   describe "getting" do
     it 'gets the default value as a hash' do

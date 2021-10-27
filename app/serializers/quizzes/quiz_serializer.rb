@@ -274,11 +274,11 @@ module Quizzes
       quiz.lockdown_browser_monitor_data
     end
 
-    def serializable_object(**)
-      hash = super
+    def serializable_object(options = {})
+      hash = super(options)
       # legacy v1 api
       unless accepts_jsonapi?
-        hash.delete('links')
+        links = hash.delete('links')
         # id = hash['assignment_group']
         # hash['assignment_group_id'] = quiz.assignment_group.try(:id)
       else

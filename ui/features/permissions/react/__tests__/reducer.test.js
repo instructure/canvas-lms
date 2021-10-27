@@ -44,7 +44,8 @@ describe('permissions::reducer', () => {
     ACCOUNT_PERMISSIONS: [
       {
         group_name: 'Account Permissions',
-        group_permissions: [{permission_name: 'manage_courses_add'}]
+        group_permissions: [{permission_name: 'manage_courses_add'}],
+        context_type: 'Account'
       }
     ]
   })

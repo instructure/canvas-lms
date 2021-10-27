@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'spec_helper'
+
 describe "ZipPackage" do
   def add_file(fixture, context, name, folder = Folder.root_folders(context).first)
     context.attachments.create! do |attachment|

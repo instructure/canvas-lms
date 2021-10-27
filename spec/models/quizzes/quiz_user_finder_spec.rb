@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+require 'spec_helper'
 
 describe Quizzes::QuizUserFinder do
   before :once do
@@ -49,7 +50,7 @@ describe Quizzes::QuizUserFinder do
   end
 
   it "doesn't find submissions from teachers for preview submissions" do
-    sub = @quiz.generate_submission(@teacher, true)
+    sub = @quiz.generate_submission(@teacher, preview = true)
     Quizzes::SubmissionGrader.new(sub).grade_submission
     sub.save!
     expect(@finder.submitted_students).not_to include @teacher

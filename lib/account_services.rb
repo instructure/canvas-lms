@@ -19,11 +19,9 @@
 
 module AccountServices
   class AllowedServicesHash < Hash
-    def _dump(*)
-      ''
-    end
+    def _dump(*args); ''; end
 
-    def self._load(*); end
+    def self._load(*args); nil; end
   end
 
   def self.allowable_services

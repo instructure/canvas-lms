@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
+
 describe SIS::CSV::TermImporter do
   before { account_model }
 
@@ -65,7 +67,7 @@ describe SIS::CSV::TermImporter do
 
   it 'supports stickiness' do
     before_count = EnrollmentTerm.where.not(:sis_source_id => nil).count
-    process_csv_data(
+    importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00"
     )
@@ -75,7 +77,7 @@ describe SIS::CSV::TermImporter do
       expect(t.start_at).to eq DateTime.parse("2011-1-05 00:00:00")
       expect(t.end_at).to eq DateTime.parse("2011-4-14 00:00:00")
     end
-    process_csv_data(
+    importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Winter12,active,2010-1-05 00:00:00,2010-4-14 00:00:00"
     )
@@ -89,7 +91,7 @@ describe SIS::CSV::TermImporter do
       t.end_at = DateTime.parse("2009-4-14 00:00:00")
       t.save!
     end
-    process_csv_data(
+    importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Fall12,active,2011-1-05 00:00:00,2011-4-14 00:00:00"
     )
@@ -124,7 +126,7 @@ describe SIS::CSV::TermImporter do
 
     @course.destroy
 
-    process_csv_data(
+    importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Winter11,deleted,2011-1-05 00:00:00,2011-4-14 00:00:00",
     )

@@ -51,7 +51,7 @@ module AccountsHelper
     ].compact
   end
 
-  def dashboard_view_options
+  def dashboard_view_options(account)
     [
       [I18n.t('Card View'), 'cards'],
       [I18n.t('Recent Activity'), 'activity'],

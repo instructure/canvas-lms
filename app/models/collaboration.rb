@@ -100,9 +100,7 @@ class Collaboration < ActiveRecord::Base
 
   def initialize_document; end
 
-  def user_can_access_document_type?(_user)
-    true
-  end
+  def user_can_access_document_type?(user); true; end
 
   def authorize_user(user); end
 
@@ -110,9 +108,7 @@ class Collaboration < ActiveRecord::Base
 
   # def add_users_to_document(users_to_add); end
 
-  def config
-    raise NotImplementedError
-  end
+  def config; raise 'Not implemented'; end
 
   def parse_data; nil; end
 

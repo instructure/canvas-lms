@@ -380,8 +380,7 @@ module AttachmentFu # :nodoc:
               digest.update(line)
               read_bytes = true
             end
-          rescue
-            nil
+          rescue => e
           ensure
             io.close if file_from_path
           end

@@ -47,6 +47,8 @@ module Quizzes::QuizQuestion::AnswerSerializers
       end
 
       pairings.each_with_index do |entry, index|
+        answer_id, match_id = nil, nil
+
         unless entry.is_a?(Hash) || entry.is_a?(ActionController::Parameters)
           return rc.reject :invalid_type, "answer[#{index}]", Hash
         end
@@ -95,7 +97,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     #
     # @example output for answer #1 not matched to anything:
     #   [{ "answer_id": "1", "match_id": null }]
-    def deserialize(submission_data, full: false)
+    def deserialize(submission_data, full = false)
       answers.each_with_object([]) do |answer_record, out|
         answer_id = answer_record[:id]
         answer_key = build_answer_key(answer_id)

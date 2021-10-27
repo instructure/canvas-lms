@@ -90,7 +90,7 @@ describe "Groups API", type: :request do
     users.map { |user| user_json(user, opts) }
   end
 
-  def user_json(user, **)
+  def user_json(user, opts)
     hash = {
       'id' => user.id,
       'created_at' => user.created_at.iso8601,
@@ -365,7 +365,7 @@ describe "Groups API", type: :request do
     project_groups = @course.group_categories.build
     project_groups.name = "Course Project Groups"
     project_groups.save
-    api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id => project_groups.to_param))
+    json = api_call(:post, "/api/v1/group_categories/#{project_groups.id}/groups", @category_path_options.merge(:action => "create", :group_category_id => project_groups.to_param))
     expect(project_groups.groups.active.count).to eq 1
   end
 
@@ -402,7 +402,7 @@ describe "Groups API", type: :request do
   it "allows setting sis id on group creation" do
     @account = Account.default
     account_admin_user(account: @account)
-    @account.group_categories.create(name: 'gc1', sis_source_id: 'gcsis1')
+    project_groups = @account.group_categories.create(name: 'gc1', sis_source_id: 'gcsis1')
     json = api_call(:post, "/api/v1/group_categories/sis_group_category_id:gcsis1/groups",
                     @category_path_options.merge(action: :create,
                                                  group_category_id: 'sis_group_category_id:gcsis1',
@@ -415,10 +415,10 @@ describe "Groups API", type: :request do
     account_admin_user(account: @account)
     project_groups = @account.group_categories.create(name: 'gc1', sis_source_id: 'gcsis1')
     project_groups.groups.create!(:sis_source_id => "gsis1", :context => @account)
-    api_call(:post, "/api/v1/group_categories/sis_group_category_id:gcsis1/groups",
-             @category_path_options.merge(action: :create,
-                                          group_category_id: 'sis_group_category_id:gcsis1',
-                                          sis_group_id: 'gsis1'), {}, {}, { expected_status: 400 })
+    json = api_call(:post, "/api/v1/group_categories/sis_group_category_id:gcsis1/groups",
+                    @category_path_options.merge(action: :create,
+                                                 group_category_id: 'sis_group_category_id:gcsis1',
+                                                 sis_group_id: 'gsis1'), {}, {}, { expected_status: 400 })
   end
 
   it "does not allow a non-admin to create a group in a account" do
@@ -455,14 +455,14 @@ describe "Groups API", type: :request do
     new_attrs = {
       'is_public' => true,
     }
-    api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs)
+    json = api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs)
     @community.reload
     expect(@community.is_public).to eq true
 
     new_attrs = {
       'is_public' => false,
     }
-    api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs, {}, :expected_status => 400)
+    json = api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs, {}, :expected_status => 400)
     @community.reload
     expect(@community.is_public).to eq true
   end
@@ -474,18 +474,18 @@ describe "Groups API", type: :request do
       'is_public' => true,
       'join_level' => "parent_context_auto_join",
     }
-    api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs, {}, :expected_status => 401)
+    json = api_call(:put, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "update"), new_attrs, {}, :expected_status => 401)
   end
 
   it "allows a moderator to delete a group" do
     @user = @moderator
-    api_call(:delete, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "destroy"))
+    json = api_call(:delete, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "destroy"))
     expect(@community.reload.workflow_state).to eq 'deleted'
   end
 
   it "does not allow a member to delete a group" do
     @user = @member
-    api_call(:delete, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "destroy"), {}, {}, :expected_status => 401)
+    json = api_call(:delete, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "destroy"), {}, {}, :expected_status => 401)
   end
 
   describe "quota" do
@@ -667,38 +667,38 @@ describe "Groups API", type: :request do
     it "does not allow other workflow_state modifications" do
       @user = @moderator
       @membership = @community.group_memberships.where(user_id: @member).first
-      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
-                 :workflow_state => "requested"
-               })
+      json = api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
+                        :workflow_state => "requested"
+                      })
       expect(@membership.reload).to be_active
 
-      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
-                 :workflow_state => "invited"
-               })
+      json = api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
+                        :workflow_state => "invited"
+                      })
       expect(@membership.reload).to be_active
 
-      api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
-                 :workflow_state => "deleted"
-               })
+      json = api_call(:put, "#{@memberships_path}/#{@membership.id}", @memberships_path_options.merge(:group_id => @community.to_param, :membership_id => @membership.to_param, :action => "update"), {
+                        :workflow_state => "deleted"
+                      })
       expect(@membership.reload).to be_active
     end
 
     it "does not allow other workflow_state modifications using users/:user_id endpoint" do
       @user = @moderator
       @membership = @community.group_memberships.where(user_id: @member).first
-      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
-                 :workflow_state => "requested"
-               })
+      json = api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
+                        :workflow_state => "requested"
+                      })
       expect(@membership.reload).to be_active
 
-      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
-                 :workflow_state => "invited"
-               })
+      json = api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
+                        :workflow_state => "invited"
+                      })
       expect(@membership.reload).to be_active
 
-      api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
-                 :workflow_state => "deleted"
-               })
+      json = api_call(:put, "#{@alternate_memberships_path}/#{@user.id}", @memberships_path_options.merge(:group_id => @community.to_param, :user_id => @user.to_param, :action => "update"), {
+                        :workflow_state => "deleted"
+                      })
       expect(@membership.reload).to be_active
     end
 

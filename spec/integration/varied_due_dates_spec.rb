@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
 require 'nokogiri'
 
 describe "varied due dates" do
@@ -72,14 +74,14 @@ describe "varied due dates" do
     @course_due_date = 3.days.from_now
     @section_due_date = 5.days.from_now
 
-    course_with_teacher(:course => @course, :active_all => true)
+    teacher = course_with_teacher(:course => @course, :active_all => true)
     @teacher = user_with_pseudonym :user => @user
 
     create_coming_up_assignment
   end
 
   def create_recent_feedback(student)
-    @assignment.find_or_create_submission(student)
+    submission = @assignment.find_or_create_submission(student)
     @assignment.update_submission(student, {
                                     :comment => 'you should turn this in ...',
                                     :commenter => @teacher

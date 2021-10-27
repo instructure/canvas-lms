@@ -111,7 +111,7 @@ module Lti::Concerns
           params.require(:oembed_token),
           associated_tool.shared_secret
         )
-      rescue JSON::JWS::VerificationFailed, JSON::JWS::UnexpectedAlgorithm
+      rescue JSON::JWS::VerificationFailed, JSON::JWS::UnexpectedAlgorithm => error
         raise OembedAuthorizationError.new 'Error validating oembed_token signature'
       end
     end

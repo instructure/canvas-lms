@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require 'active_support'
+require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizRegrader::AttemptVersion do
   let(:regrade_options) do
@@ -75,9 +76,9 @@ describe Quizzes::QuizRegrader::AttemptVersion do
 
   describe "#regrade!" do
     it "assigns the model and saves the version" do
-      submission_data.length.times do
+      submission_data.each do |answer|
         answer_stub = double
-        expect(answer_stub).to receive(:regrade!).and_return(1)
+        expect(answer_stub).to receive(:regrade!).once.and_return(1)
         expect(Quizzes::QuizRegrader::Answer).to receive(:new).and_return answer_stub
       end
 

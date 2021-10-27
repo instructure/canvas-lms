@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import NotificationSettings from '@canvas/notification-preferences-course'
+import NotificationSettings from './react/index'
 import React from 'react'
 import ReactDom from 'react-dom'
 

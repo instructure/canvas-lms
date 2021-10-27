@@ -76,12 +76,12 @@ module YARD::Templates::Helpers::BaseHelper
         raise __errmsg
       end
 
-      topic, _controller = *lookup_topic(appendix.namespace.to_s)
+      topic, controller = *lookup_topic(appendix.namespace.to_s)
 
       if topic
         html_file = "#{topicize topic.first}.html"
         bookmark = "#{appendix.name.to_s.gsub(' ', '+')}-appendix"
-        link_url("#{html_file}##{bookmark}", appendix.title)
+        ret = link_url("#{html_file}##{bookmark}", appendix.title)
       else
         raise __errmsg
       end
@@ -145,7 +145,7 @@ module YARD::Templates::Helpers::HtmlHelper
       raise __errmsg
     end
 
-    topic, _controller = *lookup_topic(appendix.namespace.to_s)
+    topic, controller = *lookup_topic(appendix.namespace.to_s)
 
     unless topic
       raise __errmsg
@@ -202,6 +202,7 @@ end
 
 def generate_swagger_json
   api_resources = []
+  model_resources = []
   options[:resources].each do |name, controllers|
     view = ControllerListView.new(name, controllers)
     api_resources << view.swagger_reference

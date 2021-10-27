@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {bool, func, shape, string} from 'prop-types'
+import {bool, func, objectOf, shape, string} from 'prop-types'
 import _ from 'underscore'
 import {Button} from '@instructure/ui-buttons'
 import {Modal} from '@instructure/ui-modal'
@@ -108,7 +108,6 @@ export default class GradebookSettingsModal extends React.Component {
     onEntered: func,
     gradebookIsEditable: bool.isRequired,
     gradedLateSubmissionsExist: bool.isRequired,
-    loadCurrentViewOptions: func,
     onCourseSettingsUpdated: func.isRequired,
     onLatePolicyUpdate: func.isRequired,
     onViewOptionsUpdated: func.isRequired,
@@ -118,6 +117,16 @@ export default class GradebookSettingsModal extends React.Component {
       }),
       setAssignmentPostPolicies: func.isRequired,
       setCoursePostPolicy: func.isRequired
+    }),
+    viewOptions: shape({
+      columnSortSettings: shape({
+        criterion: string.isRequired,
+        direction: string.isRequired
+      }).isRequired,
+      showNotes: bool.isRequired,
+      showUnpublishedAssignments: bool.isRequired,
+      statusColors: objectOf(string).isRequired,
+      viewUngradedAsZero: bool.isRequired
     })
   }
 
@@ -136,8 +145,8 @@ export default class GradebookSettingsModal extends React.Component {
     },
     processingRequests: false,
     selectedTab: 'tab-panel-late',
-    viewOptions: this.props.loadCurrentViewOptions?.(),
-    viewOptionsLastSaved: this.props.loadCurrentViewOptions?.()
+    viewOptions: _.cloneDeep(this.props.viewOptions),
+    viewOptionsLastSaved: _.cloneDeep(this.props.viewOptions)
   }
 
   onFetchLatePolicySuccess = ({data}) => {
@@ -261,13 +270,12 @@ export default class GradebookSettingsModal extends React.Component {
   }
 
   open = () => {
-    this.setState(_state => ({
+    this.setState(state => ({
       isOpen: true,
       // We reset the View Options settings to their last-saved state here,
       // instead of on close, because doing the latter causes the reverted
       // settings to be briefly visible.
-      viewOptions: this.props.loadCurrentViewOptions?.(),
-      viewOptionsLastSaved: this.props.loadCurrentViewOptions?.()
+      viewOptions: _.cloneDeep(state.viewOptionsLastSaved)
     }))
   }
 
@@ -353,7 +361,7 @@ export default class GradebookSettingsModal extends React.Component {
                 </Tabs.Panel>
               )}
 
-              {this.props.loadCurrentViewOptions && (
+              {this.props.viewOptions && (
                 <Tabs.Panel
                   renderTitle={I18n.t('View Options')}
                   id="tab-panel-view-options"
@@ -383,12 +391,6 @@ export default class GradebookSettingsModal extends React.Component {
                       checked: this.state.viewOptions.showUnpublishedAssignments,
                       onChange: value => {
                         this.setViewOption('showUnpublishedAssignments', value)
-                      }
-                    }}
-                    showSeparateFirstLastNames={{
-                      checked: this.state.viewOptions.showSeparateFirstLastNames,
-                      onChange: value => {
-                        this.setViewOption('showSeparateFirstLastNames', value)
                       }
                     }}
                     viewUngradedAsZero={{

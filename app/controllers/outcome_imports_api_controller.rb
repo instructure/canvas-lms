@@ -45,11 +45,6 @@
 #           "example": 1,
 #           "type": "integer"
 #         },
-#         "learning_outcome_group_id": {
-#           "description": "The unique identifier for the group into which the outcomes will be imported to, or NULL.",
-#           "example": 1,
-#           "type": "integer"
-#         },
 #         "created_at": {
 #           "description": "The date the outcome import was created.",
 #           "example": "2013-12-01T23:59:00-06:00",
@@ -174,9 +169,7 @@ class OutcomeImportsApiController < ApplicationController
         file_obj = body_file
       end
 
-      import = OutcomeImport.create_with_attachment(
-        @context, params[:import_type], file_obj, @current_user, params[:learning_outcome_group_id]
-      )
+      import = OutcomeImport.create_with_attachment(@context, params[:import_type], file_obj, @current_user)
       import.schedule
 
       render json: outcome_import_json(import, @current_user, session)

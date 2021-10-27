@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
+
 require 'csv'
 
 describe Quizzes::QuizStatistics do
@@ -47,7 +49,7 @@ describe Quizzes::QuizStatistics do
     Quizzes::SubmissionGrader.new(qs).grade_submission
 
     # and one in progress
-    @quiz.generate_submission(@student)
+    qs = @quiz.generate_submission(@student)
 
     stats = @quiz.statistics(false)
     expect(stats[:multiple_attempts_exist]).to be_falsey

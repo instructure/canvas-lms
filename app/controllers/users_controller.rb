@@ -189,7 +189,7 @@ class UsersController < ApplicationController
                                          :user_dashboard, :toggle_hide_dashcard_color_overlays,
                                          :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
                                          :activity_stream_summary, :pandata_events_token, :dashboard_cards,
-                                         :user_graded_submissions, :show, :terminate_sessions]
+                                         :user_graded_submissions, :show]
   before_action :require_registered_user, :only => [:delete_user_service,
                                                     :create_user_service]
   before_action :reject_student_view_student, :only => [:delete_user_service,
@@ -1064,11 +1064,6 @@ class UsersController < ApplicationController
   # @argument user_id
   #   the student's ID
   #
-  # @argument observed_user_id [String]
-  #   Return missing submissions for the given observed user. Must be accompanied by course_ids[].
-  #   The user making the request must be observing the observed user in all the courses specified by
-  #   course_ids[].
-  #
   # @argument include[] [String, "planner_overrides"|"course"]
   #   "planner_overrides":: Optionally include the assignment's associated planner override, if it exists, for the current user.
   #                         These will be returned under a +planner_override+ key
@@ -1079,7 +1074,7 @@ class UsersController < ApplicationController
   #
   # @argument course_ids[] [String]
   #   Optionally restricts the list of past-due assignments to only those associated with the specified
-  #   course IDs. Required if observed_user_id is passed.
+  #   course IDs.
   #
   # @returns [Assignment]
   def missing_submissions
@@ -1087,23 +1082,14 @@ class UsersController < ApplicationController
       user = api_find(User, params[:user_id])
       return render_unauthorized_action unless @current_user && user.grants_right?(@current_user, :read)
 
-      included_course_ids = api_find_all(Course, Array(params[:course_ids])).pluck(:id)
-
-      if params.key?(:observed_user_id)
-        return render_unauthorized_action if included_course_ids.empty?
-
-        user = api_find(User, params[:observed_user_id])
-        valid_course_ids = @current_user.observer_enrollments.active.where(associated_user_id: params[:observed_user_id]).shard(@current_user).pluck(:course_id)
-        return render_unauthorized_action unless (included_course_ids - valid_course_ids).empty?
-      end
-
       submissions = []
 
       filter = Array(params[:filter])
       only_submittable = filter.include?('submittable')
 
       course_ids = user.participating_student_course_ids
-      course_ids = course_ids.select { |id| included_course_ids.include?(id) } unless included_course_ids.empty?
+      included_course_ids = Array(params[:course_ids])
+      course_ids = course_ids.select { |id| included_course_ids.include?(id.to_s) } unless included_course_ids.empty?
 
       Shard.partition_by_shard(course_ids) do |shard_course_ids|
         subs = Submission.active.preload(:assignment)
@@ -2090,25 +2076,6 @@ class UsersController < ApplicationController
     end
   end
 
-  # @API Terminate all user sessions
-  #
-  # Terminates all sessions for a user. This includes all browser-based
-  # sessions and all access tokens, including manually generated ones.
-  # The user can immediately re-authenticate to access Canvas again if
-  # they have the current credentials. All integrations will need to
-  # be re-authorized.
-  def terminate_sessions
-    user = api_find(User, params[:id])
-
-    return unless authorized_action(user, @current_user, :terminate_sessions)
-
-    now = Time.zone.now
-    user.update!(last_logged_out: now)
-    user.access_tokens.active.update_all(updated_at: now, permanent_expires_at: now)
-
-    render json: "ok"
-  end
-
   def media_download
     fetcher = MediaSourceFetcher.new(CanvasKaltura::ClientV3.new)
     extension = params[:type]
@@ -2203,7 +2170,11 @@ class UsersController < ApplicationController
       end
     else
       if !session["reported_#{@user.id}".to_sym]
-        @user.report_avatar_image!
+        if params[:context_code]
+          @context = Context.find_by_asset_string(params[:context_code]) rescue nil
+          @context = nil unless context.respond_to?(:users) && context.users.where(id: @user).first
+        end
+        @user.report_avatar_image!(@context)
       end
       session["reports_#{@user.id}".to_sym] = true
       render :json => { :reported => true }

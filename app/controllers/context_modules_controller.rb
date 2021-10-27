@@ -51,17 +51,14 @@ class ContextModulesController < ApplicationController
                            collection_cache_key(@modules), Time.zone, Digest::MD5.hexdigest([visible_assignments, @section_visibility].join("/"))]
         cache_key = cache_key_items.join('/')
         cache_key = add_menu_tools_to_cache_key(cache_key)
-        add_mastery_paths_to_cache_key(cache_key, @context, @current_user)
+        cache_key = add_mastery_paths_to_cache_key(cache_key, @context, @current_user)
       end
     end
 
     def load_modules
       @modules = @context.modules_visible_to(@current_user).limit(Setting.get('course_module_limit', '1000').to_i)
       @modules.each(&:check_for_stale_cache_after_unlocking!)
-      @collapsed_modules = ContextModuleProgression.for_user(@current_user)
-                                                   .for_modules(@modules)
-                                                   .pluck(:context_module_id, :collapsed)
-                                                   .select { |_cm_id, collapsed| collapsed }.map(&:first)
+      @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).pluck(:context_module_id, :collapsed).select { |cm_id, collapsed| !!collapsed }.map(&:first)
       @section_visibility = @context.course_section_visibility(@current_user)
       @combined_active_quizzes = combined_active_quizzes
 

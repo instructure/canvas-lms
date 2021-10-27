@@ -23,10 +23,11 @@ import {Button} from '@instructure/ui-buttons'
 import {
   IconCollectionSaveLine,
   IconComposeLine,
-  IconMoreLine,
+  IconMiniArrowDownLine,
   IconRemoveFromCollectionLine,
   IconReplyAll2Line,
   IconReplyLine,
+  IconSettingsLine,
   IconTrashLine
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
@@ -39,10 +40,12 @@ const Settings = props => (
     trigger={
       <Tooltip renderTip={I18n.t('More options')} placement="top">
         <Button
-          renderIcon={IconMoreLine}
+          renderIcon={IconSettingsLine}
           disabled={props.settingsDisabled}
           data-testid="settings"
-        />
+        >
+          <IconMiniArrowDownLine />
+        </Button>
       </Tooltip>
     }
     disabled={props.settingsDisabled}

@@ -159,7 +159,6 @@ class ApplicationController < ActionController::Base
           current_user_roles: @current_user&.roles(@domain_root_account),
           current_user_types: @current_user.try { |u| u.account_users.active.map { |au| au.role.name } },
           current_user_disabled_inbox: @current_user&.disabled_inbox?,
-          discussions_reporting: Account.site_admin.feature_enabled?(:discussions_reporting),
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           k12: k12?,
@@ -234,9 +233,9 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = [
-    :cc_in_rce_video_tray, :featured_help_links,
+    :cc_in_rce_video_tray, :featured_help_links, :rce_pretty_html_editor,
     :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons, :important_dates, :feature_flag_filters, :k5_parent_support,
-    :conferencing_in_planner, :remember_settings_tab, :word_count_in_speed_grader, :observer_picker, :lti_platform_storage
+    :conferencing_in_planner, :remember_settings_tab, :word_count_in_speed_grader, :lti_platform_storage
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :responsive_awareness, :responsive_misc, :product_tours, :files_dnd, :usage_rights_discussion_topics,
@@ -613,7 +612,7 @@ class ApplicationController < ActionController::Base
     InstStatsd::Statsd.batch(&block)
   end
 
-  def compute_http_cost
+  def compute_http_cost(&block)
     CanvasHttp.reset_cost!
     yield
   ensure
@@ -652,11 +651,6 @@ class ApplicationController < ActionController::Base
     headers['X-Canvas-Real-User-Id'] ||= @real_current_user.global_id.to_s if @real_current_user
   end
 
-  def append_to_header(header, value)
-    headers[header] = (headers[header] || "") + value
-    headers[header]
-  end
-
   # make things requested from jQuery go to the "format.js" part of the "respond_to do |format|" block
   # see http://codetunes.com/2009/01/31/rails-222-ajax-and-respond_to/ for why
   def fix_xhr_requests
@@ -688,15 +682,7 @@ class ApplicationController < ActionController::Base
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
     if !files_domain? && Setting.get('block_html_frames', 'true') == 'true' && !@embeddable
-      #
-      # Allow iframing on all vanity domains as well as the canonical one
-      #
-      equivalent_domains = []
-      unless @domain_root_account.nil?
-        equivalent_domains = HostUrl.context_hosts(@domain_root_account, request.host)
-      end
-
-      append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{equivalent_domains.join(' ')};")
+      headers['X-Frame-Options'] = 'SAMEORIGIN'
     end
     headers['Strict-Transport-Security'] = 'max-age=31536000' if request.ssl?
     RequestContext::Generator.store_request_meta(request, @context)
@@ -1120,16 +1106,16 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def set_badge_counts_for(context, user)
+  def set_badge_counts_for(context, user, enrollment = nil)
     return if @js_env && @js_env[:badge_counts].present?
     return unless context.present? && user.present?
     return unless context.respond_to?(:content_participation_counts) # just Course and Group so far
 
-    js_env(:badge_counts => badge_counts_for(context, user))
+    js_env(:badge_counts => badge_counts_for(context, user, enrollment))
   end
   helper_method :set_badge_counts_for
 
-  def badge_counts_for(context, user)
+  def badge_counts_for(context, user, enrollment = nil)
     badge_counts = {}
     ['Submission'].each do |type|
       participation_count = context.content_participation_counts
@@ -2228,7 +2214,7 @@ class ApplicationController < ActionController::Base
   end
   helper_method :verified_file_download_url
 
-  def user_content(str)
+  def user_content(str, cache_key = nil)
     return nil unless str
     return str.html_safe unless str.match(/object|embed|equation_image/)
 
@@ -2554,8 +2540,10 @@ class ApplicationController < ActionController::Base
 
   def self.batch_jobs_in_actions(opts = {})
     batch_opts = opts.delete(:batch)
-    around_action(opts) do |_controller, action|
-      Delayed::Batch.serial_batch(batch_opts || {}, &action)
+    around_action(opts) do |controller, action|
+      Delayed::Batch.serial_batch(batch_opts || {}) do
+        action.call
+      end
     end
   end
 

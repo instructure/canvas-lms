@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 RSpec.describe LatePolicyController, type: :controller do
   let(:valid_attributes) do
     {

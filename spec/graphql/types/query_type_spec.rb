@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require_relative "../graphql_spec_helper"
 
 describe Types::QueryType do
@@ -25,7 +26,7 @@ describe Types::QueryType do
     # set up courses, teacher, and enrollments
     test_course_1 = Course.create! name: "TEST"
     test_course_2 = Course.create! name: "TEST2"
-    Course.create! name: "TEST3"
+    test_course_3 = Course.create! name: "TEST3"
 
     teacher = user_factory(name: 'Coolguy Mcgee')
     test_course_1.enroll_user(teacher, 'TeacherEnrollment')

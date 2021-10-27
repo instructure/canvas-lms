@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../qti_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 
 describe Qti::AssessmentTestConverter do
   it "interprets duration strings that include units" do

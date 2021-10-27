@@ -109,7 +109,7 @@ module CanvasCache
     end
 
     # Find the closest index in HashRing with value <= the given value
-    def self.binary_search(ary, value)
+    def self.binary_search(ary, value, &block)
       upper = ary.size - 1
       lower = 0
       idx = 0

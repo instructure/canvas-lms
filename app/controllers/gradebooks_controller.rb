@@ -219,7 +219,7 @@ class GradebooksController < ApplicationController
       if context
         @rubric_context = Context.find_by_asset_string(params[:context_code])
       end
-      @rubric_associations = @rubric_context.shard.activate { Context.sorted_rubrics(@rubric_context) }
+      @rubric_associations = @rubric_context.shard.activate { Context.sorted_rubrics(@current_user, @rubric_context) }
       data = @rubric_associations.map { |ra|
         json = ra.as_json(methods: [:context_name], include: { :rubric => { :include_root => false } })
         # return shard-aware context codes
@@ -391,7 +391,6 @@ class GradebooksController < ApplicationController
 
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
-      allow_separate_first_last_names: root_account.allow_gradebook_show_first_last_names? && Account.site_admin.feature_enabled?(:gradebook_show_first_last_names),
       allow_view_ungraded_as_zero: allow_view_ungraded_as_zero?,
       attachment: last_exported_attachment,
       attachment_url: authenticated_download_url(last_exported_attachment),

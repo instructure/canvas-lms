@@ -68,7 +68,7 @@ class UserListV2
 
   include UserList::Parsing
 
-  def as_json(**)
+  def as_json(*options)
     {
       :users => @resolved_results,
       :duplicates => @duplicate_results,

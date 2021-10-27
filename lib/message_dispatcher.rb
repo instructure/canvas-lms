@@ -41,7 +41,7 @@ class MessageDispatcher < Delayed::PerformableMethod
   end
 
   # Called by delayed_job when a job fails to reschedule it.
-  def reschedule_at(_now, _num_attempts)
+  def reschedule_at(now, num_attempts)
     object.dispatch_at
   end
 
@@ -80,10 +80,12 @@ class MessageDispatcher < Delayed::PerformableMethod
       raise ActiveRecord::RecordNotFound unless messages.length == queued.length
     end
     messages.each do |message|
-      message.deliver
-    rescue
-      # this delivery failed, we'll have to make an individual job to retry
-      self.dispatch(message)
+      begin
+        message.deliver
+      rescue Exception, Timeout::Error => e
+        # this delivery failed, we'll have to make an individual job to retry
+        self.dispatch(message)
+      end
     end
   end
 end

@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/common.rb')
 
 require 'csv'
@@ -257,14 +258,14 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
                                                          :allow_multiple_enrollments => true, :section => section2)
       @student.save!
 
-      @quiz.quiz_questions.create!({
-                                     question_data: {
-                                       name: 'q1',
-                                       points_possible: 30,
-                                       question_type: 'essay_question',
-                                       question_text: 'ohai mark'
-                                     }
-                                   })
+      question = @quiz.quiz_questions.create!({
+                                                question_data: {
+                                                  name: 'q1',
+                                                  points_possible: 30,
+                                                  question_type: 'essay_question',
+                                                  question_text: 'ohai mark'
+                                                }
+                                              })
       @quiz.generate_quiz_data
       @quiz.save!
 

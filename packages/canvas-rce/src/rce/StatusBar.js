@@ -53,6 +53,7 @@ StatusBar.propTypes = {
   onKBShortcutModalOpen: func.isRequired,
   onA11yChecker: func.isRequired,
   onFullscreen: func.isRequired,
+  use_rce_pretty_html_editor: bool,
   use_rce_a11y_checker_notifications: bool,
   preferredHtmlEditor: oneOf([PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW]),
   readOnly: bool,
@@ -121,7 +122,7 @@ export default function StatusBar(props) {
     // adding a delay before including the HTML Editor description to wait the focus moves to the RCE
     // and prevent JAWS from reading the aria-describedby element when switching back to RCE view
     const timerid = setTimeout(() => {
-      setIncludeEdtrDesc(!isHtmlView())
+      setIncludeEdtrDesc(props.use_rce_pretty_html_editor && !isHtmlView())
     }, 100)
 
     return () => clearTimeout(timerid)
@@ -129,10 +130,11 @@ export default function StatusBar(props) {
 
   function preferredHtmlEditor() {
     if (props.preferredHtmlEditor) return props.preferredHtmlEditor
-    return PRETTY_HTML_EDITOR_VIEW
+    return props.use_rce_pretty_html_editor ? PRETTY_HTML_EDITOR_VIEW : RAW_HTML_EDITOR_VIEW
   }
 
   function getHtmlEditorView(event) {
+    if (!props.use_rce_pretty_html_editor) return RAW_HTML_EDITOR_VIEW
     if (!event.shiftKey) return preferredHtmlEditor()
     return preferredHtmlEditor() === RAW_HTML_EDITOR_VIEW
       ? PRETTY_HTML_EDITOR_VIEW
@@ -205,6 +207,8 @@ export default function StatusBar(props) {
   }
 
   function renderHtmlEditorMessage() {
+    if (!props.use_rce_pretty_html_editor) return null
+
     const message =
       props.editorView === PRETTY_HTML_EDITOR_VIEW
         ? formatMessage(
@@ -293,7 +297,9 @@ export default function StatusBar(props) {
   function renderToggleHtml() {
     const toggleToHtml = formatMessage('Switch to the html editor')
     const toggleToRich = formatMessage('Switch to the rich text editor')
-    const toggleToHtmlTip = formatMessage('Click or shift-click for the html editor.')
+    const toggleToHtmlTip = props.use_rce_pretty_html_editor
+      ? formatMessage('Click or shift-click for the html editor.')
+      : toggleToHtml
     const descText = isHtmlView() ? toggleToRich : toggleToHtml
     const titleText = isHtmlView() ? toggleToRich : toggleToHtmlTip
 
@@ -308,6 +314,7 @@ export default function StatusBar(props) {
             }}
             onKeyUp={event => {
               if (
+                props.use_rce_pretty_html_editor &&
                 props.editorView === WYSIWYG_VIEW &&
                 event.shiftKey &&
                 event.keyCode === 79

@@ -36,7 +36,6 @@ export const getContext = isMobileView => {
   const treeBrowserRootGroupId = ROOT_GROUP_ID
   const treeBrowserAccountGroupId = ACCOUNT_GROUP_ID
   const rootIds = [globalRootId, treeBrowserAccountGroupId, treeBrowserRootGroupId]
-  const individualOutcomeRatingAndCalculationFF = ENV.INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION
 
   return {
     env: {
@@ -52,8 +51,7 @@ export const getContext = isMobileView => {
       globalRootId,
       treeBrowserRootGroupId,
       treeBrowserAccountGroupId,
-      rootIds,
-      individualOutcomeRatingAndCalculationFF
+      rootIds
     }
   }
 }

@@ -19,6 +19,7 @@
 #
 
 require 'switchman/r_spec_helper'
+require_relative 'spec_helper'
 require_relative 'support/onceler/sharding'
 
 def has_sharding?

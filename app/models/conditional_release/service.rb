@@ -131,7 +131,7 @@ module ConditionalRelease
         }
       end
 
-      def rules_data(course, student, _session = nil)
+      def rules_data(course, student, session = {})
         return [] if course.blank? || student.blank?
 
         rules_data =

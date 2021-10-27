@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
 require 'sharding_spec_helper'
 require_dependency "lti/substitutions_helper"
 
@@ -423,7 +424,7 @@ module Lti
 
       it 'is inactive if the course is concluded' do
         set_up_persistance!
-        student_in_course(user: user, course: course, active_enrollment: true)
+        enrollment = student_in_course(user: user, course: course, active_enrollment: true)
         course.complete
 
         expect(subject.enrollment_state).to eq 'inactive'

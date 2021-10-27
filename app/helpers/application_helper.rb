@@ -107,20 +107,22 @@ module ApplicationHelper
       name = name.sub(/context/, context_name)
       opts.unshift context.id
       opts.push({}) unless opts[-1].is_a?(Hash)
-      begin
-        opts[-1].delete :ajax
-      rescue
-        nil
-      end
+      ajax =
+        begin
+          opts[-1].delete :ajax
+        rescue StandardError
+          nil
+        end
       opts[-1][:only_path] = true unless opts[-1][:only_path] == false
       res = self.send name, *opts
     elsif opts[0].is_a? Hash
       opts = opts[0]
-      begin
-        opts[0].delete :ajax
-      rescue
-        nil
-      end
+      ajax =
+        begin
+          opts[0].delete :ajax
+        rescue StandardError
+          nil
+        end
       opts[:only_path] = true
       opts["#{context_name}_id"] = context.id
       res = self.url_for opts
@@ -1144,7 +1146,7 @@ module ApplicationHelper
       csp_context
       .csp_whitelisted_domains(request, include_files: true, include_tools: true)
       .join(' ')
-    headers[csp_header] = "frame-src 'self' #{domains}#{csp_report_uri}; "
+    headers[csp_header] = "frame-src 'self' #{domains}#{csp_report_uri}"
   end
 
   def add_csp_for_file
@@ -1172,7 +1174,7 @@ module ApplicationHelper
       object_domains = %w['self'] + script_domains
       script_domains = %w['self' 'unsafe-eval' 'unsafe-inline'] + script_domains
     end
-    "frame-src #{frame_domains.join(' ')}; script-src #{script_domains.join(' ')}; object-src #{object_domains.join(' ')}; "
+    "frame-src #{frame_domains.join(' ')}; script-src #{script_domains.join(' ')}; object-src #{object_domains.join(' ')}"
   end
 
   # Returns true if the current_path starts with the given value

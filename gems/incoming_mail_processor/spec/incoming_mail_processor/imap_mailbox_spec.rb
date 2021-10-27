@@ -223,7 +223,7 @@ describe IncomingMailProcessor::ImapMailbox do
       exception_propegated = false
       begin
         @mailbox.disconnect
-      rescue SyntaxError
+      rescue SyntaxError => e
         exception_propegated = true
       end
       expect(exception_propegated).to be_truthy

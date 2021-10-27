@@ -44,7 +44,9 @@ class BeApproximately
 
   def array_approximates(target, expected)
     target.size == expected.size &&
-      target.each.with_index.all? { |_value, index| approximates?(target[index], expected[index]) }
+      target.map.with_index.all? { |value, index|
+        approximates?(target[index], expected[index])
+      }
   end
 
   def hash_approximates(target, expected)

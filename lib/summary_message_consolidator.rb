@@ -23,7 +23,7 @@ class SummaryMessageConsolidator
     SummaryMessageConsolidator.new.process
   end
 
-  def initialize
+  def initialize(n = nil)
     @logger = Rails.logger
   end
 

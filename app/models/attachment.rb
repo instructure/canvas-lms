@@ -348,6 +348,9 @@ class Attachment < ActiveRecord::Base
     dup.write_attribute(:filename, self.filename) unless dup.read_attribute(:filename) || dup.root_attachment_id?
     dup.migration_id = options[:migration_id]
     dup.mark_as_importing!(options[:migration]) if options[:migration]
+    if context.respond_to?(:log_merge_result)
+      context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
+    end
     dup.shard.activate do
       if Attachment.s3_storage? && !instfs_hosted? && context.try(:root_account) && self.namespace != context.root_account.file_namespace
         dup.save_without_broadcasting!
@@ -1013,7 +1016,7 @@ class Attachment < ActiveRecord::Base
   def thumbnail_for_size(geometry)
     if self.class.allows_thumbnails_of_size?(geometry)
       to_use = thumbnails.loaded? ? thumbnails.detect { |t| t.thumbnail == geometry } : thumbnails.where(thumbnail: geometry).first
-      to_use || create_dynamic_thumbnail(geometry)
+      to_use ||= create_dynamic_thumbnail(geometry)
     end
   end
 
@@ -1805,8 +1808,8 @@ class Attachment < ActiveRecord::Base
     res
   end
 
-  def mimetype(_filename = nil)
-    res = Attachment.mimetype(filename) # use the object's filename, not the passed in filename
+  def mimetype(fn = nil)
+    res = Attachment.mimetype(filename)
     res = File.mime_type?(self.uploaded_data) if (!res || res == 'unknown/unknown') && self.uploaded_data
     res ||= "unknown/unknown"
     res
@@ -1919,6 +1922,7 @@ class Attachment < ActiveRecord::Base
 
     return filename if attempts <= 1 && block.call(filename)
 
+    new_name = filename
     addition = attempts || 1
     dir = File.dirname(filename)
     dir = dir == "." ? "" : "#{dir}/"
@@ -1933,12 +1937,6 @@ class Attachment < ActiveRecord::Base
       return random_backup_name if addition >= 8
     end
     new_name
-  end
-
-  def self.shorten_filename(filename)
-    return filename.truncate(175, omission: "...#{File.extname(filename)}") if filename.length > 180
-
-    filename
   end
 
   # the list of thumbnail sizes to be pre-generated automatically

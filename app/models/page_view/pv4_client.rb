@@ -63,7 +63,7 @@ class PageView
 
         PageView.from_attributes(pv)
       end
-    rescue Net::ReadTimeout
+    rescue Net::ReadTimeout => e
       raise Pv4Timeout, "failed to load page view history due to service timeout"
     end
 

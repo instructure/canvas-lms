@@ -34,7 +34,6 @@ const defaultProps = {
   courseId: COURSE.id,
   excludeWeekends: PRIMARY_PLAN.exclude_weekends,
   pacePlan: PRIMARY_PLAN,
-  planPublishing: false,
   loadLatestPlanByContext,
   setEditingBlackoutDates,
   showLoadingOverlay,
@@ -68,7 +67,7 @@ describe('Settings', () => {
     act(() => settingsButton.click())
 
     const skipWeekendsToggle = screen.getByRole('checkbox', {name: 'Skip Weekends'})
-    expect(skipWeekendsToggle).not.toBeDisabled()
+    expect(skipWeekendsToggle).not.toHaveAttribute('disabled')
     act(() => skipWeekendsToggle.click())
     expect(toggleExcludeWeekends).toHaveBeenCalled()
 
@@ -76,18 +75,9 @@ describe('Settings', () => {
     // const hardEndDatesToggle = screen.getByRole('checkbox', {
     //   name: 'Require Completion by Specified End Date'
     // })
-    // expect(hardEndDatesToggle).not.toBeDisabled
+    // expect(hardEndDatesToggle).not.toHaveAttribute('disabled')
     // act(() => hardEndDatesToggle.click())
     // expect(toggleHardEndDates).toHaveBeenCalled()
-  })
-
-  it('disables all settings while publishing', () => {
-    const {getByRole} = render(<Settings {...defaultProps} planPublishing />)
-    const settingsButton = getByRole('button', {name: 'Modify Settings'})
-    act(() => settingsButton.click())
-
-    const skipWeekendsToggle = screen.getByRole('checkbox', {name: 'Skip Weekends'})
-    expect(skipWeekendsToggle).toBeDisabled()
   })
 
   // Skipped since we're not implementing this feature yet
@@ -100,7 +90,7 @@ describe('Settings', () => {
     const hardEndDatesToggle = screen.getByRole('checkbox', {
       name: 'Require Completion by Specified End Date'
     })
-    expect(hardEndDatesToggle).toBeDisabled()
+    expect(hardEndDatesToggle).toHaveAttribute('disabled')
   })
 
   // Skipped since we're not implementing this feature yet

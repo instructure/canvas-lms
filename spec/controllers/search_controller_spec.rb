@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
 describe SearchController do
   describe "GET 'recipients'" do
     it "assigns variables" do
@@ -53,7 +55,7 @@ describe SearchController do
       expect(response.body).not_to include('bob')
     end
 
-    it "optionally shows users who haven't finished registration" do
+    it "optionallies show users who haven't finished registration" do
       course_with_student_logged_in(:active_all => true)
       @user.update_attribute(:name, 'billy')
       other = User.create(:name => 'bob')

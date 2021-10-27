@@ -163,14 +163,14 @@ describe('ViewOptionsTabPanel', () => {
         const {getByRole} = renderPanel({
           viewUngradedAsZero: {allowed: true, checked: true, onChange: () => {}}
         })
-        expect(getByRole('checkbox', {name: 'View ungraded as 0'})).toBeChecked()
+        expect(getByRole('checkbox', {name: 'Preview ungraded as 0'})).toBeChecked()
       })
 
       it('is unchecked if .checked is false', () => {
         const {getByRole} = renderPanel({
           viewUngradedAsZero: {allowed: true, checked: false, onChange: () => {}}
         })
-        expect(getByRole('checkbox', {name: 'View ungraded as 0'})).not.toBeChecked()
+        expect(getByRole('checkbox', {name: 'Preview ungraded as 0'})).not.toBeChecked()
       })
 
       it('calls .onChange when the user toggles the item', () => {
@@ -179,7 +179,7 @@ describe('ViewOptionsTabPanel', () => {
           viewUngradedAsZero: {allowed: true, checked: false, onChange}
         })
 
-        fireEvent.click(getByRole('checkbox', {name: 'View ungraded as 0'}))
+        fireEvent.click(getByRole('checkbox', {name: 'Preview ungraded as 0'}))
         expect(onChange).toHaveBeenCalledWith(true)
       })
     })
@@ -188,7 +188,7 @@ describe('ViewOptionsTabPanel', () => {
       const {queryByRole} = renderPanel({
         viewUngradedAsZero: {allowed: false, checked: true, onChange: () => {}}
       })
-      expect(queryByRole('checkbox', {name: 'View ungraded as 0'})).not.toBeInTheDocument()
+      expect(queryByRole('checkbox', {name: 'Preview ungraded as 0'})).not.toBeInTheDocument()
     })
   })
 

@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
+
 describe SIS::CSV::GroupCategoryImporter do
   before(:once) do
     account_model
@@ -48,7 +50,7 @@ describe SIS::CSV::GroupCategoryImporter do
   end
 
   it "ensures group_category_id is unique" do
-    process_csv_data(
+    importer = process_csv_data(
       "group_category_id,category_name,status",
       "gc1,Some Category,active",
       "gc1,Other Category,active",

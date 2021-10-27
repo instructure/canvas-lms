@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+
 describe 'Submissions::ShowHelper' do
   describe 'included in a controller', type: :controller do
     controller do

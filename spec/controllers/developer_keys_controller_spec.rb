@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+
 describe DeveloperKeysController do
   let(:test_domain_root_account) { Account.create! }
   let(:site_admin_key) { DeveloperKey.create!(name: 'Site Admin Key', visible: false) }
@@ -70,7 +72,7 @@ describe DeveloperKeysController do
           Account.site_admin.enable_feature!(:site_admin_keys_only)
 
           site_admin_key = DeveloperKey.create!
-          DeveloperKey.create!(account: Account.default)
+          root_account_key = DeveloperKey.create!(account: Account.default)
 
           get 'index', params: { account_id: Account.site_admin.id }, format: :json
 

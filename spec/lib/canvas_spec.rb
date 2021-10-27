@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
+
 describe Canvas do
   describe ".timeout_protection" do
     it "wraps the block in a timeout" do
@@ -211,7 +213,7 @@ describe Canvas do
     it "infers the real user if the right pseudonym exists" do
       root_account = Account.site_admin
       user = user_model
-      pseudonym_model(user: user, account: root_account, unique_id: "someuser")
+      pseudonym = pseudonym_model(user: user, account: root_account, unique_id: "someuser")
       expect(Canvas.infer_user("someuser")).to eq(user)
     end
   end

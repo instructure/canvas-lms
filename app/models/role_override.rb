@@ -1594,19 +1594,19 @@ class RoleOverride < ActiveRecord::Base
 
   # permissions that apply to concluded courses/enrollments
   def self.concluded_permission_types
-    self.permissions.select { |_k, p| p[:applies_to_concluded] }
+    self.permissions.select { |k, p| !!p[:applies_to_concluded] }
   end
 
   def self.manageable_permissions(context, base_role_type = nil)
     permissions = self.permissions.dup
-    permissions.reject! { |_k, p| p[:account_only] == :site_admin } unless context.site_admin?
-    permissions.reject! { |_k, p| p[:account_only] == :root } unless context.root_account?
-    permissions.reject! { |_k, p| p[:available_to].exclude?(base_role_type) } unless base_role_type.nil?
-    permissions.reject! { |_k, p| p[:account_allows] && !p[:account_allows].call(context) }
-    permissions.reject! do |_k, p|
+    permissions.reject! { |k, p| p[:account_only] == :site_admin } unless context.site_admin?
+    permissions.reject! { |k, p| p[:account_only] == :root } unless context.root_account?
+    permissions.reject! { |k, p| !p[:available_to].include?(base_role_type) } unless base_role_type.nil?
+    permissions.reject! { |k, p| p[:account_allows] && !p[:account_allows].call(context) }
+    permissions.reject! { |k, p|
       p[:enabled_for_plugin] &&
         !((plugin = Canvas::Plugin.find(p[:enabled_for_plugin])) && plugin.enabled?)
-    end
+    }
     permissions
   end
 
@@ -1620,6 +1620,21 @@ class RoleOverride < ActiveRecord::Base
         label: p.key?(label_v2) ? p[:label_v2].call : p[:label].call
       }
     end
+  end
+
+  def self.css_class_for(context, permission, role, role_context = :role_account)
+    generated_permission = self.permission_for(context, permission, role, role_context = :role_account)
+
+    css = []
+    if generated_permission[:readonly]
+      css << "six-checkbox-disabled-#{generated_permission[:enabled] ? 'checked' : 'unchecked'}"
+    else
+      if generated_permission[:explicit]
+        css << "six-checkbox-default-#{generated_permission[:prior_default] ? 'checked' : 'unchecked'}"
+      end
+      css << "six-checkbox#{generated_permission[:explicit] ? '' : '-default'}-#{generated_permission[:enabled] ? 'checked' : 'unchecked'}"
+    end
+    css.join(' ')
   end
 
   def self.readonly_for(context, permission, role, role_context = :role_account)

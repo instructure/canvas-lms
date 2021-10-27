@@ -17,12 +17,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../qti_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 if Qti.migration_executable
   describe "QTI 2.1 zip" do
     before(:once) do
       archive_file_path = File.join(BASE_FIXTURE_DIR, 'qti', 'qti_2_1.zip')
       unzipped_file_path = create_temp_dir!
+      export_folder = create_temp_dir!
       exporter = Qti::Converter.new(:export_archive_path => archive_file_path, :base_download_dir => unzipped_file_path)
       exporter.export
       @course_data = exporter.course.with_indifferent_access

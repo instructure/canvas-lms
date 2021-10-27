@@ -114,7 +114,7 @@ module AssignmentUtil
                     end
     end
 
-    def apply
+    def apply(&block)
       submissions.find_each do |submission|
         unless seen_assignment_recently?(submission.student)
           yield assignment: assignment, submission: submission

@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 describe DataFixup::MigrateHomeroomSettingsToColumns do
   before :once do
     @c1 = course_factory

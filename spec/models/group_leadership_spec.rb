@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'spec_helper'
+
 describe GroupLeadership do
   describe "member_changed_event" do
     before(:once) do
@@ -42,7 +44,7 @@ describe GroupLeadership do
         leader = user_model
         follower = user_model
         leader_membership = @group.group_memberships.create!(:user => leader, :workflow_state => 'accepted')
-        @group.group_memberships.create!(:user => follower, :workflow_state => 'accepted')
+        follower_membership = @group.group_memberships.create!(:user => follower, :workflow_state => 'accepted')
         expect(@group.reload.leader).to eq leader
         leader_membership.destroy
         expect(@group.reload.leader).to eq follower

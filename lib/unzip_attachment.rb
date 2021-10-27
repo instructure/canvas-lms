@@ -101,7 +101,7 @@ class UnzipAttachment
 
         folder_path_array = path_elements_for(@context_files_folder.full_name)
         entry_path_array = path_elements_for(entry.name)
-        entry_path_array.pop
+        filename = entry_path_array.pop
 
         folder_path_array += entry_path_array
         folder_name = folder_path_array.join('/')
@@ -112,7 +112,7 @@ class UnzipAttachment
         # Hyphenate the path.  So, /some/file/path becomes some-file-path
         # Since Tempfile guarantees that the names are unique, we don't
         # have to worry about what this name actually is.
-        Tempfile.open do |f|
+        Tempfile.open(filename) do |f|
           begin
             file_size = 0
             md5 = entry.extract(f.path, true) do |bytes|
@@ -197,7 +197,7 @@ class UnzipAttachment
   # Creates a title-ized name from a path.
   # So, display_name(/tmp/foo/bar_baz) generates 'Bar baz'
   def display_name(path)
-    File.split(path).last
+    display_name = File.split(path).last
   end
 
   # Finds the folder in the database, creating the path if necessary
@@ -230,6 +230,7 @@ class UnzipAttachment
     @folders = nil if reset
     return @folders if @folders
 
+    root_folders = Folder.root_folders(self.context)
     @folders = OpenStruct.new(:root_directory => self.context_files_folder)
   end
 end

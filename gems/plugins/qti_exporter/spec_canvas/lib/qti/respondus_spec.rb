@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../qti_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 if Qti.migration_executable
   describe "Converting respondus QTI" do
     it "converts multiple choice" do
@@ -28,7 +28,7 @@ if Qti.migration_executable
     end
 
     it "finds correct answer for multiple choice with zero point weights" do
-      hash = get_question_hash(RESPONDUS_FIXTURE_DIR, 'zero_point_mc', delete_answer_ids: false, flavor: Qti::Flavors::RESPONDUS)
+      hash = get_question_hash(RESPONDUS_FIXTURE_DIR, 'zero_point_mc', false, :flavor => Qti::Flavors::RESPONDUS)
       expect(hash[:import_error]).to eq nil
       expect(hash[:answers].first[:weight]).to eq 100
     end

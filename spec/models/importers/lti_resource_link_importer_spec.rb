@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'spec_helper'
+
 describe Importers::LtiResourceLinkImporter do
   subject { described_class.process_migration(hash, migration) }
 

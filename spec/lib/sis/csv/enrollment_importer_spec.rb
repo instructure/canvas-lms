@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
+
 describe SIS::CSV::EnrollmentImporter do
   before { account_model }
 
@@ -628,7 +630,7 @@ describe SIS::CSV::EnrollmentImporter do
       batch = Account.default.sis_batches.create!
       csv = double(root_account: Account.default, batch: batch, :[] => nil)
       importer = SIS::CSV::EnrollmentImporter.new(csv)
-      importer.persist_errors(csv, ['a string error message'])
+      importer.persist_errors(csv, ['a string error message'], batch)
       expect(batch.sis_batch_errors.count).to eq(1)
     end
   end
@@ -856,7 +858,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(work).to receive(:root_account_from_id).once.and_return(nil)
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
     # the enrollments
-    process_csv_data_cleanly(
+    importer = process_csv_data_cleanly(
       "course_id,root_account,user_id,role,status",
       "test_1,account2,user_1,teacher,active",
     )

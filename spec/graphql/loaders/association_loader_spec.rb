@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+
 describe Loaders::AssociationLoader do
   before(:once) do
     @c1 = Course.create! name: "asdf"
@@ -31,7 +33,7 @@ describe Loaders::AssociationLoader do
 
   around(:each) do |example|
     @query_count = 0
-    subscription = ActiveSupport::Notifications.subscribe('sql.active_record') do
+    subscription = ActiveSupport::Notifications.subscribe('sql.active_record') do |_, _, _, _, data|
       @query_count += 1
     end
 

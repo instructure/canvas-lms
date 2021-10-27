@@ -23,41 +23,41 @@ module AddressBook
   # shapes but no data -- while being separate from the original
   # MessageableUser strategy.
   class Empty < AddressBook::Base
-    def known_users(_users, **)
+    def known_users(users, options = {})
       []
     end
 
-    def common_courses(_user)
+    def common_courses(user)
       {}
     end
 
-    def common_groups(_user)
+    def common_groups(user)
       {}
     end
 
-    def known_in_context(_context)
+    def known_in_context(context)
       []
     end
 
-    def count_in_contexts(_contexts)
+    def count_in_contexts(contexts)
       {}
     end
 
     module Bookmarker
-      def self.bookmark_for(_user)
+      def self.bookmark_for(user)
         'unused'
       end
 
-      def self.validate(_bookmark)
+      def self.validate(bookmark)
         true
       end
     end
 
-    def search_users(**)
+    def search_users(options = {})
       BookmarkedCollection.build(Bookmarker) { |pager| pager }
     end
 
-    def preload_users(_users)
+    def preload_users(users)
       []
     end
 

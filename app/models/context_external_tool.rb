@@ -333,7 +333,7 @@ class ContextExternalTool < ActiveRecord::Base
     return if self.vendor_help_link.blank?
 
     begin
-      _value, uri = CanvasHttp.validate_url(self.vendor_help_link)
+      value, uri = CanvasHttp.validate_url(self.vendor_help_link)
       self.vendor_help_link = uri.to_s
     rescue URI::Error, ArgumentError
       self.vendor_help_link = nil
@@ -947,7 +947,7 @@ class ContextExternalTool < ActiveRecord::Base
     if !context.is_a?(Account) && context.respond_to?(:context_external_tools)
       tools += context.context_external_tools.having_setting(type.to_s)
     end
-    tools + ContextExternalTool.having_setting(type.to_s).where(context_type: 'Account', context_id: context.account_chain_ids)
+    tools += ContextExternalTool.having_setting(type.to_s).where(context_type: 'Account', context_id: context.account_chain_ids)
   end
 
   def self.serialization_excludes; [:shared_secret, :settings]; end
@@ -1174,7 +1174,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def self.key_for_granted_permissions(granted_permissions)
-    Digest::MD5.hexdigest(granted_permissions.sort.flatten.join(",")) # for consistency's sake
+    Digest::MD5.hexdigest(granted_permissions.sort_by { |k, v| k.to_s }.flatten.join(",")) # for consistency's sake
   end
 
   # returns a key composed of the updated_at times for all the tools visible to someone with the granted_permissions

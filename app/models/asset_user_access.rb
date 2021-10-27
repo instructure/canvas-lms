@@ -179,7 +179,7 @@ class AssetUserAccess < ActiveRecord::Base
     unless @asset
       return nil unless asset_code
 
-      asset_code, = self.asset_code.split(":").reverse
+      asset_code, general = self.asset_code.split(":").reverse
       @asset = Context.find_asset_by_asset_string(asset_code, context)
       @asset ||= (match = asset_code.match(/enrollment_(\d+)/)) && Enrollment.where(:id => match[1]).first
     end
@@ -284,8 +284,9 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def self.infer_asset(code)
-    asset_code, = code.split(":").reverse
-    Context.find_asset_by_asset_string(asset_code)
+    asset_code, general = code.split(":").reverse
+    asset = Context.find_asset_by_asset_string(asset_code)
+    asset
   end
 
   # For Quizzes, we want the view score not to include the participation score

@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require File.expand_path('../spec_helper', File.dirname(__FILE__))
+
 module ActiveRecord
   describe Base do
     describe '.wildcard' do
@@ -94,11 +96,11 @@ module ActiveRecord
 
         it "doesnt obfuscate the error when it dies in a transaction" do
           account = Account.create!
-          account.courses.create!
+          course = account.courses.create!
           User.create!
           expect do
             ActiveRecord::Base.transaction do
-              User.all.find_each do
+              User.all.find_each do |batch|
                 # to force a foreign key error
                 Account.where(id: account).delete_all
               end
@@ -120,7 +122,7 @@ module ActiveRecord
         it "uses a temp table when you select without an id" do
           expect do
             User.create!
-            User.select(:name).find_in_batches do
+            User.select(:name).find_in_batches do |batch|
               User.connection.select_value("SELECT COUNT(*) FROM users_in_batches_temp_table_#{User.select(:name).to_sql.hash.abs.to_s(36)}")
             end
           end.to_not raise_error
@@ -180,11 +182,11 @@ module ActiveRecord
 
         it "doesnt obfuscate the error when it dies in a transaction" do
           account = Account.create!
-          account.courses.create!
+          course = account.courses.create!
           User.create!
           expect do
             ActiveRecord::Base.transaction do
-              User.all.find_in_batches(strategy: :temp_table) do
+              User.all.find_in_batches(strategy: :temp_table) do |batch|
                 # to force a foreign key error
                 Account.where(id: account).delete_all
               end
@@ -445,7 +447,7 @@ module ActiveRecord
         fk_name = ActiveRecord::Migration.find_foreign_key(:notatable, :users)
         other_fk_name = ActiveRecord::Migration.find_foreign_key(:users, :notatable)
         expect(fk_name).to be_nil
-        expect(other_fk_name).to be_nil
+        expect(fk_name).to be_nil
       end
 
       it 'actually renames foreign keys' do

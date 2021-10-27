@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+
 describe Loaders::SISIDLoader do
   it "works" do
     course_with_student(active_all: true)

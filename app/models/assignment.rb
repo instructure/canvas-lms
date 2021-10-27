@@ -413,7 +413,6 @@ class Assignment < ActiveRecord::Base
   def secure_params
     body = {}
     body[:lti_assignment_id] = self.lti_context_id || SecureRandom.uuid
-    body[:lti_assignment_description] = self.description
     Canvas::Security.create_jwt(body)
   end
 
@@ -1828,7 +1827,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def filter_attributes_for_user(hash, user, _session)
+  def filter_attributes_for_user(hash, user, session)
     if (lock_info = self.locked_for?(user, :check_policies => true))
       hash.delete('description') unless include_description?(user, lock_info)
       hash['lock_info'] = lock_info

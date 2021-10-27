@@ -131,7 +131,7 @@ class ReleaseNotesController < ApplicationController
       end
     end
 
-    all_notes.sort_by { |note| note.show_ats[release_note_env] }.reverse!.first(latest_limit)
+    notes = all_notes.sort_by { |note| note.show_ats[release_note_env] }.reverse!.first(latest_limit)
   end
 
   def last_seen_release_note

@@ -46,7 +46,7 @@ module Factories
   end
 
   def course_model(opts = {})
-    opts.delete :reusable
+    allow_reusable = opts.delete :reusable
     @course = factory_with_protected_attributes(Course, course_valid_attributes.merge(opts))
     @teacher = user_model
     e = @course.enroll_teacher(@teacher)

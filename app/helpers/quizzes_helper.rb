@@ -23,7 +23,7 @@ require 'nokogiri'
 module QuizzesHelper
   RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/
 
-  def needs_unpublished_warning?(quiz = @quiz)
+  def needs_unpublished_warning?(quiz = @quiz, user = @current_user)
     return false unless can_publish(quiz)
 
     !quiz.available? || quiz.unpublished_changes?
@@ -462,7 +462,7 @@ module QuizzesHelper
     end
 
     if answer_list.empty?
-      answers.delete_if { |k, _v| !k.match?(/^question_#{hash_get(question, :id)}/) }
+      answers.delete_if { |k, v| !k.match(/^question_#{hash_get(question, :id)}/) }
       answers.each { |k, v| res.sub!(/\{\{#{k}\}\}/, h(v)) }
       res.gsub!(/\{\{question_[^}]+\}\}/, "")
     end
@@ -663,7 +663,7 @@ module QuizzesHelper
     end
 
     titles = titles.map { |title| h(title) }
-    "title=\"#{titles.join(' ')}\"".html_safe if titles.length > 0 # rubocop:disable Rails/OutputSafety
+    title = "title=\"#{titles.join(' ')}\"".html_safe if titles.length > 0
   end
 
   def matching_answer_title(item_text, did_select_answer, selected_answer_text, is_correct_answer, correct_answer_text, show_correct_answers)
@@ -688,7 +688,7 @@ module QuizzesHelper
     end
 
     titles = titles.map { |title| h(title) }
-    "title=\"#{titles.join(' ')}\"".html_safe if titles.length > 0 # rubocop:disable Rails/OutputSafety
+    title = "title=\"#{titles.join(' ')}\"".html_safe if titles.length > 0
   end
 
   def show_correct_answers?

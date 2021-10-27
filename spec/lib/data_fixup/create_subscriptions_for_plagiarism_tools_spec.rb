@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+require 'spec_helper'
 require 'lti2_spec_helper'
 
 describe DataFixup::CreateSubscriptionsForPlagiarismTools do
@@ -120,7 +121,7 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
     end
 
     it 'creates a subscription if there are two tools, but one has a different SubmissionEvent endpoint' do
-      Lti::ToolProxy.create!(
+      tool_proxy2 = Lti::ToolProxy.create!(
         raw_data: {
           'enabled_capability' => [placement],
           'tool_profile' => { 'service_offered' => [{ 'endpoint' => 'yoyo.ma', '@id' => '#vnd.Canvas.SubmissionEvent' }] },
