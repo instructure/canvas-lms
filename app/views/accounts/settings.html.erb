@@ -830,20 +830,24 @@ acknowledge that you have read and agreed to the
           <fieldset>
             <h2 class="screenreader-only"><%= t('Who Can Create New Courses') %></h2>
             <legend><%= t(:create_courses_title, "Who Can Create New Courses") %></legend>
-            <div style="font-size: 0.8em;"><%= t(:create_courses_description, "(Account Administrators can always create courses)") %></div>
-            <%= f.fields_for :settings do |settings| %>
-              <div>
-                <%= settings.check_box :teachers_can_create_courses, :checked => @account.teachers_can_create_courses? %>
-                <%= settings.label :teachers_can_create_courses, :en => "Teachers" %>
-              </div>
-              <div>
-                <%= settings.check_box :students_can_create_courses, :checked => @account.students_can_create_courses? %>
-                <%= settings.label :students_can_create_courses, :en => "Students" %>
-              </div>
-              <div>
-                <%= settings.check_box :no_enrollments_can_create_courses, :checked => @account.no_enrollments_can_create_courses? %>
-                <%= settings.label :no_enrollments_can_create_courses, :en => "Users with no enrollments" %>
-              </div>
+            <% if @account.feature_enabled?(:create_course_subaccount_picker) %>
+              <div id="course_creation_settings"></div>
+            <% else %>
+              <div style="font-size: 0.8em;"><%= t(:create_courses_description, "(Account Administrators can always create courses)") %></div>
+              <%= f.fields_for :settings do |settings| %>
+                <div>
+                  <%= settings.check_box :teachers_can_create_courses, :checked => @account.teachers_can_create_courses? %>
+                  <%= settings.label :teachers_can_create_courses, :en => "Teachers" %>
+                </div>
+                <div>
+                  <%= settings.check_box :students_can_create_courses, :checked => @account.students_can_create_courses? %>
+                  <%= settings.label :students_can_create_courses, :en => "Students" %>
+                </div>
+                <div>
+                  <%= settings.check_box :no_enrollments_can_create_courses, :checked => @account.no_enrollments_can_create_courses? %>
+                  <%= settings.label :no_enrollments_can_create_courses, :en => "Users with no enrollments" %>
+                </div>
+              <% end %>
             <% end %>
           </fieldset>
         <% end %>
