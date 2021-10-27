@@ -131,7 +131,7 @@ export function groupGranularPermissionsInRole(role) {
 
   if (ENV.ACCOUNT_PERMISSIONS) {
     accountPermissionsByName = ENV.ACCOUNT_PERMISSIONS.find(
-      el => el.group_name === 'Account Permissions'
+      el => el.context_type && el.context_type === 'Account'
     ).group_permissions.map(perm => perm.permission_name)
   }
 
