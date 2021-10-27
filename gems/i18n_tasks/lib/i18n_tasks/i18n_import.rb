@@ -34,7 +34,7 @@ module I18nTasks
       @new_translations = new_translations[language].flatten_keys
     end
 
-    def compare_translations(&warning)
+    def compare_translations
       [
         [missing_keys, "missing translations"],
         [unexpected_keys, "unexpected translations"]
@@ -54,7 +54,7 @@ module I18nTasks
       end
     end
 
-    def compare_mismatches(&warning)
+    def compare_mismatches
       # Important to populate @placeholder_mismatches and @markdown_mismatches first
       find_mismatches
 

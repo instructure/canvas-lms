@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe RubricsController do
   describe "GET 'index'" do
     it "requires authorization" do
@@ -568,7 +566,7 @@ describe RubricsController do
       course_with_teacher_logged_in(:active_all => true)
       outcome_with_rubric
       assignment = @course.assignments.create!(assignment_valid_attributes)
-      association = @rubric.associate_with(assignment, @course, :purpose => 'grading')
+      @rubric.associate_with(assignment, @course, :purpose => 'grading')
 
       update_params = {
         "course_id" => @course.id,

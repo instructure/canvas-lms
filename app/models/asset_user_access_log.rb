@@ -295,9 +295,6 @@ class AssetUserAccessLog
     log_batch_size = mb_settings[:log_batch_size]
     max_compaction_time = mb_settings[:max_compaction_time]
     receive_timeout = mb_settings[:receive_timeout]
-    # semaphore to flip if we manage to advance to the "head"
-    # of the topic within this compaction run.
-    caught_up = false
     early_exit = false # use to signal as soon as we've decided to bail on compaction.
     positive_runtime_budget = true # set to false when budget runtime exceed allocation
 
@@ -859,7 +856,7 @@ class AssetUserAccessLog
       "(#{row["aua_id"]}, #{row["view_count"]}, '#{max_updated_at}')"
     end.join(", ")
 
-    update_query = <<~SQL
+    <<~SQL.squish
       UPDATE #{AssetUserAccess.quoted_table_name} AS aua
       SET view_score = COALESCE(aua.view_score, 0) + log_segment.view_count,
         updated_at = GREATEST(aua.updated_at, TO_TIMESTAMP(log_segment.max_updated_at, 'YYYY-MM-DD HH24:MI:SS.US')),

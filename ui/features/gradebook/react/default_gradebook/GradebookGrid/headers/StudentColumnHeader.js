@@ -70,6 +70,18 @@ export default class StudentColumnHeader extends ColumnHeader {
     ...ColumnHeader.defaultProps
   }
 
+  getColumnHeaderName() {
+    return I18n.t('Student Name')
+  }
+
+  getColumnHeaderOptions() {
+    return I18n.t('Student Name Options')
+  }
+
+  showDisplayAsViewOption() {
+    return true
+  }
+
   onShowSectionNames = () => {
     this.onSelectSecondaryInfo('section')
   }
@@ -228,7 +240,7 @@ export default class StudentColumnHeader extends ColumnHeader {
                   padding="0 0 0 small"
                 >
                   <Text fontStyle="normal" size="x-small" weight="bold">
-                    {I18n.t('Student Name')}
+                    {this.getColumnHeaderName()}
                   </Text>
                 </View>
               </Grid.Col>
@@ -246,7 +258,7 @@ export default class StudentColumnHeader extends ColumnHeader {
                         variant="icon"
                         icon={IconMoreSolid}
                       >
-                        <ScreenReaderContent>{I18n.t('Student Name Options')}</ScreenReaderContent>
+                        <ScreenReaderContent>{this.getColumnHeaderOptions()}</ScreenReaderContent>
                       </Button>
                     }
                     onToggle={this.onToggle}
@@ -254,30 +266,32 @@ export default class StudentColumnHeader extends ColumnHeader {
                   >
                     {sortMenu}
 
-                    <Menu
-                      label={I18n.t('Display as')}
-                      contentRef={this.bindDisplayAsMenuContent}
-                      disabled={this.props.disabled}
-                    >
-                      <Menu.Group
-                        label={<ScreenReaderContent>{I18n.t('Display as')}</ScreenReaderContent>}
+                    {this.showDisplayAsViewOption() && (
+                      <Menu
+                        label={I18n.t('Display as')}
+                        contentRef={this.bindDisplayAsMenuContent}
+                        disabled={this.props.disabled}
                       >
-                        <Menu.Item
-                          key="first_last"
-                          selected={this.props.selectedPrimaryInfo === 'first_last'}
-                          onSelect={this.onShowFirstLastNames}
+                        <Menu.Group
+                          label={<ScreenReaderContent>{I18n.t('Display as')}</ScreenReaderContent>}
                         >
-                          {studentRowHeaderConstants.primaryInfoLabels.first_last}
-                        </Menu.Item>
-                        <Menu.Item
-                          key="last_first"
-                          selected={this.props.selectedPrimaryInfo === 'last_first'}
-                          onSelect={this.onShowLastFirstNames}
-                        >
-                          {studentRowHeaderConstants.primaryInfoLabels.last_first}
-                        </Menu.Item>
-                      </Menu.Group>
-                    </Menu>
+                          <Menu.Item
+                            key="first_last"
+                            selected={this.props.selectedPrimaryInfo === 'first_last'}
+                            onSelect={this.onShowFirstLastNames}
+                          >
+                            {studentRowHeaderConstants.primaryInfoLabels.first_last}
+                          </Menu.Item>
+                          <Menu.Item
+                            key="last_first"
+                            selected={this.props.selectedPrimaryInfo === 'last_first'}
+                            onSelect={this.onShowLastFirstNames}
+                          >
+                            {studentRowHeaderConstants.primaryInfoLabels.last_first}
+                          </Menu.Item>
+                        </Menu.Group>
+                      </Menu>
+                    )}
 
                     <Menu
                       contentRef={this.bindSecondaryInfoMenuContent}

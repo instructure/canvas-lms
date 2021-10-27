@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 describe 'Canvas::Twilio' do
   def make_phone_number_stub(number, country_code)
     phone_number_stub = double("Canvas::Twilio.lookups_client.phone_numbers(#{number})")
@@ -104,8 +102,8 @@ describe 'Canvas::Twilio' do
       )
     end
 
-    it 'raises an exception when attempting to deliver without a config file' do
-      allow(Canvas::Twilio).to receive(:config).and_return({})
+    it 'raises an exception when attempting to deliver without config' do
+      allow(Rails.application.credentials).to receive(:twilio_creds).and_return(nil)
 
       expect { Canvas::Twilio.deliver('+18015550100', 'message text') }.to raise_error("Twilio is not configured")
     end

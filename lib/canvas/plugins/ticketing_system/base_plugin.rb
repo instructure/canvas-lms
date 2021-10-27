@@ -58,20 +58,20 @@ module Canvas::Plugins::TicketingSystem
     # recieves is a Canvas ErrorReport decorated with
     # a CustomError from this same module (Canvas::Plugins::TicketingSystem).
     def export_error(report, conf)
-      raise "MUST OVERRIDE WITH THE CALLBACK FOR ERROR REPORT"
+      raise NotImplementedError
     end
 
     # When overriding, this should just provide the String which is
     # the unique name of this plugin to use in the canvas plugin registry
     def plugin_id
-      raise "MUST OVERRIDE WITH THE PLUGIN ID TO REGISTER WITH"
+      raise NotImplementedError
     end
 
     # When overriding, this method should return a hash very similar to
     # all the hashes found for plugin registration in
     # lib/canvas/plugins/default_plugins.rb
     def settings
-      raise "MUST OVERRIDE WITH A SETTINGS HASH FOR PLUGIN REGISTRATION"
+      raise NotImplementedError
     end
   end
 end

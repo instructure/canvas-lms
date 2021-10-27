@@ -146,7 +146,7 @@ class AssessmentRequest < ActiveRecord::Base
     (self.asset.assignment.title rescue self.asset.title) rescue t("#unknown", "Unknown")
   end
 
-  def comment_added(comment)
+  def comment_added
     self.workflow_state = "completed" unless active_rubric_association? && self.rubric_association.rubric
   end
 

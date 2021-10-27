@@ -49,6 +49,9 @@ const locale = {
   "announcement_list_da155734": { "message": "Rhestr Cyhoeddiadau" },
   "announcements_a4b8ed4a": { "message": "Cyhoeddiadau" },
   "apply_781a2546": { "message": "Rhoi ar waith" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Gosod newidiadau i bob achos o’r Botymau a’r Eiconau hyn yn y Cwrs."
+  },
   "apps_54d24a47": { "message": "Apiau" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Bydd y gymhareb agwedd yn cael ei chadw"
@@ -63,9 +66,6 @@ const locale = {
   },
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Mae cynnwys sydd wedi’i gadw’n awtomatig yn bodoli. Hoffech chi lwytho’r cynnwys sydd wedi’i gadw’n awtomatig?"
-  },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "Agor rhagolwg mewn-llinell yn awtomatig. (Dim ond ar ôl cadw mae''r rhagolwg i''w weld)"
   },
   "available_folders_694d0436": { "message": "Ffolderi sydd ar gael" },
   "below_81d4dceb": { "message": "O dan" },
@@ -108,6 +108,9 @@ const locale = {
     "message": "Cau dewislen neu ddeialog. Hefyd yn mynd a chi''n ôl i''r ardal olygu"
   },
   "close_d634289d": { "message": "Cau" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Rhaid i ffeiliau capsiynau caeedig fod yn llai na { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "Capsiynau Caeedig/Isdeitlau"
   },
@@ -141,6 +144,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Trwydded Creative Commons:"
   },
+  "current_image_f16c249c": { "message": "Delwedd Bresennol" },
   "custom_6979cd81": { "message": "Personol" },
   "date_added_ed5ad465": { "message": "Dyddiad Ychwanegu" },
   "decorative_image_3c28aa7d": { "message": "Delwedd addurniadol" },
@@ -156,9 +160,6 @@ const locale = {
   "details_98a31b68": { "message": "Manylion" },
   "dimensions_45ddb7b7": { "message": "Dimensiynau" },
   "directionality_26ae9e08": { "message": "Cyfeirioldeb" },
-  "disable_in_line_preview_2a675175": {
-    "message": "Analluogi''r rhagolwg mewn-llinell."
-  },
   "discussions_a5f96392": { "message": "Trafodaethau" },
   "discussions_index_6c36ced": { "message": "Mynegai Trafodaethau" },
   "display_options_315aba85": { "message": "Dangos Opsiynau" },
@@ -296,11 +297,11 @@ const locale = {
   "middle_27dc1d5": { "message": "Canol" },
   "miscellaneous_e9818229": { "message": "Amrywiol" },
   "modules_c4325335": { "message": "Modiwlau" },
+  "multi_color_image_63d7372f": { "message": "Delwedd mwy nag un lliw" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Yn gorfod bod o leiaf { width } x { height }px"
   },
   "my_files_2f621040": { "message": "Fy ffeiliau" },
-  "my_images_427f9b0c": { "message": "Fy Nelweddau" },
   "name_1aed4a1b": { "message": "Enw" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Llywiwch trwy''r ddewislen neu''r bar offer"
@@ -378,9 +379,10 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "Dangos opsiynau delwedd" },
   "show_link_options_545338fd": { "message": "Dangos opsiynau dolen" },
   "show_video_options_6ed3721a": { "message": "Dangos opsiynau fideo" },
+  "single_color_image_4e5d4dbc": { "message": "Delwedd un lliw" },
   "size_b30e1077": { "message": "Maint" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "Mae maint { file } yn fwy na’r { max } MB a ganiateir ar gyfer maint y ffeil."
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Mae maint y ffeil capsiynau’n fwy na’r { max } kb a ganiateir ar gyfer maint y ffeil."
   },
   "small_b070434a": { "message": "Bach" },
   "something_went_wrong_89195131": { "message": "Aeth rhywbeth o’i le." },

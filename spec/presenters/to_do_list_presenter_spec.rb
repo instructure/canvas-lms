@@ -130,7 +130,7 @@ describe 'ToDoListPresenter' do
                                        peer_reviews: true
                                      })
       assignment.publish
-      assessment = assignment.assign_peer_review(reviewer, reviewee)
+      assignment.assign_peer_review(reviewer, reviewee)
       assignment.submit_homework(reviewee, body: 'you say potato...')
     end
 

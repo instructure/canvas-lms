@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper.rb')
-
 IMPORT_JSON_DIR = File.dirname(__FILE__) + '/fixtures/importer/'
 
 QUESTIONS = [
@@ -51,7 +49,7 @@ def get_import_data(sub_folder, hash_name)
   data
 end
 
-def import_example_questions(context)
+def import_example_questions
   questions = []
   QUESTIONS.each do |question|
     if import_data_exists?(['vista', 'quiz'], question[0])

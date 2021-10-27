@@ -23,16 +23,12 @@ require 'twilio-ruby'
 module Canvas::Twilio
   DEFAULT_COUNTRY = 'US'
 
-  def self.config
-    @config ||= ConfigFile.load('twilio') || {}
-  end
-
   def self.account_sid
-    config['account_sid']
+    Rails.application.credentials.twilio_creds&.[](:account_sid)
   end
 
   def self.auth_token
-    config['auth_token']
+    Rails.application.credentials.twilio_creds&.[](:auth_token)
   end
 
   def self.client

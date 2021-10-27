@@ -103,7 +103,7 @@ describe "API Authentication", type: :request do
     end
 
     describe "oauth2 native app flow" do
-      def flow(opts = {})
+      def flow
         enable_forgery_protection do
           user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
           course_with_teacher(:user => @user)

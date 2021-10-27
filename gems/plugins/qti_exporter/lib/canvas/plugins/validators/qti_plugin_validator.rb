@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Canvas::Plugins::Validators::QtiPluginValidator
-  def self.validate(settings, plugin_setting)
+  def self.validate(settings, _plugin_setting)
     settings.with_indifferent_access.slice(:enabled)
   end
 end

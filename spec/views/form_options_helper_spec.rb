@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe ActionView::Helpers::FormOptionsHelper do
   describe "#time_zone_options_for_select" do
     let(:form) { f = Object.new; f.extend(ActionView::Helpers::FormOptionsHelper); f }

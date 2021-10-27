@@ -125,7 +125,7 @@ export default function ViewOptionsTabPanel({
             {viewUngradedAsZero.allowed &&
               renderCheckbox(
                 viewUngradedAsZero,
-                I18n.t('Preview ungraded as 0'),
+                I18n.t('View ungraded as 0'),
                 'viewUngradedAsZero'
               )}
           </FormFieldGroup>

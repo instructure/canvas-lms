@@ -101,7 +101,6 @@ class BrandConfigRegenerator
     new_config = config.clone_with_new_parent(new_parent_md5)
     new_config.save_unless_dup!
 
-    account = thing.is_a?(SharedBrandConfig) ? thing.account : thing
     job_type = thing.is_a?(SharedBrandConfig) ? :sync_to_s3_and_save_to_shared_brand_config! : :sync_to_s3_and_save_to_account!
     new_config.send(job_type, @progress, thing)
 

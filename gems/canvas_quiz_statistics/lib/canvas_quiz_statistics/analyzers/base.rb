@@ -57,7 +57,7 @@ module CanvasQuizStatistics::Analyzers
     # metric calculations. See DSL for more info on stateful metrics.
     #
     # @return [Hash] You must return a Hash with symbolized keys for a context.
-    def build_context(responses)
+    def build_context(_responses)
       {}
     end
 

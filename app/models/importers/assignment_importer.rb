@@ -28,7 +28,6 @@ module Importers
 
     def self.process_migration(data, migration)
       assignments = data['assignments'] ? data['assignments'] : []
-      to_import = migration.to_import 'assignments'
 
       create_assignments(assignments, migration)
 

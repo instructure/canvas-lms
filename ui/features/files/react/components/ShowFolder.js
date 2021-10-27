@@ -24,8 +24,8 @@ import I18n from 'i18n!react_files'
 import ShowFolder from '../legacy/components/ShowFolder'
 import File from '@canvas/files/backbone/models/File.coffee'
 import FilePreview from '@canvas/files/react/components/FilePreview'
-import DirectShareCourseTray from '../../../../shared/direct-sharing/react/components/DirectShareCourseTray'
-import DirectShareUserModal from '../../../../shared/direct-sharing/react/components/DirectShareUserModal'
+import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
+import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import FolderChild from './FolderChild'
 import UploadDropZone from './UploadDropZone'
 import FileUpload from './FileUpload'
@@ -74,36 +74,34 @@ ShowFolder.renderFolderChildOrEmptyContainer = function () {
       </div>
     )
   } else {
-    return this.props.currentFolder
-      .children(this.props.query)
-      .map(child => (
-        <FolderChild
-          key={child.cid}
-          model={child}
-          isSelected={_.indexOf(this.props.selectedItems, child) >= 0}
-          toggleSelected={this.props.toggleItemSelected.bind(null, child)}
-          userCanEditFilesForContext={this.props.userCanEditFilesForContext}
-          userCanDeleteFilesForContext={this.props.userCanDeleteFilesForContext}
-          userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
-          usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
-          externalToolsForContext={this.props.externalToolsForContext}
-          previewItem={this.props.previewItem.bind(null, child)}
-          dndOptions={this.props.dndOptions}
-          modalOptions={this.props.modalOptions}
-          clearSelectedItems={this.props.clearSelectedItems}
-          onMove={this.props.onMove}
-          onCopyToClick={model => {
-            if (model instanceof File) {
-              this.setState({copyFileId: model.id})
-            }
-          }}
-          onSendToClick={model => {
-            if (model instanceof File) {
-              this.setState({sendFileId: model.id})
-            }
-          }}
-        />
-      ))
+    return this.props.currentFolder.children(this.props.query).map(child => (
+      <FolderChild
+        key={child.cid}
+        model={child}
+        isSelected={_.indexOf(this.props.selectedItems, child) >= 0}
+        toggleSelected={this.props.toggleItemSelected.bind(null, child)}
+        userCanEditFilesForContext={this.props.userCanEditFilesForContext}
+        userCanDeleteFilesForContext={this.props.userCanDeleteFilesForContext}
+        userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
+        usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
+        externalToolsForContext={this.props.externalToolsForContext}
+        previewItem={this.props.previewItem.bind(null, child)}
+        dndOptions={this.props.dndOptions}
+        modalOptions={this.props.modalOptions}
+        clearSelectedItems={this.props.clearSelectedItems}
+        onMove={this.props.onMove}
+        onCopyToClick={model => {
+          if (model instanceof File) {
+            this.setState({copyFileId: model.id})
+          }
+        }}
+        onSendToClick={model => {
+          if (model instanceof File) {
+            this.setState({sendFileId: model.id})
+          }
+        }}
+      />
+    ))
   }
 }
 

@@ -24,6 +24,7 @@ import {IsolatedThreadsContainer} from '../IsolatedThreadsContainer'
 import {MockedProvider} from '@apollo/react-testing'
 import {PageInfo} from '../../../../graphql/PageInfo'
 import React from 'react'
+import {updateDiscussionEntryParticipantMock} from '../../../../graphql/Mocks'
 
 jest.mock('../../../utils/constants', () => ({
   ...jest.requireActual('../../../utils/constants'),
@@ -67,8 +68,12 @@ describe('IsolatedThreadsContainer', () => {
     setOnSuccess.mockClear()
   })
 
-  const defaultProps = overrides => ({
-    discussionTopic: Discussion.mock(),
+  const defaultProps = ({
+    discussionEntryOverrides = {},
+    discussionOverrides = {},
+    overrides = {}
+  } = {}) => ({
+    discussionTopic: Discussion.mock(discussionOverrides),
     discussionEntry: DiscussionEntry.mock({
       discussionSubentriesConnection: {
         nodes: [
@@ -76,7 +81,8 @@ describe('IsolatedThreadsContainer', () => {
             _id: '50',
             id: '50',
             read: false,
-            message: '<p>This is the child reply</P>'
+            message: '<p>This is the child reply</P>',
+            ...discussionEntryOverrides
           })
         ],
         pageInfo: PageInfo.mock(),
@@ -116,28 +122,30 @@ describe('IsolatedThreadsContainer', () => {
   describe('Spinners', () => {
     it('show newer spinner when fetchingMoreNewerReplies is true', async () => {
       const container = setup(
-        defaultProps({hasMoreNewerReplies: true, fetchingMoreNewerReplies: true})
+        defaultProps({
+          overrides: {hasMoreNewerReplies: true, fetchingMoreNewerReplies: true}
+        })
       )
       await waitFor(() => expect(container.queryByTestId('new-reply-spinner')).toBeTruthy())
     })
 
     it('hide newer button spinner when fetchingMoreNewerReplies is false', async () => {
       const container = setup(
-        defaultProps({hasMoreNewerReplies: true, fetchingMoreNewerReplies: false})
+        defaultProps({overrides: {hasMoreNewerReplies: true, fetchingMoreNewerReplies: false}})
       )
       await waitFor(() => expect(container.queryByTestId('new-reply-spinner')).toBeNull())
     })
 
     it('show older button spinner when fetchingMoreOlderReplies is true', async () => {
       const container = setup(
-        defaultProps({hasMoreOlderReplies: true, fetchingMoreOlderReplies: true})
+        defaultProps({overrides: {hasMoreOlderReplies: true, fetchingMoreOlderReplies: true}})
       )
       await waitFor(() => expect(container.queryByTestId('old-reply-spinner')).toBeTruthy())
     })
 
     it('hide older button spinner when fetchingMoreOlderReplies is false', async () => {
       const container = setup(
-        defaultProps({hasMoreOlderReplies: true, fetchingMoreOlderReplies: false})
+        defaultProps({overrides: {hasMoreOlderReplies: true, fetchingMoreOlderReplies: false}})
       )
       await waitFor(() => expect(container.queryByTestId('old-reply-spinner')).toBeNull())
     })
@@ -146,7 +154,9 @@ describe('IsolatedThreadsContainer', () => {
   describe('show more replies buttons', () => {
     it('clicking show older replies button calls showOlderReplies()', async () => {
       const showOlderReplies = jest.fn()
-      const container = setup(defaultProps({hasMoreOlderReplies: true, showOlderReplies}))
+      const container = setup(
+        defaultProps({overrides: {hasMoreOlderReplies: true, showOlderReplies}})
+      )
       const showOlderRepliesButton = await container.findByTestId('show-more-replies-button')
       fireEvent.click(showOlderRepliesButton)
       await waitFor(() => expect(showOlderReplies).toHaveBeenCalled())
@@ -154,7 +164,9 @@ describe('IsolatedThreadsContainer', () => {
 
     it('clicking show newer replies button calls showNewerReplies()', async () => {
       const showNewerReplies = jest.fn()
-      const container = setup(defaultProps({hasMoreNewerReplies: true, showNewerReplies}))
+      const container = setup(
+        defaultProps({overrides: {hasMoreNewerReplies: true, showNewerReplies}})
+      )
       const showNewerRepliesButton = await container.findByTestId('show-more-replies-button')
       fireEvent.click(showNewerRepliesButton)
       await waitFor(() => expect(showNewerReplies).toHaveBeenCalled())
@@ -164,7 +176,7 @@ describe('IsolatedThreadsContainer', () => {
   describe('thread actions menu', () => {
     it('allows toggling the unread state of an entry', async () => {
       const onToggleUnread = jest.fn()
-      const props = defaultProps({onToggleUnread})
+      const props = defaultProps({overrides: {onToggleUnread}})
       props.discussionEntry.discussionSubentriesConnection.nodes[0].read = true
       const {findAllByTestId, findByTestId} = setup(props)
 
@@ -177,7 +189,7 @@ describe('IsolatedThreadsContainer', () => {
     })
 
     it('only shows the delete option if you have permission', async () => {
-      const props = defaultProps({onDelete: jest.fn()})
+      const props = defaultProps({overrides: {onDelete: jest.fn()}})
       props.discussionEntry.discussionSubentriesConnection.nodes[0].permissions.delete = false
       const {queryByTestId, findAllByTestId} = setup(props)
 
@@ -188,7 +200,7 @@ describe('IsolatedThreadsContainer', () => {
 
     it('allows deleting an entry', async () => {
       const onDelete = jest.fn()
-      const {getByTestId, findAllByTestId} = setup(defaultProps({onDelete}))
+      const {getByTestId, findAllByTestId} = setup(defaultProps({overrides: {onDelete}}))
 
       const threadActionsMenu = await findAllByTestId('thread-actions-menu')
       fireEvent.click(threadActionsMenu[0])
@@ -198,7 +210,7 @@ describe('IsolatedThreadsContainer', () => {
     })
 
     it('only shows the speed grader option if you have permission', async () => {
-      const props = defaultProps({onOpenInSpeedGrader: jest.fn()})
+      const props = defaultProps({overrides: {onOpenInSpeedGrader: jest.fn()}})
       props.discussionTopic.permissions.speedGrader = false
       const {queryByTestId, findAllByTestId} = setup(props)
 
@@ -209,13 +221,72 @@ describe('IsolatedThreadsContainer', () => {
 
     it('allows opening an entry in speedgrader', async () => {
       const onOpenInSpeedGrader = jest.fn()
-      const {getByTestId, findAllByTestId} = setup(defaultProps({onOpenInSpeedGrader}))
+      const {getByTestId, findAllByTestId} = setup(defaultProps({overrides: {onOpenInSpeedGrader}}))
 
       const threadActionsMenu = await findAllByTestId('thread-actions-menu')
       fireEvent.click(threadActionsMenu[0])
       fireEvent.click(getByTestId('inSpeedGrader'))
 
       expect(onOpenInSpeedGrader).toHaveBeenCalled()
+    })
+  })
+
+  describe('Report Reply', () => {
+    it('does not show Report', () => {
+      const {getByTestId, queryByText} = setup(defaultProps())
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+
+      expect(queryByText('Report')).toBeNull()
+    })
+
+    describe('when feature flag and setting is enabled', () => {
+      beforeAll(() => {
+        window.ENV.student_reporting_enabled = true
+      })
+
+      it('show Report', () => {
+        const {getByTestId, queryByText} = setup(defaultProps())
+
+        fireEvent.click(getByTestId('thread-actions-menu'))
+
+        expect(queryByText('Report')).toBeTruthy()
+      })
+
+      it('show Reported', () => {
+        const {getByTestId, queryByText} = setup(
+          defaultProps({
+            discussionEntryOverrides: {
+              entryParticipant: {
+                reportType: 'other'
+              }
+            }
+          })
+        )
+
+        fireEvent.click(getByTestId('thread-actions-menu'))
+
+        expect(queryByText('Reported')).toBeTruthy()
+      })
+
+      it('can Report', async () => {
+        const {getByTestId, queryByText} = setup(
+          defaultProps(),
+          updateDiscussionEntryParticipantMock({
+            discussionEntryId: '50',
+            reportType: 'other'
+          })
+        )
+
+        fireEvent.click(getByTestId('thread-actions-menu'))
+        fireEvent.click(queryByText('Report'))
+        fireEvent.click(queryByText('Other'))
+        fireEvent.click(getByTestId('report-reply-submit-button'))
+
+        await waitFor(() => {
+          expect(setOnSuccess).toHaveBeenCalledWith('You have reported this reply.', false)
+        })
+      })
     })
   })
 })

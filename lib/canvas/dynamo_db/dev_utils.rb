@@ -42,7 +42,7 @@ module Canvas
         dynamodb = canvas_ddb.client
         local_table_name = canvas_ddb.prefixed_table_name(table_name)
         exists = begin
-          result = dynamodb.describe_table(table_name: local_table_name)
+          dynamodb.describe_table(table_name: local_table_name)
           true
         rescue Aws::DynamoDB::Errors::ResourceNotFoundException
           false

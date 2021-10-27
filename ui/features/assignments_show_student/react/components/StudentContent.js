@@ -27,7 +27,7 @@ import MarkAsDoneButton from './MarkAsDoneButton'
 import LoadingIndicator from '@canvas/loading-indicator'
 import MissingPrereqs from './MissingPrereqs'
 import DateLocked from '../DateLocked'
-import React, {Suspense, lazy, useContext} from 'react'
+import React, {Suspense, lazy, useContext, useEffect} from 'react'
 import PropTypes from 'prop-types'
 import {Spinner} from '@instructure/ui-spinner'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
@@ -155,6 +155,36 @@ function renderContentBaseOnAvailability({assignment, submission}, alertContext)
 
 function StudentContent(props) {
   const alertContext = useContext(AlertManagerContext)
+
+  const {description, name} = props.assignment
+  useEffect(() => {
+    const setUpImmersiveReader = async () => {
+      const mountPoints = [
+        document.getElementById('immersive_reader_mount_point'),
+        document.getElementById('immersive_reader_mobile_mount_point')
+      ].filter(element => element != null)
+
+      if (mountPoints.length === 0) {
+        return
+      }
+
+      import('../../../../shared/immersive-reader/ImmersiveReader')
+        .then(ImmersiveReader => {
+          mountPoints.forEach(mountPoint => {
+            ImmersiveReader.initializeReaderButton(mountPoint, {
+              content:
+                description || I18n.t('No additional details were added for this assignment.'),
+              title: name
+            })
+          })
+        })
+        .catch(e => {
+          console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
+        })
+    }
+
+    setUpImmersiveReader()
+  }, [description, name])
 
   // TODO: Move the button provider up one level
   return (

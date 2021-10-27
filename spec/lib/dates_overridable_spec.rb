@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 shared_examples_for "an object whose dates are overridable" do
   # let(:overridable) - an Assignment or Quiz
   # let(:overridable_type) - :assignment or :quiz
@@ -345,9 +343,6 @@ shared_examples_for "an object whose dates are overridable" do
       dates_hash = overridable.dates_hash_visible_to(@teacher)
       expect(dates_hash.size).to eq 2
 
-      override = dates_hash[0]
-      original = dates_hash[1]
-
       dates_hash.sort_by! { |d| d[:title].to_s }
       expect(dates_hash[0][:title]).to be_nil
       expect(dates_hash[1][:title]).to eq "value for name"
@@ -480,7 +475,6 @@ shared_examples_for "an object whose dates are overridable" do
 
     it "returns false when there is no assignment" do
       if overridable_type == :quiz
-        as = overridable.assignment
         overridable.assignment = nil # a survey quiz
         expect(overridable.differentiated_assignments_applies?).to be_falsey
       end

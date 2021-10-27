@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 describe Quizzes::QuizSerializer do
   def quiz_serializer(options = {})
     options.reverse_merge!({

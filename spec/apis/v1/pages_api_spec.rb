@@ -231,11 +231,11 @@ describe "Pages API", type: :request do
             # we need a new course that does not already have a front page, in an account with planner enabled
             course_with_teacher(:active_all => true, :account => @course.account)
             todo_date = 1.week.from_now.beginning_of_day
-            json = api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
-                            { :controller => 'wiki_pages_api', :action => 'update_front_page', :format => 'json',
-                              :course_id => @course.to_param },
-                            { :wiki_page => { :title => 'New Wiki Page!', :student_planner_checkbox => '1',
-                                              :body => 'hello new page', :student_todo_at => todo_date } })
+            api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
+                     { :controller => 'wiki_pages_api', :action => 'update_front_page', :format => 'json',
+                       :course_id => @course.to_param },
+                     { :wiki_page => { :title => 'New Wiki Page!', :student_planner_checkbox => '1',
+                                       :body => 'hello new page', :student_todo_at => todo_date } })
             page = @course.wiki.front_page
             expect(page.todo_date).to eq todo_date
           end
@@ -757,11 +757,11 @@ describe "Pages API", type: :request do
         other_page.workflow_state = 'active'
         other_page.save!
 
-        json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{other_page.url}",
-                        { :controller => 'wiki_pages_api', :action => 'update', :format => 'json',
-                          :course_id => @course.to_param, :url => other_page.url },
-                        { :wiki_page =>
-                          { :title => 'Another Page', :body => 'Another page body', :front_page => false } })
+        api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{other_page.url}",
+                 { :controller => 'wiki_pages_api', :action => 'update', :format => 'json',
+                   :course_id => @course.to_param, :url => other_page.url },
+                 { :wiki_page =>
+                   { :title => 'Another Page', :body => 'Another page body', :front_page => false } })
 
         # the front page url should remain unchanged
         expect(wiki.reload.get_front_page_url).to eq @front_page.url
@@ -1285,17 +1285,17 @@ describe "Pages API", type: :request do
       end
 
       it "does not show" do
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
-                        { :controller => "wiki_pages_api", :action => "show", :format => "json", :course_id => "#{@course.id}", :url => @unpublished_page.url },
-                        {}, {}, { :expected_status => 401 })
+        api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
+                 { :controller => "wiki_pages_api", :action => "show", :format => "json", :course_id => @course.id.to_s, :url => @unpublished_page.url },
+                 {}, {}, { :expected_status => 401 })
       end
 
       it "does not show unpublished on public courses" do
         @course.is_public = true
         @course.save!
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
-                        { :controller => "wiki_pages_api", :action => "show", :format => "json", :course_id => "#{@course.id}", :url => @unpublished_page.url },
-                        {}, {}, { :expected_status => 401 })
+        api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@unpublished_page.url}",
+                 { :controller => "wiki_pages_api", :action => "show", :format => "json", :course_id => @course.id.to_s, :url => @unpublished_page.url },
+                 {}, {}, { :expected_status => 401 })
       end
     end
 
@@ -1379,9 +1379,9 @@ describe "Pages API", type: :request do
           mod.add_item(:id => @vpage.id, :type => 'wiki_page')
           mod.unlock_at = 1.year.from_now
           mod.save!
-          json = api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/3",
-                          { :controller => "wiki_pages_api", :action => "show_revision", :format => "json", :course_id => "#{@course.id}",
-                            :url => @vpage.url, :revision_id => '3' }, {}, {}, { :expected_status => 401 })
+          api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@vpage.url}/revisions/3",
+                   { :controller => "wiki_pages_api", :action => "show_revision", :format => "json", :course_id => @course.id.to_s,
+                     :url => @vpage.url, :revision_id => '3' }, {}, {}, { :expected_status => 401 })
         end
 
         it "does not revert page content" do

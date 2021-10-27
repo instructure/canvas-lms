@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe MediaObjectsController do
   before :once do
     course_with_teacher(active_all: true)
@@ -507,7 +505,7 @@ describe MediaObjectsController do
 
     it "will return a 404 if the given course_id doesn't exist" do
       course_with_teacher_logged_in
-      mo1 = MediaObject.create!(user_id: @user, context: @course, media_id: 'in_course')
+      MediaObject.create!(user_id: @user, context: @course, media_id: 'in_course')
       MediaObject.create!(user_id: @user, media_id: 'not_in_course')
 
       get 'index', params: { course_id: 171_717, exclude: %w[sources tracks] }
@@ -517,10 +515,9 @@ describe MediaObjectsController do
 
     it "will return user's media if context_type isn't 'course'" do
       course_with_teacher_logged_in
-      mo1 =
-        MediaObject.create!(
-          user_id: @user, context: @course, media_id: 'in_course', user_entered_title: 'AAA'
-        )
+      MediaObject.create!(
+        user_id: @user, context: @course, media_id: 'in_course', user_entered_title: 'AAA'
+      )
       mo2 =
         MediaObject.create!(
           user_id: @user, context: @user, media_id: 'not_in_course', user_entered_title: 'BBB'

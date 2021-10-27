@@ -48,7 +48,7 @@ module EventStream::IndexStrategy
       index_scope = index_scope.where("created_at <= ?", options[:newest]) if options[:newest].present?
       index_scope = index_scope.select(:id, :created_at) if options[:just_ids] == true
       event_bookmarker = EventStream::IndexStrategy::ActiveRecord::Bookmarker.new(ar_type)
-      bookmarked_collection = BookmarkedCollection.build(event_bookmarker) do |pager|
+      BookmarkedCollection.build(event_bookmarker) do |pager|
         records = pager_to_records(index_scope, pager)
         pager.replace(records)
         pager.has_more! if records.next_page

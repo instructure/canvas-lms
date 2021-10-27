@@ -23,7 +23,7 @@
   load_blueprint_courses_ui
   @has_content_notices = load_content_notices
   provide :head, include_common_stylesheets
-  set_badge_counts_for(@context, @current_user, @current_enrollment) if @set_badge_counts
+  set_badge_counts_for(@context, @current_user) if @set_badge_counts
   js_env notices: flash_notices()
 -%>
 <%= render :partial => "layouts/head" %>
@@ -133,7 +133,7 @@
             <div id="immersive_reader_mount_point"></div>
           <% end %>
           <% if show_student_view_button? %>
-            <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn", :id => "easy_student_view", :role => 'complementary', :method => :post do %>
+            <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn", :id => "easy_student_view", :method => :post do %>
               <i class="icon-student-view"></i> <%= t('Student View') %>
             <% end %>
           <% end %>

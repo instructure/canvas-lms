@@ -111,7 +111,11 @@ export default class DatetimeField {
     this.debouncedSRFME = debounce($.screenReaderFlashMessageExclusive, 1000)
 
     // process initial value
-    this.setFromValue()
+    if (options.time) {
+      this.setFromDateTime(options.time)
+    } else {
+      this.setFromValue()
+    }
   }
 
   processTimeOptions(options) {
@@ -189,7 +193,11 @@ export default class DatetimeField {
   setDate(date) {
     if (!this.showDate) {
       this.implicitDate = date
-      this.$field.data('inputdate', date)
+      // replace the date portion of what we have with the date we just received
+      const newDate = date.toISOString().substr(0, 10)
+      const oldTime = (this.$field.data('inputdate') || date.toISOString()).substr(10)
+      const timeWithNewDate = `${newDate}${oldTime}`
+      this.$field.data('inputdate', timeWithNewDate)
       return this.setFromValue()
     } else {
       return this.setFormattedDatetime(date, DATE_FORMAT_OPTIONS)
@@ -208,9 +216,17 @@ export default class DatetimeField {
   setFromValue(e) {
     const inputdate = this.$field.data('inputdate')
     if (typeof e !== 'undefined' && ['focus', 'blur'].includes(e.type) && !inputdate) return
+    if (e?.type === 'change') {
+      this.$field.data('inputdate', null)
+    }
     this.parseValue()
     this.update()
     this.updateSuggest(e?.type === 'keyup') // only show suggestions when typing
+  }
+
+  setFromDateTime(val) {
+    this.parseValue(val)
+    this.update()
   }
 
   normalizeValue(value) {
@@ -243,16 +259,19 @@ export default class DatetimeField {
     }
   }
 
-  parseValue() {
+  parseValue(val) {
     if (this.$field.data('inputdate')) {
       const inputdate = this.$field.data('inputdate')
       this.datetime = inputdate instanceof Date ? inputdate : new Date(inputdate)
       this.blank = false
       this.invalid = this.datetime === null
-      this.$field.data('inputdate', null)
     } else {
+      if (val) {
+        this.setFormattedDatetime(val, TIME_FORMAT_OPTIONS)
+      }
       const value = this.normalizeValue(this.$field.val())
       this.datetime = tz.parse(value)
+      this.$field.data('inputdate', this.datetime?.toISOString())
       this.blank = !value
       this.invalid = !this.blank && this.datetime === null
     }

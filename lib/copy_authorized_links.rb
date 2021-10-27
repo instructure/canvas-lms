@@ -58,7 +58,6 @@ module CopyAuthorizedLinks
     end
 
     def copy_authorized_links_to_context
-      block = self.class.copy_authorized_links_block rescue nil
       columns = (self.class.copy_authorized_links_columns || []).compact
       columns.each do |column|
         if column == :custom
@@ -68,8 +67,6 @@ module CopyAuthorizedLinks
         else
           html = self.read_attribute(column) rescue nil
           if html && !html.empty?
-            context, inferred_user = self.instance_eval(&block) if block
-            user = @copy_authorized_links_override_user || inferred_user
             self.write_attribute(column, html) if html && !html.empty?
           end
         end

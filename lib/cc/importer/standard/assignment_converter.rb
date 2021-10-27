@@ -83,7 +83,7 @@ module CC::Importer::Standard
 
     def parse_canvas_assignment_data(meta_doc, html_doc = nil, assignment = {})
       if html_doc
-        title, body = get_html_title_and_body(html_doc)
+        _title, body = get_html_title_and_body(html_doc)
         assignment['description'] = body
       end
 

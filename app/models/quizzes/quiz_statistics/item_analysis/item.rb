@@ -41,7 +41,7 @@ class Quizzes::QuizStatistics::ItemAnalysis::Item
     @answers = question[:answers]
                .each_with_index
                .sort_by { |answer, i| [-answer[:weight], i] }
-               .map { |answer, i| answer[:id] }
+               .map { |answer, _i| answer[:id] }
     @respondent_ids = []
     @respondent_map = Hash.new { |hash, key| hash[key] = [] }
     @scores = []

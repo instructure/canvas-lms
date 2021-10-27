@@ -116,14 +116,14 @@ describe Mutations::CreateAssignment do
 
   it "creates an assignment with attributes" do
     query = +"courseId: #{@course.to_param}\n"
-    TEST_ATTRS.each do |graphql_name, assignment_name, initial_value, update_value, graphql_result, assignment_result = graphql_result|
+    TEST_ATTRS.each do |graphql_name, _assignment_name, _initial_value, update_value, _graphql_result, _assignment_result|
       query << "#{graphql_name}: #{update_value}\n"
     end
     result = execute_with_input(query)
     expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'createAssignment', 'errors')).to be_nil
     assignment = Assignment.find(result.dig('data', 'createAssignment', 'assignment', '_id'))
-    TEST_ATTRS.each do |graphql_name, assignment_name, initial_value, update_value, graphql_result, assignment_result = graphql_result|
+    TEST_ATTRS.each do |graphql_name, assignment_name, _initial_value, _update_value, graphql_result, assignment_result = graphql_result|
       expect(result.dig('data', 'createAssignment', 'assignment', graphql_name)).to eq graphql_result
       expect(assignment.send(assignment_name)).to eq assignment_result
     end

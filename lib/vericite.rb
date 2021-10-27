@@ -62,7 +62,7 @@ module VeriCite
       email = if item.is_a?(User)
                 item.email
               end
-      email ||= "#{item.asset_string}@null.instructure.example.com"
+      email || "#{item.asset_string}@null.instructure.example.com"
     end
 
     def self.default_assignment_vericite_settings
@@ -234,7 +234,7 @@ module VeriCite
             assignment_data.assignment_due_date = assignment.due_at.to_time.utc.to_i * 1000
           end
           assignment_data.assignment_grade = assignment.points_possible != nil ? assignment.points_possible : -1
-          data, status_code, headers = vericite_client.assignments_context_id_assignment_id_post(context_id, assignment_id, consumer, consumer_secret, assignment_data)
+          _data, status_code, _headers = vericite_client.assignments_context_id_assignment_id_post(context_id, assignment_id, consumer, consumer_secret, assignment_data)
           # check status code
           response[:return_code] = status_code
           if !is_response_success?(response)
@@ -266,7 +266,7 @@ module VeriCite
           external_content_data.upload_content_length = args[:psize]
           report_meta_data.external_content_data = external_content_data
           # @return [Array<ExternalContentUploadInfo>]
-          data, status_code, headers = vericite_client.reports_submit_request_context_id_assignment_id_user_id_post(context_id, assignment_id, user_id, consumer, consumer_secret, report_meta_data)
+          data, status_code, _headers = vericite_client.reports_submit_request_context_id_assignment_id_user_id_post(context_id, assignment_id, user_id, consumer, consumer_secret, report_meta_data)
           # check status code
           response[:return_code] = status_code
           if !is_response_success?(response)
@@ -341,7 +341,7 @@ module VeriCite
             token_user_role = 'Instructor'
           end
           # @return [Array<ReportURLLinkReponse>]
-          data, status_code, headers = vericite_client.reports_urls_context_id_get(context_id, assignment_id_filter, consumer, consumer_secret, token_user, token_user_role, { user_id_filter => user_id, external_content_id_filter => args[:oid] })
+          data, status_code, _headers = vericite_client.reports_urls_context_id_get(context_id, assignment_id_filter, consumer, consumer_secret, token_user, token_user_role, { user_id_filter => user_id, external_content_id_filter => args[:oid] })
           # check status code
           response[:return_code] = status_code
           if !is_response_success?(response)

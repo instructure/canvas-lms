@@ -21,7 +21,7 @@
 module Api::V1::FeatureFlag
   include Api::V1::Json
 
-  def feature_json(feature, current_user, session)
+  def feature_json(feature, _current_user, _session)
     # this isn't an AR object, so api_json doesn't work
     hash = feature.as_json.slice('feature', 'applies_to', 'enable_at', 'root_opt_in', 'beta',
                                  'release_notes_url', 'autoexpand', 'pending_enforcement', 'type')

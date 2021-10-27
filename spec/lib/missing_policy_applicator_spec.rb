@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 describe MissingPolicyApplicator do
   describe '.apply_missing_deductions' do
     it 'invokes #apply_missing_deductions' do

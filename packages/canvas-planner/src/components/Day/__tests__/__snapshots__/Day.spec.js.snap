@@ -29,6 +29,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
           "id": "1",
         }
       }
+      isObserving={false}
       items={
         Array [
           Object {
@@ -63,6 +64,7 @@ exports[`groups itemsForDay that come in on prop changes 1`] = `
           "id": "1",
         }
       }
+      isObserving={false}
       items={
         Array [
           Object {
@@ -119,6 +121,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
           "id": "1",
         }
       }
+      isObserving={false}
       items={
         Array [
           Object {
@@ -153,6 +156,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
           "id": "1",
         }
       }
+      isObserving={false}
       items={
         Array [
           Object {
@@ -195,6 +199,7 @@ exports[`groups itemsForDay that come in on prop changes 2`] = `
           "id": "1",
         }
       }
+      isObserving={false}
       items={
         Array [
           Object {
@@ -246,6 +251,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
           "id": "1",
         }
       }
+      isObserving={false}
       items={
         Array [
           Object {
@@ -280,6 +286,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
           "id": "1",
         }
       }
+      isObserving={false}
       items={
         Array [
           Object {
@@ -322,6 +329,7 @@ exports[`groups itemsForDay that have no context into the "Notes" category 1`] =
           "id": "1",
         }
       }
+      isObserving={false}
       items={
         Array [
           Object {
@@ -373,6 +381,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
           "id": "1",
         }
       }
+      isObserving={false}
       items={
         Array [
           Object {
@@ -409,6 +418,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
           "id": "1",
         }
       }
+      isObserving={false}
       items={
         Array [
           Object {
@@ -454,6 +464,7 @@ exports[`renders grouping correctly when having itemsForDay 1`] = `
           "id": "1",
         }
       }
+      isObserving={false}
       items={
         Array [
           Object {

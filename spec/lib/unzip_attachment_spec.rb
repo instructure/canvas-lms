@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe UnzipAttachment do
   def fixture_filename(filename)
     File.expand_path(File.join(File.dirname(__FILE__), %W(.. fixtures #{filename})))
@@ -132,6 +130,13 @@ describe UnzipAttachment do
       ua = UnzipAttachment.new(:course => @course, :filename => filename)
       expect { ua.process }.not_to raise_error
       expect(@course.attachments.map(&:display_name)).to eq ['~tilde']
+    end
+
+    it "does not fail when dealing with long filenames" do
+      filename = fixture_filename("zip_with_long_filename_inside.zip")
+      ua = UnzipAttachment.new(:course => @course, :filename => filename)
+      expect { ua.process }.not_to raise_exception
+      expect(@course.attachments.map(&:display_name)).to eq ["entry_#{(1..115).to_a.join}.txt"]
     end
 
     describe 'validations' do

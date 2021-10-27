@@ -163,7 +163,6 @@ class DiscussionTopicsApiController < ApplicationController
       )
       include_enrollment_state = params[:include_enrollment_state] && (@context.is_a?(Course) || @context.is_a?(Group)) &&
                                  @context.grants_right?(@current_user, session, :read_as_admin)
-      enrollments = nil
       if include_enrollment_state || include_context_card_info
         enrollment_context = @context.is_a?(Course) ? @context : @context.context
         all_enrollments = enrollment_context.enrollments.where(:user_id => participants).to_a

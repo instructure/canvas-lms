@@ -18,15 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe NotificationPreferencesController do
   before :once do
     @sms_notification = Notification.create!(name: 'Confirm SMS Communication Channel', category: 'Registration')
     @discussion_entry_notification = Notification.create!(name: 'New Discussion Entry', category: 'DiscussionEntry')
     user_model
     communication_channel_model
-    NotificationPolicy.setup_with_default_policies(@user, nil)
+    NotificationPolicy.setup_with_default_policies(@user)
   end
 
   before :each do

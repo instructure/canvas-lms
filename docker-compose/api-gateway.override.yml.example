@@ -8,8 +8,8 @@
 #
 # 2) match keypairs between canvas and the api gateway for signing and encryption (they should be
 #    different keypairs, you can just RSA generate new ones).
-#    The canvas side of each keypair should be stored in config/inst_access_signature.yml.
-#    See config/inst_access_signature.yml.example for example.
+#    The canvas side of each keypair should be stored in config/vault_contents.yml.
+#    See config/vault_contents.yml.example for example.
 #    private signing key for canvas gets matched to INST_ACCESS_SIGNING_PUBLIC_KEY here.
 #    public encryption key for canvas gets matched to INST_ACCESS_PRIVATE_KEY here.
 #

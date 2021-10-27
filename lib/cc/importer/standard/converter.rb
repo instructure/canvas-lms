@@ -47,7 +47,7 @@ module CC::Importer::Standard
     end
 
     # exports the package into the intermediary json
-    def convert(to_export = nil)
+    def convert(_to_export = nil)
       @course[:assignments] ||= []
 
       @archive.prepare_cartridge_file(MANIFEST_FILE)

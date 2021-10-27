@@ -21,6 +21,7 @@ import {defaultGradebookProps} from '../../__tests__/GradebookSpecHelper'
 import {darken, statusColors, defaultColors} from '../../constants/colors'
 import {render, within} from '@testing-library/react'
 import Gradebook from '../../Gradebook'
+
 import '@testing-library/jest-dom/extend-expect'
 
 describe('Gradebook', () => {

@@ -530,7 +530,7 @@ describe "Group Categories API", type: :request do
     describe "POST 'assign_unassigned_members'" do
       it "requires :manage_groups permission" do
         course_with_teacher(:active_all => true)
-        student = @course.enroll_student(user_model).user
+        @course.enroll_student(user_model)
         category = @course.group_categories.create(:name => "Group Category")
 
         raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",

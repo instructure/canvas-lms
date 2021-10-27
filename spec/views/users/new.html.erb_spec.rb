@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/users/new" do
@@ -26,9 +25,9 @@ describe "/users/new" do
     course_with_student
     view_context
     terms_of_service_content = TermsOfServiceContent.create!(content: "default content")
-    terms_of_service = TermsOfService.create!(terms_type: "default",
-                                              terms_of_service_content: terms_of_service_content,
-                                              account: @course.account)
+    TermsOfService.create!(terms_type: "default",
+                           terms_of_service_content: terms_of_service_content,
+                           account: @course.account)
     assign(:user, User.new)
     assign(:pseudonym, Pseudonym.new)
 

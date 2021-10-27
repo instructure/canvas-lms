@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 shared_examples_for 'QuizReportSerializer Associations' do
   it 'embeds its attachment as :file when present' do
     statistics.generate_csv

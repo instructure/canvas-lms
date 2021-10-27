@@ -86,7 +86,7 @@ describe "calendar2" do
 
       it "is navigable via the jump-to-date control" do
         yesterday = 1.day.ago
-        event = make_event(start: yesterday)
+        make_event(start: yesterday)
         load_agenda_view
         expect(f("#content")).not_to contain_css('.agenda-event__item-container')
         quick_jump_to_date(yesterday.strftime("%b %-d %Y"))

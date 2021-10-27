@@ -25,7 +25,7 @@ describe Canvas::RootAccountCacher do
 
   it "does not get confused by the same account id on different shards" do
     user = User.create!
-    p1 = user.pseudonyms.create!(unique_id: 'p1', account: Account.default)
+    user.pseudonyms.create!(unique_id: 'p1', account: Account.default)
     a2 = nil
     @shard1.activate do
       a2 = Account.create!(id: Account.default.local_id)

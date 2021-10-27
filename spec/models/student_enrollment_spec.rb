@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe StudentEnrollment do
   before(:each) do
     @student = User.create(:name => "some student")
@@ -152,6 +150,62 @@ describe StudentEnrollment do
           assignment_id: nil
         ).count
       }
+    end
+  end
+
+  describe "pace plan republishing" do
+    before :once do
+      @enrollment = course_with_student active_all: true
+      @pace_plan = @course.pace_plans.create!
+      @pace_plan.publish
+    end
+
+    it "does nothing if pace plans aren't turned on" do
+      @enrollment.update start_at: 1.day.from_now
+      expect(Delayed::Job.where(singleton: "pace_plan_republish:#{@course.global_id}:")).not_to exist
+    end
+
+    context "with pace plans enabled" do
+      before :once do
+        @course.enable_pace_plans = true
+        @course.save!
+      end
+
+      it "queues an update for a new student enrollment" do
+        student_in_course(active_all: true, user: user_with_pseudonym)
+        expect(Delayed::Job.where(singleton: "pace_plan_republish:#{@course.global_id}:")).to exist
+      end
+
+      it "doesn't queue an update if the pace plan isn't published" do
+        @pace_plan.update workflow_state: 'unpublished'
+        student_in_course(active_all: true, user: user_with_pseudonym)
+        expect(Delayed::Job.where(singleton: "pace_plan_republish:#{@course.global_id}:")).not_to exist
+      end
+
+      it "publishes a student pace plan (alone) if it exists" do
+        student_pace_plan = @course.pace_plans.create!(user_id: @enrollment.user_id)
+        student_pace_plan.publish
+        @enrollment.start_at = 2.days.from_now
+        @enrollment.save!
+        expect(Delayed::Job.where(singleton: "pace_plan_republish:#{@course.global_id}:")).not_to exist
+        expect(Delayed::Job.where(singleton: "pace_plan_republish:#{@course.global_id}:#{@enrollment.global_user_id}")).to exist
+      end
+
+      it "doesn't queue an update for irrelevant changes" do
+        @enrollment.last_attended_at = 1.day.ago
+        @enrollment.save!
+        expect(Delayed::Job.where(singleton: "pace_plan_republish:#{@course.global_id}:")).not_to exist
+      end
+
+      it "queues only one update when multiple enrollments are created" do
+        3.times { student_in_course(active_all: true, user: user_with_pseudonym) }
+        expect(Delayed::Job.where("strand LIKE 'pace_plan_republish:%'").count).to eq 1
+      end
+
+      it "doesn't queue an update for non-student-enrollment creation" do
+        ta_in_course(active_all: true, user: user_with_pseudonym)
+        expect(Delayed::Job.where(singleton: "pace_plan_republish:#{@course.global_id}:")).not_to exist
+      end
     end
   end
 end

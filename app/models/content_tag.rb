@@ -385,6 +385,9 @@ class ContentTag < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.save!
 
+    # for outcome links delete the associated friendly description
+    delete_outcome_friendly_description if self.content_type == 'LearningOutcome'
+
     run_due_date_cacher_for_quizzes_next(force: true)
 
     # after deleting the last native link to an unaligned outcome, delete the
@@ -692,5 +695,9 @@ class ContentTag < ActiveRecord::Base
 
     clear_context = context_type == 'LearningOutcomeGroup' ? nil : context
     Outcomes::LearningOutcomeGroupChildren.new(clear_context).clear_total_outcomes_cache
+  end
+
+  def delete_outcome_friendly_description
+    OutcomeFriendlyDescription.active.find_by(context: self.context, learning_outcome_id: self.content_id)&.destroy
   end
 end

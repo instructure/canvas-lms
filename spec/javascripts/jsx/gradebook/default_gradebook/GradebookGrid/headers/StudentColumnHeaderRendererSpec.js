@@ -21,7 +21,62 @@ import {
   createGradebook,
   setFixtureHtml
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper.js'
+import StudentColumnHeader from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/StudentColumnHeader'
 import StudentColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/StudentColumnHeaderRenderer.js'
+import StudentLastNameColumnHeader from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/StudentLastNameColumnHeader'
+
+QUnit.module('GradebookGrid StudentLastNameColumnHeaderRenderer', suiteHooks => {
+  let $container
+  let gradebook
+  let renderer
+  let component
+
+  function render() {
+    renderer.render(
+      {} /* column */,
+      $container,
+      {} /* gridSupport */,
+      {
+        ref(ref) {
+          component = ref
+        }
+      }
+    )
+  }
+
+  suiteHooks.beforeEach(() => {
+    $container = document.createElement('div')
+    document.body.appendChild($container)
+    setFixtureHtml($container)
+
+    gradebook = createGradebook({
+      login_handle_name: 'a_jones',
+      sis_name: 'Example SIS'
+    })
+    sinon.stub(gradebook, 'saveSettings')
+    renderer = new StudentColumnHeaderRenderer(gradebook, StudentLastNameColumnHeader, 'student_lastname')
+  })
+
+  suiteHooks.afterEach(() => {
+    $container.remove()
+  })
+
+  QUnit.module('#render()', () => {
+    test('renders the StudentLastNameColumnHeader to the given container node', () => {
+      render()
+      ok($container.innerText.includes('Student Last Name'), 'the "Student Last Name" header is rendered')
+    })
+  })
+
+  QUnit.module('#destroy()', () => {
+    test('unmounts the component', () => {
+      render()
+      renderer.destroy({}, $container)
+      const removed = ReactDOM.unmountComponentAtNode($container)
+      strictEqual(removed, false, 'the component was already unmounted')
+    })
+  })
+})
 
 /* eslint-disable qunit/no-identical-names */
 QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
@@ -53,7 +108,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       sis_name: 'Example SIS'
     })
     sinon.stub(gradebook, 'saveSettings')
-    renderer = new StudentColumnHeaderRenderer(gradebook)
+    renderer = new StudentColumnHeaderRenderer(gradebook, StudentColumnHeader, 'student')
   })
 
   suiteHooks.afterEach(() => {

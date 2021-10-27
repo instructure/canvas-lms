@@ -41,11 +41,11 @@ describe "Api::V1::ObserverAlert" do
   subject(:api) { ObserverAlertApiHarness.new }
 
   describe "#observer_alert_json" do
-    let(:user) { user_model }
-    let(:session) { Object.new }
+    let(:user) { user_with_pseudonym }
+    let(:session) { user_session(user) }
 
     it "returns json" do
-      alert = observer_alert_model
+      alert = observer_alert_model(observer: user)
       json = api.observer_alert_json(alert, user, session)
       expect(json['title']).to eq('value for type')
       expect(json['alert_type']).to eq('course_announcement')
@@ -59,33 +59,71 @@ describe "Api::V1::ObserverAlert" do
     context "returns a correct html_url" do
       before :once do
         @course = course_model
+        @course.offer!
       end
 
       it "for discussion_topic" do
         ann = Announcement.create!(context: @course, message: "Danger! Danger! Will Robinson")
-        alert = observer_alert_model(course: @course, active_all: true, alert_type: 'course_announcement', context: ann)
+        alert = observer_alert_model(observer: user, course: @course, active_all: true, alert_type: 'course_announcement', context: ann)
         json = api.observer_alert_json(alert, user, session)
         expect(json['html_url']).to eq api.course_discussion_topic_url(@course.id, ann)
       end
 
       it "for assignment" do
-        asg = assignment_model
-        alert = observer_alert_model(course: @course, active_all: true, alert_type: 'assignment_grade_high', context: asg)
+        asg = assignment_model(course: @course)
+        alert = observer_alert_model(observer: user, course: @course, active_all: true, alert_type: 'assignment_grade_high', context: asg)
         json = api.observer_alert_json(alert, user, session)
         expect(json['html_url']).to eq api.course_assignment_url(@course.id, asg)
       end
 
       it "for course" do
-        alert = observer_alert_model(course: @course, active_all: true, alert_type: 'course_grade_high', context: @course)
+        alert = observer_alert_model(observer: user, course: @course, active_all: true, alert_type: 'course_grade_high', context: @course)
         json = api.observer_alert_json(alert, user, session)
         expect(json['html_url']).to eq api.course_url(@course)
       end
 
       it "for assignment_missing" do
         submission = submission_model(course: @course)
-        alert = observer_alert_model(course: @course, active_all: true, alert_type: 'assignment_missing', context: submission)
+        alert = observer_alert_model(student: @student, observer: user, course: @course, active_all: true, alert_type: 'assignment_missing', context: submission)
         json = api.observer_alert_json(alert, user, session)
         expect(json['html_url']).to eq api.course_assignment_url(@course.id, submission.assignment)
+      end
+    end
+
+    context "returns a correct locked_for_user" do
+      before :once do
+        @course = course_model
+        @course.offer!
+      end
+
+      it "for assignment" do
+        asg = assignment_model(course: @course)
+        alert = observer_alert_model(observer: user, course: @course, active_all: true, alert_type: 'assignment_grade_high', context: asg)
+        json = api.observer_alert_json(alert, user, session)
+        expect(json['locked_for_user']).to eq false
+      end
+
+      it "for course" do
+        alert = observer_alert_model(observer: user, course: @course, active_all: true, alert_type: 'course_grade_high', context: @course)
+        json = api.observer_alert_json(alert, user, session)
+        expect(json['locked_for_user']).to eq false
+      end
+
+      it "for invisible course" do
+        alert = observer_alert_model(student: @student, observer: user, course: @course, active_all: true, alert_type: 'course_grade_high', context: @course)
+
+        @course.destroy
+        json = api.observer_alert_json(alert, user, session)
+        expect(json['locked_for_user']).to eq true
+      end
+
+      it "for deleted assignment" do
+        assignment = assignment_model(context: @course)
+        alert = observer_alert_model(student: @student, observer: user, course: @course, active_all: true, alert_type: 'assignment_grade_low', threshold: 70, context: assignment)
+
+        assignment.destroy!
+        json = api.observer_alert_json(alert, user, session)
+        expect(json['locked_for_user']).to eq true
       end
     end
   end

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
+require_relative '../../qti_helper'
 if Qti.migration_executable
   describe "Converting Blackboard 8 qti" do
     it "converts multiple choice" do
@@ -61,7 +61,7 @@ if Qti.migration_executable
     end
 
     it "converts matching questions" do
-      hash = get_question_hash(bb8_question_dir, 'matching', false)
+      hash = get_question_hash(bb8_question_dir, 'matching', delete_answer_ids: false)
       matches = {}
       hash[:matches].each { |m| matches[m[:match_id]] = m[:text] }
       hash[:answers].each do |a|

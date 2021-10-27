@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe OutcomeFriendlyDescription, type: :model do
   let_once(:account) { account_model }
   let_once(:outcome) { outcome_model }

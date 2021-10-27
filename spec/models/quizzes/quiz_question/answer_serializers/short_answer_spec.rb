@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_specs.rb')
 require File.expand_path(File.dirname(__FILE__) + '/support/textual_answer_serializers_specs.rb')
 
@@ -38,7 +37,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::ShortAnswer do
     expect(subject.deserialize({})).to eq nil
   end
 
-  it 'degracefullies sanitize its text' do
+  it 'gracefully sanitizes its text' do
     expect(subject.serialize('Hello World!').answer).to eq({
       question_5: 'hello world!'
     }.with_indifferent_access)

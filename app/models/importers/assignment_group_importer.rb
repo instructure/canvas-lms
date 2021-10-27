@@ -101,7 +101,7 @@ module Importers
         end
       end
       if rules.blank? && context.respond_to?(:assignment_group_no_drop_assignments)
-        context.assignment_group_no_drop_assignments&.delete_if { |k, v| v == item } # don't set never_drop rules if there are no drop rules
+        context.assignment_group_no_drop_assignments&.delete_if { |_k, v| v == item } # don't set never_drop rules if there are no drop rules
       end
       item.rules = rules.presence
 

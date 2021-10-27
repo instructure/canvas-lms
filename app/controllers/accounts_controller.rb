@@ -828,7 +828,7 @@ class AccountsController < ApplicationController
           @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
           @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
         else
-          account_settings.each { |k, v| @account.errors.add(k.to_sym, t(:cannot_manage_account, 'You are not allowed to manage account settings')) }
+          account_settings.each_key { |k| @account.errors.add(k.to_sym, t(:cannot_manage_account, 'You are not allowed to manage account settings')) }
           unauthorized = true
         end
       end
@@ -854,7 +854,7 @@ class AccountsController < ApplicationController
             end
           end
         else
-          quota_settings.each { |k, v| @account.errors.add(k.to_sym, t(:cannot_manage_quotas, 'You are not allowed to manage quota settings')) }
+          quota_settings.each_key { |k| @account.errors.add(k.to_sym, t(:cannot_manage_quotas, 'You are not allowed to manage quota settings')) }
           unauthorized = true
         end
       end
@@ -1012,7 +1012,7 @@ class AccountsController < ApplicationController
 
         custom_help_links = params[:account].delete :custom_help_links
         if custom_help_links
-          sorted_help_links = custom_help_links.to_unsafe_h.select { |_k, h| h['state'] != 'deleted' && h['state'] != 'new' }.sort_by { |_k, h| _k.to_i }
+          sorted_help_links = custom_help_links.to_unsafe_h.select { |_k, h| h['state'] != 'deleted' && h['state'] != 'new' }.sort_by { |k, _h| k.to_i }
           sorted_help_links.map! do |index_with_hash|
             hash = index_with_hash[1].to_hash.with_indifferent_access
             hash.delete('state')

@@ -31,7 +31,6 @@ class EportfolioCategoriesController < ApplicationController
 
   def create
     if authorized_action(@portfolio, @current_user, :update)
-      category_names = @portfolio.eportfolio_categories.map { |c| c.name }
       @category = @portfolio.eportfolio_categories.build(eportfolio_category_params)
       respond_to do |format|
         if @category.save

@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 RSpec.describe GradingPeriodSetsController, type: :controller do
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
 
@@ -210,7 +208,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
 
       describe "GET #index" do
         it "fetches sets through the root account" do
-          grading_period_set = group_helper.create_for_account(root_account)
+          group_helper.create_for_account(root_account)
 
           get :index, params: { account_id: sub_account.to_param }, session: valid_session
 

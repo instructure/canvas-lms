@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 require 'nokogiri'
 
 describe FilesController do
@@ -116,7 +114,6 @@ describe FilesController do
         get "http://test.host/users/#{@me.id}/files/#{@att.id}/download", params: { :wrap => '1' }
         expect(response).to be_redirect
         uri = URI.parse response['Location']
-        qs = Rack::Utils.parse_nested_query(uri.query)
         expect(uri.host).to eq 'test.host'
         expect(uri.path).to eq "/users/#{@me.id}/files/#{@att.id}"
         location = response['Location']
@@ -396,7 +393,7 @@ describe FilesController do
 
   it "does not use relative urls for safefiles in other contexts" do
     course_with_teacher_logged_in(:active_all => true)
-    a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
+    attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
   end
 
   it "returns the dynamically generated thumbnail of the size given" do

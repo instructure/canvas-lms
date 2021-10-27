@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 describe Canvas::Plugin do
   describe '.value_to_boolean' do
     it "accepts 0/1 as strings" do

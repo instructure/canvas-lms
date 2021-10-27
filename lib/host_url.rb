@@ -61,7 +61,7 @@ class HostUrl
       @@protocol
     end
 
-    def context_host(context = nil, current_host = nil)
+    def context_host(_context = nil, _current_host = nil)
       default_host
     end
 
@@ -78,7 +78,7 @@ class HostUrl
       res
     end
 
-    def file_host_with_shard(account, current_host = nil)
+    def file_host_with_shard(account, _current_host = nil)
       return [@@file_host, Shard.default] if @@file_host
 
       res = nil

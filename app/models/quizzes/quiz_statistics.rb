@@ -96,7 +96,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
                          })
   end
 
-  def __process_csv_job(progress)
+  def __process_csv_job(_progress)
     generate_csv
   end
 

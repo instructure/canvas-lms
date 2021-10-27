@@ -26,7 +26,6 @@ describe 'quizzes question creation' do
 
   before(:once) do
     course_with_teacher(active_all: true)
-    Account.default.enable_feature!(:rce_enhancements)
   end
 
   before(:each) do
@@ -150,7 +149,7 @@ describe 'quizzes question creation' do
       end
 
       short_answer_field.call
-      alert = driver.switch_to.alert
+      driver.switch_to.alert
       yield (driver.switch_to.alert)
       accept_alert
     end

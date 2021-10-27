@@ -10,13 +10,15 @@
 
 require "bundler/inline"
 
-# be tricksy and use a tiny subset of the gemfile so that
-# it will be very quick
-gemfile do
-  source 'https://rubygems.org/'
+Dir.chdir(File.expand_path("..", __dir__)) do
+  # be tricksy and use a tiny subset of the gemfile so that
+  # it will be very quick
+  gemfile do
+    source 'https://rubygems.org/'
 
-  gemfile = File.expand_path("../Gemfile.d/rubocop.rb", __dir__)
-  eval(File.read(gemfile))
+    gemfile = File.expand_path("../Gemfile.d/rubocop.rb", __dir__)
+    eval(File.read(gemfile))
+  end
 end
 
 load Gem.bin_path("rubocop", "rubocop")

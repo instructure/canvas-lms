@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path("#{File.dirname(__FILE__)}/../spec_helper.rb")
-
 describe PacePlanPresenter do
   describe '#as_json' do
     before :once do
@@ -51,7 +49,6 @@ describe PacePlanPresenter do
       expect(formatted_plan[:course_section_id]).to eq(@pace_plan.course_section_id)
       expect(formatted_plan[:user_id]).to eq(@pace_plan.user_id)
       expect(formatted_plan[:workflow_state]).to eq(@pace_plan.workflow_state)
-      expect(formatted_plan[:start_date]).to eq(@pace_plan.start_date)
       expect(formatted_plan[:end_date]).to eq(@pace_plan.end_date)
       expect(formatted_plan[:exclude_weekends]).to eq(@pace_plan.exclude_weekends)
       expect(formatted_plan[:hard_end_dates]).to eq(@pace_plan.hard_end_dates)
@@ -101,7 +98,6 @@ describe PacePlanPresenter do
       expect(formatted_plan[:course_section_id]).to eq(pace_plan.course_section_id)
       expect(formatted_plan[:user_id]).to eq(pace_plan.user_id)
       expect(formatted_plan[:workflow_state]).to eq(pace_plan.workflow_state)
-      expect(formatted_plan[:start_date]).to eq(pace_plan.start_date)
       expect(formatted_plan[:end_date]).to eq(pace_plan.end_date)
       expect(formatted_plan[:exclude_weekends]).to eq(pace_plan.exclude_weekends)
       expect(formatted_plan[:hard_end_dates]).to eq(pace_plan.hard_end_dates)

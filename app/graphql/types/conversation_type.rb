@@ -33,13 +33,19 @@ module Types
 
     field :conversation_messages_connection, Types::ConversationMessageType.connection_type, null: true do
       argument :participants, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('User')
+      argument :created_before, DateTimeType, required: false
     end
-    def conversation_messages_connection(participants: nil)
+    def conversation_messages_connection(participants: nil, created_before: nil)
       load_association(:conversation_messages).then do |messages|
         Loaders::AssociationLoader.for(ConversationMessage, :conversation_message_participants).load_many(messages).then do
           messages = messages.select { |message| message.conversation_message_participants.pluck(:user_id).include?(current_user.id) }
           if participants
             messages = messages.select { |message| (participants - message.conversation_message_participants.pluck(:user_id).map(&:to_s)).empty? }
+          end
+          if created_before
+            # We are converting the created_at time to a string and then parsing it back to a time to do the
+            # comparisson. We do this to get rid of the nanoseconds on the timestamp
+            messages = messages.select { |message| Time.zone.parse(message.created_at.to_s) <= created_before }
           end
           messages
         end

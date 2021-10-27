@@ -68,7 +68,7 @@ module Lti
 
     class Runner < Struct.new(:callbacks)
       def perform
-        callbacks.each do |tool_id, callback|
+        callbacks.each_value do |callback|
           begin
             CanvasHttp.get(URI.parse(callback).to_s)
           rescue => e

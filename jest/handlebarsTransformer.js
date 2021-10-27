@@ -17,7 +17,7 @@
  */
 
 const {transformSync} = require('@babel/core')
-const {compile} = require('../frontend_build/i18nLinerHandlebars')
+const {compile} = require('../ui-build/webpack/i18nLinerHandlebars')
 
 exports.process = (source, path) => {
   const amd = compile(source, path, {

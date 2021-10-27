@@ -40,7 +40,7 @@ module Account::Settings
     end
 
     def inheritable_settings
-      self.account_settings_options.select { |k, v| v[:inheritable] }.keys
+      self.account_settings_options.select { |_k, v| v[:inheritable] }.keys
     end
   end
 

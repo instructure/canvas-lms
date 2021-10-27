@@ -114,7 +114,7 @@ describe "external tool assignments" do
     a.external_tool_tag.update_attribute(:content_type, 'ContextExternalTool')
 
     mod = @course.context_modules.create!
-    t = mod.add_item(:id => a.id, :type => 'assignment')
+    mod.add_item(:id => a.id, :type => 'assignment')
     page = @course.wiki_pages.create!(:title => "wiki title")
     mod.add_item(:id => page.id, :type => 'wiki_page')
 

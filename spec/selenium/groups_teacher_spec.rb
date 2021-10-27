@@ -163,8 +163,8 @@ describe "new groups" do
       f(".icon-more").click
       wait_for_animations
       f(".message-all-unassigned").click
-      replace_content(fj('textarea[name="body"]'), "blah blah blah students")
-      fj(".btn-primary[data-text-when-loaded='Sent!']").click
+      replace_content(f('#message_all_unassigned'), "blah blah blah students")
+      f('button[type="submit"]').click
       wait_for_ajaximations
 
       expect(@course).to eq Conversation.last.context

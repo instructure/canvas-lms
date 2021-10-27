@@ -44,7 +44,7 @@ class Quizzes::QuizSortables
   # items is in format: [{"type" => "question", "id" => 1},
   #                      {"type" => "group",    "id" => 3}]
   def build_items(items)
-    items.each_with_index.map { |item, i| find_object_for_item(item) }.compact
+    items.filter_map { |item| find_object_for_item(item) }
   end
 
   def find_object_for_item(item)

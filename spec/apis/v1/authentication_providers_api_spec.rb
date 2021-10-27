@@ -82,7 +82,7 @@ describe "AuthenticationProviders API", type: :request do
     end
 
     it "creates a saml aac" do
-      json = call_create(@saml_hash)
+      call_create(@saml_hash)
       aac = @account.authentication_providers.first
       expect(aac.auth_type).to eq 'saml'
       expect(aac.idp_entity_id).to eq 'http://example.com/saml1'

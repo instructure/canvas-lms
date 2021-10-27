@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe PluginSetting do
   before(:all) do
     Canvas::Plugin.register('plugin_setting_test', nil, { :encrypted_settings => [:foo], :settings => { :bar => 'asdf' } })
@@ -60,7 +58,7 @@ describe PluginSetting do
   end
 
   it "returns updated content if created" do
-    s = PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty" })
+    PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty" })
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     expect(settings).not_to be_nil
     expect(settings[:bar]).to eq "qwerty"
@@ -78,7 +76,7 @@ describe PluginSetting do
     expect(settings[:bar]).to eq "asdf"
   end
 
-  it "immediatelies uncache on save" do
+  it "immediately uncaches on save" do
     enable_cache do
       s = PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty" })
       # cache it

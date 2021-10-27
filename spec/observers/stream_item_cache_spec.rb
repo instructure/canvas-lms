@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe StreamItemCache do
   describe "#invalidate_recent_stream_items" do
     it "deletes both the dashboard and context specific keys" do

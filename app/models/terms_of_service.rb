@@ -55,7 +55,7 @@ class TermsOfService < ActiveRecord::Base
   end
 
   DEFAULT_OPTIONS = { :terms_type => "default" }.freeze
-  def self.term_options_for_account(account)
+  def self.term_options_for_account(_account)
     DEFAULT_OPTIONS
   end
 

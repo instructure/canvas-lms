@@ -877,8 +877,7 @@ class AssignmentsApiController < ApplicationController
         ActiveRecord::Associations::Preloader.new.preload(assignments, :score_statistic)
       end
 
-      hashes = []
-      hashes = assignments.map do |assignment|
+      assignments.map do |assignment|
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
         needs_grading_course_proxy = @context.grants_right?(user, session, :manage_grades) ?
@@ -897,7 +896,6 @@ class AssignmentsApiController < ApplicationController
                         include_can_edit: include_params.include?('can_edit'),
                         include_score_statistics: include_params.include?('score_statistics'))
       end
-      hashes
     end
   end
 
@@ -1451,11 +1449,17 @@ class AssignmentsApiController < ApplicationController
   end
 
   def needs_grading_permission?
-    grading_attributes = [:points_possible, :grading_type, :grading_standard_id]
-    updating_grading_attribute = grading_attributes.any? do |attribute|
-      params[:assignment].key?(attribute) && params[:assignment][attribute] != @assignment[attribute]
+    grading_attributes = {
+      points_possible: params.dig(:assignment, :points_possible)&.to_f,
+      grading_type: params.dig(:assignment, :grading_type),
+      grading_standard_id: params.dig(:assignment, :grading_standard_id).presence&.to_i
+    }
+
+    changing_grade_attr = grading_attributes.any? do |attribute, value|
+      params[:assignment]&.key?(attribute) && value != @assignment[attribute]
     end
-    updating_grading_attribute && @assignment.submissions.graded.exists?
+
+    changing_grade_attr && @assignment.submissions.graded.exists?
   end
 
   # old_assignment is the assignement we want to copy from

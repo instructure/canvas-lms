@@ -1,6 +1,0 @@
-development:
-  private_key: <private key in base 64>
-  encryption_public_key: <public key in base 64 [NOT SAME KEYPAIR AS SIGNATURE!]>
-test:
-  private_key: <private key in base 64>
-  encryption_public_key: <public key in base 64 [NOT SAME KEYPAIR AS SIGNATURE!]>

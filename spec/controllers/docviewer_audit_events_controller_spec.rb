@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe DocviewerAuditEventsController do
   before :once do
     @course = Course.create!(name: 'a course')

@@ -99,7 +99,7 @@ class DelayedMessage < ActiveRecord::Base
     delayed_messages.each do |m|
       uniqs[[m.context_id, m.context_type, m.notification_id]] = m
     end
-    delayed_messages = uniqs.map { |key, val| val }.compact
+    delayed_messages = uniqs.values
     delayed_messages = delayed_messages.sort_by { |dm| [dm.notification.sort_order, dm.notification.category] }
     first = delayed_messages.detect { |m|
       m.communication_channel &&

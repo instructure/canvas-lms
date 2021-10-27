@@ -115,7 +115,7 @@ describe GradingPeriodsController do
 
       it "gets course associated grading periods if both are available" do
         course_period = create_course_grading_period(course)
-        account_period = create_account_grading_period(root_account)
+        create_account_grading_period(root_account)
         get :index, params: { course_id: course.id }
         expect_grading_period_id_match(json_parse, course_period)
       end
@@ -143,7 +143,7 @@ describe GradingPeriodsController do
       end
 
       it "cannot get any course associated grading periods" do
-        period = create_course_grading_period(course)
+        create_course_grading_period(course)
         get :index, params: { account_id: root_account.id }
         expect(json_parse['grading_periods'].count).to eql(0)
       end

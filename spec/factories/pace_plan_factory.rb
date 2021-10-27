@@ -27,7 +27,6 @@ module Factories
   def valid_pace_plan_attributes
     {
       workflow_state: 'active',
-      start_date: '2021-09-01',
       end_date: '2021-09-30',
       exclude_weekends: true,
       hard_end_dates: true,

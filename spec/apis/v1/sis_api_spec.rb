@@ -111,12 +111,12 @@ describe SisApiController, type: :request do
           start_at = 1.week.ago
           course1 = context.courses.create!
           course2 = context.courses.create!(:start_at => start_at - 1.day)
-          course3 = context.courses.create!(:start_at => start_at + 1.day)
+          context.courses.create!(:start_at => start_at + 1.day)
 
           term1 = context.root_account.enrollment_terms.create!(:start_at => start_at - 1.day)
           term2 = context.root_account.enrollment_terms.create!(:start_at => start_at + 1.day)
           course4 = context.courses.create!(:enrollment_term => term1)
-          course5 = context.courses.create!(:enrollment_term => term2)
+          context.courses.create!(:enrollment_term => term2)
 
           context.courses.not_deleted.each do |c|
             c.update_attribute(:workflow_state, 'available')
@@ -135,12 +135,12 @@ describe SisApiController, type: :request do
           end_at = 1.week.from_now
           course1 = context.courses.create!
           course2 = context.courses.create!(:conclude_at => end_at + 1.day)
-          course3 = context.courses.create!(:conclude_at => end_at - 1.day)
+          context.courses.create!(:conclude_at => end_at - 1.day)
 
           term1 = context.root_account.enrollment_terms.create!(:end_at => end_at + 1.day)
           term2 = context.root_account.enrollment_terms.create!(:end_at => end_at - 1.day)
           course4 = context.courses.create!(:enrollment_term => term1)
-          course5 = context.courses.create!(:enrollment_term => term2)
+          context.courses.create!(:enrollment_term => term2)
 
           context.courses.not_deleted.each do |c|
             c.update_attribute(:workflow_state, 'available')

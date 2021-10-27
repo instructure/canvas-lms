@@ -75,8 +75,8 @@ describe CC::CCHelper do
 
     it "translates media links using the original flavor" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
-      translated = @exporter.html_content(<<-HTML)
-      <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
+      @exporter.html_content(<<~HTML)
+        <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
       HTML
       expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
       expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq 'one'
@@ -104,8 +104,8 @@ describe CC::CCHelper do
 
     it "translates media links using an alternate flavor" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :media_object_flavor => 'flash video')
-      translated = @exporter.html_content(<<-HTML)
-      <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
+      @exporter.html_content(<<~HTML)
+        <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
       HTML
       expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
       expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq 'two'
@@ -274,7 +274,7 @@ describe CC::CCHelper do
 
     it "preserves query parameters on links" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
-      page = @course.wiki_pages.create!(:title => "something")
+      @course.wiki_pages.create!(:title => "something")
       other_page = @course.wiki_pages.create!(:title => "LinkByTitle")
       assignment = @course.assignments.create!(:name => "Thing")
       mod = @course.context_modules.create!(:name => "Stuff")

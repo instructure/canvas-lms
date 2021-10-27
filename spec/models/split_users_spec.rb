@@ -394,7 +394,7 @@ describe SplitUsers do
       end
 
       it "deconflicts duplicated paths where it can" do
-        notification = Notification.where(name: "Report Generated").first_or_create
+        Notification.where(name: "Report Generated").first_or_create
         communication_channel(restored_user, { username: 'test@instructure.com' })
         restored_user_ccs = restored_user.communication_channels.where.not(workflow_state: 'retired')
                                          .map { |cc| [cc.path, cc.workflow_state] }.sort

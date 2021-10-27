@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe OutcomesController do
   def context_outcome(context)
     @outcome_group ||= context.root_outcome_group
@@ -133,6 +131,22 @@ describe OutcomesController do
         user_session(@admin)
         get 'index', params: { :account_id => @account.id }
         expect(assigns[:js_env][:OUTCOMES_FRIENDLY_DESCRIPTION]).to eq false
+      end
+    end
+
+    context "individual_outcome_rating_and_calculation" do
+      it "returns true if individual_outcome_rating_and_calculation feature flag is enabled" do
+        @account.root_account.enable_feature!(:individual_outcome_rating_and_calculation)
+        user_session(@admin)
+        get 'index', params: { :account_id => @account.id }
+        expect(assigns[:js_env][:INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION]).to eq true
+      end
+
+      it "returns false if individual_outcome_rating_and_calculation feature flag is disabled" do
+        @account.root_account.disable_feature!(:individual_outcome_rating_and_calculation)
+        user_session(@admin)
+        get 'index', params: { :account_id => @account.id }
+        expect(assigns[:js_env][:INDIVIDUAL_OUTCOME_RATING_AND_CALCULATION]).to eq false
       end
     end
   end

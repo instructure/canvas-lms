@@ -46,8 +46,8 @@ describe AppointmentGroupsController, type: :request do
     ag1 = AppointmentGroup.create!(:title => "something", :contexts => [@course1])
     cat = @course1.group_categories.create(name: "foo")
     ag2 = AppointmentGroup.create!(:title => "another", :contexts => [@course1], :sub_context_codes => [cat.asset_string])
-    ag3 = AppointmentGroup.create!(:title => "inaccessible", :contexts => [Course.create!])
-    ag4 = AppointmentGroup.create!(:title => "past", :contexts => [@course1, @course2], :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]])
+    AppointmentGroup.create!(:title => "inaccessible", :contexts => [Course.create!])
+    AppointmentGroup.create!(:title => "past", :contexts => [@course1, @course2], :new_appointments => [["#{Time.zone.now.year - 1}-01-01 12:00:00", "#{Time.zone.now.year - 1}-01-01 13:00:00"]])
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable'
@@ -59,7 +59,7 @@ describe AppointmentGroupsController, type: :request do
   end
 
   it "returns past manageable appointment groups, if requested" do
-    ag = AppointmentGroup.create!(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]], :contexts => [@course])
+    AppointmentGroup.create!(:title => "past", :new_appointments => [["#{Time.zone.now.year - 1}-01-01 12:00:00", "#{Time.zone.now.year - 1}-01-01 13:00:00"]], :contexts => [@course])
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&include_past_appointments=1", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :include_past_appointments => '1'
                     })
@@ -67,8 +67,8 @@ describe AppointmentGroupsController, type: :request do
   end
 
   it "restricts manageable appointment groups by context_codes" do
-    ag1 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course1])
-    ag2 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course2])
+    AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.zone.now.year + 1}-01-01 12:00:00", "#{Time.zone.now.year + 1}-01-01 13:00:00"]], :contexts => [@course1])
+    AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.zone.now.year + 1}-01-01 12:00:00", "#{Time.zone.now.year + 1}-01-01 13:00:00"]], :contexts => [@course2])
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable'
@@ -92,7 +92,7 @@ describe AppointmentGroupsController, type: :request do
     ag3.publish!
 
     student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
-    ag4 = AppointmentGroup.create!(:title => "unpublished", :contexts => [@course])
+    AppointmentGroup.create!(:title => "unpublished", :contexts => [@course])
     ag5 = AppointmentGroup.create!(:title => "no times", :contexts => [@course])
     ag5.publish!
 
@@ -168,7 +168,7 @@ describe AppointmentGroupsController, type: :request do
   end
 
   it 'paginates appointment groups' do
-    ids = 5.times.map { |i| AppointmentGroup.create!(:title => "#{i}".object_id, :contexts => [@course]) }
+    5.times { |i| AppointmentGroup.create!(:title => i, :contexts => [@course]) }
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&per_page=2", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json',
                       :scope => 'manageable', :per_page => '2'
@@ -410,9 +410,9 @@ describe AppointmentGroupsController, type: :request do
   it 'publishes an appointment group in an update through the api' do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     expect(ag.workflow_state).to eq 'pending'
-    json = api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
-                    { :controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s },
-                    { :appointment_group => { :publish => '1' } })
+    api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
+             { :controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s },
+             { :appointment_group => { :publish => '1' } })
     ag.reload
     expect(ag.workflow_state).to eq 'active'
   end

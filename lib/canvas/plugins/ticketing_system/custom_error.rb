@@ -108,7 +108,7 @@ module Canvas::Plugins::TicketingSystem
             become_user_uri.query = (Hash[*(become_user_uri.query || '')
                             .split('&').map { |part| part.split('=') }.flatten])
                                     .merge({ 'become_user_id' => user_id }).to_query
-          rescue URI::Error => e
+          rescue URI::Error
             become_user_uri = "unable to parse uri: #{url}"
           end
           become_user_uri.to_s

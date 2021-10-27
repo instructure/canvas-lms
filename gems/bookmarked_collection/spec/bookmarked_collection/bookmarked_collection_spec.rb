@@ -21,40 +21,44 @@
 require 'spec_helper'
 
 describe "BookmarkedCollection" do
-  class IDBookmarker
-    def self.bookmark_for(object)
-      object.id
-    end
-
-    def self.validate(bookmark)
-      # can't actually validate because sometimes it'll be a mock
-      true
-    end
-
-    def self.restrict_scope(scope, pager)
-      if (bookmark = pager.current_bookmark)
-        comparison = (pager.include_bookmark ? 'id >= ?' : 'id > ?')
-        scope = scope.where(comparison, bookmark)
+  let(:id_bookmarker) do
+    Class.new do
+      def self.bookmark_for(object)
+        object.id
       end
-      scope.order("id ASC")
+
+      def self.validate(_bookmark)
+        # can't actually validate because sometimes it'll be a mock
+        true
+      end
+
+      def self.restrict_scope(scope, pager)
+        if (bookmark = pager.current_bookmark)
+          comparison = (pager.include_bookmark ? 'id >= ?' : 'id > ?')
+          scope = scope.where(comparison, bookmark)
+        end
+        scope.order("id ASC")
+      end
     end
   end
 
-  class NameBookmarker
-    def self.bookmark_for(course)
-      course.name
-    end
-
-    def self.validate(bookmark)
-      bookmark.is_a?(String)
-    end
-
-    def self.restrict_scope(scope, pager)
-      if (bookmark = pager.current_bookmark)
-        comparison = (pager.include_bookmark ? 'name >= ?' : 'name > ?')
-        scope = scope.where(comparison, bookmark)
+  let(:name_bookmarker) do
+    Class.new do
+      def self.bookmark_for(course)
+        course.name
       end
-      scope.order("name ASC")
+
+      def self.validate(bookmark)
+        bookmark.is_a?(String)
+      end
+
+      def self.restrict_scope(scope, pager)
+        if (bookmark = pager.current_bookmark)
+          comparison = (pager.include_bookmark ? 'name >= ?' : 'name > ?')
+          scope = scope.where(comparison, bookmark)
+        end
+        scope.order("name ASC")
+      end
     end
   end
 
@@ -68,28 +72,28 @@ describe "BookmarkedCollection" do
     end
 
     it "returns a WrapProxy" do
-      expect(BookmarkedCollection.wrap(IDBookmarker, @scope)).to be_a(PaginatedCollection::Proxy)
+      expect(BookmarkedCollection.wrap(id_bookmarker, @scope)).to be_a(PaginatedCollection::Proxy)
     end
 
     it "uses the provided scope when executing pagination" do
-      collection = BookmarkedCollection.wrap(IDBookmarker, @scope)
+      collection = BookmarkedCollection.wrap(id_bookmarker, @scope)
       expect(collection.paginate(:per_page => 1)).to eq([@scope.first])
     end
 
     it "uses the bookmarker's bookmark generator to produce bookmarks" do
       bookmark = double
-      allow(IDBookmarker).to receive(:bookmark_for) { bookmark }
+      allow(id_bookmarker).to receive(:bookmark_for) { bookmark }
 
-      collection = BookmarkedCollection.wrap(IDBookmarker, @scope)
+      collection = BookmarkedCollection.wrap(id_bookmarker, @scope)
       expect(collection.paginate(:per_page => 1).next_bookmark).to eq(bookmark)
     end
 
     it "uses the bookmarker's bookmark applicator to restrict by bookmark" do
       bookmark = @scope.order(:id).first.id
       bookmarked_scope = @scope.order(:id).where("id>?", bookmark)
-      allow(IDBookmarker).to receive(:restrict_scope) { bookmarked_scope }
+      allow(id_bookmarker).to receive(:restrict_scope) { bookmarked_scope }
 
-      collection = BookmarkedCollection.wrap(IDBookmarker, @scope)
+      collection = BookmarkedCollection.wrap(id_bookmarker, @scope)
       expect(collection.paginate(:per_page => 1)).to eq([bookmarked_scope.first])
     end
 
@@ -97,7 +101,7 @@ describe "BookmarkedCollection" do
       course = @scope.order(:id).last
       course.update(:name => 'Matching Name')
 
-      collection = BookmarkedCollection.wrap(IDBookmarker, @scope) do |scope|
+      collection = BookmarkedCollection.wrap(id_bookmarker, @scope) do |scope|
         scope.where(:name => course.name)
       end
 
@@ -119,8 +123,8 @@ describe "BookmarkedCollection" do
       @created_scope = example_class.where(:state => 'created')
       @deleted_scope = example_class.where(:state => 'deleted')
 
-      @created_collection = BookmarkedCollection.wrap(IDBookmarker, @created_scope)
-      @deleted_collection = BookmarkedCollection.wrap(IDBookmarker, @deleted_scope)
+      @created_collection = BookmarkedCollection.wrap(id_bookmarker, @created_scope)
+      @deleted_collection = BookmarkedCollection.wrap(id_bookmarker, @deleted_scope)
       @collection = BookmarkedCollection.merge(
         ['created', @created_collection],
         ['deleted', @deleted_collection]
@@ -161,8 +165,8 @@ describe "BookmarkedCollection" do
         @created_course = @created_scope.create!(:name => "Same Name")
         @deleted_course = @deleted_scope.create!(:name => "Same Name")
 
-        @created_collection = BookmarkedCollection.wrap(NameBookmarker, @created_scope)
-        @deleted_collection = BookmarkedCollection.wrap(NameBookmarker, @deleted_scope)
+        @created_collection = BookmarkedCollection.wrap(name_bookmarker, @created_scope)
+        @deleted_collection = BookmarkedCollection.wrap(name_bookmarker, @deleted_scope)
         @collection = BookmarkedCollection.merge(
           ['created', @created_collection],
           ['deleted', @deleted_collection]
@@ -184,8 +188,8 @@ describe "BookmarkedCollection" do
         @created_course = @created_scope.create!(:name => "Same Name")
         @deleted_course = @deleted_scope.create!(:name => "Same Name")
 
-        @created_collection = BookmarkedCollection.wrap(NameBookmarker, @created_scope)
-        @deleted_collection = BookmarkedCollection.wrap(NameBookmarker, @deleted_scope)
+        @created_collection = BookmarkedCollection.wrap(name_bookmarker, @created_scope)
+        @deleted_collection = BookmarkedCollection.wrap(name_bookmarker, @deleted_scope)
         @collection = BookmarkedCollection.merge(
           ['created', @created_collection],
           ['deleted', @deleted_collection]
@@ -222,8 +226,8 @@ describe "BookmarkedCollection" do
       @created_course2 = @created_scope.create!
       @deleted_course2 = @deleted_scope.create!
 
-      @created_collection = BookmarkedCollection.wrap(IDBookmarker, @created_scope)
-      @deleted_collection = BookmarkedCollection.wrap(IDBookmarker, @deleted_scope)
+      @created_collection = BookmarkedCollection.wrap(id_bookmarker, @created_scope)
+      @deleted_collection = BookmarkedCollection.wrap(id_bookmarker, @deleted_scope)
       @collection = BookmarkedCollection.concat(
         ['created', @created_collection],
         ['deleted', @deleted_collection]
@@ -267,7 +271,7 @@ describe "BookmarkedCollection" do
     end
 
     it "doesn't get confused by subcollections that don't respect per_page" do
-      bookmarker = IDBookmarker
+      bookmarker = id_bookmarker
       created_collection = BookmarkedCollection.build(bookmarker) do |pager|
         scope = @created_scope
         scope = bookmarker.restrict_scope(scope, pager)
@@ -286,7 +290,7 @@ describe "BookmarkedCollection" do
     end
 
     it "efficiently has a next page that coincides with a partial read" do
-      bookmarker = IDBookmarker
+      bookmarker = id_bookmarker
       created_collection = BookmarkedCollection.build(bookmarker) do |pager|
         scope = @created_scope
         scope = bookmarker.restrict_scope(scope, pager)
@@ -331,9 +335,9 @@ describe "BookmarkedCollection" do
     end
 
     it "handles concat(A, merge(B, C))" do
-      @user_collection = BookmarkedCollection.wrap(IDBookmarker, @user_scope)
-      @created_collection = BookmarkedCollection.wrap(IDBookmarker, @created_scope)
-      @deleted_collection = BookmarkedCollection.wrap(IDBookmarker, @deleted_scope)
+      @user_collection = BookmarkedCollection.wrap(id_bookmarker, @user_scope)
+      @created_collection = BookmarkedCollection.wrap(id_bookmarker, @created_scope)
+      @deleted_collection = BookmarkedCollection.wrap(id_bookmarker, @deleted_scope)
 
       @course_collection = BookmarkedCollection.merge(
         ['created', @created_collection],
@@ -355,10 +359,10 @@ describe "BookmarkedCollection" do
     end
 
     it "handles merge(A, merge(B, C))" do
-      # use NameBookmarker to make user/course merge interesting
-      @user_collection = BookmarkedCollection.wrap(NameBookmarker, @user_scope)
-      @created_collection = BookmarkedCollection.wrap(NameBookmarker, @created_scope)
-      @deleted_collection = BookmarkedCollection.wrap(NameBookmarker, @deleted_scope)
+      # use name_bookmarker to make user/course merge interesting
+      @user_collection = BookmarkedCollection.wrap(name_bookmarker, @user_scope)
+      @created_collection = BookmarkedCollection.wrap(name_bookmarker, @created_scope)
+      @deleted_collection = BookmarkedCollection.wrap(name_bookmarker, @deleted_scope)
 
       @course_collection = BookmarkedCollection.merge(
         ['created', @created_collection],
@@ -380,9 +384,9 @@ describe "BookmarkedCollection" do
     end
 
     it "handles concat(A, concat(B, C))" do
-      @user_collection = BookmarkedCollection.wrap(IDBookmarker, @user_scope)
-      @created_collection = BookmarkedCollection.wrap(IDBookmarker, @created_scope)
-      @deleted_collection = BookmarkedCollection.wrap(IDBookmarker, @deleted_scope)
+      @user_collection = BookmarkedCollection.wrap(id_bookmarker, @user_scope)
+      @created_collection = BookmarkedCollection.wrap(id_bookmarker, @created_scope)
+      @deleted_collection = BookmarkedCollection.wrap(id_bookmarker, @deleted_scope)
 
       @course_collection = BookmarkedCollection.concat(
         ['created', @created_collection],
@@ -404,9 +408,9 @@ describe "BookmarkedCollection" do
     end
 
     it "does not allow merge(A, concat(B, C))" do
-      @user_collection = BookmarkedCollection.wrap(NameBookmarker, @user_scope)
-      @created_collection = BookmarkedCollection.wrap(NameBookmarker, @created_scope)
-      @deleted_collection = BookmarkedCollection.wrap(NameBookmarker, @deleted_scope)
+      @user_collection = BookmarkedCollection.wrap(name_bookmarker, @user_scope)
+      @created_collection = BookmarkedCollection.wrap(name_bookmarker, @created_scope)
+      @deleted_collection = BookmarkedCollection.wrap(name_bookmarker, @deleted_scope)
 
       @course_collection = BookmarkedCollection.concat(
         ['created', @created_collection],

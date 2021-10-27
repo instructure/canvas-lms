@@ -104,9 +104,7 @@ class SubmissionList
 
   # An iterator on a sorted and filtered list of submission versions.
   def each(&block)
-    self.submission_entries.each do |entry|
-      yield(entry)
-    end
+    self.submission_entries.each(&block)
   end
 
   # An iterator on the day only, not each submission
@@ -172,7 +170,6 @@ class SubmissionList
 
   # Returns an array of assignments with an array of submission open structs.
   def assignments_for_grader_and_day(grader, day)
-    start = Time.now
     hsh = submission_entries.find_all { |e| e[:grader] == grader and e[:graded_on] == day }.inject({}) do |h, submission|
       assignment = submission[:assignment_name]
       h[assignment] ||= OpenObject.new(

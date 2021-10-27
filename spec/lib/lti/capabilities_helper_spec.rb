@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require_dependency "lti/capabilities_helper"
 
 # Get a list of valid capabilities
@@ -101,6 +100,7 @@ module Lti
          vnd.Canvas.submission.url
          Context.title
          com.instructure.Assignment.lti.id
+         com.instructure.Assignment.description
          com.instructure.Assignment.allowedFileExtensions
          com.instructure.Person.name_sortable
          com.instructure.PostMessageToken

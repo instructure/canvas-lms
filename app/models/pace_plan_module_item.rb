@@ -30,13 +30,14 @@ class PacePlanModuleItem < ActiveRecord::Base
   validate :assignable_module_item
 
   scope :active, -> { joins(:module_item).merge(ContentTag.active) }
+  scope :not_deleted, -> { joins(:module_item).merge(ContentTag.not_deleted) }
   scope :ordered, -> {
                     joins(module_item: :context_module)
                       .order('context_modules.position, context_modules.id, content_tags.position, content_tags.id')
                   }
 
   def assignable_module_item
-    unless module_item&.can_have_assignment?
+    unless module_item&.assignment
       self.errors.add(:module_item, 'is not assignable')
     end
   end

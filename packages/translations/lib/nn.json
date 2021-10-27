@@ -92,6 +92,9 @@
     "apply_781a2546": {
         "message": "Bruk"
     },
+    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+        "message": "Bruk endringane på alle forekomster av denne knappen og ikonet i emnet."
+    },
     "apps_54d24a47": {
         "message": "Appar"
     },
@@ -148,9 +151,6 @@
     },
     "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
         "message": "Auto-lagra innhald finst. Vil du laste inn auto-lagra innhald i staden for?"
-    },
-    "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-        "message": "Opne automatisk i integrert førehandsvising (sjå førehandsvisinga etter lagring)"
     },
     "available_folders_694d0436": {
         "message": "Tilgjengelege mapper"
@@ -244,6 +244,9 @@
     },
     "close_opportunity_center_popup_9907d981": {
         "message": "Lukk popup-menyen med val"
+    },
+    "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+        "message": "Tekst-fil må vere mindre enn { maxKb } kB."
     },
     "closed_captions_subtitles_e6aaa016": {
         "message": "Undertekstar"
@@ -380,9 +383,6 @@
     "directionality_26ae9e08": {
         "message": "Retningsgivande"
     },
-    "disable_in_line_preview_2a675175": {
-        "message": "Slå av integrert førehandsvising"
-    },
     "discussion_6719c51d": {
         "message": "Diskusjon"
     },
@@ -445,6 +445,9 @@
     },
     "edit_equation_f5279959": {
         "message": "Endre likning"
+    },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "Rediger knappen/ikonet "
     },
     "edit_link_7f53bebb": {
         "message": "Endre lenke"
@@ -833,9 +836,6 @@
     "my_grades_98834476": {
         "message": "Mine vurderingar"
     },
-    "my_images_427f9b0c": {
-        "message": "Mine bilder"
-    },
     "name_1aed4a1b": {
         "message": "Namn"
     },
@@ -971,6 +971,9 @@
     "preformatted_d0670862": {
         "message": "Førehandsformatert"
     },
+    "pretty_html_editor_28748756": {
+        "message": "Pen HTML-editor."
+    },
     "preview_53003fd2": {
         "message": "Førehandsvising"
     },
@@ -1034,6 +1037,9 @@
     "right_to_left_9cfb092a": {
         "message": "Høgre mot venstre"
     },
+    "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
+        "message": "I den pene HTML-editoren kan du ikkje redigere med tastatur. Gå til ein rein HTML-editor her."
+    },
     "save_11a80ec3": {
         "message": "Lagre"
     },
@@ -1064,6 +1070,9 @@
     "selected_274ce24f": {
         "message": "Valt"
     },
+    "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
+        "message": "Bruk Shift-O for å opne den pene HTML-editoren."
+    },
     "show_all_ae37d610": {
         "message": "Vis alt"
     },
@@ -1085,8 +1094,8 @@
     "size_b30e1077": {
         "message": "Storleik"
     },
-    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-        "message": "Storleiken på { file } er større enn lovleg maksgrense på { max } MB."
+    "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+        "message": "Storleiken på tekst-fila er større enn grensa på { max } kB."
     },
     "small_b070434a": {
         "message": "Liten"
@@ -1201,6 +1210,9 @@
     },
     "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
         "message": "Materialet er brukt i samsvar med sitatretten"
+    },
+    "the_pretty_html_editor_is_not_keyboard_accessible__d6d5d2b": {
+        "message": "I den pene HTML-editoren kan du ikkje redigere med tastatur. Trykk Shift-O for å opne den reine HTML-editoren."
     },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Det er ingen poeng knytta til elementet"

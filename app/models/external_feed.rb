@@ -50,7 +50,7 @@ class ExternalFeed < ActiveRecord::Base
 
   def display_name(short = true)
     short_url = (self.url || "").split("/")[0, 3].join("/")
-    res = self.title || (short ? t(:short_feed_title, "%{short_url} feed", :short_url => short_url) : self.url)
+    self.title || (short ? t(:short_feed_title, "%{short_url} feed", :short_url => short_url) : self.url)
   end
 
   def header_match=(str)

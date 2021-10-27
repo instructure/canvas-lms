@@ -30,12 +30,7 @@ tinymce.create('tinymce.plugins.InstructureHtmlView', {
       icon: 'htmlview',
       onAction: () => ed.execCommand('instructureHtmlView'),
       onSetup(api) {
-        // safari won't fullscreen the textarea that's the raw html editor
-        const disable =
-          !('requestFullscreen' in document.body) &&
-          !ed.rceWrapper.props.use_rce_pretty_html_editor &&
-          ed.rceWrapper.state.fullscreenState.isTinyFullscreen
-        api.setDisabled(disable)
+        api.setDisabled(false)
       }
     })
   }

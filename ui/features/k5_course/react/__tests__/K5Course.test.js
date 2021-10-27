@@ -396,7 +396,7 @@ describe('K-5 Subject Course', () => {
         url: 'http://enroll_url/'
       }
       const {getByRole} = render(<K5Course {...defaultProps} selfEnrollment={selfEnrollment} />)
-      const button = getByRole('link', {name: 'Join this Course'})
+      const button = getByRole('link', {name: 'Join this Subject'})
       expect(button).toBeInTheDocument()
       expect(button.href).toBe('http://enroll_url/')
     })
@@ -409,14 +409,14 @@ describe('K-5 Subject Course', () => {
       const {getByRole, getByText} = render(
         <K5Course {...defaultProps} selfEnrollment={selfEnrollment} />
       )
-      const button = getByRole('button', {name: 'Drop this Course'})
+      const button = getByRole('button', {name: 'Drop this Subject'})
       expect(button).toBeInTheDocument()
       act(() => button.click())
       expect(getByText('Drop Arts and Crafts')).toBeInTheDocument()
       expect(getByText('Confirm Unenrollment')).toBeInTheDocument()
       expect(
         getByText(
-          'Are you sure you want to unenroll in this course? You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications.'
+          'Are you sure you want to unenroll in this subject? You will no longer be able to see the subject roster or communicate directly with the teachers, and you will no longer see subject events in your stream and as notifications.'
         )
       ).toBeInTheDocument()
       expect(getByRole('button', {name: 'Cancel'})).toBeInTheDocument()
@@ -431,19 +431,19 @@ describe('K-5 Subject Course', () => {
       const {getByRole, getAllByRole, getByText} = render(
         <K5Course {...defaultProps} selfEnrollment={selfEnrollment} />
       )
-      const openModalButton = getByRole('button', {name: 'Drop this Course'})
+      const openModalButton = getByRole('button', {name: 'Drop this Subject'})
       act(() => openModalButton.click())
-      const dropButton = getAllByRole('button', {name: 'Drop this Course'})[1]
+      const dropButton = getAllByRole('button', {name: 'Drop this Subject'})[1]
       act(() => dropButton.click())
-      expect(getByText('Dropping course')).toBeInTheDocument()
+      expect(getByText('Dropping subject')).toBeInTheDocument()
       expect(fetchMock.called(selfEnrollment.url)).toBeTruthy()
     })
 
     it('renders neither if selfEnrollment is nil', () => {
       const {getByText, queryByText} = render(<K5Course {...defaultProps} />)
       expect(getByText('Arts and Crafts')).toBeInTheDocument()
-      expect(queryByText('Join this Course')).not.toBeInTheDocument()
-      expect(queryByText('Drop this Course')).not.toBeInTheDocument()
+      expect(queryByText('Join this Subject')).not.toBeInTheDocument()
+      expect(queryByText('Drop this Subject')).not.toBeInTheDocument()
     })
   })
 
