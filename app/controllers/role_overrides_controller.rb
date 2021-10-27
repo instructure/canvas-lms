@@ -695,9 +695,21 @@ class RoleOverridesController < ApplicationController
   private
 
   def course_permissions(context)
-    site_admin = { :group_name => t('site_admin_permissions', "Site Admin Permissions"), :group_permissions => [] }
-    account = { :group_name => t('account_permissions', "Account Permissions"), :group_permissions => [] }
-    course = { :group_name => t('course_permissions', "Course & Account Permissions"), :group_permissions => [] }
+    site_admin = {
+      group_name: t('site_admin_permissions', 'Site Admin Permissions'),
+      group_permissions: [],
+      context_type: 'Siteadmin'
+    }
+    account = {
+      group_name: t('account_permissions', 'Account Permissions'),
+      group_permissions: [],
+      context_type: 'Account'
+    }
+    course = {
+      group_name: t('course_permissions', 'Course & Account Permissions'),
+      group_permissions: [],
+      context_type: 'Course'
+    }
 
     RoleOverride.manageable_permissions(context).each do |p|
       # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
@@ -753,11 +765,22 @@ class RoleOverridesController < ApplicationController
   #     ]
   # context - the current context
   def account_permissions(context)
-    # Add group_names
-    site_admin = { :group_name => t('site_admin_permissions', "Site Admin Permissions"), :group_permissions => [] }
-    account = { :group_name => t('account_permissions', "Account Permissions"), :group_permissions => [] }
-    course = { :group_name => t('course_permissions', "Course & Account Permissions"), :group_permissions => [] }
-    admin_tools = { :group_name => t('admin_tools_permissions', "Admin Tools"), :group_permissions => [] }
+    site_admin = {
+      group_name: t('site_admin_permissions', 'Site Admin Permissions'),
+      group_permissions: [],
+      context_type: 'Siteadmin'
+    }
+    account = {
+      group_name: t('account_permissions', 'Account Permissions'),
+      group_permissions: [],
+      context_type: 'Account'
+    }
+    course = {
+      group_name: t('course_permissions', 'Course & Account Permissions'),
+      group_permissions: [],
+      context_type: 'Course'
+    }
+    admin_tools = { group_name: t('admin_tools_permissions', 'Admin Tools'), group_permissions: [] }
 
     # Add group_permissions
     RoleOverride.manageable_permissions(context).each do |p|
