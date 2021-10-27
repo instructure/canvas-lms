@@ -67,6 +67,13 @@ Lint/SymbolConversion:
   Severity: error
 Lint/UnifiedInteger:
   Severity: error
+Lint/UselessAssignment:
+  Severity: error
+Lint/UnusedBlockArgument:
+  Severity: error
+Lint/UnusedMethodArgument:
+  AllowUnusedKeywordArguments: true # there's no way to mark a kwarg as unused
+  Severity: error
 
 Metrics:
   Enabled: false # SnR is just too low to have this enabled
@@ -160,15 +167,6 @@ Lint/AmbiguousBlockAssociation: # TODO
     - change
     - not_change
     - raise_error
-Lint/UnusedBlockArgument: # TODO manually fix these by removing the argument if possible
-  Severity: warning
-  AutoCorrect: false
-Lint/UnusedMethodArgument: # TODO manually fix these by removing the argument if possible
-  Severity: warning
-  AllowUnusedKeywordArguments: true # there's no way to mark a kwarg as unused
-  AutoCorrect: false
-Lint/UselessAssignment: # TODO
-  Severity: warning
 
 Naming/VariableNumber: # TODO
   Enabled: false

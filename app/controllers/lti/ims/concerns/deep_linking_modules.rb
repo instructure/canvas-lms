@@ -98,20 +98,19 @@ module Lti::IMS::Concerns
       create_module if create_new_module?
 
       content_items_for_modules.each do |content_item|
-        tag =
-          context_module.add_item(
-            {
-              type: 'context_external_tool',
-              id: tool.id,
-              new_tab: 0,
-              indent: 0,
-              url: content_item[:url],
-              title: content_item[:title],
-              position: 1,
-              link_settings: launch_dimensions(content_item),
-              custom_params: Lti::DeepLinkingUtil.validate_custom_params(content_item[:custom])
-            }
-          )
+        context_module.add_item(
+          {
+            type: 'context_external_tool',
+            id: tool.id,
+            new_tab: 0,
+            indent: 0,
+            url: content_item[:url],
+            title: content_item[:title],
+            position: 1,
+            link_settings: launch_dimensions(content_item),
+            custom_params: Lti::DeepLinkingUtil.validate_custom_params(content_item[:custom])
+          }
+        )
       end
     end
 
