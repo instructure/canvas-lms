@@ -2287,12 +2287,7 @@ class Submission < ActiveRecord::Base
     res.workflow_state = 'assigned' if res.new_record?
     just_created = res.new_record?
     res.send_reminder! # this method also saves the assessment_request
-    case obj
-    when User
-      user = obj
-    when Submission
-      obj.assign_assessment(res) if just_created
-    end
+    obj.assign_assessment(res) if obj.is_a?(Submission) && just_created
     res
   end
 
@@ -2372,7 +2367,6 @@ class Submission < ActiveRecord::Base
   end
 
   def to_atom(opts = {})
-    prefix = self.assignment.context_prefix || ""
     author_name = self.assignment.present? && self.assignment.context.present? ? self.assignment.context.name : t('atom_no_author', "No Author")
     Atom::Entry.new do |entry|
       entry.title     = "#{self&.user.name} -- #{self&.assignment.title}#{', ' + self.assignment.context.name if opts[:include_context]}"

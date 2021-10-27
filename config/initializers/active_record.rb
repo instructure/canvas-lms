@@ -450,8 +450,6 @@ class ActiveRecord::Base
     num_days = options[:num_days] || 20
     min_date = (options[:min_date] || max_date.advance(:days => -(num_days - 1))).midnight
 
-    offset = max_date.utc_offset
-
     expression = "((#{column} || '-00')::TIMESTAMPTZ AT TIME ZONE '#{Time.zone.tzinfo.name}')::DATE"
 
     result = where("#{column} >= ? AND #{column} < ?",

@@ -298,8 +298,8 @@ module AttachmentFu # :nodoc:
         # it looks like they're not always working for some reason
         begin
           bucket.object(old_full_filename).move_to(full_filename, :acl => attachment_options[:s3_access])
-        rescue => e
-          filename = @old_filename
+        rescue
+          nil
         end
 
         @old_filename = nil

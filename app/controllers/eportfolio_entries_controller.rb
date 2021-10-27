@@ -32,7 +32,6 @@ class EportfolioEntriesController < ApplicationController
     if authorized_action(@portfolio, @current_user, :update)
       @category = @portfolio.eportfolio_categories.find(params[:eportfolio_entry].delete(:eportfolio_category_id))
 
-      page_names = @category.eportfolio_entries.map { |c| c.name }
       @page = @portfolio.eportfolio_entries.build(eportfolio_entry_params)
       @page.eportfolio_category = @category
       @page.parse_content(params)

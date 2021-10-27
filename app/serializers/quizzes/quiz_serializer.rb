@@ -278,7 +278,7 @@ module Quizzes
       hash = super
       # legacy v1 api
       unless accepts_jsonapi?
-        links = hash.delete('links')
+        hash.delete('links')
         # id = hash['assignment_group']
         # hash['assignment_group_id'] = quiz.assignment_group.try(:id)
       else

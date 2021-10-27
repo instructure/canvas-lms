@@ -244,7 +244,6 @@ class CourseSection < ActiveRecord::Base
     # This is messy, and I hate it.
     # The SIS import actually gives us three names for a section
     #   and I don't know which one is best, or which one to show.
-    name_had_changed = name_changed?
     # Here's the current plan:
     # - otherwise, just use name
     # - use the method display_name to consolidate this logic

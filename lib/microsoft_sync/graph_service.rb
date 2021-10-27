@@ -114,8 +114,6 @@ module MicrosoftSync
         group_remove_user_requests(group_id, owners, 'owners')
       quota = [reqs.count, reqs.count]
 
-      expected_error = nil
-
       ignored_request_ids = run_batch(
         'group_remove_users',
         reqs,

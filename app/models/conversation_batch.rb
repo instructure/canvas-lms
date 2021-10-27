@@ -70,7 +70,7 @@ class ConversationBatch < ActiveRecord::Base
 
       update_attribute :workflow_state, 'sent'
     end
-  rescue StandardError => e
+  rescue
     self.workflow_state = 'error'
     save!
   end

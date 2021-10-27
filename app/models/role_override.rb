@@ -1623,7 +1623,7 @@ class RoleOverride < ActiveRecord::Base
   end
 
   def self.css_class_for(context, permission, role, role_context = :role_account)
-    generated_permission = self.permission_for(context, permission, role, role_context = :role_account)
+    generated_permission = self.permission_for(context, permission, role, :role_account)
 
     css = []
     if generated_permission[:readonly]

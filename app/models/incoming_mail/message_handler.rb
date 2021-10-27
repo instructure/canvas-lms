@@ -97,7 +97,7 @@ module IncomingMail
         # Can't use our usual mechanisms, so just try to send it once now
         begin
           Mailer.deliver(Mailer.create_message(outgoing_message))
-        rescue => e
+        rescue
           # TODO: put some kind of error logging here?
         end
       end

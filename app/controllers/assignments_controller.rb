@@ -530,7 +530,6 @@ class AssignmentsController < ApplicationController
   def syllabus
     rce_js_env
     add_crumb @context.elementary_enabled? ? t("Important Info") : t('#crumbs.syllabus', "Syllabus")
-    active_tab = "Syllabus"
 
     @course_home_sub_navigation_tools =
       ContextExternalTool.all_tools_for(@context, placements: :course_home_sub_navigation,

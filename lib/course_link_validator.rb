@@ -278,7 +278,7 @@ class CourseLinkValidator
       return :unpublished_item if object.workflow_state == 'unpublished'
     end
     nil
-  rescue => e
+  rescue
     :missing_item
   end
 

@@ -580,7 +580,7 @@ class Pseudonym < ActiveRecord::Base
     pseudonyms = []
     begin
       pseudonyms = find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
-    rescue ImpossibleCredentialsError => e
+    rescue ImpossibleCredentialsError
       Rails.logger.info("Impossible pseudonym credentials: #{credentials[:unique_id]}, invalidating session")
       return :impossible_credentials
     end

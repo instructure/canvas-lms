@@ -192,8 +192,6 @@ module Importers
       item.hide_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:hide_correct_answers_at]) if master_migration || hash[:hide_correct_answers_at]
       item.scoring_policy = hash[:which_attempt_to_keep] if master_migration || hash[:which_attempt_to_keep]
 
-      missing_links = []
-
       unless migration.quizzes_next_migration? # The description is mapped to "instructions" in NQ
         item.description = migration.convert_html(hash[:description], :quiz, hash[:migration_id], :description)
       end

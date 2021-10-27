@@ -434,6 +434,7 @@ class Conversation < ActiveRecord::Base
   def context_name
     name = context.try(:name)
     name ||= Context.find_by_asset_string(context_tags.first).try(:name) if context_tags.first
+    name
   end
 
   def context_code

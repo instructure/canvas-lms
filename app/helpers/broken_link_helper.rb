@@ -55,7 +55,7 @@ module BrokenLinkHelper
 
     course_validator = CourseLinkValidator.new(course)
     course_validator.check_object_status(url, object: link_obj) || response_code_type
-  rescue => e
+  rescue
     :missing_item
   end
 

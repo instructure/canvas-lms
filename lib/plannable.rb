@@ -123,7 +123,7 @@ module Plannable
           rel_hash = nil
         end
       end
-      rel_array.reduce(object) { |val, key| val = val.send(key) }
+      rel_array.reduce(object) { |val, key| val.send(key) }
     end
 
     # Grabs the value to use for the bookmark & comparison

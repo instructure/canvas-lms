@@ -31,7 +31,7 @@ module Exporters
       begin
         handle = attachment.open(:need_local_file => true)
         zipfile.get_output_stream(filename) { |zos| Zip::IOExtras.copy_stream(zos, handle) }
-      rescue => e
+      rescue
         return false
       ensure
         handle.close if handle
