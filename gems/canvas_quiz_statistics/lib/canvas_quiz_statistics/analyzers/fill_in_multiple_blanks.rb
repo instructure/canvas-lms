@@ -61,21 +61,21 @@ module CanvasQuizStatistics::Analyzers
     # Number of students who filled all blanks correctly.
     #
     # @return [Integer]
-    metric :correct => [:grades] do |responses, grades|
+    metric :correct => [:grades] do |_responses, grades|
       grades.select { |r| r == 'true' }.length
     end
 
     # Number of students who filled one or more blanks correctly.
     #
     # @return [Integer]
-    metric :partially_correct => [:grades] do |responses, grades|
+    metric :partially_correct => [:grades] do |_responses, grades|
       grades.select { |r| r == 'partial' }.length
     end
 
     # Number of students who didn't fill any blank correctly.
     #
     # @return [Integer]
-    metric :incorrect => [:grades] do |responses, grades|
+    metric :incorrect => [:grades] do |_responses, grades|
       grades.select { |r| Base::Constants::FalseLike.include?(r) }.length
     end
 

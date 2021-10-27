@@ -175,7 +175,7 @@ module CanvasCassandra
     # updating columns with nil values, rather than creating tombstone delete
     # records for them
     def insert_record(table_name, primary_key_attrs, changes, ttl_seconds = nil, execute_options: {})
-      changes = changes.reject { |k, v| v.is_a?(Array) ? v.last.nil? : v.nil? }
+      changes = changes.reject { |_k, v| v.is_a?(Array) ? v.last.nil? : v.nil? }
       update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options: execute_options)
     end
 
@@ -204,7 +204,10 @@ module CanvasCassandra
     # => ["name = ? AND state = ?", ["foo", "ut"]]
     def build_where_conditions(conditions)
       where_args = []
-      where_clause = conditions.sort_by { |k, v| k.to_s }.map { |k, v| where_args << v; "#{k} = ?" }.join(" AND ")
+      where_clause = conditions.sort.map do |k, v|
+        where_args << v
+        "#{k} = ?"
+      end.join(" AND ")
       return where_clause, where_args
     end
 
@@ -219,18 +222,12 @@ module CanvasCassandra
 
     protected
 
-    def stringify_hash(hash)
-      hash.dup.tap do |new_hash|
-        new_hash.keys.each { |k| new_hash[k.to_s] = new_hash.delete(k) unless k.is_a?(String) }
-      end
-    end
-
     def do_update_record(table_name, primary_key_attrs, changes, ttl_seconds, execute_options: {})
-      primary_key_attrs = stringify_hash(primary_key_attrs)
-      changes = stringify_hash(changes)
+      primary_key_attrs = primary_key_attrs.stringify_keys
+      changes = changes.stringify_keys
       where_clause, where_args = build_where_conditions(primary_key_attrs)
 
-      primary_key_attrs.each do |key, value|
+      primary_key_attrs.each_key do |key|
         if changes[key].is_a?(Array) && !changes[key].first.nil?
           raise ArgumentError, "Cannot change the primary key of a record, attempted to change #{key} #{changes[key].inspect}"
         end
@@ -238,13 +235,13 @@ module CanvasCassandra
 
       deletes, updates = changes.
                          # normalize the values since we accept two formats
-                         map { |key, val| [key, val.is_a?(Array) ? val.last : val] }.
+                         transform_values { |val| val.is_a?(Array) ? val.last : val }.
                          # reject values that are part of the primary key, since those are in the where clause
-                         reject { |key, val| primary_key_attrs.key?(key) }.
+                         except(*primary_key_attrs.keys).
                          # sort, just so the generated cql is deterministic
                          sort_by(&:first).
                          # split changes into updates and deletes
-                         partition { |key, val| val.nil? }
+                         partition { |_key, val| val.nil? }
 
       # inserts and updates in cassandra are equivalent,
       # so no need to differentiate here

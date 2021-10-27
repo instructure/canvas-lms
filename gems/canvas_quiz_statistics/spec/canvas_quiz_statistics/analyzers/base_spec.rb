@@ -70,7 +70,7 @@ describe CanvasQuizStatistics::Analyzers::Base do
               { colors: responses.map { |r| r[:color] } }
             end
 
-            metric something: [:colors] do |responses, colors|
+            metric something: [:colors] do |_responses, colors|
               colors.join(', ')
             end
           end

@@ -278,7 +278,7 @@ module HtmlTextHelper
     message = HtmlTextHelper.escape_html(message)
 
     # now put the links back in
-    message = message.gsub(AUTO_LINKIFY_PLACEHOLDER) do |match|
+    message = message.gsub(AUTO_LINKIFY_PLACEHOLDER) do
       placeholder_blocks.shift
     end
 

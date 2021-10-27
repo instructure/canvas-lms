@@ -262,8 +262,7 @@ module AuthenticationMethods
       end
 
       if request_become_user && request_become_user.id != session[:become_user_id].to_i && request_become_user.can_masquerade?(@current_user, @domain_root_account)
-        params_without_become = params.dup
-        params_without_become.delete_if { |k, v| ['become_user_id', 'become_teacher', 'become_student', 'me'].include? k }
+        params_without_become = params.except('become_user_id', 'become_teacher', 'become_student', 'me')
         params_without_become[:only_path] = true
         session[:masquerade_return_to] = url_for(params_without_become.to_unsafe_h)
         return redirect_to user_masquerade_url(request_become_user.id)

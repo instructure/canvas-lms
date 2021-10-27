@@ -109,7 +109,7 @@ describe BookmarkedCollection::Proxy do
     it "doesn't blow up when filtering everything out" do
       bookmarker = BookmarkedCollection::SimpleBookmarker.new(@scope.klass, :id)
       @proxy = BookmarkedCollection.wrap(bookmarker, @scope)
-      @proxy = BookmarkedCollection.filter(@proxy) do |item|
+      @proxy = BookmarkedCollection.filter(@proxy) do
         false
       end
       collection = @proxy.instance_variable_get(:@collection)

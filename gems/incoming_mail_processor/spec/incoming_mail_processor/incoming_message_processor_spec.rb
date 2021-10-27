@@ -595,7 +595,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
                                          })
       processed_second = false
 
-      TimeoutMailbox.send(:define_method, :each_message) do |opts|
+      TimeoutMailbox.send(:define_method, :each_message) do |**|
         if @config[:username] == 'first'
           raise Timeout::Error
         else

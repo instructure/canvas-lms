@@ -546,7 +546,7 @@ class GradebookImporter
 
   def process_submissions(row, student)
     importer_submissions = []
-    @assignments.each_with_index do |assignment, idx|
+    @assignments.each do |assignment|
       assignment_id = assignment.new_record? ? assignment.id : assignment.previous_id
       assignment_index = @assignment_indices[assignment.id]
       grade = row[assignment_index]&.strip

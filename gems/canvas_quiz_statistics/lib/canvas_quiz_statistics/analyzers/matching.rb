@@ -111,7 +111,7 @@ module CanvasQuizStatistics::Analyzers
     #     }
     #   ]
     # }
-    metric :answer_sets => [:answers, :matches] do |responses, answers, matches|
+    metric :answer_sets => [:answers, :matches] do |responses, _answers, matches|
       answer_sets = parse_answers do |answer, stats|
         stats[:answers] = matches.map do |match|
           build_answer(match[:match_id],
