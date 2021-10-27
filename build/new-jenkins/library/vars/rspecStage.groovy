@@ -125,6 +125,7 @@ def setupNode() {
 
 def tearDownNode(prefix) {
   if (env.AUTO_CANCELLED.toBoolean()) {
+    println 'Test queue is empty, releasing node.'
     return
   }
   sh 'rm -rf ./tmp && mkdir -p tmp'
@@ -180,6 +181,7 @@ def tearDownNode(prefix) {
 def runRspecqSuite() {
   try {
     if (env.AUTO_CANCELLED.toBoolean()) {
+      println 'Test queue is empty, releasing node.'
       return
     }
     sh(script: 'docker-compose exec -T -e ENABLE_AXE_SELENIUM \
@@ -249,7 +251,12 @@ def runReporter() {
 def queue_empty() {
   env.REGISTRY_BASE = 'starlord.inscloudgate.net/jenkins'
   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $REGISTRY_BASE/redis:alpine"
-  def queueSize = sh(script: "docker run -e REDISCLI_AUTH=${RSPECQ_REDIS_PASSWORD} -e TEST_QUEUE_HOST -t $REGISTRY_BASE/redis:alpine redis-cli -h $TEST_QUEUE_HOST -p 6379 llen ${JOB_NAME}_build${BUILD_NUMBER}:queue:unprocessed", returnStdout: true).split(' ')[1].trim()
-  def queueStatus = sh(script: "docker run -e REDISCLI_AUTH=${RSPECQ_REDIS_PASSWORD} -e TEST_QUEUE_HOST -t $REGISTRY_BASE/redis:alpine redis-cli -h $TEST_QUEUE_HOST -p 6379 get  ${JOB_NAME}_build${BUILD_NUMBER}:queue:status", returnStdout: true).trim()
-  queueStatus == '\"ready\"' && queueSize.toInteger() == 0
+  def queueInfo = sh(script: "docker run -e REDISCLI_AUTH=${env.RSPECQ_REDIS_PASSWORD} -e TEST_QUEUE_HOST -t --rm $REGISTRY_BASE/redis:alpine /bin/sh -c '\
+                                      redis-cli -h $TEST_QUEUE_HOST -p 6379 llen ${JOB_NAME}_build${BUILD_NUMBER}:queue:unprocessed;\
+                                      redis-cli -h $TEST_QUEUE_HOST -p 6379 scard ${JOB_NAME}_build${BUILD_NUMBER}:queue:processed;\
+                                      redis-cli -h $TEST_QUEUE_HOST -p 6379 get ${JOB_NAME}_build${BUILD_NUMBER}:queue:status'", returnStdout: true).split('\n')
+  def queueUnprocessed = queueInfo[0].split(' ')[1].trim()
+  def queueProcessed = queueInfo[1].split(' ')[1].trim()
+  def queueStatus = queueInfo[2].trim()
+  return queueStatus == '\"ready\"' && queueUnprocessed.toInteger() == 0 && queueProcessed.toInteger() > 1
 }
