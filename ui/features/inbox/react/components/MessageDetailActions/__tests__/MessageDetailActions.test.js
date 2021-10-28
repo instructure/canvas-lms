@@ -24,8 +24,7 @@ describe('MessageDetailItem', () => {
   it('sends the selected option to the provided callback function', () => {
     const props = {
       onReply: jest.fn(),
-      onReplyAll: jest.fn(),
-      onDelete: jest.fn()
+      onReplyAll: jest.fn()
     }
     const {getByRole, getByText} = render(<MessageDetailActions {...props} />)
 
@@ -41,9 +40,5 @@ describe('MessageDetailItem', () => {
     fireEvent.click(moreOptionsButton)
     fireEvent.click(getByText('Reply All'))
     expect(props.onReplyAll).toHaveBeenCalled()
-
-    fireEvent.click(moreOptionsButton)
-    fireEvent.click(getByText('Delete'))
-    expect(props.onDelete).toHaveBeenCalled()
   })
 })

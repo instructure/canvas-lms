@@ -705,6 +705,8 @@ class AssignmentsController < ApplicationController
         POST_TO_SIS: post_to_sis,
         SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@context),
         VALID_DATE_RANGE: CourseDateRange.new(@context),
+        ANNOTATED_DOCUMENT_SUBMISSIONS:
+          Account.site_admin.feature_enabled?(:annotated_document_submissions),
         NEW_QUIZZES_ASSIGNMENT_BUILD_BUTTON_ENABLED:
           Account.site_admin.feature_enabled?(:new_quizzes_assignment_build_button)
       }
@@ -746,12 +748,14 @@ class AssignmentsController < ApplicationController
       end
 
       if @assignment.annotatable_attachment_id.present?
-        hash[:ANNOTATED_DOCUMENT] = {
-          display_name: @assignment.annotatable_attachment.display_name,
-          context_type: @assignment.annotatable_attachment.context_type,
-          context_id: @assignment.annotatable_attachment.context_id,
-          id: @assignment.annotatable_attachment.id
-        }
+        if Account.site_admin.feature_enabled?(:annotated_document_submissions)
+          hash[:ANNOTATED_DOCUMENT] = {
+            display_name: @assignment.annotatable_attachment.display_name,
+            context_type: @assignment.annotatable_attachment.context_type,
+            context_id: @assignment.annotatable_attachment.context_id,
+            id: @assignment.annotatable_attachment.id
+          }
+        end
       end
 
       hash[:USAGE_RIGHTS_REQUIRED] = @context.try(:usage_rights_required?)
