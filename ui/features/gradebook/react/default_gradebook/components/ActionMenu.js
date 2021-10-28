@@ -47,7 +47,6 @@ class ActionMenu extends React.Component {
     contextAllowsGradebookUploads: bool.isRequired,
     getAssignmentOrder: func.isRequired,
     gradebookImportUrl: string.isRequired,
-    showStudentFirstLastName: bool.isRequired,
 
     currentUserId: string.isRequired,
     gradebookExportUrl: string.isRequired,
@@ -134,11 +133,7 @@ class ActionMenu extends React.Component {
     $.flashMessage(I18n.t('Gradebook export started'))
 
     return this.exportManager
-      .startExport(
-        this.props.gradingPeriodId,
-        this.props.getAssignmentOrder,
-        this.props.showStudentFirstLastName
-      )
+      .startExport(this.props.gradingPeriodId, this.props.getAssignmentOrder)
       .then(resolution => {
         this.setExportInProgress(false)
 
