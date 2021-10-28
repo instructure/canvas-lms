@@ -183,4 +183,19 @@ module Factories
                                                 url: "http://www.google.com"
                                               })
   end
+
+  def quiz_with_question_group_pointing_to_question_bank
+    course_with_student
+    @bank = @course.assessment_question_banks.create!(title: "Test Bank")
+    @bank.assessment_questions.create!(question_data: { name: "Group Question 1", question_type: "essay_question", question_text: "gq1", answers: [] })
+    @bank.assessment_questions.create!(question_data: { name: "Group Question 2", question_type: "essay_question", question_text: "gq2", answers: [] })
+    @quiz = @course.quizzes.create!(title: "i'm tired quiz")
+    @quiz.quiz_questions.create!(question_data: { name: "Quiz Question 1", question_type: "essay_question", question_text: "qq1", answers: [], points_possible: 5.0 })
+    @group = @quiz.quiz_groups.create!(name: "question group", pick_count: 3, question_points: 5.0)
+    @group.assessment_question_bank = @bank
+    @group.save!
+    @quiz.generate_quiz_data
+    @quiz.save!
+    @quiz.reload
+  end
 end
