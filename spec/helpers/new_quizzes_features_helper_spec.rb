@@ -151,4 +151,31 @@ describe NewQuizzesFeaturesHelper do
       expect(new_quizzes_navigation_placements_enabled?(fake_context)).to eq false
     end
   end
+
+  describe "#new_quizzes_bank_migrations_enabled?" do
+    before do
+      allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
+      allow(@context.root_account).to receive(:feature_enabled?).with(:new_quizzes_migration).and_return(true)
+      Account.site_admin.enable_feature!(:new_quizzes_bank_migrations)
+    end
+
+    it 'returns true when new_quizzes_bank_migrations, new_quizzes_migration and quizzes_next are true' do
+      expect(new_quizzes_bank_migrations_enabled?).to eq true
+    end
+
+    it 'returns false when new_quizzes_bank_migrations is disabled' do
+      Account.site_admin.disable_feature!(:new_quizzes_bank_migrations)
+      expect(new_quizzes_bank_migrations_enabled?).to eq false
+    end
+
+    it 'returns false when quizzes_next is disabled' do
+      allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(false)
+      expect(new_quizzes_bank_migrations_enabled?).to eq false
+    end
+
+    it 'returns false when new_quizzes_migration is disabled' do
+      allow(@context.root_account).to receive(:feature_enabled?).with(:new_quizzes_migration).and_return(false)
+      expect(new_quizzes_bank_migrations_enabled?).to eq false
+    end
+  end
 end
