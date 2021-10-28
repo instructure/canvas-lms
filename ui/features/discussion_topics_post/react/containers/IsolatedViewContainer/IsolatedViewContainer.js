@@ -434,7 +434,7 @@ export const IsolatedViewContainer = props => {
           )}
         </IsolatedParent>
         {!props.RCEOpen && (
-          <View as="div" borderWidth="medium none none none" padding="medium none none">
+          <View as="div" borderWidth="small none none none" padding="medium none none">
             <IsolatedThreadsContainer
               discussionTopic={props.discussionTopic}
               discussionEntry={isolatedEntryOlderDirection.data.legacyNode}
