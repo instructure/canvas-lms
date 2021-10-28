@@ -114,7 +114,6 @@ export interface UIState {
   readonly showLoadingOverlay: boolean
   readonly showProjections: boolean
   readonly editingBlackoutDates: boolean
-  readonly adjustingHardEndDatesAfter?: number
 }
 
 export interface StoreState {

@@ -28,12 +28,13 @@ import {Spinner} from '@instructure/ui-spinner'
 import {StoreState} from '../types'
 import {getAutoSaving, getShowLoadingOverlay} from '../reducers/ui'
 import {pacePlanActions} from '../actions/pace_plans'
-import {getPlanPublishing, getUnpublishedChangeCount} from '../reducers/pace_plans'
+import {getPlanPublishing, getUnpublishedChangeCount, isStudentPlan} from '../reducers/pace_plans'
 
 interface StoreProps {
   readonly autoSaving: boolean
   readonly planPublishing: boolean
   readonly showLoadingOverlay: boolean
+  readonly studentPlan: boolean
   readonly unpublishedChanges: boolean
 }
 
@@ -50,8 +51,11 @@ export const Footer: React.FC<ComponentProps> = ({
   publishPlan,
   resetPlan,
   showLoadingOverlay,
+  studentPlan,
   unpublishedChanges
 }) => {
+  if (studentPlan) return null
+
   const disabled = autoSaving || planPublishing || showLoadingOverlay || !unpublishedChanges
   // This wrapper div attempts to roughly match the dimensions of the publish button
   const publishLabel = planPublishing ? (
@@ -83,6 +87,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     autoSaving: getAutoSaving(state),
     planPublishing: getPlanPublishing(state),
     showLoadingOverlay: getShowLoadingOverlay(state),
+    studentPlan: isStudentPlan(state),
     unpublishedChanges: getUnpublishedChangeCount(state) !== 0
   }
 }

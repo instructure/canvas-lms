@@ -83,6 +83,7 @@ export const getPublishingError = (state: StoreState): string | undefined => {
   return progress.message
 }
 export const getEndDate = (state: StoreState): string | undefined => state.pacePlan.end_date
+export const isStudentPlan = (state: StoreState) => state.pacePlan.context_type === 'Enrollment'
 
 export const getPacePlanItems = createSelector(getPacePlanModules, getModuleItems)
 
