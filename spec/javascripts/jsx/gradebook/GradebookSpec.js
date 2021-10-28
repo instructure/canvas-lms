@@ -9770,6 +9770,65 @@ QUnit.module('Gradebook#setCurrentGradingPeriod', hooks => {
   })
 })
 
+QUnit.module('Gradebook#toggleShowSeparateFirstLastNames', hooks => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook({
+      grid: {
+        getColumns: () => [],
+        updateCell: sinon.stub()
+      },
+      settings: {
+        allow_separate_first_last_names: 'true'
+      }
+    })
+
+    sandbox.stub(gradebook, 'saveSettings').callsFake((_data, callback) => {
+      callback()
+    })
+  })
+
+  test('toggles showSeparateFirstLastNames to true when false', () => {
+    gradebook.gridDisplaySettings.showSeparateFirstLastNames = false
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    gradebook.toggleShowSeparateFirstLastNames()
+
+    strictEqual(gradebook.gridDisplaySettings.showSeparateFirstLastNames, true)
+  })
+
+  test('toggles showSeparateFirstLastNames to false when true', () => {
+    gradebook.gridDisplaySettings.showSeparateFirstLastNames = true
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    gradebook.toggleShowSeparateFirstLastNames()
+
+    strictEqual(gradebook.gridDisplaySettings.showSeparateFirstLastNames, false)
+  })
+
+  test('calls updateColumnsAndRenderViewOptionsMenu after toggling', () => {
+    gradebook.gridDisplaySettings.showSeparateFirstLastNames = true
+    const stubFn = sandbox
+      .stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+      .callsFake(() => {
+        strictEqual(gradebook.gridDisplaySettings.showSeparateFirstLastNames, false)
+      })
+    gradebook.toggleShowSeparateFirstLastNames()
+
+    strictEqual(stubFn.callCount, 1)
+  })
+
+  test('calls saveSettings with the new value of the setting', () => {
+    gradebook.gridDisplaySettings.showSeparateFirstLastNames = false
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+
+    gradebook.toggleShowSeparateFirstLastNames()
+
+    deepEqual(gradebook.saveSettings.firstCall.args[0], {
+      showSeparateFirstLastNames: true
+    })
+  })
+})
+
 QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
   let gradebook
 
@@ -9921,6 +9980,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
     sinon.stub(GradebookApi, 'updateTeacherNotesColumn').resolves()
 
     sinon.stub(FlashAlert, 'showFlashError')
+    setFixtureHtml(container)
   })
 
   hooks.afterEach(() => {
@@ -9995,7 +10055,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
     })
   })
 
-  QUnit.module('when updating teacher notes settings', () => {
+  QUnit.module('when updating view settings', () => {
     QUnit.module('when the notes column does not exist', () => {
       test('calls the createTeacherNotesColumn API function if showNotes is true', async () => {
         await gradebook.handleViewOptionsUpdated({showNotes: true})
@@ -10078,6 +10138,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
     QUnit.module('when updating items stored in user settings', () => {
       const updateParams = (overrides = {}) => ({
         showUnpublishedAssignments: false,
+        showSeparateFirstLastNames: false,
         statusColors: gradebook.state.gridColors,
         viewUngradedAsZero: false,
         ...overrides
@@ -10103,6 +10164,33 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
       test('does not call saveUserSettings if no value has changed', async () => {
         await gradebook.handleViewOptionsUpdated(updateParams())
         strictEqual(GradebookApi.saveUserSettings.callCount, 0)
+      })
+
+      QUnit.module('updating showSeparateFirstLastNames assignments', () => {
+        test('shows separate last/first names when showSeparateFirstLastNames is set to true', async () => {
+          await gradebook.handleViewOptionsUpdated(updateParams({showSeparateFirstLastNames: true}))
+          deepEqual(gradebook.gridData.columns.frozen, ['student_lastname', 'student_firstname'])
+        })
+
+        test('shows student name when showSeparateFirstLastNames is set to false', async () => {
+          await gradebook.handleViewOptionsUpdated(
+            updateParams({showSeparateFirstLastNames: false})
+          )
+          deepEqual(gradebook.gridData.columns.frozen, ['student'])
+        })
+
+        test('does not update student columns if the request fails', async () => {
+          QUnit.expect(1)
+          GradebookApi.saveUserSettings.rejects(new Error('no way'))
+
+          try {
+            await gradebook.handleViewOptionsUpdated(
+              updateParams({showSeparateFirstLastNames: true})
+            )
+          } catch {
+            deepEqual(gradebook.gridData.columns.frozen, ['student'])
+          }
+        })
       })
 
       QUnit.module('updating showing unpublished assignments', () => {
