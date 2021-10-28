@@ -26,9 +26,9 @@ import {Flex} from '@instructure/ui-flex'
 import {Spinner} from '@instructure/ui-spinner'
 
 import {StoreState} from '../types'
-import {getAutoSaving, getPlanPublishing, getShowLoadingOverlay} from '../reducers/ui'
+import {getAutoSaving, getShowLoadingOverlay} from '../reducers/ui'
 import {pacePlanActions} from '../actions/pace_plans'
-import {getUnpublishedChangeCount} from '../reducers/pace_plans'
+import {getPlanPublishing, getUnpublishedChangeCount} from '../reducers/pace_plans'
 
 interface StoreProps {
   readonly autoSaving: boolean

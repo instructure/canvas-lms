@@ -121,7 +121,8 @@ class GradebookExporter
 
     CSVWithI18n.generate(**@options.slice(:encoding, :col_sep, :include_bom)) do |csv|
       # First row
-      header = ["Student", "ID"]
+      header = @options[:show_student_first_last_name] ? ["LastName", "FirstName"] : ["Student"]
+      header << "ID"
       header << "SIS User ID" if include_sis_id
       header << "SIS Login ID"
       header << "Integration ID" if include_sis_id && show_integration_id?
@@ -156,6 +157,7 @@ class GradebookExporter
       # Possible "hidden" (muted or manual posting) row
       if assignments.any? { |assignment| show_as_hidden?(assignment) }
         row = [nil, nil, nil, nil]
+        row << nil if @options[:show_student_first_last_name]
         if include_sis_id
           row << nil
           row << nil if show_integration_id?
@@ -190,6 +192,7 @@ class GradebookExporter
 
       # Second Row
       row = ["    Points Possible", nil, nil, nil]
+      row << nil if @options[:show_student_first_last_name]
       if include_sis_id
         row << nil
         row << nil if show_integration_id?
@@ -260,7 +263,12 @@ class GradebookExporter
               "N/A"
             end
           end
-          row = [student_name(student), student.id]
+          row = if @options[:show_student_first_last_name]
+                  [student_name(student.last_name), student_name(student.first_name)]
+                else
+                  [student_name(student.sortable_name)]
+                end
+          row << student.id
           pseudonym = SisPseudonym.for(student, student_enrollment, type: :implicit, require_sis: false, root_account: @course.root_account)
           row << pseudonym&.sis_user_id if include_sis_id
           row << pseudonym&.unique_id
@@ -393,9 +401,8 @@ class GradebookExporter
   # Returns the student name to use for the export.  If the name
   # starts with =, quote it so anyone pulling the data into Excel
   # doesn't have a formula execute.
-  def student_name(student)
-    name = student.sortable_name
-    name = "=\"#{name}\"" if name =~ STARTS_WITH_EQUAL
+  def student_name(name)
+    name = "=\"#{name}\"" if name.match?(STARTS_WITH_EQUAL)
     name
   end
 

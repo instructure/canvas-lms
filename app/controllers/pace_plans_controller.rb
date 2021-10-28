@@ -40,7 +40,7 @@ class PacePlansController < ApplicationController
       end
     end
 
-    progress = Progress.find_by(context: @pace_plan, workflow_state: ['queued', 'running'], tag: 'pace_plan_publish')
+    progress = latest_progress
     progress_json = progress_json(progress, @current_user, session) if progress
 
     js_env({
@@ -56,7 +56,7 @@ class PacePlansController < ApplicationController
   end
 
   def api_show
-    progress = Progress.find_by(context: @pace_plan, workflow_state: ['queued', 'running'], tag: 'pace_plan_publish')
+    progress = latest_progress
     progress_json = progress_json(progress, @current_user, session) if progress
     render json: {
       pace_plan: PacePlanPresenter.new(@pace_plan).as_json,
@@ -132,6 +132,11 @@ class PacePlansController < ApplicationController
   end
 
   private
+
+  def latest_progress
+    progress = Progress.order(created_at: :desc).find_by(context: @pace_plan, tag: 'pace_plan_publish')
+    progress&.workflow_state == "completed" ? nil : progress
+  end
 
   def enrollments_json(course)
     json = course.all_real_student_enrollments.map do |enrollment|

@@ -190,6 +190,24 @@ describe PacePlansController, type: :controller do
       expect(response).to be_successful
       expect(JSON.parse(response.body)["pace_plan"]["id"]).to eq(@pace_plan.id)
     end
+
+    it "renders the latest progress object associated with publishing" do
+      Progress.create!(context: @pace_plan, tag: 'pace_plan_publish', workflow_state: 'failed')
+      Progress.create!(context: @pace_plan, tag: 'pace_plan_publish', workflow_state: 'running')
+
+      get :api_show, params: { course_id: @course.id, id: @pace_plan.id }
+      expect(response).to be_successful
+      expect(JSON.parse(response.body)["progress"]["workflow_state"]).to eq("running")
+    end
+
+    it "renders a nil progress object if the most recent progress was completed" do
+      Progress.create!(context: @pace_plan, tag: 'pace_plan_publish', workflow_state: 'failed')
+      Progress.create!(context: @pace_plan, tag: 'pace_plan_publish', workflow_state: 'completed')
+
+      get :api_show, params: { course_id: @course.id, id: @pace_plan.id }
+      expect(response).to be_successful
+      expect(JSON.parse(response.body)["progress"]).to be_nil
+    end
   end
 
   describe "PUT #update" do
