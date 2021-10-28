@@ -229,6 +229,7 @@ export class Grouping extends Component {
             }}
             date={theDay}
             responsiveSize={this.props.responsiveSize}
+            simplifiedControls={this.props.simplifiedControls}
           />
         </li>
       )
