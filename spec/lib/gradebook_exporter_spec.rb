@@ -173,6 +173,41 @@ describe GradebookExporter do
       end
     end
 
+    describe "separate columns for student last and first names" do
+      subject(:csv) { exporter(@exporter_options).to_csv }
+
+      before(:once) do
+        @exporter_options = {}
+        @current_assignment = @course.assignments.create! due_at: 1.week.from_now,
+                                                          title: "current",
+                                                          points_possible: 10
+        student_in_course active_all: true
+        @current_assignment.grade_student @student, grade: 3, grader: @teacher
+        @rows = CSV.parse(csv)
+      end
+
+      it "is a csv with three rows" do
+        expect(@rows.count).to be 3
+      end
+
+      it "is a csv with rows of equal length" do
+        expect(@rows.first.length).to eq @rows.second.length
+      end
+
+      it "shows student first and last names in headers" do
+        @exporter_options[:show_student_first_last_name] = true
+        expect(CSV.parse(csv, headers: true).headers).to include("LastName", "FirstName")
+        expect(CSV.parse(csv, headers: true).headers).not_to include("Student")
+      end
+
+      it "shows student first and last name in rows" do
+        @exporter_options[:show_student_first_last_name] = true
+        rows = CSV.parse(csv)
+        expect(rows[2][0]).to eq(@student.last_name)
+        expect(rows[2][1]).to eq(@student.first_name)
+      end
+    end
+
     describe "default output with blank course" do
       before(:once) do
         @course.custom_gradebook_columns.create! title: "Custom Column 1"
