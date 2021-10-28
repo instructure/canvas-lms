@@ -18,20 +18,34 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative 'autoextend/extension'
+require_relative "autoextend/railtie" if defined?(Rails::Railtie)
 
 module Autoextend
   class << self
-    def const_added(const, source:)
+    def const_added(const, source:, recursive: false)
       const_name = const.is_a?(String) ? const : const.name
       return [] unless const_name
 
       extensions_list = extensions_hash.fetch(const_name.to_sym, [])
-      sorted_extensions(extensions_list).each do |extension|
+      ret = sorted_extensions(extensions_list).each do |extension|
         if const == const_name
           const = Object.const_get(const_name, false)
         end
         extension.extend(const, source: source)
       end
+
+      if recursive
+        const.constants(false).each do |child|
+          next if const.autoload?(child)
+
+          child_const = const.const_get(child, false)
+          next unless child_const.is_a?(Module)
+
+          const_added(child_const, source: source, recursive: true)
+        end
+      end
+
+      ret
     end
 
     # Add a hook to automatically extend a class or module with a module,
@@ -94,7 +108,13 @@ module Autoextend
       end
 
       # immediately extend the class if it's already defined
-      if Object.const_defined?(const_name.to_s, false)
+      # If autoload? is true, don't use const_defined? as it is set up to be autoloaded but hasn't been loaded yet
+      module_chain = const_name.to_s.split('::').inject([]) { |all, val| all + [[(all.last ? "#{all.last.first}::#{all.last[1]}" : nil), val]] }
+      exists_and_not_to_autoload = module_chain.all? do |mod, name|
+        mod = mod.nil? ? Object : Object.const_get(mod)
+        !mod.autoload?(name) && mod.const_defined?(name.to_s, false)
+      end
+      if exists_and_not_to_autoload
         extension.before.each do |before_module|
           if const_extensions.any? { |ext| ext.module_name == before_module }
             raise "Already included #{before_module}; cannot include #{module_name} first"
@@ -112,6 +132,20 @@ module Autoextend
 
     def extensions
       extensions_hash.values.flatten
+    end
+
+    def inject_into_zetwerk
+      return unless Object.const_defined?(:Zeitwerk)
+
+      Zeitwerk::Registry.loaders.each do |loader|
+        loader.on_load do |_cpath, value, abspath|
+          # Skip autovivified modules from directories
+          next unless abspath.end_with?('.rb')
+          next unless value.is_a?(Module)
+
+          Autoextend.const_added(value, source: :Zeitwerk, recursive: true)
+        end
+      end
     end
 
     private
@@ -174,23 +208,12 @@ end
 
 module Autoextend::ActiveSupport
   module Dependencies
-    def notify_autoextend_of_new_constant(constant)
-      Autoextend.const_added(constant, source: :'ActiveSupport::Dependencies')
-      # check for nested constants
-      constant.constants(false).each do |child|
-        child_const = constant.const_get(child, false)
-        next unless child_const.is_a?(Module)
-
-        notify_autoextend_of_new_constant(child_const)
-      end
-    end
-
     def new_constants_in(*_descs)
       super.each do |constant_name|
         constant = Object.const_get(constant_name, false)
         next unless constant.is_a?(Module)
 
-        notify_autoextend_of_new_constant(constant)
+        Autoextend.const_added(constant, source: :'ActiveSupport::Dependencies', recursive: true)
       end
     end
 
