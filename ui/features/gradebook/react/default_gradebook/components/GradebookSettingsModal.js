@@ -19,10 +19,11 @@
 import React from 'react'
 import {bool, func, shape, string} from 'prop-types'
 import _ from 'underscore'
-import {Button} from '@instructure/ui-buttons'
-import {Modal} from '@instructure/ui-modal'
+import {Button, CloseButton} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {Heading} from '@instructure/ui-heading'
 import {Tabs} from '@instructure/ui-tabs'
-import {View} from '@instructure/ui-view'
+import {Tray} from '@instructure/ui-tray'
 import I18n from 'i18n!gradebook'
 
 import AdvancedTabPanel from './AdvancedTabPanel'
@@ -88,8 +89,6 @@ function onUpdateSuccess({close}) {
   close()
   return Promise.resolve()
 }
-
-const MODAL_CONTENTS_HEIGHT = 550
 
 export default class GradebookSettingsModal extends React.Component {
   static propTypes = {
@@ -290,7 +289,7 @@ export default class GradebookSettingsModal extends React.Component {
     this.setState(state => ({viewOptions: {...state.viewOptions, [key]: value}}))
   }
 
-  changeTab(_ev, {id}) {
+  changeTab = (_ev, {id}) => {
     this.setState({selectedTab: id})
   }
 
@@ -299,18 +298,32 @@ export default class GradebookSettingsModal extends React.Component {
     const tab = this.state.selectedTab
 
     return (
-      <Modal
+      <Tray
         label={I18n.t('Gradebook Settings')}
         onDismiss={this.close}
         onEntered={this.props.onEntered}
         onExited={this.props.onClose}
         onOpen={this.fetchLatePolicy}
         open={this.state.isOpen}
-        size="large"
+        placement="end"
+        size="medium"
       >
-        <Modal.Body>
-          <View as="div" height={MODAL_CONTENTS_HEIGHT}>
-            <Tabs onRequestTabChange={this.changeTab.bind(this)}>
+        <Flex direction="column" height="100vh">
+          <Flex.Item as="header" padding="medium">
+            <Flex direction="row">
+              <Flex.Item shouldGrow shouldShrink>
+                <Heading level="h3">{I18n.t('Gradebook Settings')}</Heading>
+              </Flex.Item>
+
+              <Flex.Item>
+                <CloseButton placement="static" variant="icon" onClick={this.close}>
+                  {I18n.t('Close')}
+                </CloseButton>
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+          <Flex.Item shouldGrow shouldShrink overflowX="hidden">
+            <Tabs onRequestTabChange={this.changeTab}>
               <Tabs.Panel
                 renderTitle={I18n.t('Late Policies')}
                 id="tab-panel-late"
@@ -407,24 +420,23 @@ export default class GradebookSettingsModal extends React.Component {
                 </Tabs.Panel>
               )}
             </Tabs>
-          </View>
-        </Modal.Body>
+          </Flex.Item>
+          <Flex.Item align="end" as="footer" margin="small" overflowY="hidden">
+            <Button id="gradebook-settings-cancel-button" onClick={this.close} margin="0 small">
+              {I18n.t('Cancel')}
+            </Button>
 
-        <Modal.Footer>
-          <Button id="gradebook-settings-cancel-button" onClick={this.close} margin="0 small">
-            {I18n.t('Cancel')}
-          </Button>
-
-          <Button
-            id="gradebook-settings-update-button"
-            onClick={this.handleUpdateButtonClicked}
-            disabled={!this.isUpdateButtonEnabled()}
-            variant="primary"
-          >
-            {I18n.t('Update')}
-          </Button>
-        </Modal.Footer>
-      </Modal>
+            <Button
+              id="gradebook-settings-update-button"
+              onClick={this.handleUpdateButtonClicked}
+              disabled={!this.isUpdateButtonEnabled()}
+              variant="primary"
+            >
+              {I18n.t('Apply Settings')}
+            </Button>
+          </Flex.Item>
+        </Flex>
+      </Tray>
     )
   }
 }
