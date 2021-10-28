@@ -3651,13 +3651,13 @@ describe User do
       expect(@ta.can_create_enrollment_for?(@course, nil, 'ObserverEnrollment')).to be_truthy
     end
 
-    it "returns true if :manage_students is enabled" do
+    it "returns false if :manage_students is enabled" do
       @course.root_account.role_overrides.create!(
         permission: 'add_student_to_course',
         role: ta_role,
         enabled: false
       )
-      expect(@ta.can_create_enrollment_for?(@course, nil, 'StudentEnrollment')).to be_truthy
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'StudentEnrollment')).to be_falsey
     end
 
     it "returns true if :manage_students is disabled" do
