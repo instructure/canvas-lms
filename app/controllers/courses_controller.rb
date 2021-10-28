@@ -498,7 +498,15 @@ class CoursesController < ApplicationController
         format.html {
           css_bundle :context_list, :course_list
           js_bundle :course_list
-          js_env({ CREATE_COURSES_PERMISSION: @current_user.create_courses_right(@domain_root_account) })
+
+          create_permission_root_account = @current_user.create_courses_right(@domain_root_account)
+          create_permission_mcc_account = @current_user.create_courses_right(@domain_root_account.manually_created_courses_account)
+          js_env({
+                   CREATE_COURSES_PERMISSIONS: {
+                     PERMISSION: create_permission_root_account || create_permission_mcc_account,
+                     RESTRICT_TO_MCC_ACCOUNT: !!(!create_permission_root_account && create_permission_mcc_account)
+                   }
+                 })
 
           set_k5_mode(require_k5_theme: true)
 
