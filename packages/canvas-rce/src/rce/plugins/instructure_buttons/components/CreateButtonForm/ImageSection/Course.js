@@ -26,11 +26,6 @@ const Course = () => {
   const storeProps = useStoreProps()
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
 
-  const fetchInitial = () => {
-    setIsLoading(true)
-    storeProps.fetchInitialImages()
-  }
-
   return (
     <View>
       <ImageList
@@ -49,9 +44,8 @@ const Course = () => {
           sort: 'date_added',
           order: 'desc'
         }}
-        onImageEmbed={(a, b, c) => {
-          // TODO: in next commit, handle image selection
-          console.log('Selected Image', a)
+        onImageEmbed={(file) => {
+          // TODO: Set current image
         }}
       />
     </View>
