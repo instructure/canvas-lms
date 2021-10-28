@@ -2120,6 +2120,7 @@ class Gradebook extends React.Component {
 
     return {
       allowSortingByModules: modulesEnabled,
+      allowShowSeparateFirstLastNames: this.options.allow_separate_first_last_names,
       allowViewUngradedAsZero: this.courseFeatures.allowViewUngradedAsZero,
       loadCurrentViewOptions: () => {
         const {criterion, direction} = this.getColumnSortSettingsViewOptionsMenuProps()
@@ -2143,6 +2144,7 @@ class Gradebook extends React.Component {
     columnSortSettings: {criterion, direction} = {},
     showNotes,
     showUnpublishedAssignments,
+    showSeparateFirstLastNames,
     statusColors: colors,
     viewUngradedAsZero
   }) => {
@@ -2169,18 +2171,29 @@ class Gradebook extends React.Component {
     // Finally, the remaining options are saved to the user's settings.
     const {
       showUnpublishedAssignments: oldShowUnpublished,
+      showSeparateFirstLastNames: oldShowSeparateFirstLastNames,
       viewUngradedAsZero: oldViewUngradedAsZero
     } = this.gridDisplaySettings
 
     const viewUngradedAsZeroChanged =
       this.courseFeatures.allowViewUngradedAsZero && oldViewUngradedAsZero !== viewUngradedAsZero
     const showUnpublishedChanged = oldShowUnpublished !== showUnpublishedAssignments
+    const showSeparateFirstLastNamesChanged =
+      oldShowSeparateFirstLastNames !== showSeparateFirstLastNames
     const colorsChanged = !_.isEqual(this.state.gridColors, colors)
 
-    if (colorsChanged || showUnpublishedChanged || viewUngradedAsZeroChanged) {
+    if (
+      colorsChanged ||
+      showUnpublishedChanged ||
+      viewUngradedAsZeroChanged ||
+      showSeparateFirstLastNamesChanged
+    ) {
       const changedSettings = {
         colors: colorsChanged ? colors : undefined,
         showUnpublishedAssignments: showUnpublishedChanged ? showUnpublishedAssignments : undefined,
+        showSeparateFirstLastNames: showSeparateFirstLastNamesChanged
+          ? showSeparateFirstLastNames
+          : undefined,
         viewUngradedAsZero: viewUngradedAsZeroChanged ? viewUngradedAsZero : undefined
       }
       promises.push(this.saveUpdatedUserSettings(changedSettings))
@@ -2213,7 +2226,12 @@ class Gradebook extends React.Component {
     })
   }
 
-  saveUpdatedUserSettings = ({colors, showUnpublishedAssignments, viewUngradedAsZero}) => {
+  saveUpdatedUserSettings = ({
+    colors,
+    showUnpublishedAssignments,
+    viewUngradedAsZero,
+    showSeparateFirstLastNames
+  }) => {
     return this.saveSettings({
       colors,
       showUnpublishedAssignments,
@@ -2239,6 +2257,11 @@ class Gradebook extends React.Component {
           this.calculateStudentGrade(student, true)
         })
         this.updateAllTotalColumns()
+      }
+
+      if (showSeparateFirstLastNames !== undefined) {
+        this.gridDisplaySettings.showSeparateFirstLastNames = showSeparateFirstLastNames
+        this.renderActionMenu()
       }
     })
   }
