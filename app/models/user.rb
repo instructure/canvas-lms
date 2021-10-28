@@ -2747,29 +2747,20 @@ class User < ActiveRecord::Base
     accounts = pseudonyms.shard(self).active.map(&:account)
     return true if accounts.empty?
 
-    accounts.any? { |a| a.users_can_edit_name? }
+    accounts.any?(&:users_can_edit_name?)
   end
 
   def limit_parent_app_web_access?
-    pseudonyms.shard(self).active.map(&:account).any? { |a| a.limit_parent_app_web_access? }
+    pseudonyms.shard(self).active.map(&:account).any?(&:limit_parent_app_web_access?)
   end
 
   def sections_for_course(course)
-    course.student_enrollments.active.for_user(self).map { |e| e.course_section }
+    course.student_enrollments.active.for_user(self).map(&:course_section)
   end
 
   def can_create_enrollment_for?(course, session, type)
     return false if type == 'StudentEnrollment' && MasterCourses::MasterTemplate.is_master_course?(course)
     return false if course.template?
-
-    # we intend on keeping this role override in tandem with add/remove students to course
-    # so short-circuit if it's enabled, else we might return false prematurely
-    # depending on the state of :granular_permissions_manage_users feature flag
-    if course.grants_right?(self, session, :manage_students)
-      if %w{StudentEnrollment ObserverEnrollment}.include?(type)
-        return true
-      end
-    end
 
     if course.root_account.feature_enabled?(:granular_permissions_manage_users)
       return true if type == 'TeacherEnrollment' && course.grants_right?(self, session, :add_teacher_to_course)
@@ -2777,8 +2768,13 @@ class User < ActiveRecord::Base
       return true if type == 'DesignerEnrollment' && course.grants_right?(self, session, :add_designer_to_course)
       return true if type == 'StudentEnrollment' && course.grants_right?(self, session, :add_student_to_course)
       return true if type == 'ObserverEnrollment' && course.grants_right?(self, session, :add_observer_to_course)
-    elsif type != 'StudentEnrollment' && course.grants_right?(self, session, :manage_admin_users)
-      return true
+    else
+      if type != 'StudentEnrollment' && course.grants_right?(self, session, :manage_admin_users)
+        return true
+      end
+      if %w{StudentEnrollment ObserverEnrollment}.include?(type) && course.grants_right?(self, session, :manage_students)
+        return true
+      end
     end
     false
   end

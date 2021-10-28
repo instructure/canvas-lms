@@ -168,7 +168,7 @@ describe EnrollmentsApiController, type: :request do
 
       it "is unauthorized for users without add_student_to_course permission (granular)" do
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
-        @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_students)
+        @course.account.role_overrides.create!(role: admin_role, enabled: true, permission: :manage_students)
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :add_student_to_course)
         api_call :post, @path, @path_options,
                  {
