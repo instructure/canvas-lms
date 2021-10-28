@@ -7,6 +7,13 @@
   box-sizing: border-box;
   padding: var(--padding);
   border-bottom: var(--borderWidth) solid var(--borderColor);
+  &.small {
+    &.k5Layout {
+      >.contentPrimary {
+        margin-inline-start: 25px;
+      }
+    }
+  }
 }
 
 .activityIndicator {
