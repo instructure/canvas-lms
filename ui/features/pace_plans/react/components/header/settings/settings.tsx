@@ -199,6 +199,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
           <View as="div" padding="small">
             <View as="div">
               <Checkbox
+                data-testid="skip-weekends-toggle"
                 label={I18n.t('Skip Weekends')}
                 checked={this.props.excludeWeekends}
                 disabled={this.props.planPublishing}
