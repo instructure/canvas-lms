@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/helpers/manage_groups_common')
+require_relative 'helpers/manage_groups_common'
 describe "manage groups" do
   include_context "in-process server selenium tests"
   include ManageGroupsCommon

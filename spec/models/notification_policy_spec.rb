@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
-
 describe NotificationPolicy do
   it "creates a new instance given valid attributes" do
     notification_policy_model

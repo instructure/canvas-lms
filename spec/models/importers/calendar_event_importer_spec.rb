@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
+require_relative '../../import_helper'
 
 describe Importers::CalendarEventImporter do
   let_once(:migration_course) { course_factory(active_all: true) }

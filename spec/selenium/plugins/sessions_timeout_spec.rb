@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path('spec/selenium/common')
+require_relative '../common'
 
 describe "Sessions Timeout" do
   include_context "in-process server selenium tests"

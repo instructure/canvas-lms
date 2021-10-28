@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
+require_relative 'messages_helper'
 
 describe 'assignment_due_date_override_changed' do
   before :once do

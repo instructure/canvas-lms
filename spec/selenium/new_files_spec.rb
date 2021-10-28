@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
+require_relative 'common'
+require_relative 'helpers/files_common'
+require_relative 'helpers/public_courses_context'
 
 describe "better_file_browsing" do
   include_context "in-process server selenium tests"

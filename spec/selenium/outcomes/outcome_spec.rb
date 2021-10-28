@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../helpers/outcome_common'
-require File.expand_path(File.dirname(__FILE__) + '/pages/improved_outcome_management_page')
+require_relative 'pages/improved_outcome_management_page'
 
 describe "outcomes" do
   include_context "in-process server selenium tests"

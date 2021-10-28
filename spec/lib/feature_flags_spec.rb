@@ -18,8 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper.rb'
-require_relative '../feature_flag_helper.rb'
+require_relative '../feature_flag_helper'
 
 describe FeatureFlags do
   include FeatureFlagHelper

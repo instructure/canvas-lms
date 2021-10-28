@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../sharding_spec_helper.rb')
-
 describe Auditors::ActiveRecord::FeatureFlagRecord do
   let(:request_id) { 'abcde-12345' }
   let(:feature_name) { 'root_account_feature' }

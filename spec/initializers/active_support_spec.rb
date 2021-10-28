@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "../sharding_spec_helper"
-
 describe 'ActiveSupport::JSON' do
   it "encodes hash keys correctly" do
     expect(ActiveSupport::JSON.encode("<>" => "<>").downcase).to eq "{\"\\u003c\\u003e\":\"\\u003c\\u003e\"}"

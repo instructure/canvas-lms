@@ -8232,7 +8232,6 @@ describe Assignment do
   end
 
   describe '.with_student_submission_count' do
-    require_relative '../sharding_spec_helper'
     specs_require_sharding
 
     it "doesn't reference multiple shards when accessed from a different shard" do

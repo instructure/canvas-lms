@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
+require_relative 'helpers/context_modules_common'
+require_relative 'helpers/public_courses_context'
 
 describe "context modules" do
   include_context "in-process server selenium tests"

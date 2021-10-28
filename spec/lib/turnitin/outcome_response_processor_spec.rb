@@ -19,7 +19,7 @@
 
 require 'active_support/dependencies'
 require_dependency "turnitin/outcome_response_processor"
-require File.expand_path(File.dirname(__FILE__) + '/turnitin_spec_helper')
+require_relative 'turnitin_spec_helper'
 require 'turnitin_api'
 module Turnitin
   describe OutcomeResponseProcessor do

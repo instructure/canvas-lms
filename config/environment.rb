@@ -23,7 +23,7 @@ def environment_configuration(_config)
 end
 
 # Load the rails application
-require File.expand_path('../application', __FILE__)
+require_relative 'application'
 
 # Initialize the rails application
 CanvasRails::Application.initialize!

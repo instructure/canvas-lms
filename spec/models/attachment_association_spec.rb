@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
-
 describe AttachmentAssociation do
   context 'create' do
     it 'sets the root_account_id using course context' do

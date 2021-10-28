@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
-
 describe SplitUsers do
   describe 'user splitting' do
     let!(:restored_user) { user_model } # user will be merged into source_user and then restored on split

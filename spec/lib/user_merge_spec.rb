@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
-
 describe UserMerge do
   describe 'with simple users' do
     let!(:user1) { user_model }

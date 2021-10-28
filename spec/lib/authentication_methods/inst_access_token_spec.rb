@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../sharding_spec_helper'
-
 describe AuthenticationMethods::InstAccessToken do
   let(:signing_keypair) { OpenSSL::PKey::RSA.new(2048) }
   let(:encryption_keypair) { OpenSSL::PKey::RSA.new(2048) }

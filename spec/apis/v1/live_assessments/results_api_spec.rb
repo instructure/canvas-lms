@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
+require_relative '../../api_spec_helper'
 
 describe LiveAssessments::ResultsController, type: :request do
   let_once(:assessment_course) { course_factory(active_all: true) }

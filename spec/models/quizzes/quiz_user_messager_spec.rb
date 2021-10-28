@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + "/quiz_user_messager_spec_helper.rb")
+require_relative "quiz_user_messager_spec_helper"
 
 describe Quizzes::QuizUserMessager do
   include Quizzes::QuizUserMessagerSpecHelper

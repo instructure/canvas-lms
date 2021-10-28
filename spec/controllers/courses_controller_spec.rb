@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'sharding_spec_helper'
 require_relative '../helpers/k5_common'
 
 describe CoursesController do

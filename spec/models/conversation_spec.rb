@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
-
 describe Conversation do
   let_once(:sender) { user_factory }
   let_once(:recipient) { user_factory }

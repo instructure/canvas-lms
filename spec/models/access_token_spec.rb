@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
-
 describe AccessToken do
   context "Authenticate" do
     shared_examples "#authenticate" do

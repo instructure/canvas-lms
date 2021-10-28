@@ -18,10 +18,10 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../common'
-require_relative 'pages/new_course_search_page.rb'
-require_relative 'pages/new_course_add_people_modal.rb'
-require_relative 'pages/new_course_add_course_modal.rb'
-require_relative 'pages/course_page.rb'
+require_relative 'pages/new_course_search_page'
+require_relative 'pages/new_course_add_people_modal'
+require_relative 'pages/new_course_add_course_modal'
+require_relative 'pages/course_page'
 
 describe "new account course search" do
   include NewCourseSearchPage

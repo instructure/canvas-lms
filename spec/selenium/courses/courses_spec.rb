@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common.rb'
-require_relative 'pages/courses_home_page.rb'
+require_relative '../common'
+require_relative 'pages/courses_home_page'
 
 describe "courses" do
   include_context "in-process server selenium tests"

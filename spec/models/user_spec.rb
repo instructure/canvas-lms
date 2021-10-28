@@ -20,7 +20,6 @@
 
 require 'rotp'
 
-require_relative '../sharding_spec_helper'
 require_relative '../helpers/k5_common'
 
 describe User do

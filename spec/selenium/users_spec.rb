@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative 'common'
 
 describe "users" do
   include_context "in-process server selenium tests"

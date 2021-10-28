@@ -19,7 +19,6 @@
 #
 
 require_relative "../../../spec_helper"
-require_relative "../../../sharding_spec_helper"
 
 def gen_ssha_password(password)
   salt = SecureRandom.random_bytes(10)

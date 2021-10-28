@@ -18,8 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-require File.expand_path(File.dirname(__FILE__) + '/../lti_1_3_spec_helper')
+require_relative '../lti_1_3_spec_helper'
 require_relative '../helpers/k5_common'
 
 describe UsersController do

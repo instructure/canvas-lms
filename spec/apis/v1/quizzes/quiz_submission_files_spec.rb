@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../file_uploads_spec_helper')
+require_relative '../../api_spec_helper'
+require_relative '../../file_uploads_spec_helper'
 
 describe Quizzes::QuizSubmissionFilesController, type: :request do
   context "quiz submissions file uploads" do
