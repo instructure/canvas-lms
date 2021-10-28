@@ -3230,8 +3230,14 @@ class User < ActiveRecord::Base
     return nil if fake_student? || account.root_account.site_admin?
 
     scope = account.root_account.enrollments.active.where(user_id: self)
-    return :teacher if account.root_account.teachers_can_create_courses? && scope.exists?(type: %w[TeacherEnrollment DesignerEnrollment])
-    return :student if account.root_account.students_can_create_courses? && scope.exists?(type: %w[StudentEnrollment ObserverEnrollment])
+    teacher_right = account.root_account.teachers_can_create_courses? && scope.where(type: %w[TeacherEnrollment DesignerEnrollment]).exists?
+    # k5 users can still create courses anywhere, even if the setting restricts them to the manually created courses account
+    return :teacher if teacher_right && (account.root_account.teachers_can_create_courses_anywhere? || active_k5_enrollments?)
+    return :teacher if teacher_right && account == account.root_account.manually_created_courses_account
+
+    student_right = account.root_account.students_can_create_courses? && scope.where(type: %w[StudentEnrollment ObserverEnrollment]).exists?
+    return :student if student_right && (account.root_account.students_can_create_courses_anywhere? || active_k5_enrollments?)
+    return :student if student_right && account == account.root_account.manually_created_courses_account
     return :no_enrollments if account.root_account.no_enrollments_can_create_courses? && !scope.exists?
 
     nil

@@ -79,7 +79,8 @@ ready(() => {
             setModalOpen={isOpen => {
               if (!isOpen) ReactDOM.unmountComponentAtNode(container)
             }}
-            permissions={ENV.CREATE_COURSES_PERMISSION}
+            permissions={ENV.CREATE_COURSES_PERMISSIONS.PERMISSION}
+            restrictToMCCAccount={ENV.CREATE_COURSES_PERMISSIONS.RESTRICT_TO_MCC_ACCOUNT}
             isK5User={ENV.K5_USER}
           />,
           container
