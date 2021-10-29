@@ -64,11 +64,6 @@ module Types
     field :message, String, null: true
     delegate :message, to: :object
 
-    field :locked_for_user, Boolean, null: false
-    def locked_for_user
-      object.locked_for?(current_user, check_policies: true)
-    end
-
     field :available_for_user, Boolean, null: false
     def available_for_user
       locked_info = object.locked_for?(current_user, check_policies: true)
