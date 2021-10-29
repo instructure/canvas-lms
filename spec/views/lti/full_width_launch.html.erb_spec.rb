@@ -105,6 +105,27 @@ describe "lti full width launch view" do
       end
     end
 
+    context "when the user is a student view user" do
+      let(:current_user) { course.student_view_student }
+
+      before :each do
+        ctrl.instance_variable_set(:@current_user, current_user)
+      end
+
+      it "does not warn about quizzes being unavailable when the user is active" do
+        ctrl.send(:content_tag_redirect, Account.default, tag, nil)
+        expect(ctrl.response.body).not_to have_text("no longer available")
+      end
+    end
+
+    context "when the user is an observer" do
+      it "warns the observer with a concluded enrollment about a New Quizzes being unavailable" do
+        course.enroll_user(current_user, 'ObserverEnrollment', enrollment_state: "completed")
+        ctrl.send(:content_tag_redirect, Account.default, tag, nil)
+        expect(ctrl.response.body).to have_text("no longer available")
+      end
+    end
+
     context "when the user is a teacher" do
       before :each do
         course.enroll_teacher(current_user, enrollment_state: "active")
