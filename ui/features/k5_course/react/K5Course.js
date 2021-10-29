@@ -42,6 +42,7 @@ import {Flex} from '@instructure/ui-flex'
 import {AccessibleContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
+import {TruncateText} from '@instructure/ui-truncate-text'
 
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 import K5Tabs, {scrollElementIntoViewIfCoveredByHeader} from '@canvas/k5/react/K5Tabs'
@@ -74,8 +75,9 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {savedObservedId} from '@canvas/k5/ObserverGetObservee'
 
 const HERO_ASPECT_RATIO = 5
-const HERO_STICKY_HEIGHT_PX = 100
+const HERO_STICKY_HEIGHT_PX = 64
 const MOBILE_NAV_BREAKPOINT_PX = 768
+const STICKY_HERO_CUTOFF_BUFFER_PX = 80
 
 const COURSE_TABS = [
   {
@@ -209,8 +211,21 @@ ConfirmDropModal.propTypes = {
 }
 
 export const CourseHeaderHero = forwardRef(
-  ({backgroundColor, height, name, image, selfEnrollment, showingMobileNav, observerMode}, ref) => {
+  (
+    {
+      backgroundColor,
+      height,
+      name,
+      image,
+      selfEnrollment,
+      showingMobileNav,
+      observerMode,
+      shouldShrink
+    },
+    ref
+  ) => {
     const [isModalOpen, setModalOpen] = useState(false)
+    const possiblyTruncatedName = shouldShrink ? <TruncateText>{name}</TruncateText> : name
     return (
       <div
         id="k5-course-header-hero"
@@ -226,7 +241,8 @@ export const CourseHeaderHero = forwardRef(
           borderRadius: '8px',
           height: `${height}px`,
           width: '100%',
-          marginBottom: '1rem'
+          marginBottom: '1rem',
+          overflowY: 'hidden'
         }}
         data-testid="k5-course-header-hero"
         ref={ref}
@@ -235,15 +251,15 @@ export const CourseHeaderHero = forwardRef(
           <div
             style={{
               background: 'linear-gradient(90deg, rgba(0, 0, 0, 0.7), transparent)',
-              borderBottomLeftRadius: '8px',
-              borderBottomRightRadius: '8px'
+              height: shouldShrink ? `${HERO_STICKY_HEIGHT_PX}px` : undefined,
+              maxHeight: shouldShrink ? undefined : `${height}px`
             }}
           >
-            <Flex alignItems="center" margin="small medium">
+            <Flex alignItems="center" padding="small medium" height="100%">
               {!showingMobileNav && (
                 <Flex.Item shouldGrow shouldShrink margin="0 small 0 0">
                   <Heading as="h1" aria-hidden={observerMode} color="primary-inverse">
-                    {name}
+                    {possiblyTruncatedName}
                   </Heading>
                 </Flex.Item>
               )}
@@ -282,98 +298,109 @@ CourseHeaderHero.propTypes = {
   image: PropTypes.string,
   selfEnrollment: PropTypes.object,
   showingMobileNav: PropTypes.bool.isRequired,
-  observerMode: PropTypes.bool.isRequired
+  observerMode: PropTypes.bool.isRequired,
+  shouldShrink: PropTypes.bool.isRequired
 }
 
-export function CourseHeaderOptions({
-  settingsPath,
-  showStudentView,
-  studentViewPath,
-  canReadAsAdmin,
-  courseContext,
-  observerList,
-  currentUser,
-  handleChangeObservedUser,
-  showingMobileNav,
-  showObserverOptions
-}) {
-  const buttonProps = {
-    id: 'manage-subject-btn',
-    'data-testid': 'manage-button',
-    href: settingsPath,
-    renderIcon: <IconEditSolid />
-  }
-  const altText = I18n.t('Manage Subject: %{courseContext}', {courseContext})
+export const CourseHeaderOptions = forwardRef(
+  (
+    {
+      settingsPath,
+      showStudentView,
+      studentViewPath,
+      canReadAsAdmin,
+      courseContext,
+      observerList,
+      currentUser,
+      handleChangeObservedUser,
+      showingMobileNav,
+      showObserverOptions
+    },
+    ref
+  ) => {
+    const buttonProps = {
+      id: 'manage-subject-btn',
+      'data-testid': 'manage-button',
+      href: settingsPath,
+      renderIcon: <IconEditSolid />
+    }
+    const altText = I18n.t('Manage Subject: %{courseContext}', {courseContext})
 
-  const collapseManageButton = showingMobileNav && showObserverOptions
-  const sideItemsWidth = '200px'
+    const collapseManageButton = showingMobileNav && showObserverOptions
+    const sideItemsWidth = '200px'
 
-  const manageButton = (
-    <Flex.Item size={collapseManageButton ? undefined : sideItemsWidth} key="course-header-manage">
-      {collapseManageButton ? (
-        <IconButton {...buttonProps} screenReaderLabel={altText} margin="0 small 0 0" />
-      ) : (
-        <Button {...buttonProps}>
-          <AccessibleContent alt={altText}>{I18n.t('Manage Subject')}</AccessibleContent>
-        </Button>
-      )}
-    </Flex.Item>
-  )
-
-  const observerOptions = (
-    <Flex.Item shouldGrow textAlign="center" key="course-header-observer-options">
-      <View as="div" display="inline-block" width={showingMobileNav ? '100%' : '16em'}>
-        <ScreenReaderContent>
-          <Heading as="h1">{courseContext}</Heading>
-        </ScreenReaderContent>
-        <ObserverOptions
-          observerList={observerList}
-          currentUser={currentUser}
-          handleChangeObservedUser={handleChangeObservedUser}
-          canAddObservee={false}
-        />
-      </View>
-    </Flex.Item>
-  )
-
-  const studentViewButton = (
-    <Flex.Item textAlign="end" size={sideItemsWidth} key="course-header-student-view">
-      <Button
-        id="student-view-btn"
-        href={studentViewPath}
-        data-method="post"
-        renderIcon={<IconStudentViewLine />}
+    const manageButton = (
+      <Flex.Item
+        size={collapseManageButton ? undefined : sideItemsWidth}
+        key="course-header-manage"
       >
-        {I18n.t('Student View')}
-      </Button>
-    </Flex.Item>
-  )
+        {collapseManageButton ? (
+          <IconButton {...buttonProps} screenReaderLabel={altText} margin="0 small 0 0" />
+        ) : (
+          <Button {...buttonProps}>
+            <AccessibleContent alt={altText}>{I18n.t('Manage Subject')}</AccessibleContent>
+          </Button>
+        )}
+      </Flex.Item>
+    )
 
-  const headerItems = []
-  if (canReadAsAdmin) {
-    headerItems.push(manageButton)
-  }
-  if (showObserverOptions) {
-    headerItems.push(observerOptions)
-  }
-  if (showStudentView && !showingMobileNav) {
-    headerItems.push(studentViewButton)
-  }
+    const observerOptions = (
+      <Flex.Item shouldGrow textAlign="center" key="course-header-observer-options">
+        <View as="div" display="inline-block" width={showingMobileNav ? '100%' : '16em'}>
+          <ScreenReaderContent>
+            <Heading as="h1">{courseContext}</Heading>
+          </ScreenReaderContent>
+          <ObserverOptions
+            observerList={observerList}
+            currentUser={currentUser}
+            handleChangeObservedUser={handleChangeObservedUser}
+            canAddObservee={false}
+          />
+        </View>
+      </Flex.Item>
+    )
 
-  return headerItems.length > 0 ? (
-    <View
-      id="k5-course-header-options"
-      as="section"
-      borderWidth="0 0 small 0"
-      padding="0 0 medium 0"
-      margin="0 0 medium 0"
-    >
-      <Flex alignItems="center" justifyItems="space-between">
-        {headerItems}
-      </Flex>
-    </View>
-  ) : null
-}
+    const studentViewButton = (
+      <Flex.Item textAlign="end" size={sideItemsWidth} key="course-header-student-view">
+        <Button
+          id="student-view-btn"
+          href={studentViewPath}
+          data-method="post"
+          renderIcon={<IconStudentViewLine />}
+        >
+          {I18n.t('Student View')}
+        </Button>
+      </Flex.Item>
+    )
+
+    const headerItems = []
+    if (canReadAsAdmin) {
+      headerItems.push(manageButton)
+    }
+    if (showObserverOptions) {
+      headerItems.push(observerOptions)
+    }
+    if (showStudentView && !showingMobileNav) {
+      headerItems.push(studentViewButton)
+    }
+
+    return headerItems.length > 0 ? (
+      <div ref={ref}>
+        <View
+          id="k5-course-header-options"
+          as="section"
+          borderWidth="0 0 small 0"
+          padding="0 0 medium 0"
+          margin="0 0 medium 0"
+        >
+          <Flex alignItems="center" justifyItems="space-between">
+            {headerItems}
+          </Flex>
+        </View>
+      </div>
+    ) : null
+  }
+)
 
 CourseHeaderOptions.propTypes = {
   settingsPath: PropTypes.string.isRequired,
@@ -447,12 +474,14 @@ export function K5Course({
   const modulesRef = useRef(null)
   const contentRef = useRef(null)
   const headerRef = useRef(null)
+  const headerOptionsRef = useRef(null)
   const tabsPaddingRef = useRef(null)
   const [modulesExist, setModulesExist] = useState(true)
   const [windowSize, setWindowSize] = useState(() => getWindowSize())
   const [observedUserId, setObservedUserId] = useState(initialObservedId)
   const showObserverOptions =
     parentSupportEnabled && shouldShowObserverOptions(observerList, currentUser)
+  const showingMobileNav = windowSize.width < MOBILE_NAV_BREAKPOINT_PX
   useEffect(() => {
     modulesRef.current = document.getElementById('k5-modules-container')
     contentRef.current.appendChild(modulesRef.current)
@@ -491,20 +520,27 @@ export function K5Course({
   }
 
   const courseHeader = sticky => {
+    // Height of the header options (manage, student view) - may be 0 for some users
+    const headerOptionsHeight =
+      headerOptionsRef.current?.getBoundingClientRect().bottom + window.scrollY || 0
     // If we don't have a ref to the header's width yet, use viewport width as a best guess
     const headerHeight = (headerRef.current?.offsetWidth || windowSize.width) / HERO_ASPECT_RATIO
     if (tabsRef && !tabsPaddingRef.current) {
-      tabsPaddingRef.current = tabsRef.getBoundingClientRect().bottom - headerHeight
+      tabsPaddingRef.current =
+        tabsRef.getBoundingClientRect().bottom - headerHeight - headerOptionsHeight
     }
     // This is the vertical px by which the header will shrink when sticky
-    const headerShrinkDiff = headerRef.current ? headerHeight - HERO_STICKY_HEIGHT_PX : 0
+    const headerShrinkDiff = headerRef.current
+      ? headerHeight - HERO_STICKY_HEIGHT_PX + headerOptionsHeight
+      : 0
     // This is the vertical px by which the content overflows the viewport
     const contentScrollOverflow = document.body.scrollHeight - windowSize.height
     // If the window height is smaller than the height of the header, flickering and weird
-    // sticky behavior occurs. This is a hack to force the header to shrink when we get close
-    // to that size
+    // sticky behavior occurs. This is a hack to force the header to shrink when we get
+    // somewhat close to that size
     const isWindowTooSmall = tabsPaddingRef.current
-      ? windowSize.height < tabsPaddingRef.current + headerHeight
+      ? windowSize.height <
+        tabsPaddingRef.current + headerHeight + headerOptionsHeight + STICKY_HERO_CUTOFF_BUFFER_PX
       : false
     // Make sure that there is more vertical scroll overflow height than the header will
     // lose when transitioning to a sticky state. Otherwise the header will flicker rapidly
@@ -512,22 +548,8 @@ export function K5Course({
     const shouldShrink =
       (sticky && activeTab.current === currentTab && contentScrollOverflow > headerShrinkDiff) ||
       isWindowTooSmall
-    const showingMobileNav = windowSize.width < MOBILE_NAV_BREAKPOINT_PX
     return (
       <View id="k5-course-header" as="div" padding={sticky && shouldShrink ? 'medium 0 0 0' : '0'}>
-        <CourseHeaderOptions
-          canReadAsAdmin={canReadAsAdmin}
-          settingsPath={settingsPath}
-          showStudentView={showStudentView}
-          studentViewPath={`${studentViewPath + window.location.hash}`}
-          courseContext={name}
-          parentSupportEnabled={parentSupportEnabled}
-          observerList={observerList}
-          currentUser={currentUser}
-          handleChangeObservedUser={setObservedUserId}
-          showingMobileNav={showingMobileNav}
-          showObserverOptions={showObserverOptions}
-        />
         <CourseHeaderHero
           name={name}
           image={bannerImageUrl || cardImageUrl}
@@ -537,6 +559,7 @@ export function K5Course({
           showingMobileNav={showingMobileNav}
           ref={headerRef}
           observerMode={showObserverOptions}
+          shouldShrink={shouldShrink}
         />
       </View>
     )
@@ -580,6 +603,20 @@ export function K5Course({
         elementRef={e => (contentRef.current = e)}
         onFocus={scrollElementIntoViewIfCoveredByHeader(tabsRef)}
       >
+        <CourseHeaderOptions
+          canReadAsAdmin={canReadAsAdmin}
+          settingsPath={settingsPath}
+          showStudentView={showStudentView}
+          studentViewPath={`${studentViewPath + window.location.hash}`}
+          courseContext={name}
+          parentSupportEnabled={parentSupportEnabled}
+          observerList={observerList}
+          currentUser={currentUser}
+          handleChangeObservedUser={setObservedUserId}
+          showingMobileNav={showingMobileNav}
+          showObserverOptions={showObserverOptions}
+          ref={headerOptionsRef}
+        />
         {!tabContentOnly && courseTabs}
         {!renderTabs?.length && <EmptyCourse name={name} id={id} canManage={canManage} />}
         {currentTab === renderTabs?.[0]?.id && (

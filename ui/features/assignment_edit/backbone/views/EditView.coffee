@@ -429,7 +429,7 @@ export default class EditView extends ValidatedFormView
     @setAnnotatedDocument(null)
 
   shouldRenderUsageRights: =>
-    ENV?.ANNOTATED_DOCUMENT_SUBMISSIONS and ENV.USAGE_RIGHTS_REQUIRED
+    ENV.USAGE_RIGHTS_REQUIRED
 
   setAnnotatedDocumentUsageRights:(usageRights) =>
     @annotatedDocumentUsageRights = usageRights
@@ -655,23 +655,22 @@ export default class EditView extends ValidatedFormView
     @handleGroupCategoryChange()
     @handleAnonymousGradingChange()
 
-    if ENV.ANNOTATED_DOCUMENT_SUBMISSIONS
-      if ENV.ANNOTATED_DOCUMENT
-        @setAnnotatedDocument({
-          id: ENV.ANNOTATED_DOCUMENT.id,
-          name: ENV.ANNOTATED_DOCUMENT.display_name,
-          contextType: pluralize(ENV.ANNOTATED_DOCUMENT.context_type).toLowerCase(),
-          contextId: ENV.ANNOTATED_DOCUMENT.context_id,
-        })
+    if ENV.ANNOTATED_DOCUMENT
+      @setAnnotatedDocument({
+        id: ENV.ANNOTATED_DOCUMENT.id,
+        name: ENV.ANNOTATED_DOCUMENT.display_name,
+        contextType: pluralize(ENV.ANNOTATED_DOCUMENT.context_type).toLowerCase(),
+        contextId: ENV.ANNOTATED_DOCUMENT.context_id,
+      })
 
-      @renderAnnotatedDocumentSelector() if @$allowAnnotatedDocument.prop('checked')
+    @renderAnnotatedDocumentSelector() if @$allowAnnotatedDocument.prop('checked')
 
-      if @$allowAnnotatedDocument.prop('checked')
-        @$allowAnnotatedDocumentInfo.show()
-      else
-        @$allowAnnotatedDocumentInfo.hide()
+    if @$allowAnnotatedDocument.prop('checked')
+      @$allowAnnotatedDocumentInfo.show()
+    else
+      @$allowAnnotatedDocumentInfo.hide()
 
-      @renderAnnotatedDocumentUsageRightsSelectBox() if @shouldRenderUsageRights()
+    @renderAnnotatedDocumentUsageRightsSelectBox() if @shouldRenderUsageRights()
 
     if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
       @conditionalReleaseEditor = ConditionalRelease.attach(
@@ -698,7 +697,6 @@ export default class EditView extends ValidatedFormView
       lockedItems: @lockedItems
       anonymousGradingEnabled: ENV?.ANONYMOUS_GRADING_ENABLED or false
       anonymousInstructorAnnotationsEnabled: ENV?.ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED or false
-      annotatedDocumentSubmissionsEnabled: ENV?.ANNOTATED_DOCUMENT_SUBMISSIONS or false
 
   _attachEditorToDescription: =>
     return if @lockedItems.content
