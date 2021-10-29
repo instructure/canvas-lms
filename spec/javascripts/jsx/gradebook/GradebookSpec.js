@@ -10198,6 +10198,62 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
   })
 })
 
+QUnit.module('Gradebook#saveSettings', () => {
+  let gradebook
+
+  QUnit.module('when enhanced_gradebook_filters is enabled', enhancedFilterHooks => {
+    let errorFn
+    let successFn
+    let saveUserSettingsStub
+
+    enhancedFilterHooks.beforeEach(() => {
+      gradebook = createGradebook({
+        enhanced_gradebook_filters: true
+      })
+
+      errorFn = sinon.stub()
+      successFn = sinon.stub()
+
+      saveUserSettingsStub = sinon.stub(GradebookApi, 'saveUserSettings')
+    })
+
+    enhancedFilterHooks.afterEach(() => {
+      saveUserSettingsStub.restore()
+    })
+
+    test('calls the provided successFn if the request succeeds', async () => {
+      saveUserSettingsStub.resolves({})
+      await gradebook.saveSettings({}, successFn, errorFn)
+      strictEqual(successFn.callCount, 1)
+      ok(errorFn.notCalled)
+    })
+
+    test('calls the provided errorFn if the request fails', async () => {
+      saveUserSettingsStub.rejects(new Error(':('))
+      await gradebook.saveSettings({}, successFn, errorFn)
+      strictEqual(errorFn.callCount, 1)
+      ok(successFn.notCalled)
+    })
+
+    test('just returns if the request succeeds and no successFn is provided', async () => {
+      QUnit.expect(0)
+      saveUserSettingsStub.resolves({})
+      await gradebook.saveSettings({})
+    })
+
+    test('throws an error if the request fails and no errorFn is provided', async () => {
+      QUnit.expect(1)
+      saveUserSettingsStub.rejects(new Error('>:('))
+
+      try {
+        await gradebook.saveSettings({})
+      } catch (error) {
+        strictEqual(error.message, '>:(')
+      }
+    })
+  })
+})
+
 QUnit.module('Gradebook', suiteHooks => {
   let $container
   let gradebook
