@@ -19,7 +19,7 @@
 #
 
 require 'rotp'
-
+require 'timecop'
 require_relative '../helpers/k5_common'
 
 describe User do
@@ -43,6 +43,27 @@ describe User do
         user
         user.short_name = "chewie"
         expect(user).to be_valid
+      end
+    end
+  end
+
+  describe "notifications" do
+    describe "#daily_notification_time" do
+      it "returns the users 6pm local time" do
+        Time.use_zone('UTC') do
+          @central = ActiveSupport::TimeZone.us_zones.find { |zone| zone.name == 'Central Time (US & Canada)' }
+          # set up user in central time (different than the specific time zones
+          # referenced in set_send_at)
+          @account = Account.create!(:name => 'new acct')
+          @user = user_with_pseudonym(:account => @account)
+          @user.time_zone = @central.name
+          @user.pseudonym.update_attribute(:account, @account)
+          @user.save
+
+          Timecop.freeze(Time.zone.local(2021, 9, 22, 1, 0, 0)) do
+            expect(@user.daily_notification_time).to  eq(@central.now.change(:day => 22, :hour => 18))
+          end
+        end
       end
     end
   end
