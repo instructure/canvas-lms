@@ -36,7 +36,10 @@ module Autoextend
 
       if recursive
         const.constants(false).each do |child|
-          next if const.autoload?(child)
+          # If the constant is set to autoload, don't accidentally autoload it
+          # If we are processing a constant's parent while processing the child
+          # the constant will be return by constants, but not defined, so just skip it
+          next if const.autoload?(child) || !const.const_defined?(child, false)
 
           child_const = const.const_get(child, false)
           next unless child_const.is_a?(Module)
@@ -135,12 +138,10 @@ module Autoextend
     end
 
     def inject_into_zetwerk
-      return unless Object.const_defined?(:Zeitwerk)
+      return unless Object.const_defined?(:Rails)
 
-      Zeitwerk::Registry.loaders.each do |loader|
-        loader.on_load do |_cpath, value, abspath|
-          # Skip autovivified modules from directories
-          next unless abspath.end_with?('.rb')
+      Rails.autoloaders.each do |loader|
+        loader.on_load do |_cpath, value, _abspath|
           next unless value.is_a?(Module)
 
           Autoextend.const_added(value, source: :Zeitwerk, recursive: true)
