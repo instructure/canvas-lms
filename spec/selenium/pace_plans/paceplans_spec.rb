@@ -82,9 +82,9 @@ describe 'pace plan page' do
       visit_pace_plans_page
 
       expect(module_title_text(0)).to include(module_title)
-      expect(module_item_title_text(0)).to eq(module_assignment_title)
-      expect(module_item_title_text(1)).to eq(discussion_title)
-      expect(module_item_title_text(2)).to eq(quiz_title)
+      expect(module_item_title_text(0)).to start_with(module_assignment_title)
+      expect(module_item_title_text(1)).to start_with(discussion_title)
+      expect(module_item_title_text(2)).to start_with(quiz_title)
     end
 
     it 'does not show a module item that is not an assignment' do
@@ -98,7 +98,7 @@ describe 'pace plan page' do
       visit_pace_plans_page
 
       expect(module_items.count).to eq(1)
-      expect(module_item_title_text(0)).to eq(module_assignment_title)
+      expect(module_item_title_text(0)).to start_with(module_assignment_title)
     end
 
     it 'does not show any publish status when no pace plan created yet' do
