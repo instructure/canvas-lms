@@ -2839,6 +2839,8 @@ class Gradebook extends React.Component {
 
     if (this.options.enhanced_gradebook_filters) {
       return GradebookApi.saveUserSettings(this.options.context_id, data.gradebook_settings)
+        .then(successFn)
+        .catch(errorFn)
     } else {
       return $.ajaxJSON(this.options.settings_update_url, 'PUT', data, successFn, errorFn)
     }
