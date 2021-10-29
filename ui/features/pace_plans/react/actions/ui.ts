@@ -33,8 +33,6 @@ export enum Constants {
   SET_ERROR_MESSAGE = 'UI/SET_ERROR_MESSAGE',
   TOGGLE_DIVIDE_INTO_WEEKS = 'UI/TOGGLE_DIVIDE_INTO_WEEKS',
   TOGGLE_SHOW_PROJECTIONS = 'UI/TOGGLE_SHOW_PROJECTIONS',
-  PUBLISH_PLAN_STARTED = 'UI/PUBLISH_PLAN_STARTED',
-  PUBLISH_PLAN_FINISHED = 'UI/PUBLISH_PLAN_FINISHED',
   SET_SELECTED_PLAN_CONTEXT = 'UI/SET_SELECTED_PLAN_CONTEXT',
   SET_RESPONSIVE_SIZE = 'UI/SET_RESPONSIVE_SIZE',
   SHOW_LOADING_OVERLAY = 'UI/SHOW_LOADING_OVERLAY',
@@ -51,8 +49,6 @@ export const regularActions = {
   setErrorMessage: (message: string) => createAction(Constants.SET_ERROR_MESSAGE, message),
   toggleDivideIntoWeeks: () => createAction(Constants.TOGGLE_DIVIDE_INTO_WEEKS),
   toggleShowProjections: () => createAction(Constants.TOGGLE_SHOW_PROJECTIONS),
-  publishPlanStarted: () => createAction(Constants.PUBLISH_PLAN_STARTED),
-  publishPlanFinished: () => createAction(Constants.PUBLISH_PLAN_FINISHED),
   showLoadingOverlay: (message: string) => createAction(Constants.SHOW_LOADING_OVERLAY, message),
   hideLoadingOverlay: () => createAction(Constants.HIDE_LOADING_OVERLAY),
   setEditingBlackoutDates: (editing: boolean) =>

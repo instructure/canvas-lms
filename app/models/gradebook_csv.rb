@@ -36,7 +36,3 @@ class GradebookCSV < ActiveRecord::Base
     progress.workflow_state == 'failed'
   end
 end
-
-# TODO: this shim is temporary while we rename
-# references in plugins.  It should then be removed.
-GradebookCsv = GradebookCSV

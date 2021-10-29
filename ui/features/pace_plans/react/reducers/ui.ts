@@ -26,7 +26,6 @@ export const initialState: UIState = {
   autoSaving: false,
   errorMessage: '',
   divideIntoWeeks: true,
-  planPublishing: false,
   selectedContextType: 'Course',
   selectedContextId: window.ENV.COURSE?.id || '',
   loadingMessage: '',
@@ -42,7 +41,6 @@ export const initialState: UIState = {
 export const getAutoSaving = (state: StoreState) => state.ui.autoSaving
 export const getErrorMessage = (state: StoreState) => state.ui.errorMessage
 export const getDivideIntoWeeks = (state: StoreState) => state.ui.divideIntoWeeks
-export const getPlanPublishing = (state: StoreState) => state.ui.planPublishing
 export const getSelectedContextType = (state: StoreState) => state.ui.selectedContextType
 export const getSelectedContextId = (state: StoreState) => state.ui.selectedContextId
 export const getLoadingMessage = (state: StoreState) => state.ui.loadingMessage
@@ -72,10 +70,6 @@ export default (state = initialState, action: UIAction): UIState => {
       return {...state, divideIntoWeeks: !state.divideIntoWeeks}
     case UIConstants.TOGGLE_SHOW_PROJECTIONS:
       return {...state, showProjections: !state.showProjections}
-    case UIConstants.PUBLISH_PLAN_STARTED:
-      return {...state, planPublishing: true}
-    case UIConstants.PUBLISH_PLAN_FINISHED:
-      return {...state, planPublishing: false}
     case UIConstants.SET_SELECTED_PLAN_CONTEXT:
       return {
         ...state,

@@ -394,7 +394,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #
   # If a blueprint course object is restricted, editing will be limited for copies in associated courses.
   #
-  # @argument content_type [String, "assignment"|"attachment"|"discussion_topic"|"external_tool"|"quiz"|"wiki_page"]
+  # @argument content_type [String, "assignment"|"attachment"|"discussion_topic"|"external_tool"|"lti-quiz"|"quiz"|"wiki_page"]
   #   The type of the object.
   #
   # @argument content_id [Integer]
@@ -417,8 +417,8 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   #
   def restrict_item
     content_type = params[:content_type]
-    unless %w{assignment attachment discussion_topic external_tool quiz wiki_page}.include?(content_type)
-      return render :json => { :message => "Must be a valid content type (assignment,attachment,discussion_topic,external_tool,quiz,wiki_page)" }, :status => :bad_request
+    unless %w{assignment attachment discussion_topic external_tool lti-quiz quiz wiki_page}.include?(content_type)
+      return render :json => { :message => "Must be a valid content type (assignment,attachment,discussion_topic,external_tool,lti-quiz,quiz,wiki_page)" }, :status => :bad_request
     end
     unless params.has_key?(:restricted)
       return render :json => { :message => "Must set 'restricted'" }, :status => :bad_request
@@ -430,6 +430,8 @@ class MasterCourses::MasterTemplatesController < ApplicationController
         @course.context_external_tools.active
       when 'attachment'
         @course.attachments.not_deleted
+      when 'lti-quiz'
+        @course.assignments.active
       else
         @course.send(content_type.pluralize).where.not(:workflow_state => 'deleted')
       end
