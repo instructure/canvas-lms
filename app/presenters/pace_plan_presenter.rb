@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class PacePlanPresenter
+  include Rails.application.routes.url_helpers
+
   attr_reader :pace_plan
 
   def initialize(pace_plan)
@@ -70,6 +72,8 @@ class PacePlanPresenter
         root_account_id: ppmi.root_account_id,
         module_item_id: module_item.id,
         assignment_title: module_item.title,
+        points_possible: TextHelper.round_if_whole(module_item.try_rescue(:assignment).try_rescue(:points_possible)),
+        assignment_link: "#{course_url(pace_plan.course, only_path: true)}/modules/items/#{module_item.id}",
         position: module_item.position,
         module_item_type: module_item.content_type,
         published: module_item.published?

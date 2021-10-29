@@ -48,7 +48,7 @@ const text = (changeCount: number) => {
 
   return I18n.t(
     {
-      one: '%{count} unpublished change',
+      one: '1 unpublished change',
       other: '%{count} unpublished changes'
     },
     {count: changeCount}
