@@ -110,6 +110,3 @@ class Login::OAuth2Controller < Login::OAuthBaseController
              end
   end
 end
-
-# TODO: Shim until plugins are fully renamed
-::Login::Oauth2Controller = ::Login::OAuth2Controller
