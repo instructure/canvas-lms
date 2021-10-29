@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
-<% if Lti::QuizzesNextHelper.sessionless_launch?(@current_user, @tool) %>
+<% if Lti::QuizzesNextHelper.userless_launch?(@current_user, @tool) %>
   <div class="alert alert-danger lock_explanation" role="alert">
     <%= t 'The quiz is unavailable if you are not logged in' %>
   </div>
