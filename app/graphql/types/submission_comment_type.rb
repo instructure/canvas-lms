@@ -75,6 +75,22 @@ module Types
       end
     end
 
+    field :assignment, Types::AssignmentType, null: true
+    def assignment
+      load_association(:submission).then do |submission|
+        Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
+          assignment
+        end
+      end
+    end
+
+    field :course, Types::CourseType, null: true
+    def course
+      load_association(:context).then do |course|
+        course
+      end
+    end
+
     field :read, Boolean, null: false
     def read
       load_association(:submission).then do |submission|
