@@ -74,7 +74,7 @@ export interface PacePlan {
   readonly workflow_state: WorkflowStates
   readonly modules: Module[]
   readonly exclude_weekends: boolean
-  readonly hard_end_dates?: boolean
+  readonly hard_end_dates: boolean
   readonly course_id: string
   readonly course_section_id?: string
   readonly user_id?: string

@@ -29,6 +29,7 @@ import {
   getPacePlan,
   getPlanPublishing,
   getProjectedEndDate,
+  getStartDate,
   getExcludeWeekends
 } from '../../../reducers/pace_plans'
 import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
@@ -37,6 +38,7 @@ import {pacePlanActions as actions} from '../../../actions/pace_plans'
 type StoreProps = {
   pacePlan: PacePlan
   projectedEndDate?: string
+  projectedStartDate?: string
   weekendsDisabled?: boolean
   blackoutDates: BlackoutDate[]
   planPublishing: boolean
@@ -48,20 +50,23 @@ type DispatchProps = {
 }
 
 type PassedProps = {
-  type: 'start' | 'end'
+  type: 'start' | 'end' | 'end-selection'
+  label?: Object
+  width: string
 }
 
 export type PacePlanDateSelectorProps = StoreProps & DispatchProps & PassedProps
 
 export const PacePlanDateSelector = (props: PacePlanDateSelectorProps) => {
   const startType = props.type === 'start'
+  const endSelectionType = props.type === 'end-selection'
   const enrollmentType = props.pacePlan.context_type === 'Enrollment'
 
   const validateDay = useCallback(
     (date: moment.Moment) => {
       const crossesOtherDate = startType
         ? date > moment(props.pacePlan.end_date)
-        : date < moment(props.pacePlan.start_date)
+        : date < moment(props.projectedStartDate)
 
       const errors: string[] = []
       if (crossesOtherDate)
@@ -73,32 +78,46 @@ export const PacePlanDateSelector = (props: PacePlanDateSelectorProps) => {
 
       return errors.join(' ')
     },
-    [startType, props.pacePlan.start_date, props.pacePlan.end_date]
+    [startType, props.pacePlan.end_date, props.projectedStartDate]
   )
 
   let interaction: InputInteraction = 'enabled'
-  if (enrollmentType || !startType) {
+  if (enrollmentType || !(startType || endSelectionType)) {
     interaction = 'readonly'
   } else if (props.planPublishing) {
     interaction = 'disabled'
   }
 
-  const label = startType
-    ? enrollmentType
-      ? I18n.t('Start Date')
-      : I18n.t('Projected Start Date')
-    : enrollmentType
-    ? I18n.t('End Date')
-    : I18n.t('Projected End Date')
+  let label
+  if (props.label) {
+    label = props.label
+  } else {
+    label = startType
+      ? enrollmentType
+        ? I18n.t('Start Date')
+        : I18n.t('Projected Start Date')
+      : enrollmentType
+      ? I18n.t('End Date')
+      : I18n.t('Projected End Date')
+  }
+
+  let dateValue
+  if (startType) {
+    dateValue = props.pacePlan.start_date
+  } else if (props.type === 'end-selection') {
+    dateValue = props.pacePlan.end_date
+  } else {
+    dateValue = props.projectedEndDate
+  }
 
   return (
     <PacePlanDateInput
       interaction={interaction}
-      dateValue={startType ? props.pacePlan.start_date : props.projectedEndDate}
+      dateValue={dateValue}
       onDateChange={startType ? props.setStartDate : props.setEndDate}
       validateDay={validateDay}
       label={label}
-      width="14rem"
+      width={props.width || '14rem'}
       blackoutDates={props.blackoutDates}
       weekendsDisabled={props.weekendsDisabled}
     />
@@ -111,6 +130,7 @@ const mapStateToProps = (state: StoreState) => {
     weekendsDisabled: getExcludeWeekends(state),
     blackoutDates: getBlackoutDates(state),
     projectedEndDate: getProjectedEndDate(state),
+    projectedStartDate: getStartDate(state),
     planPublishing: getPlanPublishing(state)
   }
 }
