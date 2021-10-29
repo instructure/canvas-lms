@@ -36,7 +36,6 @@ import UnpublishedChangesTrayContents from './components/unpublished_changes_tra
 // @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_app'
 import {getSummarizedChanges} from './reducers/pace_plans'
-import {pacePlanActions} from './actions/pace_plans'
 import {SummarizedChange} from './utils/change_tracking'
 import {Tray} from '@instructure/ui-tray'
 
@@ -48,7 +47,6 @@ interface StoreProps {
 }
 
 interface DispatchProps {
-  readonly pollForPublishStatus: typeof pacePlanActions.pollForPublishStatus
   readonly setResponsiveSize: typeof actions.setResponsiveSize
 }
 
@@ -64,15 +62,9 @@ export const App: React.FC<ResponsiveComponentProps> = ({
   setResponsiveSize,
   showLoadingOverlay,
   responsiveSize,
-  pollForPublishStatus,
   unpublishedChanges
 }) => {
   const [trayOpen, setTrayOpen] = useState(false)
-
-  // Start polling for publish status on mount if applicable
-  useEffect(() => {
-    pollForPublishStatus()
-  }, [pollForPublishStatus])
 
   useEffect(() => {
     setResponsiveSize(responsiveSize)
@@ -146,6 +138,5 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 }
 
 export default connect(mapStateToProps, {
-  pollForPublishStatus: pacePlanActions.pollForPublishStatus,
   setResponsiveSize: actions.setResponsiveSize
 })(ResponsiveApp)

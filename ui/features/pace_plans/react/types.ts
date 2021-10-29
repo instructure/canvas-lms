@@ -65,7 +65,6 @@ export interface Module {
 
 export type PlanContextTypes = 'Course' | 'Section' | 'Enrollment'
 export type WorkflowStates = 'unpublished' | 'active' | 'deleted'
-export type ProgressStates = 'queued' | 'running' | 'completed' | 'failed'
 
 export interface PacePlan {
   readonly id?: string
@@ -83,23 +82,10 @@ export interface PacePlan {
   readonly published_at?: string
 }
 
-export interface Progress {
-  readonly id: string
-  readonly completion?: number
-  readonly message?: string
-  readonly created_at: string
-  readonly updated_at: string
-  readonly workflow_state: ProgressStates
-  readonly url: string
-}
-
 /* Redux state types */
 
 export type EnrollmentsState = Enrollments
-export type PacePlansState = PacePlan & {
-  originalPlan: PacePlan
-  publishingProgress?: Progress
-}
+export type PacePlansState = PacePlan & {originalPlan: PacePlan}
 export type SectionsState = Sections
 export type ResponsiveSizes = 'small' | 'large'
 
@@ -107,6 +93,7 @@ export interface UIState {
   readonly autoSaving: boolean
   readonly errorMessage: string
   readonly divideIntoWeeks: boolean
+  readonly planPublishing: boolean
   readonly selectedContextType: PlanContextTypes
   readonly selectedContextId: string
   readonly loadingMessage: string
