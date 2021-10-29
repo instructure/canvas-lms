@@ -104,6 +104,24 @@ export default class AssignmentColumnHeader extends ColumnHeader {
   static propTypes = {
     ...ColumnHeader.propTypes,
 
+    allStudents: arrayOf(
+      shape({
+        id: string.isRequired,
+        isInactive: bool.isRequired,
+        isTestStudent: bool.isRequired,
+        name: string.isRequired,
+        sortableName: string.isRequired,
+        submission: shape({
+          excused: bool.isRequired,
+          latePolicyStatus: string,
+          postedAt: instanceOf(Date),
+          score: number,
+          submittedAt: instanceOf(Date),
+          workflowState: string.isRequired
+        }).isRequired
+      })
+    ).isRequired,
+
     assignment: shape({
       anonymizeStudents: bool.isRequired,
       courseId: string.isRequired,
@@ -120,6 +138,8 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       isDisabled: bool.isRequired,
       onSelect: func.isRequired
     }).isRequired,
+
+    getCurrentlyShownStudents: func.isRequired,
 
     hideGradesAction: shape({
       hasGradesOrCommentsToHide: bool.isRequired,
@@ -148,24 +168,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       onSortByUnposted: func.isRequired,
       settingKey: string.isRequired
     }).isRequired,
-
-    students: arrayOf(
-      shape({
-        id: string.isRequired,
-        isInactive: bool.isRequired,
-        isTestStudent: bool.isRequired,
-        name: string.isRequired,
-        sortableName: string.isRequired,
-        submission: shape({
-          excused: bool.isRequired,
-          latePolicyStatus: string,
-          postedAt: instanceOf(Date),
-          score: number,
-          submittedAt: instanceOf(Date),
-          workflowState: string.isRequired
-        }).isRequired
-      })
-    ).isRequired,
 
     submissionsLoaded: bool.isRequired,
 
@@ -277,9 +279,10 @@ export default class AssignmentColumnHeader extends ColumnHeader {
   }
 
   activeStudentDetails() {
-    const activeStudents = this.props.students.filter(
-      student => !student.isInactive && !student.isTestStudent
-    )
+    const activeStudents = this.props
+      .getCurrentlyShownStudents()
+      .filter(student => !student.isInactive && !student.isTestStudent)
+
     return activeStudents.map(student => {
       const {excused, latePolicyStatus, score, submittedAt} = student.submission
       return {
@@ -479,7 +482,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       return null
     }
 
-    const submissions = this.props.students.map(student => student.submission)
+    const submissions = this.props.allStudents.map(student => student.submission)
     const postableSubmissionsPresent = submissions.some(isPostable)
 
     // Assignment has at least one hidden submission that can be posted

@@ -4599,6 +4599,47 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
       deepEqual(Object.keys(students), ['1101', '1102', '9901'])
     })
   })
+
+  QUnit.module('#visibleStudentsThatCanSeeAssinment', hooks => {
+    hooks.beforeEach(() => {
+      gradebook.options.gradebook_assignment_search_and_redesign = true
+      gradebook.gotChunkOfStudents(allStudents)
+      gradebook.courseContent.students.setStudentIds(['1101', '1102'])
+    })
+
+    test('includes students who can see the assignment when no filters are active', () => {
+      const students = gradebook.visibleStudentsThatCanSeeAssignment('2302')
+      ok(Object.keys(students).includes('1102'))
+    })
+
+    test('includes students who can see the assignment and match the active filters', () => {
+      gradebook.filteredStudentIds = ['1102']
+      gradebook.courseContent.students.setStudentIds(['1101', '1102'])
+
+      const students = gradebook.visibleStudentsThatCanSeeAssignment('2302')
+      ok(Object.keys(students).includes('1102'))
+    })
+
+    test('excludes students who cannot see the assignment', () => {
+      const students = gradebook.visibleStudentsThatCanSeeAssignment('2302')
+      notOk(Object.keys(students).includes('1101'))
+    })
+
+    test('excludes students who can see the assignment but do not match active filters', () => {
+      gradebook.filteredStudentIds = ['1102']
+      gradebook.courseContent.students.setStudentIds(['1101'])
+
+      const students = gradebook.visibleStudentsThatCanSeeAssignment('2302')
+      notOk(Object.keys(students).includes('1102'))
+    })
+
+    test('excludes students who can see the assignment but do not match the current search', () => {
+      gradebook.filteredStudentIds = ['1101']
+
+      const students = gradebook.visibleStudentsThatCanSeeAssignment('2302')
+      notOk(Object.keys(students).includes('1102'))
+    })
+  })
 })
 
 QUnit.module('Gradebook#setSortRowsBySetting', hooks => {

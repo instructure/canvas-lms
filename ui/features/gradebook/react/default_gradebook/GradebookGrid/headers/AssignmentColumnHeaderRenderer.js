@@ -58,19 +58,27 @@ function getProps(column, gradebook, options) {
     gradebook.contentLoadStates.studentsLoaded &&
     gradebook.contentLoadStates.submissionsLoaded
 
-  const visibleStudentsForAssignment = Object.values(
-    gradebook.studentsThatCanSeeAssignment(assignmentId)
-  )
-  const students = visibleStudentsForAssignment.map(student => ({
+  const processStudent = student => ({
     id: student.id,
     isInactive: student.isInactive,
     isTestStudent: student.enrollments[0].type === 'StudentViewEnrollment',
     name: student.name,
     sortableName: student.sortable_name,
     submission: getSubmission(student, assignmentId)
-  }))
+  })
 
-  const hasGradesOrPostableComments = students.some(
+  // Menu options for posting and hiding grades should always take into account
+  // all loaded students, regardless of any active filters.
+  const allStudents = Object.values(gradebook.studentsThatCanSeeAssignment(assignmentId)).map(
+    processStudent
+  )
+
+  // For the "Message Students Who" window, we only want to show students who
+  // match active filters, and so must retrieve the list each time.
+  const getCurrentlyShownStudents = () =>
+    Object.values(gradebook.visibleStudentsThatCanSeeAssignment(assignmentId)).map(processStudent)
+
+  const hasGradesOrPostableComments = allStudents.some(
     student => isGraded(student.submission) || student.submission.hasPostableComments
   )
 
@@ -78,6 +86,7 @@ function getProps(column, gradebook, options) {
     ref: options.ref,
     addGradebookElement: gradebook.keyboardNav.addGradebookElement,
 
+    allStudents,
     assignment: {
       anonymizeStudents: assignment.anonymize_students,
       courseId: assignment.course_id,
@@ -104,6 +113,7 @@ function getProps(column, gradebook, options) {
         'gradingScheme'
       )
     },
+    getCurrentlyShownStudents,
 
     onHeaderKeyDown: event => {
       gradebook.handleHeaderKeyDown(event, columnId)
@@ -114,7 +124,7 @@ function getProps(column, gradebook, options) {
 
     hideGradesAction: {
       hasGradesOrPostableComments,
-      hasGradesOrCommentsToHide: students.some(student => student.submission.postedAt != null),
+      hasGradesOrCommentsToHide: allStudents.some(student => student.submission.postedAt != null),
       onSelect(onExited) {
         if (gradebook.postPolicies) {
           gradebook.postPolicies.showHideAssignmentGradesTray({assignmentId, onExited})
@@ -125,7 +135,7 @@ function getProps(column, gradebook, options) {
     postGradesAction: {
       enabledForUser: gradebook.options.gradebook_is_editable,
       hasGradesOrPostableComments,
-      hasGradesOrCommentsToPost: students.some(student => isPostable(student.submission)),
+      hasGradesOrCommentsToPost: allStudents.some(student => isPostable(student.submission)),
       onSelect(onExited) {
         if (gradebook.postPolicies) {
           gradebook.postPolicies.showPostAssignmentGradesTray({assignmentId, onExited})
@@ -169,7 +179,6 @@ function getProps(column, gradebook, options) {
       settingKey: sortRowsBySetting.settingKey
     },
 
-    students,
     submissionsLoaded: gradebook.contentLoadStates.submissionsLoaded
   }
 }
