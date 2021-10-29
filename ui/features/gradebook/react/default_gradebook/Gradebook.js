@@ -970,15 +970,32 @@ class Gradebook extends React.Component {
   }
 
   studentsThatCanSeeAssignment(assignmentId) {
-    let allStudents, assignment, base
-    return (
-      (base = this.courseContent.assignmentStudentVisibility)[assignmentId] ||
-      (base[assignmentId] =
-        ((assignment = this.getAssignment(assignmentId)),
-        (allStudents = {...this.students, ...this.studentViewStudents}),
-        assignment.only_visible_to_overrides
-          ? _.pick(allStudents, ...assignment.assignment_visibility)
-          : allStudents))
+    const {assignmentStudentVisibility} = this.courseContent
+    if (assignmentStudentVisibility[assignmentId] == null) {
+      const allStudentsById = {...this.students, ...this.studentViewStudents}
+
+      const assignment = this.getAssignment(assignmentId)
+      assignmentStudentVisibility[assignmentId] = assignment.only_visible_to_overrides
+        ? _.pick(allStudentsById, ...assignment.assignment_visibility)
+        : allStudentsById
+    }
+
+    return assignmentStudentVisibility[assignmentId]
+  }
+
+  // This is like studentsThatCanSeeAssignment, but returns only students
+  // visible with the current filters, instead of all the students the
+  // Gradebook knows about.
+  visibleStudentsThatCanSeeAssignment(assignmentId) {
+    const visibleStudentsIgnoringSearch = _.pick(
+      this.studentsThatCanSeeAssignment(assignmentId),
+      this.courseContent.students.listStudentIds()
+    )
+
+    return Object.fromEntries(
+      Object.entries(visibleStudentsIgnoringSearch).filter(([_id, student]) =>
+        this.rowFilter(student)
+      )
     )
   }
 
