@@ -43,7 +43,16 @@ Bundler.require(*Rails.groups)
 #      ...
 #      CANVAS_ZEITWERK: 1
 unless defined?(CANVAS_ZEITWERK)
-  CANVAS_ZEITWERK = (ENV['CANVAS_ZEITWERK'] == '1')
+  CANVAS_ZEITWERK = if ENV['CANVAS_ZEITWERK']
+                      (ENV['CANVAS_ZEITWERK'] == '1')
+                    elsif Rails.root && (zw_settings = ConfigFile.load("zeitwerk"))
+                      zw_settings["enabled"]
+                    else
+                      # choose to force zeitwerk on in dev/test
+                      # environments unless they override with
+                      # an env var or file
+                      !Rails.env.production?
+                    end
 end
 
 module CanvasRails
