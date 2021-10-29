@@ -28,20 +28,22 @@ module Lti
     module_function :quizzes_next_tool?
 
     def unavailable_for_students?(context, current_user, tool)
-      current_user_enrollment = context.enrollments.where(user: current_user)
+      return false unless quizzes_next_tool?(tool)
+      return false unless current_user.roles(context.root_account).exclude?('admin')
 
-      current_user.roles(context.root_account).exclude?('admin') &&
-        quizzes_next_tool?(tool) &&
-        current_user_enrollment.of_student_type.active_by_date.union(current_user_enrollment.of_admin_type).none?
+      current_user_enrollment = context.enrollments.where(user: current_user)
+      current_user_enrollment
+        .where(type: ['StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'])
+        .active_by_date.union(current_user_enrollment.of_admin_type).none?
     end
 
     module_function :unavailable_for_students?
 
-    def sessionless_launch?(current_user, tool)
+    def userless_launch?(current_user, tool)
       quizzes_next_tool?(tool) &&
         current_user.blank?
     end
 
-    module_function :sessionless_launch?
+    module_function :userless_launch?
   end
 end
