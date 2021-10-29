@@ -39,6 +39,16 @@ module PacePlansDateHelpers
       end
     end
 
+    def days_between(start_date, end_date, exclude_weekends, inclusive_end: true, blackout_dates: [])
+      return nil if end_date.nil?
+
+      end_date += 1.day if inclusive_end
+
+      BusinessTime::Config.with(business_time_config(exclude_weekends, blackout_dates)) do
+        start_date.business_days_until(end_date)
+      end
+    end
+
     private
 
     def business_time_config(exclude_weekends, blackout_dates)
