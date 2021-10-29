@@ -2914,6 +2914,15 @@ class User < ActiveRecord::Base
     (account_bucket * DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET) + user_bucket
   end
 
+  def daily_notification_time
+    # The time daily notifications are sent out is 6pm local time. This is
+    # referencing the definition in our documentation and in DelayedMessage#set_send_at
+    time_zone = self.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone
+    target = time_zone.now.change(:hour => 18)
+    target += 1.day if target < time_zone.now
+    target
+  end
+
   def weekly_notification_time
     # weekly notification scheduling happens in Eastern-time
     time_zone = ActiveSupport::TimeZone.us_zones.find { |zone| zone.name == 'Eastern Time (US & Canada)' }

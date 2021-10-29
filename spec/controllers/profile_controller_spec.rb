@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'timecop'
+
 describe ProfileController do
   before :once do
     course_with_teacher(:active_all => true)
@@ -331,6 +333,23 @@ describe ProfileController do
   end
 
   describe "communication" do
+    before :once do
+      # shouldn't be used, but to make sure it's not equal to any of the other
+      # time zones in play
+      Time.use_zone('UTC') do
+        # time zones of interest
+        @central = ActiveSupport::TimeZone.us_zones.find { |zone| zone.name == 'Central Time (US & Canada)' }
+
+        # set up user in central time (different than the specific time zones
+        # referenced in set_send_at)
+        @account = Account.create!(:name => 'new acct')
+        @user = user_with_pseudonym(:account => @account)
+        @user.time_zone = @central.name
+        @user.pseudonym.update_attribute(:account, @account)
+        @user.save
+      end
+    end
+
     context "when rendering the full view" do
       render_views
 
@@ -338,6 +357,30 @@ describe ProfileController do
         user_session(@user)
         get "communication"
         expect(response.body).to include "<title>Notification Settings</title>"
+      end
+    end
+
+    describe "js_env" do
+      it "sets the weekly_notification_range" do
+        allow(@user).to receive(:weekly_notification_bucket).and_return(0)
+        user_session(@user)
+        Timecop.freeze(Time.zone.local(2021, 9, 22, 1, 0, 0)) do
+          get "communication"
+
+          expect(assigns[:js_env][:NOTIFICATION_PREFERENCES_OPTIONS][:weekly_notification_range][:weekday]).to eq("Friday")
+          expect(assigns[:js_env][:NOTIFICATION_PREFERENCES_OPTIONS][:weekly_notification_range].keys).to eq([:weekday, :start_time, :end_time])
+          expect(assigns[:js_env][:NOTIFICATION_PREFERENCES_OPTIONS][:weekly_notification_range][:start_time]).to eq "10pm"
+          expect(assigns[:js_env][:NOTIFICATION_PREFERENCES_OPTIONS][:weekly_notification_range][:end_time]).to eq "12am"
+        end
+      end
+
+      it "sets the daily_notification_time" do
+        user_session(@user)
+        Timecop.freeze(Time.zone.local(2021, 9, 22, 1, 0, 0)) do
+          get "communication"
+
+          expect(assigns[:js_env][:NOTIFICATION_PREFERENCES_OPTIONS][:daily_notification_time]).to eq(" 6pm")
+        end
       end
     end
   end

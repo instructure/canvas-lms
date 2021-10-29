@@ -245,7 +245,13 @@ class ProfileController < ApplicationController
       enable_course_selector:
         Account.site_admin.feature_enabled?(:notification_settings_course_selector) || @user&.active_k5_enrollments?,
       allowed_push_categories: Notification.categories_to_send_in_push,
-      send_scores_in_emails_text: Notification.where(category: 'Grading').first.related_user_setting(@user, @domain_root_account),
+      send_scores_in_emails_text: Notification.where(category: 'Grading').first&.related_user_setting(@user, @domain_root_account),
+      daily_notification_time: time_string(@current_user.daily_notification_time, nil, @current_user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone),
+      weekly_notification_range: {
+        weekday: I18n.l(@current_user.weekly_notification_range.first.in_time_zone.to_date, :format => :weekday),
+        start_time: time_string(@current_user.weekly_notification_range.first, nil, @current_user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone),
+        end_time: time_string(@current_user.weekly_notification_range.last, nil, @current_user.time_zone || ActiveSupport::TimeZone['America/Denver'] || Time.zone)
+      },
       read_privacy_info: @user.preferences[:read_notification_privacy_info],
       account_privacy_notice: @domain_root_account.settings[:external_notification_warning]
     }
