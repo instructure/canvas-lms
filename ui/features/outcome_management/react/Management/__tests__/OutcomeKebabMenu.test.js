@@ -84,6 +84,20 @@ describe('OutcomeKebabMenu', () => {
     expect(getByText('Add Outcomes')).toBeInTheDocument()
   })
 
+  it('does not render Import Outcomes in Kebab menu if a isGroup is not provided and menu button clicked', () => {
+    const {queryByText} = render(<OutcomeKebabMenu {...defaultProps()} />)
+    const menuButton = queryByText(groupMenuTitle)
+    fireEvent.click(menuButton)
+    expect(queryByText('Import Outcomes')).not.toBeInTheDocument()
+  })
+
+  it('renders Import Outcomes in Kebab menu if a isGroup is provided and menu button clicked', () => {
+    const {getByText} = render(<OutcomeKebabMenu {...defaultProps({isGroup: true})} />)
+    const menuButton = getByText(groupMenuTitle)
+    fireEvent.click(menuButton)
+    expect(getByText('Import Outcomes')).toBeInTheDocument()
+  })
+
   describe('with Kebab menu open', () => {
     it('handles click on Edit item', () => {
       const {getByText} = render(<OutcomeKebabMenu {...defaultProps()} />)
@@ -123,6 +137,16 @@ describe('OutcomeKebabMenu', () => {
       fireEvent.click(menuItem)
       expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
       expect(onMenuHandlerMock.mock.calls[0][1]).toBe('add_outcomes')
+    })
+
+    it('handles click on Import Outcomes item', () => {
+      const {getByText} = render(<OutcomeKebabMenu {...defaultProps({isGroup: true})} />)
+      const menuButton = getByText(groupMenuTitle)
+      fireEvent.click(menuButton)
+      const menuItem = getByText('Import Outcomes')
+      fireEvent.click(menuItem)
+      expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
+      expect(onMenuHandlerMock.mock.calls[0][1]).toBe('import_outcomes')
     })
 
     it('handles click on View Description item', () => {

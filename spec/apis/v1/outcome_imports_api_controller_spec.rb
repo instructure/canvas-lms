@@ -112,6 +112,59 @@ describe OutcomeImportsApiController, type: :request do
     end
   end
 
+  describe "returns error for created group ids query" do
+    before do
+      api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_imports",
+               { controller: "outcome_imports_api", action: "create", format: "json",
+                 account_id: @account.id.to_s },
+               { import_type: "instructure_csv",
+                 attachment: fixture_file_upload("files/outcomes/test_outcomes_with_errors.csv", "text/csv") })
+    end
+
+    it "if import is still being processed" do
+      import = OutcomeImport.order(:id).last
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}/created_group_ids",
+                      { controller: "outcome_imports_api", action: "created_group_ids", format: "json",
+                        account_id: @account.id.to_s, id: import.id.to_s })
+
+      expect(json["message"]).to eq("Import is still being processed")
+    end
+
+    it "if import has failed" do
+      run_jobs
+
+      import = OutcomeImport.order(:id).last
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}/created_group_ids",
+                      { controller: "outcome_imports_api", action: "created_group_ids", format: "json",
+                        account_id: @account.id.to_s, id: import.id.to_s })
+
+      expect(json["message"]).to eq("Import has failed")
+    end
+  end
+
+  describe "returns created group ids" do
+    it do
+      api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_imports",
+               { controller: "outcome_imports_api", action: "create", format: "json",
+                 account_id: @account.id.to_s },
+               { import_type: "instructure_csv",
+                 attachment: fixture_file_upload("files/outcomes/test_outcomes_1.csv", "text/csv") })
+
+      run_jobs
+
+      import = OutcomeImport.order(:id).last
+      imported_group_ids = LearningOutcomeGroup.where(outcome_import_id: import.id).pluck(:id).map(&:to_s)
+
+      json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_imports/#{import.id}/created_group_ids",
+                      { controller: "outcome_imports_api", action: "created_group_ids", format: "json",
+                        account_id: @account.id.to_s, id: import.id.to_s })
+
+      expect(imported_group_ids.sort).to eq(json.sort)
+    end
+  end
+
   it "allows raw post without content-type" do
     # In the current API docs, we specify that you need to send a content-type to make raw
     # post work. However, long ago we added code to make it work even without the header,
