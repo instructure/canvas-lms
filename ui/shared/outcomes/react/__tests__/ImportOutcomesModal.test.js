@@ -55,6 +55,6 @@ it('calls onFileDrop and hides if a file is accepted', () => {
   const dummyFile = {file: 'foo'}
   const modal = shallow(<ImportOutcomesModal onFileDrop={onFileDrop} />)
   modal.instance().onSelection([dummyFile], [], {})
-  expect(onFileDrop).toHaveBeenCalledWith(dummyFile)
+  expect(onFileDrop).toHaveBeenCalledWith(dummyFile, undefined, undefined)
   expect(modal.instance().state.show).toEqual(false)
 })

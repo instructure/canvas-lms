@@ -118,15 +118,18 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
       if (improvedManagement && selectedIndex === 0 && importRef) {
         await showOutcomesImporterIfInProgress(
           {
+            learningOutcomeGroupId: lhsGroupId,
             disableOutcomeViews: disableManageView,
             resetOutcomeViews: resetManageView,
             mount: importRef,
-            contextUrlRoot: ENV.CONTEXT_URL_ROOT
+            contextUrlRoot: ENV.CONTEXT_URL_ROOT,
+            onSuccessfulCreateOutcome
           },
           ENV.current_user.id
         )
       }
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [improvedManagement, selectedIndex, importRef])
 
   const unmountImportRef = () => {
@@ -141,13 +144,16 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
     setIsImporting(false)
   }
 
-  const onFileDrop = file => {
+  const onFileDrop = (file, learningOutcomeGroupId, learningOutcomeGroupAncestorIds) => {
     showOutcomesImporter({
+      learningOutcomeGroupId,
+      learningOutcomeGroupAncestorIds,
       file,
       disableOutcomeViews: disableManageView,
       resetOutcomeViews: resetManageView,
       mount: importRef,
-      contextUrlRoot: ENV.CONTEXT_URL_ROOT
+      contextUrlRoot: ENV.CONTEXT_URL_ROOT,
+      onSuccessfulOutcomesImport: onSuccessfulCreateOutcome
     })
   }
 
@@ -186,6 +192,7 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
                 importNumber={importNumber}
                 createdOutcomeGroupIds={createdOutcomeGroupIds}
                 onLhsSelectedGroupIdChanged={setLhsGroupId}
+                handleFileDrop={onFileDrop}
               />
             )
           ) : (

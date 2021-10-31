@@ -1403,6 +1403,7 @@ CanvasRails::Application.routes.draw do
       %w[account course].each do |context|
         post "#{context}s/:#{context}_id/outcome_imports(/group/:learning_outcome_group_id)", action: :create
         get "#{context}s/:#{context}_id/outcome_imports/:id", action: :show
+        get "#{context}s/:#{context}_id/outcome_imports/:id/created_group_ids", action: :created_group_ids
       end
     end
 
@@ -1482,7 +1483,7 @@ CanvasRails::Application.routes.draw do
       end
 
       scope(controller: :login) do
-        get 'login/session_token', action: :session_token, as: :login_session_token
+        get "login/session_token", action: :session_token, as: :login_session_token
       end
 
       scope(controller: :observer_alerts_api) do

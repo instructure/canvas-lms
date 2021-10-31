@@ -116,7 +116,9 @@ describe('OutcomeManagement', () => {
           disableOutcomeViews: expect.any(Function),
           resetOutcomeViews: expect.any(Function),
           mount: expect.any(Element),
-          contextUrlRoot: ENV.CONTEXT_URL_ROOT
+          contextUrlRoot: ENV.CONTEXT_URL_ROOT,
+          learningOutcomeGroupId: null,
+          onSuccessfulCreateOutcome: expect.any(Function)
         },
         '1'
       )
