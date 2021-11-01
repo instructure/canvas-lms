@@ -333,8 +333,6 @@ describe ContentMigration do
     end
 
     describe "student annotation assignments" do
-      before(:each) { Account.site_admin.enable_feature!(:annotated_document_submissions) }
-
       let(:source_attachment) do
         attachment_model(course: @copy_from, filename: 'some_attachment')
       end

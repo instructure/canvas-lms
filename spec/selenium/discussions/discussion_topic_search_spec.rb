@@ -54,5 +54,42 @@ describe "Discussion Topic Search" do
       expect(fj("span:contains('bar')")).to be_present
       expect(f("#content")).not_to contain_jqcss("span:contains('foo')")
     end
+
+    it "resets to page 1 upon clearing search term" do
+      (1..2).each do |number|
+        @topic.discussion_entries.create!(
+          user: @teacher,
+          message: "foo #{number}"
+        )
+      end
+
+      @topic.discussion_entries.create!(
+        user: @teacher, message: 'bar'
+      )
+
+      student = student_in_course(course: @course, name: 'Jeff', active_all: true).user
+      user_session(student)
+
+      # visit a fast loading page first to set localstorage
+      get "/courses/#{@course.id}/discussion_topics"
+      # rubocop:disable Specs/NoExecuteScript
+      driver.execute_script("window.localStorage.setItem('DISCUSSION_PER_PAGE', 1)")
+      # rubocop:enable Specs/NoExecuteScript
+
+      # load the intended page
+      get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
+      f("input[placeholder='Search entries or author...']").send_keys("foo")
+      wait_for_ajaximations
+      expect(fj("span:contains('foo 2')")).to be_present
+      expect(f("#content")).not_to contain_jqcss("span:contains('bar')")
+      fj("button:contains('2')").click
+      wait_for_ajaximations
+      expect(fj("span:contains('foo 1')")).to be_present
+      expect(fj("button[aria-current='page']:contains('2')")).to be_present
+      f("button[data-testid='clear-search-button']").click
+      wait_for_ajaximations
+      expect(fj("button[aria-current='page']:contains('1')")).to be_present
+      expect(fj("span:contains('bar')")).to be_present
+    end
   end
 end

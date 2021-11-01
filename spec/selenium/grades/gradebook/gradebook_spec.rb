@@ -49,13 +49,58 @@ describe "Gradebook" do
     expect(f('.slick-header-columns')).not_to include_text(@ungraded_assignment.title)
   end
 
-  it 'filters students', priority: "1", test_id: 210018 do
-    Gradebook.visit(@course)
-    expect(Gradebook.fetch_student_names.size).to eq(@all_students.size)
-    f('.gradebook_filter input').send_keys @course.students[0].name
-    sleep 1 # InputFilter has a delay
-    expect(Gradebook.fetch_student_names.size).to eq(1)
-    expect(Gradebook.fetch_student_names[0]).to eq(@course.students[0].name)
+  context "search" do
+    it 'filters students without delay' do
+      Account.site_admin.enable_feature!(:remove_gradebook_student_search_delay)
+      Gradebook.visit(@course)
+      expect(Gradebook.fetch_student_names.size).to eq(@all_students.size)
+      f('.gradebook_filter input').send_keys @course.students[0].name
+      expect(Gradebook.fetch_student_names).to match_array [@course.students[0].name]
+    end
+
+    context "redesign" do
+      before(:each) do
+        Account.site_admin.enable_feature!(:gradebook_assignment_search_and_redesign)
+        Gradebook.visit(@course)
+      end
+
+      it 'filters students' do
+        expect(Gradebook.fetch_student_names.size).to eq(@all_students.size)
+        f('#gradebook-student-search input').send_keys @course.students[0].name
+        f('#gradebook-student-search input').send_keys(:return)
+        expect(Gradebook.fetch_student_names).to match_array [@course.students[0].name]
+      end
+
+      it 'filters assignments' do
+        graded_assignments = @course.assignments.where(grading_type: "points").where.not(points_possible: nil)
+        expect(Gradebook.fetch_assignment_names.size).to eq(graded_assignments.size)
+        f('#gradebook-assignment-search input').send_keys(@course.assignments[0].name)
+        f('#gradebook-assignment-search input').send_keys(:return)
+        expect(Gradebook.fetch_assignment_names).to match_array [@course.assignments[0].name]
+      end
+
+      it 'filters students and assignments' do
+        f('#gradebook-student-search input').send_keys(@course.students[1].name)
+        f('#gradebook-student-search input').send_keys(:return)
+        f('#gradebook-assignment-search input').send_keys(@course.assignments[1].name)
+        f('#gradebook-assignment-search input').send_keys(:return)
+        expect(Gradebook.fetch_student_names).to match_array [@course.students[1].name]
+        expect(Gradebook.fetch_assignment_names).to match_array [@course.assignments[1].name]
+      end
+
+      it 'filters by multiple students and assignments' do
+        f('#gradebook-student-search input').send_keys(@course.students[0].name)
+        f('#gradebook-student-search input').send_keys(:return)
+        f('#gradebook-student-search input').send_keys(@course.students[1].name)
+        f('#gradebook-student-search input').send_keys(:return)
+        f('#gradebook-assignment-search input').send_keys(@course.assignments[0].name)
+        f('#gradebook-assignment-search input').send_keys(:return)
+        f('#gradebook-assignment-search input').send_keys(@course.assignments[1].name)
+        f('#gradebook-assignment-search input').send_keys(:return)
+        expect(Gradebook.fetch_student_names).to match_array [@course.students[0].name, @course.students[1].name]
+        expect(Gradebook.fetch_assignment_names).to match_array [@course.assignments[0].name, @course.assignments[1].name]
+      end
+    end
   end
 
   it "validates correct number of students showing up in gradebook", priority: "1", test_id: 210019 do

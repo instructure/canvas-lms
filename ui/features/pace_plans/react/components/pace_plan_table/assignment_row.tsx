@@ -45,17 +45,13 @@ import {
   getPacePlan,
   getDueDate,
   getExcludeWeekends,
-  getPacePlanItemPosition
+  getPacePlanItemPosition,
+  getPlanPublishing
 } from '../../reducers/pace_plans'
 import {actions} from '../../actions/pace_plan_items'
 import {actions as uiActions} from '../../actions/ui'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
-import {
-  getAutoSaving,
-  getAdjustingHardEndDatesAfter,
-  getPlanPublishing,
-  getShowProjections
-} from '../../reducers/ui'
+import {getAutoSaving, getAdjustingHardEndDatesAfter, getShowProjections} from '../../reducers/ui'
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
