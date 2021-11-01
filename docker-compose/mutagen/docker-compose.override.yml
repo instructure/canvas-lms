@@ -103,3 +103,4 @@ x-mutagen:
           - "/.vscode"
           - "/tags"
           - "/tags.*"
+          - "/vendor/bundle/"
