@@ -113,7 +113,6 @@ const ignoredErrors = [
   /The prop `rubric.id` is marked as required in `RubricTab`/,
   /The prop `rubricAssessment.data\[0\].criterion_id` is marked as required in `Rubric`/,
   /The prop `screenReaderLabel` is marked as required in `IconButton`/,
-  /The prop `selectedRoles\[0\].value` is marked as required in `PermissionsIndex`/,
   /The prop `text` is marked as required in `(SVGWithTextPlaceholder|TextPlaceholder)`/,
   /The prop `value` is marked as required in `CanvasSelectOption`/,
   /Unexpected keys "searchPermissions", "filterRoles", "tabChanged", "setAndOpenAddTray" found in preloadedState argument passed to createStore/,
