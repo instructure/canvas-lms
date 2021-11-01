@@ -22,3 +22,8 @@ module Canvas
   module OAuth
   end
 end
+
+# TODO: this shim is just for renaming plugin references from Oauth to OAuth.
+# It should be removed once that transition is complete
+
+::Canvas::Oauth = ::Canvas::OAuth
