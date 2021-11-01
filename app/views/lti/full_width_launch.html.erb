@@ -24,8 +24,4 @@
 
 <% css_bundle :external_tool_full_width %>
 
-<% if Lti::QuizzesNextHelper.quizzes_next_tool?(@tool) %>
-  <%= render 'lti/lti_message_quizzes_next' %>
-<% else %>
-  <%= render 'lti/lti_message' %>
-<% end %>
+<%= render 'lti/lti_message_quizzes_next' %>
