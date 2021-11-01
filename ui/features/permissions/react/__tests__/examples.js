@@ -57,6 +57,7 @@ const BASIC_ROLE_PERMISSION = {
 const ROLES = [
   {
     id: '1',
+    value: '1',
     label: 'Course Admin',
     base_role_type: 'Course Admin',
     contextType: COURSE,
@@ -68,6 +69,7 @@ const ROLES = [
   },
   {
     id: '2',
+    value: '2',
     label: 'Course Sub-Admin',
     base_role_type: 'Course Admin',
     contextType: COURSE,
@@ -79,6 +81,7 @@ const ROLES = [
   },
   {
     id: '3',
+    value: '3',
     label: 'Account Admin',
     base_role_type: 'Account Admin',
     contextType: ACCOUNT,
@@ -87,6 +90,7 @@ const ROLES = [
   },
   {
     id: '4',
+    value: '4',
     label: 'Account Sub-admin',
     base_role_type: 'Account Admin',
     contextType: ACCOUNT,
