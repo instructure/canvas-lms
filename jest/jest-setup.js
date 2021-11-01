@@ -111,7 +111,6 @@ const ignoredErrors = [
   /The prop `rootId` is marked as required in `GroupSelectionDrillDown`/,
   /The prop `rubric.criteria\[0\].id` is marked as required in `Rubric`/,
   /The prop `rubric.id` is marked as required in `RubricTab`/,
-  /The prop `rubricAssessment.data\[0\].criterion_id` is marked as required in `Rubric`/,
   /The prop `screenReaderLabel` is marked as required in `IconButton`/,
   /The prop `text` is marked as required in `(SVGWithTextPlaceholder|TextPlaceholder)`/,
   /The prop `value` is marked as required in `CanvasSelectOption`/,
