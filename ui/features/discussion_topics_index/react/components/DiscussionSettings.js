@@ -175,7 +175,7 @@ export default class DiscussionSettings extends Component {
         <Modal
           open={this.props.isSettingsModalOpen}
           onDismiss={this.props.toggleModalOpen}
-          label={I18n.t('Edit Discussion Settings')}
+          label={I18n.t('Discussion Settings')}
           onExited={this.exited}
         >
           <Modal.Body>
