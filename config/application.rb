@@ -43,15 +43,15 @@ Bundler.require(*Rails.groups)
 #      ...
 #      CANVAS_ZEITWERK: 1
 unless defined?(CANVAS_ZEITWERK)
+  # choose to force zeitwerk on
+  # unless overridden with
+  # an env var or file
   CANVAS_ZEITWERK = if ENV['CANVAS_ZEITWERK']
                       (ENV['CANVAS_ZEITWERK'] == '1')
                     elsif Rails.root && (zw_settings = ConfigFile.load("zeitwerk"))
                       zw_settings["enabled"]
                     else
-                      # choose to force zeitwerk on in dev/test
-                      # environments unless they override with
-                      # an env var or file
-                      !Rails.env.production?
+                      true
                     end
 end
 
@@ -63,12 +63,6 @@ module CanvasRails
     # at which point the stuff inside this conditional block should remain.
     if CANVAS_ZEITWERK
       config.autoloader = :zeitwerk
-      # TODO: when we aren't finding copious errors
-      # anymore we can stop logging the autoloading paths.
-      # For now, this lets us figure out why constant loading
-      # is not behaving as expected quickly and easily:
-      Rails.autoloaders.logger = Logger.new("#{Rails.root}/log/autoloading.log")
-      # Rails.autoloaders.log!
 
       # TODO: someday we can use this line, which will NOT
       # add anything on the autoload paths the actual ruby
