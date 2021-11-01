@@ -64,7 +64,11 @@ export const MessageDetailItem = ({...props}) => {
           <View as="div" margin="none none x-small">
             <Text weight="light">{createdAt}</Text>
           </View>
-          <MessageDetailActions onReply={props.onReply} onReplyAll={props.onReplyAll} />
+          <MessageDetailActions
+            onReply={props.onReply}
+            onReplyAll={props.onReplyAll}
+            onDelete={props.onDelete}
+          />
         </Flex.Item>
       </Flex>
       <Text>{props.conversationMessage.body}</Text>
@@ -93,7 +97,8 @@ MessageDetailItem.propTypes = {
   conversationMessage: PropTypes.object,
   contextName: PropTypes.string,
   onReply: PropTypes.func,
-  onReplyAll: PropTypes.func
+  onReplyAll: PropTypes.func,
+  onDelete: PropTypes.func
 }
 
 MessageDetailItem.defaultProps = {

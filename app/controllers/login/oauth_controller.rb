@@ -69,6 +69,3 @@ class Login::OAuthController < Login::OAuthBaseController
     oauth_login_callback_url(id: @aac.global_id)
   end
 end
-
-# TODO: Shim until plugins are fully renamed
-::Login::OauthController = ::Login::OAuthController
