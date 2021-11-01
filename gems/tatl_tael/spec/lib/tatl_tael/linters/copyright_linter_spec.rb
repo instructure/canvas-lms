@@ -25,6 +25,8 @@ require 'pp'
 require 'fakefs/safe'
 require "timecop"
 
+FIXTURE_BASE = File.expand_path("fixtures/copyright_linter/", __dir__)
+
 describe TatlTael::Linters::CopyrightLinter do
   let(:config) { TatlTael::Linters.config_for_linter(described_class) }
   let(:status) { "added" }
@@ -63,7 +65,6 @@ describe TatlTael::Linters::CopyrightLinter do
     end
   end
 
-  FIXTURE_BASE = File.expand_path("../fixtures/copyright_linter/", __FILE__)
   def fixture_path_for(type, file_name)
     File.expand_path("../fixtures/copyright_linter/#{type}/#{file_name}.#{type}", __FILE__)
   end

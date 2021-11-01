@@ -46,6 +46,9 @@ if ENV['WITH_ZEITWERK']
   Autoextend.inject_into_zetwerk
 end
 
+# rubocop:disable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration
+# these specs needs to work with real constants, because we're testing the hooking
+# of constants being defined
 describe Autoextend do
   before do
     module AutoextendSpec
@@ -228,3 +231,4 @@ describe Autoextend do
     end
   end
 end
+# rubocop:enable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration
