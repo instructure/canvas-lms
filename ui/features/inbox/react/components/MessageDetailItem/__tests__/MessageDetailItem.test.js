@@ -79,8 +79,7 @@ describe('MessageDetailItem', () => {
       },
       contextName: 'Fake Course 1',
       onReply: jest.fn(),
-      onReplyAll: jest.fn(),
-      onDelete: jest.fn()
+      onReplyAll: jest.fn()
     }
 
     const {getByTestId, getByText} = render(<MessageDetailItem {...props} />)
@@ -93,9 +92,5 @@ describe('MessageDetailItem', () => {
     fireEvent.click(moreOptionsButton)
     fireEvent.click(getByText('Reply All'))
     expect(props.onReplyAll).toHaveBeenCalled()
-
-    fireEvent.click(moreOptionsButton)
-    fireEvent.click(getByText('Delete'))
-    expect(props.onDelete).toHaveBeenCalled()
   })
 })

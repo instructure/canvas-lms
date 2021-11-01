@@ -18,17 +18,11 @@
 
 import {Action} from 'redux'
 import {ThunkAction} from 'redux-thunk'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-// @ts-ignore: TS doesn't understand i18n scoped imports
-import I18n from 'i18n!pace_plans_actions'
 
-import {PacePlan, PlanContextTypes, Progress, StoreState} from '../types'
+import {PacePlan, PlanContextTypes, StoreState} from '../types'
 import {createAction, ActionsUnion} from '../shared/types'
 import {actions as uiActions} from './ui'
 import * as Api from '../api/pace_plan_api'
-
-export const PUBLISH_STATUS_POLLING_MS = 3000
-const TERMINAL_PROGRESS_STATUSES = ['completed', 'failed']
 
 export enum Constants {
   SET_END_DATE = 'PACE_PLAN/SET_END_DATE',
@@ -38,8 +32,7 @@ export enum Constants {
   SET_PACE_PLAN = 'PACE_PLAN/SET_PACE_PLAN',
   PLAN_CREATED = 'PACE_PLAN/PLAN_CREATED',
   TOGGLE_HARD_END_DATES = 'PACE_PLAN/TOGGLE_HARD_END_DATES',
-  RESET_PLAN = 'PACE_PLAN/RESET_PLAN',
-  SET_PROGRESS = 'PACE_PLAN/SET_PROGRESS'
+  RESET_PLAN = 'PACE_PLAN/RESET_PLAN'
 }
 
 /* Action creators */
@@ -56,66 +49,27 @@ const regularActions = {
   planCreated: (plan: PacePlan) => createAction(Constants.PLAN_CREATED, plan),
   toggleExcludeWeekends: () => createAction(Constants.TOGGLE_EXCLUDE_WEEKENDS),
   toggleHardEndDates: () => createAction(Constants.TOGGLE_HARD_END_DATES),
-  resetPlan: () => createAction(Constants.RESET_PLAN),
-  setProgress: (progress?: Progress) => createAction(Constants.SET_PROGRESS, progress)
+  resetPlan: () => createAction(Constants.RESET_PLAN)
 }
 
 const thunkActions = {
-  publishPlan: (): ThunkAction<Promise<void>, StoreState, void, Action> => {
+  publishPlan: (): ThunkAction<void, StoreState, void, Action> => {
     return (dispatch, getState) => {
-      dispatch(uiActions.showLoadingOverlay(I18n.t('Starting publish...')))
+      dispatch(uiActions.publishPlanStarted())
 
       return Api.publish(getState().pacePlan)
-        .then(responseBody => {
-          if (!responseBody) throw new Error(I18n.t('Response body was empty'))
-          const {pace_plan: updatedPlan, progress} = responseBody
+        .then(updatedPlan => {
+          if (!updatedPlan) throw new Error('Response body was empty')
           dispatch(pacePlanActions.setPacePlan(updatedPlan))
-          dispatch(pacePlanActions.setProgress(progress))
-          dispatch(pacePlanActions.pollForPublishStatus())
           dispatch(uiActions.hideLoadingOverlay())
+          dispatch(uiActions.publishPlanFinished())
         })
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
-          dispatch(uiActions.setErrorMessage(I18n.t('There was an error publishing your plan.')))
-          console.log(error) // eslint-disable-line no-console
+          dispatch(uiActions.publishPlanFinished())
+          dispatch(uiActions.setErrorMessage('There was an error publishing your plan.'))
+          console.error(error) // eslint-disable-line no-console
         })
-    }
-  },
-  pollForPublishStatus: (): ThunkAction<void, StoreState, void, Action> => {
-    // Give the thunk function a name so that we can assert on it in tests
-    return function pollingThunk(dispatch, getState) {
-      const progress = getState().pacePlan.publishingProgress
-      if (!progress || TERMINAL_PROGRESS_STATUSES.includes(progress.workflow_state)) return
-
-      const pollingLoop = () =>
-        Api.getPublishProgress(progress.id)
-          .then(updatedProgress => {
-            if (!updatedProgress) throw new Error(I18n.t('Response body was empty'))
-            dispatch(
-              pacePlanActions.setProgress(
-                updatedProgress.workflow_state !== 'completed' ? updatedProgress : undefined
-              )
-            )
-            if (TERMINAL_PROGRESS_STATUSES.includes(updatedProgress.workflow_state)) {
-              showFlashAlert({
-                message: I18n.t('Finished publishing plan'),
-                err: null,
-                type: 'success',
-                srOnly: true
-              })
-            } else {
-              setTimeout(pollingLoop, PUBLISH_STATUS_POLLING_MS)
-            }
-          })
-          .catch(error => {
-            dispatch(
-              uiActions.setErrorMessage(
-                I18n.t('There was an error checking plan publishing status')
-              )
-            )
-            console.log(error) // eslint-disable-line no-console
-          })
-      return pollingLoop()
     }
   },
   resetToLastPublished: (
@@ -123,21 +77,21 @@ const thunkActions = {
     contextId: string
   ): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
-      dispatch(uiActions.showLoadingOverlay(I18n.t('Loading...')))
+      dispatch(uiActions.showLoadingOverlay('Loading...'))
 
-      await Api.waitForActionCompletion(() => getState().ui.autoSaving)
+      await Api.waitForActionCompletion(
+        () => getState().ui.autoSaving || getState().ui.planPublishing
+      )
 
       return Api.resetToLastPublished(contextType, contextId)
         .then(pacePlan => {
-          if (!pacePlan) throw new Error(I18n.t('Response body was empty'))
+          if (!pacePlan) throw new Error('Response body was empty')
           dispatch(pacePlanActions.setPacePlan(pacePlan))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
-          dispatch(
-            uiActions.setErrorMessage(I18n.t('There was an error resetting to the previous plan.'))
-          )
+          dispatch(uiActions.setErrorMessage('There was an error resetting to the previous plan.'))
           console.error(error) // eslint-disable-line no-console
         })
     }
@@ -148,19 +102,19 @@ const thunkActions = {
     afterAction: LoadingAfterAction = pacePlanActions.setPacePlan
   ): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
-      dispatch(uiActions.showLoadingOverlay(I18n.t('Loading...')))
+      dispatch(uiActions.showLoadingOverlay('Loading...'))
 
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
       return Api.getNewPacePlanFor(getState().course.id, contextType, contextId)
         .then(pacePlan => {
-          if (!pacePlan) throw new Error(I18n.t('Response body was empty'))
+          if (!pacePlan) throw new Error('Response body was empty')
           dispatch(afterAction(pacePlan))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
-          dispatch(uiActions.setErrorMessage(I18n.t('There was an error loading the plan.')))
+          dispatch(uiActions.setErrorMessage('There was an error loading the plan.'))
           console.error(error) // eslint-disable-line no-console
         })
     }
@@ -168,21 +122,21 @@ const thunkActions = {
   relinkToParentPlan: (): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
       const pacePlanId = getState().pacePlan.id
-      if (!pacePlanId) return Promise.reject(new Error(I18n.t('Cannot relink unsaved plans')))
+      if (!pacePlanId) return Promise.reject(new Error('Cannot relink unsaved plans'))
 
-      dispatch(uiActions.showLoadingOverlay(I18n.t('Relinking plans...')))
+      dispatch(uiActions.showLoadingOverlay('Relinking plans...'))
 
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
       return Api.relinkToParentPlan(pacePlanId)
         .then(pacePlan => {
-          if (!pacePlan) throw new Error(I18n.t('Response body was empty'))
+          if (!pacePlan) throw new Error('Response body was empty')
           dispatch(pacePlanActions.setPacePlan(pacePlan))
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
-          dispatch(uiActions.setErrorMessage(I18n.t('There was an error linking plan.')))
+          dispatch(uiActions.setErrorMessage('There was an error linking plan.'))
           console.error(error) // eslint-disable-line no-console
         })
     }
