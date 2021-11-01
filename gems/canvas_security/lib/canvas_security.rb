@@ -37,6 +37,7 @@ module CanvasSecurity
   # For the moment, this is a convenient way to inject
   # this base class without needing to depend on it directly.
   mattr_writer :settings_store
+  mattr_accessor :region, :environment
 
   # Expected interface for this object is:
   #   object.get(setting_name, 'default_value') # [ returning a string ]
@@ -229,7 +230,12 @@ module CanvasSecurity
 
     jwt = JSON::JWT.new(payload)
     jws = jwt.sign(signing_secret, alg || :HS256)
-    jwe = jws.encrypt(encryption_secret, 'dir', :A256GCM)
+    jwe = JSON::JWE.new(jws)
+    jwe.alg = 'dir'
+    jwe.enc = 'A256GCM'
+    jwe.header[:region] = region if region
+    jwe.header[:environment] = environment if environment
+    jwe.encrypt!(encryption_secret)
     jwe.to_s
   end
 

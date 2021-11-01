@@ -20,3 +20,5 @@ require 'canvas_security'
 
 CanvasSecurity.settings_store = Setting
 CanvasSecurity.validate_encryption_key(ENV['UPDATE_ENCRYPTION_KEY_HASH'])
+CanvasSecurity.region = Canvas.region
+CanvasSecurity.environment = Canvas.environment
