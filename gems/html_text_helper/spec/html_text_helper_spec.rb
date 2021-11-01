@@ -20,13 +20,7 @@
 require 'spec_helper'
 
 describe HtmlTextHelper do
-  class TestClassForMixins
-    extend HtmlTextHelper
-  end
-
-  def th
-    TestClassForMixins
-  end
+  let(:th) { Class.new.tap { |th| th.extend HtmlTextHelper } }
 
   context "format_message" do
     it "detects and linkify URLs" do
