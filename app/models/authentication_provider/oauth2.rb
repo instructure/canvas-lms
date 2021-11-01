@@ -68,7 +68,3 @@ class AuthenticationProvider::OAuth2 < AuthenticationProvider::Delegated
     {}
   end
 end
-
-# TODO: this shim is temporary while renaming referenves plugins
-# and should be removed after
-::AuthenticationProvider::Oauth2 = ::AuthenticationProvider::OAuth2

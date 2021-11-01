@@ -48,7 +48,6 @@ describe CanvadocSessionsController do
     end
 
     before(:each) do
-      Account.site_admin.enable_feature!(:annotated_document_submissions)
       @assignment.update!(annotatable_attachment_id: @attachment.id)
       user_session(@student)
     end
@@ -63,12 +62,6 @@ describe CanvadocSessionsController do
     let(:canvadocs_session_url_params) do
       json_response = json_parse(response.body)
       Rack::Utils.parse_query(URI(json_response["canvadocs_session_url"]).query)
-    end
-
-    it "renders unauthorized if the feature flag is off" do
-      Account.site_admin.disable_feature!(:annotated_document_submissions)
-      post :create, params: params
-      expect(response).to have_http_status(:unauthorized)
     end
 
     it "renders unauthorized if the user does not own the submission" do
