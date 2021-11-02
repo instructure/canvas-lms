@@ -109,7 +109,6 @@ const ignoredErrors = [
   /The prop `rollups\[0\].outcomeRollups\[0\].rating.mastery` is marked as required in `Gradebook`/,
   /The prop `rootId` is marked as required in `GroupSelectionDrillDown`/,
   /The prop `screenReaderLabel` is marked as required in `IconButton`/,
-  /The prop `value` is marked as required in `CanvasSelectOption`/,
   /Unexpected keys "searchPermissions", "filterRoles", "tabChanged", "setAndOpenAddTray" found in preloadedState argument passed to createStore/,
   /Use the `defaultValue` or `value` props on <select> instead of setting `selected` on <option>/,
   /validateDOMNesting\(...\): %s cannot appear as a child of <%s>/,
