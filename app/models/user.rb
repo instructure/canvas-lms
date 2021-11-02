@@ -1192,18 +1192,21 @@ class User < ActiveRecord::Base
 
   def check_accounts_right?(user, sought_right)
     # check if the user we are given is an admin in one of this user's accounts
-    return false unless user
+    return false unless user && sought_right
     return true if Account.site_admin.grants_right?(user, sought_right)
     return self.account.grants_right?(user, sought_right) if self.fake_student? # doesn't have account association
 
     common_shards = associated_shards & user.associated_shards
     search_method = ->(shard) do
-      associated_accounts.shard(shard).any? { |a| a.grants_right?(user, sought_right) }
+      # new users with creation pending enrollments don't have account associations
+      if associated_accounts.shard(shard).empty? && common_shards.length == 1 && !self.unavailable?
+        self.account.grants_right?(user, sought_right)
+      else
+        associated_accounts.shard(shard).any? { |a| a.grants_right?(user, sought_right) }
+      end
     end
-
     # search shards the two users have in common first, since they're most likely
     return true if common_shards.any?(&search_method)
-
     # now do an exhaustive search, since it's possible to have admin permissions for accounts
     # you're not associated with
     return true if (associated_shards - common_shards).any?(&search_method)
