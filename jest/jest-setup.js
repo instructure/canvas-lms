@@ -107,7 +107,6 @@ const ignoredErrors = [
   /The prop `rollup.outcomeId` is marked as required in `StudentOutcomeScore`/,
   /The prop `rollup.rating.mastery` is marked as required in `StudentOutcomeScore`/,
   /The prop `rollups\[0\].outcomeRollups\[0\].rating.mastery` is marked as required in `Gradebook`/,
-  /The prop `rollups\[0\].outcomeRollups\[0\].rating.mastery` is marked as required in `ScoresGrid`/,
   /The prop `rootId` is marked as required in `GroupSelectionDrillDown`/,
   /The prop `rubric.id` is marked as required in `RubricTab`/,
   /The prop `screenReaderLabel` is marked as required in `IconButton`/,
