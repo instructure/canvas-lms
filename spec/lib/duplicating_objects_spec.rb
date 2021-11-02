@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../lib/duplicating_objects'
 require 'set'
+
 describe DuplicatingObjects do
   include DuplicatingObjects
 
@@ -30,40 +30,42 @@ describe DuplicatingObjects do
   end
 
   describe 'get_copy_title' do
-    class MockEntity
-      def initialize(title)
-        @title = title
-      end
+    let(:klass) do
+      Class.new do
+        def initialize(title)
+          @title = title
+        end
 
-      def get_potentially_conflicting_titles(_title_base)
-        ['Foo', 'assignment Copy', 'Foo Copy', 'Foo Copy 1', 'Foo Copy 2', 'Foo Copy 5'].to_set
-      end
+        def get_potentially_conflicting_titles(_title_base)
+          ['Foo', 'assignment Copy', 'Foo Copy', 'Foo Copy 1', 'Foo Copy 2', 'Foo Copy 5'].to_set
+        end
 
-      attr_accessor :title
+        attr_accessor :title
+      end
     end
 
     it 'copy treated as "Copy" but case is respected' do
-      entity = MockEntity.new('assignment copy')
+      entity = klass.new('assignment copy')
       expect(get_copy_title(entity, 'Copy', entity.title)).to eq('assignment copy 2')
     end
 
     it 'no conflicts' do
-      entity = MockEntity.new('Bar')
+      entity = klass.new('Bar')
       expect(get_copy_title(entity, 'Copy', entity.title)).to eq 'Bar Copy'
     end
 
     it 'conflict not ending in suffix' do
-      entity = MockEntity.new('Foo')
+      entity = klass.new('Foo')
       expect(get_copy_title(entity, 'Copy', entity.title)).to eq 'Foo Copy 3'
     end
 
     it 'conflict ending in suffix' do
-      entity = MockEntity.new('Foo Copy 1')
+      entity = klass.new('Foo Copy 1')
       expect(get_copy_title(entity, 'Copy', entity.title)).to eq 'Foo Copy 3'
     end
 
     it 'increments from given number' do
-      entity = MockEntity.new('Foo Copy 5')
+      entity = klass.new('Foo Copy 5')
       expect(get_copy_title(entity, 'Copy', entity.title)).to eq 'Foo Copy 6'
     end
   end

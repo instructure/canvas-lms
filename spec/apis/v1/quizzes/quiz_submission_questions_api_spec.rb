@@ -22,142 +22,140 @@ require_relative '../../api_spec_helper'
 require 'quiz_spec_helper'
 
 describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
-  module Helpers
-    def create_question(type, factory_options = {}, quiz = @quiz)
-      factory = method(:"#{type}_question_data")
+  def create_question(type, factory_options = {}, quiz = @quiz)
+    factory = method(:"#{type}_question_data")
 
-      # can't test for #arity directly since it might be an optional parameter
-      data = factory.parameters.include?([:opt, :options]) ?
-        factory.call(factory_options) :
-        factory.call
+    # can't test for #arity directly since it might be an optional parameter
+    data = if factory.parameters.include?([:opt, :options])
+             factory.call(factory_options)
+           else
+             factory.call
+           end
 
-      data = data.except('id', 'assessment_question_id')
+    data = data.except('id', 'assessment_question_id')
 
-      qq = quiz.quiz_questions.create!({ question_data: data })
-      qq.assessment_question.question_data = data
-      qq.assessment_question.save!
+    qq = quiz.quiz_questions.create!({ question_data: data })
+    qq.assessment_question.question_data = data
+    qq.assessment_question.save!
 
-      qq
-    end
+    qq
+  end
 
-    def create_question_set
-      @qq1 = create_question 'multiple_choice'
-      @qq2 = create_question 'true_false'
-      create_answers
-    end
+  def create_question_set
+    @qq1 = create_question 'multiple_choice'
+    @qq2 = create_question 'true_false'
+    create_answers
+  end
 
-    def create_answers(opts = { correct: true })
-      @quiz_submission.submission_data = {
-        "question_#{@qq1.id}" => opts[:correct] ? "1658" : "2405",
-        "question_#{@qq2.id}" => opts[:correct] ? "8950" : "8403"
-      }
-    end
+  def create_answers(opts = { correct: true })
+    @quiz_submission.submission_data = {
+      "question_#{@qq1.id}" => opts[:correct] ? "1658" : "2405",
+      "question_#{@qq2.id}" => opts[:correct] ? "8950" : "8403"
+    }
+  end
 
-    def api_index(data = {}, options = {})
-      url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions"
-      params = { :controller => 'quizzes/quiz_submission_questions',
-                 :action => 'index',
-                 :format => 'json',
-                 :quiz_submission_id => @quiz_submission.id.to_s,
-                 :quiz_submission_attempt => options[:quiz_submission_attempt] }
-      if options[:raw]
-        raw_api_call(:get, url, params, data)
-      else
-        api_call(:get, url, params, data)
-      end
-    end
-
-    def api_show(data = {}, options = {})
-      url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}"
-      params = { :controller => 'quizzes/quiz_submission_questions',
-                 :action => 'show',
-                 :format => 'json',
-                 :quiz_submission_id => @quiz_submission.id.to_s,
-                 :id => @question[:id].to_s }
-      if options[:raw]
-        raw_api_call(:get, url, params, data)
-      else
-        api_call(:get, url, params, data)
-      end
-    end
-
-    def api_answer(data = {}, options = {})
-      url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions"
-      params = { :controller => 'quizzes/quiz_submission_questions',
-                 :action => 'answer',
-                 :format => 'json',
-                 :quiz_submission_id => @quiz_submission.id.to_s }
-      data = {
-        validation_token: @quiz_submission.validation_token,
-        attempt: @quiz_submission.attempt
-      }.merge(data)
-
-      if options[:raw]
-        raw_api_call(:post, url, params, data)
-      else
-        api_call(:post, url, params, data)
-      end
-    end
-
-    def api_flag(data = {}, options = {})
-      url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}/flag"
-      params = { :controller => 'quizzes/quiz_submission_questions',
-                 :action => 'flag',
-                 :format => 'json',
-                 :quiz_submission_id => @quiz_submission.id.to_s,
-                 :id => @question[:id].to_s }
-      data = {
-        validation_token: @quiz_submission.validation_token,
-        attempt: @quiz_submission.attempt
-      }.merge(data)
-
-      if options[:raw]
-        raw_api_call(:put, url, params, data)
-      else
-        api_call(:put, url, params, data)
-      end
-    end
-
-    def api_formatted_answer(question, data = {}, options = {})
-      url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{question[:id]}/formatted_answer"
-      params = { :controller => 'quizzes/quiz_submission_questions',
-                 :action => 'formatted_answer',
-                 :format => 'json',
-                 :quiz_submission_id => @quiz_submission.id.to_s,
-                 :id => question[:id].to_s }
-      data = {
-        validation_token: @quiz_submission.validation_token,
-        attempt: @quiz_submission.attempt
-      }.merge(data)
-
-      if options[:raw]
-        raw_api_call(:get, url, params, data)
-      else
-        api_call(:get, url, params, data)
-      end
-    end
-
-    def api_unflag(data = {}, options = {})
-      url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}/unflag"
-      params = { :controller => 'quizzes/quiz_submission_questions',
-                 :action => 'unflag',
-                 :format => 'json',
-                 :quiz_submission_id => @quiz_submission.id.to_s,
-                 :id => @question[:id].to_s }
-      data = {
-        validation_token: @quiz_submission.validation_token,
-        attempt: @quiz_submission.attempt
-      }.merge(data)
-
-      if options[:raw]
-        raw_api_call(:put, url, params, data)
-      else
-        api_call(:put, url, params, data)
-      end
+  def api_index(data = {}, options = {})
+    url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions"
+    params = { :controller => 'quizzes/quiz_submission_questions',
+               :action => 'index',
+               :format => 'json',
+               :quiz_submission_id => @quiz_submission.id.to_s,
+               :quiz_submission_attempt => options[:quiz_submission_attempt] }
+    if options[:raw]
+      raw_api_call(:get, url, params, data)
+    else
+      api_call(:get, url, params, data)
     end
   end
 
-  include Helpers
+  def api_show(data = {}, options = {})
+    url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}"
+    params = { :controller => 'quizzes/quiz_submission_questions',
+               :action => 'show',
+               :format => 'json',
+               :quiz_submission_id => @quiz_submission.id.to_s,
+               :id => @question[:id].to_s }
+    if options[:raw]
+      raw_api_call(:get, url, params, data)
+    else
+      api_call(:get, url, params, data)
+    end
+  end
+
+  def api_answer(data = {}, options = {})
+    url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions"
+    params = { :controller => 'quizzes/quiz_submission_questions',
+               :action => 'answer',
+               :format => 'json',
+               :quiz_submission_id => @quiz_submission.id.to_s }
+    data = {
+      validation_token: @quiz_submission.validation_token,
+      attempt: @quiz_submission.attempt
+    }.merge(data)
+
+    if options[:raw]
+      raw_api_call(:post, url, params, data)
+    else
+      api_call(:post, url, params, data)
+    end
+  end
+
+  def api_flag(data = {}, options = {})
+    url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}/flag"
+    params = { :controller => 'quizzes/quiz_submission_questions',
+               :action => 'flag',
+               :format => 'json',
+               :quiz_submission_id => @quiz_submission.id.to_s,
+               :id => @question[:id].to_s }
+    data = {
+      validation_token: @quiz_submission.validation_token,
+      attempt: @quiz_submission.attempt
+    }.merge(data)
+
+    if options[:raw]
+      raw_api_call(:put, url, params, data)
+    else
+      api_call(:put, url, params, data)
+    end
+  end
+
+  def api_formatted_answer(question, data = {}, options = {})
+    url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{question[:id]}/formatted_answer"
+    params = { :controller => 'quizzes/quiz_submission_questions',
+               :action => 'formatted_answer',
+               :format => 'json',
+               :quiz_submission_id => @quiz_submission.id.to_s,
+               :id => question[:id].to_s }
+    data = {
+      validation_token: @quiz_submission.validation_token,
+      attempt: @quiz_submission.attempt
+    }.merge(data)
+
+    if options[:raw]
+      raw_api_call(:get, url, params, data)
+    else
+      api_call(:get, url, params, data)
+    end
+  end
+
+  def api_unflag(data = {}, options = {})
+    url = "/api/v1/quiz_submissions/#{@quiz_submission.id}/questions/#{@question[:id]}/unflag"
+    params = { :controller => 'quizzes/quiz_submission_questions',
+               :action => 'unflag',
+               :format => 'json',
+               :quiz_submission_id => @quiz_submission.id.to_s,
+               :id => @question[:id].to_s }
+    data = {
+      validation_token: @quiz_submission.validation_token,
+      attempt: @quiz_submission.attempt
+    }.merge(data)
+
+    if options[:raw]
+      raw_api_call(:put, url, params, data)
+    else
+      api_call(:put, url, params, data)
+    end
+  end
 
   describe 'GET /quiz_submissions/:quiz_submission_id/questions [index]' do
     before :once do
