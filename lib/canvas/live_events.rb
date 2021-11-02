@@ -970,4 +970,13 @@ module Canvas::LiveEvents
       root_account_id: description.root_account_id
     }
   end
+
+  def self.heartbeat
+    data = {
+      environment: Canvas.environment,
+      region_code: Canvas.region_code || 'not_configured',
+      region: Canvas.region || 'not_configured'
+    }
+    post_event_stringified('heartbeat', data)
+  end
 end
