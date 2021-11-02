@@ -106,7 +106,7 @@ module LiveEvents
           end
           send_events(records)
         rescue => e
-          logger.error("Exception making LiveEvents async call: #{e}")
+          logger.error("Exception making LiveEvents async call: #{e}\n#{e.backtrace.first}")
         end
         LiveEvents.on_work_unit_end&.call
       end
@@ -127,6 +127,7 @@ module LiveEvents
 
     def send_events(records)
       return if records.empty?
+      return if records.include? :stop
 
       res = time_block do
         @stream_client.put_records(
