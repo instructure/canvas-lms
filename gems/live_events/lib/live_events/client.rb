@@ -32,7 +32,7 @@ module LiveEvents
     def self.config
       res = LiveEvents.settings
       if res['stub_kinesis']
-        return true unless Rails.env.production?
+        return res.dup unless Rails.env.production?
 
         LiveEvents.logger&.warn(
           "LIVE_EVENTS: stub_kinesis was set in production with value #{res['stub_kinesis']}"
