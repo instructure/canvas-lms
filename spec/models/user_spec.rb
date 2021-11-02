@@ -2987,6 +2987,17 @@ describe User do
         # ensure seeking user gets permissions it should on target user
         expect(target.grants_right?(seeker, :view_statistics)).to eq true
       end
+
+      it 'falls back to user shard for callsite, if no account associations found for target user' do
+        account = Account.default
+        target = user_factory()
+        seeker = account_admin_user(
+          account: account,
+          role: Role.get_built_in_role('AccountAdmin', root_account_id: account.id)
+        )
+        # ensure seeking user gets permissions it should on target user
+        expect(target.grants_right?(seeker, :read_full_profile)).to eq true
+      end
     end
   end
 
