@@ -22,53 +22,60 @@ require 'httparty'
 
 # See also be_a_microsoft_sync_public_error matcher in support/microsoft_sync/errors.rb
 describe MicrosoftSync::Errors do
-  class MicrosoftSync::TestErrorNotPublic < StandardError; end
+  before do
+    stub_const("MicrosoftSync::TestErrorNotPublic",
+               Class.new(StandardError))
 
-  class MicrosoftSync::TestError < MicrosoftSync::Errors::PublicError
-    def self.public_message
-      I18n.t 'oops, this is a public error'
-    end
-  end
+    stub_const("MicrosoftSync::TestError",
+               Class.new(MicrosoftSync::Errors::PublicError) do
+                 def self.public_message
+                   I18n.t 'oops, this is a public error'
+                 end
+               end)
 
-  class MicrosoftSync::TestErrorInterpolations < MicrosoftSync::Errors::PublicError
-    def self.public_message
-      I18n.t 'An API named %{name} returned problem %{description} :('
-    end
+    stub_const("MicrosoftSync::TestErrorInterpolations",
+               Class.new(MicrosoftSync::Errors::PublicError) do
+                 def self.public_message
+                   I18n.t 'An API named %{name} returned problem %{description} :('
+                 end
 
-    def public_interpolated_values
-      { name: @name, description: @description }
-    end
+                 def public_interpolated_values
+                   { name: @name, description: @description }
+                 end
 
-    def initialize(message, name, description)
-      super(message)
-      @name = name
-      @description = description
-    end
-  end
+                 def initialize(message, name, description)
+                   super(message)
+                   @name = name
+                   @description = description
+                 end
+               end)
 
-  class MicrosoftSync::TestErrorCountInterpolation < MicrosoftSync::Errors::PublicError
-    def self.public_message
-      I18n.t(one: 'One problem happened', other: '%{count} problems happened')
-    end
+    stub_const("MicrosoftSync::TestErrorCountInterpolation",
+               Class.new(MicrosoftSync::Errors::PublicError) do
+                 def self.public_message
+                   I18n.t(one: 'One problem happened', other: '%{count} problems happened')
+                 end
 
-    def public_interpolated_values
-      { count: @n_problems }
-    end
+                 def public_interpolated_values
+                   { count: @n_problems }
+                 end
 
-    def initialize(message, n_problems)
-      super(message)
-      @n_problems = n_problems
-    end
-  end
+                 def initialize(message, n_problems)
+                   super(message)
+                   @n_problems = n_problems
+                 end
+               end)
 
-  class MicrosoftSync::TestErrorBadInterpolations < MicrosoftSync::Errors::PublicError
-    def self.public_message
-      I18n.t 'Interpolation foo does not exist, see: %{foo}'
-    end
+    stub_const("MicrosoftSync::TestErrorBadInterpolations",
+               Class.new(MicrosoftSync::Errors::PublicError) do
+                 def self.public_message
+                   I18n.t 'Interpolation foo does not exist, see: %{foo}'
+                 end
 
-    def public_interpolated_values
-      {}
-    end
+                 def public_interpolated_values
+                   {}
+                 end
+               end)
   end
 
   describe '.serialize' do

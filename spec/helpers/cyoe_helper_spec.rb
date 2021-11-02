@@ -22,20 +22,19 @@ require_relative '../conditional_release_spec_helper'
 describe CyoeHelper do
   include CyoeHelper
 
-  FakeItem = Struct.new(:id, :content_type, :graded?, :content).freeze
-  FakeContent = Struct.new(:assignment?, :graded?).freeze
-  FakeTag = Struct.new(:id, :assignment).freeze
+  let(:fake_item_class) { Struct.new(:id, :content_type, :graded?, :content) }
+  let(:fake_content_class) { Struct.new(:assignment?, :graded?) }
 
   describe 'cyoeable item' do
     it 'returns false if an item is not a quiz or assignment' do
-      topic = FakeItem.new(1, 'DiscussionTopic', false)
+      topic = fake_item_class.new(1, 'DiscussionTopic', false)
       expect(helper.cyoe_able?(topic)).to eq false
     end
 
     context 'graded' do
       it 'returns true for quizzes and assignments' do
-        quiz = FakeItem.new(1, 'Quizzes::Quiz', true, FakeContent.new(true))
-        assignment = FakeItem.new(1, 'Assignment', true, FakeContent.new(true, true))
+        quiz = fake_item_class.new(1, 'Quizzes::Quiz', true, fake_content_class.new(true))
+        assignment = fake_item_class.new(1, 'Assignment', true, fake_content_class.new(true, true))
         expect(helper.cyoe_able?(quiz)).to eq true
         expect(helper.cyoe_able?(assignment)).to eq true
       end
@@ -43,8 +42,8 @@ describe CyoeHelper do
 
     context 'ungraded' do
       it 'does not return true for quizzes or assignments' do
-        quiz = FakeItem.new(1, 'Quizzes::Quiz', false)
-        assignment = FakeItem.new(1, 'Assignment', false)
+        quiz = fake_item_class.new(1, 'Quizzes::Quiz', false)
+        assignment = fake_item_class.new(1, 'Assignment', false)
         expect(helper.cyoe_able?(quiz)).to eq false
         expect(helper.cyoe_able?(assignment)).to eq false
       end

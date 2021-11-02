@@ -43,7 +43,22 @@ describe Canvas::LiveEvents do
   end
 
   before do
-    LiveEvents.stream_client = FakeStreamClient.new
+    LiveEvents.stream_client = Class.new do
+      attr_accessor :data, :stream, :stream_name
+
+      def initialize(stream_name = 'stream')
+        @stream_name = stream_name
+      end
+
+      def put_records(stream_name:, records:)
+        @data = records
+        @stream = stream_name
+      end
+
+      def body
+        @data['body']
+      end
+    end.new
     allow(LiveEvents).to receive(:get_context).and_return({ compact_live_events: true })
   end
 
@@ -55,34 +70,6 @@ describe Canvas::LiveEvents do
       context_id: @course.global_id.to_s,
       context_type: 'Course'
     )
-  end
-
-  class FakeSettings
-    def call
-      {
-        'kinesis_stream_name' => 'fake_stream',
-        'aws_region' => 'us-east-1',
-        'aws_access_key_id' => 'key',
-        'aws_secret_access_key_dec' => 'secret'
-      }
-    end
-  end
-
-  class FakeStreamClient
-    attr_accessor :data, :stream, :stream_name
-
-    def initialize(stream_name = 'stream')
-      @stream_name = stream_name
-    end
-
-    def put_records(stream_name:, records:)
-      @data = records
-      @stream = stream_name
-    end
-
-    def body
-      @data['body']
-    end
   end
 
   describe '.amended_context' do
@@ -1161,24 +1148,25 @@ describe Canvas::LiveEvents do
   end
 
   describe '.quiz_export_complete' do
-    class FakeExport
-      attr_accessor :context
+    let(:export_class) do
+      Class.new do
+        attr_accessor :context
 
-      def initialize(context)
-        @context = context
-      end
+        def initialize(context)
+          @context = context
+        end
 
-      def settings
-        {
-          quizzes2: {
-            key1: 'val1',
-            key2: 'val2'
+        def settings
+          {
+            quizzes2: {
+              key1: 'val1',
+              key2: 'val2'
+            }
           }
-        }
+        end
       end
     end
-
-    let(:content_export) { FakeExport.new(course_model) }
+    let(:content_export) { export_class.new(course_model) }
 
     it 'triggers a live event with content export settings and amended context details' do
       fake_export_context = { key1: 'val1', key2: 'val2' }

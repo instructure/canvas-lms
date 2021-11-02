@@ -94,36 +94,38 @@ describe Mutations::CreateAssignment do
     CanvasSchema.execute(mutation_command, context: context)
   end
 
-  TEST_ATTRS = [
-    ["name", :name, "Example Assignment", '"some other assignment title"', "some other assignment title"],
-    ["description", :description, nil, '"this is a description"', "this is a description"],
-    ["dueAt", :due_at, nil, '"2018-01-01T01:00:00Z"', "2018-01-01T01:00:00Z"],
-    ["lockAt", :lock_at, nil, '"2018-01-01T01:00:00Z"', "2018-01-01T01:00:00Z"],
-    ["unlockAt", :unlock_at, nil, '"2018-01-01T01:00:00Z"', "2018-01-01T01:00:00Z"],
-    ["position", :position, 1, 2, 2],
-    ["pointsPossible", :points_possible, nil, 100, 100],
-    ["gradingType", :grading_type, "points", "not_graded", "not_graded"],
-    ["allowedExtensions", :allowed_extensions, [], '[ "docs", "blah" ]', ["docs", "blah"]],
-    ["allowedAttempts", :allowed_attempts, nil, 10, 10],
-    ["onlyVisibleToOverrides", :only_visible_to_overrides, false, true, true],
-    ["submissionTypes", :submission_types, "none", '[ discussion_topic, not_graded ]', ["discussion_topic", "not_graded"], "discussion_topic,not_graded"],
-    ["gradeGroupStudentsIndividually", :grade_group_students_individually, false, true, true],
-    ["omitFromFinalGrade", :omit_from_final_grade, false, true, true],
-    ["anonymousInstructorAnnotations", :anonymous_instructor_annotations, false, true, true],
-    ["postToSis", :post_to_sis, false, true, true],
-    ["anonymousGrading", :anonymous_grading, false, true, true],
-  ]
+  let(:test_attrs) do
+    [
+      ["name", :name, "Example Assignment", '"some other assignment title"', "some other assignment title"],
+      ["description", :description, nil, '"this is a description"', "this is a description"],
+      ["dueAt", :due_at, nil, '"2018-01-01T01:00:00Z"', "2018-01-01T01:00:00Z"],
+      ["lockAt", :lock_at, nil, '"2018-01-01T01:00:00Z"', "2018-01-01T01:00:00Z"],
+      ["unlockAt", :unlock_at, nil, '"2018-01-01T01:00:00Z"', "2018-01-01T01:00:00Z"],
+      ["position", :position, 1, 2, 2],
+      ["pointsPossible", :points_possible, nil, 100, 100],
+      ["gradingType", :grading_type, "points", "not_graded", "not_graded"],
+      ["allowedExtensions", :allowed_extensions, [], '[ "docs", "blah" ]', ["docs", "blah"]],
+      ["allowedAttempts", :allowed_attempts, nil, 10, 10],
+      ["onlyVisibleToOverrides", :only_visible_to_overrides, false, true, true],
+      ["submissionTypes", :submission_types, "none", '[ discussion_topic, not_graded ]', ["discussion_topic", "not_graded"], "discussion_topic,not_graded"],
+      ["gradeGroupStudentsIndividually", :grade_group_students_individually, false, true, true],
+      ["omitFromFinalGrade", :omit_from_final_grade, false, true, true],
+      ["anonymousInstructorAnnotations", :anonymous_instructor_annotations, false, true, true],
+      ["postToSis", :post_to_sis, false, true, true],
+      ["anonymousGrading", :anonymous_grading, false, true, true],
+    ]
+  end
 
   it "creates an assignment with attributes" do
     query = +"courseId: #{@course.to_param}\n"
-    TEST_ATTRS.each do |graphql_name, _assignment_name, _initial_value, update_value, _graphql_result, _assignment_result|
+    test_attrs.each do |graphql_name, _assignment_name, _initial_value, update_value, _graphql_result, _assignment_result|
       query << "#{graphql_name}: #{update_value}\n"
     end
     result = execute_with_input(query)
     expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'createAssignment', 'errors')).to be_nil
     assignment = Assignment.find(result.dig('data', 'createAssignment', 'assignment', '_id'))
-    TEST_ATTRS.each do |graphql_name, assignment_name, _initial_value, _update_value, graphql_result, assignment_result = graphql_result|
+    test_attrs.each do |graphql_name, assignment_name, _initial_value, _update_value, graphql_result, assignment_result = graphql_result|
       expect(result.dig('data', 'createAssignment', 'assignment', graphql_name)).to eq graphql_result
       expect(assignment.send(assignment_name)).to eq assignment_result
     end

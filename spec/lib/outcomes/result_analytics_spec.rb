@@ -23,8 +23,6 @@ describe Outcomes::ResultAnalytics do
   let(:ra) { Outcomes::ResultAnalytics }
   let(:time) { Time.zone.now }
 
-  Rollup = Outcomes::ResultAnalytics::Rollup
-
   def outcome_from_score(score, args)
     title = args[:title] || "name, o1"
     outcome = args[:outcome] || create_outcome(args)

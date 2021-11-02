@@ -159,7 +159,7 @@ describe Quizzes::QuizReportsController, type: :request do
     end
 
     context 're-generation' do
-      JOB_TAG = Quizzes::QuizStatistics.csv_job_tag
+      let(:job_tag) { Quizzes::QuizStatistics.csv_job_tag }
       let(:report_type) { 'student_analysis' }
 
       it "works when a job had failed previously" do
@@ -173,7 +173,7 @@ describe Quizzes::QuizReportsController, type: :request do
 
           # keep a reference to the job before we run because it will get
           # migrated to the failed jobs table:
-          job = Delayed::Job.where(tag: JOB_TAG).first
+          job = Delayed::Job.where(tag: job_tag).first
 
           run_jobs
 
@@ -188,7 +188,7 @@ describe Quizzes::QuizReportsController, type: :request do
                      }]
                    }, { jsonapi: true })
 
-        new_job = Delayed::Job.where(tag: JOB_TAG).first
+        new_job = Delayed::Job.where(tag: job_tag).first
 
         expect(new_job).to be_present
         expect(original_job.id).not_to eq new_job.id

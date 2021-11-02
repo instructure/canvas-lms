@@ -108,30 +108,23 @@ module Services
       end
 
       context 'payload contents' do
-        class SendMessageSpy
-          attr_accessor :sent_hash
-
-          def send_message(message_body:, queue_url:)
-            @sent_hash = JSON.parse(message_body)
-          end
-        end
-
         it "sends all parameters (directly)" do
           req_id = SecureRandom.uuid
           allow(RequestContextGenerator).to receive(:request_id).and_return(req_id)
-          expected = {
-            global_id: 1,
-            type: 'email',
-            message: 'hello',
-            target: 'alice@example.com',
-            request_id: req_id
-          }.with_indifferent_access
 
-          spy = SendMessageSpy.new
-          allow(NotificationService).to receive(:notification_sqs).and_return(spy)
+          sqs = double
+          expect(sqs).to receive(:send_message) do |message_body:, **|
+            expect(JSON.parse(message_body)).to eq({
+              global_id: 1,
+              type: 'email',
+              message: 'hello',
+              target: 'alice@example.com',
+              request_id: req_id
+            }.with_indifferent_access)
+          end
+          expect(NotificationService).to receive(:notification_sqs).and_return(sqs)
 
           NotificationService.process(1, 'hello', 'email', 'alice@example.com')
-          expect(expected).to eq spy.sent_hash
         end
       end
     end
