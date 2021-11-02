@@ -19,13 +19,6 @@ import $ from 'jquery'
 import EquationEditorView from '@canvas/rce/backbone/views/EquationEditorView'
 
 QUnit.module('EquationEditorView', () => {
-  QUnit.module('doubleEncodeEquationForUrl', () => {
-    test('encodes pound sign using utf-8', assert => {
-      const equation = '\xA3'
-      assert.equal(EquationEditorView.doubleEncodeEquationForUrl(equation), '%25C2%25A3')
-    })
-  })
-
   QUnit.module('getEquationText', () => {
     test("just uses the text if it isn't really an element", assert => {
       const equation = '65 * 32'

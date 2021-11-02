@@ -245,16 +245,6 @@ export default class EquationEditorView extends Backbone.View {
     this.$el.dialog('close')
   }
 
-  // the following is here to make it easier to unit test
-  static doubleEncodeEquationForUrl(text) {
-    return encodeURIComponent(encodeURIComponent(text))
-  }
-
-  // the following will be called by onSubmit below
-  doubleEncodeEquationForUrl(text) {
-    return this.constructor.doubleEncodeEquationForUrl(text)
-  }
-
   onSubmit(event) {
     event.preventDefault()
 
@@ -265,56 +255,9 @@ export default class EquationEditorView extends Backbone.View {
       return
     }
 
-    // get the equation image to check that it succeeds
-    // if it does, we'll send its html to the RCE, where
-    // the image will get pulled from the cache, so the 2nd
-    // request won't cost much
-    // NOTE: commented out because the service used in prod
-    //       will not accept a CORS request
-    const url = `/equation_images/${this.doubleEncodeEquationForUrl(text)}`
-    // fetch(url, {
-    //   method: 'GET',
-    //   mode: 'cors',
-    //   redirect: 'follow'
-    // })
-    //   .then(response => {
     this.restoreCaret()
-    // if (response.ok) {
-    const code = this.loadImage(text, url)
-    RceCommandShim.send(this.$editor, 'insert_code', code)
-    //   } else {
-    //     const code = this.loadAltMath(text)
-    //     this.editor.selection.setContent(code)
-    //   }
+    RceCommandShim.send(this.$editor, 'insertMathEquation', text)
     this.close()
-    // })
-    // .catch(() => {
-    //   const code = this.loadAltMath(text)
-    //   this.editor.selection.setContent(code)
-    //   this.close()
-    // })
-  }
-
-  // the image generator was successful
-  loadImage(text, url) {
-    // if I simple create the html string, xsslint fails jenkins
-    const img = document.createElement('img')
-    img.setAttribute('alt', `LaTeX: ${text}`)
-    img.setAttribute('title', text)
-    img.setAttribute('class', 'equation_image')
-    img.setAttribute('data-equation-content', text)
-    img.setAttribute('src', url)
-    return img.outerHTML
-  }
-
-  // there are LaTex equations the the image generator can't deal with
-  // that MathJax can. If the image failed, let's inject the LaTex
-  // as inline math for MathJax to process later.
-  loadAltMath(text) {
-    const span = document.createElement('span')
-    span.setAttribute('class', 'math_equation_latex')
-    span.textContent = `\\(${text}\\)`
-    return span.outerHTML
   }
 }
 EquationEditorView.initClass()

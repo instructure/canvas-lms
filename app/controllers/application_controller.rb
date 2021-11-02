@@ -267,7 +267,8 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = [
     :cc_in_rce_video_tray, :featured_help_links,
     :strip_origin_from_quiz_answer_file_references, :rce_buttons_and_icons, :important_dates, :feature_flag_filters, :k5_parent_support,
-    :conferencing_in_planner, :remember_settings_tab, :word_count_in_speed_grader, :observer_picker, :lti_platform_storage
+    :conferencing_in_planner, :remember_settings_tab, :word_count_in_speed_grader, :observer_picker, :lti_platform_storage,
+    :scale_equation_images
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :responsive_awareness, :responsive_misc, :product_tours, :files_dnd, :usage_rights_discussion_topics,

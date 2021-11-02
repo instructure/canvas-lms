@@ -39,18 +39,25 @@ describe EquationImagesController do
     end
 
     it 'redirects image requests to codecogs' do
-      get 'show', params: { :id => 'foo' }
+      get 'show', params: { id: 'foo' }
+      expect(response).to redirect_to('http://latex.codecogs.com/gif.latex?foo')
+    end
+
+    it 'includes scale param if present' do
+      Account.site_admin.enable_feature!(:scale_equation_images)
+      get 'show', params: { id: 'foo', scale: 2 }
+      expect(response).to redirect_to('http://latex.codecogs.com/gif.latex?foo&scale=2')
+    end
+
+    it 'omits scale param if feature is off present' do
+      Account.site_admin.disable_feature!(:scale_equation_images)
+      get 'show', params: { id: 'foo', scale: 2 }
       expect(response).to redirect_to('http://latex.codecogs.com/gif.latex?foo')
     end
 
     context 'when using MathMan' do
       let(:service_url) { 'http://get.mml.com' }
-      before do
-        allow(MathMan).to receive_messages(
-          url_for: service_url,
-          use_for_svg?: true
-        )
-      end
+      before { allow(MathMan).to receive_messages(url_for: service_url, use_for_svg?: true) }
 
       it 'redirects to service_url' do
         get :show, params: { id: '5' }
