@@ -296,4 +296,13 @@ Rails.configuration.after_initialize do
                                          })
     end
   end
+
+  Delayed::Periodic.cron 'Canvas::LiveEvents#heartbeat', '*/1 * * * *' do
+    DatabaseServer.send_in_each_region(
+      Canvas::LiveEvents,
+      :heartbeat,
+      { run_current_region_asynchronously: true,
+        singleton: 'Canvas::LiveEvents#heartbeat' }
+    )
+  end
 end
