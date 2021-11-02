@@ -303,6 +303,16 @@ pipeline {
     CANVAS_LMS_REFSPEC = getCanvasLmsRefspec()
     DOCKER_WORKDIR = getDockerWorkDir()
     LOCAL_WORKDIR = getLocalWorkDir()
+
+    // TEST_CACHE_CLASSES is consumed by config/environments/test.rb
+    // to decide whether to allow class reloading or not.
+    // in local development we usually want this unset or set to '0' because
+    // we want spring to be able to reload classes between
+    // spec runs, but this is expensive when running all the
+    // specs for the build.  EVERYWHERE in the build we want
+    // to be able to cache classes because they don't change while the build
+    // is running and should never be reloaded.
+    TEST_CACHE_CLASSES = '1'
   }
 
   stages {
