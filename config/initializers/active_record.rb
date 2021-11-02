@@ -95,38 +95,6 @@ class ActiveRecord::Base
     "#{self.class.reflection_type_name}_#{id}"
   end
 
-  def self.all_models
-    return @all_models if @all_models.present?
-
-    @all_models = (ActiveRecord::Base.models_from_files +
-                   [Version]).compact.uniq.reject { |model|
-      (model < Tableless) ||
-        model.abstract_class?
-    }
-  end
-
-  def self.models_from_files
-    @from_files ||= begin
-      Dir[
-        "#{Rails.root}/app/models/**/*.rb",
-        "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
-        "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
-      ].sort.each do |file|
-        next if const_defined?(file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize)
-
-        if CANVAS_ZEITWERK
-          load(file)
-        else
-          # TODO: require_or_load is no longer a viable mechanism path
-          # when zeitwerk is the active code loader.  This should
-          # be removed when zeitwerk is fully enabled everywhere.
-          ActiveSupport::Dependencies.require_or_load(file)
-        end
-      end
-      ActiveRecord::Base.descendants
-    end
-  end
-
   def self.maximum_text_length
     @maximum_text_length ||= 64.kilobytes - 1
   end
