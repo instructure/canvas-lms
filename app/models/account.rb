@@ -1589,8 +1589,10 @@ class Account < ActiveRecord::Base
         t '#account.default_site_administrator_account_name', 'Site Admin'
         t '#account.default_account_name', 'Default Account'
         account = special_accounts[special_account_type] = Account.new(:name => default_account_name)
-        account.save!
-        Setting.set("#{special_account_type}_account_id", account.id)
+        GuardRail.activate(:primary) do
+          account.save!
+          Setting.set("#{special_account_type}_account_id", account.id)
+        end
         special_account_ids[special_account_type] = account.id
       end
       account
@@ -1958,13 +1960,15 @@ class Account < ActiveRecord::Base
     display_name = t('#account.manually_created_courses', "Manually-Created Courses")
     acct = manually_created_courses_account_from_settings
     if acct.blank?
-      transaction do
-        lock!
-        acct = manually_created_courses_account_from_settings
-        acct ||= self.sub_accounts.where(name: display_name).first_or_create! # for backwards compatibility
-        if acct.id != self.settings[:manually_created_courses_account_id]
-          self.settings[:manually_created_courses_account_id] = acct.id
-          self.save!
+      GuardRail.activate(:primary) do
+        transaction do
+          lock!
+          acct = manually_created_courses_account_from_settings
+          acct ||= self.sub_accounts.where(name: display_name).first_or_create! # for backwards compatibility
+          if acct.id != self.settings[:manually_created_courses_account_id]
+            self.settings[:manually_created_courses_account_id] = acct.id
+            self.save!
+          end
         end
       end
     end
