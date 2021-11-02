@@ -20,39 +20,44 @@
 require_relative '../spec_helper'
 
 describe BroadcastPolicy::InstanceMethods do
-  class Harness
-    include BroadcastPolicy::InstanceMethods
-    attr_accessor :attributes, :changed_attributes
+  let(:harness_class) do
+    Class.new do
+      include BroadcastPolicy::InstanceMethods
+      attr_accessor :attributes, :changed_attributes
 
-    def initialize
-      @attributes = {}
-      @changed_attributes = {}
-    end
+      def initialize
+        @attributes = {}
+        @changed_attributes = {}
+      end
 
-    def attribute_changed?(method)
-      changed_attributes.key?(method)
-    end
-    alias_method :saved_change_to_attribute?, :attribute_changed?
+      def attribute_changed?(method)
+        changed_attributes.key?(method)
+      end
+      alias_method :saved_change_to_attribute?, :attribute_changed?
 
-    def new_record?
-      false
-    end
+      def new_record?
+        false
+      end
 
-    def method_missing(method, *)
-      case method.to_s
-      when /^saved_change_to.+\?\z/
-        method = method.to_s.sub(/^saved_change_to/, "").to_sym
-        method = method.to_s.sub(/\?\z/, "").to_sym
-        attribute_changed? method
-      when /_changed\?\z/
-        method = method.to_s.sub(/_changed\?\z/, "").to_sym
-        attribute_changed? method
-      when /_was\z/, /_before_last_save\z/
-        method = method.to_s.sub(/_was\z/, "").to_sym
-        method = method.to_s.sub(/_before_last_save\z/, "").to_sym
-        attribute_changed?(method) ? changed_attributes[method] : attributes[method]
-      else
-        attributes[method]
+      def method_missing(method, *) # rubocop:disable Style/MissingRespondToMissing
+        method = method.to_s
+        case method
+        when /^saved_change_to.+\?\z/
+          method = method.sub(/^saved_change_to/, "")
+                         .delete_suffix("?")
+                         .to_sym
+          attribute_changed? method
+        when /_changed\?\z/
+          method = method.delete_suffix("_changed?", "").to_sym
+          attribute_changed? method
+        when /_was\z/, /_before_last_save\z/
+          method = method.delete_suffix("_was")
+                         .delete_suffix("_before_last_save")
+                         .to_sym
+          attribute_changed?(method) ? changed_attributes[method] : attributes[method]
+        else
+          attributes[method.to_sym]
+        end
       end
     end
   end
@@ -66,7 +71,7 @@ describe BroadcastPolicy::InstanceMethods do
   end
 
   let(:harness) do
-    Harness.new.tap { |h| h.attributes = default_attrs }
+    harness_class.new.tap { |h| h.attributes = default_attrs }
   end
 
   describe "#changed_in_state" do
@@ -93,15 +98,14 @@ describe BroadcastPolicy::InstanceMethods do
 
   describe "#with_changed_attributes_from" do
     let!(:og_changed_attributes) { harness.changed_attributes }
+    let(:prior_version) do
+      harness_class.new.tap do |h|
+        h.attributes = { id: 1, workflow_state: "created", score: 5.0 }
+      end
+    end
 
     before do
       harness.changed_attributes[:score] = 3.0
-    end
-
-    let(:prior_version) do
-      Harness.new.tap { |h|
-        h.attributes = { id: 1, workflow_state: "created", score: 5.0 }
-      }
     end
 
     it "hides existing changed_attributes" do

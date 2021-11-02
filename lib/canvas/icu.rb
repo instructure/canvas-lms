@@ -59,7 +59,7 @@ module Canvas::ICU
       ICU::Lib.attach_function(:ucol_getAttribute, "ucol_getAttribute#{suffix}", [:pointer, :int, :pointer], :int)
       ICU::Lib.attach_function(:ucol_setAttribute, "ucol_setAttribute#{suffix}", [:pointer, :int, :int, :pointer], :void)
 
-      ICU::Collation::Collator.class_eval do
+      class ICU::Collation::Collator
         def [](attribute)
           ATTRIBUTE_VALUES_INVERSE[ICU::Lib.check_error do |error|
             ICU::Lib.ucol_getAttribute(@c, ATTRIBUTES[attribute], error)
