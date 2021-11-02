@@ -434,21 +434,6 @@ describe Attachment do
       a = attachment_model(:uploaded_data => default_uploaded_data)
       expect(a.filename).to eql("doc.doc")
     end
-
-    context "uploading and db transactions" do
-      before :once do
-        attachment_model(:context => Account.default.groups.create!, :filename => 'test.mp4', :content_type => 'video')
-      end
-
-      it "delays upload until the #save transaction is committed" do
-        allow(Rails.env).to receive(:test?).and_return(false)
-        @attachment.uploaded_data = default_uploaded_data
-        expect(Attachment.connection).to receive(:after_transaction_commit).twice
-        expect(@attachment).not_to receive(:touch_context_if_appropriate)
-        expect(@attachment).not_to receive(:ensure_media_object)
-        @attachment.save
-      end
-    end
   end
 
   context "ensure_media_object" do
