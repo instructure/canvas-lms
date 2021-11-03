@@ -589,13 +589,11 @@ class ContextModule < ActiveRecord::Base
       end
     end
 
-    tags = self.shard.activate do
-      DifferentiableAssignment.filter(tags, user, self.context, opts) do |tags, user_ids|
-        filter.call(tags, user_ids, self.context_id, opts)
+    shard.activate do
+      DifferentiableAssignment.filter(tags, user, self.context, opts) do |ts, user_ids|
+        filter.call(ts, user_ids, self.context_id, opts)
       end
     end
-
-    tags
   end
 
   def reload

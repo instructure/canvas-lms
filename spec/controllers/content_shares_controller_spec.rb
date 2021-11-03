@@ -195,7 +195,7 @@ describe ContentSharesController do
         expect(json[0]['content_type']).to eq 'assignment'
 
         links = Api.parse_pagination_links(response.headers['Link'])
-        link = links.detect { |link| link[:rel] == 'next' }
+        link = links.detect { |l| l[:rel] == 'next' }
         expect(link[:uri].path).to eq '/api/v1/users/self/content_shares/sent'
         expect(link[:uri].query).to include 'page=2'
         expect(link[:uri].query).to include 'per_page=1'
@@ -207,7 +207,7 @@ describe ContentSharesController do
         expect(json[0]['content_type']).to eq 'module_item'
 
         links = Api.parse_pagination_links(response.headers['Link'])
-        expect(links.detect { |link| link[:rel] == 'next' }).to be_nil
+        expect(links.detect { |l| l[:rel] == 'next' }).to be_nil
       end
 
       it "lists received content shares" do

@@ -743,7 +743,7 @@ describe UsersController do
       end
 
       it "re-uses 'conflicting' unique_ids if it hasn't been fully registered yet" do
-        u = User.create! { |u| u.workflow_state = 'creation_pending' }
+        u = User.create!(workflow_state: "creation_pending")
         p = Pseudonym.create!(:unique_id => 'jacob@instructure.com', :user => u)
         post 'create', params: { :pseudonym => { :unique_id => 'jacob@instructure.com' }, :user => { :name => 'Jacob Fugal', :terms_of_use => '1' } }
         expect(response).to be_successful

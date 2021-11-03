@@ -128,11 +128,10 @@ class AppointmentGroup < ActiveRecord::Base
         # a group category can only be assigned at creation time to
         # appointment groups with one course
         gc = GroupCategory.where(id: $1).first
-        code = @new_sub_context_codes.first
         self.appointment_group_sub_contexts = [
           AppointmentGroupSubContext.new(:appointment_group => self,
                                          :sub_context => gc,
-                                         :sub_context_code => code)
+                                         :sub_context_code => @new_sub_context_codes.first)
         ]
       else
         # if new record and we have a course without sections, add all the sections

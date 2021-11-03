@@ -1129,14 +1129,14 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "lists all of a user's enrollments in an account" do
-        e = @student.enrollments.current.first
-        sis_batch = e.root_account.sis_batches.create
+        enrollment = @student.enrollments.current.first
+        sis_batch = enrollment.root_account.sis_batches.create
         SisBatch.where(id: sis_batch).update_all(workflow_state: 'imported')
-        e.sis_batch_id = sis_batch.id
-        e.save!
+        enrollment.sis_batch_id = sis_batch.id
+        enrollment.save!
         json = api_call(:get, @user_path, @user_params)
         enrollments = @student.enrollments.current.eager_load(:user).order("users.sortable_name ASC")
-        expect(json).to eq enrollments.map { |e|
+        expect(json).to eq(enrollments.map do |e|
           {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -1187,7 +1187,7 @@ describe EnrollmentsApiController, type: :request do
             'last_attended_at' => nil,
             'total_activity_time' => 0
           }
-        }
+        end)
       end
 
       context "filtering by SIS IDs" do

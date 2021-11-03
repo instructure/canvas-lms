@@ -39,7 +39,7 @@ describe CommunicationChannelsController do
 
     it "creates a new CC regardless of conflicts" do
       u = User.create!
-      cc = u.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
+      cc = u.communication_channels.create!(path: "jt@instructure.com", path_type: "email", workflow_state: "active")
       user_session(@user)
       post 'create', params: { :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' } }
       expect(response).to be_successful
@@ -50,10 +50,12 @@ describe CommunicationChannelsController do
     end
 
     it "resurrects retired CCs" do
-      cc = @user.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc|
-        cc.workflow_state = 'retired'
-        cc.bounce_count = CommunicationChannel::RETIRE_THRESHOLD
-      }
+      cc = @user.communication_channels.create!(
+        path: "jt@instructure.com",
+        path_type: "email",
+        workflow_state: "retired",
+        bounce_count: CommunicationChannel::RETIRE_THRESHOLD
+      )
       user_session(@user)
       post 'create', params: { :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' } }
       expect(response).to be_successful

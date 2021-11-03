@@ -82,7 +82,7 @@ class Quizzes::QuizQuestion::AnswerGroup
     end
 
     def any_value_of(keys, default = "")
-      key = keys.find { |key| @data.key?(key) }
+      key = keys.find { |k| @data.key?(k) }
       @data[key] || default
     end
 

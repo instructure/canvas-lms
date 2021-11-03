@@ -101,7 +101,7 @@ module Importers
       if item['type'] == 'submodule'
         sub_items = []
         sub_items << { :type => 'heading', :title => item['title'], :indent => indent, :migration_id => item['migration_id'] }.with_indifferent_access
-        sub_items += (item['items'] || []).map { |item| self.flatten_item(item, indent + 1) }
+        sub_items += (item['items'] || []).map { |i| self.flatten_item(i, indent + 1) }
         sub_items
       else
         item[:indent] = (item[:indent] || 0) + indent
@@ -162,7 +162,7 @@ module Importers
       item_map = {}
       item.item_migration_position ||= (item.content_tags.not_deleted.pluck(:position).compact + [item.content_tags.not_deleted.count]).max
       items = hash[:items] || []
-      items = items.map { |item| self.flatten_item(item, 0) }.flatten
+      items = items.map { |i| self.flatten_item(i, 0) }.flatten
 
       imported_migration_ids = []
 

@@ -70,10 +70,10 @@ class CustomData < ActiveRecord::Base
 
   def hash_data_from_scope(hash, scope)
     keys = scope.split('/')
-    keys.inject(hash) do |hash, k|
-      raise ArgumentError, 'invalid scope for hash' unless hash.is_a? Hash
+    keys.inject(hash) do |h, k|
+      raise ArgumentError, 'invalid scope for hash' unless h.is_a?(Hash)
 
-      hash[k]
+      h[k]
     end
   end
 
@@ -106,18 +106,18 @@ class CustomData < ActiveRecord::Base
 
   def delete_hash_data_from_scope(hash, scope)
     keys = scope.split('/')
-    del_frd = ->(hash) do
+    del_frd = ->(hash2) do
       k = keys.shift
       if keys.empty?
-        raise ArgumentError, 'invalid scope for hash' unless hash.has_key? k
+        raise ArgumentError, 'invalid scope for hash' unless hash2.key?(k)
 
-        hash.delete k
+        hash2.delete k
       else
-        h = hash[k]
-        raise ArgumentError, 'invalid scope for hash' if h.nil?
+        hash3 = hash2[k]
+        raise ArgumentError, 'invalid scope for hash' if hash3.nil?
 
-        ret = del_frd.call(h)
-        hash.delete k if h.empty?
+        ret = del_frd.call(hash3)
+        hash2.delete k if hash3.empty?
         ret
       end
     end

@@ -54,8 +54,8 @@ describe CanvasQuizStatistics::Analyzers::ShortAnswer do
   describe '[:answers]' do
     it 'generates the "other" answer for incorrect answers' do
       stats = subject.run([{ text: '12345' }])
-      answer = stats[:answers].detect do |answer|
-        answer[:id] == CanvasQuizStatistics::Analyzers::Base::Constants::UnknownAnswerKey
+      answer = stats[:answers].detect do |a|
+        a[:id] == CanvasQuizStatistics::Analyzers::Base::Constants::UnknownAnswerKey
       end
 
       expect(answer).to be_present
