@@ -65,45 +65,43 @@ RSpec.shared_context 'lti_layout_spec_helper' do
   let(:ctrl) { LtiLayoutSpecHelper.create_controller }
   let(:tool) { LtiLayoutSpecHelper.create_tool }
   let(:tag) { LtiLayoutSpecHelper.create_tag(tool) }
+end
 
-  module LtiLayoutSpecHelper
-    def self.create_tag(tool)
-      ContentTag.create!({
-                           title: 'Test',
-                           content_id: tool.id,
-                           content_type: 'ContextExternalTool',
-                           tag_type: 'context_module',
-                           context_type: 'Account',
-                           context_id: Account.default.id,
-                           root_account_id: Account.default,
-                           url: 'https://example.com'
-                         })
-    end
+module LtiLayoutSpecHelper
+  def self.create_tag(tool)
+    ContentTag.create!(title: 'Test',
+                       content_id: tool.id,
+                       content_type: 'ContextExternalTool',
+                       tag_type: 'context_module',
+                       context_type: 'Account',
+                       context_id: Account.default.id,
+                       root_account_id: Account.default,
+                       url: 'https://example.com')
+  end
 
-    def self.create_tool(tool_id = 'A brand new tool')
-      dev_key = DeveloperKey.create
-      course = Course.create
-      ContextExternalTool.create(developer_key: dev_key, context: course, tool_id: tool_id)
-    end
+  def self.create_tool(tool_id = 'A brand new tool')
+    dev_key = DeveloperKey.create
+    course = Course.create
+    ContextExternalTool.create(developer_key: dev_key, context: course, tool_id: tool_id)
+  end
 
-    def self.create_request
-      ActionDispatch::Request.new({
-                                    "rack.input" => StringIO.new(""),
-                                    "HTTP_HOST" => 'example.com',
-                                    "HTTP_ACCEPT" => 'text/html',
-                                    "REQUEST_METHOD" => 'GET',
-                                    "action_dispatch.request.parameters" => {
-                                      "display" => "full_width"
-                                    }
-                                  })
-    end
+  def self.create_request
+    ActionDispatch::Request.new({
+                                  "rack.input" => StringIO.new(""),
+                                  "HTTP_HOST" => 'example.com',
+                                  "HTTP_ACCEPT" => 'text/html',
+                                  "REQUEST_METHOD" => 'GET',
+                                  "action_dispatch.request.parameters" => {
+                                    "display" => "full_width"
+                                  }
+                                })
+  end
 
-    def self.create_response
-      ActionDispatch::TestResponse.new
-    end
+  def self.create_response
+    ActionDispatch::TestResponse.new
+  end
 
-    def self.create_controller
-      ApplicationController.new
-    end
+  def self.create_controller
+    ApplicationController.new
   end
 end

@@ -26,11 +26,11 @@ require_relative "../pages/student_interactions_report_page"
 describe 'Global Grades' do
   include_context "in-process server selenium tests"
 
-  SCORE1 = 90.0
-  SCORE2 = 76.0
-  SCORE3 = 9.0
-  SCORE4 = 8.0
-  SCORE5 = 47
+  let_once(:score1) { 90.0 }
+  let_once(:score2) { 76.0 }
+  let_once(:score3) { 9.0 }
+  let_once(:score4) { 8.0 }
+  let_once(:score5) { 47 }
 
   before(:once) do
     now = Time.zone.now
@@ -107,19 +107,23 @@ describe 'Global Grades' do
     )
 
     # Grade the assignments
-    @assignment1.grade_student(@student, grade: SCORE1, grader: @teacher)
-    @assignment2.grade_student(@student, grade: SCORE2, grader: @teacher)
-    @assignment3.grade_student(@student, grade: SCORE3, grader: @teacher)
-    @assignment4.grade_student(@student, grade: SCORE4, grader: @teacher)
-    @assignment5.grade_student(@student, grade: SCORE5, grader: @teacher)
-
-    GRADE_CURRENT_GP = ((SCORE1 + SCORE2 + SCORE3) / (@assignment1.points_possible + @assignment2.points_possible +
-      @assignment3.points_possible)) * 100
-    GRADE_OLD_GP = ((SCORE4 / @assignment4.points_possible) * 100)
-    GRADE_TOTAL_GP = ((SCORE1 + SCORE2 + SCORE3 + SCORE4) / (@assignment1.points_possible + @assignment2.points_possible +
-      @assignment3.points_possible + @assignment4.points_possible)) * 100
-    GRADE_TOTAL_NO_GP = (SCORE5 / @assignment5.points_possible) * 100
+    @assignment1.grade_student(@student, grade: score1, grader: @teacher)
+    @assignment2.grade_student(@student, grade: score2, grader: @teacher)
+    @assignment3.grade_student(@student, grade: score3, grader: @teacher)
+    @assignment4.grade_student(@student, grade: score4, grader: @teacher)
+    @assignment5.grade_student(@student, grade: score5, grader: @teacher)
   end
+
+  let(:grade_current_gp) do
+    ((score1 + score2 + score3) / (@assignment1.points_possible + @assignment2.points_possible +
+      @assignment3.points_possible)) * 100
+  end
+  let(:grade_old_gp) { ((score4 / @assignment4.points_possible) * 100) }
+  let(:grade_total_gp) do
+    ((score1 + score2 + score3 + score4) / (@assignment1.points_possible + @assignment2.points_possible +
+      @assignment3.points_possible + @assignment4.points_possible)) * 100
+  end
+  let(:grade_total_no_gp) { (score5 / @assignment5.points_possible) * 100 }
 
   context 'as student' do
     before(:each) do
@@ -144,11 +148,11 @@ describe 'Global Grades' do
     it 'show score for grading period', priority: "1", test_id: 3501070 do
       GlobalGrades.select_grading_period(@course_with_gp, "old grading period")
       # verify course grade
-      expect(GlobalGrades.get_score_for_course_no_percent(@course_with_gp)).to eq(GRADE_OLD_GP.round(2))
+      expect(GlobalGrades.get_score_for_course_no_percent(@course_with_gp)).to eq(grade_old_gp.round(2))
     end
 
     it 'show score for course without grading periods', priority: "1", test_id: 3501470 do
-      expect(GlobalGrades.get_score_for_course_no_percent(@course_no_gp)).to eq(GRADE_TOTAL_NO_GP.round(2))
+      expect(GlobalGrades.get_score_for_course_no_percent(@course_no_gp)).to eq(grade_total_no_gp.round(2))
     end
   end
 
@@ -169,7 +173,7 @@ describe 'Global Grades' do
       expect(GlobalGrades.score(@course_with_gp)).to include_text("average for 1 student")
       # calculate expected grade average
 
-      expect(GlobalGrades.get_score_for_course_no_percent(@course_with_gp)).to eq GRADE_TOTAL_GP.round(2)
+      expect(GlobalGrades.get_score_for_course_no_percent(@course_with_gp)).to eq grade_total_gp.round(2)
     end
 
     it 'has grades table with interactions report' do # test id 350053
@@ -183,7 +187,7 @@ describe 'Global Grades' do
       # verify url has correct course id
       expect(driver.current_url).to eq app_url + "/courses/#{@course_with_gp.id}/gradebook"
       # verify assignment score is correct
-      expect(Gradebook::Cells.get_total_grade(@student)).to eq("#{GRADE_CURRENT_GP.round(2)}%")
+      expect(Gradebook::Cells.get_total_grade(@student)).to eq("#{grade_current_gp.round(2)}%")
     end
 
     it 'goes to student interactions report', priority: "1", test_id: 3500433 do
@@ -191,7 +195,7 @@ describe 'Global Grades' do
 
       expect(StudentInteractionsReport.report).to be_displayed
       # verify current score
-      expect(StudentInteractionsReport.current_score(@student.name)).to eq("#{GRADE_TOTAL_GP.round(1)}%")
+      expect(StudentInteractionsReport.current_score(@student.name)).to eq("#{grade_total_gp.round(1)}%")
     end
   end
 end
