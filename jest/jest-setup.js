@@ -105,7 +105,6 @@ const ignoredErrors = [
   /The prop `rcsProps.canUploadFiles` is marked as required in `ForwardRef`/,
   /The prop `renderLabel` is marked as required in `(FileDrop|NumberInput|Select)`/,
   /The prop `rollup.outcomeId` is marked as required in `StudentOutcomeScore`/,
-  /The prop `rollup.rating.mastery` is marked as required in `StudentOutcomeScore`/,
   /The prop `rootId` is marked as required in `GroupSelectionDrillDown`/,
   /The prop `screenReaderLabel` is marked as required in `IconButton`/,
   /Unexpected keys "searchPermissions", "filterRoles", "tabChanged", "setAndOpenAddTray" found in preloadedState argument passed to createStore/,
