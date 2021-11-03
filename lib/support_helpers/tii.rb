@@ -199,7 +199,7 @@ module SupportHelpers
           :assignment_fix
         elsif tii[:assignment_error].try(:[], :error_code) == 419
           :assignment_exists_fix
-        elsif tii.values.any? { |v| v.is_a?(Hash) && v[:error_code] == 206 }
+        elsif tii.values.any? { |v| v.is_a?(Hash) && v[:error_code] == 206 } # rubocop:disable Lint/DuplicateBranch
           :assignment_fix
         else
           :no_fix

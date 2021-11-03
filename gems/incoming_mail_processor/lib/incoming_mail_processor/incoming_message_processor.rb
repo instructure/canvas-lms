@@ -245,24 +245,25 @@ module IncomingMailProcessor
       "incoming_message_processor"
     end
 
+    BULK_PRECEDENCE_VALUES = %w[bulk list junk].freeze
+    private_constant :BULK_PRECEDENCE_VALUES
+
     def self.bounce_message?(mail)
       mail.header.fields.any? do |field|
         case field.name
-
-        # RFC-3834
-        when 'Auto-Submitted' then field.value != 'no'
-
-        # old klugey stuff uses this
-        when 'Precedence' then ['bulk', 'list', 'junk'].include?(field.value)
-
-        # Exchange sets this
-        when 'X-Auto-Response-Suppress' then true
-
-        # some other random headers I found that are easy to check
-        when 'X-Autoreply', 'X-Autorespond', 'X-Autoresponder' then true
-
-        # not a bounce header we care about
-        else false
+        when 'Auto-Submitted' # RFC-3834
+          field.value != 'no'
+        when 'Precedence' # old kludgey stuff uses this
+          BULK_PRECEDENCE_VALUES.include?(field.value)
+        when 'X-Auto-Response-Suppress', # Exchange sets this
+             # some other random headers I found that are easy to check
+             'X-Autoreply',
+             'X-Autorespond',
+             'X-Autoresponder'
+          true
+        else
+          # not a bounce header we care about
+          false
         end
       end
     end

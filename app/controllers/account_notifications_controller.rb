@@ -220,9 +220,8 @@ class AccountNotificationsController < ApplicationController
       roles = []
 
       params[:account_notification_roles].each do |role_param|
-        if (role = @account.get_role_by_id(role_param))
-          roles << role
-        elsif (role = @account.get_role_by_name(role_param))
+        if (role = @account.get_role_by_id(role_param)) ||
+           (role = @account.get_role_by_name(role_param))
           roles << role
         elsif role_param.nil? || role_param.to_s == "NilEnrollment"
           roles << nil

@@ -582,9 +582,8 @@ class ContextModulesController < ApplicationController
           obj = @context.find_asset(params[:id], [:attachment, :discussion_topic, :assignment, :quiz, :wiki_page, :content_tag])
           if obj.is_a?(ContentTag)
             result[:current_item] = @tags.detect { |t| t.id == obj.id }
-          elsif obj.is_a?(DiscussionTopic) && obj.assignment_id
-            result[:current_item] = @tags.detect { |t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
-          elsif obj.is_a?(Quizzes::Quiz) && obj.assignment_id
+          elsif (obj.is_a?(DiscussionTopic) && obj.assignment_id) ||
+                (obj.is_a?(Quizzes::Quiz) && obj.assignment_id)
             result[:current_item] = @tags.detect { |t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
           end
         end

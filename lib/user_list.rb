@@ -122,9 +122,8 @@ class UserList
         [a, b]
       when /\s*(.+?)\s*<(\S+?@\S+?)>/
         [$1, $2]
-      when /<(\S+?@\S+?)>/
-        [nil, $1]
-      when /(\S+?@\S+)/
+      when /<(\S+?@\S+?)>/,
+           /(\S+?@\S+)/
         [nil, $1]
       else
         nil
