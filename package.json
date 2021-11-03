@@ -20,6 +20,7 @@
     ]
   },
   "dependencies": {
+    "@apollo/client": "^3.4.16",
     "@instructure/brandable_css": "^3",
     "@instructure/canvas-theme": "^7",
     "@instructure/debounce": "^7",
