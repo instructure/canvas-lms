@@ -127,6 +127,11 @@ class InfoController < ApplicationController
     render status: :not_found, template: "shared/errors/404_message"
   end
 
+  def live_events_heartbeat
+    Canvas::LiveEvents.heartbeat
+    render plain: "heartbeat event sent at #{Time.now.utc.iso8601}"
+  end
+
   def web_app_manifest
     # brand_variable returns a value that we expect to go through a rails
     # asset helper, so we need to do that manually here
