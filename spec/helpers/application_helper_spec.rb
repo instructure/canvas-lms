@@ -853,9 +853,16 @@ describe ApplicationHelper do
           expect(planner_enabled?).to be true
         end
 
-        it "returns true for the observer" do
+        it "returns false for the observer if not k5_user" do
+          allow(helper).to receive(:k5_user?).and_return(false)
           @current_user = @observer
-          expect(planner_enabled?).to be true
+          expect(helper.planner_enabled?).to be false
+        end
+
+        it "returns true for the observer if k5_user" do
+          allow(helper).to receive(:k5_user?).and_return(true)
+          @current_user = @observer
+          expect(helper.planner_enabled?).to be true
         end
 
         it "still returns false for a teacher" do
