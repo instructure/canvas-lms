@@ -348,9 +348,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def default_roles
-    if context.is_a?(Group)
-      'members'
-    elsif context.is_a?(Course)
+    if context.is_a?(Course)
       'teachers'
     else
       'members'

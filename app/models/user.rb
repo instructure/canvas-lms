@@ -1344,18 +1344,12 @@ class User < ActiveRecord::Base
 
   def self.infer_id(obj)
     case obj
-    when User
+    when User, OpenObject
       obj.id
     when Numeric
       obj
-    when CommunicationChannel
+    when CommunicationChannel, Pseudonym, AccountUser
       obj.user_id
-    when Pseudonym
-      obj.user_id
-    when AccountUser
-      obj.user_id
-    when OpenObject
-      obj.id
     when String
       obj.to_i
     else

@@ -208,10 +208,7 @@ class StreamItem < ActiveRecord::Base
       res.delete 'body' # this can be pretty large, and we don't display it
       res['assignment'] = object.assignment.attributes.slice('id', 'title', 'due_at', 'points_possible', 'submission_types', 'group_category_id')
       res[:course_id] = object.context.id
-    when Collaboration
-      res = object.attributes
-      res['users'] = object.users.map { |u| prepare_user(u) }
-    when WebConference
+    when Collaboration, WebConference
       res = object.attributes
       res['users'] = object.users.map { |u| prepare_user(u) }
     when AssessmentRequest
