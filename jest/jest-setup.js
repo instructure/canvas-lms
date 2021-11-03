@@ -93,7 +93,6 @@ const ignoredErrors = [
   /The prop `isLoading` is marked as required in `LoadingWrapper`/,
   /The prop `jwt` is marked as required in `CanvasContentTray`/,
   /The prop `label` is marked as required in `(CanvasInstUIModal|FormField|FormFieldLayout|Modal)`/,
-  /The prop `listDeveloperKeyScopesSet` is marked as required in `(Scopes|ScopesList)`/,
   /The prop `loading` is marked as required in `(HomeroomAnnouncementsLayout|LoadingWrapper)`/,
   /The prop `name` is marked as required in `Avatar`/,
   /The prop `onChangeSubmission` is marked as required in `StudentContent`/,
