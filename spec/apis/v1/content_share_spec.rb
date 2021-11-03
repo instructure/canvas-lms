@@ -29,6 +29,19 @@ describe ContentShare do
     @cs = @teacher.sent_content_shares.create! name: 'test', content_export: @export, read_state: 'read'
   end
 
+  let(:export_settings) do
+    {
+      "assignment" => { "assignments" => { 'blah' => '1' } },
+      "attachment" => { "attachments" => { "blah" => "1" } },
+      "discussion_topic" => { "discussion_topics" => { 'blah' => '1' } },
+      "page" => { "wiki_pages" => { 'blah' => '1' } },
+      "quiz" => { "quizzes" => { 'blah' => '1' } },
+      "module_item" => { "wiki_pages" => { 'bap' => '1' }, "content_tags" => { 'blah' => '1' } },
+      "module" => { "content_tags" => { 'bar' => '1', 'baz' => '1' }, "context_modules" => { 'foo' => '1' },
+                    "assignments" => { 'bip' => '1' }, "wiki_pages" => { 'bap' => '1' } }
+    }
+  end
+
   it "detects an assignment export" do
     detect_export('assignment')
   end
@@ -57,19 +70,8 @@ describe ContentShare do
     detect_export('module')
   end
 
-  EXPORT_SETTINGS = {
-    "assignment" => { "assignments" => { 'blah' => '1' } },
-    "attachment" => { "attachments" => { "blah" => "1" } },
-    "discussion_topic" => { "discussion_topics" => { 'blah' => '1' } },
-    "page" => { "wiki_pages" => { 'blah' => '1' } },
-    "quiz" => { "quizzes" => { 'blah' => '1' } },
-    "module_item" => { "wiki_pages" => { 'bap' => '1' }, "content_tags" => { 'blah' => '1' } },
-    "module" => { "content_tags" => { 'bar' => '1', 'baz' => '1' }, "context_modules" => { 'foo' => '1' },
-                  "assignments" => { 'bip' => '1' }, "wiki_pages" => { 'bap' => '1' } }
-  }
-
   def detect_export(type)
-    @export.settings = { "selected_content" => EXPORT_SETTINGS[type] }
+    @export.settings = { "selected_content" => export_settings[type] }
     @export.save!
     thing = content_share_json(@cs, nil, {})
     expect(thing['content_type']).to eq type

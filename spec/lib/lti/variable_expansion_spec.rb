@@ -22,22 +22,24 @@ require_dependency "lti/variable_expansion"
 
 module Lti
   describe VariableExpansion do
-    class TestExpander
-      attr_accessor :one, :two, :three
+    let(:klass) do
+      Class.new do
+        attr_accessor :one, :two, :three
 
-      def initialize
-        @one = 1
-        @two = 2
-        @three = 3
+        def initialize
+          @one = 1
+          @two = 2
+          @three = 3
+        end
       end
     end
 
     it 'must accept multiple guards and combine their results with a logical AND' do
       var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> { true }, -> { true })
-      expect(var_exp.expand(TestExpander.new)).to eq 6
+      expect(var_exp.expand(klass.new)).to eq 6
 
       var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> { false }, -> { true })
-      expect(var_exp.expand(TestExpander.new)).to eq '$test'
+      expect(var_exp.expand(klass.new)).to eq '$test'
     end
 
     it 'accepts and sets default_name' do
@@ -47,12 +49,12 @@ module Lti
 
     it 'expands variables' do
       var_exp = described_class.new('test', [], -> { @one + @two + @three })
-      expect(var_exp.expand(TestExpander.new)).to eq 6
+      expect(var_exp.expand(klass.new)).to eq 6
     end
 
     it 'does not expand if the guard evals false' do
       var_exp = described_class.new('test', [], -> { @one + @two + @three }, -> { false })
-      expect(var_exp.expand(TestExpander.new)).to eq '$test'
+      expect(var_exp.expand(klass.new)).to eq '$test'
     end
   end
 end

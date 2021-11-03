@@ -21,12 +21,7 @@
 require_relative '../spec_helper'
 
 describe Moderation do
-  subject(:test_moderation) do
-    class TestModeration
-      include Moderation
-    end
-    TestModeration.new
-  end
+  subject(:test_moderation) { Class.new { include Moderation }.new }
 
   describe "create_moderation_selections_for_assignment" do
     before :once do

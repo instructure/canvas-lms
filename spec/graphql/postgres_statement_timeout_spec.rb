@@ -23,9 +23,10 @@ require_relative "./graphql_spec_helper"
 describe "graphql pg statement_timeouts" do
   before(:once) do
     course_with_student(active_all: true)
-    QUERY = %|query { course(id: "#{@course.id}") { name } }|
-    MUTATION = %|mutation { updateAssignment(input: {id: "1"}) { assignment { name } } }|
   end
+
+  let(:query) { %|query { course(id: "#{@course.id}") { name } }| }
+  let(:mutation) { %|mutation { updateAssignment(input: {id: "1"}) { assignment { name } } }| }
 
   def make_stuff_slow
     allow_any_instance_of(Course).to receive(:name) {
@@ -43,7 +44,7 @@ describe "graphql pg statement_timeouts" do
     it "works when fast" do
       make_stuff_slow
       expect {
-        CanvasSchema.execute(QUERY, context: { current_user: @teacher })
+        CanvasSchema.execute(query, context: { current_user: @teacher })
       }.not_to raise_error
     end
 
@@ -51,7 +52,7 @@ describe "graphql pg statement_timeouts" do
       make_stuff_slow
       Setting.set('graphql_statement_timeout', 1)
       expect {
-        CanvasSchema.execute(QUERY, context: { current_user: @teacher })
+        CanvasSchema.execute(query, context: { current_user: @teacher })
       }.to raise_error(GraphQLPostgresTimeout::Error)
     end
   end
@@ -60,14 +61,14 @@ describe "graphql pg statement_timeouts" do
     it "works when fast" do
       make_stuff_slow
       expect {
-        CanvasSchema.execute(MUTATION, context: { current_user: @teacher })
+        CanvasSchema.execute(mutation, context: { current_user: @teacher })
       }.not_to raise_error
     end
 
     it "fails when slow" do
       make_stuff_slow
       Setting.set('graphql_statement_timeout', 1)
-      result = CanvasSchema.execute(MUTATION, context: { current_user: @teacher })
+      result = CanvasSchema.execute(mutation, context: { current_user: @teacher })
       expect(result.dig("data", "updateAssignment")).to be_nil
       expect(result.dig("errors", 0, "path")).to eq ["updateAssignment"]
     end
