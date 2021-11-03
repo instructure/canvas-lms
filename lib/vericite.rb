@@ -155,9 +155,8 @@ module VeriCite
         raise "Unsupported submission type for VeriCite integration: #{submission.submission_type}"
       end
 
-      responses.keys.each do |asset_string|
-        res = responses[asset_string]
-        responses[asset_string] = is_response_success?(res) ? { object_id: res[:returned_object_id] } : response_error_hash(res)
+      responses.transform_values! do |res|
+        is_response_success?(res) ? { object_id: res[:returned_object_id] } : response_error_hash(res)
       end
 
       responses

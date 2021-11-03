@@ -193,7 +193,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
 
   def to_csv
     include_root_accounts = quiz.context.root_account.trust_exists?
-    csv = CSV.generate do |csv|
+    CSV.generate do |csv|
       context = quiz.context
 
       # write columns to csv
@@ -297,14 +297,14 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
             row << list.map { |str| (str || '').gsub(/,/, '\,') }.join(',')
           elsif question[:question_type] == 'matching_question'
             answer_ids = question[:answers].map { |a| a[:id] }
-            answer_and_matches = answer_ids.map { |id| [id, answer["answer_#{id}".to_sym].to_i] }
-            row << answer_and_matches.map { |id, match_id|
+            answer_and_matches = answer_ids.map { |aid| [aid, answer["answer_#{aid}".to_sym].to_i] }
+            row << answer_and_matches.map do |answer_id, match_id|
               res = []
-              res << (question[:answers].detect { |a| a[:id] == id } || {})[:text]
+              res << (question[:answers].detect { |a| a[:id] == answer_id } || {})[:text]
               match = question[:matches].detect { |m| m[:match_id] == match_id } || question[:answers].detect { |m| m[:match_id] == match_id } || {}
               res << (match[:right] || match[:text])
               res.map { |s| (s || '').gsub(/\=>/, '\=>') }.join('=>').gsub(/,/, '\,')
-            }.join(',')
+            end.join(',')
           elsif question[:question_type] == 'numerical_question'
             row << (answer && answer[:text])
           elsif question[:question_type] == 'file_upload_question'
@@ -322,7 +322,6 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
         csv << row
       end
     end
-    csv
   end
 
   private

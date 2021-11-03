@@ -308,12 +308,12 @@ class ContextModulesController < ApplicationController
 
   def reorder
     if authorized_action(@context.context_modules.temp_record, @current_user, :update)
-      m = @context.context_modules.not_deleted.first
+      first_module = @context.context_modules.not_deleted.first
 
       # A hash where the key is the module id and the value is the module position
       order_before = Hash[@context.context_modules.not_deleted.pluck(:id, :position)]
 
-      m.update_order(params[:order].split(","))
+      first_module.update_order(params[:order].split(","))
       # Need to invalidate the ordering cache used by context_module.rb
       @context.touch
 

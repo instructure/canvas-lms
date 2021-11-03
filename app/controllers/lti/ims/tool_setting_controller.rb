@@ -114,7 +114,7 @@ module Lti
           elsif bubble == 'distinct' && request.headers['accept'].include?('application/vnd.ims.lti.v2.toolsettings.simple+json')
             @content_type = 'application/vnd.ims.lti.v2.toolsettings.simple+json'
             custom = {}
-            graph.reverse_each { |tool_setting| custom.merge!(tool_setting.custom) }
+            graph.reverse_each { |ts| custom.merge!(ts.custom) }
             custom
           end
         else
@@ -138,7 +138,7 @@ module Lti
 
       def custom_settings(type, json)
         if request.content_type == 'application/vnd.ims.lti.v2.toolsettings+json'
-          setting = json['@graph'].find { |setting| setting['@type'] == type }
+          setting = json['@graph'].find { |s| s['@type'] == type }
           setting['custom']
         else
           json

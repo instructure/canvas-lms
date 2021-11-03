@@ -50,9 +50,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleAnswers do
     it 'generate "none" answer for those who picked no choice at all' do
       stats = subject.run([{}])
 
-      answer = stats[:answers].detect do |answer|
-        answer[:id] == Constants::MissingAnswerKey
-      end
+      answer = stats[:answers].detect { |a| a[:id] == Constants::MissingAnswerKey }
 
       expect(answer).to be_present
       expect(answer[:responses]).to eq(1)

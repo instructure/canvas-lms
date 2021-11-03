@@ -3108,7 +3108,7 @@ describe Course, "tabs_available" do
       tool.settings[:windowTarget] = "_blank"
       tool.save!
       tabs = @course.tabs_available
-      tab = tabs.find { |tab| tab[:id] == tool.asset_string }
+      tab = tabs.find { |t| t[:id] == tool.asset_string }
       expect(tab[:target]).to eq '_blank'
     end
 
@@ -3127,7 +3127,7 @@ describe Course, "tabs_available" do
       tool.settings[:windowTarget] = "_blank"
       tool.save!
       tabs = @course.tabs_available
-      tab = tabs.find { |tab| tab[:id] == tool.asset_string }
+      tab = tabs.find { |t| t[:id] == tool.asset_string }
       expect(tab[:args]).to include({ display: 'borderless' })
     end
 
@@ -3146,7 +3146,7 @@ describe Course, "tabs_available" do
       tool.settings[:windowTarget] = "parent"
       tool.save!
       tabs = @course.tabs_available
-      tab = tabs.find { |tab| tab[:id] == tool.asset_string }
+      tab = tabs.find { |t| t[:id] == tool.asset_string }
       expect(tab.keys).not_to include :target
     end
 

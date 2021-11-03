@@ -1021,15 +1021,15 @@ class Attachment < ActiveRecord::Base
     self.dynamic_thumbnail_sizes.include?(geometry)
   end
 
-  def self.truncate_filename(filename, len, &block)
+  def self.truncate_filename(filename, max_len, &block)
     block ||= lambda { |str, len| str[0...len] }
     ext_index = filename.rindex('.')
     if ext_index
-      ext = block.call(filename[ext_index..-1], (len / 2) + 1)
-      base = block.call(filename[0...ext_index], len - ext.length)
+      ext = block.call(filename[ext_index..], (max_len / 2) + 1)
+      base = block.call(filename[0...ext_index], max_len - ext.length)
       base + ext
     else
-      block.call(filename, len)
+      block.call(filename, max_len)
     end
   end
 

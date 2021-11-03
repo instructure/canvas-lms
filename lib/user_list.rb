@@ -278,17 +278,17 @@ class UserList
                .map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |sms|
         address = sms.delete(:address)[/\d+/]
         addresses = smses.select { |a| a[:address].gsub(/[^\d]/, '') == address }
-        addresses.each do |address|
+        addresses.each do |a|
           # ccs are not unique; just error out on duplicates
-          if address.has_key?(:user_id) && (address[:user_id] != login[:user_id] || address[:shard] != Shard.current)
-            address[:user_id] = false
-            address[:details] = :non_unique
-            address.delete(:name)
-            address.delete(:shard)
+          if a.key?(:user_id) && (a[:user_id] != login[:user_id] || a[:shard] != Shard.current)
+            a[:user_id] = false
+            a[:details] = :non_unique
+            a.delete(:name)
+            a.delete(:shard)
           else
             sms[:user_id] = sms[:user_id].to_i
-            address.merge!(sms)
-            address[:shard] = Shard.current
+            a.merge!(sms)
+            a[:shard] = Shard.current
           end
         end
       end

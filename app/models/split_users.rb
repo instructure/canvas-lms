@@ -167,8 +167,8 @@ class SplitUsers
     Shard.partition_by_shard(enrollment_ids) do |enrollments|
       restore_enrollments(enrollments)
     end
-    Shard.partition_by_shard(pseudonyms) do |pseudonyms|
-      move_new_enrollments(enrollment_ids, pseudonyms)
+    Shard.partition_by_shard(pseudonyms) do |shard_pseudonyms|
+      move_new_enrollments(enrollment_ids, shard_pseudonyms)
     end
     account_users_ids = records.where(context_type: 'AccountUser').pluck(:context_id)
 
