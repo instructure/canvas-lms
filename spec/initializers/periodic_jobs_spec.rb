@@ -19,12 +19,10 @@
 
 describe 'PeriodicJobs' do
   describe ".with_each_shard_by_database_in_region" do
-    before do
-      stub_const("FakeJob", Class.new do
-        def self.some_method_to_run(arg1 = "other arg")
-          # no-op
-        end
-      end)
+    class FakeJob
+      def self.some_method_to_run(arg1 = "other arg")
+        # no-op
+      end
     end
 
     it "inserts jobs without jitter" do

@@ -49,12 +49,12 @@ require 'fixtures/animal'
 require 'fixtures/trail'
 require 'fixtures/week_event'
 
-Zoo = CanvasPartmanTest::Zoo
-Animal = CanvasPartmanTest::Animal
-Trail = CanvasPartmanTest::Trail
-WeekEvent = CanvasPartmanTest::WeekEvent
-
 RSpec.configure do |config|
+  Zoo = CanvasPartmanTest::Zoo
+  Animal = CanvasPartmanTest::Animal
+  Trail = CanvasPartmanTest::Trail
+  WeekEvent = CanvasPartmanTest::WeekEvent
+
   config.color = true
   config.order = :random
 

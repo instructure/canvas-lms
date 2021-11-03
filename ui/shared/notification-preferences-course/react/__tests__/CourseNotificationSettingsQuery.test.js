@@ -174,7 +174,6 @@ describe('Course Notification Settings', () => {
         <MockedProvider mocks={mocks}>
           <CourseNotificationSettingsManager
             courseId="1"
-            userId="1"
             courseName="Course"
             enabled
             notificationPreferences={mockedPrefs}

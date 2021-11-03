@@ -23,9 +23,13 @@ describe ProgressRunner do
     @progress = double("progress").as_null_object
   end
 
-  let(:progress_messages) do
-    Module.new do
-      attr_accessor :message
+  module ProgressMessages
+    def message=(m)
+      @message = m
+    end
+
+    def message
+      @message
     end
   end
 
@@ -61,7 +65,7 @@ describe ProgressRunner do
   end
 
   it "rescues exceptions and record messages as errors" do
-    @progress.extend(progress_messages)
+    @progress.extend(ProgressMessages)
     expect(@progress).to receive(:complete!).once
     expect(@progress).to receive(:completion=).with(100.0)
     expect(@progress).to receive(:save).once
@@ -91,7 +95,7 @@ describe ProgressRunner do
   end
 
   it "has default completion and error messages" do
-    @progress.extend(progress_messages)
+    @progress.extend(ProgressMessages)
 
     progress_runner = ProgressRunner.new(@progress)
     ids = (1..4).to_a
@@ -105,7 +109,7 @@ describe ProgressRunner do
   # it "should complete progress if only some records fail"
 
   it "fails progress if all records fail" do
-    @progress.extend(progress_messages)
+    @progress.extend(ProgressMessages)
     expect(@progress).to receive(:completion=).with(100.0)
     expect(@progress).to receive(:fail!).once
     expect(@progress).to receive(:save).once

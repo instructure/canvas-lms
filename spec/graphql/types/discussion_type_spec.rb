@@ -389,23 +389,12 @@ describe Types::DiscussionType do
     it "locked_for_user is set correctly" do
       allow_any_instantiation_of(discussion).to receive(:locked_for?)
         .with(@teacher, check_policies: true)
-        .and_return({ unlock_at: 'a sample date' })
+        .and_return(true)
       expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("lockedForUser")).to be true
       allow_any_instantiation_of(discussion).to receive(:locked_for?)
         .with(@teacher, check_policies: true)
         .and_return(false)
       expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("lockedForUser")).to be false
-    end
-
-    it "available_for_user is set correctly" do
-      allow_any_instantiation_of(discussion).to receive(:locked_for?)
-        .with(@teacher, check_policies: true)
-        .and_return({ unlock_at: 'a sample date' })
-      expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("availableForUser")).to be false
-      allow_any_instantiation_of(discussion).to receive(:locked_for?)
-        .with(@teacher, check_policies: true)
-        .and_return(false)
-      expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("availableForUser")).to be true
     end
   end
 

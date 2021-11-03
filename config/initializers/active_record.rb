@@ -114,14 +114,7 @@ class ActiveRecord::Base
       ].sort.each do |file|
         next if const_defined?(file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize)
 
-        if CANVAS_ZEITWERK
-          load(file)
-        else
-          # TODO: require_or_load is no longer a viable mechanism path
-          # when zeitwerk is the active code loader.  This should
-          # be removed when zeitwerk is fully enabled everywhere.
-          ActiveSupport::Dependencies.require_or_load(file)
-        end
+        ActiveSupport::Dependencies.require_or_load(file)
       end
       ActiveRecord::Base.descendants
     end
