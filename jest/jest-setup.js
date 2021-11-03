@@ -95,7 +95,6 @@ const ignoredErrors = [
   /The prop `label` is marked as required in `(CanvasInstUIModal|FormField|FormFieldLayout|Modal)`/,
   /The prop `listDeveloperKeyScopesSet` is marked as required in `(Scopes|ScopesList)`/,
   /The prop `loading` is marked as required in `(HomeroomAnnouncementsLayout|LoadingWrapper)`/,
-  /The prop `ltiKeysSetLtiKey` is marked as required in `DeveloperKeyActionButtons`/,
   /The prop `name` is marked as required in `Avatar`/,
   /The prop `onChangeSubmission` is marked as required in `StudentContent`/,
   /The prop `outcomeGroup.title` is marked as required in `(GroupDescriptionModal|GroupEditModal|ManageOutcomesView)`/,
