@@ -98,7 +98,6 @@ const ignoredErrors = [
   /The prop `ltiKeysSetLtiKey` is marked as required in `DeveloperKeyActionButtons`/,
   /The prop `name` is marked as required in `Avatar`/,
   /The prop `onChangeSubmission` is marked as required in `StudentContent`/,
-  /The prop `onSelect` is marked as required in `MailboxSelectionDropdown`/,
   /The prop `outcomeGroup.title` is marked as required in `(GroupDescriptionModal|GroupEditModal|ManageOutcomesView)`/,
   /The prop `outcomes\[0\].mastery_points` is marked as required in `(Gradebook|ScoresGrid)`/,
   /The prop `rcsProps.canUploadFiles` is marked as required in `ForwardRef`/,
