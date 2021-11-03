@@ -23,53 +23,51 @@ require_dependency "conditional_release/bounds_validations"
 
 module ConditionalRelease
   describe BoundsValidations do
-    class BoundsValidationsSpec
-      include ActiveModel::Validations
-      include BoundsValidations
-      attr_accessor :upper_bound, :lower_bound
-    end
-
-    before(:once) do
-      @subject = BoundsValidationsSpec.new
+    subject do
+      Class.new do
+        include ActiveModel::Validations
+        include BoundsValidations
+        attr_accessor :upper_bound, :lower_bound
+      end.new
     end
 
     it 'has to have a bound' do
-      @subject.upper_bound = @subject.lower_bound = nil
-      expect(@subject.valid?).to be false
-      expect(@subject.errors).to include(:base)
+      subject.upper_bound = subject.lower_bound = nil
+      expect(subject.valid?).to be false
+      expect(subject.errors).to include(:base)
     end
 
     it 'can have a single lower bound' do
-      @subject.upper_bound = nil
-      @subject.lower_bound = 2
-      expect(@subject.valid?).to be true
+      subject.upper_bound = nil
+      subject.lower_bound = 2
+      expect(subject.valid?).to be true
     end
 
     it 'can have a single upper bound' do
-      @subject.upper_bound = 10
-      @subject.lower_bound = nil
-      expect(@subject.valid?).to be true
+      subject.upper_bound = 10
+      subject.lower_bound = nil
+      expect(subject.valid?).to be true
     end
 
     it 'has to have numbers for bounds' do
-      @subject.upper_bound = 'foo'
-      @subject.lower_bound = { bar: :baz }
-      expect(@subject.valid?).to be false
-      expect(@subject.errors).to include(:upper_bound, :lower_bound)
+      subject.upper_bound = 'foo'
+      subject.lower_bound = { bar: :baz }
+      expect(subject.valid?).to be false
+      expect(subject.errors).to include(:upper_bound, :lower_bound)
     end
 
     it 'has to have upper_bound > lower_bound' do
-      @subject.upper_bound = 10
-      @subject.lower_bound = 90
-      expect(@subject.valid?).to be false
-      expect(@subject.errors).to include(:base)
+      subject.upper_bound = 10
+      subject.lower_bound = 90
+      expect(subject.valid?).to be false
+      expect(subject.errors).to include(:base)
     end
 
     it 'has to have non-negative bounds' do
-      @subject.upper_bound = -1
-      @subject.lower_bound = -3
-      expect(@subject.valid?).to be false
-      expect(@subject.errors).to include(:upper_bound, :lower_bound)
+      subject.upper_bound = -1
+      subject.lower_bound = -3
+      expect(subject.valid?).to be false
+      expect(subject.errors).to include(:upper_bound, :lower_bound)
     end
   end
 end

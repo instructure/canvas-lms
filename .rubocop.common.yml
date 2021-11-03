@@ -39,6 +39,8 @@ Lint/AmbiguousRegexpLiteral:
   Severity: error
 Lint/AssignmentInCondition:
   Severity: error
+Lint/ConstantDefinitionInBlock:
+  Severity: error
 Lint/Debugger:
   Severity: error
 Lint/DeprecatedClassMethods:

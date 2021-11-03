@@ -22,7 +22,7 @@ require_relative '../../lti2_spec_helper'
 
 describe ContentMigration do
   context "course copy assignments" do
-    include_examples "course copy"
+    include_context "course copy"
 
     it "links assignments to account rubrics and outcomes" do
       account = @copy_from.account

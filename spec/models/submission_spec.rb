@@ -3803,9 +3803,6 @@ describe Submission do
   end
 
   describe "#missing" do
-    SUBMISSIONS_THAT_CANT_BE_MISSING = %w/none on_paper external_tool/
-    SUBMISSION_TYPES = %w/none on_paper online_quiz discussion_topic external_tool online_upload online_text_entry online_url media_recording/
-
     before :once do
       @now = Time.zone.now
       submission_spec_model(cached_due_date: 1.day.ago(@now), submission_type: nil, submit_homework: true)
@@ -3814,8 +3811,17 @@ describe Submission do
       @another_submission = @another_assignment.submissions.last
     end
 
-    SUBMISSION_TYPES.each do |sub_type|
-      should_not_be_missing = SUBMISSIONS_THAT_CANT_BE_MISSING.include?(sub_type)
+    submissions_that_cant_be_missing = %w[none on_paper external_tool]
+    %w[none
+       on_paper
+       online_quiz
+       discussion_topic
+       external_tool
+       online_upload
+       online_text_entry
+       online_url
+       media_recording].each do |sub_type|
+      should_not_be_missing = submissions_that_cant_be_missing.include?(sub_type)
       expected_status = should_not_be_missing ? 'false' : 'true'
       it "returns #{expected_status} when late_policy_status is nil and submission_type is #{sub_type}" do
         @another_assignment.update(submission_types: sub_type)
