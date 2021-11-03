@@ -69,7 +69,8 @@ class Submission < ActiveRecord::Base
                 :skip_grade_calc,
                 :grade_posting_in_progress,
                 :score_unchanged
-  attr_writer :versioned_originality_reports
+  attr_writer :versioned_originality_reports,
+              :text_entry_originality_reports
   # This can be set to true to force late policy behaviour that would
   # be skipped otherwise. See #late_policy_relevant_changes? and
   # #score_late_or_none. It is reset to false in an after save so late
@@ -801,13 +802,24 @@ class Submission < ActiveRecord::Base
     turnitin_data.except(:webhook_info, :provider, :last_processed_attempt).merge(data)
   end
 
-  # Returns an array of the versioned originality reports in a sorted order. The ordering goes
-  # from least preferred report to most preferred reports, assuming there are reports that share
-  # the same submission and attachment combination. Otherwise, the ordering can be safely ignored.
+  def text_entry_originality_reports
+    @text_entry_originality_reports ||= begin
+      if self.association(:originality_reports).loaded?
+        originality_reports.select { |o| o.attachment_id.blank? }
+      else
+        originality_reports.where(attachment_id: nil)
+      end
+    end
+  end
+
+  # Returns an array of both the versioned originality reports (those with attachments) and
+  # text_entry_originality_reports in a sorted order. The ordering goes from least preferred
+  # report to most preferred reports, assuming there are reports that share the same submission and
+  # attachment combination. Otherwise, the ordering can be safely ignored.
   #
   # @return [Array<OriginalityReport>]
   def originality_reports_for_display
-    versioned_originality_reports.uniq.sort_by do |report|
+    (versioned_originality_reports + text_entry_originality_reports).uniq.sort_by do |report|
       [OriginalityReport::ORDERED_VALID_WORKFLOW_STATES.index(report.workflow_state) || -1, report.updated_at]
     end
   end
@@ -844,7 +856,8 @@ class Submission < ActiveRecord::Base
   end
 
   def has_originality_report?
-    versioned_originality_reports.present?
+    versioned_originality_reports.present? ||
+      text_entry_originality_reports.present?
   end
 
   def all_versioned_attachments
@@ -1706,13 +1719,16 @@ class Submission < ActiveRecord::Base
   end
 
   def versioned_originality_reports
-    @versioned_originality_reports ||=
-      # turns out the database stores timestamps with 9 decimal places, but Ruby/Rails only serves
-      # up 6.  however, submission versions (when deserialized into a Submission model) like to
-      # show 9. and apparently to_f rounds, but iso8601 doesn't
-      # it would be better if we saved the attempt number on the originality report and matched
-      # them up that way
-      originality_reports.select { |o| o.submission_time&.iso8601(6) == submitted_at&.iso8601(6) }
+    @versioned_originality_reports ||= begin
+      attachment_ids = attachment_ids_for_version
+      return [] if attachment_ids.empty?
+
+      if self.association(:originality_reports).loaded?
+        originality_reports.select { |o| attachment_ids.include?(o.attachment_id) }
+      else
+        originality_reports.where(attachment_id: attachment_ids)
+      end
+    end
   end
 
   def versioned_attachments
@@ -1771,19 +1787,32 @@ class Submission < ActiveRecord::Base
   # submissions (avoids having O(N) originality report queries)
   # NOTE: all submissions must belong to the same shard
   def self.bulk_load_versioned_originality_reports(submissions)
-    reports = originality_reports_by_submission_id_submission_time(submissions)
-    submissions.each do |s|
-      s.versioned_originality_reports = reports.dig(s.id, s.submitted_at&.iso8601(6))
+    attachment_ids_by_submission_and_index = group_attachment_ids_by_submission_and_index(submissions)
+    bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
+
+    reports_by_attachment_id = if bulk_attachment_ids.empty?
+                                 {}
+                               else
+                                 OriginalityReport.where(
+                                   submission_id: submissions.map(&:id), attachment_id: bulk_attachment_ids
+                                 ).group_by(&:attachment_id)
+                               end
+
+    submissions.each_with_index do |s, index|
+      s.versioned_originality_reports =
+        reports_by_attachment_id.values_at(*attachment_ids_by_submission_and_index[[s, index]]).flatten.compact
     end
   end
 
-  def self.originality_reports_by_submission_id_submission_time(submissions)
-    reports = OriginalityReport.where(submission_id: submissions)
-    reports.each_with_object({}) do |report, hash|
-      report_submission_time = report.submission_time.iso8601(6)
-      hash[report.submission_id] ||= {}
-      hash[report.submission_id][report_submission_time] ||= []
-      hash[report.submission_id][report_submission_time] << report
+  def self.bulk_load_text_entry_originality_reports(submissions)
+    submissions = Array(submissions)
+    submission_ids = submissions.map(&:id)
+
+    reports_by_submission =
+      OriginalityReport.where(submission_id: submission_ids, attachment_id: nil).group_by(&:submission_id)
+
+    submissions.each do |s|
+      s.text_entry_originality_reports = reports_by_submission[s.id] || []
     end
   end
 
