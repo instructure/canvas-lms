@@ -83,7 +83,6 @@ const ignoredErrors = [
   /The prop `dateTime` is marked as required in `FriendlyDatetime`/,
   /The prop `focusOnInit` is marked as required in `(FileUpload|TextEntry|UrlEntry)`/,
   /The prop `groupTitle` is marked as required in `(GroupMoveModal|GroupRemoveModal|SearchBreadcrumb)`/,
-  /The prop `hasLoaded` is marked as required in `HistoryList`/,
   /The prop `id` is marked as required in `(CanvasSelectOption|ColHeader|DashboardCard|FormField|Option)`/,
   /The prop `isLoading` is marked as required in `LoadingWrapper`/,
   /The prop `label` is marked as required in `(CanvasInstUIModal|FormField|FormFieldLayout|Modal)`/,
