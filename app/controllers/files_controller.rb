@@ -491,7 +491,11 @@ class FilesController < ApplicationController
     params[:include] = Array(params[:include])
     if read_allowed(@attachment, @current_user, session, params)
       json = attachment_json(@attachment, @current_user, {}, { include: params[:include], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) })
-      json.merge!(doc_preview_json(@attachment))
+
+      # Add canvadoc session URL if the file is unlocked
+      json.merge!(
+        doc_preview_json(@attachment, locked_for_user: json[:locked_for_user])
+      )
       render :json => json
     end
   end
@@ -631,12 +635,21 @@ class FilesController < ApplicationController
                            {}
                          end
 
-          [json[:attachment],
-           doc_preview_json(attachment),
-           attachment_json(attachment, @current_user, {}, json_include)].reduce(&:merge!)
+          json[:attachment].merge!(
+            attachment_json(attachment, @current_user, {}, json_include)
+          )
+
+          # Add canvadoc session URL if the file is unlocked
+          json[:attachment].merge!(
+            doc_preview_json(
+              attachment,
+              locked_for_user: json.dig(:attachment, :locked_for_user)
+            )
+          )
 
           log_asset_access(attachment, "files", "files")
         end
+
         render :json => json
       end
     end
