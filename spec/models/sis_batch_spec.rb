@@ -43,7 +43,7 @@ describe SisBatch do
             z.get_output_stream("csv_#{i}.csv") { |f| f.puts(dat) }
             i += 1
           end
-          z.get_output_stream("csv_#{i}.csv") {} if add_empty_file
+          z.get_output_stream("csv_#{i}.csv") { nil } if add_empty_file
         end
       end
 

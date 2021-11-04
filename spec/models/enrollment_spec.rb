@@ -856,7 +856,7 @@ describe Enrollment do
       describe '#find_score' do
         before(:each) do
           @course.update!(grading_standard_enabled: true)
-          allow(GradeCalculator).to receive(:recompute_final_score) {}
+          allow(GradeCalculator).to receive(:recompute_final_score)
           @enrollment.scores.create!(current_score: 85.3)
           @enrollment.scores.create!(grading_period: period, current_score: 99.1)
           @enrollment.scores.create!(assignment_group: a_group, current_score: 66.3)

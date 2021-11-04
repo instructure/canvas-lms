@@ -142,9 +142,6 @@ describe AssessmentQuestion do
     expect(serialized_data_before).to eq serialized_data_after
   end
 
-  it "does not modify the question_data hash in place when translating links" do
-  end
-
   it "does not drop non-string/array/hash data types when translate links" do
     bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
 

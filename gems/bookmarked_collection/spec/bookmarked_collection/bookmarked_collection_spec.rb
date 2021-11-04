@@ -170,7 +170,7 @@ describe "BookmarkedCollection" do
         @collection = BookmarkedCollection.merge(
           ['created', @created_collection],
           ['deleted', @deleted_collection]
-        ) do; end
+        ) { nil }
       end
 
       it "collapses duplicates" do

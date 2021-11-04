@@ -139,7 +139,7 @@ describe ActiveRecord::Base do
       include_examples "batches"
 
       it "raises an error when not in a transaction" do
-        expect { User.all.find_in_batches(strategy: :temp_table) {} }.to raise_error(ArgumentError)
+        expect { User.all.find_in_batches(strategy: :temp_table) { nil } }.to raise_error(ArgumentError)
       end
 
       it "finds all enrollments from course join" do
@@ -196,7 +196,7 @@ describe ActiveRecord::Base do
     context "with id" do
       it "raises an error when start is used with group" do
         expect do
-          Account.group(:id).find_each(strategy: :id, start: 0) {}
+          Account.group(:id).find_each(strategy: :id, start: 0) { nil }
         end.to raise_error(ArgumentError)
       end
     end
