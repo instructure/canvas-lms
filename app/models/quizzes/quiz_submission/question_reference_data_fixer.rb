@@ -123,7 +123,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
       # 1. the "id" must point to the assessment question's:
       next if question_data[:id] != question_data[:assessment_question_id]
 
-      qq = quiz_questions.detect do |qq|
+      quiz_question = quiz_questions.detect do |qq|
         qq.assessment_question_id == question_data[:assessment_question_id]
       end
 
@@ -132,21 +132,23 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
       # Otherwise, we simply need to link to it by rewriting the ID.
       #
       # a) Create the quiz question for *this* quiz if it doesn't exist:
-      aq = assessment_questions.detect { |aq| aq.id == question_data[:id] }
-      unless qq
-        qq = aq.create_quiz_question(quiz_id)
+      assessment_question = assessment_questions.detect do |aq|
+        aq.id == question_data[:id]
+      end
+      unless quiz_question
+        quiz_question = assessment_question.create_quiz_question(quiz_id)
 
         # track it for later if needed
-        quiz_questions.unshift(qq)
+        quiz_questions.unshift(quiz_question)
       end
 
       # b) Link to the QuizQuestion instead:
-      if qq.id != question_data[:id]
-        question_data[:id] = qq.id
+      if quiz_question.id != question_data[:id]
+        question_data[:id] = quiz_question.id
       end
 
       # keep track of id changes to fix submission_data
-      id_map[aq.id] = qq.id
+      id_map[assessment_question.id] = quiz_question.id
     end
 
     if quiz_submission.graded?

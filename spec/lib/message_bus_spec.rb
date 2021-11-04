@@ -67,12 +67,11 @@ describe MessageBus do
     topic_name = "lazily-created-topic-#{SecureRandom.hex(17)}"
     subscription_name = "subscription-#{SecureRandom.hex(5)}"
     call_count = 0
-    original_producer_for = MessageBus.method(:producer_for)
-    allow(MessageBus).to receive(:producer_for) do |namespace, topic_name|
+    allow(MessageBus).to receive(:producer_for).and_wrap_original do |original, namespace, topic|
       call_count += 1
       raise(::Pulsar::Error::Timeout, "Big Ops Fail") if call_count <= 1
 
-      original_producer_for.call(namespace, topic_name)
+      original.call(namespace, topic)
     end
     MessageBus.send_one_message(namespace, topic_name, { test_my_key: "test_my_val" }.to_json)
     MessageBus.production_worker.stop! # make sure we actually get through shipping the messages

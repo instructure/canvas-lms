@@ -525,23 +525,26 @@ class CoursesController < ApplicationController
     @current_enrollments = []
     @future_enrollments = []
 
+    completed_states = %i[completed rejected]
+    active_states = %i[active invited]
     all_enrollments.group_by { |e| [e.course_id, e.type] }.values.each do |enrollments|
-      e = enrollments.sort_by { |e| e.state_with_date_sortable }.first
+      first_enrollment = enrollments.min_by(&:state_with_date_sortable)
       if enrollments.count > 1
         # pick the last one so if all sections have "ended" it still shows up in past enrollments because dates are still terrible
-        e.course_section = enrollments.map(&:course_section).sort_by { |cs| cs.end_at || CanvasSort::Last }.last
-        e.readonly!
+        first_enrollment.course_section = enrollments.map(&:course_section).max_by { |cs| cs.end_at || CanvasSort::Last }
+        first_enrollment.readonly!
       end
 
-      state = e.state_based_on_date
-      if [:completed, :rejected].include?(state) ||
-         ([:active, :invited].include?(state) && e.section_or_course_date_in_past?) # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
-        @past_enrollments << e unless e.workflow_state == "invited"
-      elsif !e.hard_inactive?
-        if e.enrollment_state.pending? || state == :creation_pending || (e.admin? && e.course.start_at&.>(Time.now.utc))
-          @future_enrollments << e unless e.restrict_future_listing?
+      state = first_enrollment.state_based_on_date
+      if completed_states.include?(state) ||
+         (active_states.include?(state) && first_enrollment.section_or_course_date_in_past?) # strictly speaking, these enrollments are perfectly active but enrollment dates are terrible
+        @past_enrollments << first_enrollment unless first_enrollment.workflow_state == "invited"
+      elsif !first_enrollment.hard_inactive?
+        if first_enrollment.enrollment_state.pending? || state == :creation_pending ||
+           (first_enrollment.admin? && first_enrollment.course.start_at&.>(Time.now.utc))
+          @future_enrollments << first_enrollment unless first_enrollment.restrict_future_listing?
         elsif state != :inactive
-          @current_enrollments << e
+          @current_enrollments << first_enrollment
         end
       end
     end
@@ -3040,8 +3043,7 @@ class CoursesController < ApplicationController
         end
 
         if (mc_restrictions = params[:course][:blueprint_restrictions])
-          restrictions = Hash[mc_restrictions.to_unsafe_h.map { |k, v| [k.to_sym, value_to_boolean(v)] }]
-          template.default_restrictions = restrictions
+          template.default_restrictions = mc_restrictions.to_unsafe_h.map { |k, v| [k.to_sym, value_to_boolean(v)] }.to_h
         end
 
         if (mc_restrictions_by_type = params[:course][:blueprint_restrictions_by_object_type])

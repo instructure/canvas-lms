@@ -43,8 +43,8 @@ module Quizzes::LogAuditing
         # locate the most recent answer to this question (keep in mind that this
         # event set is sorted by created_at DESC):
         previous_events.each do |previous_event|
-          previous_answer = previous_event.answers.detect do |answer|
-            answer['quiz_question_id'] == question_id
+          previous_answer = previous_event.answers.detect do |a|
+            a['quiz_question_id'] == question_id
           end
 
           break unless previous_answer.nil?

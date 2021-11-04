@@ -180,7 +180,7 @@ describe "course people" do
       open_kyle_menu(@student)
       # when
       links = ff(".admin-links li a")
-      link = links.detect { |link| link.text.include?("User Details") }
+      link = links.detect { |l| l.text.include?("User Details") }
       href = link['href']
       link.click
       wait_for_ajaximations

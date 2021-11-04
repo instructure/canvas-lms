@@ -965,7 +965,7 @@ class Course < ActiveRecord::Base
         return [] unless allowed_role_ids.any?
 
         allowed_user_ids = Set.new
-        role_user_ids.each { |role_id, user_id| allowed_user_ids << user_id if allowed_role_ids.include?(role_id) }
+        role_user_ids.each { |role_id, u_id| allowed_user_ids << u_id if allowed_role_ids.include?(role_id) }
         User.where(:id => allowed_user_ids).to_a
       else
         User.where(:id => instructor_enrollment_scope.select(:id)).to_a

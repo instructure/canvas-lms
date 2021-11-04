@@ -122,9 +122,9 @@ class CourseLinkValidator
         (invalid_module_links[ct.context_module] ||= []) << invalid_link.merge(:link_text => ct.title)
       end
     end
-    invalid_module_links.each do |mod, invalid_module_links|
+    invalid_module_links.each do |mod, links|
       self.issues << { :name => mod.name, :type => :module,
-                       :content_url => "/courses/#{self.course.id}/modules#module_#{mod.id}" }.merge(:invalid_links => invalid_module_links)
+                       :content_url => "/courses/#{self.course.id}/modules#module_#{mod.id}" }.merge(:invalid_links => links)
     end
 
     progress.update_completion! 65

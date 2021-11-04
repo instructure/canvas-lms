@@ -2047,7 +2047,10 @@ describe Attachment do
         expect(actual_file).to receive(:read).twice { data.shift }
         expect(File).to receive(:open).and_yield(actual_file)
         expect_any_instance_of(@attachment.s3object.class).to receive(:get).with(include(:response_target))
-        @attachment.open { |data| expect(data).to eq "test"; callback = true }
+        @attachment.open do |d|
+          expect(d).to eq "test"
+          callback = true
+        end
         expect(callback).to eq true
       end
 

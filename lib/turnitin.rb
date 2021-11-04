@@ -202,9 +202,8 @@ module Turnitin
         raise "Unsupported submission type for turnitin integration: #{submission.submission_type}"
       end
 
-      responses.keys.each do |asset_string|
-        res = responses[asset_string]
-        responses[asset_string] = res.success? ? { object_id: res.returned_object_id } : res.error_hash
+      responses.transform_values! do |res|
+        res.success? ? { object_id: res.returned_object_id } : res.error_hash
       end
 
       responses

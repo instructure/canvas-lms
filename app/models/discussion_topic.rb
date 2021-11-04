@@ -502,10 +502,12 @@ class DiscussionTopic < ActiveRecord::Base
     return "read" unless current_user # default for logged out user
 
     uid = current_user.is_a?(User) ? current_user.id : current_user
-    dtp = discussion_topic_participants.loaded? ?
-      discussion_topic_participants.detect { |dtp| dtp.user_id == uid } :
-      discussion_topic_participants.where(user_id: uid).select(:workflow_state).first
-    dtp.try(:workflow_state) || "unread"
+    ws = if discussion_topic_participants.loaded?
+           discussion_topic_participants.detect { |dtp| dtp.user_id == uid }&.workflow_state
+         else
+           discussion_topic_participants.where(user_id: uid).pick(:workflow_state)
+         end
+    ws || "unread"
   end
 
   def read?(current_user = nil)
