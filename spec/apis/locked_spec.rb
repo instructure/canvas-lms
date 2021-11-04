@@ -27,7 +27,13 @@ shared_examples_for 'a locked api item' do
   end
 
   def verify_locked(*lock_info_extra)
+    prohibited_fields = %w(
+      canvadoc_session_url
+      crocodoc_session_url
+    )
+
     json = api_get_json
+
     expect(json).not_to be_nil
 
     expect(json['locked_for_user']).to be_truthy, "expected 'locked_for_user' to be true"
@@ -37,6 +43,8 @@ shared_examples_for 'a locked api item' do
     expect(lock_info).not_to be_nil, 'expected lock_info to be present'
     expect(lock_info['asset_string']).not_to be_nil, "expected lock_info to contain 'asset_string'"
     lock_info_extra.each { |attribute| expect(lock_info[attribute.to_s]).not_to be_nil, "expected lock_info to contain '#{attribute}'" }
+
+    expect(json.keys & prohibited_fields).to be_empty
   end
 
   before(:once) do
