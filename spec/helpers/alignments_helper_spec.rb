@@ -104,7 +104,7 @@ describe AlignmentsHelper do
 
   describe "outcome_alignment_tag" do
     context "without an alignment" do
-      let(:string) { outcome_alignment_tag(@course, outcome) {} }
+      let(:string) { outcome_alignment_tag(@course, outcome) { nil } }
       let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it "includes an id of 'alignment_blank'" do
@@ -127,7 +127,7 @@ describe AlignmentsHelper do
     end
 
     context "with an alignment" do
-      let(:string) { outcome_alignment_tag(@course, outcome, alignment) {} }
+      let(:string) { outcome_alignment_tag(@course, outcome, alignment) { nil } }
       let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it "includes an id of 'alignment_{id}'" do
@@ -151,7 +151,7 @@ describe AlignmentsHelper do
     end
 
     context "with a graded alignment" do
-      let(:string) { outcome_alignment_tag(@course, outcome, graded_alignment) {} }
+      let(:string) { outcome_alignment_tag(@course, outcome, graded_alignment) { nil } }
       let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it "includes html class 'also_assignment'" do
@@ -166,7 +166,7 @@ describe AlignmentsHelper do
                                    purpose: "grading"
                                  })
       }
-      let(:string) { outcome_alignment_tag(@course, outcome, graded_alignment) {} }
+      let(:string) { outcome_alignment_tag(@course, outcome, graded_alignment) { nil } }
       let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it "has html 'data-has-rubric-association' data attritbute" do

@@ -125,6 +125,6 @@ describe ProgressRunner do
     expect(@progress).to receive(:calculate_completion!).exactly(times_update).times
 
     progress_runner = ProgressRunner.new(@progress)
-    progress_runner.do_batch_update(ids) {}
+    progress_runner.do_batch_update(ids) { nil }
   end
 end

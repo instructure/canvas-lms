@@ -2618,7 +2618,7 @@ describe Course, "update_account_associations" do
 
   it "is reentrant" do
     Course.skip_updating_account_associations do
-      Course.skip_updating_account_associations {}
+      Course.skip_updating_account_associations { nil }
       expect(Course.skip_updating_account_associations?).to be_truthy
     end
   end

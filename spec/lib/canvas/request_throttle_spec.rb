@@ -444,7 +444,7 @@ describe 'RequestThrottle' do
         it "still tracks cost when disabled (for debugging)" do
           allow(RequestThrottle).to receive(:enabled?).and_return(false)
           expect(@bucket).to receive(:increment).twice
-          @bucket.reserve_capacity {}
+          @bucket.reserve_capacity { 0 }
         end
 
         it "will always be allowed when disabled, even with full bucket" do
