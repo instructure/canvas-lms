@@ -188,8 +188,7 @@ namespace :db do
 
   desc "generate data"
   task :generate_data => [:configure_default_settings, :load_notifications,
-                          :evaluate_notification_templates] do
-  end
+                          :evaluate_notification_templates]
 
   desc "Configure Default Account Name"
   task :configure_account_name => :load_environment do

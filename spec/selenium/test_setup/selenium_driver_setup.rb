@@ -488,7 +488,7 @@ module SeleniumDriverSetup
       # with our shared conn and transactional fixtures (e.g. special
       # accounts and their caching)
       @allow_requests = false
-      request_mutex.synchronize {}
+      request_mutex.synchronize { nil }
     end
 
     def allow_requests!

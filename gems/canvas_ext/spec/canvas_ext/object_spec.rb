@@ -23,7 +23,7 @@ require 'spec_helper'
 describe "Object#try_rescue" do
   it "returns nil when nil is the receiver" do
     expect(nil.try_rescue(:asdf)).to be_nil
-    expect(nil.try_rescue(:asdf) {}).to be_nil
+    expect(nil.try_rescue(:asdf) { nil }).to be_nil
   end
 
   it "calls the method" do

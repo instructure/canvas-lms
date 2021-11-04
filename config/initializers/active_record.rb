@@ -974,7 +974,7 @@ module UsefulFindInBatches
 
         if remaining > of
           begin
-            old_proc = connection.raw_connection.set_notice_processor {}
+            old_proc = connection.raw_connection.set_notice_processor { nil }
             index = if (select_values.empty? || select_values.any? { |v| v.to_s == primary_key.to_s }) && order_values.empty?
                       connection.execute(%{CREATE INDEX "temp_primary_key" ON #{connection.quote_local_table_name(table)}(#{connection.quote_column_name(primary_key)})})
                       primary_key.to_s
