@@ -1067,12 +1067,19 @@ describe "Files API", type: :request do
     end
 
     def should_be_locked(json)
+      prohibited_fields = %w(
+        canvadoc_session_url
+        crocodoc_session_url
+      )
+
       expect(json['url']).to eq ""
       expect(json['thumbnail_url']).to eq ""
       expect(json['hidden']).to be_truthy
       expect(json['hidden_for_user']).to be_truthy
       expect(json['locked_for_user']).to be_truthy
       expect(json['preview_url'].include?('verifier')).to be_falsey
+
+      expect(json.keys & prohibited_fields).to be_empty
     end
 
     it "is locked/hidden for a student" do
