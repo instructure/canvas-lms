@@ -47,6 +47,8 @@ Lint/DeprecatedClassMethods:
   Severity: error
 Lint/DeprecatedOpenSSLConstant:
   Severity: error
+Lint/DuplicateBranch:
+  Severity: error
 Lint/NonDeterministicRequireOrder:
   Severity: error
 Lint/ParenthesesAsGroupedExpression:

@@ -314,9 +314,7 @@ class CourseLinkValidator
       end
 
       case response.code
-      when /^2/ # 2xx code
-        true
-      when "401", "403", "429", "503"
+      when /^2/, "401", "403", "429", "503"
         # we accept unauthorized and forbidden codes here because sometimes servers refuse to serve our requests
         # and someone can link to a site that requires authentication anyway - doesn't necessarily make it invalid
         true

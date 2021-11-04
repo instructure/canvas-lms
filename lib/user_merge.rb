@@ -378,11 +378,11 @@ class UserMerge
       if from_user.shard != target_user.shard
         User.clone_communication_channel(source_cc, target_user, max_position)
       end
-    elsif target_cc.unconfirmed?
+    elsif target_cc.unconfirmed? # rubocop:disable Lint/DuplicateBranch
       # unconfirmed*, unconfirmed
       # retired, unconfirmed
       to_retire = source_cc
-    elsif source_cc.unconfirmed?
+    elsif source_cc.unconfirmed? # rubocop:disable Lint/DuplicateBranch
       # unconfirmed, retired
       # target_cc will not be able to be restored on split, but it is either unconfirmed or retired so nbd
       target_cc.destroy_permanently!

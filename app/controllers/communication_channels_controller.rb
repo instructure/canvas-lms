@@ -226,9 +226,9 @@ class CommunicationChannelsController < ApplicationController
     cc ||= @current_user && @current_user.communication_channels.unretired.where('path_type != ?', CommunicationChannel::TYPE_PUSH).find_by_confirmation_code(@nonce)
 
     @headers = false
-    if cc && cc.path_type == 'email' && !EmailAddressValidator.valid?(cc.path)
+    if !cc || (cc.path_type == 'email' && !EmailAddressValidator.valid?(cc.path))
       failed = true
-    elsif cc
+    else
       @communication_channel = cc
       @user = cc.user
       @enrollment = @user.enrollments.where(uuid: params[:enrollment], workflow_state: 'invited').first if params[:enrollment].present?
@@ -421,8 +421,6 @@ class CommunicationChannelsController < ApplicationController
           return # render
         end
       end
-    else
-      failed = true
     end
 
     if failed

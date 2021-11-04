@@ -2115,7 +2115,7 @@ class Attachment < ActiveRecord::Base
       elsif attachment.context.respond_to?(:submissions_folder)
         # if it's not in a submissions folder, or has previously been submitted, we need to make a copy
         attachment.copy_to_folder!(attachment.context.submissions_folder(assignment_context))
-      else
+      else # rubocop:disable Lint/DuplicateBranch
         attachment # in a weird context; leave it alone
       end
     end
