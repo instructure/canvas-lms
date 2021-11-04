@@ -98,4 +98,26 @@ describe "dashboard" do
       expect(f("#content")).not_to contain_css('#planner-todosidebar-item-list')
     end
   end
+
+  context "as an observer" do
+    before :once do
+      Account.site_admin.enable_feature!(:k5_parent_support)
+      course_with_student(active_all: true)
+      @student = @user
+      @observer = user_factory(active_all: true)
+      @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
+      assignment_model(due_at: 2.days.from_now, course: @course, submission_types: 'online_text_entry', name: 'Todo for observer')
+    end
+
+    before :each do
+      user_session(@observer)
+    end
+
+    it "renders classic todos for observers, even with planner enabled" do
+      get "/"
+      wait_for_ajaximations
+
+      expect(f('.right-side-list.events .event-details__title')).to include_text('Todo for observer')
+    end
+  end
 end
