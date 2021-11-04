@@ -1083,8 +1083,8 @@ class DiscussionTopicsController < ApplicationController
       f.id = polymorphic_url([@context, :discussion_topics])
     end
     @entries = []
-    @entries.concat @context.discussion_topics
-                            .select { |dt| dt.visible_for?(@current_user) }
+    @entries.concat(@context.discussion_topics
+                            .select { |dt| dt.visible_for?(@current_user) })
     @entries.concat @context.discussion_entries.active
     @entries = @entries.sort_by { |e| e.updated_at }
     @entries.each do |entry|

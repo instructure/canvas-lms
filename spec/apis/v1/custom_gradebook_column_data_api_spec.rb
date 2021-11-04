@@ -106,9 +106,9 @@ describe CustomGradebookColumnDataApiController, type: :request do
                       course_id: @course.to_param, id: @col.to_param, action: "index",
                       controller: "custom_gradebook_column_data_api", format: "json"
       expect(response).to be_successful
-      expect(json).to match_array @col.custom_gradebook_column_data.map { |d|
+      expect(json).to match_array(@col.custom_gradebook_column_data.map do |d|
         custom_gradebook_column_datum_json(d, @user, session)
-      }
+      end)
     end
 
     it 'can paginate' do

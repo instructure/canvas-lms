@@ -463,8 +463,8 @@ describe CoursesController, type: :request do
 
   before :each do
     @course_dates_stubbed = true
-    allow_any_instance_of(Course).to receive(:start_at).and_wrap_original { |original| original.call unless @course_dates_stubbed }
-    allow_any_instance_of(Course).to receive(:end_at).and_wrap_original { |original| original.call unless @course_dates_stubbed }
+    allow_any_instance_of(Course).to(receive(:start_at).and_wrap_original { |original| original.call unless @course_dates_stubbed })
+    allow_any_instance_of(Course).to(receive(:end_at).and_wrap_original { |original| original.call unless @course_dates_stubbed })
   end
 
   describe "observer viewing a course" do
@@ -2894,8 +2894,8 @@ describe CoursesController, type: :request do
 
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
                       { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
-      expect(json.sort_by { |x| x["id"] }).to eq api_json_response([first_user, new_user],
-                                                                   :only => user_api_fields).sort_by { |x| x["id"] }
+      expect(json.sort_by { |x| x["id"] }).to eq(api_json_response([first_user, new_user],
+                                                                   :only => user_api_fields).sort_by { |x| x["id"] })
     end
 
     it "does not include user sis id or login id for non-admins" do
@@ -2962,8 +2962,8 @@ describe CoursesController, type: :request do
 
       json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011/students.json",
                       { :controller => 'courses', :action => 'students', :course_id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' })
-      expect(json.sort_by { |x| x["id"] }).to eq api_json_response([first_user, new_user],
-                                                                   :only => user_api_fields).sort_by { |x| x["id"] }
+      expect(json.sort_by { |x| x["id"] }).to eq(api_json_response([first_user, new_user],
+                                                                   :only => user_api_fields).sort_by { |x| x["id"] })
 
       @course2.enroll_teacher(@user).accept!
       ro.destroy
@@ -3088,7 +3088,7 @@ describe CoursesController, type: :request do
             :only => user_api_fields
           )
 
-        expect(sorted_users).to eq expected_users.sort_by { |x| x["id"] }
+        expect(sorted_users).to eq(expected_users.sort_by { |x| x["id"] })
       end
 
       it "respects limit option (as pagination)" do
@@ -3199,10 +3199,10 @@ describe CoursesController, type: :request do
       it "returns a list of users" do
         json = api_call(:get, api_url, api_route)
         expected_users = @course1.users.to_a.uniq - [@test_student]
-        expect(json.sort_by { |x| x["id"] }).to eq api_json_response(
+        expect(json.sort_by { |x| x["id"] }).to eq(api_json_response(
           expected_users,
           only: user_api_fields
-        ).sort_by { |x| x["id"] }
+        ).sort_by { |x| x["id"] })
       end
 
       it 'does not include the sis_user_id when not an admin' do
@@ -3231,10 +3231,10 @@ describe CoursesController, type: :request do
                           user_ids: expected_users.map(&:id),
                           format: 'json'
                         })
-        expect(json.sort_by { |x| x["id"] }).to eq api_json_response(
+        expect(json.sort_by { |x| x["id"] }).to eq(api_json_response(
           expected_users,
           only: user_api_fields
-        ).sort_by { |x| x["id"] }
+        ).sort_by { |x| x["id"] })
       end
 
       it "excludes the test student by default" do
@@ -3578,8 +3578,8 @@ describe CoursesController, type: :request do
         json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' },
                         :enrollment_type => 'student')
-        expect(json.sort_by { |x| x["id"] }).to eq api_json_response([first_user, new_user],
-                                                                     :only => user_api_fields).sort_by { |x| x["id"] }
+        expect(json.sort_by { |x| x["id"] }).to eq(api_json_response([first_user, new_user],
+                                                                     :only => user_api_fields).sort_by { |x| x["id"] })
 
         @course2.enroll_teacher(@user).accept!
         ro.destroy

@@ -31,7 +31,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
     end
 
     def test_builder(enrollment, res)
-      expect(Canvas::Builders::EnrollmentDateBuilder.build(enrollment).map { |d| d.map(&:to_i) }).to eq res.map { |d| d.map(&:to_i) }
+      expect(Canvas::Builders::EnrollmentDateBuilder.build(enrollment).map { |d| d.map(&:to_i) }).to eq(res.map { |d| d.map(&:to_i) })
     end
 
     context "has enrollment dates from enrollment" do

@@ -151,11 +151,11 @@ describe Types::CourseType do
           course_type.resolve(<<~GQL, current_user: @student)
             assignmentsConnection(filter: {gradingPeriodId: null}) { edges { node { _id } } }
           GQL
-        ).to eq [
+        ).to eq([
           other_ag_assignment,
           @term2_assignment1,
           @term1_assignment1,
-        ].map { |a| a.id.to_s }
+        ].map { |a| a.id.to_s })
       end
     end
   end

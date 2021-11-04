@@ -1476,7 +1476,7 @@ describe 'Submissions API', type: :request do
          "late_policy_status" => nil,
          "seconds_late" => 0,
          "points_deducted" => nil }]
-    expect(json.sort_by { |h| h['user_id'] }).to eql res.sort_by { |h| h['user_id'] }
+    expect(json.sort_by { |h| h['user_id'] }).to eql(res.sort_by { |h| h['user_id'] })
   end
 
   it "paginates submissions" do

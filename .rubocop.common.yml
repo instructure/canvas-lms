@@ -31,6 +31,12 @@ Layout:
 Layout/LineLength:
   Enabled: false # TODO. Maybe.
 
+Lint/AmbiguousBlockAssociation:
+  IgnoredMethods:
+    - change
+    - not_change
+    - raise_error
+  Severity: error
 Lint/AmbiguousOperator:
   Severity: error
 Lint/AmbiguousOperatorPrecedence:
@@ -171,12 +177,6 @@ Style/WhileUntilModifier:
 
 # the following cops are currently silenced, but we may want to enable them IF
 # we correct all instances in the codebase first
-
-Lint/AmbiguousBlockAssociation: # TODO
-  IgnoredMethods:
-    - change
-    - not_change
-    - raise_error
 
 Naming/VariableNumber: # TODO
   Enabled: false

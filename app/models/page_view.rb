@@ -286,7 +286,7 @@ class PageView < ActiveRecord::Base
     changes_applied
   end
 
-  scope :for_context, proc { |ctx| where(:context_type => ctx.class.name, :context_id => ctx) }
+  scope :for_context, ->(ctx) { where(context_type: ctx.class.name, context_id: ctx) }
   scope :for_users, lambda { |users| where(:user_id => users) }
 
   def self.pv4_client
