@@ -179,7 +179,7 @@ describe "Outcomes Import API", type: :request do
         end
 
         it "includes the United Kingdom" do
-          expect(available_json).to be_any { |j| j["title"] == "UK Department for Education" }
+          expect(available_json.any? { |j| j["title"] == "UK Department for Education" }).to be true
         end
 
         it "includes the common core standards" do

@@ -37,7 +37,7 @@ describe "Importing modules" do
         expect(context.context_modules.count).to eq 1
 
         mod = ContextModule.where(migration_id: data[:migration_id]).first
-        expect(mod.content_tags.count).to eq data[:items].count { |m| m[:linked_resource_type] == 'URL_TYPE' }
+        expect(mod.content_tags.count).to eq(data[:items].count { |m| m[:linked_resource_type] == 'URL_TYPE' })
         expect(mod.name).to eq data[:title]
       end
     end

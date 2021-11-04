@@ -29,26 +29,26 @@ describe Types::RubricRatingType do
   it 'works' do
     expect(
       rubric_type.resolve('criteria { ratings { _id } }')
-    ).to eq rubric.criteria.map { |c| c[:ratings].map { |r| r[:id].to_s } }
+    ).to eq(rubric.criteria.map { |c| c[:ratings].pluck(:id).map(&:to_s) })
   end
 
   describe 'works for the field' do
     it 'description' do
       expect(
         rubric_type.resolve('criteria { ratings { description } }')
-      ).to eq rubric.criteria.map { |c| c[:ratings].map { |r| r[:description] } }
+      ).to eq(rubric.criteria.map { |c| c[:ratings].pluck(:description) })
     end
 
     it 'long_description' do
       expect(
         rubric_type.resolve('criteria { ratings { longDescription } }')
-      ).to eq rubric.criteria.map { |c| c[:ratings].map { |r| r[:long_description] } }
+      ).to eq(rubric.criteria.map { |c| c[:ratings].pluck(:long_description) })
     end
 
     it 'points' do
       expect(
         rubric_type.resolve('criteria { ratings { points } }')
-      ).to eq rubric.criteria.map { |c| c[:ratings].map { |r| r[:points] } }
+      ).to eq(rubric.criteria.map { |c| c[:ratings].pluck(:points) })
     end
   end
 end

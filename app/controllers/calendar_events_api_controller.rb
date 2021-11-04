@@ -1110,7 +1110,7 @@ class CalendarEventsApiController < ApplicationController
     if codes
       # add publicly accessible courses to the selected contexts
       @contexts ||= []
-      pertinent_context_codes = Set.new @contexts.map { |c| c.asset_string }
+      pertinent_context_codes = Set.new(@contexts.map(&:asset_string))
 
       codes.each do |c|
         unless pertinent_context_codes.include?(c)

@@ -142,7 +142,7 @@ describe Rubric do
             @rubric.reload.update_mastery_scales
 
             rubric_criterion = @rubric.criteria_object.first
-            expect(rubric_criterion.ratings.map(&:description)).to eq OutcomeProficiency.default_ratings.map { |r| r[:description] }
+            expect(rubric_criterion.ratings.map(&:description)).to eq OutcomeProficiency.default_ratings.pluck(:description)
           end
         end
 

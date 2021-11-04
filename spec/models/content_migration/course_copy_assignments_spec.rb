@@ -641,7 +641,7 @@ describe ContentMigration do
         expect(@copy_to.assignments.count).to eq 0
         expect(@copy_to.quizzes.count).to eq 0
         expect(@copy_to.discussion_topics.count).to eq 0
-        expect(@cm.content_export.error_messages.sort).to eq warnings.sort.map { |w| [w, nil] }
+        expect(@cm.content_export.error_messages.sort).to eq(warnings.sort.map { |w| [w, nil] })
       end
 
       it "does not mark assignment as copied if not set to be frozen" do

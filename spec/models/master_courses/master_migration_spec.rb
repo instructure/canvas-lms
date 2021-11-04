@@ -571,7 +571,7 @@ describe MasterCourses::MasterMigration do
       expect(copied_answers.values.flatten.all? { |a| a["id"] != 0 }).to be_truthy
       q.quiz_questions.each do |qq|
         qq_to = q_to.quiz_questions.where(:migration_id => mig_id(qq)).first
-        expect(copied_answers[qq_to.id].map { |a| a["id"].to_i }).to eq qq.question_data["answers"].map { |a| a["id"].to_i }
+        expect(copied_answers[qq_to.id].map { |a| a["id"].to_i }).to eq(qq.question_data["answers"].map { |a| a["id"].to_i })
       end
 
       Quizzes::Quiz.where(:id => q).update_all(:updated_at => 1.minute.from_now) # recopy

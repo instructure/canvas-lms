@@ -3273,9 +3273,9 @@ class CoursesController < ApplicationController
     @entries = []
     @entries.concat Assignments::ScopedToUser.new(@context, @current_user, @context.assignments.published).scope
     @entries.concat @context.calendar_events.active
-    @entries.concat DiscussionTopic::ScopedToUser.new(@context, @current_user, @context.discussion_topics.published).scope.select { |dt|
-      !dt.locked_for?(@current_user, :check_policies => true)
-    }
+    @entries.concat(DiscussionTopic::ScopedToUser.new(@context, @current_user, @context.discussion_topics.published).scope.reject do |dt|
+      dt.locked_for?(@current_user, :check_policies => true)
+    end)
     @entries.concat WikiPages::ScopedToUser.new(@context, @current_user, @context.wiki_pages.published).scope
     @entries = @entries.sort_by { |e| e.updated_at }
     @entries.each do |entry|
