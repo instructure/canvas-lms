@@ -86,7 +86,6 @@ const ignoredErrors = [
   /The prop `id` is marked as required in `(CanvasSelectOption|ColHeader|DashboardCard|FormField|Option)`/,
   /The prop `isLoading` is marked as required in `LoadingWrapper`/,
   /The prop `label` is marked as required in `(CanvasInstUIModal|FormField|FormFieldLayout|Modal)`/,
-  /The prop `name` is marked as required in `Avatar`/,
   /The prop `rcsProps.canUploadFiles` is marked as required in `ForwardRef`/,
   /The prop `renderLabel` is marked as required in `(FileDrop|NumberInput|Select)`/,
   /The prop `rootId` is marked as required in `GroupSelectionDrillDown`/,
