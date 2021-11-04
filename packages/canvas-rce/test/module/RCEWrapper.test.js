@@ -1232,6 +1232,18 @@ describe('RCEWrapper', () => {
         assert.deepStrictEqual(mergePlugins(a, b), result)
       })
     })
+
+    describe('configures menus', () => {
+      it('includes instructure_media in plugins if not instRecordDisabled', () => {
+        const instance = createBasicElement({instRecordDisabled: false})
+        assert.ok(instance.tinymceInitOptions.plugins.includes('instructure_record'))
+      })
+
+      it('removes instructure_media from plugins if instRecordDisabled is set', () => {
+        const instance = createBasicElement({instRecordDisabled: true})
+        assert.ok(!instance.tinymceInitOptions.plugins.includes('instructure_record'))
+      })
+    })
   })
 
   describe('lti tool favorites', () => {
