@@ -20,15 +20,11 @@
 require_relative '../../../spec_helper'
 
 describe "Api::V1::Pseudonym" do
-  class Harness
-    include Api::V1::Pseudonym
-  end
-
   describe "#pseudonym_json" do
     let(:pseudonym) { Pseudonym.new(account: Account.default) }
     let(:session) { {} }
     let(:user) { User.new }
-    let(:api) { Harness.new }
+    let(:api) { Class.new { include Api::V1::Pseudonym }.new }
 
     it "includes the authentication_provider_type if there is one" do
       aac = AuthenticationProvider.new(auth_type: "ldap")

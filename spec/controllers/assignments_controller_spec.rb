@@ -2094,18 +2094,11 @@ describe AssignmentsController do
 
       before(:each) do
         @assignment.update!(annotatable_attachment: @attachment)
-        Account.site_admin.enable_feature!(:annotated_document_submissions)
         user_session(@teacher)
       end
 
       it 'is not present when the assignment is not annotatable' do
         @assignment.update!(annotatable_attachment: nil)
-        get :edit, params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env]).not_to have_key(:ANNOTATED_DOCUMENT)
-      end
-
-      it 'is not present when the feature flag is not enabled' do
-        Account.site_admin.disable_feature!(:annotated_document_submissions)
         get :edit, params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env]).not_to have_key(:ANNOTATED_DOCUMENT)
       end
@@ -2128,22 +2121,6 @@ describe AssignmentsController do
       it 'contains the attachment context_id when the assignment is annotatable' do
         get :edit, params: { course_id: @course.id, id: @assignment.id }
         expect(assigns[:js_env][:ANNOTATED_DOCUMENT][:context_id]).to eq @attachment.context_id
-      end
-    end
-
-    describe 'js_env ANNOTATED_DOCUMENT_SUBMISSIONS' do
-      it "sets FLAGS/annotated_document_submissions in js_env as true if enabled" do
-        user_session(@teacher)
-        Account.site_admin.enable_feature!(:annotated_document_submissions)
-        get 'edit', params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:ANNOTATED_DOCUMENT_SUBMISSIONS]).to eq(true)
-      end
-
-      it "sets FLAGS/annotated_document_submissions in js_env as false if disabled" do
-        user_session(@teacher)
-        Account.site_admin.disable_feature!(:annotated_document_submissions)
-        get 'edit', params: { course_id: @course.id, id: @assignment.id }
-        expect(assigns[:js_env][:ANNOTATED_DOCUMENT_SUBMISSIONS]).to eq(false)
       end
     end
 

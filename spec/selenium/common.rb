@@ -61,6 +61,17 @@ module SeleniumDependencies
   include LoginAndSessionMethods
 end
 
+# synchronize db connection methods for a modicum of thread safety
+module SynchronizeConnection
+  %w{cache_sql execute exec_cache exec_no_cache query transaction}.each do |method|
+    class_eval <<~RUBY, __FILE__, __LINE__ + 1
+      def #{method}(*)                                           # def execute(*)
+        SeleniumDriverSetup.request_mutex.synchronize { super }  #   SeleniumDriverSetup.request_mutex.synchronize { super }
+      end                                                        # end
+    RUBY
+  end
+end
+
 shared_context "in-process server selenium tests" do
   include SeleniumDependencies
 
@@ -109,17 +120,6 @@ shared_context "in-process server selenium tests" do
 
     allow(HostUrl).to receive(:default_host).and_return(app_host_and_port)
     allow(HostUrl).to receive(:file_host).and_return(app_host_and_port)
-  end
-
-  # synchronize db connection methods for a modicum of thread safety
-  module SynchronizeConnection
-    %w{cache_sql execute exec_cache exec_no_cache query transaction}.each do |method|
-      class_eval <<-RUBY, __FILE__, __LINE__ + 1
-        def #{method}(*)
-          SeleniumDriverSetup.request_mutex.synchronize { super }
-        end
-      RUBY
-    end
   end
 
   before(:all) do

@@ -411,7 +411,7 @@ describe Context do
 
   describe "resolved_root_account_id" do
     it 'calls root_account_id if present' do
-      class HasRootAccountId
+      klass = Class.new do
         include Context
 
         def root_account_id
@@ -419,15 +419,13 @@ describe Context do
         end
       end
 
-      expect(HasRootAccountId.new.resolved_root_account_id).to eq 99
+      expect(klass.new.resolved_root_account_id).to eq 99
     end
 
     it 'returns nil if root_account_id not present' do
-      class DoesntHaveRootAccountId
-        include Context
-      end
+      klass = Class.new { include Context }
 
-      expect(DoesntHaveRootAccountId.new.resolved_root_account_id).to eq nil
+      expect(klass.new.resolved_root_account_id).to eq nil
     end
   end
 end

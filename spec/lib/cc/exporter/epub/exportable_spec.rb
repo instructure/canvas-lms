@@ -20,19 +20,21 @@
 require_relative '../../cc_spec_helper'
 
 describe "Exportable" do
-  class ExportableTest
-    include CC::Exporter::Epub::Exportable
+  let(:klass) do
+    Class.new do
+      include CC::Exporter::Epub::Exportable
 
-    def attachment
-      @_attachment ||= Attachment.create({
-                                           context: Course.create,
-                                           filename: 'exortable-test-file',
-                                           uploaded_data: File.open(cartridge_path)
-                                         })
-    end
+      def attachment
+        @attachment ||= Attachment.create({
+                                            context: Course.create,
+                                            filename: 'exportable-test-file',
+                                            uploaded_data: File.open(cartridge_path)
+                                          })
+      end
 
-    def cartridge_path
-      File.join(File.dirname(__FILE__), "/../../../../fixtures/migration/unicode-filename-test-export.imscc")
+      def cartridge_path
+        File.join(File.dirname(__FILE__), "/../../../../fixtures/migration/unicode-filename-test-export.imscc")
+      end
     end
   end
 
@@ -42,7 +44,7 @@ describe "Exportable" do
     end
 
     before do
-      @epub_export = ExportableTest.new.convert_to_epub
+      @epub_export = klass.new.convert_to_epub
     end
 
     let(:epub_path) do

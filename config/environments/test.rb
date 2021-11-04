@@ -24,7 +24,12 @@ environment_configuration(defined?(config) && config) do |config|
   # test suite.  You never need to work with it otherwise.  Remember that
   # your test database is "scratch space" for the test suite and is wiped
   # and recreated between test runs.  Don't rely on the data there!
-  config.cache_classes = true
+  # In local development we usually want this unset or set to '0' because
+  # we want spring to be able to reload classes between
+  # spec runs, but this is expensive when running all the
+  # specs for the build, so this ENV var can be provided by
+  # any harness to turn class caching on for performance.
+  config.cache_classes = (ENV.fetch("TEST_CACHE_CLASSES", "0") == "1")
 
   # Show formatted error reports and disable caching
   config.consider_all_requests_local = false

@@ -39,12 +39,11 @@ describe Quizzes::QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
     }.with_indifferent_access
   end
 
-  Util = Quizzes::QuizQuestion::AnswerSerializers::Util
-
   # needed for auto specs
   def sanitize(answer_hash)
     answer_hash.each_pair do |variable, answer_text|
-      answer_hash[variable] = Util.sanitize_text(answer_text)
+      answer_hash[variable] =
+        Quizzes::QuizQuestion::AnswerSerializers::Util.sanitize_text(answer_text)
     end
 
     answer_hash

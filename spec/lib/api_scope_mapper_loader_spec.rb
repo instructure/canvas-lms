@@ -30,6 +30,7 @@ describe ApiScopeMapperLoader do
     end
 
     it "loads the api_scope_mapper_fallback if the file is not present" do
+      skip("interop-7144")
       allow(File).to receive(:exist?).and_return(false)
       api_scope_mapper = ApiScopeMapperLoader.load
       expect(api_scope_mapper.name_for_resource(resource)).to eq resource

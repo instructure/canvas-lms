@@ -72,7 +72,7 @@ describe NotificationPolicy do
                          :subject => "Hello",
                          :category => "TestImmediately"
     allow_any_instance_of(Message).to receive(:get_template).and_return("here's a free id <%= data.course_id %>")
-    class DataTest < ActiveRecord::Base
+    klass = Class.new(ActiveRecord::Base) do
       self.table_name = :courses
 
       has_a_broadcast_policy
@@ -95,10 +95,10 @@ describe NotificationPolicy do
         Account.default
       end
     end
-    dt = DataTest.new(account_id: Account.default.id,
-                      root_account_id: Account.default.id,
-                      enrollment_term_id: Account.default.default_enrollment_term.id,
-                      workflow_state: 'created')
+    dt = klass.new(account_id: Account.default.id,
+                   root_account_id: Account.default.id,
+                   enrollment_term_id: Account.default.default_enrollment_term.id,
+                   workflow_state: 'created')
     dt.save!
     msg = dt.messages_sent["Hello"].find { |m| m.to == "blarg@example.com" }
     expect(msg).not_to be_nil

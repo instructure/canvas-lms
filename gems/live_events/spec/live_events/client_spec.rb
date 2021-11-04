@@ -31,48 +31,39 @@ describe LiveEvents::Client do
                                                              })
   end
 
-  class FakeStreamClient
-    attr_accessor :data, :stream, :stream_name
+  let(:fake_stream_client_class) do
+    Class.new do
+      attr_accessor :data, :stream, :stream_name
 
-    def initialize(stream_name = 'stream')
-      @stream_name = stream_name
-    end
+      def initialize(stream_name = 'stream')
+        @stream_name = stream_name
+      end
 
-    def put_records(stream_name:, records:)
-      @data = records
-      @stream = stream_name
-    end
-  end
-
-  class LELogger
-    def info(data)
-      data
-    end
-
-    def error(data)
-      data
-    end
-
-    def warn(data)
-      data
+      def put_records(stream_name:, records:)
+        @data = records
+        @stream = stream_name
+      end
     end
   end
 
   let(:test_stream_name) { 'my_stream' }
-  let(:fclient) { FakeStreamClient.new(test_stream_name) }
+  let(:fclient) { fake_stream_client_class.new(test_stream_name) }
 
   def prep_client_and_worker
     stub_config
-    LiveEvents.logger = LELogger.new
+    allow(LiveEvents).to receive(:logger).and_return(double(info: nil, error: nil, warn: nil))
     LiveEvents.max_queue_size = -> { 100 }
-    LiveEvents.stream_client = fclient
+    allow(LiveEvents).to receive(:stream_client).and_return(fclient)
     LiveEvents.clear_context!
 
     @client = LiveEvents::Client.new nil, fclient, test_stream_name
+    allow(LiveEvents).to receive(:client).and_return(@client)
+    LiveEvents.worker.stop!
     LiveEvents.worker.start!
   end
 
-  def expect_put_records(payload, stream_client = LiveEvents.stream_client)
+  def expect_put_records(payload, stream_client = nil)
+    stream_client ||= LiveEvents.stream_client
     expect(stream_client.data.size).to eq(payload.size)
     expect(JSON.parse(stream_client.data.first[:data])).to eq(payload.first[:data])
     expect(stream_client.data.first[:partition_key]).to eq(payload.first[:partition_key])
@@ -82,13 +73,14 @@ describe LiveEvents::Client do
   describe ".aws_config" do
     before { prep_client_and_worker }
 
+    after { LiveEvents.worker.stop! }
+
     it "parses the endpoint correctly" do
       res = LiveEvents::Client.aws_config({
                                             "aws_endpoint" => "http://example.com:6543/"
                                           })
 
       expect(res[:endpoint]).to eq("http://example.com:6543/")
-      LiveEvents.worker.stop!
     end
 
     it "ignores invalid endpoints" do
@@ -97,7 +89,6 @@ describe LiveEvents::Client do
                                           })
 
       expect(res.key?(:endpoint)).to eq false
-      LiveEvents.worker.stop!
     end
 
     it "loads custom creds" do
@@ -111,12 +102,12 @@ describe LiveEvents::Client do
                                           })
 
       expect(res[:credentials]).to eq('a_value')
-      LiveEvents.worker.stop!
     end
   end
 
   describe ".config" do
     subject { LiveEvents::Client.config }
+
     before { allow(LiveEvents).to receive(:settings).and_return(settings) }
 
     let(:settings) do
@@ -163,6 +154,8 @@ describe LiveEvents::Client do
 
   describe "post_event" do
     before { prep_client_and_worker }
+
+    after { LiveEvents.worker.stop! }
 
     it "calls put_records on the kinesis stream" do
       now = Time.now
@@ -232,6 +225,8 @@ describe LiveEvents::Client do
   describe "LiveEvents helper" do
     before { prep_client_and_worker }
 
+    after { LiveEvents.worker.stop! }
+
     it "sets context info via set_context and send it with events" do
       LiveEvents.set_context({ user_id: 123 })
 
@@ -290,9 +285,6 @@ describe LiveEvents::Client do
       let(:test_stream_name) { 'custom_stream_name' }
 
       it "uses custom stream client when defined" do
-        fake_stream_client = FakeStreamClient.new test_stream_name
-        LiveEvents.stream_client = fake_stream_client
-
         now = Time.now # rubocop:disable Rails/SmartTimeZone
 
         LiveEvents.post_event(
@@ -313,7 +305,7 @@ describe LiveEvents::Client do
             },
             partition_key: 'pkey'
           }],
-          fake_stream_client
+          fclient
         )
       end
     end

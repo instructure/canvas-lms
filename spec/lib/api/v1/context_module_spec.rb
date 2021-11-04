@@ -18,36 +18,36 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Api::V1::ContextModule do
-  class Dummy
-    include Api::V1::ContextModule
+  let(:dummy_class) do
+    Class.new do
+      include Api::V1::ContextModule
 
-    def request
-      @request
-    end
+      attr_reader :request
 
-    def initialize(request)
-      @request = request
-    end
-
-    def value_to_boolean(object)
-      return true if object
-    end
-
-    def course_context_modules_item_redirect_url(opts = {})
-      "course_context_modules_item_redirect_url(:course_id => #{opts[:course_id]}, :id => #{opts[:id]}, :host => HostUrl.context_host(Course.find(#{opts[:course_id]}))"
-    end
-
-    def api_v1_course_external_tool_sessionless_launch_url(context)
-      if context.context_module_tags != [] && context.context_module_tags.first.url
-        return context.context_module_tags.first.url
+      def initialize(request)
+        @request = request
       end
 
-      context.context_external_tools.first.url
+      def value_to_boolean(object)
+        return true if object
+      end
+
+      def course_context_modules_item_redirect_url(opts = {})
+        "course_context_modules_item_redirect_url(:course_id => #{opts[:course_id]}, :id => #{opts[:id]}, :host => HostUrl.context_host(Course.find(#{opts[:course_id]}))"
+      end
+
+      def api_v1_course_external_tool_sessionless_launch_url(context)
+        if context.context_module_tags != [] && context.context_module_tags.first.url
+          return context.context_module_tags.first.url
+        end
+
+        context.context_external_tools.first.url
+      end
     end
   end
 
   describe "#module_item_json" do
-    subject { Dummy.new(double(params: { frame_external_urls: 'http://www.instructure.com' })) }
+    subject { dummy_class.new(double(params: { frame_external_urls: 'http://www.instructure.com' })) }
 
     before do
       course_with_teacher(account: Account.default)

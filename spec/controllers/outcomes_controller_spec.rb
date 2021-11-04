@@ -306,8 +306,8 @@ describe OutcomesController do
   end
 
   describe "POST 'create'" do
-    before :once do
-      OUTCOME_PARAMS = {
+    let(:outcome_params) do
+      {
         :description => "A long description",
         :short_description => "A short description"
       }
@@ -322,13 +322,13 @@ describe OutcomesController do
     it "does not let a student create a outcome" do
       user_session(@student)
       post 'create', params: { :course_id => @course.id,
-                               :learning_outcome => { :short_description => TEST_STRING } }
+                               :learning_outcome => { :short_description => "a" } }
       assert_unauthorized
     end
 
     it "allows creating a new outcome with the root group" do
       user_session(@teacher)
-      post 'create', params: { :course_id => @course.id, :learning_outcome => OUTCOME_PARAMS }
+      post 'create', params: { :course_id => @course.id, :learning_outcome => outcome_params }
       expect(response).to be_redirect
       expect(assigns[:outcome]).not_to be_nil
       expect(assigns[:outcome][:description]).to eql("A long description")
@@ -354,7 +354,7 @@ describe OutcomesController do
       expect(outcome_group).not_to be_nil
 
       post 'create', params: { :course_id => @course.id, :learning_outcome_group_id => outcome_group.id,
-                               :learning_outcome => OUTCOME_PARAMS }
+                               :learning_outcome => outcome_params }
       expect(response).to be_redirect
       expect(assigns[:outcome]).not_to be_nil
       expect(assigns[:outcome][:description]).to eql("A long description")
@@ -370,7 +370,7 @@ describe OutcomesController do
   end
 
   describe "PUT 'update'" do
-    TEST_STRING = "Some test String"
+    let(:test_string) { "Some test string" }
 
     before :each do
       course_outcome
@@ -378,23 +378,23 @@ describe OutcomesController do
 
     it "requires authorization" do
       put 'update', params: { :course_id => @course.id, :id => @outcome.id,
-                              :learning_outcome => { :short_description => TEST_STRING } }
+                              :learning_outcome => { :short_description => test_string } }
       assert_unauthorized
     end
 
     it "does not let a student update the outcome" do
       user_session(@student)
       put 'update', params: { :course_id => @course.id, :id => @outcome.id,
-                              :learning_outcome => { :short_description => TEST_STRING } }
+                              :learning_outcome => { :short_description => test_string } }
       assert_unauthorized
     end
 
     it "allows updating the outcome" do
       user_session(@teacher)
       put 'update', params: { :course_id => @course.id, :id => @outcome.id,
-                              :learning_outcome => { :short_description => TEST_STRING } }
+                              :learning_outcome => { :short_description => test_string } }
       @outcome.reload
-      expect(@outcome[:short_description]).to eql TEST_STRING
+      expect(@outcome[:short_description]).to eql test_string
     end
   end
 

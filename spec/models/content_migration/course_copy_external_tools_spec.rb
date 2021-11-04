@@ -21,7 +21,7 @@ require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "course copy external tools" do
-    include_examples "course copy"
+    include_context "course copy"
 
     before :once do
       @tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :custom_fields => { 'a' => '1', 'b' => '2' }, :url => "http://www.example.com")

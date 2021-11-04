@@ -77,7 +77,7 @@ it('Show an error in the modal if the pairing code fails to generate', () => {
     status: 401
   })
 
-  const tree = shallow(<GeneratePairingCode />)
+  const tree = shallow(<GeneratePairingCode {...defaultProps} />)
   tree.setState({showModal: true})
 
   moxios.wait(() => {
@@ -95,7 +95,7 @@ it('Shows the loading spinner while the pairing code is being generated', () => 
 })
 
 it('clicking the close button will close the modal', () => {
-  const tree = shallow(<GeneratePairingCode />)
+  const tree = shallow(<GeneratePairingCode {...defaultProps} />)
   tree.setState({showModal: true})
 
   const closeButton = tree.find('CloseButton')
@@ -104,7 +104,7 @@ it('clicking the close button will close the modal', () => {
 })
 
 it('clicking the ok button will close the modal', () => {
-  const tree = shallow(<GeneratePairingCode />)
+  const tree = shallow(<GeneratePairingCode {...defaultProps} />)
   tree.setState({showModal: true})
 
   const okButton = tree.find('ModalFooter Button')

@@ -53,6 +53,7 @@ function props(pending = false, requireScopes = true, onRequireScopesChange = ()
     dispatch: () => {},
     listScopesSet: () => {},
     updateDeveloperKey: () => {},
+    listDeveloperKeyScopesSet: () => {},
     requireScopes,
     onRequireScopesChange
   }

@@ -21,7 +21,7 @@ require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "course copy outcomes" do
-    include_examples "course copy"
+    include_context "course copy"
 
     it "copies all learning outcomes and their groups if selected" do
       default = @copy_from.root_outcome_group

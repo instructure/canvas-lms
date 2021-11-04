@@ -770,23 +770,16 @@ describe ActiveRecord::Base do
   end
 
   describe "callbacks" do
-    before do
-      class MockAccount < Account
+    it "uses default scope" do
+      mock_account = Class.new(Account) do
         include RSpec::Matchers
         before_save do
           expect(Account.all.to_sql).not_to match(/callbacks something/)
-          expect(MockAccount.all.to_sql).not_to match(/callbacks something/)
+          expect(self.class.all.to_sql).not_to match(/callbacks something/)
           true
         end
       end
-    end
-
-    after do
-      Object.send(:remove_const, :MockAccount)
-    end
-
-    it "uses default scope" do
-      MockAccount.where(name: 'callbacks something').create!
+      mock_account.where(name: 'callbacks something').create!
     end
   end
 

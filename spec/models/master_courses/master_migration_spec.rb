@@ -2913,17 +2913,22 @@ describe MasterCourses::MasterMigration do
     end
 
     context "master courses + external migrations" do
-      class TestExternalContentService
-        cattr_reader :course, :migration, :imported_content
-        def self.send_imported_content(course, migration, imported_content)
-          @@course = course
-          @@migration = migration
-          @@imported_content = imported_content
+      let(:klass) do
+        Class.new do
+          class << self
+            attr_reader :course, :migration, :imported_content
+
+            def send_imported_content(course, migration, imported_content)
+              @course = course
+              @migration = migration
+              @imported_content = imported_content
+            end
+          end
         end
       end
 
       before :each do
-        allow(Canvas::Migration::ExternalContent::Migrator).to receive(:registered_services).and_return({ 'test_service' => TestExternalContentService })
+        allow(Canvas::Migration::ExternalContent::Migrator).to receive(:registered_services).and_return({ 'test_service' => klass })
       end
 
       it "works" do
@@ -2939,8 +2944,8 @@ describe MasterCourses::MasterMigration do
         page = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai")
         quiz = @copy_from.quizzes.create!
 
-        allow(TestExternalContentService).to receive(:applies_to_course?).and_return(true)
-        allow(TestExternalContentService).to receive(:begin_export).and_return(true)
+        allow(klass).to receive(:applies_to_course?).and_return(true)
+        allow(klass).to receive(:begin_export).and_return(true)
 
         data = {
           '$canvas_assignment_id' => assmt.id,
@@ -2952,8 +2957,8 @@ describe MasterCourses::MasterMigration do
           '$canvas_page_id' => page.id,
           '$canvas_quiz_id' => quiz.id
         }
-        allow(TestExternalContentService).to receive(:export_completed?).and_return(true)
-        allow(TestExternalContentService).to receive(:retrieve_export).and_return(data)
+        allow(klass).to receive(:export_completed?).and_return(true)
+        allow(klass).to receive(:retrieve_export).and_return(data)
 
         run_master_migration
 
@@ -2966,7 +2971,7 @@ describe MasterCourses::MasterMigration do
         copied_page = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
         copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
 
-        expect(TestExternalContentService.course).to eq @copy_to
+        expect(klass.course).to eq @copy_to
 
         expected_data = {
           '$canvas_assignment_id' => copied_assmt.id,
@@ -2978,7 +2983,7 @@ describe MasterCourses::MasterMigration do
           '$canvas_page_id' => copied_page.id,
           '$canvas_quiz_id' => copied_quiz.id
         }
-        expect(TestExternalContentService.imported_content).to eq expected_data
+        expect(klass.imported_content).to eq expected_data
       end
     end
   end
