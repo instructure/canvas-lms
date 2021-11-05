@@ -95,19 +95,6 @@ QUnit.module('Gradebook Data Loading: Content Load States', suiteHooks => {
     })
   })
 
-  QUnit.module('#setContextModulesLoaded()', () => {
-    test('optionally sets context modules as "loaded"', () => {
-      gradebook.setContextModulesLoaded(true)
-      strictEqual(gradebook.contentLoadStates.contextModulesLoaded, true)
-    })
-
-    test('optionally sets context modules as "not loaded"', () => {
-      gradebook.setContextModulesLoaded(true)
-      gradebook.setContextModulesLoaded(false)
-      strictEqual(gradebook.contentLoadStates.contextModulesLoaded, false)
-    })
-  })
-
   QUnit.module('#setCustomColumnsLoaded()', () => {
     test('optionally sets custom columns as "loaded"', () => {
       gradebook.setCustomColumnsLoaded(true)
