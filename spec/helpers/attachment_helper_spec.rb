@@ -75,4 +75,49 @@ describe AttachmentHelper do
       expect(response.headers).not_to have_key('Cache-Control')
     end
   end
+
+  describe '#doc_preview_json' do
+    subject { doc_preview_json(attachment, locked_for_user: locked_for_user) }
+
+    let(:attachment) { @att }
+    let(:locked_for_user) { false }
+
+    shared_examples_for 'scenarios when the file is not locked for the user' do
+      let(:preview_json) { raise 'set in examples' }
+
+      it 'adds the crocodoc session url' do
+        expect(preview_json.keys).to include(:crocodoc_session_url)
+      end
+
+      it 'adds the canvadoc session url' do
+        expect(preview_json.keys).to include(:canvadoc_session_url)
+      end
+    end
+
+    context "when 'locked_for_user' is true" do
+      let(:locked_for_user) { false }
+
+      it_behaves_like 'scenarios when the file is not locked for the user' do
+        let(:preview_json) { subject }
+      end
+    end
+
+    context "when 'locked_for_user' is not given" do
+      it_behaves_like 'scenarios when the file is not locked for the user' do
+        let(:preview_json) { doc_preview_json(attachment) }
+      end
+    end
+
+    context "when 'locked_for_user' is false" do
+      let(:locked_for_user) { true }
+
+      it 'does not add the crocodoc session url' do
+        expect(subject.keys).not_to include(:crocodoc_session_url)
+      end
+
+      it 'does not add the canvadoc session url' do
+        expect(subject.keys).not_to include(:canvadoc_session_url)
+      end
+    end
+  end
 end

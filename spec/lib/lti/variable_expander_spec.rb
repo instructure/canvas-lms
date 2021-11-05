@@ -1605,8 +1605,7 @@ module Lti
       end
 
       context 'user is not logged in' do
-        let(:user) { nil }
-
+        let(:user) {}
         it 'has substitution for $vnd.Canvas.Person.email.sis when user is not logged in' do
           exp_hash = { test: '$vnd.Canvas.Person.email.sis' }
           variable_expander.expand_variables!(exp_hash)

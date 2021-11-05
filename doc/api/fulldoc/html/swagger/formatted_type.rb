@@ -83,7 +83,9 @@ class FormattedType
       ["string", "date-time"]
     elsif date?
       ["string", "date"]
-    else # string?
+    elsif string?
+      ["string", nil]
+    else
       ["string", nil]
     end
   end

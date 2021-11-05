@@ -21,7 +21,7 @@ require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "pace plans" do
-    include_context "course copy"
+    include_examples "course copy"
 
     it "copies pace plan attributes" do
       pace_plan = @copy_from.pace_plans.new

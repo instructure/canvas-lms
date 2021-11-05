@@ -63,10 +63,9 @@ shared_examples 'allow Quiz LTI placement when the correct Feature Flags are ena
 end
 
 describe SectionTabHelper do
-  before do
-    stub_const("SectionTabHelperSpec", Class.new { include SectionTabHelper })
+  class SectionTabHelperSpec
+    include SectionTabHelper
   end
-
   let_once(:course) { course_model }
 
   describe 'AvailableSectionTabs' do

@@ -139,7 +139,7 @@ describe ActiveRecord::Base do
       include_examples "batches"
 
       it "raises an error when not in a transaction" do
-        expect { User.all.find_in_batches(strategy: :temp_table) { nil } }.to raise_error(ArgumentError)
+        expect { User.all.find_in_batches(strategy: :temp_table) {} }.to raise_error(ArgumentError)
       end
 
       it "finds all enrollments from course join" do
@@ -196,7 +196,7 @@ describe ActiveRecord::Base do
     context "with id" do
       it "raises an error when start is used with group" do
         expect do
-          Account.group(:id).find_each(strategy: :id, start: 0) { nil }
+          Account.group(:id).find_each(strategy: :id, start: 0) {}
         end.to raise_error(ArgumentError)
       end
     end
@@ -770,16 +770,23 @@ describe ActiveRecord::Base do
   end
 
   describe "callbacks" do
-    it "uses default scope" do
-      mock_account = Class.new(Account) do
+    before do
+      class MockAccount < Account
         include RSpec::Matchers
         before_save do
           expect(Account.all.to_sql).not_to match(/callbacks something/)
-          expect(self.class.all.to_sql).not_to match(/callbacks something/)
+          expect(MockAccount.all.to_sql).not_to match(/callbacks something/)
           true
         end
       end
-      mock_account.where(name: 'callbacks something').create!
+    end
+
+    after do
+      Object.send(:remove_const, :MockAccount)
+    end
+
+    it "uses default scope" do
+      MockAccount.where(name: 'callbacks something').create!
     end
   end
 

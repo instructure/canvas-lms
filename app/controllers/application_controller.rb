@@ -2131,8 +2131,10 @@ class ApplicationController < ActionController::Base
         Canvas::Plugin.find(:vericite).try(:enabled?)
       elsif feature == :lockdown_browser
         Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
+      elsif AccountServices.allowable_services[feature]
+        true
       else
-        !!AccountServices.allowable_services[feature]
+        false
       end
     end
   end

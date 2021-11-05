@@ -370,7 +370,11 @@ describe UserContent, type: :request do
   end
 
   context "process_incoming_html_content" do
-    let(:tester) { Class.new { include Api }.new }
+    class Tester
+      include Api
+    end
+
+    let(:tester) { Tester.new }
 
     it "adds the expected href to instructure_inline_media_comment anchors" do
       factory_with_protected_attributes(MediaObject, media_id: 'test2', media_type: 'audio')
@@ -483,7 +487,11 @@ describe UserContent, type: :request do
         <a href="/courses/#{@course.id}/files/#{a3.id}/download">Hi</a>
       HTML2
 
-      expect(Class.new { include Api }.new.api_bulk_load_user_content_attachments(
+      class ApiClass
+        include Api
+      end
+
+      expect(ApiClass.new.api_bulk_load_user_content_attachments(
                [html1, html2],
                @course
              )).to eq({ a1.id => a1, a2.id => a2, a3.id => a3 })

@@ -530,7 +530,7 @@ namespace :i18n do
       puts opts
       exit
     end
-    args = opts.order!(ARGV) { nil }
+    args = opts.order!(ARGV) {}
     opts.parse!(args)
     options[:keys] = ARGV
 

@@ -2085,7 +2085,7 @@ class Submission < ActiveRecord::Base
            if final
              pgs.detect(&:final)
            else
-             pgs.detect { |pg2| !pg2.final && pg2.scorer_id == scorer.id }
+             pgs.detect { |pg| !pg.final && pg.scorer_id == scorer.id }
            end
          else
            if final
@@ -2545,11 +2545,12 @@ class Submission < ActiveRecord::Base
     return "read" unless current_user # default for logged out user
 
     uid = current_user.is_a?(User) ? current_user.id : current_user
-    state = if content_participations.loaded?
-              content_participations.detect { |cp2| cp2.user_id == uid }&.workflow_state
-            else
-              content_participations.where(user_id: uid).pick(:workflow_state)
-            end
+    cp = if content_participations.loaded?
+           content_participations.detect { |cp| cp.user_id == uid }
+         else
+           content_participations.where(user_id: uid).first
+         end
+    state = cp.try(:workflow_state)
     return state if state.present?
     return "read" if assignment.deleted? || assignment.muted? || !self.user_id
     return "unread" if self.grade || self.score

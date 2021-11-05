@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative "apm_common"
-
 describe Canvas::Apm do
   after(:each) do
     Canvas::DynamicSettings.config = nil
@@ -108,7 +106,50 @@ describe Canvas::Apm do
   end
 
   describe "general tracing" do
-    include_context "apm"
+    class FakeSpan
+      attr_reader :tags
+      attr_accessor :resource, :span_type
+
+      def initialize
+        self.reset!
+      end
+
+      def reset!
+        @tags = {}
+      end
+
+      def set_tag(key, val)
+        @tags[key] = val
+      end
+
+      def get_tag(key)
+        @tags[key]
+      end
+    end
+
+    class FakeTracer
+      attr_reader :span
+
+      def initialize
+        @span = FakeSpan.new
+      end
+
+      def trace(_name, opts = {})
+        span.resource = opts.fetch(:resource, nil)
+        yield span
+      end
+
+      def active_root_span
+        @span
+      end
+
+      def enabled
+        true
+      end
+    end
+
+    let(:tracer) { FakeTracer.new }
+    let(:span) { tracer.span }
 
     around do |example|
       Canvas::Apm.reset!

@@ -43,18 +43,16 @@ describe Api::V1::QuizSubmissionQuestion do
     qq
   end
 
-  let(:harness_class) do
-    Class.new do
-      include Api::V1::QuizSubmissionQuestion
-      include Api
+  class QuizSubmissionsQuestionHarness
+    include Api::V1::QuizSubmissionQuestion
+    include Api
 
-      def initialize(opts)
-        @context = opts[:context] if opts[:context]
-      end
+    def initialize(opts)
+      @context = opts[:context] if opts[:context]
     end
   end
 
-  let(:api) { harness_class.new(context: @course) }
+  let(:api) { QuizSubmissionsQuestionHarness.new(context: @course) }
 
   describe "#quiz_submissions_questions_json" do
     subject { api.quiz_submission_questions_json(quiz_questions, @quiz_submission) }
