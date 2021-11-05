@@ -20,64 +20,68 @@
 describe "Exportable" do
   # this class is only necessary until we get our package into a public repo
   # (canvas_offline_course_viewer npm package)
-  class ZipPackageTest < CC::Exporter::WebZip::ZipPackage
-    def initialize(exporter, course, user, progress_key)
-      super(exporter, course, user, progress_key)
-      @index_file = 'dist/index.html'
-      @bundle_file = 'dist/viewer/bundle.js'
-      @dist_dir = 'dist'
-      @viewer_dir = 'dist/viewer'
-    end
+  before do
+    stub_const("ZipPackageTest",
+               Class.new(CC::Exporter::WebZip::ZipPackage) do
+                 def initialize(exporter, course, user, progress_key)
+                   super(exporter, course, user, progress_key)
+                   @index_file = 'dist/index.html'
+                   @bundle_file = 'dist/viewer/bundle.js'
+                   @dist_dir = 'dist'
+                   @viewer_dir = 'dist/viewer'
+                 end
 
-    def dist_package_path
-      Dir.mkdir(@dist_dir) unless Dir.exist?(@dist_dir)
-      Dir.mkdir(@viewer_dir) unless Dir.exist?(@viewer_dir)
-      index_file = File.new(@index_file, "w+")
-      index_file.write("<html></html>")
-      index_file.close
-      bundle_file = File.new(@bundle_file, "w+")
-      bundle_file.write("{}")
-      bundle_file.close
-      @dist_dir
-    end
+                 def dist_package_path
+                   Dir.mkdir(@dist_dir) unless Dir.exist?(@dist_dir)
+                   Dir.mkdir(@viewer_dir) unless Dir.exist?(@viewer_dir)
+                   index_file = File.new(@index_file, "w+")
+                   index_file.write("<html></html>")
+                   index_file.close
+                   bundle_file = File.new(@bundle_file, "w+")
+                   bundle_file.write("{}")
+                   bundle_file.close
+                   @dist_dir
+                 end
 
-    def cleanup_files
-      super
-      File.delete(@index_file) if File.exist?(@index_file)
-      File.delete(@bundle_file) if File.exist?(@bundle_file)
-      Dir.delete(@viewer_dir) if Dir.exist?(@viewer_dir)
-      Dir.delete(@dist_dir) if Dir.exist?(@dist_dir)
-    end
-  end
+                 def cleanup_files
+                   super
+                   File.delete(@index_file) if File.exist?(@index_file)
+                   File.delete(@bundle_file) if File.exist?(@bundle_file)
+                   Dir.delete(@viewer_dir) if Dir.exist?(@viewer_dir)
+                   Dir.delete(@dist_dir) if Dir.exist?(@dist_dir)
+                 end
+               end)
 
-  class ExportableTest
-    include CC::Exporter::WebZip::Exportable
+    stub_const("ExportableTest",
+               Class.new do
+                 include CC::Exporter::WebZip::Exportable
 
-    def initialize(course, user, cartridge_path)
-      @course = course
-      @user = user
-      @cartridge_path = cartridge_path
-    end
+                 def initialize(course, user, cartridge_path)
+                   @course = course
+                   @user = user
+                   @cartridge_path = cartridge_path
+                 end
 
-    def attachment
-      @_attachment ||= Attachment.create({
-                                           context: Course.create,
-                                           filename: 'exportable-test-file',
-                                           uploaded_data: File.open(@cartridge_path)
-                                         })
-    end
+                 def attachment
+                   @attachment ||= Attachment.create({
+                                                       context: Course.create,
+                                                       filename: 'exportable-test-file',
+                                                       uploaded_data: File.open(@cartridge_path)
+                                                     })
+                 end
 
-    def cartridge_path
-      File.join(File.dirname(__FILE__), "/../../../../fixtures/migration/unicode-filename-test-export.imscc")
-    end
+                 def cartridge_path
+                   File.join(File.dirname(__FILE__), "/../../../../fixtures/migration/unicode-filename-test-export.imscc")
+                 end
 
-    def create_zip(exporter, progress_key)
-      ZipPackageTest.new(exporter, @course, @user, progress_key)
-    end
+                 def create_zip(exporter, progress_key)
+                   ZipPackageTest.new(exporter, @course, @user, progress_key)
+                 end
 
-    def content_export
-      @export ||= @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
-    end
+                 def content_export
+                   @content_export ||= @course.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
+                 end
+               end)
   end
 
   context "#convert_to_web_zip" do

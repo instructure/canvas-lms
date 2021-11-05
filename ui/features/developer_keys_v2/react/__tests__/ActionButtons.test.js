@@ -38,6 +38,7 @@ const props = ({
     deleteDeveloperKey: jest.fn(),
     editDeveloperKey: jest.fn(),
     developerKeysModalOpen: jest.fn(),
+    ltiKeysSetLtiKey: jest.fn(),
     developerKey,
     visible: true,
     developerName: 'Unnamed Tool',
@@ -93,10 +94,7 @@ it('warns the user when deleting a LTI key', () => {
   )
 
   window.confirm = jest.fn()
-  wrapper
-    .find('Button')
-    .at(2)
-    .simulate('click')
+  wrapper.find('Button').at(2).simulate('click')
   expect(window.confirm).toHaveBeenCalledWith(
     'Are you sure you want to delete this developer key? This action will also delete all tools associated with the developer key in this context.'
   )

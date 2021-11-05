@@ -832,8 +832,8 @@ class SisBatch < ActiveRecord::Base
               successful_ids = []
               failed_data = []
               data.each do |row|
-                ActiveRecord::Base.unique_constraint_retry do |retry_count|
-                  if retry_count == 0
+                ActiveRecord::Base.unique_constraint_retry do |retry_count2|
+                  if retry_count2 == 0
                     successful_ids += type.constantize.connection.select_values(restore_sql(type, [row.to_restore_array]))
                   else
                     failed_data << row

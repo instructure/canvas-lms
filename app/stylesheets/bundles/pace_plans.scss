@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+@import 'base/environment';
+
 // This is a workaround for an InstUI v7 issue with the Menu component not being
 // properly themeable. This should be removed once we're on InstUI v8
 [data-position-content="pace-plan-menu"] [role="menu"] {
@@ -72,5 +74,12 @@
       height: 3.75rem;
       padding: 0.5rem 0.75rem;
     }
+  }
+}
+
+#pace-plans-required-end-date-input > span {
+  width: 100%;
+  & label > span {
+    margin-#{direction(left)}: 1.75rem;
   }
 }

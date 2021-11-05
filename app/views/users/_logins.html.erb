@@ -58,7 +58,17 @@
             <% end %>
           </th>
           <td class='account'>
-            <%= link_to(pseudonym ? pseudonym.account.name : nbsp, account_url(pseudonym ? pseudonym.account : "{{ account_id }}"), :class => 'account_name') %>
+            <% if pseudonym&.account == @domain_root_account %>
+              <%= link_to(pseudonym.account.name, account_url(pseudonym.account), class: 'account_name') %>
+            <% elsif pseudonym %>
+              <% pseudonym.shard.activate do %>
+                <%= link_to(pseudonym.account.name, account_user_url(pseudonym.account,
+                                                                     pseudonym.user,
+                                                                     host: HostUrl.context_host(pseudonym.account)), class: 'account_name') %>
+              <% end %>
+            <% else %>
+              <%= link_to(nbsp, account_url("{{ account_id }}"), class: 'account_name') %>
+            <% end %>
           </td>
           <td class='details'>
 

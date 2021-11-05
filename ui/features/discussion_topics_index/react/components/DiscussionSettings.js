@@ -122,7 +122,7 @@ export default class DiscussionSettings extends Component {
             <Checkbox
               id="allow_student_discussion_editing"
               disabled={this.props.isSavingSettings}
-              label={I18n.t('Edit and delete their own posts')}
+              label={I18n.t('Edit and delete their own replies')}
               value="allow_student_discussion_editing"
             />
             <Checkbox
@@ -175,7 +175,7 @@ export default class DiscussionSettings extends Component {
         <Modal
           open={this.props.isSettingsModalOpen}
           onDismiss={this.props.toggleModalOpen}
-          label={I18n.t('Edit Discussion Settings')}
+          label={I18n.t('Discussion Settings')}
           onExited={this.exited}
         >
           <Modal.Body>
@@ -190,7 +190,7 @@ export default class DiscussionSettings extends Component {
                   this.setState({markAsRead: event.target.checked})
                 }}
                 defaultChecked={this.props.userSettings.manual_mark_as_read}
-                label={I18n.t('Manually mark posts as read')}
+                label={I18n.t('Manually mark replies as read')}
                 value="small"
               />
               {this.renderTeacherOptions()}

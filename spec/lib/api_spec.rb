@@ -816,10 +816,13 @@ describe Api do
   end
 
   context ".process_incoming_html_content" do
-    class T
-      extend Api
-      def self.request
-        OpenStruct.new({ host: 'some-host.com', port: 80 })
+    let(:klass) do
+      Class.new do
+        extend Api
+
+        def self.request
+          OpenStruct.new({ host: 'some-host.com', port: 80 })
+        end
       end
     end
 
@@ -838,7 +841,7 @@ describe Api do
         <a href="/courses/#{@course.id}/files/#{@attachment.id}/notdownload?b=2&amp;verifier=shouldstay&amp;c=2">but not here</a>
         <a href="http://some-host.com/courses/#{@course.id}/assignments">absolute!</a>
       </div>}
-      fixed_html = T.process_incoming_html_content(html)
+      fixed_html = klass.process_incoming_html_content(html)
       expect(fixed_html).to eq %{<div>
         Here are some bad links
         <a href="/courses/#{@course.id}/files/#{@attachment.id}/download">here</a>
@@ -854,12 +857,12 @@ describe Api do
 
     it 'passes host and port to Content.process_incoming' do
       expect(Api::Html::Content).to receive(:process_incoming).with(anything, host: 'some-host.com', port: 80)
-      T.process_incoming_html_content('<div/>')
+      klass.process_incoming_html_content('<div/>')
     end
 
     it "doesn't explode with invalid mailtos" do
       html = %{<a href="mailto:spamme%20example.com">beep</a>http://some-host.com/linktotricktheparserintoparsinglinks}
-      expect(T.process_incoming_html_content(html)).to eq html
+      expect(klass.process_incoming_html_content(html)).to eq html
     end
   end
 
@@ -1047,12 +1050,10 @@ describe Api do
   end
 
   describe "#accepts_jsonapi?" do
-    class TestApiController
-      include Api
-    end
+    let(:test_api_controller) { Class.new { include Api } }
 
     it "returns true when application/vnd.api+json in the Accept header" do
-      controller = TestApiController.new
+      controller = test_api_controller.new
       allow(controller).to receive(:request).and_return double(headers: {
                                                                  'Accept' => 'application/vnd.api+json'
                                                                })
@@ -1060,7 +1061,7 @@ describe Api do
     end
 
     it "returns false when application/vnd.api+json not in the Accept header" do
-      controller = TestApiController.new
+      controller = test_api_controller.new
       allow(controller).to receive(:request).and_return double(headers: {
                                                                  'Accept' => 'application/json'
                                                                })

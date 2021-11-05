@@ -20,93 +20,91 @@
 require 'spec_helper'
 
 describe CanvasQuizStatistics::Util do
-  Util = CanvasQuizStatistics::Util
-
   describe '#deep_symbolize_keys' do
     it 'does nothing on anything but a Hash' do
-      expect(Util.deep_symbolize_keys(5)).to eq(5)
-      expect(Util.deep_symbolize_keys([])).to eq([])
-      expect(Util.deep_symbolize_keys(nil)).to eq(nil)
+      expect(described_class.deep_symbolize_keys(5)).to eq(5)
+      expect(described_class.deep_symbolize_keys([])).to eq([])
+      expect(described_class.deep_symbolize_keys(nil)).to eq(nil)
     end
 
     it 'symbolizes top-level keys' do
-      expect(Util.deep_symbolize_keys({ 'a' => 'b', c: 'd' })).to eq({
-                                                                       a: 'b',
-                                                                       c: 'd'
-                                                                     })
+      expect(described_class.deep_symbolize_keys({ 'a' => 'b', c: 'd' })).to eq({
+                                                                                  a: 'b',
+                                                                                  c: 'd'
+                                                                                })
     end
 
     it 'symbolizes keys of nested hashes' do
-      expect(Util.deep_symbolize_keys({
-                                        'e' => {
-                                          'f' => 'g',
-                                          h: 'i'
-                                        }
-                                      })).to eq({
-                                                  e: {
-                                                    f: 'g',
-                                                    h: 'i'
-                                                  }
-                                                })
+      expect(described_class.deep_symbolize_keys({
+                                                   'e' => {
+                                                     'f' => 'g',
+                                                     h: 'i'
+                                                   }
+                                                 })).to eq({
+                                                             e: {
+                                                               f: 'g',
+                                                               h: 'i'
+                                                             }
+                                                           })
     end
 
     it 'symbolizes keys of hashes inside arrays' do
-      expect(Util.deep_symbolize_keys({
-                                        'e' => [{
-                                          'f' => 'g',
-                                          h: 'i'
-                                        }]
-                                      })).to eq({
-                                                  e: [{
-                                                    f: 'g',
-                                                    h: 'i'
-                                                  }]
-                                                })
+      expect(described_class.deep_symbolize_keys({
+                                                   'e' => [{
+                                                     'f' => 'g',
+                                                     h: 'i'
+                                                   }]
+                                                 })).to eq({
+                                                             e: [{
+                                                               f: 'g',
+                                                               h: 'i'
+                                                             }]
+                                                           })
     end
 
     it 'symbolizes all sorts of things' do
-      expect(Util.deep_symbolize_keys({
-                                        item1: 'value1',
-                                        "item2" => 'value2',
-                                        hash: {
-                                          item3: 'value3',
-                                          "item4" => 'value4'
-                                        },
-                                        'array' => [{
-                                          "item5" => 'value5',
-                                          item6: 'value6'
-                                        }]
-                                      })).to eq({
-                                                  item1: 'value1',
-                                                  item2: 'value2',
-                                                  hash: {
-                                                    item3: 'value3',
-                                                    item4: 'value4'
-                                                  },
-                                                  array: [{
-                                                    item5: 'value5',
-                                                    item6: 'value6'
-                                                  }]
-                                                })
+      expect(described_class.deep_symbolize_keys({
+                                                   item1: 'value1',
+                                                   "item2" => 'value2',
+                                                   hash: {
+                                                     item3: 'value3',
+                                                     "item4" => 'value4'
+                                                   },
+                                                   'array' => [{
+                                                     "item5" => 'value5',
+                                                     item6: 'value6'
+                                                   }]
+                                                 })).to eq({
+                                                             item1: 'value1',
+                                                             item2: 'value2',
+                                                             hash: {
+                                                               item3: 'value3',
+                                                               item4: 'value4'
+                                                             },
+                                                             array: [{
+                                                               item5: 'value5',
+                                                               item6: 'value6'
+                                                             }]
+                                                           })
     end
 
     it 'works with numbers for keys' do
-      expect(Util.deep_symbolize_keys({
-                                        "1" => "first",
-                                        "2" => "second"
-                                      })).to eq({
-                                                  :"1" => "first",
-                                                  :"2" => "second"
-                                                })
+      expect(described_class.deep_symbolize_keys({
+                                                   "1" => "first",
+                                                   "2" => "second"
+                                                 })).to eq({
+                                                             :"1" => "first",
+                                                             :"2" => "second"
+                                                           })
     end
 
     it 'skips nils and items that cant be symbolized' do
-      expect(Util.deep_symbolize_keys({ nil => 'foo' })).to eq({ nil => 'foo' })
+      expect(described_class.deep_symbolize_keys({ nil => 'foo' })).to eq({ nil => 'foo' })
     end
 
     it 'only munges hashes' do
-      expect(Util.deep_symbolize_keys([])).to eq([])
-      expect(Util.deep_symbolize_keys([{ 'foo' => 'bar' }])).to eq([{ 'foo' => 'bar' }])
+      expect(described_class.deep_symbolize_keys([])).to eq([])
+      expect(described_class.deep_symbolize_keys([{ 'foo' => 'bar' }])).to eq([{ 'foo' => 'bar' }])
     end
   end
 end

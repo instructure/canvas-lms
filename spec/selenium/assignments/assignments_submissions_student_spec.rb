@@ -439,14 +439,14 @@ describe "submissions" do
 
       it "does not allow a user to submit a file-submission assignment from previously uploaded files with an illegal file extension", priority: "1", test_id: 237031 do
         skip_if_safari(:alert)
-        FILENAME = "hello-world.sh"
-        FIXTURE_FN = "files/#{FILENAME}"
+        filename = "hello-world.sh"
+        fixture_fn = "files/#{filename}"
 
         local_storage!
 
-        add_file(fixture_file_upload(FIXTURE_FN, 'application/x-sh'),
-                 @student, FILENAME)
-        File.read(fixture_file_path(FIXTURE_FN))
+        add_file(fixture_file_upload(fixture_fn, 'application/x-sh'),
+                 @student, filename)
+        File.read(fixture_file_path(fixture_fn))
         assignment = @course.assignments.create!(:title => 'assignment 1',
                                                  :name => 'assignment 1',
                                                  :submission_types => "online_upload",
@@ -458,7 +458,7 @@ describe "submissions" do
 
         # traverse the tree
         f('li[aria-label="My files"] button').click
-        f('li[aria-label="' + FILENAME + '"] button').click
+        f('li[aria-label="' + filename + '"] button').click
 
         f('#submit_file_button').click
 

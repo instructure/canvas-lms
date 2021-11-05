@@ -502,10 +502,12 @@ class DiscussionTopic < ActiveRecord::Base
     return "read" unless current_user # default for logged out user
 
     uid = current_user.is_a?(User) ? current_user.id : current_user
-    dtp = discussion_topic_participants.loaded? ?
-      discussion_topic_participants.detect { |dtp| dtp.user_id == uid } :
-      discussion_topic_participants.where(user_id: uid).select(:workflow_state).first
-    dtp.try(:workflow_state) || "unread"
+    ws = if discussion_topic_participants.loaded?
+           discussion_topic_participants.detect { |dtp| dtp.user_id == uid }&.workflow_state
+         else
+           discussion_topic_participants.where(user_id: uid).pick(:workflow_state)
+         end
+    ws || "unread"
   end
 
   def read?(current_user = nil)
@@ -941,21 +943,12 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def should_send_to_stream
-    if !self.published?
-      false
-    elsif self.not_available_yet?
-      false
-    elsif self.cloned_item_id
-      false
-    elsif self.root_topic_id && self.has_group_category?
-      false
-    elsif self.in_unpublished_module?
-      false
-    elsif self.locked_by_module?
-      false
-    else
-      true
-    end
+    self.published? &&
+      !self.not_available_yet? &&
+      !self.cloned_item_id &&
+      !(self.root_topic_id && self.has_group_category?) &&
+      !self.in_unpublished_module? &&
+      !self.locked_by_module?
   end
 
   on_create_send_to_streams do
@@ -1011,9 +1004,8 @@ class DiscussionTopic < ActiveRecord::Base
     remaining_participants = participants if section_specific
     user_ids = []
     stream_item&.stream_item_instances&.shard(stream_item)&.find_each do |item|
-      if locked_by_module && self.locked_by_module_item?(item.user)
-        destroy_item_and_track(item, user_ids)
-      elsif section_specific && remaining_participants.none? { |p| p.id == item.user_id }
+      if (locked_by_module && self.locked_by_module_item?(item.user)) ||
+         (section_specific && remaining_participants.none? { |p| p.id == item.user_id })
         destroy_item_and_track(item, user_ids)
       end
     end
@@ -1539,7 +1531,7 @@ class DiscussionTopic < ActiveRecord::Base
         locked = { object: self, module: item.context_module }
       elsif self.locked? # nothing more specific, it's just locked
         locked = { object: self, can_view: true }
-      elsif root_topic && (l = root_topic.low_level_locked_for?(user, opts))
+      elsif (l = root_topic&.low_level_locked_for?(user, opts)) # rubocop:disable Lint/DuplicateBranch
         locked = l
       end
       locked

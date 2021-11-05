@@ -210,7 +210,7 @@ describe Api::V1::User do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!
       @user.pseudonyms.create!(:unique_id => 'abc', :account => Account.default)
-      p = @user.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
+      p = @user.pseudonyms.create!(unique_id: "xyz", account: Account.default, sis_user_id: "xyz")
       sis_batch = p.account.sis_batches.create
       SisBatch.where(id: sis_batch).update_all(workflow_state: 'imported')
       Pseudonym.where(id: p.id).update_all(sis_batch_id: sis_batch.id)
@@ -231,7 +231,7 @@ describe Api::V1::User do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!
       @user.pseudonyms.destroy_all
-      p = @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2) { |p| p.sis_user_id = 'a' }
+      p = @user.pseudonyms.create!(unique_id: "abc", account: @account2, sis_user_id: "a")
       allow(p).to receive(:works_for_account?).with(Account.default, true).and_return(true)
       allow_any_instantiation_of(Account.default).to receive(:trust_exists?).and_return(true)
       allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([@account2.id])

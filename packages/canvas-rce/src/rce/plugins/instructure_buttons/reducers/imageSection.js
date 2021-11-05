@@ -20,7 +20,7 @@ import formatMessage from '../../../../format-message'
 
 export const initialState = {
   mode: 'course', // TODO: Update to 'upload' once we support it
-  currentImage: null
+  currentImage: ''
 }
 
 export const modes = {

@@ -21,7 +21,7 @@ require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "course copy unpublished items" do
-    include_examples "course copy"
+    include_context "course copy"
 
     it "copies unpublished modules" do
       cm = @copy_from.context_modules.create!(:name => "some module")

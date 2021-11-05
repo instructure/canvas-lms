@@ -1196,6 +1196,18 @@ class AccountsController < ApplicationController
 
       @announcements = @account.announcements.order(created_at: 'desc').paginate(page: params[:page], per_page: 50)
       @external_integration_keys = ExternalIntegrationKey.indexed_keys_for(@account)
+
+      course_creation_settings = {}
+      if @account.root_account? && !@account.site_admin?
+        course_creation_settings.merge!({
+                                          teachers_can_create_courses: @account.teachers_can_create_courses?,
+                                          students_can_create_courses: @account.students_can_create_courses?,
+                                          no_enrollments_can_create_courses: @account.no_enrollments_can_create_courses?,
+                                          teachers_can_create_courses_anywhere: @account.teachers_can_create_courses_anywhere?,
+                                          students_can_create_courses_anywhere: @account.students_can_create_courses_anywhere?,
+                                        })
+      end
+
       js_env({
                APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
                LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
@@ -1217,7 +1229,8 @@ class AccountsController < ApplicationController
                  CLIENT_ID: MicrosoftSync::LoginService.client_id,
                  REDIRECT_URI: MicrosoftSync::LoginService::REDIRECT_URI,
                  BASE_URL: MicrosoftSync::LoginService::BASE_URL
-               }
+               },
+               COURSE_CREATION_SETTINGS: course_creation_settings
              })
       js_env(edit_help_links_env, true)
     end
@@ -1739,7 +1752,8 @@ class AccountsController < ApplicationController
                                    :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view,
                                    :smart_alerts_threshold, :enable_fullstory, :enable_google_analytics,
                                    { :enable_as_k5_account => [:value, :locked] }.freeze,
-                                   :enable_push_notifications].freeze
+                                   :enable_push_notifications, :teachers_can_create_courses_anywhere,
+                                   :students_can_create_courses_anywhere].freeze
 
   def permitted_account_attributes
     [:name, :turnitin_account_id, :turnitin_shared_secret, :include_crosslisted_courses,

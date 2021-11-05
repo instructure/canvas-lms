@@ -389,7 +389,7 @@ class ContextModule < ActiveRecord::Base
       return true
     elsif !self.active?
       return false
-    elsif self.context.user_has_been_observer?(user)
+    elsif self.context.user_has_been_observer?(user) # rubocop:disable Lint/DuplicateBranch
       return true
     end
 
@@ -589,13 +589,11 @@ class ContextModule < ActiveRecord::Base
       end
     end
 
-    tags = self.shard.activate do
-      DifferentiableAssignment.filter(tags, user, self.context, opts) do |tags, user_ids|
-        filter.call(tags, user_ids, self.context_id, opts)
+    shard.activate do
+      DifferentiableAssignment.filter(tags, user, self.context, opts) do |ts, user_ids|
+        filter.call(ts, user_ids, self.context_id, opts)
       end
     end
-
-    tags
   end
 
   def reload
@@ -808,10 +806,8 @@ class ContextModule < ActiveRecord::Base
         action == :done
       when 'must_contribute'
         action == :contributed
-      when 'must_submit'
-        action == :scored || action == :submitted
-      when 'min_score'
-        action == :scored ||
+      when 'must_submit', 'min_score'
+        action == :scored || # rubocop:disable Style/MultipleComparison
           action == :submitted # to mark progress in the incomplete_requirements (moves from 'unlocked' to 'started')
       else
         false

@@ -184,7 +184,7 @@ describe "self enrollment" do
 
   context "in a published course" do
     let(:active_course) { true }
-    let(:set_up_course) {}
+    let(:set_up_course) { nil }
     let(:primary_action) { "Go to the Course" }
     let(:assert_valid_dashboard) {
       expect(f('#global_nav_courses_link')).to include_text("Courses")
@@ -220,7 +220,7 @@ describe "self enrollment" do
 
   context "in an unpublished course" do
     let(:active_course) { false }
-    let(:set_up_course) {}
+    let(:set_up_course) { nil }
     let(:primary_action) { "Go to your Dashboard" }
     let(:assert_valid_dashboard) {
       expect(f('#global_nav_courses_link')).to include_text("Courses")

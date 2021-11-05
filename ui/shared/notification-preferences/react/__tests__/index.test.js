@@ -26,6 +26,7 @@ function defaultProps(overrides) {
     contextName: 'Course01',
     enabled: false,
     updatePreference: jest.fn(),
+    userId: '1',
     notificationPreferences: {channels: []},
     ...overrides
   }

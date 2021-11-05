@@ -1665,28 +1665,20 @@ describe "Accounts API", type: :request do
   end
 
   context "account api extension" do
-    module MockPlugin
-      def self.extend_account_json(hash, *)
-        hash[:extra_thing] = "something"
-      end
-    end
-
-    module BadMockPlugin
-      def self.not_the_right_method
+    let(:mock_plugin) do
+      Module.new do
+        def self.extend_account_json(hash, *)
+          hash[:extra_thing] = "something"
+        end
       end
     end
 
     include Api::V1::Account
 
     it "allows a plugin to extend the account_json method" do
-      expect(Api::V1::Account.register_extension(BadMockPlugin)).to be_falsey
-      expect(Api::V1::Account.register_extension(MockPlugin)).to be_truthy
+      allow(Api::V1::Account).to receive(:extensions).and_return([mock_plugin])
 
-      begin
-        expect(account_json(@a1, @me, @session, [])[:extra_thing]).to eq "something"
-      ensure
-        Api::V1::Account.deregister_extension(MockPlugin)
-      end
+      expect(account_json(@a1, @me, @session, [])[:extra_thing]).to eq "something"
     end
   end
 end

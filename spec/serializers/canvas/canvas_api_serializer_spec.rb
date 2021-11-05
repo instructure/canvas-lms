@@ -36,12 +36,15 @@ describe Canvas::APISerializer do
     end
   end
 
+  # rubocop:disable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration
+  # Canvas::APISerializer accesses klass.name in it's inherited hook,
+  # so we can't use stub_const
   it "creates an alias for object based on serializer class name" do
     class FooSerializer < Canvas::APISerializer
     end
 
     expect(FooSerializer.new({}, options).foo).to eq({})
-
+  ensure
     Object.send(:remove_const, :FooSerializer)
   end
 
@@ -110,6 +113,7 @@ describe Canvas::APISerializer do
       expect(object).to receive(:bar).and_return Foo.new(1, 'Alice')
       serializer = FooSerializer.new(object, { root: nil, controller: con })
       expect(serializer.as_json(root: nil)['links']['bar']).to eq "1"
+    ensure
       Object.send(:remove_const, :BarSerializer)
     end
 
@@ -190,3 +194,4 @@ describe Canvas::APISerializer do
     end
   end
 end
+# rubocop:enable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration

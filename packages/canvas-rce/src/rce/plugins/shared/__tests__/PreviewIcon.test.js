@@ -36,6 +36,21 @@ describe('PreviewIcon()', () => {
     expect(getByTestId('preview-icon')).toHaveStyle('height: 25px')
   })
 
+  describe('when an image data URL is provided', () => {
+    beforeEach(() => {
+      props = {
+        testId: 'preview-icon',
+        image: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAtAAAAQ9CAYAAABwXXr6AAABdGlDQ1BpY2...'
+      }
+    })
+
+    it('uses the image in the preview', () => {
+      const {getByTestId} = subject(props)
+
+      expect(getByTestId('preview-icon')).toHaveStyle(`backgroundImage: url(${props.image})`)
+    })
+  })
+
   describe('when a color is provided', () => {
     beforeEach(() => {
       props = {

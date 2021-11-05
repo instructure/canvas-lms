@@ -19,12 +19,8 @@
 #
 
 describe LocaleSelection do
-  class TestClassForMixins
-    extend LocaleSelection
-  end
-
   def ls
-    TestClassForMixins
+    Class.new { extend LocaleSelection }
   end
 
   context 'accept-language' do

@@ -22,7 +22,7 @@ require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "course copy with native conditional release data" do
-    include_examples "course copy"
+    include_context "course copy"
 
     before :once do
       setup_course_with_native_conditional_release(course: @copy_from)

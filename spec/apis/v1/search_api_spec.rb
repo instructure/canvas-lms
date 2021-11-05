@@ -151,13 +151,13 @@ describe SearchController, type: :request do
                       { :controller => 'search', :action => 'recipients', :format => 'json', :user_id => other.id.to_s })
       expect(json).to eq []
       # now they have a conversation in common
-      c = Conversation.initiate([@user, other], true)
+      conversation = Conversation.initiate([@user, other], true)
       json = api_call(:get, "/api/v1/search/recipients?user_id=#{other.id}",
                       { :controller => 'search', :action => 'recipients', :format => 'json', :user_id => other.id.to_s })
       expect(json).to eq []
       # ... but it has to be explicity referenced via from_conversation_id
-      json = api_call(:get, "/api/v1/search/recipients?user_id=#{other.id}&from_conversation_id=#{c.id}",
-                      { :controller => 'search', :action => 'recipients', :format => 'json', :user_id => other.id.to_s, :from_conversation_id => c.id.to_s })
+      json = api_call(:get, "/api/v1/search/recipients?user_id=#{other.id}&from_conversation_id=#{conversation.id}",
+                      { :controller => 'search', :action => 'recipients', :format => 'json', :user_id => other.id.to_s, :from_conversation_id => conversation.id.to_s })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
         { "id" => other.id, "pronouns" => nil, "name" => "other personage", "full_name" => "other personage", "common_courses" => {}, "common_groups" => {} },

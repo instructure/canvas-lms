@@ -44,30 +44,29 @@ class FilePreviewsController < ApplicationController
       log_asset_access(@file, "files", "files")
       # redirect to or render content for the file according to its type
       # crocodocs (if annotation requested)
-      if Canvas::Plugin.value_to_boolean(params[:annotate]) && (url = @file.crocodoc_url(@current_user))
-        redirect_to url and return
-      # canvadocs
-      elsif (url = @file.canvadoc_url(@current_user))
-        redirect_to url and return
+      # and canvadocs
+      if (Canvas::Plugin.value_to_boolean(params[:annotate]) && (url = @file.crocodoc_url(@current_user))) ||
+         (url = @file.canvadoc_url(@current_user))
+        redirect_to url
       # google docs
       elsif GoogleDocsPreview.previewable?(@domain_root_account, @file)
         url = GoogleDocsPreview.url_for(@file)
-        redirect_to('//docs.google.com/viewer?' + { embedded: true, url: url }.to_query) and return
+        redirect_to('//docs.google.com/viewer?' + { embedded: true, url: url }.to_query)
       # images
       elsif @file.content_type =~ %r{\Aimage/}
-        return render template: 'file_previews/img_preview', layout: false
+        render template: 'file_previews/img_preview', layout: false
       # media files
       elsif @file.content_type =~ %r{\A(audio|video)/}
         js_env NEW_FILES_PREVIEW: 1
         js_bundle :file_preview
-        return render template: 'file_previews/media_preview', layout: false
+        render template: 'file_previews/media_preview', layout: false
       # html files
       elsif @file.content_type == 'text/html'
-        return redirect_to context_url(@context, :context_file_preview_url, @file.id)
+        redirect_to context_url(@context, :context_file_preview_url, @file.id)
       # no preview available
       else
         @accessed_asset = nil # otherwise it will double-log when they download the file
-        return render template: 'file_previews/no_preview', layout: false
+        render template: 'file_previews/no_preview', layout: false
       end
     end
   end

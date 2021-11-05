@@ -626,7 +626,7 @@ class SisImportsApiController < ApplicationController
         end
       end
 
-      batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj, @current_user) do |batch|
+      batch = SisBatch.create_with_attachment(@account, params[:import_type], file_obj, @current_user) do |batch| # rubocop:disable Lint/ShadowingOuterLocalVariable
         batch.change_threshold = params[:change_threshold]
 
         batch.options ||= {}
