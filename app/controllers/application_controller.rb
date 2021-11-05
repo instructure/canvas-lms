@@ -80,6 +80,37 @@ class ApplicationController < ActionController::Base
   after_action :update_enrollment_last_activity_at
   set_callback :html_render, :after, :add_csp_for_root
 
+  class << self
+    def instance_id
+      nil
+    end
+
+    def region
+      nil
+    end
+
+    def test_cluster_name
+      nil
+    end
+
+    def test_cluster?
+      false
+    end
+
+    def google_drive_timeout
+      Setting.get('google_drive_timeout', 30).to_i
+    end
+
+    private
+
+    def batch_jobs_in_actions(opts = {})
+      batch_opts = opts.delete(:batch)
+      around_action(opts) do |_controller, action|
+        Delayed::Batch.serial_batch(batch_opts || {}, &action)
+      end
+    end
+  end
+
   add_crumb(proc {
     title = I18n.t('links.dashboard', 'My Dashboard')
     crumb = <<-END
@@ -2550,13 +2581,6 @@ class ApplicationController < ActionController::Base
     common_courses + common_groups
   end
 
-  def self.batch_jobs_in_actions(opts = {})
-    batch_opts = opts.delete(:batch)
-    around_action(opts) do |_controller, action|
-      Delayed::Batch.serial_batch(batch_opts || {}, &action)
-    end
-  end
-
   def not_found
     raise ActionController::RoutingError.new('Not Found')
   end
@@ -2677,10 +2701,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def self.google_drive_timeout
-    Setting.get('google_drive_timeout', 30).to_i
-  end
-
   def google_drive_connection
     return @google_drive_connection if @google_drive_connection
 
@@ -2720,22 +2740,6 @@ class ApplicationController < ActionController::Base
         google_drive_connection.authorized?
       end
     end
-  end
-
-  def self.instance_id
-    nil
-  end
-
-  def self.region
-    nil
-  end
-
-  def self.test_cluster_name
-    nil
-  end
-
-  def self.test_cluster?
-    false
   end
 
   def setup_live_events_context

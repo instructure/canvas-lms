@@ -421,11 +421,11 @@ class StreamItem < ActiveRecord::Base
     end
   end
 
-  private
-
   def self.new_message?(object)
     object.is_a?(Message) && object.new_record?
   end
+
+  private
 
   # Internal: Format the stream item's asset to avoid showing hidden data.
   #

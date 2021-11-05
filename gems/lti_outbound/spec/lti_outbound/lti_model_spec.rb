@@ -35,7 +35,7 @@ describe LtiOutbound::LTIModel do
     end
 
     it 'handles multiple attributes at once' do
-      dummy.proc_accessor(:test1, :test2)
+      dummy.send(:proc_accessor, :test1, :test2)
     end
 
     it 'evaluates a proc when assigned a proc' do

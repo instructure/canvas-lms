@@ -54,48 +54,50 @@ class ExternalIntegrationKey < ActiveRecord::Base
     can :write
   end
 
-  def self.indexed_keys_for(context)
-    keys = context.external_integration_keys.index_by(&:key_type)
-    key_types.each do |key_type|
-      next if keys.key?(key_type)
+  class << self
+    def indexed_keys_for(context)
+      keys = context.external_integration_keys.index_by(&:key_type)
+      key_types.each do |key_type|
+        next if keys.key?(key_type)
 
-      keys[key_type] = ExternalIntegrationKey.new
-      keys[key_type].context = context
-      keys[key_type].key_type = key_type
+        keys[key_type] = ExternalIntegrationKey.new
+        keys[key_type].context = context
+        keys[key_type].key_type = key_type
+      end
+      keys
     end
-    keys
-  end
 
-  def self.key_type(name, options = {})
-    key_types_known << name
-    key_type_labels[name] = options[:label]
-    key_type_rights[name] = options[:rights] || {}
-  end
-
-  def self.label_for(key_type)
-    key_label = key_type_labels[key_type]
-    if key_label.respond_to? :call
-      key_label.call
-    else
-      key_label
+    def key_type(name, options = {})
+      key_types_known << name
+      key_type_labels[name] = options[:label]
+      key_type_rights[name] = options[:rights] || {}
     end
-  end
 
-  def self.key_types
-    key_types_known.to_a
-  end
+    def label_for(key_type)
+      key_label = key_type_labels[key_type]
+      if key_label.respond_to? :call
+        key_label.call
+      else
+        key_label
+      end
+    end
 
-  private
+    def key_types
+      key_types_known.to_a
+    end
 
-  def self.key_types_known
-    @key_types_known ||= Set.new
-  end
+    def key_type_rights
+      @key_type_rights ||= {}
+    end
 
-  def self.key_type_labels
-    @key_types_labels ||= {}
-  end
+    private
 
-  def self.key_type_rights
-    @key_type_rights ||= {}
+    def key_types_known
+      @key_types_known ||= Set.new
+    end
+
+    def key_type_labels
+      @key_type_labels ||= {}
+    end
   end
 end
