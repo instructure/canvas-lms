@@ -43,7 +43,6 @@ const ignoredErrors = [
   /Can't perform a React state update on an unmounted component/,
   /CancelAttemptButton: prop type `submission` is invalid/,
   /Cannot read property '(activeElement|useRealTimers)' of undefined/,
-  /Cannot read property 'length' of null/,
   /Cannot read property 'name' of null/,
   /Cannot update during an existing state transition/,
   /ColorPicker: isMounted is deprecated/,
