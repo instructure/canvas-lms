@@ -135,6 +135,7 @@ class GradebookImporter
     @gradebook_importer_assignments = {}
     @gradebook_importer_custom_columns = {}
     @gradebook_importer_override_scores = {}
+    @has_student_first_last_names = false
 
     begin
       csv_stream do |row|
@@ -390,25 +391,31 @@ class GradebookImporter
   end
 
   def row_has_student_headers?(row)
-    row.length > 3 && row[0].include?('Student') && row[1].include?('ID')
+    (row.length > 3 && row[0].include?("Student") && row[1].include?("ID")) ||
+      (row.length > 4 && row[0].include?("LastName") && row[1].include?("FirstName") && row[2].include?("ID"))
   end
 
   def update_column_count(row)
     # A side effect that's necessary to finish validation, but needs to come
     # after the row.length check above.
-    @student_columns = 3 # name, user id, section
-    if /SIS\s+Login\s+ID/.match?(row[2])
-      @sis_login_id_column = 2
+
+    # includes name, ID, section
+    @has_student_first_last_names = (row[0] == "LastName" && row[1] == "FirstName")
+    raise InvalidHeaderRow if @has_student_first_last_names && !allow_student_last_first_names?
+
+    @student_columns = student_name_column_count = @has_student_first_last_names ? 4 : 3
+    if /SIS\s+Login\s+ID/.match?(row[student_name_column_count - 1])
+      @sis_login_id_column = student_name_column_count - 1
       @student_columns += 1
-    elsif row[2] =~ /SIS\s+User\s+ID/ && row[3] =~ /SIS\s+Login\s+ID/
+    elsif row[student_name_column_count - 1] =~ /SIS\s+User\s+ID/ && row[student_name_column_count] =~ /SIS\s+Login\s+ID/
       # Integration id might be after sis id and login id, ignore it.
-      i = /Integration\s+ID/.match?(row[4]) ? 1 : 0
-      @sis_user_id_column = 2
-      @sis_login_id_column = 3
+      i = /Integration\s+ID/.match?(row[student_name_column_count + 1]) ? 1 : 0
+      @sis_user_id_column = student_name_column_count - 1
+      @sis_login_id_column = student_name_column_count
       @student_columns += 2 + i
-      if /Root\s+Account/.match?(row[4 + i])
+      if /Root\s+Account/.match?(row[student_name_column_count + 1 + i])
         @student_columns += 1
-        @root_account_column = 4 + i
+        @root_account_column = student_name_column_count + 1 + i
       end
     end
 
@@ -418,6 +425,8 @@ class GradebookImporter
 
   GRADEBOOK_IMPORTER_RESERVED_NAMES = [
     "Student",
+    "LastName",
+    "FirstName",
     "ID",
     "SIS User ID",
     "SIS Login ID",
@@ -510,7 +519,8 @@ class GradebookImporter
   end
 
   def process_student(row)
-    student_id = row[1] # the second column in the csv should have the student_id for each row
+    # second or third column in the csv should have the student_id for each row
+    student_id = @has_student_first_last_names ? row[2] : row[1]
     student = @all_students[student_id.to_i] if student_id.present?
     unless student
       ra_sis_id = row[@root_account_column].presence if @root_account_column
@@ -529,13 +539,15 @@ class GradebookImporter
       pseudonym = @pseudonyms_by_sis_id[sis_user_id] if sis_user_id
       pseudonym ||= @pseudonyms_by_login_id[sis_login_id] if sis_login_id
       student = @all_students[pseudonym.user_id] if pseudonym
+
+      unless student
+        name = @has_student_first_last_names ? "#{row[1]} #{row[0]}".strip : row[0]
+        student = @all_students.find do |_id, s|
+          s.name == name || s.sortable_name == name
+        end.try(:last)
+        student ||= User.new(name: name)
+      end
     end
-    if row[0].present?
-      student ||= @all_students.find do |_id, s|
-        s.name == row[0] || s.sortable_name == row[0]
-      end.try(:last)
-    end
-    student ||= User.new(:name => row[0])
     student.previous_id = student.id
     student.id ||= NegativeId.generate
     @missing_student ||= student.new_record?
@@ -861,5 +873,9 @@ class GradebookImporter
 
   def allow_override_scores?
     @context.allow_final_grade_override? && Account.site_admin.feature_enabled?(:import_override_scores_in_gradebook)
+  end
+
+  def allow_student_last_first_names?
+    @context.root_account.allow_gradebook_show_first_last_names? && Account.site_admin.feature_enabled?(:gradebook_show_first_last_names)
   end
 end
