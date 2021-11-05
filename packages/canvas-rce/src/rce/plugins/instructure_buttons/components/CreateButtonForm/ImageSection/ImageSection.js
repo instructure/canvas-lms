@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useReducer, useState} from 'react'
+import React, {useReducer, useState, useEffect} from 'react'
 
 import formatMessage from '../../../../../../format-message'
-import reducer, {initialState, modes} from '../../../reducers/imageSection'
+import reducer, {actions, initialState, modes} from '../../../reducers/imageSection'
+import {actions as svgActions} from '../../../reducers/svgSettings'
 
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -35,10 +36,24 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
-export const ImageSection = () => {
+export const ImageSection = ({onChange}) => {
   const [openCropModal, setOpenCropModal] = useState(false)
   const [state, dispatch] = useReducer(reducer, initialState)
   const allowedModes = {[modes.courseImages.type]: Course}
+
+  useEffect(() => {
+    onChange({
+      type: svgActions.SET_ENCODED_IMAGE,
+      payload: state.image
+    })
+  }, [state.image])
+
+  useEffect(() => {
+    onChange({
+      type: svgActions.SET_ENCODED_IMAGE_TYPE,
+      payload: state.mode
+    })
+  }, [state.mode])
 
   return (
     <Group as="section" defaultExpanded summary={formatMessage('Image')}>
