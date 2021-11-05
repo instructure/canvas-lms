@@ -23,6 +23,7 @@ require 'controller_view'
 
 class ControllerListView < HashView
   def initialize(name, controllers)
+    super()
     @controllers = controllers.map do |ctrl|
       ControllerView.new(ctrl)
     end

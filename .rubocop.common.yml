@@ -59,6 +59,8 @@ Lint/DuplicateMethods:
   Severity: error
 Lint/EmptyBlock:
   Severity: error
+Lint/MissingSuper:
+  Severity: error
 Lint/NonDeterministicRequireOrder:
   Severity: error
 Lint/ParenthesesAsGroupedExpression:

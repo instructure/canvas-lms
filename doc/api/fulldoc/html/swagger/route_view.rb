@@ -24,6 +24,7 @@ class RouteView < HashView
   attr_reader :raw_route, :method_view
 
   def initialize(raw_route, method_view)
+    super()
     @raw_route = raw_route
     @method_view = method_view
   end

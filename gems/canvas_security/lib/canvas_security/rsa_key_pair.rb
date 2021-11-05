@@ -25,6 +25,7 @@ module CanvasSecurity
     ALG = 'RS256'.freeze
     SIZE = 2048
     def initialize(use: 'sig')
+      super()
       @alg = ALG
       @use = use
       @private_key = OpenSSL::PKey::RSA.new SIZE

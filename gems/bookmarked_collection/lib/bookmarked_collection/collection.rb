@@ -24,6 +24,7 @@ class BookmarkedCollection::Collection < Array
   FIRST_TOKEN = "first"
 
   def initialize(bookmarker)
+    super()
     @bookmarker = bookmarker
   end
 
