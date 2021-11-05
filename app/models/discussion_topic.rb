@@ -320,8 +320,6 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  attr_accessor :saved_by
-
   def update_assignment
     return if self.deleted?
 

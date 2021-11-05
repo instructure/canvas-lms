@@ -138,7 +138,7 @@ module Canvas::ICU
     # in test, this will reveal system configuration problems
     throw if Rails.env.test?
 
-    def self.collator
+    def self.collator # rubocop:disable Lint/DuplicateMethods
       NaiveCollator
     end
   end

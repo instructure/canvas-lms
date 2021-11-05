@@ -22,7 +22,7 @@ class UserService < ActiveRecord::Base
   include Workflow
 
   belongs_to :user
-  attr_accessor :password
+  attr_reader :password
 
   validates_presence_of :user_id, :service, :service_user_id, :workflow_state
 

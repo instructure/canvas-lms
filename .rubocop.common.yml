@@ -49,6 +49,8 @@ Lint/DeprecatedOpenSSLConstant:
   Severity: error
 Lint/DuplicateBranch:
   Severity: error
+Lint/DuplicateMethods:
+  Severity: error
 Lint/EmptyBlock:
   Severity: error
 Lint/NonDeterministicRequireOrder:
