@@ -1464,7 +1464,8 @@ class Submission < ActiveRecord::Base
     # I think the idea of having unpublished scores is unnecessarily confusing.
     # It may be that we want to have that functionality later on, but for now
     # I say it's just confusing.
-    if true # self.assignment && self.assignment.published?
+    # if self.assignment && self.assignment.published?
+    begin
       self.published_score = self.score
       self.published_grade = self.grade
     end

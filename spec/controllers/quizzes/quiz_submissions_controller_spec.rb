@@ -190,7 +190,7 @@ describe Quizzes::QuizSubmissionsController do
     before :once do
       @course = nil
       @student = nil
-      quiz_with_submission(!:complete_quiz)
+      quiz_with_submission(false)
       @quiz.update_attribute(:one_question_at_a_time, true)
     end
 
@@ -223,7 +223,7 @@ describe Quizzes::QuizSubmissionsController do
     context "with a zip parameter present" do
       it "queues a job to get all attachments for all submissions of a quiz" do
         user_session(@teacher)
-        quiz = course_quiz !!:active
+        quiz = course_quiz true
         expect(ContentZipper).to receive(:delay).and_return(ContentZipper)
         expect(ContentZipper).to receive(:process_attachment)
         get 'index', params: { quiz_id: quiz.id, zip: '1', course_id: @course }
@@ -235,7 +235,7 @@ describe Quizzes::QuizSubmissionsController do
           enrollment_type: "TeacherEnrollment", start_at: 2.days.ago, end_at: 1.day.ago, context: term.root_account
         )
         user_session(@teacher)
-        quiz = course_quiz !!:active
+        quiz = course_quiz true
         expect(quiz.grants_right?(@teacher, :grade)).to eq false
         expect(quiz.grants_right?(@teacher, :review_grades)).to eq true
         expect(ContentZipper).to receive(:delay).and_return(ContentZipper)
@@ -247,7 +247,7 @@ describe Quizzes::QuizSubmissionsController do
 
   describe "POST / (#extension)" do
     context "as a teacher in course" do
-      let_once(:quiz) { course_quiz !!:active }
+      let_once(:quiz) { course_quiz true }
       it "is able to extend own extra attempts" do
         user_session(@teacher)
         request.accept = "application/json"

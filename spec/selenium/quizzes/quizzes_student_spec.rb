@@ -108,7 +108,7 @@ describe 'quizzes' do
       context 'when logged out while taking a quiz' do
         it 'is notified and able to relogin', priority: "1", test_id: 209413 do
           # setup a quiz and start taking it
-          quiz_with_new_questions(!:goto_edit)
+          quiz_with_new_questions(goto_edit: false)
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
           expect_new_page_load { f('#take_quiz_link').click }
           sleep 1 # sleep because display is updated on timer, not ajax callback

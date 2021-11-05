@@ -157,7 +157,7 @@ describe 'quizzes question creation' do
 
   context 'errors' do
     before :once do
-      quiz_with_new_questions(false)
+      quiz_with_new_questions(goto_edit: false)
     end
 
     it 'shows errors for graded quizzes', priority: "1", test_id: 197491 do

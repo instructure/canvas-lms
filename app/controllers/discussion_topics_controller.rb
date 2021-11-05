@@ -961,7 +961,7 @@ class DiscussionTopicsController < ApplicationController
   #         -H 'Authorization: Bearer <token>'
   #
   def create
-    process_discussion_topic(!!:is_new)
+    process_discussion_topic(is_new: true)
   end
 
   # @API Update a topic
@@ -1046,7 +1046,7 @@ class DiscussionTopicsController < ApplicationController
   #         -H 'Authorization: Bearer <token>'
   #
   def update
-    process_discussion_topic(!:is_new)
+    process_discussion_topic(is_new: false)
   end
 
   # @API Delete a topic
@@ -1187,13 +1187,13 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
-  def process_discussion_topic(is_new = false)
+  def process_discussion_topic(is_new:)
     ActiveRecord::Base.transaction do
-      process_discussion_topic_runner(is_new)
+      process_discussion_topic_runner(is_new: is_new)
     end
   end
 
-  def process_discussion_topic_runner(is_new = false)
+  def process_discussion_topic_runner(is_new:)
     @errors = {}
 
     model_type = if value_to_boolean(params[:is_announcement]) &&
