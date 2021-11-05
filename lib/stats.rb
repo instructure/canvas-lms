@@ -60,8 +60,6 @@ module Stats
     alias_method :count, :size
     def empty?; @items.size == 0; end
 
-    def sum_of_squares; @sum_of_squares; end
-
     def mean; @items.empty? ? nil : (sum.to_f / @items.size); end
     alias_method :avg, :mean
 

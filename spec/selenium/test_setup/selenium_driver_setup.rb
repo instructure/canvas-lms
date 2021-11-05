@@ -90,8 +90,6 @@ module SeleniumDriverSetup
                   :server_ip,
                   :server_port
 
-    attr_reader :driver
-
     def reset!
       dump_browser_log if browser_log
       @driver = nil
