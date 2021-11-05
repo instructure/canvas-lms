@@ -876,11 +876,12 @@ class Message < ActiveRecord::Base
       unbounded_loop_paranoia_counter = 10
       current_context = context
 
-      until current_context&.is_a_context?
-        return nil if unbounded_loop_paranoia_counter <= 0 || current_context.nil?
-        return nil unless current_context.respond_to?(:context)
+      loop do
+        break if unbounded_loop_paranoia_counter.zero? ||
+                 current_context.nil? ||
+                 current_context.is_a_context?
 
-        current_context = current_context.context
+        current_context = current_context.try(:context)
         unbounded_loop_paranoia_counter -= 1
       end
 

@@ -345,19 +345,19 @@ namespace :i18n do
     import = I18nTasks::I18nImport.new(source_translations, new_translations)
 
     complete_translations = import.compile_complete_translations do |error_items, description|
-      begin
+      loop do
         puts "Warning: #{error_items.size} #{description}. What would you like to do?"
         puts " [C] continue anyway"
         puts " [V] view #{description}"
         puts " [D] debug"
         puts " [Q] quit"
-        case (command = $stdin.gets.upcase.strip)
-        when 'Q' then return :abort
+        case $stdin.gets.upcase.strip
+        when 'C' then break :accept
+        when 'Q' then break :abort
         when 'D' then debugger # rubocop:disable Lint/Debugger
         when 'V' then puts error_items.join("\n")
         end
-      end while command != 'C'
-      :accept
+      end
     end
 
     next if complete_translations.nil?

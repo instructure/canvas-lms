@@ -92,7 +92,7 @@ module Lti::IMS::Concerns
           end
           standard_claim_errors(jwt_hash)
           developer_key_errors
-          return if @errors.present?
+          return if @errors.present? # rubocop:disable Lint/NoReturnInBeginEndBlocks
 
           jwt_hash
         rescue JSON::JWT::InvalidFormat
