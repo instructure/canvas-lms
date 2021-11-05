@@ -77,6 +77,135 @@ class ContextExternalTool < ActiveRecord::Base
     can :read and can :update and can :delete and can :update_manually
   end
 
+  class << self
+    # because global navigation tool visibility can depend on a user having particular permissions now
+    # this needs to expand from being a simple "admins/members" check to something more full-fledged
+    # this will return a hash with the original visibility setting alone with a computed list of
+    # all other permissions (as needed) granted by the current context so all users with the same
+    # set of computed permissions will share the same global nav cache
+    def global_navigation_granted_permissions(root_account:, user:, context:, session: nil)
+      return { :original_visibility => 'members' } unless user
+
+      permissions_hash = {}
+      # still use the original visibility setting
+      permissions_hash[:original_visibility] = Rails.cache.fetch_with_batched_keys(
+        ['external_tools/global_navigation/visibility', root_account.asset_string].cache_key,
+        batch_object: user, batched_keys: [:enrollments, :account_users]
+      ) do
+        # let them see admin level tools if there are any courses they can manage
+        if root_account.grants_right?(user, :manage_content) ||
+           GuardRail.activate(:secondary) { Course.manageable_by_user(user.id, false).not_deleted.where(:root_account_id => root_account).exists? }
+          'admins'
+        else
+          'members'
+        end
+      end
+      required_permissions = global_navigation_permissions_to_check(root_account)
+      required_permissions.each do |permission|
+        # run permission checks against the context if any of the tools are configured to require them
+        permissions_hash[permission] = context.grants_right?(user, session, permission)
+      end
+      permissions_hash
+    end
+
+    def filtered_global_navigation_tools(root_account, granted_permissions)
+      tools = all_global_navigation_tools(root_account)
+
+      if granted_permissions[:original_visibility] != 'admins'
+        # reject the admin only tools
+        tools.reject! { |tool| tool.global_navigation[:visibility] == 'admins' }
+      end
+      # check against permissions if needed
+      tools.select! do |tool|
+        required_permissions_str = tool.extension_setting(:global_navigation, 'required_permissions')
+        if required_permissions_str
+          required_permissions_str.split(",").map(&:to_sym).all? { |p| granted_permissions[p] }
+        else
+          true
+        end
+      end
+      tools
+    end
+
+    # returns a key composed of the updated_at times for all the tools visible to someone with the granted_permissions
+    # i.e. if it hasn't changed since the last time we rendered the erb template for the menu then we can re-use the same html
+    def global_navigation_menu_render_cache_key(root_account, granted_permissions)
+      # only re-render the menu if one of the global nav tools has changed
+      perm_key = key_for_granted_permissions(granted_permissions)
+      compiled_key = ['external_tools/global_navigation/compiled_tools_updated_at', root_account.global_asset_string, perm_key].cache_key
+
+      # shameless plug for the cache register system:
+      # batching with the :global_navigation key means that we can easily mark every one of these for recalculation
+      # in the :check_global_navigation_cache callback instead of having to explicitly delete multiple keys
+      # (which was fine when we only had two visibility settings but not when an infinite combination of permissions is in play)
+      Rails.cache.fetch_with_batched_keys(compiled_key, batch_object: root_account, batched_keys: :global_navigation) do
+        tools = filtered_global_navigation_tools(root_account, granted_permissions)
+        Digest::MD5.hexdigest(tools.sort.map(&:cache_key).join('/'))
+      end
+    end
+
+    def visible?(visibility, user, context, session = nil)
+      visibility = visibility.to_s
+      return true unless %w(public members admins).include?(visibility)
+      return true if visibility == 'public'
+      return true if visibility == 'members' &&
+                     context.grants_any_right?(user, session, :participate_as_student, :read_as_admin)
+      return true if visibility == 'admins' && context.grants_right?(user, session, :read_as_admin)
+
+      false
+    end
+
+    def editor_button_json(tools, context, user, session = nil)
+      tools.select! { |tool| visible?(tool.editor_button['visibility'], user, context, session) }
+      markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new({ link_attributes: { target: '_blank' } }))
+      tools.map do |tool|
+        {
+          :name => tool.label_for(:editor_button, I18n.locale),
+          :id => tool.id,
+          :favorite => tool.is_rce_favorite_in_context?(context),
+          :url => tool.editor_button(:url),
+          :icon_url => tool.editor_button(:icon_url),
+          :canvas_icon_class => tool.editor_button(:canvas_icon_class),
+          :width => tool.editor_button(:selection_width),
+          :height => tool.editor_button(:selection_height),
+          :use_tray => tool.editor_button(:use_tray) == "true",
+          :description => if tool.description
+                            Sanitize.clean(markdown.render(tool.description), CanvasSanitize::SANITIZE)
+                          else
+                            ""
+                          end
+        }
+      end
+    end
+
+    private
+
+    def context_id_for(asset, shard)
+      str = asset.asset_string.to_s
+      raise "Empty value" if str.blank?
+
+      Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
+    end
+
+    def global_navigation_permissions_to_check(root_account)
+      # look at the list of tools that are configured for the account and see if any are asking for permissions checks
+      Rails.cache.fetch_with_batched_keys("external_tools/global_navigation/permissions_to_check", batch_object: root_account, batched_keys: :global_navigation) do
+        tools = all_global_navigation_tools(root_account)
+        tools.map { |tool| tool.extension_setting(:global_navigation, 'required_permissions')&.split(",")&.map(&:to_sym) }.compact.flatten.uniq
+      end
+    end
+
+    def all_global_navigation_tools(root_account)
+      RequestCache.cache('global_navigation_tools', root_account) do # prevent re-querying
+        root_account.context_external_tools.active.having_setting(:global_navigation).to_a
+      end
+    end
+
+    def key_for_granted_permissions(granted_permissions)
+      Digest::MD5.hexdigest(granted_permissions.sort.flatten.join(",")) # for consistency's sake
+    end
+  end
+
   Lti::ResourcePlacement::PLACEMENTS.each do |type|
     class_eval <<-RUBY, __FILE__, __LINE__ + 1
       def #{type}(setting=nil)
@@ -1089,13 +1218,6 @@ class ContextExternalTool < ActiveRecord::Base
 
   private
 
-  def self.context_id_for(asset, shard)
-    str = asset.asset_string.to_s
-    raise "Empty value" if str.blank?
-
-    Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
-  end
-
   def check_global_navigation_cache
     if self.context.is_a?(Account) && self.context.root_account?
       self.context.clear_cache_key(:global_navigation) # it's hard to know exactly _what_ changed so clear all initial global nav caches at once
@@ -1105,124 +1227,6 @@ class ContextExternalTool < ActiveRecord::Base
   def clear_tool_domain_cache
     if self.saved_change_to_domain? || self.saved_change_to_url? || self.saved_change_to_workflow_state?
       self.context.clear_tool_domain_cache
-    end
-  end
-
-  # because global navigation tool visibility can depend on a user having particular permissions now
-  # this needs to expand from being a simple "admins/members" check to something more full-fledged
-  # this will return a hash with the original visibility setting alone with a computed list of
-  # all other permissions (as needed) granted by the current context so all users with the same
-  # set of computed permissions will share the same global nav cache
-  def self.global_navigation_granted_permissions(root_account:, user:, context:, session: nil)
-    return { :original_visibility => 'members' } unless user
-
-    permissions_hash = {}
-    # still use the original visibility setting
-    permissions_hash[:original_visibility] = Rails.cache.fetch_with_batched_keys(
-      ['external_tools/global_navigation/visibility', root_account.asset_string].cache_key,
-      batch_object: user, batched_keys: [:enrollments, :account_users]
-    ) do
-      # let them see admin level tools if there are any courses they can manage
-      if root_account.grants_right?(user, :manage_content) ||
-         GuardRail.activate(:secondary) { Course.manageable_by_user(user.id, false).not_deleted.where(:root_account_id => root_account).exists? }
-        'admins'
-      else
-        'members'
-      end
-    end
-    required_permissions = self.global_navigation_permissions_to_check(root_account)
-    required_permissions.each do |permission|
-      # run permission checks against the context if any of the tools are configured to require them
-      permissions_hash[permission] = context.grants_right?(user, session, permission)
-    end
-    permissions_hash
-  end
-
-  def self.global_navigation_permissions_to_check(root_account)
-    # look at the list of tools that are configured for the account and see if any are asking for permissions checks
-    Rails.cache.fetch_with_batched_keys("external_tools/global_navigation/permissions_to_check", batch_object: root_account, batched_keys: :global_navigation) do
-      tools = self.all_global_navigation_tools(root_account)
-      tools.map { |tool| tool.extension_setting(:global_navigation, 'required_permissions')&.split(",")&.map(&:to_sym) }.compact.flatten.uniq
-    end
-  end
-
-  def self.all_global_navigation_tools(root_account)
-    RequestCache.cache('global_navigation_tools', root_account) do # prevent re-querying
-      root_account.context_external_tools.active.having_setting(:global_navigation).to_a
-    end
-  end
-
-  def self.filtered_global_navigation_tools(root_account, granted_permissions)
-    tools = self.all_global_navigation_tools(root_account)
-
-    if granted_permissions[:original_visibility] != 'admins'
-      # reject the admin only tools
-      tools.reject! { |tool| tool.global_navigation[:visibility] == 'admins' }
-    end
-    # check against permissions if needed
-    tools.select! do |tool|
-      required_permissions_str = tool.extension_setting(:global_navigation, 'required_permissions')
-      if required_permissions_str
-        required_permissions_str.split(",").map(&:to_sym).all? { |p| granted_permissions[p] }
-      else
-        true
-      end
-    end
-    tools
-  end
-
-  def self.key_for_granted_permissions(granted_permissions)
-    Digest::MD5.hexdigest(granted_permissions.sort.flatten.join(",")) # for consistency's sake
-  end
-
-  # returns a key composed of the updated_at times for all the tools visible to someone with the granted_permissions
-  # i.e. if it hasn't changed since the last time we rendered the erb template for the menu then we can re-use the same html
-  def self.global_navigation_menu_render_cache_key(root_account, granted_permissions)
-    # only re-render the menu if one of the global nav tools has changed
-    perm_key = key_for_granted_permissions(granted_permissions)
-    compiled_key = ['external_tools/global_navigation/compiled_tools_updated_at', root_account.global_asset_string, perm_key].cache_key
-
-    # shameless plug for the cache register system:
-    # batching with the :global_navigation key means that we can easily mark every one of these for recalculation
-    # in the :check_global_navigation_cache callback instead of having to explicitly delete multiple keys
-    # (which was fine when we only had two visibility settings but not when an infinite combination of permissions is in play)
-    Rails.cache.fetch_with_batched_keys(compiled_key, batch_object: root_account, batched_keys: :global_navigation) do
-      tools = self.filtered_global_navigation_tools(root_account, granted_permissions)
-      Digest::MD5.hexdigest(tools.sort.map(&:cache_key).join('/'))
-    end
-  end
-
-  def self.visible?(visibility, user, context, session = nil)
-    visibility = visibility.to_s
-    return true unless %w(public members admins).include?(visibility)
-    return true if visibility == 'public'
-    return true if visibility == 'members' &&
-                   context.grants_any_right?(user, session, :participate_as_student, :read_as_admin)
-    return true if visibility == 'admins' && context.grants_right?(user, session, :read_as_admin)
-
-    false
-  end
-
-  def self.editor_button_json(tools, context, user, session = nil)
-    tools.select! { |tool| visible?(tool.editor_button['visibility'], user, context, session) }
-    markdown = Redcarpet::Markdown.new(Redcarpet::Render::HTML.new({ link_attributes: { target: '_blank' } }))
-    tools.map do |tool|
-      {
-        :name => tool.label_for(:editor_button, I18n.locale),
-        :id => tool.id,
-        :favorite => tool.is_rce_favorite_in_context?(context),
-        :url => tool.editor_button(:url),
-        :icon_url => tool.editor_button(:icon_url),
-        :canvas_icon_class => tool.editor_button(:canvas_icon_class),
-        :width => tool.editor_button(:selection_width),
-        :height => tool.editor_button(:selection_height),
-        :use_tray => tool.editor_button(:use_tray) == "true",
-        :description => if tool.description
-                          Sanitize.clean(markdown.render(tool.description), CanvasSanitize::SANITIZE)
-                        else
-                          ""
-                        end
-      }
     end
   end
 end

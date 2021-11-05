@@ -59,6 +59,8 @@ Lint/DuplicateMethods:
   Severity: error
 Lint/EmptyBlock:
   Severity: error
+Lint/IneffectiveAccessModifier:
+  Severity: error
 Lint/MissingSuper:
   Severity: error
 Lint/NonDeterministicRequireOrder:
