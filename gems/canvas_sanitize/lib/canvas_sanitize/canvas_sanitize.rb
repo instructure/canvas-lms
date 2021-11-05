@@ -361,10 +361,13 @@ module CanvasSanitize # :nodoc:
       case arg
       when Symbol
         @config.fields << arg
-      when Hash,
-           Sanitize::Config::RELAXED,
-           Sanitize::Config::BASIC,
-           Sanitize::Config::RESTRICTED
+      when Hash
+        @config.sanitizer << arg
+      when Sanitize::Config::RELAXED
+        @config.sanitizer << arg
+      when Sanitize::Config::BASIC
+        @config.sanitizer << arg
+      when Sanitize::Config::RESTRICTED
         @config.sanitizer << arg
       end
     end

@@ -261,12 +261,14 @@ class RequestThrottle
       "request_throttling:#{client_identifier}"
     end
 
-    {
-      maximum: 800,
-      hwm: 600,
-      outflow: 10,
-      up_front_cost: 50,
-    }.each do |(setting, default)|
+    SETTING_DEFAULTS = [
+      [:maximum, 800],
+      [:hwm, 600],
+      [:outflow, 10],
+      [:up_front_cost, 50],
+    ]
+
+    SETTING_DEFAULTS.each do |(setting, default)|
       define_method(setting) do
         (self.class.custom_settings_hash[client_identifier]&.[](setting.to_s) ||
           Setting.get("request_throttle.#{setting}", default)).to_f

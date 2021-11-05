@@ -58,6 +58,8 @@ module Types
         nil
       elsif object.include_reply_preview && Account.site_admin.feature_enabled?(:isolated_view)
         load_association(:parent_entry)
+      else
+        nil
       end
     end
 

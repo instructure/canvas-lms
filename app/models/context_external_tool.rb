@@ -498,7 +498,9 @@ class ContextExternalTool < ActiveRecord::Base
     case property
     when :enabled
       true
-    when :url, :target_link_uri
+    when :url
+      url
+    when :target_link_uri
       url
     when :selection_width
       800

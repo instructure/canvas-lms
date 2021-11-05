@@ -477,8 +477,9 @@ class Course < ActiveRecord::Base
     if self.banner_image_url.present? && self.banner_image_id.present?
       self.errors.add(:banner_image, t("banner_image_url and banner_image_id cannot both be set."))
       false
-    elsif (self.banner_image_id.present? && valid_course_image_id?(self.banner_image_id)) ||
-          (self.banner_image_url.present? && valid_course_image_url?(self.banner_image_url))
+    elsif self.banner_image_id.present? && valid_course_image_id?(self.banner_image_id)
+      true
+    elsif self.banner_image_url.present? && valid_course_image_url?(self.banner_image_url)
       true
     else
       if self.banner_image_id.present?
@@ -494,8 +495,9 @@ class Course < ActiveRecord::Base
     if self.image_url.present? && self.image_id.present?
       self.errors.add(:image, t("image_url and image_id cannot both be set."))
       false
-    elsif (self.image_id.present? && valid_course_image_id?(self.image_id)) ||
-          (self.image_url.present? && valid_course_image_url?(self.image_url))
+    elsif self.image_id.present? && valid_course_image_id?(self.image_id)
+      true
+    elsif self.image_url.present? && valid_course_image_url?(self.image_url)
       true
     else
       if self.image_id.present?
@@ -963,7 +965,7 @@ class Course < ActiveRecord::Base
         return [] unless allowed_role_ids.any?
 
         allowed_user_ids = Set.new
-        role_user_ids.each { |role_id, u_id| allowed_user_ids << u_id if allowed_role_ids.include?(role_id) }
+        role_user_ids.each { |role_id, user_id| allowed_user_ids << user_id if allowed_role_ids.include?(role_id) }
         User.where(:id => allowed_user_ids).to_a
       else
         User.where(:id => instructor_enrollment_scope.select(:id)).to_a
@@ -2402,11 +2404,13 @@ class Course < ActiveRecord::Base
   def readable_default_wiki_editing_roles
     roles = self.default_wiki_editing_roles || "teachers"
     case roles
+    when 'teachers'
+      t('wiki_permissions.only_teachers', 'Only Teachers')
     when 'teachers,students'
       t('wiki_permissions.teachers_students', 'Teacher and Students')
     when 'teachers,students,public'
       t('wiki_permissions.all', 'Anyone')
-    else # 'teachers'
+    else
       t('wiki_permissions.only_teachers', 'Only Teachers')
     end
   end

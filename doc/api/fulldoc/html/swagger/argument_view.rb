@@ -127,7 +127,13 @@ class ArgumentView < HashView
 
   def required?
     types = enum_and_types.last.map { |t| t.downcase }
-    swagger_param_type == 'path' || types.include?('required')
+    if swagger_param_type == 'path'
+      true
+    elsif types.include?('required')
+      true
+    else
+      false
+    end
   end
 
   def array?

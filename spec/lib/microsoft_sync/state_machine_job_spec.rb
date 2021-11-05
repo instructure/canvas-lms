@@ -536,8 +536,7 @@ module MicrosoftSync
         end
 
         context 'when the error is a GracefulCancelError' do
-          before do
-            stub_const("MicrosoftSync::GracefulCancelTestError", Class.new(MicrosoftSync::Errors::GracefulCancelError))
+          class GracefulCancelTestError < MicrosoftSync::Errors::GracefulCancelError
           end
 
           let(:error) { GracefulCancelTestError.new }

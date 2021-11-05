@@ -48,7 +48,7 @@ describe ErrorReport do
     end
 
     it "ignores error classes that it's configured to overlook" do
-      stub_const("ErrorReportSpecException", Class.new(StandardError))
+      class ErrorReportSpecException < StandardError; end
       described_class.configure_to_ignore(["ErrorReportSpecException"])
       report = described_class.log_exception_from_canvas_errors(ErrorReportSpecException.new, {})
       expect(report).to be_nil

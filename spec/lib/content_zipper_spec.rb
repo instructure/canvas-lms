@@ -479,11 +479,12 @@ describe ContentZipper do
       user = User.create!
       eportfolio = user.eportfolios.create!(name: 'an name')
       eportfolio.ensure_defaults
-      attachment = eportfolio.attachments.create!(
-        display_name: "an_attachment",
-        user: user,
-        workflow_state: "to_be_zipped"
-      )
+      attachment = eportfolio.attachments.build do |attachment|
+        attachment.display_name = 'an_attachment'
+        attachment.user = user
+        attachment.workflow_state = 'to_be_zipped'
+      end
+      attachment.save!
       expect {
         ContentZipper.new.zip_eportfolio(attachment, eportfolio)
       }.to_not raise_error

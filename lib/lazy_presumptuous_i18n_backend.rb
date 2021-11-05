@@ -117,8 +117,8 @@ class LazyPresumptuousI18nBackend
   end
 
   def register_file(filename)
-    case (locale_from_filename = File.basename(filename, ".*"))
-    when "locales"
+    locale = File.basename(filename, '.*')
+    if locale == 'locales'
       data = YAML.load_file(filename)
       data.each do |locale, locale_data|
         # `store_translations` uses `deep_symbolize_keys`, so we do too to make
@@ -128,7 +128,7 @@ class LazyPresumptuousI18nBackend
         register_translations(locale, locale_data)
       end
       log "parsing and registering #{filename} [#{data.keys.join(', ')}]"
-    when "community"
+    elsif locale == 'community'
       data = CSV.read(filename, headers: true)
       csv_locales = data.headers - ["key"]
       csv_locales.each do |csv_locale|
@@ -139,8 +139,8 @@ class LazyPresumptuousI18nBackend
       end
       log "parsing and registering #{filename} [#{csv_locales.join(', ')}]"
     else
-      log "registering locale [#{locale_from_filename}] << #{filename}"
-      register_translations(locale_from_filename, filename)
+      log "registering locale [#{locale}] << #{filename}"
+      register_translations(locale, filename)
     end
   end
 

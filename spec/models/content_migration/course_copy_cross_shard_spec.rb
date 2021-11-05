@@ -5,7 +5,7 @@ require_relative 'course_copy_helper'
 describe ContentMigration do
   context "course copy across shards" do
     specs_require_sharding
-    include_context "course copy"
+    include_examples "course copy"
 
     before :once do
       @shard1.activate do

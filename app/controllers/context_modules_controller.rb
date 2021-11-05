@@ -308,12 +308,12 @@ class ContextModulesController < ApplicationController
 
   def reorder
     if authorized_action(@context.context_modules.temp_record, @current_user, :update)
-      first_module = @context.context_modules.not_deleted.first
+      m = @context.context_modules.not_deleted.first
 
       # A hash where the key is the module id and the value is the module position
       order_before = Hash[@context.context_modules.not_deleted.pluck(:id, :position)]
 
-      first_module.update_order(params[:order].split(","))
+      m.update_order(params[:order].split(","))
       # Need to invalidate the ordering cache used by context_module.rb
       @context.touch
 
@@ -582,8 +582,9 @@ class ContextModulesController < ApplicationController
           obj = @context.find_asset(params[:id], [:attachment, :discussion_topic, :assignment, :quiz, :wiki_page, :content_tag])
           if obj.is_a?(ContentTag)
             result[:current_item] = @tags.detect { |t| t.id == obj.id }
-          elsif (obj.is_a?(DiscussionTopic) && obj.assignment_id) ||
-                (obj.is_a?(Quizzes::Quiz) && obj.assignment_id)
+          elsif obj.is_a?(DiscussionTopic) && obj.assignment_id
+            result[:current_item] = @tags.detect { |t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
+          elsif obj.is_a?(Quizzes::Quiz) && obj.assignment_id
             result[:current_item] = @tags.detect { |t| t.content_type == 'Assignment' && t.content_id == obj.assignment_id }
           end
         end

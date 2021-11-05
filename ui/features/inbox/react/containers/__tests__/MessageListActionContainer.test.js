@@ -57,7 +57,6 @@ describe('MessageListActionContainer', () => {
             onCompose={jest.fn()}
             onReply={jest.fn()}
             onReplyAll={jest.fn()}
-            onSelectMailbox={jest.fn()}
             {...overrideProps}
           />
         </AlertManagerContext.Provider>
