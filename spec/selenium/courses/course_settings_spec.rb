@@ -134,16 +134,22 @@ describe "course settings" do
       expect(@course.grading_standard).to eq(@standard)
     end
 
-    it 'shows the correct course status when published' do
-      get "/courses/#{@course.id}/settings"
-      expect(f('#course-status').text).to eq 'Course is Published'
-    end
+    context "as a ta" do
+      before :each do
+        course_with_ta_logged_in(course: @course)
+      end
 
-    it 'shows the correct course status when unpublished' do
-      @course.workflow_state = 'claimed'
-      @course.save!
-      get "/courses/#{@course.id}/settings"
-      expect(f('#course-status').text).to eq 'Course is Unpublished'
+      it 'shows the correct course status when published' do
+        get "/courses/#{@course.id}/settings"
+        expect(f('#course-status').text).to eq 'Course is Published'
+      end
+
+      it 'shows the correct course status when unpublished' do
+        @course.workflow_state = 'claimed'
+        @course.save!
+        get "/courses/#{@course.id}/settings"
+        expect(f('#course-status').text).to eq 'Course is Unpublished'
+      end
     end
 
     it "shows the correct status with a tooltip when published and graded submissions" do
@@ -454,12 +460,19 @@ describe "course settings" do
       expect(fj('.summary tr:nth(5)').text).to match(/taaaa:\s*None/)
     end
 
-    it "shows publish/unpublish buttons for k5 subject courses", ignore_js_errors: true do
-      @account.enable_as_k5_account!
-      course_with_teacher_logged_in(:active_all => true)
+    it "shows publish/unpublish buttons in sidebar and no status badge if user can change publish state" do
+      course_with_teacher_logged_in(active_all: true)
       get "/courses/#{@course.id}/settings"
       expect(f("#course_status_form")).to be_present
       expect(f("#course_status_form #continue_to")).to have_attribute("value", "#{course_url(@course)}/settings")
+      expect(f("#content")).not_to contain_css("#course-status")
+    end
+
+    it "shows only published status badge if user can't change publish status" do
+      course_with_ta_logged_in(active_all: true)
+      get "/courses/#{@course.id}/settings"
+      expect(f("#course-status")).to be_present
+      expect(f("#content")).not_to contain_css("#course_status_form")
     end
   end
 
