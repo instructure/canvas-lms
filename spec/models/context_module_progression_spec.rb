@@ -108,12 +108,12 @@ describe ContextModuleProgression do
 
   context '#evaluate' do
     let(:module_progression) do
-      p = @module.context_module_progressions.create do |p|
-        p.context_module = @module
-        p.user = @user
-        p.current = true
-        p.evaluated_at = 5.minutes.ago
-      end
+      p = @module.context_module_progressions.create!(
+        context_module: @module,
+        user: @user,
+        current: true,
+        evaluated_at: 5.minutes.ago
+      )
       p.workflow_state = 'bogus'
       p
     end

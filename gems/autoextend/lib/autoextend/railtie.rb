@@ -17,9 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'byebug'
-require 'inst_access'
-
-RSpec.configure do |config|
-  config.order = 'random'
+module Autoextend
+  class Railtie < Rails::Railtie
+    # CANVAS_RAILS6_1 this method will need changing for a post-rails 6.1 world
+    initializer "inject autoextend hooks" do
+      ::Autoextend.inject_into_zetwerk
+    end
+  end
 end

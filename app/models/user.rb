@@ -536,9 +536,9 @@ class User < ActiveRecord::Base
         next
       end
       account_chain = account_chain_cache[account_id]
-      account_chain.each_with_index do |account_id, idx|
-        results[account_id] ||= idx
-        results[account_id] = idx if idx < results[account_id]
+      account_chain.each_with_index do |a_id, idx|
+        results[a_id] ||= idx
+        results[a_id] = idx if idx < results[a_id]
       end
     end
 
@@ -1344,18 +1344,12 @@ class User < ActiveRecord::Base
 
   def self.infer_id(obj)
     case obj
-    when User
+    when User, OpenObject
       obj.id
     when Numeric
       obj
-    when CommunicationChannel
+    when CommunicationChannel, Pseudonym, AccountUser
       obj.user_id
-    when Pseudonym
-      obj.user_id
-    when AccountUser
-      obj.user_id
-    when OpenObject
-      obj.id
     when String
       obj.to_i
     else
@@ -2820,7 +2814,7 @@ class User < ActiveRecord::Base
       templates.concat active_pseudonyms
       templates.uniq!
 
-      template = templates.detect { |template| !account.pseudonyms.active.by_unique_id(template.unique_id).first }
+      template = templates.detect { |t| !account.pseudonyms.active.by_unique_id(t.unique_id).first }
       if template
         # creating this not attached to the user's pseudonyms is intentional
         pseudonym = account.pseudonyms.build

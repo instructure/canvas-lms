@@ -284,14 +284,14 @@ describe "context modules" do
   end
 
   describe "files" do
-    FILE_NAME = 'some test file'
+    let(:file_name) { 'some test file' }
 
     before(:once) do
       course_factory(active_course: true)
       @course.usage_rights_required = true
       @course.save!
       # adding file to course
-      @file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
+      @file = @course.attachments.create!(:display_name => file_name, :uploaded_data => default_uploaded_data)
       @file.context = @course
       @file.save!
 
@@ -340,7 +340,7 @@ describe "context modules" do
       end
 
       it "adds multiple file items to a module" do
-        file_names = [FILE_NAME, "another.txt"]
+        file_names = [file_name, "another.txt"]
         get "/courses/#{@course.id}/modules"
         add_existing_module_file_items('#attachments_select', file_names)
         file_names.each { |item_name| expect(fj(".context_module_item:contains(#{item_name.inspect})")).to be_displayed }
@@ -504,7 +504,7 @@ describe "context modules" do
 
     it "adds a file item to a module", priority: "1", test_id: 126728 do
       get "/courses/#{@course.id}/modules"
-      add_existing_module_item('#attachments_select', 'File', FILE_NAME)
+      add_existing_module_item('#attachments_select', 'File', file_name)
     end
 
     it "does not remove the file link in a module when file is overwritten" do
@@ -512,18 +512,18 @@ describe "context modules" do
       @module.add_item({ :id => @file.id, :type => 'attachment' })
       get "/courses/#{@course.id}/modules"
 
-      expect(f('.context_module_item')).to include_text(FILE_NAME)
-      file = @course.attachments.create!(:display_name => FILE_NAME, :uploaded_data => default_uploaded_data)
+      expect(f('.context_module_item')).to include_text(file_name)
+      file = @course.attachments.create!(:display_name => file_name, :uploaded_data => default_uploaded_data)
       file.context = @course
       file.save!
       Attachment.last.handle_duplicates(:overwrite)
       refresh_page
-      expect(f('.context_module_item')).to include_text(FILE_NAME)
+      expect(f('.context_module_item')).to include_text(file_name)
     end
 
     it "sets usage rights on a file in a module", priority: "1", test_id: 369251 do
       get "/courses/#{@course.id}/modules"
-      add_existing_module_item('#attachments_select', 'File', FILE_NAME)
+      add_existing_module_item('#attachments_select', 'File', file_name)
       ff('.icon-publish')[0].click
       wait_for_ajaximations
       set_value f('.UsageRightsSelectBox__select'), 'own_copyright'
@@ -537,7 +537,7 @@ describe "context modules" do
 
     it 'edit file module item inline', priority: "2", test_id: 132492 do
       get "/courses/#{@course.id}/modules"
-      add_existing_module_item('#attachments_select', 'File', FILE_NAME)
+      add_existing_module_item('#attachments_select', 'File', file_name)
       verify_edit_item_form
     end
   end

@@ -20,29 +20,33 @@
 require_relative '../../../cc_spec_helper'
 
 describe "MediaConverter" do
-  class MediaConverterTest
-    include CC::Exporter::Epub::Converters::MediaConverter
+  let(:klass) do
+    Class.new do
+      include CC::Exporter::Epub::Converters::MediaConverter
 
-    def initialize(course = {})
-      @course = course
-    end
+      def initialize(course = {})
+        @course = course
+      end
 
-    def unsupported_files
-      return [{
-        file_name: File.basename("#{CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN)}/path/to/movie.mov")
-      }]
+      def unsupported_files
+        [{
+          file_name: File.basename("#{CGI.escape(self.class::WEB_CONTENT_TOKEN)}/path/to/movie.mov")
+        }]
+      end
     end
   end
 
   describe "#convert_media_paths!" do
+    subject(:test_instance) { klass.new }
+
     let_once(:a_href) do
-      "#{CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN)}/path/to/img.jpg"
+      "#{CGI.escape(klass::WEB_CONTENT_TOKEN)}/path/to/img.jpg"
     end
     let_once(:img_src) do
-      "#{CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN)}/path/to/img.jpg"
+      "#{CGI.escape(klass::WEB_CONTENT_TOKEN)}/path/to/img.jpg"
     end
     let_once(:mov_path) do
-      "#{CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN)}/path/to/movie.mov"
+      "#{CGI.escape(klass::WEB_CONTENT_TOKEN)}/path/to/movie.mov"
     end
 
     let(:doc) do
@@ -58,13 +62,10 @@ describe "MediaConverter" do
         </div>
       HTML
     end
-    subject(:test_instance) do
-      MediaConverterTest.new
-    end
 
     it "updates link hrefs containing WEB_CONTENT_TOKEN" do
       expect(doc.search('a').all? do |element|
-        element['href'].match(CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN))
+        element['href'].match(CGI.escape(klass::WEB_CONTENT_TOKEN))
       end).to be_truthy, 'precondition'
 
       test_instance.convert_media_paths!(doc)
@@ -74,13 +75,13 @@ describe "MediaConverter" do
       end).to be_truthy
 
       expect(doc.search('a').all? do |element|
-        element['href'].match(CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN))
+        element['href'].match(CGI.escape(klass::WEB_CONTENT_TOKEN))
       end).to be_falsey
     end
 
     it "updates img srcs containing WEB_CONTENT_TOKEN" do
       expect(doc.search('img').all? do |element|
-        element['src'].match(CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN))
+        element['src'].match(CGI.escape(klass::WEB_CONTENT_TOKEN))
       end).to be_truthy, 'precondition'
 
       test_instance.convert_media_paths!(doc)
@@ -90,7 +91,7 @@ describe "MediaConverter" do
       end).to be_truthy
 
       expect(doc.search('img').all? do |element|
-        element['src'].match(CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN))
+        element['src'].match(CGI.escape(klass::WEB_CONTENT_TOKEN))
       end).to be_falsey
     end
 
@@ -106,7 +107,7 @@ describe "MediaConverter" do
 
     it "does not explode with non standard file names" do
       other_doc = Nokogiri::HTML5.fragment(
-        "<div><a href=\"#{CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN)}/path/to/im%28g.jpg\"}>blah</a>"
+        "<div><a href=\"#{CGI.escape(klass::WEB_CONTENT_TOKEN)}/path/to/im%28g.jpg\"}>blah</a>"
       )
 
       test_instance.convert_media_paths!(other_doc)
@@ -116,6 +117,8 @@ describe "MediaConverter" do
   end
 
   describe "#convert_flv_paths!" do
+    subject(:test_instance) { klass.new }
+
     let(:doc) do
       Nokogiri::HTML5.fragment(<<-HTML)
         <div>
@@ -125,7 +128,6 @@ describe "MediaConverter" do
         </div>
       HTML
     end
-    subject(:test_instance) { MediaConverterTest.new }
 
     it "hrefses with flv to hrefs with mp4" do
       expect(doc.search('a').all? do |element|
@@ -146,6 +148,8 @@ describe "MediaConverter" do
 
   describe "#convert_audio_tags!" do
     context "for links with class instructure_audio_link" do
+      subject(:test_instance) { klass.new }
+
       let(:doc) do
         Nokogiri::HTML5.fragment(<<-HTML)
           <a href="#{CC::Exporter::Epub::FILE_PATH}/path/to/audio.mp3"
@@ -154,7 +158,6 @@ describe "MediaConverter" do
           </a>
         HTML
       end
-      subject(:test_instance) { MediaConverterTest.new }
 
       it "changes a tags to audio tags" do
         expect(doc.search('a').any?).to be_truthy, 'precondition'
@@ -168,6 +171,8 @@ describe "MediaConverter" do
     end
 
     context "for links with class audio_comment" do
+      subject(:test_instance) { klass.new }
+
       let(:doc) do
         Nokogiri::HTML5.fragment(<<-HTML)
           <a href="#{CC::Exporter::Epub::FILE_PATH}/path/to/audio.mp3"
@@ -176,7 +181,6 @@ describe "MediaConverter" do
           </a>
         HTML
       end
-      subject(:test_instance) { MediaConverterTest.new }
 
       it "changes a tags to audio tags" do
         expect(doc.search('a').any?).to be_truthy, 'precondition'
@@ -192,6 +196,8 @@ describe "MediaConverter" do
 
   describe "#convert_video_tags!" do
     context "for links with class instructure_video_link" do
+      subject(:test_instance) { klass.new }
+
       let(:doc) do
         Nokogiri::HTML5.fragment(<<-HTML)
           <a href="#{CC::Exporter::Epub::FILE_PATH}/path/to/audio.mp3"
@@ -200,7 +206,6 @@ describe "MediaConverter" do
           </a>
         HTML
       end
-      subject(:test_instance) { MediaConverterTest.new }
 
       it "changes a tags to audio tags" do
         expect(doc.search('a').any?).to be_truthy, 'precondition'
@@ -214,6 +219,8 @@ describe "MediaConverter" do
     end
 
     context "for links with class video_comment" do
+      subject(:test_instance) { klass.new }
+
       let(:doc) do
         Nokogiri::HTML5.fragment(<<-HTML)
           <a href="#{CC::Exporter::Epub::FILE_PATH}/path/to/audio.mp3"
@@ -222,7 +229,6 @@ describe "MediaConverter" do
           </a>
         HTML
       end
-      subject(:test_instance) { MediaConverterTest.new }
 
       it "changes a tags to audio tags" do
         expect(doc.search('a').any?).to be_truthy, 'precondition'

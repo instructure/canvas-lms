@@ -18,6 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# rubocop:disable Lint/ConstantDefinitionInBlock
+# we define some modules and classes inside of blocks like RSpec.configure
+# in this file, but we fully expect them to be globally accessible
+# moving them outside of the block where they're defined would distance them
+# from their use, making things harder to find
+
 begin
   require 'byebug'
 rescue LoadError
@@ -881,3 +887,5 @@ end
 def enable_default_developer_key!
   enable_developer_key_account_binding!(DeveloperKey.default)
 end
+
+# rubocop:enable Lint/ConstantDefinitionInBlock

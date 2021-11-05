@@ -18,15 +18,14 @@
 #
 
 describe TextHelper do
-  class TestClassForMixins
-    extend TextHelper
-    def self.t(*args)
-      I18n.t(*args)
-    end
-  end
-
   def th
-    TestClassForMixins
+    Class.new do
+      extend TextHelper
+
+      def self.t(*args)
+        I18n.t(*args)
+      end
+    end
   end
 
   context "datetime_string" do

@@ -21,7 +21,7 @@ require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "course copy dates" do
-    include_examples "course copy"
+    include_context "course copy"
 
     describe "date shifting" do
       before :once do

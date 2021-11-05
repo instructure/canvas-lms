@@ -22,7 +22,7 @@ require_relative '../../lti2_spec_helper'
 
 describe ContentMigration do
   context "course copy assignments" do
-    include_examples "course copy"
+    include_context "course copy"
 
     it "links assignments to account rubrics and outcomes" do
       account = @copy_from.account
@@ -333,8 +333,6 @@ describe ContentMigration do
     end
 
     describe "student annotation assignments" do
-      before(:each) { Account.site_admin.enable_feature!(:annotated_document_submissions) }
-
       let(:source_attachment) do
         attachment_model(course: @copy_from, filename: 'some_attachment')
       end

@@ -27,7 +27,7 @@ describe "Gradebook" do
   include GradebookCommon
   include ColorCommon
 
-  let(:extra_setup) {}
+  let(:extra_setup) { nil }
   let(:students) { @course.students }
 
   before :once do

@@ -21,7 +21,7 @@ require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "course copy quizzes" do
-    include_examples "course copy"
+    include_context "course copy"
 
     before :each do
       skip unless Qti.qti_enabled?

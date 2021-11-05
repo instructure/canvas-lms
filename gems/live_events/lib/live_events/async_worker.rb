@@ -78,7 +78,7 @@ module LiveEvents
 
       @thread = Thread.new { self.run_thread }
       @running = true
-      at_exit { stop! }
+      at_exit { stop! unless stopped? }
     end
 
     def run_thread

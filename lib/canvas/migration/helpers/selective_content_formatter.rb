@@ -127,12 +127,12 @@ module Canvas::Migration::Helpers
         if course_data['pace_plans']
           content_list << { type: 'pace_plans', property: "#{property_prefix}[all_pace_plans]", title: PACE_PLAN_TYPE.call }
         end
-        SELECTIVE_CONTENT_TYPES.each do |type, title|
-          if course_data[type] && course_data[type].count > 0
-            hash = { type: type, property: "#{property_prefix}[all_#{type}]", title: title.call, count: course_data[type].count }
-            add_url!(hash, type, selectable_outcomes)
-            content_list << hash
-          end
+        SELECTIVE_CONTENT_TYPES.each do |type2, title|
+          next unless course_data[type2] && course_data[type2].count > 0
+
+          hash = { type: type2, property: "#{property_prefix}[all_#{type2}]", title: title.call, count: course_data[type2].count }
+          add_url!(hash, type2, selectable_outcomes)
+          content_list << hash
         end
       end
 
@@ -326,18 +326,18 @@ module Canvas::Migration::Helpers
           content_list << { type: 'syllabus_body', property: "#{property_prefix}[all_syllabus_body]", title: COURSE_SYLLABUS_TYPE.call }
           content_list << { type: 'pace_plans', property: "#{property_prefix}[all_pace_plans]", title: PACE_PLAN_TYPE.call } if source.pace_plans.primary.not_deleted.any?
 
-          SELECTIVE_CONTENT_TYPES.each do |type, title|
-            next if type == 'groups'
+          SELECTIVE_CONTENT_TYPES.each do |type2, title|
+            next if type2 == 'groups'
 
             count = 0
-            if type == 'discussion_topics'
+            if type2 == 'discussion_topics'
               count = source.discussion_topics.active.only_discussion_topics.count
-            elsif type == 'learning_outcomes'
+            elsif type2 == 'learning_outcomes'
               count = source.linked_learning_outcomes.count
-            elsif type == 'tool_profiles'
+            elsif type2 == 'tool_profiles'
               count = source.tool_proxies.active.count
-            elsif source.respond_to?(type) && source.send(type).respond_to?(:count)
-              scope = source.send(type).except(:preload)
+            elsif source.respond_to?(type2) && source.send(type2).respond_to?(:count)
+              scope = source.send(type2).except(:preload)
               if scope.klass.respond_to?(:not_deleted)
                 scope = scope.not_deleted
               elsif scope.klass.respond_to?(:active)
@@ -348,8 +348,8 @@ module Canvas::Migration::Helpers
 
             next if count == 0
 
-            hash = { type: type, property: "#{property_prefix}[all_#{type}]", title: title.call, count: count }
-            add_url!(hash, type, selectable_outcomes)
+            hash = { type: type2, property: "#{property_prefix}[all_#{type2}]", title: title.call, count: count }
+            add_url!(hash, type2, selectable_outcomes)
             content_list << hash
           end
         end
@@ -455,8 +455,8 @@ module Canvas::Migration::Helpers
       if (mod = modules.detect { |m| m['migration_id'] == parent_mig_id })
         mod['submodules']
       else
-        modules.each do |mod|
-          if mod['submodules'] && (sm_data = submodule_data(mod['submodules'], parent_mig_id))
+        modules.each do |m|
+          if m['submodules'] && (sm_data = submodule_data(m['submodules'], parent_mig_id))
             return sm_data
           end
         end

@@ -37,7 +37,7 @@ module Canvas::Plugins
         id = "some_plugin_id"
         settings = { one: "two" }
         expect(Canvas::Plugin).to receive(:register).with(id, TicketingSystem::PLUGIN_ID, settings)
-        TicketingSystem.register_plugin(id, settings) { |r| }
+        TicketingSystem.register_plugin(id, settings) { nil }
       end
 
       it "fires the provided call back on every error report" do

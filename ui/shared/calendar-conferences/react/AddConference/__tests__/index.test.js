@@ -59,7 +59,7 @@ describe('AddConference', () => {
     })
 
     it('has default text', () => {
-      const badType = [{type: 'BadConference'}]
+      const badType = [{type: 'BadConference', name: 'Conferencing'}]
       const {getByRole} = render(<AddConference {...getProps({conferenceTypes: badType})} />)
       const button = getByRole('button')
       expect(button.textContent).toEqual('Add Conferencing')

@@ -58,7 +58,9 @@ export const MessageDetailActions = ({...props}) => {
           {I18n.t('Reply All')}
         </Menu.Item>
         <Menu.Item value="forward">{I18n.t('Forward')}</Menu.Item>
-        <Menu.Item value="delete">{I18n.t('Delete')}</Menu.Item>
+        <Menu.Item value="delete" onSelect={props.onDelete}>
+          {I18n.t('Delete')}
+        </Menu.Item>
       </Menu>
     </>
   )
@@ -66,5 +68,6 @@ export const MessageDetailActions = ({...props}) => {
 
 MessageDetailActions.propTypes = {
   onReply: PropTypes.func,
-  onReplyAll: PropTypes.func
+  onReplyAll: PropTypes.func,
+  onDelete: PropTypes.func
 }

@@ -103,17 +103,16 @@ describe ContextExternalToolsHelper do
     end
 
     before :each do
-      @controller = DummyController.new
+      klass = Class.new(ApplicationController) do
+        include ContextExternalToolsHelper
+      end
+      @controller = klass.new
       allow(@controller).to receive(:external_tool_url).and_return("http://stub.dev/tool_url")
       # allow(@controller).to receive(:request).and_return(ActionDispatch::TestRequest.new)
       # @controller.instance_variable_set(:@context, @course)
     end
 
     before :once do
-      class DummyController < ApplicationController
-        include ContextExternalToolsHelper
-      end
-
       course_model
       @root_account = @course.root_account
       @account = account_model(:root_account => @root_account, :parent_account => @root_account)

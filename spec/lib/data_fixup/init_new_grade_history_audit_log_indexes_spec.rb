@@ -31,20 +31,24 @@ describe DataFixup::InitNewGradeHistoryAuditLogIndexes do
     "SELECT id FROM #{table_name}"
   end
 
-  NO_GRADER_REQUIRED_TABLES = %w(
-    grade_changes_by_course_assignment
-    grade_changes_by_course_assignment_student
-    grade_changes_by_course_student
-  ).freeze
+  let(:no_grader_required_tables) do
+    %w(
+      grade_changes_by_course_assignment
+      grade_changes_by_course_assignment_student
+      grade_changes_by_course_student
+    ).freeze
+  end
 
-  GRADER_REQUIRED_TABLES = %w(
-    grade_changes_by_course_assignment_grader
-    grade_change_by_course_assignment_grader_student
-    grade_changes_by_course_grader
-    grade_changes_by_course_grader_student
-  ).freeze
+  let(:grader_required_tables) do
+    %w(
+      grade_changes_by_course_assignment_grader
+      grade_change_by_course_assignment_grader_student
+      grade_changes_by_course_grader
+      grade_changes_by_course_grader_student
+    ).freeze
+  end
 
-  INDEX_TABLES = (NO_GRADER_REQUIRED_TABLES + GRADER_REQUIRED_TABLES).freeze
+  let(:index_tables) { (no_grader_required_tables + grader_required_tables).freeze }
 
   before(:each) do
     @database = CanvasCassandra::DatabaseBuilder.from_config(:auditors)
@@ -78,7 +82,7 @@ describe DataFixup::InitNewGradeHistoryAuditLogIndexes do
   it 'creates all the new indexes for records with grader ids' do
     DataFixup::InitNewGradeHistoryAuditLogIndexes.run
 
-    INDEX_TABLES.each do |table_name|
+    index_tables.each do |table_name|
       cql = search_table_cql(table_name)
       ids = []
       @database.execute(cql).fetch do |row|
@@ -92,14 +96,14 @@ describe DataFixup::InitNewGradeHistoryAuditLogIndexes do
   it 'creates the expected subset of indexes for records without grader ids' do
     DataFixup::InitNewGradeHistoryAuditLogIndexes.run
 
-    INDEX_TABLES.each do |table_name|
+    index_tables.each do |table_name|
       cql = search_table_cql(table_name)
       ids = []
       @database.execute(cql).fetch do |row|
         ids << row['id']
       end
 
-      if GRADER_REQUIRED_TABLES.include?(table_name)
+      if grader_required_tables.include?(table_name)
         expect(ids).not_to include(@values.second.first)
       else
         expect(ids).to include(@values.second.first)

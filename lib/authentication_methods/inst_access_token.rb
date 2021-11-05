@@ -34,7 +34,7 @@ module AuthenticationMethods
     # not a valid one (expired or bad signature) and processing should only
     # continue on the assumption that this is an invalid request.
     def self.parse(token_string)
-      return false unless InstAccess::Token.is_token?(token_string)
+      return false unless InstAccess::Token.token?(token_string)
 
       begin
         InstAccess::Token.from_token_string(token_string)

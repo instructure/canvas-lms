@@ -53,12 +53,12 @@ load_cache_config = -> do
   end
 
   # resolve links
-  cache_map.each_key do |cluster|
-    value = cluster
+  cache_map.each_key do |cluster_name|
+    value = cluster_name
     while value.is_a?(String)
       value = cache_map[value]
     end
-    cache_map[cluster] = value
+    cache_map[cluster_name] = value
   end
 
   # fallback for no configuration whatsoever

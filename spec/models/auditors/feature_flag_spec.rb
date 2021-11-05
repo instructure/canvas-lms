@@ -108,7 +108,7 @@ describe Auditors::FeatureFlag do
     end
 
     it "does not swallow auditor write errors" do
-      test_err_class = Class.new(StandardError) {}
+      test_err_class = Class.new(StandardError)
       allow(Auditors::ActiveRecord::FeatureFlagRecord).to receive(:create_from_event_stream!).and_raise(test_err_class.new("DB Error"))
       expect { Auditors::FeatureFlag.record(@flag, @user, 'on') }.to raise_error(test_err_class)
     end

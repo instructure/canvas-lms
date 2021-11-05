@@ -109,11 +109,9 @@ class Quizzes::QuizRegrader::Answer
     newly_scored_data = Quizzes::SubmissionGrader.score_question(question_data, fake_submission_data)
 
     # always give full credit
-    if regrade_option == "full_credit"
-      newly_scored_data[:points] = points_possible
-
-      # give full credit if was previously correct or correct now
-    elsif regrade_option == "current_and_previous_correct" && previously_correct
+    if regrade_option == "full_credit" ||
+       # give full credit if it was previously correct or correct now
+       (regrade_option == "current_and_previous_correct" && previously_correct)
       newly_scored_data[:points] = points_possible
     end
 

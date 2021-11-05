@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-shared_examples_for "course copy" do
+shared_context "course copy" do
   before :once do
     course_with_teacher(:course_name => "from course", :active_all => true)
     @copy_from = @course

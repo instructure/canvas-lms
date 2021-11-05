@@ -54,9 +54,11 @@ describe('MessageListActionContainer', () => {
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
           <MessageListActionContainer
+            activeMailbox="inbox"
             onCompose={jest.fn()}
             onReply={jest.fn()}
             onReplyAll={jest.fn()}
+            onSelectMailbox={jest.fn()}
             {...overrideProps}
           />
         </AlertManagerContext.Provider>

@@ -101,9 +101,9 @@ module Quizzes
       # we're going to merge the item analysis for applicable questions into the
       # generic question statistics from the student analysis
       question_statistics.each do |question|
-        question_id = question[:id] = "#{question[:id]}"
-        question_item = item_analysis_report.detect do |question_item|
-          "#{question_item[:question_id]}" == question_id
+        question_id = question[:id] = question[:id].to_s
+        question_item = item_analysis_report.detect do |item|
+          item[:question_id].to_s == question_id
         end
 
         if question_item.present?

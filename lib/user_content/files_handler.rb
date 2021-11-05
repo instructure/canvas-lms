@@ -107,10 +107,12 @@ module UserContent
       if user_can_access_attachment?
         ProcessedUrl.new(match: match, attachment: attachment, is_public: is_public, in_app: in_app).url
       else
+        # Setting is_public: false and in_app: true to force never adding verifier query param
+        processed_url = ProcessedUrl.new(match: match, attachment: attachment, is_public: false, in_app: true).url
         begin
-          uri = URI.parse(match.url)
+          uri = URI.parse(processed_url)
         rescue URI::InvalidURIError
-          uri = URI.parse(Addressable::URI.escape(match.url))
+          uri = URI.parse(Addressable::URI.escape(processed_url))
         end
         if attachment.previewable_media? && match.url.present?
           uri.query = (uri.query.to_s.split("&") + ["no_preview=1"]).join("&")
