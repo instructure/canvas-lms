@@ -552,7 +552,7 @@ describe Quizzes::QuizzesApiController, type: :request do
   describe "DELETE /courses/:course_id/quizzes/id (destroy)" do
     it "deletes a quiz" do
       teacher_in_course active_all: true
-      quiz = course_quiz !!:active
+      quiz = course_quiz true
       api_call(:delete, "/api/v1/courses/#{@course.id}/quizzes/#{quiz.id}",
                { controller: 'quizzes/quizzes_api', action: 'destroy',
                  format: 'json', course_id: @course.id.to_s,

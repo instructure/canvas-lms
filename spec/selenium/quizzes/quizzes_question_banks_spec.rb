@@ -267,7 +267,7 @@ describe 'quizzes question banks' do
       @course.save
 
       # create quiz that pulls from question bank
-      quiz_with_new_questions true
+      quiz_with_new_questions
 
       # create question group, fill with existing question bank questions
       create_question_group

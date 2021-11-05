@@ -520,7 +520,7 @@ describe Quizzes::QuizzesController do
 
     it "allows forcing authentication on public quiz pages" do
       @course.update_attribute :is_public, true
-      course_quiz !!:active
+      course_quiz(true)
       get 'show', params: { :course_id => @course.id, :id => @quiz.id, :force_user => 1 }
       expect(response).to be_redirect
       expect(response.location).to match(/login/)
@@ -528,14 +528,14 @@ describe Quizzes::QuizzesController do
 
     it "renders the show page for public courses" do
       @course.update_attribute :is_public, true
-      course_quiz !!:active
+      course_quiz(true)
       get 'show', params: { course_id: @course.id, id: @quiz.id, take: '1' }
       expect(response).to be_successful
     end
 
     it "sets session[headless_quiz] if persist_headless param is sent" do
       user_session(@student)
-      course_quiz !!:active
+      course_quiz(true)
       get 'show', params: { :course_id => @course.id, :id => @quiz.id, :persist_headless => 1 }
       expect(controller.session[:headless_quiz]).to be_truthy
       expect(assigns[:headers]).to be_falsey
@@ -543,7 +543,7 @@ describe Quizzes::QuizzesController do
 
     it "does not render headers if session[:headless_quiz] is set" do
       user_session(@student)
-      course_quiz !!:active
+      course_quiz(true)
       controller.session[:headless_quiz] = true
       get 'show', params: { :course_id => @course.id, :id => @quiz.id }
       expect(assigns[:headers]).to be_falsey
@@ -551,7 +551,7 @@ describe Quizzes::QuizzesController do
 
     it "assigns js_env for attachments if submission is present" do
       user_session(@student)
-      course_quiz !!:active
+      course_quiz(true)
       submission = @quiz.generate_submission @student
       create_attachment_for_file_upload_submission!(submission)
       get 'show', params: { :course_id => @course.id, :id => @quiz.id }
