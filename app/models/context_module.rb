@@ -306,7 +306,11 @@ class ContextModule < ActiveRecord::Base
         next if tag.asset_workflow_state == 'deleted'
 
         # although the module will be restored unpublished, the items should match the asset's published state
-        tag.workflow_state = tag.content && tag.sync_workflow_state_to_asset? ? tag.asset_workflow_state : 'unpublished'
+        tag.workflow_state = if tag.content && tag.sync_workflow_state_to_asset?
+                               tag.asset_workflow_state
+                             else
+                               'unpublished'
+                             end
         # deal with the possibility that the asset has been renamed after the module was deleted
         tag.title = Context.asset_name(tag.content) if tag.content && tag.sync_title_to_asset_title?
         tag.save
@@ -905,7 +909,10 @@ class ContextModule < ActiveRecord::Base
   end
 
   def completion_events=(value)
-    return write_attribute(:completion_events, nil) unless value
+    unless value
+      write_attribute(:completion_events, nil)
+      return
+    end
 
     write_attribute(:completion_events, (value.map(&:to_sym) & VALID_COMPLETION_EVENTS).join(','))
   end

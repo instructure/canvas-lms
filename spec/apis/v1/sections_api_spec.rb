@@ -134,7 +134,7 @@ describe SectionsController, type: :request do
     end
 
     it "returns all sections if :all are specified" do
-      12.times { @course2.course_sections.create!(:name => 'Section #{i}') }
+      12.times { |i| @course2.course_sections.create!(name: "Section #{i}") }
 
       endpoint = "/api/v1/courses/#{@course2.id}/sections.json"
       params = { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }

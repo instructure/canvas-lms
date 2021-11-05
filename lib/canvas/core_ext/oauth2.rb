@@ -19,7 +19,7 @@
 
 module Canvas::CoreExt
   module OAuth2
-    def get_token(params, access_token_opts = {}, access_token_class = ::OAuth2::AccessToken) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+    def get_token(params, access_token_opts = {}, access_token_class = ::OAuth2::AccessToken)
       params = ::OAuth2::Authenticator.new(id, secret, options[:auth_scheme]).apply(params)
       opts = { :raise_errors => options[:raise_errors], :parse => params.delete(:parse) }
       headers = params.delete(:headers) || {}

@@ -27,6 +27,7 @@
 begin
   require 'byebug'
 rescue LoadError
+  nil
 end
 
 require 'securerandom'

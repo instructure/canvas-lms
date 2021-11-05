@@ -92,6 +92,7 @@ module Importers
                 new_url = uri.to_s
               end
             rescue URI::InvalidURIError, URI::InvalidComponentError
+              nil
             end
           end
         end

@@ -79,7 +79,7 @@ describe 'quizzes stats' do
           expect(fj(".report-generator:contains('#{report_type}')")).to include_text("Generate #{report_type.downcase} report")
         end
 
-        it 'downloads a csv when pressing #{report_type} button', priority: "1", test_id: 270039 do
+        it "downloads a csv when pressing #{report_type} button", priority: "1", test_id: 270039 do
           skip("QUIZ-5120")
           button = fj(".generate-report:contains('#{report_type}')")
           button.click

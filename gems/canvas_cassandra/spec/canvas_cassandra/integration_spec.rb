@@ -46,6 +46,7 @@ describe "execute and update" do
     begin
       db.execute("drop table page_views")
     rescue CassandraCQL::Error::InvalidRequestException
+      nil
     end
     db.execute("create table page_views (request_id text primary key, user_id bigint)")
   end

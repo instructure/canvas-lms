@@ -811,7 +811,7 @@ class Course < ActiveRecord::Base
     # args[0] should be user_id, args[1], if true, will include completed
     # enrollments as well as active enrollments
     user_id = args[0]
-    workflow_states = (args[1].present? ? %w{'active' 'completed'} : %w{'active'}).join(', ')
+    workflow_states = (args[1].present? ? ["'active'", "'completed'"] : ["'active'"]).join(', ')
     admin_completed_sql = ""
     enrollment_completed_sql = ""
 

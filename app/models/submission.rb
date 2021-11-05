@@ -2399,7 +2399,7 @@ class Submission < ActiveRecord::Base
   def to_atom(opts = {})
     author_name = self.assignment.present? && self.assignment.context.present? ? self.assignment.context.name : t('atom_no_author', "No Author")
     Atom::Entry.new do |entry|
-      entry.title     = "#{self&.user.name} -- #{self&.assignment.title}#{', ' + self.assignment.context.name if opts[:include_context]}"
+      entry.title     = "#{user.name} -- #{assignment.title}#{', ' + self.assignment.context.name if opts[:include_context]}"
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime('%Y-%m-%d')}:/submissions/#{self.feed_code}_#{self.updated_at.strftime('%Y-%m-%d')}"

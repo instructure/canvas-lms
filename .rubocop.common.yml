@@ -31,73 +31,23 @@ Layout:
 Layout/LineLength:
   Enabled: false # TODO. Maybe.
 
+Lint:
+  Severity: error
 Lint/AmbiguousBlockAssociation:
   IgnoredMethods:
     - change
     - not_change
     - raise_error
-  Severity: error
-Lint/AmbiguousOperator:
-  Severity: error
-Lint/AmbiguousOperatorPrecedence:
-  Severity: error
-Lint/AmbiguousRegexpLiteral:
-  Severity: error
-Lint/AssignmentInCondition:
-  Severity: error
-Lint/ConstantDefinitionInBlock:
-  Severity: error
-Lint/Debugger:
-  Severity: error
-Lint/DeprecatedClassMethods:
-  Severity: error
-Lint/DeprecatedOpenSSLConstant:
-  Severity: error
-Lint/DuplicateBranch:
-  Severity: error
-Lint/DuplicateMethods:
-  Severity: error
-Lint/EmptyBlock:
-  Severity: error
-Lint/IneffectiveAccessModifier:
-  Severity: error
-Lint/MissingSuper:
-  Severity: error
-Lint/NoReturnInBeginEndBlocks:
-  Severity: error
-Lint/NonDeterministicRequireOrder:
-  Severity: error
-Lint/ParenthesesAsGroupedExpression:
-  Severity: error
-Lint/RedundantRequireStatement:
-  Severity: error
-Lint/RedundantSafeNavigation:
-  Severity: error
-Lint/RedundantSplatExpansion:
-  Severity: error
-Lint/RedundantStringCoercion:
-  Severity: error
-Lint/RedundantWithIndex:
-  Severity: error
+Lint/NoFileUtilsRmRf:
+  Severity: warning # intended for specs; not enforced
+Lint/NoSleep:
+  Severity: warning # intended for specs; not enforced
+Lint/NonLocalExitFromIterator:
+  Enabled: false # SnR is too low because of how often this construct is used
 Lint/SafeNavigationConsistency:
   Enabled: false # https://github.com/rubocop/rubocop/issues/9816
-Lint/SendWithMixinArgument:
-  Severity: error
-Lint/ShadowingOuterLocalVariable:
-  Severity: error
-Lint/SymbolConversion:
-  Severity: error
-Lint/UnifiedInteger:
-  Severity: error
-Lint/UselessAssignment:
-  Severity: error
-Lint/UnusedBlockArgument:
-  Severity: error
 Lint/UnusedMethodArgument:
   AllowUnusedKeywordArguments: true # there's no way to mark a kwarg as unused
-  Severity: error
-Lint/Void:
-  Severity: error
 
 Metrics:
   Enabled: false # SnR is just too low to have this enabled
@@ -185,6 +135,9 @@ Style/WhileUntilModifier:
 
 # the following cops are currently silenced, but we may want to enable them IF
 # we correct all instances in the codebase first
+
+Lint/UriEscapeUnescape: # TODO
+  Severity: warning
 
 Naming/VariableNumber: # TODO
   Enabled: false

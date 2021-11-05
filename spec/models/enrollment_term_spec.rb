@@ -362,88 +362,70 @@ describe EnrollmentTerm do
 
     it 'recomputes scores for all courses in the enrollment term' do
       # update_columns to avoid triggering EnrollmentTerm#recompute_course_scores_later
-      # rubocop:disable Rails/SkipsModelValidations
       @grading_period.update_columns(start_date: 1.week.ago(@now))
-      # rubocop:enable Rails/SkipsModelValidations
-
       expect { @term.recompute_course_scores_later }.to change {
-        [@first_course_in_term, @second_course_in_term].map do |course|
-          enrollment = course.student_enrollments.find_by(user_id: @student)
-          enrollment.computed_current_score
-        end
-      }.from([nil, nil]).to([80.0, 50.0])
+                                                          [@first_course_in_term, @second_course_in_term].map do |course|
+                                                            enrollment = course.student_enrollments.find_by(user_id: @student)
+                                                            enrollment.computed_current_score
+                                                          end
+                                                        }.from([nil, nil]).to([80.0, 50.0])
     end
 
     it 'does not recomputes scores for courses not in the enrollment term' do
       # update_columns to avoid triggering EnrollmentTerm#recompute_course_scores_later
-      # rubocop:disable Rails/SkipsModelValidations
       @grading_period.update_columns(start_date: 1.week.ago(@now))
-      # rubocop:enable Rails/SkipsModelValidations
-
       expect { @term.recompute_course_scores_later }.not_to change {
-        enrollment = @course_not_in_term.student_enrollments.find_by(user_id: @student)
-        enrollment.computed_current_score
-      }
+                                                              enrollment = @course_not_in_term.student_enrollments.find_by(user_id: @student)
+                                                              enrollment.computed_current_score
+                                                            }
     end
 
     it 're-caches due dates on submissions in courses in the enrollment term' do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
-      # rubocop:disable Rails/SkipsModelValidations
       Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
                 .update_all(due_at: new_due_date)
-      # rubocop:enable Rails/SkipsModelValidations
-
       expect { @term.recompute_course_scores_later }.to change {
-        [@first_course_assignment, @second_course_assignment].map do |assignment|
-          submission = assignment.submissions.find_by(user_id: @student)
-          submission.cached_due_date
-        end
-      }.from([@now, @now]).to([new_due_date, new_due_date])
+                                                          [@first_course_assignment, @second_course_assignment].map do |assignment|
+                                                            submission = assignment.submissions.find_by(user_id: @student)
+                                                            submission.cached_due_date
+                                                          end
+                                                        }.from([@now, @now]).to([new_due_date, new_due_date])
     end
 
     it 'does not re-cache due dates for courses not in the enrollment term' do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
-      # rubocop:disable Rails/SkipsModelValidations
       Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
                 .update_all(due_at: new_due_date)
-      # rubocop:enable Rails/SkipsModelValidations
-
       expect { @term.recompute_course_scores_later }.not_to change {
-        submission = @not_in_term_assignment.submissions.find_by(user_id: @student)
-        submission.cached_due_date
-      }
+                                                              submission = @not_in_term_assignment.submissions.find_by(user_id: @student)
+                                                              submission.cached_due_date
+                                                            }
     end
 
     it 're-caches grading period IDs on submissions in courses in the enrollment term' do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
-      # rubocop:disable Rails/SkipsModelValidations
       Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
                 .update_all(due_at: new_due_date)
-      # rubocop:enable Rails/SkipsModelValidations
-
       expect { @term.recompute_course_scores_later }.to change {
-        [@first_course_assignment, @second_course_assignment].map do |assignment|
-          submission = assignment.submissions.find_by(user_id: @student)
-          submission.grading_period_id
-        end
-      }.from([nil, nil]).to([@grading_period.id, @grading_period.id])
+                                                          [@first_course_assignment, @second_course_assignment].map do |assignment|
+                                                            submission = assignment.submissions.find_by(user_id: @student)
+                                                            submission.grading_period_id
+                                                          end
+                                                        }.from([nil, nil]).to([@grading_period.id, @grading_period.id])
     end
 
     it 'does not re-cache grading period IDs on submissions in courses not in the enrollment term' do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
-      # rubocop:disable Rails/SkipsModelValidations
       Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
                 .update_all(due_at: new_due_date)
-      # rubocop:enable Rails/SkipsModelValidations
-
       expect { @term.recompute_course_scores_later }.not_to change {
-        submission = @not_in_term_assignment.submissions.find_by(user_id: @student)
-        submission.grading_period_id
-      }
+                                                              submission = @not_in_term_assignment.submissions.find_by(user_id: @student)
+                                                              submission.grading_period_id
+                                                            }
     end
   end
 end

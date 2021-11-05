@@ -202,6 +202,7 @@ class FilesController < ApplicationController
       # maybe their browser is being stupid and came to the files domain directly with an old verifier - try to go back and get a new one
       return redirect_to_fallback_url if files_domain?
     rescue Users::AccessVerifier::InvalidVerifier
+      nil
     end
 
     if access_verifier[:user]

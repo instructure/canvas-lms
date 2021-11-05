@@ -70,7 +70,7 @@ class Lti::ResourceLink < ApplicationRecord
     context:, lookup_uuid:, custom: nil,
     context_external_tool: nil, context_external_tool_launch_url: nil
   )
-    result = lookup_uuid.present? && context&.lti_resource_links.find_by(lookup_uuid: lookup_uuid)
+    result = lookup_uuid.present? && context&.lti_resource_links&.find_by(lookup_uuid: lookup_uuid)
     result || context&.shard&.activate do
       new(
         context: context,
