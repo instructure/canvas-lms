@@ -1321,8 +1321,7 @@ describe Course do
   end
 
   describe "#reset_content" do
-    before do
-      :once
+    before(:once) do
       course_with_student
     end
 

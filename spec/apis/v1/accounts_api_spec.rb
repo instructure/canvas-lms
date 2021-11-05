@@ -1427,7 +1427,6 @@ describe "Accounts API", type: :request do
         @t1 = @teacher
         course_with_teacher(:account => @a1, :user => @t1, :course_name => 'c1b')
         course_with_teacher(:account => @a1, :course_name => 'c2')
-        @teacher
         course_with_teacher(:account => @a1, :course_name => 'c3')
         @t3 = @teacher
         @user = @me

@@ -602,7 +602,6 @@ class CalendarEvent < ActiveRecord::Base
       write_attribute(:participants_per_appointment, limit)
       self.override_participants_per_appointment = true
     end
-    limit
   end
 
   def update_matching_days=(update)

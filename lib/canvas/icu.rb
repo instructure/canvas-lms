@@ -70,7 +70,6 @@ module Canvas::ICU
           ICU::Lib.check_error do |error|
             ICU::Lib.ucol_setAttribute(@c, ATTRIBUTES[attribute], ATTRIBUTE_VALUES[value], error)
           end
-          value
         end
 
         ATTRIBUTES = {

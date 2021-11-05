@@ -908,7 +908,6 @@ class User < ActiveRecord::Base
     p = Pseudonym.find(p)
     p.move_to_top
     self.reload
-    p
   end
 
   def email_channel
@@ -2875,7 +2874,6 @@ class User < ActiveRecord::Base
     else
       self.otp_secret_key_enc = self.otp_secret_key_salt = nil
     end
-    key
   end
 
   def crocodoc_id!

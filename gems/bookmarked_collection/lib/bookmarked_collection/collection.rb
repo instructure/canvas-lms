@@ -102,7 +102,6 @@ class BookmarkedCollection::Collection < Array
 
   def current_page=(page)
     self.current_bookmark = page_to_bookmark(page)
-    page
   end
 
   def first_page

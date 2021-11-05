@@ -96,6 +96,8 @@ Lint/UnusedBlockArgument:
 Lint/UnusedMethodArgument:
   AllowUnusedKeywordArguments: true # there's no way to mark a kwarg as unused
   Severity: error
+Lint/Void:
+  Severity: error
 
 Metrics:
   Enabled: false # SnR is just too low to have this enabled
