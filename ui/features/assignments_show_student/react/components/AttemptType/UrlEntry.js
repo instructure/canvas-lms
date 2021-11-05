@@ -207,7 +207,7 @@ class UrlEntry extends React.Component {
     <View as="div" borderWidth="small" data-testid="url-entry" margin="0 0 medium 0">
       <Billboard
         heading={I18n.t('Enter Web URL')}
-        headingAs="h4"
+        headingAs="span"
         headingLevel="h4"
         message={this.renderURLInput()}
         theme={{backgroundColor: theme.variables.colors.porcelain}}
