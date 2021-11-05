@@ -43,7 +43,7 @@ class ContextExternalTool < ActiveRecord::Base
   validate :url_or_domain_is_set
   validate :validate_urls
   serialize :settings
-  attr_accessor :config_type, :config_url, :config_xml
+  attr_reader :config_type, :config_url, :config_xml
 
   before_save :infer_defaults, :validate_vendor_help_link
   after_save :touch_context, :check_global_navigation_cache, :clear_tool_domain_cache

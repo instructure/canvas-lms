@@ -21,7 +21,8 @@
 class GroupCategory < ActiveRecord::Base
   attr_reader :create_group_count
   attr_reader :create_group_member_count
-  attr_accessor :assign_unassigned_members, :group_by_section
+  attr_accessor :group_by_section
+  attr_writer :assign_unassigned_members
 
   belongs_to :context, polymorphic: [:course, :account]
   belongs_to :sis_batch

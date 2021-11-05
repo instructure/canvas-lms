@@ -455,10 +455,6 @@ class Group < ActiveRecord::Base
     self.group_category.groups.where("id<>?", self).to_a
   end
 
-  def student_organized?
-    self.group_category && self.group_category.student_organized?
-  end
-
   def ensure_defaults
     self.name ||= CanvasSlug.generate_securish_uuid
     self.uuid ||= CanvasSlug.generate_securish_uuid
