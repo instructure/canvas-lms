@@ -104,7 +104,6 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
       settings_will_change!
       settings['userinfo_endpoint'] = value
     end
-    value
   end
 
   protected

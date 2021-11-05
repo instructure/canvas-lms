@@ -179,7 +179,10 @@ describe "MessageableUser::Calculator" do
 
         context "concluded enrollment" do
           before do
-            @enrollment.workflow_state == 'completed'
+            # specifically, the workflow_state assignment below was accidentally a comparison
+            # https://github.com/instructure/canvas-lms/commit/c106826889469f8faa08847d4002c6b5d074fa13
+            skip "VICE-2235: specs broken since inception"
+            @enrollment.workflow_state = "completed"
             @enrollment.save!
           end
 

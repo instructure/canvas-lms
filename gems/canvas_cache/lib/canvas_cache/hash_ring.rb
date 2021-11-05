@@ -62,7 +62,7 @@ module CanvasCache
       # and therefore the top bit is set
       digest_length = result.values.sum.to_s(2).length
       max = 1 << digest_length
-      result[ring[sorted_keys.last]] + max - last
+      result[ring[sorted_keys.last]] = max - last
       result.map { |k, v| [k, v.to_f / max] }.sort_by(&:last).to_h
     end
 

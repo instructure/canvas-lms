@@ -620,7 +620,6 @@ describe "people" do
     new_role = @account.roles.new(:name => old_role.name)
     new_role.base_role_type = "StudentEnrollment"
     new_role.save!
-    new_role
 
     student_in_course(:course => @course, :role => new_role, :name => "number2")
 

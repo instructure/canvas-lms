@@ -29,7 +29,7 @@ describe Quizzes::QuizQuestion do
     expect(q.question_data).not_to be_nil
     expect(q.question_data.class).to eq Quizzes::QuizQuestion::QuestionData
     expect(q.assessment_question_id).to eql(a.id)
-    q.question_data == qd
+    q.question_data = qd
 
     data = q.data
     expect(data[:assessment_question_id]).to eql(a.id)
