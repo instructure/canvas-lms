@@ -63,6 +63,8 @@ Lint/IneffectiveAccessModifier:
   Severity: error
 Lint/MissingSuper:
   Severity: error
+Lint/NoReturnInBeginEndBlocks:
+  Severity: error
 Lint/NonDeterministicRequireOrder:
   Severity: error
 Lint/ParenthesesAsGroupedExpression:
