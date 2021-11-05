@@ -407,8 +407,7 @@ class PageView < ActiveRecord::Base
     # if you interrupt and re-start the migrator, start_at cannot be changed,
     # since it's saved in cassandra to persist the migration state
     def initialize(skip_deleted_accounts = true, start_at = nil)
-      self.start_at = start_at || 52.weeks.ago
-      self.logger = Rails.logger
+      super(start_at || 52.weeks.ago, Rails.logger)
 
       if skip_deleted_accounts
         account_ids = Set.new(Account.root_accounts.active.pluck(:id))

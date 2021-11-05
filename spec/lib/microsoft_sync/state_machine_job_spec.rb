@@ -86,6 +86,7 @@ module MicrosoftSync
 
   class StateMachineJobTestSteps2 < StateMachineJobTestStepsBase
     def initialize(step_initial_retries, step_second_delay_amounts = [1, 2, 3])
+      super()
       @step_initial_retries = step_initial_retries
       @step_second_delay_amounts = step_second_delay_amounts
     end

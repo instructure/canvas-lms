@@ -22,8 +22,7 @@ module Canvas::OAuth
 
   class ClientCredentialsProvider < Provider
     def initialize(client_id, host, scopes = nil, protocol = 'http://')
-      @client_id = client_id
-      @scopes = scopes || []
+      super(client_id, nil, scopes || [])
       @expected_aud = Rails.application.routes.url_helpers.oauth2_token_url(
         host: host,
         protocol: protocol

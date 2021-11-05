@@ -34,6 +34,8 @@ class Quizzes::QuizQuestion::Base
     type_name = klass.question_type
     raise("question type #{type_name} already exists") if question_types.key?(type_name)
 
+    super
+
     # because this is where subclass registration happens, we need this to be populated
     # before we start trying to load any question data.
     # This is taken care of by the Quizzes::Preloader
