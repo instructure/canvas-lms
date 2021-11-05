@@ -240,7 +240,6 @@ module BasicLTI
 
       protected
 
-      # rubocop:disable Metrics/PerceivedComplexity, Metrics/MethodLength
       def handle_replace_result(tool, assignment, user)
         text_value = self.result_score
         score_value = self.result_total_score
@@ -359,7 +358,6 @@ module BasicLTI
 
         true
       end
-      # rubocop:enable Metrics/PerceivedComplexity, Metrics/MethodLength
 
       def handle_delete_result(tool, assignment, user)
         assignment.grade_student(user, :grade => nil, grader_id: -tool.id)

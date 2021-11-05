@@ -376,23 +376,21 @@ describe GradeCalculator do
           expect(final_grade_info(@user, @course)[:possible]).to equal 60.0
         end
         it "drops the lowest visible when that rule is in place" do
-          @group.update_attribute(:rules, 'drop_lowest:1') # rubocop:disable Rails/SkipsModelValidations
+          @group.update_attribute(:rules, 'drop_lowest:1')
           # 5 + 15 + 10 - 5
           expect(final_grade_info(@user, @course)[:total]).to equal 25.0
           expect(final_grade_info(@user, @course)[:possible]).to equal 40.0
           expect(final_grade_info(@user, @course)[:dropped]).to eq [find_submission(@overridden_lowest)]
         end
         it "drops the highest visible when that rule is in place" do
-          @group.update_attribute(:rules, 'drop_highest:1') # rubocop:disable Rails/SkipsModelValidations
+          @group.update_attribute(:rules, 'drop_highest:1')
           # 5 + 15 + 10 - 15
           expect(final_grade_info(@user, @course)[:total]).to equal 15.0
           expect(final_grade_info(@user, @course)[:possible]).to equal 40.0
           expect(final_grade_info(@user, @course)[:dropped]).to eq [find_submission(@overridden_highest)]
         end
         it "does not count an invisible assignment with never drop on" do
-          # rubocop:disable Rails/SkipsModelValidations
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
-          # rubocop:enable Rails/SkipsModelValidations
           # 5 + 15 + 10 - 10
           expect(final_grade_info(@user, @course)[:total]).to equal 20.0
           expect(final_grade_info(@user, @course)[:possible]).to equal 40.0

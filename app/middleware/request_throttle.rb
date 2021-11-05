@@ -243,7 +243,7 @@ class RequestThrottle
   # and hwm were equal, then the bucket would always leak at least a tiny bit
   # by the beginning of the next request, and thus would never be considered
   # full.
-  LeakyBucket = Struct.new(:client_identifier, :count, :last_touched) do
+  LeakyBucket = Struct.new(:client_identifier, :count, :last_touched) do # rubocop:disable Lint/StructNewOverride
     def initialize(client_identifier, count = 0.0, last_touched = nil)
       super
     end

@@ -224,9 +224,9 @@ module VeriCite
           assignment_data = VeriCiteClient::AssignmentData.new()
           assignment_data.assignment_title = assignment.title != nil ? assignment.title : assignment_id
           assignment_data.assignment_instructions = assignment.description != nil ? assignment.description : ""
-          assignment_data.assignment_exclude_quotes = args["exclude_quoted"] != nil && args["exclude_quoted"] == '1' ? true : false
-          assignment_data.assignment_exclude_self_plag = args["exclude_self_plag"] != nil && args["exclude_self_plag"] == '1' ? true : false
-          assignment_data.assignment_store_in_index = args["store_in_index"] != nil && args["store_in_index"] == '1' ? true : false
+          assignment_data.assignment_exclude_quotes = args["exclude_quoted"] == '1'
+          assignment_data.assignment_exclude_self_plag = args["exclude_self_plag"] == '1'
+          assignment_data.assignment_store_in_index = args["store_in_index"] == '1'
           assignment_data.assignment_due_date = 0
           if assignment.due_at != nil
             # convert to epoch time in milli

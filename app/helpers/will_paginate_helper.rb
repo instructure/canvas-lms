@@ -23,7 +23,6 @@ require 'will_paginate/core_ext'
 require 'will_paginate/view_helpers'
 require 'will_paginate/view_helpers/link_renderer_base'
 
-# rubocop:disable Rails/ContentTag this is not the Rails `tag` method in this file
 module WillPaginateHelper
   class AccessibleLinkRenderer < WillPaginate::ActionView::LinkRenderer
     protected
@@ -55,4 +54,3 @@ module WillPaginateHelper
     end
   end
 end
-# rubocop:enable Rails/ContentTag

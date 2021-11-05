@@ -140,7 +140,7 @@ module AttachmentFu # :nodoc:
             processor_mod = AttachmentFu::Processors.const_get(attachment_options[:processor])
             prepend processor_mod unless included_modules.include?(processor_mod)
           end
-        rescue Object, Exception
+        rescue Object
           raise unless load_related_exception?($!)
 
           processors.shift
@@ -150,7 +150,7 @@ module AttachmentFu # :nodoc:
         begin
           processor_mod = AttachmentFu::Processors.const_get("#{attachment_options[:processor].to_s.classify}Processor")
           include processor_mod unless included_modules.include?(processor_mod)
-        rescue Object, Exception
+        rescue Object
           raise unless load_related_exception?($!)
 
           puts "Problems loading #{options[:processor]}Processor: #{$!}"
@@ -342,7 +342,7 @@ module AttachmentFu # :nodoc:
     # TODO: Allow it to work with Merb tempfiles too.
     def uploaded_data=(file_data)
       if self.is_a?(Attachment)
-        return nil if file_data.nil? || (file_data.respond_to?(:size) && file_data.size == 0)
+        return if file_data.nil? || (file_data.respond_to?(:size) && file_data.size == 0)
 
         # glean information from the file handle
         self.content_type = detect_mimetype(file_data)
@@ -395,7 +395,7 @@ module AttachmentFu # :nodoc:
         end
         file_data
       else
-        return nil if file_data.nil? || file_data.size == 0
+        return if file_data.nil? || file_data.size == 0
 
         self.content_type = file_data.content_type
         self.filename     = file_data.original_filename if respond_to?(:filename)

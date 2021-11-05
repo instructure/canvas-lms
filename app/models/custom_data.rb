@@ -19,7 +19,7 @@
 #
 
 class CustomData < ActiveRecord::Base
-  class WriteConflict < Exception
+  class WriteConflict < RuntimeError
     attr_accessor :conflict_scope, :type_at_conflict, :value_at_conflict
 
     def initialize(opts = {})

@@ -132,11 +132,13 @@ class WikiPage < ActiveRecord::Base
     if self.context.wiki_pages.not_deleted.where(title: self.title).where.not(:id => self.id).first
       real_title = self.title.gsub(/-(\d*)\z/, '') # remove any "-#" at the end
       n = $1 ? $1.to_i + 1 : 2
-      begin
+      new_title = nil
+      loop do
         mod = "-#{n}"
         new_title = real_title[0...(TITLE_LENGTH - mod.length)] + mod
         n = n.succ
-      end while self.context.wiki_pages.not_deleted.where(title: new_title).where.not(:id => self.id).exists?
+        break unless context.wiki_pages.not_deleted.where(title: new_title).where.not(id: id).exists?
+      end
 
       self.title = new_title
     end

@@ -193,7 +193,7 @@ describe Mutations::CreateLearningOutcome do
 
   context 'transactions' do
     it 'rolls back outcome creation if linking to group fails' do
-      expect_any_instance_of(LearningOutcomeGroup).to receive(:add_outcome).and_raise('Boom!') # rubocop:disable RSpec/AnyInstance
+      expect_any_instance_of(LearningOutcomeGroup).to receive(:add_outcome).and_raise('Boom!')
       query = <<~QUERY
         groupId: #{@course_group.id}
         title: "Spec Learning Outcome via Mutation"

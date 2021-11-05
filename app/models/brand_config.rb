@@ -122,8 +122,8 @@ class BrandConfig < ActiveRecord::Base
     self.save! unless dup?
   end
 
-  def to_json
-    BrandableCSS.all_brand_variable_values(self).to_json
+  def to_json(*args)
+    BrandableCSS.all_brand_variable_values(self).to_json(*args)
   end
 
   def to_js
@@ -165,7 +165,8 @@ class BrandConfig < ActiveRecord::Base
       s3_uploader.upload_file(send(:"public_#{type}_path"))
       begin
         File.delete(send(:"#{type}_file"))
-      rescue Errno::ENOENT # continue if something else deleted it in another process
+      rescue Errno::ENOENT
+        # continue if something else deleted it in another process
       end
     end
   end

@@ -100,6 +100,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       end
 
       if !@submission || (@quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip))
+        nil
       elsif is_previewing? || (@submission.temporary_user_code == temporary_user_code(false)) ||
             (@submission.grants_right?(@current_user, session, :update))
         if !@submission.completed? && (!@submission.overdue? || is_previewing?)

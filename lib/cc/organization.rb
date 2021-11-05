@@ -39,7 +39,6 @@ module CC
 
     def create_organizations
       @manifest_node.organizations do |orgs|
-        orgs = orgs
         orgs.organization(
           :identifier => 'org_1',
           :structure => 'rooted-hierarchy'

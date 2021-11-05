@@ -315,7 +315,6 @@ describe "Outcome Results API", type: :request do
           end
         end
 
-        # rubocop:disable RSpec/NestedGroups
         context 'Student filters in LMGB FF' do
           before do
             @concluded_student = User.create!(:name => 'Student - Concluded')
@@ -487,7 +486,6 @@ describe "Outcome Results API", type: :request do
             end
           end
         end
-        # rubocop:enable RSpec/NestedGroups
       end
 
       describe "user_ids parameter" do

@@ -38,7 +38,7 @@ class CourseForMenuPresenter
     position = @user.dashboard_positions[course.asset_string]
 
     observee = if course.primary_enrollment_type == 'ObserverEnrollment'
-                 ObserverEnrollment.observed_students(course, @user)&.keys&.map(&:name).join(', ')
+                 ObserverEnrollment.observed_students(course, @user)&.keys&.map(&:name)&.join(', ')
                end
 
     {

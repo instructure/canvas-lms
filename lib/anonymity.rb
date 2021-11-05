@@ -24,28 +24,28 @@
 # for an assignment, for example, can be referenced by their "anonymous" ID
 # for that specific assignment so that their default ID is concealed.
 module Anonymity
-  # Returns a unique short id to be used as an anonymous ID. If the
-  # generated short id is already in use, loop until an available
-  # one is generated.
-  # This method will throw a unique constraint error from the
-  # database if it has used all unique ids.
-  # An optional argument of existing_ids can be supplied
-  # to customize the handling of existing ids. E.g. bulk
-  # generation of anonymous ids where you wouldn't want to
-  # continuously query the database
-  def self.generate_id(existing_ids: [])
-    loop do
-      short_id = self.generate_short_id
-      break short_id unless existing_ids.include?(short_id)
+  class << self
+    # Returns a unique short id to be used as an anonymous ID. If the
+    # generated short id is already in use, loop until an available
+    # one is generated.
+    # This method will throw a unique constraint error from the
+    # database if it has used all unique ids.
+    # An optional argument of existing_ids can be supplied
+    # to customize the handling of existing ids. E.g. bulk
+    # generation of anonymous ids where you wouldn't want to
+    # continuously query the database
+    def generate_id(existing_ids: [])
+      loop do
+        short_id = self.generate_short_id
+        break short_id unless existing_ids.include?(short_id)
+      end
     end
-  end
 
-  private_class_method
-
-  # base58 to avoid literal problems with prefixed 0 (i.e. when 0x123
-  # is interpreted as a hex value `0x123 == 291`), and similar looking
-  # characters: 0/O, I/l
-  def self.generate_short_id
-    SecureRandom.base58(5)
+    # base58 to avoid literal problems with prefixed 0 (i.e. when 0x123
+    # is interpreted as a hex value `0x123 == 291`), and similar looking
+    # characters: 0/O, I/l
+    def generate_short_id
+      SecureRandom.base58(5)
+    end
   end
 end

@@ -130,10 +130,8 @@ module MicrosoftSync
       end
     end
 
-    class Complete; end
-
     # Return this when your job is done:
-    COMPLETE = Complete.new
+    COMPLETE = Object.new
 
     # Signals that this step of the job failed, but the job may be retriable.
     #
@@ -278,7 +276,7 @@ module MicrosoftSync
 
         log { "step #{current_step} finished with #{result.class.name.split('::').last}" }
         case result
-        when Complete
+        when COMPLETE
           job_state_record&.update_unless_deleted(
             workflow_state: :completed, job_state: nil, last_error: nil
           )
@@ -365,8 +363,9 @@ module MicrosoftSync
     # Ensure delay amount is not too long so as to make the job look stalled:
     def clip_delay_amount(delay_amount)
       max_delay = steps_object.max_delay.to_f
-      delay_amount.to_f.clamp(0, max_delay).tap do |clipped|
-        log { "Clipped delay #{delay_amount} to #{clipped}" } if clipped != delay_amount.to_f
+      delay_amount = delay_amount.to_f
+      delay_amount.clamp(0, max_delay).tap do |clipped|
+        log { "Clipped delay #{delay_amount} to #{clipped}" } unless clipped.equal?(delay_amount)
       end
     end
 

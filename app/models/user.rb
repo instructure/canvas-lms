@@ -1416,7 +1416,7 @@ class User < ActiveRecord::Base
   #
   # Returns nothing if avatar is set; false if avatar is locked.
   def avatar_image=(val)
-    return false if avatar_state == :locked
+    return if avatar_state == :locked
 
     # Clear out the old avatar first, in case of failure to get new avatar.
     # The order of these attributes is standard throughout the method.

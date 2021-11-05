@@ -111,7 +111,7 @@ class ContentZipper
                   :content_type, :uuid, :id, :attachment
 
     # Match on /files URLs capturing the object id.
-    FILES_REGEX = %r{/files/(?<obj_id>\d+)/\w+(?:(?:[^\s"<'\?\/]*)([^\s"<']*))?}
+    FILES_REGEX = %r{/files/(?<obj_id>\d+)/\w+(?:(?:[^\s"<'?/]*)(?:[^\s"<']*))?}.freeze
 
     def initialize(attachment, index = nil)
       @attachment = attachment
@@ -184,7 +184,6 @@ class ContentZipper
 
   def render_eportfolio_page_content(page, portfolio, static_attachments, submissions_hash)
     @page = page
-    @portfolio = @portfolio
     @static_attachments = static_attachments
     @submissions_hash = submissions_hash
     av = ActionView::Base.with_view_paths(ActionController::Base.view_paths)

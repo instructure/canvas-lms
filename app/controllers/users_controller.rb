@@ -2764,8 +2764,6 @@ class UsersController < ApplicationController
     Canvas::ICU.collate_by(data.values) { |e| e[:enrollment].user.sortable_name }
   end
 
-  protected
-
   def require_self_registration
     get_context
     @context = @domain_root_account || Account.default unless @context.is_a?(Account)

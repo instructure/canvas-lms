@@ -105,7 +105,7 @@ module LiveEvents
             total_bytes += r[:total_bytes]
           end
           send_events(records)
-        rescue Exception => e
+        rescue => e
           logger.error("Exception making LiveEvents async call: #{e}")
         end
         LiveEvents.on_work_unit_end&.call

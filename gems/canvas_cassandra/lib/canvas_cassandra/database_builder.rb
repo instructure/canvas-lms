@@ -60,8 +60,8 @@ module CanvasCassandra
         Bundler.require 'cassandra'
         begin
           @connections[key] = CanvasCassandra::Database.new(fingerprint, servers, opts, logger)
-        rescue Exception => exception
-          logger.error "Failed to create cassandra connection for #{key}: #{exception}"
+        rescue => e
+          logger.error "Failed to create cassandra connection for #{key}: #{e}"
           nil # don't save this nil into @connections[key], so we can retry later
         end
       end

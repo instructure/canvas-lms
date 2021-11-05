@@ -74,6 +74,7 @@ module Alerts
           if matches
             last_sent = Rails.cache.fetch(cache_key)
             if last_sent.blank?
+              nil
             elsif alert.repetition.blank?
               matches = false
             else
