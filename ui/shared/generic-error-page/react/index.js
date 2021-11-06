@@ -138,7 +138,7 @@ export default class GenericErrorPage extends React.Component {
           )}
           {this.state.commentPosted && this.state.commentPostError && (
             <View display="block" data-test-id="generic-error-comments-submitted">
-              <Text color="error" margin="x-small">
+              <Text color="danger" margin="x-small">
                 {I18n.t('Comment failed to post! Please try again later.')}
               </Text>
             </View>

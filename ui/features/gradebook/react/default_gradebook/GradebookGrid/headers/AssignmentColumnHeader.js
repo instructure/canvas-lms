@@ -37,7 +37,7 @@ function SecondaryDetailLine(props) {
   if (anonymous || unpublished) {
     return (
       <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--secondary">
-        <Text color="error" size="x-small" transform="uppercase" weight="bold">
+        <Text color="danger" size="x-small" transform="uppercase" weight="bold">
           {unpublished ? I18n.t('Unpublished') : I18n.t('Anonymous')}
         </Text>
       </span>
