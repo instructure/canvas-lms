@@ -216,7 +216,7 @@ export default function UnsplashPanel({source, setUnsplashData, brandColor, live
                     variant="link"
                     fluidWidth
                     theme={{
-                      mediumPadding: '0'
+                      mediumPaddingHorizontal: '0'
                     }}
                     onClick={() => {
                       setSelectedImage(resultImage.id)
