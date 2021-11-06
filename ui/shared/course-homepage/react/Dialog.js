@@ -171,7 +171,7 @@ class CourseHomeDialog extends React.Component {
               <Button
                 variant="link"
                 href={wikiUrl}
-                theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+                theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
               >
                 {I18n.t('Front Page must be set first')}
               </Button>
