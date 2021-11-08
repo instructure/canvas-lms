@@ -352,6 +352,8 @@ export default class Assignment extends Model
 
   canGroup: -> !@get('has_submitted_submissions')
 
+  isPlagiarismPlatformLocked: -> @get('has_submitted_submissions') ||  _.includes(@frozenAttributes(), 'submission_types')
+
   gradingStandardId: (id) =>
     return @get('grading_standard_id') unless arguments.length > 0
     @set 'grading_standard_id', id
@@ -619,15 +621,15 @@ export default class Assignment extends Model
       'isDuplicating', 'isExternalTool', 'isGenericExternalTool', 'isGpaScaled',
       'isImporting', 'isLetterGraded', 'isMasteryConnectTool', 'isMigrating',
       'isNonPlacementExternalTool', 'isNotGraded', 'isOnlineSubmission',
-      'isOnlyVisibleToOverrides', 'isQuizLTIAssignment', 'isSimple',
-      'is_quiz_assignment', 'labelId', 'lockAt', 'moderatedGrading',
+      'isOnlyVisibleToOverrides', 'isPlagiarismPlatformLocked', 'isQuizLTIAssignment',
+      'isSimple', 'is_quiz_assignment', 'labelId', 'lockAt', 'moderatedGrading',
       'multipleDueDates', 'name', 'newQuizzesAssignmentBuildButtonEnabled',
       'nonBaseDates', 'notifyOfUpdate', 'objectTypeDisplayName', 'omitFromFinalGrade',
       'originalAssignmentName', 'peerReviewCount', 'peerReviews', 'peerReviewsAssignAt',
       'pointsPossible', 'position', 'postToSIS', 'postToSISEnabled', 'published',
       'restrictFileExtensions', 'secureParams', 'selectedSubmissionTypeToolId',
       'showBuildButton', 'showGradersAnonymousToGradersCheckbox', 'singleSectionDueDate',
-      'submissionType', 'submissionTypeSelectionTools', 'submissionTypesFrozen',
+      'submissionType', 'submissionTypeSelectionTools', 'submissionTypesFrozen', 
       'turnitinAvailable', 'turnitinEnabled', 'unlockAt', 'vericiteAvailable',
       'vericiteEnabled', 'importantDates', 'externalToolIframeWidth', 'externalToolIframeHeight'
     ]
