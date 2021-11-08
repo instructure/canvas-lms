@@ -2379,7 +2379,7 @@ class User < ActiveRecord::Base
         ret[:primary] << "course_#{e.course_id}"
         ret[:secondary] << "course_section_#{e.course_section_id}"
       end
-      ret[:secondary].concat groups.map { |g| "group_category_#{g.group_category_id}" }
+      ret[:secondary].concat(groups.map { |g| "group_category_#{g.group_category_id}" })
       ret
     end
   end
@@ -2808,10 +2808,10 @@ class User < ActiveRecord::Base
       active_pseudonyms = self.all_active_pseudonyms(:reload).select { |p| !p.password_auto_generated? && !p.account.delegated_authentication? }
       templates = []
       # re-arrange in the order we prefer
-      templates.concat active_pseudonyms.select { |p| p.account_id == preferred_template_account.id } if preferred_template_account
-      templates.concat active_pseudonyms.select { |p| p.account_id == Account.site_admin.id }
-      templates.concat active_pseudonyms.select { |p| p.account_id == Account.default.id }
-      templates.concat active_pseudonyms
+      templates.concat(active_pseudonyms.select { |p| p.account_id == preferred_template_account.id }) if preferred_template_account
+      templates.concat(active_pseudonyms.select { |p| p.account_id == Account.site_admin.id })
+      templates.concat(active_pseudonyms.select { |p| p.account_id == Account.default.id })
+      templates.concat(active_pseudonyms)
       templates.uniq!
 
       template = templates.detect { |t| !account.pseudonyms.active.by_unique_id(t.unique_id).first }

@@ -243,7 +243,7 @@ def assert_jsonapi_compliance(json, primary_set, associations = [])
   required_keys = [primary_set]
 
   if associations.any?
-    required_keys.concat associations.map { |s| s.pluralize }
+    required_keys.concat(associations.map(&:pluralize))
     required_keys << 'meta'
   end
 

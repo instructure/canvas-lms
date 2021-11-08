@@ -264,7 +264,7 @@ describe Outcomes::ResultAnalytics do
       rollups = ra.outcome_results_rollups(results: results, users: users)
       rollup_scores = ra.rollup_user_results(results).map(&:outcome_results).flatten
       rollups.each.with_index do |rollup, _|
-        expect(rollup.scores.map(&:outcome_results).flatten).to eq rollup_scores.find_all { |score| score.user.id == rollup.context.id }
+        expect(rollup.scores.map(&:outcome_results).flatten).to eq(rollup_scores.find_all { |score| score.user.id == rollup.context.id })
       end
     end
 

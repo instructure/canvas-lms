@@ -2044,7 +2044,7 @@ describe Attachment do
 
         expect(Tempfile).to receive(:new).and_return(tempfile)
         actual_file = double()
-        expect(actual_file).to receive(:read).twice { data.shift }
+        expect(actual_file).to(receive(:read).twice { data.shift })
         expect(File).to receive(:open).and_yield(actual_file)
         expect_any_instance_of(@attachment.s3object.class).to receive(:get).with(include(:response_target))
         @attachment.open do |d|

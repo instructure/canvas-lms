@@ -214,7 +214,7 @@ describe CalendarEventsApiController, type: :request do
       course_ids = create_courses(15, enroll_user: @me)
       now = Time.now.utc
       create_records(CalendarEvent, course_ids.map { |id| { context_id: id, context_type: 'Course', context_code: "course_#{id}", title: id, start_at: '2012-01-08 12:00:00', workflow_state: 'active', created_at: now, updated_at: now } })
-      contexts.concat course_ids.map { |id| "course_#{id}" }
+      contexts.concat(course_ids.map { |id| "course_#{id}" })
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
                         :controller => 'calendar_events_api', :action => 'index', :format => 'json',
                         :context_codes => contexts, :start_date => '2012-01-08', :end_date => '2012-01-07', :per_page => '25'
@@ -229,7 +229,7 @@ describe CalendarEventsApiController, type: :request do
       course_ids = create_courses(20, enroll_user: @me)
       now = Time.now.utc
       create_records(CalendarEvent, course_ids.map { |id| { context_id: id, context_type: 'Course', context_code: "course_#{id}", title: id, start_at: '2012-01-08 12:00:00', workflow_state: 'active', created_at: now, updated_at: now } })
-      contexts.concat course_ids.map { |id| "course_#{id}" }
+      contexts.concat(course_ids.map { |id| "course_#{id}" })
       json = api_call(:get, "/api/v1/calendar_events?start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
                         :controller => 'calendar_events_api', :action => 'index', :format => 'json',
                         :context_codes => contexts, :start_date => '2012-01-08', :end_date => '2012-01-07', :per_page => '25'
@@ -1592,21 +1592,21 @@ describe CalendarEventsApiController, type: :request do
                         :context_codes => ["course_#{@course.id}"], :all_events => 1, :per_page => '10'
                       })
       expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=2.*>; rel="next",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
-      expect(json.map { |a| a['id'] }).to eql ids[0...10].map { |id| "assignment_#{id}" }
+      expect(json.map { |a| a['id'] }).to eql(ids[0...10].map { |id| "assignment_#{id}" })
 
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=2", {
                         :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
                         :context_codes => ["course_#{@course.id}"], :all_events => 1, :per_page => '10', :page => '2'
                       })
       expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="next",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="prev",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
-      expect(json.map { |a| a['id'] }).to eql ids[10...20].map { |id| "assignment_#{id}" }
+      expect(json.map { |a| a['id'] }).to eql(ids[10...20].map { |id| "assignment_#{id}" })
 
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&all_events=1&context_codes[]=course_#{@course.id}&per_page=10&page=3", {
                         :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
                         :context_codes => ["course_#{@course.id}"], :all_events => 1, :per_page => '10', :page => '3'
                       })
       expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=2.*>; rel="prev",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=1.*>; rel="first",<http://www.example.com/api/v1/calendar_events.*type=assignment&.*page=3.*>; rel="last"})
-      expect(json.map { |a| a['id'] }).to eql ids[20...25].map { |id| "assignment_#{id}" }
+      expect(json.map { |a| a['id'] }).to eql(ids[20...25].map { |id| "assignment_#{id}" })
     end
 
     it 'ignores invalid end_dates' do
@@ -1633,7 +1633,7 @@ describe CalendarEventsApiController, type: :request do
       contexts = [@course.asset_string]
       course_ids = create_courses(15, enroll_user: @me)
       create_assignments(course_ids, 1, due_at: '2012-01-08 12:00:00')
-      contexts.concat course_ids.map { |id| "course_#{id}" }
+      contexts.concat(course_ids.map { |id| "course_#{id}" })
       json = api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=2012-01-08&end_date=2012-01-07&per_page=25&context_codes[]=" + contexts.join("&context_codes[]="), {
                         :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
                         :context_codes => contexts, :start_date => '2012-01-08', :end_date => '2012-01-07', :per_page => '25'

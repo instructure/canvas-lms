@@ -68,10 +68,10 @@ describe 'quizzes question with html answers' do
     img_alt = 'sample alt text'
     img_cls = 'sample_image'
     quiz_with_new_questions(
-      true,
       { id: 1 },
       { id: 2 },
-      { id: 3, answer_html: "<img src=\"#{img_url}\" alt=\"#{img_alt}\" class=\"#{img_cls}\">" }
+      { id: 3, answer_html: "<img src=\"#{img_url}\" alt=\"#{img_alt}\" class=\"#{img_cls}\">" },
+      goto_edit: true
     )
     begin
       dismiss_flash_messages

@@ -21,7 +21,7 @@ module SpecTimeLimit
   class Error < ::Timeout::Error
     # #initialize and #to_s are overwritten here to prevent Timeout.timeout
     # overwriting the error message to "execution expired"
-    def initialize(message)
+    def initialize(message) # rubocop:disable Lint/MissingSuper
       @message = message
     end
 

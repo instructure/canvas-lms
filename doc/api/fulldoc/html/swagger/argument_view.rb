@@ -31,6 +31,7 @@ class ArgumentView < HashView
   DEFAULT_DESC = "no description"
 
   def initialize(line, http_verb = "get", path_variables = [], deprecated: false)
+    super()
     @deprecated = deprecated
     @deprecated_date_key = :NOTICE
     @effective_date_key = :EFFECTIVE

@@ -3674,18 +3674,20 @@ describe Course, 'grade_publishing' do
                                   :format_type => "instructure_csv"
                                 })
         @checked = false
-        allow(Course).to receive(:valid_grade_export_types).and_return({
-                                                                         "instructure_csv" => {
-                                                                           :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
-                                                                             expect(course).to eq @course
-                                                                             expect(enrollments.sort_by(&:id)).to eq @student_enrollments.sort_by(&:id).find_all { |e| e.workflow_state == 'active' }
-                                                                             expect(publishing_pseudonym).to eq @pseudonym
-                                                                             expect(publishing_user).to eq @user
-                                                                             @checked = true
-                                                                             return []
-                                                                           }
-                                                                         }
-                                                                       })
+        allow(Course).to receive(:valid_grade_export_types).and_return(
+          {
+            "instructure_csv" => {
+              callback: lambda { |course, enrollments, publishing_user, publishing_pseudonym|
+                expect(course).to eq @course
+                expect(enrollments.sort_by(&:id)).to eq(@student_enrollments.sort_by(&:id).find_all { |e| e.workflow_state == 'active' })
+                expect(publishing_pseudonym).to eq @pseudonym
+                expect(publishing_user).to eq @user
+                @checked = true
+                return []
+              }
+            }
+          }
+        )
         @course.send_final_grades_to_endpoint @user
         expect(@checked).to be_truthy
       end
