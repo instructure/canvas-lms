@@ -118,4 +118,19 @@ describe Types::EnrollmentType do
       ).to eq enrollment.course_section.id.to_s
     end
   end
+
+  describe "associated_user" do
+    it "returns the associated user when one exists" do
+      observer = User.create!
+      observer_enrollment = observer_in_course(course: @course, user: observer)
+      observer_enrollment.update!(associated_user: @student)
+
+      tester = GraphQLTypeTester.new(observer_enrollment, current_user: @observer)
+      expect(tester.resolve("associatedUser { _id }")).to eq @student.id.to_s
+    end
+
+    it "returns nil when no associated user exists" do
+      expect(enrollment_type.resolve("associatedUser { _id }")).to be nil
+    end
+  end
 end

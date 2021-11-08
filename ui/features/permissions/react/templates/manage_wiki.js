@@ -76,7 +76,7 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Pages - create'),
-      description: I18n.t('Allows user to delete course pages.')
+      description: I18n.t('Allows user to create course pages.')
     },
     {
       description: I18n.t(
