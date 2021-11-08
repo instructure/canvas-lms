@@ -17,6 +17,7 @@
  */
 
 import groovy.transform.Field
+import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 
 @Field static final SUCCESS_NOT_BUILT = [buildResult: 'SUCCESS', stageResult: 'NOT_BUILT']
 @Field static final SUCCESS_UNSTABLE = [buildResult: 'SUCCESS', stageResult: 'UNSTABLE']
@@ -126,7 +127,7 @@ def setupNode() {
 
     sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
   } catch (err) {
-    if (env.RSPECQ_ENABLED == '1') {
+    if (env.RSPECQ_ENABLED == '1' && !(err instanceof FlowInterruptedException)) {
       send_slack_alert(err)
       env.AUTO_CANCELLED += "${env.CI_NODE_INDEX},"
       cancel_node(SUCCESS_UNSTABLE, "RspecQ node setup failed!: ${err}")
@@ -217,6 +218,9 @@ def runRspecqSuite() {
 
     throw e
   } catch (err) {
+    if (err instanceof FlowInterruptedException) {
+      throw err
+    }
     send_slack_alert(err)
     env.AUTO_CANCELLED += "${env.CI_NODE_INDEX},"
     cancel_node(SUCCESS_UNSTABLE, "RspecQ node failed!: ${err}")
