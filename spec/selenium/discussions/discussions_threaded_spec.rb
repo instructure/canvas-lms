@@ -308,12 +308,10 @@ describe "threaded discussions" do
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
       end
 
-      it "does not allow editing for a concluded student", skip: 'VICE-1986' do
-        # TODO: complete test once concluded students can no longer edit
-      end
-
-      it "does not allow deleting for a concluded student", skip: 'VICE-1986' do
-        # TODO: complete test once concluded students can no longer delete
+      it "does not allow editing or deleting for a concluded student" do
+        f("button[data-testid='thread-actions-menu']").click
+        expect(f('body')).not_to contain_jqcss("li:contains('Edit')")
+        expect(f('body')).not_to contain_jqcss("li:contains('Delete')")
       end
     end
 
