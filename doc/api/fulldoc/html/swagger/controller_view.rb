@@ -26,6 +26,7 @@ class ControllerView < HashView
   attr_reader :controller
 
   def initialize(controller)
+    super()
     @controller = controller
   end
 

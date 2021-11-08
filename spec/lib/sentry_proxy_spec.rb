@@ -21,15 +21,13 @@ require_relative "../spec_helper"
 
 describe SentryProxy do
   let(:data) { { a: 'b', c: 'd' } }
+  let(:error_klass) { Class.new(StandardError) }
 
   before(:each) { SentryProxy.clear_ignorable_errors }
 
-  class MyCustomError < StandardError
-  end
-
   describe ".capture" do
     it "forwards exceptions on to raven" do
-      e = MyCustomError.new
+      e = error_klass.new
       expect(Raven).to receive(:capture_exception).with(e, data)
       SentryProxy.capture(e, data)
     end
@@ -47,14 +45,14 @@ describe SentryProxy do
     end
 
     it "does not send the message if configured as ignorable" do
-      SentryProxy.register_ignorable_error(MyCustomError)
-      e = MyCustomError.new
+      SentryProxy.register_ignorable_error(error_klass)
+      e = error_klass.new
       expect(Raven).to_not receive(:capture_exception)
       SentryProxy.capture(e, data)
     end
 
     it "does not send to sentry for low-level errors" do
-      e = MyCustomError.new
+      e = error_klass.new
       expect(Raven).to receive(:capture_exception).never
       SentryProxy.capture(e, data, :warn)
     end
@@ -62,13 +60,13 @@ describe SentryProxy do
 
   describe ".register_ignorable_error" do
     it "keeps track of errors we don't care about reporting" do
-      SentryProxy.register_ignorable_error(MyCustomError)
-      expect(SentryProxy.ignorable_errors).to include(MyCustomError.to_s)
+      SentryProxy.register_ignorable_error(error_klass)
+      expect(SentryProxy.ignorable_errors).to include(error_klass.to_s)
     end
 
     it "prevents the same error from being registered many times" do
       start_count = SentryProxy.ignorable_errors.size
-      10.times { SentryProxy.register_ignorable_error(MyCustomError) }
+      10.times { SentryProxy.register_ignorable_error(error_klass) }
       expect(SentryProxy.ignorable_errors.size).to eq(start_count + 1)
     end
 

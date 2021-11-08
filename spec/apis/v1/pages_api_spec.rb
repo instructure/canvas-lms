@@ -804,9 +804,6 @@ describe "Pages API", type: :request do
         end
 
         context 'with draft state' do
-          before :once do
-          end
-
           it 'accepts published' do
             json = api_call(:put, "/api/v1/courses/#{@course.id}/pages/#{@test_page.url}",
                             { :controller => 'wiki_pages_api', :action => 'update', :format => 'json', :course_id => @course.to_param, :url => @test_page.url },

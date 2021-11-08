@@ -26,6 +26,7 @@ export const Conversation = {
   fragment: gql`
     fragment Conversation on Conversation {
       _id
+      id
       contextId
       contextType
       contextName
@@ -47,6 +48,7 @@ export const Conversation = {
 
   shape: shape({
     _id: string,
+    id: string,
     contextId: string,
     contextType: string,
     contextName: string,
@@ -61,6 +63,7 @@ export const Conversation = {
 
   mock: ({
     _id = '196',
+    id = 'Q29udmVyc2F0aW9uLTE5Ng==',
     contextId = '195',
     contextType = 'Course',
     contextName = 'XavierSchool',
@@ -118,6 +121,7 @@ export const Conversation = {
     }
   } = {}) => ({
     _id,
+    id,
     contextId,
     contextType,
     contextName,

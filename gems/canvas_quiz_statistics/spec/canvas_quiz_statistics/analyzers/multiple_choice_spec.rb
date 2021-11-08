@@ -98,7 +98,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleChoice do
     describe '[:responses]' do
       it 'counts the number of students who got it right' do
         stats = subject.run([{ answer_id: 3023 }])
-        answer = stats[:answers].detect { |answer| answer[:id] == '3023' }
+        answer = stats[:answers].detect { |a| a[:id] == '3023' }
         expect(answer[:responses]).to eq(1)
       end
     end

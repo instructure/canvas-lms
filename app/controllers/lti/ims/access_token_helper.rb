@@ -83,7 +83,7 @@ module Lti::IMS::AccessTokenHelper
         DeveloperKey.find_cached(access_token.sub)
       end
     rescue ActiveRecord::RecordNotFound
-      return nil
+      nil
     end
   end
 

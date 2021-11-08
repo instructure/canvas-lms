@@ -38,14 +38,13 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
     source_context = nil
     if input[:source_context_type].present?
       if input[:source_context_id].present?
-        source_context =
-          begin
-            context_class(input[:source_context_type]).find_by(id: input[:source_context_id])
-          rescue NameError
-            return validation_error(
-              I18n.t('invalid value'), attribute: 'sourceContextType'
-            )
-          end
+        begin
+          source_context = context_class(input[:source_context_type]).find_by(id: input[:source_context_id])
+        rescue NameError
+          return validation_error(
+            I18n.t('invalid value'), attribute: 'sourceContextType'
+          )
+        end
 
         if source_context.nil?
           raise GraphQL::ExecutionError, I18n.t('no such source context')

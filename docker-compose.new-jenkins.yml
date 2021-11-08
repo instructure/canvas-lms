@@ -19,6 +19,7 @@ services:
       FORCE_FAILURE:
       CANVAS_RAILS6_0:
       CANVAS_ZEITWERK:
+      TEST_CACHE_CLASSES:
 
       # parallel_tests
       CI_NODE_TOTAL:

@@ -942,9 +942,8 @@ class Enrollment < ActiveRecord::Base
 
   def can_switch_to?(type)
     case type
-    when 'ObserverEnrollment'
-      ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'].include?(self.type)
-    when 'StudentEnrollment'
+    when 'ObserverEnrollment',
+         'StudentEnrollment'
       ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'].include?(self.type)
     when 'TaEnrollment'
       ['TeacherEnrollment'].include?(self.type)

@@ -1321,8 +1321,7 @@ describe Course do
   end
 
   describe "#reset_content" do
-    before do
-      :once
+    before(:once) do
       course_with_student
     end
 
@@ -2618,7 +2617,7 @@ describe Course, "update_account_associations" do
 
   it "is reentrant" do
     Course.skip_updating_account_associations do
-      Course.skip_updating_account_associations {}
+      Course.skip_updating_account_associations { nil }
       expect(Course.skip_updating_account_associations?).to be_truthy
     end
   end
@@ -3108,7 +3107,7 @@ describe Course, "tabs_available" do
       tool.settings[:windowTarget] = "_blank"
       tool.save!
       tabs = @course.tabs_available
-      tab = tabs.find { |tab| tab[:id] == tool.asset_string }
+      tab = tabs.find { |t| t[:id] == tool.asset_string }
       expect(tab[:target]).to eq '_blank'
     end
 
@@ -3127,7 +3126,7 @@ describe Course, "tabs_available" do
       tool.settings[:windowTarget] = "_blank"
       tool.save!
       tabs = @course.tabs_available
-      tab = tabs.find { |tab| tab[:id] == tool.asset_string }
+      tab = tabs.find { |t| t[:id] == tool.asset_string }
       expect(tab[:args]).to include({ display: 'borderless' })
     end
 
@@ -3146,7 +3145,7 @@ describe Course, "tabs_available" do
       tool.settings[:windowTarget] = "parent"
       tool.save!
       tabs = @course.tabs_available
-      tab = tabs.find { |tab| tab[:id] == tool.asset_string }
+      tab = tabs.find { |t| t[:id] == tool.asset_string }
       expect(tab.keys).not_to include :target
     end
 
@@ -3674,18 +3673,20 @@ describe Course, 'grade_publishing' do
                                   :format_type => "instructure_csv"
                                 })
         @checked = false
-        allow(Course).to receive(:valid_grade_export_types).and_return({
-                                                                         "instructure_csv" => {
-                                                                           :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
-                                                                             expect(course).to eq @course
-                                                                             expect(enrollments.sort_by(&:id)).to eq @student_enrollments.sort_by(&:id).find_all { |e| e.workflow_state == 'active' }
-                                                                             expect(publishing_pseudonym).to eq @pseudonym
-                                                                             expect(publishing_user).to eq @user
-                                                                             @checked = true
-                                                                             return []
-                                                                           }
-                                                                         }
-                                                                       })
+        allow(Course).to receive(:valid_grade_export_types).and_return(
+          {
+            "instructure_csv" => {
+              callback: lambda { |course, enrollments, publishing_user, publishing_pseudonym|
+                expect(course).to eq @course
+                expect(enrollments.sort_by(&:id)).to eq(@student_enrollments.sort_by(&:id).find_all { |e| e.workflow_state == 'active' })
+                expect(publishing_pseudonym).to eq @pseudonym
+                expect(publishing_user).to eq @user
+                @checked = true
+                return []
+              }
+            }
+          }
+        )
         @course.send_final_grades_to_endpoint @user
         expect(@checked).to be_truthy
       end

@@ -155,25 +155,22 @@ module Importers
         resolved
       elsif attr == 'src' && (info_match = url.match(/\Adata:(?<mime_type>[-\w]+\/[-\w\+\.]+)?;base64,(?<image>.*)/m))
         link_embedded_image(info_match)
-      elsif attr == 'src' && node['class'] && node['class'] =~ /equation_image/
-        # Equation image, leave it alone
-        resolved
-      elsif url =~ %r{\A/assessment_questions/\d+/files/\d+}
-        # The file is in the context of an AQ, leave the link alone
-        resolved
-      elsif url =~ %r{\A/courses/\d+/files/\d+}
-        # This points to a specific file already, leave it alone
-        resolved
-      elsif @migration && @migration.for_course_copy?
-        # For course copies don't try to fix relative urls. Any url we can
-        # correctly alter was changed during the 'export' step
-        resolved
-      elsif url.start_with?('#')
-        # It's just a link to an anchor, leave it alone
+      elsif # rubocop:disable Lint/DuplicateBranch
+            # Equation image, leave it alone
+            (attr == 'src' && node['class'] && node['class'].include?("equation_image")) || # rubocop:disable Layout/ConditionPosition
+            # The file is in the context of an AQ, leave the link alone
+            url =~ %r{\A/assessment_questions/\d+/files/\d+} ||
+            # This points to a specific file already, leave it alone
+            url =~ %r{\A/courses/\d+/files/\d+} ||
+            # For course copies don't try to fix relative urls. Any url we can
+            # correctly alter was changed during the 'export' step
+            @migration&.for_course_copy? ||
+            # It's just a link to an anchor, leave it alone
+            url.start_with?('#')
         resolved
       elsif relative_url?(url)
         unresolved(:file, :rel_path => URI.unescape(url))
-      else
+      else # rubocop:disable Lint/DuplicateBranch
         resolved
       end
     end

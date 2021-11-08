@@ -399,7 +399,7 @@ describe AccountsController do
           :subtext => 'Questions are submitted to your instructor', :type => 'default',
           :url => '#teacher_feedback', :available_to => ['student'] } } } }
       @account.reload
-      link = @account.settings[:custom_help_links].detect { |link| link['id'] == 'instructor_question' }
+      link = @account.settings[:custom_help_links].detect { |l| l['id'] == 'instructor_question' }
       expect(link).not_to have_key('text')
       expect(link).not_to have_key('subtext')
       expect(link).not_to have_key('url')
@@ -408,7 +408,7 @@ describe AccountsController do
         { :id => 'instructor_question', :text => 'yo', :subtext => 'wiggity', :type => 'default',
           :url => '#dawg', :available_to => ['student'] } } } }
       @account.reload
-      link = @account.settings[:custom_help_links].detect { |link| link['id'] == 'instructor_question' }
+      link = @account.settings[:custom_help_links].detect { |l| l['id'] == 'instructor_question' }
       expect(link['text']).to eq 'yo'
       expect(link['subtext']).to eq 'wiggity'
       expect(link['url']).to eq '#dawg'

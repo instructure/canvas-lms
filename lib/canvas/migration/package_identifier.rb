@@ -53,9 +53,8 @@ module Canvas::Migration
         doc = create_xml_doc(data)
 
         if get_node_val(doc, 'metadata schema') =~ COMMON_CARTRIDGE_REGEX
-          if !!doc.at_css(%{resources resource[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::SYLLABUS}"] file[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::COURSE_SETTINGS}"]})
-            :canvas_cartridge
-          elsif !!doc.at_css(%{resources resource[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::CANVAS_EXPORT_FLAG}"]})
+          if doc.at_css(%{resources resource[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::SYLLABUS}"] file[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::COURSE_SETTINGS}"]}) ||
+             doc.at_css(%{resources resource[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::CANVAS_EXPORT_FLAG}"]})
             :canvas_cartridge
           elsif get_node_val(doc, 'metadata schemaversion') == "1.0.0"
             :common_cartridge_1_0
@@ -80,9 +79,8 @@ module Canvas::Migration
           :scorm_1_2
         elsif has_namespace(doc, "http://www.adlnet.org/xsd/adlcp_v1p3")
           :scorm_1_3 # scorm 2004
-        elsif doc.at_css('resources resource[type^=ims_qti]')
-          :qti
-        elsif doc.at_css('resources resource[type^=imsqti]')
+        elsif doc.at_css('resources resource[type^=ims_qti]') ||
+              doc.at_css('resources resource[type^=imsqti]')
           :qti
         else
           # generic IMS Content Package?

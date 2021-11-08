@@ -21,8 +21,8 @@
 require 'spec_helper'
 
 describe AdheresToPolicy::InstanceMethods do
-  before(:each) do
-    @some_class = Class.new do
+  let(:some_class) do
+    Class.new do
       attr_accessor :user
 
       extend AdheresToPolicy::ClassMethods
@@ -31,19 +31,18 @@ describe AdheresToPolicy::InstanceMethods do
         can :read
       end
     end
-
-    class User
-    end
   end
+
+  let(:user_class) { Class.new }
 
   it "has setup a series of methods on the instance" do
     %w(rights_status granted_rights grants_right? grants_any_right? grants_all_rights?).each do |method|
-      expect(@some_class.new).to respond_to(method)
+      expect(some_class.new).to respond_to(method)
     end
   end
 
   it "is able to check a policy" do
-    some_instance = @some_class.new
+    some_instance = some_class.new
     some_instance.user = 1
     expect(some_instance.grants_right?(1, :read)).to eq true
   end
@@ -330,12 +329,14 @@ describe AdheresToPolicy::InstanceMethods do
   end
 
   context "grants_right?" do
-    before(:each) do
-      @actor_class = Class.new do
+    let(:actor_class) do
+      # need to copy the method to a local variable so that it's visible within the block
+      user_class = self.user_class
+      Class.new do
         extend AdheresToPolicy::ClassMethods
 
         set_policy do
-          given { |actor| actor == "allowed actor" || actor.class.to_s == "User" }
+          given { |actor| actor == "allowed actor" || actor.is_a?(user_class) }
           can :read
 
           given { |actor| actor == "allowed actor" }
@@ -345,24 +346,24 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     it "checks the policy" do
-      non_context = @actor_class.new
+      non_context = actor_class.new
       expect(non_context.grants_right?("allowed actor", :read)).to eq true
       expect(non_context.grants_right?("allowed actor", :asdf)).to eq false
     end
 
     it "returns false if no specific ones are sought" do
-      non_context = @actor_class.new
+      non_context = actor_class.new
       expect(non_context.grants_right?("allowed actor")).to eq false
     end
 
     it "returns false if no user is provided" do
-      non_context = @actor_class.new
+      non_context = actor_class.new
       expect(non_context.grants_right?("allowed actor", :read)).to eq true
       expect(non_context.grants_right?(nil, :read)).to eq false
     end
 
     it "raises argument exception if anything other then one right is provided" do
-      non_context = @actor_class.new
+      non_context = actor_class.new
       expect(non_context.grants_right?("allowed actor", :read)).to eq true
       expect {
         non_context.grants_right?("allowed actor", :asdf, :read)
@@ -375,8 +376,8 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       it "caches permissions" do
-        user = User.new
-        actor = @actor_class.new
+        user = user_class
+        actor = actor_class.new
 
         expect(AdheresToPolicy::Cache).to receive(:fetch).twice.with(/permissions/, an_instance_of(Hash)).and_return([])
         actor.rights_status(user)

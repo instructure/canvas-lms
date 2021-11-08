@@ -66,6 +66,7 @@ export const handlers = [
           }),
           conversation: Conversation.mock({
             _id: '195',
+            id: 'Q29udmVyc2F0aW9uLTE5NQ==',
             subject: 'h1'
           })
         }
@@ -99,6 +100,7 @@ export const handlers = [
           ...ConversationParticipant.mock({_id: '123', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMTA='}),
           conversation: Conversation.mock({
             _id: '10',
+            id: 'Q29udmVyc2F0aW9uLTEw',
             subject: 'This is a course scoped conversation'
           })
         }
@@ -112,7 +114,11 @@ export const handlers = [
             {_id: '256', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2', workflowState: 'unread'},
             {_id: '257', id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4', workflowState: 'unread'}
           ),
-          conversation: Conversation.mock({_id: '197', subject: 'This is an inbox conversation'})
+          conversation: Conversation.mock({
+            _id: '197',
+            id: 'Q29udmVyc2F0aW9uLTE5Nw==',
+            subject: 'This is an inbox conversation'
+          })
         }
       ]
       data.legacyNode.conversationsConnection.nodes[0].conversation.conversationMessagesConnection.nodes =

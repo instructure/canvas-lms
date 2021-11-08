@@ -1977,6 +1977,7 @@ class Gradebook extends React.Component {
       gradebookIsEditable: this.options.gradebook_is_editable,
       contextAllowsGradebookUploads: this.options.context_allows_gradebook_uploads,
       gradebookImportUrl: this.options.gradebook_import_url,
+      showStudentFirstLastName: this.gridDisplaySettings.showSeparateFirstLastNames,
       currentUserId: this.options.currentUserId,
       gradebookExportUrl: this.options.export_gradebook_csv_url,
       postGradesLtis: this.postGradesLtis,
@@ -2838,6 +2839,8 @@ class Gradebook extends React.Component {
 
     if (this.options.enhanced_gradebook_filters) {
       return GradebookApi.saveUserSettings(this.options.context_id, data.gradebook_settings)
+        .then(successFn)
+        .catch(errorFn)
     } else {
       return $.ajaxJSON(this.options.settings_update_url, 'PUT', data, successFn, errorFn)
     }
@@ -3676,7 +3679,7 @@ class Gradebook extends React.Component {
     const toggleableAction = () => {
       this.gridDisplaySettings.showSeparateFirstLastNames =
         !this.gridDisplaySettings.showSeparateFirstLastNames
-      return this.updateColumnsAndRenderViewOptionsMenu()
+      return this.updateColumnsAndRenderViewOptionsMenu() && this.renderActionMenu()
     }
     toggleableAction()
     return this.saveSettings(

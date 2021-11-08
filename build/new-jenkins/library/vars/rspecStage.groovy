@@ -16,6 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import groovy.transform.Field
+
+@Field static final SUCCESS_NOT_BUILT = [buildResult: 'SUCCESS', stageResult: 'NOT_BUILT']
+@Field static final SUCCESS_UNSTABLE = [buildResult: 'SUCCESS', stageResult: 'UNSTABLE']
+
 def createDistribution(nestedStages) {
   def rspecNodeTotal = configuration.getInteger('rspec-ci-node-total')
   def seleniumNodeTotal = configuration.getInteger('selenium-ci-node-total')
@@ -102,30 +107,38 @@ def createDistribution(nestedStages) {
 }
 
 def setupNode() {
-  env.AUTO_CANCELLED = 'false'
-  distribution.unstashBuildScripts()
-  if (queue_empty()) {
-    catchError([buildResult: 'SUCCESS', stageResult: 'ABORTED']) {
-      env.AUTO_CANCELLED = 'true'
-      error 'Test queue is empty, releasing node.'
+  try {
+    env.AUTO_CANCELLED = env.AUTO_CANCELLED ?: ''
+    distribution.unstashBuildScripts()
+    if (env.RSPECQ_ENABLED == '1' && queue_empty()) {
+      env.AUTO_CANCELLED += "${env.CI_NODE_INDEX},"
+      cancel_node(SUCCESS_NOT_BUILT, 'Test queue is empty, releasing node.')
+      return
     }
-    return
-  }
-  libraryScript.execute 'bash/print-env-excluding-secrets.sh'
-  if (env.RSPECQ_ENABLED == '1') {
-    def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
-    env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${TEST_QUEUE_HOST}:6379"
-  }
-  credentials.withStarlordCredentials { ->
-    sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
-  }
+    libraryScript.execute 'bash/print-env-excluding-secrets.sh'
+    if (env.RSPECQ_ENABLED == '1') {
+      def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
+      env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${TEST_QUEUE_HOST}:6379"
+    }
+    credentials.withStarlordCredentials { ->
+      sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
+    }
 
-  sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
+    sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
+  } catch (err) {
+    if (env.RSPECQ_ENABLED == '1') {
+      send_slack_alert(err)
+      env.AUTO_CANCELLED += "${env.CI_NODE_INDEX},"
+      cancel_node(SUCCESS_UNSTABLE, "RspecQ node setup failed!: ${err}")
+      return
+    }
+    throw err
+  }
 }
 
 def tearDownNode(prefix) {
-  if (env.AUTO_CANCELLED.toBoolean()) {
-    println 'Test queue is empty, releasing node.'
+  if (env.AUTO_CANCELLED.split(',').contains("${env.CI_NODE_INDEX}")) {
+    cancel_node(SUCCESS_NOT_BUILT, 'Node cancelled!')
     return
   }
   sh 'rm -rf ./tmp && mkdir -p tmp'
@@ -180,8 +193,8 @@ def tearDownNode(prefix) {
 
 def runRspecqSuite() {
   try {
-    if (env.AUTO_CANCELLED.toBoolean()) {
-      println 'Test queue is empty, releasing node.'
+    if (env.AUTO_CANCELLED.split(',').contains("${env.CI_NODE_INDEX}")) {
+      cancel_node(SUCCESS_NOT_BUILT, 'Node cancelled!')
       return
     }
     sh(script: 'docker-compose exec -T -e ENABLE_AXE_SELENIUM \
@@ -203,6 +216,12 @@ def runRspecqSuite() {
     }
 
     throw e
+  } catch (err) {
+    send_slack_alert(err)
+    env.AUTO_CANCELLED += "${env.CI_NODE_INDEX},"
+    cancel_node(SUCCESS_UNSTABLE, "RspecQ node failed!: ${err}")
+    /* groovylint-disable-next-line ReturnNullFromCatchBlock */
+    return
   }
 }
 
@@ -259,4 +278,18 @@ def queue_empty() {
   def queueProcessed = queueInfo[1].split(' ')[1].trim()
   def queueStatus = queueInfo[2].trim()
   return queueStatus == '\"ready\"' && queueUnprocessed.toInteger() == 0 && queueProcessed.toInteger() > 1
+}
+
+def send_slack_alert(error) {
+  slackSend(
+    channel: '#canvas_builds-noisy',
+    color: 'danger',
+    message: """<${env.BUILD_URL}|RspecQ node failure: ${error}>"""
+  )
+}
+
+def cancel_node(buildResult, errorMessage) {
+  catchError(buildResult) {
+    error errorMessage
+  }
 }

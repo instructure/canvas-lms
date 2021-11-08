@@ -93,6 +93,19 @@ describe "student k5 course dashboard" do
       expect(empty_modules_image).to be_displayed
     end
 
+    it 'loads the dashboard for public courses even if unauthenticated' do
+      @subject_course.is_public = true
+      @subject_course.save!
+      destroy_session
+
+      get "/courses/#{@subject_course.id}#home"
+
+      expect(retrieve_title_text).to match(/#{@subject_course_title}/)
+      expect(home_tab).to be_displayed
+      expect(schedule_tab).to be_displayed
+      expect(empty_subject_home).to be_displayed
+    end
+
     it_behaves_like "K5 Subject Home Tab"
   end
 

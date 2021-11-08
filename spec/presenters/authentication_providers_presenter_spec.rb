@@ -39,9 +39,7 @@ describe AuthenticationProvidersPresenter do
     end
 
     it "wraps them in an array" do
-      class NotArray < Array
-      end
-      account = stubbed_account(NotArray.new([]))
+      account = stubbed_account(Class.new(Array).new)
       presenter = described_class.new(account)
       expect(presenter.configs.class).to eq(Array)
     end

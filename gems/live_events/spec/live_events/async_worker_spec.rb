@@ -45,24 +45,10 @@ describe LiveEvents::AsyncWorker do
     }
   end
 
-  class LELogger
-    def info(data)
-      data
-    end
-
-    def error(data)
-      data
-    end
-
-    def debug(data)
-      data
-    end
-  end
-
   before(:each) do
     LiveEvents.max_queue_size = -> { 100 }
     LiveEvents.statsd = nil
-    LiveEvents.logger = LELogger.new
+    allow(LiveEvents).to receive(:logger).and_return(double(info: nil, error: nil, debug: nil))
     @worker = LiveEvents::AsyncWorker.new(false, stream_client: stream_client, stream_name: stream_name)
     allow(@worker).to receive(:at_exit)
   end

@@ -56,20 +56,18 @@ module Lti
       alias_method :validate!, :jwt
 
       def tool_proxy
-        @_tool_proxy ||= begin
-          tp = ToolProxy.where(guid: unverified_jwt[:sub], workflow_state: 'active').first
-          return nil unless tp.present?
+        @tool_proxy ||=
+          if (tp = ToolProxy.where(guid: unverified_jwt[:sub], workflow_state: 'active').first)
+            developer_key = tp.product_family.developer_key
+            raise InvalidAuthJwt, "the Developer Key is not active or available in this environment" if developer_key.present? && !developer_key.usable?
 
-          developer_key = tp.product_family.developer_key
-          raise InvalidAuthJwt, "the Developer Key is not active or available in this environment" if developer_key.present? && !developer_key.usable?
+            ims_tool_proxy = ::IMS::LTI::Models::ToolProxy.from_json(tp.raw_data)
+            if (ims_tool_proxy.enabled_capabilities & ['Security.splitSecret', 'OAuth.splitSecret']).blank?
+              raise InvalidAuthJwt, "the Tool Proxy must be using a split secret"
+            end
 
-          ims_tool_proxy = ::IMS::LTI::Models::ToolProxy.from_json(tp.raw_data)
-          if (ims_tool_proxy.enabled_capabilities & ['Security.splitSecret', 'OAuth.splitSecret']).blank?
-            raise InvalidAuthJwt, "the Tool Proxy must be using a split secret"
+            tp
           end
-
-          tp
-        end
       end
 
       def developer_key
@@ -79,7 +77,7 @@ module Lti
 
           dev_key
         rescue ActiveRecord::RecordNotFound
-          return nil
+          nil
         end
       end
 

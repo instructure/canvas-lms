@@ -536,9 +536,9 @@ class User < ActiveRecord::Base
         next
       end
       account_chain = account_chain_cache[account_id]
-      account_chain.each_with_index do |account_id, idx|
-        results[account_id] ||= idx
-        results[account_id] = idx if idx < results[account_id]
+      account_chain.each_with_index do |a_id, idx|
+        results[a_id] ||= idx
+        results[a_id] = idx if idx < results[a_id]
       end
     end
 
@@ -908,7 +908,6 @@ class User < ActiveRecord::Base
     p = Pseudonym.find(p)
     p.move_to_top
     self.reload
-    p
   end
 
   def email_channel
@@ -1344,18 +1343,12 @@ class User < ActiveRecord::Base
 
   def self.infer_id(obj)
     case obj
-    when User
+    when User, OpenObject
       obj.id
     when Numeric
       obj
-    when CommunicationChannel
+    when CommunicationChannel, Pseudonym, AccountUser
       obj.user_id
-    when Pseudonym
-      obj.user_id
-    when AccountUser
-      obj.user_id
-    when OpenObject
-      obj.id
     when String
       obj.to_i
     else
@@ -2385,7 +2378,7 @@ class User < ActiveRecord::Base
         ret[:primary] << "course_#{e.course_id}"
         ret[:secondary] << "course_section_#{e.course_section_id}"
       end
-      ret[:secondary].concat groups.map { |g| "group_category_#{g.group_category_id}" }
+      ret[:secondary].concat(groups.map { |g| "group_category_#{g.group_category_id}" })
       ret
     end
   end
@@ -2814,13 +2807,13 @@ class User < ActiveRecord::Base
       active_pseudonyms = self.all_active_pseudonyms(:reload).select { |p| !p.password_auto_generated? && !p.account.delegated_authentication? }
       templates = []
       # re-arrange in the order we prefer
-      templates.concat active_pseudonyms.select { |p| p.account_id == preferred_template_account.id } if preferred_template_account
-      templates.concat active_pseudonyms.select { |p| p.account_id == Account.site_admin.id }
-      templates.concat active_pseudonyms.select { |p| p.account_id == Account.default.id }
-      templates.concat active_pseudonyms
+      templates.concat(active_pseudonyms.select { |p| p.account_id == preferred_template_account.id }) if preferred_template_account
+      templates.concat(active_pseudonyms.select { |p| p.account_id == Account.site_admin.id })
+      templates.concat(active_pseudonyms.select { |p| p.account_id == Account.default.id })
+      templates.concat(active_pseudonyms)
       templates.uniq!
 
-      template = templates.detect { |template| !account.pseudonyms.active.by_unique_id(template.unique_id).first }
+      template = templates.detect { |t| !account.pseudonyms.active.by_unique_id(t.unique_id).first }
       if template
         # creating this not attached to the user's pseudonyms is intentional
         pseudonym = account.pseudonyms.build
@@ -2881,7 +2874,6 @@ class User < ActiveRecord::Base
     else
       self.otp_secret_key_enc = self.otp_secret_key_salt = nil
     end
-    key
   end
 
   def crocodoc_id!

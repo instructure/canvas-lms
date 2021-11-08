@@ -217,7 +217,7 @@ describe Outcomes::CSVImporter do
       import_fake_csv([
                         headers + ['ratings'],
                         outcome_row(vendor_guid: uuid) + [' 0012,34.5678 ', 'english number']
-                      ]) {}
+                      ]) { nil }
 
       outcome = LearningOutcome.find_by(vendor_guid: uuid)
       expect(outcome.rubric_criterion[:ratings][0][:points]).to eq(1234.5678)
@@ -229,7 +229,7 @@ describe Outcomes::CSVImporter do
       import_fake_csv([
                         headers + ['ratings'],
                         outcome_row(vendor_guid: uuid) + [' 123 456,5678 ', 'bon nombre']
-                      ]) {}
+                      ]) { nil }
 
       outcome = LearningOutcome.find_by(vendor_guid: uuid)
       expect(outcome.rubric_criterion[:ratings][0][:points]).to eq(123456.5678)

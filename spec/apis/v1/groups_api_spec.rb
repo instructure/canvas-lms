@@ -818,7 +818,7 @@ describe "Groups API", type: :request do
       }.to change(User, :count).by(2)
       @memberships = @community.reload.group_memberships.where(:workflow_state => "invited").order(:id).to_a
       expect(@memberships.count).to eq 2
-      expect(@json.sort_by { |a| a['id'] }).to eq @memberships.map { |gm| membership_json(gm) }
+      expect(@json.sort_by { |a| a['id'] }).to eq(@memberships.map { |gm| membership_json(gm) })
     end
 
     it "does not allow a member to invite people to a group" do

@@ -21,6 +21,7 @@
 
 class ModuleProgressionVisibleLoader < GraphQL::Batch::Loader
   def initialize(user)
+    super()
     @user = user
   end
 

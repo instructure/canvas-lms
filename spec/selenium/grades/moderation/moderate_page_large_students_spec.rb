@@ -24,7 +24,7 @@ require_relative '../pages/speedgrader_page'
 describe 'Moderation Page' do
   include_context 'in-process server selenium tests'
 
-  GRADES = [["10", "8"], ["9", "7"], ["5", "3"]]
+  let(:grades) { [["10", "8"], ["9", "7"], ["5", "3"]] }
 
   before(:once) do
     @moderated_course = course_factory(course_name: "Moderated Course")
@@ -47,8 +47,8 @@ describe 'Moderation Page' do
 
     # teachers 2 and 3 grade the assignment for students 1 and 2
     (1..2).map do |i|
-      @assignment.grade_student(@students[0], grade: GRADES[i][0], grader: @teachers[i], provisional: true)
-      @assignment.grade_student(@students[1], grade: GRADES[i][1], grader: @teachers[i], provisional: true)
+      @assignment.grade_student(@students[0], grade: grades[i][0], grader: @teachers[i], provisional: true)
+      @assignment.grade_student(@students[1], grade: grades[i][1], grader: @teachers[i], provisional: true)
     end
     # grade the rest of the students, one grader to student
     (2..8).map do |i|
@@ -84,8 +84,8 @@ describe 'Moderation Page' do
 
   it 'displays grades', priority: "1", test_id: 3505169 do
     ModeratePage.visit(@moderated_course.id, @assignment.id)
-    expect(ModeratePage.fetch_grades(@students[0])).to contain_exactly(GRADES[1][0], GRADES[2][0], '–')
-    expect(ModeratePage.fetch_grades(@students[1])).to contain_exactly(GRADES[1][1], GRADES[2][1], '–')
+    expect(ModeratePage.fetch_grades(@students[0])).to contain_exactly(grades[1][0], grades[2][0], '–')
+    expect(ModeratePage.fetch_grades(@students[1])).to contain_exactly(grades[1][1], grades[2][1], '–')
   end
 
   it 'displays first 20 students', priority: "1", test_id: 3505169 do

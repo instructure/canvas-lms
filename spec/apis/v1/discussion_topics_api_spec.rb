@@ -609,7 +609,9 @@ describe DiscussionTopicsController, type: :request do
 
         expect(json_topic).not_to be nil
         expect(json_topic['group_category_id']).to eq group_topic.group_category_id
-        expect(json_topic['group_topic_children']).to eq group_topic.child_topics.map { |topic| { "id" => topic.id, "group_id" => topic.context_id } }
+        expect(json_topic['group_topic_children']).to eq(
+          group_topic.child_topics.map { |topic| { "id" => topic.id, "group_id" => topic.context_id } }
+        )
       end
 
       describe "section specific announcements" do
@@ -838,7 +840,9 @@ describe DiscussionTopicsController, type: :request do
 
         expect(json).not_to be nil
         expect(json['group_category_id']).to eq group_topic.group_category_id
-        expect(json['group_topic_children']).to eq group_topic.child_topics.map { |topic| { "id" => topic.id, "group_id" => topic.context_id } }
+        expect(json['group_topic_children']).to eq(
+          group_topic.child_topics.map { |topic| { "id" => topic.id, "group_id" => topic.context_id } }
+        )
       end
 
       it "properly translates a video media comment in the discussion topic's message" do
@@ -1978,7 +1982,7 @@ describe DiscussionTopicsController, type: :request do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :per_page => '3' }
       )
       expect(json.length).to eq 3
-      expect(json.map { |e| e['id'] }).to eq entries.last(3).reverse.map { |e| e.id }
+      expect(json.map { |e| e['id'] }).to eq entries.last(3).reverse.map(&:id)
       links = response.headers['Link'].split(",")
       expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries/ }).to be_truthy
       expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2&per_page=3>/)
@@ -1992,7 +1996,7 @@ describe DiscussionTopicsController, type: :request do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :page => '3', :per_page => '3' }
       )
       expect(json.length).to eq 2
-      expect(json.map { |e| e['id'] }).to eq [entries.first, @entry].map { |e| e.id }
+      expect(json.map { |e| e['id'] }).to eq [entries.first, @entry].map(&:id)
       links = response.headers['Link'].split(",")
       expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries/ }).to be_truthy
       expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2&per_page=3>/)
@@ -2014,7 +2018,7 @@ describe DiscussionTopicsController, type: :request do
       expect(json.length).to eq 1
       reply_json = json.first['recent_replies']
       expect(reply_json.length).to eq 10
-      expect(reply_json.map { |e| e['id'] }).to eq replies.last(10).reverse.map { |e| e.id }
+      expect(reply_json.map { |e| e['id'] }).to eq replies.last(10).reverse.map(&:id)
       expect(json.first['has_more_replies']).to be_truthy
     end
   end
@@ -2074,7 +2078,7 @@ describe DiscussionTopicsController, type: :request do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s, :per_page => '3' }
       )
       expect(json.length).to eq 3
-      expect(json.map { |e| e['id'] }).to eq replies.last(3).reverse.map { |e| e.id }
+      expect(json.map { |e| e['id'] }).to eq replies.last(3).reverse.map(&:id)
       links = response.headers['Link'].split(",")
       expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries\/#{@entry.id}\/replies/ }).to be_truthy
       expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2&per_page=3>/)
@@ -2088,7 +2092,7 @@ describe DiscussionTopicsController, type: :request do
           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :entry_id => @entry.id.to_s, :page => '3', :per_page => '3' }
       )
       expect(json.length).to eq 2
-      expect(json.map { |e| e['id'] }).to eq [replies.first, @reply].map { |e| e.id }
+      expect(json.map { |e| e['id'] }).to eq [replies.first, @reply].map(&:id)
       links = response.headers['Link'].split(",")
       expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries\/#{@entry.id}\/replies/ }).to be_truthy
       expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2&per_page=3>/)
@@ -2731,10 +2735,10 @@ describe DiscussionTopicsController, type: :request do
       expect(json['unread_entries'].size).to eq 2 # two marked read, then ones this user wrote are never unread
       expect(json['unread_entries'].sort).to eq (@topic.discussion_entries - [@root2, @reply3] - @topic.discussion_entries.select { |e| e.user == @user }).map(&:id).sort
 
-      expect(json['participants'].sort_by { |h| h['id'] }).to eq [
+      expect(json['participants'].sort_by { |h| h['id'] }).to eq([
         { 'id' => @student.id, "pronouns" => nil, 'display_name' => @student.short_name, 'avatar_image_url' => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@student.id}" },
         { 'id' => @teacher.id, "pronouns" => nil, 'display_name' => @teacher.short_name, 'avatar_image_url' => User.avatar_fallback_url(nil, request), "html_url" => "http://www.example.com/courses/#{@course.id}/users/#{@teacher.id}" },
-      ].sort_by { |h| h['id'] }
+      ].sort_by { |h| h['id'] })
 
       reply_reply1_attachment_json = {
         "content-type" => "application/loser",

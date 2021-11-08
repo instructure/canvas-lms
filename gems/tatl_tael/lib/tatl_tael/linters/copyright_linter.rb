@@ -190,9 +190,8 @@ module TatlTael
           end
 
           if first_line_about_to_write
-            if first_line_exception?(line) # e.g. "# encoding: UTF-8"
-              next
-            elsif ending_block_comment_only?(line, ext) # e.g. "*/"
+            if first_line_exception?(line) || # e.g. "# encoding: UTF-8"
+               ending_block_comment_only?(line, ext) # e.g. "*/"
               next
             elsif !blank_or_comment_symbol_only?(line, ext)
               temp_file.write "\n"

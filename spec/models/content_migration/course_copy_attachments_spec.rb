@@ -21,7 +21,7 @@ require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "course copy attachments" do
-    include_examples "course copy"
+    include_context "course copy"
 
     it "assigns the correct parent folder when the parent folder has already been created" do
       folder = Folder.root_folders(@copy_from).first

@@ -48,7 +48,7 @@ class ContentParticipationCount < ActiveRecord::Base
 
         # if the participant was just created, the count will already be correct
         if opts[:offset].present? && !participant.new_record?
-          participant.unread_count = participant.unread_count(!:refresh) + opts[:offset]
+          participant.unread_count = participant.unread_count(refresh: false) + opts[:offset]
         end
         participant.save if participant.new_record? || participant.changed?
       end
@@ -107,7 +107,7 @@ class ContentParticipationCount < ActiveRecord::Base
     end
   end
 
-  def unread_count(refresh = true)
+  def unread_count(refresh: true)
     refresh_unread_count if refresh && !frozen? && ttl.present? && self.updated_at.utc < ttl.seconds.ago.utc
     read_attribute(:unread_count)
   end

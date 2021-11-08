@@ -21,6 +21,12 @@
 class GradeSummaryPresenter
   attr_reader :groups_assignments, :assignment_order
 
+  class << self
+    def cache_key(context, method)
+      ['grade_summary_presenter', context, method].cache_key
+    end
+  end
+
   def initialize(context, current_user, id_param, assignment_order: :due_at)
     @context = context
     @current_user = current_user
@@ -353,11 +359,5 @@ class GradeSummaryPresenter
     else
       module_position_comparison
     end
-  end
-
-  private_class_method
-
-  def self.cache_key(context, method)
-    ['grade_summary_presenter', context, method].cache_key
   end
 end

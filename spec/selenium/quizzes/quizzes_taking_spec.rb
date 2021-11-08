@@ -26,7 +26,7 @@ describe 'quiz taking' do
 
   before :each do
     course_with_student_logged_in(active_all: true)
-    @quiz = quiz_with_new_questions(!:goto_edit)
+    @quiz = quiz_with_new_questions(goto_edit: false)
   end
 
   it 'toggles only the essay question that was toggled leaving others on the page alone',

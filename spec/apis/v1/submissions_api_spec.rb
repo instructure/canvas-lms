@@ -1476,7 +1476,7 @@ describe 'Submissions API', type: :request do
          "late_policy_status" => nil,
          "seconds_late" => 0,
          "points_deducted" => nil }]
-    expect(json.sort_by { |h| h['user_id'] }).to eql res.sort_by { |h| h['user_id'] }
+    expect(json.sort_by { |h| h['user_id'] }).to eql(res.sort_by { |h| h['user_id'] })
   end
 
   it "paginates submissions" do
@@ -2158,7 +2158,7 @@ describe 'Submissions API', type: :request do
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
                       { controller: 'submissions_api', action: 'for_students', format: 'json', course_id: @course.to_param },
                       { student_ids: [@student1.id], assignment_ids: [@assignment.id], grouped: true })
-      row = json.detect { |row| row['user_id'] == @student1.id }
+      row = json.detect { |r| r['user_id'] == @student1.id }
       expect(row['section_id']).to eq enrollments.last.course_section_id
     end
 
@@ -4798,7 +4798,7 @@ describe 'Submissions API', type: :request do
                       include: %w[submission_history] })
 
     url = URI.parse(URI.decode(json[0]["submission_history"][0]["attachments"][0]["preview_url"]))
-    blob = JSON.parse(URI.decode_www_form(url.query).find { |a| a.first == "blob" }.second)
+    blob = JSON.parse(URI.decode_www_form(url.query).to_h["blob"])
     expect(blob).to include({
                               "enable_annotations" => true,
                               "anonymous_instructor_annotations" => false,

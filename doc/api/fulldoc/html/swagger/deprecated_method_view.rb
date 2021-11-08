@@ -27,6 +27,7 @@ class DeprecatedMethodView < HashView
   attr_reader :description, :effective_date, :notice_date
 
   def initialize(tag)
+    super()
     @deprecated_date_key = :NOTICE
     @effective_date_key = :EFFECTIVE
     @tag_declaration_line = tag.text

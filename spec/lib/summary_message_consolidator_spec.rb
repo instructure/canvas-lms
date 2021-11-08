@@ -29,7 +29,7 @@ describe "SummaryMessageConsolidator" do
       SummaryMessageConsolidator.process
     end
     messages.each { |m| expect(m.reload.workflow_state).to eq 'sent'; expect(m.batched_at).to be_present }
-    queued = created_jobs.map { |j| j.payload_object.jobs.map { |j| j.payload_object.args } }.flatten
+    queued = created_jobs.map { |j| j.payload_object.jobs.map { |j2| j2.payload_object.args } }.flatten
     expect(queued.map(&:to_i).sort).to eq messages.map(&:id).sort
   end
 
@@ -64,8 +64,8 @@ describe "SummaryMessageConsolidator" do
 
     SummaryMessageConsolidator.process
     dm_summarize_expectation = expect(DelayedMessage).to receive(:summarize)
-    dms.each_slice(delayed_messages_per_account) do |dms|
-      dm_summarize_expectation.with(dms.map(&:id))
+    dms.each_slice(delayed_messages_per_account) do |slice|
+      dm_summarize_expectation.with(slice.map(&:id))
     end
     run_jobs
   end

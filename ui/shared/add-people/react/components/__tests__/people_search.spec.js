@@ -22,8 +22,14 @@ import PeopleSearch from '../people_search'
 
 describe('PeopleSearch', () => {
   const props = {
-    roles: [{a: 'teacher'}, {b: 'student'}],
-    sections: [{a: 'secA'}, {b: 'secB'}]
+    roles: [
+      {id: '0', a: 'teacher'},
+      {id: '1', b: 'student'}
+    ],
+    sections: [
+      {id: '0', a: 'secA'},
+      {id: '1', b: 'secB'}
+    ]
   }
 
   test('displays Email Address as default label', () => {

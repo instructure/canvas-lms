@@ -76,7 +76,6 @@
           {{#t "labels.allow_media_recordings"}}Media Recordings{{/t}}
         </label>
         {{/if}}
-        {{#if annotatedDocumentSubmissionsEnabled}}
         <label class="checkbox" for="assignment_annotated_document">
           {{checkbox "acceptsAnnotatedDocument"
           id="assignment_annotated_document"
@@ -94,7 +93,6 @@
           style="{{hiddenUnless acceptsAnnotatedDocument}}; padding: 0 0 0 42px;">
         </div>
         <input type="hidden" name="annotatable_attachment_id" id="annotatable_attachment_id" />
-        {{/if}}
         <label class="checkbox" for="assignment_online_upload">
           {{checkbox "acceptsOnlineUpload"
           id="assignment_online_upload"

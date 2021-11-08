@@ -172,7 +172,7 @@ describe Quizzes::QuizzesController do
         doc = Nokogiri::HTML5(response.body)
         needing_review = doc.at_css('#questions_needing_review')
         expect(needing_review).to be_present
-        expect(needing_review.children.css('li a').map { |n| n.text }).to eq @quiz.quiz_data.map { |qq| qq['name'] }
+        expect(needing_review.children.css('li a').map(&:text)).to eq(@quiz.quiz_data.map { |qq| qq['name'] })
       end
 
       it "displays message about the quiz changing significantly" do
@@ -195,7 +195,7 @@ describe Quizzes::QuizzesController do
         doc = Nokogiri::HTML5(response.body)
         needing_review = doc.at_css('#questions_needing_review')
         expect(needing_review).to be_present
-        expect(needing_review.children.css('li a').map { |n| n.text }).to eq @quiz.quiz_data.map { |qq| qq['name'] }
+        expect(needing_review.children.css('li a').map(&:text)).to eq(@quiz.quiz_data.map { |qq| qq['name'] })
       end
 
       it "shoudn't show the user's name/email when it's an anonymous submission" do
