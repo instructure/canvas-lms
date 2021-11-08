@@ -89,7 +89,7 @@ module Lti::Messages
         document_targets: %w(iframe).freeze,
         media_types: %w(application/vnd.ims.imsccv1p1 application/vnd.ims.imsccv1p2 application/vnd.ims.imsccv1p3 application/zip application/xml).freeze
       }.freeze,
-      'module_index_menu' => {
+      'module_index_menu_modal' => {
         accept_multiple: true,
         accept_types: %w(ltiResourceLink).freeze,
         auto_create: true,
@@ -105,7 +105,7 @@ module Lti::Messages
       }.freeze
     }.freeze
 
-    MODAL_PLACEMENTS = %w(editor_button assignment_selection link_selection migration_selection course_assignments_menu).freeze
+    MODAL_PLACEMENTS = %w(editor_button assignment_selection link_selection migration_selection course_assignments_menu module_index_menu_modal).freeze
 
     def initialize(tool:, context:, user:, expander:, return_url:, opts: {})
       super
