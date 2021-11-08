@@ -2283,7 +2283,11 @@ class CoursesController < ApplicationController
                                         image_url: @context.image,
                                         banner_image_url: @context.banner_image,
                                         color: @context.course_color,
-                                        course_overview: @context&.wiki&.front_page&.body,
+                                        course_overview: {
+                                          body: @context.wiki&.front_page&.body,
+                                          url: @context.wiki&.front_page_url,
+                                          canEdit: @context.wiki&.front_page&.grants_any_right?(@current_user, session, :update, :update_content) && !@context.wiki&.front_page&.editing_restricted?(:content)
+                                        },
                                         hide_final_grades: @context.hide_final_grades?,
                                         student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
                                         outcome_proficiency: @context.root_account.feature_enabled?(:account_level_mastery_scales) ? @context.resolved_outcome_proficiency&.as_json : @context.account.resolved_outcome_proficiency&.as_json,
