@@ -733,18 +733,20 @@ class Conversation < ActiveRecord::Base
     @current_context_strings ||= {}
     @current_context_strings[threshold] ||= begin
       participants = conversation_participants.to_a
-      return [] if private? && participants.size == 1
+      if private? && participants.size == 1
+        []
+      else
+        threshold ||= participants.size / 2
+        preloaded_users_hash ||= preload_users_and_context_codes
 
-      threshold ||= participants.size / 2
-      preloaded_users_hash ||= preload_users_and_context_codes
-
-      participants.flat_map { |cp| (cp.user = preloaded_users_hash[cp.user_id])&.conversation_context_codes }
-                  .group_by { |code| code }
-                  .map { |code, dups| [code, dups.length] }
-                  .select { |_code, dups| dups > threshold }
-                  .sort_by(&:last)
-                  .map(&:first)
-                  .reverse
+        participants.flat_map { |cp| (cp.user = preloaded_users_hash[cp.user_id])&.conversation_context_codes }
+                    .group_by { |code| code }
+                    .map { |code, dups| [code, dups.length] }
+                    .select { |_code, dups| dups > threshold }
+                    .sort_by(&:last)
+                    .map(&:first)
+                    .reverse
+      end
     end
   end
 

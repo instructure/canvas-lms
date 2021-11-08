@@ -33,8 +33,131 @@ module IncomingMailProcessor
 
     ImportantHeaders = %w(To From Subject Content-Type)
 
+    BULK_PRECEDENCE_VALUES = %w[bulk list junk].freeze
+    private_constant :BULK_PRECEDENCE_VALUES
+
     class << self
       attr_accessor :mailbox_accounts, :settings, :deprecated_settings, :logger
+
+      def create_mailbox(account)
+        mailbox_class = get_mailbox_class(account)
+        mailbox = mailbox_class.new(account.config)
+        mailbox.set_timeout_method(&method(:timeout_method))
+        return mailbox
+      end
+
+      def error_report_category
+        "incoming_message_processor"
+      end
+
+      def bounce_message?(mail)
+        mail.header.fields.any? do |field|
+          case field.name
+          when 'Auto-Submitted' # RFC-3834
+            field.value != 'no'
+          when 'Precedence' # old kludgey stuff uses this
+            BULK_PRECEDENCE_VALUES.include?(field.value)
+          when 'X-Auto-Response-Suppress', # Exchange sets this
+              # some other random headers I found that are easy to check
+              'X-Autoreply',
+              'X-Autorespond',
+              'X-Autoresponder'
+            true
+          else
+            # not a bounce header we care about
+            false
+          end
+        end
+      end
+
+      def utf8ify(string, encoding)
+        encoding ||= 'UTF-8'
+        encoding = encoding.upcase
+        encoding = "UTF-8" if encoding == "UTF8"
+
+        # change encoding; if it throws an exception (i.e. unrecognized encoding), just strip invalid UTF-8
+        new_string = string.encode("UTF-8", encoding) rescue nil
+        new_string&.valid_encoding? ? new_string : Utf8Cleaner.strip_invalid_utf8(string)
+      end
+
+      def extract_address_tag(message, account)
+        addr, domain = account.address.split(/@/)
+        regex = Regexp.new("#{Regexp.escape(addr)}\\+([^@]+)@#{Regexp.escape(domain)}")
+        message.to&.each do |address|
+          if (match = regex.match(address))
+            return match[1]
+          end
+        end
+
+        # if no match is found, return false
+        # so that self.process message stops processing.
+        false
+      end
+
+      private
+
+      def mailbox_keys
+        MailboxClasses.keys.map(&:to_s)
+      end
+
+      def get_mailbox_class(account)
+        MailboxClasses.fetch(account.protocol)
+      end
+
+      def timeout_method
+        Canvas.timeout_protection("incoming_message_processor", raise_on_timeout: true) do
+          yield
+        end
+      end
+
+      def configure_settings(config)
+        @settings = IncomingMailProcessor::Settings.new
+        @deprecated_settings = IncomingMailProcessor::DeprecatedSettings.new
+
+        config.symbolize_keys.each do |key, value|
+          if IncomingMailProcessor::Settings.members.map(&:to_sym).include?(key)
+            self.settings.send("#{key}=", value)
+          elsif IncomingMailProcessor::DeprecatedSettings.members.map(&:to_sym).include?(key)
+            logger.warn("deprecated setting sent to IncomingMessageProcessor: #{key}") if logger
+            self.deprecated_settings.send("#{key}=", value)
+          else
+            raise "unrecognized setting sent to IncomingMessageProcessor: #{key}"
+          end
+        end
+      end
+
+      def configure_accounts(account_configs)
+        flat_account_configs = flatten_account_configs(account_configs)
+        self.mailbox_accounts = flat_account_configs.map do |mailbox_protocol, mailbox_config|
+          error_folder = mailbox_config.delete(:error_folder)
+          address = mailbox_config[:address] || mailbox_config[:username]
+          IncomingMailProcessor::MailboxAccount.new({
+                                                      :protocol => mailbox_protocol.to_sym,
+                                                      :config => mailbox_config,
+                                                      :address => address,
+                                                      :error_folder => error_folder,
+                                                    })
+        end
+      end
+
+      def flatten_account_configs(account_configs)
+        account_configs.reduce([]) do |flat_account_configs, (mailbox_protocol, mailbox_config)|
+          flat_mailbox_configs = flatten_mailbox_overrides(mailbox_config)
+          flat_mailbox_configs.each do |single_mailbox_config|
+            flat_account_configs << [mailbox_protocol, single_mailbox_config]
+          end
+
+          flat_account_configs
+        end
+      end
+
+      def flatten_mailbox_overrides(mailbox_config)
+        mailbox_defaults = mailbox_config.except('accounts')
+        mailbox_overrides = mailbox_config['accounts'] || [{}]
+        mailbox_overrides.map do |override_config|
+          mailbox_defaults.merge(override_config).symbolize_keys
+        end
+      end
     end
 
     def initialize(message_handler, error_reporter)
@@ -171,113 +294,6 @@ module IncomingMailProcessor
       (Time.now - datetime).to_i * 1000 if datetime # age in ms, please
     end
 
-    def self.mailbox_keys
-      MailboxClasses.keys.map(&:to_s)
-    end
-
-    def self.get_mailbox_class(account)
-      MailboxClasses.fetch(account.protocol)
-    end
-
-    def self.create_mailbox(account)
-      mailbox_class = get_mailbox_class(account)
-      mailbox = mailbox_class.new(account.config)
-      mailbox.set_timeout_method(&method(:timeout_method))
-      return mailbox
-    end
-
-    def self.timeout_method
-      Canvas.timeout_protection("incoming_message_processor", raise_on_timeout: true) do
-        yield
-      end
-    end
-
-    def self.configure_settings(config)
-      @settings = IncomingMailProcessor::Settings.new
-      @deprecated_settings = IncomingMailProcessor::DeprecatedSettings.new
-
-      config.symbolize_keys.each do |key, value|
-        if IncomingMailProcessor::Settings.members.map(&:to_sym).include?(key)
-          self.settings.send("#{key}=", value)
-        elsif IncomingMailProcessor::DeprecatedSettings.members.map(&:to_sym).include?(key)
-          logger.warn("deprecated setting sent to IncomingMessageProcessor: #{key}") if logger
-          self.deprecated_settings.send("#{key}=", value)
-        else
-          raise "unrecognized setting sent to IncomingMessageProcessor: #{key}"
-        end
-      end
-    end
-
-    def self.configure_accounts(account_configs)
-      flat_account_configs = flatten_account_configs(account_configs)
-      self.mailbox_accounts = flat_account_configs.map do |mailbox_protocol, mailbox_config|
-        error_folder = mailbox_config.delete(:error_folder)
-        address = mailbox_config[:address] || mailbox_config[:username]
-        IncomingMailProcessor::MailboxAccount.new({
-                                                    :protocol => mailbox_protocol.to_sym,
-                                                    :config => mailbox_config,
-                                                    :address => address,
-                                                    :error_folder => error_folder,
-                                                  })
-      end
-    end
-
-    def self.flatten_account_configs(account_configs)
-      account_configs.reduce([]) do |flat_account_configs, (mailbox_protocol, mailbox_config)|
-        flat_mailbox_configs = flatten_mailbox_overrides(mailbox_config)
-        flat_mailbox_configs.each do |single_mailbox_config|
-          flat_account_configs << [mailbox_protocol, single_mailbox_config]
-        end
-
-        flat_account_configs
-      end
-    end
-
-    def self.flatten_mailbox_overrides(mailbox_config)
-      mailbox_defaults = mailbox_config.except('accounts')
-      mailbox_overrides = mailbox_config['accounts'] || [{}]
-      mailbox_overrides.map do |override_config|
-        mailbox_defaults.merge(override_config).symbolize_keys
-      end
-    end
-
-    def self.error_report_category
-      "incoming_message_processor"
-    end
-
-    BULK_PRECEDENCE_VALUES = %w[bulk list junk].freeze
-    private_constant :BULK_PRECEDENCE_VALUES
-
-    def self.bounce_message?(mail)
-      mail.header.fields.any? do |field|
-        case field.name
-        when 'Auto-Submitted' # RFC-3834
-          field.value != 'no'
-        when 'Precedence' # old kludgey stuff uses this
-          BULK_PRECEDENCE_VALUES.include?(field.value)
-        when 'X-Auto-Response-Suppress', # Exchange sets this
-             # some other random headers I found that are easy to check
-             'X-Autoreply',
-             'X-Autorespond',
-             'X-Autoresponder'
-          true
-        else
-          # not a bounce header we care about
-          false
-        end
-      end
-    end
-
-    def self.utf8ify(string, encoding)
-      encoding ||= 'UTF-8'
-      encoding = encoding.upcase
-      encoding = "UTF-8" if encoding == "UTF8"
-
-      # change encoding; if it throws an exception (i.e. unrecognized encoding), just strip invalid UTF-8
-      new_string = string.encode("UTF-8", encoding) rescue nil
-      new_string&.valid_encoding? ? new_string : Utf8Cleaner.strip_invalid_utf8(string)
-    end
-
     def process_mailbox(mailbox, account, opts = {})
       error_folder = account.error_folder
       mailbox.connect
@@ -336,20 +352,6 @@ module IncomingMailProcessor
       @error_reporter.log_exception(self.class.error_report_category, e,
                                     :from => message.from.try(:first),
                                     :to => message.to.to_s)
-    end
-
-    def self.extract_address_tag(message, account)
-      addr, domain = account.address.split(/@/)
-      regex = Regexp.new("#{Regexp.escape(addr)}\\+([^@]+)@#{Regexp.escape(domain)}")
-      message.to&.each do |address|
-        if (match = regex.match(address))
-          return match[1]
-        end
-      end
-
-      # if no match is found, return false
-      # so that self.process message stops processing.
-      false
     end
   end
 end

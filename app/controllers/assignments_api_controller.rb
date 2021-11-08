@@ -1478,12 +1478,10 @@ class AssignmentsApiController < ApplicationController
   # in a failure retry, we place a new assignment next to the failed assignments
   # in an initial dup request, a new assignment will be placed next to old_assignment
   def target_assignment_for_duplicate
-    @_target_assignment_for_duplicate ||= begin
-      target_assignment_id = params[:target_assignment_id]
-      return old_assignment_for_duplicate if target_assignment_id.blank?
+    target_assignment_id = params[:target_assignment_id]
+    return old_assignment_for_duplicate if target_assignment_id.blank?
 
-      target_course_for_duplicate.active_assignments.find_by(id: target_assignment_id)
-    end
+    @target_assignment_for_duplicate ||= target_course_for_duplicate.active_assignments.find_by(id: target_assignment_id)
   end
 
   # target course is:
@@ -1491,12 +1489,10 @@ class AssignmentsApiController < ApplicationController
   #   - different from @context, in case of "Retry" in course copy
   #   - the same @course for assignment copy
   def target_course_for_duplicate
-    @_target_course_for_duplicate ||= begin
-      target_course_id = params[:target_course_id]
-      return @context if target_course_id.blank?
+    target_course_id = params[:target_course_id]
+    return @context if target_course_id.blank?
 
-      Course.find_by(id: target_course_id)
-    end
+    @target_course_for_duplicate ||= Course.find_by(id: target_course_id)
   end
 
   def failure_retry?

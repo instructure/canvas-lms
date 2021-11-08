@@ -59,7 +59,11 @@ Lint/DuplicateMethods:
   Severity: error
 Lint/EmptyBlock:
   Severity: error
+Lint/IneffectiveAccessModifier:
+  Severity: error
 Lint/MissingSuper:
+  Severity: error
+Lint/NoReturnInBeginEndBlocks:
   Severity: error
 Lint/NonDeterministicRequireOrder:
   Severity: error
@@ -91,6 +95,8 @@ Lint/UnusedBlockArgument:
   Severity: error
 Lint/UnusedMethodArgument:
   AllowUnusedKeywordArguments: true # there's no way to mark a kwarg as unused
+  Severity: error
+Lint/Void:
   Severity: error
 
 Metrics:

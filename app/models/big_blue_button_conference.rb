@@ -50,6 +50,74 @@ class BigBlueButtonConference < WebConference
     visible: false
   }
 
+  class << self
+    def send_request(action, options, use_fallback_config: false)
+      url_str = generate_request(action, options, use_fallback_config: use_fallback_config)
+      http_response = nil
+      Canvas.timeout_protection("big_blue_button") do
+        logger.debug "big blue button api call: #{url_str}"
+        http_response = CanvasHttp.get(url_str, redirect_limit: 5)
+      end
+      case http_response
+      when Net::HTTPSuccess
+        response = xml_to_hash(http_response.body)
+        if response[:returncode] == 'SUCCESS'
+          return response
+        else
+          logger.error "big blue button api error #{response[:message]} (#{response[:messageKey]})"
+        end
+      else
+        logger.error "big blue button http error #{http_response}"
+      end
+      nil
+    rescue
+      logger.error "big blue button unhandled exception #{$ERROR_INFO}"
+      nil
+    end
+
+    def generate_request(action, options, use_fallback_config: false)
+      config_to_use = (use_fallback_config && fallback_config.presence) || config
+      query_string = options.to_query
+      query_string << ("&checksum=" + Digest::SHA1.hexdigest(action.to_s + query_string + config_to_use[:secret_dec]))
+      "https://#{config_to_use[:domain]}/bigbluebutton/api/#{action}?#{query_string}"
+    end
+
+    private
+
+    def fallback_config
+      Canvas::Plugin.find(:big_blue_button_fallback).settings&.with_indifferent_access
+    end
+
+    def xml_to_hash(xml_string)
+      doc = Nokogiri::XML(xml_string)
+      # assumes the top level value will be a hash
+      xml_to_value(doc.root)
+    end
+
+    def xml_to_value(node)
+      child_elements = node.element_children
+
+      # if there are no children at all, then this is an empty node
+      if node.children.empty?
+        nil
+      # If no child_elements, this is probably a text node, so just return its content
+      elsif child_elements.empty?
+        node.content
+      # The BBB API follows the pattern where a plural element (ie <bars>)
+      # contains many singular elements (ie <bar>) and nothing else. Detect this
+      # and return an array to be assigned to the plural element.
+      # It excludes the playback node as all of them may be showing different content.
+      elsif node.name.singularize == child_elements.first.name || node.name == "playback"
+        child_elements.map { |child| xml_to_value(child) }
+      # otherwise, make a hash of the child elements
+      else
+        child_elements.each_with_object({}) do |child, hash|
+          hash[child.name.to_sym] = xml_to_value(child)
+        end
+      end
+    end
+  end
+
   def initiate_conference
     return conference_key if conference_key && !retouch?
 
@@ -247,73 +315,8 @@ class BigBlueButtonConference < WebConference
     self.class.generate_request(*args)
   end
 
-  def self.fallback_config
-    Canvas::Plugin.find(:big_blue_button_fallback).settings&.with_indifferent_access
-  end
-
-  def self.generate_request(action, options, use_fallback_config: false)
-    config_to_use = (use_fallback_config && fallback_config.presence) || config
-    query_string = options.to_query
-    query_string << ("&checksum=" + Digest::SHA1.hexdigest(action.to_s + query_string + config_to_use[:secret_dec]))
-    "https://#{config_to_use[:domain]}/bigbluebutton/api/#{action}?#{query_string}"
-  end
-
   def send_request(action, options)
     self.class.send_request(action, options, use_fallback_config: use_fallback_config?)
-  end
-
-  def self.send_request(action, options, use_fallback_config: false)
-    url_str = generate_request(action, options, use_fallback_config: use_fallback_config)
-    http_response = nil
-    Canvas.timeout_protection("big_blue_button") do
-      logger.debug "big blue button api call: #{url_str}"
-      http_response = CanvasHttp.get(url_str, redirect_limit: 5)
-    end
-
-    case http_response
-    when Net::HTTPSuccess
-      response = xml_to_hash(http_response.body)
-      if response[:returncode] == 'SUCCESS'
-        return response
-      else
-        logger.error "big blue button api error #{response[:message]} (#{response[:messageKey]})"
-      end
-    else
-      logger.error "big blue button http error #{http_response}"
-    end
-    nil
-  rescue
-    logger.error "big blue button unhandled exception #{$ERROR_INFO}"
-    nil
-  end
-
-  def self.xml_to_hash(xml_string)
-    doc = Nokogiri::XML(xml_string)
-    # assumes the top level value will be a hash
-    xml_to_value(doc.root)
-  end
-
-  def self.xml_to_value(node)
-    child_elements = node.element_children
-
-    # if there are no children at all, then this is an empty node
-    if node.children.empty?
-      nil
-    # If no child_elements, this is probably a text node, so just return its content
-    elsif child_elements.empty?
-      node.content
-    # The BBB API follows the pattern where a plural element (ie <bars>)
-    # contains many singular elements (ie <bar>) and nothing else. Detect this
-    # and return an array to be assigned to the plural element.
-    # It excludes the playback node as all of them may be showing different content.
-    elsif node.name.singularize == child_elements.first.name || node.name == "playback"
-      child_elements.map { |child| xml_to_value(child) }
-    # otherwise, make a hash of the child elements
-    else
-      child_elements.each_with_object({}) do |child, hash|
-        hash[child.name.to_sym] = xml_to_value(child)
-      end
-    end
   end
 
   def filter_duration(recording_formats)

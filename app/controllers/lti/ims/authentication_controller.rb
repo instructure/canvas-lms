@@ -192,7 +192,7 @@ module Lti
             end
           end
 
-          reject! 'Invalid redirect_uri' and return unless is_valid
+          reject! 'Invalid redirect_uri' unless is_valid
 
           oidc_params[:redirect_uri]
         end

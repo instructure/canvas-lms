@@ -777,8 +777,11 @@ describe AssignmentOverrideApplicator do
   end
 
   describe "assignment_with_overrides" do
+    around do |example|
+      Time.use_zone('Alaska', &example)
+    end
+
     before :each do
-      Time.zone == 'Alaska'
       @assignment = create_assignment(
         :due_at => 5.days.from_now,
         :unlock_at => 4.days.from_now,

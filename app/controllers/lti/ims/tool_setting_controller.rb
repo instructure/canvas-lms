@@ -178,7 +178,7 @@ module Lti
                  get_context
                  tool_proxy_guid = params[:tool_proxy_guid]
                  resource_link_id = params[:resource_link_id]
-                 render_unauthorized and return unless tool_proxy_guid == tool_proxy.guid
+                 render_unauthorized and return unless tool_proxy_guid == tool_proxy.guid # rubocop:disable Lint/NoReturnInBeginEndBlocks
 
                  tool_proxy.tool_settings.find_by(
                    context: @context,

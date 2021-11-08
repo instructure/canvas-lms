@@ -43,7 +43,6 @@ const ignoredErrors = [
   /Can't perform a React state update on an unmounted component/,
   /CancelAttemptButton: prop type `submission` is invalid/,
   /Cannot read property '(activeElement|useRealTimers)' of undefined/,
-  /Cannot read property 'length' of null/,
   /Cannot read property 'name' of null/,
   /Cannot update during an existing state transition/,
   /ColorPicker: isMounted is deprecated/,
@@ -63,7 +62,6 @@ const ignoredErrors = [
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `editorOptions.toolbar\[0\]` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
-  /Invalid prop `headingAs` of value `h4` supplied to `Billboard`/,
   /Invalid prop `returnFocusTo` of type `DeprecatedComponent` supplied to `(CourseHomeDialog|HomePagePromptContainer)`/,
   /Invalid prop `selectedDate` of type `date` supplied to `CanvasDateInput`/,
   /Invalid prop `value` of type `object` supplied to `CanvasSelect`/,
@@ -76,7 +74,6 @@ const ignoredErrors = [
   /Render methods should be a pure function of props and state/,
   /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
   /The above error occurred in the <.*> component/,
-  /The prop `avatarName` is marked as required in `UserLink`/,
   /The prop `children` is marked as required in `TruncateText`/,
   /The prop `courseId` is marked as required in `(LatestAnnouncementLink|PublishButton)`/,
   /The prop `currentUserRoles` is marked as required in `ObserverOptions`/,

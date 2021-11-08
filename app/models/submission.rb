@@ -1722,9 +1722,9 @@ class Submission < ActiveRecord::Base
   def versioned_originality_reports
     @versioned_originality_reports ||= begin
       attachment_ids = attachment_ids_for_version
-      return [] if attachment_ids.empty?
-
-      if self.association(:originality_reports).loaded?
+      if attachment_ids.empty?
+        []
+      elsif self.association(:originality_reports).loaded?
         originality_reports.select { |o| attachment_ids.include?(o.attachment_id) }
       else
         originality_reports.where(attachment_id: attachment_ids)
