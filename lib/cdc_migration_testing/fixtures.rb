@@ -21,3 +21,7 @@
 Dir.glob(File.join(__dir__, "fixtures/**/*.rb")).sort.each do |file|
   require_relative file
 end
+
+Dir.glob(File.join(__dir__, "../../gems/plugins/*/lib/cdc_migration_testing/fixtures/**/*.rb")).sort.each do |file|
+  require_relative file
+end
