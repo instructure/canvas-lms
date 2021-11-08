@@ -89,6 +89,11 @@ class ContextModulesController < ApplicationController
       favorites_enabled = @domain_root_account&.feature_enabled?(:commons_favorites)
       @module_index_tools = favorites_enabled ? external_tools_display_hashes(:module_index_menu) : []
       @module_group_tools = favorites_enabled ? external_tools_display_hashes(:module_group_menu) : []
+      @module_menu_tools = GuardRail.activate(:secondary) do
+        ContextExternalTool.all_tools_for(@context, placements: :module_index_menu_modal,
+                                                    root_account: @domain_root_account, current_user: @current_user).to_a
+      end
+      module_menu_tool_definitions = Lti::AppLaunchCollator.launch_definitions(@module_menu_tools, [:module_index_menu_modal])
 
       module_file_details = load_module_file_details if @context.grants_right?(@current_user, session, :manage_content)
       js_env :course_id => @context.id,
@@ -100,6 +105,7 @@ class ContextModulesController < ApplicationController
                manage_files_edit: @context.grants_right?(@current_user, session, :manage_files_edit)
              },
              :MODULE_TRAY_TOOLS => { :module_index_menu => @module_index_tools, :module_group_menu => @module_group_tools },
+             MODULE_MENU_TOOLS: module_menu_tool_definitions,
              :DEFAULT_POST_TO_SIS => @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
              :new_quizzes_modules_support => Account.site_admin.feature_enabled?(:new_quizzes_modules_support)
 
