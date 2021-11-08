@@ -385,8 +385,12 @@ class ContentZipper
     index
   end
 
-  def add_file(attachment, zipfile, filename)
-    mark_successful! if attachment.deleted? || add_attachment_to_zip(attachment, zipfile, filename)
+  def add_file(attachment, zipfile, fn)
+    if attachment.deleted?
+      mark_successful!
+    elsif add_attachment_to_zip(attachment, zipfile, fn)
+      mark_successful!
+    end
   end
 
   def add_online_submission_content(filename, display_page, zipfile)

@@ -6,10 +6,11 @@ describe TatlTael::Linters do
   describe TatlTael::Linters::BaseLinter do
     describe ".inherited" do
       context "not a simple linter" do
-        foo_linter = Class.new(TatlTael::Linters::BaseLinter)
+        class FooLinter < TatlTael::Linters::BaseLinter
+        end
 
         it "saves the subclass" do
-          expect(TatlTael::Linters.linters).to include(foo_linter)
+          expect(TatlTael::Linters.linters).to include(FooLinter)
         end
       end
 
@@ -21,7 +22,7 @@ describe TatlTael::Linters do
     end
 
     describe "#changes_matching" do
-      let(:change) { Struct.new(:status, :path) }
+      Change = Struct.new(:status, :path)
 
       let(:config) { {} }
       let(:base_linter) { TatlTael::Linters::BaseLinter.new(config: config, changes: changes) }
@@ -33,11 +34,11 @@ describe TatlTael::Linters do
 
       context "filtering by statuses" do
         let(:added_change_path) { "path/to/foo" }
-        let(:added_change) { change.new("added", added_change_path) }
+        let(:added_change) { Change.new("added", added_change_path) }
         let(:deleted_change_path) { "path/to/deleted" }
-        let(:deleted_change) { change.new("deleted", deleted_change_path) }
+        let(:deleted_change) { Change.new("deleted", deleted_change_path) }
         let(:modified_change_path) { "path/to/mod" }
-        let(:modified_change) { change.new("modified", modified_change_path) }
+        let(:modified_change) { Change.new("modified", modified_change_path) }
 
         let(:changes) { [added_change, deleted_change, modified_change] }
 
@@ -56,9 +57,9 @@ describe TatlTael::Linters do
 
       context "filtering by includes" do
         let(:added_change_path) { "path/to/foo" }
-        let(:added_change) { change.new("added", added_change_path) }
+        let(:added_change) { Change.new("added", added_change_path) }
         let(:modified_change_path) { "path/to/mod" }
-        let(:modified_change) { change.new("modified", modified_change_path) }
+        let(:modified_change) { Change.new("modified", modified_change_path) }
 
         let(:changes) { [added_change, modified_change] }
 
@@ -77,9 +78,9 @@ describe TatlTael::Linters do
 
       context "filtering by allowlist" do
         let(:added_change_path) { "path/to/foo" }
-        let(:added_change) { change.new("added", added_change_path) }
+        let(:added_change) { Change.new("added", added_change_path) }
         let(:modified_change_path) { "path/to/mod" }
-        let(:modified_change) { change.new("modified", modified_change_path) }
+        let(:modified_change) { Change.new("modified", modified_change_path) }
 
         let(:changes) { [added_change, modified_change] }
 
@@ -140,23 +141,19 @@ describe TatlTael::Linters do
   let(:changes) { double }
 
   describe ".comments" do
-    let(:bar_linter) do
-      Class.new(TatlTael::Linters::BaseLinter) do
-        def run
-          [[], [nil], "1"]
-        end
+    class BarLinter < TatlTael::Linters::BaseLinter
+      def run
+        [[], [nil], "1"]
       end
     end
 
-    let(:zoo_linter) do
-      Class.new(TatlTael::Linters::BaseLinter) do
-        def run
-          [nil, "2", "3"]
-        end
+    class ZooLinter < TatlTael::Linters::BaseLinter
+      def run
+        [nil, "2", "3"]
       end
     end
 
-    let(:saved_linters) { [bar_linter, zoo_linter] }
+    let(:saved_linters) { [BarLinter, ZooLinter] }
 
     it "collects linter comments" do
       expect(linters).to receive(:linters).and_return(saved_linters)

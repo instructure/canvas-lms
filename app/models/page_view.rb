@@ -286,7 +286,7 @@ class PageView < ActiveRecord::Base
     changes_applied
   end
 
-  scope :for_context, ->(ctx) { where(context_type: ctx.class.name, context_id: ctx) }
+  scope :for_context, proc { |ctx| where(:context_type => ctx.class.name, :context_id => ctx) }
   scope :for_users, lambda { |users| where(:user_id => users) }
 
   def self.pv4_client
@@ -407,7 +407,8 @@ class PageView < ActiveRecord::Base
     # if you interrupt and re-start the migrator, start_at cannot be changed,
     # since it's saved in cassandra to persist the migration state
     def initialize(skip_deleted_accounts = true, start_at = nil)
-      super(start_at || 52.weeks.ago, Rails.logger)
+      self.start_at = start_at || 52.weeks.ago
+      self.logger = Rails.logger
 
       if skip_deleted_accounts
         account_ids = Set.new(Account.root_accounts.active.pluck(:id))

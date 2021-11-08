@@ -62,7 +62,6 @@ module MicrosoftSync
       attr_reader :cause
 
       def initialize(cause)
-        super()
         @cause = cause
       end
     end

@@ -130,6 +130,7 @@ QUnit.module('EditView', {
       VALID_DATE_RANGE: {},
       use_rce_enhancements: true,
       COURSE_ID: 1,
+      ANNOTATED_DOCUMENT_SUBMISSIONS: true,
       USAGE_RIGHTS_REQUIRED: true
     })
     this.server = sinon.fakeServer.create()
@@ -2026,7 +2027,8 @@ QUnit.module('EditView student annotation submission', hooks => {
       MODERATED_GRADING_MAX_GRADER_COUNT: 2,
       VALID_DATE_RANGE: {},
       use_rce_enhancements: true,
-      COURSE_ID: 1
+      COURSE_ID: 1,
+      ANNOTATED_DOCUMENT_SUBMISSIONS: true
     })
     server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
@@ -2043,7 +2045,14 @@ QUnit.module('EditView student annotation submission', hooks => {
     fixtures.innerHTML = ''
   })
 
-  test('renders annotatable document option', function () {
+  test('does not render annotatable document option (flag missing)', function () {
+    ENV.ANNOTATED_DOCUMENT_SUBMISSIONS = false
+    view = editView()
+    equal(view.$('#assignment_annotated_document').length, 0)
+  })
+
+  test('renders annotatable document option (flag turned on)', function () {
+    ENV.ANNOTATED_DOCUMENT_SUBMISSIONS = true
     view = editView()
     const label = view.$('#assignment_annotated_document').parent()
     ok(label.text().includes('Student Annotation'))
@@ -2069,6 +2078,7 @@ QUnit.module('EditView student annotation submission', hooks => {
     let assignmentOpts
 
     contextHooks.beforeEach(function () {
+      ENV.ANNOTATED_DOCUMENT_SUBMISSIONS = true
       ENV.ANNOTATED_DOCUMENT = {
         id: '1',
         display_name: filename,

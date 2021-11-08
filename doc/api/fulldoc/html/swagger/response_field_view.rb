@@ -27,7 +27,6 @@ class ResponseFieldView < HashView
   attr_reader :types, :effective_date, :notice_date
 
   def initialize(tag)
-    super()
     line = tag.text
     @deprecated = tag.tag_name == 'deprecated_response_field'
     @deprecated_date_key = :NOTICE

@@ -364,7 +364,8 @@ describe DueDateCacher do
 
     it "does not consider users who are no longer in scope" do
       DueDateCacher.with_executing_user(student) do
-        DueDateCacher.with_executing_user(other_student) { nil }
+        DueDateCacher.with_executing_user(other_student) do
+        end
 
         expect(DueDateCacher.current_executing_user).to eq student
       end

@@ -22,7 +22,7 @@ require_relative '../../lti2_spec_helper'
 
 describe ContentMigration do
   context "course copy assignments" do
-    include_context "course copy"
+    include_examples "course copy"
 
     it "links assignments to account rubrics and outcomes" do
       account = @copy_from.account
@@ -333,6 +333,8 @@ describe ContentMigration do
     end
 
     describe "student annotation assignments" do
+      before(:each) { Account.site_admin.enable_feature!(:annotated_document_submissions) }
+
       let(:source_attachment) do
         attachment_model(course: @copy_from, filename: 'some_attachment')
       end
@@ -641,7 +643,7 @@ describe ContentMigration do
         expect(@copy_to.assignments.count).to eq 0
         expect(@copy_to.quizzes.count).to eq 0
         expect(@copy_to.discussion_topics.count).to eq 0
-        expect(@cm.content_export.error_messages.sort).to eq(warnings.sort.map { |w| [w, nil] })
+        expect(@cm.content_export.error_messages.sort).to eq warnings.sort.map { |w| [w, nil] }
       end
 
       it "does not mark assignment as copied if not set to be frozen" do

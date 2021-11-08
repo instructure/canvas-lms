@@ -41,7 +41,6 @@ end
 
 class ReturnView < ReturnViewNull
   def initialize(line)
-    super()
     if line
       @line = line.gsub(/\s+/m, " ").strip
     else

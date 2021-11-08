@@ -23,10 +23,13 @@ Rack::Utils.multipart_part_limit = 256 # default is 128
 
 module EnableRackChunking
   def chunkable_version?(*)
-    return false if defined?(PactConfig)
-    return super if ::Rails.env.test? || ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_chunking", failsafe: true]
-
-    false
+    if defined?(PactConfig)
+      false
+    elsif ::Rails.env.test? || ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_chunking", failsafe: true]
+      super
+    else
+      false
+    end
   end
 end
 Rack::Chunked.prepend(EnableRackChunking)

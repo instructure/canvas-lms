@@ -22,7 +22,7 @@ class UserService < ActiveRecord::Base
   include Workflow
 
   belongs_to :user
-  attr_reader :password
+  attr_accessor :password
 
   validates_presence_of :user_id, :service, :service_user_id, :workflow_state
 
@@ -176,6 +176,8 @@ class UserService < ActiveRecord::Base
     case type
     when 'google_drive'
       t '#user_service.descriptions.google_drive', 'Students can use Google Drive to collaborate on group projects.  Google Drive allows for real-time collaborative editing of documents, spreadsheets and presentations.'
+    when 'google_calendar'
+      ''
     when CommunicationChannel::TYPE_TWITTER
       t '#user_service.descriptions.twitter', 'Twitter is a great resource for out-of-class communication.'
     when 'delicious'
@@ -184,7 +186,7 @@ class UserService < ActiveRecord::Base
       t '#user_service.descriptions.diigo', 'Diigo is a collaborative link-sharing tool.  You can tag any page on the Internet for later reference.  You can also link to other users\' Diigo accounts to share links of similar interest.'
     when 'skype'
       t '#user_service.descriptions.skype', 'Skype is a free tool for online voice and video calls.'
-    else # 'google_calendar'
+    else
       ''
     end
   end

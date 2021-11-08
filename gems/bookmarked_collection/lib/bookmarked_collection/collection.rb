@@ -24,7 +24,6 @@ class BookmarkedCollection::Collection < Array
   FIRST_TOKEN = "first"
 
   def initialize(bookmarker)
-    super()
     @bookmarker = bookmarker
   end
 
@@ -102,6 +101,7 @@ class BookmarkedCollection::Collection < Array
 
   def current_page=(page)
     self.current_bookmark = page_to_bookmark(page)
+    page
   end
 
   def first_page

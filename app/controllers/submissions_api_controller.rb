@@ -950,13 +950,13 @@ class SubmissionsApiController < ApplicationController
 
       includes.delete("submission_comments")
       Version.preload_version_number(@submissions)
-      json[:all_submissions] = @submissions.map do |s|
+      json[:all_submissions] = @submissions.map do |submission|
         if visiblity_included
-          s.visible_to_user = users_with_visibility.include?(s.user_id)
+          submission.visible_to_user = users_with_visibility.include?(submission.user_id)
         end
 
         submission_json(
-          s,
+          submission,
           @assignment,
           @current_user,
           session,

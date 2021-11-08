@@ -20,10 +20,44 @@
 
 require 'delayed/testing'
 require_dependency "canvas/apm/inst_jobs/plugin"
-require_relative "../../apm_common"
 
 describe Canvas::Apm::InstJobs::Plugin do
-  include_context "apm"
+  class FakeSpan
+    attr_reader :tags
+    attr_accessor :resource, :span_type
+
+    def initialize
+      self.reset!
+    end
+
+    def reset!
+      @tags = {}
+    end
+
+    def set_tag(key, val)
+      @tags[key] = val
+    end
+  end
+
+  class FakeTracer
+    attr_reader :span
+
+    def initialize
+      @span = FakeSpan.new
+    end
+
+    def trace(_name, opts = {})
+      span.resource = opts.fetch(:resource, nil)
+      yield span
+    end
+
+    def enabled
+      true
+    end
+  end
+
+  let(:tracer) { FakeTracer.new }
+  let(:span) { tracer.span }
 
   around do |example|
     Canvas::Apm::InstJobs::Plugin.tracer = tracer

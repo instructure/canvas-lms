@@ -50,8 +50,12 @@ module Lti::IMS::Concerns
       end
 
       def tool
-        @tool ||= context && developer_key &&
-                  ContextExternalTool.all_tools_for(context).where(developer_key: developer_key).take
+        @_tool ||= begin
+          return nil unless context
+          return nil unless developer_key
+
+          ContextExternalTool.all_tools_for(context).where(developer_key: developer_key).take
+        end
       end
     end
   end

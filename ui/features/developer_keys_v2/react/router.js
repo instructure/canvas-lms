@@ -22,9 +22,7 @@ import page from 'page'
 import qs from 'qs'
 import DeveloperKeysApp from './App'
 import actions from './actions/developerKeysActions'
-import storeCreator from './store/store'
-
-const store = storeCreator()
+import store from './store/store'
 
 /**
  * Route Handlers
