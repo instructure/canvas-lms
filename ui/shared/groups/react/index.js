@@ -32,7 +32,7 @@ import ContextGroupCollection from '../backbone/collections/ContextGroupCollecti
 import BackboneState from './mixins/BackboneState'
 import PaginatedGroupList from './PaginatedGroupList'
 import Filter from './Filter'
-import NewGroupDialog from './NewGroupDialog'
+import NewStudentGroupModal from './NewStudentGroupModal'
 import ManageGroupDialog from './ManageGroupDialog'
 import 'jqueryui/dialog'
 import PropTypes from 'prop-types'
@@ -49,6 +49,7 @@ const StudentView = createReactClass({
   getInitialState() {
     return {
       filter: '',
+      showNewStudentGroupModal: false,
       userCollection: new UserCollection(null, {
         params: {enrollment_type: 'student', per_page: 15, sort: 'username'}
       }),
@@ -90,53 +91,34 @@ const StudentView = createReactClass({
     )
   },
 
-  openNewGroupDialog() {
-    const $dialog = $('<div>').dialog({
-      id: 'add_group_form',
-      title: 'New Student Group',
-      height: 500,
-      width: 700,
-      'fix-dialog-buttons': false,
-
-      close: _e => {
-        ReactDOM.unmountComponentAtNode($dialog[0])
-        $(this).remove()
-      }
-    })
-
-    const closeDialog = e => {
-      e.preventDefault()
-      $dialog.dialog('close')
-    }
-
-    ReactDOM.render(
-      <NewGroupDialog
-        userCollection={this.state.userCollection}
-        createGroup={this.createGroup}
-        closeDialog={closeDialog}
-        loadMore={() => this._loadMore(this.state.userCollection)}
-      />,
-      $dialog[0]
+  renderNewStudentGroupModal(open = true) {
+    return (
+      <>
+        <NewStudentGroupModal
+          userCollection={this.state.userCollection}
+          loadMore={() => this._loadMore(this.state.userCollection)}
+          onSave={() => this._onNewStudentGroupSave()}
+          open={open}
+          onDismiss={() => {
+            this.setState({showNewStudentGroupModal: false})
+          }}
+        />
+      </>
     )
+  },
+
+  _onNewGroupButtonClick() {
+    this.setState({showNewStudentGroupModal: true})
+  },
+
+  _onNewStudentGroupSave() {
+    // fetch a new paginated set of models for this collection from the server
+    this.state.groupCollection.fetch()
   },
 
   _categoryGroups(group) {
     return this.state.groupCollection.filter(
       g => g.get('group_category_id') === group.get('group_category_id')
-    )
-  },
-
-  _onCreateGroup(group) {
-    this.state.groupCollection.add(group)
-    $.flashMessage(I18n.t('Created Group %{group_name}', {group_name: group.name}))
-  },
-
-  createGroup(name, joinLevel, invitees) {
-    $.ajaxJSON(
-      `/courses/${ENV.course_id}/groups`,
-      'POST',
-      {group: {name, join_level: joinLevel}, invitees},
-      group => this._onCreateGroup(group)
     )
   },
 
@@ -273,7 +255,7 @@ const StudentView = createReactClass({
         <Button
           color="primary"
           renderIcon={IconAddLine}
-          onClick={this.openNewGroupDialog}
+          onClick={this._onNewGroupButtonClick}
           data-test-id="add-group-button"
         >
           <PresentationContent>{I18n.t('Group')}</PresentationContent>
@@ -303,6 +285,7 @@ const StudentView = createReactClass({
             {this.props.enableGroupCreation && newGroupButton && (
               <div className="pull-right group-categories-actions">{newGroupButton}</div>
             )}
+            {this.state.showNewStudentGroupModal ? this.renderNewStudentGroupModal() : null}
             <div
               className="roster-tab tab-panel"
               ref={ref => {
