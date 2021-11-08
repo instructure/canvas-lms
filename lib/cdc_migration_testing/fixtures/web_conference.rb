@@ -20,18 +20,23 @@
 
 module CdcFixtures
   def self.create_web_conference
-    ps = PluginSetting.find_or_create_by(name: 'adobe_connect')
-    ps.settings = {}
-    ps.disabled = false
-    ps.save!
+    # the model-generator may have created a record with id 1 already, but
+    # bypassing the sequence, so it'll try to create with id 1 and fail.
+    # just let it try twice
+    PluginSetting.unique_constraint_retry do
+      ps = PluginSetting.where(name: 'adobe_connect').first_or_initialize
+      ps.settings = {}
+      ps.disabled = false
+      ps.save! if ps.changed?
+    end
 
-    return WebConference.new({
-                               title: 'default',
-                               conference_type: 'AdobeConnect',
-                               context_id: 1,
-                               context_type: 'Course',
-                               user_id: 1,
-                               root_account_id: 1,
-                             })
+    WebConference.new(
+      title: 'default',
+      conference_type: 'AdobeConnect',
+      context_id: 1,
+      context_type: 'Course',
+      user_id: 1,
+      root_account_id: 1,
+    )
   end
 end
