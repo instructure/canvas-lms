@@ -112,7 +112,11 @@ module MicrosoftSync
           end
         end
 
-        if (special_case_value = SpecialCase.match(special_cases, response.code, response.body))
+        special_case_value = SpecialCase.match(
+          special_cases,
+          status_code: response.code, body: response.body
+        )
+        if special_case_value
           log_and_increment(method, path, statsd_tags, :expected, response.code)
           if special_case_value.is_a?(StandardError)
             raise ExpectedErrorWrapper, special_case_value
@@ -345,7 +349,8 @@ module MicrosoftSync
         special_cases_values = {}
         grouped = responses.group_by do |subresponse|
           special_case_value = SpecialCase.match(
-            special_cases, subresponse['status'], subresponse['body'].to_json
+            special_cases,
+            status_code: subresponse['status'], body: subresponse['body'].to_json
           )
 
           if special_case_value
