@@ -627,8 +627,12 @@ export function K5Course({
           />
         )}
         {currentTab === TAB_IDS.HOME &&
-          (courseOverview || courseOverview?.length === 0 ? (
-            <OverviewPage content={courseOverview} />
+          (courseOverview.body || courseOverview.body?.length === 0 ? (
+            <OverviewPage
+              content={courseOverview.body}
+              url={`/courses/${id}/pages/${courseOverview.url}/edit`}
+              canEdit={courseOverview.canEdit}
+            />
           ) : (
             <EmptyHome
               pagesPath={pagesPath}
@@ -697,7 +701,11 @@ K5Course.propTypes = {
   color: PropTypes.string,
   defaultTab: PropTypes.string,
   plannerEnabled: PropTypes.bool,
-  courseOverview: PropTypes.string,
+  courseOverview: PropTypes.shape({
+    body: PropTypes.string,
+    url: PropTypes.string,
+    canEdit: PropTypes.bool
+  }).isRequired,
   hideFinalGrades: PropTypes.bool.isRequired,
   currentUser: PropTypes.object.isRequired,
   userIsStudent: PropTypes.bool.isRequired,
