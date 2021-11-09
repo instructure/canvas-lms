@@ -603,7 +603,7 @@ describe MicrosoftSync::GraphService do
         end
 
         it 'falls back to the batch api' do
-          expect(service).to receive(:add_users_to_group_via_batch)
+          expect(service.groups).to receive(:add_users_to_group_via_batch)
             .with('msgroupid', members, owners).and_return('foo')
           expect(subject).to eq('foo')
         end

@@ -549,12 +549,12 @@ describe MicrosoftSync::SyncerSteps do
     before do
       allow(diff).to \
         receive(:additions_in_slices_of)
-        .with(MicrosoftSync::GraphService::GROUP_USERS_BATCH_SIZE)
+        .with(MicrosoftSync::GraphService::GroupsEndpoints::GROUP_USERS_BATCH_SIZE)
         .and_yield(owners: %w[o3], members: %w[o1 o2])
         .and_yield(members: %w[o3])
       allow(diff).to \
         receive(:removals_in_slices_of)
-        .with(MicrosoftSync::GraphService::GROUP_USERS_BATCH_SIZE)
+        .with(MicrosoftSync::GraphService::GroupsEndpoints::GROUP_USERS_BATCH_SIZE)
         .and_yield(owners: %w[o1], members: %w[m1 m2])
         .and_yield(members: %w[m3])
     end
