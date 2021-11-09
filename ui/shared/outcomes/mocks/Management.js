@@ -420,7 +420,12 @@ export const groupDetailMocks = ({
                   description: '',
                   title: `Outcome 1 - ${title}`,
                   isImported: outcomeIsImported,
-                  __typename: 'LearningOutcome'
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    _id: '101',
+                    description: 'Outcome 1 - friendly description',
+                    __typename: 'FriendlyDescription'
+                  }
                 },
                 __typename: 'ContentTag'
               },
@@ -431,7 +436,12 @@ export const groupDetailMocks = ({
                   description: '',
                   title: `Outcome 2 - ${title}`,
                   isImported: outcomeIsImported,
-                  __typename: 'LearningOutcome'
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    _id: '102',
+                    description: 'Outcome 2 - friendly description',
+                    __typename: 'FriendlyDescription'
+                  }
                 },
                 __typename: 'ContentTag'
               }
@@ -478,7 +488,12 @@ export const groupDetailMocks = ({
                   description: '',
                   title: `Outcome 1 - ${title}`,
                   isImported: outcomeIsImported,
-                  __typename: 'LearningOutcome'
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    description: 'Outcome 1 - friendly description',
+                    __typename: 'FriendlyDescription',
+                    _id: '101'
+                  }
                 },
                 __typename: 'ContentTag'
               },
@@ -489,7 +504,12 @@ export const groupDetailMocks = ({
                   description: '',
                   title: `Outcome 3 - ${title}`,
                   isImported: outcomeIsImported,
-                  __typename: 'LearningOutcome'
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    description: 'Outcome 3 - friendly description',
+                    __typename: 'FriendlyDescription',
+                    _id: '103'
+                  }
                 },
                 __typename: 'ContentTag'
               }
@@ -537,9 +557,13 @@ export const groupDetailMocks = ({
                   _id: '5',
                   description: '',
                   isImported: false,
-                  friendlyDescription: null,
                   title: `Outcome 5 - ${title}`,
-                  __typename: 'LearningOutcome'
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    description: 'Outcome 5 - friendly description',
+                    __typename: 'FriendlyDescription',
+                    _id: '105'
+                  }
                 },
                 __typename: 'ContentTag'
               },
@@ -550,7 +574,12 @@ export const groupDetailMocks = ({
                   description: '',
                   isImported: outcomeIsImported,
                   title: `Outcome 6 - ${title}`,
-                  __typename: 'LearningOutcome'
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    description: 'Outcome 6 - friendly description',
+                    __typename: 'FriendlyDescription',
+                    _id: '106'
+                  }
                 },
                 __typename: 'ContentTag'
               }
@@ -1041,7 +1070,12 @@ export const findOutcomesMocks = ({
                   description: '',
                   isImported,
                   title: `Outcome 5 - Group ${groupId}`,
-                  __typename: 'LearningOutcome'
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    _id: '5',
+                    description: 'Outcome 5 - friendly description',
+                    __typename: 'FriendlyDescription'
+                  }
                 },
                 __typename: 'ContentTag'
               },
@@ -1052,7 +1086,12 @@ export const findOutcomesMocks = ({
                   description: '',
                   isImported,
                   title: `Outcome 6 - Group ${groupId}`,
-                  __typename: 'LearningOutcome'
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    _id: '6',
+                    description: 'Outcome 6 - friendly description',
+                    __typename: 'FriendlyDescription'
+                  }
                 },
                 __typename: 'ContentTag'
               }
@@ -1099,7 +1138,12 @@ export const findOutcomesMocks = ({
                   description: '',
                   isImported,
                   title: `Outcome 5 - Group ${groupId}`,
-                  __typename: 'LearningOutcome'
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    _id: '5',
+                    description: 'Outcome 5 - friendly description',
+                    __typename: 'FriendlyDescription'
+                  }
                 },
                 __typename: 'ContentTag'
               },
@@ -1110,7 +1154,12 @@ export const findOutcomesMocks = ({
                   description: '',
                   isImported,
                   title: `Outcome 6 - Group ${groupId}`,
-                  __typename: 'LearningOutcome'
+                  __typename: 'LearningOutcome',
+                  friendlyDescription: {
+                    _id: '6',
+                    description: 'Outcome 6 - friendly description',
+                    __typename: 'FriendlyDescription'
+                  }
                 },
                 __typename: 'ContentTag'
               }
