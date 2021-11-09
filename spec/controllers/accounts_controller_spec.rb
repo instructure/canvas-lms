@@ -1412,6 +1412,21 @@ describe AccountsController do
       expect(response.body).to match(/\"sis_course_id\":\"30\".+\"sis_course_id\":\"31\".+\"sis_course_id\":\"42\".+\"sis_course_id\":\"52\"/)
     end
 
+    it "counts enrollments correctly" do
+      admin_logged_in(@account)
+      student1 = user_factory
+      student2 = user_factory
+      @c1.enroll_user(student1, "StudentEnrollment", :enrollment_state => 'active')
+      @c1.enroll_user(student2, "StudentEnrollment", :enrollment_state => 'active')
+      @c2.enroll_user(student1, "StudentEnrollment", :enrollment_state => 'active')
+      get 'courses_api', params: { account_id: @account.id, include: ['total_students'] }
+
+      expect(response).to be_successful
+      res = JSON.parse(response.body)
+      expect(res.detect { |r| r['id'] == @c1.id }['total_students']).to eq(2)
+      expect(res.detect { |r| r['id'] == @c2.id }['total_students']).to eq(1)
+    end
+
     context "sorting by term" do
       let(:letters_in_random_order) { 'daqwds'.split('') }
       before do
@@ -1647,6 +1662,21 @@ describe AccountsController do
         expect(response.body).not_to match(/\"display_name\":\"inactive\"/)
         expect(response.body).to match(/\"display_name\":\"Teachy McTeacher\"/)
         expect(response.body).to match(/\"display_name\":\"Cross Shard\"/)
+      end
+
+      it "counts enrollments correctly cross-shard" do
+        admin_logged_in(@account)
+        student1 = user_factory
+        student2 = user_factory
+        @c1.enroll_user(student1, "StudentEnrollment", :enrollment_state => 'active')
+        @c1.enroll_user(student2, "StudentEnrollment", :enrollment_state => 'active')
+        @c2.enroll_user(student1, "StudentEnrollment", :enrollment_state => 'active')
+        @shard1.activate { get 'courses_api', params: { account_id: @account.id, include: ['total_students'] } }
+
+        expect(response).to be_successful
+        res = JSON.parse(response.body)
+        expect(res.detect { |r| r['id'] == @c1.global_id }['total_students']).to eq(2)
+        expect(res.detect { |r| r['id'] == @c2.global_id }['total_students']).to eq(1)
       end
     end
   end
