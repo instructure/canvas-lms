@@ -2949,6 +2949,7 @@ describe Enrollment do
       end
 
       it 'is false for a user without :manage_students' do
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
         allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
         expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
@@ -2985,26 +2986,26 @@ describe Enrollment do
         @enrollment.reload
       end
 
-      it 'is true for a user who has been granted :manage_students' do
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+      it 'is true for a user who has been granted :remove_student_from_course' do
+        allow(@course).to receive(:grants_right?).with(user, session, :remove_student_from_course).and_return(true)
         allow(@course).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(false)
         expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
       end
 
-      it 'is false for a user without :manage_students' do
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+      it 'is false for a user without :remove_student_from_course' do
+        allow(@course).to receive(:grants_right?).with(user, session, :remove_student_from_course).and_return(false)
         expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
 
       it 'is false for someone with :allow_course_admin_actions in other context' do
         context = CourseSection.new(id: 10)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(context).to receive(:grants_right?).with(user, session, :remove_student_from_course).and_return(true)
         allow(context).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(true)
         expect(@enrollment.can_be_deleted_by(user, context, session)).to be_falsey
       end
 
       it 'is false if a user is trying to remove their own enrollment' do
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(@course).to receive(:grants_right?).with(user, session, :remove_student_from_course).and_return(true)
         allow(@course).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(false)
         allow(@course).to receive_messages(:account => @course)
         @enrollment.user_id = user.id
@@ -3050,13 +3051,7 @@ describe Enrollment do
         @enrollment.reload
       end
 
-      it 'is true with :manage_students' do
-        allow(@course).to receive(:grants_right?).and_return(false)
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
-        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
-      end
-
-      it "is true without :manage_students but with the :remove_observer_from_account granular" do
+      it 'is true with :remove_observer_from_course' do
         allow(@course).to receive(:grants_right?).and_return(false)
         allow(@course).to receive(:grants_right?).with(user, session, :remove_observer_from_course).and_return(true)
         expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy

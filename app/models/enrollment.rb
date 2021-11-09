@@ -908,13 +908,12 @@ class Enrollment < ActiveRecord::Base
   def can_be_deleted_by(user, context, session)
     return context.grants_right?(user, session, :use_student_view) if fake_student?
 
-    can_remove = [StudentEnrollment, ObserverEnrollment].include?(self.class) && context.grants_right?(user, session, :manage_students)
-
     if self.root_account.feature_enabled? :granular_permissions_manage_users
-      can_remove ||= can_delete_via_granular(user, session, context)
+      can_remove = can_delete_via_granular(user, session, context)
       can_remove &&= self.user_id != user.id || context.account.grants_right?(user, session, :allow_course_admin_actions)
     else
-      can_remove ||= context.grants_right?(user, session, :manage_admin_users) unless student?
+      can_remove = context.grants_right?(user, session, :manage_admin_users) && !student?
+      can_remove ||= [StudentEnrollment, ObserverEnrollment].include?(self.class) && context.grants_right?(user, session, :manage_students)
       can_remove &&= self.user_id != user.id || context.account.grants_right?(user, session, :manage_admin_users)
     end
     can_remove && context.id == (context.is_a?(Course) ? self.course_id : self.course_section_id)
@@ -1542,7 +1541,8 @@ class Enrollment < ActiveRecord::Base
     (self.teacher? && context.grants_right?(user, session, :remove_teacher_from_course)) ||
       (self.ta? && context.grants_right?(user, session, :remove_ta_from_course)) ||
       (self.designer? && context.grants_right?(user, session, :remove_designer_from_course)) ||
-      (self.observer? && context.grants_right?(user, session, :remove_observer_from_course))
+      (self.observer? && context.grants_right?(user, session, :remove_observer_from_course)) ||
+      (self.student? && context.grants_right?(user, session, :remove_student_from_course))
   end
 
   def remove_user_as_final_grader?
