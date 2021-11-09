@@ -184,6 +184,7 @@ describe "differentiated_assignments" do
       course_with_differentiated_assignments_enabled
       add_multiple_sections
     end
+
     context "assignment only visible to overrides" do
       context "ADHOC overrides" do
         before { assignment_with_true_only_visible_to_overrides }
@@ -226,6 +227,7 @@ describe "differentiated_assignments" do
             teacher_in_course(course: @course)
             enroll_user_in_group(@group_foo, { user: @student })
           end
+
           it "does not keep the assignment visible even if there is a grade" do
             @assignment.grade_student(@student, grade: 10, grader: @teacher)
             @student.group_memberships.each(&:destroy!)
@@ -282,6 +284,7 @@ describe "differentiated_assignments" do
 
         context "user in groups with and without override" do
           before { enroller_user_in_both_groups(user: @user) }
+
           it "shows the assignment to the user" do
             ensure_user_sees_assignment
           end
@@ -293,6 +296,7 @@ describe "differentiated_assignments" do
           assignment_with_true_only_visible_to_overrides
           give_section_due_date(@assignment, @section_foo)
         end
+
         context "user in section with override who then changes sections" do
           before do
             teacher_in_course(course: @course)
@@ -331,6 +335,7 @@ describe "differentiated_assignments" do
         end
         context "user in section with override" do
           before { enroller_user_in_section(@section_foo) }
+
           it "shows the assignment to the user" do
             ensure_user_sees_assignment
           end
@@ -369,6 +374,7 @@ describe "differentiated_assignments" do
         end
         context "user in section with no override" do
           before { enroller_user_in_section(@section_bar) }
+
           it "hides the assignment from the user" do
             ensure_user_does_not_see_assignment
           end
@@ -377,6 +383,7 @@ describe "differentiated_assignments" do
           before do
             enroller_user_in_both_sections
           end
+
           it "shows the assignment to the user" do
             ensure_user_sees_assignment
           end
@@ -387,6 +394,7 @@ describe "differentiated_assignments" do
           assignment_with_false_only_visible_to_overrides
           give_section_due_date(@assignment, @section_foo)
         end
+
         context "user in default section" do
           it "shows the assignment to the user" do
             ensure_user_sees_assignment
@@ -399,12 +407,14 @@ describe "differentiated_assignments" do
         end
         context "user in section with override" do
           before { enroller_user_in_section(@section_foo) }
+
           it "shows the assignment to the user" do
             ensure_user_sees_assignment
           end
         end
         context "user in section with no override" do
           before { enroller_user_in_section(@section_bar) }
+
           it "shows the assignment to the user" do
             ensure_user_sees_assignment
           end
@@ -413,6 +423,7 @@ describe "differentiated_assignments" do
           before do
             enroller_user_in_both_sections
           end
+
           it "shows the assignment to the user" do
             ensure_user_sees_assignment
           end

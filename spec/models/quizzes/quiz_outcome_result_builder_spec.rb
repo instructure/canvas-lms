@@ -33,6 +33,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       @quiz_result = @quiz_results.first
       @question_results = @quiz_results.first.learning_outcome_question_results
     end
+
     it 'has valid bank data' do
       expect(@bank.learning_outcome_alignments.length).to eql(1)
       expect(@q2.assessment_question.assessment_question_bank).to eql(@bank)
@@ -111,6 +112,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
         @quiz_results = LearningOutcomeResult.where(user_id: @user).sort_by(&:learning_outcome_id).to_a
         @question_results = @quiz_results.map(&:learning_outcome_question_results)
       end
+
       it "has valid bank data" do
         expect(@bank.learning_outcome_alignments.length).to eql(1)
         expect(@bank2.learning_outcome_alignments.length).to eql(1)
@@ -442,6 +444,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       @q1.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
       @q2.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
     end
+
     it "does not generate a learning outcome result" do
       q1_data = @q1.question_data
       q1_data[:points_possible] = 0.0

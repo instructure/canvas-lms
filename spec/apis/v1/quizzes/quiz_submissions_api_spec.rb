@@ -765,6 +765,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       @quiz_submission.update_attribute(:end_at, now + 1.hour)
       Quizzes::QuizSubmission.where(:id => @quiz_submission).update_all(:updated_at => now - 1.hour)
     end
+
     it "gives times for the quiz" do
       json = qs_api_time(false)
       expect(json).to have_key("time_left")

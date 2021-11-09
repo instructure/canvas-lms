@@ -27,6 +27,7 @@ module Lti
     let(:service_name) { OriginalityReportsApiController::ORIGINALITY_REPORT_SERVICE }
     let(:aud) { host }
     before(:once) { attachment_model }
+
     before :each do
       course_factory(active_all: true)
       message_handler.update(message_type: 'basic-lti-launch-request')

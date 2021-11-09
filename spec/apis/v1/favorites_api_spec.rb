@@ -184,6 +184,7 @@ describe "Favorites API", type: :request do
       @user.favorites.build(:context => @group_fave)
       @user.save
     end
+
     it "add favorite group" do
       api_call(:post, "/api/v1/users/self/favorites/groups/#{@group_not_yet_fave.id}",
                :controller => "favorites", :action => "add_favorite_groups", :format => "json", :id => @group_not_yet_fave.id)

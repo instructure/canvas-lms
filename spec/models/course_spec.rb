@@ -2636,6 +2636,7 @@ describe Course, "tabs_available" do
     before :once do
       course_with_teacher(:active_all => true)
     end
+
     let_once(:default_tab_ids) { Course.default_tabs.pluck(:id) }
 
     describe 'TAB_CONFERENCES' do

@@ -167,6 +167,7 @@ describe GraphQLController do
           example.run
         end
       end
+
       let(:token_signing_keypair) { OpenSSL::PKey::RSA.new(2048) }
       let(:signing_priv_key) { token_signing_keypair.to_s }
       let(:token) { InstAccess::Token.for_user(user_uuid: @student.uuid, account_uuid: @student.account.uuid) }

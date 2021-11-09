@@ -206,6 +206,7 @@ describe CanvasSecurity do
 
   describe '.config' do
     before { described_class.instance_variable_set(:@config, nil) }
+
     after  { described_class.instance_variable_set(:@config, nil) }
 
     it 'loads config as erb from config/security.yml' do

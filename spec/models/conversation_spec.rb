@@ -219,6 +219,7 @@ describe Conversation do
           @recipient = user_factory
         end
       end
+
       it "increments when adding messages" do
         Conversation.initiate([@sender, @recipient], false).add_message(@sender, 'test')
         expect(@sender.conversations.first.message_count).to eql 1

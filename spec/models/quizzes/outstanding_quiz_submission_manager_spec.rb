@@ -32,6 +32,7 @@ describe Quizzes::OutstandingQuizSubmissionManager do
       @submission.save!
       @outstanding = Quizzes::OutstandingQuizSubmissionManager.new(@quiz)
     end
+
     it 'is overdue and need_grading' do
       expect(@submission.overdue?).to be true
       expect(@submission.needs_grading?).to be true

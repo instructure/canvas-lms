@@ -1415,6 +1415,7 @@ describe DiscussionTopic do
         @section = @course.course_sections.create!(name: "test section")
         create_section_override_for_assignment(@topic.assignment, { course_section: @section })
       end
+
       context "enabled" do
         it "filters subscribers based on visibility" do
           @topic.subscribe(@student)
@@ -1468,6 +1469,7 @@ describe DiscussionTopic do
       @student = create_users(1, return_type: :record).pop
       student_in_section(@section, user: @student)
     end
+
     it "returns discussions that have assignment and visibility" do
       create_section_override_for_assignment(@topic.assignment, { course_section: @section })
       expect(DiscussionTopic.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@topic)
@@ -2468,6 +2470,7 @@ describe DiscussionTopic do
       @module.save!
       @topic.reload
     end
+
     it 'clears stream items when unpublishing a module' do
       expect { @module.unpublish! }.to change { @student.stream_item_instances.count }.by(-1)
     end
@@ -2487,6 +2490,7 @@ describe DiscussionTopic do
         @module.unpublish!
         @tag.unpublish!
       end
+
       it 'does not create stream items for unpublished modules' do
         @topic.unpublish!
         expect { @topic.publish! }.to change { @student.stream_item_instances.count }.by 0

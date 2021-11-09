@@ -699,6 +699,7 @@ This text has a http://www.google.com link in it...
 
   describe 'audit event logging' do
     before(:once) { @assignment.update!(anonymous_grading: true, grader_count: 2) }
+
     it 'creates exactly one AnonymousOrModerationEvent on creation' do
       expect { @submission.submission_comments.create!(author: @student, anonymous: false) }
         .to change { AnonymousOrModerationEvent.count }.by(1)

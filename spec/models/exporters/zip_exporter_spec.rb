@@ -191,6 +191,7 @@ describe "Exporters::ZipExporter" do
           # This is different from the spec in this test file where there is no
           # attachment when exporting a hidden folder, but the UI allows for
           # downloading hidden attachments when the user has a direct link.
+
           it_behaves_like "exports for users with file access"
         end
       end

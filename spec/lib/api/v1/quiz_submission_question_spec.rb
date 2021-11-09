@@ -82,6 +82,7 @@ describe Api::V1::QuizSubmissionQuestion do
 
   describe "quiz_submissions_questions_json shuffle_answers" do
     before { allow_any_instance_of(Array).to receive(:shuffle!) }
+
     let(:quiz_questions) do
       [create_question("multiple_choice")]
     end

@@ -35,6 +35,7 @@ module Canvas
       before(:each) do
         allow(InstStatsd::Statsd).to receive(:increment)
       end
+
       let(:data) { {} }
 
       it "increments the error level by default" do

@@ -395,6 +395,7 @@ describe "Gradebook" do
 
   context "assignment header focus" do
     before { Gradebook.visit(@course) }
+
     let(:assignment) { @course.assignments.first }
 
     it 'is placed on assignment header trigger upon sort' do

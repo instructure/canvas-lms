@@ -1168,6 +1168,7 @@ describe GradebooksController do
         before do
           @user.set_preference(:gradebook_version, "2")
         end
+
         include_examples "working download"
       end
 
@@ -1175,6 +1176,7 @@ describe GradebooksController do
         before do
           @user.set_preference(:gradebook_version, "srgb")
         end
+
         include_examples "working download"
       end
     end
@@ -1241,6 +1243,7 @@ describe GradebooksController do
 
     context "includes relevant account settings in ENV" do
       before { user_session(@teacher) }
+
       let(:custom_login_id) { 'FOOBAR' }
 
       it 'includes login_handle_name' do

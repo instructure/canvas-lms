@@ -56,6 +56,7 @@ describe PseudonymSession do
   after(:each) do
     Authlogic::Session::Base.controller = nil
   end
+
   describe "save_record" do
     it "will not overwrite the last_request_at within the configured window" do
       pseud = pseudonym_model

@@ -51,6 +51,7 @@ describe Quizzes::QuizQuestion do
                              :answers => answers }
       @question = @quiz.quiz_questions.create(:question_data => @short_answer_data)
     end
+
     it "clears blanks before saving" do
       expect(@question.question_data.answers.size).to eq 1
       expect(@question.question_data.answers.first['text']).to eq @short_answer_data[:answers].first["answer_text"]

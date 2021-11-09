@@ -245,6 +245,7 @@ describe 'Moderated Marking' do
         ModeratePage.enter_custom_grade(@student1, 4)
         wait_for_ajaximations
       end
+
       it 'selects the custom grade', priority: '1', test_id: 3505170 do
         skip('unskip this in GRADE-1615 once this is not flaky using using the most recent InstUI')
         # the aria-activedescendant will be the id of the selected option

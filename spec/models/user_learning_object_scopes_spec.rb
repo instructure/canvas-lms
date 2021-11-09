@@ -57,14 +57,17 @@ describe UserLearningObjectScopes do
         @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2,
                                                                                     :enrollment_state => 'active', :allow_multiple_enrollments => true)
       end
+
       context "observer watching student with visibility" do
         before { @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
+
         it "is true" do
           expect(@observer.assignments_visible_in_course(@course)).to include @assignment
         end
       end
       context "observer watching student without visibility" do
         before { @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
+
         it "is false" do
           expect(@observer.assignments_visible_in_course(@course)).not_to include @assignment
         end

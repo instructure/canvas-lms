@@ -197,6 +197,7 @@ describe "interaction with differentiated assignments" do
       da_setup
       create_da_assignment
     end
+
     it "hides students from speedgrader if they don't have Differentiated assignment visibility or a graded submission" do
       @s1, @s2, @s3 = create_users_in_course(@course, 3, return_type: :record, section_id: @default_section.id)
       @s4, @s5 = create_users_in_course(@course, 2, return_type: :record, section_id: @section1.id)

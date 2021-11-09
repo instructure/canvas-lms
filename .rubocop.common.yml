@@ -86,6 +86,8 @@ RSpec/EmptyExampleGroup:
   Severity: error
 RSpec/EmptyLineAfterExample:
   Severity: error
+RSpec/EmptyLineAfterHook:
+  Severity: error
 RSpec/ExampleLength:
   Enabled: false # this is a Metrics-style cop
 RSpec/ExampleWording:

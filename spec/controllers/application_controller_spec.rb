@@ -1682,6 +1682,7 @@ describe ApplicationController do
     before do
       flash[:notice] = 'A flash notice'
     end
+
     subject(:discard) do
       flash.instance_variable_get('@discard')
     end

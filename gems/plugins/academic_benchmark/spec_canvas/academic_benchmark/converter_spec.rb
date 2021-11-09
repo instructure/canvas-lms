@@ -145,6 +145,7 @@ describe AcademicBenchmark::Converter do
     allow(AcademicBenchmarks::Api::Standards).to receive(:new).and_return(standards_mock)
     @user = admin_user
   end
+
   subject(:converter) do
     AcademicBenchmark::Converter.new(converter_settings)
   end

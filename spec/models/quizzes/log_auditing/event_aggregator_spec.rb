@@ -73,6 +73,7 @@ describe Quizzes::LogAuditing::EventAggregator do
       build_course_quiz_qs
       @aggregator = Quizzes::LogAuditing::EventAggregator.new(@quiz)
     end
+
     it "returns no events gracefully" do
       @aggregated_submission_data = @aggregator.run(@qs.id, @qs.attempt, Time.zone.now)
       expect(@aggregated_submission_data).to be_a(Hash)
@@ -86,6 +87,7 @@ describe Quizzes::LogAuditing::EventAggregator do
       build_out_database_events
       @aggregator = Quizzes::LogAuditing::EventAggregator.new(@quiz)
     end
+
     it "reduces all events to submission_data" do
       @aggregated_submission_data = @aggregator.run(@qs.id, @qs.attempt, @events.last.created_at)
       expect(@aggregated_submission_data).to eq(latest_submission_data)

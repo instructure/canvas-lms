@@ -1026,6 +1026,7 @@ describe SpeedGrader::Assignment do
           i += 1
         end
       end
+
       let(:submission) { Submission.find_or_initialize_by(assignment: @assignment, user: @student) }
 
       let(:urls) do

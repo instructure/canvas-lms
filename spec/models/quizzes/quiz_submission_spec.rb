@@ -1365,12 +1365,14 @@ describe Quizzes::QuizSubmission do
         @quiz.due_at = 3.hours.ago
         @quiz.save!
       end
+
       before :each do
         @submission = @quiz.generate_submission(@student)
         @submission.end_at = @quiz.due_at
         @submission.save!
         @resp = Quizzes::QuizSubmission.needs_grading
       end
+
       it "finds an outstanding submissions" do
         expect(@resp.size).to eq 1
       end
@@ -1414,6 +1416,7 @@ describe Quizzes::QuizSubmission do
         @quiz = @course.quizzes.create! title: 'Test Quiz'
         @submission = @quiz.quiz_submissions.build
       end
+
       it "takes ids from questions" do
         allow(@submission).to receive(:questions).and_return [{ "id" => 2 }, { "id" => 3 }]
 
@@ -1426,6 +1429,7 @@ describe Quizzes::QuizSubmission do
         @quiz = @course.quizzes.create! title: 'Test Quiz'
         @submission = @quiz.quiz_submissions.build
       end
+
       it "fetches questions based on quiz_question_ids" do
         allow(@submission).to receive(:quiz_question_ids).and_return [2, 3]
         expect(Quizzes::QuizQuestion).to receive(:where)

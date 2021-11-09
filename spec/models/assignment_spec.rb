@@ -7504,6 +7504,7 @@ describe Assignment do
 
         context 'when a grading period is deleted for a submission' do
           before { @old.grading_period_group.destroy }
+
           it { is_expected.not_to be_in_closed_grading_period }
         end
       end
@@ -7536,6 +7537,7 @@ describe Assignment do
 
         context "with preloaded submissions" do
           before { assignment.submissions.load }
+
           it { is_expected.not_to be_in_closed_grading_period }
         end
       end

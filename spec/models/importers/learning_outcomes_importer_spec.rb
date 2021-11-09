@@ -223,6 +223,7 @@ describe "Importing Learning Outcomes" do
 
   describe "with the outcome_alignments_course_migration FF enabled" do
     before(:once) { @context.root_account.enable_feature!(:outcome_alignments_course_migration) }
+
     let(:migration) do
       ContentMigration.create!(:context => @context).tap do |m|
         m.migration_ids_to_import = { :copy => {} }

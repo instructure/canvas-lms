@@ -1039,6 +1039,7 @@ describe 'Speedgrader' do
         submission_types: 'online_text_entry,online_upload'
       )
     end
+
     before :each do
       user_session(@teacher)
       Speedgrader.visit(@course.id, @assignment.id)

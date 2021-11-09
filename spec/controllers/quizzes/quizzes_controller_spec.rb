@@ -825,6 +825,7 @@ describe Quizzes::QuizzesController do
 
   describe "GET 'moderate'" do
     before(:once) { course_quiz }
+
     it "requires authorization" do
       get 'moderate', params: { :course_id => @course.id, :quiz_id => @quiz.id }
       assert_unauthorized
@@ -2609,6 +2610,7 @@ describe Quizzes::QuizzesController do
 
   describe "GET 'submission_html'" do
     before(:once) { course_quiz(true) }
+
     before(:each) { user_session(@teacher) }
 
     it "renders nothing if there's no submission for current user" do
@@ -2736,6 +2738,7 @@ describe Quizzes::QuizzesController do
       student_in_section(@course_section, user: @student1)
       create_section_override_for_quiz(@quiz, course_section: @course_section)
     end
+
     context 'index' do
       it 'shows the quiz to students with visibility' do
         user_session(@student1)

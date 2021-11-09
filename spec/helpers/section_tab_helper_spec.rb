@@ -107,6 +107,7 @@ describe SectionTabHelper do
           tabs = Course.default_tabs + [bad_tab]
           allow(course).to receive(:tabs_available).and_return(tabs)
         end
+
         let(:available_section_tabs) do
           SectionTabHelperSpec::AvailableSectionTabs.new(
             course, current_user, domain_root_account, session
