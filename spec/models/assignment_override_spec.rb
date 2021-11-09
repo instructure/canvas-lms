@@ -561,6 +561,7 @@ describe AssignmentOverride do
 
   describe '#availability_expired?' do
     let(:override) { assignment_override_model }
+
     subject { override.availability_expired? }
 
     context 'without an overridden lock_at' do
@@ -986,6 +987,7 @@ describe AssignmentOverride do
     let(:override) do
       assignment_override_model(@options)
     end
+
     subject(:visible_enrollments) do
       AssignmentOverride.visible_enrollments_for([override], @student)
     end

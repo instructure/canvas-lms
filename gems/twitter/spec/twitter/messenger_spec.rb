@@ -50,6 +50,7 @@ describe Twitter::Messenger do
 
     context "with no twitter service" do
       let(:messenger) { Twitter::Messenger.new(message, nil, 'host', id) }
+
       it 'sends nothing if there is no service' do
         expect(connection_mock).to receive(:send_direct_message).never
         expect(messenger.deliver).to be_nil
@@ -59,6 +60,7 @@ describe Twitter::Messenger do
 
   describe '#url' do
     let(:message) { double(:id => 42, :main_link => nil, :url => nil) }
+
     subject { messenger.url }
 
     it { is_expected.to match(/host/) }

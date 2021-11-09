@@ -1963,6 +1963,7 @@ describe CoursesController, type: :request do
 
     context "an authorized user" do
       let(:course_ids) { [@course1.id, @course2.id, @course3.id] }
+
       it "deletes multiple courses" do
         expect(Auditors::Course).to receive(:record_deleted).exactly(course_ids.length).times
         api_call(:put, @path, @params, { :event => 'delete', :course_ids => course_ids })

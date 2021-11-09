@@ -39,6 +39,7 @@ describe 'simply_versioned' do
 
   describe "explicit versions" do
     let(:woozel) { Woozel.create!(:name => 'Eeyore') }
+
     it "creates the first version on save" do
       woozel = Woozel.new(:name => 'Eeyore')
       expect(woozel).not_to be_versioned
@@ -204,10 +205,12 @@ describe 'simply_versioned' do
 
   context "callbacks" do
     let(:woozel) { Woozel.create!(name: 'test') }
+
     context "on_load" do
       let(:on_load) do
         lambda { |model, _version| model.name = 'test override' }
       end
+
       before do
         woozel.simply_versioned_options[:on_load] = on_load
         woozel.reload

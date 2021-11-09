@@ -88,6 +88,7 @@ describe Reporting::CountsReport do
       end
 
       let(:datum) { 'teachers' }
+
       include_examples "user_counts"
     end
 
@@ -99,6 +100,7 @@ describe Reporting::CountsReport do
       end
 
       let(:datum) { 'students' }
+
       include_examples "user_counts"
     end
 
@@ -110,6 +112,7 @@ describe Reporting::CountsReport do
       end
 
       let(:datum) { 'users' }
+
       include_examples "user_counts"
 
       it "includes tas" do

@@ -26,6 +26,7 @@ describe Api::V1::AssignmentOverride do
       def session; {} end
     end
   end
+
   subject { test_class.new }
 
   describe "#interpret_assignment_override_data" do

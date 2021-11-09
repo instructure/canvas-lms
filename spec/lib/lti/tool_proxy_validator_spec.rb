@@ -49,6 +49,7 @@ module Lti
         }
       }
     end
+
     before :each do
       allow(tp_validator).to receive(:tool_consumer_profile=)
       allow(tp_validator).to receive(:errors)

@@ -375,6 +375,7 @@ describe FeatureFlags do
 
   describe "caching" do
     let(:t_cache_key) { t_root_account.feature_flag_cache_key('course_feature') }
+
     before do
       t_root_account.feature_flags.create! feature: 'course_feature', state: 'allowed'
     end

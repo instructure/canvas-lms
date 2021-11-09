@@ -21,6 +21,7 @@ require 'delayed/testing'
 
 describe BrandConfigRegenerator do
   let(:new_brand_config) { BrandConfig.for(variables: { "ic-brand-primary" => "green" }) }
+
   def setup_account_family_with_configs
     @parent_account = Account.default
     @parent_account.brand_config = @parent_config = BrandConfig.for(variables: { "ic-brand-primary" => "red" })

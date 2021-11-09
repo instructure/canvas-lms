@@ -42,6 +42,7 @@ describe Lti::ContentItemUtil do
         "confirmUrl" : "' + url + '"
       }')
     end
+
     subject { described_class.new(content_item) }
 
     it 'makes a POST to confirm creation' do
@@ -81,6 +82,7 @@ describe Lti::ContentItemUtil do
         }
       }')
     end
+
     subject { described_class.new(content_item) }
 
     it "will not call back for success if no confirmUrl is present" do

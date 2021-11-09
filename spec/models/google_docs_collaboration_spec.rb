@@ -28,6 +28,7 @@ describe GoogleDocsCollaboration do
 
   describe "#initialize_document" do
     let(:user) { User.new }
+
     it "creates a google doc" do
       google_docs_collaboration = GoogleDocsCollaboration.new
       google_docs_collaboration.title = "title"

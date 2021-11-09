@@ -304,6 +304,7 @@ describe SortsAssignments do
     let(:assignment2) { double }
     let(:assignment3) { double }
     let(:assignments) { [assignment1, assignment2, assignment3] }
+
     before :each do
       allow(course).to receive_messages(:grants_right? => true)
       assignments.each { |assignment|

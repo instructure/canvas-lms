@@ -107,6 +107,7 @@ module DrDiff
       let(:change_status) { "M" }
       let(:change_status_full) { "modified" }
       let(:change_output) { [change_status, change_path].join("\t") }
+
       it "creates changes from the status and path" do
         allow(git_proxy).to receive(:shell).and_return(change_output)
 

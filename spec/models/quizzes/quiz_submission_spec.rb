@@ -1925,6 +1925,7 @@ describe Quizzes::QuizSubmission do
     let(:quiz_submission) do
       Quizzes::QuizSubmission.new
     end
+
     it 'returns submission.excused?' do
       quiz_submission.submission = submission
       expect(quiz_submission.excused?).to eq submission.excused?

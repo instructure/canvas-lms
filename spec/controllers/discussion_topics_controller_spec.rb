@@ -1371,6 +1371,7 @@ describe DiscussionTopicsController do
 
     describe 'the new topic' do
       let(:topic) { assigns[:topic] }
+
       before(:each) do
         user_session(@student)
         post 'create', params: topic_params(@course), :format => :json

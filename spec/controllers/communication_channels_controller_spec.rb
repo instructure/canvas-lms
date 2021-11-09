@@ -1413,6 +1413,7 @@ describe CommunicationChannelsController do
 
       let(:second_sns_access_token) { @user.access_tokens.create!(developer_key: second_sns_developer_key) }
       let(:sns_channel) { @user.communication_channels.create(path_type: CommunicationChannel::TYPE_PUSH, path: 'push') }
+
       before(:each) { sns_channel }
 
       it 'shouldnt error if an endpoint does not exist for the push_token', type: :request do
@@ -1424,6 +1425,7 @@ describe CommunicationChannelsController do
 
       context 'has a notification endpoint' do
         let(:fake_token) { 'insttothemoon' }
+
         before(:each) { sns_access_token.notification_endpoints.create!(token: fake_token) }
 
         context "cross-shard user" do

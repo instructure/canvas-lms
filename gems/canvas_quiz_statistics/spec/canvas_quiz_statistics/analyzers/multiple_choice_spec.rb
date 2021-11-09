@@ -21,6 +21,7 @@ require 'spec_helper'
 
 describe CanvasQuizStatistics::Analyzers::MultipleChoice do
   let(:question_data) { QuestionHelpers.fixture('multiple_choice_question') }
+
   subject { described_class.new(question_data) }
 
   it 'does not blow up when no responses are provided' do

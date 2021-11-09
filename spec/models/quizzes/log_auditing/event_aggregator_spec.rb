@@ -82,6 +82,7 @@ describe Quizzes::LogAuditing::EventAggregator do
   end
   context "with set of events" do
     let(:latest_submission_data) { { "question_#{@questions[0].id}" => "goodbye", "question_#{@questions[0].id}_marked" => false } }
+
     before :once do
       build_course_quiz_qs
       build_out_database_events

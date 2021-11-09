@@ -501,6 +501,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
     context 'when tool configuration does not exist' do
       let(:tool_configuration) { nil }
+
       it_behaves_like 'an endpoint that requires an existing tool configuration'
     end
 
@@ -516,6 +517,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
     context 'when the current user does not have "lti_add_edit"' do
       let(:student) { student_in_course(active_all: true).user }
+
       before { user_session(student) }
 
       it 'responds with "unauthorized"' do
@@ -543,6 +545,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
     context do
       let(:tool_configuration) { nil }
+
       it_behaves_like 'an endpoint that requires an existing tool configuration'
     end
 

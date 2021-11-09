@@ -162,6 +162,7 @@ module BroadcastPolicies
 
     describe '#when there is no quiz submission' do
       let(:policy) { QuizSubmissionPolicy.new(nil) }
+
       specify { expect(policy.should_dispatch_submission_graded?).to be_falsey }
       specify { expect(policy.should_dispatch_submission_grade_changed?).to be_falsey }
     end

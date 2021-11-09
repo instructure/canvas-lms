@@ -209,6 +209,7 @@ describe "assignments" do
                            }
                          })
     }
+
     before(:each) { assignment.assign_peer_review(reviewer, reviewed) }
 
     context 'when reviewed is logged in' do

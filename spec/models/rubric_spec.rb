@@ -664,6 +664,7 @@ describe Rubric do
 
   describe 'create' do
     let(:root_account) { Account.default }
+
     it 'sets the root_account_id using course' do
       course_model
       rubric_for_course

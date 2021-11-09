@@ -6293,21 +6293,25 @@ describe Course, 'touch_root_folder_if_necessary' do
 
     describe "restrict_student_future_view" do
       let(:setting) { :restrict_student_future_view }
+
       include_examples 'inherited setting should inherit'
     end
 
     describe "restrict_student_past_view" do
       let(:setting) { :restrict_student_past_view }
+
       include_examples 'inherited setting should inherit'
     end
 
     describe "lock_all_announcements" do
       let(:setting) { :lock_all_announcements }
+
       include_examples 'inherited setting should inherit'
     end
 
     describe "usage_rights_required" do
       let(:setting) { :usage_rights_required }
+
       include_examples 'inherited setting should inherit'
     end
   end
