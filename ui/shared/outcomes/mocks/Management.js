@@ -643,7 +643,11 @@ export const groupDetailMocks = ({
           canEdit,
           contextId,
           contextType,
-          friendlyDescription: null,
+          friendlyDescription: {
+            _id: '26',
+            description: 'friendly',
+            __typename: 'OutcomeFriendlyDescriptionType'
+          },
           __typename: 'LearningOutcome'
         },
         group: {
