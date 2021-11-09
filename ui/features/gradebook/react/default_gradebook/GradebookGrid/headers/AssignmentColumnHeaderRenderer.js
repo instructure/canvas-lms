@@ -155,6 +155,8 @@ function getProps(column, gradebook, options) {
       }
     },
 
+    showMessageStudentsWithObserversDialog:
+      gradebook.options.show_message_students_with_observers_dialog,
     showUnpostedMenuItem: gradebook.options.new_gradebook_development_enabled,
 
     sortBySetting: {
