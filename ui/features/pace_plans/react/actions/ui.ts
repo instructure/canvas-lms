@@ -37,8 +37,7 @@ export enum Constants {
   SET_RESPONSIVE_SIZE = 'UI/SET_RESPONSIVE_SIZE',
   SHOW_LOADING_OVERLAY = 'UI/SHOW_LOADING_OVERLAY',
   HIDE_LOADING_OVERLAY = 'UI/HIDE_LOADING_OVERLAY',
-  SET_EDITING_BLACKOUT_DATES = 'UI/SET_EDITING_BLACKOUT_DATES',
-  SET_ADJUSTING_HARD_END_DATES_AFTER = 'UI/SET_ADJUSTING_HARD_END_DATES_AFTER'
+  SET_EDITING_BLACKOUT_DATES = 'UI/SET_EDITING_BLACKOUT_DATES'
 }
 
 /* Action creators */
@@ -59,9 +58,7 @@ export const regularActions = {
     newSelectedPlan: PacePlan
   ) => createAction(Constants.SET_SELECTED_PLAN_CONTEXT, {contextType, contextId, newSelectedPlan}),
   setResponsiveSize: (responsiveSize: ResponsiveSizes) =>
-    createAction(Constants.SET_RESPONSIVE_SIZE, responsiveSize),
-  setAdjustingHardEndDatesAfter: (position: number | undefined) =>
-    createAction(Constants.SET_ADJUSTING_HARD_END_DATES_AFTER, position)
+    createAction(Constants.SET_RESPONSIVE_SIZE, responsiveSize)
 }
 
 export const thunkActions = {

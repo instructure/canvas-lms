@@ -20,13 +20,12 @@ import React from 'react'
 import {act, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
-import {BLACKOUT_DATES, PRIMARY_PLAN} from '../../../__tests__/fixtures'
+import {BLACKOUT_DATES, PRIMARY_PLAN, STUDENT_PLAN} from '../../../__tests__/fixtures'
 import {renderConnected} from '../../../__tests__/utils'
 
 import {AssignmentRow} from '../assignment_row'
 
 const setPlanItemDuration = jest.fn()
-const setAdjustingHardEndDatesAfter = jest.fn()
 
 const defaultProps = {
   pacePlan: PRIMARY_PLAN,
@@ -37,15 +36,13 @@ const defaultProps = {
   planPublishing: false,
   blackoutDates: BLACKOUT_DATES,
   autosaving: false,
-  enrollmentHardEndDatePlan: false,
-  adjustingHardEndDatesAfter: undefined,
   disabledDaysOfWeek: [],
   showProjections: true,
   setPlanItemDuration,
-  setAdjustingHardEndDatesAfter,
   datesVisible: true,
   hover: false,
-  isStacked: false
+  isStacked: false,
+  isStudentPlan: false
 }
 
 afterEach(() => {
@@ -107,5 +104,17 @@ describe('AssignmentRow', () => {
       name: 'Duration for module Basic encryption/decryption'
     })
     expect(daysInput).toBeDisabled()
+  })
+
+  it('shows durations as read-only text when on student plans', () => {
+    const {queryByRole, getByText} = renderConnected(
+      <AssignmentRow {...defaultProps} pacePlan={STUDENT_PLAN} isStudentPlan />
+    )
+    expect(
+      queryByRole('textbox', {
+        name: 'Duration for module Basic encryption/decryption'
+      })
+    ).not.toBeInTheDocument()
+    expect(getByText('2')).toBeInTheDocument()
   })
 })

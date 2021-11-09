@@ -46,12 +46,12 @@ import {
   getDueDate,
   getExcludeWeekends,
   getPacePlanItemPosition,
-  getPlanPublishing
+  getPlanPublishing,
+  isStudentPlan
 } from '../../reducers/pace_plans'
 import {actions} from '../../actions/pace_plan_items'
-import {actions as uiActions} from '../../actions/ui'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
-import {getAutoSaving, getAdjustingHardEndDatesAfter, getShowProjections} from '../../reducers/ui'
+import {getShowProjections} from '../../reducers/ui'
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
@@ -71,16 +71,13 @@ interface StoreProps {
   readonly excludeWeekends: boolean
   readonly pacePlanItemPosition: number
   readonly blackoutDates: BlackoutDate[]
-  readonly autosaving: boolean
-  readonly enrollmentHardEndDatePlan: boolean
-  readonly adjustingHardEndDatesAfter?: number
   readonly planPublishing: boolean
   readonly showProjections: boolean
+  readonly isStudentPlan: boolean
 }
 
 interface DispatchProps {
   readonly setPlanItemDuration: typeof actions.setPlanItemDuration
-  readonly setAdjustingHardEndDatesAfter: typeof uiActions.setAdjustingHardEndDatesAfter
 }
 
 interface LocalState {
@@ -111,7 +108,6 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   shouldComponentUpdate(nextProps: ComponentProps, nextState: LocalState) {
     return (
       nextProps.dueDate !== this.props.dueDate ||
-      nextProps.adjustingHardEndDatesAfter !== this.props.adjustingHardEndDatesAfter ||
       nextState.duration !== this.state.duration ||
       nextState.hovering !== this.state.hovering ||
       nextProps.pacePlan.exclude_weekends !== this.props.pacePlan.exclude_weekends ||
@@ -205,11 +201,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   }
 
   isDayDisabled = (date: moment.Moment): boolean => {
-    return (
-      this.newDuration(date) < 0 ||
-      DateHelpers.inBlackoutDate(date, this.props.blackoutDates) ||
-      (this.props.enrollmentHardEndDatePlan && date > moment(this.props.pacePlan.end_date))
-    )
+    return this.newDuration(date) < 0 || DateHelpers.inBlackoutDate(date, this.props.blackoutDates)
   }
 
   /* Renderers */
@@ -243,39 +235,36 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   }
 
   renderDurationInput = () => {
-    if (this.props.enrollmentHardEndDatePlan) {
-      return null
-    } else {
-      const value = this.state.duration
-
+    if (this.props.isStudentPlan) {
       return (
-        <NumberInput
-          interaction={this.props.planPublishing ? 'disabled' : 'enabled'}
-          renderLabel={
-            <ScreenReaderContent>
-              Duration for module {this.props.pacePlanItem.assignment_title}
-            </ScreenReaderContent>
-          }
-          data-testid="duration-number-input"
-          display="inline-block"
-          width="5.5rem"
-          value={value}
-          onChange={this.onChangeItemDuration}
-          onBlur={this.onBlur}
-          onDecrement={e => this.onDecrementOrIncrement(e, -1)}
-          onIncrement={e => this.onDecrementOrIncrement(e, 1)}
-        />
+        <Flex height="2.375rem" alignItems="center" justifyItems="center">
+          {this.state.duration}
+        </Flex>
       )
     }
+
+    return (
+      <NumberInput
+        interaction={this.props.planPublishing ? 'disabled' : 'enabled'}
+        renderLabel={
+          <ScreenReaderContent>
+            Duration for module {this.props.pacePlanItem.assignment_title}
+          </ScreenReaderContent>
+        }
+        data-testid="duration-number-input"
+        display="inline-block"
+        width="5.5rem"
+        value={this.state.duration}
+        onChange={this.onChangeItemDuration}
+        onBlur={this.onBlur}
+        onDecrement={e => this.onDecrementOrIncrement(e, -1)}
+        onIncrement={e => this.onDecrementOrIncrement(e, 1)}
+      />
+    )
   }
 
   renderDate = () => {
-    const dateText =
-      this.props.adjustingHardEndDatesAfter !== undefined &&
-      this.props.pacePlanItemPosition > this.props.adjustingHardEndDatesAfter
-        ? I18n.t('Adjusting due dates...')
-        : moment(this.props.dueDate).format('l')
-    return <Text>{dateText}</Text>
+    return moment(this.props.dueDate).format('l')
   }
 
   renderTitle() {
@@ -296,19 +285,21 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     return (
       <ApplyTheme theme={{[(Cell as any).theme]: themeOverrides}}>
         <Row
-          data-testid='pp-module-item-row'
+          data-testid="pp-module-item-row"
           onMouseEnter={() => this.setState({hovering: true})}
           onMouseLeave={() => this.setState({hovering: false})}
           {...pick(this.props, ['hover', 'isStacked', 'headers'])}
         >
-          <Cell data-testid='pp-title-cell' >
+          <Cell data-testid="pp-title-cell">
             <View margin={labelMargin}>{this.renderTitle()}</View>
           </Cell>
-          <Cell>
-            <View data-testid="duration-input" margin={labelMargin}>{this.renderDurationInput()}</View>
+          <Cell textAlign="center">
+            <View data-testid="duration-input" margin={labelMargin}>
+              {this.renderDurationInput()}
+            </View>
           </Cell>
           {(this.props.showProjections || this.props.datesVisible) && (
-            <Cell>
+            <Cell textAlign="center">
               <View margin={labelMargin}>{this.renderDate()}</View>
             </Cell>
           )}
@@ -330,19 +321,14 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
     excludeWeekends: getExcludeWeekends(state),
     pacePlanItemPosition: getPacePlanItemPosition(state, props),
     blackoutDates: getBlackoutDates(state),
-    autosaving: getAutoSaving(state),
-    enrollmentHardEndDatePlan: !!(
-      pacePlan.hard_end_dates && pacePlan.context_type === 'Enrollment'
-    ),
-    adjustingHardEndDatesAfter: getAdjustingHardEndDatesAfter(state),
     planPublishing: getPlanPublishing(state),
-    showProjections: getShowProjections(state)
+    showProjections: getShowProjections(state),
+    isStudentPlan: isStudentPlan(state)
   }
 }
 
 const ConnectedAssignmentRow = connect(mapStateToProps, {
-  setPlanItemDuration: actions.setPlanItemDuration,
-  setAdjustingHardEndDatesAfter: uiActions.setAdjustingHardEndDatesAfter
+  setPlanItemDuration: actions.setPlanItemDuration
 })(AssignmentRow)
 
 // This hack allows AssignmentRow to be rendered inside an InstUI Table.Body
