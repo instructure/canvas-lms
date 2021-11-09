@@ -42,6 +42,7 @@ module Users
 
       context "for self_registration" do
         let(:policy) { CreationNotifyPolicy.new(true, { force_self_registration: true }) }
+
         before { allow(channel).to receive_messages(has_merge_candidates?: false) }
 
         it "sends confirmation notification" do

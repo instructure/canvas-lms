@@ -600,6 +600,7 @@ describe Account do
 
   context "allow_global_includes?" do
     let(:root) { Account.default }
+
     it "false unless they've checked the box to allow it" do
       expect(root.allow_global_includes?).to be_falsey
     end

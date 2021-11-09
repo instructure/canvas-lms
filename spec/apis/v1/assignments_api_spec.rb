@@ -1988,6 +1988,7 @@ describe AssignmentsApiController, type: :request do
 
       context 'with online_upload' do
         let(:submission_types) { ['online_upload'] }
+
         it "sets the configuration LTI 1 tool if one is provided" do
           expect(a.tool_settings_tool).to eq(tool)
         end
@@ -1995,6 +1996,7 @@ describe AssignmentsApiController, type: :request do
 
       context 'with online_text_entry' do
         let(:submission_types) { ['online_text_entry'] }
+
         it "sets the configuration LTI 1 tool if one is provided" do
           expect(a.tool_settings_tool).to eq(tool)
         end

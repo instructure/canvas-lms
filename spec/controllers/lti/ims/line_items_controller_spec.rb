@@ -370,6 +370,7 @@ module Lti
         context do
           let(:new_score_maximum) { 88.2 }
           let(:params_overrides) { super().merge(scoreMaximum: new_score_maximum) }
+
           it 'updates the score maximum' do
             send_request
             body = parsed_response_body
@@ -380,6 +381,7 @@ module Lti
         context do
           let(:new_label) { 'a new label!' }
           let(:params_overrides) { super().merge(label: new_label) }
+
           it 'updates the label' do
             send_request
             expect(line_item.reload.label).to eq new_label

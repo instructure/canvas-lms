@@ -1434,6 +1434,7 @@ describe AccountsController do
 
     context "sorting by term" do
       let(:letters_in_random_order) { 'daqwds'.split('') }
+
       before do
         @account = Account.create!
         create_courses(letters_in_random_order.map { |i|

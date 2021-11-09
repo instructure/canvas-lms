@@ -1534,6 +1534,7 @@ describe ExternalToolsController do
         include_context 'lti_1_3_spec_helper'
         let(:tool_configuration) { Lti::ToolConfiguration.create! settings: settings, developer_key: developer_key }
         let(:developer_key) { DeveloperKey.create!(account: @course.account) }
+
         before do
           tool = tool_configuration.new_external_tool(@course)
           tool.save!
@@ -1979,6 +1980,7 @@ describe ExternalToolsController do
 
   describe "'GET 'generate_sessionless_launch'" do
     let(:login_pseudonym) { pseudonym(@user) }
+
     before do
       allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }

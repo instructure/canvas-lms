@@ -1564,6 +1564,7 @@ describe Attachment do
 
   context "s3 storage with sharding" do
     let(:sz) { "640x>" }
+
     specs_require_sharding
 
     before :each do

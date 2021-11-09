@@ -530,6 +530,7 @@ describe "admin settings tab" do
 
   context "external integration keys" do
     let!(:key_value) { '42' }
+
     before(:once) do
       ExternalIntegrationKey.key_type :external_key0, label: 'External Key 0', rights: { read: proc { true }, write: true }
       ExternalIntegrationKey.key_type :external_key1, label: proc { 'External Key 1' }, rights: { read: true, write: false }

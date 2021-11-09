@@ -666,6 +666,7 @@ describe OAuth2ProviderController do
 
         context 'with bad signing key' do
           let(:signing_key) { JSON::JWK.new(other_key.private_jwk) }
+
           before do
             other_key.generate_rsa_keypair! overwrite: true
             other_key.save!

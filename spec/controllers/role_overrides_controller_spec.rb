@@ -20,6 +20,7 @@
 
 describe RoleOverridesController do
   let(:parent_account) { Account.default }
+
   before :each do
     @account = account_model(:parent_account => parent_account)
     account_admin_user(:account => @account)

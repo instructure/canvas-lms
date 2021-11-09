@@ -23,6 +23,7 @@ module Canvas::Plugins
   describe TicketingSystem do
     describe ".is_selected?" do
       let(:fake_settings) { double(settings_for_plugin: { type: 'some_service' }) }
+
       it "is true if the provided plugin id is the byots selection" do
         expect(TicketingSystem.is_selected?("some_service", fake_settings)).to be(true)
       end

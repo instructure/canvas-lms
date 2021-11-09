@@ -3270,6 +3270,7 @@ describe Submission do
   context '#external_tool_url' do
     let(:submission) { Submission.new }
     let(:lti_submission) { @assignment.submit_homework @user, submission_type: 'basic_lti_launch', url: 'http://www.example.com' }
+
     context 'submission_type of "basic_lti_launch"' do
       it 'returns a url containing the submitted url' do
         expect(lti_submission.external_tool_url).to eq(lti_submission.url)

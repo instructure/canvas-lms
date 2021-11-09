@@ -23,6 +23,7 @@ require 'formatted_type'
 
 describe FormattedType do
   let(:ft) { FormattedType.new(example) }
+
   subject { ft }
 
   context "integer" do

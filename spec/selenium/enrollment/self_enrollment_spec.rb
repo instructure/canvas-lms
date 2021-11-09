@@ -210,6 +210,7 @@ describe "self enrollment" do
       expect(f('#global_nav_courses_link')).to include_text("Courses") # show for future course
       expect(f('#dashboard')).to include_text("You've enrolled in one or more courses that have not started yet")
     }
+
     context "with open registration" do
       include_examples "open registration"
     end
@@ -226,6 +227,7 @@ describe "self enrollment" do
       expect(f('#global_nav_courses_link')).to include_text("Courses")
       expect(f('#dashboard')).to include_text("You've enrolled in one or more courses that have not started yet")
     }
+
     context "with open registration" do
       include_examples "open registration"
     end

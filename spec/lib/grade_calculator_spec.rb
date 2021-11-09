@@ -1890,6 +1890,7 @@ describe GradeCalculator do
 
   context "error trapping" do
     let(:calc) { GradeCalculator.new([@student.id], @course) }
+
     context "deadlocks" do
       it ".save_assignment_group_scores raises Delayed::RetriableError when deadlocked" do
         allow(Score.connection).to receive(:execute).and_raise(ActiveRecord::Deadlocked)

@@ -927,6 +927,7 @@ describe Api do
 
       context "with per_page parameter > max_per_page argument" do
         let(:controller) { double('controller', request: request, response: response, params: { per_page: 100 }) }
+
         it "takes the smaller of the max_per_page arugment and the per_page param" do
           expect(Api.paginate(collection, controller, 'example.com', { max_per_page: 75 }).size)
             .to eq 75
@@ -935,6 +936,7 @@ describe Api do
 
       context "with per_page parameter < max_per_page argument" do
         let(:controller) { double('controller', request: request, response: response, params: { per_page: 75 }) }
+
         it "takes the smaller of the max_per_page arugment and the per_page param" do
           expect(Api.paginate(collection, controller, 'example.com', { max_per_page: 100 }).size)
             .to eq 75

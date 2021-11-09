@@ -70,6 +70,7 @@ describe 'Web conferences' do
 
   context 'when concluding a conference' do
     let(:conference_title) { 'Newer Conference' }
+
     before(:once) do
       conference = create_wimba_conference(conference_title)
       conference.add_attendee(@user)

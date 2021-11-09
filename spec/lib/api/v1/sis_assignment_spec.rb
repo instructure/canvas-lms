@@ -145,6 +145,7 @@ describe Api::V1::SisAssignment do
     context "returns hash when there are no courses" do
       let(:assignments) { [assignment_1] }
       let(:results) { subject.sis_assignments_json(assignments) }
+
       it { expect(results.size).to eq(1) }
       it { expect(results.first["id"]).to eq(assignment_1.id) }
     end

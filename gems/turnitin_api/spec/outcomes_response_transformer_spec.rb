@@ -30,6 +30,7 @@ describe TurnitinApi::OutcomesResponseTransformer do
       'outcomes_tool_placement_url' => "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321"
     }
   end
+
   subject { described_class.new(oauth_key, oauth_secret, lti_params, outcomes_response_json) }
 
   describe 'initialize' do

@@ -828,6 +828,7 @@ module Lti::IMS
 
         context 'when timestamp is before updated_at' do
           let(:params_overrides) { super().merge(timestamp: 1.day.ago.iso8601(3)) }
+
           it_behaves_like 'a bad request'
         end
 
@@ -837,6 +838,7 @@ module Lti::IMS
               :scoreMaximum
             )
           end
+
           it_behaves_like 'an unprocessable entity'
         end
 
@@ -871,16 +873,19 @@ module Lti::IMS
 
         context 'when user_id not found in course' do
           let(:user) { student_in_course(course: course_model, active_all: true).user }
+
           it_behaves_like 'an unprocessable entity'
         end
 
         context 'when user_id is not a student in course' do
           let(:user) { ta_in_course(course: course, active_all: true).user }
+
           it_behaves_like 'an unprocessable entity'
         end
 
         context 'when timestamp is not a string' do
           let(:params_overrides) { super().merge(timestamp: Time.zone.now.to_i) }
+
           it_behaves_like 'a bad request'
         end
 
@@ -888,6 +893,7 @@ module Lti::IMS
           let(:params_overrides) do
             super().merge(Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: Time.zone.now.to_i })
           end
+
           it_behaves_like 'a bad request'
         end
 
@@ -895,6 +901,7 @@ module Lti::IMS
           let(:params_overrides) do
             super().merge(Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: 'asdf' })
           end
+
           it_behaves_like 'a bad request'
         end
 
@@ -904,6 +911,7 @@ module Lti::IMS
               Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: Time.zone.now + 5.minutes }
             )
           end
+
           it_behaves_like 'a bad request'
         end
 
@@ -913,6 +921,7 @@ module Lti::IMS
               Lti::Result::AGS_EXT_SUBMISSION => { submission_type: 'online_upload' }
             )
           end
+
           it_behaves_like 'an unprocessable entity'
         end
       end

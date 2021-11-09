@@ -2668,6 +2668,7 @@ describe User do
 
   describe "manual_mark_as_read" do
     let(:user) { User.new }
+
     subject { user.manual_mark_as_read? }
 
     context 'default' do

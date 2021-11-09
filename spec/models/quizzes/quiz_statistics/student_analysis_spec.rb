@@ -54,6 +54,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   end
 
   let(:report_type) { 'student_analysis' }
+
   include_examples "Quizzes::QuizStatistics::Report"
   before(:once) { course_factory }
 

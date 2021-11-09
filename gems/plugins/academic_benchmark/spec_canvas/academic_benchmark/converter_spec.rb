@@ -136,6 +136,7 @@ describe AcademicBenchmark::Converter do
                                                               { :description => "Not awesome", :points => 0 }] }
                              })
   end
+
   before do
     allow(AcademicBenchmark).to receive(:config).and_return({ partner_id: "instructure", partner_key: "key" })
     standards_mock = double("standards")

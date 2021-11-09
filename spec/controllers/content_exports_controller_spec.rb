@@ -60,6 +60,7 @@ describe ContentExportsController do
     describe 'with a valid file' do
       let(:filename) { 'cccv1p0' }
       let(:full_path) { Rails.root + "lib/cc/xsd/#{filename}.xsd" }
+
       before { get 'xml_schema', params: { :version => filename } }
 
       it 'sends in the entire file' do

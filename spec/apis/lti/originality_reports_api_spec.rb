@@ -26,6 +26,7 @@ module Lti
     include_context 'lti2_api_spec_helper'
     let(:service_name) { OriginalityReportsApiController::ORIGINALITY_REPORT_SERVICE }
     let(:aud) { host }
+
     before(:once) { attachment_model }
 
     before :each do
