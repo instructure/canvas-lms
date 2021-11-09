@@ -30,7 +30,8 @@ describe MicrosoftSync::SyncerSteps do
       MicrosoftSync::GraphServiceHelpers,
       graph_service: instance_double(
         MicrosoftSync::GraphService,
-        teams: instance_double(MicrosoftSync::GraphService::TeamsEndpoints)
+        teams: instance_double(MicrosoftSync::GraphService::TeamsEndpoints),
+        groups: instance_double(MicrosoftSync::GraphService::GroupsEndpoints)
       )
     )
   end
@@ -565,13 +566,13 @@ describe MicrosoftSync::SyncerSteps do
     end
 
     it 'adds/removes users based on the diff' do
-      expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+      expect(graph_service.groups).to receive(:add_users_ignore_duplicates)
         .with('mygroup', owners: %w[o3], members: %w[o1 o2])
-      expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+      expect(graph_service.groups).to receive(:add_users_ignore_duplicates)
         .with('mygroup', members: %w[o3])
-      expect(graph_service).to receive(:remove_group_users_ignore_missing)
+      expect(graph_service.groups).to receive(:remove_users_ignore_missing)
         .with('mygroup', members: %w[m1 m2], owners: %w[o1])
-      expect(graph_service).to receive(:remove_group_users_ignore_missing)
+      expect(graph_service.groups).to receive(:remove_users_ignore_missing)
         .with('mygroup', members: %w[m3])
 
       subject
@@ -579,8 +580,8 @@ describe MicrosoftSync::SyncerSteps do
 
     context 'when the Microsoft API says there are too many members in a group' do
       before do
-        allow(graph_service).to receive(:remove_group_users_ignore_missing)
-        allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+        allow(graph_service.groups).to receive(:remove_users_ignore_missing)
+        allow(graph_service.groups).to receive(:add_users_ignore_duplicates)
           .and_raise(MicrosoftSync::Errors::MembersQuotaExceeded)
       end
 
@@ -589,8 +590,8 @@ describe MicrosoftSync::SyncerSteps do
 
     context 'when the Microsoft API says there are too many owners in a group' do
       before do
-        allow(graph_service).to receive(:remove_group_users_ignore_missing)
-        allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+        allow(graph_service.groups).to receive(:remove_users_ignore_missing)
+        allow(graph_service.groups).to receive(:add_users_ignore_duplicates)
           .and_raise(MicrosoftSync::Errors::OwnersQuotaExceeded)
       end
 
@@ -599,9 +600,9 @@ describe MicrosoftSync::SyncerSteps do
 
     context 'when some users to be added already exist in the group' do
       it 'logs and increments statsd metrics' do
-        expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+        expect(graph_service.groups).to receive(:add_users_ignore_duplicates)
           .twice.and_return(members: %w[o3], owners: %w[o1 o2])
-        allow(graph_service).to receive(:remove_group_users_ignore_missing)
+        allow(graph_service.groups).to receive(:remove_users_ignore_missing)
 
         allow(Rails.logger).to receive(:warn)
         allow(InstStatsd::Statsd).to receive(:increment).and_call_original
@@ -622,8 +623,8 @@ describe MicrosoftSync::SyncerSteps do
 
     context "when some users to be removed don't exist in the group" do
       it 'logs and increments statsd metrics' do
-        allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
-        expect(graph_service).to receive(:remove_group_users_ignore_missing)
+        allow(graph_service.groups).to receive(:add_users_ignore_duplicates)
+        expect(graph_service.groups).to receive(:remove_users_ignore_missing)
           .twice.and_return(owners: %w[m2 m3])
 
         allow(Rails.logger).to receive(:warn)
@@ -645,9 +646,9 @@ describe MicrosoftSync::SyncerSteps do
 
     context "when the last owner is removed but a new owner is added" do
       it "adds the new owner but raises the error still" do
-        expect(graph_service).to receive(:remove_group_users_ignore_missing)
+        expect(graph_service.groups).to receive(:remove_users_ignore_missing)
           .and_raise(MicrosoftSync::Errors::MissingOwners)
-        expect(graph_service).to receive(:add_users_to_group_ignore_duplicates).twice
+        expect(graph_service.groups).to receive(:add_users_ignore_duplicates).twice
         expect { subject }.to raise_error(MicrosoftSync::Errors::MissingOwners)
       end
     end
@@ -655,8 +656,8 @@ describe MicrosoftSync::SyncerSteps do
     context 'when there is an error in adding classes (e.g. too many users)' do
       it 'still removes users' do
         err_class = Class.new(StandardError)
-        expect(graph_service).to receive(:remove_group_users_ignore_missing).twice
-        expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+        expect(graph_service.groups).to receive(:remove_users_ignore_missing).twice
+        expect(graph_service.groups).to receive(:add_users_ignore_duplicates)
           .and_raise(err_class)
         expect { subject }.to raise_error(err_class)
       end
@@ -681,8 +682,8 @@ describe MicrosoftSync::SyncerSteps do
                       retry_args: { step: :step_generate_diff }
 
       it 'goes to the step_check_team_exists on success' do
-        allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
-        allow(graph_service).to receive(:remove_group_users_ignore_missing)
+        allow(graph_service.groups).to receive(:add_users_ignore_duplicates)
+        allow(graph_service.groups).to receive(:remove_users_ignore_missing)
         expect_next_step(subject, :step_check_team_exists)
       end
     end

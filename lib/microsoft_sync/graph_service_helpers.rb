@@ -57,7 +57,7 @@ module MicrosoftSync
     end
 
     def update_group_with_course_data(ms_group_id, course)
-      graph_service.update_group(
+      graph_service.groups.update(
         ms_group_id,
         microsoft_EducationClassLmsExt: {
           ltiContextId: course.lti_context_id || Lti::Asset.opaque_identifier_for(course),
@@ -127,9 +127,9 @@ module MicrosoftSync
     end
 
     def get_group_users_aad_ids(group_id, owners: false)
-      method = owners ? :list_group_owners : :list_group_members
+      method = owners ? :list_owners : :list_members
       [].tap do |aad_ids|
-        graph_service.send(
+        graph_service.groups.send(
           method, group_id, select: ['id'], top: GET_GROUP_USERS_BATCH_SIZE
         ) do |users|
           aad_ids.concat(users.map { |user| user['id'] })

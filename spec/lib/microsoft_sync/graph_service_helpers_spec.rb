@@ -26,7 +26,8 @@ describe MicrosoftSync::GraphServiceHelpers do
     instance_double(
       MicrosoftSync::GraphService,
       education_classes: instance_double(MicrosoftSync::GraphService::EducationClassesEndpoints),
-      users: instance_double(MicrosoftSync::GraphService::UsersEndpoints)
+      users: instance_double(MicrosoftSync::GraphService::UsersEndpoints),
+      groups: instance_double(MicrosoftSync::GraphService::GroupsEndpoints)
     )
   end
 
@@ -185,7 +186,7 @@ describe MicrosoftSync::GraphServiceHelpers do
       # force generation of lti context id (normally done lazily)
       lti_context_id = Lti::Asset.opaque_identifier_for(@course)
       expect(lti_context_id).to_not eq(nil)
-      expect(graph_service).to receive(:update_group).with(
+      expect(graph_service.groups).to receive(:update).with(
         'msgroupid',
         microsoft_EducationClassLmsExt: {
           ltiContextId: lti_context_id,
@@ -202,7 +203,7 @@ describe MicrosoftSync::GraphServiceHelpers do
     end
 
     def expect_lms_ext_properties(props)
-      expect(graph_service).to receive(:update_group).with(
+      expect(graph_service.groups).to receive(:update).with(
         'msgroupid',
         hash_including(
           microsoft_EducationClassLmsExt: hash_including(props),
@@ -302,19 +303,21 @@ describe MicrosoftSync::GraphServiceHelpers do
 
   describe '#get_group_users_aad_ids' do
     it 'returns ids of all pages of members' do
-      expect(subject.graph_service).to receive(:list_group_members).once
-                                                                   .with('mygroupid', select: ['id'], top: 999)
-                                                                   .and_yield([{ 'id' => 'a' }, { 'id' => 'b' }])
-                                                                   .and_yield([{ 'id' => 'c' }])
+      expect(subject.graph_service.groups).to receive(:list_members)
+        .once
+        .with('mygroupid', select: ['id'], top: 999)
+        .and_yield([{ 'id' => 'a' }, { 'id' => 'b' }])
+        .and_yield([{ 'id' => 'c' }])
       expect(subject.get_group_users_aad_ids('mygroupid')).to eq(%w[a b c])
     end
 
     context 'when owners: true is passed in' do
       it 'returns owners' do
-        expect(subject.graph_service).to receive(:list_group_owners).once
-                                                                    .with('mygroupid', select: ['id'], top: 999)
-                                                                    .and_yield([{ 'id' => 'a' }, { 'id' => 'b' }])
-                                                                    .and_yield([{ 'id' => 'c' }])
+        expect(subject.graph_service.groups).to receive(:list_owners)
+          .once
+          .with('mygroupid', select: ['id'], top: 999)
+          .and_yield([{ 'id' => 'a' }, { 'id' => 'b' }])
+          .and_yield([{ 'id' => 'c' }])
         expect(subject.get_group_users_aad_ids('mygroupid', owners: true)).to eq(%w[a b c])
       end
     end

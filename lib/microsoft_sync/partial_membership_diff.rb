@@ -31,7 +31,7 @@
 # same time period), because we don't know the state on the Microsoft side,
 # this may indicate unnecessary changes (such as removing a user from a group
 # it is not in); by executing the actions recommended by this class with
-# GraphService's remove_group_users_ignore_missing(), such actions turn into
+# graph_service.groups's remove_users_ignore_missing(), such actions turn into
 # no-ops.
 # For instance, here is an example where what seems like the "optimal" method
 # could lead to us never adding an owner. You can check that the actions we
