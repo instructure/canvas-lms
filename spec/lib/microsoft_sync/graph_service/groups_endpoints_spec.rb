@@ -298,7 +298,8 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
 
   describe '#add_users_via_batch' do
     subject do
-      endpoints.add_users_via_batch('msgroupid', %w[m1 m2], %w[o1 o2])&.transform_values(&:sort)
+      endpoints.add_users_via_batch('msgroupid', %w[m1 m2], %w[o1 o2])
+               .issues_by_member_type.symbolize_keys.transform_values(&:symbolize_keys)
     end
 
     let(:url) { 'https://graph.microsoft.com/v1.0/$batch' }
@@ -346,14 +347,16 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
 
     {
       # all are successfully added:
-      %i[success success success success] => nil,
+      %i[success success success success] => {},
       # some owners were already in the group:
-      %i[success success success add_duplicate] => { owners: %w[o2] },
+      %i[success success success add_duplicate] =>
+        { owners: { o2: :ignored } },
       # some members were already in the group:
-      %i[add_duplicate add_duplicate success success] => { members: %w[m1 m2] },
+      %i[add_duplicate add_duplicate success success] =>
+        { members: { m1: :ignored, m2: :ignored } },
       # some members and owners were already in the group:
       %i[add_duplicate success add_duplicate add_duplicate] =>
-        { members: %w[m1], owners: %w[o1 o2] },
+        { members: { m1: :ignored }, owners: { o1: :ignored, o2: :ignored } },
       %i[add_duplicate success success add_owners_quota_exceeded] =>
         MicrosoftSync::Errors::OwnersQuotaExceeded,
       %i[add_duplicate success success add_members_quota_exceeded] =>
@@ -375,7 +378,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     subject do
       endpoints
         .remove_users_ignore_missing('msgroupid', members: %w[m1 m2], owners: %w[o1 o2])
-        &.transform_values(&:sort)
+        .issues_by_member_type.symbolize_keys.transform_values(&:symbolize_keys)
     end
 
     let(:url) { 'https://graph.microsoft.com/v1.0/$batch' }
@@ -407,15 +410,19 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
 
     {
       # all successfully removed:
-      %i[success success success success] => nil,
+      %i[success success success success] => {},
       # some owners were not in the group:
-      %i[success success success remove_missing] => { owners: %w[o2] },
+      %i[success success success remove_missing] =>
+        { owners: { o2: :ignored } },
       # some members were not in the group:
-      %i[remove_missing remove_missing success success] => { members: %w[m1 m2] },
+      %i[remove_missing remove_missing success success] =>
+        { members: { m1: :ignored, m2: :ignored } },
       # some members were not in the group (alternate response format)
-      %i[remove_missing2 remove_missing2 success success] => { members: %w[m1 m2] },
+      %i[remove_missing2 remove_missing2 success success] =>
+        { members: { m1: :ignored, m2: :ignored } },
       # some members and owners were not in the group
-      %i[remove_missing success remove_missing remove_missing] => { members: %w[m1], owners: %w[o1 o2] },
+      %i[remove_missing success remove_missing remove_missing] =>
+        { members: { m1: :ignored }, owners: { o1: :ignored, o2: :ignored } },
     }.each do |types, result|
       context "when the batch responses are: #{types.inspect}" do
         let(:batch_response_types) { types }

@@ -232,12 +232,12 @@ module MicrosoftSync
       retry_object_for_error(e)
     end
 
-    def log_batch_skipped(type, users)
-      return unless users # GraphService batch functions return nil if all succesful
+    def log_batch_skipped(type, change_result)
+      return if change_result.blank?
 
-      n_total = users.values.map(&:length).sum
+      n_total = change_result.total_unsuccessful
       Rails.logger.warn("#{self.class.name} (#{group.global_id}): " \
-                        "Skipping redundant #{type} for #{n_total}: #{users.to_json}")
+                        "Skipping redundant #{type} for #{n_total}: #{change_result.to_json}")
       InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_BATCHES}.#{type}",
                                    tags: { sync_type: sync_type })
       InstStatsd::Statsd.count("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}", n_total,
@@ -292,10 +292,10 @@ module MicrosoftSync
 
     def execute_diff_add_users(diff)
       diff.additions_in_slices_of(GraphService::GroupsEndpoints::USERS_BATCH_SIZE) do |members_and_owners|
-        skipped = graph_service.groups.add_users_ignore_duplicates(
+        change_result = graph_service.groups.add_users_ignore_duplicates(
           group.ms_group_id, **members_and_owners
         )
-        log_batch_skipped(:add, skipped)
+        log_batch_skipped(:add, change_result)
       end
     rescue Errors::MembersQuotaExceeded
       raise_and_disable_group(MaxMemberEnrollmentsReached)
@@ -305,10 +305,10 @@ module MicrosoftSync
 
     def execute_diff_remove_users(diff)
       diff.removals_in_slices_of(GraphService::GroupsEndpoints::USERS_BATCH_SIZE) do |members_and_owners|
-        skipped = graph_service.groups.remove_users_ignore_missing(
+        change_result = graph_service.groups.remove_users_ignore_missing(
           group.ms_group_id, **members_and_owners
         )
-        log_batch_skipped(:remove, skipped)
+        log_batch_skipped(:remove, change_result)
       end
     end
 
