@@ -107,6 +107,7 @@
   "creative_commons_license_725584ae": {
     "message": "Creative Commons 许可证："
   },
+  "crop_image_807ebb08": { "message": "裁剪图像" },
   "current_image_f16c249c": { "message": "当前图像" },
   "custom_6979cd81": { "message": "自定义" },
   "date_added_ed5ad465": { "message": "按添加日期排序" },
@@ -257,6 +258,7 @@
   },
   "no_results_found_for_term_1564c08e": { "message": "未找到{ term }的结果。" },
   "none_3b5e34d2": { "message": "无" },
+  "none_selected_b93d56d2": { "message": "未选中任何项" },
   "octagon_e48be9f": { "message": "八边形" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "打开此键盘快捷方式对话框"
@@ -301,6 +303,7 @@
   "saved_buttons_and_icons_8278eed2": { "message": "保存的按钮和图标" },
   "search_280d00bd": { "message": "搜索" },
   "search_term_b2d2235": { "message": "搜索学期" },
+  "select_crop_shape_d441feeb": { "message": "选择裁剪形状" },
   "select_language_7c93a900": { "message": "选择语言" },
   "selected_274ce24f": { "message": "已选择" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

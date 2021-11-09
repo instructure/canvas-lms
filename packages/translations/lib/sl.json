@@ -329,6 +329,9 @@
     "creative_commons_license_725584ae": {
         "message": "Licenca Creative Commons:"
     },
+    "crop_image_807ebb08": {
+        "message": "Obreži sliko"
+    },
     "current_image_f16c249c": {
         "message": "Trenutna slika"
     },
@@ -896,6 +899,9 @@
     "none_3b5e34d2": {
         "message": "Brez"
     },
+    "none_selected_b93d56d2": {
+        "message": "Nobena ni izbrana"
+    },
     "nothing_due_this_week_d45c9ef9": {
         "message": "Ta teden ni nobenega roka"
     },
@@ -1078,6 +1084,9 @@
     },
     "search_term_b2d2235": {
         "message": "Iskalni izraz"
+    },
+    "select_crop_shape_d441feeb": {
+        "message": "Izberite obliko izrezovanja"
     },
     "select_language_7c93a900": {
         "message": "Izberite jezik"

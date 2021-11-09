@@ -329,6 +329,9 @@
     "creative_commons_license_725584ae": {
         "message": "Licencja Creative Commons:"
     },
+    "crop_image_807ebb08": {
+        "message": "Przytnij obraz"
+    },
     "current_image_f16c249c": {
         "message": "Bieżący obraz"
     },
@@ -896,6 +899,9 @@
     "none_3b5e34d2": {
         "message": "Brak"
     },
+    "none_selected_b93d56d2": {
+        "message": "Nie wybrano żadnego"
+    },
     "nothing_due_this_week_d45c9ef9": {
         "message": "Brak terminów w tym tygodniu"
     },
@@ -1078,6 +1084,9 @@
     },
     "search_term_b2d2235": {
         "message": "Wyszukiwany termin"
+    },
+    "select_crop_shape_d441feeb": {
+        "message": "Wybierz przycięty fragment"
     },
     "select_language_7c93a900": {
         "message": "Wybierz język"
