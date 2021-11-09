@@ -53,12 +53,10 @@ module MicrosoftSync
         ),
       ].freeze
 
-      # Returns nil if all removed, or a hash with a list of :members and/or :owners that did
-      # not exist in the group (e.g. {owners: ['a', 'b'], members: ['c']} or {owners: ['a']}
+      # Returns a GroupMembershipChangeResult
       # NOTE: Microsoft API does not distinguish between a group not existing, a
       # user not existing, and an owner not existing in the group. If the group
-      # doesn't exist, this will return the full lists of members and owners
-      # passed in.
+      # doesn't exist, all members and owners will be listed in the change result.
       def remove_users_ignore_missing(group_id, members: [], owners: [])
         check_group_users_args(members, owners)
 
@@ -67,13 +65,13 @@ module MicrosoftSync
           group_remove_user_requests(group_id, owners, 'owners')
         quota = [reqs.count, reqs.count]
 
-        ignored_request_ids = run_batch(
+        ignored_request_hash = run_batch(
           'group_remove_users',
           reqs,
           quota: quota,
           special_cases: BATCH_REMOVE_USERS_SPECIAL_CASES
-        ).keys
-        split_request_ids_to_hash(ignored_request_ids)
+        )
+        create_membership_change_result(ignored_request_hash)
       end
 
       BATCH_ADD_USERS_SPECIAL_CASES = [
@@ -91,19 +89,18 @@ module MicrosoftSync
         ),
       ].freeze
 
-      # Returns {owners: ['a', 'b', 'c'], members: ['d', 'e', 'f']} if there are owners
-      # or members not added. If all were added successfully, returns nil.
+      # Returns a GroupMembershipChangeResult
       def add_users_via_batch(group_id, members, owners)
         reqs =
           group_add_user_requests(group_id, members, 'members') +
           group_add_user_requests(group_id, owners, 'owners')
-        ignored_request_ids = run_batch(
+        ignored_request_hash = run_batch(
           'group_add_users',
           reqs,
           quota: [reqs.count, reqs.count],
           special_cases: BATCH_ADD_USERS_SPECIAL_CASES
-        ).keys
-        split_request_ids_to_hash(ignored_request_ids)
+        )
+        create_membership_change_result(ignored_request_hash)
       end
 
       ADD_USERS_SPECIAL_CASES = [
@@ -127,8 +124,10 @@ module MicrosoftSync
         ),
       ].freeze
 
-      # Returns nil if all added, or a hash with a list of :members and/or :owners that already
-      # existed in the group (e.g. {owners: ['a', 'b'], members: ['c']} or {owners: ['a']}
+      # Returns nil or a blank GroupMembershipChangeResult if all users were
+      # added successfully. Returns a GroupMembershipChangeResult batch to
+      # return if there are any non-fatal issues (e.g. some users existed in
+      # the group already)
       def add_users_ignore_duplicates(group_id, members: [], owners: [])
         check_group_users_args(members, owners)
 
@@ -151,19 +150,21 @@ module MicrosoftSync
         end
       end
 
-      # Maps requests ids, e.g. ["members_a", "members_b", "owners_a"]
-      # to a hash like {members: %w[a b], owners: %w[a]}
-      def split_request_ids_to_hash(req_ids)
-        return nil if req_ids.blank?
-
-        req_ids
-          .group_by { |id| id.split("_").first.to_sym }
-          .transform_values { |ids| ids.map { |id| id.split("_").last } }
-      end
-
       private
 
       # ==== Helpers for removing and adding in batch ===
+
+      # Expects a hash like {"members_1234" => :ignored, "owners_89ab" => :ignored}
+      def create_membership_change_result(batch_result_hash)
+        res = GroupMembershipChangeResult.new
+
+        batch_result_hash.each do |request_id, special_case_value|
+          members_or_owners, user_id = request_id.split("_")
+          res.add_issue(members_or_owners, user_id, special_case_value)
+        end
+
+        res
+      end
 
       def check_group_users_args(members, owners)
         raise ArgumentError, 'Missing members/owners' if members.empty? && owners.empty?
