@@ -302,7 +302,8 @@ describe PseudonymsController do
       end
 
       it 'will not allow admin to add pseudonyms to unrelated users' do
-        user2 = User.create!
+        unassociated_account = Account.create!
+        user2 = user_with_pseudonym(active_all: true, account: unassociated_account)
         post 'create', params: { user_id: user2.id, pseudonym: { unique_id: 'user' } }
         assert_unauthorized
       end
