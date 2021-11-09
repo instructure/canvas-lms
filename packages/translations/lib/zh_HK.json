@@ -329,6 +329,9 @@
     "creative_commons_license_725584ae": {
         "message": "創意共享授權："
     },
+    "crop_image_807ebb08": {
+        "message": "裁剪影像"
+    },
     "current_image_f16c249c": {
         "message": "目前的圖像"
     },
@@ -896,6 +899,9 @@
     "none_3b5e34d2": {
         "message": "無"
     },
+    "none_selected_b93d56d2": {
+        "message": "未選擇任何項目"
+    },
     "nothing_due_this_week_d45c9ef9": {
         "message": "無本週截止事項"
     },
@@ -1078,6 +1084,9 @@
     },
     "search_term_b2d2235": {
         "message": "搜尋學期"
+    },
+    "select_crop_shape_d441feeb": {
+        "message": "選擇裁剪形狀"
     },
     "select_language_7c93a900": {
         "message": "選擇語言"

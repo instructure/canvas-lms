@@ -329,6 +329,9 @@
     "creative_commons_license_725584ae": {
         "message": "Лицензионное соглашение Creative Commons:"
     },
+    "crop_image_807ebb08": {
+        "message": "Обрезать изображение"
+    },
     "current_image_f16c249c": {
         "message": "Текущее изображение"
     },
@@ -896,6 +899,9 @@
     "none_3b5e34d2": {
         "message": "Нет"
     },
+    "none_selected_b93d56d2": {
+        "message": "Нет выбранных элементов"
+    },
     "nothing_due_this_week_d45c9ef9": {
         "message": "На этой неделе не требуется ничего выполнять"
     },
@@ -1078,6 +1084,9 @@
     },
     "search_term_b2d2235": {
         "message": "критерий поиска"
+    },
+    "select_crop_shape_d441feeb": {
+        "message": "Выберите обрезку формы"
     },
     "select_language_7c93a900": {
         "message": "Выбрать язык"
