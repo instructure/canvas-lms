@@ -362,7 +362,7 @@ describe Quizzes::QuizSubmissionService do
       it 'is a no-op if no changes are requested' do
         expect_version_object
         qs.workflow_state = 'complete'
-        expect(qs).to receive(:update_scores).never
+        expect(qs).not_to receive(:update_scores)
 
         subject.update_scores qs, qs.attempt, {}
       end

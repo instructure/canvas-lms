@@ -6884,7 +6884,7 @@ describe Assignment do
     end
 
     it "does not trigger when nothing changed" do
-      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).not_to receive(:recompute)
       @assignment.save
     end
   end
@@ -7255,7 +7255,7 @@ describe Assignment do
     end
 
     it 'does not update grades when due_at changes' do
-      expect(@assignment.context).to receive(:recompute_student_scores).never
+      expect(@assignment.context).not_to receive(:recompute_student_scores)
       @assignment.due_at = 6.months.ago
       @assignment.save!
     end
@@ -7297,7 +7297,7 @@ describe Assignment do
     it 'does not update grades if grading period did not change' do
       @assignment.due_at = 1.month.ago
       @assignment.save!
-      expect(@assignment.context).to receive(:recompute_student_scores).never
+      expect(@assignment.context).not_to receive(:recompute_student_scores)
       @assignment.due_at = 2.months.ago
       @assignment.save!
     end
@@ -7333,7 +7333,7 @@ describe Assignment do
     end
 
     it "does not update grades otherwise" do
-      expect(@assignment.context).to receive(:recompute_student_scores).never
+      expect(@assignment.context).not_to receive(:recompute_student_scores)
       @assignment.title = 'hi'
       @assignment.due_at = 1.hour.ago
       @assignment.description = 'blah'
@@ -8126,7 +8126,7 @@ describe Assignment do
       end
 
       it "does not dispatch update for ungraded submissions" do
-        expect_any_instance_of(Submission).to receive(:assignment_muted_changed).never
+        expect_any_instance_of(Submission).not_to receive(:assignment_muted_changed)
         @assignment.unmute!
       end
     end

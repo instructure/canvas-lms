@@ -108,7 +108,7 @@ describe SupportHelpers::Crocodoc::CrocodocFixer do
       fixer =
         SupportHelpers::Crocodoc::SubmissionFixer.new('email', nil, assignment2.id, student.id)
 
-      expect(fixer).to receive(:resubmit_attachment).never
+      expect(fixer).not_to receive(:resubmit_attachment)
       fixer.fix
     end
 

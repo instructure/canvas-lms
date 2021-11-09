@@ -293,7 +293,7 @@ describe UserListV2 do
         skip_if_prepended_class_method_stubs_broken
         Setting.set('global_lookups_shard_threshold', '3') # i.e. if we'd have to look on more than 3 shards, we should use global lookups
 
-        expect(Pseudonym).to receive(:associated_shards_for_column).never
+        expect(Pseudonym).not_to receive(:associated_shards_for_column)
         ul = UserListV2.new('jt@instructure.com', search_type: 'unique_id')
         expect(ul.resolved_results).to be_empty
         expect(ul.duplicate_results.first.map { |r| r[:user_id] }).to match_array([@user1.id, @user2.id])

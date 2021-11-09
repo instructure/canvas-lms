@@ -187,7 +187,7 @@ describe CommunicationChannel do
 
   it "does not update cache if workflow_state doesn't change" do
     cc = communication_channel_model
-    expect(cc.user).to receive(:clear_email_cache!).never
+    expect(cc.user).not_to receive(:clear_email_cache!)
     cc.save!
   end
 
@@ -746,7 +746,7 @@ describe CommunicationChannel do
         cc.e164_path,
         true
       )
-      expect(cc).to receive(:send_otp_via_sms_gateway!).never
+      expect(cc).not_to receive(:send_otp_via_sms_gateway!)
       cc.send_otp!('123456', account)
       expect(InstStatsd::Statsd).to have_received(:increment).with(
         "message.deliver.sms.one_time_password",
@@ -766,7 +766,7 @@ describe CommunicationChannel do
     end
 
     it "sends via email if not configured" do
-      expect(Services::NotificationService).to receive(:process).never
+      expect(Services::NotificationService).not_to receive(:process)
       expect(cc).to receive(:send_otp_via_sms_gateway!).once
       cc.send_otp!('123456')
     end

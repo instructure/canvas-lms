@@ -53,7 +53,7 @@ describe SentryProxy do
 
     it "does not send to sentry for low-level errors" do
       e = error_klass.new
-      expect(Raven).to receive(:capture_exception).never
+      expect(Raven).not_to receive(:capture_exception)
       SentryProxy.capture(e, data, :warn)
     end
   end

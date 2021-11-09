@@ -452,7 +452,7 @@ describe AddressBook::MessageableUser do
       expect(Rails.cache).to receive(:fetch)
         .with(match(/address_book_preload/))
         .and_return(MessageableUser.where(id: student).to_a)
-      expect(teacher).to receive(:load_messageable_users).never
+      expect(teacher).not_to receive(:load_messageable_users)
       AddressBook::MessageableUser.new(teacher).preload_users([student])
     end
 

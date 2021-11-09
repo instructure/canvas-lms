@@ -1201,7 +1201,7 @@ describe DiscussionTopic do
 
     it "does not attempt to clear stream items if a discussion topic was not section specific before last save" do
       topic = @course.discussion_topics.create!(title: "Ben Loves Panda", user: @teacher)
-      expect(topic.stream_item).to receive(:stream_item_instances).never
+      expect(topic.stream_item).not_to receive(:stream_item_instances)
       topic.update!(title: "Lemon Loves Panda")
     end
 

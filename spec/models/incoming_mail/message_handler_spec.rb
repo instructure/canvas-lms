@@ -103,8 +103,8 @@ describe IncomingMail::MessageHandler do
         it "silently fails on no message notification id" do
           message = double("original message without notification id", original_message_attributes.merge(:notification_id => nil))
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
-          expect(Mailer).to receive(:create_message).never
-          expect(message.context).to receive(:reply_from).never
+          expect(Mailer).not_to receive(:create_message)
+          expect(message.context).not_to receive(:reply_from)
 
           subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         end
@@ -112,31 +112,31 @@ describe IncomingMail::MessageHandler do
         it "silently fails on invalid secure id" do
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
           allow(CanvasSecurity).to receive(:verify_hmac_sha1).and_return(false)
-          expect(Mailer).to receive(:create_message).never
-          expect(original_message.context).to receive(:reply_from).never
+          expect(Mailer).not_to receive(:create_message)
+          expect(original_message.context).not_to receive(:reply_from)
 
           subject.handle(outgoing_from_address, body, html_body, incoming_message, tag)
         end
 
         it "silently fails if the original message is missing" do
           expect(Message).to receive(:where).with(id: original_message_id).and_return(double(first: nil))
-          expect_any_instance_of(Message).to receive(:deliver).never
+          expect_any_instance_of(Message).not_to receive(:deliver)
 
           subject.handle(outgoing_from_address, body, html_body, incoming_message, "#{secure_id}-#{original_message_id}")
         end
 
         it "silently fails if the address tag is invalid" do
-          expect(Message).to receive(:where).never
-          expect_any_instance_of(Message).to receive(:deliver).never
+          expect(Message).not_to receive(:where)
+          expect_any_instance_of(Message).not_to receive(:deliver)
 
           subject.handle(outgoing_from_address, body, html_body, incoming_message, "#{secure_id}-not-an-id")
         end
 
         it "silently fails if the message is not from one of the original recipient's email addresses" do
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
-          expect_any_instance_of(Message).to receive(:deliver).never
+          expect_any_instance_of(Message).not_to receive(:deliver)
           expect(Account.site_admin).to receive(:feature_enabled?).with(:notification_service).and_return(false)
-          expect(original_message.context).to receive(:reply_from).never
+          expect(original_message.context).not_to receive(:reply_from)
           message = double("incoming message with bad from",
                            incoming_message_attributes.merge(:from => ['not_lucy@example.com'],
                                                              :reply_to => ['also_not_lucy@example.com']))
@@ -146,7 +146,7 @@ describe IncomingMail::MessageHandler do
         it 'raises BlankMessage for empty message' do
           message = double("original message without notification id", original_message_attributes)
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
-          expect(original_message.context).to receive(:reply_from).never
+          expect(original_message.context).not_to receive(:reply_from)
           subject.handle(outgoing_from_address, " ", html_body, incoming_message, tag)
         end
       end
@@ -180,7 +180,7 @@ describe IncomingMail::MessageHandler do
         it "does not send a message if the incoming message has no from" do
           invalid_incoming_message = double("invalid incoming message", incoming_message_attributes.merge(from: nil, reply_to: nil))
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
-          expect_any_instance_of(Message).to receive(:deliver).never
+          expect_any_instance_of(Message).not_to receive(:deliver)
 
           subject.handle(outgoing_from_address, body, html_body, invalid_incoming_message, tag)
         end
@@ -282,7 +282,7 @@ describe IncomingMail::MessageHandler do
           it "bounces the message back to the incoming from address" do
             allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(original_message)
 
-            expect_any_instance_of(Message).to receive(:deliver).never
+            expect_any_instance_of(Message).not_to receive(:deliver)
             expect(Mailer).to receive(:create_message)
 
             message = double("incoming message with bad from",

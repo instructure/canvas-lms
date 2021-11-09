@@ -44,15 +44,15 @@ describe ActiveSupport::Cache::SafeRedisRaceCondition do
 
     it "doesn't lock for an existing key" do
       store.write("bob", 42)
-      expect(store).to receive(:lock).never
-      expect(store).to receive(:unlock).never
+      expect(store).not_to receive(:lock)
+      expect(store).not_to receive(:unlock)
       expect(store.fetch('bob') { raise "not reached" }).to eq 42
     end
 
     it "doesn't populate for a stale key that someone else is populating" do
       store.write("bob", 42, expires_in: -1)
       expect(store).to receive(:lock).and_return(false)
-      expect(store).to receive(:unlock).never
+      expect(store).not_to receive(:unlock)
 
       expect(store.fetch('bob') { raise "not reached" }).to eq 42
     end
@@ -72,7 +72,7 @@ describe ActiveSupport::Cache::SafeRedisRaceCondition do
       expect(store).to receive(:read_entry).and_return(nil).ordered
       expect(store).to receive(:lock).and_return(false).ordered
       expect(store).to receive(:read_entry).and_call_original.ordered
-      expect(store).to receive(:unlock).never
+      expect(store).not_to receive(:unlock)
       expect(store.fetch('bob') { raise "not reached" }).to eq 42
     end
 
@@ -99,7 +99,7 @@ describe ActiveSupport::Cache::SafeRedisRaceCondition do
       expect(store).to receive(:read_entry).and_return(nil)
       expect(store).to receive(:lock).and_return(true)
       expect(store).to receive(:write_entry)
-      expect(store).to receive(:unlock).never
+      expect(store).not_to receive(:unlock)
       expect(store.fetch('bob') { 42 }).to eq 42
     end
   end

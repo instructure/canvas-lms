@@ -161,7 +161,7 @@ describe Login::OtpController do
       before do
         @user.otp_secret_key = ROTP::Base32.random
         @user.save!
-        expect_any_instance_of(CommunicationChannel).to receive(:send_otp!).never
+        expect_any_instance_of(CommunicationChannel).not_to receive(:send_otp!)
         user_session(@user, @pseudonym)
         session[:pending_otp] = true
       end
@@ -223,7 +223,7 @@ describe Login::OtpController do
         skip "needs redis" unless Canvas.redis_enabled?
 
         Canvas.redis.set("otp_used:#{@user.global_id}:123456", '1')
-        expect_any_instance_of(ROTP::TOTP).to receive(:verify).never
+        expect_any_instance_of(ROTP::TOTP).not_to receive(:verify)
         post :create, params: { :otp_login => { :verification_code => '123456' } }
         expect(response).to redirect_to(otp_login_url)
       end

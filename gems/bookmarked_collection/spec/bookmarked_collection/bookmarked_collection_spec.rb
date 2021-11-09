@@ -305,7 +305,7 @@ describe "BookmarkedCollection" do
         ['deleted', @deleted_collection]
       )
 
-      expect(@deleted_collection).to receive(:execute_pager).never
+      expect(@deleted_collection).not_to receive(:execute_pager)
       expect(@collection.paginate(per_page: 1).next_page).not_to be_nil
     end
   end

@@ -272,14 +272,14 @@ describe SupportHelpers::Tii do
           expect(Turnitin::Client).to receive(:new).and_return(turnitin_client)
 
           fixer = SupportHelpers::Tii::AssignmentFixer.new('email', nil, @a1.id)
-          expect(turnitin_client).to receive(:createCourse).never
+          expect(turnitin_client).not_to receive(:createCourse)
           expect(turnitin_client).to receive(:createOrUpdateAssignment).and_return({ assignment_id: 1 })
           expect_any_instantiation_of(@s1).to receive(:resubmit_to_turnitin)
-          expect_any_instantiation_of(@s2).to receive(:resubmit_to_turnitin).never
+          expect_any_instantiation_of(@s2).not_to receive(:resubmit_to_turnitin)
           expect_any_instantiation_of(@s3).to receive(:resubmit_to_turnitin)
-          expect_any_instantiation_of(@s4).to receive(:resubmit_to_turnitin).never
-          expect_any_instantiation_of(@s5).to receive(:resubmit_to_turnitin).never
-          expect_any_instantiation_of(@s6).to receive(:resubmit_to_turnitin).never
+          expect_any_instantiation_of(@s4).not_to receive(:resubmit_to_turnitin)
+          expect_any_instantiation_of(@s5).not_to receive(:resubmit_to_turnitin)
+          expect_any_instantiation_of(@s6).not_to receive(:resubmit_to_turnitin)
 
           Timecop.scale(300) { fixer.fix(:md5_fix) }
         end
@@ -316,13 +316,13 @@ describe SupportHelpers::Tii do
 
       describe '#fix' do
         it 'does nothing' do
-          expect(Turnitin::Client).to receive(:new).never
-          expect_any_instantiation_of(@s1).to receive(:resubmit_to_turnitin).never
-          expect_any_instantiation_of(@s2).to receive(:resubmit_to_turnitin).never
-          expect_any_instantiation_of(@s3).to receive(:resubmit_to_turnitin).never
-          expect_any_instantiation_of(@s4).to receive(:resubmit_to_turnitin).never
-          expect_any_instantiation_of(@s5).to receive(:resubmit_to_turnitin).never
-          expect_any_instantiation_of(@s6).to receive(:resubmit_to_turnitin).never
+          expect(Turnitin::Client).not_to receive(:new)
+          expect_any_instantiation_of(@s1).not_to receive(:resubmit_to_turnitin)
+          expect_any_instantiation_of(@s2).not_to receive(:resubmit_to_turnitin)
+          expect_any_instantiation_of(@s3).not_to receive(:resubmit_to_turnitin)
+          expect_any_instantiation_of(@s4).not_to receive(:resubmit_to_turnitin)
+          expect_any_instantiation_of(@s5).not_to receive(:resubmit_to_turnitin)
+          expect_any_instantiation_of(@s6).not_to receive(:resubmit_to_turnitin)
 
           fixer = SupportHelpers::Tii::AssignmentFixer.new('email', nil, @a1.id)
           Timecop.scale(300) { fixer.fix }
@@ -335,18 +335,18 @@ describe SupportHelpers::Tii do
         turnitin_client = double
         expect(Turnitin::Client).to receive(:new).and_return(turnitin_client)
       else
-        expect(Turnitin::Client).to receive(:new).never
+        expect(Turnitin::Client).not_to receive(:new)
       end
 
       fixer = SupportHelpers::Tii::AssignmentFixer.new('email', nil, @a1.id)
       expect(turnitin_client).to receive(:createCourse) if create_course
       expect(turnitin_client).to receive(:createOrUpdateAssignment).and_return({ assignment_id: 1 }) if create_or_update_assignment
       expect_any_instantiation_of(@s1).to receive(:resubmit_to_turnitin)
-      expect_any_instantiation_of(@s2).to receive(:resubmit_to_turnitin).never
+      expect_any_instantiation_of(@s2).not_to receive(:resubmit_to_turnitin)
       expect_any_instantiation_of(@s3).to receive(:resubmit_to_turnitin)
-      expect_any_instantiation_of(@s4).to receive(:resubmit_to_turnitin).never
-      expect_any_instantiation_of(@s5).to receive(:resubmit_to_turnitin).never
-      expect_any_instantiation_of(@s6).to receive(:resubmit_to_turnitin).never
+      expect_any_instantiation_of(@s4).not_to receive(:resubmit_to_turnitin)
+      expect_any_instantiation_of(@s5).not_to receive(:resubmit_to_turnitin)
+      expect_any_instantiation_of(@s6).not_to receive(:resubmit_to_turnitin)
       Timecop.scale(300) { fixer.fix }
     end
   end

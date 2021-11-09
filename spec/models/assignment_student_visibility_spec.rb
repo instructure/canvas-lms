@@ -503,7 +503,7 @@ describe "differentiated_assignments" do
 
       it "does not call AssignmentStudentVisibility.users_with_visibility_by_assignment " \
          "if all assignments are visible to everyone" do
-        expect(AssignmentStudentVisibility).to receive(:users_with_visibility_by_assignment).never
+        expect(AssignmentStudentVisibility).not_to receive(:users_with_visibility_by_assignment)
         # change this assignment so that it is visible to all students
         assignment_only_visible_to_overrides.only_visible_to_overrides = false
         assignment_only_visible_to_overrides.save!

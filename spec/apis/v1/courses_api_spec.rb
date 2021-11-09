@@ -1117,7 +1117,7 @@ describe CoursesController, type: :request do
 
       it "allows setting sis_course_id without offering the course" do
         expect(Auditors::Course).to receive(:record_created).once
-        expect(Auditors::Course).to receive(:record_published).never
+        expect(Auditors::Course).not_to receive(:record_published)
         json = api_call(:post, @resource_path,
                         @resource_params,
                         { :account_id => @account.id, :course => { :name => 'Test Course', :sis_course_id => '9999' } })

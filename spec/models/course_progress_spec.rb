@@ -120,7 +120,7 @@ describe CourseProgress do
 
       [@module, @module2, @module3].each do |m|
         m.evaluate_for(@user)
-        expect_any_instantiation_of(m).to receive(:evaluate_for).never # shouldn't re-evaluate
+        expect_any_instantiation_of(m).not_to receive(:evaluate_for) # shouldn't re-evaluate
       end
 
       progress = CourseProgress.new(@course, @user, read_only: true).to_json

@@ -67,7 +67,7 @@ module Users
 
         it "doesnt send the registration notification if shouldnt notify" do
           policy = CreationNotifyPolicy.new(true, { send_confirmation: '0' })
-          expect(pseudonym).to receive(:send_registration_notification!).never
+          expect(pseudonym).not_to receive(:send_registration_notification!)
           result = policy.dispatch!(user, pseudonym, channel)
           expect(result).to be(false)
         end

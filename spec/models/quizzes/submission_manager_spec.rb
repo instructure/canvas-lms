@@ -75,7 +75,7 @@ describe Quizzes::SubmissionManager do
       it 'fetches the submission from the db and does not change an existing workflow state' do
         submission = @quiz.quiz_submissions.create!(user: test_user)
         submission.update_attribute :workflow_state, 'graded'
-        expect_any_instance_of(Quizzes::QuizSubmission).to receive(:save!).never
+        expect_any_instance_of(Quizzes::QuizSubmission).not_to receive(:save!)
         s = nil
         expect {
           s = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(test_user)

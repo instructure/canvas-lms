@@ -163,7 +163,7 @@ describe FeatureFlags do
         t_sub_account.feature_flags.create! feature: 'course_feature', state: 'on'
         t_root_account.feature_flags.create! feature: 'course_feature', state: 'off'
         expect(t_sub_account.lookup_feature_flag('course_feature').context).to eql t_root_account
-        expect_any_instance_of(Account).to receive(:feature_flag).never
+        expect_any_instance_of(Account).not_to receive(:feature_flag)
         expect(t_sub_account.lookup_feature_flag('course_feature').context).to eql t_root_account
       end
     end
@@ -205,7 +205,7 @@ describe FeatureFlags do
 
         it "caches the nil of the feature beneath the root account" do
           expect(t_course.lookup_feature_flag('root_opt_in_feature')).to be_nil
-          expect_any_instance_of(Account).to receive(:feature_flag).never
+          expect_any_instance_of(Account).not_to receive(:feature_flag)
           expect(t_course.lookup_feature_flag('root_opt_in_feature')).to be_nil
         end
       end
@@ -391,7 +391,7 @@ describe FeatureFlags do
       enable_cache do
         t_root_account.feature_flag('course_feature2')
         expect(Rails.cache).to be_exist(t_root_account.feature_flag_cache_key('course_feature2'))
-        expect(FeatureFlag).to receive(:where).never
+        expect(FeatureFlag).not_to receive(:where)
         t_root_account.reload.feature_flag('course_feature2')
       end
     end

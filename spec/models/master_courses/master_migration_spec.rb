@@ -45,7 +45,7 @@ describe MasterCourses::MasterMigration do
       @template.active_migration = running
       @template.save!
 
-      expect_any_instance_of(MasterCourses::MasterMigration).to receive(:queue_export_job).never
+      expect_any_instance_of(MasterCourses::MasterMigration).not_to receive(:queue_export_job)
       expect {
         MasterCourses::MasterMigration.start_new_migration!(@template, @user)
       }.to raise_error("cannot start new migration while another one is running")
@@ -75,7 +75,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "does not do anything if there aren't any child courses to push to" do
-      expect(@migration).to receive(:create_export).never
+      expect(@migration).not_to receive(:create_export)
       @migration.perform_exports
       @migration.reload
       expect(@migration).to be_completed
@@ -87,7 +87,7 @@ describe MasterCourses::MasterMigration do
       sub = @template.add_child_course!(other_course)
       sub.destroy!
 
-      expect(@migration).to receive(:create_export).never
+      expect(@migration).not_to receive(:create_export)
       @migration.perform_exports
     end
 
@@ -1875,7 +1875,7 @@ describe MasterCourses::MasterMigration do
         child_sub_folder = copied_att.folder
         child_parent_folder = child_sub_folder.parent_folder
         expected_ids = [child_sub_folder, child_parent_folder, Folder.root_folders(@copy_to).first].map(&:id)
-        expect(Folder.connection).to receive(:select_values).never # should have already been cached in migration
+        expect(Folder.connection).not_to receive(:select_values) # should have already been cached in migration
         expect(MasterCourses::FolderHelper.locked_folder_ids_for_course(@copy_to)).to match_array(expected_ids)
       end
     end

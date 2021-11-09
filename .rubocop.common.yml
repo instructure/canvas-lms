@@ -106,6 +106,8 @@ RSpec/MultipleMemoizedHelpers:
   Enabled: false # complicated setup is sometimes necessary
 RSpec/NestedGroups:
   Enabled: false # legacy code
+RSpec/ReceiveNever:
+  Severity: error
 RSpec/RepeatedDescription:
   Severity: error
 RSpec/SubjectStub:

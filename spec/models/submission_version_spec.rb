@@ -123,7 +123,7 @@ describe SubmissionVersion do
 
     Version.preload_version_number([sub1, sub2])
 
-    [sub1, sub2].each { |s| expect(s).to receive(:versions).never }
+    [sub1, sub2].each { |s| expect(s).not_to receive(:versions) }
 
     expect(sub1.version_number).to eq 3
     expect(sub2.version_number).to eq 2

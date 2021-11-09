@@ -1148,7 +1148,7 @@ describe GradebooksController do
 
       shared_examples_for "working download" do
         it "does not recompute enrollment grades" do
-          expect(Enrollment).to receive(:recompute_final_score).never
+          expect(Enrollment).not_to receive(:recompute_final_score)
           get 'show', params: { :course_id => @course.id, :init => 1, :assignments => 1 }, :format => 'csv'
         end
 

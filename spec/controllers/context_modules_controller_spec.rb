@@ -807,7 +807,7 @@ describe ContextModulesController do
         override.assignment_override_students.create!(:user => student)
       end
 
-      expect(AssignmentOverrideApplicator).to receive(:overrides_for_assignment_and_user).never
+      expect(AssignmentOverrideApplicator).not_to receive(:overrides_for_assignment_and_user)
 
       get 'content_tag_assignment_data', params: { course_id: @course.id }, format: 'json' # precache
       json = json_parse(response.body)

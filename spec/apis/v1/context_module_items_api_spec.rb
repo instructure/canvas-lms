@@ -1393,7 +1393,7 @@ describe "Module Items API", type: :request do
 
       describe "caching CYOE data" do
         it "uses the cache when requested again" do
-          expect(ConditionalRelease::Service).to receive(:request_rules).never
+          expect(ConditionalRelease::Service).not_to receive(:request_rules)
           3.times do
             api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module3.id}/items?include[]=mastery_paths",
                      :controller => "context_module_items_api", :action => "index", :format => "json",
