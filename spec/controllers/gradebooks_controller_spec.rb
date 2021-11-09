@@ -854,6 +854,31 @@ describe GradebooksController do
         end
       end
 
+      describe "show_message_students_with_observers_dialog" do
+        shared_examples_for "environment variable" do
+          it "is true when the feature is enabled" do
+            Account.site_admin.enable_feature!(:message_observers_of_students_who)
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options[:show_message_students_with_observers_dialog]).to be true
+          end
+
+          it "is false when the feature is not enabled" do
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options[:show_message_students_with_observers_dialog]).to be false
+          end
+        end
+
+        context "when individual gradebook is enabled" do
+          before { @teacher.set_preference(:gradebook_version, "srgb") }
+
+          include_examples "environment variable"
+        end
+
+        context "when default gradebook is enabled" do
+          include_examples "environment variable"
+        end
+      end
+
       describe "default_grading_standard" do
         it "uses the course's grading standard" do
           grading_standard = grading_standard_for(@course)

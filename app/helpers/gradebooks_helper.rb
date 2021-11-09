@@ -189,4 +189,8 @@ module GradebooksHelper
       t('Due: No Due Date')
     end
   end
+
+  def show_message_students_with_observers_dialog?
+    Account.site_admin.feature_enabled?(:message_observers_of_students_who)
+  end
 end
