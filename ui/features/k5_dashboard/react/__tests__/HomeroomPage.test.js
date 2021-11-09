@@ -23,7 +23,8 @@ import HomeroomPage from '../HomeroomPage'
 describe('HomeroomPage', () => {
   const getProps = (overrides = {}) => ({
     visible: true,
-    createPermissions: 'admin',
+    createPermission: 'admin',
+    restrictCourseCreation: false,
     loadingAnnouncements: false,
     loadingCards: false,
     homeroomAnnouncements: [],
@@ -87,17 +88,17 @@ describe('HomeroomPage', () => {
   })
 
   describe('start a new subject button', () => {
-    it('is not present if createPermissions is set to null', () => {
-      const {queryByText} = render(<HomeroomPage {...getProps({createPermissions: null})} />)
+    it('is not present if createPermission is set to null', () => {
+      const {queryByText} = render(<HomeroomPage {...getProps({createPermission: null})} />)
       expect(queryByText('Open new subject modal')).not.toBeInTheDocument()
     })
 
-    it('is present if createPermissions is set to teacher', () => {
-      const {getByText} = render(<HomeroomPage {...getProps({createPermissions: 'teacher'})} />)
+    it('is present if createPermission is set to teacher', () => {
+      const {getByText} = render(<HomeroomPage {...getProps({createPermission: 'teacher'})} />)
       expect(getByText('Open new subject modal')).toBeInTheDocument()
     })
 
-    describe('with createPermissions set to admin', () => {
+    describe('with createPermission set to admin', () => {
       it('is visible', () => {
         const {getByText} = render(<HomeroomPage {...getProps()} />)
         expect(getByText('Open new subject modal')).toBeInTheDocument()

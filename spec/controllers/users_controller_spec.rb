@@ -2711,13 +2711,14 @@ describe UsersController do
       end
     end
 
-    it "sets ENV.CREATE_COURSES_PERMISSION to teacher if user is a teacher and can create courses" do
+    it "sets ENV.CREATE_COURSES_PERMISSIONS correctly if user is a teacher and can create courses" do
       Account.default.settings[:teachers_can_create_courses] = true
       Account.default.save!
       course_with_teacher_logged_in(active_all: true)
 
       get 'user_dashboard'
-      expect(assigns[:js_env][:CREATE_COURSES_PERMISSION]).to be(:teacher)
+      expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be(:teacher)
+      expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
     end
   end
 

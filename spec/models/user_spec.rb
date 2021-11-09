@@ -3743,5 +3743,73 @@ describe User do
       @account.save!
       expect(@user.create_courses_right(@account)).to be(:student)
     end
+
+    context "with teachers_can_create_courses_anywhere and students_can_create_courses_anywhere false" do
+      before :once do
+        @account.settings[:teachers_can_create_courses_anywhere] = false
+        @account.settings[:students_can_create_courses_anywhere] = false
+        @account.save!
+      end
+
+      context "with teachers_can_create_courses and students_can_create_courses true" do
+        before :once do
+          @account.settings[:teachers_can_create_courses] = true
+          @account.settings[:students_can_create_courses] = true
+          @account.save!
+        end
+
+        context "when user has no k5 enrollments" do
+          before :each do
+            allow(@user).to receive(:active_k5_enrollments?).and_return(false)
+          end
+
+          it "returns nil for root account if user has teacher enrollments but teachers_can_create_courses_anywhere is false" do
+            course_with_teacher(user: @user, active_all: true)
+            expect(@user.create_courses_right(@account)).to be_nil
+          end
+
+          it "returns nil for root account if user has student enrollments but students_can_create_courses_anywhere is false" do
+            course_with_student(user: @user, active_all: true)
+            expect(@user.create_courses_right(@account)).to be_nil
+          end
+
+          it "returns :teacher for MCC account if user has teacher enrollments and teachers_can_create_courses_anywhere is false" do
+            course_with_teacher(user: @user, active_all: true)
+            expect(@user.create_courses_right(@account.manually_created_courses_account)).to be(:teacher)
+          end
+
+          it "returns :student for MCC account if user has student enrollments and students_can_create_courses_anywhere is false" do
+            course_with_student(user: @user, active_all: true)
+            expect(@user.create_courses_right(@account.manually_created_courses_account)).to be(:student)
+          end
+        end
+
+        context "when user has some k5 enrollments" do
+          before :each do
+            allow(@user).to receive(:active_k5_enrollments?).and_return(true)
+          end
+
+          it "returns :teacher for root account if user has teacher enrollments even though teachers_can_create_courses_anywhere is false" do
+            course_with_teacher(user: @user, active_all: true)
+            expect(@user.create_courses_right(@account)).to be(:teacher)
+          end
+
+          it "returns :student for root account if user has student enrollments even though students_can_create_courses_anywhere is false" do
+            course_with_student(user: @user, active_all: true)
+            expect(@user.create_courses_right(@account)).to be(:student)
+          end
+
+          it "still returns :teacher for MCC account if user has teacher enrollments and teachers_can_create_courses_anywhere is false" do
+            course_with_teacher(user: @user, active_all: true)
+            expect(@user.create_courses_right(@account.manually_created_courses_account)).to be(:teacher)
+          end
+
+          it "still returns :student for MCC account if user has student enrollments and students_can_create_courses_anywhere is false" do
+            course_with_student(user: @user, active_all: true)
+            expect(@user.create_courses_right(@account.manually_created_courses_account)).to be(:student)
+          end
+        end
+      end
+    end
   end
 end
