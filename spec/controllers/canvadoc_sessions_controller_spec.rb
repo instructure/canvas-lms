@@ -24,8 +24,8 @@ describe CanvadocSessionsController do
   include HmacHelper
 
   before :once do
-    course_with_teacher(:active_all => true)
-    student_in_course
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
 
     @attachment1 = attachment_model :content_type => 'application/pdf',
                                     :context => @student
@@ -64,10 +64,17 @@ describe CanvadocSessionsController do
       Rack::Utils.parse_query(URI(json_response["canvadocs_session_url"]).query)
     end
 
-    it "renders unauthorized if the user does not own the submission" do
+    it "is unauthorized for teachers attempting to access a draft" do
       user_session(@teacher)
       post :create, params: params
       expect(response).to have_http_status(:unauthorized)
+    end
+
+    it "is authorized for teachers attempting to access a non-draft" do
+      user_session(@teacher)
+      @submission.canvadocs_annotation_contexts.create!(attachment: @attachment, submission_attempt: 1)
+      post :create, params: params.merge(submission_attempt: 1)
+      expect(response).to be_successful
     end
 
     it "renders unauthorized if the assignment is not annotatable" do
@@ -539,7 +546,7 @@ describe CanvadocSessionsController do
           end
         end
 
-        it "always sets read_only to false when the user is a teacher" do
+        it "sets read_only to false when the teacher has permission to grade" do
           user_session(@teacher)
           custom_blob = blob.merge(
             annotation_context: @annotation_context.launch_id,
@@ -551,6 +558,23 @@ describe CanvadocSessionsController do
           expect(@attachment.canvadoc)
             .to receive(:session_url)
             .with(hash_including(read_only: false))
+
+          get :show, params: { blob: custom_blob, hmac: custom_hmac }
+        end
+
+        it "sets read_only to true when the teacher does not have permission to grade" do
+          @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
+          user_session(@teacher)
+          custom_blob = blob.merge(
+            annotation_context: @annotation_context.launch_id,
+            enrollment_type: "teacher",
+            user_id: @teacher.global_id
+          ).to_json
+          custom_hmac = Canvas::Security.hmac_sha1(custom_blob)
+
+          expect(@attachment.canvadoc)
+            .to receive(:session_url)
+            .with(hash_including(read_only: true))
 
           get :show, params: { blob: custom_blob, hmac: custom_hmac }
         end

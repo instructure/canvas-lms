@@ -693,11 +693,11 @@ class ContextExternalTool < ActiveRecord::Base
 
       if settings[setting].is_a?(Hash)
         settings[setting].keys.each do |property|
-          if settings[setting][property] =~ URI::regexp
+          if settings[setting][property].match?(URI::DEFAULT_PARSER.make_regexp)
             settings[setting][property] = replace_host.call(settings[setting][property], new_domain)
           end
         end
-      elsif settings[setting] =~ URI::regexp
+      elsif settings[setting].match?(URI::DEFAULT_PARSER.make_regexp)
         settings[setting] = replace_host.call(settings[setting], new_domain)
       end
     end

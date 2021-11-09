@@ -54,7 +54,7 @@ class PactApiConsumerProxy
         JSON::JWT.decode(env[AUTH_HEADER].split.last) # Remove the "Bearer "
       rescue JSON::JWT::InvalidFormat
         return true
-      rescue Exception
+      rescue
         # Other exceptions (like VerificationFailed) are OK -- we do not
         # expect a new token to be filled in if we get here. JWT
         # verification should be stubbed in the provider state.

@@ -47,7 +47,7 @@ module PermissionsHelper
     raise "invalid permissions - #{nonexistent_permissions}" if nonexistent_permissions.any?
 
     precalculated_map = {}
-    Shard.partition_by_shard(courses, lambda(&:shard)) do |sharded_courses|
+    Shard.partition_by_shard(courses, :shard.to_proc) do |sharded_courses|
       unpublished, published = sharded_courses.partition(&:unpublished?)
       all_applicable_enrollments = []
       enrollment_scope = Enrollment.not_inactive_by_date.for_user(self).select("enrollments.*, enrollment_states.state AS date_based_state_in_db")

@@ -48,6 +48,7 @@ module IncomingMailProcessor
     def disconnect
       @pop.finish
     rescue
+      nil
     end
 
     def each_message(opts = {})

@@ -6741,7 +6741,6 @@ describe Submission do
       @quiz = generate_quiz(@course)
       @quiz_assignment = @quiz.assignment
 
-      # rubocop:disable Rails/SkipsModelValidations
       @unsubmitted_quiz_submission = @assignment.submissions.create(user: User.create, submission_type: 'online_quiz')
       Submission.where(id: @unsubmitted_quiz_submission.id).update_all(submitted_at: nil, cached_due_date: nil)
 
@@ -6819,8 +6818,6 @@ describe Submission do
       @timely_hw_marked_late = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
       Submission.where(id: @timely_hw_marked_late.id).update_all(submitted_at: @now, cached_due_date: nil)
       Submission.where(id: @timely_hw_marked_late.id).update_all(late_policy_status: 'late')
-      # rubocop:enable Rails/SkipsModelValidations
-
       @late_submission_ids = Submission.late.map(&:id)
     end
 
@@ -6911,7 +6908,6 @@ describe Submission do
       @quiz = generate_quiz(@course)
       @quiz_assignment = @quiz.assignment
 
-      # rubocop:disable Rails/SkipsModelValidations
       @unsubmitted_quiz_submission = @assignment.submissions.create(user: User.create, submission_type: 'online_quiz')
       Submission.where(id: @unsubmitted_quiz_submission.id).update_all(submitted_at: nil, cached_due_date: nil)
 
@@ -6989,8 +6985,6 @@ describe Submission do
       @timely_hw_marked_late = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
       Submission.where(id: @timely_hw_marked_late.id).update_all(submitted_at: @now, cached_due_date: nil)
       Submission.where(id: @timely_hw_marked_late.id).update_all(late_policy_status: 'late')
-      # rubocop:enable Rails/SkipsModelValidations
-
       @not_late_submission_ids = Submission.not_late.map(&:id)
     end
 

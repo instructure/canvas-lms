@@ -65,10 +65,11 @@ class AppointmentGroup < ActiveRecord::Base
     if record.validation_event_override
       appointments = appointments.select { |a| a.new_record? || a.id != record.validation_event_override.id } << record.validation_event_override
     end
-    appointments.sort_by(&:start_at).inject(nil) do |prev, appointment|
+    prev = nil
+    appointments.sort_by(&:start_at).each do |appointment|
       record.errors.add(attr, t('errors.invalid_end_at', "Appointment end time precedes start time")) if appointment.end_at < appointment.start_at
       record.errors.add(attr, t('errors.overlapping_appointments', "Appointments overlap")) if prev && appointment.start_at < prev.end_at
-      appointment
+      prev = appointment
     end
   end
 

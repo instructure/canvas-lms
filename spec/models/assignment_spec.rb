@@ -6636,7 +6636,7 @@ describe Assignment do
       submissions = @quiz.assignment.submissions
 
       Setting.set('too_many_quiz_submission_versions', 3)
-      1.times { @quiz_submission.versions.create! }
+      @quiz_submission.versions.create!
       expect(@quiz.assignment.too_many_qs_versions?(submissions)).to be_falsey
 
       2.times { @quiz_submission.versions.create! }

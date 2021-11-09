@@ -29,6 +29,7 @@ describe Autoextend do
       begin
         extension.const_name.to_s.constantize
       rescue NameError
+        nil
       end
 
       # not found via autoloading? maybe it's a migration

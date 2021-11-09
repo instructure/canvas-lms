@@ -141,7 +141,7 @@ describe SearchController, type: :request do
                       { :controller => 'search', :action => 'recipients', :format => 'json', :user_id => @bob.id.to_s, :search => "asdf" })
       json.each { |c| c.delete("avatar_url") }
       expect(json).to eql [
-        { "id" => @bob.id, "pronouns" => nil, "name" => "bob", "pronouns" => nil, "full_name" => "robert", "common_courses" => { @course.id.to_s => ["StudentEnrollment"] }, "common_groups" => { @group.id.to_s => ["Member"] } },
+        { "id" => @bob.id, "pronouns" => nil, "name" => "bob", "full_name" => "robert", "common_courses" => { @course.id.to_s => ["StudentEnrollment"] }, "common_groups" => { @group.id.to_s => ["Member"] } },
       ]
     end
 

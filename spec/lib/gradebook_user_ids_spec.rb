@@ -443,9 +443,7 @@ describe GradebookUserIds do
         fake_student_enrollment2 = course_with_user('StudentViewEnrollment', course: @course, active_all: true)
         fake_student2 = fake_student_enrollment2.user
         fake_student2.update!(sortable_name: "Alpha")
-        # rubocop:disable Rails/SkipsModelValidations
         @assignment.submissions.where(user_id: [@student3]).update_all(late_policy_status: "missing")
-        # rubocop:enable Rails/SkipsModelValidations
         expect(gradebook_user_ids.user_ids[-2..-1]).to eq([fake_student2.id, @fake_student.id])
       end
 
@@ -482,16 +480,12 @@ describe GradebookUserIds do
         end
 
         it "orders the missing user_ids by their sortable_name and user_id" do
-          # rubocop:disable Rails/SkipsModelValidations
           @assignment.submissions.where(user: [@student2, @student3, @student4]).update_all(late_policy_status: "missing")
-          # rubocop:enable Rails/SkipsModelValidations
           expect(gradebook_user_ids.user_ids[0..2]).to eq([@student4.id, @student3.id, @student2.id])
         end
 
         it "puts non-missing, real users in the middle, ordered by their sortable_name and user_id" do
-          # rubocop:disable Rails/SkipsModelValidations
           @assignment.submissions.where(user_id: [@student2]).update_all(late_policy_status: "missing")
-          # rubocop:enable Rails/SkipsModelValidations
           expect(gradebook_user_ids.user_ids[1..3]).to eq([@student1.id, @student4.id, @student3.id])
         end
       end
@@ -516,9 +510,7 @@ describe GradebookUserIds do
         fake_student_enrollment2 = course_with_user('StudentViewEnrollment', course: @course, active_all: true)
         fake_student2 = fake_student_enrollment2.user
         fake_student2.update!(sortable_name: "Alpha")
-        # rubocop:disable Rails/SkipsModelValidations
         @assignment.submissions.where(user_id: [@student3]).update_all(late_policy_status: "late")
-        # rubocop:enable Rails/SkipsModelValidations
         expect(gradebook_user_ids.user_ids[-2..-1]).to eq([fake_student2.id, @fake_student.id])
       end
 
@@ -555,16 +547,12 @@ describe GradebookUserIds do
         end
 
         it "orders the missing user_ids by their sortable_name and user_id" do
-          # rubocop:disable Rails/SkipsModelValidations
           @assignment.submissions.where(user: [@student2, @student3, @student4]).update_all(late_policy_status: "late")
-          # rubocop:enable Rails/SkipsModelValidations
           expect(gradebook_user_ids.user_ids[0..2]).to eq([@student4.id, @student3.id, @student2.id])
         end
 
         it "puts non-late, real users in the middle, ordered by their sortable_name and user_id" do
-          # rubocop:disable Rails/SkipsModelValidations
           @assignment.submissions.where(user_id: [@student2]).update_all(late_policy_status: "late")
-          # rubocop:enable Rails/SkipsModelValidations
           expect(gradebook_user_ids.user_ids[1..3]).to eq([@student1.id, @student4.id, @student3.id])
         end
       end

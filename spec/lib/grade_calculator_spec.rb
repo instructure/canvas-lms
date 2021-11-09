@@ -975,9 +975,7 @@ describe GradeCalculator do
 
         # update_column to avoid callbacks on submission that would trigger the grade calculator.
         # For these specs we want control over when the grade calculator is kicked off
-        # rubocop:disable Rails/SkipsModelValidations
         submission.update_column(:score, assignment_score_pair[1])
-        # rubocop:enable Rails/SkipsModelValidations
       end
 
       # Make sure the world knows about the grades we surreptitiously assigned above
@@ -1005,9 +1003,7 @@ describe GradeCalculator do
       describe 'overall course score' do
         context 'with the percent weighting scheme' do
           before :each do
-            # rubocop:disable Rails/SkipsModelValidations
             @course.update_column(:group_weighting_scheme, 'percent')
-            # rubocop:enable Rails/SkipsModelValidations
             GradeCalculator.new(@student.id, @course).compute_and_save_scores
           end
 
@@ -1119,9 +1115,7 @@ describe GradeCalculator do
 
         context 'with the percent weighting scheme' do
           before :each do
-            # rubocop:disable Rails/SkipsModelValidations
             @course.update_column(:group_weighting_scheme, 'percent')
-            # rubocop:enable Rails/SkipsModelValidations
             GradeCalculator.new(@student.id, @course).compute_and_save_scores
           end
 
@@ -1424,9 +1418,7 @@ describe GradeCalculator do
           @first_period.update!(weight: 25.0)
           @second_period.update!(weight: 75.0)
           # update_all to avoid callbacks on submission that would trigger the grade calculator
-          # rubocop:disable Rails/SkipsModelValidations
           @student.submissions.update_all(score: nil)
-          # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           expect(overall_course_score.current_score).to be_nil
         end
@@ -1435,9 +1427,7 @@ describe GradeCalculator do
           @first_period.update!(weight: 25.0)
           @second_period.update!(weight: 75.0)
           # update_all to avoid callbacks on assignment that would trigger the grade calculator
-          # rubocop:disable Rails/SkipsModelValidations
           @course.assignments.update_all(omit_from_final_grade: true)
-          # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           expect(overall_course_score.final_score).to equal(0.0)
         end
@@ -1446,9 +1436,7 @@ describe GradeCalculator do
           @first_period.update!(weight: 25.0)
           @second_period.update!(weight: 75.0)
           # update_column to avoid callbacks on submission that would trigger the grade calculator
-          # rubocop:disable Rails/SkipsModelValidations
           Submission.where(user: @student, assignment: @assignments[0..2]).update_all(score: nil)
-          # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           # GP1: 0 / 150 * 100 = 0
           # GP2: 131.4 / 150 * 100 = 87.60
@@ -1460,9 +1448,7 @@ describe GradeCalculator do
           @first_period.update!(weight: 25.0)
           @second_period.update!(weight: 75.0)
           # update_column to avoid callbacks on assignment that would trigger the grade calculator
-          # rubocop:disable Rails/SkipsModelValidations
           Assignment.where(id: @assignments[0..2].map(&:id)).update_all(omit_from_final_grade: true)
-          # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           # GP1: 0
           # GP2: (131.4 + 42) / (300 + 100) * 100 = 43.35
@@ -1474,9 +1460,7 @@ describe GradeCalculator do
           @first_period.update!(weight: 25.0)
           @second_period.update!(weight: 75.0)
           # update_all to avoid callbacks on submission that would trigger the grade calculator
-          # rubocop:disable Rails/SkipsModelValidations
           @student.submissions.update_all(score: 0.0)
-          # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           expect(overall_course_score.current_score).to equal(0.0)
         end
@@ -1485,9 +1469,7 @@ describe GradeCalculator do
           @first_period.update!(weight: 25.0)
           @second_period.update!(weight: 75.0)
           # update_all to avoid callbacks on submission that would trigger the grade calculator
-          # rubocop:disable Rails/SkipsModelValidations
           @student.submissions.update_all(score: 0.0)
-          # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           expect(overall_course_score.final_score).to equal(0.0)
         end
@@ -1497,9 +1479,7 @@ describe GradeCalculator do
           @first_period.update!(weight: nil)
           @second_period.update!(weight: nil)
           # update_all to avoid callbacks on submission that would trigger the grade calculator
-          # rubocop:disable Rails/SkipsModelValidations
           @student.submissions.update_all(score: nil)
-          # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           expect(overall_course_score.current_score).to be_nil
         end
@@ -1509,9 +1489,7 @@ describe GradeCalculator do
           @first_period.update!(weight: nil)
           @second_period.update!(weight: nil)
           # update_all to avoid callbacks on assignment that would trigger the grade calculator
-          # rubocop:disable Rails/SkipsModelValidations
           @course.assignments.update_all(omit_from_final_grade: true)
-          # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           expect(overall_course_score.final_score).to equal(0.0)
         end
@@ -1521,9 +1499,7 @@ describe GradeCalculator do
           @first_period.update!(weight: 0.0)
           @second_period.update!(weight: 0.0)
           # update_all to avoid callbacks on submission that would trigger the grade calculator
-          # rubocop:disable Rails/SkipsModelValidations
           @student.submissions.update_all(score: 0.0)
-          # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           expect(overall_course_score.current_score).to equal(0.0)
         end
@@ -1533,9 +1509,7 @@ describe GradeCalculator do
           @first_period.update!(weight: 0.0)
           @second_period.update!(weight: 0.0)
           # update_all to avoid callbacks on submission that would trigger the grade calculator
-          # rubocop:disable Rails/SkipsModelValidations
           @student.submissions.update_all(score: 0.0)
-          # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           expect(overall_course_score.final_score).to equal(0.0)
         end
@@ -1545,9 +1519,7 @@ describe GradeCalculator do
           @first_period.update!(weight: 0.0)
           @second_period.update!(weight: 0.0)
           # update_all to avoid callbacks on submission that would trigger the grade calculator
-          # rubocop:disable Rails/SkipsModelValidations
           @student.submissions.update_all(score: nil)
-          # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           expect(overall_course_score.current_score).to be_nil
         end
@@ -1557,9 +1529,7 @@ describe GradeCalculator do
           @first_period.update!(weight: 0.0)
           @second_period.update!(weight: 0.0)
           # update_all to avoid callbacks on assignment that would trigger the grade calculator
-          # rubocop:disable Rails/SkipsModelValidations
           @course.assignments.update_all(omit_from_final_grade: true)
-          # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           expect(overall_course_score.final_score).to equal(0.0)
         end
@@ -1569,9 +1539,7 @@ describe GradeCalculator do
           @first_period.update!(weight: nil)
           @second_period.update!(weight: nil)
           # update_all to avoid callbacks on submission that would trigger the grade calculator
-          # rubocop:disable Rails/SkipsModelValidations
           @student.submissions.update_all(score: 0.0)
-          # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           expect(overall_course_score.current_score).to equal(0.0)
         end
@@ -1581,9 +1549,7 @@ describe GradeCalculator do
           @first_period.update!(weight: nil)
           @second_period.update!(weight: nil)
           # update_all to avoid callbacks on submission that would trigger the grade calculator
-          # rubocop:disable Rails/SkipsModelValidations
           @student.submissions.update_all(score: 0.0)
-          # rubocop:enable Rails/SkipsModelValidations
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
           expect(overall_course_score.final_score).to equal(0.0)
         end
@@ -1746,10 +1712,7 @@ describe GradeCalculator do
           unposted_final_points: nil,
           unposted_final_score: nil
         }
-        # rubocop:disable Rails/SkipsModelValidations
         initial_scores.update_all(updated_score_attributes)
-        # rubocop:enable Rails/SkipsModelValidations
-
         GradeCalculator.new(@student.id, @course, only_update_points: true).compute_and_save_scores
         @final_scores = Score.where(enrollment: @course.enrollments.find_by(user: @student)).order(id: :asc).to_a
       end

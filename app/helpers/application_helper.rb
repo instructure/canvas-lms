@@ -1168,9 +1168,9 @@ module ApplicationHelper
         include_tools: false
       )
     if include_files_domain_in_csp
-      frame_domains = %w['self'] + frame_domains
-      object_domains = %w['self'] + script_domains
-      script_domains = %w['self' 'unsafe-eval' 'unsafe-inline'] + script_domains
+      frame_domains = ["'self'"] + frame_domains
+      object_domains = ["'self'"] + script_domains
+      script_domains = ["'self'", "'unsafe-eval'", "'unsafe-inline'"] + script_domains
     end
     "frame-src #{frame_domains.join(' ')}; script-src #{script_domains.join(' ')}; object-src #{object_domains.join(' ')}; "
   end

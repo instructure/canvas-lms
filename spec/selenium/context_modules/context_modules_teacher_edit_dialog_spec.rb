@@ -292,7 +292,7 @@ describe "context modules" do
 
     it "still displays due date and points possible after indent change" do
       get "/courses/#{@course.id}/modules"
-      module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
+      add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
       tag = ContentTag.last
 
       def due_date_assertion
@@ -310,7 +310,7 @@ describe "context modules" do
         end
       end
 
-      def points_possible_assertion(module_item, tag)
+      def points_possible_assertion(tag)
         stale_element = true
         attempt = 5
         module_item = f("#context_module_item_#{tag.id}")
@@ -327,15 +327,14 @@ describe "context modules" do
       end
 
       due_date_assertion
-      points_possible_assertion(module_item, tag)
+      points_possible_assertion(tag)
 
       # change indent with arrows
       f("#context_module_item_#{tag.id} .al-trigger").click
       f('.indent_item_link').click
 
-      module_item = f("#context_module_item_#{tag.id}")
       due_date_assertion
-      points_possible_assertion(module_item, tag)
+      points_possible_assertion(tag)
 
       # change indent from edit form
       f("#context_module_item_#{tag.id} .al-trigger").click
@@ -345,9 +344,8 @@ describe "context modules" do
       form = f('#edit_item_form')
       form.submit
 
-      module_item = f("#context_module_item_#{tag.id}")
       due_date_assertion
-      points_possible_assertion(module_item, tag)
+      points_possible_assertion(tag)
     end
   end
 end

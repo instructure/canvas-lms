@@ -226,7 +226,6 @@ class Auditors::GradeChange
     scope.unscope(where: :assignment_id).where("assignment_id IS NULL")
   end
 
-  # rubocop:disable Metrics/BlockLength
   Stream = Audits.stream do
     grades_ar_type = Auditors::ActiveRecord::GradeChangeRecord
     backend_strategy -> { Audits.backend_strategy }
@@ -355,8 +354,6 @@ class Auditors::GradeChange
       }
     end
   end
-  # rubocop:enable Metrics/BlockLength
-
   def self.record(skip_insert: false, submission: nil, override_grade_change: nil, event_type: nil)
     if (submission.blank? && override_grade_change.blank?) || (submission.present? && override_grade_change.present?)
       raise ArgumentError, "Must specify exactly one of submission or override_grade_change"

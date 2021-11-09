@@ -49,6 +49,7 @@ module IncomingMailProcessor
       @imap.logout
       @imap.disconnect
     rescue
+      nil
     end
 
     def each_message(opts = {})

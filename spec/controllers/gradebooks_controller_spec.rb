@@ -1451,7 +1451,6 @@ describe GradebooksController do
             expect(@gradebook_env[:outcome_proficiency]).to eq(@proficiency.as_json)
           end
 
-          # rubocop:disable RSpec/NestedGroups
           describe "with account_level_mastery_scales enabled" do
             before do
               @course_proficiency = outcome_proficiency_model(@course)
@@ -1466,7 +1465,6 @@ describe GradebooksController do
               expect(@gradebook_env[:outcome_proficiency]).to eq(@course_proficiency.as_json)
             end
           end
-          # rubocop:enable RSpec/NestedGroups
         end
 
         describe ".sections" do

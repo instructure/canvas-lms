@@ -70,10 +70,10 @@ module YARD::Templates::Helpers::BaseHelper
       scope_name, resource_name = $1.downcase, $2.gsub('+', ' ')
       link_url("#{scope_name}.html##{resource_name}", args[1] || resource_name)
     elsif args.first.is_a?(String) && args.first == 'Appendix:' && args.size > 1
-      __errmsg = "unable to locate referenced appendix '#{args[1]}'"
+      errmsg = "unable to locate referenced appendix '#{args[1]}'"
 
       unless (appendix = lookup_appendix(args[1].to_s))
-        raise __errmsg
+        raise errmsg
       end
 
       topic, _controller = *lookup_topic(appendix.namespace.to_s)
@@ -83,7 +83,7 @@ module YARD::Templates::Helpers::BaseHelper
         bookmark = "#{appendix.name.to_s.gsub(' ', '+')}-appendix"
         link_url("#{html_file}##{bookmark}", appendix.title)
       else
-        raise __errmsg
+        raise errmsg
       end
 
     # A non-API link, delegate to YARD's HTML linker
@@ -139,16 +139,16 @@ module YARD::Templates::Helpers::HtmlHelper
 
   # override yard-appendix link_appendix
   def link_appendix(ref)
-    __errmsg = "unable to locate referenced appendix '#{ref}'"
+    errmsg = "unable to locate referenced appendix '#{ref}'"
 
     unless (appendix = lookup_appendix(ref.to_s))
-      raise __errmsg
+      raise errmsg
     end
 
     topic, _controller = *lookup_topic(appendix.namespace.to_s)
 
     unless topic
-      raise __errmsg
+      raise errmsg
     end
 
     html_file = "#{topicize topic.first}.html"

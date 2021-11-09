@@ -31,10 +31,7 @@ class CanvadocSessionsController < ApplicationController
       return render_unauthorized_action
     end
 
-    # Denying graders from this endpoint for now because graders should be
-    # grading in SpeedGrader. This also simplifies the enable_annotations opt now
-    # that we don't have to consider grading roles or peer reviewers.
-    return render_unauthorized_action unless submission.user == @current_user
+    return render_unauthorized_action unless submission.grants_right?(@current_user, :read)
     return render_unauthorized_action if submission.assignment.annotatable_attachment_id.blank?
 
     is_draft = submission_attempt == "draft"
@@ -53,6 +50,8 @@ class CanvadocSessionsController < ApplicationController
     if annotation_context.nil?
       return render json: { error: "No annotations associated with that submission_attempt" }, status: :bad_request
     end
+
+    return render_unauthorized_action unless annotation_context.grants_right?(@current_user, :read)
 
     render json: {
       annotation_context_launch_id: annotation_context.launch_id,
@@ -110,7 +109,7 @@ class CanvadocSessionsController < ApplicationController
         if blob["annotation_context"].present?
           opts[:annotation_context] = blob["annotation_context"]
           annotation_context = submission.canvadocs_annotation_contexts.find_by(launch_id: opts[:annotation_context])
-          opts[:read_only] = !annotation_context.grants_right?(@current_user, :readwrite)
+          opts[:read_only] = !annotation_context.grants_right?(@current_user, :annotate)
         end
       end
 

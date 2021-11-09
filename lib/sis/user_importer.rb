@@ -40,8 +40,6 @@ module SIS
       importer.success_count
     end
 
-    private
-
     class Work
       attr_accessor :success_count, :users_to_set_sis_batch_ids,
                     :pseudos_to_set_sis_batch_ids, :users_to_add_account_associations,

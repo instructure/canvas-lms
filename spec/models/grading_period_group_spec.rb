@@ -69,31 +69,25 @@ describe GradingPeriodGroup do
 
     it 'computes scores for active terms' do
       # update_columns to avoid a grade recalculation
-      # rubocop:disable Rails/SkipsModelValidations
       @group.update_columns(weighted: false)
-      # rubocop:enable Rails/SkipsModelValidations
       expect { @group.recompute_scores_for_each_term(true) }.to change {
-        [@first_course, @second_course].map do |course|
-          Enrollment.find_by(course: course, user: @student).computed_current_score
-        end
-      }.from([0.0, 0.0]).to([80.0, 80.0])
+                                                                  [@first_course, @second_course].map do |course|
+                                                                    Enrollment.find_by(course: course, user: @student).computed_current_score
+                                                                  end
+                                                                }.from([0.0, 0.0]).to([80.0, 80.0])
     end
 
     it 'does not computes scores for inactive terms' do
       # update_columns to avoid a grade recalculation
-      # rubocop:disable Rails/SkipsModelValidations
       @group.update_columns(weighted: false)
-      # rubocop:enable Rails/SkipsModelValidations
       expect { @group.recompute_scores_for_each_term(true) }.not_to change {
-        Enrollment.find_by(course: @course_for_deleted_term, user: @student).computed_current_score
-      }
+                                                                      Enrollment.find_by(course: @course_for_deleted_term, user: @student).computed_current_score
+                                                                    }
     end
 
     it 'can be passed enrollment term IDs on which to operate' do
       # update_columns to avoid a grade recalculation
-      # rubocop:disable Rails/SkipsModelValidations
       @group.update_columns(weighted: false)
-      # rubocop:enable Rails/SkipsModelValidations
       ids = [@second_course.enrollment_term_id]
       expect { @group.recompute_scores_for_each_term(true, term_ids: ids) }.to change {
         [@first_course, @second_course].map do |course|
@@ -105,25 +99,21 @@ describe GradingPeriodGroup do
     it 'recomputes grading period scores if passed `true`' do
       assignment = @first_course.assignments.first
       # update_columns to avoid a grade recalculation
-      # rubocop:disable Rails/SkipsModelValidations
       assignment.update_columns(points_possible: 20)
-      # rubocop:enable Rails/SkipsModelValidations
       expect { @group.recompute_scores_for_each_term(true) }.to change {
-        enrollment = Enrollment.find_by(course: @first_course, user: @student)
-        enrollment.computed_current_score(grading_period_id: @period)
-      }.from(80.0).to(40.0)
+                                                                  enrollment = Enrollment.find_by(course: @first_course, user: @student)
+                                                                  enrollment.computed_current_score(grading_period_id: @period)
+                                                                }.from(80.0).to(40.0)
     end
 
     it 'does not recompute grading period scores if passed `false`' do
       assignment = @first_course.assignments.first
       # update_columns to avoid a grade recalculation
-      # rubocop:disable Rails/SkipsModelValidations
       assignment.update_columns(points_possible: 20)
-      # rubocop:enable Rails/SkipsModelValidations
       expect { @group.recompute_scores_for_each_term(false) }.not_to change {
-        enrollment = Enrollment.find_by(course: @first_course, user: @student)
-        enrollment.computed_current_score(grading_period_id: @period)
-      }
+                                                                       enrollment = Enrollment.find_by(course: @first_course, user: @student)
+                                                                       enrollment.computed_current_score(grading_period_id: @period)
+                                                                     }
     end
   end
 

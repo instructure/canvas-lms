@@ -808,7 +808,7 @@ describe 'Submissions API', type: :request do
                       :course_id => @course.to_param,
                       :assignment_id => assignment.to_param
                     }, {
-                      :include => %w(user, submission_comments)
+                      include: %w[user submission_comments]
                     })
 
     expect(json.first['user']).to be_nil

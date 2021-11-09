@@ -73,6 +73,7 @@ class ExternalFeedAggregator
         @logger.info("#{entries.length} new entries added")
         return true
       rescue
+        nil
       end
     end
     false

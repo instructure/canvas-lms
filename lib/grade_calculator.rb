@@ -308,7 +308,7 @@ class GradeCalculator
       score = scores[score_type][:grade]
       full_weight = scores[score_type][:full_weight]
       score = scale_score_up(score, full_weight) if full_weight < 100
-      if score == 0.0 && score_type == :current && grading_period_scores.none?(&:current_score)
+      if score.abs < Float::EPSILON && score_type == :current && grading_period_scores.none?(&:current_score)
         score = nil
       end
       adjusted_scores[score_type][:grade] = score ? score.round(2) : score
