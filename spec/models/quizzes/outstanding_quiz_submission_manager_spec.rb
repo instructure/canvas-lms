@@ -36,17 +36,20 @@ describe Quizzes::OutstandingQuizSubmissionManager do
       expect(@submission.overdue?).to be true
       expect(@submission.needs_grading?).to be true
     end
+
     it "#find_by_quizes" do
       subs = @outstanding.find_by_quiz
       expect(subs.size).to eq 1
       expect(subs.first.id).to eq @submission.id
     end
+
     it 'forces grading to close the submission' do
       subs = @outstanding.find_by_quiz
       @outstanding.grade_by_ids(subs.map(&:id))
       subs = @outstanding.find_by_quiz
       expect(subs.size).to eq 0
     end
+
     it 'grades multiple submissions' do
       sub_count = @outstanding.find_by_quiz.size
       student_count = 2

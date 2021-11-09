@@ -133,6 +133,7 @@ describe "speed grader" do
       # make sure avatar shows up for user comment
       expect(Speedgrader.avatar_comment).to have_attribute('style', "display: inline\;")
     end
+
     context 'Hide Student names checked' do
       after(:each) do
         Speedgrader.uncheck_hide_student_name

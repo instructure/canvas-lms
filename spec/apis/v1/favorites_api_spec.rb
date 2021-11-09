@@ -189,12 +189,14 @@ describe "Favorites API", type: :request do
                :controller => "favorites", :action => "add_favorite_groups", :format => "json", :id => @group_not_yet_fave.id)
       expect(@user.favorites.size).to eql(2) # Added one in before method, one in test
     end
+
     it "lists favorite groups" do
       json = api_call(:get, "/api/v1/users/self/favorites/groups",
                       :controller => "favorites", :action => "list_favorite_groups", :format => "json")
       expect(json[0]['id']).to eql @group_fave.id
       expect(@user.favorites.size).to eql(1)
     end
+
     it "clears favorite groups" do
       expect(@user.favorites.size).to eql(1)
       group_fave_2 = Group.create!(:name => "new_fave", :context => @context)
@@ -206,11 +208,13 @@ describe "Favorites API", type: :request do
                :controller => "favorites", :action => "reset_groups_favorites", :format => "json")
       expect(@user.favorites.size).to eql(0)
     end
+
     it "deletes one favorite group" do
       json = api_call(:delete, "/api/v1/users/self/favorites/groups/#{@group_fave.id}",
                       :controller => "favorites", :action => "remove_favorite_groups", :format => "json", :id => @group_fave.id)
       expect(json['context_type']).to eql("Group")
     end
+
     it "lists all groups if none are favorited" do
       api_call(:delete, "/api/v1/users/self/favorites/groups",
                :controller => "favorites", :action => "reset_groups_favorites", :format => "json")

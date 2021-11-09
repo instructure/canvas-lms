@@ -1206,18 +1206,23 @@ describe Enrollment do
     it "allows StudentEnrollment" do
       expect(Enrollment.typed_enrollment('StudentEnrollment')).to eql(StudentEnrollment)
     end
+
     it "allows TeacherEnrollment" do
       expect(Enrollment.typed_enrollment('TeacherEnrollment')).to eql(TeacherEnrollment)
     end
+
     it "allows TaEnrollment" do
       expect(Enrollment.typed_enrollment('TaEnrollment')).to eql(TaEnrollment)
     end
+
     it "allows ObserverEnrollment" do
       expect(Enrollment.typed_enrollment('ObserverEnrollment')).to eql(ObserverEnrollment)
     end
+
     it "allows DesignerEnrollment" do
       expect(Enrollment.typed_enrollment('DesignerEnrollment')).to eql(DesignerEnrollment)
     end
+
     it "allows not NothingEnrollment" do
       expect(Enrollment.typed_enrollment('NothingEnrollment')).to eql(nil)
     end

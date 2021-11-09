@@ -137,6 +137,7 @@ describe "Outcomes Import API", type: :request do
           stub_ab_config_with({})
           expect(request.call(type: request_type)["error"]).to match(/needs partner_key/i)
         end
+
         it "rejects a partner key that is the empty string" do
           stub_ab_config_with({
                                 partner_id: "instructure",
@@ -383,6 +384,7 @@ describe "Outcomes Import API", type: :request do
         it "requires valid migration id" do
           expect(status_json(migration_id: 1)["error"]).to match(/no content migration matching id/i)
         end
+
         it "check valid migration id" do
           cm_mock = double("content_migration", {
                              id: 2,

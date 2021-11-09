@@ -49,6 +49,7 @@ describe 'ProfileController', type: :request do
         json = call_setting(as_user: @teacher, for_user: user)
         expect(json["short_name"]).to eq("User")
       end
+
       it "returns unauthorized profiles for other students" do
         course_with_teacher(:active_all => true)
         user = user_with_pseudonym
@@ -64,6 +65,7 @@ describe 'ProfileController', type: :request do
         json = call_setting(as_user: user, for_user: user)
         expect(json["short_name"]).to eq("User")
       end
+
       it "returns unauthorized when attempting to access another students profile" do
         user_one = user_with_pseudonym(:active_user => true)
         user_two = user_with_pseudonym(:active_user => true, :user => user_factory)

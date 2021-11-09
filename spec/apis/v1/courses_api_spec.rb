@@ -4534,11 +4534,13 @@ describe ContentImportsController, type: :request do
     @copy_to.reload
     expect(@copy_to.syllabus_body).to eq nil
   end
+
   it "skips copy wiki pages" do
     run_except_copy(:wiki_pages)
     check_counts 1
     expect(@copy_to.wiki_pages.count).to eq 0
   end
+
   each_copy_option do |option, association|
     it "skips copy #{option}" do
       run_except_copy(option)

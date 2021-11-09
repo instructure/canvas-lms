@@ -544,6 +544,7 @@ shared_examples_for "file uploads api without quotas" do
     attachment = Attachment.order(:id).last
     expect(json['upload_url']).to match(/#{attachment.quota_exemption_key}/)
   end
+
   it "ignores context-related quotas in preflight" do
     s3_storage!
     @context.write_attribute(:storage_quota, 0)

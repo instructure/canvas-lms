@@ -64,6 +64,7 @@ describe ReleaseNotesController do
       expect(res.first['id']).to eq(the_note.id)
       expect(res.first['langs']).to be_nil
     end
+
     it 'returns the object with langs with includes[]=langs' do
       the_note = note
       get 'index', params: { includes: ['langs'] }

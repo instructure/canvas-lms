@@ -113,6 +113,7 @@ describe PseudonymsController do
         expect(assigns[:ccs].detect { |cc| cc == @cc }.messages_sent).not_to be_nil
         expect(assigns[:ccs].detect { |cc| cc == @cc }.messages_sent).not_to be_empty
       end
+
       it "sends password-change email case insensitively" do
         pseudonym(@user, :username => 'user1@example.com')
         get 'forgot_password', params: { :pseudonym_session => { :unique_id_forgot => 'USER1@EXAMPLE.COM' } }

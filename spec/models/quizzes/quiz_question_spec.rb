@@ -38,6 +38,7 @@ describe Quizzes::QuizQuestion do
     expect(data[:answers][0][:weight]).to eq 100
     expect(data[:answers][1][:weight]).to eql(0.0)
   end
+
   context "blank answers for fill_in[_multiple]_blank[s] questions" do
     before :once do
       answers = [{ "answer_text" => "True", 'id' => 1, }, { 'id' => 2, "answer_text" => "" }]

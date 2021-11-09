@@ -97,6 +97,7 @@ describe Quizzes::QuizSubmission do
           expect(subject.finished_at_fallback).to eq(now)
         end
       end
+
       it "works with no end_at time" do
         Timecop.freeze(5.minutes.ago) do
           now = Time.zone.now
@@ -1373,14 +1374,17 @@ describe Quizzes::QuizSubmission do
       it "finds an outstanding submissions" do
         expect(@resp.size).to eq 1
       end
+
       it "returns quiz_submission information" do
         expect(@resp.first).to be_a(Quizzes::QuizSubmission)
         expect(@resp.first.id).to eq @submission.id
       end
+
       it "returns user information" do
         expect(@resp.first.user).to be_a(User)
         expect(@resp.first.user.id).to eq @student.id
       end
+
       it "returns items which require grading" do
         expect(@resp.map(&:needs_grading?).all?).to be true
       end
@@ -1921,6 +1925,7 @@ describe Quizzes::QuizSubmission do
       quiz_submission.submission = submission
       expect(quiz_submission.excused?).to eq submission.excused?
     end
+
     it 'functions without valid submission' do
       expect(quiz_submission.excused?).to eq nil
     end

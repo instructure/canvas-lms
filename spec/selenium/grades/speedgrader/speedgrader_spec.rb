@@ -277,6 +277,7 @@ describe 'Speedgrader' do
           expect(rating).not_to include_text('pts')
         end
       end
+
       context 'saving rubric ratings' do
         before :each do
           Speedgrader.rating_by_text("Much Awesome").click

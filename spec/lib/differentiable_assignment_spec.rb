@@ -44,6 +44,7 @@ shared_examples_for "a differentiable_object" do
         allow(differentiable_view).to receive(:where).and_return([:a_record])
         expect(differentiable.visible_to_user?(@user)).to be_truthy
       end
+
       it "without a visibility should be false" do
         allow(differentiable_view).to receive(:where).and_return([])
         expect(differentiable.visible_to_user?(@user)).to be_falsey
@@ -127,6 +128,7 @@ shared_examples_for "a differentiable_object" do
       student_in_course(:course => @course)
       expect(call_filter).to eq :filtered
     end
+
     context "observer" do
       before do
         @observer = User.create(name: "observer")
@@ -136,6 +138,7 @@ shared_examples_for "a differentiable_object" do
         @user = @observer_enrollment.user
         expect(call_filter).to eq :not_filtered
       end
+
       it "filters with observed students" do
         student_in_course(:course => @course)
         @observer_enrollment.update_attribute(:associated_user_id, @user.id)
@@ -148,10 +151,12 @@ shared_examples_for "a differentiable_object" do
       teacher_in_course(:course => @course)
       expect(call_filter).to eq :not_filtered
     end
+
     it "does not filter if no user" do
       @user = nil
       expect(call_filter).to eq :not_filtered
     end
+
     it "does not filter if user not in course" do
       original_user = @user
       # override @user and @course

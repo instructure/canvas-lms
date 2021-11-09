@@ -265,11 +265,13 @@ describe "differentiated_assignments" do
             @user.group_memberships.each(&:destroy!)
             ensure_user_does_not_see_assignment
           end
+
           it "updates when the override is deleted" do
             ensure_user_sees_assignment
             @assignment.assignment_overrides.each(&:destroy!)
             ensure_user_does_not_see_assignment
           end
+
           it "does not return duplicate visibilities with multiple visible sections" do
             enroll_user_in_group(@group_bar, { user: @user })
             give_group_due_date(@assignment, @group_bar)
@@ -389,6 +391,7 @@ describe "differentiated_assignments" do
           it "shows the assignment to the user" do
             ensure_user_sees_assignment
           end
+
           it "does not show deleted assignments" do
             @assignment.destroy
             ensure_user_does_not_see_assignment
