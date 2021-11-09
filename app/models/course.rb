@@ -194,6 +194,8 @@ class Course < ActiveRecord::Base
   has_many :content_migrations, :as => :context, :inverse_of => :context
   has_many :content_exports, :as => :context, :inverse_of => :context
   has_many :epub_exports, -> { where("type IS NULL").order("created_at DESC") }
+
+  has_many :gradebook_filters, inverse_of: :course, dependent: :destroy
   attr_accessor :latest_epub_export
 
   has_many :web_zip_exports, -> { where(type: "WebZipExport") }
@@ -1474,6 +1476,7 @@ class Course < ActiveRecord::Base
   def destroy
     return false if template?
 
+    gradebook_filters.in_batches.destroy_all
     self.workflow_state = 'deleted'
     save!
   end
