@@ -36,7 +36,7 @@ export default function LatePolicyGrade(props) {
     <div style={{display: 'flex', flexDirection: 'row'}}>
       <div style={{paddingRight: '.5rem'}}>
         <div>
-          <Text color="error" as="span">
+          <Text color="danger" as="span">
             {I18n.t('Late Penalty:')}
           </Text>
         </div>
@@ -48,7 +48,7 @@ export default function LatePolicyGrade(props) {
       </div>
       <div style={{flex: 1}}>
         <div id="late-penalty-value">
-          <Text color="error" as="span">
+          <Text color="danger" as="span">
             {pointsDeducted}
           </Text>
         </div>

@@ -29,7 +29,7 @@ export default function InvalidGradeIndicator(props) {
     <div className="Grid__GradeCell__InvalidGrade">
       <Tooltip placement="bottom" tip={I18n.t('This is not a valid grade')} variant="inverse">
         <Button buttonRef={props.elementRef} size="small" variant="icon">
-          <Text color="error">
+          <Text color="danger">
             <IconWarningLine />
           </Text>
         </Button>

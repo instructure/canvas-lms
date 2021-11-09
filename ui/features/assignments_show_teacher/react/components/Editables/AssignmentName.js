@@ -74,7 +74,7 @@ export default class AssignmentName extends React.Component {
   render() {
     const msg = this.state.isValid ? null : (
       <div>
-        <Text color="error">{this.props.invalidMessage('name')}</Text>
+        <Text color="danger">{this.props.invalidMessage('name')}</Text>
       </div>
     )
     return (
