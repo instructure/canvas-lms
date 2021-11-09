@@ -25,7 +25,9 @@ describe "Gradebook - total column menu options" do
   include GradebookCommon
 
   before(:once) { gradebook_data_setup }
+
   before(:each) { user_session(@teacher) }
+
   after(:each) { clear_local_storage }
 
   context "Display as" do

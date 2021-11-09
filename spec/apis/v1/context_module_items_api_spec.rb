@@ -1170,6 +1170,7 @@ describe "Module Items API", type: :request do
       context 'enabled' do
         context 'with override' do
           before { create_section_override_for_assignment(@assignment, { course_section: @new_section }) }
+
           it "lists all assignments" do
             json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
                             :controller => "context_module_items_api", :action => "index", :format => "json",

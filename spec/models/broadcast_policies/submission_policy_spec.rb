@@ -76,6 +76,7 @@ module BroadcastPolicies
 
     describe '#should_dispatch_assignment_submitted_late?' do
       before { allow(submission).to receive(:late?).and_return true }
+
       def wont_send_when
         yield
         expect(policy.should_dispatch_assignment_submitted_late?).to be_falsey

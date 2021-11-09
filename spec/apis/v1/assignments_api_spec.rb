@@ -1089,6 +1089,7 @@ describe AssignmentsApiController, type: :request do
           setup_course
           @course.update(hide_distribution_graphs: true)
         end
+
         it "does not show score statistics to a student" do
           setup_graded_submissions
           user_session @students[0]
@@ -1138,6 +1139,7 @@ describe AssignmentsApiController, type: :request do
           @observers = create_users(10, return_type: :record)
           @observer_enrollments = create_enrollments(@course, @observers, enrollment_type: 'ObserverEnrollment', return_type: :record)
         end
+
         before :each do
           @observer = @observers.pop
           @observer_enrollment = @observer_enrollments.pop
@@ -5071,6 +5073,7 @@ describe AssignmentsApiController, type: :request do
         :description => "public stuff"
       )
     end
+
     context "user does not have the permission to delete the assignment" do
       it "does not delete the assignment" do
         api_call(:delete,

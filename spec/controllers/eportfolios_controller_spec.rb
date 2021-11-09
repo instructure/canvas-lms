@@ -112,6 +112,7 @@ describe EportfoliosController do
 
   describe "GET 'show'" do
     before(:once) { eportfolio }
+
     it "requires authorization if the eportfolio is not public" do
       get 'show', params: { :id => @portfolio.id }
       assert_unauthorized
@@ -272,6 +273,7 @@ describe EportfoliosController do
 
   describe "PUT 'update'" do
     before(:once) { eportfolio }
+
     it "requires authorization" do
       put 'update', params: { :id => @portfolio.id, :eportfolio => { :name => "new title" } }
       assert_unauthorized
@@ -352,6 +354,7 @@ describe EportfoliosController do
 
   describe "DELETE 'destroy'" do
     before(:once) { eportfolio }
+
     it "requires authorization" do
       delete 'destroy', params: { :id => @portfolio.id }
       assert_unauthorized
@@ -371,6 +374,7 @@ describe EportfoliosController do
 
   describe "POST 'reorder_categories'" do
     before(:once) { eportfolio }
+
     it "requires authorization" do
       post 'reorder_categories', params: { :eportfolio_id => @portfolio.id, :order => '' }
       assert_unauthorized
@@ -423,6 +427,7 @@ describe EportfoliosController do
 
   describe "POST 'reorder_entries'" do
     before(:once) { eportfolio }
+
     it "requires authorization" do
       post 'reorder_entries', params: { :eportfolio_id => @portfolio.id, :order => '', :eportfolio_category_id => 1 }
       assert_unauthorized

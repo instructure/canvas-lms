@@ -52,6 +52,7 @@ describe 'BigBlueButton conferences' do
   end
 
   after { close_extra_windows }
+
   context 'when a conference is open' do
     context 'and the conference has no recordings' do
       before(:once) do

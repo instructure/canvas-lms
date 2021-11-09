@@ -198,6 +198,7 @@ describe "speed grader" do
           s.add_comment(author: @teacher2, comment: 'Just a comment by teacher2')
         end
       end
+
       before(:each) do
         Speedgrader.visit(@course.id, @assignment.id)
       end

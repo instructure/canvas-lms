@@ -141,6 +141,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
       before do
         @migrator.start!
       end
+
       it 'must post the context_id to the configured tools' do
         assert_requested(:post, export_url, {
                            body: hash_including(context_id: Lti::Asset.opaque_identifier_for(@course))

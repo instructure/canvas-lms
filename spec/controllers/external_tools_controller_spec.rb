@@ -1539,6 +1539,7 @@ describe ExternalToolsController do
           tool.save!
           enable_developer_key_account_binding!(developer_key)
         end
+
         it_behaves_like 'detects duplication in context' do
           let(:params) do
             {
@@ -2180,6 +2181,7 @@ describe ExternalToolsController do
       before do
         @backup_controller_access_token = controller.instance_variable_get(:@access_token)
       end
+
       after { controller.instance_variable_set :@access_token, @backup_controller_access_token }
 
       it 'returns the lti 1.3 launch url with a session token' do

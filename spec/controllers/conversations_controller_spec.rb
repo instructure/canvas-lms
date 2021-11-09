@@ -647,6 +647,7 @@ describe ConversationsController do
       course_with_student(:active_all => true)
       conversation(:num_other_users => 2)
     end
+
     before(:each) { user_session(@student) }
 
     it "adds recipients" do
@@ -676,6 +677,7 @@ describe ConversationsController do
 
   describe "POST 'remove_messages'" do
     before(:once) { course_with_student(active_all: true) }
+
     before(:each) { user_session(@student) }
 
     it "removes messages" do

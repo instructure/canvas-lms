@@ -45,6 +45,7 @@ describe QuestionBanksController do
 
   describe "move_questions" do
     before(:once) { create_course_with_two_question_banks! }
+
     before(:each) { user_session(@teacher) }
 
     it "copies questions" do

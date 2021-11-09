@@ -177,6 +177,7 @@ describe "communication_channels/confirm.html.erb" do
         @user.update_attribute(:workflow_state, 'creation_pending')
         assign(:pseudonym, @user.pseudonyms.build(:account => Account.default))
       end
+
       include_examples "user registration"
     end
   end

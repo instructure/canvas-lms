@@ -188,6 +188,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
       before do
         @discussion_entry.change_read_state('unread', @discussion_entry.user)
       end
+
       it 'updates the forcedReadState to true' do
         expect(@discussion_entry.read?(@discussion_entry.user)).to be false
         result = run_mutation({ id: @discussion_entry.id, read: true, forcedReadState: true })

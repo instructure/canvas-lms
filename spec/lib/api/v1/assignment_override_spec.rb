@@ -249,6 +249,7 @@ describe Api::V1::AssignmentOverride do
       @quiz = quiz_model course: @course
       @override = create_section_override_for_assignment(@quiz)
     end
+
     subject(:assignment_overrides_json) { test_class.new.assignment_overrides_json([@override], @student) }
 
     it 'delegates to AssignmentOverride.visible_enrollments_for' do

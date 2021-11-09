@@ -166,6 +166,7 @@ describe AlignmentsHelper do
                                    purpose: "grading"
                                  })
       }
+
       let(:string) { outcome_alignment_tag(@course, outcome, graded_alignment) { nil } }
       let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 

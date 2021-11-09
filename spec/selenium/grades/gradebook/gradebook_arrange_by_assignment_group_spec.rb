@@ -28,6 +28,7 @@ describe "Gradebook view menu" do
   include GradebookCommon
 
   before(:once) { gradebook_data_setup }
+
   before(:each) { user_session(@teacher) }
 
   context "sort by assignment group order" do

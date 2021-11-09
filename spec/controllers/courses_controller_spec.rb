@@ -2903,6 +2903,7 @@ describe CoursesController do
 
   describe "POST 'self_unenrollment'" do
     before(:once) { course_with_student(:active_all => true) }
+
     before(:each) { user_session(@student) }
 
     it "unenrolls" do
@@ -3413,6 +3414,7 @@ describe CoursesController do
           @account = Account.default
           course_with_teacher(:account => @account, :active_all => true)
         end
+
         before(:each) { user_session(@teacher) }
 
         it "ignores storage_quota" do

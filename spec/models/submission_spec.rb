@@ -3209,6 +3209,7 @@ describe Submission do
 
       context 'when assignment.due_date is in the past' do
         before { @assignment.update!(due_at: 1.day.ago) }
+
         it { is_expected.to be_grants_right(student, nil, :view_turnitin_report) }
       end
     end
@@ -3219,6 +3220,7 @@ describe Submission do
           turnitin_settings: @assignment.turnitin_settings.merge(originality_report_visibility: 'never')
         )
       end
+
       it { is_expected.not_to be_grants_right(student, nil, :view_turnitin_report) }
     end
   end
@@ -7138,6 +7140,7 @@ describe Submission do
       @assignment.grade_student(@student, score: 10, grader: @teacher, provisional: true)
       @assignment.grade_student(@student, score: 50, grader: @teacher, provisional: true, final: true)
     end
+
     let(:submission) { @assignment.submissions.first }
 
     it 'returns the provisional grade matching the passed-in scorer if provided' do
@@ -7558,16 +7561,19 @@ describe Submission do
 
       context 'when a submission is posted' do
         before { submission.update!(posted_at: Time.zone.now) }
+
         it { is_expected.not_to be_hide_grade_from_student }
       end
     end
 
     context 'when assignment posts automatically' do
       before { assignment.ensure_post_policy(post_manually: false) }
+
       it { is_expected.not_to be_hide_grade_from_student }
 
       context 'when a submission is posted' do
         before { submission.update!(posted_at: Time.zone.now) }
+
         it { is_expected.not_to be_hide_grade_from_student }
       end
 
@@ -7576,6 +7582,7 @@ describe Submission do
           assignment.grade_student(student, score: 5, grader: teacher)
           assignment.hide_submissions
         end
+
         it { is_expected.to be_hide_grade_from_student }
       end
 
@@ -7584,6 +7591,7 @@ describe Submission do
           assignment.update!(submission_types: "online_text_entry")
           assignment.submit_homework(student, submission_type: "online_text_entry", body: "hi")
         end
+
         it { is_expected.not_to be_hide_grade_from_student }
       end
 

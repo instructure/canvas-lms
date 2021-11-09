@@ -766,6 +766,7 @@ describe ApplicationHelper do
     before(:each) do
       @domain_root_account = Account.default
     end
+
     context "with new_users_tutorial feature flag enabled" do
       before(:each) do
         @domain_root_account.enable_feature! :new_user_tutorial

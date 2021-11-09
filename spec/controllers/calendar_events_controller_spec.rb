@@ -43,6 +43,7 @@ describe CalendarEventsController do
     @event = course_event
     stub_conference_plugins
   end
+
   let(:conference_params) do
     { conference_type: 'BigBlueButton', title: 'a conference', user: teacher_enrollment.user }
   end

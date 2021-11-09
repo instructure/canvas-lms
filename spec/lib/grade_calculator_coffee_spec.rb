@@ -367,6 +367,7 @@ describe GradeCalculator do
         before :each do
           set_up_course_for_differentiated_assignments
         end
+
         it "calculates scores based on visible assignments only" do
           # Non-overridden assignments are not visible to this student at all even though she's been graded on them
           # because the assignment is only visible to overrides. Therefore only the (first three) overridden assignments

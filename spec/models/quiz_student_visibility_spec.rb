@@ -146,6 +146,7 @@ describe "differentiated_assignments" do
       course_with_differentiated_assignments_enabled
       add_multiple_sections
     end
+
     context "quiz only visible to overrides" do
       before do
         quiz_with_true_only_visible_to_overrides
@@ -186,6 +187,7 @@ describe "differentiated_assignments" do
           @student = @user
           teacher_in_course(course: @course)
         end
+
         it "does not keep the quiz visible even if there is a grade" do
           @quiz.assignment.grade_student(@student, grade: 10, grader: @teacher)
           Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
@@ -220,6 +222,7 @@ describe "differentiated_assignments" do
       end
       context "user in section with override" do
         before { enroller_user_in_section(@section_foo) }
+
         it "shows the quiz to the user" do
           ensure_user_sees_quiz
         end
@@ -240,6 +243,7 @@ describe "differentiated_assignments" do
       end
       context "user in section with no override" do
         before { enroller_user_in_section(@section_bar) }
+
         it "hides the quiz from the user" do
           ensure_user_does_not_see_quiz
         end
@@ -248,6 +252,7 @@ describe "differentiated_assignments" do
         before do
           enroller_user_in_both_sections
         end
+
         it "shows the quiz to the user" do
           ensure_user_sees_quiz
         end
@@ -258,6 +263,7 @@ describe "differentiated_assignments" do
         quiz_with_false_only_visible_to_overrides
         give_section_foo_due_date(@quiz)
       end
+
       context "user in default section" do
         it "shows the quiz to the user" do
           ensure_user_sees_quiz
@@ -265,12 +271,14 @@ describe "differentiated_assignments" do
       end
       context "user in section with override" do
         before { enroller_user_in_section(@section_foo) }
+
         it "shows the quiz to the user" do
           ensure_user_sees_quiz
         end
       end
       context "user in section with no override" do
         before { enroller_user_in_section(@section_bar) }
+
         it "shows the quiz to the user" do
           ensure_user_sees_quiz
         end
@@ -279,6 +287,7 @@ describe "differentiated_assignments" do
         before do
           enroller_user_in_both_sections
         end
+
         it "shows the quiz to the user" do
           ensure_user_sees_quiz
         end

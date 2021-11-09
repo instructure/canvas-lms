@@ -663,6 +663,7 @@ describe CoursesController, type: :request do
     before :once do
       account_admin_user
     end
+
     it "returns a course list for an observed students" do
       parent = User.create
       add_linked_observer(@me, parent)
@@ -1835,6 +1836,7 @@ describe CoursesController, type: :request do
       @path = "/api/v1/courses/#{@course.id}"
       @params = { :controller => 'courses', :action => 'destroy', :format => 'json', :id => @course.id.to_s }
     end
+
     context "an authorized user" do
       it "is able to delete a course" do
         expect(Auditors::Course).to receive(:record_deleted).once
@@ -1902,6 +1904,7 @@ describe CoursesController, type: :request do
       @path = "/api/v1/courses/#{@course.id}/reset_content"
       @params = { :controller => 'courses', :action => 'reset_content', :format => 'json', :course_id => @course.id.to_s }
     end
+
     context "an authorized user" do
       it "is able to reset a course" do
         @course.root_account.disable_feature!(:granular_permissions_manage_courses)

@@ -162,6 +162,7 @@ describe EpubExportsController do
     before(:each) do
       user_session(@student)
     end
+
     it "returns 404 with the feature disabled" do
       account = Account.default
       account.disable_feature!(:epub_export)

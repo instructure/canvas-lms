@@ -962,6 +962,7 @@ describe AssignmentOverride do
       @override = assignment_override_model
       @overrides = [@override]
     end
+
     subject(:visible_enrollments) do
       AssignmentOverride.visible_enrollments_for(@overrides, @student)
     end
@@ -981,6 +982,7 @@ describe AssignmentOverride do
     before do
       @options = {}
     end
+
     let(:override) do
       assignment_override_model(@options)
     end

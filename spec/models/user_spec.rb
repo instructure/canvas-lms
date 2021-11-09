@@ -1367,6 +1367,7 @@ describe User do
 
   context "tabs_available" do
     before(:once) { Account.default }
+
     it "does not include unconfigured external tools" do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
       tool.course_navigation = { :url => "http://www.example.com", :text => "Example URL" }
@@ -1506,6 +1507,7 @@ describe User do
         @user.avatar_image_url = '1234567890ABCDEF'
         @user.save!
       end
+
       it "raises ArgumentError when uuid nil or blank" do
         expect { @user.clear_avatar_image_url_with_uuid(nil) }.to raise_error(ArgumentError, "'uuid' is required and cannot be blank")
         expect { @user.clear_avatar_image_url_with_uuid('') }.to raise_error(ArgumentError, "'uuid' is required and cannot be blank")
@@ -2307,6 +2309,7 @@ describe User do
 
   describe "quota" do
     before(:once) { user_factory }
+
     it "defaults to User.default_storage_quota" do
       expect(@user.quota).to eql User.default_storage_quota
     end
@@ -2331,6 +2334,7 @@ describe User do
     before :once do
       user_with_pseudonym
     end
+
     let_once(:root_acct1) { Account.create! }
     let_once(:root_acct2) { Account.create! }
 
@@ -2672,11 +2676,13 @@ describe User do
 
     context 'after being set to true' do
       before { allow(user).to receive_messages(preferences: { manual_mark_as_read: true }) }
+
       it     { is_expected.to be_truthy }
     end
 
     context 'after being set to false' do
       before { allow(user).to receive_messages(preferences: { manual_mark_as_read: false }) }
+
       it     { is_expected.to be_falsey }
     end
   end

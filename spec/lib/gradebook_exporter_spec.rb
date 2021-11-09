@@ -244,6 +244,7 @@ describe GradebookExporter do
 
       context "when Final Grade Override is enabled" do
         before(:once) { enable_final_grade_override! }
+
         let_once(:override_headers) { expected_headers.push("Override Score") }
 
         it "includes the Override Score and Override Grade headers when the course has a grading standard" do

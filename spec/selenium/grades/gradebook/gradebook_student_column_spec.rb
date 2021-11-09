@@ -28,6 +28,7 @@ describe "Student column header options" do
   include GradebookSetup
 
   before(:once) { init_course_with_students(3) }
+
   before(:each) { user_session(@teacher) }
 
   context "student name sort by" do

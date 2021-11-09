@@ -456,6 +456,7 @@ describe Account do
     before do
       @a = Account.new
     end
+
     it "is able to specify a list of enabled services" do
       @a.allowed_services = 'twitter'
       expect(@a.service_enabled?(:twitter)).to be_truthy

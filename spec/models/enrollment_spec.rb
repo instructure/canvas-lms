@@ -1900,6 +1900,7 @@ describe Enrollment do
           course_with_student(active_all: true)
         end
       end
+
       include_examples 'term and enrollment dates'
 
       describe 'section dates' do
@@ -1991,6 +1992,7 @@ describe Enrollment do
           course_with_teacher(active_all: true)
         end
       end
+
       include_examples 'term and enrollment dates'
     end
 

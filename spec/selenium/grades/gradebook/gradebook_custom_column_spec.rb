@@ -25,6 +25,7 @@ describe "Gradebook - custom columns" do
   include GradebookCommon
 
   before(:once) { gradebook_data_setup }
+
   before(:each) { user_session(@teacher) }
 
   def custom_column(opts = {})
