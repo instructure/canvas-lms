@@ -1319,11 +1319,13 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def mark_submitted_assignments(user, assignments)
-    submitted_ids = Submission.active.where("submission_type IS NOT NULL")
-                              .where(user_id: user, assignment_id: assignments)
-                              .pluck(:assignment_id)
-    assignments.each do |assignment|
-      assignment.user_submitted = submitted_ids.include? assignment.id
+    Shard.partition_by_shard(assignments) do |shard_assignments|
+      submitted_ids = Submission.active.where("submission_type IS NOT NULL")
+                                .where(user_id: user, assignment_id: shard_assignments)
+                                .pluck(:assignment_id)
+      shard_assignments.each do |assignment|
+        assignment.user_submitted = submitted_ids.include? assignment.id
+      end
     end
   end
 
