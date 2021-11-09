@@ -135,14 +135,16 @@ describe('RCEWrapper', () => {
         remove: elem => {
           elem.remove()
         },
-        doc: document.createElement('div')
+        doc: document
       },
       selection: {
         getEnd: () => {
           return 0
         },
         getNode: () => {
-          return null
+          const div = document.createElement('div')
+          document.body.appendChild(div)
+          return div
         },
         getContent: () => {
           return ''
@@ -201,6 +203,7 @@ describe('RCEWrapper', () => {
       ++failedCount
     }
     document.body.innerHTML = ''
+    sinon.reset()
   })
 
   after(() => {
@@ -339,9 +342,18 @@ describe('RCEWrapper', () => {
       contentInsertion.insertLink.restore()
     })
 
+    it('inserts math equations', () => {
+      const tex = 'y = x^2'
+      const dbl_encoded_tex = window.encodeURIComponent(window.encodeURIComponent(tex))
+      const img_html = `<img alt="LaTeX: ${tex}" title="${tex}" class="equation_image" data-equation-content="${tex}" src="/equation_images/${dbl_encoded_tex}?scale=1">`
+      sinon.stub(contentInsertion, 'insertContent')
+      instance.insertMathEquation(tex)
+      assert.ok(contentInsertion.insertContent.calledWith(editor, img_html))
+    })
+
     describe('checkReadyToGetCode', () => {
       afterEach(() => {
-        editor.dom.doc = document.createElement('div') // reset
+        editor.dom.doc.body.innerHTML = ''
       })
       it('returns true if there are no elements with data-placeholder-for attributes', () => {
         assert.ok(instance.checkReadyToGetCode(() => {}))
@@ -350,7 +362,7 @@ describe('RCEWrapper', () => {
       it('calls promptFunc if there is an element with data-placeholder-for attribute', () => {
         const placeholder = document.createElement('img')
         placeholder.setAttribute('data-placeholder-for', 'image1')
-        editor.dom.doc.appendChild(placeholder)
+        editor.dom.doc.body.appendChild(placeholder)
         const spy = sinon.spy()
         instance.checkReadyToGetCode(spy)
         sinon.assert.calledWith(
@@ -362,7 +374,7 @@ describe('RCEWrapper', () => {
       it('returns true if promptFunc returns true', () => {
         const placeholder = document.createElement('img')
         placeholder.setAttribute('data-placeholder-for', 'image1')
-        editor.dom.doc.appendChild(placeholder)
+        editor.dom.doc.body.appendChild(placeholder)
         const stub = sinon.stub().returns(true)
         assert.ok(instance.checkReadyToGetCode(stub))
       })
@@ -370,7 +382,7 @@ describe('RCEWrapper', () => {
       it('returns false if promptFunc returns false', () => {
         const placeholder = document.createElement('img')
         placeholder.setAttribute('data-placeholder-for', 'image1')
-        editor.dom.doc.appendChild(placeholder)
+        editor.dom.doc.body.appendChild(placeholder)
         const stub = sinon.stub().returns(false)
         assert.ok(!instance.checkReadyToGetCode(stub))
       })
@@ -576,7 +588,7 @@ describe('RCEWrapper', () => {
       it('removes placeholders that match the given name', () => {
         const placeholder = document.createElement('img')
         placeholder.setAttribute('data-placeholder-for', 'image1')
-        editor.dom.doc.appendChild(placeholder)
+        editor.dom.doc.body.appendChild(placeholder)
         instance.removePlaceholders('image1')
         assert.ok(!editor.dom.doc.querySelector(`[data-placeholder-for="image1"]`))
       })
@@ -586,7 +598,7 @@ describe('RCEWrapper', () => {
         placeholder.setAttribute('data-placeholder-for', 'image1')
         const placeholder2 = document.createElement('img')
         placeholder2.setAttribute('data-placeholder-for', 'image2')
-        editor.dom.doc.appendChild(placeholder2)
+        editor.dom.doc.body.appendChild(placeholder2)
         instance.removePlaceholders('image1')
         assert.ok(!editor.dom.doc.querySelector(`[data-placeholder-for="image1"]`))
         assert.ok(editor.dom.doc.querySelector(`[data-placeholder-for="image2"]`))
@@ -636,7 +648,6 @@ describe('RCEWrapper', () => {
       })
 
       it('inserts embed code', () => {
-        sinon.stub(contentInsertion, 'insertContent')
         instance.insertEmbedCode('embed me!')
         assert(insertedSpy.called)
       })

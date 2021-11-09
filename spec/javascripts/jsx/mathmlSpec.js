@@ -231,52 +231,21 @@ test('getImageEquationText returns undefined if it is not an equation image', ()
   equal(mathImageHelper.getImageEquationText(img), undefined)
 })
 
-test('catchEquationImages only processes loaded images', assert => {
-  const done = assert.async()
+test('catchEquationImages processes equation images', () => {
   const root = document.getElementById('fixtures')
   root.innerHTML = `
-    <img id="i1"
-      class="equation_image"
-      src="https://www.instructure.com/themes/instructure_blog/images/logo.svg?_time=${Date.now()}"
-    >
     <img id="i2"
       class="equation_image"
       src="data:image/gif;base64,R0lGODdhDAAMAIABAMzMzP///ywAAAAADAAMAAACFoQfqYeabNyDMkBQb81Uat85nxguUAEAOw=="
     >
-  `
-
-  window.setTimeout(() => {
-    mathImageHelper.catchEquationImages(root)
-    equal(document.querySelectorAll('img[mathjaxified]').length, 1)
-    done()
-  }, 0)
-})
-
-test('catchEquationImages defers processing images until loaded', assert => {
-  const done = assert.async()
-  const root = document.getElementById('fixtures')
-  const spy = sinon.spy(mathImageHelper, 'dispatchProcessNewMathOnLoad')
-  root.innerHTML = `
-    <img id="i1"
+    <img id="i2"
       class="equation_image"
-      data-equation-content="x"
-      src="https://www.instructure.com/themes/instructure_blog/images/logo.svg?_time=${Date.now()}"
+      src="http://localhost:3000/equation_images/17?scale=1.5"
     >
   `
   mathImageHelper.catchEquationImages(root)
-  equal(document.querySelectorAll('img[mathjaxified]').length, 0)
-  equal(spy.callCount, 0)
-  document
-    .getElementById('i1')
-    .setAttribute(
-      'src',
-      'data:image/gif;base64,R0lGODdhDAAMAIABAMzMzP///ywAAAAADAAMAAACFoQfqYeabNyDMkBQb81Uat85nxguUAEAOw=='
-    )
-
-  window.setTimeout(() => {
-    equal(spy.callCount, 1)
-    done()
-  }, 0)
+  equal(document.querySelectorAll('img[mathjaxified]').length, 1)
+  equal(document.querySelector('.math_equation_latex').textContent, '\\(17\\)')
 })
 
 test('removeStrayEquationImages only removes tagged images', () => {
