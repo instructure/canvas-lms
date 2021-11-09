@@ -17,145 +17,48 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+module MicrosoftSync::GraphService::GroupsEndpoints::SpecHelper
+  extend self
+
+  SAMPLE_RESPONSES_CODES_BODIES_HEADERS = {
+    success: [204, nil],
+    error400: [400, 'bad'],
+    error500: [500, 'bad2'],
+    throttled: [429, 'badthrottled'],
+    throttled123: [429, 'badthrottled', { 'Retry-After' => '123' }],
+    throttled456: [429, 'badthrottled', { 'Retry-After' => '456' }],
+
+    add_duplicate: [400, { error: { code: "Request_BadRequest", message: "One or more added object references already exist for the following modified properties: 'members'." } }],
+    add_owners_quota_exceeded: [403, { error: { code: "Directory_QuotaExceeded", message: "Unable to perform operation as '121' would exceed the maximum quota count '100' for forward-link owners." } }],
+    add_members_quota_exceeded: [403, { error: { code: "Directory_QuotaExceeded", message: "Unable to perform operation as '121' would exceed the maximum quota count '100' for forward-link members." } }],
+    add_nonexistent_users: [404, { error: { code: "Request_ResourceNotFound", message: "Resource 'af3c8a2b-d61a-41d4-b0c1-9b185548d991' does not exist or one of its queried reference-property objects are not present." } }],
+
+    remove_missing: [404, { error: { code: "Request_ResourceNotFound", msg: "Resource '12345689-1212-1212-1212-abc212121212' does not exist or one of its queried reference-property objects are not present." } }],
+    # This style seems to happen if we remove with the API after (right after?) removing from the UI:
+    remove_missing2: [400, { error: { code: "Request_BadRequest", message: "One or more removed object references do not exist for the following modified properties: 'members'." } }],
+    remove_last_owner: [400, { error: { code: "Request_BadRequest", message: "The group must have at least one owner, hence this owner cannot be removed." } }],
+  }.freeze
+
+  def build_batch_response_body(request_ids, _batch_request_types)
+    responses = batch_response_types.zip(request_ids).map do |type, req_id|
+      code, body, headers = SAMPLE_RESPONSES_CODES_BODIES_HEADERS[type] || raise("bad type #{type}")
+      { id: req_id, status: code, body: body, headers: headers }.compact
+    end
+    { responses: responses }
+  end
+
+  def json_response_from_sample(type)
+    json_response(*SAMPLE_RESPONSES_CODES_BODIES_HEADERS[type])
+  end
+
+  def status_code_for_sample_type(type)
+    SAMPLE_RESPONSES_CODES_BODIES_HEADERS[type].first || raise('bad type')
+  end
+end
+
 describe MicrosoftSync::GraphService::GroupsEndpoints do
+  include MicrosoftSync::GraphService::GroupsEndpoints::SpecHelper
   include_context 'microsoft_sync_graph_service_endpoints'
-
-  def succ(id)
-    { id: id, status: 204, body: nil }
-  end
-
-  def err(id)
-    { id: id, status: 400, body: "bad" }
-  end
-
-  def err2(id)
-    { id: id, status: 500, body: "bad2" }
-  end
-
-  def throttled(id, retry_after = nil)
-    resp = { id: id, status: 429, body: "badthrottled" }
-    resp[:headers] = { 'Retry-After' => retry_after.to_s } if retry_after
-    resp
-  end
-
-  shared_examples_for 'a batch request that fails' do
-    it 'raises an error with a message with the codes/bodies' do
-      expected_message = "Batch of #{bad_codes.count}: codes #{bad_codes}, bodies #{bad_bodies.inspect}"
-      expect { subject }.to raise_error(expected_error, expected_message) do |e|
-        expect(e).to be_a_microsoft_sync_public_error(/while making a batch request/)
-      end
-    end
-
-    it 'increments statsd counters based on the responses' do
-      expect { subject }.to raise_error(expected_error)
-
-      codes.each do |type, codes_list|
-        codes_list = [codes_list].flatten
-        codes_list.uniq.each do |code|
-          expect(InstStatsd::Statsd).to have_received(:count).once.with(
-            "microsoft_sync.graph_service.batch.#{type}", codes_list.count(code), tags: {
-              msft_endpoint: endpoint_name, status: code, extra_tag: 'abc'
-            }
-          )
-        end
-      end
-    end
-  end
-
-  shared_examples_for 'a members/owners batch request that can fail' do
-    let(:ignored_code) { ignored_members_m1_response[:status] }
-    let(:expected_error) { MicrosoftSync::GraphService::Http::BatchRequestFailed }
-
-    context 'a batch request with an errored subrequest' do
-      it_behaves_like 'a batch request that fails' do
-        let(:bad_codes) { [400] }
-        let(:bad_bodies) { %w[bad] }
-        let(:codes) { { success: [204, 204], error: 400, ignored: ignored_code } }
-        let(:batch_responses) do
-          [ignored_members_m1_response, succ('members_m2'), err('owners_o1'), succ('owners_o2')]
-        end
-      end
-    end
-
-    context 'a batch request with different types of errored subrequests' do
-      it_behaves_like 'a batch request that fails' do
-        let(:bad_codes) { [400, 400, 500] }
-        let(:bad_bodies) { %w[bad bad bad2] }
-        let(:codes) { { success: 204, error: [400, 400, 500] } }
-        let(:batch_responses) do
-          [err('members_m1'), err('members_m2'), err2('owners_o1'), succ('owners_o2')]
-        end
-      end
-    end
-
-    context 'a batch request with two throttled subrequests' do
-      let(:batch_responses) do
-        [
-          ignored_members_m1_response,
-          throttled('members_m2', retry_delay1), throttled('owners_o1', retry_delay2),
-          succ('owners_o2')
-        ]
-      end
-
-      let(:retry_delay1) { nil }
-      let(:retry_delay2) { nil }
-
-      it_behaves_like 'a batch request that fails' do
-        let(:bad_codes) { [429, 429] }
-        let(:bad_bodies) { %w[badthrottled badthrottled] }
-        let(:codes) { { success: 204, throttled: [429, 429], ignored: ignored_code } }
-        let(:expected_error) { MicrosoftSync::GraphService::Http::BatchRequestThrottled }
-      end
-
-      context 'when no response has a retry delay' do
-        it 'raises an error with retry_after_delay of nil' do
-          expect { subject }.to raise_error(MicrosoftSync::Errors::Throttled) do |e|
-            expect(e.retry_after_seconds).to eq(nil)
-          end
-        end
-      end
-
-      context 'when one response has a retry delay' do
-        let(:retry_delay1) { '1.23' }
-
-        it 'raises an error with that retry delay' do
-          expect { subject }.to raise_error { |e| expect(e.retry_after_seconds).to eq(1.23) }
-        end
-      end
-
-      context 'when both responses have a retry delay' do
-        let(:retry_delay1) { '1.23' }
-        let(:retry_delay2) { '2.34' }
-
-        it 'raises an error with the greater retry delay' do
-          expect { subject }.to raise_error { |e| expect(e.retry_after_seconds).to eq(2.34) }
-        end
-      end
-    end
-
-    context 'a batch request with throttled and errored subrequests' do
-      let(:bad_codes) { [400, 429] }
-      let(:bad_bodies) { %w[bad badthrottled] }
-      let(:codes) { { success: 204, error: 400, throttled: 429, ignored: ignored_code } }
-      let(:batch_responses) do
-        [
-          ignored_members_m1_response,
-          err('members_m2'), throttled('owners_o1'), succ('owners_o2')
-        ]
-      end
-      let(:expected_error) { MicrosoftSync::GraphService::Http::BatchRequestThrottled }
-
-      it_behaves_like 'a batch request that fails'
-
-      context 'when the overall response is a 424' do
-        let(:batch_overall_response_code) { 424 }
-
-        it_behaves_like 'a batch request that fails'
-      end
-    end
-  end
-
-  #### INDIVIDUAL METHODS / ENDPOINTS
 
   describe '#update_group' do
     subject { endpoints.update('msgroupid', abc: { def: 'ghi' }) }
@@ -181,8 +84,8 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     let(:members) { Set.new %w[m1 m2] }
     let(:owners) { Set.new %w[o1 o2] }
 
-    let(:http_method) { :patch }
     let(:url) { 'https://graph.microsoft.com/v1.0/groups/msgroupid' }
+    let(:http_method) { :patch }
     let(:with_params) { { body: req_body } }
     let(:req_body) do
       {
@@ -255,15 +158,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
 
     %w[members owners].each do |members_or_owners|
       context "when the PATCH endpoint returns a '#{members_or_owners} quota exceeded' error" do
-        let(:response) do
-          {
-            status: 403,
-            body: {
-              code: "Directory_QuotaExceeded",
-              message: "Unable to perform operation as '121' would exceed the maximum quota count '100' for forward-link '#{members_or_owners}'.",
-            }.to_json
-          }
-        end
+        let(:response) { json_response_from_sample(:"add_#{members_or_owners}_quota_exceeded") }
 
         it 'falls back to the batch api' do
           expect(endpoints).to receive(:add_users_via_batch)
@@ -273,129 +168,21 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
       end
     end
 
-    context 'when using JSON batching because some users already exist' do
+    context 'when some users already exist' do
       let(:response) { { status: 400, body: 'One or more added object references already exist' } }
-      let(:batch_overall_response_code) { 200 }
-      let(:batch_url) { 'https://graph.microsoft.com/v1.0/$batch' }
-      let(:batch_method) { :post }
-      let(:batch_body) do
-        {
-          requests: [
-            {
-              id: "members_m1", url: "/groups/msgroupid/members/$ref", method: "POST",
-              body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/m1" },
-              headers: { "Content-Type": "application/json" }
-            },
-            {
-              id: "members_m2", url: "/groups/msgroupid/members/$ref", method: "POST",
-              body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/m2" },
-              headers: { "Content-Type": "application/json" }
-            },
-            {
-              id: "owners_o1", url: "/groups/msgroupid/owners/$ref", method: "POST",
-              body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/o1" },
-              headers: { "Content-Type": "application/json" }
-            },
-            {
-              id: "owners_o2", url: "/groups/msgroupid/owners/$ref", method: "POST",
-              body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/o2" },
-              headers: { "Content-Type": "application/json" }
-            }
-          ]
-        }
+
+      it 'falls back to the batch api' do
+        expect(endpoints).to receive(:add_users_via_batch)
+          .with('msgroupid', members, owners).and_return('foo')
+        expect(subject).to eq('foo')
       end
 
-      def dupe(id)
-        err_msg = "One or more added object references already exist for the following modified properties: 'members'."
-        { id: id, status: 400, body: { error: { code: "Request_BadRequest", message: err_msg } } }
-      end
-
-      before do
-        stub_request(batch_method, batch_url).with(body: batch_body)
-                                             .to_return(json_response(batch_overall_response_code, responses: batch_responses))
-      end
-
-      context 'when all are successfully added' do
-        let(:batch_responses) do
-          [succ('members_m1'), succ('members_m2'), succ('owners_o1'), succ('owners_o2')]
-        end
-
-        it { is_expected.to eq(nil) }
-
-        it 'passes along the quota used to run_batch' do
-          expect(endpoints.http).to \
-            receive(:run_batch).with(anything, anything, hash_including(quota: [4, 4]))
-                               .and_call_original
-          subject
-        end
-
-        it 'increments the "expected" counter for the first request' do
-          subject
-          expect(InstStatsd::Statsd).to have_received(:increment)
-            .with('microsoft_sync.graph_service.expected',
-                  tags: hash_including(msft_endpoint: 'patch_groups'))
-        end
-      end
-
-      context 'when some owners were already in the group' do
-        let(:batch_responses) do
-          [succ('members_m1'), succ('members_m2'), succ('owners_o1'), dupe('owners_o2')]
-        end
-
-        it 'returns a hash with an array with those users' do
-          expect(subject.transform_values(&:sort)).to eq(owners: %w[o2])
-        end
-      end
-
-      context 'when some members were already in the group' do
-        let(:batch_responses) do
-          [dupe('members_m1'), dupe('members_m2'), succ('owners_o1'), succ('owners_o2')]
-        end
-
-        it 'returns a hash with an array with those users' do
-          expect(subject.transform_values(&:sort)).to eq(members: %w[m1 m2])
-        end
-      end
-
-      context 'when some members and owners were already in the group' do
-        let(:batch_responses) do
-          [dupe('members_m1'), succ('members_m2'), dupe('owners_o1'), dupe('owners_o2')]
-        end
-
-        it 'returns a hash with arrays with those users' do
-          expect(subject.transform_values(&:sort)).to eq(members: %w[m1], owners: %w[o1 o2])
-        end
-      end
-
-      %w[members owners].each do |members_or_owners|
-        context "when the API returns a '#{members_or_owners} quota exceeded' error" do
-          let(:batch_responses) do
-            [
-              dupe('members_m1'),
-              succ('members_m2'),
-              succ('owners_m1'),
-              { id: 'owners_m2', status: 403, body: msft_api_error_body }
-            ]
-          end
-
-          let(:msft_api_error_body) do
-            {
-              code: "Directory_QuotaExceeded",
-              message: "Unable to perform operation as '121' would exceed the maximum quota count '100' for forward-link '#{members_or_owners}'.",
-            }
-          end
-
-          it "raises an Errors::#{members_or_owners.capitalize}QuotaExceeded error" do
-            expect { subject }.to raise_error(
-              "MicrosoftSync::Errors::#{members_or_owners.capitalize}QuotaExceeded".constantize
-            )
-          end
-        end
-      end
-
-      it_behaves_like 'a members/owners batch request that can fail' do
-        let(:endpoint_name) { 'group_add_users' }
-        let(:ignored_members_m1_response) { dupe('members_m1') }
+      it 'increments the "expected" counter' do
+        allow(endpoints).to receive(:add_users_via_batch)
+        subject
+        expect(InstStatsd::Statsd).to have_received(:increment)
+          .with('microsoft_sync.graph_service.expected',
+                tags: hash_including(msft_endpoint: 'patch_groups'))
       end
     end
   end
@@ -421,107 +208,224 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     end
   end
 
-  describe '#remove_users_ignore_missing' do
+  #### BATCH ENDPOINTS ###
+
+  # Sets `batch_response_types` and `status` and expects subject to use those.
+  # Tests that the proper error is raised and that it increments the statsd counters
+  # for each subresponse type
+  shared_examples_for 'a members/owners batch request that can fail' do |ignored_type:, endpoint_name:|
+    ignored_code = MicrosoftSync::GraphService::GroupsEndpoints::SpecHelper
+                   .status_code_for_sample_type(ignored_type)
+
+    {
+      [ignored_type, :success, :error400, :success] => {
+        throttled: false,
+        bad_codes: [400], bad_bodies: %w[bad],
+        statsd_codes: { success: [204, 204], error: 400, ignored: ignored_code }
+      },
+      # Mixed error types:
+      %i[success error400 error400 error500] => {
+        throttled: false,
+        bad_codes: [400, 400, 500], bad_bodies: %w[bad bad bad2],
+        statsd_codes: { success: [204], error: [400, 400, 500] },
+      },
+      [ignored_type, :throttled, :throttled, :success] => {
+        throttled: true,
+        bad_codes: [429, 429], bad_bodies: %w[badthrottled badthrottled],
+        statsd_codes: { success: 204, throttled: [429, 429], ignored: ignored_code },
+        retry_delay: nil
+      },
+      [ignored_type, :throttled, :throttled123, :success] => {
+        throttled: true,
+        bad_codes: [429, 429], bad_bodies: %w[badthrottled badthrottled],
+        statsd_codes: { success: 204, throttled: [429, 429], ignored: ignored_code },
+        retry_delay: 123
+      },
+      [ignored_type, :throttled123, :throttled456, :success] => {
+        throttled: true,
+        bad_codes: [429, 429], bad_bodies: %w[badthrottled badthrottled],
+        statsd_codes: { success: 204, throttled: [429, 429], ignored: ignored_code },
+        # Uses the greater retry delay:
+        retry_delay: 456
+      },
+      [ignored_type, :error400, :throttled, :success] => {
+        throttled: true,
+        bad_codes: [400, 429], bad_bodies: %w[bad badthrottled],
+        statsd_codes: { success: 204, error: 400, throttled: 429, ignored: ignored_code },
+      },
+    }.each do |response_types, params|
+      context "when batch response types are #{response_types.inspect}" do
+        let(:batch_response_types) { response_types }
+
+        it 'raises an error with a message with the codes/bodies' do
+          expected_error = if params[:throttled]
+                             MicrosoftSync::GraphService::Http::BatchRequestThrottled
+                           else
+                             MicrosoftSync::GraphService::Http::BatchRequestFailed
+                           end
+          expected_message = "Batch of #{params[:bad_codes].count}: " \
+                             "codes #{params[:bad_codes]}, bodies #{params[:bad_bodies].inspect}"
+          expect { subject }.to raise_error(expected_error, expected_message) do |e|
+            expect(e).to be_a_microsoft_sync_public_error(/while making a batch request/)
+          end
+        end
+
+        it 'increments statsd counters based on the responses' do
+          expect { subject }.to raise_error(/Batch of.*codes/)
+
+          params[:statsd_codes].each do |type, codes_list|
+            codes_list = [codes_list].flatten
+            codes_list.uniq.each do |code|
+              expect(InstStatsd::Statsd).to have_received(:count).once.with(
+                "microsoft_sync.graph_service.batch.#{type}", codes_list.count(code), tags: {
+                  msft_endpoint: endpoint_name, status: code, extra_tag: 'abc'
+                }
+              )
+            end
+          end
+        end
+
+        if params[:retry_relay]
+          it 'raises an error with the proper retry delay' do
+            expect { subject }.to raise_error(e) do
+              expect(e.retry_after_seconds).to eq(params[:retry_delay])
+            end
+          end
+        end
+      end
+    end
+  end
+
+  describe '#add_users_via_batch' do
     subject do
-      endpoints.remove_users_ignore_missing('msgroupid', members: %w[m1 m2], owners: %w[o1 o2])
+      endpoints.add_users_via_batch('msgroupid', %w[m1 m2], %w[o1 o2])&.transform_values(&:sort)
     end
 
     let(:url) { 'https://graph.microsoft.com/v1.0/$batch' }
     let(:http_method) { :post }
-    let(:with_params) do
-      {
-        body: {
-          requests: [
-            { id: "members_m1", url: "/groups/msgroupid/members/m1/$ref", method: "DELETE" },
-            { id: "members_m2", url: "/groups/msgroupid/members/m2/$ref", method: "DELETE" },
-            { id: "owners_o1", url: "/groups/msgroupid/owners/o1/$ref", method: "DELETE" },
-            { id: "owners_o2", url: "/groups/msgroupid/owners/o2/$ref", method: "DELETE" }
-          ]
-        }
-      }
-    end
-    let(:response_body) { { responses: batch_responses } }
-    let(:batch_responses) { [] }
-    let(:status) { batch_overall_response_code }
-    let(:batch_overall_response_code) { 200 }
-
-    def missing(id)
-      err_msg = "Resource '12345689-1212-1212-1212-abc212121212' does not exist or one of " \
-                "its queried reference-property objects are not present."
-      { id: id, status: 404, body: { error: { code: "Request_ResourceNotFound", msg: err_msg } } }
-    end
-
-    # This style seems to happen if we remove with the API after (right after?) removing from the UI
-    def missing2(id)
-      msg = "One or more removed object references do not exist for the following " \
-            "modified properties: 'members'."
-      { id: id, status: 400, body: { error: { code: "Request_BadRequest", message: msg } } }
+    let(:with_params) { { body: { requests: batch_requests } } }
+    let(:batch_requests) do
+      [
+        {
+          id: "members_m1", url: "/groups/msgroupid/members/$ref", method: "POST",
+          body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/m1" },
+          headers: { "Content-Type": "application/json" }
+        },
+        {
+          id: "members_m2", url: "/groups/msgroupid/members/$ref", method: "POST",
+          body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/m2" },
+          headers: { "Content-Type": "application/json" }
+        },
+        {
+          id: "owners_o1", url: "/groups/msgroupid/owners/$ref", method: "POST",
+          body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/o1" },
+          headers: { "Content-Type": "application/json" }
+        },
+        {
+          id: "owners_o2", url: "/groups/msgroupid/owners/$ref", method: "POST",
+          body: { "@odata.id": "https://graph.microsoft.com/v1.0/directoryObjects/o2" },
+          headers: { "Content-Type": "application/json" }
+        },
+      ]
     end
 
-    def last_owner_removed(id)
-      msg = "The group must have at least one owner, hence this owner cannot be removed."
-      { id: id, status: 400, body: { error: { code: "Request_BadRequest", message: msg } } }
+    let(:status) { 200 }
+    let(:response_body) { build_batch_response_body(request_ids, batch_response_types) }
+    let(:batch_response_types) { [] }
+    let(:request_ids) { %w[members_m1 members_m2 owners_o1 owners_o2] }
+
+    it_behaves_like 'a members/owners batch request that can fail',
+                    ignored_type: :add_duplicate, endpoint_name: 'group_add_users'
+
+    it 'passes along the quota used to run_batch' do
+      expect(endpoints.http).to \
+        receive(:run_batch).with(anything, anything, hash_including(quota: [4, 4]))
+                           .and_call_original
+      subject
     end
 
-    context 'when all are successfully removed' do
-      let(:batch_responses) do
-        [succ('members_m1'), succ('members_m2'), succ('owners_o1'), succ('owners_o2')]
-      end
+    {
+      # all are successfully added:
+      %i[success success success success] => nil,
+      # some owners were already in the group:
+      %i[success success success add_duplicate] => { owners: %w[o2] },
+      # some members were already in the group:
+      %i[add_duplicate add_duplicate success success] => { members: %w[m1 m2] },
+      # some members and owners were already in the group:
+      %i[add_duplicate success add_duplicate add_duplicate] =>
+        { members: %w[m1], owners: %w[o1 o2] },
+      %i[add_duplicate success success add_owners_quota_exceeded] =>
+        MicrosoftSync::Errors::OwnersQuotaExceeded,
+      %i[add_duplicate success success add_members_quota_exceeded] =>
+        MicrosoftSync::Errors::MembersQuotaExceeded,
+    }.each do |types, result|
+      context "when the batch responses are: #{types.inspect}" do
+        let(:batch_response_types) { types }
 
-      it { is_expected.to eq(nil) }
-
-      it 'passes along the quota used to run_batch' do
-        expect(endpoints.http).to \
-          receive(:run_batch).with(anything, anything, hash_including(quota: [4, 4]))
-                             .and_call_original
-        subject
-      end
-    end
-
-    context 'when some owners were not in the group' do
-      let(:batch_responses) do
-        [succ('members_m1'), succ('members_m2'), succ('owners_o1'), missing('owners_o2')]
-      end
-
-      it 'returns a hash with an array with those users' do
-        expect(subject.transform_values(&:sort)).to eq(owners: %w[o2])
-      end
-    end
-
-    context 'when some members were not in the group' do
-      let(:batch_responses) do
-        [missing('members_m1'), missing('members_m2'), succ('owners_o1'), succ('owners_o2')]
-      end
-
-      it 'returns a hash with an array with those users' do
-        expect(subject.transform_values(&:sort)).to eq(members: %w[m1 m2])
+        if result.is_a?(Class)
+          it { expect { subject }.to raise_error(result) }
+        else
+          it { is_expected.to eq(result) }
+        end
       end
     end
+  end
 
-    context 'when some members were not in the group (alternate response format)' do
-      let(:batch_responses) do
-        [missing2('members_m1'), missing2('members_m2'), succ('owners_o1'), succ('owners_o2')]
-      end
-
-      it 'returns a hash with an array with those users' do
-        expect(subject.transform_values(&:sort)).to eq(members: %w[m1 m2])
-      end
+  describe '#remove_users_ignore_missing' do
+    subject do
+      endpoints
+        .remove_users_ignore_missing('msgroupid', members: %w[m1 m2], owners: %w[o1 o2])
+        &.transform_values(&:sort)
     end
 
-    context 'when some members and owners were not in the group' do
-      let(:batch_responses) do
-        [missing('members_m1'), succ('members_m2'), missing('owners_o1'), missing('owners_o2')]
-      end
+    let(:url) { 'https://graph.microsoft.com/v1.0/$batch' }
+    let(:http_method) { :post }
+    let(:with_params) { { body: { requests: batch_requests } } }
+    let(:batch_requests) do
+      [
+        { id: "members_m1", url: "/groups/msgroupid/members/m1/$ref", method: "DELETE" },
+        { id: "members_m2", url: "/groups/msgroupid/members/m2/$ref", method: "DELETE" },
+        { id: "owners_o1", url: "/groups/msgroupid/owners/o1/$ref", method: "DELETE" },
+        { id: "owners_o2", url: "/groups/msgroupid/owners/o2/$ref", method: "DELETE" }
+      ]
+    end
 
-      it 'returns a hash with arrays with those users' do
-        expect(subject.transform_values(&:sort)).to eq(members: %w[m1], owners: %w[o1 o2])
+    let(:status) { 200 }
+    let(:response_body) { build_batch_response_body(request_ids, batch_response_types) }
+    let(:request_ids) { %w[members_m1 members_m2 owners_o1 owners_o2] }
+    let(:batch_response_types) { [] }
+
+    it_behaves_like 'a members/owners batch request that can fail',
+                    ignored_type: :remove_missing, endpoint_name: 'group_remove_users'
+
+    it 'passes along the quota used to run_batch' do
+      expect(endpoints.http).to \
+        receive(:run_batch).with(anything, anything, hash_including(quota: [4, 4]))
+                           .and_call_original
+      subject
+    end
+
+    {
+      # all successfully removed:
+      %i[success success success success] => nil,
+      # some owners were not in the group:
+      %i[success success success remove_missing] => { owners: %w[o2] },
+      # some members were not in the group:
+      %i[remove_missing remove_missing success success] => { members: %w[m1 m2] },
+      # some members were not in the group (alternate response format)
+      %i[remove_missing2 remove_missing2 success success] => { members: %w[m1 m2] },
+      # some members and owners were not in the group
+      %i[remove_missing success remove_missing remove_missing] => { members: %w[m1], owners: %w[o1 o2] },
+    }.each do |types, result|
+      context "when the batch responses are: #{types.inspect}" do
+        let(:batch_response_types) { types }
+
+        it { is_expected.to eq(result) }
       end
     end
 
     context 'when the last owner in a group is removed' do
-      let(:batch_responses) do
-        [succ('members_m1'), succ('members_m2'), last_owner_removed('owners_o1'), succ('owners_o2')]
-      end
+      let(:batch_response_types) { %i[success success remove_last_owner success] }
 
       it 'raises an MissingOwners' do
         expect { subject }.to raise_microsoft_sync_graceful_cancel_error(
@@ -538,11 +442,6 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
           )
         }.to raise_error(ArgumentError, "Only 20 users can be batched at once. Got 21.")
       end
-    end
-
-    it_behaves_like 'a members/owners batch request that can fail' do
-      let(:endpoint_name) { 'group_remove_users' }
-      let(:ignored_members_m1_response) { missing('members_m1') }
     end
   end
 end
