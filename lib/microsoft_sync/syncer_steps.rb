@@ -292,7 +292,7 @@ module MicrosoftSync
 
     def execute_diff_add_users(diff)
       diff.additions_in_slices_of(GraphService::GroupsEndpoints::USERS_BATCH_SIZE) do |members_and_owners|
-        skipped = graph_service.add_users_to_group_ignore_duplicates(
+        skipped = graph_service.groups.add_users_ignore_duplicates(
           group.ms_group_id, **members_and_owners
         )
         log_batch_skipped(:add, skipped)
@@ -305,7 +305,7 @@ module MicrosoftSync
 
     def execute_diff_remove_users(diff)
       diff.removals_in_slices_of(GraphService::GroupsEndpoints::USERS_BATCH_SIZE) do |members_and_owners|
-        skipped = graph_service.remove_group_users_ignore_missing(
+        skipped = graph_service.groups.remove_users_ignore_missing(
           group.ms_group_id, **members_and_owners
         )
         log_batch_skipped(:remove, skipped)

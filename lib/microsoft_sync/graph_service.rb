@@ -31,10 +31,6 @@ module MicrosoftSync
   class GraphService
     attr_reader :http
 
-    delegate :update_group, :list_group_members, :list_group_owners,
-             :remove_group_users_ignore_missing, :add_users_to_group_via_batch,
-             :add_users_to_group_ignore_duplicates, to: :groups
-
     def initialize(tenant, extra_statsd_tags)
       @http = MicrosoftSync::GraphService::Http.new(tenant, extra_statsd_tags)
     end

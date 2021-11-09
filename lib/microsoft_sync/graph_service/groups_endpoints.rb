@@ -24,21 +24,21 @@ module MicrosoftSync
       DIRECTORY_OBJECT_PREFIX = 'https://graph.microsoft.com/v1.0/directoryObjects/'
       USERS_BATCH_SIZE = 20
 
-      def update_group(group_id, params)
+      def update(group_id, params)
         request(:patch, "groups/#{group_id}", quota: [1, 1], body: params)
       end
 
       # Yields (results, next_link) for each page, or returns first page of results if no block given.
-      def list_group_members(group_id, options = {}, &blk)
+      def list_members(group_id, options = {}, &blk)
         get_paginated_list("groups/#{group_id}/members", quota: [3, 0], **options, &blk)
       end
 
       # Yields (results, next_link) for each page, or returns first page of results if no block given.
-      def list_group_owners(group_id, options = {}, &blk)
+      def list_owners(group_id, options = {}, &blk)
         get_paginated_list("groups/#{group_id}/owners", quota: [2, 0], **options, &blk)
       end
 
-      BATCH_REMOVE_GROUP_USERS_SPECIAL_CASES = [
+      BATCH_REMOVE_USERS_SPECIAL_CASES = [
         SpecialCase.new(
           404, /does not exist or one of its queried reference-property objects are not present/i,
           result: :ignored
@@ -59,7 +59,7 @@ module MicrosoftSync
       # user not existing, and an owner not existing in the group. If the group
       # doesn't exist, this will return the full lists of members and owners
       # passed in.
-      def remove_group_users_ignore_missing(group_id, members: [], owners: [])
+      def remove_users_ignore_missing(group_id, members: [], owners: [])
         check_group_users_args(members, owners)
 
         reqs =
@@ -71,12 +71,12 @@ module MicrosoftSync
           'group_remove_users',
           reqs,
           quota: quota,
-          special_cases: BATCH_REMOVE_GROUP_USERS_SPECIAL_CASES
+          special_cases: BATCH_REMOVE_USERS_SPECIAL_CASES
         ).keys
         split_request_ids_to_hash(ignored_request_ids)
       end
 
-      BATCH_ADD_USERS_TO_GROUP_SPECIAL_CASES = [
+      BATCH_ADD_USERS_SPECIAL_CASES = [
         SpecialCase.new(
           400, /One or more added object references already exist/i,
           result: :ignored
@@ -93,7 +93,7 @@ module MicrosoftSync
 
       # Returns {owners: ['a', 'b', 'c'], members: ['d', 'e', 'f']} if there are owners
       # or members not added. If all were added successfully, returns nil.
-      def add_users_to_group_via_batch(group_id, members, owners)
+      def add_users_via_batch(group_id, members, owners)
         reqs =
           group_add_user_requests(group_id, members, 'members') +
           group_add_user_requests(group_id, owners, 'owners')
@@ -101,12 +101,12 @@ module MicrosoftSync
           'group_add_users',
           reqs,
           quota: [reqs.count, reqs.count],
-          special_cases: BATCH_ADD_USERS_TO_GROUP_SPECIAL_CASES
+          special_cases: BATCH_ADD_USERS_SPECIAL_CASES
         ).keys
         split_request_ids_to_hash(ignored_request_ids)
       end
 
-      ADD_USERS_TO_GROUP_SPECIAL_CASES = [
+      ADD_USERS_SPECIAL_CASES = [
         SpecialCase.new(
           400, /One or more added object references already exist/i,
           result: :fallback_to_batch
@@ -129,7 +129,7 @@ module MicrosoftSync
 
       # Returns nil if all added, or a hash with a list of :members and/or :owners that already
       # existed in the group (e.g. {owners: ['a', 'b'], members: ['c']} or {owners: ['a']}
-      def add_users_to_group_ignore_duplicates(group_id, members: [], owners: [])
+      def add_users_ignore_duplicates(group_id, members: [], owners: [])
         check_group_users_args(members, owners)
 
         body = {
@@ -143,11 +143,11 @@ module MicrosoftSync
           :patch, "groups/#{group_id}",
           body: body,
           quota: [1, write_quota],
-          special_cases: ADD_USERS_TO_GROUP_SPECIAL_CASES
+          special_cases: ADD_USERS_SPECIAL_CASES
         )
 
         if response == :fallback_to_batch
-          add_users_to_group_via_batch(group_id, members, owners)
+          add_users_via_batch(group_id, members, owners)
         end
       end
 

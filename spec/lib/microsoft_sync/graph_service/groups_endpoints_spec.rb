@@ -158,7 +158,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
   #### INDIVIDUAL METHODS / ENDPOINTS
 
   describe '#update_group' do
-    subject { endpoints.update_group('msgroupid', abc: { def: 'ghi' }) }
+    subject { endpoints.update('msgroupid', abc: { def: 'ghi' }) }
 
     let(:http_method) { :patch }
     let(:url) { 'https://graph.microsoft.com/v1.0/groups/msgroupid' }
@@ -171,9 +171,9 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     it_behaves_like 'an endpoint that uses up quota', [1, 1]
   end
 
-  describe '#add_users_to_group_ignore_duplicates' do
+  describe '#add_users_ignore_duplicates' do
     subject do
-      endpoints.add_users_to_group_ignore_duplicates(
+      endpoints.add_users_ignore_duplicates(
         'msgroupid', members: members, owners: owners
       )
     end
@@ -203,7 +203,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     it { is_expected.to eq(nil) }
 
     context 'when members is not given' do
-      subject { endpoints.add_users_to_group_ignore_duplicates('msgroupid', owners: owners) }
+      subject { endpoints.add_users_ignore_duplicates('msgroupid', owners: owners) }
 
       let(:req_body) { super().slice('owners@odata.bind') }
 
@@ -211,7 +211,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     end
 
     context 'when owners is not given' do
-      subject { endpoints.add_users_to_group_ignore_duplicates('msgroupid', members: members) }
+      subject { endpoints.add_users_ignore_duplicates('msgroupid', members: members) }
 
       let(:req_body) { super().slice('members@odata.bind') }
 
@@ -220,13 +220,13 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
 
     context 'when members and owners are not given' do
       it 'raises an ArgumentError' do
-        expect { endpoints.add_users_to_group_ignore_duplicates('msgroupid') }.to \
+        expect { endpoints.add_users_ignore_duplicates('msgroupid') }.to \
           raise_error(ArgumentError, 'Missing members/owners')
       end
     end
 
     context 'when 20 users are given' do
-      subject { endpoints.add_users_to_group_ignore_duplicates('msgroupid', members: (1..20).map(&:to_s)) }
+      subject { endpoints.add_users_ignore_duplicates('msgroupid', members: (1..20).map(&:to_s)) }
 
       let(:req_body) do
         {
@@ -244,7 +244,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     context 'when more than 20 users are given' do
       it 'raises an ArgumentError' do
         expect {
-          endpoints.add_users_to_group_ignore_duplicates(
+          endpoints.add_users_ignore_duplicates(
             'msgroupid', members: ['x'] * 10, owners: ['y'] * 11
           )
         }.to raise_error(
@@ -266,7 +266,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
         end
 
         it 'falls back to the batch api' do
-          expect(endpoints).to receive(:add_users_to_group_via_batch)
+          expect(endpoints).to receive(:add_users_via_batch)
             .with('msgroupid', members, owners).and_return('foo')
           expect(subject).to eq('foo')
         end
@@ -400,8 +400,8 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     end
   end
 
-  describe '#list_group_members' do
-    let(:method_name) { :list_group_members }
+  describe '#list_members' do
+    let(:method_name) { :list_members }
     let(:method_args) { ['mygroup'] }
     let(:url) { 'https://graph.microsoft.com/v1.0/groups/mygroup/members' }
 
@@ -410,8 +410,8 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     end
   end
 
-  describe '#list_group_owners' do
-    let(:method_name) { :list_group_owners }
+  describe '#list_owners' do
+    let(:method_name) { :list_owners }
     let(:method_args) { ['mygroup'] }
     let(:url) { 'https://graph.microsoft.com/v1.0/groups/mygroup/owners' }
     let(:url_variables) { ['mygroup'] }
@@ -421,9 +421,9 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     end
   end
 
-  describe '#remove_group_users_ignore_missing' do
+  describe '#remove_users_ignore_missing' do
     subject do
-      endpoints.remove_group_users_ignore_missing('msgroupid', members: %w[m1 m2], owners: %w[o1 o2])
+      endpoints.remove_users_ignore_missing('msgroupid', members: %w[m1 m2], owners: %w[o1 o2])
     end
 
     let(:url) { 'https://graph.microsoft.com/v1.0/$batch' }
@@ -533,7 +533,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
     context 'when more than 20 users are given' do
       it 'raises an ArgumentError' do
         expect {
-          endpoints.remove_group_users_ignore_missing(
+          endpoints.remove_users_ignore_missing(
             'msgroupid', members: ['x'] * 10, owners: ['y'] * 11
           )
         }.to raise_error(ArgumentError, "Only 20 users can be batched at once. Got 21.")
