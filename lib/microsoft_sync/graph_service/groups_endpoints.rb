@@ -22,7 +22,7 @@ module MicrosoftSync
   class GraphService
     class GroupsEndpoints < EndpointsBase
       DIRECTORY_OBJECT_PREFIX = 'https://graph.microsoft.com/v1.0/directoryObjects/'
-      GROUP_USERS_BATCH_SIZE = 20
+      USERS_BATCH_SIZE = 20
 
       def update_group(group_id, params)
         request(:patch, "groups/#{group_id}", quota: [1, 1], body: params)
@@ -168,8 +168,8 @@ module MicrosoftSync
       def check_group_users_args(members, owners)
         raise ArgumentError, 'Missing members/owners' if members.empty? && owners.empty?
 
-        if (n_total_additions = members.length + owners.length) > GROUP_USERS_BATCH_SIZE
-          raise ArgumentError, "Only #{GROUP_USERS_BATCH_SIZE} users can be batched at " \
+        if (n_total_additions = members.length + owners.length) > USERS_BATCH_SIZE
+          raise ArgumentError, "Only #{USERS_BATCH_SIZE} users can be batched at " \
                                "once. Got #{n_total_additions}."
         end
       end

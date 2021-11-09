@@ -41,12 +41,12 @@ module MicrosoftSync
     end
 
     def list_education_classes_for_course(course)
-      graph_service.list_education_classes(filter: { externalId: course.uuid })
+      graph_service.education_classes.list(filter: { externalId: course.uuid })
     end
 
     # Returns the hash of the new course, including the 'id' key
     def create_education_class(course)
-      graph_service.create_education_class(
+      graph_service.education_classes.create(
         description: course.public_description.presence&.truncate(1024),
         displayName: course.name,
         externalId: course.uuid,
@@ -103,7 +103,7 @@ module MicrosoftSync
       unexpected = []
       result_hash = {}
 
-      graph_service.list_users(
+      graph_service.users.list(
         select: ['id', remote_attribute],
         filter: { remote_attribute => downcased_uniqued }
       ).each do |user_object|

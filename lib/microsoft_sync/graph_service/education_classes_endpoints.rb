@@ -22,7 +22,7 @@ module MicrosoftSync
   class GraphService
     class EducationClassesEndpoints < EndpointsBase
       # Yields (results, next_link) for each page, or returns first page of results if no block given.
-      def list_education_classes(options = {}, &blk)
+      def list(options = {}, &blk)
         get_paginated_list(
           'education/classes',
           quota: [1, 0],
@@ -36,7 +36,7 @@ module MicrosoftSync
         )
       end
 
-      def create_education_class(params)
+      def create(params)
         request(:post, 'education/classes', quota: [1, 1], body: params)
       end
     end

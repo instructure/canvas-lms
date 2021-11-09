@@ -50,8 +50,8 @@ describe MicrosoftSync::GraphService::TeamsEndpoints do
     end
   end
 
-  describe '#create_education_class_team' do
-    subject { endpoints.create_education_class_team("Evan's group id") }
+  describe '#create_for_education_class' do
+    subject { endpoints.create_for_education_class("Evan's group id") }
 
     let(:http_method) { :post }
     let(:url) { 'https://graph.microsoft.com/v1.0/teams' }
