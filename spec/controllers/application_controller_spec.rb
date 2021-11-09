@@ -1588,7 +1588,7 @@ describe ApplicationController do
       user_factory
       controller.instance_variable_set(:@context, @user)
 
-      expect(Course).to receive(:where).never
+      expect(Course).not_to receive(:where)
       controller.send(:get_all_pertinent_contexts, only_contexts: 'Group_1')
     end
 
@@ -1596,7 +1596,7 @@ describe ApplicationController do
       user_factory
       controller.instance_variable_set(:@context, @user)
 
-      expect(@user).to receive(:current_groups).never
+      expect(@user).not_to receive(:current_groups)
       controller.send(:get_all_pertinent_contexts, include_groups: true, only_contexts: 'Course_1')
     end
 

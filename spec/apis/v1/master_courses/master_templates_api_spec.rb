@@ -160,7 +160,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       other_course = course_factory
       @template.add_child_course!(other_course)
 
-      expect_any_instantiation_of(@template).to receive(:add_child_course!).never
+      expect_any_instantiation_of(@template).not_to receive(:add_child_course!)
       api_call(:put, @url, @params, { :course_ids_to_add => [other_course.id] })
     end
 

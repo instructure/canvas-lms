@@ -654,7 +654,7 @@ describe AssignmentOverride do
   describe '#update_grading_period_grades with no grading periods' do
     it 'does not update grades when due_at changes' do
       assignment_model
-      expect_any_instance_of(Course).to receive(:recompute_student_scores).never
+      expect_any_instance_of(Course).not_to receive(:recompute_student_scores)
       override = AssignmentOverride.new
       override.assignment = @assignment
       override.due_at = 6.months.ago
@@ -688,7 +688,7 @@ describe AssignmentOverride do
 
     it 'does not update grades if there are no students on this override' do
       @override.assignment_override_students.clear
-      expect_any_instance_of(Course).to receive(:recompute_student_scores).never
+      expect_any_instance_of(Course).not_to receive(:recompute_student_scores)
       @override.due_at = 6.months.ago
       @override.save!
     end
@@ -710,7 +710,7 @@ describe AssignmentOverride do
     it 'does not update grades if grading period did not change' do
       @override.due_at = 1.month.ago
       @override.save!
-      expect_any_instance_of(Course).to receive(:recompute_student_scores).never
+      expect_any_instance_of(Course).not_to receive(:recompute_student_scores)
       @override.due_at = 2.months.ago
       @override.save!
     end
@@ -785,7 +785,7 @@ describe AssignmentOverride do
     end
 
     it "does not trigger when nothing changed" do
-      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).not_to receive(:recompute)
       @override.save
     end
   end
@@ -846,7 +846,7 @@ describe AssignmentOverride do
 
     it "does nothing if it is not ADHOC" do
       allow(@override).to receive(:set_type).and_return "NOT_ADHOC"
-      expect(@override).to receive(:destroy).never
+      expect(@override).not_to receive(:destroy)
 
       @override.destroy_if_empty_set
     end
@@ -854,7 +854,7 @@ describe AssignmentOverride do
     it "does nothing if the set is not empty" do
       allow(@override).to receive(:set_type).and_return "ADHOC"
       allow(@override).to receive(:set).and_return [1, 2, 3]
-      expect(@override).to receive(:destroy).never
+      expect(@override).not_to receive(:destroy)
 
       @override.destroy_if_empty_set
     end

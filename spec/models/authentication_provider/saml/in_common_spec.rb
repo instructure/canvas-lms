@@ -36,13 +36,13 @@ describe AuthenticationProvider::SAML::InCommon do
 
     it "does nothing if there aren't any InCommon providers" do
       saml.destroy
-      expect(subject).to receive(:refresh_if_necessary).never
+      expect(subject).not_to receive(:refresh_if_necessary)
       subject.refresh_providers
     end
 
     it "does nothing if no changes" do
       expect(subject).to receive(:refresh_if_necessary).and_return(false)
-      expect(subject).to receive(:validate_and_parse_metadata).never
+      expect(subject).not_to receive(:validate_and_parse_metadata)
       subject.refresh_providers
     end
 
@@ -51,7 +51,7 @@ describe AuthenticationProvider::SAML::InCommon do
       expect(subject).to receive(:validate_and_parse_metadata).and_return({})
 
       expect(Canvas::Errors).to receive(:capture_exception).once
-      expect_any_instantiation_of(saml).to receive(:populate_from_metadata).never
+      expect_any_instantiation_of(saml).not_to receive(:populate_from_metadata)
 
       subject.refresh_providers
     end
@@ -69,7 +69,7 @@ describe AuthenticationProvider::SAML::InCommon do
       expect(Canvas::Errors).to receive(:capture_exception).once
       expect_any_instantiation_of(saml).to receive(:populate_from_metadata).with('metadata1').and_raise('error')
       expect_any_instantiation_of(saml2).to receive(:populate_from_metadata).with('metadata2')
-      expect_any_instantiation_of(saml2).to receive(:save!).never
+      expect_any_instantiation_of(saml2).not_to receive(:save!)
 
       subject.refresh_providers
     end

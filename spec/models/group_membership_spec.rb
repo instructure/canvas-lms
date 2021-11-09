@@ -340,7 +340,7 @@ describe GroupMembership do
     it "triggers a batch when membership is created" do
       new_user = user_factory
 
-      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).not_to receive(:recompute)
       expect(DueDateCacher).to receive(:recompute_users_for_course).with(
         new_user.id,
         @course.id,
@@ -351,7 +351,7 @@ describe GroupMembership do
     end
 
     it "triggers a batch when membership is deleted" do
-      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).not_to receive(:recompute)
       expect(DueDateCacher).to receive(:recompute_users_for_course).with(
         @membership.user.id,
         @course.id,
@@ -361,14 +361,14 @@ describe GroupMembership do
     end
 
     it "does not trigger when nothing changed" do
-      expect(DueDateCacher).to receive(:recompute).never
-      expect(DueDateCacher).to receive(:recompute_course).never
+      expect(DueDateCacher).not_to receive(:recompute)
+      expect(DueDateCacher).not_to receive(:recompute_course)
       @membership.save
     end
 
     it "does not trigger when it's an account group" do
-      expect(DueDateCacher).to receive(:recompute).never
-      expect(DueDateCacher).to receive(:recompute_course).never
+      expect(DueDateCacher).not_to receive(:recompute)
+      expect(DueDateCacher).not_to receive(:recompute_course)
       @group = Account.default.groups.create!(:name => 'Group!')
       @group.group_memberships.create!(:user => user_factory)
     end

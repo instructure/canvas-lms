@@ -31,14 +31,14 @@ module Alerts
       context "basic evaluation" do
         it "does not trigger any alerts for unpublished courses" do
           course = double('Course', :available? => false)
-          expect_any_instance_of(Notification).to receive(:create_message).never
+          expect_any_instance_of(Notification).not_to receive(:create_message)
 
           DelayedAlertSender.evaluate_for_course(course, nil)
         end
 
         it "does not trigger any alerts for courses with no alerts" do
           course = double('Course', :available? => true, :alerts => [])
-          expect_any_instance_of(Notification).to receive(:create_message).never
+          expect_any_instance_of(Notification).not_to receive(:create_message)
 
           DelayedAlertSender.evaluate_for_course(course, nil)
         end
@@ -47,7 +47,7 @@ module Alerts
           course = Account.default.courses.create!
           course.offer!
           course.alerts.create!(:recipients => [:student], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
-          expect_any_instance_of(Notification).to receive(:create_message).never
+          expect_any_instance_of(Notification).not_to receive(:create_message)
 
           DelayedAlertSender.evaluate_for_course(course, nil)
         end
@@ -55,7 +55,7 @@ module Alerts
         it "does not trigger any alerts when there are no teachers in the class" do
           course_with_student(:active_course => true)
           @course.alerts.create!(:recipients => [:student], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
-          expect_any_instance_of(Notification).to receive(:create_message).never
+          expect_any_instance_of(Notification).not_to receive(:create_message)
 
           DelayedAlertSender.evaluate_for_course(@course, nil)
         end
@@ -83,7 +83,7 @@ module Alerts
           @course.reload
           @course.start_at = Time.zone.now - 30.days
 
-          expect_any_instance_of(Notification).to receive(:create_message).never
+          expect_any_instance_of(Notification).not_to receive(:create_message)
           DelayedAlertSender.evaluate_for_course(@course, [])
         end
 
@@ -98,7 +98,7 @@ module Alerts
           @course.reload
           @course.start_at = Time.zone.now - 30.days
 
-          expect_any_instance_of(Notification).to receive(:create_message).never
+          expect_any_instance_of(Notification).not_to receive(:create_message)
           DelayedAlertSender.evaluate_for_course(@course, [])
         end
       end

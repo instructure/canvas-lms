@@ -72,14 +72,14 @@ module Services
         @account.save!
         @au.reload
         expect(@queue).to receive(:send_message).once
-        expect(Mailer).to receive(:create_message).never
+        expect(Mailer).not_to receive(:create_message)
         @message.path_type = "slack"
         @message.to = "test@email.com"
         expect { @message.deliver }.not_to raise_error
       end
 
       it 'expects slack to not enqueue without slack api token' do
-        expect(@queue).to receive(:send_message).never
+        expect(@queue).not_to receive(:send_message)
       end
 
       it "processes push notification message type" do

@@ -2043,7 +2043,7 @@ describe Quizzes::QuizzesController do
         due_date_cacher = instance_double(DueDateCacher)
         allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
 
-        expect(due_date_cacher).to receive(:recompute).never
+        expect(due_date_cacher).not_to receive(:recompute)
 
         post 'update', params: @no_changes
       end

@@ -3560,7 +3560,7 @@ describe Course, 'grade_publishing' do
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:delay).never
+        expect(@course).not_to receive(:delay)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
                                   :publish_endpoint => "http://localhost/endpoint",
@@ -3576,7 +3576,7 @@ describe Course, 'grade_publishing' do
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:delay).never
+        expect(@course).not_to receive(:delay)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
                                   :publish_endpoint => "http://localhost/endpoint",
@@ -3592,7 +3592,7 @@ describe Course, 'grade_publishing' do
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:delay).never
+        expect(@course).not_to receive(:delay)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
                                   :publish_endpoint => "http://localhost/endpoint",
@@ -3968,7 +3968,7 @@ describe Course, 'grade_publishing' do
                                                                            }
                                                                          }
                                                                        })
-        expect(SSLCommon).to receive(:post_data).never
+        expect(SSLCommon).not_to receive(:post_data)
         @course.send_final_grades_to_endpoint @user
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["unpublishable", "published", "unpublishable", "published", "published", "unpublishable", "unpublished", "unpublishable", "published"]
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil] * 9
@@ -4327,7 +4327,7 @@ describe Course, 'grade_publishing' do
       if expect_success
         expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "test-jt-data", "application/jtmimetype", {})
       else
-        expect(SSLCommon).to receive(:post_data).never
+        expect(SSLCommon).not_to receive(:post_data)
       end
       @course.publish_final_grades(user)
     end

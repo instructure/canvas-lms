@@ -3989,7 +3989,7 @@ describe AssignmentsApiController, type: :request do
             due_date_cacher = instance_double(DueDateCacher)
             allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
 
-            expect(due_date_cacher).to receive(:recompute).never
+            expect(due_date_cacher).not_to receive(:recompute)
 
             update_assignment
           end
@@ -6253,7 +6253,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "preloads student_ids when including adhoc overrides" do
-      expect_any_instantiation_of(@override).to receive(:assignment_override_students).never
+      expect_any_instantiation_of(@override).not_to receive(:assignment_override_students)
       json = api_call_as_user(@teacher, :get,
                               "/api/v1/courses/#{@course.id}/assignments?include[]=overrides",
                               { :controller => 'assignments_api',
@@ -6266,7 +6266,7 @@ describe AssignmentsApiController, type: :request do
     it "preloads student_ids when including adhoc overrides on assignment groups api as well" do
       # yeah i know this is a separate api; sue me
 
-      expect_any_instantiation_of(@override).to receive(:assignment_override_students).never
+      expect_any_instantiation_of(@override).not_to receive(:assignment_override_students)
       json = api_call_as_user(@teacher, :get,
                               "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&include[]=overrides",
                               { :controller => 'assignment_groups',

@@ -125,7 +125,7 @@ module SIS
       end
 
       it "saves with broadcasting if notify is set" do
-        expect(enrollment).to receive(:save_without_broadcasting!).never
+        expect(enrollment).not_to receive(:save_without_broadcasting!)
 
         EnrollmentImporter.new(Account.default, { batch: Account.default.sis_batches.create! }).process(messages) do |importer|
           sis_enrollment = SIS::Models::Enrollment.new(

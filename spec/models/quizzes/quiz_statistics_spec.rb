@@ -121,7 +121,7 @@ describe Quizzes::QuizStatistics do
     stats.reload
     expect(stats.csv_attachment).to be_present
 
-    expect(stats).to receive(:build_csv_attachment).never
+    expect(stats).not_to receive(:build_csv_attachment)
     expect(stats.generate_csv).to eq attachment
   end
 

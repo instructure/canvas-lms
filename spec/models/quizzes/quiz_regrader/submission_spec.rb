@@ -112,7 +112,7 @@ describe Quizzes::QuizRegrader::Submission do
 
       # submission data isn't called if not included in question_regrades
       submission_data << { :question_id => 4 }
-      expect(Quizzes::QuizRegrader::Answer).to receive(:new).with(submission_data.last, nil).never
+      expect(Quizzes::QuizRegrader::Answer).not_to receive(:new).with(submission_data.last, nil)
 
       # submission updates and saves correct data
       expect(submission).to receive(:save_with_versioning!).once
@@ -132,7 +132,7 @@ describe Quizzes::QuizRegrader::Submission do
       # The ones that need regrading were part of a different attempt
       multiple_attempts_submission_data.each do
         answer_stub = double
-        expect(answer_stub).to receive(:regrade!).never
+        expect(answer_stub).not_to receive(:regrade!)
       end
 
       # submission should still update and save correct data

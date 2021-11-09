@@ -1450,7 +1450,7 @@ describe Submission do
     end
 
     it "does not log ungraded submission change when assignment muted" do
-      expect(Auditors::GradeChange).to receive(:record).never
+      expect(Auditors::GradeChange).not_to receive(:record)
       @assignment.mute!
       @assignment.unmute!
     end
@@ -2924,7 +2924,7 @@ describe Submission do
         init_turnitin_api
         expect(@assignment).to receive(:create_in_turnitin).and_return(false)
         expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => false, :error? => true, :error_hash => {}))
-        expect(@turnitin_api).to receive(:submitPaper).never
+        expect(@turnitin_api).not_to receive(:submitPaper)
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
         expect(@submission.reload.turnitin_data[:status]).to eq 'error'
       end
@@ -2934,7 +2934,7 @@ describe Submission do
         # first a submission, to get us into failed state
         expect(@assignment).to receive(:create_in_turnitin).and_return(false)
         expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => false, :error? => true, :error_hash => {}))
-        expect(@turnitin_api).to receive(:submitPaper).never
+        expect(@turnitin_api).not_to receive(:submitPaper)
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
         expect(@submission.reload.turnitin_data[:status]).to eq 'error'
 
@@ -2994,7 +2994,7 @@ describe Submission do
 
       it "does not blow up if submission_type has changed when job runs" do
         @submission.submission_type = 'online_url'
-        expect(@submission.context).to receive(:turnitin_settings).never
+        expect(@submission.context).not_to receive(:turnitin_settings)
         expect { @submission.submit_to_turnitin }.not_to raise_error
       end
     end
@@ -4015,7 +4015,7 @@ describe Submission do
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
 
       submission.versioned_originality_reports
-      expect(OriginalityReport).to receive(:where).never
+      expect(OriginalityReport).not_to receive(:where)
       submission.versioned_originality_reports
     end
 
@@ -4065,7 +4065,7 @@ describe Submission do
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
 
       Submission.bulk_load_versioned_originality_reports([submission])
-      expect(OriginalityReport).to receive(:where).never
+      expect(OriginalityReport).not_to receive(:where)
       submission.versioned_originality_reports
     end
 
@@ -4112,7 +4112,7 @@ describe Submission do
 
   context "bulk loading attachments" do
     def ensure_attachments_arent_queried
-      expect(Attachment).to receive(:where).never
+      expect(Attachment).not_to receive(:where)
     end
 
     def submission_for_some_user

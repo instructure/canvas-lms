@@ -609,7 +609,7 @@ describe SIS::CSV::EnrollmentImporter do
     user1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     user2 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
     course1.enroll_user(user2)
-    expect(DueDateCacher).to receive(:recompute).never
+    expect(DueDateCacher).not_to receive(:recompute)
     # there are no assignments so this will just return, but we just want to see
     # that it gets called correctly and for the users that wre imported
     expect(DueDateCacher).to receive(:recompute_users_for_course).with([user1.id], course1.id, nil, update_grades: true)
@@ -849,7 +849,7 @@ describe SIS::CSV::EnrollmentImporter do
       account: account2
     )
     user = account2.pseudonyms.where(sis_user_id: 'user_1').first.user
-    expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).never
+    expect(SisPseudonym).not_to receive(:for).with(user, @account, type: :implicit, require_sis: false)
 
     warnings = []
     work = SIS::EnrollmentImporter::Work.new(@account.sis_batches.create!, @account, Rails.logger, warnings)

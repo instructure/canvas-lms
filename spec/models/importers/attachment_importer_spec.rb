@@ -57,9 +57,9 @@ module Importers
         expect(migration).to receive(:import_object?).with('attachments', migration_id).and_return(true)
         expect(attachment).to receive(:context=).with(course)
         expect(attachment).to receive(:migration_id=).with(migration_id)
-        expect(attachment).to receive(:locked=).never
-        expect(attachment).to receive(:file_state=).never
-        expect(attachment).to receive(:display_name=).never
+        expect(attachment).not_to receive(:locked=)
+        expect(attachment).not_to receive(:file_state=)
+        expect(attachment).not_to receive(:display_name=)
         expect(attachment).to receive(:save_without_broadcasting!)
 
         Importers::AttachmentImporter.process_migration(data, migration)
@@ -155,7 +155,7 @@ module Importers
           }
         }
 
-        expect(::Attachment).to receive(:where).never
+        expect(::Attachment).not_to receive(:where)
 
         Importers::AttachmentImporter.process_migration(data, migration)
       end
@@ -172,7 +172,7 @@ module Importers
           }
         }
 
-        expect(::Attachment).to receive(:where).never
+        expect(::Attachment).not_to receive(:where)
 
         Importers::AttachmentImporter.process_migration(data, migration)
       end

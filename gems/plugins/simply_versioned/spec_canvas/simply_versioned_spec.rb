@@ -86,7 +86,7 @@ describe 'simply_versioned' do
       woozel.with_versioning(&:save!)
       expect(woozel.versions.loaded?).to eq false
       first = woozel.versions.first
-      expect(Woozel.connection).to receive(:select_all).never
+      expect(Woozel.connection).not_to receive(:select_all)
       expect(first.versionable).to eq woozel
     end
 
@@ -95,7 +95,7 @@ describe 'simply_versioned' do
       woozel.with_versioning(&:save!)
       expect(woozel.versions.loaded?).to eq false
       all = woozel.versions.to_a
-      expect(Woozel.connection).to receive(:select_all).never
+      expect(Woozel.connection).not_to receive(:select_all)
       all.each do |version|
         expect(version.versionable).to eq woozel
       end

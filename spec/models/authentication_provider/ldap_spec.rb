@@ -59,7 +59,7 @@ describe AuthenticationProvider::LDAP do
       aac = AuthenticationProvider::LDAP.new
       aac.auth_type = 'ldap'
       aac.ldap_filter = 'bob'
-      expect(aac).to receive(:ldap_connection).never
+      expect(aac).not_to receive(:ldap_connection)
       aac.ldap_bind_result('test', '')
     end
 

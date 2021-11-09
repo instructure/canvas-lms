@@ -1303,7 +1303,7 @@ describe CommunicationChannelsController do
       user_with_pseudonym(:active_all => true) # new user
       @enrollment = @course.enroll_user(@user)
 
-      expect_any_instantiation_of(@cc).to receive(:send_confirmation!).never
+      expect_any_instantiation_of(@cc).not_to receive(:send_confirmation!)
       get 're_send_confirmation', params: { :user_id => @pseudonym.user_id, :id => @cc.id, :enrollment_id => @enrollment.id }
       expect(response).to be_successful
     end

@@ -273,8 +273,8 @@ describe Message do
     it "does not deliver if canceled" do
       message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
       @message.cancel
-      expect(@message).to receive(:deliver_via_email).never
-      expect(Mailer).to receive(:create_message).never
+      expect(@message).not_to receive(:deliver_via_email)
+      expect(Mailer).not_to receive(:create_message)
       expect(@message.deliver).to be_nil
       expect(@message.reload.state).to eq :cancelled
     end
@@ -287,12 +287,12 @@ describe Message do
 
       message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
       expect(Mailer).to receive(:create_message).and_raise(Timeout::Error.new)
-      expect(ErrorReport).to receive(:log_exception).never
+      expect(ErrorReport).not_to receive(:log_exception)
       expect { @message.deliver }.to raise_exception(Timeout::Error)
 
       message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
       expect(Mailer).to receive(:create_message).and_raise("450 recipient address rejected")
-      expect(ErrorReport).to receive(:log_exception).never
+      expect(ErrorReport).not_to receive(:log_exception)
       expect(@message.deliver).to eq false
     end
 
@@ -361,7 +361,7 @@ describe Message do
       it "delivers to each of a user's push endpoints" do
         ne = double()
         expect(ne).to receive(:push_json).twice.and_return(true)
-        expect(ne).to receive(:destroy).never
+        expect(ne).not_to receive(:destroy)
         expect(@user).to receive(:notification_endpoints).and_return([ne, ne])
 
         message_model(notification_name: 'Assignment Created',
@@ -394,7 +394,7 @@ describe Message do
             notification_name: 'New Wiki Page',
             user: @user
           )
-          expect(@message).to receive(:deliver_via_push).never
+          expect(@message).not_to receive(:deliver_via_push)
           @message.deliver
         end
       end
@@ -419,7 +419,7 @@ describe Message do
             notification_name: 'New Wiki Page',
             user: @user
           )
-          expect(@message).to receive(:deliver_via_push).never
+          expect(@message).not_to receive(:deliver_via_push)
           @message.deliver
         end
       end

@@ -52,7 +52,7 @@ describe Twitter::Messenger do
       let(:messenger) { Twitter::Messenger.new(message, nil, 'host', id) }
 
       it 'sends nothing if there is no service' do
-        expect(connection_mock).to receive(:send_direct_message).never
+        expect(connection_mock).not_to receive(:send_direct_message)
         expect(messenger.deliver).to be_nil
       end
     end

@@ -182,7 +182,7 @@ describe Login::CasController do
 
     it "redirects when a user is authorized but not found in canvas" do
       # We dont want to log them out of everything.
-      expect(controller).to receive(:logout_user_action).never
+      expect(controller).not_to receive(:logout_user_action)
 
       # Default to Login url with a nil value
       session[:sentinel] = true

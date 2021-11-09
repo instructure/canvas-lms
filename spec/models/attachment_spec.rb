@@ -444,8 +444,8 @@ describe Attachment do
         allow(Rails.env).to receive(:test?).and_return(false)
         @attachment.uploaded_data = default_uploaded_data
         expect(Attachment.connection).to receive(:after_transaction_commit).twice
-        expect(@attachment).to receive(:touch_context_if_appropriate).never
-        expect(@attachment).to receive(:ensure_media_object).never
+        expect(@attachment).not_to receive(:touch_context_if_appropriate)
+        expect(@attachment).not_to receive(:ensure_media_object)
         @attachment.save
       end
     end
@@ -486,7 +486,7 @@ describe Attachment do
 
     it "does not create a media object in a skip_media_object_creation block" do
       Attachment.skip_media_object_creation do
-        expect(@attachment).to receive(:build_media_object).never
+        expect(@attachment).not_to receive(:build_media_object)
         @attachment.save!
       end
     end
@@ -495,7 +495,7 @@ describe Attachment do
       @attachment.filename = 'foo.png'
       @attachment.content_type = 'image/png'
       expect(@attachment).to receive(:ensure_media_object).once
-      expect(@attachment).to receive(:build_media_object).never
+      expect(@attachment).not_to receive(:build_media_object)
       @attachment.save!
     end
 
@@ -588,8 +588,8 @@ describe Attachment do
       a2 = attachment_model(root_attachment: a)
       expect(a).to receive(:make_childless).once
       expect(a).to receive(:destroy_content).once
-      expect(a2).to receive(:make_childless).never
-      expect(a2).to receive(:destroy_content).never
+      expect(a2).not_to receive(:make_childless)
+      expect(a2).not_to receive(:destroy_content)
       a2.destroy_permanently_plus
       a.destroy_permanently_plus
       expect { a.reload }.to raise_error(ActiveRecord::RecordNotFound)
@@ -602,7 +602,7 @@ describe Attachment do
       a = attachment_model
       allow(a).to receive(:s3object).and_return(double('s3object'))
       s3object = a.s3object
-      expect(s3object).to receive(:delete).never
+      expect(s3object).not_to receive(:delete)
       a.destroy_content
     end
 
@@ -617,7 +617,7 @@ describe Attachment do
     it 'does not do destroy_content_and_replace twice' do
       a = attachment_model(uploaded_data: default_uploaded_data)
       a.destroy_content_and_replace # works
-      expect(a).to receive(:send_to_purgatory).never
+      expect(a).not_to receive(:send_to_purgatory)
       a.destroy_content_and_replace # returns because it already happened
     end
 
@@ -746,7 +746,7 @@ describe Attachment do
       s3_storage!
       a = attachment_model
       s3object = a.s3object
-      expect(s3object).to receive(:delete).never
+      expect(s3object).not_to receive(:delete)
       a.destroy_permanently!
     end
   end
@@ -1528,7 +1528,7 @@ describe Attachment do
     end
 
     it "fails for non-root attachments" do
-      expect(@old_object).to receive(:copy_to).never
+      expect(@old_object).not_to receive(:copy_to)
       expect { @child.change_namespace(@new_account.file_namespace) }.to raise_error('change_namespace must be called on a root attachment')
       expect(@root.reload.namespace).to eq @old_account.file_namespace
       expect(@child.reload.namespace).to eq @root.reload.namespace
@@ -1536,7 +1536,7 @@ describe Attachment do
 
     it "does not copy if the destination exists" do
       expect(@new_object).to receive(:exists?).and_return(true)
-      expect(@old_object).to receive(:copy_to).never
+      expect(@old_object).not_to receive(:copy_to)
       @root.change_namespace(@new_account.file_namespace)
       expect(@root.namespace).to eq @new_account.file_namespace
       expect(@child.reload.namespace).to eq @root.namespace
@@ -1693,7 +1693,7 @@ describe Attachment do
         @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data)
       }
       @attachment.thumbnail_url(:size => "640x>")
-      expect(@attachment).to receive(:create_dynamic_thumbnail).never
+      expect(@attachment).not_to receive(:create_dynamic_thumbnail)
       url = @attachment.thumbnail_url(:size => "640x>")
       thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
       expect(url).to be_present
@@ -2116,7 +2116,7 @@ describe Attachment do
         end
 
         it "does not delete the new s3object" do
-          expect(@attachment.s3object).to receive(:delete).never
+          expect(@attachment.s3object).not_to receive(:delete)
           @attachment.process_s3_details!({})
         end
 

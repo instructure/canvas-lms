@@ -2254,14 +2254,14 @@ describe CoursesController do
 
     it "does not publish when offer is false" do
       @course.claim!
-      expect(Auditors::Course).to receive(:record_published).never
+      expect(Auditors::Course).not_to receive(:record_published)
       user_session(@teacher)
       put 'update', params: { :id => @course.id, :offer => "false" }
       expect(@course.reload).to be_claimed
     end
 
     it "does not log published event if course was already published" do
-      expect(Auditors::Course).to receive(:record_published).never
+      expect(Auditors::Course).not_to receive(:record_published)
       user_session(@teacher)
       put 'update', params: { :id => @course.id, :offer => true }
     end
@@ -2428,7 +2428,7 @@ describe CoursesController do
 
     it "doesn't allow a teacher to undelete a course" do
       @course.destroy
-      expect(Auditors::Course).to receive(:record_restored).never
+      expect(Auditors::Course).not_to receive(:record_restored)
       user_session(@teacher)
       put 'update', params: { :id => @course.id, :course => { :event => 'undelete' }, :format => :json }
       expect(response.status).to eq 401
@@ -2942,7 +2942,7 @@ describe CoursesController do
     end
 
     it 'does not try and publish grades' do
-      expect_any_instance_of(Course).to receive(:publish_final_grades).never
+      expect_any_instance_of(Course).not_to receive(:publish_final_grades)
       user_session(@teacher)
       get 'sis_publish_status', params: { :course_id => @course.id }
       expect(response).to be_successful

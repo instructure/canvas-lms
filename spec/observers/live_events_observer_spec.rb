@@ -24,7 +24,7 @@ describe LiveEventsObserver do
       user_model(name: "Joey Joe Joe")
 
       @user.name = "Joey Joe Joe"
-      expect(Canvas::LiveEvents).to receive(:user_updated).never
+      expect(Canvas::LiveEvents).not_to receive(:user_updated)
       @user.save!
     end
 
@@ -35,7 +35,7 @@ describe LiveEventsObserver do
 
       @course.name = "CS101"
       @course.sis_batch_id = sis.id
-      expect(Canvas::LiveEvents).to receive(:course_updated).never
+      expect(Canvas::LiveEvents).not_to receive(:course_updated)
       @course.save!
     end
 
@@ -53,7 +53,7 @@ describe LiveEventsObserver do
       @course.syllabus_body = "old syllabus"
       @course.save!
 
-      expect(Canvas::LiveEvents).to receive(:course_syllabus_updated).never
+      expect(Canvas::LiveEvents).not_to receive(:course_syllabus_updated)
       @course.save!
     end
 
@@ -90,7 +90,7 @@ describe LiveEventsObserver do
 
     it "does not post trivial update events" do
       wiki_page_model
-      expect(Canvas::LiveEvents).to receive(:wiki_page_updated).never
+      expect(Canvas::LiveEvents).not_to receive(:wiki_page_updated)
       @page.touch
     end
 
@@ -347,7 +347,7 @@ describe LiveEventsObserver do
     end
 
     it "does not post for other ContentExport types" do
-      expect(Canvas::LiveEvents).to receive(:quiz_export_complete).never
+      expect(Canvas::LiveEvents).not_to receive(:quiz_export_complete)
       course = Account.default.courses.create!
       ce = course.content_exports.create!
       ce.export(synchronous: true)

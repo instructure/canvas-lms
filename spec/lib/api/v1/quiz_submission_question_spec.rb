@@ -102,7 +102,7 @@ describe Api::V1::QuizSubmissionQuestion do
     describe "shuffle_answers false" do
       subject { api.quiz_submission_questions_json(quiz_questions, @quiz_submission, { shuffle_answers: false }) }
       it "shuffles answers when opt is given" do
-        expect_any_instance_of(Array).to receive(:shuffle!).never
+        expect_any_instance_of(Array).not_to receive(:shuffle!)
         answer_text = subject[:quiz_submission_questions].first["answers"].map { |a| a["text"] }
         expect(answer_text).to eq(["a", "b", "c", "d"])
       end
