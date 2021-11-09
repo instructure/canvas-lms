@@ -90,10 +90,12 @@ describe Quizzes::LogAuditing::EventAggregator do
       @aggregated_submission_data = @aggregator.run(@qs.id, @qs.attempt, @events.last.created_at)
       expect(@aggregated_submission_data).to eq(latest_submission_data)
     end
+
     it "builds submission_data up to the specified timestamp, inclusive" do
       submission_data = @aggregator.run(@qs.id, @qs.attempt, @events[0].created_at)
       expect(submission_data).to eq({ "question_#{@questions[0].id}" => "hello" })
     end
+
     it "replaces previous content in submission_data build" do
       submission_data = @aggregator.run(@qs.id, @qs.attempt, @events[3].created_at)
       expect(submission_data).to eq({ "question_#{@questions[0].id}" => "goodbye", "question_#{@questions[0].id}_marked" => true })

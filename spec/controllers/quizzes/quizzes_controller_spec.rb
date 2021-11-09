@@ -2742,6 +2742,7 @@ describe Quizzes::QuizzesController do
         get 'index', params: { :course_id => @course.id }
         expect(controller.js_env[:QUIZZES][:assignment].count).to eq 1
       end
+
       it 'hides the quiz to students with visibility' do
         user_session(@student2)
         get 'index', params: { :course_id => @course.id }
@@ -2754,12 +2755,14 @@ describe Quizzes::QuizzesController do
         get 'show', params: { :course_id => @course.id, :id => @quiz.id }
         expect(response).not_to be_redirect
       end
+
       it 'redirect for students without visibility or a submission' do
         user_session(@student2)
         get 'show', params: { :course_id => @course.id, :id => @quiz.id }
         expect(response).to be_redirect
         expect(flash[:error]).to match(/You do not have access to the requested quiz/)
       end
+
       it 'shows a message to students without visibility with a submission' do
         Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student2)
         user_session(@student2)

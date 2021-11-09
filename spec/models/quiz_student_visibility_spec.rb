@@ -223,6 +223,7 @@ describe "differentiated_assignments" do
         it "shows the quiz to the user" do
           ensure_user_sees_quiz
         end
+
         it "updates when enrollments change" do
           ensure_user_sees_quiz
           enrollments = StudentEnrollment.where(:user_id => @user.id, :course_id => @course.id, :course_section_id => @section_foo.id)
@@ -230,6 +231,7 @@ describe "differentiated_assignments" do
           enrollments.each(&:destroy_permanently!)
           ensure_user_does_not_see_quiz
         end
+
         it "updates when the override is deleted" do
           ensure_user_sees_quiz
           @quiz.assignment_overrides.to_a.each(&:destroy!)

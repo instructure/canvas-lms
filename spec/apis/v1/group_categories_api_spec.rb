@@ -490,6 +490,7 @@ describe "Group Categories API", type: :request do
                                                   :group_category_id => @category.to_param))
         expect(response.code).to eq '401'
       end
+
       it "does not allow a student to create a course group category" do
         name = 'Discussion Groups'
         raw_api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",

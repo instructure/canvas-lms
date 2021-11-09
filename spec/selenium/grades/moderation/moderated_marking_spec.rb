@@ -254,6 +254,7 @@ describe 'Moderated Marking' do
         ModeratePage.grade_input(@student1).click
         expect(f("##{selected_id}").text).to eq "4 (Custom)"
       end
+
       it 'adds the custom grade as an option in the dropdown', priority: '1', test_id: 3505170 do
         ModeratePage.grade_input(@student1).click
         expect(ModeratePage.grade_input_dropdown(@student1)).to include_text "4 (Custom)"

@@ -1072,6 +1072,7 @@ describe "Pages API", type: :request do
         [{ "hide_from_students" => false, "url" => @front_page.url, "created_at" => @front_page.created_at.as_json, "updated_at" => @front_page.revised_at.as_json, "title" => @front_page.title }]
       )
     end
+
     it 'does not allow update to page todo_date if student' do
       todo_date = Time.zone.local(2008, 9, 1, 12, 0, 0)
       page = @course.wiki_pages.create!(:title => "hrup", :todo_date => todo_date)

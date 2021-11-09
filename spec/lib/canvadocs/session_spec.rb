@@ -41,6 +41,7 @@ describe Canvadocs::Session do
       @submission = submission_model(user: student, course: course, assignment: assignment)
       expect(observing?(observer)).to eq true
     end
+
     it "returns false if the user is not an observer" do
       course = course_factory(active_all: true)
       student = user_factory(active_all: true, active_state: 'active')
@@ -76,6 +77,7 @@ describe Canvadocs::Session do
       @submission = submission_model(user: student, course: course, assignment: assignment)
       expect(managing?(teacher)).to eq true
     end
+
     it "returns false if the user does not have a TeacherEnrollment" do
       course = course_factory(active_all: true)
       student = user_factory(active_all: true, active_state: 'active')

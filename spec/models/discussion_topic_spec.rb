@@ -505,16 +505,20 @@ describe DiscussionTopic do
       it "is visible to a student with an override" do
         expect(@topic.visible_for?(@student1)).to be_truthy
       end
+
       it "is not visible to a student without an override" do
         expect(@topic.visible_for?(@student2)).to be_falsey
       end
+
       it "is visible to a teacher" do
         expect(@topic.visible_for?(@teacher)).to be_truthy
       end
+
       it "does not grant reply permissions to a student without an override" do
         expect(@topic.check_policy(@student1)).to include :reply
         expect(@topic.check_policy(@student2)).not_to include :reply
       end
+
       context "active_participants_with_visibility" do
         it "filters participants by visibility" do
           [@student1, @teacher].each do |user|
@@ -1468,11 +1472,13 @@ describe DiscussionTopic do
       create_section_override_for_assignment(@topic.assignment, { course_section: @section })
       expect(DiscussionTopic.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@topic)
     end
+
     it "returns discussions that have no assignment" do
       @topic.assignment_id = nil
       @topic.save!
       expect(DiscussionTopic.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@topic)
     end
+
     it "does not return discussions that have an assignment and no visibility" do
       expect(DiscussionTopic.visible_to_students_in_course_with_da([@student.id], [@course.id])).not_to include(@topic)
     end
@@ -2465,14 +2471,17 @@ describe DiscussionTopic do
     it 'clears stream items when unpublishing a module' do
       expect { @module.unpublish! }.to change { @student.stream_item_instances.count }.by(-1)
     end
+
     it 'removes stream items when the module item is changed to unpublished' do
       expect { @tag.unpublish! }.to change { @student.stream_item_instances.count }.by(-1)
     end
+
     it 'clears stream items when added to unpublished module items' do
       expect {
         @module.content_tags.create!(workflow_state: 'unpublished', content: @topic, context: @course)
       }.to change { @student.stream_item_instances.count }.by(-1)
     end
+
     describe 'unpublished context module' do
       before(:once) do
         @module.unpublish!
@@ -2482,14 +2491,17 @@ describe DiscussionTopic do
         @topic.unpublish!
         expect { @topic.publish! }.to change { @student.stream_item_instances.count }.by 0
       end
+
       it 'removes stream items from published topic when added to an unpublished module' do
         topic = discussion_topic_model(context: @course)
         expect { @module.add_item(type: 'discussion_topic', id: topic.id) }.to change { @student.stream_item_instances.count }.by(-1)
       end
+
       it 'creates stream items when module is published' do
         @tag.publish!
         expect { @module.publish! }.to change { @student.stream_item_instances.count }.by 1
       end
+
       it 'creates stream items when module item is published' do
         @module.publish!
         expect { @tag.publish! }.to change { @student.stream_item_instances.count }.by 1

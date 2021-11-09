@@ -596,6 +596,7 @@ describe SectionsController, type: :request do
                  { course_section: { integration_id: 'taken' } })
         expect(response).to be_bad_request
       end
+
       it "throws error when sis_id is not unique" do
         @course.course_sections.create!(name: "Test Section", sis_source_id: 'taken')
         CourseSection.where(id: @section)

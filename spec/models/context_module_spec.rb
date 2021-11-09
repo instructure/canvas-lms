@@ -1515,11 +1515,13 @@ describe ContextModule do
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@assignment)).to be_falsey
         expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@assignment)).to be_falsey
       end
+
       it "does not reload the tags if already loaded" do
         expect(ContentTag).to receive(:visible_to_students_in_course_with_da).never
         ActiveRecord::Associations::Preloader.new.preload(@module, content_tags: :content)
         @module.content_tags_visible_to(@student_1)
       end
+
       it "filters differentiated discussions" do
         discussion_topic_model(:user => @teacher, :context => @course)
         @discussion_assignment = @course.assignments.create!(:title => "some discussion assignment", only_visible_to_overrides: true)
@@ -1533,6 +1535,7 @@ describe ContextModule do
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@topic)).to be_truthy
         expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@topic)).to be_falsey
       end
+
       it "filters differentiated pages" do
         @page_assignment = wiki_page_assignment_model(course: @course, only_visible_to_overrides: true)
         create_section_override_for_assignment(@page_assignment, { course_section: @overriden_section })
@@ -1541,6 +1544,7 @@ describe ContextModule do
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@page)).to be_truthy
         expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@page)).to be_falsey
       end
+
       it "filters differentiated quizzes" do
         @quiz = Quizzes::Quiz.create!({
                                         context: @course,
@@ -1557,6 +1561,7 @@ describe ContextModule do
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@quiz)).to be_truthy
         expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@quiz)).to be_falsey
       end
+
       it "works for observers" do
         @observer = User.create
         @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @overriden_section, :enrollment_state => 'active')

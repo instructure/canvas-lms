@@ -794,6 +794,7 @@ describe Quizzes::Quiz do
       sub2 = q.generate_submission(u)
       expect(sub2.end_at).to be_nil
     end
+
     it 'does not set end_at to due_at' do
       due_at = 1.day.from_now
       u = User.create!(:name => "Fred Colon")
@@ -801,6 +802,7 @@ describe Quizzes::Quiz do
       sub2 = q.generate_submission(u)
       expect(sub2.end_at).not_to eq due_at
     end
+
     it "sets end_at for course end dates" do
       deadline = 1.day.from_now
       @course.restrict_enrollments_to_course_dates = true
@@ -811,6 +813,7 @@ describe Quizzes::Quiz do
       sub2 = q.generate_submission(@user)
       expect(sub2.end_at).to eq deadline
     end
+
     it "sets end_at to nil" do
       # when course.end_at doesn't exist
       deadline = 1.day.from_now
@@ -2344,6 +2347,7 @@ describe Quizzes::Quiz do
         it 'shows the quiz if there is an override' do
           expect(@quiz.visible_to_user?(@student1)).to be_truthy
         end
+
         it "grants submit rights" do
           allow(@course).to receive(:grants_right?).with(@student1, nil, :participate_as_student).and_return(true)
           allow(@course).to receive(:grants_right?).with(@student1, nil, :manage_assignments).and_return(false)
@@ -2357,11 +2361,13 @@ describe Quizzes::Quiz do
         it 'hides the quiz there is no override' do
           expect(@quiz.visible_to_user?(@student2)).to be_falsey
         end
+
         it 'shows the quiz if it is not only visible to overrides' do
           @quiz.only_visible_to_overrides = false
           @quiz.save!
           expect(@quiz.visible_to_user?(@student2)).to be_truthy
         end
+
         it 'does not grant submit rights' do
           allow(@course).to receive(:grants_right?).with(@student2, nil, :participate_as_student).and_return(true)
           allow(@course).to receive(:grants_right?).with(@student2, nil, :manage_assignments).and_return(false)
@@ -2382,10 +2388,12 @@ describe Quizzes::Quiz do
             @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
             expect(@quiz.visible_to_user?(@observer)).to be_truthy
           end
+
           it 'hides the quiz there is no override' do
             @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
             expect(@quiz.visible_to_user?(@observer)).to be_falsey
           end
+
           it 'shows the quiz if it is not only visible to overrides' do
             @quiz.only_visible_to_overrides = false
             @quiz.save!
@@ -2398,6 +2406,7 @@ describe Quizzes::Quiz do
           it 'shows the quiz if there is an override' do
             expect(@quiz.visible_to_user?(@observer)).to be_truthy
           end
+
           it 'shows the quiz even if there is no override' do
             expect(@quiz.visible_to_user?(@observer)).to be_truthy
           end

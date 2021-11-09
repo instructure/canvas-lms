@@ -1151,6 +1151,7 @@ describe GradebooksController do
           expect(Enrollment).to receive(:recompute_final_score).never
           get 'show', params: { :course_id => @course.id, :init => 1, :assignments => 1 }, :format => 'csv'
         end
+
         it "gets all the expected datas even with multibytes characters" do
           @course.assignments.create(:title => "Déjà vu")
           exporter = GradebookExporter.new(

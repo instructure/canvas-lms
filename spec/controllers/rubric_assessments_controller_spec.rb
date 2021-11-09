@@ -26,6 +26,7 @@ describe RubricAssessmentsController do
       post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @user.to_param } }
       assert_unauthorized
     end
+
     it "assigns variables" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course, :purpose => 'grading')
@@ -332,6 +333,7 @@ describe RubricAssessmentsController do
       post 'remind', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :assessment_request_id => @assessment_request.id }
       assert_unauthorized
     end
+
     it "sends reminder" do
       user_session(@teacher)
       post 'remind', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :assessment_request_id => @assessment_request.id }

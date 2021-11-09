@@ -76,17 +76,20 @@ describe Context do
       assignment_model
       expect(@course.find_asset(@assignment.asset_string)).to eql(@assignment)
     end
+
     it "finds a valid wiki page" do
       course_model
       page = @course.wiki_pages.create!(:title => 'test')
       expect(@course.find_asset(page.asset_string)).to eql(page)
       expect(@course.find_asset(page.asset_string, [:wiki_page])).to eql(page)
     end
+
     it "does not find a valid wiki page if told to ignore wiki pages" do
       course_model
       page = @course.wiki_pages.create!(:title => 'test')
       expect(@course.find_asset(page.asset_string, [:assignment])).to be nil
     end
+
     it "does not find an invalid assignment" do
       assignment_model
       @course2 = Course.create!

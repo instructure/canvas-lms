@@ -1511,15 +1511,18 @@ describe User do
         expect { @user.clear_avatar_image_url_with_uuid('') }.to raise_error(ArgumentError, "'uuid' is required and cannot be blank")
         expect { @user.clear_avatar_image_url_with_uuid('  ') }.to raise_error(ArgumentError, "'uuid' is required and cannot be blank")
       end
+
       it "clears avatar_image_url when uuid matches" do
         @user.clear_avatar_image_url_with_uuid('1234567890ABCDEF')
         expect(@user.avatar_image_url).to be_nil
         expect(@user.changed?).to eq false # should be saved
       end
+
       it "does not clear avatar_image_url when no match" do
         @user.clear_avatar_image_url_with_uuid('NonMatchingText')
         expect(@user.avatar_image_url).to eq '1234567890ABCDEF'
       end
+
       it "does not error when avatar_image_url is nil" do
         @user.avatar_image_url = nil
         @user.save!
@@ -2218,6 +2221,7 @@ describe User do
       expect(User.avatar_key("2")).to eq "2-#{Canvas::Security.hmac_sha1('2')[0, 10]}"
       expect(User.avatar_key("161612461246")).to eq "161612461246-#{Canvas::Security.hmac_sha1('161612461246')[0, 10]}"
     end
+
     it " should return '0' for an invalid user id" do
       expect(User.avatar_key(nil)).to eq "0"
       expect(User.avatar_key("")).to eq "0"
@@ -2230,6 +2234,7 @@ describe User do
       expect(User.user_id_from_avatar_key("2-#{Canvas::Security.hmac_sha1('2')[0, 10]}")).to eq '2'
       expect(User.user_id_from_avatar_key("1536394658-#{Canvas::Security.hmac_sha1('1536394658')[0, 10]}")).to eq '1536394658'
     end
+
     it "returns nil for an invalid avatar key" do
       expect(User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1('1')}")).to eq nil
       expect(User.user_id_from_avatar_key("1")).to eq nil

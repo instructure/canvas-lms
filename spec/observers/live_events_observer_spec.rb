@@ -27,6 +27,7 @@ describe LiveEventsObserver do
       expect(Canvas::LiveEvents).to receive(:user_updated).never
       @user.save!
     end
+
     it "doesn't post events for NOP fields" do
       account_model
       course_model(name: "CS101", account: @account)
@@ -37,6 +38,7 @@ describe LiveEventsObserver do
       expect(Canvas::LiveEvents).to receive(:course_updated).never
       @course.save!
     end
+
     it "does post event for actual change" do
       user_model(name: "Joey Joe Joe")
 

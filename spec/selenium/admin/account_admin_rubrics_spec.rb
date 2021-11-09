@@ -35,6 +35,7 @@ describe "account shared rubric specs" do
   it "deletes a rubric" do
     should_delete_a_rubric
   end
+
   it "edits a rubric" do
     should_edit_a_rubric
   end

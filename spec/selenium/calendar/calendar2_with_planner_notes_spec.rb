@@ -50,6 +50,7 @@ describe "calendar2" do
       expect(note).to include_text('Student To Do')
       expect(note).to contain_css('i.icon-note-light')
     end
+
     it "creates a new student calendar todo" do
       title = "new todo title"
       get '/calendar2'
@@ -68,6 +69,7 @@ describe "calendar2" do
       expect(note).to include_text(title)
       expect(note).to contain_css('i.icon-note-light')
     end
+
     it "deletes a student calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Student To Do")
       get '/calendar2'
@@ -78,6 +80,7 @@ describe "calendar2" do
       f('.btn-primary').click       # delete button in the confirmation dialog
       expect(f('.fc-view-container')).not_to contain_css('a.fc-event')
     end
+
     it "edits a student calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Student To Do")
       new_title = "new todo title"
@@ -91,6 +94,7 @@ describe "calendar2" do
       note = f('a.fc-event')
       expect(note).to include_text(new_title)
     end
+
     it "shows course calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
       get '/calendar2'
@@ -102,6 +106,7 @@ describe "calendar2" do
       expect(note).to include_text('Course To Do')
       expect(note).to contain_css('i.icon-note-light')
     end
+
     it "edits a course calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
       new_title = "new course todo title"
@@ -115,6 +120,7 @@ describe "calendar2" do
       note = f('a.fc-event')
       expect(note).to include_text(new_title)
     end
+
     it "moves a course calendar todo to the student calendar" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
       get '/calendar2'

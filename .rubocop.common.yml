@@ -84,6 +84,8 @@ RSpec/DescribedClass:
   Enabled: false # we haven't used it, and it seems antithetical to RSpec/NamedSubject
 RSpec/EmptyExampleGroup:
   Severity: error
+RSpec/EmptyLineAfterExample:
+  Severity: error
 RSpec/ExampleLength:
   Enabled: false # this is a Metrics-style cop
 RSpec/ExampleWording:

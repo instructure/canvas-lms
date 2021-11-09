@@ -375,6 +375,7 @@ describe GradeCalculator do
           expect(final_grade_info(@user, @course)[:total]).to equal 30.0
           expect(final_grade_info(@user, @course)[:possible]).to equal 60.0
         end
+
         it "drops the lowest visible when that rule is in place" do
           @group.update_attribute(:rules, 'drop_lowest:1')
           # 5 + 15 + 10 - 5
@@ -382,6 +383,7 @@ describe GradeCalculator do
           expect(final_grade_info(@user, @course)[:possible]).to equal 40.0
           expect(final_grade_info(@user, @course)[:dropped]).to eq [find_submission(@overridden_lowest)]
         end
+
         it "drops the highest visible when that rule is in place" do
           @group.update_attribute(:rules, 'drop_highest:1')
           # 5 + 15 + 10 - 15
@@ -389,6 +391,7 @@ describe GradeCalculator do
           expect(final_grade_info(@user, @course)[:possible]).to equal 40.0
           expect(final_grade_info(@user, @course)[:dropped]).to eq [find_submission(@overridden_highest)]
         end
+
         it "does not count an invisible assignment with never drop on" do
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
           # 5 + 15 + 10 - 10
@@ -396,6 +399,7 @@ describe GradeCalculator do
           expect(final_grade_info(@user, @course)[:possible]).to equal 40.0
           expect(final_grade_info(@user, @course)[:dropped]).to eq [find_submission(@overridden_middle)]
         end
+
         it "saves scores for all assignment group and enrollment combinations" do
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
           user_ids = @course.enrollments.map(&:user_id).uniq
@@ -404,6 +408,7 @@ describe GradeCalculator do
           expect(Score.where(assignment_group_id: group_ids).count).to eq @course.enrollments.count * group_ids.length
           expect(ScoreMetadata.where(score_id: Score.where(assignment_group_id: group_ids)).count).to eq 2
         end
+
         it "saves dropped submission to group score metadata" do
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
           GradeCalculator.new(@user.id, @course.id).compute_and_save_scores

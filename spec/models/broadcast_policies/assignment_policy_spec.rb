@@ -68,6 +68,7 @@ module BroadcastPolicies
           allow(assignment).to receive(:saved_change_to_workflow_state?).and_return false
         }
       }
+
       specify { wont_send_when { allow(assignment).to receive(:published?).and_return false } }
       specify { wont_send_when { allow(context).to receive(:concluded?).and_return true } }
     end
