@@ -1,4 +1,10 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "Un gran foro de discusión"
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "Una magnífica actividad"
+    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Acceder al Editor HTML agradable"
     },
@@ -59,6 +65,9 @@
     "alt_text_611fb322": {
         "message": "Texto alternativo"
     },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "Una maravillosa actividad del foro de discusión"
+    },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Ha habido un error al leer el archivo"
     },
@@ -82,6 +91,9 @@
     },
     "apply_781a2546": {
         "message": "Aplicar"
+    },
+    "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+        "message": "Aplica cambios a todas las instancias de este Botón e icono en el Curso"
     },
     "apps_54d24a47": {
         "message": "Aplicaciones"
@@ -233,6 +245,9 @@
     "close_opportunity_center_popup_9907d981": {
         "message": "Cerrar ventana emergente del centro de oportunidades"
     },
+    "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+        "message": "El archivo de transcripción de audio debe tener menos de { maxKb } kb"
+    },
     "closed_captions_subtitles_e6aaa016": {
         "message": "Subtítulos/subtítulos ocultos"
     },
@@ -313,6 +328,12 @@
     },
     "creative_commons_license_725584ae": {
         "message": "Licencia Creative Commons:"
+    },
+    "crop_image_807ebb08": {
+        "message": "Ajustar la imagen"
+    },
+    "current_image_f16c249c": {
+        "message": "Imagen actual"
     },
     "custom_6979cd81": {
         "message": "Personalizar"
@@ -431,6 +452,9 @@
     "edit_equation_f5279959": {
         "message": "Editar ecuación"
     },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "Editar Botón Existente/Icono"
+    },
     "edit_link_7f53bebb": {
         "message": "Editar enlace"
     },
@@ -478,6 +502,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Error al cargar ítems anteriores"
+    },
+    "exciting_discussion_9f67bd0a": {
+        "message": "Foro de discusión animado"
     },
     "excused_cf8792eb": {
         "message": "Justificado"
@@ -565,6 +592,9 @@
     },
     "fullscreen_873bf53f": {
         "message": "Pantalla completa"
+    },
+    "fun_quiz_47ab0b0": {
+        "message": "Examen divertido"
     },
     "generating_preview_45b53be0": {
         "message": "Generando la vista previa..."
@@ -689,6 +719,15 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } { items, plural,\n     =1 {ítem}\n  other {ítems}\n} completado(s)"
     },
+    "join_6cafecca": {
+        "message": "Unirse"
+    },
+    "join_active_online_meeting_d9d892b2": {
+        "message": "Unirse a una reunión en línea activa"
+    },
+    "join_online_meeting_b1725843": {
+        "message": "Unirse a una reunión en línea"
+    },
     "jump_to_navigation_toolbar_2952cd8b": {
         "message": "Salte a la barra de herramientas de navegación"
     },
@@ -697,6 +736,9 @@
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Métodos abreviados de teclado"
+    },
+    "language_arts_35b79a8b": {
+        "message": "Artes del idioma"
     },
     "large_9c5e80e7": {
         "message": "Grande"
@@ -770,6 +812,9 @@
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Parece que no hay nada aquí"
     },
+    "math_ede93050": {
+        "message": "Matemáticas"
+    },
     "media_af190855": {
         "message": "Contenido multimedia"
     },
@@ -790,6 +835,9 @@
     },
     "modules_c4325335": {
         "message": "Módulos"
+    },
+    "multi_color_image_63d7372f": {
+        "message": "Imagen multicolor"
     },
     "must_be_at_least_width_x_height_px_41dc825e": {
         "message": "Debe ser al menos { width } x { height } px"
@@ -850,6 +898,9 @@
     },
     "none_3b5e34d2": {
         "message": "Ninguno"
+    },
+    "none_selected_b93d56d2": {
+        "message": "Ninguna seleccionada"
     },
     "nothing_due_this_week_d45c9ef9": {
         "message": "Nada vence esta semana"
@@ -1019,6 +1070,9 @@
     "schedule_preview_3bcda153": {
         "message": "Vista previa del horario"
     },
+    "science_8d92214a": {
+        "message": "Ciencia"
+    },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "Desplácese para ver su historial"
     },
@@ -1030,6 +1084,9 @@
     },
     "search_term_b2d2235": {
         "message": "Término de búsqueda"
+    },
+    "select_crop_shape_d441feeb": {
+        "message": "Seleccione la forma de recorte"
     },
     "select_language_7c93a900": {
         "message": "Seleccionar idioma"
@@ -1058,11 +1115,20 @@
     "show_video_options_6ed3721a": {
         "message": "Mostrar opciones de video"
     },
+    "single_color_image_4e5d4dbc": {
+        "message": "Imagen unicolor"
+    },
     "size_b30e1077": {
         "message": "Tamaño"
     },
+    "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+        "message": "El tamaño del archivo es superior al máximo permitido para archivos, que es de { max } kb."
+    },
     "small_b070434a": {
         "message": "Pequeño"
+    },
+    "social_studies_13fa30c7": {
+        "message": "Estudios sociales"
     },
     "something_went_wrong_89195131": {
         "message": "Ha habido un error."
@@ -1156,6 +1222,9 @@
     },
     "text_size_887c2f6": {
         "message": "Tamaño del texto"
+    },
+    "the_best_assignment_15e98be1": {
+        "message": "La mejor actividad"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "La fecha y la hora de entrega de esta actividad pendiente han vencido"

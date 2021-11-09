@@ -119,6 +119,7 @@
   "course_navigation_dd035109": { "message": "Leiðarnet námskeiðs" },
   "create_button_and_icon_5c089934": { "message": "Búa til hnapp og tákn" },
   "creative_commons_license_725584ae": { "message": "Creative Commons leyfi:" },
+  "crop_image_807ebb08": { "message": "Klippa mynd" },
   "current_image_f16c249c": { "message": "Núverandi mynd" },
   "custom_6979cd81": { "message": "Sérsníða" },
   "date_added_ed5ad465": { "message": "Dagsetning bætt við" },
@@ -289,6 +290,7 @@
     "message": "Engar niðurstöður fundust fyrir { term }."
   },
   "none_3b5e34d2": { "message": "Ekkert" },
+  "none_selected_b93d56d2": { "message": "Ekkert valið" },
   "octagon_e48be9f": { "message": "Átthyrningur" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Opna svarglugga flýtilykla"
@@ -337,6 +339,7 @@
   "saved_buttons_and_icons_8278eed2": { "message": "Vistaðir hnappar og tákn" },
   "search_280d00bd": { "message": "Leita" },
   "search_term_b2d2235": { "message": "Leitarhugtak" },
+  "select_crop_shape_d441feeb": { "message": "Veldu klippiform" },
   "select_language_7c93a900": { "message": "Velja tungumál" },
   "selected_274ce24f": { "message": "Valið" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

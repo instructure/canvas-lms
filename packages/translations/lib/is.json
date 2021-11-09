@@ -329,6 +329,9 @@
     "creative_commons_license_725584ae": {
         "message": "Creative Commons leyfi:"
     },
+    "crop_image_807ebb08": {
+        "message": "Klippa mynd"
+    },
     "current_image_f16c249c": {
         "message": "Núverandi mynd"
     },
@@ -896,6 +899,9 @@
     "none_3b5e34d2": {
         "message": "Ekkert"
     },
+    "none_selected_b93d56d2": {
+        "message": "Ekkert valið"
+    },
     "nothing_due_this_week_d45c9ef9": {
         "message": "Engin skil þessa viku"
     },
@@ -1078,6 +1084,9 @@
     },
     "search_term_b2d2235": {
         "message": "Leitarhugtak"
+    },
+    "select_crop_shape_d441feeb": {
+        "message": "Veldu klippiform"
     },
     "select_language_7c93a900": {
         "message": "Velja tungumál"
