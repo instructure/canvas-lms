@@ -33,6 +33,7 @@ jest.useFakeTimers()
 describe('OutcomeEditModal', () => {
   let onCloseHandlerMock
   let showFlashAlertSpy
+  let onEditLearningOutcomeHandlerMock
 
   const outcome = {
     _id: '1',
@@ -47,11 +48,13 @@ describe('OutcomeEditModal', () => {
     outcome,
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
+    onEditLearningOutcomeHandler: onEditLearningOutcomeHandlerMock,
     ...props
   })
 
   beforeEach(() => {
     onCloseHandlerMock = jest.fn()
+    onEditLearningOutcomeHandlerMock = jest.fn()
     showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
   })
 
@@ -182,6 +185,7 @@ describe('OutcomeEditModal', () => {
       })
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
+      expect(onEditLearningOutcomeHandlerMock).toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: '"Updated name" was successfully updated.',
         type: 'success'
@@ -196,6 +200,7 @@ describe('OutcomeEditModal', () => {
       fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
+      expect(onEditLearningOutcomeHandlerMock).not.toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while editing this outcome. Please try again.',
         type: 'error'
@@ -211,6 +216,7 @@ describe('OutcomeEditModal', () => {
       })
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
+      expect(onEditLearningOutcomeHandlerMock).toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: '"Outcome" was successfully updated.',
         type: 'success'
@@ -224,6 +230,7 @@ describe('OutcomeEditModal', () => {
       })
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
+      expect(onEditLearningOutcomeHandlerMock).not.toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while editing this outcome. Please try again.',
         type: 'error'
@@ -259,6 +266,7 @@ describe('OutcomeEditModal', () => {
       fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
+      expect(onEditLearningOutcomeHandlerMock).toHaveBeenCalled()
       // if setFriendlyDescription mutation is called the expectation below will fail
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: '"Updated name" was successfully updated.',

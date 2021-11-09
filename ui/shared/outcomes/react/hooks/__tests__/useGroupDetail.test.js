@@ -29,6 +29,8 @@ import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 jest.mock('@canvas/alerts/react/FlashAlert')
 
 const outcomeTitles = result => result.current.group.outcomes.edges.map(edge => edge.node.title)
+const outcomeFriendlyDescriptions = result =>
+  result.current.group.outcomes.edges.map(edge => edge.node.friendlyDescription?.description || '')
 
 describe('groupDetailHook', () => {
   let cache, mocks, showFlashAlertSpy
@@ -172,6 +174,7 @@ describe('groupDetailHook', () => {
     await act(async () => jest.runAllTimers())
     expect(result.current.group.title).toBe('Group 1')
     expect(outcomeTitles(result)).toEqual(['Outcome 1 - Group 1', 'Outcome 2 - Group 1'])
+    expect(outcomeFriendlyDescriptions(result)).toEqual(['', ''])
     act(() => rerender('200'))
     await act(async () => jest.runAllTimers())
     expect(result.current.group.title).toBe('Refetched Group 200')
@@ -180,6 +183,7 @@ describe('groupDetailHook', () => {
       'Refetched Outcome 2 - Group 200',
       'Newly Created Outcome - Group 200'
     ])
+    expect(outcomeFriendlyDescriptions(result)).toEqual(['friendly', '', ''])
   })
 
   it('should not load group info if ACCOUNT_GROUP_ID passed as id', async () => {
