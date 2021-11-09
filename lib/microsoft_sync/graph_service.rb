@@ -69,12 +69,6 @@ module MicrosoftSync
       request(:patch, "groups/#{group_id}", quota: [1, 1], body: params)
     end
 
-    # Used for debugging. Example:
-    # get_group('id', select: %w[microsoft_EducationClassLmsExt microsoft_EducationClassSisExt])
-    def get_group(group_id, options = {})
-      request(:get, "groups/#{group_id}", quota: [1, 0], query: expand_options(**options))
-    end
-
     # Yields (results, next_link) for each page, or returns first page of results if no block given.
     def list_group_members(group_id, options = {}, &blk)
       get_paginated_list("groups/#{group_id}/members", quota: [3, 0], **options, &blk)
