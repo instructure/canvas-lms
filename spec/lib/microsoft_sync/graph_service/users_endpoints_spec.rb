@@ -20,10 +20,10 @@
 describe MicrosoftSync::GraphService::UsersEndpoints do
   include_context 'microsoft_sync_graph_service_endpoints'
 
-  describe '#list_users' do
+  describe '#list' do
     let(:http_method) { :get }
     let(:url) { 'https://graph.microsoft.com/v1.0/users' }
-    let(:method_name) { :list_users }
+    let(:method_name) { :list }
     let(:method_args) { [] }
 
     it_behaves_like 'a paginated list endpoint'
