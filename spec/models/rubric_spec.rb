@@ -142,7 +142,7 @@ describe Rubric do
             @rubric.reload.update_mastery_scales
 
             rubric_criterion = @rubric.criteria_object.first
-            expect(rubric_criterion.ratings.map(&:description)).to eq OutcomeProficiency.default_ratings.map { |r| r[:description] }
+            expect(rubric_criterion.ratings.map(&:description)).to eq OutcomeProficiency.default_ratings.pluck(:description)
           end
         end
 
@@ -398,7 +398,7 @@ describe Rubric do
 
       let(:last_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_deleted').last }
 
-      before(:each) do
+      before do
         rubric.update_with_association(teacher, {}, course, association_object: assignment)
       end
 
@@ -430,7 +430,7 @@ describe Rubric do
         let(:old_rubric) { Rubric.create!(title: 'zzz', context: course) }
         let(:last_updated_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_updated').last }
 
-        before(:each) do
+        before do
           old_rubric.update_with_association(
             teacher,
             {},
@@ -664,6 +664,7 @@ describe Rubric do
 
   describe 'create' do
     let(:root_account) { Account.default }
+
     it 'sets the root_account_id using course' do
       course_model
       rubric_for_course

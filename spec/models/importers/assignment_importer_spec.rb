@@ -801,7 +801,7 @@ describe "Importing assignments" do
       course.assignments.find_by(migration_id: migration_id)
     end
 
-    before(:each) do
+    before do
       course.enable_feature!(:anonymous_marking)
       course.enable_feature!(:moderated_grading)
     end

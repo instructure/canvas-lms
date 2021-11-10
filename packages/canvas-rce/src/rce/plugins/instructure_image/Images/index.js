@@ -74,7 +74,7 @@ export default function Images(props) {
 
       {error && (
         <View as="div" role="alert" margin="medium">
-          <Text color="error">{formatMessage('Loading failed.')}</Text>
+          <Text color="danger">{formatMessage('Loading failed.')}</Text>
         </View>
       )}
     </View>

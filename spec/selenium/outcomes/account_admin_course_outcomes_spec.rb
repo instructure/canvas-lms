@@ -26,8 +26,9 @@ describe "account admin outcomes" do
   let(:outcome_url) { "/accounts/#{Account.default.id}/outcomes" }
   let(:who_to_login) { 'admin' }
   let(:account) { Account.default }
+
   describe "course outcomes" do
-    before(:each) do
+    before do
       RoleOverride.create!(:context => account, :permission => 'manage_courses',
                            :role => admin_role, :enabled => false) # should not manage_courses permission
       course_with_admin_logged_in
@@ -82,7 +83,7 @@ describe "account admin outcomes" do
     context "outcome groups" do
       let(:one) { 1 }
 
-      before(:each) do
+      before do
         setup_fake_state_data(one)
         open_outcomes_find
         click_on_state_standards

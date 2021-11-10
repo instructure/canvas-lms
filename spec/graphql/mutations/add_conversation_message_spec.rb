@@ -37,7 +37,6 @@ RSpec.describe Mutations::AddConversationMessage do
     @conversation
   end
 
-  # rubocop:disable Metrics/ParameterLists
   def mutation_str(
     conversation_id: nil,
     body: nil,
@@ -85,7 +84,6 @@ RSpec.describe Mutations::AddConversationMessage do
       }
     GQL
   end
-  # rubocop:enable Metrics/ParameterLists
 
   def run_mutation(opts = {}, current_user = @student)
     result = CanvasSchema.execute(
@@ -126,9 +124,7 @@ RSpec.describe Mutations::AddConversationMessage do
   end
 
   it 'queues a job if needed' do
-    # rubocop:disable RSpec/AnyInstance
     allow_any_instance_of(ConversationParticipant).to receive(:should_process_immediately?).and_return(false)
-    # rubocop:enable RSpec/AnyInstance
     conversation
     result = run_mutation(conversation_id: @conversation.conversation_id, body: 'This should be delayed', recipients: [@teacher.id.to_s])
 

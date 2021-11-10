@@ -29,7 +29,7 @@ class Mutations::CreateGroupInSet < Mutations::BaseMutation
   def resolve(input:)
     category_id = GraphQLHelpers.parse_relay_or_legacy_id(input[:group_set_id], "GroupSet")
     set = GroupCategory.find(category_id)
-    if set&.root_account.feature_enabled?(:granular_permissions_manage_groups)
+    if set&.root_account&.feature_enabled?(:granular_permissions_manage_groups)
       verify_authorized_action!(set.context, :manage_groups_add)
     else
       verify_authorized_action!(set.context, :manage_groups)

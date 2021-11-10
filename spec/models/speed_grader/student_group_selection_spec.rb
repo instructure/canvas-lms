@@ -66,7 +66,7 @@ describe SpeedGrader::StudentGroupSelection do
     end
 
     context "when a group that does not contain the student was previously selected" do
-      before(:each) do
+      before do
         @teacher.preferences[:gradebook_settings] = { @course.global_id => { 'filter_rows_by' => { 'student_group_id' => group1.id.to_s } } }
         @teacher.save!
       end
@@ -111,7 +111,7 @@ describe SpeedGrader::StudentGroupSelection do
     end
 
     context "when a non-empty group is already selected" do
-      before(:each) do
+      before do
         @teacher.preferences[:gradebook_settings] = { @course.global_id => { 'filter_rows_by' => { 'student_group_id' => group2.id.to_s } } }
         @teacher.save!
       end
@@ -138,7 +138,7 @@ describe SpeedGrader::StudentGroupSelection do
     end
 
     context "when an empty group is already selected" do
-      before(:each) do
+      before do
         @teacher.preferences[:gradebook_settings] = { @course.global_id => { 'filter_rows_by' => { 'student_group_id' => empty_group.id.to_s } } }
         @teacher.save!
       end

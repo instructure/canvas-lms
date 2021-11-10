@@ -22,7 +22,7 @@ require "spec_helper"
 
 describe CanvasCassandra do
   describe "logger" do
-    around(:each) do |example|
+    around do |example|
       prev_logger = CanvasCassandra.logger
       example.run
     ensure

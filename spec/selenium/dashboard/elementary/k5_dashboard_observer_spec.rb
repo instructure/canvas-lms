@@ -47,7 +47,7 @@ describe "observer k5 dashboard" do
     observer_setup
   end
 
-  before :each do
+  before do
     user_session @observer
     driver.manage.delete_cookie("#{ObserverEnrollmentsHelper::OBSERVER_COOKIE_PREFIX}#{@observer.id}")
   end

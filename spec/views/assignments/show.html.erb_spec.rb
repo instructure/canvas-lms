@@ -60,7 +60,7 @@ describe "/assignments/show" do
   end
 
   describe "moderation page link" do
-    before :each do
+    before do
       course_with_teacher(active_all: true)
       view_context(@course, @user)
       g = @course.assignment_groups.create!(name: "Homework")
@@ -123,7 +123,7 @@ describe "/assignments/show" do
   end
 
   context "confetti" do
-    before(:each) do
+    before do
       course_with_student(active_all: true)
       view_context(@course, @user)
       a = @course.assignments.create!(title: "Introduce Yourself")

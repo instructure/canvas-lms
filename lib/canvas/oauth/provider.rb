@@ -21,7 +21,7 @@ module Canvas::OAuth
   class Provider
     OAUTH2_OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
 
-    attr_reader :client_id, :redirect_uri, :scopes, :purpose
+    attr_reader :client_id, :scopes, :purpose
 
     def initialize(client_id, redirect_uri = "", scopes = [], purpose = nil)
       @client_id = client_id

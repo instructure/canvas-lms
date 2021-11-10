@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ComposeInputWrapper} from '../../ComposeInputWrapper/ComposeInputWrapper'
+import {ComposeInputWrapper} from '../../components/ComposeInputWrapper/ComposeInputWrapper'
 import {CourseSelect} from '../../components/CourseSelect/CourseSelect'
 import I18n from 'i18n!conversations_2'
 import {IndividualMessageCheckbox} from '../../components/IndividualMessageCheckbox/IndividualMessageCheckbox'

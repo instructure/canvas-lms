@@ -23,7 +23,7 @@ describe "quizzes assignments" do
   include_context "in-process server selenium tests"
   include AssignmentsCommon
 
-  before(:each) do
+  before do
     @domain_root_account = Account.default
     course_with_teacher_logged_in
   end

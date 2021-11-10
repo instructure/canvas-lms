@@ -71,6 +71,7 @@ describe Quizzes::QuizQuestionsController do
       expect(assigns[:question].question_data[:answers].length).to eql(2)
       expect(assigns[:quiz]).to eql(@quiz)
     end
+
     it "preserves ids, if provided, on create" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :quiz_id => @quiz, :question => {

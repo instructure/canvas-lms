@@ -36,7 +36,7 @@ describe DatadogRumHelper do
       Account.site_admin.enable_feature!(:datadog_rum_js)
     end
 
-    before :each do
+    before do
       allow(Canvas::DynamicSettings).to receive(:find).and_call_original
       allow(Canvas::DynamicSettings).to(
         receive(:find).with("datadog-rum", tree: "config", service: "canvas").and_return(datadog_rum_config)
@@ -45,7 +45,7 @@ describe DatadogRumHelper do
     end
 
     context "when opted in to using datadog rum js" do
-      before :each do
+      before do
         opt_in_datadog_rum_js
       end
 

@@ -136,7 +136,7 @@ describe Gradebook::FinalGradeOverrides do
       ]
     end
 
-    before(:each) do
+    before do
       course.enrollment_term.grading_period_group = grading_period.grading_period_group
       course.enable_feature!(:final_grades_override)
       course.allow_final_grade_override = true

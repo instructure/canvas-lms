@@ -196,7 +196,7 @@ describe FilesController do
         @tool.save!
       end
 
-      before :each do
+      before do
         user_factory(active_all: true)
         user_session(@user)
       end
@@ -226,7 +226,7 @@ describe FilesController do
         end
       end
 
-      before :each do
+      before do
         user_session(@user)
       end
 
@@ -631,7 +631,7 @@ describe FilesController do
     end
 
     context "as student" do
-      before(:each) do
+      before do
         user_session(@student)
       end
 
@@ -749,7 +749,7 @@ describe FilesController do
         @account = account_model
       end
 
-      before :each do
+      before do
         allow(HostUrl).to receive(:file_host).and_return('files.test')
         request.host = 'files.test'
         user_session(@teacher)
@@ -1173,7 +1173,7 @@ describe FilesController do
       @attachment = factory_with_protected_attributes(Attachment, :context => @course, :file_state => 'deleted', :workflow_state => 'unattached', :filename => 'test.txt', :content_type => 'text')
     end
 
-    before :each do
+    before do
       @content = Rack::Test::UploadedFile.new(File.join(RSpec.configuration.fixture_path, 'courses.yml'), '')
       request.env['CONTENT_TYPE'] = 'multipart/form-data'
       enable_forgery_protection
@@ -1256,7 +1256,7 @@ describe FilesController do
   end
 
   describe "POST api_capture" do
-    before :each do
+    before do
       allow(InstFS).to receive(:enabled?).and_return(true)
       allow(InstFS).to receive(:jwt_secrets).and_return(["jwt signing key"])
       @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
@@ -1515,7 +1515,7 @@ describe FilesController do
     end
 
     context "with direct rights" do
-      before :each do
+      before do
         user_session @student
       end
 
@@ -1528,7 +1528,7 @@ describe FilesController do
     end
 
     context "without direct rights" do
-      before :each do
+      before do
         user_session @teacher
       end
 

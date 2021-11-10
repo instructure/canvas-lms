@@ -89,7 +89,7 @@ describe SupportHelpers::TurnitinController do
       end
 
       it "returns 400 status without id" do
-        expect(SupportHelpers::Tii::AssignmentFixer).to receive(:new).never
+        expect(SupportHelpers::Tii::AssignmentFixer).not_to receive(:new)
         get :assignment
         expect(response.body).to eq('Missing assignment `id` parameter')
         assert_status(400)

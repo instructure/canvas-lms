@@ -42,7 +42,7 @@ describe Mutations::SetOverrideScore do
   let(:score_for_enrollment) { student_enrollment.find_score }
   let(:score_for_grading_period) { student_enrollment.find_score(grading_period_id: grading_period.id) }
 
-  before(:each) do
+  before do
     course.assignments.create!(title: "hi", grading_type: "points", points_possible: 1000)
   end
 
@@ -156,7 +156,7 @@ describe Mutations::SetOverrideScore do
     end
 
     describe "grade change audit events" do
-      before(:each) do
+      before do
         grading_standard = course.grading_standards.create!(data: GradingStandard.default_grading_standard)
         course.update!(default_grading_standard: grading_standard)
         score_for_grading_period.update!(override_score: 75.0)

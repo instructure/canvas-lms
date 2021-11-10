@@ -29,7 +29,7 @@ describe "Gradebook History Page" do
     gb_history_setup(2)
   end
 
-  before(:each) do
+  before do
     user_session(@teacher)
     GradeBookHistory.visit(@course)
     wait_for_ajaximations

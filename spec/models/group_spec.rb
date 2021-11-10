@@ -265,7 +265,7 @@ describe Group do
   end
 
   context 'with granular permissions enabled' do
-    before :each do
+    before do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
     end
 
@@ -855,7 +855,7 @@ describe Group do
   end
 
   describe '#favorite_for_user?' do
-    before :each do
+    before do
       context = course_model
       @group_fave = Group.create!(:name => "group1", :context => context)
       @group_not_fave = Group.create!(:name => "group2", :context => context)

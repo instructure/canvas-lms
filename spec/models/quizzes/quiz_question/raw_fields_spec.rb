@@ -21,6 +21,7 @@
 describe Quizzes::QuizQuestion::RawFields do
   describe "#fetch_any" do
     let(:fields) { Quizzes::QuizQuestion::RawFields.new(answer_comment: "an answer comment", comments: "another answer comment") }
+
     it "fetches a specified key" do
       expect(fields.fetch_any(:answer_comment)).to eq "an answer comment"
     end

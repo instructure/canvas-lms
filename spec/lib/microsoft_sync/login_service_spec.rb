@@ -45,7 +45,7 @@ describe MicrosoftSync::LoginService do
     context 'when configured' do
       subject { described_class.new_token('mytenant') }
 
-      before :each do
+      before do
         allow(InstStatsd::Statsd).to receive(:increment)
       end
 

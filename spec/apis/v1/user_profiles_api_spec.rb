@@ -191,7 +191,7 @@ describe "User Profile API", type: :request do
       @student.user_services.create! :service => 'somethingthatdoesntexistanymore', :service_user_name => 'user', :service_user_id => 'user', :visible => true
     end
 
-    before :each do
+    before do
       allow(Twitter::Connection).to receive(:config).and_return({ :some_hash => "fullofstuff" })
     end
 

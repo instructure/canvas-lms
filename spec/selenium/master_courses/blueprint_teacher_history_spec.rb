@@ -38,7 +38,7 @@ describe "master courses - child courses - sync history for teacher" do
     @cm = @copy_to.content_migrations.where(:child_subscription_id => @sub).last
   end
 
-  before :each do
+  before do
     user_session(@teacher)
   end
 

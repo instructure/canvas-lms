@@ -34,6 +34,7 @@ describe Canvas::LockExplanation do
 
     context "with a :lock_at key in the hash" do
       let(:hash) { { lock_at: DateTime.tomorrow } }
+
       context "with a type of 'page'" do
         it "returns the correct explanation string" do
           expect(result).to match(/This page was locked /)
@@ -43,6 +44,7 @@ describe Canvas::LockExplanation do
     context "with no :unlock_at or :lock_at in the hash" do
       context "with a context module in the hash" do
         let(:hash) { { context_module: object, asset_string: 'course_1' } }
+
         context "with a published object" do
           let(:object) {
             cm = ContextModule.new(workflow_state: 'published', name: 'foo')
@@ -72,6 +74,7 @@ describe Canvas::LockExplanation do
 
               context "when the group's context is an account" do
                 let(:context) { Group.new(context: Account.new) }
+
                 it "raises" do
                   expect { result }.to raise_error("Either Context or Group context must be a Course")
                 end
@@ -80,6 +83,7 @@ describe Canvas::LockExplanation do
 
             context "when the context is an account" do
               let(:context) { Account.new }
+
               it "raises" do
                 expect { result }.to raise_error("Either Context or Group context must be a Course")
               end

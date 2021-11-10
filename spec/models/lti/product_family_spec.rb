@@ -25,7 +25,7 @@ module Lti
     let(:account) { Account.new }
 
     describe 'validations' do
-      before(:each) do
+      before do
         subject.vendor_code = 'vendor_code'
         subject.product_code = 'product_code'
         subject.vendor_name = 'vendor_name'

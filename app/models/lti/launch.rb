@@ -23,8 +23,8 @@ module Lti
   class Launch
     FRAME_ALLOWANCES = ['geolocation', 'microphone', 'camera', 'midi', 'encrypted-media', 'autoplay'].freeze
 
-    attr_writer :analytics_id, :analytics_message_type
-    attr_accessor :link_text, :resource_url, :params, :launch_type, :tool_dimensions, :base_string
+    attr_writer :analytics_id, :analytics_message_type, :resource_url
+    attr_accessor :link_text, :params, :launch_type, :tool_dimensions, :base_string
 
     def self.iframe_allowances(user_agent = nil)
       browser = Browser.new(user_agent)

@@ -19,18 +19,20 @@
 #
 
 describe JobLiveEventsContext do
-  class FakeDelayed
-    include JobLiveEventsContext
+  let(:klass) do
+    Class.new do
+      include JobLiveEventsContext
 
-    attr_accessor :global_id, :tag
+      attr_accessor :global_id, :tag
 
-    def initialize
-      @global_id = 1
-      @tag = 'foobar'
+      def initialize
+        @global_id = 1
+        @tag = 'foobar'
+      end
     end
   end
 
-  let(:fake_delayed_instance) { FakeDelayed.new }
+  let(:fake_delayed_instance) { klass.new }
 
   describe '#live_events_context' do
     it 'yields a hash with job and default account details' do

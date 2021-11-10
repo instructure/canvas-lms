@@ -60,4 +60,13 @@ describe('DiscussionTopicAlertManager', () => {
     })
     expect(container.queryByTestId('delayed-until')).toBeTruthy()
   })
+
+  it('should render not avalable for user alert', () => {
+    const container = setup({
+      discussionTopic: Discussion.mock({
+        availableForUser: false
+      })
+    })
+    expect(container.queryByTestId('locked-for-user')).toBeTruthy()
+  })
 })

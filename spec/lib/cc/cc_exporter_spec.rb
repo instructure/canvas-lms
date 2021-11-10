@@ -59,7 +59,7 @@ describe "Common Cartridge exporting" do
       @ce.user = @user
     end
 
-    after(:each) do
+    after do
       if @file_handle && File.exist?(@file_handle.path)
         FileUtils::rm_rf(@file_handle.path)
       end
@@ -540,7 +540,7 @@ describe "Common Cartridge exporting" do
     describe "tool proxies" do
       include_context "lti2_course_spec_helper"
 
-      before(:each) do
+      before do
         tool_proxy.context = @course
         tool_proxy.save!
       end
@@ -716,7 +716,7 @@ describe "Common Cartridge exporting" do
     context 'similarity detection tool associations' do
       include_context "lti2_course_spec_helper"
 
-      before(:each) do
+      before do
         allow(Lti::ToolProxy).to receive(:find_all_proxies_for_context) { Lti::ToolProxy.where(id: tool_proxy.id) }
         tool_proxy.context = @course
         tool_proxy.save!
@@ -780,7 +780,7 @@ describe "Common Cartridge exporting" do
         Nokogiri::XML(@zip_file.read(assignment_xml_file))
       end
 
-      before(:each) do
+      before do
         allow(Lti::ToolProxy).to receive(:find_all_proxies_for_context) { Lti::ToolProxy.where(id: tool_proxy.id) }
 
         assignment = @course.assignments.create! name: 'test assignment', submission_types: 'online_upload'

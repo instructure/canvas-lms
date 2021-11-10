@@ -21,7 +21,7 @@
 describe Outcomes::LearningOutcomeGroupChildren do
   subject { described_class.new(context) }
 
-  # rubocop:disable RSpec/LetSetup, Layout/LineLength
+  # rubocop:disable RSpec/LetSetup
   let!(:context) { Account.default }
   let!(:global_group) { LearningOutcomeGroup.create(title: 'global') }
   let!(:global_group_subgroup) { global_group.child_outcome_groups.build(title: 'global subgroup') }
@@ -51,7 +51,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
   let!(:cg1) { outcome_group_model(context: course, outcome_group_id: cg0, title: 'Course Group 1') }
   let!(:cg2) { outcome_group_model(context: course, outcome_group_id: cg1, title: 'Course Group 2') }
   let!(:args) { { target_group_id: cg1.id } }
-  # rubocop:enable RSpec/LetSetup, Layout/LineLength
+  # rubocop:enable RSpec/LetSetup
 
   # Outcome Structure for visual reference
   # Global
@@ -90,7 +90,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
     context.root_account.enable_feature! :improved_outcomes_management
   end
 
-  before(:each) do
+  before do
     cg1.add_outcome o3
     cg2.add_outcome o8
   end
@@ -506,9 +506,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
     context 'when a group is edited' do
       it 'does not clear the cache' do
         enable_cache do
-          # rubocop:disable RSpec/AnyInstance
           expect_any_instance_of(Outcomes::LearningOutcomeGroupChildren).not_to receive(:clear_descendants_cache)
-          # rubocop:enable RSpec/AnyInstance
           expect(subject.total_outcomes(g0.id)).to eq 12
           g1.update(title: 'title edited')
           expect(described_class.new(context).total_outcomes(g0.id)).to eq 12

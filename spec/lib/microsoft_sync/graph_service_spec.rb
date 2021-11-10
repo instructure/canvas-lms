@@ -55,7 +55,6 @@ describe MicrosoftSync::GraphService do
     allow(InstStatsd::Statsd).to receive(:count).and_call_original
 
     # Test retry on intermittent errors without internal retry
-    MicrosoftSync::GraphService::Http # need to load before stubbing
     stub_const('MicrosoftSync::GraphService::Http::DEFAULT_N_INTERMITTENT_RETRIES', 0)
   end
 

@@ -329,6 +329,9 @@
     "creative_commons_license_725584ae": {
         "message": "Creative Commons -lisenssi:"
     },
+    "crop_image_807ebb08": {
+        "message": "Rajaa kuva"
+    },
     "current_image_f16c249c": {
         "message": "Nykyinen kuva"
     },
@@ -896,6 +899,9 @@
     "none_3b5e34d2": {
         "message": "Ei mitään"
     },
+    "none_selected_b93d56d2": {
+        "message": "Ei valintoja"
+    },
     "nothing_due_this_week_d45c9ef9": {
         "message": "Ei mitään erääntyvää tällä viikolla"
     },
@@ -1078,6 +1084,9 @@
     },
     "search_term_b2d2235": {
         "message": "Hakutermi"
+    },
+    "select_crop_shape_d441feeb": {
+        "message": "Valitse rajauksen muoto"
     },
     "select_language_7c93a900": {
         "message": "Valitse kieli"

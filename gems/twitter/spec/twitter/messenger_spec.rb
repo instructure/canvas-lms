@@ -38,7 +38,7 @@ describe Twitter::Messenger do
     let(:connection_mock) { double() }
 
     context "with a twitter service" do
-      before(:each) do
+      before do
         expect(Twitter::Connection).to receive(:from_service_token).with("twitter_token", "twitter_secret").and_return(connection_mock)
       end
 
@@ -50,8 +50,9 @@ describe Twitter::Messenger do
 
     context "with no twitter service" do
       let(:messenger) { Twitter::Messenger.new(message, nil, 'host', id) }
+
       it 'sends nothing if there is no service' do
-        expect(connection_mock).to receive(:send_direct_message).never
+        expect(connection_mock).not_to receive(:send_direct_message)
         expect(messenger.deliver).to be_nil
       end
     end
@@ -59,6 +60,7 @@ describe Twitter::Messenger do
 
   describe '#url' do
     let(:message) { double(:id => 42, :main_link => nil, :url => nil) }
+
     subject { messenger.url }
 
     it { is_expected.to match(/host/) }

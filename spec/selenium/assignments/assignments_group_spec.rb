@@ -49,7 +49,7 @@ describe "assignment groups" do
     ff('.assignment_group')
   end
 
-  before(:each) do
+  before do
     @domain_root_account = Account.default
     course_with_teacher_logged_in
     @course.require_assignment_group
@@ -250,7 +250,7 @@ describe "assignment groups" do
     let(:time) { Time.zone.local(2018, 2, 7, 4, 15) }
     let(:current_time) { format_time_for_view(time, :medium) }
 
-    before :each do
+    before do
       @course.require_assignment_group
 
       Timecop.freeze(time) do

@@ -22,7 +22,7 @@ require "spec_helper"
 describe CanvadocsAnnotationContext do
   before(:once) do
     @course = course_model
-    student = @course.enroll_student(User.create!).user
+    student = student_in_course(course: @course, active_all: true).user
     @assignment = assignment_model(course: @course)
     @sub = @assignment.submissions.find_by(user: student)
     @att = attachment_model(context: student)
@@ -69,27 +69,151 @@ describe CanvadocsAnnotationContext do
   end
 
   describe "permissions" do
-    describe "readwrite" do
-      it "grants readwrite when the user is a teacher" do
-        teacher = @course.enroll_teacher(User.create!).user
-        annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
-        expect(annotation_context.grants_right?(teacher, :readwrite)).to be true
+    describe "read" do
+      context "draft submissions" do
+        let(:annotation_context) do
+          @sub.canvadocs_annotation_contexts.create!(attachment: @att, submission_attempt: nil)
+        end
+
+        it "grants read to the owning user" do
+          expect(annotation_context.grants_right?(@sub.user, :read)).to be true
+        end
+
+        it "does not grant read to students that do not own the submission" do
+          other_student = student_in_course(course: @course, active_all: true).user
+          expect(annotation_context.grants_right?(other_student, :read)).to be false
+        end
+
+        it "does not grant read to peers assigned for review" do
+          peer_reviewer = student_in_course(course: @course, active_all: true).user
+          @assignment.update!(peer_reviews: true)
+          @assignment.assign_peer_review(peer_reviewer, @sub.user)
+          expect(annotation_context.grants_right?(peer_reviewer, :read)).to be false
+        end
+
+        it "does not grant read to teachers" do
+          teacher = teacher_in_course(course: @course, active_all: true).user
+          expect(annotation_context.grants_right?(teacher, :read)).to be false
+        end
+
+        it "does not grant read to provisional graders" do
+          @assignment.update!(moderated_grading: true, grader_count: 1)
+          teacher = teacher_in_course(course: @course, active_all: true).user
+          expect(annotation_context.grants_right?(teacher, :read)).to be false
+        end
       end
 
-      it "grants readwrite when the submission belongs to the user and is a draft" do
-        annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: nil)
-        expect(annotation_context.grants_right?(@sub.user, :readwrite)).to be true
+      context "non-draft submissions" do
+        let(:annotation_context) do
+          @sub.canvadocs_annotation_contexts.create!(attachment: @att, submission_attempt: 1)
+        end
+
+        it "grants read to the owning user" do
+          expect(annotation_context.grants_right?(@sub.user, :read)).to be true
+        end
+
+        it "does not grant read to students that do not own the submission" do
+          other_student = student_in_course(course: @course, active_all: true).user
+          expect(annotation_context.grants_right?(other_student, :read)).to be false
+        end
+
+        it "grants read to peers assigned for review" do
+          peer_reviewer = student_in_course(course: @course, active_all: true).user
+          @assignment.update!(peer_reviews: true)
+          @assignment.assign_peer_review(peer_reviewer, @sub.user)
+          expect(annotation_context.grants_right?(peer_reviewer, :read)).to be true
+        end
+
+        it "grants read to teachers" do
+          teacher = teacher_in_course(course: @course, active_all: true).user
+          expect(annotation_context.grants_right?(teacher, :read)).to be true
+        end
+
+        it "does not grant read to teachers without manage grades permissions" do
+          @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
+          teacher = teacher_in_course(course: @course, active_all: true).user
+          expect(annotation_context.grants_right?(teacher, :read)).to be false
+        end
+
+        it "grants read to provisional graders" do
+          @assignment.update!(moderated_grading: true, grader_count: 1)
+          teacher = teacher_in_course(course: @course, active_all: true).user
+          expect(annotation_context.grants_right?(teacher, :read)).to be true
+        end
+      end
+    end
+
+    describe "annotate" do
+      context "draft submissions" do
+        let(:annotation_context) do
+          @sub.canvadocs_annotation_contexts.create!(attachment: @att, submission_attempt: nil)
+        end
+
+        it "grants annotate to the owning user" do
+          expect(annotation_context.grants_right?(@sub.user, :annotate)).to be true
+        end
+
+        it "does not grant annotate to students that do not own the submission" do
+          other_student = student_in_course(course: @course, active_all: true).user
+          expect(annotation_context.grants_right?(other_student, :annotate)).to be false
+        end
+
+        it "does not grant annotate to peers assigned for review" do
+          peer_reviewer = student_in_course(course: @course, active_all: true).user
+          @assignment.update!(peer_reviews: true)
+          @assignment.assign_peer_review(peer_reviewer, @sub.user)
+          expect(annotation_context.grants_right?(peer_reviewer, :annotate)).to be false
+        end
+
+        it "does not grant annotate to teachers" do
+          teacher = teacher_in_course(course: @course, active_all: true).user
+          expect(annotation_context.grants_right?(teacher, :annotate)).to be false
+        end
+
+        it "does not grant annotate to provisional graders" do
+          @assignment.update!(moderated_grading: true, grader_count: 1)
+          teacher = teacher_in_course(course: @course, active_all: true).user
+          expect(annotation_context.grants_right?(teacher, :annotate)).to be false
+        end
       end
 
-      it "does not grant readwrite when the submission belongs to the user but is not a draft" do
-        annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
-        expect(annotation_context.grants_right?(@sub.user, :readwrite)).to be false
-      end
+      context "non-draft submissions" do
+        let(:annotation_context) do
+          @sub.canvadocs_annotation_contexts.create!(attachment: @att, submission_attempt: 1)
+        end
 
-      it "does not grant readwrite when the submission does not belongs to the user yet is a draft" do
-        other_student = @course.enroll_student(User.create!).user
-        annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: nil)
-        expect(annotation_context.grants_right?(other_student, :readwrite)).to be false
+        it "does not grant annotate to the owning user" do
+          expect(annotation_context.grants_right?(@sub.user, :annotate)).to be false
+        end
+
+        it "does not grant annotate to students that do not own the submission" do
+          other_student = student_in_course(course: @course, active_all: true).user
+          expect(annotation_context.grants_right?(other_student, :annotate)).to be false
+        end
+
+        it "does not grant annotate to peers assigned for review" do
+          peer_reviewer = student_in_course(course: @course, active_all: true).user
+          @assignment.update!(peer_reviews: true)
+          @assignment.assign_peer_review(peer_reviewer, @sub.user)
+          expect(annotation_context.grants_right?(peer_reviewer, :annotate)).to be false
+        end
+
+        it "grants annotate to teachers" do
+          teacher = teacher_in_course(course: @course, active_all: true).user
+          expect(annotation_context.grants_right?(teacher, :annotate)).to be true
+        end
+
+        it "does not grant annotate to teachers without manage grades permissions" do
+          @course.root_account.role_overrides.create!(permission: "manage_grades", role: teacher_role, enabled: false)
+          teacher = teacher_in_course(course: @course, active_all: true).user
+          expect(annotation_context.grants_right?(teacher, :annotate)).to be false
+        end
+
+        it "grants annotate to provisional graders" do
+          @assignment.update!(moderated_grading: true, grader_count: 1)
+          teacher = teacher_in_course(course: @course, active_all: true).user
+          expect(annotation_context.grants_right?(teacher, :annotate)).to be true
+        end
       end
     end
 
@@ -102,30 +226,30 @@ describe CanvadocsAnnotationContext do
         @assignment.update!(final_grader: @final_grader, grader_count: 2, moderated_grading: true)
       end
 
-      it "grants readwrite if grader slots are still available" do
+      it "grants annotate if grader slots are still available" do
         annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
-        expect(annotation_context.grants_right?(@provisional_grader_1, :readwrite)).to be true
+        expect(annotation_context.grants_right?(@provisional_grader_1, :annotate)).to be true
       end
 
-      it "grants readwrite if grader is final grader and slots are full" do
+      it "grants annotate if grader is final grader and slots are full" do
         @assignment.grade_student(@sub.user, grader: @provisional_grader_1, provisional: true, score: 1)
         @assignment.grade_student(@sub.user, grader: @provisional_grader_2, provisional: true, score: 1)
         annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
-        expect(annotation_context.grants_right?(@final_grader, :readwrite)).to be true
+        expect(annotation_context.grants_right?(@final_grader, :annotate)).to be true
       end
 
-      it "grants readwrite if grader is not final grader, slots are full, but user has graded before" do
+      it "grants annotate if grader is not final grader, slots are full, but user has graded before" do
         @assignment.grade_student(@sub.user, grader: @provisional_grader_1, provisional: true, score: 1)
         @assignment.grade_student(@sub.user, grader: @provisional_grader_2, provisional: true, score: 1)
         annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
-        expect(annotation_context.grants_right?(@provisional_grader_1, :readwrite)).to be true
+        expect(annotation_context.grants_right?(@provisional_grader_1, :annotate)).to be true
       end
 
-      it "does not grant readwrite if grader is not final grader, slots are full, and user has not graded before" do
+      it "does not grant annotate if grader is not final grader, slots are full, and user has not graded before" do
         @assignment.grade_student(@sub.user, grader: @provisional_grader_1, provisional: true, score: 1)
         @assignment.grade_student(@sub.user, grader: @provisional_grader_2, provisional: true, score: 1)
         annotation_context = CanvadocsAnnotationContext.create!(submission: @sub, attachment: @att, submission_attempt: 1)
-        expect(annotation_context.grants_right?(@provisional_grader_3, :readwrite)).to be false
+        expect(annotation_context.grants_right?(@provisional_grader_3, :annotate)).to be false
       end
     end
   end

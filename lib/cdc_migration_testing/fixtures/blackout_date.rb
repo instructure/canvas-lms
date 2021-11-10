@@ -20,13 +20,12 @@
 
 module CdcFixtures
   def self.create_blackout_date
-    BlackoutDate.new({
-                       context_type: 'Account',
-                       context_id: 1,
-                       start_date: Time.zone.today,
-                       end_date: Time.zone.today,
-                       event_title: 'default',
-                       root_account_id: 1
-                     })
+    BlackoutDate.new(id: 1,
+                     context_type: 'Account',
+                     context_id: 1,
+                     start_date: Time.zone.today,
+                     end_date: Time.zone.today,
+                     event_title: 'default',
+                     root_account_id: 1)
   end
 end

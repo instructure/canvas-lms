@@ -220,7 +220,7 @@ describe "External Tools" do
         course_with_teacher_logged_in(:account => @account, :active_all => true)
         get "/courses" # populate the cache once
 
-        expect(ContextExternalTool).to receive(:filtered_global_navigation_tools).never
+        expect(ContextExternalTool).not_to receive(:filtered_global_navigation_tools)
         get "/courses"
         doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@admin_tool.asset_string}_menu_item a")).to be_present
@@ -262,7 +262,7 @@ describe "External Tools" do
         expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to be_present
 
         c2 = course_with_teacher(:account => @account, :active_all => true, :user => @teacher).course
-        expect(ContextExternalTool).to receive(:filtered_global_navigation_tools).never
+        expect(ContextExternalTool).not_to receive(:filtered_global_navigation_tools)
         get "/courses/#{c2.id}" # viewing different course but permissions are the same - should remain cached
         doc = Nokogiri::HTML5(response.body)
         expect(doc.at_css("##{@permissiony_tool.asset_string}_menu_item a")).to be_present

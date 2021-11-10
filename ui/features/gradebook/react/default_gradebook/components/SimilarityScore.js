@@ -62,7 +62,7 @@ export default class SimilarityScore extends PureComponent {
                 variant="link"
                 icon={statusIcon}
                 href={reportUrl}
-                theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+                theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
               >
                 <Text margin="auto auto auto small">
                   {I18n.t('%{score}% similarity score', {score: displayScore})}

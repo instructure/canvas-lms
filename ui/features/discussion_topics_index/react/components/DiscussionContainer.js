@@ -210,9 +210,7 @@ export class DiscussionsContainer extends Component {
             summary={
               <Flex>
                 <Flex.Item shouldGrow shouldShrink>
-                  <div aria-hidden="true">
-                    <Text weight="bold">{this.props.title}</Text>
-                  </div>
+                  <Text weight="bold">{this.props.title}</Text>
                 </Flex.Item>
                 {!this.props.pinned ? (
                   <Flex.Item shouldShrink textAlign="end">

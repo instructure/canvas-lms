@@ -143,7 +143,7 @@ describe "Conferences API", type: :request do
       describe "course conferences" do
         let(:conference) { course.web_conferences.create!(conference_type: "Wimba", user: teacher) }
 
-        before(:each) do
+        before do
           conference.add_user(student, "attendee")
         end
 
@@ -160,7 +160,7 @@ describe "Conferences API", type: :request do
       describe "group conferences" do
         let(:conference) { group.web_conferences.create!(conference_type: "Wimba", user: teacher) }
 
-        before(:each) do
+        before do
           conference.add_user(student, "attendee")
         end
 

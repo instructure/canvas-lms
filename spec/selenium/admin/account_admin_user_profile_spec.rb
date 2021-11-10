@@ -35,7 +35,7 @@ describe "admin account people profile" do
   end
 
   context 'in admin merge page' do
-    before(:each) do
+    before do
       user_session(@admin)
       visit_merge_user_accounts(@user1.id)
       search_username_input.click

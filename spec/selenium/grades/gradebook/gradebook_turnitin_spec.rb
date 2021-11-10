@@ -25,7 +25,8 @@ describe "Gradebook - turnitin" do
   include GradebookCommon
 
   before(:once) { gradebook_data_setup }
-  before(:each) { user_session(@teacher) }
+
+  before { user_session(@teacher) }
 
   it "shows turnitin data when the New Gradebook Plagiarism Indicator feature flag is enabled" do
     @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)

@@ -90,8 +90,6 @@ module SeleniumDriverSetup
                   :server_ip,
                   :server_port
 
-    attr_reader :driver
-
     def reset!
       dump_browser_log if browser_log
       @driver = nil
@@ -488,7 +486,7 @@ module SeleniumDriverSetup
       # with our shared conn and transactional fixtures (e.g. special
       # accounts and their caching)
       @allow_requests = false
-      request_mutex.synchronize {}
+      request_mutex.synchronize { nil }
     end
 
     def allow_requests!

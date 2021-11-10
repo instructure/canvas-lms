@@ -35,7 +35,7 @@ end
 
 describe NotificationMessageCreator do
   context 'create_message' do
-    before(:each) do
+    before do
       allow_any_instance_of(Message).to receive(:get_template).and_return('template')
     end
 
@@ -528,7 +528,7 @@ describe NotificationMessageCreator do
     end
 
     context "notification policy overrides" do
-      before(:each) { notification_set({ notification_opts: { category: 'PandaExpressTime' } }) }
+      before { notification_set({ notification_opts: { category: 'PandaExpressTime' } }) }
 
       it 'uses the policy override if available for immediate messages' do
         @notification_policy.frequency = 'daily'
@@ -605,7 +605,7 @@ describe NotificationMessageCreator do
   end
 
   context "localization" do
-    before(:each) do
+    before do
       notification_set
       allow_any_instance_of(Message).to receive(:body).and_return('template')
     end

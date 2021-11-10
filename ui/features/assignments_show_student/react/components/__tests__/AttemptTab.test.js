@@ -350,6 +350,58 @@ describe('ContentTabs', () => {
         expect(buttons[1]).toHaveTextContent('Upload')
       })
 
+      it('shows disabled buttons for the available submission types for observers', async () => {
+        const props = await mockAssignmentAndSubmission({
+          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
+        })
+        const {getAllByRole} = render(
+          <MockedProvider mocks={defaultMocks()}>
+            <StudentViewContext.Provider
+              value={{allowChangesToSubmission: false, isObserver: true}}
+            >
+              <AttemptTab {...props} focusAttemptOnInit={false} />
+            </StudentViewContext.Provider>
+          </MockedProvider>
+        )
+
+        const buttons = getAllByRole('button')
+        expect(buttons).toHaveLength(2)
+        expect(buttons[0]).toBeDisabled()
+        expect(buttons[1]).toBeDisabled()
+      })
+
+      it('displays "Available submission types" for observers', async () => {
+        const props = await mockAssignmentAndSubmission({
+          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
+        })
+        const {getByText} = render(
+          <MockedProvider mocks={defaultMocks()}>
+            <StudentViewContext.Provider
+              value={{allowChangesToSubmission: false, isObserver: true}}
+            >
+              <AttemptTab {...props} focusAttemptOnInit={false} />
+            </StudentViewContext.Provider>
+          </MockedProvider>
+        )
+
+        expect(getByText('Available submission types')).toBeInTheDocument()
+      })
+
+      it('displays "Choose a submission type" for students', async () => {
+        const props = await mockAssignmentAndSubmission({
+          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
+        })
+        const {getByText} = render(
+          <MockedProvider mocks={defaultMocks()}>
+            <StudentViewContext.Provider value={{allowChangesToSubmission: true, observer: false}}>
+              <AttemptTab {...props} focusAttemptOnInit={false} />
+            </StudentViewContext.Provider>
+          </MockedProvider>
+        )
+
+        expect(getByText('Choose a submission type')).toBeInTheDocument()
+      })
+
       it('does not render the submission type selector if the submission cannot be modified', async () => {
         const props = await mockAssignmentAndSubmission({
           Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}

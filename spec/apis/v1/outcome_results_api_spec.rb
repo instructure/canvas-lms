@@ -315,7 +315,6 @@ describe "Outcome Results API", type: :request do
           end
         end
 
-        # rubocop:disable RSpec/NestedGroups
         context 'Student filters in LMGB FF' do
           before do
             @concluded_student = User.create!(:name => 'Student - Concluded')
@@ -487,7 +486,6 @@ describe "Outcome Results API", type: :request do
             end
           end
         end
-        # rubocop:enable RSpec/NestedGroups
       end
 
       describe "user_ids parameter" do
@@ -712,7 +710,7 @@ describe "Outcome Results API", type: :request do
         expect(json['rollups'].size).to eq 1
         json['rollups'].each do |rollup|
           expect(rollup.keys.sort).to eq %w(links scores)
-          rollup['links']['course'] == @course.id.to_s
+          expect(rollup['links']['course']).to eq @course.id.to_s
           expect(rollup['scores'].size).to eq 1
           rollup['scores'].each do |score|
             expect(score.keys.sort).to eq %w(count hide_points links score submitted_at title)

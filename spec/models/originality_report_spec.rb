@@ -87,6 +87,7 @@ describe OriginalityReport do
     subject.save!
     expect(subject.originality_report_attachment).to eq originality_attachemnt
   end
+
   it 'can create multiple originality reports with the same originality_report_attachment_id' do
     report = OriginalityReport.create!(
       attachment: attachment,

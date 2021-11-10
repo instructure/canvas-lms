@@ -21,7 +21,7 @@ require 'rails_helper'
 require 'audits'
 
 RSpec.describe Audits do
-  after(:each) do
+  after do
     DynamicSettings.config = nil
     DynamicSettings.reset_cache!
     DynamicSettings.fallback_data = nil

@@ -24,7 +24,7 @@ describe 'drag and drop reordering' do
   include_context "in-process server selenium tests"
   include QuizzesCommon
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in
 
     quiz_with_new_questions

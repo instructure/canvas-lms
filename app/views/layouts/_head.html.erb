@@ -38,7 +38,7 @@
   <%= yield :head %>
   <%= include_custom_meta_tags %>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="<%= brand_variable('ic-brand-primary') %>">
+  <meta name="theme-color" content="<%= brand_variable('ic-brand-global-nav-bgd') %>">
   <%= benchmark("include_css_bundles") { include_css_bundles } %>
   <%= include_account_css %>
   <script>

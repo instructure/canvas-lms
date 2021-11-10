@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {PacePlan, PlanContextTypes, WorkflowStates} from '../types'
+import {PacePlan, PlanContextTypes, Progress, WorkflowStates} from '../types'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 /* API helpers */
@@ -51,28 +51,33 @@ export const waitForActionCompletion = (actionInProgress: () => boolean, waitTim
 /* API methods */
 
 export const update = (pacePlan: PacePlan, extraSaveParams = {}) =>
-  doFetchApi<{pace_plan: PacePlan}>({
+  doFetchApi<{pace_plan: PacePlan; progress: Progress}>({
     path: `/api/v1/courses/${pacePlan.course_id}/pace_plans/${pacePlan.id}`,
     method: 'PUT',
     body: {
       ...extraSaveParams,
       pace_plan: transformPacePlanForApi(pacePlan)
     }
-  }).then(({json}) => json?.pace_plan)
+  }).then(({json}) => json)
 
 export const create = (pacePlan: PacePlan, extraSaveParams = {}) =>
-  doFetchApi<{pace_plan: PacePlan}>({
+  doFetchApi<{pace_plan: PacePlan; progress: Progress}>({
     path: `/api/v1/courses/${pacePlan.course_id}/pace_plans`,
     method: 'POST',
     body: {
       ...extraSaveParams,
       pace_plan: transformPacePlanForApi(pacePlan)
     }
-  }).then(({json}) => json?.pace_plan)
+  }).then(({json}) => json)
 
 // This is now just a convenience function for creating/update depending on the
 // state of the plan
 export const publish = (plan: PacePlan) => (plan?.id ? update(plan) : create(plan))
+
+export const getPublishProgress = (progressId: string) =>
+  doFetchApi<Progress>({
+    path: `/api/v1/progress/${progressId}`
+  }).then(({json}) => json)
 
 export const resetToLastPublished = (contextType: PlanContextTypes, contextId: string) =>
   doFetchApi<{pace_plan: PacePlan}>({

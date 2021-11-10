@@ -30,7 +30,7 @@ RSpec.shared_context "plagiarism_platform", :shared_context => :metadata do
     double(code: 200, parsed_response: { 'Id' => SecureRandom.uuid }, ok?: true)
   end
 
-  before(:each) do
+  before do
     allow(subscription_service).to receive(:available?).and_return true
     allow(subscription_service).to receive(:destroy_tool_proxy_subscription).and_return success_response
     allow(subscription_service).to receive(:create_tool_proxy_subscription).and_return(

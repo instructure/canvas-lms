@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 context "accessing public content" do
-  before :each do
+  before do
     course_factory(active_all: true)
     @course.update_attribute(:is_public, true)
     @course.update_attribute(:is_public_to_auth_users, true)

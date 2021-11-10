@@ -138,6 +138,14 @@ $.widget('ui.selectmenu', {
             self._moveSelection(1)
             break
           case $.ui.keyCode.TAB:
+            // This monstrosity of a widget is not part of the page's tabbable
+            // elements, and will only be receiving tab events if it's open or
+            // was just closed because an item got selected. Preemptively focus
+            // the real (hidden) select menu, which is actually tabbable, so
+            // that it can decide where to direct the tab. This may be a terrible
+            // idea, but it seems to work.
+
+            document.getElementById('students_selectmenu').focus()
             ret = true
             break
           case $.ui.keyCode.PAGE_UP:

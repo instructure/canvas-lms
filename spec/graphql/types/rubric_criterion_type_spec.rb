@@ -27,7 +27,7 @@ describe Types::RubricCriterionType do
   let!(:rubric_type) { GraphQLTypeTester.new(rubric, current_user: student) }
 
   it 'works' do
-    expect(rubric_type.resolve('criteria { _id }')).to eq rubric.criteria.map { |c| c[:id].to_s }
+    expect(rubric_type.resolve('criteria { _id }')).to eq(rubric.criteria.map { |c| c[:id].to_s })
   end
 
   describe 'works for the field' do
@@ -40,7 +40,7 @@ describe Types::RubricCriterionType do
     it 'description' do
       expect(
         rubric_type.resolve('criteria { description }')
-      ).to eq rubric.criteria.map { |c| c[:description] }
+      ).to eq rubric.criteria.pluck(:description)
     end
 
     it 'ignore_for_scoring' do
@@ -52,13 +52,13 @@ describe Types::RubricCriterionType do
     it 'long_description' do
       expect(
         rubric_type.resolve('criteria { longDescription }')
-      ).to eq rubric.criteria.map { |c| c[:long_description] }
+      ).to eq rubric.criteria.pluck(:long_description)
     end
 
     it 'mastery_points' do
       expect(
         rubric_type.resolve('criteria { masteryPoints }')
-      ).to eq rubric.criteria.map { |c| c[:mastery_points] }
+      ).to eq rubric.criteria.pluck(:master_points)
     end
 
     it 'outcome' do
@@ -66,19 +66,19 @@ describe Types::RubricCriterionType do
       rubric.save!
       expect(
         rubric_type.resolve('criteria { outcome { _id }}')
-      ).to eq rubric.criteria.map { |c| c[:learning_outcome_id].to_s }
+      ).to eq rubric.criteria.pluck(:learning_outcome_id).map(&:to_s)
     end
 
     it 'points' do
       expect(
         rubric_type.resolve('criteria { points }')
-      ).to eq rubric.criteria.map { |c| c[:points] }
+      ).to eq rubric.criteria.pluck(:points)
     end
 
     it 'ratings' do
       expect(
         rubric_type.resolve('criteria { ratings { _id }}')
-      ).to eq rubric.criteria.map { |c| c[:ratings].map { |r| r[:id].to_s } }
+      ).to eq(rubric.criteria.map { |c| c[:ratings].map { |r| r[:id].to_s } })
     end
   end
 end

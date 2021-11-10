@@ -45,7 +45,7 @@ describe "discussions" do
       let(:topic) { somebody_topic }
       let(:topic_participant) { topic.discussion_topic_participants.find_by(user: somebody) }
 
-      before(:each) do
+      before do
         user_session(somebody)
         stub_rcs_config
       end

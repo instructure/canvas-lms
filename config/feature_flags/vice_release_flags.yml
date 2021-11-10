@@ -39,6 +39,14 @@ draft_discussions:
     in the discussions redesign
   applies_to: SiteAdmin
 
+discussions_inline_grading:
+  state: hidden
+  beta: false
+  display_name: Discussion Inline Grading
+  description: |-
+    Allows a grader to grade discussions as they read
+  applies_to: SiteAdmin
+
 discussions_reporting:
   state: hidden
   beta: false

@@ -61,7 +61,7 @@ module Lti
     def self.find_all_proxies_for_context(context)
       account_ids = context.account_chain.map { |a| a.id }
 
-      account_sql_string = account_ids.each_with_index.map { |x, i| "('Account',#{x},#{i})" }.unshift("('#{context.class.name}',#{context.id},#{0})").join(',')
+      account_sql_string = account_ids.each_with_index.map { |x, i| "('Account',#{x},#{i})" }.unshift("('#{context.class.name}',#{context.id},0)").join(',')
 
       subquery = ToolProxyBinding.select('DISTINCT ON (lti_tool_proxies.id) lti_tool_proxy_bindings.*').joins(:tool_proxy)
                                  .joins("INNER JOIN ( VALUES #{account_sql_string}) as x(context_type, context_id, ordering) ON lti_tool_proxy_bindings.context_type = x.context_type AND lti_tool_proxy_bindings.context_id = x.context_id")
@@ -74,7 +74,7 @@ module Lti
       account_ids = context.account_chain.map { |a| a.id }
 
       # Added i+1 on this to ensure that the x.ordering later doesn't have 2 0's
-      account_sql_string = account_ids.each_with_index.map { |x, i| "('Account',#{x},#{i + 1})" }.unshift("('#{context.class.name}',#{context.id},#{0})").join(',')
+      account_sql_string = account_ids.each_with_index.map { |x, i| "('Account',#{x},#{i + 1})" }.unshift("('#{context.class.name}',#{context.id},0)").join(',')
 
       subquery = ToolProxyBinding
                  .select('DISTINCT ON (x.ordering, lti_tool_proxy_bindings.tool_proxy_id) lti_tool_proxy_bindings.*, x.ordering')

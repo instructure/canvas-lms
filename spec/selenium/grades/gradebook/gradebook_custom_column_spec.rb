@@ -25,7 +25,8 @@ describe "Gradebook - custom columns" do
   include GradebookCommon
 
   before(:once) { gradebook_data_setup }
-  before(:each) { user_session(@teacher) }
+
+  before { user_session(@teacher) }
 
   def custom_column(opts = {})
     opts.reverse_merge! title: "<b>SIS ID</b>"

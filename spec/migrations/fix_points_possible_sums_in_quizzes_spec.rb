@@ -36,14 +36,14 @@ describe 'FixPointsPossibleSumsInQuizzes' do
     @quiz = q
   end
 
-  before :each do
+  before do
     # creates rounding error just like the real thing!
     points = Array.new(question_count) { question_points }.inject(:+) # .sum uses the native ruby 2.4 sum if the first element is numeric in rails 5.1 ...and doesn't quite give the same answer :/
     allow(Quizzes::Quiz).to receive(:count_points_possible).and_return(points)
   end
 
   context 'for unpublished quiz' do
-    before :each do
+    before do
       @quiz.generate_quiz_data
       @quiz.save!
       @quiz.reload
@@ -82,7 +82,7 @@ describe 'FixPointsPossibleSumsInQuizzes' do
   end
 
   context 'for published quiz' do
-    before :each do
+    before do
       @quiz.publish!
       @quiz.reload
       allow(Quizzes::Quiz).to receive(:count_points_possible).and_call_original

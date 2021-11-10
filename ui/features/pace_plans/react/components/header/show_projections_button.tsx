@@ -24,15 +24,15 @@ import {connect} from 'react-redux'
 import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconEyeLine, IconOffLine} from '@instructure/ui-icons'
 
-import {getPacePlanType} from '../../reducers/pace_plans'
+import {isStudentPlan} from '../../reducers/pace_plans'
 import {getResponsiveSize, getShowProjections} from '../../reducers/ui'
-import {PlanContextTypes, ResponsiveSizes, StoreState} from '../../types'
+import {ResponsiveSizes, StoreState} from '../../types'
 import {actions as uiActions} from '../../actions/ui'
 
 interface StoreProps {
-  readonly pacePlanType: PlanContextTypes
   readonly responsiveSize: ResponsiveSizes
   readonly showProjections: boolean
+  readonly studentPlan: boolean
 }
 
 interface DispatchProps {
@@ -42,13 +42,13 @@ interface DispatchProps {
 type ComponentProps = StoreProps & DispatchProps
 
 export const ShowProjectionsButton: React.FC<ComponentProps> = ({
-  pacePlanType,
   responsiveSize,
   showProjections,
+  studentPlan,
   toggleShowProjections
 }) => {
   // Don't show the projections button on student plans
-  if (pacePlanType === 'Enrollment') return null
+  if (studentPlan) return null
 
   const buttonText = showProjections ? I18n.t('Hide Projections') : I18n.t('Show Projections')
   const Icon = showProjections ? IconOffLine : IconEyeLine
@@ -77,9 +77,9 @@ export const ShowProjectionsButton: React.FC<ComponentProps> = ({
 
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
-    pacePlanType: getPacePlanType(state),
     responsiveSize: getResponsiveSize(state),
-    showProjections: getShowProjections(state)
+    showProjections: getShowProjections(state),
+    studentPlan: isStudentPlan(state)
   }
 }
 

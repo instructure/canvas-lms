@@ -91,11 +91,10 @@ module ConversationsHelper
     result = { :courses => {}, :groups => {} }
     return result if audience.empty?
 
-    context_tags.inject(result) do |hash, tag|
+    context_tags.each do |tag|
       next unless tag =~ /\A(course|group)_(\d+)\z/
 
-      hash["#{$1}s".to_sym][$2.to_i] = []
-      hash
+      result["#{$1}s".to_sym][$2.to_i] = []
     end
 
     if audience.size == 1 && include_private_conversation_enrollments
@@ -175,7 +174,6 @@ module ConversationsHelper
 
   def valid_context?(context)
     case context
-    when nil then false
     when Account then valid_account_context?(context)
     when Course, Group then context.membership_for_user(@current_user) || context.grants_right?(@current_user, session, :send_messages)
     else false

@@ -30,7 +30,7 @@ describe "In speedgrader" do
   include GroupsCommon
 
   context "as a teacher in course with unlimited sections " do
-    before(:each) do
+    before do
       @teacher_enrollment = course_with_teacher(course: @course, active_all: true)
       user_logged_in(user: @teacher)
       @assignment = @course.assignments.create(name: 'assignment with rubric', points_possible: 10)

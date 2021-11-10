@@ -26,7 +26,7 @@ describe "outcomes as a student" do
   let(:who_to_login) { 'student' }
   let(:outcome_url) { "/courses/#{@course.id}/outcomes" }
 
-  before(:each) do
+  before do
     course_with_student_logged_in
   end
 

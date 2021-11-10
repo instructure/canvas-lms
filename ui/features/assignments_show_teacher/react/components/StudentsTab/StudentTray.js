@@ -155,7 +155,7 @@ export default class StudentTray extends React.Component {
             icon={IconEmailLine}
             buttonRef={b => (this.messageStudentsButton = b)}
             onClick={this.handleMessageButtonClick}
-            theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+            theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
           >
             {I18n.t('Message Student')}
           </Button>
@@ -164,7 +164,7 @@ export default class StudentTray extends React.Component {
           variant="link"
           icon={IconUploadLine}
           onClick={this.handleSubmitForStudent}
-          theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+          theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
         >
           {I18n.t('Submit for Student')}
         </Button>

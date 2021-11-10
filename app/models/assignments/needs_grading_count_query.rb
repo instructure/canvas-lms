@@ -23,9 +23,9 @@ module Assignments
     class CourseProxy
       attr_reader :course, :user
 
-      def initialize(_course, _user)
-        @course = _course
-        @user = _user
+      def initialize(course, user)
+        @course = course
+        @user = user
       end
 
       def section_visibilities

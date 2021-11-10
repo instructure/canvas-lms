@@ -50,7 +50,7 @@ describe 'quizzes stats' do
     context 'teacher preview' do
       it 'does not show a quiz stats button if there was a teacher preview', priority: "2", test_id: 140645 do
         skip_if_safari(:alert)
-        quiz_with_new_questions(!:goto_edit)
+        quiz_with_new_questions(goto_edit: false)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
         # take the quiz
@@ -79,7 +79,7 @@ describe 'quizzes stats' do
           expect(fj(".report-generator:contains('#{report_type}')")).to include_text("Generate #{report_type.downcase} report")
         end
 
-        it 'downloads a csv when pressing #{report_type} button', priority: "1", test_id: 270039 do
+        it "downloads a csv when pressing #{report_type} button", priority: "1", test_id: 270039 do
           skip("QUIZ-5120")
           button = fj(".generate-report:contains('#{report_type}')")
           button.click

@@ -25,7 +25,7 @@ describe GradeCalculator do
 
   # We should keep this in sync with GradeCalculatorSpec.coffee
   context "GradeCalculatorSpec.coffee examples" do
-    before :each do
+    before do
       @group = @group1 = @course.assignment_groups.create!(:name => 'group 1')
     end
 
@@ -277,7 +277,7 @@ describe GradeCalculator do
     end
 
     context "assignment groups with 0 points possible" do
-      before :each do
+      before do
         @group1.group_weight = 50
         @group1.save!
         @group2 = @course.assignment_groups.create! :name => 'group 2',
@@ -309,7 +309,7 @@ describe GradeCalculator do
     end
 
     context "grading periods" do
-      before :each do
+      before do
         student_in_course active_all: true
         @gp1, @gp2 = grading_periods count: 2
         @a1, @a2 = [@gp1, @gp2].map do |gp|
@@ -364,9 +364,10 @@ describe GradeCalculator do
       end
 
       context "DA" do
-        before :each do
+        before do
           set_up_course_for_differentiated_assignments
         end
+
         it "calculates scores based on visible assignments only" do
           # Non-overridden assignments are not visible to this student at all even though she's been graded on them
           # because the assignment is only visible to overrides. Therefore only the (first three) overridden assignments
@@ -375,29 +376,31 @@ describe GradeCalculator do
           expect(final_grade_info(@user, @course)[:total]).to equal 30.0
           expect(final_grade_info(@user, @course)[:possible]).to equal 60.0
         end
+
         it "drops the lowest visible when that rule is in place" do
-          @group.update_attribute(:rules, 'drop_lowest:1') # rubocop:disable Rails/SkipsModelValidations
+          @group.update_attribute(:rules, 'drop_lowest:1')
           # 5 + 15 + 10 - 5
           expect(final_grade_info(@user, @course)[:total]).to equal 25.0
           expect(final_grade_info(@user, @course)[:possible]).to equal 40.0
           expect(final_grade_info(@user, @course)[:dropped]).to eq [find_submission(@overridden_lowest)]
         end
+
         it "drops the highest visible when that rule is in place" do
-          @group.update_attribute(:rules, 'drop_highest:1') # rubocop:disable Rails/SkipsModelValidations
+          @group.update_attribute(:rules, 'drop_highest:1')
           # 5 + 15 + 10 - 15
           expect(final_grade_info(@user, @course)[:total]).to equal 15.0
           expect(final_grade_info(@user, @course)[:possible]).to equal 40.0
           expect(final_grade_info(@user, @course)[:dropped]).to eq [find_submission(@overridden_highest)]
         end
+
         it "does not count an invisible assignment with never drop on" do
-          # rubocop:disable Rails/SkipsModelValidations
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
-          # rubocop:enable Rails/SkipsModelValidations
           # 5 + 15 + 10 - 10
           expect(final_grade_info(@user, @course)[:total]).to equal 20.0
           expect(final_grade_info(@user, @course)[:possible]).to equal 40.0
           expect(final_grade_info(@user, @course)[:dropped]).to eq [find_submission(@overridden_middle)]
         end
+
         it "saves scores for all assignment group and enrollment combinations" do
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
           user_ids = @course.enrollments.map(&:user_id).uniq
@@ -406,6 +409,7 @@ describe GradeCalculator do
           expect(Score.where(assignment_group_id: group_ids).count).to eq @course.enrollments.count * group_ids.length
           expect(ScoreMetadata.where(score_id: Score.where(assignment_group_id: group_ids)).count).to eq 2
         end
+
         it "saves dropped submission to group score metadata" do
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
           GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
@@ -471,7 +475,7 @@ describe GradeCalculator do
     end
 
     context "excused assignments" do
-      before :each do
+      before do
         student_in_course(active_all: true)
         @a1 = @course.assignments.create! points_possible: 10
         @a2 = @course.assignments.create! points_possible: 90

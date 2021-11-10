@@ -27,6 +27,7 @@ require 'deprecated_method_view'
 
 class MethodView < HashView
   def initialize(method)
+    super()
     @method = method
   end
 

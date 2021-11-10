@@ -31,14 +31,14 @@ describe "speed grader" do
   include SpeedGraderCommon
   include GroupsCommon
 
-  before(:each) do
+  before do
     stub_kaltura
     course_with_teacher_logged_in
     @assignment = @course.assignments.create(name: 'assignment with rubric', points_possible: 10)
   end
 
   context "as a course limited ta" do
-    before(:each) do
+    before do
       @taenrollment = course_with_ta(course: @course, active_all: true)
       @taenrollment.limit_privileges_to_course_section = true
       @taenrollment.save!
@@ -169,7 +169,7 @@ describe "speed grader" do
   end
 
   context 'when student names are hidden' do
-    before(:each) do
+    before do
       student_in_course(active_all: true, name: 'student b')
       @student1 = @student
       student_in_course(active_all: true, name: 'student a')
@@ -235,7 +235,7 @@ describe "speed grader" do
   end
 
   context "multiple enrollments" do
-    before(:each) do
+    before do
       student_in_course(active_all: true)
       @course_section = @course.course_sections.create!(name: "<h1>Other Section</h1>")
       @enrollment = @course.enroll_student(@student,
@@ -316,7 +316,7 @@ describe "speed grader" do
   end
 
   context "student dropdown" do
-    before(:each) do
+    before do
       @section0 = @course.course_sections.create!(name: "Section0")
       @section1 = @course.course_sections.create!(name: "Section1")
 

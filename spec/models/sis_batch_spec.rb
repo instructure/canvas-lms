@@ -43,7 +43,7 @@ describe SisBatch do
             z.get_output_stream("csv_#{i}.csv") { |f| f.puts(dat) }
             i += 1
           end
-          z.get_output_stream("csv_#{i}.csv") {} if add_empty_file
+          z.get_output_stream("csv_#{i}.csv") { nil } if add_empty_file
         end
       end
 
@@ -304,8 +304,8 @@ describe SisBatch do
       @a1 = @account
       @a2 = account_model
       b5 = create_csv_data(['old_id'])
-      expect_any_instantiation_of(b2).to receive(:process_without_send_later).never
-      expect_any_instantiation_of(b5).to receive(:process_without_send_later).never
+      expect_any_instantiation_of(b2).not_to receive(:process_without_send_later)
+      expect_any_instantiation_of(b5).not_to receive(:process_without_send_later)
       SisBatch.process_all_for_account(@a1)
       run_jobs
       [b1, b2, b4].each { |batch| expect([:imported, :imported_with_messages]).to be_include(batch.reload.state) }
@@ -325,7 +325,7 @@ test_1,TC 101,Test Course 101,,term1,deleted
     end
 
     describe "with parallel importers" do
-      before :each do
+      before do
         @batch1 = create_csv_data(
           [%{user_id,login_id,status
           user_1,user_1,active
@@ -646,7 +646,7 @@ s2,test_1,section2,active},
                                  user_1,user_1,active}])
       batch.update(batch_mode: true, batch_mode_term: @term)
       expect_any_instantiation_of(batch).to receive(:remove_previous_imports).once
-      expect_any_instantiation_of(batch).to receive(:non_batch_courses_scope).never
+      expect_any_instantiation_of(batch).not_to receive(:non_batch_courses_scope)
       batch.process_without_send_later
       run_jobs
     end
@@ -772,12 +772,12 @@ s2,test_1,section2,active},
           %{section_id,user_id,role,status
           section_1,user_1,student,deleted}
         ]
-      ) do |batch|
-        batch.options = {}
-        batch.batch_mode = true
-        batch.options[:skip_deletes] = true
-        batch.save!
-        batch.process_without_send_later
+      ) do |b|
+        b.options = {}
+        b.batch_mode = true
+        b.options[:skip_deletes] = true
+        b.save!
+        b.process_without_send_later
         run_jobs
       end
       expect(batch.reload.workflow_state).to eq 'imported'
@@ -909,7 +909,7 @@ s2,test_1,section2,active},
     end
 
     it "skips diffing if previous diff not available" do
-      expect_any_instance_of(SIS::CSV::DiffGenerator).to receive(:generate).never
+      expect_any_instance_of(SIS::CSV::DiffGenerator).not_to receive(:generate)
       batch = process_csv_data([
                                  %{course_id,short_name,long_name,account_id,term_id,status
 test_1,TC 101,Test Course 101,,term1,active
@@ -1258,12 +1258,12 @@ test_1,u1,student,active}
                                       term2,term2,active},
                                     %{course_id,short_name,long_name,account_id,term_id,status},
                                     %{course_id,user_id,role,status},
-                                  ]) do |batch|
-            batch.options = {}
-            batch.batch_mode = true
-            batch.options[:multi_term_batch_mode] = true
-            batch.save!
-            batch.process_without_send_later
+                                  ]) do |b|
+            b.options = {}
+            b.batch_mode = true
+            b.options[:multi_term_batch_mode] = true
+            b.save!
+            b.process_without_send_later
             run_jobs
           end
           expect(@e1.reload).to be_deleted
@@ -1359,12 +1359,12 @@ test_1,u1,student,active}
           batch = create_csv_data([
                                     %{course_id,short_name,long_name,account_id,term_id,status},
                                     %{course_id,user_id,role,status},
-                                  ]) do |batch|
-            batch.options = {}
-            batch.batch_mode = true
-            batch.options[:multi_term_batch_mode] = true
-            batch.save!
-            batch.process_without_send_later
+                                  ]) do |b|
+            b.options = {}
+            b.batch_mode = true
+            b.options[:multi_term_batch_mode] = true
+            b.save!
+            b.process_without_send_later
             run_jobs
           end
           expect(@e1.reload).to be_active
@@ -1383,12 +1383,12 @@ test_1,u1,student,active}
       batch = create_csv_data([
                                 %{course_id,short_name,long_name,account_id,term_id,status},
                                 %{course_id,user_id,role,status},
-                              ]) do |batch|
-        batch.options = {}
-        batch.batch_mode = true
-        batch.options[:multi_term_batch_mode] = true
-        batch.batch_mode_term = term
-        batch.save!
+                              ]) do |b|
+        b.options = {}
+        b.batch_mode = true
+        b.options[:multi_term_batch_mode] = true
+        b.batch_mode_term = term
+        b.save!
       end
       ['failed', 'failed_with_messages', 'aborted'].each do |status|
         batch.workflow_state = status

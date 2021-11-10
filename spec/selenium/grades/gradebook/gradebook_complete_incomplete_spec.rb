@@ -31,7 +31,7 @@ describe "Gradebook" do
       assignments_with_grades_setup('pass_fail', 'pass')
     end
 
-    before :each do
+    before do
       user_session(@teacher)
       Gradebook.visit(@course)
     end

@@ -36,7 +36,7 @@ describe "scheduler" do
       course_with_student(:active_all => true)
     end
 
-    before(:each) do
+    before do
       user_session(@student)
     end
 

@@ -33,7 +33,7 @@ describe "collaborations" do
     type = 'google_docs'
 
     context "#{title} collaboration" do
-      before(:each) do
+      before do
         course_with_teacher_logged_in
         setup_google_drive
       end

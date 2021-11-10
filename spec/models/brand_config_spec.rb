@@ -156,8 +156,8 @@ describe BrandConfig do
     describe "with cdn disabled" do
       before do
         expect(Canvas::Cdn).to receive(:enabled?).at_least(:once).and_return(false)
-        expect(@subaccount_bc).to receive(:s3_uploader).never
-        expect(File).to receive(:delete).never
+        expect(@subaccount_bc).not_to receive(:s3_uploader)
+        expect(File).not_to receive(:delete)
       end
 
       it "writes the json representation to the json file" do
@@ -177,7 +177,7 @@ describe BrandConfig do
     end
 
     describe "with cdn enabled" do
-      before :each do
+      before do
         expect(Canvas::Cdn).to receive(:enabled?).at_least(:once).and_return(true)
         s3 = double(bucket: nil)
         allow(Aws::S3::Resource).to receive(:new).and_return(s3)

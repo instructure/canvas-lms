@@ -72,7 +72,11 @@ const defaultProps = {
   canManage: false,
   canReadAnnouncements: true,
   canReadAsAdmin: false,
-  courseOverview: '<h2>Time to learn!</h2>',
+  courseOverview: {
+    body: '<h2>Time to learn!</h2>',
+    url: 'home',
+    canEdit: true
+  },
   hideFinalGrades: false,
   userIsStudent: true,
   showStudentView: false,
@@ -485,9 +489,26 @@ describe('K-5 Subject Course', () => {
       expect(getByText('Time to learn!')).toBeInTheDocument()
     })
 
+    it('shows an edit button when front page is set', () => {
+      const {getByRole} = render(<K5Course {...defaultProps} defaultTab={TAB_IDS.HOME} />)
+      const button = getByRole('link', {name: 'Edit home page'})
+      expect(button).toBeInTheDocument()
+      expect(button.href).toContain('/courses/30/pages/home/edit')
+    })
+
+    const emptyCourseOverview = {
+      body: null,
+      url: null,
+      canEdit: null
+    }
+
     it('shows an empty home state if the front page is not set', () => {
       const {getByText, getByTestId} = render(
-        <K5Course {...defaultProps} courseOverview={null} defaultTab={TAB_IDS.HOME} />
+        <K5Course
+          {...defaultProps}
+          courseOverview={emptyCourseOverview}
+          defaultTab={TAB_IDS.HOME}
+        />
       )
       expect(getByTestId('empty-home-panda')).toBeInTheDocument()
       expect(getByText('This is where you’ll land when your home is complete.')).toBeInTheDocument()
@@ -496,21 +517,35 @@ describe('K-5 Subject Course', () => {
     describe('manage home button', () => {
       it('shows the home manage button to teachers when the front page is not set ', () => {
         const {getByTestId} = render(
-          <K5Course {...defaultProps} courseOverview={null} defaultTab={TAB_IDS.HOME} canManage />
+          <K5Course
+            {...defaultProps}
+            courseOverview={emptyCourseOverview}
+            defaultTab={TAB_IDS.HOME}
+            canManage
+          />
         )
         expect(getByTestId('manage-home-button')).toBeInTheDocument()
       })
 
       it('does not show the home manage button to students', () => {
         const {queryByTestId} = render(
-          <K5Course {...defaultProps} courseOverview={null} defaultTab={TAB_IDS.HOME} />
+          <K5Course
+            {...defaultProps}
+            courseOverview={emptyCourseOverview}
+            defaultTab={TAB_IDS.HOME}
+          />
         )
         expect(queryByTestId('manage-home-button')).not.toBeInTheDocument()
       })
 
       it('sends the user to the course pages list if the course has wiki pages', () => {
         const {getByTestId} = render(
-          <K5Course {...defaultProps} courseOverview={null} defaultTab={TAB_IDS.HOME} canManage />
+          <K5Course
+            {...defaultProps}
+            courseOverview={emptyCourseOverview}
+            defaultTab={TAB_IDS.HOME}
+            canManage
+          />
         )
         const manageHomeLink = getByTestId('manage-home-button')
         expect(manageHomeLink.href).toMatch('/courses/30/pages')
@@ -521,7 +556,7 @@ describe('K-5 Subject Course', () => {
           <K5Course
             {...defaultProps}
             hasWikiPages={false}
-            courseOverview={null}
+            courseOverview={emptyCourseOverview}
             defaultTab={TAB_IDS.HOME}
             canManage
           />

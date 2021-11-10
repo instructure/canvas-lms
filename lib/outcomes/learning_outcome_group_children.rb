@@ -24,12 +24,9 @@ module Outcomes
 
     SHORT_DESCRIPTION = "coalesce(learning_outcomes.short_description, '')"
 
-    # rubocop:disable Layout/LineLength
     # E'<[^>]+>' -> removes html tags
     # E'&\\w+;'  -> removes html entities
     DESCRIPTION = "regexp_replace(regexp_replace(coalesce(learning_outcomes.description, ''), E'<[^>]+>', '', 'gi'), E'&\\w+;', ' ', 'gi')"
-    # rubocop:enable Layout/LineLength
-
     MAP_CANVAS_POSTGRES_LOCALES = {
       "ar" => "arabic", # العربية
       "ca" => "spanish", # Català

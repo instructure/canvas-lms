@@ -50,7 +50,7 @@ describe AssignmentGroup do
   end
 
   context "visible_assignments" do
-    before(:each) do
+    before do
       @ag = @course.assignment_groups.create!(@valid_attributes)
       @s = @course.course_sections.create!(name: "test section")
       student_in_section(@s, user: @student)

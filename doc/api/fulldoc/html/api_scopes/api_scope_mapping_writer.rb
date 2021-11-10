@@ -30,7 +30,7 @@ class ApiScopeMappingWriter
 
   def generate_scope_mapper
     mapping = generate_scopes_mapping(@resources)
-    out = ERB.new(@template, nil, '-').result(binding)
+    out = ERB.new(@template, trim_mode: '-').result(binding)
     File.open(@output_file, 'w') { |file| file.write(out) }
   end
 

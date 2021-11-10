@@ -57,7 +57,7 @@ describe Lti::TokenController do
   end
 
   context 'when user is not site admin' do
-    before :each do
+    before do
       user_session(account_admin_user(account: root_account))
     end
 
@@ -71,7 +71,7 @@ describe Lti::TokenController do
   context 'when user is site admin' do
     let(:user) { site_admin_user }
 
-    before :each do
+    before do
       user_session(user)
     end
 

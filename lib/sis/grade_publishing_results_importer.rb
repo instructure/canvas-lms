@@ -26,8 +26,6 @@ module SIS
       return importer.success_count
     end
 
-    private
-
     class Work
       attr_accessor :success_count
 

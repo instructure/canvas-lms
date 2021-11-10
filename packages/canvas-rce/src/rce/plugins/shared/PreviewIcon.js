@@ -19,27 +19,41 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const PreviewIcon = ({color, testId, variant}) => {
+const PreviewIcon = ({color, testId, variant, image}) => {
   const variantSettings = PreviewIcon.variants[variant]
+
+  const background = () => {
+    if (!!image) {
+      return {
+        backgroundImage: `url(${image})`,
+        backgroundSize: 'contain',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center'
+      }
+    }
+
+    return {
+      background: color ||
+      `
+        linear-gradient(
+          135deg,
+          rgba(255,255,255,1) ${variantSettings.gradientOne}, rgba(255,0,0,1) ${variantSettings.gradientOne},
+          rgba(255,0,0,1) ${variantSettings.gradientTwo}, rgba(255,255,255,1) ${variantSettings.gradientTwo}
+        )
+      `
+    }
+  }
 
   return (
     <span
       data-testid={testId}
       style={{
-        background:
-          color ||
-          `
-            linear-gradient(
-              135deg,
-              rgba(255,255,255,1) ${variantSettings.gradientOne}, rgba(255,0,0,1) ${variantSettings.gradientOne},
-              rgba(255,0,0,1) ${variantSettings.gradientTwo}, rgba(255,255,255,1) ${variantSettings.gradientTwo}
-            )
-          `,
         border: '1px solid #73818C',
         borderRadius: '3px',
         display: 'block',
         height: variantSettings.width,
-        width: variantSettings.width
+        width: variantSettings.width,
+        ...background()
       }}
     />
   )
@@ -61,13 +75,15 @@ PreviewIcon.variants = {
 PreviewIcon.propTypes = {
   color: PropTypes.string,
   testId: PropTypes.string,
-  variant: PropTypes.string
+  variant: PropTypes.string,
+  image: PropTypes.string
 }
 
 PreviewIcon.defaultProps = {
   variant: 'small',
   color: null,
-  testId: null
+  testId: null,
+  image: ''
 }
 
 export default PreviewIcon

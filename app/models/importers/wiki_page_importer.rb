@@ -240,7 +240,7 @@ module Importers
 
         item.editing_roles = hash[:editing_roles] if hash[:editing_roles].present?
         item.notify_of_update = hash[:notify_of_update] if !hash[:notify_of_update].nil?
-      else
+      else # rubocop:disable Lint/DuplicateBranch
         allow_save = false
       end
       if allow_save && hash[:migration_id]

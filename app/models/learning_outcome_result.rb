@@ -138,7 +138,6 @@ class LearningOutcomeResult < ActiveRecord::Base
   scope :for_association, lambda { |association| where(:association_type => association.class.to_s, :association_id => association.id) }
   scope :for_associated_asset, lambda { |associated_asset| where(:associated_asset_type => associated_asset.class.to_s, :associated_asset_id => associated_asset.id) }
   scope :with_active_link, lambda { where("content_tags.workflow_state <> 'deleted'").joins(:alignment) }
-  # rubocop:disable Layout/LineLength
   scope :exclude_muted_associations, -> {
     joins("LEFT JOIN #{RubricAssociation.quoted_table_name} rassoc ON rassoc.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'RubricAssociation'")
       .joins("LEFT JOIN #{Assignment.quoted_table_name} ra ON ra.id = rassoc.association_id AND rassoc.association_type = 'Assignment' AND rassoc.purpose = 'grading' AND rassoc.workflow_state = 'active'")
@@ -155,7 +154,6 @@ class LearningOutcomeResult < ActiveRecord::Base
              ' OR pc.id IS NULL'\
              ' OR (pc.id IS NOT NULL AND pc.post_manually = False)')
   }
-  # rubocop:enable Layout/LineLength
 
   private
 
@@ -214,7 +212,7 @@ class LearningOutcomeResult < ActiveRecord::Base
   end
 
   def needs_scale?(scale_data)
-    scale_data && scale_data[:scale_percent] != 1.0
+    scale_data && (scale_data[:scale_percent] - 1.0).abs > Float::EPSILON # != 1.0
   end
 
   def precise_mastery_percent

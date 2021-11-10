@@ -248,13 +248,17 @@ module SpeedGrader
                     # we'll use to create custom crocodoc urls for each prov grade
                     sub_attachments << a
                   end
-                  a.as_json(only: attachment_json_fields).tap do |json|
-                    json[:attachment][:view_inline_ping_url] = assignment_file_inline_view_path(assignment.id, a.id)
-                    json[:attachment][:canvadoc_url] = a.canvadoc_url(current_user, url_opts)
-                    json[:attachment][:crocodoc_url] = a.crocodoc_url(current_user, url_opts)
-                    json[:attachment][:submitted_to_crocodoc] = a.crocodoc_document.present?
-                    json[:attachment][:hijack_crocodoc_session] = a.crocodoc_document.present? && migrate_to_canvadocs?
-                    json[:attachment][:upload_status] = AttachmentUploadStatus.upload_status(a)
+                  a.as_json(only: attachment_json_fields).tap do |attachment_json|
+                    attachment_json[:attachment].merge!(
+                      {
+                        view_inline_ping_url: assignment_file_inline_view_path(assignment.id, a.id),
+                        canvadoc_url: a.canvadoc_url(current_user, url_opts),
+                        crocodoc_url: a.crocodoc_url(current_user, url_opts),
+                        submitted_to_crocodoc: a.crocodoc_document.present?,
+                        hijack_crocodoc_session: a.crocodoc_document.present? && migrate_to_canvadocs?,
+                        upload_status: AttachmentUploadStatus.upload_status(a),
+                      }
+                    )
                   end
                 end
               end

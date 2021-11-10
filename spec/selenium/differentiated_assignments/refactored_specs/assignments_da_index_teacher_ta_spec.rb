@@ -23,7 +23,7 @@ describe 'Viewing differentiated assignments' do
   include_context 'differentiated assignments'
 
   context 'as the teacher' do
-    before(:each) { login_as(users.teacher) }
+    before { login_as(users.teacher) }
 
     context 'on the assignments index page' do
       it 'shows all quizzes, assignments, and discussions', priority: "1", test_id: 618802 do
@@ -38,7 +38,7 @@ describe 'Viewing differentiated assignments' do
   end
 
   context 'as the TA' do
-    before(:each) { login_as(users.ta) }
+    before { login_as(users.ta) }
 
     context 'on the assignments index page' do
       it 'shows all quizzes, assignments, and discussions', priority: "1", test_id: 618803 do

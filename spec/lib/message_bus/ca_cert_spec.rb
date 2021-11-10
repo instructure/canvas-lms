@@ -27,7 +27,7 @@ describe MessageBus::CaCert do
     }
   end
 
-  before(:each) do
+  before do
     skip("pulsar config required to test") unless MessageBus.enabled?
     File.delete(cert_location) if File.exist?(cert_location)
     allow(Canvas::Vault).to receive(:read).with(fake_vault_path).and_return({
@@ -36,7 +36,7 @@ describe MessageBus::CaCert do
     LocalCache.cache.clear
   end
 
-  after(:each) do
+  after do
     LocalCache.cache.clear
     File.delete(cert_location) if File.exist?(cert_location)
   end

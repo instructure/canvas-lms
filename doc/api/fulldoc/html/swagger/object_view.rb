@@ -32,6 +32,7 @@ class ObjectView < HashView
   # returns the full JSON text of the @object being described by the API docs.
   # It's possible that 'object' has multiple JSON parts.
   def initialize(object)
+    super()
     @object = object
   end
 

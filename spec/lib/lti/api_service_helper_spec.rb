@@ -52,7 +52,7 @@ module Lti
       Lti::ProductFamily.create!(vendor_code: 'a', product_code: 'b', vendor_name: 'c', root_account: root_account)
     }
 
-    before(:each) do
+    before do
       @tool_proxy = ToolProxy.create!(
         guid: 'key', shared_secret: 'secret', product_version: 1,
         lti_version: 'LTIv2p0', workflow_state: 'active', raw_data: '{}',
@@ -62,7 +62,7 @@ module Lti
     end
 
     describe "#lti_authenticate" do
-      before(:each) do
+      before do
         allow(subject).to receive_messages(oauth_consumer_key: 'key')
         allow(subject).to receive_messages(oauth_authenticated_request?: true)
       end

@@ -70,7 +70,7 @@ describe CollaborationsHelper do
       allow(collab).to receive(:is_a?).with(ExternalToolCollaboration).and_return(true)
       allow(collab).to receive(:update_url).and_return(nil)
       allow(collab).to receive(:grants_any_right?).and_return(true)
-      expect(helper).to receive(:render).never
+      expect(helper).not_to receive(:render)
       helper.edit_button(collab, user)
     end
   end
@@ -92,7 +92,7 @@ describe CollaborationsHelper do
 
     it "doesn't return collaboration links if the user doesn't have permission" do
       allow(collab).to receive(:grants_any_right?).and_return(false)
-      expect(helper).to receive(:render).with('collaborations/collaboration_links', collaboration: collab, user: user).never
+      expect(helper).not_to receive(:render).with('collaborations/collaboration_links', collaboration: collab, user: user)
       helper.collaboration_links(collab, user)
     end
   end

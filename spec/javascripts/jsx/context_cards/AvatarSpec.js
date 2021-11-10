@@ -36,7 +36,7 @@ QUnit.module('StudentContextTray/Avatar', hooks => {
   })
 
   test('renders no avatars by default', () => {
-    subject = TestUtils.renderIntoDocument(<Avatar user={{}} courseId="1" canMasquerade />)
+    subject = TestUtils.renderIntoDocument(<Avatar name="" user={{}} courseId="1" canMasquerade />)
 
     throws(() => {
       TestUtils.findRenderedComponentWithType(subject, InstUIAvatar)
@@ -51,7 +51,9 @@ QUnit.module('StudentContextTray/Avatar', hooks => {
       avatar_url: avatarUrl,
       _id: '17'
     }
-    subject = TestUtils.renderIntoDocument(<Avatar user={user} courseId="1" canMasquerade />)
+    subject = TestUtils.renderIntoDocument(
+      <Avatar name="" user={user} courseId="1" canMasquerade />
+    )
 
     const avatar = TestUtils.findRenderedComponentWithType(subject, InstUIAvatar)
     equal(avatar.props.name, user.name)

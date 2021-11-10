@@ -43,7 +43,7 @@ describe 'login' do
         encode_extra_attributes_as: :raw
       )
       @cas_client.instance_variable_set(:@stub_response, stub_response)
-      def @cas_client.validate_service_ticket(st)
+      def @cas_client.validate_service_ticket(st) # rubocop:disable Lint/NestedMethodDefinition
         response = CASClient::ValidationResponse.new(@stub_response)
         st.user = response.user
         st.success = response.is_success?

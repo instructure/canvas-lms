@@ -535,12 +535,11 @@ class ExternalToolsController < ApplicationController
       lookup_uuid: resource_link_lookup_uuid,
       context: @context,
       root_account_id: tool.root_account_id
-    ).active.take.tap do |resource_link|
-      if resource_link.nil?
-        raise InvalidSettingsError, t(
-          "Couldn't find valid settings for this link: Resource link not found"
-        )
-      end
+    ).active.take
+    if resource_link.nil?
+      raise InvalidSettingsError, t(
+        "Couldn't find valid settings for this link: Resource link not found"
+      )
     end
 
     # Verify the resource link was intended for the domain it's being

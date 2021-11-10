@@ -31,7 +31,7 @@ describe "shared/_select_content_dialog" do
   end
 
   describe "with new_quizzes_modules_support disabled" do
-    before(:each) do
+    before do
       course_with_teacher
       view_context
       Account.site_admin.disable_feature!(:new_quizzes_modules_support)
@@ -64,14 +64,14 @@ describe "shared/_select_content_dialog" do
   end
 
   describe "with new_quizzes_modules_support enabled" do
-    before(:each) do
+    before do
       course_with_teacher
       view_context
       Account.site_admin.enable_feature!(:new_quizzes_modules_support)
       allow(NewQuizzesFeaturesHelper).to receive(:new_quizzes_enabled?).and_return(true)
     end
 
-    after(:each) do
+    after do
       Account.site_admin.disable_feature!(:new_quizzes_modules_support)
     end
 

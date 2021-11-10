@@ -141,6 +141,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
       before do
         @migrator.start!
       end
+
       it 'must post the context_id to the configured tools' do
         assert_requested(:post, export_url, {
                            body: hash_including(context_id: Lti::Asset.opaque_identifier_for(@course))
@@ -243,6 +244,7 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
 
   describe '#successfully_started?' do
     let(:migrator) { Lti::ContentMigrationService::Exporter.new('', '', {}) }
+
     it 'must return true when status and fetch urls are both present' do
       migrator.instance_variable_set(:@status_url, 'junk')
       migrator.instance_variable_set(:@fetch_url, 'junk')

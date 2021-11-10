@@ -22,6 +22,7 @@ import CanvasRce from '@canvas/rce/react/CanvasRce'
 import TinyMCEContentItem from '@canvas/tinymce-external-tools/TinyMCEContentItem'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import apiUserContent from '@canvas/util/jquery/apiUserContent'
+import StudentViewContext from '../Context'
 
 // This is how long we wait to see that changes have stopped before actually
 // saving the draft
@@ -85,12 +86,8 @@ export default class TextEntry extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this._tinyeditor == null || this.props.readOnly) {
+    if (this._tinyeditor == null) {
       return
-    }
-
-    if (this.props.readOnly !== prevProps.readOnly) {
-      this._tinyeditor.mode.set(this.props.readOnly ? 'readonly' : 'design')
     }
 
     if (this.props.submission.attempt !== prevProps.submission.attempt) {
@@ -98,7 +95,7 @@ export default class TextEntry extends React.Component {
       this._tinyeditor.setContent(body)
       this._lastSavedContent = body
 
-      if (this.props.focusOnInit && !this.props.readOnly) {
+      if (this.props.focusOnInit) {
         this._rceRef.current.focus()
       }
     }
@@ -128,7 +125,7 @@ export default class TextEntry extends React.Component {
     const isNewAttempt = submission.submissionDraft == null && submission.state === 'unsubmitted'
     // If read-only *or* this is a brand new attempt with no content,
     // we don't want to save a draft, so don't bother comparing
-    if (this.props.readOnly || (isNewAttempt && newContent === '')) {
+    if (isNewAttempt && newContent === '') {
       return
     }
 
@@ -153,13 +150,12 @@ export default class TextEntry extends React.Component {
   // in this.handleRCEInit
   handleRCEInit = tinyeditor => {
     this._tinyeditor = tinyeditor
-    tinyeditor.mode.set(this.props.readOnly ? 'readonly' : 'design')
 
     const draftBody = this.getDraftBody()
     tinyeditor.setContent(draftBody)
     this._lastSavedContent = draftBody
 
-    if (this.props.focusOnInit && !this.props.readOnly) {
+    if (this.props.focusOnInit) {
       this._rceRef.current.focus()
     }
     this._isInitted = true
@@ -186,36 +182,50 @@ export default class TextEntry extends React.Component {
     })
   }
 
+  renderContent() {
+    return (
+      <div
+        data-testid="read-only-content"
+        dangerouslySetInnerHTML={{
+          __html: apiUserContent.convert(this.props.submission.body)
+        }}
+      />
+    )
+  }
+
+  renderRCE(context) {
+    return (
+      <div data-testid="text-editor">
+        <CanvasRce
+          ref={this._rceRef}
+          autosave={false}
+          defaultContent={this.getDraftBody()}
+          editorOptions={{
+            focus: false
+          }}
+          height={300}
+          readOnly={context.isObserver}
+          textareaId="textentry_text"
+          onFocus={this.handleEditorFocus}
+          onBlur={() => {}}
+          onInit={this.handleRCEInit}
+          onContentChange={content => {
+            this.checkForChanges(content)
+          }}
+        />
+      </div>
+    )
+  }
+
   render() {
     return (
       <>
         {this.props.readOnly ? (
-          <div
-            data-testid="read-only-content"
-            dangerouslySetInnerHTML={{
-              __html: apiUserContent.convert(this.props.submission.body)
-            }}
-          />
+          this.renderContent()
         ) : (
-          <div data-testid="text-editor">
-            <CanvasRce
-              ref={this._rceRef}
-              autosave={false}
-              defaultContent={this.getDraftBody()}
-              editorOptions={{
-                focus: false
-              }}
-              height={300}
-              readOnly={this.props.readOnly}
-              textareaId="textentry_text"
-              onFocus={this.handleEditorFocus}
-              onBlur={() => {}}
-              onInit={this.handleRCEInit}
-              onContentChange={content => {
-                this.checkForChanges(content)
-              }}
-            />
-          </div>
+          <StudentViewContext.Consumer>
+            {context => this.renderRCE(context)}
+          </StudentViewContext.Consumer>
         )}
       </>
     )

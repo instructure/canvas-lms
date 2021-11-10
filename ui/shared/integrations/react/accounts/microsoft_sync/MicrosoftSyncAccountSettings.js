@@ -94,7 +94,12 @@ export default function MicrosoftSyncAccountSettings() {
                   tip={I18n.t('Your Azure Active Directory Tenant Name')}
                   on={['hover', 'focus']}
                 >
-                  <IconButton renderIcon={IconInfoLine} withBackground={false} withBorder={false} />
+                  <IconButton
+                    screenReaderLabel="Tenant Name"
+                    renderIcon={IconInfoLine}
+                    withBackground={false}
+                    withBorder={false}
+                  />
                 </Tooltip>
               </Table.RowHeader>
 
@@ -122,7 +127,12 @@ export default function MicrosoftSyncAccountSettings() {
                   placement="top"
                   on={['hover', 'focus']}
                 >
-                  <IconButton renderIcon={IconInfoLine} withBackground={false} withBorder={false} />
+                  <IconButton
+                    screenReaderLabel="Login Attribute"
+                    renderIcon={IconInfoLine}
+                    withBackground={false}
+                    withBorder={false}
+                  />
                 </Tooltip>
               </Table.RowHeader>
 
@@ -147,7 +157,12 @@ export default function MicrosoftSyncAccountSettings() {
                   )}
                   on={['hover', 'focus']}
                 >
-                  <IconButton renderIcon={IconInfoLine} withBackground={false} withBorder={false} />
+                  <IconButton
+                    screenReaderLabel="Suffix"
+                    renderIcon={IconInfoLine}
+                    withBackground={false}
+                    withBorder={false}
+                  />
                 </Tooltip>
               </Table.RowHeader>
               <Table.Cell>
@@ -172,7 +187,12 @@ export default function MicrosoftSyncAccountSettings() {
                   )}
                   on={['hover', 'focus']}
                 >
-                  <IconButton renderIcon={IconInfoLine} withBackground={false} withBorder={false} />
+                  <IconButton
+                    screenReaderLabel="Active Directory Lookup Attribute"
+                    renderIcon={IconInfoLine}
+                    withBackground={false}
+                    withBorder={false}
+                  />
                 </Tooltip>
               </Table.RowHeader>
 

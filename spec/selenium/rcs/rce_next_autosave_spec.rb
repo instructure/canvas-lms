@@ -39,7 +39,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
   end
 
   context 'WYSIWYG generic as a teacher' do
-    before(:each) do
+    before do
       Setting.set('rce_auto_save_max_age_ms', 1.hour.to_i * 1_000)
       course_with_teacher_logged_in
       Account.default.enable_feature!(:rce_auto_save)
@@ -217,7 +217,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
     end
   end
   context 'WYSIWYG generic as an admin' do
-    before(:each) do
+    before do
       Setting.set('rce_auto_save_max_age_ms', 1.hour.to_i * 1_000)
       account_with_admin_logged_in
       Account.default.enable_feature!(:rce_auto_save)

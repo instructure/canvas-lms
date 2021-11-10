@@ -27,6 +27,7 @@ module Assignments
       course_with_teacher(active_all: true)
       student_in_course(active_all: true, user_name: "some user")
     end
+
     let_once(:published) do
       @course.assignments.create({
                                    title: 'published assignment'

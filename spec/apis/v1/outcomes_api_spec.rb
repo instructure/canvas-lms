@@ -981,7 +981,7 @@ describe "Outcomes API", type: :request do
     describe "update" do
       context "mastery calculations" do
         context "not allow updating the outcome after being used for assessing" do
-          before :each do
+          before do
             @outcome.calculation_method = 'decaying_average'
             @outcome.calculation_int = 62
             @outcome.save!
@@ -1075,7 +1075,7 @@ describe "Outcomes API", type: :request do
           end
 
           context "updating rubric criterion when assessed" do
-            before :each do
+            before do
               @outcome2 = @course.created_learning_outcomes.create!(:title => 'outcome')
               @course.root_outcome_group.add_outcome(@outcome2)
               @outcome2.rubric_criterion = {

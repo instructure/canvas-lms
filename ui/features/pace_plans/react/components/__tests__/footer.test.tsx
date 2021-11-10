@@ -30,6 +30,7 @@ const defaultProps = {
   publishPlan,
   resetPlan,
   showLoadingOverlay: false,
+  studentPlan: false,
   unpublishedChanges: true
 }
 
@@ -74,5 +75,10 @@ describe('Footer', () => {
 
     const spinner = within(publishButton).getByRole('img', {name: 'Publishing plan...'})
     expect(spinner).toBeInTheDocument()
+  })
+
+  it('renders nothing for student plans', () => {
+    const {queryByRole} = render(<Footer {...defaultProps} studentPlan />)
+    expect(queryByRole('button')).not.toBeInTheDocument()
   })
 })

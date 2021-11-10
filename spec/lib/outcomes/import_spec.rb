@@ -18,30 +18,33 @@
 #
 
 RSpec.describe Outcomes::Import do
-  class TestImporter
-    include Outcomes::Import
-
-    def initialize(context)
-      @context = context
-    end
-
-    def current_import_id
-      outcome_import_id
-    end
-
-    def new_import
-      @outcome_import_id = nil
-      outcome_import_id
-    end
-
-    attr_reader :context
-  end
-
   let_once(:root_account) { account_model }
   let_once(:course) { course_model(account: root_account) }
   let_once(:other_context) { account_model }
   let_once(:outcome_vendor_guid) { 'imanoutcome' }
   let_once(:group_vendor_guid) { 'imagroup' }
+
+  let(:klass) do
+    Class.new do
+      include Outcomes::Import
+
+      def initialize(context)
+        @context = context
+      end
+
+      def current_import_id
+        outcome_import_id
+      end
+
+      def new_import
+        @outcome_import_id = nil
+        outcome_import_id
+      end
+
+      attr_reader :context
+    end
+  end
+
   let(:context) { root_account }
   let(:parent1) { outcome_group_model(context: context, vendor_guid: 'parent1') }
   let(:parent2) { outcome_group_model(context: context, vendor_guid: 'parent2') }
@@ -64,7 +67,7 @@ RSpec.describe Outcomes::Import do
       calculation_int: 3
     }
   end
-  let(:importer) { TestImporter.new(context) }
+  let(:importer) { klass.new(context) }
 
   # on export, nil database values are converted to ''
   def simulate_export(attributes)
@@ -85,7 +88,7 @@ RSpec.describe Outcomes::Import do
     it 'raises an error for anything else' do
       expect do
         importer.import_object(**group_attributes, object_type: 'monkey')
-      end.to raise_error(TestImporter::InvalidDataError, /Invalid object_type/)
+      end.to raise_error(klass::InvalidDataError, /Invalid object_type/)
     end
   end
 
@@ -101,7 +104,7 @@ RSpec.describe Outcomes::Import do
         existing_group.destroy_permanently!.id
         expect do
           importer.import_group(**group_attributes, vendor_guid: magic_guid)
-        end.to raise_error(TestImporter::InvalidDataError, /not found/)
+        end.to raise_error(klass::InvalidDataError, /not found/)
       end
 
       it '"imports" group if matching group not in correct context' do
@@ -179,7 +182,7 @@ RSpec.describe Outcomes::Import do
       importer.import_group(group_attributes)
       expect do
         importer.import_group(group_attributes)
-      end.to raise_error TestImporter::InvalidDataError, /already appeared/
+      end.to raise_error klass::InvalidDataError, /already appeared/
     end
 
     context 'with parents' do
@@ -204,14 +207,14 @@ RSpec.describe Outcomes::Import do
       it 'fails if parents not found in file' do
         expect do
           importer.import_group(**group_attributes, parent_guids: 'blahblahblah')
-        end.to raise_error(TestImporter::InvalidDataError, /Parent references not found/)
+        end.to raise_error(klass::InvalidDataError, /Parent references not found/)
       end
 
       it 'fails if parents not found' do
         parent1.destroy_permanently!
         expect do
           importer.import_group(**group_attributes, parent_guids: 'parent1')
-        end.to raise_error(TestImporter::InvalidDataError, /Parent references not found/)
+        end.to raise_error(klass::InvalidDataError, /Parent references not found/)
       end
 
       it 'reassigns parents of existing group' do
@@ -243,14 +246,14 @@ RSpec.describe Outcomes::Import do
         existing_outcome.destroy_permanently!.id
         expect do
           importer.import_outcome(**outcome_attributes, vendor_guid: magic_guid)
-        end.to raise_error(TestImporter::InvalidDataError, /with canvas id/)
+        end.to raise_error(klass::InvalidDataError, /with canvas id/)
       end
 
       it 'fails if matching outcome not in visible context' do
         existing_outcome.update! context: other_context
         expect do
           importer.import_outcome(**outcome_attributes, vendor_guid: magic_guid)
-        end.to raise_error(TestImporter::InvalidDataError, /in another unrelated course or account/)
+        end.to raise_error(klass::InvalidDataError, /in another unrelated course or account/)
       end
 
       it 'updates description if outcome in current context' do
@@ -272,7 +275,7 @@ RSpec.describe Outcomes::Import do
       end
 
       context 'importing outcome into visible context' do
-        let(:importer) { TestImporter.new(course) }
+        let(:importer) { klass.new(course) }
 
         it 'fails updating non-vendor guid attributes' do
           expect do
@@ -280,7 +283,7 @@ RSpec.describe Outcomes::Import do
               **outcome_attributes,
               vendor_guid: magic_guid
             )
-          end.to raise_error(TestImporter::InvalidDataError, /Cannot modify outcome from another context/)
+          end.to raise_error(klass::InvalidDataError, /Cannot modify outcome from another context/)
         end
 
         it 'allows magic guid to reference but not update outcome' do
@@ -302,7 +305,7 @@ RSpec.describe Outcomes::Import do
         existing_outcome.update! context: other_context
         expect do
           importer.import_outcome(**outcome_attributes)
-        end.to raise_error(TestImporter::InvalidDataError, /in another unrelated course or account/)
+        end.to raise_error(klass::InvalidDataError, /in another unrelated course or account/)
       end
 
       it 'updates if outcome in current context' do
@@ -322,7 +325,7 @@ RSpec.describe Outcomes::Import do
         importer.import_outcome(**outcome_attributes, ratings: ratings)
         expect(existing_outcome.reload.title).to eq "i'm an outcome"
 
-        course_importer = TestImporter.new(course)
+        course_importer = klass.new(course)
         course_importer.import_outcome(**outcome_attributes, ratings: ratings)
         expect(LearningOutcomeGroup.for_context(course).first.child_outcome_links.count).to eq(1)
       end
@@ -362,7 +365,7 @@ RSpec.describe Outcomes::Import do
       importer.import_outcome(outcome_attributes)
       expect do
         importer.import_outcome(outcome_attributes)
-      end.to raise_error TestImporter::InvalidDataError, /already appeared/
+      end.to raise_error klass::InvalidDataError, /already appeared/
     end
 
     context 'with parents' do
@@ -401,14 +404,14 @@ RSpec.describe Outcomes::Import do
       it 'fails if parents not found' do
         expect do
           importer.import_outcome(**outcome_attributes, parent_guids: 'parent1 parentmissing')
-        end.to raise_error(TestImporter::InvalidDataError, /Parent references not found/)
+        end.to raise_error(klass::InvalidDataError, /Parent references not found/)
       end
 
       it 'does not find parents from another context' do
         parent1.update! context: other_context
         expect do
           importer.import_outcome(**outcome_attributes, parent_guids: 'parent1')
-        end.to raise_error(TestImporter::InvalidDataError, /Parent references not found/)
+        end.to raise_error(klass::InvalidDataError, /Parent references not found/)
       end
 
       it 'reassigns parents of existing outcome' do
@@ -438,7 +441,7 @@ RSpec.describe Outcomes::Import do
         it 'does not assign parents when attributes are changed' do
           expect do
             importer.import_outcome(**outcome_attributes, parent_guids: 'parent1')
-          end.to raise_error(TestImporter::InvalidDataError, /Cannot modify outcome from another context/)
+          end.to raise_error(klass::InvalidDataError, /Cannot modify outcome from another context/)
         end
 
         it 'assigns parents for outcome in another context if attributes unchanged' do
@@ -463,7 +466,7 @@ RSpec.describe Outcomes::Import do
           it 'does not assign parents when attributes are changed' do
             expect do
               importer.import_outcome(**outcome_attributes, parent_guids: 'parent1')
-            end.to raise_error(TestImporter::InvalidDataError, /Cannot modify .* the global context/)
+            end.to raise_error(klass::InvalidDataError, /Cannot modify .* the global context/)
           end
 
           it 'assigns parents if attributes are unchanged' do

@@ -192,7 +192,7 @@ describe BigBlueButtonConference do
 
       it "doesn't look if setting is false" do
         @bbb.save
-        expect(@bbb).to receive(:send_request).never
+        expect(@bbb).not_to receive(:send_request)
         @bbb.recordings
       end
 
@@ -279,7 +279,7 @@ describe BigBlueButtonConference do
 
       it "does not make a call for conferences without keys" do
         allow(@bbb).to receive(:conference_key).and_return(nil)
-        expect(BigBlueButtonConference).to receive(:send_request).never
+        expect(BigBlueButtonConference).not_to receive(:send_request)
 
         BigBlueButtonConference.preload_recordings([@bbb])
       end
@@ -345,7 +345,7 @@ describe BigBlueButtonConference do
       }
     }
 
-    before :each do
+    before do
       old_config = {
         :domain => "bbb_old.instructure.com",
         :secret_dec => "old_secret",

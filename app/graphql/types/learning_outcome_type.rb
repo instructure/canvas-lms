@@ -31,6 +31,7 @@ module Types
 
     class ImportedLoader < GraphQL::Batch::Loader
       def initialize(target_context_id, target_context_type)
+        super()
         @target_context_id = target_context_id
         @target_context_type = target_context_type.downcase.capitalize
       end

@@ -30,7 +30,7 @@ describe 'taking a quiz' do
       course_with_student(course: @course, active_all: 1)
     end
 
-    before(:each) { user_session(@student) }
+    before { user_session(@student) }
 
     context 'when the quiz is past due' do
       let(:quiz_past_due) do

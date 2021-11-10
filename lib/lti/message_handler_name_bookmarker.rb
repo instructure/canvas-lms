@@ -19,29 +19,17 @@
 #
 module Lti
   module MessageHandlerNameBookmarker
-    def self.bookmark_for(message_handler)
-      [(message_handler.resource_handler.name || '').downcase, message_handler.id]
-    end
+    extend NameBookmarkerBase
 
-    def self.validate(bookmark)
-      bookmark.is_a?(Array) && bookmark.size == 2 &&
-        bookmark[0].is_a?(String) &&
-        bookmark[1].is_a?(Integer)
+    def self.bookmark_for(message_handler)
+      bookmark_for_name_and_id(message_handler.resource_handler.name, message_handler.id)
     end
 
     def self.restrict_scope(scope, pager)
-      name_collation_key = BookmarkedCollection.best_unicode_collation_key('lti_resource_handlers.name')
-      placeholder_collation_key = BookmarkedCollection.best_unicode_collation_key('?')
-      if pager.current_bookmark
-        bookmark = pager.current_bookmark
-        comparison = (pager.include_bookmark ? ">=" : ">")
-        scope = scope.where(
-          " (#{name_collation_key} = #{placeholder_collation_key} AND lti_message_handlers.id #{comparison} ?) "\
-          "OR #{name_collation_key} #{comparison} #{placeholder_collation_key}",
-          bookmark[0], bookmark[1], bookmark[0]
-        )
-      end
-      scope.order(name_collation_key, :id)
+      restrict_scope_by_name_and_id_fields(
+        scope: scope, pager: pager,
+        name_field: 'lti_resource_handlers.name', id_field: 'lti_message_handlers.id'
+      )
     end
   end
 end

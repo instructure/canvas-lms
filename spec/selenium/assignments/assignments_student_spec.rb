@@ -27,7 +27,7 @@ describe "assignments" do
   include AssignmentsCommon
 
   context "as a student" do
-    before(:each) do
+    before do
       course_with_student_logged_in
     end
 
@@ -172,7 +172,7 @@ describe "assignments" do
     end
 
     context "overridden lock_at" do
-      before :each do
+      before do
         setup_sections_and_overrides_all_future
         @course.enroll_user(@student, 'StudentEnrollment', :section => @section2, :enrollment_state => 'active')
       end
@@ -209,7 +209,7 @@ describe "assignments" do
     end
 
     context "click_away_accept_alert" do # this context exits to handle the click_away_accept_alert method call after each spec that needs it even if it fails early to prevent other specs from failing
-      after(:each) do
+      after do
         click_away_accept_alert
       end
 
@@ -252,7 +252,7 @@ describe "assignments" do
         setup_google_drive()
       end
 
-      after(:each) do
+      after do
         click_away_accept_alert
       end
 
@@ -266,7 +266,7 @@ describe "assignments" do
       end
 
       context "select file or folder" do
-        before(:each) do
+        before do
           # double out function calls
           google_drive_connection = double()
           allow(google_drive_connection).to receive(:service_type).and_return('google_drive')

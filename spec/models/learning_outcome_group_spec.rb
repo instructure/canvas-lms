@@ -19,7 +19,7 @@
 #
 
 describe LearningOutcomeGroup do
-  before :each do
+  before do
     course_factory
     @root = @course.root_outcome_group
   end
@@ -154,7 +154,7 @@ describe LearningOutcomeGroup do
   end
 
   describe '#add_outcome_group' do
-    before :each do
+    before do
       @group1 = @course.learning_outcome_groups.create!(:title => 'group1')
       @group2 = @course.learning_outcome_groups.create!(:title => 'group2')
       @outcome1 = @course.created_learning_outcomes.create!(:title => 'o1')

@@ -110,7 +110,7 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
       @quiz_submission.save!
     end
 
-    before(:each) do
+    before do
       @quiz_submission.events.destroy_all
     end
 

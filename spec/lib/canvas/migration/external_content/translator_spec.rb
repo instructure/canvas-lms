@@ -88,7 +88,7 @@ describe Canvas::Migration::ExternalContent::Translator do
       assmt.save!
       @cm.add_imported_item(assmt)
 
-      expect(@course).to receive(:assignments).never
+      expect(@course).not_to receive(:assignments)
       expect(@translator.get_canvas_id_from_migration_id(Assignment, mig_id)).to eq assmt.id
     end
   end

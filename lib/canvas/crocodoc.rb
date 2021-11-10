@@ -26,9 +26,9 @@ class Canvas::Crocodoc
     Canvas::Plugin.find(:crocodoc).enabled?
   end
 
-  class TimeoutError < Exception
+  class TimeoutError < RuntimeError
   end
 
-  class CutoffError < Exception
+  class CutoffError < RuntimeError
   end
 end

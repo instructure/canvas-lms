@@ -22,6 +22,7 @@
 # CoursePermissionType)
 class Loaders::PermissionsLoader < GraphQL::Batch::Loader
   def initialize(record, current_user:, session:)
+    super()
     @record = record
     @current_user = current_user
     @session = session

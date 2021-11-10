@@ -267,7 +267,8 @@ module BrandableCSS
       s3_uploader.upload_file(public_default_path(type, high_contrast))
       begin
         File.delete(default_brand_file(type, high_contrast))
-      rescue Errno::ENOENT # continue if something else deleted it in another process
+      rescue Errno::ENOENT
+        # continue if something else deleted it in another process
       end
     end
 
