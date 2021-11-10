@@ -100,6 +100,7 @@ describe Api::V1::QuizQuestion do
 
     describe 'text_only_questions' do
       let(:question_data) { { "answers" => answers, "question_type" => "text_only_questions" } }
+
       it { is_expected.not_to include("answers") }
       it { is_expected.not_to include("matching_answer_incorrect_matches") }
       it { is_expected.not_to include("points_possible") }
@@ -122,6 +123,7 @@ describe Api::V1::QuizQuestion do
 
     describe 'calculated_questions' do
       let(:question_data) { { "answers" => answers, "question_type" => "calculated_question" } }
+
       it { is_expected.to include("answers") }
       it { is_expected.to include("variables") }
       it { is_expected.to include("formulas") }
@@ -131,6 +133,7 @@ describe Api::V1::QuizQuestion do
 
     describe 'multiple_dropdowns_question' do
       let(:question_data) { { "answers" => answers, "question_type" => "multiple_dropdowns_question" } }
+
       it { is_expected.to include("answers") }
     end
   end

@@ -304,7 +304,7 @@ describe ContextModuleProgression do
     progression.reload
     expect(progression).to be_started
 
-    expect_any_instantiation_of(@topic).to receive(:recalculate_context_module_actions!).never # doesn't recalculate unless it's a new requirement
+    expect_any_instantiation_of(@topic).not_to receive(:recalculate_context_module_actions!) # doesn't recalculate unless it's a new requirement
     @module.update_attribute(:completion_requirements, { @tag1.id => { :type => 'must_submit' }, @tag2.id => { :type => 'must_contribute' } })
   end
 

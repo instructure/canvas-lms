@@ -25,6 +25,7 @@ describe CalendarsController do
   end
 
   before(:once) { course_with_student(active_all: true) }
+
   before(:each) { user_session(@student) }
 
   describe "GET 'show'" do

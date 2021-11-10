@@ -1965,6 +1965,7 @@ describe 'Submissions API', type: :request do
         course_with_ta(course: @course)
         user_session(@ta)
       end
+
       it "only shows caller's provisional grade" do
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json",
@@ -2056,6 +2057,7 @@ describe 'Submissions API', type: :request do
         observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
         observer_enrollment.update_attribute(:associated_user_id, @student.id)
       }
+
       context "differentiated_assignments on" do
         it "returns the submissons if the observed student is in the overriden section" do
           json = call_to_for_students(as_observer: true)

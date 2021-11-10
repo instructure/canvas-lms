@@ -215,7 +215,7 @@ describe CanvadocSessionsController do
 
     it "doesn't upload documents that are already uploaded" do
       @attachment1.submit_to_canvadocs
-      expect_any_instance_of(Attachment).to receive(:submit_to_canvadocs).never
+      expect_any_instance_of(Attachment).not_to receive(:submit_to_canvadocs)
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
       expect(response).to redirect_to("https://example.com/sessions/SESSION/view?theme=dark")
     end

@@ -24,6 +24,7 @@ describe "sync grades to sis" do
   include_context "in-process server selenium tests"
 
   before(:once) { export_plugin_setting.update(disabled: false) }
+
   before :each do
     course_with_admin_logged_in
     stub_rcs_config

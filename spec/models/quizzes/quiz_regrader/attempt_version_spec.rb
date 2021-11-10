@@ -83,7 +83,7 @@ describe Quizzes::QuizRegrader::AttemptVersion do
 
       # submission data isn't called if not included in question_regrades
       submission_data << { :question_id => 4 }
-      expect(Quizzes::QuizRegrader::Answer).to receive(:new).with(submission_data.last, nil).never
+      expect(Quizzes::QuizRegrader::Answer).not_to receive(:new).with(submission_data.last, nil)
 
       expect(submission).to receive(:score=).with(3)
       expect(submission).to receive(:score_before_regrade).and_return nil

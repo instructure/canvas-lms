@@ -1450,7 +1450,7 @@ describe Submission do
     end
 
     it "does not log ungraded submission change when assignment muted" do
-      expect(Auditors::GradeChange).to receive(:record).never
+      expect(Auditors::GradeChange).not_to receive(:record)
       @assignment.mute!
       @assignment.unmute!
     end
@@ -2924,7 +2924,7 @@ describe Submission do
         init_turnitin_api
         expect(@assignment).to receive(:create_in_turnitin).and_return(false)
         expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => false, :error? => true, :error_hash => {}))
-        expect(@turnitin_api).to receive(:submitPaper).never
+        expect(@turnitin_api).not_to receive(:submitPaper)
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
         expect(@submission.reload.turnitin_data[:status]).to eq 'error'
       end
@@ -2934,7 +2934,7 @@ describe Submission do
         # first a submission, to get us into failed state
         expect(@assignment).to receive(:create_in_turnitin).and_return(false)
         expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => false, :error? => true, :error_hash => {}))
-        expect(@turnitin_api).to receive(:submitPaper).never
+        expect(@turnitin_api).not_to receive(:submitPaper)
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
         expect(@submission.reload.turnitin_data[:status]).to eq 'error'
 
@@ -2994,7 +2994,7 @@ describe Submission do
 
       it "does not blow up if submission_type has changed when job runs" do
         @submission.submission_type = 'online_url'
-        expect(@submission.context).to receive(:turnitin_settings).never
+        expect(@submission.context).not_to receive(:turnitin_settings)
         expect { @submission.submit_to_turnitin }.not_to raise_error
       end
     end
@@ -3209,6 +3209,7 @@ describe Submission do
 
       context 'when assignment.due_date is in the past' do
         before { @assignment.update!(due_at: 1.day.ago) }
+
         it { is_expected.to be_grants_right(student, nil, :view_turnitin_report) }
       end
     end
@@ -3219,6 +3220,7 @@ describe Submission do
           turnitin_settings: @assignment.turnitin_settings.merge(originality_report_visibility: 'never')
         )
       end
+
       it { is_expected.not_to be_grants_right(student, nil, :view_turnitin_report) }
     end
   end
@@ -3268,6 +3270,7 @@ describe Submission do
   context '#external_tool_url' do
     let(:submission) { Submission.new }
     let(:lti_submission) { @assignment.submit_homework @user, submission_type: 'basic_lti_launch', url: 'http://www.example.com' }
+
     context 'submission_type of "basic_lti_launch"' do
       it 'returns a url containing the submitted url' do
         expect(lti_submission.external_tool_url).to eq(lti_submission.url)
@@ -4012,7 +4015,7 @@ describe Submission do
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
 
       submission.versioned_originality_reports
-      expect(OriginalityReport).to receive(:where).never
+      expect(OriginalityReport).not_to receive(:where)
       submission.versioned_originality_reports
     end
 
@@ -4062,7 +4065,7 @@ describe Submission do
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
 
       Submission.bulk_load_versioned_originality_reports([submission])
-      expect(OriginalityReport).to receive(:where).never
+      expect(OriginalityReport).not_to receive(:where)
       submission.versioned_originality_reports
     end
 
@@ -4109,7 +4112,7 @@ describe Submission do
 
   context "bulk loading attachments" do
     def ensure_attachments_arent_queried
-      expect(Attachment).to receive(:where).never
+      expect(Attachment).not_to receive(:where)
     end
 
     def submission_for_some_user
@@ -7138,6 +7141,7 @@ describe Submission do
       @assignment.grade_student(@student, score: 10, grader: @teacher, provisional: true)
       @assignment.grade_student(@student, score: 50, grader: @teacher, provisional: true, final: true)
     end
+
     let(:submission) { @assignment.submissions.first }
 
     it 'returns the provisional grade matching the passed-in scorer if provided' do
@@ -7558,16 +7562,19 @@ describe Submission do
 
       context 'when a submission is posted' do
         before { submission.update!(posted_at: Time.zone.now) }
+
         it { is_expected.not_to be_hide_grade_from_student }
       end
     end
 
     context 'when assignment posts automatically' do
       before { assignment.ensure_post_policy(post_manually: false) }
+
       it { is_expected.not_to be_hide_grade_from_student }
 
       context 'when a submission is posted' do
         before { submission.update!(posted_at: Time.zone.now) }
+
         it { is_expected.not_to be_hide_grade_from_student }
       end
 
@@ -7576,6 +7583,7 @@ describe Submission do
           assignment.grade_student(student, score: 5, grader: teacher)
           assignment.hide_submissions
         end
+
         it { is_expected.to be_hide_grade_from_student }
       end
 
@@ -7584,6 +7592,7 @@ describe Submission do
           assignment.update!(submission_types: "online_text_entry")
           assignment.submit_homework(student, submission_type: "online_text_entry", body: "hi")
         end
+
         it { is_expected.not_to be_hide_grade_from_student }
       end
 

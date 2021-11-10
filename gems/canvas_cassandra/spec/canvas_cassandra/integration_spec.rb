@@ -32,6 +32,7 @@ describe "execute and update" do
     target_location = Pathname.new(File.expand_path("../../../../..", __FILE__))
     allow(Rails).to receive(:root).and_return(target_location)
   end
+
   let(:cassandra_configured?) do
     ConfigFile.load("page_views", "test")
   end

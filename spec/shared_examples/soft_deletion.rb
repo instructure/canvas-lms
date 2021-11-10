@@ -44,6 +44,7 @@ shared_examples "soft deletion" do
 
   describe "#active" do
     let!(:destroy_the_second_active_object) { second.destroy }
+
     it "includes active associations" do
       expect(active_scope).to include first
     end

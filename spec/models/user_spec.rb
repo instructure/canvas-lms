@@ -1367,6 +1367,7 @@ describe User do
 
   context "tabs_available" do
     before(:once) { Account.default }
+
     it "does not include unconfigured external tools" do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
       tool.course_navigation = { :url => "http://www.example.com", :text => "Example URL" }
@@ -1506,20 +1507,24 @@ describe User do
         @user.avatar_image_url = '1234567890ABCDEF'
         @user.save!
       end
+
       it "raises ArgumentError when uuid nil or blank" do
         expect { @user.clear_avatar_image_url_with_uuid(nil) }.to raise_error(ArgumentError, "'uuid' is required and cannot be blank")
         expect { @user.clear_avatar_image_url_with_uuid('') }.to raise_error(ArgumentError, "'uuid' is required and cannot be blank")
         expect { @user.clear_avatar_image_url_with_uuid('  ') }.to raise_error(ArgumentError, "'uuid' is required and cannot be blank")
       end
+
       it "clears avatar_image_url when uuid matches" do
         @user.clear_avatar_image_url_with_uuid('1234567890ABCDEF')
         expect(@user.avatar_image_url).to be_nil
         expect(@user.changed?).to eq false # should be saved
       end
+
       it "does not clear avatar_image_url when no match" do
         @user.clear_avatar_image_url_with_uuid('NonMatchingText')
         expect(@user.avatar_image_url).to eq '1234567890ABCDEF'
       end
+
       it "does not error when avatar_image_url is nil" do
         @user.avatar_image_url = nil
         @user.save!
@@ -2218,6 +2223,7 @@ describe User do
       expect(User.avatar_key("2")).to eq "2-#{Canvas::Security.hmac_sha1('2')[0, 10]}"
       expect(User.avatar_key("161612461246")).to eq "161612461246-#{Canvas::Security.hmac_sha1('161612461246')[0, 10]}"
     end
+
     it " should return '0' for an invalid user id" do
       expect(User.avatar_key(nil)).to eq "0"
       expect(User.avatar_key("")).to eq "0"
@@ -2230,6 +2236,7 @@ describe User do
       expect(User.user_id_from_avatar_key("2-#{Canvas::Security.hmac_sha1('2')[0, 10]}")).to eq '2'
       expect(User.user_id_from_avatar_key("1536394658-#{Canvas::Security.hmac_sha1('1536394658')[0, 10]}")).to eq '1536394658'
     end
+
     it "returns nil for an invalid avatar key" do
       expect(User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1('1')}")).to eq nil
       expect(User.user_id_from_avatar_key("1")).to eq nil
@@ -2302,6 +2309,7 @@ describe User do
 
   describe "quota" do
     before(:once) { user_factory }
+
     it "defaults to User.default_storage_quota" do
       expect(@user.quota).to eql User.default_storage_quota
     end
@@ -2326,6 +2334,7 @@ describe User do
     before :once do
       user_with_pseudonym
     end
+
     let_once(:root_acct1) { Account.create! }
     let_once(:root_acct2) { Account.create! }
 
@@ -2659,6 +2668,7 @@ describe User do
 
   describe "manual_mark_as_read" do
     let(:user) { User.new }
+
     subject { user.manual_mark_as_read? }
 
     context 'default' do
@@ -2667,11 +2677,13 @@ describe User do
 
     context 'after being set to true' do
       before { allow(user).to receive_messages(preferences: { manual_mark_as_read: true }) }
+
       it     { is_expected.to be_truthy }
     end
 
     context 'after being set to false' do
       before { allow(user).to receive_messages(preferences: { manual_mark_as_read: false }) }
+
       it     { is_expected.to be_falsey }
     end
   end
@@ -3096,7 +3108,7 @@ describe User do
     end
 
     it "batches DueDateCacher jobs" do
-      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).not_to receive(:recompute)
       expect(DueDateCacher).to receive(:recompute_users_for_course).twice # sync_enrollments and destroy_enrollments
       test_student = @course.student_view_student
       test_student.destroy

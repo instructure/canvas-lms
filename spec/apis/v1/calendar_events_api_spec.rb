@@ -1815,8 +1815,10 @@ describe CalendarEventsApiController, type: :request do
           @observer = User.create
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :allow_multiple_enrollments => true)
         end
+
         context 'following a student with visibility' do
           before { @observer_enrollment.update_attribute(:associated_user_id, @student_in_overriden_section.id) }
+
           it "only shows events for assignments visible to that student" do
             json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2099-01-08&context_codes[]=course_#{@course.id}", {
                                       :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
@@ -1832,6 +1834,7 @@ describe CalendarEventsApiController, type: :request do
             student_in_section(@section, user: @student_in_general_section)
             @course.enroll_user(@observer, "ObserverEnrollment", { :allow_multiple_enrollments => true, :associated_user_id => @student_in_general_section.id })
           end
+
           it "doesnt show duplicate events" do
             json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2099-01-08&context_codes[]=course_#{@course.id}", {
                                       :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',
@@ -1843,6 +1846,7 @@ describe CalendarEventsApiController, type: :request do
 
         context 'following a student without visibility' do
           before { @observer_enrollment.update_attribute(:associated_user_id, @student_in_general_section.id) }
+
           it "only shows events for assignments visible to that student" do
             json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2099-01-08&context_codes[]=course_#{@course.id}", {
                                       :controller => 'calendar_events_api', :action => 'index', :format => 'json', :type => 'assignment',

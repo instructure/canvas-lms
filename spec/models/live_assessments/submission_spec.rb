@@ -28,6 +28,7 @@ describe LiveAssessments::Submission do
     outcome
   end
   let(:alignment) { outcome.align(assessment, assessment_context, mastery_type: 'none') }
+
   let_once(:assessment_user) { course_with_student(course: assessment_context, active_all: true).user }
   let_once(:assessment) { LiveAssessments::Assessment.create(context: assessment_context, key: 'test key', title: 'test title') }
   let_once(:submission) { LiveAssessments::Submission.create(user: assessment_user, assessment: assessment, possible: 10, score: 5, assessed_at: Time.now) }

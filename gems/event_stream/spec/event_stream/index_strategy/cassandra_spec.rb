@@ -322,7 +322,7 @@ describe EventStream::IndexStrategy::Cassandra do
 
         it "handles exclusionary newest/oldest parameters" do
           @pager = @index.for_key('key', oldest: @oldest, newest: @oldest - 1.day)
-          expect(@database).to receive(:execute).never
+          expect(@database).not_to receive(:execute)
           @pager.paginate(:per_page => 1)
         end
       end

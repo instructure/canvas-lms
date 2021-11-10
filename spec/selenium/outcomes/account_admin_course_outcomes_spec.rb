@@ -26,6 +26,7 @@ describe "account admin outcomes" do
   let(:outcome_url) { "/accounts/#{Account.default.id}/outcomes" }
   let(:who_to_login) { 'admin' }
   let(:account) { Account.default }
+
   describe "course outcomes" do
     before(:each) do
       RoleOverride.create!(:context => account, :permission => 'manage_courses',

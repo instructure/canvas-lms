@@ -1066,7 +1066,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,full_name,email,status",
       "u,'long_string_for_user_login_should_throw_an_error_and_be_caught_and_be_returned_to_import_and_not_sent_to_sentry',U U,u@example.com,active"
     )
-    expect(Canvas::Errors).to receive(:capture_exception).never
+    expect(Canvas::Errors).not_to receive(:capture_exception)
     expect(importer.errors.map { |x| x[1] }).to eq ["Could not save the user with user_id: 'u'. Unknown reason: unique_id is too long (maximum is 100 characters)"]
   end
 

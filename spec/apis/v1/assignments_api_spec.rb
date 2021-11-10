@@ -1089,6 +1089,7 @@ describe AssignmentsApiController, type: :request do
           setup_course
           @course.update(hide_distribution_graphs: true)
         end
+
         it "does not show score statistics to a student" do
           setup_graded_submissions
           user_session @students[0]
@@ -1138,6 +1139,7 @@ describe AssignmentsApiController, type: :request do
           @observers = create_users(10, return_type: :record)
           @observer_enrollments = create_enrollments(@course, @observers, enrollment_type: 'ObserverEnrollment', return_type: :record)
         end
+
         before :each do
           @observer = @observers.pop
           @observer_enrollment = @observer_enrollments.pop
@@ -1986,6 +1988,7 @@ describe AssignmentsApiController, type: :request do
 
       context 'with online_upload' do
         let(:submission_types) { ['online_upload'] }
+
         it "sets the configuration LTI 1 tool if one is provided" do
           expect(a.tool_settings_tool).to eq(tool)
         end
@@ -1993,6 +1996,7 @@ describe AssignmentsApiController, type: :request do
 
       context 'with online_text_entry' do
         let(:submission_types) { ['online_text_entry'] }
+
         it "sets the configuration LTI 1 tool if one is provided" do
           expect(a.tool_settings_tool).to eq(tool)
         end
@@ -3985,7 +3989,7 @@ describe AssignmentsApiController, type: :request do
             due_date_cacher = instance_double(DueDateCacher)
             allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
 
-            expect(due_date_cacher).to receive(:recompute).never
+            expect(due_date_cacher).not_to receive(:recompute)
 
             update_assignment
           end
@@ -5071,6 +5075,7 @@ describe AssignmentsApiController, type: :request do
         :description => "public stuff"
       )
     end
+
     context "user does not have the permission to delete the assignment" do
       it "does not delete the assignment" do
         api_call(:delete,
@@ -6248,7 +6253,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "preloads student_ids when including adhoc overrides" do
-      expect_any_instantiation_of(@override).to receive(:assignment_override_students).never
+      expect_any_instantiation_of(@override).not_to receive(:assignment_override_students)
       json = api_call_as_user(@teacher, :get,
                               "/api/v1/courses/#{@course.id}/assignments?include[]=overrides",
                               { :controller => 'assignments_api',
@@ -6261,7 +6266,7 @@ describe AssignmentsApiController, type: :request do
     it "preloads student_ids when including adhoc overrides on assignment groups api as well" do
       # yeah i know this is a separate api; sue me
 
-      expect_any_instantiation_of(@override).to receive(:assignment_override_students).never
+      expect_any_instantiation_of(@override).not_to receive(:assignment_override_students)
       json = api_call_as_user(@teacher, :get,
                               "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&include[]=overrides",
                               { :controller => 'assignment_groups',

@@ -521,7 +521,7 @@ describe GradingPeriodGroup do
     end
 
     it 'does not recompute course scores when the weighted attribute is not changed' do
-      expect(Enrollment).to receive(:recompute_final_score).never
+      expect(Enrollment).not_to receive(:recompute_final_score)
       @grading_period_set.update!(title: 'The Best Set')
     end
   end

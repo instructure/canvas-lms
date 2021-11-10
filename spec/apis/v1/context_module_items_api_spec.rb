@@ -1170,6 +1170,7 @@ describe "Module Items API", type: :request do
       context 'enabled' do
         context 'with override' do
           before { create_section_override_for_assignment(@assignment, { course_section: @new_section }) }
+
           it "lists all assignments" do
             json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
                             :controller => "context_module_items_api", :action => "index", :format => "json",
@@ -1392,7 +1393,7 @@ describe "Module Items API", type: :request do
 
       describe "caching CYOE data" do
         it "uses the cache when requested again" do
-          expect(ConditionalRelease::Service).to receive(:request_rules).never
+          expect(ConditionalRelease::Service).not_to receive(:request_rules)
           3.times do
             api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module3.id}/items?include[]=mastery_paths",
                      :controller => "context_module_items_api", :action => "index", :format => "json",

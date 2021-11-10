@@ -119,6 +119,7 @@ RSpec.shared_examples "course_files" do
       expect(user.avatar_state).to eq :approved
       expect(f(".links .approve_avatar_link")).not_to be_displayed
     end
+
     it "deletes the avatar" do
       user = create_avatar_state
       f("#any_profile").click

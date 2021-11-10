@@ -215,7 +215,7 @@ describe Login::CanvasController do
                                                                     .with('username', 'password')
                                                                     .and_return([{ 'uid' => ['12345'] }])
       Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
-      expect_any_instantiation_of(aac).to receive(:ldap_bind_result).never
+      expect_any_instantiation_of(aac).not_to receive(:ldap_bind_result)
       post 'create', params: { :pseudonym_session => { :unique_id => 'username', :password => 'password' } }
       expect(response).to be_redirect
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
@@ -262,7 +262,7 @@ describe Login::CanvasController do
 
     it "doesn't query the server at all if the enabled features don't require it, and there is no matching login" do
       ap = Account.default.authentication_providers.create!(auth_type: 'ldap')
-      expect_any_instantiation_of(ap).to receive(:ldap_bind_result).never
+      expect_any_instantiation_of(ap).not_to receive(:ldap_bind_result)
       post 'create', params: { :pseudonym_session => { :unique_id => 'username', :password => 'password' } }
       assert_status(400)
       expect(response).to render_template(:new)

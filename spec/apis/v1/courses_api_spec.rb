@@ -663,6 +663,7 @@ describe CoursesController, type: :request do
     before :once do
       account_admin_user
     end
+
     it "returns a course list for an observed students" do
       parent = User.create
       add_linked_observer(@me, parent)
@@ -1116,7 +1117,7 @@ describe CoursesController, type: :request do
 
       it "allows setting sis_course_id without offering the course" do
         expect(Auditors::Course).to receive(:record_created).once
-        expect(Auditors::Course).to receive(:record_published).never
+        expect(Auditors::Course).not_to receive(:record_published)
         json = api_call(:post, @resource_path,
                         @resource_params,
                         { :account_id => @account.id, :course => { :name => 'Test Course', :sis_course_id => '9999' } })
@@ -1835,6 +1836,7 @@ describe CoursesController, type: :request do
       @path = "/api/v1/courses/#{@course.id}"
       @params = { :controller => 'courses', :action => 'destroy', :format => 'json', :id => @course.id.to_s }
     end
+
     context "an authorized user" do
       it "is able to delete a course" do
         expect(Auditors::Course).to receive(:record_deleted).once
@@ -1902,6 +1904,7 @@ describe CoursesController, type: :request do
       @path = "/api/v1/courses/#{@course.id}/reset_content"
       @params = { :controller => 'courses', :action => 'reset_content', :format => 'json', :course_id => @course.id.to_s }
     end
+
     context "an authorized user" do
       it "is able to reset a course" do
         @course.root_account.disable_feature!(:granular_permissions_manage_courses)
@@ -1960,6 +1963,7 @@ describe CoursesController, type: :request do
 
     context "an authorized user" do
       let(:course_ids) { [@course1.id, @course2.id, @course3.id] }
+
       it "deletes multiple courses" do
         expect(Auditors::Course).to receive(:record_deleted).exactly(course_ids.length).times
         api_call(:put, @path, @params, { :event => 'delete', :course_ids => course_ids })
@@ -4534,11 +4538,13 @@ describe ContentImportsController, type: :request do
     @copy_to.reload
     expect(@copy_to.syllabus_body).to eq nil
   end
+
   it "skips copy wiki pages" do
     run_except_copy(:wiki_pages)
     check_counts 1
     expect(@copy_to.wiki_pages.count).to eq 0
   end
+
   each_copy_option do |option, association|
     it "skips copy #{option}" do
       run_except_copy(option)

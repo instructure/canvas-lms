@@ -22,6 +22,7 @@ describe MessagesController do
   describe "create" do
     context "an admin user" do
       before(:once) { site_admin_user }
+
       before(:each) { user_session(@user) }
 
       it "is able to access the page" do

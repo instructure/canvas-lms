@@ -54,6 +54,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   end
 
   let(:report_type) { 'student_analysis' }
+
   include_examples "Quizzes::QuizStatistics::Report"
   before(:once) { course_factory }
 
@@ -585,7 +586,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
         answers: []
       }
 
-      expect(CanvasQuizStatistics).to receive(:analyze).never
+      expect(CanvasQuizStatistics).not_to receive(:analyze)
 
       subject.send(:stats_for_question, question_data, [])
     end

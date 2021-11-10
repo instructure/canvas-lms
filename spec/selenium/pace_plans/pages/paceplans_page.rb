@@ -29,6 +29,10 @@ module PacePlansPageObject
     "[data-testid='duration-number-input']"
   end
 
+  def edit_tray_close_button_selector
+    "button:contains('Close')"
+  end
+
   def module_items_selector
     "[data-testid='pp-title-cell']"
   end
@@ -43,6 +47,10 @@ module PacePlansPageObject
 
   def publish_button_selector
     "button:contains('Publish')"
+  end
+
+  def publish_status_button_selector
+    "[data-testid='publish-status-button']"
   end
 
   def publish_status_selector
@@ -73,6 +81,14 @@ module PacePlansPageObject
     "button:contains('Students')"
   end
 
+  def unpublished_changes_list_selector
+    "[aria-label='Unpublished Changes tray'] li"
+  end
+
+  def unpublished_changes_tray_selector
+    "[aria-label='Unpublished Changes tray']"
+  end
+
   #------------------------- Elements --------------------------------
 
   def cancel_button
@@ -81,6 +97,10 @@ module PacePlansPageObject
 
   def duration_field
     f(duration_field_selector)
+  end
+
+  def edit_tray_close_button
+    fj(edit_tray_close_button_selector)
   end
 
   def module_items
@@ -101,6 +121,10 @@ module PacePlansPageObject
 
   def publish_status
     f(publish_status_selector)
+  end
+
+  def publish_status_button
+    f(publish_status_button_selector)
   end
 
   def settings_button
@@ -127,12 +151,24 @@ module PacePlansPageObject
     fj(students_menu_item_selector)
   end
 
+  def unpublished_changes_list
+    ff(unpublished_changes_list_selector)
+  end
+
+  def unpublished_changes_tray
+    f(unpublished_changes_tray_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
   def visit_pace_plans_page
     get "/courses/#{@course.id}/pace_plans"
   end
 
   #----------------------- Click Items -------------------------------
+
+  def click_edit_tray_close_button
+    edit_tray_close_button.click
+  end
 
   def click_main_pace_plan_menu
     pace_plan_menu[1].click
@@ -154,6 +190,10 @@ module PacePlansPageObject
   def click_students_menu_item
     students_menu_item.click # focus on it
     students_menu_item.click # click on it
+  end
+
+  def click_unpublished_changes_button
+    publish_status_button.click
   end
 
   #------------------------------Retrieve Text------------------------
@@ -179,6 +219,10 @@ module PacePlansPageObject
     element_exists?(publish_status_selector)
   end
 
+  def publish_status_button_exists?
+    element_exists?(publish_status_button_selector)
+  end
+
   def show_hide_pace_plans_button_text
     show_hide_pace_plans.text
   end
@@ -197,5 +241,9 @@ module PacePlansPageObject
 
   def update_module_item_duration(duration)
     duration_field.send_keys([:control, 'a'], :backspace, duration, :tab)
+  end
+
+  def unpublished_changes_tray_exists?
+    element_exists?(unpublished_changes_tray_selector)
   end
 end

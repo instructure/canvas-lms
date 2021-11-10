@@ -37,6 +37,7 @@ describe EportfolioEntriesController do
 
   describe "GET 'show'" do
     before(:once) { eportfolio_entry(@category) }
+
     it "requires authorization" do
       get 'show', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
       assert_unauthorized
@@ -160,6 +161,7 @@ describe EportfolioEntriesController do
 
   describe "PUT 'update'" do
     before(:once) { eportfolio_entry(@category) }
+
     it "requires authorization" do
       put 'update', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
       assert_unauthorized
@@ -176,6 +178,7 @@ describe EportfolioEntriesController do
 
   describe "DELETE 'destroy'" do
     before(:once) { eportfolio_entry(@category) }
+
     it "requires authorization" do
       delete 'destroy', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
       assert_unauthorized
@@ -192,6 +195,7 @@ describe EportfolioEntriesController do
 
   describe "GET 'attachment'" do
     before(:once) { eportfolio_entry(@category) }
+
     it "requires authorization" do
       get 'attachment', params: { :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => 1 }
       assert_unauthorized

@@ -771,6 +771,7 @@ describe "Users API", type: :request do
       student_in_course(:course => @course, :user => user_with_pseudonym(:name => 'Student', :username => 'pvuser2@example.com', :active_user => true))
       @user = @admin
     end
+
     include_examples "cassandra page views"
     include_examples "page view api"
   end

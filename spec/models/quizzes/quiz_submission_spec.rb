@@ -97,6 +97,7 @@ describe Quizzes::QuizSubmission do
           expect(subject.finished_at_fallback).to eq(now)
         end
       end
+
       it "works with no end_at time" do
         Timecop.freeze(5.minutes.ago) do
           now = Time.zone.now
@@ -1364,23 +1365,28 @@ describe Quizzes::QuizSubmission do
         @quiz.due_at = 3.hours.ago
         @quiz.save!
       end
+
       before :each do
         @submission = @quiz.generate_submission(@student)
         @submission.end_at = @quiz.due_at
         @submission.save!
         @resp = Quizzes::QuizSubmission.needs_grading
       end
+
       it "finds an outstanding submissions" do
         expect(@resp.size).to eq 1
       end
+
       it "returns quiz_submission information" do
         expect(@resp.first).to be_a(Quizzes::QuizSubmission)
         expect(@resp.first.id).to eq @submission.id
       end
+
       it "returns user information" do
         expect(@resp.first.user).to be_a(User)
         expect(@resp.first.user.id).to eq @student.id
       end
+
       it "returns items which require grading" do
         expect(@resp.map(&:needs_grading?).all?).to be true
       end
@@ -1410,6 +1416,7 @@ describe Quizzes::QuizSubmission do
         @quiz = @course.quizzes.create! title: 'Test Quiz'
         @submission = @quiz.quiz_submissions.build
       end
+
       it "takes ids from questions" do
         allow(@submission).to receive(:questions).and_return [{ "id" => 2 }, { "id" => 3 }]
 
@@ -1422,6 +1429,7 @@ describe Quizzes::QuizSubmission do
         @quiz = @course.quizzes.create! title: 'Test Quiz'
         @submission = @quiz.quiz_submissions.build
       end
+
       it "fetches questions based on quiz_question_ids" do
         allow(@submission).to receive(:quiz_question_ids).and_return [2, 3]
         expect(Quizzes::QuizQuestion).to receive(:where)
@@ -1917,10 +1925,12 @@ describe Quizzes::QuizSubmission do
     let(:quiz_submission) do
       Quizzes::QuizSubmission.new
     end
+
     it 'returns submission.excused?' do
       quiz_submission.submission = submission
       expect(quiz_submission.excused?).to eq submission.excused?
     end
+
     it 'functions without valid submission' do
       expect(quiz_submission.excused?).to eq nil
     end

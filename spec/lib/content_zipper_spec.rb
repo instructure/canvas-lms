@@ -582,6 +582,7 @@ describe ContentZipper do
 
   describe "complete_attachment" do
     before { @attachment = Attachment.new display_name: "I <3 testing.png" }
+
     context "when attachment wasn't zipped successfully" do
       it "moves the zip attachment into an error state and save!s it" do
         expect(@attachment).to receive(:save!).once

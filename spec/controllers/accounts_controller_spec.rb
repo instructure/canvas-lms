@@ -35,6 +35,7 @@ describe AccountsController do
 
   context "confirm_delete_user" do
     before(:once) { account_with_admin }
+
     before(:each) { user_session(@admin) }
 
     it "confirms deletion of canvas-authenticated users" do
@@ -57,6 +58,7 @@ describe AccountsController do
 
   context "remove_user" do
     before(:once) { account_with_admin }
+
     before(:each) { user_session(@admin) }
 
     it "removes user from the account" do
@@ -187,6 +189,7 @@ describe AccountsController do
 
   describe "add_account_user" do
     before(:once) { account_with_admin }
+
     before(:each) { user_session(@admin) }
 
     it "allows adding a new account admin" do
@@ -703,6 +706,7 @@ describe AccountsController do
 
     context "turnitin" do
       before(:once) { account_with_admin }
+
       before(:each) { user_session(@admin) }
 
       it "allows setting turnitin values" do
@@ -746,6 +750,7 @@ describe AccountsController do
 
     context "terms of service settings" do
       before(:once) { account_with_admin }
+
       before(:each) { user_session(@admin) }
 
       it "is able to set and update a custom terms of service" do
@@ -1429,6 +1434,7 @@ describe AccountsController do
 
     context "sorting by term" do
       let(:letters_in_random_order) { 'daqwds'.split('') }
+
       before do
         @account = Account.create!
         create_courses(letters_in_random_order.map { |i|

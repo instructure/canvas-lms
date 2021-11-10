@@ -70,7 +70,7 @@ describe Auditors::FeatureFlag do
       it "doesn't record an error when not configured" do
         allow(Auditors::FeatureFlag::Stream).to receive(:database).and_return(nil)
         expect(CanvasCassandra::DatabaseBuilder).to receive(:configured?).with("auditors").once.and_return(false)
-        expect(EventStream::Logger).to receive(:error).never
+        expect(EventStream::Logger).not_to receive(:error)
         Auditors::FeatureFlag.record(@flag, @user, 'off')
       end
     end

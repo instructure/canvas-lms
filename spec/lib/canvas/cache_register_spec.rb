@@ -111,7 +111,7 @@ describe Canvas::CacheRegister do
 
       it "does not do anything if reverted" do
         set_revert!
-        expect(Canvas::CacheRegister).to receive(:redis).never
+        expect(Canvas::CacheRegister).not_to receive(:redis)
         @user.clear_cache_key(:enrollments)
       end
 
@@ -317,7 +317,7 @@ describe Canvas::CacheRegister do
 
     it "falls back to a regular fetch (appending the keys) if not using a redis cache store" do
       enable_cache(:memory_store) do
-        expect(Rails.cache).to receive(:fetch_with_cache_register).never
+        expect(Rails.cache).not_to receive(:fetch_with_cache_register)
         check_cache
       end
     end

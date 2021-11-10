@@ -277,6 +277,7 @@ describe 'Speedgrader' do
           expect(rating).not_to include_text('pts')
         end
       end
+
       context 'saving rubric ratings' do
         before :each do
           Speedgrader.rating_by_text("Much Awesome").click
@@ -1038,6 +1039,7 @@ describe 'Speedgrader' do
         submission_types: 'online_text_entry,online_upload'
       )
     end
+
     before :each do
       user_session(@teacher)
       Speedgrader.visit(@course.id, @assignment.id)

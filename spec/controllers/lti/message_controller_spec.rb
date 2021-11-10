@@ -131,6 +131,7 @@ module Lti
           resource_handler: default_resource_handler
         )
       end
+
       context 'course' do
         it 'initiates a tool proxy reregistration request' do
           course_with_teacher_logged_in(:active_all => true)

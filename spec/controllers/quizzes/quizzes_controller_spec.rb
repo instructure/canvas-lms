@@ -825,6 +825,7 @@ describe Quizzes::QuizzesController do
 
   describe "GET 'moderate'" do
     before(:once) { course_quiz }
+
     it "requires authorization" do
       get 'moderate', params: { :course_id => @course.id, :quiz_id => @quiz.id }
       assert_unauthorized
@@ -2042,7 +2043,7 @@ describe Quizzes::QuizzesController do
         due_date_cacher = instance_double(DueDateCacher)
         allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
 
-        expect(due_date_cacher).to receive(:recompute).never
+        expect(due_date_cacher).not_to receive(:recompute)
 
         post 'update', params: @no_changes
       end
@@ -2609,6 +2610,7 @@ describe Quizzes::QuizzesController do
 
   describe "GET 'submission_html'" do
     before(:once) { course_quiz(true) }
+
     before(:each) { user_session(@teacher) }
 
     it "renders nothing if there's no submission for current user" do
@@ -2736,12 +2738,14 @@ describe Quizzes::QuizzesController do
       student_in_section(@course_section, user: @student1)
       create_section_override_for_quiz(@quiz, course_section: @course_section)
     end
+
     context 'index' do
       it 'shows the quiz to students with visibility' do
         user_session(@student1)
         get 'index', params: { :course_id => @course.id }
         expect(controller.js_env[:QUIZZES][:assignment].count).to eq 1
       end
+
       it 'hides the quiz to students with visibility' do
         user_session(@student2)
         get 'index', params: { :course_id => @course.id }
@@ -2754,12 +2758,14 @@ describe Quizzes::QuizzesController do
         get 'show', params: { :course_id => @course.id, :id => @quiz.id }
         expect(response).not_to be_redirect
       end
+
       it 'redirect for students without visibility or a submission' do
         user_session(@student2)
         get 'show', params: { :course_id => @course.id, :id => @quiz.id }
         expect(response).to be_redirect
         expect(flash[:error]).to match(/You do not have access to the requested quiz/)
       end
+
       it 'shows a message to students without visibility with a submission' do
         Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student2)
         user_session(@student2)

@@ -77,6 +77,7 @@ describe "Individual View Gradebook" do
 
       expect(SRGB.main_grade_input.attribute('disabled')).to eq 'true'
     end
+
     context 'when grades are posted' do
       before(:once) do
         @moderated_assignment.update!(grades_published_at: Time.zone.now)

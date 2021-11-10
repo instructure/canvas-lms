@@ -51,6 +51,7 @@ module Lti
       m.oauth_consumer_key = tool.consumer_key
       m
     end
+
     subject { described_class.new(launch_url, message.signed_post_params(tool.shared_secret)) }
 
     it 'creates a message from the signed_params' do

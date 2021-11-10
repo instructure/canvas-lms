@@ -95,7 +95,7 @@ describe AssignmentOverrideApplicator do
     it "does not attempt to apply overrides if an overridden assignment is overridden for the same user" do
       @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
       expect(@overridden_assignment.overridden_for_user.id).to eq @student.id
-      expect(AssignmentOverrideApplicator).to receive(:overrides_for_assignment_and_user).never
+      expect(AssignmentOverrideApplicator).not_to receive(:overrides_for_assignment_and_user)
       @reoverridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@overridden_assignment, @student)
     end
 
@@ -185,7 +185,7 @@ describe AssignmentOverrideApplicator do
       it "caches by assignment and user" do
         enable_cache do
           AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-          expect(Rails.cache).to receive(:write_entry).never
+          expect(Rails.cache).not_to receive(:write_entry)
           AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
         end
       end
@@ -869,7 +869,7 @@ describe AssignmentOverrideApplicator do
       @override = assignment_override_model(:assignment => @assignment)
       enable_cache do
         AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
-        expect(Rails.cache).to receive(:write_entry).never
+        expect(Rails.cache).not_to receive(:write_entry)
         Timecop.freeze(5.seconds.from_now) do
           AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
         end

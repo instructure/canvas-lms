@@ -431,7 +431,7 @@ describe Api do
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({ "test-lookup" => ["thing1", "thing2"] })
-      expect(Api).to receive(:relation_for_sis_mapping_and_columns).never
+      expect(Api).not_to receive(:relation_for_sis_mapping_and_columns)
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing1", "thing2"]
     end
 
@@ -927,6 +927,7 @@ describe Api do
 
       context "with per_page parameter > max_per_page argument" do
         let(:controller) { double('controller', request: request, response: response, params: { per_page: 100 }) }
+
         it "takes the smaller of the max_per_page arugment and the per_page param" do
           expect(Api.paginate(collection, controller, 'example.com', { max_per_page: 75 }).size)
             .to eq 75
@@ -935,6 +936,7 @@ describe Api do
 
       context "with per_page parameter < max_per_page argument" do
         let(:controller) { double('controller', request: request, response: response, params: { per_page: 75 }) }
+
         it "takes the smaller of the max_per_page arugment and the per_page param" do
           expect(Api.paginate(collection, controller, 'example.com', { max_per_page: 100 }).size)
             .to eq 75

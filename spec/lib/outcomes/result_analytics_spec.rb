@@ -254,6 +254,7 @@ describe Outcomes::ResultAnalytics do
     before do
       allow_any_instance_of(ActiveRecord::Associations::Preloader).to receive(:preload)
     end
+
     it 'returns a rollup for each distinct user_id' do
       results = [
         outcome_from_score(4.0, {}),

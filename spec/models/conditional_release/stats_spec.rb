@@ -241,6 +241,7 @@ module ConditionalRelease
           check_trend(7, 35, 17, 100, -1)
           check_trend(1, 2, 467, 995, -1)
         end
+
         it 'trends stable if score within 3 % points of base score' do
           check_trend(100, 100, 102, 100, 0)
           check_trend(100, 100, 98, 100, 0)

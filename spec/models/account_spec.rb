@@ -456,6 +456,7 @@ describe Account do
     before do
       @a = Account.new
     end
+
     it "is able to specify a list of enabled services" do
       @a.allowed_services = 'twitter'
       expect(@a.service_enabled?(:twitter)).to be_truthy
@@ -599,6 +600,7 @@ describe Account do
 
   context "allow_global_includes?" do
     let(:root) { Account.default }
+
     it "false unless they've checked the box to allow it" do
       expect(root.allow_global_includes?).to be_falsey
     end

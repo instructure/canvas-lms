@@ -151,7 +151,7 @@ describe QuizzesNext::ExportService do
 
     it 'skips assignments created prior to the current migration' do
       Assignment.where(:id => new_assignment1).update_all(:created_at => 1.day.ago)
-      expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).never
+      expect(Canvas::LiveEvents).not_to receive(:quizzes_next_quiz_duplicated)
       described_class.send_imported_content(new_course, content_migration, basic_import_content)
     end
 

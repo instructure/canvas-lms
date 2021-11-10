@@ -23,6 +23,7 @@ require_relative "../graphql_spec_helper"
 describe Types::CourseType do
   let_once(:course) { course_with_student(active_all: true); @course }
   let(:course_type) { GraphQLTypeTester.new(course, current_user: @student) }
+
   let_once(:other_section) { course.course_sections.create! name: "other section" }
   let_once(:other_teacher) {
     course.enroll_teacher(user_factory, section: other_section, limit_privileges_to_course_section: true).user

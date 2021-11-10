@@ -35,6 +35,7 @@ describe 'content_export_failed' do
 
     context ".email" do
       let(:path_type) { :email }
+
       it "renders the content export id" do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("ContentExport:#{asset.id}")
@@ -43,6 +44,7 @@ describe 'content_export_failed' do
 
     context ".email.html" do
       let(:path_type) { :summary }
+
       it "renders the content export id" do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("ContentExport:#{asset.id}")
@@ -59,6 +61,7 @@ describe 'content_export_failed' do
 
     context ".email" do
       let(:path_type) { :email }
+
       it 'renders the epub export id' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("EpubExport:#{asset.id}")
@@ -67,6 +70,7 @@ describe 'content_export_failed' do
 
     context ".summary" do
       let(:path_type) { :summary }
+
       it 'renders the epub export id' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("EpubExport:#{asset.id}")
@@ -83,6 +87,7 @@ describe 'content_export_failed' do
 
     context ".email" do
       let(:path_type) { :email }
+
       it 'renders the web zip export id' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("WebZipExport:#{asset.id}")
@@ -91,6 +96,7 @@ describe 'content_export_failed' do
 
     context ".summary" do
       let(:path_type) { :summary }
+
       it 'renders the web zip export id' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("WebZipExport:#{asset.id}")

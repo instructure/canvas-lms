@@ -1206,18 +1206,23 @@ describe Enrollment do
     it "allows StudentEnrollment" do
       expect(Enrollment.typed_enrollment('StudentEnrollment')).to eql(StudentEnrollment)
     end
+
     it "allows TeacherEnrollment" do
       expect(Enrollment.typed_enrollment('TeacherEnrollment')).to eql(TeacherEnrollment)
     end
+
     it "allows TaEnrollment" do
       expect(Enrollment.typed_enrollment('TaEnrollment')).to eql(TaEnrollment)
     end
+
     it "allows ObserverEnrollment" do
       expect(Enrollment.typed_enrollment('ObserverEnrollment')).to eql(ObserverEnrollment)
     end
+
     it "allows DesignerEnrollment" do
       expect(Enrollment.typed_enrollment('DesignerEnrollment')).to eql(DesignerEnrollment)
     end
+
     it "allows not NothingEnrollment" do
       expect(Enrollment.typed_enrollment('NothingEnrollment')).to eql(nil)
     end
@@ -1747,7 +1752,7 @@ describe Enrollment do
         end
 
         it "does not attempt to recompute scores since the user is not a student" do
-          expect(Enrollment).to receive(:recompute_final_score).never
+          expect(Enrollment).not_to receive(:recompute_final_score)
           @enrollment.workflow_state = 'invited'
           @enrollment.save!
           @enrollment.accept
@@ -1895,6 +1900,7 @@ describe Enrollment do
           course_with_student(active_all: true)
         end
       end
+
       include_examples 'term and enrollment dates'
 
       describe 'section dates' do
@@ -1986,6 +1992,7 @@ describe Enrollment do
           course_with_teacher(active_all: true)
         end
       end
+
       include_examples 'term and enrollment dates'
     end
 
@@ -2659,7 +2666,7 @@ describe Enrollment do
             @shard2.activate do
               expect(Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id)).to eq [@enrollment1, @enrollment2].sort_by(&:global_id)
             end
-            expect(Shard).to receive(:with_each_shard).never
+            expect(Shard).not_to receive(:with_each_shard)
             @shard1.activate do
               expect(Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id)).to eq [@enrollment1, @enrollment2].sort_by(&:global_id)
             end
@@ -3120,7 +3127,7 @@ describe Enrollment do
     end
 
     it "does not trigger a batch when enrollment is not student" do
-      expect(DueDateCacher).to receive(:recompute_users_for_course).never
+      expect(DueDateCacher).not_to receive(:recompute_users_for_course)
       @course.enroll_teacher(user_factory)
     end
 
@@ -3130,12 +3137,12 @@ describe Enrollment do
     end
 
     it "does not trigger when nothing changed" do
-      expect(DueDateCacher).to receive(:recompute_users_for_course).never
+      expect(DueDateCacher).not_to receive(:recompute_users_for_course)
       @enrollment.save
     end
 
     it "does not trigger when set_update_cached_due_dates callback is suspended" do
-      expect(DueDateCacher).to receive(:recompute_users_for_course).never
+      expect(DueDateCacher).not_to receive(:recompute_users_for_course)
       Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
         @course.enroll_student(user_factory)
       end
@@ -3145,7 +3152,7 @@ describe Enrollment do
       override = assignment_override_model(assignment: @assignments.first)
       override.assignment_override_students.create(user: @student)
       expect(DueDateCacher).to receive(:recompute_users_for_course).once
-      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).not_to receive(:recompute)
       @enrollment.destroy
     end
 

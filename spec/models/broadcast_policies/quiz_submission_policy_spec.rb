@@ -94,6 +94,7 @@ module BroadcastPolicies
       before do
         allow(quiz_submission).to receive(:changed_state_to).with(:pending_review).and_return true
       end
+
       def wont_send_when
         yield
         expect(policy.should_dispatch_submission_needs_grading?).to be_falsey
@@ -161,6 +162,7 @@ module BroadcastPolicies
 
     describe '#when there is no quiz submission' do
       let(:policy) { QuizSubmissionPolicy.new(nil) }
+
       specify { expect(policy.should_dispatch_submission_graded?).to be_falsey }
       specify { expect(policy.should_dispatch_submission_grade_changed?).to be_falsey }
     end

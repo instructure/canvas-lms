@@ -41,6 +41,7 @@ describe "calendar2" do
     before(:each) do
       course_with_teacher_logged_in
     end
+
     context "event creation" do
       it "creates an event by hitting the '+' in the top bar" do
         get "/calendar2"

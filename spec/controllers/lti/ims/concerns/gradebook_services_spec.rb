@@ -108,6 +108,7 @@ module Lti
 
         context 'with uuid that first digit matches user_id' do
           before { user.enrollments.first.update!(workflow_state: 'active') }
+
           let(:valid_params) { { course_id: context.id, user_id: "#{user.id}apzx", line_item_id: line_item.id } }
 
           it 'fails to find user' do

@@ -159,6 +159,7 @@ describe Folder do
     expect(f.active_file_attachments).to be_include(a)
     # f.active_file_attachments.should be_include(nil_a)
   end
+
   it "assigns unfiled files to the 'unfiled' folder" do
     f = Folder.unfiled_folder(@course)
     a = f.file_attachments.build

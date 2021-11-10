@@ -65,7 +65,7 @@ describe EnrollmentTerm do
     end
 
     it 'does not recompute course scores if the grading period set is not changed' do
-      expect(Enrollment).to receive(:recompute_final_score).never
+      expect(Enrollment).not_to receive(:recompute_final_score)
       @term.update!(name: 'The Best Term')
     end
 

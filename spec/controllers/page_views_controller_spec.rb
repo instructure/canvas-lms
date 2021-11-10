@@ -79,6 +79,7 @@ describe PageViewsController do
     before :once do
       Setting.set('enable_page_views', true)
     end
+
     include_examples "GET 'index' as csv"
   end
 

@@ -1916,6 +1916,7 @@ describe Course, "participants" do
         partic = @course.participants(include_observers: true, excluded_user_ids: [@student.id, @student_following_observer.id])
         [@student, @student_following_observer].each { |usr| expect(partic).to_not be_include(usr) }
       end
+
       it "includes admins and course level observers" do
         partic = @course.participants(include_observers: true, excluded_user_ids: [@student.id, @student_following_observer.id])
         [@ta, @teach, @course_level_observer].each { |usr| expect(partic).to be_include(usr) }
@@ -2635,6 +2636,7 @@ describe Course, "tabs_available" do
     before :once do
       course_with_teacher(:active_all => true)
     end
+
     let_once(:default_tab_ids) { Course.default_tabs.pluck(:id) }
 
     describe 'TAB_CONFERENCES' do
@@ -3558,7 +3560,7 @@ describe Course, 'grade_publishing' do
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:delay).never
+        expect(@course).not_to receive(:delay)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
                                   :publish_endpoint => "http://localhost/endpoint",
@@ -3574,7 +3576,7 @@ describe Course, 'grade_publishing' do
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:delay).never
+        expect(@course).not_to receive(:delay)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
                                   :publish_endpoint => "http://localhost/endpoint",
@@ -3590,7 +3592,7 @@ describe Course, 'grade_publishing' do
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:delay).never
+        expect(@course).not_to receive(:delay)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
                                   :publish_endpoint => "http://localhost/endpoint",
@@ -3966,7 +3968,7 @@ describe Course, 'grade_publishing' do
                                                                            }
                                                                          }
                                                                        })
-        expect(SSLCommon).to receive(:post_data).never
+        expect(SSLCommon).not_to receive(:post_data)
         @course.send_final_grades_to_endpoint @user
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["unpublishable", "published", "unpublishable", "published", "published", "unpublishable", "unpublished", "unpublishable", "published"]
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil] * 9
@@ -4325,7 +4327,7 @@ describe Course, 'grade_publishing' do
       if expect_success
         expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "test-jt-data", "application/jtmimetype", {})
       else
-        expect(SSLCommon).to receive(:post_data).never
+        expect(SSLCommon).not_to receive(:post_data)
       end
       @course.publish_final_grades(user)
     end
@@ -6291,21 +6293,25 @@ describe Course, 'touch_root_folder_if_necessary' do
 
     describe "restrict_student_future_view" do
       let(:setting) { :restrict_student_future_view }
+
       include_examples 'inherited setting should inherit'
     end
 
     describe "restrict_student_past_view" do
       let(:setting) { :restrict_student_past_view }
+
       include_examples 'inherited setting should inherit'
     end
 
     describe "lock_all_announcements" do
       let(:setting) { :lock_all_announcements }
+
       include_examples 'inherited setting should inherit'
     end
 
     describe "usage_rights_required" do
       let(:setting) { :usage_rights_required }
+
       include_examples 'inherited setting should inherit'
     end
   end
