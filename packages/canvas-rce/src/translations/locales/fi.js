@@ -146,6 +146,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Creative Commons -lisenssi:"
   },
+  "crop_image_807ebb08": { "message": "Rajaa kuva" },
   "current_image_f16c249c": { "message": "Nykyinen kuva" },
   "custom_6979cd81": { "message": "Mukauta" },
   "date_added_ed5ad465": { "message": "Lisäyspäivämäärä" },
@@ -322,6 +323,7 @@ const locale = {
     "message": "Tuloksia ei löytynyt kohteelle { term }."
   },
   "none_3b5e34d2": { "message": "Ei mitään" },
+  "none_selected_b93d56d2": { "message": "Ei valintoja" },
   "octagon_e48be9f": { "message": "Kahdeksankulmio" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Avaa tämä näppäimistön pikakuvakkeiden valintaruutu"
@@ -372,6 +374,7 @@ const locale = {
   },
   "search_280d00bd": { "message": "Hae" },
   "search_term_b2d2235": { "message": "Hakutermi" },
+  "select_crop_shape_d441feeb": { "message": "Valitse rajauksen muoto" },
   "select_language_7c93a900": { "message": "Valitse kieli" },
   "selected_274ce24f": { "message": "Valittu" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

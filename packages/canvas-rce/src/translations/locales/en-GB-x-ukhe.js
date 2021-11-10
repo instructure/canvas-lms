@@ -136,6 +136,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Creative Commons Licence:"
   },
+  "crop_image_807ebb08": { "message": "Crop Image" },
   "current_image_f16c249c": { "message": "Current Image" },
   "custom_6979cd81": { "message": "Custom" },
   "date_added_ed5ad465": { "message": "Date added" },
@@ -306,6 +307,7 @@ const locale = {
     "message": "No results found for { term }."
   },
   "none_3b5e34d2": { "message": "None" },
+  "none_selected_b93d56d2": { "message": "None Selected" },
   "octagon_e48be9f": { "message": "Octagon" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Open this keyboard shortcuts dialogue"
@@ -354,6 +356,7 @@ const locale = {
   "saved_buttons_and_icons_8278eed2": { "message": "Saved Buttons and Icons" },
   "search_280d00bd": { "message": "Search" },
   "search_term_b2d2235": { "message": "Search Term" },
+  "select_crop_shape_d441feeb": { "message": "Select crop shape" },
   "select_language_7c93a900": { "message": "Select Language" },
   "selected_274ce24f": { "message": "Selected" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

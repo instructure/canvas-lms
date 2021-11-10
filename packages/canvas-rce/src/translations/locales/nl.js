@@ -144,6 +144,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Creative Commons-licentie:"
   },
+  "crop_image_807ebb08": { "message": "Afbeelding bijsnijden" },
   "current_image_f16c249c": { "message": "Huidige afbeelding" },
   "custom_6979cd81": { "message": "Aangepast" },
   "date_added_ed5ad465": { "message": "Datum toegevoegd" },
@@ -328,6 +329,7 @@ const locale = {
     "message": "Geen resultaten gevonden voor { term }."
   },
   "none_3b5e34d2": { "message": "Geen" },
+  "none_selected_b93d56d2": { "message": "Geen geselecteerd" },
   "octagon_e48be9f": { "message": "Achthoek" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Open dit dialoogvenster met sneltoetsen"
@@ -380,6 +382,7 @@ const locale = {
   },
   "search_280d00bd": { "message": "Zoeken" },
   "search_term_b2d2235": { "message": "Zoekterm" },
+  "select_crop_shape_d441feeb": { "message": "Bijsnijvorm selecteren" },
   "select_language_7c93a900": { "message": "Taal selecteren" },
   "selected_274ce24f": { "message": "Geselecteerd" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
