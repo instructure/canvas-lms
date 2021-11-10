@@ -231,7 +231,10 @@ export default class AttemptTab extends Component {
     // upload-file module.  Rather than calling that method, we call uploadFile
     // for each file to track progress for the individual uploads.
     const {assignment} = this.props
-    const uploadUrl = `/api/v1/courses/${assignment.env.courseId}/assignments/${assignment._id}/submissions/${assignment.env.currentUser.id}/files`
+    const uploadUrl =
+      assignment.groupSet?.currentGroup == null
+        ? `/api/v1/courses/${assignment.env.courseId}/assignments/${assignment._id}/submissions/${assignment.env.currentUser.id}/files`
+        : `/api/v1/groups/${assignment.groupSet.currentGroup._id}/files`
 
     const uploadPromises = []
     files.forEach((file, i) => {
