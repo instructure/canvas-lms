@@ -470,7 +470,7 @@ module Lti::IMS
             end
 
             context 'in local storage mode' do
-              before do
+              before :each do
                 local_storage!
               end
 
@@ -479,7 +479,7 @@ module Lti::IMS
             end
 
             context 'in s3 storage mode' do
-              before do
+              before :each do
                 s3_storage!
               end
 
@@ -488,7 +488,7 @@ module Lti::IMS
             end
 
             context 'with InstFS enabled' do
-              before do
+              before :each do
                 allow(InstFS).to receive(:enabled?).and_return(true)
                 allow(InstFS).to receive(:jwt_secrets).and_return(['jwt signing key'])
                 @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
@@ -524,7 +524,7 @@ module Lti::IMS
               end
 
               context 'when InstFS is unreachable' do
-                before do
+                before :each do
                   allow(CanvasHttp).to receive(:post).and_raise(Net::ReadTimeout)
                 end
 
@@ -532,7 +532,7 @@ module Lti::IMS
               end
 
               context 'when InstFS responds with a 500' do
-                before do
+                before :each do
                   allow(CanvasHttp).to receive(:post).and_return(
                     double(class: Net::HTTPServerError, code: 500, body: {})
                   )
@@ -542,7 +542,7 @@ module Lti::IMS
               end
 
               context 'when InstFS responds with a 400' do
-                before do
+                before :each do
                   allow(CanvasHttp).to receive(:post).and_return(
                     double(class: Net::HTTPBadRequest, code: 400, body: {})
                   )
@@ -828,7 +828,6 @@ module Lti::IMS
 
         context 'when timestamp is before updated_at' do
           let(:params_overrides) { super().merge(timestamp: 1.day.ago.iso8601(3)) }
-
           it_behaves_like 'a bad request'
         end
 
@@ -838,7 +837,6 @@ module Lti::IMS
               :scoreMaximum
             )
           end
-
           it_behaves_like 'an unprocessable entity'
         end
 
@@ -873,19 +871,16 @@ module Lti::IMS
 
         context 'when user_id not found in course' do
           let(:user) { student_in_course(course: course_model, active_all: true).user }
-
           it_behaves_like 'an unprocessable entity'
         end
 
         context 'when user_id is not a student in course' do
           let(:user) { ta_in_course(course: course, active_all: true).user }
-
           it_behaves_like 'an unprocessable entity'
         end
 
         context 'when timestamp is not a string' do
           let(:params_overrides) { super().merge(timestamp: Time.zone.now.to_i) }
-
           it_behaves_like 'a bad request'
         end
 
@@ -893,7 +888,6 @@ module Lti::IMS
           let(:params_overrides) do
             super().merge(Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: Time.zone.now.to_i })
           end
-
           it_behaves_like 'a bad request'
         end
 
@@ -901,7 +895,6 @@ module Lti::IMS
           let(:params_overrides) do
             super().merge(Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: 'asdf' })
           end
-
           it_behaves_like 'a bad request'
         end
 
@@ -911,7 +904,6 @@ module Lti::IMS
               Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: Time.zone.now + 5.minutes }
             )
           end
-
           it_behaves_like 'a bad request'
         end
 
@@ -921,7 +913,6 @@ module Lti::IMS
               Lti::Result::AGS_EXT_SUBMISSION => { submission_type: 'online_upload' }
             )
           end
-
           it_behaves_like 'an unprocessable entity'
         end
       end

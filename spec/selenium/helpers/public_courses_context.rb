@@ -35,7 +35,7 @@ shared_context "public course as a logged out user" do
     @course
   end
 
-  before do
+  before :each do
     ensure_logged_out
   end
 end

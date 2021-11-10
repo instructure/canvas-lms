@@ -51,7 +51,7 @@ describe "Gradebook - Assignment Column" do
     end
   end
 
-  before { user_session(@teacher) }
+  before(:each) { user_session(@teacher) }
 
   context "with Sorting" do
     it "sorts by Missing", test_id: 3253336, priority: "1" do
@@ -77,7 +77,7 @@ describe "Gradebook - Assignment Column" do
   end
 
   context "with Enter Grades As Menu" do
-    before do
+    before(:each) do
       Gradebook.visit(@course)
     end
 
@@ -134,7 +134,7 @@ describe "Gradebook - Assignment Column" do
   end
 
   context "with anonymous assignment" do
-    before do
+    before(:each) do
       # enable anonymous flag at account level
       Account.default.enable_feature!(:anonymous_marking)
 

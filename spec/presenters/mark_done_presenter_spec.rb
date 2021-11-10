@@ -19,7 +19,7 @@
 #
 
 describe MarkDonePresenter do
-  before do
+  before :each do
     course_with_student(:active_all => true)
   end
 

@@ -21,31 +21,29 @@
 require 'spec_helper'
 
 describe LtiOutbound::LTIModel do
-  let(:dummy) do
-    Class.new(LtiOutbound::LTIModel) do
-      proc_accessor :attribute
-    end
+  class Dummy < LtiOutbound::LTIModel
+    proc_accessor :attribute
   end
 
   describe '#proc_accessor' do
     it 'acts as a regular attr_accessor for assigned values' do
-      model = dummy.new
+      model = Dummy.new
       model.attribute = 'test_value'
       expect(model.attribute).to eq 'test_value'
     end
 
     it 'handles multiple attributes at once' do
-      dummy.send(:proc_accessor, :test1, :test2)
+      Dummy.proc_accessor(:test1, :test2)
     end
 
     it 'evaluates a proc when assigned a proc' do
-      model = dummy.new
+      model = Dummy.new
       model.attribute = -> { 'test_value' }
       expect(model.attribute).to eq 'test_value'
     end
 
     it 'caches the result of the executed proc' do
-      model = dummy.new
+      model = Dummy.new
       obj = double(:message => 'message')
       model.attribute = -> { obj.message() }
       2.times { model.attribute }

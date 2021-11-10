@@ -93,34 +93,28 @@ function SubmissionTypeSelector({
   }
 
   return (
-    <StudentViewContext.Consumer>
-      {context => (
-        <View as="div" data-testid="submission-type-selector" margin="0 auto small">
-          <Text as="p" weight="bold">
-            {context.isObserver
-              ? I18n.t('Available submission types')
-              : I18n.t('Choose a submission type')}
-          </Text>
+    <View as="div" data-testid="submission-type-selector" margin="0 auto small">
+      <Text as="p" weight="bold">
+        {I18n.t('Choose a submission type')}
+      </Text>
 
-          <Flex wrap="wrap">
-            {assignment.submissionTypes.map(type => (
-              <Flex.Item as="div" key={type} margin="0 medium 0 0" data-testid={type}>
-                <SubmissionTypeButton
-                  displayName={friendlyTypeName(type)}
-                  icon={iconsByType[type]}
-                  selected={activeSubmissionType === type}
-                  onSelected={() => {
-                    updateActiveSubmissionType(type)
-                  }}
-                />
-              </Flex.Item>
-            ))}
+      <Flex wrap="wrap">
+        {assignment.submissionTypes.map(type => (
+          <Flex.Item as="div" key={type} margin="0 medium 0 0" data-testid={type}>
+            <SubmissionTypeButton
+              displayName={friendlyTypeName(type)}
+              icon={iconsByType[type]}
+              selected={activeSubmissionType === type}
+              onSelected={() => {
+                updateActiveSubmissionType(type)
+              }}
+            />
+          </Flex.Item>
+        ))}
 
-            {assignment.submissionTypes.includes('online_upload') && externalToolOptions}
-          </Flex>
-        </View>
-      )}
-    </StudentViewContext.Consumer>
+        {assignment.submissionTypes.includes('online_upload') && externalToolOptions}
+      </Flex>
+    </View>
   )
 }
 
@@ -294,9 +288,7 @@ export default class AttemptTab extends Component {
   }
 
   renderTextAttempt = context => {
-    const readOnly =
-      (!context.allowChangesToSubmission && !context.isObserver) ||
-      isSubmitted(this.props.submission)
+    const readOnly = !context.allowChangesToSubmission || isSubmitted(this.props.submission)
     return (
       <Suspense fallback={<LoadingIndicator />}>
         <TextEntry
@@ -425,16 +417,15 @@ export default class AttemptTab extends Component {
               <GroupSubmissionReminder groupSet={assignment.groupSet} />
             )}
 
-            {(context.allowChangesToSubmission || context.isObserver) &&
-              !isSubmitted(submission) && (
-                <SubmissionTypeSelector
-                  activeSubmissionType={this.props.activeSubmissionType}
-                  assignment={assignment}
-                  selectedExternalTool={this.props.selectedExternalTool}
-                  submission={submission}
-                  updateActiveSubmissionType={this.props.updateActiveSubmissionType}
-                />
-              )}
+            {context.allowChangesToSubmission && !isSubmitted(submission) && (
+              <SubmissionTypeSelector
+                activeSubmissionType={this.props.activeSubmissionType}
+                assignment={assignment}
+                selectedExternalTool={this.props.selectedExternalTool}
+                submission={submission}
+                updateActiveSubmissionType={this.props.updateActiveSubmissionType}
+              />
+            )}
 
             {selectedType != null &&
               this.renderByType(selectedType, context, this.props.selectedExternalTool)}

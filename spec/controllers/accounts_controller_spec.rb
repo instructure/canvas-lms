@@ -35,8 +35,7 @@ describe AccountsController do
 
   context "confirm_delete_user" do
     before(:once) { account_with_admin }
-
-    before { user_session(@admin) }
+    before(:each) { user_session(@admin) }
 
     it "confirms deletion of canvas-authenticated users" do
       user_with_pseudonym :account => @account
@@ -58,8 +57,7 @@ describe AccountsController do
 
   context "remove_user" do
     before(:once) { account_with_admin }
-
-    before { user_session(@admin) }
+    before(:each) { user_session(@admin) }
 
     it "removes user from the account" do
       user_with_pseudonym :account => @account
@@ -142,7 +140,7 @@ describe AccountsController do
       @deleted_user.destroy
     end
 
-    before { user_session(@site_admin) }
+    before(:each) { user_session(@site_admin) }
 
     it 'allows site-admins to restore deleted users' do
       put 'restore_user', params: { account_id: @account.id, user_id: @deleted_user.id }
@@ -189,8 +187,7 @@ describe AccountsController do
 
   describe "add_account_user" do
     before(:once) { account_with_admin }
-
-    before { user_session(@admin) }
+    before(:each) { user_session(@admin) }
 
     it "allows adding a new account admin" do
       post 'add_account_user', params: { :account_id => @account.id, :role_id => admin_role.id, :user_list => 'testadmin@example.com' }
@@ -402,7 +399,7 @@ describe AccountsController do
           :subtext => 'Questions are submitted to your instructor', :type => 'default',
           :url => '#teacher_feedback', :available_to => ['student'] } } } }
       @account.reload
-      link = @account.settings[:custom_help_links].detect { |l| l['id'] == 'instructor_question' }
+      link = @account.settings[:custom_help_links].detect { |link| link['id'] == 'instructor_question' }
       expect(link).not_to have_key('text')
       expect(link).not_to have_key('subtext')
       expect(link).not_to have_key('url')
@@ -411,7 +408,7 @@ describe AccountsController do
         { :id => 'instructor_question', :text => 'yo', :subtext => 'wiggity', :type => 'default',
           :url => '#dawg', :available_to => ['student'] } } } }
       @account.reload
-      link = @account.settings[:custom_help_links].detect { |l| l['id'] == 'instructor_question' }
+      link = @account.settings[:custom_help_links].detect { |link| link['id'] == 'instructor_question' }
       expect(link['text']).to eq 'yo'
       expect(link['subtext']).to eq 'wiggity'
       expect(link['url']).to eq '#dawg'
@@ -514,7 +511,7 @@ describe AccountsController do
           @user = account_admin_user(account: @account)
         end
 
-        before do
+        before :each do
           user_session(@user)
         end
 
@@ -545,7 +542,7 @@ describe AccountsController do
           @user = account_admin_user(account: @root_account)
         end
 
-        before do
+        before :each do
           user_session(@user)
         end
 
@@ -617,7 +614,7 @@ describe AccountsController do
         @account.save!
       end
 
-      before do
+      before :each do
         user_session(@user)
       end
 
@@ -706,8 +703,7 @@ describe AccountsController do
 
     context "turnitin" do
       before(:once) { account_with_admin }
-
-      before { user_session(@admin) }
+      before(:each) { user_session(@admin) }
 
       it "allows setting turnitin values" do
         post 'update', params: { :id => @account.id, :account => {
@@ -750,8 +746,7 @@ describe AccountsController do
 
     context "terms of service settings" do
       before(:once) { account_with_admin }
-
-      before { user_session(@admin) }
+      before(:each) { user_session(@admin) }
 
       it "is able to set and update a custom terms of service" do
         post 'update', params: { :id => @account.id, :account => {
@@ -1417,24 +1412,8 @@ describe AccountsController do
       expect(response.body).to match(/\"sis_course_id\":\"30\".+\"sis_course_id\":\"31\".+\"sis_course_id\":\"42\".+\"sis_course_id\":\"52\"/)
     end
 
-    it "counts enrollments correctly" do
-      admin_logged_in(@account)
-      student1 = user_factory
-      student2 = user_factory
-      @c1.enroll_user(student1, "StudentEnrollment", :enrollment_state => 'active')
-      @c1.enroll_user(student2, "StudentEnrollment", :enrollment_state => 'active')
-      @c2.enroll_user(student1, "StudentEnrollment", :enrollment_state => 'active')
-      get 'courses_api', params: { account_id: @account.id, include: ['total_students'] }
-
-      expect(response).to be_successful
-      res = JSON.parse(response.body)
-      expect(res.detect { |r| r['id'] == @c1.id }['total_students']).to eq(2)
-      expect(res.detect { |r| r['id'] == @c2.id }['total_students']).to eq(1)
-    end
-
     context "sorting by term" do
       let(:letters_in_random_order) { 'daqwds'.split('') }
-
       before do
         @account = Account.create!
         create_courses(letters_in_random_order.map { |i|
@@ -1669,26 +1648,11 @@ describe AccountsController do
         expect(response.body).to match(/\"display_name\":\"Teachy McTeacher\"/)
         expect(response.body).to match(/\"display_name\":\"Cross Shard\"/)
       end
-
-      it "counts enrollments correctly cross-shard" do
-        admin_logged_in(@account)
-        student1 = user_factory
-        student2 = user_factory
-        @c1.enroll_user(student1, "StudentEnrollment", :enrollment_state => 'active')
-        @c1.enroll_user(student2, "StudentEnrollment", :enrollment_state => 'active')
-        @c2.enroll_user(student1, "StudentEnrollment", :enrollment_state => 'active')
-        @shard1.activate { get 'courses_api', params: { account_id: @account.id, include: ['total_students'] } }
-
-        expect(response).to be_successful
-        res = JSON.parse(response.body)
-        expect(res.detect { |r| r['id'] == @c1.global_id }['total_students']).to eq(2)
-        expect(res.detect { |r| r['id'] == @c2.global_id }['total_students']).to eq(1)
-      end
     end
   end
 
   describe "#eportfolio_moderation" do
-    before do
+    before(:each) do
       account_with_admin_logged_in
 
       author.eportfolios.create!(name: "boring")

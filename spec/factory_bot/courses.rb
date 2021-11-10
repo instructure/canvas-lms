@@ -18,5 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 FactoryBot.define do
-  factory :course
+  factory :course do
+  end
 end

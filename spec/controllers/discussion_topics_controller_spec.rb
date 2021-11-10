@@ -921,7 +921,7 @@ describe DiscussionTopicsController do
     end
 
     context "in a homeroom course" do
-      before do
+      before(:each) do
         @course.account.enable_as_k5_account!
       end
 
@@ -1145,7 +1145,6 @@ describe DiscussionTopicsController do
 
     context 'usage rights - teacher' do
       before { user_session(@teacher) }
-
       before :once do
         attachment_model
         @topic_with_file = @course.discussion_topics.create!(title: "some topic", attachment: @attachment)
@@ -1200,7 +1199,7 @@ describe DiscussionTopicsController do
   end
 
   context 'student planner' do
-    before do
+    before :each do
       course_topic
     end
 
@@ -1307,8 +1306,7 @@ describe DiscussionTopicsController do
     before(:once) do
       Setting.set('enable_page_views', 'db')
     end
-
-    before do
+    before(:each) do
       allow(controller).to receive_messages(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
     end
 
@@ -1349,7 +1347,7 @@ describe DiscussionTopicsController do
     end
 
     describe "create_announcements_unlocked preference" do
-      before do
+      before(:each) do
         @teacher.create_announcements_unlocked(false)
         user_session(@teacher)
       end
@@ -1371,8 +1369,7 @@ describe DiscussionTopicsController do
 
     describe 'the new topic' do
       let(:topic) { assigns[:topic] }
-
-      before do
+      before(:each) do
         user_session(@student)
         post 'create', params: topic_params(@course), :format => :json
       end
@@ -1392,7 +1389,7 @@ describe DiscussionTopicsController do
 
     # TODO: fix this terribleness
     describe 'section specific discussions' do
-      before do
+      before(:each) do
         user_session(@teacher)
         @section1 = @course.course_sections.create!(name: "Section 1")
         @section2 = @course.course_sections.create!(name: "Section 2")
@@ -1689,13 +1686,12 @@ describe DiscussionTopicsController do
       @topic = DiscussionTopic.create!(context: @course, title: 'Test Topic',
                                        delayed_post_at: '2013-01-01T00:00:00UTC', lock_at: '2013-01-02T00:00:00UTC')
     end
-
-    before do
+    before(:each) do
       user_session(@teacher)
     end
 
     describe "create_announcements_unlocked preference" do
-      before do
+      before(:each) do
         @teacher.create_announcements_unlocked(false)
         user_session(@teacher)
       end

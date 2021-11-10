@@ -212,13 +212,11 @@ shared_examples_for "an object whose dates are overridable" do
 
     context "when it does" do
       before { override }
-
       it { is_expected.to be_truthy }
     end
 
     context "when it does but it's deleted" do
       before { override.destroy }
-
       it { is_expected.to be_falsey }
     end
 
@@ -230,7 +228,6 @@ shared_examples_for "an object whose dates are overridable" do
   describe "has_active_overrides?" do
     context "has active overrides" do
       before { override }
-
       it "returns true" do
         expect(overridable.reload.has_active_overrides?).to eq true
       end
@@ -330,7 +327,7 @@ shared_examples_for "an object whose dates are overridable" do
   end
 
   describe "#dates_hash_visible_to" do
-    before do
+    before :each do
       override.set = course.default_section
       override.override_due_at(7.days.from_now)
       override.save!

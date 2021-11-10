@@ -325,7 +325,7 @@ describe "assignments_2 feature flag and parameter" do
       @assignment = @course.assignments.create!(title: "some assignment")
     end
 
-    before do
+    before :each do
       user_session @teacher
     end
 
@@ -362,7 +362,7 @@ describe "assignments_2 feature flag and parameter" do
       @assignment = @course.assignments.create!(title: "some assignment")
     end
 
-    before do
+    before :each do
       user_session @student
     end
 
@@ -416,7 +416,7 @@ describe "assignments_2 feature flag and parameter" do
       add_linked_observer(@student, @observer)
     end
 
-    before do
+    before(:each) do
       user_session(@observer)
     end
 
@@ -453,7 +453,7 @@ describe "assignments_2 feature flag and parameter" do
   end
 
   describe "description" do
-    before do
+    before :each do
       skip "TODO doesn't work right because public_user_content is wonky"
     end
 

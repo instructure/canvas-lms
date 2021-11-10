@@ -41,8 +41,7 @@ describe('student view integration tests', () => {
       ASSIGNMENT_ID: '1',
       COURSE_ID: '1',
       current_user: {display_name: 'bob', avatar_url: 'awesome.avatar.url', id: '1'},
-      PREREQS: {},
-      current_user_roles: ['user', 'student']
+      PREREQS: {}
     }
   })
 

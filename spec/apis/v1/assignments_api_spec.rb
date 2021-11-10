@@ -569,7 +569,7 @@ describe AssignmentsApiController, type: :request do
         create_section_override_for_assignment(@far_future_assignment, { course_section: @section2, due_at: (Time.now - 10.days) })
       end
 
-      before do
+      before :each do
         user_session(@student1)
       end
 
@@ -650,7 +650,7 @@ describe AssignmentsApiController, type: :request do
           @user = @observer
         end
 
-        before do
+        before :each do
           user_session(@observer)
         end
 
@@ -857,7 +857,7 @@ describe AssignmentsApiController, type: :request do
         assignment_override_model(assignment: @assignment, set_type: 'Noop', title: 'Just a Tag')
       end
 
-      before do
+      before :each do
         user_session(@teacher)
       end
 
@@ -995,7 +995,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       context "as a student" do
-        before do
+        before :each do
           setup_course
         end
 
@@ -1089,7 +1089,6 @@ describe AssignmentsApiController, type: :request do
           setup_course
           @course.update(hide_distribution_graphs: true)
         end
-
         it "does not show score statistics to a student" do
           setup_graded_submissions
           user_session @students[0]
@@ -1139,8 +1138,7 @@ describe AssignmentsApiController, type: :request do
           @observers = create_users(10, return_type: :record)
           @observer_enrollments = create_enrollments(@course, @observers, enrollment_type: 'ObserverEnrollment', return_type: :record)
         end
-
-        before do
+        before :each do
           @observer = @observers.pop
           @observer_enrollment = @observer_enrollments.pop
           setup_course
@@ -1988,7 +1986,6 @@ describe AssignmentsApiController, type: :request do
 
       context 'with online_upload' do
         let(:submission_types) { ['online_upload'] }
-
         it "sets the configuration LTI 1 tool if one is provided" do
           expect(a.tool_settings_tool).to eq(tool)
         end
@@ -1996,7 +1993,6 @@ describe AssignmentsApiController, type: :request do
 
       context 'with online_text_entry' do
         let(:submission_types) { ['online_text_entry'] }
-
         it "sets the configuration LTI 1 tool if one is provided" do
           expect(a.tool_settings_tool).to eq(tool)
         end
@@ -2920,7 +2916,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       context "when the user is a teacher" do
-        before do
+        before :each do
           @current_user = @teacher
         end
 
@@ -2988,7 +2984,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       context "when the user is an admin" do
-        before do
+        before :each do
           @current_user = @admin
         end
 
@@ -3027,7 +3023,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     context "sis validations enabled" do
-      before do
+      before(:each) do
         a = @course.account
         a.enable_feature!(:new_sis_integrations)
         a.settings[:sis_syncing] = { value: true }
@@ -3769,7 +3765,7 @@ describe AssignmentsApiController, type: :request do
         @new_grading_standard = grading_standard_for(@course)
       end
 
-      before do
+      before :each do
         @json = api_update_assignment_call(@course, @assignment, {
                                              'name' => 'some assignment',
                                              'points_possible' => '12',
@@ -3989,7 +3985,7 @@ describe AssignmentsApiController, type: :request do
             due_date_cacher = instance_double(DueDateCacher)
             allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
 
-            expect(due_date_cacher).not_to receive(:recompute)
+            expect(due_date_cacher).to receive(:recompute).never
 
             update_assignment
           end
@@ -4338,7 +4334,7 @@ describe AssignmentsApiController, type: :request do
         @assignment = create_frozen_assignment_in_course(@course)
       end
 
-      before do
+      before :each do
         allow(PluginSetting).to receive(:settings_for_plugin).and_return({ "title" => "yes" }).at_least(:once)
       end
 
@@ -4586,7 +4582,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       context "when the user is a teacher" do
-        before do
+        before :each do
           @current_user = @teacher
         end
 
@@ -4787,7 +4783,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       context "when the user is an admin" do
-        before do
+        before :each do
           @current_user = @admin
         end
 
@@ -5075,7 +5071,6 @@ describe AssignmentsApiController, type: :request do
         :description => "public stuff"
       )
     end
-
     context "user does not have the permission to delete the assignment" do
       it "does not delete the assignment" do
         api_call(:delete,
@@ -5143,7 +5138,7 @@ describe AssignmentsApiController, type: :request do
         )
       end
 
-      before do
+      before :each do
         allow_any_instantiation_of(@assignment).to receive(:overridden_for)
           .and_return @assignment
         allow_any_instantiation_of(@assignment).to receive(:locked_for?).and_return(
@@ -5416,7 +5411,7 @@ describe AssignmentsApiController, type: :request do
             @assignment = create_frozen_assignment_in_course(@course)
           end
 
-          before do
+          before :each do
             allow(PluginSetting).to receive(:settings_for_plugin).and_return({ "title" => "yes" })
             @json = api_get_assignment_in_course(@assignment, @course)
           end
@@ -5449,7 +5444,7 @@ describe AssignmentsApiController, type: :request do
                                                       })
           end
 
-          before do
+          before :each do
             allow(PluginSetting).to receive(:settings_for_plugin).and_return({ "title" => "yes" }) # enable plugin
             expect_any_instantiation_of(@assignment).to receive(:overridden_for).and_return @assignment
             expect_any_instantiation_of(@assignment).to receive(:frozen?).at_least(:once).and_return false
@@ -5780,7 +5775,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     context 'can_submit value' do
-      before do
+      before :each do
         course_with_student_logged_in(:course_name => "Course 1", :active_all => 1)
         @course.start_at = 14.days.ago
         @course.save!
@@ -6253,7 +6248,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "preloads student_ids when including adhoc overrides" do
-      expect_any_instantiation_of(@override).not_to receive(:assignment_override_students)
+      expect_any_instantiation_of(@override).to receive(:assignment_override_students).never
       json = api_call_as_user(@teacher, :get,
                               "/api/v1/courses/#{@course.id}/assignments?include[]=overrides",
                               { :controller => 'assignments_api',
@@ -6266,7 +6261,7 @@ describe AssignmentsApiController, type: :request do
     it "preloads student_ids when including adhoc overrides on assignment groups api as well" do
       # yeah i know this is a separate api; sue me
 
-      expect_any_instantiation_of(@override).not_to receive(:assignment_override_students)
+      expect_any_instantiation_of(@override).to receive(:assignment_override_students).never
       json = api_call_as_user(@teacher, :get,
                               "/api/v1/courses/#{@course.id}/assignment_groups?include[]=assignments&include[]=overrides",
                               { :controller => 'assignment_groups',

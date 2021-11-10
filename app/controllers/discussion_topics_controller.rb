@@ -701,7 +701,6 @@ class DiscussionTopicsController < ApplicationController
                isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                student_reporting_enabled: Account.site_admin.feature_enabled?(:discussions_reporting),
-               inline_grading_enabled: Account.site_admin.feature_enabled?(:discussions_inline_grading),
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
                # GRADED_RUBRICS_URL must be within DISCUSSION to avoid page error
                DISCUSSION: {
@@ -962,7 +961,7 @@ class DiscussionTopicsController < ApplicationController
   #         -H 'Authorization: Bearer <token>'
   #
   def create
-    process_discussion_topic(is_new: true)
+    process_discussion_topic(!!:is_new)
   end
 
   # @API Update a topic
@@ -1047,7 +1046,7 @@ class DiscussionTopicsController < ApplicationController
   #         -H 'Authorization: Bearer <token>'
   #
   def update
-    process_discussion_topic(is_new: false)
+    process_discussion_topic(!:is_new)
   end
 
   # @API Delete a topic
@@ -1084,8 +1083,8 @@ class DiscussionTopicsController < ApplicationController
       f.id = polymorphic_url([@context, :discussion_topics])
     end
     @entries = []
-    @entries.concat(@context.discussion_topics
-                            .select { |dt| dt.visible_for?(@current_user) })
+    @entries.concat @context.discussion_topics
+                            .select { |dt| dt.visible_for?(@current_user) }
     @entries.concat @context.discussion_entries.active
     @entries = @entries.sort_by { |e| e.updated_at }
     @entries.each do |entry|
@@ -1188,13 +1187,13 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
-  def process_discussion_topic(is_new:)
+  def process_discussion_topic(is_new = false)
     ActiveRecord::Base.transaction do
-      process_discussion_topic_runner(is_new: is_new)
+      process_discussion_topic_runner(is_new)
     end
   end
 
-  def process_discussion_topic_runner(is_new:)
+  def process_discussion_topic_runner(is_new = false)
     @errors = {}
 
     model_type = if value_to_boolean(params[:is_announcement]) &&

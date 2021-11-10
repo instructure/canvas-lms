@@ -20,9 +20,10 @@ import React, {useEffect} from 'react'
 import {CondensedButton} from '@instructure/ui-buttons'
 // @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!unpublished_changes_button_props'
-import {getPacePlan, getPlanPublishing, getUnpublishedChangeCount} from '../reducers/pace_plans'
+import {getPacePlan, getUnpublishedChangeCount} from '../reducers/pace_plans'
 import {StoreState} from '../types'
 import {connect} from 'react-redux'
+import {getPlanPublishing} from '../reducers/ui'
 import {Spinner} from '@instructure/ui-spinner'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -91,11 +92,11 @@ export const UnpublishedChangesIndicator = ({
     )
   }
   return changeCount ? (
-    <CondensedButton data-testid="publish-status-button" onClick={onClick} margin={margin}>
+    <CondensedButton onClick={onClick} margin={margin}>
       {text(changeCount)}
     </CondensedButton>
   ) : (
-    <span data-testid="publish-status">{text(changeCount)}</span>
+    <span data-testid="publish-status" >{text(changeCount)}</span>
   )
 }
 

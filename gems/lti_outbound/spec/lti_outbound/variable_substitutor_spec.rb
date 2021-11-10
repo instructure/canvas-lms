@@ -49,7 +49,7 @@ describe LtiOutbound::VariableSubstitutor do
       end
 
       it 'can evaluate a proc' do
-        subject.add_substitution('$My.custom.proc', proc { 'blah' })
+        subject.add_substitution '$My.custom.proc', Proc.new { 'blah' }
         data_hash = { custom_var: '$My.custom.proc' }
         subject.substitute!(data_hash)
 

@@ -32,8 +32,7 @@ describe "Gradebook" do
 
     @comment_text = "This is a new group comment!"
   end
-
-  before { user_session(@teacher) }
+  before(:each) { user_session(@teacher) }
 
   it "validates posting a comment to a graded assignment", priority: "1", test_id: 210046 do
     Gradebook.visit(@course)

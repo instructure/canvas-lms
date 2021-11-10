@@ -201,10 +201,9 @@ describe StreamItem do
       let(:submission) { assignment.submission_for_student(student) }
 
       context "when the submission is not posted" do
-        before do
+        before(:each) do
           assignment.post_policy.update!(post_manually: true)
         end
-
         let(:generated_instances) do
           stream_items = StreamItem.generate_all(submission, [student.id, teacher.id])
           stream_items.first.stream_item_instances

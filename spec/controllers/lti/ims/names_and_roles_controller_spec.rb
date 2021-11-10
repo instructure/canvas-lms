@@ -162,6 +162,7 @@ describe Lti::IMS::NamesAndRolesController do
     end
   end
 
+  # rubocop:disable RSpec/LetSetup
   shared_examples 'rlid check' do
     let(:rlid_param) { expected_lti_id(course) }
     let(:params_overrides) { super().merge(rlid: rlid_param) }
@@ -292,6 +293,8 @@ describe Lti::IMS::NamesAndRolesController do
         end
       end
     end
+    # rubocop:enable RSpec/LetSetup
+
     context 'when the rlid param does not specify the course context LTI ID' do
       let(:rlid_param) { "nonsense-#{expected_lti_id(course)}" }
 
@@ -596,6 +599,7 @@ describe Lti::IMS::NamesAndRolesController do
       end
 
       # rubocop:disable RSpec/LetSetup
+      # rubocop:disable RSpec/NestedGroups
       context 'and an assignment rlid param is specified' do
         include_context 'assignment context'
         let(:rlid_param) { rlid_param_1 }
@@ -858,6 +862,7 @@ describe Lti::IMS::NamesAndRolesController do
         end
       end
       # rubocop:enable RSpec/LetSetup
+      # rubocop:enable RSpec/NestedGroups
     end
   end
 
@@ -1029,6 +1034,7 @@ describe Lti::IMS::NamesAndRolesController do
       # for Course contexts, except that we're just checking to see if we can narrow results even further based
       # on group memberships
       # rubocop:disable RSpec/LetSetup
+      # rubocop:disable RSpec/NestedGroups
       context 'and an assignment rlid param is specified' do
         include_context 'assignment context'
         let(:rlid_param) { rlid_param_1 }
@@ -1227,6 +1233,7 @@ describe Lti::IMS::NamesAndRolesController do
         end
       end
       # rubocop:enable RSpec/LetSetup
+      # rubocop:enable RSpec/NestedGroups
     end
   end
 
@@ -1298,6 +1305,7 @@ describe Lti::IMS::NamesAndRolesController do
     total_pages = page_count(total_items, effective_page_size)
     pass_thrus = as_query_params(pass_thru_params)
 
+    # rubocop:disable Layout/LineLength
     expected_links = [
       "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page}&per_page=#{effective_page_size}>; rel=\"current\"",
       "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page + 1}&per_page=#{effective_page_size}>; rel=\"next\"",
@@ -1306,6 +1314,7 @@ describe Lti::IMS::NamesAndRolesController do
       "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{total_pages}&per_page=#{effective_page_size}>; rel=\"last\""
     ]
 
+    # rubocop:enable Layout/LineLength
     expected_links.reject! { |el| el.include?('rel="next"') } if rsp_page == total_pages
     expected_links.reject! { |el| el.include?('rel="prev"') } if rsp_page <= 1
     expected_links.reject! { |el| el.include?('rel="last"') } if rsp_page > total_pages

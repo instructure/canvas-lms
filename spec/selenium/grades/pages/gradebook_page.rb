@@ -670,14 +670,6 @@ module Gradebook
     f(assignment_header_cell_selector(title))
   end
 
-  def self.assignment_names
-    ff('.assignment-name')
-  end
-
-  def self.fetch_assignment_names
-    assignment_names.map(&:text)
-  end
-
   def self.assignment_header_menu_trigger_element(assignment_name)
     assignment_header_cell_element(assignment_name).find_element(:css, '.Gradebook__ColumnHeaderAction button')
   end

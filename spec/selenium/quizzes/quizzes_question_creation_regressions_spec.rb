@@ -28,12 +28,12 @@ describe 'quizzes question creation' do
     course_with_teacher(active_all: true)
   end
 
-  before do
+  before(:each) do
     user_session(@teacher)
   end
 
   context "edge cases" do
-    before do
+    before(:each) do
       @last_quiz = start_quiz_question
     end
 
@@ -157,7 +157,7 @@ describe 'quizzes question creation' do
 
   context 'errors' do
     before :once do
-      quiz_with_new_questions(goto_edit: false)
+      quiz_with_new_questions(false)
     end
 
     it 'shows errors for graded quizzes', priority: "1", test_id: 197491 do

@@ -145,6 +145,7 @@ describe LatePolicyApplicator do
 
       @late_submission1 = @assignment_in_closed_gp.submissions.find_by(user: @students[0])
       # Update using update_all to prevent any callbacks that already apply late policies
+      # rubocop:disable Rails/SkipsModelValidations
       Submission.where(id: @late_submission1.id)
                 .update_all(
                   submitted_at: @now - 3.months + 1.hour,
@@ -216,6 +217,7 @@ describe LatePolicyApplicator do
                   points_deducted: 10,
                   submission_type: 'online_text_entry'
                 )
+      # rubocop:enable Rails/SkipsModelValidations
     end
 
     context 'when the course has no late policy' do

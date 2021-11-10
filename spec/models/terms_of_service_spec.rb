@@ -50,7 +50,7 @@ describe TermsOfService do
   end
 
   describe "#ensure_terms_for_account" do
-    before do
+    before :each do
       TermsOfService.skip_automatic_terms_creation = false
     end
 

@@ -45,7 +45,7 @@ describe Mutable do
 
     it "skips update if already muted" do
       expect(@mutable).to receive(:muted?).and_return(true)
-      expect(@mutable).not_to receive(:update_attribute)
+      expect(@mutable).to receive(:update_attribute).never
       @mutable.mute!
     end
   end
@@ -59,7 +59,7 @@ describe Mutable do
 
     it "skips update if not muted" do
       expect(@mutable).to receive(:muted?).and_return(false)
-      expect(@mutable).not_to receive(:update_attribute)
+      expect(@mutable).to receive(:update_attribute).never
       @mutable.unmute!
     end
   end

@@ -25,7 +25,7 @@ describe 'quizzes students' do
   include QuizzesCommon
 
   context 'with a teacher' do
-    before do
+    before :each do
       course_with_teacher_logged_in
       @quiz = @course.quizzes.create!(title: 'new quiz')
       @quiz.quiz_questions.create!(

@@ -35,7 +35,7 @@ describe "student k5 dashboard important dates" do
     student_setup
   end
 
-  before do
+  before :each do
     user_session @student
   end
 

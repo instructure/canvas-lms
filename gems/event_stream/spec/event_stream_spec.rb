@@ -21,7 +21,7 @@
 require 'spec_helper'
 
 describe EventStream do
-  before do
+  before(:each) do
     EventStream.current_shard_lookup = nil
     EventStream.get_index_ids_lookup = nil
   end

@@ -43,7 +43,7 @@ describe DataFixup::CreateLtiLinksForLegacyLtiToolSettings do
     )
   end
 
-  before do
+  before(:each) do
     link_tool_setting
     proxy_tool_setting
   end

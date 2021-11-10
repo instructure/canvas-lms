@@ -30,7 +30,7 @@ describe "quizzes questions" do
     @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
   end
 
-  before do
+  before(:each) do
     user_session(@teacher)
   end
 

@@ -24,7 +24,7 @@ describe CoursesController do
   include K5Common
 
   describe "GET 'index'" do
-    before do
+    before(:each) do
       controller.instance_variable_set(:@domain_root_account, Account.default)
     end
 
@@ -51,8 +51,7 @@ describe CoursesController do
       expect(assigns[:current_enrollments][0]).to eql(@enrollment)
       expect(assigns[:past_enrollments]).not_to be_nil
       expect(assigns[:future_enrollments]).not_to be_nil
-      expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be_nil
-      expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
+      expect(assigns[:js_env][:CREATE_COURSES_PERMISSION]).to be_nil
     end
 
     it "does not duplicate enrollments in variables" do
@@ -651,7 +650,7 @@ describe CoursesController do
     describe "per-assignment permissions" do
       let(:assignment_permissions) { assigns[:js_env][:PERMISSIONS][:by_assignment_id] }
 
-      before do
+      before(:each) do
         @course = Course.create!(default_view: "assignments")
         @teacher = course_with_user("TeacherEnrollment", course: @course, active_all: true).user
         @ta = course_with_user("TaEnrollment", course: @course, active_all: true).user
@@ -687,7 +686,7 @@ describe CoursesController do
     end
 
     describe 'Course notification settings' do
-      before do
+      before(:each) do
         @course = Course.create!(default_view: "assignments")
         @teacher = course_with_user("TeacherEnrollment", course: @course, active_all: true).user
       end
@@ -1205,7 +1204,7 @@ describe CoursesController do
         @c2 = @s2.add_comment(:author => @teacher, :comment => "some comment2")
       end
 
-      before do
+      before(:each) do
         user_session(@me)
       end
 
@@ -1749,7 +1748,7 @@ describe CoursesController do
           @student.enrollments.destroy_all
         end
 
-        before do
+        before :each do
           user_session(@student)
         end
 
@@ -1846,7 +1845,7 @@ describe CoursesController do
         toggle_k5_setting(@course.account)
       end
 
-      before do
+      before :each do
         user_session(@student)
       end
 
@@ -2254,14 +2253,14 @@ describe CoursesController do
 
     it "does not publish when offer is false" do
       @course.claim!
-      expect(Auditors::Course).not_to receive(:record_published)
+      expect(Auditors::Course).to receive(:record_published).never
       user_session(@teacher)
       put 'update', params: { :id => @course.id, :offer => "false" }
       expect(@course.reload).to be_claimed
     end
 
     it "does not log published event if course was already published" do
-      expect(Auditors::Course).not_to receive(:record_published)
+      expect(Auditors::Course).to receive(:record_published).never
       user_session(@teacher)
       put 'update', params: { :id => @course.id, :offer => true }
     end
@@ -2428,7 +2427,7 @@ describe CoursesController do
 
     it "doesn't allow a teacher to undelete a course" do
       @course.destroy
-      expect(Auditors::Course).not_to receive(:record_restored)
+      expect(Auditors::Course).to receive(:record_restored).never
       user_session(@teacher)
       put 'update', params: { :id => @course.id, :course => { :event => 'undelete' }, :format => :json }
       expect(response.status).to eq 401
@@ -2551,7 +2550,7 @@ describe CoursesController do
     end
 
     describe "touching content when public visibility changes" do
-      before do
+      before :each do
         user_session(@teacher)
         @assignment = @course.assignments.create!(:name => "name")
         @time = 1.day.ago
@@ -2605,7 +2604,7 @@ describe CoursesController do
     end
 
     describe "course images" do
-      before do
+      before :each do
         user_session(@teacher)
       end
 
@@ -2682,7 +2681,7 @@ describe CoursesController do
     end
 
     describe 'course colors' do
-      before do
+      before :each do
         user_session(@teacher)
       end
 
@@ -2726,7 +2725,7 @@ describe CoursesController do
         ta_in_course
       end
 
-      before do
+      before :each do
         user_session(@admin)
       end
 
@@ -2903,8 +2902,7 @@ describe CoursesController do
 
   describe "POST 'self_unenrollment'" do
     before(:once) { course_with_student(:active_all => true) }
-
-    before { user_session(@student) }
+    before(:each) { user_session(@student) }
 
     it "unenrolls" do
       @enrollment.update_attribute(:self_enrolled, true)
@@ -2942,7 +2940,7 @@ describe CoursesController do
     end
 
     it 'does not try and publish grades' do
-      expect_any_instance_of(Course).not_to receive(:publish_final_grades)
+      expect_any_instance_of(Course).to receive(:publish_final_grades).never
       user_session(@teacher)
       get 'sis_publish_status', params: { :course_id => @course.id }
       expect(response).to be_successful
@@ -3296,7 +3294,7 @@ describe CoursesController do
         account_admin_user :account => @account
       end
 
-      before do
+      before :each do
         user_session @user
       end
 
@@ -3347,7 +3345,7 @@ describe CoursesController do
           @account.account_users.create!(user: @user, role: role)
         end
 
-        before do
+        before :each do
           user_session @user
         end
 
@@ -3378,7 +3376,7 @@ describe CoursesController do
           @account.account_users.create!(user: @user, role: role)
         end
 
-        before do
+        before :each do
           user_session @user
         end
 
@@ -3414,8 +3412,7 @@ describe CoursesController do
           @account = Account.default
           course_with_teacher(:account => @account, :active_all => true)
         end
-
-        before { user_session(@teacher) }
+        before(:each) { user_session(@teacher) }
 
         it "ignores storage_quota" do
           post 'update', params: { :id => @course.id, :course =>
@@ -3968,7 +3965,7 @@ describe CoursesController do
       @course = course_factory(active_all: true)
     end
 
-    before do
+    before :each do
       user_session(@user)
     end
 

@@ -52,7 +52,7 @@ describe "Respondus SOAP API", type: :request do
     end
   end
 
-  before do
+  before(:each) do
     setting = PluginSetting.where(name: 'qti_converter').new
     setting.settings = Canvas::Plugin.find('qti_converter').default_settings.merge({ :enabled => 'true' })
     setting.save!

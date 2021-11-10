@@ -49,12 +49,12 @@ require 'fixtures/animal'
 require 'fixtures/trail'
 require 'fixtures/week_event'
 
-Zoo = CanvasPartmanTest::Zoo
-Animal = CanvasPartmanTest::Animal
-Trail = CanvasPartmanTest::Trail
-WeekEvent = CanvasPartmanTest::WeekEvent
-
 RSpec.configure do |config|
+  Zoo = CanvasPartmanTest::Zoo
+  Animal = CanvasPartmanTest::Animal
+  Trail = CanvasPartmanTest::Trail
+  WeekEvent = CanvasPartmanTest::WeekEvent
+
   config.color = true
   config.order = :random
 
@@ -79,7 +79,7 @@ RSpec.configure do |config|
     [Animal, Trail, Zoo, WeekEvent].each(&:drop_schema)
   end
 
-  config.after do
+  config.after :each do
     connection.tables.grep(/^partman_(?:animals|trails)_/).each do |partition_table_name|
       begin
         SchemaHelper.drop_table(partition_table_name)

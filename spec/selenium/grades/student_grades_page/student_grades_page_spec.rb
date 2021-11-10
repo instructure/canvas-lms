@@ -45,7 +45,7 @@ describe "gradebook - logged in as a student" do
       @course.save!
     end
 
-    before do
+    before(:each) do
       user_session(@student)
       StudentGradesPage.visit_as_student(@course)
     end
@@ -115,7 +115,7 @@ describe "gradebook - logged in as a student" do
       @assignment.grade_student(@student, grade: 'A', grader: @teacher)
     end
 
-    before do
+    before :each do
       skip('Unskip in GRADE-1359')
       user_session(@student)
       StudentGradesPage.visit_as_student(@course)

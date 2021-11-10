@@ -26,7 +26,7 @@ require 'multipart'
 describe "CanvasHttp" do
   include WebMock::API
 
-  around do |block|
+  around :each do |block|
     fake_logger = Class.new do
       attr_reader :messages
 
@@ -51,7 +51,7 @@ describe "CanvasHttp" do
   end
 
   describe ".post" do
-    before do
+    before :each do
       WebMock::RequestRegistry.instance.reset!
     end
 
@@ -271,7 +271,7 @@ describe "CanvasHttp" do
   end
 
   describe '#insecure_host?' do
-    around do |example|
+    around(:each) do |example|
       old_filters = CanvasHttp.blocked_ip_filters
       CanvasHttp.blocked_ip_filters = -> { ['127.0.0.1/8', '42.42.42.42/16'] }
       example.call
@@ -301,7 +301,7 @@ describe "CanvasHttp" do
   end
 
   describe ".tempfile_for_url" do
-    before do
+    before(:each) do
       tempfile = double('tempfile')
       allow(tempfile).to receive(:binmode)
       allow(Tempfile).to receive(:new).and_return(tempfile)

@@ -36,7 +36,7 @@ describe 'Late Policies:' do
   end
 
   context "grade detail tray other" do
-    before do
+    before(:each) do
       user_session(@teacher)
       GradebookIndividualViewPage.visit(@course.id)
     end

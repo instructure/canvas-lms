@@ -124,7 +124,6 @@ describe Lti::ExternalToolTab do
       allow(course).to receive(:id).and_return(3)
       course
     end
-
     subject { described_class.new(context, :course_navigation, [tool]) }
 
     it 'sets the label based on placement' do
@@ -182,7 +181,6 @@ describe Lti::ExternalToolTab do
       allow(user).to receive(:id).and_return(4)
       user
     end
-
     subject { described_class.new(context, :user_navigation, [tool]) }
 
     it 'sets the label based on placement' do

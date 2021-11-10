@@ -163,9 +163,7 @@ ready(() => {
   // This is in a setTimeout to have it run on the next time through the event loop
   // so that the code that actually renders the user_content runs first,
   // because it has to be rendered before we can check if isMathOnPage
-  let processedBodyMath = false
   setTimeout(() => {
-    processedBodyMath = true
     window.dispatchEvent(
       new CustomEvent(mathml.processNewMathEventName, {
         detail: {target: document.body}
@@ -174,7 +172,6 @@ ready(() => {
   }, 0)
 
   const observer = new MutationObserver((mutationList, _observer) => {
-    if (!processedBodyMath) return
     for (let m = 0; m < mutationList.length; ++m) {
       if (mutationList[m]?.addedNodes?.length) {
         const addedNodes = mutationList[m].addedNodes

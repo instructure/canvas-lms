@@ -209,7 +209,7 @@ describe RubricsController do
 
       let(:last_created_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_created').last }
 
-      before do
+      before(:each) do
         user_session(teacher)
       end
 
@@ -246,7 +246,6 @@ describe RubricsController do
       put 'update', params: { :course_id => @course.id, :id => @rubric.id }
       assert_unauthorized
     end
-
     it "assigns variables" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
@@ -255,7 +254,6 @@ describe RubricsController do
       expect(assigns[:rubric]).to eql(@rubric)
       expect(response).to be_successful
     end
-
     it "updates the rubric if updateable" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
@@ -690,7 +688,7 @@ describe RubricsController do
       let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
       let(:rubric) { Rubric.create!(title: 'aaa', context: course) }
 
-      before do
+      before(:each) do
         rubric.update_with_association(
           teacher,
           {},

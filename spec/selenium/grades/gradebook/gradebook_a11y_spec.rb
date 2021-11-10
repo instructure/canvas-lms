@@ -27,7 +27,7 @@ describe "Gradebook" do
   include GradebookCommon
   include ColorCommon
 
-  let(:extra_setup) { nil }
+  let(:extra_setup) {}
   let(:students) { @course.students }
 
   before :once do
@@ -395,7 +395,6 @@ describe "Gradebook" do
 
   context "assignment header focus" do
     before { Gradebook.visit(@course) }
-
     let(:assignment) { @course.assignments.first }
 
     it 'is placed on assignment header trigger upon sort' do

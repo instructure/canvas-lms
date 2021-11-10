@@ -43,22 +43,7 @@ describe Canvas::LiveEvents do
   end
 
   before do
-    LiveEvents.stream_client = Class.new do
-      attr_accessor :data, :stream, :stream_name
-
-      def initialize(stream_name = 'stream')
-        @stream_name = stream_name
-      end
-
-      def put_records(stream_name:, records:)
-        @data = records
-        @stream = stream_name
-      end
-
-      def body
-        @data['body']
-      end
-    end.new
+    LiveEvents.stream_client = FakeStreamClient.new
     allow(LiveEvents).to receive(:get_context).and_return({ compact_live_events: true })
   end
 
@@ -70,6 +55,34 @@ describe Canvas::LiveEvents do
       context_id: @course.global_id.to_s,
       context_type: 'Course'
     )
+  end
+
+  class FakeSettings
+    def call
+      {
+        'kinesis_stream_name' => 'fake_stream',
+        'aws_region' => 'us-east-1',
+        'aws_access_key_id' => 'key',
+        'aws_secret_access_key_dec' => 'secret'
+      }
+    end
+  end
+
+  class FakeStreamClient
+    attr_accessor :data, :stream, :stream_name
+
+    def initialize(stream_name = 'stream')
+      @stream_name = stream_name
+    end
+
+    def put_records(stream_name:, records:)
+      @data = records
+      @stream = stream_name
+    end
+
+    def body
+      @data['body']
+    end
   end
 
   describe '.amended_context' do
@@ -217,7 +230,7 @@ describe Canvas::LiveEvents do
   end
 
   describe ".wiki_page_updated" do
-    before do
+    before(:each) do
       course_with_teacher
       @page = @course.wiki_pages.create(:title => "old title", :body => "old body")
     end
@@ -264,7 +277,7 @@ describe Canvas::LiveEvents do
   end
 
   describe ".conversation_forwarded" do
-    before do
+    before(:each) do
       @user1 = user_model
       @user2 = user_model
       @convo = Conversation.initiate([@user1, @user2], false)
@@ -491,7 +504,7 @@ describe Canvas::LiveEvents do
       let(:submission) { assignment.submissions.first }
 
       context "with post policies enabled" do
-        before do
+        before(:each) do
           assignment.hide_submissions
         end
 
@@ -693,7 +706,7 @@ describe Canvas::LiveEvents do
     end
 
     describe ".submissions_bulk_updated" do
-      before do
+      before(:each) do
         # This creates a course with a single student and a number of assignments
         # equal to the value of "submissions"
         course_with_student_submissions(submissions: 3)
@@ -867,7 +880,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.assignment_created' do
-    before do
+    before :each do
       course_with_student_submissions
       @assignment = @course.assignments.first
     end
@@ -974,7 +987,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.assignment_updated' do
-    before do
+    before :each do
       course_with_student_submissions
       @assignment = @course.assignments.first
     end
@@ -1148,25 +1161,24 @@ describe Canvas::LiveEvents do
   end
 
   describe '.quiz_export_complete' do
-    let(:export_class) do
-      Class.new do
-        attr_accessor :context
+    class FakeExport
+      attr_accessor :context
 
-        def initialize(context)
-          @context = context
-        end
+      def initialize(context)
+        @context = context
+      end
 
-        def settings
-          {
-            quizzes2: {
-              key1: 'val1',
-              key2: 'val2'
-            }
+      def settings
+        {
+          quizzes2: {
+            key1: 'val1',
+            key2: 'val2'
           }
-        end
+        }
       end
     end
-    let(:content_export) { export_class.new(course_model) }
+
+    let(:content_export) { FakeExport.new(course_model) }
 
     it 'triggers a live event with content export settings and amended context details' do
       fake_export_context = { key1: 'val1', key2: 'val2' }

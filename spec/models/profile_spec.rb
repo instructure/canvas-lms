@@ -20,9 +20,7 @@
 
 describe Profile do
   context "sub-classing" do
-    # rubocop:disable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration
-    # Profile accesses klass.name in its inherited hook, so we can't stub this
-    before do
+    before(:all) do
       class FooProfile < Profile; end
 
       class Foo < ActiveRecord::Base
@@ -31,9 +29,8 @@ describe Profile do
         def root_account; Account.default; end
       end
     end
-    # rubocop:enable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration
 
-    after do
+    after(:all) do
       Object.send(:remove_const, :FooProfile)
       Object.send(:remove_const, :Foo)
     end

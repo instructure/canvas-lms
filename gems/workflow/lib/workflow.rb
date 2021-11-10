@@ -84,7 +84,7 @@ module Workflow
     end
   end
 
-  class TransitionHalted < RuntimeError
+  class TransitionHalted < Exception
     attr_reader :halted_because
 
     def initialize(msg = nil)
@@ -93,7 +93,7 @@ module Workflow
     end
   end
 
-  class NoTransitionAllowed < RuntimeError; end
+  class NoTransitionAllowed < Exception; end
 
   class State
     attr_accessor :name, :events, :on_entry, :on_exit

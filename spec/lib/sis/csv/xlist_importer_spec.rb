@@ -22,7 +22,7 @@ describe SIS::CSV::XlistImporter do
   before { account_model }
 
   context 'account associations' do
-    before do
+    before(:each) do
       process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
         "A001,,Humanities,active",

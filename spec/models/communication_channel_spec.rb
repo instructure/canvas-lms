@@ -23,7 +23,7 @@ describe CommunicationChannel do
     Messages::Partitioner.process
   end
 
-  before do
+  before(:each) do
     @pseudonym = double('Pseudonym')
     allow(@pseudonym).to receive(:destroyed?).and_return(false)
     allow(Pseudonym).to receive(:find_by_user_id).and_return(@pseudonym)
@@ -187,7 +187,7 @@ describe CommunicationChannel do
 
   it "does not update cache if workflow_state doesn't change" do
     cc = communication_channel_model
-    expect(cc.user).not_to receive(:clear_email_cache!)
+    expect(cc.user).to receive(:clear_email_cache!).never
     cc.save!
   end
 
@@ -746,7 +746,7 @@ describe CommunicationChannel do
         cc.e164_path,
         true
       )
-      expect(cc).not_to receive(:send_otp_via_sms_gateway!)
+      expect(cc).to receive(:send_otp_via_sms_gateway!).never
       cc.send_otp!('123456', account)
       expect(InstStatsd::Statsd).to have_received(:increment).with(
         "message.deliver.sms.one_time_password",
@@ -766,14 +766,14 @@ describe CommunicationChannel do
     end
 
     it "sends via email if not configured" do
-      expect(Services::NotificationService).not_to receive(:process)
+      expect(Services::NotificationService).to receive(:process).never
       expect(cc).to receive(:send_otp_via_sms_gateway!).once
       cc.send_otp!('123456')
     end
   end
 
   describe '#user_can_have_more_channels?' do
-    before do
+    before(:each) do
       @domain_root_account = Account.default
       @user = User.create!
     end
@@ -785,7 +785,7 @@ describe CommunicationChannel do
     end
 
     describe 'when :max_communication_channels is set' do
-      before do
+      before(:each) do
         @domain_root_account.settings[:max_communication_channels] = 2
         @domain_root_account.save!
       end
@@ -796,7 +796,7 @@ describe CommunicationChannel do
       end
 
       describe 'when there are more CCs then the setting' do
-        before do
+        before(:each) do
           @cc1 = communication_channel(@user, { username: 'cc1@test.com' })
           @cc2 = communication_channel(@user, { username: 'cc2@test.com' })
         end

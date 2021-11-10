@@ -22,7 +22,6 @@ require_relative '../../spec_helper'
 
 describe Login::OAuth2Controller do
   let(:aac) { Account.default.authentication_providers.create!(auth_type: 'facebook') }
-
   before do
     aac
     allow(Canvas::Plugin.find(:facebook)).to receive(:settings).and_return({})
@@ -53,7 +52,7 @@ describe Login::OAuth2Controller do
       state = CGI.parse(URI.parse(response.location).query)['state'].first
       expect(state).to_not be_nil
 
-      expect_any_instantiation_of(aac).not_to receive(:get_token)
+      expect_any_instantiation_of(aac).to receive(:get_token).never
       Timecop.travel(15.minutes) do
         get :create, params: { state: state }
         expect(response).to redirect_to(login_url)

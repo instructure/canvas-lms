@@ -26,7 +26,6 @@ describe SIS::CSV::LoginImporter do
       "user_1,int1,user1,User,Uno,user@example.com,active"
     )
   end
-
   let(:user) { CommunicationChannel.by_path('user@example.com').first.user }
 
   it "creates new logins on existing users" do

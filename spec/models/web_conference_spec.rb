@@ -21,7 +21,7 @@
 describe WebConference do
   include ExternalToolsSpecHelper
 
-  before { stub_plugins }
+  before(:each) { stub_plugins }
 
   def stub_plugins
     allow(WebConference).to receive(:plugins).and_return(
@@ -121,7 +121,7 @@ describe WebConference do
       WimbaConference.create!(:title => "my conference", :user => @user, :duration => 60, :context => course_factory)
     end
 
-    before do
+    before :each do
       email = "email@email.com"
       allow(@user).to receive(:email).and_return(email)
     end

@@ -48,7 +48,7 @@ describe EpubExportsController do
         )
       end
 
-      before do
+      before(:each) do
         user_session(@student)
       end
 
@@ -159,10 +159,9 @@ describe EpubExportsController do
   end
 
   context "with feature disabled" do
-    before do
+    before(:each) do
       user_session(@student)
     end
-
     it "returns 404 with the feature disabled" do
       account = Account.default
       account.disable_feature!(:epub_export)

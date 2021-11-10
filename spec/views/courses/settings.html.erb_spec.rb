@@ -143,7 +143,7 @@ describe "courses/settings.html.erb" do
       @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
     end
 
-    before do
+    before :each do
       @course.root_account.reload
       view_context(@course, @teacher)
     end

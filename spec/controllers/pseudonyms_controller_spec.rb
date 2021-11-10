@@ -113,7 +113,6 @@ describe PseudonymsController do
         expect(assigns[:ccs].detect { |cc| cc == @cc }.messages_sent).not_to be_nil
         expect(assigns[:ccs].detect { |cc| cc == @cc }.messages_sent).not_to be_empty
       end
-
       it "sends password-change email case insensitively" do
         pseudonym(@user, :username => 'user1@example.com')
         get 'forgot_password', params: { :pseudonym_session => { :unique_id_forgot => 'USER1@EXAMPLE.COM' } }
@@ -184,7 +183,7 @@ describe PseudonymsController do
       user_with_pseudonym(:active_all => true)
     end
 
-    before do
+    before :each do
       user_session(@user, @pseudonym)
     end
 
@@ -246,7 +245,7 @@ describe PseudonymsController do
   describe "create" do
     # these specs only test the non-api version of the calls
     context "with site admin permissions" do
-      before do
+      before :each do
         user_with_pseudonym(:active_all => true)
         Account.site_admin.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
@@ -264,7 +263,7 @@ describe PseudonymsController do
         Account.default.account_users.create!(user: @user)
       end
 
-      before do
+      before :each do
         user_session(@user, @pseudonym)
       end
 
@@ -303,8 +302,7 @@ describe PseudonymsController do
       end
 
       it 'will not allow admin to add pseudonyms to unrelated users' do
-        unassociated_account = Account.create!
-        user2 = user_with_pseudonym(active_all: true, account: unassociated_account)
+        user2 = User.create!
         post 'create', params: { user_id: user2.id, pseudonym: { unique_id: 'user' } }
         assert_unauthorized
       end
@@ -317,7 +315,7 @@ describe PseudonymsController do
         @account.account_users.create!(user: @user)
       end
 
-      before do
+      before :each do
         allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
         user_session(@user, @pseudonym)
       end
@@ -521,7 +519,7 @@ describe PseudonymsController do
       end
     end
 
-    before do
+    before :each do
       user_session(@admin, @admin_pseudonym)
     end
 

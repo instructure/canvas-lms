@@ -159,7 +159,7 @@ describe "conversations new" do
       end
 
       context "with date-restricted course" do
-        before do
+        before(:each) do
           @course.restrict_enrollments_to_course_dates = true
           @course.restrict_student_past_view = true
           @course.restrict_student_future_view = true
@@ -265,7 +265,7 @@ describe "conversations new" do
         end
 
         context "Message Address Book" do
-          before do
+          before(:each) do
             @t1_name = 'teacher1'
             @t2_name = 'teacher2'
             @t1 = user_factory(name: @t1_name, active_user: true)

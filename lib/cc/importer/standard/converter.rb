@@ -38,6 +38,7 @@ module CC::Importer::Standard
     def initialize(settings)
       super(settings, "cc")
 
+      @course = @course
       @is_canvas_cartridge = nil
       @resources = {}
       @file_path_migration_id = {}

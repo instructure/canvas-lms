@@ -47,7 +47,7 @@ describe PageViewsController do
       account_admin_user
     end
 
-    before do
+    before :each do
       student_in_course
       user_session(@admin)
     end
@@ -79,7 +79,6 @@ describe PageViewsController do
     before :once do
       Setting.set('enable_page_views', true)
     end
-
     include_examples "GET 'index' as csv"
   end
 

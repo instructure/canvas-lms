@@ -160,7 +160,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       other_course = course_factory
       @template.add_child_course!(other_course)
 
-      expect_any_instantiation_of(@template).not_to receive(:add_child_course!)
+      expect_any_instantiation_of(@template).to receive(:add_child_course!).never
       api_call(:put, @url, @params, { :course_ids_to_add => [other_course.id] })
     end
 
@@ -351,7 +351,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
                                                     :shared_secret => "secret", :custom_fields => { 'a' => '1', 'b' => '2' }, :url => "http://www.example.com")
 
       type_pairs = { 'assignment' => assmt, 'attachment' => file, 'discussion_topic' => topic,
-                     'external_tool' => tool, 'lti-quiz' => assmt, 'quiz' => quiz, 'wiki_page' => page }
+                     'external_tool' => tool, 'quiz' => quiz, 'wiki_page' => page }
       type_pairs.each do |content_type, obj|
         api_call(:put, @url, @params, { :content_type => content_type, :content_id => obj.id, :restricted => '1' }, {}, { :expected_status => 200 })
         mc_tag = @template.content_tag_for(obj)

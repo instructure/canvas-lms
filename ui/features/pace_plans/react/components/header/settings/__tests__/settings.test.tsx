@@ -48,22 +48,22 @@ afterEach(() => {
 
 describe('Settings', () => {
   it('renders a settings menu with toggles and a button to open the blackout dates modal', () => {
-    const {getByRole} = renderConnected(<Settings {...defaultProps} />)
+    const {getByRole} = render(<Settings {...defaultProps} />)
     const settingsButton = getByRole('button', {name: 'Modify Settings'})
     expect(settingsButton).toBeInTheDocument()
 
     act(() => settingsButton.click())
 
     expect(screen.getByRole('checkbox', {name: 'Skip Weekends'})).toBeInTheDocument()
-    expect(
-      screen.getByRole('checkbox', {name: 'Require Completion by Specified End Date'})
-    ).toBeInTheDocument()
     // Commented out since we're not implementing these features yet
+    // expect(
+    //   screen.getByRole('checkbox', {name: 'Require Completion by Specified End Date'})
+    // ).toBeInTheDocument()
     // expect(screen.getByRole('button', {name: 'View Blackout Dates'})).toBeInTheDocument()
   })
 
   it('toggles the associated setting when the checkboxes are clicked', () => {
-    const {getByRole} = renderConnected(<Settings {...defaultProps} />)
+    const {getByRole} = render(<Settings {...defaultProps} />)
     const settingsButton = getByRole('button', {name: 'Modify Settings'})
     act(() => settingsButton.click())
 
@@ -72,16 +72,17 @@ describe('Settings', () => {
     act(() => skipWeekendsToggle.click())
     expect(toggleExcludeWeekends).toHaveBeenCalled()
 
-    const hardEndDatesToggle = screen.getByRole('checkbox', {
-      name: 'Require Completion by Specified End Date'
-    })
-    expect(hardEndDatesToggle).not.toBeDisabled
-    act(() => hardEndDatesToggle.click())
-    expect(toggleHardEndDates).toHaveBeenCalled()
+    // Commented out since we're not implementing these features yet
+    // const hardEndDatesToggle = screen.getByRole('checkbox', {
+    //   name: 'Require Completion by Specified End Date'
+    // })
+    // expect(hardEndDatesToggle).not.toBeDisabled
+    // act(() => hardEndDatesToggle.click())
+    // expect(toggleHardEndDates).toHaveBeenCalled()
   })
 
   it('disables all settings while publishing', () => {
-    const {getByRole} = renderConnected(<Settings {...defaultProps} planPublishing />)
+    const {getByRole} = render(<Settings {...defaultProps} planPublishing />)
     const settingsButton = getByRole('button', {name: 'Modify Settings'})
     act(() => settingsButton.click())
 
@@ -89,22 +90,17 @@ describe('Settings', () => {
     expect(skipWeekendsToggle).toBeDisabled()
   })
 
-  it('does not display end date selector when hard end dates is false', () => {
-    const {getByRole, queryByRole} = renderConnected(
-      <Settings {...defaultProps} pacePlan={{...PRIMARY_PLAN, hard_end_dates: false}} />
-    )
+  // Skipped since we're not implementing this feature yet
+  it.skip('disables hard end dates toggle if the pace plan does not have an end date', () => {
+    const props = {...defaultProps, pacePlan: {...PRIMARY_PLAN, end_date: undefined}}
+    const {getByRole} = render(<Settings {...props} />)
     const settingsButton = getByRole('button', {name: 'Modify Settings'})
     act(() => settingsButton.click())
-    expect(queryByRole('combobox', {name: 'End Date'})).not.toBeInTheDocument()
-  })
 
-  it('displays end date selector when hard end dates is true', () => {
-    const {getByRole, queryByRole} = renderConnected(
-      <Settings {...defaultProps} pacePlan={{...PRIMARY_PLAN, hard_end_dates: true}} />
-    )
-    const settingsButton = getByRole('button', {name: 'Modify Settings'})
-    act(() => settingsButton.click())
-    expect(queryByRole('combobox', {name: 'End Date'})).toBeInTheDocument()
+    const hardEndDatesToggle = screen.getByRole('checkbox', {
+      name: 'Require Completion by Specified End Date'
+    })
+    expect(hardEndDatesToggle).toBeDisabled()
   })
 
   // Skipped since we're not implementing this feature yet

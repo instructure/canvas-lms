@@ -29,7 +29,7 @@ describe "sub account outcomes" do
     let(:outcome_url) { "/accounts/#{account.id}/outcomes" }
     let(:who_to_login) { 'admin' }
 
-    before do
+    before(:each) do
       course_with_admin_logged_in
     end
 

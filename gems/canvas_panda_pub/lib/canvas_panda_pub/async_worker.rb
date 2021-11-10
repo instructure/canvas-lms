@@ -105,7 +105,7 @@ module CanvasPandaPub
             # since a) that incurs a Redis hit for every use, and b) we're
             # already protected from blocking Canvas since we're in a thread.
             p.call
-          rescue => e
+          rescue Exception => e
             @logger.error("Exception making PandaPub call to channel #{tag}: #{e}")
           end
           CanvasPandaPub.on_work_unit_end&.call

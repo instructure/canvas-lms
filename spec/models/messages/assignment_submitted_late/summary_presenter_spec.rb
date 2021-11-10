@@ -45,7 +45,7 @@ describe Messages::AssignmentSubmittedLate::SummaryPresenter do
     end
 
     context "when the assignment is anonymously graded" do
-      before do
+      before(:each) do
         assignment.update!(anonymous_grading: true)
       end
 

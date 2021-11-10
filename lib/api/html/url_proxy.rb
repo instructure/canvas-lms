@@ -102,12 +102,18 @@ module Api
         case context
         when Announcement
           context.context
-        when CourseSection, DiscussionTopic, Group, WikiPage
+        when CourseSection
+          context.course
+        when DiscussionTopic
           context.course
         when DiscussionEntry
           context.discussion_topic.course
         when Message
           context.media_context
+        when Group
+          context.context
+        when WikiPage
+          context.course
         else
           context
         end

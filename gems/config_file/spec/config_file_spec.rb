@@ -22,13 +22,13 @@ require 'spec_helper'
 
 describe ConfigFile do
   describe ".cache_object" do
-    before do
+    before(:each) do
       ConfigFile.unstub
       target_location = Pathname.new(File.join(File.dirname(__FILE__), 'fixtures'))
       allow(Rails).to receive(:root).and_return(target_location)
     end
 
-    after do
+    after(:each) do
       ConfigFile.unstub
     end
 

@@ -27,7 +27,7 @@ describe "submissions" do
   include SubmissionsCommon
 
   context 'as a teacher' do
-    before do
+    before(:each) do
       course_with_teacher_logged_in
     end
 
@@ -57,7 +57,7 @@ describe "submissions" do
   end
 
   context "student view" do
-    before do
+    before(:each) do
       course_with_teacher_logged_in
     end
 

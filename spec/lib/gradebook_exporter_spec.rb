@@ -173,41 +173,6 @@ describe GradebookExporter do
       end
     end
 
-    describe "separate columns for student last and first names" do
-      subject(:csv) { exporter(@exporter_options).to_csv }
-
-      before(:once) do
-        @exporter_options = {}
-        @current_assignment = @course.assignments.create! due_at: 1.week.from_now,
-                                                          title: "current",
-                                                          points_possible: 10
-        student_in_course active_all: true
-        @current_assignment.grade_student @student, grade: 3, grader: @teacher
-        @rows = CSV.parse(csv)
-      end
-
-      it "is a csv with three rows" do
-        expect(@rows.count).to be 3
-      end
-
-      it "is a csv with rows of equal length" do
-        expect(@rows.first.length).to eq @rows.second.length
-      end
-
-      it "shows student first and last names in headers" do
-        @exporter_options[:show_student_first_last_name] = true
-        expect(CSV.parse(csv, headers: true).headers).to include("LastName", "FirstName")
-        expect(CSV.parse(csv, headers: true).headers).not_to include("Student")
-      end
-
-      it "shows student first and last name in rows" do
-        @exporter_options[:show_student_first_last_name] = true
-        rows = CSV.parse(csv)
-        expect(rows[2][0]).to eq(@student.last_name)
-        expect(rows[2][1]).to eq(@student.first_name)
-      end
-    end
-
     describe "default output with blank course" do
       before(:once) do
         @course.custom_gradebook_columns.create! title: "Custom Column 1"
@@ -244,7 +209,6 @@ describe GradebookExporter do
 
       context "when Final Grade Override is enabled" do
         before(:once) { enable_final_grade_override! }
-
         let_once(:override_headers) { expected_headers.push("Override Score") }
 
         it "includes the Override Score and Override Grade headers when the course has a grading standard" do
@@ -317,7 +281,7 @@ describe GradebookExporter do
       end
 
       context "when muted assignments are present" do
-        before do
+        before(:each) do
           @course.assignments.create!(muted: true, points_possible: 10)
           @exporter_options = {}
         end
@@ -439,14 +403,14 @@ describe GradebookExporter do
       end
 
       describe "grades" do
-        before do
+        before :each do
           @assignment = @course.assignments.create!(title: 'Verkefni 1', points_possible: 10, grading_type: 'gpa_scale')
           @student = student_in_course(course: @course, active_all: true).user
           @assignment.grade_student(@student, grader: @teacher, score: 7.5)
         end
 
         context 'when forcing the field separator to be a semicolon' do
-          before do
+          before :each do
             @teacher.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
             @csv = exporter(locale: :is).to_csv
             @icsv = CSV.parse(@csv, col_sep: ";", headers: true)
@@ -466,12 +430,12 @@ describe GradebookExporter do
         end
 
         context 'when not forcing the field separator to be a semicolon' do
-          before do
+          before :each do
             @teacher.disable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
           end
 
           context 'when autodetecting field separator to use' do
-            before do
+            before :each do
               @teacher.enable_feature!(:autodetect_field_separators_for_gradebook_exports)
               @csv = exporter(locale: :is).to_csv
               @icsv = CSV.parse(@csv, col_sep: ";", headers: true)
@@ -491,7 +455,7 @@ describe GradebookExporter do
           end
 
           context 'when not autodetecting field separator to use' do
-            before do
+            before :each do
               @teacher.disable_feature!(:autodetect_field_separators_for_gradebook_exports)
               @csv = exporter(locale: :is).to_csv
               @icsv = CSV.parse(@csv, col_sep: ",", headers: true)
@@ -523,7 +487,7 @@ describe GradebookExporter do
     end
 
     context "a course has assignments with due dates" do
-      before do
+      before(:each) do
         @no_due_date_assignment = @course.assignments.create! title: "no due date",
                                                               points_possible: 10
 
@@ -558,7 +522,7 @@ describe GradebookExporter do
 
       describe "with grading periods" do
         describe "assignments in the selected grading period are exported" do
-          before do
+          before(:each) do
             @csv = exporter(grading_period_id: @last_period.id).to_csv
             @rows = CSV.parse(@csv, headers: true)
             @headers = @rows.headers
@@ -743,7 +707,7 @@ describe GradebookExporter do
   end
 
   context "when a course has anonymous assignments" do
-    before do
+    before(:each) do
       @student = User.create!
       student_in_course(user: @student, course: @course, active_all: true)
       @assignment = @course.assignments.create!(title: "Anon Assignment", points_possible: 10, anonymous_grading: true)
@@ -774,7 +738,7 @@ describe GradebookExporter do
       @course.assignments.create!(title: "Unposted Anon", points_possible: 10, anonymous_grading: true)
     end
 
-    before do
+    before(:each) do
       @course.assignments.create!(title: "Ungraded", points_possible: 10)
 
       posted_assignment.ensure_post_policy(post_manually: true)
@@ -865,7 +829,7 @@ describe GradebookExporter do
       end
       let(:exporter) { GradebookExporter.new(@course, @teacher, { grading_period_id: grading_period.id }) }
 
-      before do
+      before(:each) do
         allow(exporter).to receive(:enrollments_for_csv).and_return([enrollment])
       end
 
@@ -910,7 +874,7 @@ describe GradebookExporter do
       end
 
       context "when final grade override is enabled for the course" do
-        before { enable_final_grade_override! }
+        before(:each) { enable_final_grade_override! }
 
         let(:parsed_csv) { CSV.parse(exporter.to_csv, headers: true) }
 
@@ -939,7 +903,7 @@ describe GradebookExporter do
       end
 
       context "when final grade override is not allowed for the course" do
-        before do
+        before(:each) do
           @course.enable_feature!(:final_grades_override)
           @course.update!(allow_final_grade_override: false)
         end
@@ -983,7 +947,7 @@ describe GradebookExporter do
     context "when no grading period is supplied" do
       let(:exporter) { GradebookExporter.new(@course, @teacher) }
 
-      before do
+      before(:each) do
         allow(exporter).to receive(:enrollments_for_csv).and_return([enrollment])
       end
 
@@ -1028,7 +992,7 @@ describe GradebookExporter do
       end
 
       context "when final grade override is enabled for the course" do
-        before { enable_final_grade_override! }
+        before(:each) { enable_final_grade_override! }
 
         let(:parsed_csv) { CSV.parse(exporter.to_csv, headers: true) }
 
@@ -1056,7 +1020,7 @@ describe GradebookExporter do
       end
 
       context "when final grade override is not allowed for the course" do
-        before do
+        before(:each) do
           @course.enable_feature!(:final_grades_override)
           @course.update!(allow_final_grade_override: false)
         end

@@ -38,8 +38,7 @@ import EmptyDashboardState from '@canvas/k5/react/EmptyDashboardState'
 
 const HomeroomPage = ({
   cards,
-  createPermission,
-  restrictCourseCreation,
+  createPermissions,
   homeroomAnnouncements,
   loadingAnnouncements,
   visible,
@@ -99,7 +98,7 @@ const HomeroomPage = ({
           <Flex.Item>
             <Heading level="h2">{I18n.t('My Subjects')}</Heading>
           </Flex.Item>
-          {createPermission && (
+          {createPermissions && (
             <Flex.Item>
               <Tooltip renderTip={I18n.t('Start a new subject')}>
                 <IconButton
@@ -130,8 +129,7 @@ const HomeroomPage = ({
         <CreateCourseModal
           isModalOpen={courseModalOpen}
           setModalOpen={setCourseModalOpen}
-          permissions={createPermission}
-          restrictToMCCAccount={restrictCourseCreation}
+          permissions={createPermissions}
           isK5User
         />
       )}
@@ -141,8 +139,7 @@ const HomeroomPage = ({
 
 HomeroomPage.propTypes = {
   cards: PropTypes.array,
-  createPermission: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']),
-  restrictCourseCreation: PropTypes.bool.isRequired,
+  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']),
   homeroomAnnouncements: PropTypes.array.isRequired,
   loadingAnnouncements: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,

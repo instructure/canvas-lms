@@ -46,7 +46,7 @@ describe ContentZipper do
       Submission.where(:id => @submission).update_all(:submitted_at => 5.minutes.ago)
     end
 
-    before do
+    before(:each) do
       user_session(@teacher)
     end
 

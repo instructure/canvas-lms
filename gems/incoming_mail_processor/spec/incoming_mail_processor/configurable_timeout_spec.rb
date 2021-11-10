@@ -20,22 +20,19 @@
 require 'spec_helper'
 
 describe IncomingMailProcessor::ConfigurableTimeout do
-  let(:timeout_tester) do
-    Class.new do
-      include IncomingMailProcessor::ConfigurableTimeout
+  class TimeoutTester
+    include IncomingMailProcessor::ConfigurableTimeout
+    def default_timeout_duration
+      0.0001
+    end
 
-      def default_timeout_duration
-        0.0001
-      end
-
-      def foo(arg)
-        arg
-      end
+    def foo(arg)
+      arg
     end
   end
 
   before do
-    @tester = timeout_tester.new
+    @tester = TimeoutTester.new
   end
 
   it "provides a default timeout" do

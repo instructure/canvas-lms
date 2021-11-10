@@ -38,7 +38,6 @@ class Enrollment
 
     describe "recording updates" do
       before(:once) { course_with_student(:active_all => 1) }
-
       let(:recent_activity) { Enrollment::RecentActivity.new(@enrollment) }
       let(:now) { Time.zone.now }
 

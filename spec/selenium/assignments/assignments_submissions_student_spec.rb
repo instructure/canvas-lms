@@ -40,7 +40,7 @@ describe "submissions" do
       @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => @due_date - 1.day)
     end
 
-    before do
+    before(:each) do
       user_session(@student)
     end
 
@@ -439,14 +439,14 @@ describe "submissions" do
 
       it "does not allow a user to submit a file-submission assignment from previously uploaded files with an illegal file extension", priority: "1", test_id: 237031 do
         skip_if_safari(:alert)
-        filename = "hello-world.sh"
-        fixture_fn = "files/#{filename}"
+        FILENAME = "hello-world.sh"
+        FIXTURE_FN = "files/#{FILENAME}"
 
         local_storage!
 
-        add_file(fixture_file_upload(fixture_fn, 'application/x-sh'),
-                 @student, filename)
-        File.read(fixture_file_path(fixture_fn))
+        add_file(fixture_file_upload(FIXTURE_FN, 'application/x-sh'),
+                 @student, FILENAME)
+        File.read(fixture_file_path(FIXTURE_FN))
         assignment = @course.assignments.create!(:title => 'assignment 1',
                                                  :name => 'assignment 1',
                                                  :submission_types => "online_upload",
@@ -458,7 +458,7 @@ describe "submissions" do
 
         # traverse the tree
         f('li[aria-label="My files"] button').click
-        f('li[aria-label="' + filename + '"] button').click
+        f('li[aria-label="' + FILENAME + '"] button').click
 
         f('#submit_file_button').click
 
@@ -524,12 +524,12 @@ describe "submissions" do
       course_with_student(active_all: true)
     end
 
-    before do
+    before :each do
       user_session @student
     end
 
     shared_examples "shows as excused" do
-      before do
+      before :each do
         assignment.grade_student @student, excuse: true, grader: @teacher
       end
 

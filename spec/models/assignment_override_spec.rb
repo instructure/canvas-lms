@@ -379,7 +379,7 @@ describe AssignmentOverride do
   end
 
   describe "#title_from_students" do
-    before do
+    before :each do
       @assignment_override = AssignmentOverride.new
       allow(AssignmentOverride).to receive(:title_from_student_count)
     end
@@ -561,7 +561,6 @@ describe AssignmentOverride do
 
   describe '#availability_expired?' do
     let(:override) { assignment_override_model }
-
     subject { override.availability_expired? }
 
     context 'without an overridden lock_at' do
@@ -654,7 +653,7 @@ describe AssignmentOverride do
   describe '#update_grading_period_grades with no grading periods' do
     it 'does not update grades when due_at changes' do
       assignment_model
-      expect_any_instance_of(Course).not_to receive(:recompute_student_scores)
+      expect_any_instance_of(Course).to receive(:recompute_student_scores).never
       override = AssignmentOverride.new
       override.assignment = @assignment
       override.due_at = 6.months.ago
@@ -688,7 +687,7 @@ describe AssignmentOverride do
 
     it 'does not update grades if there are no students on this override' do
       @override.assignment_override_students.clear
-      expect_any_instance_of(Course).not_to receive(:recompute_student_scores)
+      expect_any_instance_of(Course).to receive(:recompute_student_scores).never
       @override.due_at = 6.months.ago
       @override.save!
     end
@@ -710,7 +709,7 @@ describe AssignmentOverride do
     it 'does not update grades if grading period did not change' do
       @override.due_at = 1.month.ago
       @override.save!
-      expect_any_instance_of(Course).not_to receive(:recompute_student_scores)
+      expect_any_instance_of(Course).to receive(:recompute_student_scores).never
       @override.due_at = 2.months.ago
       @override.save!
     end
@@ -785,7 +784,7 @@ describe AssignmentOverride do
     end
 
     it "does not trigger when nothing changed" do
-      expect(DueDateCacher).not_to receive(:recompute)
+      expect(DueDateCacher).to receive(:recompute).never
       @override.save
     end
   end
@@ -846,7 +845,7 @@ describe AssignmentOverride do
 
     it "does nothing if it is not ADHOC" do
       allow(@override).to receive(:set_type).and_return "NOT_ADHOC"
-      expect(@override).not_to receive(:destroy)
+      expect(@override).to receive(:destroy).never
 
       @override.destroy_if_empty_set
     end
@@ -854,7 +853,7 @@ describe AssignmentOverride do
     it "does nothing if the set is not empty" do
       allow(@override).to receive(:set_type).and_return "ADHOC"
       allow(@override).to receive(:set).and_return [1, 2, 3]
-      expect(@override).not_to receive(:destroy)
+      expect(@override).to receive(:destroy).never
 
       @override.destroy_if_empty_set
     end
@@ -963,7 +962,6 @@ describe AssignmentOverride do
       @override = assignment_override_model
       @overrides = [@override]
     end
-
     subject(:visible_enrollments) do
       AssignmentOverride.visible_enrollments_for(@overrides, @student)
     end
@@ -983,11 +981,9 @@ describe AssignmentOverride do
     before do
       @options = {}
     end
-
     let(:override) do
       assignment_override_model(@options)
     end
-
     subject(:visible_enrollments) do
       AssignmentOverride.visible_enrollments_for([override], @student)
     end

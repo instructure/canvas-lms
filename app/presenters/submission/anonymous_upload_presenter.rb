@@ -19,6 +19,11 @@
 #
 
 class Submission::AnonymousUploadPresenter < Submission::UploadPresenter
+  def initialize(course, assignment)
+    @course = course
+    @assignment = assignment
+  end
+
   def file_download_href(comment, file)
     context_url(
       @course,

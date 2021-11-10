@@ -209,8 +209,6 @@ class User < ActiveRecord::Base
   has_many :comment_bank_items, -> { where("workflow_state<>'deleted'") }
   has_many :microsoft_sync_partial_sync_changes, :class_name => 'MicrosoftSync::PartialSyncChange', dependent: :destroy, inverse_of: :user
 
-  has_many :gradebook_filters, inverse_of: :user, dependent: :destroy
-
   belongs_to :otp_communication_channel, :class_name => 'CommunicationChannel'
 
   belongs_to :merged_into_user, class_name: 'User'
@@ -538,9 +536,9 @@ class User < ActiveRecord::Base
         next
       end
       account_chain = account_chain_cache[account_id]
-      account_chain.each_with_index do |a_id, idx|
-        results[a_id] ||= idx
-        results[a_id] = idx if idx < results[a_id]
+      account_chain.each_with_index do |account_id, idx|
+        results[account_id] ||= idx
+        results[account_id] = idx if idx < results[account_id]
       end
     end
 
@@ -910,6 +908,7 @@ class User < ActiveRecord::Base
     p = Pseudonym.find(p)
     p.move_to_top
     self.reload
+    p
   end
 
   def email_channel
@@ -1049,7 +1048,6 @@ class User < ActiveRecord::Base
     self.deleted_at = Time.now.utc
     if self.save
       eportfolios.active.in_batches.destroy_all
-      gradebook_filters.in_batches.destroy_all
     end
   end
 
@@ -1195,21 +1193,18 @@ class User < ActiveRecord::Base
 
   def check_accounts_right?(user, sought_right)
     # check if the user we are given is an admin in one of this user's accounts
-    return false unless user && sought_right
+    return false unless user
     return true if Account.site_admin.grants_right?(user, sought_right)
     return self.account.grants_right?(user, sought_right) if self.fake_student? # doesn't have account association
 
     common_shards = associated_shards & user.associated_shards
     search_method = ->(shard) do
-      # new users with creation pending enrollments don't have account associations
-      if associated_accounts.shard(shard).empty? && common_shards.length == 1 && !self.unavailable?
-        self.account.grants_right?(user, sought_right)
-      else
-        associated_accounts.shard(shard).any? { |a| a.grants_right?(user, sought_right) }
-      end
+      associated_accounts.shard(shard).any? { |a| a.grants_right?(user, sought_right) }
     end
+
     # search shards the two users have in common first, since they're most likely
     return true if common_shards.any?(&search_method)
+
     # now do an exhaustive search, since it's possible to have admin permissions for accounts
     # you're not associated with
     return true if (associated_shards - common_shards).any?(&search_method)
@@ -1349,12 +1344,18 @@ class User < ActiveRecord::Base
 
   def self.infer_id(obj)
     case obj
-    when User, OpenObject
+    when User
       obj.id
     when Numeric
       obj
-    when CommunicationChannel, Pseudonym, AccountUser
+    when CommunicationChannel
       obj.user_id
+    when Pseudonym
+      obj.user_id
+    when AccountUser
+      obj.user_id
+    when OpenObject
+      obj.id
     when String
       obj.to_i
     else
@@ -1416,7 +1417,7 @@ class User < ActiveRecord::Base
   #
   # Returns nothing if avatar is set; false if avatar is locked.
   def avatar_image=(val)
-    return if avatar_state == :locked
+    return false if avatar_state == :locked
 
     # Clear out the old avatar first, in case of failure to get new avatar.
     # The order of these attributes is standard throughout the method.
@@ -2384,7 +2385,7 @@ class User < ActiveRecord::Base
         ret[:primary] << "course_#{e.course_id}"
         ret[:secondary] << "course_section_#{e.course_section_id}"
       end
-      ret[:secondary].concat(groups.map { |g| "group_category_#{g.group_category_id}" })
+      ret[:secondary].concat groups.map { |g| "group_category_#{g.group_category_id}" }
       ret
     end
   end
@@ -2750,20 +2751,29 @@ class User < ActiveRecord::Base
     accounts = pseudonyms.shard(self).active.map(&:account)
     return true if accounts.empty?
 
-    accounts.any?(&:users_can_edit_name?)
+    accounts.any? { |a| a.users_can_edit_name? }
   end
 
   def limit_parent_app_web_access?
-    pseudonyms.shard(self).active.map(&:account).any?(&:limit_parent_app_web_access?)
+    pseudonyms.shard(self).active.map(&:account).any? { |a| a.limit_parent_app_web_access? }
   end
 
   def sections_for_course(course)
-    course.student_enrollments.active.for_user(self).map(&:course_section)
+    course.student_enrollments.active.for_user(self).map { |e| e.course_section }
   end
 
   def can_create_enrollment_for?(course, session, type)
     return false if type == 'StudentEnrollment' && MasterCourses::MasterTemplate.is_master_course?(course)
     return false if course.template?
+
+    # we intend on keeping this role override in tandem with add/remove students to course
+    # so short-circuit if it's enabled, else we might return false prematurely
+    # depending on the state of :granular_permissions_manage_users feature flag
+    if course.grants_right?(self, session, :manage_students)
+      if %w{StudentEnrollment ObserverEnrollment}.include?(type)
+        return true
+      end
+    end
 
     if course.root_account.feature_enabled?(:granular_permissions_manage_users)
       return true if type == 'TeacherEnrollment' && course.grants_right?(self, session, :add_teacher_to_course)
@@ -2771,13 +2781,8 @@ class User < ActiveRecord::Base
       return true if type == 'DesignerEnrollment' && course.grants_right?(self, session, :add_designer_to_course)
       return true if type == 'StudentEnrollment' && course.grants_right?(self, session, :add_student_to_course)
       return true if type == 'ObserverEnrollment' && course.grants_right?(self, session, :add_observer_to_course)
-    else
-      if type != 'StudentEnrollment' && course.grants_right?(self, session, :manage_admin_users)
-        return true
-      end
-      if %w{StudentEnrollment ObserverEnrollment}.include?(type) && course.grants_right?(self, session, :manage_students)
-        return true
-      end
+    elsif type != 'StudentEnrollment' && course.grants_right?(self, session, :manage_admin_users)
+      return true
     end
     false
   end
@@ -2809,13 +2814,13 @@ class User < ActiveRecord::Base
       active_pseudonyms = self.all_active_pseudonyms(:reload).select { |p| !p.password_auto_generated? && !p.account.delegated_authentication? }
       templates = []
       # re-arrange in the order we prefer
-      templates.concat(active_pseudonyms.select { |p| p.account_id == preferred_template_account.id }) if preferred_template_account
-      templates.concat(active_pseudonyms.select { |p| p.account_id == Account.site_admin.id })
-      templates.concat(active_pseudonyms.select { |p| p.account_id == Account.default.id })
-      templates.concat(active_pseudonyms)
+      templates.concat active_pseudonyms.select { |p| p.account_id == preferred_template_account.id } if preferred_template_account
+      templates.concat active_pseudonyms.select { |p| p.account_id == Account.site_admin.id }
+      templates.concat active_pseudonyms.select { |p| p.account_id == Account.default.id }
+      templates.concat active_pseudonyms
       templates.uniq!
 
-      template = templates.detect { |t| !account.pseudonyms.active.by_unique_id(t.unique_id).first }
+      template = templates.detect { |template| !account.pseudonyms.active.by_unique_id(template.unique_id).first }
       if template
         # creating this not attached to the user's pseudonyms is intentional
         pseudonym = account.pseudonyms.build
@@ -2876,6 +2881,7 @@ class User < ActiveRecord::Base
     else
       self.otp_secret_key_enc = self.otp_secret_key_salt = nil
     end
+    key
   end
 
   def crocodoc_id!
@@ -3233,14 +3239,8 @@ class User < ActiveRecord::Base
     return nil if fake_student? || account.root_account.site_admin?
 
     scope = account.root_account.enrollments.active.where(user_id: self)
-    teacher_right = account.root_account.teachers_can_create_courses? && scope.where(type: %w[TeacherEnrollment DesignerEnrollment]).exists?
-    # k5 users can still create courses anywhere, even if the setting restricts them to the manually created courses account
-    return :teacher if teacher_right && (account.root_account.teachers_can_create_courses_anywhere? || active_k5_enrollments?)
-    return :teacher if teacher_right && account == account.root_account.manually_created_courses_account
-
-    student_right = account.root_account.students_can_create_courses? && scope.where(type: %w[StudentEnrollment ObserverEnrollment]).exists?
-    return :student if student_right && (account.root_account.students_can_create_courses_anywhere? || active_k5_enrollments?)
-    return :student if student_right && account == account.root_account.manually_created_courses_account
+    return :teacher if account.root_account.teachers_can_create_courses? && scope.exists?(type: %w[TeacherEnrollment DesignerEnrollment])
+    return :student if account.root_account.students_can_create_courses? && scope.exists?(type: %w[StudentEnrollment ObserverEnrollment])
     return :no_enrollments if account.root_account.no_enrollments_can_create_courses? && !scope.exists?
 
     nil

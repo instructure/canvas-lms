@@ -43,7 +43,7 @@ describe "SpeedGrader" do
   end
 
   context "with an anonymous assignment" do
-    before do
+    before(:each) do
       # an anonymous assignment
       @assignment = @course.assignments.create!(
         name: 'anonymous assignment',
@@ -95,7 +95,7 @@ describe "SpeedGrader" do
   end
 
   context 'with a moderated assignment' do
-    before do
+    before(:each) do
       @moderated_assignment = @course.assignments.create!(
         title: 'Moderated Assignment1',
         grader_count: 2,

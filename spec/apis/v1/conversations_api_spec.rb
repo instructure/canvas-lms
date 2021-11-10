@@ -2493,7 +2493,7 @@ describe ConversationsController, type: :request do
       account_admin_user(:account => Account.site_admin)
     end
 
-    before do
+    before :each do
       @c1.remove_messages(:all)
       @c1.message_count = 0
       @c1.last_message_at = nil

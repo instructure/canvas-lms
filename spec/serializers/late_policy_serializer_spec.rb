@@ -28,7 +28,6 @@ RSpec.describe LatePolicySerializer do
   let(:course) { Course.create! }
 
   it { expect(json.keys).to contain_exactly :late_policy }
-
   it do
     expect(json[:late_policy].keys).to contain_exactly(
       :id,

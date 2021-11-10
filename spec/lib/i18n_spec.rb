@@ -43,7 +43,6 @@ describe I18n do
 
   context "interpolation" do
     before { I18n.locale = I18n.default_locale }
-
     after { I18n.locale = I18n.default_locale }
 
     it "falls back to en if the current locale's interpolation is broken" do
@@ -74,7 +73,6 @@ describe I18n do
 
   context "genitives" do
     before { I18n.locale = I18n.default_locale }
-
     after { I18n.locale = I18n.default_locale }
 
     it "forms with `'s` in english" do

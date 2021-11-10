@@ -49,7 +49,7 @@ describe "discussions" do
     context "as a teacher" do
       let(:topic) { teacher_topic }
 
-      before do
+      before(:each) do
         user_session(teacher)
         stub_rcs_config
       end
@@ -159,7 +159,6 @@ describe "discussions" do
 
       context "with a group attached" do
         let(:graded_topic) { assignment_topic }
-
         before do
           @gc = GroupCategory.create(:name => "Sharks", :context => @course)
           @student = student_in_course(:course => @course, :active_all => true).user
@@ -189,7 +188,6 @@ describe "discussions" do
 
         context "graded" do
           let(:topic) { assignment_topic }
-
           it "locks and display the group name", priority: "1", test_id: 270922 do
             topic.group_category = @gc
             topic.save!

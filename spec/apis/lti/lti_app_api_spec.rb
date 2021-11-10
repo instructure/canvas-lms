@@ -28,7 +28,6 @@ module Lti
     include LtiSpecHelper
 
     let(:account) { Account.create }
-
     describe '#launch_definitions' do
       before do
         tp = create_tool_proxy
@@ -285,7 +284,6 @@ module Lti
           account_id: account.id
         }
       end
-
       subject { api_call(:get, "/api/v1/accounts/#{account.id}/lti_apps", params) }
 
       it "includes is_rce_favorite when applicable" do

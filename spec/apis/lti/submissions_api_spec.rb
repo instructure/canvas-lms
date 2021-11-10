@@ -116,7 +116,6 @@ module Lti
 
     describe "#show" do
       let(:endpoint) { "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}" }
-
       include_examples "authorization"
 
       it "returns a submission json object" do
@@ -173,7 +172,6 @@ module Lti
 
     describe "#history" do
       let(:endpoint) { "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}/history" }
-
       include_examples "authorization"
       it "returns the submission history as an array of JSON objects" do
         now = Time.now.utc
@@ -237,7 +235,6 @@ module Lti
 
     describe "#attachment" do
       let(:endpoint) { "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}/attachment/#{attachment.id}" }
-
       include_examples 'authorization'
 
       it "allows a user to download a file" do

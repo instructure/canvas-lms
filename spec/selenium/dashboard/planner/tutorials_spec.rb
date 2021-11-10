@@ -26,7 +26,7 @@ describe "Tutorials" do
       course_with_teacher(active_all: true, new_user: true)
     end
 
-    before do
+    before(:each) do
       user_session(@teacher)
     end
 

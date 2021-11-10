@@ -31,7 +31,7 @@ shared_examples_for 'k5 schedule' do
   include K5Common
   include SharedExamplesCommon
 
-  before do
+  before :each do
     @now = Time.zone.now
   end
 

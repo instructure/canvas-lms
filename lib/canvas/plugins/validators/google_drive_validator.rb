@@ -63,7 +63,7 @@ module Canvas::Plugins::Validators::GoogleDriveValidator
         return 'Missing `auth_uri`' unless jayson['web']['auth_uri']
         return 'Missing `token_uri`' unless jayson['web']['token_uri']
       end
-    rescue TypeError, JSON::JSONError => e
+    rescue Exception => e
       "Is not valid JSON \n (#{e.message}) \n (#{e.backtrace.inspect})"
     end
   end
