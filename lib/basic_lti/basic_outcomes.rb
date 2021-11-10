@@ -206,40 +206,9 @@ module BasicLTI
         yield if block_given? && !(submission&.grader_id && submission.grader_id > 0 && prioritize_non_tool_grade)
       end
 
-      def self.create_homework_submission(submission_hash, assignment, user)
-        submission = assignment.submit_homework(user, submission_hash.clone) if submission_hash[:submission_type].present?
-        submission = assignment.grade_student(user, submission_hash).first if submission_hash[:grade].present?
-        submission
-      end
-
-      def self.fetch_attachment_and_save_submission(url, attachment, submission_hash, assignment, user, attempt_number = 0)
-        failed_retryable = attachment.clone_url(url, 'rename', true)
-        if failed_retryable && ((attempt_number += 1) < MAX_ATTEMPTS)
-          # Exits out of the first job and creates a second one so that the run_at time won't hold back
-          # the entire n_strand. Also creates it in a different strand for retries, so we shouldn't block
-          # any incoming uploads.
-          job_options = {
-            priority: Delayed::HIGH_PRIORITY,
-            # because inst-jobs only takes 2 items from an array to make a string strand
-            # name and this uses 3
-            n_strand: (Attachment.clone_url_strand(url) << 'failed').join('/'),
-            run_at: Time.now.utc + (attempt_number**4) + 5
-          }
-          delay(**job_options).fetch_attachment_and_save_submission(
-            url,
-            attachment,
-            submission_hash,
-            assignment,
-            user,
-            attempt_number
-          )
-        else
-          create_homework_submission submission_hash, assignment, user
-        end
-      end
-
       protected
 
+      # rubocop:disable Metrics/PerceivedComplexity, Metrics/MethodLength
       def handle_replace_result(tool, assignment, user)
         text_value = self.result_score
         score_value = self.result_total_score
@@ -341,22 +310,32 @@ module BasicLTI
               n_strand: Attachment.clone_url_strand(url)
             }
 
-            self.class.delay(**job_options).fetch_attachment_and_save_submission(
+            delay(**job_options).fetch_attachment_and_save_submission(
               url,
               attachment,
               submission_hash,
               assignment,
               user
             )
-          elsif !(@submission = self.class.create_homework_submission(submission_hash, assignment, user))
-            self.code_major = 'failure'
-            self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
+          else
+            create_homework_submission submission_hash, assignment, user
           end
         end
 
         self.body = "<replaceResultResponse />"
 
         true
+      end
+      # rubocop:enable Metrics/PerceivedComplexity, Metrics/MethodLength
+
+      def create_homework_submission(submission_hash, assignment, user)
+        @submission = assignment.submit_homework(user, submission_hash.clone) if submission_hash[:submission_type].present?
+        @submission = assignment.grade_student(user, submission_hash).first if submission_hash[:grade].present?
+
+        unless @submission
+          self.code_major = 'failure'
+          self.description = I18n.t('lib.basic_lti.no_submission_created', 'This outcome request failed to create a new homework submission.')
+        end
       end
 
       def handle_delete_result(tool, assignment, user)
@@ -379,6 +358,34 @@ module BasicLTI
       }
         true
       end
+
+      # rubocop:disable Metrics/ParameterLists
+      def fetch_attachment_and_save_submission(url, attachment, submission_hash, assignment, user, attempt_number = 0)
+        failed_retryable = attachment.clone_url(url, 'rename', true)
+        if failed_retryable && ((attempt_number += 1) < MAX_ATTEMPTS)
+          # Exits out of the first job and creates a second one so that the run_at time won't hold back
+          # the entire n_strand. Also creates it in a different strand for retries, so we shouldn't block
+          # any incoming uploads.
+          job_options = {
+            priority: Delayed::HIGH_PRIORITY,
+            # because inst-jobs only takes 2 items from an array to make a string strand
+            # name and this uses 3
+            n_strand: (Attachment.clone_url_strand(url) << 'failed').join('/'),
+            run_at: Time.now.utc + (attempt_number**4) + 5
+          }
+          delay(**job_options).fetch_attachment_and_save_submission(
+            url,
+            attachment,
+            submission_hash,
+            assignment,
+            user,
+            attempt_number
+          )
+        else
+          create_homework_submission submission_hash, assignment, user
+        end
+      end
+      # rubocop:enable Metrics/ParameterLists
 
       def submission_score
         if @submission.try(:graded?)

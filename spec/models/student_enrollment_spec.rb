@@ -19,7 +19,7 @@
 #
 
 describe StudentEnrollment do
-  before do
+  before(:each) do
     @student = User.create(:name => "some student")
     @course = Course.create(:name => "some course")
     @se = @course.enroll_student(@student)
@@ -65,7 +65,7 @@ describe StudentEnrollment do
       )
     end
 
-    before do
+    before(:each) do
       course.enable_feature!(:final_grades_override)
       course.allow_final_grade_override = true
       course.save!

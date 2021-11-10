@@ -27,13 +27,15 @@ import * as pacePlanAPI from '../api/pace_plan_api'
 import {actions as uiActions} from './ui'
 import {pacePlanActions} from './pace_plans'
 
-const updatePacePlan = (
+const updatePacePlan = async (
   dispatch: Dispatch<Action>,
   getState: () => StoreState,
   planBefore: PacePlan,
   shouldBlock: boolean,
   extraSaveParams = {}
 ) => {
+  await pacePlanAPI.waitForActionCompletion(() => getState().ui.planPublishing)
+
   const plan = getPacePlan(getState())
 
   if (planBefore.id && plan.id !== planBefore.id) {

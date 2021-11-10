@@ -33,7 +33,7 @@ describe 'Access Different Gradebooks Environments', type: :request do
   end
 
   describe 'GET #speed_grader' do
-    before do
+    before :each do
       user_session(@teacher)
     end
 
@@ -116,7 +116,7 @@ describe 'Access Different Gradebooks Environments', type: :request do
 
   describe 'GET #grade_summary' do
     context 'when logged in as a student' do
-      before do
+      before :each do
         user_session(@student)
         @course_id = @course.id.to_s
       end

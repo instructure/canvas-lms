@@ -38,7 +38,6 @@ describe 'appointment_reserved_for_user' do
 
   context ".email" do
     let(:path_type) { :email }
-
     it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_options)
       expect(msg.subject).to include('some title')
@@ -60,7 +59,6 @@ describe 'appointment_reserved_for_user' do
 
   context ".sms" do
     let(:path_type) { :sms }
-
     it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_options)
       expect(msg.body).to include('some title')
@@ -69,7 +67,6 @@ describe 'appointment_reserved_for_user' do
 
   context ".summary" do
     let(:path_type) { :summary }
-
     it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_options)
       expect(msg.subject).to include('some title')
@@ -80,7 +77,6 @@ describe 'appointment_reserved_for_user' do
 
   context ".twitter" do
     let(:path_type) { :twitter }
-
     it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_options)
       expect(msg.body).to include('some title')

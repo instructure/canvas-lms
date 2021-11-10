@@ -578,7 +578,6 @@ describe ContentTag do
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @student)
     end
-
     context "assignments" do
       before do
         @assignment = @course.assignments.create!(:title => "some assignment", :only_visible_to_overrides => true)
@@ -589,12 +588,10 @@ describe ContentTag do
                                   :id => @assignment.id
                                 })
       end
-
       it "returns assignments if there is visibility" do
         create_section_override_for_assignment(@assignment, { course_section: @section })
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
       end
-
       it "does not return assignments if there is no visibility" do
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).not_to include(@tag)
       end
@@ -616,17 +613,14 @@ describe ContentTag do
                                   :id => @topic.id
                                 })
       end
-
       it "returns discussions without attached assignments" do
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
       end
-
       it "returns discussions with attached assignments if there is visibility" do
         attach_assignment_to_discussion
         create_section_override_for_assignment(@assignment, { course_section: @section })
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
       end
-
       it "does not return discussions with attached assignments if there is no visibility" do
         attach_assignment_to_discussion
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).not_to include(@tag)
@@ -642,12 +636,10 @@ describe ContentTag do
                                   :id => @quiz.id
                                 })
       end
-
       it "returns a quiz if there is visibility" do
         create_section_override_for_quiz(@quiz, course_section: @section)
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).to include(@tag)
       end
-
       it "does not return quiz if there is not visibility" do
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).not_to include(@tag)
       end

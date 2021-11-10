@@ -30,7 +30,7 @@ describe "student planner" do
     @course.enroll_student(@student1).accept!
   end
 
-  before do
+  before :each do
     user_session(@student1)
   end
 

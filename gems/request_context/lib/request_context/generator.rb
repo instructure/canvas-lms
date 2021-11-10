@@ -113,9 +113,6 @@ module RequestContext
     def self.store_request_meta(request, context)
       self.add_meta_header("o", request.path_parameters[:controller])
       self.add_meta_header("n", request.path_parameters[:action])
-      if request.request_parameters && request.request_parameters['operationName']
-        self.add_meta_header("on", request.request_parameters['operationName'])
-      end
       if context
         self.add_meta_header("t", context.class)
         self.add_meta_header("i", context.id)

@@ -121,7 +121,7 @@ describe FeatureFlag do
   describe "audit log" do
     let_once(:acting_user) { user_model }
 
-    before do
+    before(:each) do
       allow(Audits).to receive(:config).and_return({ 'write_paths' => ['active_record'], 'read_path' => 'active_record' })
     end
 

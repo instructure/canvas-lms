@@ -28,11 +28,10 @@ describe "Student column header options" do
   include GradebookSetup
 
   before(:once) { init_course_with_students(3) }
-
-  before { user_session(@teacher) }
+  before(:each) { user_session(@teacher) }
 
   context "student name sort by" do
-    before do
+    before(:each) do
       Gradebook.visit(@course)
       @students = @course.students.sort_by { |x| x[:id] }
     end
@@ -44,7 +43,7 @@ describe "Student column header options" do
   end
 
   context "Display as" do
-    before do
+    before(:each) do
       Gradebook.visit(@course)
       @students = @course.students.sort_by { |x| x[:id] }
     end
@@ -71,7 +70,7 @@ describe "Student column header options" do
   end
 
   context "Secondary Info" do
-    before do
+    before(:each) do
       Gradebook.visit(@course)
     end
 

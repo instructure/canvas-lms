@@ -39,7 +39,7 @@ describe CommunicationChannelsController do
 
     it "creates a new CC regardless of conflicts" do
       u = User.create!
-      cc = u.communication_channels.create!(path: "jt@instructure.com", path_type: "email", workflow_state: "active")
+      cc = u.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
       user_session(@user)
       post 'create', params: { :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' } }
       expect(response).to be_successful
@@ -50,12 +50,10 @@ describe CommunicationChannelsController do
     end
 
     it "resurrects retired CCs" do
-      cc = @user.communication_channels.create!(
-        path: "jt@instructure.com",
-        path_type: "email",
-        workflow_state: "retired",
-        bounce_count: CommunicationChannel::RETIRE_THRESHOLD
-      )
+      cc = @user.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc|
+        cc.workflow_state = 'retired'
+        cc.bounce_count = CommunicationChannel::RETIRE_THRESHOLD
+      }
       user_session(@user)
       post 'create', params: { :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' } }
       expect(response).to be_successful
@@ -852,7 +850,7 @@ describe CommunicationChannelsController do
           account_admin_user_with_role_changes(:account => @account, :role_changes => { view_notifications: true })
         end
 
-        before do
+        before :each do
           user_session(@admin)
         end
 
@@ -1303,7 +1301,7 @@ describe CommunicationChannelsController do
       user_with_pseudonym(:active_all => true) # new user
       @enrollment = @course.enroll_user(@user)
 
-      expect_any_instantiation_of(@cc).not_to receive(:send_confirmation!)
+      expect_any_instantiation_of(@cc).to receive(:send_confirmation!).never
       get 're_send_confirmation', params: { :user_id => @pseudonym.user_id, :id => @cc.id, :enrollment_id => @enrollment.id }
       expect(response).to be_successful
     end
@@ -1413,8 +1411,7 @@ describe CommunicationChannelsController do
 
       let(:second_sns_access_token) { @user.access_tokens.create!(developer_key: second_sns_developer_key) }
       let(:sns_channel) { @user.communication_channels.create(path_type: CommunicationChannel::TYPE_PUSH, path: 'push') }
-
-      before { sns_channel }
+      before(:each) { sns_channel }
 
       it 'shouldnt error if an endpoint does not exist for the push_token', type: :request do
         json = api_call(:delete, "/api/v1/users/self/communication_channels/push",
@@ -1425,8 +1422,7 @@ describe CommunicationChannelsController do
 
       context 'has a notification endpoint' do
         let(:fake_token) { 'insttothemoon' }
-
-        before { sns_access_token.notification_endpoints.create!(token: fake_token) }
+        before(:each) { sns_access_token.notification_endpoints.create!(token: fake_token) }
 
         context "cross-shard user" do
           specs_require_sharding

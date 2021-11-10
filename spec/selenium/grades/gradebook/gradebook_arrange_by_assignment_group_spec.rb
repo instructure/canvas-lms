@@ -28,11 +28,10 @@ describe "Gradebook view menu" do
   include GradebookCommon
 
   before(:once) { gradebook_data_setup }
-
-  before { user_session(@teacher) }
+  before(:each) { user_session(@teacher) }
 
   context "sort by assignment group order" do
-    before do
+    before(:each) do
       Gradebook.visit(@course)
     end
 
@@ -59,7 +58,7 @@ describe "Gradebook view menu" do
   end
 
   context "assignment group dropdown" do
-    before do
+    before(:each) do
       Gradebook.visit(@course)
     end
 

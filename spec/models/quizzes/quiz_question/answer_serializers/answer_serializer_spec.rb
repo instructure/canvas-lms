@@ -18,19 +18,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer do
+  ASes = Quizzes::QuizQuestion::AnswerSerializers
+
   it 'automatically registers answer serializers' do
-    ases = Quizzes::QuizQuestion::AnswerSerializers
+    serializer = nil
 
     qq = { question_type: 'uber_hax_question' }
 
-    expect(ases.serializer_for(qq)).to be_kind_of(Quizzes::QuizQuestion::AnswerSerializers::Unknown)
+    expect(ASes.serializer_for(qq)).to be_kind_of(Quizzes::QuizQuestion::AnswerSerializers::Unknown)
 
-    stub_const("Quizzes::QuizQuestion::AnswerSerializers::UberHax",
-               Class.new(Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer))
+    class Quizzes::QuizQuestion::AnswerSerializers::UberHax < Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer
+    end
 
-    serializer = nil
-    expect { serializer = ases.serializer_for(qq) }.to_not raise_error
-    expect(serializer.is_a?(ases::AnswerSerializer)).to be_truthy
+    begin
+      expect { serializer = ASes.serializer_for(qq) }.to_not raise_error
+      expect(serializer.is_a?(ASes::AnswerSerializer)).to be_truthy
+    ensure
+      Quizzes::QuizQuestion::AnswerSerializers.send(:remove_const, :UberHax)
+    end
   end
 
   it 'has Error constant' do

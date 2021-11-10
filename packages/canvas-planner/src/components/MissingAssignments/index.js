@@ -146,7 +146,7 @@ export class MissingAssignments extends Component {
           fluidWidth
           onToggle={() => toggleMissing()}
           summary={
-            <View data-testid="missing-data" margin="0 0 0 small">
+            <View data-testid="missing-data" margin="0 0 0 x-small">
               {getMissingItemsText(expanded, items.length)}
             </View>
           }
@@ -158,7 +158,6 @@ export class MissingAssignments extends Component {
                 {...opp}
                 course={courses.find(c => c.id === opp.course_id)}
                 timeZone={timeZone}
-                responsiveSize={responsiveSize}
               />
             ))}
           </View>

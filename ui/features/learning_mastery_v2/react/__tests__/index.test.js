@@ -74,8 +74,7 @@ describe('LearningMastery', () => {
           rating: {
             points: 3,
             color: 'green',
-            description: 'rating description!',
-            mastery: false
+            description: 'rating description!'
           }
         }
       ]

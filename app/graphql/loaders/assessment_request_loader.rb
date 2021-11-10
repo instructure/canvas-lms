@@ -20,7 +20,6 @@
 
 class Loaders::AssessmentRequestLoader < GraphQL::Batch::Loader
   def initialize(current_user:)
-    super()
     @current_user = current_user
   end
 

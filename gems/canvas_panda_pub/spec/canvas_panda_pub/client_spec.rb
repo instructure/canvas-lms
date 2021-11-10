@@ -37,7 +37,7 @@ describe CanvasPandaPub::Client do
     }
   end
 
-  before do
+  before(:each) do
     stub_config
     CanvasPandaPub.process_interval = -> { 0.1 }
     CanvasPandaPub.max_queue_size = -> { 100 }
@@ -45,7 +45,7 @@ describe CanvasPandaPub::Client do
     @client = CanvasPandaPub::Client.new
   end
 
-  after do
+  after(:each) do
     WebMock.reset!
   end
 

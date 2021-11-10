@@ -69,7 +69,6 @@ describe 'appointment_reserved_by_user.twitter' do
 
   context ".sms" do
     let(:path_type) { :sms }
-
     it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_data)
       expect(msg.body).to include('some title')
@@ -79,7 +78,6 @@ describe 'appointment_reserved_by_user.twitter' do
 
   context ".twitter" do
     let(:path_type) { :twitter }
-
     it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_data)
       expect(msg.body).to include('some title')

@@ -33,11 +33,14 @@ export enum Constants {
   SET_ERROR_MESSAGE = 'UI/SET_ERROR_MESSAGE',
   TOGGLE_DIVIDE_INTO_WEEKS = 'UI/TOGGLE_DIVIDE_INTO_WEEKS',
   TOGGLE_SHOW_PROJECTIONS = 'UI/TOGGLE_SHOW_PROJECTIONS',
+  PUBLISH_PLAN_STARTED = 'UI/PUBLISH_PLAN_STARTED',
+  PUBLISH_PLAN_FINISHED = 'UI/PUBLISH_PLAN_FINISHED',
   SET_SELECTED_PLAN_CONTEXT = 'UI/SET_SELECTED_PLAN_CONTEXT',
   SET_RESPONSIVE_SIZE = 'UI/SET_RESPONSIVE_SIZE',
   SHOW_LOADING_OVERLAY = 'UI/SHOW_LOADING_OVERLAY',
   HIDE_LOADING_OVERLAY = 'UI/HIDE_LOADING_OVERLAY',
-  SET_EDITING_BLACKOUT_DATES = 'UI/SET_EDITING_BLACKOUT_DATES'
+  SET_EDITING_BLACKOUT_DATES = 'UI/SET_EDITING_BLACKOUT_DATES',
+  SET_ADJUSTING_HARD_END_DATES_AFTER = 'UI/SET_ADJUSTING_HARD_END_DATES_AFTER'
 }
 
 /* Action creators */
@@ -48,6 +51,8 @@ export const regularActions = {
   setErrorMessage: (message: string) => createAction(Constants.SET_ERROR_MESSAGE, message),
   toggleDivideIntoWeeks: () => createAction(Constants.TOGGLE_DIVIDE_INTO_WEEKS),
   toggleShowProjections: () => createAction(Constants.TOGGLE_SHOW_PROJECTIONS),
+  publishPlanStarted: () => createAction(Constants.PUBLISH_PLAN_STARTED),
+  publishPlanFinished: () => createAction(Constants.PUBLISH_PLAN_FINISHED),
   showLoadingOverlay: (message: string) => createAction(Constants.SHOW_LOADING_OVERLAY, message),
   hideLoadingOverlay: () => createAction(Constants.HIDE_LOADING_OVERLAY),
   setEditingBlackoutDates: (editing: boolean) =>
@@ -58,7 +63,9 @@ export const regularActions = {
     newSelectedPlan: PacePlan
   ) => createAction(Constants.SET_SELECTED_PLAN_CONTEXT, {contextType, contextId, newSelectedPlan}),
   setResponsiveSize: (responsiveSize: ResponsiveSizes) =>
-    createAction(Constants.SET_RESPONSIVE_SIZE, responsiveSize)
+    createAction(Constants.SET_RESPONSIVE_SIZE, responsiveSize),
+  setAdjustingHardEndDatesAfter: (position: number | undefined) =>
+    createAction(Constants.SET_ADJUSTING_HARD_END_DATES_AFTER, position)
 }
 
 export const thunkActions = {

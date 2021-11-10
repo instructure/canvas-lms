@@ -39,7 +39,7 @@ describe JwtsController do
     end
 
     context "with valid user session" do
-      before { user_session(token_user) }
+      before(:each) { user_session(token_user) }
 
       it "generates a base64 encoded token for a user session with env var secrets" do
         post 'create', format: 'json'
@@ -79,7 +79,7 @@ describe JwtsController do
     end
 
     context "with valid user session" do
-      before do
+      before(:each) do
         user_session(token_user)
         request.env['HTTP_HOST'] = 'testhost'
       end

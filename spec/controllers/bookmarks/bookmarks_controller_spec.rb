@@ -29,7 +29,7 @@ describe Bookmarks::BookmarksController do
     let(:u) { user_factory }
     let!(:bookmark) { Bookmarks::Bookmark.create(user_id: u.id, name: 'bio 101', url: '/courses/1') }
 
-    before do
+    before(:each) do
       user_session(u)
     end
 

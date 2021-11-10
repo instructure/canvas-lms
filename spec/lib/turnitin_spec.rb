@@ -31,9 +31,11 @@ describe Turnitin::Client do
     @submission.reload
   end
 
+  FakeHTTPResponse = Struct.new(:body)
   def stub_net_http_to_return(partial_body, return_code = 1)
     body = "<returndata>#{partial_body}<rcode>#{return_code}</rcode></returndata>"
-    expect_any_instance_of(Net::HTTP).to receive(:start).and_return(double(body: body))
+    fake_response = FakeHTTPResponse.new(body)
+    expect_any_instance_of(Net::HTTP).to receive(:start).and_return(fake_response)
   end
 
   describe '#state_from_similarity_score' do
@@ -69,7 +71,7 @@ describe Turnitin::Client do
   end
 
   describe 'class methods' do
-    before do
+    before(:each) do
       @default_settings = {
         :originality_report_visibility => 'immediate',
         :s_paper_check => '1',
@@ -113,7 +115,7 @@ describe Turnitin::Client do
   end
 
   describe "create assignment" do
-    before do
+    before(:each) do
       course_with_student(:active_all => true)
       turnitin_assignment
       @turnitin_api = Turnitin::Client.new('test_account', 'sekret')
@@ -179,7 +181,7 @@ describe Turnitin::Client do
   end
 
   describe "submit paper" do
-    before do
+    before(:each) do
       course_with_student(:active_all => true)
       turnitin_assignment
       turnitin_submission
@@ -214,7 +216,7 @@ describe Turnitin::Client do
   end
 
   describe "#prepare_params" do
-    before do
+    before(:each) do
       course_with_student(:active_all => true)
       turnitin_assignment
       turnitin_submission

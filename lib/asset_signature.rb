@@ -20,23 +20,21 @@
 module AssetSignature
   DELIMITER = '-'
 
-  class << self
-    def generate(asset)
-      "#{asset.id}#{DELIMITER}#{generate_hmac(asset.class, asset.id)}"
-    end
+  def self.generate(asset)
+    "#{asset.id}#{DELIMITER}#{generate_hmac(asset.class, asset.id)}"
+  end
 
-    def find_by_signature(klass, signature)
-      id, hmac = signature.split(DELIMITER, 2)
-      return nil unless Canvas::Security.verify_hmac_sha1(hmac, "#{klass}#{id}", truncate: 8)
+  def self.find_by_signature(klass, signature)
+    id, hmac = signature.split(DELIMITER, 2)
+    return nil unless Canvas::Security.verify_hmac_sha1(hmac, "#{klass}#{id}", truncate: 8)
 
-      klass.where(id: id.to_i).first
-    end
+    klass.where(id: id.to_i).first
+  end
 
-    private
+  private
 
-    def generate_hmac(klass, id)
-      data = "#{klass}#{id}"
-      Canvas::Security.hmac_sha1(data)[0, 8]
-    end
+  def self.generate_hmac(klass, id)
+    data = "#{klass}#{id}"
+    Canvas::Security.hmac_sha1(data)[0, 8]
   end
 end

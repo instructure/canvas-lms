@@ -42,7 +42,7 @@ describe "master courses - child courses - assignment locking" do
     @assmt_copy.save!
   end
 
-  before do
+  before :each do
     stub_rcs_config
     user_session(@teacher)
   end

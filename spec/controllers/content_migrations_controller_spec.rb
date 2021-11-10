@@ -35,7 +35,7 @@ describe ContentMigrationsController do
     end
 
     describe '#index' do
-      before do
+      before :each do
         user_session(@teacher)
       end
 

@@ -28,7 +28,7 @@ describe "calendar2" do
     Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
-  before do
+  before(:each) do
     Account.default.tap do |a|
       a.settings[:show_scheduler] = true
       a.save!
@@ -36,7 +36,7 @@ describe "calendar2" do
   end
 
   context "as a teacher" do
-    before do
+    before(:each) do
       course_with_teacher_logged_in
     end
 

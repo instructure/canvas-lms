@@ -127,19 +127,19 @@ QUnit.module(
     }
 
     function getGradePercentageForMissingSubmissionsInput() {
-      return findInput('Grade for missing submissions')
+      return findInput('Grade percentage for missing submissions')
     }
 
     function getLateSubmissionDeductionPercentInput() {
-      return findInput('Late submission deduction')
+      return findInput('Late submission deduction percent')
     }
 
     function getLateSubmissionDeductionIntervalInput() {
-      return findInput('Deduction interval')
+      return findInput('Late submission deduction interval')
     }
 
     function getLowestPossibleGradePercentInput() {
-      return findInput('Lowest possible grade')
+      return findInput('Lowest possible grade percent')
     }
 
     QUnit.module('Late Policies', () => {
@@ -642,7 +642,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
   test('missing submission input has label describing it', function () {
     this.wrapper = mountComponent()
     const input = missingPenaltiesForm(this.wrapper).find('#missing-submission-grade').at(0)
-    strictEqual(input.text(), 'Grade for missing submissions')
+    strictEqual(input.text(), 'Grade percentage for missing submissions')
   })
 
   test('enables the missing deduction input if the missing deduction checkbox is checked', function () {

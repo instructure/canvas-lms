@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe LocalCache do
-  after do
+  after(:each) do
     LocalCache.clear(force: true)
     LocalCache.reset
   end
@@ -39,14 +39,14 @@ describe LocalCache do
       }
     end
 
-    before do
+    before(:each) do
       skip("Must have a local redis available to run this spec") unless Canvas.redis_enabled?
       allow(ConfigFile).to receive(:load).with("local_cache").and_return(redis_conf_hash)
       LocalCache.reset
       LocalCache.clear
     end
 
-    after do
+    after(:each) do
       LocalCache.clear
     end
 
@@ -92,7 +92,7 @@ describe LocalCache do
   end
 
   describe "in memory" do
-    before do
+    before(:each) do
       allow(ConfigFile).to receive(:load).with("local_cache").and_return({ store: "memory" })
       LocalCache.reset
     end

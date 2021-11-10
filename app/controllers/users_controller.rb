@@ -504,8 +504,6 @@ class UsersController < ApplicationController
     js_env({ K5_USER: k5_user && !k5_disabled }, true)
 
     # things needed on both k5 and classic dashboards
-    create_permission_root_account = @current_user.create_courses_right(@domain_root_account)
-    create_permission_mcc_account = @current_user.create_courses_right(@domain_root_account.manually_created_courses_account)
     js_env({
              PREFERENCES: {
                dashboard_view: @current_user.dashboard_view(@domain_root_account),
@@ -516,10 +514,7 @@ class UsersController < ApplicationController
              STUDENT_PLANNER_COURSES: planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment),
              STUDENT_PLANNER_GROUPS: planner_enabled? && map_groups_for_planner(@current_user.current_groups),
              CAN_ENABLE_K5_DASHBOARD: k5_disabled && k5_user,
-             CREATE_COURSES_PERMISSIONS: {
-               PERMISSION: create_permission_root_account || create_permission_mcc_account,
-               RESTRICT_TO_MCC_ACCOUNT: !!(!create_permission_root_account && create_permission_mcc_account)
-             }
+             CREATE_COURSES_PERMISSION: @current_user.create_courses_right(@domain_root_account)
            })
 
     if k5_user?
@@ -2248,9 +2243,9 @@ class UsersController < ApplicationController
     @context.courses.each do |context|
       @entries.concat Assignments::ScopedToUser.new(context, @current_user, context.assignments.published.where("assignments.updated_at>?", cutoff)).scope
       @entries.concat context.calendar_events.active.where("updated_at>?", cutoff)
-      @entries.concat(DiscussionTopic::ScopedToUser.new(context, @current_user, context.discussion_topics.published.where("discussion_topics.updated_at>?", cutoff)).scope.reject do |dt|
-        dt.locked_for?(@current_user, :check_policies => true)
-      end)
+      @entries.concat DiscussionTopic::ScopedToUser.new(context, @current_user, context.discussion_topics.published.where("discussion_topics.updated_at>?", cutoff)).scope.select { |dt|
+        !dt.locked_for?(@current_user, :check_policies => true)
+      }
       @entries.concat WikiPages::ScopedToUser.new(context, @current_user, context.wiki_pages.published.where("wiki_pages.updated_at>?", cutoff)).scope
     end
     @entries.each do |entry|
@@ -2763,6 +2758,8 @@ class UsersController < ApplicationController
 
     Canvas::ICU.collate_by(data.values) { |e| e[:enrollment].user.sortable_name }
   end
+
+  protected
 
   def require_self_registration
     get_context

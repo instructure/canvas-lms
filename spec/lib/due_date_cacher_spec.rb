@@ -364,7 +364,8 @@ describe DueDateCacher do
 
     it "does not consider users who are no longer in scope" do
       DueDateCacher.with_executing_user(student) do
-        DueDateCacher.with_executing_user(other_student) { nil }
+        DueDateCacher.with_executing_user(other_student) do
+        end
 
         expect(DueDateCacher.current_executing_user).to eq student
       end
@@ -1037,7 +1038,7 @@ describe DueDateCacher do
 
     let(:event_type) { 'submission_updated' }
 
-    before do
+    before(:each) do
       course.enroll_teacher(teacher, active_all: true)
       course.enroll_student(student, active_all: true)
     end
@@ -1053,7 +1054,7 @@ describe DueDateCacher do
         end
         let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
 
-        before do
+        before(:each) do
           Assignment.suspend_due_date_caching do
             assignment.update!(due_at: due_at)
           end
@@ -1082,7 +1083,7 @@ describe DueDateCacher do
         let!(:assignment) { course.assignments.create!(title: 'zzz', anonymous_grading: true) }
         let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
 
-        before do
+        before(:each) do
           Assignment.suspend_due_date_caching do
             assignment.update!(due_at: due_at)
           end
@@ -1111,7 +1112,7 @@ describe DueDateCacher do
         let!(:assignment) { course.assignments.create!(title: 'z!', anonymous_grading: true, due_at: original_due_at) }
         let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
 
-        before do
+        before(:each) do
           Assignment.suspend_due_date_caching do
             assignment.update!(due_at: nil)
           end

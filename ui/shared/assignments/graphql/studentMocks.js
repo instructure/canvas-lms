@@ -97,7 +97,6 @@ export async function mockAssignmentAndSubmission(overrides = []) {
   const result = await Promise.all([mockAssignment(overrides), mockSubmission(overrides)])
   return {
     assignment: result[0],
-    submission: result[1],
-    onChangeSubmission: () => {}
+    submission: result[1]
   }
 }

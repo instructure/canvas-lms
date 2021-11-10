@@ -22,10 +22,9 @@ require "addressable/uri"
 module MathMan
   class InvalidConfigurationError < StandardError; end
 
-  def self.url_for(latex:, target:, scale: '')
-    scale_param = "&scale=#{scale}" if scale.present?
+  def self.url_for(latex:, target:)
     uri = base_url.join(target.to_s)
-    uri.query = "tex=#{latex}#{scale_param}"
+    uri.query = "tex=#{latex}"
     uri.to_s
   end
 

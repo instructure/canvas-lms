@@ -41,7 +41,7 @@ function checkedValue(submission, assignment) {
 export default class SubmissionTrayRadioInputGroup extends React.Component {
   state = {pendingUpdateData: null}
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (
       this.props.submissionUpdating &&
       !nextProps.submissionUpdating &&

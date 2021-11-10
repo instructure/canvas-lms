@@ -57,17 +57,14 @@ describe UserLearningObjectScopes do
         @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2,
                                                                                     :enrollment_state => 'active', :allow_multiple_enrollments => true)
       end
-
       context "observer watching student with visibility" do
         before { @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
-
         it "is true" do
           expect(@observer.assignments_visible_in_course(@course)).to include @assignment
         end
       end
       context "observer watching student without visibility" do
         before { @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
-
         it "is false" do
           expect(@observer.assignments_visible_in_course(@course)).not_to include @assignment
         end
@@ -121,7 +118,7 @@ describe UserLearningObjectScopes do
 
     # NOTE: More thorough testing of the Assignment#not_locked named scope is in assignment_spec.rb
     context "locked assignments" do
-      before do
+      before :each do
         # Setup default values for tests (leave unsaved for easy changes)
         @quiz.unlock_at = nil
         @quiz.lock_at = nil
@@ -515,7 +512,7 @@ describe UserLearningObjectScopes do
   end
 
   describe "submissions_needing_peer_review" do
-    before do
+    before(:each) do
       @reviewer = course_with_student(active_all: true).user
       @reviewee = course_with_student(course: @course, active_all: true).user
 
@@ -903,7 +900,7 @@ describe UserLearningObjectScopes do
     let(:opts) { { due_after: 1.day.ago, due_before: 2.days.from_now } }
 
     context 'course discussions' do
-      before do
+      before(:each) do
         course_with_student(active_all: true)
         discussion_topic_model(context: @course)
         group_discussion_topic_model(context: @course)
@@ -1045,7 +1042,7 @@ describe UserLearningObjectScopes do
     end
 
     context 'discussions made within groups' do
-      before do
+      before(:each) do
         course_with_student(active_all: true)
         @group_category = @course.group_categories.create(name: 'Project Group')
         @group1 = group_model(name: 'Project Group 1', group_category: @group_category, context: @course)
@@ -1119,7 +1116,7 @@ describe UserLearningObjectScopes do
   end
 
   describe "wiki_pages_needing_viewing" do
-    before do
+    before(:each) do
       course_with_student(active_all: true)
       @course_page = wiki_page_model(course: @course)
       @group_category = @course.group_categories.create(name: 'Project Group')

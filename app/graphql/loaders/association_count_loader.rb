@@ -20,7 +20,6 @@
 
 class Loaders::AssociationCountLoader < GraphQL::Batch::Loader
   def initialize(model, association)
-    super()
     @model = model
     @association = association
   end

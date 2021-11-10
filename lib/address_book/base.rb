@@ -27,7 +27,6 @@ module AddressBook
   # cache.
   class Base
     def self.inherited(derived)
-      super
       return unless derived.superclass == AddressBook::Base
 
       derived.prepend(AddressBook::Caching)

@@ -22,7 +22,7 @@ require_relative '../../spec_helper'
 require 'webmock/rspec'
 
 describe OutcomesService::MigrationService do
-  around do |example|
+  around(:example) do |example|
     WebMock.disable_net_connect!(allow_localhost: true)
     example.run
     WebMock.enable_net_connect!

@@ -34,11 +34,11 @@ describe "Gradebook editing grades" do
     show_sections_filter(@teacher)
   end
 
-  before do
+  before(:each) do
     user_session(@teacher)
   end
 
-  after do
+  after(:each) do
     clear_local_storage
   end
 
@@ -257,7 +257,7 @@ describe "Gradebook editing grades" do
       @assignment.grade_student(@students[0], grade: 10, grader: @teacher)
     end
 
-    before do
+    before :each do
       user_session(@teacher)
       Gradebook.visit(@course)
     end
@@ -273,7 +273,7 @@ describe "Gradebook editing grades" do
   end
 
   context "for a moderated assignment" do
-    before do
+    before(:each) do
       # turn on the moderation flag
       Account.default.enable_feature!(:anonymous_marking)
 
@@ -333,7 +333,7 @@ describe "Gradebook editing grades" do
     end
 
     context 'for assignments with at least one due date in a closed grading period' do
-      before do
+      before(:each) do
         show_grading_periods_filter(@teacher)
         Gradebook.visit(@course)
         Gradebook.select_grading_period('All Grading Periods')
@@ -341,7 +341,7 @@ describe "Gradebook editing grades" do
       end
 
       describe 'the Curve Grades menu item' do
-        before do
+        before(:each) do
           @curve_grades_menu_item = Gradebook.assignment_header_menu_item_selector('Curve Grades')
         end
 
@@ -358,7 +358,7 @@ describe "Gradebook editing grades" do
       end
 
       describe 'the Set Default Grade menu item' do
-        before do
+        before(:each) do
           @set_default_grade_menu_item = Gradebook.assignment_header_menu_item_selector('Set Default Grade')
         end
 

@@ -22,7 +22,7 @@ require 'tsort'
 module Autoextend
   Extension = Struct.new(:const_name,
                          :module,
-                         :method, # rubocop:disable Lint/StructNewOverride
+                         :method,
                          :block,
                          :singleton,
                          :after_load,

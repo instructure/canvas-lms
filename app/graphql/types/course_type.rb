@@ -163,19 +163,15 @@ module Types
       scope
     end
 
-    field :enrollments_connection, EnrollmentType.connection_type, null: true do
-      argument :filter, EnrollmentFilterInputType, required: false
-    end
-    def enrollments_connection(filter: {})
+    field :enrollments_connection, EnrollmentType.connection_type, null: true
+    def enrollments_connection
       return nil unless course.grants_any_right?(
         current_user, session,
         :read_roster, :view_all_grades, :manage_grades
       )
 
-      scope = course.apply_enrollment_visibility(course.all_enrollments, current_user).active
-      scope = scope.where(associated_user_id: filter[:associated_user_ids]) if filter[:associated_user_ids].present?
-      scope = scope.where(type: filter[:types]) if filter[:types].present?
-      scope
+      course.apply_enrollment_visibility(course.all_enrollments,
+                                         current_user).active
     end
 
     field :grading_periods_connection, GradingPeriodType.connection_type, null: true

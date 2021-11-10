@@ -38,7 +38,7 @@ describe "master courses - child courses - wiki page locking" do
     @page_copy.save!
   end
 
-  before do
+  before :each do
     user_session(@teacher)
   end
 

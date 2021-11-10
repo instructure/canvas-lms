@@ -107,7 +107,6 @@ RSpec.describe LatePolicyController, type: :controller do
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
-
       it do
         expect(json_parse).to eql(
           'status' => 'unauthorized',
@@ -158,7 +157,6 @@ RSpec.describe LatePolicyController, type: :controller do
       end
 
       it { expect(response).to have_http_status(:unauthorized) }
-
       it do
         expect(json_parse).to eql(
           'status' => 'unauthorized',
@@ -175,7 +173,6 @@ RSpec.describe LatePolicyController, type: :controller do
       end
 
       it { expect(response).to have_http_status(:bad_request) }
-
       it do
         expect(json_parse).to eql(
           'status' => 'bad_request',
@@ -224,7 +221,6 @@ RSpec.describe LatePolicyController, type: :controller do
         end
 
         it { expect(response).to have_http_status(:unauthorized) }
-
         it do
           expect(json_parse).to eql(
             'status' => 'unauthorized',

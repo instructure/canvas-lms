@@ -19,6 +19,7 @@
 #
 
 require 'nokogiri'
+require 'nokogumbo'
 
 module CC
   module CCHelper

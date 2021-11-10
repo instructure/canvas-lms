@@ -17,7 +17,6 @@
 %>
 
 <% blueprint_subscription ||= nil %>
-<% show_publish_controls ||= false %>
 <% if blueprint_subscription %>
   <script>
     function gotoBlueprintInfo() {
@@ -34,7 +33,7 @@
   </script>
 <% end %>
 <div>
-  <% if show_publish_controls %>
+  <% if can_do(@context, @current_user, :change_course_state, :manage_courses_publish) && (@context.unpublished? || @context.unpublishable?) && @context.elementary_subject_course? %>
     <div id="course_status">
       <h4>
         <%= t('headers.course_status', %{Course Status}) %>

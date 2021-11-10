@@ -22,7 +22,6 @@ shared_examples_for "a differentiable_object" do
   before do
     teacher_in_course(active_all: true, course: differentiable.context)
   end
-
   describe "differentiated_assignments_applies?" do
     context "only_visible_to_overrides is true" do
       it "returns true" do
@@ -41,12 +40,10 @@ shared_examples_for "a differentiable_object" do
   describe "visible_to_user?" do
     context "student" do
       before { student_in_course(:course => @course) }
-
       it "with a visibility it should be true" do
         allow(differentiable_view).to receive(:where).and_return([:a_record])
         expect(differentiable.visible_to_user?(@user)).to be_truthy
       end
-
       it "without a visibility should be false" do
         allow(differentiable_view).to receive(:where).and_return([])
         expect(differentiable.visible_to_user?(@user)).to be_falsey
@@ -64,12 +61,10 @@ shared_examples_for "a differentiable_object" do
         @course.reload
         @observer = User.create(name: "observer")
       end
-
       context "observing only a section (with or without an override)" do
         before do
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
         end
-
         it "is visible" do
           expect(differentiable.visible_to_user?(@observer)).to be_truthy
         end
@@ -80,7 +75,6 @@ shared_examples_for "a differentiable_object" do
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
           @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
         end
-
         it "is visible" do
           expect(differentiable.visible_to_user?(@observer)).to be_truthy
         end
@@ -91,7 +85,6 @@ shared_examples_for "a differentiable_object" do
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
           @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
         end
-
         it "is not visible" do
           expect(differentiable.visible_to_user?(@observer)).to be_falsey
         end
@@ -102,7 +95,6 @@ shared_examples_for "a differentiable_object" do
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :associated_user_id => @student1.id)
           @course.enroll_user(@observer, "ObserverEnrollment", { :allow_multiple_enrollments => true, :associated_user_id => @student2.id })
         end
-
         it "is visible" do
           expect(differentiable.visible_to_user?(@observer)).to be_truthy
         end
@@ -113,7 +105,6 @@ shared_examples_for "a differentiable_object" do
           @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active', :associated_user_id => @student3.id)
           @course.enroll_user(@observer, "ObserverEnrollment", { :allow_multiple_enrollments => true, :associated_user_id => @student2.id })
         end
-
         it "is not visible" do
           expect(differentiable.visible_to_user?(@observer)).to be_falsey
         end
@@ -136,18 +127,15 @@ shared_examples_for "a differentiable_object" do
       student_in_course(:course => @course)
       expect(call_filter).to eq :filtered
     end
-
     context "observer" do
       before do
         @observer = User.create(name: "observer")
         @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
       end
-
       it "does not filter when no observed students" do
         @user = @observer_enrollment.user
         expect(call_filter).to eq :not_filtered
       end
-
       it "filters with observed students" do
         student_in_course(:course => @course)
         @observer_enrollment.update_attribute(:associated_user_id, @user.id)
@@ -160,12 +148,10 @@ shared_examples_for "a differentiable_object" do
       teacher_in_course(:course => @course)
       expect(call_filter).to eq :not_filtered
     end
-
     it "does not filter if no user" do
       @user = nil
       expect(call_filter).to eq :not_filtered
     end
-
     it "does not filter if user not in course" do
       original_user = @user
       # override @user and @course

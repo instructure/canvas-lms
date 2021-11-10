@@ -111,7 +111,7 @@ describe GradingStandardsController do
       )
     end
 
-    before do
+    before(:each) do
       user_session(@teacher)
     end
 

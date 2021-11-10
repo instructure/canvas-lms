@@ -61,7 +61,7 @@ describe AssignmentOverrideApplicator do
   end
 
   describe "assignment_overridden_for" do
-    before do
+    before :each do
       student_in_course
       @assignment = create_assignment(:course => @course)
     end
@@ -95,7 +95,7 @@ describe AssignmentOverrideApplicator do
     it "does not attempt to apply overrides if an overridden assignment is overridden for the same user" do
       @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
       expect(@overridden_assignment.overridden_for_user.id).to eq @student.id
-      expect(AssignmentOverrideApplicator).not_to receive(:overrides_for_assignment_and_user)
+      expect(AssignmentOverrideApplicator).to receive(:overrides_for_assignment_and_user).never
       @reoverridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@overridden_assignment, @student)
     end
 
@@ -171,7 +171,7 @@ describe AssignmentOverrideApplicator do
   end
 
   describe "overrides_for_assignment_and_user" do
-    before do
+    before :each do
       student_in_course
       @assignment = create_assignment(:course => @course, :due_at => 5.days.from_now)
     end
@@ -185,7 +185,7 @@ describe AssignmentOverrideApplicator do
       it "caches by assignment and user" do
         enable_cache do
           AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
-          expect(Rails.cache).not_to receive(:write_entry)
+          expect(Rails.cache).to receive(:write_entry).never
           AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
         end
       end
@@ -287,7 +287,7 @@ describe AssignmentOverrideApplicator do
     end
 
     context 'adhoc overrides' do
-      before do
+      before :each do
         @override = assignment_override_model(:assignment => @assignment)
         @override_student = @override.assignment_override_students.build
         @override_student.user = @student
@@ -352,7 +352,7 @@ describe AssignmentOverrideApplicator do
     end
 
     context 'group overrides' do
-      before do
+      before :each do
         create_group_override
       end
 
@@ -440,7 +440,7 @@ describe AssignmentOverrideApplicator do
     end
 
     context 'section overrides' do
-      before do
+      before :each do
         @override = assignment_override_model(:assignment => @assignment)
         @override.set = @course.default_section
         @override.save!
@@ -777,11 +777,8 @@ describe AssignmentOverrideApplicator do
   end
 
   describe "assignment_with_overrides" do
-    around do |example|
-      Time.use_zone('Alaska', &example)
-    end
-
-    before do
+    before :each do
+      Time.zone == 'Alaska'
       @assignment = create_assignment(
         :due_at => 5.days.from_now,
         :unlock_at => 4.days.from_now,
@@ -869,7 +866,7 @@ describe AssignmentOverrideApplicator do
       @override = assignment_override_model(:assignment => @assignment)
       enable_cache do
         AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
-        expect(Rails.cache).not_to receive(:write_entry)
+        expect(Rails.cache).to receive(:write_entry).never
         Timecop.freeze(5.seconds.from_now) do
           AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
         end
@@ -985,7 +982,7 @@ describe AssignmentOverrideApplicator do
   end
 
   describe "overridden_due_at" do
-    before do
+    before :each do
       @assignment = create_assignment(:due_at => 5.days.from_now)
       @override = assignment_override_model(:assignment => @assignment)
     end
@@ -1050,7 +1047,7 @@ describe AssignmentOverrideApplicator do
   # pulled from the same assignment/override the due_at is
 
   describe "overridden_unlock_at" do
-    before do
+    before :each do
       @assignment = create_assignment(:due_at => 11.days.from_now, :unlock_at => 10.days.from_now)
       @override = assignment_override_model(:assignment => @assignment)
     end
@@ -1119,7 +1116,7 @@ describe AssignmentOverrideApplicator do
   end
 
   describe "overridden_lock_at" do
-    before do
+    before :each do
       @assignment = create_assignment(:due_at => 1.day.from_now, :lock_at => 5.days.from_now)
       @override = assignment_override_model(:assignment => @assignment)
     end
@@ -1202,7 +1199,7 @@ describe AssignmentOverrideApplicator do
   end
 
   describe "without_overrides" do
-    before do
+    before :each do
       student_in_course
       @assignment = create_assignment(:course => @course)
     end

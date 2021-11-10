@@ -168,7 +168,7 @@ describe EnrollmentsApiController, type: :request do
 
       it "is unauthorized for users without add_student_to_course permission (granular)" do
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
-        @course.account.role_overrides.create!(role: admin_role, enabled: true, permission: :manage_students)
+        @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_students)
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :add_student_to_course)
         api_call :post, @path, @path_options,
                  {
@@ -1041,7 +1041,7 @@ describe EnrollmentsApiController, type: :request do
             end
           end
 
-          before do
+          before :each do
             Timecop.freeze(@first_grading_period.end_date - 1.day) do
               @assignment_in_first_period.grade_student(@student, grade: 10, grader: @teacher)
             end
@@ -1129,14 +1129,14 @@ describe EnrollmentsApiController, type: :request do
       end
 
       it "lists all of a user's enrollments in an account" do
-        enrollment = @student.enrollments.current.first
-        sis_batch = enrollment.root_account.sis_batches.create
+        e = @student.enrollments.current.first
+        sis_batch = e.root_account.sis_batches.create
         SisBatch.where(id: sis_batch).update_all(workflow_state: 'imported')
-        enrollment.sis_batch_id = sis_batch.id
-        enrollment.save!
+        e.sis_batch_id = sis_batch.id
+        e.save!
         json = api_call(:get, @user_path, @user_params)
         enrollments = @student.enrollments.current.eager_load(:user).order("users.sortable_name ASC")
-        expect(json).to eq(enrollments.map do |e|
+        expect(json).to eq enrollments.map { |e|
           {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -1187,7 +1187,7 @@ describe EnrollmentsApiController, type: :request do
             'last_attended_at' => nil,
             'total_activity_time' => 0
           }
-        end)
+        }
       end
 
       context "filtering by SIS IDs" do
@@ -1368,7 +1368,7 @@ describe EnrollmentsApiController, type: :request do
         recent_activity.record!(Time.zone.now)
         json = api_call(:get, @user_path, @user_params)
         enrollments = @student.enrollments.current.eager_load(:user).order("users.sortable_name ASC")
-        expect(json).to eq(enrollments.map do |e|
+        expect(json).to eq enrollments.map { |e|
           {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -1419,7 +1419,7 @@ describe EnrollmentsApiController, type: :request do
             'last_attended_at' => nil,
             'total_activity_time' => e.total_activity_time
           }
-        end)
+        }
       end
 
       it "returns enrollments for unpublished courses" do
@@ -1594,7 +1594,7 @@ describe EnrollmentsApiController, type: :request do
         enrollments = %w{observer student ta teacher}.inject([]) do |res, type|
           res + @course.send("#{type}_enrollments").eager_load(:user).order(User.sortable_name_order_by_clause("users"))
         end
-        expect(json).to match_array(enrollments.map do |e|
+        expect(json).to match_array enrollments.map { |e|
           h = {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -1639,7 +1639,7 @@ describe EnrollmentsApiController, type: :request do
           ) if e.user == @user
 
           h
-        end)
+        }
       end
 
       it "is able to return an enrollment object by id" do
@@ -1684,7 +1684,7 @@ describe EnrollmentsApiController, type: :request do
       it "lists its own enrollments" do
         json = api_call(:get, @user_path, @user_params)
         enrollments = @user.enrollments.current.eager_load(:user).order("users.sortable_name ASC")
-        expect(json).to eq(enrollments.map do |e|
+        expect(json).to eq enrollments.map { |e|
           {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -1721,7 +1721,7 @@ describe EnrollmentsApiController, type: :request do
             'last_attended_at' => nil,
             'total_activity_time' => 0
           }
-        end)
+        }
       end
 
       context "override scores" do
@@ -2108,7 +2108,7 @@ describe EnrollmentsApiController, type: :request do
         enrollment_json.select { |enrollment| enrollment["type"] == "ObserverEnrollment" }
       end
 
-      before do
+      before(:each) do
         course.enroll_student(observed_student, active_all: true)
         course.enroll_student(hidden_student, active_all: true)
 
@@ -2119,7 +2119,7 @@ describe EnrollmentsApiController, type: :request do
       end
 
       context "when the observer is observing at least one student in the course" do
-        before do
+        before(:each) do
           course.enroll_user(observer, 'ObserverEnrollment', associated_user_id: observed_student.id)
         end
 
@@ -2463,7 +2463,7 @@ describe EnrollmentsApiController, type: :request do
                     :id => @enrollment.id.to_param, :format => 'json' }
       end
 
-      before do
+      before :each do
         time = Time.now
         allow(Time).to receive(:now).and_return(time)
       end
@@ -2701,7 +2701,7 @@ describe EnrollmentsApiController, type: :request do
     describe "filters" do
       it "properly filters by a single enrollment type" do
         json = api_call(:get, "#{@path}?type[]=StudentEnrollment", @params.merge(:type => %w{StudentEnrollment}))
-        expect(json).to eql(@course.student_enrollments.map do |e|
+        expect(json).to eql @course.student_enrollments.map { |e|
           {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -2737,7 +2737,7 @@ describe EnrollmentsApiController, type: :request do
               'created_at' => e.user.created_at.iso8601
             }
           }
-        end)
+        }
       end
 
       it "properly filters by multiple enrollment types" do

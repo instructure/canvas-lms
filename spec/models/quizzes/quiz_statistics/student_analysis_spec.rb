@@ -54,7 +54,6 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   end
 
   let(:report_type) { 'student_analysis' }
-
   include_examples "Quizzes::QuizStatistics::Report"
   before(:once) { course_factory }
 
@@ -158,7 +157,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   end
 
   context "csv" do
-    before do
+    before(:each) do
       student_in_course(:active_all => true)
       @quiz = @course.quizzes.create!
       @quiz.quiz_questions.create!(:question_data => { :name => "test 1" })
@@ -586,7 +585,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
         answers: []
       }
 
-      expect(CanvasQuizStatistics).not_to receive(:analyze)
+      expect(CanvasQuizStatistics).to receive(:analyze).never
 
       subject.send(:stats_for_question, question_data, [])
     end

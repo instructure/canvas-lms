@@ -37,14 +37,14 @@ module Canvas
       end
     end
 
-    before do
+    before(:each) do
       @old_registry = described_class.instance_variable_get(:@registry)
       described_class.clear_callback_registry!
       @error_harness = error_testing_class.new
       @error_harness.register!
     end
 
-    after do
+    after(:each) do
       described_class.instance_variable_set(:@registry, @old_registry)
     end
 

@@ -113,12 +113,12 @@ describe "grades" do
   end
 
   context "as a teacher" do
-    before do
+    before(:each) do
       user_session(@teacher)
     end
 
     context 'overall grades' do
-      before do
+      before(:each) do
         @course_names = []
         @course_names << @course
         3.times do |i|
@@ -165,7 +165,7 @@ describe "grades" do
   end
 
   context "as a student" do
-    before do
+    before(:each) do
       user_session(@student_1)
     end
 
@@ -277,12 +277,12 @@ describe "grades" do
     end
 
     context "rubric criterion ranges disabled" do
-      before do
+      before(:each) do
         @rubric.criteria[0][:criterion_use_range] = false
         @rubric.save!
       end
 
-      after do
+      after(:each) do
         @rubric.criteria[0][:criterion_use_range] = true
         @rubric.save!
       end

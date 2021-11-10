@@ -184,7 +184,7 @@ describe CanvasPartman::PartitionManager do
       it "detects when enough partitions already exist" do
         expect(subject).to receive(:partition_tables).and_return(['partman_trails_0', 'partman_trails_1'])
         expect(Zoo).to receive(:maximum).and_return(nil)
-        expect(subject).not_to receive(:create_partition)
+        expect(subject).to receive(:create_partition).never
 
         subject.ensure_partitions(2)
       end

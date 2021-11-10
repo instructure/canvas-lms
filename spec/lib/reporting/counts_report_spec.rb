@@ -81,38 +81,35 @@ describe Reporting::CountsReport do
     end
 
     describe "teachers" do
-      before do
+      before :each do
         course_with_teacher(:account => @account1, :user => user_with_pseudonym, :active_course => 1, :active_enrollment => 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
       end
 
       let(:datum) { 'teachers' }
-
       include_examples "user_counts"
     end
 
     describe "students" do
-      before do
+      before :each do
         course_with_student(:account => @account1, :user => user_with_pseudonym, :active_course => 1, :active_enrollment => 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
       end
 
       let(:datum) { 'students' }
-
       include_examples "user_counts"
     end
 
     describe "users" do
-      before do
+      before :each do
         course_with_ta(:account => @account1, :user => user_with_pseudonym, :active_course => 1, :active_enrollment => 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
       end
 
       let(:datum) { 'users' }
-
       include_examples "user_counts"
 
       it "includes tas" do
@@ -173,7 +170,7 @@ describe Reporting::CountsReport do
     end
 
     describe "files" do
-      before do
+      before :each do
         # the account needs a course in it to get data out of the report
         course_factory(account: @account1, active_course: 1)
       end

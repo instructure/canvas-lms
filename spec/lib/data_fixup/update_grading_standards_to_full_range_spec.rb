@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe DataFixup::UpdateGradingStandardsToFullRange do
-  before do
+  before :each do
     course_with_student
 
     @negative_grading_standard = GradingStandard.new(context: @course, workflow_state: 'active')

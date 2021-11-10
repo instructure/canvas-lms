@@ -23,12 +23,6 @@ class Quizzes::QuizQuestionBuilder
     shuffle_answers: false
   }
 
-  class << self
-    def t(*args)
-      ::ActiveRecord::Base.t(*args)
-    end
-  end
-
   def initialize(options = {})
     self.options = DEFAULT_OPTIONS.merge(options)
   end
@@ -224,6 +218,10 @@ class Quizzes::QuizQuestionBuilder
   end
 
   protected
+
+  def self.t(*args)
+    ::ActiveRecord::Base.t(*args)
+  end
 
   # @property [Integer] submission_question_index
   # @private

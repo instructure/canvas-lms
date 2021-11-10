@@ -69,7 +69,7 @@ describe 'Viewing graded quizzes' do
         run_jobs # run it
       end
 
-      before do
+      before :each do
         user_session(@student)
       end
 

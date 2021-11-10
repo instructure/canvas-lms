@@ -44,7 +44,7 @@ describe "/assignments/_syllabus_content" do
       render '/assignments/_syllabus_content'
     end
 
-    before do
+    before(:each) do
       course_factory :active_all => true
       @course.is_public = true
       @course.save!

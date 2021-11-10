@@ -107,7 +107,7 @@ module AttachmentFu # :nodoc:
         # remove directory also if it is now empty
         Dir.rmdir(File.dirname(full_filename)) if (Dir.entries(File.dirname(full_filename)) - ['.', '..']).empty?
       rescue
-        logger.info "Exception destroying  #{full_filename.inspect}: [#{$!.class.name}] #{$!}"
+        logger.info "Exception destroying  #{full_filename.inspect}: [#{$!.class.name}] #{$1}"
         logger.warn $!.backtrace.collect { |b| " > #{b}" }.join("\n")
       end
 
@@ -120,7 +120,16 @@ module AttachmentFu # :nodoc:
         # and we don't want to get rid of the original...
         # TODO: we'll just have to figure out a different way to clean out
         # the cruft that happens because of this
-        false
+        return
+        return unless @old_filename && @old_filename != full_filename
+
+        if save_attachment? && File.exist?(@old_filename)
+          FileUtils.rm @old_filename
+        elsif File.exist?(@old_filename)
+          FileUtils.mv @old_filename, full_filename
+        end
+        @old_filename = nil
+        true
       end
 
       # Saves the file to the file system

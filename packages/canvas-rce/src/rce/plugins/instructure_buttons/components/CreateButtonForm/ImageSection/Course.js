@@ -21,16 +21,15 @@ import React from 'react'
 import {View} from '@instructure/ui-view'
 import ImageList from '../../../../instructure_image/Images'
 import {useStoreProps} from '../../../../shared/StoreContext'
-import useDataUrl from '../../../../shared/useDataUrl'
 
 const Course = () => {
   const storeProps = useStoreProps()
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
-  const {setUrl, dataUrl, dataLoading, dataError} = useDataUrl()
 
-  // TODO Next: Set the image in the preview icon and remove log
-  //            Also, properly handle data loading + error state
-  console.log(dataUrl)
+  const fetchInitial = () => {
+    setIsLoading(true)
+    storeProps.fetchInitialImages()
+  }
 
   return (
     <View>
@@ -50,8 +49,9 @@ const Course = () => {
           sort: 'date_added',
           order: 'desc'
         }}
-        onImageEmbed={file => {
-          setUrl(file.download_url)
+        onImageEmbed={(a, b, c) => {
+          // TODO: in next commit, handle image selection
+          console.log('Selected Image', a)
         }}
       />
     </View>

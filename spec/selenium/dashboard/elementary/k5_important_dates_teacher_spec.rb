@@ -36,7 +36,7 @@ describe "teacher k5 dashboard important dates" do
     Account.site_admin.enable_feature!(:important_dates)
   end
 
-  before do
+  before :each do
     user_session @homeroom_teacher
   end
 

@@ -714,7 +714,7 @@ module Lti
         end
 
         context "prefer_sis_email" do
-          before do
+          before(:each) do
             tool.settings[:prefer_sis_email] = "true"
             tool.save!
           end

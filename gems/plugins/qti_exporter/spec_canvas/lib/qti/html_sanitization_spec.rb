@@ -52,7 +52,6 @@ if Qti.migration_executable
             :text => "No answer text provided." }
         ]
       end
-
       it "sanitizes and strip qti v2p1 html nodes" do
         manifest_node = get_manifest_node('multiple_choice')
         hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node => manifest_node, :base_dir => html_sanitization_question_dir('nodes'))
@@ -79,7 +78,6 @@ if Qti.migration_executable
         expect(hash[:answers][3][:html]).to eq nil
         expect(hash[:answers][3][:text]).to eq "Twitter" # we've stripped off extraneous whitespace
       end
-
       it "sanitizes and strip qti v2p1 html nodes" do
         manifest_node = get_manifest_node('multiple_answer')
         hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node => manifest_node, :base_dir => html_sanitization_question_dir('nodes'))
@@ -105,7 +103,6 @@ if Qti.migration_executable
           { :html => nil, :text => "Sydney" }
         ]
       end
-
       it "sanitizes and strip qti v2p1 html nodes" do
         manifest_node = get_manifest_node('matching')
         hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node => manifest_node, :base_dir => html_sanitization_question_dir('nodes'))

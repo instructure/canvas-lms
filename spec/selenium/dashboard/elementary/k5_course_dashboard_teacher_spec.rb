@@ -42,7 +42,7 @@ describe "teacher k5 course dashboard" do
     teacher_setup
   end
 
-  before do
+  before :each do
     user_session @homeroom_teacher
   end
 

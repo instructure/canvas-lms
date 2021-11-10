@@ -22,7 +22,6 @@
 # Canvas analytics plugin
 class Loaders::CourseStudentAnalyticsLoader < GraphQL::Batch::Loader
   def initialize(course_id, current_user:, session:)
-    super()
     @course_id = course_id
     @current_user = current_user
     @session = session

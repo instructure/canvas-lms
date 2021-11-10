@@ -95,6 +95,31 @@ class ActiveRecord::Base
     "#{self.class.reflection_type_name}_#{id}"
   end
 
+  def self.all_models
+    return @all_models if @all_models.present?
+
+    @all_models = (ActiveRecord::Base.models_from_files +
+                   [Version]).compact.uniq.reject { |model|
+      (model < Tableless) ||
+        model.abstract_class?
+    }
+  end
+
+  def self.models_from_files
+    @from_files ||= begin
+      Dir[
+        "#{Rails.root}/app/models/**/*.rb",
+        "#{Rails.root}/vendor/plugins/*/app/models/**/*.rb",
+        "#{Rails.root}/gems/plugins/*/app/models/**/*.rb",
+      ].sort.each do |file|
+        next if const_defined?(file.sub(%r{.*/app/models/(.*)\.rb$}, '\1').camelize)
+
+        ActiveSupport::Dependencies.require_or_load(file)
+      end
+      ActiveRecord::Base.descendants
+    end
+  end
+
   def self.maximum_text_length
     @maximum_text_length ||= 64.kilobytes - 1
   end
@@ -604,11 +629,12 @@ class ActiveRecord::Base
     # transaction. useful for possible race conditions where we don't want to
     # take a lock (e.g. when we create a submission).
     retries.times do |retry_count|
-      result = transaction(:requires_new => true) { uncached { yield(retry_count) } }
-      connection.clear_query_cache
-      return result
-    rescue ActiveRecord::RecordNotUnique
-      next
+      begin
+        result = transaction(:requires_new => true) { uncached { yield(retry_count) } }
+        connection.clear_query_cache
+        return result
+      rescue ActiveRecord::RecordNotUnique
+      end
     end
     GuardRail.activate(:primary) do
       result = transaction(:requires_new => true) { uncached { yield(retries) } }
@@ -973,7 +999,7 @@ module UsefulFindInBatches
 
         if remaining > of
           begin
-            old_proc = connection.raw_connection.set_notice_processor { nil }
+            old_proc = connection.raw_connection.set_notice_processor {}
             index = if (select_values.empty? || select_values.any? { |v| v.to_s == primary_key.to_s }) && order_values.empty?
                       connection.execute(%{CREATE INDEX "temp_primary_key" ON #{connection.quote_local_table_name(table)}(#{connection.quote_column_name(primary_key)})})
                       primary_key.to_s
@@ -1110,23 +1136,23 @@ module UsefulBatchEnumerator
         raw_update = update.value.value_before_type_cast
         # we want to check exact class here, not ancestry, since we want to ignore
         # subclasses we don't understand
-        if pred.instance_of?(Arel::Nodes::Equality)
+        if pred.class == Arel::Nodes::Equality
           update != pred.right
-        elsif pred.instance_of?(Arel::Nodes::NotEqual)
+        elsif pred.class == Arel::Nodes::NotEqual
           update == pred.right
-        elsif pred.instance_of?(Arel::Nodes::GreaterThanOrEqual)
+        elsif pred.class == Arel::Nodes::GreaterThanOrEqual
           raw_update < pred.right.value.value_before_type_cast
-        elsif pred.instance_of?(Arel::Nodes::GreaterThan)
+        elsif pred.class == Arel::Nodes::GreaterThan
           raw_update <= pred.right.value.value_before_type_cast
-        elsif pred.instance_of?(Arel::Nodes::LessThanOrEqual)
+        elsif pred.class == Arel::Nodes::LessThanOrEqual
           raw_update >= pred.right.value.value_before_type_cast
-        elsif pred.instance_of?(Arel::Nodes::LessThan)
-          raw_update > pred.right.value.value_before_type_cast
-        elsif pred.instance_of?(Arel::Nodes::Between)
+        elsif pred.class == Arel::Nodes::LessThan
+          raw_update >= pred.right.value.value_before_type_cast
+        elsif pred.class == Arel::Nodes::Between
           raw_update < pred.right.left.value.value_before_type_cast || raw_update > pred.right.right.value.value_before_type_cast
-        elsif pred.instance_of?(Arel::Nodes::In) && pred.right.is_a?(Array)
-          pred.right.exclude?(update)
-        elsif pred.instance_of?(Arel::Nodes::NotIn) && pred.right.is_a?(Array)
+        elsif pred.class == Arel::Nodes::In && pred.right.is_a?(Array)
+          !pred.right.include?(update)
+        elsif pred.class == Arel::Nodes::NotIn && pred.right.is_a?(Array)
           pred.right.include?(update)
         end
       end && found_match

@@ -82,7 +82,7 @@ describe GradebookUploadsController do
     end
 
     context "with authorized teacher" do
-      before { user_session(@teacher) }
+      before(:each) { user_session(@teacher) }
 
       it "accepts a valid csv upload" do
         check_create_response
@@ -96,7 +96,7 @@ describe GradebookUploadsController do
       end
 
       context "and final grade column" do
-        before do
+        before(:each) do
           @course.grading_standard_id = 0
           @course.save!
         end

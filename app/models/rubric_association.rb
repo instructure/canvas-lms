@@ -345,11 +345,13 @@ class RubricAssociation < ActiveRecord::Base
         rating[:comments] = data[:comments]
         rating[:above_threshold] = rating[:points] > criterion.mastery_points if criterion.mastery_points && rating[:points]
         criterion.ratings.each_with_index do |r, index|
-          next unless ((r.points.to_f - rating[:points].to_f).abs < Float::EPSILON) ||
-                      (criterion.criterion_use_range && r.points.to_f > rating[:points].to_f && criterion.ratings[index + 1].try(:points).to_f < rating[:points].to_f)
-
-          rating[:description] ||= r.description
-          rating[:id] ||= r.id
+          if r.points.to_f == rating[:points].to_f
+            rating[:description] ||= r.description
+            rating[:id] ||= r.id
+          elsif criterion.criterion_use_range && r.points.to_f > rating[:points].to_f && criterion.ratings[index + 1].try(:points).to_f < rating[:points].to_f
+            rating[:description] ||= r.description
+            rating[:id] ||= r.id
+          end
         end
         save_comment = data[:save_comment] == '1' && params[:assessment_type] != 'peer_review'
         if rating[:comments] && !rating[:comments].empty? && save_comment

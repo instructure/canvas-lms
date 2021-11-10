@@ -26,9 +26,8 @@ describe "account admin outcomes" do
   let(:outcome_url) { "/accounts/#{Account.default.id}/outcomes" }
   let(:who_to_login) { 'admin' }
   let(:account) { Account.default }
-
   describe "state level outcomes" do
-    before do
+    before(:each) do
       course_with_admin_logged_in
       @root_account = Account.site_admin
       account_admin_user(:account => @root_account, :active_all => true)
@@ -108,7 +107,7 @@ describe "account admin outcomes" do
       require_relative 'pages/improved_outcome_management_page'
       include ImprovedOutcomeManagementPage
 
-      before do
+      before(:each) do
         enable_improved_outcomes_management(account)
         @cm.export_content
         run_jobs

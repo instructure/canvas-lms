@@ -144,7 +144,7 @@ RSpec.describe SubmissionCommentsController do
       let(:last_event) { audit_events.last }
 
       context 'when an assignment is auditable' do
-        before do
+        before(:each) do
           user_session(teacher)
         end
 
@@ -198,7 +198,7 @@ RSpec.describe SubmissionCommentsController do
       }
     end
 
-    before do
+    before(:each) do
       user_session(@the_teacher)
     end
 
@@ -268,7 +268,7 @@ RSpec.describe SubmissionCommentsController do
       end
       let(:last_event) { audit_events.last }
 
-      before do
+      before(:each) do
         user_session(student)
       end
 
