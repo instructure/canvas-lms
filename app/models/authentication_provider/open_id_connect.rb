@@ -22,11 +22,11 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
   attr_accessor :instance_debugging
 
   def self.sti_name
-    self == OpenIDConnect ? 'openid_connect'.freeze : super
+    self == OpenIDConnect ? 'openid_connect' : super
   end
 
   def self.display_name
-    self == OpenIDConnect ? 'OpenID Connect'.freeze : super
+    self == OpenIDConnect ? 'OpenID Connect' : super
   end
 
   def self.open_id_connect_params
@@ -79,7 +79,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
   end
 
   def login_attribute
-    super.presence || 'sub'.freeze
+    super.presence || 'sub'
   end
 
   def unique_id(token)
@@ -148,9 +148,9 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
   PROFILE_CLAIMS = ['name', 'family_name', 'given_name', 'middle_name', 'nickname', 'preferred_username',
                     'profile', 'picture', 'website', 'gender', 'birthdate', 'zoneinfo', 'locale', 'updated_at'].freeze
   def scope_for_options
-    result = (scope || ''.freeze).split(' '.freeze)
+    result = (scope || '').split(' ')
 
-    result.unshift('openid'.freeze)
+    result.unshift('openid')
     claims = requested_claims
     # see http://openid.net/specs/openid-connect-core-1_0.html#ScopeClaims
     result << 'profile' unless (claims & PROFILE_CLAIMS).empty?
@@ -159,6 +159,6 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
     result << 'phone' if claims.include?('phone_number') || claims.include?('phone_number_verified')
 
     result.uniq!
-    result.join(' '.freeze)
+    result.join(' ')
   end
 end

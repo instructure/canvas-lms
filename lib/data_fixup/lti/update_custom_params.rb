@@ -19,7 +19,7 @@
 #
 
 module DataFixup::Lti::UpdateCustomParams
-  LOGGER_PREFIX = "Lti::UpdateCustomParams => ".freeze
+  LOGGER_PREFIX = "Lti::UpdateCustomParams => "
 
   # This script will update all specified instances of LTI tools within Canvas,
   # it is intended to be copied and pasted into a Canvas console

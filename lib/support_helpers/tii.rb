@@ -45,7 +45,7 @@ module SupportHelpers
       end
 
       def like_error
-        "turnitin_data LIKE '%error%'".freeze
+        "turnitin_data LIKE '%error%'"
       end
 
       def object_type
@@ -73,7 +73,7 @@ module SupportHelpers
       end
 
       def like_error
-        "turnitin_settings LIKE '%2305%'".freeze
+        "turnitin_settings LIKE '%2305%'"
       end
 
       def object_type
@@ -93,7 +93,7 @@ module SupportHelpers
       end
 
       def like_error
-        "turnitin_settings LIKE '%MD5 not authenticated%'".freeze
+        "turnitin_settings LIKE '%MD5 not authenticated%'"
       end
     end
 
@@ -269,7 +269,7 @@ module SupportHelpers
       private
 
       def like_error
-        "turnitin_data LIKE '--- \n:last_processed_attempt: _\n' OR turnitin_data LIKE '--- \n:last_processed_attempt: _\nattachment_________: \n  :status: pending\n'".freeze
+        "turnitin_data LIKE '--- \n:last_processed_attempt: _\n' OR turnitin_data LIKE '--- \n:last_processed_attempt: _\nattachment_________: \n  :status: pending\n'"
       end
 
       def load_broken_objects
@@ -296,7 +296,7 @@ module SupportHelpers
       end
 
       def like_error
-        'turnitin_data LIKE E\'%:status: pending\n:status: error\n:assignment_error: !ruby/hash:ActiveSupport::HashWithIndifferentAccess\n  error_code: 217%\''.freeze
+        'turnitin_data LIKE E\'%:status: pending\n:status: error\n:assignment_error: !ruby/hash:ActiveSupport::HashWithIndifferentAccess\n  error_code: 217%\''
       end
     end
   end

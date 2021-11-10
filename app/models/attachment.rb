@@ -43,7 +43,7 @@ class Attachment < ActiveRecord::Base
   EXCLUDED_COPY_ATTRIBUTES = %w{id root_attachment_id uuid folder_id user_id
                                 filename namespace workflow_state root_account_id}
 
-  CLONING_ERROR_TYPE = 'attachment_clone_url'.freeze
+  CLONING_ERROR_TYPE = 'attachment_clone_url'
 
   include HasContentTags
   include ContextModuleItem

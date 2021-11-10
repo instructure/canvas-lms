@@ -33,9 +33,9 @@ module Lti
         }, status: :not_found
       end
 
-      TOOL_SETTINGS_SERVICE = 'ToolProxySettings'.freeze
-      TOOL_PROXY_BINDING_SERVICE = 'ToolProxyBindingSettings'.freeze
-      LTI_LINK_SETTINGS = 'LtiLinkSettings'.freeze
+      TOOL_SETTINGS_SERVICE = 'ToolProxySettings'
+      TOOL_PROXY_BINDING_SERVICE = 'ToolProxyBindingSettings'
+      LTI_LINK_SETTINGS = 'LtiLinkSettings'
 
       skip_before_action :load_user
       before_action :authenticate_api_call

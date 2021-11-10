@@ -113,7 +113,7 @@ module Lti
   class OriginalityReportsApiController < ApplicationController
     include Lti::IMS::AccessTokenHelper
 
-    ORIGINALITY_REPORT_SERVICE = 'vnd.Canvas.OriginalityReport'.freeze
+    ORIGINALITY_REPORT_SERVICE = 'vnd.Canvas.OriginalityReport'
 
     SERVICE_DEFINITIONS = [
       {

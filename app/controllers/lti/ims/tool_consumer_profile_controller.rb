@@ -23,7 +23,7 @@ module Lti
     class ToolConsumerProfileController < ApplicationController
       include Lti::IMS::AccessTokenHelper
 
-      TOOL_CONSUMER_PROFILE_SERVICE = 'ToolConsumerProfile'.freeze
+      TOOL_CONSUMER_PROFILE_SERVICE = 'ToolConsumerProfile'
 
       before_action :require_context
       skip_before_action :load_user

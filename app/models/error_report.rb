@@ -41,7 +41,7 @@ class ErrorReport < ActiveRecord::Base
   end
 
   class Reporter
-    IGNORED_CATEGORIES = "404,ActionDispatch::RemoteIp::IpSpoofAttackError,Turnitin::Errors::SubmissionNotScoredError".freeze
+    IGNORED_CATEGORIES = "404,ActionDispatch::RemoteIp::IpSpoofAttackError,Turnitin::Errors::SubmissionNotScoredError"
 
     def ignored_categories
       Setting.get('ignored_error_report_categories', IGNORED_CATEGORIES).split(',')

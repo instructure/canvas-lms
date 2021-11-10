@@ -20,7 +20,7 @@
 require 'vault'
 
 module Canvas::Vault
-  CACHE_KEY_PREFIX = 'vault/'.freeze
+  CACHE_KEY_PREFIX = 'vault/'
   class MissingVaultSecret < StandardError; end
 
   class << self

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
-  LOG_PREFIX = "RebuildingQuizSubmissions - ".freeze
+  LOG_PREFIX = "RebuildingQuizSubmissions - "
 
   SQL_SEARCH_STRING = <<-SQL
     select

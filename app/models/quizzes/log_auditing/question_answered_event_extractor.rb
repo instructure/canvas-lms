@@ -32,7 +32,6 @@ module Quizzes::LogAuditing
         AND attempt = :attempt
         AND event_type = '#{EVENT_TYPE}'
       SQL
-      .freeze
 
     # Main API. Extract, optimize, and persist an answer event from a given
     # submission data construct.

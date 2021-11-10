@@ -20,9 +20,9 @@
 
 module CanvasSecurity
   class KeyStorage
-    PAST = 'jwk-past.json'.freeze
-    PRESENT = 'jwk-present.json'.freeze
-    FUTURE = 'jwk-future.json'.freeze
+    PAST = 'jwk-past.json'
+    PRESENT = 'jwk-present.json'
+    FUTURE = 'jwk-future.json'
     MAX_CACHE_AGE = 10.days.to_i
     MIN_ROTATION_PERIOD = 1.hour
 

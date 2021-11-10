@@ -22,7 +22,7 @@ module Lti
     class AccessToken
       private_class_method :new
 
-      ISS = 'Canvas'.freeze
+      ISS = 'Canvas'
 
       attr_reader :aud, :sub, :reg_key, :shard_id
 

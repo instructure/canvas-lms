@@ -27,9 +27,9 @@ module RuboCop
               " Selenium::WebDriver::Error::NoSuchElementError" \
               " (just like find_element, etc).\n" \
               "Look through custom_selenium_rspec_matchers.rb" \
-              " and custom_wait_methods.rb.".freeze
+              " and custom_wait_methods.rb."
 
-        BAD_CONST = "Selenium::WebDriver::Wait".freeze
+        BAD_CONST = "Selenium::WebDriver::Wait"
         BAD_CONST_MATCHER = BAD_CONST.split("::")
                                      .map { |name| ":#{name})" }
                                      .join(" ")

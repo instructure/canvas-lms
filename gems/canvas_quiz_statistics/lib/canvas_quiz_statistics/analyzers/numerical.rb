@@ -38,8 +38,8 @@ module CanvasQuizStatistics::Analyzers
     inherit :responses, :full_credit, from: :essay
     inherit :correct, :incorrect, from: :fill_in_multiple_blanks
 
-    RANGE_ANSWER = 'range_answer'.freeze
-    PRECISION_ANSWER = 'precision_answer'.freeze
+    RANGE_ANSWER = 'range_answer'
+    PRECISION_ANSWER = 'precision_answer'
 
     # Statistics for the pre-defined answers.
     #

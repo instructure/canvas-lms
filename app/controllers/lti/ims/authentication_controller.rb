@@ -38,7 +38,7 @@ module Lti
         scope
       ].freeze
       OPTIONAL_PARAMS = ['state'].freeze
-      SCOPE = 'openid'.freeze
+      SCOPE = 'openid'
 
       skip_before_action :load_user, only: :authorize_redirect
       skip_before_action :verify_authenticity_token, only: :authorize_redirect

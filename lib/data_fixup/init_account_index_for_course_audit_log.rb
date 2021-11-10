@@ -20,7 +20,7 @@
 
 module DataFixup
   class InitAccountIndexForCourseAuditLog
-    LAST_BATCH_TABLE = 'courses_index_last_batch'.freeze
+    LAST_BATCH_TABLE = 'courses_index_last_batch'
 
     def self.run
       fixup = new
@@ -57,11 +57,11 @@ module DataFixup
       FROM courses
       WHERE token(id) > token(?)
       LIMIT ?
-    }.freeze
+    }
 
     UPDATE_CQL = %{
       UPDATE courses SET account_id = ? WHERE id = ?
-    }.freeze
+    }
 
     ResultStruct = Struct.new(:index, :record, :key)
 

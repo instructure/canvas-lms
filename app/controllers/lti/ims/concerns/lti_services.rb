@@ -22,7 +22,7 @@ module Lti::IMS::Concerns
     extend ActiveSupport::Concern
 
     UNIVERSAL_GRANT_HOST = Canvas::Security.config['lti_grant_host'] ||
-                           'canvas.instructure.com'.freeze
+                           'canvas.instructure.com'
 
     class AccessToken
       def initialize(raw_jwt_str)

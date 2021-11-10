@@ -25,20 +25,20 @@ module Gradebook
   extend SeleniumDependencies
 
   # Student Headings
-  STUDENT_COLUMN_MENU_SELECTOR = '.container_0 .Gradebook__ColumnHeaderAction'.freeze
+  STUDENT_COLUMN_MENU_SELECTOR = '.container_0 .Gradebook__ColumnHeaderAction'
 
   # Gradebook Menu
-  GRADEBOOK_MENU_SELECTOR = '[data-component="GradebookMenu"]'.freeze
-  INDIVIDUAL_VIEW_ITEM_SELECTOR = 'individual-gradebook'.freeze
-  GRADE_HISTORY_ITEM_SELECTOR = 'gradebook-history'.freeze
-  LEARING_MASTERY_ITEM_SELECTOR = 'learning-mastery'.freeze
+  GRADEBOOK_MENU_SELECTOR = '[data-component="GradebookMenu"]'
+  INDIVIDUAL_VIEW_ITEM_SELECTOR = 'individual-gradebook'
+  GRADE_HISTORY_ITEM_SELECTOR = 'gradebook-history'
+  LEARING_MASTERY_ITEM_SELECTOR = 'learning-mastery'
 
   # Action Menu
-  ACTION_MENU_SELECTOR = '[data-component="ActionMenu"]'.freeze
-  ACTION_MENU_ITEM_SELECTOR = 'body [data-menu-id="%s"]'.freeze
+  ACTION_MENU_SELECTOR = '[data-component="ActionMenu"]'
+  ACTION_MENU_ITEM_SELECTOR = 'body [data-menu-id="%s"]'
 
   # Menu Items
-  MENU_ITEM_SELECTOR = 'span[data-menu-item-id="%s"]'.freeze
+  MENU_ITEM_SELECTOR = 'span[data-menu-item-id="%s"]'
 
   def self.gradebook_settings_cog
     f('#gradebook-settings-button')

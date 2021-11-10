@@ -20,12 +20,12 @@
 require_relative '../common'
 
 module AdminSettingsCommon
-  SIS_SYNC_ID = "#account_settings_sis_syncing_value".freeze
-  SIS_IMPORT_ID = "#account_allow_sis_import".freeze
-  DUE_DATE_REQUIRED_CHECKBOX_ID = "#account_settings_sis_require_assignment_due_date_value".freeze
-  NAME_LENGTH_ID = "#account_settings_sis_assignment_name_length_value".freeze
-  NAME_LENGTH_VALUE_ID = "#account_settings_sis_assignment_name_length_input_value".freeze
-  DEFAULT_SIS = "#account_settings_sis_default_grade_export_value".freeze
+  SIS_SYNC_ID = "#account_settings_sis_syncing_value"
+  SIS_IMPORT_ID = "#account_allow_sis_import"
+  DUE_DATE_REQUIRED_CHECKBOX_ID = "#account_settings_sis_require_assignment_due_date_value"
+  NAME_LENGTH_ID = "#account_settings_sis_assignment_name_length_value"
+  NAME_LENGTH_VALUE_ID = "#account_settings_sis_assignment_name_length_input_value"
+  DEFAULT_SIS = "#account_settings_sis_default_grade_export_value"
 
   def turn_on_sis_settings(account)
     account.set_feature_flag! 'post_grades', 'on'

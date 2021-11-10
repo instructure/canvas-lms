@@ -33,8 +33,8 @@ module DataFixup::SetActlContextTypeForCourseLevelToolProxies
   end
 
   class ProductFamilyFixer
-    COURSE_CONTEXT_TYPE = 'Course'.freeze
-    ACCOUNT_CONTEXT_TYPE = 'Account'.freeze
+    COURSE_CONTEXT_TYPE = 'Course'
+    ACCOUNT_CONTEXT_TYPE = 'Account'
 
     attr_reader :product_family
 

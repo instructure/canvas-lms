@@ -1582,7 +1582,7 @@ class RoleOverride < ActiveRecord::Base
     }
   )
 
-  ACCESS_TOKEN_SCOPE_PREFIX = 'https://api.instructure.com/auth/canvas'.freeze
+  ACCESS_TOKEN_SCOPE_PREFIX = 'https://api.instructure.com/auth/canvas'
 
   def self.permissions
     Permissions.retrieve

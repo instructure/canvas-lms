@@ -24,7 +24,7 @@ module Lti
     class PlagiarismSubscriptionError < StandardError
     end
 
-    SUBMISSION_EVENT_ID = 'vnd.Canvas.SubmissionEvent'.freeze
+    SUBMISSION_EVENT_ID = 'vnd.Canvas.SubmissionEvent'
     EVENT_TYPES = %w(submission_created
                      plagiarism_resubmit
                      submission_updated
