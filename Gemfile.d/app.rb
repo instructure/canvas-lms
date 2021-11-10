@@ -130,7 +130,7 @@ gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '2.3.0', require: 'zip'
 gem 'saml2', '3.1.1'
   gem 'nokogiri-xmlsec-instructure', '0.10.1', require: false
-gem 'sanitize', '5.2.3', require: false
+gem 'sanitize', '6.0.0', require: false
 gem 'sentry-raven', '2.13.0', require: false
 gem 'simple_oauth', '0.3.1', require: false
 gem 'twilio-ruby', '5.36.0', require: false
