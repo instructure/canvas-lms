@@ -38,7 +38,7 @@ describe Twitter::Messenger do
     let(:connection_mock) { double() }
 
     context "with a twitter service" do
-      before(:each) do
+      before do
         expect(Twitter::Connection).to receive(:from_service_token).with("twitter_token", "twitter_secret").and_return(connection_mock)
       end
 

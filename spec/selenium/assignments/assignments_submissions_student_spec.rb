@@ -40,7 +40,7 @@ describe "submissions" do
       @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => @due_date - 1.day)
     end
 
-    before(:each) do
+    before do
       user_session(@student)
     end
 
@@ -524,12 +524,12 @@ describe "submissions" do
       course_with_student(active_all: true)
     end
 
-    before :each do
+    before do
       user_session @student
     end
 
     shared_examples "shows as excused" do
-      before :each do
+      before do
         assignment.grade_student @student, excuse: true, grader: @teacher
       end
 

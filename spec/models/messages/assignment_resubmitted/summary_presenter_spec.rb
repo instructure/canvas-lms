@@ -45,7 +45,7 @@ describe Messages::AssignmentResubmitted::SummaryPresenter do
     end
 
     context "when the assignment is anonymously graded" do
-      before(:each) do
+      before do
         assignment.update!(anonymous_grading: true)
       end
 

@@ -209,7 +209,7 @@ describe RubricsController do
 
       let(:last_created_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_created').last }
 
-      before(:each) do
+      before do
         user_session(teacher)
       end
 
@@ -690,7 +690,7 @@ describe RubricsController do
       let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
       let(:rubric) { Rubric.create!(title: 'aaa', context: course) }
 
-      before(:each) do
+      before do
         rubric.update_with_association(
           teacher,
           {},

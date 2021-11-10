@@ -44,7 +44,7 @@ describe "assignment" do
       )
     end
 
-    before(:each) do
+    before do
       user_session(@teacher1)
     end
 

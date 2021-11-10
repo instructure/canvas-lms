@@ -212,7 +212,7 @@ describe RubricAssessmentsController do
         }
       end
 
-      before(:each) do
+      before do
         course.enroll_teacher(teacher, enrollment_state: 'active')
         course.enroll_ta(provisional_grader, enrollment_state: 'active')
         course.enroll_ta(interloper, enrollment_state: 'active')
@@ -250,7 +250,7 @@ describe RubricAssessmentsController do
       end
 
       describe 'returned JSON' do
-        before(:each) do
+        before do
           assignment.moderation_graders.create!(user: provisional_grader, anonymous_id: 'noooo')
         end
 
@@ -467,7 +467,7 @@ describe RubricAssessmentsController do
   end
 
   describe 'user ID handling' do
-    before(:each) do
+    before do
       setup_course_assessment
       @assignment.find_or_create_submission(@student1).update!(anonymous_id: 'abcde')
     end

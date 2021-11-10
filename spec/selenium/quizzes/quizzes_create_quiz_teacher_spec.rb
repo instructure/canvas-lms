@@ -35,13 +35,13 @@ describe 'creating a quiz' do
   include WikiAndTinyCommon
 
   context 'as a teacher' do
-    before(:each) do
+    before do
       stub_rcs_config
       course_with_teacher_logged_in(course_name: 'Test Course', active_all: true)
     end
 
     context 'when the course has two sections' do
-      before(:each) do
+      before do
         @section_a = @course.course_sections.first
         @section_b = @course.course_sections.create!(name: 'Section B')
         course_quiz(active: true)
@@ -116,7 +116,7 @@ describe 'creating a quiz' do
     end
 
     context 'when on the quizzes index page' do
-      before(:each) do
+      before do
         get "/courses/#{@course.id}/quizzes"
       end
 

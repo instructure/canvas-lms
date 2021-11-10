@@ -260,7 +260,7 @@ describe Role do
     end
 
     context "with granular_permissions_manage_users FF disabled" do
-      before :each do
+      before do
         course_with_ta
         @course.root_account.disable_feature!(:granular_permissions_manage_users)
       end
@@ -290,7 +290,7 @@ describe Role do
     end
 
     context "with granular_permissions_manage_users FF enabled" do
-      before :each do
+      before do
         course_with_teacher
         @role = custom_account_role("EnrollmentManager", account: @course.account)
         @admin = account_admin_user(account: @course.account, role: @role)

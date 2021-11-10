@@ -24,7 +24,7 @@ describe 'quizzes question with html answers' do
   include_context 'in-process server selenium tests'
   include QuizzesCommon
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in
     stub_rcs_config
   end

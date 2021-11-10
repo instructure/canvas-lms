@@ -641,7 +641,7 @@ describe Account do
   end
 
   context "closest_turnitin_originality" do
-    before :each do
+    before do
       @root_account = Account.create!(:turnitin_pledge => "root")
       @root_account.turnitin_originality = 'after_grading'
       @root_account.save!
@@ -1805,7 +1805,7 @@ describe Account do
       @settings = [:restrict_student_future_view, :lock_all_announcements]
     end
 
-    before :each do
+    before do
       account_model
       @sub1 = @account.sub_accounts.create!
       @sub2 = @sub1.sub_accounts.create!
@@ -2090,7 +2090,7 @@ describe Account do
     specs_require_cache(:redis_cache_store)
 
     describe "cached_account_users_for" do
-      before :each do
+      before do
         @account = Account.create!
         @user = User.create!
       end

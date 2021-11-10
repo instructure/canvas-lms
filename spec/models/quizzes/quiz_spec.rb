@@ -828,7 +828,7 @@ describe Quizzes::Quiz do
     end
 
     describe 'term.end_at when no enrollment_restrictions are present' do
-      before(:each) do
+      before do
         @deadline = 3.days.from_now
         @course.conclude_at = 2.days.from_now
         @course.save!
@@ -849,7 +849,7 @@ describe Quizzes::Quiz do
     end
 
     describe 'course.end_at when course.restrict_enrollments_to_course_dates' do
-      before(:each) do
+      before do
         @deadline = 3.days.from_now
         @course.restrict_enrollments_to_course_dates = true
         @course.conclude_at = @deadline
@@ -878,7 +878,7 @@ describe Quizzes::Quiz do
     end
 
     describe 'section.end_at when section.restrict_enrollments_to_section_dates' do
-      before(:each) do
+      before do
         # when course.end_at or term.end_at doesn't exist
         @deadline = 3.days.from_now
         @start_at = 3.days.ago
@@ -1484,7 +1484,7 @@ describe Quizzes::Quiz do
   end
 
   describe "#update_cached_due_dates?" do
-    before :each do
+    before do
       @quiz = @course.quizzes.create!(title: 'Test Quiz')
     end
 

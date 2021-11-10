@@ -38,7 +38,7 @@ describe "moderated grading assignments" do
   end
 
   context "with assignment moderation setting" do
-    before(:each) do
+    before do
       # turn on the moderation flag
       Account.default.enable_feature!(:anonymous_marking)
       Account.default.enable_feature!(:moderated_grading)
@@ -81,7 +81,7 @@ describe "moderated grading assignments" do
   end
 
   context "with moderator selected" do
-    before(:each) do
+    before do
       # turn on the moderation flag
       Account.default.enable_feature!(:anonymous_marking)
 

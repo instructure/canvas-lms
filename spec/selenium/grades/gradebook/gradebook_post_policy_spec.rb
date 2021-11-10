@@ -74,7 +74,7 @@ describe 'Gradebook Post Policy' do
     )
   end
 
-  before :each do
+  before do
     user_session(@teacher1)
     Gradebook.visit(@course_with_manual_post)
   end
@@ -87,7 +87,7 @@ describe 'Gradebook Post Policy' do
     end
 
     context 'when post everyone' do
-      before :each do
+      before do
         Gradebook.manually_post_grades(@manual_assignment, 'Everyone')
       end
 
@@ -103,7 +103,7 @@ describe 'Gradebook Post Policy' do
     end
 
     context 'when post everyone for section' do
-      before :each do
+      before do
         Gradebook.manually_post_grades(@manual_assignment, 'Everyone', @section2)
       end
 
@@ -138,7 +138,7 @@ describe 'Gradebook Post Policy' do
         @manual_assignment.post_submissions(submission_ids: @submissions.pluck(:id))
       end
 
-      before :each do
+      before do
         Gradebook.click_hide_grades(@manual_assignment.id)
         HideGradesTray.hide_grades
       end
@@ -170,7 +170,7 @@ describe 'Gradebook Post Policy' do
         @manual_assignment.post_submissions(submission_ids: @submissions.pluck(:id))
       end
 
-      before :each do
+      before do
         Gradebook.click_hide_grades(@manual_assignment.id)
         HideGradesTray.select_section(@section2.name)
         HideGradesTray.hide_grades
@@ -199,7 +199,7 @@ describe 'Gradebook Post Policy' do
       @manual_assignment.grade_student(@graded_student, grade: 8, grader: @teacher1)
     end
 
-    before :each do
+    before do
       Gradebook.manually_post_grades(@manual_assignment, 'Graded')
     end
 
@@ -223,7 +223,7 @@ describe 'Gradebook Post Policy' do
       end
     end
 
-    before :each do
+    before do
       Gradebook.manually_post_grades(@manual_assignment, 'Graded', @section2)
     end
 
@@ -249,7 +249,7 @@ describe 'Gradebook Post Policy' do
   end
 
   context 'when Post Policy set to Automatically' do
-    before :each do
+    before do
       user_session(@teacher2)
       Gradebook.visit(@course_with_auto_post)
       Gradebook::Cells.edit_grade(@course_two_students.first, @auto_assignment, '9')
@@ -261,7 +261,7 @@ describe 'Gradebook Post Policy' do
   end
 
   context 'assignment level post policy automatically' do
-    before :each do
+    before do
       Gradebook.click_grade_posting_policy(@manual_assignment.id)
       Gradebook::AssignmentPostingPolicy.post_policy_type_radio_button('Automatically').click
       Gradebook::AssignmentPostingPolicy.save_button.click

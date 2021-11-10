@@ -25,7 +25,7 @@ describe "assignment rubrics" do
   include RubricsCommon
 
   context "assignment rubrics as a teacher" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 
@@ -168,7 +168,7 @@ describe "assignment rubrics" do
     end
 
     context "with the account_level_mastery_scales FF enabled" do
-      before :each do
+      before do
         create_assignment_with_points(2)
         outcome_with_rubric(context: @course.account)
         @course.account.enable_feature!(:account_level_mastery_scales)
@@ -396,7 +396,7 @@ describe "assignment rubrics" do
     end
 
     context "ranged ratings" do
-      before(:each) do
+      before do
         @course.account.root_account.enable_feature!(:rubric_criterion_range)
         @assignment = @course.assignments.create(name: 'assignment with rubric')
         outcome_with_rubric
@@ -565,7 +565,7 @@ describe "assignment rubrics" do
     end
 
     context "non-scoring rubrics" do
-      before(:each) do
+      before do
         @assignment = @course.assignments.create(name: 'NSR assignment')
         outcome_with_rubric
         @rubric.associate_with(@assignment, @course, purpose: 'grading')
@@ -619,7 +619,7 @@ describe "assignment rubrics" do
     end
 
     context "criterion copy" do
-      before(:each) do
+      before do
         @course.account.root_account.enable_feature!(:rubric_criterion_range)
         @assignment = @course.assignments.create(name: 'assignment with rubric')
         outcome_with_rubric
@@ -658,7 +658,7 @@ describe "assignment rubrics" do
   end
 
   context "assignment rubrics as a student" do
-    before(:each) do
+    before do
       course_with_student_logged_in
     end
 
@@ -715,7 +715,7 @@ describe "assignment rubrics" do
   end
 
   context "assignment rubrics as an designer" do
-    before(:each) do
+    before do
       course_with_designer_logged_in
     end
 

@@ -25,7 +25,7 @@ describe "add_people" do
   let(:enrollee_count) { 0 }
 
   context "as a teacher" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       4.times { |i| add_section("Section #{i}") }
       user_with_pseudonym(:name => "Foo Foo", :active_user => true, :username => "foo", :account => @account)
@@ -180,7 +180,7 @@ describe "add_people" do
   end
 
   context('as an admin') do
-    before(:each) do
+    before do
       course_with_admin_logged_in
     end
 

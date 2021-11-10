@@ -25,7 +25,7 @@ describe "assignments" do
   include AssignmentsCommon
 
   context "as observer" do
-    before(:each) do
+    before do
       @course   = course_factory(active_all: true)
       @student  = user_factory(active_all: true, :active_state => 'active')
       @observer = user_factory(active_all: true, :active_state => 'active')
@@ -38,7 +38,7 @@ describe "assignments" do
     end
 
     context "when not linked to student" do
-      before(:each) do
+      before do
         @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
       end
 
@@ -62,7 +62,7 @@ describe "assignments" do
     end
 
     context "when linked to student" do
-      before(:each) do
+      before do
         @student_enrollment = @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :section => @section2)
         @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :section => @section2)
         @observer_enrollment.update_attribute(:associated_user_id, @student.id)
@@ -76,7 +76,7 @@ describe "assignments" do
       end
 
       context "overridden lock_at" do
-        before(:each) do
+        before do
           setup_sections_and_overrides_all_future
           @course.enroll_user(@student, 'StudentEnrollment', :section => @section2, :enrollment_state => 'active')
         end

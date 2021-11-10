@@ -72,7 +72,7 @@ describe "Course Account Reports" do
   end
 
   describe "unpublished courses" do
-    before(:each) do
+    before do
       @report = 'unpublished_courses_csv'
     end
 
@@ -107,7 +107,7 @@ describe "Course Account Reports" do
   end
 
   describe "deleted courses" do
-    before(:each) do
+    before do
       @report = 'recently_deleted_courses_csv'
     end
 

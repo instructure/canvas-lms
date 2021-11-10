@@ -37,7 +37,7 @@ describe "permissions index" do
   end
 
   describe "editing role info" do
-    before :each do
+    before do
       user_session(@admin)
       @custom_student_role = custom_student_role("A Kitty")
       PermissionsIndex.visit(@account)
@@ -57,7 +57,7 @@ describe "permissions index" do
   end
 
   describe "Add Role" do
-    before :each do
+    before do
       user_session(@admin)
       PermissionsIndex.visit(@account)
     end
@@ -78,7 +78,7 @@ describe "permissions index" do
 
   describe "permissions table" do
     context "root account" do
-      before :each do
+      before do
         user_session(@admin)
       end
 
@@ -145,7 +145,7 @@ describe "permissions index" do
     end
 
     context "subaccount" do
-      before :each do
+      before do
         user_session(@admin)
       end
 
@@ -159,7 +159,7 @@ describe "permissions index" do
   end
 
   context "in the permissions tray" do
-    before :each do
+    before do
       admin_logged_in
       @role = custom_teacher_role('test role', account: @account)
       @permission_name = 'manage_students'
@@ -175,7 +175,7 @@ describe "permissions index" do
   end
 
   context "main controls" do
-    before(:each) do
+    before do
       user_session(@admin)
       PermissionsIndex.visit(Account.default)
     end

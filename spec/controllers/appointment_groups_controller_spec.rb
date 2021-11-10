@@ -62,7 +62,7 @@ describe AppointmentGroupsController do
     @group_ag.publish!
   end
 
-  before :each do
+  before do
     user_session @student
   end
 

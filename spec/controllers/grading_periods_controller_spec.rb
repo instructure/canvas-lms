@@ -188,7 +188,7 @@ describe GradingPeriodsController do
   end
 
   describe "PUT update" do
-    before(:each) do
+    before do
       login_admin
     end
 
@@ -219,7 +219,7 @@ describe GradingPeriodsController do
   end
 
   describe "DELETE destroy" do
-    before(:each) do
+    before do
       login_admin
     end
 
@@ -374,7 +374,7 @@ describe GradingPeriodsController do
         let(:group) { group_helper.legacy_create_for_course(course) }
         let(:period_1) { group.grading_periods.create!(period_1_params) }
 
-        before(:each) do
+        before do
           login_admin
         end
 
@@ -555,7 +555,7 @@ describe GradingPeriodsController do
         let(:group) { group_helper.create_for_account(root_account) }
         let(:period_1) { group.grading_periods.create!(period_1_params) }
 
-        before(:each) do
+        before do
           login_admin
           course.enrollment_term.update_attribute(:grading_period_group_id, group)
         end

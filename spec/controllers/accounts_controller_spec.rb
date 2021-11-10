@@ -36,7 +36,7 @@ describe AccountsController do
   context "confirm_delete_user" do
     before(:once) { account_with_admin }
 
-    before(:each) { user_session(@admin) }
+    before { user_session(@admin) }
 
     it "confirms deletion of canvas-authenticated users" do
       user_with_pseudonym :account => @account
@@ -59,7 +59,7 @@ describe AccountsController do
   context "remove_user" do
     before(:once) { account_with_admin }
 
-    before(:each) { user_session(@admin) }
+    before { user_session(@admin) }
 
     it "removes user from the account" do
       user_with_pseudonym :account => @account
@@ -142,7 +142,7 @@ describe AccountsController do
       @deleted_user.destroy
     end
 
-    before(:each) { user_session(@site_admin) }
+    before { user_session(@site_admin) }
 
     it 'allows site-admins to restore deleted users' do
       put 'restore_user', params: { account_id: @account.id, user_id: @deleted_user.id }
@@ -190,7 +190,7 @@ describe AccountsController do
   describe "add_account_user" do
     before(:once) { account_with_admin }
 
-    before(:each) { user_session(@admin) }
+    before { user_session(@admin) }
 
     it "allows adding a new account admin" do
       post 'add_account_user', params: { :account_id => @account.id, :role_id => admin_role.id, :user_list => 'testadmin@example.com' }
@@ -514,7 +514,7 @@ describe AccountsController do
           @user = account_admin_user(account: @account)
         end
 
-        before :each do
+        before do
           user_session(@user)
         end
 
@@ -545,7 +545,7 @@ describe AccountsController do
           @user = account_admin_user(account: @root_account)
         end
 
-        before :each do
+        before do
           user_session(@user)
         end
 
@@ -617,7 +617,7 @@ describe AccountsController do
         @account.save!
       end
 
-      before :each do
+      before do
         user_session(@user)
       end
 
@@ -707,7 +707,7 @@ describe AccountsController do
     context "turnitin" do
       before(:once) { account_with_admin }
 
-      before(:each) { user_session(@admin) }
+      before { user_session(@admin) }
 
       it "allows setting turnitin values" do
         post 'update', params: { :id => @account.id, :account => {
@@ -751,7 +751,7 @@ describe AccountsController do
     context "terms of service settings" do
       before(:once) { account_with_admin }
 
-      before(:each) { user_session(@admin) }
+      before { user_session(@admin) }
 
       it "is able to set and update a custom terms of service" do
         post 'update', params: { :id => @account.id, :account => {
@@ -1688,7 +1688,7 @@ describe AccountsController do
   end
 
   describe "#eportfolio_moderation" do
-    before(:each) do
+    before do
       account_with_admin_logged_in
 
       author.eportfolios.create!(name: "boring")

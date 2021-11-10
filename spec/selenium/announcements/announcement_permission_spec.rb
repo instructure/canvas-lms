@@ -35,7 +35,7 @@ describe 'announcement permissions' do
   extend DiscussionHelpers::SetupContext
 
   context 'discussion created by teacher' do
-    before :each do
+    before do
       course_with_teacher(active_all: true, name: 'teacher1')
       @discussion_topic = DiscussionHelpers.create_discussion_topic(
         @course,
@@ -48,7 +48,7 @@ describe 'announcement permissions' do
     end
 
     shared_examples 'allow announcement view with discussions disallowed' do |context|
-      before :each do
+      before do
         enable_view_announcements(@course, context_role)
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
@@ -85,7 +85,7 @@ describe 'announcement permissions' do
     end
 
     shared_examples 'disallow announcement view with discussions disallowed' do |context|
-      before :each do
+      before do
         disable_view_announcements(@course, context_role)
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
@@ -114,7 +114,7 @@ describe 'announcement permissions' do
     end
 
     shared_examples 'disallow discussion topic view with announcements allowed' do |context|
-      before :each do
+      before do
         enable_view_announcements(@course, context_role)
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
@@ -156,7 +156,7 @@ describe 'announcement permissions' do
     end
 
     shared_examples 'disallow discussion detail view with announcements allowed' do |context|
-      before :each do
+      before do
         enable_view_announcements(@course, context_role)
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
@@ -189,7 +189,7 @@ describe 'announcement permissions' do
   end
 
   context 'discussion created by student' do
-    before :each do
+    before do
       course_with_student(active_all: true, name: 'student1')
       @discussion_topic = DiscussionHelpers.create_discussion_topic(
         @course,
@@ -202,7 +202,7 @@ describe 'announcement permissions' do
     end
 
     shared_examples 'disallow discussion detail view with announcements allowed' do |context|
-      before :each do
+      before do
         enable_view_announcements(@course, context_role)
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)

@@ -479,7 +479,7 @@ describe Login::CanvasController do
       @user.save!
     end
 
-    before :each do
+    before do
       allow_any_instance_of(ActionController::TestRequest).to receive(:remote_ip).and_return('127.0.0.1')
     end
 
@@ -523,7 +523,7 @@ describe Login::CanvasController do
       user_with_pseudonym(:active_all => 1, :password => 'qwertyuiop')
     end
 
-    before :each do
+    before do
       redis = double('Redis')
       allow(redis).to receive(:setex)
       allow(redis).to receive(:hmget)

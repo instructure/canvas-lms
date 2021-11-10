@@ -29,7 +29,7 @@ module Lti
 
     before(:once) { attachment_model }
 
-    before :each do
+    before do
       course_factory(active_all: true)
       message_handler.update(message_type: 'basic-lti-launch-request')
       student_in_course active_all: true
@@ -66,7 +66,7 @@ module Lti
     end
 
     describe "GET assignments/:assignment_id/originality_report/submissions/:submission_id/:id (#show)" do
-      before :each do
+      before do
         report_initial_values = {
           attachment: @attachment,
           originality_score: 0.5,
@@ -262,7 +262,7 @@ module Lti
     end
 
     describe "PUT assignments/:assignment_id/originality_report (#update)" do
-      before :each do
+      before do
         report_initial_values = {
           attachment: @attachment,
           originality_score: 0.5,
@@ -1010,7 +1010,7 @@ module Lti
       end
 
       context "optional params" do
-        before :each do
+        before do
           report_file = @attachment.dup
           report_file.save!
 

@@ -27,7 +27,7 @@ describe EportfolioCategory do
   describe "callbacks" do
     describe "#check_for_spam" do
       context "when the setting has a value" do
-        before(:each) do
+        before do
           Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
         end
 

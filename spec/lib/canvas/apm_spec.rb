@@ -20,7 +20,7 @@
 require_relative "apm_common"
 
 describe Canvas::Apm do
-  after(:each) do
+  after do
     Canvas::DynamicSettings.config = nil
     Canvas::DynamicSettings.reset_cache!
     Canvas::DynamicSettings.fallback_data = nil

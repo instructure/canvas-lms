@@ -48,7 +48,7 @@ describe "master courses - child courses - module item locking" do
       @normal_tag = @mod.add_item(id: @assmt.id, type: "assignment")
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 
@@ -125,7 +125,7 @@ describe "master courses - child courses - module item locking" do
       @header_tag = @mod.add_item(:type => 'context_module_sub_header', :title => 'header')
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 

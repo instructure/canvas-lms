@@ -30,7 +30,7 @@ describe "Gradebook - concluded courses and enrollments" do
 
   before(:once) { gradebook_data_setup }
 
-  before(:each) { user_session(@teacher) }
+  before { user_session(@teacher) }
 
   let(:conclude_student_1) { @student_1.enrollments.where(course_id: @course).first.conclude }
   let(:deactivate_student_1) { @student_1.enrollments.where(course_id: @course).first.deactivate }

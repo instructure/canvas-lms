@@ -48,7 +48,7 @@ describe ProfileController do
     end
 
     describe "other user's profile" do
-      before :each do
+      before do
         # to allow viewing other user's profile
         allow(@controller).to receive(:api_request?).and_return(true)
       end
@@ -182,7 +182,7 @@ describe ProfileController do
       @user.register
     end
 
-    before :each do
+    before do
       # reload to catch the user change
       user_session(@user, @pseudonym.reload)
     end

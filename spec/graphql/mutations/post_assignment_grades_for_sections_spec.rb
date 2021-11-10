@@ -60,7 +60,7 @@ describe Mutations::PostAssignmentGradesForSections do
     CanvasSchema.execute(mutation_str, context: context)
   end
 
-  before(:each) do
+  before do
     @section1_student = section1.enroll_user(User.create!, "StudentEnrollment", "active").user
     @section2_student = section2.enroll_user(User.create!, "StudentEnrollment", "active").user
   end
@@ -180,7 +180,7 @@ describe Mutations::PostAssignmentGradesForSections do
       context "when the poster has limited visibility" do
         let(:ta) { User.create! }
 
-        before(:each) do
+        before do
           course.enroll_ta(ta, enrollment_state: "active", section: section1, limit_privileges_to_course_section: true)
         end
 
@@ -204,7 +204,7 @@ describe Mutations::PostAssignmentGradesForSections do
       let(:section1_user_ids) { section1.enrollments.pluck(:user_id) }
       let(:section1_submissions) { assignment.submissions.where(user_id: section1_user_ids) }
 
-      before(:each) do
+      before do
         @section1_student2 = User.create!
         section1.enroll_user(@section1_student2, "StudentEnrollment", "active")
         @student1_submission = assignment.submissions.find_by(user: @section1_student)
@@ -264,7 +264,7 @@ describe Mutations::PostAssignmentGradesForSections do
         )
       end
 
-      before(:each) do
+      before do
         section1.enroll_user(student, "StudentEnrollment", "active")
         teacher.update!(email: "fakeemail@example.com", workflow_state: :registered)
         teacher.email_channel.update!(workflow_state: :active)

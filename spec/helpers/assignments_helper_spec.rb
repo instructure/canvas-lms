@@ -184,7 +184,7 @@ describe AssignmentsHelper do
     let(:reviewee) { course.enroll_student(User.create!, active_all: true).user }
     let(:assessment) { assignment.submission_for_student(reviewer).assigned_assessments.first }
 
-    before(:each) do
+    before do
       assignment.assign_peer_review(reviewer, reviewee)
 
       # Avoid having to go down a rabbit hole of imports

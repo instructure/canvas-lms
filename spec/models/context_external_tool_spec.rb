@@ -1797,7 +1797,7 @@ describe ContextExternalTool do
   end
 
   describe "default_label" do
-    append_before(:each) do
+    append_before do
       @tool = @root_account.context_external_tools.new(:consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com", :name => "tool name")
     end
 
@@ -1813,7 +1813,7 @@ describe ContextExternalTool do
   end
 
   describe "label_for" do
-    append_before(:each) do
+    append_before do
       @tool = @root_account.context_external_tools.new(:name => 'tool', :consumer_key => '12345', :shared_secret => 'secret', :url => "http://example.com")
     end
 
@@ -2427,7 +2427,7 @@ describe ContextExternalTool do
       let(:account) { account_model }
 
       shared_examples_for 'finds related assignments' do
-        before :each do
+        before do
           # assignments that should never get returned
           diff_context = assignment_model(context: course_model)
           ContentTag.create!(context: diff_context, content: old_tool)

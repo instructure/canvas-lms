@@ -23,7 +23,7 @@ describe MessagesController do
     context "an admin user" do
       before(:once) { site_admin_user }
 
-      before(:each) { user_session(@user) }
+      before { user_session(@user) }
 
       it "is able to access the page" do
         post 'create', params: { :user_id => @user.to_param }

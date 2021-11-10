@@ -26,7 +26,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
   include AssignmentsCommon
 
   context "Student" do
-    before :each do
+    before do
       course_with_student_logged_in
       da_setup
       create_da_assignment
@@ -98,7 +98,7 @@ describe "interaction with differentiated assignments on the dashboard and calen
   end
 
   context "Observer with student" do
-    before :each do
+    before do
       observer_setup
       da_setup
       create_da_assignment

@@ -28,7 +28,7 @@ describe ConferencesController do
     student_in_course(active_all: true, user: user_with_pseudonym(active_all: true))
   end
 
-  before :each do
+  before do
     allow(BigBlueButtonConference).to receive(:send_request).and_return('')
     allow(BigBlueButtonConference).to receive(:get_auth_token).and_return('abc123')
   end

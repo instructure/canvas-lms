@@ -26,7 +26,7 @@ describe CalendarsController do
 
   before(:once) { course_with_student(active_all: true) }
 
-  before(:each) { user_session(@student) }
+  before { user_session(@student) }
 
   describe "GET 'show'" do
     it "does not redirect to the old calendar even with default settings" do

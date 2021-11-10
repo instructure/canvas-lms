@@ -31,7 +31,7 @@ describe "announcements" do
       course_with_teacher(user: @teacher, active_course: true, active_enrollment: true)
     end
 
-    before :each do
+    before do
       user_session(@teacher)
       stub_rcs_config
     end
@@ -257,7 +257,7 @@ describe "announcements" do
     end
 
     context "in a homeroom course" do
-      before :each do
+      before do
         @course.account.enable_as_k5_account!
         @course.homeroom_course = true
         @course.save!

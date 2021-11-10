@@ -115,7 +115,7 @@ describe CollaborationsController do
   end
 
   describe "GET 'members'" do
-    before(:each) do
+    before do
       @collab = @course.collaborations.create!(
         title: "accessible",
         user: @student,
@@ -130,7 +130,7 @@ describe CollaborationsController do
     end
 
     context "with user access token" do
-      before(:each) do
+      before do
         pseudonym(@student)
         @student.save!
         enable_default_developer_key!
@@ -242,7 +242,7 @@ describe CollaborationsController do
         course_with_teacher(:active_all => true)
       end
 
-      before :each do
+      before do
         user_session(@teacher)
         get 'show', params: { :course_id => @course.id, :id => collaboration.id }
       end

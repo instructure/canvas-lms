@@ -301,7 +301,7 @@ describe "Wiki Pages" do
   end
 
   context "embed video in a Page" do
-    before :each do
+    before do
       course_with_teacher_logged_in :account => @account, :active_all => true
       @course.wiki_pages.create!(title: 'Page1')
     end

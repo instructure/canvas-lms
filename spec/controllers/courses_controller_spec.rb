@@ -24,7 +24,7 @@ describe CoursesController do
   include K5Common
 
   describe "GET 'index'" do
-    before(:each) do
+    before do
       controller.instance_variable_set(:@domain_root_account, Account.default)
     end
 
@@ -651,7 +651,7 @@ describe CoursesController do
     describe "per-assignment permissions" do
       let(:assignment_permissions) { assigns[:js_env][:PERMISSIONS][:by_assignment_id] }
 
-      before(:each) do
+      before do
         @course = Course.create!(default_view: "assignments")
         @teacher = course_with_user("TeacherEnrollment", course: @course, active_all: true).user
         @ta = course_with_user("TaEnrollment", course: @course, active_all: true).user
@@ -687,7 +687,7 @@ describe CoursesController do
     end
 
     describe 'Course notification settings' do
-      before(:each) do
+      before do
         @course = Course.create!(default_view: "assignments")
         @teacher = course_with_user("TeacherEnrollment", course: @course, active_all: true).user
       end
@@ -1205,7 +1205,7 @@ describe CoursesController do
         @c2 = @s2.add_comment(:author => @teacher, :comment => "some comment2")
       end
 
-      before(:each) do
+      before do
         user_session(@me)
       end
 
@@ -1749,7 +1749,7 @@ describe CoursesController do
           @student.enrollments.destroy_all
         end
 
-        before :each do
+        before do
           user_session(@student)
         end
 
@@ -1846,7 +1846,7 @@ describe CoursesController do
         toggle_k5_setting(@course.account)
       end
 
-      before :each do
+      before do
         user_session(@student)
       end
 
@@ -2551,7 +2551,7 @@ describe CoursesController do
     end
 
     describe "touching content when public visibility changes" do
-      before :each do
+      before do
         user_session(@teacher)
         @assignment = @course.assignments.create!(:name => "name")
         @time = 1.day.ago
@@ -2605,7 +2605,7 @@ describe CoursesController do
     end
 
     describe "course images" do
-      before :each do
+      before do
         user_session(@teacher)
       end
 
@@ -2682,7 +2682,7 @@ describe CoursesController do
     end
 
     describe 'course colors' do
-      before :each do
+      before do
         user_session(@teacher)
       end
 
@@ -2726,7 +2726,7 @@ describe CoursesController do
         ta_in_course
       end
 
-      before :each do
+      before do
         user_session(@admin)
       end
 
@@ -2904,7 +2904,7 @@ describe CoursesController do
   describe "POST 'self_unenrollment'" do
     before(:once) { course_with_student(:active_all => true) }
 
-    before(:each) { user_session(@student) }
+    before { user_session(@student) }
 
     it "unenrolls" do
       @enrollment.update_attribute(:self_enrolled, true)
@@ -3296,7 +3296,7 @@ describe CoursesController do
         account_admin_user :account => @account
       end
 
-      before :each do
+      before do
         user_session @user
       end
 
@@ -3347,7 +3347,7 @@ describe CoursesController do
           @account.account_users.create!(user: @user, role: role)
         end
 
-        before :each do
+        before do
           user_session @user
         end
 
@@ -3378,7 +3378,7 @@ describe CoursesController do
           @account.account_users.create!(user: @user, role: role)
         end
 
-        before :each do
+        before do
           user_session @user
         end
 
@@ -3415,7 +3415,7 @@ describe CoursesController do
           course_with_teacher(:account => @account, :active_all => true)
         end
 
-        before(:each) { user_session(@teacher) }
+        before { user_session(@teacher) }
 
         it "ignores storage_quota" do
           post 'update', params: { :id => @course.id, :course =>
@@ -3968,7 +3968,7 @@ describe CoursesController do
       @course = course_factory(active_all: true)
     end
 
-    before :each do
+    before do
       user_session(@user)
     end
 

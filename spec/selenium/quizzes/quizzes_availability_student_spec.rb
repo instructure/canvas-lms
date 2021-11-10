@@ -26,10 +26,10 @@ describe 'Taking a quiz as a student' do
   include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
 
-  before(:each) { course_with_student_logged_in }
+  before { course_with_student_logged_in }
 
   context 'when the available from date is in the future' do
-    before(:each) do
+    before do
       create_quiz_with_due_date(
         unlock_at: default_time_for_unlock_date(1.day.from_now),
         due_at: default_time_for_due_date(2.days.from_now)
@@ -45,7 +45,7 @@ describe 'Taking a quiz as a student' do
   end
 
   context 'when the available until date is in the past' do
-    before(:each) do
+    before do
       create_quiz_with_due_date(
         due_at: default_time_for_due_date(2.days.ago),
         lock_at: default_time_for_lock_date(1.day.ago)
@@ -61,7 +61,7 @@ describe 'Taking a quiz as a student' do
   end
 
   context 'when the due date is in the past' do
-    before(:each) do
+    before do
       create_quiz_with_due_date(
         due_at: default_time_for_due_date(Time.zone.now.advance(days: -1))
       )

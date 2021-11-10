@@ -50,7 +50,7 @@ describe "Exporters::ZipExporter" do
       end
 
       context "when exporting a published attachment" do
-        before(:each) do
+        before do
           attachment_model(
             context: course,
             folder: folder,
@@ -63,13 +63,13 @@ describe "Exporters::ZipExporter" do
         subject { exporter.export }
 
         context "when the user is an active teacher" do
-          before(:each) { @user = teacher }
+          before { @user = teacher }
 
           it_behaves_like "exports for users with file access"
         end
 
         context "when the user is a concluded teacher" do
-          before(:each) do
+          before do
             teacher.enrollments.find_by(course: course).conclude
             @user = teacher
           end
@@ -78,14 +78,14 @@ describe "Exporters::ZipExporter" do
         end
 
         context "when the user is a student" do
-          before(:each) { @user = student }
+          before { @user = student }
 
           it_behaves_like "exports for users with file access"
         end
       end
 
       context "when exporting an unpublished attachment" do
-        before(:each) do
+        before do
           attachment_model(
             context: course,
             folder: folder,
@@ -99,13 +99,13 @@ describe "Exporters::ZipExporter" do
         subject { exporter.export }
 
         context "when the user is an active teacher" do
-          before(:each) { @user = teacher }
+          before { @user = teacher }
 
           it_behaves_like "exports for users with file access"
         end
 
         context "when the user is a concluded teacher" do
-          before(:each) do
+          before do
             teacher.enrollments.find_by(course: course).conclude
             @user = teacher
           end
@@ -114,14 +114,14 @@ describe "Exporters::ZipExporter" do
         end
 
         context "when the user is a student" do
-          before(:each) { @user = student }
+          before { @user = student }
 
           it_behaves_like "exports for users without file access"
         end
       end
 
       context "when exporting an availability locked attachment" do
-        before(:each) do
+        before do
           attachment_model(
             context: course,
             folder: folder,
@@ -136,13 +136,13 @@ describe "Exporters::ZipExporter" do
         subject { exporter.export }
 
         context "when the user is an active teacher" do
-          before(:each) { @user = teacher }
+          before { @user = teacher }
 
           it_behaves_like "exports for users with file access"
         end
 
         context "when the user is a concluded teacher" do
-          before(:each) do
+          before do
             teacher.enrollments.find_by(course: course).conclude
             @user = teacher
           end
@@ -151,14 +151,14 @@ describe "Exporters::ZipExporter" do
         end
 
         context "when the user is a student" do
-          before(:each) { @user = student }
+          before { @user = student }
 
           it_behaves_like "exports for users without file access"
         end
       end
 
       context "when exporting a hidden attachment" do
-        before(:each) do
+        before do
           attachment_model(
             context: course,
             file_state: "hidden",
@@ -172,13 +172,13 @@ describe "Exporters::ZipExporter" do
         subject { exporter.export }
 
         context "when the user is an active teacher" do
-          before(:each) { @user = teacher }
+          before { @user = teacher }
 
           it_behaves_like "exports for users with file access"
         end
 
         context "when the user is a concluded teacher" do
-          before(:each) do
+          before do
             teacher.enrollments.find_by(course: course).conclude
             @user = teacher
           end
@@ -187,7 +187,7 @@ describe "Exporters::ZipExporter" do
         end
 
         context "when the user is a student" do
-          before(:each) { @user = student }
+          before { @user = student }
           # This is different from the spec in this test file where there is no
           # attachment when exporting a hidden folder, but the UI allows for
           # downloading hidden attachments when the user has a direct link.
@@ -209,7 +209,7 @@ describe "Exporters::ZipExporter" do
       end
 
       context "when exporting a published folder with published files" do
-        before(:each) do
+        before do
           attachment_model(
             context: course,
             folder: folder,
@@ -222,13 +222,13 @@ describe "Exporters::ZipExporter" do
         subject { exporter.export }
 
         context "when the user is an active teacher" do
-          before(:each) { @user = teacher }
+          before { @user = teacher }
 
           it_behaves_like "exports for users with file access"
         end
 
         context "when the user is a concluded teacher" do
-          before(:each) do
+          before do
             teacher.enrollments.find_by(course: course).conclude
             @user = teacher
           end
@@ -237,14 +237,14 @@ describe "Exporters::ZipExporter" do
         end
 
         context "when the user is a student" do
-          before(:each) { @user = student }
+          before { @user = student }
 
           it_behaves_like "exports for users with file access"
         end
       end
 
       context "when exporting an unpublished folder containing unpublished files" do
-        before(:each) do
+        before do
           folder.update!(locked: true)
 
           attachment_model(
@@ -260,13 +260,13 @@ describe "Exporters::ZipExporter" do
         subject { exporter.export }
 
         context "when the user is an active teacher" do
-          before(:each) { @user = teacher }
+          before { @user = teacher }
 
           it_behaves_like "exports for users with file access"
         end
 
         context "when the user is a concluded teacher" do
-          before(:each) do
+          before do
             teacher.enrollments.find_by(course: course).conclude
             @user = teacher
           end
@@ -275,14 +275,14 @@ describe "Exporters::ZipExporter" do
         end
 
         context "when the user is a student" do
-          before(:each) { @user = student }
+          before { @user = student }
 
           it_behaves_like "exports for users without file access"
         end
       end
 
       context "when exporting an availability locked folder with availability locked files" do
-        before(:each) do
+        before do
           folder.update!(lock_at: 1.day.ago, unlock_at: 3.days.ago)
 
           attachment_model(
@@ -299,13 +299,13 @@ describe "Exporters::ZipExporter" do
         subject { exporter.export }
 
         context "when the user is an active teacher" do
-          before(:each) { @user = teacher }
+          before { @user = teacher }
 
           it_behaves_like "exports for users with file access"
         end
 
         context "when the user is a concluded teacher" do
-          before(:each) do
+          before do
             teacher.enrollments.find_by(course: course).conclude
             @user = teacher
           end
@@ -314,14 +314,14 @@ describe "Exporters::ZipExporter" do
         end
 
         context "when the user is a student" do
-          before(:each) { @user = student }
+          before { @user = student }
 
           it_behaves_like "exports for users without file access"
         end
       end
 
       context "when exporting a hidden folder with hidden files" do
-        before(:each) do
+        before do
           folder.update!(workflow_state: "hidden")
 
           attachment_model(
@@ -337,13 +337,13 @@ describe "Exporters::ZipExporter" do
         subject { exporter.export }
 
         context "when the user is an active teacher" do
-          before(:each) { @user = teacher }
+          before { @user = teacher }
 
           it_behaves_like "exports for users with file access"
         end
 
         context "when the user is a concluded teacher" do
-          before(:each) do
+          before do
             teacher.enrollments.find_by(course: course).conclude
             @user = teacher
           end
@@ -352,7 +352,7 @@ describe "Exporters::ZipExporter" do
         end
 
         context "when the user is a student" do
-          before(:each) { @user = student }
+          before { @user = student }
 
           it_behaves_like "exports for users without file access"
         end

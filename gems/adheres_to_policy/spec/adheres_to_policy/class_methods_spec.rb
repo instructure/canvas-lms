@@ -21,7 +21,7 @@
 require 'spec_helper'
 
 describe AdheresToPolicy::ClassMethods do
-  before(:each) do
+  before do
     @some_class = Class.new do
       extend AdheresToPolicy::ClassMethods
     end

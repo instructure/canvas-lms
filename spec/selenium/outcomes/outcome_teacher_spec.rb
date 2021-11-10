@@ -124,7 +124,7 @@ describe "outcomes as a teacher" do
   end
 
   context "bulk groups and outcomes" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 
@@ -165,7 +165,7 @@ describe "outcomes as a teacher" do
   end
 
   context "moving outcomes tree" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       who_to_login == 'teacher' ? @context = @course : @context = account
     end

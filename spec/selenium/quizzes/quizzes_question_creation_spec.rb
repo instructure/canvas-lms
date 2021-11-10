@@ -24,12 +24,12 @@ describe 'quizzes question creation' do
   include_context "in-process server selenium tests"
   include QuizzesCommon
 
-  before(:each) do
+  before do
     stub_rcs_config
   end
 
   context 'when creating a new question' do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       @last_quiz = start_quiz_question
     end
@@ -431,7 +431,7 @@ describe 'quizzes question creation' do
       @quiz.reload
     end
 
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       quiz_questions_creation
     end
@@ -450,7 +450,7 @@ describe 'quizzes question creation' do
   end
 
   context 'when creating a new quiz question group' do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 
@@ -463,7 +463,7 @@ describe 'quizzes question creation' do
   end
 
   context 'when editing a quiz question' do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       @quiz = @course.quizzes.create!(title: 'new quiz')
     end
@@ -495,7 +495,7 @@ describe 'quizzes question creation' do
   end
 
   context 'when editing a quiz question group' do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 

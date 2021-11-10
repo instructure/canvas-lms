@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Canvas::CacheRegister do
-  before :each do
+  before do
     skip("require redis") unless Canvas.redis_enabled?
     allow(Canvas::CacheRegister).to receive(:enabled?).and_return(true)
   end
@@ -188,7 +188,7 @@ describe Canvas::CacheRegister do
       context "with sharding" do
         specs_require_sharding
 
-        before :each do
+        before do
           @users = []
           @users << User.create!
           @shard1.activate { @users << User.create! }
@@ -361,7 +361,7 @@ describe Canvas::CacheRegister do
     specs_require_sharding
     specs_require_cache(:redis_cache_store)
 
-    before :each do
+    before do
       @user = @shard1.activate { User.create! }
       @base_key = User.base_cache_register_key_for(@user)
     end

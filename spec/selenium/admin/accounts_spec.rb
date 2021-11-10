@@ -22,7 +22,7 @@ require_relative '../common'
 describe "account" do
   include_context "in-process server selenium tests"
 
-  before(:each) do
+  before do
     course_with_admin_logged_in
   end
 

@@ -29,7 +29,7 @@ describe 'viewing a quiz with variable due dates on the quiz show page' do
   context 'as a TA in both sections' do
     before(:once) { prepare_vdd_scenario_for_ta }
 
-    before(:each) do
+    before do
       user_session(@ta1)
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     end

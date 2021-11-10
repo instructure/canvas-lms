@@ -38,7 +38,7 @@ module Importers
                :handle_duplicates => nil)
       end
 
-      before :each do
+      before do
         allow(course).to receive(:id).and_return(course_id)
         allow(migration).to receive(:import_object?).with('attachments', migration_id).and_return(true)
       end

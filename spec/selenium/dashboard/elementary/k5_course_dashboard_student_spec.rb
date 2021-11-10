@@ -40,7 +40,7 @@ describe "student k5 course dashboard" do
     student_setup
   end
 
-  before :each do
+  before do
     user_session @student
   end
 

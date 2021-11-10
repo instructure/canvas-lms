@@ -478,7 +478,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       end
 
       context "when the user is a teacher" do
-        before :each do
+        before do
           @current_user = @teacher
         end
 
@@ -527,7 +527,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       end
 
       context "when the user is an admin" do
-        before :each do
+        before do
           @current_user = @admin
         end
 
@@ -822,7 +822,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       end
 
       context "when the user is a teacher" do
-        before :each do
+        before do
           @current_user = @teacher
         end
 
@@ -968,7 +968,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       end
 
       context "when the user is an admin" do
-        before :each do
+        before do
           @current_user = @admin
         end
 

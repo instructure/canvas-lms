@@ -135,7 +135,7 @@ describe GradebookUserIds do
   context "with viewing user's privileges limited" do
     let!(:viewable_section) { @course.course_sections.create! }
 
-    before(:each) do
+    before do
       teacher_in_section(
         viewable_section,
         # we omit allow_multiple_enrollments here to clear this user's existing enrollments

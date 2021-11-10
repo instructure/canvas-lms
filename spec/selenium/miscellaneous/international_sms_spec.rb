@@ -24,7 +24,7 @@ describe "international sms" do
   include_context "in-process server selenium tests"
 
   context "international sms enabled" do
-    before(:each) do
+    before do
       course_with_student_logged_in
       @user.account.enable_feature!(:international_sms)
     end

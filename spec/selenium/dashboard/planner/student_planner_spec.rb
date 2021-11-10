@@ -32,7 +32,7 @@ describe "student planner" do
     @course.enroll_student(@student1).accept!
   end
 
-  before :each do
+  before do
     user_session(@student1)
   end
 
@@ -195,7 +195,7 @@ describe "student planner" do
   context "Create To Do Sidebar" do
     include StudentContextTray
 
-    before :each do
+    before do
       user_session(@student1)
     end
 
@@ -484,7 +484,7 @@ describe "student planner" do
       @future_discussion = graded_discussion_in_the_future
     end
 
-    before :each do
+    before do
       user_session(@student1)
     end
 
@@ -533,7 +533,7 @@ describe "student planner" do
       @course.enroll_teacher(@teacher1).accept!
     end
 
-    before :each do
+    before do
       user_session(@teacher1)
     end
 
@@ -598,7 +598,7 @@ describe "student planner" do
   end
 
   context "interaction with ToDoSidebar" do
-    before :each do
+    before do
       user_session(@student1)
       @todo_item = @student1.planner_notes.create!(todo_date: 2.days.from_now, title: "Some Todo Item")
     end

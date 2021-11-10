@@ -36,7 +36,7 @@ describe 'Screenreader Gradebook Student Information' do
   end
 
   context 'in Student Information section' do
-    before(:each) do
+    before do
       course_setup
       user_session(teacher)
       srgb_page.visit(test_course.id)
@@ -61,7 +61,7 @@ describe 'Screenreader Gradebook Student Information' do
     end
 
     context 'displays no points possible warning' do
-      before(:each) do
+      before do
         @course.apply_assignment_group_weights = true
         @course.save!
         srgb_page.visit(test_course.id)

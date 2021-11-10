@@ -22,12 +22,12 @@ require_relative '../common'
 describe "links", priority: "2" do
   include_context "in-process server selenium tests"
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in
   end
 
   describe "course links" do
-    before(:each) do
+    before do
       get "/courses/#{@course.id}"
     end
 
@@ -104,7 +104,7 @@ describe "links", priority: "2" do
   end
 
   describe "dashboard links" do
-    before(:each) do
+    before do
       get "/"
     end
 

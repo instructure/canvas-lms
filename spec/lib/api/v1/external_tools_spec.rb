@@ -25,7 +25,7 @@ describe Api::V1::ExternalTools do
   let(:controller) { ExternalToolTestController.new }
 
   describe "#external_tool_json" do
-    before(:each) do
+    before do
       course_with_student
     end
 

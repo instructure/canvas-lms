@@ -217,7 +217,7 @@ describe Canvas::LiveEvents do
   end
 
   describe ".wiki_page_updated" do
-    before(:each) do
+    before do
       course_with_teacher
       @page = @course.wiki_pages.create(:title => "old title", :body => "old body")
     end
@@ -264,7 +264,7 @@ describe Canvas::LiveEvents do
   end
 
   describe ".conversation_forwarded" do
-    before(:each) do
+    before do
       @user1 = user_model
       @user2 = user_model
       @convo = Conversation.initiate([@user1, @user2], false)
@@ -491,7 +491,7 @@ describe Canvas::LiveEvents do
       let(:submission) { assignment.submissions.first }
 
       context "with post policies enabled" do
-        before(:each) do
+        before do
           assignment.hide_submissions
         end
 
@@ -693,7 +693,7 @@ describe Canvas::LiveEvents do
     end
 
     describe ".submissions_bulk_updated" do
-      before(:each) do
+      before do
         # This creates a course with a single student and a number of assignments
         # equal to the value of "submissions"
         course_with_student_submissions(submissions: 3)
@@ -867,7 +867,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.assignment_created' do
-    before :each do
+    before do
       course_with_student_submissions
       @assignment = @course.assignments.first
     end
@@ -974,7 +974,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.assignment_updated' do
-    before :each do
+    before do
       course_with_student_submissions
       @assignment = @course.assignments.first
     end

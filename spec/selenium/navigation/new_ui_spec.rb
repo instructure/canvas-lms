@@ -27,7 +27,7 @@ describe 'new ui' do
   include RCENextPage
 
   context 'as teacher' do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 

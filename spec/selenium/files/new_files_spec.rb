@@ -31,7 +31,7 @@ describe "better_file_browsing" do
       course_with_teacher(active_all: true)
     end
 
-    before(:each) do
+    before do
       user_session @teacher
     end
 
@@ -54,7 +54,7 @@ describe "better_file_browsing" do
                @course, "example.pdf")
     end
 
-    before(:each) do
+    before do
       user_session @teacher
     end
 
@@ -74,7 +74,7 @@ describe "better_file_browsing" do
     end
 
     context "from cog icon" do
-      before :each do
+      before do
         get "/courses/#{@course.id}/files"
       end
 
@@ -94,7 +94,7 @@ describe "better_file_browsing" do
     end
 
     context "from cloud icon" do
-      before :each do
+      before do
         get "/courses/#{@course.id}/files"
       end
 
@@ -201,7 +201,7 @@ describe "better_file_browsing" do
   end
 
   context "Search textbox" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       txt_files = ["a_file.txt", "b_file.txt", "c_file.txt"]
       txt_files.map do |text_file|
@@ -224,7 +224,7 @@ describe "better_file_browsing" do
       txt_files.map { |text_file| add_file(fixture_file_upload("files/#{text_file}", 'text/plain'), @course, text_file) }
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 
@@ -314,7 +314,7 @@ describe "better_file_browsing" do
                @course, "a_file.txt")
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
       get "/courses/#{@course.id}/files"
     end
@@ -333,7 +333,7 @@ describe "better_file_browsing" do
   end
 
   context "File Preview" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       add_file(fixture_file_upload('files/a_file.txt', 'text/plain'),
                @course, "a_file.txt")
@@ -378,7 +378,7 @@ describe "better_file_browsing" do
                @user, "a_file.txt")
     end
 
-    before :each do
+    before do
       user_session @teacher
     end
 

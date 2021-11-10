@@ -26,7 +26,7 @@ describe 'quizzes regressions' do
   include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in(course_name: 'teacher course')
     @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
     @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
@@ -51,7 +51,7 @@ describe 'quizzes regressions' do
   end
 
   context 'rubrics' do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       @context = @course
       q = quiz_model

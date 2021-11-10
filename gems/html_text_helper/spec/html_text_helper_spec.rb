@@ -218,7 +218,7 @@ describe HtmlTextHelper do
   end
 
   describe "simplify html" do
-    before(:each) do
+    before do
       @body = <<~END.strip
         <p><strong>This is a bold tag</strong></p>
         <p><em>This is an em tag</em></p>

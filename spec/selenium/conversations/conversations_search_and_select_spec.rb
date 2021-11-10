@@ -54,7 +54,7 @@ describe "conversations index page" do
     end
 
     describe "multi-select" do
-      before(:each) do
+      before do
         @conversations = [conversation(@teacher, @s1, @s2, workflow_state: 'read'),
                           conversation(@teacher, @s1, @s2, workflow_state: 'read'),
                           conversation(@teacher, @s1, @s2, workflow_state: 'read')]

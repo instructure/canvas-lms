@@ -25,7 +25,7 @@ describe "dashboard" do
   include_context "in-process server selenium tests"
 
   context "as a teacher" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in(:active_cc => true)
     end
 
@@ -197,7 +197,7 @@ describe "dashboard" do
     end
 
     describe "Todo Ignore Options Focus Management" do
-      before :each do
+      before do
         assignment = assignment_model({ :submission_types => 'online_text_entry', :course => @course })
         @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
         @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')

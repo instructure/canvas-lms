@@ -20,7 +20,7 @@
 # TODO: Remove this spec once Audits engine extraction is complete.
 # for now leaving it here will confirm the Auditors/Audits shim is operating as expected.
 describe Auditors do
-  after(:each) do
+  after do
     Canvas::DynamicSettings.config = nil
     Canvas::DynamicSettings.reset_cache!
     Canvas::DynamicSettings.fallback_data = nil

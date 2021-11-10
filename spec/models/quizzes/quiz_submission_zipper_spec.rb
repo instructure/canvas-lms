@@ -66,7 +66,7 @@ describe Quizzes::QuizSubmissionZipper do
       @quiz = course_quiz(true)
     end
 
-    before :each do
+    before do
       allow(@quiz).to receive(:quiz_submissions).and_return submission_stubs
       allow(Attachment).to receive(:where).with(id: ["1", "2"]).and_return([attachments.first, attachments.second])
       @zipper = Quizzes::QuizSubmissionZipper.new(:quiz => @quiz,

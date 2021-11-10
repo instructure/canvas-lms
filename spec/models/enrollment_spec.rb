@@ -302,7 +302,7 @@ describe Enrollment do
       user
     end
 
-    before :each do
+    before do
       original_enrollment = @course.enroll_student(student)
       original_enrollment.accept(true)
       assignment.grade_student(student, grade: "10", grader: teacher)
@@ -355,7 +355,7 @@ describe Enrollment do
         @course.update!(allow_final_grade_override: true)
       end
 
-      before(:each) do
+      before do
         allow(@course).to receive(:grading_standard_enabled?).and_return true
       end
 
@@ -452,7 +452,7 @@ describe Enrollment do
         @course.update!(allow_final_grade_override: true)
       end
 
-      before(:each) do
+      before do
         allow(@course).to receive(:grading_standard_enabled?).and_return true
       end
 
@@ -541,7 +541,7 @@ describe Enrollment do
         @course.update!(allow_final_grade_override: true)
       end
 
-      before(:each) do
+      before do
         @course.enable_feature!(:final_grades_override)
         @course.update!(grading_standard_enabled: true)
         @score.update!(override_score: 99.0)
@@ -593,7 +593,7 @@ describe Enrollment do
         @course.update!(allow_final_grade_override: true)
       end
 
-      before(:each) do
+      before do
         @score.update!(override_score: 99.0)
       end
 
@@ -716,7 +716,7 @@ describe Enrollment do
       end
 
       describe '#computed_current_grade' do
-        before(:each) do
+        before do
           @course.grading_standard_enabled = true
           @course.save!
         end
@@ -750,7 +750,7 @@ describe Enrollment do
       end
 
       describe '#unposted_current_grade' do
-        before(:each) do
+        before do
           @course.grading_standard_enabled = true
           @course.save!
         end
@@ -854,7 +854,7 @@ describe Enrollment do
       end
 
       describe '#find_score' do
-        before(:each) do
+        before do
           @course.update!(grading_standard_enabled: true)
           allow(GradeCalculator).to receive(:recompute_final_score)
           @enrollment.scores.create!(current_score: 85.3)
@@ -1014,7 +1014,7 @@ describe Enrollment do
       end
 
       describe '#computed_final_grade' do
-        before(:each) do
+        before do
           @course.grading_standard_enabled = true
           @course.save!
         end
@@ -1070,7 +1070,7 @@ describe Enrollment do
     end
 
     describe 'restoring enrollments directly from soft-deleted to completed state' do
-      before :each do
+      before do
         # Create two enrollments for this course
         @enrollment.save!
         user2 = User.create!
@@ -2646,7 +2646,7 @@ describe Enrollment do
           end
         end
 
-        before :each do
+        before do
           allow(Enrollment).to receive(:cross_shard_invitations?).and_return(true)
           skip "working CommunicationChannel.associated_shards" unless CommunicationChannel.associated_shards('jt@instructure.com').length == 2
         end
@@ -2944,7 +2944,7 @@ describe Enrollment do
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
-      before :each do
+      before do
         course_with_student
         @course.root_account.disable_feature!(:granular_permissions_manage_users)
       end
@@ -2987,7 +2987,7 @@ describe Enrollment do
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
-      before :each do
+      before do
         course_with_student
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @enrollment.reload
@@ -3024,7 +3024,7 @@ describe Enrollment do
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
-      before :each do
+      before do
         course_with_observer
         @course.root_account.disable_feature!(:granular_permissions_manage_users)
       end
@@ -3052,7 +3052,7 @@ describe Enrollment do
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
-      before :each do
+      before do
         course_with_observer
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @enrollment.reload
@@ -3080,7 +3080,7 @@ describe Enrollment do
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
-      before :each do
+      before do
         course_with_teacher
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @enrollment.reload
@@ -3203,7 +3203,7 @@ describe Enrollment do
     end
 
     context "the enrollment is a student enrollment" do
-      before(:each) do
+      before do
         allow(@enrollment).to receive(:student?).and_return(true)
         allow(@enrollment).to receive(:fake_student?).and_return(false)
       end
@@ -3224,7 +3224,7 @@ describe Enrollment do
     end
 
     context "the enrollment is a fake student enrollment" do
-      before(:each) do
+      before do
         allow(@enrollment).to receive(:student?).and_return(false)
         allow(@enrollment).to receive(:fake_student?).and_return(true)
       end
@@ -3490,7 +3490,7 @@ describe Enrollment do
     let(:course) { course_factory }
     let(:enrollment_type) { 'StudentEnrollment' }
 
-    before :each do
+    before do
       MicrosoftSync::Group.create!(course: course)
     end
 
@@ -3501,7 +3501,7 @@ describe Enrollment do
     end
 
     context 'when feature flag is off' do
-      before :each do
+      before do
         course.root_account.disable_feature!(:microsoft_group_enrollments_syncing)
       end
 
@@ -3511,12 +3511,12 @@ describe Enrollment do
     end
 
     context 'when feature flag is on' do
-      before :each do
+      before do
         course.root_account.enable_feature!(:microsoft_group_enrollments_syncing)
       end
 
       context 'when account has turned sync off' do
-        before :each do
+        before do
           course.root_account.settings[:microsoft_sync_enabled] = false
           course.root_account.save!
         end
@@ -3527,7 +3527,7 @@ describe Enrollment do
       end
 
       context 'when account has turned sync on' do
-        before :each do
+        before do
           course.root_account.settings[:microsoft_sync_enabled] = true
           course.root_account.save!
         end

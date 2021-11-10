@@ -56,7 +56,7 @@ describe Api::V1::User do
     user_with_pseudonym(:user => @user)
   end
 
-  before :each do
+  before do
     @test_api = TestUserApi.new
     @test_api.services_enabled = []
     @test_api.request.protocol = 'http'
@@ -311,7 +311,7 @@ describe Api::V1::User do
         @student2 = course_with_student(:course => @course).user
       end
 
-      before :each do
+      before do
         @course.update!(grading_standard_enabled: true)
       end
 
@@ -404,7 +404,7 @@ describe Api::V1::User do
     let(:enrollment_json) { @test_api.enrollment_json(student_enrollment, subject, nil) }
     let(:grades) { enrollment_json.fetch("grades") }
 
-    before(:each) do
+    before do
       course.enable_feature!(:final_grades_override)
       course.update!(allow_final_grade_override: true, grading_standard_enabled: true)
       @course_score = student_enrollment.scores.create!(course_score: true, current_score: 63, final_score: 73, override_score: 99)
@@ -453,7 +453,7 @@ describe Api::V1::User do
         end
 
         context "when no grade override exists" do
-          before(:each) do
+          before do
             @course_score.update!(override_score: nil)
           end
 
@@ -476,7 +476,7 @@ describe Api::V1::User do
       end
 
       context "when Final Grade Override is not allowed" do
-        before(:each) do
+        before do
           course.update!(allow_final_grade_override: false)
         end
 
@@ -498,7 +498,7 @@ describe Api::V1::User do
       end
 
       context "when Final Grade Override is disabled" do
-        before(:each) do
+        before do
           course.disable_feature!(:final_grades_override)
         end
 
@@ -555,7 +555,7 @@ describe Api::V1::User do
         end
 
         context "when no grade override exists" do
-          before(:each) do
+          before do
             @course_score.update!(override_score: nil)
           end
 
@@ -586,7 +586,7 @@ describe Api::V1::User do
       end
 
       context "when Final Grade Override is not allowed" do
-        before(:each) do
+        before do
           course.update!(allow_final_grade_override: false)
         end
 
@@ -616,7 +616,7 @@ describe Api::V1::User do
       end
 
       context "when Final Grade Override is disabled" do
-        before(:each) do
+        before do
           course.disable_feature!(:final_grades_override)
         end
 
@@ -798,7 +798,7 @@ describe "Users API", type: :request do
   end
 
   describe "api_show" do
-    before :each do
+    before do
       @other_user = User.create!(:name => "user name")
       email = "email@somewhere.org"
       @other_user.pseudonyms.create!(:unique_id => email, :account => Account.default) { |p| p.sis_user_id = email }
@@ -1570,7 +1570,7 @@ describe "Users API", type: :request do
     end
 
     context "as an anonymous user" do
-      before :each do
+      before do
         user_factory(active_all: true)
         @user = nil
       end
@@ -2212,7 +2212,7 @@ describe "Users API", type: :request do
   end
 
   context "user files" do
-    before :each do
+    before do
       @context = @user
     end
 
@@ -2319,14 +2319,14 @@ describe "Users API", type: :request do
   end
 
   describe 'Custom Colors' do
-    before :each do
+    before do
       @a = Account.default
       @u = user_factory(active_all: true)
       @a.account_users.create!(user: @u)
     end
 
     describe 'GET custom colors' do
-      before :each do
+      before do
         @user.set_preference(:custom_colors, {
                                "user_#{@user.id}" => "efefef",
                                "course_3" => "ababab"
@@ -2489,14 +2489,14 @@ describe "Users API", type: :request do
   end
 
   describe "dashboard positions" do
-    before :each do
+    before do
       @a = Account.default
       @u = user_factory(active_all: true)
       @a.account_users.create!(user: @u)
     end
 
     describe "GET dashboard positions" do
-      before :each do
+      before do
         @user.set_preference(:dashboard_positions, {
                                "course_1" => 3,
                                "course_2" => 1,
@@ -2821,7 +2821,7 @@ describe "Users API", type: :request do
         @params = { controller: "users", action: "missing_submissions", user_id: @observer.id, format: "json" }
       end
 
-      before :each do
+      before do
         user_session(@observer)
       end
 

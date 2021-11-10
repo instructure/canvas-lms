@@ -201,7 +201,7 @@ describe StreamItem do
       let(:submission) { assignment.submission_for_student(student) }
 
       context "when the submission is not posted" do
-        before(:each) do
+        before do
           assignment.post_policy.update!(post_manually: true)
         end
 

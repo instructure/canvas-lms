@@ -261,7 +261,7 @@ describe GradebooksHelper do
   end
 
   describe "translated_due_date_for_speedgrader" do
-    before :each do
+    before do
       @current_user = user_factory
       @course = Account.default.courses.create!(name: 'My Course')
       @course.enroll_teacher(@current_user, enrollment_state: 'active')

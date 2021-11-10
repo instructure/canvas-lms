@@ -29,7 +29,7 @@ describe "outcomes" do
   let(:outcome_url) { "/courses/#{@course.id}/outcomes" }
 
   describe "course outcomes" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 
@@ -213,7 +213,7 @@ describe "outcomes" do
     end
 
     describe 'with improved_outcome_management enabled' do
-      before(:each) do
+      before do
         enable_improved_outcomes_management(Account.default)
       end
 

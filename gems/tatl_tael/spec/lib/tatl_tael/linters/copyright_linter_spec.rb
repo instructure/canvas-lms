@@ -136,7 +136,7 @@ describe TatlTael::Linters::CopyrightLinter do
               context fixture_variant_name do # e.g. context "invalid--missing" do
                 let(:fixture_path) { fixture_variant }
 
-                around(:each) do |example|
+                around do |example|
                   # cache linter config so we don't have to clone it into the fake fs
                   TatlTael::Linters.config
                   FakeFS do
@@ -145,7 +145,7 @@ describe TatlTael::Linters::CopyrightLinter do
                   end
                 end
 
-                before :each do
+                before do
                   real_path = fixture_path_for(fixture_base_type, fixture_variant_name)
                   # clone the fixture into empty/fake fs
                   FakeFS::FileSystem.clone(real_path, fixture_variant)

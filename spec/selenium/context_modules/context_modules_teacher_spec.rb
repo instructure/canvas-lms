@@ -41,7 +41,7 @@ describe "context modules" do
       @course.reload
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 
@@ -535,7 +535,7 @@ describe "context modules" do
     end
 
     context "expanding/collapsing modules" do
-      before :each do
+      before do
         @mod = create_modules(2, true)
         @mod[0].add_item({ id: @assignment.id, type: 'assignment' })
         @mod[1].add_item({ id: @assignment2.id, type: 'assignment' })

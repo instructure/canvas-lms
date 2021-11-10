@@ -53,7 +53,7 @@ describe PlannerOverridesController do
   end
 
   context "as student" do
-    before :each do
+    before do
       user_session(@student)
     end
 

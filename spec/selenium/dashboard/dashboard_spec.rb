@@ -33,7 +33,7 @@ describe "dashboard" do
   end
 
   context "as a student" do
-    before :each do
+    before do
       course_with_student_logged_in(:active_all => true)
       @course.default_view = 'feed'
       @course.save!
@@ -361,7 +361,7 @@ describe "dashboard" do
   end
 
   context "as a teacher" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in(:active_cc => true)
     end
 
@@ -437,7 +437,7 @@ describe "dashboard" do
         Account.default.save!
       end
 
-      before :each do
+      before do
         user_session(@teacher)
       end
 

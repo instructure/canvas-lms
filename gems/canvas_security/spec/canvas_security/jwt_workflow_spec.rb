@@ -20,7 +20,7 @@
 require 'spec_helper'
 
 describe CanvasSecurity::JWTWorkflow do
-  before(:each) do
+  before do
     @c = 'a_course'
     @a = 'an_account'
   end

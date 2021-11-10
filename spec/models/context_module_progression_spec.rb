@@ -170,7 +170,7 @@ describe ContextModuleProgression do
       let(:tag) { @module.add_item({ id: assignment.id, type: "assignment" }) }
       let(:min_score) { 90 }
 
-      before(:each) do
+      before do
         @module.update!(completion_requirements: { tag.id => { type: "min_score", min_score: min_score } })
         @submission = assignment.submit_homework(@user, body: "my homework")
       end

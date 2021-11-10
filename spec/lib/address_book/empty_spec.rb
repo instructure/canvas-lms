@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe AddressBook::Empty do
-  before :each do
+  before do
     @address_book = AddressBook::Empty.new(user_model)
   end
 

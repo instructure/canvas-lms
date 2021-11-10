@@ -330,7 +330,7 @@ shared_examples_for "an object whose dates are overridable" do
   end
 
   describe "#dates_hash_visible_to" do
-    before :each do
+    before do
       override.set = course.default_section
       override.override_due_at(7.days.from_now)
       override.save!

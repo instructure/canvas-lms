@@ -33,7 +33,7 @@ describe "Learning Outcome exporting" do
     @ce.save!
   end
 
-  after(:each) do
+  after do
     if @file_handle && File.exist?(@file_handle.path)
       FileUtils.rm(@file_handle.path)
     end
@@ -67,11 +67,11 @@ describe "Learning Outcome exporting" do
   end
 
   context 'with selectable_outcomes_in_course_copy enabled' do
-    before(:each) do
+    before do
       @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
     end
 
-    after(:each) do
+    after do
       @course.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
       @ce.selected_content = nil
     end

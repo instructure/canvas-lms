@@ -23,7 +23,7 @@ require_dependency "lti/membership_service/course_lis_person_collator"
 module Lti::MembershipService
   describe CourseLisPersonCollator do
     context 'course with teacher' do
-      before(:each) do
+      before do
         course_with_teacher
       end
 
@@ -102,7 +102,7 @@ module Lti::MembershipService
   end
 
   describe '#memberships' do
-    before(:each) do
+    before do
       course_with_teacher
     end
 
@@ -125,7 +125,7 @@ module Lti::MembershipService
     end
 
     context 'course with user that has many enrollments' do
-      before(:each) do
+      before do
         @course.enroll_user(@teacher, 'TaEnrollment', enrollment_state: 'active')
         @course.enroll_user(@teacher, 'DesignerEnrollment', enrollment_state: 'active')
         @course.enroll_user(@teacher, 'StudentEnrollment', enrollment_state: 'active')
@@ -168,7 +168,7 @@ module Lti::MembershipService
     context 'course with multiple users' do
       let(:user_sis_id) { "user_sis_id_01" }
 
-      before(:each) do
+      before do
         @course.enroll_user(@teacher, 'TeacherEnrollment', enrollment_state: 'active')
         @ta = user_model
         @course.enroll_user(@ta, 'TaEnrollment', enrollment_state: 'active')
@@ -222,7 +222,7 @@ module Lti::MembershipService
   end
 
   context 'pagination' do
-    before(:each) do
+    before do
       course_with_teacher
       @course.enroll_user(@teacher, 'TeacherEnrollment', enrollment_state: 'active')
       @ta = user_model

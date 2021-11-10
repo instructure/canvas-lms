@@ -22,7 +22,7 @@ require_relative '../common'
 describe "layout" do
   include_context "in-process server selenium tests"
 
-  before(:each) do
+  before do
     course_with_student_logged_in
     @user.update_attribute(:name, "</script><b>evil html & name</b>")
     get "/"

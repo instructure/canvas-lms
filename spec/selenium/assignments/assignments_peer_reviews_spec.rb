@@ -83,7 +83,7 @@ describe "assignments" do
         @assignment = assignment_model({ course: @course, peer_reviews: true, automatic_peer_reviews: false })
       end
 
-      before :each do
+      before do
         user_session(@student1)
       end
 
@@ -210,10 +210,10 @@ describe "assignments" do
                          })
     }
 
-    before(:each) { assignment.assign_peer_review(reviewer, reviewed) }
+    before { assignment.assign_peer_review(reviewer, reviewed) }
 
     context 'when reviewed is logged in' do
-      before(:each) { user_logged_in(user: reviewed) }
+      before { user_logged_in(user: reviewed) }
 
       it 'blocks reviewer name on assignments page', priority: "1", test_id: 216384 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}"
@@ -234,7 +234,7 @@ describe "assignments" do
     end
 
     context 'when reviewer is logged in' do
-      before(:each) { user_logged_in(user: reviewer) }
+      before { user_logged_in(user: reviewer) }
 
       it 'shows comment reviewer name on submission page', priority: "1", test_id: 216387 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/anonymous_submissions/#{submission.anonymous_id}"
@@ -243,7 +243,7 @@ describe "assignments" do
     end
 
     context 'when teacher is logged in' do
-      before(:each) { user_logged_in(user: teacher) }
+      before { user_logged_in(user: teacher) }
 
       it 'shows comment reviewer name on submission page', priority: "1", test_id: 216389 do
         get "/courses/#{review_course.id}/assignments/#{assignment.id}/submissions/#{reviewed.id}"
@@ -259,7 +259,7 @@ describe "assignments" do
     end
 
     context 'when peer review and plagiarism are enabled' do
-      before(:each) {
+      before {
         user_logged_in(user: reviewer)
         # assignment settings
         assignment.vericite_enabled = true

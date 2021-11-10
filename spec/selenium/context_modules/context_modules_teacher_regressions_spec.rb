@@ -41,7 +41,7 @@ describe "context modules" do
       @course.reload
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 

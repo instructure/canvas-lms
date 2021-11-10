@@ -106,7 +106,7 @@ describe "master courses sidebar" do
   end
 
   describe "as a master course teacher" do
-    before :each do
+    before do
       user_session(@master_teacher)
     end
 
@@ -156,7 +156,7 @@ describe "master courses sidebar" do
       account_admin_user(active_all: true)
     end
 
-    before :each do
+    before do
       user_session(@admin)
     end
 
@@ -253,7 +253,7 @@ describe "master courses sidebar" do
     end
 
     context "after sync" do
-      before :each do
+      before do
         open_blueprint_sidebar
         send_notification_checkbox.click
         add_message_checkbox.click

@@ -30,7 +30,7 @@ describe ContextExternalToolsHelper do
   end
 
   shared_examples "#external_tools_menu_items" do
-    before :each do
+    before do
       html = helper.external_tools_menu_items(@mock_tools_hash, @menu_item_options)
       @parsed_html = Nokogiri::HTML5.fragment(html)
     end
@@ -102,7 +102,7 @@ describe ContextExternalToolsHelper do
       settings_hash
     end
 
-    before :each do
+    before do
       klass = Class.new(ApplicationController) do
         include ContextExternalToolsHelper
       end

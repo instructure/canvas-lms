@@ -136,7 +136,7 @@ describe ExternalContentController do
         message
       end
 
-      before(:each) do
+      before do
         allow_any_instance_of(Lti::MessageAuthenticator).to receive(:valid?).and_return(true)
         course_with_teacher
         user_session(@teacher)

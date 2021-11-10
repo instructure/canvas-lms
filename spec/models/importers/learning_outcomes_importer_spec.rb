@@ -44,11 +44,11 @@ describe "Importing Learning Outcomes" do
   end
 
   context 'selectable_outcomes_in_course_copy enabled' do
-    before(:example) do
+    before do
       @context.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
     end
 
-    after(:example) do
+    after do
       @context.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
     end
 

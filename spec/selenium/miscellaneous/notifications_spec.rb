@@ -36,7 +36,7 @@ describe "Notifications" do
       enrollment.accept!
     end
 
-    before :each do
+    before do
       site_admin_logged_in
     end
 
@@ -156,7 +156,7 @@ describe "Notifications" do
     end
 
     context "Announcement notification" do
-      before :each do
+      before do
         setup_notification(@student, name: 'New Announcement', category: 'Announcement', sms: true)
       end
 

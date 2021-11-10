@@ -19,7 +19,7 @@
 #
 
 describe AssetUserAccessLog do
-  around(:each) do |example|
+  around do |example|
     old_compaction_recv_timeout = Setting.get("aua_compaction_receive_timeout_ms", "1000")
     # let's not waste time with queue throttling in tests
     MessageBus.worker_process_interval = -> { 0.01 }
@@ -68,7 +68,7 @@ describe AssetUserAccessLog do
     end
 
     describe "via message bus" do
-      before(:each) do
+      before do
         skip("pulsar config required to test") unless MessageBus.enabled?
         MessageBus.reset!
         @channel_config = {
@@ -78,7 +78,7 @@ describe AssetUserAccessLog do
         allow(AssetUserAccessLog).to receive(:channel_config).and_return(@channel_config)
       end
 
-      after(:each) do
+      after do
         MessageBus.process_all_and_reset!
       end
 
@@ -128,7 +128,7 @@ describe AssetUserAccessLog do
     end
 
     describe "under emergency load shedding" do
-      before(:each) do
+      before do
         @channel_config = {
           "pulsar_writes_enabled" => false,
           "pulsar_reads_enabled" => false,
@@ -335,7 +335,7 @@ describe AssetUserAccessLog do
     end
 
     describe "via message bus" do
-      before(:each) do
+      before do
         skip("pulsar config required to test") unless MessageBus.enabled?
         allow(AssetUserAccessLog).to receive(:channel_config).and_return({
                                                                            "pulsar_writes_enabled" => true,
@@ -349,7 +349,7 @@ describe AssetUserAccessLog do
         reset_message_bus_topic(@account, AssetUserAccessLog::PULSAR_SUBSCRIPTION)
       end
 
-      after(:each) do
+      after do
         MessageBus.process_all_and_reset!
       end
 
@@ -444,7 +444,7 @@ describe AssetUserAccessLog do
     end
 
     describe "multiple root accounts with ripcord" do
-      before(:each) do
+      before do
         skip("pulsar config required to test") unless MessageBus.enabled?
         allow(AssetUserAccessLog).to receive(:channel_config).and_return({
                                                                            "pulsar_writes_enabled" => true,

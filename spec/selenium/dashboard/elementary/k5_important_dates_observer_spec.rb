@@ -38,7 +38,7 @@ describe "observer k5 dashboard important dates" do
     observer_setup
   end
 
-  before :each do
+  before do
     user_session @observer
   end
 

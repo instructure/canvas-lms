@@ -26,7 +26,7 @@ describe "eportfolios" do
   include_context "in-process server selenium tests"
   include EportfoliosCommon
 
-  before(:each) do
+  before do
     course_with_student_logged_in
   end
 
@@ -41,7 +41,7 @@ describe "eportfolios" do
   end
 
   context "eportfolio created with user" do
-    before(:each) do
+    before do
       eportfolio_model({ :user => @user, :name => "student content" })
     end
 

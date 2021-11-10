@@ -175,7 +175,7 @@ describe ExternalToolsController do
         }
       end
 
-      before(:each) do
+      before do
         allow_any_instance_of(AppCenter::AppApi).to receive(:fetch_app_center_response).and_return(app_center_response)
         allow_any_instance_of(CC::Importer::BLTIConverter).to receive(:fetch).and_return(config_response)
 

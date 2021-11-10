@@ -46,7 +46,7 @@ describe QuestionBanksController do
   describe "move_questions" do
     before(:once) { create_course_with_two_question_banks! }
 
-    before(:each) { user_session(@teacher) }
+    before { user_session(@teacher) }
 
     it "copies questions" do
       post 'move_questions', params: { :course_id => @course.id, :question_bank_id => @bank1.id, :assessment_question_bank_id => @bank2.id, :questions => { @question1.id => 1, @question2.id => 1 } }
@@ -80,7 +80,7 @@ describe QuestionBanksController do
       @bank = @course.assessment_question_banks.create!
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 
@@ -112,7 +112,7 @@ describe QuestionBanksController do
       @bank = @course.assessment_question_banks.create!
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 

@@ -42,7 +42,7 @@ describe CanvasDynamoDB::Database do
   end
 
   describe "#get_item" do
-    before(:each) do
+    before do
       ddb_client_class = Class.new do
         attr_reader :last_query
 

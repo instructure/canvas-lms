@@ -22,7 +22,7 @@ require_relative '../common'
 describe "plugins ui" do
   include_context "in-process server selenium tests"
 
-  before(:each) do
+  before do
     site_admin_logged_in
   end
 

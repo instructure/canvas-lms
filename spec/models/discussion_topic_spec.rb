@@ -255,7 +255,7 @@ describe DiscussionTopic do
   end
 
   context "permissions" do
-    before :each do
+    before do
       @teacher1 = @teacher
       @teacher2 = user_factory
       teacher_in_course(:course => @course, :user => @teacher2, :active_all => true)

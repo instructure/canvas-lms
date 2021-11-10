@@ -104,7 +104,7 @@ describe SectionTabHelper do
 
       context 'when context has tabs_available' do
         let(:bad_tab) { { label: 'bad tab' } }
-        before(:each) do
+        before do
           tabs = Course.default_tabs + [bad_tab]
           allow(course).to receive(:tabs_available).and_return(tabs)
         end

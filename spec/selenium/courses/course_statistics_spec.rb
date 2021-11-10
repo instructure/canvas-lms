@@ -22,7 +22,7 @@ require_relative '../common'
 describe "course statistics" do
   include_context "in-process server selenium tests"
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in
     @student1 = student_in_course(:active_all => true, :name => "Sheldon Cooper").user
     @student2 = student_in_course(:active_all => true, :name => "Leonard Hofstadter").user

@@ -28,7 +28,7 @@ describe "student groups" do
   let(:group_category_name) { 'cat1' }
 
   describe "as a student" do
-    before(:each) do
+    before do
       course_with_student_logged_in(:active_all => true)
     end
 
@@ -68,7 +68,7 @@ describe "student groups" do
     end
 
     describe "new student group" do
-      before(:each) do
+      before do
         seed_students(2)
         get "/courses/#{@course.id}/groups"
         f('button[data-test-id="add-group-button"]').click
@@ -172,7 +172,7 @@ describe "student groups" do
     end
 
     describe "student group index page" do
-      before(:each) do
+      before do
         create_group(group_name: group_name)
         get "/courses/#{@course.id}/groups"
       end
@@ -228,7 +228,7 @@ describe "student groups" do
     end
 
     describe "Manage Student Group Page" do
-      before(:each) do
+      before do
         create_group(group_name: group_name, enroll_student_count: 2)
         get "/courses/#{@course.id}/groups"
       end

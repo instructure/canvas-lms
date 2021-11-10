@@ -19,7 +19,7 @@
 #
 
 describe GradeSummaryAssignmentPresenter do
-  before :each do
+  before do
     attachment_model
     course_factory(active_all: true)
     student_in_course active_all: true
@@ -215,7 +215,7 @@ describe GradeSummaryAssignmentPresenter do
   end
 
   describe "#show_submission_details?" do
-    before :each do
+    before do
       @submission_stub = double()
       allow(@submission_stub).to receive(:originality_reports_for_display)
     end
@@ -266,7 +266,7 @@ describe GradeSummaryAssignmentPresenter do
     end
 
     context "when assignment posts manually" do
-      before(:each) do
+      before do
         @assignment.ensure_post_policy(post_manually: true)
       end
 
@@ -282,7 +282,7 @@ describe GradeSummaryAssignmentPresenter do
     end
 
     context "when assignment posts automatically" do
-      before(:each) do
+      before do
         @assignment.ensure_post_policy(post_manually: false)
       end
 

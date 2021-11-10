@@ -33,7 +33,7 @@ describe CrocodocSessionsController do
     @hmac = Canvas::Security.hmac_sha1(@blob)
   end
 
-  before :each do
+  before do
     allow_any_instance_of(Crocodoc::API).to receive(:upload).and_return 'uuid' => '1234567890'
     allow_any_instance_of(Crocodoc::API).to receive(:session).and_return 'session' => 'SESSION'
     user_session(@student)

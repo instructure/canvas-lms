@@ -32,7 +32,7 @@ describe "user_content" do
       MESSAGE
     end
 
-    before(:each) do
+    before do
       course_with_student_logged_in(:active_all => true)
       allow(HostUrl).to receive(:is_file_host?).and_return(true)
     end

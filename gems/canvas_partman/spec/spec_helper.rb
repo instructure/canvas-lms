@@ -79,7 +79,7 @@ RSpec.configure do |config|
     [Animal, Trail, Zoo, WeekEvent].each(&:drop_schema)
   end
 
-  config.after :each do
+  config.after do
     connection.tables.grep(/^partman_(?:animals|trails)_/).each do |partition_table_name|
       begin
         SchemaHelper.drop_table(partition_table_name)

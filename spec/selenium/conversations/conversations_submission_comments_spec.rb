@@ -110,7 +110,7 @@ describe "conversations new" do
       end
 
       shared_examples 'shows submission comments' do |context|
-        before :each do
+        before do
           case context
           when :student
             user_session(@s2)

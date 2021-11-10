@@ -21,7 +21,7 @@
 describe CourseProgress do
   let(:progress_error) { { :error => { :message => 'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course' } } }
 
-  before :each do
+  before do
     allow_any_instance_of(CourseProgress).to receive(:course_context_modules_item_redirect_url) do |_, opts = {}|
       "course_context_modules_item_redirect_url(:course_id => #{opts[:course_id]}, :id => #{opts[:id]}, :host => HostUrl.context_host(Course.find(#{opts[:course_id]}))"
     end

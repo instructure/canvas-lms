@@ -398,7 +398,7 @@ describe Rubric do
 
       let(:last_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_deleted').last }
 
-      before(:each) do
+      before do
         rubric.update_with_association(teacher, {}, course, association_object: assignment)
       end
 
@@ -430,7 +430,7 @@ describe Rubric do
         let(:old_rubric) { Rubric.create!(title: 'zzz', context: course) }
         let(:last_updated_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_updated').last }
 
-        before(:each) do
+        before do
           old_rubric.update_with_association(
             teacher,
             {},

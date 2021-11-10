@@ -25,7 +25,7 @@ describe "courses" do
   include K5Common
 
   context "as a teacher" do
-    before(:each) do
+    before do
       account = Account.default
       account.settings = { :open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true }
       account.save!
@@ -34,7 +34,7 @@ describe "courses" do
     end
 
     context 'draft state' do
-      before(:each) do
+      before do
         course_with_teacher_logged_in
         @course.default_view = 'feed'
         @course.save
@@ -306,7 +306,7 @@ describe "courses" do
       end
     end
 
-    before(:each) do
+    before do
       course_with_teacher(:active_all => true, :name => 'discussion course')
       @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :name => 'student@example.com', :password => 'asdfasdf')
       Account.default.settings[:allow_invitation_previews] = true
@@ -398,7 +398,7 @@ describe "courses" do
       @course.save!
     end
 
-    before :each do
+    before do
       user_session @teacher
     end
 

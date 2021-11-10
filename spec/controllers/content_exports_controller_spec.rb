@@ -38,7 +38,7 @@ describe ContentExportsController do
       course_factory(active_all: true)
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 

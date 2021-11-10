@@ -34,7 +34,7 @@ describe "speed grader" do
     submission_model(user: @student, assignment: @assignment, body: "first student submission text")
   end
 
-  before(:each) do
+  before do
     user_session(@teacher)
     Speedgrader.visit(@course.id, @assignment.id)
     Speedgrader.add_comment_to_library("First Comment")

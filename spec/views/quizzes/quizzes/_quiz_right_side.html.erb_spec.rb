@@ -30,7 +30,7 @@ describe "/quizzes/quizzes/_quiz_right_side" do
   end
 
   context "when post policies is enabled" do
-    before(:each) do
+    before do
       course_with_student
       view_context
 

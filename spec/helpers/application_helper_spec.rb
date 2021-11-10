@@ -106,12 +106,12 @@ describe ApplicationHelper do
   end
 
   describe "Time Display Helpers" do
-    before :each do
+    before do
       @zone = Time.zone
       Time.zone = "Alaska"
     end
 
-    after :each do
+    after do
       Time.zone = @zone
     end
 
@@ -538,7 +538,7 @@ describe ApplicationHelper do
     end
 
     context "with a custom dashboard_url on the account" do
-      before :each do
+      before do
         @domain_root_account.settings[:dashboard_url] = "http://foo.bar"
       end
 
@@ -559,7 +559,7 @@ describe ApplicationHelper do
       end
 
       context "with a user logged in" do
-        before :each do
+        before do
           @current_user = user_factory
         end
 
@@ -678,7 +678,7 @@ describe ApplicationHelper do
       context "when the request path is the account external tools path" do
         let(:request) { double('request', :fullpath => '/accounts/2/external_tools/27') }
 
-        before :each do
+        before do
           @context = Account.default
           allow(controller).to receive(:controller_name).and_return('external_tools')
         end
@@ -691,7 +691,7 @@ describe ApplicationHelper do
       context "when the request path is the course external tools path" do
         let(:request) { double('request', :fullpath => '/courses/2/external_tools/27') }
 
-        before :each do
+        before do
           @context = Account.default.courses.create!
           allow(controller).to receive(:controller_name).and_return('external_tools')
         end
@@ -741,7 +741,7 @@ describe ApplicationHelper do
 
   describe "map_groups_for_planner" do
     context "with planner enabled" do
-      before(:each) do
+      before do
         @account = Account.default
       end
 
@@ -763,12 +763,12 @@ describe ApplicationHelper do
   end
 
   describe "tutorials_enabled?" do
-    before(:each) do
+    before do
       @domain_root_account = Account.default
     end
 
     context "with new_users_tutorial feature flag enabled" do
-      before(:each) do
+      before do
         @domain_root_account.enable_feature! :new_user_tutorial
         @current_user = User.create!
       end
@@ -786,7 +786,7 @@ describe ApplicationHelper do
   end
 
   describe "planner_enabled?" do
-    before(:each) do
+    before do
       @domain_root_account = Account.default
     end
 
@@ -902,7 +902,7 @@ describe ApplicationHelper do
 
   describe "file_access_real_user" do
     context "not on the files domain" do
-      before :each do
+      before do
         @files_domain = false
       end
 
@@ -914,7 +914,7 @@ describe ApplicationHelper do
     end
 
     context "on the files domain" do
-      before :each do
+      before do
         @files_domain = true
       end
 
@@ -947,7 +947,7 @@ describe ApplicationHelper do
 
   describe "file_access_developer_key" do
     context "not on the files domain" do
-      before :each do
+      before do
         @files_domain = false
       end
 
@@ -964,7 +964,7 @@ describe ApplicationHelper do
     end
 
     context "on the files domain" do
-      before :each do
+      before do
         @files_domain = true
       end
 
@@ -982,7 +982,7 @@ describe ApplicationHelper do
 
   describe "file_access_root_account" do
     context "not on the files domain" do
-      before :each do
+      before do
         @domain_root_account = Account.default
         @files_domain = false
       end
@@ -993,7 +993,7 @@ describe ApplicationHelper do
     end
 
     context "on the files domain" do
-      before :each do
+      before do
         @files_domain = true
       end
 
@@ -1015,7 +1015,7 @@ describe ApplicationHelper do
       let(:request) { double("request", host_with_port: host) }
       let(:logged_in_user) { user_model }
 
-      before :each do
+      before do
         @files_domain = false
       end
 
@@ -1027,7 +1027,7 @@ describe ApplicationHelper do
     context "on the files domain" do
       let(:logged_in_user) { user_model }
 
-      before :each do
+      before do
         @files_domain = true
       end
 
@@ -1043,12 +1043,12 @@ describe ApplicationHelper do
   end
 
   describe "file_authenticator" do
-    before :each do
+    before do
       @domain_root_account = Account.default
     end
 
     context "not on the files domain, logged in" do
-      before :each do
+      before do
         @files_domain = false
         @current_user = user_model
       end
@@ -1080,7 +1080,7 @@ describe ApplicationHelper do
     end
 
     context "not on the files domain, not logged in" do
-      before :each do
+      before do
         @files_domain = false
         @current_user = nil
       end
@@ -1102,7 +1102,7 @@ describe ApplicationHelper do
       let(:developer_key) { DeveloperKey.create! }
       let(:original_host) { 'non-files-domain' }
 
-      before :each do
+      before do
         @files_domain = true
         session['file_access_user_id'] = access_user.id
         session['file_access_real_user_id'] = real_access_user.id
@@ -1138,7 +1138,7 @@ describe ApplicationHelper do
     end
 
     context "on the files domain without access user" do
-      before :each do
+      before do
         @files_domain = true
         session['file_access_user_id'] = nil
         session['file_access_real_user_id'] = nil
@@ -1170,7 +1170,7 @@ describe ApplicationHelper do
   end
 
   describe "#alt_text_for_login_logo" do
-    before :each do
+    before do
       @domain_root_account = Account.default
     end
 
@@ -1334,14 +1334,14 @@ describe ApplicationHelper do
       @pseudonym = @user.pseudonyms.create!(unique_id: 'blah', account: Account.default)
     end
 
-    before :each do
+    before do
       @current_user = @user
       @current_pseudonym = @pseudonym
       @domain_root_account = Account.default
     end
 
     context "with no k5 enrollments" do
-      before :each do
+      before do
         allow(helper).to receive(:k5_user?).and_return(false)
       end
 
@@ -1381,7 +1381,7 @@ describe ApplicationHelper do
     end
 
     context "with k5 enrollments" do
-      before :each do
+      before do
         allow(helper).to receive(:k5_user?).and_return(true)
       end
 
