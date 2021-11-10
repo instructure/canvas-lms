@@ -69,13 +69,11 @@ module CanvasQuizStatistics::Analyzers::Concerns
     def calculate_responses(responses, answers, *args)
       responses.each do |response|
         answer = locate_answer(response, answers, *args)
-        answer ||= begin
-          if answer_present_but_unknown?(response, *args)
-            generate_unknown_answer(answers)
-          else
-            generate_missing_answer(answers)
-          end
-        end
+        answer ||= if answer_present_but_unknown?(response, *args)
+                     generate_unknown_answer(answers)
+                   else
+                     generate_missing_answer(answers)
+                   end
 
         answer[:user_ids] << response[:user_id]
         answer[:user_names] << response[:user_name]

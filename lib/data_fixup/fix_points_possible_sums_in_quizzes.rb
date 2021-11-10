@@ -22,12 +22,10 @@ module DataFixup
     def self.run
       Quizzes::Quiz.find_ids_in_ranges(:batch_size => 10000) do |min_id, max_id|
         affected_quizzes.where(id: min_id..max_id).find_each do |quiz|
-          begin
-            possible = Quizzes::Quiz.count_points_possible(quiz.root_entries(true))
-            quiz.update!(points_possible: possible)
-          rescue => e
-            Rails.logger.error("Error occured trying to repair Quiz #{quiz.global_id} #{e}")
-          end
+          possible = Quizzes::Quiz.count_points_possible(quiz.root_entries(true))
+          quiz.update!(points_possible: possible)
+        rescue => e
+          Rails.logger.error("Error occured trying to repair Quiz #{quiz.global_id} #{e}")
         end
       end
     end

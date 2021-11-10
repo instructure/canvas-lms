@@ -1954,11 +1954,9 @@ describe Account do
       end
 
       it "includes the account id in the error message" do
-        begin
-          Account.find_cached(nonsense_id)
-        rescue ::Canvas::AccountCacheError => e
-          expect(e.message).to eq("Couldn't find Account with 'id'=#{nonsense_id}")
-        end
+        Account.find_cached(nonsense_id)
+      rescue ::Canvas::AccountCacheError => e
+        expect(e.message).to eq("Couldn't find Account with 'id'=#{nonsense_id}")
       end
     end
 

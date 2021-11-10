@@ -109,12 +109,10 @@ module ActiveRecord
 
       describe "with temp table" do
         around do |example|
-          begin
-            ActiveRecord::Base.in_migration = true
-            example.run
-          ensure
-            ActiveRecord::Base.in_migration = false
-          end
+          ActiveRecord::Base.in_migration = true
+          example.run
+        ensure
+          ActiveRecord::Base.in_migration = false
         end
 
         it "uses a temp table when you select without an id" do

@@ -167,12 +167,10 @@ module Importers
       imported_migration_ids = []
 
       items.each do |tag_hash|
-        begin
-          tags = self.add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
-          imported_migration_ids.concat tags.map(&:migration_id)
-        rescue
-          migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!)
-        end
+        tags = self.add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
+        imported_migration_ids.concat tags.map(&:migration_id)
+      rescue
+        migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!)
       end
 
       item.content_tags.where.not(:migration_id => nil)

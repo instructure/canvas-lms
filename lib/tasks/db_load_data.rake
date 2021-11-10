@@ -87,35 +87,33 @@ namespace :db do
   desc "Create an administrator user"
   task :configure_admin => :load_environment do
     def create_admin(email, password)
-      begin
-        pseudonym = Account.site_admin.pseudonyms.active.by_unique_id(email).first
-        pseudonym ||= Account.default.pseudonyms.active.by_unique_id(email).first
-        user = pseudonym ? pseudonym.user : User.create!
-        user.register! unless user.registered?
-        unless pseudonym
-          # don't pass the password in the create call, because that way is extra
-          # picky. the admin should know what they're doing, and we'd rather not
-          # fail here.
-          pseudonym = user.pseudonyms.create!(:unique_id => email,
-                                              :password => "validpassword", :password_confirmation => "validpassword", :account => Account.site_admin)
-          user.communication_channels.create!(:path => email) { |cc| cc.workflow_state = 'active' }
-        end
-        # set the password later.
-        pseudonym.password = pseudonym.password_confirmation = password
-        unless pseudonym.save
-          raise pseudonym.errors.full_messages.first if pseudonym.errors.size > 0
-
-          raise "unknown error saving password"
-        end
-        Account.site_admin.account_users.where(user_id: user,
-                                               role_id: Role.get_built_in_role('AccountAdmin', root_account_id: Account.site_admin.id)).first_or_create!
-        Account.default.account_users.where(user_id: user,
-                                            role_id: Role.get_built_in_role('AccountAdmin', root_account_id: Account.default.id)).first_or_create!
-        user
-      rescue => e
-        STDERR.puts "Problem creating administrative account, please try again: #{e}"
-        nil
+      pseudonym = Account.site_admin.pseudonyms.active.by_unique_id(email).first
+      pseudonym ||= Account.default.pseudonyms.active.by_unique_id(email).first
+      user = pseudonym ? pseudonym.user : User.create!
+      user.register! unless user.registered?
+      unless pseudonym
+        # don't pass the password in the create call, because that way is extra
+        # picky. the admin should know what they're doing, and we'd rather not
+        # fail here.
+        pseudonym = user.pseudonyms.create!(:unique_id => email,
+                                            :password => "validpassword", :password_confirmation => "validpassword", :account => Account.site_admin)
+        user.communication_channels.create!(:path => email) { |cc| cc.workflow_state = 'active' }
       end
+      # set the password later.
+      pseudonym.password = pseudonym.password_confirmation = password
+      unless pseudonym.save
+        raise pseudonym.errors.full_messages.first if pseudonym.errors.size > 0
+
+        raise "unknown error saving password"
+      end
+      Account.site_admin.account_users.where(user_id: user,
+                                             role_id: Role.get_built_in_role('AccountAdmin', root_account_id: Account.site_admin.id)).first_or_create!
+      Account.default.account_users.where(user_id: user,
+                                          role_id: Role.get_built_in_role('AccountAdmin', root_account_id: Account.default.id)).first_or_create!
+      user
+    rescue => e
+      STDERR.puts "Problem creating administrative account, please try again: #{e}"
+      nil
     end
 
     user = nil

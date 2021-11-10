@@ -138,24 +138,22 @@ module MessageBus
       # expanded. https://guides.rubyonrails.org/threading_and_code_execution.html#wrapping-application-code
       Rails.application.executor.wrap do
         Shard.lookup(shard_id).activate do
-          begin
-            status = produce_message(namespace, topic_name, message)
-          rescue StandardError => e
-            # if we errored, we didn't actually process the message
-            # put it back on the queue to try to get to it later.
-            # Does this screw up ordering?  yes, absolutely, but ruby queues are one-way.
-            # If your messages within topics are required to be stricly ordered, you need to
-            # generate a producer and manage error handling yourself.
-            @queue.push(work_tuple)
-            # if this is NOT one of the known error types from pulsar
-            # then we actually need to know about it with a full ":error"
-            # level in sentry.
-            err_level = ::MessageBus.rescuable_pulsar_errors.include?(e.class) ? :warn : :error
-            CanvasErrors.capture_exception(:message_bus, e, err_level)
-            status = :error
-          ensure
-            MessageBus.on_work_unit_end&.call
-          end
+          status = produce_message(namespace, topic_name, message)
+        rescue StandardError => e
+          # if we errored, we didn't actually process the message
+          # put it back on the queue to try to get to it later.
+          # Does this screw up ordering?  yes, absolutely, but ruby queues are one-way.
+          # If your messages within topics are required to be stricly ordered, you need to
+          # generate a producer and manage error handling yourself.
+          @queue.push(work_tuple)
+          # if this is NOT one of the known error types from pulsar
+          # then we actually need to know about it with a full ":error"
+          # level in sentry.
+          err_level = ::MessageBus.rescuable_pulsar_errors.include?(e.class) ? :warn : :error
+          CanvasErrors.capture_exception(:message_bus, e, err_level)
+          status = :error
+        ensure
+          MessageBus.on_work_unit_end&.call
         end
       end
       status

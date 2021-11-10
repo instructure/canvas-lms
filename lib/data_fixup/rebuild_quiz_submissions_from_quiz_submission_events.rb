@@ -93,17 +93,15 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
         find_missing_submissions_on_current_shard
       end
       ids.map do |id|
-        begin
-          Rails.logger.info LOG_PREFIX + "#{id} data fix starting..."
-          success = run(id)
-        rescue => e
-          Rails.logger.warn LOG_PREFIX + "#{id} failed with error: #{e}"
-        ensure
-          if success
-            Rails.logger.info LOG_PREFIX + "#{id} completed successfully"
-          else
-            Rails.logger.warn LOG_PREFIX + "#{id} failed"
-          end
+        Rails.logger.info LOG_PREFIX + "#{id} data fix starting..."
+        success = run(id)
+      rescue => e
+        Rails.logger.warn LOG_PREFIX + "#{id} failed with error: #{e}"
+      ensure
+        if success
+          Rails.logger.info LOG_PREFIX + "#{id} completed successfully"
+        else
+          Rails.logger.warn LOG_PREFIX + "#{id} failed"
         end
       end
     end

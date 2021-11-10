@@ -36,11 +36,9 @@ module SIS
         messages = []
         count = SIS::EnrollmentImporter.new(@root_account, importer_opts).process(messages) do |importer|
           csv_rows(csv, index, count) do |row|
-            begin
-              importer.add_enrollment(create_enrollment(row, messages, csv: csv))
-            rescue ImportError => e
-              messages << SisBatch.build_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
-            end
+            importer.add_enrollment(create_enrollment(row, messages, csv: csv))
+          rescue ImportError => e
+            messages << SisBatch.build_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
           end
         end
         persist_errors(csv, messages)

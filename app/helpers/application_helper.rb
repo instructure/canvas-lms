@@ -76,11 +76,9 @@ module ApplicationHelper
       Rails
       .cache
       .fetch(['short_name_lookup', code].cache_key) do
-        begin
-          Context.find_by_asset_string(code).short_name
-        rescue StandardError
-          ''
-        end
+        Context.find_by_asset_string(code).short_name
+      rescue StandardError
+        ''
       end
   end
 
@@ -1113,12 +1111,10 @@ module ApplicationHelper
 
   def csp_report_uri
     @csp_report_uri ||=
-      begin
-        if (host = csp_context.root_account.csp_logging_config['host'])
-          "; report-uri #{host}report/#{csp_context.root_account.global_id}"
-        else
-          ''
-        end
+      if (host = csp_context.root_account.csp_logging_config['host'])
+        "; report-uri #{host}report/#{csp_context.root_account.global_id}"
+      else
+        ''
       end
   end
 

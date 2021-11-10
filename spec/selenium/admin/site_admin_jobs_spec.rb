@@ -38,12 +38,10 @@ describe "site admin jobs ui" do
 
   def jobs_on_hold
     @all_jobs.select do |job|
-      begin
-        job.reload
-        job.locked_by == 'on hold'
-      rescue ActiveRecord::RecordNotFound
-        false
-      end
+      job.reload
+      job.locked_by == 'on hold'
+    rescue ActiveRecord::RecordNotFound
+      false
     end
   end
 

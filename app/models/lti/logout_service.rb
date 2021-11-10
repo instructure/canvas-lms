@@ -69,11 +69,9 @@ module Lti
     class Runner < Struct.new(:callbacks)
       def perform
         callbacks.each_value do |callback|
-          begin
-            CanvasHttp.get(URI.parse(callback).to_s)
-          rescue => e
-            Rails.logger.error("Failed to call logout callback '#{callback}': #{e.inspect}")
-          end
+          CanvasHttp.get(URI.parse(callback).to_s)
+        rescue => e
+          Rails.logger.error("Failed to call logout callback '#{callback}': #{e.inspect}")
         end
       end
     end

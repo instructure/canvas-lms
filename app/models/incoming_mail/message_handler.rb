@@ -32,32 +32,30 @@ module IncomingMail
 
       from_channel = nil
       original_message.shard.activate do
-        begin
-          context = original_message.context
-          user = original_message.user
-          raise IncomingMail::Errors::UnknownAddress unless valid_user_and_context?(context, user)
+        context = original_message.context
+        user = original_message.user
+        raise IncomingMail::Errors::UnknownAddress unless valid_user_and_context?(context, user)
 
-          from_channel = sent_from_channel(user, incoming_message)
-          raise IncomingMail::Errors::UnknownSender unless from_channel
-          raise IncomingMail::Errors::MessageTooLong if body.length > ActiveRecord::Base.maximum_text_length
-          raise IncomingMail::Errors::MessageTooLong if html_body.length > ActiveRecord::Base.maximum_text_length
-          raise IncomingMail::Errors::BlankMessage if body.blank?
+        from_channel = sent_from_channel(user, incoming_message)
+        raise IncomingMail::Errors::UnknownSender unless from_channel
+        raise IncomingMail::Errors::MessageTooLong if body.length > ActiveRecord::Base.maximum_text_length
+        raise IncomingMail::Errors::MessageTooLong if html_body.length > ActiveRecord::Base.maximum_text_length
+        raise IncomingMail::Errors::BlankMessage if body.blank?
 
-          Rails.cache.fetch(['incoming_mail_reply_from', context, incoming_message.message_id].cache_key, expires_in: 7.days) do
-            context.reply_from({
-                                 :purpose => 'general',
-                                 :user => user,
-                                 :subject => IncomingMailProcessor::IncomingMessageProcessor.utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
-                                 :html => html_body,
-                                 :text => body
-                               })
-            true
-          end
-        rescue IncomingMail::Errors::ReplyFrom => error
-          bounce_message(original_message, incoming_message, error, outgoing_from_address, from_channel)
-        rescue => e
-          Canvas::Errors.capture_exception("IncomingMailProcessor", e)
+        Rails.cache.fetch(['incoming_mail_reply_from', context, incoming_message.message_id].cache_key, expires_in: 7.days) do
+          context.reply_from({
+                               :purpose => 'general',
+                               :user => user,
+                               :subject => IncomingMailProcessor::IncomingMessageProcessor.utf8ify(incoming_message.subject, incoming_message.header[:subject].try(:charset)),
+                               :html => html_body,
+                               :text => body
+                             })
+          true
         end
+      rescue IncomingMail::Errors::ReplyFrom => error
+        bounce_message(original_message, incoming_message, error, outgoing_from_address, from_channel)
+      rescue => e
+        Canvas::Errors.capture_exception("IncomingMailProcessor", e)
       end
     end
 

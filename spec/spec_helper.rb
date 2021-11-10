@@ -78,15 +78,13 @@ module SpecTransactionWrapper
   def self.wrap_block_in_transaction(block)
     exception = nil
     ActiveRecord::Base.transaction(joinable: false, requires_new: true) do
-      begin
-        block.call
-      rescue ActiveRecord::StatementInvalid
-        # these need to properly roll back the transaction
-        raise
-      rescue
-        # anything else, the transaction needs to commit, but we need to re-raise outside the transaction
-        exception = $!
-      end
+      block.call
+    rescue ActiveRecord::StatementInvalid
+      # these need to properly roll back the transaction
+      raise
+    rescue
+      # anything else, the transaction needs to commit, but we need to re-raise outside the transaction
+      exception = $!
     end
     raise exception if exception
   end

@@ -187,22 +187,20 @@ class EpubExport < ActiveRecord::Base
   handle_asynchronously :convert_to_epub, priority: Delayed::LOW_PRIORITY
 
   def create_attachment_from_path!(file_path)
-    begin
-      mime_type = MIME::Types.type_for(file_path).first
-      file = Rack::Multipart::UploadedFile.new(
-        file_path,
-        mime_type.try(:content_type)
-      )
-      attachment = self.attachments.new
-      attachment.filename = File.basename(file_path)
-      Attachments::Storage.store_for_attachment(attachment, file)
-      attachment.save!
-    rescue Errno::ENOENT => e
-      mark_as_failed
-      raise e
-    ensure
-      file.try(:close)
-    end
+    mime_type = MIME::Types.type_for(file_path).first
+    file = Rack::Multipart::UploadedFile.new(
+      file_path,
+      mime_type.try(:content_type)
+    )
+    attachment = self.attachments.new
+    attachment.filename = File.basename(file_path)
+    Attachments::Storage.store_for_attachment(attachment, file)
+    attachment.save!
+  rescue Errno::ENOENT => e
+    mark_as_failed
+    raise e
+  ensure
+    file.try(:close)
   end
 
   def cleanup_file_path!(file_path)

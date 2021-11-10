@@ -359,24 +359,22 @@ test_1,TC 101,Test Course 101,,term1,deleted
 
     describe "with non-standard batches" do
       it "only queues one 'process_all_for_account' job and run together" do
-        begin
-          SisBatch.valid_import_types["silly_sis_batch"] = {
-            :callback => lambda { |batch| batch.data[:silliness_complete] = true; batch.finish(true) }
-          }
-          enable_cache do
-            batch1 = @account.sis_batches.create!(:workflow_state => "created", :data => { :import_type => "silly_sis_batch" })
-            batch1.process
-            batch2 = @account.sis_batches.create!(:workflow_state => "created", :data => { :import_type => "silly_sis_batch" })
-            batch2.process
-            expect(Delayed::Job.where(tag: "SisBatch.process_all_for_account",
-                                      singleton: SisBatch.strand_for_account(@account)).count).to eq 1
-            SisBatch.process_all_for_account(@account)
-            expect(batch1.reload.data[:silliness_complete]).to eq true
-            expect(batch2.reload.data[:silliness_complete]).to eq true
-          end
-        ensure
-          SisBatch.valid_import_types.delete("silly_sis_batch")
+        SisBatch.valid_import_types["silly_sis_batch"] = {
+          :callback => lambda { |batch| batch.data[:silliness_complete] = true; batch.finish(true) }
+        }
+        enable_cache do
+          batch1 = @account.sis_batches.create!(:workflow_state => "created", :data => { :import_type => "silly_sis_batch" })
+          batch1.process
+          batch2 = @account.sis_batches.create!(:workflow_state => "created", :data => { :import_type => "silly_sis_batch" })
+          batch2.process
+          expect(Delayed::Job.where(tag: "SisBatch.process_all_for_account",
+                                    singleton: SisBatch.strand_for_account(@account)).count).to eq 1
+          SisBatch.process_all_for_account(@account)
+          expect(batch1.reload.data[:silliness_complete]).to eq true
+          expect(batch2.reload.data[:silliness_complete]).to eq true
         end
+      ensure
+        SisBatch.valid_import_types.delete("silly_sis_batch")
       end
     end
   end

@@ -67,13 +67,11 @@ describe 'LTI Advantage Errors' do
     end
 
     it 'supports idiomatic raise usage' do
-      begin
-        raise described_class, 'message override'
-      rescue described_class => error
-        expect(error.message).to eq("message override :: #{default_api_message}")
-        expect(error.api_message).to eq(default_api_message)
-        expect(error.status_code).to eq(default_status_code)
-      end
+      raise described_class, 'message override'
+    rescue described_class => error
+      expect(error.message).to eq("message override :: #{default_api_message}")
+      expect(error.api_message).to eq(default_api_message)
+      expect(error.status_code).to eq(default_status_code)
     end
   end
 
@@ -153,13 +151,12 @@ describe 'LTI Advantage Errors' do
       # custom LTI Advantage error hierarchy work as expected, so we pick a rando error type at the bottom
       # of that tree and see if we can rescue it specifying a type at the top of that tree. (This is basically what
       # LTI Advantage controllers are expected to do.)
-      begin
-        raise Lti::IMS::AdvantageErrors::InvalidAccessTokenClaims, 'message override'
-      rescue Lti::IMS::AdvantageErrors::AdvantageServiceError => error
-        expect(error.message).to eq('message override :: Access token contains invalid claims')
-        expect(error.api_message).to eq('Access token contains invalid claims')
-        expect(error.status_code).to eq(:unauthorized)
-      end
+
+      raise Lti::IMS::AdvantageErrors::InvalidAccessTokenClaims, 'message override'
+    rescue Lti::IMS::AdvantageErrors::AdvantageServiceError => error
+      expect(error.message).to eq('message override :: Access token contains invalid claims')
+      expect(error.api_message).to eq('Access token contains invalid claims')
+      expect(error.status_code).to eq(:unauthorized)
     end
   end
 end

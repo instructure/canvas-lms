@@ -317,12 +317,10 @@ class AccountNotification < ActiveRecord::Base
 
     # don't try to send a message to an entire account in one job
     self.applicable_user_ids.each_slice(self.class.users_per_message_batch) do |sliced_user_ids|
-      begin
-        self.message_recipients = sliced_user_ids.map { |id| "user_#{id}" }
-        self.save # trigger the broadcast policy
-      ensure
-        self.message_recipients = nil
-      end
+      self.message_recipients = sliced_user_ids.map { |id| "user_#{id}" }
+      self.save # trigger the broadcast policy
+    ensure
+      self.message_recipients = nil
     end
     self.update_attribute(:messages_sent_at, Time.now.utc)
   end

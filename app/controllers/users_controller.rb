@@ -1224,26 +1224,24 @@ class UsersController < ApplicationController
   ServiceCredentials = Struct.new(:service_user_name, :decrypted_password)
 
   def create_user_service
-    begin
-      user_name = params[:user_service][:user_name]
-      password = params[:user_service][:password]
-      service = ServiceCredentials.new(user_name, password)
-      case params[:user_service][:service]
-      when 'delicious'
-        delicious_get_last_posted(service)
-      when 'diigo'
-        Diigo::Connection.diigo_get_bookmarks(service)
-      when 'skype'
-        true
-      else
-        raise "Unknown Service"
-      end
-      @service = UserService.register_from_params(@current_user, params[:user_service])
-      render :json => @service
-    rescue => e
-      Canvas::Errors.capture_exception(:user_service, e)
-      render :json => { :errors => true }, :status => :bad_request
+    user_name = params[:user_service][:user_name]
+    password = params[:user_service][:password]
+    service = ServiceCredentials.new(user_name, password)
+    case params[:user_service][:service]
+    when 'delicious'
+      delicious_get_last_posted(service)
+    when 'diigo'
+      Diigo::Connection.diigo_get_bookmarks(service)
+    when 'skype'
+      true
+    else
+      raise "Unknown Service"
     end
+    @service = UserService.register_from_params(@current_user, params[:user_service])
+    render :json => @service
+  rescue => e
+    Canvas::Errors.capture_exception(:user_service, e)
+    render :json => { :errors => true }, :status => :bad_request
   end
 
   def services

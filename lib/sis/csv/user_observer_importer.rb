@@ -34,11 +34,9 @@ module SIS
       def process(csv, index = nil, count = nil)
         count = SIS::UserObserverImporter.new(@root_account, importer_opts).process do |i|
           csv_rows(csv, index, count) do |row|
-            begin
-              i.process_user_observer(row['observer_id'], row['student_id'], row['status'])
-            rescue ImportError => e
-              SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
-            end
+            i.process_user_observer(row['observer_id'], row['student_id'], row['status'])
+          rescue ImportError => e
+            SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
           end
         end
         count

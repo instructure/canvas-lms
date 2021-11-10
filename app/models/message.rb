@@ -263,15 +263,13 @@ class Message < ActiveRecord::Base
   # populate the avatar, name, and email in the conversation email notification
 
   def author
-    @_author ||= begin
-      if author_context.has_attribute?(:user_id)
-        User.find(context.user_id)
-      elsif author_context.has_attribute?(:author_id)
-        User.find(context.author_id)
-      else
-        nil
-      end
-    end
+    @_author ||= if author_context.has_attribute?(:user_id)
+                   User.find(context.user_id)
+                 elsif author_context.has_attribute?(:author_id)
+                   User.find(context.author_id)
+                 else
+                   nil
+                 end
   end
 
   def author_context
@@ -1115,18 +1113,16 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def deliver_via_push
-    begin
-      self.user.notification_endpoints.each do |notification_endpoint|
-        notification_endpoint.destroy unless notification_endpoint.push_json(sns_json)
-      end
-      complete_dispatch
-    rescue StandardError => e
-      @exception = e
-      error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
-      logger.error error_string
-      cancel
-      raise e
+    self.user.notification_endpoints.each do |notification_endpoint|
+      notification_endpoint.destroy unless notification_endpoint.push_json(sns_json)
     end
+    complete_dispatch
+  rescue StandardError => e
+    @exception = e
+    error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+    logger.error error_string
+    cancel
+    raise e
   end
 
   private

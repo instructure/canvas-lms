@@ -55,13 +55,11 @@ class Quizzes::QuizSubmissionHistory
   end
 
   def kept
-    @kept ||= begin
-      if @submission.score == @submission.kept_score
-        @submission
-      else
-        version_models.detect { |v| v.score == @submission.kept_score }
-      end
-    end
+    @kept ||= if @submission.score == @submission.kept_score
+                @submission
+              else
+                version_models.detect { |v| v.score == @submission.kept_score }
+              end
   end
 
   private

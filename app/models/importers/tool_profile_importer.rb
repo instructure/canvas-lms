@@ -26,28 +26,26 @@ module Importers
         tool_profiles = data['tool_profiles'] || []
 
         tool_profiles.each do |tool_profile|
-          begin
-            values = tease_out_required_values!(tool_profile)
-            next unless migration.import_object?('tool_profiles', tool_profile['migration_id'])
+          values = tease_out_required_values!(tool_profile)
+          next unless migration.import_object?('tool_profiles', tool_profile['migration_id'])
 
-            tool_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
-              context: migration.context,
-              vendor_code: values[:vendor_code],
-              product_code: values[:product_code]
-            )
+          tool_proxies = Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
+            context: migration.context,
+            vendor_code: values[:vendor_code],
+            product_code: values[:product_code]
+          )
 
-            if tool_proxies.empty?
-              if values[:registration_url].blank?
-                migration.add_warning(I18n.t("We were unable to find a tool profile match for \"%{product_name}\".", product_name: values[:product_name]))
-              else
-                migration.add_warning(I18n.t("We were unable to find a tool profile match for \"%{product_name}\". If you would like to use this tool please install it using the following registration url: %{registration_url}", product_name: values[:product_name], registration_url: values[:registration_url]))
-              end
-            elsif tool_proxies.none? { |tool_proxy| tool_proxy.matching_tool_profile?(tool_profile['tool_profile']) }
-              migration.add_warning(I18n.t("We found a different version of \"%{product_name}\" installed for your course. If this tool fails to work as intended, try reregistering or reinstalling it.", product_name: values[:product_name]))
+          if tool_proxies.empty?
+            if values[:registration_url].blank?
+              migration.add_warning(I18n.t("We were unable to find a tool profile match for \"%{product_name}\".", product_name: values[:product_name]))
+            else
+              migration.add_warning(I18n.t("We were unable to find a tool profile match for \"%{product_name}\". If you would like to use this tool please install it using the following registration url: %{registration_url}", product_name: values[:product_name], registration_url: values[:registration_url]))
             end
-          rescue MissingRequiredToolProfileValuesError => e
-            migration.add_import_warning('tool_profile', tool_profile['resource_href'], e)
+          elsif tool_proxies.none? { |tool_proxy| tool_proxy.matching_tool_profile?(tool_profile['tool_profile']) }
+            migration.add_warning(I18n.t("We found a different version of \"%{product_name}\" installed for your course. If this tool fails to work as intended, try reregistering or reinstalling it.", product_name: values[:product_name]))
           end
+        rescue MissingRequiredToolProfileValuesError => e
+          migration.add_import_warning('tool_profile', tool_profile['resource_href'], e)
         end
       end
 

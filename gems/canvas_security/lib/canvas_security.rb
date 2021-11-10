@@ -253,18 +253,16 @@ module CanvasSecurity
     keys += encryption_keys
 
     keys.each do |key|
-      begin
-        body = JSON::JWT.decode(token, key)
-        verify_jwt(body, ignore_expiration: ignore_expiration)
-        return body.with_indifferent_access
-      rescue JSON::JWS::VerificationFailed
-        # Keep looping, to try all the keys. If none succeed,
-        # we raise below.
-      rescue CanvasSecurity::TokenExpired
-        raise
-      rescue => e
-        raise CanvasSecurity::InvalidToken, e
-      end
+      body = JSON::JWT.decode(token, key)
+      verify_jwt(body, ignore_expiration: ignore_expiration)
+      return body.with_indifferent_access
+    rescue JSON::JWS::VerificationFailed
+      # Keep looping, to try all the keys. If none succeed,
+      # we raise below.
+    rescue CanvasSecurity::TokenExpired
+      raise
+    rescue => e
+      raise CanvasSecurity::InvalidToken, e
     end
 
     raise CanvasSecurity::InvalidToken
@@ -287,13 +285,11 @@ module CanvasSecurity
                        end
 
     secrets_to_check.each do |cur_secret|
-      begin
-        raw_jwt = JSON::JWT.decode(signed_coded_jwt.plain_text, cur_secret)
-        verify_jwt(raw_jwt, ignore_expiration: ignore_expiration)
-        return raw_jwt.with_indifferent_access
-      rescue JSON::JWS::VerificationFailed => e
-        CanvasErrors.capture_exception(:security_auth, e, :info)
-      end
+      raw_jwt = JSON::JWT.decode(signed_coded_jwt.plain_text, cur_secret)
+      verify_jwt(raw_jwt, ignore_expiration: ignore_expiration)
+      return raw_jwt.with_indifferent_access
+    rescue JSON::JWS::VerificationFailed => e
+      CanvasErrors.capture_exception(:security_auth, e, :info)
     end
     raise CanvasSecurity::InvalidToken
   end

@@ -221,12 +221,10 @@ module Lti
       private
 
       def line_item_params
-        @_line_item_params ||= begin
-          params.permit(%i(resourceId resourceLinkId scoreMaximum label tag),
-                        Lti::LineItem::AGS_EXT_SUBMISSION_TYPE => [:type, :external_tool_url]).transform_keys do |k|
-            k.to_s.underscore
-          end.except(:resource_link_id)
-        end
+        @_line_item_params ||= params.permit(%i(resourceId resourceLinkId scoreMaximum label tag),
+                                             Lti::LineItem::AGS_EXT_SUBMISSION_TYPE => [:type, :external_tool_url]).transform_keys do |k|
+          k.to_s.underscore
+        end.except(:resource_link_id)
       end
 
       def assignment

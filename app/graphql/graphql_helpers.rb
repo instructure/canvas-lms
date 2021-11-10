@@ -26,23 +26,19 @@ module GraphQLHelpers
   # will get a standard canvas id
   def self.relay_or_legacy_id_prepare_func(expected_type)
     proc do |relay_or_legacy_id|
-      begin
-        self.parse_relay_or_legacy_id(relay_or_legacy_id, expected_type)
-      rescue InvalidIDError => e
-        GraphQL::ExecutionError.new(e.message)
-      end
+      self.parse_relay_or_legacy_id(relay_or_legacy_id, expected_type)
+    rescue InvalidIDError => e
+      GraphQL::ExecutionError.new(e.message)
     end
   end
 
   def self.relay_or_legacy_ids_prepare_func(expected_type)
     proc do |relay_or_legacy_ids|
-      begin
-        relay_or_legacy_ids.map do |relay_or_legacy_id|
-          self.parse_relay_or_legacy_id(relay_or_legacy_id, expected_type)
-        end
-      rescue InvalidIDError => e
-        GraphQL::ExecutionError.new(e.message)
+      relay_or_legacy_ids.map do |relay_or_legacy_id|
+        self.parse_relay_or_legacy_id(relay_or_legacy_id, expected_type)
       end
+    rescue InvalidIDError => e
+      GraphQL::ExecutionError.new(e.message)
     end
   end
 

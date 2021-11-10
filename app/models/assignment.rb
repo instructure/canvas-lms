@@ -1192,12 +1192,10 @@ class Assignment < ActiveRecord::Base
   private :validate_resource_link_custom_params
 
   def primary_resource_link
-    @primary_resource_link ||= begin
-      lti_resource_links.find_by(
-        resource_link_uuid: lti_context_id,
-        context: self
-      )
-    end
+    @primary_resource_link ||= lti_resource_links.find_by(
+      resource_link_uuid: lti_context_id,
+      context: self
+    )
   end
 
   def lti_1_3_external_tool_tag?

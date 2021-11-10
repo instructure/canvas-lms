@@ -297,18 +297,16 @@ class BigBlueButtonConference < WebConference
   end
 
   def fetch_recordings
-    @loaded_recordings ||= begin
-      if conference_key && settings[:record]
-        response = send_request(:getRecordings, {
-                                  :meetingID => conference_key,
-                                })
-        result = response[:recordings] if response
-        result = [] if result.is_a?(String)
-        Array(result)
-      else
-        []
-      end
-    end
+    @loaded_recordings ||= if conference_key && settings[:record]
+                             response = send_request(:getRecordings, {
+                                                       :meetingID => conference_key,
+                                                     })
+                             result = response[:recordings] if response
+                             result = [] if result.is_a?(String)
+                             Array(result)
+                           else
+                             []
+                           end
   end
 
   def generate_request(*args)

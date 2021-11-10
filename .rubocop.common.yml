@@ -138,6 +138,8 @@ Style/ParenthesesAroundCondition:
   Severity: error
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
+Style/RedundantBegin:
+  Severity: error
 Style/RedundantInterpolation:
   Severity: error
 Style/RedundantFreeze:

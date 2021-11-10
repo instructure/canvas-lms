@@ -35,21 +35,19 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionVersions
     def run_on_array(submission_ids, timestamp = Time.zone.now)
       base_url = "#{Shard.current.id}/api/v1/"
       submission_ids.map do |id|
-        begin
-          Rails.logger.info LOG_PREFIX + "#{id} data fix starting..."
-          success = run(id, timestamp)
-        rescue => e
-          Rails.logger.warn LOG_PREFIX + "#{id} failed with error: #{e}"
-        ensure
-          if success
-            Rails.logger.info LOG_PREFIX + "#{id} completed successfully"
-            sub = Submission.find(id)
-            assignment = sub.assignment
-            url = "#{base_url}courses/#{assignment.context.id}/assignments/#{assignment.id}/submissions/#{sub.user_id}"
-            Rails.logger.info LOG_PREFIX + "You can investigate #{id} manually at #{url}"
-          else
-            Rails.logger.warn LOG_PREFIX + "#{id} failed"
-          end
+        Rails.logger.info LOG_PREFIX + "#{id} data fix starting..."
+        success = run(id, timestamp)
+      rescue => e
+        Rails.logger.warn LOG_PREFIX + "#{id} failed with error: #{e}"
+      ensure
+        if success
+          Rails.logger.info LOG_PREFIX + "#{id} completed successfully"
+          sub = Submission.find(id)
+          assignment = sub.assignment
+          url = "#{base_url}courses/#{assignment.context.id}/assignments/#{assignment.id}/submissions/#{sub.user_id}"
+          Rails.logger.info LOG_PREFIX + "You can investigate #{id} manually at #{url}"
+        else
+          Rails.logger.warn LOG_PREFIX + "#{id} failed"
         end
       end
     end

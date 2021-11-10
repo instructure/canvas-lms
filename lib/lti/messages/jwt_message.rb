@@ -199,12 +199,10 @@ module Lti::Messages
       return nil unless @context.is_a?(Course)
       return nil if @user.blank?
 
-      @_current_observee_list ||= begin
-        @user.observer_enrollments.current
-             .where(course_id: @context.id)
-             .preload(:associated_user)
-             .map { |e| e.try(:associated_user).try(:lti_id) }.compact
-      end
+      @_current_observee_list ||= @user.observer_enrollments.current
+                                       .where(course_id: @context.id)
+                                       .preload(:associated_user)
+                                       .map { |e| e.try(:associated_user).try(:lti_id) }.compact
     end
 
     def custom_parameters

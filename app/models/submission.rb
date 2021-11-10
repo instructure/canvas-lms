@@ -803,13 +803,11 @@ class Submission < ActiveRecord::Base
   end
 
   def text_entry_originality_reports
-    @text_entry_originality_reports ||= begin
-      if self.association(:originality_reports).loaded?
-        originality_reports.select { |o| o.attachment_id.blank? }
-      else
-        originality_reports.where(attachment_id: nil)
-      end
-    end
+    @text_entry_originality_reports ||= if self.association(:originality_reports).loaded?
+                                          originality_reports.select { |o| o.attachment_id.blank? }
+                                        else
+                                          originality_reports.where(attachment_id: nil)
+                                        end
   end
 
   # Returns an array of both the versioned originality reports (those with attachments) and

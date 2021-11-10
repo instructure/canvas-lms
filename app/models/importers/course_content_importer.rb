@@ -276,104 +276,102 @@ module Importers
     end
 
     def self.adjust_dates(course, migration)
-      begin
-        # Adjust dates
-        if (shift_options = migration.date_shift_options)
-          shift_options = self.shift_date_options(course, shift_options)
+      # Adjust dates
+      if (shift_options = migration.date_shift_options)
+        shift_options = self.shift_date_options(course, shift_options)
 
-          Assignment.suspend_due_date_caching do
-            migration.imported_migration_items_by_class(Assignment).each do |event|
-              event.reload # just in case
-              event.due_at = shift_date(event.due_at, shift_options)
-              event.lock_at = shift_date(event.lock_at, shift_options)
-              event.unlock_at = shift_date(event.unlock_at, shift_options)
-              event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
-              event.needs_update_cached_due_dates = true if event.update_cached_due_dates?
-              event.save_without_broadcasting
-              if event.errors.any?
-                migration.add_warning(t("Couldn't adjust dates on assignment %{name} (ID %{id})", name: event.name, id: event.id.to_s))
-              end
-            end
-          end
-
-          migration.imported_migration_items_by_class(Attachment).each do |event|
+        Assignment.suspend_due_date_caching do
+          migration.imported_migration_items_by_class(Assignment).each do |event|
+            event.reload # just in case
+            event.due_at = shift_date(event.due_at, shift_options)
             event.lock_at = shift_date(event.lock_at, shift_options)
             event.unlock_at = shift_date(event.unlock_at, shift_options)
+            event.peer_reviews_due_at = shift_date(event.peer_reviews_due_at, shift_options)
+            event.needs_update_cached_due_dates = true if event.update_cached_due_dates?
             event.save_without_broadcasting
-          end
-
-          migration.imported_migration_items_by_class(Folder).each do |event|
-            event.lock_at = shift_date(event.lock_at, shift_options)
-            event.unlock_at = shift_date(event.unlock_at, shift_options)
-            event.save
-          end
-
-          (migration.imported_migration_items_by_class(Announcement) +
-            migration.imported_migration_items_by_class(DiscussionTopic)).each do |event|
-            event.reload
-            event.saved_by = :after_migration
-            event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
-            event.lock_at = shift_date(event.lock_at, shift_options)
-            event.todo_date = shift_date(event.todo_date, shift_options)
-            event.save_without_broadcasting
-          end
-
-          migration.imported_migration_items_by_class(CalendarEvent).each do |event|
-            event.reload
-            event.start_at = shift_date(event.start_at, shift_options)
-            event.end_at = shift_date(event.end_at, shift_options)
-            if event.all_day_date
-              ad_time = event.all_day_date.in_time_zone(shift_options[:time_zone] || Time.zone)
-              event.all_day_date = shift_date(ad_time, shift_options).try(:to_date)
+            if event.errors.any?
+              migration.add_warning(t("Couldn't adjust dates on assignment %{name} (ID %{id})", name: event.name, id: event.id.to_s))
             end
-            event.save_without_broadcasting
-          end
-
-          Assignment.suspend_due_date_caching do
-            migration.imported_migration_items_by_class(Quizzes::Quiz).each do |event|
-              event.reload # have to reload the quiz_data to keep link resolution - the others are just in case
-              event.due_at = shift_date(event.due_at, shift_options)
-              event.lock_at = shift_date(event.lock_at, shift_options)
-              event.unlock_at = shift_date(event.unlock_at, shift_options)
-              event.show_correct_answers_at = shift_date(event.show_correct_answers_at, shift_options)
-              event.hide_correct_answers_at = shift_date(event.hide_correct_answers_at, shift_options)
-              event.saved_by = :migration
-              event.save
-            end
-
-            migration.imported_migration_items_by_class(AssignmentOverride).each do |event|
-              AssignmentOverride.overridden_dates.each do |field|
-                date = event.send(field)
-                next unless date
-
-                event.send("#{field}=", shift_date(date, shift_options))
-              end
-              event.save_without_broadcasting
-            end
-          end
-
-          migration.imported_migration_items_by_class(ContextModule).each do |event|
-            event.unlock_at = shift_date(event.unlock_at, shift_options)
-            event.save
-          end
-
-          migration.imported_migration_items_by_class(WikiPage).each do |event|
-            event.reload
-            event.todo_date = shift_date(event.todo_date, shift_options)
-            event.save_without_broadcasting
-          end
-
-          course.set_course_dates_if_blank(shift_options)
-        else
-          (migration.imported_migration_items_by_class(Announcement) +
-            migration.imported_migration_items_by_class(DiscussionTopic)).each do |event|
-            event.saved_by = :after_migration
-            event.schedule_delayed_transitions
           end
         end
-      rescue
-        migration.add_warning(t(:due_dates_warning, "Couldn't adjust the due dates."), $!)
+
+        migration.imported_migration_items_by_class(Attachment).each do |event|
+          event.lock_at = shift_date(event.lock_at, shift_options)
+          event.unlock_at = shift_date(event.unlock_at, shift_options)
+          event.save_without_broadcasting
+        end
+
+        migration.imported_migration_items_by_class(Folder).each do |event|
+          event.lock_at = shift_date(event.lock_at, shift_options)
+          event.unlock_at = shift_date(event.unlock_at, shift_options)
+          event.save
+        end
+
+        (migration.imported_migration_items_by_class(Announcement) +
+          migration.imported_migration_items_by_class(DiscussionTopic)).each do |event|
+          event.reload
+          event.saved_by = :after_migration
+          event.delayed_post_at = shift_date(event.delayed_post_at, shift_options)
+          event.lock_at = shift_date(event.lock_at, shift_options)
+          event.todo_date = shift_date(event.todo_date, shift_options)
+          event.save_without_broadcasting
+        end
+
+        migration.imported_migration_items_by_class(CalendarEvent).each do |event|
+          event.reload
+          event.start_at = shift_date(event.start_at, shift_options)
+          event.end_at = shift_date(event.end_at, shift_options)
+          if event.all_day_date
+            ad_time = event.all_day_date.in_time_zone(shift_options[:time_zone] || Time.zone)
+            event.all_day_date = shift_date(ad_time, shift_options).try(:to_date)
+          end
+          event.save_without_broadcasting
+        end
+
+        Assignment.suspend_due_date_caching do
+          migration.imported_migration_items_by_class(Quizzes::Quiz).each do |event|
+            event.reload # have to reload the quiz_data to keep link resolution - the others are just in case
+            event.due_at = shift_date(event.due_at, shift_options)
+            event.lock_at = shift_date(event.lock_at, shift_options)
+            event.unlock_at = shift_date(event.unlock_at, shift_options)
+            event.show_correct_answers_at = shift_date(event.show_correct_answers_at, shift_options)
+            event.hide_correct_answers_at = shift_date(event.hide_correct_answers_at, shift_options)
+            event.saved_by = :migration
+            event.save
+          end
+
+          migration.imported_migration_items_by_class(AssignmentOverride).each do |event|
+            AssignmentOverride.overridden_dates.each do |field|
+              date = event.send(field)
+              next unless date
+
+              event.send("#{field}=", shift_date(date, shift_options))
+            end
+            event.save_without_broadcasting
+          end
+        end
+
+        migration.imported_migration_items_by_class(ContextModule).each do |event|
+          event.unlock_at = shift_date(event.unlock_at, shift_options)
+          event.save
+        end
+
+        migration.imported_migration_items_by_class(WikiPage).each do |event|
+          event.reload
+          event.todo_date = shift_date(event.todo_date, shift_options)
+          event.save_without_broadcasting
+        end
+
+        course.set_course_dates_if_blank(shift_options)
+      else
+        (migration.imported_migration_items_by_class(Announcement) +
+          migration.imported_migration_items_by_class(DiscussionTopic)).each do |event|
+          event.saved_by = :after_migration
+          event.schedule_delayed_transitions
+        end
       end
+    rescue
+      migration.add_warning(t(:due_dates_warning, "Couldn't adjust the due dates."), $!)
     end
 
     def self.clear_assignment_and_quiz_caches(migration)

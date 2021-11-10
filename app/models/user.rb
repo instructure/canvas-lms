@@ -696,20 +696,18 @@ class User < ActiveRecord::Base
             aa.depth = depth
             aa.shard = Shard.shard_for(account_id)
             aa.shard.activate do
-              begin
-                UserAccountAssociation.transaction(:requires_new => true) do
-                  aa.save!
-                end
-              rescue ActiveRecord::RecordNotUnique
-                # race condition - someone else created the UAA after we queried for existing ones
-                old_aa = UserAccountAssociation.where(user_id: aa.user_id, account_id: aa.account_id).first
-                raise unless old_aa # wtf!
+              UserAccountAssociation.transaction(:requires_new => true) do
+                aa.save!
+              end
+            rescue ActiveRecord::RecordNotUnique
+              # race condition - someone else created the UAA after we queried for existing ones
+              old_aa = UserAccountAssociation.where(user_id: aa.user_id, account_id: aa.account_id).first
+              raise unless old_aa # wtf!
 
-                # make sure we don't need to change the depth
-                if depth < old_aa.depth
-                  old_aa.depth = depth
-                  old_aa.save!
-                end
+              # make sure we don't need to change the depth
+              if depth < old_aa.depth
+                old_aa.depth = depth
+                old_aa.save!
               end
             end
           else
@@ -760,9 +758,7 @@ class User < ActiveRecord::Base
 
   # Returns an array of groups which are currently visible for the user.
   def visible_groups
-    @visible_groups ||= begin
-      filter_visible_groups_for_user(self.current_groups)
-    end
+    @visible_groups ||= filter_visible_groups_for_user(self.current_groups)
   end
 
   def filter_visible_groups_for_user(groups)

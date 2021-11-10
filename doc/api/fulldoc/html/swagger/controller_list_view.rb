@@ -90,11 +90,9 @@ class ControllerListView < HashView
   def models
     {}.tap do |m|
       merge = lambda do |name, hash|
-        begin
-          m.merge! hash
-        rescue JSON::ParserError
-          puts "Unable to parse model: #{name} (#{ctrl.raw_name})"
-        end
+        m.merge! hash
+      rescue JSON::ParserError
+        puts "Unable to parse model: #{name} (#{ctrl.raw_name})"
       end
 
       # If @object tags are available to describe a class of object, we'll

@@ -81,9 +81,7 @@ class AuthenticationProvider::LinkedIn < AuthenticationProvider::OAuth2
   end
 
   def email(token)
-    token.options[:emailAddress] ||= begin
-      token.get("/v2/emailAddress?q=members&projection=(elements*(handle~))").parsed["elements"].first["handle~"]
-    end
+    token.options[:emailAddress] ||= token.get("/v2/emailAddress?q=members&projection=(elements*(handle~))").parsed["elements"].first["handle~"]
   end
 
   def email_required?
