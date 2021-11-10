@@ -29,7 +29,7 @@ describe "better_file_browsing" do
       @student = course_with_student(active_all: true).user
     end
 
-    before :each do
+    before do
       user_session(@student)
     end
 

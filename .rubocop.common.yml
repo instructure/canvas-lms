@@ -96,6 +96,8 @@ RSpec/ExampleWording:
   Severity: error
 RSpec/ExpectInHook:
   Enabled: false # follows RSpec/MultipleExpectations
+RSpec/HookArgument:
+  Severity: error
 RSpec/InstanceVariable:
   Enabled: false # legacy code
 RSpec/MessageSpies:
@@ -170,8 +172,6 @@ RSpec/ContextWording: # TODO
 RSpec/DescribeClass: # TODO
   Enabled: false
 RSpec/ExpectChange: # TODO: autocorrect (unsafe)
-  Enabled: false
-RSpec/HookArgument: # TODO: autocorrect
   Enabled: false
 RSpec/NamedSubject: # TODO
   Enabled: false

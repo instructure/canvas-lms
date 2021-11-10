@@ -41,7 +41,7 @@ describe "context modules" do
       @course.reload
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 
@@ -261,7 +261,7 @@ describe "context modules" do
         @mod[0].add_item({ id: @assignment2.id, type: 'assignment' })
       end
 
-      before :each do
+      before do
         get "/courses/#{@course.id}/modules"
       end
 

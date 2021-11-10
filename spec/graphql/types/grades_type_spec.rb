@@ -41,7 +41,7 @@ describe Types::GradesType do
 
   let(:enrollment_type) { GraphQLTypeTester.new(student_enrollment, current_user: teacher) }
 
-  before(:each) do
+  before do
     score.update!(
       current_score: 68.0,
       final_score: 78.1,

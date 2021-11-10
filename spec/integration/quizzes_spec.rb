@@ -28,7 +28,7 @@ describe Quizzes::QuizzesController do
   end
 
   context "#show" do
-    before :each do
+    before do
       course_with_teacher_logged_in(:active_all => true)
       assignment_model(:course => @course)
       quiz_model(:course => @course, :assignment_id => @assignment.id)
@@ -123,7 +123,7 @@ describe Quizzes::QuizzesController do
   end
 
   context "show_student" do
-    before :each do
+    before do
       course_with_student_logged_in(:active_all => true)
       course_quiz true
       post "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@student.id}"

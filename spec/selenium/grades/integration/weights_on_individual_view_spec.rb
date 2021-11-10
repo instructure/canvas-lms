@@ -44,7 +44,7 @@ describe 'individual view' do
     weighted_grading_setup
   end
 
-  after(:each) do
+  after do
     clear_local_storage
   end
 

@@ -106,7 +106,7 @@ describe 'Late Policies:' do
       @a3.grade_student(@student, grade: 9, grader: @teacher)
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
       Gradebook.visit(@course)
     end
@@ -162,7 +162,7 @@ describe 'Late Policies:' do
       student_in_course
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
       Gradebook.visit(@course)
       Gradebook.settings_cog_select

@@ -114,7 +114,7 @@ describe 'Moderated Grades API', type: :request do
     let(:create_url) { "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/moderated_students" }
 
     context 'when no student_ids are passed in' do
-      before(:each) do
+      before do
         @assignment.update!(final_grader: @teacher)
         user_session @teacher
         @parsed_json = api_call(:post, create_url, create_params, {}, {})

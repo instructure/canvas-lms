@@ -54,7 +54,7 @@ describe GradebookHistoryApiController do
     @submission4.update!(:graded_at => (Time.now - 24.hours), :grader_id => @other_grader.id, :score => 70)
   end
 
-  before :each do
+  before do
     user_session(@teacher)
   end
 
@@ -113,7 +113,7 @@ describe GradebookHistoryApiController do
 
   describe 'GET feed' do
     context 'deleted submissions' do
-      before :each do
+      before do
         @submission1.destroy
         get 'feed', params: { course_id: @course.id }, format: 'json'
       end

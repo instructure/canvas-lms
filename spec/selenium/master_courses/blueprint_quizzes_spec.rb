@@ -54,7 +54,7 @@ describe "blueprint courses quizzes" do
     end
 
     context "as a blueprint's teacher" do
-      before :each do
+      before do
         user_session(@master_teacher)
       end
 
@@ -93,7 +93,7 @@ describe "blueprint courses quizzes" do
       @quiz_copy.save!
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 
@@ -229,7 +229,7 @@ describe "blueprint courses quizzes" do
       copy_group.quiz_questions.create! quiz: @quiz_copy, question_data: question_data
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 

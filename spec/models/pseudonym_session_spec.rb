@@ -19,7 +19,7 @@
 #
 
 describe PseudonymSession do
-  before(:each) do
+  before do
     fake_controller_cls = Class.new do
       attr_reader :request
 
@@ -53,7 +53,7 @@ describe PseudonymSession do
     Authlogic::Session::Base.controller = fake_controller_cls.new
   end
 
-  after(:each) do
+  after do
     Authlogic::Session::Base.controller = nil
   end
 

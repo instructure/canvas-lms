@@ -258,7 +258,7 @@ module Alerts
           @submission = @assignment.submit_homework(@user, :body => 'body')
         end
 
-        before :each do
+        before do
           @pseudonym = double('Pseudonym')
           allow(@pseudonym).to receive(:destroyed?).and_return(false)
           allow(Pseudonym).to receive(:find_by_user_id).and_return(@pseudonym)

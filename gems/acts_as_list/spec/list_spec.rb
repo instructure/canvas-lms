@@ -40,12 +40,12 @@ class UnscopedListMixin < Mixin
 end
 
 describe "ListTest" do
-  after :each do
+  after do
     teardown_db
   end
 
   describe do
-    before :each do
+    before do
       setup_db
       (1..4).each { |counter| ListMixin.create! :pos => counter, :parent_id => 5 }
     end
@@ -189,7 +189,7 @@ describe "ListTest" do
   end
 
   describe 'SubTest' do
-    before :each do
+    before do
       setup_db
       (1..4).each { |i| (i.odd? ? ListMixinSub1 : ListMixinSub2).create! :pos => i, :parent_id => 5000 }
     end

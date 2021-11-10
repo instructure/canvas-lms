@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe CanvasSecurity::JWTWorkflow do
-  before(:each) do
+  before do
     @c = Course.new
     @a = Account.new
     @c.account = @a
@@ -35,7 +35,7 @@ describe CanvasSecurity::JWTWorkflow do
 
   describe 'workflows' do
     describe ':rich_content' do
-      before(:each) do
+      before do
         allow(@c).to receive(:respond_to?).with(:usage_rights_required?).and_return(true)
         allow(@c).to receive(:grants_right?)
         allow(@c).to receive(:feature_enabled?)
@@ -107,7 +107,7 @@ describe CanvasSecurity::JWTWorkflow do
     end
 
     describe ':ui' do
-      before(:each) { allow(@u).to receive(:prefers_high_contrast?) }
+      before { allow(@u).to receive(:prefers_high_contrast?) }
 
       it 'sets use_high_contrast to true' do
         expect(@u).to receive(:prefers_high_contrast?).and_return(true)

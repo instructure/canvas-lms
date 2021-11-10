@@ -26,7 +26,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
   include RCENextPage
 
   context "as a student" do
-    before(:each) do
+    before do
       course_with_student_logged_in
       stub_rcs_config
     end

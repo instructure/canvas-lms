@@ -517,7 +517,7 @@ describe Folder do
     end
 
     context "when a 'Buttons and Icons' folder already exists" do
-      before(:each) do
+      before do
         @existing_folder = Folder.buttons_and_icons_folder(course)
       end
 

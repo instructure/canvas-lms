@@ -53,7 +53,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::MissingWord do
     context "with no answer specified as correct" do
       let(:unspecified_answers) { raw_answers.map { |a| a[:answer_weight] = 0; a } }
 
-      before(:each) do
+      before do
         question = Quizzes::QuizQuestion::QuestionData.new({})
         question.answers = Quizzes::QuizQuestion::AnswerGroup.new(unspecified_answers)
         parser = Quizzes::QuizQuestion::AnswerParsers::MissingWord.new(question.answers)

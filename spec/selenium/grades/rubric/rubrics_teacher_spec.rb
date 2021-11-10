@@ -26,7 +26,7 @@ describe "teacher shared rubric specs" do
   let(:rubric_url) { "/courses/#{@course.id}/rubrics" }
   let(:who_to_login) { 'teacher' }
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in
   end
 
@@ -61,7 +61,7 @@ describe "course rubrics" do
   include RubricsCommon
 
   context "as a teacher" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 
@@ -186,7 +186,7 @@ describe "course rubrics" do
     end
 
     context "with the account_level_mastery_scales FF enabled" do
-      before :each do
+      before do
         @course.account.enable_feature!(:account_level_mastery_scales)
       end
 

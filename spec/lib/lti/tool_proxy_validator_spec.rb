@@ -50,7 +50,7 @@ module Lti
       }
     end
 
-    before :each do
+    before do
       allow(tp_validator).to receive(:tool_consumer_profile=)
       allow(tp_validator).to receive(:errors)
       allow(::IMS::LTI::Services::ToolProxyValidator).to receive(:new).and_return(tp_validator)
@@ -116,7 +116,7 @@ module Lti
           sp
         end
 
-        before(:each) do
+        before do
           allow(tp_validator).to receive(:errors).and_return({})
         end
 

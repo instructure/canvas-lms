@@ -34,7 +34,7 @@ describe ExternalToolsController do
   end
 
   describe "GET 'jwt_token'" do
-    before :each do
+    before do
       @iat = Time.zone.now
       allow_any_instance_of(Time.zone.class).to receive(:now).and_return(@iat)
       @tool = new_valid_tool(@course)

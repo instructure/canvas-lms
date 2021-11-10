@@ -126,7 +126,7 @@ describe 'Global Grades' do
   let(:grade_total_no_gp) { (score5 / @assignment5.points_possible) * 100 }
 
   context 'as student' do
-    before(:each) do
+    before do
       user_session(@student)
 
       # navigate to global grades page
@@ -157,7 +157,7 @@ describe 'Global Grades' do
   end
 
   context 'as teacher' do
-    before(:each) do
+    before do
       user_session(@teacher)
 
       # navigate to global grades page

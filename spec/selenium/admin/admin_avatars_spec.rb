@@ -32,7 +32,7 @@ RSpec.shared_examples "course_files" do
       set_granular_permission
     end
 
-    before(:each) do
+    before do
       course_with_admin_logged_in
       Account.default.enable_service(:avatars)
       Account.default.settings[:avatars] = 'enabled_pending'
@@ -134,7 +134,7 @@ RSpec.shared_examples "course_files" do
     context "student tray in original gradebook" do
       include StudentContextTray
 
-      before(:each) do
+      before do
         @account = Account.default
         @student = student_in_course.user
         @student.avatar_image_url = "http://www.example.com"

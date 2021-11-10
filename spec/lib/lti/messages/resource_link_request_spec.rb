@@ -134,7 +134,7 @@ describe Lti::Messages::ResourceLinkRequest do
         ]
       end
 
-      before(:each) do
+      before do
         allow(controller).to receive(:lti_line_item_index_url).and_return('lti_line_item_index_url')
         allow(controller).to receive(:lti_line_item_show_url).with(
           {

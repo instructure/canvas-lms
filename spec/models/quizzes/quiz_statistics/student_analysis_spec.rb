@@ -158,7 +158,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   end
 
   context "csv" do
-    before(:each) do
+    before do
       student_in_course(:active_all => true)
       @quiz = @course.quizzes.create!
       @quiz.quiz_questions.create!(:question_data => { :name => "test 1" })

@@ -371,7 +371,7 @@ describe ContentMigration do
       context "when copying a single assignment" do
         let(:content_migration) { @cm }
 
-        before(:each) do
+        before do
           content_migration.copy_options = { assignments: { mig_id(source_assignment) => true } }
         end
 
@@ -400,7 +400,7 @@ describe ContentMigration do
           )
         end
 
-        before(:each) do
+        before do
           content_migration.copy_options = {
             assignments: {
               mig_id(source_assignment) => true,
@@ -1013,7 +1013,7 @@ describe ContentMigration do
     end
 
     context 'post_to_sis' do
-      before :each do
+      before do
         @course.root_account.enable_feature!(:new_sis_integrations)
         @course.root_account.settings[:sis_syncing] = true
         @course.root_account.settings[:sis_require_assignment_due_date] = true

@@ -31,7 +31,7 @@ describe "context modules" do
       @mod = @course.context_modules.first
     end
 
-    before(:each) do
+    before do
       course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
     end
 
@@ -207,7 +207,7 @@ describe "context modules" do
       @mod = @course.context_modules.first
     end
 
-    before(:each) do
+    before do
       course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
     end
 
@@ -300,7 +300,7 @@ describe "context modules" do
       @file2.save!
     end
 
-    before(:each) do
+    before do
       course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
     end
 
@@ -551,7 +551,7 @@ describe "context modules" do
       @course.reload
     end
 
-    before(:each) do
+    before do
       remove_user_session
     end
 

@@ -22,7 +22,7 @@ describe Quizzes::SubmissionManager do
   describe '#find_or_create_submission' do
     let(:test_user) { user_factory }
 
-    before(:each) do
+    before do
       course_factory
       @quiz = @course.quizzes.create! :title => "hello"
     end

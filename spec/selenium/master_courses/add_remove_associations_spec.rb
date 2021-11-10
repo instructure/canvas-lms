@@ -56,7 +56,7 @@ describe "master courses - add and remove course associations" do
     account_admin_user(active_all: true)
   end
 
-  before :each do
+  before do
     user_session(@admin)
   end
 

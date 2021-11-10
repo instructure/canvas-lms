@@ -25,7 +25,7 @@ describe 'publishing a quiz' do
   include QuizzesCommon
 
   context 'as a teacher' do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       @quiz = create_quiz_with_due_date(course: @course)
       @quiz.workflow_state = 'unavailable'
@@ -40,7 +40,7 @@ describe 'publishing a quiz' do
       end
 
       context 'after the quiz is published' do
-        before(:each) do
+        before do
           @quiz.workflow_state = 'available'
           @quiz.save!
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"

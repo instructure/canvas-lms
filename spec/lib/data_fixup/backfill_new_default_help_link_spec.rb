@@ -50,7 +50,7 @@ describe DataFixup::BackfillNewDefaultHelpLink do
     @original_help_links_builder = @account.help_links_builder
   end
 
-  before(:each) do
+  before do
     allow_any_instance_of(Account).to receive(:help_links_builder).and_return(help_links_builder_double)
     allow(help_links_builder_double).to receive(:default_links).and_return([])
     allow(help_links_builder_double).to receive(:instantiate_links) { |links| @original_help_links_builder.instantiate_links(links) }

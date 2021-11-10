@@ -73,7 +73,7 @@ describe "site admin jobs ui" do
     Delayed::Job.list_jobs(:future, nil)
   end
 
-  before(:each) do
+  before do
     site_admin_logged_in
     track_jobs do
       2.times { "present".delay.reverse }
@@ -122,7 +122,7 @@ describe "site admin jobs ui" do
     end
 
     context "all jobs" do
-      before(:each) do
+      before do
         load_jobs_page
       end
 

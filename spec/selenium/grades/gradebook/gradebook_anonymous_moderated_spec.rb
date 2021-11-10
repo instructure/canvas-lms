@@ -41,7 +41,7 @@ describe 'New Gradebook' do
       )
     end
 
-    before(:each) do
+    before do
       # create a new anonymous assignment
       @anonymous_assignment = @course.assignments.create!(
         title: 'Anonymous Assignment',
@@ -81,7 +81,7 @@ describe 'New Gradebook' do
       @teacher3 = course_with_teacher(course: @course, name: 'Teacher3', active_all: true).user
     end
 
-    before(:each) do
+    before do
       # create moderated assignment
       @moderated_assignment = @course.assignments.create!(
         title: 'Moderated Assignment1',
@@ -127,7 +127,7 @@ describe 'New Gradebook' do
     end
 
     context "causes editing grades to be" do
-      before(:each) do
+      before do
         user_session(@teacher1)
         Gradebook.visit(@course)
       end

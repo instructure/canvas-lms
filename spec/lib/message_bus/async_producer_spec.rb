@@ -24,7 +24,7 @@ end
 describe MessageBus::AsyncProducer do
   let(:namespace) { "test-only" }
 
-  before(:each) do
+  before do
     skip("pulsar config required to test") unless MessageBus.enabled?
   end
 
@@ -60,7 +60,7 @@ describe MessageBus::AsyncProducer do
   end
 
   describe "push" do
-    around(:each) do |example|
+    around do |example|
       # let's not waste time with queue throttling in tests
       MessageBus.worker_process_interval = -> { 0.01 }
       MessageBus.max_mem_queue_size = -> { 10 }
@@ -70,7 +70,7 @@ describe MessageBus::AsyncProducer do
       Canvas::MessageBusConfig.apply # resets config changes made to interval and queue size
     end
 
-    after(:each) do
+    after do
       MessageBus.reset!
     end
 
@@ -120,7 +120,7 @@ describe MessageBus::AsyncProducer do
       Bundler.require(:pulsar)
     end
 
-    around(:each) do |example|
+    around do |example|
       # let's not waste time with queue throttling in tests
       MessageBus.worker_process_interval = -> { 0.01 }
       example.run

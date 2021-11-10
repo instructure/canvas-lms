@@ -43,7 +43,7 @@ describe TokensController do
         user_factory(active_user: true)
       end
 
-      before :each do
+      before do
         user_session(@user)
       end
 

@@ -69,7 +69,7 @@ describe RubricAssociationsController do
 
       let(:last_created_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_created').last }
 
-      before(:each) do
+      before do
         user_session(teacher)
       end
 
@@ -231,7 +231,7 @@ describe RubricAssociationsController do
       let(:old_rubric) { Rubric.create!(title: 'zzz', context: course) }
       let(:last_updated_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_updated').last }
 
-      before(:each) do
+      before do
         RubricAssociation.generate(
           teacher,
           old_rubric,
@@ -347,7 +347,7 @@ describe RubricAssociationsController do
         RubricAssociation.generate(teacher, rubric, course, purpose: 'grading', association_object: assignment)
       end
 
-      before(:each) do
+      before do
         user_session(teacher)
       end
 

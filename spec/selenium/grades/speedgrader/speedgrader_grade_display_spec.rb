@@ -32,7 +32,7 @@ describe "speed grader - grade display" do
     let(:points) { 10.0 }
     let(:grade) { 3.0 }
 
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       create_and_enroll_students(2)
       @assignment = @course.assignments.create(name: 'assignment', points_possible: points)
@@ -64,7 +64,7 @@ describe "speed grader - grade display" do
       grade_assignments
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 
@@ -95,7 +95,7 @@ describe "speed grader - grade display" do
     let(:first_grade) { 5 }
     let(:last_grade) { 10 }
 
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       create_and_enroll_students(2)
       @assignment = @course.assignments.create!(

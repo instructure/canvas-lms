@@ -36,7 +36,7 @@ describe "assignments" do
   end
 
   context "as a student" do
-    before(:each) do
+    before do
       course_with_student_logged_in
     end
 

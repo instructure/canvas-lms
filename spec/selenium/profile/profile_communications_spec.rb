@@ -46,7 +46,7 @@ describe "profile communication settings" do
   let(:sns_channel) { communication_channel(@user, { username: 'push', path_type: CommunicationChannel::TYPE_PUSH }) }
 
   context "as teacher" do
-    before :each do
+    before do
       course_with_teacher_logged_in
     end
 

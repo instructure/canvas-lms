@@ -29,7 +29,7 @@ module Lti::MembershipService
     let(:group_hash) { group_presenter.as_json }
 
     context 'course with single enrollment' do
-      before(:each) do
+      before do
         course_with_teacher
       end
 
@@ -95,7 +95,7 @@ module Lti::MembershipService
     end
 
     context 'group with single student' do
-      before(:each) do
+      before do
         course_with_teacher
         @course.offer!
         @student = user_model
@@ -168,7 +168,7 @@ module Lti::MembershipService
     end
 
     context 'course with multiple enrollments' do
-      before(:each) do
+      before do
         course_with_teacher(:active_course => true)
         @course.enroll_user(@teacher, 'TeacherEnrollment', enrollment_state: 'active')
         @ta = user_model

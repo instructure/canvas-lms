@@ -25,7 +25,7 @@ describe AuthenticationMethods::InstAccessToken do
   let(:encryption_priv_key) { encryption_keypair.to_s }
   let(:encryption_pub_key) { encryption_keypair.public_key.to_s }
 
-  around(:each) do |example|
+  around do |example|
     InstAccess.with_config(signing_key: signing_priv_key) do
       example.run
     end

@@ -32,7 +32,7 @@ describe DocviewerAuditEventsController do
     Canvadoc.create!(document_id: "abc123#{@attachment.id}", attachment_id: @attachment.id)
   end
 
-  before :each do
+  before do
     # Assignment.create! will hit MultiCache, and if a default stub doesn't
     # exist, the stub with args will throw an error.
     allow(Canvas::DynamicSettings).to receive(:find).and_return({})

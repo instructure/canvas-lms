@@ -33,7 +33,7 @@ describe "calendar2" do
   end
 
   context "as the student" do
-    before :each do
+    before do
       # or some stuff we need to click is "below the fold"
 
       user_session(@student1)
@@ -160,7 +160,7 @@ describe "calendar2" do
   end
 
   context "as the teacher" do
-    before :each do
+    before do
       # or some stuff we need to click is "below the fold"
 
       user_session(@teacher)
@@ -231,7 +231,7 @@ describe "calendar2" do
       @course2 = course_with_student(user: @user, active_all: true).course
     end
 
-    before :each do
+    before do
       # or some stuff we need to click is "below the fold"
       @user.update!(preferences: { :selected_calendar_contexts => ["user_#{@user.id}", "course_#{@course1.id}", "course_#{@course2.id}"] })
       user_session(@user)

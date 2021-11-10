@@ -42,7 +42,7 @@ describe "conversations new" do
   end
 
   context "Course with Faculty Journal not enabled" do
-    before(:each) do
+    before do
       site_admin_logged_in
       stub_rcs_config
     end
@@ -57,7 +57,7 @@ describe "conversations new" do
   end
 
   context "Course with Faculty Journal enabled" do
-    before(:each) do
+    before do
       site_admin_logged_in
       @course.account.update_attribute(:enable_user_notes, true)
     end

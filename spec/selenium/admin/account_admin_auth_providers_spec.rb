@@ -24,7 +24,7 @@ describe 'account authentication' do
   include_context 'in-process server selenium tests'
   include AuthenticationProvidersCommon
 
-  before(:each) do
+  before do
     course_with_admin_logged_in
   end
 

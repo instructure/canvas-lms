@@ -32,7 +32,7 @@ describe Lti::PermissionChecker do
     end
 
     context "assignment" do
-      before :each do
+      before do
         allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:create_subscription).and_return true
         allow_any_instance_of(AssignmentConfigurationToolLookup).to receive(:destroy_subscription).and_return true
         @original_fallback = Canvas::DynamicSettings.fallback_data
@@ -42,7 +42,7 @@ describe Lti::PermissionChecker do
         }
       end
 
-      after :each do
+      after do
         Canvas::DynamicSettings.fallback_data = @original_fallback
       end
 

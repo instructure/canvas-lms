@@ -550,7 +550,7 @@ describe "Accounts API", type: :request do
         }
       end
 
-      before(:each) do
+      before do
         user_session(@user)
       end
 
@@ -573,7 +573,7 @@ describe "Accounts API", type: :request do
       end
 
       context 'microsoft_group_enrollments_syncing flag disabled' do
-        before(:each) { account.root_account.disable_feature!(:microsoft_group_enrollments_syncing) }
+        before { account.root_account.disable_feature!(:microsoft_group_enrollments_syncing) }
 
         it_behaves_like 'an invalid request'
 
@@ -585,7 +585,7 @@ describe "Accounts API", type: :request do
       end
 
       context 'microsoft_group_enrollments_syncing flag enabled' do
-        before(:each) { account.root_account.enable_feature!(:microsoft_group_enrollments_syncing) }
+        before { account.root_account.enable_feature!(:microsoft_group_enrollments_syncing) }
 
         context 'no Microsoft Teams settings provided' do
           let(:tenant_name) { nil }
@@ -691,7 +691,7 @@ describe "Accounts API", type: :request do
         end
 
         context 'account already has settings' do
-          before(:each) do
+          before do
             account.settings = {
               microsoft_sync_enabled: true,
               microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
@@ -717,7 +717,7 @@ describe "Accounts API", type: :request do
             it_behaves_like 'a valid request'
 
             context 'account has already has a suffix set' do
-              before(:each) do
+              before do
                 account.settings[:microsoft_sync_login_attribute_suffix] = "@example.com"
                 account.save!
               end

@@ -35,7 +35,7 @@ module Services
         @at = AccessToken.create!(:user => @user, :developer_key => DeveloperKey.default)
       end
 
-      before(:each) do
+      before do
         @queue = double('notification queue')
         allow(NotificationService).to receive(:notification_sqs).and_return(@queue)
         allow(NotificationService).to receive(:choose_queue_url).and_return('default')

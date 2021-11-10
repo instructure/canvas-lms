@@ -22,7 +22,7 @@ require 'turnitin_api'
 module Turnitin
   describe AttachmentManager do
     include_context "shared_tii_lti"
-    before(:each) do
+    before do
       allow(TiiClient).to receive(:new).with(lti_student, lti_assignment, tool, outcome_response_json).and_return(tii_client)
     end
 

@@ -225,7 +225,7 @@ describe MediaObject do
       )
     end
 
-    before :each do
+    before do
       mock_kaltura = double('CanvasKaltura::ClientV3')
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_kaltura)
       allow(mock_kaltura).to receive(:media_sources).and_return(
@@ -234,7 +234,7 @@ describe MediaObject do
       )
     end
 
-    before :each do
+    before do
       @mock_kaltura = double('CanvasKaltura::ClientV3')
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
       allow(@mock_kaltura).to receive(:startSession).and_return(nil)

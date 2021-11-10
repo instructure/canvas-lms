@@ -39,7 +39,7 @@ describe Canvadocs do
 
     let(:user_filter) { session_params[:user_filter] }
 
-    before(:each) do
+    before do
       course.enroll_student(student).accept(true)
       course.enroll_teacher(teacher).accept(true)
       attachment.associate_with(submission)
@@ -86,7 +86,7 @@ describe Canvadocs do
         end
 
         context 'when a grader is viewing' do
-          before(:each) do
+          before do
             @current_user = teacher
           end
 
@@ -100,7 +100,7 @@ describe Canvadocs do
           end
 
           context 'when the assignment is moderated' do
-            before(:each) do
+            before do
               assignment.update!(moderated_grading: true, final_grader: teacher, grader_count: 1)
             end
 
@@ -290,12 +290,12 @@ describe Canvadocs do
         end
 
         context 'for an unmoderated anonymized assignment' do
-          before(:each) do
+          before do
             assignment.update!(anonymous_grading: true, muted: true)
           end
 
           context 'when a student is viewing' do
-            before(:each) do
+            before do
               @current_user = student
             end
 
@@ -310,7 +310,7 @@ describe Canvadocs do
           end
 
           context 'when a teacher is viewing' do
-            before(:each) do
+            before do
               @current_user = teacher
             end
 
@@ -325,12 +325,12 @@ describe Canvadocs do
         end
 
         context 'for an unmoderated non-anonymized assignment' do
-          before(:each) do
+          before do
             assignment.update!(anonymous_grading: false, muted: false)
           end
 
           context 'when a student is viewing' do
-            before(:each) do
+            before do
               @current_user = student
             end
 
@@ -344,7 +344,7 @@ describe Canvadocs do
           end
 
           context 'when a teacher is viewing' do
-            before(:each) do
+            before do
               @current_user = teacher
             end
 
@@ -371,7 +371,7 @@ describe Canvadocs do
             { type: 'real', role: 'ta', id: provisional_grader.global_id.to_s, name: 'Pub the Prov' }
           end
 
-          before(:each) do
+          before do
             assignment.update!(moderated_grading: true, final_grader: final_grader, grader_count: 1)
             assignment.moderation_graders.create!(user: final_grader, anonymous_id: 'qqqqq')
             course.enroll_ta(provisional_grader).accept(true)
@@ -379,7 +379,7 @@ describe Canvadocs do
           end
 
           context 'when a student is viewing' do
-            before(:each) do
+            before do
               @current_user = student
             end
 
@@ -415,7 +415,7 @@ describe Canvadocs do
           end
 
           context 'when a provisional grader is viewing' do
-            before(:each) do
+            before do
               @current_user = provisional_grader
             end
 
@@ -467,7 +467,7 @@ describe Canvadocs do
           end
 
           context 'when the final grader is viewing' do
-            before(:each) do
+            before do
               @current_user = final_grader
             end
 
@@ -527,7 +527,7 @@ describe Canvadocs do
         end
 
         context 'when a grader is viewing' do
-          before(:each) do
+          before do
             @current_user = teacher
           end
 
@@ -541,7 +541,7 @@ describe Canvadocs do
           end
 
           context 'when the assignment is moderated' do
-            before(:each) do
+            before do
               assignment.update!(moderated_grading: true, final_grader: teacher, grader_count: 1)
             end
 
@@ -571,12 +571,12 @@ describe Canvadocs do
         let(:ta_anonymous_data) { hash_including(type: 'anonymous', role: 'ta', id: 'tttt') }
 
         context 'for an unmoderated anonymized assignment' do
-          before(:each) do
+          before do
             assignment.update!(anonymous_grading: true, muted: true)
           end
 
           context 'when a student is viewing' do
-            before(:each) do
+            before do
               @current_user = student
             end
 
@@ -591,7 +591,7 @@ describe Canvadocs do
           end
 
           context 'when a teacher is viewing' do
-            before(:each) do
+            before do
               @current_user = teacher
             end
 
@@ -605,7 +605,7 @@ describe Canvadocs do
           end
 
           context 'when a ta is viewing' do
-            before(:each) do
+            before do
               @current_user = ta
             end
 
@@ -620,12 +620,12 @@ describe Canvadocs do
         end
 
         context 'for an unmoderated non-anonymized assignment' do
-          before(:each) do
+          before do
             assignment.update!(anonymous_grading: false, muted: false)
           end
 
           context 'when a student is viewing' do
-            before(:each) do
+            before do
               @current_user = student
             end
 
@@ -639,7 +639,7 @@ describe Canvadocs do
           end
 
           context 'when a teacher is viewing' do
-            before(:each) do
+            before do
               @current_user = teacher
             end
 
@@ -666,7 +666,7 @@ describe Canvadocs do
             { type: 'real', role: 'ta', id: provisional_grader.global_id.to_s, name: 'Pub the Prov' }
           end
 
-          before(:each) do
+          before do
             assignment.update!(moderated_grading: true, final_grader: final_grader, grader_count: 1)
             assignment.moderation_graders.create!(user: final_grader, anonymous_id: 'qqqqq')
             course.enroll_ta(provisional_grader).accept(true)
@@ -674,7 +674,7 @@ describe Canvadocs do
           end
 
           context 'when a student is viewing' do
-            before(:each) do
+            before do
               @current_user = student
             end
 
@@ -710,7 +710,7 @@ describe Canvadocs do
           end
 
           context 'when a provisional grader is viewing' do
-            before(:each) do
+            before do
               @current_user = provisional_grader
             end
 
@@ -762,7 +762,7 @@ describe Canvadocs do
           end
 
           context 'when the final grader is viewing' do
-            before(:each) do
+            before do
               @current_user = final_grader
             end
 
@@ -796,7 +796,7 @@ describe Canvadocs do
         end
 
         context 'for a student annotation assignment' do
-          before(:each) do
+          before do
             assignment.update!(submission_types: 'student_annotation', annotatable_attachment: attachment)
             assignment.submit_homework(
               submission.user,
@@ -807,7 +807,7 @@ describe Canvadocs do
           end
 
           context 'when the student is viewing' do
-            before(:each) do
+            before do
               @current_user = student
             end
 
@@ -841,7 +841,7 @@ describe Canvadocs do
             let(:peer_reviewer2_real_data) { { type: 'real', role: 'student', id: peer_reviewer2.global_id.to_s, name: 'Penny the Peer Reviewer' } }
             let(:student_real_data) { { type: 'real', role: 'student', id: student.global_id.to_s, name: "Sev the Student" } }
 
-            before(:each) do
+            before do
               assignment.update!(peer_reviews: true)
               AssessmentRequest.create!(
                 user: student,
@@ -879,7 +879,7 @@ describe Canvadocs do
           end
 
           context 'when an instructor is viewing' do
-            before(:each) do
+            before do
               @current_user = teacher
             end
 

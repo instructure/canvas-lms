@@ -30,7 +30,7 @@ describe Attachment do
   end
 
   context "file_store_config" do
-    around(:each) do |example|
+    around do |example|
       ConfigFile.unstub
       example.run
       ConfigFile.unstub
@@ -55,7 +55,7 @@ describe Attachment do
   end
 
   context "public_url" do
-    before :each do
+    before do
       local_storage!
     end
 
@@ -88,7 +88,7 @@ describe Attachment do
       user_model
     end
 
-    before :each do
+    before do
       attachment_with_context(@user)
       @attachment.instfs_uuid = 1
       allow(InstFS).to receive(:enabled?).and_return true
@@ -114,7 +114,7 @@ describe Attachment do
   end
 
   context "public_url s3_storage" do
-    before :each do
+    before do
       s3_storage!
     end
 
@@ -247,7 +247,7 @@ describe Attachment do
       configure_canvadocs
     end
 
-    before :each do
+    before do
       allow_any_instance_of(Canvadocs::API).to receive(:upload).and_return "id" => 1234
     end
 
@@ -648,7 +648,7 @@ describe Attachment do
     end
 
     context "inst-fs" do
-      before :each do
+      before do
         allow(InstFS).to receive(:enabled?).and_return(true)
         allow(InstFS).to receive(:app_host).and_return("https://somehost.example")
       end
@@ -1514,7 +1514,7 @@ describe Attachment do
       @new_account = account_model
     end
 
-    before :each do
+    before do
       s3_storage!
       Attachment.current_root_account = @old_account
       @root = attachment_model(filename: 'unknown 2.loser')
@@ -1567,7 +1567,7 @@ describe Attachment do
 
     specs_require_sharding
 
-    before :each do
+    before do
       s3_storage!
       attachment_model(:uploaded_data => stub_png_data, :filename => 'profile.png')
     end
@@ -2068,7 +2068,7 @@ describe Attachment do
       attachment_model(filename: 'new filename')
     end
 
-    before :each do
+    before do
       allow(Attachment).to receive(:local_storage?).and_return(false)
       allow(Attachment).to receive(:s3_storage?).and_return(true)
       allow(@attachment).to receive(:s3object).and_return(double('s3object'))
@@ -2083,7 +2083,7 @@ describe Attachment do
         @attachment = attachment
       end
 
-      before :each do
+      before do
         allow(@existing_attachment).to receive(:s3object).and_return(double('existing_s3object'))
         allow(@attachment).to receive(:find_existing_attachment_for_md5).and_return(@existing_attachment)
       end

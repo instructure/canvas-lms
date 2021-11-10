@@ -159,7 +159,7 @@ describe 'dashcards' do
     # it 'should show files created notifications in dashcard', priority: "1", test_id: 238414
 
     context "course name and code display" do
-      before :each do
+      before do
         @course1 = course_model
         @course1.offer!
         @course1.save!
@@ -186,7 +186,7 @@ describe 'dashcards' do
     end
 
     context "dashcard custom color calendar" do
-      before :each do
+      before do
         # create another course to ensure the color matches to the right course
         @course1 = course_factory(
           course_name: 'Second Course',
@@ -223,7 +223,7 @@ describe 'dashcards' do
     end
 
     context "dashcard color picker" do
-      before :each do
+      before do
         get '/'
         f('.ic-DashboardCard__header-button').click
         wait_for_ajaximations

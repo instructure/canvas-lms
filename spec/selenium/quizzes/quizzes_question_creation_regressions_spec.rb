@@ -28,12 +28,12 @@ describe 'quizzes question creation' do
     course_with_teacher(active_all: true)
   end
 
-  before(:each) do
+  before do
     user_session(@teacher)
   end
 
   context "edge cases" do
-    before(:each) do
+    before do
       @last_quiz = start_quiz_question
     end
 

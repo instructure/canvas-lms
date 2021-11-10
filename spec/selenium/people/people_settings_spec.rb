@@ -22,7 +22,7 @@ require_relative '../common'
 describe "course people" do
   include_context "in-process server selenium tests"
 
-  before :each do
+  before do
     course_with_teacher_logged_in limit_privileges_to_course_section: false, active_all: true
     @account = @course.account # for custom roles
     @custom_student_role = custom_student_role("custom stu")

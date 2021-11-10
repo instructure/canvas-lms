@@ -26,7 +26,7 @@ describe 'Submissions API', type: :request do
 
   let(:params) { {} }
 
-  before :each do
+  before do
     allow(HostUrl).to receive(:file_host_with_shard).and_return(["www.example.com", Shard.default])
   end
 
@@ -469,7 +469,7 @@ describe 'Submissions API', type: :request do
         @a1.update_submission(@student1, comment: 'Answer: forty-two')
       end
 
-      before(:each) do
+      before do
         @user = @student1
 
         @json = api_call(:get,
@@ -1801,7 +1801,7 @@ describe 'Submissions API', type: :request do
       let(:assignment) { @course.assignments.create! }
       let(:student1_sub) { assignment.submissions.find_by(user: @student1) }
 
-      before(:each) do
+      before do
         assignment.ensure_post_policy(post_manually: true)
       end
 
@@ -2128,7 +2128,7 @@ describe 'Submissions API', type: :request do
       submit_homework(@assignment, @student2)
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 
@@ -2181,7 +2181,7 @@ describe 'Submissions API', type: :request do
   end
 
   describe "#show_anonymous" do
-    before(:each) do
+    before do
       @student = user_factory(active_all: true)
       course_with_teacher(:active_all => true)
       section = @course.course_sections.create!(name: "test section")
@@ -2239,7 +2239,7 @@ describe 'Submissions API', type: :request do
   end
 
   describe "#show" do
-    before(:each) do
+    before do
       @student = user_factory(active_all: true)
       course_with_teacher(:active_all => true)
       @section = @course.course_sections.create!(name: "test section")
@@ -3658,7 +3658,7 @@ describe 'Submissions API', type: :request do
   end
 
   context "moderated grading" do
-    before :each do
+    before do
       student_in_course(active_all: true)
       teacher_in_course(active_all: true)
       @assignment = @course.assignments.create!(
@@ -4991,7 +4991,7 @@ describe 'Submissions API', type: :request do
   end
 
   context 'bulk update' do
-    before :each do
+    before do
       @student1 = user_factory(active_all: true)
       @student2 = user_factory(active_all: true)
       course_with_teacher(:active_all => true)

@@ -20,7 +20,7 @@
 require 'spec_helper'
 
 describe 'A file with a know extension' do
-  before(:each) do
+  before do
     @file = File.open(File.dirname(__FILE__) + '/../fixtures/file.jpg')
   end
 
@@ -41,7 +41,7 @@ describe 'A file with a know extension' do
 end
 
 describe 'A file with anunknow extension' do
-  before(:each) do
+  before do
     @file = File.open(File.dirname(__FILE__) + '/../fixtures/file.unknown')
   end
 
@@ -55,7 +55,7 @@ describe 'A file with anunknow extension' do
 end
 
 describe 'A valid file path' do
-  before(:each) do
+  before do
     @file_path = "#{Dir.pwd} + /picture.png"
   end
 
@@ -69,7 +69,7 @@ describe 'A valid file path' do
 end
 
 describe "An unknown extension" do
-  before(:each) do
+  before do
     @file_path = 'file.unknown'
   end
 

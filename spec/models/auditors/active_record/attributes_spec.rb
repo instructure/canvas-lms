@@ -20,7 +20,7 @@
 
 describe Auditors::ActiveRecord::Attributes do
   describe "treating a model like it has event stream attributes" do
-    before :each do
+    before do
       @model_type = Class.new(Hash) do
         include Auditors::ActiveRecord::Attributes
       end

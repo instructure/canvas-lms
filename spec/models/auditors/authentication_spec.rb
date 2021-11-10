@@ -21,7 +21,7 @@
 require_relative '../../cassandra_spec_helper'
 
 describe Auditors::Authentication do
-  before(:each) do
+  before do
     shard_class = Class.new {
       define_method(:activate) { |&b| b.call }
     }

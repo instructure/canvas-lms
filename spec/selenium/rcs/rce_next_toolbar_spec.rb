@@ -33,7 +33,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
   include RCENextPage
 
   context 'WYSIWYG generic as a teacher' do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       Account.site_admin.enable_feature!(:new_math_equation_handling)
       Account.site_admin.enable_feature!(:inline_math_everywhere)
@@ -440,7 +440,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
     end
 
     describe 'floating toolbar' do
-      before(:each) do
+      before do
         create_wiki_page_with_text('hello')
         visit_existing_wiki_edit(@course, 'hello')
         driver.manage.window.resize_to(1_000, 800)
@@ -467,7 +467,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
     end
 
     context 'in a narrow window' do
-      before :each do
+      before do
         rce_wysiwyg_state_setup(@course)
         driver.manage.window.resize_to(500, 800)
       end
@@ -501,7 +501,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
     end
 
     context 'content insertion buttons' do
-      before :each do
+      before do
         body = <<-HTML
         <p><span id="ok">i am OK!</span></p>
         <p><span id="ifr">cannot link <iframe>me</iframe></span></p>

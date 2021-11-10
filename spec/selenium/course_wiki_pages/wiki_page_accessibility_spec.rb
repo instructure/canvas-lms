@@ -40,7 +40,7 @@ describe "Wiki Pages" do
       @course.wiki_pages.create!(:title => "Baz")
     end
 
-    before :each do
+    before do
       user_session(@user)
     end
 
@@ -53,7 +53,7 @@ describe "Wiki Pages" do
     end
 
     describe "Add Page Button" do
-      before :each do
+      before do
         visit_course_wiki_index_page(@course.id)
 
         driver.execute_script("$('a.btn.new_page').focus()")
@@ -139,7 +139,7 @@ describe "Wiki Pages" do
     end
 
     context "Use as Front Page Link" do
-      before :each do
+      before do
         visit_course_wiki_index_page(@course.id)
         f('tbody .al-trigger').click
       end
@@ -157,7 +157,7 @@ describe "Wiki Pages" do
     end
 
     context "Cog menu" do
-      before :each do
+      before do
         visit_course_wiki_index_page(@course.id)
         f('tbody .al-trigger').click
         f('.edit-menu-item').click
@@ -222,7 +222,7 @@ describe "Wiki Pages" do
         @user = @teacher
       end
 
-      before :each do
+      before do
         user_session(@user)
         get "/courses/#{@course.id}/pages/#{@vpage.url}/revisions"
       end
@@ -264,7 +264,7 @@ describe "Wiki Pages" do
     end
 
     context "Edit Page", ignore_js_errors: true do
-      before :each do
+      before do
         visit_wiki_edit_page(@course.id, "bar")
         wait_for_ajaximations
       end

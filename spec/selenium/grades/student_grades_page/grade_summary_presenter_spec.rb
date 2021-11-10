@@ -41,7 +41,7 @@ describe GradeSummaryPresenter do
   end
 
   describe "grade summary page" do
-    before(:each) do
+    before do
       enroll_teacher_and_students
     end
 

@@ -99,7 +99,7 @@ module Lti::IMS
         let(:folder) { Folder.create!(name: "test", context: user) }
         let(:progress) { Progress.create!(context: assignment, user: user, tag: :upload_via_url) }
 
-        before :each do
+        before do
           allow(InstFS).to receive(:enabled?).and_return(true)
           allow(InstFS).to receive(:jwt_secrets).and_return(["jwt signing key"])
           @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)

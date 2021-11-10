@@ -168,7 +168,7 @@ describe Api::V1::Course do
     end
 
     describe "total_scores" do
-      before(:each) do
+      before do
         @enrollment.scores.create!(
           current_score: 95.0, final_score: 85.0,
           unposted_current_score: 94.0, unposted_final_score: 84.0
@@ -230,7 +230,7 @@ describe Api::V1::Course do
     end
 
     describe "current_grading_period_scores" do
-      before(:each) do
+      before do
         @course.grading_standard_enabled = true
         @course.default_post_policy.update!(post_manually: false)
         create_grading_periods_for(@course, grading_periods: [:current, :future])
@@ -461,7 +461,7 @@ describe CoursesController, type: :request do
     @user.pseudonym.update_attribute(:sis_user_id, 'user1')
   end
 
-  before :each do
+  before do
     @course_dates_stubbed = true
     allow_any_instance_of(Course).to(receive(:start_at).and_wrap_original { |original| original.call unless @course_dates_stubbed })
     allow_any_instance_of(Course).to(receive(:end_at).and_wrap_original { |original| original.call unless @course_dates_stubbed })
@@ -3983,7 +3983,7 @@ describe CoursesController, type: :request do
     include_examples "file uploads api with folders"
     include_examples "file uploads api with quotas"
 
-    before :each do
+    before do
       @context = @course
     end
 

@@ -31,7 +31,7 @@ describe "discussion assignments" do
   include WikiAndTinyCommon
   include RCENextPage
 
-  before(:each) do
+  before do
     stub_rcs_config
     @domain_root_account = Account.default
     course_with_teacher_logged_in

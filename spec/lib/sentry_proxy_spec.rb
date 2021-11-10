@@ -23,7 +23,7 @@ describe SentryProxy do
   let(:data) { { a: 'b', c: 'd' } }
   let(:error_klass) { Class.new(StandardError) }
 
-  before(:each) { SentryProxy.clear_ignorable_errors }
+  before { SentryProxy.clear_ignorable_errors }
 
   describe ".capture" do
     it "forwards exceptions on to raven" do

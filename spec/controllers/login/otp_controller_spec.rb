@@ -242,7 +242,7 @@ describe Login::OtpController do
       @user.save!
     end
 
-    before :each do
+    before do
       user_session(@user)
     end
 

@@ -83,7 +83,7 @@ describe EventStream::Backend::ActiveRecord do
   describe "executing operations" do
     let(:backend) { EventStream::Backend::ActiveRecord.new(stream) }
 
-    after(:each) do
+    after do
       ar_type.reset!
     end
 

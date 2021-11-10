@@ -32,7 +32,7 @@ describe "Gradebook" do
       @assignment.grade_student(@students[0], grade: 'pass', grader: @teacher)
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 

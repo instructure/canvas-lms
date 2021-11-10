@@ -24,7 +24,7 @@ describe "admin settings tab" do
   let(:account) { Account.default }
   let(:sub_account) { account.sub_accounts.create!(:name => 'sub-account') }
 
-  before :each do
+  before do
     user_logged_in(:user => site_admin_user(account: account))
   end
 

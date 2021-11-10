@@ -31,7 +31,7 @@ describe "offline contents" do
   end
 
   context "as a teacher" do
-    before :each do
+    before do
       @teacher1 = user_with_pseudonym(:username => 'teacher1@example.com', :active_all => 1)
       @course1.enroll_teacher(@teacher1).accept!
       user_session(@teacher1)
@@ -42,7 +42,7 @@ describe "offline contents" do
   end
 
   context "as a student" do
-    before :each do
+    before do
       @student1 = user_with_pseudonym(:username => 'student1@example.com', :active_all => 1)
       @course1.enroll_student(@student1).accept!
       user_session(@student1)

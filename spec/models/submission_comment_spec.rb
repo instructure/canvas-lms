@@ -160,7 +160,7 @@ RSpec.describe SubmissionComment do
     end
 
     context 'draft comment' do
-      before(:each) do
+      before do
         @comment = @submission.add_comment(author: @teacher, comment: '42', draft_comment: true)
       end
 

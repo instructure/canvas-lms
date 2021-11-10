@@ -25,7 +25,7 @@ describe "better_file_browsing, folders" do
   include FilesCommon
 
   context "Folders" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       get "/courses/#{@course.id}/files"
       folder_name = "new test folder"
@@ -124,7 +124,7 @@ describe "better_file_browsing, folders" do
   end
 
   context "Folder Tree" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       get "/courses/#{@course.id}/files"
     end

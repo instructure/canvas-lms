@@ -90,7 +90,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
     context.root_account.enable_feature! :improved_outcomes_management
   end
 
-  before(:each) do
+  before do
     cg1.add_outcome o3
     cg2.add_outcome o8
   end

@@ -42,11 +42,11 @@ describe "interaction with grading periods" do
       end
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 
-    after :each do
+    after do
       clear_local_storage
     end
 
@@ -199,7 +199,7 @@ describe "interaction with grading periods" do
     let!(:assignment2) { test_course.assignments.create!(title: 'Assignment 2', due_at: 6.weeks.from_now(now), points_possible: 10) }
     let!(:grade_assignment1) { assignment1.grade_student(student, grade: 8, grader: teacher) }
 
-    before(:each) do
+    before do
       test_course.offer!
       user_session(student)
       get "/courses/#{test_course.id}/grades"

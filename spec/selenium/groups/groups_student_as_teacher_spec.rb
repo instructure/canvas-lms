@@ -28,7 +28,7 @@ describe "student groups" do
   let(:group_category_name) { 'cat1' }
 
   context "As a teacher" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 
@@ -46,7 +46,7 @@ describe "student groups" do
     context "with a student group created" do
       let(:students_in_group) { 4 }
 
-      before(:each) do
+      before do
         create_student_group_as_a_teacher(group_name, (students_in_group - 1))
         get("/courses/#{@course.id}/groups")
       end

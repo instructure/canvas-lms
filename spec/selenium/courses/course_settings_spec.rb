@@ -24,7 +24,7 @@ describe "course settings" do
   include_context "in-process server selenium tests"
   include CourseSettingsPage
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
     @account = @course.account
   end
@@ -36,7 +36,7 @@ describe "course settings" do
   end
 
   context "k5 courses" do
-    before(:each) do
+    before do
       @account.enable_as_k5_account!
     end
 
@@ -88,7 +88,7 @@ describe "course settings" do
   end
 
   context "considering homeroom courses" do
-    before(:each) do
+    before do
       @account.enable_as_k5_account!
       @course.homeroom_course = true
       @course.save!
@@ -135,7 +135,7 @@ describe "course settings" do
     end
 
     context "as a ta" do
-      before :each do
+      before do
         course_with_ta_logged_in(course: @course)
       end
 
@@ -243,7 +243,7 @@ describe "course settings" do
 
     describe "pace plans setting" do
       describe "when the pace plans feature flag is enabled" do
-        before(:each) do
+        before do
           @account.enable_feature!(:pace_plans)
         end
 
@@ -266,7 +266,7 @@ describe "course settings" do
       end
 
       describe "when the pace plans feature flag is disabled" do
-        before(:each) do
+        before do
           @account.disable_feature!(:pace_plans)
         end
 
@@ -519,7 +519,7 @@ describe "course settings" do
   end
 
   context "link validator" do
-    before(:each) do
+    before do
       Setting.set('link_validator_poll_timeout', 100)
       Setting.set('link_validator_poll_timeout_initial', 100)
     end

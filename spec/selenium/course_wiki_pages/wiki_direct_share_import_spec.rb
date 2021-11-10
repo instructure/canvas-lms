@@ -32,7 +32,7 @@ describe 'course wiki pages' do
   include SendToDialogPage
 
   context 'with direct share FF ON' do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       @course.save!
       @module1 = @course.context_modules.create!(:name => "module 1")
@@ -70,7 +70,7 @@ describe 'course wiki pages' do
     end
 
     context 'copy to' do
-      before(:each) do
+      before do
         visit_course_wiki_index_page(@course.id)
         manage_wiki_page_item_button(@wiki_page1.title).click
         copy_to_menu_item.click
@@ -89,7 +89,7 @@ describe 'course wiki pages' do
   end
 
   context 'with commons fav FF ON' do
-    before(:each) do
+    before do
       @tool = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
       @tool.wiki_index_menu = { :url => "http://www.example.com", :text => "Commons Fav" }
       @tool.save!

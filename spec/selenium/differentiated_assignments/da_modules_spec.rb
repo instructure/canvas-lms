@@ -38,7 +38,7 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
   end
 
   context "Student" do
-    before :each do
+    before do
       course_with_student_logged_in
       da_setup
       da_module_setup
@@ -80,7 +80,7 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
 
   context "Observer" do
     context "with a student attached" do
-      before :each do
+      before do
         observer_setup
         da_setup
         da_module_setup
@@ -106,7 +106,7 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
     end
 
     context "without a student attached" do
-      before :each do
+      before do
         course_with_observer_logged_in
         da_setup
         da_module_setup

@@ -33,7 +33,7 @@ describe "collaborations" do
     type = 'google_docs'
 
     context "#{title} collaboration" do
-      before(:each) do
+      before do
         course_with_teacher_logged_in
         setup_google_drive
       end
@@ -57,7 +57,7 @@ describe "collaborations" do
     end
 
     context "Google Docs collaborations with google docs not having access" do
-      before(:each) do
+      before do
         course_with_teacher_logged_in
         setup_google_drive(false, false)
       end
@@ -73,7 +73,7 @@ describe "collaborations" do
   end
 
   describe "Accessibility" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       create_collaboration!('etherpad', 'Collaboration 1')
       create_collaboration!('etherpad', 'Collaboration 2')

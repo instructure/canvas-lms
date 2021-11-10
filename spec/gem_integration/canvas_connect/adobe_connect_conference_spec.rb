@@ -29,13 +29,13 @@ describe AdobeConnectConference do
     }
   end
 
-  before(:each) do
+  before do
     @conference = AdobeConnectConference.new
     allow(@conference).to receive(:config).and_return(connect_config)
   end
 
   context 'with an admin participant' do
-    before(:each) do
+    before do
       @user = User.new(:name => 'Don Draper')
       allow(AdobeConnect::Service).to receive(:user_session).and_return('CookieValue')
       expect(@conference).to receive(:add_host).with(@user).and_return(@user)

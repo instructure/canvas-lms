@@ -33,7 +33,7 @@ describe ContentSharesController do
     let(:sender) { @teacher_1 }
     let(:receiver) { @teacher_2 }
 
-    before :each do
+    before do
       user_session(sender)
     end
 

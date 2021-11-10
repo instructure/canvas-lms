@@ -47,7 +47,7 @@ describe PlannerController do
   end
 
   context "as student" do
-    before :each do
+    before do
       user_session(@student)
     end
 
@@ -277,7 +277,7 @@ describe PlannerController do
           @e2.conclude
         end
 
-        before :each do
+        before do
           user_session(@u)
         end
 
@@ -331,7 +331,7 @@ describe PlannerController do
           @deleted_topic = discussion_topic_model(context: @group, todo_date: 1.day.from_now); @deleted_topic.destroy
         end
 
-        before :each do
+        before do
           user_session(@student)
         end
 
@@ -655,7 +655,7 @@ describe PlannerController do
             @planner_note2 = planner_note_model(user: @student, todo_date: 1.day.from_now)
           end
 
-          before :each do
+          before do
             user_session(@student)
           end
 
@@ -1214,7 +1214,7 @@ describe PlannerController do
       @original_enrollment = observer_in_course(active_all: true, associated_user_id: @student)
     end
 
-    before :each do
+    before do
       user_session(@observer)
     end
 

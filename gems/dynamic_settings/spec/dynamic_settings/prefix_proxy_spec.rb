@@ -25,16 +25,16 @@ module DynamicSettings
       )
     end
 
-    after(:each) do
+    after do
       DynamicSettings.cache.clear(force: true)
     end
 
     describe '.fetch(key, ttl: @default_ttl)' do
-      before(:each) do
+      before do
         DynamicSettings.cache.reset
       end
 
-      after(:each) do
+      after do
         DynamicSettings.fallback_recovery_lambda = nil
       end
 

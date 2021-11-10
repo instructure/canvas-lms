@@ -784,7 +784,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
   end
 
   describe 'PUT /quiz_submissions/:quiz_submission_id/questions/:id/flag [flag]' do
-    before :each do
+    before do
       course_with_student_logged_in(:active_all => true)
       @quiz = quiz_model(course: @course)
       @quiz_submission = @quiz.generate_submission(@student)
@@ -809,7 +809,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
   end
 
   describe 'PUT /quiz_submissions/:quiz_submission_id/questions/:id/unflag [unflag]' do
-    before :each do
+    before do
       course_with_student_logged_in(:active_all => true)
       @quiz = quiz_model(course: @course)
       @quiz_submission = @quiz.generate_submission(@student)

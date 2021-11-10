@@ -56,7 +56,7 @@ describe "groups" do
       add_users_to_group(@students + [@student], @testgroup.first)
     end
 
-    before :each do
+    before do
       user_session(@student)
     end
 
@@ -483,7 +483,7 @@ describe "groups" do
     end
     #-------------------------------------------------------------------------------------------------------------------
     describe "collaborations page" do
-      before :each do
+      before do
         setup_google_drive
         unless PluginSetting.where(name: 'google_drive').exists?
           PluginSetting.create!(name: 'google_drive', settings: {})

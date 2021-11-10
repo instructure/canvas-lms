@@ -91,7 +91,7 @@ describe 'RequestThrottle' do
   end
 
   describe "#call" do
-    after(:each) do
+    after do
       Setting.remove("request_throttle.enabled")
     end
 

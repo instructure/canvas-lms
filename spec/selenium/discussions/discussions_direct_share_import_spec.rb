@@ -37,7 +37,7 @@ describe 'discussions' do
     )
   end
 
-  before(:each) do
+  before do
     user_session(@teacher)
   end
 

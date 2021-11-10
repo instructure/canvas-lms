@@ -165,7 +165,7 @@ shared_examples_for 'k5 important dates calendar picker' do |context|
     @account.save!
   end
 
-  before :each do
+  before do
     subject_course_title_prefix = "Subject "
     @new_course_list = []
     case context

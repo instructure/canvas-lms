@@ -331,12 +331,12 @@ RSpec.configure do |config|
   end
 
   if ENV['RAILS_LOAD_ALL_LOCALES'] && RSpec.configuration.filter.rules[:i18n]
-    config.around :each do |example|
+    config.around do |example|
       SpecMultipleLocales.run(example)
     end
   end
 
-  config.around(:each) do |example|
+  config.around do |example|
     Rails.logger.info "STARTING SPEC #{example.full_description}"
     SpecTimeLimit.enforce(example) do
       example.run
@@ -385,7 +385,7 @@ RSpec.configure do |config|
     end
   end
 
-  config.before :each do
+  config.before do
     raise "all specs need to use transactions" unless using_transactions_properly?
 
     reset_all_the_things!
@@ -433,7 +433,7 @@ RSpec.configure do |config|
   Canvas::Redis.singleton_class.prepend(TrackRedisUsage)
   Canvas::Redis.redis_used = true
 
-  config.before :each do
+  config.before do
     if Canvas::Redis.redis_enabled? && Canvas::Redis.redis_used
       # yes, we really mean to run this dangerous redis command
       GuardRail.activate(:deploy) { Canvas::Redis.redis.flushdb }
@@ -550,7 +550,7 @@ RSpec.configure do |config|
   end
 
   def specs_require_cache(new_cache = :memory_store)
-    before :each do
+    before do
       set_cache(new_cache)
     end
   end

@@ -50,7 +50,7 @@ describe "groups" do
       add_users_to_group(@students, @testgroup.first)
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 

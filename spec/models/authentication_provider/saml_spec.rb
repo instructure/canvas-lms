@@ -19,7 +19,7 @@
 #
 
 describe AuthenticationProvider::SAML do
-  before(:each) do
+  before do
     skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
     @account = Account.create!(:name => "account")
     @file_that_exists = File.expand_path(__FILE__)

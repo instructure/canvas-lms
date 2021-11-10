@@ -21,7 +21,7 @@
 require 'spec_helper'
 
 describe "BookmarkedCollection::Collection" do
-  before :each do
+  before do
     @bookmark = double('bookmark')
     @bookmarker = double('bookmarker', :validate => true, :bookmark_for => @bookmark)
     @collection = BookmarkedCollection::Collection.new(@bookmarker)
@@ -162,7 +162,7 @@ describe "BookmarkedCollection::Collection" do
   end
 
   describe "#has_more!" do
-    before :each do
+    before do
       @item = double('item')
       @collection << @item
       @bookmark = double('bookmark')

@@ -29,7 +29,7 @@ describe "context modules" do
     end
 
     context "when adding new module" do
-      before(:each) do
+      before do
         user_session(@teacher)
         get "/courses/#{@course.id}"
       end
@@ -66,7 +66,7 @@ describe "context modules" do
         @course.context_modules.create! name: "New Module"
       end
 
-      before :each do
+      before do
         user_session(@teacher)
         get "/courses/#{@course.id}"
         wait_for_modules_ui

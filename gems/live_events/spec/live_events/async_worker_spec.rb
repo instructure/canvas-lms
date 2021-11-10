@@ -45,7 +45,7 @@ describe LiveEvents::AsyncWorker do
     }
   end
 
-  before(:each) do
+  before do
     LiveEvents.max_queue_size = -> { 100 }
     LiveEvents.statsd = nil
     allow(LiveEvents).to receive(:logger).and_return(double(info: nil, error: nil, debug: nil))
@@ -53,7 +53,7 @@ describe LiveEvents::AsyncWorker do
     allow(@worker).to receive(:at_exit)
   end
 
-  after(:each) do
+  after do
     LiveEvents.statsd = nil
   end
 

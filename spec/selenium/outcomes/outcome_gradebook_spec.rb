@@ -34,11 +34,11 @@ describe "outcome gradebook" do
       show_sections_filter(@teacher)
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 
-    after(:each) do
+    after do
       clear_local_storage
     end
 

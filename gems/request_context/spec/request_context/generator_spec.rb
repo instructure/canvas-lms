@@ -136,7 +136,7 @@ describe "RequestContext::Generator" do
       CanvasSecurity.sign_hmac_sha512(remote_request_context_id, shared_secret)
     end
 
-    before(:each) do
+    before do
       # TODO: Probably shouldn't be stubbing this deep in a gem?
       # Maybe we should be passing in a config'd secret to CanvasSecurity
       # directly rather than monkeying with dynamic_settings.
@@ -155,7 +155,7 @@ describe "RequestContext::Generator" do
       env['HTTP_X_REQUEST_CONTEXT_SIGNATURE'] = CanvasSecurity.base64_encode(remote_signature)
     end
 
-    after(:each) { DynamicSettings.fallback_data = {} }
+    after { DynamicSettings.fallback_data = {} }
 
     def run_middleware
       _, headers, _msg = RequestContext::Generator.new(->(_) { [200, {}, []] }).call(env)

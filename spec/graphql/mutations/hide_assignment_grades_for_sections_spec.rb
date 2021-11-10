@@ -59,7 +59,7 @@ describe Mutations::HideAssignmentGradesForSections do
     CanvasSchema.execute(mutation_str, context: context)
   end
 
-  before(:each) do
+  before do
     @section1_student = section1.enroll_user(User.create!, "StudentEnrollment", "active").user
     @section2_student = section2.enroll_user(User.create!, "StudentEnrollment", "active").user
   end
@@ -132,7 +132,7 @@ describe Mutations::HideAssignmentGradesForSections do
       let(:section1_student_submission) { assignment.submissions.find_by(user: @section1_student) }
       let(:section2_student_submission) { assignment.submissions.find_by(user: @section2_student) }
 
-      before(:each) do
+      before do
         now = Time.zone.now
         section1_student_submission.update!(posted_at: now)
         section2_student_submission.update!(posted_at: now)
@@ -191,7 +191,7 @@ describe Mutations::HideAssignmentGradesForSections do
       context "when the hider has limited visibility" do
         let(:ta) { User.create! }
 
-        before(:each) do
+        before do
           course.enroll_ta(ta, enrollment_state: "active", section: section1, limit_privileges_to_course_section: true)
         end
 

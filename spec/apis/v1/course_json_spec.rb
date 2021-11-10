@@ -111,7 +111,7 @@ module Api
               end
 
               context "when no grade override exists" do
-                before(:each) { @course_score.update!(override_score: nil) }
+                before { @course_score.update!(override_score: nil) }
 
                 it "sets computed_current_grade to the computed current grade" do
                   expect(json_enrollment.fetch(:computed_current_grade)).to eq "D-"
@@ -132,7 +132,7 @@ module Api
             end
 
             context "when Final Grade Override is not allowed" do
-              before(:each) { course.update!(allow_final_grade_override: false) }
+              before { course.update!(allow_final_grade_override: false) }
 
               it "sets computed_current_grade to the computed current grade" do
                 expect(json_enrollment.fetch(:computed_current_grade)).to eq "D-"
@@ -152,7 +152,7 @@ module Api
             end
 
             context "when Final Grade Override is disabled" do
-              before(:each) { course.disable_feature!(:final_grades_override) }
+              before { course.disable_feature!(:final_grades_override) }
 
               it "sets computed_current_grade to the computed current grade" do
                 expect(json_enrollment.fetch(:computed_current_grade)).to eq "D-"
@@ -216,7 +216,7 @@ module Api
               end
 
               context "when no grade override exists" do
-                before(:each) { @course_score.update!(override_score: nil) }
+                before { @course_score.update!(override_score: nil) }
 
                 it "does not include an override_grade key" do
                   expect(json_enrollment).not_to have_key :override_grade
@@ -229,7 +229,7 @@ module Api
             end
 
             context "when Final Grade Override is not allowed" do
-              before(:each) { course.update!(allow_final_grade_override: false) }
+              before { course.update!(allow_final_grade_override: false) }
 
               it "does not include an override_grade key" do
                 expect(json_enrollment).not_to have_key :override_grade
@@ -241,7 +241,7 @@ module Api
             end
 
             context "when Final Grade Override is disabled" do
-              before(:each) { course.disable_feature!(:final_grades_override) }
+              before { course.disable_feature!(:final_grades_override) }
 
               it "does not include an override_grade key" do
                 expect(json_enrollment).not_to have_key :override_grade
@@ -307,7 +307,7 @@ module Api
               end
 
               context "when no grade override exists" do
-                before(:each) { @gp_score.update!(override_score: nil) }
+                before { @gp_score.update!(override_score: nil) }
 
                 it "sets current_period_computed_current_grade to the computed current grade" do
                   expect(json_enrollment.fetch(:current_period_computed_current_grade)).to eq "D-"
@@ -328,7 +328,7 @@ module Api
             end
 
             context "when Final Grade Override is not allowed" do
-              before(:each) { course.update!(allow_final_grade_override: false) }
+              before { course.update!(allow_final_grade_override: false) }
 
               it "sets current_period_computed_current_grade to the computed current grade" do
                 expect(json_enrollment.fetch(:current_period_computed_current_grade)).to eq "D-"
@@ -348,7 +348,7 @@ module Api
             end
 
             context "when Final Grade Override is disabled" do
-              before(:each) { course.disable_feature!(:final_grades_override) }
+              before { course.disable_feature!(:final_grades_override) }
 
               it "sets current_period_computed_current_grade to the computed current grade" do
                 expect(json_enrollment.fetch(:current_period_computed_current_grade)).to eq "D-"
@@ -423,7 +423,7 @@ module Api
               end
 
               context "when no grade override exists" do
-                before(:each) { @gp_score.update!(override_score: nil) }
+                before { @gp_score.update!(override_score: nil) }
 
                 it "does not include a current_period_override_grade key" do
                   expect(json_enrollment).not_to have_key :current_period_override_grade
@@ -436,7 +436,7 @@ module Api
             end
 
             context "when Final Grade Override is not allowed" do
-              before(:each) { course.update!(allow_final_grade_override: false) }
+              before { course.update!(allow_final_grade_override: false) }
 
               it "does not include a current_period_override_grade key" do
                 expect(json_enrollment).not_to have_key :current_period_override_grade
@@ -448,7 +448,7 @@ module Api
             end
 
             context "when Final Grade Override is disabled" do
-              before(:each) { course.disable_feature!(:final_grades_override) }
+              before { course.disable_feature!(:final_grades_override) }
 
               it "does not include a current_period_override_grade key" do
                 expect(json_enrollment).not_to have_key :current_period_override_grade
@@ -599,7 +599,7 @@ module Api
         let(:hash) { { :a => '1', :b => '2' } }
         let(:includes) { ['these', 'three', 'keys'] }
 
-        before(:each) do
+        before do
           @json = CourseJson.new(course, user, includes, enrollments) { hash }
         end
 

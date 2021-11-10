@@ -124,7 +124,7 @@ describe "people" do
       enroll_ta(@test_ta)
     end
 
-    before :each do
+    before do
       user_session @teacher
     end
 
@@ -378,7 +378,7 @@ describe "people" do
       course_with_ta(:active_all => true)
     end
 
-    before :each do
+    before do
       user_session @ta
     end
 
@@ -418,7 +418,7 @@ describe "people" do
     end
 
     context "without view all grades permissions" do
-      before(:each) do
+      before do
         ['view_all_grades', 'manage_grades'].each do |permission|
           RoleOverride.create!(permission: permission, enabled: false, context: @course.account, role: ta_role)
         end
@@ -437,7 +437,7 @@ describe "people" do
       end
 
       context "with new profile flag enabled" do
-        before(:each) do
+        before do
           @course.account.settings[:enable_profiles] = true
           @course.account.save!
           @student = create_user('student@test.com')
@@ -462,7 +462,7 @@ describe "people" do
       course_with_student(:active_all => true)
     end
 
-    before :each do
+    before do
       user_session @student
     end
 
@@ -481,7 +481,7 @@ describe "people" do
       @section2 = @course.course_sections.create!(name: 'section2')
     end
 
-    before :each do
+    before do
       user_session @teacher
     end
 
@@ -638,7 +638,7 @@ describe "people" do
       @enrollment = @course.enroll_teacher(@teacher, enrollment_state: 'active')
     end
 
-    before :each do
+    before do
       admin_logged_in
     end
 

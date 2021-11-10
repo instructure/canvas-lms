@@ -34,7 +34,7 @@ describe Mutations::SetModuleItemCompletion do
   let(:module1_assignment_item) { module1.content_tags.find_by!(content_type: "Assignment", content_id: assignment.id) }
   let(:module2_assignment_item) { module2.content_tags.find_by!(content_type: "Assignment", content_id: assignment.id) }
 
-  before(:each) do
+  before do
     module1.add_item(id: assignment.id, type: "assignment")
     module1.completion_requirements = [{ id: module1_assignment_item.id, type: "must_mark_done" }]
     module1.save!
@@ -69,7 +69,7 @@ describe Mutations::SetModuleItemCompletion do
   end
 
   context "when executed by a user with permission to view the module and its owning course" do
-    before(:each) { course.offer! }
+    before { course.offer! }
 
     let(:context) { { current_user: student } }
 
@@ -108,7 +108,7 @@ describe Mutations::SetModuleItemCompletion do
       end
 
       context "when 'done' is set to false" do
-        before(:each) do
+        before do
           assignment.context_module_action(student, :done)
         end
 

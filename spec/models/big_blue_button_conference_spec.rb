@@ -345,7 +345,7 @@ describe BigBlueButtonConference do
       }
     }
 
-    before :each do
+    before do
       old_config = {
         :domain => "bbb_old.instructure.com",
         :secret_dec => "old_secret",

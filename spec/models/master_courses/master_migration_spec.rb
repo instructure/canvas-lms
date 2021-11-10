@@ -24,7 +24,7 @@ describe MasterCourses::MasterMigration do
     user_factory
   end
 
-  before :each do
+  before do
     skip unless Qti.qti_enabled?
     local_storage!
   end
@@ -2927,7 +2927,7 @@ describe MasterCourses::MasterMigration do
         end
       end
 
-      before :each do
+      before do
         allow(Canvas::Migration::ExternalContent::Migrator).to receive(:registered_services).and_return({ 'test_service' => klass })
       end
 

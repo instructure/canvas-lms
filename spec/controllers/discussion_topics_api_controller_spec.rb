@@ -25,7 +25,7 @@ describe DiscussionTopicsApiController do
       @topic = @course.discussion_topics.create!(:title => 'discussion')
     end
 
-    before :each do
+    before do
       user_session(@student)
       allow(controller).to receive_messages(:form_authenticity_token => 'abc', :form_authenticity_param => 'abc')
       post 'add_entry', params: { :topic_id => @topic.id, :course_id => @course.id, :user_id => @user.id, :message => 'message', :read_state => 'read' }, :format => 'json'
@@ -55,7 +55,7 @@ describe DiscussionTopicsApiController do
   end
 
   context "add_entry file quota" do
-    before :each do
+    before do
       course_with_student :active_all => true
       @course.allow_student_forum_attachments = true
       @course.save!

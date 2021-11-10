@@ -1037,7 +1037,7 @@ describe DueDateCacher do
 
     let(:event_type) { 'submission_updated' }
 
-    before(:each) do
+    before do
       course.enroll_teacher(teacher, active_all: true)
       course.enroll_student(student, active_all: true)
     end
@@ -1053,7 +1053,7 @@ describe DueDateCacher do
         end
         let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
 
-        before(:each) do
+        before do
           Assignment.suspend_due_date_caching do
             assignment.update!(due_at: due_at)
           end
@@ -1082,7 +1082,7 @@ describe DueDateCacher do
         let!(:assignment) { course.assignments.create!(title: 'zzz', anonymous_grading: true) }
         let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
 
-        before(:each) do
+        before do
           Assignment.suspend_due_date_caching do
             assignment.update!(due_at: due_at)
           end
@@ -1111,7 +1111,7 @@ describe DueDateCacher do
         let!(:assignment) { course.assignments.create!(title: 'z!', anonymous_grading: true, due_at: original_due_at) }
         let(:last_event) { AnonymousOrModerationEvent.where(assignment: assignment, event_type: event_type).last }
 
-        before(:each) do
+        before do
           Assignment.suspend_due_date_caching do
             assignment.update!(due_at: nil)
           end

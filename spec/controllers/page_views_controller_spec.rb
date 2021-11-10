@@ -47,7 +47,7 @@ describe PageViewsController do
       account_admin_user
     end
 
-    before :each do
+    before do
       student_in_course
       user_session(@admin)
     end

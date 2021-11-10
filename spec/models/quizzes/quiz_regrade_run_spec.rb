@@ -24,7 +24,7 @@ describe Quizzes::QuizRegradeRun do
   end
 
   describe "#perform" do
-    before(:each) do
+    before do
       @course = Course.create!
       @quiz = Quizzes::Quiz.create!(:context => @course)
       @user = User.create!

@@ -852,7 +852,7 @@ describe CommunicationChannelsController do
           account_admin_user_with_role_changes(:account => @account, :role_changes => { view_notifications: true })
         end
 
-        before :each do
+        before do
           user_session(@admin)
         end
 
@@ -1414,7 +1414,7 @@ describe CommunicationChannelsController do
       let(:second_sns_access_token) { @user.access_tokens.create!(developer_key: second_sns_developer_key) }
       let(:sns_channel) { @user.communication_channels.create(path_type: CommunicationChannel::TYPE_PUSH, path: 'push') }
 
-      before(:each) { sns_channel }
+      before { sns_channel }
 
       it 'shouldnt error if an endpoint does not exist for the push_token', type: :request do
         json = api_call(:delete, "/api/v1/users/self/communication_channels/push",
@@ -1426,7 +1426,7 @@ describe CommunicationChannelsController do
       context 'has a notification endpoint' do
         let(:fake_token) { 'insttothemoon' }
 
-        before(:each) { sns_access_token.notification_endpoints.create!(token: fake_token) }
+        before { sns_access_token.notification_endpoints.create!(token: fake_token) }
 
         context "cross-shard user" do
           specs_require_sharding

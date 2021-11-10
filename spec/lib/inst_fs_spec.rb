@@ -61,7 +61,7 @@ describe InstFS do
     end
 
     context "authenticated_url" do
-      before :each do
+      before do
         @attachment = attachment_with_context(user_model)
         @attachment.instfs_uuid = 1
         @attachment.filename = "test.txt"
@@ -234,7 +234,7 @@ describe InstFS do
     end
 
     context "authenticated_thumbnail_url" do
-      before :each do
+      before do
         @attachment = attachment_with_context(user_model)
         @attachment.instfs_uuid = 1
         @attachment.filename = "test.txt"

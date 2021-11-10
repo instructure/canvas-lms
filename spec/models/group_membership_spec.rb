@@ -90,7 +90,7 @@ describe GroupMembership do
 
   context "Notifications" do
     context "in published course" do
-      before :each do
+      before do
         course_with_teacher(active_all: true)
         @student1 = student_in_course(active_all: true).user
         @group1 = @course.groups.create(group_category: GroupCategory.student_organized_for(@course))

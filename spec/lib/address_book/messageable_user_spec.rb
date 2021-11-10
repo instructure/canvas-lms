@@ -117,7 +117,7 @@ describe AddressBook::MessageableUser do
     end
 
     describe "with optional :context" do
-      before :each do
+      before do
         @recipient = user_model(workflow_state: 'registered')
         @sender = user_model(workflow_state: 'registered')
         @address_book = AddressBook::MessageableUser.new(@sender)
@@ -297,7 +297,7 @@ describe AddressBook::MessageableUser do
     describe "sharding" do
       specs_require_sharding
 
-      before :each do
+      before do
         enrollment = @shard1.activate { teacher_in_course(active_all: true) }
         @teacher = enrollment.user
         @course = enrollment.course

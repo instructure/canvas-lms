@@ -41,11 +41,11 @@ describe "rubyzip encoding fix patch" do
   end
 
   context "with zip file" do
-    before(:each) do
+    before do
       @arch = Zip::File.open(@zip_path)
     end
 
-    after(:each) do
+    after do
       @arch.close
     end
 

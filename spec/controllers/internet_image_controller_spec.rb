@@ -21,7 +21,7 @@
 require 'webmock/rspec'
 
 describe InternetImageController do
-  around(:example) do |example|
+  around do |example|
     WebMock.disable_net_connect!(allow_localhost: true)
     example.run
     WebMock.enable_net_connect!
@@ -46,7 +46,7 @@ describe InternetImageController do
       @plugin.update_attribute(:settings, { access_key: 'key', application_name: 'canvas' }.with_indifferent_access)
     end
 
-    before :each do
+    before do
       user_model
       user_session(@user)
     end
@@ -108,7 +108,7 @@ describe InternetImageController do
       @plugin.update_attribute(:settings, { access_key: 'key' }.with_indifferent_access)
     end
 
-    before :each do
+    before do
       user_model
       user_session(@user)
     end

@@ -23,7 +23,7 @@ describe CommunicationChannel do
     Messages::Partitioner.process
   end
 
-  before(:each) do
+  before do
     @pseudonym = double('Pseudonym')
     allow(@pseudonym).to receive(:destroyed?).and_return(false)
     allow(Pseudonym).to receive(:find_by_user_id).and_return(@pseudonym)
@@ -773,7 +773,7 @@ describe CommunicationChannel do
   end
 
   describe '#user_can_have_more_channels?' do
-    before(:each) do
+    before do
       @domain_root_account = Account.default
       @user = User.create!
     end
@@ -785,7 +785,7 @@ describe CommunicationChannel do
     end
 
     describe 'when :max_communication_channels is set' do
-      before(:each) do
+      before do
         @domain_root_account.settings[:max_communication_channels] = 2
         @domain_root_account.save!
       end
@@ -796,7 +796,7 @@ describe CommunicationChannel do
       end
 
       describe 'when there are more CCs then the setting' do
-        before(:each) do
+        before do
           @cc1 = communication_channel(@user, { username: 'cc1@test.com' })
           @cc2 = communication_channel(@user, { username: 'cc2@test.com' })
         end

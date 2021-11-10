@@ -24,7 +24,7 @@ describe Auditors::FeatureFlag do
   let(:request_id) { 42 }
   let(:feature_name) { 'root_account_feature' }
 
-  before(:each) do
+  before do
     allow(Feature).to receive(:definitions).and_return({
                                                          feature_name => Feature.new(feature: feature_name, applies_to: 'RootAccount')
                                                        })

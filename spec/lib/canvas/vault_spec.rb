@@ -77,7 +77,7 @@ module Canvas
     end
 
     describe '.read' do
-      before(:each) do
+      before do
         allow(described_class).to receive(:config).and_return(static_config)
         @stub = stub_request(:get, "#{addr}/v1/test/path")
                 .to_return(status: 200, body: {
@@ -158,7 +158,7 @@ module Canvas
         let(:lease_duration) { 3600 }
         let(:credential_data) { { credential_id: 'aabbccdd', credential_secret: 'pampelmousse' } }
 
-        before(:each) do
+        before do
           skip("Must have a local redis available to run this spec") unless Canvas.redis_enabled?
           allow(ConfigFile).to receive(:load).with("local_cache").and_return({
                                                                                store: "redis",

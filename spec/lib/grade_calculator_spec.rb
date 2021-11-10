@@ -423,7 +423,7 @@ describe GradeCalculator do
     end
 
     describe "group with no grade or muted grade" do
-      before(:each) do
+      before do
         two_groups_two_assignments(50, 10, 50, 10)
         @submission = @assignment.grade_student(@user, grade: "5", grader: @teacher)
       end
@@ -447,7 +447,7 @@ describe GradeCalculator do
           let(:auto_assignment) { @assignment }
           let(:manual_assignment) { @assignment2 }
 
-          before(:each) do
+          before do
             # We assigned this above, but repeat it for the sake of clarity
             auto_assignment.grade_student(@user, grade: "5", grader: @teacher)
 
@@ -487,7 +487,7 @@ describe GradeCalculator do
             let(:calculator) { GradeCalculator.new([@user.id], @course.id, ignore_muted: false) }
             let(:computed_score_data) { calculator.compute_scores.first }
 
-            before(:each) do
+            before do
               @anonymized_assignment = @course.assignments.create!(anonymous_grading: true)
               @anonymized_assignment.grade_student(@user, grade: "10", grader: @teacher)
             end
@@ -521,7 +521,7 @@ describe GradeCalculator do
 
             # Calling compute_and_save_scores when ignore_muted is true will start
             # a separate run calculating hidden scores
-            before(:each) { calculator.compute_and_save_scores }
+            before { calculator.compute_and_save_scores }
 
             it "ignores unposted submissions when calculating the current score" do
               expect(enrollment.computed_current_score).to eq 50.0
@@ -929,7 +929,7 @@ describe GradeCalculator do
   end
 
   describe '#compute_and_save_scores' do
-    before :each do
+    before do
       @now = Time.zone.now
       @grading_period_options = { count: 2, weights: [30, 70], start_dates: [1, 2].map { |n| @now + n.months } }
 
@@ -1002,7 +1002,7 @@ describe GradeCalculator do
     context 'without grading periods' do
       describe 'overall course score' do
         context 'with the percent weighting scheme' do
-          before :each do
+          before do
             @course.update_column(:group_weighting_scheme, 'percent')
             GradeCalculator.new(@student.id, @course).compute_and_save_scores
           end
@@ -1049,7 +1049,7 @@ describe GradeCalculator do
         end
 
         context 'without a weighting scheme' do
-          before :each do
+          before do
             GradeCalculator.new(@student.id, @course).compute_and_save_scores
           end
 
@@ -1114,7 +1114,7 @@ describe GradeCalculator do
         end
 
         context 'with the percent weighting scheme' do
-          before :each do
+          before do
             @course.update_column(:group_weighting_scheme, 'percent')
             GradeCalculator.new(@student.id, @course).compute_and_save_scores
           end
@@ -1161,7 +1161,7 @@ describe GradeCalculator do
         end
 
         context 'without a weighting scheme' do
-          before :each do
+          before do
             GradeCalculator.new(@student.id, @course).compute_and_save_scores
           end
 
@@ -1209,7 +1209,7 @@ describe GradeCalculator do
     end
 
     context 'with grading periods' do
-      before :each do
+      before do
         @grading_periods = grading_periods(@grading_period_options)
         @first_period, @second_period = @grading_periods
       end
@@ -1303,7 +1303,7 @@ describe GradeCalculator do
       end
 
       context 'when grading periods are weighted' do
-        before :each do
+        before do
           group = @first_period.grading_period_group
           group.update!(weighted: true)
           @ungraded_assignment = @course.assignments.create!(
@@ -1561,7 +1561,7 @@ describe GradeCalculator do
         end
 
         context 'with the percent weighting scheme' do
-          before :each do
+          before do
             @course.update_column(:group_weighting_scheme, 'percent')
             GradeCalculator.new(@student.id, @course).compute_and_save_scores
           end
@@ -1608,7 +1608,7 @@ describe GradeCalculator do
         end
 
         context 'without a weighting scheme' do
-          before :each do
+          before do
             GradeCalculator.new(@student.id, @course).compute_and_save_scores
           end
 
@@ -1699,7 +1699,7 @@ describe GradeCalculator do
     end
 
     context 'when given only_update_points: true' do
-      before :each do
+      before do
         GradeCalculator.new(@student.id, @course).compute_and_save_scores
         initial_scores = Score.where(enrollment: @course.enrollments.find_by(user: @student)).order(id: :asc)
         updated_score_attributes = {
@@ -1789,7 +1789,7 @@ describe GradeCalculator do
     end
 
     context("assignment group scores") do
-      before(:each) do
+      before do
         @group1 = @course.assignment_groups.create!(name: "some group 1")
         @assignment1 = @course.assignments.create!(name: "assignment 1", points_possible: 20, assignment_group: @group1)
         @assignment1.grade_student(@student, grade: 12, grader: @teacher)
@@ -1842,7 +1842,7 @@ describe GradeCalculator do
       end
 
       context "assignment group score creation" do
-        before(:each) do
+        before do
           @group = @course.assignment_groups.create!(name: "yet another group")
           @group.scores.each(&:destroy_permanently!)
           @group.reload

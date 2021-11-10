@@ -26,7 +26,7 @@ describe 'quizzes with draft state' do
   include QuizzesCommon
   include AssignmentOverridesSeleniumHelper
 
-  before(:each) do
+  before do
     course_with_student_logged_in
     @course.update(name: 'teacher course')
     @course.save!
@@ -38,7 +38,7 @@ describe 'quizzes with draft state' do
 
   context 'with a student' do
     context 'with an unpublished quiz' do
-      before(:each) do
+      before do
         @quiz.unpublish!
       end
 
@@ -56,7 +56,7 @@ describe 'quizzes with draft state' do
     end
 
     context 'when the available date is in the future' do
-      before(:each) do
+      before do
         @quiz.unlock_at = Time.now.utc + 200.seconds
         @quiz.publish!
       end

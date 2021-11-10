@@ -35,7 +35,7 @@ describe "content security policy" do
       @csp_course.enroll_user(@csp_user, 'TeacherEnrollment', enrollment_state: 'active')
     end
 
-    before(:each) { create_session(@csp_pseudonym) }
+    before { create_session(@csp_pseudonym) }
 
     it "displays a flash alert for non-whitelisted iframe", ignore_js_errors: true do
       @csp_course.wiki_pages.create!(title: 'Page1', body: "<iframe width=\"560\" height=\"315\""\

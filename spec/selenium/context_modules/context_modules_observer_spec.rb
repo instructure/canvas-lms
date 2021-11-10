@@ -24,7 +24,7 @@ describe "context modules" do
   include ContextModulesCommon
 
   context "as an observer" do
-    before(:each) do
+    before do
       @course = course_factory(active_all: true)
       @student = user_factory(active_all: true, :active_state => 'active')
       @observer = user_factory(active_all: true, :active_state => 'active')

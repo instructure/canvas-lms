@@ -751,7 +751,7 @@ describe Api do
     end
 
     context "mobile css/js" do
-      before(:each) do
+      before do
         student_in_course
         account = @course.root_account
         bc = BrandConfig.create(mobile_css_overrides: 'somewhere.css')

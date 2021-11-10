@@ -379,7 +379,7 @@ describe AssignmentOverride do
   end
 
   describe "#title_from_students" do
-    before :each do
+    before do
       @assignment_override = AssignmentOverride.new
       allow(AssignmentOverride).to receive(:title_from_student_count)
     end

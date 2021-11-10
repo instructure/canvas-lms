@@ -400,12 +400,12 @@ describe Message do
       end
 
       context 'with the enable_push_notifications account setting disabled' do
-        before :each do
+        before do
           account = Account.default
           account.settings[:enable_push_notifications] = false
         end
 
-        after :each do
+        after do
           account = Account.default
           account.settings[:enable_push_notifications] = true
         end

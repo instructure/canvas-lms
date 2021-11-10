@@ -49,7 +49,7 @@ describe "discussions" do
     context "as a teacher" do
       let(:topic) { teacher_topic }
 
-      before(:each) do
+      before do
         user_session(teacher)
         stub_rcs_config
       end

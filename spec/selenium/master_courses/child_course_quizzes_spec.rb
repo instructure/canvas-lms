@@ -41,7 +41,7 @@ describe "master courses - child courses - quiz locking" do
     @quiz_copy.save!
   end
 
-  before :each do
+  before do
     user_session(@teacher)
     stub_rcs_config
   end

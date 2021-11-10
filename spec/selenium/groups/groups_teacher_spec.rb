@@ -26,7 +26,7 @@ describe "new groups" do
   include GroupsCommon
 
   context "as a teacher" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 
@@ -1089,7 +1089,7 @@ describe "new groups" do
   end
 
   context "manage groups permissions as a teacher" do
-    before(:each) { course_with_teacher_logged_in }
+    before { course_with_teacher_logged_in }
 
     it "does not allow adding a group set if they don't have the permission" do
       @course.root_account.disable_feature!(:granular_permissions_manage_groups)

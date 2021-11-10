@@ -25,7 +25,7 @@ describe "large enrollments", priority: "2" do
   include GradebookCommon
 
   context "page links" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
 
       create_users_in_course @course, 500

@@ -31,7 +31,7 @@ describe "course sections" do
     ff('#enrollment_table tr')
   end
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in
     @section = @course.default_section
   end
@@ -129,7 +129,7 @@ describe "course sections" do
   end
 
   context "student tray" do
-    before(:each) do
+    before do
       @account = Account.default
     end
 

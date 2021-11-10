@@ -26,7 +26,7 @@ describe 'Theme Editor' do
   include ColorCommon
   include ThemeEditorCommon
 
-  before(:each) do
+  before do
     course_with_admin_logged_in
   end
 
