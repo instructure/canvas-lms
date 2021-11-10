@@ -150,6 +150,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Licenca Creative Commons:"
   },
+  "crop_image_807ebb08": { "message": "Obreži sliko" },
   "current_image_f16c249c": { "message": "Trenutna slika" },
   "custom_6979cd81": { "message": "Po meri" },
   "date_added_ed5ad465": { "message": "Datum dodajanja" },
@@ -322,6 +323,7 @@ const locale = {
     "message": "Ni najdenih rezultatov za { term }."
   },
   "none_3b5e34d2": { "message": "Brez" },
+  "none_selected_b93d56d2": { "message": "Nobena ni izbrana" },
   "octagon_e48be9f": { "message": "Osmerokotnik" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Odpri to pogovorno okno z bližnjicami"
@@ -376,6 +378,7 @@ const locale = {
   "saved_buttons_and_icons_8278eed2": { "message": "Shranjeni gumbi in ikone" },
   "search_280d00bd": { "message": "Iskanje" },
   "search_term_b2d2235": { "message": "Iskalni izraz" },
+  "select_crop_shape_d441feeb": { "message": "Izberite obliko izrezovanja" },
   "select_language_7c93a900": { "message": "Izberite jezik" },
   "selected_274ce24f": { "message": "Izbrano" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

@@ -137,6 +137,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "สิทธิ์ใช้งาน Creative Commons:"
   },
+  "crop_image_807ebb08": { "message": "ครอปภาพ" },
   "current_image_f16c249c": { "message": "ภาพปัจจุบัน" },
   "custom_6979cd81": { "message": "กำหนดเอง" },
   "date_added_ed5ad465": { "message": "วันที่ที่เพิ่ม" },
@@ -307,6 +308,7 @@ const locale = {
     "message": "ไม่พบผลลัพธ์สำหรับ { term }"
   },
   "none_3b5e34d2": { "message": "ไม่มี" },
+  "none_selected_b93d56d2": { "message": "ไม่ได้เลือกรายการใด" },
   "octagon_e48be9f": { "message": "แปดเหลี่ยม" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "เปิดกล่องโต้ตอบชอร์ตคัทแป้นพิมพ์นี้"
@@ -357,6 +359,7 @@ const locale = {
   "saved_buttons_and_icons_8278eed2": { "message": "ปุ่มและไอคอนที่บันทึกไว้" },
   "search_280d00bd": { "message": "ค้นหา" },
   "search_term_b2d2235": { "message": "คำค้นหา" },
+  "select_crop_shape_d441feeb": { "message": "เลือกรูปทรงการครอป" },
   "select_language_7c93a900": { "message": "เลือกภาษา" },
   "selected_274ce24f": { "message": "เลือกแล้ว" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

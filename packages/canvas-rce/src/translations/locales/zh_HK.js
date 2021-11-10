@@ -128,6 +128,7 @@ const locale = {
   "course_navigation_dd035109": { "message": "課程導航" },
   "create_button_and_icon_5c089934": { "message": "建立按鈕和圖示" },
   "creative_commons_license_725584ae": { "message": "創意共享授權：" },
+  "crop_image_807ebb08": { "message": "裁剪影像" },
   "current_image_f16c249c": { "message": "目前的圖像" },
   "custom_6979cd81": { "message": "自訂" },
   "date_added_ed5ad465": { "message": "添加的日期" },
@@ -278,6 +279,7 @@ const locale = {
     "message": "找不到 { term } 的結果。"
   },
   "none_3b5e34d2": { "message": "無" },
+  "none_selected_b93d56d2": { "message": "未選擇任何項目" },
   "octagon_e48be9f": { "message": "八邊形" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "開啟此鍵盤快速鍵對話方塊"
@@ -322,6 +324,7 @@ const locale = {
   "saved_buttons_and_icons_8278eed2": { "message": "儲存的按鈕和圖示" },
   "search_280d00bd": { "message": "搜尋" },
   "search_term_b2d2235": { "message": "搜尋學期" },
+  "select_crop_shape_d441feeb": { "message": "選擇裁剪形狀" },
   "select_language_7c93a900": { "message": "選擇語言" },
   "selected_274ce24f": { "message": "已選擇" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

@@ -150,6 +150,7 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Licenza Creative Commons:"
   },
+  "crop_image_807ebb08": { "message": "Ritaglia immagine" },
   "current_image_f16c249c": { "message": "Immagine attuale" },
   "custom_6979cd81": { "message": "Personalizzato" },
   "date_added_ed5ad465": { "message": "Data aggiunta" },
@@ -330,6 +331,7 @@ const locale = {
     "message": "Nessun risultato trovato per { term }."
   },
   "none_3b5e34d2": { "message": "Nessuno" },
+  "none_selected_b93d56d2": { "message": "Nessuna selezionata" },
   "octagon_e48be9f": { "message": "Ottagono" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Apri questa finestra di dialogo delle scelte rapide da tastiera"
@@ -382,6 +384,7 @@ const locale = {
   "saved_buttons_and_icons_8278eed2": { "message": "Pulsanti e icone salvati" },
   "search_280d00bd": { "message": "Cerca" },
   "search_term_b2d2235": { "message": "Cerca termine" },
+  "select_crop_shape_d441feeb": { "message": "Seleziona forma di ritaglio" },
   "select_language_7c93a900": { "message": "Selezionare la lingua" },
   "selected_274ce24f": { "message": "Selezionato" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
