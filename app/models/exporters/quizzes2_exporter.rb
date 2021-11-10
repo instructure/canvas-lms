@@ -21,7 +21,7 @@ require 'English'
 
 module Exporters
   class Quizzes2Exporter
-    GROUP_NAME = 'Migrated Quizzes'.freeze
+    GROUP_NAME = 'Migrated Quizzes'
 
     attr_accessor :course, :quiz
 

@@ -21,7 +21,7 @@
 require 'saml2'
 
 class AuthenticationProvider::SAML::UKFederation < AuthenticationProvider::SAML::Federation
-  URN = 'http://ukfederation.org.uk'.freeze
+  URN = 'http://ukfederation.org.uk'
 
   class << self
     def endpoint

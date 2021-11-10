@@ -315,7 +315,7 @@ class Course < ActiveRecord::Base
 
   # A hard limit on the number of graders (excluding the moderator) a moderated
   # assignment can have.
-  MODERATED_GRADING_GRADER_LIMIT = 10.freeze
+  MODERATED_GRADING_GRADER_LIMIT = 10
 
   def [](attr)
     attr.to_s == 'asset_string' ? self.asset_string : super

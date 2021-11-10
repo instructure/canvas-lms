@@ -30,7 +30,7 @@ class UserPreferenceValue < ActiveRecord::Base
 
   # this means that the preference value is no longer stored on the user object
   # and is in it's own record in the db
-  EXTERNAL = :external.freeze
+  EXTERNAL = :external
 
   def self.add_user_preference(key, use_sub_keys: false)
     # set use_sub_keys if we were previously storing a big ol' Hash but only getting/setting one value at a time

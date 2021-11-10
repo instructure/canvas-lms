@@ -78,7 +78,7 @@ module Lti::IMS
       :verify_attempts_for_online_upload,
     )
 
-    MIME_TYPE = 'application/vnd.ims.lis.v1.score+json'.freeze
+    MIME_TYPE = 'application/vnd.ims.lis.v1.score+json'
 
     # @API Create a Score
     #
@@ -219,7 +219,7 @@ module Lti::IMS
       content_items: %i[type url title]
     ].freeze
     SCORE_SUBMISSION_TYPES = %w[none basic_lti_launch online_text_entry online_url external_tool online_upload].freeze
-    DEFAULT_SUBMISSION_TYPE = 'external_tool'.freeze
+    DEFAULT_SUBMISSION_TYPE = 'external_tool'
 
     def scopes_matcher
       self.class.all_of(TokenScopes::LTI_AGS_SCORE_SCOPE)

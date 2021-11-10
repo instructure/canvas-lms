@@ -511,7 +511,7 @@ module SIS
       ERRORS_TO_REASONS = {
         'unique_id is invalid' => "Invalid login_id: '%{login_id}'",
       }.freeze
-      DEFAULT_REASON = 'Unknown reason: %{message}'.freeze
+      DEFAULT_REASON = 'Unknown reason: %{message}'
 
       def generate_readable_error_message(options)
         response = ERRORS_TO_REASONS.fetch(options[:message]) { DEFAULT_REASON }

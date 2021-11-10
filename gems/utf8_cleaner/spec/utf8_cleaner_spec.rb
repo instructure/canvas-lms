@@ -45,7 +45,7 @@ describe Utf8Cleaner do
   end
 
   it "strips out invalid characters from frozen strings" do
-    frozen = "\x7Fohai".freeze
+    frozen = "\x7Fohai"
     expect(Utf8Cleaner.strip_invalid_utf8(frozen)).to eql("ohai")
   end
 

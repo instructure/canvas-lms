@@ -67,7 +67,7 @@ module Lti
     skip_before_action :load_user
     before_action :authorized_lti2_tool, :tool_proxy_related_to_assignment?, :user_related_to_assignment?
 
-    ASSIGNMENT_SERVICE = 'vnd.Canvas.Assignment'.freeze
+    ASSIGNMENT_SERVICE = 'vnd.Canvas.Assignment'
     SERVICE_DEFINITIONS = [
       {
         id: ASSIGNMENT_SERVICE,

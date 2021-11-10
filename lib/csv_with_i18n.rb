@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 class CSVWithI18n < CSV
-  BYTE_ORDER_MARK = "\xEF\xBB\xBF".freeze
+  BYTE_ORDER_MARK = "\xEF\xBB\xBF"
 
   def initialize(data, **options)
     @include_bom = options.delete(:include_bom)

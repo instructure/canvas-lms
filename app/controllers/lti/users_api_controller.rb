@@ -29,8 +29,8 @@ module Lti
     before_action :user_in_context, only: :show
     before_action :tool_in_context, only: :group_index
 
-    USER_SERVICE = 'vnd.Canvas.User'.freeze
-    GROUP_INDEX_SERVICE = 'vnd.Canvas.GroupIndex'.freeze
+    USER_SERVICE = 'vnd.Canvas.User'
+    GROUP_INDEX_SERVICE = 'vnd.Canvas.GroupIndex'
     SERVICE_DEFINITIONS = [
       {
         id: USER_SERVICE,

@@ -19,8 +19,8 @@
 
 module Lti
   class ToolConfiguration < ActiveRecord::Base
-    CANVAS_EXTENSION_LABEL = 'canvas.instructure.com'.freeze
-    DEFAULT_PRIVACY_LEVEL = 'anonymous'.freeze
+    CANVAS_EXTENSION_LABEL = 'canvas.instructure.com'
+    DEFAULT_PRIVACY_LEVEL = 'anonymous'
 
     belongs_to :developer_key
 

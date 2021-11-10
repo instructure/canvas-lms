@@ -24,7 +24,7 @@ class AuthenticationProvider::GitHub < AuthenticationProvider::OAuth2
   plugin_settings :domain, :client_id, client_secret: :client_secret_dec
 
   def self.sti_name
-    'github'.freeze
+    'github'
   end
 
   def self.recognized_params
@@ -32,16 +32,16 @@ class AuthenticationProvider::GitHub < AuthenticationProvider::OAuth2
   end
 
   def self.login_attributes
-    ['id'.freeze, 'email'.freeze, 'login'.freeze].freeze
+    ['id', 'email', 'login'].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
     [
-      'email'.freeze,
-      'id'.freeze,
-      'login'.freeze,
-      'name'.freeze
+      'email',
+      'id',
+      'login',
+      'name'
     ].freeze
   end
 
@@ -57,7 +57,7 @@ class AuthenticationProvider::GitHub < AuthenticationProvider::OAuth2
   end
 
   def login_attribute
-    super || 'id'.freeze
+    super || 'id'
   end
 
   protected
@@ -81,13 +81,13 @@ class AuthenticationProvider::GitHub < AuthenticationProvider::OAuth2
 
   def client_options
     {
-      site: domain.present? ? "https://#{domain}/api/v3" : 'https://api.github.com'.freeze,
+      site: domain.present? ? "https://#{domain}/api/v3" : 'https://api.github.com',
       authorize_url: "https://#{inferred_domain}/login/oauth/authorize",
       token_url: "https://#{inferred_domain}/login/oauth/access_token"
     }
   end
 
   def inferred_domain
-    domain.presence || 'github.com'.freeze
+    domain.presence || 'github.com'
   end
 end

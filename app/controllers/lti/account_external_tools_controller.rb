@@ -32,7 +32,7 @@ module Lti
 
     before_action :verify_target_developer_key, only: [:create, :update]
 
-    MIME_TYPE = 'application/vnd.canvas.contextexternaltools+json'.freeze
+    MIME_TYPE = 'application/vnd.canvas.contextexternaltools+json'
 
     ACTION_SCOPE_MATCHERS = {
       create: all_of(TokenScopes::LTI_CREATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE),

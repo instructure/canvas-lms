@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionVersions
-  LOG_PREFIX = "RebuildingQuizSubmissions - ".freeze
+  LOG_PREFIX = "RebuildingQuizSubmissions - "
 
   class << self
     def run(submission_id, timestamp = Time.zone.now)

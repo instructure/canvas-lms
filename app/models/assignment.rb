@@ -45,7 +45,7 @@ class Assignment < ActiveRecord::Base
   ALLOWED_GRADING_TYPES = %w(points percent letter_grade gpa_scale pass_fail not_graded).freeze
   OFFLINE_SUBMISSION_TYPES = %i(on_paper external_tool none not_graded wiki_page).freeze
   SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze
-  LTI_EULA_SERVICE = 'vnd.Canvas.Eula'.freeze
+  LTI_EULA_SERVICE = 'vnd.Canvas.Eula'
   AUDITABLE_ATTRIBUTES = %w[
     muted
     due_at

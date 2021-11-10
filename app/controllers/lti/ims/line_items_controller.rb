@@ -80,8 +80,8 @@ module Lti
         index: any_of(TokenScopes::LTI_AGS_LINE_ITEM_SCOPE, TokenScopes::LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE)
       }.with_indifferent_access.freeze
 
-      MIME_TYPE = 'application/vnd.ims.lis.v2.lineitem+json'.freeze
-      CONTAINER_MIME_TYPE = 'application/vnd.ims.lis.v2.lineitemcontainer+json'.freeze
+      MIME_TYPE = 'application/vnd.ims.lis.v2.lineitem+json'
+      CONTAINER_MIME_TYPE = 'application/vnd.ims.lis.v2.lineitemcontainer+json'
 
       rescue_from ActionController::BadRequest do |e|
         unless Rails.env.production?

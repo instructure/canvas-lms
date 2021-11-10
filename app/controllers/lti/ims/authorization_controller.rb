@@ -73,8 +73,8 @@ module Lti
       ].freeze
 
       class InvalidGrant < RuntimeError; end
-      JWT_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:jwt-bearer'.freeze
-      AUTHORIZATION_CODE_GRANT_TYPE = 'authorization_code'.freeze
+      JWT_GRANT_TYPE = 'urn:ietf:params:oauth:grant-type:jwt-bearer'
+      AUTHORIZATION_CODE_GRANT_TYPE = 'authorization_code'
       GRANT_TYPES = [JWT_GRANT_TYPE, AUTHORIZATION_CODE_GRANT_TYPE].freeze
 
       rescue_from JSON::JWS::VerificationFailed,

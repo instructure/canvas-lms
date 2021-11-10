@@ -32,19 +32,19 @@ class AuthenticationProvider::Clever < AuthenticationProvider::OAuth2
   end
 
   def self.login_attributes
-    ['id'.freeze, 'sis_id'.freeze, 'email'.freeze, 'student_number'.freeze, 'teacher_number'.freeze, 'state_id'.freeze, 'district_username'.freeze].freeze
+    ['id', 'sis_id', 'email', 'student_number', 'teacher_number', 'state_id', 'district_username'].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
-    (login_attributes + ['first_name'.freeze, 'last_name'.freeze, 'home_language'.freeze]).freeze
+    (login_attributes + ['first_name', 'last_name', 'home_language']).freeze
   end
 
   # Rename db field
   alias_attribute :district_id, :auth_filter
 
   def login_attribute
-    super || 'id'.freeze
+    super || 'id'
   end
 
   def unique_id(token)
@@ -81,9 +81,9 @@ class AuthenticationProvider::Clever < AuthenticationProvider::OAuth2
 
   def client_options
     {
-      site: 'https://api.clever.com'.freeze,
+      site: 'https://api.clever.com',
       authorize_url: 'https://clever.com/oauth/authorize',
-      token_url: 'https://clever.com/oauth/tokens'.freeze,
+      token_url: 'https://clever.com/oauth/tokens',
       auth_scheme: :basic_auth,
     }
   end

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class TokenScopes
-  OAUTH2_SCOPE_NAMESPACE = '/auth/'.freeze
+  OAUTH2_SCOPE_NAMESPACE = '/auth/'
   USER_INFO_SCOPE = {
     resource: :oauth2,
     verb: "GET",
@@ -28,28 +28,28 @@ class TokenScopes
   CD2_SCOPE = {
     resource: :peer_services,
     verb: "GET",
-    scope: "cd2".freeze
+    scope: "cd2"
   }.freeze
-  LTI_AGS_LINE_ITEM_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem".freeze
-  LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly".freeze
-  LTI_AGS_RESULT_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly".freeze
-  LTI_AGS_SCORE_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/score".freeze
-  LTI_AGS_SHOW_PROGRESS_SCOPE = "https://canvas.instructure.com/lti-ags/progress/scope/show".freeze
-  LTI_NRPS_V2_SCOPE = "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly".freeze
-  LTI_UPDATE_PUBLIC_JWK_SCOPE = "https://canvas.instructure.com/lti/public_jwk/scope/update".freeze
-  LTI_ACCOUNT_LOOKUP_SCOPE = "https://canvas.instructure.com/lti/account_lookup/scope/show".freeze
-  LTI_CREATE_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/create".freeze
-  LTI_SHOW_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/show".freeze
-  LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/update".freeze
-  LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/list".freeze
-  LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/destroy".freeze
-  LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/list_event_types".freeze
-  LTI_SHOW_FEATURE_FLAG_SCOPE = "https://canvas.instructure.com/lti/feature_flags/scope/show".freeze
-  LTI_CREATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/create".freeze
-  LTI_DESTROY_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/destroy".freeze
-  LTI_LIST_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/list".freeze
-  LTI_SHOW_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/show".freeze
-  LTI_UPDATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/update".freeze
+  LTI_AGS_LINE_ITEM_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem"
+  LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly"
+  LTI_AGS_RESULT_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly"
+  LTI_AGS_SCORE_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/score"
+  LTI_AGS_SHOW_PROGRESS_SCOPE = "https://canvas.instructure.com/lti-ags/progress/scope/show"
+  LTI_NRPS_V2_SCOPE = "https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly"
+  LTI_UPDATE_PUBLIC_JWK_SCOPE = "https://canvas.instructure.com/lti/public_jwk/scope/update"
+  LTI_ACCOUNT_LOOKUP_SCOPE = "https://canvas.instructure.com/lti/account_lookup/scope/show"
+  LTI_CREATE_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/create"
+  LTI_SHOW_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/show"
+  LTI_UPDATE_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/update"
+  LTI_LIST_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/list"
+  LTI_DESTROY_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/destroy"
+  LTI_LIST_EVENT_TYPES_DATA_SERVICE_SUBSCRIPTION_SCOPE = "https://canvas.instructure.com/lti/data_services/scope/list_event_types"
+  LTI_SHOW_FEATURE_FLAG_SCOPE = "https://canvas.instructure.com/lti/feature_flags/scope/show"
+  LTI_CREATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/create"
+  LTI_DESTROY_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/destroy"
+  LTI_LIST_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/list"
+  LTI_SHOW_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/show"
+  LTI_UPDATE_ACCOUNT_EXTERNAL_TOOLS_SCOPE = "https://canvas.instructure.com/lti/account_external_tools/scope/update"
   LTI_SCOPES = {
     LTI_AGS_LINE_ITEM_SCOPE => I18n.t("Can create and view assignment data in the gradebook associated with the tool."),
     LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE => I18n.t("Can view assignment data in the gradebook associated with the tool."),

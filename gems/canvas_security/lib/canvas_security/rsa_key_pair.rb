@@ -21,8 +21,8 @@ require 'openssl'
 
 module CanvasSecurity
   class RSAKeyPair < JWKKeyPair
-    KTY = 'RSA'.freeze
-    ALG = 'RS256'.freeze
+    KTY = 'RSA'
+    ALG = 'RS256'
     SIZE = 2048
     def initialize(use: 'sig')
       super()

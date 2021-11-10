@@ -57,11 +57,11 @@ class ContextExternalTool < ActiveRecord::Base
     :editor_button => [:use_tray].freeze
   }.freeze
 
-  DISABLED_STATE = 'disabled'.freeze
-  QUIZ_LTI = 'Quizzes 2'.freeze
-  ANALYTICS_2 = 'fd75124a-140e-470f-944c-114d2d93bb40'.freeze
+  DISABLED_STATE = 'disabled'
+  QUIZ_LTI = 'Quizzes 2'
+  ANALYTICS_2 = 'fd75124a-140e-470f-944c-114d2d93bb40'
   TOOL_FEATURE_MAPPING = { ANALYTICS_2 => :analytics_2 }.freeze
-  PREFERRED_LTI_VERSION = '1_3'.freeze
+  PREFERRED_LTI_VERSION = '1_3'
 
   workflow do
     state :anonymous

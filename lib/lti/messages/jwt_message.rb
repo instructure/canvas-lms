@@ -36,7 +36,7 @@ module Lti::Messages
   # Canvas, please see the inline documentation of
   # app/models/lti/lti_advantage_adapter.rb.
   class JwtMessage
-    EXTENSION_PREFIX = 'https://www.instructure.com/'.freeze
+    EXTENSION_PREFIX = 'https://www.instructure.com/'
 
     def initialize(tool:, context:, user:, expander:, return_url:, opts: {})
       @tool = tool

@@ -24,13 +24,13 @@ module DataFixup
       new.build_indexes
     end
 
-    LAST_BATCH_TABLE = 'grade_changes_index_last_batch'.freeze
+    LAST_BATCH_TABLE = 'grade_changes_index_last_batch'
     SEARCH_CQL = %{
       SELECT id, created_at, context_id, assignment_id, grader_id, student_id
       FROM grade_changes
       WHERE token(id) > token(?)
       LIMIT ?
-    }.freeze
+    }
     INDEX_METHODS = [
       :add_course_assignment_index,
       :add_course_assignment_grader_index,
