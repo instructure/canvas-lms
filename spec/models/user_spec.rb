@@ -1808,7 +1808,7 @@ describe User do
     context "sharding" do
       specs_require_sharding
 
-      before :each do
+      before do
         account2 = @shard1.activate { account_model }
         (4..6).each do |x|
           course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true, :account => account2).course
@@ -3449,7 +3449,7 @@ describe User do
   describe "#participating_student_current_and_concluded_course_ids" do
     let(:user) { User.create! }
 
-    before :each do
+    before do
       course_with_student(user: user, active_all: true)
     end
 
@@ -3492,7 +3492,7 @@ describe User do
   end
 
   describe '#dashboard_view' do
-    before(:each) do
+    before do
       course_factory
       user_factory(active_all: true)
       user_session(@user)
@@ -3616,7 +3616,7 @@ describe User do
     end
 
     context "user has opted out of celebrations" do
-      before :each do
+      before do
         user.enable_feature!(:disable_celebrations)
       end
 
@@ -3771,7 +3771,7 @@ describe User do
         end
 
         context "when user has no k5 enrollments" do
-          before :each do
+          before do
             allow(@user).to receive(:active_k5_enrollments?).and_return(false)
           end
 
@@ -3797,7 +3797,7 @@ describe User do
         end
 
         context "when user has some k5 enrollments" do
-          before :each do
+          before do
             allow(@user).to receive(:active_k5_enrollments?).and_return(true)
           end
 

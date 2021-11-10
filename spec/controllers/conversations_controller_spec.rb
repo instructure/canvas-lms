@@ -164,7 +164,7 @@ describe ConversationsController do
         a.account_users.create!(user: @user)
       end
 
-      before :each do
+      before do
         user_session(@teacher)
         session[:become_user_id] = @student.id
       end
@@ -214,7 +214,7 @@ describe ConversationsController do
       course_with_student(:active_all => true)
     end
 
-    before :each do
+    before do
       user_session(@student)
       conversation
     end
@@ -366,7 +366,7 @@ describe ConversationsController do
         @account_id = @course.account_id
       end
 
-      before :each do
+      before do
         user_session(@teacher)
       end
 
@@ -500,7 +500,7 @@ describe ConversationsController do
     end
 
     context "user_notes" do
-      before :each do
+      before do
         Account.default.update_attribute :enable_user_notes, true
         user_session(@teacher)
 
@@ -648,7 +648,7 @@ describe ConversationsController do
       conversation(:num_other_users => 2)
     end
 
-    before(:each) { user_session(@student) }
+    before { user_session(@student) }
 
     it "adds recipients" do
       new_user = User.create
@@ -678,7 +678,7 @@ describe ConversationsController do
   describe "POST 'remove_messages'" do
     before(:once) { course_with_student(active_all: true) }
 
-    before(:each) { user_session(@student) }
+    before { user_session(@student) }
 
     it "removes messages" do
       message = conversation.add_message('another')

@@ -47,7 +47,7 @@ describe "Blueprint association settings" do
     created_sub_accounts.count == 1 ? created_sub_accounts[0] : created_sub_accounts
   end
 
-  before :each do
+  before do
     user_session(@admin)
     get "/courses/#{@master.id}"
   end

@@ -28,7 +28,7 @@ describe 'quizzes' do
     course_with_student(active_all: true)
   end
 
-  before(:each) do
+  before do
     user_session(@student)
   end
 
@@ -66,7 +66,7 @@ describe 'quizzes' do
             expect(f('#not_right_side .take_quiz_button').text).to eq text
           end
 
-          before(:each) do
+          before do
             @resume_text = 'Resume Quiz'
           end
 
@@ -187,7 +187,7 @@ describe 'quizzes' do
   end
 
   context "when 'show correct answers after last attempt setting' is on" do
-    before(:each) do
+    before do
       quiz_with_submission
       @quiz.update(:show_correct_answers => true,
                    :show_correct_answers_last_attempt => true, :allowed_attempts => 2)

@@ -159,7 +159,7 @@ describe "course copy" do
       end
     end
 
-    before(:each) do
+    before do
       course_with_admin_logged_in
       @date_to_use = 2.weeks.from_now.monday.strftime("%Y-%m-%d")
     end

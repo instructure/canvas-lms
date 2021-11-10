@@ -35,7 +35,7 @@ describe GradeChangeAuditApiController do
   end
   let(:student_ids) { events_for_assignment.map { |event| event.fetch("links").fetch("student") }.compact }
 
-  before :each do
+  before do
     user_session(admin)
     allow(Audits).to receive(:write_to_cassandra?).and_return(CanvasCassandra::DatabaseBuilder.configured?(:auditors))
     allow(Audits).to receive(:write_to_postgres?).and_return(true)
@@ -46,12 +46,12 @@ describe GradeChangeAuditApiController do
   describe "GET for_assignment" do
     let(:params) { { assignment_id: assignment.id } }
 
-    before :each do
+    before do
       assignment.grade_student(student, grader: teacher, score: 100)
     end
 
     context "reading from cassandra" do
-      before :each do
+      before do
         skip unless CanvasCassandra::DatabaseBuilder.configured?(:auditors)
         allow(Audits).to receive(:read_from_cassandra?).and_return(true)
         allow(Audits).to receive(:read_from_postgres?).and_return(false)
@@ -63,7 +63,7 @@ describe GradeChangeAuditApiController do
       end
 
       context "when assignment is anonymous and muted" do
-        before :each do
+        before do
           assignment.update!(anonymous_grading: true)
           assignment.update!(muted: true)
           assignment.reload
@@ -103,7 +103,7 @@ describe GradeChangeAuditApiController do
     end
 
     describe "override grade change events" do
-      before(:each) do
+      before do
         override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
           grader: teacher,
           old_grade: nil,
@@ -149,7 +149,7 @@ describe GradeChangeAuditApiController do
     end
 
     describe "current_grade" do
-      before(:each) do
+      before do
         allow(Audits).to receive(:read_from_cassandra?).and_return(false)
         allow(Audits).to receive(:write_to_cassandra?).and_return(false)
         allow(Audits).to receive(:read_from_postgres?).and_return(true)
@@ -163,7 +163,7 @@ describe GradeChangeAuditApiController do
       let(:current_grades) { returned_events.pluck('grade_current') }
 
       context "for assignment grade changes" do
-        before(:each) do
+        before do
           assignment.grade_student(student, grader: teacher, score: 75)
         end
 
@@ -178,7 +178,7 @@ describe GradeChangeAuditApiController do
       end
 
       context "for override grade changes" do
-        before(:each) do
+        before do
           Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
 
           @course.enable_feature!(:final_grades_override)
@@ -208,7 +208,7 @@ describe GradeChangeAuditApiController do
         end
 
         context "for scores not in a grading period" do
-          before(:each) do
+          before do
             apply_override_score(new_score: 90.0)
             apply_override_score(new_score: 70.0)
           end
@@ -245,7 +245,7 @@ describe GradeChangeAuditApiController do
             Score.create!(grading_period: grading_period, enrollment: student.enrollments.first)
           end
 
-          before(:each) do
+          before do
             apply_override_score(score_record: grading_period_score, new_score: 90.0)
             apply_override_score(score_record: grading_period_score, new_score: 70.0)
           end
@@ -273,7 +273,7 @@ describe GradeChangeAuditApiController do
   describe "GET for_course" do
     let(:params) { { course_id: course.id } }
 
-    before :each do
+    before do
       assignment.grade_student(student, grader: teacher, score: 100)
     end
 
@@ -283,7 +283,7 @@ describe GradeChangeAuditApiController do
     end
 
     context "when assignment is anonymous and muted" do
-      before :each do
+      before do
         assignment.update!(anonymous_grading: true)
         assignment.update!(muted: true)
         assignment.reload
@@ -305,7 +305,7 @@ describe GradeChangeAuditApiController do
   describe "GET for_student" do
     let(:params) { { student_id: student.id } }
 
-    before :each do
+    before do
       assignment.grade_student(student, grader: teacher, score: 100)
     end
 
@@ -315,7 +315,7 @@ describe GradeChangeAuditApiController do
     end
 
     context "when assignment is anonymous and muted" do
-      before :each do
+      before do
         assignment.update!(anonymous_grading: true)
         assignment.update!(muted: true)
         assignment.reload
@@ -332,7 +332,7 @@ describe GradeChangeAuditApiController do
   describe "GET for_grader" do
     let(:params) { { grader_id: teacher.id } }
 
-    before :each do
+    before do
       assignment.grade_student(student, grader: teacher, score: 100)
     end
 
@@ -342,7 +342,7 @@ describe GradeChangeAuditApiController do
     end
 
     context "when assignment is anonymous and muted" do
-      before :each do
+      before do
         assignment.update!(anonymous_grading: true)
         assignment.update!(muted: true)
         assignment.reload
@@ -371,7 +371,7 @@ describe GradeChangeAuditApiController do
       }
     end
 
-    before :each do
+    before do
       allow(Audits).to receive(:read_from_cassandra?).and_return(false)
       allow(Audits).to receive(:write_to_cassandra?).and_return(false)
       allow(Audits).to receive(:read_from_postgres?).and_return(true)
@@ -385,7 +385,7 @@ describe GradeChangeAuditApiController do
     end
 
     context "when assignment is anonymous and muted" do
-      before :each do
+      before do
         assignment.update!(anonymous_grading: true)
         assignment.update!(muted: true)
         assignment.reload
@@ -426,7 +426,7 @@ describe GradeChangeAuditApiController do
         )
       end
 
-      before(:each) do
+      before do
         # FIXME this should be in before(:once) but Auditors.write_to_postgres? isn't stubbed there
         Auditors::GradeChange.record(override_grade_change: @override_grade_change)
       end
@@ -480,7 +480,7 @@ describe GradeChangeAuditApiController do
     describe "filtering by student" do
       let(:returned_assignment_ids) { returned_events.map { |event| event.dig('links', 'assignment') } }
 
-      before(:each) do
+      before do
         override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
           grader: teacher,
           old_grade: nil,

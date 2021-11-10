@@ -103,7 +103,7 @@ module SIS
         Account.default.pseudonyms << @user.pseudonym
       end
 
-      before(:each) do
+      before do
         allow(StudentEnrollment).to receive(:new).and_return(enrollment)
         allow(SisBatchRollBackData).to receive(:build_data).and_return(nil)
         allow(Setting).to receive(:get).and_return(1)

@@ -32,7 +32,7 @@ describe "Gradebook" do
     gradebook_data_setup
   end
 
-  before(:each) do
+  before do
     user_session(@teacher)
   end
 
@@ -59,7 +59,7 @@ describe "Gradebook" do
     end
 
     context "redesign" do
-      before(:each) do
+      before do
         Account.site_admin.enable_feature!(:gradebook_assignment_search_and_redesign)
         Gradebook.visit(@course)
       end
@@ -128,7 +128,7 @@ describe "Gradebook" do
   end
 
   context 'view ungraded as 0' do
-    before(:each) do
+    before do
       @course.account.enable_feature!(:view_ungraded_as_zero)
       Gradebook.visit(@course)
     end

@@ -492,7 +492,7 @@ describe "accounts/settings.html.erb" do
     let(:account) { Account.default }
     let(:admin) { account_admin_user }
 
-    before(:each) do
+    before do
       assign(:context, account)
       assign(:account, account)
       assign(:root_account, account)

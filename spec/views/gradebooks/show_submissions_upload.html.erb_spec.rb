@@ -52,7 +52,7 @@ describe "/gradebooks/show_submissions_upload", type: :view do
   end
 
   describe "when the submissions upload is finished" do
-    before :each do
+    before do
       progress.workflow_state = "completed"
       progress.set_results({
                              comments: [
@@ -116,7 +116,7 @@ describe "/gradebooks/show_submissions_upload", type: :view do
     end
 
     context "when some files were uploaded" do
-      before :each do
+      before do
         render "gradebooks/show_submissions_upload"
       end
 

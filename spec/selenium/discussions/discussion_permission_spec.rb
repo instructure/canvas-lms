@@ -30,7 +30,7 @@ describe "discussion permissions" do
   extend DiscussionHelpers::SetupContext
 
   context 'discussion created by teacher' do
-    before :each do
+    before do
       course_with_teacher(active_all: true, name: 'teacher1')
       @discussion_topic = DiscussionHelpers.create_discussion_topic(
         @course,
@@ -42,7 +42,7 @@ describe "discussion permissions" do
     end
 
     shared_examples 'no viewing discussion title, no discussion link' do |context|
-      before :each do
+      before do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
@@ -84,7 +84,7 @@ describe "discussion permissions" do
     end
 
     shared_examples 'no viewing discussion details' do |context|
-      before :each do
+      before do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
@@ -115,7 +115,7 @@ describe "discussion permissions" do
     end
 
     shared_examples 'allow viewing discussions, not edit or post' do |context|
-      before :each do
+      before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
@@ -148,7 +148,7 @@ describe "discussion permissions" do
     end
 
     shared_examples 'allow viewing and posting to discussions, not edit' do |context|
-      before :each do
+      before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.enable_post_to_discussions(@course, context_role)
@@ -186,7 +186,7 @@ describe "discussion permissions" do
     end
 
     shared_examples 'allow viewing and editing discussions, not posting' do |context|
-      before :each do
+      before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.enable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
@@ -219,7 +219,7 @@ describe "discussion permissions" do
     end
 
     shared_examples 'allow view, edit and post to discussions' do |context|
-      before :each do
+      before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.enable_moderate_discussions(@course, context_role)
         DiscussionHelpers.enable_post_to_discussions(@course, context_role)
@@ -258,7 +258,7 @@ describe "discussion permissions" do
   end # context 'discussion created by teacher'
 
   context 'discussion created by student' do
-    before :each do
+    before do
       course_with_student(active_all: true, name: 'student1')
       @discussion_topic = DiscussionHelpers.create_discussion_topic(
         @course,
@@ -270,7 +270,7 @@ describe "discussion permissions" do
     end
 
     shared_examples 'no viewing discussion title' do |context|
-      before :each do
+      before do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
@@ -306,7 +306,7 @@ describe "discussion permissions" do
     end
 
     shared_examples 'no viewing discussion details' do |context|
-      before :each do
+      before do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
@@ -337,7 +337,7 @@ describe "discussion permissions" do
     end
 
     shared_examples 'allow viewing discussions, not edit or post' do |context|
-      before :each do
+      before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
@@ -370,7 +370,7 @@ describe "discussion permissions" do
     end
 
     shared_examples 'allow viewing and posting to discussions, not edit' do |context|
-      before :each do
+      before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.enable_post_to_discussions(@course, context_role)
@@ -403,7 +403,7 @@ describe "discussion permissions" do
     end
 
     shared_examples 'allow viewing and editing discussions, not posting' do |context|
-      before :each do
+      before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.enable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)
@@ -436,7 +436,7 @@ describe "discussion permissions" do
     end
 
     shared_examples 'allow view, edit and post to discussions' do |context|
-      before :each do
+      before do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
         DiscussionHelpers.enable_moderate_discussions(@course, context_role)
         DiscussionHelpers.enable_post_to_discussions(@course, context_role)
@@ -479,7 +479,7 @@ describe "discussion permissions" do
     end
 
     shared_examples 'allow view, edit and post to own discussions with permissions off' do
-      before :each do
+      before do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
         DiscussionHelpers.disable_moderate_discussions(@course, context_role)
         DiscussionHelpers.disable_post_to_discussions(@course, context_role)

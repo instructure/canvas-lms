@@ -50,7 +50,7 @@ describe "terms of use test" do
       @account = Account.default
     end
 
-    before :each do
+    before do
       user_session(@admin)
     end
 

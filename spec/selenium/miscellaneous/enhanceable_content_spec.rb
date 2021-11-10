@@ -95,7 +95,7 @@ describe "enhanceable_content" do
   end
 
   context "media file preview thumbnails" do
-    before :each do
+    before do
       stub_kaltura
       course_factory(active_all: true)
 
@@ -116,7 +116,7 @@ describe "enhanceable_content" do
     end
 
     describe "for locked files" do
-      before :each do
+      before do
         @attachment.locked = true
         @attachment.save!
       end

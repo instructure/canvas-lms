@@ -470,7 +470,7 @@ module Lti::IMS
             end
 
             context 'in local storage mode' do
-              before :each do
+              before do
                 local_storage!
               end
 
@@ -479,7 +479,7 @@ module Lti::IMS
             end
 
             context 'in s3 storage mode' do
-              before :each do
+              before do
                 s3_storage!
               end
 
@@ -488,7 +488,7 @@ module Lti::IMS
             end
 
             context 'with InstFS enabled' do
-              before :each do
+              before do
                 allow(InstFS).to receive(:enabled?).and_return(true)
                 allow(InstFS).to receive(:jwt_secrets).and_return(['jwt signing key'])
                 @token = Canvas::Security.create_jwt({}, nil, InstFS.jwt_secret)
@@ -524,7 +524,7 @@ module Lti::IMS
               end
 
               context 'when InstFS is unreachable' do
-                before :each do
+                before do
                   allow(CanvasHttp).to receive(:post).and_raise(Net::ReadTimeout)
                 end
 
@@ -532,7 +532,7 @@ module Lti::IMS
               end
 
               context 'when InstFS responds with a 500' do
-                before :each do
+                before do
                   allow(CanvasHttp).to receive(:post).and_return(
                     double(class: Net::HTTPServerError, code: 500, body: {})
                   )
@@ -542,7 +542,7 @@ module Lti::IMS
               end
 
               context 'when InstFS responds with a 400' do
-                before :each do
+                before do
                   allow(CanvasHttp).to receive(:post).and_return(
                     double(class: Net::HTTPBadRequest, code: 400, body: {})
                   )

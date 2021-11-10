@@ -27,7 +27,7 @@ describe AssignmentConfigurationToolLookup do
   let(:stub_response) { double(code: 200, parsed_response: { 'Id' => test_id }, ok?: true) }
   let(:assignment) { assignment_model(course: course) }
 
-  before(:each) do
+  before do
     message_handler.update(capabilities: ["Canvas.placements.similarityDetection"])
 
     resource_handler.message_handlers << message_handler

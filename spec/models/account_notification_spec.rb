@@ -351,7 +351,7 @@ describe AccountNotification do
     end
 
     describe "dexclude students for surveys?" do
-      before(:each) do
+      before do
         flag = AccountNotification::ACCOUNT_SERVICE_NOTIFICATION_FLAGS.first
         @survey = account_notification(:required_account_service => flag, :account => Account.site_admin)
         @a1 = account_model

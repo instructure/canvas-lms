@@ -100,7 +100,7 @@ describe "profile" do
   end
 
   context "non password tests" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 
@@ -188,7 +188,7 @@ describe "profile" do
     end
 
     context "when pronouns are enabled" do
-      before :each do
+      before do
         @user.account.settings = { :can_add_pronouns => true }
         @user.account.save!
       end
@@ -336,7 +336,7 @@ describe "profile" do
   end
 
   context "services test" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 
@@ -399,7 +399,7 @@ describe "profile" do
   end
 
   describe "avatar reporting" do
-    before :each do
+    before do
       Account.default.enable_service(:avatars)
       Account.default.settings[:avatars] = 'enabled_pending'
       Account.default.save!
@@ -450,7 +450,7 @@ describe "profile" do
   end
 
   describe 'avatar removing' do
-    before :each do
+    before do
       Account.default.enable_service(:avatars)
       Account.default.settings[:avatars] = 'enabled_pending'
       Account.default.save!

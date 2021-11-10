@@ -119,7 +119,7 @@ module BroadcastPolicies
     describe "#should_dispatch_submissions_posted" do
       let(:posting_params) { { graded_only: false } }
 
-      before(:each) do
+      before do
         allow(assignment).to receive(:posting_params_for_notifications).and_return posting_params
       end
 

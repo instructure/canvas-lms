@@ -35,12 +35,12 @@ describe CanvasCassandra::DatabaseBuilder do
     end
   end
 
-  before(:each) do
+  before do
     target_location = Pathname.new(File.join(File.dirname(__FILE__), '..', 'fixtures'))
     allow(Rails).to receive(:root).and_return(target_location)
   end
 
-  around(:each) do |example|
+  around do |example|
     @logger_obj = logger_klass.new
     prev_logger = CanvasCassandra.logger
     CanvasCassandra.logger = @logger_obj

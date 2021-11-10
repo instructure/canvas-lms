@@ -57,7 +57,7 @@ module Turnitin
       end
       let(:originality_report_url) { "http://example.com/report" }
 
-      before :each do
+      before do
         allow(subject).to receive(:originality_data).and_return(originality_data)
         allow(subject).to receive(:originality_report_url).and_return(originality_report_url)
       end

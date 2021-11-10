@@ -72,7 +72,7 @@ describe 'Moderation Page' do
     submissions[1].update!(anonymous_id: "AAAAA")
   end
 
-  before(:each) do
+  before do
     user_session(@teachers[3])
   end
 

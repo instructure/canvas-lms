@@ -26,7 +26,7 @@ describe 'ToDoListPresenter' do
     let(:grader) { course_with_teacher(course: course, active_all: true).user }
     let(:final_grader) { course_with_teacher(course: course, active_all: true).user }
 
-    before :each do
+    before do
       assignment = Assignment.create!(
         context: course,
         title: 'report',
@@ -63,7 +63,7 @@ describe 'ToDoListPresenter' do
       course_with_user(enrollment_type, user: result, course: course2, active_all: true).user
     end
 
-    before :each do
+    before do
       Assignment.create!(
         context: course1,
         title: 'assignment1',
@@ -120,7 +120,7 @@ describe 'ToDoListPresenter' do
     let(:reviewer) { course_with_user('StudentEnrollment', course: course1, active_all: true).user }
     let(:reviewee) { course_with_user('StudentEnrollment', course: course1, active_all: true).user }
 
-    before :each do
+    before do
       course1.offer!
       assignment = Assignment.create({
                                        context: course1,

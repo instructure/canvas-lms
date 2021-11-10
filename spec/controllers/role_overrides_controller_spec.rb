@@ -21,7 +21,7 @@
 describe RoleOverridesController do
   let(:parent_account) { Account.default }
 
-  before :each do
+  before do
     @account = account_model(:parent_account => parent_account)
     account_admin_user(:account => @account)
     user_session(@admin)
@@ -60,7 +60,7 @@ describe RoleOverridesController do
   end
 
   describe 'update' do
-    before :each do
+    before do
       @role_name = 'NewRole'
       @permission = 'read_reports'
       @role = @account.roles.build(:name => @role_name)
@@ -100,7 +100,7 @@ describe RoleOverridesController do
     end
 
     describe 'grouped permissions' do
-      before :each do
+      before do
         @grouped_permission = 'manage_wiki'
         @granular_permissions = ['manage_wiki_create', 'manage_wiki_delete', 'manage_wiki_update']
       end
@@ -163,7 +163,7 @@ describe RoleOverridesController do
   end
 
   describe "create" do
-    before :each do
+    before do
       @role_name = 'NewRole'
       @permission = 'read_reports'
       @role = @account.roles.build(:name => @role_name)
@@ -177,7 +177,7 @@ describe RoleOverridesController do
     end
 
     describe "override already exists" do
-      before :each do
+      before do
         @existing_override = @account.role_overrides.build(
           :permission => @permission,
           :role => @role
@@ -225,7 +225,7 @@ describe RoleOverridesController do
     end
 
     describe "no override yet" do
-      before :each do
+      before do
         @initial_count = @account.role_overrides.size
       end
 
@@ -339,7 +339,7 @@ describe RoleOverridesController do
       end
 
       context 'with granular permissions' do
-        before :each do
+        before do
           @grouped_permission = 'manage_wiki'
           @granular_permissions = ['manage_wiki_create', 'manage_wiki_delete', 'manage_wiki_update']
         end

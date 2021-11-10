@@ -21,7 +21,7 @@ describe RuboCop::Cop::Lint::NoSleep do
   subject(:cop) { described_class.new }
 
   context "controller" do
-    before(:each) do
+    before do
       allow(cop).to receive(:file_name).and_return("knights_controller.rb")
     end
 
@@ -40,7 +40,7 @@ describe RuboCop::Cop::Lint::NoSleep do
   end
 
   context "spec" do
-    before(:each) do
+    before do
       allow(cop).to receive(:file_name).and_return("alerts_spec.rb")
     end
 
@@ -59,7 +59,7 @@ describe RuboCop::Cop::Lint::NoSleep do
   end
 
   context "other" do
-    before(:each) do
+    before do
       allow(cop).to receive(:file_name).and_return("bookmark_service.rb")
     end
 

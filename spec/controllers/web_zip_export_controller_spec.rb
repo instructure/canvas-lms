@@ -29,7 +29,7 @@ describe WebZipExportsController do
     student_in_course(active_all: true)
   end
 
-  before(:each) do
+  before do
     user_session(@student)
   end
 

@@ -31,7 +31,7 @@ describe "Gradebook History Page" do
     course_factory(active_all: true)
   end
 
-  before(:each) do
+  before do
     user_session(@teacher)
     GradeBookHistory.visit(@course)
   end

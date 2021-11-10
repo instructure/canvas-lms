@@ -22,7 +22,7 @@ require_relative '../common'
 describe "default plugins" do
   include_context "in-process server selenium tests"
 
-  before(:each) do
+  before do
     user_logged_in
     Account.site_admin.account_users.create!(user: @user)
   end

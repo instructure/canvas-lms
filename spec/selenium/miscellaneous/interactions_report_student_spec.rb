@@ -23,7 +23,7 @@ describe "student interactions report" do
   include_context "in-process server selenium tests"
 
   context "as a student" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in(active_all: true)
       @student1 = student_in_course(active_all: true).user
       @student2 = student_in_course(active_all: true, name: "zzz student").user

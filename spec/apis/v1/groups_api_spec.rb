@@ -1027,7 +1027,7 @@ describe "Groups API", type: :request do
       @group = @course.groups.create!(:name => 'Group 1')
     end
 
-    before :each do
+    before do
       user_session @teacher
     end
 

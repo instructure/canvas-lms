@@ -86,7 +86,7 @@ describe "assignment batch edit" do
     end
 
     context "bulk edit feature" do
-      before(:each) do
+      before do
         user_session(@teacher1)
         visit_assignments_index_page(@course1.id)
         goto_bulk_edit_view

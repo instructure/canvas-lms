@@ -19,7 +19,7 @@
 #
 
 describe UserListV2 do
-  before(:each) do
+  before do
     @account = Account.default
     @account.settings = { :open_registration => true }
     @account.save!

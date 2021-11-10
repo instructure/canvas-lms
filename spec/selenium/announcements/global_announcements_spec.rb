@@ -22,7 +22,7 @@ require_relative '../common'
 describe "global announcements" do
   include_context "in-process server selenium tests"
 
-  before :each do
+  before do
     course_with_student_logged_in
   end
 

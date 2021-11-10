@@ -314,7 +314,7 @@ describe DeveloperKeysController do
     let(:test_domain_root_account_admin) { account_admin_user(account: test_domain_root_account) }
     let(:sub_account) { test_domain_root_account.sub_accounts.create!(parent_account: test_domain_root_account, root_account: test_domain_root_account) }
 
-    before :each do
+    before do
       user_session(test_domain_root_account_admin)
       allow(LoadAccount).to receive(:default_domain_root_account).and_return(test_domain_root_account)
     end

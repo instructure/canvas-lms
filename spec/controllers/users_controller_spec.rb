@@ -353,7 +353,7 @@ describe UsersController do
     end
 
     context "query matching" do
-      before :each do
+      before do
         course_with_teacher_logged_in(:course_name => "Extra course", :active_all => 1)
       end
 
@@ -378,7 +378,7 @@ describe UsersController do
     end
 
     context "concluded courses" do
-      before :each do
+      before do
         course_with_teacher_logged_in(:course_name => "MyCourse1", :active_all => 1)
         course1 = @course
         course1.workflow_state = 'completed'
@@ -497,12 +497,12 @@ describe UsersController do
     end
 
     context 'self registration' do
-      before :each do
+      before do
         Account.default.canvas_authentication_provider.update_attribute(:self_registration, true)
       end
 
       context 'self registration for observers only' do
-        before :each do
+        before do
           Account.default.canvas_authentication_provider.update_attribute(:self_registration, 'observer')
         end
 
@@ -1134,7 +1134,7 @@ describe UsersController do
     end
 
     context "as a student" do
-      before(:each) do
+      before do
         user_session(student)
       end
 
@@ -1236,7 +1236,7 @@ describe UsersController do
     end
 
     context "with unposted assignments" do
-      before(:each) do
+      before do
         unposted_assignment = assignment_model(
           course: course, due_at: Time.zone.now,
           points_possible: 90
@@ -1252,7 +1252,7 @@ describe UsersController do
       end
 
       context "when the requester can manage grades" do
-        before(:each) do
+        before do
           course.root_account.role_overrides.create!(
             permission: 'view_all_grades', role: teacher_role, enabled: false
           )
@@ -1272,7 +1272,7 @@ describe UsersController do
       end
 
       context "when the requester can view all grades" do
-        before(:each) do
+        before do
           course.root_account.role_overrides.create!(
             permission: 'view_all_grades', role: teacher_role, enabled: true
           )
@@ -1295,7 +1295,7 @@ describe UsersController do
       end
 
       context "when the requester does not have permissions to see unposted grades" do
-        before(:each) do
+        before do
           course.root_account.role_overrides.create!(
             permission: 'view_all_grades', role: teacher_role, enabled: false
           )
@@ -1313,7 +1313,7 @@ describe UsersController do
     context "as an observer" do
       let!(:observer) { user_with_pseudonym(active_all: true) }
 
-      before(:each) do
+      before do
         add_linked_observer(student, observer)
         user_session(observer)
       end
@@ -1460,7 +1460,7 @@ describe UsersController do
     context "as a student" do
       let(:grade) { assigns[:grades][:student_enrollments][course_1.id] }
 
-      before(:each) do
+      before do
         user_session(student)
       end
 
@@ -1621,7 +1621,7 @@ describe UsersController do
         add_linked_observer(student, observer)
       end
 
-      before(:each) do
+      before do
         user_session(observer)
       end
 
@@ -1964,7 +1964,7 @@ describe UsersController do
   end
 
   describe "GET 'public_feed.atom'" do
-    before(:each) do
+    before do
       course_with_student(:active_all => true)
       @as = assignment_model(:course => @course)
       @dt = @course.discussion_topics.create!(:title => "hi", :message => "blah", :user => @student)
@@ -2356,7 +2356,7 @@ describe UsersController do
   end
 
   describe "login hooks" do
-    before :each do
+    before do
       Account.default.canvas_authentication_provider.update_attribute(:self_registration, true)
     end
 
@@ -2416,7 +2416,7 @@ describe UsersController do
   end
 
   describe '#dashboard_view' do
-    before(:each) do
+    before do
       course_factory
       user_factory(active_all: true)
       user_session(@user)
@@ -2566,7 +2566,7 @@ describe UsersController do
     end
 
     context "data preloading" do
-      before :each do
+      before do
         course_with_student_logged_in(active_all: true)
         @course1 = @course
         @course2 = course_with_student(active_all: true, user: @user).course
@@ -2612,7 +2612,7 @@ describe UsersController do
         @account = Account.default
       end
 
-      before(:each) do
+      before do
         course_with_student_logged_in(active_all: true)
       end
 
@@ -2662,7 +2662,7 @@ describe UsersController do
             course_with_student
           end
 
-          before :each do
+          before do
             user_session @student
           end
 
@@ -2690,7 +2690,7 @@ describe UsersController do
             @course = course_factory(active_all: true, account: @account)
           end
 
-          before :each do
+          before do
             user_session(@user1)
           end
 

@@ -24,7 +24,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
   include WikiAndTinyCommon
 
   context "as a teacher" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 

@@ -28,7 +28,7 @@ describe "account shared rubric specs" do
   let(:who_to_login) { 'admin' }
   let(:account) { Account.default }
 
-  before(:each) do
+  before do
     course_with_admin_logged_in
   end
 

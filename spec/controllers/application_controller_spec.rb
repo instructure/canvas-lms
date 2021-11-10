@@ -23,7 +23,7 @@ require_relative '../lti_1_3_spec_helper'
 require_relative '../helpers/k5_common'
 
 RSpec.describe ApplicationController do
-  before :each do
+  before do
     request_double = double(
       host_with_port: "www.example.com",
       host: "www.example.com",
@@ -40,7 +40,7 @@ RSpec.describe ApplicationController do
   end
 
   describe "#google_drive_connection" do
-    before :each do
+    before do
       settings_mock = double()
       allow(settings_mock).to receive(:settings).and_return({})
       allow(Canvas::Plugin).to receive(:find).and_return(settings_mock)
@@ -131,7 +131,7 @@ RSpec.describe ApplicationController do
 
     describe "user flags" do
       context "eventAlertTimeout" do
-        before(:each) do
+        before do
           user_factory
           controller.instance_variable_set(:@domain_root_account, Account.default)
           controller.instance_variable_set(:@current_user, @user)
@@ -150,7 +150,7 @@ RSpec.describe ApplicationController do
     end
 
     describe "ENV.DIRECT_SHARE_ENABLED" do
-      before :each do
+      before do
         allow(controller).to receive(:user_display_json)
         allow(controller).to receive('api_v1_course_ping_url').and_return({})
         controller.instance_variable_set(:@domain_root_account, Account.default)
@@ -228,7 +228,7 @@ RSpec.describe ApplicationController do
 
     context "feature/release flags" do
       context "canvas_k6_theme" do
-        before(:each) do
+        before do
           controller.instance_variable_set(:@context, @course)
         end
 
@@ -238,7 +238,7 @@ RSpec.describe ApplicationController do
       end
 
       context "responsive_awareness" do
-        before(:each) do
+        before do
           controller.instance_variable_set(:@domain_root_account, Account.default)
         end
 
@@ -253,7 +253,7 @@ RSpec.describe ApplicationController do
       end
 
       context "responsive_misc" do
-        before(:each) do
+        before do
           controller.instance_variable_set(:@domain_root_account, Account.default)
         end
 
@@ -268,7 +268,7 @@ RSpec.describe ApplicationController do
       end
 
       context "files_dnd" do
-        before(:each) do
+        before do
           controller.instance_variable_set(:@domain_root_account, Account.default)
         end
 
@@ -284,7 +284,7 @@ RSpec.describe ApplicationController do
       end
 
       context "usage_rights_discussion_topics" do
-        before(:each) do
+        before do
           controller.instance_variable_set(:@domain_root_account, Account.default)
         end
 
@@ -344,7 +344,7 @@ RSpec.describe ApplicationController do
     end
 
     context "comment_library_suggestions_enabled" do
-      before(:each) do
+      before do
         user_factory
         controller.instance_variable_set(:@domain_root_account, Account.default)
         controller.instance_variable_set(:@current_user, @user)
@@ -365,7 +365,7 @@ RSpec.describe ApplicationController do
     context "canvas for elementary" do
       let(:course) { create_course }
 
-      before(:each) do
+      before do
         controller.instance_variable_set(:@context, course)
         allow(controller).to receive('api_v1_course_ping_url').and_return({})
       end
@@ -500,7 +500,7 @@ RSpec.describe ApplicationController do
       @attachment.save!
     end
 
-    before :each do
+    before do
       # safe_domain_file_url wants to use request.protocol
       allow(controller).to receive(:request).and_return(double("request", :protocol => '', :host_with_port => '', :url => ''))
 
@@ -1459,7 +1459,7 @@ RSpec.describe ApplicationController do
       @tool.save!
     end
 
-    before :each do
+    before do
       allow(controller).to receive(:request).and_return(ActionDispatch::TestRequest.create)
       controller.instance_variable_set(:@context, @course)
     end
@@ -1501,7 +1501,7 @@ RSpec.describe ApplicationController do
   end
 
   describe 'verify_authenticity_token' do
-    before :each do
+    before do
       # default setup is a protected non-GET non-API session-authenticated request with bogus tokens
       cookies = ActionDispatch::Cookies::CookieJar.new(nil)
       controller.allow_forgery_protection = true
@@ -1725,7 +1725,7 @@ describe ApplicationController do
       }
     end
 
-    before(:each) do
+    before do
       Thread.current[:context] = nil
     end
 
@@ -1973,7 +1973,7 @@ describe ApplicationController do
         course_with_teacher :active_all => true
       end
 
-      before :each do
+      before do
         user_session @teacher
         controller.instance_variable_set(:@context, @course)
         controller.instance_variable_set(:@current_user, @user)
@@ -2020,7 +2020,7 @@ describe ApplicationController do
         course_with_student :active_all => true
       end
 
-      before :each do
+      before do
         user_session @student
         controller.instance_variable_set(:@context, @course)
         controller.instance_variable_set(:@current_user, @user)
@@ -2047,7 +2047,7 @@ describe ApplicationController do
       course_with_student(active_all: true)
     end
 
-    before(:each) do
+    before do
       user_session(@student)
       controller.instance_variable_set(:@context, @course)
       controller.instance_variable_set(:@current_user, @student)
@@ -2143,7 +2143,7 @@ describe ApplicationController do
     end
 
     context "when user has immersive reader flag enabled" do
-      before(:each) do
+      before do
         @student.enable_feature!(:user_immersive_reader_wiki_pages)
       end
 
@@ -2154,7 +2154,7 @@ describe ApplicationController do
   describe "new math equation handling feature" do
     let(:root_account) { Account.default }
 
-    before(:each) do
+    before do
       controller.instance_variable_set(:@domain_root_account, root_account)
     end
 
@@ -2186,7 +2186,7 @@ describe ApplicationController do
       toggle_k5_setting(@course.account)
     end
 
-    before :each do
+    before do
       user_session(@student1)
       @controller.instance_variable_set(:@current_user, @student1)
       @controller.instance_variable_set(:@domain_root_account, @course.root_account)
@@ -2295,7 +2295,7 @@ describe ApplicationController do
         @course.enroll_student(@student2)
       end
 
-      before :each do
+      before do
         user_session(@student2)
         @controller.instance_variable_set(:@current_user, @student2)
       end
@@ -2361,7 +2361,7 @@ end
 
 describe CoursesController do
   describe "set_js_wiki_data" do
-    before :each do
+    before do
       course_with_teacher_logged_in :active_all => true
       @course.wiki_pages.create!(:title => 'blah').set_as_front_page!
       @course.reload
@@ -2387,7 +2387,7 @@ describe CoursesController do
   end
 
   describe "set_master_course_js_env_data" do
-    before :each do
+    before do
       controller.instance_variable_set(:@domain_root_account, Account.default)
       account_admin_user(:active_all => true)
       controller.instance_variable_set(:@current_user, @user)

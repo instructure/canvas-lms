@@ -43,7 +43,7 @@ describe Messages::AssignmentSubmittedLate::SMSPresenter do
     end
 
     context "when the assignment is anonymously graded" do
-      before(:each) do
+      before do
         assignment.update!(anonymous_grading: true)
       end
 
@@ -68,7 +68,7 @@ describe Messages::AssignmentSubmittedLate::SMSPresenter do
     end
 
     context "when the assignment is anonymously graded" do
-      before(:each) do
+      before do
         assignment.update!(anonymous_grading: true)
       end
 

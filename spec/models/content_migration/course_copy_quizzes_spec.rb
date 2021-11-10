@@ -23,7 +23,7 @@ describe ContentMigration do
   context "course copy quizzes" do
     include_context "course copy"
 
-    before :each do
+    before do
       skip unless Qti.qti_enabled?
     end
 

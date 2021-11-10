@@ -28,7 +28,7 @@ describe 'Wiki pages and Tiny WYSIWYG editor Files', ignore_js_errors: true do
   include RCENextPage
 
   context 'wiki and tiny files in RCE Next' do
-    before(:each) do
+    before do
       stub_rcs_config
       course_factory(active_all: true, name: 'wiki course')
       @student =
@@ -64,7 +64,7 @@ describe 'Wiki pages and Tiny WYSIWYG editor Files', ignore_js_errors: true do
   end
 
   context 'wiki sidebar images and locking/hiding' do
-    before(:each) do
+    before do
       stub_rcs_config
       course_with_teacher(active_all: true, name: 'wiki course')
       @student =
@@ -113,7 +113,7 @@ describe 'Wiki pages and Tiny WYSIWYG editor Files', ignore_js_errors: true do
   end
 
   context 'wiki documents as teacher' do
-    before(:each) do
+    before do
       stub_rcs_config
       course_with_teacher_logged_in
       @root_folder = Folder.root_folders(@course).first

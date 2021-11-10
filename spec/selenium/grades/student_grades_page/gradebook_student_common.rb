@@ -23,7 +23,7 @@ require_relative '../../helpers/shared_examples_common'
 shared_examples 'Arrange By dropdown' do |context|
   include SharedExamplesCommon
 
-  before :each do
+  before do
     enroll_context(context)
     get "/courses/#{@course.id}/grades/#{@student.id}"
   end

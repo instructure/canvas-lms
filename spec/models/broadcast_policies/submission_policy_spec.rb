@@ -219,7 +219,7 @@ module BroadcastPolicies
         course.enroll_student(student)
       end
 
-      before(:each) do
+      before do
         assignment.ensure_post_policy(post_manually: true)
         course.update!(workflow_state: "available")
       end

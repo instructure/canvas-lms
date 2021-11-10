@@ -28,7 +28,7 @@ end
 # TODO: this spec that interacts directly with the parent app should probably go
 # live in the parent app, not here in the gem...
 describe "execute and update" do
-  before(:each) do
+  before do
     target_location = Pathname.new(File.expand_path("../../../../..", __FILE__))
     allow(Rails).to receive(:root).and_return(target_location)
   end

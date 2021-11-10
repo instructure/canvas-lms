@@ -97,7 +97,7 @@ describe "admin_tools" do
   end
 
   context "View Notifications" do
-    before :each do
+    before do
       @account.settings[:admins_can_view_notifications] = true
       @account.save!
     end

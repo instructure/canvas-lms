@@ -128,12 +128,12 @@ describe "Enrollment::BatchStateUpdater" do
       Enrollment::BatchStateUpdater.sync_microsoft_group([@course], @course.root_account)
     end
 
-    before :each do
+    before do
       MicrosoftSync::Group.create!(course: @course)
     end
 
     context 'when feature flag is off' do
-      before :each do
+      before do
         @course.root_account.disable_feature!(:microsoft_group_enrollments_syncing)
       end
 
@@ -143,12 +143,12 @@ describe "Enrollment::BatchStateUpdater" do
     end
 
     context 'when feature flag is on' do
-      before :each do
+      before do
         @course.root_account.enable_feature!(:microsoft_group_enrollments_syncing)
       end
 
       context 'when account has turned sync off' do
-        before :each do
+        before do
           @course.root_account.settings[:microsoft_sync_enabled] = false
           @course.root_account.save!
         end
@@ -159,7 +159,7 @@ describe "Enrollment::BatchStateUpdater" do
       end
 
       context 'when account has turned sync on' do
-        before :each do
+        before do
           @course.root_account.settings[:microsoft_sync_enabled] = true
           @course.root_account.save!
         end

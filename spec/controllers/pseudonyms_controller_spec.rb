@@ -184,7 +184,7 @@ describe PseudonymsController do
       user_with_pseudonym(:active_all => true)
     end
 
-    before :each do
+    before do
       user_session(@user, @pseudonym)
     end
 
@@ -246,7 +246,7 @@ describe PseudonymsController do
   describe "create" do
     # these specs only test the non-api version of the calls
     context "with site admin permissions" do
-      before :each do
+      before do
         user_with_pseudonym(:active_all => true)
         Account.site_admin.account_users.create!(user: @user)
         user_session(@user, @pseudonym)
@@ -264,7 +264,7 @@ describe PseudonymsController do
         Account.default.account_users.create!(user: @user)
       end
 
-      before :each do
+      before do
         user_session(@user, @pseudonym)
       end
 
@@ -317,7 +317,7 @@ describe PseudonymsController do
         @account.account_users.create!(user: @user)
       end
 
-      before :each do
+      before do
         allow(LoadAccount).to receive(:default_domain_root_account).and_return(@account)
         user_session(@user, @pseudonym)
       end
@@ -521,7 +521,7 @@ describe PseudonymsController do
       end
     end
 
-    before :each do
+    before do
       user_session(@admin, @admin_pseudonym)
     end
 

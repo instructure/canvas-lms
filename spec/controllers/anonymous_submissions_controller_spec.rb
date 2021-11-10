@@ -315,7 +315,7 @@ RSpec.describe AnonymousSubmissionsController do
     end
 
     context "when the submission's turnitin data contains a report URL" do
-      before(:each) do
+      before do
         submission.update!(turnitin_data: { asset_string => { report_url: 'MY_GREAT_REPORT' } })
       end
 

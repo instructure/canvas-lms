@@ -1041,7 +1041,7 @@ describe EnrollmentsApiController, type: :request do
             end
           end
 
-          before :each do
+          before do
             Timecop.freeze(@first_grading_period.end_date - 1.day) do
               @assignment_in_first_period.grade_student(@student, grade: 10, grader: @teacher)
             end
@@ -2108,7 +2108,7 @@ describe EnrollmentsApiController, type: :request do
         enrollment_json.select { |enrollment| enrollment["type"] == "ObserverEnrollment" }
       end
 
-      before(:each) do
+      before do
         course.enroll_student(observed_student, active_all: true)
         course.enroll_student(hidden_student, active_all: true)
 
@@ -2119,7 +2119,7 @@ describe EnrollmentsApiController, type: :request do
       end
 
       context "when the observer is observing at least one student in the course" do
-        before(:each) do
+        before do
           course.enroll_user(observer, 'ObserverEnrollment', associated_user_id: observed_student.id)
         end
 
@@ -2463,7 +2463,7 @@ describe EnrollmentsApiController, type: :request do
                     :id => @enrollment.id.to_param, :format => 'json' }
       end
 
-      before :each do
+      before do
         time = Time.now
         allow(Time).to receive(:now).and_return(time)
       end

@@ -325,7 +325,7 @@ test_1,TC 101,Test Course 101,,term1,deleted
     end
 
     describe "with parallel importers" do
-      before :each do
+      before do
         @batch1 = create_csv_data(
           [%{user_id,login_id,status
           user_1,user_1,active

@@ -20,7 +20,7 @@
 describe MessageBus do
   let(:namespace) { "test-only" }
 
-  around(:each) do |example|
+  around do |example|
     old_interval = MessageBus.worker_process_interval_lambda
     # let's not waste time with queue throttling in tests
     MessageBus.worker_process_interval = -> { 0.01 }
@@ -29,11 +29,11 @@ describe MessageBus do
     MessageBus.worker_process_interval = old_interval unless old_interval.nil?
   end
 
-  before(:each) do
+  before do
     skip("pulsar config required to test") unless MessageBus.enabled?
   end
 
-  after(:each) do
+  after do
     MessageBus.process_all_and_reset!
   end
 

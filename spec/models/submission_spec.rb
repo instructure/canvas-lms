@@ -1646,7 +1646,7 @@ describe Submission do
         end
 
         context "when grade_posting_in_progress is true" do
-          before(:each) do
+          before do
             submission.grade_posting_in_progress = true
           end
 
@@ -1670,7 +1670,7 @@ describe Submission do
         end
 
         context "when grade_posting_in_progress is false" do
-          before(:each) do
+          before do
             submission.grade_posting_in_progress = false
           end
 
@@ -1942,7 +1942,7 @@ describe Submission do
 
   describe "permission policy" do
     describe "can :grade" do
-      before(:each) do
+      before do
         @submission = Submission.new
         @grader = User.new
       end
@@ -1957,7 +1957,7 @@ describe Submission do
     end
 
     describe "can :autograde" do
-      before(:each) do
+      before do
         @submission = Submission.new
       end
 
@@ -2071,7 +2071,7 @@ describe Submission do
   end
 
   describe '#can_grade?' do
-    before(:each) do
+    before do
       @account = Account.new
       @course = Course.new(account: @account)
       @assignment = Assignment.new(course: @course)
@@ -2100,7 +2100,7 @@ describe Submission do
     end
 
     context 'when assignment is unpublished' do
-      before(:each) do
+      before do
         allow(@assignment).to receive(:published?).and_return(false)
 
         @status = @submission.grants_right?(@grader, :grade)
@@ -2116,7 +2116,7 @@ describe Submission do
     end
 
     context 'when the grader does not have the right to manage grades for the course' do
-      before(:each) do
+      before do
         allow(@course).to receive(:grants_right?).with(@grader, nil, :manage_grades).and_return(false)
 
         @status = @submission.grants_right?(@grader, :grade)
@@ -2132,7 +2132,7 @@ describe Submission do
     end
 
     context 'when the grader is a teacher and the assignment is in a closed grading period' do
-      before(:each) do
+      before do
         allow(@course).to receive(:account_membership_allows).with(@grader).and_return(false)
         grading_period = double("grading_period", closed?: true)
         allow(@submission).to receive(:grading_period).and_return(grading_period)
@@ -2150,7 +2150,7 @@ describe Submission do
     end
 
     context "when grader_id is a teacher's id and the assignment is in a closed grading period" do
-      before(:each) do
+      before do
         allow(@course).to receive(:account_membership_allows).with(@grader).and_return(false)
         grading_period = double("grading_period", closed?: true)
         allow(@submission).to receive(:grading_period).and_return(grading_period)
@@ -2180,7 +2180,7 @@ describe Submission do
   end
 
   describe '#can_autograde?' do
-    before(:each) do
+    before do
       @account = Account.new
       @course = Course.new(account: @account)
       @assignment = Assignment.new(course: @course)
@@ -2200,7 +2200,7 @@ describe Submission do
     end
 
     context 'when assignment is unpublished' do
-      before(:each) do
+      before do
         allow(@assignment).to receive(:published?).and_return(false)
 
         @status = @submission.grants_right?(nil, :autograde)
@@ -2216,7 +2216,7 @@ describe Submission do
     end
 
     context 'when the grader is not an autograder' do
-      before(:each) do
+      before do
         @submission.grader_id = 1
 
         @status = @submission.grants_right?(nil, :autograde)
@@ -2232,7 +2232,7 @@ describe Submission do
     end
 
     context 'when the assignment is in a closed grading period for the student' do
-      before(:each) do
+      before do
         grading_period = double("grading_period", closed?: true)
         allow(@submission).to receive(:grading_period).and_return(grading_period)
 
@@ -2345,7 +2345,7 @@ describe Submission do
                                     originality_score: other_state == 'scored' ? 2 : nil)
         end
 
-        before(:each) do
+        before do
           submission.update(attachment_ids: attachment.id.to_s)
         end
 
@@ -2699,7 +2699,7 @@ describe Submission do
                                         originality_report_url: duplicate_url)
             end
 
-            before(:each) do
+            before do
               assignment.submit_homework(test_student, submission_type: 'online_upload',
                                                        attachments: [attachment, other_attachment])
             end
@@ -2753,7 +2753,7 @@ describe Submission do
                                       originality_report_url: other_url)
           end
 
-          before(:each) do
+          before do
             submission.update(attachment_ids: attachment.id.to_s)
           end
 
@@ -3052,7 +3052,7 @@ describe Submission do
         @submission.save!
       end
 
-      before :each do
+      before do
         api = Turnitin::Client.new('test_account', 'sekret')
         expect(Turnitin::Client).to receive(:new).at_least(1).and_return(api)
         expect(api).to receive(:sendRequest).with(:generate_report, 1, include(:oid => "123456789")).at_least(1).and_return('http://foo.bar')
@@ -3406,7 +3406,7 @@ describe Submission do
   describe "mute" do
     let(:submission) { Submission.new }
 
-    before :each do
+    before do
       submission.published_score = 100
       submission.published_grade = 'A'
       submission.graded_at = Time.now
@@ -3584,7 +3584,7 @@ describe Submission do
     let(:assignment) { @course.assignments.create! }
     let(:submission) { assignment.submissions.find_by(user: @student) }
 
-    before :each do
+    before do
       assignment.ensure_post_policy(post_manually: true)
     end
 
@@ -3615,7 +3615,7 @@ describe Submission do
     let(:assignment) { @course.assignments.create! }
     let(:submission) { assignment.submissions.find_by(user: @student) }
 
-    before :each do
+    before do
       assignment.grade_student(@student, grader: @teacher, score: 5)
     end
 
@@ -4273,7 +4273,7 @@ describe Submission do
       assignment
     end
 
-    before(:each) do
+    before do
       student_in_course(active_all: true)
       @student2 = user_factory
       @student2_enrollment = @course.enroll_student(@student2)
@@ -5834,12 +5834,12 @@ describe Submission do
   end
 
   describe '#ensure_grader_can_grade' do
-    before(:each) do
+    before do
       @submission = Submission.new()
     end
 
     context 'when #grader_can_grade? returns true' do
-      before(:each) do
+      before do
         expect(@submission).to receive(:grader_can_grade?).and_return(true)
       end
 
@@ -5855,7 +5855,7 @@ describe Submission do
     end
 
     context 'when #grader_can_grade? returns false' do
-      before(:each) do
+      before do
         expect(@submission).to receive(:grader_can_grade?).and_return(false)
       end
 
@@ -5872,7 +5872,7 @@ describe Submission do
   end
 
   describe '#grader_can_grade?' do
-    before(:each) do
+    before do
       @submission = Submission.new()
     end
 
@@ -5943,7 +5943,7 @@ describe Submission do
   end
 
   describe "#comments_excluding_drafts_for" do
-    before(:each) do
+    before do
       @teacher = course_with_user("TeacherEnrollment", course: @course, name: "Teacher", active_all: true).user
       ta = course_with_user("TaEnrollment", course: @course, name: "First Ta", active_all: true).user
       student = course_with_user("StudentEnrollment", course: @course, name: "Student", active_all: true).user
@@ -6566,7 +6566,7 @@ describe Submission do
   end
 
   describe "#can_view_details?" do
-    before :each do
+    before do
       @assignment.update!(anonymous_grading: true)
       @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'a body')
     end
@@ -6575,7 +6575,7 @@ describe Submission do
       let(:reviewer) { @context.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
       let(:reviewer_sub) { @assignment.submissions.find_by!(user: reviewer) }
 
-      before(:each) do
+      before do
         @assignment.update!(peer_reviews: true)
       end
 
@@ -6620,7 +6620,7 @@ describe Submission do
     end
 
     context 'when the assignment is unmuted' do
-      before(:each) do
+      before do
         @assignment.unmute!
       end
 
@@ -7639,7 +7639,7 @@ describe Submission do
       end
 
       context "when unposting an individual submission" do
-        before(:each) { submission.update!(posted_at: 1.day.ago) }
+        before { submission.update!(posted_at: 1.day.ago) }
 
         context "when post policies are enabled" do
           it "mutes an unmuted assignment when a submission is hidden" do

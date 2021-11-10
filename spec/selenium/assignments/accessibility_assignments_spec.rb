@@ -22,7 +22,7 @@ require_relative '../helpers/accessibility/accessibility_common'
 
 describe "accessibility assignments", priority: "2" do
   include_context "in-process server selenium tests"
-  before(:each) do
+  before do
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/assignments"
   end

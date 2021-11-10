@@ -41,7 +41,7 @@ describe "context modules" do
       @course.reload
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 
@@ -123,7 +123,7 @@ describe "context modules" do
         @tag = ContentTag.last
       end
 
-      before :each do
+      before do
         get "/courses/#{@course.id}/modules"
         f("#context_module_item_#{@tag.id} .al-trigger").click
       end
@@ -184,7 +184,7 @@ describe "context modules" do
         modules[1].add_item({ :id => @assignment3.id, :type => 'assignment' })
       end
 
-      before :each do
+      before do
         skip_if_chrome('skipped - research find html')
         get "/courses/#{@course.id}/modules"
 

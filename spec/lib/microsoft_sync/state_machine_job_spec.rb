@@ -143,7 +143,7 @@ module MicrosoftSync
       "MicrosoftSync::StateMachineJobTest:MicrosoftSync::Group:#{state_record.global_id}"
     end
 
-    around(:each) { |example| Timecop.freeze { example.run } }
+    around { |example| Timecop.freeze { example.run } }
 
     describe '#run_synchronously' do
       it 'runs all the steps' do

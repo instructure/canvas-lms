@@ -313,7 +313,7 @@ describe ContentZipper do
 
   describe "zip_folder" do
     context "checking permissions" do
-      before(:each) do
+      before do
         course_with_student(active_all: true)
         folder = Folder.root_folders(@course).first
         attachment_model(uploaded_data: stub_png_data('hidden.png'),
@@ -386,7 +386,7 @@ describe ContentZipper do
       end
 
       context "in a public course" do
-        before(:each) do
+        before do
           @course.is_public = true
           @course.save!
         end

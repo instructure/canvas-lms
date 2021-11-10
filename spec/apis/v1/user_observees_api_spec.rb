@@ -652,7 +652,7 @@ describe UserObserveesController, type: :request do
 
     context "with sharding" do
       specs_require_sharding
-      before :each do
+      before do
         @shard2.activate do
           @token_student = user_with_pseudonym(name: "Sharded Student", active_all: true)
         end

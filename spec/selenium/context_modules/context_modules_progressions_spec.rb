@@ -68,7 +68,7 @@ describe "context modules" do
       # unlocked for student 3
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 
@@ -140,7 +140,7 @@ describe "context modules" do
       course_with_teacher(active_all: true)
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 
@@ -204,7 +204,7 @@ describe "context modules" do
       @course.enroll_student(@student).accept!
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 

@@ -30,7 +30,7 @@ describe DataFixup::InitAccountIndexForCourseAuditLog do
     }
   end
 
-  before(:each) do
+  before do
     @database = CanvasCassandra::DatabaseBuilder.from_config(:auditors)
     skip("requires cassandra auditors") unless @database
 

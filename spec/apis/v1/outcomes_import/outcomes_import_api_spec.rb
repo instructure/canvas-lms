@@ -168,7 +168,7 @@ describe "Outcomes Import API", type: :request do
 
   shared_examples "outcomes import" do
     context "Account" do
-      before :each do
+      before do
         stub_ab_import
         stub_ab_config
         stub_ab_api

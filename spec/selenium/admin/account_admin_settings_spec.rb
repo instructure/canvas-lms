@@ -47,7 +47,7 @@ describe "root account basic settings" do
       @account = Account.default
     end
 
-    before :each do
+    before do
       user_session(@admin)
       @admin.account.enable_feature!(:slack_notifications)
     end
@@ -84,7 +84,7 @@ describe "root account basic settings" do
           account.enable_feature!(:microsoft_group_enrollments_syncing)
         end
 
-        before :each do
+        before do
           account_admin_user(account: account)
           user_session(@admin)
         end
@@ -214,7 +214,7 @@ describe "root account basic settings" do
       account_admin_user(:active_all => true)
     end
 
-    before :each do
+    before do
       user_session(@admin)
     end
 

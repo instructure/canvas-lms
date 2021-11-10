@@ -322,7 +322,7 @@ describe SpeedGrader::Assignment do
     end
 
     describe "has_postable_comments" do
-      before(:each) do
+      before do
         @assignment.ensure_post_policy(post_manually: true)
       end
 
@@ -507,7 +507,7 @@ describe SpeedGrader::Assignment do
         student.attachments.create!(uploaded_data: stub_png_data, filename: 'file.png', viewed_at: viewed_at_time)
       end
 
-      before(:each) do
+      before do
         assignment.submit_homework(student, attachments: [attachment])
       end
 
@@ -524,7 +524,7 @@ describe SpeedGrader::Assignment do
       end
 
       context 'for an anonymized assignment' do
-        before(:each) do
+        before do
           allow(assignment).to receive(:anonymize_students?).and_return(true)
         end
 
@@ -869,7 +869,7 @@ describe SpeedGrader::Assignment do
       course.enroll_student(default_section_student, enrollment_state: :active)
     end
 
-    before(:each) do
+    before do
       user_session(teacher)
     end
 
@@ -1384,7 +1384,7 @@ describe SpeedGrader::Assignment do
     end
 
     context "when graders cannot view other grader's comments" do
-      before(:each) do
+      before do
         assignment.update!(grader_comments_visible_to_graders: false)
       end
 
@@ -1820,7 +1820,7 @@ describe SpeedGrader::Assignment do
       )
     end
 
-    before :each do
+    before do
       submission_1.anonymous_id = 'aaaaa'
       submission_1.save!
 
@@ -1839,7 +1839,7 @@ describe SpeedGrader::Assignment do
         end
       end
 
-      before :each do
+      before do
         assignment.update!(anonymous_grading: false)
       end
 
@@ -2161,7 +2161,7 @@ describe SpeedGrader::Assignment do
       )
     end
 
-    before :each do
+    before do
       submission.anonymous_id = 'aaaaa'
       submission.save!
 
@@ -2171,7 +2171,7 @@ describe SpeedGrader::Assignment do
     context "when the user is the final grader and cannot view other grader names" do
       let(:json) { SpeedGrader::Assignment.new(assignment, final_grader, avatars: true, grading_role: :moderator).json }
 
-      before :each do
+      before do
         assignment.update!(grader_names_visible_to_final_grader: false)
       end
 
@@ -2239,7 +2239,7 @@ describe SpeedGrader::Assignment do
       end
 
       context "when the user cannot view student names" do
-        before :each do
+        before do
           assignment.update!(anonymous_grading: true)
         end
 
@@ -2422,7 +2422,7 @@ describe SpeedGrader::Assignment do
       end
 
       context "when the user cannot view student names" do
-        before :each do
+        before do
           assignment.update!(anonymous_grading: true)
         end
 
@@ -2836,7 +2836,7 @@ describe SpeedGrader::Assignment do
       end
 
       context "when the user cannot view student names" do
-        before :each do
+        before do
           assignment.update!(anonymous_grading: true)
         end
 

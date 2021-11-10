@@ -26,7 +26,7 @@ describe "API Authentication", type: :request do
     enable_developer_key_account_binding!(@key)
   end
 
-  before :each do
+  before do
     @client_id = @key.id
     @client_secret = @key.api_key
     enable_forgery_protection
@@ -53,7 +53,7 @@ describe "API Authentication", type: :request do
         course_with_teacher(:user => @user)
       end
 
-      before :each do
+      before do
         # Trust the referer
         allow_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
         post '/login/canvas', params: { 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test1234' }

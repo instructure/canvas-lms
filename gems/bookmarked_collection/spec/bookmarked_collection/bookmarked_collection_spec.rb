@@ -63,7 +63,7 @@ describe "BookmarkedCollection" do
   end
 
   describe ".wrap" do
-    before :each do
+    before do
       example_class = Class.new(ActiveRecord::Base) do
         self.table_name = 'examples'
       end
@@ -110,7 +110,7 @@ describe "BookmarkedCollection" do
   end
 
   describe ".merge" do
-    before :each do
+    before do
       example_class = Class.new(ActiveRecord::Base) do
         self.table_name = 'examples'
       end
@@ -156,7 +156,7 @@ describe "BookmarkedCollection" do
     end
 
     context "with a merge proc" do
-      before :each do
+      before do
         @created_scope.delete_all
         @deleted_scope.delete_all
 
@@ -179,7 +179,7 @@ describe "BookmarkedCollection" do
     end
 
     context "with ties across collections" do
-      before :each do
+      before do
         @created_scope.delete_all
         @deleted_scope.delete_all
 
@@ -213,7 +213,7 @@ describe "BookmarkedCollection" do
   end
 
   describe ".concat" do
-    before :each do
+    before do
       example_class = Class.new(ActiveRecord::Base) do
         self.table_name = 'examples'
       end
@@ -311,7 +311,7 @@ describe "BookmarkedCollection" do
   end
 
   describe "nested compositions" do
-    before :each do
+    before do
       example_class = Class.new(ActiveRecord::Base) do
         self.table_name = 'examples'
       end

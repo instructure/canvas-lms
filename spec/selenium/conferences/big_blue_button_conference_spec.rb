@@ -46,7 +46,7 @@ describe 'BigBlueButton conferences' do
     course_with_student(name: "Student John", course: @course, active_all: true)
   end
 
-  before(:each) do
+  before do
     user_session(@teacher)
     get conferences_index_page
   end

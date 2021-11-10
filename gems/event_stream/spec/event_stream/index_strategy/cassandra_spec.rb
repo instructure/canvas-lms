@@ -136,7 +136,7 @@ describe EventStream::IndexStrategy::Cassandra do
     end
 
     describe "for_key" do
-      before(:each) do
+      before do
         shard_class = Class.new { define_method(:activate) { |&b| b.call } }
 
         EventStream.current_shard_lookup = lambda {
@@ -329,7 +329,7 @@ describe EventStream::IndexStrategy::Cassandra do
     end
 
     describe "ids_for_key" do
-      before(:each) do
+      before do
         shard_class = Class.new { define_method(:activate) { |&b| b.call } }
 
         EventStream.current_shard_lookup = lambda {

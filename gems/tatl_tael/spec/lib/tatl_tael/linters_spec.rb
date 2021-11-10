@@ -26,7 +26,7 @@ describe TatlTael::Linters do
       let(:config) { {} }
       let(:base_linter) { TatlTael::Linters::BaseLinter.new(config: config, changes: changes) }
 
-      before :each do
+      before do
         allow(base_linter).to receive(:changes)
           .and_return(changes)
       end
@@ -108,14 +108,14 @@ describe TatlTael::Linters do
       let(:config) { {} }
       let(:base_linter) { TatlTael::Linters::BaseLinter.new(config: config, changes: changes) }
 
-      before :each do
+      before do
         allow(base_linter).to receive(:changes_matching)
           .with(hash_including(query))
           .and_return(changes)
       end
 
       context "changes exist matching the query" do
-        before :each do
+        before do
           allow(changes).to receive(:empty?).and_return(false)
         end
 
@@ -125,7 +125,7 @@ describe TatlTael::Linters do
       end
 
       context "changes DO NOT exist matching the query" do
-        before :each do
+        before do
           allow(changes).to receive(:empty?).and_return(true)
         end
 

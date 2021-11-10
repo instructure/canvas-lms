@@ -182,7 +182,7 @@ describe "Group Categories API", type: :request do
         @user = @course.teacher_enrollments.first.user
       end
 
-      before :each do
+      before do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
                         @category_path_options.merge(:action => 'create',
                                                      :course_id => @course.to_param),
@@ -731,7 +731,7 @@ describe "Group Categories API", type: :request do
         }
         let(:admin) { admin_role(root_account_id: @account.resolved_root_account_id) }
 
-        before :each do
+        before do
           @user = User.create!(name: 'billy')
           @account.account_users.create(user: @user)
         end

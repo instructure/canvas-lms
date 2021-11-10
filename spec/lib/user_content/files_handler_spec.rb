@@ -183,7 +183,7 @@ describe UserContent::FilesHandler do
         )
       end
 
-      before(:each) { allow(subject).to receive(:user_can_access_attachment?).and_return false }
+      before { allow(subject).to receive(:user_can_access_attachment?).and_return false }
 
       context 'url contains invalid uri' do
         # single quotes will make it valid uri, so keep this in double quotes

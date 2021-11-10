@@ -37,7 +37,7 @@ describe ContentMigration do
       end
     end
 
-    before :each do
+    before do
       allow(Canvas::Migration::ExternalContent::Migrator).to receive(:registered_services).and_return({ 'test_service' => klass })
     end
 

@@ -45,7 +45,7 @@ describe "course syllabus" do
   end
 
   context "as a teacher" do
-    before(:each) do
+    before do
       stub_rcs_config
       course_with_teacher_logged_in
       @group = @course.assignment_groups.create!(:name => 'first assignment group')

@@ -24,7 +24,7 @@ describe 'quiz taking' do
   include_context 'in-process server selenium tests'
   include QuizzesCommon
 
-  before :each do
+  before do
     course_with_student_logged_in(active_all: true)
     @quiz = quiz_with_new_questions(goto_edit: false)
   end

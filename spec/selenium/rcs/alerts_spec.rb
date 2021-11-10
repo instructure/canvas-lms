@@ -22,7 +22,7 @@ require_relative '../common'
 describe "Alerts" do
   include_context "in-process server selenium tests"
 
-  before(:each) do
+  before do
     @context = Account.default
     @context.settings[:enable_alerts] = true
     @context.save!

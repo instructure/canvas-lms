@@ -129,7 +129,7 @@ describe SortsAssignments do
     let(:zero_count_query) { double(count: 0) }
     let(:bad_count_query) { double(count: -1) }
 
-    before :each do
+    before do
       assignments.each { |assignment|
         allow(assignment).to receive_messages(
           :grants_right? => true,
@@ -175,7 +175,7 @@ describe SortsAssignments do
                                    })
     }
 
-    before :each do
+    before do
       assignments.each { |assignment|
         allow(assignment).to receive_messages(
           :grants_right? => true,
@@ -191,7 +191,7 @@ describe SortsAssignments do
     end
 
     describe "the Struct returned" do
-      before :each do
+      before do
         ungraded_assignments = []
         allow(SortsAssignments).to receive(:vdd_map).and_return(assignments)
         allow(SortsAssignments).to receive(:ungraded_for_user_and_session)
@@ -265,7 +265,7 @@ describe SortsAssignments do
     let(:session) { double }
     let(:user) { double }
 
-    before :each do
+    before do
       assignments.each { |assignment|
         allow(assignment).to receive(:expects_submission?).and_return true
         allow(assignment).to receive(:grants_right?).and_return false
@@ -305,7 +305,7 @@ describe SortsAssignments do
     let(:assignment3) { double }
     let(:assignments) { [assignment1, assignment2, assignment3] }
 
-    before :each do
+    before do
       allow(course).to receive_messages(:grants_right? => true)
       assignments.each { |assignment|
         allow(assignment).to receive_messages(

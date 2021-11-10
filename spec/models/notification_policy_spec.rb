@@ -261,7 +261,7 @@ describe NotificationPolicy do
       @announcement = notification_model(:name => 'Setting 1', :category => 'Announcement')
     end
 
-    before :each do
+    before do
       allow(Notification).to receive(:all).and_return([@notification])
     end
 

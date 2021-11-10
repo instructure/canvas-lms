@@ -88,7 +88,7 @@ describe "conversations new" do
     end
 
     context "conversations ui" do
-      before(:each) do
+      before do
         conversations
       end
 
@@ -157,7 +157,7 @@ describe "conversations new" do
     end
 
     describe "message list" do
-      before(:each) do
+      before do
         @participant = conversation(@teacher, @s[0], @s[1], body: 'hi there', workflow_state: 'unread')
         @convo = @participant.conversation
         @convo.update_attribute(:subject, 'test')

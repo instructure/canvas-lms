@@ -29,7 +29,7 @@ describe EnrollmentsFromUserList do
     %{david@example.com, "Richards, David" <david_richards@example.com>, David Richards <david_richards_jr@example.com>, david_richards_jr@example.com, DAVID@example.com}
   end
 
-  before(:each) do
+  before do
     course_model(:reusable => true)
     @el = UserList.new(list_to_parse)
     account = Account.default

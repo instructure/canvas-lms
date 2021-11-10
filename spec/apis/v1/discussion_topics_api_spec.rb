@@ -2120,7 +2120,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     describe "teacher" do
-      before(:each) do
+      before do
         @user = @teacher
         @url = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries"
       end
@@ -3261,7 +3261,7 @@ describe DiscussionTopicsController, type: :request do
       end
     }
 
-    before :each do
+    before do
       course_with_teacher(active_all: true, is_public: true) # sets @teacher and @course
       account_admin_user(account: @course.account) # sets @admin
       @student1 = student_in_course(active_all: true).user
@@ -3305,7 +3305,7 @@ describe DiscussionTopicsController, type: :request do
         end
       }
 
-      before :each do
+      before do
         prev_course = @course
         course_with_teacher
         @student = student_in_course.user

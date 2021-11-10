@@ -62,7 +62,7 @@ describe GradebookFiltersApiController, type: :request do
   end
 
   context 'when creating a new record' do
-    before :each do
+    before do
       Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
       @course = course_model
       @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: 'First filter', payload: { foo: :bar })
@@ -98,7 +98,7 @@ describe GradebookFiltersApiController, type: :request do
   end
 
   context 'when updating a record' do
-    before :each do
+    before do
       Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
       @course = course_model
       @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: 'First filter', payload: { foo: :bar })
@@ -136,7 +136,7 @@ describe GradebookFiltersApiController, type: :request do
   end
 
   context 'when getting the details of a record' do
-    before :each do
+    before do
       Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
       @course = course_model
       @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: 'First filter', payload: { foo: :bar })
@@ -171,7 +171,7 @@ describe GradebookFiltersApiController, type: :request do
   end
 
   context 'when destroying a record' do
-    before :each do
+    before do
       Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
       @course = course_model
       @gradebook_filter = @course.gradebook_filters.create!(user: @teacher, course: @course, name: 'First filter', payload: { foo: :bar })

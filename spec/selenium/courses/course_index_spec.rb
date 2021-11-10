@@ -53,7 +53,7 @@ describe "course index" do
     @user.enrollments.where(course: @future_courses).update_all(workflow_state: 'active')
   end
 
-  before :each do
+  before do
     user_session(@user)
     instance_variable_set(:@current_user, @user)
     instance_variable_set(:@domain_root_account, Account.default)

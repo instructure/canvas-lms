@@ -172,7 +172,7 @@ describe "Favorites API", type: :request do
   end
 
   context "group favorites" do
-    before :each do
+    before do
       @user = user_model
       @context = course_model
       @group_fave = Group.create!(:name => "group1", :context => @context)

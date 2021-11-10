@@ -38,7 +38,7 @@ describe 'pace plan page' do
     enable_pace_plans_in_course
   end
 
-  before :each do
+  before do
     user_session @teacher
   end
 

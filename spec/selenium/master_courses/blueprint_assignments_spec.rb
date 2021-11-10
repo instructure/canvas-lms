@@ -52,7 +52,7 @@ describe "blueprint courses assignments" do
       @copy_assmt = @minion.assignments.last
     end
 
-    before :each do
+    before do
       user_session(@master_teacher)
     end
 
@@ -93,7 +93,7 @@ describe "blueprint courses assignments" do
       @assmt_copy.save!
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 
@@ -205,7 +205,7 @@ describe "blueprint courses assignments" do
       @tag = @template.create_content_tag_for!(@assignment)
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 

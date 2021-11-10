@@ -55,7 +55,7 @@ describe Course do
     Account.default.default_enrollment_term
   end
 
-  before :each do
+  before do
     @course = Account.default.courses.build
     @course.workflow_state = 'claimed'
     @course.root_account = Account.default
@@ -242,7 +242,7 @@ describe Course do
       @course = Account.default.courses.create!
     end
 
-    before :each do
+    before do
       @course.enable_feature!(:final_grades_override)
       @course.allow_final_grade_override = true
     end
@@ -268,7 +268,7 @@ describe Course do
     end
 
     context "Setting is set to On" do
-      before :each do
+      before do
         @course.update!(:hide_sections_on_course_users_page => true)
       end
 
@@ -295,7 +295,7 @@ describe Course do
     end
 
     context "Setting is set to Off" do
-      before :each do
+      before do
         @course.update!(:hide_sections_on_course_users_page => false)
       end
 
@@ -431,7 +431,7 @@ describe Course do
       @term = Account.default.enrollment_terms.create!
     end
 
-    before :each do
+    before do
       @course.enrollment_term = @term
     end
 
@@ -2991,7 +2991,7 @@ describe Course, "tabs_available" do
   end
 
   context "students" do
-    before :each do
+    before do
       course_with_student(:active_all => true)
     end
 
@@ -3295,12 +3295,12 @@ describe Course, 'grade_publishing' do
     @course_section = @course.default_section
   end
 
-  after(:each) do
+  after do
     Course.valid_grade_export_types.delete("test_export")
   end
 
   context 'mocked plugin settings' do
-    before(:each) do
+    before do
       @plugin_settings = Canvas::Plugin.find!("grade_export").default_settings.clone
       @plugin = double()
       allow(Canvas::Plugin).to receive(:find!).with('grade_export').and_return(@plugin)
@@ -4164,7 +4164,7 @@ describe Course, 'grade_publishing' do
           @course.update!(grading_standard_id: 0)
         end
 
-        before(:each) do
+        before do
           @course.enable_feature!(:final_grades_override)
           @course.update!(allow_final_grade_override: true)
         end
@@ -4221,7 +4221,7 @@ describe Course, 'grade_publishing' do
           @course.update!(grading_standard_id: 0)
         end
 
-        before(:each) do
+        before do
           @course.enable_feature!(:final_grades_override)
         end
 
@@ -5557,7 +5557,7 @@ describe Course do
       @course = course_model
     end
 
-    before :each do
+    before do
       @course.write_attribute(:workflow_state, 'available')
       @course.write_attribute(:is_public, true)
     end
@@ -6175,7 +6175,7 @@ describe Course, "default_section" do
 end
 
 describe Course, "#student_annotation_documents_folder" do
-  before(:each) do
+  before do
     @course = Course.create!
   end
 
@@ -6250,7 +6250,7 @@ describe Course, 'touch_root_folder_if_necessary' do
 
   context "inheritable settings" do
     shared_examples 'inherited setting should inherit' do
-      before :each do
+      before do
         account_model
         course_factory(:account => @account)
       end

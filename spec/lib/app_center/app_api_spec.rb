@@ -22,7 +22,7 @@
 describe AppCenter::AppApi do
   let(:api) { AppCenter::AppApi.new(@account) }
 
-  before(:each) do
+  before do
     account_model
     default_settings = api.app_center.default_settings
     default_settings['base_url'] = 'http://www.example.com'

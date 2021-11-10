@@ -62,7 +62,7 @@ describe "context modules" do
       @module_3.save!
     end
 
-    before :each do
+    before do
       user_session(@student)
     end
 
@@ -280,7 +280,7 @@ describe "context modules" do
     end
 
     context "next and previous buttons", priority: "2" do
-      before :each do
+      before do
         user_session(@teacher)
       end
 
@@ -621,7 +621,7 @@ describe "context modules" do
       @module = @course.context_modules.create!(name: "module")
     end
 
-    before :each do
+    before do
       user_session(@student)
     end
 

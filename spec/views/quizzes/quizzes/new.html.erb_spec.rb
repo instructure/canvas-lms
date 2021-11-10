@@ -42,7 +42,7 @@ describe "/quizzes/quizzes/new" do
   end
 
   context "with course and quiz" do
-    before :each do
+    before do
       course_with_teacher(:active_all => true)
       @quiz = course_quiz
       assign(:quiz, @quiz)

@@ -28,7 +28,7 @@ describe MediaObjectsController, type: :request do
   describe "POST '/api/v1/media_objects'" do
     let(:user) { @student }
 
-    before :each do
+    before do
       user_session(user)
     end
 

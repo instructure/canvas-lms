@@ -31,7 +31,7 @@ describe "teacher planner" do
   end
 
   context "teacher interaction with ToDoSidebar" do
-    before :each do
+    before do
       @assignment1 = @course.assignments.create({
                                                   name: "Teacher Assignment",
                                                   due_at: Time.zone.now - 1.days,

@@ -290,7 +290,7 @@ describe ContextController do
   end
 
   describe "POST 'object_snippet'" do
-    before(:each) do
+    before do
       @obj = "<object data='test'></object>"
       allow(HostUrl).to receive(:is_file_host?).and_return(true)
       @data = Base64.encode64(@obj)

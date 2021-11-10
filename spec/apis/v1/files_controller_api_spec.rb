@@ -1478,7 +1478,7 @@ describe "Files API", type: :request do
       t_course.teachers.first
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 

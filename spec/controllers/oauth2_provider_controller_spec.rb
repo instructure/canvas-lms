@@ -123,7 +123,7 @@ describe OAuth2ProviderController do
         user_with_pseudonym(:active_all => 1, :password => 'qwertyuiop')
       end
 
-      before :each do
+      before do
         user_session(@user)
 
         redis = double('Redis')

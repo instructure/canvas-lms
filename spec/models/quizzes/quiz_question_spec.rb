@@ -199,7 +199,7 @@ describe Quizzes::QuizQuestion do
   end
 
   context 'root_account_id' do
-    before(:each) { quiz_with_graded_submission([]) }
+    before { quiz_with_graded_submission([]) }
 
     it "uses root_account value from account" do
       question = @quiz.quiz_questions.create!

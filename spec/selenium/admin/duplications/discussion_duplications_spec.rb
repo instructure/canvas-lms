@@ -28,7 +28,7 @@ describe "duplicate discussion" do
   context 'discussion created by teacher' do
     context 'duplicating' do
       describe 'course context' do
-        before :each do
+        before do
           course_with_teacher(active_all: true, name: 'teacher1')
           @discussion_topic = DiscussionHelpers.create_discussion_topic(
             @course,

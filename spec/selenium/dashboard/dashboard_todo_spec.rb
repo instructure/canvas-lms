@@ -23,7 +23,7 @@ describe "dashboard" do
   include_context "in-process server selenium tests"
 
   context "as a student" do
-    before(:each) do
+    before do
       course_with_student_logged_in(:active_all => true)
     end
 
@@ -109,7 +109,7 @@ describe "dashboard" do
       assignment_model(due_at: 2.days.from_now, course: @course, submission_types: 'online_text_entry', name: 'Todo for observer')
     end
 
-    before :each do
+    before do
       user_session(@observer)
     end
 

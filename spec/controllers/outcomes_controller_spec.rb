@@ -372,7 +372,7 @@ describe OutcomesController do
   describe "PUT 'update'" do
     let(:test_string) { "Some test string" }
 
-    before :each do
+    before do
       course_outcome
     end
 
@@ -399,7 +399,7 @@ describe OutcomesController do
   end
 
   describe "DELETE 'destroy'" do
-    before :each do
+    before do
       course_outcome
     end
 
@@ -423,12 +423,12 @@ describe OutcomesController do
   end
 
   describe "GET 'outcome_result" do
-    before :each do
+    before do
       course_outcome
     end
 
     context "with a quiz result" do
-      before :each do
+      before do
         assessment_question_bank_with_questions
         @outcome.align(@bank, @bank.context, :mastery_score => 0.7)
 

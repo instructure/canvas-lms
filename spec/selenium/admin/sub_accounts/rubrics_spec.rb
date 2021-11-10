@@ -28,7 +28,7 @@ describe "sub account shared rubric specs" do
   let(:rubric_url) { "/accounts/#{account.id}/rubrics" }
   let(:who_to_login) { 'admin' }
 
-  before(:each) do
+  before do
     course_with_admin_logged_in
   end
 

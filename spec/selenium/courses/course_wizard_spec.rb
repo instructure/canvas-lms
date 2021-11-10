@@ -32,7 +32,7 @@ describe 'course wizard' do
   include CourseLeftNavPageComponent
   include CalendarPage
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in
   end
 

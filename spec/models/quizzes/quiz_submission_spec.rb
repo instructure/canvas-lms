@@ -748,7 +748,7 @@ describe Quizzes::QuizSubmission do
         quiz_submission.with_versioning(true, &:save!)
       end
 
-      before(:each) do
+      before do
         student_in_course
       end
 
@@ -1366,7 +1366,7 @@ describe Quizzes::QuizSubmission do
         @quiz.save!
       end
 
-      before :each do
+      before do
         @submission = @quiz.generate_submission(@student)
         @submission.end_at = @quiz.due_at
         @submission.save!
@@ -1648,7 +1648,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe "associated submission" do
-    before(:each) { course_with_student }
+    before { course_with_student }
 
     it "assigns seconds_late to zero when not late" do
       Timecop.freeze do
@@ -1711,7 +1711,7 @@ describe Quizzes::QuizSubmission do
     end
 
     context "when Quiz autosubmit is disabled" do
-      before :each do
+      before do
         course_factory
         subject.quiz = @course.quizzes.create!
         subject.end_at = 1.hour.from_now
@@ -1731,7 +1731,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe "#overdue_and_needs_submission?" do
-    before :each do
+    before do
       course_factory
       subject.quiz = @course.quizzes.create!
       subject.end_at = 3.days.ago
@@ -1753,7 +1753,7 @@ describe Quizzes::QuizSubmission do
     end
 
     context "when Quiz autosubmit is disabled" do
-      before :each do
+      before do
         allow(subject.quiz).to receive(:timer_autosubmit_disabled?).and_return(true)
       end
 
@@ -1770,7 +1770,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe "#overdue?" do
-    before :each do
+    before do
       course_factory
       subject.quiz = @course.quizzes.create!
     end
@@ -1805,7 +1805,7 @@ describe Quizzes::QuizSubmission do
     end
 
     context "when Quiz autosubmit is disabled" do
-      before :each do
+      before do
         subject.end_at = 6.minutes.ago
         allow(subject.quiz).to receive(:timer_autosubmit_disabled?).and_return(true)
       end
@@ -1859,7 +1859,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe '#snapshot!' do
-    before :each do
+    before do
       subject.quiz = Quizzes::Quiz.new
       subject.attempt = 1
     end
@@ -1938,7 +1938,7 @@ describe Quizzes::QuizSubmission do
 
   describe "#posted?" do
     context "when this submission's quiz is a graded quiz" do
-      before(:each) { quiz_with_graded_submission([]) }
+      before { quiz_with_graded_submission([]) }
 
       it "returns true if the underlying submission is posted" do
         allow(@quiz_submission.submission).to receive(:posted?).and_return(true)
@@ -1961,7 +1961,7 @@ describe Quizzes::QuizSubmission do
   end
 
   context 'root_account_id' do
-    before(:each) { quiz_with_graded_submission([]) }
+    before { quiz_with_graded_submission([]) }
 
     it "uses root_account value from account" do
       expect(@quiz_submission.root_account_id).to eq Account.default.id
@@ -1994,7 +1994,7 @@ describe Quizzes::QuizSubmission do
     end
 
     context "when the quiz submission is hidden from the student" do
-      before(:each) do
+      before do
         quiz_submission.submission.update!(posted_at: nil)
       end
 

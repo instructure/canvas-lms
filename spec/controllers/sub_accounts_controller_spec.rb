@@ -250,7 +250,7 @@ describe SubAccountsController do
       @sub_account = @root_account.sub_accounts.create!
     end
 
-    before :each do
+    before do
       user_session @user
     end
 

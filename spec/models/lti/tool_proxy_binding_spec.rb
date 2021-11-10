@@ -26,7 +26,7 @@ module Lti
     let(:tool_proxy) { ToolProxy.new }
 
     describe 'validations' do
-      before(:each) do
+      before do
         subject.context = account
         subject.tool_proxy = tool_proxy
       end

@@ -50,7 +50,7 @@ describe Messages::SubmissionCommentForTeacher::SMSPresenter do
     end
 
     context "when the assignment is anonymously graded" do
-      before(:each) do
+      before do
         assignment.update!(anonymous_grading: true)
       end
 
@@ -79,7 +79,7 @@ describe Messages::SubmissionCommentForTeacher::SMSPresenter do
       end
 
       context "when grades have been posted" do
-        before(:each) do
+        before do
           assignment.unmute!
         end
 
@@ -108,7 +108,7 @@ describe Messages::SubmissionCommentForTeacher::SMSPresenter do
     end
 
     context "when the assignment is anonymously graded" do
-      before(:each) do
+      before do
         assignment.update!(anonymous_grading: true)
       end
 
@@ -137,7 +137,7 @@ describe Messages::SubmissionCommentForTeacher::SMSPresenter do
       end
 
       context "when grades have been posted" do
-        before(:each) do
+        before do
           assignment.unmute!
         end
 

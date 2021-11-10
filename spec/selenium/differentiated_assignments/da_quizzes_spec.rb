@@ -26,7 +26,7 @@ describe "interaction with differentiated quizzes" do
   include AssignmentsCommon
 
   context "Student" do
-    before(:each) do
+    before do
       course_with_student_logged_in
       da_setup
       @da_quiz = create_da_quiz
@@ -133,7 +133,7 @@ describe "interaction with differentiated quizzes" do
     end
   end
   context "Observer with student" do
-    before(:each) do
+    before do
       observer_setup
       da_setup
       @da_quiz = create_da_quiz

@@ -21,7 +21,7 @@
 require 'nokogiri'
 
 describe "student interactions links" do
-  before(:each) do
+  before do
     username = "nobody@example.com"
     password = "asdfasdf"
     u = user_with_pseudonym :active_user => true,
@@ -48,7 +48,7 @@ describe "student interactions links" do
   end
 
   context "as a user without permissions to view grades" do
-    before(:each) do
+    before do
       ['view_all_grades', 'manage_grades'].each do |permission|
         RoleOverride.create!(permission: permission, enabled: false, context: @course.account, role: ta_role)
       end
@@ -71,7 +71,7 @@ describe "student interactions links" do
   end
 
   context "as a user with permissions to view grades" do
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 

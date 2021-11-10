@@ -288,7 +288,7 @@ module IncomingMailProcessor
     end
 
     describe "#process" do
-      before(:each) do
+      before do
         @mock_mailbox = double
         allow(IncomingMessageProcessor).to receive(:create_mailbox).and_return(@mock_mailbox)
       end

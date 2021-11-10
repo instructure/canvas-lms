@@ -57,7 +57,7 @@ describe "discussions" do
     context "as a student" do
       let(:topic) { student_topic }
 
-      before(:each) do
+      before do
         user_session(student)
         stub_rcs_config
       end

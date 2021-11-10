@@ -563,7 +563,7 @@ describe Quizzes::QuizzesController do
     end
 
     describe "js_env SUBMISSION_VERSIONS_URL" do
-      before(:each) do
+      before do
         user_session(@student)
         course_quiz(true)
       end
@@ -1008,7 +1008,7 @@ describe Quizzes::QuizzesController do
         course_quiz
       end
 
-      before :each do
+      before do
         user_session(@teacher)
       end
 
@@ -1045,7 +1045,7 @@ describe Quizzes::QuizzesController do
         @quiz.save!
       end
 
-      before :each do
+      before do
         user_session(@student)
       end
 
@@ -1222,7 +1222,7 @@ describe Quizzes::QuizzesController do
         @quiz.generate_submission(@student)
       end
 
-      before :each do
+      before do
         user_session(@student)
       end
 
@@ -1564,7 +1564,7 @@ describe Quizzes::QuizzesController do
       end
 
       context "when the user is a teacher" do
-        before :each do
+        before do
           user_session(@teacher)
         end
 
@@ -1636,7 +1636,7 @@ describe Quizzes::QuizzesController do
       end
 
       context "when the user is an admin" do
-        before :each do
+        before do
           user_session(@admin)
         end
 
@@ -1922,7 +1922,7 @@ describe Quizzes::QuizzesController do
     end
 
     describe "DueDateCacher" do
-      before :each do
+      before do
         user_session(@teacher)
         @quiz = @course.quizzes.build(:title => "Update Overrides Quiz", :workflow_state => 'edited')
         @quiz.save!
@@ -2121,7 +2121,7 @@ describe Quizzes::QuizzesController do
         @quiz.assignment.update_attribute(:created_at, 1.day.ago)
       end
 
-      before :each do
+      before do
         user_session(@teacher)
       end
 
@@ -2196,7 +2196,7 @@ describe Quizzes::QuizzesController do
       end
 
       context "when the user is a teacher" do
-        before :each do
+        before do
           user_session(@teacher)
         end
 
@@ -2387,7 +2387,7 @@ describe Quizzes::QuizzesController do
       end
 
       context "when the user is an admin" do
-        before :each do
+        before do
           user_session(@admin)
         end
 
@@ -2611,7 +2611,7 @@ describe Quizzes::QuizzesController do
   describe "GET 'submission_html'" do
     before(:once) { course_quiz(true) }
 
-    before(:each) { user_session(@teacher) }
+    before { user_session(@teacher) }
 
     it "renders nothing if there's no submission for current user" do
       get 'submission_html', params: { course_id: @course.id, quiz_id: @quiz.id }

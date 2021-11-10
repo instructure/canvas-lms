@@ -42,7 +42,7 @@ describe TurnitinApi::OutcomesResponseTransformer do
   end
 
   describe 'response' do
-    before(:each) do
+    before do
       stub_request(:post, "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
         .to_return(:status => 200, :body => fixture('outcome_detailed_response.json'), :headers => { 'Content-Type' => 'application/json' })
     end
@@ -53,7 +53,7 @@ describe TurnitinApi::OutcomesResponseTransformer do
   end
 
   describe 'original_submission' do
-    before(:each) do
+    before do
       stub_request(:post, "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
         .to_return(:status => 200, :body => fixture('outcome_detailed_response.json'), :headers => { 'Content-Type' => 'application/json' })
 
@@ -69,7 +69,7 @@ describe TurnitinApi::OutcomesResponseTransformer do
   end
 
   describe 'originality report' do
-    before(:each) do
+    before do
       stub_request(:post, "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
         .to_return(:status => 200, :body => fixture('outcome_detailed_response.json'), :headers => { 'Content-Type' => 'application/json' })
     end
@@ -80,7 +80,7 @@ describe TurnitinApi::OutcomesResponseTransformer do
   end
 
   describe 'originality data' do
-    before(:each) do
+    before do
       stub_request(:post, "http://turnitin.com/api/lti/1p0/outcome_tool_data/4321")
         .to_return(:status => 200, :body => fixture('outcome_detailed_response.json'), :headers => { 'Content-Type' => 'application/json' })
     end

@@ -69,7 +69,7 @@ describe Turnitin::Client do
   end
 
   describe 'class methods' do
-    before(:each) do
+    before do
       @default_settings = {
         :originality_report_visibility => 'immediate',
         :s_paper_check => '1',
@@ -113,7 +113,7 @@ describe Turnitin::Client do
   end
 
   describe "create assignment" do
-    before(:each) do
+    before do
       course_with_student(:active_all => true)
       turnitin_assignment
       @turnitin_api = Turnitin::Client.new('test_account', 'sekret')
@@ -179,7 +179,7 @@ describe Turnitin::Client do
   end
 
   describe "submit paper" do
-    before(:each) do
+    before do
       course_with_student(:active_all => true)
       turnitin_assignment
       turnitin_submission
@@ -214,7 +214,7 @@ describe Turnitin::Client do
   end
 
   describe "#prepare_params" do
-    before(:each) do
+    before do
       course_with_student(:active_all => true)
       turnitin_assignment
       turnitin_submission

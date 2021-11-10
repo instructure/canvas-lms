@@ -25,7 +25,7 @@ describe GradeCalculator do
 
   # We should keep this in sync with GradeCalculatorSpec.coffee
   context "GradeCalculatorSpec.coffee examples" do
-    before :each do
+    before do
       @group = @group1 = @course.assignment_groups.create!(:name => 'group 1')
     end
 
@@ -277,7 +277,7 @@ describe GradeCalculator do
     end
 
     context "assignment groups with 0 points possible" do
-      before :each do
+      before do
         @group1.group_weight = 50
         @group1.save!
         @group2 = @course.assignment_groups.create! :name => 'group 2',
@@ -309,7 +309,7 @@ describe GradeCalculator do
     end
 
     context "grading periods" do
-      before :each do
+      before do
         student_in_course active_all: true
         @gp1, @gp2 = grading_periods count: 2
         @a1, @a2 = [@gp1, @gp2].map do |gp|
@@ -364,7 +364,7 @@ describe GradeCalculator do
       end
 
       context "DA" do
-        before :each do
+        before do
           set_up_course_for_differentiated_assignments
         end
 
@@ -475,7 +475,7 @@ describe GradeCalculator do
     end
 
     context "excused assignments" do
-      before :each do
+      before do
         student_in_course(active_all: true)
         @a1 = @course.assignments.create! points_possible: 10
         @a2 = @course.assignments.create! points_possible: 90

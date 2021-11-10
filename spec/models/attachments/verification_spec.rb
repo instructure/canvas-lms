@@ -68,7 +68,7 @@ describe Attachments::Verification do
   end
 
   context "verifying a verifier" do
-    before :each do
+    before do
       allow(InstStatsd::Statsd).to receive(:increment)
     end
 

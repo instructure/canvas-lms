@@ -177,7 +177,7 @@ describe BrandConfig do
     end
 
     describe "with cdn enabled" do
-      before :each do
+      before do
         expect(Canvas::Cdn).to receive(:enabled?).at_least(:once).and_return(true)
         s3 = double(bucket: nil)
         allow(Aws::S3::Resource).to receive(:new).and_return(s3)

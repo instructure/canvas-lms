@@ -902,7 +902,7 @@ describe CalendarEventsApiController, type: :request do
       end
 
       context 'participants' do
-        before :each do
+        before do
           course_with_teacher(:active_all => true)
           @ag = AppointmentGroup.create!(title: "something", participants_per_appointment: 4, contexts: [@course],
                                          participant_visibility: "protected", new_appointments: [["2012-01-01 12:00:00", "2012-01-01 13:00:00"],
@@ -2389,7 +2389,7 @@ describe CalendarEventsApiController, type: :request do
             end
 
             context 'when in same course section' do
-              before :each do
+              before do
                 @student_enrollment2 = @course.enroll_user(@student2, 'StudentEnrollment', enrollment_state: 'active', section: @section1)
                 @observer_enrollment2 = ObserverEnrollment.new(user: @observer,
                                                                course: @course,
@@ -2414,7 +2414,7 @@ describe CalendarEventsApiController, type: :request do
             end
 
             context 'when in same course different sections' do
-              before :each do
+              before do
                 @student_enrollment2 = @course.enroll_user(@student2, 'StudentEnrollment', :enrollment_state => 'active', :section => @section2)
                 @observer_enrollment2 = ObserverEnrollment.create!(:user => @observer,
                                                                    :course => @course,
@@ -2442,7 +2442,7 @@ describe CalendarEventsApiController, type: :request do
             end
 
             context 'when in different courses' do
-              before(:each) do
+              before do
                 @course1 = @course
                 @course2 = course_factory(active_all: true)
 

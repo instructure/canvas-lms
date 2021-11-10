@@ -31,7 +31,7 @@ describe "reply attachment" do
     @student = student_in_course.user
   end
 
-  before(:each) do
+  before do
     stub_rcs_config
   end
 

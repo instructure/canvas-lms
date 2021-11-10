@@ -21,7 +21,7 @@
 require 'nokogiri'
 
 describe "user asset accesses" do
-  before(:each) do
+  before do
     Setting.set('enable_page_views', 'db')
 
     username = "nobody@example.com"

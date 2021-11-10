@@ -26,7 +26,7 @@ describe DataFixup::ReassociateGradingPeriodGroups do
   let(:group_helper) { Factories::GradingPeriodGroupHelper.new }
   let(:period_helper) { Factories::GradingPeriodHelper.new }
 
-  before(:each) do
+  before do
     @root_account = Account.create(name: 'new account')
     group = group_helper.create_for_account(@root_account)
     period_helper.create_presets_for_group(group, :current)
@@ -62,7 +62,7 @@ describe DataFixup::ReassociateGradingPeriodGroups do
   end
 
   context "post-fixup" do
-    before(:each) do
+    before do
       DataFixup::ReassociateGradingPeriodGroups.run
     end
 

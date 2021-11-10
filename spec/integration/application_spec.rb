@@ -100,7 +100,7 @@ describe "site-wide" do
   end
 
   context "user headers" do
-    before(:each) do
+    before do
       course_with_teacher
 
       student_in_course

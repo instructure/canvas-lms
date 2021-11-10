@@ -38,7 +38,7 @@ describe "dashboard" do
       @course.enroll_student(@student2, section: @section2).accept!
     end
 
-    before :each do
+    before do
       @announcement1 = @course.announcements.create!(title: "here is an annoucement",
                                                      message: "here is the announcement message",
                                                      is_section_specific: true,
@@ -104,7 +104,7 @@ describe "dashboard" do
       @course.save!
     end
 
-    before :each do
+    before do
       @announcement1 = @course.announcements.create!(title: "here is an annoucement",
                                                      message: "here is the announcement message",
                                                      is_section_specific: true,
@@ -164,7 +164,7 @@ describe "dashboard" do
       @course.save!
     end
 
-    before :each do
+    before do
       @announcement1 = @course.announcements.create!(title: "here is an annoucement",
                                                      message: "here is the announcement message",
                                                      is_section_specific: true,

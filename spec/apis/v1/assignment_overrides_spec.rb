@@ -149,7 +149,7 @@ describe AssignmentOverridesController, type: :request do
     end
 
     describe 'as an account admin not enrolled in the class' do
-      before :each do
+      before do
         account_admin_user(:account => Account.site_admin, :active_all => true)
       end
 

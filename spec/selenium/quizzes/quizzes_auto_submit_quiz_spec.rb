@@ -30,7 +30,7 @@ describe 'taking a quiz' do
       course_with_student(course: @course, active_all: 1)
     end
 
-    before(:each) { user_session(@student) }
+    before { user_session(@student) }
 
     def auto_submit_quiz(quiz)
       take_and_answer_quiz(submit: false, quiz: quiz, lock_after: 10.seconds)

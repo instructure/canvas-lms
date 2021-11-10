@@ -297,7 +297,7 @@ describe "Module Items API", type: :request do
     end
 
     context 'with differentiated assignments' do
-      before :each do
+      before do
         course_with_student(:course => @course, :active_all => true)
         @user = @student
       end
@@ -880,7 +880,7 @@ describe "Module Items API", type: :request do
       end
 
       context "section specific discussions" do
-        before :each do
+        before do
           @topic_section = @course.course_sections.create!
           @topic.is_section_specific = true
           @topic.course_sections = [@topic_section]

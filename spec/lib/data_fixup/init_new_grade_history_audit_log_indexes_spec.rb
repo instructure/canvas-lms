@@ -50,7 +50,7 @@ describe DataFixup::InitNewGradeHistoryAuditLogIndexes do
 
   let(:index_tables) { (no_grader_required_tables + grader_required_tables).freeze }
 
-  before(:each) do
+  before do
     @database = CanvasCassandra::DatabaseBuilder.from_config(:auditors)
     skip("requires cassandra auditors") unless @database
 

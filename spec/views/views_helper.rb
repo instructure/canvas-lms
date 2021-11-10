@@ -33,7 +33,7 @@ def view_portfolio(portfolio = @portfolio, current_user = @user)
 end
 
 RSpec.shared_context 'lti_layout_spec_helper' do
-  before :each do
+  before do
     allow(ActionController).to receive(:flash).with(any_args).and_return(true)
     allow(User).to receive(:default_avatar_fallback).and_return("http://localhost/avatar.png")
     allow(ctrl).to receive(:session).and_return({})

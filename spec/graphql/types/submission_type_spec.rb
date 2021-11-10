@@ -146,7 +146,7 @@ describe Types::SubmissionType do
   end
 
   describe "body" do
-    before(:each) do
+    before do
       allow(GraphQLHelpers::UserContent).to receive(:process).and_return("bad")
     end
 
@@ -161,7 +161,7 @@ describe Types::SubmissionType do
       let(:submission_type_for_student) { GraphQLTypeTester.new(submission, current_user: @student) }
       let(:submission_type_for_teacher) { GraphQLTypeTester.new(submission, current_user: @teacher) }
 
-      before(:each) do
+      before do
         assignment.hide_submissions
       end
 

@@ -25,7 +25,7 @@ describe Loaders::AssetStringLoader do
     @assignment = @course1.assignments.create! name: "asdf"
   end
 
-  around(:each) do |example|
+  around do |example|
     @query_count = 0
     subscription = ActiveSupport::Notifications.subscribe('sql.active_record') do
       @query_count += 1

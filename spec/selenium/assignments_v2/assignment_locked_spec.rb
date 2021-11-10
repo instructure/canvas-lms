@@ -40,7 +40,7 @@ describe 'assignments' do
         )
       end
 
-      before(:each) do
+      before do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
       end
@@ -68,7 +68,7 @@ describe 'assignments' do
         )
       end
 
-      before(:each) do
+      before do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment)
       end
@@ -104,7 +104,7 @@ describe 'assignments' do
         module2.update!(prerequisites: [{ id: module1.id, name: module1.name, type: 'context_module' }])
       end
 
-      before(:each) do
+      before do
         user_session(@student)
         StudentAssignmentPageV2.visit(@course, @assignment2)
       end

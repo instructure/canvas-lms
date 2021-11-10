@@ -36,7 +36,7 @@ describe "google analytics" do
   end
 
   context 'with GA enabled' do
-    before(:each) do
+    before do
       Setting.set('google_analytics_key', 'testing123')
     end
 

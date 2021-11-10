@@ -23,7 +23,7 @@ describe TatlTael::Linters::SimpleLinter do
 
   describe "#run" do
     context "precondition NOT met" do
-      before :each do
+      before do
         allow(simple_linter).to receive(:precondition_met?).and_return(false)
       end
 
@@ -33,12 +33,12 @@ describe TatlTael::Linters::SimpleLinter do
     end
 
     context "precondition met" do
-      before :each do
+      before do
         allow(simple_linter).to receive(:precondition_met?).and_return(true)
       end
 
       context "requirement met" do
-        before :each do
+        before do
           allow(simple_linter).to receive(:requirement_met?).and_return(true)
         end
 
@@ -56,7 +56,7 @@ describe TatlTael::Linters::SimpleLinter do
           }
         end
 
-        before :each do
+        before do
           allow(simple_linter).to receive(:requirement_met?).and_return(false)
         end
 
@@ -69,7 +69,7 @@ describe TatlTael::Linters::SimpleLinter do
 
   describe "#precondition_met?" do
     context "changes exist for the precondition query" do
-      before :each do
+      before do
         allow(simple_linter).to receive(:changes_exist?)
           .with(pretty_config[:precondition])
           .and_return(true)
@@ -81,7 +81,7 @@ describe TatlTael::Linters::SimpleLinter do
     end
 
     context "changes DO NOT exist for the precondition query" do
-      before :each do
+      before do
         allow(simple_linter).to receive(:changes_exist?)
           .with(pretty_config[:precondition])
           .and_return(false)
@@ -118,7 +118,7 @@ describe TatlTael::Linters::SimpleLinter do
       end
 
       context "changes exist for the requirement query" do
-        before :each do
+        before do
           allow(simple_linter).to receive(:changes_exist?)
             .with(config_with_pretty_requirement[:requirement])
             .and_return(true)
@@ -130,7 +130,7 @@ describe TatlTael::Linters::SimpleLinter do
       end
 
       context "changes DO NOT exist for the requirement query" do
-        before :each do
+        before do
           allow(simple_linter).to receive(:changes_exist?)
             .with(config_with_pretty_requirement[:requirement])
             .and_return(false)

@@ -69,7 +69,7 @@ describe 'Speedgrader' do
 
   context 'grading' do
     describe 'displays grades correctly' do
-      before :each do
+      before do
         user_session(@teacher)
       end
 
@@ -99,7 +99,7 @@ describe 'Speedgrader' do
         @quiz = seed_quiz_with_submission
       end
 
-      before(:each) do
+      before do
         user_session(@teacher)
         Speedgrader.visit(@course.id, @quiz.assignment_id)
       end
@@ -144,7 +144,7 @@ describe 'Speedgrader' do
         @assignment.grade_student(@students.second, grade: 'fail', grader: @teacher)
       end
 
-      before :each do
+      before do
         user_session(@teacher)
         Speedgrader.visit(@course.id, @assignment.id)
         Speedgrader.wait_for_grade_input
@@ -186,7 +186,7 @@ describe 'Speedgrader' do
         rubric.reload
       end
 
-      before :each do
+      before do
         user_session(@teacher)
       end
 
@@ -198,7 +198,7 @@ describe 'Speedgrader' do
       end
 
       context 'saves grades in' do
-        before :each do
+        before do
           Speedgrader.visit(@course.id, @assignment.id)
           Speedgrader.view_rubric_button.click
           Speedgrader.select_rubric_criterion('Much Awesome')
@@ -260,7 +260,7 @@ describe 'Speedgrader' do
         rubric.reload
       end
 
-      before :each do
+      before do
         user_session(@teacher)
         Speedgrader.visit(@course.id, @assignment.id)
         wait_for_ajaximations
@@ -279,7 +279,7 @@ describe 'Speedgrader' do
       end
 
       context 'saving rubric ratings' do
-        before :each do
+        before do
           Speedgrader.rating_by_text("Much Awesome").click
           Speedgrader.rating_by_text("So Wow").click
           Speedgrader.save_rubric_button.click
@@ -336,7 +336,7 @@ describe 'Speedgrader' do
       end
 
       describe 'flashes a warning when grade changes in' do
-        before :each do
+        before do
           user_session(@teacher)
         end
 
@@ -359,7 +359,7 @@ describe 'Speedgrader' do
     end
 
     context 'Using a rubric to grade' do
-      before :each do
+      before do
         user_session(@teacher)
       end
 
@@ -408,7 +408,7 @@ describe 'Speedgrader' do
         )
       end
 
-      before :each do
+      before do
         user_session(@teacher)
       end
 
@@ -507,7 +507,7 @@ describe 'Speedgrader' do
         end
 
         context 'student switching' do
-          after :each do
+          after do
             clear_local_storage
           end
 
@@ -568,11 +568,11 @@ describe 'Speedgrader' do
         )
       end
 
-      before :each do
+      before do
         user_session(@teacher)
       end
 
-      after :each do
+      after do
         clear_local_storage
       end
 
@@ -646,11 +646,11 @@ describe 'Speedgrader' do
         end
       end
 
-      before :each do
+      before do
         user_session(@teacher)
       end
 
-      after :each do
+      after do
         clear_local_storage
       end
 
@@ -722,7 +722,7 @@ describe 'Speedgrader' do
         @quiz = seed_quiz_with_submission
       end
 
-      before(:each) do
+      before do
         user_session(@teacher)
         Speedgrader.visit(@course.id, @quiz.assignment_id)
       end
@@ -743,7 +743,7 @@ describe 'Speedgrader' do
         @assignment.grade_student @students[0], grade: 10, grader: @teacher
       end
 
-      before(:each) do
+      before do
         user_session(@teacher)
         Speedgrader.visit(@course.id, @assignment.id)
       end
@@ -764,7 +764,7 @@ describe 'Speedgrader' do
         @assignment.grade_student @students[0], grade: 10, grader: @teacher
       end
 
-      before(:each) do
+      before do
         user_session(@teacher)
         Speedgrader.visit(@course.id, @assignment.id)
       end
@@ -831,7 +831,7 @@ describe 'Speedgrader' do
 
     let_once(:quiz) { seed_quiz_with_submission(6) }
 
-    before(:each) do
+    before do
       user_session(@teacher)
       Speedgrader.visit(@course.id, quiz.assignment_id)
     end
@@ -884,13 +884,13 @@ describe 'Speedgrader' do
       @assignment = @course.assignments.create!(title: 'My Title', grading_type: 'letter_grade', points_possible: 20)
     end
 
-    before :each do
+    before do
       user_session(@teacher)
       # see first student
       Speedgrader.visit(@course.id, @assignment.id)
     end
 
-    after :each do
+    after do
       clear_local_storage
     end
 
@@ -1040,7 +1040,7 @@ describe 'Speedgrader' do
       )
     end
 
-    before :each do
+    before do
       user_session(@teacher)
       Speedgrader.visit(@course.id, @assignment.id)
     end
@@ -1081,7 +1081,7 @@ describe 'Speedgrader' do
       @assignment = @course.assignments.create! name: "aaa", due_at: 2.years.ago
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 

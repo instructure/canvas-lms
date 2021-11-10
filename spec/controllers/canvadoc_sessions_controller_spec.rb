@@ -31,7 +31,7 @@ describe CanvadocSessionsController do
                                     :context => @student
   end
 
-  before :each do
+  before do
     PluginSetting.create! :name => 'canvadocs',
                           :settings => { "base_url" => "https://example.com" }
     allow_any_instance_of(Canvadocs::API).to receive(:upload).and_return "id" => 1234
@@ -47,7 +47,7 @@ describe CanvadocSessionsController do
       Canvadoc.create!(attachment: @attachment)
     end
 
-    before(:each) do
+    before do
       @assignment.update!(annotatable_attachment_id: @attachment.id)
       user_session(@student)
     end
@@ -479,7 +479,7 @@ describe CanvadocSessionsController do
         Canvadoc.create!(attachment: @attachment)
       end
 
-      before(:each) do
+      before do
         allow(Attachment).to receive(:find).with(@attachment.global_id).and_return(@attachment)
         user_session(@student)
       end
@@ -497,7 +497,7 @@ describe CanvadocSessionsController do
       let(:hmac) { Canvas::Security.hmac_sha1(blob.to_json) }
 
       context "when annotation_context is present" do
-        before(:each) do
+        before do
           @assignment.update!(annotatable_attachment: @attachment, submission_types: "student_annotation")
           @submission.update!(attempt: 2)
           @annotation_context = @submission.canvadocs_annotation_contexts.find_or_create_by(
@@ -518,7 +518,7 @@ describe CanvadocSessionsController do
         end
 
         context "when the user is a student" do
-          before(:each) do
+          before do
             user_session(@student)
           end
 

@@ -42,7 +42,7 @@ describe "help dialog" do
   end
 
   context "help as a student" do
-    before(:each) do
+    before do
       course_with_student_logged_in(:active_all => true)
     end
 
@@ -107,7 +107,7 @@ describe "help dialog" do
   end
 
   context "help dialog as a teacher" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in(:active_all => true)
     end
 
@@ -142,7 +142,7 @@ describe "help dialog" do
   end
 
   context "customization link" do
-    before :each do
+    before do
       user_logged_in(:active_all => true)
     end
 
@@ -167,7 +167,7 @@ describe "help dialog" do
   end
 
   context "featured and new links" do
-    before :each do
+    before do
       user_logged_in(:active_all => true)
       Account.site_admin.enable_feature! :featured_help_links
       Account.default.account_users.create!(:user => @user)
@@ -207,7 +207,7 @@ describe "help dialog" do
   end
 
   context 'welcome tour' do
-    before :each do
+    before do
       course_with_student_logged_in(active_all: true)
       Account.default.enable_feature!('product_tours')
     end

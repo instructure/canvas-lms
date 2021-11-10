@@ -25,7 +25,7 @@ describe 'quizzes question banks' do
   include QuizzesCommon
 
   context 'as a teacher' do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 
