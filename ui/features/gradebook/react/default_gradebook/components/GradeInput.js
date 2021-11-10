@@ -164,7 +164,7 @@ export default class GradeInput extends Component {
     this.state = stateFromProps(props)
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const submissionChanged = this.props.submission.id !== nextProps.submission.id
     const submissionUpdated = this.props.submissionUpdating && !nextProps.submissionUpdating
 
