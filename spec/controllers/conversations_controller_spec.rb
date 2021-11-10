@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
-
 describe ConversationsController do
   def conversation(opts = {})
     num_other_users = opts[:num_other_users] || 1
@@ -425,7 +423,7 @@ describe ConversationsController do
       end
     end
 
-    it "correctlies infer context tags" do
+    it "infers context tags correctly" do
       course_with_teacher_logged_in(:active_all => true)
       @course1 = @course
       @course2 = course_factory(active_all: true)
@@ -661,7 +659,7 @@ describe ConversationsController do
       expect(@conversation.reload.participants.size).to eq 4 # includes @user
     end
 
-    it "correctlies infer context tags" do
+    it "infers context tags correctly" do
       a = Account.default
       @group = a.groups.create!
       @conversation.participants.each { |user| @group.users << user }

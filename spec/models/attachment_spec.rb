@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
-
 describe Attachment do
   context "validation" do
     it "creates a new instance given valid attributes" do
@@ -122,7 +120,6 @@ describe Attachment do
 
     it "gives back a signed s3 url" do
       a = attachment_model
-      s3object = a.s3object
       expect(a.public_url(expires_in: 1.day)).to match(/^https:\/\//)
       a.destroy_permanently!
     end
@@ -335,7 +332,7 @@ describe Attachment do
         expect(canvadocable.canvadoc).not_to be_nil
         expect(canvadocable.canvadoc).to receive(:upload).and_raise(Canvadoc::UploadTimeout, "test timeout")
         captured = false
-        allow(Canvas::Errors).to receive(:capture) do |e, error_data, error_level|
+        allow(Canvas::Errors).to receive(:capture) do |e, _error_data, error_level|
           if e.is_a?(Canvadoc::UploadTimeout)
             captured = true
             expect(error_level).to eq(:warn)
@@ -679,7 +676,7 @@ describe Attachment do
         expect(att.instfs_uuid).to eq dup_uuid
       end
 
-      it "actuallies destroy the content" do
+      it "actually destroys the content" do
         uuid = "old-id"
         att = attachment_model(instfs_uuid: uuid)
         expect(InstFS).to receive(:delete_file).with(uuid)
@@ -844,7 +841,7 @@ describe Attachment do
       allow(Attachment).to receive(:s3_storage?).and_return(true)
       expect_any_instance_of(Attachment).to receive(:make_rootless).once
       expect_any_instance_of(Attachment).to receive(:change_namespace).once
-      a2 = a.clone_for(c2)
+      a.clone_for(c2)
     end
 
     it "creates thumbnails for images on clone" do
@@ -856,7 +853,7 @@ describe Attachment do
       expect_any_instance_of(Attachment).to receive(:copy_attachment_content).once
       expect_any_instance_of(Attachment).to receive(:change_namespace).once
       expect_any_instance_of(Attachment).to receive(:create_thumbnail_size).once
-      a2 = a.clone_for(c2)
+      a.clone_for(c2)
     end
 
     it "links the thumbnail" do
@@ -985,7 +982,7 @@ describe Attachment do
       expect(a.grants_right?(nil, mock_session, :download)).to eql(true)
     end
 
-    it "correctlies deny user access based on 'file_access_user_id'" do
+    it "denies user access based on 'file_access_user_id' correctly" do
       a = attachment_model(context: user)
       other_user = user_model
       mock_session = ActionController::TestSession.new({
@@ -1181,7 +1178,7 @@ describe Attachment do
 
     it "forces rename semantics in submissions folders" do
       user_model
-      a1 = attachment_model context: @user, folder: @user.submissions_folder, filename: 'a1.txt'
+      attachment_model context: @user, folder: @user.submissions_folder, filename: 'a1.txt'
       a2 = attachment_model context: @user, folder: @user.submissions_folder, filename: 'a2.txt'
       a2.display_name = 'a1.txt'
       deleted = a2.handle_duplicates(:overwrite)
@@ -1344,7 +1341,7 @@ describe Attachment do
       expect(@a.root_account_id).to eq @account.id
     end
 
-    it "immediatelies infer the namespace if not yet set" do
+    it "immediately infers the namespace if not yet set" do
       Attachment.current_root_account = nil
       @a = Attachment.new(:context => @course)
       expect(@a).to be_new_record
@@ -1424,11 +1421,11 @@ describe Attachment do
       end
 
       it "links a cross-shard cloned_item correctly" do
-        c0 = course_factory
+        course_factory
         a0 = attachment_model(display_name: 'lolcats.mp4', context: @course, uploaded_data: stub_file_data('lolcats.mp4', '...', 'video/mp4'))
         @shard1.activate do
           c1 = course_factory(account: account_model)
-          a1 = a0.clone_for(c1)
+          a0.clone_for(c1)
         end
         a0.reload
         expect(Shard.shard_for(a0.cloned_item_id)).to eq @shard1
@@ -1497,7 +1494,6 @@ describe Attachment do
 
     it "grants rights to owning user even if the user is on a seperate shard" do
       user = nil
-      attachments = []
 
       @shard1.activate do
         user = User.create!
@@ -1695,7 +1691,7 @@ describe Attachment do
       expect(@attachment).to receive(:create_or_update_thumbnail).with(anything, sz, sz) {
         @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data)
       }
-      url = @attachment.thumbnail_url(:size => "640x>")
+      @attachment.thumbnail_url(:size => "640x>")
       expect(@attachment).to receive(:create_dynamic_thumbnail).never
       url = @attachment.thumbnail_url(:size => "640x>")
       thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
@@ -1942,7 +1938,7 @@ describe Attachment do
       expect(quota[:quota_used]).to eq 1.megabyte
 
       @assignment = @course.assignments.create!
-      sub = @assignment.submit_homework(@user, attachments: [@attachment])
+      @assignment.submit_homework(@user, attachments: [@attachment])
 
       attachment_model(:context => @user, :uploaded_data => stub_png_data, :filename => "otherfile.png")
       @attachment.update_attribute(:size, 1.megabyte)

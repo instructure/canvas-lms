@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../../common'
-require_relative '../pages/admin_account_page.rb'
-require_relative '../pages/course_page.rb'
-require_relative '../../../factories/analytics_2_tool_factory.rb'
+require_relative '../pages/admin_account_page'
+require_relative '../pages/course_page'
+require_relative '../../../factories/analytics_2_tool_factory'
 
 describe "analytics in Canvas" do
   include_context "in-process server selenium tests"

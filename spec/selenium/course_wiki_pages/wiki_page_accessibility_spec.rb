@@ -21,8 +21,8 @@ require_relative '../common'
 require_relative '../helpers/public_courses_context'
 require_relative '../helpers/wiki_and_tiny_common'
 require_relative '../helpers/files_common'
-require_relative 'page_objects/wiki_index_page.rb'
-require_relative 'page_objects/wiki_page.rb'
+require_relative 'page_objects/wiki_index_page'
+require_relative 'page_objects/wiki_page'
 
 describe "Wiki Pages" do
   include_context "in-process server selenium tests"
@@ -278,7 +278,7 @@ describe "Wiki Pages" do
 
       it "alerts user if navigating away from page with unsaved html changes", priority: "1", test_id: 126838 do
         skip_if_safari(:alert)
-        switch_editor_views(wiki_page_body)
+        switch_editor_views
         wiki_page_body.send_keys("derp")
         fln('Home').click
         expect(driver.switch_to.alert).to be_present
@@ -287,7 +287,7 @@ describe "Wiki Pages" do
 
       it "does not save changes when navigating away and not saving", priority: "1", test_id: 267613 do
         skip_if_safari(:alert)
-        switch_editor_views(wiki_page_body)
+        switch_editor_views
         wiki_page_body.send_keys('derp')
         fln('Home').click
         expect(driver.switch_to.alert).to be_present
@@ -298,7 +298,7 @@ describe "Wiki Pages" do
 
       it "alerts user if navigating away from page after title change", priority: "1", test_id: 267832 do
         skip_if_safari(:alert)
-        switch_editor_views(wiki_page_body)
+        switch_editor_views
         f('.title').clear()
         f('.title').send_keys("derpy-title")
         fln('Home').click

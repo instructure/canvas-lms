@@ -173,24 +173,17 @@ def maybeSlackSendRetrigger() {
   }
 }
 
-def useRspecQ(percentage) {
+def useRspecQ() {
   if (configuration.isRspecqEnabled()) {
     env.RSPECQ_ENABLED = '1'
     return true
   }
-
-  java.security.SecureRandom random = new java.security.SecureRandom()
-  if (!(env.RSPECQ_ENABLED == '1' && random.nextInt((100 / percentage).intValue()) == 0)) {
-    env.RSPECQ_ENABLED = '0'
-    return false
-  }
-
-  return true
+  return env.RSPECQ_ENABLED == '1'
 }
 
 def getRspecProcesses() {
   // Determine if this build is using RSpecQ and set RSPEC_PROCESSES
-  if (useRspecQ(50)) {
+  if (useRspecQ()) {
     configuration.getInteger('rspecq-processes')
   } else {
     configuration.getInteger('rspec-processes')
@@ -417,6 +410,28 @@ pipeline {
 
                 extendedStage('Consumer Smoke Test').queue(stages) {
                   sh 'build/new-jenkins/consumer-smoke-test.sh'
+                }
+
+                extendedStage('Zeitwerk Check').queue(stages) {
+                  withEnv([
+                      'COMPOSE_FILE=docker-compose.new-jenkins.yml',
+                      'CANVAS_ZEITWERK=1'
+                  ]) {
+                    // the purpose of this stage is to ensure any new code introduce to canvas or any
+                    // autoloaded/eager-loaded dependencies conforms to our zeitwerk config
+                    // so we can start using zeitwerk as our code loader.
+                    //
+                    // the generally expected file structure can be found here: https://github.com/fxn/zeitwerk#file-structure
+                    sh '''
+                      echo "HEY HUMAN!"
+                      echo "**********"
+                      echo "Are you debugging a build failure here?"
+                      echo "see general zeitwerk rules, it may help: https://github.com/fxn/zeitwerk#file-structure"
+                      echo "**********"
+                      echo "HEY HUMAN!"
+                      docker-compose -p "zeitwerk-check" run --rm canvas bash -c "./bin/rails zeitwerk:check"
+                    '''
+                  }
                 }
 
                 extendedStage(JS_BUILD_IMAGE_STAGE)

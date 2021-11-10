@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/turnitin_spec_helper')
+require_relative 'turnitin_spec_helper'
 require 'turnitin_api'
 module Turnitin
   describe AttachmentManager do

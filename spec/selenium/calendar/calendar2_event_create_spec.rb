@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common')
+require_relative '../common'
+require_relative '../helpers/calendar2_common'
 require_relative '../../helpers/k5_common'
 
 describe "calendar2" do
@@ -43,7 +43,6 @@ describe "calendar2" do
     end
     context "event creation" do
       it "creates an event by hitting the '+' in the top bar" do
-        event_title = 'new event'
         get "/calendar2"
 
         fj('#create_new_event_link').click
@@ -82,7 +81,7 @@ describe "calendar2" do
         expect(CalendarEvent.last.location_address).to eq location_address
       end
 
-      it 'cosistentlies format date <input> value to what datepicker would set it as, even in langs that have funky formatting' do
+      it 'consistently formats date <input> value to what datepicker would set it as, even in langs that have funky formatting' do
         skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
         skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
         @user.locale = 'fr'
@@ -338,7 +337,8 @@ describe "calendar2" do
                      datetime.change({ day: 15 })
                    end
         replace_content(f('input[name=date]'), format_date_for_view(datetime, :short))
-        f('.validated-form-view').submit
+        f('button[type=submit]').click
+        wait_for_ajaximations
         refresh_page
         f('.fc-content .fc-title').click
         event_content = fj('.event-details-content:visible')

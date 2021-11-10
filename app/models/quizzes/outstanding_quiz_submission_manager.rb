@@ -54,10 +54,7 @@ module Quizzes
     end
 
     def find_by_quiz
-      # Find these in batches, so as to reduce the memory load
-      outstanding_qs = []
-      outstanding_qs = Quizzes::QuizSubmission.where("quiz_id = ?", @quiz.id).preload(:user).needs_grading
-      outstanding_qs
+      Quizzes::QuizSubmission.where(quiz_id: @quiz).preload(:user).needs_grading
     end
   end
 end

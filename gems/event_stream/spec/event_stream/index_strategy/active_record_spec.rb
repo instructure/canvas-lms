@@ -21,13 +21,13 @@
 require 'spec_helper'
 
 describe EventStream::IndexStrategy::ActiveRecord do
-  before :each do
-    @fake_record_type = Class.new do
+  let(:fake_record_type) do
+    Class.new do
       def created_at
-        @_created_val ||= Time.zone.now
+        @created_at ||= Time.zone.now
       end
 
-      def self.paginate(options = {})
+      def self.paginate(**)
         self
       end
 
@@ -50,26 +50,25 @@ describe EventStream::IndexStrategy::ActiveRecord do
       end
 
       def self.apply_condition(condition)
-        @_conditions ||= []
-        @_conditions << condition
+        @conditions ||= []
+        @conditions << condition
       end
 
       def self.applied_conditions
-        @_conditions
+        @conditions
       end
     end
   end
 
   describe "scope assembly" do
     before :each do
-      query_options = {}
       stream = double('stream',
                       :record_type => EventStream::Record,
-                      :active_record_type => @fake_record_type)
-      ar_cls = @fake_record_type
+                      :active_record_type => fake_record_type)
+      ar_cls = fake_record_type
       base_index = EventStream::Index.new(stream) do
         self.table "table"
-        self.entry_proc lambda { |a1, a2| nil }
+        self.entry_proc lambda { |_a1, _a2| }
         self.ar_scope_proc lambda { |a1, a2| ar_cls.where({ one: a1.id, two: a2.id }) }
       end
       @index = base_index.strategy_for(:active_record)
@@ -80,7 +79,7 @@ describe EventStream::IndexStrategy::ActiveRecord do
       arg2 = double('arg2', :id => "def")
       outcome = @index.for_ar_scope([arg1, arg2], {})
       outcome.paginate(per_page: 10)
-      conditions = @fake_record_type.applied_conditions
+      conditions = fake_record_type.applied_conditions
       expect(conditions).to include({ one: 'abc', two: 'def' })
       expect(conditions).to include("created_at DESC")
     end
@@ -95,17 +94,17 @@ describe EventStream::IndexStrategy::ActiveRecord do
           10
         end
       end
-      base_scope = @fake_record_type
-      expect(@fake_record_type).to receive(:where).with("created_at < ?", Time.zone.parse("2020-06-12T15:34:13-06:00")).and_return(@fake_record_type)
-      expect(@fake_record_type).to receive(:order).with("created_at DESC").and_return(@fake_record_type)
+      base_scope = fake_record_type
+      expect(fake_record_type).to receive(:where).with("created_at < ?", Time.zone.parse("2020-06-12T15:34:13-06:00")).and_return(fake_record_type)
+      expect(fake_record_type).to receive(:order).with("created_at DESC").and_return(fake_record_type)
       EventStream::IndexStrategy::ActiveRecord.pager_to_records(base_scope, pager_type.new)
     end
   end
 
   describe "internal Bookmarker" do
     it "just uses the created_at field for bookmarking" do
-      bookmarker = EventStream::IndexStrategy::ActiveRecord::Bookmarker.new(@fake_record_type)
-      model = @fake_record_type.new
+      bookmarker = EventStream::IndexStrategy::ActiveRecord::Bookmarker.new(fake_record_type)
+      model = fake_record_type.new
       bookmark_value = bookmarker.bookmark_for(model)
       expect(bookmark_value).to eq(model.created_at.to_s)
       expect(bookmarker.validate(bookmark_value)).to eq(true)

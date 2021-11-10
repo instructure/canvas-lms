@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../sharding_spec_helper'
-
 describe Canvas::CacheRegister do
   before :each do
     skip("require redis") unless Canvas.redis_enabled?
@@ -41,7 +39,7 @@ describe Canvas::CacheRegister do
   end
 
   context "reading" do
-    it "automaticallies set the key to the current time if it doesn't exist" do
+    it "automatically sets the key to the current time if it doesn't exist" do
       Timecop.freeze(time1) do
         @key = @user.cache_key(:enrollments)
         expect(@key).to include(to_stamp(time1))

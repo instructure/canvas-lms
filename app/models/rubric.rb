@@ -259,7 +259,6 @@ class Rubric < ActiveRecord::Base
   def update_criteria(params)
     self.without_versioning(&:save) if self.new_record?
     data = generate_criteria(params)
-    self.update_assessments_for_new_criteria(data.criteria)
     self.hide_score_total = params[:hide_score_total] if self.hide_score_total == nil || (self.association_count || 0) < 2
     self.data = data.criteria
     self.title = data.title
@@ -405,17 +404,13 @@ class Rubric < ActiveRecord::Base
     criteria.reject { |c| c[:ignore_for_scoring] }.map { |c| c[:points] }.reduce(:+)
   end
 
-  def update_assessments_for_new_criteria(new_criteria)
-    criteria = self.data
-  end
-
   # undo innocuous changes introduced by migrations which break `will_change_with_update?`
   def self.normalize(criteria)
     case criteria
     when Array
       criteria.map { |criterion| Rubric.normalize(criterion) }
     when Hash
-      h = criteria.reject { |k, v| v.blank? }.stringify_keys
+      h = criteria.reject { |_k, v| v.blank? }.stringify_keys
       h.delete('title') if h['title'] == h['description']
       h.each do |k, v|
         h[k] = Rubric.normalize(v) if v.is_a?(Hash) || v.is_a?(Array)

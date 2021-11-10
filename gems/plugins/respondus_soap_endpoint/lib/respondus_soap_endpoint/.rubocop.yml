@@ -1,0 +1,4 @@
+inherit_from: ../../../.rubocop.yml
+
+Naming:
+  Enabled: false # weird SOAP names

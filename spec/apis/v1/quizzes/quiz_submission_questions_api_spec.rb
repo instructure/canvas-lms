@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
+require_relative '../../api_spec_helper'
 require 'quiz_spec_helper'
 
 describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
@@ -172,7 +172,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
     end
 
     it 'is authorized for student' do
-      json = api_index({}, { raw: true })
+      api_index({}, { raw: true })
       assert_status(200)
     end
 
@@ -267,7 +267,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
     it 'is unauthorized' do
       skip
-      json = api_show({}, { raw: true })
+      api_show({}, { raw: true })
       assert_status(401)
     end
 

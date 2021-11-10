@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + "/common")
-require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
+require_relative "common"
+require_relative 'helpers/context_modules_common'
 
 describe "context modules" do
   include_context "in-process server selenium tests"
@@ -375,7 +375,6 @@ describe "context modules" do
         expect(el).to_not be_selected
         el.click
         go_to_modules
-        el = f "#context_modules .context_module[data-module-id='#{@mark_done_module.id}']"
         validate_context_module_status_icon(@mark_done_module.id, @completed_icon)
         expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .fulfilled")).to be_displayed
         expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .unfulfilled")).to_not be_displayed

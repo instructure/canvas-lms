@@ -166,7 +166,6 @@ class Folder < ActiveRecord::Base
     t :default_folder_name, 'New Folder'
     self.name = 'New Folder' if self.name.blank?
     self.name = self.name.strip.gsub(/\//, "_")
-    folder = self
     @update_sub_folders = false
     self.parent_folder_id = nil if !self.parent_folder || self.parent_folder.context != self.context || self.parent_folder_id == self.id
     self.context = self.parent_folder.context if self.parent_folder
@@ -282,7 +281,7 @@ class Folder < ActiveRecord::Base
 
     dup ||= Folder.new
     dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if { |k, v| [:id, :full_name, :parent_folder_id].include?(k.to_sym) }.each do |key, val|
+    self.attributes.except("id", "full_name", "parent_folder_id").each do |key, val|
       dup.send("#{key}=", val)
     end
     if self.unique_type && context.folders.active.where(:unique_type => self.unique_type).exists?
@@ -305,7 +304,6 @@ class Folder < ActiveRecord::Base
         end
       end
     end
-    context.log_merge_result(t :folder_created, "Folder \"%{name}\" created", :name => dup.full_name)
     dup.updated_at = Time.now
     dup.clone_updated = true
     dup

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe "CanvasSort::First" do
   it "is equal to itself" do
     expect(CanvasSort::First).to eq CanvasSort::First

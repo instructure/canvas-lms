@@ -117,7 +117,6 @@ describe Mutations::MoveOutcomeLinks do
   end
 
   it "writes group to context" do
-    prev_updated_at = @course.root_outcome_group.updated_at
     context = {
       current_user: @teacher
     }

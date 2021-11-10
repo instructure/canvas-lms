@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 require 'delayed/testing'
 
 describe Folder do
@@ -258,7 +257,7 @@ describe Folder do
     end
 
     it "returns nil on incomplete match" do
-      foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
+      @course.folders.create! name: 'foo', parent_folder: @root_folder
       expect(Folder.resolve_path(@course, "foo/bar")).to be_nil
     end
 

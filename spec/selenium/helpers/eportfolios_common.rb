@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative '../common'
 
 module EportfoliosCommon
-  def create_eportfolio(is_public = false)
+  def create_eportfolio
     get "/dashboard/eportfolios"
     f(".add_eportfolio_link").click
     wait_for_animations
@@ -76,7 +76,6 @@ module EportfoliosCommon
   end
 
   def move_section_to_bottom(section)
-    section_name = section.find_element(:css, '.name').text
     section.find_element(:css, '.section_settings_menu').click
     section.find_element(:css, '.move_section_link').click
     move_to_modal = f("[role=dialog][aria-label=\"Move Section\"]")
@@ -102,7 +101,6 @@ module EportfoliosCommon
   end
 
   def move_page_to_bottom(page)
-    page_name = page.find_element(:css, '.name').text
     page.find_element(:css, '.page_settings_menu').click
     page.find_element(:css, '.move_page_link').click
     move_to_modal = f("[role=dialog][aria-label=\"Move Page\"]")

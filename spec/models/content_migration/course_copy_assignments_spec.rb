@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/course_copy_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper')
+require_relative 'course_copy_helper'
+require_relative '../../lti2_spec_helper'
 
 describe ContentMigration do
   context "course copy assignments" do
@@ -604,7 +604,7 @@ describe ContentMigration do
         @topic.assignment = assignment
         @topic.save
 
-        @admin = account_admin_user(opts = {})
+        @admin = account_admin_user
       end
 
       it "copies for admin" do
@@ -756,7 +756,7 @@ describe ContentMigration do
       end
 
       it "copies grading standards referenced by exported assignments" do
-        gs1, gs2 = make_grading_standard(@copy_from, title: 'One'), make_grading_standard(@copy_from, title: 'Two')
+        _gs1, gs2 = make_grading_standard(@copy_from, title: 'One'), make_grading_standard(@copy_from, title: 'Two')
         assign = @copy_from.assignments.build
         assign.grading_standard = gs2
         assign.save!

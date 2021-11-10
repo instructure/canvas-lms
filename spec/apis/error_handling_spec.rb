@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
+require_relative 'api_spec_helper'
 
 describe "API Error Handling", type: :request do
   before :once do
@@ -40,7 +40,7 @@ describe "API Error Handling", type: :request do
       parsed = JSON.parse(errors)['errors']
       expect(parsed.size).to be > 0
       expect(errors).not_to match(/blah blah/)
-      parsed.each { |k, v| v.each { |i| expect(i.keys.sort).to eq ['attribute', 'message', 'type'] } }
+      parsed.each_value { |v| v.each { |i| expect(i.keys.sort).to eq ['attribute', 'message', 'type'] } }
     end
   end
 

@@ -42,7 +42,7 @@ module PostgreSQLAdapterExtensions
     ActiveRecord::ConnectionAdapters::PostgreSQL::ExplainPrettyPrinter.new.pp(exec_query(sql, "EXPLAIN", binds))
   end
 
-  def readonly?(table = nil, column = nil)
+  def readonly?
     return @readonly unless @readonly.nil?
 
     @readonly = in_recovery?

@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/groups_common')
+require_relative 'common'
+require_relative 'helpers/groups_common'
 require_relative '../selenium/people/pages/course_groups_page'
 
 describe "new groups" do
@@ -163,8 +163,8 @@ describe "new groups" do
       f(".icon-more").click
       wait_for_animations
       f(".message-all-unassigned").click
-      replace_content(fj('textarea[name="body"]'), "blah blah blah students")
-      fj(".btn-primary[data-text-when-loaded='Sent!']").click
+      replace_content(f('#message_all_unassigned'), "blah blah blah students")
+      f('button[type="submit"]').click
       wait_for_ajaximations
 
       expect(@course).to eq Conversation.last.context

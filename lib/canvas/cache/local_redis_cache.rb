@@ -56,7 +56,7 @@ module Canvas
       # canvas redis is patched to disallow "scan" operations,
       # but clearing the whole thing does technically remove any
       # keys matching this pattern
-      def delete_matched(pattern)
+      def delete_matched(_pattern)
         clear
       end
 

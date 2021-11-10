@@ -111,7 +111,7 @@ module CanvasQuizStatistics::Analyzers
     #     }
     #   ]
     # }
-    metric :answer_sets => [:answers, :matches] do |responses, answers, matches|
+    metric :answer_sets => [:answers, :matches] do |responses, _answers, matches|
       answer_sets = parse_answers do |answer, stats|
         stats[:answers] = matches.map do |match|
           build_answer(match[:match_id],
@@ -157,7 +157,7 @@ module CanvasQuizStatistics::Analyzers
       answers.detect { |a| a[:id] == match_id }
     end
 
-    def answer_present_but_unknown?(*args)
+    def answer_present_but_unknown?(*)
       false
     end
   end

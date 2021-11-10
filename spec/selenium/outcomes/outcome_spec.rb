@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative '../helpers/outcome_common'
-require File.expand_path(File.dirname(__FILE__) + '/pages/improved_outcome_management_page')
+require_relative 'pages/improved_outcome_management_page'
 
 describe "outcomes" do
   include_context "in-process server selenium tests"
@@ -173,7 +173,6 @@ describe "outcomes" do
     context "actions" do
       it "does not render an HTML-escaped title in outcome directory while editing", priority: "2", test_id: 250554 do
         title = 'escape & me <<->> if you dare'
-        escaped_title = 'escape &amp; me &lt;&lt;-&gt;&gt; if you dare'
         who_to_login == 'teacher' ? @context = @course : @context = account
         outcome_model
         get outcome_url

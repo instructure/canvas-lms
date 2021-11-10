@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common')
+require_relative '../common'
+require_relative '../helpers/calendar2_common'
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
@@ -232,8 +232,8 @@ describe "calendar2" do
     end
 
     it "includes todo items from both" do
-      page1 = @course1.wiki_pages.create!(title: 'Page1', todo_date: Date.today, workflow_state: 'unpublished')
-      page2 = @course2.wiki_pages.create!(title: 'Page2', todo_date: Date.today, workflow_state: 'published')
+      @course1.wiki_pages.create!(title: 'Page1', todo_date: Time.zone.today, workflow_state: 'unpublished')
+      @course2.wiki_pages.create!(title: 'Page2', todo_date: Time.zone.today, workflow_state: 'published')
       get '/calendar2'
       wait_for_ajax_requests
       fj('.fc-title:contains("Page1")').click

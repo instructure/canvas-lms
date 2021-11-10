@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/course_copy_helper.rb')
+require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "cross-institution migration" do
@@ -59,7 +59,7 @@ describe ContentMigration do
 
       # account question bank in course quiz
       @bank = @account.assessment_question_banks.create!(:title => "account bank")
-      aq = @bank.assessment_questions.create!(:question_data =>
+      @bank.assessment_questions.create!(:question_data =>
         { 'question_name' => 'test question 1', 'question_type' => 'essay_question', 'question_text' => 'blah' })
       @quiz = @copy_from.quizzes.create!
       @quiz.quiz_groups.create! pick_count: 1, assessment_question_bank_id: @bank.id

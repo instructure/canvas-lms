@@ -72,5 +72,5 @@ class AssignmentStudentVisibility < ActiveRecord::Base
   end
 
   # readonly? is not checked in destroy though
-  before_destroy { |record| raise ActiveRecord::ReadOnlyRecord }
+  before_destroy { raise ActiveRecord::ReadOnlyRecord }
 end

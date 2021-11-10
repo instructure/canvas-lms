@@ -18,10 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
-
 describe ConversationParticipant do
-  it "correctlies set up conversations" do
+  it "sets up conversations correctly" do
     sender = user_factory
     recipient = user_factory
     convo = sender.initiate_conversation([recipient])
@@ -48,7 +46,7 @@ describe ConversationParticipant do
     expect(recipient.unread_conversations_count).to eq 0
   end
 
-  it "correctlies manage messages" do
+  it "manages messages correctly" do
     sender = user_factory
     recipient = user_factory
     convo = sender.initiate_conversation([recipient])

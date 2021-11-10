@@ -219,7 +219,7 @@ module CC
         end
       end
 
-      def short_answer_response_str(node, question)
+      def short_answer_response_str(node, _question)
         node.response_str(
           :ident => "response1",
           :rcardinality => 'Single'
@@ -258,7 +258,7 @@ module CC
         end
       end
 
-      def calculated_response_str(node, question)
+      def calculated_response_str(node, _question)
         node.response_str(
           :ident => 'response1',
           :rcardinality => 'Single'
@@ -403,7 +403,7 @@ module CC
         end
       end
 
-      def essay_resprocessing(node, question)
+      def essay_resprocessing(node, _question)
         other_respcondition(node)
       end
 
@@ -424,7 +424,7 @@ module CC
           unless answer['comments'].blank? && answer['comments_html'].blank?
             node.respcondition do |r_node|
               r_node.conditionvar do |c_node|
-                c_node.not do |n_node|
+                c_node.not do
                   c_node.varequal(answer['match_id'], :respident => "response_#{answer['id']}")
                 end
               end
@@ -451,7 +451,7 @@ module CC
         end
       end
 
-      def calculated_resprocessing(node, question)
+      def calculated_resprocessing(node, _question)
         node.respcondition(:title => 'correct') do |r_node|
           r_node.conditionvar do |c_node|
             c_node.other

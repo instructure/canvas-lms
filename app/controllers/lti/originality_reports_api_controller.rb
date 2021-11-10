@@ -243,7 +243,8 @@ module Lti
     #
     # @returns OriginalityReport
     def update
-      if @report.update(update_report_params)
+      updates = { error_message: nil }.merge(update_report_params)
+      if @report.update(updates)
         OriginalityReport.delay_if_production.copy_to_group_submissions!(report_id: @report.id, user_id: @report.submission.user_id)
         render json: api_json(@report, @current_user, session)
       else
@@ -278,14 +279,7 @@ module Lti
     end
 
     def create_attributes
-      [
-        :originality_score,
-        :error_message,
-        :file_id,
-        :originality_report_file_id,
-        :originality_report_url,
-        :workflow_state
-      ].freeze
+      (update_attributes + [:file_id]).freeze
     end
 
     def update_attributes

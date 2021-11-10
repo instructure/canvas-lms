@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/course_copy_helper.rb')
+require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "course copy for external content" do
@@ -137,15 +137,15 @@ describe ContentMigration do
 
     it "sends a list of exported assets to the external service when selectively exporting" do
       assmt = @copy_from.assignments.create!
-      other_assmt = @copy_from.assignments.create!
+      @copy_from.assignments.create!
       graded_quiz = @copy_from.quizzes.create!
       graded_quiz.generate_quiz_data
       graded_quiz.workflow_state = 'available'
       graded_quiz.save!
 
       cm = @copy_from.context_modules.create!(:name => "some module")
-      item = cm.add_item(:id => assmt.id, :type => 'assignment')
-      item2 = cm.add_item(:id => graded_quiz.id, :type => 'quiz')
+      cm.add_item(:id => assmt.id, :type => 'assignment')
+      cm.add_item(:id => graded_quiz.id, :type => 'quiz')
 
       allow(TestExternalContentService).to receive(:applies_to_course?).and_return(true)
       allow(TestExternalContentService).to receive(:export_completed?).and_return(true)

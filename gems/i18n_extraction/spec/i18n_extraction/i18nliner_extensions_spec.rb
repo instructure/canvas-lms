@@ -98,7 +98,7 @@ describe I18nliner::Extractors::RubyExtractor do
       expect { extract "t 'dude', 'this is <em>important</em>'" }.to raise_error(/html tags in default translation/)
     end
 
-    it "generallies be ok with angle brackets" do
+    it "is generally ok with angle brackets" do
       expect(extract("t 'obvious', 'TIL 1 < 2'")).to eq({ 'asdf.obvious' => 'TIL 1 < 2' })
       expect(extract("t 'email', 'please enter an email, e.g. Joe User <joe@example.com>'")).to eq({ 'asdf.email' => 'please enter an email, e.g. Joe User <joe@example.com>' })
     end

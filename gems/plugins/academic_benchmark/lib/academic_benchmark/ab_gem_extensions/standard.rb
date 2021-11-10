@@ -26,7 +26,7 @@ module AcademicBenchmarks
         number&.prefix_enhanced
       end
 
-      def build_outcomes(ratings = {}, parent = nil)
+      def build_outcomes(ratings = {}, _parent = nil)
         hash = {
           migration_id: guid,
           vendor_guid: guid,

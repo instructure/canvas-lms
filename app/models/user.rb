@@ -722,7 +722,7 @@ class User < ActiveRecord::Base
         end
       end
 
-      to_delete += current_associations.map { |k, v| v[0] }
+      to_delete += current_associations.map { |_k, v| v[0] }
       UserAccountAssociation.where(:id => to_delete).delete_all unless incremental || to_delete.empty?
     end
   end
@@ -1266,7 +1266,7 @@ class User < ActiveRecord::Base
     can :read_profile and can :view_statistics and can :read_reports and can :read_grades
 
     given { |user| self.check_accounts_right?(user, :manage_user_logins) }
-    can :read and can :read_reports and can :read_profile and can :api_show_user
+    can :read and can :read_reports and can :read_profile and can :api_show_user and can :terminate_sessions
 
     given { |user| self.check_accounts_right?(user, :read_roster) }
     can :read_full_profile and can :api_show_user
@@ -1447,7 +1447,7 @@ class User < ActiveRecord::Base
     end
   end
 
-  def report_avatar_image!(associated_context = nil)
+  def report_avatar_image!
     if self.avatar_state == :approved || self.avatar_state == :locked
       self.avatar_state = 're_reported'
     else
@@ -1799,25 +1799,6 @@ class User < ActiveRecord::Base
       :otp_secret_key_salt,
       :collkey
     ]
-  end
-
-  attr_accessor :merge_mappings
-  attr_accessor :merge_results
-
-  def merge_mapped_id(*args)
-    nil
-  end
-
-  def map_merge(*args)
-  end
-
-  def log_merge_result(text)
-    @merge_results ||= []
-    @merge_results << text
-  end
-
-  def warn_merge_result(text)
-    record_merge_result(text)
   end
 
   def secondary_identifier
@@ -2748,7 +2729,7 @@ class User < ActiveRecord::Base
   def menu_courses(enrollment_uuid = nil, opts = {})
     return @menu_courses if @menu_courses
 
-    can_favorite = proc { |c| !(c.elementary_subject_course? || c.elementary_homeroom_course?) || c.user_is_admin?(self) }
+    can_favorite = proc { |c| !(c.elementary_subject_course? || c.elementary_homeroom_course?) || c.user_is_admin?(self) || self.roles(c.root_account).include?('teacher') }
     # this terribleness is so we try to make sure that the newest courses show up in the menu
     courses = self.courses_with_primary_enrollment(:current_and_invited_courses, enrollment_uuid, opts)
                   .sort_by { |c| [c.primary_enrollment_rank, Time.now - (c.primary_enrollment_date || Time.now)] }

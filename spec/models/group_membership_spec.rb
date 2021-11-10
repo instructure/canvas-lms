@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe GroupMembership do
   it "ensures a mutually exclusive relationship" do
     category = Account.default.group_categories.create!(:name => "blah")
@@ -379,7 +377,7 @@ describe GroupMembership do
   it "runs due date updates for discussion assignments" do
     group_discussion_assignment
     @assignment.update_attribute(:only_visible_to_overrides, true)
-    override = @assignment.assignment_overrides.create!(:set => @group1)
+    @assignment.assignment_overrides.create!(:set => @group1)
     @student1 = student_in_course(course: @course, active_all: true).user
     membership = @group1.add_user(@student1)
     @topic.child_topic_for(@student1).reply_from(:user => @student1, :text => "sup")

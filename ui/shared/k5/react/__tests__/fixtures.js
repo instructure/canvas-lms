@@ -91,6 +91,39 @@ export const MOCK_ASSIGNMENTS = [
   }
 ]
 
+export const MOCK_OBSERVEE_ASSIGNMENTS = [
+  {
+    context_code: 'course_31',
+    context_color: null,
+    context_name: 'Math',
+    html_url: 'http://localhost:3000/courses/31/assignments/111',
+    id: 'assignment_111',
+    important_dates: true,
+    start_at: '2021-10-02T13:59:59Z',
+    title: 'Number theory',
+    type: 'assignment',
+    assignment: {
+      due_at: '2021-10-02T13:59:59Z', // 7:59am MT, 7:44pm Kathmandu
+      submission_types: ['online_text_entry', 'online_url', 'media_recording', 'online_upload']
+    }
+  },
+  {
+    context_code: 'course_32',
+    context_color: '#CCCCCC',
+    context_name: 'Physics',
+    html_url: 'http://localhost:3000/courses/32/assignments/200',
+    id: 'assignment_200',
+    important_dates: true,
+    start_at: '2021-010-04T05:59:59Z',
+    title: 'Dynamics',
+    type: 'assignment',
+    assignment: {
+      due_at: '2021-10-04T11:30:00Z', // 5:30am MT, 5:15pm Kathmandu
+      submission_types: ['online_quiz']
+    }
+  }
+]
+
 export const MOCK_CARDS = [
   {
     id: '1',
@@ -165,6 +198,19 @@ export const MOCK_EVENTS = [
     important_dates: true,
     start_at: '2021-06-30T07:00:00Z', // 1am MT, 12:45pm Kathmandu
     title: 'Morning Yoga',
+    type: 'event'
+  }
+]
+
+export const MOCK_OBSERVEE_EVENTS = [
+  {
+    context_color: '#CCCCCC',
+    context_name: 'Math',
+    html_url: 'http://localhost:3000/calendar?event_id=99&include_contexts=course_31',
+    id: '100',
+    important_dates: true,
+    start_at: '2021-10-30T07:00:00Z', // 1am MT, 12:45pm Kathmandu
+    title: 'First Quiz',
     type: 'event'
   }
 ]

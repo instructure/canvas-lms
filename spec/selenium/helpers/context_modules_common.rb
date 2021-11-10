@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative '../common'
 
 module ContextModulesCommon
   def io
@@ -378,7 +378,7 @@ module ContextModulesCommon
     expect(f('#content_tag_indent_select')).to be_displayed
   end
 
-  def lock_check_click(form)
+  def lock_check_click
     move_to_click('label[for=unlock_module_at]')
   end
 

@@ -35,15 +35,15 @@ module CommunicationChannelsHelper
       return user.name unless pseudonym
     end
 
-    if !(conflicting_users = merge_opportunities.select { |(user, pseudonyms)| user != pseudonym.user && user.name == pseudonym.user.name }).empty?
+    if (conflicting_users = merge_opportunities.select { |u, _pseudonym| u != pseudonym.user && u.name == pseudonym.user.name }).empty?
+      pseudonym.user.name
+    else
       conflicting_pseudonyms = conflicting_users.map(&:last).flatten
       if conflicting_pseudonyms.find { |p| p.account != pseudonym.account }
         "#{pseudonym.user.name} (#{pseudonym.account.name} - #{pseudonym.unique_id})"
       else
         "#{pseudonym.user.name} (#{pseudonym.unique_id})"
       end
-    else
-      pseudonym.user.name
     end
   end
 end

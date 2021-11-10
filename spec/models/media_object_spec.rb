@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe MediaObject do
   context "loading with legacy support" do
     it "loads by either media_id or old_media_id" do
@@ -32,7 +30,7 @@ describe MediaObject do
 
     it "does not find an arbitrary MediaObject when given a nil id" do
       course_factory
-      mo = factory_with_protected_attributes(MediaObject, :media_id => '0_abcdefgh', :context => @course)
+      factory_with_protected_attributes(MediaObject, :media_id => '0_abcdefgh', :context => @course)
       expect(MediaObject.by_media_id(nil).first).to be_nil
     end
 

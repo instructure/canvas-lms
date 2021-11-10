@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
-
 class TestApiInstance
   include Api
   def initialize(root_account, current_user)
@@ -398,9 +396,9 @@ describe Api do
       account1 = account_model
       account2 = account_model
       user1 = user_with_pseudonym :username => "sisuser1@example.com", :account => account1
-      user2 = user_with_pseudonym :username => "sisuser2@example.com", :account => account2
+      user_with_pseudonym :username => "sisuser2@example.com", :account => account2
       user3 = user_with_pseudonym :username => "sisuser3@example.com", :account => account1
-      user4 = user_with_pseudonym :username => "sisuser3@example.com", :account => account2
+      user_with_pseudonym :username => "sisuser3@example.com", :account => account2
       user5 = user_factory :account => account1
       user6 = user_factory :account => account2
       expect(Api.map_ids(["sis_login_id:sisuser1@example.com", "sis_login_id:sisuser2@example.com", "sis_login_id:sisuser3@example.com", user5.id, user6.id], User, account1).sort).to eq [user1.id, user3.id, user5.id, user6.id].sort
@@ -439,8 +437,6 @@ describe Api do
 
     it 'does not try and make params when no non-ar_id columns have returned without ar_id columns' do
       collection = double()
-      object1 = double()
-      object2 = double()
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
                                             .and_return({})
@@ -603,7 +599,7 @@ describe Api do
   end
 
   context 'sis_mappings' do
-    it 'correctlies capture course lookups' do
+    it 'captures course lookups correctly' do
       lookups = Api.sis_find_sis_mapping_for_collection(Course)[:lookups]
       expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq ["sis_source_id", "1"]
       expect(Api.sis_parse_id("sis_term_id:1", lookups)).to eq [nil, nil]
@@ -614,7 +610,7 @@ describe Api do
       expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
     end
 
-    it 'correctlies capture enrollment_term lookups' do
+    it 'captures enrollment_term lookups correctly' do
       lookups = Api.sis_find_sis_mapping_for_collection(EnrollmentTerm)[:lookups]
       expect(Api.sis_parse_id("sis_term_id:1", lookups)).to eq ["sis_source_id", "1"]
       expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
@@ -625,7 +621,7 @@ describe Api do
       expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
     end
 
-    it 'correctlies capture user lookups' do
+    it 'capture user lookups correctly' do
       lookups = Api.sis_find_sis_mapping_for_collection(User)[:lookups]
       expect(Api.sis_parse_id("sis_user_id:1", lookups)).to eq ["pseudonyms.sis_user_id", "1"]
       expect(Api.sis_parse_id("sis_login_id:1", lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('1')"]
@@ -638,7 +634,7 @@ describe Api do
         eq ["users.uuid", "tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"]
     end
 
-    it 'correctlies capture account lookups' do
+    it 'captures account lookups correctly' do
       lookups = Api.sis_find_sis_mapping_for_collection(Account)[:lookups]
       expect(Api.sis_parse_id("sis_account_id:1", lookups)).to eq ["sis_source_id", "1"]
       expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
@@ -649,7 +645,7 @@ describe Api do
       expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
     end
 
-    it 'correctlies capture course_section lookups' do
+    it 'captures course_section lookups correctly' do
       lookups = Api.sis_find_sis_mapping_for_collection(CourseSection)[:lookups]
       expect(Api.sis_parse_id("sis_section_id:1", lookups)).to eq ["sis_source_id", "1"]
       expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
@@ -660,7 +656,7 @@ describe Api do
       expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
     end
 
-    it 'correctlies capture group_categories lookups' do
+    it 'captures group_categories lookups correctly' do
       lookups = Api.sis_find_sis_mapping_for_collection(GroupCategory)[:lookups]
       expect(Api.sis_parse_id("sis_group_category_id:1", lookups)).to eq ["sis_source_id", "1"]
       expect(Api.sis_parse_id("sis_section_id:1", lookups)).to eq [nil, nil]
@@ -672,27 +668,27 @@ describe Api do
       expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
     end
 
-    it 'correctlies query the course table' do
+    it 'queries the course table correctly' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(Course)
       expect(Api.relation_for_sis_mapping_and_columns(Course, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
 
-    it 'correctlies query the enrollment_term table' do
+    it 'queries the enrollment_term table correctly' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(EnrollmentTerm)
       expect(Api.relation_for_sis_mapping_and_columns(EnrollmentTerm, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
 
-    it 'correctlies query the user table' do
+    it 'queries the user table correctly' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(User)
       expect(Api.relation_for_sis_mapping_and_columns(User, { "pseudonyms.sis_user_id" => ["1"], "pseudonyms.unique_id" => ["1"], "users.id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/\(pseudonyms.account_id = #{Account.default.id} AND pseudonyms.sis_user_id IN \('1'\)\) OR \(pseudonyms.account_id = #{Account.default.id} AND pseudonyms.unique_id IN \('1'\)\) OR users.id IN \('1'\)/)
     end
 
-    it 'correctlies query the account table' do
+    it 'queries the account table correctly' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(Account)
       expect(Api.relation_for_sis_mapping_and_columns(Account, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
 
-    it 'correctlies query the course_section table' do
+    it 'queries the course_section table correctly' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(CourseSection)
       expect(Api.relation_for_sis_mapping_and_columns(CourseSection, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end

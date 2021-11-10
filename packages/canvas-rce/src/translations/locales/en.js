@@ -64,9 +64,6 @@ const locale = {
   "auto_saved_content_exists_would_you_like_to_load_t_fee528f2": {
     "message": "Auto-saved content exists. Would you like to load the auto-saved content instead?"
   },
-  "automatically_open_an_in_line_preview_preview_disp_ed784ffe": {
-    "message": "Automatically open an in-line preview. (Preview displays only after saving)"
-  },
   "available_folders_694d0436": { "message": "Available folders" },
   "below_81d4dceb": { "message": "Below" },
   "bottom_third_5f5fec1d": { "message": "Bottom Third" },
@@ -102,6 +99,9 @@ const locale = {
     "message": "Close a menu or dialog. Also returns you to the editor area"
   },
   "close_d634289d": { "message": "Close" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "Closed caption file must be less than { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "Closed Captions/Subtitles"
   },
@@ -135,6 +135,8 @@ const locale = {
   "creative_commons_license_725584ae": {
     "message": "Creative Commons License:"
   },
+  "crop_image_807ebb08": { "message": "Crop Image" },
+  "current_image_f16c249c": { "message": "Current Image" },
   "custom_6979cd81": { "message": "Custom" },
   "date_added_ed5ad465": { "message": "Date Added" },
   "decorative_image_3c28aa7d": { "message": "Decorative Image" },
@@ -150,7 +152,6 @@ const locale = {
   "details_98a31b68": { "message": "Details" },
   "dimensions_45ddb7b7": { "message": "Dimensions" },
   "directionality_26ae9e08": { "message": "Directionality" },
-  "disable_in_line_preview_2a675175": { "message": "Disable in-line preview." },
   "discussions_a5f96392": { "message": "Discussions" },
   "discussions_index_6c36ced": { "message": "Discussions Index" },
   "display_options_315aba85": { "message": "Display Options" },
@@ -288,11 +289,11 @@ const locale = {
   "middle_27dc1d5": { "message": "Middle" },
   "miscellaneous_e9818229": { "message": "Miscellaneous" },
   "modules_c4325335": { "message": "Modules" },
+  "multi_color_image_63d7372f": { "message": "Multi Color Image" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Must be at least { width } x { height }px"
   },
   "my_files_2f621040": { "message": "My files" },
-  "my_images_427f9b0c": { "message": "My Images" },
   "name_1aed4a1b": { "message": "Name" },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigate through the menu or toolbar"
@@ -311,6 +312,7 @@ const locale = {
     "message": "No results found for { term }."
   },
   "none_3b5e34d2": { "message": "None" },
+  "none_selected_b93d56d2": { "message": "None Selected" },
   "octagon_e48be9f": { "message": "Octagon" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Open this keyboard shortcuts dialog"
@@ -359,6 +361,7 @@ const locale = {
   "saved_buttons_and_icons_8278eed2": { "message": "Saved Buttons and Icons" },
   "search_280d00bd": { "message": "Search" },
   "search_term_b2d2235": { "message": "Search Term" },
+  "select_crop_shape_d441feeb": { "message": "Select crop shape" },
   "select_language_7c93a900": { "message": "Select Language" },
   "selected_274ce24f": { "message": "Selected" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
@@ -368,9 +371,10 @@ const locale = {
   "show_image_options_1e2ecc6b": { "message": "Show image options" },
   "show_link_options_545338fd": { "message": "Show link options" },
   "show_video_options_6ed3721a": { "message": "Show video options" },
+  "single_color_image_4e5d4dbc": { "message": "Single Color Image" },
   "size_b30e1077": { "message": "Size" },
-  "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
-    "message": "Size of { file } is greater than the maximum { max } MB allowed file size."
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "Size of caption file is greater than the maximum { max } kb allowed file size."
   },
   "small_b070434a": { "message": "Small" },
   "something_went_wrong_89195131": { "message": "Something went wrong." },

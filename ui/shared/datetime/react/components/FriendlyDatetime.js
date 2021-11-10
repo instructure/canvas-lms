@@ -47,7 +47,7 @@ class FriendlyDatetime extends Component {
   render = _.memoize(
     () => {
       // Separate props not used by the `time` element
-      const {showTime, ...timeElementProps} = this.props
+      const {prefixMobile, showTime, ...timeElementProps} = this.props
 
       let datetime = this.props.dateTime
       if (!datetime) {
@@ -76,7 +76,7 @@ class FriendlyDatetime extends Component {
       if (fixedPrefix && !fixedPrefix.endsWith(' ')) {
         fixedPrefix += ' '
       }
-      let fixedPrefixMobile = this.props.prefixMobile
+      let fixedPrefixMobile = prefixMobile
       if (fixedPrefixMobile && !fixedPrefixMobile.endsWith(' ')) {
         fixedPrefixMobile += ' '
       }

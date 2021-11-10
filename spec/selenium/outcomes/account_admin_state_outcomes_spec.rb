@@ -16,8 +16,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/outcome_common')
+require_relative '../common'
+require_relative '../helpers/outcome_common'
 
 describe "account admin outcomes" do
   include_examples "in-process server selenium tests"
@@ -104,7 +104,7 @@ describe "account admin outcomes" do
     end
 
     describe 'with improved_outcome_management enabled' do
-      require File.expand_path(File.dirname(__FILE__) + '/pages/improved_outcome_management_page')
+      require_relative 'pages/improved_outcome_management_page'
       include ImprovedOutcomeManagementPage
 
       before(:each) do
@@ -168,9 +168,9 @@ describe "account admin outcomes" do
       it "does not fail while filtering the common core group", priority: "2", test_id: 250010 do
         # setup fake state data, so that it has to paginate
         root_group = LearningOutcomeGroup.global_root_outcome_group
-        fake_cc = root_group.child_outcome_groups.create!(:title => "Fake Common Core")
+        root_group.child_outcome_groups.create!(:title => "Fake Common Core")
         11.times { root_group.child_outcome_groups.create!(:title => "G is after F") }
-        last_group = root_group.child_outcome_groups.create!(:title => "Z is last")
+        root_group.child_outcome_groups.create!(:title => "Z is last")
 
         # go to the find panel
         get outcome_url

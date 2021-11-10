@@ -273,7 +273,7 @@ class FoldersController < ApplicationController
             :sub_folders => sub_folders_scope.by_position.map { |f| f.as_json(folders_options) },
             :files => files.map { |f|
               f.as_json(files_options).tap { |json|
-                json['attachment'].merge! doc_preview_json(f, @current_user)
+                json['attachment'].merge! doc_preview_json(f)
               }
             }
           }

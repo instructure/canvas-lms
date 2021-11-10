@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
 require_relative '../selenium/helpers/groups_common'
 require_relative '../lti2_spec_helper'
 
@@ -4295,7 +4294,7 @@ describe Assignment do
         @a.peer_review_count = 2
         srand(1) # this isn't really necessary but given the random nature i wanted to make it fail consistently without the code fix
         res = @a.assign_peer_reviews
-        expect(res.group_by(&:user_id).map { |k, v| v.count }.uniq).to eq [2] # everybody should get 2 reviews
+        expect(res.group_by(&:user_id).values.map(&:count).uniq).to eq [2] # everybody should get 2 reviews
       end
 
       it "assigns peer reviews to members of the same group when enabled" do
@@ -6416,7 +6415,7 @@ describe Assignment do
       end
 
       it "does not flag attributes as frozen for admin" do
-        @att_map.each_pair do |att, setting|
+        @att_map.each_key do |att|
           expect(@asmnt.att_frozen?(att, @admin)).to eq false
         end
       end
@@ -7136,7 +7135,7 @@ describe Assignment do
       gc = @course.group_categories.create! name: "Homework Groups"
       @assignment.update group_category_id: gc.id,
                          grade_group_students_individually: false
-      g1, g2 = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
+      g1, _g2 = Array.new(2) { |i| gc.groups.create! name: "Group #{i}", context: @course }
       g1.add_user(s1)
       g1.add_user(s2)
 
@@ -8233,7 +8232,6 @@ describe Assignment do
   end
 
   describe '.with_student_submission_count' do
-    require_relative '../sharding_spec_helper'
     specs_require_sharding
 
     it "doesn't reference multiple shards when accessed from a different shard" do

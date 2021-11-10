@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../api_spec_helper'
 
 def call_setting(opts)
   status_assertion = opts[:assert_unauthorized] ? { :expected_status => 401 } : {}
@@ -53,7 +53,7 @@ describe 'ProfileController', type: :request do
         course_with_teacher(:active_all => true)
         user = user_with_pseudonym
 
-        json = call_setting(as_user: @teacher, for_user: user, assert_unauthorized: true)
+        call_setting(as_user: @teacher, for_user: user, assert_unauthorized: true)
       end
     end
 
@@ -68,7 +68,7 @@ describe 'ProfileController', type: :request do
         user_one = user_with_pseudonym(:active_user => true)
         user_two = user_with_pseudonym(:active_user => true, :user => user_factory)
 
-        json = call_setting(as_user: user_one, for_user: user_two, assert_unauthorized: true)
+        call_setting(as_user: user_one, for_user: user_two, assert_unauthorized: true)
       end
     end
   end

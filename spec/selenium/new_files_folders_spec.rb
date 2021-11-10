@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
+require_relative 'common'
+require_relative 'helpers/files_common'
 
 describe "better_file_browsing, folders" do
   include_context "in-process server selenium tests"
@@ -112,7 +112,7 @@ describe "better_file_browsing, folders" do
       folder = @course.folders.where(:name => folder_name).first
       expect(folder).to_not be_nil
       file_name = "some silly file"
-      att = @course.attachments.create!(:display_name => file_name, :uploaded_data => default_uploaded_data, :folder => folder)
+      @course.attachments.create!(:display_name => file_name, :uploaded_data => default_uploaded_data, :folder => folder)
       folder_link = fln(folder_name, f('.ef-directory'))
       expect(folder_link).to be_present
       folder_link.click

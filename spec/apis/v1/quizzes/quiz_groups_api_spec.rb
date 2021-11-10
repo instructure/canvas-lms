@@ -17,8 +17,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../locked_spec')
+require_relative '../../api_spec_helper'
+require_relative '../../locked_spec'
 
 describe Quizzes::QuizGroupsController, type: :request do
   before :once do

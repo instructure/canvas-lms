@@ -17,7 +17,7 @@
  *
  */
 
-import React, {useEffect, useState, useRef} from 'react'
+import React, {useEffect, useState, useRef, useCallback} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!dashboard_grades_page'
 
@@ -25,11 +25,12 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 
-import {fetchGrades, fetchGradesForGradingPeriod, getCourseGrades} from '@canvas/k5/react/utils'
+import {fetchGradesForGradingPeriod, getCourseGrades, transformGrades} from '@canvas/k5/react/utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import GradesSummary from './GradesSummary'
 import GradingPeriodSelect, {ALL_PERIODS_OPTION} from './GradingPeriodSelect'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
+import useFetchApi from '@canvas/use-fetch-api-hook'
 
 export const getGradingPeriodsFromCourses = courses =>
   courses
@@ -112,34 +113,50 @@ export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUs
   const [selectedGradingPeriodId, selectGradingPeriodId] = useState('')
   const [specificPeriodGrades, setSpecificPeriodGrades] = useState([])
   const userRef = useRef(null)
-
-  const loadCourses = includeObservedUsers => {
-    setLoading(true)
-    fetchGrades(includeObservedUsers)
-      .then(results => results.filter(c => !c.isHomeroom))
-      .then(results => {
-        setCourses(results)
-        setCoursesByUser(getCoursesByObservee(results, observedUserId, currentUser))
-        setGradingPeriods(getGradingPeriodsFromCourses(results))
-        setLoading(false)
-      })
-      .catch(err => {
-        showFlashError(I18n.t('Failed to load the grades tab'))(err)
-        setLoading(false)
-      })
+  const includeObservedUsers = currentUserRoles.includes('observer')
+  const include = [
+    'total_scores',
+    'current_grading_period_scores',
+    'grading_periods',
+    'course_image'
+  ]
+  if (includeObservedUsers) {
+    include.push('observed_users')
   }
 
+  useFetchApi({
+    success: useCallback(
+      results => {
+        if (results) {
+          const subjects = transformGrades(results).filter(c => !c.isHomeroom)
+          setCourses(subjects)
+          setCoursesByUser(getCoursesByObservee(subjects, observedUserId, currentUser))
+          setGradingPeriods(getGradingPeriodsFromCourses(subjects))
+          setLoading(false)
+        }
+      },
+      [currentUser] // eslint-disable-line react-hooks/exhaustive-deps
+    ),
+    error: useCallback(err => {
+      showFlashError(I18n.t('Failed to load the grades tab'))(err)
+      setLoading(false)
+    }, []),
+    loading: setLoading,
+    path: '/api/v1/users/self/courses',
+    fetchAllPages: true,
+    params: {
+      enrollment_state: 'active',
+      per_page: '100',
+      include
+    },
+    forceResult: visible ? undefined : false
+  })
   useEffect(() => {
-    if (visible) {
-      if (!courses && currentUserRoles?.length > 0) {
-        const includeObservedUser = currentUserRoles.includes('observer')
-        loadCourses(includeObservedUser)
-      } else if (courses && userRef.current !== observedUserId) {
-        setCoursesByUser(getCoursesByObservee(courses, observedUserId, currentUser))
-        userRef.current = observedUserId
-      }
+    if (visible && courses && userRef.current !== observedUserId) {
+      setCoursesByUser(getCoursesByObservee(courses, observedUserId, currentUser))
+      userRef.current = observedUserId
     }
-  }, [courses, visible, observedUserId, currentUser, currentUserRoles]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [courses, visible, observedUserId, currentUser])
 
   const loadSpecificPeriodGrades = gradingPeriodId => {
     if (gradingPeriodId === ALL_PERIODS_OPTION) {

@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative '../common'
 require_relative '../rcs/pages/rce_next_page'
 module WikiAndTinyCommon
   include RCENextPage
@@ -25,17 +25,15 @@ module WikiAndTinyCommon
   end
 
   def clear_wiki_rce
-    element = wiki_page_body
-    wait_for_tiny(element)
+    wait_for_rce
     clear_tiny(element)
     element
   end
 
   def type_in_wiki_html(html)
     element = wiki_page_body
-    switch_editor_views(element)
+    switch_editor_views
     element.send_keys(html)
-    switch_editor_views(element)
   end
 
   def wiki_page_tools_file_tree_setup(skip_tree = false, skip_image_list = false)
@@ -99,7 +97,7 @@ module WikiAndTinyCommon
   def manually_create_wiki_page(title, body)
     f('.new_page').click
     wait_for_ajaximations
-    wait_for_tiny(wiki_page_body)
+    wait_for_rce
     replace_content(f('#title'), title)
     type_in_tiny('textarea.body', body)
     expect_new_page_load { f('form.edit-form button.submit').click }
@@ -154,7 +152,7 @@ module WikiAndTinyCommon
 
   def add_image_to_rce
     get "/courses/#{@course.id}/pages/front-page/edit"
-    wait_for_tiny(f('form.edit-form .edit-content'))
+    wait_for_rce
     fj('[role="presentation"]:contains("Images")').click
     fj('button:contains(" Upload a new image")').click
     alt_text = 'image file'
@@ -192,13 +190,13 @@ module WikiAndTinyCommon
       .attachments
       .create!(filename: title, context: @course) { |a| a.content_type = 'text/plain' }
     get "/courses/#{@course.id}/pages/front-page/edit"
-    wait_for_tiny(f('form.edit-form .edit-content'))
+    wait_for_rce
     fj('[role="presentation"]:contains("Files")').click
     fj("aside li:contains('#{title}')").click
     in_frame wiki_page_body_ifr_id do
       expect(f('#tinymce a').attribute('href')).to include course_file_id_path(@text_file)
     end
-    switch_editor_views(wiki_page_body)
+    switch_editor_views
     expect(find_css_in_string(wiki_page_body[:value], '.instructure_file_link')).not_to be_empty
     force_click('form.edit-form button.submit')
     wait_for_ajax_requests
@@ -248,22 +246,27 @@ module WikiAndTinyCommon
 
   def visit_front_page_edit(course)
     get "/courses/#{course.id}/pages/front-page/edit"
+    wait_for_rce
   end
 
   def visit_existing_wiki_edit(course, page_name)
     get "/courses/#{course.id}/pages/#{page_name}/edit"
+    wait_for_rce
   end
 
   def visit_new_announcement_page(course)
     get "/courses/#{course.id}/discussion_topics/new?is_announcement=true"
+    wait_for_rce
   end
 
   def visit_new_assignment_page(course)
     get "/courses/#{course.id}/assignments/new"
+    wait_for_rce
   end
 
   def visit_new_discussion_page(course)
     get "/courses/#{course.id}/discussion_topics/new"
+    wait_for_rce
   end
 
   def visit_new_quiz_page(course, quiz)
@@ -272,6 +275,10 @@ module WikiAndTinyCommon
 
   def visit_syllabus(course)
     get "/courses/#{course.id}/assignments/syllabus"
+  end
+
+  def generic_tinymce_parent
+    f('.ic-RichContentEditor')
   end
 
   def click_edit_syllabus
@@ -312,7 +319,7 @@ module WikiAndTinyCommon
 
   def wysiwyg_state_setup(course, text = "1\n2\n3", val: false, html: false)
     visit_front_page_edit(course)
-    wait_for_tiny(edit_wiki_css)
+    wait_for_rce
     if val == true
       add_text_to_tiny(text)
       validate_link(text)
@@ -324,10 +331,14 @@ module WikiAndTinyCommon
 
   def rce_wysiwyg_state_setup(course, text = "1\n2\n3", html: false, new_rce: false)
     visit_front_page_edit(course)
-    wait_for_tiny(edit_wiki_css)
+    wait_for_rce
     if html
       # Switch to HTML
       f("button[data-btn-id='rce-edit-btn']").click
+      button = f('button[data-btn-id="rce-editormessage-btn"]')
+      if button.text == 'Raw HTML Editor'
+        button.click
+      end
       in_frame tiny_rce_ifr_id do
         tinyrce_element = f('body')
         tinyrce_element.send_keys(text)

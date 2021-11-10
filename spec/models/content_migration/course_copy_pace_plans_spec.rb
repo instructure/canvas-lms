@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/course_copy_helper.rb')
+require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "pace plans" do
@@ -26,7 +26,6 @@ describe ContentMigration do
     it "copies pace plan attributes" do
       pace_plan = @copy_from.pace_plans.new
       pace_plan.workflow_state = 'active'
-      pace_plan.start_date = 1.day.ago.beginning_of_day
       pace_plan.end_date = 1.day.from_now.beginning_of_day
       pace_plan.published_at = Time.now.utc
       pace_plan.exclude_weekends = false

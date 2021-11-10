@@ -18,9 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../lti2_spec_helper')
+require_relative '../lti2_spec_helper'
 
 describe AssignmentsController do
   before :once do
@@ -252,6 +250,20 @@ describe AssignmentsController do
       Account.site_admin.disable_feature!(:new_quizzes_modules_support)
       get 'index', params: { :course_id => @course.id }
       expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to eq(false)
+    end
+
+    it "sets FLAGS/new_quizzes_skip_to_build_module_button in js_env as true if enabled" do
+      user_session(@teacher)
+      Account.site_admin.enable_feature!(:new_quizzes_skip_to_build_module_button)
+      get 'index', params: { :course_id => @course.id }
+      expect(assigns[:js_env][:FLAGS][:new_quizzes_skip_to_build_module_button]).to eq(true)
+    end
+
+    it "sets FLAGS/new_quizzes_skip_to_build_module_button in js_env as false if disabled" do
+      user_session(@teacher)
+      Account.site_admin.disable_feature!(:new_quizzes_skip_to_build_module_button)
+      get 'index', params: { :course_id => @course.id }
+      expect(assigns[:js_env][:FLAGS][:new_quizzes_skip_to_build_module_button]).to eq(false)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do

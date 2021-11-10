@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe SectionTabPresenter do
   let_once(:tab) { Course.default_tabs[0] }
   let_once(:assignments_tab) do

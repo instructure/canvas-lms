@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../../spec/apis/api_spec_helper')
+require "apis/api_spec_helper"
 
 describe 'simply_versioned' do
   before :all do
-    class Woozel < ActiveRecord::Base
+    class Woozel < ActiveRecord::Base # rubocop:disable Lint/ConstantDefinitionInBlock,RSpec/LeakyConstantDeclaration this needs to be a real class
       simply_versioned :explicit => true
     end
 
@@ -206,7 +206,7 @@ describe 'simply_versioned' do
     let(:woozel) { Woozel.create!(name: 'test') }
     context "on_load" do
       let(:on_load) do
-        lambda { |model, version| model.name = 'test override' }
+        lambda { |model, _version| model.name = 'test override' }
       end
       before do
         woozel.simply_versioned_options[:on_load] = on_load

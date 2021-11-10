@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 describe DataFixup::PopulateRootAccountIdsOnCommunicationChannels do
   describe 'populate' do
     context 'when on the same shard as the user' do

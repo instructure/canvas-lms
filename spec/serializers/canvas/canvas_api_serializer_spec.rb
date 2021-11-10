@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 describe Canvas::APISerializer do
   let(:controller) { ActiveModel::FakeController.new }
   let(:options) { { scope: {}, controller: controller } }
@@ -110,7 +108,6 @@ describe Canvas::APISerializer do
       end
       object = Foo.new(1, 'Bob')
       expect(object).to receive(:bar).and_return Foo.new(1, 'Alice')
-      url = "http://example.com/api/v1/bar/1"
       serializer = FooSerializer.new(object, { root: nil, controller: con })
       expect(serializer.as_json(root: nil)['links']['bar']).to eq "1"
       Object.send(:remove_const, :BarSerializer)

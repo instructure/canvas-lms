@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + "/../../spec_helper")
-
 describe Schemas::Lti::PublicJwk do
   describe "valid?" do
     subject { Schemas::Lti::PublicJwk.new.valid?(json_hash) }

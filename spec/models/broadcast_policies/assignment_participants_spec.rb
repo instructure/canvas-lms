@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path('../../spec_helper', File.dirname(__FILE__))
-
 describe BroadcastPolicies::AssignmentParticipants do
   before :once do
     course_with_student(active_all: true)

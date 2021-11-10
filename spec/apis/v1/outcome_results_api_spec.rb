@@ -18,8 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require_relative '../api_spec_helper'
 
 describe "Outcome Results API", type: :request do
   let_once(:outcome_course) do
@@ -135,7 +134,7 @@ describe "Outcome Results API", type: :request do
   end
 
   let(:outcome_students) do
-    students = 0.upto(3).map do |i|
+    (0..3).map do |i|
       student = student_in_course(active_all: true).user
       create_outcome_assessment(student: student, points: i)
       student
@@ -303,7 +302,7 @@ describe "Outcome Results API", type: :request do
           end
 
           it 'uses resolved_outcome_proficiency for points scaling if one exists' do
-            proficiency = outcome_proficiency_model(@course)
+            outcome_proficiency_model(@course)
             outcome_result
             user_session @user
 
@@ -334,6 +333,10 @@ describe "Outcome Results API", type: :request do
             @no_results_student = User.create!(:name => 'Student - No Results')
             @no_results_student.register!
             @course.enroll_student(@no_results_student)
+
+            @observer = User.create!(:name => 'Observer')
+            @observer.register!
+            @course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @no_results_student.id, enrollment_state: 'active')
 
             outcome_result # Creates result for enrolled student outcome_student
           end
@@ -655,12 +658,12 @@ describe "Outcome Results API", type: :request do
 
     describe "outcomes" do
       before :once do
-        @outcomes = 0.upto(3).map do |i|
+        @outcomes = Array.new(4) do
           create_outcome_assessment(new: true)
           @outcome
         end
         @outcome_group = @course.learning_outcome_groups.create!(:title => 'groupage')
-        @outcomes += 0.upto(2).map do |i|
+        @outcomes += Array.new(3) do
           create_outcome_assessment(new: true)
           @outcome
         end
@@ -817,7 +820,7 @@ describe "Outcome Results API", type: :request do
       student = outcome_student
       outcome_assessment
       student2 = @shard2.activate { User.create!(name: 'outofshard') }
-      enrollment = @course.enroll_student(student2, enrollment_state: 'active')
+      @course.enroll_student(student2, enrollment_state: 'active')
       create_outcome_assessment(student: student2)
       @user = @teacher
 

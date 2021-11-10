@@ -21,8 +21,6 @@
 # built-in roles are only associated to a root account and have nil for account_id
 # and a workflow_state of 'built_in'
 
-require 'spec_helper'
-
 describe 'DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesAdd' do
   before(:once) { @account = account_model(parent_account: Account.default) }
 

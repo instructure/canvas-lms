@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 # TODO: Remove this spec once Audits engine extraction is complete.
 # for now leaving it here will confirm the Auditors/Audits shim is operating as expected.
 describe Auditors do

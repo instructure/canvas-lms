@@ -19,8 +19,8 @@
 
 # bk test
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/eportfolios_common')
+require_relative 'common'
+require_relative 'helpers/eportfolios_common'
 
 describe "eportfolios" do
   include_context "in-process server selenium tests"
@@ -36,7 +36,7 @@ describe "eportfolios" do
   end
 
   it "creates an eportfolio that is public", priority: "2", test_id: 114348 do
-    create_eportfolio(true)
+    create_eportfolio
     validate_eportfolio(true)
   end
 

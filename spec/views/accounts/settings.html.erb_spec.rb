@@ -18,8 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
+require_relative '../views_helper'
 
 describe "accounts/settings.html.erb" do
   before do
@@ -556,7 +555,7 @@ describe "accounts/settings.html.erb" do
     let(:site_admin) { site_admin_user }
     let(:sub_account) { account_model(root_account: account) }
 
-    def render_for(target_account, target_user, &block)
+    def render_for(target_account, target_user)
       assign(:context, target_account)
       assign(:account, target_account)
       assign(:root_account, target_account)

@@ -67,6 +67,13 @@ Lint/SymbolConversion:
   Severity: error
 Lint/UnifiedInteger:
   Severity: error
+Lint/UselessAssignment:
+  Severity: error
+Lint/UnusedBlockArgument:
+  Severity: error
+Lint/UnusedMethodArgument:
+  AllowUnusedKeywordArguments: true # there's no way to mark a kwarg as unused
+  Severity: error
 
 Metrics:
   Enabled: false # SnR is just too low to have this enabled
@@ -87,6 +94,8 @@ Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
 Rails/HasManyOrHasOneDependent:
   Enabled: false # legacy code + most things we soft delete anyway
+Rails/HelperInstanceVariable:
+  Enabled: false # legacy code
 Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
 Rails/ContentTag:
@@ -158,15 +167,6 @@ Lint/AmbiguousBlockAssociation: # TODO
     - change
     - not_change
     - raise_error
-Lint/UnusedBlockArgument: # TODO manually fix these by removing the argument if possible
-  Severity: warning
-  AutoCorrect: false
-Lint/UnusedMethodArgument: # TODO manually fix these by removing the argument if possible
-  Severity: warning
-  AllowUnusedKeywordArguments: true # there's no way to mark a kwarg as unused
-  AutoCorrect: false
-Lint/UselessAssignment: # TODO
-  Severity: warning
 
 Naming/VariableNumber: # TODO
   Enabled: false
@@ -174,7 +174,8 @@ Naming/VariableNumber: # TODO
 Rails/DynamicFindBy: # TODO; autocorrect (unsafe)
   AllowedMethods:
     - find_by_name # PluginSetting.find_by_name
-  AutoCorrect: false  
+    - find_by_asset_string # ApplicationRecord.find_by_asset_string
+  AutoCorrect: false
 Rails/ReadWriteAttribute: # TODO: autocorrect (unsafe)
   Enabled: false # accessors are often defined in terms of read_attribute
 Rails/TimeZone: # TODO: autocorrect (unsafe)
@@ -183,6 +184,8 @@ Rails/WhereExists: # TODO: autocorrect(unsafe)
   EnforcedStyle: where
   AutoCorrect: false
 
+RSpec/BeEql: # TODO: autocorrect
+  Enabled: false
 RSpec/ContextWording: # TODO
   Enabled: false
 RSpec/DescribeClass: # TODO
@@ -194,6 +197,8 @@ RSpec/HookArgument: # TODO: autocorrect
 RSpec/NamedSubject: # TODO
   Enabled: false
 RSpec/NotToNot: # TODO: autocorrect
+  Enabled: false
+RSpec/PredicateMatcher: # TODO: autocorrect (unsafe)
   Enabled: false
 RSpec/ScatteredSetup: # TODO: investigate if these are required
   Enabled: false
@@ -251,6 +256,8 @@ Style/ReturnNil: # TODO: autocorrect (investigate violations)
 Style/SignalException: # TODO: autocorrect
   Enabled: false
 Style/StderrPuts: # TODO: autocorrect
+  Enabled: false
+Style/StringConcatenation: # TODO: autocorrect (maybe)
   Enabled: false
 Style/StringLiterals:
   EnforcedStyle: double_quotes

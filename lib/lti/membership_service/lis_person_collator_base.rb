@@ -72,7 +72,7 @@ module Lti
         )
       end
 
-      def generate_roles(user)
+      def generate_roles(_user)
         []
       end
     end

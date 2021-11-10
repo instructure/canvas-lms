@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../../models/quizzes/quiz_statistics/item_analysis/common')
+require_relative '../../api_spec_helper'
+require_relative '../../../models/quizzes/quiz_statistics/item_analysis/common'
 
 describe Quizzes::QuizReportsController, type: :request do
   describe "GET /courses/:course_id/quizzes/:quiz_id/reports [index]" do

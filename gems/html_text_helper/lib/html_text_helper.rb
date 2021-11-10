@@ -278,7 +278,7 @@ module HtmlTextHelper
     message = HtmlTextHelper.escape_html(message)
 
     # now put the links back in
-    message = message.gsub(AUTO_LINKIFY_PLACEHOLDER) do |match|
+    message = message.gsub(AUTO_LINKIFY_PLACEHOLDER) do
       placeholder_blocks.shift
     end
 
@@ -297,10 +297,7 @@ module HtmlTextHelper
     end
     processed_lines << quote_clump(quote_block) if !quote_block.empty?
     message = processed_lines.join("\n")
-    if opts[:url]
-      url = add_notification_to_link(opts[:url], opts[:notification_id]) if opts[:notification_id]
-      links.unshift opts[:url]
-    end
+    links.unshift opts[:url] if opts[:url]
     links.unshift message.html_safe
   end
 

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
-
 describe GradeCalculator do
   before :once do
     course_with_student active_all: true
@@ -99,7 +97,7 @@ describe GradeCalculator do
     it "deletes irrelevant scores for inactive grading periods" do
       grading_period_set = @course.root_account.grading_period_groups.create!
       grading_period_set.enrollment_terms << @course.enrollment_term
-      period1 = grading_period_set.grading_periods.create!(
+      grading_period_set.grading_periods.create!(
         title: "A Grading Period",
         start_date: 20.days.ago,
         end_date: 10.days.ago
@@ -199,7 +197,7 @@ describe GradeCalculator do
           course_with_student(active_all: true, account: account, user: @user)
           grading_period_set = account.grading_period_groups.create!
           grading_period_set.enrollment_terms << @course.enrollment_term
-          period1 = grading_period_set.grading_periods.create!(
+          grading_period_set.grading_periods.create!(
             title: "A Grading Period",
             start_date: 20.days.ago,
             end_date: 10.days.ago

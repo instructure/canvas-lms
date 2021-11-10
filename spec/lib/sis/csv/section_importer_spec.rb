@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
-
 describe SIS::CSV::SectionImporter do
   before { account_model }
 
@@ -114,7 +112,7 @@ describe SIS::CSV::SectionImporter do
     course = @account.courses.create!(:sis_source_id => "C001")
     section = course.default_section
     section.update(:sis_source_id => "S001", :workflow_state => "deleted")
-    new_section = course.course_sections.create!(:default_section => true)
+    course.course_sections.create!(:default_section => true)
     process_csv_data_cleanly(
       "section_id,course_id,name,status",
       "S001,C001,Sec1,active"

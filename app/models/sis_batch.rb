@@ -559,7 +559,7 @@ class SisBatch < ActiveRecord::Base
     end
   end
 
-  def remove_non_batch_sections(sections, total_rows, current_row)
+  def remove_non_batch_sections(sections, _total_rows, current_row)
     section_count = 0
     current_row ||= 0
     # delete sections who weren't in this batch, whose course was in the selected term
@@ -686,7 +686,7 @@ class SisBatch < ActiveRecord::Base
       count: count, type: type, change_threshold: change_threshold)
   end
 
-  def as_json(options = {})
+  def as_json(**)
     data = {
       "id" => self.id,
       "created_at" => self.created_at,

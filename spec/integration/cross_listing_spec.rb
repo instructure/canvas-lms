@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe "cross listing" do
   describe "user course associations" do
     it "is not kept when a user is not enrolled in that course anymore" do

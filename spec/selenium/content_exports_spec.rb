@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative 'common'
 
 require 'nokogiri'
 
@@ -51,7 +51,7 @@ describe "content exports" do
       expect(@export.export_type).to eq 'qti'
     end
 
-    it "selectivelies create qti export", priority: "2", test_id: 1341342 do
+    it "selectively creates qti export", priority: "2", test_id: 1341342 do
       q1 = @course.quizzes.create!(:title => 'quiz1')
       q2 = @course.quizzes.create!(:title => 'quiz2')
 

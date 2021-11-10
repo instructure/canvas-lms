@@ -21,7 +21,7 @@ require "fileutils"
 require 'webdrivers/chromedriver'
 require_relative "common_helper_methods/custom_alert_actions"
 require_relative 'common_helper_methods/custom_screen_actions'
-require_relative 'patches/selenium/webdriver/remote/w3c/bridge.rb'
+require_relative 'patches/selenium/webdriver/remote/w3c/bridge'
 
 # WebDriver uses port 7054 (the "locking port") as a mutex to ensure
 # that we don't launch two Firefox instances at the same time. Each

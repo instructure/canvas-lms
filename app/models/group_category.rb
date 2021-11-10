@@ -632,7 +632,7 @@ class GroupCategory < ActiveRecord::Base
         if num_groups_assigned > @groups.count
           # we over-assigned because of sections with too few people (only one group) - so we'll have to steal one from a big section
           # preferably one that can take the hit the best - i.e. has the most groups currently and then fewest extra users
-          big_section_id = group_counts.select { |k, count| count > 1 }.sort_by { |k, count| [count, -1 * user_counts[k]] }.last.first
+          big_section_id = group_counts.select { |_k, count| count > 1 }.max_by { |k, count| [count, -1 * user_counts[k]] }.first
           group_counts[big_section_id] -= 1
           num_groups_assigned -= 1
         else

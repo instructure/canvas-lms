@@ -19,17 +19,13 @@ import {createActions, createAction} from 'redux-actions'
 import axios from 'axios'
 import moment from 'moment-timezone'
 import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
+import {deepEqual} from '@instructure/ui-utils'
 import parseLinkHeader from 'parse-link-header'
 import configureAxios from '../utilities/configureAxios'
 import {alert} from '../utilities/alertUtils'
 import formatMessage from '../format-message'
 import {maybeUpdateTodoSidebar} from './sidebar-actions'
-import {
-  clearWeeklyItems,
-  getWeeklyPlannerItems,
-  preloadSurroundingWeeks,
-  startLoadingItems
-} from './loading-actions'
+import {getWeeklyPlannerItems, preloadSurroundingWeeks, startLoadingItems} from './loading-actions'
 
 import {
   transformInternalToApiItem,
@@ -58,7 +54,10 @@ export const {
   scrollToNewActivity,
   scrollToToday,
   toggleMissingItems,
-  selectedObservee
+  selectedObservee,
+  clearWeeklyItems,
+  clearOpportunities,
+  clearDays
 } = createActions(
   'INITIAL_OPTIONS',
   'ADD_OPPORTUNITIES',
@@ -78,7 +77,10 @@ export const {
   'SCROLL_TO_NEW_ACTIVITY',
   'SCROLL_TO_TODAY',
   'TOGGLE_MISSING_ITEMS',
-  'SELECTED_OBSERVEE'
+  'SELECTED_OBSERVEE',
+  'CLEAR_WEEKLY_ITEMS',
+  'CLEAR_OPPORTUNITIES',
+  'CLEAR_DAYS'
 )
 
 export * from './loading-actions'
@@ -283,22 +285,28 @@ function getOverrideDataOnItem(plannerItem) {
   }
 }
 
+export const clearItems = () => {
+  return dispatch => {
+    dispatch(clearWeeklyItems())
+    dispatch(clearOpportunities())
+    dispatch(clearDays())
+  }
+}
+
 export const reloadWithObservee = (observeeId, contextCodes) => {
   return (dispatch, getState) => {
     if (
       getState().selectedObservee?.id !== observeeId ||
-      (observeeId &&
-        JSON.stringify(getState().selectedObservee?.contextCodes) !== JSON.stringify(contextCodes))
+      (observeeId && !deepEqual(getState().selectedObservee?.contextCodes, contextCodes))
     ) {
+      dispatch(selectedObservee({id: observeeId, contextCodes}))
+      dispatch(clearItems())
       if (observeeId && !contextCodes) {
-        dispatch(selectedObservee({id: observeeId, contextCodes}))
-        dispatch(clearWeeklyItems())
         dispatch(startLoadingItems())
       } else {
-        dispatch(selectedObservee({id: observeeId, contextCodes}))
-        dispatch(clearWeeklyItems())
         dispatch(getWeeklyPlannerItems(moment.tz(getState().timeZone).startOf('day')))
         dispatch(preloadSurroundingWeeks())
+        dispatch(startLoadingAllOpportunities())
       }
     }
   }

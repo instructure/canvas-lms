@@ -126,6 +126,15 @@ describe('ComposeModalContainer', () => {
     })
   })
 
+  describe('Media', () => {
+    it('opens the media upload modal', async () => {
+      const container = setup()
+      const mediaButton = await container.findByTestId('media-upload')
+      fireEvent.click(mediaButton)
+      expect(await container.findByText('Upload Media')).toBeInTheDocument()
+    })
+  })
+
   describe('Subject', () => {
     it('allows setting the subject', async () => {
       const {findByTestId} = setup()
@@ -168,6 +177,13 @@ describe('ComposeModalContainer', () => {
 
       const selectOptions = await component.findAllByText('Fighting Magneto 101')
       expect(selectOptions.length).toBeGreaterThan(0)
+    })
+
+    it('does not render All Courses option', async () => {
+      const {findByTestId, queryByText} = setup()
+      const courseDropdown = await findByTestId('course-select')
+      fireEvent.click(courseDropdown)
+      expect(await queryByText('All Courses')).not.toBeInTheDocument()
     })
   })
 

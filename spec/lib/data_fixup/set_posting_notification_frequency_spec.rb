@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe DataFixup::SetPostingNotificationFrequency do
   let_once(:account) { Account.create! }
   let_once(:course) { Course.create!(account: account) }

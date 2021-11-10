@@ -44,10 +44,10 @@ module Canvas
         # Otherwise, return nil & use the same domain the page request came from, like normal.
       end
 
-      def push_to_s3!(*args, &block)
+      def push_to_s3!(*args, **kwargs, &block)
         return unless config.bucket
 
-        uploader = Canvas::Cdn::S3Uploader.new(*args)
+        uploader = Canvas::Cdn::S3Uploader.new(*args, **kwargs)
         uploader.upload!(&block)
       end
 

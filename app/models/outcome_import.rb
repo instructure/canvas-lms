@@ -51,9 +51,10 @@ class OutcomeImport < ApplicationRecord
   # If you are going to change any settings on the import before it's processed,
   # do it in the block passed into this method, so that the changes are saved
   # before the import is marked created and eligible for processing.
-  def self.create_with_attachment(context, import_type, attachment, user = nil)
+  def self.create_with_attachment(context, import_type, attachment, user = nil, learning_outcome_group_id = nil)
     import = OutcomeImport.create!(
       context: context,
+      learning_outcome_group_id: learning_outcome_group_id,
       progress: 0,
       workflow_state: :initializing,
       data: { import_type: import_type },

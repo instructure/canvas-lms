@@ -45,7 +45,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
 
     # @return [String|NilClass]
     #   The HTML-escaped textual answer, or nil if no response was received.
-    def deserialize(submission_data, full = false)
+    def deserialize(submission_data, full: false)
       text = submission_data[question_key]
 
       if text.present?

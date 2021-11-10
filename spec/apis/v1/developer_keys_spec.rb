@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../lti_1_3_spec_helper')
+require_relative '../api_spec_helper'
+require_relative '../../lti_1_3_spec_helper'
 
 describe DeveloperKeysController, type: :request do
   include_context 'lti_1_3_spec_helper'
@@ -104,7 +104,7 @@ describe DeveloperKeysController, type: :request do
 
     it 'does not include `test_cluster_only` by default' do
       admin_session
-      key = DeveloperKey.create!
+      DeveloperKey.create!
       json = api_call(:get, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
                         controller: 'developer_keys',
                         action: 'index',
@@ -117,7 +117,7 @@ describe DeveloperKeysController, type: :request do
     it 'does include `test_cluster_only` when enabled' do
       Setting.set("dev_key_test_cluster_checks_enabled", true)
       admin_session
-      key = DeveloperKey.create!
+      DeveloperKey.create!
       json = api_call(:get, "/api/v1/accounts/#{sa_id}/developer_keys.json", {
                         controller: 'developer_keys',
                         action: 'index',

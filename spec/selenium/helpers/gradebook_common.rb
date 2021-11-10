@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative '../common'
 
 module GradebookCommon
   shared_context 'reusable_gradebook_course' do
@@ -98,7 +98,7 @@ module GradebookCommon
     end
   end
 
-  def set_default_grade(cell_index, points = "5")
+  def set_default_grade(points = "5")
     move_to_click('[data-menu-item-id="set-default-grade"]')
     dialog = find_with_jquery('.ui-dialog:visible')
     f('.grading_value').send_keys(points)

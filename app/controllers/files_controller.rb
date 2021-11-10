@@ -494,7 +494,7 @@ class FilesController < ApplicationController
 
       # Add canvadoc session URL if the file is unlocked
       json.merge!(
-        doc_preview_json(@attachment, @current_user, locked_for_user: json[:locked_for_user])
+        doc_preview_json(@attachment, locked_for_user: json[:locked_for_user])
       )
       render :json => json
     end
@@ -502,7 +502,6 @@ class FilesController < ApplicationController
 
   def show
     GuardRail.activate(:secondary) do
-      original_params = params.dup
       params[:id] ||= params[:file_id]
       get_context
       # note that the /files/XXX URL implicitly uses the current user as the
@@ -644,7 +643,6 @@ class FilesController < ApplicationController
           json[:attachment].merge!(
             doc_preview_json(
               attachment,
-              @current_user,
               locked_for_user: json.dig(:attachment, :locked_for_user)
             )
           )
@@ -752,7 +750,7 @@ class FilesController < ApplicationController
 
   # Is the user permitted to upload a file to the context with the given intent
   # and related asset?
-  def authorized_upload?(context, user, asset, intent)
+  def authorized_upload?(context, asset, intent)
     if asset.is_a?(Assignment) && intent == 'comment'
       authorized_action(asset, @current_user, :attach_submission_comment_files)
     elsif asset.is_a?(Assignment) && intent == 'submit'
@@ -831,7 +829,7 @@ class FilesController < ApplicationController
       @context = group || @current_user
     end
 
-    if authorized_upload?(@context, @asset, intent, @current_user)
+    if authorized_upload?(@context, @asset, intent)
       api_attachment_preflight(@context, request,
                                check_quota: check_quota?(@context, intent),
                                folder: default_folder(@context, @asset, intent),
@@ -1032,7 +1030,7 @@ class FilesController < ApplicationController
     end
 
     json = attachment_json(@attachment, @current_user, {}, json_params)
-    json.merge!(doc_preview_json(@attachment, @current_user))
+    json.merge!(doc_preview_json(@attachment))
 
     # render as_text for IE, otherwise it'll prompt
     # to download the JSON response

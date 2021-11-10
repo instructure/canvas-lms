@@ -26,6 +26,10 @@ declare global {
   }
 
   const ENV: any
+
+  declare interface JQueryStatic {
+    flashError: (any, number?) => void
+  }
 }
 
 // Global scope declarations are only allowed in module contexts, so we

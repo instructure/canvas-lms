@@ -157,15 +157,15 @@ class UsageRightsController < ApplicationController
 
   # recursively enumerate file ids under a folder
   def enumerate_contents(folder)
-    ids = folder.active_sub_folders.inject([]) { |file_ids, folder| file_ids += enumerate_contents(folder) }
-    ids += folder.active_file_attachments.pluck(:id)
+    ids = folder.active_sub_folders.flat_map { |sub_folder| enumerate_contents(sub_folder) }
+    ids + folder.active_file_attachments.pluck(:id)
   end
 
   # assign the given usage rights to params[:file_ids] / params[:folder_ids]
   def assign_usage_rights(usage_rights)
     folder_ids = Array(params[:folder_ids]).map(&:to_i)
     folders = @context.folders.active.where(id: folder_ids).to_a
-    file_ids = folders.inject([]) { |file_ids, folder| file_ids += enumerate_contents(folder) }
+    file_ids = folders.flat_map { |folder| enumerate_contents(folder) }
     file_ids += @context.attachments.not_deleted.where(id: Array(params[:file_ids]).map(&:to_i)).pluck(:id)
     update_attrs = { usage_rights_id: usage_rights&.id }
     update_attrs.merge!(locked: false) if usage_rights.present? && value_to_boolean(params[:publish])

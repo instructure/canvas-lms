@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe CourseLinkValidator do
   it "validates all the links" do
     allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(false) # don't actually ping the links for the specs
@@ -51,7 +49,7 @@ describe CourseLinkValidator do
     event = @course.calendar_events.create!(:title => "event", :description => html)
     topic = @course.discussion_topics.create!(:title => "discussion title", :message => html)
     mod = @course.context_modules.create!(:name => "some module")
-    tag = mod.add_item(:type => 'external_url', :url => bad_url, :title => 'pls view')
+    mod.add_item(:type => 'external_url', :url => bad_url, :title => 'pls view')
     page = @course.wiki_pages.create!(:title => "wiki", :body => html)
     quiz = @course.quizzes.create!(:title => 'quiz1', :description => html)
 
@@ -100,8 +98,8 @@ describe CourseLinkValidator do
 
     course_factory
     bank = @course.assessment_question_banks.create!(:title => 'bank')
-    aq = bank.assessment_questions.create!(:question_data => { 'name' => 'test question',
-                                                               'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
+    bank.assessment_questions.create!(:question_data => { 'name' => 'test question',
+                                                          'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
 
     CourseLinkValidator.queue_course(@course)
     run_jobs
@@ -139,7 +137,7 @@ describe CourseLinkValidator do
     allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(true)
 
     course_factory
-    topic = @course.discussion_topics.create!(:message => %{<a href="http://www.www.www">pretend this is real</a>}, :title => "title")
+    @course.discussion_topics.create!(:message => %{<a href="http://www.www.www">pretend this is real</a>}, :title => "title")
 
     CourseLinkValidator.queue_course(@course)
     run_jobs

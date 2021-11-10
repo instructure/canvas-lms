@@ -73,7 +73,6 @@ class GraphQLTypeTester
     field_context = @context.merge(context)
     type = CanvasSchema.resolve_type(nil, @obj, field_context) or
       raise "couldn't resolve type for #{@obj.inspect}"
-    field = extract_field(field_and_subfields, type)
     variables = {
       id: CanvasSchema.id_from_object(@obj, type, field_context)
     }
@@ -113,14 +112,15 @@ class GraphQLTypeTester
   end
 
   def extract_results(result)
-    return result unless result.respond_to?(:reduce)
+    result = result.to_hash if result.respond_to?(:to_hash)
+    return result unless result.is_a?(Hash)
 
-    result.reduce(nil) do |result, (k, v)|
-      case v
-      when Hash then extract_results(v)
-      when Array then v.map { |x| extract_results(x) }
-      else v
-      end
+    # return the last value of the last pair of a hash, recursively
+    v = result.to_a.last.last
+    case v
+    when Hash then extract_results(v)
+    when Array then v.map { |x| extract_results(x) }
+    else v
     end
   end
 end

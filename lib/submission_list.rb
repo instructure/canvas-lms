@@ -104,9 +104,7 @@ class SubmissionList
 
   # An iterator on a sorted and filtered list of submission versions.
   def each(&block)
-    self.submission_entries.each do |entry|
-      yield(entry)
-    end
+    self.submission_entries.each(&block)
   end
 
   # An iterator on the day only, not each submission
@@ -122,7 +120,7 @@ class SubmissionList
     # puts "----------------------------------------------"
     # puts "starting"
     # puts "---------------------------------------------------------------------------------"
-    self.list.map do |day, value|
+    self.list.map do |day, _value|
       # puts "-----------------------------------------------item #{Time.now - current}----------------------------"
       # current = Time.now
       OpenObject.new(:date => day, :graders => graders_for_day(day))
@@ -172,7 +170,6 @@ class SubmissionList
 
   # Returns an array of assignments with an array of submission open structs.
   def assignments_for_grader_and_day(grader, day)
-    start = Time.now
     hsh = submission_entries.find_all { |e| e[:grader] == grader and e[:graded_on] == day }.inject({}) do |h, submission|
       assignment = submission[:assignment_name]
       h[assignment] ||= OpenObject.new(
@@ -224,7 +221,7 @@ class SubmissionList
   # makes our final product much more yummy.
   def trim_keys(list)
     list.each do |hsh|
-      hsh.delete_if { |key, v| !VALID_KEYS.include?(key) }
+      hsh.slice!(*VALID_KEYS)
     end
   end
 

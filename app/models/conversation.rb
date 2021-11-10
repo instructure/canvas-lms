@@ -434,6 +434,7 @@ class Conversation < ActiveRecord::Base
   def context_name
     name = context.try(:name)
     name ||= Context.find_by_asset_string(context_tags.first).try(:name) if context_tags.first
+    name
   end
 
   def context_code
@@ -737,15 +738,13 @@ class Conversation < ActiveRecord::Base
       threshold ||= participants.size / 2
       preloaded_users_hash ||= preload_users_and_context_codes
 
-      participants.inject([]) { |ary, cp|
-        cp.user = preloaded_users_hash[cp.user_id]
-        cp.user ? ary.concat(cp.user.conversation_context_codes) : ary
-      }.sort.inject({}) { |hash, str|
-        hash[str] = (hash[str] || 0) + 1
-        hash
-      }.select { |key, value|
-        value > threshold
-      }.sort_by(&:last).map(&:first).reverse
+      participants.flat_map { |cp| (cp.user = preloaded_users_hash[cp.user_id])&.conversation_context_codes }
+                  .group_by { |code| code }
+                  .map { |code, dups| [code, dups.length] }
+                  .select { |_code, dups| dups > threshold }
+                  .sort_by(&:last)
+                  .map(&:first)
+                  .reverse
     end
   end
 
@@ -767,17 +766,16 @@ class Conversation < ActiveRecord::Base
     course = self.context.is_a?(Course) ? self.context : self.context.context
 
     # can still reply if a teacher is involved
-    if course.is_a?(Course) && self.conversation_participants.where(:user_id => course.admin_enrollments.active.select(:user_id)).exists?
-      false
-    # can still reply if observing all the other participants
-    elsif course.is_a?(Course) && observing_all_other_participants(user, self.conversation_participants, course)
+    if (course.is_a?(Course) && self.conversation_participants.where(:user_id => course.admin_enrollments.active.select(:user_id)).exists?) ||
+       # can still reply if observing all the other participants
+       (course.is_a?(Course) && observing_all_other_participants(user, course))
       false
     else
       !self.context.grants_any_right?(user, :send_messages, :send_messages_all)
     end
   end
 
-  def observing_all_other_participants(user, participants, course)
+  def observing_all_other_participants(user, course)
     observee_ids = user.observer_enrollments.active.where(course: course).pluck(:associated_user_id)
     return false if observee_ids.empty?
 

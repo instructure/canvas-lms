@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require_relative "../graphql_spec_helper"
 
 RSpec.shared_examples "DiscussionType" do
@@ -59,6 +58,10 @@ RSpec.shared_examples "DiscussionType" do
         allowed: ->(user) { discussion.grants_right?(user, nil, :read_as_admin) }
       },
       {
+        value: 'studentReporting',
+        allowed: ->(_user) { discussion.course.student_reporting? }
+      },
+      {
         value: 'manageContent',
         allowed: ->(user) { discussion.context.grants_right?(user, :manage_content) }
       },
@@ -96,7 +99,7 @@ RSpec.shared_examples "DiscussionType" do
       },
       {
         value: 'showRubric',
-        allowed: ->(user) { !discussion.assignment_id.nil? && !discussion.assignment.rubric.nil? }
+        allowed: ->(_user) { !discussion.assignment_id.nil? && !discussion.assignment.rubric.nil? }
       },
       {
         value: 'addRubric',
@@ -386,12 +389,23 @@ describe Types::DiscussionType do
     it "locked_for_user is set correctly" do
       allow_any_instantiation_of(discussion).to receive(:locked_for?)
         .with(@teacher, check_policies: true)
-        .and_return(true)
+        .and_return({ unlock_at: 'a sample date' })
       expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("lockedForUser")).to be true
       allow_any_instantiation_of(discussion).to receive(:locked_for?)
         .with(@teacher, check_policies: true)
         .and_return(false)
       expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("lockedForUser")).to be false
+    end
+
+    it "available_for_user is set correctly" do
+      allow_any_instantiation_of(discussion).to receive(:locked_for?)
+        .with(@teacher, check_policies: true)
+        .and_return({ unlock_at: 'a sample date' })
+      expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("availableForUser")).to be false
+      allow_any_instantiation_of(discussion).to receive(:locked_for?)
+        .with(@teacher, check_policies: true)
+        .and_return(false)
+      expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("availableForUser")).to be true
     end
   end
 

@@ -27,7 +27,7 @@ module Api::V1
       day_hash = Hash.new { |hash, date| hash[date] = { :graders => {} } }
       submissions_set(course, api_context)
         .each_with_object(day_hash) { |submission, day| update_graders_hash(day[day_string_for(submission)][:graders], submission, api_context) }
-        .each do |date, date_hash|
+        .each_value do |date_hash|
           compress(date_hash, :graders)
           date_hash[:graders].each { |grader| compress(grader, :assignments) }
         end
@@ -37,8 +37,9 @@ module Api::V1
 
     def json_for_date(date, course, api_context)
       submissions_set(course, api_context, :date => date)
-        .each_with_object({}) { |sub, memo| update_graders_hash(memo, sub, api_context) }.values
-        .each { |grader| compress(grader, :assignments) }
+        .each_with_object({}) { |sub, memo| update_graders_hash(memo, sub, api_context) }
+        .each_value { |grader| compress(grader, :assignments) }
+        .values
     end
 
     def version_json(course, version, api_context, opts = {})

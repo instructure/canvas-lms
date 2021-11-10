@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe AddressBook do
   describe "for" do
     it "returns an instance of AddressBook::MessageableUser for 'messageable_user' strategy" do

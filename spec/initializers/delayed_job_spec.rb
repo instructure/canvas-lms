@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path('../sharding_spec_helper', File.dirname(__FILE__))
-
 describe 'Delayed::Job' do
   it "defines job.account" do
     job = Delayed::Job.new

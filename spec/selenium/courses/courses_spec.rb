@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../common.rb'
-require_relative 'pages/courses_home_page.rb'
+require_relative '../common'
+require_relative 'pages/courses_home_page'
 
 describe "courses" do
   include_context "in-process server selenium tests"
@@ -67,7 +67,7 @@ describe "courses" do
     before(:each) do
       course_with_teacher(:active_all => true, :name => 'discussion course')
       @student = User.create!(:name => "First Student")
-      en = @course.enroll_student(@student)
+      @course.enroll_student(@student)
       user_session(@student)
     end
 

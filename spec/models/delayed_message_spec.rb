@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
-
 describe DelayedMessage do
   it "creates a new instance given valid attributes" do
     delayed_message_model
@@ -68,7 +66,7 @@ describe DelayedMessage do
     end
 
     it "has a scope to filter by the state" do
-      notification = notification_model :name => 'New Stuff'
+      notification_model :name => 'New Stuff'
       delayed_message_model(:workflow_state => 'pending')
       delayed_message_model(:workflow_state => 'cancelled')
       delayed_message_model(:workflow_state => 'sent')

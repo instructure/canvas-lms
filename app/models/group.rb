@@ -322,6 +322,7 @@ class Group < ActiveRecord::Base
   def full_name
     res = before_label(self.name) + " "
     res += (self.context.course_code rescue self.context.name) if self.context
+    res
   end
 
   def to_atom
@@ -454,25 +455,6 @@ class Group < ActiveRecord::Base
     self.group_category.groups.where("id<>?", self).to_a
   end
 
-  attr_accessor :merge_mappings
-  attr_accessor :merge_results
-
-  def merge_mapped_id(*args)
-    nil
-  end
-
-  def map_merge(*args)
-  end
-
-  def log_merge_result(text)
-    @merge_results ||= []
-    @merge_results << text
-  end
-
-  def warn_merge_result(text)
-    record_merge_result(text)
-  end
-
   def student_organized?
     self.group_category && self.group_category.student_organized?
   end
@@ -563,7 +545,7 @@ class Group < ActiveRecord::Base
       given { |user| user && self.leader == user }
       can :update
 
-      given { |user| self.group_category.try(:communities?) }
+      given { group_category.try(:communities?) }
       can :create
 
       given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) }
@@ -721,7 +703,7 @@ class Group < ActiveRecord::Base
   TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_FILES,
     TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_SETTINGS, TAB_COLLABORATIONS,
     TAB_COLLABORATIONS_NEW = *1..20
-  def tabs_available(user = nil, opts = {})
+  def tabs_available(user = nil, **)
     available_tabs = [
       { :id => TAB_HOME,          :label => t("#group.tabs.home", "Home"), :css_class => 'home', :href => :group_path },
       { :id => TAB_ANNOUNCEMENTS, :label => t('#tabs.announcements', "Announcements"), :css_class => 'announcements', :href => :group_announcements_path },

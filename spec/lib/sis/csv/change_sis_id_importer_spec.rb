@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
-
 describe SIS::CSV::ChangeSisIdImporter do
   before { account_model }
 
@@ -158,7 +156,7 @@ describe SIS::CSV::ChangeSisIdImporter do
       u1.pseudonym.integration_id = 'int1'
       u1.pseudonym.save!
 
-      importer = process_csv_data(
+      process_csv_data(
         'old_id,new_id,old_integration_id,new_integration_id,type',
         ',,int1,int2,user',
         'GC1,GC2,,,group_category'
@@ -167,7 +165,7 @@ describe SIS::CSV::ChangeSisIdImporter do
       expect(gc.sis_source_id).to eq('GC2')
     end
 
-    it 'cleanlies handle error if integration_id is given' do
+    it 'cleanly handles error if integration_id is given' do
       u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
 
       importer = process_csv_data(

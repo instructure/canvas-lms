@@ -89,10 +89,10 @@ module Importers
                                                     'question_bank_id', 'is_quiz_question_bank', 'question_bank_name']
 
     def self.check_question_equality(question1, question2)
-      stripped_q1 = question1.reject { |k, v| IGNORABLE_QUESTION_KEYS.include?(k) }
-      stripped_q2 = question2.reject { |k, v| IGNORABLE_QUESTION_KEYS.include?(k) }
-      stripped_q1_answers = (question1['answers'] || []).map { |ans| ans.reject { |k, v| k == 'id' } }
-      stripped_q2_answers = (question2['answers'] || []).map { |ans| ans.reject { |k, v| k == 'id' } }
+      stripped_q1 = question1.except(*IGNORABLE_QUESTION_KEYS)
+      stripped_q2 = question2.except(*IGNORABLE_QUESTION_KEYS)
+      stripped_q1_answers = (question1['answers'] || []).map { |ans| ans.reject { |k, _v| k == 'id' } }
+      stripped_q2_answers = (question2['answers'] || []).map { |ans| ans.reject { |k, _v| k == 'id' } }
 
       stripped_q1 == stripped_q2 && stripped_q1_answers == stripped_q2_answers
     end
@@ -191,8 +191,6 @@ module Importers
       item.show_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:show_correct_answers_at]) if master_migration || hash[:show_correct_answers_at]
       item.hide_correct_answers_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:hide_correct_answers_at]) if master_migration || hash[:hide_correct_answers_at]
       item.scoring_policy = hash[:which_attempt_to_keep] if master_migration || hash[:which_attempt_to_keep]
-
-      missing_links = []
 
       unless migration.quizzes_next_migration? # The description is mapped to "instructions" in NQ
         item.description = migration.convert_html(hash[:description], :quiz, hash[:migration_id], :description)

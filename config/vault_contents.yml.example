@@ -16,9 +16,18 @@ development:
     security_token: 'fake-security-token'
 #  'app-canvas/data/secrets':
 #    data:
-#      raven_dsn: garbage-dsn-here
 #      google_docs_creds:
 #        secret_key: so-secret
+#      inst_access_signature:
+#        private_key: <private key in base 64>
+#        encryption_public_key: <public key in base 64 [NOT SAME KEYPAIR AS SIGNATURE!]>
+#      raven_dsn: garbage-dsn-here
+#      twilio_creds:
+#        account_sid: <sid>
+#        auth_token: <token>
+#      twitter_creds:
+#        api_key: <apikey>
+#        secret_key: <secretkey>
 test:
   'sts/testaccount/sts/canvas-shards-lookupper-test':
     access_key: 'fake-access-key'

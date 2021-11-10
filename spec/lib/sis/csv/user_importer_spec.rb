@@ -19,7 +19,6 @@
 #
 
 require_relative "../../../spec_helper"
-require_relative "../../../sharding_spec_helper"
 
 def gen_ssha_password(password)
   salt = SecureRandom.random_bytes(10)
@@ -1766,6 +1765,42 @@ describe SIS::CSV::UserImporter do
       "user_2,user2,User,Dos,invalid_at_example.com,active"
     )
     expect(importer.errors.length).to eq 1
+  end
+
+  it 'can suspend a user' do
+    process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_2,user2,User,Dos,user@example.com,active"
+    )
+    process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_2,user2,User,Dos,user@example.com,suspended"
+    )
+    expect(Pseudonym.find_by(sis_user_id: 'user_2')).to be_suspended
+  end
+
+  it 'can create a user suspended' do
+    process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_2,user2,User,Dos,user@example.com,suspended"
+    )
+    p = Pseudonym.find_by(sis_user_id: 'user_2')
+    expect(p).to be_suspended
+    expect(p.user).to be_registered
+  end
+
+  it 'undeletes a user to suspended' do
+    process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_2,user2,User,Dos,user@example.com,deleted"
+    )
+    process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_2,user2,User,Dos,user@example.com,suspended"
+    )
+    p = Pseudonym.find_by(sis_user_id: 'user_2')
+    expect(p).to be_suspended
+    expect(p.user).to be_registered
   end
 
   context "sharding" do

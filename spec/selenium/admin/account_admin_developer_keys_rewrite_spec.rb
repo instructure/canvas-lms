@@ -263,31 +263,22 @@ describe 'Developer Keys' do
     end
 
     context "scopes" do
-      before(:all) do
-        # if docs haven't been generated, use mock data
-        unless File.exist?(Rails.root.join('lib', 'api_scope_mapper.rb'))
-          def api_scope_mapper_fallback
-            klass = Class.new(Object)
-            klass.class_eval do
-              def self.lookup_resource(controller, action)
-                controller == :assignment_groups_api ? :assignment_groups : controller
-              end
-
-              def self.name_for_resource(resource)
-                resource == :assignment_groups ? 'Assignment Groups' : resource.to_s
-              end
+      unless File.exist?(Rails.root.join('lib/api_scope_mapper.rb'))
+        before do
+          stub_const("ApiScopeMapper", Class.new do
+            def self.lookup_resource(controller, _action)
+              controller == :assignment_groups_api ? :assignment_groups : controller
             end
-            klass
-          end
 
-          Object.const_set("ApiScopeMapper", api_scope_mapper_fallback)
+            def self.name_for_resource(resource)
+              resource == :assignment_groups ? 'Assignment Groups' : resource.to_s
+            end
+          end)
+
           TokenScopes.reset!
         end
-      end
 
-      after(:all) do
-        unless File.exist?(Rails.root.join('lib', 'api_scope_mapper.rb'))
-          Object.const_set("ApiScopeMapper", ApiScopeMapperLoader.api_scope_mapper_fallback)
+        after do
           TokenScopes.reset!
         end
       end

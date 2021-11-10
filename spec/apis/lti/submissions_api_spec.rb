@@ -18,9 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/lti2_api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require_relative 'lti2_api_spec_helper'
+require_relative '../api_spec_helper'
 
 require_dependency "lti/ims/access_token_helper"
 require_dependency "lti/submissions_api_controller"
@@ -249,7 +248,6 @@ module Lti
       it "returns a 401 if the attachment isn't associated to the assignment" do
         get "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}", headers: request_headers
         attachment1 = Attachment.create!(context: Account.create!, filename: "test.txt", content_type: "text/plain")
-        endpoint = "/api/lti/assignments/#{assignment.id}/submissions/#{submission.id}/attachment/#{attachment1.id}"
         get controller.attachment_url(attachment1), headers: request_headers
         expect(response.code).to eq "401"
       end

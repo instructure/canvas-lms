@@ -280,6 +280,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def add_warning(user_message, opts = {})
+    Rails.logger.warn("Migration warning: #{user_message}: #{opts.inspect}")
     if !opts.is_a? Hash
       # convert deprecated behavior to new
       exception_or_info = opts
@@ -538,9 +539,21 @@ class ContentMigration < ActiveRecord::Base
     Canvas::Plugin::value_to_boolean option
   end
 
+  def capture_job_id
+    job = Delayed::Worker.current_job
+    return false unless job
+
+    self.migration_settings[:job_ids] ||= []
+    return false if self.migration_settings[:job_ids].include?(job.id)
+
+    self.migration_settings[:job_ids] << job.id
+    true
+  end
+
   def import_content
     reset_job_progress(:running) if !import_immediately?
     self.workflow_state = :importing
+    capture_job_id
     self.save
 
     Lti::Asset.opaque_identifier_for(self.context)
@@ -985,13 +998,13 @@ class ContentMigration < ActiveRecord::Base
 
   def imported_migration_items_for_insert_type
     import_type = migration_settings[:insert_into_module_type]
-    imported_items = if import_type.present?
-                       class_name = self.class.import_class_name(import_type)
-                       imported_migration_items_hash[class_name] ||= {}
-                       imported_migration_items_hash[class_name].values
-                     else
-                       imported_migration_items
-                     end
+    if import_type.present?
+      class_name = self.class.import_class_name(import_type)
+      imported_migration_items_hash[class_name] ||= {}
+      imported_migration_items_hash[class_name].values
+    else
+      imported_migration_items
+    end
   end
 
   def self.import_class_name(import_type)

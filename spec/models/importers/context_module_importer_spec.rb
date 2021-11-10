@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
+require_relative '../../import_helper'
 
 describe "Importing modules" do
   SYSTEMS.each do |system|
@@ -147,7 +147,7 @@ describe "Importing modules" do
 
   it "selects module items for import" do
     data = get_import_data('', 'module-item-select')
-    context = get_import_context
+    get_import_context
     migration = @course.content_migrations.create!
     migration.migration_settings[:migration_ids_to_import] = { :copy => { :context_modules => { 'i2ef97656ba4eb818e23343af83e5a1c2' => '1' } } }
     Importers::ContextModuleImporter.select_all_linked_module_items(data, migration)

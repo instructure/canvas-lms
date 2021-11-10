@@ -113,6 +113,11 @@
                   <a href="{{edit_url}}" id="ui-id-{{id}}-2" class="icon-edit" tabindex="-1" role="menuitem" title='{{#t}}Edit Quiz{{/t}}'>{{#t}}Edit{{/t}}</a>
                 </li>
               {{/if}}
+              {{#if canShowQuizBuildShortCut}}
+                <li role="presentation">
+                  <a href="{{build_url}}" id="ui-id-{{id}}-5" class="icon-quiz" tabindex="-1" role="menuitem" title='{{#t}}Build Quiz{{/t}}'>{{#t}}Build{{/t}}</a>
+                </li>
+              {{/if}}
               {{#if canDuplicate}}
               <li>
                 <a

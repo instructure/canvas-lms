@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative '../common'
 
 module DiscussionsCommon
   def go_to_topic
@@ -83,7 +83,7 @@ module DiscussionsCommon
     type_in_tiny 'textarea', message
 
     if attachment.present?
-      filename, fullpath, data = get_file(attachment)
+      _filename, fullpath, _data = get_file(attachment)
       scroll_to(@last_entry.find_element(:css, '.discussion-reply-add-attachment'))
       @last_entry.find_element(:css, '.discussion-reply-add-attachment').click
       wait_for_ajaximations

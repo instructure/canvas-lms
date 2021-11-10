@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module CoreExt
+module Canvas::CoreExt
   module OAuth2
     def get_token(params, access_token_opts = {}, access_token_class = ::OAuth2::AccessToken) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
       params = ::OAuth2::Authenticator.new(id, secret, options[:auth_scheme]).apply(params)
@@ -41,4 +41,4 @@ module CoreExt
     end
   end
 end
-OAuth2::Client.prepend(CoreExt::OAuth2)
+OAuth2::Client.prepend(Canvas::CoreExt::OAuth2)

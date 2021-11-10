@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
+require_relative '../common'
 
 describe "sis imports ui" do
   include_context "in-process server selenium tests"
 
-  def account_with_admin_logged_in(opts = {})
+  def account_with_admin_logged_in
     @account = Account.default
     account_admin_user
     user_session(@admin)

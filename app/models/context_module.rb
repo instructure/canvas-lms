@@ -289,7 +289,7 @@ class ContextModule < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
     ContentTag.where(:context_module_id => self).where.not(:workflow_state => 'deleted').update_all(:workflow_state => 'deleted', :updated_at => self.deleted_at)
-    delay_if_production(n_strand: "context_module_update_downstreams", priority: Delayed::LOW_PRIORITY).update_downstreams(self.position)
+    delay_if_production(n_strand: "context_module_update_downstreams", priority: Delayed::LOW_PRIORITY).update_downstreams
     save!
     true
   end
@@ -316,8 +316,9 @@ class ContextModule < ActiveRecord::Base
     self.save
   end
 
-  def update_downstreams(original_position = nil)
-    original_position ||= self.position || 0
+  def update_downstreams(_original_position = nil)
+    # TODO: remove the unused argument; it's not sent anymore, but it was sent through a delayed job
+    # so compatibility was maintained when sender was updated to not send it
     positions = ContextModule.module_positions(self.context).to_a.sort_by { |a| a[1] }
     downstream_ids = positions.select { |a| a[1] > (self.position || 0) }.map { |a| a[0] }
     downstreams = downstream_ids.empty? ? [] : self.context.context_modules.not_deleted.where(id: downstream_ids)
@@ -565,9 +566,9 @@ class ContextModule < ActiveRecord::Base
   end
 
   def filter_tags_for_da(tags, user, opts = {})
-    filter = Proc.new do |tags, user_ids, course_id, opts|
+    filter = proc do |inner_tags, user_ids|
       visible_item_ids = {}
-      tags.select do |tag|
+      inner_tags.select do |tag|
         item_type =
           case tag.content_type
           when 'Assignment'
@@ -788,7 +789,6 @@ class ContextModule < ActiveRecord::Base
   end
 
   def update_for(user, action, tag, points = nil)
-    retry_count = 0
     return nil unless self.context.grants_right?(user, :participate_as_student)
     return nil unless (progression = self.evaluate_for(user))
     return nil if progression.locked?

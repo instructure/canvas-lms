@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require_relative('web_conference_spec_helper')
 
 describe BigBlueButtonConference do
@@ -44,14 +43,14 @@ describe BigBlueButtonConference do
       @conference.settings[:create_time] = @create_time
     end
 
-    it "correctlies retrieve a config hash" do
+    it "retrieves a config hash correctly" do
       config = @conference.config
       expect(config).not_to be_nil
       expect(config[:conference_type]).to eql('BigBlueButton')
       expect(config[:class_name]).to eql('BigBlueButtonConference')
     end
 
-    it "correctlies generate join urls" do
+    it "generates join urls correctly" do
       expect(@conference.config).not_to be_nil
       # set some vars so it thinks it's been created and doesn't do an api call
       @conference.conference_key = 'test'

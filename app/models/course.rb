@@ -746,7 +746,7 @@ class Course < ActiveRecord::Base
           end
         end
 
-        to_delete += current_associations.map { |k, v| v.map { |k2, v2| v2[0] } }.flatten
+        to_delete += current_associations.map { |_k, v| v.map { |_k2, v2| v2[0] } }.flatten
         unless to_delete.empty?
           CourseAccountAssociation.where(:id => to_delete).delete_all
         end
@@ -1608,7 +1608,7 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def unenrolled_user_can_read?(user, session)
+  def unenrolled_user_can_read?(_user, session)
     self.is_public || (self.is_public_to_auth_users && session.present? && session.has_key?(:user_id))
   end
 
@@ -1616,7 +1616,7 @@ class Course < ActiveRecord::Base
     given { |user, session| self.available? && unenrolled_user_can_read?(user, session) }
     can :read and can :read_outcomes and can :read_syllabus
 
-    given { |user, session| self.available? && (self.public_syllabus || (self.public_syllabus_to_auth && session.present? && session.has_key?(:user_id))) }
+    given { |_user, session| self.available? && (self.public_syllabus || (self.public_syllabus_to_auth && session.present? && session.key?(:user_id))) }
     can :read_syllabus
 
     RoleOverride.permissions.each do |permission, details|
@@ -1627,7 +1627,7 @@ class Course < ActiveRecord::Base
       can permission
     end
 
-    given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || (hash[:enrollment_state] == "active" && hash[:user_state].to_s == "pre_registered")) && (self.available? || self.completed? || (self.claimed? && hash[:is_admin])) }
+    given { |_user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || (hash[:enrollment_state] == "active" && hash[:user_state].to_s == "pre_registered")) && (self.available? || self.completed? || (self.claimed? && hash[:is_admin])) }
     can :read and can :read_outcomes
 
     given { |user| (self.available? || self.completed?) && user && fetch_on_enrollments("has_not_inactive_enrollment", user) { enrollments.for_user(user).not_inactive_by_date.exists? } }
@@ -2496,18 +2496,6 @@ class Course < ActiveRecord::Base
     end
   end
 
-  attr_accessor :merge_results
-
-  def log_merge_result(text)
-    @merge_results ||= []
-    logger.debug text
-    @merge_results << text
-  end
-
-  def warn_merge_result(text)
-    log_merge_result(text)
-  end
-
   def bool_res(val)
     Canvas::Plugin.value_to_boolean(val)
   end
@@ -2630,6 +2618,10 @@ class Course < ActiveRecord::Base
      :home_page_announcement_limit, :enable_offline_web_export, :usage_rights_required,
      :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates,
      :homeroom_course, :course_color, :alt_name]
+  end
+
+  def student_reporting?
+    !!self.allow_student_discussion_reporting
   end
 
   def set_course_dates_if_blank(shift_options)
@@ -3476,7 +3468,7 @@ class Course < ActiveRecord::Base
     false
   end
 
-  def filter_attributes_for_user(hash, user, session)
+  def filter_attributes_for_user(hash, user, _session)
     hash.delete('hide_final_grades') if hash.key?('hide_final_grades') && !grants_right?(user, :update)
     hash
   end

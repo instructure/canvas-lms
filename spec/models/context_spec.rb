@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
-
 describe Context do
   context "find_by_asset_string" do
     it "finds a valid course" do
@@ -189,11 +187,11 @@ describe Context do
   context "self.names_by_context_types_and_ids" do
     it "finds context names" do
       contexts = []
-      contexts << course1 = Course.create!(:name => "a course")
-      contexts << course2 = Course.create!(:name => "another course")
-      contexts << group1 = Account.default.groups.create!(:name => "a group")
-      contexts << group2 = Account.default.groups.create!(:name => "another group")
-      contexts << user = User.create!(:name => "a user")
+      contexts << Course.create!(:name => "a course")
+      contexts << Course.create!(:name => "another course")
+      contexts << Account.default.groups.create!(:name => "a group")
+      contexts << Account.default.groups.create!(:name => "another group")
+      contexts << User.create!(:name => "a user")
       names = Context.names_by_context_types_and_ids(contexts.map { |c| [c.class.name, c.id] })
       contexts.each do |c|
         expect(names[[c.class.name, c.id]]).to eql(c.name)

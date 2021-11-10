@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../cc_spec_helper')
+require_relative '../cc_spec_helper'
 
 require 'nokogiri'
 require 'tmpdir'
@@ -253,7 +253,7 @@ describe "Standard Common Cartridge importing" do
   end
 
   context "selective import" do
-    it "selectivelies import files" do
+    it "selectively imports files" do
       @course = course_factory
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {

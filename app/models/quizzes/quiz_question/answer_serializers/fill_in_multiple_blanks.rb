@@ -106,7 +106,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     #     "color": null,
     #     "size": "XL"
     #   }
-    def deserialize(submission_data, full = false)
+    def deserialize(submission_data, full: false)
       answers.each_with_object({}) do |answer_record, out|
         blank = answer_record[:blank_id]
         blank_key = answer_blank_key(blank)

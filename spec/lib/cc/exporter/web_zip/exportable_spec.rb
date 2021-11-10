@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-
 describe "Exportable" do
   # this class is only necessary until we get our package into a public repo
   # (canvas_offline_course_viewer npm package)

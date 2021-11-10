@@ -17,13 +17,13 @@
  */
 
 import {Button, IconButton} from '@instructure/ui-buttons'
-import {IconMiniArrowDownLine, IconReplyLine, IconSettingsLine} from '@instructure/ui-icons'
+import I18n from 'i18n!conversations_2'
+import {IconMoreLine, IconReplyLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
-import I18n from 'i18n!conversations_2'
 
 export const MessageDetailActions = ({...props}) => {
   return (
@@ -33,26 +33,30 @@ export const MessageDetailActions = ({...props}) => {
           size="small"
           margin="0 x-small 0 0"
           screenReaderLabel={I18n.t('Reply')}
-          onClick={() => props.handleOptionSelect('reply')}
+          onClick={props.onReply}
+          data-testid="message-reply"
         >
           <IconReplyLine />
         </IconButton>
       </Tooltip>
       <Menu
         placement="bottom"
-        onSelect={(event, value) => {
-          props.handleOptionSelect(value)
-        }}
         trigger={
           <Tooltip renderTip={I18n.t('More options')} on={['hover', 'focus']}>
-            <Button margin="0 x-small 0 0" size="small" renderIcon={IconSettingsLine}>
+            <Button
+              margin="0 x-small 0 0"
+              size="small"
+              renderIcon={IconMoreLine}
+              data-testid="message-more-options"
+            >
               <ScreenReaderContent>{I18n.t('More options')}</ScreenReaderContent>
-              <IconMiniArrowDownLine />
             </Button>
           </Tooltip>
         }
       >
-        <Menu.Item value="reply-all">{I18n.t('Reply All')}</Menu.Item>
+        <Menu.Item value="reply-all" onSelect={props.onReplyAll}>
+          {I18n.t('Reply All')}
+        </Menu.Item>
         <Menu.Item value="forward">{I18n.t('Forward')}</Menu.Item>
         <Menu.Item value="delete">{I18n.t('Delete')}</Menu.Item>
       </Menu>
@@ -61,5 +65,6 @@ export const MessageDetailActions = ({...props}) => {
 }
 
 MessageDetailActions.propTypes = {
-  handleOptionSelect: PropTypes.func
+  onReply: PropTypes.func,
+  onReplyAll: PropTypes.func
 }

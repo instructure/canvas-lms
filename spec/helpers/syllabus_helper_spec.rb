@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe SyllabusHelper do
   describe '#syllabus_user_content' do
     before :once do

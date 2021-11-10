@@ -20,6 +20,8 @@
 module K5Mode
   extend ActiveSupport::Concern
 
+  K5_JS_BUNDLE = [:k5_theme, nil, false].freeze
+
   included do
     set_callback :html_render, :before, :set_k5_mode
   end
@@ -41,7 +43,8 @@ module K5Mode
 
     if @context.try(:elementary_enabled?) || (require_k5_theme && k5_user?)
       css_bundle :k5_theme
-      js_bundle :k5_theme
+      # The k5 theme needs to be loaded before other bundles to take effect
+      js_bundles.unshift K5_JS_BUNDLE unless js_bundles.include? K5_JS_BUNDLE
     elsif @context.try(:feature_enabled?, :canvas_k6_theme)
       css_bundle :k6_theme
     end

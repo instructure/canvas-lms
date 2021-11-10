@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../common')
-require File.expand_path(File.dirname(__FILE__) + '/../helpers/calendar2_common')
+require_relative '../common'
+require_relative '../helpers/calendar2_common'
 
 describe "calendar2" do
   include_context "in-process server selenium tests"
@@ -94,7 +94,7 @@ describe "calendar2" do
         noon = Time.zone.now.at_beginning_of_day + 12.hours
         first_event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
         second_start = first_event.start_at + 6.minutes
-        second_event = @course.calendar_events.create!(:title => "ohai", :start_at => second_start, :end_at => second_start + 5.minutes)
+        @course.calendar_events.create!(:title => "ohai", :start_at => second_start, :end_at => second_start + 5.minutes)
 
         load_week_view
 
@@ -146,7 +146,7 @@ describe "calendar2" do
 
       it "shows the right times in the tool tips for short events", priority: "2", test_id: 768983 do
         noon = Time.zone.now.at_beginning_of_day + 12.hours
-        event = @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
+        @course.calendar_events.create! :title => "ohai", :start_at => noon, :end_at => noon + 5.minutes
         load_week_view
 
         elt = fj('.fc-event:visible')

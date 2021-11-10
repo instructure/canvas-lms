@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
-
 describe StreamItemsHelper do
   before :once do
     Notification.create!(:name => "Assignment Created", :category => "TestImmediately")
@@ -106,7 +104,7 @@ describe StreamItemsHelper do
         course_with_teacher(:active_all => 1)
         @user2 = @shard1.activate { user_model }
         @course.enroll_student(@user2).accept!
-        dt = @course.discussion_topics.create!(:title => 'title')
+        @course.discussion_topics.create!(:title => 'title')
 
         items = @user2.recent_stream_items
         categorized = helper.categorize_stream_items(items, @user2)

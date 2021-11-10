@@ -31,7 +31,8 @@ jest.mock('../../utilities/apiUtils', () => ({
     newActivity: response.new_activity,
     transformedToInternal: true
   })),
-  transformInternalToApiItem: jest.fn(internal => ({...internal, transformedToApi: true}))
+  transformInternalToApiItem: jest.fn(internal => ({...internal, transformedToApi: true})),
+  observedUserId: jest.requireActual('../../utilities/apiUtils').observedUserId
 }))
 
 const getBasicState = () => ({

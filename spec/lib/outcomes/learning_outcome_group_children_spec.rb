@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe Outcomes::LearningOutcomeGroupChildren do
   subject { described_class.new(context) }
 

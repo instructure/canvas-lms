@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
-
 describe SplitUsers do
   describe 'user splitting' do
     let!(:restored_user) { user_model } # user will be merged into source_user and then restored on split
@@ -394,7 +392,7 @@ describe SplitUsers do
       end
 
       it "deconflicts duplicated paths where it can" do
-        notification = Notification.where(name: "Report Generated").first_or_create
+        Notification.where(name: "Report Generated").first_or_create
         communication_channel(restored_user, { username: 'test@instructure.com' })
         restored_user_ccs = restored_user.communication_channels.where.not(workflow_state: 'retired')
                                          .map { |cc| [cc.path, cc.workflow_state] }.sort

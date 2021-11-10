@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../sharding_spec_helper'
-
 describe ObserverAlert do
   include Api
   include Api::V1::ObserverAlertThreshold
@@ -292,7 +290,7 @@ describe ObserverAlert do
       # course with just the student
       course_with_teacher
       course_with_student(course: @course)
-      assignment = assignment_model(context: @course, due_at: 5.minutes.ago, submission_types: 'online_text_entry', points_possible: 100)
+      assignment_model(context: @course, due_at: 5.minutes.ago, submission_types: 'online_text_entry', points_possible: 100)
 
       # course with the student and observer
       course_with_student(user: @student)

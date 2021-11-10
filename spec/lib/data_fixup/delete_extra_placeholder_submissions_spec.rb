@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe DataFixup::DeleteExtraPlaceholderSubmissions do
   before(:once) do
     course_with_student

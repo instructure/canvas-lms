@@ -235,7 +235,7 @@ This text has a http://www.google.com link in it...
 
   it "marks last_comment_at on the submission" do
     prepare_test_submission
-    student_comment = @submission.add_comment(:author => @submission.user, :comment => "some comment")
+    @submission.add_comment(:author => @submission.user, :comment => "some comment")
     expect(@submission.reload.last_comment_at).to be_nil
 
     draft_comment = @submission.add_comment(:author => @teacher, :comment => "some comment", :draft_comment => true)

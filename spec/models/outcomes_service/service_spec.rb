@@ -19,7 +19,6 @@
 #
 
 require_relative '../../spec_helper'
-require_relative '../../sharding_spec_helper'
 
 describe OutcomesService::Service do
   before :once do

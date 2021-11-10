@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/lti2_api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative 'lti2_api_spec_helper'
+require_relative '../api_spec_helper'
 
 require_dependency "lti/ims/access_token_helper"
 require_dependency "lti/plagiarism_assignments_api_controller"
@@ -86,13 +86,13 @@ module Lti
       end
 
       it 'returns 404 when the assignment cannot be found' do
-        user = user_model
+        user_model
         get "#{endpoint}/blah", headers: request_headers
         expect(response).to be_not_found
       end
 
       it 'returns 404 when the user cannot be found' do
-        user = user_model
+        user_model
         get "#{endpoint}/#{assignment.id}", params: { user_id: 'blah' }, headers: request_headers
         expect(response).to be_not_found
       end

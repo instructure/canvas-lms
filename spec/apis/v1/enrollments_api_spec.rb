@@ -18,8 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require_relative '../api_spec_helper'
 
 describe EnrollmentsApiController, type: :request do
   describe "enrollment creation" do
@@ -101,34 +100,34 @@ describe EnrollmentsApiController, type: :request do
         c2 = Account.default.courses.create!
         user = c2.student_view_student
 
-        json = api_call :post, @path, @path_options,
-                        {
-                          :enrollment => {
-                            :user_id => user.id,
-                            :type => 'StudentEnrollment',
-                            :enrollment_state => 'active',
-                            :course_section_id => @section.id,
-                            :limit_privileges_to_course_section => true,
-                            :start_at => nil,
-                            :end_at => nil
-                          }
-                        }, {}, expected_status: 400
+        api_call :post, @path, @path_options,
+                 {
+                   :enrollment => {
+                     :user_id => user.id,
+                     :type => 'StudentEnrollment',
+                     :enrollment_state => 'active',
+                     :course_section_id => @section.id,
+                     :limit_privileges_to_course_section => true,
+                     :start_at => nil,
+                     :end_at => nil
+                   }
+                 }, {}, expected_status: 400
         expect(@section.enrollments.count).to eq 0
       end
 
       it "does not allow enrolling a user as a student view student" do
-        json = api_call :post, @path, @path_options,
-                        {
-                          :enrollment => {
-                            :user_id => @unenrolled_user.id,
-                            :type => 'StudentViewEnrollment',
-                            :enrollment_state => 'active',
-                            :course_section_id => @section.id,
-                            :limit_privileges_to_course_section => true,
-                            :start_at => nil,
-                            :end_at => nil
-                          }
-                        }, {}, expected_status: 400
+        api_call :post, @path, @path_options,
+                 {
+                   :enrollment => {
+                     :user_id => @unenrolled_user.id,
+                     :type => 'StudentViewEnrollment',
+                     :enrollment_state => 'active',
+                     :course_section_id => @section.id,
+                     :limit_privileges_to_course_section => true,
+                     :start_at => nil,
+                     :end_at => nil
+                   }
+                 }, {}, expected_status: 400
         expect(@section.enrollments.count).to eq 0
       end
 
@@ -153,36 +152,36 @@ describe EnrollmentsApiController, type: :request do
       it "is unauthorized for users without manage_students permission (non-granular)" do
         @course.root_account.disable_feature!(:granular_permissions_manage_users)
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_students)
-        json = api_call :post, @path, @path_options,
-                        {
-                          :enrollment => {
-                            :user_id => @unenrolled_user.id,
-                            :type => 'StudentEnrollment',
-                            :enrollment_state => 'active',
-                            :course_section_id => @section.id,
-                            :limit_privileges_to_course_section => true,
-                            :start_at => nil,
-                            :end_at => nil
-                          }
-                        }, {}, { :expected_status => 401 }
+        api_call :post, @path, @path_options,
+                 {
+                   :enrollment => {
+                     :user_id => @unenrolled_user.id,
+                     :type => 'StudentEnrollment',
+                     :enrollment_state => 'active',
+                     :course_section_id => @section.id,
+                     :limit_privileges_to_course_section => true,
+                     :start_at => nil,
+                     :end_at => nil
+                   }
+                 }, {}, { :expected_status => 401 }
       end
 
       it "is unauthorized for users without add_student_to_course permission (granular)" do
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :manage_students)
         @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :add_student_to_course)
-        json = api_call :post, @path, @path_options,
-                        {
-                          :enrollment => {
-                            :user_id => @unenrolled_user.id,
-                            :type => 'StudentEnrollment',
-                            :enrollment_state => 'active',
-                            :course_section_id => @section.id,
-                            :limit_privileges_to_course_section => true,
-                            :start_at => nil,
-                            :end_at => nil
-                          }
-                        }, {}, { :expected_status => 401 }
+        api_call :post, @path, @path_options,
+                 {
+                   :enrollment => {
+                     :user_id => @unenrolled_user.id,
+                     :type => 'StudentEnrollment',
+                     :enrollment_state => 'active',
+                     :course_section_id => @section.id,
+                     :limit_privileges_to_course_section => true,
+                     :start_at => nil,
+                     :end_at => nil
+                   }
+                 }, {}, { :expected_status => 401 }
       end
 
       it "creates a new teacher enrollment" do
@@ -394,7 +393,7 @@ describe EnrollmentsApiController, type: :request do
                  })
       end
 
-      it "optionallies send notifications" do
+      it "optionally sends notifications" do
         expect_any_instance_of(StudentEnrollment).to receive(:save).at_least(:once)
 
         api_call(:post, @path, @path_options, {
@@ -790,21 +789,21 @@ describe EnrollmentsApiController, type: :request do
         account.settings.delete(:self_enrollment)
         account.save!
 
-        json = raw_api_call :post, @path, @path_options,
-                            {
-                              enrollment: {
-                                user_id: 'self',
-                                self_enrollment_code: @course.self_enrollment_code
-                              }
-                            }
+        raw_api_call :post, @path, @path_options,
+                     {
+                       enrollment: {
+                         user_id: 'self',
+                         self_enrollment_code: @course.self_enrollment_code
+                       }
+                     }
         expect(response.code).to eql '400'
       end
 
       it "does not allow self-enrollment in a concluded course" do
         @course.update(:start_at => 2.days.ago, :conclude_at => 1.day.ago,
                        :restrict_enrollments_to_course_dates => true)
-        json = raw_api_call :post, @path, @path_options,
-                            { enrollment: { user_id: 'self', self_enrollment_code: @course.self_enrollment_code } }
+        raw_api_call :post, @path, @path_options,
+                     { enrollment: { user_id: 'self', self_enrollment_code: @course.self_enrollment_code } }
         expect(response.code).to eql '400'
         expect(response.body).to include("concluded")
       end
@@ -850,7 +849,7 @@ describe EnrollmentsApiController, type: :request do
       @section = @course.course_sections.create!
     end
 
-    it "deterministicallies order enrollments for pagination" do
+    it "orders enrollments deterministically for pagination" do
       allow_any_instance_of(EnrollmentsApiController).to receive(:use_bookmarking?).and_return(true)
       enrollment_num = 10
       enrollment_num.times do
@@ -875,7 +874,7 @@ describe EnrollmentsApiController, type: :request do
       end
     end
 
-    it "deterministicallies order enrollments for pagination with bookmarking not enabled" do
+    it "orders enrollments deterministically for pagination with bookmarking not enabled" do
       allow_any_instance_of(EnrollmentsApiController).to receive(:use_bookmarking?).and_return(false)
       enrollment_num = 10
       enrollment_num.times do
@@ -2290,7 +2289,7 @@ describe EnrollmentsApiController, type: :request do
         it "properly paginates" do
           json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(:page => 1.to_param, :per_page => 1.to_param))
           enrollments = %w{observer student ta teacher}.inject([]) { |res, type|
-            res = res + @course.send("#{type}_enrollments").preload(:user)
+            res + @course.send("#{type}_enrollments").preload(:user)
           }.map do |e|
             h = {
               'root_account_id' => e.root_account_id,
@@ -2353,7 +2352,7 @@ describe EnrollmentsApiController, type: :request do
         it "properly paginates" do
           json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(:page => 1.to_param, :per_page => 1.to_param))
           enrollments = %w{observer student ta teacher}.inject([]) { |res, type|
-            res = res + @course.send("#{type}_enrollments").preload(:user)
+            res + @course.send("#{type}_enrollments").preload(:user)
           }.map do |e|
             h = {
               'root_account_id' => e.root_account_id,
@@ -2694,7 +2693,7 @@ describe EnrollmentsApiController, type: :request do
         end
 
         it "does not show enrollment" do
-          json = api_call(:get, @base_path + "/#{@enrollment.id}", @params.merge(id: @enrollment.to_param), {}, {}, { expected_status: 401 })
+          api_call(:get, @base_path + "/#{@enrollment.id}", @params.merge(id: @enrollment.to_param), {}, {}, { expected_status: 401 })
         end
       end
     end

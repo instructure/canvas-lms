@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
-
 describe LiveEvents do
   it 'triggers a live event on login' do
     expect(Canvas::LiveEvents).to receive(:logged_in).once

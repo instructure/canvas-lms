@@ -27,6 +27,7 @@ require_relative '../pages/k5_resource_tab_page'
 require_relative '../../../helpers/k5_common'
 require_relative '../shared_examples/k5_navigation_tabs_shared_examples'
 require_relative '../shared_examples/k5_subject_grades_shared_examples'
+require_relative '../shared_examples/k5_schedule_shared_examples'
 require_relative '../../../helpers/observer_enrollments_helper_spec'
 
 describe "observer k5 dashboard" do
@@ -298,5 +299,9 @@ describe "observer k5 dashboard" do
 
   context 'subject grades shared examples' do
     it_behaves_like 'k5 subject grades'
+  end
+
+  context 'schedule shared examples' do
+    it_behaves_like 'k5 schedule'
   end
 end

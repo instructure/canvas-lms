@@ -17,8 +17,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 shared_examples_for 'Takeable Quiz Services' do
   it 'denies access to locked quizzes' do
     allow(quiz).to receive(:locked_for?).and_return(true)

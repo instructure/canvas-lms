@@ -309,6 +309,10 @@ const dropEmptyCategories = categories => {
 const NotificationPreferencesTable = props => {
   const [sendScoresInEmails, setSendScoresInEmails] = useState(props.preferences.sendScoresInEmails)
 
+  if (ENV.discussions_reporting && ENV?.current_user_roles?.includes('teacher')) {
+    notificationCategories.discussions.ReportedReply = {}
+  }
+
   if (props.preferences.channels?.length > 0) {
     formatPreferencesData(props.preferences)
     return (

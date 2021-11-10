@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path('../sharding_spec_helper', File.dirname(__FILE__))
-
 describe UserSearch do
   describe '.for_user_in_context' do
     let(:search_names) { ['Rose Tyler', 'Martha Jones', 'Rosemary Giver', 'Martha Stewart', 'Tyler Pickett', 'Jon Stewart', 'Stewart Little', 'Ĭńşŧřůćƭǜȑȩ Person'] }
@@ -70,7 +68,7 @@ describe UserSearch do
         end
 
         it 'will not pickup students outside the course' do
-          out_of_course_student = User.create!(:name => 'Stewart Stewart')
+          User.create!(:name => 'Stewart Stewart')
           # names is evaluated lazily from the 'let' block so ^ user is still being
           # created before the query executes
           expect(names).not_to include('Stewart Stewart')
@@ -132,7 +130,7 @@ describe UserSearch do
 
             before do
               newstudent = User.create!(:name => 'Tyler Student')
-              e = StudentEnrollment.create!(:user => newstudent, :course => course, :workflow_state => 'active')
+              StudentEnrollment.create!(:user => newstudent, :course => course, :workflow_state => 'active')
             end
 
             it { should include('Rose Tyler') }
@@ -146,7 +144,7 @@ describe UserSearch do
 
             before do
               newstudent = User.create!(:name => 'Tyler Student')
-              e = StudentEnrollment.create!(:user => newstudent, :course => course, :workflow_state => 'active')
+              StudentEnrollment.create!(:user => newstudent, :course => course, :workflow_state => 'active')
             end
 
             it { should include('Rose Tyler') }

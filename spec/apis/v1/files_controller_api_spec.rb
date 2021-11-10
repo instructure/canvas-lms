@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../locked_spec')
+require_relative '../api_spec_helper'
+require_relative '../locked_spec'
 
 RSpec.configure do |config|
   config.include ApplicationHelper
@@ -372,13 +372,13 @@ describe "Files API", type: :request do
                                                                                :content_type => 'text/plain',
                                                                                :content_length => 1234,
                                                                              })
-        json = call_create_success
+        call_create_success
       end
 
       it "calls back for local storage" do
         local_storage!
         upload_data
-        json = call_create_success
+        call_create_success
       end
     end
   end
@@ -630,9 +630,9 @@ describe "Files API", type: :request do
 
     context "content_types" do
       before :once do
-        txt = attachment_model :display_name => 'thing.txt', :content_type => 'text/plain', :context => @course, :folder => @f1
-        png = attachment_model :display_name => 'thing.png', :content_type => 'image/png', :context => @course, :folder => @f1
-        gif = attachment_model :display_name => 'thing.gif', :content_type => 'image/gif', :context => @course, :folder => @f1
+        attachment_model :display_name => 'thing.txt', :content_type => 'text/plain', :context => @course, :folder => @f1
+        attachment_model :display_name => 'thing.png', :content_type => 'image/png', :context => @course, :folder => @f1
+        attachment_model :display_name => 'thing.gif', :content_type => 'image/gif', :context => @course, :folder => @f1
       end
 
       it "matches one content-type" do
@@ -877,9 +877,9 @@ describe "Files API", type: :request do
 
     context "content_types" do
       before :once do
-        txt = attachment_model :display_name => 'thing.txt', :content_type => 'text/plain', :context => @course, :folder => @f1
-        png = attachment_model :display_name => 'thing.png', :content_type => 'image/png', :context => @course, :folder => @f1
-        gif = attachment_model :display_name => 'thing.gif', :content_type => 'image/gif', :context => @course, :folder => @f1
+        attachment_model :display_name => 'thing.txt', :content_type => 'text/plain', :context => @course, :folder => @f1
+        attachment_model :display_name => 'thing.png', :content_type => 'image/png', :context => @course, :folder => @f1
+        attachment_model :display_name => 'thing.gif', :content_type => 'image/gif', :context => @course, :folder => @f1
       end
 
       it "matches one content-type" do

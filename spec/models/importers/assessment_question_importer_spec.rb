@@ -18,14 +18,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
+require_relative '../../import_helper'
 
 describe "Assessment Question import from hash" do
   SYSTEMS.each do |system|
     QUESTIONS.each do |q|
       if import_data_exists? [system, 'quiz'], q[0]
         it "imports #{q[0]} questions for #{system}" do
-          test_question_import(q[0], system, q[1])
+          test_question_import(q[0], system)
         end
       end
     end
@@ -164,7 +164,7 @@ describe "Assessment Question import from hash" do
   end
 end
 
-def test_question_import(hash_name, system, question_type = nil)
+def test_question_import(hash_name, system)
   q = get_import_data [system, 'quiz'], hash_name
   context = get_import_context(system)
   data = { 'assessment_questions' => { 'assessment_questions' => [q] } }

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
-
 describe Api::V1::CourseEvent do
   include Api::V1::CourseEvent
 
@@ -35,7 +33,7 @@ describe Api::V1::CourseEvent do
     "feed_calendar_url(#{feed_code.inspect})"
   end
 
-  def service_enabled?(type)
+  def service_enabled?(_type)
     false
   end
 

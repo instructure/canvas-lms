@@ -30,7 +30,7 @@ module Api::V1::ExternalFeeds
     end
   end
 
-  def external_feed_api_json(external_feed, context, user, session)
+  def external_feed_api_json(external_feed, _context, user, session)
     options = { :only => API_EXPOSED_EXTERNAL_FEED_PARAMS,
                 :methods => [:display_name] }
 

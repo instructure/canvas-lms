@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../sharding_spec_helper'
 require 'rotp'
 
 describe Login::CanvasController do
@@ -201,7 +200,7 @@ describe Login::CanvasController do
   end
 
   it "rejects canvas auth if Canvas auth is disabled" do
-    aac = Account.default.authentication_providers.create!(:auth_type => 'ldap')
+    Account.default.authentication_providers.create!(:auth_type => 'ldap')
     Account.default.canvas_authentication_provider.destroy
     get 'new'
     assert_status(404)
@@ -353,6 +352,7 @@ describe Login::CanvasController do
                           active_all: 1,
                           password: 'qwertyuiop',
                           account: account)
+      allow(HostUrl).to receive(:context_host).with(Account.default, 'test.host').and_return("account")
       allow(HostUrl).to receive(:context_host).with(account, 'test.host').and_return("account2")
       post 'create', params: { :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop' } }
       expect(response).to redirect_to(dashboard_url(host: 'account2', cross_domain_login: 'test.host'))
@@ -366,6 +366,7 @@ describe Login::CanvasController do
                           password: 'qwertyuiop',
                           account: account)
       Account.default.account_users.create!(user: @user)
+      allow(HostUrl).to receive(:context_host).with(Account.default, 'test.host').and_return("account")
       allow(HostUrl).to receive(:context_host).with(account, 'test.host').and_return("account2")
       post 'create', params: { :pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop' } }
       expect(response).to redirect_to(dashboard_url(:login_success => 1))

@@ -31,7 +31,8 @@ export default function StudentAnnotationAttempt(props) {
   useEffect(() => {
     axios
       .post('/api/v1/canvadoc_session', {
-        submission_attempt: isSubmitted ? props.submission.attempt : 'draft',
+        submission_attempt:
+          isSubmitted && props.submission.attempt !== 0 ? props.submission.attempt : 'draft',
         submission_id: props.submission._id
       })
       .then(result => {
@@ -39,7 +40,7 @@ export default function StudentAnnotationAttempt(props) {
         setFetchingCanvadocSession(false)
         setValidResponse(true)
 
-        if (!isSubmitted) {
+        if (!isSubmitted || props.submission.attempt === 0) {
           props.createSubmissionDraft({
             variables: {
               id: props.submission.id,
@@ -53,6 +54,7 @@ export default function StudentAnnotationAttempt(props) {
         setFetchingCanvadocSession(false)
         setValidResponse(false)
       })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSubmitted, props.submission.attempt])
 
   return (

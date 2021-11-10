@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
-
 describe "MessageableUser" do
   describe ".build_select" do
     it "ignores common_course_column without common_role_column" do

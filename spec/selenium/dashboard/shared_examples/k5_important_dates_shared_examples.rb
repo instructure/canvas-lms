@@ -194,14 +194,20 @@ shared_examples_for 'k5 important dates calendar picker' do |context|
       Account.site_admin.enable_feature!(:k5_parent_support)
       @observer = user_with_pseudonym(name: "Mom", email: "bestmom@example.com", workflow_state: "available")
       add_linked_observer(@student, @observer, root_account: @account)
+      # For now, The calendar picker is only available if the observer is viewing his own enrollments
       2.times do |x|
         course_with_student(
           active_all: true,
-          user: @student,
+          user: @observer,
           course_name: "#{subject_course_title_prefix}#{x + 1}"
         )
         @new_course_list << @course
       end
+      course_with_student(
+        active_all: true,
+        user: @observer,
+        course: @subject_course
+      )
       user_session(@observer)
     end
   end

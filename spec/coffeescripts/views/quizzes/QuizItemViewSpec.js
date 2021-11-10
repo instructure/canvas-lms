@@ -55,7 +55,9 @@ const createView = function (quiz, options = {}) {
   ENV.FLAGS = {
     post_to_sis_enabled: options.post_to_sis,
     migrate_quiz_enabled: options.migrate_quiz_enabled,
-    DIRECT_SHARE_ENABLED: options.DIRECT_SHARE_ENABLED || false
+    DIRECT_SHARE_ENABLED: options.DIRECT_SHARE_ENABLED || false,
+    new_quizzes_skip_to_build_module_button: options.new_quizzes_skip_to_build_module_button,
+    quiz_lti_enabled: !!options.quiz_lti_enabled
   }
 
   const view = new QuizItemView({model: quiz, publishIconView: icon})
@@ -466,6 +468,39 @@ test('duplicate option is not available when a quiz can not be duplicated (old q
   const json = view.toJSON()
   ok(!json.canDuplicate)
   equal(view.$('.duplicate_assignment').length, 0)
+})
+
+test('can skip to build when the flag is enabled', () => {
+  const quiz = createQuiz({
+    id: 1,
+    title: 'Foo',
+    can_duplicate: true,
+    can_update: true,
+    quiz_type: 'quizzes.next'
+  })
+  Object.assign(window.ENV, {current_user_roles: ['admin']})
+  const view = createView(quiz, {
+    canManage: true,
+    new_quizzes_skip_to_build_module_button: true,
+    quiz_lti_enabled: true
+  })
+  const json = view.toJSON()
+  ok(json.canShowQuizBuildShortCut)
+  equal(view.$('a.icon-quiz').length, 1)
+})
+
+test('cannot skip to build when the flag is disabled', () => {
+  const quiz = createQuiz({
+    id: 1,
+    title: 'Foo',
+    can_update: true,
+    quiz_type: 'quizzes.next'
+  })
+  Object.assign(window.ENV, {current_user_roles: ['admin']})
+  const view = createView(quiz, {quiz_lti_enabled: true})
+  const json = view.toJSON()
+  ok(!json.canShowQuizBuildShortCut)
+  equal(view.$('a.icon-quiz').length, 0)
 })
 
 test('clicks on Retry button to trigger another duplicating request', () => {

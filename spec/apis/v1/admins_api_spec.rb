@@ -18,8 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require_relative '../../sharding_spec_helper'
+require_relative '../api_spec_helper'
 
 describe "Admins API", type: :request do
   before :once do
@@ -35,9 +34,9 @@ describe "Admins API", type: :request do
     end
 
     it "flags the user as an admin for the account" do
-      json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-                      { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
-                      { :user_id => @new_user.id })
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
+               { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+               { :user_id => @new_user.id })
       @new_user.reload
       expect(@new_user.account_users.size).to eq 1
       admin = @new_user.account_users.first
@@ -45,9 +44,9 @@ describe "Admins API", type: :request do
     end
 
     it "defaults the role of the admin association to AccountAdmin" do
-      json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-                      { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
-                      { :user_id => @new_user.id })
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
+               { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+               { :user_id => @new_user.id })
       @new_user.reload
       admin = @new_user.account_users.first
       expect(admin.role).to eq admin_role
@@ -55,9 +54,9 @@ describe "Admins API", type: :request do
 
     it "respects the provided role, if any" do
       role = custom_account_role('CustomAccountUser', :account => @admin.account)
-      json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-                      { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
-                      { :user_id => @new_user.id, :role_id => role.id })
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
+               { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+               { :user_id => @new_user.id, :role_id => role.id })
       @new_user.reload
       admin = @new_user.account_users.first
       expect(admin.role).to eq role
@@ -65,9 +64,9 @@ describe "Admins API", type: :request do
 
     it "is able to find a role by name (though deprecated)" do
       role = custom_account_role('CustomAccountUser', :account => @admin.account)
-      json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-                      { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
-                      { :user_id => @new_user.id, :role => "CustomAccountUser" })
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
+               { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+               { :user_id => @new_user.id, :role => "CustomAccountUser" })
       @new_user.reload
       admin = @new_user.account_users.first
       expect(admin.role).to eq role
@@ -114,10 +113,10 @@ describe "Admins API", type: :request do
       expect_any_instance_of(AccountUser).to receive(:account_user_notification!).never
       expect_any_instance_of(AccountUser).to receive(:account_user_registration!).never
 
-      json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-                      { :controller => 'admins', :action => 'create', :format => 'json',
-                        :account_id => @admin.account.to_param },
-                      { :user_id => @new_user.to_param, :send_confirmation => 'false' })
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
+               { :controller => 'admins', :action => 'create', :format => 'json',
+                 :account_id => @admin.account.to_param },
+               { :user_id => @new_user.to_param, :send_confirmation => 'false' })
 
       # Both of the expectations above should pass.
     end
@@ -125,10 +124,10 @@ describe "Admins API", type: :request do
     it "sends a notification email if 'send_confirmation' isn't set" do
       expect_any_instance_of(AccountUser).to receive(:account_user_registration!).once
 
-      json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-                      { :controller => 'admins', :action => 'create', :format => 'json',
-                        :account_id => @admin.account.to_param },
-                      { :user_id => @new_user.to_param })
+      api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
+               { :controller => 'admins', :action => 'create', :format => 'json',
+                 :account_id => @admin.account.to_param },
+               { :user_id => @new_user.to_param })
 
       # Expectation above should pass.
     end

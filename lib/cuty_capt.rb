@@ -118,7 +118,7 @@ class CutyCapt
     [path, "--url=#{url}", "--out=#{img_file}", "--out-format=#{format}", "--delay=#{delay}", "--max-wait=#{timeout}", "--header=Accept-Language:#{lang}"]
   end
 
-  def self.snapshot_url(url, &block)
+  def self.snapshot_url(url)
     return nil unless (config = self.config)
     return nil unless self.verify_url(url)
 

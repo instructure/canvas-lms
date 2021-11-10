@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../api_spec_helper'
 
 describe OutcomeImportsApiController, type: :request do
   before :once do
@@ -87,6 +87,29 @@ describe OutcomeImportsApiController, type: :request do
                                    "id" => import.id,
                                    "workflow_state" => "succeeded"
                                  })
+  end
+
+  describe "imports within group" do
+    let(:group) { LearningOutcomeGroup.create!(title: "test", context: @account) }
+
+    let(:make_api_call) {
+      api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_imports/group/#{group.id}",
+               { :controller => 'outcome_imports_api', :action => 'create', :format => 'json',
+                 :account_id => @account.id.to_s, :learning_outcome_group_id => group.id.to_s },
+               { :import_type => 'instructure_csv',
+                 :attachment => fixture_file_upload("files/outcomes/test_outcomes_no_groups.csv", 'text/csv') })
+
+      run_jobs
+    }
+
+    it { expect { make_api_call }.to change { group.child_outcome_links.count }.by(1) }
+
+    it { expect { make_api_call }.to change { LearningOutcome.count }.by(1) }
+
+    it {
+      make_api_call
+      expect(group.child_outcome_links.first.content).to eq(LearningOutcome.first)
+    }
   end
 
   it "allows raw post without content-type" do

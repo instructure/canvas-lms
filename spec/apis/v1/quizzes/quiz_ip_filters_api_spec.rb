@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
+require_relative '../../api_spec_helper'
 
 describe Quizzes::QuizIpFiltersController, type: :request do
   before :once do
@@ -72,7 +72,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
     it 'restricts access to itself' do
       student_in_course
 
-      json = get_index(true)
+      get_index(true)
       assert_status(401)
     end
 

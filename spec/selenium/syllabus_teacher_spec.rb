@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/wiki_and_tiny_common')
-require File.expand_path(File.dirname(__FILE__) + '/rcs/pages/rce_next_page')
+require_relative 'common'
+require_relative 'helpers/public_courses_context'
+require_relative 'helpers/files_common'
+require_relative 'helpers/wiki_and_tiny_common'
+require_relative 'rcs/pages/rce_next_page'
 
 describe "course syllabus" do
   include_context "in-process server selenium tests"

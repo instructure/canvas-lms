@@ -23,7 +23,7 @@ describe EnrollmentState do
   describe "#enrollments_needing_calculation" do
     it "finds enrollments that need calculation" do
       course_factory
-      normal_enroll = student_in_course(:course => @course)
+      student_in_course(:course => @course)
 
       invalidated_enroll1 = student_in_course(:course => @course)
       EnrollmentState.where(:enrollment_id => invalidated_enroll1).update_all(:state_is_current => false)

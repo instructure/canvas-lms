@@ -126,6 +126,7 @@ class Quizzes::QuizzesController < ApplicationController
           post_to_sis_enabled: Assignment.sis_grade_export_enabled?(@context),
           quiz_lti_enabled: quiz_lti_enabled?,
           new_quizzes_modules_support: Account.site_admin.feature_enabled?(:new_quizzes_modules_support),
+          new_quizzes_skip_to_build_module_button: Account.site_admin.feature_enabled?(:new_quizzes_skip_to_build_module_button),
           migrate_quiz_enabled:
             @context.feature_enabled?(:quizzes_next) &&
             @context.quiz_lti_tool.present?,
@@ -315,7 +316,6 @@ class Quizzes::QuizzesController < ApplicationController
       @quiz.due_at = params[:due_at] if params[:due_at]
       @quiz.assignment_group_id = params[:assignment_group_id] if params[:assignment_group_id]
 
-      student_ids = @context.student_ids
       @banks_hash = get_banks(@quiz)
 
       if (@has_student_submissions = @quiz.has_student_submissions?)
@@ -437,7 +437,6 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def update
-    n = Time.now.to_f
     if authorized_action(@quiz, @current_user, :update)
       quiz_params = get_quiz_params
       params[:quiz] ||= {}

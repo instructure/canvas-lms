@@ -18,10 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require_relative '../api_spec_helper'
+require_relative '../file_uploads_spec_helper'
+require_relative '../../cassandra_spec_helper'
 
 class TestUserApi
   include Api::V1::User
@@ -31,9 +30,13 @@ class TestUserApi
 
   def avatar_image_url(*args); "avatar_image_url(#{args.first})"; end
 
-  def course_student_grades_url(course_id, user_id); ""; end
+  def course_student_grades_url(_course_id, _user_id)
+    ""
+  end
 
-  def course_user_url(course_id, user_id); ""; end
+  def course_user_url(_course_id, _user_id)
+    ""
+  end
 
   def initialize
     @domain_root_account = Account.default
@@ -730,7 +733,7 @@ describe "Users API", type: :request do
         expect(response.headers['Link']).not_to match(/last/)
         response.headers['Link'].split(',').find { |l| l =~ /<([^>]+)>.+next/ }
         url = $1
-        path, querystring = url.split("?")
+        _path, querystring = url.split("?")
         page = Rack::Utils.parse_nested_query(querystring)['page']
         json = api_call(:get, url,
                         { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :page => page, :per_page => Setting.get('api_max_per_page', '2') })
@@ -1137,7 +1140,7 @@ describe "Users API", type: :request do
     it "does return a next header on the last page" do
       @account = Account.default
       u = User.create!(name: 'test user')
-      p = u.pseudonyms.create!(account: @account, unique_id: 'user')
+      u.pseudonyms.create!(account: @account, unique_id: 'user')
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, { search_term: u.id.to_s, per_page: '1', page: '1' })
       expect(json.length).to eq 1
@@ -1150,28 +1153,28 @@ describe "Users API", type: :request do
 
   describe "user account creation" do
     def create_user_skip_cc_confirm(admin_user)
-      json = api_call(:post, "/api/v1/accounts/#{admin_user.account.id}/users",
-                      { :controller => 'users', :action => 'create', :format => 'json', :account_id => admin_user.account.id.to_s },
-                      {
-                        :user => {
-                          :name => "Test User",
-                          :short_name => "Test",
-                          :sortable_name => "User, T.",
-                          :time_zone => "Mountain Time (US & Canada)",
-                          :locale => 'en'
-                        },
-                        :pseudonym => {
-                          :unique_id => "test@example.com",
-                          :password => "password123",
-                          :sis_user_id => "12345",
-                          :send_confirmation => 0
-                        },
-                        :communication_channel => {
-                          :type => "sms",
-                          :address => '8018888888',
-                          :skip_confirmation => 1
-                        }
-                      })
+      api_call(:post, "/api/v1/accounts/#{admin_user.account.id}/users",
+               { :controller => 'users', :action => 'create', :format => 'json', :account_id => admin_user.account.id.to_s },
+               {
+                 :user => {
+                   :name => "Test User",
+                   :short_name => "Test",
+                   :sortable_name => "User, T.",
+                   :time_zone => "Mountain Time (US & Canada)",
+                   :locale => 'en'
+                 },
+                 :pseudonym => {
+                   :unique_id => "test@example.com",
+                   :password => "password123",
+                   :sis_user_id => "12345",
+                   :send_confirmation => 0
+                 },
+                 :communication_channel => {
+                   :type => "sms",
+                   :address => '8018888888',
+                   :skip_confirmation => 1
+                 }
+               })
       users = User.where(name: "Test User").to_a
       expect(users.length).to eql 1
       user = users.first
@@ -1240,26 +1243,26 @@ describe "Users API", type: :request do
       end
 
       it "allows site admins to create users" do
-        json = api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
-                        { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },
-                        {
-                          :user => {
-                            :name => "Test User",
-                            :short_name => "Test",
-                            :sortable_name => "User, T.",
-                            :time_zone => "Mountain Time (US & Canada)",
-                            :locale => 'en'
-                          },
-                          :pseudonym => {
-                            :unique_id => "test@example.com",
-                            :password => "password123",
-                            :sis_user_id => "12345",
-                            :send_confirmation => 0
-                          },
-                          :communication_channel => {
-                            :confirmation_url => true
-                          }
-                        })
+        api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
+                 { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },
+                 {
+                   :user => {
+                     :name => "Test User",
+                     :short_name => "Test",
+                     :sortable_name => "User, T.",
+                     :time_zone => "Mountain Time (US & Canada)",
+                     :locale => 'en'
+                   },
+                   :pseudonym => {
+                     :unique_id => "test@example.com",
+                     :password => "password123",
+                     :sis_user_id => "12345",
+                     :send_confirmation => 0
+                   },
+                   :communication_channel => {
+                     :confirmation_url => true
+                   }
+                 })
         users = User.where(name: "Test User").to_a
         expect(users.length).to eql 1
         user = users.first
@@ -1364,22 +1367,22 @@ describe "Users API", type: :request do
         end
 
         it "raises an error trying to reactivate an active section" do
-          other_user = user_with_pseudonym(:active_all => true)
+          user_with_pseudonym(:active_all => true)
           @pseudonym.sis_user_id = "12345"
           @pseudonym.save!
 
           @user = @site_admin
-          json = api_call(:post, "/api/v1/accounts/#{Account.default.id}/users",
-                          { :controller => 'users', :action => 'create', :format => 'json', :account_id => Account.default.id.to_s },
-                          { :enable_sis_reactivation => '1', :user => { :name => "Test User" },
-                            :pseudonym => { :unique_id => "test@example.com", :password => "password123", :sis_user_id => "12345" },  }, {}, { :expected_status => 400 })
+          api_call(:post, "/api/v1/accounts/#{Account.default.id}/users",
+                   { :controller => 'users', :action => 'create', :format => 'json', :account_id => Account.default.id.to_s },
+                   { :enable_sis_reactivation => '1', :user => { :name => "Test User" },
+                     :pseudonym => { :unique_id => "test@example.com", :password => "password123", :sis_user_id => "12345" }, }, {}, { :expected_status => 400 })
         end
 
         it "carries on if there's no section to reactivate" do
           json = api_call(:post, "/api/v1/accounts/#{Account.default.id}/users",
                           { :controller => 'users', :action => 'create', :format => 'json', :account_id => Account.default.id.to_s },
                           { :enable_sis_reactivation => '1', :user => { :name => "Test User" },
-                            :pseudonym => { :unique_id => "test@example.com", :password => "password123", :sis_user_id => "12345" },  })
+                            :pseudonym => { :unique_id => "test@example.com", :password => "password123", :sis_user_id => "12345" }, })
 
           user = User.find(json['id'])
           expect(user.pseudonym.sis_user_id).to eq '12345'
@@ -1690,7 +1693,7 @@ describe "Users API", type: :request do
                           }
                         })
         user = User.find(json['id'])
-        avatar_url = json.delete("avatar_url")
+        json.delete("avatar_url")
         expect(json).to eq({
                              'name' => 'Tobias Funke',
                              'sortable_name' => 'Funke, Tobias',
@@ -1822,9 +1825,9 @@ describe "Users API", type: :request do
         expect(user.profile.bio).to eq new_bio
 
         another_title = 'another title'
-        json = api_call(:put, @path, @path_options, {
-                          :user => { :title => another_title }
-                        })
+        api_call(:put, @path, @path_options, {
+                   :user => { :title => another_title }
+                 })
         expect(user.profile.reload.title).to eq another_title
       end
 
@@ -1846,9 +1849,9 @@ describe "Users API", type: :request do
         another_title = 'another title'
         another_bio = 'another bio'
         another_email = 'duddett@example.com'
-        json = api_call(:put, @path, @path_options, {
-                          :user => { title: another_title, bio: another_bio, email: another_email }
-                        })
+        api_call(:put, @path, @path_options, {
+                   :user => { title: another_title, bio: another_bio, email: another_email }
+                 })
         expect(user.profile.reload.title).to eq another_title
       end
 
@@ -2807,6 +2810,70 @@ describe "Users API", type: :request do
       a = @course.assignments.create!(due_at: 2.days.ago, workflow_state: 'unpublished', submission_types: "online_text_entry")
       json = api_call(:get, @path, @params)
       expect(json.map { |i| i["id"] }).not_to be_include a.id
+    end
+
+    context "as observer" do
+      before :once do
+        @observer = user_factory(active_all: true)
+        @course.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
+        @path = "/api/v1/users/#{@observer.id}/missing_submissions"
+        @params = { controller: "users", action: "missing_submissions", user_id: @observer.id, format: "json" }
+      end
+
+      before :each do
+        user_session(@observer)
+      end
+
+      it "renders unauthorized if course_ids is not passed" do
+        api_call(:get, @path, @params.merge(observed_user_id: @student.id))
+        assert_unauthorized
+      end
+
+      it "renders unauthorized if course_ids is empty" do
+        api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: []))
+        assert_unauthorized
+      end
+
+      it "returns missing assignments data for observed student" do
+        json = api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: [@course.id]))
+        expect(json.length).to be(2)
+        expect(json[0]["course_id"]).to eq(@course.id)
+        expect(json[1]["course_id"]).to eq(@course.id)
+      end
+
+      it "renders unauthorized if the observer's enrollment is deleted" do
+        @observer.enrollments.first.destroy
+        api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: [@course.id]))
+        assert_unauthorized
+      end
+
+      it "renders unauthorized if the observer isn't observing the student in a passed course" do
+        course1 = @course
+        course2 = course_factory(active_all: true)
+        course2.enroll_student(@student, enrollment_state: "active")
+        course2.enroll_user(@observer, "ObserverEnrollment")
+        api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: [course1.id, course2.id]))
+        assert_unauthorized
+      end
+
+      it "returns missing assignments for all courses provided" do
+        course1 = @course
+        course2 = course_factory(active_all: true)
+        course3 = course_factory(active_all: true)
+        course2.assignments.create!(name: 'A2', due_at: 3.days.ago, workflow_state: 'published', submission_types: "online_text_entry")
+        course3.assignments.create!(name: 'A3', due_at: 3.days.ago, workflow_state: 'published', submission_types: "online_text_entry")
+        course2.enroll_student(@student, enrollment_state: "active")
+        course3.enroll_student(@student, enrollment_state: "active")
+        course2.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
+        course3.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student.id })
+
+        json = api_call(:get, @path, @params.merge(observed_user_id: @student.id, course_ids: [course1.id, course2.id]))
+        p json
+        expect(json.length).to be(3)
+        assignment_names = json.map { |a| a["name"] }
+        expect(assignment_names).to include("A2")
+        expect(assignment_names).not_to include("A3")
+      end
     end
   end
 

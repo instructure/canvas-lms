@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
-
 describe CollaborationsController do
   before :once do
     plugin_setting = PluginSetting.new(:name => "etherpad", :settings => {})
@@ -100,7 +98,7 @@ describe CollaborationsController do
 
     it "only returns collaborations that the user has access to read" do
       user_session(@student)
-      collab1 = @course.collaborations.create!(
+      @course.collaborations.create!(
         title: "inaccessible",
         user: @teacher
       ).tap { |c| c.update_attribute :url, 'http://www.example.com' }

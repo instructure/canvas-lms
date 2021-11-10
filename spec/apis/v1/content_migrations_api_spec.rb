@@ -18,8 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require_relative '../api_spec_helper'
 
 describe ContentMigrationsController, type: :request do
   before :once do
@@ -356,6 +355,43 @@ describe ContentMigrationsController, type: :request do
       expect(migration.job_progress).not_to be_nil
       key = CC::CCHelper.create_key(assignment, global: true)
       expect(migration.copy_options).to eq({ 'assignments' => { key => '1' } })
+    end
+
+    it "records both jobs involved with a selective import" do
+      # create the migration, specifying selective import
+      json = api_call(:post,
+                      @migration_url,
+                      @params,
+                      {
+                        :migration_type => 'canvas_cartridge_importer',
+                        :selective_import => '1',
+                        :pre_attachment => { :name => 'example.imscc' }
+                      })
+      expect(json['workflow_state']).to eq 'pre_processing'
+
+      # (pretend to) upload the file
+      cm = ContentMigration.find json['id']
+      file = Attachment.new(context: cm, display_name: 'example.imscc')
+      file.uploaded_data = fixture_file_upload('migration/canvas_cc_minimum.zip')
+      file.save!
+      cm.attachment = file
+      cm.save!
+      cm.queue_migration
+      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 123))
+      run_jobs
+      expect(cm.reload.workflow_state).to eq 'exported'
+      expect(cm.migration_settings['job_ids']).to eq([123])
+
+      # update the migration with the selection
+      json = api_call(:put,
+                      "#{@migration_url}/#{cm.id}",
+                      @params.merge(:action => 'update', :id => cm.to_param),
+                      { :copy => { 'everything' => '1' } })
+      expect(json['workflow_state']).to eq 'running'
+      allow(Delayed::Worker).to receive(:current_job).and_return(double("Delayed::Job", id: 456))
+      run_jobs
+      expect(cm.reload.workflow_state).to eq 'imported'
+      expect(cm.migration_settings['job_ids']).to match_array([123, 456])
     end
 
     it "queues for course copy on concluded courses" do
@@ -704,7 +740,7 @@ describe ContentMigrationsController, type: :request do
       end
 
       it "sets the selective data" do
-        json = api_call(:put, @migration_url, @params, @post_params)
+        api_call(:put, @migration_url, @params, @post_params)
         @migration.reload
         copy_options = { 'all_assignments' => 'true', 'context_modules' => { '9000' => 'true' } }
         expect(@migration.migration_settings[:migration_ids_to_import]).to eq({ 'copy' => copy_options })
@@ -812,7 +848,7 @@ describe ContentMigrationsController, type: :request do
   describe 'content selection cross-shard' do
     specs_require_sharding
 
-    it "actuallies return local identifiers created from the correct shard if needed" do
+    it "actually returns local identifiers created from the correct shard if needed" do
       @migration_url = "/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}/selective_data"
       @params = { :controller => 'content_migrations', :format => 'json', :course_id => @course.id.to_param, :action => 'content_list', :id => @migration.id.to_param }
 

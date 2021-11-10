@@ -102,7 +102,7 @@ module Quizzes::LogAuditing
 
         answers << {
           "quiz_question_id" => qq[:id].to_s,
-          "answer" => serializer.deserialize(submission_data, true)
+          "answer" => serializer.deserialize(submission_data, full: true)
         }
       end
     end # extract_answers

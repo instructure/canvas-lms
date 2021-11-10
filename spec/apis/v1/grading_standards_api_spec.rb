@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../api_spec_helper'
 
 describe GradingStandardsApiController, type: :request do
   let(:account) { Account.default }
@@ -107,7 +107,7 @@ describe GradingStandardsApiController, type: :request do
       end
 
       it "returns a 404 if the grading standard does not exist" do
-        res = api_call(:get, "#{course_resources_path}/5", course_resource_params.merge(grading_standard_id: "5"), {}, {}, { expected_status: 404 })
+        api_call(:get, "#{course_resources_path}/5", course_resource_params.merge(grading_standard_id: "5"), {}, {}, { expected_status: 404 })
       end
     end
 

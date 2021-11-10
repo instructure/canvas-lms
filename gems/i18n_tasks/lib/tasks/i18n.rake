@@ -301,7 +301,6 @@ namespace :i18n do
           puts "Exported en.yml, current translations unmodified (check git log for last change)"
         else
           `git commit -a -m"generated en.yml for translation"`
-          remote_branch = `git remote-ref`.strip.sub(%r{\Aremotes/[^/]+/(.*)\z}, '\\1')
           local = current_branch || 'master'
           `remote=$(git config branch."#{local}".remote); \
            remote_ref=$(git config branch."#{local}".merge); \
@@ -319,7 +318,7 @@ namespace :i18n do
   end
 
   desc "Validates and imports new translations"
-  task :import, [:source_file, :translated_file] => :environment do |t, args|
+  task :import, [:source_file, :translated_file] => :environment do |_t, args|
     require 'open-uri'
     Hash.include I18nTasks::HashExtensions unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
@@ -369,7 +368,7 @@ namespace :i18n do
   end
 
   desc "Imports new translations, ignores missing or unexpected keys"
-  task :autoimport, [:translated_file, :source_file] => :environment do |t, args|
+  task :autoimport, [:translated_file, :source_file] => :environment do |_t, args|
     require 'open-uri'
 
     if args[:source_file].present?
@@ -389,7 +388,7 @@ namespace :i18n do
     process = ->(node) do
       case node
       when Hash
-        node.delete_if { |k, v| process.call(v).nil? }
+        node.delete_if { |_k, v| process.call(v).nil? }
       when Proc
         nil
       else
@@ -499,18 +498,18 @@ namespace :i18n do
   end
 
   desc "Download language files from Transifex"
-  task :transifex, [:user, :password, :languages] do |t, args|
+  task :transifex, [:user, :password, :languages] do |_t, args| # rubocop:disable Rails/RakeEnvironment
     languages = transifex_languages(args[:languages])
     transifex_download(args[:user], args[:password], languages)
   end
 
   desc "Download language files from Transifex and import them"
-  task :transifeximport, [:user, :password, :languages, :source_file] => :environment do |t, args|
+  task :transifeximport, [:user, :password, :languages, :source_file] => :environment do |_t, args|
     import_languages(:transifex, args)
   end
 
   desc "Download language files from s3 and import them"
-  task :s3import, [:s3_bucket, :languages, :source_file] => :environment do |t, args|
+  task :s3import, [:s3_bucket, :languages, :source_file] => :environment do |_t, args|
     import_languages(:s3, args)
   end
 

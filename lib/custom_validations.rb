@@ -23,7 +23,7 @@ module CustomValidations
     def validates_as_url(*fields, allowed_schemes: %w{http https})
       validates_each(fields, :allow_nil => true) do |record, attr, value|
         begin
-          value, uri = CanvasHttp.validate_url(value, allowed_schemes: allowed_schemes)
+          value, = CanvasHttp.validate_url(value, allowed_schemes: allowed_schemes)
 
           record.send("#{attr}=", value)
         rescue CanvasHttp::Error, URI::Error, ArgumentError
@@ -33,7 +33,7 @@ module CustomValidations
     end
 
     def validates_as_readonly(*fields)
-      validates_each(fields) do |record, attr, value|
+      validates_each(fields) do |record, attr, _value|
         if !record.new_record? && record.send("#{attr}_changed?")
           record.errors.add attr, "cannot be changed"
         end

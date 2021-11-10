@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-
 describe 'RequestThrottle' do
   let(:base_req) { { 'QUERY_STRING' => '', 'PATH_INFO' => '/', 'REQUEST_METHOD' => 'GET' } }
   let(:request_user_1) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4', 'rack.session' => { user_id: 1 } }) }
@@ -30,13 +28,12 @@ describe 'RequestThrottle' do
   let(:request_header_token) { request_user_2.merge({ 'REMOTE_ADDR' => '4.3.2.1', 'HTTP_AUTHORIZATION' => "Bearer #{token2.full_token}" }) }
   let(:request_logged_out) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4', 'rack.session.options' => { id: 'sess1' } }) }
   let(:request_no_session) { base_req.merge({ 'REMOTE_ADDR' => '1.2.3.4' }) }
+  let(:inner_app) { lambda { |_env| response } }
+  let(:throttler) { RequestThrottle.new(inner_app) }
+  let(:rate_limit_exceeded) { throttler.rate_limit_exceeded }
 
   # not a let so that actual and expected aren't the same object that get modified together
   def response; [200, { 'Content-Type' => 'text/plain' }, ['Hello']]; end
-
-  let(:inner_app) { lambda { |env| response } }
-  let(:throttler) { RequestThrottle.new(inner_app) }
-  let(:rate_limit_exceeded) { throttler.rate_limit_exceeded }
 
   after { RequestThrottle.reload! }
 
@@ -203,8 +200,8 @@ describe 'RequestThrottle' do
       end
 
       it "weights the cost by settings" do
-        cpu_cost = Setting.set("request_throttle.cpu_cost_weight", "2.0")
-        db_cost = Setting.set("request_throttle.db_cost_weight", "0.5")
+        Setting.set("request_throttle.cpu_cost_weight", "2.0")
+        Setting.set("request_throttle.db_cost_weight", "0.5")
         cost = throttle.calculate_cost(20, 4, {})
         expect(cost).to eq(42)
       end
@@ -227,7 +224,7 @@ describe 'RequestThrottle' do
       it "does not skip if no client_identifier found" do
         expect(strip_variable_headers(throttler.call(request_no_session))).to eq response
         bucket = RequestThrottle::LeakyBucket.new("ip:#{request_no_session['REMOTE_ADDR']}")
-        count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
+        _count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
         expect(last_touched.to_f).to be > 0.0
       end
     end
@@ -285,7 +282,7 @@ describe 'RequestThrottle' do
       it "increments the bucket" do
         expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
         bucket = RequestThrottle::LeakyBucket.new("user:1")
-        count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
+        _count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
         expect(last_touched.to_f).to be > 0.0
       end
     end

@@ -22,8 +22,8 @@ require_relative '../spec_helper'
 describe BroadcastPolicy::NotificationPolicy do
   let(:subject) do
     policy = BroadcastPolicy::NotificationPolicy.new(:test_notification)
-    policy.to       = ->(record) { ['user@example.com', 'user2@example.com'] }
-    policy.whenever = ->(record) { true }
+    policy.to       = proc { ['user@example.com', 'user2@example.com'] }
+    policy.whenever = proc { true }
     policy
   end
 

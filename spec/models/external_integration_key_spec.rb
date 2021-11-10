@@ -18,13 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'sharding_spec_helper'
-
 describe ExternalIntegrationKey do
   before(:once) do
     ExternalIntegrationKey.key_type :external_key0, label: 'External Key 0', rights: proc { true }
     ExternalIntegrationKey.key_type :external_key1, label: proc { 'External Key 1' }, rights: { write: false }
-    ExternalIntegrationKey.key_type :external_key2, rights: { read: true, write: proc { |key, user| false } }
+    ExternalIntegrationKey.key_type :external_key2, rights: { read: true, write: proc { false } }
     ExternalIntegrationKey.key_type :external_key3
   end
 

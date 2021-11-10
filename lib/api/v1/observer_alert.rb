@@ -52,6 +52,8 @@ module Api::V1::ObserverAlert
             course_assignment_url(assignment.context_id, assignment)
           end
 
+    hash['locked_for_user'] = !(alert.context.nil? || alert.context_type == 'AccountNotification' || alert.context.grants_right?(user, session, :read))
+
     hash['html_url'] = url
     hash
   end

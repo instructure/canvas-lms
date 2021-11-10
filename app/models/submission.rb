@@ -416,7 +416,7 @@ class Submission < ActiveRecord::Base
 
   simply_versioned :explicit => true,
                    :when => lambda { |model| model.new_version_needed? },
-                   :on_create => lambda { |model, version| SubmissionVersion.index_version(version) },
+                   :on_create => lambda { |_model, version| SubmissionVersion.index_version(version) },
                    :on_load => lambda { |model, version| model&.cached_due_date = version.versionable&.cached_due_date }
 
   # This needs to be after simply_versioned because the grade change audit uses
@@ -2194,7 +2194,7 @@ class Submission < ActiveRecord::Base
     if opts[:comment].present? || opts[:media_comment_id]
       comment = submission_comments.create!(opts.slice(*valid_keys))
     end
-    opts[:assessment_request].comment_added(comment) if opts[:assessment_request] && comment
+    opts[:assessment_request].comment_added if opts[:assessment_request] && comment
 
     comment
   end
@@ -2316,12 +2316,7 @@ class Submission < ActiveRecord::Base
     res.workflow_state = 'assigned' if res.new_record?
     just_created = res.new_record?
     res.send_reminder! # this method also saves the assessment_request
-    case obj
-    when User
-      user = obj
-    when Submission
-      obj.assign_assessment(res) if just_created
-    end
+    obj.assign_assessment(res) if obj.is_a?(Submission) && just_created
     res
   end
 
@@ -2401,7 +2396,6 @@ class Submission < ActiveRecord::Base
   end
 
   def to_atom(opts = {})
-    prefix = self.assignment.context_prefix || ""
     author_name = self.assignment.present? && self.assignment.context.present? ? self.assignment.context.name : t('atom_no_author', "No Author")
     Atom::Entry.new do |entry|
       entry.title     = "#{self&.user.name} -- #{self&.assignment.title}#{', ' + self.assignment.context.name if opts[:include_context]}"
@@ -2715,7 +2709,7 @@ class Submission < ActiveRecord::Base
           scope = scope.where(:enrollments => { :course_section_id => section })
         end
 
-        user_ids = user_grades.map { |id, data| id }
+        user_ids = user_grades.keys
         preloaded_users = scope.where(:id => user_ids)
         preloaded_submissions = assignment.submissions.where(user_id: user_ids).group_by(&:user_id)
 

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe "Account Reports", type: :request do
   it "renders page with default reports and all custom_reports" do
     # If this test is failing from a change in a different report plugin, there

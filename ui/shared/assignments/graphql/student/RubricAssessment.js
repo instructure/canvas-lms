@@ -25,6 +25,7 @@ export const RubricAssessment = {
   fragment: gql`
     fragment RubricAssessment on RubricAssessment {
       _id
+      artifactAttempt
       assessment_type: assessmentType
       assessor {
         _id
@@ -47,6 +48,7 @@ export const RubricAssessment = {
 
   shape: shape({
     _id: string.isRequired,
+    artifactAttempt: number,
     assessment_type: string,
     assessor: shape({
       _id: string.isRequired,
@@ -61,6 +63,7 @@ export const RubricAssessment = {
 export const DefaultMocks = {
   RubricAssessment: () => ({
     _id: '1',
+    artifactAttempt: '1',
     assessmentType: 'grading',
     assessmentRatings: [{}],
     score: '10'

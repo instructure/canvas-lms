@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/helpers/context_modules_common')
-require File.expand_path(File.dirname(__FILE__) + '/helpers/public_courses_context')
+require_relative 'helpers/context_modules_common'
+require_relative 'helpers/public_courses_context'
 
 describe "context modules" do
   include_context "in-process server selenium tests"
@@ -128,7 +128,7 @@ describe "context modules" do
       f(".edit_module_link").click
       expect(f('#add_context_module_form')).to be_displayed
       edit_form = f('#add_context_module_form')
-      lock_check_click(edit_form)
+      lock_check_click
       wait_for_ajaximations
       unlock_date = edit_form.find_element(:id, 'context_module_unlock_at')
       unlock_date.send_keys(lock_until)

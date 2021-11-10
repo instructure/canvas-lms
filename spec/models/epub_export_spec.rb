@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe EpubExport do
   before :once do
     course_with_teacher(active_all: true)
@@ -342,10 +340,10 @@ describe EpubExport do
 
   it "escapes html characters in titles" do
     course_with_student(active_all: true)
-    assignment = @course.assignments.create!({
-                                               title: 'here you go </html> lol',
-                                               description: "beep beep"
-                                             })
+    @course.assignments.create!({
+                                  title: 'here you go </html> lol',
+                                  description: "beep beep"
+                                })
 
     EpubExports::CreateService.new(@course, @student, :epub_export).save
     run_jobs

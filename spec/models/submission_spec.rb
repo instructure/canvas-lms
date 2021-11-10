@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../sharding_spec_helper'
 require_relative '../lib/validates_as_url'
 
 describe Submission do
@@ -2900,7 +2899,7 @@ describe Submission do
         expect(job.run_at).to be > Time.now.utc
       end
 
-      it "initiallies set turnitin submission to pending" do
+      it "initially sets turnitin submission to pending" do
         init_turnitin_api
         expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ :assignment_id => "1234" })
         expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => true))
@@ -3981,7 +3980,7 @@ describe Submission do
     it "includes attachments to previous versions" do
       old_attachment_1 = attachment_model(context: @student)
       old_attachment_2 = attachment_model(context: @student)
-      sub = @assignment.submit_homework @student, attachments: [old_attachment_1, old_attachment_2]
+      @assignment.submit_homework @student, attachments: [old_attachment_1, old_attachment_2]
       attachment_model context: @student
       sub = @assignment.submit_homework @student, attachments: [@attachment]
       expect(sub.attachments.to_a).to eq([@attachment])

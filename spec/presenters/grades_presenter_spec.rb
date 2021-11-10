@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
-
 describe GradesPresenter do
   let(:presenter) { GradesPresenter.new(enrollments) }
   let(:shard) { FakeShard.new }
@@ -134,7 +132,6 @@ describe GradesPresenter do
         course = Course.create!
         course.offer!
         enrollments = []
-        student_enrollment = nil
 
         @shard2.activate do
           @student = User.create!
@@ -185,7 +182,7 @@ describe GradesPresenter do
 
     let(:observed_enrollment) { double('observerd_enrollment', attrs.merge(:is_a? => true, :associated_user_id => 1)) }
     let(:teacher_enrollment) { double('teacher_enrollment', attrs.merge(:instructor? => true)) }
-    let(:student_enrollment) { student_enrollment = double('student_enrollment', attrs.merge(:student? => true)) }
+    let(:student_enrollment) { double('student_enrollment', attrs.merge(:student? => true)) }
 
     before do
       allow(StudentEnrollment).to receive_messages(active: double(where: [double]))

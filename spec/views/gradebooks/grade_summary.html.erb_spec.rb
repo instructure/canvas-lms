@@ -18,14 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
+require_relative '../views_helper'
 
 describe "/gradebooks/grade_summary" do
   it "renders" do
     course_with_student
     view_context
-    a = @course.assignments.create!(:title => "some assignment")
+    @course.assignments.create!(:title => "some assignment")
     assign(:presenter, GradeSummaryPresenter.new(@course, @user, nil))
     render "gradebooks/grade_summary"
     expect(response).not_to be_nil
@@ -35,7 +34,7 @@ describe "/gradebooks/grade_summary" do
     course_with_student
     @course.hide_final_grades = true
     view_context
-    a = @course.assignments.create!(:title => "some assignment")
+    @course.assignments.create!(:title => "some assignment")
     assign(:presenter, GradeSummaryPresenter.new(@course, @user, nil))
     render "gradebooks/grade_summary"
     expect(response).not_to be_nil
@@ -49,7 +48,7 @@ describe "/gradebooks/grade_summary" do
     @student = @user
     @user = @teacher
     view_context
-    a = @course.assignments.create!(:title => "some assignment")
+    @course.assignments.create!(:title => "some assignment")
     presenter = assign(:presenter, GradeSummaryPresenter.new(@course, @teacher, @student.id))
     expect(presenter.student_enrollment).not_to be_nil
     render "gradebooks/grade_summary"

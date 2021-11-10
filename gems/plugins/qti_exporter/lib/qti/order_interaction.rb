@@ -28,7 +28,7 @@ module Qti
     def parse_question_data
       match_map = {}
       get_all_matches(match_map)
-      if (node = @doc.at_css('correctResponse'))
+      if @doc.at_css('correctResponse')
         get_correct_responses(match_map)
       else
         get_all_answers(match_map)

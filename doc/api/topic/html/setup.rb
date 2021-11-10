@@ -20,7 +20,7 @@
 
 def init
   if options[:all_resources]
-    options[:controllers] = options[:resources].map { |r, c| c }.flatten
+    options[:controllers] = options[:resources].flat_map(&:last)
     sections :header, :method_details_list, [T('method_details')]
   else
     sections :header, [:topic_doc, :method_details_list, [T('method_details')]]

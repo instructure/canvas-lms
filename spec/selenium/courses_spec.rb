@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/common')
+require_relative 'common'
 require_relative "../helpers/k5_common"
 
 describe "courses" do
@@ -158,7 +158,7 @@ describe "courses" do
       end
     end
 
-    it "correctlies update the course quota" do
+    it "updates the course quota correctly" do
       course_with_admin_logged_in
 
       # first try setting the quota explicitly

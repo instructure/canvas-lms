@@ -19,7 +19,6 @@
 #
 
 require_relative '../../conditional_release_spec_helper'
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe ConditionalRelease::Service do
   before :once do
@@ -102,7 +101,7 @@ describe ConditionalRelease::Service do
     end
 
     it 'includes a default grading scheme even when the assignment does not use it' do
-      standard = grading_standard_for(@course)
+      grading_standard_for(@course)
       assignment_model course: @course, grading_type: 'points'
       env = CRService.env_for(@course, @student, assignment: @assignment)
       cr_env = env[:CONDITIONAL_RELEASE_ENV]
@@ -215,7 +214,7 @@ describe ConditionalRelease::Service do
         end
 
         it "invalidates cache on rule change" do
-          data = CRService.rules_for(@course, @student, nil)
+          CRService.rules_for(@course, @student, nil)
           @rule.update_attribute(:deleted_at, Time.now.utc)
           expect(CRService.rules_for(@course, @student, nil)).to eq []
         end

@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper'
-
 describe "security" do
   it "verify_hmac_sha1" do
     msg = "sign me"

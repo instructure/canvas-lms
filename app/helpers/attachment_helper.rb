@@ -60,7 +60,7 @@ module AttachmentHelper
     attrs.inject(+"") { |s, (attr, val)| s << "data-#{attr}=#{val} " }
   end
 
-  def doc_preview_json(attachment, user, locked_for_user: false)
+  def doc_preview_json(attachment, locked_for_user: false)
     # Don't add canvadoc session URL if the file is locked to the user
     return {} if locked_for_user
 

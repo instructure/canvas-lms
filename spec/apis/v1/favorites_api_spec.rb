@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../api_spec_helper'
 
 describe "Favorites API", type: :request do
   before :once do
@@ -110,7 +110,7 @@ describe "Favorites API", type: :request do
 
       # add some new courses, and fave one
       course6 = course_with_student(:course_name => "Course 6", :user => @user, :active_all => true).course
-      course7 = course_with_student(:course_name => "Course 7", :user => @user, :active_all => true).course
+      course_with_student(:course_name => "Course 7", :user => @user, :active_all => true).course
       json = api_call(:post, "/api/v1/users/self/favorites/courses/#{course6.id}",
                       { :controller => "favorites", :action => "add_favorite_course", :format => "json", :id => "#{course6.id}" })
       expect(json["context_id"]).to eql(course6.id)

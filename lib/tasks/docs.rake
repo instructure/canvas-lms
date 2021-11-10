@@ -39,7 +39,8 @@ begin
       # t.options << '--debug'
     end
 
-    task 'api' do |t|
+    desc "generate API docs"
+    task 'api' do # rubocop:disable Rails/RakeEnvironment
       puts "API Documentation successfully generated in #{DOC_DIR}\n" \
            "See #{DOC_DIR}/index.html"
     end

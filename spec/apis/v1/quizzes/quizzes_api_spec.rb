@@ -18,9 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../locked_spec')
-require File.expand_path(File.dirname(__FILE__) + '/../../../file_upload_helper')
+require_relative '../../api_spec_helper'
+require_relative '../../locked_spec'
+require_relative '../../../file_upload_helper'
 
 describe Quizzes::QuizzesApiController, type: :request do
   include FileUploadHelper
@@ -100,7 +100,7 @@ describe Quizzes::QuizzesApiController, type: :request do
         let(:quiz_count) { 10 }
         let(:quizzes) { (0..quiz_count).map { @course.quizzes.create! :title => "the same title" } }
 
-        it "deterministicallies order quizzes for pagination" do
+        it "orders quizzes deterministically for pagination" do
           found_quiz_ids = []
           quiz_count.times do |i|
             page_num = i + 1
@@ -697,7 +697,7 @@ describe Quizzes::QuizzesApiController, type: :request do
         @qq1 = @quiz.quiz_questions.create!(
           question_data: multiple_choice_question_data
         )
-        json = api_update_quiz({}, { published: true })
+        api_update_quiz({}, { published: true })
         expect(@quiz.reload).to be_published
         expect(@quiz.question_count).to eq 1
       end

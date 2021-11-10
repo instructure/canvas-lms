@@ -50,7 +50,7 @@ class RubricsController < ApplicationController
     permission = @context.is_a?(User) ? :manage : [:manage_rubrics, :read_rubrics]
     return unless authorized_action(@context, @current_user, permission)
 
-    if (id = params[:id]) =~ Api::ID_REGEX
+    if params[:id].match?(Api::ID_REGEX)
       js_env :ROOT_OUTCOME_GROUP => get_root_outcome,
              :PERMISSIONS => {
                manage_rubrics: @context.grants_right?(@current_user, session, :manage_rubrics)

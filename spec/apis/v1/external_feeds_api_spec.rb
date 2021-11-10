@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
+require_relative '../api_spec_helper'
 
 describe 'ExternalFeedsController', type: :request do
   shared_examples_for "Announcement External Feeds" do
@@ -80,16 +80,16 @@ describe 'ExternalFeedsController', type: :request do
       expect(feed.verbosity).to eq 'full'
 
       # invalid url
-      json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
-                              { :url => "ker blah" }, {}, :expected_status => 400)
+      api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
+                       { :url => "ker blah" }, {}, :expected_status => 400)
 
       # no url
-      json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
-                              { :verbosity => 'full' }, {}, :expected_status => 400)
+      api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
+                       { :verbosity => 'full' }, {}, :expected_status => 400)
 
       # duplicate url
-      json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
-                              { :url => "http://www.example.com/feed" }, {}, :expected_status => 400)
+      api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
+                       { :url => "http://www.example.com/feed" }, {}, :expected_status => 400)
 
       # url protocol is inferred
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),

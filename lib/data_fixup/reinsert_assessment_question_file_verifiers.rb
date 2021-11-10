@@ -27,7 +27,6 @@ module DataFixup::ReinsertAssessmentQuestionFileVerifiers
     if links.any?
       att_id_map = Hash[links.map { |l| [l, l.match(/\/assessment_questions\/\d+\/files\/(\d+)/)[1].to_i] }]
       uuid_map = Hash[Attachment.where(:id => att_id_map.values, :context_type => "AssessmentQuestion").pluck(:id, :uuid)]
-      new_data = data
       links.each do |link|
         uuid = uuid_map[att_id_map[link]]
         next unless uuid # just in case somehow the attachment disappeared

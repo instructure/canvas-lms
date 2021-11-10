@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
-
 require 'nokogiri'
 
 describe UsersController do
@@ -259,11 +257,11 @@ describe UsersController do
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
         expect(response).to redirect_to "http://someschool.instructure.com/images/messages/avatar-50.png"
 
-        diff = data.select { |k, v| k =~ /avatar_img/ }.size - orig_size
+        diff = data.count { |k, _v| k.include?("avatar_img") } - orig_size
         expect(diff).to be > 0
 
         @user.update_attribute(:avatar_image, { 'type' => 'attachment', 'url' => '/images/thumbnails/foo.gif' })
-        expect(data.select { |k, v| k =~ /avatar_img/ }.size).to eq orig_size
+        expect(data.count { |k, _v| k.include?("avatar_img") }).to eq orig_size
 
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
         expect(response).to redirect_to "http://someschool.instructure.com/images/thumbnails/foo.gif"

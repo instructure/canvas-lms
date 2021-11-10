@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
-
 describe OutcomeImportError, type: :model do
   describe 'associations' do
     it { is_expected.to belong_to(:outcome_import) }

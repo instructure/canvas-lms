@@ -39,7 +39,7 @@ module Api::V1::QuizIpFilter
     hash
   end
 
-  def quiz_ip_filter_json(filter, context, user, session)
+  def quiz_ip_filter_json(filter, _context, user, session)
     api_json(filter.with_indifferent_access, user, session, API_ALLOWED_QUIZ_IP_FILTER_OUTPUT_FIELDS)
   end
 end

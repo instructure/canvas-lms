@@ -54,7 +54,7 @@ module AddressBook
     # existing conversation should be considered known; ignored if the sender
     # is not already a participant in that conversation.
     def known_users(users, options = {})
-      raise NotImplemented
+      raise NotImplementedError
     end
 
     # as known_users, but for just the one user
@@ -90,12 +90,12 @@ module AddressBook
     # such as `course_123` or `course_123_teachers` or as a Course,
     # CourseSection, or Group object).
     def known_in_context(context)
-      raise NotImplemented
+      raise NotImplementedError
     end
 
     # counts the known users in each of the given contexts
     def count_in_contexts(contexts)
-      raise NotImplemented
+      raise NotImplementedError
     end
 
     # returns a paginatable collection for all known users matching the search
@@ -126,7 +126,7 @@ module AddressBook
     # the result -- we know it's used in a merge -- so all it needs to
     # implement are depth, new_pager, and execute_page.
     def search_users(options = {})
-      raise NotImplemented
+      raise NotImplementedError
     end
 
     # flag the provided users as known, even if they would not otherwise be, to
@@ -134,7 +134,7 @@ module AddressBook
     # contexts for participants in existing conversations. future lookups of
     # users not otherwise known will provide empty sets common contexts.
     def preload_users(users)
-      raise NotImplemented
+      raise NotImplementedError
     end
 
     # returns the course sections known to the sender
