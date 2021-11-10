@@ -1,3 +1,3 @@
 source 'https://rubygems.org'
-gem 'ddtrace', require: 'ddtrace/auto_instrument'
+gem 'ddtrace'
 gem 'google-protobuf', '~> 3.0'
