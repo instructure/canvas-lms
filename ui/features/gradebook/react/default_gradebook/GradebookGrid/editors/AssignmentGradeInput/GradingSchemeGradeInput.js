@@ -112,7 +112,7 @@ export default class GradingSchemeInput extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.textInput !== document.activeElement) {
       const {assignment, gradingScheme, pendingGradeInfo, submission} = nextProps
       const value = formatGrade(submission, assignment, gradingScheme, pendingGradeInfo)

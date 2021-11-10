@@ -100,7 +100,7 @@ class ActionMenu extends React.Component {
     this.launchPostGrades = this.launchPostGrades.bind(this)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const existingExport = this.getExistingExport()
 
     this.exportManager = new GradebookExportManager(

@@ -2820,7 +2820,7 @@ test('removes the filter when the "view section filter" option is turned off', f
 
 QUnit.module('Gradebook#updateCurrentSection', {
   setup() {
-    this.server = sinon.createFakeServer({respondImmediately: true})
+    this.server = sinon.fakeServer.create({respondImmediately: true})
     this.server.respondWith([200, {}, ''])
 
     this.gradebook = createGradebook({settings_update_url: '/settingUrl'})
@@ -3810,7 +3810,13 @@ QUnit.module('Gradebook#filterAssignments', {
       {id: '1', name: 'Algebra', position: 1},
       {id: '2', name: 'English', position: 2}
     ]
-    this.gradebook.gradingPeriodSet = {id: '1501', gradingPeriods: [{id: '1401'}, {id: '1402'}]}
+    this.gradebook.gradingPeriodSet = {
+      id: '1501',
+      gradingPeriods: [
+        {id: '1401', title: 'Grading Period #1'},
+        {id: '1402', title: 'Grading Period #2'}
+      ]
+    }
     this.gradebook.gridDisplaySettings.showUnpublishedAssignments = true
     this.gradebook.show_attendance = true
   }
@@ -5584,7 +5590,7 @@ QUnit.module('Gradebook#arrangeColumnsBy', hooks => {
 
 QUnit.module('Gradebook#updateCurrentGradingPeriod', {
   setup() {
-    this.server = sinon.createFakeServer({respondImmediately: true})
+    this.server = sinon.fakeServer.create({respondImmediately: true})
     this.server.respondWith([200, {}, ''])
 
     setFixtureHtml($fixtures)
@@ -5592,7 +5598,10 @@ QUnit.module('Gradebook#updateCurrentGradingPeriod', {
     this.gradebook = createGradebook({
       grading_period_set: {
         id: '1501',
-        grading_periods: [{id: '1401'}, {id: '1402'}]
+        grading_periods: [
+          {id: '1401', title: 'Grading Period #1'},
+          {id: '1402', title: 'Grading Period #2'}
+        ]
       },
       settings: {
         filter_columns_by: {
@@ -5682,7 +5691,7 @@ test('renders the action menu', function () {
 
 QUnit.module('Gradebook#updateCurrentModule', {
   setup() {
-    this.server = sinon.createFakeServer({respondImmediately: true})
+    this.server = sinon.fakeServer.create({respondImmediately: true})
     this.server.respondWith([200, {}, ''])
 
     setFixtureHtml($fixtures)
@@ -5779,7 +5788,7 @@ test('has no effect when the module has not changed', function () {
 
 QUnit.module('Gradebook#updateCurrentAssignmentGroup', {
   setup() {
-    this.server = sinon.createFakeServer({respondImmediately: true})
+    this.server = sinon.fakeServer.create({respondImmediately: true})
     this.server.respondWith([200, {}, ''])
 
     setFixtureHtml($fixtures)
