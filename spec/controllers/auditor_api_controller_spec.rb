@@ -19,17 +19,13 @@
 #
 
 describe AuditorApiController do
-  class AuditsController < AuditorApiController
-    def check_configured
-      super
-    end
-
-    def query_options
-      super
+  let(:audits_controller_class) do
+    Class.new(AuditorApiController) do
+      public :check_configured, :query_options
     end
   end
 
-  let(:audits_controller) { AuditsController.new }
+  let(:audits_controller) { audits_controller_class.new }
 
   context 'check_configured' do
     it 'returns not_found if database is not configured' do

@@ -220,7 +220,6 @@ module Lti
 
     def module_sequence(tag)
       env_hash = {}
-      tag = @context.context_module_tags.not_deleted.find(params[:module_item_id])
       @lti_launch.launch_type = 'window' if tag.new_tab
       tag.context_module_action(@current_user, :read)
       sequence_asset = tag.try(:content)

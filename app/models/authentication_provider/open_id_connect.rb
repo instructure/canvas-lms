@@ -104,7 +104,6 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
       settings_will_change!
       settings['userinfo_endpoint'] = value
     end
-    value
   end
 
   protected
@@ -119,9 +118,9 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::OAuth2
     token.options[:claims] ||= begin
       jwt_string = token.params['id_token']
       debug_set(:id_token, jwt_string) if instance_debugging
-      return {} if jwt_string.blank?
+      id_token = {} if jwt_string.blank?
 
-      id_token = begin
+      id_token ||= begin
         ::Canvas::Security.decode_jwt(jwt_string, [:skip_verification])
       rescue ::Canvas::Security::InvalidToken
         Rails.logger.warn("Failed to decode OpenID Connect id_token: #{jwt_string.inspect}")

@@ -245,7 +245,7 @@ describe Course do
 
     it 'uses sql if the assignments are still a relation' do
       args = @test_course.active_assignments
-      expect_any_instance_of(Assignment).to receive(:id).never
+      expect_any_instance_of(Assignment).not_to receive(:id)
       edd = EffectiveDueDates.for_course(@test_course, args)
       edd.to_hash
     end
@@ -1623,7 +1623,7 @@ describe Course do
 
         expect(@test_course).to receive(:grading_periods?).and_return false
         edd = EffectiveDueDates.for_course(@test_course)
-        expect(edd).to receive(:to_hash).never
+        expect(edd).not_to receive(:to_hash)
         expect(edd.any_in_closed_grading_period?).to eq(false)
       end
 
@@ -1700,13 +1700,13 @@ describe Course do
 
         expect(@test_course).to receive(:grading_periods?).and_return false
         edd = EffectiveDueDates.for_course(@test_course)
-        expect(edd).to receive(:to_hash).never
+        expect(edd).not_to receive(:to_hash)
         expect(edd.in_closed_grading_period?(@assignment2)).to eq(false)
       end
 
       it 'returns false if assignment id is nil' do
         edd = EffectiveDueDates.for_course(@test_course, @assignment1)
-        expect(edd).to receive(:to_hash).never
+        expect(edd).not_to receive(:to_hash)
         expect(edd.in_closed_grading_period?(nil)).to eq(false)
       end
 

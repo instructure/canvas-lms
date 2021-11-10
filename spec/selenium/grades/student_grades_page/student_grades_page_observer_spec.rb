@@ -24,7 +24,7 @@ describe "gradebook" do
   include GradebookCommon
 
   context "as an observer" do
-    before(:each) do
+    before do
       user_with_pseudonym
       course_with_observer user: @user, active_all: true
       @course.observers = [@observer]

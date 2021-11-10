@@ -1069,7 +1069,7 @@ module Lti
           # complaints. The user_factory takes care of this.
           let(:user) { user_factory }
 
-          before(:each) do
+          before do
             # AR complains if you don't save the course to the database first.
             course.save!
             enrolled_section = add_section("section one", { course: course })
@@ -1605,7 +1605,8 @@ module Lti
       end
 
       context 'user is not logged in' do
-        let(:user) {}
+        let(:user) { nil }
+
         it 'has substitution for $vnd.Canvas.Person.email.sis when user is not logged in' do
           exp_hash = { test: '$vnd.Canvas.Person.email.sis' }
           variable_expander.expand_variables!(exp_hash)
@@ -1797,7 +1798,7 @@ module Lti
         context 'pseudonym' do
           let(:pseudonym) { Pseudonym.new }
 
-          before :each do
+          before do
             allow(SisPseudonym).to receive(:for).with(user, anything, anything).and_return(pseudonym)
           end
 

@@ -74,7 +74,7 @@ describe DashboardHelper do
 
   describe "map_courses_for_menu" do
     context "Dashcard Reordering" do
-      before(:each) do
+      before do
         @account = Account.default
         @domain_root_account = @account
       end

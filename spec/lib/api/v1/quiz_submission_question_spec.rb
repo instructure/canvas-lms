@@ -43,16 +43,18 @@ describe Api::V1::QuizSubmissionQuestion do
     qq
   end
 
-  class QuizSubmissionsQuestionHarness
-    include Api::V1::QuizSubmissionQuestion
-    include Api
+  let(:harness_class) do
+    Class.new do
+      include Api::V1::QuizSubmissionQuestion
+      include Api
 
-    def initialize(opts)
-      @context = opts[:context] if opts[:context]
+      def initialize(opts)
+        @context = opts[:context] if opts[:context]
+      end
     end
   end
 
-  let(:api) { QuizSubmissionsQuestionHarness.new(context: @course) }
+  let(:api) { harness_class.new(context: @course) }
 
   describe "#quiz_submissions_questions_json" do
     subject { api.quiz_submission_questions_json(quiz_questions, @quiz_submission) }
@@ -80,6 +82,7 @@ describe Api::V1::QuizSubmissionQuestion do
 
   describe "quiz_submissions_questions_json shuffle_answers" do
     before { allow_any_instance_of(Array).to receive(:shuffle!) }
+
     let(:quiz_questions) do
       [create_question("multiple_choice")]
     end
@@ -99,7 +102,7 @@ describe Api::V1::QuizSubmissionQuestion do
     describe "shuffle_answers false" do
       subject { api.quiz_submission_questions_json(quiz_questions, @quiz_submission, { shuffle_answers: false }) }
       it "shuffles answers when opt is given" do
-        expect_any_instance_of(Array).to receive(:shuffle!).never
+        expect_any_instance_of(Array).not_to receive(:shuffle!)
         answer_text = subject[:quiz_submission_questions].first["answers"].map { |a| a["text"] }
         expect(answer_text).to eq(["a", "b", "c", "d"])
       end

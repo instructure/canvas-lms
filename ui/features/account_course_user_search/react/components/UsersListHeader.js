@@ -38,7 +38,7 @@ export default function UsersListHeader(props) {
             onUpdateFilters({search_term, sort: id, order: newOrder, role_filter_id})
           })}
           variant="link"
-          theme={{fontWeight: '700', mediumPadding: '0', mediumHeight: '1.5rem'}}
+          theme={{fontWeight: '700', mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
         >
           {label}
           {sort === id ? (

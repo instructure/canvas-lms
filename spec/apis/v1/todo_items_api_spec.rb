@@ -51,7 +51,7 @@ describe UsersController, type: :request do
     @a2.reload
   end
 
-  before :each do
+  before do
     @a1_json =
       {
         'type' => 'submitting',
@@ -318,7 +318,7 @@ describe UsersController, type: :request do
   end
 
   context 'when the assignment is differentiated/ has overrides' do
-    before :each do
+    before do
       @course = course_factory(active_all: true)
       @section = @course.course_sections.create!
 

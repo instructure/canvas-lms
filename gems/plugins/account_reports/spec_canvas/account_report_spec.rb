@@ -23,7 +23,7 @@ require_relative 'report_spec_helper'
 describe "Account Reports" do
   include ReportSpecHelper
 
-  before(:each) do
+  before do
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')

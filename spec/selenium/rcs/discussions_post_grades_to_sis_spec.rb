@@ -24,7 +24,8 @@ describe "sync grades to sis" do
   include_context "in-process server selenium tests"
 
   before(:once) { export_plugin_setting.update(disabled: false) }
-  before :each do
+
+  before do
     course_with_admin_logged_in
     stub_rcs_config
     Account.default.set_feature_flag!('post_grades', 'on')
@@ -47,7 +48,7 @@ describe "sync grades to sis" do
   end
 
   context "editing an existing topic with post_to_sis checked" do
-    before :each do
+    before do
       get "/courses/#{@course.id}/discussion_topics/new"
       f('#discussion-title').send_keys('New Discussion Title')
       f('#use_for_grading').click
@@ -66,7 +67,7 @@ describe "sync grades to sis" do
   end
 
   shared_examples "gradebook_sync_grades" do
-    before :each do
+    before do
       if @enhanced_filters
         Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
       end
@@ -114,7 +115,7 @@ describe "sync grades to sis" do
   end
 
   context "when enhanced filters is enabled" do
-    before(:each) do
+    before do
       @enhanced_filters = true
     end
 
@@ -122,7 +123,7 @@ describe "sync grades to sis" do
   end
 
   context "when enhanced filters is not enabled" do
-    before(:each) do
+    before do
       @enhanced_filters = false
     end
 

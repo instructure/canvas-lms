@@ -32,6 +32,7 @@ module Lti
           resource_link_id: 'resource_link_id'
         }
       end
+
       it "requires vendor_code" do
         params.delete :vendor_code
         link = Lti::Link.new(params)

@@ -129,6 +129,7 @@
   "creative_commons_license_725584ae": {
     "message": "Licencia Creative Commons:"
   },
+  "crop_image_807ebb08": { "message": "Cortar imagen" },
   "current_image_f16c249c": { "message": "Imagen actual" },
   "custom_6979cd81": { "message": "Personalizar" },
   "date_added_ed5ad465": { "message": "Fecha de agregado" },
@@ -307,6 +308,7 @@
     "message": "No se encontraron resultados para { term }."
   },
   "none_3b5e34d2": { "message": "Ninguno" },
+  "none_selected_b93d56d2": { "message": "Nada seleccionado" },
   "octagon_e48be9f": { "message": "Octágono" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Abrir esta ventana de diálogo de atajos de teclado"
@@ -361,6 +363,7 @@
   },
   "search_280d00bd": { "message": "Buscar" },
   "search_term_b2d2235": { "message": "Término de búsqueda" },
+  "select_crop_shape_d441feeb": { "message": "Seleccionar forma de corte" },
   "select_language_7c93a900": { "message": "Seleccionar idioma" },
   "selected_274ce24f": { "message": "Seleccionado" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

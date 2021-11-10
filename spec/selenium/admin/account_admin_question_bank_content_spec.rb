@@ -22,7 +22,7 @@ require_relative '../common'
 describe "account admin question bank" do
   include_context "in-process server selenium tests"
 
-  before(:each) do
+  before do
     admin_logged_in
     @question_bank = create_question_bank
     @question = create_question

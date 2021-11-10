@@ -29,7 +29,7 @@ describe 'viewing a quiz with variable due dates on the quiz show page' do
   context 'as an observer linked to two students in different sections' do
     before(:once) { prepare_vdd_scenario_for_first_observer }
 
-    before(:each) do
+    before do
       user_session(@observer1)
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     end
@@ -51,7 +51,7 @@ describe 'viewing a quiz with variable due dates on the quiz show page' do
   context 'as an observer linked to a single student' do
     before(:once) { prepare_vdd_scenario_for_second_observer }
 
-    before(:each) do
+    before do
       user_session(@observer2)
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     end

@@ -35,7 +35,6 @@ class Profile < ActiveRecord::Base
   def title=(title)
     write_attribute(:title, title)
     write_attribute(:path, infer_path) if path.nil?
-    title
   end
 
   def infer_path

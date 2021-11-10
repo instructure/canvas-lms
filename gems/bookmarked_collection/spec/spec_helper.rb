@@ -28,7 +28,7 @@ RSpec.configure do |config|
   config.color = true
   config.order = 'random'
 
-  config.around(:each) do |example|
+  config.around do |example|
     ActiveRecord::Base.transaction do
       example.run
       raise ActiveRecord::Rollback

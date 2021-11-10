@@ -22,7 +22,7 @@ require_relative "../spec_helper"
 
 describe DumpHelper do
   it "complains about hashes with default procs" do
-    val = Hash.new {}
+    val = Hash.new { nil }
     expect { DumpHelper.find_dump_error(val) }.to raise_error(/^val: can't dump hash with default proc: #<Proc:/)
   end
 

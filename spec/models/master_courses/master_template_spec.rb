@@ -65,7 +65,7 @@ describe MasterCourses::MasterTemplate do
 
       MasterCourses::MasterTemplate.remove_as_master_course(@course)
 
-      expect(template).to receive(:destroy).never
+      expect(template).not_to receive(:destroy)
       expect(template).to be_deleted
     end
   end
@@ -78,7 +78,7 @@ describe MasterCourses::MasterTemplate do
     it "caches the result" do
       enable_cache do
         expect(check).to be_falsey
-        expect(@course).to receive(:master_course_templates).never
+        expect(@course).not_to receive(:master_course_templates)
         expect(check).to be_falsey
         expect(MasterCourses::MasterTemplate.is_master_course?(@course.id)).to be_falsey # should work with ids too
       end
@@ -108,7 +108,7 @@ describe MasterCourses::MasterTemplate do
 
     it "finds tags" do
       tag = @template.create_content_tag_for!(@assignment)
-      expect(@template).to receive(:create_content_tag_for!).never # don't try to recreate
+      expect(@template).not_to receive(:create_content_tag_for!) # don't try to recreate
       expect(@template.content_tag_for(@assignment)).to eq tag
     end
 

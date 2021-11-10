@@ -24,7 +24,7 @@ export default function UserLink({size, avatar_url, name, avatarName, ...propsTo
   return (
     <Button
       variant="link"
-      theme={{mediumPadding: '0', mediumHeight: '1rem'}}
+      theme={{mediumPaddingHorizontal: '0', mediumHeight: '1rem'}}
       {...propsToPassOnToLink}
     >
       <Avatar

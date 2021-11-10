@@ -67,6 +67,10 @@ def isPatchsetRetriggered() {
   return userCause && userCause[0].shortDescription.contains('Retriggered')
 }
 
+def isStartedByUser() {
+  return currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')
+}
+
 def postFn(status) {
   try {
     def requestStartTime = System.currentTimeMillis()
@@ -90,6 +94,10 @@ def postFn(status) {
         dockerUtils.tagRemote(env.CASSANDRA_IMAGE_TAG, env.CASSANDRA_MERGE_IMAGE)
         dockerUtils.tagRemote(env.DYNAMODB_IMAGE_TAG, env.DYNAMODB_MERGE_IMAGE)
         dockerUtils.tagRemote(env.POSTGRES_IMAGE_TAG, env.POSTGRES_MERGE_IMAGE)
+      }
+
+      if (isStartedByUser()) {
+        gerrit.submitVerified((status == 'SUCCESS' ? '+1' : '-1'), "${env.BUILD_URL}/build-summary-report/")
       }
     }
   } finally {
@@ -190,6 +198,19 @@ def getRspecProcesses() {
   }
 }
 
+@groovy.transform.Field final static GERRIT_CHANGE_ID_REGEX = /Change\-Id: (.*)/
+
+def getChangeId() {
+  if (env.GERRIT_CHANGE_ID) {
+    return env.GERRIT_CHANGE_ID
+  }
+  def commitMessage = env.GERRIT_CHANGE_COMMIT_MESSAGE ? new String(env.GERRIT_CHANGE_COMMIT_MESSAGE.decodeBase64()) : null
+  if (!commitMessage) {
+    error 'GERRIT_CHANGE_COMMIT_MESSAGE not found! You must provide a commit message!'
+  }
+  return (commitMessage =~ GERRIT_CHANGE_ID_REGEX).findAll()[0][1]
+}
+
 // These functions are intentionally pinned to GERRIT_EVENT_TYPE == 'change-merged' to ensure that real post-merge
 // builds always run correctly. We intentionally ignore overrides for version pins, docker image paths, etc when
 // running real post-merge builds.
@@ -251,6 +272,7 @@ pipeline {
     POSTGRES_CLIENT = configuration.postgresClient()
     SKIP_CACHE = configuration.skipCache()
     RSPEC_PROCESSES = getRspecProcesses()
+    GERRIT_CHANGE_ID = getChangeId()
 
     // e.g. postgres-12-ruby-2.6
     TAG_SUFFIX = imageTag.suffix()
@@ -303,6 +325,16 @@ pipeline {
     CANVAS_LMS_REFSPEC = getCanvasLmsRefspec()
     DOCKER_WORKDIR = getDockerWorkDir()
     LOCAL_WORKDIR = getLocalWorkDir()
+
+    // TEST_CACHE_CLASSES is consumed by config/environments/test.rb
+    // to decide whether to allow class reloading or not.
+    // in local development we usually want this unset or set to '0' because
+    // we want spring to be able to reload classes between
+    // spec runs, but this is expensive when running all the
+    // specs for the build.  EVERYWHERE in the build we want
+    // to be able to cache classes because they don't change while the build
+    // is running and should never be reloaded.
+    TEST_CACHE_CLASSES = '1'
   }
 
   stages {
@@ -320,6 +352,11 @@ pipeline {
             } else {
               gerrit.submitLintReview('0')
             }
+          }
+
+          if (isStartedByUser()) {
+            env.GERRIT_PATCHSET_REVISION = git.getRevisionHash()
+            buildParameters += string(name: 'GERRIT_PATCHSET_REVISION', value: "${env.GERRIT_PATCHSET_REVISION}")
           }
 
           // Ensure that all build flags are compatible.

@@ -391,7 +391,7 @@ describe AssignmentGroupsController, type: :request do
   end
 
   context 'when module_ids are requested' do
-    before :each do
+    before do
       @mods = Array.new(2) { |i| @course.context_modules.create! name: "Mod#{i}" }
       g = @course.assignment_groups.create! name: 'assignments'
       a = @course.assignments.create! assignment_group: g, title: 'blah'
@@ -972,7 +972,7 @@ describe AssignmentGroupsApiController, type: :request do
       end
 
       context "as a teacher" do
-        before :each do
+        before do
           @current_user = @teacher
           student_in_course(course: @course, active_all: true)
           @assignment = @course.assignments.create!({

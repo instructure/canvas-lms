@@ -115,7 +115,7 @@ describe BookmarkedCollection::SimpleBookmarker do
       @non_collated_bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class,
                                                                             { :name => { :skip_collation => true } }, :id)
       pager = double(current_bookmark: nil)
-      expect(BookmarkedCollection).to receive(:best_unicode_collation_key).never
+      expect(BookmarkedCollection).not_to receive(:best_unicode_collation_key)
       expect(@non_collated_bookmarker.restrict_scope(@example_class, pager)).to eq(
         [@bill, @bob2, @bob, @bobby, @joe]
       )

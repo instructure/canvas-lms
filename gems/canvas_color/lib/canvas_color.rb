@@ -413,8 +413,6 @@ module CanvasColor
       val
     end
 
-    public
-
     # Some constants for general use
     WHITE = Color.new(255, 255, 255).freeze
     BLACK = Color.new(0, 0, 0).freeze

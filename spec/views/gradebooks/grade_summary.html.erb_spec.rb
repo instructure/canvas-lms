@@ -102,7 +102,7 @@ describe "/gradebooks/grade_summary" do
   end
 
   describe "submission details link" do
-    before(:each) do
+    before do
       course_with_teacher
       student_in_course(active_all: true)
 
@@ -278,7 +278,7 @@ describe "/gradebooks/grade_summary" do
         course.assignments.create!(title: 'hi', submission_types: 'online_upload', anonymous_grading: true)
       end
 
-      before :each do
+      before do
         assignment.ensure_post_policy(post_manually: true)
         assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hello')
         assignment.grade_student(student, score: 10, grader: teacher)
@@ -387,7 +387,7 @@ describe "/gradebooks/grade_summary" do
     end
 
     context "when the New Gradebook Plagiarism Indicator feature is enabled" do
-      before(:each) do
+      before do
         course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
         assignment.submit_homework(student, submission_type: "online_text_entry", body: "hi")
 
@@ -525,13 +525,13 @@ describe "/gradebooks/grade_summary" do
     let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
     let(:assignment) { course.assignments.create! }
 
-    before(:each) do
+    before do
       view_context(course, student)
       assign(:presenter, GradeSummaryPresenter.new(course, student, nil))
     end
 
     context "when comments exist" do
-      before(:each) do
+      before do
         submission = assignment.submission_for_student(student)
         submission.add_comment(author: teacher, comment: "hello")
       end

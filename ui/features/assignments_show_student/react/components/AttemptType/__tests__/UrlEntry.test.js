@@ -21,6 +21,7 @@ import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphql/studentMocks'
 import {MockedProvider} from '@apollo/react-testing'
+import StudentViewContext from '../../Context'
 
 import UrlEntry from '../UrlEntry'
 
@@ -93,6 +94,35 @@ describe('UrlEntry', () => {
       )
 
       expect(getByTestId('url-entry')).toBeInTheDocument()
+    })
+
+    it('renders the website url input as disabled for observers', async () => {
+      const props = await makeProps({
+        Submission: {
+          submissionDraft: {
+            activeSubmissionType: 'online_url',
+            attachments: () => [],
+            body: null,
+            meetsUrlCriteria: false,
+            url: null
+          }
+        }
+      })
+      const overrides = {
+        ExternalToolConnection: {
+          nodes: [{}]
+        }
+      }
+      const mocks = await createGraphqlMocks(overrides)
+      const {getByTestId} = render(
+        <MockedProvider mocks={mocks}>
+          <StudentViewContext.Provider value={{allowChangesToSubmission: false, isObserver: true}}>
+            <UrlEntry {...props} />
+          </StudentViewContext.Provider>
+        </MockedProvider>
+      )
+
+      expect(getByTestId('url-input')).toHaveAttribute('readonly')
     })
 
     it('moves focus to the website url input after render when focusOnInit is true', async () => {

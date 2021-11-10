@@ -40,8 +40,6 @@ module SIS
       importer.success_count
     end
 
-    private
-
     class Work
       attr_accessor :success_count, :users_to_set_sis_batch_ids,
                     :pseudos_to_set_sis_batch_ids, :users_to_add_account_associations,
@@ -387,14 +385,14 @@ module SIS
               active_pseudo_counts = pseudo_scope.count
               sis_pseudo_counts = pseudo_scope.where('account_id = ? AND sis_user_id IS NOT NULL', @root_account).count
 
-              other_ccs = ccs.reject { |other_cc|
-                cc_user_id = other_cc.user_id
+              other_ccs = ccs.reject do |other|
+                cc_user_id = other.user_id
                 same_user = cc_user_id == user.id
                 no_active_pseudos = active_pseudo_counts.fetch(cc_user_id, 0) == 0
                 active_sis_pseudos = sis_pseudo_counts.fetch(cc_user_id, 0) != 0
 
                 same_user || no_active_pseudos || active_sis_pseudos
-              }
+              end
               unless other_ccs.empty?
                 cc.send_merge_notification!
               end

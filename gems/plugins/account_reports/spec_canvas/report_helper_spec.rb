@@ -85,7 +85,7 @@ describe "report helper" do
 
     it 'does one query for pseudonyms' do
       report.preload_logins_for_users([@user])
-      expect(SisPseudonym).to receive(:for).never
+      expect(SisPseudonym).not_to receive(:for)
       report.loaded_pseudonym({ @user.id => [@pseudonym] }, @user, enrollment: @enrollmnent)
     end
 
@@ -100,7 +100,7 @@ describe "report helper" do
     it 'uses deleted pseudonyms when passed' do
       @pseudonym.destroy
       report.preload_logins_for_users([@user])
-      expect(SisPseudonym).to receive(:for).never
+      expect(SisPseudonym).not_to receive(:for)
       pseudonym = report.loaded_pseudonym({ @user.id => [@pseudonym] }, @user, include_deleted: true, enrollment: @enrollmnent)
       expect(pseudonym).to eq @pseudonym
     end

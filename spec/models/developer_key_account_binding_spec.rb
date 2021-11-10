@@ -71,6 +71,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
 
     context 'with visible dev keys in "on" and tool_configurations' do
       let(:first_key) { DeveloperKey.first }
+
       before do
         first_key.create_tool_configuration! settings: settings
       end

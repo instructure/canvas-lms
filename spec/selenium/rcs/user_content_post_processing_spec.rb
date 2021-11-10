@@ -22,7 +22,7 @@ require_relative '../common'
 describe 'user_content post processing' do
   include_context 'in-process server selenium tests'
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in
     @file =
       @course.attachments.create!(

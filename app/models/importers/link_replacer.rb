@@ -186,11 +186,7 @@ module Importers
         if item.quiz
           replace_item_placeholders!({ :item => item.quiz }, { :description => links }, true)
         end
-      when DiscussionTopic
-        if item.assignment
-          replace_item_placeholders!({ :item => item.assignment }, { :description => links }, true)
-        end
-      when Quizzes::Quiz
+      when DiscussionTopic, Quizzes::Quiz
         if item.assignment
           replace_item_placeholders!({ :item => item.assignment }, { :description => links }, true)
         end

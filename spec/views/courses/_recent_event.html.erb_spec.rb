@@ -95,7 +95,7 @@ describe "/courses/_recent_event" do
   end
 
   context "assignment muting" do
-    before(:each) do
+    before do
       course_with_student
       view_context
       @quiz = @course.quizzes.create!

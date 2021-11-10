@@ -236,7 +236,7 @@ module QuizzesCommon
     @quiz
   end
 
-  def quiz_with_new_questions(goto_edit = true, *answers)
+  def quiz_with_new_questions(*answers, goto_edit: true)
     @context = @course
     bank = @context.assessment_question_banks.create!(title: 'Test Bank')
     @quiz = quiz_model
@@ -370,7 +370,7 @@ module QuizzesCommon
   end
 
   def take_quiz
-    @quiz ||= quiz_with_new_questions(!:goto_edit)
+    @quiz ||= quiz_with_new_questions(goto_edit: false)
     begin_quiz
 
     yield
@@ -806,11 +806,11 @@ module QuizzesCommon
   end
 
   def verify_quiz_submission_is_late
-    verify_quiz_submission_late_status(:late)
+    verify_quiz_submission_late_status(late: true)
   end
 
   def verify_quiz_submission_is_not_late
-    verify_quiz_submission_late_status(!:late)
+    verify_quiz_submission_late_status(late: false)
   end
 
   def open_quiz_show_page
@@ -822,11 +822,11 @@ module QuizzesCommon
   end
 
   def verify_quiz_submission_is_late_in_speedgrader
-    verify_quiz_submission_status_in_speedgrader(:late)
+    verify_quiz_submission_status_in_speedgrader(late: true)
   end
 
   def verify_quiz_submission_is_not_late_in_speedgrader
-    verify_quiz_submission_status_in_speedgrader(!:late)
+    verify_quiz_submission_status_in_speedgrader(late: false)
   end
 
   def open_quiz_in_speedgrader
@@ -861,7 +861,7 @@ module QuizzesCommon
     "/courses/#{@course.id}/quizzes/#{@quiz.id}/take?user_id=#{@user.id}"
   end
 
-  def verify_quiz_submission_late_status(late)
+  def verify_quiz_submission_late_status(late:)
     open_student_quiz_submission
     submission_page_info = f('.submission_details', f('#not_right_side'))
 
@@ -872,7 +872,7 @@ module QuizzesCommon
     end
   end
 
-  def verify_quiz_submission_status_in_speedgrader(late)
+  def verify_quiz_submission_status_in_speedgrader(late:)
     open_quiz_in_speedgrader
     speedgrader_submission_details = f('#submission_details', f('.right_side_content'))
 

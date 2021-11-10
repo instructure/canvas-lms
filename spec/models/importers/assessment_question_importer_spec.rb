@@ -174,7 +174,7 @@ def test_question_import(hash_name, system)
 
   db_aq = AssessmentQuestion.where(migration_id: q[:migration_id]).first
   expect(db_aq.migration_id).to eq q[:migration_id]
-  db_aq.name == q[:question_name]
+  expect(db_aq.name).to eq q[:question_name]
 
   bank = AssessmentQuestionBank.where(context_type: context.class.to_s, context_id: context, title: AssessmentQuestionBank.default_imported_title).first
   bank_aq = bank.assessment_questions.first

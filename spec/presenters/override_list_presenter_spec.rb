@@ -157,7 +157,7 @@ describe OverrideListPresenter do
     end
 
     context "for ADHOC overrides" do
-      before :each do
+      before do
         override = assignment.assignment_overrides.create!(due_at: 1.week.from_now)
         override.assignment_override_students.create!(user: user, assignment: assignment)
         override.assignment_override_students.create!(user: second_user, assignment: assignment)

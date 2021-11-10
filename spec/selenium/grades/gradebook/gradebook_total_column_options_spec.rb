@@ -25,11 +25,13 @@ describe "Gradebook - total column menu options" do
   include GradebookCommon
 
   before(:once) { gradebook_data_setup }
-  before(:each) { user_session(@teacher) }
-  after(:each) { clear_local_storage }
+
+  before { user_session(@teacher) }
+
+  after { clear_local_storage }
 
   context "Display as" do
-    before(:each) do
+    before do
       Gradebook.visit(@course)
     end
 
@@ -116,7 +118,7 @@ describe "Gradebook - total column menu options" do
   end
 
   context "Sort By" do
-    before(:each) do
+    before do
       Gradebook.visit(@course)
     end
 
@@ -130,7 +132,7 @@ describe "Gradebook - total column menu options" do
   end
 
   context "Move to" do
-    before(:each) do
+    before do
       Gradebook.visit(@course)
     end
 

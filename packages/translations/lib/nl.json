@@ -329,6 +329,9 @@
     "creative_commons_license_725584ae": {
         "message": "Creative Commons-licentie:"
     },
+    "crop_image_807ebb08": {
+        "message": "Afbeelding bijsnijden"
+    },
     "current_image_f16c249c": {
         "message": "Huidige afbeelding"
     },
@@ -896,6 +899,9 @@
     "none_3b5e34d2": {
         "message": "Geen"
     },
+    "none_selected_b93d56d2": {
+        "message": "Geen geselecteerd"
+    },
     "nothing_due_this_week_d45c9ef9": {
         "message": "Niets in te leveren deze week"
     },
@@ -1078,6 +1084,9 @@
     },
     "search_term_b2d2235": {
         "message": "Zoekterm"
+    },
+    "select_crop_shape_d441feeb": {
+        "message": "Bijsnijvorm selecteren"
     },
     "select_language_7c93a900": {
         "message": "Taal selecteren"

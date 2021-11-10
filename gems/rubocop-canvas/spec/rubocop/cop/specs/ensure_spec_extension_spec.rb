@@ -21,7 +21,7 @@ describe RuboCop::Cop::Specs::EnsureSpecExtension do
   subject(:cop) { described_class.new }
 
   context "named as *_spec.rb" do
-    before(:each) do
+    before do
       allow(cop).to receive(:file_name).and_return("dragoon_spec.rb")
     end
 
@@ -57,7 +57,7 @@ describe RuboCop::Cop::Specs::EnsureSpecExtension do
   end
 
   context "not named as *_spec.rb" do
-    before(:each) do
+    before do
       allow(cop).to receive(:file_name).and_return("dragoon.rb")
     end
 

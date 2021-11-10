@@ -119,6 +119,7 @@
   "creative_commons_license_725584ae": {
     "message": "Creative Commons licens:"
   },
+  "crop_image_807ebb08": { "message": "Beskær billede" },
   "current_image_f16c249c": { "message": "Nuværende billede" },
   "custom_6979cd81": { "message": "Brugerdefineret" },
   "date_added_ed5ad465": { "message": "Dato tilføjet" },
@@ -293,6 +294,7 @@
     "message": "Der blev ikke fundet nogen resultater for { term }."
   },
   "none_3b5e34d2": { "message": "Ingen" },
+  "none_selected_b93d56d2": { "message": "Ingen valgt" },
   "octagon_e48be9f": { "message": "Octagon" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Åbn dialogen for denne genvejstast"
@@ -341,6 +343,7 @@
   "saved_buttons_and_icons_8278eed2": { "message": "Gemte knapper og ikoner" },
   "search_280d00bd": { "message": "Søg" },
   "search_term_b2d2235": { "message": "Søgeord" },
+  "select_crop_shape_d441feeb": { "message": "Vælg beskæringsform" },
   "select_language_7c93a900": { "message": "Vælg sprog" },
   "selected_274ce24f": { "message": "Valgt" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

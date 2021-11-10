@@ -609,7 +609,7 @@ describe "Default Account Reports" do
 
       describe "grading scheme values" do
         context "when the Add Grading Scheme to Admin Grade Reports flag is enabled" do
-          before(:each) do
+          before do
             @account.enable_feature!(:final_grades_override)
           end
 

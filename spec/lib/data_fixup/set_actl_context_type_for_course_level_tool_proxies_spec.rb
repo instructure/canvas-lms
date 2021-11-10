@@ -43,7 +43,7 @@ describe DataFixup::SetActlContextTypeForCourseLevelToolProxies do
   let(:test_id) { SecureRandom.uuid }
   let(:stub_response) { double(code: 200, parsed_response: { 'Id' => test_id }, ok?: true) }
 
-  before(:each) do
+  before do
     allow(subscription_service).to receive_messages(available?: true)
     allow(subscription_service).to receive_messages(create_tool_proxy_subscription: stub_response)
     allow(subscription_service).to receive_messages(destroy_tool_proxy_subscription: stub_response)

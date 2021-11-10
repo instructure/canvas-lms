@@ -23,7 +23,7 @@ shared_examples_for "settings basic tests" do |account_type|
   include SharedExamplesCommon
   include_context "in-process server selenium tests"
 
-  before(:each) do
+  before do
     course_with_admin_logged_in
   end
 
@@ -46,7 +46,7 @@ shared_examples_for "settings basic tests" do |account_type|
       admin.id
     end
 
-    before(:each) do
+    before do
       get "/accounts/#{account.id}/settings"
       f("#tab-users-link").click
     end
@@ -71,7 +71,7 @@ shared_examples_for "settings basic tests" do |account_type|
       wait_for_new_page_load { submit_form("#account_settings") }
     end
 
-    before(:each) do
+    before do
       course_with_admin_logged_in
       group_model(context: @course)
       get account_settings_url

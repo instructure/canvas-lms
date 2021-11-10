@@ -24,7 +24,7 @@ require_relative 'page_objects/submission_detail_page'
 describe 'Anonymous Moderated Marking' do
   include_context 'in-process server selenium tests'
 
-  before(:each) do
+  before do
     # create a course with a teacher
     course_with_teacher(course_name: 'Course1')
   end
@@ -81,7 +81,7 @@ describe 'Anonymous Moderated Marking' do
       submission_model(user: @student, assignment: @anonymous_assignment, body: "first student submission text")
     end
 
-    before :each do
+    before do
       user_session(@student)
       SubmissionDetails.visit_as_student(@course.id, @anonymous_assignment.id, @student.id)
     end
@@ -114,7 +114,7 @@ describe 'Anonymous Moderated Marking' do
       submission_model(user: @student, assignment: @moderated_assignment, body: "first student submission text")
     end
 
-    before :each do
+    before do
       user_session(@student)
       SubmissionDetails.visit_as_student(@course.id, @moderated_assignment.id, @student.id)
     end

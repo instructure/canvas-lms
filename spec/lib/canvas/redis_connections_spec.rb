@@ -19,7 +19,7 @@
 #
 
 describe "Canvas::RedisConnections" do
-  before(:each) do
+  before do
     skip("requires redis") unless CanvasCache::Redis.enabled?
   end
 

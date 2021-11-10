@@ -233,22 +233,17 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def editable_by?(question)
-    if self.independently_edited?
+    if self.independently_edited? ||
+       # If the assessment_question was created long before the quiz_question,
+       # then the assessment question must have been created on its own, which means
+       # it shouldn't be affected by changes to the quiz_question since it wasn't
+       # based on the quiz_question to begin with
+       (!self.new_record? && question.assessment_question_id == self.id && question.created_at && self.created_at < question.created_at + 5.minutes && self.created_at > question.created_at + 30.seconds) ||
+       (self.assessment_question_bank && self.assessment_question_bank.title != AssessmentQuestionBank.default_unfiled_title) ||
+       (question.is_a?(Quizzes::QuizQuestion) && question.generated?)
       false
-    # If the assessment_question was created long before the quiz_question,
-    # then the assessment question must have been created on its own, which means
-    # it shouldn't be affected by changes to the quiz_question since it wasn't
-    # based on the quiz_question to begin with
-    elsif !self.new_record? && question.assessment_question_id == self.id && question.created_at && self.created_at < question.created_at + 5.minutes && self.created_at > question.created_at + 30.seconds
-      false
-    elsif self.assessment_question_bank && self.assessment_question_bank.title != AssessmentQuestionBank.default_unfiled_title
-      false
-    elsif question.is_a?(Quizzes::QuizQuestion) && question.generated?
-      false
-    elsif self.new_record? || (quiz_questions.count <= 1 && question.assessment_question_id == self.id)
-      true
     else
-      false
+      self.new_record? || (quiz_questions.count <= 1 && question.assessment_question_id == self.id)
     end
   end
 

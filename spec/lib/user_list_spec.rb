@@ -19,7 +19,7 @@
 #
 
 describe UserList do
-  before(:each) do
+  before do
     @account = Account.default
     @account.settings = { :open_registration => true }
     @account.save!
@@ -240,7 +240,7 @@ describe UserList do
   end
 
   context "closed registration" do
-    before(:each) do
+    before do
       @account.settings = { :open_registration => false }
       @account.save!
     end

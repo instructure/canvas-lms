@@ -25,7 +25,8 @@ export default {
   component: MessageDetailItem,
   argTypes: {
     onReply: {action: 'reply'},
-    onReplyAll: {action: 'replyAll'}
+    onReplyAll: {action: 'replyAll'},
+    onDelete: {action: 'delete'}
   }
 }
 

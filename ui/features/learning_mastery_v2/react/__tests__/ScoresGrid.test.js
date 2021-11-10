@@ -32,7 +32,8 @@ describe('ScoresGrid', () => {
               rating: {
                 points: 3,
                 color: 'green',
-                description: 'mastery'
+                description: 'mastery',
+                mastery: false
               }
             }
           ]

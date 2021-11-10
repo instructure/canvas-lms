@@ -24,7 +24,7 @@ describe UsersController do
       user_factory
     end
 
-    before :each do
+    before do
       user_session @user
     end
 

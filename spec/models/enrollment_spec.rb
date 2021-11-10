@@ -302,7 +302,7 @@ describe Enrollment do
       user
     end
 
-    before :each do
+    before do
       original_enrollment = @course.enroll_student(student)
       original_enrollment.accept(true)
       assignment.grade_student(student, grade: "10", grader: teacher)
@@ -355,7 +355,7 @@ describe Enrollment do
         @course.update!(allow_final_grade_override: true)
       end
 
-      before(:each) do
+      before do
         allow(@course).to receive(:grading_standard_enabled?).and_return true
       end
 
@@ -452,7 +452,7 @@ describe Enrollment do
         @course.update!(allow_final_grade_override: true)
       end
 
-      before(:each) do
+      before do
         allow(@course).to receive(:grading_standard_enabled?).and_return true
       end
 
@@ -541,7 +541,7 @@ describe Enrollment do
         @course.update!(allow_final_grade_override: true)
       end
 
-      before(:each) do
+      before do
         @course.enable_feature!(:final_grades_override)
         @course.update!(grading_standard_enabled: true)
         @score.update!(override_score: 99.0)
@@ -593,7 +593,7 @@ describe Enrollment do
         @course.update!(allow_final_grade_override: true)
       end
 
-      before(:each) do
+      before do
         @score.update!(override_score: 99.0)
       end
 
@@ -716,7 +716,7 @@ describe Enrollment do
       end
 
       describe '#computed_current_grade' do
-        before(:each) do
+        before do
           @course.grading_standard_enabled = true
           @course.save!
         end
@@ -750,7 +750,7 @@ describe Enrollment do
       end
 
       describe '#unposted_current_grade' do
-        before(:each) do
+        before do
           @course.grading_standard_enabled = true
           @course.save!
         end
@@ -854,9 +854,9 @@ describe Enrollment do
       end
 
       describe '#find_score' do
-        before(:each) do
+        before do
           @course.update!(grading_standard_enabled: true)
-          allow(GradeCalculator).to receive(:recompute_final_score) {}
+          allow(GradeCalculator).to receive(:recompute_final_score)
           @enrollment.scores.create!(current_score: 85.3)
           @enrollment.scores.create!(grading_period: period, current_score: 99.1)
           @enrollment.scores.create!(assignment_group: a_group, current_score: 66.3)
@@ -1014,7 +1014,7 @@ describe Enrollment do
       end
 
       describe '#computed_final_grade' do
-        before(:each) do
+        before do
           @course.grading_standard_enabled = true
           @course.save!
         end
@@ -1070,7 +1070,7 @@ describe Enrollment do
     end
 
     describe 'restoring enrollments directly from soft-deleted to completed state' do
-      before :each do
+      before do
         # Create two enrollments for this course
         @enrollment.save!
         user2 = User.create!
@@ -1206,18 +1206,23 @@ describe Enrollment do
     it "allows StudentEnrollment" do
       expect(Enrollment.typed_enrollment('StudentEnrollment')).to eql(StudentEnrollment)
     end
+
     it "allows TeacherEnrollment" do
       expect(Enrollment.typed_enrollment('TeacherEnrollment')).to eql(TeacherEnrollment)
     end
+
     it "allows TaEnrollment" do
       expect(Enrollment.typed_enrollment('TaEnrollment')).to eql(TaEnrollment)
     end
+
     it "allows ObserverEnrollment" do
       expect(Enrollment.typed_enrollment('ObserverEnrollment')).to eql(ObserverEnrollment)
     end
+
     it "allows DesignerEnrollment" do
       expect(Enrollment.typed_enrollment('DesignerEnrollment')).to eql(DesignerEnrollment)
     end
+
     it "allows not NothingEnrollment" do
       expect(Enrollment.typed_enrollment('NothingEnrollment')).to eql(nil)
     end
@@ -1747,7 +1752,7 @@ describe Enrollment do
         end
 
         it "does not attempt to recompute scores since the user is not a student" do
-          expect(Enrollment).to receive(:recompute_final_score).never
+          expect(Enrollment).not_to receive(:recompute_final_score)
           @enrollment.workflow_state = 'invited'
           @enrollment.save!
           @enrollment.accept
@@ -1895,6 +1900,7 @@ describe Enrollment do
           course_with_student(active_all: true)
         end
       end
+
       include_examples 'term and enrollment dates'
 
       describe 'section dates' do
@@ -1986,6 +1992,7 @@ describe Enrollment do
           course_with_teacher(active_all: true)
         end
       end
+
       include_examples 'term and enrollment dates'
     end
 
@@ -2639,7 +2646,7 @@ describe Enrollment do
           end
         end
 
-        before :each do
+        before do
           allow(Enrollment).to receive(:cross_shard_invitations?).and_return(true)
           skip "working CommunicationChannel.associated_shards" unless CommunicationChannel.associated_shards('jt@instructure.com').length == 2
         end
@@ -2659,7 +2666,7 @@ describe Enrollment do
             @shard2.activate do
               expect(Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id)).to eq [@enrollment1, @enrollment2].sort_by(&:global_id)
             end
-            expect(Shard).to receive(:with_each_shard).never
+            expect(Shard).not_to receive(:with_each_shard)
             @shard1.activate do
               expect(Enrollment.cached_temporary_invitations('jt@instructure.com').sort_by(&:global_id)).to eq [@enrollment1, @enrollment2].sort_by(&:global_id)
             end
@@ -2937,7 +2944,7 @@ describe Enrollment do
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
-      before :each do
+      before do
         course_with_student
         @course.root_account.disable_feature!(:granular_permissions_manage_users)
       end
@@ -2949,6 +2956,7 @@ describe Enrollment do
       end
 
       it 'is false for a user without :manage_students' do
+        allow(@course).to receive(:grants_right?).with(user, session, :manage_admin_users).and_return(false)
         allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
         expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
@@ -2979,32 +2987,32 @@ describe Enrollment do
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
-      before :each do
+      before do
         course_with_student
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @enrollment.reload
       end
 
-      it 'is true for a user who has been granted :manage_students' do
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+      it 'is true for a user who has been granted :remove_student_from_course' do
+        allow(@course).to receive(:grants_right?).with(user, session, :remove_student_from_course).and_return(true)
         allow(@course).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(false)
         expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
       end
 
-      it 'is false for a user without :manage_students' do
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(false)
+      it 'is false for a user without :remove_student_from_course' do
+        allow(@course).to receive(:grants_right?).with(user, session, :remove_student_from_course).and_return(false)
         expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
 
       it 'is false for someone with :allow_course_admin_actions in other context' do
         context = CourseSection.new(id: 10)
-        allow(context).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(context).to receive(:grants_right?).with(user, session, :remove_student_from_course).and_return(true)
         allow(context).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(true)
         expect(@enrollment.can_be_deleted_by(user, context, session)).to be_falsey
       end
 
       it 'is false if a user is trying to remove their own enrollment' do
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
+        allow(@course).to receive(:grants_right?).with(user, session, :remove_student_from_course).and_return(true)
         allow(@course).to receive(:grants_right?).with(user, session, :allow_course_admin_actions).and_return(false)
         allow(@course).to receive_messages(:account => @course)
         @enrollment.user_id = user.id
@@ -3016,7 +3024,7 @@ describe Enrollment do
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
-      before :each do
+      before do
         course_with_observer
         @course.root_account.disable_feature!(:granular_permissions_manage_users)
       end
@@ -3044,19 +3052,13 @@ describe Enrollment do
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
-      before :each do
+      before do
         course_with_observer
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @enrollment.reload
       end
 
-      it 'is true with :manage_students' do
-        allow(@course).to receive(:grants_right?).and_return(false)
-        allow(@course).to receive(:grants_right?).with(user, session, :manage_students).and_return(true)
-        expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
-      end
-
-      it "is true without :manage_students but with the :remove_observer_from_account granular" do
+      it 'is true with :remove_observer_from_course' do
         allow(@course).to receive(:grants_right?).and_return(false)
         allow(@course).to receive(:grants_right?).with(user, session, :remove_observer_from_course).and_return(true)
         expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_truthy
@@ -3078,7 +3080,7 @@ describe Enrollment do
       let(:user) { double(:id => 42) }
       let(:session) { double }
 
-      before :each do
+      before do
         course_with_teacher
         @course.root_account.enable_feature!(:granular_permissions_manage_users)
         @enrollment.reload
@@ -3125,7 +3127,7 @@ describe Enrollment do
     end
 
     it "does not trigger a batch when enrollment is not student" do
-      expect(DueDateCacher).to receive(:recompute_users_for_course).never
+      expect(DueDateCacher).not_to receive(:recompute_users_for_course)
       @course.enroll_teacher(user_factory)
     end
 
@@ -3135,12 +3137,12 @@ describe Enrollment do
     end
 
     it "does not trigger when nothing changed" do
-      expect(DueDateCacher).to receive(:recompute_users_for_course).never
+      expect(DueDateCacher).not_to receive(:recompute_users_for_course)
       @enrollment.save
     end
 
     it "does not trigger when set_update_cached_due_dates callback is suspended" do
-      expect(DueDateCacher).to receive(:recompute_users_for_course).never
+      expect(DueDateCacher).not_to receive(:recompute_users_for_course)
       Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
         @course.enroll_student(user_factory)
       end
@@ -3150,7 +3152,7 @@ describe Enrollment do
       override = assignment_override_model(assignment: @assignments.first)
       override.assignment_override_students.create(user: @student)
       expect(DueDateCacher).to receive(:recompute_users_for_course).once
-      expect(DueDateCacher).to receive(:recompute).never
+      expect(DueDateCacher).not_to receive(:recompute)
       @enrollment.destroy
     end
 
@@ -3201,7 +3203,7 @@ describe Enrollment do
     end
 
     context "the enrollment is a student enrollment" do
-      before(:each) do
+      before do
         allow(@enrollment).to receive(:student?).and_return(true)
         allow(@enrollment).to receive(:fake_student?).and_return(false)
       end
@@ -3222,7 +3224,7 @@ describe Enrollment do
     end
 
     context "the enrollment is a fake student enrollment" do
-      before(:each) do
+      before do
         allow(@enrollment).to receive(:student?).and_return(false)
         allow(@enrollment).to receive(:fake_student?).and_return(true)
       end
@@ -3488,7 +3490,7 @@ describe Enrollment do
     let(:course) { course_factory }
     let(:enrollment_type) { 'StudentEnrollment' }
 
-    before :each do
+    before do
       MicrosoftSync::Group.create!(course: course)
     end
 
@@ -3499,7 +3501,7 @@ describe Enrollment do
     end
 
     context 'when feature flag is off' do
-      before :each do
+      before do
         course.root_account.disable_feature!(:microsoft_group_enrollments_syncing)
       end
 
@@ -3509,12 +3511,12 @@ describe Enrollment do
     end
 
     context 'when feature flag is on' do
-      before :each do
+      before do
         course.root_account.enable_feature!(:microsoft_group_enrollments_syncing)
       end
 
       context 'when account has turned sync off' do
-        before :each do
+        before do
           course.root_account.settings[:microsoft_sync_enabled] = false
           course.root_account.save!
         end
@@ -3525,7 +3527,7 @@ describe Enrollment do
       end
 
       context 'when account has turned sync on' do
-        before :each do
+        before do
           course.root_account.settings[:microsoft_sync_enabled] = true
           course.root_account.save!
         end

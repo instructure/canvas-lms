@@ -66,13 +66,13 @@ describe Quizzes::QuizSubmissionService do
   end
 
   describe '#create' do
-    before :each do
+    before do
       # consume all calls to actual QS generation, no need to test this
       allow(quiz).to receive(:generate_submission)
     end
 
     context 'as an authentic user' do
-      before :each do
+      before do
         allow(quiz).to receive(:grants_right?).and_return true
       end
 
@@ -139,7 +139,7 @@ describe Quizzes::QuizSubmissionService do
     end
 
     context 'as an anonymous participant' do
-      before :each do
+      before do
         participant.user = nil
         quiz.context = Account.default.courses.new.tap { |c| c.root_account = Account.default }
       end
@@ -177,7 +177,7 @@ describe Quizzes::QuizSubmissionService do
     end
 
     context 'as the participant' do
-      before :each do
+      before do
         allow(quiz).to receive(:grants_right?).and_return true
       end
 
@@ -235,7 +235,7 @@ describe Quizzes::QuizSubmissionService do
     end
 
     context 'as the participant' do
-      before :each do
+      before do
         allow(quiz).to receive(:grants_right?).and_return true
       end
 
@@ -281,7 +281,7 @@ describe Quizzes::QuizSubmissionService do
     end
 
     context 'as a teacher' do
-      before :each do
+      before do
         allow(qs).to receive(:grants_right?).with(participant.user, :update_scores).and_return true
       end
 
@@ -362,14 +362,14 @@ describe Quizzes::QuizSubmissionService do
       it 'is a no-op if no changes are requested' do
         expect_version_object
         qs.workflow_state = 'complete'
-        expect(qs).to receive(:update_scores).never
+        expect(qs).not_to receive(:update_scores)
 
         subject.update_scores qs, qs.attempt, {}
       end
     end
 
     context 'as someone else' do
-      before :each do
+      before do
         allow(qs).to receive(:grants_right?).with(participant.user, :update_scores).and_return false
       end
 

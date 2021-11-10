@@ -100,7 +100,6 @@ module Lti::IMS::Concerns
       end
     end
 
-    # rubocop:disable Metrics/BlockLength
     included do
       skip_before_action :load_user
 
@@ -186,6 +185,5 @@ module Lti::IMS::Concerns
         end
       end
     end
-    # rubocop:enable Metrics/BlockLength
   end
 end

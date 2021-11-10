@@ -29,7 +29,7 @@ describe 'viewing a quiz with variable due dates on the quizzes index page' do
   context 'as a teacher in both sections' do
     before(:once) { prepare_vdd_scenario_for_teacher }
 
-    before(:each) do
+    before do
       user_session(@teacher1)
       get "/courses/#{@course.id}/quizzes"
     end

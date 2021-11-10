@@ -42,11 +42,6 @@ describe('Rce normalizeProps', () => {
     assert.equal(normalized.tinymce, tinymce)
   })
 
-  it('normalizes the language', () => {
-    const normalized = normalizeProps({...props, language: 'mi-NZ'}, tinymce, MockMutationObserver)
-    assert.equal(normalized.language, 'mi')
-  })
-
   it('retains other props', () => {
     const normalized = normalizeProps(
       {...props, textareaId: 'textareaId'},
@@ -54,27 +49,5 @@ describe('Rce normalizeProps', () => {
       MockMutationObserver
     )
     assert.equal(normalized.textareaId, 'textareaId')
-  })
-
-  describe('configureMenus', () => {
-    it('places instructure_media in menubar if not instRecordDisabled', () => {
-      props = {...props, instRecordDisabled: false}
-      const normalized = normalizeProps(props, tinymce, MockMutationObserver)
-      assert.strictEqual(normalized.editorOptions.menubar, 'edit view insert format tools table')
-      assert.strictEqual(
-        normalized.editorOptions.menu.insert.items,
-        'instructure_links instructure_image instructure_media instructure_document | instructure_equation inserttable instructure_media_embed | hr'
-      )
-    })
-
-    it('instructure_media not in menubar if instRecordDisabled is set', () => {
-      props = {...props, instRecordDisabled: true}
-      const normalized = normalizeProps(props, tinymce, MockMutationObserver)
-      assert.strictEqual(normalized.editorOptions.menubar, 'edit view insert format tools table')
-      assert.strictEqual(
-        normalized.editorOptions.menu.insert.items,
-        'instructure_links instructure_image instructure_document | instructure_equation inserttable instructure_media_embed | hr'
-      )
-    })
   })
 })

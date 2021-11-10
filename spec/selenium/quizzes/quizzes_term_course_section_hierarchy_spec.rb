@@ -24,7 +24,7 @@ describe "quizzes section hierarchy" do
   include_context "in-process server selenium tests"
   include QuizzesCommon
 
-  before :each do
+  before do
     course_with_teacher_logged_in
     @new_section = @course.course_sections.create!(name: 'New Section')
     @student = student_in_section(@new_section)
@@ -92,7 +92,7 @@ describe "quizzes section hierarchy" do
     end
 
     context "term end date in past" do
-      before :each do
+      before do
         term = EnrollmentTerm.find(@course.enrollment_term_id)
         term.start_at = Time.zone.now.advance(days: -60)
         term.end_at = Time.zone.now.advance(days: -15)
@@ -123,7 +123,7 @@ describe "quizzes section hierarchy" do
   end
 
   context "course overrides hierarchy when restrict to section dates is not checked" do
-    before :each do
+    before do
       @new_section.restrict_enrollments_to_section_dates = false
       @new_section.save!
     end
@@ -138,7 +138,7 @@ describe "quizzes section hierarchy" do
     end
 
     context "course ends in future" do
-      before :each do
+      before do
         @course.conclude_at = Time.zone.now.advance(days: 10)
         @course.save!
       end
@@ -153,7 +153,7 @@ describe "quizzes section hierarchy" do
 
   context "term overrides hierarchy when restrict to course and section dates are not checked" do
     context "course ends in past" do
-      before :each do
+      before do
         @course.restrict_enrollments_to_course_dates = false
         @course.save!
         @new_section.restrict_enrollments_to_section_dates = false

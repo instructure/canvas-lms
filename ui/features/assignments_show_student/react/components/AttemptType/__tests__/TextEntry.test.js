@@ -21,6 +21,7 @@ import userEvent from '@testing-library/user-event'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 import React from 'react'
 import TextEntry from '../TextEntry'
+import StudentViewContext from '../../Context'
 
 jest.mock('@canvas/tinymce-external-tools/TinyMCEContentItem', () => ({
   fromJSON: contentItem => ({
@@ -95,6 +96,24 @@ describe('TextEntry', () => {
           await renderEditor()
           await waitFor(() => {
             expect(fakeEditor.readonly).toStrictEqual(false)
+          })
+        })
+
+        it('is enabled for observers', async () => {
+          const props = await makeProps()
+          render(
+            <StudentViewContext.Provider
+              value={{isObserver: true, allowChangesToSubmission: false}}
+            >
+              <TextEntry {...props} />
+            </StudentViewContext.Provider>
+          )
+          await waitFor(() => {
+            expect(tinymce.editors[0]).toBeDefined()
+          })
+          fakeEditor = tinymce.editors[0]
+          await waitFor(() => {
+            expect(fakeEditor.readonly).toStrictEqual(true)
           })
         })
       })

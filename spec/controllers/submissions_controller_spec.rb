@@ -574,7 +574,7 @@ describe SubmissionsController do
     end
 
     context "google doc" do
-      before(:each) do
+      before do
         course_with_student_logged_in(active_all: true)
         @course.account.enable_service(:avatars)
         @assignment = @course.assignments.create!(title: 'some assignment', submission_types: 'online_upload')
@@ -646,12 +646,12 @@ describe SubmissionsController do
     end
 
     describe "confetti celebrations" do
-      before(:each) do
+      before do
         Account.default.enable_feature!(:confetti_for_assignments)
       end
 
       context "submission is made before due date" do
-        before(:each) do
+        before do
           course_with_student_logged_in(:active_all => true)
           @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload", :due_at => 5.days.from_now)
         end
@@ -663,7 +663,7 @@ describe SubmissionsController do
         end
 
         context "confetti_for_assignments flag is disabled" do
-          before(:each) do
+          before do
             Account.default.disable_feature!(:confetti_for_assignments)
           end
 
@@ -680,7 +680,7 @@ describe SubmissionsController do
       end
 
       context "submission is made after due date" do
-        before(:each) do
+        before do
           course_with_student_logged_in(:active_all => true)
           @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload", :due_at => 5.days.ago)
         end
@@ -693,7 +693,7 @@ describe SubmissionsController do
       end
 
       context "submission is made with no due date" do
-        before(:each) do
+        before do
           course_with_student_logged_in(:active_all => true)
           @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
         end
@@ -705,7 +705,7 @@ describe SubmissionsController do
         end
 
         context "confetti_for_assignments flag is disabled" do
-          before(:each) do
+          before do
             Account.default.disable_feature!(:confetti_for_assignments)
           end
 
@@ -924,7 +924,7 @@ describe SubmissionsController do
       let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
       let(:student_sub) { assignment.submissions.find_by!(user: student) }
 
-      before(:each) do
+      before do
         AssessmentRequest.create!(assessor: reviewer, assessor_asset: reviewer_sub, asset: student_sub, user: student)
         user_session(student)
       end
@@ -941,7 +941,7 @@ describe SubmissionsController do
       end
 
       context "when anonymous grading is enabled for the assignment" do
-        before(:each) do
+        before do
           assignment.update!(anonymous_grading: true)
         end
 
@@ -958,7 +958,7 @@ describe SubmissionsController do
       end
 
       context "when anonymous peer reviews are enabled for the assignment" do
-        before(:each) do
+        before do
           assignment.update!(anonymous_peer_reviews: true)
         end
 
@@ -1071,7 +1071,7 @@ describe SubmissionsController do
                                 originality_report_url: 'http://www.instructure.com')
     end
 
-    before :each do
+    before do
       user_session(test_teacher)
     end
 
@@ -1186,7 +1186,7 @@ describe SubmissionsController do
     end
 
     context "when the submission's turnitin data contains a report URL" do
-      before(:each) do
+      before do
         submission.update!(turnitin_data: { asset_string => { report_url: 'MY_GREAT_REPORT' } })
       end
 
@@ -1236,7 +1236,7 @@ describe SubmissionsController do
   describe "GET audit_events" do
     let(:first_student) { course_with_user("StudentEnrollment", course: @course, name: "First", active_all: true).user }
 
-    before(:each) do
+    before do
       @course = Course.create!
       @course.account.enable_service(:avatars)
       second_student = course_with_user("StudentEnrollment", course: @course, name: "Second", active_all: true).user
@@ -1249,7 +1249,7 @@ describe SubmissionsController do
       @teacher.account.role_overrides.create!(permission: :view_audit_trail, role: teacher_role, enabled: true)
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 
@@ -1311,7 +1311,7 @@ describe SubmissionsController do
 
       let(:returned_users) { json_parse(response.body).fetch("users") }
 
-      before(:each) do
+      before do
         @course.enroll_teacher(other_grader, enrollment_state: "active")
         @assignment.update!(moderated_grading: true, grader_count: 2, final_grader: final_grader)
 
@@ -1373,7 +1373,7 @@ describe SubmissionsController do
         end
       end
 
-      before(:each) { @assignment.grade_student(first_student, grader_id: -external_tool.id, score: 80) }
+      before { @assignment.grade_student(first_student, grader_id: -external_tool.id, score: 80) }
 
       it "returns an event for external tool" do
         get :audit_events, params: params, format: :json

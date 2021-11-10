@@ -34,7 +34,7 @@ describe Api::V1::Attachment do
     let(:student) { course_with_user("StudentEnrollment", course: course, active_all: true).user }
     let(:teacher) { course_with_user("TeacherEnrollment", course: course, active_all: true).user }
 
-    before(:each) do
+    before do
       allow(Canvadocs).to receive(:enabled?).and_return(true)
       Canvadoc.create!(document_id: "abc123#{attachment.id}", attachment_id: attachment.id)
     end

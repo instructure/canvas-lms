@@ -522,7 +522,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       submission.excused = true
       gradebook.gotChunkOfStudents([student])
       render()
-      const studentProp = component.props.students.find(s => s.id === student.id)
+      const studentProp = component.props.allStudents.find(s => s.id === student.id)
       strictEqual(studentProp.submission.excused, true)
     })
 
@@ -532,7 +532,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       delete student.assignment_2301
       gradebook.gotChunkOfStudents([student])
       render()
-      const studentProp = component.props.students.find(s => s.id === student.id)
+      const studentProp = component.props.allStudents.find(s => s.id === student.id)
       strictEqual(studentProp.submission.excused, false)
     })
 
@@ -541,7 +541,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       submission.late_policy_status = 'missing'
       gradebook.gotChunkOfStudents([student])
       render()
-      const studentProp = component.props.students.find(s => s.id === student.id)
+      const studentProp = component.props.allStudents.find(s => s.id === student.id)
       strictEqual(studentProp.submission.latePolicyStatus, 'missing')
     })
 
@@ -551,7 +551,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       delete student.assignment_2301
       gradebook.gotChunkOfStudents([student])
       render()
-      const studentProp = component.props.students.find(s => s.id === student.id)
+      const studentProp = component.props.allStudents.find(s => s.id === student.id)
       strictEqual(studentProp.submission.latePolicyStatus, null)
     })
 
@@ -560,7 +560,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       submission.score = 9
       gradebook.gotChunkOfStudents([student])
       render()
-      const studentProp = component.props.students.find(s => s.id === student.id)
+      const studentProp = component.props.allStudents.find(s => s.id === student.id)
       strictEqual(studentProp.submission.score, '9')
     })
 
@@ -570,7 +570,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       delete student.assignment_2301
       gradebook.gotChunkOfStudents([student])
       render()
-      const studentProp = component.props.students.find(s => s.id === student.id)
+      const studentProp = component.props.allStudents.find(s => s.id === student.id)
       strictEqual(studentProp.submission.score, null)
     })
 
@@ -580,7 +580,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       submission.submitted_at = submittedAt
       gradebook.gotChunkOfStudents([student])
       render()
-      const studentProp = component.props.students.find(s => s.id === student.id)
+      const studentProp = component.props.allStudents.find(s => s.id === student.id)
       strictEqual(studentProp.submission.submittedAt, submittedAt)
     })
 
@@ -590,7 +590,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       delete student.assignment_2301
       gradebook.gotChunkOfStudents([student])
       render()
-      const studentProp = component.props.students.find(s => s.id === student.id)
+      const studentProp = component.props.allStudents.find(s => s.id === student.id)
       strictEqual(studentProp.submission.submittedAt, null)
     })
 
@@ -600,7 +600,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       submission.posted_at = postedAt
       gradebook.gotChunkOfStudents([student])
       render()
-      const studentProp = component.props.students.find(s => s.id === student.id)
+      const studentProp = component.props.allStudents.find(s => s.id === student.id)
       strictEqual(studentProp.submission.postedAt, postedAt)
     })
 
@@ -610,7 +610,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       delete student.assignment_2301
       gradebook.gotChunkOfStudents([student])
       render()
-      const studentProp = component.props.students.find(s => s.id === student.id)
+      const studentProp = component.props.allStudents.find(s => s.id === student.id)
       strictEqual(studentProp.submission.postedAt, null)
     })
 
@@ -619,7 +619,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       student.enrollments = [{type: 'StudentViewEnrollment'}]
       gradebook.gotChunkOfStudents([student])
       render()
-      const studentProp = component.props.students.find(s => s.id === student.id)
+      const studentProp = component.props.allStudents.find(s => s.id === student.id)
       strictEqual(studentProp.isTestStudent, true)
     })
 
@@ -628,8 +628,20 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       student.enrollments = [{type: 'StudentEnrollment'}]
       gradebook.gotChunkOfStudents([student])
       render()
-      const studentProp = component.props.students.find(s => s.id === student.id)
+      const studentProp = component.props.allStudents.find(s => s.id === student.id)
       strictEqual(studentProp.isTestStudent, false)
+    })
+
+    test('getCurrentlyShownStudents() fetches students using visibleStudentsThatCanSeeAssignment', () => {
+      buildGradebook()
+      sinon.stub(gradebook, 'visibleStudentsThatCanSeeAssignment').returns({[student.id]: student})
+
+      render()
+      const visibleStudents = component.props.getCurrentlyShownStudents()
+      deepEqual(
+        visibleStudents.map(visibleStudent => visibleStudent.id),
+        [student.id]
+      )
     })
 
     test('includes a callback for keyDown events', () => {

@@ -46,12 +46,13 @@ describe 'BigBlueButton conferences' do
     course_with_student(name: "Student John", course: @course, active_all: true)
   end
 
-  before(:each) do
+  before do
     user_session(@teacher)
     get conferences_index_page
   end
 
   after { close_extra_windows }
+
   context 'when a conference is open' do
     context 'and the conference has no recordings' do
       before(:once) do

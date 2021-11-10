@@ -42,7 +42,7 @@ describe AuthenticationProvider::SAML::MetadataRefresher do
 
     it "doesn't populate if nothing changed" do
       expect(subject).to receive(:refresh_if_necessary).with(saml1.global_id, '1').and_return(false)
-      expect(saml1).to receive(:populate_from_metadata_xml).never
+      expect(saml1).not_to receive(:populate_from_metadata_xml)
 
       subject.refresh_providers
     end
@@ -50,7 +50,7 @@ describe AuthenticationProvider::SAML::MetadataRefresher do
     it "does populate, but doesn't save, if the XML changed, but nothing changes on the model" do
       expect(subject).to receive(:refresh_if_necessary).with(saml1.global_id, '1').and_return('xml')
       expect_any_instantiation_of(saml1).to receive(:populate_from_metadata_xml).with('xml')
-      expect_any_instantiation_of(saml1).to receive(:save!).never
+      expect_any_instantiation_of(saml1).not_to receive(:save!)
 
       subject.refresh_providers
     end
@@ -67,7 +67,7 @@ describe AuthenticationProvider::SAML::MetadataRefresher do
     it "ignores nil/blank metadata_uris" do
       AuthenticationProvider::SAML.where(id: saml1.id).update_all(metadata_uri: nil)
       Account.default.authentication_providers.create!(auth_type: 'saml', metadata_uri: '')
-      expect(subject).to receive(:refresh_if_necessary).never
+      expect(subject).not_to receive(:refresh_if_necessary)
 
       subject.refresh_providers
     end
@@ -89,7 +89,7 @@ describe AuthenticationProvider::SAML::MetadataRefresher do
     end
 
     it "doesn't pass ETag if force_fetch: true" do
-      expect(redis).to receive(:get).never
+      expect(redis).not_to receive(:get)
       expect(CanvasHttp).to receive(:get).with("url", {})
 
       subject.send(:refresh_if_necessary, 1, 'url', force_fetch: true)

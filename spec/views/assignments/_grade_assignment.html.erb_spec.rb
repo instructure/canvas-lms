@@ -24,7 +24,7 @@ describe '_grade_assignment' do
     course_with_ta
   end
 
-  before :each do
+  before do
     view_context(@course, @ta)
     @assignment = @course.assignments.create!(title: 'an assignment')
     assign(:assignment, @assignment)

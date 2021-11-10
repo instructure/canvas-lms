@@ -391,7 +391,6 @@ class UserObserveesController < ApplicationController
       ra_id_map[user_id] ||= []
       ra_id_map[user_id] << ra_id
     end
-    ra_id_map
 
     user_rows.each do |row|
       row['observation_link_root_account_ids'] = ra_id_map[row['id']] || []

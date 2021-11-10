@@ -127,6 +127,7 @@
   "creative_commons_license_725584ae": {
     "message": "Llicència de Creative Commons:"
   },
+  "crop_image_807ebb08": { "message": "Retalla la imatge" },
   "current_image_f16c249c": { "message": "Imatge actual" },
   "custom_6979cd81": { "message": "Personalitzat" },
   "date_added_ed5ad465": { "message": "Data afegida" },
@@ -307,6 +308,7 @@
     "message": "No s''ha trobat cap resultat per a { term }."
   },
   "none_3b5e34d2": { "message": "Cap" },
+  "none_selected_b93d56d2": { "message": "No se’n ha seleccionat cap" },
   "octagon_e48be9f": { "message": "Octàgon" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Obre aquest quadre de diàleg de dreceres del teclat"
@@ -365,6 +367,9 @@
   "saved_buttons_and_icons_8278eed2": { "message": "Botons i icones desats" },
   "search_280d00bd": { "message": "Cerca" },
   "search_term_b2d2235": { "message": "Terme de cerca" },
+  "select_crop_shape_d441feeb": {
+    "message": "Selecciona l’opció Retalla la forma"
+  },
   "select_language_7c93a900": { "message": "Selecciona l''idioma" },
   "selected_274ce24f": { "message": "Seleccionat" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

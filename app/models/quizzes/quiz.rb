@@ -270,6 +270,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     Quizzes::Quiz.where(:id => self).update_all(:unpublished_question_count => cnt)
     self.unpublished_question_count = cnt
   rescue
+    # TODO: no idea what we're protecting against here
   end
 
   def for_assignment?

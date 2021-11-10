@@ -134,8 +134,7 @@ describe EventStream::AttrConfig do
     it "requires setting non-defaulted fields before validation" do
       value = double('value')
       @class.attr_config :field
-      obj = @class.new(:field => value)
-      obj.field.== value
+      @class.new(:field => value)
       expect {
         @class.new
       }.to raise_exception ArgumentError

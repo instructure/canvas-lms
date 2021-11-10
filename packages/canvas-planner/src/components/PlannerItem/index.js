@@ -338,6 +338,10 @@ export class PlannerItem_raw extends Component {
         <Button
           variant="link"
           theme={{
+            mediumPadding:
+              this.props.simplifiedControls && this.props.responsiveSize === 'small'
+                ? '0'
+                : undefined,
             mediumPaddingHorizontal: '0',
             mediumHeight: 'normal',
             linkColor: this.props.simplifiedControls ? colors.licorice : undefined,
@@ -640,9 +644,15 @@ export class PlannerItem_raw extends Component {
   render() {
     return (
       <div
-        className={classnames(styles.root, styles[this.getLayout()], 'planner-item', {
-          [styles.missingItem]: this.props.isMissingItem
-        })}
+        className={classnames(
+          styles.root,
+          styles[this.getLayout()],
+          'planner-item',
+          {
+            [styles.missingItem]: this.props.isMissingItem
+          },
+          this.props.simplifiedControls ? styles.k5Layout : ''
+        )}
         ref={this.registerRootDivRef}
       >
         {this.renderNotificationBadge()}

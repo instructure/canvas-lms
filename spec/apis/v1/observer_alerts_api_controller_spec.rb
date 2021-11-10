@@ -143,7 +143,7 @@ describe ObserverAlertsApiController, type: :request do
   end
 
   context '#update' do
-    before :each do
+    before do
       @course = course_model
       @assignment = assignment_model(context: @course)
 

@@ -49,7 +49,7 @@ describe AssetSignature do
     end
 
     it 'returns nil if the signature does not check out' do
-      expect(SomeModel).to receive(:where).never
+      expect(SomeModel).not_to receive(:where)
       expect(AssetSignature.find_by_signature(SomeModel, '24-not-the-sig')).to be_nil
     end
   end

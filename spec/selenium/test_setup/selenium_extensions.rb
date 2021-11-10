@@ -233,6 +233,7 @@ module SeleniumExtensions
 
   class ReloadableCollection < ::Array
     def initialize(collection, finder_proc)
+      super()
       @finder_proc = finder_proc
       replace collection
     end

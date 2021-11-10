@@ -24,7 +24,7 @@ describe "add content box" do
   include_context "in-process server selenium tests"
   include EportfoliosCommon
 
-  before(:each) do
+  before do
     course_with_student_logged_in
     stub_rcs_config
     @assignment = @course.assignments.create(:name => 'new assignment')
@@ -83,7 +83,7 @@ describe "add content box" do
   end
 
   context "adding html content" do
-    before(:each) do
+    before do
       @html_content = "<strong>student</strong>"
       f(".add_html_link").click
       wait_for_ajaximations

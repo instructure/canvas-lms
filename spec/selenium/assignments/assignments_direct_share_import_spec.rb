@@ -101,7 +101,7 @@ describe 'assignments' do
       setup
     end
 
-    before(:each) do
+    before do
       user_session(@teacher1)
     end
 
@@ -120,7 +120,7 @@ describe 'assignments' do
     end
 
     context 'copy to' do
-      before(:each) do
+      before do
         visit_assignments_index_page(@course1.id)
         manage_assignment_menu(@assignment1.id).click
         copy_assignment_menu_link(@assignment1.id).click
@@ -173,7 +173,7 @@ describe 'assignments' do
     end
 
     context 'send to' do
-      before(:each) do
+      before do
         visit_assignments_index_page(@course1.id)
         stub_common_cartridge_url
         manage_assignment_menu(@assignment1.id).click

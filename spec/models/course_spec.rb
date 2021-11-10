@@ -55,7 +55,7 @@ describe Course do
     Account.default.default_enrollment_term
   end
 
-  before :each do
+  before do
     @course = Account.default.courses.build
     @course.workflow_state = 'claimed'
     @course.root_account = Account.default
@@ -242,7 +242,7 @@ describe Course do
       @course = Account.default.courses.create!
     end
 
-    before :each do
+    before do
       @course.enable_feature!(:final_grades_override)
       @course.allow_final_grade_override = true
     end
@@ -268,7 +268,7 @@ describe Course do
     end
 
     context "Setting is set to On" do
-      before :each do
+      before do
         @course.update!(:hide_sections_on_course_users_page => true)
       end
 
@@ -295,7 +295,7 @@ describe Course do
     end
 
     context "Setting is set to Off" do
-      before :each do
+      before do
         @course.update!(:hide_sections_on_course_users_page => false)
       end
 
@@ -431,7 +431,7 @@ describe Course do
       @term = Account.default.enrollment_terms.create!
     end
 
-    before :each do
+    before do
       @course.enrollment_term = @term
     end
 
@@ -1321,8 +1321,7 @@ describe Course do
   end
 
   describe "#reset_content" do
-    before do
-      :once
+    before(:once) do
       course_with_student
     end
 
@@ -1611,6 +1610,13 @@ describe Course do
       course.save!
       expect(course.reload.default_post_policy).to be_post_manually
     end
+  end
+
+  it 'destroys associated gradebook filters when the course is soft-deleted' do
+    course_with_teacher(active_all: true)
+    @course.gradebook_filters.create!(user: @teacher, course: @course, name: 'First filter', payload: { foo: :bar })
+    @course.destroy
+    expect(@course.gradebook_filters.count).to eq 0
   end
 end
 
@@ -1910,6 +1916,7 @@ describe Course, "participants" do
         partic = @course.participants(include_observers: true, excluded_user_ids: [@student.id, @student_following_observer.id])
         [@student, @student_following_observer].each { |usr| expect(partic).to_not be_include(usr) }
       end
+
       it "includes admins and course level observers" do
         partic = @course.participants(include_observers: true, excluded_user_ids: [@student.id, @student_following_observer.id])
         [@ta, @teach, @course_level_observer].each { |usr| expect(partic).to be_include(usr) }
@@ -2618,7 +2625,7 @@ describe Course, "update_account_associations" do
 
   it "is reentrant" do
     Course.skip_updating_account_associations do
-      Course.skip_updating_account_associations {}
+      Course.skip_updating_account_associations { nil }
       expect(Course.skip_updating_account_associations?).to be_truthy
     end
   end
@@ -2629,6 +2636,7 @@ describe Course, "tabs_available" do
     before :once do
       course_with_teacher(:active_all => true)
     end
+
     let_once(:default_tab_ids) { Course.default_tabs.pluck(:id) }
 
     describe 'TAB_CONFERENCES' do
@@ -2983,7 +2991,7 @@ describe Course, "tabs_available" do
   end
 
   context "students" do
-    before :each do
+    before do
       course_with_student(:active_all => true)
     end
 
@@ -3108,7 +3116,7 @@ describe Course, "tabs_available" do
       tool.settings[:windowTarget] = "_blank"
       tool.save!
       tabs = @course.tabs_available
-      tab = tabs.find { |tab| tab[:id] == tool.asset_string }
+      tab = tabs.find { |t| t[:id] == tool.asset_string }
       expect(tab[:target]).to eq '_blank'
     end
 
@@ -3127,7 +3135,7 @@ describe Course, "tabs_available" do
       tool.settings[:windowTarget] = "_blank"
       tool.save!
       tabs = @course.tabs_available
-      tab = tabs.find { |tab| tab[:id] == tool.asset_string }
+      tab = tabs.find { |t| t[:id] == tool.asset_string }
       expect(tab[:args]).to include({ display: 'borderless' })
     end
 
@@ -3146,7 +3154,7 @@ describe Course, "tabs_available" do
       tool.settings[:windowTarget] = "parent"
       tool.save!
       tabs = @course.tabs_available
-      tab = tabs.find { |tab| tab[:id] == tool.asset_string }
+      tab = tabs.find { |t| t[:id] == tool.asset_string }
       expect(tab.keys).not_to include :target
     end
 
@@ -3287,12 +3295,12 @@ describe Course, 'grade_publishing' do
     @course_section = @course.default_section
   end
 
-  after(:each) do
+  after do
     Course.valid_grade_export_types.delete("test_export")
   end
 
   context 'mocked plugin settings' do
-    before(:each) do
+    before do
       @plugin_settings = Canvas::Plugin.find!("grade_export").default_settings.clone
       @plugin = double()
       allow(Canvas::Plugin).to receive(:find!).with('grade_export').and_return(@plugin)
@@ -3552,7 +3560,7 @@ describe Course, 'grade_publishing' do
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:delay).never
+        expect(@course).not_to receive(:delay)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
                                   :publish_endpoint => "http://localhost/endpoint",
@@ -3568,7 +3576,7 @@ describe Course, 'grade_publishing' do
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:delay).never
+        expect(@course).not_to receive(:delay)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
                                   :publish_endpoint => "http://localhost/endpoint",
@@ -3584,7 +3592,7 @@ describe Course, 'grade_publishing' do
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:delay).never
+        expect(@course).not_to receive(:delay)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
                                   :publish_endpoint => "http://localhost/endpoint",
@@ -3674,18 +3682,20 @@ describe Course, 'grade_publishing' do
                                   :format_type => "instructure_csv"
                                 })
         @checked = false
-        allow(Course).to receive(:valid_grade_export_types).and_return({
-                                                                         "instructure_csv" => {
-                                                                           :callback => lambda { |course, enrollments, publishing_user, publishing_pseudonym|
-                                                                             expect(course).to eq @course
-                                                                             expect(enrollments.sort_by(&:id)).to eq @student_enrollments.sort_by(&:id).find_all { |e| e.workflow_state == 'active' }
-                                                                             expect(publishing_pseudonym).to eq @pseudonym
-                                                                             expect(publishing_user).to eq @user
-                                                                             @checked = true
-                                                                             return []
-                                                                           }
-                                                                         }
-                                                                       })
+        allow(Course).to receive(:valid_grade_export_types).and_return(
+          {
+            "instructure_csv" => {
+              callback: lambda { |course, enrollments, publishing_user, publishing_pseudonym|
+                expect(course).to eq @course
+                expect(enrollments.sort_by(&:id)).to eq(@student_enrollments.sort_by(&:id).find_all { |e| e.workflow_state == 'active' })
+                expect(publishing_pseudonym).to eq @pseudonym
+                expect(publishing_user).to eq @user
+                @checked = true
+                return []
+              }
+            }
+          }
+        )
         @course.send_final_grades_to_endpoint @user
         expect(@checked).to be_truthy
       end
@@ -3958,7 +3968,7 @@ describe Course, 'grade_publishing' do
                                                                            }
                                                                          }
                                                                        })
-        expect(SSLCommon).to receive(:post_data).never
+        expect(SSLCommon).not_to receive(:post_data)
         @course.send_final_grades_to_endpoint @user
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["unpublishable", "published", "unpublishable", "published", "published", "unpublishable", "unpublished", "unpublishable", "published"]
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil] * 9
@@ -4154,7 +4164,7 @@ describe Course, 'grade_publishing' do
           @course.update!(grading_standard_id: 0)
         end
 
-        before(:each) do
+        before do
           @course.enable_feature!(:final_grades_override)
           @course.update!(allow_final_grade_override: true)
         end
@@ -4211,7 +4221,7 @@ describe Course, 'grade_publishing' do
           @course.update!(grading_standard_id: 0)
         end
 
-        before(:each) do
+        before do
           @course.enable_feature!(:final_grades_override)
         end
 
@@ -4317,7 +4327,7 @@ describe Course, 'grade_publishing' do
       if expect_success
         expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "test-jt-data", "application/jtmimetype", {})
       else
-        expect(SSLCommon).to receive(:post_data).never
+        expect(SSLCommon).not_to receive(:post_data)
       end
       @course.publish_final_grades(user)
     end
@@ -5547,7 +5557,7 @@ describe Course do
       @course = course_model
     end
 
-    before :each do
+    before do
       @course.write_attribute(:workflow_state, 'available')
       @course.write_attribute(:is_public, true)
     end
@@ -6165,7 +6175,7 @@ describe Course, "default_section" do
 end
 
 describe Course, "#student_annotation_documents_folder" do
-  before(:each) do
+  before do
     @course = Course.create!
   end
 
@@ -6240,7 +6250,7 @@ describe Course, 'touch_root_folder_if_necessary' do
 
   context "inheritable settings" do
     shared_examples 'inherited setting should inherit' do
-      before :each do
+      before do
         account_model
         course_factory(:account => @account)
       end
@@ -6283,21 +6293,25 @@ describe Course, 'touch_root_folder_if_necessary' do
 
     describe "restrict_student_future_view" do
       let(:setting) { :restrict_student_future_view }
+
       include_examples 'inherited setting should inherit'
     end
 
     describe "restrict_student_past_view" do
       let(:setting) { :restrict_student_past_view }
+
       include_examples 'inherited setting should inherit'
     end
 
     describe "lock_all_announcements" do
       let(:setting) { :lock_all_announcements }
+
       include_examples 'inherited setting should inherit'
     end
 
     describe "usage_rights_required" do
       let(:setting) { :usage_rights_required }
+
       include_examples 'inherited setting should inherit'
     end
   end

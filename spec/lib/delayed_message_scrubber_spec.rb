@@ -41,7 +41,7 @@ describe DelayedMessageScrubber do
   end
 
   describe '#scrub' do
-    before(:each) do
+    before do
       @context      = course_factory
       @notification = Notification.create!(name: 'Test Notification', category: 'Test')
       @recipient    = user_factory

@@ -46,7 +46,7 @@ describe DataFixup::UpdateAnonymousGradingSettings do
 
   describe 'UpdateAnonymousGradingSettings::run_for_accounts_in_range' do
     context 'for an account with anonymous_grading enabled' do
-      before(:each) do
+      before do
         set_anonymous_grading_flag(course_or_account: @account)
       end
 
@@ -97,7 +97,7 @@ describe DataFixup::UpdateAnonymousGradingSettings do
 
   describe 'UpdateAnonymousGradingSettings::run_for_courses_in_range' do
     context 'for a course with anonymous_grading enabled' do
-      before(:each) do
+      before do
         set_anonymous_grading_flag(course_or_account: @course, state: 'on')
       end
 

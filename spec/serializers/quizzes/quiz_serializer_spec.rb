@@ -249,6 +249,7 @@ describe Quizzes::QuizSerializer do
 
   describe "takeable" do
     before { skip }
+
     before do
       course_with_teacher(active_all: true)
       course_quiz(true)
@@ -330,6 +331,7 @@ describe Quizzes::QuizSerializer do
 
     describe "student_quiz_submissions" do
       before { skip }
+
       context "when user may grade" do
         it "sends the url for all submissions" do
           course_with_teacher(active_all: true)
@@ -361,6 +363,7 @@ describe Quizzes::QuizSerializer do
 
     describe "quiz_submission" do
       before { skip }
+
       it "includes the quiz_submission in the response if it is present" do
         course_with_student(active_all: true)
         quiz_with_graded_submission([], user: @student, course: @course)
@@ -407,6 +410,7 @@ describe Quizzes::QuizSerializer do
 
     describe "submitted_students" do
       before { skip }
+
       it "sends nil if user can't grade" do
         course_with_student(active_all: true)
         @quiz.unstub(:check_right?)
@@ -431,6 +435,7 @@ describe Quizzes::QuizSerializer do
 
     describe "unsubmitted_students" do
       before { skip }
+
       it "sends nil if user can't grade" do
         @quiz.unstub(:check_right?)
         @quiz.unstub(:grants_right?)

@@ -310,6 +310,51 @@ describe('DiscussionFullPage', () => {
     })
   })
 
+  describe('AvailableForUser', () => {
+    describe('Topic is unavailable', () => {
+      it('should show locked discussion topic', async () => {
+        const mocks = getDiscussionQueryMock()
+        mocks[0].result.data.legacyNode.availableForUser = false
+        const container = setup(mocks)
+        expect(await container.findByTestId('locked-discussion')).toBeInTheDocument()
+      })
+
+      it('should show available discussion topic alert', async () => {
+        const mocks = getDiscussionQueryMock()
+        mocks[0].result.data.legacyNode.availableForUser = false
+        const container = setup(mocks)
+        expect(await container.findByTestId('locked-for-user')).toBeInTheDocument()
+      })
+
+      it('should not show root replies', async () => {
+        const mocks = getDiscussionQueryMock()
+        mocks[0].result.data.legacyNode.availableForUser = false
+        const container = setup(mocks)
+        expect(container.queryByTestId('discussion-root-entry-container')).toBeNull()
+      })
+    })
+
+    describe('Topic is available', () => {
+      it('should not show locked discussion topic', async () => {
+        const mocks = getDiscussionQueryMock()
+        const container = setup(mocks)
+        expect(container.queryByTestId('locked-discussion')).toBeNull()
+      })
+
+      it('should not show available discussion topic alert', () => {
+        const mocks = getDiscussionQueryMock()
+        const container = setup(mocks)
+        expect(container.queryByTestId('locked-for-user')).toBeNull()
+      })
+
+      it('should show root replies', async () => {
+        const mocks = getDiscussionQueryMock()
+        const container = setup(mocks)
+        expect(await container.findByTestId('discussion-root-entry-container')).toBeInTheDocument()
+      })
+    })
+  })
+
   describe('error handling', () => {
     it('should render generic error page when DISCUSSION_QUERY returns errors', async () => {
       const container = setup(getDiscussionQueryMock({shouldError: true}))

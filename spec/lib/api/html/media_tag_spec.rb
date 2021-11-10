@@ -26,6 +26,28 @@ module Api
     describe MediaTag do
       let(:doc) { double() }
 
+      before do
+        stub_const("StubbedNode",
+                   Class.new do
+                     attr_accessor :inner_html
+                     attr_reader :tag_name
+
+                     def initialize(tag_name, doc)
+                       @tag_name = tag_name
+                       @doc = doc
+                       @attrs = {}
+                     end
+
+                     def []=(key, val)
+                       @attrs[key] = val
+                     end
+
+                     def [](key)
+                       @attrs[key]
+                     end
+                   end)
+      end
+
       describe "#has_media_comment?" do
         def media_tag(tag, attr, val)
           allow(tag).to receive(:[]).with(attr).and_return(val)
@@ -194,25 +216,6 @@ module Api
           specify { expect(anchor_node['href']).to eq("/media_objects/119") }
           specify { expect(anchor_node['class']).to eq("instructure_inline_media_comment video_comment") }
           specify { expect(anchor_node['id']).to eq("media_comment_119") }
-        end
-      end
-
-      class StubbedNode
-        attr_accessor :inner_html
-        attr_reader :tag_name
-
-        def initialize(tag_name, doc)
-          @tag_name = tag_name
-          @doc = doc
-          @attrs = {}
-        end
-
-        def []=(key, val)
-          @attrs[key] = val
-        end
-
-        def [](key)
-          @attrs[key]
         end
       end
     end

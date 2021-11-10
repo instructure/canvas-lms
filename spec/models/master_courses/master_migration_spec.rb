@@ -24,7 +24,7 @@ describe MasterCourses::MasterMigration do
     user_factory
   end
 
-  before :each do
+  before do
     skip unless Qti.qti_enabled?
     local_storage!
   end
@@ -45,7 +45,7 @@ describe MasterCourses::MasterMigration do
       @template.active_migration = running
       @template.save!
 
-      expect_any_instance_of(MasterCourses::MasterMigration).to receive(:queue_export_job).never
+      expect_any_instance_of(MasterCourses::MasterMigration).not_to receive(:queue_export_job)
       expect {
         MasterCourses::MasterMigration.start_new_migration!(@template, @user)
       }.to raise_error("cannot start new migration while another one is running")
@@ -75,7 +75,7 @@ describe MasterCourses::MasterMigration do
     end
 
     it "does not do anything if there aren't any child courses to push to" do
-      expect(@migration).to receive(:create_export).never
+      expect(@migration).not_to receive(:create_export)
       @migration.perform_exports
       @migration.reload
       expect(@migration).to be_completed
@@ -87,7 +87,7 @@ describe MasterCourses::MasterMigration do
       sub = @template.add_child_course!(other_course)
       sub.destroy!
 
-      expect(@migration).to receive(:create_export).never
+      expect(@migration).not_to receive(:create_export)
       @migration.perform_exports
     end
 
@@ -571,7 +571,7 @@ describe MasterCourses::MasterMigration do
       expect(copied_answers.values.flatten.all? { |a| a["id"] != 0 }).to be_truthy
       q.quiz_questions.each do |qq|
         qq_to = q_to.quiz_questions.where(:migration_id => mig_id(qq)).first
-        expect(copied_answers[qq_to.id].map { |a| a["id"].to_i }).to eq qq.question_data["answers"].map { |a| a["id"].to_i }
+        expect(copied_answers[qq_to.id].map { |a| a["id"].to_i }).to eq(qq.question_data["answers"].map { |a| a["id"].to_i })
       end
 
       Quizzes::Quiz.where(:id => q).update_all(:updated_at => 1.minute.from_now) # recopy
@@ -1875,7 +1875,7 @@ describe MasterCourses::MasterMigration do
         child_sub_folder = copied_att.folder
         child_parent_folder = child_sub_folder.parent_folder
         expected_ids = [child_sub_folder, child_parent_folder, Folder.root_folders(@copy_to).first].map(&:id)
-        expect(Folder.connection).to receive(:select_values).never # should have already been cached in migration
+        expect(Folder.connection).not_to receive(:select_values) # should have already been cached in migration
         expect(MasterCourses::FolderHelper.locked_folder_ids_for_course(@copy_to)).to match_array(expected_ids)
       end
     end
@@ -2913,17 +2913,22 @@ describe MasterCourses::MasterMigration do
     end
 
     context "master courses + external migrations" do
-      class TestExternalContentService
-        cattr_reader :course, :migration, :imported_content
-        def self.send_imported_content(course, migration, imported_content)
-          @@course = course
-          @@migration = migration
-          @@imported_content = imported_content
+      let(:klass) do
+        Class.new do
+          class << self
+            attr_reader :course, :migration, :imported_content
+
+            def send_imported_content(course, migration, imported_content)
+              @course = course
+              @migration = migration
+              @imported_content = imported_content
+            end
+          end
         end
       end
 
-      before :each do
-        allow(Canvas::Migration::ExternalContent::Migrator).to receive(:registered_services).and_return({ 'test_service' => TestExternalContentService })
+      before do
+        allow(Canvas::Migration::ExternalContent::Migrator).to receive(:registered_services).and_return({ 'test_service' => klass })
       end
 
       it "works" do
@@ -2939,8 +2944,8 @@ describe MasterCourses::MasterMigration do
         page = @copy_from.wiki_pages.create!(:title => "wiki", :body => "ohai")
         quiz = @copy_from.quizzes.create!
 
-        allow(TestExternalContentService).to receive(:applies_to_course?).and_return(true)
-        allow(TestExternalContentService).to receive(:begin_export).and_return(true)
+        allow(klass).to receive(:applies_to_course?).and_return(true)
+        allow(klass).to receive(:begin_export).and_return(true)
 
         data = {
           '$canvas_assignment_id' => assmt.id,
@@ -2952,8 +2957,8 @@ describe MasterCourses::MasterMigration do
           '$canvas_page_id' => page.id,
           '$canvas_quiz_id' => quiz.id
         }
-        allow(TestExternalContentService).to receive(:export_completed?).and_return(true)
-        allow(TestExternalContentService).to receive(:retrieve_export).and_return(data)
+        allow(klass).to receive(:export_completed?).and_return(true)
+        allow(klass).to receive(:retrieve_export).and_return(data)
 
         run_master_migration
 
@@ -2966,7 +2971,7 @@ describe MasterCourses::MasterMigration do
         copied_page = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
         copied_quiz = @copy_to.quizzes.where(:migration_id => mig_id(quiz)).first
 
-        expect(TestExternalContentService.course).to eq @copy_to
+        expect(klass.course).to eq @copy_to
 
         expected_data = {
           '$canvas_assignment_id' => copied_assmt.id,
@@ -2978,7 +2983,7 @@ describe MasterCourses::MasterMigration do
           '$canvas_page_id' => copied_page.id,
           '$canvas_quiz_id' => copied_quiz.id
         }
-        expect(TestExternalContentService.imported_content).to eq expected_data
+        expect(klass.imported_content).to eq expected_data
       end
     end
   end

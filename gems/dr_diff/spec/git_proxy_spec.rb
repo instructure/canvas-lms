@@ -79,7 +79,7 @@ module DrDiff
       context "first line starts with wip" do
         let(:first_line) { "[WIP] foobar" }
 
-        before :each do
+        before do
           allow(git_proxy).to receive(:first_line).and_return(first_line)
         end
 
@@ -91,7 +91,7 @@ module DrDiff
       context "first line does not starts with wip" do
         let(:first_line) { "foobar wip yo" }
 
-        before :each do
+        before do
           allow(git_proxy).to receive(:first_line).and_return(first_line)
         end
 
@@ -107,6 +107,7 @@ module DrDiff
       let(:change_status) { "M" }
       let(:change_status_full) { "modified" }
       let(:change_output) { [change_status, change_path].join("\t") }
+
       it "creates changes from the status and path" do
         allow(git_proxy).to receive(:shell).and_return(change_output)
 
@@ -121,7 +122,7 @@ module DrDiff
         let(:git_proxy) { described_class.new }
         let(:dirty_cmd) { "git diff --name-status" }
 
-        before :each do
+        before do
           allow_any_instance_of(described_class).to receive(:dirty?).and_return(true)
         end
 
@@ -138,7 +139,7 @@ module DrDiff
         let(:git_proxy) { described_class.new(sha: sha) }
         let(:clean_cmd) { "git diff-tree --no-commit-id --name-status -r #{sha}" }
 
-        before :each do
+        before do
           allow(git_proxy).to receive(:dirty?).and_return(false)
         end
 

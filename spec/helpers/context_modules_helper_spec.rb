@@ -157,7 +157,7 @@ describe ContextModulesHelper do
 
     it "does not set mastery_paths if cyoe is disabled" do
       allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
-      expect(ConditionalRelease::Service).to receive(:rules_for).never
+      expect(ConditionalRelease::Service).not_to receive(:rules_for)
       module_data = process_module_data(t_module, true, @student, @session)
       item_data = module_data[:items_data][item.id]
       expect(item_data[:mastery_paths]).to be nil

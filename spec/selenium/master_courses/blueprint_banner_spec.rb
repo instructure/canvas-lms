@@ -32,7 +32,7 @@ describe "master courses banner" do
   end
 
   describe "as a master course teacher" do
-    before :each do
+    before do
       user_session(@master_teacher)
     end
 

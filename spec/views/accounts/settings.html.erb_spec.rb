@@ -260,6 +260,7 @@ describe "accounts/settings.html.erb" do
 
     context "regular admin user" do
       let(:current_user) { account_admin_user }
+
       before do
         @account = Account.default
         @subaccount = @account.sub_accounts.create!(:name => 'sub-account')
@@ -491,7 +492,7 @@ describe "accounts/settings.html.erb" do
     let(:account) { Account.default }
     let(:admin) { account_admin_user }
 
-    before(:each) do
+    before do
       assign(:context, account)
       assign(:account, account)
       assign(:root_account, account)

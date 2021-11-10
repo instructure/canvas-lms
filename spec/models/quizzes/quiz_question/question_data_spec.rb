@@ -54,6 +54,7 @@ describe Quizzes::QuizQuestion::QuestionData do
 
     context "on any question type" do
       let(:question_data) { Quizzes::QuizQuestion::QuestionData.generate }
+
       context "it seeds QuestionData with" do
         it "regrade_option" do
           expect(question_data).to have_question_field :regrade_option
@@ -99,6 +100,7 @@ describe Quizzes::QuizQuestion::QuestionData do
 
     context "of 'calculated' type" do
       let(:question_data) { Quizzes::QuizQuestion::QuestionData.generate(question_type: 'calculated_question') }
+
       context "it seeds QuestionData with" do
         it "formulas" do
           expect(question_data).to have_question_field :formulas
@@ -120,6 +122,7 @@ describe Quizzes::QuizQuestion::QuestionData do
 
     context "of 'matching' type" do
       let(:question_data) { Quizzes::QuizQuestion::QuestionData.generate(question_type: 'matching_question') }
+
       context "it seeds QuestionData with" do
         it "matching_answer_incorrect_matches" do
           expect(question_data).to have_question_field :matching_answer_incorrect_matches

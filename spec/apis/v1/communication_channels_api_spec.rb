@@ -305,7 +305,7 @@ describe 'CommunicationChannels API', type: :request do
     end
 
     context 'an admin' do
-      before(:each) { @user = admin }
+      before { @user = admin }
 
       it "is able to delete others' channels" do
         json = api_call(:delete, path, path_options)
@@ -323,7 +323,7 @@ describe 'CommunicationChannels API', type: :request do
     end
 
     context 'a user' do
-      before(:each) { @user = someone }
+      before { @user = someone }
 
       it 'is able to delete its own channels' do
         json = api_call(:delete, path, path_options)

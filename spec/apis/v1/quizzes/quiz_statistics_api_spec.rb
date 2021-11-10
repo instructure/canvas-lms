@@ -81,6 +81,7 @@ describe Quizzes::QuizStatisticsController, type: :request do
       expect(json['quiz_statistics'][0]).to have_key('links')
       expect(json['quiz_statistics'][0]).not_to have_key('quiz_id')
     end
+
     it "returns :no_content for large quizzes" do
       allow(Quizzes::QuizStatistics).to receive(:large_quiz?).and_return true
 

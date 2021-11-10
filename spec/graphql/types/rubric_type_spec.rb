@@ -39,7 +39,7 @@ describe Types::RubricType do
     it 'criteria' do
       expect(
         rubric_type.resolve('criteria { _id }')
-      ).to eq rubric.criteria.map { |c| c[:id].to_s }
+      ).to eq(rubric.criteria.map { |c| c[:id].to_s })
     end
 
     it 'free_form_criterion_comments' do

@@ -90,6 +90,13 @@ describe Types::ConversationType do
       result = conversation_type.resolve(%|conversationMessagesConnection(createdBefore: "#{Time.zone.at(float_time).iso8601}") { nodes { body } }|)
       expect(result).to include(@conversation.conversation.conversation_messages[0].body)
     end
+
+    it 'does not return deleted messages' do
+      message = @conversation.conversation.add_message(@student, 'delete me')
+      message.conversation_message_participants.where(user_id: @teacher.id).first.update!(workflow_state: 'deleted')
+      result = conversation_type.resolve('conversationMessagesConnection { nodes { body } }')
+      expect(result).to match_array(@conversation.conversation.conversation_messages.where.not(id: message).pluck(:body))
+    end
   end
 
   context 'conversationPaticipants' do

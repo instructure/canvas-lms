@@ -30,7 +30,7 @@ describe 'native canvas conditional release' do
     Account.default.enable_feature! :conditional_release
   end
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in
   end
 
@@ -210,7 +210,7 @@ describe 'native canvas conditional release' do
   end
 
   context 'Mastery Path Breakdowns' do
-    before :each do
+    before do
       @trigger_assmt = @course.assignments.create!(:points_possible => 10, submission_types: "online_text_entry")
       ranges = [
         FactoryBot.create(

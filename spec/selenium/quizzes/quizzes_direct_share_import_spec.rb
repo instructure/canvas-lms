@@ -25,7 +25,7 @@ describe 'quizzes' do
   include_context 'in-process server selenium tests'
   include QuizzesIndexPage
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in
     @course.save!
     @quiz1 = @course.quizzes.create!(:title => "Math Quiz!")

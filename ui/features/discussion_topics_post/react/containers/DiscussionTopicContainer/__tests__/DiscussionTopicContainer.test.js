@@ -660,6 +660,32 @@ describe('DiscussionTopicContainer', () => {
     expect(container.queryByTestId('created-tooltip')).toBeFalsy()
   })
 
+  describe('AvailableForUser', () => {
+    it('topic is unavailable', () => {
+      const props = {
+        discussionTopic: Discussion.mock({
+          availableForUser: false,
+          title: 'This topic is unavailable'
+        })
+      }
+      const container = setup(props)
+      expect(container.queryByText('This topic is unavailable')).toBeInTheDocument()
+      expect(container.getByTestId('locked-discussion')).toBeInTheDocument()
+    })
+
+    it('topic is available', () => {
+      const props = {
+        discussionTopic: Discussion.mock({
+          availableForUser: true,
+          title: 'This topic is available'
+        })
+      }
+      const container = setup(props)
+      expect(container.queryByText('This topic is available')).toBeInTheDocument()
+      expect(container.queryByTestId('locked-discussion')).toBeNull()
+    })
+  })
+
   describe('Peer Reviews', () => {
     it('renders with a due date', () => {
       const props = {discussionTopic: Discussion.mock()}

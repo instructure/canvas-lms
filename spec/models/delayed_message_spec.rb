@@ -185,7 +185,7 @@ describe DelayedMessage do
       @user.save
     end
 
-    before :each do
+    before do
       # build the delayed message
       @dm = DelayedMessage.new(:context => @account, :communication_channel => @user.communication_channel)
     end

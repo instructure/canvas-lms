@@ -23,10 +23,10 @@ describe 'Viewing differentiated assignments' do
   include_context 'differentiated assignments'
 
   context 'as the first student' do
-    before(:each) { login_as(users.first_student) }
+    before { login_as(users.first_student) }
 
     context 'on the assignments index page' do
-      before(:each) { go_to(urls.assignments_index_page) }
+      before { go_to(urls.assignments_index_page) }
 
       it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 618804 do
         expect(list_of_assignments.text).to include(
@@ -49,10 +49,10 @@ describe 'Viewing differentiated assignments' do
   end
 
   context 'as the first observer' do
-    before(:each) { login_as(users.first_observer) }
+    before { login_as(users.first_observer) }
 
     context 'on the assignments index page' do
-      before(:each) { go_to(urls.assignments_index_page) }
+      before { go_to(urls.assignments_index_page) }
 
       it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 619042 do
         expect(list_of_assignments.text).to include(
@@ -75,10 +75,10 @@ describe 'Viewing differentiated assignments' do
   end
 
   context 'as the second student' do
-    before(:each) { login_as(users.second_student) }
+    before { login_as(users.second_student) }
 
     context 'on the assignments index page' do
-      before(:each) { go_to(urls.assignments_index_page) }
+      before { go_to(urls.assignments_index_page) }
 
       it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 619043 do
         expect(list_of_assignments.text).to include(
@@ -97,10 +97,10 @@ describe 'Viewing differentiated assignments' do
   end
 
   context 'as the third student' do
-    before(:each) { login_as(users.third_student) }
+    before { login_as(users.third_student) }
 
     context 'on the assignments index page' do
-      before(:each) { go_to(urls.assignments_index_page) }
+      before { go_to(urls.assignments_index_page) }
 
       it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 619044 do
         expect(list_of_assignments.text).to include(
@@ -119,10 +119,10 @@ describe 'Viewing differentiated assignments' do
   end
 
   context 'as the third observer' do
-    before(:each) { login_as(users.third_observer) }
+    before { login_as(users.third_observer) }
 
     context 'on the assignments index page' do
-      before(:each) { go_to(urls.assignments_index_page) }
+      before { go_to(urls.assignments_index_page) }
 
       it 'only shows assigned quizzes, assignments, and discussions', priority: "1", test_id: 619046 do
         expect(list_of_assignments.text).to include(

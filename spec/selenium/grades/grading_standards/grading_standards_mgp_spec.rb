@@ -108,7 +108,7 @@ describe "grading periods account page" do
       period_name_1 = "A Grading Period"
       period_name_2 = "Another Grading Period"
 
-      before(:each) do
+      before do
         group1 = backend_group_helper.create_for_account_with_term(Account.default, term_name_1, group_name_1)
         group2 = backend_group_helper.create_for_account_with_term(Account.default, term_name_2, group_name_2)
         backend_period_helper.create_for_group(group1, title: period_name_1)

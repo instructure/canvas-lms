@@ -26,7 +26,7 @@ RSpec::Matchers.define :have_answer do |expected|
 end
 
 shared_examples_for "All answer parsers" do
-  before(:each) do
+  before do
     question = Quizzes::QuizQuestion::QuestionData.new(question_params)
     question.answers = Quizzes::QuizQuestion::AnswerGroup.new(raw_answers)
     parser = parser_class.new(question.answers)

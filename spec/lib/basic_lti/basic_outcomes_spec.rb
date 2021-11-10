@@ -26,7 +26,7 @@ describe BasicLTI::BasicOutcomes do
     WebMock.disable_net_connect!(allow_localhost: true)
   end
 
-  before(:each) do
+  before do
     course_model.offer
     @root_account = @course.root_account
     @account = account_model(:root_account => @root_account, :parent_account => @root_account)
@@ -449,7 +449,7 @@ describe BasicLTI::BasicOutcomes do
     end
 
     context "with prioritizeNonToolGrade details" do
-      before(:each) do
+      before do
         xml.at_css('imsx_POXBody > replaceResultRequest').add_child(
           "<submissionDetails><prioritizeNonToolGrade/></submissionDetails>"
         )

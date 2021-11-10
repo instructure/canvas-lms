@@ -20,13 +20,7 @@
 require 'spec_helper'
 
 describe HtmlTextHelper do
-  class TestClassForMixins
-    extend HtmlTextHelper
-  end
-
-  def th
-    TestClassForMixins
-  end
+  let(:th) { Class.new.tap { |th| th.extend HtmlTextHelper } }
 
   context "format_message" do
     it "detects and linkify URLs" do
@@ -224,7 +218,7 @@ describe HtmlTextHelper do
   end
 
   describe "simplify html" do
-    before(:each) do
+    before do
       @body = <<~END.strip
         <p><strong>This is a bold tag</strong></p>
         <p><em>This is an em tag</em></p>

@@ -50,9 +50,9 @@ describe Setting do
     it "doesn't need to query if all settings are already cached, even when skipping cache" do
       Setting.reset_cache!
       Setting.get('setting1', nil)
-      expect(Setting).to receive(:find_by).never
-      expect(Setting).to receive(:pluck).never
-      expect(MultiCache).to receive(:fetch).never
+      expect(Setting).not_to receive(:find_by)
+      expect(Setting).not_to receive(:pluck)
+      expect(MultiCache).not_to receive(:fetch)
       Setting.skip_cache { Setting.get('setting2', nil) }
     end
   end

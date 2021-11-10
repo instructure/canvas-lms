@@ -784,7 +784,7 @@ describe TabsController, type: :request do
     end
 
     describe "user profile" do
-      before(:each) { user_model }
+      before { user_model }
 
       let(:tool) {
         Account.default.context_external_tools.new({

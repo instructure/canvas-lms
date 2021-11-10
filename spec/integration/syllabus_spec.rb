@@ -119,7 +119,7 @@ describe "syllabus" do
   end
 
   context "as an authenticated non-course user" do
-    before :each do
+    before do
       user_factory(active_all: true)
       user_session(@user)
     end
@@ -132,7 +132,7 @@ describe "syllabus" do
   end
 
   context "as an authenticated non-course user" do
-    before :each do
+    before do
       user_factory(active_all: true)
       user_session(@user)
     end

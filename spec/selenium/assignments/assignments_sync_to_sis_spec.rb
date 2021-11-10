@@ -42,7 +42,7 @@ describe "assignments sync to sis" do
       @course.require_assignment_group
     end
 
-    before :each do
+    before do
       create_session(@pseudonym)
       account_model
       turn_on_sis
@@ -165,7 +165,7 @@ describe "assignments sync to sis" do
         let(:differentiate) { true }
         let(:section_to_set) { "Section B" }
 
-        before(:each) do
+        before do
           assign_section_due_date
         end
 
@@ -206,7 +206,7 @@ describe "assignments sync to sis" do
       let(:params) { { name: assignment_name } }
       let(:type) { @course.assignments }
 
-      before(:each) do
+      before do
         account_model
         turn_on_sis
       end

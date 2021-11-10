@@ -108,12 +108,12 @@ describe ContextModuleProgression do
 
   context '#evaluate' do
     let(:module_progression) do
-      p = @module.context_module_progressions.create do |p|
-        p.context_module = @module
-        p.user = @user
-        p.current = true
-        p.evaluated_at = 5.minutes.ago
-      end
+      p = @module.context_module_progressions.create!(
+        context_module: @module,
+        user: @user,
+        current: true,
+        evaluated_at: 5.minutes.ago
+      )
       p.workflow_state = 'bogus'
       p
     end
@@ -170,7 +170,7 @@ describe ContextModuleProgression do
       let(:tag) { @module.add_item({ id: assignment.id, type: "assignment" }) }
       let(:min_score) { 90 }
 
-      before(:each) do
+      before do
         @module.update!(completion_requirements: { tag.id => { type: "min_score", min_score: min_score } })
         @submission = assignment.submit_homework(@user, body: "my homework")
       end
@@ -304,7 +304,7 @@ describe ContextModuleProgression do
     progression.reload
     expect(progression).to be_started
 
-    expect_any_instantiation_of(@topic).to receive(:recalculate_context_module_actions!).never # doesn't recalculate unless it's a new requirement
+    expect_any_instantiation_of(@topic).not_to receive(:recalculate_context_module_actions!) # doesn't recalculate unless it's a new requirement
     @module.update_attribute(:completion_requirements, { @tag1.id => { :type => 'must_submit' }, @tag2.id => { :type => 'must_contribute' } })
   end
 

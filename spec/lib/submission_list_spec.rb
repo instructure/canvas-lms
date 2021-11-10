@@ -262,9 +262,11 @@ describe SubmissionList do
       it "remembers the 'Before' grade " do
         expect(submission.previous_grade).to eq "5"
       end
+
       it "remembers the 'After' grade" do
         expect(submission.new_grade).to eq "3"
       end
+
       it "remembers the 'Current' grade" do
         expect(submission.current_grade).to eq "3"
       end
@@ -280,9 +282,11 @@ describe SubmissionList do
       it "remembers the 'Before' grade" do
         expect(submission.previous_grade).to eq "7"
       end
+
       it "remembers the 'After' grade" do
         expect(submission.new_grade).to be_blank
       end
+
       it "remembers the 'Current' grade" do
         expect(submission.current_grade).to be_blank
       end

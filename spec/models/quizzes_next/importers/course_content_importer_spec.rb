@@ -105,7 +105,7 @@ describe QuizzesNext::Importers::CourseContentImporter do
 
     it 'does nothing' do
       expect(Importers::CourseContentImporter)
-        .to receive(:import_content).never
+        .not_to receive(:import_content)
       importer.import_content(double)
     end
   end

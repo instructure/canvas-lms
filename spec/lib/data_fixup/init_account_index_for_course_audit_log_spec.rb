@@ -30,11 +30,7 @@ describe DataFixup::InitAccountIndexForCourseAuditLog do
     }
   end
 
-  INDEX_TABLES = %w(
-    courses_by_account
-  ).freeze
-
-  before(:each) do
+  before do
     @database = CanvasCassandra::DatabaseBuilder.from_config(:auditors)
     skip("requires cassandra auditors") unless @database
 

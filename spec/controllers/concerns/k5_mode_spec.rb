@@ -50,7 +50,7 @@ describe K5Mode do
     end
 
     context 'teacher' do
-      before :each do
+      before do
         user_session(@teacher)
       end
 
@@ -65,7 +65,7 @@ describe K5Mode do
       end
 
       context 'that is also a student' do
-        before :each do
+        before do
           @course.enroll_user(@teacher, 'StudentEnrollment', enrollment_state: 'active')
         end
 
@@ -82,7 +82,7 @@ describe K5Mode do
     end
 
     context 'admin' do
-      before :each do
+      before do
         user_session(@admin)
       end
 
@@ -98,7 +98,7 @@ describe K5Mode do
     end
 
     context 'student' do
-      before :each do
+      before do
         user_session(@student)
       end
 

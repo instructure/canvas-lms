@@ -361,9 +361,10 @@ class Login::SamlController < ApplicationController
     @aac ||= begin
       scope = @domain_root_account.authentication_providers.active.where(auth_type: 'saml')
       id = params[:id] || params[:entityID]
-      return scope.first! unless id
 
-      if id.to_i == 0
+      if !id
+        scope.first!
+      elsif id.to_i == 0
         scope.find_by!(idp_entity_id: id)
       else
         scope.find(id)

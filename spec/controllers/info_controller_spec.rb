@@ -78,7 +78,7 @@ describe InfoController do
   end
 
   describe "GET 'readiness'" do
-    before(:each) do
+    before do
       allow(Account.connection).to receive(:active?).and_return(true)
       allow(MultiCache.cache).to receive(:fetch).and_call_original
       allow(MultiCache.cache).to receive(:fetch).with('readiness').and_return(nil)

@@ -58,7 +58,7 @@ describe Api::V1::SubmissionComment do
     let(:student3) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
     let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
 
-    before(:each) do
+    before do
       student_sub.add_comment(author: student, comment: "I'm Student")
     end
 

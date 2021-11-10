@@ -318,9 +318,8 @@ class AssignmentOverridesController < ApplicationController
     override_params = deserialize_overrides(params[:assignment_overrides])
     if override_params.blank?
       return bad_request(errors: ['no assignment_overrides values present'])
-    elsif !override_params.is_a? Array
-      return bad_request(errors: ['must specify an array with entry format { id, assignment_id }'])
-    elsif !override_params.all? { |o| o.is_a?(ActionController::Parameters) && o.key?('assignment_id') && o.key?('id') }
+    elsif !override_params.is_a?(Array) ||
+          !override_params.all? { |o| o.is_a?(ActionController::Parameters) && o.key?('assignment_id') && o.key?('id') }
       return bad_request(errors: ['must specify an array with entry format { id, assignment_id }'])
     end
 

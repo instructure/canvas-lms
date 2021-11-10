@@ -25,7 +25,7 @@ describe 'taking a timed quiz without auto-submit' do
   include QuizzesCommon
 
   context 'as a teacher' do
-    before(:each) do
+    before do
       Account.site_admin.allow_feature! :timer_without_autosubmission
       Account.default.enable_feature! :timer_without_autosubmission
 

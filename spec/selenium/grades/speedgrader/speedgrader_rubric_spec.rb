@@ -25,7 +25,7 @@ describe "speed grader - rubrics" do
   include_context "in-process server selenium tests"
   include SpeedGraderCommon
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in
     outcome_with_rubric
     @assignment = @course.assignments.create(name: 'assignment with rubric', points_possible: 10)

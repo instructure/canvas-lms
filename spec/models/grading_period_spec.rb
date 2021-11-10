@@ -803,6 +803,7 @@ describe GradingPeriod do
     let(:creation_arguments) { [period_one, period_two] }
     let(:period_one) { { title: 'an title', start_date: 1.week.ago(now), end_date: 2.weeks.from_now(now) } }
     let(:period_two) { { title: 'an title', start_date: 2.weeks.from_now(now), end_date: 5.weeks.from_now(now) } }
+
     include_examples "soft deletion"
   end
 

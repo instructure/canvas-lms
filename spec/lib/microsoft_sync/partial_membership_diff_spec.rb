@@ -132,29 +132,30 @@ describe MicrosoftSync::PartialMembershipDiff do
     diff
   end
 
-  EXPECTED_ACTIONS = {
-    m_X: %i[remove_member],
-    m_M: %i[add_member],
-    m_O: [],
-    m_MO: %i[add_member],
-    o_X: %i[remove_member remove_owner],
-    o_M: %i[remove_owner add_member],
-    o_O: %i[add_member add_owner],
-    o_MO: %i[add_member add_owner],
-    mo_X: %i[remove_member remove_owner],
-    mo_M: %i[remove_owner add_member],
-    mo_O: %i[add_member add_owner],
-    mo_MO: %i[add_member add_owner],
-  }.transform_values(&:freeze).freeze
+  expected_actions =
+    {
+      m_X: %i[remove_member],
+      m_M: %i[add_member],
+      m_O: [],
+      m_MO: %i[add_member],
+      o_X: %i[remove_member remove_owner],
+      o_M: %i[remove_owner add_member],
+      o_O: %i[add_member add_owner],
+      o_MO: %i[add_member add_owner],
+      mo_X: %i[remove_member remove_owner],
+      mo_M: %i[remove_owner add_member],
+      mo_O: %i[add_member add_owner],
+      mo_MO: %i[add_member add_owner],
+    }.transform_values(&:freeze).freeze
 
   [20, 4].each do |slice_len|
     context "with a slice size of #{slice_len}" do
       let(:slice_size) { slice_len }
 
-      EXPECTED_ACTIONS.each do |aad, actions|
+      expected_actions.each do |aad, actions|
         context "for a user with MSFT role type and enrollment types '#{aad}'" do
           it "executes the actions #{actions.inspect}" do
-            expect(actions_by_aad[aad.to_s]).to match_array(EXPECTED_ACTIONS[aad])
+            expect(actions_by_aad[aad.to_s]).to match_array(expected_actions[aad])
           end
         end
       end
@@ -184,7 +185,7 @@ describe MicrosoftSync::PartialMembershipDiff do
         let(:teacher_enrollment_type) { owner_enrollment }
 
         it "classifies it as an owner" do
-          expect(actions_by_aad['o_O']).to match_array(EXPECTED_ACTIONS[:o_O])
+          expect(actions_by_aad['o_O']).to match_array(expected_actions[:o_O])
         end
       end
     end
@@ -194,7 +195,7 @@ describe MicrosoftSync::PartialMembershipDiff do
         let(:student_enrollment_type) { member_enrollment }
 
         it "classifies it as an member" do
-          expect(actions_by_aad['o_M']).to match_array(EXPECTED_ACTIONS[:o_M])
+          expect(actions_by_aad['o_M']).to match_array(expected_actions[:o_M])
         end
       end
     end

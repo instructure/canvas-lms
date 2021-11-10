@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# rubocop:disable RSpec/NamedSubject
 shared_examples "soft deletion" do
   let(:first) do
     if creation_arguments.is_a? Array
@@ -45,6 +44,7 @@ shared_examples "soft deletion" do
 
   describe "#active" do
     let!(:destroy_the_second_active_object) { second.destroy }
+
     it "includes active associations" do
       expect(active_scope).to include first
     end
@@ -134,4 +134,3 @@ shared_examples "has_one soft deletion" do
     end
   end
 end
-# rubocop:enable RSpec/NamedSubject

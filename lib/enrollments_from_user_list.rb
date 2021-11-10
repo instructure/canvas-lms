@@ -52,10 +52,10 @@ class EnrollmentsFromUserList
         # list of user ids
         User.from_tokens(list)
       end
-    users.each_slice(Setting.get('enrollments_from_user_list_batch_size', 50).to_i) do |users|
+    users.each_slice(Setting.get('enrollments_from_user_list_batch_size', 50).to_i) do |users_slice|
       @course.transaction do
         Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
-          users.each { |user| enroll_user(user) }
+          users_slice.each { |user| enroll_user(user) }
         end
       end
     end

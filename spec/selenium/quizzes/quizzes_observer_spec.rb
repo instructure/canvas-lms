@@ -29,12 +29,12 @@ describe 'quizzes observers' do
     course_with_observer(active_all: true, course: @course).update_attribute(:associated_user_id, @student.id)
   end
 
-  before(:each) do
+  before do
     user_session(@observer)
   end
 
   context "when 'show correct answers after last attempt setting' is on" do
-    before(:each) do
+    before do
       quiz_with_submission
       @quiz.update(:show_correct_answers => true,
                    :show_correct_answers_last_attempt => true, :allowed_attempts => 2)

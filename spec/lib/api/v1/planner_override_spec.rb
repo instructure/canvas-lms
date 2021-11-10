@@ -18,17 +18,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Api::V1::PlannerOverride do
-  class PlannerOverrideHarness
-    include Api::V1::PlannerOverride
-  end
-
   before :once do
     course_factory active_all: true
     student_in_course active_all: true
   end
 
   describe '.planner_override_json' do
-    let(:api) { PlannerOverrideHarness.new }
+    let(:api) { Class.new { include Api::V1::PlannerOverride }.new }
     let(:session) { double }
 
     it 'shows plannable_type as a string' do

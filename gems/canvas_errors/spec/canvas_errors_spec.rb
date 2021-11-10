@@ -34,14 +34,14 @@ describe CanvasErrors do
     end
   end
 
-  before(:each) do
+  before do
     @old_registry = described_class.instance_variable_get(:@registry)
     described_class.clear_callback_registry!
     @error_harness = error_testing_class.new
     @error_harness.register!
   end
 
-  after(:each) do
+  after do
     described_class.instance_variable_set(:@registry, @old_registry)
   end
 
@@ -57,7 +57,7 @@ describe CanvasErrors do
   end
 
   describe 'with inferred context' do
-    around(:each) do |example|
+    around do |example|
       prev_context = Thread.current[:context]
       example.run
     ensure

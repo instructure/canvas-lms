@@ -38,7 +38,7 @@ describe "master courses - child courses - external tool locking" do
     @tool_copy.save!
   end
 
-  before :each do
+  before do
     user_session(@teacher)
   end
 

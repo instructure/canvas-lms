@@ -68,7 +68,7 @@ describe Polling::PollSession do
   end
 
   describe ".available_for" do
-    before(:each) do
+    before do
       @course1 = course_model
       @course2 = course_model
       @teacher1 = teacher_in_course(course: @course1).user

@@ -834,11 +834,10 @@ class AssetUserAccessLog
           aua_log.id > #{lower_ra_boundary} )
       ROOT_ACCOUNT_SUBCLAUSE
     end.join(" OR ")
-    query_string = """
-     #{query_prefix} ( #{root_account_conditions} )
-     GROUP BY aua_log.asset_user_access_id
-    """
-    query_string
+    <<~SQL.squish
+      #{query_prefix} ( #{root_account_conditions} )
+      GROUP BY aua_log.asset_user_access_id
+    SQL
   end
 
   # we want to do the whole set of updates for this batch to AUA rows

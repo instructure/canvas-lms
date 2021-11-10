@@ -23,6 +23,7 @@ require_dependency "lti/navigation_cache"
 module Lti
   describe NavigationCache do
     let(:account) { double }
+
     subject { NavigationCache.new(account) }
 
     describe "#cache_key" do

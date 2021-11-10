@@ -149,7 +149,7 @@ describe AssignmentOverridesController, type: :request do
     end
 
     describe 'as an account admin not enrolled in the class' do
-      before :each do
+      before do
         account_admin_user(:account => Account.site_admin, :active_all => true)
       end
 
@@ -781,7 +781,7 @@ describe AssignmentOverridesController, type: :request do
         expect(new_prog).to be_completed # since they can't see the assignment yet
 
         other_prog = mod.evaluate_for(@other_student)
-        expect_any_instantiation_of(other_prog).to receive(:evaluate!).never
+        expect_any_instantiation_of(other_prog).not_to receive(:evaluate!)
 
         api_update_override(@course, @assignment, @override, :assignment_override => { :student_ids => [@new_student.id] })
 

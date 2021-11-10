@@ -36,7 +36,7 @@ describe "speed grader" do
     submission_model(user: @student1, assignment: @assignment, body: "first student submission text")
   end
 
-  before(:each) do
+  before do
     user_session(@teacher1)
   end
 
@@ -55,7 +55,7 @@ describe "speed grader" do
 
   context 'manually submitted comments' do
     context 'using media' do
-      before(:each) do
+      before do
         stub_kaltura
       end
 
@@ -133,8 +133,9 @@ describe "speed grader" do
       # make sure avatar shows up for user comment
       expect(Speedgrader.avatar_comment).to have_attribute('style', "display: inline\;")
     end
+
     context 'Hide Student names checked' do
-      after(:each) do
+      after do
         Speedgrader.uncheck_hide_student_name
       end
 
@@ -167,7 +168,7 @@ describe "speed grader" do
     end
 
     context 'with inactive students' do
-      after(:each) do
+      after do
         # Reactive student to not poison other tests
         @en.reactivate
       end
@@ -197,7 +198,8 @@ describe "speed grader" do
           s.add_comment(author: @teacher2, comment: 'Just a comment by teacher2')
         end
       end
-      before(:each) do
+
+      before do
         Speedgrader.visit(@course.id, @assignment.id)
       end
 
@@ -233,7 +235,7 @@ describe "speed grader" do
       end
     end
 
-    before(:each) do
+    before do
       Speedgrader.visit(@course.id, @assignment.id)
       Speedgrader.new_comment_text_area.send_keys 'Testing Draft Comments'
     end
@@ -294,7 +296,7 @@ describe "speed grader" do
     end
 
     describe 'draft comment display' do
-      after(:each) do
+      after do
         Speedgrader.clear_new_comment
       end
 
@@ -322,7 +324,7 @@ describe "speed grader" do
     end
 
     describe 'publishing a draft comment' do
-      before(:each) do
+      before do
         Speedgrader.clear_new_comment
       end
 
@@ -355,7 +357,7 @@ describe "speed grader" do
     end
 
     describe 'deleting a draft comment' do
-      before(:each) do
+      before do
         Speedgrader.clear_new_comment
       end
 
@@ -392,7 +394,7 @@ describe "speed grader" do
       @comment2 = @submission2.add_comment(author: @teacher1, comment: 'comment2', attempt: 2)
     end
 
-    before(:each) do
+    before do
       Speedgrader.visit(@course.id, @assignment.id)
     end
 
@@ -455,7 +457,7 @@ describe "speed grader" do
       @assignment.submit_homework(@student_2, comment: @private_comment_2)
     end
 
-    before(:each) do
+    before do
       Speedgrader.visit(@course.id, @assignment.id)
     end
 

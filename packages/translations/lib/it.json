@@ -329,6 +329,9 @@
     "creative_commons_license_725584ae": {
         "message": "Licenza Creative Commons:"
     },
+    "crop_image_807ebb08": {
+        "message": "Ritaglia immagine"
+    },
     "current_image_f16c249c": {
         "message": "Immagine attuale"
     },
@@ -896,6 +899,9 @@
     "none_3b5e34d2": {
         "message": "Nessuno"
     },
+    "none_selected_b93d56d2": {
+        "message": "Nessuna selezionata"
+    },
     "nothing_due_this_week_d45c9ef9": {
         "message": "Niente In scadenza questa settimana"
     },
@@ -1078,6 +1084,9 @@
     },
     "search_term_b2d2235": {
         "message": "Cerca termine"
+    },
+    "select_crop_shape_d441feeb": {
+        "message": "Seleziona forma di ritaglio"
     },
     "select_language_7c93a900": {
         "message": "Selezionare la lingua"

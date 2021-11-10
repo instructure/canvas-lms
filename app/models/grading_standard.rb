@@ -94,8 +94,8 @@ class GradingStandard < ActiveRecord::Base
     # look for keys with only digits and a single '.'
     if key_name.to_s =~ (/\A(\d*[.])?\d+\Z/)
       # compare numbers
-      # second condition to filter letters so zeros work properly ("A".to_f == 0)
-      ordered_scheme.index { |g, _| g.to_f == key_name.to_f && g.to_s.match(/\A(\d*[.])?\d+\Z/) }
+      # second condition to filter letters so zeros work properly ("A".to_d == 0)
+      ordered_scheme.index { |g, _| g.to_d == key_name.to_d && g.to_s.match(/\A(\d*[.])?\d+\Z/) }
     else
       # compare words
       ordered_scheme.index { |g, _| g.to_s.downcase == key_name.to_s.downcase }
@@ -228,7 +228,7 @@ class GradingStandard < ActiveRecord::Base
   end
 
   def full_range_scheme
-    if data.present? && data.none? { |datum| datum[1] == 0.0 }
+    if data.present? && data.none? { |datum| datum[1].abs < Float::EPSILON }
       errors.add(:data, 'grading schemes must have 0% for the lowest grade')
     end
   end

@@ -43,6 +43,7 @@ describe OutcomeCalculationMethod, type: :model do
             99
           ).for(:calculation_int)
         end
+
         it do
           is_expected.not_to allow_values(
             -1,
@@ -65,6 +66,7 @@ describe OutcomeCalculationMethod, type: :model do
             5
           ).for(:calculation_int)
         end
+
         it do
           is_expected.not_to allow_values(
             -1,

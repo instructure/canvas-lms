@@ -21,11 +21,9 @@
 describe CourseProgress do
   let(:progress_error) { { :error => { :message => 'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course' } } }
 
-  before :each do
-    class CourseProgress
-      def course_context_modules_item_redirect_url(opts = {})
-        "course_context_modules_item_redirect_url(:course_id => #{opts[:course_id]}, :id => #{opts[:id]}, :host => HostUrl.context_host(Course.find(#{opts[:course_id]}))"
-      end
+  before do
+    allow_any_instance_of(CourseProgress).to receive(:course_context_modules_item_redirect_url) do |_, opts = {}|
+      "course_context_modules_item_redirect_url(:course_id => #{opts[:course_id]}, :id => #{opts[:id]}, :host => HostUrl.context_host(Course.find(#{opts[:course_id]}))"
     end
   end
 
@@ -122,7 +120,7 @@ describe CourseProgress do
 
       [@module, @module2, @module3].each do |m|
         m.evaluate_for(@user)
-        expect_any_instantiation_of(m).to receive(:evaluate_for).never # shouldn't re-evaluate
+        expect_any_instantiation_of(m).not_to receive(:evaluate_for) # shouldn't re-evaluate
       end
 
       progress = CourseProgress.new(@course, @user, read_only: true).to_json

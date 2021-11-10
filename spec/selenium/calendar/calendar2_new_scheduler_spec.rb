@@ -34,7 +34,7 @@ describe "scheduler" do
       scheduler_setup
     end
 
-    before :each do
+    before do
       user_session(@student1)
     end
 

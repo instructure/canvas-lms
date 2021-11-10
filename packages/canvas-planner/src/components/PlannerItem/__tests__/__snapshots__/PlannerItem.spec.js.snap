@@ -96,6 +96,7 @@ exports[`does not render end time if the same as start time 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -263,6 +264,7 @@ exports[`prefers to render feedback if it and the location are available 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -442,6 +444,7 @@ exports[`renders Announcement correctly with everything 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -611,6 +614,7 @@ exports[`renders Announcement correctly with just date 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -759,6 +763,7 @@ exports[`renders Announcement correctly with just points 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -928,6 +933,7 @@ exports[`renders Announcement correctly without right side content 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -1076,6 +1082,7 @@ exports[`renders Assignment correctly with everything 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -1245,6 +1252,7 @@ exports[`renders Assignment correctly with just date 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -1393,6 +1401,7 @@ exports[`renders Assignment correctly with just points 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -1562,6 +1571,7 @@ exports[`renders Assignment correctly without right side content 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -1710,6 +1720,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -1876,6 +1887,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -2063,6 +2075,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -2229,6 +2242,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -2396,6 +2410,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -2562,6 +2577,7 @@ exports[`renders Discussion correctly with everything 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -2731,6 +2747,7 @@ exports[`renders Discussion correctly with just date 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -2879,6 +2896,7 @@ exports[`renders Discussion correctly with just points 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -3048,6 +3066,7 @@ exports[`renders Discussion correctly without right side content 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -3196,6 +3215,7 @@ exports[`renders Note correctly with Group 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -3353,6 +3373,7 @@ exports[`renders Note correctly with everything 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -3545,6 +3566,7 @@ exports[`renders Note correctly without Course 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -3728,6 +3750,7 @@ exports[`renders Page correctly with everything 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -3897,6 +3920,7 @@ exports[`renders Page correctly with just date 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -4045,6 +4069,7 @@ exports[`renders Page correctly with just points 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -4214,6 +4239,7 @@ exports[`renders Page correctly without right side content 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -4362,6 +4388,7 @@ exports[`renders Quiz correctly with everything 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -4531,6 +4558,7 @@ exports[`renders Quiz correctly with just date 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -4679,6 +4707,7 @@ exports[`renders Quiz correctly with just points 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -4848,6 +4877,7 @@ exports[`renders Quiz correctly without right side content 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -4996,6 +5026,7 @@ exports[`renders assignment peer reviews correctly 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -5144,6 +5175,7 @@ exports[`renders correctly 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -5313,6 +5345,7 @@ exports[`renders feedback anonymously according to the assignment settings 1`] =
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -5491,6 +5524,7 @@ exports[`renders feedback if available 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -5670,6 +5704,7 @@ exports[`renders media feedback if available 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -5849,6 +5884,7 @@ exports[`renders the end time if available 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -6016,6 +6052,7 @@ exports[`renders the location if available 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }
@@ -6185,6 +6222,7 @@ exports[`renders user-created Todo correctly 1`] = `
                 "linkColor": undefined,
                 "linkHoverColor": undefined,
                 "mediumHeight": "normal",
+                "mediumPadding": undefined,
                 "mediumPaddingHorizontal": "0",
               }
             }

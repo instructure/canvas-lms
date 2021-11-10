@@ -36,23 +36,22 @@ module CopyAuthorizedLinks
       columns = (self.class.copy_authorized_links_columns || []).compact
       @copy_authorized_links_override_user = user
       columns.each do |column|
-        if column == :custom
-        else
-          html = self.read_attribute(column) rescue nil
-          if html && !html.empty?
-            context, inferred_user = self.instance_eval(&block) if block
-            user = @copy_authorized_links_override_user || inferred_user
-            re = Regexp.new("/#{context.class.to_s.pluralize.underscore}/#{context.id}/files/(\\d+)")
-            ids = []
-            html.scan(re) do |match|
-              ids << match[0]
-            end
-            Attachment.where(id: ids.uniq).each do |file|
-              html = html.gsub(Regexp.new("/#{context.class.to_s.pluralize.underscore}/#{context.id}/files/#{file.id}"), "/#{file.context_type.pluralize.underscore}/#{file.context_id}/files/#{file.id}")
-            end
-            self.write_attribute(column, html) if html && !html.empty?
-          end
+        next if column == :custom
+
+        html = self.read_attribute(column) rescue nil
+        next if html.blank?
+
+        context, inferred_user = self.instance_eval(&block) if block
+        user = @copy_authorized_links_override_user || inferred_user
+        re = Regexp.new("/#{context.class.to_s.pluralize.underscore}/#{context.id}/files/(\\d+)")
+        ids = []
+        html.scan(re) do |match|
+          ids << match[0]
         end
+        Attachment.where(id: ids.uniq).each do |file|
+          html = html.gsub(Regexp.new("/#{context.class.to_s.pluralize.underscore}/#{context.id}/files/#{file.id}"), "/#{file.context_type.pluralize.underscore}/#{file.context_id}/files/#{file.id}")
+        end
+        self.write_attribute(column, html) if html.present?
       end
       self.save
     end
