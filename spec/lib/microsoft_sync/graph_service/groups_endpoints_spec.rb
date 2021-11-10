@@ -31,7 +31,9 @@ module MicrosoftSync::GraphService::GroupsEndpoints::SpecHelper
     add_duplicate: [400, { error: { code: "Request_BadRequest", message: "One or more added object references already exist for the following modified properties: 'members'." } }],
     add_owners_quota_exceeded: [403, { error: { code: "Directory_QuotaExceeded", message: "Unable to perform operation as '121' would exceed the maximum quota count '100' for forward-link owners." } }],
     add_members_quota_exceeded: [403, { error: { code: "Directory_QuotaExceeded", message: "Unable to perform operation as '121' would exceed the maximum quota count '100' for forward-link members." } }],
-    add_nonexistent_users: [404, { error: { code: "Request_ResourceNotFound", message: "Resource 'af3c8a2b-d61a-41d4-b0c1-9b185548d991' does not exist or one of its queried reference-property objects are not present." } }],
+    add_nonexistent_m1_user: [404, { error: { code: "Request_ResourceNotFound", message: "Resource 'm1' does not exist or one of its queried reference-property objects are not present." } }],
+    add_nonexistent_o1_user: [404, { error: { code: "Request_ResourceNotFound", message: "Resource 'o1' does not exist or one of its queried reference-property objects are not present." } }],
+    add_nonexistent_group: [404, { error: { code: "Request_ResourceNotFound", message: "Resource 'msgroupid' does not exist or one of its queried reference-property objects are not present." } }],
 
     remove_missing: [404, { error: { code: "Request_ResourceNotFound", msg: "Resource '12345689-1212-1212-1212-abc212121212' does not exist or one of its queried reference-property objects are not present." } }],
     # This style seems to happen if we remove with the API after (right after?) removing from the UI:
@@ -156,21 +158,7 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
       end
     end
 
-    %w[members owners].each do |members_or_owners|
-      context "when the PATCH endpoint returns a '#{members_or_owners} quota exceeded' error" do
-        let(:response) { json_response_from_sample(:"add_#{members_or_owners}_quota_exceeded") }
-
-        it 'falls back to the batch api' do
-          expect(endpoints).to receive(:add_users_via_batch)
-            .with('msgroupid', members, owners).and_return('foo')
-          expect(subject).to eq('foo')
-        end
-      end
-    end
-
-    context 'when some users already exist' do
-      let(:response) { { status: 400, body: 'One or more added object references already exist' } }
-
+    shared_examples_for 'a fallback to the batch api' do
       it 'falls back to the batch api' do
         expect(endpoints).to receive(:add_users_via_batch)
           .with('msgroupid', members, owners).and_return('foo')
@@ -183,6 +171,34 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
         expect(InstStatsd::Statsd).to have_received(:increment)
           .with('microsoft_sync.graph_service.expected',
                 tags: hash_including(msft_endpoint: 'patch_groups'))
+      end
+    end
+
+    %w[members owners].each do |members_or_owners|
+      context "when the PATCH endpoint returns a '#{members_or_owners} quota exceeded' error" do
+        let(:response) { json_response_from_sample(:"add_#{members_or_owners}_quota_exceeded") }
+
+        it_behaves_like 'a fallback to the batch api'
+      end
+    end
+
+    context 'when some users are already in the group' do
+      let(:response) { json_response_from_sample(:add_duplicate) }
+
+      it_behaves_like 'a fallback to the batch api'
+    end
+
+    context 'when some users cannot be found on the microsoft side' do
+      let(:response) { json_response_from_sample(:add_nonexistent_o1_user) }
+
+      it_behaves_like 'a fallback to the batch api'
+    end
+
+    context 'when the group (or something else) cannot be found on the microsoft side' do
+      let(:response) { json_response_from_sample(:add_nonexistent_group) }
+
+      it 'raises a HTTPNotFound' do
+        expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPNotFound)
       end
     end
   end
@@ -350,13 +366,24 @@ describe MicrosoftSync::GraphService::GroupsEndpoints do
       %i[success success success success] => {},
       # some owners were already in the group:
       %i[success success success add_duplicate] =>
-        { owners: { o2: :ignored } },
+        { owners: { o2: :already_in_group } },
       # some members were already in the group:
       %i[add_duplicate add_duplicate success success] =>
-        { members: { m1: :ignored, m2: :ignored } },
+        { members: { m1: :already_in_group, m2: :already_in_group } },
       # some members and owners were already in the group:
       %i[add_duplicate success add_duplicate add_duplicate] =>
-        { members: { m1: :ignored }, owners: { o1: :ignored, o2: :ignored } },
+        { members: { m1: :already_in_group }, owners: { o1: :already_in_group, o2: :already_in_group } },
+      # Trying to add member that doesn't exist:
+      %i[add_nonexistent_m1_user success success success] =>
+        { members: { m1:
+                    MicrosoftSync::GraphService::GroupMembershipChangeResult::NONEXISTENT_USER } },
+      # Trying to add o1 user (owner) but o1 doesn't exist:
+      %i[success success add_nonexistent_o1_user success] =>
+        { owners: { o1:
+                    MicrosoftSync::GraphService::GroupMembershipChangeResult::NONEXISTENT_USER } },
+      # Trying to add o2 user, got message saying something else (o1) didn't exist:
+      %i[success success success add_nonexistent_o1_user] =>
+        MicrosoftSync::GraphService::Http::BatchRequestFailed,
       %i[add_duplicate success success add_owners_quota_exceeded] =>
         MicrosoftSync::Errors::OwnersQuotaExceeded,
       %i[add_duplicate success success add_members_quota_exceeded] =>

@@ -59,4 +59,16 @@ describe MicrosoftSync::GraphService::GroupMembershipChangeResult do
       expect(subject.total_unsuccessful).to eq(3)
     end
   end
+
+  describe '#nonexistent_user_ids' do
+    before do
+      subject.add_issue 'members', 'ghi', described_class::NONEXISTENT_USER
+      subject.add_issue 'owners', 'def', described_class::NONEXISTENT_USER
+      subject.add_issue 'owners', 'ghi', described_class::NONEXISTENT_USER
+    end
+
+    it 'returns any users with any issue reason NONEXISTENT_USER' do
+      expect(subject.nonexistent_user_ids.sort).to eq(['def', 'ghi'])
+    end
+  end
 end

@@ -23,6 +23,8 @@
 module MicrosoftSync
   class GraphService
     class GroupMembershipChangeResult
+      NONEXISTENT_USER = :nonexistent_user
+
       delegate :to_json, :blank?, :present?, to: :issues_by_member_type
 
       def issues_by_member_type
@@ -31,6 +33,12 @@ module MicrosoftSync
 
       def total_unsuccessful
         @total_unsuccessful ||= issues_by_member_type.values.sum(&:length)
+      end
+
+      def nonexistent_user_ids
+        issues_by_member_type.values.map do |issues|
+          issues.select { |_aad, issue| issue == NONEXISTENT_USER }.keys
+        end.flatten.uniq
       end
 
       def add_issue(members_or_owners, user_id, reason)
