@@ -161,7 +161,7 @@ def init
   options[:objects] = run_verifier(options[:objects])
   options[:resources] = options[:objects]
                         .group_by { |o| o.tags('API').first.text }
-                        .sort_by  { |o| o.first }
+                        .sort_by  { |o| o.first.downcase }
   generate_swagger_json
   generate_data_services_markdown_pages
   scope_writer = ApiScopeMappingWriter.new(options[:resources])
