@@ -177,9 +177,7 @@ class CourseProgress
 
   def module_requirements_completed(progression)
     @_module_requirements_completed ||= {}
-    @_module_requirements_completed[progression.id] ||= begin
-      progression.requirements_met.select { |req| module_requirements(progression.context_module).include?(req) }.uniq
-    end
+    @_module_requirements_completed[progression.id] ||= progression.requirements_met.select { |req| module_requirements(progression.context_module).include?(req) }.uniq
   end
 
   def module_reqs_to_complete_count(mod)

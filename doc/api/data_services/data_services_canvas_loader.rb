@@ -21,16 +21,12 @@ class DataServicesCanvasLoader
   JSON_BASE_PATH = 'doc/api/data_services/json/canvas'
 
   def self.data
-    @@data ||= begin
-      DataServicesEventsLoader.new(JSON_BASE_PATH).data
-    end
+    @@data ||= DataServicesEventsLoader.new(JSON_BASE_PATH).data
   end
 
   def self.metadata
-    @@metadata ||= begin
-      {
-        examples: JSON.parse(File.read("#{JSON_BASE_PATH}/metadata.json"))
-      }
-    end
+    @@metadata ||= {
+      examples: JSON.parse(File.read("#{JSON_BASE_PATH}/metadata.json"))
+    }
   end
 end

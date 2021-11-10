@@ -207,16 +207,14 @@ module Lti
     end
 
     def resource_link_request
-      @_resource_link_request ||= begin
-        Lti::Messages::ResourceLinkRequest.new(
-          tool: @tool,
-          context: @context,
-          user: @user,
-          expander: @expander,
-          return_url: @return_url,
-          opts: @opts.merge(option_overrides)
-        )
-      end
+      @_resource_link_request ||= Lti::Messages::ResourceLinkRequest.new(
+        tool: @tool,
+        context: @context,
+        user: @user,
+        expander: @expander,
+        return_url: @return_url,
+        opts: @opts.merge(option_overrides)
+      )
     end
 
     def option_overrides

@@ -59,30 +59,28 @@ class EportfolioCategoriesController < ApplicationController
   end
 
   def show
-    begin
-      if params[:verifier] == @portfolio.uuid
-        session[:eportfolio_ids] ||= []
-        session[:eportfolio_ids] << @portfolio.id
-        session[:permissions_key] = SecureRandom.uuid
-      end
-      if authorized_action(@portfolio, @current_user, :read)
-        if params[:id]
-          @category = @portfolio.eportfolio_categories.find(params[:id])
-        elsif params[:category_name]
-          @category = @portfolio.eportfolio_categories.where(slug: params[:category_name]).first!
-        end
-        @page = @category.eportfolio_entries.first
-        @page ||= @portfolio.eportfolio_entries.create(:eportfolio_category => @category, :allow_comments => true, :show_comments => true, :name => t(:default_name, "New Page")) if @portfolio.grants_right?(@current_user, session, :update)
-        raise ActiveRecord::RecordNotFound if !@page
-
-        eportfolio_page_attributes
-
-        render "eportfolios/show", stream: can_stream_template?
-      end
-    rescue ActiveRecord::RecordNotFound
-      flash[:notice] = t('errors.missing_page', "Couldn't find that page")
-      redirect_to eportfolio_url(@portfolio.id)
+    if params[:verifier] == @portfolio.uuid
+      session[:eportfolio_ids] ||= []
+      session[:eportfolio_ids] << @portfolio.id
+      session[:permissions_key] = SecureRandom.uuid
     end
+    if authorized_action(@portfolio, @current_user, :read)
+      if params[:id]
+        @category = @portfolio.eportfolio_categories.find(params[:id])
+      elsif params[:category_name]
+        @category = @portfolio.eportfolio_categories.where(slug: params[:category_name]).first!
+      end
+      @page = @category.eportfolio_entries.first
+      @page ||= @portfolio.eportfolio_entries.create(:eportfolio_category => @category, :allow_comments => true, :show_comments => true, :name => t(:default_name, "New Page")) if @portfolio.grants_right?(@current_user, session, :update)
+      raise ActiveRecord::RecordNotFound if !@page
+
+      eportfolio_page_attributes
+
+      render "eportfolios/show", stream: can_stream_template?
+    end
+  rescue ActiveRecord::RecordNotFound
+    flash[:notice] = t('errors.missing_page', "Couldn't find that page")
+    redirect_to eportfolio_url(@portfolio.id)
   end
 
   def destroy

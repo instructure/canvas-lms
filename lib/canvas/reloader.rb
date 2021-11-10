@@ -28,11 +28,9 @@ module Canvas::Reloader
       Rails.logger.info("Canvas::Reloader fired")
       @pending_reload = false
       to_reload.each do |block|
-        begin
-          block.call
-        rescue => e
-          Canvas::Errors.capture_exception(:reloader, e)
-        end
+        block.call
+      rescue => e
+        Canvas::Errors.capture_exception(:reloader, e)
       end
     end
 

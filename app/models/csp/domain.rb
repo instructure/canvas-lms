@@ -33,12 +33,10 @@ class Csp::Domain < ActiveRecord::Base
   after_save :invalidate_domain_list_cache
 
   def validate_domain
-    begin
-      URI.parse(self.domain)
-    rescue
-      self.errors.add(:domain, "Invalid domain")
-      return false
-    end
+    URI.parse(self.domain)
+  rescue
+    self.errors.add(:domain, "Invalid domain")
+    return false
   end
 
   def downcase_domain

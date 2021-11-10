@@ -60,18 +60,16 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
   end
 
   def lti_tool
-    @_lti_tool ||= begin
-      if tool_id.present?
-        tool
-      elsif tool_type == 'Lti::MessageHandler'
-        Lti::MessageHandler.by_resource_codes(
-          vendor_code: tool_vendor_code,
-          product_code: tool_product_code,
-          resource_type_code: tool_resource_type_code,
-          context: assignment.course
-        )
-      end
-    end
+    @_lti_tool ||= if tool_id.present?
+                     tool
+                   elsif tool_type == 'Lti::MessageHandler'
+                     Lti::MessageHandler.by_resource_codes(
+                       vendor_code: tool_vendor_code,
+                       product_code: tool_product_code,
+                       resource_type_code: tool_resource_type_code,
+                       context: assignment.course
+                     )
+                   end
   end
 
   def resource_codes

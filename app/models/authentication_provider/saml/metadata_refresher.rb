@@ -29,15 +29,13 @@ class AuthenticationProvider::SAML::MetadataRefresher
                                                 .shard(shard_scope)
 
       providers.each do |provider|
-        begin
-          new_data = refresh_if_necessary(provider.global_id, provider.metadata_uri)
-          next unless new_data
+        new_data = refresh_if_necessary(provider.global_id, provider.metadata_uri)
+        next unless new_data
 
-          provider.populate_from_metadata_xml(new_data)
-          provider.save! if provider.changed?
-        rescue => e
-          ::Canvas::Errors.capture_exception(:saml_metadata_refresh, e)
-        end
+        provider.populate_from_metadata_xml(new_data)
+        provider.save! if provider.changed?
+      rescue => e
+        ::Canvas::Errors.capture_exception(:saml_metadata_refresh, e)
       end
     end
 

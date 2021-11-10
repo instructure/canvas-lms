@@ -159,11 +159,9 @@ module Lti
       end
 
       def id_token
-        @id_token ||= begin
-          Lti::Messages::JwtMessage.generate_id_token(cached_launch_with_nonce).merge({
-                                                                                        state: oidc_params[:state]
-                                                                                      })
-        end
+        @id_token ||= Lti::Messages::JwtMessage.generate_id_token(cached_launch_with_nonce).merge({
+                                                                                                    state: oidc_params[:state]
+                                                                                                  })
       end
 
       def authorize_redirect_url

@@ -39,19 +39,17 @@ class AssetUserAccess < ActiveRecord::Base
   scope :most_recent, -> { order('updated_at DESC') }
 
   def infer_root_account_id(asset_for_root_account_id = nil)
-    self.root_account_id ||= begin
-      if context_type != 'User'
-        context&.resolved_root_account_id || 0
-      elsif asset_for_root_account_id.is_a?(User)
-        # Unfillable. Point to the dummy root account with id=0.
-        0
-      else
-        asset_for_root_account_id.try(:resolved_root_account_id) ||
-          asset_for_root_account_id.try(:root_account_id) || 0
-        # We could default `asset_for_root_account_id ||= asset`, but AUAs shouldn't
-        # ever be created outside of .log(), and calling `asset` would add a DB hit
-      end
-    end
+    self.root_account_id ||= if context_type != 'User'
+                               context&.resolved_root_account_id || 0
+                             elsif asset_for_root_account_id.is_a?(User)
+                               # Unfillable. Point to the dummy root account with id=0.
+                               0
+                             else
+                               asset_for_root_account_id.try(:resolved_root_account_id) ||
+                                 asset_for_root_account_id.try(:root_account_id) || 0
+                               # We could default `asset_for_root_account_id ||= asset`, but AUAs shouldn't
+                               # ever be created outside of .log(), and calling `asset` would add a DB hit
+                             end
   end
 
   def category

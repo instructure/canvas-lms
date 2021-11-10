@@ -301,13 +301,11 @@ module Lti
     end
 
     def submission
-      @_submission ||= begin
-        if params[:file_id].present?
-          AttachmentAssociation.find_by(attachment_id: params[:file_id])&.context
-        else
-          Submission.active.find(params[:submission_id])
-        end
-      end
+      @_submission ||= if params[:file_id].present?
+                         AttachmentAssociation.find_by(attachment_id: params[:file_id])&.context
+                       else
+                         Submission.active.find(params[:submission_id])
+                       end
     end
 
     def attachment
@@ -347,20 +345,18 @@ module Lti
     end
 
     def lti_link_params
-      @_lti_link_params ||= begin
-        if lti_link_settings&.dig('tool_setting', 'resource_type_code')
-          lti_link_settings['tool_setting'].merge({
-                                                    id: @report&.lti_link&.id,
-                                                    product_code: tool_proxy.product_family.product_code,
-                                                    vendor_code: tool_proxy.product_family.vendor_code
-                                                  })
-        else
-          {
-            id: @report&.lti_link&.id,
-            _destroy: true
-          }
-        end
-      end
+      @_lti_link_params ||= if lti_link_settings&.dig('tool_setting', 'resource_type_code')
+                              lti_link_settings['tool_setting'].merge({
+                                                                        id: @report&.lti_link&.id,
+                                                                        product_code: tool_proxy.product_family.product_code,
+                                                                        vendor_code: tool_proxy.product_family.vendor_code
+                                                                      })
+                            else
+                              {
+                                id: @report&.lti_link&.id,
+                                _destroy: true
+                              }
+                            end
     end
 
     def lti_link_settings

@@ -80,33 +80,31 @@ class ExternalFeedAggregator
   end
 
   def process_feed(feed)
-    begin
-      LiveEvents.set_context(Canvas::LiveEvents.amended_context(feed.context))
-      @logger.info("feed found: #{feed.url}")
-      @logger.info('requesting entries')
-      require 'net/http'
+    LiveEvents.set_context(Canvas::LiveEvents.amended_context(feed.context))
+    @logger.info("feed found: #{feed.url}")
+    @logger.info('requesting entries')
+    require 'net/http'
 
-      response = CanvasHttp.get(feed.url)
-      case response
-      when Net::HTTPSuccess
-        success = parse_entries(feed, response.body)
-        @logger.info(success ? 'successful response' : '200 with no data returned')
-        feed.consecutive_failures = 0 if success
-        feed.update_attribute(:refresh_at, success_wait_seconds.seconds.from_now)
-      else
-        @logger.info("request failed #{response.class}")
-        handle_failure(feed)
-      end
-    rescue CanvasHttp::Error,
-           CanvasHttp::RelativeUriError,
-           CanvasHttp::InsecureUriError,
-           Timeout::Error,
-           SocketError,
-           SystemCallError,
-           OpenSSL::SSL::SSLError => e
-      Canvas::Errors.capture_exception(:external_feed, e, :info)
+    response = CanvasHttp.get(feed.url)
+    case response
+    when Net::HTTPSuccess
+      success = parse_entries(feed, response.body)
+      @logger.info(success ? 'successful response' : '200 with no data returned')
+      feed.consecutive_failures = 0 if success
+      feed.update_attribute(:refresh_at, success_wait_seconds.seconds.from_now)
+    else
+      @logger.info("request failed #{response.class}")
       handle_failure(feed)
     end
+  rescue CanvasHttp::Error,
+         CanvasHttp::RelativeUriError,
+         CanvasHttp::InsecureUriError,
+         Timeout::Error,
+         SocketError,
+         SystemCallError,
+         OpenSSL::SSL::SSLError => e
+    Canvas::Errors.capture_exception(:external_feed, e, :info)
+    handle_failure(feed)
   end
 
   def handle_failure(feed)

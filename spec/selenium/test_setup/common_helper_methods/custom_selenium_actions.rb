@@ -273,11 +273,9 @@ module CustomSeleniumActions
   end
 
   def dialog_for(node)
-    begin
-      node.find_element(:xpath, "ancestor-or-self::div[contains(@class, 'ui-dialog')]")
-    rescue StandardError
-      false
-    end
+    node.find_element(:xpath, "ancestor-or-self::div[contains(@class, 'ui-dialog')]")
+  rescue StandardError
+    false
   end
 
   # for when you have something like a textarea's value and you want to match it's contents

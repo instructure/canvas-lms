@@ -1486,23 +1486,21 @@ class ApplicationController < ActionController::Base
   end
 
   def log_page_view
-    begin
-      user = @current_user || (@accessed_asset && @accessed_asset[:user])
-      if user && @log_page_views != false
-        add_interaction_seconds
-        log_participation(user)
-        log_gets
-        finalize_page_view
-      else
-        @page_view.destroy if @page_view && !@page_view.new_record?
-      end
-    rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
-      Canvas::Errors.capture_exception(:page_view, e)
-      logger.error "Pageview error!"
-      raise e if Rails.env.development?
-
-      true
+    user = @current_user || (@accessed_asset && @accessed_asset[:user])
+    if user && @log_page_views != false
+      add_interaction_seconds
+      log_participation(user)
+      log_gets
+      finalize_page_view
+    else
+      @page_view.destroy if @page_view && !@page_view.new_record?
     end
+  rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
+    Canvas::Errors.capture_exception(:page_view, e)
+    logger.error "Pageview error!"
+    raise e if Rails.env.development?
+
+    true
   end
 
   def add_interaction_seconds
@@ -2144,29 +2142,27 @@ class ApplicationController < ActionController::Base
     feature = feature.to_sym
     return @features_enabled[feature] if @features_enabled[feature] != nil
 
-    @features_enabled[feature] ||= begin
-      if [:question_banks].include?(feature)
-        true
-      elsif feature == :twitter
-        !!Twitter::Connection.config
-      elsif feature == :diigo
-        !!Diigo::Connection.config
-      elsif feature == :google_drive
-        Canvas::Plugin.find(:google_drive).try(:enabled?)
-      elsif feature == :etherpad
-        !!EtherpadCollaboration.config
-      elsif feature == :kaltura
-        !!CanvasKaltura::ClientV3.config
-      elsif feature == :web_conferences
-        !!WebConference.config
-      elsif feature == :vericite
-        Canvas::Plugin.find(:vericite).try(:enabled?)
-      elsif feature == :lockdown_browser
-        Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
-      else
-        !!AccountServices.allowable_services[feature]
-      end
-    end
+    @features_enabled[feature] ||= if [:question_banks].include?(feature)
+                                     true
+                                   elsif feature == :twitter
+                                     !!Twitter::Connection.config
+                                   elsif feature == :diigo
+                                     !!Diigo::Connection.config
+                                   elsif feature == :google_drive
+                                     Canvas::Plugin.find(:google_drive).try(:enabled?)
+                                   elsif feature == :etherpad
+                                     !!EtherpadCollaboration.config
+                                   elsif feature == :kaltura
+                                     !!CanvasKaltura::ClientV3.config
+                                   elsif feature == :web_conferences
+                                     !!WebConference.config
+                                   elsif feature == :vericite
+                                     Canvas::Plugin.find(:vericite).try(:enabled?)
+                                   elsif feature == :lockdown_browser
+                                     Canvas::Plugin.all_for_tag(:lockdown_browser).any? { |p| p.settings[:enabled] }
+                                   else
+                                     !!AccountServices.allowable_services[feature]
+                                   end
   end
   helper_method :feature_enabled?
 
@@ -2732,15 +2728,13 @@ class ApplicationController < ActionController::Base
   end
 
   def user_has_google_drive
-    @user_has_google_drive ||= begin
-      if logged_in_user
-        Rails.cache.fetch_with_batched_keys('user_has_google_drive', batch_object: logged_in_user, batched_keys: :user_services) do
-          google_drive_connection.authorized?
-        end
-      else
-        google_drive_connection.authorized?
-      end
-    end
+    @user_has_google_drive ||= if logged_in_user
+                                 Rails.cache.fetch_with_batched_keys('user_has_google_drive', batch_object: logged_in_user, batched_keys: :user_services) do
+                                   google_drive_connection.authorized?
+                                 end
+                               else
+                                 google_drive_connection.authorized?
+                               end
   end
 
   def setup_live_events_context

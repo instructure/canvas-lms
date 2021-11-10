@@ -99,19 +99,15 @@ describe BasicLTI::BasicOutcomes do
 
   context "Exceptions" do
     it "BasicLTI::BasicOutcomes::Unauthorized should have 401 status" do
-      begin
-        raise BasicLTI::BasicOutcomes::Unauthorized, "Invalid signature"
-      rescue BasicLTI::BasicOutcomes::Unauthorized => e
-        expect(e.response_status).to be 401
-      end
+      raise BasicLTI::BasicOutcomes::Unauthorized, "Invalid signature"
+    rescue BasicLTI::BasicOutcomes::Unauthorized => e
+      expect(e.response_status).to be 401
     end
 
     it "BasicLTI::BasicOutcomes::InvalidRequest should have 415 status" do
-      begin
-        raise BasicLTI::BasicOutcomes::InvalidRequest, "Invalid request"
-      rescue BasicLTI::BasicOutcomes::InvalidRequest => e
-        expect(e.response_status).to be 415
-      end
+      raise BasicLTI::BasicOutcomes::InvalidRequest, "Invalid request"
+    rescue BasicLTI::BasicOutcomes::InvalidRequest => e
+      expect(e.response_status).to be 415
     end
   end
 

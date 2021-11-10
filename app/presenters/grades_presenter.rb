@@ -23,19 +23,15 @@ class GradesPresenter
   end
 
   def student_enrollments
-    @student_enrollments ||= begin
-      current_enrollments.select { |e| e.student? }.index_by { |e| e.course }
-    end
+    @student_enrollments ||= current_enrollments.select { |e| e.student? }.index_by { |e| e.course }
   end
 
   def observed_enrollments
-    @observed_enrollments ||= begin
-      observer_enrollments.map { |e|
-        e.shard.activate do
-          StudentEnrollment.active.where(user_id: e.associated_user_id, course_id: e.course_id).first
-        end
-      }.uniq.compact
-    end
+    @observed_enrollments ||= observer_enrollments.map { |e|
+      e.shard.activate do
+        StudentEnrollment.active.where(user_id: e.associated_user_id, course_id: e.course_id).first
+      end
+    }.uniq.compact
   end
 
   def course_grade_summaries
@@ -76,14 +72,10 @@ class GradesPresenter
   private
 
   def observer_enrollments
-    @observer_enrollments ||= begin
-      current_enrollments.select { |e| e.is_a?(ObserverEnrollment) && e.associated_user_id }
-    end
+    @observer_enrollments ||= current_enrollments.select { |e| e.is_a?(ObserverEnrollment) && e.associated_user_id }
   end
 
   def current_enrollments
-    @current_enrollments ||= begin
-      @enrollments.select { |e| e.state_based_on_date == :active }
-    end
+    @current_enrollments ||= @enrollments.select { |e| e.state_based_on_date == :active }
   end
 end

@@ -81,31 +81,29 @@ class ReportSnapshot < ActiveRecord::Base
   scope :progressive, -> { where(:report_type => 'counts_progressive_detailed') }
 
   def push_to_instructure_if_collection_enabled
-    begin
-      return if self.report_type != REPORT_TO_SEND
-      return if self.account != Account.default
+    return if self.report_type != REPORT_TO_SEND
+    return if self.account != Account.default
 
-      collection_type = Setting.get("usage_statistics_collection", "opt_out")
-      return if collection_type == "opt_out"
+    collection_type = Setting.get("usage_statistics_collection", "opt_out")
+    return if collection_type == "opt_out"
 
-      require 'lib/ssl_common'
+    require 'lib/ssl_common'
 
-      data = {
-        "collection_type" => collection_type,
-        "installation_uuid" => Canvas.installation_uuid,
-        "report_type" => self.report_type,
-        "data" => read_attribute(:data),
-        "rails_env" => Rails.env
-      }
+    data = {
+      "collection_type" => collection_type,
+      "installation_uuid" => Canvas.installation_uuid,
+      "report_type" => self.report_type,
+      "data" => read_attribute(:data),
+      "rails_env" => Rails.env
+    }
 
-      if collection_type == "opt_in"
-        data["account_name"] = Account.default.name
-        data["admin_email"] = Account.site_admin.users.first.pseudonyms.first.unique_id
-      end
-
-      SSLCommon.post_form(STATS_COLLECTION_URL, data)
-    rescue
-      nil
+    if collection_type == "opt_in"
+      data["account_name"] = Account.default.name
+      data["admin_email"] = Account.site_admin.users.first.pseudonyms.first.unique_id
     end
+
+    SSLCommon.post_form(STATS_COLLECTION_URL, data)
+  rescue
+    nil
   end
 end

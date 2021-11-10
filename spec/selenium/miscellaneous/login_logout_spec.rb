@@ -93,15 +93,13 @@ describe "login logout test" do
   end
 
   it "fails on an invalid authenticity token", priority: "1" do
-    begin
-      user_with_pseudonym({ :active_user => true })
-      get "/login"
-      driver.execute_script "$.cookie('_csrf_token', '42')"
-      fill_in_login_form("nobody@example.com", 'asdfasdf')
-      assert_flash_error_message "Invalid Authenticity Token"
-    ensure
-      driver.execute_script "$.cookie('_csrf_token', '', { expires: -1 })"
-    end
+    user_with_pseudonym({ :active_user => true })
+    get "/login"
+    driver.execute_script "$.cookie('_csrf_token', '42')"
+    fill_in_login_form("nobody@example.com", 'asdfasdf')
+    assert_flash_error_message "Invalid Authenticity Token"
+  ensure
+    driver.execute_script "$.cookie('_csrf_token', '', { expires: -1 })"
   end
 
   it "logins when a trusted referer exists", priority: "2" do

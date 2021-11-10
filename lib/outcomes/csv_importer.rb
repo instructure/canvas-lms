@@ -96,17 +96,15 @@ module Outcomes
     def parse_batch(headers, batch)
       Account.transaction do
         results = batch.map do |row, line|
-          begin
-            utf8_row = row.map(&method(:check_encoding))
-            import_row(headers, utf8_row) unless utf8_row.all?(&:blank?)
-            []
-          rescue ParseError, InvalidDataError => e
-            [[line, e.message]]
-          rescue ActiveRecord::RecordInvalid => e
-            errors = e.record.errors
-            errors.set_reporter(:array, :human)
-            errors.to_a.map { |err| [line, err] }
-          end
+          utf8_row = row.map(&method(:check_encoding))
+          import_row(headers, utf8_row) unless utf8_row.all?(&:blank?)
+          []
+        rescue ParseError, InvalidDataError => e
+          [[line, e.message]]
+        rescue ActiveRecord::RecordInvalid => e
+          errors = e.record.errors
+          errors.set_reporter(:array, :human)
+          errors.to_a.map { |err| [line, err] }
         end
 
         results.flatten(1)

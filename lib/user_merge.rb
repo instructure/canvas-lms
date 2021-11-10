@@ -140,25 +140,23 @@ class UserMerge
       version_updates = ['rubric_assessments', 'wiki_pages']
       touching_updates = ['access_tokens', 'group_memberships']
       updates.each do |table, column|
-        begin
-          klass = table.classify.constantize
-          if klass.new.respond_to?("#{column}=".to_sym)
-            scope = klass.where(column => from_user)
-            klass.transaction do
-              if version_updates.include?(table)
-                update_versions(scope, table, column)
-              end
-
-              update = { column => target_user.id }
-              if touching_updates.include?(table) && klass.column_names.include?('updated_at')
-                update[:updated_at] = Time.now.utc
-              end
-              scope.update_all(update)
+        klass = table.classify.constantize
+        if klass.new.respond_to?("#{column}=".to_sym)
+          scope = klass.where(column => from_user)
+          klass.transaction do
+            if version_updates.include?(table)
+              update_versions(scope, table, column)
             end
+
+            update = { column => target_user.id }
+            if touching_updates.include?(table) && klass.column_names.include?('updated_at')
+              update[:updated_at] = Time.now.utc
+            end
+            scope.update_all(update)
           end
-        rescue => e
-          Rails.logger.error "migrating #{table} column #{column} failed: #{e}"
         end
+      rescue => e
+        Rails.logger.error "migrating #{table} column #{column} failed: #{e}"
       end
 
       context_updates = ['calendar_events']
@@ -602,46 +600,44 @@ class UserMerge
       [:assignment_id, :submissions],
       [:quiz_id, :'quizzes/quiz_submissions']
     ].each do |unique_id, table|
-      begin
-        # Submissions are a special case since there's a unique index
-        # on the table, and if both the old user and the new user
-        # have a submission for the same assignment there will be
-        # a conflict.
-        model = table.to_s.classify.constantize
-        already_scope = model.where(:user_id => target_user)
-        scope = model.where(:user_id => from_user)
-        if model.name == "Submission"
-          # we prefer submissions that have grades then submissions that have
-          # a submission... that sort of makes sense.
-          # we swap empty objects in cases of collision so that we don't
-          # end up causing a unique index violation for a given assignment for
-          # the either user, but also so we don't destroy submissions in case
-          # of a user split.
-          to_move_ids = scope.graded.select(unique_id).where.not(unique_id => already_scope.graded.select(unique_id)).pluck(:id)
-          to_move_ids += scope.having_submission
-                              .select(unique_id)
-                              .where.not(unique_id => already_scope.having_submission.select(unique_id))
-                              .where.not(id: to_move_ids)
-                              .pluck(:id)
-          to_move = scope.where(id: to_move_ids).to_a
-          move_back = already_scope.where(unique_id => to_move.map(&unique_id)).to_a
-          merge_data.build_more_data(to_move, data: data) unless to_move.empty?
-          merge_data.build_more_data(move_back, data: data) unless move_back.empty?
-          swap_submission(model, move_back, table, to_move, to_move_ids, 'fk_rails_8d85741475')
-        elsif model.name == "Quizzes::QuizSubmission"
-          subscope = already_scope.to_a
-          to_move = model.where(user_id: from_user).joins(:submission).where(submissions: { user_id: target_user }).to_a
-          move_back = model.where(user_id: target_user).joins(:submission).where(submissions: { user_id: from_user }).to_a
+      # Submissions are a special case since there's a unique index
+      # on the table, and if both the old user and the new user
+      # have a submission for the same assignment there will be
+      # a conflict.
+      model = table.to_s.classify.constantize
+      already_scope = model.where(:user_id => target_user)
+      scope = model.where(:user_id => from_user)
+      if model.name == "Submission"
+        # we prefer submissions that have grades then submissions that have
+        # a submission... that sort of makes sense.
+        # we swap empty objects in cases of collision so that we don't
+        # end up causing a unique index violation for a given assignment for
+        # the either user, but also so we don't destroy submissions in case
+        # of a user split.
+        to_move_ids = scope.graded.select(unique_id).where.not(unique_id => already_scope.graded.select(unique_id)).pluck(:id)
+        to_move_ids += scope.having_submission
+                            .select(unique_id)
+                            .where.not(unique_id => already_scope.having_submission.select(unique_id))
+                            .where.not(id: to_move_ids)
+                            .pluck(:id)
+        to_move = scope.where(id: to_move_ids).to_a
+        move_back = already_scope.where(unique_id => to_move.map(&unique_id)).to_a
+        merge_data.build_more_data(to_move, data: data) unless to_move.empty?
+        merge_data.build_more_data(move_back, data: data) unless move_back.empty?
+        swap_submission(model, move_back, table, to_move, to_move_ids, 'fk_rails_8d85741475')
+      elsif model.name == "Quizzes::QuizSubmission"
+        subscope = already_scope.to_a
+        to_move = model.where(user_id: from_user).joins(:submission).where(submissions: { user_id: target_user }).to_a
+        move_back = model.where(user_id: target_user).joins(:submission).where(submissions: { user_id: from_user }).to_a
 
-          to_move += scope.where("#{unique_id} NOT IN (?)", [subscope.map(&unique_id), move_back.map(&unique_id)].flatten).to_a
-          move_back += already_scope.where(unique_id => to_move.map(&unique_id)).to_a
-          merge_data.build_more_data(to_move, data: data)
-          merge_data.build_more_data(move_back, data: data)
-          swap_submission(model, move_back, table, to_move, to_move, 'fk_rails_04850db4b4')
-        end
-      rescue => e
-        Rails.logger.error "migrating #{table} column user_id failed: #{e}"
+        to_move += scope.where("#{unique_id} NOT IN (?)", [subscope.map(&unique_id), move_back.map(&unique_id)].flatten).to_a
+        move_back += already_scope.where(unique_id => to_move.map(&unique_id)).to_a
+        merge_data.build_more_data(to_move, data: data)
+        merge_data.build_more_data(move_back, data: data)
+        swap_submission(model, move_back, table, to_move, to_move, 'fk_rails_04850db4b4')
       end
+    rescue => e
+      Rails.logger.error "migrating #{table} column user_id failed: #{e}"
     end
     merge_data.bulk_insert_merge_data(data) unless data.empty?
     @data = []
@@ -673,25 +669,23 @@ class UserMerge
       version_ids = []
       Version.where(:versionable_type => versionable_type, :versionable_id => ids).find_in_batches(strategy: :cursor) do |versions|
         versions.each do |version|
-          begin
-            version_attrs = YAML.load(version.yaml)
-            if version_attrs[column.to_s] == from_user.id
-              version_attrs[column.to_s] = target_user.id
-            end
-            # i'm pretty sure simply_versioned just stores fields as strings, but
-            # i haven't had time to verify that 100% yet, so better safe than sorry
-            if version_attrs[column.to_sym] == from_user.id
-              version_attrs[column.to_sym] = target_user.id
-            end
-            version.yaml = version_attrs.to_yaml
-            version.save!
-            if versionable_type == 'Submission'
-              version_ids << version.id
-            end
-          rescue => e
-            Rails.logger.error "migrating versions for #{table} column #{column} failed: #{e}"
-            raise e unless Rails.env.production?
+          version_attrs = YAML.load(version.yaml)
+          if version_attrs[column.to_s] == from_user.id
+            version_attrs[column.to_s] = target_user.id
           end
+          # i'm pretty sure simply_versioned just stores fields as strings, but
+          # i haven't had time to verify that 100% yet, so better safe than sorry
+          if version_attrs[column.to_sym] == from_user.id
+            version_attrs[column.to_sym] = target_user.id
+          end
+          version.yaml = version_attrs.to_yaml
+          version.save!
+          if versionable_type == 'Submission'
+            version_ids << version.id
+          end
+        rescue => e
+          Rails.logger.error "migrating versions for #{table} column #{column} failed: #{e}"
+          raise e unless Rails.env.production?
         end
       end
       if version_ids.present?

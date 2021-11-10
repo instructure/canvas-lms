@@ -39,15 +39,13 @@ module Importers
       load_questions!(link_map)
 
       link_map.each do |item_key, field_links|
-        begin
-          item_key[:item] ||= retrieve_item(item_key)
+        item_key[:item] ||= retrieve_item(item_key)
 
-          replace_item_placeholders!(item_key, field_links)
+        replace_item_placeholders!(item_key, field_links)
 
-          add_missing_link_warnings!(item_key, field_links)
-        rescue
-          @migration.add_warning("An error occurred while translating content links", $!)
-        end
+        add_missing_link_warnings!(item_key, field_links)
+      rescue
+        @migration.add_warning("An error occurred while translating content links", $!)
       end
     end
 

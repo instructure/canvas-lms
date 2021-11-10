@@ -901,18 +901,16 @@ class DiscussionTopic < ActiveRecord::Base
   def can_unpublish?(opts = {})
     return @can_unpublish unless @can_unpublish.nil?
 
-    @can_unpublish = begin
-      if self.assignment
-        !self.assignment.has_student_submissions?
-      else
-        student_ids = opts[:student_ids] || self.context.all_real_student_enrollments.select(:user_id)
-        if self.for_group_discussion?
-          !DiscussionEntry.active.joins(:discussion_topic).merge(child_topics).where(user_id: student_ids).exists?
-        else
-          !self.discussion_entries.active.where(:user_id => student_ids).exists?
-        end
-      end
-    end
+    @can_unpublish = if self.assignment
+                       !self.assignment.has_student_submissions?
+                     else
+                       student_ids = opts[:student_ids] || self.context.all_real_student_enrollments.select(:user_id)
+                       if self.for_group_discussion?
+                         !DiscussionEntry.active.joins(:discussion_topic).merge(child_topics).where(user_id: student_ids).exists?
+                       else
+                         !self.discussion_entries.active.where(:user_id => student_ids).exists?
+                       end
+                     end
   end
   attr_writer :can_unpublish
 

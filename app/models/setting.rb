@@ -29,39 +29,37 @@ class Setting < Switchman::UnshardedRecord
   end
 
   def self.get(name, default, expires_in: nil, set_if_nx: false)
-    begin
-      cache.fetch(name, expires_in: expires_in) do
-        if @skip_cache && expires_in
-          obj = Setting.find_by(name: name)
-          Setting.set(name, default) if !obj && set_if_nx
-          next obj ? obj.value&.to_s : default&.to_s
-        end
-
-        fetch = Proc.new { Setting.pluck(:name, :value).to_h }
-        all_settings = if @skip_cache
-                         # we want to skip talking to redis, but it's okay to use the in-proc cache
-                         @all_settings ||= fetch.call
-                       elsif expires_in
-                         # ignore the in-proc cache, but check redis; it will have been properly
-                         # cleared by whoever set it, they just have no way to clear the in-proc cache
-                         @all_settings = MultiCache.fetch("all_settings", &fetch)
-                       else
-                         # use both caches
-                         @all_settings ||= MultiCache.fetch("all_settings", &fetch)
-                       end
-
-        if all_settings.key?(name)
-          all_settings[name]&.to_s
-        else
-          Setting.set(name, default) if set_if_nx
-          default&.to_s
-        end
+    cache.fetch(name, expires_in: expires_in) do
+      if @skip_cache && expires_in
+        obj = Setting.find_by(name: name)
+        Setting.set(name, default) if !obj && set_if_nx
+        next obj ? obj.value&.to_s : default&.to_s
       end
-    rescue ActiveRecord::StatementInvalid, ActiveRecord::ConnectionNotEstablished => e
-      # the db may not exist yet
-      Rails.logger.warn("Unable to read setting: #{e}") if Rails.logger
-      default&.to_s
+
+      fetch = Proc.new { Setting.pluck(:name, :value).to_h }
+      all_settings = if @skip_cache
+                       # we want to skip talking to redis, but it's okay to use the in-proc cache
+                       @all_settings ||= fetch.call
+                     elsif expires_in
+                       # ignore the in-proc cache, but check redis; it will have been properly
+                       # cleared by whoever set it, they just have no way to clear the in-proc cache
+                       @all_settings = MultiCache.fetch("all_settings", &fetch)
+                     else
+                       # use both caches
+                       @all_settings ||= MultiCache.fetch("all_settings", &fetch)
+                     end
+
+      if all_settings.key?(name)
+        all_settings[name]&.to_s
+      else
+        Setting.set(name, default) if set_if_nx
+        default&.to_s
+      end
     end
+  rescue ActiveRecord::StatementInvalid, ActiveRecord::ConnectionNotEstablished => e
+    # the db may not exist yet
+    Rails.logger.warn("Unable to read setting: #{e}") if Rails.logger
+    default&.to_s
   end
 
   # Note that after calling this, you should send SIGHUP to all running Canvas processes

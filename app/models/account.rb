@@ -1274,16 +1274,14 @@ class Account < ActiveRecord::Base
     return [] unless user
 
     @account_users_cache ||= {}
-    @account_users_cache[user.global_id] ||= begin
-      if self.site_admin?
-        account_users_for(user) # has own cache
-      else
-        Rails.cache.fetch_with_batched_keys(['account_users_for_user', user.cache_key(:account_users)].cache_key,
-                                            batch_object: self, batched_keys: :account_chain, skip_cache_if_disabled: true) do
-          account_users_for(user).each(&:clear_association_cache)
-        end
-      end
-    end
+    @account_users_cache[user.global_id] ||= if self.site_admin?
+                                               account_users_for(user) # has own cache
+                                             else
+                                               Rails.cache.fetch_with_batched_keys(['account_users_for_user', user.cache_key(:account_users)].cache_key,
+                                                                                   batch_object: self, batched_keys: :account_chain, skip_cache_if_disabled: true) do
+                                                 account_users_for(user).each(&:clear_association_cache)
+                                               end
+                                             end
   end
 
   # returns all active account users for this entire account tree

@@ -82,9 +82,7 @@ module Lti
     end
 
     def submission_event_service
-      @_submission_event_service ||= begin
-        tool_proxy.find_service(SUBMISSION_EVENT_ID, 'POST')
-      end
+      @_submission_event_service ||= tool_proxy.find_service(SUBMISSION_EVENT_ID, 'POST')
     end
 
     def format

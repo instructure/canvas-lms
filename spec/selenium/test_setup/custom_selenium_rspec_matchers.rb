@@ -276,13 +276,11 @@ module CustomSeleniumRSpecMatchers
   #
   matcher :contain_css do |selector|
     match do |element|
-      begin
-        # rely on implicit_wait
-        f(selector, element)
-        true
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-        false
-      end
+      # rely on implicit_wait
+      f(selector, element)
+      true
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      false
     end
 
     match_when_negated do |element|
@@ -317,13 +315,11 @@ module CustomSeleniumRSpecMatchers
   #
   matcher :contain_link do |text|
     match do |element|
-      begin
-        # rely on implicit_wait
-        fln(text, element)
-        true
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-        false
-      end
+      # rely on implicit_wait
+      fln(text, element)
+      true
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      false
     end
 
     match_when_negated do |element|
@@ -341,13 +337,11 @@ module CustomSeleniumRSpecMatchers
   #
   matcher :contain_link_partial_text do |text|
     match do |element|
-      begin
-        # rely on implicit_wait
-        flnpt(text, element)
-        true
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-        false
-      end
+      # rely on implicit_wait
+      flnpt(text, element)
+      true
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      false
     end
 
     match_when_negated do |element|

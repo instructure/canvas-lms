@@ -31,8 +31,6 @@ class GradingPeriodGradeSummaryPresenter < GradeSummaryPresenter
   end
 
   def groups
-    @groups ||= begin
-      assignments.uniq(&:assignment_group_id).map(&:assignment_group)
-    end
+    @groups ||= assignments.uniq(&:assignment_group_id).map(&:assignment_group)
   end
 end

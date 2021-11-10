@@ -1012,15 +1012,13 @@ class Course < ActiveRecord::Base
 
   def preload_user_roles!
     # plz to use before you make a billion calls to user_has_been_X? with different users
-    @user_ids_by_enroll_type ||= begin
-      self.shard.activate do
-        map = {}
-        self.enrollments.active.pluck(:user_id, :type).each do |user_id, type|
-          map[type] ||= []
-          map[type] << user_id
-        end
-        map
+    @user_ids_by_enroll_type ||= self.shard.activate do
+      map = {}
+      self.enrollments.active.pluck(:user_id, :type).each do |user_id, type|
+        map[type] ||= []
+        map[type] << user_id
       end
+      map
     end
   end
 
@@ -2086,18 +2084,16 @@ class Course < ActiveRecord::Base
     timeout_options = { raise_on_timeout: true, fallback_timeout_length: default_timeout }
 
     posts_to_make.each do |enrollment_ids, res, mime_type, headers = {}|
-      begin
-        posted_enrollment_ids += enrollment_ids
-        if res
-          Canvas.timeout_protection("send_final_grades_to_endpoint:#{global_root_account_id}", timeout_options) do
-            SSLCommon.post_data(settings[:publish_endpoint], res, mime_type, headers)
-          end
+      posted_enrollment_ids += enrollment_ids
+      if res
+        Canvas.timeout_protection("send_final_grades_to_endpoint:#{global_root_account_id}", timeout_options) do
+          SSLCommon.post_data(settings[:publish_endpoint], res, mime_type, headers)
         end
-        Enrollment.where(:id => enrollment_ids).update_all(:grade_publishing_status => (should_kick_off_grade_publishing_timeout? ? "publishing" : "published"), :grade_publishing_message => nil)
-      rescue => e
-        errors << e
-        Enrollment.where(:id => enrollment_ids).update_all(:grade_publishing_status => "error", :grade_publishing_message => e.to_s)
       end
+      Enrollment.where(:id => enrollment_ids).update_all(:grade_publishing_status => (should_kick_off_grade_publishing_timeout? ? "publishing" : "published"), :grade_publishing_message => nil)
+    rescue => e
+      errors << e
+      Enrollment.where(:id => enrollment_ids).update_all(:grade_publishing_status => "error", :grade_publishing_message => e.to_s)
     end
 
     Enrollment.where(:id => (all_enrollment_ids.to_set - posted_enrollment_ids.to_set).to_a).update_all(:grade_publishing_status => "unpublishable", :grade_publishing_message => nil)

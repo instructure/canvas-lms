@@ -378,11 +378,9 @@ module VeriCite
 
     SUCCESSFUL_RETURN_CODES = (200..299)
     def is_response_success?(response)
-      begin
-        response && response.key?(:return_code) && SUCCESSFUL_RETURN_CODES.cover?(Integer(response[:return_code]))
-      rescue
-        false
-      end
+      response && response.key?(:return_code) && SUCCESSFUL_RETURN_CODES.cover?(Integer(response[:return_code]))
+    rescue
+      false
     end
 
     def response_error_hash(response)
