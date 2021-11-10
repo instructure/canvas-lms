@@ -286,13 +286,13 @@ class RoleOverride < ActiveRecord::Base
       },
       :view_feature_flags => {
         :label => lambda { t("View feature settings at an account level") },
-        :label_v2 => lambda { t("Feature Previews - view") },
+        :label_v2 => lambda { t("Feature Options - view") },
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
       },
       :manage_feature_flags => {
         :label => lambda { t('permissions.manage_feature_flags', "Enable or disable features at an account level") },
-        :label_v2 => lambda { t("Feature Previews - enable / disable") },
+        :label_v2 => lambda { t("Feature Options - enable / disable") },
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
       },
