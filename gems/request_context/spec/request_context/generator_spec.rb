@@ -23,7 +23,7 @@ require 'timecop'
 
 describe "RequestContext::Generator" do
   let(:env) { {} }
-  let(:request) { double('Rack::Request', path_parameters: { controller: 'users', action: 'index' }) }
+  let(:request) { double('Rack::Request', path_parameters: { controller: 'users', action: 'index' }, request_parameters: { "operationName" => "GetDiscussionQuery" }) }
   let(:context) { double('Course', class: 'Course', id: 15) }
 
   it "generates the X-Canvas-Meta response header" do
@@ -42,7 +42,7 @@ describe "RequestContext::Generator" do
       RequestContext::Generator.store_request_meta(request, nil)
       [200, {}, []]
     }).call(env)
-    expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;"
+    expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;on=GetDiscussionQuery;"
   end
 
   it "adds request and context data to X-Canvas-Meta" do
@@ -51,7 +51,7 @@ describe "RequestContext::Generator" do
       RequestContext::Generator.store_request_meta(request, context)
       [200, {}, []]
     }).call(env)
-    expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;t=Course;i=15;"
+    expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;on=GetDiscussionQuery;t=Course;i=15;"
   end
 
   it "adds page view data to X-Canvas-Meta" do
