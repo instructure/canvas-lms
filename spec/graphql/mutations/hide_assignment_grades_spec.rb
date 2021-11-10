@@ -88,7 +88,7 @@ describe Mutations::HideAssignmentGrades do
     describe "hiding the grades" do
       let(:hide_submissions_job) { Delayed::Job.where(tag: "Assignment#hide_submissions").order(:id).last }
 
-      before(:each) do
+      before do
         @student_submission = assignment.submissions.find_by(user: student)
         @student_submission.update!(posted_at: Time.zone.now)
       end
@@ -134,7 +134,7 @@ describe Mutations::HideAssignmentGrades do
       describe "section_ids" do
         let(:section2) { course.course_sections.create! }
 
-        before(:each) do
+        before do
           @section2_student = section2.enroll_user(User.create!, "StudentEnrollment", "active").user
           @student2_submission = assignment.submissions.find_by(user: @section2_student)
           @student2_submission.update!(posted_at: Time.zone.now)
@@ -162,7 +162,7 @@ describe Mutations::HideAssignmentGrades do
       describe "only_student_ids" do
         let(:student2) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
 
-        before(:each) do
+        before do
           @student2_submission = assignment.submissions.find_by(user: student2)
           @student2_submission.update!(posted_at: Time.zone.now)
         end
@@ -189,7 +189,7 @@ describe Mutations::HideAssignmentGrades do
       describe "skip_student_ids" do
         let(:student2) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
 
-        before(:each) do
+        before do
           @student2_submission = assignment.submissions.find_by(user: student2)
           @student2_submission.update!(posted_at: Time.zone.now)
         end
@@ -223,7 +223,7 @@ describe Mutations::HideAssignmentGrades do
         let(:secret_student) { User.create! }
         let(:secret_section) { course.course_sections.create! }
 
-        before(:each) do
+        before do
           Enrollment.limit_privileges_to_course_section!(course, teacher, true)
           course.enroll_student(secret_student, enrollment_state: "active", section: secret_section)
 

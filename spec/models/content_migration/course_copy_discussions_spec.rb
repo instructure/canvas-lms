@@ -21,7 +21,7 @@ require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "course copy discussions" do
-    include_examples "course copy"
+    include_context "course copy"
 
     it "copies discussion topic attributes" do
       topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>",

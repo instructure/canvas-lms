@@ -59,11 +59,11 @@ module Lti
     private
 
     def lti_service_context
-      @lti_service_context ||= begin
-        return context_from_id(Account, params[:account_id]) if params.include?(:account_id)
-
-        context_from_id(Course, params[:course_id])
-      end
+      @lti_service_context ||= if params.include?(:account_id)
+                                 context_from_id(Account, params[:account_id])
+                               else
+                                 context_from_id(Course, params[:course_id])
+                               end
     end
 
     def context_from_id(context_type, context_id)

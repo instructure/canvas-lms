@@ -51,7 +51,7 @@ describe CanvasKaltura::ClientV3 do
       .to_return(:body => "<result>#{ks}</result>")
   end
 
-  before(:each) do
+  before do
     CanvasKaltura.cache = double(read: nil)
     CanvasKaltura.logger = double.as_null_object
     CanvasKaltura.timeout_protector_proc = lambda { |_options, &block| block.call }

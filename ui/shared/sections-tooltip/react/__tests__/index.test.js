@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global expect */
 import React from 'react'
 import {mount, shallow} from 'enzyme'
 import SectionTooltip from '../index'
 
 const defaultProps = () => ({
-  sections: [{id: 2, name: 'sections name', user_count: 4}]
+  sections: [{id: 2, name: 'sections name', user_count: 4}],
+  totalUserCount: 5
 })
 
 test('renders the SectionTooltip component', () => {
@@ -43,17 +43,16 @@ test('renders all sections if no sections are given', () => {
   props.sections = null
   const tree = mount(<SectionTooltip {...props} />)
   const node = tree.find('Text')
-  expect(node.text()).toBe('All Sections')
+  expect(node.at(0).text()).toBe('All Sections')
+  expect(node.at(1).text()).toBe('(5 Students)')
 })
 
 test('renders tooltip text correcly with sections', () => {
   const tree = shallow(<SectionTooltip {...defaultProps()} />)
   const node = tree.find('Tooltip')
-  expect(
-    mount(node.prop('tip')[0])
-      .find('View Text')
-      .text()
-  ).toBe('sections name (4 Users)')
+  expect(mount(node.prop('renderTip')[0]).find('View Text').text()).toBe(
+    'sections name (4 Students)'
+  )
 })
 
 test('renders multiple sections into tooltip', () => {
@@ -61,12 +60,10 @@ test('renders multiple sections into tooltip', () => {
   props.sections[1] = {id: 3, name: 'section other name', user_count: 8}
   const tree = shallow(<SectionTooltip {...props} />)
   const node = tree.find('Tooltip')
-  expect(node.prop('tip')).toHaveLength(2)
-  expect(
-    mount(node.prop('tip')[1])
-      .find('View Text')
-      .text()
-  ).toBe('section other name (8 Users)')
+  expect(node.prop('renderTip')).toHaveLength(2)
+  expect(mount(node.prop('renderTip')[1]).find('View Text').text()).toBe(
+    'section other name (8 Students)'
+  )
 })
 
 test('does not renders tooltip text when All Sections', () => {

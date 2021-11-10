@@ -571,7 +571,6 @@ class RoleOverride < ActiveRecord::Base
         :true_for => %w(TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin),
         :available_to => %w(TeacherEnrollment TaEnrollment DesignerEnrollment AccountAdmin AccountMembership)
       },
-
       manage_admin_users: {
         label: lambda { t("permissions.manage_admin_users", "Add/remove other teachers, course designers or TAs to the course") },
         label_v2: lambda { t("Users - add / remove teachers, course designers, or TAs in courses") },
@@ -588,7 +587,6 @@ class RoleOverride < ActiveRecord::Base
         ],
         account_allows: lambda { |a| !a.root_account.feature_enabled?(:granular_permissions_manage_users) }
       },
-
       allow_course_admin_actions: {
         label: lambda { t("Allow administrative actions in courses") },
         label_v2: lambda { t("Users - allow administrative actions in courses") },
@@ -605,7 +603,6 @@ class RoleOverride < ActiveRecord::Base
         ],
         account_allows: lambda { |a| a.root_account.feature_enabled?(:granular_permissions_manage_users) }
       },
-
       add_teacher_to_course: {
         label: lambda { t("Add Teachers to courses") },
         label_v2: lambda { t("Teachers - add") },
@@ -754,7 +751,6 @@ class RoleOverride < ActiveRecord::Base
         group_label: lambda { t("Users - Designers") },
         account_allows: lambda { |a| a.root_account.feature_enabled?(:granular_permissions_manage_users) }
       },
-
       :manage_assignments => {
         label: -> { t('permissions.manage_assignments', "Manage (add / edit / delete) assignments and quizzes") },
         label_v2: -> { t("Assignments and Quizzes - add / edit / delete") },

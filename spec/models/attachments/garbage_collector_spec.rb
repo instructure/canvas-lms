@@ -28,6 +28,7 @@ describe Attachments::GarbageCollector do
         uploaded_data: stub_file_data("folder.zip", "hi", "application/zip")
       )
     end
+
     let_once(:gc) { Attachments::GarbageCollector::FolderContextType.new }
 
     before do
@@ -117,6 +118,7 @@ describe Attachments::GarbageCollector do
         uploaded_data: stub_file_data("folder.zip", "hi", "application/zip")
       )
     end
+
     let_once(:gc) { Attachments::GarbageCollector::ContentExportContextType.new(older_than: 1.day.ago) }
 
     it "only deletes older than given timestamp" do

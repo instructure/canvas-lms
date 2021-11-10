@@ -66,6 +66,7 @@ describe Quizzes::QuizUserFinder do
 
   context "differentiated_assignments" do
     before { @quiz.only_visible_to_overrides = true; @quiz.save! }
+
     it "(#all_students_with_visibility) filters students if DA is on" do
       expect(@finder.unsubmitted_students).not_to include(@unsubmitted_student)
       create_section_override_for_quiz(@quiz, { course_section: @unsubmitted_student.enrollments.current.first.course_section })

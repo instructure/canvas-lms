@@ -63,6 +63,7 @@ describe Lti::DataServicesController do
       let(:params_overrides) do
         { subscription: subscription, account_id: root_account.lti_context_id }
       end
+
       it 'adds OwnerId and OwnerType if passed in for a tool' do
         expect(Services::LiveEventsSubscriptionService).to receive(:create).with(any_args,
                                                                                  hash_including(subscription.merge(OwnerId: tool.global_id.to_s, OwnerType: 'external_tool')))

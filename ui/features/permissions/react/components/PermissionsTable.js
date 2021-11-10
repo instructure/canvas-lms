@@ -225,7 +225,7 @@ export default class PermissionsTable extends Component {
                 variant="link"
                 onClick={() => this.props.setAndOpenPermissionTray(perm)}
                 id={`permission_${name}`}
-                theme={{mediumPadding: '0', mediumHeight: 'normal'}}
+                theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
                 fluidWidth
               >
                 {perm.label}

@@ -127,7 +127,8 @@ export const K5Dashboard = ({
   assignmentsDueToday,
   assignmentsMissing,
   assignmentsCompletedForToday,
-  createPermissions,
+  createPermission,
+  restrictCourseCreation,
   currentUser,
   currentUserRoles,
   timeZone,
@@ -338,7 +339,8 @@ export const K5Dashboard = ({
             )}
             <HomeroomPage
               cards={cards}
-              createPermissions={createPermissions}
+              createPermission={createPermission}
+              restrictCourseCreation={restrictCourseCreation}
               homeroomAnnouncements={homeroomAnnouncements}
               loadingAnnouncements={loadingAnnouncements}
               visible={currentTab === TAB_IDS.HOMEROOM}
@@ -401,7 +403,8 @@ K5Dashboard.propTypes = {
   assignmentsDueToday: PropTypes.object.isRequired,
   assignmentsMissing: PropTypes.object.isRequired,
   assignmentsCompletedForToday: PropTypes.object.isRequired,
-  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']),
+  createPermission: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']),
+  restrictCourseCreation: PropTypes.bool.isRequired,
   currentUser: PropTypes.shape({
     id: PropTypes.string,
     display_name: PropTypes.string,

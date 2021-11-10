@@ -30,7 +30,7 @@ describe 'Final Grade Override' do
   include_context 'in-process server selenium tests'
   include GradebookHistorySetup
 
-  before(:each) do
+  before do
     # needed until Jenkins starts using active record and cassandra is killed
     allow(Audits).to receive(:config).and_return({ 'write_paths' => ['active_record'], 'read_path' => 'active_record' })
     allow(AuditLogFieldExtension).to receive(:enabled?).and_return(false)
@@ -54,7 +54,7 @@ describe 'Final Grade Override' do
   end
 
   context "Individual Gradebook" do
-    before(:each) do
+    before do
       @student = @students.first
       @enrollment = @course.enrollments.find_by(user: @student)
       @enrollment.scores.find_by(course_score: true).update!(override_score: 97.1)
@@ -89,7 +89,7 @@ describe 'Final Grade Override' do
   end
 
   context 'with an overridden grade' do
-    before(:each) do
+    before do
       @course.update!(allow_final_grade_override: true)
       @teacher.save
 
@@ -111,7 +111,7 @@ describe 'Final Grade Override' do
   end
 
   context "Gradebook History" do
-    before(:each) do
+    before do
       @course.update!(allow_final_grade_override: true)
       @teacher.save
 
@@ -121,7 +121,7 @@ describe 'Final Grade Override' do
     end
 
     context "when final_grade_override_in_gradebook_history flag is enabled" do
-      before(:each) do
+      before do
         Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
         GradeBookHistory.visit(@course)
         wait_for_ajaximations
@@ -143,7 +143,7 @@ describe 'Final Grade Override' do
     end
 
     context "when final_grade_override_in_gradebook_history flag is disabled" do
-      before(:each) do
+      before do
         Account.site_admin.disable_feature!(:final_grade_override_in_gradebook_history)
         GradeBookHistory.visit(@course)
         wait_for_ajaximations

@@ -45,7 +45,7 @@ describe CC::CCHelper do
       @obj = @course.media_objects.create!(:media_id => 'abcde')
     end
 
-    before :each do
+    before do
       @kaltura = double('CanvasKaltura::ClientV3')
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@kaltura)
       allow(@kaltura).to receive(:startSession)

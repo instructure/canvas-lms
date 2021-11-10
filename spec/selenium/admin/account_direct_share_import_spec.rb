@@ -48,7 +48,7 @@ describe "direct share page" do
     @read_share = @teacher_2.received_content_shares.create! name: 'c-read share', content_export: @export_3, sender: @teacher_1, read_state: 'read'
   end
 
-  before :each do
+  before do
     user_session @teacher_2
     visit_content_share_page
   end

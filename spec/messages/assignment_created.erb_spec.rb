@@ -32,6 +32,7 @@ describe 'assignment_created' do
 
   context ".email" do
     let(:path_type) { :email }
+
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to match(/Quiz 2/)
@@ -42,6 +43,7 @@ describe 'assignment_created' do
 
   context ".sms" do
     let(:path_type) { :sms }
+
     it "renders" do
       generate_message(notification_name, path_type, asset)
     end
@@ -49,6 +51,7 @@ describe 'assignment_created' do
 
   context ".summary" do
     let(:path_type) { :summary }
+
     it "renders" do
       generate_message(notification_name, path_type, asset)
     end

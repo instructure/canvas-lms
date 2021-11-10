@@ -346,7 +346,10 @@ export default class SubmissionManager extends Component {
     )
   }
 
-  handleDraftComplete(success, body) {
+  handleDraftComplete(success, body, context) {
+    if (!context.allowChangesToSubmission) {
+      return
+    }
     this.updateUploadingFiles(false)
     const element = document.createElement('div')
     element.insertAdjacentHTML('beforeend', body)
@@ -397,17 +400,18 @@ export default class SubmissionManager extends Component {
     }, 4000)
   }
 
-  renderAttemptTab() {
+  renderAttemptTab(context) {
     return (
       <Mutation
         mutation={CREATE_SUBMISSION_DRAFT}
         onCompleted={data =>
           this.handleDraftComplete(
             !data.createSubmissionDraft.errors,
-            data.createSubmissionDraft.submissionDraft.body
+            data.createSubmissionDraft.submissionDraft.body,
+            context
           )
         }
-        onError={() => this.handleDraftComplete(false)}
+        onError={() => this.handleDraftComplete(false, null, context)}
         update={this.updateSubmissionDraftCache}
       >
         {createSubmissionDraft => (
@@ -634,18 +638,22 @@ export default class SubmissionManager extends Component {
 
   render() {
     return (
-      <>
-        {this.state.submittingAssignment ? <LoadingIndicator /> : this.renderAttemptTab()}
-        <StudentViewContext.Consumer>
-          {context => (
+      <StudentViewContext.Consumer>
+        {context => (
+          <>
+            {this.state.submittingAssignment ? (
+              <LoadingIndicator />
+            ) : (
+              this.renderAttemptTab(context)
+            )}
             <>
               {this.renderSimilarityPledge(context)}
               {this.renderFooter(context)}
             </>
-          )}
-        </StudentViewContext.Consumer>
-        {this.state.showConfetti ? <Confetti /> : null}
-      </>
+            {this.state.showConfetti ? <Confetti /> : null}
+          </>
+        )}
+      </StudentViewContext.Consumer>
     )
   }
 }

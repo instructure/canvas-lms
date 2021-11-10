@@ -398,7 +398,7 @@ module Lti::IMS
     def line_item_score_maximum_scale
       res_max = scores_params[:result_maximum].to_f
       # if this doesn't make sense, just don't scale
-      return 1.0 if res_max.nan? || res_max == 0.0
+      return 1.0 if res_max.nan? || res_max.abs < Float::EPSILON
 
       line_item.score_maximum / scores_params[:result_maximum].to_f
     end

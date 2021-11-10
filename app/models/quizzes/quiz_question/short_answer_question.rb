@@ -39,11 +39,10 @@ class Quizzes::QuizQuestion::ShortAnswerQuestion < Quizzes::QuizQuestion::Base
 
     answer_text = CGI::escapeHTML(answer_text).strip.downcase
 
-    answer = @question_data[:answers].sort_by { |a| a[:weight] || CanvasSort::First }.find do |answer|
+    @question_data[:answers].sort_by { |a| a[:weight] || CanvasSort::First }.find do |answer|
       valid_answer = (answer[:text] || '').strip.downcase
       # Ignore blank answers (no match on that)
       (CGI::escapeHTML(valid_answer) == answer_text) && !valid_answer.blank?
     end
-    answer
   end
 end

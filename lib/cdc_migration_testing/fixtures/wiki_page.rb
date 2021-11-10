@@ -20,12 +20,13 @@
 
 module CdcFixtures
   def self.create_wiki_page
-    Wiki.new.save!(validate: false)
-    WikiPage.new({
-                   wiki_id: 1,
-                   workflow_state: 'default',
-                   context_id: 1,
-                   context_type: 'Course'
-                 })
+    wiki = Wiki.where(id: 1).first_or_initialize
+    wiki.save!(validate: false) if wiki.new_record?
+
+    WikiPage.new(id: 1,
+                 wiki_id: 1,
+                 workflow_state: 'default',
+                 context_id: 1,
+                 context_type: 'Course')
   end
 end

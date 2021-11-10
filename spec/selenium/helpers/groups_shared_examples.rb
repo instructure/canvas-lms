@@ -136,7 +136,7 @@ shared_examples 'announcements_page_v2' do
   include SharedExamplesCommon
   include RCENextPage
 
-  before(:each) do
+  before do
     stub_rcs_config
   end
 
@@ -204,7 +204,7 @@ shared_examples 'pages_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
-  before(:each) do
+  before do
     stub_rcs_config
   end
 
@@ -264,7 +264,7 @@ shared_examples 'discussions_page' do |context|
   include SharedExamplesCommon
   include RCENextPage
 
-  before(:each) do
+  before do
     stub_rcs_config
   end
 

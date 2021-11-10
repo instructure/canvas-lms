@@ -38,11 +38,11 @@ describe ContentParticipationCount do
     it "counts current unread objects correctly" do
       ["Submission"].each do |type|
         cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @teacher, :content_type => type)
-        expect(cpc).to receive(:refresh_unread_count).never
+        expect(cpc).not_to receive(:refresh_unread_count)
         expect(cpc.unread_count).to eq 0
 
         cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => type)
-        expect(cpc).to receive(:refresh_unread_count).never
+        expect(cpc).not_to receive(:refresh_unread_count)
         expect(cpc.unread_count).to eq 1
       end
     end
@@ -51,7 +51,7 @@ describe ContentParticipationCount do
       cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission")
       ContentParticipationCount.create_or_update(:context => @course, :user => @student, :content_type => "Submission", :offset => -1)
       cpc.reload
-      expect(cpc).to receive(:refresh_unread_count).never
+      expect(cpc).not_to receive(:refresh_unread_count)
       expect(cpc.unread_count).to eq 0
     end
 
@@ -103,7 +103,7 @@ describe ContentParticipationCount do
     it "does not refresh if just created" do
       ["Submission"].each do |type|
         cpc = ContentParticipationCount.create_or_update(:context => @course, :user => @teacher, :content_type => type)
-        expect(cpc).to receive(:refresh_unread_count).never
+        expect(cpc).not_to receive(:refresh_unread_count)
         expect(cpc.unread_count).to eq 0
       end
     end

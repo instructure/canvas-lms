@@ -47,6 +47,7 @@ module ErrorContext
     end
 
     def self.inherited(klass)
+      super
       ::RSpec::Core::Formatters.register klass,
                                          :example_started,
                                          :example_failed,

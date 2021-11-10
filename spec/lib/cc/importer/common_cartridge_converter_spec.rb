@@ -443,7 +443,7 @@ describe "Standard Common Cartridge importing" do
 end
 
 describe "More Standard Common Cartridge importing" do
-  before(:each) do
+  before do
     @converter = get_standard_converter
     @copy_to = course_model
     @copy_to.name = "alt name"

@@ -45,7 +45,7 @@ describe PlannerNotesController do
 
   context "authenticated" do
     context "as student" do
-      before :each do
+      before do
         user_session(@student)
       end
 
@@ -391,7 +391,7 @@ describe PlannerNotesController do
     end
 
     context "as teacher" do
-      before :each do
+      before do
         user_session(@teacher)
       end
 

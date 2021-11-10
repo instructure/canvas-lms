@@ -42,13 +42,14 @@ describe "/quizzes/quizzes/new" do
   end
 
   context "with course and quiz" do
-    before :each do
+    before do
       course_with_teacher(:active_all => true)
       @quiz = course_quiz
       assign(:quiz, @quiz)
       assign(:js_env, { quiz_max_combination_count: 200 })
       view_context
     end
+
     it "does not display 'NOTE:' message when questions within limit" do
       Quizzes::QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT.times { quiz_question }
       render 'quizzes/quizzes/new'

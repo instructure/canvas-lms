@@ -38,7 +38,7 @@ describe 'modules' do
     @item1 = @module1.add_item(id: @assignment1.id, type: 'assignment')
   end
 
-  before :each do
+  before do
     user_session(@teacher)
     visit_modules_index_page(@course.id)
   end

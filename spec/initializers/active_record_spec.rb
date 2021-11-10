@@ -75,8 +75,8 @@ module ActiveRecord
         it "cleans up the cursor" do
           # two cursors with the same name; if it didn't get cleaned up, it would error
           expect do
-            User.all.find_each {}
-            User.all.find_each {}
+            User.all.find_each { nil }
+            User.all.find_each { nil } # rubocop:disable Style/CombinableLoops
           end.to_not raise_error
         end
 
@@ -89,7 +89,7 @@ module ActiveRecord
             end
           end.to raise_error(ArgumentError)
 
-          User.all.find_each {}
+          User.all.find_each { nil }
         end
 
         it "doesnt obfuscate the error when it dies in a transaction" do
@@ -145,7 +145,7 @@ module ActiveRecord
           User.create!
           selectors.each do |selector|
             expect {
-              User.select(selector).find_in_batches(strategy: :id) {}
+              User.select(selector).find_in_batches(strategy: :id) { nil }
             }.not_to raise_error
           end
         end
@@ -153,8 +153,8 @@ module ActiveRecord
         it "cleans up the temp table" do
           # two temp tables with the same name; if it didn't get cleaned up, it would error
           expect do
-            User.all.find_in_batches(strategy: :temp_table) {}
-            User.all.find_in_batches(strategy: :temp_table) {}
+            User.all.find_in_batches(strategy: :temp_table) { nil }
+            User.all.find_in_batches(strategy: :temp_table) { nil }
           end.to_not raise_error
         end
 
@@ -167,7 +167,7 @@ module ActiveRecord
             end
           end.to raise_error(ArgumentError)
 
-          User.all.find_in_batches(strategy: :temp_table) {}
+          User.all.find_in_batches(strategy: :temp_table) { nil }
         end
 
         it "does not die with index error when table size is exactly batch size" do
@@ -175,7 +175,7 @@ module ActiveRecord
           User.delete_all
           user_count.times { user_model }
           expect(User.count).to eq(user_count)
-          User.all.find_in_batches(strategy: :temp_table, batch_size: user_count) {}
+          User.all.find_in_batches(strategy: :temp_table, batch_size: user_count) { nil }
         end
 
         it "doesnt obfuscate the error when it dies in a transaction" do

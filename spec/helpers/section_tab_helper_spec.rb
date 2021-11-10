@@ -63,15 +63,17 @@ shared_examples 'allow Quiz LTI placement when the correct Feature Flags are ena
 end
 
 describe SectionTabHelper do
-  class SectionTabHelperSpec
-    include SectionTabHelper
+  before do
+    stub_const("SectionTabHelperSpec", Class.new { include SectionTabHelper })
   end
+
   let_once(:course) { course_model }
 
   describe 'AvailableSectionTabs' do
     let_once(:current_user) { course.users.first }
     let_once(:domain_root_account) { LoadAccount.default_domain_root_account }
     let(:session) { user_session(current_user) }
+
     let_once(:quiz_lti_tool) do
       ContextExternalTool.create!(
         context: domain_root_account,
@@ -102,10 +104,11 @@ describe SectionTabHelper do
 
       context 'when context has tabs_available' do
         let(:bad_tab) { { label: 'bad tab' } }
-        before(:each) do
+        before do
           tabs = Course.default_tabs + [bad_tab]
           allow(course).to receive(:tabs_available).and_return(tabs)
         end
+
         let(:available_section_tabs) do
           SectionTabHelperSpec::AvailableSectionTabs.new(
             course, current_user, domain_root_account, session

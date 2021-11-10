@@ -19,7 +19,7 @@
 #
 
 describe BasicLTI::QuizzesNextVersionedSubmission do
-  before(:each) do
+  before do
     course_model(workflow_state: 'available')
     @root_account = @course.root_account
     @account = account_model(:root_account => @root_account, :parent_account => @root_account)

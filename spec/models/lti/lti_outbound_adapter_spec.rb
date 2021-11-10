@@ -75,7 +75,7 @@ describe Lti::LtiOutboundAdapter do
     Lti::VariableExpander.new(account, context, controller, current_user: user)
   end
 
-  before(:each) do
+  before do
     allow_any_instance_of(Lti::LtiContextCreator).to receive(:convert).and_return(lti_context)
     allow_any_instance_of(Lti::LtiUserCreator).to receive(:convert).and_return(lti_user)
     allow_any_instance_of(Lti::LtiToolCreator).to receive(:convert).and_return(lti_tool)
@@ -279,7 +279,7 @@ describe Lti::LtiOutboundAdapter do
     let(:lti_turnitin_outcomes_placement_url) { 'turnitin/outcomes/placement' }
     let(:tool_launch) { double('tool launch', generate: {}, url: "http://example.com/launch") }
 
-    before(:each) do
+    before do
       allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
       allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }

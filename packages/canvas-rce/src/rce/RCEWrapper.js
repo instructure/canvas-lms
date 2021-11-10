@@ -323,7 +323,8 @@ class RCEWrapper extends React.Component {
       path: [],
       wordCount: 0,
       editorView: props.editorView || WYSIWYG_VIEW,
-      shouldShowOnFocusButton: (props.renderKBShortcutModal === undefined ? true : props.renderKBShortcutModal),
+      shouldShowOnFocusButton:
+        props.renderKBShortcutModal === undefined ? true : props.renderKBShortcutModal,
       KBShortcutModalOpen: false,
       messages: [],
       announcement: null,
@@ -591,6 +592,32 @@ class RCEWrapper extends React.Component {
     const editor = this.mceInstance()
     const element = contentInsertion.insertAudio(editor, audio)
     this.contentInserted(element)
+  }
+
+  insertMathEquation(tex) {
+    const ed = this.mceInstance()
+    const docSz =
+      parseFloat(
+        ed.dom.doc.defaultView.getComputedStyle(ed.dom.doc.body).getPropertyValue('font-size')
+      ) || 1
+    const imgParent = ed.selection.getNode()?.parentElement
+    const imgSz = imgParent
+      ? parseFloat(
+          ed.dom.doc.defaultView.getComputedStyle(imgParent).getPropertyValue('font-size')
+        ) || 1
+      : docSz
+    let scale = imgSz / docSz
+
+    const url = `/equation_images/${encodeURIComponent(encodeURIComponent(tex))}?scale=${scale}`
+
+    // if I simply create the html string, xsslint fails jenkins
+    const img = document.createElement('img')
+    img.setAttribute('alt', `LaTeX: ${tex}`)
+    img.setAttribute('title', tex)
+    img.setAttribute('class', 'equation_image')
+    img.setAttribute('data-equation-content', tex)
+    img.setAttribute('src', url)
+    this.insertCode(img.outerHTML)
   }
 
   removePlaceholders(name) {

@@ -310,7 +310,7 @@ describe "Screenreader Gradebook" do
       gradebook_data_setup
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 

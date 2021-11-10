@@ -25,6 +25,7 @@ describe "root account basic settings" do
   let(:account_settings_url) { "/accounts/#{account.id}/settings" }
   let(:reports_url) { "/accounts/#{account.id}/reports_tab" }
   let(:admin_tab_url) { "/accounts/#{account.id}/settings#tab-users" }
+
   include_examples "settings basic tests", :root_account
 
   it "is able to disable enable_gravatar" do
@@ -46,7 +47,7 @@ describe "root account basic settings" do
       @account = Account.default
     end
 
-    before :each do
+    before do
       user_session(@admin)
       @admin.account.enable_feature!(:slack_notifications)
     end
@@ -83,7 +84,7 @@ describe "root account basic settings" do
           account.enable_feature!(:microsoft_group_enrollments_syncing)
         end
 
-        before :each do
+        before do
           account_admin_user(account: account)
           user_session(@admin)
         end
@@ -206,5 +207,63 @@ describe "root account basic settings" do
 
     account.reload
     expect(account.settings[:ip_filters]).to be_blank
+  end
+
+  context "course creation settings" do
+    before :once do
+      account_admin_user(:active_all => true)
+    end
+
+    before do
+      user_session(@admin)
+    end
+
+    it "renders classic settings when :create_course_subaccount_picker is off" do
+      get account_settings_url
+      expect(f('#account_settings_teachers_can_create_courses')).to be_present
+      expect(f('#account_settings_students_can_create_courses')).to be_present
+      expect(f('#account_settings_no_enrollments_can_create_courses')).to be_present
+    end
+
+    context "with :create_course_subaccount_picker on" do
+      before :once do
+        account.enable_feature!(:create_course_subaccount_picker)
+      end
+
+      it "renders CourseCreationSettings component with correct default values" do
+        account.settings[:teachers_can_create_courses] = true
+        account.settings[:students_can_create_courses] = true
+        account.settings[:teachers_can_create_courses_anywhere] = false
+        account.save!
+
+        get account_settings_url
+        expect(f("[data-testid='course-creation-settings']")).to be_present
+        expect(f("input[type='checkbox'][name='account[settings][teachers_can_create_courses]']")).to be_selected
+        expect(f("input[type='checkbox'][name='account[settings][students_can_create_courses]']")).to be_selected
+        expect(f("input[type='checkbox'][name='account[settings][no_enrollments_can_create_courses]']")).not_to be_selected
+        expect(f("input[type='radio'][name='account[settings][teachers_can_create_courses_anywhere]'][value='0']")).to be_selected
+      end
+
+      it "allows settings to be updated" do
+        account.settings[:teachers_can_create_courses] = true
+        account.settings[:no_enrollments_can_create_courses] = true
+        account.settings[:teachers_can_create_courses_anywhere] = false
+        account.save!
+
+        get account_settings_url
+        f("input[type='radio'][name='account[settings][teachers_can_create_courses_anywhere]'][value='1'] + label").click
+        f("input[type='checkbox'][name='account[settings][students_can_create_courses]'] + label").click
+        f("input[type='radio'][name='account[settings][students_can_create_courses_anywhere]'][value='0'] + label").click
+        f("input[type='checkbox'][name='account[settings][no_enrollments_can_create_courses]'] + label").click
+        expect_new_page_load { submit_form("#account_settings") }
+
+        account.reload
+        expect(account.teachers_can_create_courses?).to be_truthy
+        expect(account.students_can_create_courses?).to be_truthy
+        expect(account.no_enrollments_can_create_courses?).to be_falsey
+        expect(account.teachers_can_create_courses_anywhere?).to be_truthy
+        expect(account.students_can_create_courses_anywhere?).to be_falsey
+      end
+    end
   end
 end

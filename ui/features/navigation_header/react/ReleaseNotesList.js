@@ -59,7 +59,7 @@ export default function ReleaseNotesList({badgeDisabled, setBadgeDisabled}) {
     )
   } else if (error) {
     return (
-      <Text color="error">
+      <Text color="danger">
         <IconWarningSolid size="x-small" color="error" />{' '}
         {I18n.t('Release notes could not be loaded.')}
       </Text>

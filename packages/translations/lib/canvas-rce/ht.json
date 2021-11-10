@@ -109,6 +109,7 @@
   "course_navigation_dd035109": { "message": "Navigasyon Kou" },
   "create_button_and_icon_5c089934": { "message": "Kreye Bouton ak Ikòn" },
   "creative_commons_license_725584ae": { "message": "Lisans Creative Commons" },
+  "crop_image_807ebb08": { "message": "Koupe Imaj" },
   "current_image_f16c249c": { "message": "Imaj Aktyèl" },
   "custom_6979cd81": { "message": "Pèsonalize" },
   "date_added_ed5ad465": { "message": "Dat Ajoute" },
@@ -275,6 +276,7 @@
     "message": "Nou pa jwenn rezilta pou { term }."
   },
   "none_3b5e34d2": { "message": "Okenn" },
+  "none_selected_b93d56d2": { "message": "Anyen Seleksyone" },
   "octagon_e48be9f": { "message": "Oktagòn" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Ouvri dyalòg rakousi klavye sa a"
@@ -327,6 +329,7 @@
   },
   "search_280d00bd": { "message": "Chèche" },
   "search_term_b2d2235": { "message": "Tèm Rechèch" },
+  "select_crop_shape_d441feeb": { "message": "Seleksyone koupe fòm" },
   "select_language_7c93a900": { "message": "Seleksyone Lang" },
   "selected_274ce24f": { "message": "Chwazi" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

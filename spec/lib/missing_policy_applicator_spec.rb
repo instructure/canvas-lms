@@ -329,7 +329,7 @@ describe MissingPolicyApplicator do
       let(:assignment) { @course.assignments.first }
       let(:submission) { assignment.submissions.first }
 
-      before(:each) do
+      before do
         late_policy_missing_enabled
         create_recent_assignment
         submission.update_columns(score: nil, grade: nil)
@@ -356,7 +356,7 @@ describe MissingPolicyApplicator do
       end
 
       context "when the missing_policy_applicator_emits_live_events flag is enabled" do
-        before(:each) do
+        before do
           @course.root_account.enable_feature!(:missing_policy_applicator_emits_live_events)
         end
 

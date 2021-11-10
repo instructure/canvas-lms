@@ -22,7 +22,7 @@ require_relative '../../lti2_spec_helper'
 
 describe ContentMigration do
   context "course copy assignments" do
-    include_examples "course copy"
+    include_context "course copy"
 
     it "links assignments to account rubrics and outcomes" do
       account = @copy_from.account
@@ -333,8 +333,6 @@ describe ContentMigration do
     end
 
     describe "student annotation assignments" do
-      before(:each) { Account.site_admin.enable_feature!(:annotated_document_submissions) }
-
       let(:source_attachment) do
         attachment_model(course: @copy_from, filename: 'some_attachment')
       end
@@ -373,7 +371,7 @@ describe ContentMigration do
       context "when copying a single assignment" do
         let(:content_migration) { @cm }
 
-        before(:each) do
+        before do
           content_migration.copy_options = { assignments: { mig_id(source_assignment) => true } }
         end
 
@@ -402,7 +400,7 @@ describe ContentMigration do
           )
         end
 
-        before(:each) do
+        before do
           content_migration.copy_options = {
             assignments: {
               mig_id(source_assignment) => true,
@@ -643,7 +641,7 @@ describe ContentMigration do
         expect(@copy_to.assignments.count).to eq 0
         expect(@copy_to.quizzes.count).to eq 0
         expect(@copy_to.discussion_topics.count).to eq 0
-        expect(@cm.content_export.error_messages.sort).to eq warnings.sort.map { |w| [w, nil] }
+        expect(@cm.content_export.error_messages.sort).to eq(warnings.sort.map { |w| [w, nil] })
       end
 
       it "does not mark assignment as copied if not set to be frozen" do
@@ -1015,7 +1013,7 @@ describe ContentMigration do
     end
 
     context 'post_to_sis' do
-      before :each do
+      before do
         @course.root_account.enable_feature!(:new_sis_integrations)
         @course.root_account.settings[:sis_syncing] = true
         @course.root_account.settings[:sis_require_assignment_due_date] = true

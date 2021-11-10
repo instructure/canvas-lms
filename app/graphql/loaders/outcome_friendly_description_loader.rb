@@ -24,6 +24,7 @@ class Loaders::OutcomeFriendlyDescriptionLoader < GraphQL::Batch::Loader
   VALID_CONTEXT_TYPES = ['Course', 'Account'].freeze
 
   def initialize(context_id, context_type)
+    super()
     @context_id = context_id
     @context_type = context_type
   end

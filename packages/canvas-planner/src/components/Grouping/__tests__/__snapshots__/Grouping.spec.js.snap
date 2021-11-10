@@ -175,6 +175,7 @@ exports[`renders a CompletedItemsFacade when completed items are present by defa
         notificationBadge="none"
         onClick={[Function]}
         responsiveSize="large"
+        simplifiedControls={false}
         theme={
           Object {
             "labelColor": "#5678",

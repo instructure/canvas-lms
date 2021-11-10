@@ -22,7 +22,7 @@ require_relative "../client_credentials_provider"
 module Canvas::OAuth
   module GrantTypes
     class ClientCredentials < BaseType
-      def initialize(opts, host, protocol = nil)
+      def initialize(opts, host, protocol = nil) # rubocop:disable Lint/MissingSuper
         if opts[:client_assertion_type] == 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
           raw_jwt = opts.fetch(:client_assertion)
           @provider = Canvas::OAuth::AsymmetricClientCredentialsProvider.new(raw_jwt, host, scopes_from_opts(opts), protocol)

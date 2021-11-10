@@ -313,7 +313,7 @@ describe ContentZipper do
 
   describe "zip_folder" do
     context "checking permissions" do
-      before(:each) do
+      before do
         course_with_student(active_all: true)
         folder = Folder.root_folders(@course).first
         attachment_model(uploaded_data: stub_png_data('hidden.png'),
@@ -386,7 +386,7 @@ describe ContentZipper do
       end
 
       context "in a public course" do
-        before(:each) do
+        before do
           @course.is_public = true
           @course.save!
         end
@@ -479,12 +479,11 @@ describe ContentZipper do
       user = User.create!
       eportfolio = user.eportfolios.create!(name: 'an name')
       eportfolio.ensure_defaults
-      attachment = eportfolio.attachments.build do |attachment|
-        attachment.display_name = 'an_attachment'
-        attachment.user = user
-        attachment.workflow_state = 'to_be_zipped'
-      end
-      attachment.save!
+      attachment = eportfolio.attachments.create!(
+        display_name: "an_attachment",
+        user: user,
+        workflow_state: "to_be_zipped"
+      )
       expect {
         ContentZipper.new.zip_eportfolio(attachment, eportfolio)
       }.to_not raise_error
@@ -583,6 +582,7 @@ describe ContentZipper do
 
   describe "complete_attachment" do
     before { @attachment = Attachment.new display_name: "I <3 testing.png" }
+
     context "when attachment wasn't zipped successfully" do
       it "moves the zip attachment into an error state and save!s it" do
         expect(@attachment).to receive(:save!).once

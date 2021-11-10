@@ -155,7 +155,7 @@ describe EportfolioEntry do
       let(:entry) { @eportfolio_entry }
 
       context "when the setting has a value" do
-        before(:each) do
+        before do
           Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
           Setting.set('eportfolio_content_spam_keywords', 'injurious,deleterious')
         end

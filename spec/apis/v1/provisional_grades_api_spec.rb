@@ -437,7 +437,7 @@ describe 'Provisional Grades API', type: :request do
         end
 
         context "when not all grades have been explicitly selected" do
-          before(:each) do
+          before do
             @assignment.grade_student(@student, grader: @ta, score: 12, provisional: true)
             @assignment.grade_student(@student, grader: @second_ta, score: 34, provisional: true)
             @assignment.grade_student(@second_student, grader: @ta, score: 56, provisional: true)

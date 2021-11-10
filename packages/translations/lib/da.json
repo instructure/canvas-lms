@@ -329,6 +329,9 @@
     "creative_commons_license_725584ae": {
         "message": "Creative Commons licens:"
     },
+    "crop_image_807ebb08": {
+        "message": "Beskær billede"
+    },
     "current_image_f16c249c": {
         "message": "Nuværende billede"
     },
@@ -896,6 +899,9 @@
     "none_3b5e34d2": {
         "message": "Ingen"
     },
+    "none_selected_b93d56d2": {
+        "message": "Ingen valgt"
+    },
     "nothing_due_this_week_d45c9ef9": {
         "message": "Intet skal afleveres denne uge"
     },
@@ -1078,6 +1084,9 @@
     },
     "search_term_b2d2235": {
         "message": "Søgeord"
+    },
+    "select_crop_shape_d441feeb": {
+        "message": "Vælg beskæringsform"
     },
     "select_language_7c93a900": {
         "message": "Vælg sprog"

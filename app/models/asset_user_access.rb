@@ -261,7 +261,7 @@ class AssetUserAccess < ActiveRecord::Base
     view_delta = change_hash['view_score'].compact
     # ^array with old and new value, which CAN be null, hence compact
     return false if view_delta.size < 1
-    return view_delta[0] == 1.0 if view_delta.size == 1
+    return (view_delta[0] - 1.0).abs < Float::EPSILON if view_delta.size == 1
 
     (view_delta[1] - view_delta[0]).abs == 1 # this is an increment, if true
   end

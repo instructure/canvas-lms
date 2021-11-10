@@ -159,7 +159,7 @@ describe Login::SamlController do
     allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
 
     # We dont want to log them out of everything.
-    expect(controller).to receive(:logout_user_action).never
+    expect(controller).not_to receive(:logout_user_action)
     controller.request.env['canvas.domain_root_account'] = account
 
     # Default to Login url if set to nil or blank
@@ -207,7 +207,7 @@ describe Login::SamlController do
     allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
 
     # We dont want to log them out of everything.
-    expect(controller).to receive(:logout_user_action).never
+    expect(controller).not_to receive(:logout_user_action)
     controller.request.env['canvas.domain_root_account'] = account
 
     expect(account.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
@@ -503,13 +503,13 @@ describe Login::SamlController do
 
       describe '#destroy' do
         it "returns bad request if a SAMLResponse or SAMLRequest parameter is not provided" do
-          expect(controller).to receive(:logout_user_action).never
+          expect(controller).not_to receive(:logout_user_action)
           get :destroy
           expect(response.status).to eq 400
         end
 
         it "finds the correct AAC" do
-          expect_any_instantiation_of(@aac1).to receive(:debugging?).never
+          expect_any_instantiation_of(@aac1).not_to receive(:debugging?)
           expect_any_instantiation_of(@aac2).to receive(:debugging?).at_least(1)
 
           logout_response = SAML2::LogoutResponse.new
@@ -569,7 +569,7 @@ describe Login::SamlController do
       logout_response.issuer = SAML2::NameID.new('entity')
       expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_response)
 
-      expect(controller).to receive(:logout_user_action).never
+      expect(controller).not_to receive(:logout_user_action)
       controller.request.env['canvas.domain_root_account'] = @account
       get :destroy, params: { :SAMLResponse => "foo", :RelayState => "/courses" }
       expect(response.status).to eq 400

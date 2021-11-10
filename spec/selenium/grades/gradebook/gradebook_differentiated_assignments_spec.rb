@@ -38,7 +38,7 @@ describe "Gradebook" do
       @override = create_section_override_for_assignment(@da_assignment, course_section: @other_section)
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 

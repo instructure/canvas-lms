@@ -26,7 +26,7 @@ module Canvas
   class Plugin
     @registered_plugins = {}
 
-    attr_accessor :meta, :settings
+    attr_accessor :meta
     attr_reader :id, :tag
 
     def initialize(id, tag = nil)

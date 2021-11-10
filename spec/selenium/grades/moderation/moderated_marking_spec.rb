@@ -72,7 +72,7 @@ describe 'Moderated Marking' do
   end
 
   context 'with Select_Final_Grade permission' do
-    before(:each) do
+    before do
       # enroll a ta and remove permission for TA role
       ta_in_course(course: @moderated_course, name: 'TA_One', enrollment_state: 'active')
       Account.default.role_overrides.create!(role: Role.find_by(name: 'TaEnrollment'), permission: 'select_final_grade', enabled: false)
@@ -108,7 +108,7 @@ describe 'Moderated Marking' do
       @submissions3.push sub
     end
 
-    before(:each) do
+    before do
       # visit the moderation page as teacher 1
       user_session(@teacher1)
       ModeratePage.visit(@moderated_course.id, @moderated_assignment.id)
@@ -241,10 +241,11 @@ describe 'Moderated Marking' do
     end
 
     context 'when a custom grade is entered' do
-      before(:each) do
+      before do
         ModeratePage.enter_custom_grade(@student1, 4)
         wait_for_ajaximations
       end
+
       it 'selects the custom grade', priority: '1', test_id: 3505170 do
         skip('unskip this in GRADE-1615 once this is not flaky using using the most recent InstUI')
         # the aria-activedescendant will be the id of the selected option
@@ -254,6 +255,7 @@ describe 'Moderated Marking' do
         ModeratePage.grade_input(@student1).click
         expect(f("##{selected_id}").text).to eq "4 (Custom)"
       end
+
       it 'adds the custom grade as an option in the dropdown', priority: '1', test_id: 3505170 do
         ModeratePage.grade_input(@student1).click
         expect(ModeratePage.grade_input_dropdown(@student1)).to include_text "4 (Custom)"

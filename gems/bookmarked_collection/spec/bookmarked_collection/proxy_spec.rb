@@ -22,7 +22,7 @@ require 'spec_helper'
 
 describe BookmarkedCollection::Proxy do
   describe '#paginate' do
-    before :each do
+    before do
       example_class = Class.new(ActiveRecord::Base) do
         self.table_name = 'examples'
       end

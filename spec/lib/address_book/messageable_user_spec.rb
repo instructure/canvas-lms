@@ -117,7 +117,7 @@ describe AddressBook::MessageableUser do
     end
 
     describe "with optional :context" do
-      before :each do
+      before do
         @recipient = user_model(workflow_state: 'registered')
         @sender = user_model(workflow_state: 'registered')
         @address_book = AddressBook::MessageableUser.new(@sender)
@@ -297,7 +297,7 @@ describe AddressBook::MessageableUser do
     describe "sharding" do
       specs_require_sharding
 
-      before :each do
+      before do
         enrollment = @shard1.activate { teacher_in_course(active_all: true) }
         @teacher = enrollment.user
         @course = enrollment.course
@@ -452,7 +452,7 @@ describe AddressBook::MessageableUser do
       expect(Rails.cache).to receive(:fetch)
         .with(match(/address_book_preload/))
         .and_return(MessageableUser.where(id: student).to_a)
-      expect(teacher).to receive(:load_messageable_users).never
+      expect(teacher).not_to receive(:load_messageable_users)
       AddressBook::MessageableUser.new(teacher).preload_users([student])
     end
 

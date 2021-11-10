@@ -20,6 +20,7 @@
 
 class Loaders::CourseRoleLoader < GraphQL::Batch::Loader
   def initialize(course_id:, role_types: nil, built_in_only: false)
+    super()
     @course_id = course_id
     @role_types = role_types
     @built_in_only = built_in_only

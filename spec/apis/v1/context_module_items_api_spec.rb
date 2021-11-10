@@ -297,7 +297,7 @@ describe "Module Items API", type: :request do
     end
 
     context 'with differentiated assignments' do
-      before :each do
+      before do
         course_with_student(:course => @course, :active_all => true)
         @user = @student
       end
@@ -880,7 +880,7 @@ describe "Module Items API", type: :request do
       end
 
       context "section specific discussions" do
-        before :each do
+        before do
           @topic_section = @course.course_sections.create!
           @topic.is_section_specific = true
           @topic.course_sections = [@topic_section]
@@ -1170,6 +1170,7 @@ describe "Module Items API", type: :request do
       context 'enabled' do
         context 'with override' do
           before { create_section_override_for_assignment(@assignment, { course_section: @new_section }) }
+
           it "lists all assignments" do
             json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items",
                             :controller => "context_module_items_api", :action => "index", :format => "json",
@@ -1392,7 +1393,7 @@ describe "Module Items API", type: :request do
 
       describe "caching CYOE data" do
         it "uses the cache when requested again" do
-          expect(ConditionalRelease::Service).to receive(:request_rules).never
+          expect(ConditionalRelease::Service).not_to receive(:request_rules)
           3.times do
             api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module3.id}/items?include[]=mastery_paths",
                      :controller => "context_module_items_api", :action => "index", :format => "json",
@@ -1466,9 +1467,10 @@ describe "Module Items API", type: :request do
                    :controller => "context_module_items_api", :action => "redirect",
                    :format => "json", :course_id => "#{@course.id}", :id => "#{@external_url_tag.id}")
       expect(response).to redirect_to "http://example.com/lolcats"
-      expect(@module1.evaluate_for(@user).requirements_met).to be_any { |rm|
-                                                                 rm[:type] == "must_view" && rm[:id] == @external_url_tag.id
-                                                               }
+      viewed = @module1.evaluate_for(@user).requirements_met.any? do |rm|
+        rm[:type] == "must_view" && rm[:id] == @external_url_tag.id
+      end
+      expect(viewed).to be true
     end
 
     it "disallows update" do
@@ -1578,9 +1580,10 @@ describe "Module Items API", type: :request do
         api_call(:post, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@external_url_tag.id}/mark_read",
                  :controller => "context_module_items_api", :action => "mark_item_read",
                  :format => "json", :course_id => @course.to_param, :module_id => @module1.to_param, :id => @external_url_tag.to_param)
-        expect(@module1.evaluate_for(@user).requirements_met).to be_any { |rm|
-                                                                   rm[:type] == "must_view" && rm[:id] == @external_url_tag.id
-                                                                 }
+        viewed = @module1.evaluate_for(@user).requirements_met.any? do |rm|
+          rm[:type] == "must_view" && rm[:id] == @external_url_tag.id
+        end
+        expect(viewed).to be true
       end
 
       it "does not fulfill must-view requirement on unpublished item" do
@@ -1589,9 +1592,10 @@ describe "Module Items API", type: :request do
                  { :controller => "context_module_items_api", :action => "mark_item_read",
                    :format => "json", :course_id => @course.to_param, :module_id => @module1.to_param, :id => @external_url_tag.to_param },
                  {}, {}, { expected_status: 404 })
-        expect(@module1.evaluate_for(@user).requirements_met).not_to be_any { |rm|
-                                                                       rm[:type] == "must_view" && rm[:id] == @external_url_tag.id
-                                                                     }
+        viewed = @module1.evaluate_for(@user).requirements_met.any? do |rm|
+          rm[:type] == "must_view" && rm[:id] == @external_url_tag.id
+        end
+        expect(viewed).to be false
       end
 
       it "does not fulfill must-view requirement on locked item" do

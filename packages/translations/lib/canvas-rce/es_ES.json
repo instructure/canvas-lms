@@ -30,6 +30,9 @@
   "announcement_list_da155734": { "message": "Lista de anuncios" },
   "announcements_a4b8ed4a": { "message": "Anuncios" },
   "apply_781a2546": { "message": "Aplicar" },
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Aplica cambios a todas las instancias de este Botón e icono en el Curso"
+  },
   "apps_54d24a47": { "message": "Aplicaciones" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
     "message": "Se conservará la relación de aspecto"
@@ -92,6 +95,9 @@
     "message": "Cerrar un menú o diálogo. También lo vuelve a llevar al área de editor"
   },
   "close_d634289d": { "message": "Cerrar" },
+  "closed_caption_file_must_be_less_than_maxkb_kb_5880f752": {
+    "message": "El archivo de transcripción de audio debe tener menos de { maxKb } kb"
+  },
   "closed_captions_subtitles_e6aaa016": {
     "message": "Subtítulos/subtítulos ocultos"
   },
@@ -127,6 +133,8 @@
   "creative_commons_license_725584ae": {
     "message": "Licencia Creative Commons:"
   },
+  "crop_image_807ebb08": { "message": "Ajustar la imagen" },
+  "current_image_f16c249c": { "message": "Imagen actual" },
   "custom_6979cd81": { "message": "Personalizar" },
   "date_added_ed5ad465": { "message": "Fecha en la que se añadió" },
   "decorative_image_3c28aa7d": { "message": "Imagen decorativa" },
@@ -164,6 +172,9 @@
   "due_when_7eed10c6": { "message": "Fecha de entrega: { when }" },
   "edit_c5fbea07": { "message": "Editar" },
   "edit_equation_f5279959": { "message": "Editar ecuación" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Editar Botón Existente/Icono"
+  },
   "edit_link_7f53bebb": { "message": "Editar enlace" },
   "editor_statusbar_26ac81fc": { "message": "Barra de estado del editor" },
   "embed_828fac4a": { "message": "Insertar" },
@@ -278,6 +289,7 @@
   "middle_27dc1d5": { "message": "El medio" },
   "miscellaneous_e9818229": { "message": "Misceláneo" },
   "modules_c4325335": { "message": "Módulos" },
+  "multi_color_image_63d7372f": { "message": "Imagen multicolor" },
   "must_be_at_least_width_x_height_px_41dc825e": {
     "message": "Debe ser al menos { width } x { height } px"
   },
@@ -302,6 +314,7 @@
     "message": "No se han encontrado resultados para { term }."
   },
   "none_3b5e34d2": { "message": "Ninguno" },
+  "none_selected_b93d56d2": { "message": "Ninguna seleccionada" },
   "octagon_e48be9f": { "message": "Octágono" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Abrir esta ventana de diálogo de método abreviado de teclado"
@@ -356,6 +369,7 @@
   },
   "search_280d00bd": { "message": "Buscar" },
   "search_term_b2d2235": { "message": "Término de búsqueda" },
+  "select_crop_shape_d441feeb": { "message": "Seleccione la forma de recorte" },
   "select_language_7c93a900": { "message": "Seleccionar idioma" },
   "selected_274ce24f": { "message": "Seleccionada" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {
@@ -367,7 +381,11 @@
   "show_image_options_1e2ecc6b": { "message": "Mostrar opciones de imágenes" },
   "show_link_options_545338fd": { "message": "Mostrar opciones de enlace" },
   "show_video_options_6ed3721a": { "message": "Mostrar opciones de video" },
+  "single_color_image_4e5d4dbc": { "message": "Imagen unicolor" },
   "size_b30e1077": { "message": "Tamaño" },
+  "size_of_caption_file_is_greater_than_the_maximum_m_bff5f86e": {
+    "message": "El tamaño del archivo es superior al máximo permitido para archivos, que es de { max } kb."
+  },
   "small_b070434a": { "message": "Pequeño" },
   "something_went_wrong_89195131": { "message": "Ha habido un error." },
   "something_went_wrong_and_i_don_t_know_what_to_show_e0c54ec8": {

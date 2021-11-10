@@ -34,7 +34,7 @@ describe "lti full width launch view" do
     let(:tag) { LtiLayoutSpecHelper.create_tag(tool) }
     let(:current_user) { user_with_pseudonym }
 
-    before :each do
+    before do
       ctrl.instance_variable_set(:@domain_root_account, Account.default)
       ctrl.instance_variable_set(:@current_user, current_user)
     end
@@ -108,7 +108,7 @@ describe "lti full width launch view" do
     context "when the user is a student view user" do
       let(:current_user) { course.student_view_student }
 
-      before :each do
+      before do
         ctrl.instance_variable_set(:@current_user, current_user)
       end
 
@@ -127,7 +127,7 @@ describe "lti full width launch view" do
     end
 
     context "when the user is a teacher" do
-      before :each do
+      before do
         course.enroll_teacher(current_user, enrollment_state: "active")
       end
 

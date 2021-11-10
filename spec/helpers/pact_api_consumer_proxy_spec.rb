@@ -24,7 +24,7 @@ describe PactApiConsumerProxy do
   context 'Authorization header' do
     subject(:proxy) { PactApiConsumerProxy.new }
 
-    before :each do
+    before do
       # This happens when our Pact tests run -- we need to make it happen
       # here, too.
       ActiveRecord::Base.connection.tables.each do |t|

@@ -50,7 +50,7 @@ describe "/submissions/show" do
       @submission = @assignment.submit_homework(@user)
     end
 
-    before :each do
+    before do
       view_context
       assign(:assignment, @assignment)
       assign(:submission, @submission)
@@ -182,14 +182,14 @@ describe "/submissions/show" do
       }
     end
 
-    before :each do
+    before do
       view_context(@course, teacher)
       assign(:assignment, @assignment)
       assign(:submission, @submission)
     end
 
     context "with new similarity icons enabled" do
-      before(:each) do
+      before do
         @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
       end
 
@@ -228,7 +228,7 @@ describe "/submissions/show" do
       end
 
       context "for vericite" do
-        before :each do
+        before do
           @submission.turnitin_data[:provider] = 'vericite'
         end
 
@@ -260,7 +260,7 @@ describe "/submissions/show" do
       @submission.update!(score: 23.0)
     end
 
-    before(:each) do
+    before do
       assign(:assignment, @assignment)
       assign(:context, @course)
       assign(:current_user, @student)
@@ -268,7 +268,7 @@ describe "/submissions/show" do
     end
 
     context "when assignment posts automatically" do
-      before(:each) do
+      before do
         @assignment.ensure_post_policy(post_manually: false)
       end
 
@@ -294,7 +294,7 @@ describe "/submissions/show" do
     end
 
     context "when assignment posts manually" do
-      before(:each) do
+      before do
         @assignment.ensure_post_policy(post_manually: true)
       end
 
@@ -325,7 +325,7 @@ describe "/submissions/show" do
       context "when the viewing user is a teacher" do
         let(:teacher) { @course.enroll_teacher(User.create!, enrollment_state: "active").user }
 
-        before(:each) do
+        before do
           assign(:current_user, teacher)
         end
 
@@ -374,7 +374,7 @@ describe "/submissions/show" do
         comment_list.css('.comment .comment').map { |comment| comment.text.strip }
       end
 
-      before(:each) do
+      before do
         assign(:context, course)
 
         course.enroll_teacher(teacher).accept(true)
@@ -388,7 +388,7 @@ describe "/submissions/show" do
       end
 
       context "when a teacher is viewing" do
-        before(:each) do
+        before do
           assign(:current_user, teacher)
         end
 
@@ -423,7 +423,7 @@ describe "/submissions/show" do
       end
 
       context 'when a student is viewing' do
-        before(:each) do
+        before do
           assign(:current_user, student)
         end
 
@@ -461,7 +461,7 @@ describe "/submissions/show" do
           let(:first_ta) { course_with_user("TaEnrollment", course: course, active_all: true).user }
           let(:second_ta) { course_with_user("TaEnrollment", course: course, active_all: true).user }
 
-          before(:each) do
+          before do
             moderated_submission.add_comment(author: student, comment: "I did a great job!")
             moderated_submission.add_comment(author: teacher, comment: "No, you did not.", provisional: true)
             moderated_submission.add_comment(author: first_ta, comment: "Maybe they did?", provisional: true)
@@ -631,7 +631,7 @@ describe "/submissions/show" do
       )
     end
 
-    before(:each) do
+    before do
       view_context(@course, @student)
       assign(:assignment, assignment)
       assign(:submission, submission)
@@ -667,7 +667,7 @@ describe "/submissions/show" do
       @comment = sub.add_comment(author: teacher, comment: "good job!", media_comment_id: 1, media_comment_type: "video")
     end
 
-    before(:each) do
+    before do
       assign(:assignment, assignment)
       assign(:context, @course)
       assign(:current_user, teacher)

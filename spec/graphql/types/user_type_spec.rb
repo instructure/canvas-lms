@@ -762,4 +762,81 @@ describe Types::UserType do
       ).to eq ["TeacherEnrollment"]
     end
   end
+
+  def submission_comments_mutation_str(teacher_id)
+    <<~GQL
+      {
+        legacyNode(_id: \"#{teacher_id}\", type: User) {
+          ... on User {
+            submissionCommentsConnection(first: 10) {
+              nodes {
+                comment
+                assignment {
+                  name
+                }
+                course {
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    GQL
+  end
+
+  describe 'submission comments' do
+    before(:once) do
+      course = Course.create! name: "TEST"
+
+      @teacher = course_with_user("TeacherEnrollment", course: course, name: "Mr Teacher", active_all: true).user
+      student = course_with_user("StudentEnrollment", course: course, name: "Mr Student 1", active_all: true).user
+
+      assignment = course.assignments.create!(
+        name: "Test Assignment",
+        moderated_grading: true,
+        grader_count: 10,
+        final_grader: @teacher
+      )
+      assignment.grade_student(student, grade: 1, grader: @teacher, provisional: true)
+      submission = assignment.submissions.find_by(user: student)
+
+      submission.add_comment(author: student, comment: "First comment")
+      submission.add_comment(author: @teacher, comment: "Second comment")
+      submission.add_comment(author: @teacher, comment: "Third comment")
+    end
+
+    it 'can get comments' do
+      result = CanvasSchema.execute(
+        submission_comments_mutation_str(@teacher.id),
+        context: { current_user: @teacher }
+      )
+
+      nodes = result.dig("data", "legacyNode", "submissionCommentsConnection", "nodes")
+
+      expect(nodes.map { |c| c["comment"] }).to match_array ["First comment", "Second comment", "Third comment"]
+    end
+
+    it 'can get assignment names' do
+      result = CanvasSchema.execute(
+        submission_comments_mutation_str(@teacher.id),
+        context: { current_user: @teacher }
+      )
+
+      nodes = result.dig("data", "legacyNode", "submissionCommentsConnection", "nodes")
+
+      expect(nodes.map { |c| c["assignment"]["name"] }).to match_array ["Test Assignment", "Test Assignment", "Test Assignment"]
+    end
+
+    it 'can get course names' do
+      result = CanvasSchema.execute(
+        submission_comments_mutation_str(@teacher.id),
+        context: { current_user: @teacher }
+      )
+
+      nodes = result.dig("data", "legacyNode", "submissionCommentsConnection", "nodes")
+
+      expect(nodes.map { |c| c["course"]["name"] }).to match_array %w[TEST TEST TEST]
+    end
+  end
 end

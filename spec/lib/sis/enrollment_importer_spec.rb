@@ -103,7 +103,7 @@ module SIS
         Account.default.pseudonyms << @user.pseudonym
       end
 
-      before(:each) do
+      before do
         allow(StudentEnrollment).to receive(:new).and_return(enrollment)
         allow(SisBatchRollBackData).to receive(:build_data).and_return(nil)
         allow(Setting).to receive(:get).and_return(1)
@@ -125,7 +125,7 @@ module SIS
       end
 
       it "saves with broadcasting if notify is set" do
-        expect(enrollment).to receive(:save_without_broadcasting!).never
+        expect(enrollment).not_to receive(:save_without_broadcasting!)
 
         EnrollmentImporter.new(Account.default, { batch: Account.default.sis_batches.create! }).process(messages) do |importer|
           sis_enrollment = SIS::Models::Enrollment.new(

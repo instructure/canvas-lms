@@ -33,9 +33,11 @@ module DataFixup
     #   the column(s), and the default_value is passed separately, and applied to all of
     #   the columns.
     def self.run(klass, fields, default_value: false, batch_size: 1000)
-      if fields.is_a?(Array)
+      case fields
+      when Array
         fields = fields.map { |f| [f, default_value] }.to_h
-      elsif fields.is_a?(Hash)
+      when Hash
+        # already correct type
       else
         fields = { fields => default_value }
       end

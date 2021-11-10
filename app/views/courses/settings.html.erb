@@ -29,6 +29,7 @@
   can_change_course_availability = can_manage_courses || (can_manage && !@context.root_account.settings[:prevent_course_availability_editing_by_teachers])
   can_manage_master_courses = can_manage_courses && can_do(@context.account, @current_user, :manage_master_courses)
   has_multiple_sections = @context.course_sections.active.count > 1
+  show_publish_controls = can_do(@context, @current_user, :change_course_state, :manage_courses_publish) && (@context.unpublished? || @context.unpublishable?)
 
   is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
   blueprint_subscription = @context.master_course_subscriptions.active.first
@@ -44,7 +45,7 @@
 %>
 
 <% provide :right_side do %>
-  <%= render :partial => 'settings_sidebar', :locals => { :blueprint_subscription => blueprint_subscription } %>
+  <%= render :partial => 'settings_sidebar', :locals => { blueprint_subscription: blueprint_subscription, show_publish_controls: show_publish_controls } %>
 <% end %>
 
 <h1 class="screenreader-only"><%= t 'course_settings_title', "Course Settings" %></h1>
@@ -76,7 +77,7 @@
   <div id="tab-details">
     <h2>
       <%= t('headings.details', %{Course Details}) %>
-      <% unless @context.elementary_subject_course? %>
+      <% unless show_publish_controls %>
         <% if @context.created? || @context.claimed? %>
           <span id='course-status' class='published-status unpublished pull-right'>
             <%= t('labels.course_status_unpublished', %{Course is Unpublished}) %>

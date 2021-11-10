@@ -28,7 +28,7 @@ describe "calendar2" do
     Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
-  before(:each) do
+  before do
     Account.default.tap do |a|
       a.settings[:show_scheduler] = true
       a.save!
@@ -36,7 +36,7 @@ describe "calendar2" do
   end
 
   context "as a teacher" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 
@@ -86,7 +86,7 @@ describe "calendar2" do
           .find('tbody td.fc-event-container').index()")
         end
 
-        before(:each) do
+        before do
           @monday = 1
           @friday = 5
           @initial_time = Time.zone.parse('2015-1-1').beginning_of_day + 9.hours
@@ -475,7 +475,7 @@ describe "calendar2" do
   end
 
   context "as a student" do
-    before(:each) do
+    before do
       course_with_student_logged_in
     end
 

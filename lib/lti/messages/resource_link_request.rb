@@ -102,16 +102,14 @@ module Lti::Messages
     end
 
     def assignment_line_item_url
-      @assignment_line_item_url ||= begin
-        line_item = line_item_for_assignment
-        return if line_item.blank?
-
-        # assume @context is either Group or Course, per #include_assignment_and_grade_service_claims?
-        @expander.controller.lti_line_item_show_url(
-          course_id: @context.is_a?(Group) ? context.context_id : @context.id,
-          id: line_item.id
-        )
-      end
+      @assignment_line_item_url ||=
+        if (line_item = line_item_for_assignment).present?
+          # assume @context is either Group or Course, per #include_assignment_and_grade_service_claims?
+          @expander.controller.lti_line_item_show_url(
+            course_id: @context.is_a?(Group) ? context.context_id : @context.id,
+            id: line_item.id
+          )
+        end
     end
 
     def line_item_for_assignment

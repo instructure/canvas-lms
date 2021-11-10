@@ -54,7 +54,7 @@ describe "Individual View Gradebook" do
       @student1_submission = @moderated_assignment.grade_student(@student1, grade: 13, grader: @teacher2, provisional: true).first
     end
 
-    before(:each) do
+    before do
       # switch session to non-final-grader
       user_session(@teacher2)
     end
@@ -77,12 +77,13 @@ describe "Individual View Gradebook" do
 
       expect(SRGB.main_grade_input.attribute('disabled')).to eq 'true'
     end
+
     context 'when grades are posted' do
       before(:once) do
         @moderated_assignment.update!(grades_published_at: Time.zone.now)
       end
 
-      before(:each) do
+      before do
         SRGB.visit(@course.id)
       end
 
@@ -124,7 +125,7 @@ describe "Individual View Gradebook" do
       @unmuted_anonymous_assignment.unmute!
     end
 
-    before(:each) do
+    before do
       user_session(@teacher1)
       SRGB.visit(@course.id)
     end

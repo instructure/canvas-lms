@@ -1038,7 +1038,6 @@ class Assignment < ActiveRecord::Base
       self.wiki_page = page
     end
   end
-  attr_writer :saved_by
 
   def save_submittable(submittable)
     submittable.assignment_id = self.id

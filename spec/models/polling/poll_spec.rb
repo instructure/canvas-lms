@@ -52,7 +52,7 @@ describe Polling::Poll do
     end
 
     context "the latest poll session available to the user is closed" do
-      before(:each) do
+      before do
         @student = student_in_course(active_user: true).user
         @poll = @teacher.polls.create!(question: 'A Test Poll')
         @choice = @poll.poll_choices.create!(text: 'Choice A', is_correct: true)
@@ -90,7 +90,7 @@ describe Polling::Poll do
       )
     end
 
-    before(:each) do
+    before do
       @poll = @teacher.polls.create!(question: 'A Test Poll')
       @choice1 = @poll.poll_choices.create!(text: 'Choice A', is_correct: false)
       @choice2 = @poll.poll_choices.create!(text: 'Choice B', is_correct: true)

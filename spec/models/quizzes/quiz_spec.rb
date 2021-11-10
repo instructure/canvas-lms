@@ -237,7 +237,7 @@ describe Quizzes::Quiz do
 
     it "triggers submission updates when quiz_type changes" do
       create_quiz_with_submission(quiz_type: 'graded_survey')
-      expect(@quiz).to receive(:destroy_related_submissions).never
+      expect(@quiz).not_to receive(:destroy_related_submissions)
       @quiz.quiz_type = 'assignment'
 
       @quiz.save! # should trigger update_assignment
@@ -433,7 +433,7 @@ describe Quizzes::Quiz do
     q = @course.quizzes.build(:assignment_id => a.id, :title => "some quiz", :points_possible => 10)
     q.workflow_state = 'available'
     q.notify_of_update = 1
-    expect(q.assignment).to receive(:save_without_broadcasting!).never
+    expect(q.assignment).not_to receive(:save_without_broadcasting!)
     q.save
     expect(q.assignment.messages_sent).to include('Assignment Changed')
   end
@@ -507,7 +507,7 @@ describe Quizzes::Quiz do
     expect(q.assignment_id).not_to be_nil
     expect(q.assignment.published?).to be false
     q = Quizzes::Quiz.find(q.id) # reload
-    expect(q.assignment).to receive(:save_without_broadcasting!).never
+    expect(q.assignment).not_to receive(:save_without_broadcasting!)
 
     q.publish!
 
@@ -794,6 +794,7 @@ describe Quizzes::Quiz do
       sub2 = q.generate_submission(u)
       expect(sub2.end_at).to be_nil
     end
+
     it 'does not set end_at to due_at' do
       due_at = 1.day.from_now
       u = User.create!(:name => "Fred Colon")
@@ -801,6 +802,7 @@ describe Quizzes::Quiz do
       sub2 = q.generate_submission(u)
       expect(sub2.end_at).not_to eq due_at
     end
+
     it "sets end_at for course end dates" do
       deadline = 1.day.from_now
       @course.restrict_enrollments_to_course_dates = true
@@ -811,6 +813,7 @@ describe Quizzes::Quiz do
       sub2 = q.generate_submission(@user)
       expect(sub2.end_at).to eq deadline
     end
+
     it "sets end_at to nil" do
       # when course.end_at doesn't exist
       deadline = 1.day.from_now
@@ -825,7 +828,7 @@ describe Quizzes::Quiz do
     end
 
     describe 'term.end_at when no enrollment_restrictions are present' do
-      before(:each) do
+      before do
         @deadline = 3.days.from_now
         @course.conclude_at = 2.days.from_now
         @course.save!
@@ -846,7 +849,7 @@ describe Quizzes::Quiz do
     end
 
     describe 'course.end_at when course.restrict_enrollments_to_course_dates' do
-      before(:each) do
+      before do
         @deadline = 3.days.from_now
         @course.restrict_enrollments_to_course_dates = true
         @course.conclude_at = @deadline
@@ -875,7 +878,7 @@ describe Quizzes::Quiz do
     end
 
     describe 'section.end_at when section.restrict_enrollments_to_section_dates' do
-      before(:each) do
+      before do
         # when course.end_at or term.end_at doesn't exist
         @deadline = 3.days.from_now
         @start_at = 3.days.ago
@@ -1297,7 +1300,7 @@ describe Quizzes::Quiz do
         # publish the quiz
         quiz.workflow_state = 'available'
         quiz.save
-        expect(quiz).to receive(:link_assignment_overrides).never
+        expect(quiz).not_to receive(:link_assignment_overrides)
         quiz.save
       end
     end
@@ -1481,7 +1484,7 @@ describe Quizzes::Quiz do
   end
 
   describe "#update_cached_due_dates?" do
-    before :each do
+    before do
       @quiz = @course.quizzes.create!(title: 'Test Quiz')
     end
 
@@ -1571,7 +1574,7 @@ describe Quizzes::Quiz do
 
     it "does not queue a job to regrade when no current question regrades" do
       course_with_teacher(course: @course, active_all: true)
-      expect(Quizzes::QuizRegrader::Regrader).to receive(:delay).never
+      expect(Quizzes::QuizRegrader::Regrader).not_to receive(:delay)
       quiz = @course.quizzes.create!
       quiz.save!
     end
@@ -2344,6 +2347,7 @@ describe Quizzes::Quiz do
         it 'shows the quiz if there is an override' do
           expect(@quiz.visible_to_user?(@student1)).to be_truthy
         end
+
         it "grants submit rights" do
           allow(@course).to receive(:grants_right?).with(@student1, nil, :participate_as_student).and_return(true)
           allow(@course).to receive(:grants_right?).with(@student1, nil, :manage_assignments).and_return(false)
@@ -2357,11 +2361,13 @@ describe Quizzes::Quiz do
         it 'hides the quiz there is no override' do
           expect(@quiz.visible_to_user?(@student2)).to be_falsey
         end
+
         it 'shows the quiz if it is not only visible to overrides' do
           @quiz.only_visible_to_overrides = false
           @quiz.save!
           expect(@quiz.visible_to_user?(@student2)).to be_truthy
         end
+
         it 'does not grant submit rights' do
           allow(@course).to receive(:grants_right?).with(@student2, nil, :participate_as_student).and_return(true)
           allow(@course).to receive(:grants_right?).with(@student2, nil, :manage_assignments).and_return(false)
@@ -2382,10 +2388,12 @@ describe Quizzes::Quiz do
             @observer_enrollment.update_attribute(:associated_user_id, @student1.id)
             expect(@quiz.visible_to_user?(@observer)).to be_truthy
           end
+
           it 'hides the quiz there is no override' do
             @observer_enrollment.update_attribute(:associated_user_id, @student2.id)
             expect(@quiz.visible_to_user?(@observer)).to be_falsey
           end
+
           it 'shows the quiz if it is not only visible to overrides' do
             @quiz.only_visible_to_overrides = false
             @quiz.save!
@@ -2398,6 +2406,7 @@ describe Quizzes::Quiz do
           it 'shows the quiz if there is an override' do
             expect(@quiz.visible_to_user?(@observer)).to be_truthy
           end
+
           it 'shows the quiz even if there is no override' do
             expect(@quiz.visible_to_user?(@observer)).to be_truthy
           end

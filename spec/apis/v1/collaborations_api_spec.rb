@@ -173,7 +173,7 @@ describe CollaborationsController, type: :request do
     end
 
     describe 'a non-group member' do
-      before(:each) do
+      before do
         user_factory
       end
 

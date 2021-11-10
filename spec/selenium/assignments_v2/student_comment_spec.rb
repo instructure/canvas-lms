@@ -44,7 +44,7 @@ describe 'assignments' do
       @submission.add_comment(author: @teacher, comment: "Nice Work!", attachments: [@attachment])
     end
 
-    before(:each) do
+    before do
       user_session(@student)
       StudentAssignmentPageV2.visit(@course, @assignment)
     end

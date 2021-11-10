@@ -135,7 +135,7 @@ describe "content migrations", :non_parallel do
   end
 
   context "canvas cartridge importing" do
-    before :each do
+    before do
       course_with_teacher_logged_in
       @type = 'canvas_cartridge_importer'
       @filename = 'cc_outcomes.imscc'
@@ -162,7 +162,7 @@ describe "content migrations", :non_parallel do
   end
 
   context "common cartridge importing" do
-    before :each do
+    before do
       course_with_teacher_logged_in
       @type = 'common_cartridge_importer'
       @filename = 'cc_full_test.zip'
@@ -301,7 +301,7 @@ describe "content migrations", :non_parallel do
       @type = "course_copy_importer"
     end
 
-    before :each do
+    before do
       course_with_teacher_logged_in(:active_all => true)
       @copy_from.enroll_teacher(@user).accept
     end

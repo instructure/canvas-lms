@@ -65,6 +65,13 @@ $gradebook_header_height: 3.5em;
       width: 230px;
       z-index: 100;
     }
+
+    &:focus-within {
+      // Firefox
+      outline: thin dotted var(--ic-brand-global-nav-menu-item__text-color);
+      // Webkit/Chrome
+      outline: 5px auto -webkit-focus-ring-color;
+    }
   }
 
   /*

@@ -20,7 +20,7 @@
 require_relative '../../spec_helper'
 
 describe Canvas::RequestForgeryProtection do
-  before :each do
+  before do
     # default setup is a protected non-GET non-API session-authenticated request with bogus tokens
     raw_headers = { 'X-CSRF-Token' => "bogus" }
     raw_headers = ActionDispatch::Request.new(raw_headers)

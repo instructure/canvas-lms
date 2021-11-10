@@ -107,6 +107,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
           subject { json_parse.fetch('gradebook_settings').fetch('colors') }
 
           it { is_expected.to have(5).items } # ensure we add specs for new additions
+
           it do
             is_expected.to include({
                                      'late' => '#000000',

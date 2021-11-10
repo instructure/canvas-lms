@@ -65,10 +65,11 @@ class AppointmentGroup < ActiveRecord::Base
     if record.validation_event_override
       appointments = appointments.select { |a| a.new_record? || a.id != record.validation_event_override.id } << record.validation_event_override
     end
-    appointments.sort_by(&:start_at).inject(nil) do |prev, appointment|
+    prev = nil
+    appointments.sort_by(&:start_at).each do |appointment|
       record.errors.add(attr, t('errors.invalid_end_at', "Appointment end time precedes start time")) if appointment.end_at < appointment.start_at
       record.errors.add(attr, t('errors.overlapping_appointments', "Appointments overlap")) if prev && appointment.start_at < prev.end_at
-      appointment
+      prev = appointment
     end
   end
 
@@ -128,11 +129,10 @@ class AppointmentGroup < ActiveRecord::Base
         # a group category can only be assigned at creation time to
         # appointment groups with one course
         gc = GroupCategory.where(id: $1).first
-        code = @new_sub_context_codes.first
         self.appointment_group_sub_contexts = [
           AppointmentGroupSubContext.new(:appointment_group => self,
                                          :sub_context => gc,
-                                         :sub_context_code => code)
+                                         :sub_context_code => @new_sub_context_codes.first)
         ]
       else
         # if new record and we have a course without sections, add all the sections

@@ -50,8 +50,8 @@ describe ActiveSupport::Callbacks::Suspension do
 
   describe "suspend_callbacks" do
     it "suspends all callbacks by default" do
-      expect(@instance).to receive(:validate).never
-      expect(@instance).to receive(:publish).never
+      expect(@instance).not_to receive(:validate)
+      expect(@instance).not_to receive(:publish)
       @instance.suspend_callbacks { @instance.save }
     end
 
@@ -61,7 +61,7 @@ describe ActiveSupport::Callbacks::Suspension do
     end
 
     it "only suspends given callbacks" do
-      expect(@instance).to receive(:validate).never
+      expect(@instance).not_to receive(:validate)
       expect(@instance).to receive(:publish).once
       @instance.suspend_callbacks(:validate) { @instance.save }
     end
@@ -72,7 +72,7 @@ describe ActiveSupport::Callbacks::Suspension do
     end
 
     it "only suspends callbacks of the given type" do
-      expect(@instance).to receive(:validate).never
+      expect(@instance).not_to receive(:validate)
       expect(@instance).to receive(:publish).once
       @instance.suspend_callbacks(type: :before) { @instance.save }
     end
@@ -80,8 +80,8 @@ describe ActiveSupport::Callbacks::Suspension do
 
   describe "nesting" do
     it "combines suspensions from various levels" do
-      expect(@instance).to receive(:validate).never
-      expect(@instance).to receive(:publish).never
+      expect(@instance).not_to receive(:validate)
+      expect(@instance).not_to receive(:publish)
       @instance.suspend_callbacks(:validate) do
         @instance.suspend_callbacks(:publish) do
           @instance.save
@@ -90,7 +90,7 @@ describe ActiveSupport::Callbacks::Suspension do
     end
 
     it "restores correct subset of suspensions after leaving block" do
-      expect(@instance).to receive(:validate).never
+      expect(@instance).not_to receive(:validate)
       expect(@instance).to receive(:publish).once
       @instance.suspend_callbacks(:validate) do
         @instance.suspend_callbacks(:publish) do
@@ -103,24 +103,24 @@ describe ActiveSupport::Callbacks::Suspension do
 
   describe "inheritance" do
     it "applies suspensions from the class to instances" do
-      expect(@instance).to receive(:validate).never
-      expect(@instance).to receive(:publish).never
+      expect(@instance).not_to receive(:validate)
+      expect(@instance).not_to receive(:publish)
       @class.suspend_callbacks { @instance.save }
     end
 
     it "applies suspensions from a superclass to instances of a subclass" do
       subclass = Class.new(@class)
       instance = subclass.new
-      expect(instance).to receive(:validate).never
-      expect(instance).to receive(:publish).never
+      expect(instance).not_to receive(:validate)
+      expect(instance).not_to receive(:publish)
       @class.suspend_callbacks { instance.save }
     end
 
     it "combines suspensions from various levels" do
       subclass = Class.new(@class)
       instance = subclass.new
-      expect(instance).to receive(:validate).never
-      expect(instance).to receive(:publish).never
+      expect(instance).not_to receive(:validate)
+      expect(instance).not_to receive(:publish)
       # only suspends :validate from save
       instance.suspend_callbacks(:validate, kind: :save) do
         # only suspends :publish
@@ -136,7 +136,7 @@ describe ActiveSupport::Callbacks::Suspension do
     end
 
     it "keeps class suspensions independent per thread" do
-      expect(@instance).to receive(:validate).never
+      expect(@instance).not_to receive(:validate)
       expect(@instance).to receive(:publish).once
 
       @class.suspend_callbacks(:validate) do

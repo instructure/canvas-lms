@@ -222,6 +222,7 @@ export default class CoursesListRow extends React.Component {
                 key={teacher.id}
                 href={teacher.html_url}
                 name={teacher.display_name}
+                avatarName={teacher.display_name}
                 avatar_url={teacher.avatar_image_url}
                 size="x-small"
               />

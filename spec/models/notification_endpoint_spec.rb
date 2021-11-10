@@ -95,7 +95,7 @@ describe NotificationEndpoint do
       ne = @at.notification_endpoints.create!(token: 'token')
 
       expect(@sns_client).to receive(:get_endpoint_attributes).and_return(double(attributes: { 'Enabled' => 'true', 'CustomUserData' => 'not my id' }))
-      expect(@sns_client).to receive(:delete_endpoint).never
+      expect(@sns_client).not_to receive(:delete_endpoint)
       ne.destroy
     end
   end

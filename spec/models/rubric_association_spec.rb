@@ -74,7 +74,7 @@ describe RubricAssociation do
     end
 
     context "when a peer-review assignment has been completed AFTER rubric created" do
-      before :each do
+      before do
         # Create the rubric
         @rubric = @course.rubrics.create! { |r| r.user = @teacher }
 
@@ -87,7 +87,7 @@ describe RubricAssociation do
       end
 
       context "and students are assigned to peer review" do
-        before :each do
+        before do
           # Assign students to peer review
           @assignment.assign_peer_review(@student_1, @student_2)
           @assignment.assign_peer_review(@student_2, @student_1)
@@ -100,21 +100,21 @@ describe RubricAssociation do
     end
 
     context "when a peer-review assignment has been completed BEFORE rubric created" do
-      before :each do
+      before do
         # students complete it
         @assignment.submit_homework(@student_1, :submission_type => 'online_text_entry', :body => 'Finished first')
         @assignment.submit_homework(@student_2, :submission_type => 'online_text_entry', :body => 'Finished second')
       end
 
       context "and students are assigned to peer review" do
-        before :each do
+        before do
           # Assign students to peer review
           @assignment.assign_peer_review(@student_1, @student_2)
           @assignment.assign_peer_review(@student_2, @student_1)
         end
 
         context "and a rubric is created" do
-          before :each do
+          before do
             @rubric = @course.rubrics.create! { |r| r.user = @teacher }
             ra_params = rubric_association_params_for_assignment(@assignment)
             @rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
@@ -136,7 +136,7 @@ describe RubricAssociation do
           :context => @course,
           :purpose => 'bookmark'
         )
-        expect(LearningOutcome).to receive(:update_alignments).never
+        expect(LearningOutcome).not_to receive(:update_alignments)
         ra.update_alignments
       end
 
@@ -279,7 +279,7 @@ describe RubricAssociation do
       @rubric = @course.rubrics.build
       rubric_params = HashWithIndifferentAccess.new({ "title" => "Some Rubric", "criteria" => { "0" => { "learning_outcome_id" => "", "ratings" => { "0" => { "points" => "5", "id" => "blank", "description" => "Full Marks" }, "1" => { "points" => "0", "id" => "blank_2", "description" => "No Marks" } }, "points" => "5", "long_description" => "", "id" => "", "description" => "Description of criterion" } }, "points_possible" => "5", "free_form_criterion_comments" => "0" })
       rubric_association_params = HashWithIndifferentAccess.new({ :association_object => @course, :hide_score_total => "0", :use_for_grading => "0", :purpose => "bookmark" })
-      expect_any_instantiation_of(@course).to receive(:submissions).never
+      expect_any_instantiation_of(@course).not_to receive(:submissions)
       @rubric.update_with_association(@user, rubric_params, @course, rubric_association_params)
     end
   end
@@ -352,7 +352,7 @@ describe RubricAssociation do
         let(:old_rubric) { Rubric.create!(title: 'zzz', context: course) }
         let(:last_updated_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_updated').last }
 
-        before(:each) do
+        before do
           RubricAssociation.generate(
             teacher,
             old_rubric,

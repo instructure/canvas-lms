@@ -42,7 +42,7 @@ describe "BookmarkedCollection::MergeProxy" do
   end
 
   describe "#paginate" do
-    before :each do
+    before do
       @example_class = Class.new(ActiveRecord::Base) do
         self.table_name = 'examples'
       end
@@ -93,7 +93,7 @@ describe "BookmarkedCollection::MergeProxy" do
     end
 
     describe "with multiple collections" do
-      before :each do
+      before do
         @created_scope = @example_class.where(:state => 'created')
         @deleted_scope = @example_class.where(:state => 'deleted')
 
@@ -137,7 +137,7 @@ describe "BookmarkedCollection::MergeProxy" do
       end
 
       context "when multiple collections still have results" do
-        before :each do
+        before do
           @next_page = @proxy.paginate(:per_page => 3).next_page
         end
 
@@ -151,7 +151,7 @@ describe "BookmarkedCollection::MergeProxy" do
       end
 
       context "when just one collection still has results" do
-        before :each do
+        before do
           @next_page = @proxy.paginate(:per_page => 5).next_page
         end
 
@@ -179,7 +179,7 @@ describe "BookmarkedCollection::MergeProxy" do
     end
 
     describe "with a merge proc" do
-      before :each do
+      before do
         @example_class.delete_all
         @courses = 6.times.map { @example_class.create! }
         @scope1 = @example_class.select("id, '1' as scope").where("id<?", @courses[4].id).order(:id)

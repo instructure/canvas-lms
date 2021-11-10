@@ -44,7 +44,7 @@ describe "discussions" do
     )
   }
 
-  before(:each) do
+  before do
     stub_rcs_config
   end
 
@@ -52,7 +52,7 @@ describe "discussions" do
     let(:url) { "/courses/#{course.id}/discussion_topics/new" }
 
     context "as a teacher" do
-      before(:each) do
+      before do
         user_session(teacher)
       end
 
@@ -166,7 +166,7 @@ describe "discussions" do
     end
 
     context "as a student" do
-      before(:each) do
+      before do
         user_session(student)
       end
 
@@ -261,7 +261,7 @@ describe "discussions" do
     context "as a student" do
       let(:account) { course.account }
 
-      before(:each) do
+      before do
         user_session(student)
       end
 

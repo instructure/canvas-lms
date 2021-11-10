@@ -26,11 +26,11 @@ describe CanvasCache::Redis do
   include_context "caching_helpers"
 
   describe ".enabled?" do
-    before(:each) do
+    before do
       CanvasCache::Redis.reset_config!
     end
 
-    after(:each) do
+    after do
       CanvasCache::Redis.reset_config!
     end
 
@@ -51,7 +51,7 @@ describe CanvasCache::Redis do
   end
 
   describe "with redis" do
-    before(:each) do
+    before do
       skip("redis required to test") unless CanvasCache::Redis.enabled?
     end
 

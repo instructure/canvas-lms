@@ -164,6 +164,7 @@ describe AvatarHelper do
     it "returns full URIs for groups" do
       expect(avatar_url_for_group).to match(%r{\Ahttps?://})
     end
+
     context "from other shard" do
       specs_require_sharding
       it "returns full path across shards" do

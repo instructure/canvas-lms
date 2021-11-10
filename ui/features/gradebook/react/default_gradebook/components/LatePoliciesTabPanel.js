@@ -317,7 +317,7 @@ class LatePoliciesTabPanel extends React.Component {
                       inputRef={m => {
                         this.missingSubmissionDeductionInput = m
                       }}
-                      renderLabel={I18n.t('Grade percentage for missing submissions')}
+                      renderLabel={I18n.t('Grade for missing submissions')}
                       disabled={
                         !this.getLatePolicyAttribute('missingSubmissionDeductionEnabled') ||
                         !this.props.gradebookIsEditable
@@ -384,7 +384,7 @@ class LatePoliciesTabPanel extends React.Component {
                       inputRef={l => {
                         this.lateSubmissionDeductionInput = l
                       }}
-                      renderLabel={I18n.t('Late submission deduction percent')}
+                      renderLabel={I18n.t('Late submission deduction')}
                       disabled={
                         !this.getLatePolicyAttribute('lateSubmissionDeductionEnabled') ||
                         !this.props.gradebookIsEditable
@@ -411,7 +411,7 @@ class LatePoliciesTabPanel extends React.Component {
                         !this.props.gradebookIsEditable
                       }
                       id="late-submission-interval"
-                      label={I18n.t('Late submission deduction interval')}
+                      label={I18n.t('Deduction interval')}
                       onChange={this.changeLateSubmissionInterval}
                       value={data.lateSubmissionInterval}
                     >
@@ -432,7 +432,7 @@ class LatePoliciesTabPanel extends React.Component {
                       inputRef={l => {
                         this.lateSubmissionMinimumPercentInput = l
                       }}
-                      renderLabel={I18n.t('Lowest possible grade percent')}
+                      renderLabel={I18n.t('Lowest possible grade')}
                       value={this.currentInputDisplayValue(
                         'lateSubmissionMinimumPercent',
                         MIN_PERCENTAGE_INPUT

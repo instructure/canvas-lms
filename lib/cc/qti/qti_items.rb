@@ -166,13 +166,9 @@ module CC
           short_answer_response_str(node, question)
         elsif question['question_type'] == 'matching_question'
           matching_response_lid(node, question)
-        elsif question['question_type'] == 'multiple_dropdowns_question'
+        elsif %w[multiple_dropdowns_question fill_in_multiple_blanks_question].include?(question['question_type'])
           multiple_dropdowns_response_lid(node, question)
-        elsif question['question_type'] == 'fill_in_multiple_blanks_question'
-          multiple_dropdowns_response_lid(node, question)
-        elsif question['question_type'] == 'calculated_question'
-          calculated_response_str(node, question)
-        elsif question['question_type'] == 'numerical_question'
+        elsif %w[calculated_question numerical_question].include?(question['question_type'])
           calculated_response_str(node, question)
         end
       end
@@ -289,9 +285,7 @@ module CC
           essay_resprocessing(node, question)
         elsif question['question_type'] == 'matching_question'
           matching_resprocessing(node, question)
-        elsif question['question_type'] == 'multiple_dropdowns_question'
-          multiple_dropdowns_resprocessing(node, question)
-        elsif question['question_type'] == 'fill_in_multiple_blanks_question'
+        elsif %w[multiple_dropdowns_question fill_in_multiple_blanks_question].include?(question['question_type'])
           multiple_dropdowns_resprocessing(node, question)
         elsif question['question_type'] == 'calculated_question'
           calculated_resprocessing(node, question)

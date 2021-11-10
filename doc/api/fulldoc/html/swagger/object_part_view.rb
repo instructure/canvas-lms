@@ -27,6 +27,7 @@ class ObjectPartView < HashView
   # 'part' is a hash of name/example pairs, e.g.
   # { "name": "Sheldon Cooper", "email": "sheldon@caltech.example.com" }
   def initialize(name, part)
+    super()
     @name = name
     @part = part
   end

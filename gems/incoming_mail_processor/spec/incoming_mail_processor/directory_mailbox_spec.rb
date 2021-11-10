@@ -117,7 +117,7 @@ describe IncomingMailProcessor::DirectoryMailbox do
       folder = default_config[:folder]
       expect(@mailbox).to receive(:move_file).with(folder, "foo", "aside")
       expect(@mailbox).to receive(:folder_exists?).with(folder, "aside").and_return(true)
-      expect(@mailbox).to receive(:create_folder).never
+      expect(@mailbox).not_to receive(:create_folder)
       @mailbox.each_message do |id, _body|
         @mailbox.move_message(id, "aside")
       end

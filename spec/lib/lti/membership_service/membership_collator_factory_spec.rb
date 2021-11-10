@@ -22,7 +22,7 @@ require_dependency "lti/membership_service/membership_collator_factory"
 
 module Lti::MembershipService
   describe MembershipCollatorFactory do
-    before(:each) do
+    before do
       course_with_teacher
       group_model
     end

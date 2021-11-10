@@ -20,6 +20,7 @@
 
 class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
   def initialize(current_user:, search_term: nil, sort_order: :desc, filter: nil, root_entries: false, relative_entry_id: nil, before_relative_entry: true, include_relative_entry: true)
+    super()
     @current_user = current_user
     @search_term = search_term
     @sort_order = sort_order

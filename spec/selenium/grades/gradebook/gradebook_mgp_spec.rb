@@ -39,7 +39,7 @@ describe "Gradebook with grading periods" do
     end
 
     context 'as a teacher' do
-      before(:each) do
+      before do
         user_session(@teacher)
       end
 
@@ -58,7 +58,7 @@ describe "Gradebook with grading periods" do
     end
 
     context 'as an admin' do
-      before(:each) do
+      before do
         account_admin_user(account: Account.site_admin)
         user_session(@admin)
         show_grading_periods_filter(@admin)

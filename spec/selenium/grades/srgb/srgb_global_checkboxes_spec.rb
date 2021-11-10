@@ -35,7 +35,7 @@ describe "Screenreader Gradebook" do
     assignment_1.grade_student(student, grade: 10, grader: teacher)
   end
 
-  before(:each) do
+  before do
     course_setup
     user_session(teacher)
     srgb_page.visit(test_course.id)

@@ -71,7 +71,7 @@ export default class GeneratePairingCode extends Component {
 
   renderPairingCode = () => {
     if (this.state.pairingCodeError) {
-      return <Text color="error">{I18n.t('There was an error generating the pairing code')}</Text>
+      return <Text color="danger">{I18n.t('There was an error generating the pairing code')}</Text>
     } else {
       return <Text>{this.state.pairingCode}</Text>
     }

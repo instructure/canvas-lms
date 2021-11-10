@@ -439,7 +439,7 @@ describe Api::V1::Submission do
       let(:submission) { assignment.submit_homework(student, submission_type: 'online_upload', attachments: [attachment]) }
       let(:json) { fake_controller.submission_json(submission, assignment, teacher, session) }
 
-      before(:each) do
+      before do
         allow(Canvadocs).to receive(:annotations_supported?).and_return(true)
         allow(Canvadocs).to receive(:enabled?).and_return(true)
         Canvadoc.create!(document_id: "abc123#{attachment.id}", attachment_id: attachment.id)
@@ -562,7 +562,7 @@ describe Api::V1::Submission do
     describe "read_state" do
       let(:field) { "read_state" }
 
-      before :each do
+      before do
         submission.mark_unread(user)
       end
 

@@ -63,10 +63,10 @@ describe Quizzes::QuizSubmissionZipper do
 
     before :once do
       @student = course_with_student
-      @quiz = course_quiz !!:active
+      @quiz = course_quiz(true)
     end
 
-    before :each do
+    before do
       allow(@quiz).to receive(:quiz_submissions).and_return submission_stubs
       allow(Attachment).to receive(:where).with(id: ["1", "2"]).and_return([attachments.first, attachments.second])
       @zipper = Quizzes::QuizSubmissionZipper.new(:quiz => @quiz,
@@ -113,7 +113,7 @@ describe Quizzes::QuizSubmissionZipper do
       local_storage!
       course_with_student :active_all => true
       student = @student
-      quiz = course_quiz !!:active
+      quiz = course_quiz(true)
       question = quiz.quiz_questions.create! :question_data => {
         :name => 'q1', :points_possible => 1,
         :question_type => 'file_upload_question',

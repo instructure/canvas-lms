@@ -98,8 +98,8 @@ describe "Admins API", type: :request do
     end
 
     it "does not send a notification email if passed a 0 'send_confirmation' value" do
-      expect_any_instance_of(AccountUser).to receive(:account_user_notification!).never
-      expect_any_instance_of(AccountUser).to receive(:account_user_registration!).never
+      expect_any_instance_of(AccountUser).not_to receive(:account_user_notification!)
+      expect_any_instance_of(AccountUser).not_to receive(:account_user_registration!)
 
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                { :controller => 'admins', :action => 'create', :format => 'json',
@@ -110,8 +110,8 @@ describe "Admins API", type: :request do
     end
 
     it "does not send a notification email if passed a false 'send_confirmation' value" do
-      expect_any_instance_of(AccountUser).to receive(:account_user_notification!).never
-      expect_any_instance_of(AccountUser).to receive(:account_user_registration!).never
+      expect_any_instance_of(AccountUser).not_to receive(:account_user_notification!)
+      expect_any_instance_of(AccountUser).not_to receive(:account_user_registration!)
 
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
                { :controller => 'admins', :action => 'create', :format => 'json',

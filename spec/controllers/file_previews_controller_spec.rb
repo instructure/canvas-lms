@@ -25,7 +25,7 @@ describe FilePreviewsController do
     course_with_student(account: @account, active_all: true)
   end
 
-  before(:each) do
+  before do
     user_session(@student)
   end
 

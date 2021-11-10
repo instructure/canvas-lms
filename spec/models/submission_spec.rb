@@ -1450,7 +1450,7 @@ describe Submission do
     end
 
     it "does not log ungraded submission change when assignment muted" do
-      expect(Auditors::GradeChange).to receive(:record).never
+      expect(Auditors::GradeChange).not_to receive(:record)
       @assignment.mute!
       @assignment.unmute!
     end
@@ -1646,7 +1646,7 @@ describe Submission do
         end
 
         context "when grade_posting_in_progress is true" do
-          before(:each) do
+          before do
             submission.grade_posting_in_progress = true
           end
 
@@ -1670,7 +1670,7 @@ describe Submission do
         end
 
         context "when grade_posting_in_progress is false" do
-          before(:each) do
+          before do
             submission.grade_posting_in_progress = false
           end
 
@@ -1942,7 +1942,7 @@ describe Submission do
 
   describe "permission policy" do
     describe "can :grade" do
-      before(:each) do
+      before do
         @submission = Submission.new
         @grader = User.new
       end
@@ -1957,7 +1957,7 @@ describe Submission do
     end
 
     describe "can :autograde" do
-      before(:each) do
+      before do
         @submission = Submission.new
       end
 
@@ -2071,7 +2071,7 @@ describe Submission do
   end
 
   describe '#can_grade?' do
-    before(:each) do
+    before do
       @account = Account.new
       @course = Course.new(account: @account)
       @assignment = Assignment.new(course: @course)
@@ -2100,7 +2100,7 @@ describe Submission do
     end
 
     context 'when assignment is unpublished' do
-      before(:each) do
+      before do
         allow(@assignment).to receive(:published?).and_return(false)
 
         @status = @submission.grants_right?(@grader, :grade)
@@ -2116,7 +2116,7 @@ describe Submission do
     end
 
     context 'when the grader does not have the right to manage grades for the course' do
-      before(:each) do
+      before do
         allow(@course).to receive(:grants_right?).with(@grader, nil, :manage_grades).and_return(false)
 
         @status = @submission.grants_right?(@grader, :grade)
@@ -2132,7 +2132,7 @@ describe Submission do
     end
 
     context 'when the grader is a teacher and the assignment is in a closed grading period' do
-      before(:each) do
+      before do
         allow(@course).to receive(:account_membership_allows).with(@grader).and_return(false)
         grading_period = double("grading_period", closed?: true)
         allow(@submission).to receive(:grading_period).and_return(grading_period)
@@ -2150,7 +2150,7 @@ describe Submission do
     end
 
     context "when grader_id is a teacher's id and the assignment is in a closed grading period" do
-      before(:each) do
+      before do
         allow(@course).to receive(:account_membership_allows).with(@grader).and_return(false)
         grading_period = double("grading_period", closed?: true)
         allow(@submission).to receive(:grading_period).and_return(grading_period)
@@ -2180,7 +2180,7 @@ describe Submission do
   end
 
   describe '#can_autograde?' do
-    before(:each) do
+    before do
       @account = Account.new
       @course = Course.new(account: @account)
       @assignment = Assignment.new(course: @course)
@@ -2200,7 +2200,7 @@ describe Submission do
     end
 
     context 'when assignment is unpublished' do
-      before(:each) do
+      before do
         allow(@assignment).to receive(:published?).and_return(false)
 
         @status = @submission.grants_right?(nil, :autograde)
@@ -2216,7 +2216,7 @@ describe Submission do
     end
 
     context 'when the grader is not an autograder' do
-      before(:each) do
+      before do
         @submission.grader_id = 1
 
         @status = @submission.grants_right?(nil, :autograde)
@@ -2232,7 +2232,7 @@ describe Submission do
     end
 
     context 'when the assignment is in a closed grading period for the student' do
-      before(:each) do
+      before do
         grading_period = double("grading_period", closed?: true)
         allow(@submission).to receive(:grading_period).and_return(grading_period)
 
@@ -2345,7 +2345,7 @@ describe Submission do
                                     originality_score: other_state == 'scored' ? 2 : nil)
         end
 
-        before(:each) do
+        before do
           submission.update(attachment_ids: attachment.id.to_s)
         end
 
@@ -2699,7 +2699,7 @@ describe Submission do
                                         originality_report_url: duplicate_url)
             end
 
-            before(:each) do
+            before do
               assignment.submit_homework(test_student, submission_type: 'online_upload',
                                                        attachments: [attachment, other_attachment])
             end
@@ -2753,7 +2753,7 @@ describe Submission do
                                       originality_report_url: other_url)
           end
 
-          before(:each) do
+          before do
             submission.update(attachment_ids: attachment.id.to_s)
           end
 
@@ -2924,7 +2924,7 @@ describe Submission do
         init_turnitin_api
         expect(@assignment).to receive(:create_in_turnitin).and_return(false)
         expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => false, :error? => true, :error_hash => {}))
-        expect(@turnitin_api).to receive(:submitPaper).never
+        expect(@turnitin_api).not_to receive(:submitPaper)
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
         expect(@submission.reload.turnitin_data[:status]).to eq 'error'
       end
@@ -2934,7 +2934,7 @@ describe Submission do
         # first a submission, to get us into failed state
         expect(@assignment).to receive(:create_in_turnitin).and_return(false)
         expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => false, :error? => true, :error_hash => {}))
-        expect(@turnitin_api).to receive(:submitPaper).never
+        expect(@turnitin_api).not_to receive(:submitPaper)
         @submission.submit_to_turnitin(Submission::TURNITIN_RETRY)
         expect(@submission.reload.turnitin_data[:status]).to eq 'error'
 
@@ -2994,7 +2994,7 @@ describe Submission do
 
       it "does not blow up if submission_type has changed when job runs" do
         @submission.submission_type = 'online_url'
-        expect(@submission.context).to receive(:turnitin_settings).never
+        expect(@submission.context).not_to receive(:turnitin_settings)
         expect { @submission.submit_to_turnitin }.not_to raise_error
       end
     end
@@ -3052,7 +3052,7 @@ describe Submission do
         @submission.save!
       end
 
-      before :each do
+      before do
         api = Turnitin::Client.new('test_account', 'sekret')
         expect(Turnitin::Client).to receive(:new).at_least(1).and_return(api)
         expect(api).to receive(:sendRequest).with(:generate_report, 1, include(:oid => "123456789")).at_least(1).and_return('http://foo.bar')
@@ -3209,6 +3209,7 @@ describe Submission do
 
       context 'when assignment.due_date is in the past' do
         before { @assignment.update!(due_at: 1.day.ago) }
+
         it { is_expected.to be_grants_right(student, nil, :view_turnitin_report) }
       end
     end
@@ -3219,6 +3220,7 @@ describe Submission do
           turnitin_settings: @assignment.turnitin_settings.merge(originality_report_visibility: 'never')
         )
       end
+
       it { is_expected.not_to be_grants_right(student, nil, :view_turnitin_report) }
     end
   end
@@ -3268,6 +3270,7 @@ describe Submission do
   context '#external_tool_url' do
     let(:submission) { Submission.new }
     let(:lti_submission) { @assignment.submit_homework @user, submission_type: 'basic_lti_launch', url: 'http://www.example.com' }
+
     context 'submission_type of "basic_lti_launch"' do
       it 'returns a url containing the submitted url' do
         expect(lti_submission.external_tool_url).to eq(lti_submission.url)
@@ -3403,7 +3406,7 @@ describe Submission do
   describe "mute" do
     let(:submission) { Submission.new }
 
-    before :each do
+    before do
       submission.published_score = 100
       submission.published_grade = 'A'
       submission.graded_at = Time.now
@@ -3581,7 +3584,7 @@ describe Submission do
     let(:assignment) { @course.assignments.create! }
     let(:submission) { assignment.submissions.find_by(user: @student) }
 
-    before :each do
+    before do
       assignment.ensure_post_policy(post_manually: true)
     end
 
@@ -3612,7 +3615,7 @@ describe Submission do
     let(:assignment) { @course.assignments.create! }
     let(:submission) { assignment.submissions.find_by(user: @student) }
 
-    before :each do
+    before do
       assignment.grade_student(@student, grader: @teacher, score: 5)
     end
 
@@ -3803,9 +3806,6 @@ describe Submission do
   end
 
   describe "#missing" do
-    SUBMISSIONS_THAT_CANT_BE_MISSING = %w/none on_paper external_tool/
-    SUBMISSION_TYPES = %w/none on_paper online_quiz discussion_topic external_tool online_upload online_text_entry online_url media_recording/
-
     before :once do
       @now = Time.zone.now
       submission_spec_model(cached_due_date: 1.day.ago(@now), submission_type: nil, submit_homework: true)
@@ -3814,8 +3814,17 @@ describe Submission do
       @another_submission = @another_assignment.submissions.last
     end
 
-    SUBMISSION_TYPES.each do |sub_type|
-      should_not_be_missing = SUBMISSIONS_THAT_CANT_BE_MISSING.include?(sub_type)
+    submissions_that_cant_be_missing = %w[none on_paper external_tool]
+    %w[none
+       on_paper
+       online_quiz
+       discussion_topic
+       external_tool
+       online_upload
+       online_text_entry
+       online_url
+       media_recording].each do |sub_type|
+      should_not_be_missing = submissions_that_cant_be_missing.include?(sub_type)
       expected_status = should_not_be_missing ? 'false' : 'true'
       it "returns #{expected_status} when late_policy_status is nil and submission_type is #{sub_type}" do
         @another_assignment.update(submission_types: sub_type)
@@ -4006,7 +4015,7 @@ describe Submission do
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
 
       submission.versioned_originality_reports
-      expect(OriginalityReport).to receive(:where).never
+      expect(OriginalityReport).not_to receive(:where)
       submission.versioned_originality_reports
     end
 
@@ -4056,7 +4065,7 @@ describe Submission do
       OriginalityReport.create!(attachment: attachment, originality_score: '1', submission: submission)
 
       Submission.bulk_load_versioned_originality_reports([submission])
-      expect(OriginalityReport).to receive(:where).never
+      expect(OriginalityReport).not_to receive(:where)
       submission.versioned_originality_reports
     end
 
@@ -4103,7 +4112,7 @@ describe Submission do
 
   context "bulk loading attachments" do
     def ensure_attachments_arent_queried
-      expect(Attachment).to receive(:where).never
+      expect(Attachment).not_to receive(:where)
     end
 
     def submission_for_some_user
@@ -4264,7 +4273,7 @@ describe Submission do
       assignment
     end
 
-    before(:each) do
+    before do
       student_in_course(active_all: true)
       @student2 = user_factory
       @student2_enrollment = @course.enroll_student(@student2)
@@ -5825,12 +5834,12 @@ describe Submission do
   end
 
   describe '#ensure_grader_can_grade' do
-    before(:each) do
+    before do
       @submission = Submission.new()
     end
 
     context 'when #grader_can_grade? returns true' do
-      before(:each) do
+      before do
         expect(@submission).to receive(:grader_can_grade?).and_return(true)
       end
 
@@ -5846,7 +5855,7 @@ describe Submission do
     end
 
     context 'when #grader_can_grade? returns false' do
-      before(:each) do
+      before do
         expect(@submission).to receive(:grader_can_grade?).and_return(false)
       end
 
@@ -5863,7 +5872,7 @@ describe Submission do
   end
 
   describe '#grader_can_grade?' do
-    before(:each) do
+    before do
       @submission = Submission.new()
     end
 
@@ -5934,7 +5943,7 @@ describe Submission do
   end
 
   describe "#comments_excluding_drafts_for" do
-    before(:each) do
+    before do
       @teacher = course_with_user("TeacherEnrollment", course: @course, name: "Teacher", active_all: true).user
       ta = course_with_user("TaEnrollment", course: @course, name: "First Ta", active_all: true).user
       student = course_with_user("StudentEnrollment", course: @course, name: "Student", active_all: true).user
@@ -6557,7 +6566,7 @@ describe Submission do
   end
 
   describe "#can_view_details?" do
-    before :each do
+    before do
       @assignment.update!(anonymous_grading: true)
       @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'a body')
     end
@@ -6566,7 +6575,7 @@ describe Submission do
       let(:reviewer) { @context.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
       let(:reviewer_sub) { @assignment.submissions.find_by!(user: reviewer) }
 
-      before(:each) do
+      before do
         @assignment.update!(peer_reviews: true)
       end
 
@@ -6611,7 +6620,7 @@ describe Submission do
     end
 
     context 'when the assignment is unmuted' do
-      before(:each) do
+      before do
         @assignment.unmute!
       end
 
@@ -6735,7 +6744,6 @@ describe Submission do
       @quiz = generate_quiz(@course)
       @quiz_assignment = @quiz.assignment
 
-      # rubocop:disable Rails/SkipsModelValidations
       @unsubmitted_quiz_submission = @assignment.submissions.create(user: User.create, submission_type: 'online_quiz')
       Submission.where(id: @unsubmitted_quiz_submission.id).update_all(submitted_at: nil, cached_due_date: nil)
 
@@ -6813,8 +6821,6 @@ describe Submission do
       @timely_hw_marked_late = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
       Submission.where(id: @timely_hw_marked_late.id).update_all(submitted_at: @now, cached_due_date: nil)
       Submission.where(id: @timely_hw_marked_late.id).update_all(late_policy_status: 'late')
-      # rubocop:enable Rails/SkipsModelValidations
-
       @late_submission_ids = Submission.late.map(&:id)
     end
 
@@ -6905,7 +6911,6 @@ describe Submission do
       @quiz = generate_quiz(@course)
       @quiz_assignment = @quiz.assignment
 
-      # rubocop:disable Rails/SkipsModelValidations
       @unsubmitted_quiz_submission = @assignment.submissions.create(user: User.create, submission_type: 'online_quiz')
       Submission.where(id: @unsubmitted_quiz_submission.id).update_all(submitted_at: nil, cached_due_date: nil)
 
@@ -6983,8 +6988,6 @@ describe Submission do
       @timely_hw_marked_late = @assignment.submissions.create(user: User.create, submission_type: 'online_text_entry')
       Submission.where(id: @timely_hw_marked_late.id).update_all(submitted_at: @now, cached_due_date: nil)
       Submission.where(id: @timely_hw_marked_late.id).update_all(late_policy_status: 'late')
-      # rubocop:enable Rails/SkipsModelValidations
-
       @not_late_submission_ids = Submission.not_late.map(&:id)
     end
 
@@ -7138,6 +7141,7 @@ describe Submission do
       @assignment.grade_student(@student, score: 10, grader: @teacher, provisional: true)
       @assignment.grade_student(@student, score: 50, grader: @teacher, provisional: true, final: true)
     end
+
     let(:submission) { @assignment.submissions.first }
 
     it 'returns the provisional grade matching the passed-in scorer if provided' do
@@ -7558,16 +7562,19 @@ describe Submission do
 
       context 'when a submission is posted' do
         before { submission.update!(posted_at: Time.zone.now) }
+
         it { is_expected.not_to be_hide_grade_from_student }
       end
     end
 
     context 'when assignment posts automatically' do
       before { assignment.ensure_post_policy(post_manually: false) }
+
       it { is_expected.not_to be_hide_grade_from_student }
 
       context 'when a submission is posted' do
         before { submission.update!(posted_at: Time.zone.now) }
+
         it { is_expected.not_to be_hide_grade_from_student }
       end
 
@@ -7576,6 +7583,7 @@ describe Submission do
           assignment.grade_student(student, score: 5, grader: teacher)
           assignment.hide_submissions
         end
+
         it { is_expected.to be_hide_grade_from_student }
       end
 
@@ -7584,6 +7592,7 @@ describe Submission do
           assignment.update!(submission_types: "online_text_entry")
           assignment.submit_homework(student, submission_type: "online_text_entry", body: "hi")
         end
+
         it { is_expected.not_to be_hide_grade_from_student }
       end
 
@@ -7630,7 +7639,7 @@ describe Submission do
       end
 
       context "when unposting an individual submission" do
-        before(:each) { submission.update!(posted_at: 1.day.ago) }
+        before { submission.update!(posted_at: 1.day.ago) }
 
         context "when post policies are enabled" do
           it "mutes an unmuted assignment when a submission is hidden" do

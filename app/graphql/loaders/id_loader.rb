@@ -34,6 +34,7 @@
 class Loaders::IDLoader < GraphQL::Batch::Loader
   # +scope+ is any ActiveRecord scope
   def initialize(scope)
+    super()
     @scope = scope
   end
 

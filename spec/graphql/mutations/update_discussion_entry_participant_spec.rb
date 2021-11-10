@@ -155,6 +155,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
         expect(@discussion_entry.read?(@discussion_entry.user)).to be false
         expect(@discussion_entry.find_existing_participant(@discussion_entry.user).forced_read_state).to be true
       end
+
       it 'updates the forcedReadState to false' do
         expect(@discussion_entry.read?(@discussion_entry.user)).to be true
         result = run_mutation({ id: @discussion_entry.id, read: false, forcedReadState: false })
@@ -187,6 +188,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
       before do
         @discussion_entry.change_read_state('unread', @discussion_entry.user)
       end
+
       it 'updates the forcedReadState to true' do
         expect(@discussion_entry.read?(@discussion_entry.user)).to be false
         result = run_mutation({ id: @discussion_entry.id, read: true, forcedReadState: true })
@@ -213,6 +215,7 @@ RSpec.describe Mutations::UpdateDiscussionEntryParticipant do
         expect(@discussion_entry.read?(@discussion_entry.user)).to be true
         expect(@discussion_entry.find_existing_participant(@discussion_entry.user).forced_read_state).to be true
       end
+
       it 'updates the forcedReadState to false' do
         expect(@discussion_entry.read?(@discussion_entry.user)).to be false
         result = run_mutation({ id: @discussion_entry.id, read: true, forcedReadState: false })

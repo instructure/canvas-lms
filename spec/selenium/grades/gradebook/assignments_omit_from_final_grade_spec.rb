@@ -58,7 +58,7 @@ describe 'Gradebook omit from final grade assignments' do
   let(:omit_from_final_checkbox) { f('#assignment_omit_from_final_grade') }
 
   context 'assignment edit and show pages' do
-    before(:each) do
+    before do
       enroll_teacher_and_students
       assignment_2
       user_session(teacher)
@@ -80,7 +80,7 @@ describe 'Gradebook omit from final grade assignments' do
   end
 
   context 'as a student' do
-    before(:each) do
+    before do
       enroll_teacher_and_students
       assignment_1.grade_student(student, grade: 10, grader: teacher)
       assignment_3.grade_student(student, grade: 5, grader: teacher)

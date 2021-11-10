@@ -49,7 +49,7 @@ describe Quizzes::QuizQuestion::AnswerParsers::Calculated do
       }
     end
 
-    before(:each) do
+    before do
       @question = parser_class.new(Quizzes::QuizQuestion::AnswerGroup.new(raw_answers)).parse(Quizzes::QuizQuestion::QuestionData.new(question_params))
     end
 

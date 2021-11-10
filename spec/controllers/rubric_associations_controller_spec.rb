@@ -26,6 +26,7 @@ describe RubricAssociationsController do
       post 'create', params: { :course_id => @course.id, :rubric_association => { :rubric_id => @rubric.id } }
       assert_unauthorized
     end
+
     it "assigns variables" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
@@ -39,6 +40,7 @@ describe RubricAssociationsController do
       expect(assigns[:association].title).to eql("some association")
       expect(response).to be_successful
     end
+
     it "creates without manager_rubrics permission" do
       course_with_teacher_logged_in(:active_all => true)
       @course.account.role_overrides.create! :role => teacher_role, :permission => 'manage_rubrics', :enabled => false
@@ -67,7 +69,7 @@ describe RubricAssociationsController do
 
       let(:last_created_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_created').last }
 
-      before(:each) do
+      before do
         user_session(teacher)
       end
 
@@ -171,6 +173,7 @@ describe RubricAssociationsController do
       put 'update', params: { :course_id => @course.id, :id => @rubric_association.id }
       assert_unauthorized
     end
+
     it "assigns variables" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
@@ -179,6 +182,7 @@ describe RubricAssociationsController do
       expect(assigns[:association].title).to eql("some association")
       expect(response).to be_successful
     end
+
     it "updates the rubric if updateable" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
@@ -189,6 +193,7 @@ describe RubricAssociationsController do
       expect(assigns[:association].title).to eql("some association")
       expect(response).to be_successful
     end
+
     it "does not update the rubric if not updateable (should make a new one instead)" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
@@ -200,6 +205,7 @@ describe RubricAssociationsController do
       expect(assigns[:association].title).to eql("some association")
       expect(response).to be_successful
     end
+
     it "updates the association" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
@@ -225,7 +231,7 @@ describe RubricAssociationsController do
       let(:old_rubric) { Rubric.create!(title: 'zzz', context: course) }
       let(:last_updated_event) { AnonymousOrModerationEvent.where(event_type: 'rubric_updated').last }
 
-      before(:each) do
+      before do
         RubricAssociation.generate(
           teacher,
           old_rubric,
@@ -341,7 +347,7 @@ describe RubricAssociationsController do
         RubricAssociation.generate(teacher, rubric, course, purpose: 'grading', association_object: assignment)
       end
 
-      before(:each) do
+      before do
         user_session(teacher)
       end
 

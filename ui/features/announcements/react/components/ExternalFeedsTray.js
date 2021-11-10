@@ -76,7 +76,7 @@ export default class ExternalFeedsTray extends Component {
             }}
             href={this.props.atomFeedUrl}
             icon={IconRssLine}
-            theme={{mediumPadding: '0', mediumHeight: '1.5rem'}}
+            theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
           >
             {I18n.t('RSS Feed')}
           </Button>

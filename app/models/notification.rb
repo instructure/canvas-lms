@@ -317,84 +317,49 @@ class Notification < Switchman::UnshardedRecord
   def default_frequency(user = nil)
     return FREQ_NEVER if user&.default_notifications_disabled?
 
-    # rubocop:disable Lint/DuplicateBranch
     case category
-    when 'All Submissions'
+    when 'All Submissions',
+         'Announcement Created By You',
+         'Announcement Reply',
+         'Calendar',
+         'Course Content',
+         'Conversation Created',
+         'Discussion',
+         'Files',
+         'Student Appointment Signups',
+         'TestNever'
       FREQ_NEVER
-    when 'Announcement'
+    when 'Account Notification',
+         'Added To Conversation',
+         'Announcement',
+         'Appointment Availability',
+         'Appointment Signups',
+         'Appointment Cancelations',
+         'Conversation Message',
+         'Grading',
+         'Invitation',
+         'DiscussionMention',
+         'Migration',
+         'Recording Ready',
+         'Registration',
+         'ReportedReply',
+         'TestImmediately'
       FREQ_IMMEDIATELY
-    when 'Announcement Created By You'
-      FREQ_NEVER
-    when 'Calendar'
-      FREQ_NEVER
-    when 'Student Appointment Signups'
-      FREQ_NEVER
-    when 'Appointment Availability'
-      FREQ_IMMEDIATELY
-    when 'Appointment Signups'
-      FREQ_IMMEDIATELY
-    when 'Appointment Cancelations'
-      FREQ_IMMEDIATELY
-    when 'Course Content'
-      FREQ_NEVER
-    when 'Files'
-      FREQ_NEVER
-    when 'Discussion'
-      FREQ_NEVER
-    when 'DiscussionEntry'
-      FREQ_DAILY
-    when 'DiscussionMention'
-      FREQ_IMMEDIATELY
-    when 'ReportedReply'
-      FREQ_IMMEDIATELY
-    when 'Announcement Reply'
-      FREQ_NEVER
-    when 'Due Date'
+    when 'Due Date',
+         'Grading Policies',
+         'TestWeekly'
       FREQ_WEEKLY
-    when 'Grading'
-      FREQ_IMMEDIATELY
-    when 'Grading Policies'
-      FREQ_WEEKLY
-    when 'Invitation'
-      FREQ_IMMEDIATELY
-    when 'Late Grading'
-      FREQ_DAILY
-    when 'Membership Update'
-      FREQ_DAILY
-    when 'Other'
-      FREQ_DAILY
-    when 'Registration'
-      FREQ_IMMEDIATELY
-    when 'Migration'
-      FREQ_IMMEDIATELY
-    when 'Submission Comment'
-      FREQ_DAILY
-    when 'Reminder'
-      FREQ_DAILY
-    when 'TestImmediately'
-      FREQ_IMMEDIATELY
-    when 'TestDaily'
-      FREQ_DAILY
-    when 'TestWeekly'
-      FREQ_WEEKLY
-    when 'TestNever'
-      FREQ_NEVER
-    when 'Conversation Message'
-      FREQ_IMMEDIATELY
-    when 'Added To Conversation'
-      FREQ_IMMEDIATELY
-    when 'Conversation Created'
-      FREQ_NEVER
-    when 'Recording Ready'
-      FREQ_IMMEDIATELY
-    when 'Content Link Error'
-      FREQ_DAILY
-    when 'Account Notification'
-      FREQ_IMMEDIATELY
     else
+      # 'Content Link Error',
+      # 'DiscussionEntry',
+      # 'Late Grading',
+      # 'Membership Update',
+      # 'Other',
+      # 'Reminder',
+      # 'Submission Comment',
+      # 'TestDaily'
       FREQ_DAILY
     end
-    # rubocop:enable Lint/DuplicateBranch
   end
 
   # TODO i18n: show the localized notification name in the dashboard (or

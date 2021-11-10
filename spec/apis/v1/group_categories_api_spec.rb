@@ -182,7 +182,7 @@ describe "Group Categories API", type: :request do
         @user = @course.teacher_enrollments.first.user
       end
 
-      before :each do
+      before do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
                         @category_path_options.merge(:action => 'create',
                                                      :course_id => @course.to_param),
@@ -490,6 +490,7 @@ describe "Group Categories API", type: :request do
                                                   :group_category_id => @category.to_param))
         expect(response.code).to eq '401'
       end
+
       it "does not allow a student to create a course group category" do
         name = 'Discussion Groups'
         raw_api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
@@ -730,7 +731,7 @@ describe "Group Categories API", type: :request do
         }
         let(:admin) { admin_role(root_account_id: @account.resolved_root_account_id) }
 
-        before :each do
+        before do
           @user = User.create!(name: 'billy')
           @account.account_users.create(user: @user)
         end

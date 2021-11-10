@@ -21,7 +21,7 @@
 require 'webmock/rspec'
 
 describe ReleaseNotesController do
-  around(:each) do |example|
+  around do |example|
     override_dynamic_settings(private: { canvas: { 'release_notes.yml': {
       ddb_endpoint: ENV.fetch('DDB_ENDPOINT', 'http://dynamodb:8000/'),
       ddb_table_name: "canvas_test_release_notes#{ENV.fetch('PARALLEL_INDEX', '')}"
@@ -64,6 +64,7 @@ describe ReleaseNotesController do
       expect(res.first['id']).to eq(the_note.id)
       expect(res.first['langs']).to be_nil
     end
+
     it 'returns the object with langs with includes[]=langs' do
       the_note = note
       get 'index', params: { includes: ['langs'] }

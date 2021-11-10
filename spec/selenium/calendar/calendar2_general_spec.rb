@@ -28,7 +28,7 @@ describe "calendar2" do
     Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
-  before(:each) do
+  before do
     # or some stuff we need to click is "below the fold"
 
     Account.default.tap do |a|
@@ -38,7 +38,7 @@ describe "calendar2" do
   end
 
   context "as a teacher" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 
