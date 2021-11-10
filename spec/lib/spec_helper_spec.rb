@@ -103,4 +103,37 @@ describe "spec_helper" do
       expect(root).not_to encompass([{ :key2 => :val2, :key3 => :val3 }, { :key4 => :val4 }])
     end
   end
+
+  context "ReadOnlyTestStub" do
+    it "switches to a read-only secondary" do
+      GuardRail.activate(:secondary) do
+        expect { User.create! }.to raise_error(ActiveRecord::StatementInvalid, /PG::InsufficientPrivilege/)
+      end
+    end
+
+    it "nests primary inside secondary" do
+      GuardRail.activate(:secondary) do
+        expect { User.last }.not_to raise_error
+        GuardRail.activate(:primary) do
+          expect { User.create! }.not_to raise_error
+        end
+      end
+    end
+
+    it "works with after-transaction-commit hooks" do
+      GuardRail.activate(:secondary) do
+        User.transaction do
+          User.connection.after_transaction_commit do
+            User.last.touch
+          end
+          n = User.count
+          GuardRail.activate(:primary) do
+            expect { User.create! }.not_to raise_error
+          end
+          expect(GuardRail.environment).to eq :secondary
+          expect(User.count).to eq n + 1
+        end
+      end
+    end
+  end
 end

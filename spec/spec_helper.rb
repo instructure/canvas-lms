@@ -182,6 +182,49 @@ module RSpec::Rails
   end
 end
 
+module ReadOnlySecondaryStub
+  def self.reset
+    ActiveRecord::Base.connection.execute("RESET ROLE")
+    Thread.current[:stubbed_guard_rail_env] = nil
+  end
+
+  def switch_role!(env)
+    ActiveRecord::Base.connection.execute(env == :secondary ? "SET ROLE canvas_readonly_user" : "RESET ROLE")
+  end
+
+  def environment
+    Thread.current[:stubbed_guard_rail_env] || super
+  end
+
+  def activate(env)
+    return super if environment == :deploy
+    return super unless [:primary, :secondary].include?(env)
+
+    previous_stub = Thread.current[:stubbed_guard_rail_env]
+    previous_env = previous_stub || :primary
+    return yield if previous_env == env
+
+    begin
+      switch_role!(env)
+      Thread.current[:stubbed_guard_rail_env] = env
+      yield
+    ensure
+      switch_role!(previous_env)
+      Thread.current[:stubbed_guard_rail_env] = previous_stub
+    end
+  end
+end
+GuardRail.singleton_class.prepend ReadOnlySecondaryStub
+
+module ForceTransactionCommitCallbacksToPrimary
+  def commit_records
+    GuardRail.activate(:primary) do
+      super
+    end
+  end
+end
+ActiveRecord::ConnectionAdapters::Transaction.prepend ForceTransactionCommitCallbacksToPrimary
+
 module RenderWithHelpers
   def assign(key, value)
     @assigned_variables ||= {}
@@ -344,6 +387,7 @@ RSpec.configure do |config|
   end
 
   def reset_all_the_things!
+    ReadOnlySecondaryStub.reset
     I18n.locale = :en
     Time.zone = 'UTC'
     LoadAccount.force_special_account_reload = true
