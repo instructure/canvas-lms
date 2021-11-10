@@ -150,7 +150,7 @@ describe 'quizzes' do
       (1..6).each do |var|
         qs.submission_data[
           "question_#{question.id}_#{AssessmentQuestion.variable_id("answer#{var}")}"
-        ] = ("this is my answer ##{var}")
+        ] = "this is my answer ##{var}"
       end
       response_array = qs.submission_data.values
       Quizzes::SubmissionGrader.new(qs).grade_submission

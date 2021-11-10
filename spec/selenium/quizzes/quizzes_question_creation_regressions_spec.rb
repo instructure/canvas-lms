@@ -150,7 +150,7 @@ describe 'quizzes question creation' do
 
       short_answer_field.call
       driver.switch_to.alert
-      yield (driver.switch_to.alert)
+      yield driver.switch_to.alert
       accept_alert
     end
   end

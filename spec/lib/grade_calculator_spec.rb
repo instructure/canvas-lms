@@ -1809,7 +1809,7 @@ describe GradeCalculator do
         end
         GradeCalculator.new(@student.id, @course).compute_and_save_scores
         scored_enrollment_ids = Score.where(assignment_group_id: @group1.id).map(&:enrollment_id)
-        expect(scored_enrollment_ids).to contain_exactly(*(@student.enrollments.map(&:id)))
+        expect(scored_enrollment_ids).to contain_exactly(*@student.enrollments.map(&:id))
       end
 
       it "creates a course score for the student if one does not exist, but assignment group scores exist" do

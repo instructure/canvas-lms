@@ -1549,7 +1549,7 @@ class ApplicationController < ActionController::Base
   end
 
   def log_gets
-    if @page_view && !request.xhr? && request.get? && (((response.media_type || "").to_s.match(/html/)) ||
+    if @page_view && !request.xhr? && request.get? && ((response.media_type || "").to_s.match(/html/) ||
       ((Setting.get('create_get_api_page_views', 'true') == 'true') && api_request?))
       @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
       @page_view_update = true

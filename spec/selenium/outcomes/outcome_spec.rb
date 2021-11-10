@@ -39,7 +39,7 @@ describe "outcomes" do
       f('.submit_button').click
       wait_for_ajaximations
       expect(f('.title').text).to include(title)
-      expect((f('#calculation_int').text).to_i).to eq(value)
+      expect(f('#calculation_int').text.to_i).to eq(value)
     end
 
     context "create/edit/delete outcomes" do

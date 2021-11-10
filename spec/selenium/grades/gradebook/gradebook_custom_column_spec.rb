@@ -47,7 +47,7 @@ describe "Gradebook - custom columns" do
 
     expect(Gradebook.header_selector_by_col_index(2)).to include_text col.title
     expect(Gradebook.slick_headers_selector.map(&:text).join).not_to include hidden.title
-    expect((Gradebook.slick_custom_column_cell_selector).count { |c| c.text == "123456" }).to eq 1
+    expect(Gradebook.slick_custom_column_cell_selector.count { |c| c.text == "123456" }).to eq 1
   end
 
   it "lets you show and hide the teacher notes column", priority: "1", test_id: 3253279 do

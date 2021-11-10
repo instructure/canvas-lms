@@ -140,6 +140,8 @@ Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
 Style/RedundantInterpolation:
   Severity: error
+Style/RedundantParentheses:
+  Severity: error
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
 Style/WhileUntilModifier:

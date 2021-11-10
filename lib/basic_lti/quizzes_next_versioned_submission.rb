@@ -82,7 +82,7 @@ module BasicLTI
     end
 
     def grading_period_closed?
-      !!(submission.grading_period&.closed?)
+      !!submission.grading_period&.closed?
     end
 
     def valid?(launch_url, grade)

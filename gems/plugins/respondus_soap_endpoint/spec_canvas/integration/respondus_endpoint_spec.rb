@@ -43,9 +43,9 @@ describe "Respondus SOAP API", type: :request do
     soap = SOAP::RPC::Driver.new('test', "urn:RespondusAPI")
     soap.options['protocol.streamhandler'] = 'SpecStreamHandler'
     soap.add_method(method,
-                    'userName', 'password', 'context', *(args.map(&:first)))
+                    'userName', 'password', 'context', *args.map(&:first))
     streamHandler = soap.proxy.streamhandler
-    method_args = [userName, password, context, *(args.map(&:last))]
+    method_args = [userName, password, context, *args.map(&:last)]
     streamHandler.capture(soap, method, *method_args) do |s_body, s_headers|
       post "/api/respondus/soap", params: s_body, headers: s_headers
       response

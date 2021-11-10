@@ -267,7 +267,7 @@ module CanvasCache
         unless NON_KEY_COMMANDS.include?(command)
           message[:key] = if command == :mset
                             # This is an array with a single element: an array alternating key/values
-                            request.first { |v| v.first }.select.with_index { |_, i| (i) % 2 == 0 }
+                            request.first { |v| v.first }.select.with_index { |_, i| i % 2 == 0 }
                           elsif command == :mget
                             request
                           else

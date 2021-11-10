@@ -322,7 +322,7 @@ module BasicLTI
         if error_message
           self.code_major = 'failure'
           self.description = error_message
-        elsif assignment.grading_type != "pass_fail" && (assignment.points_possible.nil?)
+        elsif assignment.grading_type != "pass_fail" && assignment.points_possible.nil?
 
           unless (submission = existing_submission)
             submission = Submission.create!(submission_hash.merge(:user => user,

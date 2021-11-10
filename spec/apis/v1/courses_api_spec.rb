@@ -4412,7 +4412,7 @@ describe ContentImportsController, type: :request do
     status_url = data['status_url']
 
     api_call(:get, status_url, { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => data['id'].to_param, :format => 'json' })
-    (JSON.parse(response.body)).tap do |res|
+    JSON.parse(response.body).tap do |res|
       expect(res['workflow_state']).to eq 'started'
       expect(res['progress']).to eq 0
     end
@@ -4423,7 +4423,7 @@ describe ContentImportsController, type: :request do
     expect(cm.content_export.error_messages).to eq []
 
     api_call(:get, status_url, { :controller => 'content_imports', :action => 'copy_course_status', :course_id => @copy_to.to_param, :id => data['id'].to_param, :format => 'json' })
-    (JSON.parse(response.body)).tap do |res|
+    JSON.parse(response.body).tap do |res|
       expect(res['workflow_state']).to eq 'completed'
       expect(res['progress']).to eq 100
     end

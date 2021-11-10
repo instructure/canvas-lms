@@ -402,7 +402,7 @@ class ContentZipper
 
   def add_submission(submission, students, zipfile)
     @submission = submission
-    @logger.debug(" checking submission for #{(submission.user.id)}")
+    @logger.debug(" checking submission for #{submission.user.id}")
 
     users_name = get_user_name(students, submission) unless @assignment.anonymize_students?
     filename = get_filename(users_name, submission)

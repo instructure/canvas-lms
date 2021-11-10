@@ -269,7 +269,7 @@ module CC
         node.resource_link_lookup_uuid resource_link.lookup_uuid if resource_link.present?
       end
 
-      node.tag!(:turnitin_settings, (assignment.send(:turnitin_settings).to_json)) if assignment.turnitin_enabled || assignment.vericite_enabled
+      node.tag!(:turnitin_settings, assignment.send(:turnitin_settings).to_json) if assignment.turnitin_enabled || assignment.vericite_enabled
       if assignment.assignment_configuration_tool_lookup_ids.present?
         resource_codes = assignment.tool_settings_tool.try(:resource_codes) || {}
         node.similarity_detection_tool({

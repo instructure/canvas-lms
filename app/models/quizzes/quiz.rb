@@ -1345,7 +1345,7 @@ class Quizzes::Quiz < ActiveRecord::Base
                          .pluck("s.quiz_id")
 
     quizzes.each do |quiz|
-      quiz.can_unpublish = !(quiz_ids_with_subs.include?(quiz.id)) &&
+      quiz.can_unpublish = !quiz_ids_with_subs.include?(quiz.id) &&
                            (quiz.assignment_id.nil? || !assmnt_ids_with_subs.include?(quiz.assignment_id))
     end
   end
