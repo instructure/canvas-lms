@@ -361,6 +361,13 @@ class OutcomeGroupsApiController < ApplicationController
     # preload the links' outcomes' contexts.
     ActiveRecord::Associations::Preloader.new.preload(@links, :learning_outcome_content => :context)
 
+    if context&.root_account&.feature_enabled?(:improved_outcomes_management) && Account.site_admin.feature_enabled?(:outcomes_friendly_description)
+      account = @context.is_a?(Account) ? @context : @context.account
+      course = @context.is_a?(Course) ? @context : nil
+      friendly_descriptions = resolve_friendly_descriptions(account, course, @links.map(&:content_id)).map { |description| [description.learning_outcome_id, description.description] }
+      outcome_params[:friendly_descriptions] = friendly_descriptions.to_h
+    end
+
     # render to json and serve
     render :json => outcome_links_json(@links, @current_user, session, outcome_params)
   end
