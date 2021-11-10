@@ -101,10 +101,10 @@ const PacePlanDateInput = ({
   }
 
   const handleDateChange = (date: MomentInput) => {
-    const parsedDate = moment(date).startOf('day')
+    const parsedDate = moment(date)
 
     if (parsedDate.isValid()) {
-      onDateChange(parsedDate.format('YYYY-MM-DD'))
+      onDateChange(parsedDate.toISOString(false).split('T')[0])
       setCustomErrors([])
     } else {
       setCustomErrors([I18n.t('The date entered is invalid.')])
