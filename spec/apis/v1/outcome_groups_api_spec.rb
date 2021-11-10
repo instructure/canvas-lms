@@ -1600,7 +1600,7 @@ describe "Outcome Groups API", type: :request do
 
     it "fails (400) if this is the last link for an aligned outcome" do
       aqb = @account.assessment_question_banks.create!
-      exp_warning = /Outcome \'#{@outcome.short_description}\' cannot be deleted because it is aligned to content\./
+      exp_warning = /Outcome '#{@outcome.short_description}' cannot be deleted because it is aligned to content\./
       @outcome.align(aqb, @account, :mastery_type => "none")
       raw_api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                    :controller => 'outcome_groups_api',

@@ -506,7 +506,7 @@ module AttachmentFu # :nodoc:
         name.gsub!(/^.*(\\|\/)/, '')
 
         # Finally, replace all non alphanumeric, underscore or periods with underscore
-        name.gsub!(/[^\w\.\-]/, '_')
+        name.gsub!(/[^\w.\-]/, '_')
       end
     end
 

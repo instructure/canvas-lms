@@ -521,14 +521,14 @@ RSpec.describe ApplicationController do
       controller.instance_variable_set(:@context, @attachment.context)
       allow(controller).to receive(:named_context_url).and_return('')
       url = controller.send(:safe_domain_file_url, @attachment)
-      expect(url).to match(/[\?&]download=1(&|$)/)
+      expect(url).to match(/[?&]download=1(&|$)/)
     end
 
     it "does not include :download=>1 in download urls for relative contexts" do
       controller.instance_variable_set(:@context, @attachment.context)
       allow(controller).to receive(:named_context_url).and_return('')
       url = controller.send(:safe_domain_file_url, @attachment, download: true)
-      expect(url).not_to match(/[\?&]download=1(&|$)/)
+      expect(url).not_to match(/[?&]download=1(&|$)/)
     end
 
     it "includes download_frd=1 and not include inline=1 in url when specified as for download" do

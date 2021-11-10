@@ -228,7 +228,7 @@ describe QuizzesHelper do
         :answers => @answers
       )
 
-      expect(html).to match(/aria\-label/)
+      expect(html).to match(/aria-label/)
       expect(html).to match(/Fill in the blank/)
     end
 

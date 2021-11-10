@@ -64,7 +64,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       assert(saved_content)
-      expect(JSON.parse(saved_content)['content']).to match(%r{<p>hello<\/p>}m)
+      expect(JSON.parse(saved_content)['content']).to match(%r{<p>hello</p>}m)
       driver.local_storage.clear
     end
 
@@ -79,7 +79,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       wait_for_rce
       saved_content = driver.local_storage[autosave_key]
       assert(saved_content)
-      expect(JSON.parse(saved_content)['content']).to match(%r{<p>hello<\/p>.*html text}m)
+      expect(JSON.parse(saved_content)['content']).to match(%r{<p>hello</p>.*html text}m)
       driver.local_storage.clear
     end
 

@@ -128,20 +128,20 @@ module I18nTasks
       end
     end
 
-    LIST_ITEM_PATTERN = /^ {0,3}(\d+\.|\*|\+|\-)\s/
+    LIST_ITEM_PATTERN = /^ {0,3}(\d+\.|\*|\+|-)\s/
 
     def markdown_and_wrappers(str)
       # Since underscores can be wrappers, and underscores can also be inside
       # placeholders (as placeholder names) we need to be unambiguous about
       # underscores in placeholders:
-      dashed_str = str.gsub(/%\{([^\}]+)\}/) { |x| x.gsub("_", "-") }
+      dashed_str = str.gsub(/%\{([^}]+)\}/) { |x| x.gsub("_", "-") }
       # some stuff this doesn't check (though we don't use):
       #   blockquotes, e.g. "> some text"
       #   reference links, e.g. "[an example][id]"
       #   indented code
-      matches = scan_and_report(dashed_str, /\\[\\`\*_\{\}\[\]\(\)#\+\-\.!]/) # escaped special char
+      matches = scan_and_report(dashed_str, /\\[\\`*_{}\[\]()#+\-.!]/) # escaped special char
                 .concat(wrappers(dashed_str))
-                .concat(scan_and_report(dashed_str, /(!?\[)[^\]]+\]\(([^\)"']+).*?\)/).map { |m| "link:#{m.last}" }) # links
+                .concat(scan_and_report(dashed_str, /(!?\[)[^\]]+\]\(([^)"']+).*?\)/).map { |m| "link:#{m.last}" }) # links
 
       # only do fancy markdown checks on multi-line strings
       if dashed_str =~ /\n/
@@ -175,7 +175,7 @@ module I18nTasks
     end
 
     def placeholders(str)
-      str.scan(/%h?\{[^\}]+\}/).sort
+      str.scan(/%h?\{[^}]+\}/).sort
     rescue ArgumentError => e
       puts "Unable to scan string: #{str.inspect}"
       raise e

@@ -466,7 +466,7 @@ class ContentZipper
   end
 
   def sanitize_attachment_filename(filename)
-    filename.gsub(/[\x00\/\\:\*\?\"<>\|]+/, '_')
+    filename.gsub(/[\x00\/\\:*?"<>|]+/, '_')
   end
 
   def sanitize_user_name(user_name)

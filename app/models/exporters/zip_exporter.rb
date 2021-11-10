@@ -55,7 +55,7 @@ module Exporters
     end
 
     def archive_name
-      @archive_name ||= "#{@common_folder_name.gsub(/[\x00-0x20\/\\\?:*"`\s]/, '_')}_export.zip"
+      @archive_name ||= "#{@common_folder_name.gsub(/[\x00-0x20\/\\?:*"`\s]/, '_')}_export.zip"
     end
 
     def export

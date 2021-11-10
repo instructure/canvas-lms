@@ -482,7 +482,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def extension
-    res = (self.filename || "").match(/(\.[^\.]*)\z/).to_s
+    res = (self.filename || "").match(/(\.[^.]*)\z/).to_s
     res = nil if res == ""
     if !res || res == ""
       res = File.mime_types[self.content_type].to_s rescue nil
@@ -588,7 +588,7 @@ class Attachment < ActiveRecord::Base
       self.workflow_state = nil
       self.file_state = 'available'
     end
-    self.md5 = (details[:etag] || "").gsub(/\"/, '')
+    self.md5 = (details[:etag] || "").gsub(/"/, '')
     self.content_type = details[:content_type]
     self.size = details[:content_length]
 

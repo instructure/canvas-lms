@@ -46,7 +46,7 @@ class RouteView < HashView
   end
 
   def remove_parentheticals(str)
-    str.gsub(/\([^\)]+\)/, '')
+    str.gsub(/\([^)]+\)/, '')
   end
 
   def path_variables

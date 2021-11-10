@@ -61,7 +61,7 @@ class ArgumentView < HashView
     # This regex is impossible to read, basically we're splitting the string up
     # into the first [bracketed] section, which might contain internal brackets,
     # and then the rest of the string.
-    md = str.strip.match(%r{\A(\[[\w ,\[\]\|"]+\])?\s*(.+)?}m)
+    md = str.strip.match(%r{\A(\[[\w ,\[\]|"]+\])?\s*(.+)?}m)
     [md[1] || DEFAULT_TYPE, md[2] || DEFAULT_DESC]
   end
 
@@ -80,7 +80,7 @@ class ArgumentView < HashView
 
   def metadata_parts
     remove_outer_square_brackets(@type)
-      .split(/\s*[,\|]\s*/).map { |t| t.force_encoding('UTF-8') }
+      .split(/\s*[,|]\s*/).map { |t| t.force_encoding('UTF-8') }
   end
 
   def enum_and_types

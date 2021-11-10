@@ -290,7 +290,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           elsif question[:question_type] == 'calculated_question'
             list = question[:answers].take(1).flat_map do |ans|
               ans[:variables] && ans[:variables].map do |variable|
-                [variable[:name], variable[:value].to_s].map { |str| str.gsub(/\=>/, '\=>') }.join('=>')
+                [variable[:name], variable[:value].to_s].map { |str| str.gsub(/=>/, '\=>') }.join('=>')
               end
             end
             list << answer[:text]
@@ -303,7 +303,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
               res << (question[:answers].detect { |a| a[:id] == answer_id } || {})[:text]
               match = question[:matches].detect { |m| m[:match_id] == match_id } || question[:answers].detect { |m| m[:match_id] == match_id } || {}
               res << (match[:right] || match[:text])
-              res.map { |s| (s || '').gsub(/\=>/, '\=>') }.join('=>').gsub(/,/, '\,')
+              res.map { |s| (s || '').gsub(/=>/, '\=>') }.join('=>').gsub(/,/, '\,')
             end.join(',')
           elsif question[:question_type] == 'numerical_question'
             row << (answer && answer[:text])

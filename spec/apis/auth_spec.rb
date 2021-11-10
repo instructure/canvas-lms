@@ -123,7 +123,7 @@ describe "API Authentication", type: :request do
 
           expect(response).to be_redirect
           expect(response['Location']).to match(%r{/login/oauth2/auth\?})
-          code = response['Location'].match(/code=([^\?&]+)/)[1]
+          code = response['Location'].match(/code=([^?&]+)/)[1]
           expect(code).to be_present
 
           # we have the code, we can close the browser session
@@ -234,7 +234,7 @@ describe "API Authentication", type: :request do
         post "/login/oauth2/accept", params: { :authenticity_token => cookies['_csrf_token'] }
         expect(response).to be_redirect
         expect(response['Location']).to match(%r{/login/oauth2/auth\?})
-        code = response['Location'].match(/code=([^\?&]+)/)[1]
+        code = response['Location'].match(/code=([^?&]+)/)[1]
         expect(code).to be_present
         get response['Location']
         expect(response).to be_successful
@@ -253,7 +253,7 @@ describe "API Authentication", type: :request do
         get "/login/oauth2/deny"
         expect(response).to be_redirect
         expect(response['Location']).to match(%r{/login/oauth2/auth\?})
-        error = response['Location'].match(%r{error=([^\?&]+)})[1]
+        error = response['Location'].match(%r{error=([^?&]+)})[1]
         expect(error).to eq "access_denied"
         expect(response['Location']).not_to match(%r{code=})
         get response['Location']
@@ -283,7 +283,7 @@ describe "API Authentication", type: :request do
 
         post "/login/oauth2/accept", params: { :authenticity_token => controller.send(:form_authenticity_token) }
 
-        code = response['Location'].match(/code=([^\?&]+)/)[1]
+        code = response['Location'].match(/code=([^?&]+)/)[1]
         expect(code).to be_present
 
         # we have the code, we can close the browser session
@@ -330,7 +330,7 @@ describe "API Authentication", type: :request do
 
             expect(response).to be_redirect
             expect(response['Location']).to match(%r{/login/oauth2/auth\?})
-            code = response['Location'].match(/code=([^\?&]+)/)[1]
+            code = response['Location'].match(/code=([^?&]+)/)[1]
             expect(code).to be_present
 
             # we have the code, we can close the browser session
@@ -395,7 +395,7 @@ describe "API Authentication", type: :request do
 
               expect(response).to be_redirect
               expect(response['Location']).to match(%r{http://www.example.com/my_uri?})
-              code = response['Location'].match(/code=([^\?&]+)/)[1]
+              code = response['Location'].match(/code=([^?&]+)/)[1]
               expect(code).to be_present
 
               # exchange the code for the token
@@ -471,7 +471,7 @@ describe "API Authentication", type: :request do
               get "/login/oauth2/auth", params: params
               expect(response).to be_redirect
               expect(response['Location']).to match(%r{http://www.example.com/my_uri?})
-              code = response['Location'].match(/code=([^\?&]+)/)[1]
+              code = response['Location'].match(/code=([^?&]+)/)[1]
               expect(code).to be_present
 
               # exchange the code for the token

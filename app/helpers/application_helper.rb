@@ -992,7 +992,7 @@ module ApplicationHelper
   end
 
   def add_uri_scheme_name(uri)
-    noSchemeName = !uri.match(%r{^(.+):\/\/(.+)})
+    noSchemeName = !uri.match(%r{^(.+)://(.+)})
     uri = 'http://' + uri if noSchemeName
     uri
   end
@@ -1187,7 +1187,7 @@ module ApplicationHelper
 
   # Determine if url is the current state for the groups sub-nav switcher
   def group_homepage_pathfinder(group)
-    request.fullpath =~ %r{groups\/#{group.id}}
+    request.fullpath =~ %r{groups/#{group.id}}
   end
 
   def link_to_parent_signup(auth_type)

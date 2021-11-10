@@ -31,7 +31,7 @@ module Qti
       imported_formula = @doc.at_css('calculated formula')
       @question[:imported_formula] = CGI.unescape(imported_formula.text) if imported_formula
       get_calculated_property('answer_tolerance')
-      if @question[:answer_tolerance] && !@question[:answer_tolerance].to_s.match(/[^\d\.]/)
+      if @question[:answer_tolerance] && !@question[:answer_tolerance].to_s.match(/[^\d.]/)
         @question[:answer_tolerance] = @question[:answer_tolerance].to_f
       end
 

@@ -15,7 +15,7 @@ def remove_signature(filename)
   return false unless File.exist?(filename)
 
   contents = File.read(filename)
-  contents.gsub!(/\A\# Schema version\: \d{14}\z/, '# ')
+  contents.gsub!(/\A\# Schema version: \d{14}\z/, '# ')
   fp = File.open(filename, 'w')
   fp.puts contents
   fp.close

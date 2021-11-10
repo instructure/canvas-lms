@@ -4968,9 +4968,9 @@ describe Assignment do
 
     it "includes permissions if specified" do
       expect(@assignment.to_json).not_to match(/permissions/)
-      expect(@assignment.to_json(:permissions => { :user => nil })).to match(/\"permissions\"\s*:\s*\{/)
+      expect(@assignment.to_json(:permissions => { :user => nil })).to match(/"permissions"\s*:\s*\{/)
       expect(@assignment.grants_right?(@teacher, :create)).to eql(true)
-      expect(@assignment.to_json(:permissions => { :user => @teacher, :session => nil })).to match(/\"permissions\"\s*:\s*\{\"/)
+      expect(@assignment.to_json(:permissions => { :user => @teacher, :session => nil })).to match(/"permissions"\s*:\s*\{"/)
       hash = @assignment.as_json(:permissions => { :user => @teacher, :session => nil })
       expect(hash["assignment"]).not_to be_nil
       expect(hash["assignment"]["permissions"]).not_to be_nil
