@@ -88,6 +88,15 @@ module PacePlansCommonPageObject
     quiz
   end
 
+  def create_published_pace_plan(module_title, assignment_title)
+    pace_plan_model(course: @course)
+    pace_plan_module = create_course_module(module_title)
+    pace_plan_assignment = create_assignment(@course, assignment_title, 'Assignment 1', 10, 'published')
+    pace_plan_module.add_item(:id => pace_plan_assignment.id, :type => 'assignment')
+    @pace_plan.pace_plan_module_items.create! module_item: @course.context_module_tags[0], duration: 2
+    @pace_plan
+  end
+
   def disable_pace_plans_in_course
     @course.update(enable_pace_plans: false)
   end

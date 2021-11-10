@@ -91,11 +91,11 @@ export const UnpublishedChangesIndicator = ({
     )
   }
   return changeCount ? (
-    <CondensedButton onClick={onClick} margin={margin}>
+    <CondensedButton data-testid="publish-status-button" onClick={onClick} margin={margin}>
       {text(changeCount)}
     </CondensedButton>
   ) : (
-    <span data-testid="publish-status" >{text(changeCount)}</span>
+    <span data-testid="publish-status">{text(changeCount)}</span>
   )
 }
 
