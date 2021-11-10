@@ -685,9 +685,9 @@ module Gradebook
   def self.assignment_header_menu_item_selector(item)
     menu_item_id = ""
 
-    if item =~ /curve(\-?\s?grade)?/i
+    if item =~ /curve(-?\s?grade)?/i
       menu_item_id = 'curve-grades'
-    elsif item =~ /set(\-?\s?default\-?\s?grade)?/i
+    elsif item =~ /set(-?\s?default-?\s?grade)?/i
       menu_item_id = 'set-default-grade'
     end
 
@@ -728,13 +728,13 @@ module Gradebook
     assignment_header_menu_element(assignment_id).click
     menu_item_id = ""
 
-    if menuitem =~ /(message(\-?\s?student)?)/i
+    if menuitem =~ /(message(-?\s?student)?)/i
       menu_item_id = 'message-students-who'
-    elsif menuitem =~ /(curve(\-?\s?grade)?)/i
+    elsif menuitem =~ /(curve(-?\s?grade)?)/i
       menu_item_id = 'curve-grades'
-    elsif menuitem =~ /(set(\-?\s?default\-?\s?grade)?)/i
+    elsif menuitem =~ /(set(-?\s?default-?\s?grade)?)/i
       menu_item_id = 'set-default-grade'
-    elsif menuitem =~ /(download(\-?\s?submission)?)/i
+    elsif menuitem =~ /(download(-?\s?submission)?)/i
       menu_item_id = 'download-submissions'
 
     end

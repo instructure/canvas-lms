@@ -182,7 +182,7 @@ module BasicLTI
 
         # ruby hash will perserve insertion order
         sorted_list = attempts.keys.sort_by do |k|
-          matches = k.match(/\?.*=(\d+)\&/)
+          matches = k.match(/\?.*=(\d+)&/)
           next 0 if matches.blank?
 
           matches.captures.first.to_i # ordered by the first lti parameter

@@ -135,7 +135,7 @@ describe 'creating a quiz' do
       it 'redirects to the correct quiz edit form', priority: "2", test_id: 399887 do
         create_new_quiz
         # check url
-        expect(driver.current_url).to match %r{/courses/\d+/quizzes/#{Quizzes::Quiz.last.id}\/edit}
+        expect(driver.current_url).to match %r{/courses/\d+/quizzes/#{Quizzes::Quiz.last.id}/edit}
       end
 
       # TODO: remove this from test-rail, this test is redundant

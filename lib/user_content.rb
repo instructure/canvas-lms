@@ -98,8 +98,8 @@ module UserContent
       obj.css('param').each do |param|
         params[param['key']] = param['value']
       end
-      (obj['style'] || '').split(/\;/).each do |attr|
-        key, value = attr.split(/\:/).map(&:strip)
+      (obj['style'] || '').split(/;/).each do |attr|
+        key, value = attr.split(/:/).map(&:strip)
         styles[key] = value
       end
       width = css_size(obj['width'])
@@ -176,7 +176,7 @@ module UserContent
       @contextless_types = contextless_types
       @context_prefix = "/#{context.class.name.tableize}/#{context.id}"
       @absolute_part = '(https?://[\w-]+(?:\.[\w-]+)*(?:\:\d{1,5})?)?'
-      @toplevel_regex = %r{#{@absolute_part}(#{@context_prefix})?/(\w+)(?:/([^\s"<'\?\/]*)([^\s"<']*))?}
+      @toplevel_regex = %r{#{@absolute_part}(#{@context_prefix})?/(\w+)(?:/([^\s"<'?/]*)([^\s"<']*))?}
       @handlers = {}
       @default_handler = nil
       @unknown_handler = nil

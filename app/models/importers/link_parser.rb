@@ -131,12 +131,12 @@ module Importers
         unresolved(:wiki_page, :migration_id => $1)
       elsif url =~ /discussion_topic_migration_id=(.*)/
         unresolved(:discussion_topic, :migration_id => $1)
-      elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/([^\?]*)(\?.*)?}
+      elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/modules/items/([^?]*)(\?.*)?}
         unresolved(:module_item, :migration_id => $1, :query => $2)
-      elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/file_ref/([^/\?#]+)(.*)}
+      elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/file_ref/([^/?#]+)(.*)}
         unresolved(:file_ref, :migration_id => $1, :rest => $2,
                               :in_media_iframe => attr == 'src' && node.name == 'iframe' && node['data-media-id'])
-      elsif url =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/([^\?]*)(\?.*)?}
+      elsif url =~ %r{(?:\$CANVAS_OBJECT_REFERENCE\$|\$WIKI_REFERENCE\$)/([^/]*)/([^?]*)(\?.*)?}
         unresolved(:object, :type => $1, :migration_id => $2, :query => $3)
 
       elsif url =~ %r{\$CANVAS_COURSE_REFERENCE\$/(.*)}
@@ -154,7 +154,7 @@ module Importers
             (attr == 'src' && node.name == 'iframe' && node['data-media-id'])
         # Course copy media reference, leave it alone
         resolved
-      elsif attr == 'src' && (info_match = url.match(/\Adata:(?<mime_type>[-\w]+\/[-\w\+\.]+)?;base64,(?<image>.*)/m))
+      elsif attr == 'src' && (info_match = url.match(/\Adata:(?<mime_type>[-\w]+\/[-\w+.]+)?;base64,(?<image>.*)/m))
         link_embedded_image(info_match)
       elsif # rubocop:disable Lint/DuplicateBranch
             # Equation image, leave it alone

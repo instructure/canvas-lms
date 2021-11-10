@@ -659,7 +659,7 @@ describe SubmissionsController do
         it "redirects with confetti" do
           post 'create', params: { :course_id => @course.id, :assignment_id => @assignment.id, :submission => { :submission_type => "online_url", :url => "url" } }
           expect(response).to be_redirect
-          expect(response).to redirect_to(/[\?&]confetti=true/)
+          expect(response).to redirect_to(/[?&]confetti=true/)
         end
 
         context "confetti_for_assignments flag is disabled" do
@@ -674,7 +674,7 @@ describe SubmissionsController do
               :submission => { :submission_type => "online_url", :url => "url" }
             }
             expect(response).to be_redirect
-            expect(response).to_not redirect_to(/[\?&]confetti=true/)
+            expect(response).to_not redirect_to(/[?&]confetti=true/)
           end
         end
       end
@@ -688,7 +688,7 @@ describe SubmissionsController do
         it "redirects without confetti" do
           post 'create', params: { :course_id => @course.id, :assignment_id => @assignment.id, :submission => { :submission_type => "online_url", :url => "url" } }
           expect(response).to be_redirect
-          expect(response).to_not redirect_to(/[\?&]confetti=true/)
+          expect(response).to_not redirect_to(/[?&]confetti=true/)
         end
       end
 
@@ -701,7 +701,7 @@ describe SubmissionsController do
         it "redirects with confetti" do
           post 'create', params: { :course_id => @course.id, :assignment_id => @assignment.id, :submission => { :submission_type => "online_url", :url => "url" } }
           expect(response).to be_redirect
-          expect(response).to redirect_to(/[\?&]confetti=true/)
+          expect(response).to redirect_to(/[?&]confetti=true/)
         end
 
         context "confetti_for_assignments flag is disabled" do
@@ -716,7 +716,7 @@ describe SubmissionsController do
               :submission => { :submission_type => "online_url", :url => "url" }
             }
             expect(response).to be_redirect
-            expect(response).to_not redirect_to(/[\?&]confetti=true/)
+            expect(response).to_not redirect_to(/[?&]confetti=true/)
           end
         end
       end
@@ -738,7 +738,7 @@ describe SubmissionsController do
         }
 
         expect(response).to be_redirect
-        expect(response).to redirect_to(/[\?&]submitted=0/)
+        expect(response).to redirect_to(/[?&]submitted=0/)
       end
 
       it "redirects with submitted=1 when submission is made on time" do
@@ -755,7 +755,7 @@ describe SubmissionsController do
         }
 
         expect(response).to be_redirect
-        expect(response).to redirect_to(/[\?&]submitted=1/)
+        expect(response).to redirect_to(/[?&]submitted=1/)
       end
 
       it "redirects with submitted=2 when submission is late" do
@@ -772,7 +772,7 @@ describe SubmissionsController do
         }
 
         expect(response).to be_redirect
-        expect(response).to redirect_to(/[\?&]submitted=2/)
+        expect(response).to redirect_to(/[?&]submitted=2/)
       end
     end
   end

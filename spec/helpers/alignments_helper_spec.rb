@@ -77,7 +77,7 @@ describe AlignmentsHelper do
       let(:string) { link_to_outcome_alignment(@course, outcome) }
 
       it "does not include an icon-* html class" do
-        expect(string.match(/icon\-/)).to be_falsey
+        expect(string.match(/icon-/)).to be_falsey
       end
 
       it "is a blank link tag" do
@@ -92,7 +92,7 @@ describe AlignmentsHelper do
       }
 
       it "does not include an icon-* html class" do
-        expect(string.match(/icon\-/)).to be_truthy
+        expect(string.match(/icon-/)).to be_truthy
       end
 
       it "is a blank link tag" do
@@ -108,7 +108,7 @@ describe AlignmentsHelper do
       let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it "includes an id of 'alignment_blank'" do
-        expect(string.match(/alignment\_blank/)).to be_truthy
+        expect(string.match(/alignment_blank/)).to be_truthy
       end
 
       it "includes class alignment" do
@@ -117,12 +117,12 @@ describe AlignmentsHelper do
 
       it "includes 1 data-* attribute" do
         expect(html.keys.select { |k|
-          k.match(/data\-/)
+          k.match(/data-/)
         }).to include('data-url')
       end
 
       it "is hidden" do
-        expect(html['style']).to match(/display\:\ none/)
+        expect(html['style']).to match(/display:\ none/)
       end
     end
 
@@ -131,7 +131,7 @@ describe AlignmentsHelper do
       let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
       it "includes an id of 'alignment_{id}'" do
-        expect(string.match(/alignment\_#{alignment.id}/)).to be_truthy
+        expect(string.match(/alignment_#{alignment.id}/)).to be_truthy
       end
 
       it "has classes alignment & its content_type_class" do
@@ -141,12 +141,12 @@ describe AlignmentsHelper do
 
       it "data-ids & data-url attributes" do
         expect(html.keys.select { |k|
-          k.match(/data\-/)
+          k.match(/data-/)
         }).to include('data-id', 'data-url')
       end
 
       it "is not hidden" do
-        expect(html['style']).not_to match(/display\:\ none/)
+        expect(html['style']).not_to match(/display:\ none/)
       end
     end
 
@@ -172,7 +172,7 @@ describe AlignmentsHelper do
 
       it "has html 'data-has-rubric-association' data attritbute" do
         expect(html.keys.find { |k|
-          k.match(/data\-has\-rubric\-association/)
+          k.match(/data-has-rubric-association/)
         }).to be_truthy
       end
     end

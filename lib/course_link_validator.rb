@@ -53,7 +53,7 @@ class CourseLinkValidator
   def initialize(course)
     self.course = course
     domain = course.root_account.domain
-    self.domain_regex = %r{\w+:?\/\/#{domain}\/} if domain
+    self.domain_regex = %r{\w+:?//#{domain}/} if domain
     self.issues = []
     self.visited_urls = {}
   end

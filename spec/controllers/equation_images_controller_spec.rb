@@ -35,7 +35,7 @@ describe EquationImagesController do
     it 'encodes `+` signs properly' do
       latex = '5%5E5%5C%3A+%5C%3A%5Csqrt%7B9%7D'
       get :show, params: { id: latex }
-      expect(assigns(:latex)).to match(/\%2B/)
+      expect(assigns(:latex)).to match(/%2B/)
     end
 
     it 'redirects image requests to codecogs' do

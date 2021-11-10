@@ -223,7 +223,7 @@ module TextHelper
   def markdown_escape(string)
     return string if string.is_a?(MarkdownSafeBuffer)
 
-    markdown_safe(string.gsub(/([\\`\*_\{\}\[\]\(\)\#\+\-\.!])/, '\\\\\1'))
+    markdown_safe(string.gsub(/([\\`*_{}\[\]()\#+\-.!])/, '\\\\\1'))
   end
 
   # use this rather than t() if the translation contains trusted markdown

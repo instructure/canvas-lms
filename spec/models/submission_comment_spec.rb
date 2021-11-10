@@ -204,7 +204,7 @@ This text has a http://www.google.com link in it...
 }
     @comment.save!
     body = @comment.formatted_body
-    expect(body).to match(/\<a/)
+    expect(body).to match(/<a/)
     expect(body).to match(/quoted_text/)
   end
 

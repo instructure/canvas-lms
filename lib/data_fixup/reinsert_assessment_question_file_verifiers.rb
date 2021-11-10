@@ -20,7 +20,7 @@
 module DataFixup::ReinsertAssessmentQuestionFileVerifiers
   def self.links_to_change(data)
     links = Set.new
-    data.scan(/\/assessment_questions\/\d+\/files\/\d+[^\'\"\>]+/) do |link|
+    data.scan(/\/assessment_questions\/\d+\/files\/\d+[^'">]+/) do |link|
       links << link unless link.include?("verifier=")
     end
     updates = {}

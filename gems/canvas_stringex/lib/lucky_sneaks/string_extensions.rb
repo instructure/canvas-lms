@@ -161,7 +161,7 @@ module LuckySneaks
         replaced = " #{replaced} " unless replaced =~ /\\1/
         dummy.gsub!(found, replaced)
       end
-      dummy = dummy.gsub(/(^|\w)'(\w|$)/, '\1\2').gsub(/[\.,:;()\[\]\/\?!\^'"_]/, " ")
+      dummy = dummy.gsub(/(^|\w)'(\w|$)/, '\1\2').gsub(/[.,:;()\[\]\/?!\^'"_]/, " ")
     end
 
     # Replace runs of whitespace in string. Defaults to a single space but any replacement

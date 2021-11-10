@@ -49,7 +49,7 @@ describe "oauth2 flow" do
         expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
         expect_new_page_load { f('#modal-box .Button--primary').click() }
         expect(driver.current_url).to match(%r{/login/oauth2/auth\?})
-        code = driver.current_url.match(%r{code=([^\?&]+)})[1]
+        code = driver.current_url.match(%r{code=([^?&]+)})[1]
         expect(code).to be_present
       end
     end
@@ -71,7 +71,7 @@ describe "oauth2 flow" do
         expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
         expect_new_page_load { f('#modal-box .Button--primary').click() }
         expect(driver.current_url).to match(%r{/login/oauth2/auth\?})
-        code = driver.current_url.match(%r{code=([^\?&]+)})[1]
+        code = driver.current_url.match(%r{code=([^?&]+)})[1]
         expect(code).to be_present
       end
     end
@@ -126,7 +126,7 @@ describe "oauth2 flow" do
       f('input[type=submit]').click
       f('body') # wait until the redirect page loads
 
-      code = driver.current_url.match(%r{code=([^\?&]+)})[1]
+      code = driver.current_url.match(%r{code=([^?&]+)})[1]
       integration_test = ActionDispatch::IntegrationTest.new(self)
       integration_test.post "/login/oauth2/token", params: {
         grant_type: 'authorization_code',

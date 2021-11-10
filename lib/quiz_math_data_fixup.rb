@@ -92,7 +92,7 @@ module QuizMathDataFixup
     html = Nokogiri::HTML5.fragment(html_str)
     if html.children.length == 1 && html.children[0].node_type == Nokogiri::XML::Node::TEXT_NODE
       # look for an equation_images URL in the text and extract the latex
-      m = %r{equation_images\/([^\s]+)}.match(html.content)
+      m = %r{equation_images/([^\s]+)}.match(html.content)
       if m && m[1]
         code = URI.unescape(URI.unescape(m[1]))
         html =
