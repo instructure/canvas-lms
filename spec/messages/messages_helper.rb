@@ -45,7 +45,6 @@ shared_examples_for "a message" do
 
   context ".email" do
     let(:path_type) { :email }
-
     it "renders" do
       generate_message(notification_name, path_type, asset, message_data_with_default)
     end
@@ -53,7 +52,6 @@ shared_examples_for "a message" do
 
   context ".sms" do
     let(:path_type) { :sms }
-
     it "renders" do
       generate_message(notification_name, path_type, asset, message_data_with_default)
     end
@@ -61,7 +59,6 @@ shared_examples_for "a message" do
 
   context ".summary" do
     let(:path_type) { :summary }
-
     it "renders" do
       generate_message(notification_name, path_type, asset, message_data_with_default)
     end
@@ -69,7 +66,6 @@ shared_examples_for "a message" do
 
   context ".twitter" do
     let(:path_type) { :twitter }
-
     it "renders" do
       generate_message(notification_name, path_type, asset, message_data_with_default)
     end
@@ -77,7 +73,6 @@ shared_examples_for "a message" do
 
   context ".push" do
     let(:path_type) { :push }
-
     it "renders" do
       generate_message(notification_name, path_type, asset, message_data_with_default)
     end

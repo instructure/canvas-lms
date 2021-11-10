@@ -21,7 +21,7 @@ require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "cross-institution migration" do
-    include_context "course copy"
+    include_examples "course copy"
 
     before do
       @account = @copy_from.account

@@ -38,7 +38,7 @@ RSpec.configure do |config|
   config.filter_run :focus
   config.order = 'random'
 
-  config.after do
+  config.after(:each) do
     Rails.cache.clear
     # Clean up after ourselves since its a class instance variable
     AdheresToPolicy::Cache.instance_variable_set(:@cache, nil)

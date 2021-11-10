@@ -27,7 +27,7 @@ describe NotificationPreferencesController do
     NotificationPolicy.setup_with_default_policies(@user)
   end
 
-  before do
+  before :each do
     user_session @user
   end
 

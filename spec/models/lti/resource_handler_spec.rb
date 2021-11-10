@@ -25,7 +25,7 @@ module Lti
     include_context 'lti2_spec_helper'
 
     describe 'validations' do
-      before do
+      before(:each) do
         resource_handler.resource_type_code = 'code'
         resource_handler.name = 'name'
         resource_handler.tool_proxy = ToolProxy.new

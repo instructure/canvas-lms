@@ -18,20 +18,22 @@
 #
 
 describe QuizzesNext::ExportService do
+  ExportService = QuizzesNext::ExportService
+
   describe '.applies_to_course?' do
     let(:course) { double('course') }
 
     context 'service enabled for context' do
       it 'returns true' do
         allow(QuizzesNext::Service).to receive(:enabled_in_context?).and_return(true)
-        expect(described_class.applies_to_course?(course)).to eq(true)
+        expect(ExportService.applies_to_course?(course)).to eq(true)
       end
     end
 
     context 'service not enabled for context' do
       it 'returns false' do
         allow(QuizzesNext::Service).to receive(:enabled_in_context?).and_return(false)
-        expect(described_class.applies_to_course?(course)).to eq(false)
+        expect(ExportService.applies_to_course?(course)).to eq(false)
       end
     end
   end
@@ -47,14 +49,14 @@ describe QuizzesNext::ExportService do
       it 'does nothing' do
         allow(QuizzesNext::Service).to receive(:active_lti_assignments_for_course).and_return([])
 
-        expect(described_class.begin_export(course, {})).to be_nil
+        expect(ExportService.begin_export(course, {})).to be_nil
       end
     end
 
     it "filters to selected assignments with selective exports" do
       export_opts = { :selective => true, :exported_assets => ['assignment_42', 'wiki_page_84'] }
       expect(QuizzesNext::Service).to receive(:active_lti_assignments_for_course).with(course, selected_assignment_ids: ["42"]).and_return([])
-      described_class.begin_export(course, export_opts)
+      ExportService.begin_export(course, export_opts)
     end
 
     it 'returns metadata for each assignment' do
@@ -72,7 +74,7 @@ describe QuizzesNext::ExportService do
 
       allow(QuizzesNext::Service).to receive(:active_lti_assignments_for_course).and_return(lti_assignments)
 
-      expect(described_class.begin_export(course, {})).to eq(
+      expect(ExportService.begin_export(course, {})).to eq(
         {
           original_course_uuid: 1234,
           assignments: [
@@ -86,7 +88,7 @@ describe QuizzesNext::ExportService do
 
   describe '.retrieve_export' do
     it 'returns what is sent in' do
-      expect(described_class.retrieve_export('foo')).to eq('foo')
+      expect(ExportService.retrieve_export('foo')).to eq('foo')
     end
   end
 
@@ -136,7 +138,7 @@ describe QuizzesNext::ExportService do
       }
 
       expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).with(payload).once
-      described_class.send_imported_content(new_course, content_migration, basic_import_content)
+      ExportService.send_imported_content(new_course, content_migration, basic_import_content)
     end
 
     it 'ignores not found assignments' do
@@ -146,33 +148,33 @@ describe QuizzesNext::ExportService do
       }
 
       expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).once
-      described_class.send_imported_content(new_course, content_migration, basic_import_content)
+      ExportService.send_imported_content(new_course, content_migration, basic_import_content)
     end
 
     it 'skips assignments created prior to the current migration' do
       Assignment.where(:id => new_assignment1).update_all(:created_at => 1.day.ago)
-      expect(Canvas::LiveEvents).not_to receive(:quizzes_next_quiz_duplicated)
-      described_class.send_imported_content(new_course, content_migration, basic_import_content)
+      expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).never
+      ExportService.send_imported_content(new_course, content_migration, basic_import_content)
     end
 
     it 'puts new assignments in the "duplicating" state' do
       allow(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated)
 
-      described_class.send_imported_content(new_course, content_migration, basic_import_content)
+      ExportService.send_imported_content(new_course, content_migration, basic_import_content)
       expect(new_assignment1.reload.workflow_state).to eq('duplicating')
     end
 
     it 'sets the new assignment as duplicate of the old assignment' do
       allow(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated)
 
-      described_class.send_imported_content(new_course, content_migration, basic_import_content)
+      ExportService.send_imported_content(new_course, content_migration, basic_import_content)
       expect(new_assignment1.reload.duplicate_of).to eq(old_assignment1)
     end
 
     it 'sets the external_tool_tag to be the same as the old tag' do
       allow(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated)
 
-      described_class.send_imported_content(new_course, content_migration, basic_import_content)
+      ExportService.send_imported_content(new_course, content_migration, basic_import_content)
       expect(new_assignment1.reload.external_tool_tag).to eq(old_assignment1.external_tool_tag)
     end
 
@@ -186,7 +188,7 @@ describe QuizzesNext::ExportService do
       # The specific error I care about here is `KeyError`, because that is what
       # is raised when we try to access a key that is not present in the
       # assignment hash, which is what has led to this fix.
-      expect { described_class.send_imported_content(new_course, content_migration, basic_import_content) }.not_to raise_error
+      expect { ExportService.send_imported_content(new_course, content_migration, basic_import_content) }.not_to raise_error
     end
   end
 end

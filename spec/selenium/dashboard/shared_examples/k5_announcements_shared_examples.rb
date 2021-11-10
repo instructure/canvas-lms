@@ -174,7 +174,7 @@ shared_examples_for 'k5 homeroom announcements with multiple homerooms' do |cont
     hr2_stale_announcement.update!(posted_at: 20.days.ago)
   end
 
-  before do
+  before :each do
     case context
     when :student
       user_session @our_student

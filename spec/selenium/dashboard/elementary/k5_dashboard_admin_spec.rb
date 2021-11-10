@@ -34,7 +34,7 @@ describe "admin k5 dashboard" do
     admin_setup
   end
 
-  before do
+  before :each do
     user_session @admin
   end
 

@@ -31,23 +31,49 @@ Layout:
 Layout/LineLength:
   Enabled: false # TODO. Maybe.
 
-Lint:
+Lint/AmbiguousOperator:
   Severity: error
-Lint/AmbiguousBlockAssociation:
-  IgnoredMethods:
-    - change
-    - not_change
-    - raise_error
-Lint/NoFileUtilsRmRf:
-  Severity: warning # intended for specs; not enforced
-Lint/NoSleep:
-  Severity: warning # intended for specs; not enforced
-Lint/NonLocalExitFromIterator:
-  Enabled: false # SnR is too low because of how often this construct is used
+Lint/AmbiguousOperatorPrecedence:
+  Severity: error
+Lint/AmbiguousRegexpLiteral:
+  Severity: error
+Lint/AssignmentInCondition:
+  Severity: error
+Lint/Debugger:
+  Severity: error
+Lint/DeprecatedClassMethods:
+  Severity: error
+Lint/DeprecatedOpenSSLConstant:
+  Severity: error
+Lint/NonDeterministicRequireOrder:
+  Severity: error
+Lint/ParenthesesAsGroupedExpression:
+  Severity: error
+Lint/RedundantRequireStatement:
+  Severity: error
+Lint/RedundantSafeNavigation:
+  Severity: error
+Lint/RedundantSplatExpansion:
+  Severity: error
+Lint/RedundantStringCoercion:
+  Severity: error
+Lint/RedundantWithIndex:
+  Severity: error
 Lint/SafeNavigationConsistency:
   Enabled: false # https://github.com/rubocop/rubocop/issues/9816
+Lint/SendWithMixinArgument:
+  Severity: error
+Lint/SymbolConversion:
+  Severity: error
+Lint/UnifiedInteger:
+  Severity: error
+Lint/UselessAssignment:
+  Severity: error
+Lint/UnusedBlockArgument:
+  Severity: error
 Lint/UnusedMethodArgument:
   AllowUnusedKeywordArguments: true # there's no way to mark a kwarg as unused
+  Severity: error
 
 Metrics:
   Enabled: false # SnR is just too low to have this enabled
@@ -84,20 +110,12 @@ RSpec/DescribedClass:
   Enabled: false # we haven't used it, and it seems antithetical to RSpec/NamedSubject
 RSpec/EmptyExampleGroup:
   Severity: error
-RSpec/EmptyLineAfterExample:
-  Severity: error
-RSpec/EmptyLineAfterHook:
-  Severity: error
-RSpec/EmptyLineAfterFinalLet:
-  Severity: error
 RSpec/ExampleLength:
   Enabled: false # this is a Metrics-style cop
 RSpec/ExampleWording:
   Severity: error
 RSpec/ExpectInHook:
   Enabled: false # follows RSpec/MultipleExpectations
-RSpec/HookArgument:
-  Severity: error
 RSpec/InstanceVariable:
   Enabled: false # legacy code
 RSpec/MessageSpies:
@@ -108,8 +126,6 @@ RSpec/MultipleMemoizedHelpers:
   Enabled: false # complicated setup is sometimes necessary
 RSpec/NestedGroups:
   Enabled: false # legacy code
-RSpec/ReceiveNever:
-  Severity: error
 RSpec/RepeatedDescription:
   Severity: error
 RSpec/SubjectStub:
@@ -146,8 +162,11 @@ Style/WhileUntilModifier:
 # the following cops are currently silenced, but we may want to enable them IF
 # we correct all instances in the codebase first
 
-Lint/UriEscapeUnescape: # TODO
-  Severity: warning
+Lint/AmbiguousBlockAssociation: # TODO
+  IgnoredMethods:
+    - change
+    - not_change
+    - raise_error
 
 Naming/VariableNumber: # TODO
   Enabled: false
@@ -172,6 +191,8 @@ RSpec/ContextWording: # TODO
 RSpec/DescribeClass: # TODO
   Enabled: false
 RSpec/ExpectChange: # TODO: autocorrect (unsafe)
+  Enabled: false
+RSpec/HookArgument: # TODO: autocorrect
   Enabled: false
 RSpec/NamedSubject: # TODO
   Enabled: false

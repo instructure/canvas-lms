@@ -22,7 +22,6 @@ export const StudentViewContextDefaults = {
   allowChangesToSubmission: true,
   cancelDraftAction: () => {},
   isLatestAttempt: true,
-  isObserver: false,
   showDraftAction: () => {},
   startNewAttemptAction: () => {},
   latestSubmission: {},

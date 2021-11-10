@@ -75,11 +75,11 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
     end
 
     context 'selectable_outcomes_in_course_copy enabled' do
-      before do
+      before(:example) do
         @migration.context.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
       end
 
-      after do
+      after(:example) do
         @migration.context.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
       end
 

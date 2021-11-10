@@ -76,7 +76,6 @@ module BroadcastPolicies
 
     describe '#should_dispatch_assignment_submitted_late?' do
       before { allow(submission).to receive(:late?).and_return true }
-
       def wont_send_when
         yield
         expect(policy.should_dispatch_assignment_submitted_late?).to be_falsey
@@ -85,19 +84,16 @@ module BroadcastPolicies
       it 'is true with the inputs are true' do
         expect(policy.should_dispatch_assignment_submitted_late?).to be_truthy
       end
-
       specify {
         wont_send_when {
           allow(submission).to receive(:group_broadcast_submission).and_return true
         }
       }
-
       specify {
         wont_send_when {
           allow(course).to receive(:available?).and_return false
         }
       }
-
       specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:has_submission?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:late?).and_return false } }
@@ -112,7 +108,6 @@ module BroadcastPolicies
       it 'is true when the relevant inputs are true' do
         expect(policy.should_dispatch_assignment_submitted?).to be_truthy
       end
-
       specify { wont_send_when { allow(course).to receive(:available?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:late?).and_return true } }
@@ -132,7 +127,6 @@ module BroadcastPolicies
       it 'is true when the relevant inputs are true' do
         expect(policy.should_dispatch_assignment_resubmitted?).to be_truthy
       end
-
       specify { wont_send_when { allow(course).to receive(:available?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:has_submission?).and_return false } }
@@ -153,7 +147,6 @@ module BroadcastPolicies
       it 'returns true when the inputs are all true' do
         expect(policy.should_dispatch_group_assignment_submitted_late?).to be_truthy
       end
-
       specify { wont_send_when { allow(submission).to receive(:group_broadcast_submission).and_return false } }
       specify { wont_send_when { allow(course).to receive(:available?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false } }
@@ -219,7 +212,7 @@ module BroadcastPolicies
         course.enroll_student(student)
       end
 
-      before do
+      before(:each) do
         assignment.ensure_post_policy(post_manually: true)
         course.update!(workflow_state: "available")
       end

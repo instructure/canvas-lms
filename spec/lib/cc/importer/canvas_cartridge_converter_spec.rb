@@ -23,7 +23,7 @@ require 'nokogiri'
 require 'tmpdir'
 
 describe "Canvas Cartridge importing" do
-  before do
+  before(:each) do
     @converter = get_cc_converter
     @copy_from = course_model
     @from_teacher = @user

@@ -34,7 +34,7 @@ describe AssessmentQuestionBank do
       @group.save
     end
 
-    after do
+    after(:each) do
       Timecop.return
     end
 

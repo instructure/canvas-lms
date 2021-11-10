@@ -21,7 +21,7 @@
 module Outcomes
   module ResultAnalytics
     Rollup = Struct.new(:context, :scores)
-    Result = Struct.new(:learning_outcome, :score, :count, :hide_points) # rubocop:disable Lint/StructNewOverride
+    Result = Struct.new(:learning_outcome, :score, :count, :hide_points)
 
     # Public: Queries learning_outcome_results for rollup.
     #

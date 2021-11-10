@@ -32,7 +32,6 @@ module Lti
       attr_reader :original_tool_id
 
       def initialize(original_tool_id)
-        super()
         @original_tool_id = original_tool_id
       end
 

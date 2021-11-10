@@ -24,7 +24,7 @@ describe 'Course Modules' do
   include_context 'in-process server selenium tests'
   include ModulesPage
 
-  before do
+  before(:each) do
     # create a course with a teacher
     course_with_teacher(active_all: true, course_name: 'Modules Course')
 
@@ -46,7 +46,7 @@ describe 'Course Modules' do
   end
 
   context 'with modules menu' do
-    before do
+    before(:each) do
       user_session(@teacher)
       visit_modules_page(@course.id)
     end

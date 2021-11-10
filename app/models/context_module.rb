@@ -306,11 +306,7 @@ class ContextModule < ActiveRecord::Base
         next if tag.asset_workflow_state == 'deleted'
 
         # although the module will be restored unpublished, the items should match the asset's published state
-        tag.workflow_state = if tag.content && tag.sync_workflow_state_to_asset?
-                               tag.asset_workflow_state
-                             else
-                               'unpublished'
-                             end
+        tag.workflow_state = tag.content && tag.sync_workflow_state_to_asset? ? tag.asset_workflow_state : 'unpublished'
         # deal with the possibility that the asset has been renamed after the module was deleted
         tag.title = Context.asset_name(tag.content) if tag.content && tag.sync_title_to_asset_title?
         tag.save
@@ -393,7 +389,7 @@ class ContextModule < ActiveRecord::Base
       return true
     elsif !self.active?
       return false
-    elsif self.context.user_has_been_observer?(user) # rubocop:disable Lint/DuplicateBranch
+    elsif self.context.user_has_been_observer?(user)
       return true
     end
 
@@ -593,11 +589,13 @@ class ContextModule < ActiveRecord::Base
       end
     end
 
-    shard.activate do
-      DifferentiableAssignment.filter(tags, user, self.context, opts) do |ts, user_ids|
-        filter.call(ts, user_ids, self.context_id, opts)
+    tags = self.shard.activate do
+      DifferentiableAssignment.filter(tags, user, self.context, opts) do |tags, user_ids|
+        filter.call(tags, user_ids, self.context_id, opts)
       end
     end
+
+    tags
   end
 
   def reload
@@ -810,8 +808,10 @@ class ContextModule < ActiveRecord::Base
         action == :done
       when 'must_contribute'
         action == :contributed
-      when 'must_submit', 'min_score'
-        action == :scored || # rubocop:disable Style/MultipleComparison
+      when 'must_submit'
+        action == :scored || action == :submitted
+      when 'min_score'
+        action == :scored ||
           action == :submitted # to mark progress in the incomplete_requirements (moves from 'unlocked' to 'started')
       else
         false
@@ -909,10 +909,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   def completion_events=(value)
-    unless value
-      write_attribute(:completion_events, nil)
-      return
-    end
+    return write_attribute(:completion_events, nil) unless value
 
     write_attribute(:completion_events, (value.map(&:to_sym) & VALID_COMPLETION_EVENTS).join(','))
   end

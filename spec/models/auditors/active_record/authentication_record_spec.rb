@@ -21,7 +21,7 @@
 describe Auditors::ActiveRecord::AuthenticationRecord do
   let(:request_id) { 'abcde-12345' }
 
-  before do
+  before(:each) do
     allow(RequestContextGenerator).to receive_messages(request_id: request_id)
   end
 

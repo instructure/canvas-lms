@@ -55,7 +55,7 @@ RSpec.configure do |config|
 
   config.order = 'random'
 
-  config.before do
+  config.before(:each) do
     # load config from local spec/fixtures/config/redis.yml
     # so that we have something for ConfigFile to parse.
     target_location = Pathname.new(File.join(File.dirname(__FILE__), 'fixtures'))

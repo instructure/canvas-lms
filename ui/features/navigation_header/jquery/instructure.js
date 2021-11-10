@@ -125,10 +125,7 @@ export function enhanceUserContent() {
             )
           }
         }
-        if (
-          (typeof img.style.width !== 'string' || !img.style.width.endsWith('%')) &&
-          !img.classList.contains('equation_image')
-        ) {
+        if (typeof img.style.width !== 'string' || !img.style.width.endsWith('%')) {
           if (img.naturalWidth === 0) {
             img.addEventListener('load', handleWidth)
           } else {

@@ -26,7 +26,6 @@ describe RubricAssessmentsController do
       post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @user.to_param } }
       assert_unauthorized
     end
-
     it "assigns variables" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course, :purpose => 'grading')
@@ -212,7 +211,7 @@ describe RubricAssessmentsController do
         }
       end
 
-      before do
+      before(:each) do
         course.enroll_teacher(teacher, enrollment_state: 'active')
         course.enroll_ta(provisional_grader, enrollment_state: 'active')
         course.enroll_ta(interloper, enrollment_state: 'active')
@@ -250,7 +249,7 @@ describe RubricAssessmentsController do
       end
 
       describe 'returned JSON' do
-        before do
+        before(:each) do
           assignment.moderation_graders.create!(user: provisional_grader, anonymous_id: 'noooo')
         end
 
@@ -333,7 +332,6 @@ describe RubricAssessmentsController do
       post 'remind', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :assessment_request_id => @assessment_request.id }
       assert_unauthorized
     end
-
     it "sends reminder" do
       user_session(@teacher)
       post 'remind', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :assessment_request_id => @assessment_request.id }
@@ -467,7 +465,7 @@ describe RubricAssessmentsController do
   end
 
   describe 'user ID handling' do
-    before do
+    before(:each) do
       setup_course_assessment
       @assignment.find_or_create_submission(@student1).update!(anonymous_id: 'abcde')
     end

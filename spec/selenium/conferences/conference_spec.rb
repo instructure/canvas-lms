@@ -35,7 +35,7 @@ describe 'Web conferences' do
     end
   end
 
-  before do
+  before(:each) do
     user_session(@teacher)
     get conferences_index_page
     stub_request(:get, /wimba\.instructure\.com/)
@@ -70,7 +70,6 @@ describe 'Web conferences' do
 
   context 'when concluding a conference' do
     let(:conference_title) { 'Newer Conference' }
-
     before(:once) do
       conference = create_wimba_conference(conference_title)
       conference.add_attendee(@user)
@@ -91,7 +90,7 @@ describe 'Web conferences' do
     end
 
     context 'as a TA invited to the conference' do
-      before do
+      before(:each) do
         user_session(@ta)
         get conferences_index_page
       end

@@ -44,135 +44,139 @@ shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
 end
 
 describe Quizzes::QuizSubmissionsApiController, type: :request do
-  def enroll_student
-    last_user = @teacher = @user
-    student_in_course(active_all: true)
-    @student = @user
-    @user = last_user
-  end
+  module Helpers
+    def enroll_student
+      last_user = @teacher = @user
+      student_in_course(active_all: true)
+      @student = @user
+      @user = last_user
+    end
 
-  def enroll_student_and_submit(submission_data = {})
-    enroll_student
-    @quiz_submission = @quiz.generate_submission(@student)
-    @quiz_submission.submission_data = submission_data
-    @quiz_submission.mark_completed
-    Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
-    @quiz_submission.reload
-  end
+    def enroll_student_and_submit(submission_data = {})
+      enroll_student
+      @quiz_submission = @quiz.generate_submission(@student)
+      @quiz_submission.submission_data = submission_data
+      @quiz_submission.mark_completed
+      Quizzes::SubmissionGrader.new(@quiz_submission).grade_submission
+      @quiz_submission.reload
+    end
 
-  def make_second_attempt
-    @quiz_submission.attempt = 2
-    @quiz_submission.with_versioning(true, &:save!)
-  end
+    def make_second_attempt
+      @quiz_submission.attempt = 2
+      @quiz_submission.with_versioning(true, &:save!)
+    end
 
-  def normalize(value)
-    value = 0 if value.is_a?(Float) && value.abs < Float::EPSILON
-    value.to_json.to_s
-  end
+    def normalize(value)
+      value = 0 if value == 0.0
+      value.to_json.to_s
+    end
 
-  def qs_api_index(raw = false, data = {})
-    url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions.json"
-    params = { :controller => 'quizzes/quiz_submissions_api', :action => 'index', :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s }
-    if raw
-      raw_api_call(:get, url, params, data)
-    else
-      api_call(:get, url, params, data)
+    def qs_api_index(raw = false, data = {})
+      url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions.json"
+      params = { :controller => 'quizzes/quiz_submissions_api', :action => 'index', :format => 'json',
+                 :course_id => @course.id.to_s,
+                 :quiz_id => @quiz.id.to_s }
+      if raw
+        raw_api_call(:get, url, params, data)
+      else
+        api_call(:get, url, params, data)
+      end
+    end
+
+    def qs_api_submission(raw = false, data = {})
+      url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submission.json"
+      params = { :controller => 'quizzes/quiz_submissions_api',
+                 :action => 'submission',
+                 :format => 'json',
+                 :course_id => @course.id.to_s,
+                 :quiz_id => @quiz.id.to_s }
+      if raw
+        raw_api_call(:get, url, params, data)
+      else
+        api_call(:get, url, params, data)
+      end
+    end
+
+    def qs_api_show(raw = false, data = {})
+      url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}.json"
+      params = { :controller => 'quizzes/quiz_submissions_api',
+                 :action => 'show',
+                 :format => 'json',
+                 :course_id => @course.id.to_s,
+                 :quiz_id => @quiz.id.to_s,
+                 :id => @quiz_submission.id.to_s }
+      if raw
+        raw_api_call(:get, url, params, data)
+      else
+        api_call(:get, url, params, data)
+      end
+    end
+
+    def qs_api_create(raw = false, data = {})
+      url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions"
+      params = { :controller => 'quizzes/quiz_submissions_api',
+                 :action => 'create',
+                 :format => 'json',
+                 :course_id => @course.id.to_s,
+                 :quiz_id => @quiz.id.to_s }
+      if raw
+        raw_api_call(:post, url, params, data)
+      else
+        api_call(:post, url, params, data)
+      end
+    end
+
+    def qs_api_complete(raw = false, data = {})
+      url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/complete"
+      params = { :controller => 'quizzes/quiz_submissions_api',
+                 :action => 'complete',
+                 :format => 'json',
+                 :course_id => @course.id.to_s,
+                 :quiz_id => @quiz.id.to_s,
+                 :id => @quiz_submission.id.to_s }
+      data = {
+        validation_token: @quiz_submission.validation_token
+      }.merge(data)
+
+      if raw
+        raw_api_call(:post, url, params, data)
+      else
+        api_call(:post, url, params, data)
+      end
+    end
+
+    def qs_api_update(raw = false, data = {})
+      url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}"
+      params = { :controller => 'quizzes/quiz_submissions_api',
+                 :action => 'update',
+                 :format => 'json',
+                 :course_id => @course.id.to_s,
+                 :quiz_id => @quiz.id.to_s,
+                 :id => @quiz_submission.id.to_s }
+      if raw
+        raw_api_call(:put, url, params, data)
+      else
+        api_call(:put, url, params, data)
+      end
+    end
+
+    def qs_api_time(raw = false, data = {})
+      url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/time"
+      params = { :controller => 'quizzes/quiz_submissions_api',
+                 :action => 'time',
+                 :format => 'json',
+                 :course_id => @course.id.to_s,
+                 :quiz_id => @quiz.id.to_s,
+                 :id => @quiz_submission.id.to_s }
+      if raw
+        raw_api_call(:get, url, params, data)
+      else
+        api_call(:get, url, params, data)
+      end
     end
   end
 
-  def qs_api_submission(raw = false, data = {})
-    url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submission.json"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'submission',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s }
-    if raw
-      raw_api_call(:get, url, params, data)
-    else
-      api_call(:get, url, params, data)
-    end
-  end
-
-  def qs_api_show(raw = false, data = {})
-    url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}.json"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'show',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s,
-               :id => @quiz_submission.id.to_s }
-    if raw
-      raw_api_call(:get, url, params, data)
-    else
-      api_call(:get, url, params, data)
-    end
-  end
-
-  def qs_api_create(raw = false, data = {})
-    url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'create',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s }
-    if raw
-      raw_api_call(:post, url, params, data)
-    else
-      api_call(:post, url, params, data)
-    end
-  end
-
-  def qs_api_complete(raw = false, data = {})
-    url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/complete"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'complete',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s,
-               :id => @quiz_submission.id.to_s }
-    data = {
-      validation_token: @quiz_submission.validation_token
-    }.merge(data)
-
-    if raw
-      raw_api_call(:post, url, params, data)
-    else
-      api_call(:post, url, params, data)
-    end
-  end
-
-  def qs_api_update(raw = false, data = {})
-    url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'update',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s,
-               :id => @quiz_submission.id.to_s }
-    if raw
-      raw_api_call(:put, url, params, data)
-    else
-      api_call(:put, url, params, data)
-    end
-  end
-
-  def qs_api_time(raw = false, data = {})
-    url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/time"
-    params = { :controller => 'quizzes/quiz_submissions_api',
-               :action => 'time',
-               :format => 'json',
-               :course_id => @course.id.to_s,
-               :quiz_id => @quiz.id.to_s,
-               :id => @quiz_submission.id.to_s }
-    if raw
-      raw_api_call(:get, url, params, data)
-    else
-      api_call(:get, url, params, data)
-    end
-  end
+  include Helpers
 
   before :once do
     course_with_teacher :active_all => true
@@ -517,7 +521,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       context 'access validations' do
         include_examples 'Quiz Submissions API Restricted Endpoints'
 
-        before do
+        before :each do
           @request_proxy = method(:qs_api_create)
         end
 
@@ -718,7 +722,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         quiz_submissions: [{
           attempt: @quiz_submission.attempt,
           questions: {
-            @qq1.id.to_s => {
+            "#{@qq1.id}" => {
               score: 10
             }
           }
@@ -735,7 +739,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         quiz_submissions: [{
           attempt: @quiz_submission.attempt,
           questions: {
-            @qq2.id.to_s => {
+            "#{@qq2.id}" => {
               comment: 'Aaaaaughibbrgubugbugrguburgle'
             }
           }
@@ -765,20 +769,17 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       @quiz_submission.update_attribute(:end_at, now + 1.hour)
       Quizzes::QuizSubmission.where(:id => @quiz_submission).update_all(:updated_at => now - 1.hour)
     end
-
     it "gives times for the quiz" do
       json = qs_api_time(false)
       expect(json).to have_key("time_left")
       expect(json).to have_key("end_at")
       expect(json["time_left"]).to be_within(5.0).of(60 * 60)
     end
-
     it "rejects a teacher other student" do
       @user = @teacher
       qs_api_time(true)
       assert_status(401)
     end
-
     it "rejects another student" do
       enroll_student
       @user = @student

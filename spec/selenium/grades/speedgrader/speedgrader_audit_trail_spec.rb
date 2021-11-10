@@ -63,7 +63,7 @@ describe 'Audit Trail' do
     end
   end
 
-  before do
+  before :each do
     user_session(@teacher3)
   end
 

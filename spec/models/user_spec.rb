@@ -1367,7 +1367,6 @@ describe User do
 
   context "tabs_available" do
     before(:once) { Account.default }
-
     it "does not include unconfigured external tools" do
       tool = Account.default.context_external_tools.new(:consumer_key => 'bob', :shared_secret => 'bob', :name => 'bob', :domain => "example.com")
       tool.course_navigation = { :url => "http://www.example.com", :text => "Example URL" }
@@ -1507,24 +1506,20 @@ describe User do
         @user.avatar_image_url = '1234567890ABCDEF'
         @user.save!
       end
-
       it "raises ArgumentError when uuid nil or blank" do
         expect { @user.clear_avatar_image_url_with_uuid(nil) }.to raise_error(ArgumentError, "'uuid' is required and cannot be blank")
         expect { @user.clear_avatar_image_url_with_uuid('') }.to raise_error(ArgumentError, "'uuid' is required and cannot be blank")
         expect { @user.clear_avatar_image_url_with_uuid('  ') }.to raise_error(ArgumentError, "'uuid' is required and cannot be blank")
       end
-
       it "clears avatar_image_url when uuid matches" do
         @user.clear_avatar_image_url_with_uuid('1234567890ABCDEF')
         expect(@user.avatar_image_url).to be_nil
         expect(@user.changed?).to eq false # should be saved
       end
-
       it "does not clear avatar_image_url when no match" do
         @user.clear_avatar_image_url_with_uuid('NonMatchingText')
         expect(@user.avatar_image_url).to eq '1234567890ABCDEF'
       end
-
       it "does not error when avatar_image_url is nil" do
         @user.avatar_image_url = nil
         @user.save!
@@ -1808,7 +1803,7 @@ describe User do
     context "sharding" do
       specs_require_sharding
 
-      before do
+      before :each do
         account2 = @shard1.activate { account_model }
         (4..6).each do |x|
           course = course_with_student(:course_name => "Course #{x}", :user => @user, :active_all => true, :account => account2).course
@@ -2223,7 +2218,6 @@ describe User do
       expect(User.avatar_key("2")).to eq "2-#{Canvas::Security.hmac_sha1('2')[0, 10]}"
       expect(User.avatar_key("161612461246")).to eq "161612461246-#{Canvas::Security.hmac_sha1('161612461246')[0, 10]}"
     end
-
     it " should return '0' for an invalid user id" do
       expect(User.avatar_key(nil)).to eq "0"
       expect(User.avatar_key("")).to eq "0"
@@ -2236,7 +2230,6 @@ describe User do
       expect(User.user_id_from_avatar_key("2-#{Canvas::Security.hmac_sha1('2')[0, 10]}")).to eq '2'
       expect(User.user_id_from_avatar_key("1536394658-#{Canvas::Security.hmac_sha1('1536394658')[0, 10]}")).to eq '1536394658'
     end
-
     it "returns nil for an invalid avatar key" do
       expect(User.user_id_from_avatar_key("1-#{Canvas::Security.hmac_sha1('1')}")).to eq nil
       expect(User.user_id_from_avatar_key("1")).to eq nil
@@ -2309,7 +2302,6 @@ describe User do
 
   describe "quota" do
     before(:once) { user_factory }
-
     it "defaults to User.default_storage_quota" do
       expect(@user.quota).to eql User.default_storage_quota
     end
@@ -2334,7 +2326,6 @@ describe User do
     before :once do
       user_with_pseudonym
     end
-
     let_once(:root_acct1) { Account.create! }
     let_once(:root_acct2) { Account.create! }
 
@@ -2668,7 +2659,6 @@ describe User do
 
   describe "manual_mark_as_read" do
     let(:user) { User.new }
-
     subject { user.manual_mark_as_read? }
 
     context 'default' do
@@ -2677,13 +2667,11 @@ describe User do
 
     context 'after being set to true' do
       before { allow(user).to receive_messages(preferences: { manual_mark_as_read: true }) }
-
       it     { is_expected.to be_truthy }
     end
 
     context 'after being set to false' do
       before { allow(user).to receive_messages(preferences: { manual_mark_as_read: false }) }
-
       it     { is_expected.to be_falsey }
     end
   end
@@ -2999,17 +2987,6 @@ describe User do
         # ensure seeking user gets permissions it should on target user
         expect(target.grants_right?(seeker, :view_statistics)).to eq true
       end
-
-      it 'falls back to user shard for callsite, if no account associations found for target user' do
-        account = Account.default
-        target = user_factory()
-        seeker = account_admin_user(
-          account: account,
-          role: Role.get_built_in_role('AccountAdmin', root_account_id: account.id)
-        )
-        # ensure seeking user gets permissions it should on target user
-        expect(target.grants_right?(seeker, :read_full_profile)).to eq true
-      end
     end
   end
 
@@ -3108,7 +3085,7 @@ describe User do
     end
 
     it "batches DueDateCacher jobs" do
-      expect(DueDateCacher).not_to receive(:recompute)
+      expect(DueDateCacher).to receive(:recompute).never
       expect(DueDateCacher).to receive(:recompute_users_for_course).twice # sync_enrollments and destroy_enrollments
       test_student = @course.student_view_student
       test_student.destroy
@@ -3449,7 +3426,7 @@ describe User do
   describe "#participating_student_current_and_concluded_course_ids" do
     let(:user) { User.create! }
 
-    before do
+    before :each do
       course_with_student(user: user, active_all: true)
     end
 
@@ -3492,7 +3469,7 @@ describe User do
   end
 
   describe '#dashboard_view' do
-    before do
+    before(:each) do
       course_factory
       user_factory(active_all: true)
       user_session(@user)
@@ -3616,7 +3593,7 @@ describe User do
     end
 
     context "user has opted out of celebrations" do
-      before do
+      before :each do
         user.enable_feature!(:disable_celebrations)
       end
 
@@ -3663,13 +3640,13 @@ describe User do
       expect(@ta.can_create_enrollment_for?(@course, nil, 'ObserverEnrollment')).to be_truthy
     end
 
-    it "returns false if :manage_students is enabled" do
+    it "returns true if :manage_students is enabled" do
       @course.root_account.role_overrides.create!(
         permission: 'add_student_to_course',
         role: ta_role,
         enabled: false
       )
-      expect(@ta.can_create_enrollment_for?(@course, nil, 'StudentEnrollment')).to be_falsey
+      expect(@ta.can_create_enrollment_for?(@course, nil, 'StudentEnrollment')).to be_truthy
     end
 
     it "returns true if :manage_students is disabled" do
@@ -3755,80 +3732,5 @@ describe User do
       @account.save!
       expect(@user.create_courses_right(@account)).to be(:student)
     end
-
-    context "with teachers_can_create_courses_anywhere and students_can_create_courses_anywhere false" do
-      before :once do
-        @account.settings[:teachers_can_create_courses_anywhere] = false
-        @account.settings[:students_can_create_courses_anywhere] = false
-        @account.save!
-      end
-
-      context "with teachers_can_create_courses and students_can_create_courses true" do
-        before :once do
-          @account.settings[:teachers_can_create_courses] = true
-          @account.settings[:students_can_create_courses] = true
-          @account.save!
-        end
-
-        context "when user has no k5 enrollments" do
-          before do
-            allow(@user).to receive(:active_k5_enrollments?).and_return(false)
-          end
-
-          it "returns nil for root account if user has teacher enrollments but teachers_can_create_courses_anywhere is false" do
-            course_with_teacher(user: @user, active_all: true)
-            expect(@user.create_courses_right(@account)).to be_nil
-          end
-
-          it "returns nil for root account if user has student enrollments but students_can_create_courses_anywhere is false" do
-            course_with_student(user: @user, active_all: true)
-            expect(@user.create_courses_right(@account)).to be_nil
-          end
-
-          it "returns :teacher for MCC account if user has teacher enrollments and teachers_can_create_courses_anywhere is false" do
-            course_with_teacher(user: @user, active_all: true)
-            expect(@user.create_courses_right(@account.manually_created_courses_account)).to be(:teacher)
-          end
-
-          it "returns :student for MCC account if user has student enrollments and students_can_create_courses_anywhere is false" do
-            course_with_student(user: @user, active_all: true)
-            expect(@user.create_courses_right(@account.manually_created_courses_account)).to be(:student)
-          end
-        end
-
-        context "when user has some k5 enrollments" do
-          before do
-            allow(@user).to receive(:active_k5_enrollments?).and_return(true)
-          end
-
-          it "returns :teacher for root account if user has teacher enrollments even though teachers_can_create_courses_anywhere is false" do
-            course_with_teacher(user: @user, active_all: true)
-            expect(@user.create_courses_right(@account)).to be(:teacher)
-          end
-
-          it "returns :student for root account if user has student enrollments even though students_can_create_courses_anywhere is false" do
-            course_with_student(user: @user, active_all: true)
-            expect(@user.create_courses_right(@account)).to be(:student)
-          end
-
-          it "still returns :teacher for MCC account if user has teacher enrollments and teachers_can_create_courses_anywhere is false" do
-            course_with_teacher(user: @user, active_all: true)
-            expect(@user.create_courses_right(@account.manually_created_courses_account)).to be(:teacher)
-          end
-
-          it "still returns :student for MCC account if user has student enrollments and students_can_create_courses_anywhere is false" do
-            course_with_student(user: @user, active_all: true)
-            expect(@user.create_courses_right(@account.manually_created_courses_account)).to be(:student)
-          end
-        end
-      end
-    end
-  end
-
-  it "destroys associated gradebook filters when the user is soft-deleted" do
-    course_with_teacher(:active_all => true)
-    @course.gradebook_filters.create!(user: @teacher, course: @course, name: 'First filter', payload: { foo: :bar })
-    @teacher.destroy
-    expect(@teacher.gradebook_filters.count).to eq 0
   end
 end

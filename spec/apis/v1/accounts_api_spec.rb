@@ -550,7 +550,7 @@ describe "Accounts API", type: :request do
         }
       end
 
-      before do
+      before(:each) do
         user_session(@user)
       end
 
@@ -573,7 +573,7 @@ describe "Accounts API", type: :request do
       end
 
       context 'microsoft_group_enrollments_syncing flag disabled' do
-        before { account.root_account.disable_feature!(:microsoft_group_enrollments_syncing) }
+        before(:each) { account.root_account.disable_feature!(:microsoft_group_enrollments_syncing) }
 
         it_behaves_like 'an invalid request'
 
@@ -585,7 +585,7 @@ describe "Accounts API", type: :request do
       end
 
       context 'microsoft_group_enrollments_syncing flag enabled' do
-        before { account.root_account.enable_feature!(:microsoft_group_enrollments_syncing) }
+        before(:each) { account.root_account.enable_feature!(:microsoft_group_enrollments_syncing) }
 
         context 'no Microsoft Teams settings provided' do
           let(:tenant_name) { nil }
@@ -691,7 +691,7 @@ describe "Accounts API", type: :request do
         end
 
         context 'account already has settings' do
-          before do
+          before(:each) do
             account.settings = {
               microsoft_sync_enabled: true,
               microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
@@ -717,7 +717,7 @@ describe "Accounts API", type: :request do
             it_behaves_like 'a valid request'
 
             context 'account has already has a suffix set' do
-              before do
+              before(:each) do
                 account.settings[:microsoft_sync_login_attribute_suffix] = "@example.com"
                 account.save!
               end
@@ -1427,6 +1427,7 @@ describe "Accounts API", type: :request do
         @t1 = @teacher
         course_with_teacher(:account => @a1, :user => @t1, :course_name => 'c1b')
         course_with_teacher(:account => @a1, :course_name => 'c2')
+        @teacher
         course_with_teacher(:account => @a1, :course_name => 'c3')
         @t3 = @teacher
         @user = @me
@@ -1664,20 +1665,28 @@ describe "Accounts API", type: :request do
   end
 
   context "account api extension" do
-    let(:mock_plugin) do
-      Module.new do
-        def self.extend_account_json(hash, *)
-          hash[:extra_thing] = "something"
-        end
+    module MockPlugin
+      def self.extend_account_json(hash, *)
+        hash[:extra_thing] = "something"
+      end
+    end
+
+    module BadMockPlugin
+      def self.not_the_right_method
       end
     end
 
     include Api::V1::Account
 
     it "allows a plugin to extend the account_json method" do
-      allow(Api::V1::Account).to receive(:extensions).and_return([mock_plugin])
+      expect(Api::V1::Account.register_extension(BadMockPlugin)).to be_falsey
+      expect(Api::V1::Account.register_extension(MockPlugin)).to be_truthy
 
-      expect(account_json(@a1, @me, @session, [])[:extra_thing]).to eq "something"
+      begin
+        expect(account_json(@a1, @me, @session, [])[:extra_thing]).to eq "something"
+      ensure
+        Api::V1::Account.deregister_extension(MockPlugin)
+      end
     end
   end
 end

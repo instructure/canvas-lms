@@ -25,7 +25,7 @@ describe "Services API", type: :request do
     user_with_pseudonym(:active_all => true)
   end
 
-  before do
+  before :each do
     stub_kaltura
   end
 

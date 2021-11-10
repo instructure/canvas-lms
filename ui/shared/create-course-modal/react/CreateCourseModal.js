@@ -35,13 +35,7 @@ import useFetchApi from '@canvas/use-fetch-api-hook'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import {createNewCourse, getAccountsFromEnrollments} from './utils'
 
-export const CreateCourseModal = ({
-  isModalOpen,
-  setModalOpen,
-  permissions,
-  restrictToMCCAccount,
-  isK5User
-}) => {
+export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions, isK5User}) => {
   const [loading, setLoading] = useState(true)
   const [allAccounts, setAllAccounts] = useState([])
   const [allHomerooms, setAllHomerooms] = useState([])
@@ -121,19 +115,13 @@ export const CreateCourseModal = ({
     }, [])
   }
 
-  const useTeacherStudentOpts =
-    ['teacher', 'student'].includes(permissions) && !restrictToMCCAccount
-  const useNoEnrollmentsOpts =
-    permissions === 'no_enrollments' ||
-    (['teacher', 'student'].includes(permissions) && restrictToMCCAccount)
-
   useFetchApi({
     loading: setLoading,
     error: useCallback(err => showFlashError(I18n.t('Unable to get accounts'))(err), []),
     fetchAllPages: true,
+    ...(['teacher', 'student'].includes(permissions) && teacherStudentFetchOpts),
     ...(permissions === 'admin' && adminFetchOpts),
-    ...(useTeacherStudentOpts && teacherStudentFetchOpts),
-    ...(useNoEnrollmentsOpts && noEnrollmentsFetchOpts)
+    ...(permissions === 'no_enrollments' && noEnrollmentsFetchOpts)
   })
 
   const handleAccountSelected = id => {
@@ -295,6 +283,5 @@ CreateCourseModal.propTypes = {
   isModalOpen: PropTypes.bool.isRequired,
   setModalOpen: PropTypes.func.isRequired,
   permissions: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']).isRequired,
-  restrictToMCCAccount: PropTypes.bool.isRequired,
   isK5User: PropTypes.bool.isRequired
 }

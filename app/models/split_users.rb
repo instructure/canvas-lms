@@ -167,8 +167,8 @@ class SplitUsers
     Shard.partition_by_shard(enrollment_ids) do |enrollments|
       restore_enrollments(enrollments)
     end
-    Shard.partition_by_shard(pseudonyms) do |shard_pseudonyms|
-      move_new_enrollments(enrollment_ids, shard_pseudonyms)
+    Shard.partition_by_shard(pseudonyms) do |pseudonyms|
+      move_new_enrollments(enrollment_ids, pseudonyms)
     end
     account_users_ids = records.where(context_type: 'AccountUser').pluck(:context_id)
 
@@ -214,7 +214,6 @@ class SplitUsers
         ccs = CommunicationChannel.where(id: cc_records.where(previous_workflow_state: 'non_existent').pluck(:context_id))
         DelayedMessage.where(communication_channel_id: ccs).delete_all
         NotificationPolicy.where(communication_channel: ccs).delete_all
-        NotificationPolicyOverride.where(communication_channel: ccs).delete_all
         ccs.delete_all
       end
     end
@@ -228,7 +227,7 @@ class SplitUsers
       target_cc = cr.context
       # if this cc didn't get moved, we don't need to worry
       # about deconflicting it with the source users.
-      next unless target_cc&.user_id == source_user.id
+      next unless target_cc.user_id == source_user.id
 
       conflict_cc = restored_user.communication_channels.detect do |c|
         c.path.downcase == target_cc.path.downcase && c.path_type == target_cc.path_type

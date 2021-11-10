@@ -19,7 +19,7 @@
 #
 
 describe Lti::Asset do
-  before do
+  before(:each) do
     course_model
   end
 

@@ -69,7 +69,11 @@ module CanvasCassandra
     # private Struct used to store batch information
     class Batch < Struct.new(:statements, :args, :counter_statements, :counter_args, :execute_options)
       def initialize
-        super([], [], [], [], {})
+        self.statements = []
+        self.args = []
+        self.counter_statements = []
+        self.counter_args = []
+        self.execute_options = {}
       end
 
       def to_cql_ary(field = nil)

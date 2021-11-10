@@ -23,13 +23,6 @@ require 'active_support/version'
 
 module ActiveSupport::Callbacks
   module Suspension
-    def self.included(base)
-      # use extend to avoid this callback being called again
-      base.extend(self)
-      base.singleton_class.include(ClassMethods)
-      base.include(InstanceMethods)
-    end
-
     # Ignores the specified callbacks for the duration of the block.
     #
     # suspend_callbacks{ ... }
@@ -192,6 +185,13 @@ module ActiveSupport::Callbacks
           end
         end
       end
+    end
+
+    def self.included(base)
+      # use extend to avoid this callback being called again
+      base.extend(self)
+      base.singleton_class.include(ClassMethods)
+      base.include(InstanceMethods)
     end
   end
 end

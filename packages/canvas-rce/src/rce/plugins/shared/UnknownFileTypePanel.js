@@ -24,7 +24,7 @@ import formatMessage from '../../../format-message'
 export default function UnknownFileTypePanel() {
   return (
     <View as="div" margin="medium">
-      <Text color="danger">
+      <Text color="error">
         {formatMessage("Something went wrong and I don't know what to show you.")}
       </Text>
     </View>

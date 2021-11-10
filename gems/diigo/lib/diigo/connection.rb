@@ -19,7 +19,7 @@
 #
 
 module Diigo
-  class Error < RuntimeError; end
+  class Error < ::Exception; end
 
   class TooManyRedirectsError < Diigo::Error; end
 

@@ -29,7 +29,7 @@ describe "analytics in Canvas" do
   include Factories
 
   context "account nav menu" do
-    before do
+    before :each do
       @admin = account_admin_user(:active_all => true)
       user_session(@admin)
     end
@@ -76,7 +76,7 @@ describe "analytics in Canvas" do
     end
 
     describe "course menu for teacher role" do
-      before do
+      before :each do
         user_session(@teacher)
       end
 
@@ -92,7 +92,7 @@ describe "analytics in Canvas" do
 
     describe "course people page for teacher role" do
       context "with A2 FF enabled" do
-        before do
+        before :each do
           user_session(@teacher)
           @course.root_account.enable_feature!(:analytics_2)
         end
@@ -108,7 +108,7 @@ describe "analytics in Canvas" do
       end
 
       context "with A2 FF disabled" do
-        before do
+        before :each do
           user_session(@teacher)
           @course.root_account.disable_feature!(:analytics_2)
         end
@@ -151,7 +151,7 @@ describe "analytics in Canvas" do
       # no permissions are required for analytics 2 for course home page links
       # view_all_grades permission is required in analytics 2 for student tray and user analytics
       context "with A2 FF enabled" do
-        before do
+        before :each do
           @course.root_account.enable_feature!(:analytics_2)
           @course.account.role_overrides.create!(permission: :view_all_grades, role: teacher_role, enabled: false)
           user_session(@teacher)
@@ -166,7 +166,7 @@ describe "analytics in Canvas" do
       end
 
       context "with A2 FF disabled" do
-        before do
+        before :each do
           @course.account.role_overrides.create!(permission: :view_analytics, role: teacher_role, enabled: false)
           @course.root_account.disable_feature!(:analytics_2)
           user_session(@teacher)

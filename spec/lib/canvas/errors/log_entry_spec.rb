@@ -25,7 +25,7 @@ module Canvas
       let(:data) { { tags: { foo: "bar" } } }
 
       describe "with an exception" do
-        before do
+        before(:each) do
           @raised_error = nil
           raise ArgumentError, "Test Message"
         rescue ArgumentError => e
@@ -70,7 +70,7 @@ module Canvas
       end
 
       describe "a nested exception" do
-        before do
+        before(:each) do
           @raised_error = nil
           begin
             begin

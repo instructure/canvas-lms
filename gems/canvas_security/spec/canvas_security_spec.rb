@@ -124,7 +124,7 @@ describe CanvasSecurity do
         JSON::JWT.new({ a: 1 }.merge(claims)).sign(key, :HS256).to_s
       end
 
-      around do |example|
+      around(:example) do |example|
         Timecop.freeze(Time.utc(2013, 3, 13, 9, 12)) do
           example.run
         end
@@ -182,7 +182,6 @@ describe CanvasSecurity do
 
   describe "hmac_sha512" do
     let(:message) { "asdf1234" }
-
     it "verifies items signed with the same secret" do
       shared_secret = "super-sekrit"
       signature = CanvasSecurity.sign_hmac_sha512(message, shared_secret)
@@ -207,7 +206,6 @@ describe CanvasSecurity do
 
   describe '.config' do
     before { described_class.instance_variable_set(:@config, nil) }
-
     after  { described_class.instance_variable_set(:@config, nil) }
 
     it 'loads config as erb from config/security.yml' do

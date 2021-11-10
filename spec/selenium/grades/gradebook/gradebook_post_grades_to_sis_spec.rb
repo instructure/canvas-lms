@@ -34,11 +34,11 @@ describe "Gradebook - post grades to SIS" do
     show_sections_filter(@teacher)
   end
 
-  before do
+  before(:each) do
     user_session(@teacher)
   end
 
-  after do
+  after(:each) do
     clear_local_storage
   end
 

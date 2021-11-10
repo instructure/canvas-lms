@@ -228,11 +228,13 @@ module CanvasKaltura
 
     def mediaTypeToSymbol(type)
       case type.to_i
+      when 1
+        :video
       when 2
         :image
       when 5
         :audio
-      else # 1
+      else
         :video
       end
     end

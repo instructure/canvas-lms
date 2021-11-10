@@ -19,11 +19,11 @@
 #
 
 describe CutyCapt do
-  before do
+  before(:each) do
     CutyCapt.config = nil
   end
 
-  after do
+  after :each do
     CutyCapt.config = nil
     ConfigFile.unstub
   end

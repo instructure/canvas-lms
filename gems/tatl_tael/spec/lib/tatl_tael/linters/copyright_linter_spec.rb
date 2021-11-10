@@ -25,8 +25,6 @@ require 'pp'
 require 'fakefs/safe'
 require "timecop"
 
-FIXTURE_BASE = File.expand_path("fixtures/copyright_linter/", __dir__)
-
 describe TatlTael::Linters::CopyrightLinter do
   let(:config) { TatlTael::Linters.config_for_linter(described_class) }
   let(:status) { "added" }
@@ -65,6 +63,7 @@ describe TatlTael::Linters::CopyrightLinter do
     end
   end
 
+  FIXTURE_BASE = File.expand_path("../fixtures/copyright_linter/", __FILE__)
   def fixture_path_for(type, file_name)
     File.expand_path("../fixtures/copyright_linter/#{type}/#{file_name}.#{type}", __FILE__)
   end
@@ -108,7 +107,6 @@ describe TatlTael::Linters::CopyrightLinter do
   context "allowed file" do
     # doesn't need to exist cuz it'll be ignored before attempting to read
     let(:fixture_path) { Consts::PUBLIC_VENDOR_JS_PATH }
-
     include_examples "does not comment"
   end
 
@@ -136,7 +134,7 @@ describe TatlTael::Linters::CopyrightLinter do
               context fixture_variant_name do # e.g. context "invalid--missing" do
                 let(:fixture_path) { fixture_variant }
 
-                around do |example|
+                around(:each) do |example|
                   # cache linter config so we don't have to clone it into the fake fs
                   TatlTael::Linters.config
                   FakeFS do
@@ -145,7 +143,7 @@ describe TatlTael::Linters::CopyrightLinter do
                   end
                 end
 
-                before do
+                before :each do
                   real_path = fixture_path_for(fixture_base_type, fixture_variant_name)
                   # clone the fixture into empty/fake fs
                   FakeFS::FileSystem.clone(real_path, fixture_variant)

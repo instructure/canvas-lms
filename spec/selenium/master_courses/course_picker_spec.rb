@@ -63,7 +63,7 @@ describe "master courses - course picker" do
     account_admin_user(active_all: true)
   end
 
-  before do
+  before :each do
     user_session(@admin)
   end
 

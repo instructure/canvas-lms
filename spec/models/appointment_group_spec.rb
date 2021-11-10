@@ -232,7 +232,7 @@ describe AppointmentGroup do
   end
 
   context "update_appointments" do
-    before do
+    before :each do
       course_with_teacher_logged_in(:active_all => true)
       @ag = AppointmentGroup.create!(
         :title => "test",

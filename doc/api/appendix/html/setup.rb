@@ -20,6 +20,10 @@
 
 include T('default/appendix/html')
 
+def init
+  super
+end
+
 def appendix
   controllers = options[:controllers]
 

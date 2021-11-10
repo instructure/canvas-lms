@@ -24,7 +24,7 @@ describe 'calendar2' do
   include_context 'in-process server selenium tests'
   include Calendar2Common
 
-  before do
+  before(:each) do
     course_with_teacher_logged_in
   end
 
@@ -43,7 +43,7 @@ describe 'calendar2' do
   end
 
   context '24-hour' do
-    before do
+    before(:each) do
       Account.default.tap do |a|
         a.default_locale = 'en-GB'
         a.save!

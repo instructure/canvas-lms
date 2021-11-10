@@ -35,7 +35,7 @@ describe "discussion assignments" do
     @g1.save!
   end
 
-  before do
+  before :each do
     user_session(@teacher)
     stub_rcs_config
   end

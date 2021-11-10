@@ -37,7 +37,7 @@ describe "student k5 dashboard schedule" do
     student_setup
   end
 
-  before do
+  before :each do
     user_session @student
     @now = Time.zone.now
   end

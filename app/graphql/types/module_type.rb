@@ -20,7 +20,6 @@
 
 class ModuleItemsVisibleLoader < GraphQL::Batch::Loader
   def initialize(user)
-    super()
     @user = user
   end
 

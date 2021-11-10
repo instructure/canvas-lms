@@ -631,7 +631,7 @@ describe GradebooksController do
     let(:gradebook_options) { controller.js_env.fetch(:GRADEBOOK_OPTIONS) }
 
     context "as an admin" do
-      before do
+      before :each do
         account_admin_user(account: @course.root_account)
         user_session(@admin)
       end
@@ -692,7 +692,7 @@ describe GradebooksController do
     end
 
     context "in development and requested version is 'default'" do
-      before do
+      before :each do
         account_admin_user(account: @course.root_account)
         user_session(@admin)
         @admin.set_preference(:gradebook_version, "individual")
@@ -706,7 +706,7 @@ describe GradebooksController do
     end
 
     context "in development and requested version is 'individual'" do
-      before do
+      before :each do
         account_admin_user(account: @course.root_account)
         user_session(@admin)
         @admin.set_preference(:gradebook_version, "default")
@@ -722,7 +722,7 @@ describe GradebooksController do
     describe "prefetching" do
       render_views
 
-      before do
+      before :each do
         user_session(@teacher)
       end
 
@@ -758,7 +758,7 @@ describe GradebooksController do
     end
 
     describe 'js_env' do
-      before do
+      before :each do
         user_session(@teacher)
       end
 
@@ -826,7 +826,7 @@ describe GradebooksController do
 
       describe "view ungraded as zero" do
         context "when individual gradebook is enabled" do
-          before { @teacher.set_preference(:gradebook_version, "srgb") }
+          before(:each) { @teacher.set_preference(:gradebook_version, "srgb") }
 
           it "save_view_ungraded_as_zero_to_server is true when the feature is enabled" do
             @course.account.enable_feature!(:view_ungraded_as_zero)
@@ -1019,7 +1019,7 @@ describe GradebooksController do
 
         let(:group_categories_json) { assigns[:js_env][:GRADEBOOK_OPTIONS][:student_groups] }
 
-        before do
+        before(:each) do
           category.create_groups(2)
           category2.create_groups(2)
         end
@@ -1122,7 +1122,7 @@ describe GradebooksController do
       end
 
       describe "sections" do
-        before do
+        before(:each) do
           @course.course_sections.create!
           Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
         end
@@ -1142,16 +1142,15 @@ describe GradebooksController do
         @course.assignments.create(:title => "Assignment 2")
       end
 
-      before do
+      before :each do
         user_session(@teacher)
       end
 
       shared_examples_for "working download" do
         it "does not recompute enrollment grades" do
-          expect(Enrollment).not_to receive(:recompute_final_score)
+          expect(Enrollment).to receive(:recompute_final_score).never
           get 'show', params: { :course_id => @course.id, :init => 1, :assignments => 1 }, :format => 'csv'
         end
-
         it "gets all the expected datas even with multibytes characters" do
           @course.assignments.create(:title => "Déjà vu")
           exporter = GradebookExporter.new(
@@ -1168,7 +1167,6 @@ describe GradebooksController do
         before do
           @user.set_preference(:gradebook_version, "2")
         end
-
         include_examples "working download"
       end
 
@@ -1176,7 +1174,6 @@ describe GradebooksController do
         before do
           @user.set_preference(:gradebook_version, "srgb")
         end
-
         include_examples "working download"
       end
     end
@@ -1243,7 +1240,6 @@ describe GradebooksController do
 
     context "includes relevant account settings in ENV" do
       before { user_session(@teacher) }
-
       let(:custom_login_id) { 'FOOBAR' }
 
       it 'includes login_handle_name' do
@@ -1297,7 +1293,7 @@ describe GradebooksController do
         @course.enable_feature!(:outcome_gradebook)
       end
 
-      before do
+      before :each do
         user_session(@teacher)
       end
 
@@ -1398,7 +1394,7 @@ describe GradebooksController do
       end
 
       context "when the user prefers learning mastery" do
-        before do
+        before :each do
           update_preferred_gradebook_view!("learning_mastery")
         end
 
@@ -1455,6 +1451,7 @@ describe GradebooksController do
             expect(@gradebook_env[:outcome_proficiency]).to eq(@proficiency.as_json)
           end
 
+          # rubocop:disable RSpec/NestedGroups
           describe "with account_level_mastery_scales enabled" do
             before do
               @course_proficiency = outcome_proficiency_model(@course)
@@ -1469,6 +1466,7 @@ describe GradebooksController do
               expect(@gradebook_env[:outcome_proficiency]).to eq(@course_proficiency.as_json)
             end
           end
+          # rubocop:enable RSpec/NestedGroups
         end
 
         describe ".sections" do
@@ -1681,13 +1679,13 @@ describe GradebooksController do
     end
 
     describe "js_env" do
-      before { user_session(@teacher) }
+      before(:each) { user_session(@teacher) }
 
       describe "OVERRIDE_GRADES_ENABLED" do
         let(:override_grades_enabled) { assigns[:js_env][:OVERRIDE_GRADES_ENABLED] }
 
         context "when the final_grade_override_in_gradebook_history feature is enabled" do
-          before { Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history) }
+          before(:each) { Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history) }
 
           it "is set to true if the final_grade_override flag is enabled and the course setting is on" do
             @course.enable_feature!(:final_grades_override)
@@ -1762,7 +1760,7 @@ describe GradebooksController do
     end
 
     context "with an authenticated user" do
-      before do
+      before(:each) do
         user_session(@teacher)
       end
 
@@ -1798,7 +1796,7 @@ describe GradebooksController do
       assignment_model
     end
 
-    before do
+    before :each do
       user_session(@teacher)
     end
 
@@ -1841,7 +1839,7 @@ describe GradebooksController do
       end
 
       describe 'non-anonymous assignment' do
-        before do
+        before(:each) do
           user_session(@teacher)
           post(
             'update_submission',
@@ -2017,7 +2015,7 @@ describe GradebooksController do
       end
 
       context 'media comments' do
-        before do
+        before :each do
           post 'update_submission',
                params: {
                  course_id: @course.id,
@@ -2103,7 +2101,7 @@ describe GradebooksController do
         @student = @course.enroll_student(User.create!(:name => "some user"), :enrollment_state => :active).user
       end
 
-      before do
+      before :each do
         user_session(@teacher)
       end
 
@@ -2368,7 +2366,7 @@ describe GradebooksController do
       )
     end
 
-    before do
+    before :each do
       user_session(@teacher)
     end
 
@@ -2496,7 +2494,7 @@ describe GradebooksController do
       end
 
       describe "student group filtering" do
-        before do
+        before(:each) do
           @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
 
           group_category.create_groups(2)
@@ -2507,7 +2505,7 @@ describe GradebooksController do
         let(:group1) { group_category.groups.first }
 
         context "when the SpeedGrader student group filter is enabled for the course" do
-          before do
+          before(:each) do
             @course.update!(filter_speed_grader_by_student_group: true)
           end
 
@@ -2537,7 +2535,7 @@ describe GradebooksController do
           end
 
           context "when the selected group stays the same" do
-            before do
+            before(:each) do
               @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_id" => group1.id } })
             end
 
@@ -2555,7 +2553,7 @@ describe GradebooksController do
           context "when the selected group is cleared due to loading a student not in any group" do
             let(:groupless_student) { @course.enroll_student(User.create!, enrollment_state: :active).user }
 
-            before do
+            before(:each) do
               @teacher.set_preference(:gradebook_settings, @course.global_id, { "filter_rows_by" => { "student_group_id" => group1.id } })
             end
 
@@ -2589,7 +2587,7 @@ describe GradebooksController do
     end
 
     describe 'current_anonymous_id' do
-      before do
+      before(:each) do
         user_session(@teacher)
       end
 
@@ -2697,7 +2695,7 @@ describe GradebooksController do
     describe 'selected_section_id preference' do
       let(:course_settings) { @teacher.reload.get_preference(:gradebook_settings, @course.global_id) }
 
-      before do
+      before(:each) do
         user_session(@teacher)
       end
 
@@ -2716,7 +2714,7 @@ describe GradebooksController do
       end
 
       context 'when a section has previously been selected' do
-        before do
+        before(:each) do
           @teacher.set_preference(:gradebook_settings, @course.global_id,
                                   { filter_rows_by: { section_id: @course.course_sections.first.id } })
         end
@@ -2962,7 +2960,7 @@ describe GradebooksController do
 
     let(:update_params) { { course_id: @course.id, override_scores: override_score_updates } }
 
-    before do
+    before(:each) do
       user_session(@teacher)
 
       Account.site_admin.enable_feature!(:import_override_scores_in_gradebook)

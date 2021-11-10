@@ -106,7 +106,7 @@ describe 'Gradebook performance' do
     @assignments4 = @assignments_array[3]
   end
 
-  before do
+  before :each do
     user_session(@teacher)
   end
 

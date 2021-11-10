@@ -155,8 +155,9 @@ module VeriCite
         raise "Unsupported submission type for VeriCite integration: #{submission.submission_type}"
       end
 
-      responses.transform_values! do |res|
-        is_response_success?(res) ? { object_id: res[:returned_object_id] } : response_error_hash(res)
+      responses.keys.each do |asset_string|
+        res = responses[asset_string]
+        responses[asset_string] = is_response_success?(res) ? { object_id: res[:returned_object_id] } : response_error_hash(res)
       end
 
       responses
@@ -224,9 +225,9 @@ module VeriCite
           assignment_data = VeriCiteClient::AssignmentData.new()
           assignment_data.assignment_title = assignment.title != nil ? assignment.title : assignment_id
           assignment_data.assignment_instructions = assignment.description != nil ? assignment.description : ""
-          assignment_data.assignment_exclude_quotes = args["exclude_quoted"] == '1'
-          assignment_data.assignment_exclude_self_plag = args["exclude_self_plag"] == '1'
-          assignment_data.assignment_store_in_index = args["store_in_index"] == '1'
+          assignment_data.assignment_exclude_quotes = args["exclude_quoted"] != nil && args["exclude_quoted"] == '1' ? true : false
+          assignment_data.assignment_exclude_self_plag = args["exclude_self_plag"] != nil && args["exclude_self_plag"] == '1' ? true : false
+          assignment_data.assignment_store_in_index = args["store_in_index"] != nil && args["store_in_index"] == '1' ? true : false
           assignment_data.assignment_due_date = 0
           if assignment.due_at != nil
             # convert to epoch time in milli

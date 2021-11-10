@@ -47,7 +47,6 @@ export const Module: React.FC<PassedProps> = props => {
   const [actuallyExpanded, setActuallyExpanded] = useState(props.showProjections)
   const [datesVisible, setDatesVisible] = useState(props.showProjections)
   const wasExpanded = useRef(props.showProjections)
-  const isStudentPlan = props.pacePlan.context_type === 'Enrollment'
 
   useEffect(() => {
     if (!wasExpanded.current && props.showProjections) {
@@ -78,7 +77,7 @@ export const Module: React.FC<PassedProps> = props => {
         width={actuallyExpanded ? '6.5rem' : '0'}
         id={`module-${props.module.id}-duration`}
       >
-        <Flex as="div" alignItems="end" justifyItems="center" padding={headerPadding}>
+        <Flex as="div" alignItems="end" padding={headerPadding}>
           {I18n.t('Due Date')}
         </Flex>
       </ColHeader>
@@ -147,17 +146,8 @@ export const Module: React.FC<PassedProps> = props => {
                       {I18n.t('Assignments')}
                     </Flex>
                   </ColHeader>
-                  <ColHeader
-                    id={`module-${props.module.id}-days`}
-                    width={isStudentPlan ? '5rem' : '7.5rem'}
-                  >
-                    <Flex
-                      as="div"
-                      alignItems="end"
-                      justifyItems={isStudentPlan ? 'center' : 'start'}
-                      padding={headerPadding}
-                      margin={`0 0 0 ${isStudentPlan ? '0' : 'xx-small'}`}
-                    >
+                  <ColHeader id={`module-${props.module.id}-days`} width="7.5rem">
+                    <Flex as="div" alignItems="end" padding={headerPadding}>
                       {I18n.t('Days')}
                     </Flex>
                   </ColHeader>

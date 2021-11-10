@@ -38,8 +38,6 @@ module CanvasQuizStatistics::Analyzers
 
   class Base
     def self.inherited(klass)
-      super
-
       namespace = CanvasQuizStatistics::Analyzers
       namespace.available_analyzers ||= {}
       namespace.available_analyzers[klass.question_type] = klass

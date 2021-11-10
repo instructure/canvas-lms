@@ -46,7 +46,7 @@ describe Lti::PlagiarismSubscriptionsHelper do
   end
   let(:subscription_service) { class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
 
-  before do
+  before(:each) do
     course_with_teacher(active_all: true)
     allow(subscription_service).to receive_messages(create_tool_proxy_subscription: stub_response)
     allow(subscription_service).to receive_messages(available?: true)
@@ -88,7 +88,7 @@ describe Lti::PlagiarismSubscriptionsHelper do
     end
 
     context 'bad subscriptions service configuration' do
-      before do
+      before(:each) do
         ss = class_double(Services::LiveEventsSubscriptionService).as_stubbed_const
         allow(ss).to receive_messages(create_tool_proxy_subscription: stub_bad_response)
         allow(ss).to receive_messages(available?: false)
@@ -100,7 +100,7 @@ describe Lti::PlagiarismSubscriptionsHelper do
     end
 
     context 'bad subscription request' do
-      before do
+      before(:each) do
         allow(subscription_service).to receive_messages(create_tool_proxy_subscription: stub_bad_response)
       end
 
@@ -144,7 +144,7 @@ describe Lti::PlagiarismSubscriptionsHelper do
   describe '#destroy_subscription' do
     let(:subscription_helper) { Lti::PlagiarismSubscriptionsHelper.new(tool_proxy) }
 
-    before do
+    before(:each) do
       allow(subscription_service).to receive_messages(destroy_tool_proxy_subscription: stub_response)
     end
 

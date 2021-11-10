@@ -19,9 +19,6 @@
 
 require 'spec_helper'
 
-# rubocop:disable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration
-# these specs needs to work with real constants, because they inherit from a class
-# that asks for the constant's name _in_ the `inherited` hook
 describe CanvasQuizStatistics::Analyzers::Base do
   Base = CanvasQuizStatistics::Analyzers::Base
   subject { described_class.new({}) }
@@ -134,4 +131,3 @@ describe CanvasQuizStatistics::Analyzers::Base do
     end
   end
 end
-# rubocop:enable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration

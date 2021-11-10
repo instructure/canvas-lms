@@ -30,7 +30,7 @@ describe Attachment do
   end
 
   context "file_store_config" do
-    around do |example|
+    around(:each) do |example|
       ConfigFile.unstub
       example.run
       ConfigFile.unstub
@@ -55,7 +55,7 @@ describe Attachment do
   end
 
   context "public_url" do
-    before do
+    before :each do
       local_storage!
     end
 
@@ -88,7 +88,7 @@ describe Attachment do
       user_model
     end
 
-    before do
+    before :each do
       attachment_with_context(@user)
       @attachment.instfs_uuid = 1
       allow(InstFS).to receive(:enabled?).and_return true
@@ -114,7 +114,7 @@ describe Attachment do
   end
 
   context "public_url s3_storage" do
-    before do
+    before :each do
       s3_storage!
     end
 
@@ -247,7 +247,7 @@ describe Attachment do
       configure_canvadocs
     end
 
-    before do
+    before :each do
       allow_any_instance_of(Canvadocs::API).to receive(:upload).and_return "id" => 1234
     end
 
@@ -434,6 +434,21 @@ describe Attachment do
       a = attachment_model(:uploaded_data => default_uploaded_data)
       expect(a.filename).to eql("doc.doc")
     end
+
+    context "uploading and db transactions" do
+      before :once do
+        attachment_model(:context => Account.default.groups.create!, :filename => 'test.mp4', :content_type => 'video')
+      end
+
+      it "delays upload until the #save transaction is committed" do
+        allow(Rails.env).to receive(:test?).and_return(false)
+        @attachment.uploaded_data = default_uploaded_data
+        expect(Attachment.connection).to receive(:after_transaction_commit).twice
+        expect(@attachment).to receive(:touch_context_if_appropriate).never
+        expect(@attachment).to receive(:ensure_media_object).never
+        @attachment.save
+      end
+    end
   end
 
   context "ensure_media_object" do
@@ -471,7 +486,7 @@ describe Attachment do
 
     it "does not create a media object in a skip_media_object_creation block" do
       Attachment.skip_media_object_creation do
-        expect(@attachment).not_to receive(:build_media_object)
+        expect(@attachment).to receive(:build_media_object).never
         @attachment.save!
       end
     end
@@ -480,7 +495,7 @@ describe Attachment do
       @attachment.filename = 'foo.png'
       @attachment.content_type = 'image/png'
       expect(@attachment).to receive(:ensure_media_object).once
-      expect(@attachment).not_to receive(:build_media_object)
+      expect(@attachment).to receive(:build_media_object).never
       @attachment.save!
     end
 
@@ -573,8 +588,8 @@ describe Attachment do
       a2 = attachment_model(root_attachment: a)
       expect(a).to receive(:make_childless).once
       expect(a).to receive(:destroy_content).once
-      expect(a2).not_to receive(:make_childless)
-      expect(a2).not_to receive(:destroy_content)
+      expect(a2).to receive(:make_childless).never
+      expect(a2).to receive(:destroy_content).never
       a2.destroy_permanently_plus
       a.destroy_permanently_plus
       expect { a.reload }.to raise_error(ActiveRecord::RecordNotFound)
@@ -587,7 +602,7 @@ describe Attachment do
       a = attachment_model
       allow(a).to receive(:s3object).and_return(double('s3object'))
       s3object = a.s3object
-      expect(s3object).not_to receive(:delete)
+      expect(s3object).to receive(:delete).never
       a.destroy_content
     end
 
@@ -602,7 +617,7 @@ describe Attachment do
     it 'does not do destroy_content_and_replace twice' do
       a = attachment_model(uploaded_data: default_uploaded_data)
       a.destroy_content_and_replace # works
-      expect(a).not_to receive(:send_to_purgatory)
+      expect(a).to receive(:send_to_purgatory).never
       a.destroy_content_and_replace # returns because it already happened
     end
 
@@ -633,7 +648,7 @@ describe Attachment do
     end
 
     context "inst-fs" do
-      before do
+      before :each do
         allow(InstFS).to receive(:enabled?).and_return(true)
         allow(InstFS).to receive(:app_host).and_return("https://somehost.example")
       end
@@ -731,7 +746,7 @@ describe Attachment do
       s3_storage!
       a = attachment_model
       s3object = a.s3object
-      expect(s3object).not_to receive(:delete)
+      expect(s3object).to receive(:delete).never
       a.destroy_permanently!
     end
   end
@@ -1499,7 +1514,7 @@ describe Attachment do
       @new_account = account_model
     end
 
-    before do
+    before :each do
       s3_storage!
       Attachment.current_root_account = @old_account
       @root = attachment_model(filename: 'unknown 2.loser')
@@ -1513,7 +1528,7 @@ describe Attachment do
     end
 
     it "fails for non-root attachments" do
-      expect(@old_object).not_to receive(:copy_to)
+      expect(@old_object).to receive(:copy_to).never
       expect { @child.change_namespace(@new_account.file_namespace) }.to raise_error('change_namespace must be called on a root attachment')
       expect(@root.reload.namespace).to eq @old_account.file_namespace
       expect(@child.reload.namespace).to eq @root.reload.namespace
@@ -1521,7 +1536,7 @@ describe Attachment do
 
     it "does not copy if the destination exists" do
       expect(@new_object).to receive(:exists?).and_return(true)
-      expect(@old_object).not_to receive(:copy_to)
+      expect(@old_object).to receive(:copy_to).never
       @root.change_namespace(@new_account.file_namespace)
       expect(@root.namespace).to eq @new_account.file_namespace
       expect(@child.reload.namespace).to eq @root.namespace
@@ -1549,10 +1564,9 @@ describe Attachment do
 
   context "s3 storage with sharding" do
     let(:sz) { "640x>" }
-
     specs_require_sharding
 
-    before do
+    before :each do
       s3_storage!
       attachment_model(:uploaded_data => stub_png_data, :filename => 'profile.png')
     end
@@ -1678,7 +1692,7 @@ describe Attachment do
         @attachment.thumbnails.create!(:thumbnail => "640x>", :uploaded_data => stub_png_data)
       }
       @attachment.thumbnail_url(:size => "640x>")
-      expect(@attachment).not_to receive(:create_dynamic_thumbnail)
+      expect(@attachment).to receive(:create_dynamic_thumbnail).never
       url = @attachment.thumbnail_url(:size => "640x>")
       thumb = @attachment.thumbnails.where(thumbnail: "640x>").first
       expect(url).to be_present
@@ -2030,13 +2044,10 @@ describe Attachment do
 
         expect(Tempfile).to receive(:new).and_return(tempfile)
         actual_file = double()
-        expect(actual_file).to(receive(:read).twice { data.shift })
+        expect(actual_file).to receive(:read).twice { data.shift }
         expect(File).to receive(:open).and_yield(actual_file)
         expect_any_instance_of(@attachment.s3object.class).to receive(:get).with(include(:response_target))
-        @attachment.open do |d|
-          expect(d).to eq "test"
-          callback = true
-        end
+        @attachment.open { |data| expect(data).to eq "test"; callback = true }
         expect(callback).to eq true
       end
 
@@ -2053,7 +2064,7 @@ describe Attachment do
       attachment_model(filename: 'new filename')
     end
 
-    before do
+    before :each do
       allow(Attachment).to receive(:local_storage?).and_return(false)
       allow(Attachment).to receive(:s3_storage?).and_return(true)
       allow(@attachment).to receive(:s3object).and_return(double('s3object'))
@@ -2068,7 +2079,7 @@ describe Attachment do
         @attachment = attachment
       end
 
-      before do
+      before :each do
         allow(@existing_attachment).to receive(:s3object).and_return(double('existing_s3object'))
         allow(@attachment).to receive(:find_existing_attachment_for_md5).and_return(@existing_attachment)
       end
@@ -2101,7 +2112,7 @@ describe Attachment do
         end
 
         it "does not delete the new s3object" do
-          expect(@attachment.s3object).not_to receive(:delete)
+          expect(@attachment.s3object).to receive(:delete).never
           @attachment.process_s3_details!({})
         end
 

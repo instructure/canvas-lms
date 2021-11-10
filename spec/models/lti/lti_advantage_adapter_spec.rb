@@ -70,7 +70,6 @@ describe Lti::LtiAdvantageAdapter do
       external_tool_tag_attributes: { content: tool }
     )
   end
-
   let_once(:course) do
     course_with_student
     @course

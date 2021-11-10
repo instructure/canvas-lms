@@ -730,19 +730,23 @@ class EnrollmentsApiController < ApplicationController
     @enrollment = @context.enrollments.find(params[:id])
     permission =
       case params[:task]
+      when 'conclude'
+        :can_be_concluded_by
       when 'delete', 'deactivate', 'inactivate'
         :can_be_deleted_by
-      else # 'conclude'
+      else
         :can_be_concluded_by
       end
 
     action =
       case params[:task]
+      when 'conclude'
+        :conclude
       when 'delete'
         :destroy
       when 'deactivate', 'inactivate'
         :deactivate
-      else # 'conclude'
+      else
         :conclude
       end
 

@@ -19,23 +19,23 @@
 #
 
 describe AdobeConnectConference do
-  let(:connect_config) do
-    {
-      :domain => 'http://connect.example.com',
-      :username => 'user',
-      :password => 'password',
-      :password_dec => 'password',
-      :meeting_container => 'canvas_meetings'
-    }
+  CONNECT_CONFIG = {
+    :domain => 'http://connect.example.com',
+    :username => 'user',
+    :password => 'password',
+    :password_dec => 'password',
+    :meeting_container => 'canvas_meetings'
+  }
+
+  before(:each) do
+    @conference = AdobeConnectConference.new
+    allow(@conference).to receive(:config).and_return(CONNECT_CONFIG)
   end
 
-  before do
-    @conference = AdobeConnectConference.new
-    allow(@conference).to receive(:config).and_return(connect_config)
-  end
+  subject { AdobeConnectConference.new }
 
   context 'with an admin participant' do
-    before do
+    before(:each) do
       @user = User.new(:name => 'Don Draper')
       allow(AdobeConnect::Service).to receive(:user_session).and_return('CookieValue')
       expect(@conference).to receive(:add_host).with(@user).and_return(@user)

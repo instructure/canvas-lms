@@ -22,59 +22,55 @@ require_relative '../spec_helper'
 # FIXME: these tests should all exist in a controller test,
 # since that's the context required to run any of them
 describe AuthenticationMethods do
-  let(:mock_controller_class) do
-    stub_const("MockLogger", Class.new do
+  class MockController
+    include Canvas::RequestForgeryProtection
+    include AuthenticationMethods
+
+    attr_accessor :redirects, :params, :session, :request, :render_hash, :fix_ms_office_redirects
+
+    def initialize(request:, root_account: Account.default, params: {})
+      @request = request
+      @domain_root_account = root_account
+      @params = params
+      @redirects = []
+      @render_hash = nil
+      reset_session
+    end
+
+    def reset_session
+      @session = {}
+    end
+
+    def redirect_to(url)
+      @redirects << url
+    end
+
+    def render(render_hash)
+      @render_hash = render_hash
+    end
+
+    def api_find(klass, id)
+      klass.find(id)
+    end
+
+    def cas_login_url; ''; end
+
+    def zendesk_delegated_auth_pass_through_url(options)
+      options[:target]
+    end
+
+    def cookies
+      @cookies ||= {}
+    end
+
+    class MockLogger
       def info(*); end
 
       def warn(*); end
-    end)
+    end
 
-    Class.new do
-      include Canvas::RequestForgeryProtection
-      include AuthenticationMethods
-
-      attr_accessor :redirects, :params, :session, :request, :render_hash, :fix_ms_office_redirects
-
-      def initialize(request:, root_account: Account.default, params: {})
-        @request = request
-        @domain_root_account = root_account
-        @params = params
-        @redirects = []
-        @render_hash = nil
-        reset_session
-      end
-
-      def reset_session
-        @session = {}
-      end
-
-      def redirect_to(url)
-        @redirects << url
-      end
-
-      def render(render_hash)
-        @render_hash = render_hash
-      end
-
-      def api_find(klass, id)
-        klass.find(id)
-      end
-
-      def cas_login_url
-        ''
-      end
-
-      def zendesk_delegated_auth_pass_through_url(options)
-        options[:target]
-      end
-
-      def cookies
-        @cookies ||= {}
-      end
-
-      def logger
-        MockLogger.new
-      end
+    def logger
+      MockLogger.new
     end
   end
 
@@ -84,7 +80,7 @@ describe AuthenticationMethods do
         @request = double(:env => { 'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago },
                           :format => double(:json? => false),
                           :host_with_port => "")
-        @controller = mock_controller_class.new(request: @request)
+        @controller = MockController.new(request: @request)
         allow(@controller).to receive(:load_pseudonym_from_access_token)
         allow(@controller).to receive(:api_request?).and_return(false)
         user_with_pseudonym
@@ -161,7 +157,7 @@ describe AuthenticationMethods do
                          host_with_port: "",
                          url: "",
                          method: "GET")
-        controller = mock_controller_class.new(request: request)
+        controller = MockController.new(request: request)
         allow(controller).to receive(:api_request?).and_return(true)
         controller
       end
@@ -217,7 +213,7 @@ describe AuthenticationMethods do
                          host_with_port: "",
                          url: "",
                          method: "GET")
-        controller = mock_controller_class.new(request: request)
+        controller = MockController.new(request: request)
         allow(controller).to receive(:api_request?).and_return(true)
         controller
       end
@@ -299,7 +295,7 @@ describe AuthenticationMethods do
   describe "#masked_authenticity_token" do
     before do
       @request = double(host_with_port: "")
-      @controller = mock_controller_class.new(request: @request)
+      @controller = MockController.new(request: @request)
       @session_options = {}
       expect(CanvasRails::Application.config).to receive(:session_options).at_least(:once).and_return(@session_options)
     end
@@ -343,7 +339,7 @@ describe AuthenticationMethods do
     let(:dev_key) { DeveloperKey.create!(account: account) }
     let(:access_token) { AccessToken.create!(developer_key: dev_key) }
     let(:request) { double(format: double(:json? => false), host_with_port: "") }
-    let(:controller) { mock_controller_class.new(request: request, root_account: account) }
+    let(:controller) { MockController.new(request: request, root_account: account) }
 
     it "doesn't call '#get_context' if the Dev key is owned by the domain root account" do
       expect(controller).not_to receive(:get_context)

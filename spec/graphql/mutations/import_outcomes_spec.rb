@@ -332,9 +332,12 @@ describe Mutations::ImportOutcomes do
   end
 
   it "calls process_job with root_outcome_group if target_context provided" do
+    # rubocop:disable RSpec/AnyInstance
     expect_any_instance_of(described_class).to receive(:process_job).with(
       hash_including(target_group: @course.root_outcome_group)
     ).and_call_original
+    # rubocop:enable RSpec/AnyInstance
+
     exec_graphql(
       outcome_id: get_outcome_id("0 Group E outcome"),
       target_group_id: nil,
@@ -349,9 +352,12 @@ describe Mutations::ImportOutcomes do
       context: @course
     )
 
+    # rubocop:disable RSpec/AnyInstance
     expect_any_instance_of(described_class).to receive(:process_job).with(
       hash_including(target_group: dummy_group)
     ).and_call_original
+    # rubocop:enable RSpec/AnyInstance
+
     exec_graphql(
       outcome_id: get_outcome_id("0 Group E outcome"),
       target_group_id: dummy_group.id
@@ -636,7 +642,7 @@ describe Mutations::ImportOutcomes do
                              outcomes: 6.times.map { |i| "#{i} Group E outcome" },
                              groups: [{
                                title: "Group F",
-                               outcomes: ["0 Group F outcome"],
+                               outcomes: 1.times.map { |i| "#{i} Group F outcome" },
                              }]
                            }]
                          }], @course.root_outcome_group)
@@ -727,14 +733,14 @@ describe Mutations::ImportOutcomes do
                              outcomes: 5.times.map { |i| "#{i} Group B outcome" }
                            }, {
                              title: "Root Group A",
-                             outcomes: ["0 Root Group A outcome"]
+                             outcomes: 1.times.map { |i| "#{i} Root Group A outcome" }
                            }], Account.default.root_outcome_group)
       end
 
       it "import Root Group A with 1 outcome to Course" do
         assert_tree_exists([{
                              title: "Root Group A",
-                             outcomes: ["0 Root Group A outcome"]
+                             outcomes: 1.times.map { |i| "#{i} Root Group A outcome" }
                            }], @course.root_outcome_group)
       end
 
@@ -809,10 +815,10 @@ describe Mutations::ImportOutcomes do
                              title: "Root Group A",
                              groups: [{
                                title: "Root Group B",
-                               outcomes: ["0 Root Group B outcome"],
+                               outcomes: 1.times.map { |i| "#{i} Root Group B outcome" },
                              }, {
                                title: "Root Group C",
-                               outcomes: ["0 Root Group C outcome"],
+                               outcomes: 1.times.map { |i| "#{i} Root Group C outcome" },
                              }]
                            }], Account.default.root_outcome_group)
 
@@ -823,10 +829,10 @@ describe Mutations::ImportOutcomes do
                              title: "Root Group A",
                              groups: [{
                                title: "Root Group B",
-                               outcomes: ["0 Root Group B outcome"],
+                               outcomes: 1.times.map { |i| "#{i} Root Group B outcome" },
                              }, {
                                title: "Root Group C",
-                               outcomes: ["0 Root Group C outcome"],
+                               outcomes: 1.times.map { |i| "#{i} Root Group C outcome" },
                              }]
                            }], @course.root_outcome_group)
       end

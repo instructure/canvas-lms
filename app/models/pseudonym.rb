@@ -374,7 +374,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def email=(e)
-    return unless user
+    return false unless user
 
     self.user.email = (e)
     user.save!
@@ -386,7 +386,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def sms=(s)
-    return unless user
+    return false unless user
 
     self.user.sms = (s)
     user.save!

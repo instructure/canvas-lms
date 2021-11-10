@@ -35,7 +35,7 @@ describe 'Late Policy statuses:' do
       grade_assignments
     end
 
-    before do
+    before(:each) do
       user_session(@teacher)
       StudentGradesPage.visit_as_teacher(@course, @course.students.first)
     end
