@@ -539,9 +539,9 @@ class DiscussionTopicsController < ApplicationController
 
     if @topic.assignment.present?
       hash[:ATTRIBUTES][:assignment][:assignment_overrides] =
-        (assignment_overrides_json(
+        assignment_overrides_json(
           @topic.assignment.overrides_for(@current_user, ensure_set_not_empty: true)
-        ))
+        )
       hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
     end
 
@@ -1395,7 +1395,7 @@ class DiscussionTopicsController < ApplicationController
   def process_lock_parameters(discussion_topic_hash)
     # Handle locking/unlocking (overrides workflow state if provided). It appears that the locked param as a hash
     # is from old code and is not being used. Verification requested.
-    if !(@topic.lock_at_changed?)
+    if !@topic.lock_at_changed?
       if params.has_key?(:locked) && !params[:locked].is_a?(Hash)
         should_lock = value_to_boolean(params[:locked])
         if should_lock != @topic.locked?

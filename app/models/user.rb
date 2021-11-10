@@ -1299,7 +1299,7 @@ class User < ActiveRecord::Base
       (self == user && self.mfa_settings != :required) ||
 
         # a site_admin with permission to reset_any_mfa
-        (Account.site_admin.grants_right?(user, :reset_any_mfa)) ||
+        Account.site_admin.grants_right?(user, :reset_any_mfa) ||
         # an admin can reset another user's MFA only if they can manage *all*
         # of the user's pseudonyms
         (self != user && self.pseudonyms.shard(self).all? do |p|

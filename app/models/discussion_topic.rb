@@ -929,9 +929,9 @@ class DiscussionTopic < ActiveRecord::Base
 
     topics.each do |topic|
       if topic.assignment_id
-        topic.can_unpublish = !(assmnt_ids_with_subs.include?(topic.assignment_id))
+        topic.can_unpublish = !assmnt_ids_with_subs.include?(topic.assignment_id)
       else
-        topic.can_unpublish = !(topic_ids_with_entries.include?(topic.id))
+        topic.can_unpublish = !topic_ids_with_entries.include?(topic.id)
       end
     end
   end
@@ -1360,7 +1360,7 @@ class DiscussionTopic < ActiveRecord::Base
   def users_with_permissions(users)
     permission = self.is_announcement ? :read_announcements : :read_forum
     course = self.course
-    if !(course.is_a?(Course))
+    if !course.is_a?(Course)
       return users.select do |u|
         self.is_announcement ? self.context.grants_right?(u, :read_announcements) : self.context.grants_right?(u, :read_forum)
       end

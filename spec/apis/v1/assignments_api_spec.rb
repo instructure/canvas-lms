@@ -2564,7 +2564,7 @@ describe AssignmentsApiController, type: :request do
         overrides = [{
           'student_ids' => opts[:student_ids] || [],
           'title' => opts[:title] || 'adhoc override',
-          'due_at' => opts[:adhoc_due_at] || (5.days.from_now).iso8601
+          'due_at' => opts[:adhoc_due_at] || 5.days.from_now.iso8601
         }]
 
         overrides.concat(opts[:additional_overrides]) if opts[:additional_overrides]

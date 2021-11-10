@@ -236,8 +236,8 @@ module GroupsCommon
   end
 
   def select_change_groups_option
-    (ff('#option_change_groups').last).click
-    (ff('#clone_category_submit_button').last).click
+    ff('#option_change_groups').last.click
+    ff('#clone_category_submit_button').last.click
     wait_for_ajaximations
   end
 

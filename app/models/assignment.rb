@@ -3338,7 +3338,7 @@ class Assignment < ActiveRecord::Base
     return unless assignments.any?
 
     assmnt_ids_with_subs ||= assignment_ids_with_submissions(assignments.map(&:id))
-    assignments.each { |a| a.can_unpublish = !(assmnt_ids_with_subs.include?(a.id)) }
+    assignments.each { |a| a.can_unpublish = !assmnt_ids_with_subs.include?(a.id) }
   end
 
   def self.assignment_ids_with_submissions(assignment_ids)

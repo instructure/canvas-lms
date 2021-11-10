@@ -47,7 +47,7 @@ module MessageBus
       return @base_string if @suffix.nil?
 
       extension = "-#{@suffix}"
-      return @base_string if @base_string[(-1 * (extension.length))..] == extension
+      return @base_string if @base_string[(-1 * extension.length)..] == extension
 
       @base_string + extension
     end

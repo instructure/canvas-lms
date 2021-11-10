@@ -107,7 +107,7 @@ describe Types::CourseType do
                                              start_date: 2.days.ago,
                                              end_date: 2.days.from_now
         @term1_assignment1 = course.assignments.create! name: "asdf",
-                                                        due_at: (1.5).weeks.ago
+                                                        due_at: 1.5.weeks.ago
         @term2_assignment1 = course.assignments.create! name: ";lkj",
                                                         due_at: Date.today
       end

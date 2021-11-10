@@ -1984,7 +1984,7 @@ class Course < ActiveRecord::Base
     end
     overall_status = "error"
     overall_status = "unpublished" unless found_statuses.size > 0
-    overall_status = (%w{error unpublished pending publishing published unpublishable}).detect { |s| found_statuses.include?(s) } || overall_status
+    overall_status = %w{error unpublished pending publishing published unpublishable}.detect { |s| found_statuses.include?(s) } || overall_status
     return enrollments, overall_status
   end
 

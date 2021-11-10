@@ -102,7 +102,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       if !@submission || (@quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip))
         nil
       elsif is_previewing? || (@submission.temporary_user_code == temporary_user_code(false)) ||
-            (@submission.grants_right?(@current_user, session, :update))
+            @submission.grants_right?(@current_user, session, :update)
         if !@submission.completed? && (!@submission.overdue? || is_previewing?)
           if params[:action] == 'record_answer'
             if (last_question = params[:last_question_id])

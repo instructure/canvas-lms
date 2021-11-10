@@ -544,7 +544,7 @@ class FilesController < ApplicationController
 
         if params[:download]
           if (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
-             (@attachment.grants_right?(@current_user, session, :download))
+             @attachment.grants_right?(@current_user, session, :download)
             disable_page_views if params[:preview]
             begin
               send_attachment(@attachment)

@@ -227,7 +227,7 @@ module AccountReports
     account_report.message = message
     failed_report(account_report) unless csv
     if account_report.workflow_state == 'aborted'
-      account_report.parameters["extra_text"] = (I18n.t('Report has been aborted'))
+      account_report.parameters["extra_text"] = I18n.t('Report has been aborted')
     else
       account_report.workflow_state = csv ? 'complete' : 'error'
     end

@@ -381,7 +381,7 @@ module Importers
       return nil unless (uri = URI.parse(original_url))
 
       custom_fields_query = custom_fields.map { |k, v| "custom_#{CGI.escape(k)}=#{CGI.escape(v)}" }.join("&")
-      uri.query = uri.query.present? ? ([uri.query, custom_fields_query].join("&")) : custom_fields_query
+      uri.query = uri.query.present? ? [uri.query, custom_fields_query].join("&") : custom_fields_query
       new_url = uri.to_s
 
       if new_url.length < MAX_URL_LENGTH

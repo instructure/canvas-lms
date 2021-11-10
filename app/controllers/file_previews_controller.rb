@@ -82,6 +82,6 @@ class FilePreviewsController < ApplicationController
   def download_allowed(attachment, user, session, params)
     verifier_checker = Attachments::Verification.new(attachment)
     (params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) ||
-      (attachment.grants_right?(user, session, :download))
+      attachment.grants_right?(user, session, :download)
   end
 end

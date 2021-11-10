@@ -269,7 +269,7 @@ module Api::V1::Assignment
 
     if assignment.quiz?
       hash['quiz_id'] = assignment.quiz.id
-      hash['anonymous_submissions'] = !!(assignment.quiz.anonymous_submissions)
+      hash['anonymous_submissions'] = !!assignment.quiz.anonymous_submissions
     end
 
     if assignment.allowed_extensions.present?

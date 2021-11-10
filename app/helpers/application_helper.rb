@@ -1218,7 +1218,7 @@ module ApplicationHelper
   end
 
   def planner_enabled?
-    !!(@current_user&.has_student_enrollment?) ||
+    !!@current_user&.has_student_enrollment? ||
       (Account.site_admin.feature_enabled?(:k5_parent_support) && @current_user&.roles(@domain_root_account)&.include?('observer') && k5_user?)
   end
 

@@ -24,7 +24,7 @@ module Quizzes::LogAuditing
   class QuestionAnsweredEventExtractor
     EVENT_TYPE = Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
     RE_QUESTION_ANSWER_FIELD = /^question_(\d+)_?/
-    SQL_FIND_PREDECESSORS = (
+    SQL_FIND_PREDECESSORS =
       <<~SQL
             created_at >= :started_at
         AND created_at <= :created_at
@@ -32,7 +32,7 @@ module Quizzes::LogAuditing
         AND attempt = :attempt
         AND event_type = '#{EVENT_TYPE}'
       SQL
-    ).freeze
+      .freeze
 
     # Main API. Extract, optimize, and persist an answer event from a given
     # submission data construct.
