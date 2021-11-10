@@ -3,6 +3,15 @@
 
 exit 0 if ENV['DISABLE_RUBOCOP'] == '1'
 
+require "bundler/inline"
+
+gemfile do
+  source "https://rubygems.org/"
+
+  gem "gergich", "2.0.0"
+  gem "colorize", "0.8.1"
+end
+
 require_relative './linter'
 require 'optparse'
 
