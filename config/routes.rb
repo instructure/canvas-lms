@@ -2079,7 +2079,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :feature_flags) do
       %w(course account user).each do |context|
         prefix = "#{context}s/:#{context}_id/features"
-        get "#{prefix}", action: :index, as: "#{context}_features"
+        get prefix.to_s, action: :index, as: "#{context}_features"
         get "#{prefix}/enabled", action: :enabled_features, as: "#{context}_enabled_features"
         get "#{prefix}/flags/:feature", action: :show
         put "#{prefix}/flags/:feature", action: :update
@@ -2092,7 +2092,7 @@ CanvasRails::Application.routes.draw do
       %w(course group).each do |context|
         prefix = "#{context}s/:#{context}_id/conferences"
         get prefix, action: :index, as: "#{context}_conferences"
-        post "#{prefix}", action: :create
+        post prefix.to_s, action: :create
         post "#{prefix}/:conference_id/recording_ready", action: :recording_ready, as: "#{context}_conferences_recording_ready"
       end
 

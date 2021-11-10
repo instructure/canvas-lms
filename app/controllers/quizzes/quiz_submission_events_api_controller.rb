@@ -141,7 +141,7 @@ class Quizzes::QuizSubmissionEventsApiController < ApplicationController
                json: {
                  quiz_submission_events: events.map do |e|
                    {
-                     id: "#{e.id}",
+                     id: e.id.to_s,
                      event_type: e.event_type,
                      event_data: e.event_data,
                      created_at: e.created_at

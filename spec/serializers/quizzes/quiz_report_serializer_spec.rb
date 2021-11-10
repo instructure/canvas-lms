@@ -118,7 +118,7 @@ describe Quizzes::QuizReportSerializer do
     end
 
     it 'serializes id' do
-      expect(json['id']).to eq "#{statistics.id}"
+      expect(json['id']).to eq statistics.id.to_s
     end
 
     context 'associations' do

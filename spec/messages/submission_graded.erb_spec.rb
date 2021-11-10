@@ -45,6 +45,6 @@ describe "submission_graded" do
     observer = user_model
     observer.preferences[:send_observed_names_in_notifications] = true
     message = generate_message(:submission_graded, :twitter, asset, user: observer)
-    expect(message.body).to match("#{@submission.user.name}")
+    expect(message.body).to match(@submission.user.name)
   end
 end

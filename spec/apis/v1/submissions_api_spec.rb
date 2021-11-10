@@ -5616,7 +5616,7 @@ describe 'Submissions API', type: :request do
           )
           path = "/api/v1/courses/#{course.id}/assignments/#{assignment.id}/submissions"
           json = api_call_as_user(teacher, :get, path, params.merge(assignment_id: assignment.id, include: field))
-          expect(json).to all include("#{field}" => 'unsubmitted')
+          expect(json).to all include(field.to_s => 'unsubmitted')
         end
       end
 

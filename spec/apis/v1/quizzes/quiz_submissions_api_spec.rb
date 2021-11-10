@@ -583,8 +583,8 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
                             controller: "quizzes/quiz_submissions_api",
                             action: "create",
                             format: "json",
-                            course_id: "#{@course.id}",
-                            quiz_id: "#{@quiz.id}"
+                            course_id: @course.id.to_s,
+                            quiz_id: @quiz.id.to_s
                           },
                           {},
                           { 'Accept' => 'application/vnd.api+json' },
@@ -602,8 +602,8 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
                             controller: "quizzes/quiz_submissions_api",
                             action: "create",
                             format: "json",
-                            course_id: "#{@course.id}",
-                            quiz_id: "#{@quiz.id}"
+                            course_id: @course.id.to_s,
+                            quiz_id: @quiz.id.to_s
                           },
                           {},
                           { 'Accept' => 'application/vnd.api+json' })

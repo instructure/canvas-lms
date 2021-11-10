@@ -173,7 +173,7 @@ describe Context do
       at = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       data = {
         :entries => [
-          { :entryId => "test", :originalId => "#{at.id}" }
+          { :entryId => "test", :originalId => at.id.to_s }
         ]
       }
       mo = MediaObject.create!(:context => @course, :media_id => "test")

@@ -573,7 +573,7 @@ describe AppointmentGroup do
     end
 
     it "respects the current_only option" do
-      @ag.update(:new_appointments => [["#{Time.zone.now - 2.hour}", "#{Time.zone.now - 1.hour}"]])
+      @ag.update(:new_appointments => [[(Time.zone.now - 2.hour).to_s, (Time.zone.now - 1.hour).to_s]])
       expect(@ag.available_slots(current_only: true)).to eql 4
     end
   end

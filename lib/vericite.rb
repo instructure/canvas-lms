@@ -286,10 +286,10 @@ module VeriCite
           user_score_cache_key_prefix = "vericite_scores/#{consumer}/#{context_id}/#{assignment_id}/"
           users_score_map = {}
           # first check if the cache already has the user's score and if we haven't looked up this assignment lately:
-          users_score_map["#{user_id}"] = Rails.cache.read("#{user_score_cache_key_prefix}#{user_id}")
-          if users_score_map["#{user_id}"].nil? && Rails.cache.read(user_score_cache_key_prefix) == nil
+          users_score_map[user_id.to_s] = Rails.cache.read("#{user_score_cache_key_prefix}#{user_id}")
+          if users_score_map[user_id.to_s].nil? && Rails.cache.read(user_score_cache_key_prefix) == nil
             # we already looked up this user in Redis, don't bother again (by setting {})
-            users_score_map["#{user_id}"] ||= {}
+            users_score_map[user_id.to_s] ||= {}
             # we need to look up the user scores in VeriCite for this course
             # @return [Array<ReportScoreReponse>]
             data, status_code, _headers = vericite_client.reports_scores_context_id_get(context_id, consumer, consumer_secret, { :assignment_id => assignment_id })
@@ -321,8 +321,8 @@ module VeriCite
           end
 
           # the user score map shouldn't be empty now (either grabbed from the cache or VeriCite)
-          unless users_score_map["#{user_id}"].nil?
-            users_score_map["#{user_id}"].each do |key, score|
+          unless users_score_map[user_id.to_s].nil?
+            users_score_map[user_id.to_s].each do |key, score|
               if key ==  args[:oid] && score >= 0
                 response[:similarity_score] = score
               end

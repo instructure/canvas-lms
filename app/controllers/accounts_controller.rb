@@ -625,7 +625,7 @@ class AccountsController < ApplicationController
     sortable_name_col = User.sortable_name_order_by_clause('users')
 
     order = if params[:sort] == 'course_name'
-              "#{Course.best_unicode_collation_key('courses.name')}"
+              Course.best_unicode_collation_key('courses.name').to_s
             elsif params[:sort] == 'sis_course_id'
               "courses.sis_source_id"
             elsif params[:sort] == 'teacher'

@@ -211,7 +211,7 @@ describe "Outcome Results API", type: :request do
       end
 
       it "requires user ids to be students in the context" do
-        raw_api_call(:get, outcome_rollups_url(@course, user_ids: "#{@teacher.id}"),
+        raw_api_call(:get, outcome_rollups_url(@course, user_ids: @teacher.id.to_s),
                      controller: 'outcome_results', action: 'rollups', format: 'json',
                      course_id: @course.id.to_s, user_ids: @teacher.id)
         assert_status(400)

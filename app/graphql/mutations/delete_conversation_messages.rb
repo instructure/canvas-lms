@@ -37,7 +37,7 @@ class Mutations::DeleteConversationMessages < Mutations::BaseMutation
 
     participant_record.remove_messages(*messages)
     context[:deleted_models] = { conversation_messages: {} }
-    messages.each { |message| context[:deleted_models][:conversation_messages]["#{message.id}"] = message }
+    messages.each { |message| context[:deleted_models][:conversation_messages][message.id.to_s] = message }
     { conversation_message_ids: input[:ids] }
   rescue ActiveRecord::RecordInvalid => e
     errors_for(e.record)

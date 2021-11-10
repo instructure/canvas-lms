@@ -50,7 +50,7 @@ describe "conversations new" do
       expect(f('.btn.dropdown-toggle[data-id="compose-message-course"]')).to include_text('Select course')
 
       # Selects course for rest of elements to display
-      select_message_course("#{@course.name}")
+      select_message_course(@course.name.to_s)
       wait_for_ajaximations
 
       # To field displays

@@ -147,13 +147,13 @@ describe "student groups" do
         f('.student-group-header .icon-mini-arrow-right').click
         wait_for_ajaximations
 
-        expect(f('div[role="list"]')).to include_text("#{@students[0].name}")
+        expect(f('div[role="list"]')).to include_text(@students[0].name.to_s)
 
         # First student leaves group
         fj('.student-group-join :contains("Leave")').click
         wait_for_ajaximations
 
-        expect(f('div[role="list"]')).not_to include_text("#{@students[0].name}")
+        expect(f('div[role="list"]')).not_to include_text(@students[0].name.to_s)
 
         user_session(@teacher)
         get "/courses/#{@course.id}/groups"
@@ -163,8 +163,8 @@ describe "student groups" do
         wait_for_ajaximations
 
         # Ensure First Student is no longer in groups, but in Unassigned Students section
-        expect(f('div[data-view="groups"]')).not_to include_text("#{@students[0].name}")
-        expect(f('.unassigned-students')).to include_text("#{@students[0].name}")
+        expect(f('div[data-view="groups"]')).not_to include_text(@students[0].name.to_s)
+        expect(f('.unassigned-students')).to include_text(@students[0].name.to_s)
         # Fourth student should remain group leader
         expect(fj(".group[data-id=\"#{@testgroup[0].id}\"] ." \
                   ".group-leader:contains(\"#{@students[3].name}\")")).to be_displayed

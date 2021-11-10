@@ -113,7 +113,7 @@ module CanvasQuizStatistics::Analyzers::Concerns
 
     def build_answer(id, text, correct = false)
       {
-        id: "#{id}",
+        id: id.to_s,
         text: text.to_s,
         correct: correct,
         responses: 0,

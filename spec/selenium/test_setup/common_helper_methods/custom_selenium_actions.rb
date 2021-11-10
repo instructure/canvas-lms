@@ -670,7 +670,7 @@ module CustomSeleniumActions
   end
 
   def scroll_to(element)
-    element_location = "#{element.location['y']}"
+    element_location = element.location['y'].to_s
     driver.execute_script('window.scrollTo(0, ' + element_location + ');')
   end
 

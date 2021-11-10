@@ -582,11 +582,11 @@ describe Quizzes::QuizSubmission do
           {
             "text_after_answers" => "",
             "question_#{@questions[0].id}" => "<p>Lorem ipsum answer.</p>",
-            "context_id" => "#{@course.id}",
+            "context_id" => @course.id.to_s,
             "context_type" => "Course",
-            "user_id" => "#{@user.id}",
-            "quiz_id" => "#{@quiz.id}",
-            "course_id" => "#{@course.id}",
+            "user_id" => @user.id.to_s,
+            "quiz_id" => @quiz.id.to_s,
+            "course_id" => @course.id.to_s,
             "question_text" => "Lorem ipsum question",
           }
         end
@@ -602,7 +602,7 @@ describe Quizzes::QuizSubmission do
                                          'override_scores' => true,
                                          'context_type' => 'Course',
                                          'submission_version_number' => '1',
-                                         "question_score_#{@questions[0].id}" => "#{score}"
+                                         "question_score_#{@questions[0].id}" => score.to_s
                                        })
       end
 
@@ -664,11 +664,11 @@ describe Quizzes::QuizSubmission do
             "text_after_answers" => "",
             "question_#{@questions[0].id}" => "<p>Lorem ipsum answer 1.</p>",
             "question_#{@questions[1].id}" => "<p>Lorem ipsum answer 2.</p>",
-            "context_id" => "#{@course.id}",
+            "context_id" => @course.id.to_s,
             "context_type" => "Course",
-            "user_id" => "#{@user.id}",
-            "quiz_id" => "#{@quiz.id}",
-            "course_id" => "#{@course.id}",
+            "user_id" => @user.id.to_s,
+            "quiz_id" => @quiz.id.to_s,
+            "course_id" => @course.id.to_s,
             "question_text" => "Lorem ipsum question",
           }
         end
@@ -704,11 +704,11 @@ describe Quizzes::QuizSubmission do
           {
             "text_after_answers" => "",
             "question_#{@questions[0].id}" => "<p>Lorem ipsum answer 1.</p>",
-            "context_id" => "#{@course.id}",
+            "context_id" => @course.id.to_s,
             "context_type" => "Course",
-            "user_id" => "#{@user.id}",
-            "quiz_id" => "#{@quiz.id}",
-            "course_id" => "#{@course.id}",
+            "user_id" => @user.id.to_s,
+            "quiz_id" => @quiz.id.to_s,
+            "course_id" => @course.id.to_s,
             "question_text" => "Lorem ipsum question",
           }
         end

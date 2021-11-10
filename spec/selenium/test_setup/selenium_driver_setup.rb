@@ -360,7 +360,7 @@ module SeleniumDriverSetup
 
     def firefox_profile
       if CONFIG[:firefox_path].present?
-        Selenium::WebDriver::Firefox::Binary.path = "#{CONFIG[:firefox_path]}"
+        Selenium::WebDriver::Firefox::Binary.path = (CONFIG[:firefox_path]).to_s
       end
       profile = Selenium::WebDriver::Firefox::Profile.new
       profile.add_extension Rails.root.join("spec/selenium/test_setup/JSErrorCollector.xpi")

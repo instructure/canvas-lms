@@ -1443,7 +1443,7 @@ describe "Accounts API", type: :request do
       it "filters courses by teacher enrollments" do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?by_teachers[]=sis_user_id:a_sis_id&by_teachers[]=#{@t3.id}",
                         { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
-                          :format => 'json', :by_teachers => ['sis_user_id:a_sis_id', "#{@t3.id}"] },
+                          :format => 'json', :by_teachers => ['sis_user_id:a_sis_id', @t3.id.to_s] },
                         {}, {}, { :domain_root_account => @a1 })
         expect(json.collect { |row| row['name'] }).to eql ['c1a', 'c1b', 'c3']
       end
@@ -1501,7 +1501,7 @@ describe "Accounts API", type: :request do
       it "works with a numeric ID" do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?by_subaccounts[]=#{@sub2.id}",
                         { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
-                          :format => 'json', :by_subaccounts => ["#{@sub2.id}"] },
+                          :format => 'json', :by_subaccounts => [@sub2.id.to_s] },
                         {}, {}, { :domain_root_account => @a1 })
         expect(json.collect { |row| row['name'] }).to eql ['in sub2']
       end

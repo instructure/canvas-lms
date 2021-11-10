@@ -34,7 +34,7 @@ describe "better_file_browsing" do
     end
 
     def verify_hidden_item_not_searchable_as_student(search_text)
-      f("input[type='search']").send_keys "#{search_text}", :return
+      f("input[type='search']").send_keys search_text.to_s, :return
       expect(f("body")).not_to contain_css(".ef-item-row")
     end
 

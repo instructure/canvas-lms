@@ -1435,7 +1435,7 @@ describe DiscussionTopicsController, type: :request do
   context "differentiated assignments" do
     def calls_display_topic(topic, opts = { except: [] })
       get_index(topic.context)
-      expect(JSON.parse(response.body).to_s).to include("#{topic.assignment.title}")
+      expect(JSON.parse(response.body).to_s).to include(topic.assignment.title.to_s)
 
       calls = [:get_show, :get_entries, :get_replies, :add_entry, :add_reply]
       calls.reject! { |call| opts[:except].include?(call) }
@@ -1444,7 +1444,7 @@ describe DiscussionTopicsController, type: :request do
 
     def calls_do_not_show_topic(topic)
       get_index(topic.context)
-      expect(JSON.parse(response.body).to_s).not_to include("#{topic.assignment.title}")
+      expect(JSON.parse(response.body).to_s).not_to include(topic.assignment.title.to_s)
 
       calls = [:get_show, :get_entries, :get_replies, :add_entry, :add_reply]
       calls.each { |call| expect(self.send(call, topic).to_s).to eq "401" }
@@ -1545,7 +1545,7 @@ describe DiscussionTopicsController, type: :request do
 
       @user = @student_with_override
       get_index(@course)
-      expect(JSON.parse(response.body).to_s).not_to include("#{@assignment_3.title}")
+      expect(JSON.parse(response.body).to_s).not_to include(@assignment_3.title.to_s)
     end
 
     it "doesnt hide topics without assignment" do
@@ -1553,7 +1553,7 @@ describe DiscussionTopicsController, type: :request do
 
       @user = @student_without_override
       get_index(@course)
-      expect(JSON.parse(response.body).to_s).to include("#{@non_graded_topic.title}")
+      expect(JSON.parse(response.body).to_s).to include(@non_graded_topic.title.to_s)
     end
   end
 
@@ -3014,7 +3014,7 @@ describe DiscussionTopicsController, type: :request do
     json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
                     { :controller => "discussion_topics_api", :action => "show", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
     expect(json['assignment']).not_to be_nil
-    expect(json['assignment']['due_at']).to eq override.due_at.iso8601.to_s
+    expect(json['assignment']['due_at']).to eq override.due_at.iso8601
   end
 
   describe "duplicate" do

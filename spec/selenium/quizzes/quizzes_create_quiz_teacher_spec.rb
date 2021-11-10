@@ -80,14 +80,14 @@ describe 'creating a quiz' do
         save_settings
 
         # verify default section due date & availability dates
-        expect(obtain_due_date(@section_a)).to include_text("#{format_time_for_view(due_at_a)}")
-        expect(obtain_availability_start_date(@section_a)).to include_text("#{format_time_for_view(unlock_at_a)}")
-        expect(obtain_availability_end_date(@section_a)).to include_text("#{format_time_for_view(lock_at_a)}")
+        expect(obtain_due_date(@section_a)).to include_text(format_time_for_view(due_at_a).to_s)
+        expect(obtain_availability_start_date(@section_a)).to include_text(format_time_for_view(unlock_at_a).to_s)
+        expect(obtain_availability_end_date(@section_a)).to include_text(format_time_for_view(lock_at_a).to_s)
 
         # verify Section B due date & availability dates
-        expect(obtain_due_date(@section_b)).to include_text("#{format_time_for_view(due_at_b)}")
-        expect(obtain_availability_start_date(@section_b)).to include_text("#{format_time_for_view(unlock_at_b)}")
-        expect(obtain_availability_end_date(@section_b)).to include_text("#{format_time_for_view(lock_at_b)}")
+        expect(obtain_due_date(@section_b)).to include_text(format_time_for_view(due_at_b).to_s)
+        expect(obtain_availability_start_date(@section_b)).to include_text(format_time_for_view(unlock_at_b).to_s)
+        expect(obtain_availability_end_date(@section_b)).to include_text(format_time_for_view(lock_at_b).to_s)
       end
     end
 
