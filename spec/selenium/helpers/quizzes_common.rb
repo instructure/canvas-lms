@@ -595,7 +595,7 @@ module QuizzesCommon
     data = []
     els.each do |el|
       # its a question
-      if el['class'].match(/question_holder/)
+      if el['class'].include?('question_holder')
         id = el.find_element(:css, 'a')['name'].gsub(/question_/, '')
         question = {
           :id => id.to_i,
@@ -612,7 +612,7 @@ module QuizzesCommon
         end
 
         # its a group
-      elsif el['class'].match(/group_top/)
+      elsif el['class'].include?('group_top')
         last_group_id = el['id'].gsub(/group_top_/, '').to_i
         data << {
           :id => last_group_id,
@@ -622,7 +622,7 @@ module QuizzesCommon
         }
 
         # group ended
-      elsif el['class'].match(/group_bottom/)
+      elsif el['class'].include?('group_bottom')
         last_group_id = nil
       end
     end

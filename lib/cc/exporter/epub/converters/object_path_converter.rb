@@ -48,7 +48,7 @@ module CC::Exporter::Epub::Converters
       return nil unless match.present?
 
       if sort_by_content
-        match[1] =~ /module/ ? nil : "#{match[1]}.xhtml##{match[2]}"
+        match[1].include?('module') ? nil : "#{match[1]}.xhtml##{match[2]}"
       else
         item = get_item(match[1], match[2])
         item[:href]

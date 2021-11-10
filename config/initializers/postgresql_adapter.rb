@@ -317,7 +317,7 @@ module PostgreSQLAdapterExtensions
     end
 
     I18n.available_locales.each do |locale|
-      next if locale =~ /-x-/
+      next if locale.to_s.include?('-x-')
 
       I18n.locale = locale
       next if Canvas::ICU.collator.rules.empty?

@@ -152,7 +152,7 @@ describe Canvas::ICU do
       include_examples "ICU Collator"
 
       before do
-        skip "Postgres does not have collation support" if ActiveRecord::Base.best_unicode_collation_key('col') =~ /LOWER/
+        skip "Postgres does not have collation support" if ActiveRecord::Base.best_unicode_collation_key('col').include?('LOWER')
       end
 
       def collate(values)

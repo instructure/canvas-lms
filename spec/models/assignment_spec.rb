@@ -5060,7 +5060,7 @@ describe Assignment do
       assignment_model(:due_at => "", :course => @course)
       res = @assignment.to_ics
       expect(res).not_to be_nil
-      expect(res.match(/DTSTART/)).to be_nil
+      expect(res.include?('DTSTART')).to eq false
     end
 
     it ".to_ics should not return data for null due dates" do
@@ -5076,9 +5076,9 @@ describe Assignment do
       @assignment.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
       res = @assignment.to_ics
       expect(res).not_to be_nil
-      expect(res.match(/DTEND:20080903T115500Z/)).not_to be_nil
-      expect(res.match(/DTSTART:20080903T115500Z/)).not_to be_nil
-      expect(res.match(/DTSTAMP:20080903T120500Z/)).not_to be_nil
+      expect(res.include?('DTEND:20080903T115500Z')).not_to be_nil
+      expect(res.include?('DTSTART:20080903T115500Z')).not_to be_nil
+      expect(res.include?('DTSTAMP:20080903T120500Z')).not_to be_nil
     end
 
     it ".to_ics should return correct dates even with different time_zone_edited" do
@@ -5088,9 +5088,9 @@ describe Assignment do
       @assignment.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
       res = @assignment.to_ics
       expect(res).not_to be_nil
-      expect(res.match(/DTEND:20080903T115500Z/)).not_to be_nil
-      expect(res.match(/DTSTART:20080903T115500Z/)).not_to be_nil
-      expect(res.match(/DTSTAMP:20080903T120500Z/)).not_to be_nil
+      expect(res.include?('DTEND:20080903T115500Z')).not_to be_nil
+      expect(res.include?('DTSTART:20080903T115500Z')).not_to be_nil
+      expect(res.include?('DTSTAMP:20080903T120500Z')).not_to be_nil
     end
 
     it ".to_ics should return correct dates even with different timezone on call midnight" do
@@ -5101,9 +5101,9 @@ describe Assignment do
       Time.zone = 'HST'
       res = @assignment.to_ics
       expect(res).not_to be_nil
-      expect(res.match(/DTEND:20080903T235900Z/)).not_to be_nil
-      expect(res.match(/DTSTART:20080903T235900Z/)).not_to be_nil
-      expect(res.match(/DTSTAMP:20080903T120500Z/)).not_to be_nil
+      expect(res.include?('DTEND:20080903T235900Z')).not_to be_nil
+      expect(res.include?('DTSTART:20080903T235900Z')).not_to be_nil
+      expect(res.include?('DTSTAMP:20080903T120500Z')).not_to be_nil
     end
 
     it ".to_ics should return string data for assignments with due dates in correct tz" do
@@ -5113,9 +5113,9 @@ describe Assignment do
       @assignment.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
       res = @assignment.to_ics
       expect(res).not_to be_nil
-      expect(res.match(/DTEND:20080903T195500Z/)).not_to be_nil
-      expect(res.match(/DTSTART:20080903T195500Z/)).not_to be_nil
-      expect(res.match(/DTSTAMP:20080903T200500Z/)).not_to be_nil
+      expect(res.include?('DTEND:20080903T195500Z')).not_to be_nil
+      expect(res.include?('DTSTART:20080903T195500Z')).not_to be_nil
+      expect(res.include?('DTSTAMP:20080903T200500Z')).not_to be_nil
     end
 
     it ".to_ics should return data for assignments with due dates" do
@@ -5153,8 +5153,8 @@ describe Assignment do
       assignment_model(:due_at => "Sep 3 2008 11:59pm", :course => @course)
       expect(@assignment.all_day).to eql(true)
       res = @assignment.to_ics
-      expect(res.match(/DTSTART;VALUE=DATE:20080903/)).not_to be_nil
-      expect(res.match(/DTEND;VALUE=DATE:20080903/)).not_to be_nil
+      expect(res.include?('DTSTART;VALUE=DATE:20080903')).not_to be_nil
+      expect(res.include?('DTEND;VALUE=DATE:20080903')).not_to be_nil
     end
 
     it ".to_ics should populate uid and summary fields" do

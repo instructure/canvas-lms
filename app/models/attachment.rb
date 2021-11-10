@@ -238,7 +238,7 @@ class Attachment < ActiveRecord::Base
     end
 
     # try an infer encoding if it would be useful to do so
-    delay.infer_encoding if self.encoding.nil? && self.content_type =~ /text/ && self.context_type != 'SisBatch'
+    delay.infer_encoding if self.encoding.nil? && self.content_type&.include?('text') && self.context_type != 'SisBatch'
     if respond_to?(:process_attachment, true)
       automatic_thumbnail_sizes.each do |suffix|
         delay_if_production(singleton: "attachment_thumbnail_#{global_id}_#{suffix}")
@@ -470,12 +470,12 @@ class Attachment < ActiveRecord::Base
   end
 
   def assert_file_extension
-    self.content_type = nil if self.content_type && (self.content_type == 'application/x-unknown' || self.content_type.match(/ERROR/))
+    self.content_type = nil if content_type == 'application/x-unknown' || content_type&.include?('ERROR')
     self.content_type ||= self.mimetype(self.filename)
     if self.filename && self.filename.split(".").length < 2
       # we actually have better luck assuming zip files without extensions
       # are docx files than assuming they're zip files
-      self.content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' if self.content_type.match(/zip/)
+      self.content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' if content_type&.include?('zip')
       ext = self.extension
       self.write_attribute(:filename, self.filename + ext) unless ext == '.unknown'
     end

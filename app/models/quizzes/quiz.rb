@@ -323,7 +323,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     val = val.in_time_zone.end_of_day if val.is_a?(Date)
     if val.is_a?(String)
       super(Time.zone.parse(val))
-      self.lock_at = CanvasTime.fancy_midnight(self.lock_at) unless val =~ /:/
+      self.lock_at = CanvasTime.fancy_midnight(self.lock_at) unless val.include?(':')
     else
       super(val)
     end
@@ -333,7 +333,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     val = val.in_time_zone.end_of_day if val.is_a?(Date)
     if val.is_a?(String)
       super(Time.zone.parse(val))
-      infer_times unless val =~ /:/
+      infer_times unless val.include?(':')
     else
       super(val)
     end

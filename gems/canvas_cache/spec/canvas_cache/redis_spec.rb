@@ -360,7 +360,7 @@ describe CanvasCache::Redis do
         end
         # we don't log the second message under spring, cause reasons; we only
         # care about the primary message anyway
-        msgs = messages.select { |m| m =~ /Query failure/ }
+        msgs = messages.select { |m| m.include?('Query failure') }
         expect(msgs.length).to eq(1)
         m = msgs.first
         expect(m).to match(/\[REDIS\] Query failure/)

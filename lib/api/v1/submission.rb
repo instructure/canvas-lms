@@ -227,7 +227,7 @@ module Api::V1::Submission
 
     # include the discussion topic entries
     if other_fields.include?('discussion_entries') &&
-       assignment.submission_types =~ /discussion_topic/ &&
+       assignment.submission_types&.include?('discussion_topic') &&
        assignment.discussion_topic
       # group assignments will have a child topic for each group.
       # it's also possible the student posted in the main topic, as well as the

@@ -70,7 +70,7 @@ module AttachmentFu # :nodoc:
           commands.limit("disk", "1000MB") # because arbitrary numbers are arbitrary
 
           # gif are not handled correct, this is a hack, but it seems to work.
-          if img[:format] =~ /GIF/
+          if img[:format].include?('GIF')
             img.format("png")
           end
 
