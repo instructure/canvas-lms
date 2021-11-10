@@ -75,7 +75,7 @@ describe "profile" do
     # check to see if error box popped up
     errorboxes = ff('.error_text')
     expect(errorboxes.length).to be > 1
-    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Invalid old password for the login/ }).to be_truthy
+    expect(errorboxes.any? { |errorbox| errorbox.text.include?('Invalid old password for the login') }).to be_truthy
   end
 
   it "changes the password" do
@@ -89,14 +89,14 @@ describe "profile" do
     log_in_to_settings
     change_password('asdfasdf', SecureRandom.hex(128))
     errorboxes = ff('.error_text')
-    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Can't exceed 255 characters/ }).to be_truthy
+    expect(errorboxes.any? { |errorbox| errorbox.text.include?("Can't exceed 255 characters") }).to be_truthy
   end
 
   it "rejects passwords shorter than 8 characters", priority: "2", test_id: 1055503 do
     log_in_to_settings
     change_password('asdfasdf', SecureRandom.hex(2))
     errorboxes = ff('.error_text')
-    expect(errorboxes.any? { |errorbox| errorbox.text =~ /Must be at least 8 characters/ }).to be_truthy
+    expect(errorboxes.any? { |errorbox| errorbox.text.include?('Must be at least 8 characters') }).to be_truthy
   end
 
   context "non password tests" do

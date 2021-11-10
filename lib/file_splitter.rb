@@ -22,7 +22,7 @@
 module FileSplitter
   # OK, lame, but if there's a commas, call it comma-seperated
   def format
-    @format = @txt =~ /,/ ? :each_record : :each_line
+    @format = @txt.include?(',') ? :each_record : :each_line
   end
 
   # Send it a block, expects @txt to be set in the parser.

@@ -434,7 +434,7 @@ module Api
   end
 
   def self.build_links_hash(base_url, opts = {})
-    base_url += (base_url =~ /\?/ ? '&' : '?')
+    base_url += (base_url.include?('?') ? '&' : '?')
     qp = opts[:query_parameters] || {}
     qp = qp.with_indifferent_access.except(*EXCLUDE_IN_PAGINATION_LINKS)
     base_url += "#{qp.to_query}&" if qp.present?
@@ -652,7 +652,7 @@ module Api
   end
 
   def accepts_jsonapi?
-    !!(/application\/vnd\.api\+json/ =~ request.headers['Accept'].to_s)
+    !!request.headers['Accept'].to_s.include?('application/vnd.api+json')
   end
 
   # Return a template url that follows the root links key for the jsonapi.org

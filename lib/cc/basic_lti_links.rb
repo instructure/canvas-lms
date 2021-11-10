@@ -60,9 +60,9 @@ module CC
                           http://www.imsglobal.org/xsd/imslticp_v1p0 http://www.imsglobal.org/xsd/lti/ltiv1p0/imslticp_v1p0.xsd") do |blti_node|
         blti_node.blti :title, tool.name
         blti_node.blti :description, tool.description
-        if tool.url =~ %r{http://}
+        if tool.url&.include?('http://')
           blti_node.blti :launch_url, tool.url
-        elsif tool.url =~ %r{https://}
+        elsif tool.url&.include?('https://')
           blti_node.blti :secure_launch_url, tool.url
         end
         blti_node.blti(:icon, tool.settings[:icon_url]) if tool.settings[:icon_url]

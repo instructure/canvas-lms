@@ -96,8 +96,8 @@ describe "calendar2" do
 
       get "/calendar2"
       events = ff('.fc-event')
-      event1 = events.detect { |e| e.text =~ /Assignment 1/ }
-      event2 = events.detect { |e| e.text =~ /Assignment 2/ }
+      event1 = events.detect { |e| e.text.include?('Assignment 1') }
+      event2 = events.detect { |e| e.text.include?('Assignment 2') }
       expect(event1).not_to be_nil
       expect(event2).not_to be_nil
       expect(event1).not_to eq event2

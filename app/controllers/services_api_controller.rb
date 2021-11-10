@@ -80,7 +80,7 @@ class ServicesApiController < ApplicationController
     client = CanvasKaltura::ClientV3.new
     uid = "#{@user.id}_#{@domain_root_account.id}"
     res = client.startSession(CanvasKaltura::SessionType::USER, uid)
-    raise "Kaltura session failed to generate" if res =~ /START_SESSION_ERROR/
+    raise "Kaltura session failed to generate" if res.include?('START_SESSION_ERROR')
 
     hash = {
       :ks => res,

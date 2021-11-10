@@ -180,7 +180,7 @@ module CanvasHttp
     begin
       uri = URI.parse(value)
     rescue URI::InvalidURIError => e
-      if e.message =~ /URI must be ascii only/
+      if e.message.include?('URI must be ascii only')
         uri = URI.parse(Addressable::URI.normalized_encode(value).chomp("/"))
         value = uri.to_s
       else

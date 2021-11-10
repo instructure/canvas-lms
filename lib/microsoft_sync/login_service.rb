@@ -72,7 +72,7 @@ module MicrosoftSync
 
         response.parsed_response
       rescue Errors::HTTPBadRequest
-        if response.body =~ /Tenant .* not found/ || response.body =~ /is neither a valid DNS name/
+        if response.body =~ /Tenant .* not found/ || response.body.include?('is neither a valid DNS name')
           raise TenantDoesNotExist
         end
 

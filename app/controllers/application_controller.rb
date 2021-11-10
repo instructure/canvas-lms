@@ -1547,7 +1547,7 @@ class ApplicationController < ActionController::Base
   end
 
   def log_gets
-    if @page_view && !request.xhr? && request.get? && ((response.media_type || "").to_s.match(/html/) ||
+    if @page_view && !request.xhr? && request.get? && ((response.media_type || "").to_s.include?('html') ||
       ((Setting.get('create_get_api_page_views', 'true') == 'true') && api_request?))
       @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
       @page_view_update = true
@@ -2302,7 +2302,7 @@ class ApplicationController < ActionController::Base
   end
 
   def json_as_text?
-    (request.headers['CONTENT_TYPE'].to_s =~ %r{multipart/form-data}) &&
+    request.headers['CONTENT_TYPE'].to_s.include?('multipart/form-data') &&
       (params[:format].to_s != 'json' || in_app?)
   end
 
@@ -2334,7 +2334,7 @@ class ApplicationController < ActionController::Base
   end
 
   def stringify_json_ids?
-    request.headers['Accept'] =~ %r{application/json\+canvas-string-ids}
+    request.headers['Accept']&.include?('application/json+canvas-string-ids')
   end
 
   def json_cast(obj)
@@ -2529,7 +2529,7 @@ class ApplicationController < ActionController::Base
   end
 
   def ms_office?
-    !!(request.user_agent.to_s =~ /ms-office/) ||
+    !!request.user_agent.to_s.include?('ms-office') ||
       !!(request.user_agent.to_s =~ %r{Word/\d+\.\d+})
   end
 

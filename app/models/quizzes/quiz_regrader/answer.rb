@@ -99,7 +99,7 @@ class Quizzes::QuizRegrader::Answer
 
     fake_submission_data = if question_data[:question_type] == 'multiple_answers_question'
                              hash = {}
-                             answer.each { |k, v| hash["question_#{question_id}_#{k}"] = v if /answer/ =~ k.to_s }
+                             answer.each { |k, v| hash["question_#{question_id}_#{k}"] = v if k.to_s.include?('answer') }
                              answer.merge(hash)
                            else
                              answer.merge("question_#{question_id}" => answer[:text])

@@ -502,7 +502,7 @@ module CustomSeleniumActions
     fj("#ui-datepicker-div a:contains(#{day_text})").click
   end
 
-  MODIFIER_KEY = RUBY_PLATFORM =~ /darwin/ ? :command : :control
+  MODIFIER_KEY = RUBY_PLATFORM.include?('darwin') ? :command : :control
   def replace_content(el, value, options = {})
     # el.clear doesn't work with textboxes that have a pattern attribute that's why we have :backspace.
     # We are treating the chrome browser different because Selenium cannot send :command key to chrome on Mac.

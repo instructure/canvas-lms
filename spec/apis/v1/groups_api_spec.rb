@@ -137,7 +137,7 @@ describe "Groups API", type: :request do
     json = api_call(:get, "/api/v1/users/self/groups", @category_path_options.merge(:action => "index"))
     expect(json).to eq [group_json(@community), group_json(@group)]
     links = response.headers['Link'].split(",")
-    expect(links.all? { |l| l =~ /api\/v1\/users\/self\/groups/ }).to be_truthy
+    expect(links.all? { |l| l.include?('api/v1/users/self/groups') }).to be_truthy
   end
 
   describe "show SIS fields based on manage_sis permissions" do

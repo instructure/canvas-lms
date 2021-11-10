@@ -102,8 +102,8 @@ describe ContentMigration do
 
       expect(@cm.warnings.detect { |w| w =~ /account External Tool.+must be configured/ }).not_to be_nil
       expect(@cm.warnings.detect { |w| w =~ /external Learning Outcome couldn't be found.+creating a copy/ }).not_to be_nil
-      expect(@cm.warnings.detect { |w| w =~ /Couldn't find the question bank/ }).not_to be_nil
-      expect(@cm.warnings.detect { |w| w =~ /referenced a grading scheme that was not found/ }).not_to be_nil
+      expect(@cm.warnings.detect { |w| w.include?("Couldn't find the question bank") }).not_to be_nil
+      expect(@cm.warnings.detect { |w| w.include?('referenced a grading scheme that was not found') }).not_to be_nil
     end
   end
 end

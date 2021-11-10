@@ -122,7 +122,7 @@ module CanvasCache
     def self.redis_failure?(redis_name)
       return false unless last_redis_failure[redis_name]
       # i feel this dangling rescue is justifiable, given the try-to-be-failsafe nature of this code
-      if redis_name =~ /localhost/
+      if redis_name.include?('localhost')
         # talking to local redis should not short ciruit as long
         return (Time.zone.now - last_redis_failure[redis_name]) < (settings_store.get('redis_local_failure_time', '2').to_i rescue 2)
       end

@@ -64,6 +64,9 @@ Naming/FileName:
   Exclude:
     - "**/Gemfile.d/~after.rb"
 
+Performance/StringInclude:
+  Severity: error
+
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
 Rails/HasManyOrHasOneDependent:

@@ -152,9 +152,9 @@ describe "Rubrics API", type: :request do
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
     expect(links.all? { |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/rubrics/ }).to be_truthy
-    expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2/)
-    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1/)
-    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3/)
+    expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2/)
+    expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1/)
+    expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
 
     # get the last page
     json = rubrics_api_call(context, { :per_page => '3', :page => '3' }, type)
@@ -162,9 +162,9 @@ describe "Rubrics API", type: :request do
     expect(json.length).to eq 2
     links = response.headers['Link'].split(",")
     expect(links.all? { |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/rubrics/ }).to be_truthy
-    expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2/)
-    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1/)
-    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3/)
+    expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2/)
+    expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1/)
+    expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
   end
 
   describe "course level rubrics" do

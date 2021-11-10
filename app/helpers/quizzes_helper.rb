@@ -68,9 +68,9 @@ module QuizzesHelper
 
   def render_number(num)
     # if the string representation of this number uses scientific notation,
-    return format('%g', num) if num.to_s =~ /e/ # short circuit if scientific notation
+    return format('%g', num) if num.to_s.include?('e') # short circuit if scientific notation
 
-    if num.to_s =~ /%/
+    if num.to_s.include?('%')
       I18n.n(round_if_whole(num.delete('%'))) + '%'
     else
       I18n.n(round_if_whole(num))

@@ -515,7 +515,7 @@ class ContentMigrationsController < ApplicationController
   end
 
   def find_migration_plugin(name)
-    if name =~ /context_external_tool/
+    if name.include?('context_external_tool')
       plugin = Canvas::Plugin.new(name)
       plugin.meta[:settings] = { requires_file_upload: true, worker: 'CCWorker', valid_contexts: %w{Course} }.with_indifferent_access
       plugin
