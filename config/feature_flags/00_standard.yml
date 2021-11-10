@@ -130,13 +130,9 @@ epub_export:
 feature_flag_filters:
   state: hidden
   applies_to: SiteAdmin
-  display_name: Feature Flag Filters
-  description: Adds additional information and filtering for feature flags
-  enable_at: Date.new(2021, 9, 18)
-  pending_enforcement: true
-  environments:
-    beta:
-      enable_at: Date.new(2021, 8, 23)
+  display_name: Flags tab updates
+  description: This flag updates the title of the feature flags tab to "Feature Options" and adds
+    a "Feature Preview" pill for feature preview projects.
 featured_help_links:
   state: hidden
   applies_to: SiteAdmin
