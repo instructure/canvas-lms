@@ -159,21 +159,26 @@ class Header extends React.Component {
     return (
       <>
         <div data-testid="unread_comments_badge">
-          <Badge
-            margin="x-small"
-            count={this.props.submission.unreadCommentCount || null}
-            countUntil={100}
-          >
-            <Button
-              renderIcon={IconChatLine}
-              onClick={this.openCommentsTray}
-              disabled={addCommentsDisabled}
-            >
-              {this.props.submission.feedbackForCurrentAttempt
-                ? I18n.t('View Feedback')
-                : I18n.t('Add Comment')}
-            </Button>
-          </Badge>
+          <StudentViewContext.Consumer>
+            {context => (
+              <Badge
+                margin="x-small"
+                count={this.props.submission.unreadCommentCount || null}
+                countUntil={100}
+              >
+                <Button
+                  renderIcon={IconChatLine}
+                  onClick={this.openCommentsTray}
+                  disabled={addCommentsDisabled}
+                >
+                  {this.props.submission.feedbackForCurrentAttempt ||
+                  !context.allowChangesToSubmission
+                    ? I18n.t('View Feedback')
+                    : I18n.t('Add Comment')}
+                </Button>
+              </Badge>
+            )}
+          </StudentViewContext.Consumer>
           {addCommentsDisabled && (
             <Popover
               renderTrigger={

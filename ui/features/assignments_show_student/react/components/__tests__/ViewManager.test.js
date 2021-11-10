@@ -96,7 +96,8 @@ describe('ViewManager', () => {
       COURSE_ID: '1',
       current_user: {display_name: 'bob', avatar_url: 'awesome.avatar.url'},
       enrollment_state: 'active',
-      PREREQS: {}
+      PREREQS: {},
+      current_user_roles: ['user', 'student']
     }
   })
 

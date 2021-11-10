@@ -133,6 +133,20 @@ describe('SubmissionManager', () => {
     expect(getByText('Submit Assignment').closest('button')).toBeDisabled()
   })
 
+  it('does not render submit button for observers', async () => {
+    const props = await mockAssignmentAndSubmission({
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+    })
+    const {queryByRole} = renderInContext(
+      {allowChangesToSubmission: false, isObserver: true},
+      <MockedProvider>
+        <SubmissionManager {...props} />
+      </MockedProvider>
+    )
+
+    expect(queryByRole('button', {name: 'Submit Button'})).not.toBeInTheDocument()
+  })
+
   it('does not render the submit button if we are not on the latest submission', async () => {
     const props = await mockAssignmentAndSubmission({
       Submission: SubmissionMocks.graded
@@ -516,6 +530,20 @@ describe('SubmissionManager', () => {
         )
 
         expect(getByRole('button', {name: 'Try Again'})).toBeInTheDocument()
+      })
+
+      it('is not rendered for observers', async () => {
+        const props = await mockAssignmentAndSubmission({
+          Assignment: {
+            submissionTypes: ['online_text_entry']
+          },
+          Submission: {...SubmissionMocks.submitted}
+        })
+        const {queryByRole} = renderInContext(
+          {allowChangesToSubmission: false, isObserver: true},
+          <SubmissionManager {...props} />
+        )
+        expect(queryByRole('button', {name: 'Try Again'})).not.toBeInTheDocument()
       })
 
       it('is not rendered if changes cannot be made to the submission', async () => {
