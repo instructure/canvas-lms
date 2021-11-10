@@ -77,7 +77,7 @@ module MicrosoftSync
       BATCH_ADD_USERS_SPECIAL_CASES = [
         SpecialCase.new(
           400, /One or more added object references already exist/i,
-          result: :ignored
+          result: :already_in_group
         ),
         SpecialCase.new(
           403, /would exceed the maximum quota count.*for forward-link.*owners/i,
@@ -87,6 +87,12 @@ module MicrosoftSync
           403, /would exceed the maximum quota count.*for forward-link.*members/i,
           result: Errors::MembersQuotaExceeded
         ),
+        SpecialCase.new(404, result: GroupMembershipChangeResult::NONEXISTENT_USER) do |response|
+          # Error message must have user id (see group_add_user_requests) to match.
+          aad_id = response.batch_request_id.gsub(/^members_|^owners_/, '')
+          regex = /#{Regexp.escape aad_id}.* does not exist or one of its queried reference/
+          response.body =~ regex
+        end,
       ].freeze
 
       # Returns a GroupMembershipChangeResult
@@ -115,13 +121,10 @@ module MicrosoftSync
         # push the total number over the maximum (100). In that case, fallback to
         # batch requests, which do not have this problem.
         SpecialCase.new(
-          403, /would exceed the maximum quota count.*for forward-link.*owners/i,
+          403, /would exceed the maximum quota count.*for forward-link.*(owners|members)/i,
           result: :fallback_to_batch
         ),
-        SpecialCase.new(
-          403, /would exceed the maximum quota count.*for forward-link.*members/i,
-          result: :fallback_to_batch
-        ),
+        # There is one additional dynamic special case in add_users_special_cases()
       ].freeze
 
       # Returns nil or a blank GroupMembershipChangeResult if all users were
@@ -142,7 +145,7 @@ module MicrosoftSync
           :patch, "groups/#{group_id}",
           body: body,
           quota: [1, write_quota],
-          special_cases: ADD_USERS_SPECIAL_CASES
+          special_cases: add_users_special_cases(group_id)
         )
 
         if response == :fallback_to_batch
@@ -151,6 +154,19 @@ module MicrosoftSync
       end
 
       private
+
+      def add_users_special_cases(group_id)
+        ADD_USERS_SPECIAL_CASES + [
+          # 404 referencing some ID which is NOT the group ID. Probably one of
+          # the user(s) don't exist. Fallback to batch to deal with each user
+          # separately, in case multiple do not exist.
+          # If the group doesn't exist, we won't match here, so we'll.
+          # raise an HTTPNotFound as normal.
+          SpecialCase.new(
+            404, /does not exist or one of its queried reference/, result: :fallback_to_batch
+          ) { |response| !response.body.include?(group_id) }
+        ]
+      end
 
       # ==== Helpers for removing and adding in batch ===
 

@@ -56,6 +56,8 @@ module MicrosoftSync
     STATSD_NAME = 'microsoft_sync.syncer_steps'
     STATSD_NAME_SKIPPED_BATCHES = "#{STATSD_NAME}.skipped_batches"
     STATSD_NAME_SKIPPED_TOTAL = "#{STATSD_NAME}.skipped_total"
+    STATSD_NAME_DELETED_MAPPINGS_FOR_MISSING_USERS = \
+      "#{STATSD_NAME}.deleted_mappings_for_missing_users"
 
     # Can happen when User disables sync on account-level when jobs are running:
     class TenantMissingOrSyncDisabled < Errors::GracefulCancelError
@@ -237,7 +239,7 @@ module MicrosoftSync
 
       n_total = change_result.total_unsuccessful
       Rails.logger.warn("#{self.class.name} (#{group.global_id}): " \
-                        "Skipping redundant #{type} for #{n_total}: #{change_result.to_json}")
+                        "Skipping #{type} for #{n_total}: #{change_result.to_json}")
       InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_BATCHES}.#{type}",
                                    tags: { sync_type: sync_type })
       InstStatsd::Statsd.count("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}", n_total,
@@ -290,12 +292,22 @@ module MicrosoftSync
       raise
     end
 
+    def delete_mappings_if_users_missing(change_result)
+      bad_aads = change_result&.nonexistent_user_ids
+      if bad_aads.present?
+        Rails.logger.warn "Deleting mappings for AADs: #{bad_aads}"
+        InstStatsd::Statsd.count(STATSD_NAME_DELETED_MAPPINGS_FOR_MISSING_USERS, bad_aads.count)
+        UserMapping.where(root_account_id: course.root_account_id, aad_id: bad_aads).delete_all
+      end
+    end
+
     def execute_diff_add_users(diff)
       diff.additions_in_slices_of(GraphService::GroupsEndpoints::USERS_BATCH_SIZE) do |members_and_owners|
         change_result = graph_service.groups.add_users_ignore_duplicates(
           group.ms_group_id, **members_and_owners
         )
         log_batch_skipped(:add, change_result)
+        delete_mappings_if_users_missing(change_result)
       end
     rescue Errors::MembersQuotaExceeded
       raise_and_disable_group(MaxMemberEnrollmentsReached)
