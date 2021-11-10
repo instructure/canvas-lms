@@ -877,6 +877,8 @@ class AssignmentsApiController < ApplicationController
         ActiveRecord::Associations::Preloader.new.preload(assignments, :score_statistic)
       end
 
+      mc_status = setup_master_course_restrictions(assignments, context)
+
       assignments.map do |assignment|
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
@@ -894,7 +896,8 @@ class AssignmentsApiController < ApplicationController
                         include_overrides: include_override_objects,
                         preloaded_user_content_attachments: preloaded_attachments,
                         include_can_edit: include_params.include?('can_edit'),
-                        include_score_statistics: include_params.include?('score_statistics'))
+                        include_score_statistics: include_params.include?('score_statistics'),
+                        master_course_status: mc_status)
       end
     end
   end
