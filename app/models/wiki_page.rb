@@ -154,7 +154,7 @@ class WikiPage < ActiveRecord::Base
     url_attribute = self.class.url_attribute
     base_url = self.send(url_attribute)
     base_url = self.send(self.class.attribute_to_urlify).to_s.to_url if base_url.blank? || !self.only_when_blank
-    conditions = [wildcard("#{url_attribute}", base_url, :type => :right)]
+    conditions = [wildcard(url_attribute.to_s, base_url, :type => :right)]
     unless new_record?
       conditions.first << " and id != ?"
       conditions << id

@@ -120,7 +120,7 @@ module Qti
         # substitute {var} for [var]
         @question[:question_text].gsub!("{#{v_name}}", "[#{v_name}]") if @question[:question_text]
         # substitute {var} for var
-        @question[:imported_formula].gsub!("{#{v_name}}", "#{v_name}") if @question[:imported_formula]
+        @question[:imported_formula].gsub!("{#{v_name}}", v_name.to_s) if @question[:imported_formula]
       end
       if @question[:imported_formula]
         method_substitutions = { "sqr" => "sqrt", "Factorial" => "fact", "exp" => "e" }

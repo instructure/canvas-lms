@@ -208,10 +208,10 @@ describe "interaction with differentiated assignments" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@da_assignment.id}"
       f(".ui-selectmenu-icon").click
       [@s1, @s2].each do |student|
-        expect(f("#students_selectmenu-menu")).not_to include_text("#{student.name}")
+        expect(f("#students_selectmenu-menu")).not_to include_text(student.name.to_s)
       end
       [@s3, @s4, @s5].each do |student|
-        expect(f("#students_selectmenu-menu")).to include_text("#{student.name}")
+        expect(f("#students_selectmenu-menu")).to include_text(student.name.to_s)
       end
     end
   end

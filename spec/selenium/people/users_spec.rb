@@ -89,7 +89,7 @@ describe "users" do
 
     it "validates all page views were loaded" do
       page_views_count = 100
-      page_views_count.times { |i| page_view(:user => @student, :course => @course, :url => "#{"%03d" % i}") }
+      page_views_count.times { |i| page_view(:user => @student, :course => @course, :url => ("%03d" % i).to_s) }
       get "/users/#{@student.id}"
       wait_for_ajaximations
       scroll_page_to_bottom

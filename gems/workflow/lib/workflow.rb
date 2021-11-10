@@ -103,7 +103,7 @@ module Workflow
     end
 
     def to_s
-      "#{name}"
+      name.to_s
     end
 
     def to_sym
@@ -146,7 +146,7 @@ module Workflow
               process_event!(event_name, *args)
             end
             # INSTRUCTURE:
-            define_method "#{event_name}".to_sym do |*args|
+            define_method event_name.to_sym do |*args|
               process_event(event_name, *args)
             end
           end

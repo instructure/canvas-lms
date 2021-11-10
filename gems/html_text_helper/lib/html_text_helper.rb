@@ -302,7 +302,7 @@ module HtmlTextHelper
   end
 
   def add_notification_to_link(url, notification_id)
-    parts = "#{url}".split("#", 2)
+    parts = url.to_s.split("#", 2)
     link = parts[0]
     link += link.match(/\?/) ? "&" : "?"
     link += "clear_notification_id=#{notification_id}"

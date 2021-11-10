@@ -1564,21 +1564,21 @@ module Lti
             allow(assignment).to receive(:unlock_at).and_return(right_now)
             exp_hash = { test: '$Canvas.assignment.unlockAt.iso8601' }
             variable_expander.expand_variables!(exp_hash)
-            expect(exp_hash[:test]).to eq right_now.utc.iso8601.to_s
+            expect(exp_hash[:test]).to eq right_now.utc.iso8601
           end
 
           it 'has substitution for $Canvas.assignment.lockAt.iso8601' do
             allow(assignment).to receive(:lock_at).and_return(right_now)
             exp_hash = { test: '$Canvas.assignment.lockAt.iso8601' }
             variable_expander.expand_variables!(exp_hash)
-            expect(exp_hash[:test]).to eq right_now.utc.iso8601.to_s
+            expect(exp_hash[:test]).to eq right_now.utc.iso8601
           end
 
           it 'has substitution for $Canvas.assignment.dueAt.iso8601' do
             allow(assignment).to receive(:due_at).and_return(right_now)
             exp_hash = { test: '$Canvas.assignment.dueAt.iso8601' }
             variable_expander.expand_variables!(exp_hash)
-            expect(exp_hash[:test]).to eq right_now.utc.iso8601.to_s
+            expect(exp_hash[:test]).to eq right_now.utc.iso8601
           end
 
           it 'handles a nil unlock_at' do

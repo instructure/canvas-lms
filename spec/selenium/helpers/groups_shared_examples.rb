@@ -38,7 +38,7 @@ shared_examples 'home_page' do |context|
 
     expect('.coming_up').to be_present
     expect(ff('.coming_up .event a').size).to eq 1
-    expect(f('.coming_up .event a b')).to include_text("#{event.title}")
+    expect(f('.coming_up .event a b')).to include_text(event.title)
   end
 
   it "displays a view calendar link on the group home page", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273603, teacher: 319910) do

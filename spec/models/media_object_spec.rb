@@ -63,7 +63,7 @@ describe MediaObject do
       @a4 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       data = {
         :entries => [
-          { :entryId => "test2", :originalId => "#{@a1.id}" },
+          { :entryId => "test2", :originalId => @a1.id.to_s },
           { :entryId => "test3", :originalId => @a3.id },
           { :entryId => "test4", :originalId => "attachment_id=#{@a4.id}" }
         ],

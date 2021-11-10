@@ -1170,7 +1170,7 @@ class Attachment < ActiveRecord::Base
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/files/#{self.feed_code}"
       entry.links << Atom::Link.new(:rel => 'alternate',
                                     :href => "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/files/#{self.id}")
-      entry.content = Atom::Content::Html.new("#{self.display_name}")
+      entry.content = Atom::Content::Html.new(self.display_name.to_s)
     end
   end
 

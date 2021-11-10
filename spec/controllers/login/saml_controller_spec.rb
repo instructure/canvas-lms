@@ -482,10 +482,10 @@ describe Login::SamlController do
       end
 
       it "uses the specified AAC" do
-        get_new("#{@aac1.id}")
+        get_new(@aac1.id.to_s)
         expect(response.location.starts_with?(@aac1.log_in_url)).to be_truthy
         controller.instance_variable_set(:@aac, nil)
-        get_new("#{@aac2.id}")
+        get_new(@aac2.id.to_s)
         expect(response.location.starts_with?(@aac2.log_in_url)).to be_truthy
       end
 

@@ -154,7 +154,7 @@ describe Quizzes::QuizReportsController, type: :request do
         expect(Quizzes::QuizStatistics.count).to eq 1
 
         expect(json['quiz_reports']).to be_present
-        expect(json['quiz_reports'][0]['id']).to eq "#{Quizzes::QuizStatistics.first.id}"
+        expect(json['quiz_reports'][0]['id']).to eq Quizzes::QuizStatistics.first.id.to_s
       end
     end
 
@@ -327,7 +327,7 @@ describe Quizzes::QuizReportsController, type: :request do
         it 'renders' do
           json = api_show({}, { jsonapi: true })
           expect(json['quiz_reports']).to be_present
-          expect(json['quiz_reports'][0]['id']).to eq "#{@report.id}"
+          expect(json['quiz_reports'][0]['id']).to eq @report.id.to_s
           expect(json['quiz_reports'][0]['report_type']).to eq 'student_analysis'
         end
 

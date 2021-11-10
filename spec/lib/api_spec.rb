@@ -223,7 +223,7 @@ describe Api do
 
     it "finds assignment by id" do
       assignment = assignment_model()
-      expect(@api.api_find(Assignment, "#{assignment.id}")).to eq assignment
+      expect(@api.api_find(Assignment, assignment.id.to_s)).to eq assignment
     end
 
     it "finds assignment by sis_assignment_id" do

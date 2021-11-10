@@ -58,7 +58,7 @@ describe ConversationMessage do
       user_factory
       @conversation = @teacher.initiate_conversation([@user])
       message = add_message
-      expect(message.author_short_name_with_shared_contexts(@user)).to eq "#{message.author.short_name}"
+      expect(message.author_short_name_with_shared_contexts(@user)).to eq message.author.short_name
     end
 
     it "creates appropriate notifications on new message", priority: "1", test_id: 186561 do

@@ -353,7 +353,7 @@ describe "submissions" do
 
       asset = @submission.turnitin_assets.first.asset_string
       @submission.turnitin_data = {
-        "#{asset}" => {
+        asset.to_s => {
           :object_id => "123456",
           :publication_overlap => 5,
           :similarity_score => 100,

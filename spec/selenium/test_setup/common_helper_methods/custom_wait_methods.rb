@@ -227,7 +227,7 @@ module CustomWaitMethods
       begin
         tiny_frame = disable_implicit_wait { parent.find_element(:css, 'iframe') }
       rescue => e
-        puts "#{e.inspect}"
+        puts e.inspect
         false
       end
     end
@@ -245,7 +245,7 @@ module CustomWaitMethods
       begin
         tiny_frame = disable_implicit_wait { element.find_element(:css, 'iframe') }
       rescue => e
-        puts "#{e.inspect}"
+        puts e.inspect
         false
       end
     end

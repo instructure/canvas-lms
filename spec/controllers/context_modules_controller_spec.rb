@@ -487,7 +487,7 @@ describe ContextModulesController do
       ct1 = make_content_tag(a1, @course, m1)
       ct2 = make_content_tag(a2, @course, m1)
 
-      post 'reorder_items', params: { :course_id => @course.id, :context_module_id => m2.id, :order => "#{ct2.id}" }
+      post 'reorder_items', params: { :course_id => @course.id, :context_module_id => m2.id, :order => ct2.id.to_s }
       ct2.reload
       expect(ct2.context_module).to eq m2
       ct1.reload

@@ -27,7 +27,7 @@ module CanvasQuizStatistics::Analyzers
       answer_id = response.fetch(answer_key(blank), nil).to_s
 
       answer = if answer_id.present?
-                 answer_set[:answers].detect { |a| "#{a[:id]}" == answer_id }
+                 answer_set[:answers].detect { |a| (a[:id]).to_s == answer_id }
                end
 
       answer ||= generate_incorrect_answer({

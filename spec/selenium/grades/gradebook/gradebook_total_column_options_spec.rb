@@ -44,7 +44,7 @@ describe "Gradebook - total column menu options" do
         raise Error "Total text is missing." unless total.text
 
         total.text.strip!
-        expect(total.text).to include("#{expected_points.shift}") unless total.text.length < 1
+        expect(total.text).to include(expected_points.shift.to_s) unless total.text.length < 1
       end
     end
 

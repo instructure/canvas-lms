@@ -3534,11 +3534,11 @@ describe Submission do
         {
           "text_after_answers" => "",
           "question_#{@questions[0].id}" => "<p>Lorem ipsum answer.</p>",
-          "context_id" => "#{@course.id}",
+          "context_id" => @course.id.to_s,
           "context_type" => "Course",
-          "user_id" => "#{@user.id}",
-          "quiz_id" => "#{@quiz.id}",
-          "course_id" => "#{@course.id}",
+          "user_id" => @user.id.to_s,
+          "quiz_id" => @quiz.id.to_s,
+          "course_id" => @course.id.to_s,
           "question_text" => "Lorem ipsum question",
         }
       end

@@ -112,7 +112,7 @@ describe Submissions::AttachmentForSubmissionDownload do
     context 'when download id is in versioned_attachments' do
       before :once do
         @attachment = attachment_model(context: @assignment)
-        @submission.attachment_ids = "#{@attachment.id}"
+        @submission.attachment_ids = @attachment.id.to_s
         @submission.save
         @options = { download: @attachment.id }
       end

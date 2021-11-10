@@ -142,7 +142,7 @@ module CanvasQuizStatistics::Analyzers
         "#{answer[:approximate]} (with precision: #{answer[:precision]})"
       else
         value = format.call(answer[:exact])
-        "#{value}"
+        value.to_s
       end
     end
 
@@ -163,7 +163,7 @@ module CanvasQuizStatistics::Analyzers
     end
 
     def locate_answer(response, answers)
-      answers.detect { |answer| answer[:id] == "#{response[:answer_id]}" }
+      answers.detect { |answer| answer[:id] == (response[:answer_id]).to_s }
     end
   end
 end

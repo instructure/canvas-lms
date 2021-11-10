@@ -119,7 +119,7 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
         ]
 
         it desc do
-          answer_data = { :"question_#{question_id}" => "#{answer}" }
+          answer_data = { :"question_#{question_id}" => answer.to_s }
           question = Quizzes::QuizQuestion::NumericalQuestion.new({
                                                                     answers: [{
                                                                       id: 1,

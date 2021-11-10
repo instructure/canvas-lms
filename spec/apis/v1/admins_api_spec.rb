@@ -147,7 +147,7 @@ describe "Admins API", type: :request do
       @new_user = user_with_managed_pseudonym(:name => 'bad admin', :account => @account, :sis_user_id => 'badmin')
       @user = @admin
       @base_path = "/api/v1/accounts/#{@account.id}/admins/"
-      @path = @base_path + "#{@new_user.id}"
+      @path = @base_path + @new_user.id.to_s
       @path_opts = { :controller => "admins", :action => "destroy", :format => "json",
                      :account_id => @account.to_param, :user_id => @new_user.to_param }
     end
