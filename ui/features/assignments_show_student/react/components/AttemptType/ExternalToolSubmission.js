@@ -82,8 +82,9 @@ function ExternalToolDraftView({createSubmissionDraft, onFileUploadRequested, su
 
       if (contentItem['@type'] === 'FileItem' || contentItem.type === 'file') {
         // This is a file, so let's start the upload and redirect the user to
-        // the file upload panel
-        onFileUploadRequested({files: [contentItem]})
+        // the file upload panel. Content type will be set on back-end, so we
+        // set mediaType to an empty string here.
+        onFileUploadRequested({files: [{...contentItem, mediaType: ''}]})
       } else {
         // This is a link, so we'll treat it as an LTI launch submission and
         // save a draft to that effect
