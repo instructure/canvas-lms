@@ -41,7 +41,7 @@ describe "blueprint courses - file locking" do
                                       :migration_id => @tag.migration_id)
     end
 
-    before do
+    before :each do
       user_session(@teacher)
     end
 
@@ -113,7 +113,7 @@ describe "blueprint courses - file locking" do
       @tag = @template.create_content_tag_for!(@original_file)
     end
 
-    before do
+    before :each do
       user_session(@teacher)
     end
 

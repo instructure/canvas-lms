@@ -685,7 +685,7 @@ describe MediaObjectsController do
   end
 
   describe "POST '/media_objects'" do
-    before do
+    before :each do
       user_session(@student)
     end
 

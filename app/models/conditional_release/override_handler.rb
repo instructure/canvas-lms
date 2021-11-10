@@ -101,7 +101,8 @@ module ConditionalRelease
         assignments_to_unassign.each do |to_unassign|
           overrides = existing_overrides_map[to_unassign.id] || []
           overrides.each do |o|
-            o.assignment_override_students.detect { |aos| aos.user_id == student_id }&.destroy!
+            aos = o.assignment_override_students.detect { |aos| aos.user_id == student_id }
+            aos.destroy! if aos
           end
         end
       end

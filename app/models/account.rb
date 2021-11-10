@@ -280,8 +280,6 @@ class Account < ActiveRecord::Base
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
-  add_setting :teachers_can_create_courses_anywhere, :boolean => true, :root_only => true, :default => true
-  add_setting :students_can_create_courses_anywhere, :boolean => true, :root_only => true, :default => true
 
   add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
   add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
@@ -2161,8 +2159,8 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def available_course_visibility_override_options(options = nil)
-    options || {}
+  def available_course_visibility_override_options(_options = nil)
+    _options || {}
   end
 
   def user_needs_verification?(user)

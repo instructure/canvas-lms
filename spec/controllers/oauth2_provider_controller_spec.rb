@@ -123,7 +123,7 @@ describe OAuth2ProviderController do
         user_with_pseudonym(:active_all => 1, :password => 'qwertyuiop')
       end
 
-      before do
+      before :each do
         user_session(@user)
 
         redis = double('Redis')
@@ -631,7 +631,6 @@ describe OAuth2ProviderController do
           let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url(host: 'test.host', port: 3000) }
 
           before { request.host = 'test.host:3000' }
-
           it { is_expected.to have_http_status 200 }
         end
 
@@ -666,7 +665,6 @@ describe OAuth2ProviderController do
 
         context 'with bad signing key' do
           let(:signing_key) { JSON::JWK.new(other_key.private_jwk) }
-
           before do
             other_key.generate_rsa_keypair! overwrite: true
             other_key.save!

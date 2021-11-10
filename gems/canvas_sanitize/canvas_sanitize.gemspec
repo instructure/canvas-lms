@@ -15,7 +15,8 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "sanitize", "~> 6.0"
+  # 4.6.3 breaks protocol checking on data-url attributes if all data attributes are allowed
+  spec.add_dependency "sanitize", "~> 5.2", ">= 5.2.3"
 
   spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "byebug"

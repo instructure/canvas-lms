@@ -159,7 +159,6 @@ describe Folder do
     expect(f.active_file_attachments).to be_include(a)
     # f.active_file_attachments.should be_include(nil_a)
   end
-
   it "assigns unfiled files to the 'unfiled' folder" do
     f = Folder.unfiled_folder(@course)
     a = f.file_attachments.build
@@ -517,7 +516,7 @@ describe Folder do
     end
 
     context "when a 'Buttons and Icons' folder already exists" do
-      before do
+      before(:each) do
         @existing_folder = Folder.buttons_and_icons_folder(course)
       end
 

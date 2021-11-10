@@ -40,14 +40,14 @@ RSpec.describe "DynamicSettings::PrefixProxy with redis local cache" do
                                      default_ttl: 3.minutes)
   end
 
-  before do
+  before(:each) do
     skip("Must have a local redis available to run this spec") unless Canvas.redis_enabled?
     DynamicSettings.cache = LocalCache
     allow(ConfigFile).to receive(:load).with("local_cache").and_return(redis_conf_hash)
     LocalCache.reset
   end
 
-  after do
+  after(:each) do
     LocalCache.clear(force: true)
   end
 

@@ -21,7 +21,7 @@
 require_relative '../views_helper'
 
 describe "/context_modules/index" do
-  before do
+  before :each do
     assign(:body_classes, [])
     assign(:menu_tools, Hash.new([]))
     assign(:module_index_tools, [])

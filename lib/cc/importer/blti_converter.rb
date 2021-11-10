@@ -22,7 +22,7 @@ require 'nokogiri'
 
 module CC::Importer
   class BLTIConverter
-    class CCImportError < RuntimeError; end
+    class CCImportError < Exception; end
     include CC::Importer
 
     def get_blti_resources(manifest)

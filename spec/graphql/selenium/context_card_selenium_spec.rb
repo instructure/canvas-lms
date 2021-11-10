@@ -40,7 +40,7 @@ describe "graphql student context cards" do
   end
 
   context 'with graphql enabled as a teacher' do
-    before do
+    before :each do
       course_with_teacher_logged_in
       @section = @course.default_section
       add_enrollment('active', @section)
@@ -79,7 +79,7 @@ describe "graphql student context cards" do
   end
 
   context 'with graphql enabled as an admin' do
-    before do
+    before :each do
       course_with_admin_logged_in
       @section = @course.default_section
       add_enrollment('active', @section)

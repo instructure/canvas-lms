@@ -122,8 +122,9 @@ class UserList
         [a, b]
       when /\s*(.+?)\s*<(\S+?@\S+?)>/
         [$1, $2]
-      when /<(\S+?@\S+?)>/,
-           /(\S+?@\S+)/
+      when /<(\S+?@\S+?)>/
+        [nil, $1]
+      when /(\S+?@\S+)/
         [nil, $1]
       else
         nil
@@ -277,17 +278,17 @@ class UserList
                .map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |sms|
         address = sms.delete(:address)[/\d+/]
         addresses = smses.select { |a| a[:address].gsub(/[^\d]/, '') == address }
-        addresses.each do |a|
+        addresses.each do |address|
           # ccs are not unique; just error out on duplicates
-          if a.key?(:user_id) && (a[:user_id] != login[:user_id] || a[:shard] != Shard.current)
-            a[:user_id] = false
-            a[:details] = :non_unique
-            a.delete(:name)
-            a.delete(:shard)
+          if address.has_key?(:user_id) && (address[:user_id] != login[:user_id] || address[:shard] != Shard.current)
+            address[:user_id] = false
+            address[:details] = :non_unique
+            address.delete(:name)
+            address.delete(:shard)
           else
             sms[:user_id] = sms[:user_id].to_i
-            a.merge!(sms)
-            a[:shard] = Shard.current
+            address.merge!(sms)
+            address[:shard] = Shard.current
           end
         end
       end

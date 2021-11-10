@@ -22,30 +22,13 @@ require 'acts_as_list'
 
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :database => ":memory:")
 
-class Mixin < ActiveRecord::Base
-end
-
-class ListMixin < Mixin
-  acts_as_list :column => "pos", :scope => :parent_id
-end
-
-class ListMixinSub1 < ListMixin
-end
-
-class ListMixinSub2 < ListMixin
-end
-
-class UnscopedListMixin < Mixin
-  acts_as_list :column => "pos"
-end
-
 describe "ListTest" do
-  after do
+  after :each do
     teardown_db
   end
 
   describe do
-    before do
+    before :each do
       setup_db
       (1..4).each { |counter| ListMixin.create! :pos => counter, :parent_id => 5 }
     end
@@ -189,7 +172,7 @@ describe "ListTest" do
   end
 
   describe 'SubTest' do
-    before do
+    before :each do
       setup_db
       (1..4).each { |i| (i.odd? ? ListMixinSub1 : ListMixinSub2).create! :pos => i, :parent_id => 5000 }
     end
@@ -290,5 +273,22 @@ describe "ListTest" do
     ActiveRecord::Base.connection.tables.each do |table|
       ActiveRecord::Base.connection.drop_table(table)
     end
+  end
+
+  class Mixin < ActiveRecord::Base
+  end
+
+  class ListMixin < Mixin
+    acts_as_list :column => "pos", :scope => :parent_id
+  end
+
+  class ListMixinSub1 < ListMixin
+  end
+
+  class ListMixinSub2 < ListMixin
+  end
+
+  class UnscopedListMixin < Mixin
+    acts_as_list :column => "pos"
   end
 end

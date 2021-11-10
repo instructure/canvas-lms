@@ -26,7 +26,7 @@ describe 'Submissions API', type: :request do
 
   let(:params) { {} }
 
-  before do
+  before :each do
     allow(HostUrl).to receive(:file_host_with_shard).and_return(["www.example.com", Shard.default])
   end
 
@@ -469,7 +469,7 @@ describe 'Submissions API', type: :request do
         @a1.update_submission(@student1, comment: 'Answer: forty-two')
       end
 
-      before do
+      before(:each) do
         @user = @student1
 
         @json = api_call(:get,
@@ -808,7 +808,7 @@ describe 'Submissions API', type: :request do
                       :course_id => @course.to_param,
                       :assignment_id => assignment.to_param
                     }, {
-                      include: %w[user submission_comments]
+                      :include => %w(user, submission_comments)
                     })
 
     expect(json.first['user']).to be_nil
@@ -1476,7 +1476,7 @@ describe 'Submissions API', type: :request do
          "late_policy_status" => nil,
          "seconds_late" => 0,
          "points_deducted" => nil }]
-    expect(json.sort_by { |h| h['user_id'] }).to eql(res.sort_by { |h| h['user_id'] })
+    expect(json.sort_by { |h| h['user_id'] }).to eql res.sort_by { |h| h['user_id'] }
   end
 
   it "paginates submissions" do
@@ -1801,7 +1801,7 @@ describe 'Submissions API', type: :request do
       let(:assignment) { @course.assignments.create! }
       let(:student1_sub) { assignment.submissions.find_by(user: @student1) }
 
-      before do
+      before(:each) do
         assignment.ensure_post_policy(post_manually: true)
       end
 
@@ -1965,7 +1965,6 @@ describe 'Submissions API', type: :request do
         course_with_ta(course: @course)
         user_session(@ta)
       end
-
       it "only shows caller's provisional grade" do
         json = api_call(:get,
                         "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json",
@@ -2057,7 +2056,6 @@ describe 'Submissions API', type: :request do
         observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
         observer_enrollment.update_attribute(:associated_user_id, @student.id)
       }
-
       context "differentiated_assignments on" do
         it "returns the submissons if the observed student is in the overriden section" do
           json = call_to_for_students(as_observer: true)
@@ -2128,7 +2126,7 @@ describe 'Submissions API', type: :request do
       submit_homework(@assignment, @student2)
     end
 
-    before do
+    before(:each) do
       user_session(@teacher)
     end
 
@@ -2160,7 +2158,7 @@ describe 'Submissions API', type: :request do
                       "/api/v1/courses/#{@course.id}/students/submissions.json",
                       { controller: 'submissions_api', action: 'for_students', format: 'json', course_id: @course.to_param },
                       { student_ids: [@student1.id], assignment_ids: [@assignment.id], grouped: true })
-      row = json.detect { |r| r['user_id'] == @student1.id }
+      row = json.detect { |row| row['user_id'] == @student1.id }
       expect(row['section_id']).to eq enrollments.last.course_section_id
     end
 
@@ -2181,7 +2179,7 @@ describe 'Submissions API', type: :request do
   end
 
   describe "#show_anonymous" do
-    before do
+    before(:each) do
       @student = user_factory(active_all: true)
       course_with_teacher(:active_all => true)
       section = @course.course_sections.create!(name: "test section")
@@ -2239,7 +2237,7 @@ describe 'Submissions API', type: :request do
   end
 
   describe "#show" do
-    before do
+    before(:each) do
       @student = user_factory(active_all: true)
       course_with_teacher(:active_all => true)
       @section = @course.course_sections.create!(name: "test section")
@@ -3658,7 +3656,7 @@ describe 'Submissions API', type: :request do
   end
 
   context "moderated grading" do
-    before do
+    before :each do
       student_in_course(active_all: true)
       teacher_in_course(active_all: true)
       @assignment = @course.assignments.create!(
@@ -4800,7 +4798,7 @@ describe 'Submissions API', type: :request do
                       include: %w[submission_history] })
 
     url = URI.parse(URI.decode(json[0]["submission_history"][0]["attachments"][0]["preview_url"]))
-    blob = JSON.parse(URI.decode_www_form(url.query).to_h["blob"])
+    blob = JSON.parse(URI.decode_www_form(url.query).find { |a| a.first == "blob" }.second)
     expect(blob).to include({
                               "enable_annotations" => true,
                               "anonymous_instructor_annotations" => false,
@@ -4991,7 +4989,7 @@ describe 'Submissions API', type: :request do
   end
 
   context 'bulk update' do
-    before do
+    before :each do
       @student1 = user_factory(active_all: true)
       @student2 = user_factory(active_all: true)
       course_with_teacher(:active_all => true)

@@ -303,7 +303,7 @@ class MissingPeopleSection extends React.Component {
                 variant="link"
                 onClick={this.onSelectNewForMissing}
                 data-address={missing.address}
-                theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
+                theme={{mediumPadding: '0', mediumHeight: 'normal'}}
               >
                 {namePrompt}
               </Button>

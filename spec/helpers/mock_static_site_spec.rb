@@ -20,7 +20,7 @@
 require_relative '../spec_helper'
 
 describe "a mock static site" do
-  after do
+  after :each do
     WebMock.reset!
   end
 

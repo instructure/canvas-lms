@@ -34,7 +34,6 @@ class Loaders::ForeignKeyLoader < GraphQL::Batch::Loader
   #
   # +fk+ is the column you want to load by
   def initialize(scope, fk)
-    super()
     @scope = scope
     @column = fk
   end

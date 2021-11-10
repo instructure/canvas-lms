@@ -826,7 +826,7 @@ describe SIS::CSV::SectionImporter do
   end
 
   context 'account associations' do
-    before do
+    before(:each) do
       process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
         "A001,,Humanities,active",

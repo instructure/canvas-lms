@@ -73,14 +73,14 @@ describe CanvasHttp::CircuitBreaker do
 
   let(:test_redis) { redis_client_klass.new }
 
-  before do
+  before(:each) do
     @old_redis = CanvasHttp::CircuitBreaker.redis
     test_redis.reset!
     CanvasHttp::CircuitBreaker.redis = -> { test_redis }
     CanvasHttp.logger = NullLogger.new
   end
 
-  after do
+  after(:each) do
     CanvasHttp::CircuitBreaker.redis = @old_redis
     CanvasHttp::CircuitBreaker.threshold = nil
     CanvasHttp.logger = nil

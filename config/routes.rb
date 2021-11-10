@@ -169,10 +169,12 @@ CanvasRails::Application.routes.draw do
 
   concern :conferences do
     resources :conferences do
+      # rubocop:disable Style/SymbolArray
       match :join, via: [:get, :post]
       match :close, via: [:get, :post]
       match :recording, via: [:get]
       match :recording, via: [:delete], to: 'conferences#delete_recording', as: :delete_recording
+      # rubocop:enable Style/SymbolArray
       get :settings
     end
   end
@@ -1066,14 +1068,6 @@ CanvasRails::Application.routes.draw do
       get "groups/:group_id/tabs", action: :index, as: 'group_tabs'
       get "users/:user_id/tabs", action: :index, as: 'user_profile_tabs'
       put "courses/:course_id/tabs/:tab_id", action: :update
-    end
-
-    scope(controller: :gradebook_filters_api) do
-      get 'courses/:course_id/gradebook_filters', action: :index
-      post 'courses/:course_id/gradebook_filters', action: :create
-      get 'courses/:course_id/gradebook_filters/:id', action: :show
-      put 'courses/:course_id/gradebook_filters/:id', action: :update
-      delete 'courses/:course_id/gradebook_filters/:id', action: :destroy
     end
 
     scope(controller: :scopes_api) do
@@ -2376,16 +2370,6 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/pace_plans/:id', action: :api_show
       put 'courses/:course_id/pace_plans/:id', action: :update
       post 'courses/:course_id/pace_plans/:id/publish', action: :publish
-    end
-
-    scope(controller: :eportfolios_api) do
-      get 'users/:user_id/eportfolios', action: :index, as: :eportfolios
-      get 'eportfolios/:id', action: :show
-      delete 'eportfolios/:id', action: :delete
-      get 'eportfolios/:eportfolio_id/pages', action: :pages, as: :eportfolio_pages
-      put 'eportfolios/:eportfolio_id/moderate', action: :moderate
-      put 'users/:user_id/eportfolios', action: :moderate_all
-      put 'eportfolios/:eportfolio_id/restore', action: :restore
     end
   end
 

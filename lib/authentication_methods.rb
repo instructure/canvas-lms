@@ -19,13 +19,13 @@
 #
 
 module AuthenticationMethods
-  class AccessTokenError < RuntimeError
+  class AccessTokenError < Exception
   end
 
-  class AccessTokenScopeError < RuntimeError
+  class AccessTokenScopeError < StandardError
   end
 
-  class LoggedOutError < RuntimeError
+  class LoggedOutError < Exception
   end
 
   def self.access_token(request, params_method = :params)

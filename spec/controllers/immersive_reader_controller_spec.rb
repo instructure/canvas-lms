@@ -21,7 +21,7 @@
 require 'webmock/rspec'
 
 describe ImmersiveReaderController do
-  around do |example|
+  around(:example) do |example|
     WebMock.disable_net_connect!(allow_localhost: true)
     example.run
     WebMock.enable_net_connect!

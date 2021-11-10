@@ -56,7 +56,7 @@ describe Api::V1::User do
     user_with_pseudonym(:user => @user)
   end
 
-  before do
+  before :each do
     @test_api = TestUserApi.new
     @test_api.services_enabled = []
     @test_api.request.protocol = 'http'
@@ -210,7 +210,7 @@ describe Api::V1::User do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!
       @user.pseudonyms.create!(:unique_id => 'abc', :account => Account.default)
-      p = @user.pseudonyms.create!(unique_id: "xyz", account: Account.default, sis_user_id: "xyz")
+      p = @user.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
       sis_batch = p.account.sis_batches.create
       SisBatch.where(id: sis_batch).update_all(workflow_state: 'imported')
       Pseudonym.where(id: p.id).update_all(sis_batch_id: sis_batch.id)
@@ -231,7 +231,7 @@ describe Api::V1::User do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!
       @user.pseudonyms.destroy_all
-      p = @user.pseudonyms.create!(unique_id: "abc", account: @account2, sis_user_id: "a")
+      p = @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2) { |p| p.sis_user_id = 'a' }
       allow(p).to receive(:works_for_account?).with(Account.default, true).and_return(true)
       allow_any_instantiation_of(Account.default).to receive(:trust_exists?).and_return(true)
       allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([@account2.id])
@@ -311,7 +311,7 @@ describe Api::V1::User do
         @student2 = course_with_student(:course => @course).user
       end
 
-      before do
+      before :each do
         @course.update!(grading_standard_enabled: true)
       end
 
@@ -404,7 +404,7 @@ describe Api::V1::User do
     let(:enrollment_json) { @test_api.enrollment_json(student_enrollment, subject, nil) }
     let(:grades) { enrollment_json.fetch("grades") }
 
-    before do
+    before(:each) do
       course.enable_feature!(:final_grades_override)
       course.update!(allow_final_grade_override: true, grading_standard_enabled: true)
       @course_score = student_enrollment.scores.create!(course_score: true, current_score: 63, final_score: 73, override_score: 99)
@@ -453,7 +453,7 @@ describe Api::V1::User do
         end
 
         context "when no grade override exists" do
-          before do
+          before(:each) do
             @course_score.update!(override_score: nil)
           end
 
@@ -476,7 +476,7 @@ describe Api::V1::User do
       end
 
       context "when Final Grade Override is not allowed" do
-        before do
+        before(:each) do
           course.update!(allow_final_grade_override: false)
         end
 
@@ -498,7 +498,7 @@ describe Api::V1::User do
       end
 
       context "when Final Grade Override is disabled" do
-        before do
+        before(:each) do
           course.disable_feature!(:final_grades_override)
         end
 
@@ -555,7 +555,7 @@ describe Api::V1::User do
         end
 
         context "when no grade override exists" do
-          before do
+          before(:each) do
             @course_score.update!(override_score: nil)
           end
 
@@ -586,7 +586,7 @@ describe Api::V1::User do
       end
 
       context "when Final Grade Override is not allowed" do
-        before do
+        before(:each) do
           course.update!(allow_final_grade_override: false)
         end
 
@@ -616,7 +616,7 @@ describe Api::V1::User do
       end
 
       context "when Final Grade Override is disabled" do
-        before do
+        before(:each) do
           course.disable_feature!(:final_grades_override)
         end
 
@@ -771,7 +771,6 @@ describe "Users API", type: :request do
       student_in_course(:course => @course, :user => user_with_pseudonym(:name => 'Student', :username => 'pvuser2@example.com', :active_user => true))
       @user = @admin
     end
-
     include_examples "cassandra page views"
     include_examples "page view api"
   end
@@ -798,7 +797,7 @@ describe "Users API", type: :request do
   end
 
   describe "api_show" do
-    before do
+    before :each do
       @other_user = User.create!(:name => "user name")
       email = "email@somewhere.org"
       @other_user.pseudonyms.create!(:unique_id => email, :account => Account.default) { |p| p.sis_user_id = email }
@@ -1570,7 +1569,7 @@ describe "Users API", type: :request do
     end
 
     context "as an anonymous user" do
-      before do
+      before :each do
         user_factory(active_all: true)
         @user = nil
       end
@@ -2212,7 +2211,7 @@ describe "Users API", type: :request do
   end
 
   context "user files" do
-    before do
+    before :each do
       @context = @user
     end
 
@@ -2319,14 +2318,14 @@ describe "Users API", type: :request do
   end
 
   describe 'Custom Colors' do
-    before do
+    before :each do
       @a = Account.default
       @u = user_factory(active_all: true)
       @a.account_users.create!(user: @u)
     end
 
     describe 'GET custom colors' do
-      before do
+      before :each do
         @user.set_preference(:custom_colors, {
                                "user_#{@user.id}" => "efefef",
                                "course_3" => "ababab"
@@ -2489,14 +2488,14 @@ describe "Users API", type: :request do
   end
 
   describe "dashboard positions" do
-    before do
+    before :each do
       @a = Account.default
       @u = user_factory(active_all: true)
       @a.account_users.create!(user: @u)
     end
 
     describe "GET dashboard positions" do
-      before do
+      before :each do
         @user.set_preference(:dashboard_positions, {
                                "course_1" => 3,
                                "course_2" => 1,
@@ -2821,7 +2820,7 @@ describe "Users API", type: :request do
         @params = { controller: "users", action: "missing_submissions", user_id: @observer.id, format: "json" }
       end
 
-      before do
+      before :each do
         user_session(@observer)
       end
 

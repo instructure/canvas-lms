@@ -34,7 +34,7 @@ describe "teacher k5 todo dashboard tab" do
     teacher_setup
   end
 
-  before do
+  before :each do
     user_session @homeroom_teacher
   end
 
@@ -61,7 +61,7 @@ describe "teacher k5 todo dashboard tab" do
       course_with_student(course: @subject_course, name: 'Hardworking Student', active_all: true)
     end
 
-    before do
+    before :each do
       @assignment1_title = "assignment 1"
       @assignment1 = create_and_submit_assignment(@subject_course, "assignment 1", "assignment 1 submission", 100)
     end

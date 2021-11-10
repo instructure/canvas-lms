@@ -19,7 +19,6 @@
 import {Button} from '@instructure/ui-buttons'
 import {IconMoreLine} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
-import StudentViewContext from './Context'
 import I18n from 'i18n!assignments_2_attempt_tab'
 import React from 'react'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-content'
@@ -56,27 +55,23 @@ export default function SubmissionTypeButton({displayName, icon, selected, onSel
     iconElement = <Icon size="small" color={foregroundColor(selected)} />
   }
   return (
-    <StudentViewContext.Consumer>
-      {context => (
-        <ButtonContainer selected={selected}>
-          <Button
-            display="block"
-            interaction={selected || !context.allowChangesToSubmission ? 'readonly' : 'enabled'}
-            onClick={onSelected}
-            theme={{borderWidth: '0'}}
-            withBackground={false}
-          >
-            {iconElement}
-            <View as="div" margin="small 0 0">
-              <ScreenReaderContent>{screenReaderText}</ScreenReaderContent>
-              <Text color={foregroundColor(selected)} weight="normal" size="medium">
-                <PresentationContent>{displayName}</PresentationContent>
-              </Text>
-            </View>
-          </Button>
-        </ButtonContainer>
-      )}
-    </StudentViewContext.Consumer>
+    <ButtonContainer selected={selected}>
+      <Button
+        display="block"
+        interaction={selected ? 'readonly' : 'enabled'}
+        onClick={onSelected}
+        theme={{borderWidth: '0'}}
+        withBackground={false}
+      >
+        {iconElement}
+        <View as="div" margin="small 0 0">
+          <ScreenReaderContent>{screenReaderText}</ScreenReaderContent>
+          <Text color={foregroundColor(selected)} weight="normal" size="medium">
+            <PresentationContent>{displayName}</PresentationContent>
+          </Text>
+        </View>
+      </Button>
+    </ButtonContainer>
   )
 }
 

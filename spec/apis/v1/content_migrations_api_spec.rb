@@ -35,7 +35,7 @@ describe ContentMigrationsController, type: :request do
     @migration.save!
   end
 
-  before do
+  before :each do
     user_session @teacher
   end
 

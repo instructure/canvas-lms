@@ -80,7 +80,7 @@ describe Moodle::Converter do
   end
 
   context "quizzes" do
-    before do
+    before(:each) do
       skip if !Qti.qti_enabled?
     end
 

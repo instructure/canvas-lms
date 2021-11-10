@@ -291,7 +291,6 @@ module Canvas
     attr_accessor :error_count
 
     def initialize(error_count)
-      super()
       @error_count = error_count
     end
   end

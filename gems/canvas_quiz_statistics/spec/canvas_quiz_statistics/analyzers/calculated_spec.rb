@@ -21,7 +21,6 @@ require 'spec_helper'
 
 describe CanvasQuizStatistics::Analyzers::Calculated do
   let(:question_data) { QuestionHelpers.fixture('calculated_question') }
-
   subject { described_class.new(question_data) }
 
   it 'does not blow up when no responses are provided' do

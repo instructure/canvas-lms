@@ -52,7 +52,7 @@ export const Discussion = {
       published
       canUnpublish
       lockAt
-      availableForUser
+      lockedForUser
       entryCounts {
         unreadCount
         repliesCount
@@ -109,7 +109,7 @@ export const Discussion = {
     published: bool,
     canUnpublish: bool,
     searchEntryCount: number,
-    availableForUser: bool,
+    lockedForUser: bool,
     entryCounts: shape({
       unreadCount: number,
       repliesCount: number
@@ -148,7 +148,7 @@ export const Discussion = {
     published = true,
     canUnpublish = false,
     searchEntryCount = 3,
-    availableForUser = true,
+    lockedForUser = false,
     entryCounts = {
       unreadCount: 2,
       repliesCount: 56,
@@ -195,7 +195,7 @@ export const Discussion = {
     published,
     canUnpublish,
     entryCounts,
-    availableForUser,
+    lockedForUser,
     author,
     editor,
     attachment,

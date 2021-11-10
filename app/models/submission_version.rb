@@ -48,14 +48,16 @@ class SubmissionVersion < ActiveRecord::Base
     def extract_version_attributes(version, options = {})
       model = if options[:ignore_errors]
                 begin
-                  Submission.active.where(id: version.versionable_id).exists? && version.model
+                  return nil unless Submission.active.where(id: version.versionable_id).exists?
+
+                  version.model
                 rescue Psych::SyntaxError
-                  nil
+                  return nil
                 end
               else
                 version.model
               end
-      return nil unless model.try(:assignment_id) # model _could_ be false here, so don't use &.
+      return nil unless model.assignment_id
 
       {
         :context_id => model.course_id,

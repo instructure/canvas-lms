@@ -53,8 +53,8 @@ module Canvas
               client_opts: opts,
               logger: Rails.logger
             )
-          rescue => e
-            Rails.logger.error "Failed to create DynamoDB client for #{key}: #{e}"
+          rescue Exception => exception
+            Rails.logger.error "Failed to create DynamoDB client for #{key}: #{exception}"
             nil # don't save this nil into @clients[key], so we can retry later
           end
         end

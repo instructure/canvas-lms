@@ -22,7 +22,6 @@
 # or root_discussion_entries,
 class Loaders::DiscussionEntryCountsLoader < GraphQL::Batch::Loader
   def initialize(current_user:)
-    super()
     @current_user = current_user
   end
 

@@ -520,7 +520,7 @@ describe Quizzes::QuizzesController do
 
     it "allows forcing authentication on public quiz pages" do
       @course.update_attribute :is_public, true
-      course_quiz(true)
+      course_quiz !!:active
       get 'show', params: { :course_id => @course.id, :id => @quiz.id, :force_user => 1 }
       expect(response).to be_redirect
       expect(response.location).to match(/login/)
@@ -528,14 +528,14 @@ describe Quizzes::QuizzesController do
 
     it "renders the show page for public courses" do
       @course.update_attribute :is_public, true
-      course_quiz(true)
+      course_quiz !!:active
       get 'show', params: { course_id: @course.id, id: @quiz.id, take: '1' }
       expect(response).to be_successful
     end
 
     it "sets session[headless_quiz] if persist_headless param is sent" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz !!:active
       get 'show', params: { :course_id => @course.id, :id => @quiz.id, :persist_headless => 1 }
       expect(controller.session[:headless_quiz]).to be_truthy
       expect(assigns[:headers]).to be_falsey
@@ -543,7 +543,7 @@ describe Quizzes::QuizzesController do
 
     it "does not render headers if session[:headless_quiz] is set" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz !!:active
       controller.session[:headless_quiz] = true
       get 'show', params: { :course_id => @course.id, :id => @quiz.id }
       expect(assigns[:headers]).to be_falsey
@@ -551,7 +551,7 @@ describe Quizzes::QuizzesController do
 
     it "assigns js_env for attachments if submission is present" do
       user_session(@student)
-      course_quiz(true)
+      course_quiz !!:active
       submission = @quiz.generate_submission @student
       create_attachment_for_file_upload_submission!(submission)
       get 'show', params: { :course_id => @course.id, :id => @quiz.id }
@@ -563,7 +563,7 @@ describe Quizzes::QuizzesController do
     end
 
     describe "js_env SUBMISSION_VERSIONS_URL" do
-      before do
+      before(:each) do
         user_session(@student)
         course_quiz(true)
       end
@@ -825,7 +825,6 @@ describe Quizzes::QuizzesController do
 
   describe "GET 'moderate'" do
     before(:once) { course_quiz }
-
     it "requires authorization" do
       get 'moderate', params: { :course_id => @course.id, :quiz_id => @quiz.id }
       assert_unauthorized
@@ -1008,7 +1007,7 @@ describe Quizzes::QuizzesController do
         course_quiz
       end
 
-      before do
+      before :each do
         user_session(@teacher)
       end
 
@@ -1045,7 +1044,7 @@ describe Quizzes::QuizzesController do
         @quiz.save!
       end
 
-      before do
+      before :each do
         user_session(@student)
       end
 
@@ -1222,7 +1221,7 @@ describe Quizzes::QuizzesController do
         @quiz.generate_submission(@student)
       end
 
-      before do
+      before :each do
         user_session(@student)
       end
 
@@ -1564,7 +1563,7 @@ describe Quizzes::QuizzesController do
       end
 
       context "when the user is a teacher" do
-        before do
+        before :each do
           user_session(@teacher)
         end
 
@@ -1636,7 +1635,7 @@ describe Quizzes::QuizzesController do
       end
 
       context "when the user is an admin" do
-        before do
+        before :each do
           user_session(@admin)
         end
 
@@ -1922,7 +1921,7 @@ describe Quizzes::QuizzesController do
     end
 
     describe "DueDateCacher" do
-      before do
+      before :each do
         user_session(@teacher)
         @quiz = @course.quizzes.build(:title => "Update Overrides Quiz", :workflow_state => 'edited')
         @quiz.save!
@@ -2043,7 +2042,7 @@ describe Quizzes::QuizzesController do
         due_date_cacher = instance_double(DueDateCacher)
         allow(DueDateCacher).to receive(:new).and_return(due_date_cacher)
 
-        expect(due_date_cacher).not_to receive(:recompute)
+        expect(due_date_cacher).to receive(:recompute).never
 
         post 'update', params: @no_changes
       end
@@ -2121,7 +2120,7 @@ describe Quizzes::QuizzesController do
         @quiz.assignment.update_attribute(:created_at, 1.day.ago)
       end
 
-      before do
+      before :each do
         user_session(@teacher)
       end
 
@@ -2196,7 +2195,7 @@ describe Quizzes::QuizzesController do
       end
 
       context "when the user is a teacher" do
-        before do
+        before :each do
           user_session(@teacher)
         end
 
@@ -2387,7 +2386,7 @@ describe Quizzes::QuizzesController do
       end
 
       context "when the user is an admin" do
-        before do
+        before :each do
           user_session(@admin)
         end
 
@@ -2610,8 +2609,7 @@ describe Quizzes::QuizzesController do
 
   describe "GET 'submission_html'" do
     before(:once) { course_quiz(true) }
-
-    before { user_session(@teacher) }
+    before(:each) { user_session(@teacher) }
 
     it "renders nothing if there's no submission for current user" do
       get 'submission_html', params: { course_id: @course.id, quiz_id: @quiz.id }
@@ -2738,14 +2736,12 @@ describe Quizzes::QuizzesController do
       student_in_section(@course_section, user: @student1)
       create_section_override_for_quiz(@quiz, course_section: @course_section)
     end
-
     context 'index' do
       it 'shows the quiz to students with visibility' do
         user_session(@student1)
         get 'index', params: { :course_id => @course.id }
         expect(controller.js_env[:QUIZZES][:assignment].count).to eq 1
       end
-
       it 'hides the quiz to students with visibility' do
         user_session(@student2)
         get 'index', params: { :course_id => @course.id }
@@ -2758,14 +2754,12 @@ describe Quizzes::QuizzesController do
         get 'show', params: { :course_id => @course.id, :id => @quiz.id }
         expect(response).not_to be_redirect
       end
-
       it 'redirect for students without visibility or a submission' do
         user_session(@student2)
         get 'show', params: { :course_id => @course.id, :id => @quiz.id }
         expect(response).to be_redirect
         expect(flash[:error]).to match(/You do not have access to the requested quiz/)
       end
-
       it 'shows a message to students without visibility with a submission' do
         Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student2)
         user_session(@student2)

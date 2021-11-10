@@ -93,7 +93,7 @@ describe Quizzes::QuizQuestion::AnswerGroup::Answer do
     }
   end
 
-  before do
+  before(:each) do
     @answer = Quizzes::QuizQuestion::AnswerGroup::Answer.new(params)
   end
 

@@ -24,6 +24,8 @@ describe Lti::Messages::ResourceLinkRequest do
 
   let(:tool_override) { nil }
 
+  # rubocop:enable RSpec/ScatteredLet
+
   shared_examples 'disabled rlid claim group check' do
     let(:opts) { super().merge({ claim_group_blacklist: [:rlid] }) }
 
@@ -134,7 +136,7 @@ describe Lti::Messages::ResourceLinkRequest do
         ]
       end
 
-      before do
+      before(:each) do
         allow(controller).to receive(:lti_line_item_index_url).and_return('lti_line_item_index_url')
         allow(controller).to receive(:lti_line_item_show_url).with(
           {

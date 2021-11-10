@@ -34,7 +34,6 @@ describe "conversations new" do
     @group = cat.groups.create(:name => "the group", :context => @course)
     @group.users = [@s1, @s2]
   end
-
   context 'when react_inbox feature flag is off' do
     before do
       Account.default.set_feature_flag! :react_inbox, 'off'
@@ -110,7 +109,7 @@ describe "conversations new" do
       end
 
       shared_examples 'shows submission comments' do |context|
-        before do
+        before :each do
           case context
           when :student
             user_session(@s2)

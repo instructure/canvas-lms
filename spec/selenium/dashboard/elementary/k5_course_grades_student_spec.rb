@@ -37,7 +37,7 @@ describe "student k5 course grades tab" do
     student_setup
   end
 
-  before do
+  before :each do
     user_session @student
   end
 

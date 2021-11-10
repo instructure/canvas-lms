@@ -21,7 +21,7 @@
 require 'spec_helper'
 
 describe CanvasPandaPub::AsyncWorker do
-  before do
+  before(:each) do
     CanvasPandaPub.process_interval = -> { 0.1 }
     CanvasPandaPub.max_queue_size = -> { 100 }
     CanvasPandaPub.logger = double.as_null_object

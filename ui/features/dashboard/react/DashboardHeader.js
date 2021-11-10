@@ -278,8 +278,7 @@ function showTodoList() {
                   setModalOpen={isOpen => {
                     if (!isOpen) ReactDOM.unmountComponentAtNode(modalContainer)
                   }}
-                  permissions={ENV.CREATE_COURSES_PERMISSIONS.PERMISSION}
-                  restrictToMCCAccount={ENV.CREATE_COURSES_PERMISSIONS.RESTRICT_TO_MCC_ACCOUNT}
+                  permissions={ENV.CREATE_COURSES_PERMISSION}
                   isK5User={false} // can't be k5 user if classic dashboard is showing
                 />,
                 modalContainer

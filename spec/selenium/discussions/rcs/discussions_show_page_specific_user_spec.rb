@@ -52,7 +52,7 @@ describe "discussions" do
     @g1.save!
   end
 
-  before do
+  before(:each) do
     stub_rcs_config
   end
 
@@ -62,7 +62,7 @@ describe "discussions" do
     context "as a student" do
       let(:topic) { student_topic }
 
-      before do
+      before(:each) do
         user_session(student)
       end
 
@@ -146,7 +146,7 @@ describe "discussions" do
     context "as a teacher" do
       let(:topic) { teacher_topic }
 
-      before do
+      before(:each) do
         user_session(teacher)
       end
 

@@ -255,7 +255,7 @@ describe DiscussionTopic do
   end
 
   context "permissions" do
-    before do
+    before :each do
       @teacher1 = @teacher
       @teacher2 = user_factory
       teacher_in_course(:course => @course, :user => @teacher2, :active_all => true)
@@ -505,20 +505,16 @@ describe DiscussionTopic do
       it "is visible to a student with an override" do
         expect(@topic.visible_for?(@student1)).to be_truthy
       end
-
       it "is not visible to a student without an override" do
         expect(@topic.visible_for?(@student2)).to be_falsey
       end
-
       it "is visible to a teacher" do
         expect(@topic.visible_for?(@teacher)).to be_truthy
       end
-
       it "does not grant reply permissions to a student without an override" do
         expect(@topic.check_policy(@student1)).to include :reply
         expect(@topic.check_policy(@student2)).not_to include :reply
       end
-
       context "active_participants_with_visibility" do
         it "filters participants by visibility" do
           [@student1, @teacher].each do |user|
@@ -1201,7 +1197,7 @@ describe DiscussionTopic do
 
     it "does not attempt to clear stream items if a discussion topic was not section specific before last save" do
       topic = @course.discussion_topics.create!(title: "Ben Loves Panda", user: @teacher)
-      expect(topic.stream_item).not_to receive(:stream_item_instances)
+      expect(topic.stream_item).to receive(:stream_item_instances).never
       topic.update!(title: "Lemon Loves Panda")
     end
 
@@ -1415,7 +1411,6 @@ describe DiscussionTopic do
         @section = @course.course_sections.create!(name: "test section")
         create_section_override_for_assignment(@topic.assignment, { course_section: @section })
       end
-
       context "enabled" do
         it "filters subscribers based on visibility" do
           @topic.subscribe(@student)
@@ -1469,18 +1464,15 @@ describe DiscussionTopic do
       @student = create_users(1, return_type: :record).pop
       student_in_section(@section, user: @student)
     end
-
     it "returns discussions that have assignment and visibility" do
       create_section_override_for_assignment(@topic.assignment, { course_section: @section })
       expect(DiscussionTopic.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@topic)
     end
-
     it "returns discussions that have no assignment" do
       @topic.assignment_id = nil
       @topic.save!
       expect(DiscussionTopic.visible_to_students_in_course_with_da([@student.id], [@course.id])).to include(@topic)
     end
-
     it "does not return discussions that have an assignment and no visibility" do
       expect(DiscussionTopic.visible_to_students_in_course_with_da([@student.id], [@course.id])).not_to include(@topic)
     end
@@ -2470,42 +2462,34 @@ describe DiscussionTopic do
       @module.save!
       @topic.reload
     end
-
     it 'clears stream items when unpublishing a module' do
       expect { @module.unpublish! }.to change { @student.stream_item_instances.count }.by(-1)
     end
-
     it 'removes stream items when the module item is changed to unpublished' do
       expect { @tag.unpublish! }.to change { @student.stream_item_instances.count }.by(-1)
     end
-
     it 'clears stream items when added to unpublished module items' do
       expect {
         @module.content_tags.create!(workflow_state: 'unpublished', content: @topic, context: @course)
       }.to change { @student.stream_item_instances.count }.by(-1)
     end
-
     describe 'unpublished context module' do
       before(:once) do
         @module.unpublish!
         @tag.unpublish!
       end
-
       it 'does not create stream items for unpublished modules' do
         @topic.unpublish!
         expect { @topic.publish! }.to change { @student.stream_item_instances.count }.by 0
       end
-
       it 'removes stream items from published topic when added to an unpublished module' do
         topic = discussion_topic_model(context: @course)
         expect { @module.add_item(type: 'discussion_topic', id: topic.id) }.to change { @student.stream_item_instances.count }.by(-1)
       end
-
       it 'creates stream items when module is published' do
         @tag.publish!
         expect { @module.publish! }.to change { @student.stream_item_instances.count }.by 1
       end
-
       it 'creates stream items when module item is published' do
         @module.publish!
         expect { @tag.publish! }.to change { @student.stream_item_instances.count }.by 1

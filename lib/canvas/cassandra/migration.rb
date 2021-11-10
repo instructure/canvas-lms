@@ -61,7 +61,7 @@ module Canvas
       end
 
       def self.included(migration)
-        migration.tag :cassandra
+        migration.tag :cassandra # rubocop:disable Rails/ContentTag this is Outrigger's tag, not Rails'
         migration.singleton_class.include(ClassMethods)
       end
     end

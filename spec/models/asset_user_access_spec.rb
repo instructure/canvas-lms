@@ -300,7 +300,6 @@ describe AssetUserAccess do
   describe '#log' do
     let(:access) { AssetUserAccess.new }
     let(:context) { User.new }
-
     subject { access }
 
     before { allow(access).to receive :save }

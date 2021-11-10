@@ -24,9 +24,9 @@ describe 'quiz taking' do
   include_context 'in-process server selenium tests'
   include QuizzesCommon
 
-  before do
+  before :each do
     course_with_student_logged_in(active_all: true)
-    @quiz = quiz_with_new_questions(goto_edit: false)
+    @quiz = quiz_with_new_questions(!:goto_edit)
   end
 
   it 'toggles only the essay question that was toggled leaving others on the page alone',

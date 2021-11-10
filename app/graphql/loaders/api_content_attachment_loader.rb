@@ -20,7 +20,6 @@
 
 class Loaders::ApiContentAttachmentLoader < GraphQL::Batch::Loader
   def initialize(context)
-    super()
     @context = context
   end
 

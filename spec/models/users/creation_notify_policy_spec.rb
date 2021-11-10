@@ -42,7 +42,6 @@ module Users
 
       context "for self_registration" do
         let(:policy) { CreationNotifyPolicy.new(true, { force_self_registration: true }) }
-
         before { allow(channel).to receive_messages(has_merge_candidates?: false) }
 
         it "sends confirmation notification" do
@@ -67,7 +66,7 @@ module Users
 
         it "doesnt send the registration notification if shouldnt notify" do
           policy = CreationNotifyPolicy.new(true, { send_confirmation: '0' })
-          expect(pseudonym).not_to receive(:send_registration_notification!)
+          expect(pseudonym).to receive(:send_registration_notification!).never
           result = policy.dispatch!(user, pseudonym, channel)
           expect(result).to be(false)
         end

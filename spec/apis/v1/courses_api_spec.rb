@@ -168,7 +168,7 @@ describe Api::V1::Course do
     end
 
     describe "total_scores" do
-      before do
+      before(:each) do
         @enrollment.scores.create!(
           current_score: 95.0, final_score: 85.0,
           unposted_current_score: 94.0, unposted_final_score: 84.0
@@ -230,7 +230,7 @@ describe Api::V1::Course do
     end
 
     describe "current_grading_period_scores" do
-      before do
+      before(:each) do
         @course.grading_standard_enabled = true
         @course.default_post_policy.update!(post_manually: false)
         create_grading_periods_for(@course, grading_periods: [:current, :future])
@@ -461,10 +461,10 @@ describe CoursesController, type: :request do
     @user.pseudonym.update_attribute(:sis_user_id, 'user1')
   end
 
-  before do
+  before :each do
     @course_dates_stubbed = true
-    allow_any_instance_of(Course).to(receive(:start_at).and_wrap_original { |original| original.call unless @course_dates_stubbed })
-    allow_any_instance_of(Course).to(receive(:end_at).and_wrap_original { |original| original.call unless @course_dates_stubbed })
+    allow_any_instance_of(Course).to receive(:start_at).and_wrap_original { |original| original.call unless @course_dates_stubbed }
+    allow_any_instance_of(Course).to receive(:end_at).and_wrap_original { |original| original.call unless @course_dates_stubbed }
   end
 
   describe "observer viewing a course" do
@@ -663,7 +663,6 @@ describe CoursesController, type: :request do
     before :once do
       account_admin_user
     end
-
     it "returns a course list for an observed students" do
       parent = User.create
       add_linked_observer(@me, parent)
@@ -967,6 +966,7 @@ describe CoursesController, type: :request do
             'restrict_enrollments_to_course_dates' => true,
             'hide_final_grades' => true,
             'apply_assignment_group_weights' => true,
+            'license' => 'Creative Commons',
             'sis_course_id' => '12345',
             'public_description' => 'Nature is lethal but it doesn\'t hold a candle to man.',
             'course_format' => 'online',
@@ -1040,6 +1040,7 @@ describe CoursesController, type: :request do
             'restrict_enrollments_to_course_dates' => true,
             'hide_final_grades' => true,
             'apply_assignment_group_weights' => true,
+            'license' => 'Creative Commons',
             'sis_course_id' => '12345',
             'sis_import_id' => nil,
             'public_description' => 'Nature is lethal but it doesn\'t hold a candle to man.',
@@ -1117,7 +1118,7 @@ describe CoursesController, type: :request do
 
       it "allows setting sis_course_id without offering the course" do
         expect(Auditors::Course).to receive(:record_created).once
-        expect(Auditors::Course).not_to receive(:record_published)
+        expect(Auditors::Course).to receive(:record_published).never
         json = api_call(:post, @resource_path,
                         @resource_params,
                         { :account_id => @account.id, :course => { :name => 'Test Course', :sis_course_id => '9999' } })
@@ -1836,7 +1837,6 @@ describe CoursesController, type: :request do
       @path = "/api/v1/courses/#{@course.id}"
       @params = { :controller => 'courses', :action => 'destroy', :format => 'json', :id => @course.id.to_s }
     end
-
     context "an authorized user" do
       it "is able to delete a course" do
         expect(Auditors::Course).to receive(:record_deleted).once
@@ -1904,7 +1904,6 @@ describe CoursesController, type: :request do
       @path = "/api/v1/courses/#{@course.id}/reset_content"
       @params = { :controller => 'courses', :action => 'reset_content', :format => 'json', :course_id => @course.id.to_s }
     end
-
     context "an authorized user" do
       it "is able to reset a course" do
         @course.root_account.disable_feature!(:granular_permissions_manage_courses)
@@ -1963,7 +1962,6 @@ describe CoursesController, type: :request do
 
     context "an authorized user" do
       let(:course_ids) { [@course1.id, @course2.id, @course3.id] }
-
       it "deletes multiple courses" do
         expect(Auditors::Course).to receive(:record_deleted).exactly(course_ids.length).times
         api_call(:put, @path, @params, { :event => 'delete', :course_ids => course_ids })
@@ -2896,8 +2894,8 @@ describe CoursesController, type: :request do
 
       json = api_call(:get, "/api/v1/courses/#{@course2.id}/students.json",
                       { :controller => 'courses', :action => 'students', :course_id => @course2.id.to_s, :format => 'json' })
-      expect(json.sort_by { |x| x["id"] }).to eq(api_json_response([first_user, new_user],
-                                                                   :only => user_api_fields).sort_by { |x| x["id"] })
+      expect(json.sort_by { |x| x["id"] }).to eq api_json_response([first_user, new_user],
+                                                                   :only => user_api_fields).sort_by { |x| x["id"] }
     end
 
     it "does not include user sis id or login id for non-admins" do
@@ -2964,8 +2962,8 @@ describe CoursesController, type: :request do
 
       json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011/students.json",
                       { :controller => 'courses', :action => 'students', :course_id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' })
-      expect(json.sort_by { |x| x["id"] }).to eq(api_json_response([first_user, new_user],
-                                                                   :only => user_api_fields).sort_by { |x| x["id"] })
+      expect(json.sort_by { |x| x["id"] }).to eq api_json_response([first_user, new_user],
+                                                                   :only => user_api_fields).sort_by { |x| x["id"] }
 
       @course2.enroll_teacher(@user).accept!
       ro.destroy
@@ -3090,7 +3088,7 @@ describe CoursesController, type: :request do
             :only => user_api_fields
           )
 
-        expect(sorted_users).to eq(expected_users.sort_by { |x| x["id"] })
+        expect(sorted_users).to eq expected_users.sort_by { |x| x["id"] }
       end
 
       it "respects limit option (as pagination)" do
@@ -3201,10 +3199,10 @@ describe CoursesController, type: :request do
       it "returns a list of users" do
         json = api_call(:get, api_url, api_route)
         expected_users = @course1.users.to_a.uniq - [@test_student]
-        expect(json.sort_by { |x| x["id"] }).to eq(api_json_response(
+        expect(json.sort_by { |x| x["id"] }).to eq api_json_response(
           expected_users,
           only: user_api_fields
-        ).sort_by { |x| x["id"] })
+        ).sort_by { |x| x["id"] }
       end
 
       it 'does not include the sis_user_id when not an admin' do
@@ -3233,10 +3231,10 @@ describe CoursesController, type: :request do
                           user_ids: expected_users.map(&:id),
                           format: 'json'
                         })
-        expect(json.sort_by { |x| x["id"] }).to eq(api_json_response(
+        expect(json.sort_by { |x| x["id"] }).to eq api_json_response(
           expected_users,
           only: user_api_fields
-        ).sort_by { |x| x["id"] })
+        ).sort_by { |x| x["id"] }
       end
 
       it "excludes the test student by default" do
@@ -3580,8 +3578,8 @@ describe CoursesController, type: :request do
         json = api_call(:get, "/api/v1/courses/sis_course_id:TEST-SIS-ONE.2011/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => 'sis_course_id:TEST-SIS-ONE.2011', :format => 'json' },
                         :enrollment_type => 'student')
-        expect(json.sort_by { |x| x["id"] }).to eq(api_json_response([first_user, new_user],
-                                                                     :only => user_api_fields).sort_by { |x| x["id"] })
+        expect(json.sort_by { |x| x["id"] }).to eq api_json_response([first_user, new_user],
+                                                                     :only => user_api_fields).sort_by { |x| x["id"] }
 
         @course2.enroll_teacher(@user).accept!
         ro.destroy
@@ -3983,7 +3981,7 @@ describe CoursesController, type: :request do
     include_examples "file uploads api with folders"
     include_examples "file uploads api with quotas"
 
-    before do
+    before :each do
       @context = @course
     end
 
@@ -4538,13 +4536,11 @@ describe ContentImportsController, type: :request do
     @copy_to.reload
     expect(@copy_to.syllabus_body).to eq nil
   end
-
   it "skips copy wiki pages" do
     run_except_copy(:wiki_pages)
     check_counts 1
     expect(@copy_to.wiki_pages.count).to eq 0
   end
-
   each_copy_option do |option, association|
     it "skips copy #{option}" do
       run_except_copy(option)

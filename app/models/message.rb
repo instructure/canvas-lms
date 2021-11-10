@@ -876,12 +876,11 @@ class Message < ActiveRecord::Base
       unbounded_loop_paranoia_counter = 10
       current_context = context
 
-      loop do
-        break if unbounded_loop_paranoia_counter.zero? ||
-                 current_context.nil? ||
-                 current_context.is_a_context?
+      until current_context&.is_a_context?
+        return nil if unbounded_loop_paranoia_counter <= 0 || current_context.nil?
+        return nil unless current_context.respond_to?(:context)
 
-        current_context = current_context.try(:context)
+        current_context = current_context.context
         unbounded_loop_paranoia_counter -= 1
       end
 
@@ -1031,7 +1030,7 @@ class Message < ActiveRecord::Base
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
       cancel if e.message.try(:match, /Bad recipient/)
-    rescue => e
+    rescue StandardError, Timeout::Error => e
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
     end

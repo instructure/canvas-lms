@@ -32,7 +32,7 @@ Rails.application.config.after_initialize do
     end
   end
 
-  module Canvas # rubocop:disable Lint/ConstantDefinitionInBlock
+  module Canvas
     module Shard
       module IncludedClassMethods
         def birth

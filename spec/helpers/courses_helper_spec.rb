@@ -35,7 +35,7 @@ describe CoursesHelper do
                                                                                            :submission_types => "none" }))
     end
 
-    before do
+    before(:each) do
       user_session(@user)
     end
 

@@ -32,7 +32,6 @@ describe 'announcement_created_by_you' do
 
   context ".email" do
     let(:path_type) { :email }
-
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "value for title: value for name"
@@ -43,7 +42,6 @@ describe 'announcement_created_by_you' do
 
   context ".sms" do
     let(:path_type) { :sms }
-
     it "renders" do
       generate_message(notification_name, path_type, asset)
     end
@@ -51,7 +49,6 @@ describe 'announcement_created_by_you' do
 
   context ".summary" do
     let(:path_type) { :summary }
-
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "value for title: value for name"
@@ -62,7 +59,6 @@ describe 'announcement_created_by_you' do
 
   context ".twitter" do
     let(:path_type) { :twitter }
-
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "Canvas Alert"

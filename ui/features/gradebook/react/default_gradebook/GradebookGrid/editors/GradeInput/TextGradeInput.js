@@ -52,7 +52,7 @@ export default class TextGradeInput extends PureComponent {
     }
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps) {
     if (this.textInput !== document.activeElement) {
       const nextInfo = nextProps.pendingGradeInfo || nextProps.gradeInfo
 

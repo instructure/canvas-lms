@@ -24,34 +24,28 @@ describe GradebooksHelper do
   include TextHelper
 
   before do
-    stub_const("FakeAssignment",
-               Struct.new(:grading_type,
-                          :quiz,
-                          :points_possible,
-                          :anonymous_grading) do
-                 def anonymous_grading?
-                   anonymous_grading
-                 end
-               end)
+    FakeAssignment = Struct.new(:grading_type, :quiz, :points_possible, :anonymous_grading) do
+      def anonymous_grading?
+        anonymous_grading
+      end
+    end.freeze
+    FakeSubmission = Struct.new(:assignment, :score, :grade, :submission_type,
+                                :workflow_state, :excused?).freeze
+    FakeQuiz = Struct.new(:survey, :anonymous_submissions) do
+      def survey?
+        survey
+      end
 
-    stub_const("FakeSubmission",
-               Struct.new(:assignment,
-                          :score,
-                          :grade,
-                          :submission_type,
-                          :workflow_state,
-                          :excused?))
+      def anonymous_survey?
+        survey? && anonymous_submissions
+      end
+    end.freeze
+  end
 
-    stub_const("FakeQuiz",
-               Struct.new(:survey, :anonymous_submissions) do
-                 def survey?
-                   survey
-                 end
-
-                 def anonymous_survey?
-                   survey? && anonymous_submissions
-                 end
-               end)
+  after do
+    Object.send(:remove_const, :FakeAssignment)
+    Object.send(:remove_const, :FakeSubmission)
+    Object.send(:remove_const, :FakeQuiz)
   end
 
   let(:assignment) { FakeAssignment.new }
@@ -261,7 +255,7 @@ describe GradebooksHelper do
   end
 
   describe "translated_due_date_for_speedgrader" do
-    before do
+    before :each do
       @current_user = user_factory
       @course = Account.default.courses.create!(name: 'My Course')
       @course.enroll_teacher(@current_user, enrollment_state: 'active')

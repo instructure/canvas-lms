@@ -49,7 +49,7 @@ describe "admin sub accounts" do
     wait_for_ajaximations
   end
 
-  before do
+  before(:each) do
     course_with_admin_logged_in
   end
 

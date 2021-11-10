@@ -69,7 +69,6 @@ module Canvas::OAuth
     }.freeze
 
     def initialize(message)
-      super()
       @message = message
     end
 

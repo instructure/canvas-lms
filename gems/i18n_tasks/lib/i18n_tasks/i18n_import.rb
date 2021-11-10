@@ -41,11 +41,12 @@ module I18nTasks
       ].each do |keys, description|
         if keys.present?
           case (action = yield(keys.sort, description))
-          when :abort
+          when :abort then
             throw(:abort)
-          when :discard,
-               :accept
+          when :discard then
             :ok # <-discard and accept are the same in this case
+          when :accept then
+            :ok # <-/
           else
             raise "don't know how to handle #{action}"
           end

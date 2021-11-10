@@ -16,7 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-// eslint-disable-next-line import/no-extraneous-dependencies
 import $ from 'jquery'
 
 // configure MathJax to use 'color' extension fo LaTeX coding
@@ -40,7 +39,7 @@ const localConfig = {
 }
 
 const mathml = {
-  loadMathJax(configFile = 'TeX-MML-AM_SVG', cb = null) {
+  loadMathJax(configFile = 'TeX-MML-AM_HTMLorMML', cb = null) {
     if (this.preventMathJax()) {
       return
     }
@@ -236,14 +235,9 @@ const mathImageHelper = {
     let equation_text
     const src = img.getAttribute('src')
     if (src) {
-      try {
-        const url = new URL(src, 'http://localhost') // we don't care about the host
-        const srceq = url.pathname.split('/equation_images/')[1]
-        if (srceq) {
-          equation_text = decodeURIComponent(decodeURIComponent(srceq))
-        }
-      } catch (_ex) {
-        // If we failed to parse the src URL, something is wrong.
+      const srceq = src.split('/equation_images/')[1]
+      if (srceq) {
+        equation_text = decodeURIComponent(decodeURIComponent(srceq))
       }
     }
     return equation_text
@@ -254,19 +248,24 @@ const mathImageHelper = {
     const eqimgs = refnode.querySelectorAll('img.equation_image')
     if (eqimgs.length > 0) {
       eqimgs.forEach(img => {
-        const equation_text = this.getImageEquationText(img)
-        if (equation_text) {
+        if (img.complete && img.naturalWidth) {
+          // only process loaded images
           img.setAttribute('mathjaxified', '')
-          const mathtex = document.createElement('span')
-          mathtex.setAttribute('class', 'math_equation_latex')
-          mathtex.setAttribute('style', img.getAttribute('style'))
-          mathtex.textContent = `\\(${equation_text}\\)`
-          mathtex.style.maxWidth = ''
-          if (img.nextSibling) {
-            img.parentElement.insertBefore(mathtex, img.nextSibling)
-          } else {
-            img.parentElement.appendChild(mathtex)
+          const equation_text = this.getImageEquationText(img)
+          if (equation_text) {
+            const mathtex = document.createElement('span')
+            mathtex.setAttribute('class', 'math_equation_latex')
+            mathtex.setAttribute('style', img.getAttribute('style'))
+            mathtex.textContent = `\\(${equation_text}\\)`
+            mathtex.style.maxWidth = ''
+            if (img.nextSibling) {
+              img.parentElement.insertBefore(mathtex, img.nextSibling)
+            } else {
+              img.parentElement.appendChild(mathtex)
+            }
           }
+        } else {
+          img.addEventListener('load', this.dispatchProcessNewMathOnLoad)
         }
       })
       return true
@@ -280,6 +279,13 @@ const mathImageHelper = {
         img.parentElement.removeChild(img)
       }
     })
+  },
+
+  dispatchProcessNewMathOnLoad(event) {
+    event.target.removeEventListener('load', this.dispatchProcessNewMathOnLoad)
+    window.dispatchEvent(
+      new CustomEvent('process-new-math', {detail: {target: event.target.parentElement}})
+    )
   },
 
   nearlyInfiniteStyleFix(elem) {

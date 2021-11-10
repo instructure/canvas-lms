@@ -86,7 +86,6 @@ describe Lti::ContentItemResponse do
         content_item_response = subject({ module_items: [tag.id] })
         expect(content_item_response.media_type).to eq 'assignment'
       end
-
       it 'sets the media_type to "quiz"' do
         context_module = context.context_modules.create!(name: 'a module')
         quiz = context.quizzes.create!(title: 'a quiz')
@@ -94,7 +93,6 @@ describe Lti::ContentItemResponse do
         content_item_response = subject({ module_items: [tag.id] })
         expect(content_item_response.media_type).to eq 'quiz'
       end
-
       it 'sets the media_type to "page"' do
         context_module = context.context_modules.create!(name: 'a module')
         page = context.wiki_pages.create!(title: 'a page')
@@ -102,7 +100,6 @@ describe Lti::ContentItemResponse do
         content_item_response = subject({ module_items: [tag.id] })
         expect(content_item_response.media_type).to eq 'page'
       end
-
       it 'sets the media_type to "discussion_topic"' do
         context_module = context.context_modules.create!(name: 'a module')
         topic = context.discussion_topics.create!(:title => "blah")

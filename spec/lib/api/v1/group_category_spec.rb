@@ -89,7 +89,7 @@ describe "Api::V1::GroupCategory" do
       let(:category) { course.group_categories.create!(name: "category") }
       let(:user) { course.enroll_teacher(User.create!, enrollment_state: "active").user }
 
-      before do
+      before(:each) do
         category.create_groups(2)
       end
 

@@ -28,7 +28,7 @@ describe "master courses - settings" do
     @template = MasterCourses::MasterTemplate.set_as_master_course(@test_course)
   end
 
-  before do
+  before :each do
     admin_logged_in
   end
 

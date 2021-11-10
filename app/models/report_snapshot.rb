@@ -105,7 +105,6 @@ class ReportSnapshot < ActiveRecord::Base
 
       SSLCommon.post_form(STATS_COLLECTION_URL, data)
     rescue
-      nil
     end
   end
 end

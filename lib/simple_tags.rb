@@ -66,10 +66,6 @@ module SimpleTags
   end
 
   module WriterInstanceMethods
-    def self.included(klass)
-      klass.before_save :serialize_tags
-    end
-
     def tags=(new_tags)
       tags_will_change! unless tags == new_tags
       @tag_array = new_tags || []
@@ -87,6 +83,10 @@ module SimpleTags
         write_attribute(:tags, serialized_tags)
         remove_instance_variable :@tag_array
       end
+    end
+
+    def self.included(klass)
+      klass.before_save :serialize_tags
     end
   end
 

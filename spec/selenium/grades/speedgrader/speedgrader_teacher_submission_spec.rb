@@ -23,7 +23,7 @@ describe "speed grader submissions" do
   include_context "in-process server selenium tests"
   include SpeedGraderCommon
 
-  before do
+  before(:each) do
     stub_kaltura
 
     course_with_teacher_logged_in
@@ -299,7 +299,7 @@ describe "speed grader submissions" do
     end
 
     context "turnitin" do
-      before do
+      before(:each) do
         @assignment.turnitin_enabled = true
         @assignment.save!
       end
@@ -388,7 +388,7 @@ describe "speed grader submissions" do
     end
 
     context "LTI Plagiarism Platform" do
-      before do
+      before(:each) do
         @assignment.save!
       end
 

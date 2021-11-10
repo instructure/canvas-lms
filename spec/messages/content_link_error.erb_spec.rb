@@ -43,6 +43,5 @@ describe 'content_link_error' do
   include_examples "a message"
 
   let(:asset) { @page }
-
   include_examples "a message"
 end

@@ -20,8 +20,7 @@
 
 module IncomingMailProcessor
   class MailboxAccount
-    attr_writer :address
-    attr_accessor :protocol, :config, :error_folder
+    attr_accessor :protocol, :config, :address, :error_folder
 
     class << self
       attr_accessor :default_outgoing_email, :reply_to_enabled

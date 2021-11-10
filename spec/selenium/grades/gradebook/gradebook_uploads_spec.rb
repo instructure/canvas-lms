@@ -335,7 +335,7 @@ describe "Gradebook - uploads" do
   end
 
   describe "override grades" do
-    before do
+    before(:each) do
       @course1 = Course.create!
       @course1.enable_feature!(:final_grades_override)
       @course1.update!(allow_final_grade_override: true)

@@ -78,7 +78,7 @@ module LiveEvents
 
       @thread = Thread.new { self.run_thread }
       @running = true
-      at_exit { stop! unless stopped? }
+      at_exit { stop! }
     end
 
     def run_thread
@@ -105,7 +105,7 @@ module LiveEvents
             total_bytes += r[:total_bytes]
           end
           send_events(records)
-        rescue => e
+        rescue Exception => e
           logger.error("Exception making LiveEvents async call: #{e}")
         end
         LiveEvents.on_work_unit_end&.call
