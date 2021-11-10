@@ -31,6 +31,11 @@ describe("test", () => {
     el.setAttribute("alt", "file.txt")
     expect(rule.test(el)).toBeFalsy()
   })
+
+  test("returns false if alt text is filename with blank spaces", () => {
+    el.setAttribute("alt", "file with blank.txt")
+    expect(rule.test(el)).toBeFalsy()
+  })
 })
 
 describe("data", () => {
