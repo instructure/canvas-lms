@@ -351,6 +351,13 @@ export default class ItemView extends Backbone.View {
     base.isQuizzesNext = this.model.isQuizzesNext()
     base.useQuizzesNextIcon = this.model.isQuizzesNext() || this.isStudent()
     base.isQuizzesNextAndNotStudent = this.model.isQuizzesNext() && !this.isStudent()
+    base.canShowQuizBuildShortCut =
+      this.model.isQuizzesNext() &&
+      this.model.get('can_update') &&
+      !this.isStudent() &&
+      ENV.FLAGS &&
+      ENV.FLAGS.quiz_lti_enabled &&
+      ENV.FLAGS.new_quizzes_skip_to_build_module_button
     base.quizzesRespondusEnabled =
       this.isStudent() &&
       this.model.get('require_lockdown_browser') &&

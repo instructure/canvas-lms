@@ -35,11 +35,11 @@ QUnit.module('Quiz', {
   teardown() {}
 })
 
-test('#initialize ignores assignment if not given', function() {
+test('#initialize ignores assignment if not given', function () {
   ok(!this.quiz.get('assignment'))
 })
 
-test('#initialize sets assignment', function() {
+test('#initialize sets assignment', function () {
   const assign = {
     id: 1,
     title: 'Foo Bar'
@@ -48,36 +48,36 @@ test('#initialize sets assignment', function() {
   equal(this.quiz.get('assignment').constructor, Assignment)
 })
 
-test('#initialize ignores assignment_overrides if not given', function() {
+test('#initialize ignores assignment_overrides if not given', function () {
   ok(!this.quiz.get('assignment_overrides'))
 })
 
-test('#initialize assigns assignment_override collection', function() {
+test('#initialize assigns assignment_override collection', function () {
   this.quiz = new Quiz({assignment_overrides: []})
   equal(this.quiz.get('assignment_overrides').constructor, AssignmentOverrideCollection)
 })
 
-test('#initialize should set url from html url', function() {
+test('#initialize should set url from html url', function () {
   equal(this.quiz.get('url'), 'http://localhost:3000/courses/1/quizzes/1')
 })
 
-test('#initialize should set edit_url from html url', function() {
+test('#initialize should set edit_url from html url', function () {
   equal(this.quiz.get('edit_url'), 'http://localhost:3000/courses/1/quizzes/1/edit')
 })
 
-test('#initialize should set publish_url from html url', function() {
+test('#initialize should set publish_url from html url', function () {
   equal(this.quiz.get('publish_url'), 'http://localhost:3000/courses/1/quizzes/publish')
 })
 
-test('#initialize should set unpublish_url from html url', function() {
+test('#initialize should set unpublish_url from html url', function () {
   equal(this.quiz.get('unpublish_url'), 'http://localhost:3000/courses/1/quizzes/unpublish')
 })
 
-test('#initialize should set deletion_url from html url', function() {
+test('#initialize should set deletion_url from html url', function () {
   equal(this.quiz.get('deletion_url'), 'http://localhost:3000/courses/1/quizzes/1')
 })
 
-test('#initialize should set title_label from title', function() {
+test('#initialize should set title_label from title', function () {
   this.quiz = new Quiz({
     title: 'My Quiz!',
     readable_type: 'Quiz'
@@ -85,21 +85,21 @@ test('#initialize should set title_label from title', function() {
   equal(this.quiz.get('title_label'), 'My Quiz!')
 })
 
-test('#initialize should set title_label from readable_type', function() {
+test('#initialize should set title_label from readable_type', function () {
   this.quiz = new Quiz({readable_type: 'Quiz'})
   equal(this.quiz.get('title_label'), 'Quiz')
 })
 
-test('#initialize defaults unpublishable to true', function() {
+test('#initialize defaults unpublishable to true', function () {
   ok(this.quiz.get('unpublishable'))
 })
 
-test('#initialize sets unpublishable to false', function() {
+test('#initialize sets unpublishable to false', function () {
   this.quiz = new Quiz({unpublishable: false})
   ok(!this.quiz.get('unpublishable'))
 })
 
-test('#initialize sets publishable from can_unpublish and published', function() {
+test('#initialize sets publishable from can_unpublish and published', function () {
   this.quiz = new Quiz({
     can_unpublish: false,
     published: true
@@ -107,7 +107,7 @@ test('#initialize sets publishable from can_unpublish and published', function()
   ok(!this.quiz.get('unpublishable'))
 })
 
-test('#initialize sets question count', function() {
+test('#initialize sets question count', function () {
   this.quiz = new Quiz({
     question_count: 1,
     published: true
@@ -120,32 +120,32 @@ test('#initialize sets question count', function() {
   equal(this.quiz.get('question_count_label'), '2 Questions')
 })
 
-test('#initialize sets possible points count with no points', function() {
+test('#initialize sets possible points count with no points', function () {
   this.quiz = new Quiz()
   equal(this.quiz.get('possible_points_label'), '')
 })
 
-test('#initialize sets possible points count with 0 points', function() {
+test('#initialize sets possible points count with 0 points', function () {
   this.quiz = new Quiz({points_possible: 0})
   equal(this.quiz.get('possible_points_label'), '')
 })
 
-test('#initialize sets possible points count with 1 points', function() {
+test('#initialize sets possible points count with 1 points', function () {
   this.quiz = new Quiz({points_possible: 1})
   equal(this.quiz.get('possible_points_label'), '1 pt')
 })
 
-test('#initialize sets possible points count with 2 points', function() {
+test('#initialize sets possible points count with 2 points', function () {
   this.quiz = new Quiz({points_possible: 2})
   equal(this.quiz.get('possible_points_label'), '2 pts')
 })
 
-test('#initialize sets possible points count with 1.23 points', function() {
+test('#initialize sets possible points count with 1.23 points', function () {
   this.quiz = new Quiz({points_possible: 1.23})
   equal(this.quiz.get('possible_points_label'), '1.23 pts')
 })
 
-test('#initialize points possible to null if ungraded survey', function() {
+test('#initialize points possible to null if ungraded survey', function () {
   this.quiz = new Quiz({
     points_possible: 5,
     quiz_type: 'survey'
@@ -153,22 +153,22 @@ test('#initialize points possible to null if ungraded survey', function() {
   equal(this.quiz.get('possible_points_label'), '')
 })
 
-test('#publish saves to the server', function() {
+test('#publish saves to the server', function () {
   this.quiz.publish()
   ok(this.ajaxStub.called)
 })
 
-test('#publish sets published attribute to true', function() {
+test('#publish sets published attribute to true', function () {
   this.quiz.publish()
   ok(this.quiz.get('published'))
 })
 
-test('#unpublish saves to the server', function() {
+test('#unpublish saves to the server', function () {
   this.quiz.unpublish()
   ok(this.ajaxStub.called)
 })
 
-test('#unpublish sets published attribute to false', function() {
+test('#unpublish sets published attribute to false', function () {
   this.quiz.unpublish()
   ok(!this.quiz.get('published'))
 })
@@ -200,30 +200,34 @@ QUnit.module('Quiz.Next', {
   teardown() {}
 })
 
-test('#initialize model record id', function() {
+test('#initialize model record id', function () {
   equal(this.quiz.id, 'assignment_7')
 })
 
-test('#initialize should set url from html url', function() {
+test('#initialize should set url from html url', function () {
   equal(this.quiz.get('url'), 'http://localhost:3000/courses/1/assignments/7')
 })
 
-test('#initialize should set edit_url from html url', function() {
+test('#initialize should set build_url from html url', function () {
+  equal(this.quiz.get('build_url'), 'http://localhost:3000/courses/1/assignments/7')
+})
+
+test('#initialize should set edit_url from html url', function () {
   equal(this.quiz.get('edit_url'), 'http://localhost:3000/courses/1/assignments/7/edit?quiz_lti')
 })
 
-test('#initialize should set publish_url from html url', function() {
+test('#initialize should set publish_url from html url', function () {
   equal(this.quiz.get('publish_url'), 'http://localhost:3000/courses/1/assignments/publish/quiz')
 })
 
-test('#initialize should set unpublish_url from html url', function() {
+test('#initialize should set unpublish_url from html url', function () {
   equal(
     this.quiz.get('unpublish_url'),
     'http://localhost:3000/courses/1/assignments/unpublish/quiz'
   )
 })
 
-test('#initialize should set deletion_url from html url', function() {
+test('#initialize should set deletion_url from html url', function () {
   equal(this.quiz.get('deletion_url'), 'http://localhost:3000/courses/1/assignments/7')
 })
 
@@ -246,7 +250,7 @@ QUnit.module('Quiz.Next with manage and new_quizzes_modules_support enabled', {
   }
 })
 
-test('#initialize should set url as edit_url', function() {
+test('#initialize should set url as edit_url', function () {
   equal(this.quiz.get('url'), 'http://localhost:3000/courses/1/assignments/7/edit?quiz_lti')
 })
 
@@ -327,6 +331,16 @@ test('includes htmlUrl', () => {
   const quiz = new Quiz({url: 'http://example.com/quizzes/1'})
   const json = quiz.toView()
   deepEqual(json.htmlUrl, 'http://example.com/quizzes/1')
+})
+
+test('includes buildUrl', () => {
+  const quiz = new Quiz({
+    id: '1',
+    url: 'http://example.com/quizzes/1',
+    html_url: 'http://example.com/quizzes/1'
+  })
+  const json = quiz.toView()
+  deepEqual(json.buildUrl, 'http://example.com/quizzes/1')
 })
 
 test('includes multipleDueDates', () => {
@@ -434,7 +448,7 @@ QUnit.module('Assignment#pollUntilFinishedLoading (duplicate)', {
   }
 })
 
-test('polls for updates (duplicate)', function() {
+test('polls for updates (duplicate)', function () {
   this.quiz.pollUntilFinishedLoading(4000)
   this.clock.tick(2000)
   notOk(this.quiz.fetch.called)
@@ -442,7 +456,7 @@ test('polls for updates (duplicate)', function() {
   ok(this.quiz.fetch.called)
 })
 
-test('stops polling when the quiz has finished duplicating', function() {
+test('stops polling when the quiz has finished duplicating', function () {
   this.quiz.pollUntilFinishedLoading(3000)
   this.quiz.set({workflow_state: 'unpublished'})
   this.clock.tick(3000)
@@ -462,7 +476,7 @@ QUnit.module('Assignment#pollUntilFinishedLoading (migration)', {
   }
 })
 
-test('polls for updates (migration)', function() {
+test('polls for updates (migration)', function () {
   this.quiz.pollUntilFinishedLoading(4000)
   this.clock.tick(2000)
   notOk(this.quiz.fetch.called)
@@ -470,7 +484,7 @@ test('polls for updates (migration)', function() {
   ok(this.quiz.fetch.called)
 })
 
-test('stops polling when the quiz has finished migrating', function() {
+test('stops polling when the quiz has finished migrating', function () {
   this.quiz.pollUntilFinishedLoading(3000)
   this.quiz.set({workflow_state: 'unpublished'})
   this.clock.tick(3000)

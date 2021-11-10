@@ -225,7 +225,7 @@ test('escapes the name retrieved from the js env', () => {
   )
 })
 
-QUnit.module('Assignment#defaultToolName', {
+QUnit.module('Assignment#defaultToolName is undefined', {
   setup() {
     fakeENV.setup({
       DEFAULT_ASSIGNMENT_TOOL_NAME: undefined
@@ -1107,6 +1107,12 @@ test('includes htmlEditUrl', () => {
   const assignment = new Assignment({html_url: 'http://example.com/assignments/1'})
   const json = assignment.toView()
   equal(json.htmlEditUrl, 'http://example.com/assignments/1/edit')
+})
+
+test('includes htmlBuildUrl', () => {
+  const assignment = new Assignment({html_url: 'http://example.com/assignments/1'})
+  const json = assignment.toView()
+  equal(json.htmlBuildUrl, 'http://example.com/assignments/1')
 })
 
 test('includes multipleDueDates', () => {
