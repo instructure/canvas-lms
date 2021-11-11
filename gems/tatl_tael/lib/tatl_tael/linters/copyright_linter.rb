@@ -134,7 +134,7 @@ module TatlTael
       end
 
       def copyright_body
-        copyright.split("\n")[1..-1].join("\n") # remove first line
+        copyright.split("\n")[1..].join("\n") # remove first line
                  .gsub(/\s+/, " ").strip
       end
 

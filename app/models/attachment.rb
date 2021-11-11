@@ -464,7 +464,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def after_extension
-    res = self.extension[1..-1] rescue nil
+    res = self.extension[1..] rescue nil
     res = nil if res == "" || res == "unknown"
     res
   end
@@ -1984,7 +1984,7 @@ class Attachment < ActiveRecord::Base
       second_dot = uri.host.rindex('.', first_dot - 1) if first_dot
       return ["file_download", uri.host] unless second_dot
 
-      ["file_download", uri.host[second_dot + 1..-1]]
+      ["file_download", uri.host[second_dot + 1..]]
     end
   end
 

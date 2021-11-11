@@ -42,7 +42,7 @@ module CC
         next if file.display_name.blank?
 
         if file.is_a? Folder
-          dir = File.join(folder_names[1..-1])
+          dir = File.join(folder_names[1..])
           files_with_metadata[:folders] << [file, dir] if file_or_folder_restricted?(file)
           next
         end

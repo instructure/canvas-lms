@@ -169,9 +169,9 @@ module BrandableCSS
       default = config['default']
       if default && default.starts_with?('$')
         if css_urls
-          return "var(--#{default[1..-1]})"
+          return "var(--#{default[1..]})"
         else
-          return brand_variable_value(default[1..-1], active_brand_config, config_map, css_urls)
+          return brand_variable_value(default[1..], active_brand_config, config_map, css_urls)
         end
       end
 

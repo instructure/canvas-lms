@@ -133,7 +133,7 @@ module CanvasPartman
         if base_class.partitioning_interval == :weeks
           Time.utc(match[:year]).beginning_of_week + (match[:week].to_i - 1).weeks
         else
-          Time.utc(*match[1..-1])
+          Time.utc(*match[1..])
         end
       end
 

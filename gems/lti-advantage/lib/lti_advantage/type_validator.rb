@@ -7,7 +7,7 @@ module LtiAdvantage
     def validate(record)
       record.instance_variables.each do |v|
         value = record.instance_variable_get(v)
-        attr = v.to_s[1..-1].to_sym
+        attr = v.to_s[1..].to_sym
 
         # verify the value is of the correct type
         validate_type(attr, value, record)
