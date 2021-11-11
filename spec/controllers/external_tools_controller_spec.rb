@@ -1976,6 +1976,46 @@ describe ExternalToolsController do
       expect(response).to be_successful
       expect(assigns[:tool].is_rce_favorite).to eq true
     end
+
+    it 'updates placement properties if the enabled key is set to false' do
+      user_session(account_admin_user)
+      @tool = new_valid_tool(@course.root_account)
+      @tool.editor_button = { url: 'https://example.com', icon_url: 'https://example.com', enabled: false }
+      @tool.save!
+
+      put :update,
+          params: {
+            account_id: @course.root_account.id,
+            external_tool_id: @tool.id,
+            external_tool: { editor_button: { url: 'https://new-example.com' } }
+          },
+          format: 'json'
+      tool_updated = ContextExternalTool.find(@tool.id)
+      inactive_placements = tool_updated[:settings][:inactive_placements]
+      editor_button = tool_updated[:settings][:editor_button]
+
+      expect(response).to be_successful
+      expect(inactive_placements).to include(:editor_button)
+      expect(inactive_placements[:editor_button][:url]).to eq 'https://new-example.com'
+      expect(editor_button).to be_nil
+    end
+
+    it 'allows to remove the app placement entirely' do
+      user_session(account_admin_user)
+      @tool = new_valid_tool(@course.root_account)
+      @tool.editor_button = { url: 'https://example.com', icon_url: 'https://example.com', enabled: false }
+      @tool.save!
+
+      put :update,
+          params: {
+            account_id: @course.root_account.id,
+            external_tool_id: @tool.id,
+            external_tool: { editor_button: "null" }
+          },
+          format: 'json'
+      expect(response).to be_successful
+      expect(@tool.reload.editor_button).to eq nil
+    end
   end
 
   describe "'GET 'generate_sessionless_launch'" do
