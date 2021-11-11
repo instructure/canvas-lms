@@ -27,6 +27,7 @@ import './backbone/account_quota_settings.coffee'
 import FeatureFlags from '@canvas/feature-flags'
 import ready from '@instructure/ready'
 import MicrosoftSyncAccountSettings from '@canvas/integrations/react/accounts/microsoft_sync/MicrosoftSyncAccountSettings'
+import CourseCreationSettings from './react/course_creation_settings/CourseCreationSettings'
 
 ready(() => {
   ReactDOM.render(<FeatureFlags />, document.getElementById('tab-features'))
@@ -56,5 +57,13 @@ ready(() => {
 
   if (document.getElementById('tab-integrations')) {
     ReactDOM.render(<MicrosoftSyncAccountSettings />, document.getElementById('tab-integrations'))
+  }
+
+  const courseCreationSettingsContainer = document.getElementById('course_creation_settings')
+  if (courseCreationSettingsContainer) {
+    ReactDOM.render(
+      <CourseCreationSettings currentValues={ENV.COURSE_CREATION_SETTINGS} />,
+      courseCreationSettingsContainer
+    )
   }
 })

@@ -136,7 +136,7 @@ describe 'Account Notification API', type: :request do
   end
 
   describe 'create' do
-    before :each do
+    before do
       @path = "/api/v1/accounts/#{@admin.account.id}/account_notifications"
       @api_params = { :controller => 'account_notifications',
                       :action => 'create',
@@ -298,7 +298,7 @@ describe 'Account Notification API', type: :request do
   end
 
   describe 'update' do
-    before :each do
+    before do
       @notification = account_notification(message: 'default')
       @path = "/api/v1/accounts/#{@admin.account.id}/account_notifications/#{@notification.id}"
       @api_params = { :controller => 'account_notifications',

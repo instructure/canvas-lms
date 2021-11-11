@@ -111,7 +111,7 @@ class ContentZipper
                   :content_type, :uuid, :id, :attachment
 
     # Match on /files URLs capturing the object id.
-    FILES_REGEX = %r{/files/(?<obj_id>\d+)/\w+(?:(?:[^\s"<'\?\/]*)([^\s"<']*))?}
+    FILES_REGEX = %r{/files/(?<obj_id>\d+)/\w+(?:(?:[^\s"<'?/]*)(?:[^\s"<']*))?}.freeze
 
     def initialize(attachment, index = nil)
       @attachment = attachment
@@ -184,7 +184,6 @@ class ContentZipper
 
   def render_eportfolio_page_content(page, portfolio, static_attachments, submissions_hash)
     @page = page
-    @portfolio = @portfolio
     @static_attachments = static_attachments
     @submissions_hash = submissions_hash
     av = ActionView::Base.with_view_paths(ActionController::Base.view_paths)
@@ -385,12 +384,8 @@ class ContentZipper
     index
   end
 
-  def add_file(attachment, zipfile, fn)
-    if attachment.deleted?
-      mark_successful!
-    elsif add_attachment_to_zip(attachment, zipfile, fn)
-      mark_successful!
-    end
+  def add_file(attachment, zipfile, filename)
+    mark_successful! if attachment.deleted? || add_attachment_to_zip(attachment, zipfile, filename)
   end
 
   def add_online_submission_content(filename, display_page, zipfile)
@@ -407,7 +402,7 @@ class ContentZipper
 
   def add_submission(submission, students, zipfile)
     @submission = submission
-    @logger.debug(" checking submission for #{(submission.user.id)}")
+    @logger.debug(" checking submission for #{submission.user.id}")
 
     users_name = get_user_name(students, submission) unless @assignment.anonymize_students?
     filename = get_filename(users_name, submission)
@@ -471,7 +466,7 @@ class ContentZipper
   end
 
   def sanitize_attachment_filename(filename)
-    filename.gsub(/[\x00\/\\:\*\?\"<>\|]+/, '_')
+    filename.gsub(/[\x00\/\\:*?"<>|]+/, '_')
   end
 
   def sanitize_user_name(user_name)

@@ -100,10 +100,10 @@ def simple_quiz_with_submissions(answer_key, *submissions)
   submissions.each_with_index do |data, i|
     sub = @quiz.generate_submission(students[i])
     sub.mark_completed
-    sub.submission_data = Hash[data.each_with_index.map { |answer, i|
-      matched_answer = @questions[i].question_data[:answers].detect { |a| a[:text] == answer }
-      ["question_#{@questions[i].id}", matched_answer ? matched_answer[:id].to_s : nil]
-    }]
+    sub.submission_data = data.each_with_index.map do |answer, j|
+      matched_answer = @questions[j].question_data[:answers].detect { |a| a[:text] == answer }
+      ["question_#{@questions[j].id}", matched_answer ? matched_answer[:id].to_s : nil]
+    end.to_h
     Quizzes::SubmissionGrader.new(sub).grade_submission
   end
   @quiz.reload
@@ -130,11 +130,11 @@ def simple_quiz_with_shuffled_answers(answer_key, *submissions)
   submissions.each_with_index do |data, i|
     sub = @quiz.generate_submission(students[i])
     sub.mark_completed
-    sub.submission_data = Hash[data.each_with_index.map { |answer, i|
+    sub.submission_data = data.each_with_index.map do |answer, j|
       answer = { "T" => "True", "F" => "False" }[answer] || answer
-      matched_answer = @questions[i].question_data[:answers].detect { |a| a[:text] == answer }
-      ["question_#{@questions[i].id}", matched_answer ? matched_answer[:id].to_s : nil]
-    }]
+      matched_answer = @questions[j].question_data[:answers].detect { |a| a[:text] == answer }
+      ["question_#{@questions[j].id}", matched_answer ? matched_answer[:id].to_s : nil]
+    end.to_h
     Quizzes::SubmissionGrader.new(sub).grade_submission
   end
   @quiz.reload

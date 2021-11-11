@@ -22,7 +22,7 @@ require 'casclient'
 
 class AuthenticationProvider::CAS < AuthenticationProvider::Delegated
   def self.sti_name
-    'cas'.freeze
+    'cas'
   end
 
   def self.recognized_params

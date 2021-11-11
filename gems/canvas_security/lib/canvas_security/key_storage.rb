@@ -20,11 +20,21 @@
 
 module CanvasSecurity
   class KeyStorage
-    PAST = 'jwk-past.json'.freeze
-    PRESENT = 'jwk-present.json'.freeze
-    FUTURE = 'jwk-future.json'.freeze
+    PAST = 'jwk-past.json'
+    PRESENT = 'jwk-present.json'
+    FUTURE = 'jwk-future.json'
     MAX_CACHE_AGE = 10.days.to_i
     MIN_ROTATION_PERIOD = 1.hour
+
+    class << self
+      def max_cache_age
+        Setting.get('public_jwk_cache_age_in_seconds', MAX_CACHE_AGE)
+      end
+
+      def new_key
+        CanvasSecurity::RSAKeyPair.new.to_jwk.to_json
+      end
+    end
 
     def initialize(prefix)
       @prefix = prefix
@@ -105,14 +115,6 @@ module CanvasSecurity
 
     def consul_proxy
       @consul_proxy ||= DynamicSettings.kv_proxy(@prefix, tree: :store)
-    end
-
-    def self.max_cache_age
-      Setting.get('public_jwk_cache_age_in_seconds', MAX_CACHE_AGE)
-    end
-
-    def self.new_key
-      CanvasSecurity::RSAKeyPair.new.to_jwk.to_json
     end
   end
 end

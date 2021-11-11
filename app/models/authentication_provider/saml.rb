@@ -22,7 +22,7 @@ require 'saml2'
 
 class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   def self.sti_name
-    'saml'.freeze
+    'saml'
   end
 
   def self.enabled?(_account = nil)

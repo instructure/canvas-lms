@@ -33,23 +33,28 @@ describe Quizzes::QuizOutcomeResultBuilder do
       @quiz_result = @quiz_results.first
       @question_results = @quiz_results.first.learning_outcome_question_results
     end
+
     it 'has valid bank data' do
       expect(@bank.learning_outcome_alignments.length).to eql(1)
       expect(@q2.assessment_question.assessment_question_bank).to eql(@bank)
       expect(@bank.assessment_question_count).to eql(2)
       expect(@sub.score).to eql(1.0)
     end
+
     it "creates learning outcome results" do
       expect(@quiz_results.size).to eql(1)
       expect(@question_results.size).to eql(2)
     end
+
     it "has root account ids on learning outcome question results" do
       expect(@question_results.first.root_account_id).to eq @course.root_account_id
     end
+
     it 'considers scores in aggregate' do
       expect(@quiz_result.possible).to eql(2.0)
       expect(@quiz_result.score).to eql(1.0)
     end
+
     it "does not declare mastery" do
       expect(@quiz_result.mastery).to eql(false)
     end
@@ -107,6 +112,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
         @quiz_results = LearningOutcomeResult.where(user_id: @user).sort_by(&:learning_outcome_id).to_a
         @question_results = @quiz_results.map(&:learning_outcome_question_results)
       end
+
       it "has valid bank data" do
         expect(@bank.learning_outcome_alignments.length).to eql(1)
         expect(@bank2.learning_outcome_alignments.length).to eql(1)
@@ -117,14 +123,17 @@ describe Quizzes::QuizOutcomeResultBuilder do
         expect(@bank.assessment_question_count).to eql(2)
         expect(@bank2.assessment_question_count).to eql(2)
       end
+
       it "creates two learning outcome results" do
         expect(@question_results.map(&:size)).to eql([2, 2])
         expect(@quiz_results.size).to eql(2)
       end
+
       it 'considers scores in aggregate' do
         expect(@quiz_results.map(&:possible)).to eql([2.0, 2.0])
         expect(@quiz_results.map(&:score)).to eql([1.0, 1.0])
       end
+
       it "declares mastery when equal" do
         expect(@quiz_results.map(&:mastery)).to eql([false, true])
       end
@@ -435,6 +444,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       @q1.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
       @q2.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
     end
+
     it "does not generate a learning outcome result" do
       q1_data = @q1.question_data
       q1_data[:points_possible] = 0.0

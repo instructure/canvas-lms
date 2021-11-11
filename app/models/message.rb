@@ -263,15 +263,13 @@ class Message < ActiveRecord::Base
   # populate the avatar, name, and email in the conversation email notification
 
   def author
-    @_author ||= begin
-      if author_context.has_attribute?(:user_id)
-        User.find(context.user_id)
-      elsif author_context.has_attribute?(:author_id)
-        User.find(context.author_id)
-      else
-        nil
-      end
-    end
+    @_author ||= if author_context.has_attribute?(:user_id)
+                   User.find(context.user_id)
+                 elsif author_context.has_attribute?(:author_id)
+                   User.find(context.author_id)
+                 else
+                   nil
+                 end
   end
 
   def author_context
@@ -876,11 +874,12 @@ class Message < ActiveRecord::Base
       unbounded_loop_paranoia_counter = 10
       current_context = context
 
-      until current_context&.is_a_context?
-        return nil if unbounded_loop_paranoia_counter <= 0 || current_context.nil?
-        return nil unless current_context.respond_to?(:context)
+      loop do
+        break if unbounded_loop_paranoia_counter.zero? ||
+                 current_context.nil? ||
+                 current_context.is_a_context?
 
-        current_context = current_context.context
+        current_context = current_context.try(:context)
         unbounded_loop_paranoia_counter -= 1
       end
 
@@ -1030,7 +1029,7 @@ class Message < ActiveRecord::Base
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
       cancel if e.message.try(:match, /Bad recipient/)
-    rescue StandardError, Timeout::Error => e
+    rescue => e
       @exception = e
       logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
     end
@@ -1114,18 +1113,16 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def deliver_via_push
-    begin
-      self.user.notification_endpoints.each do |notification_endpoint|
-        notification_endpoint.destroy unless notification_endpoint.push_json(sns_json)
-      end
-      complete_dispatch
-    rescue StandardError => e
-      @exception = e
-      error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
-      logger.error error_string
-      cancel
-      raise e
+    self.user.notification_endpoints.each do |notification_endpoint|
+      notification_endpoint.destroy unless notification_endpoint.push_json(sns_json)
     end
+    complete_dispatch
+  rescue StandardError => e
+    @exception = e
+    error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
+    logger.error error_string
+    cancel
+    raise e
   end
 
   private

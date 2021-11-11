@@ -25,6 +25,7 @@ describe 'confirm_registration' do
     user_factory
     @object = communication_channel(@user, { username: 'bob@example.com' })
   end
+
   let(:asset) { @object }
   let(:notification_name) { :confirm_registration }
 

@@ -549,7 +549,7 @@ describe SIS::CSV::CourseImporter do
   end
 
   context 'account associations' do
-    before(:each) do
+    before do
       process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
         "A001,,Humanities,active",

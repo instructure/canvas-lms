@@ -70,7 +70,7 @@ describe AttachmentHelper do
   describe "set_cache_header" do
     it "does not allow caching of instfs redirects" do
       allow(@att).to receive(:instfs_hosted?).and_return(true)
-      expect(self).to receive(:cancel_cache_buster).never
+      expect(self).not_to receive(:cancel_cache_buster)
       set_cache_header(@att, false)
       expect(response.headers).not_to have_key('Cache-Control')
     end

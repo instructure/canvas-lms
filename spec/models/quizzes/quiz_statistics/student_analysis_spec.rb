@@ -54,6 +54,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   end
 
   let(:report_type) { 'student_analysis' }
+
   include_examples "Quizzes::QuizStatistics::Report"
   before(:once) { course_factory }
 
@@ -157,7 +158,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   end
 
   context "csv" do
-    before(:each) do
+    before do
       student_in_course(:active_all => true)
       @quiz = @course.quizzes.create!
       @quiz.quiz_questions.create!(:question_data => { :name => "test 1" })
@@ -422,7 +423,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     q.save
     qs = q.generate_submission(@student)
     qs.submission_data = {
-      "question_#{q.quiz_data[0][:id]}" => "#{q.quiz_data[0][:answers][0][:id]}",
+      "question_#{q.quiz_data[0][:id]}" => (q.quiz_data[0][:answers][0][:id]).to_s,
       "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][0][:id]}" => "1",
       "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][1][:id]}" => "1"
     }
@@ -512,7 +513,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     q.save
     qs = q.generate_submission(@teacher, true)
     qs.submission_data = {
-      "question_#{q.quiz_data[0][:id]}" => "#{q.quiz_data[0][:answers][0][:id]}",
+      "question_#{q.quiz_data[0][:id]}" => (q.quiz_data[0][:answers][0][:id]).to_s,
       "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][0][:id]}" => "1",
       "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][1][:id]}" => "1"
     }
@@ -531,7 +532,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     q.save
     qs = q.generate_submission(@student)
     qs.submission_data = {
-      "question_#{q.quiz_data[0][:id]}" => "#{q.quiz_data[0][:answers][0][:id]}"
+      "question_#{q.quiz_data[0][:id]}" => (q.quiz_data[0][:answers][0][:id]).to_s
     }
     Quizzes::SubmissionGrader.new(qs).grade_submission
 
@@ -551,7 +552,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     q.save
     qs = q.generate_submission(fake_student)
     qs.submission_data = {
-      "question_#{q.quiz_data[0][:id]}" => "#{q.quiz_data[0][:answers][0][:id]}",
+      "question_#{q.quiz_data[0][:id]}" => (q.quiz_data[0][:answers][0][:id]).to_s,
       "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][0][:id]}" => "1",
       "question_#{q.quiz_data[1][:id]}_answer_#{q.quiz_data[1][:answers][1][:id]}" => "1"
     }
@@ -585,7 +586,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
         answers: []
       }
 
-      expect(CanvasQuizStatistics).to receive(:analyze).never
+      expect(CanvasQuizStatistics).not_to receive(:analyze)
 
       subject.send(:stats_for_question, question_data, [])
     end

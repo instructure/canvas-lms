@@ -113,22 +113,20 @@ class UnzipAttachment
         # Since Tempfile guarantees that the names are unique, we don't
         # have to worry about what this name actually is.
         Tempfile.open do |f|
-          begin
-            file_size = 0
-            md5 = entry.extract(f.path, true) do |bytes|
-              file_size += bytes
-            end
-            zip_stats.charge_quota(file_size)
-            # This is where the attachment actually happens.  See file_in_context.rb
-            migration_id = @migration_id_map[entry.name]
-            attachment = attach(f.path, entry, folder, md5, migration_id: migration_id)
-            id_positions[attachment.id] = path_positions[entry.name]
-          rescue Attachment::OverQuotaError
-            f.unlink
-            raise
-          rescue => e
-            @logger.warn "Couldn't unzip archived file #{f.path}: #{e.message}" if @logger
+          file_size = 0
+          md5 = entry.extract(f.path, true) do |bytes|
+            file_size += bytes
           end
+          zip_stats.charge_quota(file_size)
+          # This is where the attachment actually happens.  See file_in_context.rb
+          migration_id = @migration_id_map[entry.name]
+          attachment = attach(f.path, entry, folder, md5, migration_id: migration_id)
+          id_positions[attachment.id] = path_positions[entry.name]
+        rescue Attachment::OverQuotaError
+          f.unlink
+          raise
+        rescue => e
+          @logger.warn "Couldn't unzip archived file #{f.path}: #{e.message}" if @logger
         end
       end
       update_attachment_positions(id_positions)
@@ -153,13 +151,11 @@ class UnzipAttachment
   end
 
   def attach(path, entry, folder, md5, migration_id: nil)
-    begin
-      FileInContext.attach(self.context, path, display_name: display_name(entry.name), folder: folder,
-                                               explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
-    rescue
-      FileInContext.attach(self.context, path, display_name: display_name(entry.name), folder: folder,
-                                               explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
-    end
+    FileInContext.attach(self.context, path, display_name: display_name(entry.name), folder: folder,
+                                             explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
+  rescue
+    FileInContext.attach(self.context, path, display_name: display_name(entry.name), folder: folder,
+                                             explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
   end
 
   def with_unzip_configuration

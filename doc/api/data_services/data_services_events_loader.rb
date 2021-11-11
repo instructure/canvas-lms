@@ -61,14 +61,12 @@ class DataServicesEventsLoader
   end
 
   def data
-    @data ||= begin
-      event_types.collect do |event_category, event_files|
-        {
-          event_category: event_category,
-          page_title: page_tile_formatter(event_category),
-          event_payloads: load_json_events(event_files.sort)
-        }
-      end
+    @data ||= event_types.collect do |event_category, event_files|
+      {
+        event_category: event_category,
+        page_title: page_tile_formatter(event_category),
+        event_payloads: load_json_events(event_files.sort)
+      }
     end
   end
 
@@ -79,12 +77,10 @@ class DataServicesEventsLoader
   end
 
   def event_types
-    @event_types ||= begin
-      files
-        .group_by { |file_path| extrat_category_from_file_path(file_path) }
-        .sort
-        .to_h
-    end
+    @event_types ||= files
+                     .group_by { |file_path| extrat_category_from_file_path(file_path) }
+                     .sort
+                     .to_h
   end
 
   def extrat_category_from_file_path(file_path)

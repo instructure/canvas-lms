@@ -26,7 +26,7 @@ describe BasicLTI::BasicOutcomes do
     WebMock.disable_net_connect!(allow_localhost: true)
   end
 
-  before(:each) do
+  before do
     course_model.offer
     @root_account = @course.root_account
     @account = account_model(:root_account => @root_account, :parent_account => @root_account)
@@ -99,19 +99,15 @@ describe BasicLTI::BasicOutcomes do
 
   context "Exceptions" do
     it "BasicLTI::BasicOutcomes::Unauthorized should have 401 status" do
-      begin
-        raise BasicLTI::BasicOutcomes::Unauthorized, "Invalid signature"
-      rescue BasicLTI::BasicOutcomes::Unauthorized => e
-        expect(e.response_status).to be 401
-      end
+      raise BasicLTI::BasicOutcomes::Unauthorized, "Invalid signature"
+    rescue BasicLTI::BasicOutcomes::Unauthorized => e
+      expect(e.response_status).to be 401
     end
 
     it "BasicLTI::BasicOutcomes::InvalidRequest should have 415 status" do
-      begin
-        raise BasicLTI::BasicOutcomes::InvalidRequest, "Invalid request"
-      rescue BasicLTI::BasicOutcomes::InvalidRequest => e
-        expect(e.response_status).to be 415
-      end
+      raise BasicLTI::BasicOutcomes::InvalidRequest, "Invalid request"
+    rescue BasicLTI::BasicOutcomes::InvalidRequest => e
+      expect(e.response_status).to be 415
     end
   end
 
@@ -449,7 +445,7 @@ describe BasicLTI::BasicOutcomes do
     end
 
     context "with prioritizeNonToolGrade details" do
-      before(:each) do
+      before do
         xml.at_css('imsx_POXBody > replaceResultRequest').add_child(
           "<submissionDetails><prioritizeNonToolGrade/></submissionDetails>"
         )

@@ -59,9 +59,9 @@ describe CustomGradebookColumnsApiController, type: :request do
                       "/api/v1/courses/#{@course.id}/custom_gradebook_columns",
                       course_id: @course.to_param, action: "index",
                       controller: "custom_gradebook_columns_api", format: "json"
-      expect(json).to eq @cols.map { |c|
+      expect(json).to eq(@cols.map do |c|
         custom_gradebook_column_json(c, @user, session)
-      }
+      end)
     end
 
     it 'paginates' do
@@ -77,9 +77,9 @@ describe CustomGradebookColumnsApiController, type: :request do
                       "/api/v1/courses/#{@course.id}/custom_gradebook_columns?include_hidden=1",
                       course_id: @course.to_param, include_hidden: "1", action: "index",
                       controller: "custom_gradebook_columns_api", format: "json"
-      expect(json).to eq [*@cols, @hidden].map { |c|
+      expect(json).to eq([*@cols, @hidden].map do |c|
         custom_gradebook_column_json(c, @user, session)
-      }
+      end)
     end
   end
 

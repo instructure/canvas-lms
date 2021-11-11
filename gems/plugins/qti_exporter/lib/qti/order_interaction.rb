@@ -53,7 +53,7 @@ module Qti
       @doc.css('responseCondition member').each_with_index do |a, i|
         answer = {}
         @question[:answers] << answer
-        answer[:text] = "#{i + 1}"
+        answer[:text] = (i + 1).to_s
         answer[:id] = unique_local_id
         answer[:comments] = ""
 
@@ -67,7 +67,7 @@ module Qti
       @doc.css('correctResponse > value').each_with_index do |answ, i|
         answer = {}
         @question[:answers] << answer
-        answer[:text] = "#{i + 1}"
+        answer[:text] = (i + 1).to_s
         answer[:id] = unique_local_id
         answer[:comments] = ""
 

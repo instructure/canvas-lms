@@ -29,7 +29,7 @@ module Types
       argument :_id, ID, required: true
       argument :type, LegacyNodeType, required: true
     end
-    def legacy_node(type:, _id:)
+    def legacy_node(type:, _id:) # rubocop:disable Lint/UnderscorePrefixedVariableName named for DSL reasons
       GraphQLNodeLoader.load(type, _id, context)
     end
 
@@ -103,10 +103,11 @@ module Types
       # TODO: really need a way to share similar logic like this
       # with controllers in api/v1
       current_user&.cached_currentish_enrollments(preload_courses: true)
-                  .index_by(&:course_id).values
-                  .sort_by! { |enrollment|
-        Canvas::ICU.collation_key(enrollment.course.nickname_for(current_user))
-      }.map(&:course)
+                  &.index_by(&:course_id)
+                  &.values
+                  &.sort_by! do |enrollment|
+                    Canvas::ICU.collation_key(enrollment.course.nickname_for(current_user))
+                  end&.map(&:course)
     end
 
     field :module_item, Types::ModuleItemType, null: true do

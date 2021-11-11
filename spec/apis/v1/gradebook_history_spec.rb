@@ -82,7 +82,7 @@ describe Api::V1::GradebookHistory do
       submit(@assignment2, students[0], yesterday, @grader2)
     end
 
-    before :each do
+    before do
       harness = GradebookHistoryHarness.new
       harness.instance_variable_set(:@domain_root_account, Account.default)
       @days = harness.days_json(course, api_context)
@@ -135,7 +135,7 @@ describe Api::V1::GradebookHistory do
       submit(@assignment, student2, now, @grader2)
     end
 
-    before :each do
+    before do
       harness = GradebookHistoryHarness.new
       harness.instance_variable_set(:@domain_root_account, Account.default)
       @day_hash = harness.json_for_date(now, course, api_context)

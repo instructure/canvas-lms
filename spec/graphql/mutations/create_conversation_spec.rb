@@ -297,7 +297,7 @@ RSpec.describe Mutations::CreateConversation do
   end
 
   context 'user_notes' do
-    before(:each) do
+    before do
       Account.default.update_attribute(:enable_user_notes, true)
       @students = create_users_in_course(@course, 2, account_associations: true, return_type: :record)
     end

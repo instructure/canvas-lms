@@ -136,6 +136,7 @@ describe AcademicBenchmark::Converter do
                                                               { :description => "Not awesome", :points => 0 }] }
                              })
   end
+
   before do
     allow(AcademicBenchmark).to receive(:config).and_return({ partner_id: "instructure", partner_key: "key" })
     standards_mock = double("standards")
@@ -145,6 +146,7 @@ describe AcademicBenchmark::Converter do
     allow(AcademicBenchmarks::Api::Standards).to receive(:new).and_return(standards_mock)
     @user = admin_user
   end
+
   subject(:converter) do
     AcademicBenchmark::Converter.new(converter_settings)
   end

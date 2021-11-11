@@ -40,7 +40,7 @@ module Twitter
       twitter.send_direct_message(
         @twitter_service.service_user_name,
         @twitter_service.service_user_id,
-        "#{body}"
+        body.to_s
       )
     end
 

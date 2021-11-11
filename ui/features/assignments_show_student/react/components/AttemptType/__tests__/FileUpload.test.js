@@ -26,6 +26,7 @@ import {mockAssignmentAndSubmission, mockQuery} from '@canvas/assignments/graphq
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
+import StudentViewContext from '../../Context'
 
 async function createGraphqlMocks(overrides = {}) {
   const userGroupOverrides = [{Node: () => ({__typename: 'User'})}]
@@ -102,6 +103,34 @@ describe('FileUpload', () => {
     const emptyRender = getByTestId('upload-box')
 
     expect(emptyRender).toHaveTextContent(/choose a file to upload/i)
+  })
+
+  it('renders an enabled upload file drop for students', async () => {
+    const mocks = await createGraphqlMocks()
+    const props = await makeProps()
+    const {getByTestId} = render(
+      <MockedProvider mocks={mocks}>
+        <FileUpload {...props} />
+      </MockedProvider>
+    )
+    const fileDrop = getByTestId('input-file-drop')
+
+    expect(fileDrop).not.toBeDisabled()
+  })
+
+  it('renders a disabled upload file drop for observers', async () => {
+    const mocks = await createGraphqlMocks()
+    const props = await makeProps()
+    const {getByTestId} = render(
+      <MockedProvider mocks={mocks}>
+        <StudentViewContext.Provider value={{allowChangesToSubmission: false, isObserver: true}}>
+          <FileUpload {...props} />
+        </StudentViewContext.Provider>
+      </MockedProvider>
+    )
+    const fileDrop = getByTestId('input-file-drop')
+
+    expect(fileDrop).toBeDisabled()
   })
 
   it('does not move focus to file drop box after render if focusOnInit is false', async () => {

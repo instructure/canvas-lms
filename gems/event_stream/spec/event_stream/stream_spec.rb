@@ -283,8 +283,8 @@ describe EventStream::Stream do
         spy = double('spy')
         @stream.on_insert { spy.trigger }
         expect(database).to receive(:batch).once
-        expect(database).to receive(:insert_record).never
-        expect(spy).to receive(:trigger).never
+        expect(database).not_to receive(:insert_record)
+        expect(spy).not_to receive(:trigger)
         @stream.insert(@record)
       end
     end
@@ -355,8 +355,8 @@ describe EventStream::Stream do
         spy = double('spy')
         @stream.on_update { spy.trigger }
         expect(database).to receive(:batch).once
-        expect(database).to receive(:update_record).never
-        expect(spy).to receive(:trigger).never
+        expect(database).not_to receive(:update_record)
+        expect(spy).not_to receive(:trigger)
         @stream.update(@record)
       end
     end
@@ -404,7 +404,7 @@ describe EventStream::Stream do
       end
 
       it "skips the fetch if no ids were given" do
-        expect(database).to receive(:execute).never
+        expect(database).not_to receive(:execute)
         @stream.fetch([])
       end
 
@@ -461,7 +461,7 @@ describe EventStream::Stream do
 
         it "skips insert if entry_proc and_return nil" do
           @index.entry_proc lambda { |_record| nil }
-          expect(@index_strategy).to receive(:insert).never
+          expect(@index_strategy).not_to receive(:insert)
           @stream.insert(@record)
         end
 
@@ -544,12 +544,12 @@ describe EventStream::Stream do
         end
 
         it "does not insert a record when insert callback fails" do
-          expect(@database).to receive(:execute).never
+          expect(@database).not_to receive(:execute)
           @stream.insert(@record)
         end
 
         it "does not update a record when update callback fails" do
-          expect(@database).to receive(:execute).never
+          expect(@database).not_to receive(:execute)
           @stream.update(@record)
         end
 

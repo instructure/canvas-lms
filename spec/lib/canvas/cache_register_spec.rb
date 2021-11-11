@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 describe Canvas::CacheRegister do
-  before :each do
+  before do
     skip("require redis") unless Canvas.redis_enabled?
     allow(Canvas::CacheRegister).to receive(:enabled?).and_return(true)
   end
@@ -111,7 +111,7 @@ describe Canvas::CacheRegister do
 
       it "does not do anything if reverted" do
         set_revert!
-        expect(Canvas::CacheRegister).to receive(:redis).never
+        expect(Canvas::CacheRegister).not_to receive(:redis)
         @user.clear_cache_key(:enrollments)
       end
 
@@ -188,7 +188,7 @@ describe Canvas::CacheRegister do
       context "with sharding" do
         specs_require_sharding
 
-        before :each do
+        before do
           @users = []
           @users << User.create!
           @shard1.activate { @users << User.create! }
@@ -317,7 +317,7 @@ describe Canvas::CacheRegister do
 
     it "falls back to a regular fetch (appending the keys) if not using a redis cache store" do
       enable_cache(:memory_store) do
-        expect(Rails.cache).to receive(:fetch_with_cache_register).never
+        expect(Rails.cache).not_to receive(:fetch_with_cache_register)
         check_cache
       end
     end
@@ -361,7 +361,7 @@ describe Canvas::CacheRegister do
     specs_require_sharding
     specs_require_cache(:redis_cache_store)
 
-    before :each do
+    before do
       @user = @shard1.activate { User.create! }
       @base_key = User.base_cache_register_key_for(@user)
     end

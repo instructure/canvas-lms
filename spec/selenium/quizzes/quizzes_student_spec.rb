@@ -28,7 +28,7 @@ describe 'quizzes' do
     course_with_student(active_all: true)
   end
 
-  before(:each) do
+  before do
     user_session(@student)
   end
 
@@ -66,7 +66,7 @@ describe 'quizzes' do
             expect(f('#not_right_side .take_quiz_button').text).to eq text
           end
 
-          before(:each) do
+          before do
             @resume_text = 'Resume Quiz'
           end
 
@@ -108,7 +108,7 @@ describe 'quizzes' do
       context 'when logged out while taking a quiz' do
         it 'is notified and able to relogin', priority: "1", test_id: 209413 do
           # setup a quiz and start taking it
-          quiz_with_new_questions(!:goto_edit)
+          quiz_with_new_questions(goto_edit: false)
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
           expect_new_page_load { f('#take_quiz_link').click }
           sleep 1 # sleep because display is updated on timer, not ajax callback
@@ -150,7 +150,7 @@ describe 'quizzes' do
       (1..6).each do |var|
         qs.submission_data[
           "question_#{question.id}_#{AssessmentQuestion.variable_id("answer#{var}")}"
-        ] = ("this is my answer ##{var}")
+        ] = "this is my answer ##{var}"
       end
       response_array = qs.submission_data.values
       Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -187,7 +187,7 @@ describe 'quizzes' do
   end
 
   context "when 'show correct answers after last attempt setting' is on" do
-    before(:each) do
+    before do
       quiz_with_submission
       @quiz.update(:show_correct_answers => true,
                    :show_correct_answers_last_attempt => true, :allowed_attempts => 2)

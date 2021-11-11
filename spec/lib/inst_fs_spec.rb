@@ -26,6 +26,7 @@ describe InstFS do
     let(:secrets) { [secret, rotating_secret] }
     let(:encoded_secrets) { secrets.map { |sec| Base64.encode64(sec) }.join(" ") }
     let(:settings_hash) { { 'app-host' => app_host, 'secret' => encoded_secrets } }
+
     before do
       allow(InstFS).to receive(:enabled?).and_return(true)
       allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
@@ -60,7 +61,7 @@ describe InstFS do
     end
 
     context "authenticated_url" do
-      before :each do
+      before do
         @attachment = attachment_with_context(user_model)
         @attachment.instfs_uuid = 1
         @attachment.filename = "test.txt"
@@ -233,7 +234,7 @@ describe InstFS do
     end
 
     context "authenticated_thumbnail_url" do
-      before :each do
+      before do
         @attachment = attachment_with_context(user_model)
         @attachment.instfs_uuid = 1
         @attachment.filename = "test.txt"

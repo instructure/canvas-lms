@@ -29,7 +29,7 @@ export default function CourseListHeader({sort, order, onChangeSort, id, label, 
       <Button
         variant="link"
         onClick={preventDefault(() => onChangeSort(id))}
-        theme={{fontWeight: '700', mediumPadding: '0', mediumHeight: '1.5rem'}}
+        theme={{fontWeight: '700', mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
       >
         {label}
         {sort === id ? order === 'asc' ? <IconMiniArrowUpSolid /> : <IconMiniArrowDownSolid /> : ''}

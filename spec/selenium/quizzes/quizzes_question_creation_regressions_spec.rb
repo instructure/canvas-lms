@@ -28,12 +28,12 @@ describe 'quizzes question creation' do
     course_with_teacher(active_all: true)
   end
 
-  before(:each) do
+  before do
     user_session(@teacher)
   end
 
   context "edge cases" do
-    before(:each) do
+    before do
       @last_quiz = start_quiz_question
     end
 
@@ -150,14 +150,14 @@ describe 'quizzes question creation' do
 
       short_answer_field.call
       driver.switch_to.alert
-      yield (driver.switch_to.alert)
+      yield driver.switch_to.alert
       accept_alert
     end
   end
 
   context 'errors' do
     before :once do
-      quiz_with_new_questions(false)
+      quiz_with_new_questions(goto_edit: false)
     end
 
     it 'shows errors for graded quizzes', priority: "1", test_id: 197491 do

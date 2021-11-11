@@ -1040,7 +1040,7 @@ class ConversationsController < ApplicationController
     content += "<div>#{ERB::Util.h(t('conversation_context', "From a conversation with"))} "
     participant_list_cutoff = 2
     if audience_names.length <= participant_list_cutoff
-      content += "#{ERB::Util.h(audience_names.to_sentence)}"
+      content += ERB::Util.h(audience_names.to_sentence).to_s
     else
       others_string = t('other_recipients', {
                           :one => "and 1 other",

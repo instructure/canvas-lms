@@ -41,7 +41,7 @@ describe 'editing a quiz' do
       create_quiz_with_due_date
     end
 
-    before(:each) do
+    before do
       user_session(@teacher)
     end
 
@@ -164,7 +164,7 @@ describe 'editing a quiz' do
         quiz_with_submission
       end
 
-      before(:each) do
+      before do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
       end
 
@@ -180,7 +180,7 @@ describe 'editing a quiz' do
     end
 
     context 'when the quiz has a question with a custom name' do
-      before(:each) do
+      before do
         @custom_name = 'the hardest question ever'
         qd = { question_type: "text_only_question", id: 1, question_name: @custom_name }.with_indifferent_access
         @quiz.quiz_questions.create! question_data: qd

@@ -43,7 +43,7 @@ class Attachment < ActiveRecord::Base
   EXCLUDED_COPY_ATTRIBUTES = %w{id root_attachment_id uuid folder_id user_id
                                 filename namespace workflow_state root_account_id}
 
-  CLONING_ERROR_TYPE = 'attachment_clone_url'.freeze
+  CLONING_ERROR_TYPE = 'attachment_clone_url'
 
   include HasContentTags
   include ContextModuleItem
@@ -482,7 +482,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def extension
-    res = (self.filename || "").match(/(\.[^\.]*)\z/).to_s
+    res = (self.filename || "").match(/(\.[^.]*)\z/).to_s
     res = nil if res == ""
     if !res || res == ""
       res = File.mime_types[self.content_type].to_s rescue nil
@@ -537,11 +537,9 @@ class Attachment < ActiveRecord::Base
   end
 
   def root_account
-    begin
-      root_account_id && Account.find_cached(root_account_id)
-    rescue ::Canvas::AccountCacheError
-      nil
-    end
+    root_account_id && Account.find_cached(root_account_id)
+  rescue ::Canvas::AccountCacheError
+    nil
   end
 
   def namespace
@@ -588,7 +586,7 @@ class Attachment < ActiveRecord::Base
       self.workflow_state = nil
       self.file_state = 'available'
     end
-    self.md5 = (details[:etag] || "").gsub(/\"/, '')
+    self.md5 = (details[:etag] || "").gsub(/"/, '')
     self.content_type = details[:content_type]
     self.size = details[:content_length]
 
@@ -1021,34 +1019,30 @@ class Attachment < ActiveRecord::Base
     self.dynamic_thumbnail_sizes.include?(geometry)
   end
 
-  def self.truncate_filename(filename, len, &block)
+  def self.truncate_filename(filename, max_len, &block)
     block ||= lambda { |str, len| str[0...len] }
     ext_index = filename.rindex('.')
     if ext_index
-      ext = block.call(filename[ext_index..-1], (len / 2) + 1)
-      base = block.call(filename[0...ext_index], len - ext.length)
+      ext = block.call(filename[ext_index..], (max_len / 2) + 1)
+      base = block.call(filename[0...ext_index], max_len - ext.length)
       base + ext
     else
-      block.call(filename, len)
+      block.call(filename, max_len)
     end
   end
 
   def save_without_broadcasting
-    begin
-      @skip_broadcasts = true
-      save
-    ensure
-      @skip_broadcasts = false
-    end
+    @skip_broadcasts = true
+    save
+  ensure
+    @skip_broadcasts = false
   end
 
   def save_without_broadcasting!
-    begin
-      @skip_broadcasts = true
-      save!
-    ensure
-      @skip_broadcasts = false
-    end
+    @skip_broadcasts = true
+    save!
+  ensure
+    @skip_broadcasts = false
   end
 
   # called before save
@@ -1170,7 +1164,7 @@ class Attachment < ActiveRecord::Base
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/files/#{self.feed_code}"
       entry.links << Atom::Link.new(:rel => 'alternate',
                                     :href => "http://#{HostUrl.context_host(self.context)}/#{context_url_prefix}/files/#{self.id}")
-      entry.content = Atom::Content::Html.new("#{self.display_name}")
+      entry.content = Atom::Content::Html.new(self.display_name.to_s)
     end
   end
 
@@ -2008,62 +2002,60 @@ class Attachment < ActiveRecord::Base
   end
 
   def clone_url(url, duplicate_handling, check_quota, opts = {})
-    begin
-      Attachment.clone_url_as_attachment(url, :attachment => self)
+    Attachment.clone_url_as_attachment(url, :attachment => self)
 
-      if check_quota
-        self.save! # save to calculate attachment size, otherwise self.size is nil
-        if Attachment.over_quota?(opts[:quota_context] || self.context, self.size)
-          raise OverQuotaError, t(:over_quota, 'The downloaded file exceeds the quota.')
-        end
+    if check_quota
+      self.save! # save to calculate attachment size, otherwise self.size is nil
+      if Attachment.over_quota?(opts[:quota_context] || self.context, self.size)
+        raise OverQuotaError, t(:over_quota, 'The downloaded file exceeds the quota.')
       end
-
-      self.file_state = 'available'
-      self.save!
-
-      if opts[:progress]
-        # the UI only needs the id from here
-        opts[:progress].set_results({ id: self.id })
-      end
-
-      handle_duplicates(duplicate_handling || 'overwrite')
-      nil # the rescue returns true if the file failed and is retryable, nil if successful
-    rescue StandardError => e
-      failed_retryable = false
-      self.file_state = 'errored'
-      self.workflow_state = 'errored'
-      case e
-      when CanvasHttp::TooManyRedirectsError
-        failed_retryable = true
-        self.upload_error_message = t :upload_error_too_many_redirects, "Too many redirects for %{url}", url: url
-      when CanvasHttp::InvalidResponseCodeError
-        failed_retryable = true
-        self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code} for %{url}", :code => e.code, url: url
-        Canvas::Errors.capture(e, clone_url_error_info(e, url))
-      when CanvasHttp::RelativeUriError
-        self.upload_error_message = t :upload_error_relative_uri, "No host provided for the URL: %{url}", :url => url
-      when URI::Error, ArgumentError
-        # assigning all ArgumentError to InvalidUri may be incorrect
-        self.upload_error_message = t :upload_error_invalid_url, "Could not parse the URL: %{url}", :url => url
-      when Timeout::Error
-        failed_retryable = true
-        self.upload_error_message = t :upload_error_timeout, "The request timed out: %{url}", :url => url
-      when OverQuotaError
-        self.upload_error_message = t :upload_error_over_quota, "file size exceeds quota limits: %{bytes} bytes", :bytes => self.size
-      else
-        failed_retryable = true
-        self.upload_error_message = t :upload_error_unexpected, "An unknown error occurred downloading from %{url}", :url => url
-        Canvas::Errors.capture(e, clone_url_error_info(e, url))
-      end
-
-      if opts[:progress]
-        opts[:progress].message = self.upload_error_message
-        opts[:progress].fail!
-      end
-
-      self.save!
-      failed_retryable
     end
+
+    self.file_state = 'available'
+    self.save!
+
+    if opts[:progress]
+      # the UI only needs the id from here
+      opts[:progress].set_results({ id: self.id })
+    end
+
+    handle_duplicates(duplicate_handling || 'overwrite')
+    nil # the rescue returns true if the file failed and is retryable, nil if successful
+  rescue StandardError => e
+    failed_retryable = false
+    self.file_state = 'errored'
+    self.workflow_state = 'errored'
+    case e
+    when CanvasHttp::TooManyRedirectsError
+      failed_retryable = true
+      self.upload_error_message = t :upload_error_too_many_redirects, "Too many redirects for %{url}", url: url
+    when CanvasHttp::InvalidResponseCodeError
+      failed_retryable = true
+      self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code} for %{url}", :code => e.code, url: url
+      Canvas::Errors.capture(e, clone_url_error_info(e, url))
+    when CanvasHttp::RelativeUriError
+      self.upload_error_message = t :upload_error_relative_uri, "No host provided for the URL: %{url}", :url => url
+    when URI::Error, ArgumentError
+      # assigning all ArgumentError to InvalidUri may be incorrect
+      self.upload_error_message = t :upload_error_invalid_url, "Could not parse the URL: %{url}", :url => url
+    when Timeout::Error
+      failed_retryable = true
+      self.upload_error_message = t :upload_error_timeout, "The request timed out: %{url}", :url => url
+    when OverQuotaError
+      self.upload_error_message = t :upload_error_over_quota, "file size exceeds quota limits: %{bytes} bytes", :bytes => self.size
+    else
+      failed_retryable = true
+      self.upload_error_message = t :upload_error_unexpected, "An unknown error occurred downloading from %{url}", :url => url
+      Canvas::Errors.capture(e, clone_url_error_info(e, url))
+    end
+
+    if opts[:progress]
+      opts[:progress].message = self.upload_error_message
+      opts[:progress].fail!
+    end
+
+    self.save!
+    failed_retryable
   end
 
   def crocodoc_available?
@@ -2115,7 +2107,7 @@ class Attachment < ActiveRecord::Base
       elsif attachment.context.respond_to?(:submissions_folder)
         # if it's not in a submissions folder, or has previously been submitted, we need to make a copy
         attachment.copy_to_folder!(attachment.context.submissions_folder(assignment_context))
-      else
+      else # rubocop:disable Lint/DuplicateBranch
         attachment # in a weird context; leave it alone
       end
     end

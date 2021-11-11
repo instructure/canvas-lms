@@ -63,7 +63,7 @@ describe MediaObject do
       @a4 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       data = {
         :entries => [
-          { :entryId => "test2", :originalId => "#{@a1.id}" },
+          { :entryId => "test2", :originalId => @a1.id.to_s },
           { :entryId => "test3", :originalId => @a3.id },
           { :entryId => "test4", :originalId => "attachment_id=#{@a4.id}" }
         ],
@@ -84,13 +84,13 @@ describe MediaObject do
   describe ".ensure_media_object" do
     it "does not create if the media object exists already" do
       MediaObject.create!(:context => user_factory, :media_id => "test")
-      expect(MediaObject).to receive(:create!).never
+      expect(MediaObject).not_to receive(:create!)
       MediaObject.ensure_media_object("test", {})
     end
 
     it "does not create if the media id doesn't exist in kaltura" do
       expect(MediaObject).to receive(:media_id_exists?).with("test").and_return(false)
-      expect(MediaObject).to receive(:create!).never
+      expect(MediaObject).not_to receive(:create!)
       MediaObject.ensure_media_object("test", {})
       run_jobs
     end
@@ -137,7 +137,7 @@ describe MediaObject do
       mo = MediaObject.create!(:context => user_factory, :media_id => "test")
       mo.data = { extensions: { mp4: { id: "t-yyy" } } }
       expect(mo).to receive(:retrieve_details)
-      expect(mo).to receive(:delay).never
+      expect(mo).not_to receive(:delay)
       mo.retrieve_details_ensure_codecs(1)
     end
   end
@@ -225,7 +225,7 @@ describe MediaObject do
       )
     end
 
-    before :each do
+    before do
       mock_kaltura = double('CanvasKaltura::ClientV3')
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_kaltura)
       allow(mock_kaltura).to receive(:media_sources).and_return(
@@ -234,7 +234,7 @@ describe MediaObject do
       )
     end
 
-    before :each do
+    before do
       @mock_kaltura = double('CanvasKaltura::ClientV3')
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
       allow(@mock_kaltura).to receive(:startSession).and_return(nil)

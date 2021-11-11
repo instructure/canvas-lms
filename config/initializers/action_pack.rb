@@ -30,7 +30,7 @@ module TimeZoneFormImprovements
 
       unfriendly_zone = "".html_safe
       unfriendly_zone.safe_concat options_for_select([["#{selected} (#{zone.formatted_offset})", selected]], selected)
-      unfriendly_zone.safe_concat content_tag("option".freeze, '-------------', value: '', disabled: true)
+      unfriendly_zone.safe_concat content_tag("option", '-------------', value: '', disabled: true)
       unfriendly_zone.safe_concat "\n"
       unfriendly_zone.safe_concat result
       result = unfriendly_zone

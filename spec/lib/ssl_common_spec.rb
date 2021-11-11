@@ -41,7 +41,7 @@ describe SSLCommon do
   end
 
   it "works with no auth" do
-    expect_any_instance_of(Net::HTTP::Post).to receive(:basic_auth).never
+    expect_any_instance_of(Net::HTTP::Post).not_to receive(:basic_auth)
     expect_any_instance_of(Net::HTTP).to receive(:start)
     SSLCommon.post_data("http://localhost/endpoint",
                         "somedata", "application/x-jt-is-so-cool")

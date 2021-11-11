@@ -37,13 +37,13 @@ module Canvas
         }
       end
 
-      before(:each) do
+      before do
         skip("Must have a local redis available to run this spec") unless Canvas.redis_enabled?
         @slow_cache = SlowTestRedisCache.new(redis_conf_hash)
         @fast_cache = LocalRedisCache.new(redis_conf_hash)
       end
 
-      after(:each) do
+      after do
         @fast_cache.clear(force: true)
       end
 

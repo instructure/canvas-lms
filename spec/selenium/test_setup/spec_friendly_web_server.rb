@@ -37,12 +37,10 @@ class SpecFriendlyWebServer
       @server = Puma::Server.new(app, Puma::Events.stdio)
       @server.add_tcp_listener(bind_address, port)
       Thread.new do
-        begin
-          @server.run
-        rescue
-          $stderr.puts "Unexpected server error: #{$ERROR_INFO.message}"
-          exit! 1
-        end
+        @server.run
+      rescue
+        $stderr.puts "Unexpected server error: #{$ERROR_INFO.message}"
+        exit! 1
       end
     rescue Errno::EADDRINUSE, Errno::EACCES
       raise SeleniumDriverSetup::ServerStartupError, $ERROR_INFO.message

@@ -39,7 +39,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
   end
 
   context 'WYSIWYG generic as a teacher' do
-    before(:each) do
+    before do
       Setting.set('rce_auto_save_max_age_ms', 1.hour.to_i * 1_000)
       course_with_teacher_logged_in
       Account.default.enable_feature!(:rce_auto_save)
@@ -64,7 +64,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       assert(saved_content)
-      expect(JSON.parse(saved_content)['content']).to match(%r{<p>hello<\/p>}m)
+      expect(JSON.parse(saved_content)['content']).to match(%r{<p>hello</p>}m)
       driver.local_storage.clear
     end
 
@@ -79,7 +79,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       wait_for_rce
       saved_content = driver.local_storage[autosave_key]
       assert(saved_content)
-      expect(JSON.parse(saved_content)['content']).to match(%r{<p>hello<\/p>.*html text}m)
+      expect(JSON.parse(saved_content)['content']).to match(%r{<p>hello</p>.*html text}m)
       driver.local_storage.clear
     end
 
@@ -217,7 +217,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
     end
   end
   context 'WYSIWYG generic as an admin' do
-    before(:each) do
+    before do
       Setting.set('rce_auto_save_max_age_ms', 1.hour.to_i * 1_000)
       account_with_admin_logged_in
       Account.default.enable_feature!(:rce_auto_save)

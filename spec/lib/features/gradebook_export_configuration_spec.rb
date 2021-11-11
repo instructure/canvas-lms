@@ -22,12 +22,12 @@ require_relative '../../spec_helper'
 
 describe 'Gradebook Export User-level Feature Flags' do
   describe 'use_semi_colon_field_separators_in_gradebook_exports' do
-    before :each do
+    before do
       teacher_in_course
     end
 
     context 'when the autodetect_field_separators_for_gradebook_exports feature is disabled' do
-      before :each do
+      before do
         @teacher.disable_feature!(:autodetect_field_separators_for_gradebook_exports)
         @feature = @teacher.lookup_feature_flag(:use_semi_colon_field_separators_in_gradebook_exports)
         @transitions = Feature.transitions(
@@ -46,7 +46,7 @@ describe 'Gradebook Export User-level Feature Flags' do
     end
 
     context 'when the autodetect_field_separators_for_gradebook_exports feature is enabled' do
-      before :each do
+      before do
         @teacher.enable_feature!(:autodetect_field_separators_for_gradebook_exports)
         @feature = @teacher.lookup_feature_flag(:use_semi_colon_field_separators_in_gradebook_exports)
         @transitions = Feature.transitions(
@@ -70,12 +70,12 @@ describe 'Gradebook Export User-level Feature Flags' do
   end
 
   describe 'autodetect_field_separators_for_gradebook_exports' do
-    before :each do
+    before do
       teacher_in_course
     end
 
     context 'when the use_semi_colon_field_separators_in_gradebook_exports feature is disabled' do
-      before :each do
+      before do
         @teacher.disable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
         @feature = @teacher.lookup_feature_flag(:autodetect_field_separators_for_gradebook_exports)
         @transitions = Feature.transitions(
@@ -94,7 +94,7 @@ describe 'Gradebook Export User-level Feature Flags' do
     end
 
     context 'when the use_semi_colon_field_separators_in_gradebook_exports feature is enabled' do
-      before :each do
+      before do
         @teacher.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
         @feature = @teacher.lookup_feature_flag(:autodetect_field_separators_for_gradebook_exports)
         @transitions = Feature.transitions(

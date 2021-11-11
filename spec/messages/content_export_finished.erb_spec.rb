@@ -35,6 +35,7 @@ describe 'content_export_finished' do
 
     context ".email" do
       let(:path_type) { :email }
+
       it "renders the content export link" do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("/courses/#{@course.id}/content_exports")
@@ -43,6 +44,7 @@ describe 'content_export_finished' do
 
     context ".email.html" do
       let(:path_type) { :summary }
+
       it "renders the content export link" do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("/courses/#{@course.id}/content_exports")
@@ -59,6 +61,7 @@ describe 'content_export_finished' do
 
     context ".email" do
       let(:path_type) { :email }
+
       it 'renders the epub export link' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include('/epub_exports')
@@ -67,6 +70,7 @@ describe 'content_export_finished' do
 
     context ".summary" do
       let(:path_type) { :summary }
+
       it 'renders the epub export link' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include('/epub_exports')
@@ -83,6 +87,7 @@ describe 'content_export_finished' do
 
     context ".email" do
       let(:path_type) { :email }
+
       it 'renders the web zip export link' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("/courses/#{@course.id}/offline_web_exports")
@@ -91,6 +96,7 @@ describe 'content_export_finished' do
 
     context ".summary" do
       let(:path_type) { :summary }
+
       it 'renders the web zip export link' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("/courses/#{@course.id}/offline_web_exports")

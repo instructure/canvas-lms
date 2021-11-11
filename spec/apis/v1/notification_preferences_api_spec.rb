@@ -235,7 +235,7 @@ describe NotificationPreferencesController, type: :request do
       by_address
       # self is the only possible one
       @params.delete(:user_id)
-      json = api_call(:put, "#{@prefix}",
+      json = api_call(:put, @prefix.to_s,
                       @params.merge(action: 'update_all'),
                       'notification_preferences' => [{ 'notification' => 'new_announcement', 'frequency' => 'never' }, { 'notification' => 'course_started', 'frequency' => 'weekly' }])
 

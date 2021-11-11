@@ -110,7 +110,7 @@ module Qti
     def escape_unmatched_brackets(string)
       unmatched = false
       lcount = 0
-      string.scan(/[\<\>]/) do |s|
+      string.scan(/[<>]/) do |s|
         if s == ">"
           if lcount == 0
             unmatched = true
@@ -128,7 +128,7 @@ module Qti
         string = Nokogiri::HTML5.fragment(string).to_xml rescue string
       end
 
-      string.split(/(\<[^\<\>]*\>)/m).map do |sub|
+      string.split(/(<[^<>]*>)/m).map do |sub|
         if sub.strip.start_with?("<") && sub.strip.end_with?(">")
           sub
         else

@@ -28,13 +28,14 @@ describe "sub account shared rubric specs" do
   let(:rubric_url) { "/accounts/#{account.id}/rubrics" }
   let(:who_to_login) { 'admin' }
 
-  before(:each) do
+  before do
     course_with_admin_logged_in
   end
 
   it "deletes a rubric" do
     should_delete_a_rubric
   end
+
   it "edits a rubric" do
     should_edit_a_rubric
   end

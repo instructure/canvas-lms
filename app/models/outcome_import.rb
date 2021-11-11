@@ -103,31 +103,29 @@ class OutcomeImport < ApplicationRecord
 
   def run
     root_account.shard.activate do
-      begin
-        job_started!
-        I18n.locale = locale if locale.present?
-        file = self.attachment.open(need_local_file: true)
+      job_started!
+      I18n.locale = locale if locale.present?
+      file = self.attachment.open(need_local_file: true)
 
-        Outcomes::CSVImporter.new(self, file).run do |status|
-          status[:errors].each do |row, error|
-            add_error row, error
-          end
-          self.update!(progress: status[:progress])
+      Outcomes::CSVImporter.new(self, file).run do |status|
+        status[:errors].each do |row, error|
+          add_error row, error
         end
-
-        job_completed!
-      rescue Outcomes::Import::DataFormatError => e
-        add_error(1, e.message, true)
-        job_failed!
-      rescue => e
-        report = ErrorReport.log_exception('outcomes_import', e)
-        # no I18n on error report id
-        add_error(1, I18n.t('An unexpected error has occurred: see error report %{id}', id: report.id.to_s), true)
-        job_failed!
-      ensure
-        file.close
-        notify_user
+        self.update!(progress: status[:progress])
       end
+
+      job_completed!
+    rescue Outcomes::Import::DataFormatError => e
+      add_error(1, e.message, true)
+      job_failed!
+    rescue => e
+      report = ErrorReport.log_exception('outcomes_import', e)
+      # no I18n on error report id
+      add_error(1, I18n.t('An unexpected error has occurred: see error report %{id}', id: report.id.to_s), true)
+      job_failed!
+    ensure
+      file.close
+      notify_user
     end
   end
 

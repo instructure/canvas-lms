@@ -99,7 +99,7 @@ module Canvas::Migration::ExternalContent
       end
     end
 
-    NOT_FOUND = "$OBJECT_NOT_FOUND".freeze
+    NOT_FOUND = "$OBJECT_NOT_FOUND"
 
     def get_canvas_id_from_migration_id(obj_class, migration_id)
       return NOT_FOUND if migration_id == NOT_FOUND

@@ -194,6 +194,8 @@ class Course < ActiveRecord::Base
   has_many :content_migrations, :as => :context, :inverse_of => :context
   has_many :content_exports, :as => :context, :inverse_of => :context
   has_many :epub_exports, -> { where("type IS NULL").order("created_at DESC") }
+
+  has_many :gradebook_filters, inverse_of: :course, dependent: :destroy
   attr_accessor :latest_epub_export
 
   has_many :web_zip_exports, -> { where(type: "WebZipExport") }
@@ -313,7 +315,7 @@ class Course < ActiveRecord::Base
 
   # A hard limit on the number of graders (excluding the moderator) a moderated
   # assignment can have.
-  MODERATED_GRADING_GRADER_LIMIT = 10.freeze
+  MODERATED_GRADING_GRADER_LIMIT = 10
 
   def [](attr)
     attr.to_s == 'asset_string' ? self.asset_string : super
@@ -477,9 +479,8 @@ class Course < ActiveRecord::Base
     if self.banner_image_url.present? && self.banner_image_id.present?
       self.errors.add(:banner_image, t("banner_image_url and banner_image_id cannot both be set."))
       false
-    elsif self.banner_image_id.present? && valid_course_image_id?(self.banner_image_id)
-      true
-    elsif self.banner_image_url.present? && valid_course_image_url?(self.banner_image_url)
+    elsif (self.banner_image_id.present? && valid_course_image_id?(self.banner_image_id)) ||
+          (self.banner_image_url.present? && valid_course_image_url?(self.banner_image_url))
       true
     else
       if self.banner_image_id.present?
@@ -495,9 +496,8 @@ class Course < ActiveRecord::Base
     if self.image_url.present? && self.image_id.present?
       self.errors.add(:image, t("image_url and image_id cannot both be set."))
       false
-    elsif self.image_id.present? && valid_course_image_id?(self.image_id)
-      true
-    elsif self.image_url.present? && valid_course_image_url?(self.image_url)
+    elsif (self.image_id.present? && valid_course_image_id?(self.image_id)) ||
+          (self.image_url.present? && valid_course_image_url?(self.image_url))
       true
     else
       if self.image_id.present?
@@ -811,7 +811,7 @@ class Course < ActiveRecord::Base
     # args[0] should be user_id, args[1], if true, will include completed
     # enrollments as well as active enrollments
     user_id = args[0]
-    workflow_states = (args[1].present? ? %w{'active' 'completed'} : %w{'active'}).join(', ')
+    workflow_states = (args[1].present? ? ["'active'", "'completed'"] : ["'active'"]).join(', ')
     admin_completed_sql = ""
     enrollment_completed_sql = ""
 
@@ -965,7 +965,7 @@ class Course < ActiveRecord::Base
         return [] unless allowed_role_ids.any?
 
         allowed_user_ids = Set.new
-        role_user_ids.each { |role_id, user_id| allowed_user_ids << user_id if allowed_role_ids.include?(role_id) }
+        role_user_ids.each { |role_id, u_id| allowed_user_ids << u_id if allowed_role_ids.include?(role_id) }
         User.where(:id => allowed_user_ids).to_a
       else
         User.where(:id => instructor_enrollment_scope.select(:id)).to_a
@@ -1012,15 +1012,13 @@ class Course < ActiveRecord::Base
 
   def preload_user_roles!
     # plz to use before you make a billion calls to user_has_been_X? with different users
-    @user_ids_by_enroll_type ||= begin
-      self.shard.activate do
-        map = {}
-        self.enrollments.active.pluck(:user_id, :type).each do |user_id, type|
-          map[type] ||= []
-          map[type] << user_id
-        end
-        map
+    @user_ids_by_enroll_type ||= self.shard.activate do
+      map = {}
+      self.enrollments.active.pluck(:user_id, :type).each do |user_id, type|
+        map[type] ||= []
+        map[type] << user_id
       end
+      map
     end
   end
 
@@ -1476,6 +1474,7 @@ class Course < ActiveRecord::Base
   def destroy
     return false if template?
 
+    gradebook_filters.in_batches.destroy_all
     self.workflow_state = 'deleted'
     save!
   end
@@ -1983,7 +1982,7 @@ class Course < ActiveRecord::Base
     end
     overall_status = "error"
     overall_status = "unpublished" unless found_statuses.size > 0
-    overall_status = (%w{error unpublished pending publishing published unpublishable}).detect { |s| found_statuses.include?(s) } || overall_status
+    overall_status = %w{error unpublished pending publishing published unpublishable}.detect { |s| found_statuses.include?(s) } || overall_status
     return enrollments, overall_status
   end
 
@@ -2085,18 +2084,16 @@ class Course < ActiveRecord::Base
     timeout_options = { raise_on_timeout: true, fallback_timeout_length: default_timeout }
 
     posts_to_make.each do |enrollment_ids, res, mime_type, headers = {}|
-      begin
-        posted_enrollment_ids += enrollment_ids
-        if res
-          Canvas.timeout_protection("send_final_grades_to_endpoint:#{global_root_account_id}", timeout_options) do
-            SSLCommon.post_data(settings[:publish_endpoint], res, mime_type, headers)
-          end
+      posted_enrollment_ids += enrollment_ids
+      if res
+        Canvas.timeout_protection("send_final_grades_to_endpoint:#{global_root_account_id}", timeout_options) do
+          SSLCommon.post_data(settings[:publish_endpoint], res, mime_type, headers)
         end
-        Enrollment.where(:id => enrollment_ids).update_all(:grade_publishing_status => (should_kick_off_grade_publishing_timeout? ? "publishing" : "published"), :grade_publishing_message => nil)
-      rescue => e
-        errors << e
-        Enrollment.where(:id => enrollment_ids).update_all(:grade_publishing_status => "error", :grade_publishing_message => e.to_s)
       end
+      Enrollment.where(:id => enrollment_ids).update_all(:grade_publishing_status => (should_kick_off_grade_publishing_timeout? ? "publishing" : "published"), :grade_publishing_message => nil)
+    rescue => e
+      errors << e
+      Enrollment.where(:id => enrollment_ids).update_all(:grade_publishing_status => "error", :grade_publishing_message => e.to_s)
     end
 
     Enrollment.where(:id => (all_enrollment_ids.to_set - posted_enrollment_ids.to_set).to_a).update_all(:grade_publishing_status => "unpublishable", :grade_publishing_message => nil)
@@ -2404,13 +2401,11 @@ class Course < ActiveRecord::Base
   def readable_default_wiki_editing_roles
     roles = self.default_wiki_editing_roles || "teachers"
     case roles
-    when 'teachers'
-      t('wiki_permissions.only_teachers', 'Only Teachers')
     when 'teachers,students'
       t('wiki_permissions.teachers_students', 'Teacher and Students')
     when 'teachers,students,public'
       t('wiki_permissions.all', 'Anyone')
-    else
+    else # 'teachers'
       t('wiki_permissions.only_teachers', 'Only Teachers')
     end
   end

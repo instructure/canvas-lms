@@ -24,8 +24,8 @@ module Lti
       include Lti::ApiServiceHelper
       include Lti::IMS::AccessTokenHelper
 
-      TOOL_PROXY_COLLECTION = 'ToolProxy.collection'.freeze
-      TOOL_PROXY_ITEM = 'ToolProxy.item'.freeze
+      TOOL_PROXY_COLLECTION = 'ToolProxy.collection'
+      TOOL_PROXY_ITEM = 'ToolProxy.item'
 
       SERVICE_DEFINITIONS = [
         {

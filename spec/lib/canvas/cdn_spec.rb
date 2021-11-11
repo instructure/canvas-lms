@@ -19,11 +19,11 @@
 #
 
 describe Canvas::Cdn do
-  before :each do
+  before do
     @original_config = Canvas::Cdn.config.dup
   end
 
-  after :each do
+  after do
     Canvas::Cdn.config.replace(@original_config)
   end
 

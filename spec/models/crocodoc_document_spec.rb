@@ -25,7 +25,7 @@ describe 'CrocodocDocument' do
                           :settings => { :api_key => "blahblahblahblahblah" }
   end
 
-  before :each do
+  before do
     allow_any_instance_of(Crocodoc::API).to receive(:upload).and_return 'uuid' => '1234567890'
   end
 

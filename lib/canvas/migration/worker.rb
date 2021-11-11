@@ -81,14 +81,12 @@ module Canvas::Migration::Worker
   end
 
   def self.clear_exported_data(folder)
-    begin
-      config = ConfigFile.load('external_migration')
-      if !config || !config[:keep_after_complete]
-        FileUtils::rm_rf(folder) if File.exist?(folder)
-      end
-    rescue
-      Rails.logger.warn "Couldn't clear export data for content_migration #{content_migration.id}"
+    config = ConfigFile.load('external_migration')
+    if !config || !config[:keep_after_complete]
+      FileUtils::rm_rf(folder) if File.exist?(folder)
     end
+  rescue
+    Rails.logger.warn "Couldn't clear export data for content_migration #{content_migration.id}"
   end
 
   def self.download_attachment(cm, url)

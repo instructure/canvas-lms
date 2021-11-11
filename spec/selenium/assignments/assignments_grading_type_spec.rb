@@ -30,12 +30,12 @@ describe "assignments" do
     @course = course_with_teacher({ :user => @user, :active_course => true, :active_enrollment => true }).course
   end
 
-  before :each do
+  before do
     create_session(@pseudonym)
   end
 
   context 'with points' do
-    before :each do
+    before do
       @assignment = @course.assignments.create!(
         name: 'first test assignment',
         assignment_group: @course.assignment_groups.create!(name: 'default')
@@ -72,7 +72,7 @@ describe "assignments" do
   end
 
   context 'with assignment creation' do
-    before(:each) do
+    before do
       @assignment_title = 'grading options assignment'
       AssignmentCreateEditPage.visit_new_assignment_create_page @course.id
       AssignmentCreateEditPage.edit_assignment_name @assignment_title

@@ -216,11 +216,9 @@ class GradeSummaryAssignmentPresenter
   end
 
   def grade_distribution
-    @grade_distribution ||= begin
-      if (stats = @summary.assignment_stats[assignment.id])
-        [stats.maximum, stats.minimum, stats.mean].map { |stat| stat.to_f.round(2) }
-      end
-    end
+    @grade_distribution ||= if (stats = @summary.assignment_stats[assignment.id])
+                              [stats.maximum, stats.minimum, stats.mean].map { |stat| stat.to_f.round(2) }
+                            end
   end
 
   def graph

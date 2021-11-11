@@ -312,12 +312,12 @@ class SisApiController < ApplicationController
 
   GRADE_EXPORT_NOT_ENABLED_ERROR = {
     code: 'not_enabled',
-    error: 'A SIS integration is not configured and the bulk SIS Grade Export feature is not enabled'.freeze
+    error: 'A SIS integration is not configured and the bulk SIS Grade Export feature is not enabled'
   }.freeze
 
   COURSE_NOT_PUBLISHED_ERROR = {
     code: 'unpublished_course',
-    error: 'Grade data is not available for non-published courses'.freeze
+    error: 'Grade data is not available for non-published courses'
   }.freeze
 
   # @API Retrieve assignments enabled for grade export to SIS

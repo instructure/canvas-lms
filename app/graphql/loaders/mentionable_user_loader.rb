@@ -20,6 +20,7 @@
 
 class Loaders::MentionableUserLoader < GraphQL::Batch::Loader
   def initialize(current_user:, search_term: nil)
+    super()
     @curent_user = current_user
     @search_term = search_term
   end

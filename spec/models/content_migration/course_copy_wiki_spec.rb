@@ -21,7 +21,7 @@ require_relative 'course_copy_helper'
 
 describe ContentMigration do
   context "course copy wiki" do
-    include_examples "course copy"
+    include_context "course copy"
 
     it "copies wiki page attributes" do
       page = @copy_from.wiki_pages.create!(:title => "title", :body => "<address><ul></ul></address>",

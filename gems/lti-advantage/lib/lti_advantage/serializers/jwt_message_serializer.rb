@@ -19,10 +19,10 @@
 
 module LtiAdvantage::Serializers
   class JwtMessageSerializer
-    IMS_CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti/claim/'.freeze
-    DL_CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti-dl/claim/'.freeze
-    NRPS_CLAIM_URL = 'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice'.freeze
-    AGS_CLAIM_URL = 'https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'.freeze
+    IMS_CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti/claim/'
+    DL_CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti-dl/claim/'
+    NRPS_CLAIM_URL = 'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice'
+    AGS_CLAIM_URL = 'https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'
 
     STANDARD_IMS_CLAIMS = %w(
       context
@@ -46,8 +46,8 @@ module LtiAdvantage::Serializers
       content_items
     ).freeze
 
-    NAMES_AND_ROLES_SERVICE_CLAIM = 'names_and_roles_service'.freeze
-    ASSIGNMENT_AND_GRADE_SERVICE_CLAIM = 'assignment_and_grade_service'.freeze
+    NAMES_AND_ROLES_SERVICE_CLAIM = 'names_and_roles_service'
+    ASSIGNMENT_AND_GRADE_SERVICE_CLAIM = 'assignment_and_grade_service'
 
     def initialize(object)
       @object = object

@@ -26,7 +26,7 @@ describe GradebookUpload do
     let(:gradebook_course) { teacher_enrollment.course }
     let(:attachment_data) { { dummy: "data" } }
 
-    before(:each) do
+    before do
       # actual attachment integration covered in gradebook_uploads_controller_spec;
       # that means in the spec the dummy hash will be enqueued instead of a real attachment
       # object

@@ -86,6 +86,7 @@ module MicrosoftSync
 
   class StateMachineJobTestSteps2 < StateMachineJobTestStepsBase
     def initialize(step_initial_retries, step_second_delay_amounts = [1, 2, 3])
+      super()
       @step_initial_retries = step_initial_retries
       @step_second_delay_amounts = step_second_delay_amounts
     end
@@ -142,7 +143,7 @@ module MicrosoftSync
       "MicrosoftSync::StateMachineJobTest:MicrosoftSync::Group:#{state_record.global_id}"
     end
 
-    around(:each) { |example| Timecop.freeze { example.run } }
+    around { |example| Timecop.freeze { example.run } }
 
     describe '#run_synchronously' do
       it 'runs all the steps' do
@@ -536,7 +537,8 @@ module MicrosoftSync
         end
 
         context 'when the error is a GracefulCancelError' do
-          class GracefulCancelTestError < MicrosoftSync::Errors::GracefulCancelError
+          before do
+            stub_const("MicrosoftSync::GracefulCancelTestError", Class.new(MicrosoftSync::Errors::GracefulCancelError))
           end
 
           let(:error) { GracefulCancelTestError.new }

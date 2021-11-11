@@ -130,15 +130,13 @@ module Lti::IMS::Providers
     end
 
     def assignment
-      @_assignment ||= begin
-        return nil unless rlid?
+      return nil unless rlid?
 
-        Assignment.active.for_course(course.id)
-                  .joins(line_items: :resource_link)
-                  .where(lti_resource_links: { id: resource_link&.id })
-                  .distinct
-                  .take
-      end
+      @assignment ||= Assignment.active.for_course(course.id)
+                                .joins(line_items: :resource_link)
+                                .where(lti_resource_links: { id: resource_link&.id })
+                                .distinct
+                                .take
     end
 
     def assignment?

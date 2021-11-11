@@ -101,7 +101,7 @@ describe "/quizzes/quizzes/show" do
 
     doc = Nokogiri::HTML5(response)
     doc.css(".control-group .controls .value").each do |node|
-      expect(node.content).not_to include("#{points}") if node.parent.parent.content.include? "Points"
+      expect(node.content).not_to include(points.to_s) if node.parent.parent.content.include? "Points"
     end
   end
 

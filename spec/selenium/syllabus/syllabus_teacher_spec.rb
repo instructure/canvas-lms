@@ -37,7 +37,7 @@ describe "course syllabus" do
       @assignment1 = @course1.assignments.create!(:title => 'Assignment First', :points_possible => 10)
     end
 
-    before :each do
+    before do
       user_session @teacher1
     end
 
@@ -105,7 +105,7 @@ describe "course syllabus" do
   end
 
   context 'mini calendar' do
-    before :each do
+    before do
       course_with_teacher_logged_in(active_all: true)
     end
 

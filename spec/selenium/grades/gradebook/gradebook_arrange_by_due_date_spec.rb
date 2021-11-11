@@ -31,7 +31,7 @@ describe "Gradebook - arrange by due date" do
     @assignment = @course.assignments.first
   end
 
-  before(:each) do
+  before do
     user_session(@teacher)
     Gradebook.visit(@course)
   end

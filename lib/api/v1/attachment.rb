@@ -73,9 +73,8 @@ module Api::V1::Attachment
 
     # this seems like a stupid amount of branching but it avoids expensive
     # permission checks
-    hidden_for_user = if skip_permission_checks
-                        false
-                      elsif !attachment.hidden?
+    hidden_for_user = if skip_permission_checks ||
+                         !attachment.hidden?
                         false
                       elsif options.has_key?(:can_view_hidden_files)
                         options[:can_view_hidden_files]

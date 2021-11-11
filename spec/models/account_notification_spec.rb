@@ -351,7 +351,7 @@ describe AccountNotification do
     end
 
     describe "dexclude students for surveys?" do
-      before(:each) do
+      before do
         flag = AccountNotification::ACCOUNT_SERVICE_NOTIFICATION_FLAGS.first
         @survey = account_notification(:required_account_service => flag, :account => Account.site_admin)
         @a1 = account_model
@@ -509,7 +509,7 @@ describe AccountNotification do
     context "broadcast_messages" do
       it "performs a sanity-check before" do
         an = account_notification(:account => Account.default)
-        expect(an).to receive(:applicable_user_ids).never
+        expect(an).not_to receive(:applicable_user_ids)
         an.broadcast_messages # send_message? not set
 
         an.send_message = true

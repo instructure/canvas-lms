@@ -24,7 +24,7 @@ module Lti
     class PlagiarismSubscriptionError < StandardError
     end
 
-    SUBMISSION_EVENT_ID = 'vnd.Canvas.SubmissionEvent'.freeze
+    SUBMISSION_EVENT_ID = 'vnd.Canvas.SubmissionEvent'
     EVENT_TYPES = %w(submission_created
                      plagiarism_resubmit
                      submission_updated
@@ -82,9 +82,7 @@ module Lti
     end
 
     def submission_event_service
-      @_submission_event_service ||= begin
-        tool_proxy.find_service(SUBMISSION_EVENT_ID, 'POST')
-      end
+      @_submission_event_service ||= tool_proxy.find_service(SUBMISSION_EVENT_ID, 'POST')
     end
 
     def format

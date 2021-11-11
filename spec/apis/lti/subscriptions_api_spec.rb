@@ -51,13 +51,13 @@ module Lti
       }
     end
 
-    before(:each) { allow(subscription_service).to receive_messages(available?: true) }
+    before { allow(subscription_service).to receive_messages(available?: true) }
 
     describe '#create' do
       let(:test_subscription) { { 'RootAccountId' => '1', 'foo' => 'bar' } }
       let(:stub_response) { double(code: 200, body: test_subscription.to_json) }
 
-      before(:each) do
+      before do
         allow(subscription_service).to receive_messages(create_tool_proxy_subscription: stub_response)
       end
 
@@ -119,7 +119,7 @@ module Lti
     end
 
     describe '#destroy' do
-      before(:each) do
+      before do
         allow(subscription_service).to receive_messages(destroy_tool_proxy_subscription: delete_response)
         tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
         tool_proxy.save!
@@ -158,7 +158,7 @@ module Lti
     end
 
     describe '#show' do
-      before(:each) do
+      before do
         tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
         tool_proxy.save!
       end
@@ -196,7 +196,7 @@ module Lti
     end
 
     describe '#update' do
-      before(:each) do
+      before do
         allow(subscription_service).to receive_messages(update_tool_proxy_subscription: ok_response)
         tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
         tool_proxy.save!
@@ -262,7 +262,7 @@ module Lti
     end
 
     describe '#index' do
-      before(:each) do
+      before do
         tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
         tool_proxy.save!
       end

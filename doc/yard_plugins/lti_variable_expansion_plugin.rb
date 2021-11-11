@@ -39,7 +39,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
     example = example_tags.count > 0 && example_tags.first
 
     example_text = ''
-    example_text = "#{example.text}" if example
+    example_text = example.text.to_s if example
 
     # launch_param_tags = object.tags(:launch_parameter)
     # launch_param = launch_param_tags.count > 0 && launch_param_tags.first

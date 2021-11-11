@@ -273,11 +273,9 @@ module CustomSeleniumActions
   end
 
   def dialog_for(node)
-    begin
-      node.find_element(:xpath, "ancestor-or-self::div[contains(@class, 'ui-dialog')]")
-    rescue StandardError
-      false
-    end
+    node.find_element(:xpath, "ancestor-or-self::div[contains(@class, 'ui-dialog')]")
+  rescue StandardError
+    false
   end
 
   # for when you have something like a textarea's value and you want to match it's contents
@@ -670,7 +668,7 @@ module CustomSeleniumActions
   end
 
   def scroll_to(element)
-    element_location = "#{element.location['y']}"
+    element_location = element.location['y'].to_s
     driver.execute_script('window.scrollTo(0, ' + element_location + ');')
   end
 

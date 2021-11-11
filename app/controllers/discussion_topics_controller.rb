@@ -539,9 +539,9 @@ class DiscussionTopicsController < ApplicationController
 
     if @topic.assignment.present?
       hash[:ATTRIBUTES][:assignment][:assignment_overrides] =
-        (assignment_overrides_json(
+        assignment_overrides_json(
           @topic.assignment.overrides_for(@current_user, ensure_set_not_empty: true)
-        ))
+        )
       hash[:ATTRIBUTES][:assignment][:has_student_submissions] = @topic.assignment.has_student_submissions?
     end
 
@@ -701,6 +701,7 @@ class DiscussionTopicsController < ApplicationController
                isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                student_reporting_enabled: Account.site_admin.feature_enabled?(:discussions_reporting),
+               inline_grading_enabled: Account.site_admin.feature_enabled?(:discussions_inline_grading),
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
                # GRADED_RUBRICS_URL must be within DISCUSSION to avoid page error
                DISCUSSION: {
@@ -961,7 +962,7 @@ class DiscussionTopicsController < ApplicationController
   #         -H 'Authorization: Bearer <token>'
   #
   def create
-    process_discussion_topic(!!:is_new)
+    process_discussion_topic(is_new: true)
   end
 
   # @API Update a topic
@@ -1046,7 +1047,7 @@ class DiscussionTopicsController < ApplicationController
   #         -H 'Authorization: Bearer <token>'
   #
   def update
-    process_discussion_topic(!:is_new)
+    process_discussion_topic(is_new: false)
   end
 
   # @API Delete a topic
@@ -1083,8 +1084,8 @@ class DiscussionTopicsController < ApplicationController
       f.id = polymorphic_url([@context, :discussion_topics])
     end
     @entries = []
-    @entries.concat @context.discussion_topics
-                            .select { |dt| dt.visible_for?(@current_user) }
+    @entries.concat(@context.discussion_topics
+                            .select { |dt| dt.visible_for?(@current_user) })
     @entries.concat @context.discussion_entries.active
     @entries = @entries.sort_by { |e| e.updated_at }
     @entries.each do |entry|
@@ -1187,13 +1188,13 @@ class DiscussionTopicsController < ApplicationController
     end
   end
 
-  def process_discussion_topic(is_new = false)
+  def process_discussion_topic(is_new:)
     ActiveRecord::Base.transaction do
-      process_discussion_topic_runner(is_new)
+      process_discussion_topic_runner(is_new: is_new)
     end
   end
 
-  def process_discussion_topic_runner(is_new = false)
+  def process_discussion_topic_runner(is_new:)
     @errors = {}
 
     model_type = if value_to_boolean(params[:is_announcement]) &&
@@ -1394,7 +1395,7 @@ class DiscussionTopicsController < ApplicationController
   def process_lock_parameters(discussion_topic_hash)
     # Handle locking/unlocking (overrides workflow state if provided). It appears that the locked param as a hash
     # is from old code and is not being used. Verification requested.
-    if !(@topic.lock_at_changed?)
+    if !@topic.lock_at_changed?
       if params.has_key?(:locked) && !params[:locked].is_a?(Hash)
         should_lock = value_to_boolean(params[:locked])
         if should_lock != @topic.locked?

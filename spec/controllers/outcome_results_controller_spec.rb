@@ -291,7 +291,7 @@ describe OutcomeResultsController do
       create_result(@student2.id, @outcome, outcome_assignment, 1)
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 

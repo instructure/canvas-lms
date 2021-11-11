@@ -132,11 +132,13 @@ class WikiPage < ActiveRecord::Base
     if self.context.wiki_pages.not_deleted.where(title: self.title).where.not(:id => self.id).first
       real_title = self.title.gsub(/-(\d*)\z/, '') # remove any "-#" at the end
       n = $1 ? $1.to_i + 1 : 2
-      begin
+      new_title = nil
+      loop do
         mod = "-#{n}"
         new_title = real_title[0...(TITLE_LENGTH - mod.length)] + mod
         n = n.succ
-      end while self.context.wiki_pages.not_deleted.where(title: new_title).where.not(:id => self.id).exists?
+        break unless context.wiki_pages.not_deleted.where(title: new_title).where.not(id: id).exists?
+      end
 
       self.title = new_title
     end
@@ -152,7 +154,7 @@ class WikiPage < ActiveRecord::Base
     url_attribute = self.class.url_attribute
     base_url = self.send(url_attribute)
     base_url = self.send(self.class.attribute_to_urlify).to_s.to_url if base_url.blank? || !self.only_when_blank
-    conditions = [wildcard("#{url_attribute}", base_url, :type => :right)]
+    conditions = [wildcard(url_attribute.to_s, base_url, :type => :right)]
     unless new_record?
       conditions.first << " and id != ?"
       conditions << id
@@ -348,9 +350,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def default_roles
-    if context.is_a?(Group)
-      'members'
-    elsif context.is_a?(Course)
+    if context.is_a?(Course)
       'teachers'
     else
       'members'
@@ -437,8 +437,8 @@ class WikiPage < ActiveRecord::Base
     # in the yaml.  This doctors the yaml back, and can be removed
     # when the "content_imports" exception type for psych syntax errors
     # isn't happening anymore.
-    pattern_1 = /(\<a[^<>]*?id=.*?"media_comment.*?\/\>)/im
-    pattern_2 = /(\<a[^<>]*?id=.*?"media_comment.*?\<\/a\>)/
+    pattern_1 = /(<a[^<>]*?id=.*?"media_comment.*?\/>)/im
+    pattern_2 = /(<a[^<>]*?id=.*?"media_comment.*?<\/a>)/
     replacements = []
     [pattern_1, pattern_2].each do |regex_pattern|
       yaml_string.scan(regex_pattern).each do |matched_groups|

@@ -34,7 +34,7 @@ module Turnitin
     describe '#process' do
       let(:filename) { 'my_sample_file' }
 
-      before(:each) do
+      before do
         original_submission_response = double('original_submission_mock')
         allow(original_submission_response).to receive(:headers).and_return(
           { 'content-disposition' => "attachment; filename=#{filename}", 'content-type' => 'plain/text' }
@@ -120,7 +120,7 @@ module Turnitin
       end
 
       context 'when it is the last attempt' do
-        before(:each) do
+        before do
           response_response = double('response_mock')
           allow(response_response).to receive(:body).and_return(tii_response)
           allow_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:response).and_return(response_response)

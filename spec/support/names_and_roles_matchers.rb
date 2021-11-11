@@ -31,7 +31,8 @@ module Lti::IMS::NamesAndRolesMatchers
         e.enrollments.each do |ee|
           lti_roles += map_course_enrollment_role(ee)
         end
-      else lti_roles += map_course_enrollment_role(e)
+      else
+        lti_roles += map_course_enrollment_role(e)
       end
     end
     lti_roles.uniq

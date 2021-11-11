@@ -25,7 +25,7 @@ describe "courses" do
   include CoursesHomePage
 
   context "as a teacher" do
-    before(:each) do
+    before do
       account = Account.default
       account.settings = { :open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true }
       account.save!
@@ -34,7 +34,7 @@ describe "courses" do
     end
 
     context 'in draft state' do
-      before(:each) do
+      before do
         course_with_student_submissions
         @course.default_view = 'feed'
         @course.save
@@ -64,7 +64,7 @@ describe "courses" do
   end
 
   context "as a student" do
-    before(:each) do
+    before do
       course_with_teacher(:active_all => true, :name => 'discussion course')
       @student = User.create!(:name => "First Student")
       @course.enroll_student(@student)

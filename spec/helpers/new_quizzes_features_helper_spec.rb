@@ -126,7 +126,7 @@ describe NewQuizzesFeaturesHelper do
   end
 
   describe "#new_quizzes_navigation_placements_enabled" do
-    before(:each) do
+    before do
       allow(@context).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
       Account.site_admin.enable_feature!(:new_quizzes_account_course_level_item_banks)
     end

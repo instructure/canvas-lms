@@ -164,14 +164,12 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
 
   def publish_submission_comments!
     submission_comments.select(&:provisional_grade_id).each do |provisional_comment|
-      begin
-        comment = provisional_comment.dup
-        comment.grade_posting_in_progress = true
-        comment.provisional_grade_id = nil
-        comment.save!
-      ensure
-        comment.grade_posting_in_progress = false
-      end
+      comment = provisional_comment.dup
+      comment.grade_posting_in_progress = true
+      comment.provisional_grade_id = nil
+      comment.save!
+    ensure
+      comment.grade_posting_in_progress = false
     end
   end
 

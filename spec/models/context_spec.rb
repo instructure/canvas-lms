@@ -76,17 +76,20 @@ describe Context do
       assignment_model
       expect(@course.find_asset(@assignment.asset_string)).to eql(@assignment)
     end
+
     it "finds a valid wiki page" do
       course_model
       page = @course.wiki_pages.create!(:title => 'test')
       expect(@course.find_asset(page.asset_string)).to eql(page)
       expect(@course.find_asset(page.asset_string, [:wiki_page])).to eql(page)
     end
+
     it "does not find a valid wiki page if told to ignore wiki pages" do
       course_model
       page = @course.wiki_pages.create!(:title => 'test')
       expect(@course.find_asset(page.asset_string, [:assignment])).to be nil
     end
+
     it "does not find an invalid assignment" do
       assignment_model
       @course2 = Course.create!
@@ -170,7 +173,7 @@ describe Context do
       at = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       data = {
         :entries => [
-          { :entryId => "test", :originalId => "#{at.id}" }
+          { :entryId => "test", :originalId => at.id.to_s }
         ]
       }
       mo = MediaObject.create!(:context => @course, :media_id => "test")
@@ -411,7 +414,7 @@ describe Context do
 
   describe "resolved_root_account_id" do
     it 'calls root_account_id if present' do
-      class HasRootAccountId
+      klass = Class.new do
         include Context
 
         def root_account_id
@@ -419,15 +422,13 @@ describe Context do
         end
       end
 
-      expect(HasRootAccountId.new.resolved_root_account_id).to eq 99
+      expect(klass.new.resolved_root_account_id).to eq 99
     end
 
     it 'returns nil if root_account_id not present' do
-      class DoesntHaveRootAccountId
-        include Context
-      end
+      klass = Class.new { include Context }
 
-      expect(DoesntHaveRootAccountId.new.resolved_root_account_id).to eq nil
+      expect(klass.new.resolved_root_account_id).to eq nil
     end
   end
 end

@@ -21,21 +21,18 @@
 module Api::V1::Account
   include Api::V1::Json
 
-  @@extensions = []
+  class << self
+    def extensions
+      @extensions ||= []
+    end
+  end
 
   # In order to register a module/class as an extension,
   # it must have a class method called 'extend_account_json',
   # which should act similarly to the account_json method, but include a parameter 'hash'
   # which will have the current account json (to which the method is expected to change and return)
   def self.register_extension(extension)
-    if (result = extension.respond_to?(:extend_account_json))
-      @@extensions << extension
-    end
-    result
-  end
-
-  def self.deregister_extension(extension)
-    @@extensions.delete(extension)
+    Api::V1::Account.extensions << extension
   end
 
   def account_json(account, user, session, includes, read_only = false)
@@ -72,7 +69,7 @@ module Api::V1::Account
         hash['services'] = Hash[Account.services_exposed_to_ui_hash(nil, user, account).keys.map { |k| [k, account.service_enabled?(k)] }]
       end
 
-      @@extensions.each do |extension|
+      Api::V1::Account.extensions.each do |extension|
         hash = extension.extend_account_json(hash, account, user, session, includes)
       end
     end

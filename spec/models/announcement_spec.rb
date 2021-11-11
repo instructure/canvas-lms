@@ -34,7 +34,7 @@ describe Announcement do
       @course.save!
 
       # should not trigger an update callback by re-saving inside a before_save
-      expect_any_instance_of(Announcement).to receive(:clear_streams_if_not_published).never
+      expect_any_instance_of(Announcement).not_to receive(:clear_streams_if_not_published)
       announcement = @course.announcements.create!(valid_announcement_attributes)
 
       expect(announcement).to be_locked

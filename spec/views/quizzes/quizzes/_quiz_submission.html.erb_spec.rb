@@ -22,13 +22,13 @@ require_relative '../../../spec_helper'
 require_relative '../../views_helper'
 
 describe "/quizzes/quizzes/_quiz_submission" do
-  before(:each) do
+  before do
     course_with_student
     view_context
   end
 
   context "quiz results are visible to the student" do
-    before(:each) do
+    before do
       quiz = @course.quizzes.create!
       submission = quiz.generate_submission(@user)
       assign(:quiz, quiz)

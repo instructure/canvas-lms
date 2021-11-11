@@ -101,7 +101,7 @@ module Importers
       if item['type'] == 'submodule'
         sub_items = []
         sub_items << { :type => 'heading', :title => item['title'], :indent => indent, :migration_id => item['migration_id'] }.with_indifferent_access
-        sub_items += (item['items'] || []).map { |item| self.flatten_item(item, indent + 1) }
+        sub_items += (item['items'] || []).map { |i| self.flatten_item(i, indent + 1) }
         sub_items
       else
         item[:indent] = (item[:indent] || 0) + indent
@@ -162,17 +162,15 @@ module Importers
       item_map = {}
       item.item_migration_position ||= (item.content_tags.not_deleted.pluck(:position).compact + [item.content_tags.not_deleted.count]).max
       items = hash[:items] || []
-      items = items.map { |item| self.flatten_item(item, 0) }.flatten
+      items = items.map { |i| self.flatten_item(i, 0) }.flatten
 
       imported_migration_ids = []
 
       items.each do |tag_hash|
-        begin
-          tags = self.add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
-          imported_migration_ids.concat tags.map(&:migration_id)
-        rescue
-          migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!)
-        end
+        tags = self.add_module_item_from_migration(item, tag_hash, 0, context, item_map, migration)
+        imported_migration_ids.concat tags.map(&:migration_id)
+      rescue
+        migration.add_import_warning(t(:migration_module_item_type, "Module Item"), tag_hash[:title], $!)
       end
 
       item.content_tags.where.not(:migration_id => nil)
@@ -381,7 +379,7 @@ module Importers
       return nil unless (uri = URI.parse(original_url))
 
       custom_fields_query = custom_fields.map { |k, v| "custom_#{CGI.escape(k)}=#{CGI.escape(v)}" }.join("&")
-      uri.query = uri.query.present? ? ([uri.query, custom_fields_query].join("&")) : custom_fields_query
+      uri.query = uri.query.present? ? [uri.query, custom_fields_query].join("&") : custom_fields_query
       new_url = uri.to_s
 
       if new_url.length < MAX_URL_LENGTH

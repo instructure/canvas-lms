@@ -499,13 +499,13 @@ describe CourseSection, "moving to new course" do
     end
 
     it "does not invalidate unless something date-related changes" do
-      expect(EnrollmentState).to receive(:update_enrollment).never
+      expect(EnrollmentState).not_to receive(:update_enrollment)
       @section.name = "durp"
       @section.save!
     end
 
     it "does not invalidate if dates change if it isn't restricted to dates yet" do
-      expect(EnrollmentState).to receive(:update_enrollment).never
+      expect(EnrollmentState).not_to receive(:update_enrollment)
       @section.start_at = 1.day.from_now
       @section.save!
     end

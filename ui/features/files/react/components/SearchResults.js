@@ -24,13 +24,16 @@ import SearchResults from '../legacy/components/SearchResults'
 import NoResults from './NoResults'
 import ColumnHeaders from './ColumnHeaders'
 import Folder from '@canvas/files/backbone/models/Folder'
+import File from '@canvas/files/backbone/models/File.coffee'
 import FolderChild from './FolderChild'
 import LoadingIndicator from './LoadingIndicator'
 import FilePreview from '@canvas/files/react/components/FilePreview'
 import page from 'page'
 import FocusStore from '../legacy/modules/FocusStore'
+import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
+import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 
-SearchResults.displayErrors = function(errors) {
+SearchResults.displayErrors = function (errors) {
   let error_message = null
 
   if (errors != null) {
@@ -53,12 +56,12 @@ SearchResults.displayErrors = function(errors) {
   )
 }
 
-SearchResults.closeFilePreview = function(url) {
+SearchResults.closeFilePreview = function (url) {
   page(url)
   FocusStore.setFocusToItem()
 }
 
-SearchResults.renderFilePreview = function() {
+SearchResults.renderFilePreview = function () {
   if (this.props.query.preview != null && this.state.collection.length) {
     return (
       /*
@@ -78,61 +81,98 @@ SearchResults.renderFilePreview = function() {
   }
 }
 
-SearchResults.render = function() {
+SearchResults.render = function () {
   if (this.state.errors) {
     return this.displayErrors(this.state.errors)
   } else if (this.state.collection.loadedAll && this.state.collection.length == 0) {
     return <NoResults search_term={this.props.query.search_term} />
   } else {
     return (
-      <div role="grid">
-        <div
-          ref="accessibilityMessage"
-          className="SearchResults__accessbilityMessage col-xs"
-          tabIndex="0"
-        >
-          {I18n.t(
-            'Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.'
-          )}
-        </div>
-        <ColumnHeaders
-          to="search"
-          query={this.props.query}
-          params={this.props.params}
-          pathname={this.props.pathname}
-          toggleAllSelected={this.props.toggleAllSelected}
-          areAllItemsSelected={this.props.areAllItemsSelected}
-          usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
-        />
-        {this.state.collection.models
-          .sort(
-            Folder.prototype.childrenSorter.bind(
-              this.state.collection,
-              this.props.query.sort,
-              this.props.query.order
+      <>
+        <div role="grid">
+          <div
+            // eslint-disable-next-line react/no-string-refs
+            ref="accessibilityMessage"
+            className="SearchResults__accessbilityMessage col-xs"
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+            tabIndex="0"
+          >
+            {I18n.t(
+              'Warning: For improved accessibility in moving files, please use the Move To Dialog option found in the menu.'
+            )}
+          </div>
+          <ColumnHeaders
+            to="search"
+            query={this.props.query}
+            params={this.props.params}
+            pathname={this.props.pathname}
+            toggleAllSelected={this.props.toggleAllSelected}
+            areAllItemsSelected={this.props.areAllItemsSelected}
+            usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
+          />
+          {this.state.collection.models
+            .sort(
+              Folder.prototype.childrenSorter.bind(
+                this.state.collection,
+                this.props.query.sort,
+                this.props.query.order
+              )
             )
-          )
-          .map(child => (
-            <FolderChild
-              key={child.cid}
-              model={child}
-              isSelected={_.indexOf(this.props.selectedItems, child) >= 0}
-              toggleSelected={this.props.toggleItemSelected.bind(null, child)}
-              userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
-              usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
-              externalToolsForContext={this.props.externalToolsForContext}
-              previewItem={this.props.previewItem.bind(null, child)}
-              dndOptions={this.props.dndOptions}
-              modalOptions={this.props.modalOptions}
-              clearSelectedItems={this.props.clearSelectedItems}
-              onMove={this.props.onMove}
-            />
-          ))}
+            .map(child => (
+              <FolderChild
+                key={child.cid}
+                model={child}
+                isSelected={_.indexOf(this.props.selectedItems, child) >= 0}
+                toggleSelected={this.props.toggleItemSelected.bind(null, child)}
+                userCanEditFilesForContext={this.props.userCanEditFilesForContext}
+                userCanDeleteFilesForContext={this.props.userCanDeleteFilesForContext}
+                userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
+                usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
+                externalToolsForContext={this.props.externalToolsForContext}
+                previewItem={this.props.previewItem.bind(null, child)}
+                dndOptions={this.props.dndOptions}
+                modalOptions={this.props.modalOptions}
+                clearSelectedItems={this.props.clearSelectedItems}
+                onMove={this.props.onMove}
+                onCopyToClick={child => {
+                  if (child instanceof File) {
+                    this.setState({copyFileId: child.id})
+                  }
+                }}
+                onSendToClick={child => {
+                  if (child instanceof File) {
+                    this.setState({sendFileId: child.id})
+                  }
+                }}
+              />
+            ))}
 
-        <LoadingIndicator isLoading={!this.state.collection.loadedAll} />
+          <LoadingIndicator isLoading={!this.state.collection.loadedAll} />
 
-        {this.renderFilePreview()}
-      </div>
+          {this.renderFilePreview()}
+        </div>
+        {this.state.sendFileId && (
+          <DirectShareUserModal
+            contentShare={{content_id: this.state.sendFileId, content_type: 'attachment'}}
+            courseId={ENV.COURSE_ID}
+            onDismiss={() => {
+              this.setState({sendFileId: null})
+            }}
+            open={!!this.state.sendFileId}
+          />
+        )}
+
+        {this.state.copyFileId && (
+          <DirectShareCourseTray
+            contentSelection={{attachments: [this.state.copyFileId]}}
+            onDismiss={() => {
+              this.setState({copyFileId: null})
+            }}
+            open={!!this.state.copyFileId}
+            sourceCourseId={ENV.COURSE_ID}
+          />
+        )}
+      </>
     )
   }
 }

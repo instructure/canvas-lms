@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import actions from 'ui/features/developer_keys_v2/react/actions/developerKeysActions'
-import store from 'ui/features/developer_keys_v2/react/store/store'
+import storeCreator from 'ui/features/developer_keys_v2/react/store/store'
 import axios from '@canvas/axios'
+
+const store = storeCreator()
 
 QUnit.module('Developer key actions')
 

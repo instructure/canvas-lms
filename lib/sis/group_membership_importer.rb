@@ -28,8 +28,6 @@ module SIS
       importer.success_count
     end
 
-    private
-
     class Work
       attr_accessor :success_count, :roll_back_data
 

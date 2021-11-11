@@ -34,11 +34,9 @@ module SIS
       def process(csv, index = nil, count = nil)
         count = SIS::ChangeSisIdImporter.new(@root_account, importer_opts).process do |i|
           csv_rows(csv, index, count) do |row|
-            begin
-              i.process_change_sis_id(create_change_data(row))
-            rescue ImportError => e
-              SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
-            end
+            i.process_change_sis_id(create_change_data(row))
+          rescue ImportError => e
+            SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
           end
         end
         count

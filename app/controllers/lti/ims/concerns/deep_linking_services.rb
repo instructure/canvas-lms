@@ -21,7 +21,7 @@ module Lti::IMS::Concerns
   module DeepLinkingServices
     extend ActiveSupport::Concern
 
-    CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti-dl/claim/'.freeze
+    CLAIM_PREFIX = 'https://purl.imsglobal.org/spec/lti-dl/claim/'
 
     def validate_jwt
       render_error(deep_linking_jwt.errors) and return unless deep_linking_jwt.valid?
@@ -92,7 +92,7 @@ module Lti::IMS::Concerns
           end
           standard_claim_errors(jwt_hash)
           developer_key_errors
-          return if @errors.present?
+          return if @errors.present? # rubocop:disable Lint/NoReturnInBeginEndBlocks
 
           jwt_hash
         rescue JSON::JWT::InvalidFormat

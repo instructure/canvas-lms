@@ -4846,6 +4846,13 @@ QUnit.module('SpeedGrader', rootHooks => {
           })
           strictEqual(getPostGradesMenuItem().textContent, 'Post Grades')
         })
+
+        test('includes previous versioned_attachments in submission_history', () => {
+          const versionedAttachments = [...alphaSubmission.versioned_attachments]
+          delete alphaSubmission.versioned_attachments
+          const {submission} = SpeedGrader.EG.setOrUpdateSubmission(alphaSubmission)
+          deepEqual(submission.submission_history[0].versioned_attachments, versionedAttachments)
+        })
       })
 
       QUnit.module('#renderAttachment', hooks => {

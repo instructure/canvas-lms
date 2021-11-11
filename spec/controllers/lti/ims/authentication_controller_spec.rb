@@ -130,7 +130,7 @@ describe Lti::IMS::AuthenticationController do
               verifier: verifier,
               canvas_domain: redirect_domain
             },
-            (1.year.from_now)
+            1.year.from_now
           )
           jws[0...-1]
         end

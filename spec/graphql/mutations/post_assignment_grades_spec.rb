@@ -88,7 +88,7 @@ describe Mutations::PostAssignmentGrades do
     describe "posting the grades" do
       let(:post_submissions_job) { Delayed::Job.where(tag: "Assignment#post_submissions").order(:id).last }
 
-      before(:each) do
+      before do
         @student_submission = assignment.submissions.find_by(user: student)
       end
 
@@ -135,7 +135,7 @@ describe Mutations::PostAssignmentGrades do
         let(:section1) { course.course_sections.create! }
         let(:section2) { course.course_sections.create! }
 
-        before(:each) do
+        before do
           @section1_student = section1.enroll_user(User.create!, "StudentEnrollment", "active").user
           @section2_student = section2.enroll_user(User.create!, "StudentEnrollment", "active").user
           @student1_submission = assignment.submissions.find_by(user: @section1_student)
@@ -164,7 +164,7 @@ describe Mutations::PostAssignmentGrades do
       describe "only_student_ids" do
         let(:student2) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
 
-        before(:each) do
+        before do
           @student1_submission = assignment.submissions.find_by(user: student)
           @student2_submission = assignment.submissions.find_by(user: student2)
         end
@@ -191,7 +191,7 @@ describe Mutations::PostAssignmentGrades do
       describe "skip_student_ids" do
         let(:student2) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
 
-        before(:each) do
+        before do
           @student1_submission = assignment.submissions.find_by(user: student)
           @student2_submission = assignment.submissions.find_by(user: student2)
         end
@@ -225,7 +225,7 @@ describe Mutations::PostAssignmentGrades do
         let(:secret_student) { User.create! }
         let(:secret_section) { course.course_sections.create! }
 
-        before(:each) do
+        before do
           Enrollment.limit_privileges_to_course_section!(course, teacher, true)
           course.enroll_student(secret_student, enrollment_state: "active", section: secret_section)
         end
@@ -265,7 +265,7 @@ describe Mutations::PostAssignmentGrades do
     let(:post_submissions_job) { Delayed::Job.where(tag: "Assignment#post_submissions").order(:id).last }
     let(:student2) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
 
-    before(:each) do
+    before do
       @student1_submission = assignment.submissions.find_by(user: student)
       @student2_submission = assignment.submissions.find_by(user: student2)
       assignment.ensure_post_policy(post_manually: true)
@@ -332,7 +332,7 @@ describe Mutations::PostAssignmentGrades do
       )
     end
 
-    before(:each) do
+    before do
       section.enroll_user(student_in_section, "StudentEnrollment", "active")
       teacher.update!(email: "fakeemail@example.com", workflow_state: :registered)
       teacher.email_channel.update!(workflow_state: :active)

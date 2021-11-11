@@ -23,7 +23,7 @@ describe DataFixup::FixSelectFinalGradeForExistingAccounts do
     @ta_role = ta_role(root_account_id: @account.id)
   end
 
-  before :each do
+  before do
     RoleOverride.destroy_all
   end
 
@@ -69,7 +69,7 @@ describe DataFixup::FixSelectFinalGradeForExistingAccounts do
       @new_role = custom_ta_role('CustomTaEnrollment')
     end
 
-    before :each do
+    before do
       RoleOverride.destroy_all
     end
 
@@ -114,7 +114,7 @@ describe DataFixup::FixSelectFinalGradeForExistingAccounts do
       @teacher_role = teacher_role(root_account_id: @account.id)
     end
 
-    before :each do
+    before do
       RoleOverride.destroy_all
     end
 
@@ -166,7 +166,7 @@ describe DataFixup::FixSelectFinalGradeForExistingAccounts do
       @site_admin = Account.site_admin
     end
 
-    before :each do
+    before do
       RoleOverride.destroy_all
     end
 

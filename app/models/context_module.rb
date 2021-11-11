@@ -306,7 +306,11 @@ class ContextModule < ActiveRecord::Base
         next if tag.asset_workflow_state == 'deleted'
 
         # although the module will be restored unpublished, the items should match the asset's published state
-        tag.workflow_state = tag.content && tag.sync_workflow_state_to_asset? ? tag.asset_workflow_state : 'unpublished'
+        tag.workflow_state = if tag.content && tag.sync_workflow_state_to_asset?
+                               tag.asset_workflow_state
+                             else
+                               'unpublished'
+                             end
         # deal with the possibility that the asset has been renamed after the module was deleted
         tag.title = Context.asset_name(tag.content) if tag.content && tag.sync_title_to_asset_title?
         tag.save
@@ -389,7 +393,7 @@ class ContextModule < ActiveRecord::Base
       return true
     elsif !self.active?
       return false
-    elsif self.context.user_has_been_observer?(user)
+    elsif self.context.user_has_been_observer?(user) # rubocop:disable Lint/DuplicateBranch
       return true
     end
 
@@ -589,13 +593,11 @@ class ContextModule < ActiveRecord::Base
       end
     end
 
-    tags = self.shard.activate do
-      DifferentiableAssignment.filter(tags, user, self.context, opts) do |tags, user_ids|
-        filter.call(tags, user_ids, self.context_id, opts)
+    shard.activate do
+      DifferentiableAssignment.filter(tags, user, self.context, opts) do |ts, user_ids|
+        filter.call(ts, user_ids, self.context_id, opts)
       end
     end
-
-    tags
   end
 
   def reload
@@ -612,25 +614,21 @@ class ContextModule < ActiveRecord::Base
   end
 
   def cached_active_tags
-    @cached_active_tags ||= begin
-      if self.content_tags.loaded?
-        # don't reload the preloaded content
-        self.content_tags.select { |tag| tag.active? }
-      else
-        self.content_tags.active.to_a
-      end
-    end
+    @cached_active_tags ||= if self.content_tags.loaded?
+                              # don't reload the preloaded content
+                              self.content_tags.select { |tag| tag.active? }
+                            else
+                              self.content_tags.active.to_a
+                            end
   end
 
   def cached_not_deleted_tags
-    @cached_not_deleted_tags ||= begin
-      if self.content_tags.loaded?
-        # don't reload the preloaded content
-        self.content_tags.select { |tag| !tag.deleted? }
-      else
-        self.content_tags.not_deleted.to_a
-      end
-    end
+    @cached_not_deleted_tags ||= if self.content_tags.loaded?
+                                   # don't reload the preloaded content
+                                   self.content_tags.select { |tag| !tag.deleted? }
+                                 else
+                                   self.content_tags.not_deleted.to_a
+                                 end
   end
 
   def add_item(params, added_item = nil, opts = {})
@@ -808,10 +806,8 @@ class ContextModule < ActiveRecord::Base
         action == :done
       when 'must_contribute'
         action == :contributed
-      when 'must_submit'
-        action == :scored || action == :submitted
-      when 'min_score'
-        action == :scored ||
+      when 'must_submit', 'min_score'
+        action == :scored || # rubocop:disable Style/MultipleComparison
           action == :submitted # to mark progress in the incomplete_requirements (moves from 'unlocked' to 'started')
       else
         false
@@ -909,7 +905,10 @@ class ContextModule < ActiveRecord::Base
   end
 
   def completion_events=(value)
-    return write_attribute(:completion_events, nil) unless value
+    unless value
+      write_attribute(:completion_events, nil)
+      return
+    end
 
     write_attribute(:completion_events, (value.map(&:to_sym) & VALID_COMPLETION_EVENTS).join(','))
   end

@@ -19,7 +19,7 @@
 
 module Lti
   class ReRegConstraint
-    RE_REG_HEADER = 'VND-IMS-CONFIRM-URL'.freeze
+    RE_REG_HEADER = 'VND-IMS-CONFIRM-URL'
 
     def matches?(request)
       request.headers[RE_REG_HEADER].present? &&

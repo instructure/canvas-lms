@@ -24,6 +24,7 @@ require 'csv'
 
 describe Quizzes::QuizStatistics::ItemAnalysis do
   let(:report_type) { 'item_analysis' }
+
   include_examples "Quizzes::QuizStatistics::Report"
 
   before(:once) do

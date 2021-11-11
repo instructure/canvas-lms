@@ -34,11 +34,9 @@ describe IncomingMailProcessor::Pop3Mailbox do
   end
 
   def mock_net_pop
-    @pop_mock = Object.new
-    class << @pop_mock
-      IncomingMailProcessor::Pop3Mailbox::UsedPopMethods.each do |method_name|
-        define_method(method_name) { |*args, &block| }
-      end
+    @pop_mock = double
+    IncomingMailProcessor::Pop3Mailbox::UsedPopMethods.each do |method_name|
+      allow(@pop_mock).to receive(method_name)
     end
 
     allow(Net::POP3).to receive(:new).and_return(@pop_mock)

@@ -55,24 +55,21 @@ module.exports = {
 // we can't just use the transformImports option of @instructure/ui-babel-preset because
 // @instructure/ui-media-player uses the old pattern of putting things in /components like InstUI used to do
 if (!USE_ES_MODULES) {
-  module.exports.plugins = [
-    '@babel/plugin-proposal-optional-chaining',
-    [
-      '@instructure/babel-plugin-transform-imports',
-      {
-        '(@instructure/ui-[^/]+)$': {
-          transform: (importName, matches) => {
-            if (
-              !matches ||
-              !matches[1] ||
-              matches[1] === '@instructure/ui-test-utils' ||
-              matches[1].startsWith('@instructure/ui-media')
-            )
-              return
-            return `${matches[1]}/lib/${importName}`
-          }
+  module.exports.plugins.push([
+    '@instructure/babel-plugin-transform-imports',
+    {
+      '(@instructure/ui-[^/]+)$': {
+        transform: (importName, matches) => {
+          if (
+            !matches ||
+            !matches[1] ||
+            matches[1] === '@instructure/ui-test-utils' ||
+            matches[1].startsWith('@instructure/ui-media')
+          )
+            return
+          return `${matches[1]}/lib/${importName}`
         }
       }
-    ]
-  ]
+    }
+  ])
 }

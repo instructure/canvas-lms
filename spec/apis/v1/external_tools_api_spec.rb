@@ -1038,18 +1038,16 @@ describe ExternalToolsController, type: :request do
       #     "label"=>"conference selection",
       #     "selection_height"=>400,
       #     "selection_width"=>800},
-      "course_assignments_menu" => begin
-        if et && et.course_assignments_menu
-          {
-            "enabled" => true,
-            "text" => "course assignments menu",
-            "url" => "http://www.example.com/ims/lti/resource",
-            "label" => "course assignments menu",
-            "selection_width" => 800,
-            "selection_height" => 400
-          }
-        end
-      end,
+      "course_assignments_menu" => if et && et.course_assignments_menu
+                                     {
+                                       "enabled" => true,
+                                       "text" => "course assignments menu",
+                                       "url" => "http://www.example.com/ims/lti/resource",
+                                       "label" => "course assignments menu",
+                                       "selection_width" => 800,
+                                       "selection_height" => 400
+                                     }
+                                   end
     }
     example["is_rce_favorite"] = et.is_rce_favorite if et && et.can_be_rce_favorite?
     example

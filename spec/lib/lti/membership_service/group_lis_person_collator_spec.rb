@@ -23,7 +23,7 @@ require_dependency "lti/membership_service/group_lis_person_collator"
 module Lti::MembershipService
   describe GroupLisPersonCollator do
     context 'group with many students' do
-      before(:each) do
+      before do
         course_with_teacher
         @course.offer!
         @student1 = user_model

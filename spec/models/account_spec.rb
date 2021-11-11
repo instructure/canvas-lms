@@ -456,6 +456,7 @@ describe Account do
     before do
       @a = Account.new
     end
+
     it "is able to specify a list of enabled services" do
       @a.allowed_services = 'twitter'
       expect(@a.service_enabled?(:twitter)).to be_truthy
@@ -599,6 +600,7 @@ describe Account do
 
   context "allow_global_includes?" do
     let(:root) { Account.default }
+
     it "false unless they've checked the box to allow it" do
       expect(root.allow_global_includes?).to be_falsey
     end
@@ -639,7 +641,7 @@ describe Account do
   end
 
   context "closest_turnitin_originality" do
-    before :each do
+    before do
       @root_account = Account.create!(:turnitin_pledge => "root")
       @root_account.turnitin_originality = 'after_grading'
       @root_account.save!
@@ -1803,7 +1805,7 @@ describe Account do
       @settings = [:restrict_student_future_view, :lock_all_announcements]
     end
 
-    before :each do
+    before do
       account_model
       @sub1 = @account.sub_accounts.create!
       @sub2 = @sub1.sub_accounts.create!
@@ -1952,11 +1954,9 @@ describe Account do
       end
 
       it "includes the account id in the error message" do
-        begin
-          Account.find_cached(nonsense_id)
-        rescue ::Canvas::AccountCacheError => e
-          expect(e.message).to eq("Couldn't find Account with 'id'=#{nonsense_id}")
-        end
+        Account.find_cached(nonsense_id)
+      rescue ::Canvas::AccountCacheError => e
+        expect(e.message).to eq("Couldn't find Account with 'id'=#{nonsense_id}")
       end
     end
 
@@ -2088,7 +2088,7 @@ describe Account do
     specs_require_cache(:redis_cache_store)
 
     describe "cached_account_users_for" do
-      before :each do
+      before do
         @account = Account.create!
         @user = User.create!
       end

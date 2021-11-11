@@ -199,14 +199,14 @@ describe Pseudonym do
     it "only checks an explicit LDAP provider" do
       aac2 = @pseudonym.account.authentication_providers.create!(auth_type: 'ldap')
       @pseudonym.update_attribute(:authentication_provider, aac2)
-      expect_any_instantiation_of(@aac).to receive(:ldap_bind_result).never
+      expect_any_instantiation_of(@aac).not_to receive(:ldap_bind_result)
       expect(aac2).to receive(:ldap_bind_result).and_return(42)
       expect(@pseudonym.ldap_bind_result('stuff')).to eq 42
     end
 
     it "doesn't even check LDAP for a Canvas pseudonym" do
       @pseudonym.update_attribute(:authentication_provider, @pseudonym.account.canvas_authentication_provider)
-      expect_any_instantiation_of(@aac).to receive(:ldap_bind_result).never
+      expect_any_instantiation_of(@aac).not_to receive(:ldap_bind_result)
       expect(@pseudonym.ldap_bind_result('stuff')).to eq nil
     end
   end
@@ -219,10 +219,10 @@ describe Pseudonym do
 
   it "does not attempt validating a blank password" do
     pseudonym_model
-    expect(@pseudonym).to receive(:sis_ssha).never
+    expect(@pseudonym).not_to receive(:sis_ssha)
     @pseudonym.valid_ssha?('')
 
-    expect(@pseudonym).to receive(:ldap_bind_result).never
+    expect(@pseudonym).not_to receive(:ldap_bind_result)
     @pseudonym.valid_ldap_credentials?('')
   end
 

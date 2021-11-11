@@ -33,15 +33,28 @@ class CanvadocsAnnotationContext < ApplicationRecord
   before_validation :set_root_account_id, if: :new_record?
 
   set_policy do
+    # the submitting student can see their annotations for drafts and for prior attempts.
+    given { |user| user && user == submission.user }
+    can :read
+
+    # the submitting student can make new annotations on a draft, but not on a prior attempt.
+    given { |user| draft? && user && user == submission.user }
+    can :annotate
+
+    # assigned peer reviewers can see non-draft attempts of the assigned student, but
+    # cannot make annotations.
+    given { |user| user && !draft? && submission.peer_reviewer?(user) }
+    can :read
+
+    # users with permission to grade the submission OR provisional graders for a moderated
+    # assignment can see and make annotations on non-draft attempts.
     given do |user|
-      user && (
+      !draft? && user && (
         submission.grants_right?(user, :grade) ||
-        (submission.assignment.moderated_grading? && submission.assignment.can_be_moderated_grader?(user)) ||
-        (draft? && user == submission.user)
+        (submission.assignment.moderated_grading? && submission.assignment.can_be_moderated_grader?(user))
       )
     end
-
-    can :readwrite
+    can :read and can :annotate
   end
 
   def draft?

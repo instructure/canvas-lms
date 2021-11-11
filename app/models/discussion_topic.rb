@@ -320,8 +320,6 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  attr_accessor :saved_by
-
   def update_assignment
     return if self.deleted?
 
@@ -502,10 +500,12 @@ class DiscussionTopic < ActiveRecord::Base
     return "read" unless current_user # default for logged out user
 
     uid = current_user.is_a?(User) ? current_user.id : current_user
-    dtp = discussion_topic_participants.loaded? ?
-      discussion_topic_participants.detect { |dtp| dtp.user_id == uid } :
-      discussion_topic_participants.where(user_id: uid).select(:workflow_state).first
-    dtp.try(:workflow_state) || "unread"
+    ws = if discussion_topic_participants.loaded?
+           discussion_topic_participants.detect { |dtp| dtp.user_id == uid }&.workflow_state
+         else
+           discussion_topic_participants.where(user_id: uid).pick(:workflow_state)
+         end
+    ws || "unread"
   end
 
   def read?(current_user = nil)
@@ -901,18 +901,16 @@ class DiscussionTopic < ActiveRecord::Base
   def can_unpublish?(opts = {})
     return @can_unpublish unless @can_unpublish.nil?
 
-    @can_unpublish = begin
-      if self.assignment
-        !self.assignment.has_student_submissions?
-      else
-        student_ids = opts[:student_ids] || self.context.all_real_student_enrollments.select(:user_id)
-        if self.for_group_discussion?
-          !DiscussionEntry.active.joins(:discussion_topic).merge(child_topics).where(user_id: student_ids).exists?
-        else
-          !self.discussion_entries.active.where(:user_id => student_ids).exists?
-        end
-      end
-    end
+    @can_unpublish = if self.assignment
+                       !self.assignment.has_student_submissions?
+                     else
+                       student_ids = opts[:student_ids] || self.context.all_real_student_enrollments.select(:user_id)
+                       if self.for_group_discussion?
+                         !DiscussionEntry.active.joins(:discussion_topic).merge(child_topics).where(user_id: student_ids).exists?
+                       else
+                         !self.discussion_entries.active.where(:user_id => student_ids).exists?
+                       end
+                     end
   end
   attr_writer :can_unpublish
 
@@ -929,9 +927,9 @@ class DiscussionTopic < ActiveRecord::Base
 
     topics.each do |topic|
       if topic.assignment_id
-        topic.can_unpublish = !(assmnt_ids_with_subs.include?(topic.assignment_id))
+        topic.can_unpublish = !assmnt_ids_with_subs.include?(topic.assignment_id)
       else
-        topic.can_unpublish = !(topic_ids_with_entries.include?(topic.id))
+        topic.can_unpublish = !topic_ids_with_entries.include?(topic.id)
       end
     end
   end
@@ -941,21 +939,12 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def should_send_to_stream
-    if !self.published?
-      false
-    elsif self.not_available_yet?
-      false
-    elsif self.cloned_item_id
-      false
-    elsif self.root_topic_id && self.has_group_category?
-      false
-    elsif self.in_unpublished_module?
-      false
-    elsif self.locked_by_module?
-      false
-    else
-      true
-    end
+    self.published? &&
+      !self.not_available_yet? &&
+      !self.cloned_item_id &&
+      !(self.root_topic_id && self.has_group_category?) &&
+      !self.in_unpublished_module? &&
+      !self.locked_by_module?
   end
 
   on_create_send_to_streams do
@@ -1011,9 +1000,8 @@ class DiscussionTopic < ActiveRecord::Base
     remaining_participants = participants if section_specific
     user_ids = []
     stream_item&.stream_item_instances&.shard(stream_item)&.find_each do |item|
-      if locked_by_module && self.locked_by_module_item?(item.user)
-        destroy_item_and_track(item, user_ids)
-      elsif section_specific && remaining_participants.none? { |p| p.id == item.user_id }
+      if (locked_by_module && self.locked_by_module_item?(item.user)) ||
+         (section_specific && remaining_participants.none? { |p| p.id == item.user_id })
         destroy_item_and_track(item, user_ids)
       end
     end
@@ -1370,7 +1358,7 @@ class DiscussionTopic < ActiveRecord::Base
   def users_with_permissions(users)
     permission = self.is_announcement ? :read_announcements : :read_forum
     course = self.course
-    if !(course.is_a?(Course))
+    if !course.is_a?(Course)
       return users.select do |u|
         self.is_announcement ? self.context.grants_right?(u, :read_announcements) : self.context.grants_right?(u, :read_forum)
       end
@@ -1539,7 +1527,7 @@ class DiscussionTopic < ActiveRecord::Base
         locked = { object: self, module: item.context_module }
       elsif self.locked? # nothing more specific, it's just locked
         locked = { object: self, can_view: true }
-      elsif root_topic && (l = root_topic.low_level_locked_for?(user, opts))
+      elsif (l = root_topic&.low_level_locked_for?(user, opts)) # rubocop:disable Lint/DuplicateBranch
         locked = l
       end
       locked
@@ -1586,7 +1574,7 @@ class DiscussionTopic < ActiveRecord::Base
       txt = (message.message || "")
       attachment_matches = txt.scan(/\/#{context.class.to_s.pluralize.underscore}\/#{context.id}\/files\/(\d+)\/download/)
       attachment_ids += (attachment_matches || []).map { |m| m[0] }
-      media_object_matches = txt.scan(/media_comment_([\w\-]+)/) + txt.scan(/data-media-id=\"([\w\-]+)\"/)
+      media_object_matches = txt.scan(/media_comment_([\w\-]+)/) + txt.scan(/data-media-id="([\w\-]+)"/)
       media_object_ids += (media_object_matches || []).map { |m| m[0] }.uniq
       (attachment_ids + media_object_ids).each do |id|
         messages_hash[id] ||= message

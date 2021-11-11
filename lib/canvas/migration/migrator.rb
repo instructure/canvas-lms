@@ -64,11 +64,9 @@ module Canvas::Migration
     end
 
     def delete_unzipped_archive
-      begin
-        @archive.delete_unzipped_archive
-      rescue
-        Rails.logger.warn "Couldn't delete #{@unzipped_file_path} for content_migration #{@settings[:content_migration_id]}"
-      end
+      @archive.delete_unzipped_archive
+    rescue
+      Rails.logger.warn "Couldn't delete #{@unzipped_file_path} for content_migration #{@settings[:content_migration_id]}"
     end
 
     def get_full_path(file_name)

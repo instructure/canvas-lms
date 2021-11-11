@@ -329,6 +329,9 @@
     "creative_commons_license_725584ae": {
         "message": "Licença Creative Commons:"
     },
+    "crop_image_807ebb08": {
+        "message": "Cortar Imagem"
+    },
     "current_image_f16c249c": {
         "message": "Imagem atual"
     },
@@ -896,6 +899,9 @@
     "none_3b5e34d2": {
         "message": "Nenhum"
     },
+    "none_selected_b93d56d2": {
+        "message": "Nenhuma Selecionada"
+    },
     "nothing_due_this_week_d45c9ef9": {
         "message": "Nada de devido esta semana"
     },
@@ -1078,6 +1084,9 @@
     },
     "search_term_b2d2235": {
         "message": "Termo de pesquisa"
+    },
+    "select_crop_shape_d441feeb": {
+        "message": "Seleccionar cortar forma"
     },
     "select_language_7c93a900": {
         "message": "Selecione o idioma"

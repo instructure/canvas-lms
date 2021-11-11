@@ -29,7 +29,7 @@ describe 'viewing a quiz with variable due dates on the quizzes index page' do
   context 'as an observer linked to two students in different sections' do
     before(:once) { prepare_vdd_scenario_for_first_observer }
 
-    before(:each) do
+    before do
       skip('Entire spec context is buggy. Bug tickets created: CNVS-22794 and CNVS-22793')
       user_session(@observer1)
       get "/courses/#{@course.id}/quizzes"
@@ -71,7 +71,7 @@ describe 'viewing a quiz with variable due dates on the quizzes index page' do
   context 'as an observer linked to a single student' do
     before(:once) { prepare_vdd_scenario_for_second_observer }
 
-    before(:each) do
+    before do
       user_session(@observer2)
       get "/courses/#{@course.id}/quizzes"
     end

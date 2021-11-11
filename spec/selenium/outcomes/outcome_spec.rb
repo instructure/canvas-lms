@@ -29,7 +29,7 @@ describe "outcomes" do
   let(:outcome_url) { "/courses/#{@course.id}/outcomes" }
 
   describe "course outcomes" do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 
@@ -39,7 +39,7 @@ describe "outcomes" do
       f('.submit_button').click
       wait_for_ajaximations
       expect(f('.title').text).to include(title)
-      expect((f('#calculation_int').text).to_i).to eq(value)
+      expect(f('#calculation_int').text.to_i).to eq(value)
     end
 
     context "create/edit/delete outcomes" do
@@ -213,7 +213,7 @@ describe "outcomes" do
     end
 
     describe 'with improved_outcome_management enabled' do
-      before(:each) do
+      before do
         enable_improved_outcomes_management(Account.default)
       end
 

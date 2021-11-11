@@ -280,6 +280,8 @@ class Account < ActiveRecord::Base
   add_setting :teachers_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :students_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
+  add_setting :teachers_can_create_courses_anywhere, :boolean => true, :root_only => true, :default => true
+  add_setting :students_can_create_courses_anywhere, :boolean => true, :root_only => true, :default => true
 
   add_setting :restrict_quiz_questions, :boolean => true, :root_only => true, :default => false
   add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
@@ -1272,16 +1274,14 @@ class Account < ActiveRecord::Base
     return [] unless user
 
     @account_users_cache ||= {}
-    @account_users_cache[user.global_id] ||= begin
-      if self.site_admin?
-        account_users_for(user) # has own cache
-      else
-        Rails.cache.fetch_with_batched_keys(['account_users_for_user', user.cache_key(:account_users)].cache_key,
-                                            batch_object: self, batched_keys: :account_chain, skip_cache_if_disabled: true) do
-          account_users_for(user).each(&:clear_association_cache)
-        end
-      end
-    end
+    @account_users_cache[user.global_id] ||= if self.site_admin?
+                                               account_users_for(user) # has own cache
+                                             else
+                                               Rails.cache.fetch_with_batched_keys(['account_users_for_user', user.cache_key(:account_users)].cache_key,
+                                                                                   batch_object: self, batched_keys: :account_chain, skip_cache_if_disabled: true) do
+                                                 account_users_for(user).each(&:clear_association_cache)
+                                               end
+                                             end
   end
 
   # returns all active account users for this entire account tree
@@ -1587,8 +1587,10 @@ class Account < ActiveRecord::Base
         t '#account.default_site_administrator_account_name', 'Site Admin'
         t '#account.default_account_name', 'Default Account'
         account = special_accounts[special_account_type] = Account.new(:name => default_account_name)
-        account.save!
-        Setting.set("#{special_account_type}_account_id", account.id)
+        GuardRail.activate(:primary) do
+          account.save!
+          Setting.set("#{special_account_type}_account_id", account.id)
+        end
         special_account_ids[special_account_type] = account.id
       end
       account
@@ -1956,13 +1958,15 @@ class Account < ActiveRecord::Base
     display_name = t('#account.manually_created_courses', "Manually-Created Courses")
     acct = manually_created_courses_account_from_settings
     if acct.blank?
-      transaction do
-        lock!
-        acct = manually_created_courses_account_from_settings
-        acct ||= self.sub_accounts.where(name: display_name).first_or_create! # for backwards compatibility
-        if acct.id != self.settings[:manually_created_courses_account_id]
-          self.settings[:manually_created_courses_account_id] = acct.id
-          self.save!
+      GuardRail.activate(:primary) do
+        transaction do
+          lock!
+          acct = manually_created_courses_account_from_settings
+          acct ||= self.sub_accounts.where(name: display_name).first_or_create! # for backwards compatibility
+          if acct.id != self.settings[:manually_created_courses_account_id]
+            self.settings[:manually_created_courses_account_id] = acct.id
+            self.save!
+          end
         end
       end
     end
@@ -2159,8 +2163,8 @@ class Account < ActiveRecord::Base
     end
   end
 
-  def available_course_visibility_override_options(_options = nil)
-    _options || {}
+  def available_course_visibility_override_options(options = nil)
+    options || {}
   end
 
   def user_needs_verification?(user)

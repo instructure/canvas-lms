@@ -45,13 +45,11 @@ module Lti::Concerns
     end
 
     def jwt_validator
-      @jwt_validator ||= begin
-        Canvas::Security::JwtValidator.new(
-          jwt: verified_jwt,
-          expected_aud: Canvas::Security.config['lti_iss'],
-          require_iss: true
-        )
-      end
+      @jwt_validator ||= Canvas::Security::JwtValidator.new(
+        jwt: verified_jwt,
+        expected_aud: Canvas::Security.config['lti_iss'],
+        require_iss: true
+      )
     end
 
     def oembed_endpoint

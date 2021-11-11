@@ -28,19 +28,17 @@ module QuizMathDataFixup
     end
     questions = questions.where('updated_at>?', check_date) if check_date
     questions.find_each do |quiz_question|
-      begin
-        old_data = quiz_question.question_data.to_hash
-        new_data = fixup_question_data(quiz_question.question_data.to_hash.symbolize_keys)
-        quiz_question.write_attribute(:question_data, new_data) if new_data != old_data
-        if quiz_question.changed?
-          stat = question_bank ? 'updated_math_qb_question' : 'updated_math_question'
-          InstStatsd::Statsd.increment(stat)
-          changed = true
-          quiz_question.save!
-        end
-      rescue => e
-        Canvas::Errors.capture(e)
+      old_data = quiz_question.question_data.to_hash
+      new_data = fixup_question_data(quiz_question.question_data.to_hash.symbolize_keys)
+      quiz_question.write_attribute(:question_data, new_data) if new_data != old_data
+      if quiz_question.changed?
+        stat = question_bank ? 'updated_math_qb_question' : 'updated_math_question'
+        InstStatsd::Statsd.increment(stat)
+        changed = true
+        quiz_question.save!
       end
+    rescue => e
+      Canvas::Errors.capture(e)
     end
     qstat = question_bank ? 'updated_math_question_bank' : 'updated_math_quiz'
     InstStatsd::Statsd.increment(qstat) if changed
@@ -49,12 +47,10 @@ module QuizMathDataFixup
 
   def fixup_submission_questions_with_bad_math(submission)
     submission.questions&.each_with_index do |question, index|
-      begin
-        data = fixup_question_data(question)
-        submission.questions[index] = data
-      rescue => e
-        Canvas::Errors.capture(e)
-      end
+      data = fixup_question_data(question)
+      submission.questions[index] = data
+    rescue => e
+      Canvas::Errors.capture(e)
     end
     begin
       submission.save! if submission.changed?
@@ -92,7 +88,7 @@ module QuizMathDataFixup
     html = Nokogiri::HTML5.fragment(html_str)
     if html.children.length == 1 && html.children[0].node_type == Nokogiri::XML::Node::TEXT_NODE
       # look for an equation_images URL in the text and extract the latex
-      m = %r{equation_images\/([^\s]+)}.match(html.content)
+      m = %r{equation_images/([^\s]+)}.match(html.content)
       if m && m[1]
         code = URI.unescape(URI.unescape(m[1]))
         html =

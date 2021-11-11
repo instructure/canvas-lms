@@ -98,9 +98,9 @@ class ApiRouteSet
     only, except = opts.delete(:only), opts.delete(:except)
     maybe_action = ->(action) { (!only || Array(only).include?(action)) && (!except || !Array(except).include?(action)) }
 
-    get("#{path}", opts.merge(:action => :index, :as => "#{name_prefix}#{resource_name}")) if maybe_action[:index]
+    get(path.to_s, opts.merge(:action => :index, :as => "#{name_prefix}#{resource_name}")) if maybe_action[:index]
     get("#{path}/:#{resource_name.singularize}_id", opts.merge(:action => :show, :as => "#{name_prefix}#{resource_name.singularize}")) if maybe_action[:show]
-    post("#{path}", opts.merge(:action => :create, :as => (maybe_action[:index] ? nil : "#{name_prefix}#{resource_name}"))) if maybe_action[:create]
+    post(path.to_s, opts.merge(:action => :create, :as => (maybe_action[:index] ? nil : "#{name_prefix}#{resource_name}"))) if maybe_action[:create]
     put("#{path}/:#{resource_name.singularize}_id", opts.merge(:action => :update)) if maybe_action[:update]
     delete("#{path}/:#{resource_name.singularize}_id", opts.merge(:action => :destroy)) if maybe_action[:destroy]
   end

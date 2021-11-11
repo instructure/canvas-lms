@@ -46,9 +46,9 @@ describe('SVGWithTextPlaceholder', () => {
     expect(imgContainer).toHaveLength(1)
   })
 
-  it('renders if null is provided to the text prop', () => {
+  it('renders if empty is provided to the text prop', () => {
     ReactDOM.render(
-      <SVGWithTextPlaceholder url="www.test.com" />,
+      <SVGWithTextPlaceholder url="www.test.com" text="" />,
       document.getElementById('fixtures')
     )
     const imgContainer = $("img[src$='www.test.com']")

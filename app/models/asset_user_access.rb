@@ -39,19 +39,17 @@ class AssetUserAccess < ActiveRecord::Base
   scope :most_recent, -> { order('updated_at DESC') }
 
   def infer_root_account_id(asset_for_root_account_id = nil)
-    self.root_account_id ||= begin
-      if context_type != 'User'
-        context&.resolved_root_account_id || 0
-      elsif asset_for_root_account_id.is_a?(User)
-        # Unfillable. Point to the dummy root account with id=0.
-        0
-      else
-        asset_for_root_account_id.try(:resolved_root_account_id) ||
-          asset_for_root_account_id.try(:root_account_id) || 0
-        # We could default `asset_for_root_account_id ||= asset`, but AUAs shouldn't
-        # ever be created outside of .log(), and calling `asset` would add a DB hit
-      end
-    end
+    self.root_account_id ||= if context_type != 'User'
+                               context&.resolved_root_account_id || 0
+                             elsif asset_for_root_account_id.is_a?(User)
+                               # Unfillable. Point to the dummy root account with id=0.
+                               0
+                             else
+                               asset_for_root_account_id.try(:resolved_root_account_id) ||
+                                 asset_for_root_account_id.try(:root_account_id) || 0
+                               # We could default `asset_for_root_account_id ||= asset`, but AUAs shouldn't
+                               # ever be created outside of .log(), and calling `asset` would add a DB hit
+                             end
   end
 
   def category
@@ -96,8 +94,8 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def readable_name(include_group_name: true)
-    if self.asset_code && self.asset_code.match(/\:/)
-      split = self.asset_code.split(/\:/)
+    if self.asset_code && self.asset_code.match(/:/)
+      split = self.asset_code.split(/:/)
 
       if split[1].match(/course_\d+/)
         case split[0]
@@ -261,7 +259,7 @@ class AssetUserAccess < ActiveRecord::Base
     view_delta = change_hash['view_score'].compact
     # ^array with old and new value, which CAN be null, hence compact
     return false if view_delta.size < 1
-    return view_delta[0] == 1.0 if view_delta.size == 1
+    return (view_delta[0] - 1.0).abs < Float::EPSILON if view_delta.size == 1
 
     (view_delta[1] - view_delta[0]).abs == 1 # this is an increment, if true
   end

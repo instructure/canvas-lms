@@ -30,7 +30,7 @@ describe Quizzes::QuizGroupsController, type: :request do
   describe "POST /api/v1/courses/:course_id/quizzes/:quiz_id/groups (create)" do
     def api_create_quiz_group(quiz_group_params, opts = {})
       api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups",
-               { :controller => "quizzes/quiz_groups", :action => "create", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}" },
+               { :controller => "quizzes/quiz_groups", :action => "create", :format => "json", :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s },
                { :quiz_groups => [quiz_group_params] },
                { 'Accept' => 'application/vnd.api+json' }, opts)
     end
@@ -87,7 +87,7 @@ describe Quizzes::QuizGroupsController, type: :request do
   describe "PUT /api/v1/courses/:course_id/quizzes/:quiz_id/groups/:id (update)" do
     def api_update_quiz_group(quiz_group_params, opts = {})
       api_call(:put, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{@group.id}",
-               { :controller => "quizzes/quiz_groups", :action => "update", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}" },
+               { :controller => "quizzes/quiz_groups", :action => "update", :format => "json", :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s, :id => @group.id.to_s },
                { :quiz_groups => [quiz_group_params] },
                { 'Accept' => 'application/vnd.api+json' }, opts)
     end
@@ -140,7 +140,7 @@ describe Quizzes::QuizGroupsController, type: :request do
 
     it "deletes a quiz group" do
       raw_api_call(:delete, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{@group.id}",
-                   { :controller => "quizzes/quiz_groups", :action => "destroy", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}" },
+                   { :controller => "quizzes/quiz_groups", :action => "destroy", :format => "json", :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s, :id => @group.id.to_s },
                    {}, { 'Accept' => 'application/vnd.api+json' })
       expect(Group.exists?(@group.id)).to be_falsey
     end
@@ -158,7 +158,7 @@ describe Quizzes::QuizGroupsController, type: :request do
 
     it "reorders a quiz group's questions" do
       raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{@group.id}/reorder",
-                   { :controller => "quizzes/quiz_groups", :action => "reorder", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}" },
+                   { :controller => "quizzes/quiz_groups", :action => "reorder", :format => "json", :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s, :id => @group.id.to_s },
                    { :order => [{ "type" => "question", "id" => @question3.id },
                                 { "type" => "question", "id" => @question1.id },
                                 { "type" => "question", "id" => @question2.id }] },
@@ -177,9 +177,9 @@ describe Quizzes::QuizGroupsController, type: :request do
         :controller => "quizzes/quiz_groups",
         :action => "show",
         :format => "json",
-        :course_id => "#{@course.id}",
-        :quiz_id => "#{@quiz.id}",
-        :id => "#{group.id}"
+        :course_id => @course.id.to_s,
+        :quiz_id => @quiz.id.to_s,
+        :id => group.id.to_s
       }
     end
 

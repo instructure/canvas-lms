@@ -23,7 +23,7 @@ require_dependency "lti/membership_service_controller"
 module Lti
   describe MembershipServiceController do
     context 'lti tool access', type: :request do
-      before(:each) do
+      before do
         course_with_teacher
         @course.offer!
         @tool = external_tool_model(context: @course)
@@ -73,7 +73,7 @@ module Lti
     end
 
     context 'user not enrolled in course' do
-      before(:each) do
+      before do
         course_model
         user_model
         pseudonym(@user)
@@ -91,7 +91,7 @@ module Lti
     end
 
     context 'course with single enrollment' do
-      before(:each) do
+      before do
         course_with_teacher
         @course.offer!
         enable_default_developer_key!
@@ -106,7 +106,7 @@ module Lti
         end
 
         context 'with access token' do
-          before(:each) do
+          before do
             pseudonym(@teacher)
             @teacher.save!
             token = @teacher.access_tokens.create!(purpose: 'test').full_token
@@ -181,7 +181,7 @@ module Lti
           end
 
           context 'course with a group' do
-            before(:each) do
+            before do
               @group_category = @course.group_categories.create!(name: 'Membership')
               @group = @course.groups.create!(name: "Group", group_category: @group_category)
             end
@@ -212,7 +212,7 @@ module Lti
     end
 
     context 'course with multiple enrollments' do
-      before(:each) do
+      before do
         enable_default_developer_key!
         course_with_teacher
         @course.enroll_user(@teacher, 'TeacherEnrollment', enrollment_state: 'active')
@@ -263,7 +263,7 @@ module Lti
     end
 
     context 'user not in course group' do
-      before(:each) do
+      before do
         enable_default_developer_key!
         course_with_teacher
         @course.offer!
@@ -286,7 +286,7 @@ module Lti
     end
 
     context 'user not in account group' do
-      before(:each) do
+      before do
         user_model
         group_model
         pseudonym(@user)
@@ -304,7 +304,7 @@ module Lti
     end
 
     context 'group with single student' do
-      before(:each) do
+      before do
         course_with_teacher
         @course.offer!
         @student = user_model
@@ -323,7 +323,7 @@ module Lti
         end
 
         context 'with access token' do
-          before(:each) do
+          before do
             enable_default_developer_key!
             pseudonym(@student)
             @student.save!
@@ -402,7 +402,7 @@ module Lti
     end
 
     context 'group with multiple students' do
-      before(:each) do
+      before do
         enable_default_developer_key!
         course_with_teacher
         @course.offer!

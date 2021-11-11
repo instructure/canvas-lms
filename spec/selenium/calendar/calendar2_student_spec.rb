@@ -24,7 +24,7 @@ describe "calendar2" do
   include_context "in-process server selenium tests"
   include Calendar2Common
 
-  before(:each) do
+  before do
     Account.default.tap do |a|
       a.settings[:show_scheduler] = true
       a.save!
@@ -32,7 +32,7 @@ describe "calendar2" do
   end
 
   context "as a student" do
-    before(:each) do
+    before do
       @student = course_with_student_logged_in(:active_all => true).user
     end
 
@@ -197,7 +197,7 @@ describe "calendar2" do
   end
 
   context "as a spanish student" do
-    before(:each) do
+    before do
       # Setup with spanish locale
       @student = course_with_student_logged_in(:active_all => true).user
       @student.locale = 'es'

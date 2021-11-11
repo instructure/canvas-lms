@@ -28,6 +28,7 @@ describe "Gradebook - message students who" do
   include GroupsCommon
 
   before(:once) { gradebook_data_setup }
+
   before do
     user_session(@teacher)
   end

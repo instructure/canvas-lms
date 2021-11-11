@@ -35,6 +35,7 @@ import {IconCompleteSolid, IconTrashLine} from '@instructure/ui-icons'
 import {Img} from '@instructure/ui-img'
 import {ProgressBar} from '@instructure/ui-progress'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import StudentViewContext from '../Context'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import theme from '@instructure/canvas-theme'
@@ -232,38 +233,47 @@ class FileUpload extends Component {
       allowedExtensions.some(extension => extension.toLowerCase() === 'png')
 
     return (
-      <div data-testid="upload-box">
-        <Flex direction="column" padding="xx-small">
-          <Flex.Item padding="xx-small" textAlign="center">
-            <MoreOptions
-              assignmentID={this.props.assignment._id}
-              courseID={this.props.assignment.env.courseId}
-              handleCanvasFiles={this.handleCanvasFiles}
-              handleWebcamPhotoUpload={allowWebcamUploads ? this.handleWebcamPhotoUpload : null}
-              renderCanvasFiles
-              userID={this.props.assignment.env.currentUser.id}
-            />
-          </Flex.Item>
-          <Flex.Item margin="0 0 small 0" overflowY="visible">
-            <FileDrop
-              accept={
-                this.props.assignment.allowedExtensions.length
-                  ? this.props.assignment.allowedExtensions
-                  : ''
-              }
-              id="inputFileDrop"
-              data-testid="input-file-drop"
-              margin="xx-small"
-              messages={this.state.messages}
-              onDropAccepted={files => this.handleDropAccepted(files)}
-              onDropRejected={this.handleDropRejected}
-              renderLabel={fileDropLabel}
-              shouldAllowMultiple
-              shouldEnablePreview
-            />
-          </Flex.Item>
-        </Flex>
-      </div>
+      <StudentViewContext.Consumer>
+        {context => (
+          <div data-testid="upload-box">
+            <Flex direction="column" padding="xx-small">
+              {context.allowChangesToSubmission && (
+                <Flex.Item padding="xx-small" textAlign="center">
+                  <MoreOptions
+                    assignmentID={this.props.assignment._id}
+                    courseID={this.props.assignment.env.courseId}
+                    handleCanvasFiles={this.handleCanvasFiles}
+                    handleWebcamPhotoUpload={
+                      allowWebcamUploads ? this.handleWebcamPhotoUpload : null
+                    }
+                    renderCanvasFiles
+                    userID={this.props.assignment.env.currentUser.id}
+                  />
+                </Flex.Item>
+              )}
+              <Flex.Item margin="0 0 small 0" overflowY="visible">
+                <FileDrop
+                  accept={
+                    this.props.assignment.allowedExtensions.length
+                      ? this.props.assignment.allowedExtensions
+                      : ''
+                  }
+                  id="inputFileDrop"
+                  interaction={!context.allowChangesToSubmission ? 'readonly' : 'enabled'}
+                  data-testid="input-file-drop"
+                  margin="xx-small"
+                  messages={this.state.messages}
+                  onDropAccepted={files => this.handleDropAccepted(files)}
+                  onDropRejected={this.handleDropRejected}
+                  renderLabel={fileDropLabel}
+                  shouldAllowMultiple
+                  shouldEnablePreview
+                />
+              </Flex.Item>
+            </Flex>
+          </div>
+        )}
+      </StudentViewContext.Consumer>
     )
   }
 

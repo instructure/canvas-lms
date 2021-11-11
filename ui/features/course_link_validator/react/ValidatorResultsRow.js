@@ -141,7 +141,7 @@ export default function ValidatorResultsRow(props) {
             <Button
               variant="link"
               href={props.result.content_url}
-              theme={{mediumPadding: '0', mediumHeight: '1.25rem'}}
+              theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.25rem'}}
             >
               {props.result.name}
             </Button>

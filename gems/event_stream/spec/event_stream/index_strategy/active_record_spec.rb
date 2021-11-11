@@ -61,7 +61,7 @@ describe EventStream::IndexStrategy::ActiveRecord do
   end
 
   describe "scope assembly" do
-    before :each do
+    before do
       stream = double('stream',
                       :record_type => EventStream::Record,
                       :active_record_type => fake_record_type)

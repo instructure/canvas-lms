@@ -96,7 +96,7 @@ module AnnouncementsCommon
     # Checks that new page is loaded when the indexed announcement is clicked to verify it actually loads the topic
     expect_new_page_load { ff('.discussion-topic')[index].click }
     # Checks that the announcement is there by verifying the title is present and correct
-    expect(f('.discussion-title')).to include_text("#{@announcement.title}")
+    expect(f('.discussion-title')).to include_text(@announcement.title)
   end
 
   # Clicks edit button on Announcement show page

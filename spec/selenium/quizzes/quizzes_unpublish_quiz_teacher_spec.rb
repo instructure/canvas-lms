@@ -32,7 +32,7 @@ describe 'unpublishing a quiz on the quiz show page' do
   end
 
   context 'as a teacher' do
-    before(:each) do
+    before do
       course_with_teacher_logged_in
       create_quiz_with_due_date
     end

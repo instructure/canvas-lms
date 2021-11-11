@@ -32,7 +32,7 @@ module Lti
     subject(:tool_proxy) { ToolProxy.new }
 
     describe 'validations' do
-      before(:each) do
+      before do
         subject.shared_secret = 'shared_secret'
         subject.guid = 'guid'
         subject.product_version = '1.0beta'

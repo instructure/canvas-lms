@@ -207,14 +207,12 @@ module CustomWaitMethods
   def keep_trying_until(seconds = SeleniumDriverSetup::SECONDS_UNTIL_GIVING_UP)
     frd_error = Selenium::WebDriver::Error::TimeoutError.new
     wait_for(timeout: seconds, method: :keep_trying_until) do
-      begin
-        yield
-      rescue SeleniumExtensions::Error, Selenium::WebDriver::Error::StaleElementReferenceError # don't keep trying, abort ASAP
-        raise
-      rescue StandardError, RSpec::Expectations::ExpectationNotMetError
-        frd_error = $ERROR_INFO
-        nil
-      end
+      yield
+    rescue SeleniumExtensions::Error, Selenium::WebDriver::Error::StaleElementReferenceError # don't keep trying, abort ASAP
+      raise
+    rescue StandardError, RSpec::Expectations::ExpectationNotMetError
+      frd_error = $ERROR_INFO
+      nil
     end or CallStackUtils.raise(frd_error)
   end
 
@@ -224,30 +222,10 @@ module CustomWaitMethods
     parent = element.find_element(:xpath, '..')
     tiny_frame = nil
     keep_trying_until do
-      begin
-        tiny_frame = disable_implicit_wait { parent.find_element(:css, 'iframe') }
-      rescue => e
-        puts "#{e.inspect}"
-        false
-      end
-    end
-    tiny_frame
-  end
-
-  # a slightly modified version of wait_for_tiny
-  # that's simpler for the normal case where
-  # the RCE is created via serviceRCELoader, which
-  # adds the 'ic-RichContentEditor' class name
-  def wait_for_rce(element = nil)
-    element ||= f('.ic-RichContentEditor')
-    tiny_frame = nil
-    keep_trying_until do
-      begin
-        tiny_frame = disable_implicit_wait { element.find_element(:css, 'iframe') }
-      rescue => e
-        puts "#{e.inspect}"
-        false
-      end
+      tiny_frame = disable_implicit_wait { parent.find_element(:css, 'iframe') }
+    rescue => e
+      puts e.inspect
+      false
     end
     tiny_frame
   end
@@ -260,12 +238,10 @@ module CustomWaitMethods
     element ||= f('.rce-wrapper')
     tiny_frame = nil
     keep_trying_until do
-      begin
-        tiny_frame = disable_implicit_wait { element.find_element(:css, 'iframe') }
-      rescue => e
-        puts "#{e.inspect}"
-        false
-      end
+      tiny_frame = disable_implicit_wait { element.find_element(:css, 'iframe') }
+    rescue => e
+      puts e.inspect
+      false
     end
     tiny_frame
   end

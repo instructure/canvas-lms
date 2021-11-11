@@ -29,20 +29,15 @@ describe FileInContext do
 
   context "#attach" do
     it "creates files with the supplied filename escaped for s3" do
-      # This horrible hack is because we need Attachment to behave like S3 in this case, as far as filename
-      # escaping goes. With attachment_fu, the filename is escaped, without it it is not. Because we're not
-      # able to dynamically switch out the S3 status during specs (see the selenium specs that fork a new process
-      # to test S3), we fake out just the part we care about. Also, we can't use Mocha because we need the
-      # argument of the method. This will be fixed when we've refactored Attachment to allow dynamically
-      # switching between S3 and local.
       s3_storage!
-      unbound_method = Attachment.instance_method(:filename=)
-      class Attachment; def filename=(new_name); write_attribute :filename, sanitize_filename(new_name); end; end
-      filename = File.expand_path(File.join(File.dirname(__FILE__), %w(.. fixtures files escaping_test[0].txt)))
+
+      filename = File.expand_path(File.join(__dir__, "../fixtures/files/escaping_test[0].txt"))
       attachment = FileInContext.attach(@course, filename, folder: @folder)
+      allow(attachment).to receive(:filename=) do |new_name|
+        write_attribute(:filename, sanitize_filename(new_name))
+      end
       expect(attachment.filename).to eq 'escaping_test%5B0%5D.txt'
       expect(attachment).to be_published
-      Attachment.send(:define_method, :filename=, unbound_method)
     end
 
     describe "usage rights required" do

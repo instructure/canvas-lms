@@ -47,8 +47,16 @@ describe BroadcastPolicy do
     it "handles multiple declarations" do
       policy_harness.class_eval do
         has_a_broadcast_policy
-        set_broadcast_policy { dispatch :foo; to {}; whenever {} }
-        set_broadcast_policy { dispatch :bar; to {}; whenever {} }
+        set_broadcast_policy do
+          dispatch :foo
+          to
+          whenever
+        end
+        set_broadcast_policy do
+          dispatch :bar
+          to
+          whenever
+        end
       end
 
       policy_list = policy_harness.broadcast_policy_list
@@ -61,14 +69,22 @@ describe BroadcastPolicy do
     let(:parent) do
       Class.new(policy_harness) do
         has_a_broadcast_policy
-        set_broadcast_policy { dispatch :foo; to {}; whenever {} }
+        set_broadcast_policy do
+          dispatch :foo
+          to
+          whenever
+        end
       end
     end
 
     let(:child) do
       Class.new(parent) do
         has_a_broadcast_policy
-        set_broadcast_policy! { dispatch :bar; to {}; whenever {} }
+        set_broadcast_policy! do
+          dispatch :bar
+          to
+          whenever
+        end
       end
     end
 

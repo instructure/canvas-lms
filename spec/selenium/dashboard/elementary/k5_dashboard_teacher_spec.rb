@@ -39,7 +39,7 @@ describe 'teacher k5 dashboard' do
     teacher_setup
   end
 
-  before :each do
+  before do
     user_session @homeroom_teacher
   end
 
@@ -307,6 +307,7 @@ describe 'teacher k5 dashboard' do
     before :once do
       @account.root_account.update!(settings: { teachers_can_create_courses: true })
     end
+
     it 'provides a new course button for teacher' do
       get '/'
       expect(new_course_button).to be_displayed

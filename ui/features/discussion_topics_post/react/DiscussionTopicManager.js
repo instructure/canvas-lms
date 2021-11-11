@@ -244,18 +244,26 @@ const DiscussionTopicManager = props => {
       (searchTerm || filter === 'unread') ? (
         <NoResultsFound />
       ) : (
-        <DiscussionTopicRepliesContainer
-          discussionTopic={discussionTopicQuery.data.legacyNode}
-          updateDraftCache={updateDraftCache}
-          removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
-          onOpenIsolatedView={(discussionEntryId, isolatedId, withRCE, relativeId, highlightId) => {
-            setHighlightEntryId(highlightId)
-            openIsolatedView(discussionEntryId, isolatedId, withRCE, relativeId)
-          }}
-          goToTopic={goToTopic}
-          highlightEntryId={highlightEntryId}
-          isSearchResults={!!searchTerm}
-        />
+        discussionTopicQuery.data.legacyNode.availableForUser && (
+          <DiscussionTopicRepliesContainer
+            discussionTopic={discussionTopicQuery.data.legacyNode}
+            updateDraftCache={updateDraftCache}
+            removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
+            onOpenIsolatedView={(
+              discussionEntryId,
+              isolatedId,
+              withRCE,
+              relativeId,
+              highlightId
+            ) => {
+              setHighlightEntryId(highlightId)
+              openIsolatedView(discussionEntryId, isolatedId, withRCE, relativeId)
+            }}
+            goToTopic={goToTopic}
+            highlightEntryId={highlightEntryId}
+            isSearchResults={!!searchTerm}
+          />
+        )
       )}
       {ENV.isolated_view && isolatedEntryId && (
         <IsolatedViewContainer

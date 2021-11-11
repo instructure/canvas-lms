@@ -211,7 +211,7 @@ module Importers
       elsif hash[:page_type] == 'module_toc'
       elsif hash[:topics]
         item.title = t('title_for_topics_category', '%{category} Topics', :category => hash[:category_name])
-        description = "#{hash[:category_description]}"
+        description = (hash[:category_description]).to_s
         description += "\n\n<ul>\n"
         topic_count = 0
         hash[:topics].each do |topic|
@@ -240,7 +240,7 @@ module Importers
 
         item.editing_roles = hash[:editing_roles] if hash[:editing_roles].present?
         item.notify_of_update = hash[:notify_of_update] if !hash[:notify_of_update].nil?
-      else
+      else # rubocop:disable Lint/DuplicateBranch
         allow_save = false
       end
       if allow_save && hash[:migration_id]

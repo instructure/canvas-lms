@@ -97,6 +97,7 @@ describe Quizzes::QuizSubmission do
           expect(subject.finished_at_fallback).to eq(now)
         end
       end
+
       it "works with no end_at time" do
         Timecop.freeze(5.minutes.ago) do
           now = Time.zone.now
@@ -581,11 +582,11 @@ describe Quizzes::QuizSubmission do
           {
             "text_after_answers" => "",
             "question_#{@questions[0].id}" => "<p>Lorem ipsum answer.</p>",
-            "context_id" => "#{@course.id}",
+            "context_id" => @course.id.to_s,
             "context_type" => "Course",
-            "user_id" => "#{@user.id}",
-            "quiz_id" => "#{@quiz.id}",
-            "course_id" => "#{@course.id}",
+            "user_id" => @user.id.to_s,
+            "quiz_id" => @quiz.id.to_s,
+            "course_id" => @course.id.to_s,
             "question_text" => "Lorem ipsum question",
           }
         end
@@ -601,7 +602,7 @@ describe Quizzes::QuizSubmission do
                                          'override_scores' => true,
                                          'context_type' => 'Course',
                                          'submission_version_number' => '1',
-                                         "question_score_#{@questions[0].id}" => "#{score}"
+                                         "question_score_#{@questions[0].id}" => score.to_s
                                        })
       end
 
@@ -663,11 +664,11 @@ describe Quizzes::QuizSubmission do
             "text_after_answers" => "",
             "question_#{@questions[0].id}" => "<p>Lorem ipsum answer 1.</p>",
             "question_#{@questions[1].id}" => "<p>Lorem ipsum answer 2.</p>",
-            "context_id" => "#{@course.id}",
+            "context_id" => @course.id.to_s,
             "context_type" => "Course",
-            "user_id" => "#{@user.id}",
-            "quiz_id" => "#{@quiz.id}",
-            "course_id" => "#{@course.id}",
+            "user_id" => @user.id.to_s,
+            "quiz_id" => @quiz.id.to_s,
+            "course_id" => @course.id.to_s,
             "question_text" => "Lorem ipsum question",
           }
         end
@@ -703,11 +704,11 @@ describe Quizzes::QuizSubmission do
           {
             "text_after_answers" => "",
             "question_#{@questions[0].id}" => "<p>Lorem ipsum answer 1.</p>",
-            "context_id" => "#{@course.id}",
+            "context_id" => @course.id.to_s,
             "context_type" => "Course",
-            "user_id" => "#{@user.id}",
-            "quiz_id" => "#{@quiz.id}",
-            "course_id" => "#{@course.id}",
+            "user_id" => @user.id.to_s,
+            "quiz_id" => @quiz.id.to_s,
+            "course_id" => @course.id.to_s,
             "question_text" => "Lorem ipsum question",
           }
         end
@@ -747,7 +748,7 @@ describe Quizzes::QuizSubmission do
         quiz_submission.with_versioning(true, &:save!)
       end
 
-      before(:each) do
+      before do
         student_in_course
       end
 
@@ -1364,23 +1365,28 @@ describe Quizzes::QuizSubmission do
         @quiz.due_at = 3.hours.ago
         @quiz.save!
       end
-      before :each do
+
+      before do
         @submission = @quiz.generate_submission(@student)
         @submission.end_at = @quiz.due_at
         @submission.save!
         @resp = Quizzes::QuizSubmission.needs_grading
       end
+
       it "finds an outstanding submissions" do
         expect(@resp.size).to eq 1
       end
+
       it "returns quiz_submission information" do
         expect(@resp.first).to be_a(Quizzes::QuizSubmission)
         expect(@resp.first.id).to eq @submission.id
       end
+
       it "returns user information" do
         expect(@resp.first.user).to be_a(User)
         expect(@resp.first.user.id).to eq @student.id
       end
+
       it "returns items which require grading" do
         expect(@resp.map(&:needs_grading?).all?).to be true
       end
@@ -1410,6 +1416,7 @@ describe Quizzes::QuizSubmission do
         @quiz = @course.quizzes.create! title: 'Test Quiz'
         @submission = @quiz.quiz_submissions.build
       end
+
       it "takes ids from questions" do
         allow(@submission).to receive(:questions).and_return [{ "id" => 2 }, { "id" => 3 }]
 
@@ -1422,6 +1429,7 @@ describe Quizzes::QuizSubmission do
         @quiz = @course.quizzes.create! title: 'Test Quiz'
         @submission = @quiz.quiz_submissions.build
       end
+
       it "fetches questions based on quiz_question_ids" do
         allow(@submission).to receive(:quiz_question_ids).and_return [2, 3]
         expect(Quizzes::QuizQuestion).to receive(:where)
@@ -1640,7 +1648,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe "associated submission" do
-    before(:each) { course_with_student }
+    before { course_with_student }
 
     it "assigns seconds_late to zero when not late" do
       Timecop.freeze do
@@ -1703,7 +1711,7 @@ describe Quizzes::QuizSubmission do
     end
 
     context "when Quiz autosubmit is disabled" do
-      before :each do
+      before do
         course_factory
         subject.quiz = @course.quizzes.create!
         subject.end_at = 1.hour.from_now
@@ -1723,7 +1731,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe "#overdue_and_needs_submission?" do
-    before :each do
+    before do
       course_factory
       subject.quiz = @course.quizzes.create!
       subject.end_at = 3.days.ago
@@ -1745,7 +1753,7 @@ describe Quizzes::QuizSubmission do
     end
 
     context "when Quiz autosubmit is disabled" do
-      before :each do
+      before do
         allow(subject.quiz).to receive(:timer_autosubmit_disabled?).and_return(true)
       end
 
@@ -1762,7 +1770,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe "#overdue?" do
-    before :each do
+    before do
       course_factory
       subject.quiz = @course.quizzes.create!
     end
@@ -1797,7 +1805,7 @@ describe Quizzes::QuizSubmission do
     end
 
     context "when Quiz autosubmit is disabled" do
-      before :each do
+      before do
         subject.end_at = 6.minutes.ago
         allow(subject.quiz).to receive(:timer_autosubmit_disabled?).and_return(true)
       end
@@ -1851,7 +1859,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe '#snapshot!' do
-    before :each do
+    before do
       subject.quiz = Quizzes::Quiz.new
       subject.attempt = 1
     end
@@ -1917,10 +1925,12 @@ describe Quizzes::QuizSubmission do
     let(:quiz_submission) do
       Quizzes::QuizSubmission.new
     end
+
     it 'returns submission.excused?' do
       quiz_submission.submission = submission
       expect(quiz_submission.excused?).to eq submission.excused?
     end
+
     it 'functions without valid submission' do
       expect(quiz_submission.excused?).to eq nil
     end
@@ -1928,7 +1938,7 @@ describe Quizzes::QuizSubmission do
 
   describe "#posted?" do
     context "when this submission's quiz is a graded quiz" do
-      before(:each) { quiz_with_graded_submission([]) }
+      before { quiz_with_graded_submission([]) }
 
       it "returns true if the underlying submission is posted" do
         allow(@quiz_submission.submission).to receive(:posted?).and_return(true)
@@ -1951,7 +1961,7 @@ describe Quizzes::QuizSubmission do
   end
 
   context 'root_account_id' do
-    before(:each) { quiz_with_graded_submission([]) }
+    before { quiz_with_graded_submission([]) }
 
     it "uses root_account value from account" do
       expect(@quiz_submission.root_account_id).to eq Account.default.id
@@ -1984,7 +1994,7 @@ describe Quizzes::QuizSubmission do
     end
 
     context "when the quiz submission is hidden from the student" do
-      before(:each) do
+      before do
         quiz_submission.submission.update!(posted_at: nil)
       end
 

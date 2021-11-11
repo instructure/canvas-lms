@@ -88,7 +88,7 @@ def val_h1_populated
 end
 
 def find_all_elements(type)
-  driver.find_elements(:tag_name, "#{type}")
+  driver.find_elements(:tag_name, type.to_s)
 end
 
 def val_all_tables_have_heading
@@ -99,11 +99,11 @@ def val_all_tables_have_heading
 end
 
 def val_all_elements_attribute_presence(elements, attrib)
-  elements.each { |element| expect(element.attribute("#{attrib}")).not_to be_nil }
+  elements.each { |element| expect(element.attribute(attrib.to_s)).not_to be_nil }
 end
 
 def val_all_elements_attribute_not_empty(elements, attrib)
-  elements.each { |element| expect(element.attribute("#{attrib}")).not_to eq '' }
+  elements.each { |element| expect(element.attribute(attrib.to_s)).not_to eq '' }
 end
 
 def val_text_max_length(elements, max_length)

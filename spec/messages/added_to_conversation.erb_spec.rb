@@ -38,6 +38,7 @@ describe 'added_to_conversation' do
 
   context ".email" do
     let(:path_type) { :email }
+
     it "renders" do
       generate_message(notification_name, path_type, asset)
     end
@@ -45,6 +46,7 @@ describe 'added_to_conversation' do
 
   context ".sms" do
     let(:path_type) { :sms }
+
     it "renders" do
       generate_message(notification_name, path_type, asset)
     end
@@ -52,6 +54,7 @@ describe 'added_to_conversation' do
 
   context ".summary" do
     let(:path_type) { :summary }
+
     it "renders" do
       generate_message(notification_name, path_type, asset)
     end
@@ -59,6 +62,7 @@ describe 'added_to_conversation' do
 
   context ".twitter" do
     let(:path_type) { :twitter }
+
     it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.body).to be_present

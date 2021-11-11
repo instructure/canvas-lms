@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ComposeInputWrapper} from '../../ComposeInputWrapper/ComposeInputWrapper'
+import {ComposeInputWrapper} from '../ComposeInputWrapper/ComposeInputWrapper'
 import I18n from 'i18n!conversations_2'
 import PropTypes from 'prop-types'
 import React from 'react'

@@ -42,23 +42,23 @@ class AuthenticationProvider::Facebook < AuthenticationProvider::OAuth2
   end
 
   def self.login_attributes
-    ['id'.freeze, 'email'.freeze].freeze
+    ['id', 'email'].freeze
   end
   validates :login_attribute, inclusion: login_attributes
 
   def self.recognized_federated_attributes
     [
-      'email'.freeze,
-      'first_name'.freeze,
-      'id'.freeze,
-      'last_name'.freeze,
-      'locale'.freeze,
-      'name'.freeze,
+      'email',
+      'first_name',
+      'id',
+      'last_name',
+      'locale',
+      'name',
     ].freeze
   end
 
   def login_attribute
-    super || 'id'.freeze
+    super || 'id'
   end
 
   def unique_id(token)
@@ -81,7 +81,7 @@ class AuthenticationProvider::Facebook < AuthenticationProvider::OAuth2
 
   def authorize_options
     if login_attribute == 'email' || federated_attributes.any? { |(_k, v)| v['attribute'] == 'email' }
-      { scope: 'email'.freeze }.freeze
+      { scope: 'email' }.freeze
     else
       {}.freeze
     end
@@ -89,9 +89,9 @@ class AuthenticationProvider::Facebook < AuthenticationProvider::OAuth2
 
   def client_options
     {
-      site: 'https://graph.facebook.com'.freeze,
-      authorize_url: 'https://www.facebook.com/dialog/oauth'.freeze,
-      token_url: 'oauth/access_token'.freeze
+      site: 'https://graph.facebook.com',
+      authorize_url: 'https://www.facebook.com/dialog/oauth',
+      token_url: 'oauth/access_token'
     }
   end
 end

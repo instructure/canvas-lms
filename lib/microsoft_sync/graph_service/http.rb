@@ -75,6 +75,7 @@ module MicrosoftSync
         attr_reader :wrapped_exception
 
         def initialize(wrapped_exception)
+          super()
           @wrapped_exception = wrapped_exception
         end
       end

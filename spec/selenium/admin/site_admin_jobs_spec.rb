@@ -22,13 +22,6 @@ require_relative '../common'
 describe "site admin jobs ui" do
   include_context "in-process server selenium tests"
 
-  module FlavorTags
-    ALL = 'All'
-    CURRENT = 'Current'
-    FUTURE = 'Future'
-    FAILED = 'Failed'
-  end
-
   def put_on_hold(count = 2)
     validate_all_jobs_selected
     f("#hold-jobs").click
@@ -45,12 +38,10 @@ describe "site admin jobs ui" do
 
   def jobs_on_hold
     @all_jobs.select do |job|
-      begin
-        job.reload
-        job.locked_by == 'on hold'
-      rescue ActiveRecord::RecordNotFound
-        false
-      end
+      job.reload
+      job.locked_by == 'on hold'
+    rescue ActiveRecord::RecordNotFound
+      false
     end
   end
 
@@ -80,7 +71,7 @@ describe "site admin jobs ui" do
     Delayed::Job.list_jobs(:future, nil)
   end
 
-  before(:each) do
+  before do
     site_admin_logged_in
     track_jobs do
       2.times { "present".delay.reverse }
@@ -119,7 +110,7 @@ describe "site admin jobs ui" do
       f('button.ui-dialog-titlebar-close').click
 
       # also for failed job
-      filter_jobs(FlavorTags::FAILED)
+      filter_jobs("Failed")
       wait_for_ajax_requests
       f('#jobs-grid .slick-row .b0.f0').click
       expect(f('#job-id').text).to eq @failed_job.id.to_s
@@ -129,18 +120,18 @@ describe "site admin jobs ui" do
     end
 
     context "all jobs" do
-      before(:each) do
+      before do
         load_jobs_page
       end
 
       it "checks current popular tags" do
-        filter_tags(FlavorTags::CURRENT)
+        filter_tags("Current")
         expect(f("#tags-grid")).to include_text "String#reverse"
         expect(f("#tags-grid")).to include_text "2"
       end
 
       it "checks all popular tags", priority: "2" do
-        filter_tags(FlavorTags::ALL)
+        filter_tags("All")
         expect(f("#tags-grid")).to include_text("String#reverse\n2")
         expect(f("#tags-grid")).to include_text("String#capitalize\n1")
       end
@@ -153,7 +144,7 @@ describe "site admin jobs ui" do
       end
 
       it "confirms that all current rows were selected and put on hold", priority: "2" do
-        filter_jobs(FlavorTags::CURRENT)
+        filter_jobs("Current")
         put_on_hold
       end
 
@@ -169,7 +160,7 @@ describe "site admin jobs ui" do
       end
 
       it "confirms that future jobs were selected" do
-        filter_jobs(FlavorTags::FUTURE)
+        filter_jobs("Future")
         f("#jobs-refresh").click
         wait_for_ajax_requests
         job = Delayed::Job.where(tag: "String#capitalize").first
@@ -177,7 +168,7 @@ describe "site admin jobs ui" do
       end
 
       it "confirms that failed jobs were selected" do
-        filter_jobs(FlavorTags::FAILED)
+        filter_jobs("Failed")
         f("#jobs-refresh").click
         wait_for_ajax_requests
         expect(ff("#jobs-grid .slick-row").count).to eq 1
@@ -186,7 +177,7 @@ describe "site admin jobs ui" do
 
       it "confirms that clicking on delete button should delete all future jobs" do
         2.times { "test".delay(run_at: 2.hours.from_now).to_s }
-        filter_jobs(FlavorTags::FUTURE)
+        filter_jobs("Future")
         validate_all_jobs_selected
         expect(f("#jobs-grid .odd")).to be_displayed
         expect(f("#jobs-grid .even")).to be_displayed

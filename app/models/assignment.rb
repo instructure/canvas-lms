@@ -45,7 +45,7 @@ class Assignment < ActiveRecord::Base
   ALLOWED_GRADING_TYPES = %w(points percent letter_grade gpa_scale pass_fail not_graded).freeze
   OFFLINE_SUBMISSION_TYPES = %i(on_paper external_tool none not_graded wiki_page).freeze
   SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze
-  LTI_EULA_SERVICE = 'vnd.Canvas.Eula'.freeze
+  LTI_EULA_SERVICE = 'vnd.Canvas.Eula'
   AUDITABLE_ATTRIBUTES = %w[
     muted
     due_at
@@ -1038,7 +1038,6 @@ class Assignment < ActiveRecord::Base
       self.wiki_page = page
     end
   end
-  attr_writer :saved_by
 
   def save_submittable(submittable)
     submittable.assignment_id = self.id
@@ -1193,12 +1192,10 @@ class Assignment < ActiveRecord::Base
   private :validate_resource_link_custom_params
 
   def primary_resource_link
-    @primary_resource_link ||= begin
-      lti_resource_links.find_by(
-        resource_link_uuid: lti_context_id,
-        context: self
-      )
-    end
+    @primary_resource_link ||= lti_resource_links.find_by(
+      resource_link_uuid: lti_context_id,
+      context: self
+    )
   end
 
   def lti_1_3_external_tool_tag?
@@ -3339,7 +3336,7 @@ class Assignment < ActiveRecord::Base
     return unless assignments.any?
 
     assmnt_ids_with_subs ||= assignment_ids_with_submissions(assignments.map(&:id))
-    assignments.each { |a| a.can_unpublish = !(assmnt_ids_with_subs.include?(a.id)) }
+    assignments.each { |a| a.can_unpublish = !assmnt_ids_with_subs.include?(a.id) }
   end
 
   def self.assignment_ids_with_submissions(assignment_ids)

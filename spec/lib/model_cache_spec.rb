@@ -21,13 +21,14 @@
 require 'lib/model_cache'
 
 describe ModelCache do
-  before(:all) do
-    class TestModelCacheUser < ActiveRecord::Base
+  before do
+    # these classes must be real constants because their name is accessed when cacheable_method is called
+    class TestModelCacheUser < ActiveRecord::Base # rubocop:disable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration
       self.table_name = :users # reuse existing tables so AR doesn't asplode
       include ModelCache
     end
 
-    class TestModelCachePseudonym < ActiveRecord::Base
+    class TestModelCachePseudonym < ActiveRecord::Base # rubocop:disable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration
       self.table_name = :pseudonyms
       include ModelCache
 
@@ -44,7 +45,7 @@ describe ModelCache do
     @pseudonym = TestModelCachePseudonym.where(:id => @pseudonym).first
   end
 
-  after(:all) do
+  after do
     ModelCache.keys.delete('TestModelCacheUser')
     ModelCache.keys.delete('TestModelCachePseudonym')
     ActiveSupport::Dependencies::Reference.instance_variable_get(:@store).delete('TestModelCacheUser')

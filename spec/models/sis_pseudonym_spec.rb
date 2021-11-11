@@ -174,7 +174,7 @@ describe SisPseudonym do
   end
 
   context "with multiple acceptable sis pseudonyms" do
-    before(:each) do
+    before do
       u.pseudonyms.create!(pseud_params("user2@example.com")) do |p|
         p.workflow_state = 'active'
         p.sis_user_id = "SIS1"

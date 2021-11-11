@@ -94,7 +94,7 @@ export default class AssignmentPoints extends React.Component {
     const msg = this.state.isValid ? null : (
       <View as="div" textAlign="end" margin="xx-small 0 0 0">
         <span style={{whiteSpace: 'nowrap'}}>
-          <Text color="error">{this.props.invalidMessage('pointsPossible')}</Text>
+          <Text color="danger">{this.props.invalidMessage('pointsPossible')}</Text>
         </span>
       </View>
     )

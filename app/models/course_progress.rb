@@ -146,7 +146,7 @@ class CourseProgress
     most_recent_module_completed_at&.utc&.iso8601
   end
 
-  def to_json
+  def to_json(*)
     if course.module_based? && course.user_is_student?(user, include_all: true)
       {
         requirement_count: requirement_count,
@@ -177,9 +177,7 @@ class CourseProgress
 
   def module_requirements_completed(progression)
     @_module_requirements_completed ||= {}
-    @_module_requirements_completed[progression.id] ||= begin
-      progression.requirements_met.select { |req| module_requirements(progression.context_module).include?(req) }.uniq
-    end
+    @_module_requirements_completed[progression.id] ||= progression.requirements_met.select { |req| module_requirements(progression.context_module).include?(req) }.uniq
   end
 
   def module_reqs_to_complete_count(mod)

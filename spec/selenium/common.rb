@@ -61,6 +61,17 @@ module SeleniumDependencies
   include LoginAndSessionMethods
 end
 
+# synchronize db connection methods for a modicum of thread safety
+module SynchronizeConnection
+  %w{cache_sql execute exec_cache exec_no_cache query transaction}.each do |method|
+    class_eval <<~RUBY, __FILE__, __LINE__ + 1
+      def #{method}(*)                                           # def execute(*)
+        SeleniumDriverSetup.request_mutex.synchronize { super }  #   SeleniumDriverSetup.request_mutex.synchronize { super }
+      end                                                        # end
+    RUBY
+  end
+end
+
 shared_context "in-process server selenium tests" do
   include SeleniumDependencies
 
@@ -73,7 +84,7 @@ shared_context "in-process server selenium tests" do
     CanvasSchema.graphql_definition
   end
 
-  prepend_before :each do
+  prepend_before do
     resize_screen_to_standard
     SeleniumDriverSetup.allow_requests!
     driver.ready_for_interaction = false # need to `get` before we do anything selenium-y in a spec
@@ -99,7 +110,7 @@ shared_context "in-process server selenium tests" do
     end
   end
 
-  append_before :each do
+  append_before do
     EncryptedCookieStore.test_secret = SecureRandom.hex(64)
     enable_forgery_protection
   end
@@ -109,17 +120,6 @@ shared_context "in-process server selenium tests" do
 
     allow(HostUrl).to receive(:default_host).and_return(app_host_and_port)
     allow(HostUrl).to receive(:file_host).and_return(app_host_and_port)
-  end
-
-  # synchronize db connection methods for a modicum of thread safety
-  module SynchronizeConnection
-    %w{cache_sql execute exec_cache exec_no_cache query transaction}.each do |method|
-      class_eval <<-RUBY, __FILE__, __LINE__ + 1
-        def #{method}(*)
-          SeleniumDriverSetup.request_mutex.synchronize { super }
-        end
-      RUBY
-    end
   end
 
   before(:all) do
@@ -139,7 +139,7 @@ shared_context "in-process server selenium tests" do
     allow(Delayed::Backend::ActiveRecord::Job::Failed).to receive(:connection).and_return(@dj_connection)
   end
 
-  after(:each) do |example|
+  after do |example|
     begin
       clear_timers!
       # while disallow_requests! would generally get these, there's a small window
@@ -182,7 +182,7 @@ shared_context "in-process server selenium tests" do
   end
 
   # logs everything that showed up in the browser console during selenium tests
-  after(:each) do |example|
+  after do |example|
     # safari driver and edge driver do not support driver.manage.logs
     # don't run for sauce labs smoke tests
     next if SeleniumDriverSetup.saucelabs_test_run?

@@ -151,7 +151,7 @@ class EportfolioEntry < ActiveRecord::Base
 
   def to_atom(opts = {})
     Atom::Entry.new do |entry|
-      entry.title = "#{self.name}"
+      entry.title = self.name.to_s
       entry.authors << Atom::Person.new(:name => t(:atom_author, "ePortfolio Entry"))
       entry.updated   = self.updated_at
       entry.published = self.created_at

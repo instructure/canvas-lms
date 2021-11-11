@@ -48,7 +48,7 @@ class Lti::LineItem < ApplicationRecord
   before_destroy :destroy_resource_link, if: :assignment_line_item? # assignment will destroy all the other line_items of a resourceLink
   before_destroy :destroy_assignment
 
-  AGS_EXT_SUBMISSION_TYPE = 'https://canvas.instructure.com/lti/submission_type'.freeze
+  AGS_EXT_SUBMISSION_TYPE = 'https://canvas.instructure.com/lti/submission_type'
 
   def assignment_line_item?
     assignment.line_items.order(:created_at).first.id == self.id

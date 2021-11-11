@@ -97,7 +97,23 @@ export const DiscussionTopicAlertManager = props => {
             </Alert>
           )
         }
-        return applicableAlerts.map(a => a)
+
+        if (!props.discussionTopic.availableForUser) {
+          applicableAlerts.push(
+            <Alert key="locked-for-user" renderCloseButtonLabel="Close" margin="0 0 x-small">
+              <Text data-testid="locked-for-user" size={responsiveProps?.alert?.textSize}>
+                {I18n.t('This topic will be available %{delayedPostAt}.', {
+                  delayedPostAt: props.discussionTopic.assignment
+                    ? DateHelper.formatDatetimeForDiscussions(
+                        props.discussionTopic.assignment.unlockAt
+                      )
+                    : DateHelper.formatDatetimeForDiscussions(props.discussionTopic.delayedPostAt)
+                })}
+              </Text>
+            </Alert>
+          )
+        }
+        return applicableAlerts
       }}
     />
   )

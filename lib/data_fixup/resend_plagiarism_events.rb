@@ -36,7 +36,7 @@ module DataFixup
   # submitted in the time range will have events
   # retriggered.
   class ResendPlagiarismEvents
-    EVENT_NAME = 'plagiarism_resubmit'.freeze
+    EVENT_NAME = 'plagiarism_resubmit'
 
     def self.run(start_time: 3.months.ago, end_time: Time.zone.now, only_errors: false)
       limit, = Setting.get('trigger_plagiarism_resubmit', '100,180').split(',').map(&:to_i)

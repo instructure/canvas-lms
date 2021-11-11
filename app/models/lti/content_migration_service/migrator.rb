@@ -20,10 +20,10 @@
 module Lti
   module ContentMigrationService
     class Migrator
-      FAILED_STATUS = 'failed'.freeze
+      FAILED_STATUS = 'failed'
       JWT_LIFETIME = 30.seconds
-      SUCCESSFUL_STATUS = 'completed'.freeze
-      JSON_FORMAT = 'json'.freeze
+      SUCCESSFUL_STATUS = 'completed'
+      JSON_FORMAT = 'json'
       private_constant :FAILED_STATUS, :JWT_LIFETIME, :SUCCESSFUL_STATUS, :JSON_FORMAT
 
       private

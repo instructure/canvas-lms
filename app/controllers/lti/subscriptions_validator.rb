@@ -89,9 +89,7 @@ module Lti
     private
 
     def subscription_context
-      @_subscription_context ||= begin
-        SubscriptionsValidator.retrieve_context(subscription)
-      end
+      @_subscription_context ||= SubscriptionsValidator.retrieve_context(subscription)
     end
   end
 end

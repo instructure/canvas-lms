@@ -19,7 +19,7 @@
 #
 
 describe FileAuthenticator do
-  before :each do
+  before do
     @oauth_host = 'http://oauth.host/'
     @user = user_model
     @access_token = @user.access_tokens.create!
@@ -167,7 +167,7 @@ describe FileAuthenticator do
   end
 
   context "with a non-inst-fs attachment" do
-    before :each do
+    before do
       @attachment.instfs_uuid = nil
     end
 

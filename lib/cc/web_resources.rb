@@ -39,59 +39,57 @@ module CC
       zipper = ContentZipper.new
       zipper.user = @user
       zipper.process_folder(course_folder, @zip_file, [CCHelper::WEB_RESOURCES_FOLDER], :exporter => @manifest.exporter) do |file, folder_names|
-        begin
-          next if file.display_name.blank?
+        next if file.display_name.blank?
 
-          if file.is_a? Folder
-            dir = File.join(folder_names[1..-1])
-            files_with_metadata[:folders] << [file, dir] if file_or_folder_restricted?(file)
-            next
-          end
+        if file.is_a? Folder
+          dir = File.join(folder_names[1..-1])
+          files_with_metadata[:folders] << [file, dir] if file_or_folder_restricted?(file)
+          next
+        end
 
-          path = File.join(folder_names, file.display_name)
-          @added_attachments[file.id] = path
-          migration_id = create_key(file)
-          if file_or_folder_restricted?(file) || file.usage_rights || file.display_name != file.unencoded_filename
-            files_with_metadata[:files] << [file, migration_id]
-          end
-          @resources.resource(
-            "type" => CCHelper::WEBCONTENT,
-            :identifier => migration_id,
-            :href => path
-          ) do |res|
-            if file.locked || file.usage_rights
-              res.metadata do |meta_node|
-                meta_node.lom :lom do |lom_node|
-                  if file.locked
-                    lom_node.lom :educational do |edu_node|
-                      edu_node.lom :intendedEndUserRole do |role_node|
-                        role_node.lom :source, "IMSGLC_CC_Rolesv1p1"
-                        role_node.lom :value, "Instructor"
-                      end
+        path = File.join(folder_names, file.display_name)
+        @added_attachments[file.id] = path
+        migration_id = create_key(file)
+        if file_or_folder_restricted?(file) || file.usage_rights || file.display_name != file.unencoded_filename
+          files_with_metadata[:files] << [file, migration_id]
+        end
+        @resources.resource(
+          "type" => CCHelper::WEBCONTENT,
+          :identifier => migration_id,
+          :href => path
+        ) do |res|
+          if file.locked || file.usage_rights
+            res.metadata do |meta_node|
+              meta_node.lom :lom do |lom_node|
+                if file.locked
+                  lom_node.lom :educational do |edu_node|
+                    edu_node.lom :intendedEndUserRole do |role_node|
+                      role_node.lom :source, "IMSGLC_CC_Rolesv1p1"
+                      role_node.lom :value, "Instructor"
                     end
                   end
-                  if file.usage_rights
-                    lom_node.lom :rights do |rights_node|
-                      rights_node.lom :copyrightAndOtherRestrictions do |node|
-                        node.lom :value, (file.usage_rights.license == 'public_domain') ? "no" : "yes"
-                      end
-                      description = []
-                      description << file.usage_rights.legal_copyright if file.usage_rights.legal_copyright.present?
-                      description << file.usage_rights.license_name unless file.usage_rights.license == 'private'
-                      rights_node.lom :description do |desc|
-                        desc.lom :string, description.join('\n')
-                      end
+                end
+                if file.usage_rights
+                  lom_node.lom :rights do |rights_node|
+                    rights_node.lom :copyrightAndOtherRestrictions do |node|
+                      node.lom :value, (file.usage_rights.license == 'public_domain') ? "no" : "yes"
+                    end
+                    description = []
+                    description << file.usage_rights.legal_copyright if file.usage_rights.legal_copyright.present?
+                    description << file.usage_rights.license_name unless file.usage_rights.license == 'private'
+                    rights_node.lom :description do |desc|
+                      desc.lom :string, description.join('\n')
                     end
                   end
                 end
               end
             end
-            res.file(:href => path)
           end
-        rescue
-          title = file.unencoded_filename rescue I18n.t('course_exports.unknown_titles.file', "Unknown file")
-          add_error(I18n.t('course_exports.errors.file', "The file \"%{file_name}\" failed to export", :file_name => title), $!)
+          res.file(:href => path)
         end
+      rescue
+        title = file.unencoded_filename rescue I18n.t('course_exports.unknown_titles.file', "Unknown file")
+        add_error(I18n.t('course_exports.errors.file', "The file \"%{file_name}\" failed to export", :file_name => title), $!)
       end
 
       add_meta_info_for_files(files_with_metadata)
@@ -224,42 +222,40 @@ module CC
 
       tracks = {}
       html_content_exporter.used_media_objects.each do |obj|
-        begin
-          migration_id = create_key(obj)
-          info = html_content_exporter.media_object_infos[obj.id]
-          next unless info && info[:asset]
+        migration_id = create_key(obj)
+        info = html_content_exporter.media_object_infos[obj.id]
+        next unless info && info[:asset]
 
-          path = File.join(CCHelper::WEB_RESOURCES_FOLDER, info[:path])
+        path = File.join(CCHelper::WEB_RESOURCES_FOLDER, info[:path])
 
-          # download from kaltura if the file wasn't already exported here in add_course_files
-          if !@added_attachments || @added_attachments[obj.attachment_id] != path
-            unless CanvasKaltura::ClientV3::ASSET_STATUSES[info[:asset][:status]] == :READY &&
-                   (url = (client.flavorAssetGetPlaylistUrl(obj.media_id, info[:asset][:id]) || client.flavorAssetGetDownloadUrl(info[:asset][:id])))
-              add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"))
-              next
-            end
+        # download from kaltura if the file wasn't already exported here in add_course_files
+        if !@added_attachments || @added_attachments[obj.attachment_id] != path
+          unless CanvasKaltura::ClientV3::ASSET_STATUSES[info[:asset][:status]] == :READY &&
+                 (url = (client.flavorAssetGetPlaylistUrl(obj.media_id, info[:asset][:id]) || client.flavorAssetGetDownloadUrl(info[:asset][:id])))
+            add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"))
+            next
+          end
 
-            CanvasHttp.get(url) do |http_response|
-              raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i) unless http_response.code.to_i == 200
+          CanvasHttp.get(url) do |http_response|
+            raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i) unless http_response.code.to_i == 200
 
-              @zip_file.get_output_stream(path) do |stream|
-                http_response.read_body(stream)
-              end
-            end
-
-            @resources.resource(
-              "type" => CCHelper::WEBCONTENT,
-              :identifier => migration_id,
-              :href => path
-            ) do |res|
-              res.file(:href => path)
+            @zip_file.get_output_stream(path) do |stream|
+              http_response.read_body(stream)
             end
           end
 
-          process_media_tracks(tracks, migration_id, obj, path)
-        rescue
-          add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"), $!)
+          @resources.resource(
+            "type" => CCHelper::WEBCONTENT,
+            :identifier => migration_id,
+            :href => path
+          ) do |res|
+            res.file(:href => path)
+          end
         end
+
+        process_media_tracks(tracks, migration_id, obj, path)
+      rescue
+        add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"), $!)
       end
 
       add_tracks(tracks) if @canvas_resource_dir

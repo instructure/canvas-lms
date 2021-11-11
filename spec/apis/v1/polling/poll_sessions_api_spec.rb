@@ -121,7 +121,7 @@ describe Polling::PollSessionsController, type: :request do
         choice2 = @poll.poll_choices.create!(text: 'Choice B', is_correct: false)
 
         2.times { create_submission(choice1) }
-        1.times { create_submission(choice2) }
+        create_submission(choice2)
 
         @user = @teacher
         json = get_show
@@ -179,7 +179,7 @@ describe Polling::PollSessionsController, type: :request do
         choice2 = @poll.poll_choices.create!(text: 'Choice B', is_correct: false)
 
         2.times { create_submission(choice1) }
-        1.times { create_submission(choice2) }
+        create_submission(choice2)
 
         @user = student_in_course(active_user: true).user
 

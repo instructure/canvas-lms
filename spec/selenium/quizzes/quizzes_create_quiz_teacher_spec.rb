@@ -35,13 +35,13 @@ describe 'creating a quiz' do
   include WikiAndTinyCommon
 
   context 'as a teacher' do
-    before(:each) do
+    before do
       stub_rcs_config
       course_with_teacher_logged_in(course_name: 'Test Course', active_all: true)
     end
 
     context 'when the course has two sections' do
-      before(:each) do
+      before do
         @section_a = @course.course_sections.first
         @section_b = @course.course_sections.create!(name: 'Section B')
         course_quiz(active: true)
@@ -80,14 +80,14 @@ describe 'creating a quiz' do
         save_settings
 
         # verify default section due date & availability dates
-        expect(obtain_due_date(@section_a)).to include_text("#{format_time_for_view(due_at_a)}")
-        expect(obtain_availability_start_date(@section_a)).to include_text("#{format_time_for_view(unlock_at_a)}")
-        expect(obtain_availability_end_date(@section_a)).to include_text("#{format_time_for_view(lock_at_a)}")
+        expect(obtain_due_date(@section_a)).to include_text(format_time_for_view(due_at_a).to_s)
+        expect(obtain_availability_start_date(@section_a)).to include_text(format_time_for_view(unlock_at_a).to_s)
+        expect(obtain_availability_end_date(@section_a)).to include_text(format_time_for_view(lock_at_a).to_s)
 
         # verify Section B due date & availability dates
-        expect(obtain_due_date(@section_b)).to include_text("#{format_time_for_view(due_at_b)}")
-        expect(obtain_availability_start_date(@section_b)).to include_text("#{format_time_for_view(unlock_at_b)}")
-        expect(obtain_availability_end_date(@section_b)).to include_text("#{format_time_for_view(lock_at_b)}")
+        expect(obtain_due_date(@section_b)).to include_text(format_time_for_view(due_at_b).to_s)
+        expect(obtain_availability_start_date(@section_b)).to include_text(format_time_for_view(unlock_at_b).to_s)
+        expect(obtain_availability_end_date(@section_b)).to include_text(format_time_for_view(lock_at_b).to_s)
       end
     end
 
@@ -116,7 +116,7 @@ describe 'creating a quiz' do
     end
 
     context 'when on the quizzes index page' do
-      before(:each) do
+      before do
         get "/courses/#{@course.id}/quizzes"
       end
 
@@ -135,7 +135,7 @@ describe 'creating a quiz' do
       it 'redirects to the correct quiz edit form', priority: "2", test_id: 399887 do
         create_new_quiz
         # check url
-        expect(driver.current_url).to match %r{/courses/\d+/quizzes/#{Quizzes::Quiz.last.id}\/edit}
+        expect(driver.current_url).to match %r{/courses/\d+/quizzes/#{Quizzes::Quiz.last.id}/edit}
       end
 
       # TODO: remove this from test-rail, this test is redundant

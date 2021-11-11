@@ -63,7 +63,7 @@ export default class GridRow extends Component {
         <th className="GradesGrid__BodyRowHeader" role="rowheader" scope="row">
           <Button
             variant="link"
-            theme={{mediumPadding: '0', mediumHeight: '1.25rem'}}
+            theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.25rem'}}
             href={this.props.row.speedGraderUrl}
           >
             {this.props.row.studentName}

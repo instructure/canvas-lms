@@ -31,7 +31,7 @@ describe "scheduler" do
       Account.default.save!
     end
 
-    before(:each) do
+    before do
       course_with_teacher_logged_in
     end
 

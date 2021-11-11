@@ -24,7 +24,7 @@ describe 'Developer Keys' do
   include DeveloperKeysRewriteCommon
 
   describe 'with developer key management UI rewrite feature flag' do
-    before(:each) do
+    before do
       admin_logged_in
       Setting.set(Setting::SITE_ADMIN_ACCESS_TO_NEW_DEV_KEY_FEATURES, 'true')
     end

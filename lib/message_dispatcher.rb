@@ -45,8 +45,6 @@ class MessageDispatcher < Delayed::PerformableMethod
     object.dispatch_at
   end
 
-  protected
-
   def self.deliver_batch(messages)
     if messages.first.is_a?(Message::Queued)
       queued = messages.sort_by(&:created_at)

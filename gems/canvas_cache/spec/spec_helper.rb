@@ -101,7 +101,7 @@ RSpec.shared_context "caching_helpers", :shared_context => :metadata do
       attr_reader :captured_message_stack
 
       def initialize
-        @captured_message_stack ||= []
+        @captured_message_stack = []
       end
 
       def add(_severity, message = nil, progname = nil, &block)
@@ -126,7 +126,7 @@ RSpec.configure do |config|
 
   config.order = 'random'
 
-  config.before(:each) do
+  config.before do
     # load config from local spec/fixtures/config/redis.yml
     # so that we have something for ConfigFile to parse.
     target_location = Pathname.new(File.join(File.dirname(__FILE__), 'fixtures'))

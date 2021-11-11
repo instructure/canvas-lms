@@ -25,7 +25,7 @@ module BrandableCSS
   APP_ROOT = (defined?(Rails) && Rails.root) || Pathname.pwd
   CONFIG = YAML.load_file(APP_ROOT.join('config/brandable_css.yml')).freeze
   BRANDABLE_VARIABLES = JSON.parse(File.read(APP_ROOT.join(CONFIG['paths']['brandable_variables_json']))).freeze
-  MIGRATION_NAME = 'RegenerateBrandFilesBasedOnNewDefaults'.freeze
+  MIGRATION_NAME = 'RegenerateBrandFilesBasedOnNewDefaults'
 
   VARIABLE_HUMAN_NAMES = {
     "ic-brand-primary" => lambda { I18n.t("Primary Brand Color") },
@@ -267,7 +267,8 @@ module BrandableCSS
       s3_uploader.upload_file(public_default_path(type, high_contrast))
       begin
         File.delete(default_brand_file(type, high_contrast))
-      rescue Errno::ENOENT # continue if something else deleted it in another process
+      rescue Errno::ENOENT
+        # continue if something else deleted it in another process
       end
     end
 

@@ -61,7 +61,7 @@ describe "sync history modal" do
       create_and_migrate_master_assignments(@master)
     end
 
-    before :each do
+    before do
       user_session(@master_teacher)
     end
 
@@ -82,7 +82,7 @@ describe "sync history modal" do
       create_and_migrate_master_discussions(@master)
     end
 
-    before :each do
+    before do
       user_session(@master_teacher)
     end
 
@@ -103,7 +103,7 @@ describe "sync history modal" do
       create_and_migrate_master_assignments(@master)
     end
 
-    before :each do
+    before do
       user_session(@master_teacher)
     end
 
@@ -124,7 +124,7 @@ describe "sync history modal" do
       create_and_migrate_master_pages(@master)
     end
 
-    before :each do
+    before do
       user_session(@master_teacher)
     end
 
@@ -145,7 +145,7 @@ describe "sync history modal" do
       create_and_migrate_master_quizzes(@master)
     end
 
-    before :each do
+    before do
       user_session(@master_teacher)
     end
 

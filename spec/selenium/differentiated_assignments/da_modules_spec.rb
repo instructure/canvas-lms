@@ -38,7 +38,7 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
   end
 
   context "Student" do
-    before :each do
+    before do
       course_with_student_logged_in
       da_setup
       da_module_setup
@@ -49,16 +49,19 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
       get "/courses/#{@course.id}/modules"
       expect_module_to_not_have_items(@module)
     end
+
     it "displays module items with overrides" do
       create_section_overrides(@default_section)
       get "/courses/#{@course.id}/modules"
       expect_module_to_have_items(@module)
     end
+
     it "shows module items with graded submissions" do
       grade_da_assignments
       get "/courses/#{@course.id}/modules"
       expect_module_to_have_items(@module)
     end
+
     it "ignores completion requirements of inaccessible module items" do
       create_section_override_for_assignment(@da_discussion.assignment)
       create_section_override_for_assignment(@da_quiz)
@@ -77,7 +80,7 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
 
   context "Observer" do
     context "with a student attached" do
-      before :each do
+      before do
         observer_setup
         da_setup
         da_module_setup
@@ -88,11 +91,13 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
         get "/courses/#{@course.id}/modules"
         expect_module_to_not_have_items(@module)
       end
+
       it "displays module items with overrides", priority: "1", test_id: 135292 do
         create_section_overrides(@default_section)
         get "/courses/#{@course.id}/modules"
         expect_module_to_have_items(@module)
       end
+
       it "shows module items with graded submissions", priority: "1", test_id: 135293 do
         grade_da_assignments
         get "/courses/#{@course.id}/modules"
@@ -101,7 +106,7 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
     end
 
     context "without a student attached" do
-      before :each do
+      before do
         course_with_observer_logged_in
         da_setup
         da_module_setup

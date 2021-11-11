@@ -381,7 +381,7 @@ describe "security" do
   end
 
   describe "user masquerading" do
-    before(:each) do
+    before do
       course_with_teacher
       @teacher = @user
 
@@ -528,7 +528,7 @@ describe "security" do
   end
 
   describe "admin permissions" do
-    before(:each) do
+    before do
       @role = custom_account_role('Limited Admin', :account => Account.site_admin)
       account_admin_user(:account => Account.site_admin, :role => @role)
       user_session(@admin)
@@ -696,7 +696,7 @@ describe "security" do
     end
 
     describe 'course' do
-      before(:each) do
+      before do
         course_factory(active_all: true)
         Account.default.update_attribute(:settings, { :no_enrollments_can_create_courses => false })
       end

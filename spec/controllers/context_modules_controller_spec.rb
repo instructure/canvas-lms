@@ -130,7 +130,7 @@ describe ContextModulesController do
         end
       end
 
-      before :each do
+      before do
         user_session(@teacher)
       end
 
@@ -159,7 +159,7 @@ describe ContextModulesController do
       @m2 = @course.context_modules.create!(:name => "published")
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 
@@ -487,7 +487,7 @@ describe ContextModulesController do
       ct1 = make_content_tag(a1, @course, m1)
       ct2 = make_content_tag(a2, @course, m1)
 
-      post 'reorder_items', params: { :course_id => @course.id, :context_module_id => m2.id, :order => "#{ct2.id}" }
+      post 'reorder_items', params: { :course_id => @course.id, :context_module_id => m2.id, :order => ct2.id.to_s }
       ct2.reload
       expect(ct2.context_module).to eq m2
       ct1.reload
@@ -563,7 +563,7 @@ describe ContextModulesController do
       @external_tool_item = @module.add_item :type => 'context_external_tool', :title => 'Example Tool', :url => 'http://example.com/tool'
     end
 
-    before :each do
+    before do
       user_session(@teacher)
     end
 
@@ -688,7 +688,7 @@ describe ContextModulesController do
       @module.completion_requirements = { @tag.id => { :type => 'must_view' } }
     end
 
-    before :each do
+    before do
       @progression = @module.update_for(@student, :read, @tag)
     end
 
@@ -807,7 +807,7 @@ describe ContextModulesController do
         override.assignment_override_students.create!(:user => student)
       end
 
-      expect(AssignmentOverrideApplicator).to receive(:overrides_for_assignment_and_user).never
+      expect(AssignmentOverrideApplicator).not_to receive(:overrides_for_assignment_and_user)
 
       get 'content_tag_assignment_data', params: { course_id: @course.id }, format: 'json' # precache
       json = json_parse(response.body)
@@ -993,7 +993,7 @@ describe ContextModulesController do
   end
 
   describe "GET 'choose_mastery_path'" do
-    before :each do
+    before do
       allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
     end
 
@@ -1005,7 +1005,7 @@ describe ContextModulesController do
       @item = @mod.add_item :type => 'assignment', :id => @assg.id
     end
 
-    before :each do
+    before do
       user_session @student
     end
 
@@ -1133,7 +1133,7 @@ describe ContextModulesController do
   end
 
   describe "GET item_redirect_mastery_paths" do
-    before :each do
+    before do
       course_with_teacher_logged_in active_all: true
       @mod = @course.context_modules.create!
     end

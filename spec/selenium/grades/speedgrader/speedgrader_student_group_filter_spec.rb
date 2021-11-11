@@ -64,7 +64,7 @@ describe 'filter speed grader by student group' do
   end
 
   context 'on assignments page' do
-    before :each do
+    before do
       user_session(@teacher)
       AssignmentPage.visit(@course.id, @assignment.id)
     end
@@ -80,7 +80,7 @@ describe 'filter speed grader by student group' do
   end
 
   context 'on gradebook details tray' do
-    before :each do
+    before do
       user_session(@teacher)
     end
 

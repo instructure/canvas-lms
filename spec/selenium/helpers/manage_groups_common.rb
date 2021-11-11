@@ -40,7 +40,7 @@ module ManageGroupsCommon
         replace_content form.find_element(:css, "#category_create_group_count"), opts[:group_count].to_s
       else
         form.find_element(:css, "#category_split_groups").click
-        replace_content form.find_element(:css, "#category_split_group_count"), (opts[:group_count].to_s)
+        replace_content form.find_element(:css, "#category_split_group_count"), opts[:group_count].to_s
       end
     elsif enable_self_signup.attribute('checked')
       form.find_element(:css, "#category_create_group_count").clear

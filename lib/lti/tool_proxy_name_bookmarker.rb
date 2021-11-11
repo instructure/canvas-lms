@@ -19,29 +19,17 @@
 #
 module Lti
   module ToolProxyNameBookmarker
-    def self.bookmark_for(tool_proxy)
-      [(tool_proxy.name || '').downcase, tool_proxy.id]
-    end
+    extend NameBookmarkerBase
 
-    def self.validate(bookmark)
-      bookmark.is_a?(Array) && bookmark.size == 2 &&
-        bookmark[0].is_a?(String) &&
-        bookmark[1].is_a?(Integer)
+    def self.bookmark_for(tool_proxy)
+      bookmark_for_name_and_id(tool_proxy.name, tool_proxy.id)
     end
 
     def self.restrict_scope(scope, pager)
-      name_collation_key = BookmarkedCollection.best_unicode_collation_key('lti_tool_proxies.name')
-      placeholder_collation_key = BookmarkedCollection.best_unicode_collation_key('?')
-      if pager.current_bookmark
-        bookmark = pager.current_bookmark
-        comparison = (pager.include_bookmark ? ">=" : ">")
-        scope = scope.where(
-          " (#{name_collation_key} = #{placeholder_collation_key} AND lti_tool_proxies.id #{comparison} ?) "\
-          "OR #{name_collation_key} #{comparison} #{placeholder_collation_key}",
-          bookmark[0], bookmark[1], bookmark[0]
-        )
-      end
-      scope.order(name_collation_key, :id)
+      restrict_scope_by_name_and_id_fields(
+        scope: scope, pager: pager,
+        name_field: 'lti_tool_proxies.name', id_field: 'lti_tool_proxies.id'
+      )
     end
   end
 end

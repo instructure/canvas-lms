@@ -123,6 +123,7 @@
   "creative_commons_license_725584ae": {
     "message": "Trwydded Creative Commons:"
   },
+  "crop_image_807ebb08": { "message": "Tocio Delwedd" },
   "current_image_f16c249c": { "message": "Delwedd Bresennol" },
   "custom_6979cd81": { "message": "Personol" },
   "date_added_ed5ad465": { "message": "Dyddiad Ychwanegu" },
@@ -299,6 +300,7 @@
     "message": "Heb ddod o hyd i ganlyniadau ar gyfer { term }."
   },
   "none_3b5e34d2": { "message": "Dim" },
+  "none_selected_b93d56d2": { "message": "Dim un wedi’i ddewis" },
   "octagon_e48be9f": { "message": "Octagon" },
   "open_this_keyboard_shortcuts_dialog_9658b83a": {
     "message": "Agor y ddeialog bysellau hwylus"
@@ -349,6 +351,7 @@
   },
   "search_280d00bd": { "message": "Chwilio" },
   "search_term_b2d2235": { "message": "Term Chwilio" },
+  "select_crop_shape_d441feeb": { "message": "Dewis siâp tocio" },
   "select_language_7c93a900": { "message": "Dewis Iaith" },
   "selected_274ce24f": { "message": "Wedi dewis" },
   "shift_o_to_open_the_pretty_html_editor_55ff5a31": {

@@ -22,7 +22,7 @@ module Lti::IMS::Concerns
     extend ActiveSupport::Concern
 
     UNIVERSAL_GRANT_HOST = Canvas::Security.config['lti_grant_host'] ||
-                           'canvas.instructure.com'.freeze
+                           'canvas.instructure.com'
 
     class AccessToken
       def initialize(raw_jwt_str)
@@ -100,7 +100,6 @@ module Lti::IMS::Concerns
       end
     end
 
-    # rubocop:disable Metrics/BlockLength
     included do
       skip_before_action :load_user
 
@@ -186,6 +185,5 @@ module Lti::IMS::Concerns
         end
       end
     end
-    # rubocop:enable Metrics/BlockLength
   end
 end

@@ -23,7 +23,7 @@ require_relative "../pages/speedgrader_page"
 describe "speed grader - discussion submissions" do
   include_context "in-process server selenium tests"
 
-  before(:each) do
+  before do
     course_with_teacher_logged_in
     outcome_with_rubric
     @assignment = @course.assignments.create(
