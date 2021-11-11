@@ -413,7 +413,7 @@ class Assignment < ActiveRecord::Base
   def secure_params
     body = {}
     body[:lti_assignment_id] = self.lti_context_id || SecureRandom.uuid
-    body[:lti_assignment_description] = self.description
+    body[:lti_assignment_description] = self.lti_safe_description
     Canvas::Security.create_jwt(body)
   end
 
@@ -2358,6 +2358,10 @@ class Assignment < ActiveRecord::Base
     end
 
     json
+  end
+
+  def lti_safe_description
+    description&.truncate(1000, omission: '... (truncated)')
   end
 
   def grades_published?
