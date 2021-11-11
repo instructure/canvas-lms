@@ -35,10 +35,10 @@ class GradebookUserIds
   def user_ids
     if @column == "student"
       sort_by_student_field
-    elsif @column =~ /assignment_\d+$/
+    elsif /assignment_\d+$/.match?(@column)
       assignment_id = @column[/\d+$/]
       send("sort_by_assignment_#{@sort_by}", assignment_id)
-    elsif @column =~ /^assignment_group_\d+$/
+    elsif /^assignment_group_\d+$/.match?(@column)
       assignment_id = @column[/\d+$/]
       sort_by_assignment_group(assignment_id)
     elsif @column == "total_grade"

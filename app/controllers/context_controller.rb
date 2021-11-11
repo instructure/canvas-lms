@@ -207,7 +207,7 @@ class ContextController < ApplicationController
 
   def roster_user
     if authorized_action(@context, @current_user, :read_roster)
-      raise ActiveRecord::RecordNotFound unless params[:id] =~ Api::ID_REGEX
+      raise ActiveRecord::RecordNotFound unless Api::ID_REGEX.match?(params[:id])
 
       user_id = Shard.relative_id_for(params[:id], Shard.current, @context.shard)
       if @context.is_a?(Course)

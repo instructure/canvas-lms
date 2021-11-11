@@ -445,7 +445,7 @@ class UsersController < ApplicationController
       return_url = session[:masquerade_return_to]
       session.delete(:masquerade_return_to)
       @current_user.associate_with_shard(@user.shard, :shadow) if PageView.db?
-      if request.referer =~ /.*\/users\/#{@user.id}\/masquerade/
+      if /.*\/users\/#{@user.id}\/masquerade/.match?(request.referer)
         return return_to(return_url, dashboard_url)
       else
         return return_to(return_url, request.referer || dashboard_url)
@@ -491,7 +491,7 @@ class UsersController < ApplicationController
 
     @show_footer = true
 
-    if request.path =~ %r{\A/dashboard\z}
+    if %r{\A/dashboard\z}.match?(request.path)
       return redirect_to(dashboard_url, :status => :moved_permanently)
     end
 

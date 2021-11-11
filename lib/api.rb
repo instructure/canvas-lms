@@ -173,8 +173,8 @@ module Api
     elsif id =~ %r{\A(lti_[\w_]+|sis_[\w_]+):(.+)\z}
       sis_column = $1
       sis_id = $2
-    elsif id =~ ID_REGEX
-      return lookups['id'], (id =~ /\A\d+\z/ ? id.to_i : id)
+    elsif ID_REGEX.match?(id)
+      return lookups['id'], (/\A\d+\z/.match?(id) ? id.to_i : id)
     elsif id =~ UUID_REGEX
       return lookups['uuid'], $1
     else
@@ -212,7 +212,7 @@ module Api
   # (note that ID_REGEX may be redefined by a plugin!)
   def self.map_non_sis_ids(ids)
     ids.map { |id| id.to_s.strip }.select { |id| id =~ ID_REGEX }.map do |id|
-      id =~ /\A\d+\z/ ? id.to_i : id
+      /\A\d+\z/.match?(id) ? id.to_i : id
     end
   end
 
@@ -662,13 +662,13 @@ module Api
     placeholder = "PLACEHOLDER"
 
     placeholders = args.each_with_index.map do |arg, index|
-      arg =~ format ? "#{placeholder}#{index}" : arg
+      arg&.match?(format) ? "#{placeholder}#{index}" : arg
     end
 
     url = send(method, *placeholders)
 
     args.each_with_index do |arg, index|
-      url.sub!("#{placeholder}#{index}", arg) if arg =~ format
+      url.sub!("#{placeholder}#{index}", arg) if arg&.match?(format)
     end
 
     url

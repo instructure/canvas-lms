@@ -64,7 +64,11 @@ Naming/FileName:
   Exclude:
     - "**/Gemfile.d/~after.rb"
 
+Performance/RegexpMatch:
+  Severity: error
 Performance/StringInclude:
+  Severity: error
+Performance/StringReplacement:
   Severity: error
 
 Rails/ApplicationRecord:
@@ -165,6 +169,8 @@ Style/SlicingWithRange:
   Severity: error
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
+Style/UnpackFirst:
+  Severity: error
 Style/WhileUntilModifier:
   Enabled: false # nontrivial loops should look like loops
 

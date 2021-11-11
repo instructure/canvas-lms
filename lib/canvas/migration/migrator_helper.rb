@@ -37,7 +37,7 @@ module Canvas::Migration
 
       # timestamp can be either a time string in the format "2011-04-30T00:00:00-06:00",
       # or an integer epoch * 1000
-      if timestamp.to_s.match(/^-?[0-9.]+$/)
+      if timestamp.to_s.match?(/^-?[0-9.]+$/)
         timestamp = timestamp.to_i / 1000 rescue 0
         t = nil
         if timestamp > 0
@@ -213,7 +213,7 @@ module Canvas::Migration
         next unless m[:items]
 
         m[:items].each do |i|
-          if i[:linked_resource_type] =~ /assessment|quiz/i
+          if /assessment|quiz/i.match?(i[:linked_resource_type])
             if should_prepend?(:assessments, i[:linked_resource_id], existing_ids)
               i[:item_migration_id] = prepend_id(i[:item_migration_id], prepend_value)
               i[:linked_resource_id] = prepend_id(i[:linked_resource_id], prepend_value)

@@ -145,7 +145,7 @@ module Canvadocs
       request["Authorization"] = "Token #{token}"
       response = @http.request(request)
 
-      unless response.code =~ /\A20./
+      unless /\A20./.match?(response.code)
         err_message = "HTTP Error #{response.code}: #{response.body}"
         klass = Canvadocs::HttpError
         klass = Canvadocs::ServerError if response.code.to_s == "500"

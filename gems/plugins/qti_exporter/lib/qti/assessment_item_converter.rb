@@ -89,7 +89,7 @@ module Qti
         @question[:question_name] = @title || get_node_att(@doc, 'assessmentItem', 'title')
         # The colons are replaced with dashes in the conversion from QTI 1.2
         @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier')
-        @question[:migration_id] = @question[:migration_id].gsub(/:/, '-').gsub('identifier=', '') if @question[:migration_id]
+        @question[:migration_id] = @question[:migration_id].tr(':', '-').gsub('identifier=', '') if @question[:migration_id]
 
         if @flavor == Qti::Flavors::D2L
           # In D2L-generated QTI the assessments reference the items by the label instead of the identifier
@@ -262,15 +262,15 @@ module Qti
     def get_feedback
       @doc.search('modalFeedback').each do |f|
         id = f['identifier']
-        if id =~ /wrong|incorrect|(_IC$)/i
+        if /wrong|incorrect|(_IC$)/i.match?(id)
           extract_feedback!(@question, :incorrect_comments, f)
-        elsif id =~ /correct|(_C$)/i
+        elsif /correct|(_C$)/i.match?(id)
           if f.at_css('div.solution')
             @question[:example_solution] = clear_html(f.text.strip.gsub(/\s+/, " "))
           else
             extract_feedback!(@question, :correct_comments, f)
           end
-        elsif id =~ /solution/i
+        elsif /solution/i.match?(id)
           @question[:example_solution] = clear_html(f.text.strip.gsub(/\s+/, " "))
         elsif (@flavor == Qti::Flavors::D2L && f.text.present?) || id =~ /general_|_all/i
           extract_feedback!(@question, :neutral_comments, f)
@@ -405,7 +405,7 @@ module Qti
       end
       # Sometimes individual answers are assigned general feedback, don't return
       # the identifier if that's the case
-      id =~ /general_|_all|wrong|incorrect|correct|(_IC$)|(_C$)/i ? nil : id
+      /general_|_all|wrong|incorrect|correct|(_IC$)|(_C$)/i.match?(id) ? nil : id
     end
   end
 end

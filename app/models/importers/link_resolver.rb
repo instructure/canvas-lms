@@ -134,7 +134,7 @@ module Importers
       mig_id = nil
       # This is for backward-compatibility: canvas attachment filenames are escaped
       # with '+' for spaces and older exports have files with that instead of %20
-      alt_rel_path = rel_path.gsub('+', ' ')
+      alt_rel_path = rel_path.tr('+', ' ')
       if @migration.attachment_path_id_lookup
         mig_id ||= @migration.attachment_path_id_lookup[rel_path]
         mig_id ||= @migration.attachment_path_id_lookup[alt_rel_path]

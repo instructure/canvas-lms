@@ -82,7 +82,7 @@ module CC::Importer::Standard
       @resources.values.select { |r| r[:preferred_resource_id] }.each do |res|
         preferred = @resources[res[:preferred_resource_id]]
         if preferred && preferred != res
-          if preferred[:type] =~ SUPPORTED_TYPES
+          if SUPPORTED_TYPES.match?(preferred[:type])
             # The preferred resource is supported, use it instead
             @resources[res[:migration_id]] = preferred
           else
@@ -167,7 +167,7 @@ module CC::Importer::Standard
           if node[attr]
             val = URI.unescape(node[attr])
             begin
-              if val =~ FILEBASE_REGEX
+              if FILEBASE_REGEX.match?(val)
                 val.gsub!(FILEBASE_REGEX, '')
                 if (new_url = get_canvas_att_replacement_url(val, resource_dir))
                   node[attr] = URI.escape(new_url)

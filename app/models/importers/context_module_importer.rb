@@ -246,14 +246,14 @@ module Importers
                                            :indent => hash[:indent].to_i
                                          }, existing_item, :assignment => ass, :position => context_module.migration_position)
         end
-      elsif (hash[:linked_resource_type] || hash[:type]) =~ /folder|heading|contextmodulesubheader/i
+      elsif /folder|heading|contextmodulesubheader/i.match?((hash[:linked_resource_type] || hash[:type]))
         # just a snippet of text
         item = context_module.add_item({
                                          :title => hash[:title] || hash[:linked_resource_title],
                                          :type => 'context_module_sub_header',
                                          :indent => hash[:indent].to_i
                                        }, existing_item, :position => context_module.migration_position)
-      elsif hash[:linked_resource_type] =~ /url/i
+      elsif /url/i.match?(hash[:linked_resource_type])
         # external url
         if (url = hash[:url])
           if (CanvasHttp.validate_url(hash[:url]) rescue nil)

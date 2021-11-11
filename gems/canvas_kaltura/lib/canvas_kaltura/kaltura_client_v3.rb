@@ -283,8 +283,8 @@ module CanvasKaltura
     def bulkUploadAdd(files)
       rows = []
       files.each do |file|
-        filename = (file[:name] || "Media File").gsub(/,/, "")
-        description = (file[:description] || "no description").gsub(/,/, "")
+        filename = (file[:name] || "Media File").delete(',')
+        description = (file[:description] || "no description").delete(',')
         url = file[:url]
         rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '', '', '', '', file[:partner_data] || ''] if file[:url]
       end

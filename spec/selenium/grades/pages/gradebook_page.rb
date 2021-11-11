@@ -685,9 +685,9 @@ module Gradebook
   def self.assignment_header_menu_item_selector(item)
     menu_item_id = ""
 
-    if item =~ /curve(-?\s?grade)?/i
+    if /curve(-?\s?grade)?/i.match?(item)
       menu_item_id = 'curve-grades'
-    elsif item =~ /set(-?\s?default-?\s?grade)?/i
+    elsif /set(-?\s?default-?\s?grade)?/i.match?(item)
       menu_item_id = 'set-default-grade'
     end
 
@@ -728,13 +728,13 @@ module Gradebook
     assignment_header_menu_element(assignment_id).click
     menu_item_id = ""
 
-    if menuitem =~ /(message(-?\s?student)?)/i
+    if /(message(-?\s?student)?)/i.match?(menuitem)
       menu_item_id = 'message-students-who'
-    elsif menuitem =~ /(curve(-?\s?grade)?)/i
+    elsif /(curve(-?\s?grade)?)/i.match?(menuitem)
       menu_item_id = 'curve-grades'
-    elsif menuitem =~ /(set(-?\s?default-?\s?grade)?)/i
+    elsif /(set(-?\s?default-?\s?grade)?)/i.match?(menuitem)
       menu_item_id = 'set-default-grade'
-    elsif menuitem =~ /(download(-?\s?submission)?)/i
+    elsif /(download(-?\s?submission)?)/i.match?(menuitem)
       menu_item_id = 'download-submissions'
 
     end
@@ -747,15 +747,15 @@ module Gradebook
 
     sort_by_item = ""
 
-    if sort_type =~ /(low[\s\-]to[\s\-]high)/i
+    if /(low[\s\-]to[\s\-]high)/i.match?(sort_type)
       sort_by_item = 'Grade - Low to High'
-    elsif sort_type =~ /(high[\s\-]to[\s\-]low)/i
+    elsif /(high[\s\-]to[\s\-]low)/i.match?(sort_type)
       sort_by_item = 'Grade - High to Low'
-    elsif sort_type =~ /(missing)/i
+    elsif /(missing)/i.match?(sort_type)
       sort_by_item = 'Missing'
-    elsif sort_type =~ /(late)/i
+    elsif /(late)/i.match?(sort_type)
       sort_by_item = 'Late'
-    elsif sort_type =~ /(unposted)/i
+    elsif /(unposted)/i.match?(sort_type)
       sort_by_item = 'Unposted'
     end
     assignment_header_popover_sub_item_element(sort_by_item).click

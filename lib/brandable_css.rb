@@ -349,7 +349,7 @@ module BrandableCSS
       return(
         @decorated_font_paths =
           JSON.parse(file.read).each_with_object({}) do |(k, v), memo|
-            memo["/#{k}"] = "/dist/#{v}" if k =~ /^fonts.*woff2/
+            memo["/#{k}"] = "/dist/#{v}" if /^fonts.*woff2/.match?(k)
           end.freeze
       ) if file.exist?
 

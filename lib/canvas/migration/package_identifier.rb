@@ -52,7 +52,7 @@ module Canvas::Migration
         data = @archive.read("imsmanifest.xml")
         doc = create_xml_doc(data)
 
-        if get_node_val(doc, 'metadata schema') =~ COMMON_CARTRIDGE_REGEX
+        if COMMON_CARTRIDGE_REGEX.match?(get_node_val(doc, 'metadata schema'))
           if doc.at_css(%{resources resource[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::SYLLABUS}"] file[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::COURSE_SETTINGS}"]}) ||
              doc.at_css(%{resources resource[href="#{CC::CCHelper::COURSE_SETTINGS_DIR}/#{CC::CCHelper::CANVAS_EXPORT_FLAG}"]})
             :canvas_cartridge

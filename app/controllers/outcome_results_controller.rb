@@ -328,7 +328,7 @@ class OutcomeResultsController < ApplicationController
         send_data(
           outcome_results_rollups_csv(@current_user, @context, user_rollups, @outcomes, @outcome_paths),
           :type => "text/csv",
-          :filename => t('outcomes_filename', "Outcomes").gsub(/ /, "_") + "-" + @context.name.to_s.gsub(/ /, "_") + ".csv",
+          :filename => t('outcomes_filename', "Outcomes").tr(' ', "_") + "-" + @context.name.to_s.tr(' ', "_") + ".csv",
           :disposition => "attachment"
         )
       end
@@ -505,7 +505,7 @@ class OutcomeResultsController < ApplicationController
     if sort_by == 'outcome'
       sort_outcome_id = params[:sort_outcome_id]
       reject! "missing required sort_outcome_id parameter value" unless sort_outcome_id
-      reject! "invalid sort_outcome_id parameter value" unless sort_outcome_id =~ /\A\d+\z/
+      reject! "invalid sort_outcome_id parameter value" unless /\A\d+\z/.match?(sort_outcome_id)
     end
     sort_order = params[:sort_order]
     reject! "invalid sort_order parameter value" if sort_by && sort_order && !%w(asc desc).include?(sort_order)

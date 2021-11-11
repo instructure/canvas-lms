@@ -167,12 +167,12 @@ module CC
       doc = Nokogiri::XML.fragment(content)
       doc.css('a, img', 'iframe').each do |node|
         source = node['href'] || node['src']
-        next unless source =~ SPECIAL_REFERENCE_REGEX
+        next unless SPECIAL_REFERENCE_REGEX.match?(source)
 
-        if source =~ WEB_CONTENT_REFERENCE_REGEX
+        if WEB_CONTENT_REFERENCE_REGEX.match?(source)
           attachment_key = CGI.unescape(source.sub(WEB_CONTENT_REFERENCE_REGEX, ''))
           if node['data-media-type']
-            if attachment_key =~ MEDIAHREF_REGEX
+            if MEDIAHREF_REGEX.match?(attachment_key)
               # e.g. "/media_objects_iframe?mediahref=/foo.mp3?canvas_download&amp;type=audio=1&canvas_qs_type=audio"
               attachment_key = attachment_key.split('?').second
               attachment_key = "/" + attachment_key.split('/').second
@@ -187,7 +187,7 @@ module CC
           linked_objects.push({ local_path: attachment_key, type: 'Attachment' })
         else
           type, object_key = source.split('/').last 2
-          if type =~ SPECIAL_REFERENCE_REGEX
+          if SPECIAL_REFERENCE_REGEX.match?(type)
             type = object_key
             object_key = nil
           end
