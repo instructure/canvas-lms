@@ -338,8 +338,8 @@ module.exports = {
     .concat(
       // return a non-zero exit code if there are any warnings so we don't continue compiling assets if webpack fails
       process.env.WEBPACK_PEDANTIC !== '0'
-        ? function () {
-            this.plugin('done', ({compilation}) => {
+        ? function (compiler) {
+            compiler.hooks.done.tap('Canvas:FailOnWebpackWarnings', (compilation) => {
               if (compilation.warnings && compilation.warnings.length) {
                 console.error(compilation.warnings)
                 // If there's a bad import, webpack doesn't say where.
