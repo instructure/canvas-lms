@@ -28,13 +28,13 @@ module Quizzes
       state ||= 'untaken'
       @quiz.shard.activate do
         Quizzes::QuizSubmission.unique_constraint_retry do
-          if !user.is_a?(::User)
-            query_hash = { temporary_user_code: user.to_s }
-          elsif temporary
-            query_hash = { temporary_user_code: "user_#{user.id}" }
-          else
-            query_hash = { user_id: user.id }
-          end
+          query_hash = if !user.is_a?(::User)
+                         { temporary_user_code: user.to_s }
+                       elsif temporary
+                         { temporary_user_code: "user_#{user.id}" }
+                       else
+                         { user_id: user.id }
+                       end
 
           s = @quiz.quiz_submissions.where(query_hash).first
           s ||= @quiz.quiz_submissions.build(generate_build_hash(query_hash, user))

@@ -181,11 +181,11 @@ module Importers
               new_action += "/#{$1}"
             end
           end
-          if new_action.present?
-            new_url += new_action
-          else
-            new_url += "/preview"
-          end
+          new_url += if new_action.present?
+                       new_action
+                     else
+                       "/preview"
+                     end
           new_url += "?#{qs.join("&")}" if qs.present?
         end
         rel_path_parts.shift

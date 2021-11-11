@@ -409,11 +409,11 @@ class PageView < ActiveRecord::Base
     def initialize(skip_deleted_accounts = true, start_at = nil)
       super(start_at || 52.weeks.ago, Rails.logger)
 
-      if skip_deleted_accounts
-        account_ids = Set.new(Account.root_accounts.active.pluck(:id))
-      else
-        account_ids = Set.new(Account.root_accounts.pluck(:id))
-      end
+      account_ids = if skip_deleted_accounts
+                      Set.new(Account.root_accounts.active.pluck(:id))
+                    else
+                      Set.new(Account.root_accounts.pluck(:id))
+                    end
 
       load_migration_data(account_ids)
     end

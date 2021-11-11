@@ -368,11 +368,11 @@ module InstFS
 
     def access_jwt(resource, options = {})
       expires_in = options[:expires_in] || Setting.get('instfs.access_jwt.expiration_hours', '24').to_i.hours
-      if (expires_in >= 1.hour.to_i) && Setting.get('instfs.access_jwt.use_consistent_iat', 'true') == "true"
-        iat = consistent_iat(resource, expires_in)
-      else
-        iat = Time.now.utc.to_i
-      end
+      iat = if (expires_in >= 1.hour.to_i) && Setting.get('instfs.access_jwt.use_consistent_iat', 'true') == "true"
+              consistent_iat(resource, expires_in)
+            else
+              Time.now.utc.to_i
+            end
 
       claims = {
         iat: iat,

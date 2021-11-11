@@ -602,11 +602,11 @@ class User < ActiveRecord::Base
     user_ids = user_ids.map(&:id) if user_ids.first.is_a?(User)
     shards = [Shard.current]
     if !precalculated_associations
-      if !users_or_user_ids.first.is_a?(User)
-        users = users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
-      else
-        users = users_or_user_ids
-      end
+      users = if !users_or_user_ids.first.is_a?(User)
+                users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
+              else
+                users_or_user_ids
+              end
 
       if opts[:all_shards]
         shards = Set.new
@@ -1443,11 +1443,11 @@ class User < ActiveRecord::Base
   end
 
   def report_avatar_image!
-    if self.avatar_state == :approved || self.avatar_state == :locked
-      self.avatar_state = 're_reported'
-    else
-      self.avatar_state = 'reported'
-    end
+    self.avatar_state = if self.avatar_state == :approved || self.avatar_state == :locked
+                          're_reported'
+                        else
+                          'reported'
+                        end
     self.save!
   end
 
@@ -2733,11 +2733,11 @@ class User < ActiveRecord::Base
     favorites = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid, opts)
                     .select { |c| can_favorite.call(c) }
     # if favoritable courses (classic courses or k5 courses with admin enrollment) exist, show those and all non-favoritable courses
-    if favorites.length > 0
-      @menu_courses = favorites + courses.reject { |c| can_favorite.call(c) }
-    else
-      @menu_courses = courses
-    end
+    @menu_courses = if favorites.length > 0
+                      favorites + courses.reject { |c| can_favorite.call(c) }
+                    else
+                      courses
+                    end
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
     @menu_courses
   end

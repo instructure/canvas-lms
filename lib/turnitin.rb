@@ -288,12 +288,12 @@ module Turnitin
     def escape_params(params)
       escaped_params = {}
       params.each do |key, value|
-        if value.is_a?(String)
-          escaped_params[key] = CGI.escape(value).gsub("+", "%20")
-          # turnitin uses %20 to encode spaces (instead of +)
-        else
-          escaped_params[key] = value
-        end
+        escaped_params[key] = if value.is_a?(String)
+                                CGI.escape(value).gsub("+", "%20")
+                              # turnitin uses %20 to encode spaces (instead of +)
+                              else
+                                value
+                              end
       end
       return escaped_params
     end

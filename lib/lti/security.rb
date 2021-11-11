@@ -54,11 +54,11 @@ module Lti
     def self.generate_params_deprecated(params, url, key, secret)
       uri = URI.parse(url.strip)
 
-      if uri.port == uri.default_port
-        host = uri.host
-      else
-        host = "#{uri.host}:#{uri.port}"
-      end
+      host = if uri.port == uri.default_port
+               uri.host
+             else
+               "#{uri.host}:#{uri.port}"
+             end
 
       consumer = OAuth::Consumer.new(key, secret, {
                                        :site => "#{uri.scheme}://#{host}",

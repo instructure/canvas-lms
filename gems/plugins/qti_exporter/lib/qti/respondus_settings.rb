@@ -47,11 +47,11 @@ module Qti
 
       feedback = read_csv_setting('feedbackOptions')
       if feedback.include?('showResults') || feedback.include?('all')
-        if feedback.include?('lastAttemptOnly')
-          assessment[:hide_results] = 'until_after_last_attempt'
-        else
-          assessment[:hide_results] = { 'never' => '1' }
-        end
+        assessment[:hide_results] = if feedback.include?('lastAttemptOnly')
+                                      'until_after_last_attempt'
+                                    else
+                                      { 'never' => '1' }
+                                    end
       elsif feedback.include?('none')
         assessment[:hide_results] = 'always'
       end

@@ -218,12 +218,12 @@ module IncomingMailProcessor
     end
 
     def process(opts = {})
-      if opts[:mailbox_account_address]
-        # Find the one with that address, or do nothing if none exists (probably means we're in the middle of a deploy)
-        accounts_to_process = self.class.mailbox_accounts.select { |a| a.address == opts[:mailbox_account_address] }
-      else
-        accounts_to_process = self.class.mailbox_accounts
-      end
+      accounts_to_process = if opts[:mailbox_account_address]
+                              # Find the one with that address, or do nothing if none exists (probably means we're in the middle of a deploy)
+                              self.class.mailbox_accounts.select { |a| a.address == opts[:mailbox_account_address] }
+                            else
+                              self.class.mailbox_accounts
+                            end
 
       accounts_to_process.each do |account|
         mailbox = self.class.create_mailbox(account)

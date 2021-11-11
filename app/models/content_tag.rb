@@ -670,12 +670,12 @@ class ContentTag < ActiveRecord::Base
   def set_root_account
     return if self.root_account_id.present?
 
-    case self.context
-    when Account
-      self.root_account_id = self.context.resolved_root_account_id
-    else
-      self.root_account_id = self.context&.root_account_id
-    end
+    self.root_account_id = case self.context
+                           when Account
+                             self.context.resolved_root_account_id
+                           else
+                             self.context&.root_account_id
+                           end
   end
 
   def quiz_lti

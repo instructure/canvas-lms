@@ -155,12 +155,12 @@ module Api::V1
       end
 
       if (grader_id = options[:grader_id])
-        if grader_id.to_s == '0'
-          # yes, this is crazy.  autograded submissions have the grader_id of (quiz_id x -1)
-          collection = collection.where("submissions.grader_id<=0")
-        else
-          collection = collection.where(grader_id: grader_id)
-        end
+        collection = if grader_id.to_s == '0'
+                       # yes, this is crazy.  autograded submissions have the grader_id of (quiz_id x -1)
+                       collection.where("submissions.grader_id<=0")
+                     else
+                       collection.where(grader_id: grader_id)
+                     end
       end
 
       api_context.paginate(collection)

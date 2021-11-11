@@ -247,11 +247,11 @@ class WikiPagesApiController < ApplicationController
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
       # omit body from selection, since it's not included in index results
       scope = @context.wiki_pages.select(WikiPage.column_names - ['body']).preload(:user)
-      if params.has_key?(:published)
-        scope = value_to_boolean(params[:published]) ? scope.published : scope.unpublished
-      else
-        scope = scope.not_deleted
-      end
+      scope = if params.has_key?(:published)
+                value_to_boolean(params[:published]) ? scope.published : scope.unpublished
+              else
+                scope.not_deleted
+              end
 
       @context.shard.activate do
         scope = WikiPages::ScopedToUser.new(@context.wiki, @current_user, scope).scope
@@ -553,11 +553,11 @@ class WikiPagesApiController < ApplicationController
 
       # attempt to find an existing page
       @url = params[:url]
-      if is_front_page_action?
-        @page = @wiki.front_page
-      else
-        @page = @wiki.find_page(@url)
-      end
+      @page = if is_front_page_action?
+                @wiki.front_page
+              else
+                @wiki.find_page(@url)
+              end
     end
 
     # create a new page if the page was not found

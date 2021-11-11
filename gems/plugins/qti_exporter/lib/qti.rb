@@ -54,12 +54,12 @@ module Qti
   end
 
   def self.convert_questions(manifest_path, opts = {})
-    if (path_map = opts[:file_path_map])
-      # used when searching for matching file paths to help find the best matching path
-      sorted_paths = path_map.keys.sort_by { |v| v.length }
-    else
-      sorted_paths = []
-    end
+    sorted_paths = if (path_map = opts[:file_path_map])
+                     # used when searching for matching file paths to help find the best matching path
+                     path_map.keys.sort_by { |v| v.length }
+                   else
+                     []
+                   end
     questions = []
     doc = Nokogiri::XML(File.open(manifest_path))
     doc.css('manifest resources resource[type^=imsqti_item_xmlv2p]').each do |item|

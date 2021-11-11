@@ -325,11 +325,11 @@ class AccountsController < ApplicationController
         @accounts = (@current_user&.all_paginatable_accounts || []).paginate(per_page: 100)
       end
       format.json do
-        if @current_user
-          @accounts = Api.paginate(@current_user.all_paginatable_accounts, self, api_v1_accounts_url)
-        else
-          @accounts = []
-        end
+        @accounts = if @current_user
+                      Api.paginate(@current_user.all_paginatable_accounts, self, api_v1_accounts_url)
+                    else
+                      []
+                    end
         ActiveRecord::Associations::Preloader.new.preload(@accounts, :root_account)
 
         # originally had 'includes' instead of 'include' like other endpoints
@@ -461,22 +461,22 @@ class AccountsController < ApplicationController
     return unless authorized_action(@account, @current_user, :read)
 
     recursive = value_to_boolean(params[:recursive])
-    if recursive
-      @accounts = PaginatedCollection.build do |pager|
-        per_page = pager.per_page
-        current_page = [pager.current_page.to_i, 1].max
-        sub_accounts = Account.active.offset((current_page - 1) * per_page).limit(per_page + 1).sub_accounts_recursive(@account.id)
+    @accounts = if recursive
+                  PaginatedCollection.build do |pager|
+                    per_page = pager.per_page
+                    current_page = [pager.current_page.to_i, 1].max
+                    sub_accounts = Account.active.offset((current_page - 1) * per_page).limit(per_page + 1).sub_accounts_recursive(@account.id)
 
-        if sub_accounts.length > per_page
-          sub_accounts.pop
-          pager.next_page = current_page + 1
-        end
+                    if sub_accounts.length > per_page
+                      sub_accounts.pop
+                      pager.next_page = current_page + 1
+                    end
 
-        pager.replace sub_accounts
-      end
-    else
-      @accounts = @account.sub_accounts.order(:id)
-    end
+                    pager.replace sub_accounts
+                  end
+                else
+                  @account.sub_accounts.order(:id)
+                end
 
     @accounts = Api.paginate(@accounts, self, api_v1_sub_accounts_url,
                              :total_entries => recursive ? nil : @accounts.count)
@@ -1100,11 +1100,11 @@ class AccountsController < ApplicationController
 
         if (sis_id = params[:account].delete(:sis_source_id))
           if !@account.root_account? && sis_id != @account.sis_source_id && @account.root_account.grants_right?(@current_user, session, :manage_sis)
-            if sis_id == ''
-              @account.sis_source_id = nil
-            else
-              @account.sis_source_id = sis_id
-            end
+            @account.sis_source_id = if sis_id == ''
+                                       nil
+                                     else
+                                       sis_id
+                                     end
           end
         end
 
@@ -1701,11 +1701,11 @@ class AccountsController < ApplicationController
     return if sis_name_length_setting.nil?
 
     value = sis_name_length_setting[:value]
-    if value.to_i.to_s == value.to_s && value.to_i <= SIS_ASSINGMENT_NAME_LENGTH_DEFAULT && value.to_i >= 0
-      sis_name_length_setting[:value] = value
-    else
-      sis_name_length_setting[:value] = SIS_ASSINGMENT_NAME_LENGTH_DEFAULT
-    end
+    sis_name_length_setting[:value] = if value.to_i.to_s == value.to_s && value.to_i <= SIS_ASSINGMENT_NAME_LENGTH_DEFAULT && value.to_i >= 0
+                                        value
+                                      else
+                                        SIS_ASSINGMENT_NAME_LENGTH_DEFAULT
+                                      end
   end
 
   PERMITTED_SETTINGS_FOR_UPDATE = [:admins_can_change_passwords, :admins_can_view_notifications,

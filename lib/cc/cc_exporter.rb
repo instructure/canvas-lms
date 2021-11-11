@@ -63,11 +63,11 @@ module CC
 
         create_export_dir
         create_zip_file
-        if @qti_only_export
-          @manifest = CC::Qti::QtiManifest.new(self)
-        else
-          @manifest = Manifest.new(self, @manifest_opts)
-        end
+        @manifest = if @qti_only_export
+                      CC::Qti::QtiManifest.new(self)
+                    else
+                      Manifest.new(self, @manifest_opts)
+                    end
         @manifest.create_document
         @manifest.close
 
@@ -204,11 +204,11 @@ module CC
 
     def create_zip_file
       name = CanvasTextHelper.truncate_text(@course.name.to_url, { :max_length => 200, :ellipsis => '' })
-      if @qti_only_export
-        @zip_name = "#{name}-quiz-export.zip"
-      else
-        @zip_name = "#{name}-export.#{CCHelper::CC_EXTENSION}"
-      end
+      @zip_name = if @qti_only_export
+                    "#{name}-quiz-export.zip"
+                  else
+                    "#{name}-export.#{CCHelper::CC_EXTENSION}"
+                  end
       FileUtils::mkdir_p File.join(@export_dir, ZIP_DIR)
       @zip_path = File.join(@export_dir, ZIP_DIR, @zip_name)
       @zip_file = Zip::File.new(@zip_path, Zip::File::CREATE)

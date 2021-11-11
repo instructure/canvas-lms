@@ -138,11 +138,11 @@ module Importers
         item.title = hash[:title] unless hash[:root_folder]
         description = ""
         if hash[:header]
-          if hash[:header][:is_html]
-            description += migration.convert_html(hash[:header][:body], :wiki_page, hash[:migration_id], :body)
-          else
-            description += migration.convert_text(hash[:header][:body] || [""])
-          end
+          description += if hash[:header][:is_html]
+                           migration.convert_html(hash[:header][:body], :wiki_page, hash[:migration_id], :body)
+                         else
+                           migration.convert_text(hash[:header][:body] || [""])
+                         end
         end
 
         if hash[:description]
@@ -188,22 +188,22 @@ module Importers
               obj = context.discussion_topics.where(migration_id: sub_item[:linked_resource_id]).first
               contents += "  <li><a href='/courses/#{context.id}/discussion_topics/#{obj.id}'>#{obj.title}</a></li>\n" if obj
             when 'URL_TYPE'
-              if sub_item['title'] && sub_item['description'] && sub_item['title'] != '' && sub_item['description'] != ''
-                contents += " <li><a href='#{sub_item['url']}'>#{sub_item['title']}</a><ul><li>#{sub_item['description']}</li></ul></li>\n"
-              else
-                contents += " <li><a href='#{sub_item['url']}'>#{sub_item['title'] || sub_item['description']}</a></li>\n"
-              end
+              contents += if sub_item['title'] && sub_item['description'] && sub_item['title'] != '' && sub_item['description'] != ''
+                            " <li><a href='#{sub_item['url']}'>#{sub_item['title']}</a><ul><li>#{sub_item['description']}</li></ul></li>\n"
+                          else
+                            " <li><a href='#{sub_item['url']}'>#{sub_item['title'] || sub_item['description']}</a></li>\n"
+                          end
             end
           end
         end
         description += "<ul>\n#{contents}\n</ul>" if contents && contents.length > 0
 
         if hash[:footer]
-          if hash[:footer][:is_html]
-            description += migration.convert_html(hash[:footer][:body], :wiki_page, hash[:migration_id], :body)
-          else
-            description += migration.convert_text(hash[:footer][:body] || "")
-          end
+          description += if hash[:footer][:is_html]
+                           migration.convert_html(hash[:footer][:body], :wiki_page, hash[:migration_id], :body)
+                         else
+                           migration.convert_text(hash[:footer][:body] || "")
+                         end
         end
 
         item.body = description

@@ -173,18 +173,18 @@ class EnrollmentState < ActiveRecord::Base
       else
         # the course has yet to begin for the enrollment
         self.state_valid_until = global_start_at # store the date when that will change
-        if self.enrollment.view_restrictable?
-          # these enrollment states mean they still can't participate yet even if they've accepted it,
-          # but should be able to view just like an invited enrollment
-          if wf_state == 'active'
-            self.state = 'pending_active'
-          else
-            self.state = 'pending_invited'
-          end
-        else
-          # admin user restricted by term dates
-          self.state = 'inactive'
-        end
+        self.state = if self.enrollment.view_restrictable?
+                       # these enrollment states mean they still can't participate yet even if they've accepted it,
+                       # but should be able to view just like an invited enrollment
+                       if wf_state == 'active'
+                         'pending_active'
+                       else
+                         'pending_invited'
+                       end
+                     else
+                       # admin user restricted by term dates
+                       'inactive'
+                     end
       end
     end
   end
@@ -193,18 +193,17 @@ class EnrollmentState < ActiveRecord::Base
   # you can still access the course in a "view-only" mode
   # but courses/accounts can disable this
   def recalculate_access
-    if self.enrollment.view_restrictable?
-      self.restricted_access =
-        if self.pending?
-          self.enrollment.restrict_future_view?
-        elsif self.state == 'completed'
-          self.enrollment.restrict_past_view?
-        else
-          false
-        end
-    else
-      self.restricted_access = false
-    end
+    self.restricted_access = if self.enrollment.view_restrictable?
+                               if self.pending?
+                                 self.enrollment.restrict_future_view?
+                               elsif self.state == 'completed'
+                                 self.enrollment.restrict_past_view?
+                               else
+                                 false
+                               end
+                             else
+                               false
+                             end
     self.access_is_current = true
   end
 

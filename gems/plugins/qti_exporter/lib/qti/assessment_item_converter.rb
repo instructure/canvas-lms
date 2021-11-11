@@ -74,11 +74,11 @@ module Qti
     end
 
     def create_xml_doc
-      if @manifest_node
-        @doc = Nokogiri::XML(File.open(@href))
-      else
-        @doc = Nokogiri::XML(@qti_data)
-      end
+      @doc = if @manifest_node
+               Nokogiri::XML(File.open(@href))
+             else
+               Nokogiri::XML(@qti_data)
+             end
     end
 
     EXCLUDED_QUESTION_TEXT_CLASSES = ["RESPONSE_BLOCK", "RIGHT_MATCH_BLOCK"]
@@ -126,11 +126,11 @@ module Qti
           @question[:question_text] = ''
           text_nodes.each_with_index do |node, i|
             @question[:question_text] += "\n<br/>\n" if i > 0
-            if node['class'] == 'html'
-              @question[:question_text] += sanitize_html_string(node.text)
-            else
-              @question[:question_text] += sanitize_html!(node)
-            end
+            @question[:question_text] += if node['class'] == 'html'
+                                           sanitize_html_string(node.text)
+                                         else
+                                           sanitize_html!(node)
+                                         end
           end
         elsif @doc.at_css('itemBody associateInteraction prompt')
           @question[:question_text] = "" # apparently they deliberately had a blank question?

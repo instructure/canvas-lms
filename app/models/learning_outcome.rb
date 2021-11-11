@@ -349,11 +349,11 @@ class LearningOutcome < ActiveRecord::Base
   def artifacts_count_for_tied_context
     codes = [@tied_context.asset_string]
     if @tied_context.is_a?(Account)
-      if @tied_context == context
-        codes = "all"
-      else
-        codes = @tied_context.all_courses.select(:id).map(&:asset_string)
-      end
+      codes = if @tied_context == context
+                "all"
+              else
+                @tied_context.all_courses.select(:id).map(&:asset_string)
+              end
     end
     self.learning_outcome_results.active.for_context_codes(codes).count
   end
@@ -450,12 +450,12 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def determine_tag_type(mastery_type)
-    case mastery_type
-    when 'points', 'points_mastery'
-      new_mastery_type = 'points_mastery'
-    else
-      new_mastery_type = 'explicit_mastery'
-    end
+    new_mastery_type = case mastery_type
+                       when 'points', 'points_mastery'
+                         'points_mastery'
+                       else
+                         'explicit_mastery'
+                       end
     new_mastery_type
   end
 

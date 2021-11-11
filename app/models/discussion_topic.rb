@@ -926,11 +926,11 @@ class DiscussionTopic < ActiveRecord::Base
                                              .where(:id => topic_ids_with_entries).distinct.pluck(:root_topic_id)
 
     topics.each do |topic|
-      if topic.assignment_id
-        topic.can_unpublish = !assmnt_ids_with_subs.include?(topic.assignment_id)
-      else
-        topic.can_unpublish = !topic_ids_with_entries.include?(topic.id)
-      end
+      topic.can_unpublish = if topic.assignment_id
+                              !assmnt_ids_with_subs.include?(topic.assignment_id)
+                            else
+                              !topic_ids_with_entries.include?(topic.id)
+                            end
     end
   end
 

@@ -63,11 +63,11 @@ module CanvasPartman
         empties = 0
         partitions = partition_tables
 
-        if partitions.empty?
-          current = -1
-        else
-          current = partitions.last[base_class.table_name.length + 1..-1].to_i
-        end
+        current = if partitions.empty?
+                    -1
+                  else
+                    partitions.last[base_class.table_name.length + 1..-1].to_i
+                  end
 
         if self.partition_on_primary_key?
           partitions.reverse_each do |partition|

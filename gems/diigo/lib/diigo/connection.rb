@@ -39,11 +39,11 @@ module Diigo
         path = url.path
         path += "?" + url.query if url.query
 
-        if method == 'GET'
-          request = Net::HTTP::Get.new(path)
-        else
-          request = Net::HTTP::Post.new(path)
-        end
+        request = if method == 'GET'
+                    Net::HTTP::Get.new(path)
+                  else
+                    Net::HTTP::Post.new(path)
+                  end
         request.set_form_data(form_data) if form_data
         request.basic_auth user_name, password
         response = http.request(request)

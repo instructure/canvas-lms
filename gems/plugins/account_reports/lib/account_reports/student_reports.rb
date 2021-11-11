@@ -79,11 +79,11 @@ module AccountReports
     end
 
     def enrollment_states_string
-      if enrollment_states
-        states = Array(enrollment_states).join(' ')
-      else
-        states = 'all'
-      end
+      states = if enrollment_states
+                 Array(enrollment_states).join(' ')
+               else
+                 'all'
+               end
       states
     end
 

@@ -140,11 +140,11 @@ module Stats
       bins = {}
       @items.each do |i|
         bin = (((i - bin_base) / bin_width).floor * bin_width) + bin_base
-        if bins.has_key?(bin)
-          bins[bin] = bins[bin] + 1
-        else
-          bins[bin] = 1
-        end
+        bins[bin] = if bins.has_key?(bin)
+                      bins[bin] + 1
+                    else
+                      1
+                    end
       end
       ret_val[:data] = bins
       ret_val

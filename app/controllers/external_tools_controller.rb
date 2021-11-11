@@ -117,11 +117,11 @@ class ExternalToolsController < ApplicationController
   #     ]
   def index
     if authorized_action(@context, @current_user, :read)
-      if params[:include_parents]
-        @tools = ContextExternalTool.all_tools_for(@context, :user => (params[:include_personal] ? @current_user : nil))
-      else
-        @tools = @context.context_external_tools.active
-      end
+      @tools = if params[:include_parents]
+                 ContextExternalTool.all_tools_for(@context, :user => (params[:include_personal] ? @current_user : nil))
+               else
+                 @context.context_external_tools.active
+               end
       @tools = ContextExternalTool.search_by_attribute(@tools, :name, params[:search_term])
 
       @context.shard.activate do

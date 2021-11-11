@@ -151,11 +151,11 @@ module SIS
             root_account = @root_account
           end
 
-          if !enrollment_info.user_integration_id.blank?
-            pseudo = root_account.pseudonyms.where(integration_id: enrollment_info.user_integration_id).take
-          else
-            pseudo = root_account.pseudonyms.where(sis_user_id: enrollment_info.user_id).take
-          end
+          pseudo = if !enrollment_info.user_integration_id.blank?
+                     root_account.pseudonyms.where(integration_id: enrollment_info.user_integration_id).take
+                   else
+                     root_account.pseudonyms.where(sis_user_id: enrollment_info.user_id).take
+                   end
 
           unless pseudo
             err = +"User not found for enrollment "

@@ -267,11 +267,11 @@ module AccountReports
       terms = terms.where.not(sis_source_id: nil) if @sis_format
       terms = terms.where.not(enrollment_terms: { sis_batch_id: nil }) if @created_by_sis
 
-      if @include_deleted
-        terms = terms.where("workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
-      else
-        terms = terms.where("workflow_state<>'deleted'")
-      end
+      terms = if @include_deleted
+                terms.where("workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
+              else
+                terms.where("workflow_state<>'deleted'")
+              end
       terms
     end
 
@@ -364,15 +364,15 @@ module AccountReports
       row << c.enrollment_term_id unless @sis_format
       row << c.enrollment_term.try(:sis_source_id)
       # for sis import format 'claimed', 'created', and 'available' are all considered active
-      if @sis_format
-        if c.workflow_state == 'deleted' || c.workflow_state == 'completed'
-          row << c.workflow_state
-        else
-          row << 'active'
-        end
-      else
-        row << course_state_sub[c.workflow_state]
-      end
+      row << if @sis_format
+               if c.workflow_state == 'deleted' || c.workflow_state == 'completed'
+                 c.workflow_state
+               else
+                 'active'
+               end
+             else
+               course_state_sub[c.workflow_state]
+             end
       if c.restrict_enrollments_to_course_dates
         row << default_timezone_format(c.start_at)
         row << default_timezone_format(c.conclude_at)
@@ -704,22 +704,22 @@ module AccountReports
       end
 
       root_account.shard.activate do
-        if account != root_account
-          group_categories = GroupCategory
-                             .joins("LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id
+        group_categories = if account != root_account
+                             GroupCategory
+                               .joins("LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id
                    AND group_categories.context_type = 'Course'")
-                             .joins("LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id
+                               .joins("LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id
                    AND group_categories.context_type = 'Account'")
-                             .where("a.id IN (#{Account.sub_account_ids_recursive_sql(account.id)}) OR a.id=? OR EXISTS (?)",
-                                    account,
-                                    CourseAccountAssociation.where("course_id=c.id").where(account_id: account))
-        else
-          group_categories = root_account.all_group_categories
+                               .where("a.id IN (#{Account.sub_account_ids_recursive_sql(account.id)}) OR a.id=? OR EXISTS (?)",
+                                      account,
+                                      CourseAccountAssociation.where("course_id=c.id").where(account_id: account))
+                           else
+                             root_account.all_group_categories
                                          .joins("LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id
                      AND group_categories.context_type = 'Account'
                    LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id
                      AND group_categories.context_type = 'Course'")
-        end
+                           end
         group_categories = group_category_query_options(group_categories)
 
         generate_and_run_report headers do |csv|

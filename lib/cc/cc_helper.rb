@@ -109,13 +109,13 @@ module CC
     end
 
     def self.create_key(object, prepend = "", global: false)
-      if object.is_a? ActiveRecord::Base
-        key = global ? object.global_asset_string : object.asset_string
-      elsif global && (md = object.to_s.match(/^(.*)_(\d+)$/))
-        key = "#{md[1]}_#{Shard.global_id_for(md[2])}" # globalize asset strings
-      else
-        key = object.to_s
-      end
+      key = if object.is_a? ActiveRecord::Base
+              global ? object.global_asset_string : object.asset_string
+            elsif global && (md = object.to_s.match(/^(.*)_(\d+)$/))
+              "#{md[1]}_#{Shard.global_id_for(md[2])}" # globalize asset strings
+            else
+              object.to_s
+            end
       # make it obvious if we're using new identifiers now
       (global ? "g" : "i") + Digest::MD5.hexdigest(prepend + key)
     end
@@ -240,11 +240,11 @@ module CC
               "#{COURSE_TOKEN}/files"
             end
           else
-            if @course && match.obj_class == Attachment
-              obj = @course.attachments.find_by_id(match.obj_id)
-            else
-              obj = match.obj_class.where(id: match.obj_id).first
-            end
+            obj = if @course && match.obj_class == Attachment
+                    @course.attachments.find_by_id(match.obj_id)
+                  else
+                    match.obj_class.where(id: match.obj_id).first
+                  end
             next(match.url) unless obj && (@rewriter.user_can_view_content?(obj) || @for_epub_export)
 
             @referenced_files[obj.id] = @key_generator.create_key(obj) if @track_referenced_files && !@referenced_files[obj.id]

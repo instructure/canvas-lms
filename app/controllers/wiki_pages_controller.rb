@@ -97,11 +97,11 @@ class WikiPagesController < ApplicationController
           redirect_to polymorphic_url([@context, :wiki_page], id: encoded_name || @page, titleize: params[:titleize], action: :edit)
         else
           wiki_page = @context.wiki_pages.deleted_last.where(url: @page.url).first
-          if wiki_page && wiki_page.deleted?
-            flash[:warning] = t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
-          else
-            flash[:warning] = t('notices.page_does_not_exist', 'The page "%{title}" does not exist.', :title => @page.title)
-          end
+          flash[:warning] = if wiki_page && wiki_page.deleted?
+                              t('notices.page_deleted', 'The page "%{title}" has been deleted.', :title => @page.title)
+                            else
+                              t('notices.page_does_not_exist', 'The page "%{title}" does not exist.', :title => @page.title)
+                            end
           redirect_to polymorphic_url([@context, :wiki_pages])
         end
         return

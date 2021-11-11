@@ -301,11 +301,11 @@ module Canvas::Migration::Helpers
 
               scope = scope.select(:assignment_id) if type == 'quizzes'
 
-              if type == 'context_modules' || type == 'context_external_tools' || type == 'groups'
-                scope = scope.select(:name)
-              else
-                scope = scope.select(:title)
-              end
+              scope = if type == 'context_modules' || type == 'context_external_tools' || type == 'groups'
+                        scope.select(:name)
+                      else
+                        scope.select(:title)
+                      end
 
               if scope.klass.respond_to?(:not_deleted)
                 scope = scope.not_deleted

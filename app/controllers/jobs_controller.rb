@@ -59,11 +59,11 @@ class JobsController < ApplicationController
   end
 
   def show
-    if params[:flavor] == 'failed'
-      job = Delayed::Job::Failed.find(params[:id])
-    else
-      job = Delayed::Job.find(params[:id])
-    end
+    job = if params[:flavor] == 'failed'
+            Delayed::Job::Failed.find(params[:id])
+          else
+            Delayed::Job.find(params[:id])
+          end
     render :json => job.as_json(:include_root => false)
   end
 
