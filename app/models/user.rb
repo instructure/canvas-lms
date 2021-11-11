@@ -577,8 +577,7 @@ class User < ActiveRecord::Base
     starting_account_ids += (data[:account_users][user.id] || []).map(&:account_id)
     starting_account_ids.uniq!
 
-    result = calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
-    result
+    calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
   end
 
   def self.update_account_associations(users_or_user_ids, opts = {})

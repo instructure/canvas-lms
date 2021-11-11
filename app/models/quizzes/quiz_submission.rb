@@ -168,8 +168,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     raise "Cannot view temporary data for completed quiz" unless !self.completed?
     raise "Cannot view temporary data for completed quiz" if graded?
 
-    res = (self.submission_data || {}).with_indifferent_access
-    res
+    (self.submission_data || {}).with_indifferent_access
   end
 
   def question_answered?(id)
@@ -672,8 +671,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     version_data["workflow_state"] = self.workflow_state if attrs.include?(:workflow_state)
     version_data["manually_scored"] = self.manually_scored if attrs.include?(:manually_scored)
     version.yaml = version_data.to_yaml
-    res = version.save
-    res
+    version.save
   end
 
   def context_module_action

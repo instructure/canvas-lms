@@ -1403,9 +1403,7 @@ class DiscussionTopic < ActiveRecord::Base
 
     subscribed_users = participating_users(sub_ids).to_a
 
-    subscribed_users = filter_message_users(subscribed_users)
-
-    subscribed_users
+    filter_message_users(subscribed_users)
   end
 
   def filter_message_users(users)

@@ -97,11 +97,10 @@ module OutcomeCommon
   end
 
   def state_outcome
-    state_outcome = [
+    [
       'CCSS.ELA-Literacy.CCRA.R - Reading',
       'Craft and Structure'
     ]
-    state_outcome
   end
 
   def course_bulk_outcome_groups_course(num_of_groups, num_of_outcomes)

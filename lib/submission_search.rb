@@ -30,8 +30,7 @@ class SubmissionSearch
     # use all_submissions so state: deleted can be found
     submission_search_scope = @assignment.all_submissions
     submission_search_scope = add_filters(submission_search_scope)
-    submission_search_scope = add_order_bys(submission_search_scope)
-    submission_search_scope
+    add_order_bys(submission_search_scope)
   end
 
   def user_search_scope

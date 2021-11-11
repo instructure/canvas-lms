@@ -89,7 +89,7 @@ describe UserObserveesController, type: :request do
     if opts[:avatars]
       params.merge!(include: ["avatar_url"])
     end
-    json = api_call_as_user(
+    api_call_as_user(
       opts[:api_user] || allowed_admin,
       :get,
       "/api/v1/users/#{params[:user_id]}/observees#{page}",
@@ -98,7 +98,6 @@ describe UserObserveesController, type: :request do
       {},
       { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
     )
-    json
   end
 
   def observers_call(opts = {})
@@ -110,7 +109,7 @@ describe UserObserveesController, type: :request do
 
   def raw_observers_call(opts = {})
     params[:user_id] = opts[:user_id] || student.id
-    json = api_call_as_user(
+    api_call_as_user(
       opts[:api_user] || allowed_admin,
       :get,
       "/api/v1/users/#{params[:user_id]}/observers",
@@ -119,7 +118,6 @@ describe UserObserveesController, type: :request do
       {},
       { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
     )
-    json
   end
 
   def create_call(data, opts = {})

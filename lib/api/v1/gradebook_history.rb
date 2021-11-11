@@ -55,7 +55,7 @@ module Api::V1
       end
       grader = (json[:grader_id] && json[:grader_id] > 0 && user_cache[json[:grader_id]]) || default_grader
 
-      json = json.merge(
+      json.merge(
         :grader => grader.name,
         :assignment_name => assignment.title,
         :user_name => student.name,
@@ -63,7 +63,6 @@ module Api::V1
         :current_graded_at => submission.graded_at,
         :current_grader => current_grader.name
       )
-      json
     end
 
     def versions_json(course, versions, api_context, opts = {})

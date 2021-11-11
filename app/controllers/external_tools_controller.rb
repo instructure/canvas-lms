@@ -1230,7 +1230,7 @@ class ExternalToolsController < ApplicationController
   private
 
   def external_tools_json_for_courses(courses)
-    json = courses.reduce([]) do |all_results, course|
+    courses.reduce([]) do |all_results, course|
       tabs = course.tabs_available(@current_user, course_subject_tabs: true)
       tool_ids = []
       tabs.select { |t| t[:external] }.each do |t|
@@ -1246,8 +1246,6 @@ class ExternalToolsController < ApplicationController
       end
       all_results.push(*results)
     end
-
-    json
   end
 
   def parse_context_codes

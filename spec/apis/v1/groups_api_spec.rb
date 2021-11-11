@@ -91,14 +91,13 @@ describe "Groups API", type: :request do
   end
 
   def user_json(user, **)
-    hash = {
+    {
       'id' => user.id,
       'created_at' => user.created_at.iso8601,
       'name' => user.name,
       'sortable_name' => user.sortable_name,
       'short_name' => user.short_name
     }
-    hash
   end
 
   def membership_json(membership, is_admin = false)

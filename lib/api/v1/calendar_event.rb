@@ -29,12 +29,11 @@ module Api::V1::CalendarEvent
   include Api::V1::Conferences
 
   def event_json(event, user, session, options = {})
-    hash = if event.is_a?(::CalendarEvent)
-             calendar_event_json(event, user, session, options)
-           else
-             assignment_event_json(event, user, session, options)
-           end
-    hash
+    if event.is_a?(::CalendarEvent)
+      calendar_event_json(event, user, session, options)
+    else
+      assignment_event_json(event, user, session, options)
+    end
   end
 
   def calendar_event_json(event, user, session, options = {})

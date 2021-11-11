@@ -237,8 +237,7 @@ module Canvas::Migration::Helpers
           add_url!(hash, "submodules_#{CGI.escape(item['migration_id'])}")
         end
       end
-      hash = add_linked_resource(type, item, hash)
-      hash
+      add_linked_resource(type, item, hash)
     end
 
     def add_linked_resource(type, item, hash)

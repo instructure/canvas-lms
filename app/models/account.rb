@@ -1160,8 +1160,7 @@ class Account < ActiveRecord::Base
 
   def available_custom_roles(include_inactive = false)
     scope = Role.where(:account_id => account_chain_ids)
-    scope = include_inactive ? scope.not_deleted : scope.active
-    scope
+    include_inactive ? scope.not_deleted : scope.active
   end
 
   def available_roles(include_inactive = false)

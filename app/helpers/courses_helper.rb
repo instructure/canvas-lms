@@ -72,16 +72,14 @@ module CoursesHelper
 
   def recent_event_url(recent_event)
     context = recent_event.context
-    url = if recent_event.is_a?(Assignment)
-            context_url(context, :context_assignment_url, :id => recent_event.id)
-          else
-            calendar_url_for(nil, {
-                               :query => { :month => recent_event.start_at.month, :year => recent_event.start_at.year },
-                               :anchor => "calendar_event_" + recent_event.id.to_s
-                             })
-          end
-
-    url
+    if recent_event.is_a?(Assignment)
+      context_url(context, :context_assignment_url, :id => recent_event.id)
+    else
+      calendar_url_for(nil, {
+                         :query => { :month => recent_event.start_at.month, :year => recent_event.start_at.year },
+                         :anchor => "calendar_event_" + recent_event.id.to_s
+                       })
+    end
   end
 
   # Public: Display the given user count, or "None" if it's 0.
