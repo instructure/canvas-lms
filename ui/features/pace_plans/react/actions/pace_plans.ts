@@ -64,6 +64,7 @@ const thunkActions = {
   publishPlan: (): ThunkAction<Promise<void>, StoreState, void, Action> => {
     return (dispatch, getState) => {
       dispatch(uiActions.showLoadingOverlay(I18n.t('Starting publish...')))
+      dispatch(uiActions.clearCategoryError('publish'))
 
       return Api.publish(getState().pacePlan)
         .then(responseBody => {
@@ -76,7 +77,7 @@ const thunkActions = {
         })
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
-          dispatch(uiActions.setErrorMessage(I18n.t('There was an error publishing your plan.')))
+          dispatch(uiActions.setCategoryError('publish', error?.toString()))
           console.log(error) // eslint-disable-line no-console
         })
     }
@@ -96,6 +97,7 @@ const thunkActions = {
                 updatedProgress.workflow_state !== 'completed' ? updatedProgress : undefined
               )
             )
+            dispatch(uiActions.clearCategoryError('checkPublishStatus'))
             if (TERMINAL_PROGRESS_STATUSES.includes(updatedProgress.workflow_state)) {
               showFlashAlert({
                 message: I18n.t('Finished publishing plan'),
@@ -108,11 +110,7 @@ const thunkActions = {
             }
           })
           .catch(error => {
-            dispatch(
-              uiActions.setErrorMessage(
-                I18n.t('There was an error checking plan publishing status')
-              )
-            )
+            dispatch(uiActions.setCategoryError('checkPublishStatus', error?.toString()))
             console.log(error) // eslint-disable-line no-console
           })
       return pollingLoop()
@@ -124,6 +122,7 @@ const thunkActions = {
   ): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
       dispatch(uiActions.showLoadingOverlay(I18n.t('Loading...')))
+      dispatch(uiActions.clearCategoryError('resetToLastPublished'))
 
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
@@ -135,9 +134,7 @@ const thunkActions = {
         })
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
-          dispatch(
-            uiActions.setErrorMessage(I18n.t('There was an error resetting to the previous plan.'))
-          )
+          dispatch(uiActions.setCategoryError('resetToLastPublished', error?.toString()))
           console.error(error) // eslint-disable-line no-console
         })
     }
@@ -149,6 +146,7 @@ const thunkActions = {
   ): ThunkAction<void, StoreState, void, Action> => {
     return async (dispatch, getState) => {
       dispatch(uiActions.showLoadingOverlay(I18n.t('Loading...')))
+      dispatch(uiActions.clearCategoryError('loading'))
 
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
@@ -160,7 +158,7 @@ const thunkActions = {
         })
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
-          dispatch(uiActions.setErrorMessage(I18n.t('There was an error loading the plan.')))
+          dispatch(uiActions.setCategoryError('loading', error?.toString()))
           console.error(error) // eslint-disable-line no-console
         })
     }
@@ -171,6 +169,7 @@ const thunkActions = {
       if (!pacePlanId) return Promise.reject(new Error(I18n.t('Cannot relink unsaved plans')))
 
       dispatch(uiActions.showLoadingOverlay(I18n.t('Relinking plans...')))
+      dispatch(uiActions.clearCategoryError('relinkToParent'))
 
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
@@ -182,7 +181,7 @@ const thunkActions = {
         })
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
-          dispatch(uiActions.setErrorMessage(I18n.t('There was an error linking plan.')))
+          dispatch(uiActions.setCategoryError('relinkToParent', error?.toString()))
           console.error(error) // eslint-disable-line no-console
         })
     }
