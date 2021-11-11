@@ -275,9 +275,9 @@ module Lti
     register_expansion 'com.instructure.Assignment.description', [],
                        -> do
                          if @assignment
-                           @assignment.description
+                           @assignment.lti_safe_description
                          elsif @originality_report
-                           @originality_report.submission.assignment.description
+                           @originality_report.submission.assignment.lti_safe_description
                          elsif @secure_params.present?
                            Lti::Security.decoded_lti_assignment_description(@secure_params)
                          end
@@ -1233,7 +1233,7 @@ module Lti
     #   "Example Description"
     #   ```
     register_expansion 'Canvas.assignment.description', [],
-                       -> { @assignment.description },
+                       -> { @assignment.lti_safe_description },
                        ASSIGNMENT_GUARD
 
     # Returns the Canvas id of the group the current user is in if launching
