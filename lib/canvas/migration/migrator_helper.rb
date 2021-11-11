@@ -249,7 +249,7 @@ module Canvas::Migration
       if outcome[:type] == "learning_outcome_group"
         if selectable_outcomes
           log = { migration_id: outcome[:migration_id], title: outcome[:title], child_groups: child_groups }
-          (parent_children ? parent_children : overview[:learning_outcome_groups]) << log
+          (parent_children || overview[:learning_outcome_groups]) << log
         end
       else
         lo = { migration_id: outcome[:migration_id], title: outcome[:title] }

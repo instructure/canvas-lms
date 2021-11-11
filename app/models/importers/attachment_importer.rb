@@ -27,7 +27,7 @@ module Importers
     class << self
       def process_migration(data, migration)
         created_usage_rights_map = {}
-        attachments = data['file_map'] ? data['file_map'] : {}
+        attachments = data['file_map'] || {}
         attachments = attachments.with_indifferent_access
         attachments.values.each do |att|
           if !att['is_folder'] && (migration.import_object?("attachments", att['migration_id']) || migration.import_object?("files", att['migration_id']))

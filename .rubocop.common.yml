@@ -147,6 +147,8 @@ Style/RedundantAssignment:
   Severity: error
 Style/RedundantBegin:
   Severity: error
+Style/RedundantCondition:
+  Severity: error
 Style/RedundantInterpolation:
   Severity: error
 Style/RedundantFreeze:

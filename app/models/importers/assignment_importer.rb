@@ -27,7 +27,7 @@ module Importers
     self.item_class = Assignment
 
     def self.process_migration(data, migration)
-      assignments = data['assignments'] ? data['assignments'] : []
+      assignments = data['assignments'] || []
 
       create_assignments(assignments, migration)
 

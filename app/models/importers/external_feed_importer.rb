@@ -24,7 +24,7 @@ module Importers
     self.item_class = ExternalFeed
 
     def self.process_migration(data, migration)
-      tools = data['external_feeds'] ? data['external_feeds'] : []
+      tools = data['external_feeds'] || []
       to_import = migration.to_import 'external_feeds'
       tools.each do |tool|
         if tool['migration_id'] && (!to_import || to_import[tool['migration_id']])

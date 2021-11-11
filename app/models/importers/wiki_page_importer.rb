@@ -24,7 +24,7 @@ module Importers
     self.item_class = WikiPage
 
     def self.process_migration_course_outline(data, migration)
-      outline = data['course_outline'] ? data['course_outline'] : nil
+      outline = data['course_outline'] || nil
       return unless outline
       return unless migration.import_object?('course_outline', outline['migration_id'])
 
@@ -44,7 +44,7 @@ module Importers
         migration.context.wiki.load_tag_for_master_course_import!(migration.child_subscription_id)
       end
 
-      wikis = data['wikis'] ? data['wikis'] : []
+      wikis = data['wikis'] || []
       wikis.each do |wiki|
         unless wiki
           message = "There was a nil wiki page imported for ContentMigration:#{migration.id}"

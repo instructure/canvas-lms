@@ -24,7 +24,7 @@ module Importers
     self.item_class = ContextExternalTool
 
     def self.process_migration(data, migration)
-      tools = data['external_tools'] ? data['external_tools'] : []
+      tools = data['external_tools'] || []
       tools.each do |tool|
         if migration.import_object?("context_external_tools", tool['migration_id']) || migration.import_object?("external_tools", tool['migration_id'])
           begin

@@ -28,7 +28,7 @@ module Courses
 
       @course = course
       @course_section = course_section
-      @event_context = course_section ? course_section : course
+      @event_context = course_section || course
     end
 
     # generates individual events from a simplified "timetable" between the course/section start and end dates

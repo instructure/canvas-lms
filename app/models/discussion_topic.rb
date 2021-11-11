@@ -455,7 +455,7 @@ class DiscussionTopic < ActiveRecord::Base
     }
     opts_with_default = default_opts.merge(opts)
     copy_title =
-      opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"), self.title)
+      opts_with_default[:copy_title] || get_copy_title(self, t("Copy"), self.title)
     result = self.duplicate_base_model(copy_title, opts_with_default)
 
     # Start with a position guaranteed to not conflict with existing ones.
