@@ -754,7 +754,7 @@ class CalendarEvent < ActiveRecord::Base
       # This will change when there are other things that have calendars...
       # can't call calendar_url or calendar_url_for here, have to do it manually
       event.url =         "https://#{HostUrl.context_host(url_context)}/calendar?include_contexts=#{@event.context.asset_string}&month=#{start_at.try(:strftime, "%m")}&year=#{start_at.try(:strftime, "%Y")}##{tag_name}_#{@event.id}"
-      event.uid =         "event-#{tag_name.gsub('_', '-')}-#{@event.id}"
+      event.uid =         "event-#{tag_name.tr('_', '-')}-#{@event.id}"
       event.sequence =    0
 
       if @event.respond_to?(:applied_overrides)
@@ -762,7 +762,7 @@ class CalendarEvent < ActiveRecord::Base
           next unless override.due_at_overridden
 
           tag_name = override.class.name.underscore
-          event.uid       = "event-#{tag_name.gsub('_', '-')}-#{override.id}"
+          event.uid       = "event-#{tag_name.tr('_', '-')}-#{override.id}"
           event.summary   = "#{@event.title} (#{override.title})"
           # TODO: event.url
         end

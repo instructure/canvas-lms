@@ -25,7 +25,7 @@ class File
                # INSTRUCTURE: changed to IO.popen to avoid shell injection attacks when paths include user defined content
                IO.popen(['file', '--mime', '--brief', '--raw', '--', file.path], &:read).strip
              else
-               extensions[File.extname(file.path).gsub('.', '').downcase] rescue nil
+               extensions[File.extname(file.path).delete('.').downcase] rescue nil
              end
     elsif file.class == String
       mime = extensions[(file[file.rindex('.') + 1, file.size]).downcase] rescue nil

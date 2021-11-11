@@ -89,7 +89,7 @@ module Qti
         @question[:question_name] = @title || get_node_att(@doc, 'assessmentItem', 'title')
         # The colons are replaced with dashes in the conversion from QTI 1.2
         @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier')
-        @question[:migration_id] = @question[:migration_id].gsub(/:/, '-').gsub('identifier=', '') if @question[:migration_id]
+        @question[:migration_id] = @question[:migration_id].tr(':', '-').gsub('identifier=', '') if @question[:migration_id]
 
         if @flavor == Qti::Flavors::D2L
           # In D2L-generated QTI the assessments reference the items by the label instead of the identifier

@@ -446,7 +446,7 @@ module QuizzesHelper
     # Requires mutliline option to be robust
     res.gsub!(%r{<input.*?name=\\?['"](question_.*?)\\?['"].*?>}m) do |match|
       blank = match.match(RE_EXTRACT_BLANK_ID).to_a[1]
-      blank.gsub!(/\\/, '')
+      blank.delete!('\\')
       answer = answer_list.detect { |entry| entry[:blank_id] == blank } || {}
       answer = h(answer[:answer] || '')
 

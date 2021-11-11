@@ -586,7 +586,7 @@ class Attachment < ActiveRecord::Base
       self.workflow_state = nil
       self.file_state = 'available'
     end
-    self.md5 = (details[:etag] || "").gsub(/"/, '')
+    self.md5 = (details[:etag] || "").delete('"')
     self.content_type = details[:content_type]
     self.size = details[:content_length]
 
@@ -625,7 +625,7 @@ class Attachment < ActiveRecord::Base
   def ajax_upload_params(local_upload_url, s3_success_url, options = {})
     # Build the data that will be needed for the user to upload to s3
     # without us being the middle-man
-    sanitized_filename = full_filename.gsub(/\+/, " ")
+    sanitized_filename = full_filename.tr('+', " ")
     policy = {
       'expiration' => (options[:expiration] || S3_EXPIRATION_TIME).from_now.utc.iso8601,
       'conditions' => [
@@ -661,7 +661,7 @@ class Attachment < ActiveRecord::Base
     end
     policy['conditions'] += extras
 
-    policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
+    policy_encoded = Base64.encode64(policy.to_json).delete("\n")
     sig_key, sig_val = self.store.sign_policy(policy_encoded, options[:datetime])
 
     res[:id] = id

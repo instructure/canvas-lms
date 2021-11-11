@@ -90,7 +90,7 @@ module Canvas::Migration
     # Gets the node value and changed forward slashes to back slashes
     def get_file_path(node, selector)
       path = get_node_val(node, selector)
-      path = path.gsub('\\', '/') if path
+      path = path.tr('\\', '/') if path
       path
     end
 

@@ -144,7 +144,7 @@ class UserList
         list = list_in.map(&:strip)
         list.each { |path| parse_single_user(path) }
       else
-        str = list_in.strip.gsub(/“|”/, "\"").gsub(/\n+/, ",").gsub(/\s+/, " ").gsub(/;/, ",") + ","
+        str = list_in.strip.gsub(/“|”/, "\"").gsub(/\n+/, ",").gsub(/\s+/, " ").tr(';', ",") + ","
         chars = str.split("")
         user_start = 0
         in_quotes = false

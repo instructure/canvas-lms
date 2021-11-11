@@ -134,7 +134,7 @@ module I18nTasks
       # Since underscores can be wrappers, and underscores can also be inside
       # placeholders (as placeholder names) we need to be unambiguous about
       # underscores in placeholders:
-      dashed_str = str.gsub(/%\{([^}]+)\}/) { |x| x.gsub("_", "-") }
+      dashed_str = str.gsub(/%\{([^}]+)\}/) { |x| x.tr("_", "-") }
       # some stuff this doesn't check (though we don't use):
       #   blockquotes, e.g. "> some text"
       #   reference links, e.g. "[an example][id]"

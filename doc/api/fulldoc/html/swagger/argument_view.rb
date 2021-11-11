@@ -88,7 +88,7 @@ class ArgumentView < HashView
   end
 
   def enums
-    enum_and_types.first.map { |e| e.gsub('"', '') }
+    enum_and_types.first.map { |e| e.delete('"') }
   end
 
   def types
