@@ -31,7 +31,7 @@ module CanvasBreachMitigation
 
         cookie = { value: encoded_masked_token }
         [:domain, :httponly, :secure].each do |key|
-          next unless options.has_key?(key)
+          next unless options.key?(key)
 
           cookie[key] = options[key]
         end

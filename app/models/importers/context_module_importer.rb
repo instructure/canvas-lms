@@ -139,12 +139,12 @@ module Importers
       item.position = position
       item.context = context
 
-      if hash.has_key?(:unlock_at) && (migration.for_master_course_import? || hash[:unlock_at].present?)
+      if hash.key?(:unlock_at) && (migration.for_master_course_import? || hash[:unlock_at].present?)
         item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at])
       end
 
-      item.require_sequential_progress = hash[:require_sequential_progress] if hash.has_key?(:require_sequential_progress)
-      item.requirement_count = hash[:requirement_count] if hash.has_key?(:requirement_count)
+      item.require_sequential_progress = hash[:require_sequential_progress] if hash.key?(:require_sequential_progress)
+      item.requirement_count = hash[:requirement_count] if hash.key?(:requirement_count)
 
       if hash[:prerequisites]
         preqs = []

@@ -89,7 +89,7 @@ module Api::V1
 
     def has_permission?(*permissions)
       permissions.any? do |permission|
-        if @precalculated_permissions&.has_key?(permission)
+        if @precalculated_permissions&.key?(permission)
           @precalculated_permissions[permission]
         else
           @course.grants_right?(@user, permission)

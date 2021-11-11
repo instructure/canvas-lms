@@ -48,13 +48,13 @@ describe SisImportsApiController, type: :request do
                       :format => "json", :account_id => @account.id.to_s },
                     opts.merge({ :import_type => "instructure_csv",
                                  :attachment => Rack::Test::UploadedFile.new(path) }))
-    expect(json.has_key?("created_at")).to be_truthy
+    expect(json).to have_key("created_at")
     json.delete("created_at")
-    expect(json.has_key?("updated_at")).to be_truthy
+    expect(json).to have_key("updated_at")
     json.delete("updated_at")
-    expect(json.has_key?("ended_at")).to be_truthy
+    expect(json).to have_key("ended_at")
     json.delete("ended_at")
-    expect(json.has_key?("started_at")).to eq true
+    expect(json).to have_key("started_at")
     json.delete("started_at")
     if opts[:batch_mode_term_id]
       expect(json["batch_mode_term_id"]).not_to be_nil
@@ -94,13 +94,13 @@ describe SisImportsApiController, type: :request do
                       :attachment => fixture_file_upload("files/sis/test_user_1.csv", 'text/csv') })
     expect(Delayed::Job.where(singleton: "sis_batch:account:#{@account.id}").count).to eq 1
 
-    expect(json.has_key?("created_at")).to be_truthy
+    expect(json).to have_key("created_at")
     json.delete("created_at")
-    expect(json.has_key?("updated_at")).to be_truthy
+    expect(json).to have_key("updated_at")
     json.delete("updated_at")
-    expect(json.has_key?("ended_at")).to be_truthy
+    expect(json).to have_key("ended_at")
     json.delete("ended_at")
-    expect(json.has_key?("started_at")).to eq true
+    expect(json).to have_key("started_at")
     json.delete("started_at")
     json.delete("user")
     json.delete("csv_attachments")
@@ -136,13 +136,13 @@ describe SisImportsApiController, type: :request do
                     { :controller => 'sis_imports_api', :action => 'show', :format => 'json',
                       :account_id => @account.id.to_s, :id => batch.id.to_s })
     expect(json).to be_truthy
-    expect(json.has_key?("created_at")).to be_truthy
+    expect(json).to have_key("created_at")
     json.delete("created_at")
-    expect(json.has_key?("updated_at")).to be_truthy
+    expect(json).to have_key("updated_at")
     json.delete("updated_at")
-    expect(json.has_key?("ended_at")).to be_truthy
+    expect(json).to have_key("ended_at")
     json.delete("ended_at")
-    expect(json.has_key?("started_at")).to eq true
+    expect(json).to have_key("started_at")
     json.delete("started_at")
     json.delete("user")
     json.delete("csv_attachments")
@@ -956,7 +956,7 @@ describe SisImportsApiController, type: :request do
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}.json",
                     { controller: 'sis_imports_api', action: 'show', format: 'json',
                       account_id: @account.id.to_s, id: batch.id.to_s })
-    expect(json.key?('errors_attachment')).to be_truthy
+    expect(json).to have_key('errors_attachment')
     expect(json['errors_attachment']['id']).to eq batch.errors_attachment.id
   end
 end

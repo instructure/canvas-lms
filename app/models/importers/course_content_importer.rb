@@ -439,19 +439,19 @@ module Importers
         end
       end
 
-      if settings.has_key?('overridden_course_visibility')
+      if settings.key?('overridden_course_visibility')
         course.apply_overridden_course_visibility(settings.delete('overridden_course_visibility'))
       end
 
       if migration.for_master_course_import?
-        course.start_at    = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings['start_at']) if settings.has_key?('start_at')
-        course.conclude_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings['conclude_at']) if settings.has_key?('conclude_at')
+        course.start_at    = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings['start_at']) if settings.key?('start_at')
+        course.conclude_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(settings['conclude_at']) if settings.key?('conclude_at')
       end
 
       settings.slice(*atts.map(&:to_s)).each do |key, val|
         course.send("#{key}=", val)
       end
-      if settings.has_key?(:grading_standard_enabled)
+      if settings.key?(:grading_standard_enabled)
         if settings[:grading_standard_enabled]
           course.grading_standard_enabled = true
           if settings[:grading_standard_identifier_ref]

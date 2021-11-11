@@ -332,7 +332,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def self.valid_type?(type)
-    SIS_TYPES.has_key?(type)
+    SIS_TYPES.key?(type)
   end
 
   def reload(options = nil)
@@ -874,7 +874,7 @@ class Enrollment < ActiveRecord::Base
 
   def has_permission_to?(action)
     @permission_lookup ||= {}
-    unless @permission_lookup.has_key? action
+    unless @permission_lookup.key? action
       @permission_lookup[action] = RoleOverride.enabled_for?(course, action, self.role_id, nil)
     end
     @permission_lookup[action].include?(:self)

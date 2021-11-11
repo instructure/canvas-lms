@@ -268,7 +268,7 @@ class GroupCategoriesController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_add])
       return render(:json => { 'status' => 'unauthorized' }, :status => :unauthorized) if @group_category.protected?
 
-      file_obj = if params.has_key?(:attachment)
+      file_obj = if params.key?(:attachment)
                    params[:attachment]
                  else
                    body_file

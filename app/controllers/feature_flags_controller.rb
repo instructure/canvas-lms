@@ -234,7 +234,7 @@ class FeatureFlagsController < ApplicationController
       return render json: { message: "missing feature parameter" }, status: :bad_request unless params[:feature].present?
 
       feature = params[:feature]
-      raise ActiveRecord::RecordNotFound unless Feature.definitions.has_key?(feature.to_s)
+      raise ActiveRecord::RecordNotFound unless Feature.definitions.key?(feature.to_s)
 
       flag = @context.lookup_feature_flag(feature,
                                           override_hidden: Account.site_admin.grants_right?(@current_user, session, :read),

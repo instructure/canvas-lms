@@ -302,7 +302,7 @@ class ContextExternalTool < ActiveRecord::Base
     settings[type] = (settings[type] || {}).with_indifferent_access unless placement_inactive?(type)
 
     extension_keys.each do |key, validator|
-      if hash.has_key?(key) && (!validator || validator.call(hash[key]))
+      if hash.key?(key) && (!validator || validator.call(hash[key]))
         if placement_inactive?(type)
           settings[:inactive_placements][type][key] = hash[key]
         else

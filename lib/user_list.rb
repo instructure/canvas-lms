@@ -247,7 +247,7 @@ class UserList
           # ccs are not unique; just error out on duplicates
           # we're in a bit of a pickle if open registration is disabled, and there are conflicting
           # e-mails, but none of them are from a pseudonym
-          if address.has_key?(:user_id) && (address[:user_id] != login[:user_id] || address[:shard] != Shard.current)
+          if address.key?(:user_id) && (address[:user_id] != login[:user_id] || address[:shard] != Shard.current)
             address[:user_id] = false
             address[:details] = :non_unique
             address.delete(:name)

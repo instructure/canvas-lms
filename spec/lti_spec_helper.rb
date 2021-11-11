@@ -30,14 +30,14 @@ module LtiSpecHelper
       name: (0...8).map { (65 + rand(26)).chr }.join,
     }
     combined_opts = default_opts.merge(opts)
-    combined_opts[:context] = Account.create!(name: 'Test Account') unless combined_opts.has_key?(:context)
-    combined_opts[:product_family] = find_or_create_product_family(combined_opts[:context]) unless combined_opts.has_key?(:product_family)
+    combined_opts[:context] = Account.create!(name: 'Test Account') unless combined_opts.key?(:context)
+    combined_opts[:product_family] = find_or_create_product_family(combined_opts[:context]) unless combined_opts.key?(:product_family)
     Lti::ToolProxy.create!(combined_opts)
   end
 
   def find_or_create_product_family(opts = {})
     default_opts = { vendor_code: '123', product_code: 'abc', vendor_name: 'acme' }
-    default_opts[:root_account_id] = Account.create!(name: 'Test Account') unless opts.has_key?(:root_account_id)
+    default_opts[:root_account_id] = Account.create!(name: 'Test Account') unless opts.key?(:root_account_id)
     Lti::ProductFamily.where(default_opts.merge(opts)).first_or_create
   end
 

@@ -330,7 +330,7 @@ class SubmissionList
   # Still a list of unsorted, unfiltered hashes, but the meta data is inserted at this point
   def full_hash_list
     @full_hash_list ||= self.raw_hash_list.map do |h|
-      h[:grader] = if h.has_key? :score_before_regrade
+      h[:grader] = if h.key? :score_before_regrade
                      I18n.t('gradebooks.history.regraded', "Regraded")
                    elsif h[:grader_id] && grader_map[h[:grader_id]]
                      grader_map[h[:grader_id]].name

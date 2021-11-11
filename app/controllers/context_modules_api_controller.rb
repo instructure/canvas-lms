@@ -413,7 +413,7 @@ class ContextModulesApiController < ApplicationController
                                             end
       end
 
-      if params[:module].has_key?(:published)
+      if params[:module].key?(:published)
         if value_to_boolean(params[:module][:published])
           @module.publish
           @module.publish_items!

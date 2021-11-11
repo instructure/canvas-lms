@@ -1114,7 +1114,7 @@ class ConversationsController < ApplicationController
   end
 
   def include_private_conversation_enrollments
-    if params.has_key? :include_private_conversation_enrollments
+    if params.key? :include_private_conversation_enrollments
       value_to_boolean(params[:include_private_conversation_enrollments])
     else
       api_request?

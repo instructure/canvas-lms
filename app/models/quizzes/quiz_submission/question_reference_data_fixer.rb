@@ -163,7 +163,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
   # has side-effects on submission data
   def process_graded_submission_data(submission_data, id_map)
     submission_data.each do |grading_record|
-      if id_map.has_key?(grading_record[:question_id])
+      if id_map.key?(grading_record[:question_id])
         grading_record[:question_id] = id_map[grading_record[:question_id]]
       end
     end
@@ -188,7 +188,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
 
     # Adjust the "next_question_path" for OQAAT quizzes. This is a URL entry
     # that ends with a question ID, like "/courses/1/quizzes/1/questions/1"
-    if submission_data.has_key?("next_question_path")
+    if submission_data.key?("next_question_path")
       submission_data["next_question_path"].sub!(/(\d+)$/) do |id|
         id_map[id.to_i] || id
       end

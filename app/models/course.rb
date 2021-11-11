@@ -689,7 +689,7 @@ class Course < ActiveRecord::Base
           current_course_associations = current_associations[aa.course_id] ||= {}
           # duplicates. the unique index prevents these now, but this code
           # needs to hang around for the migration itself
-          if current_course_associations.has_key?(key)
+          if current_course_associations.key?(key)
             to_delete << aa.id
             next
           end
@@ -1024,7 +1024,7 @@ class Course < ActiveRecord::Base
 
   def preloaded_user_has_been?(user, types)
     self.shard.activate do
-      Array(types).any? { |type| @user_ids_by_enroll_type.has_key?(type) && @user_ids_by_enroll_type[type].include?(user.id) }
+      Array(types).any? { |type| @user_ids_by_enroll_type.key?(type) && @user_ids_by_enroll_type[type].include?(user.id) }
     end
   end
 
@@ -1608,7 +1608,7 @@ class Course < ActiveRecord::Base
   end
 
   def unenrolled_user_can_read?(_user, session)
-    self.is_public || (self.is_public_to_auth_users && session.present? && session.has_key?(:user_id))
+    self.is_public || (self.is_public_to_auth_users && session.present? && session.key?(:user_id))
   end
 
   set_policy do
@@ -3155,7 +3155,7 @@ class Course < ActiveRecord::Base
 
       check_for_permission = lambda do |*permissions|
         permissions.any? do |permission|
-          if opts[:precalculated_permissions]&.has_key?(permission)
+          if opts[:precalculated_permissions]&.key?(permission)
             opts[:precalculated_permissions][permission]
           else
             self.grants_right?(user, opts[:session], permission)

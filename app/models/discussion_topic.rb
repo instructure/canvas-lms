@@ -533,7 +533,7 @@ class DiscussionTopic < ActiveRecord::Base
     return unless current_user
 
     update_fields = { workflow_state: new_state }
-    update_fields[:forced_read_state] = opts[:forced] if opts.has_key?(:forced)
+    update_fields[:forced_read_state] = opts[:forced] if opts.key?(:forced)
 
     transaction do
       update_stream_item_state(current_user, new_state)
@@ -686,7 +686,7 @@ class DiscussionTopic < ActiveRecord::Base
           topic_participant.workflow_state = opts[:new_state] if opts[:new_state]
           topic_participant.unread_entry_count += opts[:offset] if opts[:offset] && opts[:offset] != 0
           topic_participant.unread_entry_count = opts[:new_count] if opts[:new_count]
-          topic_participant.subscribed = opts[:subscribed] if opts.has_key?(:subscribed)
+          topic_participant.subscribed = opts[:subscribed] if opts.key?(:subscribed)
           topic_participant.save
         end
       end

@@ -772,10 +772,10 @@ class UsersController < ApplicationController
       # support submission comments in the conversations inbox.
       # please replace this with a more reasonable solution at your earliest convenience
       opts = { paginate_url: :api_v1_user_activity_stream_url }
-      opts[:asset_type] = params[:asset_type] if params.has_key?(:asset_type)
+      opts[:asset_type] = params[:asset_type] if params.key?(:asset_type)
       opts[:context] = Context.find_by_asset_string(params[:context_code]) if params[:context_code]
-      opts[:submission_user_id] = params[:submission_user_id] if params.has_key?(:submission_user_id)
-      opts[:only_active_courses] = value_to_boolean(params[:only_active_courses]) if params.has_key?(:only_active_courses)
+      opts[:submission_user_id] = params[:submission_user_id] if params.key?(:submission_user_id)
+      opts[:only_active_courses] = value_to_boolean(params[:only_active_courses]) if params.key?(:only_active_courses)
       api_render_stream(opts)
     else
       render_unauthorized_action

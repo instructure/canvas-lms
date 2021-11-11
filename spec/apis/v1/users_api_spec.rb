@@ -76,10 +76,10 @@ describe Api::V1::User do
     it 'supports optionally providing the avatar if avatars are enabled' do
       @student.account.set_service_availability(:avatars, false)
       @student.account.save!
-      expect(@test_api.user_json(@student, @admin, {}, ['avatar_url'], @course).has_key?("avatar_url")).to be_falsey
+      expect(@test_api.user_json(@student, @admin, {}, ['avatar_url'], @course)).not_to have_key("avatar_url")
       @student.account.set_service_availability(:avatars, true)
       @student.account.save!
-      expect(@test_api.user_json(@student, @admin, {}, [], @course).has_key?("avatar_url")).to be_falsey
+      expect(@test_api.user_json(@student, @admin, {}, [], @course)).not_to have_key("avatar_url")
       expect(@test_api.user_json(@student, @admin, {}, ['avatar_url'], @course)["avatar_url"]).to match("h:/images/messages/avatar-50.png")
     end
 
@@ -95,7 +95,7 @@ describe Api::V1::User do
     it 'supports optionally including group_ids' do
       @group = @course.groups.create!(:name => "My Group")
       @group.add_user(@student, 'accepted', true)
-      expect(@test_api.user_json(@student, @admin, {}, [], @course).has_key?("group_ids")).to be_falsey
+      expect(@test_api.user_json(@student, @admin, {}, [], @course)).not_to have_key("group_ids")
       expect(@test_api.user_json(@student, @admin, {}, ['group_ids'], @course)["group_ids"]).to eq([@group.id])
     end
 

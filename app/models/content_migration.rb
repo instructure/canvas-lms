@@ -461,7 +461,7 @@ class ContentMigration < ActiveRecord::Base
       self.migration_settings = default_ms.merge(self.migration_settings).with_indifferent_access
     end
 
-    unless self.migration_settings.has_key?(:overwrite_quizzes)
+    unless self.migration_settings.key?(:overwrite_quizzes)
       self.migration_settings[:overwrite_quizzes] = for_course_copy? || for_master_course_import? || (self.migration_type && self.migration_type == 'canvas_cartridge_importer')
     end
     self.migration_settings.reverse_merge!(:prefer_existing_tools => true) if self.migration_type == 'common_cartridge_importer' # default to true

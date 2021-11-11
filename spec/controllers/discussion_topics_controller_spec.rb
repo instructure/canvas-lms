@@ -1154,14 +1154,14 @@ describe DiscussionTopicsController do
       shared_examples_for 'no usage rights returned' do
         it 'does not return usage rights on discussion topic attachment' do
           get :edit, params: { course_id: @course.id, id: @topic_with_file.id }
-          expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES]['attachments'][0].key?('usage_rights')).to be false
+          expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES]['attachments'][0]).not_to have_key('usage_rights')
         end
       end
 
       shared_examples_for 'usage rights returned' do
         it 'returns usage rights on discussion topic attachment' do
           get :edit, params: { course_id: @course.id, id: @topic_with_file.id }
-          expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES]['attachments'][0].key?('usage_rights')).to be true
+          expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES]['attachments'][0]).to have_key('usage_rights')
         end
       end
 

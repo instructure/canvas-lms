@@ -475,7 +475,7 @@ class SubmissionsController < SubmissionsBaseController
     end
     params[:submission][:comment] = params[:comment].try(:delete, :text_comment)
 
-    if params[:submission].has_key?(:body)
+    if params[:submission].key?(:body)
       params[:submission][:body] = process_incoming_html_content(params[:submission][:body])
     end
 

@@ -385,7 +385,7 @@ module Qti
       # clear extra entries
       @question.delete :feedback_id
       answers.each do |answer|
-        if feedback_hash.has_key? answer[:feedback_id]
+        if feedback_hash.key? answer[:feedback_id]
           extract_feedback!(answer, :comments, feedback_hash[answer[:feedback_id]])
         end
         answer.delete :feedback_id
