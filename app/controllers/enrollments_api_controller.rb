@@ -350,8 +350,11 @@ class EnrollmentsApiController < ApplicationController
   # and a student or in multiple course sections), each enrollment will be
   # listed separately.
   #
-  # note: Currently, only a root level admin user can return other users' enrollments. A
-  # user can, however, return his/her own enrollments.
+  # note: Currently, only a root level admin user can return other users' enrollments.
+  # A user can, however, return his/her own enrollments.
+  #
+  # Enrollments scoped to a course context will include inactive states by default
+  # if the caller has account admin authorization and the state[] parameter is omitted.
   #
   # @argument type[] [String]
   #   A list of enrollment types to return. Accepted values are
