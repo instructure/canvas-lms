@@ -34,7 +34,7 @@ module CC
 
       @canvas_resource_dir = File.join(@export_dir, CCHelper::COURSE_SETTINGS_DIR)
       canvas_export_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::CANVAS_EXPORT_FLAG)
-      FileUtils::mkdir_p @canvas_resource_dir
+      FileUtils.mkdir_p @canvas_resource_dir
 
       resources = []
       resources << run_and_set_progress(:create_course_settings, nil, I18n.t('course_exports.errors.course_settings', "Failed to export course settings"), migration_id) if export_symbol?(:all_course_settings)

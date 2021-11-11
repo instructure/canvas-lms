@@ -19,7 +19,7 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CONVERSATIONS_QUERY} from '../../graphql/Queries'
 import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../graphql/Mutations'
-import {MessageListHolder} from '../components/MessageListHolder/MessageListHolder'
+import {ConversationListHolder} from '../components/ConversationListHolder/ConversationListHolder'
 import I18n from 'i18n!conversations_2'
 import {Mask} from '@instructure/ui-overlays'
 import PropTypes from 'prop-types'
@@ -28,7 +28,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {useQuery, useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
-const MessageListContainer = ({course, scope, onSelectMessage}) => {
+const ConversationListContainer = ({course, scope, onSelectConversation}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const userID = ENV.current_user_id?.toString()
 
@@ -81,24 +81,24 @@ const MessageListContainer = ({course, scope, onSelectMessage}) => {
   }
 
   return (
-    <MessageListHolder
+    <ConversationListHolder
       conversations={data?.legacyNode?.conversationsConnection?.nodes}
       onOpen={() => {}}
-      onSelect={onSelectMessage}
+      onSelect={onSelectConversation}
       onStar={handleStar}
     />
   )
 }
 
-export default MessageListContainer
+export default ConversationListContainer
 
-MessageListContainer.propTypes = {
+ConversationListContainer.propTypes = {
   course: PropTypes.string,
   scope: PropTypes.string,
-  onSelectMessage: PropTypes.func
+  onSelectConversation: PropTypes.func
 }
 
-MessageListContainer.defaultProps = {
+ConversationListContainer.defaultProps = {
   scope: 'inbox',
-  onSelectMessage: () => {}
+  onSelectConversation: () => {}
 }

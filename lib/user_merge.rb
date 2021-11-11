@@ -506,11 +506,10 @@ class UserMerge
                    course_section_id: enrollment.course_section_id)
 
     if column == :user_id
-      scope = scope.where(user_id: users, associated_user_id: enrollment.associated_user_id)
+      scope.where(user_id: users, associated_user_id: enrollment.associated_user_id)
     else
-      scope = scope.where(user_id: enrollment.user_id, associated_user_id: users)
+      scope.where(user_id: enrollment.user_id, associated_user_id: users)
     end
-    scope
   end
 
   def enrollment_keeper(scope)

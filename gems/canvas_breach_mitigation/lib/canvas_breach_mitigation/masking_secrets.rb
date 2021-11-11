@@ -65,7 +65,7 @@ module CanvasBreachMitigation
 
         masked_token = Base64.strict_decode64(encoded_masked_token)
         one_time_pad = masked_token[0...AUTHENTICITY_TOKEN_LENGTH]
-        encrypted_csrf_token = masked_token[AUTHENTICITY_TOKEN_LENGTH..-1]
+        encrypted_csrf_token = masked_token[AUTHENTICITY_TOKEN_LENGTH..]
         xor_byte_strings(one_time_pad, encrypted_csrf_token)
       rescue
         SecureRandom.base64(AUTHENTICITY_TOKEN_LENGTH)

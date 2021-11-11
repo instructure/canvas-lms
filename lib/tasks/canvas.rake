@@ -206,7 +206,7 @@ unless $canvas_tasks_loaded
       method = :select!
       if region[0] == '-'
         method = :reject!
-        region = region[1..-1]
+        region = region[1..]
       end
       if region == 'self'
         servers.send(method, &:in_current_region?)

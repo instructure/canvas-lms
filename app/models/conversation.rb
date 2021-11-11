@@ -61,11 +61,11 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.private_hash_for(users_or_user_ids, context_code = nil)
-    if users_or_user_ids.first.is_a?(User)
-      user_ids = Shard.birth.activate { users_or_user_ids.map(&:id) }
-    else
-      user_ids = users_or_user_ids
-    end
+    user_ids = if users_or_user_ids.first.is_a?(User)
+                 Shard.birth.activate { users_or_user_ids.map(&:id) }
+               else
+                 users_or_user_ids
+               end
     str = user_ids.uniq.sort.join(',')
     str += "|#{context_code}" if context_code
     Digest::SHA1.hexdigest(str)

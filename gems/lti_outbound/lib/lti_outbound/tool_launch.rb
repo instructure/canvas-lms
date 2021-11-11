@@ -75,7 +75,7 @@ module LtiOutbound
       hash['resource_link_id'] = link_code
       hash['resource_link_title'] = overrides['resource_link_title'] || tool.name
       hash['user_id'] = user.opaque_identifier
-      hash['text'] = CGI::escape(selected_html) if selected_html
+      hash['text'] = CGI.escape(selected_html) if selected_html
 
       hash['roles'] = user.current_role_types # AccountAdmin, Student, Faculty or Observer
       hash['ext_roles'] = '$Canvas.xuser.allRoles'

@@ -804,12 +804,12 @@ class CalendarEventsApiController < ApplicationController
     respond_to do |format|
       format.ics do
         name = t('ics_title', "%{course_or_group_name} Calendar (Canvas)", :course_or_group_name => @context.name)
-        description = case
-                      when @context.is_a?(Course)
+        description = case @context
+                      when Course
                         t('ics_description_course', "Calendar events for the course, %{course_name}", :course_name => @context.name)
-                      when @context.is_a?(Group)
+                      when Group
                         t('ics_description_group', "Calendar events for the group, %{group_name}", :group_name => @context.name)
-                      when @context.is_a?(User)
+                      when User
                         t('ics_description_user', "Calendar events for the user, %{user_name}", :user_name => @context.name)
                       else
                         t('ics_description', "Calendar events for %{context_name}", :context_name => @context.name)
@@ -1222,8 +1222,7 @@ class CalendarEventsApiController < ApplicationController
     }
 
     # in courses with diff assignments on, only show the visible assignments
-    scope = scope.filter_by_visibilities_in_given_courses(student_ids.to_a, courses_to_filter_assignments.map(&:id)).group('assignments.id')
-    scope
+    scope.filter_by_visibilities_in_given_courses(student_ids.to_a, courses_to_filter_assignments.map(&:id)).group('assignments.id')
   end
 
   def calendar_event_scope(user)

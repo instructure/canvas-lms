@@ -33,7 +33,7 @@ module Lti
     def valid?
       @valid ||= begin
         valid = lti_message_authenticator.valid_signature?
-        valid &&= Security::check_and_store_nonce(cache_key, @params[:oauth_timestamp], NONCE_EXPIRATION)
+        valid &&= Security.check_and_store_nonce(cache_key, @params[:oauth_timestamp], NONCE_EXPIRATION)
         valid
       end
     end

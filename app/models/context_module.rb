@@ -162,11 +162,11 @@ class ContextModule < ActiveRecord::Base
   def infer_position
     if !self.position
       positions = ContextModule.module_positions(self.context)
-      if (max = positions.values.max)
-        self.position = max + 1
-      else
-        self.position = 1
-      end
+      self.position = if (max = positions.values.max)
+                        max + 1
+                      else
+                        1
+                      end
     end
     self.position
   end
@@ -772,7 +772,7 @@ class ContextModule < ActiveRecord::Base
 
     tag_ids_to_move = {}
     tags_before = start_pos < 2 ? [] : tags[0..start_pos - 2]
-    tags_after = start_pos > tags.length ? [] : tags[start_pos - 1..-1]
+    tags_after = start_pos > tags.length ? [] : tags[start_pos - 1..]
     (tags_before + new_tags + tags_after).each_with_index do |item, index|
       index_change = index + 1 - item.position
       if index_change != 0

@@ -337,7 +337,7 @@ class SubmissionList
                    else
                      I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission')
                    end
-      h[:safe_grader_id] = h[:grader_id] ? h[:grader_id] : 0
+      h[:safe_grader_id] = h[:grader_id] || 0
       h[:assignment_name] = self.assignment_map[h[:assignment_id]].title
       h[:student_user_id] = h[:user_id]
       h[:student_name] = self.student_map[h[:user_id]].name

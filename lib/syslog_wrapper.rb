@@ -95,11 +95,11 @@ class SyslogWrapper
     return if @level > severity
 
     if message.nil?
-      if block_given?
-        message = yield
-      else
-        message = progname
-      end
+      message = if block_given?
+                  yield
+                else
+                  progname
+                end
     end
     message = message.to_s.strip.gsub(/\e\[([0-9]+(;|))+m/, '')
     unless @skip_thread_context

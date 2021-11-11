@@ -100,11 +100,11 @@ module BrandableCSS
 
     def variables_map_with_image_urls
       @variables_map_with_image_urls ||= variables_map.each_with_object({}) do |(key, config), memo|
-        if config['type'] == 'image'
-          memo[key] = config.merge('default' => ActionController::Base.helpers.image_url(config['default']))
-        else
-          memo[key] = config
-        end
+        memo[key] = if config['type'] == 'image'
+                      config.merge('default' => ActionController::Base.helpers.image_url(config['default']))
+                    else
+                      config
+                    end
       end.freeze
     end
 
@@ -169,9 +169,9 @@ module BrandableCSS
       default = config['default']
       if default && default.starts_with?('$')
         if css_urls
-          return "var(--#{default[1..-1]})"
+          return "var(--#{default[1..]})"
         else
-          return brand_variable_value(default[1..-1], active_brand_config, config_map, css_urls)
+          return brand_variable_value(default[1..], active_brand_config, config_map, css_urls)
         end
       end
 

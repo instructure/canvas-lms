@@ -86,14 +86,13 @@ describe DiscussionTopicSectionVisibility do
   end
 
   def basic_announcement_model(course)
-    announcement = Announcement.create!(
+    Announcement.create!(
       :title => "some topic",
       :message => "I announce that i am lying",
       :user => @teacher,
       :context => course,
       :workflow_state => "published",
     )
-    announcement
   end
 
   it 'duplicates' do

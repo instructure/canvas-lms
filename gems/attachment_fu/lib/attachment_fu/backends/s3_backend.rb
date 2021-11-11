@@ -167,13 +167,12 @@ module AttachmentFu # :nodoc:
 
       def sanitize_filename(filename)
         if self.respond_to?(:root_attachment) && self.root_attachment && self.root_attachment.filename
-          filename = self.root_attachment.filename
+          self.root_attachment.filename
         else
-          filename = Attachment.truncate_filename(filename, 255) do |component, len|
+          Attachment.truncate_filename(filename, 255) do |component, len|
             CanvasTextHelper.cgi_escape_truncate(component, len)
           end
         end
-        filename
       end
 
       # The attachment ID used in the full path of a file

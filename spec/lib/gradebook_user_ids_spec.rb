@@ -444,7 +444,7 @@ describe GradebookUserIds do
         fake_student2 = fake_student_enrollment2.user
         fake_student2.update!(sortable_name: "Alpha")
         @assignment.submissions.where(user_id: [@student3]).update_all(late_policy_status: "missing")
-        expect(gradebook_user_ids.user_ids[-2..-1]).to eq([fake_student2.id, @fake_student.id])
+        expect(gradebook_user_ids.user_ids[-2..]).to eq([fake_student2.id, @fake_student.id])
       end
 
       it "excludes fake students if they are deactivated" do
@@ -511,7 +511,7 @@ describe GradebookUserIds do
         fake_student2 = fake_student_enrollment2.user
         fake_student2.update!(sortable_name: "Alpha")
         @assignment.submissions.where(user_id: [@student3]).update_all(late_policy_status: "late")
-        expect(gradebook_user_ids.user_ids[-2..-1]).to eq([fake_student2.id, @fake_student.id])
+        expect(gradebook_user_ids.user_ids[-2..]).to eq([fake_student2.id, @fake_student.id])
       end
 
       it "excludes fake students if they are deactivated" do

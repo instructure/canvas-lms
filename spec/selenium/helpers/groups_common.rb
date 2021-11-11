@@ -337,11 +337,11 @@ module GroupsCommon
   # context test. if true, allows you to test files both in and out of group context,
   #   otherwise it adds two files to the group
   def add_test_files(context_test = true)
-    if context_test
-      second_file_context = @course
-    else
-      second_file_context = @testgroup.first
-    end
+    second_file_context = if context_test
+                            @course
+                          else
+                            @testgroup.first
+                          end
 
     add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
              @testgroup.first, "example.pdf")

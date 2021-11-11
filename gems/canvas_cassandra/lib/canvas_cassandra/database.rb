@@ -51,11 +51,11 @@ module CanvasCassandra
           query = query.sub(CONSISTENCY_CLAUSE, "USING CONSISTENCY #{consistency_text} ")
         end
 
-        if @db.use_cql3? && consistency
-          result = @db.execute_with_consistency(query, consistency, *args)
-        else
-          result = @db.execute(query, *args)
-        end
+        result = if @db.use_cql3? && consistency
+                   @db.execute_with_consistency(query, consistency, *args)
+                 else
+                   @db.execute(query, *args)
+                 end
       end
 
       @logger.debug("  #{"CQL (%.2fms)" % [ms]}  #{sanitize(query, args)} #{opts.inspect} [#{fingerprint}]")

@@ -307,12 +307,12 @@ describe AssignmentOverrideApplicator do
         end
 
         it "finds the overrides for the correct student" do
-          result = AssignmentOverrideApplicator::adhoc_override(@assignment, @student)
+          result = AssignmentOverrideApplicator.adhoc_override(@assignment, @student)
           expect(result.assignment_override_id).to eq @override.id
         end
 
         it "returns AssignmentOverrideStudent" do
-          result = AssignmentOverrideApplicator::adhoc_override(@assignment, @student)
+          result = AssignmentOverrideApplicator.adhoc_override(@assignment, @student)
           expect(result).to be_an_instance_of(AssignmentOverrideStudent)
         end
       end
@@ -455,7 +455,7 @@ describe AssignmentOverrideApplicator do
 
       describe 'for students' do
         it "returns section overrides" do
-          result = AssignmentOverrideApplicator::section_overrides(@assignment, @student2)
+          result = AssignmentOverrideApplicator.section_overrides(@assignment, @student2)
           expect(result.length).to eq 1
         end
 
@@ -587,19 +587,19 @@ describe AssignmentOverrideApplicator do
         @override2_student.user = @student2
         @override2_student.save!
         @course.enroll_user(@observer, "ObserverEnrollment", { :allow_multiple_enrollments => true, :associated_user_id => @student2.id })
-        result = AssignmentOverrideApplicator::observer_overrides(@assignment, @observer)
+        result = AssignmentOverrideApplicator.observer_overrides(@assignment, @observer)
         expect(result.length).to eq 2
       end
     end
 
     context '#has_invalid_args?' do
       it "returns true with nil user" do
-        result = AssignmentOverrideApplicator::has_invalid_args?(@assignment, nil)
+        result = AssignmentOverrideApplicator.has_invalid_args?(@assignment, nil)
         expect(result).to be_truthy
       end
 
       it "returns true for assignments with no overrides" do
-        result = AssignmentOverrideApplicator::has_invalid_args?(@assignment, @student)
+        result = AssignmentOverrideApplicator.has_invalid_args?(@assignment, @student)
         expect(result).to be_truthy
       end
 
@@ -609,7 +609,7 @@ describe AssignmentOverrideApplicator do
         @override_student.user = @student
         @override_student.save!
 
-        result = AssignmentOverrideApplicator::has_invalid_args?(@assignment, @student)
+        result = AssignmentOverrideApplicator.has_invalid_args?(@assignment, @student)
         expect(result).to be_falsey
       end
     end

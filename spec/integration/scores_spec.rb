@@ -85,7 +85,7 @@ module Lti::IMS
       end
 
       def post_instfs_progress(url, params)
-        jwt = CGI::parse(URI(url).query)['token'].first
+        jwt = CGI.parse(URI(url).query)['token'].first
         jwt_params = Canvas::Security.decode_jwt(jwt, ["jwt signing key"])
         form_data = params[:form_data]
         instfs_params = { name: form_data[:filename], instfs_uuid: 1, content_type: form_data[:content_type], token: @token }

@@ -64,7 +64,7 @@ describe "Rubrics API", type: :request do
   end
 
   def rubric_data_hash(opts = {})
-    hash = {
+    {
       points: 3,
       description: "Criteria row",
       id: 1,
@@ -83,7 +83,6 @@ describe "Rubrics API", type: :request do
         }
       ]
     }.merge(opts)
-    hash
   end
 
   def rubrics_api_call(context, params = {}, type = 'course')

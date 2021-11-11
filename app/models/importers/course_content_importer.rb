@@ -35,7 +35,7 @@ module Importers
       params = migration.migration_settings[:migration_ids_to_import]
       valid_paths = []
       (data['file_map'] || {}).each_value do |file|
-        path = file['path_name'].starts_with?('/') ? file['path_name'][1..-1] : file['path_name']
+        path = file['path_name'].starts_with?('/') ? file['path_name'][1..] : file['path_name']
         migration.add_attachment_path(path, file['migration_id'])
         if migration.import_object?("attachments", file['migration_id']) || migration.import_object?("files", file['migration_id'])
           if file['errored']

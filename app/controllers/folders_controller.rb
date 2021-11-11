@@ -146,11 +146,11 @@ class FoldersController < ApplicationController
       unless can_view_hidden_files
         scope = scope.not_hidden.not_locked
       end
-      if params[:sort_by] == 'position'
-        scope = scope.by_position
-      else
-        scope = scope.by_name
-      end
+      scope = if params[:sort_by] == 'position'
+                scope.by_position
+              else
+                scope.by_name
+              end
       @folders = Api.paginate(scope, self, api_v1_list_folders_url(folder))
       render :json => folders_json(@folders, @current_user, session, opts)
     end
@@ -177,11 +177,11 @@ class FoldersController < ApplicationController
       unless can_view_hidden_files
         scope = scope.not_hidden.not_locked
       end
-      if params[:sort_by] == 'position'
-        scope = scope.by_position
-      else
-        scope = scope.by_name
-      end
+      scope = if params[:sort_by] == 'position'
+                scope.by_position
+              else
+                scope.by_name
+              end
 
       folders = Api.paginate(scope, self, url)
       render json: folders_json(folders, @current_user, session, :can_view_hidden_files => can_view_hidden_files, :context => @context)
@@ -237,11 +237,11 @@ class FoldersController < ApplicationController
         @folder = Folder.root_folders(@context).first
       else
         get_context
-        if @context
-          @folder = @context.folders.active.find(params[:id])
-        else
-          @folder = Folder.find(params[:id])
-        end
+        @folder = if @context
+                    @context.folders.active.find(params[:id])
+                  else
+                    Folder.find(params[:id])
+                  end
       end
     else
       require_context

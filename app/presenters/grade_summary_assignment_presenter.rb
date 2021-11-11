@@ -201,11 +201,11 @@ class GradeSummaryAssignmentPresenter
   end
 
   def plagiarism(type)
-    if type == 'vericite'
-      plag_data = submission.vericite_data(true)
-    else
-      plag_data = submission.originality_data
-    end
+    plag_data = if type == 'vericite'
+                  submission.vericite_data(true)
+                else
+                  submission.originality_data
+                end
     t = if is_text_entry?
           plag_data[OriginalityReport.submission_asset_key(submission)] ||
             plag_data[submission.asset_string]

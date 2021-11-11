@@ -1050,8 +1050,7 @@ class MessageableUser
     end
 
     def marshal_dump
-      ivars = (instance_variables - [:@linked_observer_ids_by_shard]).map { |name| [name, instance_variable_get(name)] }
-      ivars
+      (instance_variables - [:@linked_observer_ids_by_shard]).map { |name| [name, instance_variable_get(name)] }
     end
 
     def marshal_load(ivars)

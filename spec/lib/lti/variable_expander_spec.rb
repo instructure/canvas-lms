@@ -225,7 +225,7 @@ module Lti
 
     describe '#self.expansion_keys' do
       let(:expected_keys) do
-        VariableExpander.expansions.keys.map { |c| c.to_s[1..-1] }
+        VariableExpander.expansions.keys.map { |c| c.to_s[1..] }
       end
 
       it 'includes all expansion keys' do

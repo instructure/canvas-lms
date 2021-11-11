@@ -54,7 +54,7 @@ module Qti
                 # So check for the file starting with the full relative path, going down to just the file name
                 paths = val.split("/")
                 paths.length.times do |i|
-                  if (mig_id = find_best_path_match(paths[i..-1].join('/')))
+                  if (mig_id = find_best_path_match(paths[i..].join('/')))
                     subnode[attr] = "#{CC::CCHelper::OBJECT_TOKEN}/attachments/#{mig_id}"
                     break
                   end
@@ -99,7 +99,7 @@ module Qti
     end
 
     def clear_html(text)
-      text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) { |m| m[2..-1].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
+      text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) { |m| m[2..].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
     end
 
     def find_best_path_match(path)

@@ -36,11 +36,11 @@ module AvatarHelper
           if !user && user_id.to_i > 0
             user ||= User.find(user_id)
           end
-          if user
-            url = avatar_url_for_user(user)
-          else
-            url = "/images/messages/avatar-50.png"
-          end
+          url = if user
+                  avatar_url_for_user(user)
+                else
+                  "/images/messages/avatar-50.png"
+                end
           alt = user ? user.short_name : ''
           [url, alt]
         end
@@ -58,11 +58,11 @@ module AvatarHelper
     if opts.has_key? :url
       url = opts[:url]
     elsif user_or_id
-      if context_code
-        url = context_prefix(context_code) + user_path(user_or_id)
-      else
-        url = user_url(user_or_id)
-      end
+      url = if context_code
+              context_prefix(context_code) + user_path(user_or_id)
+            else
+              user_url(user_or_id)
+            end
     end
     link_opts = {}
     link_opts[:class] = 'fs-exclude avatar ' + opts[:class].to_s

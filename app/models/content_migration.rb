@@ -512,7 +512,7 @@ class ContentMigration < ActiveRecord::Base
     prefix = "#{migration_settings[:id_prepender]}_"
     return nil unless mig_id.start_with? prefix
 
-    mig_id[prefix.length..-1]
+    mig_id[prefix.length..]
   end
 
   def import_object?(asset_type, mig_id)
@@ -537,7 +537,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def is_set?(option)
-    Canvas::Plugin::value_to_boolean option
+    Canvas::Plugin.value_to_boolean option
   end
 
   def capture_job_id

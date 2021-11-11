@@ -509,11 +509,11 @@ module QuizzesHelper
   end
 
   def duration_in_minutes(duration_seconds)
-    if duration_seconds < 60
-      duration_minutes = 0
-    else
-      duration_minutes = (duration_seconds / 60).round
-    end
+    duration_minutes = if duration_seconds < 60
+                         0
+                       else
+                         (duration_seconds / 60).round
+                       end
     I18n.t(
       { :zero => "less than 1 minute",
         :one => "1 minute",

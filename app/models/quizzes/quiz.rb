@@ -862,13 +862,13 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def hide_results=(val)
     if val.is_a?(Hash)
-      if val[:last_attempt] == '1'
-        val = 'until_after_last_attempt'
-      elsif val[:never] != '1'
-        val = 'always'
-      else
-        val = nil
-      end
+      val = if val[:last_attempt] == '1'
+              'until_after_last_attempt'
+            elsif val[:never] != '1'
+              'always'
+            else
+              nil
+            end
     elsif val == ""
       val = nil
     end

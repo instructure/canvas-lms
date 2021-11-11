@@ -101,22 +101,22 @@ module CC::Importer::Standard
           item[:linked_resource_title] ||= title
           item = nil if item[:url].blank?
         when /\Aimsbasiclti/
-          if (asmnt = find_assignment(resource[:migration_id]))
-            item = {
-              :indent => indent,
-              :linked_resource_type => 'ASSIGNMENT',
-              :linked_resource_id => asmnt[:migration_id],
-              :linked_resource_title => get_node_val(item_node, 'title')
-            }
-          else
-            item = {
-              :indent => indent,
-              :linked_resource_type => 'CONTEXTEXTERNALTOOL',
-              :linked_resource_id => resource[:migration_id],
-              :linked_resource_title => get_node_val(item_node, 'title'),
-              :url => resource[:url]
-            }
-          end
+          item = if (asmnt = find_assignment(resource[:migration_id]))
+                   {
+                     :indent => indent,
+                     :linked_resource_type => 'ASSIGNMENT',
+                     :linked_resource_id => asmnt[:migration_id],
+                     :linked_resource_title => get_node_val(item_node, 'title')
+                   }
+                 else
+                   {
+                     :indent => indent,
+                     :linked_resource_type => 'CONTEXTEXTERNALTOOL',
+                     :linked_resource_id => resource[:migration_id],
+                     :linked_resource_title => get_node_val(item_node, 'title'),
+                     :url => resource[:url]
+                   }
+                 end
         when /\Aimsdt/
           item = {
             :indent => indent,
