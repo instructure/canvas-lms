@@ -32,7 +32,7 @@ const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
 const EncapsulationPlugin = require('webpack-encapsulation-plugin')
 const IgnoreErrorsPlugin = require('./IgnoreErrorsPlugin')
 const webpackPublicPath = require('./webpackPublicPath')
-const { canvasDir } = require('#params')
+const {canvasDir} = require('#params')
 
 require('./bundles')
 
@@ -50,7 +50,7 @@ const skipSourcemaps = Boolean(
 )
 
 const createBundleAnalyzerPlugin = (...args) => {
-  const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+  const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
   return new BundleAnalyzerPlugin(...args)
 }
 
@@ -59,31 +59,31 @@ module.exports = {
   performance: skipSourcemaps
     ? false
     : {
-      // This just reflects how big the 'main' entry is at the time of writing. Every
-      // time we get it smaller we should change this to the new smaller number so it
-      // only goes down over time instead of growing bigger over time
-      maxEntrypointSize: 1250000,
-      // This is how big our biggest js bundles are at the time of writing. We should
-      // first work to attack the things in `thingsWeKnowAreWayTooBig` so we can start
-      // tracking them too. Then, as we work to get all chunks smaller, we should change
-      // this number to the size of our biggest known asset and hopefully someday get
-      // to where they are all under the default value of 250000 and then remove this
-      // TODO: decrease back to 1200000 LS-1222
-      maxAssetSize: 1400000,
-      assetFilter: assetFilename => {
-        const thingsWeKnowAreWayTooBig = [
-          'assignment_edit',
-          'canvas-rce-async-chunk',
-          'canvas-rce-old-async-chunk',
-          'discussion_topic_edit',
-          'discussion_topics_post',
-        ]
-        return (
-          assetFilename.endsWith('.js') &&
-          !thingsWeKnowAreWayTooBig.some(t => assetFilename.includes(t))
-        )
-      }
-    },
+        // This just reflects how big the 'main' entry is at the time of writing. Every
+        // time we get it smaller we should change this to the new smaller number so it
+        // only goes down over time instead of growing bigger over time
+        maxEntrypointSize: 1250000,
+        // This is how big our biggest js bundles are at the time of writing. We should
+        // first work to attack the things in `thingsWeKnowAreWayTooBig` so we can start
+        // tracking them too. Then, as we work to get all chunks smaller, we should change
+        // this number to the size of our biggest known asset and hopefully someday get
+        // to where they are all under the default value of 250000 and then remove this
+        // TODO: decrease back to 1200000 LS-1222
+        maxAssetSize: 1400000,
+        assetFilter: assetFilename => {
+          const thingsWeKnowAreWayTooBig = [
+            'assignment_edit',
+            'canvas-rce-async-chunk',
+            'canvas-rce-old-async-chunk',
+            'discussion_topic_edit',
+            'discussion_topics_post'
+          ]
+          return (
+            assetFilename.endsWith('.js') &&
+            !thingsWeKnowAreWayTooBig.some(t => assetFilename.includes(t))
+          )
+        }
+      },
   optimization: {
     // concatenateModules: false, // uncomment if you want to get more accurate stuff from `yarn webpack:analyze`
     moduleIds: 'hashed',
@@ -139,10 +139,10 @@ module.exports = {
   devtool: skipSourcemaps
     ? false
     : process.env.NODE_ENV === 'production' ||
-    process.env.COVERAGE === '1' ||
-    process.env.SENTRY_DSN
-      ? 'source-map'
-      : 'eval',
+      process.env.COVERAGE === '1' ||
+      process.env.SENTRY_DSN
+    ? 'source-map'
+    : 'eval',
 
   entry: {main: path.resolve(canvasDir, 'ui/index.js')},
 
@@ -250,13 +250,15 @@ module.exports = {
       {
         test: /\.handlebars$/,
         include: [path.resolve(canvasDir, 'ui'), /gems\/plugins\/.*\/app\/views\/jst\//],
-        loaders: [{
-          loader: require.resolve('./i18nLinerHandlebars'),
-          options: {
-            // brandable_css assets are not available in test
-            injectBrandableStylesheet: process.env.NODE_ENV !== 'test'
+        loaders: [
+          {
+            loader: require.resolve('./i18nLinerHandlebars'),
+            options: {
+              // brandable_css assets are not available in test
+              injectBrandableStylesheet: process.env.NODE_ENV !== 'test'
+            }
           }
-        }]
+        ]
       },
       {
         test: /\.hbs$/,
@@ -293,7 +295,7 @@ module.exports = {
     }),
 
     // handles our custom i18n stuff
-    new I18nPlugin(),
+    I18nPlugin,
 
     // allow plugins to extend source files
     new SourceFileExtensionsPlugin({
@@ -317,12 +319,9 @@ module.exports = {
         path.resolve(canvasDir, 'ui'),
         path.resolve(canvasDir, 'packages'),
         path.resolve(canvasDir, 'public/javascripts'),
-        path.resolve(canvasDir, 'gems/plugins'),
+        path.resolve(canvasDir, 'gems/plugins')
       ],
-      exclude: [
-        /\/node_modules\//,
-        path.resolve(canvasDir, 'ui/shims/dummyI18nResource.js')
-      ],
+      exclude: [/\/node_modules\//, path.resolve(canvasDir, 'ui/shims/dummyI18nResource.js')],
       formatter: require('./encapsulation/ErrorFormatter'),
       rules: require('./encapsulation/moduleAccessRules')
     }),
@@ -335,57 +334,61 @@ module.exports = {
     new webpack.DefinePlugin({
       CANVAS_WEBPACK_PUBLIC_PATH: JSON.stringify(webpackPublicPath)
     })
-
-  ].concat(
-    // return a non-zero exit code if there are any warnings so we don't continue compiling assets if webpack fails
-    process.env.WEBPACK_PEDANTIC !== '0' ? function () {
-      this.plugin('done', ({compilation}) => {
-        if (compilation.warnings && compilation.warnings.length) {
-          console.error(compilation.warnings)
-          // If there's a bad import, webpack doesn't say where.
-          // Only if we let the compilation complete do we get
-          // the callstack where the import happens
-          // If you're having problems, comment out the following
-          throw new Error('webpack build had warnings. Failing.')
-        }
-      })
-    } : []
-  ).concat(
-    process.env.WEBPACK_ANALYSIS === '1' ? createBundleAnalyzerPlugin({
-      analyzerMode: 'static',
-      reportFilename: process.env.WEBPACK_ANALYSIS_FILE ? (
-        path.resolve(process.env.WEBPACK_ANALYSIS_FILE)
-      ) : (
-        path.resolve(canvasDir, 'tmp/webpack-bundle-analysis.html')
-      ),
-      openAnalyzer: false,
-      generateStatsFile: false,
-      statsOptions: {
-        source: false
-      }
-    }) : []
-  ).concat(
-    process.env.NODE_ENV === 'test'
-      ? []
-      : [
-        // don't include any of the moment locales in the common bundle (otherwise it is huge!)
-        // we load them explicitly onto the page in include_js_bundles from rails.
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-
-        // outputs a json file so Rails knows which hash fingerprints to add
-        // to each script url and so it knows which split chunks to make a
-        // <link rel=preload ... /> for for each `js_bundle`
-        new StatsWriterPlugin({
-          filename: 'webpack-manifest.json',
-          fields: ['namedChunkGroups'],
-          transform(data) {
-            const res = {}
-            Object.entries(data.namedChunkGroups).forEach(([key, value]) => {
-              res[key] = value.assets.filter(a => a.endsWith('.js'))
+  ]
+    .concat(
+      // return a non-zero exit code if there are any warnings so we don't continue compiling assets if webpack fails
+      process.env.WEBPACK_PEDANTIC !== '0'
+        ? function () {
+            this.plugin('done', ({compilation}) => {
+              if (compilation.warnings && compilation.warnings.length) {
+                console.error(compilation.warnings)
+                // If there's a bad import, webpack doesn't say where.
+                // Only if we let the compilation complete do we get
+                // the callstack where the import happens
+                // If you're having problems, comment out the following
+                throw new Error('webpack build had warnings. Failing.')
+              }
             })
-            return JSON.stringify(res, null, 2)
           }
-        })
-      ]
-  )
+        : []
+    )
+    .concat(
+      process.env.WEBPACK_ANALYSIS === '1'
+        ? createBundleAnalyzerPlugin({
+            analyzerMode: 'static',
+            reportFilename: process.env.WEBPACK_ANALYSIS_FILE
+              ? path.resolve(process.env.WEBPACK_ANALYSIS_FILE)
+              : path.resolve(canvasDir, 'tmp/webpack-bundle-analysis.html'),
+            openAnalyzer: false,
+            generateStatsFile: false,
+            statsOptions: {
+              source: false
+            }
+          })
+        : []
+    )
+    .concat(
+      process.env.NODE_ENV === 'test'
+        ? []
+        : [
+            // don't include any of the moment locales in the common bundle (otherwise it is huge!)
+            // we load them explicitly onto the page in include_js_bundles from rails.
+            new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+
+            // outputs a json file so Rails knows which hash fingerprints to add
+            // to each script url and so it knows which split chunks to make a
+            // <link rel=preload ... /> for for each `js_bundle`
+            new StatsWriterPlugin({
+              filename: 'webpack-manifest.json',
+              fields: ['namedChunkGroups'],
+              transform(data) {
+                const res = {}
+                Object.entries(data.namedChunkGroups).forEach(([key, value]) => {
+                  res[key] = value.assets.filter(a => a.endsWith('.js'))
+                })
+                return JSON.stringify(res, null, 2)
+              }
+            })
+          ]
+    )
 }
