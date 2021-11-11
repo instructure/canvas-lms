@@ -286,12 +286,7 @@ class PseudonymsController < ApplicationController
 
   def get_user
     user_id = params[:user_id] || params[:user].try(:[], :id)
-    @user = case
-            when user_id
-              api_find(User, user_id)
-            else
-              @current_user
-            end
+    @user = user_id ? api_find(User, user_id) : @current_user
     true
   end
   protected :get_user

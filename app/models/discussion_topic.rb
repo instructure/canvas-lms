@@ -597,12 +597,11 @@ class DiscussionTopic < ActiveRecord::Base
   def subscription_hold(user, session)
     return nil unless user
 
-    case
-    when initial_post_required?(user, session)
+    if initial_post_required?(user, session)
       :initial_post_required
-    when root_topic? && !child_topic_for(user)
+    elsif root_topic? && !child_topic_for(user)
       :not_in_group_set
-    when context.is_a?(Group) && !context.has_member?(user)
+    elsif context.is_a?(Group) && !context.has_member?(user)
       :not_in_group
     end
   end

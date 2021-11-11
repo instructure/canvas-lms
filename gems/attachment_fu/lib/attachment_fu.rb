@@ -159,14 +159,9 @@ module AttachmentFu # :nodoc:
     end
 
     def load_related_exception?(e) # :nodoc: implementation specific
-      case
-      when e.kind_of?(LoadError), e.kind_of?(MissingSourceFile), $!.class.name == "CompilationError"
-        # We can't rescue CompilationError directly, as it is part of the RubyInline library.
-        # We must instead rescue RuntimeError, and check the class' name.
-        true
-      else
-        false
-      end
+      # We can't rescue CompilationError directly, as it is part of the RubyInline library.
+      # We must instead rescue RuntimeError, and check the class' name.
+      e.is_a?(LoadError) || e.is_a?(MissingSourceFile) || e.instance_of?(CompilationError)
     end
     private :load_related_exception?
   end
