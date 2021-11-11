@@ -61,7 +61,7 @@ module Lti::Concerns
     end
 
     def oembed_object_uri
-      URI.parse(oembed_endpoint + (oembed_endpoint.match(/\?/) ? '&url=' : '?url=') + CGI.escape(oembed_url) + '&format=json')
+      URI.parse(oembed_endpoint + (oembed_endpoint.include?('?') ? '&url=' : '?url=') + CGI.escape(oembed_url) + '&format=json')
     end
 
     def uri_source

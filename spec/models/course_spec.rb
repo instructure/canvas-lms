@@ -2137,7 +2137,7 @@ describe Course, "gradebook_to_csv" do
     assignments, groups = [], []
     rows.headers.each do |column|
       assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment \d+/
-      groups << column if column =~ /Some Assignment Group/
+      groups << column if column.include?('Some Assignment Group')
     end
     expect(assignments).to eq ["Assignment 02", "Assignment 03", "Assignment 01", "Assignment 05", "Assignment 04", "Assignment 06", "Assignment 07", "Assignment 09", "Assignment 11", "Assignment 12", "Assignment 13", "Assignment 14", "Assignment 08", "Assignment 10"]
     expect(groups).to eq [

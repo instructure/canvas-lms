@@ -414,7 +414,7 @@ namespace :i18n do
     import = I18nTasks::I18nImport.new(source_translations, new_translations)
 
     complete_translations = import.compile_complete_translations do |error_items, description|
-      if description =~ /mismatches/
+      if description.include?('mismatches')
         # Output malformed stuff and don't import them
         errors.concat error_items
         :discard

@@ -428,7 +428,7 @@ class EnrollmentsApiController < ApplicationController
       enrollments = enrollments.joins(:user).select("enrollments.*")
 
       has_courses = enrollments.where_clause.instance_variable_get(:@predicates)
-                               .any? { |cond| cond.is_a?(String) && cond =~ /courses\./ }
+                               .any? { |cond| cond.is_a?(String) && cond.include?('courses.') }
       enrollments = enrollments.joins(:course) if has_courses
       enrollments = enrollments.shard(@shard_scope) if @shard_scope
 

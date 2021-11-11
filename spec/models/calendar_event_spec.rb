@@ -149,7 +149,7 @@ describe CalendarEvent do
         calendar_event_model(:start_at => "", :end_at => "")
         res = @event.to_ics
         expect(res).not_to be_nil
-        expect(res.match(/DTSTART/)).to be_nil
+        expect(res.include?('DTSTART')).to be false
       end
 
       it "does not return data for null times" do
@@ -165,9 +165,9 @@ describe CalendarEvent do
         @event.updated_at = Time.at(1220443500) # 3 Sep 2008 12:05pm (UTC)
         res = @event.to_ics
         expect(res).not_to be_nil
-        expect(res.match(/DTSTART:20080903T115500Z/)).not_to be_nil
-        expect(res.match(/DTEND:20080903T120000Z/)).not_to be_nil
-        expect(res.match(/DTSTAMP:20080903T120500Z/)).not_to be_nil
+        expect(res.include?('DTSTART:20080903T115500Z')).not_to be_nil
+        expect(res.include?('DTEND:20080903T120000Z')).not_to be_nil
+        expect(res.include?('DTSTAMP:20080903T120500Z')).not_to be_nil
       end
 
       it "returns string data for events with times in correct tz" do
@@ -177,9 +177,9 @@ describe CalendarEvent do
         @event.updated_at = Time.at(1220472300) # 3 Sep 2008 12:05pm (AKDT)
         res = @event.to_ics
         expect(res).not_to be_nil
-        expect(res.match(/DTSTART:20080903T195500Z/)).not_to be_nil
-        expect(res.match(/DTEND:20080903T200000Z/)).not_to be_nil
-        expect(res.match(/DTSTAMP:20080903T200500Z/)).not_to be_nil
+        expect(res.include?('DTSTART:20080903T195500Z')).not_to be_nil
+        expect(res.include?('DTEND:20080903T200000Z')).not_to be_nil
+        expect(res.include?('DTSTAMP:20080903T200500Z')).not_to be_nil
       end
 
       it "returns data for events with times" do
@@ -222,8 +222,8 @@ describe CalendarEvent do
         expect(@event.all_day).to eql(true)
         expect(@event.end_at).to eql(@event.start_at)
         res = @event.to_ics
-        expect(res.match(/DTSTART;VALUE=DATE:20080903/)).not_to be_nil
-        expect(res.match(/DTEND;VALUE=DATE:20080903/)).not_to be_nil
+        expect(res.include?('DTSTART;VALUE=DATE:20080903')).not_to be_nil
+        expect(res.include?('DTEND;VALUE=DATE:20080903')).not_to be_nil
       end
 
       it "returns a plain-text description" do

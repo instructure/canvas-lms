@@ -3071,8 +3071,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def allow_google_docs_submission?
-    self.submission_types &&
-      self.submission_types.match(/online_upload/)
+    submission_types&.include?('online_upload')
   end
 
   def <=>(comparable)

@@ -256,12 +256,12 @@ class CourseLinkValidator
   # makes sure that links to course objects exist and are in a visible state
   def check_object_status(url, object: nil)
     return :missing_item unless valid_route?(url)
-    return :missing_item if url =~ /\/test_error/
+    return :missing_item if url.include?('/test_error')
 
     object ||= Context.find_asset_by_url(url)
     unless object
       return :missing_item unless [nil, 'syllabus'].include?(url.match(/\/courses\/\d+\/\w+\/(.+)/)&.[](1))
-      return :missing_item if url =~ /\/media_objects_iframe\//
+      return :missing_item if url.include?('/media_objects_iframe/')
 
       return nil
     end

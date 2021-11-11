@@ -216,7 +216,7 @@ class MediaObject < ActiveRecord::Base
       self.data[:plays] = entry[:plays].to_i
       self.data[:download_url] = entry[:downloadUrl]
       tags = (entry[:tags] || "").split(/,/).map(&:strip)
-      old_id = tags.detect { |t| t.match(/old_id_/) }
+      old_id = tags.detect { |t| t.include?('old_id_') }
       self.old_media_id = old_id.sub(/old_id_/, '') if old_id
     end
     self.data[:extensions] ||= {}

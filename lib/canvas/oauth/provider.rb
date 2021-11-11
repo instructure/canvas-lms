@@ -138,7 +138,7 @@ module Canvas::OAuth
       if is_oob?(redirect_uri)
         controller.oauth2_auth_url(opts)
       else
-        has_params = redirect_uri =~ %r{\?}
+        has_params = redirect_uri.include?('?')
         redirect_uri + (has_params ? "&" : "?") + opts.to_query
       end
     end

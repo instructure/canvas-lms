@@ -514,9 +514,9 @@ describe ExternalToolsController, type: :request do
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
     expect(links.all? { |l| l =~ /api\/v1\/groups\/#{group.id}\/external_tools/ }).to be_truthy
-    expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2/)
-    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1/)
-    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3/)
+    expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2/)
+    expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1/)
+    expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
 
     # get the last page
     json = api_call(:get, "/api/v1/groups/#{group.id}/external_tools",
@@ -526,9 +526,9 @@ describe ExternalToolsController, type: :request do
     expect(json.length).to eq 1
     links = response.headers['Link'].split(",")
     expect(links.all? { |l| l =~ /api\/v1\/groups\/#{group.id}\/external_tools/ }).to be_truthy
-    expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2/)
-    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1/)
-    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3/)
+    expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2/)
+    expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1/)
+    expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
   end
 
   def index_call(context, type = "course")
@@ -647,9 +647,9 @@ describe ExternalToolsController, type: :request do
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
     expect(links.all? { |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/external_tools/ }).to be_truthy
-    expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2/)
-    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1/)
-    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3/)
+    expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2/)
+    expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1/)
+    expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
 
     # get the last page
     json = api_call(:get, "/api/v1/#{type}s/#{context.id}/external_tools.json?page=3&per_page=3",
@@ -657,9 +657,9 @@ describe ExternalToolsController, type: :request do
     expect(json.length).to eq 1
     links = response.headers['Link'].split(",")
     expect(links.all? { |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/external_tools/ }).to be_truthy
-    expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2/)
-    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1/)
-    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3/)
+    expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2/)
+    expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1/)
+    expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
   end
 
   def tool_with_everything(context, opts = {})

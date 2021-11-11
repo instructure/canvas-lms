@@ -390,7 +390,7 @@ class GradebookImporter
   end
 
   def row_has_student_headers?(row)
-    row.length > 3 && row[0] =~ /Student/ && row[1] =~ /ID/
+    row.length > 3 && row[0].include?('Student') && row[1].include?('ID')
   end
 
   def update_column_count(row)
@@ -666,7 +666,7 @@ class GradebookImporter
       return true
     end
 
-    if row[0] =~ /Points Possible/
+    if row[0]&.include?('Points Possible')
       # this row is describing the assignment, has no student data
       process_pp(row)
       return true
