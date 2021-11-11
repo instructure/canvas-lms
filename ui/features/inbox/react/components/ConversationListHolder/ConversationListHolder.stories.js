@@ -18,11 +18,11 @@
 
 import React from 'react'
 
-import {MessageListHolder} from './MessageListHolder'
+import {ConversationListHolder} from './ConversationListHolder'
 
 export default {
-  title: 'Examples/Canvas Inbox/MessageListHolder',
-  component: MessageListHolder,
+  title: 'Examples/Canvas Inbox/ConversationListHolder',
+  component: ConversationListHolder,
   argTypes: {
     handleOptionSelect: {action: 'onSelect'},
     handleStar: {action: 'onStar'},
@@ -30,7 +30,7 @@ export default {
   }
 }
 
-const Template = args => <MessageListHolder {...args} />
+const Template = args => <ConversationListHolder {...args} />
 
 export const WithUnreadConversations = Template.bind({})
 WithUnreadConversations.args = {
