@@ -162,9 +162,7 @@ module MicrosoftSync
       # data in case it was never done.
       new_group_id = remote_ids.first
 
-      unless new_group_id
-        new_group_id = graph_service_helpers.create_education_class(course)['id']
-      end
+      new_group_id ||= graph_service_helpers.create_education_class(course)['id']
 
       StateMachineJob::DelayedNextStep.new(
         :step_update_group_with_course_data, DELAY_BEFORE_UPDATE_GROUP, new_group_id

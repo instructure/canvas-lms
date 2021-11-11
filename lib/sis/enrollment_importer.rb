@@ -271,9 +271,7 @@ module SIS
                                                       associated_user_id: associated_user_id,
                                                       role_id: role).take
 
-          unless enrollment
-            enrollment = Enrollment.typed_enrollment(type).new
-          end
+          enrollment ||= Enrollment.typed_enrollment(type).new
           enrollment.root_account = @root_account
           enrollment.user = user
           enrollment.type = type

@@ -98,13 +98,11 @@ module Lti
     end
 
     def current_account_enrollments()
-      unless @current_account_enrollments
-        @current_account_enrollments = if @canvas_context.respond_to?(:account_chain) && !@canvas_context.account_chain.empty?
+      @current_account_enrollments ||= if @canvas_context.respond_to?(:account_chain) && !@canvas_context.account_chain.empty?
                                          @canvas_user.account_users.active.where(account_id: @canvas_context.account_chain).distinct.to_a
                                        else
                                          []
                                        end
-      end
       @current_account_enrollments
     end
 
