@@ -1738,7 +1738,7 @@ class ApplicationController < ActionController::Base
                              status_code.to_s
                            else
                              # we want to return a status string of the form "not_found", so take the rails-style "Not Found" and tweak it
-                             interpret_status(status_code).sub(/\d\d\d /, '').gsub(' ', '').underscore
+                             interpret_status(status_code).sub(/\d\d\d /, '').delete(' ').underscore
                            end
       data = { errors: [{ message: "An error occurred.", error_code: status_code_string }] }
     end

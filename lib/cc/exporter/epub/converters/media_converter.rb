@@ -55,7 +55,7 @@ module CC::Exporter::Epub::Converters
     # which will match the directory the content is stored in in the ePub.
     def convert_media_paths!(html_node)
       { a: 'href', img: 'src' }.each do |tag, attr|
-        selector = "#{tag}[#{attr}*='#{WEB_CONTENT_TOKEN.gsub('$', '')}']"
+        selector = "#{tag}[#{attr}*='#{WEB_CONTENT_TOKEN.delete('$')}']"
         html_node.search(selector).each do |match|
           unescaped = CGI.unescape(match[attr]).gsub(/\?.*/, '')
 

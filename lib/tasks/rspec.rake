@@ -195,7 +195,7 @@ unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
       desc "check if spec server is running"
       task :status do
         if File.exist?(daemonized_server_pid)
-          $stderr.puts %Q{spec_server is running (PID: #{File.read(daemonized_server_pid).gsub("\n", "")})}
+          $stderr.puts %Q{spec_server is running (PID: #{File.read(daemonized_server_pid).delete("\n")})}
         else
           $stderr.puts "No server running."
         end

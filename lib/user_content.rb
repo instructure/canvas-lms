@@ -111,7 +111,7 @@ module UserContent
       height ||= css_size(styles['height'])
       height ||= '300px'
 
-      snippet = Base64.encode64(obj.to_s).gsub("\n", '')
+      snippet = Base64.encode64(obj.to_s).delete("\n")
       hmac = Canvas::Security.hmac_sha1(snippet)
       uc = Node.new(width, height, snippet, hmac)
 
