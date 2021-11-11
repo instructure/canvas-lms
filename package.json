@@ -299,7 +299,7 @@
     "msw": "^0.27.2",
     "nyc": "^13",
     "prettier": "^2.2.1",
-    "qunitjs": "^1.14.0",
+    "qunitjs": "^1.23.0",
     "raven-js": "^3.26.2",
     "react-test-renderer": "^16",
     "redux-logger": "^3.0.6",
