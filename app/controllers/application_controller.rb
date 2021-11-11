@@ -1000,7 +1000,7 @@ class ApplicationController < ActionController::Base
           params[:context_id] = params[:course_section_id]
           params[:context_type] = "CourseSection"
           @context = api_find(CourseSection, params[:course_section_id])
-        elsif request.path.match(/\A\/profile/) || request.path == '/' || request.path.match(/\A\/dashboard\/files/) || request.path.match(/\A\/calendar/) || request.path.match(/\A\/assignments/) || request.path.match(/\A\/files/) || request.path == '/api/v1/calendar_events/visible_contexts'
+        elsif request.path.start_with?('/profile') || request.path == '/' || request.path.start_with?('/dashboard/files') || request.path.start_with?('/calendar') || request.path.start_with?('/assignments') || request.path.start_with?('/files') || request.path == '/api/v1/calendar_events/visible_contexts'
           # ^ this should be split out into things on the individual controllers
           @context_is_current_user = true
           @context = @current_user
@@ -1243,7 +1243,7 @@ class ApplicationController < ActionController::Base
   # that we can offer the feeds without requiring password authentication.
   def get_feed_context(opts = {})
     pieces = params[:feed_code].split("_", 2)
-    if params[:feed_code].match?(/\Agroup_membership/)
+    if params[:feed_code].start_with?('group_membership')
       pieces = ["group_membership", params[:feed_code].split("_", 3)[-1]]
     end
     @context = nil

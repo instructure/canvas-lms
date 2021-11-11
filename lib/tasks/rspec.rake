@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Don't load rspec if running "rake gems:*"
-unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
+unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
 
   begin
     require 'rspec/core/rake_task'

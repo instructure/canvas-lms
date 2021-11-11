@@ -31,7 +31,7 @@ class KalturaMediaFileHandler
       files << {
         :name => attachment.display_name,
         :url => attachment.public_download_url,
-        :media_type => (attachment.content_type || "").match?(/\Avideo/) ? 'video' : 'audio',
+        :media_type => attachment.content_type&.start_with?('video') ? 'video' : 'audio',
         :partner_data => build_partner_data(attachment)
       }
     end
