@@ -22,7 +22,6 @@ import ReactDOM from 'react-dom'
 import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents'
 import AssignmentColumnHeader from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/AssignmentColumnHeader'
 import MessageStudentsWhoDialog from 'ui/features/gradebook/react/shared/MessageStudentsWhoDialog'
-import MessageStudentsWithObserversDialog from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 import {blurElement, getMenuContent, getMenuItem} from './ColumnHeaderSpecHelpers'
 
 /* eslint-disable qunit/no-identical-names */
@@ -758,22 +757,14 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
 
   QUnit.module('"Options" > "Message Students Who" action', hooks => {
     let loadMessageStudentsWhoDialogPromise
-    let loadMessageStudentsWithObserversDialogPromise
 
     hooks.beforeEach(() => {
       loadMessageStudentsWhoDialogPromise = Promise.resolve(MessageStudentsWhoDialog)
-      loadMessageStudentsWithObserversDialogPromise = Promise.resolve(
-        MessageStudentsWithObserversDialog
-      )
 
       sandbox
         .stub(AsyncComponents, 'loadMessageStudentsWhoDialog')
         .returns(loadMessageStudentsWhoDialogPromise)
       sandbox.stub(MessageStudentsWhoDialog, 'show')
-
-      sandbox
-        .stub(AsyncComponents, 'loadMessageStudentsWithObserversDialog')
-        .returns(loadMessageStudentsWithObserversDialogPromise)
     })
 
     test('is always present', () => {
@@ -809,117 +800,34 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         notEqual(document.activeElement, getOptionsMenuTrigger())
       })
 
-      QUnit.module('when showMessageStudentsWithObservers is true', observerHooks => {
-        let createElementSpy
-        let renderSpy
-        let unmountSpy
-        let mountPoint
-
-        observerHooks.beforeEach(() => {
-          createElementSpy = sandbox.spy(React, 'createElement')
-          renderSpy = sandbox.spy(ReactDOM, 'render')
-          unmountSpy = sandbox.spy(ReactDOM, 'unmountComponentAtNode')
-
-          mountPoint = document.createElement('span')
-          mountPoint.dataset.component = 'MessageStudentsWithObserversModal'
-          document.body.append(mountPoint)
-
-          props.showMessageStudentsWithObserversDialog = true
-        })
-
-        observerHooks.afterEach(() => {
-          createElementSpy.restore()
-          renderSpy.restore()
-          unmountSpy.restore()
-
-          mountPoint.remove()
-        })
-
-        test('renders the modal', async () => {
-          mountAndOpenOptionsMenu()
-          getMenuItem($menuContent, 'Message Students Who').click()
-
-          const dialog = await loadMessageStudentsWithObserversDialogPromise
-          const createModalCall = createElementSpy.getCalls().find(call => call.args[0] === dialog)
-          strictEqual(renderSpy.lastCall.args[0], createModalCall.returnValue)
-        })
-
-        test('restores focus and unmounts the modal upon dialog close', async () => {
-          mountAndOpenOptionsMenu()
-          getMenuItem($menuContent, 'Message Students Who').click()
-
-          const dialog = await loadMessageStudentsWithObserversDialogPromise
-          const createModalCall = createElementSpy.getCalls().find(call => call.args[0] === dialog)
-
-          const {onClose} = createModalCall.args[1]
-          onClose()
-          strictEqual(document.activeElement, getOptionsMenuTrigger())
-          strictEqual(unmountSpy.callCount, 1)
-        })
-
-        test('includes non-test students returned by getCurrentlyShownStudents() in the "settings" hash', async () => {
-          mountAndOpenOptionsMenu()
-          getMenuItem($menuContent, 'Message Students Who').click()
-
-          const dialog = await loadMessageStudentsWithObserversDialogPromise
-          const createModalCall = createElementSpy.getCalls().find(call => call.args[0] === dialog)
-          const {students: passedStudents} = createModalCall.args[1]
-          strictEqual(passedStudents.length, 2)
-        })
-
-        test('excludes test students returned by getCurrentlyShownStudents() from the "settings" hash', async () => {
-          students[0].isTestStudent = true
-
-          mountAndOpenOptionsMenu()
-          getMenuItem($menuContent, 'Message Students Who').click()
-
-          const dialog = await loadMessageStudentsWithObserversDialogPromise
-          const createModalCall = createElementSpy.getCalls().find(call => call.args[0] === dialog)
-          const {students: passedStudents} = createModalCall.args[1]
-          deepEqual(
-            passedStudents.map(student => student.name),
-            ['Betty Ford']
-          )
-        })
+      test('includes a callback for restoring focus upon dialog close', async () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Message Students Who').click()
+        await loadMessageStudentsWhoDialogPromise
+        const [, onClose] = MessageStudentsWhoDialog.show.lastCall.args
+        onClose()
+        strictEqual(document.activeElement, getOptionsMenuTrigger())
       })
 
-      QUnit.module('when showMessageStudentsWithObservers is not true', () => {
-        test('opens the message students dialog', async () => {
-          mountAndOpenOptionsMenu()
-          getMenuItem($menuContent, 'Message Students Who').click()
-          await loadMessageStudentsWhoDialogPromise
-          strictEqual(MessageStudentsWhoDialog.show.callCount, 1)
-        })
+      test('includes non-test students in the "settings" hash', async () => {
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Message Students Who').click()
+        await loadMessageStudentsWhoDialogPromise
+        const [settings] = MessageStudentsWhoDialog.show.lastCall.args
+        strictEqual(settings.students.length, 2)
+      })
 
-        test('includes a callback for restoring focus upon dialog close', async () => {
-          mountAndOpenOptionsMenu()
-          getMenuItem($menuContent, 'Message Students Who').click()
-          await loadMessageStudentsWhoDialogPromise
-          const [, onClose] = MessageStudentsWhoDialog.show.lastCall.args
-          onClose()
-          strictEqual(document.activeElement, getOptionsMenuTrigger())
-        })
+      test('excludes test students from the "settings" hash', async () => {
+        students[0].isTestStudent = true
 
-        test('includes non-test students in the "settings" hash', async () => {
-          mountAndOpenOptionsMenu()
-          getMenuItem($menuContent, 'Message Students Who').click()
-          await loadMessageStudentsWhoDialogPromise
-          const [settings] = MessageStudentsWhoDialog.show.lastCall.args
-          strictEqual(settings.students.length, 2)
-        })
-
-        test('excludes test students from the "settings" hash', async () => {
-          students[0].isTestStudent = true
-
-          mountAndOpenOptionsMenu()
-          getMenuItem($menuContent, 'Message Students Who').click()
-          await loadMessageStudentsWhoDialogPromise
-          const [settings] = MessageStudentsWhoDialog.show.lastCall.args
-          deepEqual(
-            settings.students.map(student => student.name),
-            ['Betty Ford']
-          )
-        })
+        mountAndOpenOptionsMenu()
+        getMenuItem($menuContent, 'Message Students Who').click()
+        await loadMessageStudentsWhoDialogPromise
+        const [settings] = MessageStudentsWhoDialog.show.lastCall.args
+        deepEqual(
+          settings.students.map(student => student.name),
+          ['Betty Ford']
+        )
       })
     })
   })

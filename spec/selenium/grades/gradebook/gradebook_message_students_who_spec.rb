@@ -33,6 +33,29 @@ describe "Gradebook - message students who" do
     user_session(@teacher)
   end
 
+  context "Message Observers of Students Who" do
+    before do
+      Account.site_admin.enable_feature!(:message_observers_of_students_who)
+      @observer_1 = user_factory(active_all: true, active_state: "active", name: "observer1")
+      @observer_2 = user_factory(active_all: true, active_state: "active", name: "observer2")
+      @course.enroll_user(@observer_1, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student_1.id)
+      @course.enroll_user(@observer_2, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student_1.id)
+      @course.enroll_user(@observer_2, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student_2.id)
+    end
+
+    it "renders modal with observers displayed next to their observees" do
+      Gradebook.visit(@course)
+      Gradebook.click_assignment_header_menu_element(@third_assignment.id, "message students")
+      f("button[data-testid='show_all_recipients']").click
+
+      expect(fxpath_table_cell("List of students and observers", 1, 1)).to include_text(@student_1.name)
+      expect(fxpath_table_cell("List of students and observers", 1, 2)).to include_text(@observer_1.name, @observer_2.name)
+      expect(fxpath_table_cell("List of students and observers", 2, 1)).to include_text(@student_2.name)
+      expect(fxpath_table_cell("List of students and observers", 2, 2)).to include_text(@observer_2.name)
+      expect(fxpath_table_cell("List of students and observers", 3, 1)).to include_text(@student_3.name)
+    end
+  end
+
   it "sends messages" do
     message_text = "This is a message"
 

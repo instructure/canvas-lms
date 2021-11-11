@@ -432,7 +432,7 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
 
     test('creates the modal', function () {
       GradebookHeaderMenu.prototype.messageStudentsWho(params)
-      strictEqual(createElementStub.callCount, 1)
+      strictEqual(createElementStub.callCount, 2)
       strictEqual(createElementStub.firstCall.args[0], MessageStudentsWithObserversDialog)
 
       const [, elementProps] = createElementStub.firstCall.args
