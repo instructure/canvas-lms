@@ -472,7 +472,7 @@ class WikiPage < ActiveRecord::Base
     opts_with_default = default_opts.merge(opts)
     result = WikiPage.new({
                             :title =>
-                              opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"), self.title),
+                              opts_with_default[:copy_title] || get_copy_title(self, t("Copy"), self.title),
                             :wiki_id => self.wiki_id,
                             :context_id => self.context_id,
                             :context_type => self.context_type,

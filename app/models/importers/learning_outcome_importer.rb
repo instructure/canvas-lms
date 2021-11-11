@@ -26,7 +26,7 @@ module Importers
     def self.process_migration(data, migration)
       selectable_outcomes = migration.context.respond_to?(:root_account) &&
                             migration.context.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
-      outcomes = data['learning_outcomes'] ? data['learning_outcomes'] : []
+      outcomes = data['learning_outcomes'] || []
       migration.outcome_to_id_map = {}
       outcomes.each do |outcome|
         import_item = migration.import_object?('learning_outcomes', outcome['migration_id'])

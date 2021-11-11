@@ -41,8 +41,8 @@ class ModelView < HashView
     new(
       lines[0].strip,
       json["properties"],
-      json["description"] ? json["description"] : "",
-      json["required"] ? json["required"] : [],
+      json["description"] || "",
+      json["required"] || [],
       deprecated: json["deprecated"],
       deprecation_description: json["deprecation_description"]
     )

@@ -36,7 +36,7 @@ module LocaleSelection
     sources = [
       -> { context.locale if context.try(:is_a?, Course) },
       -> { user.locale if user && user.locale },
-      -> { session_locale if session_locale },
+      -> { session_locale },
       -> { Account.recursive_default_locale_for_id(context.account_id) if context.try(:is_a?, Course) },
       -> { Account.recursive_default_locale_for_id(context.id) if context.try(:is_a?, Account) },
       -> { root_account.try(:default_locale) },
