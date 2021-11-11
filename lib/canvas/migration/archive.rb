@@ -155,7 +155,7 @@ module Canvas::Migration
 
     def delete_unzipped_archive
       if @unzipped_file_path && File.directory?(@unzipped_file_path)
-        FileUtils::rm_rf(@unzipped_file_path)
+        FileUtils.rm_rf(@unzipped_file_path)
       end
     end
 
@@ -163,7 +163,7 @@ module Canvas::Migration
     # it into the directory with the given file name
     def prepare_cartridge_file(file_name = 'imsmanifest.xml')
       if self.path.ends_with?('xml')
-        FileUtils::cp(self.path, package_root.item_path(file_name))
+        FileUtils.cp(self.path, package_root.item_path(file_name))
       else
         unzip_archive
       end
@@ -171,7 +171,7 @@ module Canvas::Migration
 
     def delete_unzipped_file
       if File.exist?(self.unzipped_file_path)
-        FileUtils::rm_rf(self.unzipped_file_path)
+        FileUtils.rm_rf(self.unzipped_file_path)
       end
     end
 

@@ -320,7 +320,7 @@ describe LtiApiController, type: :request do
     end
 
     it "sets complex submission text" do
-      text = CGI::escapeHTML("<p>stuff</p>")
+      text = CGI.escapeHTML("<p>stuff</p>")
       make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: { :text => "<![CDATA[#{text}]]>" }))
       check_success
 

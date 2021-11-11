@@ -663,7 +663,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # taken quiz, even if it's a prior version of the submission. Thank you
   # simply_versioned for making this possible!
   def update_submission_version(version, attrs)
-    version_data = YAML::load(version.yaml)
+    version_data = YAML.load(version.yaml)
     version_data["submission_data"] = self.submission_data if attrs.include?(:submission_data)
     version_data["temporary_user_code"] = "was #{version_data['score']} until #{Time.now}"
     version_data["score"] = self.score if attrs.include?(:score)

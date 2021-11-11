@@ -127,7 +127,7 @@ module CC
       return unless external_content.present?
 
       folder = File.join(@export_dir, CCHelper::EXTERNAL_CONTENT_FOLDER)
-      FileUtils::mkdir_p(folder)
+      FileUtils.mkdir_p(folder)
 
       external_content.each do |service_key, data|
         path = File.join(folder, "#{service_key}.json")
@@ -209,7 +209,7 @@ module CC
                   else
                     "#{name}-export.#{CCHelper::CC_EXTENSION}"
                   end
-      FileUtils::mkdir_p File.join(@export_dir, ZIP_DIR)
+      FileUtils.mkdir_p File.join(@export_dir, ZIP_DIR)
       @zip_path = File.join(@export_dir, ZIP_DIR, @zip_name)
       @zip_file = Zip::File.new(@zip_path, Zip::File::CREATE)
     end

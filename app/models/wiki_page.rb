@@ -455,7 +455,7 @@ class WikiPage < ActiveRecord::Base
     end
     # if this works without throwing another error, we've
     # cleaned up the yaml successfully
-    YAML::load(new_string)
+    YAML.load(new_string)
     new_string
   end
 

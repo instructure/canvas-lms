@@ -127,7 +127,7 @@ module Importers
 
     def missing_relative_file_url(rel_path)
       # the rel_path should already be escaped
-      File.join(URI::escape("#{context_path}/file_contents/#{Folder.root_folders(context).first.name}"), rel_path.gsub(" ", "%20"))
+      File.join(URI.escape("#{context_path}/file_contents/#{Folder.root_folders(context).first.name}"), rel_path.gsub(" ", "%20"))
     end
 
     def find_file_in_context(rel_path)

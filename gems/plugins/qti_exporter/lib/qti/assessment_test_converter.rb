@@ -28,7 +28,7 @@ module Qti
     attr_reader :package_root, :identifier, :href, :interaction_type, :title, :quiz
 
     def initialize(manifest_node, base_dir, opts = {})
-      @log = Canvas::Migration::logger
+      @log = Canvas::Migration.logger
       @manifest_node = manifest_node
       @package_root = PackageRoot.new(base_dir)
       @href = @package_root.item_path(@manifest_node['href'])

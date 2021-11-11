@@ -123,7 +123,7 @@ module Qti
               answer[:text] = choice.text.strip
             else
               sanitized = sanitize_html!(choice.at_css('div[class=html]') ? Nokogiri::HTML5.fragment(choice.text) : choice, true)
-              if sanitized.present? && sanitized != CGI::escapeHTML(answer[:text])
+              if sanitized.present? && sanitized != CGI.escapeHTML(answer[:text])
                 answer[:html] = sanitized
               end
             end

@@ -692,7 +692,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def unencoded_filename
-    CGI::unescape(self.filename || t(:default_filename, "File"))
+    CGI.unescape(self.filename || t(:default_filename, "File"))
   end
 
   def quota_exemption_key

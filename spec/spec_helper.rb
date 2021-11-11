@@ -397,7 +397,7 @@ RSpec.configure do |config|
     Notification.reset_cache!
     ActiveRecord::Base.reset_any_instantiation!
     Folder.reset_path_lookups!
-    Rails::logger.try(:info, "Running #{self.class.description} #{@method_name}")
+    Rails.logger.try(:info, "Running #{self.class.description} #{@method_name}")
     Attachment.current_root_account = nil
     Canvas::DynamicSettings.reset_cache!
     ActiveRecord::Migration.verbose = false
@@ -632,18 +632,18 @@ RSpec.configure do |config|
 
   def stub_kaltura
     # trick kaltura into being activated
-    allow(CanvasKaltura::plugin_settings).to receive(:settings).and_return({
-                                                                             'domain' => 'kaltura.example.com',
-                                                                             'resource_domain' => 'cdn.kaltura.example.com',
-                                                                             'rtmp_domain' => 'rtmp.kaltura.example.com',
-                                                                             'partner_id' => '100',
-                                                                             'subpartner_id' => '10000',
-                                                                             'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
-                                                                             'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
-                                                                             'player_ui_conf' => '1',
-                                                                             'kcw_ui_conf' => '1',
-                                                                             'upload_ui_conf' => '1'
-                                                                           })
+    allow(CanvasKaltura.plugin_settings).to receive(:settings).and_return({
+                                                                            'domain' => 'kaltura.example.com',
+                                                                            'resource_domain' => 'cdn.kaltura.example.com',
+                                                                            'rtmp_domain' => 'rtmp.kaltura.example.com',
+                                                                            'partner_id' => '100',
+                                                                            'subpartner_id' => '10000',
+                                                                            'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',
+                                                                            'user_secret_key' => '1234821hrj3k21hjk4j3kl21j4kl321j4kl3j21kl4j3k2l1',
+                                                                            'player_ui_conf' => '1',
+                                                                            'kcw_ui_conf' => '1',
+                                                                            'upload_ui_conf' => '1'
+                                                                          })
   end
 
   def override_dynamic_settings(data)

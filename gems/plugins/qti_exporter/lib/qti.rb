@@ -63,7 +63,7 @@ module Qti
     questions = []
     doc = Nokogiri::XML(File.open(manifest_path))
     doc.css('manifest resources resource[type^=imsqti_item_xmlv2p]').each do |item|
-      q = AssessmentItemConverter::create_instructure_question(opts.merge(:manifest_node => item, :base_dir => File.dirname(manifest_path), :sorted_file_paths => sorted_paths))
+      q = AssessmentItemConverter.create_instructure_question(opts.merge(:manifest_node => item, :base_dir => File.dirname(manifest_path), :sorted_file_paths => sorted_paths))
       questions << q if q
     end
     questions
