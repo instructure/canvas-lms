@@ -450,13 +450,12 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def determine_tag_type(mastery_type)
-    new_mastery_type = case mastery_type
-                       when 'points', 'points_mastery'
-                         'points_mastery'
-                       else
-                         'explicit_mastery'
-                       end
-    new_mastery_type
+    case mastery_type
+    when 'points', 'points_mastery'
+      'points_mastery'
+    else
+      'explicit_mastery'
+    end
   end
 
   def clear_total_outcomes_cache

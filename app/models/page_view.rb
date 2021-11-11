@@ -206,14 +206,13 @@ class PageView < ActiveRecord::Base
     @blank_template ||= columns.inject({}) { |h, c| h[c.name] = nil; h }
     attrs = attrs.slice(*@blank_template.keys)
     shard = PageView.global_storage_namespace? ? Shard.birth : Shard.current
-    page_view = shard.activate do
+    shard.activate do
       if new_record
         new { |pv| pv.assign_attributes(attrs) }
       else
         instantiate(@blank_template.merge(attrs))
       end
     end
-    page_view
   end
 
   def self.updates_enabled?

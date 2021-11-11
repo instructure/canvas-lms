@@ -1343,12 +1343,11 @@ class Enrollment < ActiveRecord::Base
   def self.order_by_sortable_name
     clause = User.sortable_name_order_by_clause('users')
     scope = self.order(clause)
-    scope = if scope.select_values.present?
-              scope.select(clause)
-            else
-              scope.select(self.arel_table[Arel.star])
-            end
-    scope
+    if scope.select_values.present?
+      scope.select(clause)
+    else
+      scope.select(self.arel_table[Arel.star])
+    end
   end
 
   def self.top_enrollment_by(key, rank_order = :default)

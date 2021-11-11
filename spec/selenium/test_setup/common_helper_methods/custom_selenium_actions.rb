@@ -268,8 +268,7 @@ module CustomSeleniumActions
 
   def first_selected_option(select_element)
     select = Selenium::WebDriver::Support::Select.new(select_element)
-    option = select.first_selected_option
-    option
+    select.first_selected_option
   end
 
   def dialog_for(node)

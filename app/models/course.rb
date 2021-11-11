@@ -3560,8 +3560,7 @@ class Course < ActiveRecord::Base
 
   def student_view_student
     fake_student = find_or_create_student_view_student
-    fake_student = sync_enrollments(fake_student)
-    fake_student
+    sync_enrollments(fake_student)
   end
 
   # part of the way we isolate this fake student from places we don't want it

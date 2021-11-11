@@ -42,7 +42,6 @@ module Api::V1::RubricAssociation
 
   def rubric_association_json(rubric_association, user, session, _opts = {})
     json_attributes = API_ALLOWED_RUBRIC_ASSOCIATION_OUTPUT_FIELDS
-    hash = api_json(rubric_association, user, session, json_attributes)
-    hash
+    api_json(rubric_association, user, session, json_attributes)
   end
 end

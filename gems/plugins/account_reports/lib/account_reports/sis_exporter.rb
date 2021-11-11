@@ -267,12 +267,11 @@ module AccountReports
       terms = terms.where.not(sis_source_id: nil) if @sis_format
       terms = terms.where.not(enrollment_terms: { sis_batch_id: nil }) if @created_by_sis
 
-      terms = if @include_deleted
-                terms.where("workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
-              else
-                terms.where("workflow_state<>'deleted'")
-              end
-      terms
+      if @include_deleted
+        terms.where("workflow_state<>'deleted' OR sis_source_id IS NOT NULL")
+      else
+        terms.where("workflow_state<>'deleted'")
+      end
     end
 
     def courses

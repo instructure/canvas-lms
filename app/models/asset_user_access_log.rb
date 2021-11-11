@@ -553,7 +553,7 @@ class AssetUserAccessLog
     # 14) return value indicating whether we should immediately re-schedule or not
     # As long as we have never flipped the "early_exit" sign, that means
     # we made it through all accounts and didn't run out of job time.
-    caught_up = !early_exit
+    !early_exit
     # you might think "Ah, here we can compact all our postgres iterators into
     # a single global state update since we finished all the root accounts!".
     # Alas, we cannot.  In the time it takes to consume messages
@@ -563,7 +563,7 @@ class AssetUserAccessLog
     # a POSTGRES backed compaction job can make global iterator state writes.
     # once we're compacting on the message bus, we need to keep the state-per-root-account
     # until and unless we switch back to postgres.
-    caught_up # implicit return
+    # implicit return
   end
 
   def self.compaction_settings
@@ -631,11 +631,10 @@ class AssetUserAccessLog
       end
       return false unless yesterday_completed
     end
-    today_completed = compact_partition(ts)
+    compact_partition(ts)
     # it's ok if we didn't complete, we time the job out so that
     # for things that need to move or hold jobs they don't have to
     # wait forever.  If we completed compaction, though, just finish.
-    today_completed
   end
 
   # TODO: We only care about truncation

@@ -79,12 +79,11 @@ module AccountReports
     end
 
     def enrollment_states_string
-      states = if enrollment_states
-                 Array(enrollment_states).join(' ')
-               else
-                 'all'
-               end
-      states
+      if enrollment_states
+        Array(enrollment_states).join(' ')
+      else
+        'all'
+      end
     end
 
     def students_with_no_submissions
