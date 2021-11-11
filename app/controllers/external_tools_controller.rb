@@ -117,11 +117,11 @@ class ExternalToolsController < ApplicationController
   #     ]
   def index
     if authorized_action(@context, @current_user, :read)
-      @tools = if params[:include_parents]
-                 ContextExternalTool.all_tools_for(@context, :user => (params[:include_personal] ? @current_user : nil))
-               else
-                 @context.context_external_tools.active
-               end
+      if params[:include_parents]
+        @tools = ContextExternalTool.all_tools_for(@context, :user => (params[:include_personal] ? @current_user : nil))
+      else
+        @tools = @context.context_external_tools.active
+      end
       @tools = ContextExternalTool.search_by_attribute(@tools, :name, params[:search_term])
 
       @context.shard.activate do
@@ -1230,7 +1230,7 @@ class ExternalToolsController < ApplicationController
   private
 
   def external_tools_json_for_courses(courses)
-    courses.reduce([]) do |all_results, course|
+    json = courses.reduce([]) do |all_results, course|
       tabs = course.tabs_available(@current_user, course_subject_tabs: true)
       tool_ids = []
       tabs.select { |t| t[:external] }.each do |t|
@@ -1246,6 +1246,8 @@ class ExternalToolsController < ApplicationController
       end
       all_results.push(*results)
     end
+
+    json
   end
 
   def parse_context_codes

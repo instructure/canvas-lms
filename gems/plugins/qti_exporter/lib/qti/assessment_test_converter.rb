@@ -28,7 +28,7 @@ module Qti
     attr_reader :package_root, :identifier, :href, :interaction_type, :title, :quiz
 
     def initialize(manifest_node, base_dir, opts = {})
-      @log = Canvas::Migration.logger
+      @log = Canvas::Migration::logger
       @manifest_node = manifest_node
       @package_root = PackageRoot.new(base_dir)
       @href = @package_root.item_path(@manifest_node['href'])
@@ -144,17 +144,20 @@ module Qti
     end
 
     def self.parse_time_limit(time_limit)
+      limit = 0
       time_indicator = time_limit[0..0].downcase if time_limit.length > 0
       if time_indicator == 'd'
-        24 * 60 * time_limit[1..-1].to_i
+        limit = 24 * 60 * time_limit[1..-1].to_i
       elsif time_indicator == 'h'
-        60 * time_limit[1..-1].to_i
+        limit = 60 * time_limit[1..-1].to_i
       elsif time_indicator == 'm'
-        time_limit[1..-1].to_i
+        limit = time_limit[1..-1].to_i
       else
         # instructure uses minutes, QTI uses seconds
-        time_limit.to_i / 60
+        limit = time_limit.to_i / 60
       end
+
+      limit
     end
 
     def self.parse_pick_count(section)

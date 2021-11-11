@@ -197,11 +197,11 @@ class ContentExport < ActiveRecord::Base
       if @cc_exporter.export
         self.progress = 100
         self.job_progress.try :complete!
-        self.workflow_state = if for_course_copy?
-                                'exported_for_course_copy'
-                              else
-                                'exported'
-                              end
+        if for_course_copy?
+          self.workflow_state = 'exported_for_course_copy'
+        else
+          self.workflow_state = 'exported'
+        end
       else
         mark_failed
       end
@@ -481,11 +481,11 @@ class ContentExport < ActiveRecord::Base
 
   def selective_export?
     if @selective_export.nil?
-      @selective_export = if for_master_migration?
-                            (settings[:master_migration_type] == :selective)
-                          else
-                            !(selected_content.empty? || is_set?(selected_content[:everything]))
-                          end
+      if for_master_migration?
+        @selective_export = (settings[:master_migration_type] == :selective)
+      else
+        @selective_export = !(selected_content.empty? || is_set?(selected_content[:everything]))
+      end
     end
     @selective_export
   end
@@ -601,6 +601,6 @@ class ContentExport < ActiveRecord::Base
   private
 
   def is_set?(option)
-    Canvas::Plugin.value_to_boolean option
+    Canvas::Plugin::value_to_boolean option
   end
 end

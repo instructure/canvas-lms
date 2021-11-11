@@ -17,7 +17,7 @@
  */
 
 import {ApolloProvider} from 'react-apollo'
-import ConversationListContainer from '../ConversationListContainer'
+import MessageListContainer from '../MessageListContainer'
 import {handlers} from '../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../shared/msw/mswServer'
@@ -25,7 +25,7 @@ import React from 'react'
 import {render, fireEvent, waitFor} from '@testing-library/react'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
 
-describe('ConversationListContainer', () => {
+describe('MessageListContainer', () => {
   const server = mswServer(handlers)
   beforeAll(() => {
     // eslint-disable-next-line no-undef
@@ -49,10 +49,10 @@ describe('ConversationListContainer', () => {
     }
   })
 
-  const setup = conversationListContainerProps => {
+  const setup = messageListContainerProps => {
     return render(
       <ApolloProvider client={mswClient}>
-        <ConversationListContainer {...conversationListContainerProps} />
+        <MessageListContainer {...messageListContainerProps} />
       </ApolloProvider>
     )
   }
@@ -63,14 +63,14 @@ describe('ConversationListContainer', () => {
       expect(component.container).toBeTruthy()
     })
 
-    it('should change list of conversations when scope changes', async () => {
+    it('should change list of messages when scope changes', async () => {
       const component = setup()
 
       expect(await component.findByText('This is an inbox conversation')).toBeInTheDocument()
 
       component.rerender(
         <ApolloProvider client={mswClient}>
-          <ConversationListContainer scope="sent" />
+          <MessageListContainer scope="sent" />
         </ApolloProvider>
       )
 
@@ -79,12 +79,12 @@ describe('ConversationListContainer', () => {
       )
     })
 
-    it('should change list of conversations when course and scope changes', async () => {
+    it('should change list of messages when course and scope changes', async () => {
       const component = setup()
 
       component.rerender(
         <ApolloProvider client={mswClient}>
-          <ConversationListContainer scope="inbox" />
+          <MessageListContainer scope="inbox" />
         </ApolloProvider>
       )
 
@@ -94,7 +94,7 @@ describe('ConversationListContainer', () => {
 
       component.rerender(
         <ApolloProvider client={mswClient}>
-          <ConversationListContainer course="course_123" />
+          <MessageListContainer course="course_123" />
         </ApolloProvider>
       )
 
@@ -104,16 +104,16 @@ describe('ConversationListContainer', () => {
     })
   })
 
-  describe('Selected Conversations', () => {
-    it('should track when conversations are clicked', async () => {
+  describe('Selected Messages', () => {
+    it('should track when messages are clicked', async () => {
       const mock = jest.fn()
-      const conversationList = await setup({
-        onSelectConversation: mock
+      const messageList = await setup({
+        onSelectMessage: mock
       })
 
       await waitForApolloLoading()
 
-      const checkboxes = await conversationList.findAllByText('not selected')
+      const checkboxes = await messageList.findAllByText('not selected')
 
       fireEvent(
         checkboxes[0],

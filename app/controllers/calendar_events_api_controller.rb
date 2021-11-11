@@ -1222,7 +1222,8 @@ class CalendarEventsApiController < ApplicationController
     }
 
     # in courses with diff assignments on, only show the visible assignments
-    scope.filter_by_visibilities_in_given_courses(student_ids.to_a, courses_to_filter_assignments.map(&:id)).group('assignments.id')
+    scope = scope.filter_by_visibilities_in_given_courses(student_ids.to_a, courses_to_filter_assignments.map(&:id)).group('assignments.id')
+    scope
   end
 
   def calendar_event_scope(user)

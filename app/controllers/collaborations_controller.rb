@@ -217,14 +217,14 @@ class CollaborationsController < ApplicationController
         if @collaboration.valid_user?(@current_user)
           @collaboration.authorize_user(@current_user)
           log_asset_access(@collaboration, "collaborations", "other", 'participate')
-          url = if @collaboration.is_a? ExternalToolCollaboration
-                  external_tool_launch_url(
-                    @collaboration.url,
-                    @collaboration.resource_link_lookup_uuid
-                  )
-                else
-                  @collaboration.url
-                end
+          if @collaboration.is_a? ExternalToolCollaboration
+            url = external_tool_launch_url(
+              @collaboration.url,
+              @collaboration.resource_link_lookup_uuid
+            )
+          else
+            url = @collaboration.url
+          end
 
           redirect_to url
         elsif @collaboration.is_a?(GoogleDocsCollaboration)

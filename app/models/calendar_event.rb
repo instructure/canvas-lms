@@ -422,7 +422,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def time_zone_edited
-    CGI.unescapeHTML(read_attribute(:time_zone_edited) || "")
+    CGI::unescapeHTML(read_attribute(:time_zone_edited) || "")
   end
 
   has_a_broadcast_policy
@@ -716,11 +716,11 @@ class CalendarEvent < ActiveRecord::Base
         event.x_alt_desc = Icalendar::Values::Text.new(html, { 'FMTTYPE' => 'text/html' })
       end
 
-      loc_string = if @event.is_a?(CalendarEvent)
-                     [@event.location_name, @event.location_address].reject { |e| e.blank? }.join(", ")
-                   else
-                     nil
-                   end
+      if @event.is_a?(CalendarEvent)
+        loc_string = [@event.location_name, @event.location_address].reject { |e| e.blank? }.join(", ")
+      else
+        loc_string = nil
+      end
 
       if @event.context_type.eql?("AppointmentGroup")
         # We should only enter this block if a user has made an appointment, so

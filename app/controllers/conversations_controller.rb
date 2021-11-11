@@ -726,11 +726,11 @@ class ConversationsController < ApplicationController
       participants.map { |p| deleted_conversation_json(p, @current_user, session) }
     }
 
-    conversation_messages = if params['conversation_id']
-                              Conversation.find(params['conversation_id']).shard.activate { query.call }
-                            else
-                              query.call
-                            end
+    if params['conversation_id']
+      conversation_messages = Conversation.find(params['conversation_id']).shard.activate { query.call }
+    else
+      conversation_messages = query.call
+    end
 
     render :json => conversation_messages
   end

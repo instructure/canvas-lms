@@ -730,9 +730,12 @@ module ApplicationHelper
 
   # return enough group data for the planner to display items associated with groups
   def map_groups_for_planner(groups)
-    groups.map do |g|
-      { id: g.id, assetString: g.asset_string, name: g.name, url: "/groups/#{g.id}" }
-    end
+    mapped =
+      groups.map do |g|
+        { id: g.id, assetString: g.asset_string, name: g.name, url: "/groups/#{g.id}" }
+      end
+
+    mapped
   end
 
   def show_feedback_link?

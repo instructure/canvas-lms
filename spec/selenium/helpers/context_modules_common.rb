@@ -97,7 +97,8 @@ module ContextModulesCommon
   end
 
   def create_context_module(module_name)
-    @course.context_modules.create!(:name => module_name, :require_sequential_progress => true)
+    context_module = @course.context_modules.create!(:name => module_name, :require_sequential_progress => true)
+    context_module
   end
 
   def go_to_modules

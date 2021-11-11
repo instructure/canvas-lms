@@ -419,8 +419,9 @@ class OutcomeResultsController < ApplicationController
     filter_users_by_excludes(true)
     @results = find_results(all_users: false).preload(:user)
     aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context, params[:aggregate_stat])]
-    aggregate_outcome_results_rollups_json(aggregate_rollups)
+    json = aggregate_outcome_results_rollups_json(aggregate_rollups)
     # no pagination, so no meta field
+    json
   end
 
   def linked_include_collections

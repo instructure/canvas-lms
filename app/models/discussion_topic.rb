@@ -455,7 +455,7 @@ class DiscussionTopic < ActiveRecord::Base
     }
     opts_with_default = default_opts.merge(opts)
     copy_title =
-      opts_with_default[:copy_title] || get_copy_title(self, t("Copy"), self.title)
+      opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"), self.title)
     result = self.duplicate_base_model(copy_title, opts_with_default)
 
     # Start with a position guaranteed to not conflict with existing ones.
@@ -926,11 +926,11 @@ class DiscussionTopic < ActiveRecord::Base
                                              .where(:id => topic_ids_with_entries).distinct.pluck(:root_topic_id)
 
     topics.each do |topic|
-      topic.can_unpublish = if topic.assignment_id
-                              !assmnt_ids_with_subs.include?(topic.assignment_id)
-                            else
-                              !topic_ids_with_entries.include?(topic.id)
-                            end
+      if topic.assignment_id
+        topic.can_unpublish = !assmnt_ids_with_subs.include?(topic.assignment_id)
+      else
+        topic.can_unpublish = !topic_ids_with_entries.include?(topic.id)
+      end
     end
   end
 
@@ -1403,7 +1403,9 @@ class DiscussionTopic < ActiveRecord::Base
 
     subscribed_users = participating_users(sub_ids).to_a
 
-    filter_message_users(subscribed_users)
+    subscribed_users = filter_message_users(subscribed_users)
+
+    subscribed_users
   end
 
   def filter_message_users(users)

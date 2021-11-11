@@ -20,7 +20,7 @@ import ComposeModalManager from './ComposeModalContainer/ComposeModalManager'
 import {Flex} from '@instructure/ui-flex'
 import {MessageDetailContainer} from './MessageDetailContainer/MessageDetailContainer'
 import MessageListActionContainer from './MessageListActionContainer'
-import ConversationListContainer from './ConversationListContainer'
+import MessageListContainer from './MessageListContainer'
 import {NoSelectedConversation} from '../components/NoSelectedConversation/NoSelectedConversation'
 import React, {useState, useEffect} from 'react'
 import {View} from '@instructure/ui-view'
@@ -107,10 +107,10 @@ const CanvasInbox = () => {
         <Flex.Item shouldGrow shouldShrink>
           <Flex height="100%" as="div" align="center" justifyItems="center">
             <Flex.Item width="400px" height="100%">
-              <ConversationListContainer
+              <MessageListContainer
                 course={courseFilter}
                 scope={scope}
-                onSelectConversation={updateSelectedConversations}
+                onSelectMessage={updateSelectedConversations}
               />
             </Flex.Item>
             <Flex.Item shouldGrow shouldShrink height="100%" overflowY="auto">

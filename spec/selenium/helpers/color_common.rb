@@ -36,6 +36,7 @@ module ColorCommon
 
   def random_hex_color
     values = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f']
-    "#" + values.sample + values.sample + values.sample + values.sample + values.sample + values.sample
+    color = "#" + values.sample + values.sample + values.sample + values.sample + values.sample + values.sample
+    color
   end
 end

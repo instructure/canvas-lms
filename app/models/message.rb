@@ -892,7 +892,8 @@ class Message < ActiveRecord::Base
     context = context.context if context.respond_to?(:context)
     return context if context.is_a?(Course)
 
-    (context.respond_to?(:course) && context.course) ? context.course : link_root_account
+    context = (context.respond_to?(:course) && context.course) ? context.course : link_root_account
+    context
   end
 
   def notification_service_id

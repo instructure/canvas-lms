@@ -692,7 +692,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def unencoded_filename
-    CGI.unescape(self.filename || t(:default_filename, "File"))
+    CGI::unescape(self.filename || t(:default_filename, "File"))
   end
 
   def quota_exemption_key
@@ -755,11 +755,11 @@ class Attachment < ActiveRecord::Base
   def handle_duplicates(method, opts = {})
     return [] unless method.present? && self.folder
 
-    method = if self.folder.for_submissions?
-               :rename
-             else
-               method.to_sym
-             end
+    if self.folder.for_submissions?
+      method = :rename
+    else
+      method = method.to_sym
+    end
 
     if method == :overwrite
       atts = self.shard.activate { self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id).to_a }
@@ -1437,11 +1437,11 @@ class Attachment < ActiveRecord::Base
   def self.build_content_types_sql(types)
     clauses = []
     types.each do |type|
-      clauses << if type.include? '/'
-                   sanitize_sql_array(["(attachments.content_type=?)", type])
-                 else
-                   wildcard('attachments.content_type', type + '/', :type => :right)
-                 end
+      if type.include? '/'
+        clauses << sanitize_sql_array(["(attachments.content_type=?)", type])
+      else
+        clauses << wildcard('attachments.content_type', type + '/', :type => :right)
+      end
     end
     clauses.join(' OR ')
   end
@@ -2120,13 +2120,13 @@ class Attachment < ActiveRecord::Base
   end
 
   def set_publish_state_for_usage_rights
-    self.locked = if self.context &&
-                     (!self.folder || !self.folder.for_submissions?) &&
-                     self.context.respond_to?(:usage_rights_required?) && self.context.usage_rights_required?
-                    self.usage_rights.nil?
-                  else
-                    false
-                  end
+    if self.context &&
+       (!self.folder || !self.folder.for_submissions?) &&
+       self.context.respond_to?(:usage_rights_required?) && self.context.usage_rights_required?
+      self.locked = self.usage_rights.nil?
+    else
+      self.locked = false
+    end
   end
 
   # Download a URL using a GET request and return a new un-saved Attachment

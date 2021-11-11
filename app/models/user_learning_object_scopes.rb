@@ -56,8 +56,9 @@ module UserLearningObjectScopes
                                                                  *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
 
     published_visible_assignments = course.active_assignments.published
-    DifferentiableAssignment.scope_filter(published_visible_assignments,
-                                          self, course, is_teacher: false)
+    published_visible_assignments = DifferentiableAssignment.scope_filter(published_visible_assignments,
+                                                                          self, course, is_teacher: false)
+    published_visible_assignments
   end
 
   # everything is relative to the user's shard

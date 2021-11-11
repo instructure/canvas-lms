@@ -188,7 +188,8 @@ class ContentZipper
     @submissions_hash = submissions_hash
     av = ActionView::Base.with_view_paths(ActionController::Base.view_paths)
     av.extend TextHelper
-    av.render(:partial => "eportfolios/static_page", :locals => { :page => page, :portfolio => portfolio, :static_attachments => static_attachments, :submissions_hash => submissions_hash })
+    res = av.render(:partial => "eportfolios/static_page", :locals => { :page => page, :portfolio => portfolio, :static_attachments => static_attachments, :submissions_hash => submissions_hash })
+    res
   end
 
   def self.zip_base_folder(*args)

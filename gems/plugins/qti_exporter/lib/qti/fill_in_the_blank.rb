@@ -22,11 +22,11 @@ module Qti
     def initialize(opts)
       super(opts)
       @type = opts[:custom_type]
-      @question[:question_type] = if @type == 'multiple_dropdowns_question' || @type == 'inline_choice'
-                                    'multiple_dropdowns_question'
-                                  else
-                                    'fill_in_multiple_blanks_question'
-                                  end
+      if @type == 'multiple_dropdowns_question' || @type == 'inline_choice'
+        @question[:question_type] = 'multiple_dropdowns_question'
+      else
+        @question[:question_type] = 'fill_in_multiple_blanks_question'
+      end
     end
 
     def parse_question_data
@@ -54,11 +54,11 @@ module Qti
       create_xml_doc
       body = ""
       @doc.at_css('itemBody').children.each do |child|
-        body += if child.name == 'textEntryInteraction'
-                  " [#{child['responseIdentifier']}] "
-                else
-                  child.text.gsub(']]>', '').gsub('<div></div>', '').strip
-                end
+        if child.name == 'textEntryInteraction'
+          body += " [#{child['responseIdentifier']}] "
+        else
+          body += child.text.gsub(']]>', '').gsub('<div></div>', '').strip
+        end
       end
       @question[:question_text] = body
 
