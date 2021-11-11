@@ -217,15 +217,15 @@ class CourseLinkValidator
     unless (result = self.visited_urls[url])
       begin
         if ImportedHtmlConverter.relative_url?(url) || (self.domain_regex && url.match(self.domain_regex))
-          if valid_route?(url)
-            if url.match(/\/courses\/(\d+)/) && self.course.id.to_s != $1
-              result = :course_mismatch
-            else
-              result = check_object_status(url)
-            end
-          else
-            result = :unreachable
-          end
+          result = if valid_route?(url)
+                     if url.match(/\/courses\/(\d+)/) && self.course.id.to_s != $1
+                       :course_mismatch
+                     else
+                       check_object_status(url)
+                     end
+                   else
+                     :unreachable
+                   end
         else
           unless reachable_url?(url)
             result = :unreachable

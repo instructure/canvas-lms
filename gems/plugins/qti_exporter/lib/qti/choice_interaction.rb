@@ -130,11 +130,11 @@ module Qti
           end
 
           if answer[:text] == ""
-            if answer[:migration_id] =~ /true|false/i
-              answer[:text] = clear_html(answer[:migration_id])
-            else
-              answer[:text] = DEFAULT_ANSWER_TEXT
-            end
+            answer[:text] = if answer[:migration_id] =~ /true|false/i
+                              clear_html(answer[:migration_id])
+                            else
+                              DEFAULT_ANSWER_TEXT
+                            end
           end
           if @flavor == Qti::Flavors::BBLEARN && @question[:question_type] == 'true_false_question' && choice['identifier'] =~ /true|false/i
             answer[:text] = choice['identifier']

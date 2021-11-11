@@ -107,11 +107,11 @@ module Assignments
       assignment.shard.activate do
         Rails.cache.fetch(['assignment_user_grading_count_by_section', assignment.cache_key(:needs_grading), user].cache_key,
                           batch_object: user, batched_keys: :todo_list) do
-          if visibility_level == :sections
-            submissions = section_filtered_submissions
-          else
-            submissions = all_submissions
-          end
+          submissions = if visibility_level == :sections
+                          section_filtered_submissions
+                        else
+                          all_submissions
+                        end
 
           submissions
             .group("e.course_section_id")

@@ -70,13 +70,13 @@ class Folder < ActiveRecord::Base
   end
 
   def populate_root_account_id
-    if self.context_type == "User"
-      self.root_account_id = 0
-    elsif context_type == 'Account' && context.root_account?
-      self.root_account_id = self.context_id
-    else
-      self.root_account_id = self.context.root_account_id
-    end
+    self.root_account_id = if self.context_type == "User"
+                             0
+                           elsif context_type == 'Account' && context.root_account?
+                             self.context_id
+                           else
+                             self.context.root_account_id
+                           end
   end
 
   def protect_root_folder_name

@@ -374,11 +374,11 @@ class WikiPage < ActiveRecord::Base
   def participants
     res = []
     if context && context.available?
-      if !self.active?
-        res += context.participating_admins
-      else
-        res += context.participants(by_date: true)
-      end
+      res += if !self.active?
+               context.participating_admins
+             else
+               context.participants(by_date: true)
+             end
     end
     res.flatten.uniq
   end
@@ -497,13 +497,13 @@ class WikiPage < ActiveRecord::Base
   end
 
   def initialize_wiki_page(user)
-    if wiki.grants_right?(user, :publish_page)
-      # Leave the page unpublished if the user is allowed to publish it later
-      self.workflow_state = 'unpublished'
-    else
-      # If they aren't, publish it automatically
-      self.workflow_state = 'active'
-    end
+    self.workflow_state = if wiki.grants_right?(user, :publish_page)
+                            # Leave the page unpublished if the user is allowed to publish it later
+                            'unpublished'
+                          else
+                            # If they aren't, publish it automatically
+                            'active'
+                          end
 
     self.editing_roles = (context.default_wiki_editing_roles rescue nil) || default_roles
 

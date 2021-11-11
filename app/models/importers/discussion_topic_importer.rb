@@ -107,11 +107,11 @@ module Importers
 
       type = item.is_a?(Announcement) ? :announcement : :discussion_topic
       item.locked = options[:locked] if !options[:locked].nil? && type == :announcement
-      if options.message
-        item.message = migration.convert_html(options.message, type, options[:migration_id], :message)
-      else
-        item.message = I18n.t('#discussion_topic.empty_message', 'No message')
-      end
+      item.message = if options.message
+                       migration.convert_html(options.message, type, options[:migration_id], :message)
+                     else
+                       I18n.t('#discussion_topic.empty_message', 'No message')
+                     end
 
       item.delayed_post_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(options.delayed_post_at)
       if options[:assignment]

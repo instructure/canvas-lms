@@ -122,11 +122,11 @@ module Importers
       item.title = I18n.t('untitled assignment') if item.title.blank?
       item.migration_id = hash[:migration_id]
       if new_record || item.deleted? || master_migration
-        if item.can_unpublish?
-          item.workflow_state = (hash[:workflow_state] || 'published')
-        else
-          item.workflow_state = 'published'
-        end
+        item.workflow_state = if item.can_unpublish?
+                                (hash[:workflow_state] || 'published')
+                              else
+                                'published'
+                              end
       end
       if hash[:instructions_in_html] == false
         self.extend TextHelper

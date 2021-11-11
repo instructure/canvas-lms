@@ -74,11 +74,11 @@ module RespondusSoapEndpoint
         Canvas::Security.encryption_key,
         digest: 'SHA1'
       )
-      if context.blank?
-        @session = {}
-      else
-        @session = @verifier.verify(context)
-      end
+      @session = if context.blank?
+                   {}
+                 else
+                   @verifier.verify(context)
+                 end
 
       # verify that the session was created for this user
       if self.user

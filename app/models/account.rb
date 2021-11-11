@@ -374,11 +374,11 @@ class Account < ActiveRecord::Base
               val.each do |inner_key, inner_val|
                 inner_key = inner_key.to_sym
                 if opts[:values].include?(inner_key)
-                  if opts[:inheritable] && (inner_key == :locked || (inner_key == :value && opts[:boolean]))
-                    new_hash[inner_key] = Canvas::Plugin.value_to_boolean(inner_val)
-                  else
-                    new_hash[inner_key] = inner_val.to_s
-                  end
+                  new_hash[inner_key] = if opts[:inheritable] && (inner_key == :locked || (inner_key == :value && opts[:boolean]))
+                                          Canvas::Plugin.value_to_boolean(inner_val)
+                                        else
+                                          inner_val.to_s
+                                        end
                 end
               end
             end
@@ -1185,8 +1185,8 @@ class Account < ActiveRecord::Base
 
     self.shard.activate do
       role_scope = Role.not_deleted.where(:name => role_name)
-      if self.class.connection.adapter_name == 'PostgreSQL'
-        role_scope = role_scope.where("account_id = ? OR
+      role_scope = if self.class.connection.adapter_name == 'PostgreSQL'
+                     role_scope.where("account_id = ? OR
           account_id IN (
             WITH RECURSIVE t AS (
               SELECT id, parent_account_id FROM #{Account.quoted_table_name} WHERE id = ?
@@ -1195,9 +1195,9 @@ class Account < ActiveRecord::Base
             )
             SELECT id FROM t
           )", self.id, self.id)
-      else
-        role_scope = role_scope.where(:account_id => self.account_chain.map(&:id))
-      end
+                   else
+                     role_scope.where(:account_id => self.account_chain.map(&:id))
+                   end
 
       role_scope.first
     end

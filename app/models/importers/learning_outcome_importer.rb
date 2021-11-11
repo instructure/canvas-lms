@@ -52,11 +52,11 @@ module Importers
       previously_imported = false
       if !item && hash[:external_identifier]
         unless migration.cross_institution?
-          if hash[:is_global_outcome]
-            outcome = LearningOutcome.active.where(id: hash[:external_identifier], context_id: nil).first
-          else
-            outcome = context.available_outcome(hash[:external_identifier])
-          end
+          outcome = if hash[:is_global_outcome]
+                      LearningOutcome.active.where(id: hash[:external_identifier], context_id: nil).first
+                    else
+                      context.available_outcome(hash[:external_identifier])
+                    end
         end
 
         outcome ||= LearningOutcome.active.find_by(vendor_guid: hash[:vendor_guid]) if hash[:vendor_guid].present?

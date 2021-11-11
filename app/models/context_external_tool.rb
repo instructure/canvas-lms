@@ -491,11 +491,11 @@ class ContextExternalTool < ActiveRecord::Base
     @config_errors = []
     begin
       converter = CC::Importer::BLTIConverter.new
-      if config_type == 'by_url'
-        tool_hash = converter.retrieve_and_convert_blti_url(config_url)
-      else
-        tool_hash = converter.convert_blti_xml(config_xml)
-      end
+      tool_hash = if config_type == 'by_url'
+                    converter.retrieve_and_convert_blti_url(config_url)
+                  else
+                    converter.convert_blti_xml(config_xml)
+                  end
     rescue CC::Importer::BLTIConverter::CCImportError => e
       tool_hash = { :error => e.message }
     end

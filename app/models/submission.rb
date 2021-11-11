@@ -665,11 +665,11 @@ class Submission < ActiveRecord::Base
 
   def url
     read_body = read_attribute(:body) && CGI::unescapeHTML(read_attribute(:body))
-    if read_body && read_attribute(:url) && read_body[0..250] == read_attribute(:url)[0..250]
-      @full_url = read_attribute(:body)
-    else
-      @full_url = read_attribute(:url)
-    end
+    @full_url = if read_body && read_attribute(:url) && read_body[0..250] == read_attribute(:url)[0..250]
+                  read_attribute(:body)
+                else
+                  read_attribute(:url)
+                end
   end
 
   def plaintext_body

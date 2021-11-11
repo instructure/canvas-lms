@@ -68,15 +68,15 @@ module Canvas::Migration
     end
 
     def unique_quiz_dir
-      if content_migration
-        if (a = content_migration.attachment)
-          key = "#{a.filename.gsub(/\..*/, '')}_#{content_migration.id}"
-        else
-          key = content_migration.id.to_s
-        end
-      else
-        key = "data_#{rand(10000)}" # should only happen in testing
-      end
+      key = if content_migration
+              if (a = content_migration.attachment)
+                "#{a.filename.gsub(/\..*/, '')}_#{content_migration.id}"
+              else
+                content_migration.id.to_s
+              end
+            else
+              "data_#{rand(10000)}" # should only happen in testing
+            end
       "#{QUIZ_FILE_DIRECTORY}/#{key}"
     end
 
@@ -101,11 +101,11 @@ module Canvas::Migration
     end
 
     def find_export_dir
-      if @settings[:content_migration_id] && @settings[:user_id]
-        slug = "cm_#{@settings[:content_migration_id]}_user_id_#{@settings[:user_id]}_#{@settings[:migration_type]}"
-      else
-        slug = "export_#{rand(10000)}"
-      end
+      slug = if @settings[:content_migration_id] && @settings[:user_id]
+               "cm_#{@settings[:content_migration_id]}_user_id_#{@settings[:user_id]}_#{@settings[:migration_type]}"
+             else
+               "export_#{rand(10000)}"
+             end
 
       path = create_export_dir(slug)
       i = 1
@@ -119,11 +119,11 @@ module Canvas::Migration
 
     def create_export_dir(slug)
       config = ConfigFile.load('external_migration')
-      if config && config[:data_folder]
-        folder = config[:data_folder]
-      else
-        folder = Dir.tmpdir
-      end
+      folder = if config && config[:data_folder]
+                 config[:data_folder]
+               else
+                 Dir.tmpdir
+               end
       File.join(folder, slug)
     end
 

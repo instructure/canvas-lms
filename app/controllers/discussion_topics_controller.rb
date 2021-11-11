@@ -1439,11 +1439,11 @@ class DiscussionTopicsController < ApplicationController
     return if discussion_topic_hash[:group_category_id].to_i == @topic.group_category_id
     return unless can_set_group_category?
 
-    if discussion_topic_hash[:group_category_id]
-      discussion_topic_hash[:group_category] = @context.group_categories.find(discussion_topic_hash[:group_category_id])
-    else
-      discussion_topic_hash[:group_category] = nil
-    end
+    discussion_topic_hash[:group_category] = if discussion_topic_hash[:group_category_id]
+                                               @context.group_categories.find(discussion_topic_hash[:group_category_id])
+                                             else
+                                               nil
+                                             end
   end
 
   def can_set_group_category?
