@@ -43,7 +43,7 @@ module SIS
 
       def add_term(term_id, name, status, start_date = nil, end_date = nil, integration_id = nil, date_override_enrollment_type = nil)
         raise ImportError, "No term_id given for a term" if term_id.blank?
-        raise ImportError, "Improper status \"#{status}\" for term #{term_id}" unless status =~ /\Aactive|\Adeleted/i
+        raise ImportError, "Improper status \"#{status}\" for term #{term_id}" unless /\Aactive|\Adeleted/i.match?(status)
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         term = @root_account.enrollment_terms.where(sis_source_id: term_id).first_or_initialize
@@ -56,9 +56,9 @@ module SIS
             raise ImportError, "Invalid date_override_enrollment_type"
           end
 
-          if status =~ /active/i
+          if /active/i.match?(status)
             term.set_overrides(@root_account, { date_override_enrollment_type => { :start_at => start_date, :end_at => end_date } })
-          elsif status =~ /deleted/i
+          elsif /deleted/i.match?(status)
             term.enrollment_dates_overrides.where(enrollment_type: date_override_enrollment_type).destroy_all
           end
         else
@@ -72,9 +72,9 @@ module SIS
 
           term.integration_id = integration_id
 
-          if status =~ /active/i
+          if /active/i.match?(status)
             term.workflow_state = 'active'
-          elsif status =~ /deleted/i
+          elsif /deleted/i.match?(status)
             term.workflow_state = 'deleted'
           end
           if (term.stuck_sis_fields & [:start_at, :end_at]).empty?

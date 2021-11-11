@@ -73,7 +73,7 @@ module Qti
       if is_either_or
         @question[:answers].each do |a|
           split = a[:text].split(/_|\./)
-          a[:text] = split[2] =~ /true/i ? split[0] : split[1]
+          a[:text] = /true/i.match?(split[2]) ? split[0] : split[1]
         end
       end
     end
@@ -130,7 +130,7 @@ module Qti
           end
 
           if answer[:text] == ""
-            answer[:text] = if answer[:migration_id] =~ /true|false/i
+            answer[:text] = if /true|false/i.match?(answer[:migration_id])
                               clear_html(answer[:migration_id])
                             else
                               DEFAULT_ANSWER_TEXT

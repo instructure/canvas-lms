@@ -38,7 +38,7 @@ module I18nExtraction::Extensions
   module TranslateCall
     def validate_default
       if @default.is_a?(String)
-        if @default =~ /<[a-z][a-z0-9]*[> \/]/i
+        if /<[a-z][a-z0-9]*[> \/]/i.match?(@default)
           raise I18nliner::HtmlTagsInDefaultTranslationError.new(@line, @default)
         end
       end
@@ -156,7 +156,7 @@ module I18nExtraction::Extensions
       end
 
       if key && default
-        key = "labels.#{key}" unless key =~ I18nliner::Scope::ABSOLUTE_KEY
+        key = "labels.#{key}" unless I18nliner::Scope::ABSOLUTE_KEY.match?(key)
         process_translate_call(nil, :t, [key, default])
       end
     end

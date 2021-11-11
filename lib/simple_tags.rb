@@ -58,7 +58,7 @@ module SimpleTags
       @tagged_scope_handlers.inject([]) do |result, (pattern, handler)|
         handler_tags = []
         tags.delete_if do |tag|
-          handler_tags << tag and true if tag =~ pattern
+          handler_tags << tag and true if tag&.match?(pattern)
         end
         result.concat handler_tags.present? ? [handler.call(handler_tags, options)].flatten : []
       end

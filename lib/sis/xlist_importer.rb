@@ -52,7 +52,7 @@ module SIS
       def add_crosslist(xlist_course_id, section_id, status)
         raise ImportError, "No xlist_course_id given for a cross-listing" if xlist_course_id.blank?
         raise ImportError, "No section_id given for a cross-listing" if section_id.blank?
-        raise ImportError, "Improper status \"#{status}\" for a cross-listing" unless status =~ /\A(active|deleted)\z/i
+        raise ImportError, "Improper status \"#{status}\" for a cross-listing" unless /\A(active|deleted)\z/i.match?(status)
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         section = @root_account.course_sections.where(sis_source_id: section_id).take
@@ -82,7 +82,7 @@ module SIS
         end
 
         unless section.stuck_sis_fields.include?(:course_id)
-          if status =~ /\Aactive\z/i
+          if /\Aactive\z/i.match?(status)
 
             if @course.deleted?
               @course.workflow_state = 'claimed'
@@ -103,7 +103,7 @@ module SIS
               raise ImportError, "An active cross-listing failed: #{e}"
             end
 
-          elsif status =~ /\Adeleted\z/i
+          elsif /\Adeleted\z/i.match?(status)
             if @course && section.course_id != @course.id
               @success_count += 1
               return

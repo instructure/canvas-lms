@@ -230,15 +230,15 @@ module SIS
           type = if role
                    role.base_role_type
                  else
-                   if enrollment_info.role =~ /\Ateacher\z/i
+                   if /\Ateacher\z/i.match?(enrollment_info.role)
                      'TeacherEnrollment'
-                   elsif enrollment_info.role =~ /\Astudent/i
+                   elsif /\Astudent/i.match?(enrollment_info.role)
                      'StudentEnrollment'
-                   elsif enrollment_info.role =~ /\Ata\z/i
+                   elsif /\Ata\z/i.match?(enrollment_info.role)
                      'TaEnrollment'
-                   elsif enrollment_info.role =~ /\Aobserver\z/i
+                   elsif /\Aobserver\z/i.match?(enrollment_info.role)
                      'ObserverEnrollment'
-                   elsif enrollment_info.role =~ /\Adesigner\z/i
+                   elsif /\Adesigner\z/i.match?(enrollment_info.role)
                      'DesignerEnrollment'
                    end
                  end
@@ -374,14 +374,14 @@ module SIS
         all_done = false
         return true if enrollment.workflow_state == 'deleted' && pseudo.workflow_state == 'deleted'
 
-        if enrollment_info.status =~ /\Aactive/i
+        if /\Aactive/i.match?(enrollment_info.status)
           message = set_enrollment_workflow_state(enrollment, enrollment_info, pseudo, user)
           @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info) if message
-        elsif enrollment_info.status =~ /\Acompleted/i
+        elsif /\Acompleted/i.match?(enrollment_info.status)
           completed_status(enrollment)
-        elsif enrollment_info.status =~ /\Ainactive/i
+        elsif /\Ainactive/i.match?(enrollment_info.status)
           enrollment.workflow_state = 'inactive'
-        elsif enrollment_info.status =~ /\Adeleted_last_completed/i
+        elsif /\Adeleted_last_completed/i.match?(enrollment_info.status)
           # if any matching enrollment for the same user in the same course
           # exists, we will mark the enrollment as deleted, but if it is the
           # last enrollment it gets marked as completed
@@ -390,7 +390,7 @@ module SIS
           else
             completed_status(enrollment)
           end
-        elsif enrollment_info.status =~ /\Adeleted/i
+        elsif /\Adeleted/i.match?(enrollment_info.status)
           # we support creating deleted enrollments, but we want to preserve
           # the state for roll_back_data so only set workflow_state for new
           # objects otherwise delete them in a batch at the end unless it is

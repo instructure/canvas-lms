@@ -97,7 +97,7 @@ class AssetUserAccess < ActiveRecord::Base
     if self.asset_code&.include?(':')
       split = self.asset_code.split(/:/)
 
-      if split[1].match(/course_\d+/)
+      if split[1].match?(/course_\d+/)
         case split[0]
         when "announcements"
           t("Course Announcements")
@@ -157,7 +157,7 @@ class AssetUserAccess < ActiveRecord::Base
         else
           "#{include_group_name ? "#{group.name} - " : ""}Group #{split[0].titleize}"
         end
-      elsif split[1].match(/user_\d+/)
+      elsif split[1].match?(/user_\d+/)
         case split[0]
         when "files"
           t('User Files')

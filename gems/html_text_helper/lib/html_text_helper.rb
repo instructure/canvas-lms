@@ -206,7 +206,7 @@ module HtmlTextHelper
 
     tags.each do |tag|
       url = tag.attributes['href'].value
-      next if url.match(/^https?|mailto|ftp/)
+      next if url.match?(/^https?|mailto|ftp/)
 
       url.sub!("/", "") if url.start_with?("/") && base.end_with?("/")
       tag.attributes['href'].value = "#{base}#{url}"
@@ -287,7 +287,7 @@ module HtmlTextHelper
     quote_block = []
     message.split("\n").each do |line|
       # check for lines starting with '>'
-      if /^(&gt;|>)/ =~ line
+      if /^(&gt;|>)/.match?(line)
         quote_block << line
       else
         processed_lines << quote_clump(quote_block) if !quote_block.empty?

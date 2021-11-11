@@ -302,7 +302,7 @@ class CourseLinkValidator
       # flickr does a redirect to this file when a photo is deleted/not found;
       # treat this as a broken image instead of following the redirect
       url = response['Location']
-      raise RuntimeError("photo unavailable") if url =~ @unavailable_photo_redirect_pattern
+      raise RuntimeError("photo unavailable") if url&.match?(@unavailable_photo_redirect_pattern)
     end
 
     begin

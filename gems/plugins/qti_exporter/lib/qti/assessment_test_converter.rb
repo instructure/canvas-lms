@@ -47,21 +47,21 @@ module Qti
         # Get manifest data
         if (md = @manifest_node.at_css("instructureMetadata"))
           if (item = get_node_att(md, 'instructureField[name=show_score]', 'value'))
-            @quiz[:show_score] = item =~ /true/i ? true : false
+            @quiz[:show_score] = /true/i.match?(item) ? true : false
           end
           if (item = get_node_att(md, 'instructureField[name=quiz_type]', 'value') ||
              get_node_att(md, 'instructureField[name=bb8_assessment_type]', 'value'))
             # known possible values: Self-assessment, Survey, Examination (practice is instructure default)
             # BB8: Test, Pool
-            @quiz[:quiz_type] = "assignment" if item =~ /examination|test|quiz/i
-            if item =~ /pool/i
+            @quiz[:quiz_type] = "assignment" if /examination|test|quiz/i.match?(item)
+            if /pool/i.match?(item)
               # if it's pool we don't need to make a quiz object.
               return nil
             end
           end
           if (item = get_node_att(md, 'instructureField[name=which_attempt_to_keep]', 'value'))
             # known possible values: Highest, First, Last (highest is instructure default)
-            @quiz[:which_attempt_to_keep] = "keep_latest" if item =~ /last/i
+            @quiz[:which_attempt_to_keep] = "keep_latest" if /last/i.match?(item)
           end
           if (item = get_node_att(md, 'instructureField[name=max_score]', 'value'))
             @quiz[:points_possible] = item
@@ -126,7 +126,7 @@ module Qti
       if (part = doc.at_css('testPart[identifier=BaseTestPart]') || doc.at_css('testPart'))
         if (control = part.at_css('itemSessionControl'))
           if (max = control['maxAttempts'])
-            max = -1 if max =~ /unlimited/i
+            max = -1 if /unlimited/i.match?(max)
             max = max.to_i
             # -1 means no limit in instructure, 0 means no limit in QTI
             @quiz[:allowed_attempts] = max >= 1 ? max : -1
@@ -170,7 +170,7 @@ module Qti
       questions_list = @quiz[:questions]
 
       if (shuffle = get_node_att(section, 'ordering', 'shuffle'))
-        @quiz[:shuffle_answers] = true if shuffle =~ /true/i
+        @quiz[:shuffle_answers] = true if /true/i.match?(shuffle)
       end
       if (select = AssessmentTestConverter.parse_pick_count(section))
         group = { :questions => [], :pick_count => select, :question_type => 'question_group', :title => section['title'] }

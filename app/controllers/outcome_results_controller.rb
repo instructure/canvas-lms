@@ -505,7 +505,7 @@ class OutcomeResultsController < ApplicationController
     if sort_by == 'outcome'
       sort_outcome_id = params[:sort_outcome_id]
       reject! "missing required sort_outcome_id parameter value" unless sort_outcome_id
-      reject! "invalid sort_outcome_id parameter value" unless sort_outcome_id =~ /\A\d+\z/
+      reject! "invalid sort_outcome_id parameter value" unless /\A\d+\z/.match?(sort_outcome_id)
     end
     sort_order = params[:sort_order]
     reject! "invalid sort_order parameter value" if sort_by && sort_order && !%w(asc desc).include?(sort_order)

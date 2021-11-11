@@ -85,7 +85,7 @@ module Importers
 
       topic = DiscussionTopic.where(context_type: context.class.to_s, context_id: context.id)
                              .where(['id = ? OR (migration_id IS NOT NULL AND migration_id = ?)', options[:id], options[:migration_id]]).first
-      topic ||= if options[:type] =~ /announcement/i
+      topic ||= if /announcement/i.match?(options[:type])
                   context.announcements.temp_record
                 else
                   context.discussion_topics.temp_record

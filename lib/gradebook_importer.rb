@@ -88,7 +88,7 @@ class GradebookImporter
   end
 
   CSV::Converters[:decimal_comma_to_period] = ->(field) do
-    if field =~ /^-?[0-9.,]+%?$/
+    if /^-?[0-9.,]+%?$/.match?(field)
       # This field is a pure number or percentage => let's normalize it
       number_parts = field.split(/[,.]/)
       last_number_part = number_parts.pop
@@ -379,7 +379,7 @@ class GradebookImporter
 
     update_column_count row
 
-    return false if last_student_info_column(row) !~ /Section/
+    return false if !/Section/.match?(last_student_info_column(row))
 
     true
   end
@@ -397,16 +397,16 @@ class GradebookImporter
     # A side effect that's necessary to finish validation, but needs to come
     # after the row.length check above.
     @student_columns = 3 # name, user id, section
-    if row[2] =~ /SIS\s+Login\s+ID/
+    if /SIS\s+Login\s+ID/.match?(row[2])
       @sis_login_id_column = 2
       @student_columns += 1
     elsif row[2] =~ /SIS\s+User\s+ID/ && row[3] =~ /SIS\s+Login\s+ID/
       # Integration id might be after sis id and login id, ignore it.
-      i = row[4] =~ /Integration\s+ID/ ? 1 : 0
+      i = /Integration\s+ID/.match?(row[4]) ? 1 : 0
       @sis_user_id_column = 2
       @sis_login_id_column = 3
       @student_columns += 2 + i
-      if row[4 + i] =~ /Root\s+Account/
+      if /Root\s+Account/.match?(row[4 + i])
         @student_columns += 1
         @root_account_column = 4 + i
       end

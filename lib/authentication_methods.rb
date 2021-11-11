@@ -336,7 +336,7 @@ module AuthenticationMethods
       return nil
     end
     return nil unless uri.path && uri.path[0] == '/'
-    return "#{request.protocol}#{request.host_with_port}#{uri.path.sub(%r{/download$}, '')}" if uri.path =~ %r{/files/(\d+~)?\d+/download$}
+    return "#{request.protocol}#{request.host_with_port}#{uri.path.sub(%r{/download$}, '')}" if %r{/files/(\d+~)?\d+/download$}.match?(uri.path)
 
     return "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
   end

@@ -1102,7 +1102,7 @@ class ContextExternalTool < ActiveRecord::Base
     fields.each do |field_set|
       field_set.each do |key, val|
         key = key.to_s.gsub(/[^\w]/, '_').downcase
-        if key.match(/^custom_/)
+        if key.match?(/^custom_/)
           hash[key] = val
         else
           hash["custom_#{key}"] = val

@@ -1061,9 +1061,9 @@ class CalendarEventsApiController < ApplicationController
   def validate_dates
     @errors ||= {}
     if params[:start_date].present?
-      if params[:start_date] =~ Api::DATE_REGEX
+      if Api::DATE_REGEX.match?(params[:start_date])
         @start_date ||= Time.zone.parse(params[:start_date]).beginning_of_day
-      elsif params[:start_date] =~ Api::ISO8601_REGEX
+      elsif Api::ISO8601_REGEX.match?(params[:start_date])
         @start_date ||= Time.zone.parse(params[:start_date])
       else # params[:start_date] is not valid
         @errors[:start_date] = t(:invalid_date_or_time, 'Invalid date or invalid datetime for %{attr}', attr: 'start_date')
@@ -1071,9 +1071,9 @@ class CalendarEventsApiController < ApplicationController
     end
 
     if params[:end_date].present?
-      if params[:end_date] =~ Api::DATE_REGEX
+      if Api::DATE_REGEX.match?(params[:end_date])
         @end_date ||= Time.zone.parse(params[:end_date]).end_of_day
-      elsif params[:end_date] =~ Api::ISO8601_REGEX
+      elsif Api::ISO8601_REGEX.match?(params[:end_date])
         @end_date ||= Time.zone.parse(params[:end_date])
       else # params[:end_date] is not valid
         @errors[:end_date] = t(:invalid_date_or_time, 'Invalid date or invalid datetime for %{attr}', attr: 'end_date')

@@ -99,12 +99,12 @@ class UserList
                                  .options[:with]
       # look for phone numbers by searching for 10 digits, allowing
       # any non-word characters
-      if path =~ /^([^\d\w]*\d[^\d\w]*){10}$/
+      if /^([^\d\w]*\d[^\d\w]*){10}$/.match?(path)
         type = :sms
       elsif path.include?('@') && (email = parse_email(path))
         type = :email
         name, path = email
-      elsif path =~ unique_id_regex
+      elsif path&.match?(unique_id_regex)
         type = :pseudonym
       else
         @errors << { :address => path, :details => :unparseable }

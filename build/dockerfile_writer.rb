@@ -88,7 +88,7 @@ class DockerfileWriter
   def docker_compose_volume_paths
     paths = (docker_compose_config["services"]["web"]["volumes"] || []).map do |volume|
       name, path = volume.split(":")
-      next unless name =~ /\A[a-z]/
+      next unless /\A[a-z]/.match?(name)
 
       path.sub("/usr/src/app/", "")
     end.compact
