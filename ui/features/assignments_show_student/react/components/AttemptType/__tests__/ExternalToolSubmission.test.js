@@ -224,7 +224,8 @@ describe('ExternalToolSubmission', () => {
         testReceivingFileContent({
           '@type': 'FileItem',
           name: 'some file',
-          url: '/some-file'
+          url: '/some-file',
+          mediaType: ''
         })
       })
 
@@ -232,7 +233,8 @@ describe('ExternalToolSubmission', () => {
         testReceivingFileContent({
           name: 'some file',
           type: 'file',
-          url: '/some-file'
+          url: '/some-file',
+          mediaType: ''
         })
       })
 
