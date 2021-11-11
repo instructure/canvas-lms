@@ -47,7 +47,7 @@ module Qti
         # Get manifest data
         if (md = @manifest_node.at_css("instructureMetadata"))
           if (item = get_node_att(md, 'instructureField[name=show_score]', 'value'))
-            @quiz[:show_score] = /true/i.match?(item) ? true : false
+            @quiz[:show_score] = /true/i.match?(item)
           end
           if (item = get_node_att(md, 'instructureField[name=quiz_type]', 'value') ||
              get_node_att(md, 'instructureField[name=bb8_assessment_type]', 'value'))

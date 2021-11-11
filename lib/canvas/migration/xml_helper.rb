@@ -56,7 +56,7 @@ module Canvas::Migration
     end
 
     def get_bool_val(node, selector, default = nil)
-      node.at_css(selector) ? (/true|yes|t|y|1/i.match?(node.at_css(selector).text) ? true : false) : default
+      node.at_css(selector) ? /true|yes|t|y|1/i.match?(node.at_css(selector).text) : default
     end
 
     def get_int_val(node, selector, default = nil)
