@@ -49,6 +49,14 @@ module ImprovedOutcomeManagementPage
     f("input[placeholder='Enter name or code']")
   end
 
+  def friendly_description_textarea
+    f("textarea[placeholder='Enter your friendly description here']")
+  end
+
+  def rce_iframe
+    'textentry_text_ifr'
+  end
+
   def edit_outcome_title_input
     f("input[data-testid='name-input']")
   end
@@ -163,12 +171,20 @@ module ImprovedOutcomeManagementPage
     ff("div[data-testid='outcome-management-item']")
   end
 
+  def nth_individual_outcome_text(index)
+    ff("div[data-testid='outcome-management-item']")[index].text
+  end
+
   def nth_individual_outcome_title(index)
     ff("h4[data-testid='outcome-management-item-title']")[index].text
   end
 
   def outcome_remove_modal
     f("span[data-testid='outcome-management-remove-modal']")
+  end
+
+  def expand_outcome_description_button(index)
+    ff("button[data-testid='manage-outcome-item-expand-toggle']")[index]
   end
 
   # ---------------------- Actions -----------------------
@@ -182,6 +198,10 @@ module ImprovedOutcomeManagementPage
     account.enable_feature!(:improved_outcomes_management)
   end
 
+  def enable_friendly_description
+    Account.site_admin.enable_feature!(:outcomes_friendly_description)
+  end
+
   def open_find_modal
     find_button.click
   end
@@ -189,6 +209,23 @@ module ImprovedOutcomeManagementPage
   def create_outcome(title)
     create_button.click
     insert_create_outcome_title(title)
+    tree_browser_root_group.click
+    # Create button is partially covered by neighboring span, so we force the click
+    force_click(confirm_create_button)
+  end
+
+  def enter_rce_description(desc)
+    driver.switch_to.frame(rce_iframe)
+    rce.send_keys(desc)
+    driver.switch_to.default_content
+  end
+
+  def create_outcome_with_friendly_desc(title, desc, friendly_desc)
+    create_button.click
+    insert_create_outcome_title(title)
+    wait_for(method: nil, timeout: 3) { rce.present? }
+    enter_rce_description(desc)
+    insert_friendly_description(friendly_desc)
     tree_browser_root_group.click
     # Create button is partially covered by neighboring span, so we force the click
     force_click(confirm_create_button)
@@ -232,6 +269,10 @@ module ImprovedOutcomeManagementPage
 
   def insert_create_outcome_title(title)
     set_value(create_outcome_title, title)
+  end
+
+  def insert_friendly_description(desc)
+    set_value(friendly_description_textarea, desc)
   end
 
   def search_common_core(title)
