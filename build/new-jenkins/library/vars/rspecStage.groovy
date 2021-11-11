@@ -151,7 +151,9 @@ def tearDownNode(prefix) {
     archiveArtifacts(artifacts: "tmp/docker-${prefix}-${CI_NODE_INDEX}.log")
   }
 
-  archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/rspec_results/**/*'
+  if (env.ENABLE_AXE_SELENIUM == '1') {
+    archiveArtifacts allowEmptyArchive: true, artifacts: 'tmp/rspec_results/**/*'
+  }
 
   archiveArtifacts allowEmptyArchive: true, artifacts: "tmp/spec_failures/$prefix/**/*"
   findFiles(glob: "tmp/spec_failures/$prefix/**/index.html").each { file ->
