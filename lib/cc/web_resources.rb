@@ -110,7 +110,7 @@ module CC
         "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
         "xsi:schemaLocation" => "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |root_node|
-        if !files[:folders].empty?
+        unless files[:folders].empty?
           root_node.folders do |folders_node|
             files[:folders].each do |folder, path|
               folders_node.folder(:path => path) do |folder_node|
@@ -123,7 +123,7 @@ module CC
           end
         end
 
-        if !files[:files].empty?
+        unless files[:files].empty?
           root_node.files do |files_node|
             files[:files].each do |file, migration_id|
               files_node.file(:identifier => migration_id) do |file_node|

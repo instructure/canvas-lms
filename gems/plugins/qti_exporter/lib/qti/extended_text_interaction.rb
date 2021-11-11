@@ -93,7 +93,7 @@ module Qti
               @question[:question_text].gsub!("[#{answer[:blank_id]}]", "[#{cleaned}]")
               answer[:blank_id] = cleaned
             end
-            if !@question[:question_text].include?("[#{cleaned}]")
+            unless @question[:question_text].include?("[#{cleaned}]")
               @question[:question_text] += " [#{cleaned}]"
             end
           end

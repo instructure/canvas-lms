@@ -351,7 +351,7 @@ class ContentTag < ActiveRecord::Base
       other_link = ContentTag.learning_outcome_links.active
                              .where(:context_type => self.context_type, :context_id => self.context_id, :content_id => outcome)
                              .where("id<>?", self).first
-      if !other_link
+      unless other_link
         # and there are alignments to the outcome (in the link's context for
         # foreign links, in any context for native links)
         alignment_conditions = { :learning_outcome_id => outcome.id }

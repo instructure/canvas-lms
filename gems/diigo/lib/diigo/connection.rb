@@ -81,7 +81,7 @@ module Diigo
     end
 
     def self.config=(config)
-      if !config.is_a?(Proc)
+      unless config.is_a?(Proc)
         raise "Config must be a Proc"
       end
 

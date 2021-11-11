@@ -98,7 +98,7 @@ module Twitter
     end
 
     def self.config=(config)
-      if !config.respond_to?(:call)
+      unless config.respond_to?(:call)
         raise "Config must respond to #call"
       end
 

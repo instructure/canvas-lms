@@ -600,7 +600,7 @@ class User < ActiveRecord::Base
     user_ids = users_or_user_ids
     user_ids = user_ids.map(&:id) if user_ids.first.is_a?(User)
     shards = [Shard.current]
-    if !precalculated_associations
+    unless precalculated_associations
       users = if !users_or_user_ids.first.is_a?(User)
                 users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
               else
@@ -738,7 +738,7 @@ class User < ActiveRecord::Base
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
     # doesn't already exist
-    self.uuid = CanvasSlug.generate_securish_uuid if !read_attribute(:uuid)
+    self.uuid = CanvasSlug.generate_securish_uuid unless read_attribute(:uuid)
   end
   protected :assign_uuid
 
@@ -1777,7 +1777,7 @@ class User < ActiveRecord::Base
   # it will store the data in a separate table on the db and lighten the load on poor `users`
 
   def uuid
-    if !read_attribute(:uuid)
+    unless read_attribute(:uuid)
       self.update_attribute(:uuid, CanvasSlug.generate_securish_uuid)
     end
     read_attribute(:uuid)

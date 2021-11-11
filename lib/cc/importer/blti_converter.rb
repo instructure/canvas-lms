@@ -108,7 +108,7 @@ module CC::Importer
 
     def convert_blti_xml(xml)
       doc = create_xml_doc(xml)
-      if !doc.namespaces.to_s.downcase.include? 'imsglobal'
+      unless doc.namespaces.to_s.downcase.include? 'imsglobal'
         raise CCImportError.new(I18n.t("Invalid XML Configuration"))
       end
 

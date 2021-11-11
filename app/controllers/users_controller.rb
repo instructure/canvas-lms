@@ -254,7 +254,7 @@ class UsersController < ApplicationController
   end
 
   def oauth
-    if !feature_and_service_enabled?(params[:service])
+    unless feature_and_service_enabled?(params[:service])
       flash[:error] = t('service_not_enabled', "That service has not been enabled")
       return redirect_to(user_profile_url(@current_user))
     end
@@ -2205,7 +2205,7 @@ class UsersController < ApplicationController
         render :json => @user
       end
     else
-      if !session["reported_#{@user.id}".to_sym]
+      unless session["reported_#{@user.id}".to_sym]
         @user.report_avatar_image!
       end
       session["reports_#{@user.id}".to_sym] = true
@@ -2216,7 +2216,7 @@ class UsersController < ApplicationController
   def report_avatar_image
     @user = User.find(params[:user_id])
     key = "reported_#{@user.id}"
-    if !session[key]
+    unless session[key]
       session[key] = true
       @user.report_avatar_image!
     end

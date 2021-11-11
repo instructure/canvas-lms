@@ -423,7 +423,7 @@ class PageView < ActiveRecord::Base
         data = self.migration_data[account_id] = {}
         data.merge!(cassandra.execute("SELECT last_created_at FROM page_views_migration_metadata_per_account WHERE shard_id = ? AND account_id = ?", Shard.current.id.to_s, account_id).fetch.try(:to_hash) || {})
 
-        if !(data['last_created_at'])
+        unless data['last_created_at']
           data['last_created_at'] = self.start_at
         end
         # cassandra returns Time not TimeWithZone objects

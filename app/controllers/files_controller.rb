@@ -366,7 +366,7 @@ class FilesController < ApplicationController
   end
 
   def react_files
-    if !request.format.html?
+    unless request.format.html?
       return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
     end
 
@@ -850,7 +850,7 @@ class FilesController < ApplicationController
   # for local file uploads
   def api_create
     @policy, @attachment = Attachment.decode_policy(params[:Policy], params[:Signature])
-    if !@policy
+    unless @policy
       return head :bad_request
     end
 

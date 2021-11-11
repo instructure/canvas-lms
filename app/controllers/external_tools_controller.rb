@@ -150,7 +150,7 @@ class ExternalToolsController < ApplicationController
 
   def retrieve
     @tool = ContextExternalTool.find_external_tool(params[:url], @context, nil, nil, params[:client_id])
-    if !@tool
+    unless @tool
       raise InvalidSettingsError, t("#application.errors.invalid_external_tool", "Couldn't find valid settings for this link")
     end
 
@@ -464,7 +464,7 @@ class ExternalToolsController < ApplicationController
       @tool = ContextExternalTool.find_for(id, @context, selection_type, false)
     end
 
-    if !@tool
+    unless @tool
       flash[:error] = t "#application.errors.invalid_external_tool_id", "Couldn't find valid settings for this tool"
       redirect_to named_context_url(@context, :context_url)
     end

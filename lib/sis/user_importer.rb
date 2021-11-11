@@ -280,7 +280,7 @@ module SIS
             pseudo.password_confirmation = user_row.password
             pseudo.password_auto_generated = true
           end
-          pseudo.sis_ssha = user_row.ssha_password if !user_row.ssha_password.blank?
+          pseudo.sis_ssha = user_row.ssha_password unless user_row.ssha_password.blank?
           pseudo.reset_persistence_token if pseudo.sis_ssha_changed? && pseudo.password_auto_generated
           user_touched = false
 

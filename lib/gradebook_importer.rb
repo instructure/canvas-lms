@@ -379,7 +379,7 @@ class GradebookImporter
 
     update_column_count row
 
-    return false if !/Section/.match?(last_student_info_column(row))
+    return false unless /Section/.match?(last_student_info_column(row))
 
     true
   end
@@ -548,7 +548,7 @@ class GradebookImporter
       assignment_id = assignment.new_record? ? assignment.id : assignment.previous_id
       assignment_index = @assignment_indices[assignment.id]
       grade = row[assignment_index]&.strip
-      if !assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
+      unless assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
         grade = ''
       end
       new_submission = {

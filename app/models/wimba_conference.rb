@@ -208,7 +208,7 @@ class WimbaConference < WebConference
   end
 
   def init_session
-    if !@auth_cookie
+    unless @auth_cookie
       send_request('Init') or return false
     end
 

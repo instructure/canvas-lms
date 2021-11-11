@@ -90,7 +90,7 @@ module Importers
           item.set_as_front_page!
         end
       end
-      hide_from_students = hash[:hide_from_students] if !hash[:hide_from_students].nil?
+      hide_from_students = hash[:hide_from_students] unless hash[:hide_from_students].nil?
       state = hash[:workflow_state]
       if state && migration.for_master_course_import?
         item.workflow_state = state
@@ -239,7 +239,7 @@ module Importers
         item.body = migration.convert_html(hash[:text], :wiki_page, hash[:migration_id], :body)
 
         item.editing_roles = hash[:editing_roles] if hash[:editing_roles].present?
-        item.notify_of_update = hash[:notify_of_update] if !hash[:notify_of_update].nil?
+        item.notify_of_update = hash[:notify_of_update] unless hash[:notify_of_update].nil?
       else # rubocop:disable Lint/DuplicateBranch
         allow_save = false
       end

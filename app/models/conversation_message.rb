@@ -335,7 +335,7 @@ class ConversationMessage < ActiveRecord::Base
     # -----
     # context
     content = "<div>#{ERB::Util.h(self.body)}</div>"
-    if !self.attachments.empty?
+    unless self.attachments.empty?
       content += "<ul>"
       self.attachments.each do |attachment|
         href = file_download_url(attachment, :verifier => attachment.uuid,

@@ -58,7 +58,7 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
     validate_input(input)
     context = get_context(input)
 
-    if !input[:enabled].nil?
+    unless input[:enabled].nil?
       NotificationPolicyOverride.enable_for_context(current_user, context, enable: input[:enabled])
     end
 
@@ -76,7 +76,7 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
       current_user.save!
     end
 
-    if !input[:send_observed_names_in_notifications].nil?
+    unless input[:send_observed_names_in_notifications].nil?
       current_user.preferences[:send_observed_names_in_notifications] = input[:send_observed_names_in_notifications]
       current_user.save!
     end

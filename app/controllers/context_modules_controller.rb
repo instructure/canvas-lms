@@ -266,7 +266,7 @@ class ContextModulesController < ApplicationController
         @tags.shift while @tags.first && @tags.first.content_type == 'ContextModuleSubHeader'
       end
       @tag = params[:last] ? @tags.last : @tags.first
-      if !@tag
+      unless @tag
         flash[:notice] = t 'module_empty', %{There are no items in the module "%{module}"}, :module => @module.name
         redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "module_#{@module.id}")
         return
@@ -417,7 +417,7 @@ class ContextModulesController < ApplicationController
     tags.each do |tag|
       if (req = (mod.completion_requirements || []).detect { |r| r[:id] == tag.id })
         progression.requirements_met ||= []
-        if !progression.requirements_met.any? { |r| r[:id] == req[:id] && r[:type] == req[:type] }
+        unless progression.requirements_met.any? { |r| r[:id] == req[:id] && r[:type] == req[:type] }
           if !before_tag || tag.position <= before_tag.position
             pre = {
               :url => named_context_url(@context, :context_context_modules_item_redirect_url, tag.id),
@@ -579,7 +579,7 @@ class ContextModulesController < ApplicationController
         end
       else
         result[:current_item] = possible_tags.first
-        if !result[:current_item]
+        unless result[:current_item]
           obj = @context.find_asset(params[:id], [:attachment, :discussion_topic, :assignment, :quiz, :wiki_page, :content_tag])
           if obj.is_a?(ContentTag)
             result[:current_item] = @tags.detect { |t| t.id == obj.id }

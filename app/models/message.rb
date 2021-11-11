@@ -529,7 +529,7 @@ class Message < ActiveRecord::Base
   def get_template(filename)
     path = Canvas::MessageHelper.find_message_path(filename)
 
-    if !(File.exist?(path) rescue false)
+    unless (File.exist?(path) rescue false)
       return false if filename.include?('slack')
 
       filename = self.notification.name.downcase.gsub(/\s/, '_') + ".email.erb"
@@ -1130,7 +1130,7 @@ class Message < ActiveRecord::Base
     return name_helper.from_name if name_helper.from_name.present?
 
     if name_helper.asset.is_a? AppointmentGroup
-      if !name_helper.asset.contexts_for_user(user).nil?
+      unless name_helper.asset.contexts_for_user(user).nil?
         names = name_helper.asset.contexts_for_user(user).map(&:name).join(", ")
         if names == ""
           return name_helper.asset.context.name

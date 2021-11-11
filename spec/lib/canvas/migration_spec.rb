@@ -20,7 +20,7 @@
 describe "Migration package importers" do
   context "Detecting content package type" do
     def get_settings(name)
-      if !name.ends_with?('xml')
+      unless name.ends_with?('xml')
         name += '.zip'
       end
       path = File.dirname(__FILE__) + "/../../fixtures/migration/package_identifier/#{name}"

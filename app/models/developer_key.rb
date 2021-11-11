@@ -195,7 +195,7 @@ class DeveloperKey < ActiveRecord::Base
 
     # for now, only one AWS account for SNS is supported
     def sns
-      if !defined?(@sns)
+      unless defined?(@sns)
         settings = ConfigFile.load('sns')
         @sns = nil
         @sns = Aws::SNS::Client.new(settings) if settings

@@ -44,7 +44,7 @@ module CC
           rubric = assoc.rubric
           next if rubric.nil? || !rubric.active? || imported_rubrics[rubric.id]
 
-          if !export_object?(rubric)
+          unless export_object?(rubric)
             next if assoc.association_type != "Assignment"
 
             assignment = assoc.association_object
