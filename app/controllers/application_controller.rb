@@ -2073,7 +2073,7 @@ class ApplicationController < ActionController::Base
       end.join('&')
       "/conversations?#{query_string}"
     else
-      hash = params.keys.empty? ? '' : "##{params.to_json.unpack('H*').first}"
+      hash = params.keys.empty? ? '' : "##{params.to_json.unpack1('H*')}"
       "/conversations#{hash}"
     end
   end

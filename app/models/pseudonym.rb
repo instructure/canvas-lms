@@ -450,7 +450,7 @@ class Pseudonym < ActiveRecord::Base
     salt = decoded[40..]
     return false unless digest && salt
 
-    digested_password = Digest::SHA1.digest(plaintext_password + salt).unpack('H*').first
+    digested_password = Digest::SHA1.digest(plaintext_password + salt).unpack1('H*')
     digest == digested_password
   end
 
