@@ -2555,10 +2555,8 @@ class User < ActiveRecord::Base
 
   def initialize_default_folder(name)
     folder = self.active_folders.where(name: name).first
-    unless folder
-      folder = self.folders.create!(:name => name,
+    folder ||= self.folders.create!(:name => name,
                                     :parent_folder => Folder.root_folders(self).find { |f| f.name == Folder::MY_FILES_FOLDER_NAME })
-    end
     folder
   end
 

@@ -153,6 +153,8 @@ Style/NegatedIf:
   Severity: error
 Style/NumericPredicate:
   Enabled: false # `> 0` can be easier to read than `.positive?`
+Style/OrAssignment:
+  Severity: error
 Style/ParenthesesAroundCondition:
   Severity: error
 Style/PerlBackrefs:
