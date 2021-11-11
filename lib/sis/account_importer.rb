@@ -65,7 +65,7 @@ module SIS
         account ||= @root_account.all_accounts.where(sis_source_id: account_id).take
         if account.nil?
           raise ImportError, "No name given for account #{account_id}, skipping" if name.blank?
-          raise ImportError, "Improper status \"#{status}\" for account #{account_id}, skipping" unless status =~ /\A(active|deleted)/i
+          raise ImportError, "Improper status \"#{status}\" for account #{account_id}, skipping" unless /\A(active|deleted)/i.match?(status)
         end
 
         account ||= @root_account.sub_accounts.new
@@ -82,9 +82,9 @@ module SIS
         account.sis_source_id = account_id
 
         if status.present?
-          if status =~ /active/i
+          if /active/i.match?(status)
             account.workflow_state = 'active'
-          elsif status =~ /deleted/i
+          elsif /deleted/i.match?(status)
             raise ImportError, "Cannot delete the sub_account with ID: #{account_id} because it has active sub accounts." if account.sub_accounts.active.exists?
             raise ImportError, "Cannot delete the sub_account with ID: #{account_id} because it has active courses." if account.courses.active.exists?
 

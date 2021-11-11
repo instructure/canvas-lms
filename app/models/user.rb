@@ -1556,7 +1556,7 @@ class User < ActiveRecord::Base
   def clear_avatar_image_url_with_uuid(uuid)
     raise ArgumentError, "'uuid' is required and cannot be blank" if uuid.blank?
 
-    if self.avatar_image_url.to_s.match(/#{uuid}/)
+    if self.avatar_image_url.to_s.match?(/#{uuid}/)
       self.avatar_image_url = nil
       self.save
     end

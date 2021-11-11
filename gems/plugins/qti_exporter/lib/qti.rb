@@ -30,7 +30,7 @@ module Qti
     @migration_executable = EXPECTED_LOCATION
   elsif File.exist?(EXPECTED_LOCATION_ALT)
     @migration_executable = EXPECTED_LOCATION_ALT
-  elsif `#{PYTHON_MIGRATION_EXECUTABLE} --version 2>&1` =~ /qti/i
+  elsif /qti/i.match?(`#{PYTHON_MIGRATION_EXECUTABLE} --version 2>&1`)
     @migration_executable = PYTHON_MIGRATION_EXECUTABLE
   end
 

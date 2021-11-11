@@ -385,6 +385,6 @@ module ContextModulesCommon
   def get(url)
     @already_waited_for_modules_ui = false
     super
-    wait_for_modules_ui if url =~ %r{\A/courses/\d+/modules\z}
+    wait_for_modules_ui if %r{\A/courses/\d+/modules\z}.match?(url)
   end
 end

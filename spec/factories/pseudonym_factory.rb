@@ -47,7 +47,7 @@ module Factories
     @spec_pseudonym_count ||= 0
     username = opts[:username] || (@spec_pseudonym_count > 0 ? "nobody+#{@spec_pseudonym_count}@example.com" : "nobody@example.com")
     opts[:username] ||= username
-    @spec_pseudonym_count += 1 if username =~ /nobody(\+\d+)?@example.com/
+    @spec_pseudonym_count += 1 if /nobody(\+\d+)?@example.com/.match?(username)
     password = opts[:password] || "asdfasdf"
     password = nil if password == :autogenerate
     account = (opts[:account] ? opts[:account].root_account : Account.default)

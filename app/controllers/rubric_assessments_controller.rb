@@ -210,7 +210,7 @@ class RubricAssessmentsController < ApplicationController
   def resolve_user_id
     user_id = params[:rubric_assessment][:user_id]
     if user_id
-      user_id =~ Api::ID_REGEX ? user_id.to_i : nil
+      Api::ID_REGEX.match?(user_id) ? user_id.to_i : nil
     elsif params[:rubric_assessment][:anonymous_id]
       Submission.find_by!(
         anonymous_id: params[:rubric_assessment][:anonymous_id],

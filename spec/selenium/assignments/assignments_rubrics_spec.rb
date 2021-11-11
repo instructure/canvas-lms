@@ -32,7 +32,7 @@ describe "assignment rubrics" do
     def get(url)
       super
       # terrible... some rubric dom handlers get set after dom ready
-      sleep 1 if url =~ %r{\A/courses/\d+/assignments/\d+\z}
+      sleep 1 if %r{\A/courses/\d+/assignments/\d+\z}.match?(url)
     end
 
     def mark_rubric_for_grading(rubric, expect_confirmation, expect_dialog = true)

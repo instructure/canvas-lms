@@ -64,6 +64,8 @@ Naming/FileName:
   Exclude:
     - "**/Gemfile.d/~after.rb"
 
+Performance/RegexpMatch:
+  Severity: error
 Performance/StringInclude:
   Severity: error
 Performance/StringReplacement:

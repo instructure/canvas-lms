@@ -2136,7 +2136,7 @@ describe Course, "gradebook_to_csv" do
     expect(rows.length).to equal(2)
     assignments, groups = [], []
     rows.headers.each do |column|
-      assignments << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment \d+/
+      assignments << column.sub(/ \([0-9]+\)/, '') if /Assignment \d+/.match?(column)
       groups << column if column.include?('Some Assignment Group')
     end
     expect(assignments).to eq ["Assignment 02", "Assignment 03", "Assignment 01", "Assignment 05", "Assignment 04", "Assignment 06", "Assignment 07", "Assignment 09", "Assignment 11", "Assignment 12", "Assignment 13", "Assignment 14", "Assignment 08", "Assignment 10"]
@@ -2178,7 +2178,7 @@ describe Course, "gradebook_to_csv" do
     csv = GradebookExporter.new(@course, @teacher).to_csv
     rows = CSV.parse(csv)
     assignments = rows[0].each_with_object([]) do |column, collection|
-      collection << column.sub(/ \([0-9]+\)/, '') if column =~ /Assignment \d+/
+      collection << column.sub(/ \([0-9]+\)/, '') if /Assignment \d+/.match?(column)
     end
 
     expect(csv).not_to be_nil

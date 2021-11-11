@@ -178,9 +178,9 @@ module Importers
       elsif (grading = hash[:grading])
         hash[:due_at] ||= grading[:due_at] || grading[:due_date]
         hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
-        if grading[:grade_type] =~ /numeric|points/i
+        if /numeric|points/i.match?(grading[:grade_type])
           item.points_possible = grading[:points_possible] ? grading[:points_possible].to_f : 10
-        elsif grading[:grade_type] =~ /alphanumeric|letter_grade/i
+        elsif /alphanumeric|letter_grade/i.match?(grading[:grade_type])
           item.grading_type = "letter_grade"
           item.points_possible = grading[:points_possible] ? grading[:points_possible].to_f : 100
         elsif grading[:grade_type] == 'rubric'

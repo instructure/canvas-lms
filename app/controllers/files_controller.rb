@@ -159,7 +159,7 @@ class FilesController < ApplicationController
   before_action { |c| c.active_tab = "files" }
 
   def verify_api_id
-    raise ActiveRecord::RecordNotFound unless params[:id] =~ Api::ID_REGEX
+    raise ActiveRecord::RecordNotFound unless Api::ID_REGEX.match?(params[:id])
   end
 
   def quota
@@ -660,7 +660,7 @@ class FilesController < ApplicationController
   def show_relative
     path = params[:file_path]
     file_id = params[:file_id]
-    file_id = nil unless file_id.to_s =~ Api::ID_REGEX
+    file_id = nil unless Api::ID_REGEX.match?(file_id.to_s)
 
     # Manually-invoke verify_authenticity_token for non-Account contexts
     # This is to allow Account-level file downloads to skip request forgery protection

@@ -519,7 +519,7 @@ class ApplicationController < ActionController::Base
 
     tool_dimensions.each do |k, v|
       tool_dimensions[k] = link_settings[k.to_s] || @tool.settings[k] || v
-      tool_dimensions[k] = tool_dimensions[k].to_s << 'px' unless tool_dimensions[k].to_s =~ /%|px/
+      tool_dimensions[k] = tool_dimensions[k].to_s << 'px' unless /%|px/.match?(tool_dimensions[k].to_s)
     end
 
     tool_dimensions
@@ -1243,7 +1243,7 @@ class ApplicationController < ActionController::Base
   # that we can offer the feeds without requiring password authentication.
   def get_feed_context(opts = {})
     pieces = params[:feed_code].split("_", 2)
-    if params[:feed_code].match(/\Agroup_membership/)
+    if params[:feed_code].match?(/\Agroup_membership/)
       pieces = ["group_membership", params[:feed_code].split("_", 3)[-1]]
     end
     @context = nil
@@ -1984,23 +1984,23 @@ class ApplicationController < ActionController::Base
         return polymorphic_url([@context, :quizzes])
       end
 
-      if ref =~ /courses\/\d+\/gradebook/i
+      if /courses\/\d+\/gradebook/i.match?(ref)
         return polymorphic_url([@context, :gradebook])
       end
 
-      if ref =~ /courses\/\d+$/i
+      if /courses\/\d+$/i.match?(ref)
         return polymorphic_url([@context])
       end
 
-      if ref =~ /courses\/(\d+\/modules.?|.*\?module_item_id=)/
+      if /courses\/(\d+\/modules.?|.*\?module_item_id=)/.match?(ref)
         return polymorphic_url([@context, :context_modules])
       end
 
-      if ref =~ /\/courses\/.*\?quiz_lti/
+      if /\/courses\/.*\?quiz_lti/.match?(ref)
         return polymorphic_url([@context, :quizzes])
       end
 
-      if ref =~ /courses\/\d+\/assignments/
+      if /courses\/\d+\/assignments/.match?(ref)
         return polymorphic_url([@context, :assignments])
       end
     end
@@ -2256,7 +2256,7 @@ class ApplicationController < ActionController::Base
 
   def user_content(str)
     return nil unless str
-    return str.html_safe unless str.match(/object|embed|equation_image/)
+    return str.html_safe unless str.match?(/object|embed|equation_image/)
 
     UserContent.escape(str, request.host_with_port, use_new_math_equation_handling?)
   end

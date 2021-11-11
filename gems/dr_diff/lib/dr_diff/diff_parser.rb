@@ -73,9 +73,9 @@ module DrDiff
     def code_line?(line)
       return false if file_line?(line)
       return false if line_range?(line)
-      return false if line =~ /^--- a\/.*\./
-      return false if line =~ /^index .*\d\d\d$/
-      return false if line =~ /^diff --git/
+      return false if /^--- a\/.*\./.match?(line)
+      return false if /^index .*\d\d\d$/.match?(line)
+      return false if /^diff --git/.match?(line)
 
       true
     end

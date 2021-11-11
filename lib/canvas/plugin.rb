@@ -135,7 +135,7 @@ module Canvas
     end
 
     def translate(key, default, options = {})
-      key = "canvas.plugins.#{@id}.#{key}" unless key =~ /\A#/
+      key = "canvas.plugins.#{@id}.#{key}" unless /\A#/.match?(key)
       I18n.translate(key, default, options)
     end
     alias_method :t, :translate

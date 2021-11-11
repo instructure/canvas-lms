@@ -601,7 +601,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def e164_path
-    return path if path =~ /^\+\d+$/
+    return path if /^\+\d+$/.match?(path)
     return nil unless (match = path.match(/^(?<number>\d+)@(?<domain>.+)$/))
     return nil unless (carrier = CommunicationChannel.sms_carriers[match[:domain]])
 

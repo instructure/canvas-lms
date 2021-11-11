@@ -66,7 +66,7 @@ module LocaleSelection
   ACCEPT_LANGUAGE = /\A#{LANGUAGE_RANGE}(#{SEPARATOR}#{LANGUAGE_RANGE})*\z/
 
   def infer_browser_locale(accept_language, locales_with_aliases)
-    return nil unless accept_language =~ ACCEPT_LANGUAGE
+    return nil unless ACCEPT_LANGUAGE.match?(accept_language)
 
     supported_locales = locales_with_aliases.keys
 

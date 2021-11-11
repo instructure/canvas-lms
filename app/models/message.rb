@@ -1075,7 +1075,7 @@ class Message < ActiveRecord::Base
   #
   # Returns nothing.
   def deliver_via_sms
-    if to =~ /^\+[0-9]+$/
+    if /^\+[0-9]+$/.match?(to)
       begin
         unless user.account.feature_enabled?(:international_sms)
           raise "International SMS is currently disabled for this user's account"

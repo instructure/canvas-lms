@@ -238,7 +238,7 @@ namespace :i18n do
         arg = $stdin.gets.strip
         if arg.blank?
           last_export = { :type => :none }
-        elsif arg =~ /\A[a-f0-9]{7,}\z/
+        elsif /\A[a-f0-9]{7,}\z/.match?(arg)
           puts "Fetching previous export..."
           ret = `git show --name-only --oneline #{arg}`
           if $?.exitstatus == 0

@@ -56,7 +56,7 @@ module Canvas::Migration
     end
 
     def get_bool_val(node, selector, default = nil)
-      node.at_css(selector) ? (node.at_css(selector).text =~ /true|yes|t|y|1/i ? true : false) : default
+      node.at_css(selector) ? (/true|yes|t|y|1/i.match?(node.at_css(selector).text) ? true : false) : default
     end
 
     def get_int_val(node, selector, default = nil)
@@ -115,7 +115,7 @@ module Canvas::Migration
           doc.at_css('*')
         rescue ArgumentError => e
           # ruby 2.2
-          raise unless e.message =~ /^invalid byte sequence/
+          raise unless /^invalid byte sequence/.match?(e.message)
 
           doc.encoding = 'UTF-8'
         rescue Encoding::CompatibilityError
