@@ -60,12 +60,13 @@ RSpec.describe Mutations::UpdateDiscussionEntriesReadState do
   end
 
   it 'updates the read state for the given entries' do
+    expect(@topic.unread_count(@student)).to eq 0
     @entries.each do |entry|
       expect(entry.read?(@student)).to be true
     end
 
     result = run_mutation({ ids: @entries.map(&:id), read: false })
-
+    expect(@topic.unread_count(@student)).to eq @entries.count
     expect(result.dig('errors')).to be nil
     updated_entries = result.dig('data', 'updateDiscussionEntriesReadState', 'discussionEntries')
 
