@@ -38,7 +38,13 @@ class Mutations::UpdateDiscussionEntriesReadState < Mutations::BaseMutation
 
     entry = entries.first
     state = input[:read] ? :read : :unread
-    DiscussionEntryParticipant.upsert_for_entries(entry, current_user, batch: entries, new_state: state, forced: true)
+    ids = DiscussionEntryParticipant.upsert_for_entries(entry, current_user, batch: entries, new_state: state, forced: true)
+
+    # only run this if upsert_for_entries really returned ids
+    if ids
+      offset = state == :read ? -ids.length : ids.length
+      entry.discussion_topic.update_or_create_participant(current_user: current_user, offset: offset)
+    end
 
     {
       discussion_entries: entries
