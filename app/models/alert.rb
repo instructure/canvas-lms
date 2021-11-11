@@ -41,14 +41,14 @@ class Alert < ActiveRecord::Base
     include_teachers = false
     admin_role_ids = []
     self.recipients.try(:each) do |recipient|
-      case
-      when recipient == :student
+      case recipient
+      when :student
         include_student = true
-      when recipient == :teachers
+      when :teachers
         include_teachers = true
-      when recipient.is_a?(String)
+      when String
         admin_role_ids << find_role_by_name(recipient).id
-      when recipient.is_a?(Hash)
+      when Hash
         admin_role_ids << recipient[:role_id]
       else
         raise "Unsupported recipient type!"
