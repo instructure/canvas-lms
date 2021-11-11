@@ -232,11 +232,11 @@ class Assignment < ActiveRecord::Base
   def get_potentially_conflicting_titles(title_base)
     assignment_titles = Assignment.active.for_course(self.context_id)
                                   .starting_with_title(title_base).pluck("title").to_set
-    if self.wiki_page
-      wiki_titles = self.wiki_page.get_potentially_conflicting_titles(title_base)
-    else
-      wiki_titles = [].to_set
-    end
+    wiki_titles = if self.wiki_page
+                    self.wiki_page.get_potentially_conflicting_titles(title_base)
+                  else
+                    [].to_set
+                  end
     assignment_titles.union(wiki_titles)
   end
 
@@ -285,7 +285,7 @@ class Assignment < ActiveRecord::Base
     # override later.  Just helps to avoid duplicate positions.
     result.position = Assignment.active.where(assignment_group: assignment_group).maximum(:position) + 1
     result.title =
-      opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"), self.title)
+      opts_with_default[:copy_title] || get_copy_title(self, t("Copy"), self.title)
 
     if self.wiki_page && opts_with_default[:duplicate_wiki_page]
       result.wiki_page = self.wiki_page.duplicate({
@@ -851,11 +851,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def turnitin_settings=(settings)
-    if vericite_enabled?
-      settings = VeriCite::Client.normalize_assignment_vericite_settings(settings)
-    else
-      settings = Turnitin::Client.normalize_assignment_turnitin_settings(settings)
-    end
+    settings = if vericite_enabled?
+                 VeriCite::Client.normalize_assignment_vericite_settings(settings)
+               else
+                 Turnitin::Client.normalize_assignment_turnitin_settings(settings)
+               end
     unless settings.blank?
       [:created, :error].each do |key|
         settings[key] = self.turnitin_settings[key] if self.turnitin_settings[key]
@@ -1348,7 +1348,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def time_zone_edited
-    CGI::unescapeHTML(read_attribute(:time_zone_edited) || "")
+    CGI.unescapeHTML(read_attribute(:time_zone_edited) || "")
   end
 
   def restore(from = nil)

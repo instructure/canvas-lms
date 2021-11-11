@@ -35,11 +35,11 @@ module Api::V1
       @includes = includes.map { |include_key| include_key.to_sym }
       @enrollments = enrollments
       @precalculated_permissions = precalculated_permissions
-      if block_given?
-        @hash = yield(self, self.allowed_attributes, self.methods_to_send, self.permissions_to_include)
-      else
-        @hash = {}
-      end
+      @hash = if block_given?
+                yield(self, self.allowed_attributes, self.methods_to_send, self.permissions_to_include)
+              else
+                {}
+              end
     end
 
     def allowed_attributes

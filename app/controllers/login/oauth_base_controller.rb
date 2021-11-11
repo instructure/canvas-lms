@@ -34,11 +34,11 @@ class Login::OAuthBaseController < ApplicationController
     # explicitly specify this
     auth_type = params[:auth_type] if Rails.env.test?
     scope = @domain_root_account.authentication_providers.active.where(auth_type: auth_type)
-    if params[:id]
-      @aac = scope.find(params[:id])
-    else
-      @aac = scope.first!
-    end
+    @aac = if params[:id]
+             scope.find(params[:id])
+           else
+             scope.first!
+           end
   end
 
   protected

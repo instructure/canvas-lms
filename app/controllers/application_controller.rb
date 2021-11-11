@@ -1137,14 +1137,14 @@ class ApplicationController < ActionController::Base
       state = @context_enrollment.state_based_on_date
       case state
       when :invited
-        if @context_enrollment.available_at
-          flash[:html_notice] = t("You'll need to *accept the enrollment invitation* before you can fully participate in this course, starting on %{date}.",
+        flash[:html_notice] = if @context_enrollment.available_at
+                                t("You'll need to *accept the enrollment invitation* before you can fully participate in this course, starting on %{date}.",
                                   :wrapper => view_context.link_to('\1', '#', 'data-method' => 'POST', 'data-url' => course_enrollment_invitation_url(@context, accept: true)),
                                   :date => datetime_string(@context_enrollment.available_at))
-        else
-          flash[:html_notice] = t("You'll need to *accept the enrollment invitation* before you can fully participate in this course.",
+                              else
+                                t("You'll need to *accept the enrollment invitation* before you can fully participate in this course.",
                                   :wrapper => view_context.link_to('\1', '#', 'data-method' => 'POST', 'data-url' => course_enrollment_invitation_url(@context, accept: true)))
-        end
+                              end
       when :accepted
         flash[:html_notice] = t("This course hasn’t started yet. You will not be able to participate in this course until %{date}.",
                                 :date => datetime_string(@context_enrollment.available_at))
@@ -1215,17 +1215,17 @@ class ApplicationController < ActionController::Base
     redirect ||= root_url
     get_quota(context)
     if response.body.size + @quota_used > @quota
-      if context.is_a?(Account)
-        error = t "#application.errors.quota_exceeded_account", "Account storage quota exceeded"
-      elsif context.is_a?(Course)
-        error = t "#application.errors.quota_exceeded_course", "Course storage quota exceeded"
-      elsif context.is_a?(Group)
-        error = t "#application.errors.quota_exceeded_group", "Group storage quota exceeded"
-      elsif context.is_a?(User)
-        error = t "#application.errors.quota_exceeded_user", "User storage quota exceeded"
-      else
-        error = t "#application.errors.quota_exceeded", "Storage quota exceeded"
-      end
+      error = if context.is_a?(Account)
+                t "#application.errors.quota_exceeded_account", "Account storage quota exceeded"
+              elsif context.is_a?(Course)
+                t "#application.errors.quota_exceeded_course", "Course storage quota exceeded"
+              elsif context.is_a?(Group)
+                t "#application.errors.quota_exceeded_group", "Group storage quota exceeded"
+              elsif context.is_a?(User)
+                t "#application.errors.quota_exceeded_user", "User storage quota exceeded"
+              else
+                t "#application.errors.quota_exceeded", "Storage quota exceeded"
+              end
       respond_to do |format|
         flash[:error] = error unless request.format.to_s == "text/plain"
         format.html { redirect_to redirect }
@@ -1281,13 +1281,13 @@ class ApplicationController < ActionController::Base
       if !@context
         @problem = t "#application.errors.invalid_verification_code", "The verification code is invalid."
       elsif (!@context.is_public rescue false) && (!@context.respond_to?(:uuid) || pieces[1] != @context.uuid)
-        if @context_type == 'course'
-          @problem = t "#application.errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."
-        elsif @context_type == 'group'
-          @problem = t "#application.errors.feed_private_group", "The matching group has gone private, so public feeds like this one will no longer be visible."
-        else
-          @problem = t "#application.errors.feed_private", "The matching context has gone private, so public feeds like this one will no longer be visible."
-        end
+        @problem = if @context_type == 'course'
+                     t "#application.errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."
+                   elsif @context_type == 'group'
+                     t "#application.errors.feed_private_group", "The matching group has gone private, so public feeds like this one will no longer be visible."
+                   else
+                     t "#application.errors.feed_private", "The matching context has gone private, so public feeds like this one will no longer be visible."
+                   end
       end
       @context = nil if @problem
       @current_user = @context if @context.is_a?(User)
@@ -1734,12 +1734,12 @@ class ApplicationController < ActionController::Base
         BasicLTI::BasicOutcomes::InvalidRequest
       data = { errors: [{ message: exception.message }] }
     else
-      if status_code.is_a?(Symbol)
-        status_code_string = status_code.to_s
-      else
-        # we want to return a status string of the form "not_found", so take the rails-style "Not Found" and tweak it
-        status_code_string = interpret_status(status_code).sub(/\d\d\d /, '').gsub(' ', '').underscore
-      end
+      status_code_string = if status_code.is_a?(Symbol)
+                             status_code.to_s
+                           else
+                             # we want to return a status string of the form "not_found", so take the rails-style "Not Found" and tweak it
+                             interpret_status(status_code).sub(/\d\d\d /, '').gsub(' ', '').underscore
+                           end
       data = { errors: [{ message: "An error occurred.", error_code: status_code_string }] }
     end
     data
@@ -1890,11 +1890,11 @@ class ApplicationController < ActionController::Base
           @lti_launch.launch_type = 'window'
           @return_url = success_url
         else
-          if @context
-            @return_url = set_return_url
-          else
-            @return_url = external_content_success_url('external_tool_redirect')
-          end
+          @return_url = if @context
+                          set_return_url
+                        else
+                          external_content_success_url('external_tool_redirect')
+                        end
           @redirect_return = true
           js_env(:redirect_return_success_url => success_url,
                  :redirect_return_cancel_url => success_url)

@@ -126,6 +126,10 @@ Specs/EnsureSpecExtension:
 Style/Alias:
   EnforcedStyle: prefer_alias_method # https://github.com/rubocop/ruby-style-guide/issues/821
   Severity: error
+Style/ColonMethodCall:
+  Severity: error
+Style/ConditionalAssignment:
+  Severity: error
 Style/Documentation:
   Enabled: false # most things don't need to be documented
 Style/Encoding:
@@ -141,7 +145,11 @@ Style/ParenthesesAroundCondition:
   Severity: error
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
+Style/RedundantAssignment:
+  Severity: error
 Style/RedundantBegin:
+  Severity: error
+Style/RedundantCondition:
   Severity: error
 Style/RedundantInterpolation:
   Severity: error

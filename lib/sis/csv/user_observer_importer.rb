@@ -32,14 +32,13 @@ module SIS
       # possible columns:
       # observer_id, student_id, status
       def process(csv, index = nil, count = nil)
-        count = SIS::UserObserverImporter.new(@root_account, importer_opts).process do |i|
+        SIS::UserObserverImporter.new(@root_account, importer_opts).process do |i|
           csv_rows(csv, index, count) do |row|
             i.process_user_observer(row['observer_id'], row['student_id'], row['status'])
           rescue ImportError => e
             SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
           end
         end
-        count
       end
     end
   end

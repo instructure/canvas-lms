@@ -70,7 +70,7 @@ module Importers
     end
 
     def self.process_migration(data, migration)
-      modules = data['modules'] ? data['modules'] : []
+      modules = data['modules'] || []
       migration.last_module_position = migration.context.context_modules.maximum(:position) if migration.is_a?(ContentMigration)
 
       modules.each do |mod|

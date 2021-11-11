@@ -443,11 +443,11 @@ class EnrollmentsApiController < ApplicationController
 
       if params[:sis_user_id].present?
         pseudonyms = @domain_root_account.pseudonyms.where(sis_user_id: params[:sis_user_id])
-        if value_to_boolean(params[:created_for_sis_id])
-          enrollments = enrollments.where(sis_pseudonym: pseudonyms)
-        else
-          enrollments = enrollments.where(user_id: pseudonyms.pluck(:user_id))
-        end
+        enrollments = if value_to_boolean(params[:created_for_sis_id])
+                        enrollments.where(sis_pseudonym: pseudonyms)
+                      else
+                        enrollments.where(user_id: pseudonyms.pluck(:user_id))
+                      end
       end
 
       if params[:sis_section_id].present?
@@ -467,13 +467,13 @@ class EnrollmentsApiController < ApplicationController
       end
 
       if params[:grading_period_id].present?
-        if @context.is_a? User
-          grading_period = @context.courses.lazy.map do |course|
-            GradingPeriod.for(course).find_by(id: params[:grading_period_id])
-          end.detect(&:present?)
-        else
-          grading_period = GradingPeriod.for(@context).find_by(id: params[:grading_period_id])
-        end
+        grading_period = if @context.is_a? User
+                           @context.courses.lazy.map do |course|
+                             GradingPeriod.for(course).find_by(id: params[:grading_period_id])
+                           end.detect(&:present?)
+                         else
+                           GradingPeriod.for(@context).find_by(id: params[:grading_period_id])
+                         end
 
         unless grading_period
           render(:json => { error: "invalid grading_period_id" }, :status => :bad_request)
@@ -906,13 +906,13 @@ class EnrollmentsApiController < ApplicationController
     if user == @current_user
       # if user is requesting for themselves, just return all of their
       # enrollments without any extra checking.
-      if params[:state].present?
-        enrollments = user.enrollments.where(enrollment_index_conditions(true)).joins(:enrollment_state)
+      enrollments = if params[:state].present?
+                      user.enrollments.where(enrollment_index_conditions(true)).joins(:enrollment_state)
                           .where("enrollment_states.state IN (?)", enrollment_states_for_state_param)
-      else
-        enrollments = user.enrollments.current_and_invited.where(enrollment_index_conditions)
+                    else
+                      user.enrollments.current_and_invited.where(enrollment_index_conditions)
                           .joins(:enrollment_state).where("enrollment_states.state<>'completed'")
-      end
+                    end
     else
       is_approved_parent = user.grants_right?(@current_user, :read_as_parent)
       # otherwise check for read_roster rights on all of the requested

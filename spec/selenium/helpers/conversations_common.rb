@@ -61,8 +61,7 @@ module ConversationsCommon
 
     # should be one filter applied i every situation
     expect(selected.size).to eq 1
-    value = selected[0].attribute('value')
-    value
+    selected[0].attribute('value')
   end
 
   def course_filter

@@ -441,11 +441,11 @@ class ContextModulesController < ApplicationController
     type, id = ActiveRecord::Base.parse_asset_string params[:code]
     raise ActiveRecord::RecordNotFound if id == 0
 
-    if type == 'ContentTag'
-      @tag = @context.context_module_tags.active.where(id: id).first
-    else
-      @tag = @context.context_module_tags.active.where(context_module_id: params[:context_module_id], content_id: id, content_type: type).first
-    end
+    @tag = if type == 'ContentTag'
+             @context.context_module_tags.active.where(id: id).first
+           else
+             @context.context_module_tags.active.where(context_module_id: params[:context_module_id], content_id: id, content_type: type).first
+           end
     @module = @context.context_modules.active.find(params[:context_module_id])
     @progression = @module.evaluate_for(@current_user)
     @progression.current_position ||= 0 if @progression

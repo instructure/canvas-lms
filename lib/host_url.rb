@@ -48,13 +48,13 @@ class HostUrl
     # returns "http" or "https" depending on whether this instance of canvas runs over ssl
     def protocol
       if !@@protocol
-        if domain_config.key?('ssl')
-          is_secure = domain_config['ssl']
-        elsif Attachment.file_store_config.key?('secure')
-          is_secure = Attachment.file_store_config['secure']
-        else
-          is_secure = Rails.env.production?
-        end
+        is_secure = if domain_config.key?('ssl')
+                      domain_config['ssl']
+                    elsif Attachment.file_store_config.key?('secure')
+                      Attachment.file_store_config['secure']
+                    else
+                      Rails.env.production?
+                    end
 
         @@protocol = is_secure ? "https" : "http"
       end

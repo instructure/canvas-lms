@@ -310,11 +310,11 @@ class AssignmentsController < ApplicationController
           @assigned_assessments = @current_user_submission&.assigned_assessments&.select { |request| request.submission.grants_right?(@current_user, session, :read) } || []
         end
 
-        if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
-          @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user, :placements => :homework_submission)
-        else
-          @external_tools = []
-        end
+        @external_tools = if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
+                            ContextExternalTool.all_tools_for(@context, :user => @current_user, :placements => :homework_submission)
+                          else
+                            []
+                          end
 
         context_rights = @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments, :manage_assignments_edit)
         if @context.root_account.feature_enabled?(:granular_permissions_manage_assignments)

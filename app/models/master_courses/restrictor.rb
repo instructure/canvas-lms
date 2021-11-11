@@ -134,11 +134,11 @@ module MasterCourses::Restrictor
       changed_columns << "manually_deleted"
     end
     if changed_columns.any?
-      if self.is_a?(Assignment) && (submittable = self.submittable_object)
-        tag_content = submittable # mark on the owner's tag
-      else
-        tag_content = self
-      end
+      tag_content = if self.is_a?(Assignment) && (submittable = self.submittable_object)
+                      submittable # mark on the owner's tag
+                    else
+                      self
+                    end
       MasterCourses::ChildContentTag.transaction do
         child_tag = MasterCourses::ChildContentTag.where(content: tag_content).lock.first
         if child_tag

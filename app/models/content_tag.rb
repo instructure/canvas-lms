@@ -498,7 +498,7 @@ class ContentTag < ActiveRecord::Base
   def content_asset_string=(val)
     vals = val.split("_")
     id = vals.pop
-    type = Context::asset_type_for_string(vals.join("_").classify)
+    type = Context.asset_type_for_string(vals.join("_").classify)
     if type && id && id.to_i > 0
       self.content_type = type.to_s
       self.content_id = id
@@ -670,12 +670,12 @@ class ContentTag < ActiveRecord::Base
   def set_root_account
     return if self.root_account_id.present?
 
-    case self.context
-    when Account
-      self.root_account_id = self.context.resolved_root_account_id
-    else
-      self.root_account_id = self.context&.root_account_id
-    end
+    self.root_account_id = case self.context
+                           when Account
+                             self.context.resolved_root_account_id
+                           else
+                             self.context&.root_account_id
+                           end
   end
 
   def quiz_lti

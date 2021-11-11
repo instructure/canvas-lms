@@ -36,13 +36,13 @@ class ModelView < HashView
 
   def self.new_from_model(model)
     lines = model.text.lines.to_a
-    json = JSON::parse(lines[1..-1].join)
+    json = JSON.parse(lines[1..-1].join)
 
     new(
       lines[0].strip,
       json["properties"],
-      json["description"] ? json["description"] : "",
-      json["required"] ? json["required"] : [],
+      json["description"] || "",
+      json["required"] || [],
       deprecated: json["deprecated"],
       deprecation_description: json["deprecation_description"]
     )

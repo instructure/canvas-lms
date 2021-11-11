@@ -62,7 +62,7 @@ class WimbaConference < WebConference
     url = "http://#{server}/admin/api/api.pl"
     query_string = "function=#{action}"
     opts.each do |key, val|
-      query_string += "&#{CGI::escape(key)}=#{CGI::escape(val.to_s)}"
+      query_string += "&#{CGI.escape(key)}=#{CGI.escape(val.to_s)}"
     end
     url + "?" + query_string
   end
@@ -160,12 +160,12 @@ class WimbaConference < WebConference
 
   def join_url(user, room_id = wimba_id)
     (token = get_auth_token(user)) &&
-      "http://#{server}/launcher.cgi.pl?hzA=#{CGI::escape(token)}&room=#{CGI::escape(room_id)}"
+      "http://#{server}/launcher.cgi.pl?hzA=#{CGI.escape(token)}&room=#{CGI.escape(room_id)}"
   end
 
   def settings_url(user, room_id = wimba_id)
     (token = get_auth_token(user)) &&
-      "http://#{server}/admin/class/create_manage_frameset.html.epl?hzA=#{CGI::escape(token)}&class_id=#{CGI::escape(room_id)}"
+      "http://#{server}/admin/class/create_manage_frameset.html.epl?hzA=#{CGI.escape(token)}&class_id=#{CGI.escape(room_id)}"
   end
 
   def get_auth_token(user)

@@ -480,11 +480,11 @@ class Enrollment < ActiveRecord::Base
 
   def update_from(other, skip_broadcasts = false)
     self.course_id = other.course_id
-    if self.type == 'ObserverEnrollment' && other.workflow_state == 'invited'
-      self.workflow_state = 'active'
-    else
-      self.workflow_state = other.workflow_state
-    end
+    self.workflow_state = if self.type == 'ObserverEnrollment' && other.workflow_state == 'invited'
+                            'active'
+                          else
+                            other.workflow_state
+                          end
     self.start_at = other.start_at
     self.end_at = other.end_at
     self.course_section_id = other.course_section_id
@@ -1344,11 +1344,10 @@ class Enrollment < ActiveRecord::Base
     clause = User.sortable_name_order_by_clause('users')
     scope = self.order(clause)
     if scope.select_values.present?
-      scope = scope.select(clause)
+      scope.select(clause)
     else
-      scope = scope.select(self.arel_table[Arel.star])
+      scope.select(self.arel_table[Arel.star])
     end
-    scope
   end
 
   def self.top_enrollment_by(key, rank_order = :default)

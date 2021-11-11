@@ -144,11 +144,11 @@ class Feature
       apply_environment_overrides!(feature_name, attrs)
       feature = feature_name.to_s
       validate_attrs(attrs, feature)
-      if attrs[:state] == STATE_DISABLED
-        @features[feature] = DISABLED_FEATURE
-      else
-        @features[feature] = Feature.new({ feature: feature }.merge(attrs))
-      end
+      @features[feature] = if attrs[:state] == STATE_DISABLED
+                             DISABLED_FEATURE
+                           else
+                             Feature.new({ feature: feature }.merge(attrs))
+                           end
     end
   end
 

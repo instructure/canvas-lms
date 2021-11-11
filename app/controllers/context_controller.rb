@@ -129,11 +129,11 @@ class ContextController < ApplicationController
         set_student_context_cards_js_env
       end
     elsif @context.is_a?(Group)
-      if @context.grants_right?(@current_user, :read_as_admin)
-        @users = @context.participating_users.distinct.order_by_sortable_name
-      else
-        @users = @context.participating_users_in_context(sort: true).distinct.order_by_sortable_name
-      end
+      @users = if @context.grants_right?(@current_user, :read_as_admin)
+                 @context.participating_users.distinct.order_by_sortable_name
+               else
+                 @context.participating_users_in_context(sort: true).distinct.order_by_sortable_name
+               end
       @primary_users = { t('roster.group_members', 'Group Members') => @users }
       if (course = @context.context.is_a?(Course) && @context.context)
         @secondary_users = { t('roster.teachers_and_tas', 'Teachers & TAs') => course.participating_instructors.order_by_sortable_name.distinct }

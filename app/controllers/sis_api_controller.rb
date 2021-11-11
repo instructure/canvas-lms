@@ -407,14 +407,12 @@ class SisApiController < ApplicationController
                             .preload(context: { active_course_sections: [:nonxlist_course] })
 
     if include_student_overrides?
-      assignments = assignments.preload(
+      assignments.preload(
         active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]]
       )
     else
-      assignments = assignments.preload(:active_assignment_overrides)
+      assignments.preload(:active_assignment_overrides)
     end
-
-    assignments
   end
 
   def paginated_assignments

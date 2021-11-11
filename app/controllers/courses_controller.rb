@@ -1561,11 +1561,11 @@ class CoursesController < ApplicationController
 
       new_settings = {}
 
-      if key_exists
-        new_settings[:engine_selected] = update_user_engine_choice(@course, selection_obj)
-      else
-        new_settings[:engine_selected] = { user_id: selection_obj }
-      end
+      new_settings[:engine_selected] = if key_exists
+                                         update_user_engine_choice(@course, selection_obj)
+                                       else
+                                         { user_id: selection_obj }
+                                       end
       new_settings.reverse_merge!(old_settings)
       @course.settings = new_settings
       @course.save
@@ -2962,11 +2962,11 @@ class CoursesController < ApplicationController
       params[:course][:sis_source_id] = params[:course].delete(:sis_course_id) if api_request?
       if (sis_id = params[:course].delete(:sis_source_id))
         if sis_id != @course.sis_source_id && @course.root_account.grants_right?(@current_user, session, :manage_sis)
-          if sis_id == ''
-            @course.sis_source_id = nil
-          else
-            @course.sis_source_id = sis_id
-          end
+          @course.sis_source_id = if sis_id == ''
+                                    nil
+                                  else
+                                    sis_id
+                                  end
         end
       end
 
@@ -3250,11 +3250,11 @@ class CoursesController < ApplicationController
   # @returns Progress
   def batch_update
     @account = api_find(Account, params[:account_id])
-    if params[:event] == 'undelete'
-      permission = :undelete_courses
-    else
-      permission = [:manage_courses, :manage_courses_admin]
-    end
+    permission = if params[:event] == 'undelete'
+                   :undelete_courses
+                 else
+                   [:manage_courses, :manage_courses_admin]
+                 end
 
     if authorized_action(@account, @current_user, permission)
       return render(:json => { :message => 'must specify course_ids[]' }, :status => :bad_request) unless params[:course_ids].is_a?(Array)
@@ -3375,11 +3375,11 @@ class CoursesController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_as_admin)
 
     assignment_ids = effective_due_dates_params[:assignment_ids]
-    if assignment_ids.present?
-      due_dates = EffectiveDueDates.for_course(@context, assignment_ids)
-    else
-      due_dates = EffectiveDueDates.for_course(@context)
-    end
+    due_dates = if assignment_ids.present?
+                  EffectiveDueDates.for_course(@context, assignment_ids)
+                else
+                  EffectiveDueDates.for_course(@context)
+                end
 
     render json: due_dates.to_hash([
                                      :due_at, :grading_period_id, :in_closed_grading_period
@@ -3569,17 +3569,17 @@ class CoursesController < ApplicationController
 
     unless old_settings == new_settings
       settings = Course.settings_options.keys.inject({}) do |results, key|
-        if old_settings.present? && old_settings.has_key?(key)
-          old_value = old_settings[key]
-        else
-          old_value = nil
-        end
+        old_value = if old_settings.present? && old_settings.has_key?(key)
+                      old_settings[key]
+                    else
+                      nil
+                    end
 
-        if new_settings.present? && new_settings.has_key?(key)
-          new_value = new_settings[key]
-        else
-          new_value = nil
-        end
+        new_value = if new_settings.present? && new_settings.has_key?(key)
+                      new_settings[key]
+                    else
+                      nil
+                    end
 
         results[key.to_s] = [old_value, new_value] unless old_value == new_value
 

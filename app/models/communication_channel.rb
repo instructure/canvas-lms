@@ -367,11 +367,11 @@ class CommunicationChannel < ActiveRecord::Base
   # confirmation code in place.
   def set_confirmation_code(reset = false, expires_at = nil)
     self.confirmation_code = nil if reset
-    if self.path_type == TYPE_EMAIL or self.path_type.nil?
-      self.confirmation_code ||= CanvasSlug.generate(nil, 25)
-    else
-      self.confirmation_code ||= CanvasSlug.generate
-    end
+    self.confirmation_code ||= if self.path_type == TYPE_EMAIL or self.path_type.nil?
+                                 CanvasSlug.generate(nil, 25)
+                               else
+                                 CanvasSlug.generate
+                               end
     self.confirmation_code_expires_at = expires_at if reset
     true
   end

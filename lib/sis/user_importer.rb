@@ -503,12 +503,11 @@ module SIS
       private
 
       def generate_user_warning(message, user_id, login_id)
-        user_message = generate_readable_error_message(
+        generate_readable_error_message(
           message: message,
           user_id: user_id,
           login_id: login_id
         )
-        user_message
       end
 
       ERRORS_TO_REASONS = {
@@ -519,9 +518,8 @@ module SIS
       def generate_readable_error_message(options)
         response = ERRORS_TO_REASONS.fetch(options[:message]) { DEFAULT_REASON }
         reason = format(response, options)
-        result = "Could not save the user with user_id: '#{options[:user_id]}'." +
-                 " #{reason}"
-        result
+        "Could not save the user with user_id: '#{options[:user_id]}'." +
+          " #{reason}"
       end
     end
   end

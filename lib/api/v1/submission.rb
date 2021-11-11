@@ -233,14 +233,14 @@ module Api::V1::Submission
       # it's also possible the student posted in the main topic, as well as the
       # individual group one. so we search far and wide for all student entries.
 
-      if assignment.discussion_topic.has_group_category?
-        entries = assignment.shard.activate {
-          DiscussionEntry.active.where(:discussion_topic_id => assignment.discussion_topic.child_topics.select(:id))
-                         .for_user(attempt.user_id).to_a.sort_by(&:created_at)
-        }
-      else
-        entries = assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id).to_a
-      end
+      entries = if assignment.discussion_topic.has_group_category?
+                  assignment.shard.activate {
+                    DiscussionEntry.active.where(:discussion_topic_id => assignment.discussion_topic.child_topics.select(:id))
+                                   .for_user(attempt.user_id).to_a.sort_by(&:created_at)
+                  }
+                else
+                  assignment.discussion_topic.discussion_entries.active.for_user(attempt.user_id).to_a
+                end
       ActiveRecord::Associations::Preloader.new.preload(entries, :discussion_entry_participants, DiscussionEntryParticipant.where(:user_id => user))
       hash['discussion_entries'] = discussion_entry_api_json(entries, assignment.discussion_topic.context, user, session)
     end
@@ -370,11 +370,11 @@ module Api::V1::Submission
 
   def submission_provisional_grades_json(course:, assignment:, submission:, current_user:, avatars: false, includes: [])
     provisional_grades = submission.provisional_grades
-    if assignment.permits_moderation?(current_user)
-      provisional_grades = provisional_grades.sort_by { |pg| pg.final ? CanvasSort::Last : pg.created_at }
-    else
-      provisional_grades = provisional_grades.select { |pg| pg.scorer_id == current_user.id }
-    end
+    provisional_grades = if assignment.permits_moderation?(current_user)
+                           provisional_grades.sort_by { |pg| pg.final ? CanvasSort::Last : pg.created_at }
+                         else
+                           provisional_grades.select { |pg| pg.scorer_id == current_user.id }
+                         end
 
     provisional_grades.map do |provisional_grade|
       provisional_grade_json(

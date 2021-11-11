@@ -40,17 +40,17 @@ class CourseProgress
   end
 
   def current_module
-    if read_only
-      @_current_module ||= begin
-        progressions_by_mod_id = module_progressions.index_by(&:context_module_id)
-        modules.detect do |m|
-          prog = progressions_by_mod_id[m.id]
-          prog.nil? || prog.completed? == false
-        end
-      end
-    else
-      @_current_module ||= modules.detect { |m| m.evaluate_for(user).completed? == false }
-    end
+    @_current_module ||= if read_only
+                           begin
+                             progressions_by_mod_id = module_progressions.index_by(&:context_module_id)
+                             modules.detect do |m|
+                               prog = progressions_by_mod_id[m.id]
+                               prog.nil? || prog.completed? == false
+                             end
+                           end
+                         else
+                           modules.detect { |m| m.evaluate_for(user).completed? == false }
+                         end
   end
 
   def module_progressions

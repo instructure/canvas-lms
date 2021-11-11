@@ -145,7 +145,7 @@ class CutyCapt
         Kernel.exec(*cuty_arguments(config[:path], url, img_file, format, config[:delay], config[:timeout], config[:lang]))
       else
         begin
-          Timeout::timeout(config[:timeout].to_i / 1000) do
+          Timeout.timeout(config[:timeout].to_i / 1000) do
             Process.waitpid(pid)
             unless $?.success?
               logger.error("Capture failed with code: #{$?.exitstatus}")

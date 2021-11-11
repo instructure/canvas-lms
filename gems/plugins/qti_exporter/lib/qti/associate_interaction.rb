@@ -114,11 +114,11 @@ module Qti
         match = {}
         @question[:matches] << match
         match_map[sc['identifier']] = match
-        if sc['identifier'] =~ /(\d+)/
-          match[:match_id] = $1.to_i
-        else
-          match[:match_id] = unique_local_id
-        end
+        match[:match_id] = if sc['identifier'] =~ /(\d+)/
+                             $1.to_i
+                           else
+                             unique_local_id
+                           end
         match[:text] = sc.text.strip
       end
     end

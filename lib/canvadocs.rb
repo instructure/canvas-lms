@@ -171,7 +171,7 @@ module Canvadocs
     #
     # Returns a Net::HTTP::Get object for the path with query params
     def format_get(path, params)
-      query = params.map { |k, v| "#{k}=#{CGI::escape(v.to_s)}" }.join("&")
+      query = params.map { |k, v| "#{k}=#{CGI.escape(v.to_s)}" }.join("&")
       Net::HTTP::Get.new("#{path}?#{query}")
     end
 

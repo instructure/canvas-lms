@@ -848,14 +848,14 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def setup_attachments
-    if @submission
-      @attachments = Hash[@submission.attachments.map do |attachment|
-        [attachment.id, attachment]
-      end
-      ]
-    else
-      @attachments = {}
-    end
+    @attachments = if @submission
+                     Hash[@submission.attachments.map do |attachment|
+                       [attachment.id, attachment]
+                     end
+                     ]
+                   else
+                     {}
+                   end
   end
 
   def attachment_hash(attachment)

@@ -193,11 +193,11 @@ class CanvasSecurity::ServicesJwt
     def refresh_invalid_for_user?(payload, domain, user, real_user)
       invalid_user = payload[:sub] != user.global_id
       invalid_domain = payload[:domain] != domain
-      if payload[:masq_sub].present?
-        invalid_real = real_user.nil? || payload[:masq_sub] != real_user.global_id
-      else
-        invalid_real = real_user.present?
-      end
+      invalid_real = if payload[:masq_sub].present?
+                       real_user.nil? || payload[:masq_sub] != real_user.global_id
+                     else
+                       real_user.present?
+                     end
       invalid_user || invalid_domain || invalid_real
     end
 

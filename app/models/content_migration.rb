@@ -537,7 +537,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def is_set?(option)
-    Canvas::Plugin::value_to_boolean option
+    Canvas::Plugin.value_to_boolean option
   end
 
   def capture_job_id

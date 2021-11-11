@@ -577,8 +577,7 @@ class User < ActiveRecord::Base
     starting_account_ids += (data[:account_users][user.id] || []).map(&:account_id)
     starting_account_ids.uniq!
 
-    result = calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
-    result
+    calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
   end
 
   def self.update_account_associations(users_or_user_ids, opts = {})
@@ -602,11 +601,11 @@ class User < ActiveRecord::Base
     user_ids = user_ids.map(&:id) if user_ids.first.is_a?(User)
     shards = [Shard.current]
     if !precalculated_associations
-      if !users_or_user_ids.first.is_a?(User)
-        users = users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
-      else
-        users = users_or_user_ids
-      end
+      users = if !users_or_user_ids.first.is_a?(User)
+                users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
+              else
+                users_or_user_ids
+              end
 
       if opts[:all_shards]
         shards = Set.new
@@ -1397,7 +1396,7 @@ class User < ActiveRecord::Base
 
   def gravatar_url(size = 50, fallback = nil, request = nil)
     fallback = self.class.avatar_fallback_url(fallback, request)
-    "https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(self.email) rescue '000'}?s=#{size}&d=#{CGI::escape(fallback)}"
+    "https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(self.email) rescue '000'}?s=#{size}&d=#{CGI.escape(fallback)}"
   end
 
   # Public: Set a user's avatar image. This is a convenience method that sets
@@ -1443,11 +1442,11 @@ class User < ActiveRecord::Base
   end
 
   def report_avatar_image!
-    if self.avatar_state == :approved || self.avatar_state == :locked
-      self.avatar_state = 're_reported'
-    else
-      self.avatar_state = 'reported'
-    end
+    self.avatar_state = if self.avatar_state == :approved || self.avatar_state == :locked
+                          're_reported'
+                        else
+                          'reported'
+                        end
     self.save!
   end
 
@@ -2733,11 +2732,11 @@ class User < ActiveRecord::Base
     favorites = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid, opts)
                     .select { |c| can_favorite.call(c) }
     # if favoritable courses (classic courses or k5 courses with admin enrollment) exist, show those and all non-favoritable courses
-    if favorites.length > 0
-      @menu_courses = favorites + courses.reject { |c| can_favorite.call(c) }
-    else
-      @menu_courses = courses
-    end
+    @menu_courses = if favorites.length > 0
+                      favorites + courses.reject { |c| can_favorite.call(c) }
+                    else
+                      courses
+                    end
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
     @menu_courses
   end
@@ -2863,12 +2862,12 @@ class User < ActiveRecord::Base
   def otp_secret_key
     return nil unless otp_secret_key_enc
 
-    Canvas::Security::decrypt_password(otp_secret_key_enc, otp_secret_key_salt, 'otp_secret_key', self.shard.settings[:encryption_key]) if otp_secret_key_enc
+    Canvas::Security.decrypt_password(otp_secret_key_enc, otp_secret_key_salt, 'otp_secret_key', self.shard.settings[:encryption_key]) if otp_secret_key_enc
   end
 
   def otp_secret_key=(key)
     if key
-      self.otp_secret_key_enc, self.otp_secret_key_salt = Canvas::Security::encrypt_password(key, 'otp_secret_key')
+      self.otp_secret_key_enc, self.otp_secret_key_salt = Canvas::Security.encrypt_password(key, 'otp_secret_key')
     else
       self.otp_secret_key_enc = self.otp_secret_key_salt = nil
     end

@@ -548,11 +548,11 @@ class RoleOverridesController < ApplicationController
 
   def create
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      if params[:account_roles] || @context == Account.site_admin
-        roles = @context.available_account_roles(true)
-      else
-        roles = @context.available_course_roles(true)
-      end
+      roles = if params[:account_roles] || @context == Account.site_admin
+                @context.available_account_roles(true)
+              else
+                @context.available_course_roles(true)
+              end
       if params[:permissions]
         RoleOverride.permissions.keys.each do |key|
           if params[:permissions][key]

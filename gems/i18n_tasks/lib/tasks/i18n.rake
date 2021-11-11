@@ -375,11 +375,11 @@ namespace :i18n do
   task :autoimport, [:translated_file, :source_file] => :environment do |_t, args|
     require 'open-uri'
 
-    if args[:source_file].present?
-      source_translations = YAML.safe_load(open(args[:source_file]))
-    else
-      source_translations = YAML.safe_load(open("config/locales/generated/en.yml"))
-    end
+    source_translations = if args[:source_file].present?
+                            YAML.safe_load(open(args[:source_file]))
+                          else
+                            YAML.safe_load(open("config/locales/generated/en.yml"))
+                          end
     new_translations = YAML.safe_load(open(args[:translated_file]))
     autoimport(source_translations, new_translations)
   end

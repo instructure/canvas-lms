@@ -199,11 +199,11 @@ describe Role do
       @base_types = Role::ENROLLMENT_TYPES
       @custom_roles = {}
       @base_types.each do |bt|
-        if bt == 'DesignerEnrollment'
-          @custom_roles[bt] = custom_role(bt, "custom #{bt}", :account => @sub_account)
-        else
-          @custom_roles[bt] = custom_role(bt, "custom #{bt}")
-        end
+        @custom_roles[bt] = if bt == 'DesignerEnrollment'
+                              custom_role(bt, "custom #{bt}", :account => @sub_account)
+                            else
+                              custom_role(bt, "custom #{bt}")
+                            end
       end
     end
 

@@ -351,15 +351,15 @@ class FilesController < ApplicationController
 
   def images
     if authorized_action(@context.attachments.temp_record, @current_user, :read)
-      if Folder.root_folders(@context).first.grants_right?(@current_user, session, :read_contents)
-        if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
-          @images = @context.active_images.paginate page: params[:page]
-        else
-          @images = @context.active_images.not_hidden.not_locked.where(:folder_id => @context.active_folders.not_hidden.not_locked).paginate :page => params[:page]
-        end
-      else
-        @images = [].paginate
-      end
+      @images = if Folder.root_folders(@context).first.grants_right?(@current_user, session, :read_contents)
+                  if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
+                    @context.active_images.paginate page: params[:page]
+                  else
+                    @context.active_images.not_hidden.not_locked.where(:folder_id => @context.active_folders.not_hidden.not_locked).paginate :page => params[:page]
+                  end
+                else
+                  [].paginate
+                end
       headers['X-Total-Pages'] = @images.total_pages.to_s
       render :partial => "shared/wiki_image", :collection => @images
     end
