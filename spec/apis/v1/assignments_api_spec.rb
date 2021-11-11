@@ -707,7 +707,7 @@ describe AssignmentsApiController, type: :request do
       it "includes published flag for accounts that do have enabled_draft" do
         @json = api_get_assignment_in_course(@assignment, @course)
 
-        expect(@json.has_key?('published')).to be_truthy
+        expect(@json).to have_key('published')
         expect(@json['published']).to be_falsey
       end
 
@@ -877,7 +877,7 @@ describe AssignmentsApiController, type: :request do
 
       it "includes the only_visible_to_overrides flag if differentiated assignments is on" do
         @json = api_get_assignment_in_course(@assignment, @course)
-        expect(@json.has_key?('only_visible_to_overrides')).to be_truthy
+        expect(@json).to have_key('only_visible_to_overrides')
         expect(@json['only_visible_to_overrides']).to be_falsey
       end
 
@@ -889,9 +889,7 @@ describe AssignmentsApiController, type: :request do
                           :format => 'json', :course_id => @course.id.to_s
                         },
                         :include => ['assignment_visibility'])
-        json.each do |a|
-          expect(a.has_key?("assignment_visibility")).to eq true
-        end
+        expect(json).to all(have_key("assignment_visibility"))
       end
 
       it "shows all assignments" do
@@ -3866,8 +3864,8 @@ describe AssignmentsApiController, type: :request do
 
       it "updates the peer reviews info" do
         expect(@assignment.peer_reviews).to eq false
-        expect(@json.has_key?('peer_review_count')).to eq false
-        expect(@json.has_key?('peer_reviews_assign_at')).to eq false
+        expect(@json).not_to have_key('peer_review_count')
+        expect(@json).not_to have_key('peer_reviews_assign_at')
       end
 
       it "updates the grading standard" do
@@ -4146,7 +4144,7 @@ describe AssignmentsApiController, type: :request do
           }
           @user = @teacher
 
-          expect(@params.has_key?('assignment_overrides')).to be_truthy
+          expect(@params).to have_key('assignment_overrides')
 
           api_update_assignment_call(@course, @assignment, @params)
           expect(@assignment.assignment_overrides.active.count).to eq 0
@@ -5404,8 +5402,8 @@ describe AssignmentsApiController, type: :request do
         end
 
         it "excludes frozen and frozen_attributes fields" do
-          expect(@json.has_key?('frozen')).to eq false
-          expect(@json.has_key?('frozen_attributes')).to eq false
+          expect(@json).not_to have_key('frozen')
+          expect(@json).not_to have_key('frozen_attributes')
         end
       end
 
@@ -5668,7 +5666,7 @@ describe AssignmentsApiController, type: :request do
 
       it "includes assignment_visibility" do
         json = visibility_api_request @assignment1
-        expect(json.has_key?("assignment_visibility")).to eq true
+        expect(json).to have_key("assignment_visibility")
       end
 
       it "assignment_visibility includes the correct user_ids" do
@@ -5701,7 +5699,7 @@ describe AssignmentsApiController, type: :request do
           user_session @student1
           @user = @student1
           json = visibility_api_request @assignment1
-          expect(json.has_key?("assignment_visibility")).to eq false
+          expect(json).not_to have_key("assignment_visibility")
         end
       end
     end
@@ -5727,13 +5725,13 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "contains a turnitin_enabled key" do
-        expect(result.has_key?('turnitin_enabled')).to eq true
+        expect(result).to have_key('turnitin_enabled')
       end
     end
 
     context "when turnitin_enabled is false on the context" do
       it "does not contain a turnitin_enabled key" do
-        expect(result.has_key?('turnitin_enabled')).to eq false
+        expect(result).not_to have_key('turnitin_enabled')
       end
     end
 
@@ -5804,7 +5802,7 @@ describe AssignmentsApiController, type: :request do
         @course.conclude_at = 7.days.from_now
         @course.save!
         json = get_assignment
-        expect(json.key?('can_submit')).to be_present
+        expect(json).to have_key('can_submit')
         expect(json['can_submit']).to be_truthy
       end
 
@@ -5813,7 +5811,7 @@ describe AssignmentsApiController, type: :request do
         @course.restrict_enrollments_to_course_dates = false
         @course.save!
         json = get_assignment
-        expect(json.key?('can_submit')).to be_present
+        expect(json).to have_key('can_submit')
         expect(json['can_submit']).to be_truthy
       end
 
@@ -5822,7 +5820,7 @@ describe AssignmentsApiController, type: :request do
         @course.restrict_enrollments_to_course_dates = true
         @course.save!
         json = get_assignment
-        expect(json.key?('can_submit')).to be_present
+        expect(json).to have_key('can_submit')
         expect(json['can_submit']).to be_falsey
       end
 
@@ -5830,7 +5828,7 @@ describe AssignmentsApiController, type: :request do
         @assignment.submission_types = "none"
         @assignment.save!
         json = get_assignment
-        expect(json.key?('can_submit')).to be_present
+        expect(json).to have_key('can_submit')
         expect(json['can_submit']).to be_falsey
       end
 
@@ -5838,7 +5836,7 @@ describe AssignmentsApiController, type: :request do
         @assignment.submission_types = "on_paper"
         @assignment.save!
         json = get_assignment
-        expect(json.key?('can_submit')).to be_present
+        expect(json).to have_key('can_submit')
         expect(json['can_submit']).to be_falsey
       end
 
@@ -5846,7 +5844,7 @@ describe AssignmentsApiController, type: :request do
         @assignment.unlock_at = 2.days.from_now
         @assignment.save!
         json = get_assignment
-        expect(json.key?('can_submit')).to be_present
+        expect(json).to have_key('can_submit')
         expect(json['can_submit']).to be_falsey
       end
 
@@ -5855,7 +5853,7 @@ describe AssignmentsApiController, type: :request do
         @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "Assignment submitted")
         @assignment.save!
         json = get_assignment
-        expect(json.key?('can_submit')).to be_present
+        expect(json).to have_key('can_submit')
         expect(json['can_submit']).to be_falsey
       end
 
@@ -5867,8 +5865,8 @@ describe AssignmentsApiController, type: :request do
                           :format => "json",
                           :course_id => @course.id.to_s,
                           :include => ["can_submit"] })
-        expect(json.first.key?('description')).to be_present
-        expect(json.first.key?('can_submit')).not_to be_present
+        expect(json.first).to have_key('description')
+        expect(json.first).not_to have_key('can_submit')
       end
 
       it 'does not show when can_submit param is not included' do
@@ -5879,8 +5877,8 @@ describe AssignmentsApiController, type: :request do
                           :format => "json",
                           :course_id => @course.id.to_s,
                           :id => @assignment.id })
-        expect(json.key?('description')).to be_present
-        expect(json.key?('can_submit')).not_to be_present
+        expect(json).to have_key('description')
+        expect(json).not_to have_key('can_submit')
       end
     end
   end

@@ -136,7 +136,7 @@ module Api::V1::Quiz
     end
 
     # make sure assignment_group_id belongs to context
-    if update_params.has_key?("assignment_group_id")
+    if update_params.key?("assignment_group_id")
       ag_id = update_params.delete("assignment_group_id").presence
       ag = quiz.context.assignment_groups.where(id: ag_id).first
       update_params["assignment_group_id"] = ag.try(:id)
@@ -144,7 +144,7 @@ module Api::V1::Quiz
 
     # make sure allowed_attempts isn't set with a silly negative value
     # (note that -1 is ok and it means unlimited attempts)
-    if update_params.has_key?('allowed_attempts')
+    if update_params.key?('allowed_attempts')
       allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts)
       allowed_attempts = -1 if allowed_attempts.nil?
 
@@ -163,7 +163,7 @@ module Api::V1::Quiz
     end
 
     # show_correct_answers is valid if hide_results is null
-    if update_params.has_key?('show_correct_answers')
+    if update_params.key?('show_correct_answers')
       hide_results = update_params.fetch('hide_results', quiz.hide_results)
 
       unless hide_results.blank?
@@ -177,13 +177,13 @@ module Api::V1::Quiz
       # The following fields are valid only if `show_correct_answers` is true:
       if show_correct_answers == false
         %w[show_correct_answers_at hide_correct_answers_at].each do |key|
-          update_params.delete(key) if update_params.has_key?(key)
+          update_params.delete(key) if update_params.key?(key)
         end
       end
 
       # show_correct_answers_last_attempt is valid only if
       # show_correct_answers=true and allowed_attempts > 1
-      if update_params.has_key?('show_correct_answers_last_attempt')
+      if update_params.key?('show_correct_answers_last_attempt')
         allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts).to_i
 
         if show_correct_answers == false || allowed_attempts <= 1
@@ -193,7 +193,7 @@ module Api::V1::Quiz
     end
 
     # one_time_results is valid if hide_results is null
-    if update_params.has_key?('one_time_results')
+    if update_params.key?('one_time_results')
       hide_results = update_params.fetch('hide_results', quiz.hide_results)
 
       unless hide_results.blank?
@@ -202,7 +202,7 @@ module Api::V1::Quiz
     end
 
     # scoring_policy is valid if allowed_attempts > 1
-    if update_params.has_key?('scoring_policy')
+    if update_params.key?('scoring_policy')
       allowed_attempts = update_params.fetch('allowed_attempts', quiz.allowed_attempts)
       unless allowed_attempts.to_i > 1
         update_params.delete 'scoring_policy'
@@ -210,7 +210,7 @@ module Api::V1::Quiz
     end
 
     # cant_go_back is valid if one_question_at_a_time=true
-    if update_params.has_key?('cant_go_back')
+    if update_params.key?('cant_go_back')
       one_question_at_a_time = update_params.fetch('one_question_at_a_time', quiz.one_question_at_a_time)
 
       unless one_question_at_a_time
@@ -219,7 +219,7 @@ module Api::V1::Quiz
     end
 
     # discard time limit if it's a negative value
-    if update_params.has_key?('time_limit')
+    if update_params.key?('time_limit')
       time_limit = update_params.fetch('time_limit', quiz.time_limit)
 
       if time_limit && time_limit.to_i < 0
@@ -227,7 +227,7 @@ module Api::V1::Quiz
       end
     end
 
-    published = update_params.delete('published') if update_params.has_key?('published')
+    published = update_params.delete('published') if update_params.key?('published')
     quiz.attributes = update_params
     unless published.nil? || published.to_s.blank?
       if quiz.new_record?

@@ -765,7 +765,7 @@ class DiscussionTopicsApiController < ApplicationController
 
   def get_forced_option()
     opts = {}
-    opts[:forced] = value_to_boolean(params[:forced_read_state]) if params.has_key?(:forced_read_state)
+    opts[:forced] = value_to_boolean(params[:forced_read_state]) if params.key?(:forced_read_state)
     opts
   end
 

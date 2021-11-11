@@ -22,9 +22,9 @@ module CanvasCassandra
 
     def initialize(fingerprint, servers, opts, logger)
       thrift_opts = {}
-      thrift_opts[:retries] = opts.delete(:retries) if opts.has_key?(:retries)
-      thrift_opts[:connect_timeout] = opts.delete(:connect_timeout) if opts.has_key?(:connect_timeout)
-      thrift_opts[:timeout] = opts.delete(:timeout) if opts.has_key?(:timeout)
+      thrift_opts[:retries] = opts.delete(:retries) if opts.key?(:retries)
+      thrift_opts[:connect_timeout] = opts.delete(:connect_timeout) if opts.key?(:connect_timeout)
+      thrift_opts[:timeout] = opts.delete(:timeout) if opts.key?(:timeout)
 
       @db = CassandraCQL::Database.new(servers, opts, thrift_opts)
       @fingerprint = fingerprint

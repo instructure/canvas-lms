@@ -224,7 +224,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   def selected_content(type)
     {}.tap do |h|
-      h[:all_course_settings] = if migration_settings.has_key?(:copy_settings)
+      h[:all_course_settings] = if migration_settings.key?(:copy_settings)
                                   migration_settings[:copy_settings]
                                 else
                                   type == :full

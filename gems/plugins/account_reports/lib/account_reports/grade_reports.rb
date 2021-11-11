@@ -297,7 +297,7 @@ module AccountReports
 
       if @include_deleted
         students = students.where("enrollments.workflow_state IN ('active', 'completed', 'inactive', 'deleted')")
-        if @account_report.parameters.has_key? 'limiting_period'
+        if @account_report.parameters.key? 'limiting_period'
           limiting_period = @account_report.parameters['limiting_period'].to_i
           students = students.where("enrollments.workflow_state = 'active'
                                     OR c.conclude_at >= ?

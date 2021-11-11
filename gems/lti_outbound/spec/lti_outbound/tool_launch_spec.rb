@@ -380,7 +380,7 @@ describe LtiOutbound::ToolLaunch do
                                          :resource_type => 'editor_button',
                                          :variable_expander => variable_expander,
                                          :disable_lti_post_only => true).generate
-      expect(hash.key?('first')).to eq false
+      expect(hash).not_to have_key('first')
     end
   end
 

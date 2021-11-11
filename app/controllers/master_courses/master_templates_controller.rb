@@ -382,7 +382,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
     options = params.permit(:comment, :send_notification).to_unsafe_h
     [:copy_settings, :publish_after_initial_sync].each do |bool_key|
-      options[bool_key] = value_to_boolean(params[bool_key]) if params.has_key?(bool_key)
+      options[bool_key] = value_to_boolean(params[bool_key]) if params.key?(bool_key)
     end
 
     migration = MasterCourses::MasterMigration.start_new_migration!(@template, @current_user, options)
@@ -420,7 +420,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     unless %w{assignment attachment discussion_topic external_tool lti-quiz quiz wiki_page}.include?(content_type)
       return render :json => { :message => "Must be a valid content type (assignment,attachment,discussion_topic,external_tool,lti-quiz,quiz,wiki_page)" }, :status => :bad_request
     end
-    unless params.has_key?(:restricted)
+    unless params.key?(:restricted)
       return render :json => { :message => "Must set 'restricted'" }, :status => :bad_request
     end
 
@@ -554,7 +554,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   # @returns [ChangeRecord]
   def migration_details
     @mm = @template.master_migrations.where(:id => params[:id]).first!
-    return render :json => [] unless @mm.export_results.has_key?(:selective)
+    return render :json => [] unless @mm.export_results.key?(:selective)
 
     subscriptions = @template.child_subscriptions.where(:id => @mm.export_results[:selective][:subscriptions])
     tag_association = @template.content_tags
@@ -639,7 +639,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def import_details
     migration = @course.content_migrations.where(:migration_type => 'master_course_import', :id => params[:id]).first!
     @mm = migration.master_migration
-    return render :json => [] unless @mm.export_results.has_key?(:selective) && @mm.export_results[:selective][:subscriptions].include?(@subscription.id)
+    return render :json => [] unless @mm.export_results.key?(:selective) && @mm.export_results[:selective][:subscriptions].include?(@subscription.id)
 
     tag_association = @subscription.content_tags
 

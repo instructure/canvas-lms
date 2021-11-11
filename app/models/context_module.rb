@@ -456,7 +456,7 @@ class ContextModule < ActiveRecord::Base
     if prereqs.is_a?(Array)
       # validate format, skipping invalid ones
       prereqs = prereqs.select do |pre|
-        pre.has_key?(:id) && pre.has_key?(:name) && pre[:type] == 'context_module'
+        pre.key?(:id) && pre.key?(:name) && pre[:type] == 'context_module'
       end
     elsif prereqs.is_a?(String)
       res = []
@@ -467,7 +467,7 @@ class ContextModule < ActiveRecord::Base
         next unless (match = pre_regex.match(pre))
 
         id = match[1].to_i
-        if module_names.has_key?(id)
+        if module_names.key?(id)
           res << { :id => id, :type => 'context_module', :name => module_names[id] }
         end
       end

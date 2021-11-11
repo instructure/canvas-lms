@@ -25,7 +25,7 @@ module Account::Settings
         opts[:values] = [:value, :locked]
 
         self.class_eval "def #{setting}; cached_inherited_setting(:#{setting}); end", __FILE__, __LINE__
-      elsif opts && opts[:boolean] && opts.has_key?(:default)
+      elsif opts && opts[:boolean] && opts.key?(:default)
         if opts[:default]
           # if the default is true, we want a nil result to evaluate to true.
           # this prevents us from having to backfill true values into a

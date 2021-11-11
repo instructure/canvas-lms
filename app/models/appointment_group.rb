@@ -384,7 +384,7 @@ class AppointmentGroup < ActiveRecord::Base
 
   def participant_for(user)
     @participant_for ||= {}
-    return @participant_for[user.global_id] if @participant_for.has_key?(user.global_id)
+    return @participant_for[user.global_id] if @participant_for.key?(user.global_id)
 
     @participant_for[user.global_id] = begin
       participant = if participant_type == 'User'
@@ -498,7 +498,7 @@ class AppointmentGroup < ActiveRecord::Base
 
   def contexts_for_user(user)
     @contexts_for_user ||= {}
-    return @contexts_for_user[user.global_id] if @contexts_for_user.has_key?(user.global_id)
+    return @contexts_for_user[user.global_id] if @contexts_for_user.key?(user.global_id)
 
     @contexts_for_user[user.global_id] = begin
       context_codes = context_codes_for_user(user)
@@ -509,7 +509,7 @@ class AppointmentGroup < ActiveRecord::Base
 
   def context_codes_for_user(user)
     @context_codes_for_user ||= {}
-    return @context_codes_for_user[user.global_id] if @context_codes_for_user.has_key?(user.global_id)
+    return @context_codes_for_user[user.global_id] if @context_codes_for_user.key?(user.global_id)
 
     @context_codes_for_user[user.global_id] = begin
       manageable_codes = user.manageable_appointment_context_codes

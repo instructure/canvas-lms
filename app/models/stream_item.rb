@@ -68,19 +68,19 @@ class StreamItem < ActiveRecord::Base
     when 'Submission'
       data['body'] = nil
     end
-    if data.has_key?('users')
+    if data.key?('users')
       users = data.delete('users')
       users = users.map { |user| reconstitute_ar_object('User', user) }
       res.association(:users).target = users
     end
-    if data.has_key?('participants')
+    if data.key?('participants')
       users = data.delete('participants')
       users = users.map { |user| reconstitute_ar_object('User', user) }
       res.instance_variable_set(:@participants, users)
     end
 
     # unnecessary after old stream items have expired
-    if res.is_a?(Conversation) && !data.has_key?('updated_at')
+    if res.is_a?(Conversation) && !data.key?('updated_at')
       data['updated_at'] = Time.now.utc
     end
 

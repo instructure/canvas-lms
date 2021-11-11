@@ -149,7 +149,7 @@ module Api::V1::ContextModule
       hash['completion_requirement'] = ch
     end
 
-    has_update_rights = if opts.has_key? :has_update_rights
+    has_update_rights = if opts.key? :has_update_rights
                           opts[:has_update_rights]
                         else
                           context_module.grants_right?(current_user, :update)

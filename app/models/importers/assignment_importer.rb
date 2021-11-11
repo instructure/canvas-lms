@@ -258,7 +258,7 @@ module Importers
                                       key: [item.migration_id, override.set_type, override.set_id].join('/'))
         end
         can_restrict = added_overrides || (item.submission_types == "wiki_page" && context.feature_enabled?(:conditional_release))
-        if hash.has_key?(:only_visible_to_overrides) && can_restrict
+        if hash.key?(:only_visible_to_overrides) && can_restrict
           item.only_visible_to_overrides = hash[:only_visible_to_overrides]
         end
       end
@@ -290,9 +290,9 @@ module Importers
         item.saved_by = :quiz
       end
 
-      hash[:due_at] ||= hash[:due_date] if hash.has_key?(:due_date)
+      hash[:due_at] ||= hash[:due_date] if hash.key?(:due_date)
       [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at].each do |key|
-        if hash.has_key?(key) && (master_migration || hash[key].present?)
+        if hash.key?(key) && (master_migration || hash[key].present?)
           item.send "#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key])
         end
       end
@@ -302,10 +302,10 @@ module Importers
         item.group_category ||= context.group_categories.active.where(:name => t("Project Groups")).first_or_create
       end
 
-      if hash.has_key?(:moderated_grading) && context.feature_enabled?(:moderated_grading)
+      if hash.key?(:moderated_grading) && context.feature_enabled?(:moderated_grading)
         item.moderated_grading = hash[:moderated_grading]
       end
-      if hash.has_key?(:anonymous_grading) && context.feature_enabled?(:anonymous_marking)
+      if hash.key?(:anonymous_grading) && context.feature_enabled?(:anonymous_marking)
         item.anonymous_grading = hash[:anonymous_grading]
       end
 

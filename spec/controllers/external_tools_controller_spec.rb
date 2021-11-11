@@ -611,7 +611,7 @@ describe ExternalToolsController do
           get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
                                assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
-          expect(lti_launch.params.key?('ext_content_file_extensions')).not_to be
+          expect(lti_launch.params).not_to have_key('ext_content_file_extensions')
         end
 
         it "sets the accept_media_types parameter to '*.*'' if online_upload isn't accepted" do

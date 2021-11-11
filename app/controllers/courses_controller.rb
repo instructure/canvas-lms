@@ -818,7 +818,7 @@ class CoursesController < ApplicationController
       params[:course] ||= {}
       params_for_create = course_params
 
-      if params_for_create.has_key?(:syllabus_body)
+      if params_for_create.key?(:syllabus_body)
         params_for_create[:syllabus_body] = process_incoming_html_content(params_for_create[:syllabus_body])
       end
 
@@ -3565,17 +3565,17 @@ class CoursesController < ApplicationController
 
     # Since course uses write_attribute on settings its not accurate
     # so just ignore it if its in the changes hash
-    changes.delete("settings") if changes.has_key?("settings")
+    changes.delete("settings") if changes.key?("settings")
 
     unless old_settings == new_settings
       settings = Course.settings_options.keys.inject({}) do |results, key|
-        old_value = if old_settings.present? && old_settings.has_key?(key)
+        old_value = if old_settings.present? && old_settings.key?(key)
                       old_settings[key]
                     else
                       nil
                     end
 
-        new_value = if new_settings.present? && new_settings.has_key?(key)
+        new_value = if new_settings.present? && new_settings.key?(key)
                       new_settings[key]
                     else
                       nil

@@ -1278,8 +1278,7 @@ describe "Module Items API", type: :request do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@cyoe_module2.id}/items?include[]=mastery_paths",
                           :controller => "context_module_items_api", :action => "index", :format => "json",
                           :course_id => @course.id.to_s, :module_id => @cyoe_module2.id.to_s, :include => ['mastery_paths'])
-          mastery_paths = json.all? { |item| item.key? 'mastery_paths' }
-          expect(mastery_paths).to be_truthy
+          expect(json).to all(have_key('mastery_paths'))
         end
 
         it 'properly omits a wiki page item locked by CYOE from progressions' do

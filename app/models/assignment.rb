@@ -3894,7 +3894,7 @@ class Assignment < ActiveRecord::Base
     overrides = overrides.values.reject(&:empty?).flatten if overrides.is_a?(Hash)
     overrides = overrides.map do |o|
       o = o.to_unsafe_h if o.is_a?(ActionController::Parameters)
-      if o.is_a?(Hash) && o.has_key?(:due_at) && !o.has_key?(:due_at_overridden)
+      if o.is_a?(Hash) && o.key?(:due_at) && !o.key?(:due_at_overridden)
         o = o.merge(:due_at_overridden => true) # default to true if provided by api
       end
       o

@@ -76,7 +76,7 @@ module Api::V1::Attachment
     hidden_for_user = if skip_permission_checks ||
                          !attachment.hidden?
                         false
-                      elsif options.has_key?(:can_view_hidden_files)
+                      elsif options.key?(:can_view_hidden_files)
                         options[:can_view_hidden_files]
                       else
                         !can_view_hidden_files?(attachment.context, user)

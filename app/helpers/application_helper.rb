@@ -684,7 +684,7 @@ module ApplicationHelper
     opts[:indent_width] ||= 3
     opts[:depth] ||= 0
     opts[:options_so_far] ||= []
-    if opts.has_key?(:all_folders)
+    if opts.key?(:all_folders)
       opts[:sub_folders] = opts.delete(:all_folders).to_a.group_by { |f| f.parent_folder_id }
     end
 

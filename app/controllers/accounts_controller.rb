@@ -825,8 +825,8 @@ class AccountsController < ApplicationController
             account_settings[:settings].slice!(*permitted_api_account_settings)
             ensure_sis_max_name_length_value!(account_settings)
           end
-          @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.has_key?(:name) && account_params[:name].blank?
-          @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.has_key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
+          @account.errors.add(:name, t(:account_name_required, 'The account name cannot be blank')) if account_params.key?(:name) && account_params[:name].blank?
+          @account.errors.add(:default_time_zone, t(:unrecognized_time_zone, "'%{timezone}' is not a recognized time zone", :timezone => account_params[:default_time_zone])) if account_params.key?(:default_time_zone) && ActiveSupport::TimeZone.new(account_params[:default_time_zone]).nil?
         else
           account_settings.each_key { |k| @account.errors.add(k.to_sym, t(:cannot_manage_account, 'You are not allowed to manage account settings')) }
           unauthorized = true
@@ -843,7 +843,7 @@ class AccountsController < ApplicationController
       unless quota_settings.empty?
         if @account.grants_right?(@current_user, session, :manage_storage_quotas)
           [:default_storage_quota_mb, :default_user_storage_quota_mb, :default_group_storage_quota_mb].each do |quota_type|
-            next unless quota_settings.has_key?(quota_type)
+            next unless quota_settings.key?(quota_type)
 
             quota_value = quota_settings[quota_type].to_s.strip
             if !INTEGER_REGEX.match?(quota_value.to_s)
@@ -1078,7 +1078,7 @@ class AccountsController < ApplicationController
           end
         end
 
-        if params[:account][:settings] && params[:account][:settings].has_key?(:trusted_referers)
+        if params[:account][:settings] && params[:account][:settings].key?(:trusted_referers)
           if (trusted_referers = params[:account][:settings].delete(:trusted_referers)) &&
              @account.root_account?
             @account.trusted_referers = trusted_referers

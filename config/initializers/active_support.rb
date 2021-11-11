@@ -36,7 +36,7 @@ module ActiveSupport::Cache
 
     def normalize_key(key, options)
       result = super
-      if options && options.has_key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS6_0
+      if options && options.key?(:use_new_rails) ? options[:use_new_rails] : !CANVAS_RAILS6_0
         result = "rails61:#{result}"
       end
       result

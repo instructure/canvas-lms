@@ -72,7 +72,7 @@ class HostUrl
 
     def default_host
       unless @@default_host
-        @@default_host = domain_config[:domain] if domain_config.has_key?(:domain)
+        @@default_host = domain_config[:domain] if domain_config.key?(:domain)
       end
       res = @@default_host
       res ||= ENV['RAILS_HOST_WITH_PORT']
@@ -83,7 +83,7 @@ class HostUrl
       return [@@file_host, Shard.default] if @@file_host
 
       res = nil
-      res = @@file_host = domain_config[:files_domain] if domain_config.has_key?(:files_domain)
+      res = @@file_host = domain_config[:files_domain] if domain_config.key?(:files_domain)
       Rails.logger.warn("No separate files host specified for account id #{account.id}.  This is a potential security risk.") unless res || !Rails.env.production?
       res ||= @@file_host = default_host
       [res, Shard.default]

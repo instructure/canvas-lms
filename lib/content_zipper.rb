@@ -23,7 +23,7 @@ require 'set'
 
 class ContentZipper
   def initialize(options = {})
-    @check_user = options.has_key?(:check_user) ? options[:check_user] : true
+    @check_user = options.key?(:check_user) ? options[:check_user] : true
     @logger = Rails.logger
   end
   attr_writer :user
