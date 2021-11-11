@@ -425,7 +425,7 @@ module CC
       begin
         uri = URI.parse(sub_path)
         unless uri.path == "/preview" # defaults to preview, so no qs added
-          qs << "canvas_#{Rack::Utils.escape(uri.path[1..-1])}=1"
+          qs << "canvas_#{Rack::Utils.escape(uri.path[1..])}=1"
         end
 
         Rack::Utils.parse_query(uri.query).each do |k, v|

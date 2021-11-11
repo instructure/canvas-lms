@@ -701,7 +701,7 @@ class ApplicationController < ActionController::Base
     if user && !user.time_zone.blank?
       Time.zone = user.time_zone
       if Time.zone && Time.zone.name == "UTC" && user.time_zone && user.time_zone.name.match(/\s/)
-        Time.zone = user.time_zone.name.split(/\s/)[1..-1].join(" ") rescue nil
+        Time.zone = user.time_zone.name.split(/\s/)[1..].join(" ") rescue nil
       end
     else
       Time.zone = @domain_root_account && @domain_root_account.default_time_zone

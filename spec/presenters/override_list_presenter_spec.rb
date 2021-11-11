@@ -249,7 +249,7 @@ describe OverrideListPresenter do
     end
 
     context "only some sections have overrides" do
-      let(:dates_visible) { dates_visible_to_user[1..-1] }
+      let(:dates_visible) { dates_visible_to_user[1..] }
 
       before do
         allow(assignment.context).to receive(:active_section_count)

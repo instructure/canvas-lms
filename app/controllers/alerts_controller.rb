@@ -60,7 +60,7 @@ class AlertsController < ApplicationController
   def convert_recipients
     params[:alert][:recipients] = params[:alert][:recipients].to_a.map do |r|
       if r.is_a?(String) && r[0] == ':'
-        r[1..-1].to_sym
+        r[1..].to_sym
       elsif (role = (@context.is_a?(Account) ? @context.get_role_by_id(r) : @context.account.get_role_by_id(r)))
         { :role_id => role.id }
       end

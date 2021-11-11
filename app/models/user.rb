@@ -836,7 +836,7 @@ class User < ActiveRecord::Base
     end
     # Use prior information on the last name to try and reconstruct it
     prior_surname_parts = nil
-    surname = given_parts.pop(prior_surname_parts.length).join(' ') if !surname && prior_surname.present? && (prior_surname_parts = prior_surname.split) && !prior_surname_parts.empty? && given_parts.length >= prior_surname_parts.length && given_parts[-prior_surname_parts.length..-1] == prior_surname_parts
+    surname = given_parts.pop(prior_surname_parts.length).join(' ') if !surname && prior_surname.present? && (prior_surname_parts = prior_surname.split) && !prior_surname_parts.empty? && given_parts.length >= prior_surname_parts.length && given_parts[-prior_surname_parts.length..] == prior_surname_parts
     # Last resort; last name is just the last word given
     surname = given_parts.pop if !surname && given_parts.length > 1
 

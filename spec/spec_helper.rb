@@ -135,7 +135,7 @@ module ActionView::TestCase::Behavior
       # the original implementation. we can't call super because
       # we replaced the whole original method
       return Hash[_user_defined_ivars.map do |ivar|
-        [ivar[1..-1].to_sym, instance_variable_get(ivar)]
+        [ivar[1..].to_sym, instance_variable_get(ivar)]
       end]
     end
     {}
@@ -690,7 +690,7 @@ RSpec.configure do |config|
         # overridden by Attachment anyway; don't re-overwrite it
         next if base.instance_method(method).owner == base
 
-        if method.to_s[-1..-1] == '='
+        if method.to_s[-1..] == '='
           base.class_eval <<-CODE, __FILE__, __LINE__ + 1
           def #{method}(arg)
             self.as(self.class.current_backend).#{method} arg

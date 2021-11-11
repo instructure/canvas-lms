@@ -121,7 +121,7 @@ module CC::Importer::Standard
           return url
         end
       end
-      path = path[1..-1] if path.start_with?('/')
+      path = path[1..] if path.start_with?('/')
       mig_id = nil
       if resource_dir && resource_dir != "."
         mig_id = find_file_migration_id(File.join(resource_dir, path))
@@ -146,7 +146,7 @@ module CC::Importer::Standard
       return unless file[:path_name]
 
       file[:path_name].sub!(WEB_RESOURCES_FOLDER + '/', '')
-      file[:path_name] = file[:path_name][1..-1] if file[:path_name].start_with?('/')
+      file[:path_name] = file[:path_name][1..] if file[:path_name].start_with?('/')
       if @file_path_migration_id[file[:path_name]] && overwrite
         @course[:file_map].delete @file_path_migration_id[file[:path_name]]
       elsif @file_path_migration_id[file[:path_name]]

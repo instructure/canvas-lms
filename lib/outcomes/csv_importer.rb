@@ -139,7 +139,7 @@ module Outcomes
       main_columns_end = row.find_index('ratings') || row.length
       headers = row.slice(0, main_columns_end).map(&:to_sym)
 
-      after_ratings = row[(main_columns_end + 1)..-1] || []
+      after_ratings = row[(main_columns_end + 1)..] || []
       after_ratings = after_ratings.select(&:present?).map(&:to_s)
       raise ParseError, I18n.t("Invalid fields after ratings: %{fields}", fields: after_ratings.inspect) unless after_ratings.empty?
 
@@ -154,7 +154,7 @@ module Outcomes
 
     def import_row(headers, row)
       simple = headers.zip(row).to_h
-      ratings = row[headers.length..-1]
+      ratings = row[headers.length..]
 
       object = simple.to_h
       object[:ratings] = parse_ratings(ratings)

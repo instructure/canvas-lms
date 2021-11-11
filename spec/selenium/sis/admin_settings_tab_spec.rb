@@ -40,7 +40,7 @@ describe "admin settings tab" do
   def set_checkbox_via_label(id, checked)
     # Use this method for checkboxes that are hidden by their label (ic-Checkbox)
     checkbox = f(id)
-    label = f("label[for=\"#{id[1..-1]}\"]")
+    label = f("label[for=\"#{id[1..]}\"]")
     label.click if is_checked(checkbox) != checked
   end
 

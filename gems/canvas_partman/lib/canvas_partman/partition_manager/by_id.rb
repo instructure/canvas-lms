@@ -66,7 +66,7 @@ module CanvasPartman
         current = if partitions.empty?
                     -1
                   else
-                    partitions.last[base_class.table_name.length + 1..-1].to_i
+                    partitions.last[base_class.table_name.length + 1..].to_i
                   end
 
         if self.partition_on_primary_key?
@@ -96,7 +96,7 @@ module CanvasPartman
       end
 
       def partition_tables
-        super.sort_by { |t| t[base_class.table_name.length + 1..-1].to_i }
+        super.sort_by { |t| t[base_class.table_name.length + 1..].to_i }
       end
 
       protected

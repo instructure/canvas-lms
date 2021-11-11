@@ -447,7 +447,7 @@ class Pseudonym < ActiveRecord::Base
 
     decoded = Base64.decode64(self.sis_ssha.sub(/\A\{SSHA\}/, ""))
     digest = decoded[0, 40]
-    salt = decoded[40..-1]
+    salt = decoded[40..]
     return false unless digest && salt
 
     digested_password = Digest::SHA1.digest(plaintext_password + salt).unpack('H*').first

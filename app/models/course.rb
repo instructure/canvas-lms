@@ -1126,7 +1126,7 @@ class Course < ActiveRecord::Base
       res = []
       split = self.name.split(/\s/)
       res << split[0]
-      res << split[1..-1].find { |txt| txt.match(/\d/) } rescue nil
+      res << split[1..].find { |txt| txt.match(/\d/) } rescue nil
       self.course_code = res.compact.join(" ")
     end
     @group_weighting_scheme_changed = self.group_weighting_scheme_changed?

@@ -75,7 +75,7 @@ class OutcomeProficiency < ApplicationRecord
       end
     end
     # delete unused ratings
-    outcome_proficiency_ratings[ratings.length..-1].each(&:mark_for_destruction)
+    outcome_proficiency_ratings[ratings.length..].each(&:mark_for_destruction)
   end
 
   def ratings_hash
