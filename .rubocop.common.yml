@@ -66,6 +66,8 @@ Naming/FileName:
 
 Performance/RegexpMatch:
   Severity: error
+Performance/StartWith:
+  Severity: error
 Performance/StringInclude:
   Severity: error
 Performance/StringReplacement:

@@ -1431,7 +1431,7 @@ class CalendarEventsApiController < ApplicationController
     @errors = {}
     user = @observee || @current_user
     # appointment groups show up here in find-appointment mode; give them a free ride
-    ag_count = (params[:context_codes] || []).count { |code| code =~ /\Aappointment_group_/ }
+    ag_count = (params[:context_codes] || []).count { |code| code.start_with?('appointment_group_') }
     context_limit = @domain_root_account.settings[:calendar_contexts_limit] || 10
     codes = (params[:context_codes] || [user.asset_string])[0, context_limit + ag_count]
     # also accept a more compact comma-separated list of appointment group ids

@@ -843,7 +843,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def inline_content?
-    self.content_type.match(/\Atext/) || self.extension == '.html' || self.extension == '.htm' || self.extension == '.swf'
+    self.content_type.start_with?('text') || self.extension == '.html' || self.extension == '.htm' || self.extension == '.swf'
   end
 
   def self.shared_secret
