@@ -21211,7 +21211,7 @@ qunit-parser@~0.2.0:
   resolved "https://registry.yarnpkg.com/qunit-parser/-/qunit-parser-0.2.0.tgz#d80b12a08988ec9ac75e9ee4b2291f4f82cad854"
   integrity sha1-2AsSoImI7JrHXp7ksikfT4LK2FQ=
 
-qunitjs@^1.14.0:
+qunitjs@^1.23.0:
   version "1.23.1"
   resolved "https://registry.yarnpkg.com/qunitjs/-/qunitjs-1.23.1.tgz#1971cf97ac9be01a64d2315508d2e48e6fd4e719"
   integrity sha1-GXHPl6yb4Bpk0jFVCNLkjm/U5xk=
