@@ -170,7 +170,7 @@ module CC::Importer::Standard
               if val =~ FILEBASE_REGEX
                 val.gsub!(FILEBASE_REGEX, '')
                 if (new_url = get_canvas_att_replacement_url(val, resource_dir))
-                  node[attr] = URI::escape(new_url)
+                  node[attr] = URI.escape(new_url)
 
                   if node.text.strip.blank? && !node.at_css("img") # add in the filename if the link is blank and doesn't have something visible like an image
                     node.inner_html = HtmlTextHelper.escape_html(File.basename(val)) + (node.inner_html || "")
@@ -179,7 +179,7 @@ module CC::Importer::Standard
               else
                 if ImportedHtmlConverter.relative_url?(val)
                   if (new_url = get_canvas_att_replacement_url(val))
-                    node[attr] = URI::escape(new_url)
+                    node[attr] = URI.escape(new_url)
                   end
                 end
               end

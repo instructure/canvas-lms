@@ -58,7 +58,7 @@ describe "Migration package importers" do
     supported.each_pair do |key, val|
       it "finds converter for #{key}" do
         settings = get_settings(val.first)
-        expect(Canvas::Migration::Worker::get_converter(settings)).to eq val.last
+        expect(Canvas::Migration::Worker.get_converter(settings)).to eq val.last
       end
     end
 

@@ -128,7 +128,7 @@ module Canvas::Migration
     end
 
     def make_export_dir
-      FileUtils::mkdir_p @base_export_dir
+      FileUtils.mkdir_p @base_export_dir
     end
 
     # Does a JSON export of the courses

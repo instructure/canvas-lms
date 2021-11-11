@@ -1222,7 +1222,7 @@ describe ExternalToolsController do
       get 'resource_selection', params: { :course_id => @course.id, :external_tool_id => tool.id, :editor_button => '1', :selection => html }
       expect(response).to be_successful
       expect(assigns[:tool]).to eq tool
-      expect(assigns[:lti_launch].params['text']).to eq CGI::escape(html)
+      expect(assigns[:lti_launch].params['text']).to eq CGI.escape(html)
     end
 
     it "finds account-level tools" do

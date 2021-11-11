@@ -73,7 +73,7 @@ module Stats
     alias_method :variance, :var
 
     # population standard deviation
-    def stddev; @items.empty? ? nil : Math::sqrt(variance); end
+    def stddev; @items.empty? ? nil : Math.sqrt(variance); end
     alias_method :standard_deviation, :stddev
 
     def quartiles

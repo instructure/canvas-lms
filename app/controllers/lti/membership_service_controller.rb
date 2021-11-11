@@ -41,7 +41,7 @@ module Lti
       elsif lti_tool_access_enabled?
         req = OAuth::RequestProxy.proxy(request)
         consumer_key, timestamp, nonce = req.oauth_consumer_key, req.oauth_timestamp, req.oauth_nonce
-        return head :unauthorized unless Security::check_and_store_nonce("lti_nonce_#{consumer_key}_#{nonce}", timestamp, 10.minutes)
+        return head :unauthorized unless Security.check_and_store_nonce("lti_nonce_#{consumer_key}_#{nonce}", timestamp, 10.minutes)
 
         tool = ContextExternalTool.find_active_external_tool_by_consumer_key(consumer_key, @context.is_a?(Course) ? @context : @context.context)
         head :unauthorized unless tool && tool.allow_membership_service_access && OAuth::Signature.verify(request, consumer_secret: tool.shared_secret)

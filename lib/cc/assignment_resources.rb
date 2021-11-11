@@ -52,7 +52,7 @@ module CC
       migration_id = create_key(assignment)
 
       lo_folder = File.join(@export_dir, migration_id)
-      FileUtils::mkdir_p lo_folder
+      FileUtils.mkdir_p lo_folder
 
       file_name = "#{assignment.title.to_url}.html"
       path = File.join(lo_folder, file_name)
@@ -186,14 +186,14 @@ module CC
     def self.create_canvas_assignment(node, assignment, manifest = nil)
       key_generator = manifest || CCHelper
       node.title assignment.title
-      node.due_at CCHelper::ims_datetime(assignment.due_at, nil)
-      node.lock_at CCHelper::ims_datetime(assignment.lock_at, nil)
-      node.unlock_at CCHelper::ims_datetime(assignment.unlock_at, nil)
+      node.due_at CCHelper.ims_datetime(assignment.due_at, nil)
+      node.lock_at CCHelper.ims_datetime(assignment.lock_at, nil)
+      node.unlock_at CCHelper.ims_datetime(assignment.unlock_at, nil)
       if manifest && manifest.try(:user).present?
         node.module_locked assignment.locked_by_module_item?(manifest.user, deep_check_if_needed: true).present?
       end
-      node.all_day_date CCHelper::ims_date(assignment.all_day_date) if assignment.all_day_date
-      node.peer_reviews_due_at CCHelper::ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at
+      node.all_day_date CCHelper.ims_date(assignment.all_day_date) if assignment.all_day_date
+      node.peer_reviews_due_at CCHelper.ims_datetime(assignment.peer_reviews_due_at) if assignment.peer_reviews_due_at
       node.assignment_group_identifierref key_generator.create_key(assignment.assignment_group) if assignment.assignment_group && (!manifest || manifest.export_object?(assignment.assignment_group))
       if assignment.grading_standard
         if assignment.grading_standard.context == assignment.context

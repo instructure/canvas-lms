@@ -33,7 +33,7 @@ module Qti
     attr_reader :package_root, :identifier, :href, :interaction_type, :title, :question
 
     def initialize(opts)
-      @log = Canvas::Migration::logger
+      @log = Canvas::Migration.logger
       reset_local_ids
       @manifest_node = opts[:manifest_node]
       @migration_type = opts[:interaction_type]

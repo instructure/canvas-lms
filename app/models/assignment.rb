@@ -1348,7 +1348,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def time_zone_edited
-    CGI::unescapeHTML(read_attribute(:time_zone_edited) || "")
+    CGI.unescapeHTML(read_attribute(:time_zone_edited) || "")
   end
 
   def restore(from = nil)

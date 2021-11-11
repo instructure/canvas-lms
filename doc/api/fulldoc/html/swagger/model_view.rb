@@ -36,7 +36,7 @@ class ModelView < HashView
 
   def self.new_from_model(model)
     lines = model.text.lines.to_a
-    json = JSON::parse(lines[1..-1].join)
+    json = JSON.parse(lines[1..-1].join)
 
     new(
       lines[0].strip,

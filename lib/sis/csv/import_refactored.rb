@@ -94,7 +94,7 @@ module SIS
             if File.extname(file).downcase == '.zip'
               tmp_dir = Dir.mktmpdir
               @tmp_dirs << tmp_dir
-              CanvasUnzip::extract_archive(file, tmp_dir)
+              CanvasUnzip.extract_archive(file, tmp_dir)
               Dir[File.join(tmp_dir, "**/**")].each do |fn|
                 next if File.directory?(fn) || !!(fn =~ IGNORE_FILES)
 

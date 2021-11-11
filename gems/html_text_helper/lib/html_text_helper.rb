@@ -313,14 +313,14 @@ module HtmlTextHelper
   end
 
   def self.escape_html(text)
-    CGI::escapeHTML text
+    CGI.escapeHTML text
   end
 
   def self.unescape_html(text)
-    CGI::unescapeHTML text
+    CGI.unescapeHTML text
   end
 
   def self.strip_and_truncate(text, options = {})
-    CanvasTextHelper::truncate_text(strip_tags(text), options)
+    CanvasTextHelper.truncate_text(strip_tags(text), options)
   end
 end

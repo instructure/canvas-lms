@@ -422,7 +422,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def time_zone_edited
-    CGI::unescapeHTML(read_attribute(:time_zone_edited) || "")
+    CGI.unescapeHTML(read_attribute(:time_zone_edited) || "")
   end
 
   has_a_broadcast_policy

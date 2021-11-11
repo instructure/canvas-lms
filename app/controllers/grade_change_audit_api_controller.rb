@@ -252,7 +252,7 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def query
-    unless Auditors::read_from_postgres?
+    unless Auditors.read_from_postgres?
       return render json: { message: "Advanced query is unsupported on this instance" }, status: :not_implemented
     end
 
