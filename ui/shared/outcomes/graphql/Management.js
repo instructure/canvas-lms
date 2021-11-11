@@ -108,6 +108,13 @@ export const FIND_GROUP_OUTCOMES = gql`
                   targetContextType: $outcomesContextType
                   targetContextId: $outcomesContextId
                 ) @include(if: $outcomeIsImported)
+                friendlyDescription(
+                  contextId: $outcomesContextId
+                  contextType: $outcomesContextType
+                ) {
+                  _id
+                  description
+                }
               }
             }
           }

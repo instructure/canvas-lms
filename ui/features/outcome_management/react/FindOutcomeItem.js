@@ -47,7 +47,8 @@ const FindOutcomeItem = ({
   importOutcomeStatus,
   sourceContextId,
   sourceContextType,
-  importOutcomeHandler
+  importOutcomeHandler,
+  friendlyDescription
 }) => {
   const [truncated, setTruncated] = useState(true)
   const onClickHandler = () => description && setTruncated(prevState => !prevState)
@@ -156,9 +157,13 @@ const FindOutcomeItem = ({
             )}
             {isMobileView && checkbox}
           </div>
-          {description && (
+          {(description || friendlyDescription) && (
             <div style={{paddingBottom: '0.75rem'}}>
-              <OutcomeDescription description={description} truncated={truncated} />
+              <OutcomeDescription
+                description={description}
+                truncated={truncated}
+                friendlyDescription={friendlyDescription}
+              />
             </div>
           )}
         </Flex.Item>
@@ -172,6 +177,7 @@ FindOutcomeItem.propTypes = {
   id: PropTypes.string.isRequired,
   title: PropTypes.string,
   description: PropTypes.string,
+  friendlyDescription: PropTypes.string,
   isImported: PropTypes.bool.isRequired,
   importGroupStatus: PropTypes.string.isRequired,
   importOutcomeStatus: PropTypes.string,
