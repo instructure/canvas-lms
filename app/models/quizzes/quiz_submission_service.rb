@@ -165,7 +165,7 @@ class Quizzes::QuizSubmissionService
       reject! 'you are not allowed to update scores for this quiz submission', 403
     end
 
-    if !attempt
+    unless attempt
       reject! 'invalid attempt', 400
     end
 

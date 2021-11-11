@@ -831,7 +831,7 @@ class GradebooksController < ApplicationController
   end
 
   def speed_grader
-    if !@context.allows_speed_grader?
+    unless @context.allows_speed_grader?
       flash[:notice] = t(:speed_grader_disabled, 'SpeedGrader is disabled for this course')
       return redirect_to(course_gradebook_path(@context))
     end

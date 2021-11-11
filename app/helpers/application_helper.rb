@@ -832,7 +832,7 @@ module ApplicationHelper
     # for finding which values to show in the theme editor
     return @brand_account if opts[:ignore_parents]
 
-    if !@brand_account
+    unless @brand_account
       if @current_user.present?
         # If we're not viewing a `context` with an account, like if we're on the dashboard or my
         # user profile, show the branding for the lowest account where all my enrollments are. eg:
@@ -955,7 +955,7 @@ module ApplicationHelper
   # date format to screenreader users across the app
   # when telling them how to fill in a datetime field
   def accessible_date_format(format = 'datetime')
-    if !ACCEPTABLE_FORMAT_TYPES.include?(format)
+    unless ACCEPTABLE_FORMAT_TYPES.include?(format)
       raise ArgumentError, "format must be one of #{ACCEPTABLE_FORMAT_TYPES.join(',')}"
     end
 

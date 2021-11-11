@@ -66,7 +66,7 @@ module Importers
           outcome = nil if outcome.short_description != hash[:title]
         end
 
-        if !outcome
+        unless outcome
           migration.add_warning(t(:no_context_found, %{The external Learning Outcome couldn't be found for "%{title}", creating a copy.}, :title => hash[:title]))
         end
       end

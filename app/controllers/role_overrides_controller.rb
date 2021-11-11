@@ -396,7 +396,7 @@ class RoleOverridesController < ApplicationController
     role.base_role_type = base_role_type
     role.workflow_state = 'active'
     role.deleted_at = nil
-    if !role.save
+    unless role.save
       if api_request?
         render :json => role.errors, :status => :bad_request
       else

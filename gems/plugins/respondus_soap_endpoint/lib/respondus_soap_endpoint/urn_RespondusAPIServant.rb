@@ -98,7 +98,7 @@ module RespondusSoapEndpoint
 
     def load_user_with_oauth(token)
       token = AccessToken.authenticate(token)
-      if !token.try(:user)
+      unless token.try(:user)
         raise(BadAuthError)
       end
 
@@ -561,7 +561,7 @@ Implemented for: Canvas LMS}]
       }
 
       if item
-        if !item.clear_for_replacement
+        unless item.clear_for_replacement
           raise CantReplaceError
         end
 

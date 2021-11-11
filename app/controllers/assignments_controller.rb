@@ -173,7 +173,7 @@ class AssignmentsController < ApplicationController
   end
 
   def show
-    if !request.format.html?
+    unless request.format.html?
       return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
     end
 
@@ -512,7 +512,7 @@ class AssignmentsController < ApplicationController
   def peer_reviews
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
-      if !@assignment.has_peer_reviews?
+      unless @assignment.has_peer_reviews?
         redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
         return
       end

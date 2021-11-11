@@ -244,7 +244,7 @@ class SubmissionsController < SubmissionsBaseController
 
     return unless verify_api_call_has_attachment if api_request?
 
-    if !api_request?
+    unless api_request?
       if online_upload?
         return unless extensions_allowed?
         return unless has_file_attached?

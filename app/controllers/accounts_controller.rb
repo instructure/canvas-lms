@@ -1241,7 +1241,7 @@ class AccountsController < ApplicationController
   # => Add/Change Quota
   # = Restoring Content
   def admin_tools
-    if !@account.can_see_admin_tools_tab?(@current_user)
+    unless @account.can_see_admin_tools_tab?(@current_user)
       return render_unauthorized_action
     end
 

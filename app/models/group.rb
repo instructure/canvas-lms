@@ -337,7 +337,7 @@ class Group < ActiveRecord::Base
 
   # this method is idempotent
   def add_user(user, new_record_state = nil, moderator = nil)
-    return nil if !user
+    return nil unless user
 
     attrs = { :user => user, :moderator => !!moderator }
     new_record_state ||= case self.join_level

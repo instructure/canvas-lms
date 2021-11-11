@@ -290,12 +290,12 @@ module HtmlTextHelper
       if /^(&gt;|>)/.match?(line)
         quote_block << line
       else
-        processed_lines << quote_clump(quote_block) if !quote_block.empty?
+        processed_lines << quote_clump(quote_block) unless quote_block.empty?
         quote_block = []
         processed_lines << line
       end
     end
-    processed_lines << quote_clump(quote_block) if !quote_block.empty?
+    processed_lines << quote_clump(quote_block) unless quote_block.empty?
     message = processed_lines.join("\n")
     links.unshift opts[:url] if opts[:url]
     links.unshift message.html_safe

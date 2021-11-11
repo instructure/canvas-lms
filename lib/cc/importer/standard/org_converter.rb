@@ -32,7 +32,7 @@ module CC::Importer::Standard
         if item_node['identifierref']
           # item points to a single item
           if (item = process_item(item_node, 0))
-            if !misc_module
+            unless misc_module
               misc_module = { :title => "Misc Module", :migration_id => "misc_module_top_level_items", :items => [] }
               modules << misc_module
             end

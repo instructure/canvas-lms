@@ -55,7 +55,7 @@ module Api
         when 'default'
           @domain_root_account.default_enrollment_term
         when 'current'
-          if !current_term
+          unless current_term
             current_terms = @domain_root_account
                             .enrollment_terms
                             .active

@@ -110,7 +110,7 @@ module QuizzesHelper
   end
 
   def render_show_correct_answers(quiz)
-    if !quiz.show_correct_answers
+    unless quiz.show_correct_answers
       return I18n.t('No')
     end
 

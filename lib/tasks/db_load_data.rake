@@ -193,10 +193,10 @@ namespace :db do
     if (ENV['CANVAS_LMS_ACCOUNT_NAME'] || "").empty?
       require 'highline/import'
 
-      if !Rails.env.test?
+      unless Rails.env.test?
         while true do
           name = ask("What do you want users to see as the account name? This should probably be the name of your organization. > ") { |q| q.echo = obfuscate_input_or_echo }
-          break if !telemetry_enabled?
+          break unless telemetry_enabled?
 
           name_confirm = ask("Please confirm > ") { |q| q.echo = obfuscate_input_or_echo }
           break if name == name_confirm

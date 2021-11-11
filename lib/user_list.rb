@@ -212,7 +212,7 @@ class UserList
           address[:shard] = Shard.current
         end
       end
-    end if !@addresses.empty?
+    end unless @addresses.empty?
 
     # Search for matching emails (only if not open registration; otherwise there's no point - we just
     # create temporary users)

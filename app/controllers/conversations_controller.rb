@@ -1050,7 +1050,7 @@ class ConversationsController < ApplicationController
       content += "#{ERB::Util.h(audience_names[0...participant_list_cutoff].join(", "))} #{ERB::Util.h(others_string)}"
     end
 
-    if !audience_context_names.empty?
+    unless audience_context_names.empty?
       content += " (#{ERB::Util.h(audience_context_names.to_sentence)})"
     end
     content += "</div>"
@@ -1069,7 +1069,7 @@ class ConversationsController < ApplicationController
 
   def infer_scope
     filter_mode = (params[:filter_mode].respond_to?(:to_sym) && params[:filter_mode].to_sym) || :or
-    return render_error('filter_mode', 'invalid') if ![:or, :and].include?(filter_mode)
+    return render_error('filter_mode', 'invalid') unless [:or, :and].include?(filter_mode)
 
     @conversations_scope = case params[:scope]
                            when 'unread'

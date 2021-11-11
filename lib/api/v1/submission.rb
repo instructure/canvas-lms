@@ -320,7 +320,7 @@ module Api::V1::Submission
       end
     end
 
-    if !attachment
+    unless attachment
       attachment = assignment.attachments.build(:display_name => 'submissions.zip')
       attachment.workflow_state = 'to_be_zipped'
       attachment.file_state = '0'

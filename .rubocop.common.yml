@@ -147,6 +147,8 @@ Style/FrozenStringLiteralComment:
 Style/IfUnlessModifier:
   # see also https://github.com/rubocop/rubocop/discussions/10048
   Enabled: false # can obscure important decisions or put too much code in a line
+Style/NegatedIf:
+  Severity: error
 Style/NumericPredicate:
   Enabled: false # `> 0` can be easier to read than `.positive?`
 Style/ParenthesesAroundCondition:

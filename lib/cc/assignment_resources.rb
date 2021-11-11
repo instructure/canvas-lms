@@ -28,7 +28,7 @@ module CC
 
         title = assignment.title || I18n.t('course_exports.unknown_titles.assignment', "Unknown assignment")
 
-        if !assignment.can_copy?(@user)
+        unless assignment.can_copy?(@user)
           add_error(I18n.t('course_exports.errors.assignment_is_locked', "The assignment \"%{title}\" could not be copied because it is locked.", :title => title))
           next
         end

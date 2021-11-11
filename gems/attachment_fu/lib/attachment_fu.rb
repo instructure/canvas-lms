@@ -355,7 +355,7 @@ module AttachmentFu # :nodoc:
         # We first remove any root references for this file, and then we generate
         # a new unique filename for this file so anybody children of this attachment
         # will still be able to get at the original.
-        if !self.new_record?
+        unless self.new_record?
           self.root_attachment = nil
           self.root_attachment_id = nil
           self.workflow_state = nil
@@ -421,7 +421,7 @@ module AttachmentFu # :nodoc:
         res = nil
         res ||= File.mime_type?(file_data.original_filename) if file_data.respond_to?(:original_filename)
         res ||= File.mime_type?(file_data)
-        res ||= "text/plain" if !file_data.respond_to?(:path)
+        res ||= "text/plain" unless file_data.respond_to?(:path)
         res || 'unknown/unknown'
       elsif file_data.respond_to?(:content_type)
         return file_data.content_type

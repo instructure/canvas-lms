@@ -313,7 +313,7 @@ class Collaboration < ActiveRecord::Base
       # need to get everyone added to the document, cause we're going to re-add them all
       users_to_remove = collaborators.where("user_id IS NOT NULL").pluck(:user_id)
       group_ids = collaborators.where("group_id IS NOT NULL").pluck(:group_id)
-      if !group_ids.empty?
+      unless group_ids.empty?
         users_to_remove += GroupMembership.where(group_id: group_ids).distinct.pluck(:user_id)
         users_to_remove.uniq!
       end

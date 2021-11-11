@@ -121,7 +121,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def set_defaults
     self.cant_go_back = false unless self.one_question_at_a_time
-    if !self.show_correct_answers
+    unless self.show_correct_answers
       self.show_correct_answers_last_attempt = false
       self.show_correct_answers_at = nil
       self.hide_correct_answers_at = nil
@@ -144,7 +144,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       self.assignment_id = nil
     end
 
-    if !self.require_lockdown_browser
+    unless self.require_lockdown_browser
       self.require_lockdown_browser_for_results = false
     end
 
@@ -768,7 +768,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     if opts[:persist] != false
       self.quiz_data = data
 
-      if !self.survey?
+      unless self.survey?
         possible = self.class.count_points_possible(data)
         self.points_possible = [possible, 0].max
       end
@@ -908,7 +908,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     needs_review = true if [old_version.points_possible, self.points_possible].select(&:present?).count == 1 ||
                            ((old_version.points_possible || 0) - (self.points_possible || 0)).abs > 0.0001
     needs_review = true if (old_version.quiz_data || []).length != (self.quiz_data || []).length
-    if !needs_review
+    unless needs_review
       new_data = self.quiz_data
       old_data = old_version.quiz_data
       new_data.each_with_index do |q, i|

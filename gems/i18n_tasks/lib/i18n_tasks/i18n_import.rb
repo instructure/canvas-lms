@@ -162,7 +162,7 @@ module I18nTasks
       stack = []
       result = []
       parts.each do |part|
-        next if !part&.match?(pattern)
+        next unless part&.match?(pattern)
 
         if stack.last == part
           result << "#{part}-wrap"

@@ -578,7 +578,7 @@ class OutcomeResultsController < ApplicationController
   end
 
   def outcome_group_prefix(group)
-    if !group.parent_outcome_group
+    unless group.parent_outcome_group
       return []
     end
 

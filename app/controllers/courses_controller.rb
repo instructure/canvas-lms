@@ -2051,7 +2051,7 @@ class CoursesController < ApplicationController
           scope = Course
         end
 
-        if !includes.member?("all_courses")
+        unless includes.member?("all_courses")
           scope = scope.not_deleted
         end
         @context = @course = api_find(scope, params[:id])

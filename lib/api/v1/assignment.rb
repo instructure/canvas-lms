@@ -162,7 +162,7 @@ module Api::V1::Assignment
       hash['overrides'] = assignment_overrides_json(assignment.assignment_overrides.select(&:active?), user)
     end
 
-    if !assignment.user_submitted.nil?
+    unless assignment.user_submitted.nil?
       hash['user_submitted'] = assignment.user_submitted
     end
 
@@ -727,12 +727,12 @@ module Api::V1::Assignment
       update_params['time_zone_edited'] = Time.zone.name
     end
 
-    if !assignment.context.try(:turnitin_enabled?)
+    unless assignment.context.try(:turnitin_enabled?)
       update_params.delete("turnitin_enabled")
       update_params.delete("turnitin_settings")
     end
 
-    if !assignment.context.try(:vericite_enabled?)
+    unless assignment.context.try(:vericite_enabled?)
       update_params.delete("vericite_enabled")
       update_params.delete("vericite_settings")
     end

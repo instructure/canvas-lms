@@ -526,7 +526,7 @@ module AccountReports
       row << e.course_section_sis_id
       row << e.enroll_state
       row << e.associated_user_id unless @sis_format
-      if !e.associated_user_id.nil?
+      unless e.associated_user_id.nil?
         p2 = loaded_pseudonym(pseudonyms,
                               users_by_id[e.associated_user_id],
                               include_deleted: @include_deleted)

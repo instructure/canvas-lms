@@ -96,7 +96,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
         stats[:submission_logged_out_users] << temp_user
         temp_users[sub.temporary_user_code] = temp_user
       end
-      if !found_ids[sub.id]
+      unless found_ids[sub.id]
         percentile = (sub.score.to_f / quiz_points * 100).round
         stats[:unique_submission_count] += 1
         stats[:submission_scores][percentile] += 1
@@ -216,7 +216,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
         quiz_data.each do |question|
           next if question['entry_type'] == 'quiz_group'
 
-          if !found_question_ids[question[:id]]
+          unless found_question_ids[question[:id]]
             columns << "#{question[:id]}: #{strip_tags(question[:question_text])}"
             columns << question[:points_possible]
             found_question_ids[question[:id]] = true

@@ -935,7 +935,7 @@ class Submission < ActiveRecord::Base
         check_vericite_status(0)
       end
     end
-    if !self.vericite_data_hash.empty?
+    unless self.vericite_data_hash.empty?
       # only set vericite provider flag if the hash isn't empty
       self.vericite_data_hash[:provider] = :vericite
     end
@@ -951,7 +951,7 @@ class Submission < ActiveRecord::Base
   def vericite_recheck_score(data)
     update_scores = false
     # only recheck scores if an old score exists
-    if !data[:similarity_score_time].blank?
+    unless data[:similarity_score_time].blank?
       now = Time.now.to_i
       score_age = Time.now.to_i - data[:similarity_score_time]
       score_cache_time = 1200 # by default cache scores for 20 mins
@@ -964,7 +964,7 @@ class Submission < ActiveRecord::Base
       if score_age > score_cache_time
         # check if we just recently requested this score
         last_checked = 1000 # default to a high number so that if it is not set, it won't effect the outcome
-        if !data[:similarity_score_check_time].blank?
+        unless data[:similarity_score_check_time].blank?
           last_checked = now - data[:similarity_score_check_time]
         end
         # only update if we didn't just ask VeriCite for the scores 20 seconds again (this is in the case of an error, we don't want to keep asking immediately)
@@ -1091,7 +1091,7 @@ class Submission < ActiveRecord::Base
       self.vericite_data_hash[:assignment_error] = assignment_error if assignment_error.present?
       # self.vericite_data_hash[:student_error] = vericite_enrollment.error_hash if vericite_enrollment.error?
       self.vericite_data_changed!
-      if !self.vericite_data_hash.empty?
+      unless self.vericite_data_hash.empty?
         # only set vericite provider flag if the hash isn't empty
         self.vericite_data_hash[:provider] = :vericite
       end
@@ -1118,7 +1118,7 @@ class Submission < ActiveRecord::Base
     # only save if there were newly submitted attachments
     if update
       delay(run_at: 5.minutes.from_now, **VERICITE_JOB_OPTS).check_vericite_status
-      if !self.vericite_data_hash.empty?
+      unless self.vericite_data_hash.empty?
         # only set vericite provider flag if the hash isn't empty
         self.vericite_data_hash[:provider] = :vericite
       end
@@ -1186,7 +1186,7 @@ class Submission < ActiveRecord::Base
 
   def resubmit_to_vericite
     reset_vericite_assets
-    if !self.vericite_data_hash.empty?
+    unless self.vericite_data_hash.empty?
       # only set vericite provider flag if the hash isn't empty
       self.vericite_data_hash[:provider] = :vericite
     end
@@ -1317,7 +1317,7 @@ class Submission < ActiveRecord::Base
   # submitted_at is needed by the SpeedGrader, so it is set to the updated_at value
   def submitted_at
     if submission_type
-      if not read_attribute(:submitted_at)
+      unless read_attribute(:submitted_at)
         write_attribute(:submitted_at, read_attribute(:updated_at))
       end
       read_attribute(:submitted_at).in_time_zone rescue nil
@@ -1458,7 +1458,7 @@ class Submission < ActiveRecord::Base
         score.to_s
     end
 
-    self.grade = nil if !self.score
+    self.grade = nil unless self.score
     # I think the idea of having unpublished scores is unnecessarily confusing.
     # It may be that we want to have that functionality later on, but for now
     # I say it's just confusing.

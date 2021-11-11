@@ -123,7 +123,7 @@ class AssessmentQuestion < ActiveRecord::Base
     path = match_data[2]
     id_or_path = id || path
 
-    if !file_substitutions[id_or_path]
+    unless file_substitutions[id_or_path]
       if id
         file = Attachment.where(context_type: context_type, context_id: context_id, id: id_or_path).first
       elsif path

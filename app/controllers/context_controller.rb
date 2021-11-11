@@ -233,7 +233,7 @@ class ContextController < ApplicationController
       end
 
       @user = @membership.user rescue nil
-      if !@user
+      unless @user
         if @context.is_a?(Course)
           flash[:error] = t('no_user.course', "That user does not exist or is not currently a member of this course")
         elsif @context.is_a?(Group)
