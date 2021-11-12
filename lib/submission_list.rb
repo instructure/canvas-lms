@@ -298,7 +298,7 @@ class SubmissionList
   # A list of all versions in YAML format
   def yaml_list
     @yaml_list ||= self.course.submissions.not_placeholder.preload(:versions).map do |s|
-      s.versions.map { |v| v.yaml }
+      s.versions.map(&:yaml)
     end.flatten
   end
 

@@ -228,7 +228,7 @@ describe DiscussionEntry do
       [teacher, student1, quitter, outsider].each { |user| topic.subscribe(user) }
 
       topic.discussion_entries.create!(:user => quitter, :message => "Hi, I'm going to drop this class")
-      quitter.enrollments.each { |e| e.destroy }
+      quitter.enrollments.each(&:destroy)
 
       topic.discussion_entries.create!(:user => outsider, :message => "Hi I'm a student from another class")
       entry = topic.discussion_entries.create!(:user => student1, :message => "Hi I'm a student")

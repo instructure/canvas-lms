@@ -59,7 +59,7 @@ module Lti
     end
 
     def self.find_all_proxies_for_context(context)
-      account_ids = context.account_chain.map { |a| a.id }
+      account_ids = context.account_chain.map(&:id)
 
       account_sql_string = account_ids.each_with_index.map { |x, i| "('Account',#{x},#{i})" }.unshift("('#{context.class.name}',#{context.id},0)").join(',')
 
@@ -71,7 +71,7 @@ module Lti
     end
 
     def self.proxies_in_order_by_codes(context:, vendor_code:, product_code:, resource_type_code:)
-      account_ids = context.account_chain.map { |a| a.id }
+      account_ids = context.account_chain.map(&:id)
 
       # Added i+1 on this to ensure that the x.ordering later doesn't have 2 0's
       account_sql_string = account_ids.each_with_index.map { |x, i| "('Account',#{x},#{i + 1})" }.unshift("('#{context.class.name}',#{context.id},0)").join(',')

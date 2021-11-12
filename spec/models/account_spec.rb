@@ -1065,7 +1065,7 @@ describe Account do
       @user3.sortable_name = 'richard'
       @user3.save
       users = @account.users_not_in_groups([], order: User.sortable_name_order_by_clause('users'))
-      expect(users.map { |u| u.id }).to eq [@user2.id, @user1.id, @user3.id]
+      expect(users.map(&:id)).to eq [@user2.id, @user1.id, @user3.id]
     end
   end
 

@@ -1098,7 +1098,7 @@ describe "Pages API", type: :request do
       expect(json.size).to eq 1
       urls += json.collect { |page| page['url'] }
 
-      expect(urls).to eq @wiki.wiki_pages.select { |p| p.published? }.sort_by(&:id).collect(&:url)
+      expect(urls).to eq @wiki.wiki_pages.select(&:published?).sort_by(&:id).collect(&:url)
     end
 
     it "refuses to show a hidden page" do

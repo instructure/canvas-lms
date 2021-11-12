@@ -1247,7 +1247,7 @@ describe Quizzes::QuizSubmission do
         first_attempt = attempts.first
         expect(first_attempt).to be_a(Quizzes::QuizSubmissionAttempt)
 
-        expect(attempts.last_versions.map { |version| version.number }).to eq [2, 3]
+        expect(attempts.last_versions.map(&:number)).to eq [2, 3]
       end
     end
 

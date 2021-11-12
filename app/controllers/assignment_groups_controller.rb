@@ -169,7 +169,7 @@ class AssignmentGroupsController < ApplicationController
   def reorder_assignments
     @group = @context.assignment_groups.find(params[:assignment_group_id])
     if authorized_action(@group, @current_user, :update)
-      order = params[:order].split(',').map { |id| id.to_i }
+      order = params[:order].split(',').map(&:to_i)
       group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.where(id: order).distinct.except(:order).pluck(:assignment_group_id)))
       assignments = @context.active_assignments.where(id: order)
 

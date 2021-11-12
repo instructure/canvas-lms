@@ -936,7 +936,7 @@ describe Conversation do
         conversation = Conversation.initiate([@teacher, @student], true)
         conversation.add_message(@teacher, 'first message')
 
-        [@old_course, old_course2].each { |c| c.complete! }
+        [@old_course, old_course2].each(&:complete!)
 
         teacher_course = course_factory
         teacher_course.offer!

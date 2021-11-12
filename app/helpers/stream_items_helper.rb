@@ -38,11 +38,11 @@ module StreamItemsHelper
 
     topic_types = %w{DiscussionTopic Announcement}
     ActiveRecord::Associations::Preloader.new.preload(
-      stream_items.select { |i| topic_types.include?(i.asset_type) }.map { |item| item.data }, :context
+      stream_items.select { |i| topic_types.include?(i.asset_type) }.map(&:data), :context
     )
 
     ActiveRecord::Associations::Preloader.new.preload(
-      stream_items.select { |i| i.asset_type == 'DiscussionEntry' }.map { |item| item.data }, discussion_topic: :context
+      stream_items.select { |i| i.asset_type == 'DiscussionEntry' }.map(&:data), discussion_topic: :context
     )
     topic_types << 'DiscussionEntry'
 

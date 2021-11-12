@@ -297,9 +297,7 @@ module SimplyVersioned
 
     # If the model instance has more versions than the limit specified, delete all excess older versions.
     def clean_old_versions(versions_to_keep)
-      where('number <= ?', self.maximum(:number) - versions_to_keep).each do |version|
-        version.destroy
-      end
+      where('number <= ?', self.maximum(:number) - versions_to_keep).each(&:destroy)
     end
     alias_method :purge, :clean_old_versions
 

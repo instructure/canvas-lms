@@ -413,7 +413,7 @@ class AssignmentOverride < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
     p.to { applies_to_students }
-    p.whenever { |record| record.notify_change? }
+    p.whenever(&:notify_change?)
     p.filter_asset_by_recipient { |record, user|
       # note that our asset for this message is an Assignment, not an AssignmentOverride
       record.assignment.overridden_for(user)
@@ -422,7 +422,7 @@ class AssignmentOverride < ActiveRecord::Base
 
     p.dispatch :assignment_due_date_override_changed
     p.to { applies_to_admins }
-    p.whenever { |record| record.notify_change? }
+    p.whenever(&:notify_change?)
     p.data { course_broadcast_data }
   end
 

@@ -66,7 +66,7 @@ class Quizzes::QuizGroup < ActiveRecord::Base
       "name" => self.name,
       "pick_count" => self.pick_count,
       "question_points" => self.question_points,
-      "questions" => self.assessment_question_bank_id ? [] : self.quiz_questions.active.map { |q| q.data },
+      "questions" => self.assessment_question_bank_id ? [] : self.quiz_questions.active.map(&:data),
       "assessment_question_bank_id" => self.assessment_question_bank_id
     }.with_indifferent_access
   end

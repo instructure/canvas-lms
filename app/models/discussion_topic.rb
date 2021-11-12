@@ -324,7 +324,7 @@ class DiscussionTopic < ActiveRecord::Base
     return if self.deleted?
 
     if !self.assignment_id && @old_assignment_id
-      self.context_module_tags.each { |tag| tag.confirm_valid_module_requirements }
+      self.context_module_tags.each(&:confirm_valid_module_requirements)
     end
     if @old_assignment_id
       Assignment.where(:id => @old_assignment_id, :context_id => self.context_id, :context_type => self.context_type, :submission_types => 'discussion_topic').update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
@@ -1084,9 +1084,7 @@ class DiscussionTopic < ActiveRecord::Base
       self.assignment.destroy unless self.assignment.deleted?
     end
 
-    self.child_topics.each do |child|
-      child.destroy
-    end
+    self.child_topics.each(&:destroy)
   end
 
   def restore(from = nil)
@@ -1587,7 +1585,7 @@ class DiscussionTopic < ActiveRecord::Base
     attachments.each do |attachment|
       attachment.podcast_associated_asset = messages_hash[attachment.id.to_s]
     end
-    media_object_ids -= attachments.map { |a| a.media_entry_id }.compact # don't include media objects if the file is already included
+    media_object_ids -= attachments.map(&:media_entry_id).compact # don't include media objects if the file is already included
 
     media_objects = media_object_ids.empty? ? [] : MediaObject.where(media_id: media_object_ids).to_a
     media_objects = media_objects.uniq(&:media_id)

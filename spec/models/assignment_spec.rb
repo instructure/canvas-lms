@@ -4128,8 +4128,8 @@ describe Assignment do
         res = @a.assign_peer_reviews
         expect(res.length).to eql(@submissions.length)
         @submissions.each do |s|
-          expect(res.map { |a| a.asset }).to be_include(s)
-          expect(res.map { |a| a.assessor_asset }).to be_include(s)
+          expect(res.map(&:asset)).to be_include(s)
+          expect(res.map(&:assessor_asset)).to be_include(s)
         end
       end
     end
@@ -4186,7 +4186,7 @@ describe Assignment do
       @submissions.each do |s|
         assets = res.select { |a| a.asset == s }
         expect(assets.length).to eql(@a.peer_review_count)
-        expect(assets.map { |a| a.assessor_id }.uniq.length).to eql(assets.length)
+        expect(assets.map(&:assessor_id).uniq.length).to eql(assets.length)
 
         assessors = res.select { |a| a.assessor_asset == s }
         expect(assessors.length).to eql(@a.peer_review_count)
@@ -5919,8 +5919,8 @@ describe Assignment do
       expect(res).not_to be_nil
       expect(res).not_to be_empty
       expect(res.length).to eql(2)
-      expect(res.map { |s| s.user }).to be_include(@u1)
-      expect(res.map { |s| s.user }).to be_include(@u2)
+      expect(res.map(&:user)).to be_include(@u1)
+      expect(res.map(&:user)).to be_include(@u2)
     end
 
     it "creates an initial submission comment for only the submitter by default" do
@@ -6176,7 +6176,7 @@ describe Assignment do
       # Course#students until the course has been reloaded
       result = @assignment.reload.group_students(@student1)
       expect(result.first).to eq @group1
-      expect(result.last.map { |u| u.id }.sort).to eq [@student1, @student2].map { |u| u.id }.sort
+      expect(result.last.map(&:id).sort).to eq [@student1, @student2].map(&:id).sort
     end
 
     it "returns distinct users" do

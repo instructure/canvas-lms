@@ -824,7 +824,7 @@ class Submission < ActiveRecord::Base
 
   def turnitin_assets
     if self.submission_type == 'online_upload'
-      self.attachments.select { |a| a.turnitinable? }
+      self.attachments.select(&:turnitinable?)
     elsif self.submission_type == 'online_text_entry'
       [self]
     else
@@ -1046,9 +1046,7 @@ class Submission < ActiveRecord::Base
     if data_changed
       self.vericite_data_changed!
       if recheck_score_all
-        self.with_versioning(false) do |t|
-          t.save!
-        end
+        self.with_versioning(false, &:save!)
       else
         self.save
       end
@@ -1137,7 +1135,7 @@ class Submission < ActiveRecord::Base
 
   def vericite_assets
     if self.submission_type == 'online_upload'
-      self.attachments.select { |a| a.vericiteable? }
+      self.attachments.select(&:vericiteable?)
     elsif self.submission_type == 'online_text_entry'
       [self]
     else
@@ -1936,8 +1934,8 @@ class Submission < ActiveRecord::Base
     # one student from sneakily getting access to files in another user's comments,
     # since they're all being held on the assignment for now.
     attachments ||= []
-    old_ids = (Array(self.attachment_ids || "").join(",")).split(",").map { |id| id.to_i }
-    write_attribute(:attachment_ids, attachments.select { |a| (a && a.id && old_ids.include?(a.id)) || (a.recently_created? && a.context == self.assignment) || a.context != self.assignment }.map { |a| a.id }.join(","))
+    old_ids = (Array(self.attachment_ids || "").join(",")).split(",").map(&:to_i)
+    write_attribute(:attachment_ids, attachments.select { |a| (a && a.id && old_ids.include?(a.id)) || (a.recently_created? && a.context == self.assignment) || a.context != self.assignment }.map(&:id).join(","))
   end
 
   # someday code-archaeologists will wonder how this method came to be named

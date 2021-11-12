@@ -167,7 +167,7 @@ describe Quizzes::QuizGroupsController, type: :request do
                                 { "type" => "question", "id" => @question2.id }] },
                    { 'Accept' => 'application/vnd.api+json' })
 
-      order = @group.reload.quiz_questions.active.sort_by { |q| q.position }.map { |q| q.id }
+      order = @group.reload.quiz_questions.active.sort_by(&:position).map(&:id)
       expect(order).to eq [@question3.id, @question1.id, @question2.id]
     end
   end

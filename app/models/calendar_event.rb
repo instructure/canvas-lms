@@ -717,7 +717,7 @@ class CalendarEvent < ActiveRecord::Base
       end
 
       loc_string = if @event.is_a?(CalendarEvent)
-                     [@event.location_name, @event.location_address].reject { |e| e.blank? }.join(", ")
+                     [@event.location_name, @event.location_address].reject(&:blank?).join(", ")
                    else
                      nil
                    end

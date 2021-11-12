@@ -1867,7 +1867,7 @@ describe UsersController do
 
       teacher_enrollments = assigns[:presenter].teacher_enrollments
       expect(teacher_enrollments).not_to be_nil
-      teachers = teacher_enrollments.map { |e| e.user }
+      teachers = teacher_enrollments.map(&:user)
       expect(teachers).to be_include(@teacher)
       expect(teachers).not_to be_include(@designer)
     end

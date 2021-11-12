@@ -412,7 +412,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     # If the quiz suddenly changes from non-graded to graded,
     # then this will update the existing submissions to reflect quiz
     # scores in the gradebook.
-    self.quiz_submissions.each { |s| s.save! }
+    self.quiz_submissions.each(&:save!)
   end
 
   def update_learning_outcome_results(state)
@@ -441,7 +441,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def update_assignment
     delay_if_production.set_unpublished_question_count if self.id
     if !self.assignment_id && @old_assignment_id
-      self.context_module_tags.preload(:context_module => :content_tags).each { |tag| tag.confirm_valid_module_requirements }
+      self.context_module_tags.preload(:context_module => :content_tags).each(&:confirm_valid_module_requirements)
     end
     if !self.graded? && (@old_assignment_id || self.last_assignment_id)
       ::Assignment.where(
@@ -1418,7 +1418,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     question_regrades = Set.new
     quiz_regrades.where("quiz_regrades.created_at > ? AND quiz_question_regrades.regrade_option != 'disabled'", created_at)
                  .eager_load(:quiz_question_regrades).each do |regrade|
-      ids = regrade.quiz_question_regrades.map { |qqr| qqr.quiz_question_id }
+      ids = regrade.quiz_question_regrades.map(&:quiz_question_id)
       question_regrades.merge(ids)
     end
     question_regrades.count

@@ -288,9 +288,9 @@ describe GroupCategory do
       potential_members = @course.users_not_in_groups(groups)
       memberships = category.distribute_members_among_groups(potential_members, groups)
       student_ids = [student3.id, student4.id, student5.id, student6.id]
-      expect(memberships.map { |m| m.user_id }.sort).to eq student_ids.sort
+      expect(memberships.map(&:user_id).sort).to eq student_ids.sort
 
-      grouped_memberships = memberships.group_by { |m| m.group_id }
+      grouped_memberships = memberships.group_by(&:group_id)
       expect(grouped_memberships[group1.id].size).to eq 1
       expect(grouped_memberships[group2.id].size).to eq 3
     end
@@ -381,7 +381,7 @@ describe GroupCategory do
 
       # student1 shouldn't get assigned, already being in a group
       memberships = @category.assign_unassigned_members
-      expect(memberships.map { |m| m.user }).not_to include(student1)
+      expect(memberships.map(&:user)).not_to include(student1)
     end
 
     it "otherwises assign ungrouped users to groups in the @category" do
@@ -393,7 +393,7 @@ describe GroupCategory do
 
       # student2 should get assigned, not being in a group
       memberships = @category.assign_unassigned_members
-      expect(memberships.map { |m| m.user }).to include(student2)
+      expect(memberships.map(&:user)).to include(student2)
     end
 
     it "handles unequal group sizes" do

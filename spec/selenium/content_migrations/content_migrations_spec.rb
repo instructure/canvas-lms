@@ -683,7 +683,7 @@ describe "content migrations", :non_parallel do
       visit_page
       migration_type_options = ff('#chooseMigrationConverter option')
       migration_type_values = migration_type_options.map { |op| op['value'] }
-      migration_type_texts = migration_type_options.map { |op| op.text }
+      migration_type_texts = migration_type_options.map(&:text)
       expect(migration_type_values).to include(import_tool.asset_string)
       expect(migration_type_texts).to include(import_tool.name)
       expect(migration_type_values).not_to include(other_tool.asset_string)

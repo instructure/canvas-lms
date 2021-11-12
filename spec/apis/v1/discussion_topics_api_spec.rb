@@ -540,9 +540,7 @@ describe DiscussionTopicsController, type: :request do
       it "only includes topics with a given scope when specified" do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
-        [@topic, @topic2, @topic3].each do |topic|
-          topic.save!
-        end
+        [@topic, @topic2, @topic3].each(&:save!)
         [@topic2, @topic3].each(&:lock!)
         @topic2.update_attribute(:pinned, true)
 

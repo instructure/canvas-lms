@@ -1579,7 +1579,7 @@ describe DiscussionTopicsController do
       expect(topic).to be_published
       expect(topic.assignment).to be_published
       expect(@student.email_channel.messages).to be_empty
-      expect(@student.recent_stream_items.map { |item| item.data }).not_to include topic
+      expect(@student.recent_stream_items.map(&:data)).not_to include topic
     end
 
     it 'does dispatch new topic notification when not hidden' do

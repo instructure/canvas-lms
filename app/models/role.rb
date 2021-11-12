@@ -131,11 +131,11 @@ class Role < ActiveRecord::Base
   end
 
   def self.built_in_course_roles(root_account_id:)
-    built_in_roles(root_account_id: root_account_id).select { |role| role.course_role? }
+    built_in_roles(root_account_id: root_account_id).select(&:course_role?)
   end
 
   def self.visible_built_in_roles(root_account_id:)
-    built_in_roles(root_account_id: root_account_id).select { |role| role.visible? }
+    built_in_roles(root_account_id: root_account_id).select(&:visible?)
   end
 
   def self.get_role_by_id(id)

@@ -232,7 +232,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
          quiz_submissions.workflow_state = 'completed'
          AND quiz_submissions.submission_data IS NOT NULL
        )", { time: Time.now }).to_a
-    resp.select! { |qs| qs.needs_grading? }
+    resp.select!(&:needs_grading?)
     resp
   end
 
