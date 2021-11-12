@@ -65,7 +65,10 @@ describe Quizzes::QuizUserFinder do
   end
 
   context "differentiated_assignments" do
-    before { @quiz.only_visible_to_overrides = true; @quiz.save! }
+    before {
+      @quiz.only_visible_to_overrides = true
+      @quiz.save!
+    }
 
     it "(#all_students_with_visibility) filters students if DA is on" do
       expect(@finder.unsubmitted_students).not_to include(@unsubmitted_student)

@@ -834,9 +834,13 @@ RSpec.configure do |config|
       @settings = settings
     end
 
-    def valid_settings?; true; end
+    def valid_settings?
+      true
+    end
 
-    def enabled?; true; end
+    def enabled?
+      true
+    end
 
     def base; end
 

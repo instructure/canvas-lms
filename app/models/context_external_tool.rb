@@ -1092,7 +1092,9 @@ class ContextExternalTool < ActiveRecord::Base
     tools + ContextExternalTool.having_setting(type.to_s).where(context_type: 'Account', context_id: context.account_chain_ids)
   end
 
-  def self.serialization_excludes; [:shared_secret, :settings]; end
+  def self.serialization_excludes
+    [:shared_secret, :settings]
+  end
 
   # sets the custom fields from the main tool settings, and any on individual resource type settings
   def set_custom_fields(resource_type)

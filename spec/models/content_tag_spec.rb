@@ -30,11 +30,17 @@ describe ContentTag do
           @deleted = opts[:deleted]
         end
 
-        def published?; !!@published; end
+        def published?
+          !!@published
+        end
 
-        def unpublished?; !@published; end
+        def unpublished?
+          !@published
+        end
 
-        def deleted?; @deleted; end
+        def deleted?
+          @deleted
+        end
       end
 
       it "returns 'deleted' for deleted assets" do

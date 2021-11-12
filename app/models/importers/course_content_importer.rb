@@ -110,7 +110,8 @@ module Importers
           Attachment.skip_media_object_creation do
             process_migration_files(data, migration)
             migration.update_import_progress(18)
-            Importers::AttachmentImporter.process_migration(data, migration); migration.update_import_progress(20)
+            Importers::AttachmentImporter.process_migration(data, migration)
+            migration.update_import_progress(20)
             mo_attachments = migration.imported_migration_items_by_class(Attachment).find_all { |i| i.media_entry_id.present? }
             begin
               self.import_media_objects(mo_attachments, migration)
@@ -128,29 +129,42 @@ module Importers
 
         migration.update_import_progress(35)
         unless migration.quizzes_next_banks_migration?
-          question_data = Importers::AssessmentQuestionImporter.process_migration(data, migration); migration.update_import_progress(45)
+          question_data = Importers::AssessmentQuestionImporter.process_migration(data, migration)
+          migration.update_import_progress(45)
         end
-        Importers::GroupImporter.process_migration(data, migration); migration.update_import_progress(48)
-        Importers::LearningOutcomeImporter.process_migration(data, migration); migration.update_import_progress(50)
-        Importers::RubricImporter.process_migration(data, migration); migration.update_import_progress(52)
+        Importers::GroupImporter.process_migration(data, migration)
+        migration.update_import_progress(48)
+        Importers::LearningOutcomeImporter.process_migration(data, migration)
+        migration.update_import_progress(50)
+        Importers::RubricImporter.process_migration(data, migration)
+        migration.update_import_progress(52)
         course.assignment_group_no_drop_assignments = {}
-        Importers::AssignmentGroupImporter.process_migration(data, migration); migration.update_import_progress(54)
-        Importers::ExternalFeedImporter.process_migration(data, migration); migration.update_import_progress(56)
-        Importers::GradingStandardImporter.process_migration(data, migration); migration.update_import_progress(58)
-        Importers::ContextExternalToolImporter.process_migration(data, migration); migration.update_import_progress(60)
-        Importers::ToolProfileImporter.process_migration(data, migration); migration.update_import_progress(61)
+        Importers::AssignmentGroupImporter.process_migration(data, migration)
+        migration.update_import_progress(54)
+        Importers::ExternalFeedImporter.process_migration(data, migration)
+        migration.update_import_progress(56)
+        Importers::GradingStandardImporter.process_migration(data, migration)
+        migration.update_import_progress(58)
+        Importers::ContextExternalToolImporter.process_migration(data, migration)
+        migration.update_import_progress(60)
+        Importers::ToolProfileImporter.process_migration(data, migration)
+        migration.update_import_progress(61)
 
         Assignment.suspend_due_date_caching do
-          Importers::QuizImporter.process_migration(data, migration, question_data); migration.update_import_progress(65)
+          Importers::QuizImporter.process_migration(data, migration, question_data)
+          migration.update_import_progress(65)
         end
 
         Assignment.suspend_due_date_caching do
-          Importers::DiscussionTopicImporter.process_migration(data, migration); migration.update_import_progress(70)
+          Importers::DiscussionTopicImporter.process_migration(data, migration)
+          migration.update_import_progress(70)
         end
-        Importers::WikiPageImporter.process_migration(data, migration); migration.update_import_progress(75)
+        Importers::WikiPageImporter.process_migration(data, migration)
+        migration.update_import_progress(75)
 
         Assignment.suspend_due_date_caching do
-          Importers::AssignmentImporter.process_migration(data, migration); migration.update_import_progress(80)
+          Importers::AssignmentImporter.process_migration(data, migration)
+          migration.update_import_progress(80)
         end
 
         module_id = migration.migration_settings[:insert_into_module_id].presence

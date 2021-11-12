@@ -78,7 +78,10 @@ if Qti.migration_executable
         expect(matches.include?(a[:match_id])).to be_truthy
       end
       # compare everything else without the ids
-      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
+      hash[:answers].each { |a|
+        a.delete(:id)
+        a.delete(:match_id)
+      }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq AngelPropExpected::MATCHING
     end
@@ -93,7 +96,10 @@ if Qti.migration_executable
         expect(matches.include?(a[:match_id])).to be_truthy
       end
       # compare everything without the ids
-      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
+      hash[:answers].each { |a|
+        a.delete(:id)
+        a.delete(:match_id)
+      }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq AngelPropExpected::ORDER
     end

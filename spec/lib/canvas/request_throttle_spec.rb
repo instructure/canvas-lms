@@ -33,7 +33,9 @@ describe 'RequestThrottle' do
   let(:rate_limit_exceeded) { throttler.rate_limit_exceeded }
 
   # not a let so that actual and expected aren't the same object that get modified together
-  def response; [200, { 'Content-Type' => 'text/plain' }, ['Hello']]; end
+  def response
+    [200, { 'Content-Type' => 'text/plain' }, ['Hello']]
+  end
 
   after { RequestThrottle.reload! }
 

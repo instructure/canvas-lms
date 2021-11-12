@@ -493,13 +493,17 @@ describe "More Standard Common Cartridge importing" do
     # make all the fake attachments for the module items to link to
     unfiled_folder = Folder.unfiled_folder(@copy_to)
     w1 = Attachment.create!(:filename => 'w1.html', :uploaded_data => StringIO.new('w1'), :folder => unfiled_folder, :context => @copy_to)
-    w1.migration_id = "w1"; w1.save
+    w1.migration_id = "w1"
+    w1.save
     f3 = Attachment.create!(:filename => 'f3.html', :uploaded_data => StringIO.new('f3'), :folder => unfiled_folder, :context => @copy_to)
-    f3.migration_id = "f3"; f3.save
+    f3.migration_id = "f3"
+    f3.save
     f4 = Attachment.create!(:filename => 'f4.html', :uploaded_data => StringIO.new('f4'), :folder => unfiled_folder, :context => @copy_to)
-    f4.migration_id = "f4"; f4.save
+    f4.migration_id = "f4"
+    f4.save
     f5 = Attachment.create!(:filename => 'f5.html', :uploaded_data => StringIO.new('f5'), :folder => unfiled_folder, :context => @copy_to)
-    f5.migration_id = "f5"; f5.save
+    f5.migration_id = "f5"
+    f5.save
 
     # import json into new course
     hash = hash.map { |h| h.with_indifferent_access }

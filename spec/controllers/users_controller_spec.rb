@@ -155,7 +155,10 @@ describe UsersController do
 
       allow(Canvas::Plugin).to receive(:find).and_return(settings_mock)
       allow(SecureRandom).to receive(:hex).and_return('abc123')
-      expect(GoogleDrive::Client).to receive(:auth_uri) { |_c, s| state = s; "http://example.com/redirect" }
+      expect(GoogleDrive::Client).to receive(:auth_uri) { |_c, s|
+                                       state = s
+                                       "http://example.com/redirect"
+                                     }
 
       get :oauth, params: { service: "google_drive", return_to: "http://example.com" }
 
@@ -2435,7 +2438,10 @@ describe UsersController do
 
   describe "#invite_users" do
     it 'does not work without ability to manage students or admins on course' do
-      Account.default.tap { |a| a.settings[:open_registration] = true; a.save! }
+      Account.default.tap { |a|
+        a.settings[:open_registration] = true
+        a.save!
+      }
       course_with_student_logged_in(:active_all => true)
 
       post 'invite_users', params: { :course_id => @course.id }

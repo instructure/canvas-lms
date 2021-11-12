@@ -131,7 +131,9 @@ class Announcement < DiscussionTopic
     can :rate
   end
 
-  def is_announcement; true end
+  def is_announcement
+    true
+  end
 
   def homeroom_announcement?(context)
     context.is_a?(Course) && context.elementary_homeroom_course?

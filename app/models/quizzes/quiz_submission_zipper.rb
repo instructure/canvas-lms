@@ -84,7 +84,8 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
       submission[:attachment_ids]
     end.flatten
     Attachment.where(:id => ids).inject({}) do |hash, attachment|
-      hash[attachment.id] = attachment; hash
+      hash[attachment.id] = attachment
+      hash
     end
   end
 

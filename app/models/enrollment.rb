@@ -1396,7 +1396,9 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def self.serialization_excludes; [:uuid, :computed_final_score, :computed_current_score]; end
+  def self.serialization_excludes
+    [:uuid, :computed_final_score, :computed_current_score]
+  end
 
   # enrollment term per-section is deprecated; a section's term is inherited from the
   # course it is currently tied to

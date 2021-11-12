@@ -3087,7 +3087,9 @@ class Assignment < ActiveRecord::Base
     [due_at || CanvasSort::Last, Canvas::ICU.collation_key(title)]
   end
 
-  def special_class; nil; end
+  def special_class
+    nil
+  end
 
   def submission_action_string
     if submission_types == "online_quiz"

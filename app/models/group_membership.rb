@@ -207,7 +207,9 @@ class GroupMembership < ActiveRecord::Base
   end
   alias_method :active?, :accepted?
 
-  def self.serialization_excludes; [:uuid]; end
+  def self.serialization_excludes
+    [:uuid]
+  end
 
   # true iff 'active' and the pair of user and group's course match one of the
   # provided enrollments

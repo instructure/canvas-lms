@@ -134,7 +134,10 @@ if Qti.migration_executable
       end
 
       # compare everything else without the ids
-      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
+      hash[:answers].each { |a|
+        a.delete(:id)
+        a.delete(:match_id)
+      }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash.except(*keys_to_ignore)).to eq VistaExpected::MATCHING
     end

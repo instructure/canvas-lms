@@ -38,7 +38,8 @@ describe Canvas::ICU do
 
     describe ".collation_key" do
       it "returns something that's comparable" do
-        a = "a"; b = "b"
+        a = "a"
+        b = "b"
         a_prime = Canvas::ICU.collation_key(a)
         expect(a.object_id).not_to eq a_prime.object_id
         b_prime = Canvas::ICU.collation_key(b)

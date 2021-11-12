@@ -128,7 +128,7 @@ describe CalendarEventsApiController, type: :request do
                           :start_at => "2018-09-19T21:00:00Z",
                           :end_at => "2018-09-19T22:00:00Z"
                         }
-                      });
+                      })
       expect(json.first[1]).to eql "cannot create event for deleted course"
     end
 
@@ -1706,11 +1706,17 @@ describe CalendarEventsApiController, type: :request do
 
         @pub1 = @course1.assignments.create(:title => 'published assignment 1')
         @pub2 = @course2.assignments.create(:title => 'published assignment 2')
-        [@pub1, @pub2].each { |a| a.workflow_state = 'published'; a.save! }
+        [@pub1, @pub2].each { |a|
+          a.workflow_state = 'published'
+          a.save!
+        }
 
         @unpub1 = @course1.assignments.create(:title => 'unpublished assignment 1')
         @unpub2 = @course2.assignments.create(:title => 'unpublished assignment 2')
-        [@unpub1, @unpub2].each { |a| a.workflow_state = 'unpublished'; a.save! }
+        [@unpub1, @unpub2].each { |a|
+          a.workflow_state = 'unpublished'
+          a.save!
+        }
       end
 
       context 'for teachers' do
@@ -1788,7 +1794,10 @@ describe CalendarEventsApiController, type: :request do
           @only_vis_to_o, @not_only_vis_to_o = (1..2).map { @course.assignments.create(:title => 'test assig', :workflow_state => 'published', :due_at => '2012-01-07 12:00:00') }
           @only_vis_to_o.only_visible_to_overrides = true
           @only_vis_to_o.save!
-          [@only_vis_to_o, @not_only_vis_to_o].each { |a| a.workflow_state = 'published'; a.save! }
+          [@only_vis_to_o, @not_only_vis_to_o].each { |a|
+            a.workflow_state = 'published'
+            a.save!
+          }
 
           create_section_override_for_assignment(@only_vis_to_o, { course_section: @section })
         end

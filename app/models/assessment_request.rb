@@ -154,7 +154,9 @@ class AssessmentRequest < ActiveRecord::Base
     self.asset.user.name rescue t("#unknown", "Unknown")
   end
 
-  def self.serialization_excludes; [:uuid]; end
+  def self.serialization_excludes
+    [:uuid]
+  end
 
   def update_planner_override
     if saved_change_to_workflow_state? && workflow_state_before_last_save == 'assigned' && workflow_state == 'completed'

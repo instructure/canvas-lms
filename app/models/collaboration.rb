@@ -94,7 +94,9 @@ class Collaboration < ActiveRecord::Base
 
   # These methods should be implemented in child classes.
 
-  def service_name; 'Collaboration'; end
+  def service_name
+    'Collaboration'
+  end
 
   def delete_document; end
 
@@ -114,7 +116,9 @@ class Collaboration < ActiveRecord::Base
     raise NotImplementedError
   end
 
-  def parse_data; nil; end
+  def parse_data
+    nil
+  end
 
   # Public: Find the class of for the given type.
   #
@@ -183,7 +187,9 @@ class Collaboration < ActiveRecord::Base
   # Public: Declare excluded serialization fields.
   #
   # Returns an array.
-  def self.serialization_excludes; [:uuid]; end
+  def self.serialization_excludes
+    [:uuid]
+  end
 
   # Public: Soft-delete this collaboration.
   #

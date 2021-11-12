@@ -719,7 +719,9 @@ class Group < ActiveRecord::Base
     available_tabs
   end
 
-  def self.serialization_excludes; [:uuid]; end
+  def self.serialization_excludes
+    [:uuid]
+  end
 
   def allow_media_comments?
     true

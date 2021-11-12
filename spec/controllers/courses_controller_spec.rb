@@ -594,7 +594,10 @@ describe CoursesController do
       end
 
       it "does not include published course enrollments if account disallows future view and listing" do
-        Account.default.tap { |a| a.settings.merge!(:restrict_student_future_view => true, :restrict_student_future_listing => true); a.save! }
+        Account.default.tap { |a|
+          a.settings.merge!(:restrict_student_future_view => true, :restrict_student_future_listing => true)
+          a.save!
+        }
 
         course1 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true, workflow_state: 'available'
         enrollment1 = course_with_student course: course1
@@ -609,7 +612,10 @@ describe CoursesController do
 
       it "does not include unpublished course enrollments if account disallows future listing" do
         # even if it _would_ be accessible if it were published
-        Account.default.tap { |a| a.settings.merge!(:restrict_student_future_view => true, :restrict_student_future_listing => true); a.save! }
+        Account.default.tap { |a|
+          a.settings.merge!(:restrict_student_future_view => true, :restrict_student_future_listing => true)
+          a.save!
+        }
 
         course1 = Account.default.courses.create! start_at: 1.month.from_now, restrict_enrollments_to_course_dates: true
         course1.restrict_student_future_view = false
