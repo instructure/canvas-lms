@@ -40,7 +40,7 @@ class NotificationEndpoint < ActiveRecord::Base
 
   private
 
-  DIFFERENT_ATTRIBUTES_ERROR_REGEX = %r{^Invalid parameter: Token Reason: Endpoint (.*) already exists with the same Token, but different attributes.$}
+  DIFFERENT_ATTRIBUTES_ERROR_REGEX = %r{^Invalid parameter: Token Reason: Endpoint (.*) already exists with the same Token, but different attributes.$}.freeze
 
   def sns_client
     DeveloperKey.sns

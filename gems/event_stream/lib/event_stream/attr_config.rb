@@ -28,7 +28,7 @@ module EventStream::AttrConfig
 
                 raise(ArgumentError, "Expected attribute #{name} to be a Proc: #{value.class}")
               }
-    }
+    }.freeze
 
     def attr_config_defaults
       @attr_config_defaults ||= {}

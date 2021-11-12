@@ -303,7 +303,7 @@ class AccountsController < ApplicationController
   include CustomSidebarLinksHelper
   include SupportHelpers::ControllerHelpers
 
-  INTEGER_REGEX = /\A[+-]?\d+\z/
+  INTEGER_REGEX = /\A[+-]?\d+\z/.freeze
   SIS_ASSINGMENT_NAME_LENGTH_DEFAULT = 255
 
   # @API List accounts

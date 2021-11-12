@@ -429,7 +429,7 @@ module SeleniumDriverSetup
       end.to_app
     end
 
-    ASSET_PATH = %r{\A/(dist|fonts|images|javascripts)/.*\.[a-z0-9]+\z}
+    ASSET_PATH = %r{\A/(dist|fonts|images|javascripts)/.*\.[a-z0-9]+\z}.freeze
     def asset_request?(url)
       url =~ ASSET_PATH
     end

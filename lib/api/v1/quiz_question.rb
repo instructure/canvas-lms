@@ -30,7 +30,7 @@ module Api::V1::QuizQuestion
       assessment_question_id
       quiz_group_id
     )
-  }
+  }.freeze
 
   API_ALLOWED_QUESTION_DATA_OUTPUT_FIELDS = %w(
     question_name
@@ -51,7 +51,7 @@ module Api::V1::QuizQuestion
     formula_decimal_places
     matches
     matching_answer_incorrect_matches
-  )
+  ).freeze
 
   # @param [Quizzes::Quiz#quiz_data] quiz_data
   #   If you specify a quiz_data construct from a submission (or a quiz), then

@@ -3144,7 +3144,7 @@ class Assignment < ActiveRecord::Base
 
   FREEZABLE_ATTRIBUTES = %w{title description lock_at points_possible grading_type
                             submission_types assignment_group_id allowed_extensions
-                            group_category_id notify_of_update peer_reviews workflow_state}
+                            group_category_id notify_of_update peer_reviews workflow_state}.freeze
   def frozen?
     !!(self.freeze_on_copy && self.copied &&
        PluginSetting.settings_for_plugin(:assignment_freezer))

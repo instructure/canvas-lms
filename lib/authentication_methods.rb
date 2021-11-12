@@ -90,7 +90,7 @@ module AuthenticationMethods
     end
   end
 
-  ALLOWED_SCOPE_INCLUDES = %w{uuid}
+  ALLOWED_SCOPE_INCLUDES = %w{uuid}.freeze
 
   def filter_includes(key)
     # no funny business

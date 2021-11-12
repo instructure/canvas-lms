@@ -126,7 +126,7 @@ if Qti.migration_executable
         :question_name => "",
         :correct_comments => "",
         :question_type => "multiple_choice_question"
-      }
+      }.freeze
 
     TRUE_FALSE =
       { :question_type => "true_false_question",
@@ -148,7 +148,7 @@ if Qti.migration_executable
         :migration_id => "QUES_968903_1181388",
         :neutral_comments => "False is not correct",
         :neutral_comments_html => "False is <strong>not</strong> correct",
-        :correct_comments => "" }
+        :correct_comments => "" }.freeze
 
     ASSESSMENT = { :migration_id => "res_quiz_90521",
                    :question_count => 2,
@@ -163,7 +163,7 @@ if Qti.migration_executable
                    :time_limit => 15,
                    :allowed_attempts => -1,
                    :assignment_migration_id => '435646',
-                   :description => "<p>description</p>" }
+                   :description => "<p>description</p>" }.freeze
 
     ASSESSMENT_REFS = { :title => "Quiz 2",
                         :allowed_attempts => 3,
@@ -183,7 +183,7 @@ if Qti.migration_executable
                         :question_count => 3,
                         :time_limit => 15,
                         :access_code => "insecure",
-                        :assignment_migration_id => '164842' }
+                        :assignment_migration_id => '164842' }.freeze
 
     LONG_ANSWER = { :question_bank_name => "02gilback",
                     :points_possible => 5.0,
@@ -194,7 +194,7 @@ if Qti.migration_executable
                     :correct_comments => "",
                     :question_type => "essay_question",
                     :incorrect_comments => "",
-                    :question_bank_id => "SECT_3981973" }
+                    :question_bank_id => "SECT_3981973" }.freeze
 
     SHORT_ANSWER = { :question_type => "short_answer_question",
                      :incorrect_comments => "",
@@ -205,7 +205,7 @@ if Qti.migration_executable
                      :question_text => "Who is winning the Tour of California today?",
                      :question_name => "",
                      :migration_id => "QUES_522317_638596",
-                     :correct_comments => "" }
+                     :correct_comments => "" }.freeze
 
     MULTI_SELECT = { :correct_comments => "",
                      :neutral_comments => "a",
@@ -221,7 +221,7 @@ if Qti.migration_executable
                              { :text => "4", :weight => 100, :migration_id => "QUES_968905_1181391_A4710356" }],
                      :question_text => "<p>how about the even numbers?</p>",
                      :question_name => "multi select",
-                     :migration_id => "QUES_968905_1181391" }
+                     :migration_id => "QUES_968905_1181391" }.freeze
 
     MULTIPLE_SHORT = { :question_name => "multiple short answer",
                        :migration_id => "QUES_968910_1181396",
@@ -235,7 +235,7 @@ if Qti.migration_executable
                               [{ :comments => "", :text => "answer 1", :weight => 100 },
                                { :comments => "", :text => "answer 2", :weight => 100 },
                                { :comments => "", :text => "answer 3", :weight => 100 }],
-                       :question_text => "<p>What is a multiple short answer?</p>" }
+                       :question_text => "<p>What is a multiple short answer?</p>" }.freeze
 
     MATCHING = { :question_text => "<p>letter to number</p>",
                  :question_name => "matching",
@@ -259,7 +259,7 @@ if Qti.migration_executable
                          { :right => "2",
                            :comments => "",
                            :text => "b",
-                           :left => "b" }] }
+                           :left => "b" }] }.freeze
 
     ORDERING = { :question_bank_id => "SECT_3981973",
                  :answers => [],
@@ -271,7 +271,7 @@ if Qti.migration_executable
                  :question_name => "ordering question",
                  :migration_id => "QUES_968913_1181399",
                  :correct_comments => "",
-                 :question_type => "Error" }
+                 :question_type => "Error" }.freeze
 
     MATH = { :answers => [],
              :answer_tolerance => "2",
@@ -290,7 +290,7 @@ if Qti.migration_executable
                     [{ :scale => 3, :min => 10, :max => 15, :name => "x" },
                      { :scale => 1, :min => 0.1, :max => 0.9, :name => "y" },
                      { :scale => 0, :min => 100, :max => 150, :name => "z" }],
-             :correct_comments => "" }
+             :correct_comments => "" }.freeze
 
     SIMPLE_MATH = {
       :question_type => "numerical_question",
@@ -304,7 +304,7 @@ if Qti.migration_executable
       :answers =>
         [{ :weight => 100, :text => "answer_text", :numerical_answer_type => "exact_answer", :exact => 10.0 }],
       :correct_comments => ""
-    }
+    }.freeze
 
     FIB = { :migration_id => "QUES_979782_1194494",
             :answers =>
@@ -319,7 +319,7 @@ if Qti.migration_executable
             :points_possible => 1,
             :question_bank_name => "02gilback",
             :question_text => "This a weird way to do [QUES_979782_1194494_A4749142] in the blank [QUES_979782_1194494_A4749144] ",
-            :question_name => "" }
+            :question_name => "" }.freeze
 
     NO_CONDITION = { :question_name => "",
                      :migration_id => "QUES_969100_1181698",
@@ -345,7 +345,7 @@ if Qti.migration_executable
                      :incorrect_comments => "",
                      :points_possible => 2.5,
                      :question_bank_name => "02gilback",
-                     :question_text => "<p>According to the class handout Basic Principles to Enhance Memory which of the following are effective ways to remember?</p>" }
+                     :question_text => "<p>According to the class handout Basic Principles to Enhance Memory which of the following are effective ways to remember?</p>" }.freeze
 
     TEXT_ONLY = [{ :answers => [],
                    :correct_comments => "",
@@ -362,6 +362,6 @@ if Qti.migration_executable
                    :question_text => "<img src=\"quizzing/bunny_consumer.png\" alt=\"\">",
                    :question_name => "text only q 2",
                    :migration_id => "QUES_968903_1181388b",
-                   :question_type => "text_only_question" }]
+                   :question_type => "text_only_question" }].freeze
   end
 end

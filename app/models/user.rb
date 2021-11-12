@@ -21,7 +21,7 @@
 require 'atom'
 
 class User < ActiveRecord::Base
-  GRAVATAR_PATTERN = /^https?:\/\/[a-zA-Z0-9.-]+\.gravatar\.com\//
+  GRAVATAR_PATTERN = /^https?:\/\/[a-zA-Z0-9.-]+\.gravatar\.com\//.freeze
   MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS = 5
 
   include ManyRootAccounts
@@ -805,7 +805,7 @@ class User < ActiveRecord::Base
   end
 
   # Feel free to add, but the "authoritative" list (http://en.wikipedia.org/wiki/Title_(name)) is quite large
-  SUFFIXES = /^(Sn?r\.?|Senior|Jn?r\.?|Junior|II|III|IV|V|VI|Esq\.?|Esquire)$/i
+  SUFFIXES = /^(Sn?r\.?|Senior|Jn?r\.?|Junior|II|III|IV|V|VI|Esq\.?|Esquire)$/i.freeze
 
   # see also user_sortable_name.js
   def self.name_parts(name, prior_surname: nil, likely_already_surname_first: false)
@@ -1503,7 +1503,7 @@ class User < ActiveRecord::Base
     Canvas::Security.verify_hmac_sha1(sig, user_id.to_s, truncate: 10) ? user_id : nil
   end
 
-  AVATAR_SETTINGS = ['enabled', 'enabled_pending', 'sis_only', 'disabled']
+  AVATAR_SETTINGS = ['enabled', 'enabled_pending', 'sis_only', 'disabled'].freeze
   def avatar_url(size = nil, avatar_setting = nil, fallback = nil, request = nil, use_fallback = true)
     return fallback if avatar_setting == 'disabled'
 

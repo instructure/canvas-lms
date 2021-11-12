@@ -33,7 +33,7 @@ module Qti
       http://www.imsglobal.org/xsd/imsqti_v2p1
       http://www.imsglobal.org/xsd/qti/qtiv2p0
       http://www.imsglobal.org/xsd/qti/qtiv2p1
-    ]
+    ].freeze
     IMS_MD = "http://www.imsglobal.org/xsd/imsmd_v1p2"
     QTI_2_OUTPUT_PATH = "qti_2_1"
 

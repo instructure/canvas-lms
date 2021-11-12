@@ -265,7 +265,7 @@ module Api::V1::User
                               :created_at,
                               :start_at,
                               :end_at,
-                              :type]
+                              :type].freeze
 
   def enrollment_json(enrollment, user, session, includes: [], opts: {}, excludes: [])
     only = API_ENROLLMENT_JSON_OPTS.dup

@@ -157,9 +157,9 @@ module Api
 
   MAX_ID = ((2**63) - 1)
   MAX_ID_LENGTH = MAX_ID.to_s.length
-  MAX_ID_RANGE = (-MAX_ID...MAX_ID)
-  ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}
-  UUID_REGEX = %r{\Auuid:(\w{40,})\z}
+  MAX_ID_RANGE = (-MAX_ID...MAX_ID).freeze
+  ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}.freeze
+  UUID_REGEX = %r{\Auuid:(\w{40,})\z}.freeze
 
   def self.sis_parse_id(id, lookups, _current_user = nil,
                         root_account: nil)
@@ -420,7 +420,7 @@ module Api
 
   PAGINATION_PARAMS = [:current, :next, :prev, :first, :last].freeze
   LINK_PRIORITY = [:next, :last, :prev, :current, :first].freeze
-  EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key)
+  EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key).freeze
   def self.build_links(base_url, opts = {})
     links = build_links_hash(base_url, opts)
     build_links_from_hash(links)
@@ -618,10 +618,10 @@ module Api
                     (?<minute>[0-5][0-9]):
                     (?<second>60|[0-5][0-9])
                     (?<fraction>\.[0-9]+)?
-                    (?<timezone>Z|[+-](?:2[0-3]|[0-1][0-9]):[0-5][0-9])?$/x
+                    (?<timezone>Z|[+-](?:2[0-3]|[0-1][0-9]):[0-5][0-9])?$/x.freeze
 
   # regex for valid dates
-  DATE_REGEX = /^\d{4}[- \/.](0[1-9]|1[012])[- \/.](0[1-9]|[12][0-9]|3[01])$/
+  DATE_REGEX = /^\d{4}[- \/.](0[1-9]|1[012])[- \/.](0[1-9]|[12][0-9]|3[01])$/.freeze
 
   # regex for shard-aware ID
   ID = '(?:\d+~)?\d+'

@@ -18,7 +18,7 @@
 #
 module CanvasCassandra
   class Database
-    CONSISTENCY_CLAUSE = %r{%CONSISTENCY% ?}
+    CONSISTENCY_CLAUSE = %r{%CONSISTENCY% ?}.freeze
 
     def initialize(fingerprint, servers, opts, logger)
       thrift_opts = {}

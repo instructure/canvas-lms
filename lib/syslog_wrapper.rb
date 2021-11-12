@@ -98,7 +98,7 @@ class SyslogWrapper
     Logger::ERROR => :err,
     Logger::FATAL => :crit,
     Logger::UNKNOWN => :notice
-  }
+  }.freeze
 
   def add(severity, message = nil, progname = nil)
     severity ||= Logger::UNKNOWN

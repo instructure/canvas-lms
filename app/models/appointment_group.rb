@@ -417,7 +417,7 @@ class AppointmentGroup < ActiveRecord::Base
     :description,
     :location_name,
     :location_address
-  ]
+  ].freeze
 
   def update_appointments
     changed = Hash[

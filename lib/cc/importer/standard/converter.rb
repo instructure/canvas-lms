@@ -30,7 +30,7 @@ module CC::Importer::Standard
     include QuizConverter
 
     MANIFEST_FILE = "imsmanifest.xml"
-    SUPPORTED_TYPES = /assessment\z|\Aassignment|\Aimswl|\Aimsbasiclti|\Aimsdt|webcontent|learning-application-resource\z/
+    SUPPORTED_TYPES = /assessment\z|\Aassignment|\Aimswl|\Aimsbasiclti|\Aimsdt|webcontent|learning-application-resource\z/.freeze
 
     attr_accessor :resources
 
@@ -156,7 +156,7 @@ module CC::Importer::Standard
       add_file(file)
     end
 
-    FILEBASE_REGEX = /\$IMS[-_]CC[-_]FILEBASE\$/
+    FILEBASE_REGEX = /\$IMS[-_]CC[-_]FILEBASE\$/.freeze
     def replace_urls(html, resource_dir = nil)
       return "" if html.blank?
 

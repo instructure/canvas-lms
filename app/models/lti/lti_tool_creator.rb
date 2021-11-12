@@ -24,7 +24,7 @@ module Lti
       'email_only' => LtiOutbound::LTITool::PRIVACY_LEVEL_EMAIL_ONLY,
       'name_only' => LtiOutbound::LTITool::PRIVACY_LEVEL_NAME_ONLY,
       'anonymous' => LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
-    }
+    }.freeze
     def initialize(context_external_tool)
       @context_external_tool = context_external_tool
     end

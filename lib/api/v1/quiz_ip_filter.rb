@@ -27,7 +27,7 @@ module Api::V1::QuizIpFilter
       account
       filter
     ]
-  }
+  }.freeze
 
   def quiz_ip_filters_json(filters, context, user, session)
     hash = {}

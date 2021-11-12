@@ -195,7 +195,7 @@ module Importers
     class DiscussionTopicOptions
       attr_reader :options
 
-      BOOLEAN_KEYS = [:pinned, :require_initial_post, :locked]
+      BOOLEAN_KEYS = [:pinned, :require_initial_post, :locked].freeze
 
       def initialize(options = {})
         @options = options.with_indifferent_access

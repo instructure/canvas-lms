@@ -396,7 +396,7 @@ class GradebookExporter
     @course.display_totals_for_all_grading_periods?
   end
 
-  STARTS_WITH_EQUAL = /^\s*=/
+  STARTS_WITH_EQUAL = /^\s*=/.freeze
 
   # Returns the student name to use for the export.  If the name
   # starts with =, quote it so anyone pulling the data into Excel
