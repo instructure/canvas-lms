@@ -247,7 +247,8 @@ module AttachmentFu # :nodoc:
 
       ext = nil
       basename = filename.gsub(/\.\w+$/) do |s|
-        ext = s; ''
+        ext = s
+        ''
       end
       # ImageScience doesn't create gif thumbnails, only pngs
       ext.sub!(/gif$/, 'png') if attachment_options[:processor] == "ImageScience"
@@ -322,7 +323,9 @@ module AttachmentFu # :nodoc:
     end
 
     # nil placeholder in case this field is used in a form.
-    def uploaded_data() nil; end
+    def uploaded_data()
+      nil
+    end
 
     # This method handles the uploaded file object.  If you set the field name to uploaded_data, you don't need
     # any special code in your controller.

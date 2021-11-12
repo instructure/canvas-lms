@@ -2387,7 +2387,9 @@ class ApplicationController < ActionController::Base
   end
   helper_method :css_bundle
 
-  def js_bundles; @js_bundles ||= []; end
+  def js_bundles
+    @js_bundles ||= []
+  end
   helper_method :js_bundles
 
   # Use this method to place a bundle on the page, note that the end goal here
@@ -2444,7 +2446,9 @@ class ApplicationController < ActionController::Base
   end
   helper_method :add_body_class
 
-  def body_classes; @body_classes ||= []; end
+  def body_classes
+    @body_classes ||= []
+  end
   helper_method :body_classes
 
   def set_active_tab(active_tab)

@@ -21,7 +21,10 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::CourseType do
-  let_once(:course) { course_with_student(active_all: true); @course }
+  let_once(:course) {
+    course_with_student(active_all: true)
+    @course
+  }
   let(:course_type) { GraphQLTypeTester.new(course, current_user: @student) }
 
   let_once(:other_section) { course.course_sections.create! name: "other section" }
@@ -56,7 +59,10 @@ describe Types::CourseType do
   end
 
   context "sis fields" do
-    let_once(:sis_course) { course.update!(sis_course_id: "SIScourseID"); course }
+    let_once(:sis_course) {
+      course.update!(sis_course_id: "SIScourseID")
+      course
+    }
 
     let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
 

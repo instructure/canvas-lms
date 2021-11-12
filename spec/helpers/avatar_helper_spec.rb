@@ -96,7 +96,10 @@ describe AvatarHelper do
 
     describe ".avatar_url_for_user" do
       before(:once) do
-        Account.default.tap { |a| a.enable_service(:avatars); a.save! }
+        Account.default.tap { |a|
+          a.enable_service(:avatars)
+          a.save!
+        }
       end
 
       it "returns a fallback avatar if the user doesn't have one" do

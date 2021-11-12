@@ -57,7 +57,8 @@ describe "Module Items API", type: :request do
                                                :require_sequential_progress => true)
     @module2.prerequisites = "module_#{@module1.id}"
     @wiki_page = @course.wiki_pages.create!(:title => "wiki title", :body => "")
-    @wiki_page.workflow_state = 'active'; @wiki_page.save!
+    @wiki_page.workflow_state = 'active'
+    @wiki_page.save!
     @wiki_page_tag = @module2.add_item(:id => @wiki_page.id, :type => 'wiki_page')
     @attachment = attachment_model(:context => @course)
     @attachment_tag = @module2.add_item(:id => @attachment.id, :type => 'attachment')
@@ -740,8 +741,10 @@ describe "Module Items API", type: :request do
         it "moves a module item" do
           old_updated_ats = []
           Timecop.freeze(1.minute.ago) do
-            @module2.touch; old_updated_ats << @module2.updated_at
-            @module3.touch; old_updated_ats << @module3.updated_at
+            @module2.touch
+            old_updated_ats << @module2.updated_at
+            @module3.touch
+            old_updated_ats << @module3.updated_at
           end
           api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}/items/#{@wiki_page_tag.id}",
                    { :controller => "context_module_items_api", :action => "update", :format => "json",
@@ -757,8 +760,10 @@ describe "Module Items API", type: :request do
         it "moves completion requirements" do
           old_updated_ats = []
           Timecop.freeze(1.minute.ago) do
-            @module1.touch; old_updated_ats << @module1.updated_at
-            @module2.touch; old_updated_ats << @module2.updated_at
+            @module1.touch
+            old_updated_ats << @module1.updated_at
+            @module2.touch
+            old_updated_ats << @module2.updated_at
           end
           api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
                    { :controller => "context_module_items_api", :action => "update", :format => "json",
@@ -777,8 +782,10 @@ describe "Module Items API", type: :request do
         it "sets the position in the target module" do
           old_updated_ats = []
           Timecop.freeze(1.minute.ago) do
-            @module1.touch; old_updated_ats << @module1.updated_at
-            @module2.touch; old_updated_ats << @module2.updated_at
+            @module1.touch
+            old_updated_ats << @module1.updated_at
+            @module2.touch
+            old_updated_ats << @module2.updated_at
           end
           api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
                    { :controller => "context_module_items_api", :action => "update", :format => "json",

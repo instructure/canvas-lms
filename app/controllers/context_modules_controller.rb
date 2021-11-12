@@ -449,7 +449,7 @@ class ContextModulesController < ApplicationController
     @module = @context.context_modules.active.find(params[:context_module_id])
     @progression = @module.evaluate_for(@current_user)
     @progression.current_position ||= 0 if @progression
-    res = {};
+    res = {}
     if !@progression
       nil
     elsif @progression.locked?

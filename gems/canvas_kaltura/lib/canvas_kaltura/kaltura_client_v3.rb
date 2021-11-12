@@ -29,8 +29,8 @@ require 'multipart'
 # http://www.kaltura.com/api_v3/testmeDoc/index.php
 module CanvasKaltura
   class SessionType
-    USER = 0;
-    ADMIN = 2;
+    USER = 0
+    ADMIN = 2
   end
 
   class ClientV3

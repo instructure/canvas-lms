@@ -127,7 +127,10 @@ class WikiPage < ActiveRecord::Base
 
     if self.title == "Front Page" && self.new_record?
       baddies = self.context.wiki_pages.not_deleted.where(title: "Front Page").select { |p| p.url != "front-page" }
-      baddies.each { |p| p.title = to_cased_title.call(p.url); p.save_without_broadcasting! }
+      baddies.each { |p|
+        p.title = to_cased_title.call(p.url)
+        p.save_without_broadcasting!
+      }
     end
     if self.context.wiki_pages.not_deleted.where(title: self.title).where.not(:id => self.id).first
       real_title = self.title.gsub(/-(\d*)\z/, '') # remove any "-#" at the end

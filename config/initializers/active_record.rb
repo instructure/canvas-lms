@@ -762,7 +762,10 @@ module UsefulFindInBatches
     end
 
     kwargs.delete(:error_on_ignore)
-    activate { |r| r.send("in_batches_with_#{strategy}", start: start, finish: finish, **kwargs, &block); nil }
+    activate { |r|
+      r.send("in_batches_with_#{strategy}", start: start, finish: finish, **kwargs, &block)
+      nil
+    }
   end
 
   def in_batches_needs_temp_table?

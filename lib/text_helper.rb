@@ -143,7 +143,7 @@ module TextHelper
 
         # we've reached the top and found no more text nodes, break
         if n.is_a?(Nokogiri::HTML::Document)
-          break;
+          break
         else
           current = n.parent.next
         end

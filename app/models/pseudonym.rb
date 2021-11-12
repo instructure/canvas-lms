@@ -534,7 +534,9 @@ class Pseudonym < ActiveRecord::Base
   scope :active_only, -> { where(workflow_state: 'active') }
   scope :deleted, -> { where(workflow_state: 'deleted') }
 
-  def self.serialization_excludes; [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]; end
+  def self.serialization_excludes
+    [:crypted_password, :password_salt, :reset_password_token, :persistence_token, :single_access_token, :perishable_token, :sis_ssha]
+  end
 
   def self.associated_shards(_unique_id_or_sis_user_id)
     [Shard.default]

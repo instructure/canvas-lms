@@ -574,7 +574,9 @@ class WebConference < ActiveRecord::Base
     end
   end
 
-  def self.serialization_excludes; [:uuid]; end
+  def self.serialization_excludes
+    [:uuid]
+  end
 
   def set_root_account_id
     case self.context

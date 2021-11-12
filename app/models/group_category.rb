@@ -400,10 +400,12 @@ class GroupCategory < ActiveRecord::Base
   def distribute_members_among_groups_by_section
     # trying to make this work for new group sets is hard enough - i'm not even going to bother with ones with existing stuff
     if GroupMembership.active.where(:group_id => groups.active).exists?
-      self.errors.add(:group_by_section, t("Groups must be empty to assign by section")); return
+      self.errors.add(:group_by_section, t("Groups must be empty to assign by section"))
+      return
     end
     if groups.active.where.not(:max_membership => nil).exists?
-      self.errors.add(:group_by_section, t("Groups cannot have size restrictions to assign by section")); return
+      self.errors.add(:group_by_section, t("Groups cannot have size restrictions to assign by section"))
+      return
     end
 
     group_count = groups.active.count
@@ -411,7 +413,8 @@ class GroupCategory < ActiveRecord::Base
     return unless group_count > 0 && section_count > 0
 
     if group_count < section_count
-      self.errors.add(:create_group_count, t("Must have at least as many groups as sections to assign by section")); return
+      self.errors.add(:create_group_count, t("Must have at least as many groups as sections to assign by section"))
+      return
     end
 
     GroupBySectionCalculator.new(self).distribute_members

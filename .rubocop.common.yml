@@ -177,6 +177,10 @@ Style/RedundantRegexpEscape:
   Severity: error
 Style/RedundantReturn:
   Severity: error
+Style/Semicolon:
+  Severity: error
+Style/SingleLineMethods:
+  Severity: error
 Style/SlicingWithRange:
   Severity: error
 Style/SpecialGlobalVars:

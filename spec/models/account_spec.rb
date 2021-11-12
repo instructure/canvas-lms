@@ -804,7 +804,10 @@ describe Account do
       account.role_overrides.create!(:permission => 'read_reports', :role => (k == :site_admin ? @sa_role : @root_role), :enabled => true)
       account.role_overrides.create!(:permission => 'reset_any_mfa', :role => @sa_role, :enabled => true)
       # clear caches
-      account.tap { |a| a.settings[:mfa_settings] = :optional; a.save! }
+      account.tap { |a|
+        a.settings[:mfa_settings] = :optional
+        a.save!
+      }
       v[:account] = Account.find(account.id)
     end
     AdheresToPolicy::Cache.clear
@@ -1055,9 +1058,12 @@ describe Account do
     end
 
     it "allows ordering by user's sortable name" do
-      @user1.sortable_name = 'jonny'; @user1.save
-      @user2.sortable_name = 'bob'; @user2.save
-      @user3.sortable_name = 'richard'; @user3.save
+      @user1.sortable_name = 'jonny'
+      @user1.save
+      @user2.sortable_name = 'bob'
+      @user2.save
+      @user3.sortable_name = 'richard'
+      @user3.save
       users = @account.users_not_in_groups([], order: User.sortable_name_order_by_clause('users'))
       expect(users.map { |u| u.id }).to eq [@user2.id, @user1.id, @user3.id]
     end

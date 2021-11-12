@@ -192,7 +192,11 @@ module Canvas::Migration::Helpers
       return [] unless course_data['attachments'] && course_data['attachments'].length > 0
 
       remove_name_regex = %r{/[^/]*\z}
-      course_data['attachments'].each { |a| next unless a['path_name']; a['path_name'].gsub!(remove_name_regex, '') }
+      course_data['attachments'].each { |a|
+        next unless a['path_name']
+
+        a['path_name'].gsub!(remove_name_regex, '')
+      }
       folder_groups = course_data['attachments'].group_by { |a| a['path_name'] }
       sorted = folder_groups.sort_by { |i| i.first }
       sorted.each do |folder_name, atts|

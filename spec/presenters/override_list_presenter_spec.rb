@@ -194,7 +194,9 @@ describe OverrideListPresenter do
   end
 
   describe "#visible_due_dates" do
-    def visible_due_dates; @visible_due_dates; end
+    def visible_due_dates
+      @visible_due_dates
+    end
     let(:sections) do
       # the count is the important part, the actual course sections are
       # not used

@@ -68,7 +68,9 @@ describe CanvasErrors do
       fake_job_class = Class.new do
         def perform; end
 
-        def tag; "#perform"; end
+        def tag
+          "#perform"
+        end
       end
       job = fake_job_class.new
       allow(Delayed::Worker).to receive(:current_job).and_return(job)
