@@ -18,13 +18,15 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Conversation} from '../../../graphql/Conversation'
+import {CONVERSATION_MESSAGES_QUERY} from '../../../graphql/Queries'
 import {DELETE_CONVERSATION_MESSAGES} from '../../../graphql/Mutations'
 import I18n from 'i18n!conversations_2'
 import {MessageDetailHeader} from '../../components/MessageDetailHeader/MessageDetailHeader'
 import {MessageDetailItem} from '../../components/MessageDetailItem/MessageDetailItem'
 import PropTypes from 'prop-types'
 import React, {useContext} from 'react'
-import {useMutation} from 'react-apollo'
+import {Spinner} from '@instructure/ui-spinner'
+import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
 export const MessageDetailContainer = props => {
@@ -64,6 +66,25 @@ export const MessageDetailContainer = props => {
     }
   })
 
+  const {loading, error, data} = useQuery(CONVERSATION_MESSAGES_QUERY, {
+    variables: {
+      conversationID: props.conversation._id
+    }
+  })
+
+  if (loading) {
+    return (
+      <View as="div" textAlign="center" margin="large none">
+        <Spinner renderTitle={() => I18n.t('Loading Conversation Messages')} variant="inverse" />
+      </View>
+    )
+  }
+
+  if (error) {
+    setOnFailure(I18n.t('Failed to load conversation messages.'))
+    return
+  }
+
   return (
     <>
       <MessageDetailHeader
@@ -71,7 +92,7 @@ export const MessageDetailContainer = props => {
         onReply={props.onReply}
         onReplyAll={props.onReplyAll}
       />
-      {props.conversation.conversationMessagesConnection.nodes.map(message => (
+      {data?.legacyNode?.conversationMessagesConnection.nodes.map(message => (
         <View as="div" borderWidth="small none none none" padding="small" key={message.id}>
           <MessageDetailItem
             conversationMessage={message}

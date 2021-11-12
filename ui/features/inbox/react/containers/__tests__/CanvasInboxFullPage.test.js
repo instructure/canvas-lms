@@ -100,14 +100,12 @@ describe('CanvasInbox Full Page', () => {
     const conversation = await container.findByTestId('conversationListItem-Checkbox')
     fireEvent.click(conversation)
 
-    expect(await container.findByText('Watch out for that Magneto guy')).toBeInTheDocument()
-    expect(
-      await container.findByText('Wolverine is not so bad when you get to know him')
-    ).toBeInTheDocument()
+    expect(await container.findByText('this is the first reply message')).toBeInTheDocument()
+    expect(await container.findByText('this is a reply all')).toBeInTheDocument()
+    expect(await container.findByText('testing 123')).toBeInTheDocument()
   })
 
   // TODO: will be fixed with VICE-2077
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('should change the read state of a conversation', async () => {
     const container = setup()
     const conversation = await container.findByTestId('conversationListItem-Checkbox')
