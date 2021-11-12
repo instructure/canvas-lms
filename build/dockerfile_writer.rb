@@ -47,11 +47,11 @@ class DockerfileWriter
   end
 
   def generation_message
-    <<~STR
+    <<~RUBY
       # GENERATED FILE, DO NOT MODIFY!
       # To update this file please edit the relevant template and run the generation
       # task `build/dockerfile_writer.rb --env #{env} --compose-file #{compose_files.join(',')} --in #{in_file} --out #{out_file}`
-    STR
+    RUBY
   end
 
   def set_file_suffix(suffix)

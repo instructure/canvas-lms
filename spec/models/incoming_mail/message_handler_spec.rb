@@ -191,12 +191,12 @@ describe IncomingMail::MessageHandler do
             allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
 
             email_subject = "Undelivered message"
-            body = <<-BODY.strip_heredoc.strip
-            The message titled "some subject" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+            body = <<~TEXT.strip_heredoc.strip
+              The message titled "some subject" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
-            Thank you,
-            Canvas Support
-            BODY
+              Thank you,
+              Canvas Support
+            TEXT
 
             message_attributes = {
               :to => "lucy@example.com",
@@ -222,12 +222,12 @@ describe IncomingMail::MessageHandler do
             expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::ReplyToLockedTopic.new)
 
             email_subject = "Undelivered message"
-            body = <<-BODY.strip_heredoc.strip
-            The message titled "some subject" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+            body = <<~TEXT.strip_heredoc.strip
+              The message titled "some subject" could not be delivered because the discussion topic is locked. If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
-            Thank you,
-            Canvas Support
-            BODY
+              Thank you,
+              Canvas Support
+            TEXT
 
             message_attributes = {
               :to => "lucy@example.com",
@@ -253,12 +253,12 @@ describe IncomingMail::MessageHandler do
             expect(context).to receive(:reply_from).and_raise(IncomingMail::Errors::UnknownAddress.new)
 
             email_subject = "Undelivered message"
-            body = <<-BODY.strip_heredoc.strip
-            The message titled "some subject" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
+            body = <<~TEXT.strip_heredoc.strip
+              The message titled "some subject" could not be delivered.  The message was sent to an unknown mailbox address.  If you are trying to contact someone through Canvas you can try logging in to your account and sending them a message using the Inbox tool.
 
-            Thank you,
-            Canvas Support
-            BODY
+              Thank you,
+              Canvas Support
+            TEXT
 
             message_attributes = {
               :to => "lucy@example.com",

@@ -918,7 +918,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   VALID_COMPLETION_EVENTS.each do |event|
-    self.class_eval <<-CODE
+    self.class_eval <<~RUBY, __FILE__, __LINE__ + 1
       def #{event}=(value)
         if Canvas::Plugin.value_to_boolean(value)
           self.completion_events |= [:#{event}]
@@ -930,7 +930,7 @@ class ContextModule < ActiveRecord::Base
       def #{event}?
         completion_events.include?(:#{event})
       end
-    CODE
+    RUBY
   end
 
   def completion_event_callbacks

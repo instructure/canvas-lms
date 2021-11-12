@@ -169,21 +169,21 @@ describe LtiApiController, type: :request do
 
     score_xml = ''
     if score
-      score_xml = <<-XML
-          <resultScore>
-            <language>en</language>
-            <textString>#{score}</textString>
-          </resultScore>
+      score_xml = <<~XML
+        <resultScore>
+          <language>en</language>
+          <textString>#{score}</textString>
+        </resultScore>
       XML
     end
 
     raw_score_xml = ''
     if raw_score
-      raw_score_xml = <<-XML
-          <resultTotalScore>
-            <language>en</language>
-            <textString>#{raw_score}</textString>
-          </resultTotalScore>
+      raw_score_xml = <<~XML
+        <resultTotalScore>
+          <language>en</language>
+          <textString>#{raw_score}</textString>
+        </resultTotalScore>
       XML
     end
 
@@ -404,10 +404,10 @@ describe LtiApiController, type: :request do
       comments    = submissions.first.submission_comments
       expect(submissions.count).to eq 1
       expect(comments.count).to eq 1
-      expect(comments.first.comment).to eq <<~NO_POINTS.strip
+      expect(comments.first.comment).to eq <<~TEXT.strip
         An external tool attempted to grade this assignment as 75%, but was unable
         to because the assignment has no points possible.
-      NO_POINTS
+      TEXT
     end
 
     it "rejects out of bound scores" do

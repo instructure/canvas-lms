@@ -46,9 +46,9 @@ describe Mutations::DeleteDiscussionTopic do
   end
 
   it "destroys the discussion entry and returns id" do
-    query = <<~QUERY
+    query = <<~GQL
       id: #{discussion_topic.id}
-    QUERY
+    GQL
     expect(DiscussionTopic.where("user_id = #{sender.id} and deleted_at is null").length).to eq 1
     result = execute_with_input(query)
     expect(result.dig('errors')).to be_nil
@@ -65,18 +65,18 @@ describe Mutations::DeleteDiscussionTopic do
     end
 
     it "returns nil if the discussion entry doesn't exist" do
-      query = <<~QUERY
+      query = <<~GQL
         id: #{DiscussionTopic.maximum(:id)&.next || 0}
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, 'Unable to find Discussion Topic')
     end
 
     context "user does not have read permissions" do
       it "fails if the requesting user is not the discussion entry user" do
-        query = <<~QUERY
+        query = <<~GQL
           id: #{discussion_topic.id}
-        QUERY
+        GQL
         result = execute_with_input(query, user_executing: user_model)
         expect_error(result, 'Unable to find Discussion Topic')
       end
@@ -84,9 +84,9 @@ describe Mutations::DeleteDiscussionTopic do
 
     context "user can read the discussion entry" do
       it "fails with Insufficient permissions if the requesting user is not the discussion entry user" do
-        query = <<~QUERY
+        query = <<~GQL
           id: #{discussion_topic.id}
-        QUERY
+        GQL
         course_with_student(course: @course)
         result = execute_with_input(query, user_executing: @student)
         expect_error(result, 'Insufficient permissions')

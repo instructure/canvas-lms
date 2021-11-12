@@ -99,11 +99,11 @@ module ManageGroupsCommon
   def simulate_group_drag(user_id, from_group_id, to_group_id)
     from_group = (from_group_id == "blank" ? ".group_blank:visible" : "#group_#{from_group_id}")
     to_group = (to_group_id == "blank" ? ".group_blank:visible" : "#group_#{to_group_id}")
-    driver.execute_script(<<-SCRIPT)
-        window.contextGroups.moveToGroup(
-          $('#{from_group} .user_id_#{user_id}'),
-          $('#{to_group}'))
-    SCRIPT
+    driver.execute_script(<<~JS)
+      window.contextGroups.moveToGroup(
+        $('#{from_group} .user_id_#{user_id}'),
+        $('#{to_group}'))
+    JS
     sleep 1
   end
 

@@ -47,7 +47,7 @@ module CanvasPartman
           break if id_dates.empty?
 
           id_dates.group_by { |_id, date| generate_name_for_partition(date) }.each do |partition_table, part_id_dates|
-            base_class.connection.execute(<<-SQL)
+            base_class.connection.execute(<<~SQL.squish)
               WITH x AS (
                 DELETE FROM ONLY #{base_class.quoted_table_name}
                 WHERE id IN (#{part_id_dates.map(&:first).join(', ')})
@@ -119,7 +119,7 @@ module CanvasPartman
       def generate_check_constraint(date)
         constraint_range = generate_date_constraint_range(date).map { |d| d.to_s(:db) }
 
-        <<~SQL
+        <<~SQL.squish
           #{base_class.partitioning_field} >= TIMESTAMP '#{constraint_range[0]}'
           AND
           #{base_class.partitioning_field} < TIMESTAMP '#{constraint_range[1]}'

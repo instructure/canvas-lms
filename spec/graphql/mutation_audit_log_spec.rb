@@ -35,13 +35,13 @@ describe AuditLogFieldExtension do
   end
 
   let(:mutation) do
-    <<~GRAPHQL
+    <<~GQL
       mutation {
         updateAssignment(input: {id: "#{@assignment.id}"}) {
           assignment { name }
         }
       }
-    GRAPHQL
+    GQL
   end
 
   it "logs" do
@@ -52,13 +52,13 @@ describe AuditLogFieldExtension do
   it "creates a log for every item" do
     expect_any_instance_of(AuditLogFieldExtension::Logger).to receive(:log).twice
 
-    CanvasSchema.execute(<<~GRAPHQL, context: { current_user: @teacher })
+    CanvasSchema.execute(<<~GQL, context: { current_user: @teacher })
       mutation {
         hideAssignmentGrades(input: {assignmentId: "#{@assignment.id}"}) {
           assignment { _id }
         }
       }
-    GRAPHQL
+    GQL
   end
 
   it "doesn't log failed mutations" do

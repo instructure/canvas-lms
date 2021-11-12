@@ -239,7 +239,7 @@ class MessageableUser
     end
 
     def self.secondary(method)
-      secondary_module.module_eval <<-RUBY, __FILE__, __LINE__ + 1
+      secondary_module.module_eval <<~RUBY, __FILE__, __LINE__ + 1
         def #{method}(*)
           GuardRail.activate(:secondary) { super }
         end
@@ -838,7 +838,7 @@ class MessageableUser
                               .select("group_memberships.group_id AS group_id")
                               .distinct
                               .joins(:user, :group)
-                              .joins(<<~SQL)
+                              .joins(<<~SQL.squish)
                                 INNER JOIN #{Enrollment.quoted_table_name} ON
                                   enrollments.user_id=users.id AND
                                   enrollments.course_id=groups.context_id

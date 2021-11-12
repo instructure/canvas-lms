@@ -155,12 +155,12 @@ describe 'login' do
         expect(Canvas.redis.get("cas_session_slo:ST-abcd")).to eq nil
 
         # single-sign-out from CAS server cannot find key but should store the session is expired
-        post cas_logout_url, params: { :logoutRequest => <<~SAML }
+        post cas_logout_url, params: { :logoutRequest => <<~XML }
           <samlp:LogoutRequest xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="1371236167rDkbdl8FGzbqwBhICvi" Version="2.0" IssueInstant="Fri, 14 Jun 2013 12:56:07 -0600">
           <saml:NameID></saml:NameID>
           <samlp:SessionIndex>ST-abcd</samlp:SessionIndex>
           </samlp:LogoutRequest>
-        SAML
+        XML
         expect(response.status.to_i).to eq 200
 
         # This should log them out.

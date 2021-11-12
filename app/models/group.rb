@@ -275,7 +275,7 @@ class Group < ActiveRecord::Base
   def self.not_in_group_sql_fragment(groups)
     return nil if groups.empty?
 
-    sanitize_sql([<<~SQL, groups])
+    sanitize_sql([<<~SQL.squish, groups])
       NOT EXISTS (SELECT * FROM #{GroupMembership.quoted_table_name} gm
       WHERE gm.user_id = users.id AND
       gm.workflow_state != 'deleted' AND
@@ -638,6 +638,7 @@ class Group < ActiveRecord::Base
     return true if can_participate
     return false unless user.present? && self.context.present?
     return true if self.group_category.try(:communities?)
+
     case self.context
     when Course
       return self.context.enrollments.not_fake.where(:user_id => user.id).active_by_date.exists?

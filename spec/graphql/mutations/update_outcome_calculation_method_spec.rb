@@ -56,11 +56,11 @@ describe Mutations::UpdateOutcomeCalculationMethod do
   end
 
   it "updates an outcome calculation method" do
-    query = <<~QUERY
+    query = <<~GQL
       id: #{original_record.id}
       calculationMethod: "highest"
       calculationInt: null
-    QUERY
+    GQL
     result = execute_with_input(query)
     expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'updateOutcomeCalculationMethod', 'errors')).to be_nil
@@ -77,11 +77,11 @@ describe Mutations::UpdateOutcomeCalculationMethod do
 
   it "restores previously soft-deleted record" do
     original_record.destroy
-    query = <<~QUERY
+    query = <<~GQL
       id: #{original_record.id}
       calculationMethod: "highest"
       calculationInt: null
-    QUERY
+    GQL
     result = execute_with_input(query)
     result = result.dig('data', 'updateOutcomeCalculationMethod', 'outcomeCalculationMethod')
     record = OutcomeCalculationMethod.find(result.dig('_id'))
@@ -98,29 +98,29 @@ describe Mutations::UpdateOutcomeCalculationMethod do
     end
 
     it "requires manage_proficiency_calculations permission" do
-      query = <<~QUERY
+      query = <<~GQL
         id: #{original_record.id}
         calculationMethod: "highest"
-      QUERY
+      GQL
       result = execute_with_input(query, user_executing: @teacher)
       expect_error(result, 'insufficient permission')
     end
 
     it "invalid calculation method" do
-      query = <<~QUERY
+      query = <<~GQL
         id: #{original_record.id}
         calculationMethod: "foobaz"
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, 'calculation_method must be one of')
     end
 
     it "invalid calculation int" do
-      query = <<~QUERY
+      query = <<~GQL
         id: #{original_record.id}
         calculationMethod: "highest"
         calculationInt: 100
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, 'invalid calculation_int for this calculation_method')
     end

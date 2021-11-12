@@ -305,10 +305,10 @@ class Notification < Switchman::UnshardedRecord
       {
         name: :send_scores_in_emails,
         value: user.preferences[:send_scores_in_emails],
-        label: t(<<-EOS),
+        label: t(<<~TEXT),
           Include scores when alerting about grades.
           If your email is not an institution email this means sensitive content will be sent outside of the institution.
-        EOS
+        TEXT
         id: "cat_#{self.id}_option",
       }
     end
@@ -555,18 +555,18 @@ class Notification < Switchman::UnshardedRecord
     when 'Announcement'
       t(:announcement_description, 'New Announcement in your course')
     when 'Announcement Created By You'
-      mt(:announcement_created_by_you_description, <<~EOS)
+      mt(:announcement_created_by_you_description, <<~MD)
         * Announcements created by you
         * Replies to announcements you've created
-      EOS
+      MD
     when 'Course Content'
-      mt(:course_content_description, <<~EOS)
+      mt(:course_content_description, <<~MD)
         Change to course content:
 
         * Page content
         * Quiz content
         * Assignment content
-      EOS
+      MD
     when 'Files'
       t(:files_description, 'New file added to your course')
     when 'Discussion'
@@ -580,39 +580,39 @@ class Notification < Switchman::UnshardedRecord
     when 'Due Date'
       t(:due_date_description, 'Assignment due date change')
     when 'Grading'
-      mt(:grading_description, <<~EOS)
+      mt(:grading_description, <<~MD)
         Includes:
 
         * Assignment/submission grade entered/changed
         * Grade weight changed
-      EOS
+      MD
     when 'Late Grading'
-      mt(:late_grading_description, <<~EOS)
+      mt(:late_grading_description, <<~MD)
         *Instructor and Admin only:*
 
         Late assignment submission
-      EOS
+      MD
     when 'All Submissions'
-      mt(:all_submissions_description, <<~EOS)
+      mt(:all_submissions_description, <<~MD)
         *Instructor and Admin only:*
 
         Assignment (except quizzes) submission/resubmission
-      EOS
+      MD
     when 'Submission Comment'
       t(:submission_comment_description, "Assignment submission comment")
     when 'Grading Policies'
       t(:grading_policies_description, 'Course grading policy change')
     when 'Invitation'
-      mt(:invitation_description, <<~EOS)
+      mt(:invitation_description, <<~MD)
         Invitation for:
 
         * Web conference
         * Group
         * Collaboration
         * Peer Review & reminder
-      EOS
+      MD
     when 'Other'
-      mt(:other_description, <<~EOS)
+      mt(:other_description, <<~MD)
         *Instructor and Admin only:*
 
         * Course enrollment
@@ -621,15 +621,15 @@ class Notification < Switchman::UnshardedRecord
         * Migration report
         * New account user
         * New student group
-      EOS
+      MD
     when 'Calendar'
       t(:calendar_description, 'New and changed items on your course calendar')
     when 'Student Appointment Signups'
-      mt(:student_appointment_description, <<~EOS)
+      mt(:student_appointment_description, <<~MD)
         *Instructor and Admin only:*
 
         Student appointment sign-up
-      EOS
+      MD
     when 'Appointment Availability'
       t('New appointment timeslots are available for signup')
     when 'Appointment Signups'
@@ -645,28 +645,28 @@ class Notification < Switchman::UnshardedRecord
     when 'Recording Ready'
       t(:web_conference_recording_ready, 'A conference recording is ready')
     when 'Membership Update'
-      mt(:membership_update_description, <<~EOS)
+      mt(:membership_update_description, <<~MD)
         *Admin only: pending enrollment activated*
 
         * Group enrollment
         * accepted/rejected
-      EOS
+      MD
     when 'Blueprint'
-      mt(:blueprint_description, <<~BPDESC)
+      mt(:blueprint_description, <<~MD)
         *Instructor and Admin only:*
 
         Content was synced from a blueprint course to associated courses
-      BPDESC
+      MD
     when 'Content Link Error'
-      mt(:content_link_error_description, <<~CONTLINK)
+      mt(:content_link_error_description, <<~MD)
         *Instructor and Admin only:*
 
         Location and content of a failed link that a student has interacted with
-      CONTLINK
+      MD
     when 'Account Notification'
-      mt(:account_notification_description, <<~EOS)
+      mt(:account_notification_description, <<~MD)
         Institution-wide announcements (also displayed on Dashboard pages)
-      EOS
+      MD
     else
       t(:missing_description_description, "For %{category} notifications", :category => category)
     end

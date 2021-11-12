@@ -106,11 +106,11 @@ module RSpec::Core::Hooks
       example.instance_exec(example, &block)
     rescue exception_class => e
       # TODO: Come up with a better solution for this.
-      RSpec.configuration.reporter.message <<~EOS
+      RSpec.configuration.reporter.message <<~TEXT
         An error occurred in an `after(:context)` hook.
           #{e.class}: #{e.message}
           occurred at #{e.backtrace.join("\n")}
-      EOS
+      TEXT
     end
   end
 end
@@ -246,10 +246,10 @@ module RenderWithHelpers
       attr_accessor :real_controller
 
       controller_class._helper_methods.each do |helper|
-        class_eval <<-RUBY, __FILE__, __LINE__ + 1
-            def #{helper}(*args, &block)
-              real_controller.send(:#{helper}, *args, &block)
-            end
+        class_eval <<~RUBY, __FILE__, __LINE__ + 1
+          def #{helper}(*args, &block)
+            real_controller.send(:#{helper}, *args, &block)
+          end
         RUBY
       end
     end
@@ -691,17 +691,17 @@ RSpec.configure do |config|
         next if base.instance_method(method).owner == base
 
         if method.to_s[-1..] == '='
-          base.class_eval <<-CODE, __FILE__, __LINE__ + 1
-          def #{method}(arg)
-            self.as(self.class.current_backend).#{method} arg
-          end
-          CODE
+          base.class_eval <<~RUBY, __FILE__, __LINE__ + 1
+            def #{method}(arg)
+              self.as(self.class.current_backend).#{method} arg
+            end
+          RUBY
         else
-          base.class_eval <<-CODE, __FILE__, __LINE__ + 1
-          def #{method}(*args, &block)
-            self.as(self.class.current_backend).#{method}(*args, &block)
-          end
-          CODE
+          base.class_eval <<~RUBY, __FILE__, __LINE__ + 1
+            def #{method}(*args, &block)
+              self.as(self.class.current_backend).#{method}(*args, &block)
+            end
+          RUBY
         end
       end
     end

@@ -17,14 +17,14 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
               require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
 
               # ... otherwise, do this:
-              raise <<~MSG
+              raise <<~TEXT
 
                 #{"*" * 80}
                 *  You are trying to run an rspec rake task defined in
                 *  #{__FILE__},
                 *  but rspec can not be found in vendor/gems or system gems.
                 #{"*" * 80}
-              MSG
+              TEXT
             end
           end
         end

@@ -127,7 +127,7 @@ module ActiveRecord
             RUBY
           end
 
-          class_eval <<-RUBY, __FILE__, __LINE__ + 1
+          class_eval <<~RUBY, __FILE__, __LINE__ + 1
             include ActiveRecord::Acts::List::InstanceMethods
 
             def self.position_column

@@ -42,7 +42,7 @@ module Canvas
       end
       m = Module.new
 
-      m.module_eval <<-RUBY, __FILE__, __LINE__ + 1
+      m.module_eval <<~RUBY, __FILE__, __LINE__ + 1
         def #{r.name}
           return Account.current_domain_root_account if !association(#{r.name.to_sym.inspect}).loaded? && #{r.foreign_key} == Account.current_domain_root_account&.id
           return super

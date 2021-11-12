@@ -47,7 +47,7 @@ class ScoreStatisticsGenerator
     # require score then add a filter when the DA feature is on
     statistics = GuardRail.activate(:secondary) do
       connection = ScoreStatistic.connection
-      connection.select_all(<<~SQL)
+      connection.select_all(<<~SQL.squish)
         WITH want_assignments AS (
           SELECT a.id, a.created_at
           FROM #{Assignment.quoted_table_name} a
@@ -98,7 +98,7 @@ class ScoreStatisticsGenerator
     end
 
     bulk_values.each_slice(100) do |bulk_slice|
-      connection.execute(<<~SQL)
+      connection.execute(<<~SQL.squish)
         INSERT INTO #{ScoreStatistic.quoted_table_name}
           (assignment_id, maximum, minimum, mean, count, created_at, updated_at, root_account_id)
         VALUES #{bulk_slice.join(',')}
@@ -152,7 +152,7 @@ class ScoreStatisticsGenerator
       now
     ].join(",")
 
-    CourseScoreStatistic.connection.execute(<<~SQL)
+    CourseScoreStatistic.connection.execute(<<~SQL.squish)
       INSERT INTO #{CourseScoreStatistic.quoted_table_name}
         (course_id, average, score_count, created_at, updated_at)
       VALUES (#{values})

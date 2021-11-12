@@ -92,10 +92,10 @@ module CC
       canvas_export_file = File.open(path, 'w')
 
       # Fun panda joke!
-      canvas_export_file << <<~JOKE
+      canvas_export_file << <<~TEXT
         Q: What did the panda say when he was forced out of his natural habitat?
         A: This is un-BEAR-able
-      JOKE
+      TEXT
       canvas_export_file.close
     end
 

@@ -263,10 +263,10 @@ describe "Outcome Results API", type: :request do
           user_session @user
           get "/courses/#{@course.id}/outcome_rollups.csv"
           expect(response).to be_successful
-          expect(response.body).to eq <<~END
+          expect(response.body).to eq <<~CSV
             Student name,Student ID,new outcome result,new outcome mastery points
             User,#{outcome_student.id},3.0,3.0
-          END
+          CSV
         end
 
         it "obeys csv i18n flags" do
@@ -277,10 +277,10 @@ describe "Outcome Results API", type: :request do
           user_session @user
           get "/courses/#{@course.id}/outcome_rollups.csv"
           expect(response).to be_successful
-          expect(response.body).to eq <<~END
+          expect(response.body).to eq <<~CSV
             \xEF\xBB\xBFStudent name;Student ID;new outcome result;new outcome mastery points
             User;#{outcome_student.id};3.0;3.0
-          END
+          CSV
         end
 
         context 'when Account-level Mastery Scales flag is on' do
@@ -295,10 +295,10 @@ describe "Outcome Results API", type: :request do
             get "/courses/#{@course.id}/outcome_rollups.csv"
             outcome_proficiency = OutcomeProficiency.find_or_create_default!(@course)
             expect(response).to be_successful
-            expect(response.body).to eq <<~END
+            expect(response.body).to eq <<~CSV
               Student name,Student ID,new outcome result,new outcome mastery points
               User,#{outcome_student.id},#{outcome_proficiency.points_possible},#{outcome_proficiency.mastery_points}
-            END
+            CSV
           end
 
           it 'uses resolved_outcome_proficiency for points scaling if one exists' do
@@ -308,10 +308,10 @@ describe "Outcome Results API", type: :request do
 
             get "/courses/#{@course.id}/outcome_rollups.csv"
             expect(response).to be_successful
-            expect(response.body).to eq <<~END
+            expect(response.body).to eq <<~CSV
               Student name,Student ID,new outcome result,new outcome mastery points
               User,#{outcome_student.id},10.0,10.0
-            END
+            CSV
           end
         end
 

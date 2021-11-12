@@ -147,24 +147,24 @@ module BasicLTI
       def self.envelope
         return @envelope if @envelope
 
-        @envelope = Nokogiri::XML.parse <<-XML
-      <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
-        <imsx_POXHeader>
-          <imsx_POXResponseHeaderInfo>
-            <imsx_version>V1.0</imsx_version>
-            <imsx_messageIdentifier></imsx_messageIdentifier>
-            <imsx_statusInfo>
-              <imsx_codeMajor></imsx_codeMajor>
-              <imsx_severity>status</imsx_severity>
-              <imsx_description></imsx_description>
-              <imsx_messageRefIdentifier></imsx_messageRefIdentifier>
-              <imsx_operationRefIdentifier></imsx_operationRefIdentifier>
-            </imsx_statusInfo>
-          </imsx_POXResponseHeaderInfo>
-        </imsx_POXHeader>
-        <imsx_POXBody>
-        </imsx_POXBody>
-      </imsx_POXEnvelopeResponse>
+        @envelope = Nokogiri::XML.parse <<~XML
+          <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+            <imsx_POXHeader>
+              <imsx_POXResponseHeaderInfo>
+                <imsx_version>V1.0</imsx_version>
+                <imsx_messageIdentifier></imsx_messageIdentifier>
+                <imsx_statusInfo>
+                  <imsx_codeMajor></imsx_codeMajor>
+                  <imsx_severity>status</imsx_severity>
+                  <imsx_description></imsx_description>
+                  <imsx_messageRefIdentifier></imsx_messageRefIdentifier>
+                  <imsx_operationRefIdentifier></imsx_operationRefIdentifier>
+                </imsx_statusInfo>
+              </imsx_POXResponseHeaderInfo>
+            </imsx_POXHeader>
+            <imsx_POXBody>
+            </imsx_POXBody>
+          </imsx_POXEnvelopeResponse>
         XML
         @envelope.encoding = 'UTF-8'
         @envelope
@@ -248,17 +248,17 @@ module BasicLTI
           new_score = Float(text_value)
         rescue
           new_score = false
-          error_message = text_value.nil? ? nil : I18n.t('lib.basic_lti.no_parseable_score.result', <<~NO_POINTS, :grade => text_value)
+          error_message = text_value.nil? ? nil : I18n.t('lib.basic_lti.no_parseable_score.result', <<~TEXT, :grade => text_value)
             Unable to parse resultScore: %{grade}
-          NO_POINTS
+          TEXT
         end
         begin
           raw_score = Float(score_value)
         rescue
           raw_score = false
-          error_message ||= score_value.nil? ? nil : I18n.t('lib.basic_lti.no_parseable_score.result_total', <<~NO_POINTS, :grade => score_value)
+          error_message ||= score_value.nil? ? nil : I18n.t('lib.basic_lti.no_parseable_score.result_total', <<~TEXT, :grade => score_value)
             Unable to parse resultTotalScore: %{grade}
-          NO_POINTS
+          TEXT
         end
         submission_hash = {}
         existing_submission = assignment.submissions.where(user_id: user.id).first
@@ -328,10 +328,10 @@ module BasicLTI
             submission = Submission.create!(submission_hash.merge(:user => user,
                                                                   :assignment => assignment))
           end
-          submission.submission_comments.create!(:comment => I18n.t('lib.basic_lti.no_points_comment', <<~NO_POINTS, :grade => submission_hash[:grade]))
+          submission.submission_comments.create!(:comment => I18n.t('lib.basic_lti.no_points_comment', <<~TEXT, :grade => submission_hash[:grade]))
             An external tool attempted to grade this assignment as %{grade}, but was unable
             to because the assignment has no points possible.
-          NO_POINTS
+          TEXT
           self.code_major = 'failure'
           self.description = I18n.t('lib.basic_lti.no_points_possible', 'Assignment has no points possible.')
         else
@@ -427,23 +427,23 @@ module BasicLTI
         def self.envelope
           return @envelope if @envelope
 
-          @envelope = Nokogiri::XML.parse <<-XML
-        <message_response>
-          <lti_message_type></lti_message_type>
-          <statusinfo>
-            <codemajor></codemajor>
-            <severity>Status</severity>
-            <codeminor>fullsuccess</codeminor>
-          </statusinfo>
-          <result>
-            <sourcedid></sourcedid>
-            <resultscore>
-              <resultvaluesourcedid>decimal</resultvaluesourdedid>
-              <textstring></textstring>
-              <language>en-US</language>
-            </resultscore>
-          </result>
-        </message_response>
+          @envelope = Nokogiri::XML.parse <<~XML
+            <message_response>
+              <lti_message_type></lti_message_type>
+              <statusinfo>
+                <codemajor></codemajor>
+                <severity>Status</severity>
+                <codeminor>fullsuccess</codeminor>
+              </statusinfo>
+              <result>
+                <sourcedid></sourcedid>
+                <resultscore>
+                  <resultvaluesourcedid>decimal</resultvaluesourdedid>
+                  <textstring></textstring>
+                  <language>en-US</language>
+                </resultscore>
+              </result>
+            </message_response>
           XML
           @envelope.encoding = 'UTF-8'
           @envelope

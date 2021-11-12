@@ -63,7 +63,7 @@ RSpec.configure do |config|
   end
 
   def count_records(table_name)
-    pg_result = ActiveRecord::Base.connection.select_value <<-SQL
+    pg_result = ActiveRecord::Base.connection.select_value <<~SQL.squish
       SELECT  COUNT(*)
         FROM  #{table_name}
     SQL

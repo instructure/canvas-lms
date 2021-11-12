@@ -56,15 +56,15 @@ module CC::Exporter::Epub::Converters
     end
 
     def replace_missing_content!(tag)
-      tag.replace(<<-SPAN)
+      tag.replace(<<~HTML)
         <span>
           #{tag.content}
-          #{I18n.t(<<-TEXT)
+          #{I18n.t(<<~TEXT)
             (Link has been removed because content is not present or cannot be resolved.)
           TEXT
           }
         </span>
-      SPAN
+      HTML
     end
 
     def object_path_selector

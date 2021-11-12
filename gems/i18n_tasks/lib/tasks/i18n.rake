@@ -427,10 +427,10 @@ namespace :i18n do
     raise "got no translations" if complete_translations.nil?
 
     File.open("config/locales/#{import.language}.yml", "w") { |f|
-      f.write <<~HEADER
+      f.write <<~YAML
         # This YAML file is auto-generated from a Transifex import.
         # Do not edit it by hand, your changes will be overwritten.
-      HEADER
+      YAML
       f.write({ import.language => complete_translations }.to_yaml(line_width: -1))
     }
 
