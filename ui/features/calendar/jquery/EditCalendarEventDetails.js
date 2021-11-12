@@ -16,22 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!calendar'
 import $ from 'jquery'
 import _ from 'underscore'
 import tz from '@canvas/timezone'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import editCalendarEventTemplate from '../jst/editCalendarEvent.handlebars'
-import datePickerFormat from '@canvas/datetime/datePickerFormat'
 import '@canvas/datetime'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import 'date'
+import {changeTimezone} from '@canvas/datetime/changeTimezone'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 import coupleTimeFields from '@canvas/calendar/jquery/coupleTimeFields'
 import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
-import '../fcMomentHandlebarsHelpers'
 import CalendarConferenceWidget from '@canvas/calendar-conferences/react/CalendarConferenceWidget'
 import filterConferenceTypes from '@canvas/calendar-conferences/filterConferenceTypes'
 import getConferenceType from '@canvas/calendar-conferences/getConferenceType'
@@ -48,7 +46,6 @@ export default class EditCalendarEventDetails {
         contexts: this.event.possibleContexts(),
         lockedTitle: this.event.lockedTitle,
         location_name: this.event.location_name,
-        date: this.event.startDate(),
         is_child: this.event.object.parent_event_id != null,
         important_dates: this.event.important_dates
       })
@@ -265,12 +262,52 @@ export default class EditCalendarEventDetails {
     const start = fcUtil.unwrap(this.event.startDate())
     const end = fcUtil.unwrap(this.event.endDate())
 
+    // This somewhat convoluted way of getting a Date out of a Moment is because
+    // upon creating a new event, this.event.startDate() is initialized to a Moment
+    // without any time portion associated with it, so .toISOString() does not return
+    // a full normal ISO8601 value but instead just the date, as in "2021-11-16".
+    // Passing that straight into new Date() results in a value at midnight UTC on
+    // that date, which may be off by a day in the user's timezone. So instead we
+    // create the Date object with explicit year, month, and day values as shown.
+    let dateVal = new Date()
+    if (this.event.startDate()) {
+      const dateParts = this.event
+        .startDate()
+        .toISOString()
+        .split('-')
+        .map(v => parseInt(v, 10))
+      dateParts[1] -= 1 // fix up month since they start at 0
+      dateVal = new Date(...dateParts)
+    }
+    dateVal = changeTimezone(dateVal, {desiredTZ: ENV.TIMEZONE})
+
+    const timeFormatter = new Intl.DateTimeFormat(ENV.LOCALE || navigator.language, {
+      timeStyle: 'short'
+    }).format
+
+    const dateFormatter = new Intl.DateTimeFormat(ENV.LOCALE || navigator.language, {
+      dateStyle: 'medium'
+    }).format
+
     // set them up as appropriate variants of datetime_field
-    $date.date_field({
-      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))}
+    $date
+      .val(dateFormatter(dateVal))
+      .data('inputdate', dateVal.toISOString())
+      .date_field()
+      .change(_e => {
+        const date = $date.data('date')
+        $date.val(date === null ? '' : dateFormatter(date))
+      })
+
+    $start.time_field({time: start}).change(_e => {
+      const date = $start.data('date')
+      $start.val(date === null ? '' : timeFormatter(date))
     })
-    $start.time_field({time: start})
-    $end.time_field({time: end})
+
+    $end.time_field({time: end}).change(_e => {
+      const date = $end.data('date')
+      $end.val(date === null ? '' : timeFormatter(date))
+    })
 
     $start.data('instance').setTime(this.event.allDay ? null : start)
     $end.data('instance').setTime(this.event.allDay ? null : end)
