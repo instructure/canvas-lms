@@ -266,7 +266,7 @@ module RenderWithHelpers
     @controller.real_controller = real_controller
 
     # just calling "render 'path/to/view'" by default looks for a partial
-    if args.first && args.first.is_a?(String)
+    if args.first.is_a?(String)
       file = args.shift
       args = [{ :template => file }] + args
     end

@@ -146,14 +146,12 @@ class Group < ActiveRecord::Base
   end
 
   def auto_accept?
-    self.group_category &&
-      self.group_category.allows_multiple_memberships? &&
+    self.group_category&.allows_multiple_memberships? &&
       self.join_level == 'parent_context_auto_join'
   end
 
   def allow_join_request?
-    self.group_category &&
-      self.group_category.allows_multiple_memberships? &&
+    self.group_category&.allows_multiple_memberships? &&
       ['parent_context_auto_join', 'parent_context_request'].include?(self.join_level)
   end
 
@@ -168,7 +166,7 @@ class Group < ActiveRecord::Base
   end
 
   def group_category_limit_met?
-    group_category && group_category.group_limit && participating_users.size >= group_category.group_limit
+    group_category&.group_limit && participating_users.size >= group_category.group_limit
   end
 
   def context_external_tools
@@ -178,7 +176,7 @@ class Group < ActiveRecord::Base
   private :group_category_limit_met?
 
   def student_organized?
-    group_category && group_category.student_organized?
+    group_category&.student_organized?
   end
 
   def update_max_membership_from_group_category
@@ -468,9 +466,10 @@ class Group < ActiveRecord::Base
   private :ensure_defaults
 
   def set_default_account
-    if self.context && self.context.is_a?(Course)
+    case self.context
+    when Course
       self.account = self.context.account
-    elsif self.context && self.context.is_a?(Account)
+    when Account
       self.account = self.context
     end
   end
@@ -545,7 +544,7 @@ class Group < ActiveRecord::Base
       given { group_category.try(:communities?) }
       can :create
 
-      given { |user, session| self.context && self.context.grants_right?(user, session, :participate_as_student) }
+      given { |user, session| self.context&.grants_right?(user, session, :participate_as_student) }
       can :participate_as_student
 
       given { |user, session| self.grants_right?(user, session, :participate_as_student) && self.context.allow_student_organized_groups }
@@ -594,13 +593,13 @@ class Group < ActiveRecord::Base
       end
       can :read and can :delete
 
-      given { |user, session| self.context && self.context.grants_all_rights?(user, session, :read_as_admin, :post_to_forum) }
+      given { |user, session| self.context&.grants_all_rights?(user, session, :read_as_admin, :post_to_forum) }
       can :post_to_forum
 
-      given { |user, session| self.context && self.context.grants_all_rights?(user, session, :read_as_admin, :create_forum) }
+      given { |user, session| self.context&.grants_all_rights?(user, session, :read_as_admin, :create_forum) }
       can :create_forum
 
-      given { |user, session| self.context && self.context.grants_right?(user, session, :view_group_pages) }
+      given { |user, session| self.context&.grants_right?(user, session, :view_group_pages) }
       can :read and can :read_forum and can :read_announcements and can :read_roster
 
       # Join is participate + the group being in a state that allows joining directly (free_association)
@@ -613,16 +612,16 @@ class Group < ActiveRecord::Base
       given { |user, session| self.grants_right?(user, session, :manage_content) && self.context && self.context.grants_right?(user, session, :create_conferences) }
       can :create_conferences
 
-      given { |user, session| self.context && self.context.grants_right?(user, session, :read_as_admin) }
+      given { |user, session| self.context&.grants_right?(user, session, :read_as_admin) }
       can :read_as_admin
 
-      given { |user, session| self.context && self.context.grants_right?(user, session, :read_sis) }
+      given { |user, session| self.context&.grants_right?(user, session, :read_sis) }
       can :read_sis
 
-      given { |user, session| self.context && self.context.grants_right?(user, session, :view_user_logins) }
+      given { |user, session| self.context&.grants_right?(user, session, :view_user_logins) }
       can :view_user_logins
 
-      given { |user, session| self.context && self.context.grants_right?(user, session, :read_email_addresses) }
+      given { |user, session| self.context&.grants_right?(user, session, :read_email_addresses) }
       can :read_email_addresses
     end
   end
@@ -738,7 +737,7 @@ class Group < ActiveRecord::Base
     # exists solely for the migration that introduces the GroupCategory model).
     # this way group_category_name is correct if someone mistakenly uses it
     # (modulo category renaming in the GroupCategory model).
-    self.write_attribute(:category, self.group_category && self.group_category.name)
+    self.write_attribute(:category, self.group_category&.name)
   end
 
   def as_json(options = nil)
@@ -755,12 +754,12 @@ class Group < ActiveRecord::Base
   end
 
   def has_common_section?
-    self.context && self.context.is_a?(Course) &&
+    self.context.is_a?(Course) &&
       self.context.course_sections.active.any? { |section| section.common_to_users?(self.users) }
   end
 
   def has_common_section_with_user?(user)
-    return false unless self.context && self.context.is_a?(Course)
+    return false unless self.context.is_a?(Course)
 
     users = self.users.where(id: self.context.enrollments.active_or_pending.select(:user_id)) + [user]
     self.context.course_sections.active.any? { |section| section.common_to_users?(users) }

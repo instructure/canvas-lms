@@ -1760,7 +1760,7 @@ module SkipTouchCallbacks
     end
 
     def touch_callbacks_skipped?(name)
-      (@skip_touch_callbacks && @skip_touch_callbacks.include?(name)) ||
+      @skip_touch_callbacks&.include?(name) ||
         (self.superclass < ActiveRecord::Base && self.superclass.touch_callbacks_skipped?(name))
     end
   end

@@ -46,7 +46,7 @@ class WikiPagesController < ApplicationController
   end
 
   def set_pandapub_read_token
-    if @page && @page.grants_right?(@current_user, session, :read)
+    if @page&.grants_right?(@current_user, session, :read)
       if CanvasPandaPub.enabled?
         channel = "/private/wiki_page/#{@page.global_id}/update"
         js_env :WIKI_PAGE_PANDAPUB => {

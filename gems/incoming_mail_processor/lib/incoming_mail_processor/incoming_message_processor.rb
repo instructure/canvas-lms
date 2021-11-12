@@ -118,7 +118,7 @@ module IncomingMailProcessor
           if IncomingMailProcessor::Settings.members.map(&:to_sym).include?(key)
             self.settings.send("#{key}=", value)
           elsif IncomingMailProcessor::DeprecatedSettings.members.map(&:to_sym).include?(key)
-            logger.warn("deprecated setting sent to IncomingMessageProcessor: #{key}") if logger
+            logger&.warn("deprecated setting sent to IncomingMessageProcessor: #{key}")
             self.deprecated_settings.send("#{key}=", value)
           else
             raise "unrecognized setting sent to IncomingMessageProcessor: #{key}"

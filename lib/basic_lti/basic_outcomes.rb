@@ -92,7 +92,7 @@ module BasicLTI
 
       def operation_ref_identifier
         tag = @lti_request&.at_css('imsx_POXBody *:first').try(:name)
-        tag && tag.sub(%r{Request$}, '')
+        tag&.sub(%r{Request$}, '')
       end
 
       def result_score

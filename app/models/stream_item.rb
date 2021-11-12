@@ -460,9 +460,7 @@ class StreamItem < ActiveRecord::Base
         end
       end
     when Conversation
-      if res.latest_messages_from_stream_item
-        res.latest_messages_from_stream_item.select! { |m| m["participating_user_ids"].include?(viewing_user_id) }
-      end
+      res.latest_messages_from_stream_item&.select! { |m| m["participating_user_ids"].include?(viewing_user_id) }
     end
 
     res

@@ -2974,7 +2974,7 @@ describe CalendarEventsApiController, type: :request do
                       })
 
       context = json['contexts'].find do |c|
-        c['sections'] && c['sections'].find do |s|
+        c['sections']&.find do |s|
           s['id'] == @section.id.to_s
         end
       end

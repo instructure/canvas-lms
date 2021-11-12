@@ -34,7 +34,7 @@ module Exporters
       rescue
         return false
       ensure
-        handle.close if handle
+        handle&.close
       end
 
       true

@@ -60,7 +60,7 @@ module Api::V1::Attachment
       hash.merge!(attachment.master_course_api_restriction_data(options[:master_course_status]))
     end
 
-    return hash if options[:only] && options[:only].include?('names')
+    return hash if options[:only]&.include?('names')
 
     options.reverse_merge!(skip_permission_checks: false)
     includes = options[:include] || []

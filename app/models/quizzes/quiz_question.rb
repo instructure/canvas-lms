@@ -143,19 +143,19 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   end
 
   def delete_assessment_question
-    if self.assessment_question && self.assessment_question.editable_by?(self)
+    if self.assessment_question&.editable_by?(self)
       self.assessment_question.destroy
     end
   end
 
   def create_assessment_question
-    return if self.question_data && self.question_data.is_type?(:text_only)
+    return if self.question_data&.is_type?(:text_only)
 
     aq = self.assessment_question || AssessmentQuestion.new
 
     if aq.editable_by?(self)
       aq.question_data = self.question_data
-      aq.initial_context = self.quiz.context if self.quiz && self.quiz.context
+      aq.initial_context = self.quiz.context if self.quiz&.context
       aq.save! if aq.new_record?
     end
 

@@ -96,7 +96,7 @@ class SubmissionList
   attr_reader :list
 
   def initialize(course)
-    raise ArgumentError, "Must provide a course." unless course && course.is_a?(Course)
+    raise ArgumentError, "Must provide a course." unless course.is_a?(Course)
 
     @course = course
     process

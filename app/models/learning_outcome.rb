@@ -198,7 +198,7 @@ class LearningOutcome < ActiveRecord::Base
                                   context_type: context.class_name,
                                   id: alignment_id
                                 }).first
-    tag.destroy if tag
+    tag&.destroy
     tag
   end
 

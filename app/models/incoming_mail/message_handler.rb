@@ -27,7 +27,7 @@ module IncomingMail
       original_message = get_original_message(original_message_id, timestamp)
       # This prevents us from rebouncing users that have auto-replies setup -- only bounce something
       # that was sent out because of a notification.
-      return unless original_message && original_message.notification_id
+      return unless original_message&.notification_id
       return unless valid_secure_id?(original_message_id, secure_id)
 
       from_channel = nil

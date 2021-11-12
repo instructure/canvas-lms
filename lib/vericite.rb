@@ -322,11 +322,9 @@ module VeriCite
           end
 
           # the user score map shouldn't be empty now (either grabbed from the cache or VeriCite)
-          unless users_score_map[user_id.to_s].nil?
-            users_score_map[user_id.to_s].each do |key, score|
-              if key ==  args[:oid] && score >= 0
-                response[:similarity_score] = score
-              end
+          users_score_map[user_id.to_s]&.each do |key, score|
+            if key == args[:oid] && score >= 0
+              response[:similarity_score] = score
             end
           end
         when :generate_report
@@ -379,7 +377,7 @@ module VeriCite
 
     SUCCESSFUL_RETURN_CODES = (200..299)
     def is_response_success?(response)
-      response && response.key?(:return_code) && SUCCESSFUL_RETURN_CODES.cover?(Integer(response[:return_code]))
+      response&.key?(:return_code) && SUCCESSFUL_RETURN_CODES.cover?(Integer(response[:return_code]))
     rescue
       false
     end

@@ -73,7 +73,7 @@ class FileInContext
 
       @attachment
     ensure
-      uploaded_data.close if uploaded_data
+      uploaded_data&.close
     end
   end
 end

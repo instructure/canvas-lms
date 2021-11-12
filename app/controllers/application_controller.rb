@@ -401,7 +401,7 @@ class ApplicationController < ActionController::Base
   helper_method :external_tool_display_hash
 
   def k12?
-    @domain_root_account && @domain_root_account.feature_enabled?(:k12)
+    @domain_root_account&.feature_enabled?(:k12)
   end
   helper_method :k12?
 
@@ -445,7 +445,7 @@ class ApplicationController < ActionController::Base
 
   def load_blueprint_courses_ui
     return if js_env[:BLUEPRINT_COURSES_DATA]
-    return unless @context && @context.is_a?(Course) && @context.grants_right?(@current_user, :manage)
+    return unless @context.is_a?(Course) && @context.grants_right?(@current_user, :manage)
 
     is_child = MasterCourses::ChildSubscription.is_child_course?(@context)
     is_master = MasterCourses::MasterTemplate.is_master_course?(@context)
@@ -485,7 +485,7 @@ class ApplicationController < ActionController::Base
   helper_method :load_blueprint_courses_ui
 
   def load_content_notices
-    if @context && @context.respond_to?(:content_notices)
+    if @context.respond_to?(:content_notices)
       notices = @context.content_notices(@current_user)
       if notices.any?
         js_env :CONTENT_NOTICES => notices.map { |notice|
@@ -549,7 +549,7 @@ class ApplicationController < ActionController::Base
   helper_method :logged_in_user
 
   def not_fake_student_user
-    @current_user && @current_user.fake_student? ? logged_in_user : @current_user
+    @current_user&.fake_student? ? logged_in_user : @current_user
   end
 
   def rescue_action_dispatch_exception
@@ -1026,7 +1026,7 @@ class ApplicationController < ActionController::Base
             end
           end
 
-          if @context && @context.respond_to?(:short_name)
+          if @context.respond_to?(:short_name)
             crumb_url = named_context_url(@context, :context_url) if @context.grants_right?(@current_user, session, :read)
             add_crumb(@context.nickname_for(@current_user, :short_name), crumb_url)
           end
@@ -1054,7 +1054,7 @@ class ApplicationController < ActionController::Base
 
     @contexts = [@context]
     only_contexts = ActiveRecord::Base.parse_asset_string_list(opts[:only_contexts] || params[:only_contexts])
-    if @context && @context.is_a?(User)
+    if @context.is_a?(User)
       # we already know the user can read these courses and groups, so skip
       # the grants_right? check to avoid querying for the various memberships
       # again.
@@ -1115,14 +1115,12 @@ class ApplicationController < ActionController::Base
     end
 
     include_contexts = opts[:include_contexts] || params[:include_contexts]
-    if include_contexts
-      include_contexts.split(",").each do |include_context|
-        # don't load it again if we've already got it
-        next if @contexts.any? { |c| c.asset_string == include_context }
+    include_contexts&.split(",")&.each do |include_context|
+      # don't load it again if we've already got it
+      next if @contexts.any? { |c| c.asset_string == include_context }
 
-        context = Context.find_by_asset_string(include_context)
-        @contexts << context if context && context.grants_right?(@current_user, session, :read)
-      end
+      context = Context.find_by_asset_string(include_context)
+      @contexts << context if context&.grants_right?(@current_user, session, :read)
     end
 
     @contexts = @contexts.uniq
@@ -1134,7 +1132,7 @@ class ApplicationController < ActionController::Base
   def check_for_readonly_enrollment_state
     return unless request.format.html?
 
-    if @context_enrollment && @context_enrollment.is_a?(Enrollment) && ['invited', 'active'].include?(@context_enrollment.workflow_state) && action_name != "enrollment_invitation"
+    if @context_enrollment.is_a?(Enrollment) && ['invited', 'active'].include?(@context_enrollment.workflow_state) && action_name != "enrollment_invitation"
       state = @context_enrollment.state_based_on_date
       case state
       when :invited
@@ -2169,7 +2167,7 @@ class ApplicationController < ActionController::Base
   helper_method :feature_enabled?
 
   def service_enabled?(service)
-    @domain_root_account && @domain_root_account.service_enabled?(service)
+    @domain_root_account&.service_enabled?(service)
   end
   helper_method :service_enabled?
 
@@ -2475,7 +2473,7 @@ class ApplicationController < ActionController::Base
   end
 
   def reject_student_view_student
-    return unless @current_user && @current_user.fake_student?
+    return unless @current_user&.fake_student?
 
     @unauthorized_message ||= t('#application.errors.student_view_unauthorized', "You cannot access this functionality in student view.")
     render_unauthorized_action

@@ -443,7 +443,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def update_assignment_submission
     return if self.manually_scored || @skip_after_save_score_updates
 
-    if self.quiz && self.quiz.for_assignment? && assignment && !self.submission && self.user_id
+    if self.quiz&.for_assignment? && assignment && !self.submission && self.user_id
       self.submission = assignment.find_or_create_submission(self.user_id)
     end
     if self.completed? && self.submission
@@ -466,7 +466,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def save_assignment_submission
-    @assignment_submission.save! if @assignment_submission
+    @assignment_submission&.save!
   end
 
   def scores_for_versions(exclude_version_id)

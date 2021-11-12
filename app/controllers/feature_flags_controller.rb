@@ -268,7 +268,7 @@ class FeatureFlagsController < ApplicationController
       return render json: { message: "must specify feature" }, status: :bad_request unless params[:feature].present?
 
       feature_def = Feature.definitions[params[:feature]]
-      return render json: { message: "invalid feature" }, status: :bad_request unless feature_def && feature_def.applies_to_object(@context)
+      return render json: { message: "invalid feature" }, status: :bad_request unless feature_def&.applies_to_object(@context)
 
       # check whether the feature is locked
       current_flag = @context.lookup_feature_flag(params[:feature], skip_cache: true)

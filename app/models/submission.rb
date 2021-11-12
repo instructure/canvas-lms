@@ -470,8 +470,7 @@ class Submission < ActiveRecord::Base
     can :read and can :read_grade
 
     given do |user|
-      self.assignment &&
-        self.assignment.context &&
+      self.assignment&.context &&
         user &&
         self.user &&
         self.assignment.context.observer_enrollments.where(
@@ -686,7 +685,7 @@ class Submission < ActiveRecord::Base
     # of the submission as well
     self.turnitin_data.keys.each do |asset_string|
       data = self.turnitin_data[asset_string]
-      next unless data && data.is_a?(Hash) && data[:object_id]
+      next unless data.is_a?(Hash) && data[:object_id]
 
       if data[:similarity_score].blank?
         if attempt < TURNITIN_STATUS_RETRY
@@ -925,7 +924,7 @@ class Submission < ActiveRecord::Base
     update_scores = false
     if Canvas::Plugin.find(:vericite).try(:enabled?) && !self.readonly? && lookup_data
       self.vericite_data_hash.each_value do |data|
-        next unless data && data.is_a?(Hash) && data[:object_id]
+        next unless data.is_a?(Hash) && data[:object_id]
 
         update_scores = update_scores || vericite_recheck_score(data)
       end
@@ -991,7 +990,7 @@ class Submission < ActiveRecord::Base
     self.vericite_data_hash.each do |asset_string, data|
       # keep track whether the score state changed
       data_orig = data.dup
-      next unless data && data.is_a?(Hash) && data[:object_id]
+      next unless data.is_a?(Hash) && data[:object_id]
 
       # check to see if the score is stale, if so, delete it and fetch again
       recheck_score = vericite_recheck_score(data)
@@ -2431,11 +2430,9 @@ class Submission < ActiveRecord::Base
     excepts = additional_parameters.delete :except
 
     res = { :methods => methods, :include => includes }.merge(additional_parameters)
-    if excepts
-      excepts.each do |key|
-        res[:methods].delete key
-        res[:include].delete key
-      end
+    excepts&.each do |key|
+      res[:methods].delete key
+      res[:include].delete key
     end
     res
   end

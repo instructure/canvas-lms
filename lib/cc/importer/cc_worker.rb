@@ -84,7 +84,7 @@ class CC::Importer::CCWorker < Canvas::Migration::Worker::Base
     rescue Canvas::Migration::Error, Attachment::OverQuotaError => e
       cm.fail_with_error!(e, error_message: e.message, issue_level: :warning)
     rescue => e
-      cm.fail_with_error!(e) if cm
+      cm&.fail_with_error!(e)
     end
   end
 

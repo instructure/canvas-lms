@@ -334,7 +334,7 @@ class DiscussionTopic < ActiveRecord::Base
       if is_child_content?
         old_assignment.submission_types = 'none'
         own_tag = MasterCourses::ChildContentTag.where(content: self).take
-        own_tag.child_subscription.create_content_tag_for!(old_assignment, :downstream_changes => ['workflow_state']) if own_tag
+        own_tag&.child_subscription&.create_content_tag_for!(old_assignment, :downstream_changes => ['workflow_state'])
       end
     elsif self.assignment && @saved_by != :assignment && !self.root_topic_id
       deleted_assignment = self.assignment.deleted?
@@ -1026,7 +1026,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def require_initial_post?
-    self.require_initial_post || (self.root_topic && self.root_topic.require_initial_post)
+    self.require_initial_post || self.root_topic&.require_initial_post
   end
 
   def user_ids_who_have_posted_and_admins
@@ -1170,13 +1170,13 @@ class DiscussionTopic < ActiveRecord::Base
     given { |user, session| !self.root_topic_id && self.context.grants_all_rights?(user, session, :read_forum, :moderate_forum) }
     can :update and can :read_as_admin and can :delete and can :read and can :attach
 
-    given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :read_as_admin) }
+    given { |user, session| self.root_topic&.grants_right?(user, session, :read_as_admin) }
     can :read_as_admin
 
-    given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :delete) }
+    given { |user, session| self.root_topic&.grants_right?(user, session, :delete) }
     can :delete
 
-    given { |user, session| self.root_topic && self.root_topic.grants_right?(user, session, :read) }
+    given { |user, session| self.root_topic&.grants_right?(user, session, :read) }
     can :read
 
     given { |user, session| self.context.grants_all_rights?(user, session, :moderate_forum, :read_forum) }
@@ -1493,7 +1493,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def can_participate_in_course?(user)
-    if self.group && self.group.deleted?
+    if self.group&.deleted?
       false
     elsif self.course.is_a?(Course)
       # this probably isn't a perfect way to determine this but I can't think of a better one
@@ -1581,7 +1581,7 @@ class DiscussionTopic < ActiveRecord::Base
     media_object_ids = media_object_ids.uniq.compact
     attachment_ids = attachment_ids.uniq.compact
     attachments = attachment_ids.empty? ? [] : context.attachments.active.find_all_by_id(attachment_ids)
-    attachments = attachments.select { |a| a.content_type && a.content_type.match(/(video|audio)/) }
+    attachments = attachments.select { |a| a.content_type&.match(/(video|audio)/) }
     attachments.each do |attachment|
       attachment.podcast_associated_asset = messages_hash[attachment.id.to_s]
     end
@@ -1593,7 +1593,7 @@ class DiscussionTopic < ActiveRecord::Base
       if media_object.media_id == "maybe" || media_object.deleted? || (media_object.context_type != "User" && media_object.context != context)
         media_object = nil
       end
-      if media_object && media_object.podcast_format_details
+      if media_object&.podcast_format_details
         media_object.podcast_associated_asset = messages_hash[media_object.media_id]
       end
       media_object

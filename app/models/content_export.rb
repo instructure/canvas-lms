@@ -328,7 +328,7 @@ class ContentExport < ActiveRecord::Base
         @cc_exporter = CC::CCExporter.new(self)
       end
 
-      if @cc_exporter && @cc_exporter.export
+      if @cc_exporter&.export
         self.update(
           export_type: QUIZZES2
         )
@@ -521,9 +521,7 @@ class ContentExport < ActiveRecord::Base
     else
       self.settings[:errors] << [user_message, exception_or_info]
     end
-    if self.content_migration
-      self.content_migration.add_issue(user_message, :error, error_report_id: er)
-    end
+    self.content_migration&.add_issue(user_message, :error, error_report_id: er)
   end
 
   def root_account
@@ -546,7 +544,7 @@ class ContentExport < ActiveRecord::Base
   end
 
   def fast_update_progress(val)
-    content_migration.update_conversion_progress(val) if content_migration
+    content_migration&.update_conversion_progress(val)
     self.progress = val
     ContentExport.where(:id => self).update_all(:progress => val)
     if EpubExport.exists?(content_export_id: self.id)

@@ -631,7 +631,7 @@ class EnrollmentsApiController < ApplicationController
         end
       end
 
-      if role && role.course_role? && !role.deleted?
+      if role&.course_role? && !role.deleted?
         type = role.base_role_type if type.blank?
         if role.inactive?
           errors << @@errors[:inactive_role]
@@ -871,7 +871,7 @@ class EnrollmentsApiController < ApplicationController
       # if you pass in your own id, you can see if you are enrolled in the
       # course, regardless of whether you have read_roster
       scope = user_index_enrollments
-      return scope && scope.where(course_id: @context.id)
+      return scope&.where(course_id: @context.id)
     end
 
     if @context.grants_any_right?(@current_user, session, :read_roster, :view_all_grades, :manage_grades)

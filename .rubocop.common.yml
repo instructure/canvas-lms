@@ -191,6 +191,8 @@ Style/RedundantRegexpEscape:
   Severity: error
 Style/RedundantReturn:
   Severity: error
+Style/SafeNavigation:
+  Severity: error
 Style/Semicolon:
   Severity: error
 Style/SingleLineMethods:

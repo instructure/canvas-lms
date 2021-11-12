@@ -64,9 +64,9 @@ module Api::V1::ContentMigration
       json['progress_url'] = polymorphic_url([:api_v1, migration.job_progress])
     end
     if (plugin = Canvas::Plugin.find(migration.migration_type))
-      if plugin.meta[:display_name] && plugin.meta[:display_name].respond_to?(:call)
+      if plugin.meta[:display_name].respond_to?(:call)
         json['migration_type_title'] = plugin.meta[:display_name].call
-      elsif plugin.meta[:name] && plugin.meta[:name].respond_to?(:call)
+      elsif plugin.meta[:name].respond_to?(:call)
         json['migration_type_title'] = plugin.meta[:name].call
       end
     end

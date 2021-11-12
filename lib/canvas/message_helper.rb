@@ -32,13 +32,11 @@ module Canvas::MessageHelper
 
   def self.find_message_path(filename)
     path = nil
-    if @message_paths
-      @message_paths.each do |mp|
-        test_path = File.join(mp, filename)
-        if File.exist?(test_path)
-          path = test_path
-          break
-        end
+    @message_paths&.each do |mp|
+      test_path = File.join(mp, filename)
+      if File.exist?(test_path)
+        path = test_path
+        break
       end
     end
     path || default_message_path(filename)

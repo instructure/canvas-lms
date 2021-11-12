@@ -82,7 +82,7 @@ module Importers
       end
       if hash[:root_folder].present? && ['folder', 'FOLDER_TYPE'].member?(hash[:type])
         front_page = context.wiki.front_page
-        if front_page && front_page.id
+        if front_page&.id
           hash[:root_folder] = false
         else
           item.url ||= Wiki::DEFAULT_FRONT_PAGE_URL

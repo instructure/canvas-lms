@@ -52,7 +52,7 @@ module Lti
       @shared_secret ||=
         if @version.strip == 'LTI-1p0'
           tool = ContextExternalTool.where(consumer_key: @params[:oauth_consumer_key]).first
-          tool && tool.shared_secret
+          tool&.shared_secret
         end
     end
 

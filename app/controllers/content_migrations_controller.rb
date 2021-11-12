@@ -597,7 +597,7 @@ class ContentMigrationsController < ApplicationController
   def link_content_export_attachment
     ret = false
     export = ContentExport.find_by_id(params[:settings][:content_export_id])
-    if export && export.grants_right?(@current_user, session, :read)
+    if export&.grants_right?(@current_user, session, :read)
       if export.workflow_state == 'exported' && export.attachment
         @content_migration.attachment = export.attachment.clone_for(@content_migration)
         ret = true

@@ -341,10 +341,10 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user, session| !self.discussion_topic.root_topic_id && self.context.grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
 
-    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.context.grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked_for?(user, :check_policies => true) }
+    given { |user, session| self.discussion_topic.root_topic&.context&.grants_right?(user, session, :moderate_forum) && !self.discussion_topic.locked_for?(user, :check_policies => true) }
     can :update and can :delete and can :reply and can :create and can :read and can :attach
 
-    given { |user, session| self.discussion_topic.root_topic && self.discussion_topic.root_topic.context.grants_right?(user, session, :moderate_forum) }
+    given { |user, session| self.discussion_topic.root_topic&.context&.grants_right?(user, session, :moderate_forum) }
     can :update and can :delete and can :read
 
     given { |user, session| self.discussion_topic.grants_right?(user, session, :rate) }

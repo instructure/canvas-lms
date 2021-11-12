@@ -524,7 +524,7 @@ class Assignment < ActiveRecord::Base
   copy_authorized_links(:description) { [self.context, nil] }
 
   def root_account
-    context && context.root_account
+    context&.root_account
   end
 
   def name
@@ -984,7 +984,7 @@ class Assignment < ActiveRecord::Base
     if saved_change_to_submission_types?
       each_submission_type do |submittable, type|
         unless self.submission_types == type.to_s
-          submittable.unlink!(:assignment) if submittable
+          submittable&.unlink!(:assignment)
         end
       end
     end
@@ -1051,7 +1051,7 @@ class Assignment < ActiveRecord::Base
   protected :save_submittable
 
   def update_grading_standard
-    self.grading_standard.save! if self.grading_standard
+    self.grading_standard&.save!
   end
 
   def all_context_module_tags
@@ -1076,7 +1076,7 @@ class Assignment < ActiveRecord::Base
     return unless tags.any?
 
     modules = ContextModule.where(:id => tags.map(&:context_module_id)).ordered.to_a.select do |mod|
-      mod.completion_requirements && mod.completion_requirements.any? { |req| req[:type] == 'min_score' && tags.map(&:id).include?(req[:id]) }
+      mod.completion_requirements&.any? { |req| req[:type] == 'min_score' && tags.map(&:id).include?(req[:id]) }
     end
     return unless modules.any?
 
@@ -1386,7 +1386,7 @@ class Assignment < ActiveRecord::Base
 
   def process_if_quiz
     if self.submission_types == "online_quiz"
-      self.points_possible = quiz.points_possible if quiz && quiz.available?
+      self.points_possible = quiz.points_possible if quiz&.available?
       copy_attrs = %w(due_at lock_at unlock_at)
       if quiz && @saved_by != :quiz &&
          copy_attrs.any? { |attr| changes[attr] }
@@ -2626,7 +2626,7 @@ class Assignment < ActiveRecord::Base
     # exists solely for the migration that introduces the GroupCategory model).
     # this way group_category_name is correct if someone mistakenly uses it
     # (modulo category renaming in the GroupCategory model).
-    self.write_attribute(:group_category, self.group_category && self.group_category.name)
+    self.write_attribute(:group_category, self.group_category&.name)
   end
 
   def has_group_category?

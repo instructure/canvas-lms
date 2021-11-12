@@ -1079,7 +1079,7 @@ class AccountsController < ApplicationController
           end
         end
 
-        if params[:account][:settings] && params[:account][:settings].key?(:trusted_referers)
+        if params[:account][:settings]&.key?(:trusted_referers)
           if (trusted_referers = params[:account][:settings].delete(:trusted_referers)) &&
              @account.root_account?
             @account.trusted_referers = trusted_referers

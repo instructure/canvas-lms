@@ -97,7 +97,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def has_comments?
-    submission && submission.visible_submission_comments && !submission.visible_submission_comments.empty?
+    submission&.visible_submission_comments && !submission.visible_submission_comments.empty?
   end
 
   def has_scoring_details?
@@ -224,7 +224,7 @@ class GradeSummaryAssignmentPresenter
   def graph
     @graph ||= begin
       high, low, mean = grade_distribution
-      score = submission && submission.score
+      score = submission&.score
       GradeSummaryGraph.new(high, low, mean, assignment.points_possible, score)
     end
   end
@@ -250,7 +250,7 @@ class GradeSummaryAssignmentPresenter
   end
 
   def group
-    @group ||= assignment && assignment.assignment_group
+    @group ||= assignment&.assignment_group
   end
 
   def viewing_fake_student?

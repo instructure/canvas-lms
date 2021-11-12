@@ -76,9 +76,7 @@ module LiveEvents
     end
 
     def truncate(string)
-      if string
-        string.truncate(Setting.get('live_events_text_max_length', 8192).to_i, separator: ' ')
-      end
+      string&.truncate(Setting.get('live_events_text_max_length', 8192).to_i, separator: ' ')
     end
 
     def worker

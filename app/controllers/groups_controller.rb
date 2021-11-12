@@ -368,7 +368,7 @@ class GroupsController < ApplicationController
     find_group
     respond_to do |format|
       format.html do
-        if @group && @group.context
+        if @group&.context
           add_crumb @group.context.short_name, named_context_url(@group.context, :context_url)
           add_crumb @group.short_name, named_context_url(@group, :context_url)
         elsif @group
