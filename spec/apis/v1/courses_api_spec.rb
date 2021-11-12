@@ -1928,22 +1928,31 @@ describe CoursesController, type: :request do
     end
 
     context "an authorized user (granular permissions)" do
-      it "is able to reset a course" do
+      before do
         @course.root_account.enable_feature!(:granular_permissions_manage_courses)
         @course.root_account.role_overrides.create!(
           role: teacher_role,
           permission: 'manage_courses_reset',
           enabled: true
         )
+      end
+
+      it "is able to reset a course" do
         expect(Auditors::Course).to receive(:record_reset).once
                                                           .with(@course, anything, @user, anything)
-
         json = api_call(:post, @path, @params)
         @course.reload
         expect(@course.workflow_state).to eql 'deleted'
         new_course = Course.find(json['id'])
         expect(new_course.workflow_state).to eql 'claimed'
         expect(json['workflow_state']).to eql 'unpublished'
+      end
+
+      it "is not able to reset a template course" do
+        @course.enrollments.each(&:destroy)
+        @course.update!(template: true)
+        raw_api_call(:post, @path, @params)
+        expect(response.code).to eql '401'
       end
     end
     context "an unauthorized user" do

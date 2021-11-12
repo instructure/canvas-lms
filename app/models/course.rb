@@ -1671,7 +1671,7 @@ class Course < ActiveRecord::Base
     # Teachers and Designers can reset content, but not TAs
     given do |user|
       self.root_account.feature_enabled?(:granular_permissions_manage_courses) &&
-        user && !self.deleted? &&
+        user && !self.deleted? && !template? &&
         fetch_on_enrollments('active_content_admin_enrollments', user) {
           enrollments.for_user(user).of_content_admins.active_by_date.to_a
         }.any? { |e| e.has_permission_to?(:manage_courses_reset) }
@@ -1783,7 +1783,7 @@ class Course < ActiveRecord::Base
 
     # reset course content
     given do |user|
-      self.root_account.feature_enabled?(:granular_permissions_manage_courses) &&
+      self.root_account.feature_enabled?(:granular_permissions_manage_courses) && !template? &&
         self.account_membership_allows(user, :manage_courses_reset)
     end
     can :reset_content
