@@ -527,7 +527,7 @@
         <div colspan="3">
           <span class="self_enrollment_message" style="<%= hidden unless @context.self_enrollment_enabled? && !is_master_course %>">
             <% if @context.root_account.self_registration? %>
-              <%= t 'course_open_enrollment', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :url2 => register_url, :code => @context.self_enrollment_code || '{{ self_enrollment_code }}', :wrapper => '<b>\1</b>'
+              <%= t 'course_open_enrollment', <<~TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :url2 => register_url, :code => @context.self_enrollment_code || '{{ self_enrollment_code }}', :wrapper => '<b>\1</b>'
                     This course has enabled open enrollment. Students can
                     self-enroll in the course once you share with them this URL:
                     *%{url}*. Alternatively, they can sign up at *%{url2}* and
@@ -535,7 +535,7 @@
                   TEXT
               %>
             <% else %>
-              <%= t 'course_open_enrollment_without_code', <<-TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :wrapper => '<b>\1</b>'
+              <%= t 'course_open_enrollment_without_code', <<~TEXT, :url => enroll_url(@context.self_enrollment_code || '{{ self_enrollment_code }}'), :wrapper => '<b>\1</b>'
                     This course has enabled open enrollment. Students can
                     self-enroll in the course once you share with them this URL:
                     *%{url}*

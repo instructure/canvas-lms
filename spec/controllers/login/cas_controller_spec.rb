@@ -39,17 +39,17 @@ describe Login::CasController do
     user_with_pseudonym(active_all: true, account: account)
 
     cas_ticket = CanvasUuid::Uuid.generate_securish_uuid
-    request_text = <<-REQUEST_TEXT.strip
-        <samlp:LogoutRequest
-          xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
-          xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
-          ID="42"
-          Version="2.0"
-          IssueInstant="#{Time.zone.now.in_time_zone}">
-          <saml:NameID>@NOT_USED@</saml:NameID>
-          <samlp:SessionIndex>#{cas_ticket}</samlp:SessionIndex>
-        </samlp:LogoutRequest>
-    REQUEST_TEXT
+    request_text = <<~XML.strip
+      <samlp:LogoutRequest
+        xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+        xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+        ID="42"
+        Version="2.0"
+        IssueInstant="#{Time.zone.now.in_time_zone}">
+        <saml:NameID>@NOT_USED@</saml:NameID>
+        <samlp:SessionIndex>#{cas_ticket}</samlp:SessionIndex>
+      </samlp:LogoutRequest>
+    XML
 
     session[:cas_session] = cas_ticket
     session[:login_aac] = Account.default.authentication_providers.first.id
@@ -63,13 +63,13 @@ describe Login::CasController do
     user_with_pseudonym(active_all: true, account: account)
     @user.update!(workflow_state: 'deleted')
 
-    response_text = <<-RESPONSE_TEXT
-        <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
-          <cas:authenticationSuccess>
-            <cas:user>#{@user.email}</cas:user>
-          </cas:authenticationSuccess>
-        </cas:serviceResponse>
-    RESPONSE_TEXT
+    response_text = <<~XML
+      <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
+        <cas:authenticationSuccess>
+          <cas:user>#{@user.email}</cas:user>
+        </cas:authenticationSuccess>
+      </cas:serviceResponse>
+    XML
 
     controller.instance_variable_set(:@domain_root_account, Account.default)
     cas_client = controller.client
@@ -87,13 +87,13 @@ describe Login::CasController do
     user_with_pseudonym(active_all: true, account: account)
     @pseudonym.update!(workflow_state: 'suspended')
 
-    response_text = <<-RESPONSE_TEXT
-        <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
-          <cas:authenticationSuccess>
-            <cas:user>#{@user.email}</cas:user>
-          </cas:authenticationSuccess>
-        </cas:serviceResponse>
-    RESPONSE_TEXT
+    response_text = <<~XML
+      <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
+        <cas:authenticationSuccess>
+          <cas:user>#{@user.email}</cas:user>
+        </cas:authenticationSuccess>
+      </cas:serviceResponse>
+    XML
 
     controller.instance_variable_set(:@domain_root_account, Account.default)
     cas_client = controller.client
@@ -110,19 +110,19 @@ describe Login::CasController do
     account = account_with_cas(account: Account.default)
     user_with_pseudonym(active_all: true, account: account)
 
-    response_text = <<-RESPONSE_TEXT
-        <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
-          <cas:authenticationSuccess>
-            <cas:user>#{@user.email}</cas:user>
-            <cas:attributes>
-              <cas:name>#{@user.name}</cas:name>
-              <cas:email><![CDATA[#{@user.email}]]></cas:email>
-              <cas:yaml><![CDATA[--- true]]></cas:yaml>
-              <cas:json><![CDATA[{"id":#{@user.id}]]></cas:json>
-            </cas:attributes>
-          </cas:authenticationSuccess>
-        </cas:serviceResponse>
-    RESPONSE_TEXT
+    response_text = <<~XML
+      <cas:serviceResponse xmlns:cas="http://www.yale.edu/tp/cas">
+        <cas:authenticationSuccess>
+          <cas:user>#{@user.email}</cas:user>
+          <cas:attributes>
+            <cas:name>#{@user.name}</cas:name>
+            <cas:email><![CDATA[#{@user.email}]]></cas:email>
+            <cas:yaml><![CDATA[--- true]]></cas:yaml>
+            <cas:json><![CDATA[{"id":#{@user.id}]]></cas:json>
+          </cas:attributes>
+        </cas:authenticationSuccess>
+      </cas:serviceResponse>
+    XML
 
     controller.instance_variable_set(:@domain_root_account, Account.default)
     cas_client = controller.client

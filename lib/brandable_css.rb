@@ -376,20 +376,20 @@ module BrandableCSS
 
   class BrandConfigWithOutCompileAssets < RuntimeError
     def initialize
-      super <<~END
+      super <<~TEXT
 
         It looks like you are running a migration before running `rake canvas:compile_assets`
         compile_assets needs to complete before running db:migrate if brand_configs have not run
 
         run `rake canvas:compile_assets` and then try migrations again.
 
-      END
+      TEXT
     end
   end
 
   class DefaultMD5NotUpToDateError < RuntimeError
     def initialize
-      super <<~END
+      super <<~TEXT
 
         Something has changed about the default variables or images used in the Theme Editor.
         If you are seeing this and _you_ did not make changes to either app/stylesheets/brandable_variables.json
@@ -414,7 +414,7 @@ module BrandableCSS
            db/migrate/#{BrandableCSS.migration_version + 1}_#{MIGRATION_NAME.underscore}_postdeploy.rb
 
         FYI, current variables are: #{BrandableCSS.things_that_go_into_defaults_md5}
-      END
+      TEXT
     end
   end
 end

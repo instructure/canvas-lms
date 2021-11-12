@@ -68,7 +68,7 @@ module Canvas
         if klass.reflections.key?('root_account')
           m = Module.new
           polymorphic_condition = "#{r.foreign_type} == 'Account' && " if r.options[:polymorphic]
-          m.module_eval <<-RUBY, __FILE__, __LINE__ + 1
+          m.module_eval <<~RUBY, __FILE__, __LINE__ + 1
             def #{name}
               return root_account if !association(#{r.name.to_sym.inspect}).loaded? && #{polymorphic_condition}root_account_id && #{r.foreign_key} == root_account_id
               super

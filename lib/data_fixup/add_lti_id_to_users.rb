@@ -32,7 +32,7 @@ module DataFixup::AddLtiIdToUsers
   end
 
   def self.update_sql(sql_updates)
-    <<-SQL
+    <<~SQL.squish
       UPDATE #{User.quoted_table_name} AS t
       SET lti_id = x.lti_id
       FROM (VALUES #{sql_updates}) AS x(id, lti_id)

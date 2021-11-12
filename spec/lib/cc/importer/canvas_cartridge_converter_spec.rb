@@ -1180,7 +1180,7 @@ describe "Canvas Cartridge importing" do
   end
 
   it "converts media tracks" do
-    doc = Nokogiri::XML(<<-XML)
+    doc = Nokogiri::XML(<<~XML)
       <?xml version="1.0" encoding="UTF-8"?>
       <media_tracks xmlns="http://canvas.instructure.com/xsd/cccv1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">
         <media identifierref="xyz">

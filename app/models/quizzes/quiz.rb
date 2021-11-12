@@ -517,12 +517,12 @@ class Quizzes::Quiz < ActiveRecord::Base
     # 1. belong to this quiz;
     # 2. have been started; and
     # 3. won't lose time through this change.
-    where_clause = <<~END
+    where_clause = <<~SQL.squish
         quiz_id = ? AND
         started_at IS NOT NULL AND
         finished_at IS NULL AND
       #{update_sql} > end_at
-    END
+    SQL
 
     Quizzes::QuizSubmission.where(where_clause, self, new_end_at).update_all(["end_at = #{update_sql}", new_end_at])
   end

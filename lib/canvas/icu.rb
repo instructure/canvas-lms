@@ -84,7 +84,7 @@ module Canvas::ICU
         }.freeze
 
         ATTRIBUTES.each_key do |attribute|
-          class_eval <<-CODE
+          class_eval <<~RUBY, __FILE__, __LINE__ + 1
             def #{attribute}
               self[:#{attribute}]
             end
@@ -92,7 +92,7 @@ module Canvas::ICU
             def #{attribute}=(value)
               self[:#{attribute}] = value
             end
-          CODE
+          RUBY
         end
 
         ATTRIBUTE_VALUES = {

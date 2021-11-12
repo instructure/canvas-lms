@@ -20,7 +20,7 @@ class AddStrandOrderOverride < ActiveRecord::Migration[4.2]
     if connection.adapter_name == 'PostgreSQL'
       search_path = Shard.current.name
       # Use the strand_order_override as the primary sorting mechanism (useful when moving between jobs queues without preserving ID ordering)
-      execute(<<-SQL)
+      execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
         CREATE OR REPLACE FUNCTION #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')} () RETURNS trigger AS $$
         DECLARE
           running_count integer;
@@ -78,7 +78,7 @@ class AddStrandOrderOverride < ActiveRecord::Migration[4.2]
 
     if connection.adapter_name == 'PostgreSQL'
       search_path = Shard.current.name
-      execute(<<-SQL)
+      execute(<<~SQL) # rubocop:disable Rails/SquishedSQLHeredocs
         CREATE OR REPLACE FUNCTION #{connection.quote_table_name('delayed_jobs_after_delete_row_tr_fn')} () RETURNS trigger AS $$
         DECLARE
           running_count integer;

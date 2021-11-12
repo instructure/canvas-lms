@@ -109,7 +109,7 @@ describe HtmlTextHelper do
     end
 
     it "formats list elements" do
-      expect(th.html_to_text("<li>Item 1</li><li>Item 2</li>\n<li>Item 3</li> <li>Item 4\n<li>  Item 5")).to eq <<~EOS.strip
+      expect(th.html_to_text("<li>Item 1</li><li>Item 2</li>\n<li>Item 3</li> <li>Item 4\n<li>  Item 5")).to eq <<~MD.strip
         * Item 1
 
         * Item 2
@@ -119,11 +119,11 @@ describe HtmlTextHelper do
         * Item 4
 
         * Item 5
-      EOS
+      MD
     end
 
     it "formats headings" do
-      expect(th.html_to_text("<h1>heading 1</h1><h2>heading two<br>text\n</h2>\n<h3>heading 3 <br> through heading 6</h3>")).to eq <<~EOS.strip
+      expect(th.html_to_text("<h1>heading 1</h1><h2>heading two<br>text\n</h2>\n<h3>heading 3 <br> through heading 6</h3>")).to eq <<~MD.strip
         *********
         heading 1
         *********
@@ -136,11 +136,11 @@ describe HtmlTextHelper do
         heading 3
         through heading 6
         -----------------
-      EOS
+      MD
     end
 
     it "formats headings in a word wrap friendly way" do
-      expect(th.html_to_text("<h1>heading 1</h1><h2>heading two<br>text\n</h2>\n<h3>heading 3 through heading 6</h3>", line_width: 9)).to eq <<~EOS.strip
+      expect(th.html_to_text("<h1>heading 1</h1><h2>heading two<br>text\n</h2>\n<h3>heading 3 through heading 6</h3>", line_width: 9)).to eq <<~MD.strip
         *********
         heading 1
         *********
@@ -155,15 +155,15 @@ describe HtmlTextHelper do
         through
         heading 6
         ---------
-      EOS
+      MD
     end
 
     it "words wrap" do
-      expect(th.html_to_text("text that is a bit too long", line_width: 10)).to eq <<~EOS.strip
+      expect(th.html_to_text("text that is a bit too long", line_width: 10)).to eq <<~MD.strip
         text that
         is a bit
         too long
-      EOS
+      MD
     end
 
     it "squeezes whitespace" do
@@ -219,7 +219,7 @@ describe HtmlTextHelper do
 
   describe "simplify html" do
     before do
-      @body = <<~END.strip
+      @body = <<~HTML.strip
         <p><strong>This is a bold tag</strong></p>
         <p><em>This is an em tag</em></p>
         <h1>This is an h1 tag</h1>
@@ -230,7 +230,7 @@ describe HtmlTextHelper do
         <h6>This is an h6 tag</h6>
         <p><a href="http://foo.com">Link to Foo</a></p>
         <p><img src="http://google.com/someimage.png" width="50" height="50" alt="Some Image" title="Some Image" /></p>
-      END
+      HTML
     end
 
     it "converts simple tags to minimal html" do

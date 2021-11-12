@@ -183,28 +183,28 @@ class Submission < ActiveRecord::Base
 
   scope :missing, -> do
     joins(:assignment)
-      .where("
-      -- excused submissions cannot be missing
-      excused IS NOT TRUE AND NOT (
-        -- teacher said it's missing, 'nuff said.
-        -- we're doing a double 'NOT' here to avoid 'ORs' that could slow down the query
-        late_policy_status IS DISTINCT FROM 'missing' AND NOT
-        (
-          cached_due_date IS NOT NULL
-          -- submission is past due and
-          AND CURRENT_TIMESTAMP >= cached_due_date +
-            CASE assignments.submission_types WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END
-          -- submission is not submitted and
-          AND submission_type IS NULL
-          -- we expect a digital submission
-          AND NOT (
-            cached_quiz_lti IS NOT TRUE AND
-            assignments.submission_types IN ('', 'none', 'not_graded', 'on_paper', 'wiki_page', 'external_tool')
+      .where(<<~SQL.squish)
+        /* excused submissions cannot be missing */
+        excused IS NOT TRUE AND NOT (
+          /* teacher said it's missing, 'nuff said. */
+          /* we're doing a double 'NOT' here to avoid 'ORs' that could slow down the query */
+          late_policy_status IS DISTINCT FROM 'missing' AND NOT
+          (
+            cached_due_date IS NOT NULL
+            /* submission is past due and */
+            AND CURRENT_TIMESTAMP >= cached_due_date +
+              CASE assignments.submission_types WHEN 'online_quiz' THEN interval '1 minute' ELSE interval '0 minutes' END
+            /* submission is not submitted and */
+            AND submission_type IS NULL
+            /* we expect a digital submission */
+            AND NOT (
+              cached_quiz_lti IS NOT TRUE AND
+              assignments.submission_types IN ('', 'none', 'not_graded', 'on_paper', 'wiki_page', 'external_tool')
+            )
+            AND assignments.submission_types IS NOT NULL
           )
-          AND assignments.submission_types IS NOT NULL
         )
-      )
-    ")
+      SQL
   end
 
   scope :late, -> do
@@ -263,7 +263,7 @@ class Submission < ActiveRecord::Base
   # When changing these conditions, update index_submissions_needs_grading to
   # maintain performance.
   def self.needs_grading_conditions
-    conditions = +<<~SQL
+    <<~SQL.squish
       submissions.submission_type IS NOT NULL
       AND (submissions.excused=false OR submissions.excused IS NULL)
       AND (submissions.workflow_state = 'pending_review'
@@ -272,8 +272,6 @@ class Submission < ActiveRecord::Base
         )
       )
     SQL
-    conditions.gsub!(/\s+/, ' ')
-    conditions.freeze
   end
 
   # see .needs_grading_conditions

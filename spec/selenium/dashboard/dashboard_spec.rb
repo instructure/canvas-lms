@@ -76,7 +76,7 @@ describe "dashboard" do
 
     # so we can click the link w/o a page load
     def disable_recent_activity_header_course_link
-      driver.execute_script <<-JS
+      driver.execute_script <<~JS
         $('.stream-announcement .links a').attr('href', '#');
       JS
     end

@@ -29,7 +29,7 @@ module DataFixup::AddUserUuidToLearningOutcomeResults
   end
 
   def self.update_sql(start_id, end_id)
-    <<-SQL
+    <<~SQL.squish
       UPDATE #{LearningOutcomeResult.quoted_table_name} AS lor
       SET user_uuid = users.uuid
       FROM (SELECT id, uuid FROM #{User.quoted_table_name}) AS users(id, uuid)

@@ -89,11 +89,11 @@ module Canvas
     end
 
     [:name, :description, :website, :author, :author_website].each do |method|
-      class_eval <<-METHOD
+      class_eval <<~RUBY, __FILE__, __LINE__ + 1
         def #{method}
           t_if_proc(@meta[:#{method}]) || ''
         end
-      METHOD
+      RUBY
     end
 
     def setting(name)

@@ -765,8 +765,8 @@ describe Api do
 
       it 'prepends mobile css when not coming from a web browser' do
         res = @k.api_user_content(@html, @course, @student)
-        expect(res).to eq <<-HTML.strip
-  <link rel="stylesheet" href="somewhere.css"><p>a</p><p>b</p>
+        expect(res).to eq <<~HTML.strip
+          <link rel="stylesheet" href="somewhere.css"><p>a</p><p>b</p>
         HTML
       end
 

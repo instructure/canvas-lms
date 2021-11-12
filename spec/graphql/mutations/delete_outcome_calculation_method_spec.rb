@@ -50,9 +50,9 @@ describe Mutations::DeleteOutcomeCalculationMethod do
   end
 
   it "deletes an outcome calculation method with legacy id" do
-    query = <<~QUERY
+    query = <<~GQL
       id: #{original_record.id}
-    QUERY
+    GQL
     result = execute_with_input(query)
     expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'deleteOutcomeCalculationMethod', 'errors')).to be_nil
@@ -60,9 +60,9 @@ describe Mutations::DeleteOutcomeCalculationMethod do
   end
 
   it "deletes an outcome calculation method with relay id" do
-    query = <<~QUERY
+    query = <<~GQL
       id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func('OutcomeCalculationMethod').call(original_record.id.to_s)}
-    QUERY
+    GQL
     result = execute_with_input(query)
     expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'deleteOutcomeCalculationMethod', 'errors')).to be_nil
@@ -77,17 +77,17 @@ describe Mutations::DeleteOutcomeCalculationMethod do
     end
 
     it "requires manage_proficiency_calculations permission" do
-      query = <<~QUERY
+      query = <<~GQL
         id: #{original_record.id}
-      QUERY
+      GQL
       result = execute_with_input(query, user_executing: @teacher)
       expect_error(result, 'insufficient permission')
     end
 
     it "invalid id" do
-      query = <<~QUERY
+      query = <<~GQL
         id: 0
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, 'Unable to find OutcomeCalculationMethod')
     end

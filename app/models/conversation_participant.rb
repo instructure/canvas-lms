@@ -128,7 +128,7 @@ class ConversationParticipant < ActiveRecord::Base
       user_ids = users_by_conversation_shard[Shard.current]
 
       shard_conditions = if options[:mode] == :or || user_ids.size == 1
-                           [<<~SQL, user_ids]
+                           [<<~SQL.squish, user_ids]
                              EXISTS (
                                SELECT *
                                FROM #{ConversationParticipant.quoted_table_name} cp
@@ -137,7 +137,7 @@ class ConversationParticipant < ActiveRecord::Base
                              )
                            SQL
                          else
-                           [<<~SQL, user_ids, user_ids.size]
+                           [<<~SQL.squish, user_ids, user_ids.size]
                              (
                                SELECT COUNT(*)
                                FROM #{ConversationParticipant.quoted_table_name} cp

@@ -770,7 +770,7 @@ class Course < ActiveRecord::Base
                      course_account_associations.map(&:account).uniq
                    else
                      shard.activate do
-                       Account.find_by_sql(<<~SQL)
+                       Account.find_by_sql(<<~SQL.squish)
                          WITH depths AS (
                            SELECT account_id, MIN(depth)
                            FROM #{CourseAccountAssociation.quoted_table_name}
@@ -3304,7 +3304,7 @@ class Course < ActiveRecord::Base
       opts[:default] ||= false
       cast_expression = "Canvas::Plugin.value_to_boolean(val)"
     end
-    class_eval <<-CODE, __FILE__, __LINE__ + 1
+    class_eval <<~RUBY, __FILE__, __LINE__ + 1
       def #{setting}
         if Course.settings_options[#{setting.inspect}][:inherited]
           inherited = RequestCache.cache('inherited_course_setting', #{setting.inspect}, self.global_account_id) do
@@ -3330,7 +3330,7 @@ class Course < ActiveRecord::Base
           settings_frd[#{setting.inspect}] = new_val
         end
       end
-    CODE
+    RUBY
     alias_method "#{setting}?", setting if opts[:boolean]
     if opts[:alias]
       alias_method opts[:alias], setting
@@ -3712,7 +3712,7 @@ class Course < ActiveRecord::Base
   end
 
   %w{student_count teacher_count primary_enrollment_type primary_enrollment_role_id primary_enrollment_rank primary_enrollment_state primary_enrollment_date invitation}.each do |method|
-    class_eval <<-RUBY
+    class_eval <<~RUBY
       def #{method}
         read_attribute(:#{method}) || @#{method}
       end

@@ -201,14 +201,14 @@ class AppointmentGroup < ActiveRecord::Base
              "ON appointment_groups.id = agc.appointment_group_id " \
              "LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc " \
              "ON appointment_groups.id = sc.appointment_group_id")
-      .where(<<~COND, codes[:primary], codes[:secondary])
+      .where(<<~SQL.squish, codes[:primary], codes[:secondary])
         workflow_state = 'active'
         AND agc.context_code IN (?)
         AND (
           sc.sub_context_code IS NULL
           OR sc.sub_context_code IN (?)
         )
-      COND
+      SQL
   }
   # complements :manage permission
   scope :manageable_by, lambda { |*options|
@@ -225,14 +225,14 @@ class AppointmentGroup < ActiveRecord::Base
              "ON appointment_groups.id = agc.appointment_group_id " \
              "LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc " \
              "ON appointment_groups.id = sc.appointment_group_id")
-      .where(<<~COND, codes[:full] + codes[:limited], codes[:full], codes[:secondary])
+      .where(<<~SQL.squish, codes[:full] + codes[:limited], codes[:full], codes[:secondary])
         workflow_state <> 'deleted'
         AND agc.context_code IN (?)
         AND (
           agc.context_code IN (?)
           OR sc.sub_context_code IN (?)
         )
-      COND
+      SQL
   }
   scope :current, -> { where("end_at>=?", Time.zone.now) }
   scope :current_or_undated, -> { where("end_at>=? OR end_at IS NULL", Time.zone.now) }

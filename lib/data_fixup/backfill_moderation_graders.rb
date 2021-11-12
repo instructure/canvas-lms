@@ -68,7 +68,7 @@ module DataFixup::BackfillModerationGraders
         ]
         "(#{vals.join(',')})"
       end
-      ActiveRecord::Base.connection.exec_insert <<~SQL
+      ActiveRecord::Base.connection.exec_insert <<~SQL.squish
         INSERT INTO #{FeatureFlag.quoted_table_name}
           (context_id, context_type, feature, state, created_at, updated_at) VALUES #{courses.join(',')}
           ON CONFLICT (context_id, context_type, feature) DO UPDATE SET

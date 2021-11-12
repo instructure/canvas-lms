@@ -566,7 +566,7 @@ describe ActiveRecord::Base do
     it "doesn't empty the table accidentally when querying from a subquery and not the actual table" do
       u1 = User.create!(name: 'a')
       u2 = User.create!(name: 'a')
-      User.from(<<-SQL)
+      User.from(<<~SQL.squish)
         (WITH duplicates AS (
           SELECT users.*,
               ROW_NUMBER() OVER(PARTITION BY users.name

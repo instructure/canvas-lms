@@ -187,7 +187,7 @@ module AccountReports
 
     def outcome_results_scope
       students = account.learning_outcome_links.active
-                        .select(<<~SELECT)
+                        .select(<<~SQL.squish)
                           distinct on (#{outcome_order}, p.id, s.id, r.id, qr.id, q.id, a.id, subs.id, qs.id, aq.id)
                           u.sortable_name                             AS "student name",
                           p.user_id                                   AS "student id",
@@ -221,8 +221,8 @@ module AccountReports
                           e.workflow_state                            AS "enrollment state",
                           acct.id                                     AS "account id",
                           acct.name                                   AS "account name"
-                        SELECT
-                        .joins(<<~JOINS)
+                        SQL
+                        .joins(<<~SQL.squish)
                           INNER JOIN #{LearningOutcome.quoted_table_name} ON content_tags.content_id = learning_outcomes.id
                             AND content_tags.content_type = 'LearningOutcome'
                           INNER JOIN #{LearningOutcomeResult.quoted_table_name} r ON r.learning_outcome_id = learning_outcomes.id
@@ -246,7 +246,7 @@ module AccountReports
                            AND r.artifact_type IN ('QuizSubmission', 'Quizzes::QuizSubmission')
                           LEFT OUTER JOIN #{AssessmentQuestion.quoted_table_name} aq ON aq.id = qr.associated_asset_id
                            AND qr.associated_asset_type = 'AssessmentQuestion'
-                        JOINS
+                        SQL
                         .where("ct.workflow_state <> 'deleted' AND r.workflow_state <> 'deleted' AND r.artifact_type <> 'Submission'")
 
       unless @include_deleted
@@ -279,12 +279,12 @@ module AccountReports
 
     def join_course_sub_account_scope(account, scope, table = 'courses')
       if account != account.root_account
-        scope.joins(<<~JOINS)
+        scope.joins(<<~SQL.squish)
           join #{CourseAccountAssociation.quoted_table_name} caa
             ON caa.account_id = #{account.id}
             AND caa.course_id = #{table}.id
             AND caa.course_section_id IS NULL
-        JOINS
+        SQL
       else
         scope
       end

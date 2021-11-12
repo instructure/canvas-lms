@@ -61,7 +61,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
                   else
                     ''
                   end
-    DocWriter.append_md <<~HEREDOC
+    DocWriter.append_md <<~MD
       ## #{variable_substitution}#{deprecated_str}#{duplicates_text}
       #{description.strip}
 
@@ -69,7 +69,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
       #{launch_param_text}
 
       #{example_text}
-    HEREDOC
+    MD
   end
 
   private

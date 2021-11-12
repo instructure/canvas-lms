@@ -69,10 +69,10 @@ module Types
                required: false
 
       argument :enrollment_states, [CourseFilterableEnrollmentWorkflowState],
-               <<~DESC,
+               <<~MD,
                  only return users with the given enrollment state. defaults
                  to `invited`, `creation_pending`, `active`
-               DESC
+               MD
                required: false
     end
 
@@ -135,11 +135,11 @@ module Types
     end
 
     field :users_connection, UserType.connection_type, null: true do
-      argument :user_ids, [ID], <<~DOC,
+      argument :user_ids, [ID], <<~MD,
         Only include users with the given ids.
 
         **This field is deprecated, use `filter: {userIds}` instead.**
-      DOC
+      MD
                prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
                required: false
 
@@ -244,9 +244,9 @@ module Types
       end
     end
 
-    field :group_sets_connection, GroupSetType.connection_type, <<~DOC, null: true
+    field :group_sets_connection, GroupSetType.connection_type, <<~MD, null: true
       Project group sets for this course.
-    DOC
+    MD
     def group_sets_connection
       if course.grants_any_right?(current_user, :manage_groups, *RoleOverride::GRANULAR_MANAGE_GROUPS_PERMISSIONS)
         course.group_categories.where(role: nil)
@@ -284,9 +284,9 @@ module Types
     end
 
     field :assignment_post_policies, PostPolicyType.connection_type,
-          <<~DOC,
+          <<~MD,
             PostPolicies for assignments within a course
-          DOC
+          MD
           null: true
     def assignment_post_policies
       return nil unless course.grants_right?(current_user, :manage_grades)
@@ -294,10 +294,10 @@ module Types
       course.assignment_post_policies
     end
 
-    field :image_url, UrlType, <<~DOC, null: true
+    field :image_url, UrlType, <<~MD, null: true
       Returns a URL for the course image (this is the image used on dashboard
       course cards)
-    DOC
+    MD
     def image_url
       if course.image_url.present?
         course.image_url

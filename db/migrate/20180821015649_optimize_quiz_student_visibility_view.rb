@@ -22,7 +22,7 @@ class OptimizeQuizStudentVisibilityView < ActiveRecord::Migration[5.1]
   tag :postdeploy
 
   def up
-    self.connection.execute(<<-SQL)
+    self.connection.execute(<<~SQL.squish)
       CREATE OR REPLACE VIEW #{connection.quote_table_name('quiz_student_visibilities')} AS
       SELECT DISTINCT q.id as quiz_id,
         e.user_id as user_id,

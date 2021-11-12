@@ -20,7 +20,7 @@
 module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
   LOG_PREFIX = "RebuildingQuizSubmissions - "
 
-  SQL_SEARCH_STRING = <<-SQL
+  SQL_SEARCH_STRING = <<~SQL.squish
     select
       distinct submissions.id
     from
@@ -38,7 +38,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       users
     on submissions.user_id = users.id
       and users.workflow_state<>'deleted'
-    -- inner join quiz_submission_events on submissions.quiz_submission_id = quiz_submission_events.quiz_submission_id
+    /* inner join quiz_submission_events on submissions.quiz_submission_id = quiz_submission_events.quiz_submission_id */
     left outer join
       quiz_submissions
     on quiz_submissions.id = submissions.quiz_submission_id

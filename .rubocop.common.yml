@@ -60,6 +60,15 @@ Migration/Tagged:
     - cassandra
     - dynamodb
 
+Naming/HeredocDelimiterCase:
+  Severity: error
+Naming/HeredocDelimiterNaming:
+  Severity: error
+  ForbiddenDelimiters:
+    # negative regex - these are the _allowed_ delimiters
+    # any you add should describe the format of the data, not describe
+    # what the data is for. this allows editors to syntax highlight
+    - ^(?!AST|BASE64|CSV|GQL|HTML|JS|MD|PEM|REGEX|RUBY|SQL|SRT|TEXT|XML|YAML).+$
 Naming/FileName:
   Exclude:
     - "**/Gemfile.d/~after.rb"
@@ -75,17 +84,20 @@ Performance/StringReplacement:
 
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
+Rails/ContentTag:
+  Severity: error
+  Exclude:
+    - "**/db/migrate/*" # this cop is for views, not migrations, where it gets confused with outrigger
+    - "doc/**/*"
 Rails/HasManyOrHasOneDependent:
   Enabled: false # legacy code + most things we soft delete anyway
 Rails/HelperInstanceVariable:
   Enabled: false # legacy code
 Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
-Rails/ContentTag:
+Rails/SquishedSQLHeredocs:
   Severity: error
-  Exclude:
-    - "**/db/migrate/*" # this cop is for views, not migrations, where it gets confused with outrigger
-    - "doc/**/*"
+
 
 RSpec/AnyInstance:
   Enabled: false # while using an instance double would be preferable, it's a pain

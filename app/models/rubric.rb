@@ -97,27 +97,27 @@ class Rubric < ActiveRecord::Base
   end
 
   def self.with_at_most_one_association
-    joins(<<~JOINS)
+    joins(<<~SQL.squish)
       LEFT JOIN #{RubricAssociation.quoted_table_name} associations_for_count
       ON rubrics.id = associations_for_count.rubric_id
       AND associations_for_count.purpose = 'grading'
       AND associations_for_count.workflow_state = 'active'
-    JOINS
+    SQL
       .group('rubrics.id')
       .having('COUNT(rubrics.id) < 2')
   end
 
   def self.unassessed
-    joins(<<~JOINS)
+    joins(<<~SQL.squish)
       LEFT JOIN #{RubricAssociation.quoted_table_name} associations_for_unassessed
       ON rubrics.id = associations_for_unassessed.rubric_id
       AND associations_for_unassessed.purpose = 'grading'
       AND associations_for_unassessed.workflow_state = 'active'
-    JOINS
-      .joins(<<~JOINS)
+    SQL
+      .joins(<<~SQL.squish)
         LEFT JOIN #{RubricAssessment.quoted_table_name} assessments_for_unassessed
         ON associations_for_unassessed.id = assessments_for_unassessed.rubric_association_id
-      JOINS
+      SQL
       .where(assessments_for_unassessed: { id: nil })
   end
 

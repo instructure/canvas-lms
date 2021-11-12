@@ -113,12 +113,12 @@ class ApplicationController < ActionController::Base
 
   add_crumb(proc {
     title = I18n.t('links.dashboard', 'My Dashboard')
-    crumb = <<-END
+    crumb = <<~HTML
       <i class="icon-home"
          title="#{title}">
         <span class="screenreader-only">#{title}</span>
       </i>
-    END
+    HTML
 
     crumb.html_safe
   }, :root_path, class: 'home')

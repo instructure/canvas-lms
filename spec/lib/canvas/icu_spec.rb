@@ -157,7 +157,7 @@ describe Canvas::ICU do
       end
 
       def collate(values)
-        ActiveRecord::Base.connection.select_values <<-SQL
+        ActiveRecord::Base.connection.select_values <<~SQL.squish
           SELECT col FROM ( VALUES #{values.map { |v| "(#{ActiveRecord::Base.connection.quote(v)})" }.join(", ")} ) AS s(col)
           ORDER BY #{ActiveRecord::Base.best_unicode_collation_key('col')}
         SQL

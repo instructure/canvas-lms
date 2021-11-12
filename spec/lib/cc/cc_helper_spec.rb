@@ -84,8 +84,8 @@ describe CC::CCHelper do
 
     it "does not touch media links on course copy" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
-      orig = <<-HTML
-      <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
+      orig = <<~HTML
+        <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
       HTML
       translated = @exporter.html_content(orig)
       expect(translated).to eq orig
@@ -94,8 +94,8 @@ describe CC::CCHelper do
     it "does not touch links to deleted media objects" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       @obj.destroy
-      orig = <<-HTML
-      <p><a id="media_comment_abcde" class="instructure_inline_media_comment">this is a media comment</a></p>
+      orig = <<~HTML
+        <p><a id="media_comment_abcde" class="instructure_inline_media_comment">this is a media comment</a></p>
       HTML
       translated = @exporter.html_content(orig)
       expect(translated).to eq orig
@@ -163,8 +163,8 @@ describe CC::CCHelper do
     it "finds media objects outside the context (because course copy)" do
       other_course = course_factory
       @exporter = CC::CCHelper::HtmlContentExporter.new(other_course, @user)
-      @exporter.html_content(<<-HTML)
-      <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
+      @exporter.html_content(<<~HTML)
+        <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
       HTML
       expect(@exporter.used_media_objects.map(&:media_id)).to eql(['abcde'])
     end
@@ -196,8 +196,8 @@ describe CC::CCHelper do
 
     it "only translates course when trying to translate /cousers/x/users/y type links" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
-      orig = <<-HTML
-      <a href='/courses/#{@course.id}/users/#{@teacher.id}'>ME</a>
+      orig = <<~HTML
+        <a href='/courses/#{@course.id}/users/#{@teacher.id}'>ME</a>
       HTML
       translated = @exporter.html_content(orig)
       expect(translated).to match(/users\/#{@teacher.id}/)
@@ -222,7 +222,7 @@ describe CC::CCHelper do
       allow(HostUrl).to receive(:context_host).and_return('www.example.com:8080')
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)
       @othercourse = Course.create!
-      html = <<-HTML
+      html = <<~HTML
         <a href="/courses/#{@course.id}/wiki/front-page">This course's front page</a>
         <a href="/courses/#{@othercourse.id}/wiki/front-page">Other course's front page</a>
       HTML
@@ -237,7 +237,7 @@ describe CC::CCHelper do
       allow(HostUrl).to receive(:context_host).and_return('www.example.com:8080')
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)
       page = @course.wiki_pages.create(:title => '9000, the level is over')
-      html = <<-HTML
+      html = <<~HTML
         <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
       HTML
       doc = Nokogiri::HTML5(@exporter.html_content(html))
@@ -250,7 +250,7 @@ describe CC::CCHelper do
       allow(HostUrl).to receive(:context_host).and_return('www.example.com:8080')
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)
       page = @course.wiki_pages.create(:title => '9000')
-      html = <<-HTML
+      html = <<~HTML
         <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
       HTML
       doc = Nokogiri::HTML5(@exporter.html_content(html))
@@ -262,7 +262,7 @@ describe CC::CCHelper do
       allow(HostUrl).to receive(:protocol).and_return('http')
       allow(HostUrl).to receive(:context_host).and_return('www.example.com:8080')
       @assignment = @course.assignments.create!(:name => "Thing")
-      html = <<-HTML
+      html = <<~HTML
         <a href="/courses/#{@course.id}/assignments/#{@assignment.id}">Thing</a>
       HTML
       keygen = double()
@@ -297,8 +297,8 @@ describe CC::CCHelper do
       @course.media_objects.create!(:media_id => 'xyzzy')
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, media_object_flavor: 'flash video')
       expect {
-        @exporter.html_content(<<-HTML)
-        <p><a id='media_comment_xyzzy' class='instructure_inline_media_comment'>this is a media comment</a></p>
+        @exporter.html_content(<<~HTML)
+          <p><a id='media_comment_xyzzy' class='instructure_inline_media_comment'>this is a media comment</a></p>
         HTML
       }.not_to raise_error
     end
