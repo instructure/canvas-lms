@@ -5171,19 +5171,17 @@ describe Course, "#sync_homeroom_enrollments" do
     @homeroom_course.homeroom_course = true
     @homeroom_course.save!
 
-    @teacher = User.create
+    @teacher = user_with_pseudonym
     @homeroom_course.enroll_teacher(@teacher).accept
 
-    @ta = User.create
+    @ta = user_with_pseudonym
     @homeroom_course.enroll_user(@ta, "TaEnrollment").accept
 
-    @student = User.create
+    @student = user_with_pseudonym
     @homeroom_course.enroll_user(@student, "StudentEnrollment").accept
 
-    @observer = User.create
-    observer_enrollment = @homeroom_course.enroll_user(@observer, "ObserverEnrollment")
-    observer_enrollment.accept
-    observer_enrollment.update(associated_user_id: @student.id)
+    @observer = user_with_pseudonym
+    @homeroom_course.enroll_user(@observer, "ObserverEnrollment", associated_user_id: @student.id).accept
 
     @course = course_factory(active_course: true, account: @homeroom_course.account)
     @course.sync_enrollments_from_homeroom = true
@@ -5244,6 +5242,15 @@ describe Course, "#sync_homeroom_enrollments" do
     @course.homeroom_course_id = @homeroom_course.id
     @course.save!
     expect(@course.sync_homeroom_enrollments).not_to eq(false)
+  end
+
+  it "works with linked observers observing multiple students" do
+    student2 = user_with_pseudonym
+    UserObservationLink.create_or_restore(observer: @observer, student: @student, root_account: @course.root_account)
+    UserObservationLink.create_or_restore(observer: @observer, student: student2, root_account: @course.root_account)
+    @homeroom_course.enroll_user(student2, "StudentEnrollment").accept
+    @course.sync_homeroom_enrollments
+    expect(@observer.enrollments.where(course_id: @course).pluck(:associated_user_id)).to match_array([@student.id, student2.id])
   end
 
   context "cross-shard" do

@@ -3436,16 +3436,15 @@ class Course < ActiveRecord::Base
     linked_homeroom_course.all_enrollments.find_each do |enrollment|
       self.shard.activate do
         course_enrollment = if self.shard == enrollment.shard
-                              all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id, role_id: enrollment.role_id)
+                              all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id, role_id: enrollment.role_id, associated_user_id: enrollment.associated_user_id)
                             else
                               # roles don't apply across shards, so fall back to the base type
-                              all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id)
+                              all_enrollments.find_or_initialize_by(type: enrollment.type, user_id: enrollment.user_id, associated_user_id: enrollment.associated_user_id)
                             end
         course_enrollment.workflow_state = enrollment.workflow_state
         course_enrollment.start_at = enrollment.start_at
         course_enrollment.end_at = enrollment.end_at
         course_enrollment.completed_at = enrollment.completed_at
-        course_enrollment.associated_user_id = enrollment.associated_user_id
         course_enrollment.save!
         progress.increment_completion!(1) if progress&.total
       end
