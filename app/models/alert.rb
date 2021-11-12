@@ -71,9 +71,10 @@ class Alert < ActiveRecord::Base
 
   def as_json(**)
     converted_recipients = self.recipients.to_a.map do |recipient|
-      if recipient.is_a?(String)
+      case recipient
+      when String
         find_role_by_name(recipient).id
-      elsif recipient.is_a?(Hash)
+      when Hash
         recipient[:role_id]
       else
         ":#{recipient}"

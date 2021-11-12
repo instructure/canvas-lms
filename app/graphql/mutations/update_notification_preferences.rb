@@ -129,9 +129,10 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
   end
 
   def get_context(input)
-    if input[:context_type] == 'Course'
+    case input[:context_type]
+    when 'Course'
       Course.find(input[:course_id]) if input[:course_id]
-    elsif input[:context_type] == 'Account'
+    when 'Account'
       Account.find(input[:account_id]) if input[:account_id]
     end
   end

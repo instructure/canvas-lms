@@ -638,9 +638,10 @@ class Group < ActiveRecord::Base
     return true if can_participate
     return false unless user.present? && self.context.present?
     return true if self.group_category.try(:communities?)
-    if self.context.is_a?(Course)
+    case self.context
+    when Course
       return self.context.enrollments.not_fake.where(:user_id => user.id).active_by_date.exists?
-    elsif self.context.is_a?(Account)
+    when Account
       return self.context.root_account.user_account_associations.where(:user_id => user.id).exists?
     end
 

@@ -167,15 +167,16 @@ module Api
     return lookups['id'], id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
 
     id = id.to_s.strip
-    if id =~ %r{\Ahex:(lti_[\w_]+|sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z}
+    case id
+    when %r{\Ahex:(lti_[\w_]+|sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z}
       sis_column = $1
       sis_id = [$2].pack('H*')
-    elsif id =~ %r{\A(lti_[\w_]+|sis_[\w_]+):(.+)\z}
+    when %r{\A(lti_[\w_]+|sis_[\w_]+):(.+)\z}
       sis_column = $1
       sis_id = $2
-    elsif ID_REGEX.match?(id)
+    when ID_REGEX
       return lookups['id'], (/\A\d+\z/.match?(id) ? id.to_i : id)
-    elsif id =~ UUID_REGEX
+    when UUID_REGEX
       return lookups['uuid'], $1
     else
       return nil, nil

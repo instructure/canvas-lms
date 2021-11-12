@@ -780,11 +780,12 @@ class ApplicationController < ActionController::Base
   end
 
   def tab_disabled_message(context)
-    if context.is_a?(Account)
+    case context
+    when Account
       t "#application.notices.page_disabled_for_account", "That page has been disabled for this account"
-    elsif context.is_a?(Course)
+    when Course
       t "#application.notices.page_disabled_for_course", "That page has been disabled for this course"
-    elsif context.is_a?(Group)
+    when Group
       t "#application.notices.page_disabled_for_group", "That page has been disabled for this group"
     else
       t "#application.notices.page_disabled", "That page has been disabled"
@@ -1215,13 +1216,14 @@ class ApplicationController < ActionController::Base
     redirect ||= root_url
     get_quota(context)
     if response.body.size + @quota_used > @quota
-      error = if context.is_a?(Account)
+      error = case context
+              when Account
                 t "#application.errors.quota_exceeded_account", "Account storage quota exceeded"
-              elsif context.is_a?(Course)
+              when Course
                 t "#application.errors.quota_exceeded_course", "Course storage quota exceeded"
-              elsif context.is_a?(Group)
+              when Group
                 t "#application.errors.quota_exceeded_group", "Group storage quota exceeded"
-              elsif context.is_a?(User)
+              when User
                 t "#application.errors.quota_exceeded_user", "User storage quota exceeded"
               else
                 t "#application.errors.quota_exceeded", "Storage quota exceeded"
@@ -1248,7 +1250,8 @@ class ApplicationController < ActionController::Base
     end
     @context = nil
     @problem = nil
-    if pieces[0] == "enrollment"
+    case pieces[0]
+    when "enrollment"
       @enrollment = Enrollment.where(uuid: pieces[1]).first if pieces[1]
       @context_type = "Course"
       if !@enrollment
@@ -1258,7 +1261,7 @@ class ApplicationController < ActionController::Base
       end
       @context = @enrollment.course unless @problem
       @current_user = @enrollment.user unless @problem
-    elsif pieces[0] == 'group_membership'
+    when 'group_membership'
       @membership = GroupMembership.active.where(uuid: pieces[1]).first if pieces[1]
       @context_type = "Group"
       if !@membership
@@ -1268,7 +1271,7 @@ class ApplicationController < ActionController::Base
       end
       @context = @membership.group unless @problem
       @current_user = @membership.user unless @problem
-    elsif pieces[0] == 'user'
+    when 'user'
       find_user_from_uuid(pieces[1])
       @problem = t "#application.errors.invalid_verification_code", "The verification code is invalid." unless @current_user
       @context = @current_user
@@ -1281,9 +1284,10 @@ class ApplicationController < ActionController::Base
       if !@context
         @problem = t "#application.errors.invalid_verification_code", "The verification code is invalid."
       elsif (!@context.is_public rescue false) && (!@context.respond_to?(:uuid) || pieces[1] != @context.uuid)
-        @problem = if @context_type == 'course'
+        @problem = case @context_type
+                   when 'course'
                      t "#application.errors.feed_private_course", "The matching course has gone private, so public feeds like this one will no longer be visible."
-                   elsif @context_type == 'group'
+                   when 'group'
                      t "#application.errors.feed_private_group", "The matching group has gone private, so public feeds like this one will no longer be visible."
                    else
                      t "#application.errors.feed_private", "The matching context has gone private, so public feeds like this one will no longer be visible."

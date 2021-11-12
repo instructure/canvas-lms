@@ -823,9 +823,10 @@ class Submission < ActiveRecord::Base
   end
 
   def turnitin_assets
-    if self.submission_type == 'online_upload'
+    case self.submission_type
+    when 'online_upload'
       self.attachments.select(&:turnitinable?)
-    elsif self.submission_type == 'online_text_entry'
+    when 'online_text_entry'
       [self]
     else
       []
@@ -1134,9 +1135,10 @@ class Submission < ActiveRecord::Base
   end
 
   def vericite_assets
-    if self.submission_type == 'online_upload'
+    case self.submission_type
+    when 'online_upload'
       self.attachments.select(&:vericiteable?)
-    elsif self.submission_type == 'online_text_entry'
+    when 'online_text_entry'
       [self]
     else
       []

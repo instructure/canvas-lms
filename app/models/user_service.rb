@@ -228,9 +228,10 @@ class UserService < ActiveRecord::Base
   end
 
   def self.service_type(type)
-    if type == 'google_docs' || type == 'google_drive'
+    case type
+    when 'google_docs', 'google_drive'
       'DocumentService'
-    elsif type == 'delicious' || type == 'diigo'
+    when 'delicious', 'diigo'
       'BookmarkService'
     else
       'UserService'

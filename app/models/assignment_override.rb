@@ -245,9 +245,10 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set
-    if self.set_type == 'ADHOC'
+    case self.set_type
+    when 'ADHOC'
       assignment_override_students.preload(:user).map(&:user)
-    elsif self.set_type == SET_TYPE_NOOP
+    when SET_TYPE_NOOP
       nil
     else
       super

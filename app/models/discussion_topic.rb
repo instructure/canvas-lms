@@ -1611,9 +1611,10 @@ class DiscussionTopic < ActiveRecord::Base
       item = RSS::Rss::Channel::Item.new
       item.title = before_label((asset.title rescue "")) + elem.name
       link = nil
-      if asset.is_a?(DiscussionTopic)
+      case asset
+      when DiscussionTopic
         link = "http://#{HostUrl.context_host(asset.context)}/#{asset.context_url_prefix}/discussion_topics/#{asset.id}"
-      elsif asset.is_a?(DiscussionEntry)
+      when DiscussionEntry
         link = "http://#{HostUrl.context_host(asset.context)}/#{asset.context_url_prefix}/discussion_topics/#{asset.discussion_topic_id}#entry-#{asset.id}"
       end
 
@@ -1622,12 +1623,13 @@ class DiscussionTopic < ActiveRecord::Base
       item.pubDate = elem.updated_at.utc
       item.description = asset ? asset.message : elem.name
       item.enclosure
-      if elem.is_a?(Attachment)
+      case elem
+      when Attachment
         item.guid.content = link + "/#{elem.uuid}"
         url = "http://#{HostUrl.context_host(elem.context)}/#{elem.context_url_prefix}"\
               "/files/#{elem.id}/download#{elem.extension}?verifier=#{elem.uuid}"
         item.enclosure = RSS::Rss::Channel::Item::Enclosure.new(url, elem.size, elem.content_type)
-      elsif elem.is_a?(MediaObject)
+      when MediaObject
         item.guid.content = link + "/#{elem.media_id}"
         details = elem.podcast_format_details
         content_type = 'video/mpeg'

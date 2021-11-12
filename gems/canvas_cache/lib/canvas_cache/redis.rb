@@ -265,10 +265,11 @@ module CanvasCache
           host: location,
         }
         unless NON_KEY_COMMANDS.include?(command)
-          message[:key] = if command == :mset
+          message[:key] = case command
+                          when :mset
                             # This is an array with a single element: an array alternating key/values
                             request.first(&:first).select.with_index { |_, i| i % 2 == 0 }
-                          elsif command == :mget
+                          when :mget
                             request
                           else
                             request.first

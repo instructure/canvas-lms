@@ -262,15 +262,16 @@ module Qti
 
     def get_base_value(node)
       weight = AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT
-      if node['baseType'] == "float" # base_value = node.at_css('baseValue[baseType=float]')
+      case node['baseType']
+      when "float" # base_value = node.at_css('baseValue[baseType=float]')
         if node.text =~ /score\.max/i or node.text.to_f > 0
           weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
         end
-      elsif node['baseType'] == "integer" # elsif base_value = node.at_css('baseValue[baseType=integer]')
+      when "integer" # elsif base_value = node.at_css('baseValue[baseType=integer]')
         if node.text.to_i > 0
           weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
         end
-      elsif node['baseType'] == "boolean" # elsif base_value = node.at_css('baseValue[baseType=boolean]')
+      when "boolean" # elsif base_value = node.at_css('baseValue[baseType=boolean]')
         if node.text.downcase == "true"
           weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
         end

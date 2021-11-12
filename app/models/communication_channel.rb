@@ -289,11 +289,12 @@ class CommunicationChannel < ActiveRecord::Base
   # Return the 'path' for simple communication channel types like email and sms.
   # For Twitter, return the user's configured user_name for the service.
   def path_description
-    if self.path_type == TYPE_TWITTER
+    case self.path_type
+    when TYPE_TWITTER
       res = self.user.user_services.for_service(TYPE_TWITTER).first.service_user_name rescue nil
       res ||= t :default_twitter_handle, 'Twitter Handle'
       res
-    elsif self.path_type == TYPE_PUSH
+    when TYPE_PUSH
       t 'For All Devices'
     else
       self.path

@@ -290,11 +290,12 @@ class Folder < ActiveRecord::Base
       dup.save!
       self.subcontent.each do |item|
         if options[:everything] || options[:all_files] || options[item.asset_string.to_sym]
-          if item.is_a?(Attachment)
+          case item
+          when Attachment
             file = item.clone_for(context, nil, options.slice(:overwrite, :force_copy))
             file.folder_id = dup.id
             file.save_without_broadcasting!
-          elsif item.is_a?(Folder)
+          when Folder
             sub = item.clone_for(context, nil, options)
             sub.parent_folder_id = dup.id
             sub.save!
@@ -312,9 +313,10 @@ class Folder < ActiveRecord::Base
   end
 
   def self.root_folder_name_for_context(context)
-    if context.is_a? Course
+    case context
+    when Course
       ROOT_FOLDER_NAME
-    elsif context.is_a? User
+    when User
       MY_FILES_FOLDER_NAME
     else
       "files"

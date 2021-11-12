@@ -29,9 +29,10 @@ module FeatureFlags
     def self.wrap_translate_text(value)
       return -> { "" } if value.empty?
 
-      if value.is_a?(String)
+      case value
+      when String
         -> { I18n.send(:t, value) }
-      elsif value.is_a?(Hash)
+      when Hash
         wrapper = value.delete(:wrapper)
         keys = value.keys
         raise "invalid i18n settings while translating: #{value}" if keys.size != 1

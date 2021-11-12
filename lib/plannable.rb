@@ -128,9 +128,10 @@ module Plannable
 
     # Grabs the value to use for the bookmark & comparison
     def column_value(object, col)
-      if col.is_a?(Array)
+      case col
+      when Array
         object.attributes.values_at(*col).compact.first # coalesce nulls
-      elsif col.is_a?(Hash)
+      when Hash
         association_value(object, col)
       else
         object.attributes[col]

@@ -178,14 +178,15 @@ module Importers
       elsif (grading = hash[:grading])
         hash[:due_at] ||= grading[:due_at] || grading[:due_date]
         hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
-        if /numeric|points/i.match?(grading[:grade_type])
+        case grading[:grade_type]
+        when /numeric|points/i
           item.points_possible = grading[:points_possible] ? grading[:points_possible].to_f : 10
-        elsif /alphanumeric|letter_grade/i.match?(grading[:grade_type])
+        when /alphanumeric|letter_grade/i
           item.grading_type = "letter_grade"
           item.points_possible = grading[:points_possible] ? grading[:points_possible].to_f : 100
-        elsif grading[:grade_type] == 'rubric'
+        when 'rubric'
           hash[:rubric_migration_id] ||= grading[:rubric_id]
-        elsif grading[:grade_type] == 'not_graded'
+        when 'not_graded'
           item.submission_types = 'not_graded'
         end
       end

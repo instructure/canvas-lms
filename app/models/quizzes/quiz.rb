@@ -861,7 +861,8 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def hide_results=(val)
-    if val.is_a?(Hash)
+    case val
+    when Hash
       val = if val[:last_attempt] == '1'
               'until_after_last_attempt'
             elsif val[:never] != '1'
@@ -869,7 +870,7 @@ class Quizzes::Quiz < ActiveRecord::Base
             else
               nil
             end
-    elsif val == ""
+    when ""
       val = nil
     end
     write_attribute(:hide_results, val)

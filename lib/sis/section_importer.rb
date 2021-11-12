@@ -114,9 +114,10 @@ module SIS
         end
 
         section.integration_id = integration_id
-        if /active/i.match?(status)
+        case status
+        when /active/i
           section.workflow_state = 'active'
-        elsif /deleted/i.match?(status)
+        when /deleted/i
           section.workflow_state = 'deleted'
           deleted_section_ids << section.id
         end

@@ -65,7 +65,8 @@ class ContextController < ApplicationController
 
     log_asset_access(["roster", @context], 'roster', 'other')
 
-    if @context.is_a?(Course)
+    case @context
+    when Course
       return unless tab_enabled?(Course::TAB_PEOPLE)
 
       if @context.concluded?
@@ -128,7 +129,7 @@ class ContextController < ApplicationController
       if @context.grants_right?(@current_user, session, :read_as_admin)
         set_student_context_cards_js_env
       end
-    elsif @context.is_a?(Group)
+    when Group
       @users = if @context.grants_right?(@current_user, :read_as_admin)
                  @context.participating_users.distinct.order_by_sortable_name
                else
@@ -213,7 +214,8 @@ class ContextController < ApplicationController
       raise ActiveRecord::RecordNotFound unless Api::ID_REGEX.match?(params[:id])
 
       user_id = Shard.relative_id_for(params[:id], Shard.current, @context.shard)
-      if @context.is_a?(Course)
+      case @context
+      when Course
         is_admin = @context.grants_right?(@current_user, session, :read_as_admin)
         scope = @context.enrollments_visible_to(@current_user, :include_concluded => is_admin).where(user_id: user_id)
         scope = scope.active_or_pending unless is_admin
@@ -230,16 +232,17 @@ class ContextController < ApplicationController
 
           log_asset_access(@membership, "roster", "roster")
         end
-      elsif @context.is_a?(Group)
+      when Group
         @membership = @context.group_memberships.active.where(user_id: user_id).first
         @enrollments = []
       end
 
       @user = @membership.user rescue nil
       unless @user
-        if @context.is_a?(Course)
+        case @context
+        when Course
           flash[:error] = t('no_user.course', "That user does not exist or is not currently a member of this course")
-        elsif @context.is_a?(Group)
+        when Group
           flash[:error] = t('no_user.group', "That user does not exist or is not currently a member of this group")
         end
         redirect_to named_context_url(@context, :context_users_url)

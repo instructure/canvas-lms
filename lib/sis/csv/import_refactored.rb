@@ -91,7 +91,8 @@ module SIS
         @batch.data[:downloadable_attachment_ids] ||= []
         @files.each do |file|
           if File.file?(file)
-            if File.extname(file).downcase == '.zip'
+            case File.extname(file).downcase
+            when '.zip'
               tmp_dir = Dir.mktmpdir
               @tmp_dirs << tmp_dir
               CanvasUnzip.extract_archive(file, tmp_dir)
@@ -102,7 +103,7 @@ module SIS
                 att = create_batch_attachment(File.join(tmp_dir, file_name))
                 process_file(tmp_dir, file_name, att)
               end
-            elsif File.extname(file).downcase == '.csv'
+            when '.csv'
               att = @batch.attachment if @batch.attachment && File.extname(@batch.attachment.filename).downcase == '.csv'
               att ||= create_batch_attachment file
               process_file(File.dirname(file), File.basename(file), att)
