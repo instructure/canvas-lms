@@ -261,7 +261,7 @@ new_sis_integrations:
       partner products should enable this feature for enhanced assignment data
       validation workflows. When enabled, this feature displays the new SIS
       Integration settings for SIS Sync (Assignment Level Grade Passback) in Account
-      Settings. The Post to SIS feature preview has been incorporated into this new
+      Settings. The Post to SIS feature option has been incorporated into this new
       setting and will be enabled by default.
   applies_to: Account
   root_opt_in: true

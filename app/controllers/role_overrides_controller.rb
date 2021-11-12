@@ -242,7 +242,7 @@ class RoleOverridesController < ApplicationController
   #     manage_courses_add               -- Courses - add
   #     manage_courses_admin             -- Courses - manage / update
   #     manage_developer_keys            -- Developer keys - manage
-  #     manage_feature_flags             -- Feature Previews - enable / disable
+  #     manage_feature_flags             -- Feature Options - enable / disable
   #     manage_master_courses            -- Blueprint Courses - add / edit / associate / delete
   #     manage_role_overrides            -- Permissions - manage
   #     manage_storage_quotas            -- Storage Quotas - manage
@@ -253,7 +253,7 @@ class RoleOverridesController < ApplicationController
   #     read_course_content              -- Course Content - view
   #     read_course_list                 -- Courses - view list
   #     view_course_changes              -- Courses - view change logs
-  #     view_feature_flags               -- Feature Previews - view
+  #     view_feature_flags               -- Feature Options - view
   #     view_grade_changes               -- Grades - view change logs
   #     view_notifications               -- Notifications - view
   #     view_quiz_answer_audits          -- Quizzes - view submission log
