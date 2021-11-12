@@ -22,6 +22,15 @@
 module MicrosoftSync
   class GraphService
     class SpecialCase
+      class Response
+        attr_reader :status_code, :body
+
+        def initialize(status_code:, body:)
+          @status_code = status_code
+          @body = body
+        end
+      end
+
       attr_reader :status_code, :body_regex, :result
 
       def initialize(status_code, body_regex = nil, result:)
@@ -30,15 +39,17 @@ module MicrosoftSync
         @result = result
       end
 
-      def test(code, body)
-        if code == status_code && (body_regex.nil? || body =~ body_regex)
+      def test(response)
+        if response.status_code == status_code &&
+           (body_regex.nil? || response.body =~ body_regex)
           result.is_a?(Class) ? result.new : result
         end
       end
 
-      def self.match(special_cases, code, body)
+      def self.match(special_cases, **response_params)
+        response = Response.new(**response_params)
         special_cases.reduce(nil) do |result, sc|
-          result || sc.test(code, body)
+          result || sc.test(response)
         end
       end
     end

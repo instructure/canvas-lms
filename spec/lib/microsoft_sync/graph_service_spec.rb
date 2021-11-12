@@ -737,27 +737,6 @@ describe MicrosoftSync::GraphService do
     end
   end
 
-  describe '#get_group' do
-    subject { service.get_group('msgroupid') }
-
-    let(:http_method) { :get }
-    let(:url) { 'https://graph.microsoft.com/v1.0/groups/msgroupid' }
-    let(:response_body) { { 'abc' => 'def' } }
-
-    it { is_expected.to eq(response_body) }
-
-    it_behaves_like 'a graph service endpoint'
-    it_behaves_like 'an endpoint that uses up quota', [1, 0]
-
-    context 'when certain fields are selected' do
-      subject { service.get_group('msgroupid', select: %w[abc d e]) }
-
-      let(:with_params) { { query: { '$select' => 'abc,d,e' } } }
-
-      it { is_expected.to eq(response_body) }
-    end
-  end
-
   describe '#list_group_members' do
     let(:method_name) { :list_group_members }
     let(:method_args) { ['mygroup'] }
