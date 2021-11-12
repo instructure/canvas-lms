@@ -1049,9 +1049,10 @@ module Api::V1::Assignment
   def assignment_configuration_tool(assignment_params)
     tool_id = assignment_params['similarityDetectionTool'].split('_').last.to_i
     tool = nil
-    if assignment_params['configuration_tool_type'] == 'ContextExternalTool'
+    case assignment_params['configuration_tool_type']
+    when 'ContextExternalTool'
       tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)
-    elsif assignment_params['configuration_tool_type'] == 'Lti::MessageHandler'
+    when 'Lti::MessageHandler'
       mh = Lti::MessageHandler.find(tool_id)
       mh_context = mh.resource_handler.tool_proxy.context
       tool = mh if mh_context == @context || @context.account_chain.include?(mh_context)

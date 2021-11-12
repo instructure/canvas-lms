@@ -33,15 +33,16 @@ class GradebookUserIds
   end
 
   def user_ids
-    if @column == "student"
+    case @column
+    when "student"
       sort_by_student_field
-    elsif /assignment_\d+$/.match?(@column)
+    when /assignment_\d+$/
       assignment_id = @column[/\d+$/]
       send("sort_by_assignment_#{@sort_by}", assignment_id)
-    elsif /^assignment_group_\d+$/.match?(@column)
+    when /^assignment_group_\d+$/
       assignment_id = @column[/\d+$/]
       sort_by_assignment_group(assignment_id)
-    elsif @column == "total_grade"
+    when "total_grade"
       sort_by_total_grade
     else
       sort_by_student_name
@@ -190,9 +191,10 @@ class GradebookUserIds
   end
 
   def sort_by_scores(type = :total_grade, id = nil)
-    score_scope = if type == :assignment_group
+    score_scope = case type
+                  when :assignment_group
                     "scores.assignment_group_id=#{Score.connection.quote(id)}"
-                  elsif type == :grading_period
+                  when :grading_period
                     "scores.grading_period_id=#{Score.connection.quote(id)}"
                   else
                     "scores.course_score IS TRUE"

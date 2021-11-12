@@ -167,7 +167,8 @@ namespace :i18n do
   task :generate_lolz => [:generate, :environment] do
     strings_processed = 0
     process_lolz = Proc.new do |val|
-      if val.is_a?(Hash)
+      case val
+      when Hash
         processed = strings_processed
 
         hash = Hash.new
@@ -175,9 +176,9 @@ namespace :i18n do
 
         print '.' if strings_processed > processed
         hash
-      elsif val.is_a?(Array)
+      when Array
         val.each.map { |v| process_lolz.call(v) }
-      elsif val.is_a?(String)
+      when String
         strings_processed += 1
         I18n.let_there_be_lols(val)
       else

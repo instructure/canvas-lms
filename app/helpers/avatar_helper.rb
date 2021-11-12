@@ -77,9 +77,10 @@ module AvatarHelper
   end
 
   def avatar_url_for(conversation, participants = conversation.participants)
-    if participants.size == 1
+    case participants.size
+    when 1
       avatar_url_for_user(participants.first)
-    elsif participants.size == 2
+    when 2
       avatar_url_for_user(participants.find { |u| u.id != conversation.user_id })
     else
       avatar_url_for_group

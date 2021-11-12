@@ -107,9 +107,10 @@ module Api::V1::CalendarEvent
     hash['hidden'] = user ? event.hidden? : false
 
     if include.include?('participants')
-      if event.context_type == 'User'
+      case event.context_type
+      when 'User'
         hash['user'] = user_json(event.context, user, session)
-      elsif event.context_type == 'Group'
+      when 'Group'
         hash['group'] = group_json(event.context, user, session, :include => ['users'])
       end
     end

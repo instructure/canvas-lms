@@ -959,9 +959,10 @@ module ApplicationHelper
       raise ArgumentError, "format must be one of #{ACCEPTABLE_FORMAT_TYPES.join(',')}"
     end
 
-    if format == 'date'
+    case format
+    when 'date'
       I18n.t('#helpers.accessible_date_only_format', 'YYYY-MM-DD')
-    elsif format == 'time'
+    when 'time'
       I18n.t('#helpers.accessible_time_only_format', 'hh:mm')
     else
       I18n.t('#helpers.accessible_date_format', 'YYYY-MM-DD hh:mm')
@@ -1061,7 +1062,8 @@ module ApplicationHelper
         @csp_context_is_submission = false
         attachment = @attachment || @context
         if attachment.is_a?(Attachment)
-          if attachment.context_type == 'User'
+          case attachment.context_type
+          when 'User'
             # search for an attachment association
             aas =
               attachment
@@ -1078,10 +1080,10 @@ module ApplicationHelper
               @csp_context_is_submission = true
               courses.first
             end
-          elsif attachment.context_type == 'Submission'
+          when 'Submission'
             @csp_context_is_submission = true
             attachment.submission.assignment.course
-          elsif attachment.context_type == 'Course'
+          when 'Course'
             attachment.course
           else
             brand_config_account

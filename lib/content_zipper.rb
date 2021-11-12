@@ -417,10 +417,11 @@ class ContentZipper
   end
 
   def add_text_or_url(type, to_zip, called)
-    if type == :text
+    case type
+    when :text
       filename = "#{called}_text.html"
       display_page = "text_entry_page.html.erb"
-    elsif type == :url
+    when :url
       filename = "#{called}_link.html"
       display_page = "redirect_page.html.erb"
     end

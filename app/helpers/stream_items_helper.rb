@@ -52,7 +52,8 @@ module StreamItemsHelper
 
       next unless supported_categories.include?(category)
 
-      if category == "Conversation"
+      case category
+      when "Conversation"
         participant = user.conversation_participant(item.asset_id)
 
         next if participant.nil? || participant.last_message.nil? || participant.last_author?
@@ -63,7 +64,7 @@ module StreamItemsHelper
         # the workflow_state on the stream_item_instance, that workflow_state
         # may be out of sync with the underlying conversation.
         item.unread = participant.unread?
-      elsif category == "AssessmentRequest"
+      when "AssessmentRequest"
         next unless item.data.asset.grants_right?(user, :read)
       end
 

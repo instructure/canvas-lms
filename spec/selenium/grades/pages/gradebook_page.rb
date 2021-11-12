@@ -570,11 +570,12 @@ module Gradebook
   def self.gradebook_dropdown_item_click(menu_item_name)
     gradebook_menu_element.click
 
-    if menu_item_name == "Individual View"
+    case menu_item_name
+    when "Individual View"
       menu_item(INDIVIDUAL_VIEW_ITEM_SELECTOR).click
-    elsif menu_item_name == "Learning Mastery"
+    when "Learning Mastery"
       menu_item(LEARING_MASTERY_ITEM_SELECTOR).click
-    elsif menu_item_name == "Gradebook History"
+    when "Gradebook History"
       menu_item(GRADE_HISTORY_ITEM_SELECTOR).click
     end
   end
@@ -616,9 +617,10 @@ module Gradebook
     hover(student_header_menu_main_element('Sort by'))
     wait_for_ajaximations
 
-    if menu_option == "A-Z"
+    case menu_option
+    when "A-Z"
       student_header_submenu_item_element('A–Z').click
-    elsif menu_option == "Z-A"
+    when "Z-A"
       student_header_submenu_item_element('Z–A').click
     end
   end
@@ -627,11 +629,12 @@ module Gradebook
     student_column_menu.click
     hover(student_header_menu_main_element("Display as"))
 
-    if menu_option == "First,Last"
+    case menu_option
+    when "First,Last"
       student_header_submenu_item_element('First, Last Name').click
-    elsif menu_option == "Last,First"
+    when "Last,First"
       student_header_submenu_item_element('Last, First Name').click
-    elsif menu_option == "Anonymous"
+    when "Anonymous"
       student_header_submenu_item_element('Anonymous').click
     end
   end
@@ -640,13 +643,14 @@ module Gradebook
     student_column_menu.click
     hover(student_header_menu_main_element("Secondary info"))
 
-    if menu_option == "Section"
+    case menu_option
+    when "Section"
       student_header_submenu_item_element('Section').click
-    elsif menu_option == "SIS"
+    when "SIS"
       student_header_submenu_item_element('SIS ID').click
-    elsif menu_option == "Login"
+    when "Login"
       student_header_submenu_item_element('Login ID').click
-    elsif menu_option == "None"
+    when "None"
       student_header_submenu_item_element('None').click
     end
   end
@@ -685,9 +689,10 @@ module Gradebook
   def self.assignment_header_menu_item_selector(item)
     menu_item_id = ""
 
-    if /curve(-?\s?grade)?/i.match?(item)
+    case item
+    when /curve(-?\s?grade)?/i
       menu_item_id = 'curve-grades'
-    elsif /set(-?\s?default-?\s?grade)?/i.match?(item)
+    when /set(-?\s?default-?\s?grade)?/i
       menu_item_id = 'set-default-grade'
     end
 
@@ -703,11 +708,12 @@ module Gradebook
   end
 
   def self.select_view_filter(filter)
-    if filter == "Grading Periods"
+    case filter
+    when "Grading Periods"
       show_grading_period_filter_element.click
-    elsif filter == "Modules"
+    when "Modules"
       show_module_filter_element.click
-    elsif filter == "Sections"
+    when "Sections"
       show_section_filter_element.click
     end
   end
@@ -728,13 +734,14 @@ module Gradebook
     assignment_header_menu_element(assignment_id).click
     menu_item_id = ""
 
-    if /(message(-?\s?student)?)/i.match?(menuitem)
+    case menuitem
+    when /(message(-?\s?student)?)/i
       menu_item_id = 'message-students-who'
-    elsif /(curve(-?\s?grade)?)/i.match?(menuitem)
+    when /(curve(-?\s?grade)?)/i
       menu_item_id = 'curve-grades'
-    elsif /(set(-?\s?default-?\s?grade)?)/i.match?(menuitem)
+    when /(set(-?\s?default-?\s?grade)?)/i
       menu_item_id = 'set-default-grade'
-    elsif /(download(-?\s?submission)?)/i.match?(menuitem)
+    when /(download(-?\s?submission)?)/i
       menu_item_id = 'download-submissions'
 
     end
@@ -747,15 +754,16 @@ module Gradebook
 
     sort_by_item = ""
 
-    if /(low[\s\-]to[\s\-]high)/i.match?(sort_type)
+    case sort_type
+    when /(low[\s\-]to[\s\-]high)/i
       sort_by_item = 'Grade - Low to High'
-    elsif /(high[\s\-]to[\s\-]low)/i.match?(sort_type)
+    when /(high[\s\-]to[\s\-]low)/i
       sort_by_item = 'Grade - High to Low'
-    elsif /(missing)/i.match?(sort_type)
+    when /(missing)/i
       sort_by_item = 'Missing'
-    elsif /(late)/i.match?(sort_type)
+    when /(late)/i
       sort_by_item = 'Late'
-    elsif /(unposted)/i.match?(sort_type)
+    when /(unposted)/i
       sort_by_item = 'Unposted'
     end
     assignment_header_popover_sub_item_element(sort_by_item).click
@@ -790,9 +798,10 @@ module Gradebook
     assignment_group_header_options_element(group_name).click
     hover(student_header_menu_main_element('Sort by'))
 
-    if sort_type == 'Grade - High to Low'
+    case sort_type
+    when 'Grade - High to Low'
       student_header_submenu_item_element('Grade - High to Low').click
-    elsif sort_type == 'Grade - Low to High'
+    when 'Grade - Low to High'
       student_header_submenu_item_element('Grade - Low to High').click
     end
   end
@@ -801,20 +810,22 @@ module Gradebook
     select_total_column_option
     hover(student_header_menu_main_element('Sort by'))
 
-    if sort_type == 'Grade - High to Low'
+    case sort_type
+    when 'Grade - High to Low'
       student_header_submenu_item_element('Grade - High to Low').click
-    elsif sort_type == 'Grade - Low to High'
+    when 'Grade - Low to High'
       student_header_submenu_item_element('Grade - Low to High').click
     end
   end
 
   def self.click_total_header_menu_option(main_menu)
     select_total_column_option
-    if main_menu == "Move to Front"
+    case main_menu
+    when "Move to Front"
       total_header_options_menu_item_element('Move to Front').click
-    elsif main_menu == "Move to End"
+    when "Move to End"
       total_header_options_menu_item_element('Move to End').click
-    elsif main_menu == "Display as Points"
+    when "Display as Points"
       total_header_options_menu_item_element('Display as Points').click
     end
   end

@@ -60,7 +60,8 @@ class OpenObject < OpenStruct
       new_list
     elsif pre
       pre.each do |name, value|
-        if value.is_a? Array
+        case value
+        when Array
           new_list = []
           value.each do |obj|
             new_list << if obj.is_a? Hash
@@ -70,7 +71,7 @@ class OpenObject < OpenStruct
                         end
           end
           pre[name] = new_list
-        elsif value.is_a? Hash
+        when Hash
           pre[name] = OpenObject.process(value)
         end
       end

@@ -82,7 +82,8 @@ module SIS
         end
 
         unless section.stuck_sis_fields.include?(:course_id)
-          if /\Aactive\z/i.match?(status)
+          case status
+          when /\Aactive\z/i
 
             if @course.deleted?
               @course.workflow_state = 'claimed'
@@ -103,7 +104,7 @@ module SIS
               raise ImportError, "An active cross-listing failed: #{e}"
             end
 
-          elsif /\Adeleted\z/i.match?(status)
+          when /\Adeleted\z/i
             if @course && section.course_id != @course.id
               @success_count += 1
               return

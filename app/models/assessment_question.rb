@@ -161,14 +161,15 @@ class AssessmentQuestion < ActiveRecord::Base
     # or gets the relative path at the end of one like: /courses/15395/file_contents/course%20files/unfiled/test.jpg
 
     deep_translate = lambda do |obj|
-      if obj.is_a?(Hash)
+      case obj
+      when Hash
         obj.inject(HashWithIndifferentAccess.new) { |h, (k, v)|
           h[k] = deep_translate.call(v)
           h
         }
-      elsif obj.is_a?(Array)
+      when Array
         obj.map { |v| deep_translate.call(v) }
-      elsif obj.is_a?(String)
+      when String
         obj.gsub(translate_link_regex) do |match|
           translate_file_link(match, $~)
         end

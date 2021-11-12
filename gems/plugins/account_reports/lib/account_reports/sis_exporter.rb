@@ -51,9 +51,10 @@ module AccountReports
                        :files => files
                      ))
 
-      if @reports.length == 0
+      case @reports.length
+      when 0
         send_report()
-      elsif @reports.length == 1
+      when 1
         csv = self.send(@reports.first)
         send_report(csv)
       else

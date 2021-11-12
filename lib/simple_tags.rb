@@ -92,9 +92,10 @@ module SimpleTags
 
   def self.normalize_tags(tags)
     tags.inject([]) { |ary, tag|
-      if tag =~ /\A((course|group)_\d+).*/
+      case tag
+      when /\A((course|group)_\d+).*/
         ary << $1
-      elsif tag =~ /\Asection_(\d+).*/
+      when /\Asection_(\d+).*/
         section = CourseSection.where(id: $1).first
         ary << section.course.asset_string if section
         # TODO: allow user-defined tags, e.g. #foo

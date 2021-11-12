@@ -71,9 +71,10 @@ module SIS
         course.short_name = short_name if short_name.present? && (course.new_record? || !course.stuck_sis_fields.include?(:short_name))
 
         course.sis_source_id = abstract_course_id
-        if /active/i.match?(status)
+        case status
+        when /active/i
           course.workflow_state = 'active'
-        elsif /deleted/i.match?(status)
+        when /deleted/i
           course.workflow_state = 'deleted'
         end
 

@@ -453,12 +453,13 @@ class ContextModule < ActiveRecord::Base
 
   def prerequisites=(prereqs)
     Rails.cache.delete(['module_names', context].cache_key) # ensure the module list is up to date
-    if prereqs.is_a?(Array)
+    case prereqs
+    when Array
       # validate format, skipping invalid ones
       prereqs = prereqs.select do |pre|
         pre.key?(:id) && pre.key?(:name) && pre[:type] == 'context_module'
       end
-    elsif prereqs.is_a?(String)
+    when String
       res = []
       module_names = ContextModule.module_names(self.context)
       pres = prereqs.split(",")
@@ -635,21 +636,23 @@ class ContextModule < ActiveRecord::Base
     params[:type] = params[:type].underscore if params[:type]
     position = opts[:position] || ((self.content_tags.not_deleted.maximum(:position) || 0) + 1)
     position = [position, params[:position].to_i].max if params[:position]
-    if params[:type] == "wiki_page" || params[:type] == "page"
+    case params[:type]
+    when "wiki_page", "page"
       item = opts[:wiki_page] || self.context.wiki_pages.where(id: params[:id]).first
-    elsif params[:type] == "attachment" || params[:type] == "file"
+    when "attachment", "file"
       item = opts[:attachment] || self.context.attachments.not_deleted.find_by_id(params[:id])
-    elsif params[:type] == "assignment"
+    when "assignment"
       item = opts[:assignment] || self.context.assignments.active.where(id: params[:id]).first
       item = item.submittable_object if item.respond_to?(:submittable_object) && item.submittable_object
-    elsif params[:type] == "discussion_topic" || params[:type] == "discussion"
+    when "discussion_topic", "discussion"
       item = opts[:discussion_topic] || self.context.discussion_topics.active.where(id: params[:id]).first
-    elsif params[:type] == "quiz"
+    when "quiz"
       item = opts[:quiz] || self.context.quizzes.active.where(id: params[:id]).first
     end
     workflow_state = ContentTag.asset_workflow_state(item) if item
     workflow_state ||= 'active'
-    if params[:type] == 'external_url'
+    case params[:type]
+    when 'external_url'
       title = params[:title]
       added_item ||= self.content_tags.build(:context => self.context)
       added_item.attributes = {
@@ -667,7 +670,7 @@ class ContextModule < ActiveRecord::Base
       added_item.workflow_state = 'unpublished' if added_item.new_record?
       added_item.save
       added_item
-    elsif params[:type] == 'context_external_tool' || params[:type] == 'external_tool' || params[:type] == 'lti/message_handler'
+    when 'context_external_tool', 'external_tool', 'lti/message_handler'
       title = params[:title]
       added_item ||= self.content_tags.build(:context => self.context)
 
@@ -706,7 +709,7 @@ class ContextModule < ActiveRecord::Base
       end
       added_item.save
       added_item
-    elsif params[:type] == 'context_module_sub_header' || params[:type] == 'sub_header'
+    when 'context_module_sub_header', 'sub_header'
       title = params[:title]
       added_item ||= self.content_tags.build(:context => self.context)
       added_item.attributes = {

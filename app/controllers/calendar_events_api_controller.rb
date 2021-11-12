@@ -761,9 +761,10 @@ class CalendarEventsApiController < ApplicationController
           # find the context associated with the appointment..
           event_context = @contexts.find do |context|
             effective_context_code =
-              if context.is_a?(Course)
+              case context
+              when Course
                 "course_" + context.id.to_s
-              elsif context.is_a?(Group)
+              when Group
                 "group_" + context.id.to_s
               end
             !effective_context_code.nil? && appointment.effective_context_code.eql?(effective_context_code)
@@ -1379,9 +1380,10 @@ class CalendarEventsApiController < ApplicationController
   def set_duplicate_params(event_attributes, options = {})
     options[:iterator] ||= 0
     offset_interval = options[:interval] * options[:iterator]
-    offset = if options[:frequency] == "monthly"
+    offset = case options[:frequency]
+             when "monthly"
                offset_interval.months
-             elsif options[:frequency] == "daily"
+             when "daily"
                offset_interval.days
              else
                offset_interval.weeks

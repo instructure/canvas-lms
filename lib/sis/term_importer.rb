@@ -56,9 +56,10 @@ module SIS
             raise ImportError, "Invalid date_override_enrollment_type"
           end
 
-          if /active/i.match?(status)
+          case status
+          when /active/i
             term.set_overrides(@root_account, { date_override_enrollment_type => { :start_at => start_date, :end_at => end_date } })
-          elsif /deleted/i.match?(status)
+          when /deleted/i
             term.enrollment_dates_overrides.where(enrollment_type: date_override_enrollment_type).destroy_all
           end
         else
@@ -72,9 +73,10 @@ module SIS
 
           term.integration_id = integration_id
 
-          if /active/i.match?(status)
+          case status
+          when /active/i
             term.workflow_state = 'active'
-          elsif /deleted/i.match?(status)
+          when /deleted/i
             term.workflow_state = 'deleted'
           end
           if (term.stuck_sis_fields & [:start_at, :end_at]).empty?

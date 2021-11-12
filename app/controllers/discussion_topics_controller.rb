@@ -553,9 +553,10 @@ class DiscussionTopicsController < ApplicationController
       end
 
     sections =
-      if section_visibilities == :none
+      case section_visibilities
+      when :none
         []
-      elsif section_visibilities == :all
+      when :all
         @context.course_sections.active.to_a
       else
         @context.course_sections.select { |s| s.active? && section_visibilities.include?(s.id) }
@@ -1171,9 +1172,10 @@ class DiscussionTopicsController < ApplicationController
     visibilities = @context.course_section_visibility(@current_user)
 
     invalid_sections =
-      if visibilities == :all
+      case visibilities
+      when :all
         []
-      elsif visibilities == :none
+      when :none
         @topic.course_sections.map(&:id)
       else
         @topic.course_sections.map(&:id) - visibilities

@@ -127,13 +127,14 @@ class CanvasUnzip
       mime_type = 'application/x-tar' # it may not actually be a tar though, so rescue if there's a problem
     end
 
-    if mime_type == 'application/zip'
+    case mime_type
+    when 'application/zip'
       Zip::File.open(file) do |zipfile|
         zipfile.entries.each_with_index do |zip_entry, index|
           yield(Entry.new(zip_entry), index)
         end
       end
-    elsif mime_type == 'application/x-tar'
+    when 'application/x-tar'
       index = 0
       begin
         Gem::Package::TarReader.new(file).each do |tar_entry|
@@ -160,9 +161,10 @@ class CanvasUnzip
     attr_reader :entry, :type
 
     def initialize(entry)
-      if entry.is_a?(Zip::Entry)
+      case entry
+      when Zip::Entry
         @type = :zip
-      elsif entry.is_a?(Gem::Package::TarReader::Entry)
+      when Gem::Package::TarReader::Entry
         @type = :tar
       end
 
@@ -172,9 +174,10 @@ class CanvasUnzip
     end
 
     def symlink?
-      if type == :zip
+      case type
+      when :zip
         entry.symlink?
-      elsif type == :tar
+      when :tar
         entry.header.typeflag == "2"
       end
     end
@@ -188,19 +191,21 @@ class CanvasUnzip
     end
 
     def name
-      @name ||= if type == :zip
+      @name ||= case type
+                when :zip
                   # the standard is DOS (cp437) or UTF-8, although in practice, anything goes
                   normalize_name(entry.name, 'cp437')
-                elsif type == :tar
+                when :tar
                   # there is no standard. this seems like a reasonable fallback to me
                   normalize_name(entry.full_name.sub(/^\.\//, ''), 'iso-8859-1')
                 end
     end
 
     def size
-      if type == :zip
+      case type
+      when :zip
         entry.size
-      elsif type == :tar
+      when :tar
         entry.header.size
       end
     end
@@ -218,7 +223,8 @@ class CanvasUnzip
 
       digest = Digest::MD5.new
       ::File.open(dest_path, "wb") do |os|
-        if type == :zip
+        case type
+        when :zip
           entry.get_input_stream do |is|
             entry.set_extra_attributes_on_path(dest_path)
             buf = +''
@@ -228,7 +234,7 @@ class CanvasUnzip
               yield(buf.size) if block_given?
             end
           end
-        elsif type == :tar
+        when :tar
           while (buf = entry.read(BUFFER_SIZE))
             os << buf
             digest.update(buf)

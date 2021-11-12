@@ -624,11 +624,12 @@ class AccountsController < ApplicationController
 
     sortable_name_col = User.sortable_name_order_by_clause('users')
 
-    order = if params[:sort] == 'course_name'
+    order = case params[:sort]
+            when 'course_name'
               Course.best_unicode_collation_key('courses.name').to_s
-            elsif params[:sort] == 'sis_course_id'
+            when 'sis_course_id'
               "courses.sis_source_id"
-            elsif params[:sort] == 'teacher'
+            when 'teacher'
               "(SELECT #{sortable_name_col} FROM #{User.quoted_table_name}
                 JOIN #{Enrollment.quoted_table_name} on users.id = enrollments.user_id
                 WHERE enrollments.workflow_state <> 'deleted'
@@ -636,10 +637,10 @@ class AccountsController < ApplicationController
                 AND enrollments.course_id = courses.id
                 ORDER BY #{sortable_name_col} LIMIT 1)"
             # leaving subaccount as an option for backwards compatibility
-            elsif params[:sort] == 'subaccount' || params[:sort] == 'account_name'
+            when 'subaccount', 'account_name'
               "(SELECT #{Account.best_unicode_collation_key('accounts.name')} FROM #{Account.quoted_table_name}
                 WHERE accounts.id = courses.account_id)"
-            elsif params[:sort] == 'term'
+            when 'term'
               "(SELECT #{EnrollmentTerm.best_unicode_collation_key('enrollment_terms.name')}
                 FROM #{EnrollmentTerm.quoted_table_name}
                 WHERE enrollment_terms.id = courses.enrollment_term_id)"

@@ -132,6 +132,8 @@ Specs/EnsureSpecExtension:
 Style/Alias:
   EnforcedStyle: prefer_alias_method # https://github.com/rubocop/ruby-style-guide/issues/821
   Severity: error
+Style/CaseLikeIf:
+  Severity: error
 Style/ColonMethodCall:
   Severity: error
 Style/ConditionalAssignment:
