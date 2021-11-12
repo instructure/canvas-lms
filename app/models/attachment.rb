@@ -1713,9 +1713,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.submit_to_canvadocs(ids)
-    Attachment.where(id: ids).find_each do |a|
-      a.submit_to_canvadocs
-    end
+    Attachment.where(id: ids).find_each(&:submit_to_canvadocs)
   end
 
   def self.skip_3rd_party_submits(skip = true)

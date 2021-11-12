@@ -362,7 +362,7 @@ describe "Canvas Cartridge importing" do
     # convert to json
     doc = Nokogiri::XML(builder.target!)
     data = @converter.convert_learning_outcomes(doc)
-    data = data.map { |h| h.with_indifferent_access }
+    data = data.map(&:with_indifferent_access)
 
     # import json into new course
     Importers::LearningOutcomeImporter.process_migration({ 'learning_outcomes' => data }, @migration)
@@ -1410,7 +1410,7 @@ describe "Canvas Cartridge importing" do
 
       expect(migration.migration_issues.count).to eq 2
 
-      warnings = migration.migration_issues.sort_by { |i| i.fix_issue_html_url }
+      warnings = migration.migration_issues.sort_by(&:fix_issue_html_url)
       warning1 = warnings[0]
       expect(warning1.issue_type).to eq "warning"
       expect(warning1.description.start_with?("Missing links found in imported content")).to eq true

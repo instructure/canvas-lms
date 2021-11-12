@@ -506,7 +506,7 @@ describe "Module Items API", type: :request do
         expect(tag).not_to be_nil
         expect(tag.position).to eq 3
 
-        tags.each { |t| t.reload }
+        tags.each(&:reload)
         # 2 is deleted; 3 is the new one, that displaced the others to 4-6
         expect(tags.map(&:position)).to eq [1, 4, 5, 6]
       end
@@ -633,7 +633,7 @@ describe "Module Items API", type: :request do
 
         expect(json['position']).to eq 2
 
-        tags.each { |t| t.reload }
+        tags.each(&:reload)
         expect(tags.map(&:position)).to eq [2, 1, 3, 4, 5]
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
@@ -643,7 +643,7 @@ describe "Module Items API", type: :request do
 
         expect(json['position']).to eq 4
 
-        tags.each { |t| t.reload }
+        tags.each(&:reload)
         expect(tags.map(&:position)).to eq [4, 1, 2, 3, 5]
       end
 

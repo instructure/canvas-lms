@@ -357,7 +357,7 @@ module AssignmentOverrideApplicator
 
   # turn the list of overrides into a unique but consistent cache key component
   def self.overrides_hash(overrides)
-    canonical = overrides.map { |override| override.cache_key }.inspect
+    canonical = overrides.map(&:cache_key).inspect
     Digest::MD5.hexdigest(canonical)
   end
 

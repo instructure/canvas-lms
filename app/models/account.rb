@@ -1498,7 +1498,7 @@ class Account < ActiveRecord::Base
   end
 
   def find_users(string)
-    self.pseudonyms.map { |p| p.user }.select { |u| u.name.match(string) }
+    self.pseudonyms.map(&:user).select { |u| u.name.match(string) }
   end
 
   class << self

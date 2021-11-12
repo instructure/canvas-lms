@@ -32,7 +32,7 @@ module Api::V1
     def initialize(course, user, includes, enrollments, precalculated_permissions: nil)
       @course = course
       @user = user
-      @includes = includes.map { |include_key| include_key.to_sym }
+      @includes = includes.map(&:to_sym)
       @enrollments = enrollments
       @precalculated_permissions = precalculated_permissions
       @hash = if block_given?
@@ -113,7 +113,7 @@ module Api::V1
     end
 
     def needs_grading_count(enrollments, course)
-      if include_grading && enrollments && enrollments.any? { |e| e.participating_instructor? }
+      if include_grading && enrollments && enrollments.any?(&:participating_instructor?)
         proxy = Assignments::NeedsGradingCountQuery::CourseProxy.new(course, user)
         course.assignments.active.to_a.sum { |a| Assignments::NeedsGradingCountQuery.new(a, user, proxy).count }
       end

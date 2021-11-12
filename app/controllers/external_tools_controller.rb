@@ -128,7 +128,7 @@ class ExternalToolsController < ApplicationController
         @tools = @tools.placements(params[:placement]) if params[:placement]
       end
       if Canvas::Plugin.value_to_boolean(params[:selectable])
-        @tools = @tools.select { |t| t.selectable }
+        @tools = @tools.select(&:selectable)
       end
       respond_to do |format|
         @tools = Api.paginate(@tools, self, tool_pagination_url)

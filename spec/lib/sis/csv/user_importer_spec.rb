@@ -633,7 +633,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status",
       "user_2,user1,User,Uno,user@example.com,active"
     )
-    expect(importer.errors.map { |r| r.last }).to eq ["An existing Canvas user with the SIS ID user_1 has already claimed user_2's user_id requested login information, skipping"]
+    expect(importer.errors.map(&:last)).to eq ["An existing Canvas user with the SIS ID user_1 has already claimed user_2's user_id requested login information, skipping"]
     user = CommunicationChannel.by_path('user@example.com').first.user
     expect(user.pseudonyms.count).to eq 1
     expect(user.pseudonyms.by_unique_id('user1').first.sis_user_id).to eq 'user_1'
@@ -652,7 +652,7 @@ describe SIS::CSV::UserImporter do
       "user_2,user1,User,Dos,user2@example.com,active",
       "user_1,user3,User,Uno,user1@example.com,active"
     )
-    expect(importer.errors.map { |r| r.last }).to eq ["An existing Canvas user with the SIS ID user_1 has already claimed user_2's user_id requested login information, skipping"]
+    expect(importer.errors.map(&:last)).to eq ["An existing Canvas user with the SIS ID user_1 has already claimed user_2's user_id requested login information, skipping"]
     expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.unique_id).to eq "user3"
     expect(Pseudonym.where(account_id: @account, sis_user_id: "user_2").first.unique_id).to eq "user2"
   end
@@ -689,7 +689,7 @@ describe SIS::CSV::UserImporter do
       "user_id,login_id,first_name,last_name,email,status,integration_id",
       "user_2,user2,User,Uno,user2@example.com,active,int_1"
     )
-    expect(importer.errors.map { |r| r.last }).to eq ["An existing Canvas user with the SIS ID user_1 has already claimed user_2's requested integration_id, skipping"]
+    expect(importer.errors.map(&:last)).to eq ["An existing Canvas user with the SIS ID user_1 has already claimed user_2's requested integration_id, skipping"]
   end
 
   it "processes user row when integration_id is not set" do
@@ -1591,13 +1591,13 @@ describe SIS::CSV::UserImporter do
         "section_id,course_id,name,status,start_date,end_date",
         "S001,C001,Test Course 1,active,,", user: sis_user
       )
-      expect(@account.pseudonyms.where(sis_user_id: 'user_1').first.user.user_account_associations.map { |uaa| uaa.account_id }).to eq [@account.id]
+      expect(@account.pseudonyms.where(sis_user_id: 'user_1').first.user.user_account_associations.map(&:account_id)).to eq [@account.id]
       process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
         "C001,user_1,teacher,,active,,,", user: sis_user
       )
       @pseudo1 = @account.pseudonyms.where(sis_user_id: 'user_1').first
-      expect(@pseudo1.user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account.id, Account.where(sis_source_id: 'A002').first.id, Account.where(sis_source_id: 'A001').first.id].sort
+      expect(@pseudo1.user.user_account_associations.map(&:account_id).sort).to eq [@account.id, Account.where(sis_source_id: 'A002').first.id, Account.where(sis_source_id: 'A001').first.id].sort
 
       @account = @account2
       process_csv_data_cleanly(
@@ -1617,7 +1617,7 @@ describe SIS::CSV::UserImporter do
         "section_id,course_id,name,status,start_date,end_date",
         "S001,C001,Test Course 1,active,,", user: sis_user
       )
-      expect(@account.pseudonyms.where(sis_user_id: 'user_1').first.user.user_account_associations.map { |uaa| uaa.account_id }).to eq [@account.id]
+      expect(@account.pseudonyms.where(sis_user_id: 'user_1').first.user.user_account_associations.map(&:account_id)).to eq [@account.id]
       process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
         "C001,user_1,teacher,,active,,,", user: sis_user

@@ -125,8 +125,8 @@ class Folder < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.active_file_attachments.each { |a| a.destroy }
-    self.active_sub_folders.each { |s| s.destroy }
+    self.active_file_attachments.each(&:destroy)
+    self.active_sub_folders.each(&:destroy)
     self.deleted_at = Time.now.utc
     self.save
   end
@@ -217,9 +217,7 @@ class Folder < ActiveRecord::Base
   end
 
   def clean_up_children
-    Attachment.where(folder_id: @folder_id).each do |a|
-      a.destroy
-    end
+    Attachment.where(folder_id: @folder_id).each(&:destroy)
   end
 
   def subcontent(opts = {})

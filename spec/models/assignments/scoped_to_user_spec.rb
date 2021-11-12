@@ -36,9 +36,7 @@ module Assignments
     let_once(:unpublished) do
       @course.assignments.create({
                                    title: 'unpublished assignment'
-                                 }).tap do |assignment|
-        assignment.unpublish
-      end
+                                 }).tap(&:unpublish)
     end
     let_once(:inactive) do
       @course.assignments.create({

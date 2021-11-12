@@ -1280,7 +1280,7 @@ class Course < ActiveRecord::Base
   def touch_root_folder_if_necessary
     if tab_configuration_changed?
       files_tab_was_hidden = tab_configuration_was && tab_configuration_was.any? { |h| !h.blank? && h['id'] == TAB_FILES && h['hidden'] }
-      Folder.root_folders(self).each { |f| f.touch } if files_tab_was_hidden != tab_hidden?(TAB_FILES)
+      Folder.root_folders(self).each(&:touch) if files_tab_was_hidden != tab_hidden?(TAB_FILES)
     end
     true
   end
@@ -1418,9 +1418,7 @@ class Course < ActiveRecord::Base
   end
 
   def invite_uninvited_students
-    self.enrollments.where(workflow_state: "creation_pending").each do |e|
-      e.invite!
-    end
+    self.enrollments.where(workflow_state: "creation_pending").each(&:invite!)
   end
 
   workflow do
@@ -2633,7 +2631,7 @@ class Course < ActiveRecord::Base
       list << e.end_at if e.end_at
       list << e.start_at if e.start_at
       list
-    }.compact.flatten.map { |d| d.to_date }.uniq rescue []
+    }.compact.flatten.map(&:to_date).uniq rescue []
   end
 
   def real_end_date

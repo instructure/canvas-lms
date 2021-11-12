@@ -350,12 +350,8 @@ describe Types::CourseType do
     before(:once) do
       @student1 = @student
       @student2 = student_in_course(active_all: true).user
-      @inactive_user = student_in_course.tap { |enrollment|
-        enrollment.invite
-      }.user
-      @concluded_user = student_in_course.tap { |enrollment|
-        enrollment.complete
-      }.user
+      @inactive_user = student_in_course.tap(&:invite).user
+      @concluded_user = student_in_course.tap(&:complete).user
     end
 
     describe "usersConnection" do

@@ -326,7 +326,7 @@ class ContextModule < ActiveRecord::Base
     positions = ContextModule.module_positions(self.context).to_a.sort_by { |a| a[1] }
     downstream_ids = positions.select { |a| a[1] > (self.position || 0) }.map { |a| a[0] }
     downstreams = downstream_ids.empty? ? [] : self.context.context_modules.not_deleted.where(id: downstream_ids)
-    downstreams.each { |m| m.save_without_touching_context }
+    downstreams.each(&:save_without_touching_context)
   end
 
   workflow do
@@ -616,7 +616,7 @@ class ContextModule < ActiveRecord::Base
   def cached_active_tags
     @cached_active_tags ||= if self.content_tags.loaded?
                               # don't reload the preloaded content
-                              self.content_tags.select { |tag| tag.active? }
+                              self.content_tags.select(&:active?)
                             else
                               self.content_tags.active.to_a
                             end

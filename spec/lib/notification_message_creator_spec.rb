@@ -71,7 +71,7 @@ describe NotificationMessageCreator do
       end
       @user.reload
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      paths = messages.collect { |message| message.to }
+      paths = messages.collect(&:to)
       expect(paths).to include(a.path)
       expect(paths).to include(b.path)
       expect(paths).to include(c.path)

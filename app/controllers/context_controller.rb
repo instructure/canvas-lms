@@ -70,7 +70,7 @@ class ContextController < ApplicationController
 
       if @context.concluded?
         sections = @context.course_sections.active.select([:id, :course_id, :name, :end_at, :restrict_enrollments_to_section_dates]).preload(:course)
-        concluded_sections = sections.select { |s| s.concluded? }.map { |s| "section_#{s.id}" }
+        concluded_sections = sections.select(&:concluded?).map { |s| "section_#{s.id}" }
       else
         sections = @context.course_sections.active.select([:id, :name])
         concluded_sections = []
@@ -279,7 +279,7 @@ class ContextController < ApplicationController
         end
         @messages += DiscussionEntry.active.where(:discussion_topic_id => @topics, :user_id => @user).to_a
 
-        @messages = @messages.select { |m| m.grants_right?(@current_user, session, :read) }.sort_by { |e| e.created_at }.reverse
+        @messages = @messages.select { |m| m.grants_right?(@current_user, session, :read) }.sort_by(&:created_at).reverse
       end
 
       add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))

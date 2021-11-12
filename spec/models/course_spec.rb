@@ -1661,7 +1661,7 @@ describe Course do
       @user3.sortable_name = 'richard'
       @user3.save
       users = @course.users_not_in_groups([], order: User.sortable_name_order_by_clause('users'))
-      expect(users.map { |u| u.id }).to eq [@user2.id, @user1.id, @user3.id]
+      expect(users.map(&:id)).to eq [@user2.id, @user1.id, @user3.id]
     end
   end
 
@@ -2107,7 +2107,7 @@ describe Course, "gradebook_to_csv" do
   end
 
   it "orders assignments and groups by position" do
-    @assignment_group_1, @assignment_group_2 = [@course.assignment_groups.create!(:name => "Some Assignment Group 1", :group_weight => 100), @course.assignment_groups.create!(:name => "Some Assignment Group 2", :group_weight => 100)].sort_by { |a| a.id }
+    @assignment_group_1, @assignment_group_2 = [@course.assignment_groups.create!(:name => "Some Assignment Group 1", :group_weight => 100), @course.assignment_groups.create!(:name => "Some Assignment Group 2", :group_weight => 100)].sort_by(&:id)
 
     now = Time.now
 
@@ -4776,7 +4776,7 @@ describe Course, "manageable_by_user" do
     user = account_admin_user(:account => sub_account)
     course = Course.create!(:account => sub_sub_account)
 
-    expect(Course.manageable_by_user(user.id).map { |c| c.id }).to be_include(course.id)
+    expect(Course.manageable_by_user(user.id).map(&:id)).to be_include(course.id)
 
     user.account_users.first.destroy!
     expect(Course.manageable_by_user(user.id)).to_not be_exists
@@ -4789,7 +4789,7 @@ describe Course, "manageable_by_user" do
     e = course.teacher_enrollments.first
     e.accept
 
-    expect(Course.manageable_by_user(user.id).map { |c| c.id }).to be_include(course.id)
+    expect(Course.manageable_by_user(user.id).map(&:id)).to be_include(course.id)
   end
 
   it "includes courses the user is actively enrolled in as a ta" do
@@ -4799,7 +4799,7 @@ describe Course, "manageable_by_user" do
     e = course.ta_enrollments.first
     e.accept
 
-    expect(Course.manageable_by_user(user.id).map { |c| c.id }).to be_include(course.id)
+    expect(Course.manageable_by_user(user.id).map(&:id)).to be_include(course.id)
   end
 
   it "includes courses the user is actively enrolled in as a designer" do
@@ -4807,7 +4807,7 @@ describe Course, "manageable_by_user" do
     user = user_with_pseudonym
     course.enroll_designer(user).accept
 
-    expect(Course.manageable_by_user(user.id).map { |c| c.id }).to be_include(course.id)
+    expect(Course.manageable_by_user(user.id).map(&:id)).to be_include(course.id)
   end
 
   it "does not include courses the user is enrolled in when the enrollment is non-active" do
@@ -5446,7 +5446,7 @@ describe Course, "student_view_student" do
   it "creates enrollments for each section" do
     @section2 = @course.course_sections.create!
     expect { @fake_student = @course.student_view_student }.to change(Enrollment, :count).by(2)
-    expect(@fake_student.enrollments.all? { |e| e.fake_student? }).to be_truthy
+    expect(@fake_student.enrollments.all?(&:fake_student?)).to be_truthy
   end
 
   it "syncs enrollments after being created" do
@@ -5791,7 +5791,7 @@ describe Course do
       end
 
       it "does not follow deleted enrollments" do
-        @teacherC.enrollments.each { |e| e.destroy }
+        @teacherC.enrollments.each(&:destroy)
         expect(@account.courses.by_teachers([@teacherB.id, @teacherC.id]).sort_by(&:id)).to eq [@course2]
       end
 

@@ -56,7 +56,7 @@ module Qti
   def self.convert_questions(manifest_path, opts = {})
     sorted_paths = if (path_map = opts[:file_path_map])
                      # used when searching for matching file paths to help find the best matching path
-                     path_map.keys.sort_by { |v| v.length }
+                     path_map.keys.sort_by(&:length)
                    else
                      []
                    end

@@ -149,7 +149,7 @@ class ContentMigrationsController < ApplicationController
 
     scope = @context.content_migrations.where(child_subscription_id: nil).order('id DESC')
     @migrations = Api.paginate(scope, self, api_v1_course_content_migration_list_url(@context))
-    @migrations.each { |mig| mig.check_for_pre_processing_timeout }
+    @migrations.each(&:check_for_pre_processing_timeout)
     content_migration_json_hash = content_migrations_json(@migrations, @current_user, session)
 
     if api_request?

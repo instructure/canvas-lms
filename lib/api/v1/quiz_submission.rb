@@ -126,7 +126,7 @@ module Api::V1::QuizSubmission
   end
 
   def quiz_submission_zip(quiz)
-    latest_submission = quiz.quiz_submissions.map { |s| s.finished_at }.compact.max
+    latest_submission = quiz.quiz_submissions.map(&:finished_at).compact.max
     submission_zip(quiz, latest_submission)
   end
 end

@@ -685,7 +685,7 @@ module ApplicationHelper
     opts[:depth] ||= 0
     opts[:options_so_far] ||= []
     if opts.key?(:all_folders)
-      opts[:sub_folders] = opts.delete(:all_folders).to_a.group_by { |f| f.parent_folder_id }
+      opts[:sub_folders] = opts.delete(:all_folders).to_a.group_by(&:parent_folder_id)
     end
 
     folders.each do |folder|
@@ -982,7 +982,7 @@ module ApplicationHelper
   # cache key, so that we don't make an overly-long cache key.
   # if you can avoid loading the list at all, that's even better, of course.
   def collection_cache_key(collection)
-    keys = collection.map { |element| element.cache_key }
+    keys = collection.map(&:cache_key)
     Digest::MD5.hexdigest(keys.join('/'))
   end
 

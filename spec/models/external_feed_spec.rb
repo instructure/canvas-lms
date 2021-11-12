@@ -27,7 +27,7 @@ describe ExternalFeed do
     res = @feed.add_rss_entries(rss)
     expect(res).not_to be_nil
     expect(res.length).to eql(4)
-    expect(res.all? { |r| r.valid? }).to be_truthy
+    expect(res.all?(&:valid?)).to be_truthy
     expect(res[0].title).to eql("Star City")
     expect(res[1].title).to eql("Space Exploration")
     expect(res[2].title).to eql("The Engine That Does More")
@@ -111,7 +111,7 @@ describe ExternalFeed do
     expect(res).not_to be_nil
     expect(res.length).to eql(4)
     expect(@course.announcements.count).to eql(4)
-    expect(res.map { |i| i.asset } - @course.announcements).to be_empty
+    expect(res.map(&:asset) - @course.announcements).to be_empty
 
     # don't create duplicates
     @feed.add_rss_entries(rss)

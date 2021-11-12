@@ -506,7 +506,7 @@ describe "More Standard Common Cartridge importing" do
     f5.save
 
     # import json into new course
-    hash = hash.map { |h| h.with_indifferent_access }
+    hash = hash.map(&:with_indifferent_access)
     Importers::ContextModuleImporter.process_migration({ 'modules' => hash }, @migration)
     @copy_to.save!
 

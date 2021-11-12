@@ -483,7 +483,7 @@ class ContextModulesApiController < ApplicationController
     if @module.insert_at(params[:module][:position].to_i)
       # see ContextModulesController#reorder
       @context.touch
-      @context.context_modules.not_deleted.each { |m| m.save_without_touching_context }
+      @context.context_modules.not_deleted.each(&:save_without_touching_context)
       @context.touch
 
       @module.reload

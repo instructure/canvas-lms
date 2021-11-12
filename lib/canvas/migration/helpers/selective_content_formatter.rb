@@ -198,7 +198,7 @@ module Canvas::Migration::Helpers
         a['path_name'].gsub!(remove_name_regex, '')
       }
       folder_groups = course_data['attachments'].group_by { |a| a['path_name'] }
-      sorted = folder_groups.sort_by { |i| i.first }
+      sorted = folder_groups.sort_by(&:first)
       sorted.each do |folder_name, atts|
         if atts.length == 1 && atts[0]['file_name'] == folder_name
           content_list << item_hash('attachments', atts[0])

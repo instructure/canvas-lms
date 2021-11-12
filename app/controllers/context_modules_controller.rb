@@ -538,7 +538,7 @@ class ContextModulesController < ApplicationController
   def reorder_items
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
-      order = params[:order].split(",").map { |id| id.to_i }
+      order = params[:order].split(",").map(&:to_i)
       tags = @context.context_module_tags.not_deleted.where(id: order)
       affected_module_ids = (tags.map(&:context_module_id) + [@module.id]).uniq.compact
       affected_items = []
@@ -666,7 +666,7 @@ class ContextModulesController < ApplicationController
               @progressions = []
             else
               context_module_ids = @context.context_modules.active.pluck(:id)
-              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids).each { |p| p.evaluate }
+              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids).each(&:evaluate)
             end
           end
         elsif @context.grants_right?(@current_user, session, :participate_as_student)
@@ -725,7 +725,7 @@ class ContextModulesController < ApplicationController
   private
 
   def preload_assignments_and_quizzes(tags, user_is_admin)
-    assignment_tags = tags.select { |ct| ct.can_have_assignment? }
+    assignment_tags = tags.select(&:can_have_assignment?)
     return unless assignment_tags.any?
 
     content_with_assignments = assignment_tags

@@ -605,7 +605,7 @@ describe GroupsController do
       data = json_parse
       expect(data).not_to be_nil
       expect(data['users'].map { |u| u['user_id'] }.sort)
-        .to eq [u1, u2, u3].map { |u| u.id }.sort
+        .to eq [u1, u2, u3].map(&:id).sort
     end
 
     it "includes only users not in a group in the category otherwise" do
@@ -632,14 +632,14 @@ describe GroupsController do
       data = json_parse
       expect(data).not_to be_nil
       expect(data['users'].map { |u| u['user_id'] }.sort)
-        .to eq [u2, u3].map { |u| u.id }.sort
+        .to eq [u2, u3].map(&:id).sort
 
       get 'unassigned_members', params: { :course_id => @course.id, :category_id => group2.group_category.id }
       expect(response).to be_successful
       data = json_parse
       expect(data).not_to be_nil
       expect(data['users'].map { |u| u['user_id'] }.sort)
-        .to eq [u1, u3].map { |u| u.id }.sort
+        .to eq [u1, u3].map(&:id).sort
 
       get 'unassigned_members', params: { :course_id => @course.id, :category_id => group3.group_category.id }
       expect(response).to be_successful

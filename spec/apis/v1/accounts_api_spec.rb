@@ -964,7 +964,7 @@ describe "Accounts API", type: :request do
                         { :controller => 'accounts', :action => 'courses_api',
                           :account_id => @a1.to_param, :format => 'json' })
 
-        [@c1, @c2].each { |c| c.reload }
+        [@c1, @c2].each(&:reload)
         expect(json.first['id']).to eq @c1.id
         expect(json.first['name']).to eq 'c1'
         expect(json.first['account_id']).to eq @c1.account_id

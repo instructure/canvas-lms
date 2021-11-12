@@ -2041,7 +2041,7 @@ class ApplicationController < ActionController::Base
     if (event = options.delete(:event))
       options[:query][:event_id] = event.id
     end
-    options[:query][:include_contexts] = contexts_to_link_to.map { |c| c.asset_string }.join(",") unless contexts_to_link_to.empty?
+    options[:query][:include_contexts] = contexts_to_link_to.map(&:asset_string).join(",") unless contexts_to_link_to.empty?
     calendar_url(options[:query])
   end
 

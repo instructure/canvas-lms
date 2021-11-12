@@ -252,7 +252,7 @@ describe Role do
     end
 
     it "includes inactive roles" do
-      @account.roles.each { |r| r.deactivate! }
+      @account.roles.each(&:deactivate!)
       all = Role.all_enrollment_roles_for_account(@sub_account, true)
       @base_types.each do |bt|
         expect(get_base_type(all, bt)[:custom_roles][0][:name]).to eq "custom #{bt}"
