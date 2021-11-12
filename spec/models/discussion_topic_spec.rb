@@ -29,7 +29,7 @@ describe DiscussionTopic do
     user = user_factory(opts)
     user.save!
     course.enroll_user(user, opts[:enrollment_type], opts)
-    return user
+    user
   end
 
   def add_section_to_topic(topic, section, opts = {})

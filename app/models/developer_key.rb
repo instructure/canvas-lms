@@ -271,7 +271,7 @@ class DeveloperKey < ActiveRecord::Base
     end
     result
   rescue URI::Error
-    return false
+    false
   end
 
   def account_binding_for(binding_account)

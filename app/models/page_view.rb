@@ -488,7 +488,7 @@ class PageView < ActiveRecord::Base
       last_created_at = Time.zone.parse(last_created_at) unless last_created_at.is_a?(Time)
       cassandra.execute("UPDATE page_views_migration_metadata_per_account SET last_created_at = ? WHERE shard_id = ? AND account_id = ?", last_created_at, Shard.current.id.to_s, account_id)
       data['last_created_at'] = last_created_at
-      return inserted > 0
+      inserted > 0
     end
 
     def cassandra

@@ -175,6 +175,8 @@ Style/RedundantParentheses:
   Severity: error
 Style/RedundantRegexpEscape:
   Severity: error
+Style/RedundantReturn:
+  Severity: error
 Style/SlicingWithRange:
   Severity: error
 Style/SpecialGlobalVars:

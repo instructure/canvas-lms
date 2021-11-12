@@ -313,7 +313,7 @@ class StreamItem < ActiveRecord::Base
       end
     end
 
-    return [res]
+    [res]
   end
 
   def self.root_object(object)

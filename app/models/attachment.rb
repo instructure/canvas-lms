@@ -688,7 +688,7 @@ class Attachment < ActiveRecord::Base
     attachment = Attachment.find(policy['attachment_id'])
     return nil unless [:unattached, :unattached_temporary].include?(attachment.try(:state))
 
-    return policy, attachment
+    [policy, attachment]
   end
 
   def unencoded_filename
@@ -744,7 +744,7 @@ class Attachment < ActiveRecord::Base
   # put the context over quota.)
   def self.over_quota?(context, additional_quota = nil)
     quota = self.get_quota(context)
-    return quota[:quota] < quota[:quota_used] + (additional_quota || 0)
+    quota[:quota] < quota[:quota_used] + (additional_quota || 0)
   end
 
   def self.quota_available(context)
@@ -813,7 +813,7 @@ class Attachment < ActiveRecord::Base
         end
       end
     end
-    return deleted_attachments
+    deleted_attachments
   end
 
   def copy_access_attributes!(source_attachments)

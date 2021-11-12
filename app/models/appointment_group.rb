@@ -371,7 +371,7 @@ class AppointmentGroup < ActiveRecord::Base
     return false unless min_appointments_per_participant
     return false if all_appointments_filled?
 
-    return reservations_for(participant).size < min_appointments_per_participant
+    reservations_for(participant).size < min_appointments_per_participant
   end
 
   def all_appointments_filled?

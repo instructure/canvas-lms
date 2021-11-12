@@ -203,7 +203,7 @@ module RespondusSoapEndpoint
     #   identification  C_String - {http://www.w3.org/2001/XMLSchema}string
     #
     def identifyServer(_userName, _password, _context)
-      return [%{
+      [%{
 Respondus Generic Server API
 Contract version: 1
 Implemented for: Canvas LMS}]
@@ -276,7 +276,7 @@ Implemented for: Canvas LMS}]
       end
       raise(OtherError, "No items found") if list.item.empty? && !["quiz", "qdb"].include?(itemType)
 
-      return [list]
+      [list]
     end
 
     # SYNOPSIS
@@ -318,7 +318,7 @@ Implemented for: Canvas LMS}]
         raise OtherError, "Invalid item type"
       end
 
-      return []
+      []
     end
 
     # SYNOPSIS
@@ -595,7 +595,7 @@ Implemented for: Canvas LMS}]
       session['pending_migration_itemType'] = itemType
 
       if Setting.get('respondus_endpoint.polling_api', 'true') != 'false'
-        return poll_for_completion()
+        poll_for_completion()
       else
         # Deprecated in-line waiting for the migration. We've worked with Respondus
         # to implement an asynchronous, polling solution now.

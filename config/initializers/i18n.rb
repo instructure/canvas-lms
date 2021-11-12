@@ -165,7 +165,7 @@ module I18nUtilities
       text = t(text, options.delete(:en))
     end
     text = before_label(text) if options.delete(:before)
-    return text, options
+    [text, options]
   end
 
   def n(*args)

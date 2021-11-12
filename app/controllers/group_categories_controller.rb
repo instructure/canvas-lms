@@ -339,7 +339,7 @@ class GroupCategoriesController < ApplicationController
               @group_category.save!
             end
           else
-            return render json: { message: "You must have manage_sis permission to set sis attributes" }, status: :unauthorized
+            render json: { message: "You must have manage_sis permission to set sis attributes" }, status: :unauthorized
           end
         end
       else

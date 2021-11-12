@@ -131,9 +131,9 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
         new_entries_json_structure = []
       end
 
-      return json_structure, participant_ids, entry_ids, new_entries_json_structure
+      [json_structure, participant_ids, entry_ids, new_entries_json_structure]
     else
-      return nil
+      nil
     end
   end
 
@@ -189,7 +189,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       end
     end
     StringifyIds.recursively_stringify_ids(view)
-    return view.to_json, user_ids.to_a, entry_lookup.keys
+    [view.to_json, user_ids.to_a, entry_lookup.keys]
   end
 
   def in_app?

@@ -86,7 +86,7 @@ module AuthenticationMethods
       # these will happen for some configurations (no consul)
       # and for some normal use cases (old token, access token),
       # so we can return and move on
-      return
+      nil
     end
   end
 
@@ -338,7 +338,7 @@ module AuthenticationMethods
     return nil unless uri.path && uri.path[0] == '/'
     return "#{request.protocol}#{request.host_with_port}#{uri.path.sub(%r{/download$}, '')}" if %r{/files/(\d+~)?\d+/download$}.match?(uri.path)
 
-    return "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
+    "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
   end
 
   def return_to(url, fallback)

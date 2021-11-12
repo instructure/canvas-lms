@@ -79,6 +79,6 @@ module Account::Settings
         inherited_hash = current_hash
       end
     end
-    return inherited_hash
+    inherited_hash
   end
 end

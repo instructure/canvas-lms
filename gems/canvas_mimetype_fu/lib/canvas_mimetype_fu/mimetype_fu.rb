@@ -45,11 +45,7 @@ class File
     mime = mime && mime.split(";").first
     mime = nil unless mime_types[mime]
 
-    if mime
-      return mime
-    else
-      'unknown/unknown'
-    end
+    mime || 'unknown/unknown'
   end
 
   def self.mime_types

@@ -1320,7 +1320,7 @@ class DiscussionTopic < ActiveRecord::Base
                             .where(:limit_privileges_to_course_section => false, :user_id => user_ids)
                             .pluck(:user_id).to_set
     permitted_user_ids = users_in_sections.union(unlocked_teachers)
-    return non_nil_users.select { |u| permitted_user_ids.include?(u.id) }
+    non_nil_users.select { |u| permitted_user_ids.include?(u.id) }
   end
 
   def participants(include_observers = false)
@@ -1329,7 +1329,7 @@ class DiscussionTopic < ActiveRecord::Base
     if self.user && !participants_in_section.map(&:id).to_set.include?(self.user.id)
       participants_in_section += [self.user]
     end
-    return participants_in_section
+    participants_in_section
   end
 
   def visible_to_admins_only?
@@ -1364,7 +1364,7 @@ class DiscussionTopic < ActiveRecord::Base
     end
 
     readers = self.course.filter_users_by_permission(users, permission)
-    return self.users_with_section_visibility(readers)
+    self.users_with_section_visibility(readers)
   end
 
   def course
@@ -1544,7 +1544,7 @@ class DiscussionTopic < ActiveRecord::Base
                    .preload(:user)
     progressions = progressions.index_by(&:context_module_id)
 
-    return topics.reject do |topic|
+    topics.reject do |topic|
       topic.locked_by_module_item?(user, {
                                      deep_check_if_needed: true,
                                      user_context_module_progressions: progressions,
@@ -1665,7 +1665,7 @@ class DiscussionTopic < ActiveRecord::Base
   # blank data on reads.
   def materialized_view(opts = {})
     if self.new_record?
-      return "[]", [], [], []
+      ["[]", [], [], []]
     else
       DiscussionTopic::MaterializedView.materialized_view_for(self, opts)
     end

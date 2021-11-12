@@ -82,7 +82,7 @@ class Role < ActiveRecord::Base
       scope = Role.where("name = ? AND account_id = ? AND workflow_state = ?", self.name, self.account_id, 'active')
       if self.new_record? ? scope.exists? : scope.where("id <> ?", self.id).exists?
         self.errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
-        return false
+        false
       end
     end
   end
@@ -90,7 +90,7 @@ class Role < ActiveRecord::Base
   def ensure_non_built_in_name
     if !self.built_in? && Role.built_in_roles(root_account_id: self.root_account_id).map(&:label).include?(self.name)
       self.errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
-      return false
+      false
     end
   end
 
@@ -151,7 +151,7 @@ class Role < ActiveRecord::Base
 
   def ==(other_role)
     if other_role.is_a?(Role) && self.built_in? && other_role.built_in?
-      return self.name == other_role.name # be equivalent even if they're on different shards/root_accounts
+      self.name == other_role.name # be equivalent even if they're on different shards/root_accounts
     else
       super
     end

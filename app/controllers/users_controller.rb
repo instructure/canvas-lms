@@ -446,9 +446,9 @@ class UsersController < ApplicationController
       session.delete(:masquerade_return_to)
       @current_user.associate_with_shard(@user.shard, :shadow) if PageView.db?
       if /.*\/users\/#{@user.id}\/masquerade/.match?(request.referer)
-        return return_to(return_url, dashboard_url)
+        return_to(return_url, dashboard_url)
       else
-        return return_to(return_url, request.referer || dashboard_url)
+        return_to(return_url, request.referer || dashboard_url)
       end
     else
       js_bundle :act_as_modal
@@ -2773,7 +2773,7 @@ class UsersController < ApplicationController
         format.html { redirect_to root_url }
         format.json { render :json => {}, :status => 403 }
       end
-      return false
+      false
     end
   end
 
@@ -3139,7 +3139,7 @@ class UsersController < ApplicationController
       return { errors: parsed['error-codes'] } unless parsed['success']
       return { errors: ['invalid-hostname'] } unless parsed['hostname'] == request.host
 
-      return nil
+      nil
     else
       raise "Error connecting to recaptcha #{response}"
     end

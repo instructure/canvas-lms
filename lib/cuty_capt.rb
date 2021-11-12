@@ -85,7 +85,7 @@ class CutyCapt
   end
 
   def self.enabled?
-    return !self.config.nil?
+    !self.config.nil?
   end
 
   def self.verify_url(url)
@@ -184,6 +184,6 @@ class CutyCapt
       # should probably be remedied at some point
       attachment = Attachment.new(:uploaded_data => Rack::Test::UploadedFile.new(file_path, "image/png"))
     end
-    return attachment
+    attachment
   end
 end

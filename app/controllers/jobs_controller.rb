@@ -106,7 +106,7 @@ class JobsController < ApplicationController
       end
     end
 
-    return { :jobs => jobs, :total => jobs_count }
+    { :jobs => jobs, :total => jobs_count }
   end
 
   def set_navigation

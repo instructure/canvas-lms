@@ -193,7 +193,7 @@ class ContentTag < ActiveRecord::Base
     return false if self.content_type == 'WikiPage'
     return false unless self.can_have_assignment?
 
-    return content && !content.assignment_id.nil?
+    content && !content.assignment_id.nil?
   end
 
   def duplicate_able?

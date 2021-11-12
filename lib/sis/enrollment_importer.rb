@@ -123,7 +123,7 @@ module SIS
       end
 
       def any_left_to_process?
-        return @enrollment_batch.size > 0
+        @enrollment_batch.size > 0
       end
 
       def process_batch

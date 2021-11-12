@@ -295,7 +295,7 @@ module Turnitin
                                 value
                               end
       end
-      return escaped_params
+      escaped_params
     end
 
     def prepare_params(command, fcmd, args)
@@ -336,7 +336,7 @@ module Turnitin
 
       params[:md5] = request_md5(params)
       params = escape_params(params) if post
-      return params
+      params
     end
 
     def sendRequest(command, fcmd, args)

@@ -56,7 +56,7 @@ describe AssignmentsApiController, type: :request do
                                        grader_id: @teacher.id,
                                        submitted_at: now,
                                        grade_matches_current_submission: true
-    return assignment, submission
+    [assignment, submission]
   end
 
   def create_override_for_assignment(assignment = @assignment)

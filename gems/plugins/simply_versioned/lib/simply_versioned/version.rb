@@ -80,7 +80,7 @@ module SimplyVersioned
     # If the model has new columns that it didn't have before just return nil
     def method_missing(method_name, *args, &block)
       if read_attribute(:versionable_type) && read_attribute(:versionable_type).constantize.column_names.member?(method_name.to_s)
-        return nil
+        nil
       else
         super
       end

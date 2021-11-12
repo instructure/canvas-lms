@@ -106,9 +106,9 @@ class ObserverAlertThreshold < ActiveRecord::Base
   def did_pass_threshold(previous_value, new_value)
     t = self.threshold.to_i
     if self.alert_type.include? 'high'
-      return (previous_value.nil? || previous_value < t) && (!new_value.nil? && new_value > t)
+      (previous_value.nil? || previous_value < t) && (!new_value.nil? && new_value > t)
     elsif self.alert_type.include? 'low'
-      return (previous_value.nil? || previous_value > t) && (!new_value.nil? && new_value < t)
+      (previous_value.nil? || previous_value > t) && (!new_value.nil? && new_value < t)
     end
   end
 end

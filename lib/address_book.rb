@@ -38,7 +38,7 @@ module AddressBook
   end
 
   def self.implementation
-    return STRATEGIES[strategy][:implementation]
+    STRATEGIES[strategy][:implementation]
   end
 
   # instantiates an address book for the sender
@@ -50,7 +50,7 @@ module AddressBook
   def self.partition_recipients(recipients)
     users = ::MessageableUser.individual_recipients(recipients)
     contexts = ::MessageableUser.context_recipients(recipients)
-    return users, contexts
+    [users, contexts]
   end
 
   # filters the list of users to only those that are "available" (but not

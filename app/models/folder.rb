@@ -84,10 +84,10 @@ class Folder < ActiveRecord::Base
       if self.new_record?
         root_folder = Folder.root_folders(context).first
         self.parent_folder_id = root_folder.id
-        return true
+        true
       else
         errors.add(:name, t("errors.invalid_root_folder_name", "Root folder name cannot be changed"))
-        return false
+        false
       end
     end
   end
@@ -105,7 +105,7 @@ class Folder < ActiveRecord::Base
       end
       seen_folders << folder
     end
-    return true
+    true
   end
 
   def restrict_submission_folder_context

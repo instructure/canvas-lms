@@ -712,6 +712,6 @@ class WikiPagesApiController < ApplicationController
 
     @page.set_as_front_page! if !@wiki.has_front_page? && @page.is_front_page? && !@page.deleted?
 
-    return true
+    true
   end
 end

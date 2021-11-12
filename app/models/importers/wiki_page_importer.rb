@@ -257,7 +257,7 @@ module Importers
         end
         item.save_without_broadcasting!
         migration.add_imported_item(item)
-        return item
+        item
       end
     end
   end

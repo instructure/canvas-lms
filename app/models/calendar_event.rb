@@ -787,7 +787,7 @@ class CalendarEvent < ActiveRecord::Base
 
       cal.add_event(event) if event
 
-      return cal.to_ical
+      cal.to_ical
     end
   end
 

@@ -208,7 +208,7 @@ class ContextModulesController < ApplicationController
           end
         end
       end
-      return render status: 404, template: 'shared/errors/404_message'
+      render status: 404, template: 'shared/errors/404_message'
     end
   end
 
@@ -498,7 +498,7 @@ class ContextModulesController < ApplicationController
     else
       progression.uncollapse!(skip_save: progression.new_record?)
     end
-    return progression
+    progression
   end
 
   def toggle_collapse

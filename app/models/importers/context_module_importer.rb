@@ -383,9 +383,9 @@ module Importers
       new_url = uri.to_s
 
       if new_url.length < MAX_URL_LENGTH
-        return new_url
+        new_url
       else
-        return nil
+        nil
       end
     end
   end

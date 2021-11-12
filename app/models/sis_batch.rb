@@ -643,7 +643,7 @@ class SisBatch < ActiveRecord::Base
       row = remove_non_batch_sections(sections, count, row) if sections
       remove_non_batch_courses(courses, count, row) if courses
     rescue SisBatch::Aborted
-      return self.reload
+      self.reload
     end
   end
 

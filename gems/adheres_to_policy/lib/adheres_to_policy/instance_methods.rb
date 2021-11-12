@@ -202,7 +202,7 @@ module AdheresToPolicy
       args.compact!
       args.uniq!
 
-      return session, args
+      [session, args]
     end
 
     # Internal: Checks the right for a user based on session.

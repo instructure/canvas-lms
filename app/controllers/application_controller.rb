@@ -420,10 +420,10 @@ class ApplicationController < ActionController::Base
 
     if MasterCourses::MasterTemplate.is_master_course?(course)
       MasterCourses::Restrictor.preload_default_template_restrictions(objects, course)
-      return :master # return master/child status
+      :master # return master/child status
     elsif MasterCourses::ChildSubscription.is_child_course?(course)
       MasterCourses::Restrictor.preload_child_restrictions(objects)
-      return :child
+      :child
     end
   end
   helper_method :setup_master_course_restrictions
@@ -763,7 +763,7 @@ class ApplicationController < ActionController::Base
                               only_check: [id]).any? { |t| t[:id] == id }
     end
     render_tab_disabled unless valid || opts[:no_render]
-    return valid
+    valid
   end
 
   def render_tab_disabled
@@ -931,7 +931,7 @@ class ApplicationController < ActionController::Base
         raise ActiveRecord::RecordNotFound.new("Context is required, but none found")
       end
     end
-    return @context != nil
+    @context != nil
   end
 
   def require_context_and_read_access
@@ -1674,7 +1674,7 @@ class ApplicationController < ActionController::Base
     elsif exception.is_a?(ActionController::InvalidAuthenticityToken) && cookies[:_csrf_token].blank?
       redirect_to login_url(needs_cookies: '1')
       reset_session
-      return
+      nil
     else
       request.format = :html
       template = exception.error_template if exception.respond_to?(:error_template)
@@ -2213,7 +2213,7 @@ class ApplicationController < ActionController::Base
         end
         format.json { render_json_unauthorized }
       end
-      return false
+      false
     end
   end
 
@@ -2225,7 +2225,7 @@ class ApplicationController < ActionController::Base
         format.html { render "shared/registration_incomplete", status: :unauthorized }
         format.json { render :json => { 'status' => 'unauthorized', 'message' => t('#errors.registration_incomplete', 'You need to confirm your email address before you can view this page') }, :status => :unauthorized }
       end
-      return false
+      false
     end
   end
 

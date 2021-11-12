@@ -1751,9 +1751,9 @@ class CoursesController < ApplicationController
     return !!redirect_to(course_url(@context.id)) unless @pending_enrollment
 
     if params[:reject]
-      return reject_enrollment(@pending_enrollment)
+      reject_enrollment(@pending_enrollment)
     elsif params[:accept]
-      return accept_enrollment(@pending_enrollment)
+      accept_enrollment(@pending_enrollment)
     else
       redirect_to course_url(@context.id)
     end
@@ -1785,7 +1785,7 @@ class CoursesController < ApplicationController
       else
         @context_enrollment = enrollment
         enrollment = nil
-        return false
+        false
       end
     elsif (!@current_user && enrollment.user.registered?) || !enrollment.user.email_channel
       session[:return_to] = course_url(@context.id)
@@ -3183,7 +3183,7 @@ class CoursesController < ApplicationController
           redirect_to(course_url(@course))
         end
       end
-      return false
+      false
     else
       result = @course.process_event(event)
       if result
