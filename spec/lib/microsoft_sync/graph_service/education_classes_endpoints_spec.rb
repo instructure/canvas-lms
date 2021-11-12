@@ -43,14 +43,14 @@ describe MicrosoftSync::GraphService::EducationClassesEndpoints do
         klass = MicrosoftSync::Errors::NotEducationTenant
         msg =  /not an Education tenant, so cannot be used/
         expect {
-          service.list_education_classes
+          endpoints.list_education_classes
         }.to raise_microsoft_sync_graceful_cancel_error(klass, msg)
       end
     end
   end
 
   describe '#create_education_class' do
-    subject { service.create_education_class(abc: 123) }
+    subject { endpoints.create_education_class(abc: 123) }
 
     let(:http_method) { :post }
     let(:url) { 'https://graph.microsoft.com/v1.0/education/classes' }
