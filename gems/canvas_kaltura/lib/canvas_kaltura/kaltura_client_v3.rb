@@ -111,7 +111,7 @@ module CanvasKaltura
               next
             end
 
-            hash[:hasWarnings] = true if asset[:description] && asset[:description].include?("warnings")
+            hash[:hasWarnings] = true if asset[:description]&.include?("warnings")
 
             sources << hash
           else

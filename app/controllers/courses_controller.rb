@@ -1897,8 +1897,8 @@ class CoursesController < ApplicationController
   # Returns enrollment (or nil).
   def fetch_enrollment
     # Use the enrollment we already fetched, if possible
-    enrollment = @context_enrollment if @context_enrollment && @context_enrollment.pending? && (@context_enrollment.uuid == params[:invitation] || params[:invitation].blank?)
-    @current_user.reload if @context_enrollment && @context_enrollment.enrollment_state.user_needs_touch # needed to prevent permission caching
+    enrollment = @context_enrollment if @context_enrollment&.pending? && (@context_enrollment.uuid == params[:invitation] || params[:invitation].blank?)
+    @current_user.reload if @context_enrollment&.enrollment_state&.user_needs_touch # needed to prevent permission caching
 
     # Overwrite with the session enrollment, if one exists, and it's different than the current user's
     if session[:enrollment_uuid] && enrollment.try(:uuid) != session[:enrollment_uuid] &&
@@ -2436,7 +2436,7 @@ class CoursesController < ApplicationController
     if params[:role_id].present? || !Role.get_built_in_role(params[:enrollment_type], root_account_id: @context.root_account_id)
       custom_role = @context.account.get_role_by_id(params[:role_id]) if params[:role_id].present?
       custom_role ||= @context.account.get_role_by_name(params[:enrollment_type]) # backwards compatibility
-      if custom_role && custom_role.course_role?
+      if custom_role&.course_role?
         if custom_role.inactive?
           render :json => t('errors.role_not_active', "Can't add users for non-active role: '%{role}'", :role => custom_role.name), :status => :bad_request
           return
@@ -2450,7 +2450,7 @@ class CoursesController < ApplicationController
     end
 
     params[:course_section_id] ||= @context.default_section.id
-    if @current_user && @current_user.can_create_enrollment_for?(@context, session, params[:enrollment_type])
+    if @current_user&.can_create_enrollment_for?(@context, session, params[:enrollment_type])
       params[:user_list] ||= ""
 
       # Enrollment settings hash

@@ -201,7 +201,7 @@ module TextHelper
     # which we don't want
     res = doc.at_css('body').inner_html rescue nil
     res ||= doc.root.children.first.inner_html rescue ""
-    res && res.html_safe
+    res&.html_safe
   end
 
   def self.make_subject_reply_to(subject)

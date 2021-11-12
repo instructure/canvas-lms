@@ -136,7 +136,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     # temporary fix for CNVS-8651 while we rewrite front-end quizzes
     if request.get?
       @quiz = require_quiz
-      user_id = @current_user && @current_user.id
+      user_id = @current_user&.id
       redirect_to course_quiz_take_url(@context, @quiz, user_id: user_id)
     else
       backup

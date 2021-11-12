@@ -116,7 +116,7 @@ module Api::V1::ContextModule
     when 'Assignment', 'WikiPage', 'Attachment'
       api_url = polymorphic_url([:api_v1, context_module.context, content_tag.content])
     when 'ContextExternalTool'
-      if content_tag.content && content_tag.content.tool_id
+      if content_tag.content&.tool_id
         api_url = sessionless_launch_url(context_module.context, :id => content_tag.content.id, :url => (content_tag.url || content_tag.content.url))
       elsif content_tag.content
         if content_tag.content_id
@@ -183,7 +183,7 @@ module Api::V1::ContextModule
     unless opts[:for_admin]
       details[:thumbnail_url] = authenticated_thumbnail_url(item) if item.is_a?(Attachment)
       item_type = ITEM_TYPE[content_tag.content_type.to_sym] || ''
-      lock_item = item && item.respond_to?(:locked_for?) ? item : content_tag
+      lock_item = item.respond_to?(:locked_for?) ? item : content_tag
       locked_json(details, lock_item, current_user, item_type)
     end
 

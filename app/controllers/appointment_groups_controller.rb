@@ -607,7 +607,7 @@ class AppointmentGroupsController < ApplicationController
   def web_index
     # start with the first reservable appointment group
     group = AppointmentGroup.reservable_by(@current_user, params[:context_codes]).current.order(:start_at).first
-    anchor = calendar_fragment :view_name => :agenda, :view_start => group && group.start_at.strftime('%Y-%m-%d')
+    anchor = calendar_fragment :view_name => :agenda, :view_start => group&.start_at&.strftime('%Y-%m-%d')
     redirect_to calendar2_url(:anchor => anchor)
   end
 
@@ -631,8 +631,8 @@ class AppointmentGroupsController < ApplicationController
                # For the calendar to correctly pop-up the event we should use the parent event if the
                # event is a user event and the user does not own the event.
                # i.e. teacher viewing appointment slot filled by student.
-               event = event.parent_event if event && event.user && event.user != @current_user
-               event = nil unless event && event.grants_right?(@current_user, :read)
+               event = event.parent_event if event&.user && event.user != @current_user
+               event = nil unless event&.grants_right?(@current_user, :read)
                args[:view_start] = (event || @group).start_at.strftime('%Y-%m-%d')
                if event
                  calendar_args[:event_id] = event.id

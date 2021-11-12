@@ -79,7 +79,7 @@ module Importers
     end
 
     def self.import_media_objects(mo_attachments, migration)
-      wait_for_completion = migration && migration.canvas_import?
+      wait_for_completion = migration&.canvas_import?
       unless mo_attachments.blank?
         MediaObject.add_media_files(mo_attachments, wait_for_completion)
       end
@@ -413,7 +413,7 @@ module Importers
       return unless data[:course]
 
       settings = data[:course]
-      if settings[:tab_configuration] && settings[:tab_configuration].is_a?(Array)
+      if settings[:tab_configuration].is_a?(Array)
         tab_config = []
         all_tools = nil
         settings[:tab_configuration].each do |tab|

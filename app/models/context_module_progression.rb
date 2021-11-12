@@ -189,7 +189,7 @@ class ContextModuleProgression < ActiveRecord::Base
       end
 
       subs = get_submissions(tag) if tag.scoreable?
-      if subs && subs.any? { |sub| sub.respond_to?(:excused?) && sub.excused? }
+      if subs&.any? { |sub| sub.respond_to?(:excused?) && sub.excused? }
         calc.check_action!(req, true)
         next
       end

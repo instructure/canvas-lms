@@ -70,6 +70,6 @@ class Quizzes::QuizSortables
   end
 
   def quiz_group_id
-    group.id if group
+    group&.id
   end
 end

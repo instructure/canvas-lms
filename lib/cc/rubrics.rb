@@ -80,7 +80,7 @@ module CC
         end
       end
 
-      rubrics_file.close if rubrics_file
+      rubrics_file&.close
       rel_path
     end
 

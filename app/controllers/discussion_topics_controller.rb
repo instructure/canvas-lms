@@ -1432,7 +1432,7 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def process_group_parameters(discussion_topic_hash)
-    if params[:assignment] && params[:assignment].key?(:group_category_id)
+    if params[:assignment]&.key?(:group_category_id)
       id = params[:assignment].delete(:group_category_id)
       discussion_topic_hash[:group_category_id] ||= id
     end

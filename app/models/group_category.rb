@@ -207,7 +207,7 @@ class GroupCategory < ActiveRecord::Base
     # condition would may any group in the category say has_common_section?
     # false, and force us true. so we special case it, and get the short
     # circuit as a bonus.
-    return false unless self.context && self.context.is_a?(Course)
+    return false unless self.context.is_a?(Course)
 
     self.groups.any? { |group| !group.has_common_section? }
   end

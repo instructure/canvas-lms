@@ -168,12 +168,12 @@ module Api::V1::Assignment
 
     hash['omit_from_final_grade'] = assignment.omit_from_final_grade?
 
-    if assignment.context && assignment.context.turnitin_enabled?
+    if assignment.context&.turnitin_enabled?
       hash['turnitin_enabled'] = assignment.turnitin_enabled
       hash['turnitin_settings'] = turnitin_settings_json(assignment)
     end
 
-    if assignment.context && assignment.context.vericite_enabled?
+    if assignment.context&.vericite_enabled?
       hash['vericite_enabled'] = assignment.vericite_enabled
       hash['vericite_settings'] = vericite_settings_json(assignment)
     end

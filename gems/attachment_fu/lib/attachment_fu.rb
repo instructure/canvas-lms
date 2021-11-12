@@ -288,7 +288,7 @@ module AttachmentFu # :nodoc:
       rescue ThumbnailError => e
         logger.warn("error creating thumbnail for attachment_id #{self.id}: #{e.inspect}")
       ensure
-        tmp.unlink if tmp
+        tmp&.unlink
       end
 
       res
@@ -420,7 +420,7 @@ module AttachmentFu # :nodoc:
     end
 
     def detect_mimetype(file_data)
-      if file_data && file_data.respond_to?(:content_type) && (file_data.content_type.blank? || file_data.content_type.strip == "application/octet-stream")
+      if file_data.respond_to?(:content_type) && (file_data.content_type.blank? || file_data.content_type.strip == "application/octet-stream")
         res = nil
         res ||= File.mime_type?(file_data.original_filename) if file_data.respond_to?(:original_filename)
         res ||= File.mime_type?(file_data)
@@ -494,7 +494,7 @@ module AttachmentFu # :nodoc:
 
     # Generates a unique filename for a Tempfile.
     def random_tempfile_filename
-      "#{rand Time.now.to_i}#{(filename && filename.last(50)) || 'attachment'}"
+      "#{rand Time.now.to_i}#{filename&.last(50) || 'attachment'}"
     end
 
     def sanitize_filename(filename)

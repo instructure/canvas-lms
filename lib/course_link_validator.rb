@@ -30,7 +30,7 @@ class CourseLinkValidator
   # creates a new validation job
   def self.queue_course(course)
     progress = current_progress(course)
-    return progress if progress && progress.pending?
+    return progress if progress&.pending?
 
     progress ||= Progress.new(:tag => TAG, :context => course)
     progress.reset!

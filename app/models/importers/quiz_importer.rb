@@ -240,7 +240,7 @@ module Importers
         if hash[:assignment][:migration_id] && !hash[:assignment][:migration_id].start_with?(MasterCourses::MIGRATION_ID_PREFIX)
           item.assignment ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:assignment][:migration_id]).first
         end
-        item.assignment = nil if item.assignment && item.assignment.quiz && item.assignment.quiz.id != item.id
+        item.assignment = nil if item.assignment&.quiz && item.assignment.quiz.id != item.id
         item.assignment ||= context.assignments.temp_record
         item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
       elsif !item.assignment && (grading = hash[:grading])
@@ -309,7 +309,7 @@ module Importers
       item.root_entries(true) if !item.available? && !item.survey? # reload items so we get accurate points
       item.notify_of_update = false
       item.save
-      item.assignment.save_without_broadcasting if item.assignment && item.assignment.changed?
+      item.assignment.save_without_broadcasting if item.assignment&.changed?
       if recache_due_dates
         migration.find_imported_migration_item(Assignment, item.assignment.migration_id)&.needs_update_cached_due_dates = true
       end

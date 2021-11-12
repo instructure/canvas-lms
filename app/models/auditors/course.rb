@@ -62,7 +62,7 @@ class Auditors::Course
     end
 
     def event_source
-      attributes['event_source'].to_sym if attributes['event_source']
+      attributes['event_source']&.to_sym
     end
 
     def user

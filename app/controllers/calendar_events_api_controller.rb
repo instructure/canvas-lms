@@ -1099,7 +1099,7 @@ class CalendarEventsApiController < ApplicationController
 
     # only get pertinent contexts if there is a user
     if user
-      joined_codes = codes && codes.join(",")
+      joined_codes = codes&.join(",")
       get_all_pertinent_contexts(
         include_groups: true,
         cross_shard: true,

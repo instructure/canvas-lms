@@ -195,7 +195,7 @@ class Quizzes::TakeQuizPresenter
   end
 
   def form_action_params(session, user)
-    url_params = { :user_id => user && user.id }
+    url_params = { :user_id => user&.id }
     if session['lockdown_browser_popup']
       url_params.merge!(Canvas::LockdownBrowser.plugin.base.quiz_exit_params)
     end

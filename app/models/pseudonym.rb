@@ -366,7 +366,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def email
-    user.email if user
+    user&.email
   end
 
   def email_channel
@@ -382,7 +382,7 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def sms
-    user.sms if user
+    user&.sms
   end
 
   def sms=(s)

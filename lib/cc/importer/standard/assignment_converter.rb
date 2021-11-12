@@ -24,7 +24,7 @@ module CC::Importer::Standard
     def convert_cc_assignments(asmnts = [])
       resources_by_type("assignment", "assignment_xmlv1p0").each do |res|
         if (doc = get_node_or_open_file(res, 'assignment'))
-          path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
+          path = res[:href] || (res[:files]&.first && res[:files].first[:href])
           resource_dir = File.dirname(path) if path
 
           asmnt = { :migration_id => res[:migration_id] }.with_indifferent_access

@@ -376,7 +376,7 @@ class WikiPage < ActiveRecord::Base
 
   def participants
     res = []
-    if context && context.available?
+    if context&.available?
       res += if !self.active?
                context.participating_admins
              else
@@ -406,7 +406,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def user_name
-    (user && user.name) || t('unknown_user_name', "Unknown")
+    user&.name || t('unknown_user_name', "Unknown")
   end
 
   def to_param

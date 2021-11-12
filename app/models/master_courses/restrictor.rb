@@ -78,7 +78,7 @@ module MasterCourses::Restrictor
     end
 
     def mark_as_importing!(cm)
-      @importing_migration = cm if cm && cm.master_course_subscription
+      @importing_migration = cm if cm&.master_course_subscription
     end
 
     def skip_downstream_changes!
@@ -219,7 +219,7 @@ module MasterCourses::Restrictor
   end
 
   def is_child_content?
-    self.migration_id && self.migration_id.start_with?(MasterCourses::MIGRATION_ID_PREFIX)
+    self.migration_id&.start_with?(MasterCourses::MIGRATION_ID_PREFIX)
   end
 
   def child_content_restrictions

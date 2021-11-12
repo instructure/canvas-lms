@@ -406,7 +406,7 @@ class User < ActiveRecord::Base
     elsif record.validation_root_account
       course = record.validation_root_account.self_enrollment_course_for(value)
       record.self_enrollment_course = course
-      if course && course.self_enrollment_enabled?
+      if course&.self_enrollment_enabled?
         record.errors.add(attr, "full") if course.self_enrollment_limit_met?
         record.errors.add(attr, "concluded") if course.concluded?("StudentEnrollment")
         record.errors.add(attr, "already_enrolled") if course.user_is_student?(record, :include_future => true)
@@ -1004,7 +1004,7 @@ class User < ActiveRecord::Base
   end
 
   def sms
-    sms_channel.path if sms_channel
+    sms_channel&.path
   end
 
   def short_name
@@ -1102,7 +1102,7 @@ class User < ActiveRecord::Base
       group_memberships_scope.destroy_all
       user_observer_scope.destroy_all
       user_observee_scope.destroy_all
-      eportfolio_scope.in_batches.destroy_all if eportfolio_scope
+      eportfolio_scope&.in_batches&.destroy_all
       pseudonym_scope.each(&:destroy)
       account_users.each(&:destroy)
 
@@ -1169,7 +1169,7 @@ class User < ActiveRecord::Base
   end
 
   def used_feature?(feature)
-    self.features_used && self.features_used.split(/,/).include?(feature.to_s)
+    self.features_used&.split(/,/)&.include?(feature.to_s)
   end
 
   def available_courses
@@ -1430,7 +1430,7 @@ class User < ActiveRecord::Base
 
     external_avatar_url_patterns = Setting.get('avatar_external_url_patterns', '^https://[a-zA-Z0-9.-]+\.instructure\.com/').split(/,/).map { |re| Regexp.new re }
 
-    if val['url'] && val['url'].match?(GRAVATAR_PATTERN)
+    if val['url']&.match?(GRAVATAR_PATTERN)
       self.avatar_image_source = 'gravatar'
       self.avatar_image_url = val['url']
       self.avatar_state = 'submitted'
@@ -2786,7 +2786,7 @@ class User < ActiveRecord::Base
 
   def group_member_json(context)
     h = { :user_id => self.id, :name => self.last_name_first, :display_name => self.short_name }
-    if context && context.is_a?(Course)
+    if context.is_a?(Course)
       self.sections_for_course(context).each do |section|
         h[:sections] ||= []
         h[:sections] << { :section_id => section.id, :section_code => section.section_code }
@@ -3097,7 +3097,7 @@ class User < ActiveRecord::Base
   end
 
   def update_bouncing_channel_message!(channel = nil)
-    force_set_bouncing = channel && channel.bouncing? && !channel.imported?
+    force_set_bouncing = channel&.bouncing? && !channel.imported?
     return show_bouncing_channel_message! if force_set_bouncing
 
     sis_channel_ids = pseudonyms.shard(self).where.not(sis_communication_channel_id: nil).pluck(:sis_communication_channel_id)

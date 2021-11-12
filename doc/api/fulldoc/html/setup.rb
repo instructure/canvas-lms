@@ -242,7 +242,7 @@ def serialize_index
 end
 
 def asset(path, content)
-  options[:serializer].serialize(path, content) if options[:serializer]
+  options[:serializer]&.serialize(path, content)
 end
 
 def generate_assets

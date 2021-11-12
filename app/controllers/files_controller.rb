@@ -587,7 +587,7 @@ class FilesController < ApplicationController
           @headers = false
           @show_left_side = false
         end
-        if attachment.content_type && attachment.content_type.match(/\Avideo\/|audio\//)
+        if attachment.content_type&.match(/\Avideo\/|audio\//)
           attachment.context_module_action(@current_user, :read)
         end
         format.html do
@@ -1176,7 +1176,7 @@ class FilesController < ApplicationController
     @folder = @context.folders.active.find(params[:folder_id])
     if authorized_action(@context, @current_user, :manage_files_edit)
       @folders = @folder.active_sub_folders.by_position
-      @folders.first && @folders.first.update_order((params[:folder_order] || "").split(","))
+      @folders.first&.update_order((params[:folder_order] || "").split(","))
       @folder.file_attachments.by_position_then_display_name.first && @folder.file_attachments.first.update_order((params[:order] || "").split(","))
       @folder.reload
       render :json => @folder.subcontent.map { |f| f.as_json(methods: :readable_size, permissions: { user: @current_user, session: session }) }

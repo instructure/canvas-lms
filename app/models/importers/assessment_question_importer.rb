@@ -170,12 +170,10 @@ module Importers
         end
       end
 
-      if import_warnings
-        import_warnings.each do |warning|
-          migration.add_warning(warning, {
-                                  :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
-                                })
-        end
+      import_warnings&.each do |warning|
+        migration.add_warning(warning, {
+                                :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
+                              })
       end
       hash
     end
@@ -209,7 +207,7 @@ module Importers
         end
       end
 
-      hash[:answers].each_with_index do |answer, i|
+      hash[:answers]&.each_with_index do |answer, i|
         [:html, :comments_html, :left_html].each do |field|
           key = "answer #{i} #{field}"
 
@@ -222,7 +220,7 @@ module Importers
         if answer[:comments].present? && answer[:comments] == answer[:comments_html]
           answer.delete(:comments_html)
         end
-      end if hash[:answers]
+      end
 
       hash[:prepped_for_import] = true
       hash

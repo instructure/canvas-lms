@@ -105,8 +105,8 @@ module Courses
         add_error("invalid end time(s)")
       end
 
-      default_start_at = (course_section && course_section.start_at) || course.start_at || course.enrollment_term.start_at
-      default_end_at = (course_section && course_section.end_at) || course.conclude_at || course.enrollment_term.end_at
+      default_start_at = course_section&.start_at || course.start_at || course.enrollment_term.start_at
+      default_end_at = course_section&.end_at || course.conclude_at || course.enrollment_term.end_at
 
       timetable_hashes.each do |hash|
         hash[:course_start_at] ||= default_start_at

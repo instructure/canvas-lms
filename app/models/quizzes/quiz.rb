@@ -278,7 +278,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def muted?
-    self.assignment && self.assignment.muted?
+    self.assignment&.muted?
   end
 
   alias_method :destroy_permanently!, :destroy
@@ -376,7 +376,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     # NOTE: We don't have a submission user when the teacher is previewing the
     # quiz and displaying the results'
     return true if self.grants_right?(user, :grade) &&
-                   (submission && submission.user && submission.user != user)
+                   (submission&.user && submission.user != user)
 
     return false unless self.show_correct_answers
 
@@ -460,7 +460,7 @@ class Quizzes::Quiz < ActiveRecord::Base
         Quizzes::Quiz.where("assignment_id=? AND id<>?", self.assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if self.assignment_id
         self.assignment = @assignment_to_set if @assignment_to_set && !self.assignment
         a = self.assignment
-        a.quiz.clear_changes_information if a.quiz # AR#changes persist in after_saves now - needed to prevent an autosave loop
+        a.quiz&.clear_changes_information # AR#changes persist in after_saves now - needed to prevent an autosave loop
         a.points_possible = self.points_possible
         a.description = self.description
         a.title = self.title
@@ -500,7 +500,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def clear_availability_cache
     if self.should_clear_availability_cache && !self.saved_by == :migration
       self.clear_cache_key(:availability)
-      self.assignment.clear_cache_key(:availability) if self.assignment
+      self.assignment&.clear_cache_key(:availability)
     end
   end
 
@@ -803,7 +803,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def low_level_locked_for?(user, opts = {})
     RequestCache.cache(locked_request_cache_key(user)) do
       user_submission = user && quiz_submissions.where(user_id: user.id).first
-      return false if user_submission && user_submission.manually_unlocked
+      return false if user_submission&.manually_unlocked
 
       quiz_for_user = self.overridden_for(user)
 
@@ -1038,7 +1038,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def post_to_sis?
-    assignment && assignment.post_to_sis
+    assignment&.post_to_sis
   end
 
   def unpublished_changes?
@@ -1430,9 +1430,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def excused_for_student?(student)
-    if assignment
-      assignment.submission_for_student(student).excused?
-    end
+    assignment&.submission_for_student(student)&.excused?
   end
 
   def due_for_any_student_in_closed_grading_period?(periods = nil)

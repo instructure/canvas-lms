@@ -89,7 +89,7 @@ module ContextModulesHelper
     elsif item.content_type == 'WikiPage'
       item.content.url
     else
-      (item.content && item.content.respond_to?(:published?) ? item.content.id : item.id)
+      (item.content.respond_to?(:published?) ? item.content.id : item.id)
     end
   end
 

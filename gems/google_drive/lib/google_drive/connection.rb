@@ -280,8 +280,7 @@ module GoogleDrive
     def file_extension_from_header(headers, entry)
       file_extension = (entry.extension && !entry.extension.empty? && entry.extension) || 'unknown'
 
-      if headers['content-disposition'] &&
-         headers['content-disposition'].match(/filename=["']?[^;"'.]+\.(?<file_extension>[^;"']+)["']?/)
+      if headers['content-disposition']&.match(/filename=["']?[^;"'.]+\.(?<file_extension>[^;"']+)["']?/)
         file_extension = Regexp.last_match[:file_extension]
       end
 

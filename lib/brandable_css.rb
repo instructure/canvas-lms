@@ -167,7 +167,7 @@ module BrandableCSS
       return handle_urls(explicit_value, config, css_urls) if explicit_value
 
       default = config['default']
-      if default && default.starts_with?('$')
+      if default&.starts_with?('$')
         if css_urls
           return "var(--#{default[1..]})"
         else

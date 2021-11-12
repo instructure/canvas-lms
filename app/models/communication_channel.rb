@@ -398,7 +398,7 @@ class CommunicationChannel < ActiveRecord::Base
     # Add communication channel for users that already had Twitter
     # integrated before we started offering it as a cc
     twitter_service = user.user_services.for_service(CommunicationChannel::TYPE_TWITTER).first
-    twitter_service.assert_communication_channel if twitter_service
+    twitter_service&.assert_communication_channel
 
     rank_order = [TYPE_EMAIL, TYPE_SMS, TYPE_PUSH]
     # Add twitter and yo (in that order) if the user's account is setup for them.

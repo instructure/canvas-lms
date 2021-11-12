@@ -107,10 +107,8 @@ class ContextModule < ActiveRecord::Base
         # don't queue a job unless necessary
         delay_if_production(strand: "module_reeval_#{self.global_context_id}").evaluate_all_progressions
       end
-      if @discussion_topics_to_recalculate
-        @discussion_topics_to_recalculate.each do |dt|
-          dt.delay_if_production(strand: "module_reeval_#{self.global_context_id}").recalculate_context_module_actions!
-        end
+      @discussion_topics_to_recalculate&.each do |dt|
+        dt.delay_if_production(strand: "module_reeval_#{self.global_context_id}").recalculate_context_module_actions!
       end
     end
   end

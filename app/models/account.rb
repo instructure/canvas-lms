@@ -674,10 +674,8 @@ class Account < ActiveRecord::Base
       end
     end
     res = [[("&nbsp;&nbsp;" * indent).html_safe + self.name, self.id]]
-    if preloaded_accounts[self.id]
-      preloaded_accounts[self.id].each do |account|
-        res += account.sub_accounts_as_options(indent + 1, preloaded_accounts)
-      end
+    preloaded_accounts[self.id]&.each do |account|
+      res += account.sub_accounts_as_options(indent + 1, preloaded_accounts)
     end
     res
   end
@@ -1173,12 +1171,12 @@ class Account < ActiveRecord::Base
 
   def get_account_role_by_name(role_name)
     role = get_role_by_name(role_name)
-    return role if role && role.account_role?
+    return role if role&.account_role?
   end
 
   def get_course_role_by_name(role_name)
     role = get_role_by_name(role_name)
-    return role if role && role.course_role?
+    return role if role&.course_role?
   end
 
   def get_role_by_name(role_name)

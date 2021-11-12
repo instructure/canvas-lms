@@ -94,7 +94,7 @@ class CalendarEvent < ActiveRecord::Base
     contexts = find_all_by_asset_string(context_codes).group_by(&:asset_string)
     context_codes.each do |code|
       context = contexts[code] && contexts[code][0]
-      next if context && context.grants_right?(record.updating_user, :manage_calendar) && context.try(:parent_event_context) == record.context
+      next if context&.grants_right?(record.updating_user, :manage_calendar) && context.try(:parent_event_context) == record.context
 
       break record.errors.add(attr, t('errors.invalid_child_event_context', "Invalid child event context"))
     end

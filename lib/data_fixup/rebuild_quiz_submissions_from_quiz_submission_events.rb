@@ -80,7 +80,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
       quiz_submission = build_new_submission_from_quiz_submission_events(submission)
 
       # save the result
-      quiz_submission.save_with_versioning! if quiz_submission
+      quiz_submission&.save_with_versioning!
     end
 
     def find_missing_submissions_on_current_shard

@@ -117,7 +117,7 @@ class UsageRightsController < ApplicationController
       usage_rights_params = params.require(:usage_rights).permit(:use_justification, :legal_copyright, :license)
       usage_rights = @context.usage_rights.where(usage_rights_params).first
       usage_rights ||= @context.usage_rights.create(usage_rights_params)
-      return render json: usage_rights.errors, status: :bad_request unless usage_rights && usage_rights.valid?
+      return render json: usage_rights.errors, status: :bad_request unless usage_rights&.valid?
 
       assign_usage_rights(usage_rights)
     end

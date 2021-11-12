@@ -219,7 +219,7 @@ class ContextModulesController < ApplicationController
       if !(@tag.unpublished? || @tag.context_module.unpublished?) || authorized_action(@tag.context_module, @current_user, :view_unpublished_items)
         reevaluate_modules_if_locked(@tag)
         @progression = @tag.context_module.evaluate_for(@current_user) if @tag.context_module
-        @progression.uncollapse! if @progression && @progression.collapsed?
+        @progression.uncollapse! if @progression&.collapsed?
         content_tag_redirect(@context, @tag, :context_context_modules_url, :modules)
       end
     end
@@ -273,15 +273,15 @@ class ContextModulesController < ApplicationController
       end
 
       reevaluate_modules_if_locked(@tag)
-      @progression = @tag.context_module.evaluate_for(@current_user) if @tag && @tag.context_module
-      @progression.uncollapse! if @progression && @progression.collapsed?
+      @progression = @tag.context_module.evaluate_for(@current_user) if @tag&.context_module
+      @progression.uncollapse! if @progression&.collapsed?
       content_tag_redirect(@context, @tag, :context_context_modules_url)
     end
   end
 
   def reevaluate_modules_if_locked(tag)
     # if the object is locked for this user, reevaluate all the modules and clear the cache so it will be checked again when loaded
-    if tag.content && tag.content.respond_to?(:locked_for?)
+    if tag.content.respond_to?(:locked_for?)
       locked = tag.content.locked_for?(@current_user, :context => @context)
       if locked
         @context.context_modules.active.each { |m| m.evaluate_for(@current_user) }
@@ -590,7 +590,7 @@ class ContextModulesController < ApplicationController
         end
       end
       result[:current_item].evaluate_for(@current_user) rescue nil
-      if result[:current_item] && result[:current_item].position
+      if result[:current_item]&.position
         result[:previous_item] = @tags.reverse.detect { |t| t.id != result[:current_item].id && t.context_module_id == result[:current_item].context_module_id && t.position && t.position <= result[:current_item].position && t.content_type != "ContextModuleSubHeader" }
         result[:next_item] = @tags.detect { |t| t.id != result[:current_item].id && t.context_module_id == result[:current_item].context_module_id && t.position && t.position >= result[:current_item].position && t.content_type != "ContextModuleSubHeader" }
         current_module = @modules.detect { |m| m.id == result[:current_item].context_module_id }

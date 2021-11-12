@@ -29,13 +29,13 @@ module LocaleSelection
     # groups cheat and set the context to be the group after get_context runs
     # but before set_locale runs, but we want to do locale lookup based on the
     # actual context.
-    if context && context.is_a?(Group) && context.context
+    if context.is_a?(Group) && context.context
       context = context.context
     end
 
     sources = [
       -> { context.locale if context.try(:is_a?, Course) },
-      -> { user.locale if user && user.locale },
+      -> { user.locale if user&.locale },
       -> { session_locale },
       -> { Account.recursive_default_locale_for_id(context.account_id) if context.try(:is_a?, Course) },
       -> { Account.recursive_default_locale_for_id(context.id) if context.try(:is_a?, Account) },

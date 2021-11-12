@@ -61,7 +61,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     return if self.skip_parent_group_touch
 
     self.touch
-    self.learning_outcome_group.touch_parent_group if self.learning_outcome_group
+    self.learning_outcome_group&.touch_parent_group
   end
 
   # adds a new link to an outcome to this group. does nothing if a link already
@@ -277,8 +277,8 @@ class LearningOutcomeGroup < ActiveRecord::Base
   private
 
   def infer_defaults
-    self.context ||= self.parent_outcome_group && self.parent_outcome_group.context
-    if self.context && self.context.learning_outcome_groups.exists? && !building_default
+    self.context ||= self.parent_outcome_group&.context
+    if self.context&.learning_outcome_groups&.exists? && !building_default
       default = self.context.root_outcome_group
       self.learning_outcome_group_id ||= default.id unless self == default
     end

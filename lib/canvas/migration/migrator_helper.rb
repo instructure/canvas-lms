@@ -59,7 +59,7 @@ module Canvas::Migration
       error[:object] = object if object
       @errors << error
       object[:error_message] = message if object
-      if @scraper and @scraper.page
+      if @scraper&.page
         error[:error_url] = @scraper.page.uri.to_s
         error[:page_body] = @scraper.page.body
       end
@@ -91,7 +91,7 @@ module Canvas::Migration
     end
 
     def set_progress(progress)
-      if content_migration && content_migration.respond_to?(:update_conversion_progress)
+      if content_migration.respond_to?(:update_conversion_progress)
         content_migration.update_conversion_progress(progress)
       end
     end
@@ -257,10 +257,8 @@ module Canvas::Migration
         lo[:parent_migration_id] = parent_migration_id if selectable_outcomes
         overview[:learning_outcomes] << lo
       end
-      if outcome[:outcomes]
-        outcome[:outcomes].each do |sub_outcome|
-          overview = add_learning_outcome_to_overview(overview, sub_outcome, child_groups, outcome[:migration_id], selectable_outcomes)
-        end
+      outcome[:outcomes]&.each do |sub_outcome|
+        overview = add_learning_outcome_to_overview(overview, sub_outcome, child_groups, outcome[:migration_id], selectable_outcomes)
       end
       overview
     end
@@ -294,24 +292,22 @@ module Canvas::Migration
 
       if @course[:assessments]
         @overview[:assessments] = []
-        if @course[:assessments][:assessments]
-          @course[:assessments][:assessments].each do |a|
-            assmnt = {}
-            dates << a[:due_date] if a[:due_date]
-            @overview[:assessments] << assmnt
-            assmnt[:quiz_name] = a[:quiz_name]
-            assmnt[:quiz_name] ||= a[:title]
-            assmnt[:title] = a[:title]
-            assmnt[:title] ||= a[:quiz_name]
-            assmnt[:migration_id] = a[:migration_id]
-            assmnt[:type] = a[:type]
-            assmnt[:max_points] = a[:max_points]
-            assmnt[:duration] = a[:duration]
-            assmnt[:error_message] = a[:error_message] if a[:error_message]
-            if a[:assignment] && a[:assignment][:migration_id]
-              assmnt[:assignment_migration_id] = a[:assignment][:migration_id]
-              ensure_linked_assignment(a[:assignment], quiz_migration_id: a[:migration_id])
-            end
+        @course[:assessments][:assessments]&.each do |a|
+          assmnt = {}
+          dates << a[:due_date] if a[:due_date]
+          @overview[:assessments] << assmnt
+          assmnt[:quiz_name] = a[:quiz_name]
+          assmnt[:quiz_name] ||= a[:title]
+          assmnt[:title] = a[:title]
+          assmnt[:title] ||= a[:quiz_name]
+          assmnt[:migration_id] = a[:migration_id]
+          assmnt[:type] = a[:type]
+          assmnt[:max_points] = a[:max_points]
+          assmnt[:duration] = a[:duration]
+          assmnt[:error_message] = a[:error_message] if a[:error_message]
+          if a[:assignment] && a[:assignment][:migration_id]
+            assmnt[:assignment_migration_id] = a[:assignment][:migration_id]
+            ensure_linked_assignment(a[:assignment], quiz_migration_id: a[:migration_id])
           end
         end
       end

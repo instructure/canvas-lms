@@ -232,7 +232,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def active_migration_running?
-    self.active_migration && self.active_migration.still_running?
+    self.active_migration&.still_running?
   end
 
   def last_export_started_at

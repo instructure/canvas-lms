@@ -144,11 +144,9 @@ class DiscussionTopicsApiController < ApplicationController
         structure = entries.to_json
       end
 
-      if new_entries
-        new_entries.each do |e|
-          e["message"] = resolve_placeholders(e["message"]) if e["message"]
-          e["attachments"].each { |att| att["url"] = resolve_placeholders(att["url"]) if att["url"] } if e["attachments"]
-        end
+      new_entries&.each do |e|
+        e["message"] = resolve_placeholders(e["message"]) if e["message"]
+        e["attachments"]&.each { |att| att["url"] = resolve_placeholders(att["url"]) if att["url"] }
       end
 
       participants = Shard.partition_by_shard(participant_ids) do |shard_ids|

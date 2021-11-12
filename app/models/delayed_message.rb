@@ -102,8 +102,7 @@ class DelayedMessage < ActiveRecord::Base
     delayed_messages = uniqs.values
     delayed_messages = delayed_messages.sort_by { |dm| [dm.notification.sort_order, dm.notification.category] }
     first = delayed_messages.detect { |m|
-      m.communication_channel &&
-        m.communication_channel.active? &&
+      m.communication_channel&.active? &&
         !m.communication_channel.bouncing?
     }
     to = first.communication_channel rescue nil
@@ -144,7 +143,7 @@ class DelayedMessage < ActiveRecord::Base
 
   def set_send_at
     # no cc yet = wait
-    return unless self.communication_channel and self.communication_channel.user
+    return unless self.communication_channel&.user
     return if self.send_at
 
     # I got tired of trying to figure out time zones in my head, and I realized

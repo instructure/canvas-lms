@@ -42,7 +42,7 @@ class File
       File.delete(temp.path)
     end
 
-    mime = mime && mime.split(";").first
+    mime = mime&.split(";")&.first
     mime = nil unless mime_types[mime]
 
     mime || 'unknown/unknown'

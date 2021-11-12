@@ -57,7 +57,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user| (self.user && self.user == user) || (self.context && self.context.grants_right?(user, :manage_content)) }
+    given { |user| (self.user && self.user == user) || self.context&.grants_right?(user, :manage_content) }
     can :add_captions and can :delete_captions
   end
 
@@ -277,7 +277,7 @@ class MediaObject < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.attachment.destroy if self.attachment
+    self.attachment&.destroy
     save!
   end
 

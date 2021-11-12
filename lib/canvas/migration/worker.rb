@@ -23,7 +23,7 @@ module Canvas::Migration::Worker
     def on_permanent_failure(error)
       if migration_id
         cm = ContentMigration.where(id: migration_id).first
-        cm.fail_with_error!(error) if cm
+        cm&.fail_with_error!(error)
       end
     end
   end

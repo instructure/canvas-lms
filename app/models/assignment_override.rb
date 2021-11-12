@@ -146,7 +146,7 @@ class AssignmentOverride < ActiveRecord::Base
         assignment.clear_cache_key(:availability)
         DueDateCacher.recompute(assignment)
       end
-      self.quiz.clear_cache_key(:availability) if self.quiz
+      self.quiz&.clear_cache_key(:availability)
     end
   end
 
@@ -369,8 +369,7 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def notify_change?
-    self.assignment &&
-      self.assignment.context.available? &&
+    self.assignment&.context&.available? &&
       self.assignment.published? &&
       self.assignment.created_at < 3.hours.ago &&
       (saved_change_to_workflow_state? ||

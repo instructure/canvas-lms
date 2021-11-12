@@ -42,11 +42,11 @@ module CC
       @migration_config = ConfigFile.load('external_migration')
       @migration_config ||= { :keep_after_complete => false }
       @for_course_copy = opts[:for_course_copy]
-      @qti_only_export = @content_export && @content_export.qti_export?
+      @qti_only_export = @content_export&.qti_export?
       @manifest_opts = opts.slice(:version)
       @deletions = opts[:deletions]
 
-      @for_master_migration = true if @content_export && @content_export.for_master_migration?
+      @for_master_migration = true if @content_export&.for_master_migration?
     end
 
     def self.export(content_export, opts = {})
@@ -140,7 +140,7 @@ module CC
     end
 
     def set_progress(progress)
-      @content_export.fast_update_progress(progress) if @content_export
+      @content_export&.fast_update_progress(progress)
     end
 
     def errors
@@ -160,7 +160,7 @@ module CC
     end
 
     def add_exported_asset(obj)
-      @content_export && @content_export.add_exported_asset(obj)
+      @content_export&.add_exported_asset(obj)
     end
 
     def export_symbol?(obj)

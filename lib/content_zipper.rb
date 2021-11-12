@@ -259,7 +259,7 @@ class ContentZipper
       # with the shortened name
       attachment.readonly!
       path = folder_names.empty? ? attachment.display_name : File.join(folder_names, attachment.display_name)
-      callback.call(attachment, folder_names) if callback
+      callback&.call(attachment, folder_names)
       @context = folder.context
       @logger.debug("  found attachment: #{attachment.unencoded_filename}")
       if add_attachment_to_zip(attachment, zipfile, path)
@@ -324,7 +324,7 @@ class ContentZipper
       @logger.error("  skipping #{attachment.full_filename} with error: #{e.message}")
       return false
     ensure
-      handle.close if handle
+      handle&.close
     end
 
     true

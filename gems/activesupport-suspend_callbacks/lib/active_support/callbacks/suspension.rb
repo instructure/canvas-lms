@@ -174,7 +174,7 @@ module ActiveSupport::Callbacks
                 end
               end
               current.invoke_after(env)
-              skipped.pop.invoke_after(env) while skipped && skipped.first
+              skipped.pop.invoke_after(env) while skipped&.first
               break env.value
             end
           end

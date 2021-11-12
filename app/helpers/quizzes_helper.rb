@@ -552,7 +552,7 @@ module QuizzesHelper
   end
 
   def take_quiz_url
-    user_id = @current_user && @current_user.id
+    user_id = @current_user&.id
     course_quiz_take_path(@context, @quiz, user_id: user_id)
   end
 

@@ -203,7 +203,7 @@ class Quizzes::QuizzesController < ApplicationController
       if session[:quiz_id] == @quiz.id && !request.xhr?
         session.delete(:quiz_id)
       end
-      is_observer = @context_enrollment && @context_enrollment.observer?
+      is_observer = @context_enrollment&.observer?
       @locked_reason = @quiz.locked_for?(@current_user, :check_policies => true, :deep_check_if_needed => true, :is_observer => is_observer)
       @locked = @locked_reason && !can_preview?
 
@@ -218,7 +218,7 @@ class Quizzes::QuizzesController < ApplicationController
       @submission = get_submission
 
       @just_graded = false
-      if @submission && @submission.needs_grading?(!!params[:take])
+      if @submission&.needs_grading?(!!params[:take])
         GuardRail.activate(:primary) do
           Quizzes::SubmissionGrader.new(@submission).grade_submission(
             finished_at: @submission.finished_at_fallback
@@ -688,9 +688,9 @@ class Quizzes::QuizzesController < ApplicationController
       if @submission && !@submission.user_id && (logged_out_index = params[:u_index])
         @logged_out_user_index = logged_out_index
       end
-      @submission = nil if @submission && @submission.settings_only?
-      @user = @submission && @submission.user
-      if @submission && @submission.needs_grading?
+      @submission = nil if @submission&.settings_only?
+      @user = @submission&.user
+      if @submission&.needs_grading?
         Quizzes::SubmissionGrader.new(@submission).grade_submission(
           finished_at: @submission.finished_at_fallback
         )
@@ -805,7 +805,7 @@ class Quizzes::QuizzesController < ApplicationController
   def submission_html
     @submission = get_submission
     setup_attachments
-    if @submission && @submission.completed?
+    if @submission&.completed?
       @lock_results_if_needed = true
       render layout: false
     else
@@ -982,7 +982,7 @@ class Quizzes::QuizzesController < ApplicationController
   def can_take_quiz?
     return true if params[:preview] && can_preview?
     return false if params[:take] && !@quiz.grants_right?(@current_user, :submit)
-    return false if @submission && @submission.completed? && @submission.attempts_left == 0
+    return false if @submission&.completed? && @submission.attempts_left == 0
 
     @quiz_eligibility = Quizzes::QuizEligibility.new(course: @context,
                                                      quiz: @quiz,

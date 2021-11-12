@@ -146,10 +146,8 @@ module Api::V1::QuizQuestion
     # need the answer text for multiple choice - only info necessary though
     # multiple_dropdown needs blank_id
     # formula questions need variables
-    if question_data[:answers]
-      question_data[:answers].each do |record|
-        record.keep_if { |k, _| %w(id text html blank_id variables).include?(k.to_s) }
-      end
+    question_data[:answers]&.each do |record|
+      record.keep_if { |k, _| %w(id text html blank_id variables).include?(k.to_s) }
     end
 
     question_data
