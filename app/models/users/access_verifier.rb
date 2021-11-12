@@ -67,7 +67,7 @@ module Users
       oauth_host = claims[:oauth_host]
       return_url = claims[:return_url]
 
-      return {
+      {
         user: user,
         real_user: real_user,
         developer_key: developer_key,

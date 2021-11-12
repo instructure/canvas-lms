@@ -595,11 +595,7 @@ class Course < ActiveRecord::Base
   end
 
   def custom_course_visibility
-    if public_syllabus == is_public && is_public_to_auth_users == public_syllabus_to_auth
-      return false
-    else
-      return true
-    end
+    !(public_syllabus == is_public && is_public_to_auth_users == public_syllabus_to_auth)
   end
 
   def customize_course_visibility_list
@@ -1574,9 +1570,9 @@ class Course < ActiveRecord::Base
   end
 
   def storage_quota
-    return read_attribute(:storage_quota) ||
-           (self.account.default_storage_quota rescue nil) ||
-           Setting.get('course_default_quota', 500.megabytes.to_s).to_i
+    read_attribute(:storage_quota) ||
+      (self.account.default_storage_quota rescue nil) ||
+      Setting.get('course_default_quota', 500.megabytes.to_s).to_i
   end
 
   def storage_quota=(val)
@@ -1900,7 +1896,7 @@ class Course < ActiveRecord::Base
   def institution_name
     return self.root_account.name if self.root_account_id != Account.default.id
 
-    return (self.account || self.root_account).name
+    (self.account || self.root_account).name
   end
 
   def account_users_for(user)
@@ -1983,7 +1979,7 @@ class Course < ActiveRecord::Base
     overall_status = "error"
     overall_status = "unpublished" unless found_statuses.size > 0
     overall_status = %w{error unpublished pending publishing published unpublishable}.detect { |s| found_statuses.include?(s) } || overall_status
-    return enrollments, overall_status
+    [enrollments, overall_status]
   end
 
   def should_kick_off_grade_publishing_timeout?
@@ -2023,7 +2019,7 @@ class Course < ActiveRecord::Base
     return false unless format_settings
     return false if SisPseudonym.for(user, self).nil? && format_settings[:requires_publishing_pseudonym]
 
-    return true
+    true
   end
 
   def publish_final_grades(publishing_user, user_ids_to_publish = nil)
@@ -3048,7 +3044,7 @@ class Course < ActiveRecord::Base
 
   def tab_hidden?(id)
     tab = self.tab_configuration.find { |t| t[:id] == id }
-    return tab && tab[:hidden]
+    tab && tab[:hidden]
   end
 
   def external_tool_tabs(opts, user)

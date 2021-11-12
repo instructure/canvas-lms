@@ -554,9 +554,9 @@ class CommunicationChannelsController < ApplicationController
     endpoints = @current_user.notification_endpoints.shard(@current_user).where("lower(token) = ?", params[:push_token].downcase)
     if endpoints&.destroy_all
       @current_user.touch
-      return render json: { success: true }
+      render json: { success: true }
     else
-      return render json: endpoints.errors, status: :bad_request
+      render json: endpoints.errors, status: :bad_request
     end
   end
 

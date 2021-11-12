@@ -188,7 +188,7 @@ module Api
       sis_id = column[:transform].call(sis_id)
       column = column[:column]
     end
-    return column, sis_id
+    [column, sis_id]
   end
 
   def self.sis_parse_ids(ids, lookups, current_user = nil, root_account: nil)
@@ -204,7 +204,7 @@ module Api
       columns[column] << sis_id
     end
     columns.keys.each { |key| columns[key].uniq! }
-    return columns
+    columns
   end
 
   # remove things that don't look like valid database IDs
@@ -351,7 +351,7 @@ module Api
     hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
     links = build_links_from_hash(hash)
     controller.response.headers["Link"] = links.join(',') if links.length > 0
-    return collection, meta
+    [collection, meta]
   end
 
   def self.jsonapi_meta(collection, controller, base_url)

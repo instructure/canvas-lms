@@ -230,7 +230,7 @@ module BookmarkedCollection
       index_sql, *index_args = column_comparison(columns.first, ">=", bookmark.first)
       sql = [sql, index_sql].join(" AND ")
       args.concat(index_args)
-      return [sql, *args]
+      [sql, *args]
     end
   end
 end

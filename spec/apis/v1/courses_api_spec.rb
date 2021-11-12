@@ -29,7 +29,7 @@ class TestCourseApi
     "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"
   end
 
-  def api_user_content(syllabus, course); return "api_user_content(#{syllabus}, #{course.id})"; end
+  def api_user_content(syllabus, course); "api_user_content(#{syllabus}, #{course.id})"; end
 end
 
 describe Api::V1::Course do

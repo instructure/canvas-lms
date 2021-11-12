@@ -448,9 +448,9 @@ class ContentMigration < ActiveRecord::Base
         end
       end
 
-      return true
+      true
     else
-      return false
+      false
     end
   end
 

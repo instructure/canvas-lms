@@ -204,7 +204,7 @@ module CanvasCassandra
         where_args << v
         "#{k} = ?"
       end.join(" AND ")
-      return where_clause, where_args
+      [where_clause, where_args]
     end
 
     def available?

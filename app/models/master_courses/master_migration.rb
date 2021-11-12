@@ -192,7 +192,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       self.generate_imports(type, export, subscriptions)
     else
       self.fail_export_with_error!("#{type} content export #{export.id} failed")
-      return nil
+      nil
     end
   end
 

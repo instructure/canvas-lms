@@ -675,7 +675,7 @@ class DiscussionTopicsApiController < ApplicationController
 
   def require_topic
     @topic = @context.all_discussion_topics.active.find(params[:topic_id])
-    return authorized_action(@topic, @current_user, :read)
+    authorized_action(@topic, @current_user, :read)
   end
 
   def require_entry
@@ -688,7 +688,7 @@ class DiscussionTopicsApiController < ApplicationController
     # neither the current user nor the enrollment user (if any) has posted yet,
     # so give them the forbidden status
     render :json => 'require_initial_post', :status => :forbidden
-    return false
+    false
   end
 
   def build_entry(association)

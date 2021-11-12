@@ -50,7 +50,7 @@ class EffectiveDueDates
       @filtered_students = students
     end
 
-    return self # allows us to chain this method
+    self # allows us to chain this method
   end
 
   def to_hash(included = [])

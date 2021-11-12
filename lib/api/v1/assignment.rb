@@ -980,7 +980,7 @@ module Api::V1::Assignment
     end
 
     assignment.do_notifications!(prepared_update[:old_assignment], prepared_update[:notify_of_update])
-    return :created
+    :created
   end
 
   def update_api_assignment_with_overrides(prepared_update, user)

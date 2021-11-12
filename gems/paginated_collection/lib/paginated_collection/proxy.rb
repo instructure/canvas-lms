@@ -51,7 +51,7 @@ module PaginatedCollection
         raise(ArgumentError, "The PaginatedCollection block needs to return a WillPaginate-style object")
       end
 
-      return pager
+      pager
     end
   end
 end

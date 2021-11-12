@@ -215,7 +215,7 @@ module Api::V1::AssignmentOverride
     end
 
     errors = nil if errors.empty?
-    return override_data, errors
+    [override_data, errors]
   end
 
   def check_property(object, prop, present, errors, message)
@@ -393,7 +393,7 @@ module Api::V1::AssignmentOverride
       ov.set_type == 'ADHOC' &&
         !ov.visible_student_overrides(visible_user_ids)
     }.map(&:id)
-    return invisible_user_ids, invisible_override_ids
+    [invisible_user_ids, invisible_override_ids]
   end
 
   def update_override_with_invisible_data(override_params, override, invisible_override_ids, invisible_user_ids)

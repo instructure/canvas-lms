@@ -559,7 +559,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
     subscriptions = @template.child_subscriptions.where(:id => @mm.export_results[:selective][:subscriptions])
     tag_association = @template.content_tags
 
-    return render_changes(tag_association, subscriptions)
+    render_changes(tag_association, subscriptions)
   end
 
   # @API List blueprint subscriptions
@@ -643,7 +643,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
     tag_association = @subscription.content_tags
 
-    return render_changes(tag_association, [@subscription])
+    render_changes(tag_association, [@subscription])
   end
 
   protected

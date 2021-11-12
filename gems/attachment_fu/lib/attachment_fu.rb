@@ -424,7 +424,7 @@ module AttachmentFu # :nodoc:
         res ||= "text/plain" unless file_data.respond_to?(:path)
         res || 'unknown/unknown'
       elsif file_data.respond_to?(:content_type)
-        return file_data.content_type
+        file_data.content_type
       else
         'unknown/unknown'
       end

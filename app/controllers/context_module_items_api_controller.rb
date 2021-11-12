@@ -322,7 +322,7 @@ class ContextModuleItemsApiController < ApplicationController
           @tag.context_module_action(@current_user, :read)
           redirect_to @tag.url
         else
-          return render(:status => 400, :json => { :message => "incorrect module item type" })
+          render(:status => 400, :json => { :message => "incorrect module item type" })
         end
       end
     end
@@ -755,10 +755,10 @@ class ContextModuleItemsApiController < ApplicationController
       @context.touch
 
       @tag.reload
-      return true
+      true
     else
       @tag.errors.add(:position, t(:invalid_position, "Invalid position"))
-      return false
+      false
     end
   end
   protected :set_position
@@ -793,7 +793,7 @@ class ContextModuleItemsApiController < ApplicationController
     elsif @context.grants_right?(@current_user, session, :participate_as_student)
       @student = @current_user
     else
-      return true
+      true
     end
   end
   protected :find_student

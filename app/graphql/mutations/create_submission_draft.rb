@@ -111,7 +111,7 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
     end
     errors_for(invalid.record)
   rescue SubmissionError => e
-    return validation_error(e.message)
+    validation_error(e.message)
   end
 
   def self.submission_draft_log_entry(draft, _ctx)

@@ -77,7 +77,7 @@ module SIS
       end
 
       def any_left_to_process?
-        return @batched_users.size > 0
+        @batched_users.size > 0
       end
 
       def infer_user_name(user_row, prior_name = nil)

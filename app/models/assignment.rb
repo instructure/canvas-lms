@@ -831,7 +831,7 @@ class Assignment < ActiveRecord::Base
       self.turnitin_settings[:error] = res
     end
     self.save
-    return self.turnitin_settings[:current]
+    self.turnitin_settings[:current]
   end
 
   def turnitin_settings settings = nil
@@ -883,7 +883,7 @@ class Assignment < ActiveRecord::Base
       self.turnitin_settings[:error] = res
     end
     self.save
-    return self.turnitin_settings[:current]
+    self.turnitin_settings[:current]
   end
 
   def vericite_settings
@@ -904,15 +904,15 @@ class Assignment < ActiveRecord::Base
     if opts[:due_at]
       if opts[:due_at] == opts[:due_at_was]
         # (comparison is modulo time zone) no real change, leave as was
-        return opts[:all_day_was], opts[:all_day_date_was]
+        [opts[:all_day_was], opts[:all_day_date_was]]
       else
         # 'normal' case. compare due_at to fancy midnight and extract its
         # date-part
-        return (opts[:due_at].strftime("%H:%M") == '23:59'), opts[:due_at].to_date
+        [(opts[:due_at].strftime("%H:%M") == '23:59'), opts[:due_at].to_date]
       end
     else
       # no due at = all_day and all_day_date are irrelevant
-      return false, nil
+      [false, nil]
     end
   end
 
@@ -2302,7 +2302,7 @@ class Assignment < ActiveRecord::Base
       end
     end
     touch_context
-    return primary_homework
+    primary_homework
   end
 
   def submission_attributes(opts, group)

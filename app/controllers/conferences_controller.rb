@@ -332,7 +332,7 @@ class ConferencesController < ApplicationController
           return redirect_to(urls.first[:url])
         end
       end
-      return redirect_to course_conferences_url(@context, :anchor => "conference_#{@conference.id}")
+      redirect_to course_conferences_url(@context, :anchor => "conference_#{@conference.id}")
     end
   end
 

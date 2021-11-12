@@ -113,7 +113,7 @@ class RubricAssessmentsController < ApplicationController
 
     # Funky flow to avoid a double-render, re-work it if you like
     if @assessment && !authorized_action(@assessment, @current_user, :update)
-      return
+      nil
     else
       opts = {}
       provisional = value_to_boolean(params[:provisional])

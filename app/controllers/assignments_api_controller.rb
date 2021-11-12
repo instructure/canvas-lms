@@ -1433,7 +1433,7 @@ class AssignmentsApiController < ApplicationController
   def invalid_bucket_error
     err_msg = t("bucket name must be one of the following: %{bucket_names}", bucket_names: SortsAssignments::VALID_BUCKETS.join(", "))
     @context.errors.add('bucket', err_msg, :att_name => 'bucket')
-    return render :json => @context.errors, :status => :bad_request
+    render :json => @context.errors, :status => :bad_request
   end
 
   def require_user_visibility

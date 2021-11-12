@@ -309,7 +309,7 @@ module HtmlTextHelper
     link += parts[1] if parts[1]
     link
   rescue
-    return ""
+    ""
   end
 
   def self.escape_html(text)

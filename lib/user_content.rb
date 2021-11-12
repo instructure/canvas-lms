@@ -257,7 +257,7 @@ module UserContent
       content ||= get_content.call
       allow = true if content.respond_to?(:grants_right?) && content.grants_right?(user, :read)
       allow = false if allow && content.respond_to?(:locked_for?) && content.locked_for?(user)
-      return allow
+      allow
     end
   end
 end

@@ -78,15 +78,15 @@ module DashboardHelper
   def accessibility_category_label(category)
     case category
     when "Announcement"
-      return I18n.t('helpers.dashboard_helper.announcement_label', "Visit Course Announcements")
+      I18n.t('helpers.dashboard_helper.announcement_label', "Visit Course Announcements")
     when "Conversation"
-      return I18n.t('helpers.dashboard_helper.conversation_label', "Visit Conversations")
+      I18n.t('helpers.dashboard_helper.conversation_label', "Visit Conversations")
     when "Assignment"
-      return I18n.t('helpers.dashboard_helper.assignment_label', "Visit Course Assignments")
+      I18n.t('helpers.dashboard_helper.assignment_label', "Visit Course Assignments")
     when "DiscussionEntry", "DiscussionTopic"
-      return I18n.t('helpers.dashboard_helper.discussion_label', "Visit Course Discussions")
+      I18n.t('helpers.dashboard_helper.discussion_label', "Visit Course Discussions")
     when "AssessmentRequest"
-      return I18n.t('helpers.dashboard_helper.peer_review_label', "Visit Course Peer Reviews")
+      I18n.t('helpers.dashboard_helper.peer_review_label', "Visit Course Peer Reviews")
     else
       raise "Unknown activity category"
     end
@@ -95,15 +95,15 @@ module DashboardHelper
   def category_details_label(category)
     case category
     when "Announcement"
-      return I18n.t('helpers.dashboard_helper.announcement_details', "Announcement Details")
+      I18n.t('helpers.dashboard_helper.announcement_details', "Announcement Details")
     when "Conversation"
-      return I18n.t('helpers.dashboard_helper.conversation_details', "Conversation Details")
+      I18n.t('helpers.dashboard_helper.conversation_details', "Conversation Details")
     when "Assignment"
-      return I18n.t('helpers.dashboard_helper.assignment_details', "Assignment Details")
+      I18n.t('helpers.dashboard_helper.assignment_details', "Assignment Details")
     when "DiscussionEntry", "DiscussionTopic"
-      return I18n.t('helpers.dashboard_helper.discussion_details', "Discussion Details")
+      I18n.t('helpers.dashboard_helper.discussion_details', "Discussion Details")
     when "AssessmentRequest"
-      return I18n.t('helpers.dashboard_helper.peer_review_details', "Peer Review Details")
+      I18n.t('helpers.dashboard_helper.peer_review_details', "Peer Review Details")
     else
       raise "Unknown activity category"
     end
@@ -112,25 +112,25 @@ module DashboardHelper
   def activity_category_title(category, items)
     case category
     when "Announcement"
-      return I18n.t('helpers.dashboard_helper.x_new_in_announcements',
-                    { :one => "*1* Announcement", :other => "*%{count}* Announcements" },
-                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+      I18n.t('helpers.dashboard_helper.x_new_in_announcements',
+             { :one => "*1* Announcement", :other => "*%{count}* Announcements" },
+             { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     when "Conversation"
-      return I18n.t('helpers.dashboard_helper.x_new_in_conversations',
-                    { :one => "*1* Conversation Message", :other => "*%{count}* Conversation Messages" },
-                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+      I18n.t('helpers.dashboard_helper.x_new_in_conversations',
+             { :one => "*1* Conversation Message", :other => "*%{count}* Conversation Messages" },
+             { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     when "Assignment"
-      return I18n.t('helpers.dashboard_helper.x_new_in_assignments',
-                    { :one => "*1* Assignment Notification", :other => "*%{count}* Assignment Notifications" },
-                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+      I18n.t('helpers.dashboard_helper.x_new_in_assignments',
+             { :one => "*1* Assignment Notification", :other => "*%{count}* Assignment Notifications" },
+             { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     when "DiscussionEntry", "DiscussionTopic"
-      return I18n.t('helpers.dashboard_helper.x_new_in_discussions',
-                    { :one => "*1* Discussion", :other => "*%{count}* Discussions" },
-                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+      I18n.t('helpers.dashboard_helper.x_new_in_discussions',
+             { :one => "*1* Discussion", :other => "*%{count}* Discussions" },
+             { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     when "AssessmentRequest"
-      return I18n.t('helpers.dashboard_helper.x_new_in_peer_reviews',
-                    { :one => "*1* Peer Review", :other => "*%{count}* Peer Reviews" },
-                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+      I18n.t('helpers.dashboard_helper.x_new_in_peer_reviews',
+             { :one => "*1* Peer Review", :other => "*%{count}* Peer Reviews" },
+             { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     else
       raise "Unknown activity category"
     end

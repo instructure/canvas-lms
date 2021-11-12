@@ -82,7 +82,7 @@ describe SisImportsApiController, type: :request do
                        })
     batch.process_without_send_later
     run_jobs
-    return batch.reload
+    batch.reload
   end
 
   it 'kicks off a sis import via multipart attachment' do

@@ -1491,7 +1491,7 @@ class ActiveRecord::Migration
 
   def connection
     if self.class.respond_to?(:connection)
-      return self.class.connection
+      self.class.connection
     else
       @connection || ActiveRecord::Base.connection
     end

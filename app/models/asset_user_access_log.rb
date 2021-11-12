@@ -778,7 +778,7 @@ class AssetUserAccessLog
       compaction_state[:temp_root_account_max_log_ids] = {}
       self.update_metadatum(compaction_state)
     end
-    return true # to indicate we didn't bail
+    true # to indicate we didn't bail
   end
 
   # for a given log segment (the records between IDs A and B),

@@ -428,12 +428,12 @@ class SubmissionsController < SubmissionsBaseController
   private :lookup_existing_attachments
 
   def is_media_recording?
-    return params[:submission][:submission_type] == 'media_recording'
+    params[:submission][:submission_type] == 'media_recording'
   end
   private :is_media_recording?
 
   def has_media_recording?
-    return params[:submission][:media_comment_id].present?
+    params[:submission][:media_comment_id].present?
   end
   private :has_media_recording?
 
@@ -442,7 +442,7 @@ class SubmissionsController < SubmissionsBaseController
       render(:json => { :message => "No valid file ids given" }, :status => :bad_request)
       return false
     end
-    return true
+    true
   end
   private :verify_api_call_has_attachment
 
@@ -480,12 +480,12 @@ class SubmissionsController < SubmissionsBaseController
     end
 
     params[:submission].merge!(always_permitted)
-    return true
+    true
   end
   private :process_api_submission_params
 
   def online_upload?
-    return params[:attachments] && params[:submission][:submission_type] == 'online_upload'
+    params[:attachments] && params[:submission][:submission_type] == 'online_upload'
   end
   private :online_upload?
 
@@ -496,7 +496,7 @@ class SubmissionsController < SubmissionsBaseController
       redirect_to named_context_url(@context, :context_assignment_url, @assignment)
       return false
     end
-    return true
+    true
   end
   private :has_file_attached?
 
@@ -515,7 +515,7 @@ class SubmissionsController < SubmissionsBaseController
         return false
       end
     end
-    return true
+    true
   end
   private :extensions_allowed?
 
@@ -526,12 +526,12 @@ class SubmissionsController < SubmissionsBaseController
       redirect_to named_context_url(@context, :context_assignment_url, @assignment)
       return false
     end
-    return true
+    true
   end
   private :valid_text_entry?
 
   def is_google_doc?
-    return params[:google_doc] && params[:google_doc][:document_id] && params[:submission][:submission_type] == "google_doc"
+    params[:google_doc] && params[:google_doc][:document_id] && params[:submission][:submission_type] == "google_doc"
   end
   private :is_google_doc?
 
@@ -570,13 +570,13 @@ class SubmissionsController < SubmissionsBaseController
       store_google_doc_attachment(attachment, Rack::Test::UploadedFile.new(path, content_type, true))
       attachment.save!
     end
-    return attachment, nil # error message doesn't exist if we got this far
+    [attachment, nil] # error message doesn't exist if we got this far
   rescue GoogleDrive::WorkflowError => e
     Canvas::Errors.capture_exception(:google_drive, e, :warn)
-    return nil, t('errors.google_drive_workflow', 'Google Drive entry was unable to be downloaded')
+    [nil, t('errors.google_drive_workflow', 'Google Drive entry was unable to be downloaded')]
   rescue GoogleDrive::ConnectionException => e
     Canvas::Errors.capture_exception(:google_drive, e, :warn)
-    return nil, t('errors.googld_drive_timeout', 'Timed out while talking to google drive')
+    [nil, t('errors.googld_drive_timeout', 'Timed out while talking to google drive')]
   end
   protected :submit_google_doc
 

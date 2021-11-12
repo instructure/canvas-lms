@@ -100,7 +100,7 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
   rescue ActiveRecord::RecordInvalid => invalid
     errors_for(invalid.record)
   rescue ::Mutations::UpdateNotificationPreferences::ValidationError => error
-    return validation_error(error.message)
+    validation_error(error.message)
   end
 
   def validate_input(input)

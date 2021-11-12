@@ -218,9 +218,9 @@ module Qti
       right = @doc.css('div.RIGHT_MATCH_BLOCK div').size
       return unless left > 0 && right > 0
 
-      return @doc.css('div.RESPONSE_BLOCK div').size == left &&
-             @doc.css('responseProcessing responseCondition match').size == left &&
-             @doc.css('div.RESPONSE_BLOCK choiceInteraction simpleChoice').size == left * right
+      @doc.css('div.RESPONSE_BLOCK div').size == left &&
+        @doc.css('responseProcessing responseCondition match').size == left &&
+        @doc.css('div.RESPONSE_BLOCK choiceInteraction simpleChoice').size == left * right
     end
 
     def get_all_answers_for_crazy_n_squared_match_by_index_thing

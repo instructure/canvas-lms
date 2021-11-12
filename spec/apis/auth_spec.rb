@@ -210,7 +210,7 @@ describe "API Authentication", type: :request do
             response = CASClient::ValidationResponse.new("yes\n#{@stub_user.pseudonyms.first.unique_id}\n")
             st.user = response.user
             st.success = response.is_success?
-            return st
+            st
           end
           allow(CASClient::Client).to receive(:new).and_return(cas)
 

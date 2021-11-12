@@ -86,7 +86,7 @@ module Lti
       hash[:ext_lti_assignment_id] = assignment&.lti_context_id if assignment&.lti_context_id.present?
       hash[:ext_lti_student_id] = student_id if student_id
       begin
-        return Lti::Security.signed_post_params(
+        Lti::Security.signed_post_params(
           hash,
           @tool_launch.url,
           @tool.consumer_key,

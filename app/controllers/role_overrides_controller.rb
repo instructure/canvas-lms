@@ -542,7 +542,7 @@ class RoleOverridesController < ApplicationController
       set_permissions_for(@role, @context, params[:permissions])
       render :json => role_json(@context, @role, @current_user, session)
     rescue BadPermissionSettingError => e
-      return render json: { message: e }, status: :bad_request
+      render json: { message: e }, status: :bad_request
     end
   end
 

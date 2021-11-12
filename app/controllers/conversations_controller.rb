@@ -311,7 +311,7 @@ class ConversationsController < ApplicationController
         return
       end
 
-      return render :index_new
+      render :index_new
     end
   end
 

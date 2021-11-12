@@ -82,7 +82,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
       end # QuizSubmission#transaction
     end
 
-    return modified
+    modified
   end
 
   protected

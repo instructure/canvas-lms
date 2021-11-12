@@ -160,7 +160,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
     self.assessment_question = aq
 
-    return true
+    true
   end
 
   def update_assessment_question!(aq, quiz_group_id, duplicate_index)
@@ -172,7 +172,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     self.duplicate_index = duplicate_index
     save! if changed?
 
-    return self
+    self
   end
 
   def validate_blank_questions
