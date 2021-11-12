@@ -51,7 +51,7 @@ QUnit.module('MigrationConverterView', {
   }
 })
 
-test("renders a backbone view into it's main view container", 1, function() {
+test("renders a backbone view into it's main view container", function () {
   const subView = new SomeBackboneView()
   this.migrationConverterView.on('converterRendered', () =>
     ok(
@@ -63,7 +63,19 @@ test("renders a backbone view into it's main view container", 1, function() {
   return this.clock.tick(15)
 })
 
-test('trigger reset event when no subView is passed in to render', 1, function() {
+test('trigger reset event when no subView is passed in to render', function () {
   this.migrationConverterView.on('converterReset', () => ok(true, 'converterReset was called'))
   return this.migrationConverterView.renderConverter()
+})
+
+test('renders the overwrite warning', function () {
+  const subView = new SomeBackboneView()
+  this.migrationConverterView.on('converterRendered', () => {
+    strictEqual(
+      this.migrationConverterView.$el.find('#overwrite-warning').text(),
+      'Importing the same course content more than once will overwrite any existing content in the course.'
+    )
+  })
+  this.migrationConverterView.renderConverter(subView)
+  return this.clock.tick(15)
 })
