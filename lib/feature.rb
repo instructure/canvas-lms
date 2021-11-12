@@ -208,15 +208,16 @@ class Feature
 
   def self.applicable_features(object, type: nil)
     applicable_types = []
-    if object.is_a?(Account)
+    case object
+    when Account
       applicable_types << 'Account'
       applicable_types << 'Course'
       applicable_types << 'RootAccount' if object.root_account?
       applicable_types << 'User' if object.site_admin?
       applicable_types << 'SiteAdmin' if object.site_admin?
-    elsif object.is_a?(Course)
+    when Course
       applicable_types << 'Course'
-    elsif object.is_a?(User)
+    when User
       applicable_types << 'User'
     end
     definitions.values.select { |fd| applicable_types.include?(fd.applies_to) && (type.nil? || fd.type == type) }

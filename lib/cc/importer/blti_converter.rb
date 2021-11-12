@@ -152,11 +152,12 @@ module CC::Importer
       node.children.each do |property|
         next if property.name == 'text'
 
-        if property.name == 'property'
+        case property.name
+        when 'property'
           props[property['name']] = property.text.strip
-        elsif property.name == 'options'
+        when 'options'
           props[property['name']] = get_custom_properties(property)
-        elsif property.name == 'custom'
+        when 'custom'
           props[:custom_fields] = get_custom_properties(property)
         end
       end

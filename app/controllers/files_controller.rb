@@ -375,11 +375,12 @@ class FilesController < ApplicationController
       @contexts = [@context]
       get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
       files_contexts = @contexts.map do |context|
-        tool_context = if context.is_a?(Course)
+        tool_context = case context
+                       when Course
                          context
-                       elsif context.is_a?(User)
+                       when User
                          @domain_root_account
-                       elsif context.is_a?(Group)
+                       when Group
                          context.context
                        end
 
@@ -1040,9 +1041,10 @@ class FilesController < ApplicationController
 
   def api_file_status
     @attachment = Attachment.where(id: params[:id], uuid: params[:uuid]).first!
-    if @attachment.file_state == 'available'
+    case @attachment.file_state
+    when 'available'
       render :json => { :upload_status => 'ready', :attachment => attachment_json(@attachment, @current_user) }
-    elsif @attachment.file_state == 'deleted'
+    when 'deleted'
       render :json => { :upload_status => 'pending' }
     else
       render :json => { :upload_status => 'errored', :message => @attachment.upload_error_message }

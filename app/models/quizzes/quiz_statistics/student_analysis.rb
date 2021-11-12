@@ -278,16 +278,17 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           strip_html_answers(question)
           answer_item = question && question[:answers]&.detect { |a| a[:id] == answer[:answer_id] }
           answer_item ||= answer
-          if question[:question_type] == 'fill_in_multiple_blanks_question'
+          case question[:question_type]
+          when 'fill_in_multiple_blanks_question'
             blank_ids = question[:answers].map { |a| a[:blank_id] }.uniq
             row << blank_ids.map { |blank_id| answer["answer_for_#{blank_id}".to_sym].try(:gsub, /,/, '\,') }.compact.join(',')
-          elsif question[:question_type] == 'multiple_answers_question'
+          when 'multiple_answers_question'
             row << question[:answers].map { |a| answer["answer_#{a[:id]}".to_sym] == '1' ? a[:text].gsub(/,/, '\,') : nil }.compact.join(',')
-          elsif question[:question_type] == 'multiple_dropdowns_question'
+          when 'multiple_dropdowns_question'
             blank_ids = question[:answers].map { |a| a[:blank_id] }.uniq
             answer_ids = blank_ids.map { |blank_id| answer["answer_for_#{blank_id}".to_sym] }
             row << answer_ids.map { |answer_id| (question[:answers].detect { |a| a[:id] == answer_id } || {})[:text].try(:gsub, /,/, '\,') }.compact.join(',')
-          elsif question[:question_type] == 'calculated_question'
+          when 'calculated_question'
             list = question[:answers].take(1).flat_map do |ans|
               ans[:variables] && ans[:variables].map do |variable|
                 [variable[:name], variable[:value].to_s].map { |str| str.gsub(/=>/, '\=>') }.join('=>')
@@ -295,7 +296,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
             end
             list << answer[:text]
             row << list.map { |str| (str || '').gsub(/,/, '\,') }.join(',')
-          elsif question[:question_type] == 'matching_question'
+          when 'matching_question'
             answer_ids = question[:answers].map { |a| a[:id] }
             answer_and_matches = answer_ids.map { |aid| [aid, answer["answer_#{aid}".to_sym].to_i] }
             row << answer_and_matches.map do |answer_id, match_id|
@@ -305,9 +306,9 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
               res << (match[:right] || match[:text])
               res.map { |s| (s || '').gsub(/=>/, '\=>') }.join('=>').gsub(/,/, '\,')
             end.join(',')
-          elsif question[:question_type] == 'numerical_question'
+          when 'numerical_question'
             row << (answer && answer[:text])
-          elsif question[:question_type] == 'file_upload_question'
+          when 'file_upload_question'
 
             row << attachment_csv(answer)
           else

@@ -3943,10 +3943,11 @@ class Course < ActiveRecord::Base
 
   def apply_visibility_configuration(course_visibility, syllabus_visibility)
     apply_overridden_course_visibility(course_visibility)
-    if course_visibility == 'institution'
+    case course_visibility
+    when 'institution'
       self.is_public_to_auth_users = true
       self.is_public = false
-    elsif course_visibility == 'public'
+    when 'public'
       self.is_public = true
     else
       self.is_public_to_auth_users = false

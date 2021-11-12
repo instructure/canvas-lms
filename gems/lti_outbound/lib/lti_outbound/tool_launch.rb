@@ -95,11 +95,12 @@ module LtiOutbound
         hash['custom_canvas_user_id'] = '$Canvas.user.id'
         hash['lis_person_sourcedid'] = '$Person.sourcedId' if user.sis_source_id
         hash['custom_canvas_user_login_id'] = '$Canvas.user.loginId'
-        if context.is_a?(LTICourse)
+        case context
+        when LTICourse
           hash['custom_canvas_course_id'] = '$Canvas.course.id'
           hash['custom_canvas_workflow_state'] = '$Canvas.course.workflowState'
           hash['lis_course_offering_sourcedid'] = '$CourseSection.sourcedId' if context.sis_source_id
-        elsif context.is_a?(LTIAccount) || context.is_a?(LTIUser)
+        when LTIAccount, LTIUser
           hash['custom_canvas_account_id'] = '$Canvas.account.id'
           hash['custom_canvas_account_sis_id'] = '$Canvas.account.sisSourceId'
         end
@@ -155,20 +156,21 @@ module LtiOutbound
     end
 
     def set_resource_type_keys
-      if resource_type == 'editor_button'
+      case resource_type
+      when 'editor_button'
         hash['selection_directive'] = 'embed_content' # backwards compatibility
         hash['ext_content_intended_use'] = 'embed'
         hash['ext_content_return_types'] = 'oembed,lti_launch_url,url,image_url,iframe'
         hash['ext_content_return_url'] = return_url
-      elsif resource_type == 'resource_selection'
+      when 'resource_selection'
         hash['selection_directive'] = 'select_link' # backwards compatibility
         hash['ext_content_intended_use'] = 'navigation'
         hash['ext_content_return_types'] = 'lti_launch_url'
         hash['ext_content_return_url'] = return_url
-      elsif resource_type == 'homework_submission'
+      when 'homework_submission'
         hash['ext_content_intended_use'] = 'homework'
         hash['ext_content_return_url'] = return_url
-      elsif resource_type == 'migration_selection'
+      when 'migration_selection'
         hash['ext_content_intended_use'] = 'content_package'
         hash['ext_content_return_types'] = 'file'
         hash['ext_content_file_extensions'] = 'zip,imscc'

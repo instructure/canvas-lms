@@ -91,9 +91,10 @@ module Importers
       rules = ""
       if hash[:rules] && hash[:rules].length > 0
         hash[:rules].each do |rule|
-          if rule[:drop_type] == "drop_lowest" || rule[:drop_type] == "drop_highest"
+          case rule[:drop_type]
+          when "drop_lowest", "drop_highest"
             rules += "#{rule[:drop_type]}:#{rule[:drop_count]}\n"
-          elsif rule[:drop_type] == "never_drop"
+          when "never_drop"
             if context.respond_to?(:assignment_group_no_drop_assignments)
               context.assignment_group_no_drop_assignments[rule[:assignment_migration_id]] = item
             end

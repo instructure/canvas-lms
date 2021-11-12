@@ -220,7 +220,8 @@ class ContentTag < ActiveRecord::Base
   end
 
   def content_type_class(is_student = false)
-    if self.content_type == 'Assignment'
+    case self.content_type
+    when 'Assignment'
       if self.content && self.content.submission_types == 'online_quiz'
         is_student ? 'lti-quiz' : 'quiz'
       elsif self.content && self.content.submission_types == 'discussion_topic'
@@ -230,7 +231,7 @@ class ContentTag < ActiveRecord::Base
       else
         'assignment'
       end
-    elsif self.content_type == 'Quizzes::Quiz'
+    when 'Quizzes::Quiz'
       is_student ? 'lti-quiz' : 'quiz'
     else
       self.content_type.underscore

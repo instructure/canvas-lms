@@ -244,9 +244,10 @@ class ExternalToolsController < ApplicationController
     end
 
     launch_type = params[:launch_type]
-    if launch_type == 'module_item'
+    case launch_type
+    when 'module_item'
       generate_module_item_sessionless_launch
-    elsif launch_type == 'assessment'
+    when 'assessment'
       generate_assignment_sessionless_launch
     else
       generate_common_sessionless_launch(options: { launch_url: params[:url] })

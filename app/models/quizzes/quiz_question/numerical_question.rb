@@ -66,7 +66,8 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
     answer_number = i18n_decimal(answer_text)
 
     match = answers.find do |answer|
-      if answer[:numerical_answer_type] == "exact_answer"
+      case answer[:numerical_answer_type]
+      when "exact_answer"
         val = BigDecimal(answer[:exact].to_s.presence || '0.0')
 
         # calculate margin value using percentage
@@ -78,7 +79,7 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
         min = val - margin
         max = val + margin
         answer_number >= min && answer_number <= max
-      elsif answer[:numerical_answer_type] == "precision_answer"
+      when "precision_answer"
         submission = answer_number.split
         expected = BigDecimal(answer[:approximate].to_s.presence || '0.0').split
         precision = answer[:precision].to_i
@@ -107,9 +108,10 @@ class Quizzes::QuizQuestion::NumericalQuestion < Quizzes::QuizQuestion::Base
     super
 
     @question_data.answers.each do |answer|
-      answer[:text] = if answer[:numerical_answer_type] == 'exact_answer'
+      answer[:text] = case answer[:numerical_answer_type]
+                      when 'exact_answer'
                         I18n.t("%{exact_value} +/- %{margin}", :exact_value => answer[:exact], :margin => answer[:margin])
-                      elsif answer[:numerical_answer_type] == 'precision_answer'
+                      when 'precision_answer'
                         I18n.t("%{approximate_value} with precision %{precision}", :approximate_value => answer[:approximate], :precision => answer[:precision])
                       else
                         I18n.t("%{lower_bound} to %{upper_bound}", :lower_bound => answer[:start], :upper_bound => answer[:end])

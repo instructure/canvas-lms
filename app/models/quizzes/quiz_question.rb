@@ -99,9 +99,10 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   #  The user/teacher who's performing the regrade (e.g, updating the question).
   #  Note that this is NOT an id, but an actual instance of a User model.
   def question_data=(in_data)
-    data = if in_data.is_a?(String)
+    data = case in_data
+           when String
              ActiveSupport::JSON.decode(in_data)
-           elsif in_data.is_a?(Hash)
+           when Hash
              in_data.with_indifferent_access
            else
              in_data

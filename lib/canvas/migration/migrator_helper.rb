@@ -190,11 +190,12 @@ module Canvas::Migration
         end
 
         a[:questions].each do |q|
-          if q[:question_type] == "question_reference"
+          case q[:question_type]
+          when "question_reference"
             if should_prepend?(:assessment_questions, q[:migration_id], existing_ids)
               q[:migration_id] = prepend_id(q[:migration_id], prepend_value)
             end
-          elsif q[:question_type] == "question_group"
+          when "question_group"
             if q[:question_bank_migration_id].present? && should_prepend?(:assessment_question_banks, q[:question_bank_migration_id], existing_ids)
               q[:question_bank_migration_id] = prepend_id(q[:question_bank_migration_id], prepend_value)
             end

@@ -706,13 +706,14 @@ class ContextExternalTool < ActiveRecord::Base
     settings.keys.each do |setting|
       next if [:custom_fields, :environments].include? setting.to_sym
 
-      if settings[setting].is_a?(Hash)
+      case settings[setting]
+      when Hash
         settings[setting].keys.each do |property|
           if settings[setting][property].match?(URI::DEFAULT_PARSER.make_regexp)
             settings[setting][property] = replace_host.call(settings[setting][property], new_domain)
           end
         end
-      elsif settings[setting].match?(URI::DEFAULT_PARSER.make_regexp)
+      when URI::DEFAULT_PARSER.make_regexp
         settings[setting] = replace_host.call(settings[setting], new_domain)
       end
     end
@@ -1210,9 +1211,10 @@ class ContextExternalTool < ActiveRecord::Base
     scope = Assignment.active.joins(:external_tool_tag)
 
     # limit to assignments in the tool's context
-    if context.is_a? Course
+    case context
+    when Course
       scope = scope.where(context_id: context.id)
-    elsif context.is_a? Account
+    when Account
       scope = scope.where(root_account_id: root_account_id, content_tags: { root_account_id: root_account_id })
     end
 

@@ -125,9 +125,10 @@ class OutcomesController < ApplicationController
 
   def user_outcome_results
     user_id = params[:user_id]
-    @user = if @context.is_a?(User)
+    @user = case @context
+            when User
               @context
-            elsif @context.is_a?(Course)
+            when Course
               @context.users.find(user_id)
             else
               @context.all_users.find_by!(id: user_id)

@@ -228,9 +228,10 @@ class UserMerge
       value = from_record.value
       if from_user.shard != target_user.shard
         # tl;dr do the same thing as shard_aware_preferences
-        if key == "custom_colors"
+        case key
+        when "custom_colors"
           value = Hash[value.map { |id, color| [translate_course_id_or_asset_string(id), color] }]
-        elsif key == "course_nicknames"
+        when "course_nicknames"
           sub_key = translate_course_id_or_asset_string(sub_key)
         end
       end
@@ -606,7 +607,8 @@ class UserMerge
       model = table.to_s.classify.constantize
       already_scope = model.where(:user_id => target_user)
       scope = model.where(:user_id => from_user)
-      if model.name == "Submission"
+      case model.name
+      when "Submission"
         # we prefer submissions that have grades then submissions that have
         # a submission... that sort of makes sense.
         # we swap empty objects in cases of collision so that we don't
@@ -624,7 +626,7 @@ class UserMerge
         merge_data.build_more_data(to_move, data: data) unless to_move.empty?
         merge_data.build_more_data(move_back, data: data) unless move_back.empty?
         swap_submission(model, move_back, table, to_move, to_move_ids, 'fk_rails_8d85741475')
-      elsif model.name == "Quizzes::QuizSubmission"
+      when "Quizzes::QuizSubmission"
         subscope = already_scope.to_a
         to_move = model.where(user_id: from_user).joins(:submission).where(submissions: { user_id: target_user }).to_a
         move_back = model.where(user_id: target_user).joins(:submission).where(submissions: { user_id: from_user }).to_a

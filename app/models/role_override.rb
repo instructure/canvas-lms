@@ -1818,9 +1818,10 @@ class RoleOverride < ActiveRecord::Base
       # override.enabled.nil? is no longer possible, but is important for the migration that removes nils
       if override.new_record? || override.enabled.nil?
         if last_override
-          if generated_permission[:enabled] == [:descendants]
+          case generated_permission[:enabled]
+          when [:descendants]
             generated_permission[:enabled] = [:self, :descendants]
-          elsif generated_permission[:enabled] == [:self]
+          when [:self]
             generated_permission[:enabled] = nil
           end
         end

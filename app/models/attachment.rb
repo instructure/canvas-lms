@@ -172,9 +172,10 @@ class Attachment < ActiveRecord::Base
     end
 
     def find_with_possibly_replaced(a_or_as)
-      if a_or_as.is_a?(Attachment)
+      case a_or_as
+      when Attachment
         find_attachment_possibly_replaced(a_or_as)
-      elsif a_or_as.is_a?(Array)
+      when Array
         a_or_as.map { |a| find_attachment_possibly_replaced(a) }
       end
     end

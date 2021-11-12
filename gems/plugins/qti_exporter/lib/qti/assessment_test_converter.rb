@@ -145,11 +145,12 @@ module Qti
 
     def self.parse_time_limit(time_limit)
       time_indicator = time_limit[0..0].downcase if time_limit.length > 0
-      if time_indicator == 'd'
+      case time_indicator
+      when 'd'
         24 * 60 * time_limit[1..].to_i
-      elsif time_indicator == 'h'
+      when 'h'
         60 * time_limit[1..].to_i
-      elsif time_indicator == 'm'
+      when 'm'
         time_limit[1..].to_i
       else
         # instructure uses minutes, QTI uses seconds
@@ -204,9 +205,10 @@ module Qti
       end
 
       section.children.each do |child|
-        if child.name == "assessmentSection"
+        case child.name
+        when "assessmentSection"
           process_section(child)
-        elsif child.name == "assessmentItemRef"
+        when "assessmentItemRef"
           process_question(child, questions_list)
         end
       end

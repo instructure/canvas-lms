@@ -218,7 +218,8 @@ module VeriCite
 
         consumer = @account_id
         consumer_secret = @shared_secret
-        if command == :create_assignment
+        case command
+        when :create_assignment
           context_id = course.id
           assignment_id = assignment.id
           assignment_data = VeriCiteClient::AssignmentData.new()
@@ -243,7 +244,7 @@ module VeriCite
           end
           # this is a flag to signal success
           response[:assignment_id] = assignment.id
-        elsif command == :submit_paper
+        when :submit_paper
           context_id = course.id
           assignment_id = assignment.id
           user_id = user.id
@@ -279,7 +280,7 @@ module VeriCite
           end
           # this is a flag to signal success
           response[:returned_object_id] = external_content_data.external_content_id
-        elsif command == :get_scores
+        when :get_scores
           context_id = course.id
           assignment_id = assignment.id
           user_id = user.id
@@ -328,7 +329,7 @@ module VeriCite
               end
             end
           end
-        elsif command == :generate_report
+        when :generate_report
           context_id = course.id
           assignment_id_filter = assignment.id
           user_id = user.id

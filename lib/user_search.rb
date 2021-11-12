@@ -64,9 +64,10 @@ module UserSearch
       enrollment_states = Array(options[:enrollment_state]) if options[:enrollment_state]
       include_prior_enrollments = !options[:enrollment_state].nil?
       include_inactive_enrollments = !!options[:include_inactive_enrollments]
-      if context.is_a?(Account)
+      case context
+      when Account
         User.of_account(context).active
-      elsif context.is_a?(Course)
+      when Course
         context.users_visible_to(searcher, include_prior_enrollments,
                                  enrollment_state: enrollment_states, include_inactive: include_inactive_enrollments).distinct
       else
@@ -76,11 +77,12 @@ module UserSearch
 
     def order_scope(users_scope, context, options = {})
       order = ' DESC NULLS LAST, id DESC' if options[:order] == 'desc'
-      if options[:sort] == "last_login"
+      case options[:sort]
+      when "last_login"
         users_scope.select("users.*").order(Arel.sql("last_login#{order}"))
-      elsif options[:sort] == "username"
+      when "username"
         users_scope.select("users.*").order_by_sortable_name(direction: options[:order] == 'desc' ? :descending : :ascending)
-      elsif options[:sort] == "email"
+      when "email"
         users_scope = users_scope.select("users.*, (SELECT path FROM #{CommunicationChannel.quoted_table_name}
                           WHERE communication_channels.user_id = users.id AND
                             communication_channels.path_type = 'email' AND
@@ -89,7 +91,7 @@ module UserSearch
                           LIMIT 1)
                           AS email")
         users_scope.order(Arel.sql("email#{order}"))
-      elsif options[:sort] == "sis_id"
+      when "sis_id"
         users_scope = users_scope.select(User.send(:sanitize_sql, [
                                                      "users.*, (SELECT sis_user_id FROM #{Pseudonym.quoted_table_name}
           WHERE pseudonyms.user_id = users.id AND

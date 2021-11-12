@@ -127,7 +127,8 @@ module Qti
 
     def recursively_clean_inline_body_and_get_answers(node, answer_hash)
       node.children.each do |child|
-        if child.name == 'inlineChoiceInteraction'
+        case child.name
+        when 'inlineChoiceInteraction'
           response_id = child['responseIdentifier']
           answer_hash[response_id] = {}
           child.search('inlineChoice').each do |choice|
@@ -141,7 +142,7 @@ module Qti
             answer_hash[response_id][choice_id] = answer
           end
           child.replace(Nokogiri::XML::Text.new("[#{response_id}]", @doc))
-        elsif child.name == 'text'
+        when 'text'
           child.content = child.text.gsub(']]>', '').gsub('<div></div>', '')
         else
           recursively_clean_inline_body_and_get_answers(child, answer_hash)
@@ -156,9 +157,10 @@ module Qti
           next if node.name == 'text'
 
           text = ''
-          if node.name == 'div'
+          case node.name
+          when 'div'
             text = sanitize_html_string(node.text, true)
-          elsif node.name == 'extendedTextInteraction'
+          when 'extendedTextInteraction'
             id = node['responseIdentifier']
             text = " [#{id}] "
           end

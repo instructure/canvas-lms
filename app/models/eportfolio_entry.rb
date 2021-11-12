@@ -104,18 +104,19 @@ class EportfolioEntry < ActiveRecord::Base
     cnt.times do |idx|
       obj = params[("section_" + (idx + 1).to_s).to_sym].slice(:section_type, :content, :submission_id, :attachment_id)
       new_obj = { :section_type => obj[:section_type] }
-      if obj[:section_type] == 'rich_text' || obj[:section_type] == 'html'
+      case obj[:section_type]
+      when 'rich_text', 'html'
         config = CanvasSanitize::SANITIZE
         new_obj[:content] = Sanitize.clean(obj[:content] || '', config).strip
         new_obj = nil if new_obj[:content].empty?
-      elsif obj[:section_type] == 'submission'
+      when 'submission'
         submission = eportfolio.user.submissions.where(id: obj[:submission_id]).exists? if obj[:submission_id].present?
         if submission
           new_obj[:submission_id] = obj[:submission_id].to_i
         else
           new_obj = nil
         end
-      elsif obj[:section_type] == 'attachment'
+      when 'attachment'
         attachment = eportfolio.user.attachments.active.where(id: obj[:attachment_id]).exists? if obj[:attachment_id].present?
         if attachment
           new_obj[:attachment_id] = obj[:attachment_id].to_i
@@ -171,9 +172,10 @@ class EportfolioEntry < ActiveRecord::Base
     return if content_regexp.blank?
 
     content_bodies = content_sections.map do |section|
-      if section.is_a?(String)
+      case section
+      when String
         section
-      elsif section.is_a?(Hash)
+      when Hash
         section[:content]
       end
     end
