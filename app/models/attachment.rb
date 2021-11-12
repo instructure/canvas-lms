@@ -1907,9 +1907,7 @@ class Attachment < ActiveRecord::Base
   # filenames, in which case it'll test against those, or a block that'll be
   # called repeatedly with a filename until it returns true.
   def self.make_unique_filename(filename, existing_files = [], attempts = 1, &block)
-    unless block
-      block = proc { |fname| !existing_files.include?(fname) }
-    end
+    block ||= proc { |fname| !existing_files.include?(fname) }
 
     return filename if attempts <= 1 && block.call(filename)
 
