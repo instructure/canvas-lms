@@ -263,7 +263,7 @@ Implemented for: Canvas LMS}]
       when "course"
         raise(OtherError, 'Item type incompatible with selection state') unless selection_state.empty?
 
-        @user.cached_currentish_enrollments(preload_courses: true).select { |e| e.participating_admin? }.map(&:course).uniq.each do |course|
+        @user.cached_currentish_enrollments(preload_courses: true).select(&:participating_admin?).map(&:course).uniq.each do |course|
           list.item << NVPair.new(course.name, course.to_param)
         end
       when "quiz", "qdb"

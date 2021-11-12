@@ -386,9 +386,7 @@ test_1,TC 101,Test Course 101,,term1,deleted
 
   it "schedules in the future if configured" do
     track_jobs do
-      create_csv_data(['abc']) do |batch|
-        batch.process
-      end
+      create_csv_data(['abc'], &:process)
     end
 
     job = created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
@@ -399,9 +397,7 @@ test_1,TC 101,Test Course 101,,term1,deleted
 
     Setting.set('sis_batch_process_start_delay', '120')
     track_jobs do
-      create_csv_data(['abc']) do |batch|
-        batch.process
-      end
+      create_csv_data(['abc'], &:process)
     end
 
     job = created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }

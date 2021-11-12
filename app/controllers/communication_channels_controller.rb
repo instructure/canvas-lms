@@ -291,7 +291,7 @@ class CommunicationChannelsController < ApplicationController
               (account_to_pseudonyms_hash[p.account] ||= []) << p
             end
             @merge_opportunities << [user, account_to_pseudonyms_hash.each_value.map do |pseudonyms|
-              pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort_by(&:position).first
+              pseudonyms.detect(&:sis_user_id) || pseudonyms.sort_by(&:position).first
             end]
             @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
           end

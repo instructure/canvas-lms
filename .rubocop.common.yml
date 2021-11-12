@@ -185,6 +185,8 @@ Style/SlicingWithRange:
   Severity: error
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
+Style/SymbolProc:
+  Severity: error
 Style/UnpackFirst:
   Severity: error
 Style/WhileUntilModifier:

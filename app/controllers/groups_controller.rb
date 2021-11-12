@@ -330,7 +330,7 @@ class GroupsController < ApplicationController
         end
       end
 
-      format.atom { render :xml => @groups.map { |group| group.to_atom }.to_xml }
+      format.atom { render :xml => @groups.map(&:to_atom).to_xml }
 
       format.json do
         path = send("api_v1_#{@context.class.to_s.downcase}_user_groups_url")
@@ -806,7 +806,7 @@ class GroupsController < ApplicationController
       dt.locked_for?(@current_user, :check_policies => true)
     end)
     @entries.concat WikiPages::ScopedToUser.new(@context, @current_user, @context.wiki_pages.published).scope
-    @entries = @entries.sort_by { |e| e.updated_at }
+    @entries = @entries.sort_by(&:updated_at)
     @entries.each do |entry|
       feed.entries << entry.to_atom(:context => @context)
     end

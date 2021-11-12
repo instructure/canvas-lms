@@ -19,6 +19,9 @@
 #
 require 'bigdecimal'
 
+# rubocop:disable comments of Style/SymbolProc in this file are because the
+# builder DSL uses method_missing and blocks to define nested XML elements, and
+# a symbol proc confuses that use of the block
 module CC
   module Qti
     module QtiItems
@@ -447,14 +450,16 @@ module CC
 
       def calculated_resprocessing(node, _question)
         node.respcondition(:title => 'correct') do |r_node|
-          r_node.conditionvar do |c_node|
+          r_node.conditionvar do |c_node| # rubocop:disable Style/SymbolProc
             c_node.other
           end
           r_node.setvar(100, :varname => 'SCORE', :action => 'Set')
         end
         node.respcondition(:title => 'incorrect') do |r_node|
           r_node.conditionvar do |c_node|
-            c_node.not { |n_node| n_node.other }
+            c_node.not do |n_node| # rubocop:disable Style/SymbolProc
+              n_node.other
+            end
           end
           r_node.setvar(0, :varname => 'SCORE', :action => 'Set')
         end
@@ -485,7 +490,7 @@ module CC
 
       def other_respcondition(node, continue = 'No', feedback_ref = nil)
         node.respcondition(:continue => continue) do |res_node|
-          res_node.conditionvar do |c_node|
+          res_node.conditionvar do |c_node| # rubocop:disable Style/SymbolProc
             c_node.other
           end # c_node
           res_node.displayfeedback(:feedbacktype => 'Response', :linkrefid => feedback_ref) if feedback_ref

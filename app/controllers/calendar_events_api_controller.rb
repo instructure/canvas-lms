@@ -745,7 +745,7 @@ class CalendarEventsApiController < ApplicationController
       GuardRail.activate(:secondary) do
         @events.concat assignment_scope(@current_user).paginate(per_page: 1000, max: 1000)
         @events = apply_assignment_overrides(@events, @current_user)
-        @events.concat calendar_event_scope(@current_user) { |relation| relation.events_without_child_events }.paginate(per_page: 1000, max: 1000)
+        @events.concat calendar_event_scope(@current_user, &:events_without_child_events).paginate(per_page: 1000, max: 1000)
 
         # Add in any appointment groups this user can manage and someone has reserved
         appointment_codes = manageable_appointment_groups(@current_user).map(&:asset_string)

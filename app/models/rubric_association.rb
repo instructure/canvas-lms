@@ -240,7 +240,7 @@ class RubricAssociation < ActiveRecord::Base
   protected :link_to_assessments
 
   def unsubmitted_users
-    self.context.students - self.rubric_assessments.map { |a| a.user } - self.assessment_requests.map { |a| a.user }
+    self.context.students - self.rubric_assessments.map(&:user) - self.assessment_requests.map(&:user)
   end
 
   def self.generate(current_user, rubric, context, params)

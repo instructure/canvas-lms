@@ -336,7 +336,7 @@ class DiscussionTopicsController < ApplicationController
 
     scope = scope.unread_for(@current_user) if params[:filter_by] == "unread"
 
-    states = params[:scope].split(',').map { |s| s.strip } if params[:scope]
+    states = params[:scope].split(',').map(&:strip) if params[:scope]
     if states.present?
       if (states.include?('pinned') && states.include?('unpinned')) ||
          (states.include?('locked') && states.include?('unlocked'))
@@ -1087,7 +1087,7 @@ class DiscussionTopicsController < ApplicationController
     @entries.concat(@context.discussion_topics
                             .select { |dt| dt.visible_for?(@current_user) })
     @entries.concat @context.discussion_entries.active
-    @entries = @entries.sort_by { |e| e.updated_at }
+    @entries = @entries.sort_by(&:updated_at)
     @entries.each do |entry|
       feed.entries << entry.to_atom
     end

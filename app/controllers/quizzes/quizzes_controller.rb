@@ -594,7 +594,7 @@ class Quizzes::QuizzesController < ApplicationController
 
   def unpublish
     if authorized_action(@context, @current_user, [:manage_assignments, :manage_assignments_edit])
-      @quizzes = @context.quizzes.active.where(id: params[:quizzes]).select { |q| q.available? }
+      @quizzes = @context.quizzes.active.where(id: params[:quizzes]).select(&:available?)
       @quizzes.each(&:unpublish!)
 
       flash[:notice] = t('notices.quizzes_unpublished',
@@ -727,7 +727,7 @@ class Quizzes::QuizzesController < ApplicationController
           @body_classes << 'quizzes-speedgrader'
         end
         @current_submission = @submission
-        @version_instances = @submission.submitted_attempts.sort_by { |v| v.version_number }
+        @version_instances = @submission.submitted_attempts.sort_by(&:version_number)
         @versions = get_versions
         params[:version] ||= @version_instances[0].version_number if @submission.untaken? && !@version_instances.empty?
         @current_version = true

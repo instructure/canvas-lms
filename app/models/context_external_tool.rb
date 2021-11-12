@@ -1004,7 +1004,7 @@ class ContextExternalTool < ActiveRecord::Base
   # Given a collection of tools, finds the first with the given LTI version
   # If no matches were detected, returns nil
   def self.find_exact_version_match(sorted_tool_collection)
-    sorted_tool_collection.find { |t| t.uses_preferred_lti_version? }
+    sorted_tool_collection.find(&:uses_preferred_lti_version?)
   end
 
   scope :having_setting, lambda { |setting|

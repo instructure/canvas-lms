@@ -47,7 +47,7 @@ describe 'RequestThrottle' do
 
   describe "#client_identifier" do
     def req(hash)
-      ActionDispatch::Request.new(hash).tap { |req| req.fullpath }
+      ActionDispatch::Request.new(hash).tap(&:fullpath)
     end
 
     it "uses access token" do

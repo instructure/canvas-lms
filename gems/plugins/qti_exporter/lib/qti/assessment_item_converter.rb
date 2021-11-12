@@ -42,7 +42,7 @@ module Qti
       @opts = opts
       if (@path_map = opts[:file_path_map])
         @sorted_paths = opts[:sorted_file_paths]
-        @sorted_paths ||= @path_map.keys.sort_by { |v| v.length }
+        @sorted_paths ||= @path_map.keys.sort_by(&:length)
       end
 
       if @manifest_node

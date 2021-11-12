@@ -3289,7 +3289,7 @@ class CoursesController < ApplicationController
       dt.locked_for?(@current_user, :check_policies => true)
     end)
     @entries.concat WikiPages::ScopedToUser.new(@context, @current_user, @context.wiki_pages.published).scope
-    @entries = @entries.sort_by { |e| e.updated_at }
+    @entries = @entries.sort_by(&:updated_at)
     @entries.each do |entry|
       feed.entries << entry.to_atom(:context => @context)
     end

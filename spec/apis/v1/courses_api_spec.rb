@@ -2001,7 +2001,7 @@ describe CoursesController, type: :request do
       end
 
       it 'undeletes courses' do
-        [@course1, @course2].each { |c| c.destroy }
+        [@course1, @course2].each(&:destroy)
         expect(Auditors::Course).to receive(:record_restored).twice
         api_call(:put, @path, @params, { :event => 'undelete', :course_ids => [@course1.id, 'sis_course_id:course2'] })
         run_jobs

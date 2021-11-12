@@ -633,7 +633,7 @@ class GroupCategoriesController < ApplicationController
       memberships = @group_category.assign_unassigned_members(by_section, updating_user: @current_user)
 
       # render the changes
-      json = memberships.group_by { |m| m.group_id }.map do |group_id, new_members|
+      json = memberships.group_by(&:group_id).map do |group_id, new_members|
         { :id => group_id, :new_members => new_members.map { |m| m.user.group_member_json(@context) } }
       end
       render :json => json

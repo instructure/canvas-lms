@@ -429,7 +429,7 @@ describe "Modules API", type: :request do
       end
 
       it "does not update soft-deleted modules" do
-        @modules_to_update.each { |m| m.destroy }
+        @modules_to_update.each(&:destroy)
         api_call(:put, @path, @path_opts, { :event => 'delete', :module_ids => @ids_to_update },
                  {}, { :expected_status => 404 })
       end

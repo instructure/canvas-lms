@@ -351,7 +351,7 @@ class AppointmentGroupsController < ApplicationController
     # we would have a check on update as well but there may be existing ones and
     # it would be very delicate to write one in a way that doesn't accidentally
     # break the ability to edit those.
-    if contexts.any? { |c| c.concluded? }
+    if contexts.any?(&:concluded?)
       return render json: { error: t('cannot create an appointment group for a concluded course') },
                     status: :bad_request
     end

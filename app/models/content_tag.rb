@@ -339,8 +339,8 @@ class ContentTag < ActiveRecord::Base
   end
 
   def self.delete_for(asset)
-    ContentTag.where(content_id: asset, content_type: asset.class.to_s).each { |t| t.destroy }
-    ContentTag.where(context_id: asset, context_type: asset.class.to_s).each { |t| t.destroy }
+    ContentTag.where(content_id: asset, content_type: asset.class.to_s).each(&:destroy)
+    ContentTag.where(context_id: asset, context_type: asset.class.to_s).each(&:destroy)
   end
 
   def can_destroy?
@@ -442,7 +442,7 @@ class ContentTag < ActiveRecord::Base
     module_ids = tags.map(&:context_module_id).compact
 
     # update title
-    tag_ids = tags.select { |t| t.sync_title_to_asset_title? }.map(&:id)
+    tag_ids = tags.select(&:sync_title_to_asset_title?).map(&:id)
     attr_hash = { :updated_at => Time.now.utc }
     { :display_name => :title, :name => :title, :title => :title }.each do |attr, val|
       attr_hash[val] = asset.send(attr) if asset.respond_to?(attr)
@@ -450,7 +450,7 @@ class ContentTag < ActiveRecord::Base
     ContentTag.where(:id => tag_ids).update_all(attr_hash) unless tag_ids.empty?
 
     # update workflow_state
-    tag_ids = tags.select { |t| t.sync_workflow_state_to_asset? }.map(&:id)
+    tag_ids = tags.select(&:sync_workflow_state_to_asset?).map(&:id)
     attr_hash = { :updated_at => Time.now.utc }
 
     workflow_state = asset_workflow_state(asset)

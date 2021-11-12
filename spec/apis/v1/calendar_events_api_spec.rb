@@ -2457,7 +2457,7 @@ describe CalendarEventsApiController, type: :request do
 
                 @assignment1 = @default_assignment
                 @assignment2 = @course2.assignments.create!(:title => 'Override2', :due_at => '2012-01-13 12:00:00Z')
-                [@assignment1, @assignment2].each { |a| a.save! }
+                [@assignment1, @assignment2].each(&:save!)
 
                 @student1_enrollment = StudentEnrollment.create!(:user => @student, :workflow_state => 'active', :course_section => @course1.default_section, :course => @course1)
                 @student2_enrollment = StudentEnrollment.create!(:user => @student2, :workflow_state => 'active', :course_section => @course2.default_section, :course => @course2)
