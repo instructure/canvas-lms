@@ -280,7 +280,7 @@ module SIS
             pseudo.password_confirmation = user_row.password
             pseudo.password_auto_generated = true
           end
-          pseudo.sis_ssha = user_row.ssha_password unless user_row.ssha_password.blank?
+          pseudo.sis_ssha = user_row.ssha_password if !user_row.ssha_password.blank?
           pseudo.reset_persistence_token if pseudo.sis_ssha_changed? && pseudo.password_auto_generated
           user_touched = false
 
@@ -503,11 +503,12 @@ module SIS
       private
 
       def generate_user_warning(message, user_id, login_id)
-        generate_readable_error_message(
+        user_message = generate_readable_error_message(
           message: message,
           user_id: user_id,
           login_id: login_id
         )
+        user_message
       end
 
       ERRORS_TO_REASONS = {
@@ -518,8 +519,9 @@ module SIS
       def generate_readable_error_message(options)
         response = ERRORS_TO_REASONS.fetch(options[:message]) { DEFAULT_REASON }
         reason = format(response, options)
-        "Could not save the user with user_id: '#{options[:user_id]}'." +
-          " #{reason}"
+        result = "Could not save the user with user_id: '#{options[:user_id]}'." +
+                 " #{reason}"
+        result
       end
     end
   end

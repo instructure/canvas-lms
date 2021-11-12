@@ -418,11 +418,11 @@ class Course < ActiveRecord::Base
   end
 
   def module_items_visible_to(user)
-    tags = if (user_is_teacher = self.grants_right?(user, :view_unpublished_items))
-             self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
-           else
-             self.context_module_tags.active.joins(:context_module).where(:context_modules => { :workflow_state => 'active' })
-           end
+    if (user_is_teacher = self.grants_right?(user, :view_unpublished_items))
+      tags = self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
+    else
+      tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => { :workflow_state => 'active' })
+    end
 
     DifferentiableAssignment.scope_filter(tags, user, self, is_teacher: user_is_teacher)
   end
@@ -1095,11 +1095,11 @@ class Course < ActiveRecord::Base
   end
 
   def apply_assignment_group_weights=(apply)
-    self.group_weighting_scheme = if apply
-                                    'percent'
-                                  else
-                                    'equal'
-                                  end
+    if apply
+      self.group_weighting_scheme = 'percent'
+    else
+      self.group_weighting_scheme = 'equal'
+    end
   end
 
   def grade_weight_changed!
@@ -1126,7 +1126,7 @@ class Course < ActiveRecord::Base
       res = []
       split = self.name.split(/\s/)
       res << split[0]
-      res << split[1..].find { |txt| txt.match(/\d/) } rescue nil
+      res << split[1..-1].find { |txt| txt.match(/\d/) } rescue nil
       self.course_code = res.compact.join(" ")
     end
     @group_weighting_scheme_changed = self.group_weighting_scheme_changed?
@@ -1519,7 +1519,7 @@ class Course < ActiveRecord::Base
       AssignmentGroup.select("id, context_id, context_type").where(:context_type => "Course", :context_id => shard_courses)
     end.index_by(&:context_id)
     courses.each do |course|
-      unless groups[course.id]
+      if !groups[course.id]
         course.require_assignment_group rescue nil
       end
     end
@@ -2295,15 +2295,15 @@ class Course < ActiveRecord::Base
       enrollment_state = 'creation_pending' if enrollment_state == 'invited' && !self.available?
     end
     Course.unique_constraint_retry do
-      e = if opts[:allow_multiple_enrollments]
-            self.all_enrollments.where(user_id: user, type: type, role_id: role, associated_user_id: associated_user_id, course_section_id: section.id).first
-          else
-            # order by course_section_id<>section.id so that if there *is* an existing enrollment for this section, we get it (false orders before true)
-            self.all_enrollments
+      if opts[:allow_multiple_enrollments]
+        e = self.all_enrollments.where(user_id: user, type: type, role_id: role, associated_user_id: associated_user_id, course_section_id: section.id).first
+      else
+        # order by course_section_id<>section.id so that if there *is* an existing enrollment for this section, we get it (false orders before true)
+        e = self.all_enrollments
                 .where(user_id: user, type: type, role_id: role, associated_user_id: associated_user_id)
                 .order(Arel.sql("course_section_id<>#{section.id}"))
                 .first
-          end
+      end
       if e && (!e.active? || opts[:force_update])
         e.already_enrolled = true
         if e.workflow_state == 'deleted'
@@ -2549,7 +2549,7 @@ class Course < ActiveRecord::Base
               new_folder_id = root_folder.id
             end
             # make sure the file has somewhere to go
-            unless new_folder_id
+            if !new_folder_id
               # gather mapping of needed folders from old course to new course
               old_folders = []
               old_folders << file.folder
@@ -2565,11 +2565,11 @@ class Course < ActiveRecord::Base
               final_new_folders = []
               parent_folder = Folder.root_folders(self).first
               old_folders.each_with_index do |folder, idx|
-                final_new_folders << if (f = parent_folder.active_sub_folders.where(name: folder.name).first)
-                                       f
-                                     else
-                                       new_folders[idx]
-                                     end
+                if (f = parent_folder.active_sub_folders.where(name: folder.name).first)
+                  final_new_folders << f
+                else
+                  final_new_folders << new_folders[idx]
+                end
                 parent_folder = final_new_folders.last
               end
               # add or update the folder structure needed for the file
@@ -3560,7 +3560,8 @@ class Course < ActiveRecord::Base
 
   def student_view_student
     fake_student = find_or_create_student_view_student
-    sync_enrollments(fake_student)
+    fake_student = sync_enrollments(fake_student)
+    fake_student
   end
 
   # part of the way we isolate this fake student from places we don't want it
@@ -3937,12 +3938,12 @@ class Course < ActiveRecord::Base
   end
 
   def apply_overridden_course_visibility(visibility)
-    self.overridden_course_visibility = if !['institution', 'public', 'course'].include?(visibility) &&
-                                           self.root_account.available_course_visibility_override_options.keys.include?(visibility)
-                                          visibility
-                                        else
-                                          nil
-                                        end
+    if !['institution', 'public', 'course'].include?(visibility) &&
+       self.root_account.available_course_visibility_override_options.keys.include?(visibility)
+      self.overridden_course_visibility = visibility
+    else
+      self.overridden_course_visibility = nil
+    end
   end
 
   def apply_visibility_configuration(course_visibility, syllabus_visibility)

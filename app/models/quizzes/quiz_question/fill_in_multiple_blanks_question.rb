@@ -121,7 +121,7 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
               right[:user_ids] << response[:user_id]
             end
           end
-          unless found
+          if !found
             if answer_md5
               match = {
                 :id => answer_md5,

@@ -114,11 +114,11 @@ module Qti
         match = {}
         @question[:matches] << match
         match_map[sc['identifier']] = match
-        match[:match_id] = if sc['identifier'] =~ /(\d+)/
-                             $1.to_i
-                           else
-                             unique_local_id
-                           end
+        if sc['identifier'] =~ /(\d+)/
+          match[:match_id] = $1.to_i
+        else
+          match[:match_id] = unique_local_id
+        end
         match[:text] = sc.text.strip
       end
     end
@@ -285,7 +285,7 @@ module Qti
           @doc.css("match variable[identifier=#{resp_id}]").each do |variable|
             match = variable.parent
             response_if = match.parent
-            if /response(Else)?If/.match?(response_if.name)
+            if response_if.name =~ /response(Else)?If/
               if response_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
                 match_id = get_node_val(match, 'baseValue', '').strip
                 answer[:match_id] = match_map[match_id]

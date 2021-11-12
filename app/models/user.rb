@@ -577,7 +577,8 @@ class User < ActiveRecord::Base
     starting_account_ids += (data[:account_users][user.id] || []).map(&:account_id)
     starting_account_ids.uniq!
 
-    calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
+    result = calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
+    result
   end
 
   def self.update_account_associations(users_or_user_ids, opts = {})
@@ -600,12 +601,12 @@ class User < ActiveRecord::Base
     user_ids = users_or_user_ids
     user_ids = user_ids.map(&:id) if user_ids.first.is_a?(User)
     shards = [Shard.current]
-    unless precalculated_associations
-      users = if !users_or_user_ids.first.is_a?(User)
-                users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
-              else
-                users_or_user_ids
-              end
+    if !precalculated_associations
+      if !users_or_user_ids.first.is_a?(User)
+        users = users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
+      else
+        users = users_or_user_ids
+      end
 
       if opts[:all_shards]
         shards = Set.new
@@ -738,7 +739,7 @@ class User < ActiveRecord::Base
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
     # doesn't already exist
-    self.uuid = CanvasSlug.generate_securish_uuid unless read_attribute(:uuid)
+    self.uuid = CanvasSlug.generate_securish_uuid if !read_attribute(:uuid)
   end
   protected :assign_uuid
 
@@ -836,7 +837,7 @@ class User < ActiveRecord::Base
     end
     # Use prior information on the last name to try and reconstruct it
     prior_surname_parts = nil
-    surname = given_parts.pop(prior_surname_parts.length).join(' ') if !surname && prior_surname.present? && (prior_surname_parts = prior_surname.split) && !prior_surname_parts.empty? && given_parts.length >= prior_surname_parts.length && given_parts[-prior_surname_parts.length..] == prior_surname_parts
+    surname = given_parts.pop(prior_surname_parts.length).join(' ') if !surname && prior_surname.present? && (prior_surname_parts = prior_surname.split) && !prior_surname_parts.empty? && given_parts.length >= prior_surname_parts.length && given_parts[-prior_surname_parts.length..-1] == prior_surname_parts
     # Last resort; last name is just the last word given
     surname = given_parts.pop if !surname && given_parts.length > 1
 
@@ -1396,7 +1397,7 @@ class User < ActiveRecord::Base
 
   def gravatar_url(size = 50, fallback = nil, request = nil)
     fallback = self.class.avatar_fallback_url(fallback, request)
-    "https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(self.email) rescue '000'}?s=#{size}&d=#{CGI.escape(fallback)}"
+    "https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(self.email) rescue '000'}?s=#{size}&d=#{CGI::escape(fallback)}"
   end
 
   # Public: Set a user's avatar image. This is a convenience method that sets
@@ -1442,11 +1443,11 @@ class User < ActiveRecord::Base
   end
 
   def report_avatar_image!
-    self.avatar_state = if self.avatar_state == :approved || self.avatar_state == :locked
-                          're_reported'
-                        else
-                          'reported'
-                        end
+    if self.avatar_state == :approved || self.avatar_state == :locked
+      self.avatar_state = 're_reported'
+    else
+      self.avatar_state = 'reported'
+    end
     self.save!
   end
 
@@ -1556,7 +1557,7 @@ class User < ActiveRecord::Base
   def clear_avatar_image_url_with_uuid(uuid)
     raise ArgumentError, "'uuid' is required and cannot be blank" if uuid.blank?
 
-    if self.avatar_image_url.to_s.match?(/#{uuid}/)
+    if self.avatar_image_url.to_s.match(/#{uuid}/)
       self.avatar_image_url = nil
       self.save
     end
@@ -1777,7 +1778,7 @@ class User < ActiveRecord::Base
   # it will store the data in a separate table on the db and lighten the load on poor `users`
 
   def uuid
-    unless read_attribute(:uuid)
+    if !read_attribute(:uuid)
       self.update_attribute(:uuid, CanvasSlug.generate_securish_uuid)
     end
     read_attribute(:uuid)
@@ -2555,8 +2556,10 @@ class User < ActiveRecord::Base
 
   def initialize_default_folder(name)
     folder = self.active_folders.where(name: name).first
-    folder ||= self.folders.create!(:name => name,
+    unless folder
+      folder = self.folders.create!(:name => name,
                                     :parent_folder => Folder.root_folders(self).find { |f| f.name == Folder::MY_FILES_FOLDER_NAME })
+    end
     folder
   end
 
@@ -2730,11 +2733,11 @@ class User < ActiveRecord::Base
     favorites = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid, opts)
                     .select { |c| can_favorite.call(c) }
     # if favoritable courses (classic courses or k5 courses with admin enrollment) exist, show those and all non-favoritable courses
-    @menu_courses = if favorites.length > 0
-                      favorites + courses.reject { |c| can_favorite.call(c) }
-                    else
-                      courses
-                    end
+    if favorites.length > 0
+      @menu_courses = favorites + courses.reject { |c| can_favorite.call(c) }
+    else
+      @menu_courses = courses
+    end
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
     @menu_courses
   end
@@ -2860,12 +2863,12 @@ class User < ActiveRecord::Base
   def otp_secret_key
     return nil unless otp_secret_key_enc
 
-    Canvas::Security.decrypt_password(otp_secret_key_enc, otp_secret_key_salt, 'otp_secret_key', self.shard.settings[:encryption_key]) if otp_secret_key_enc
+    Canvas::Security::decrypt_password(otp_secret_key_enc, otp_secret_key_salt, 'otp_secret_key', self.shard.settings[:encryption_key]) if otp_secret_key_enc
   end
 
   def otp_secret_key=(key)
     if key
-      self.otp_secret_key_enc, self.otp_secret_key_salt = Canvas::Security.encrypt_password(key, 'otp_secret_key')
+      self.otp_secret_key_enc, self.otp_secret_key_salt = Canvas::Security::encrypt_password(key, 'otp_secret_key')
     else
       self.otp_secret_key_enc = self.otp_secret_key_salt = nil
     end

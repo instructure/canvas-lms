@@ -129,11 +129,11 @@ class ContextController < ApplicationController
         set_student_context_cards_js_env
       end
     elsif @context.is_a?(Group)
-      @users = if @context.grants_right?(@current_user, :read_as_admin)
-                 @context.participating_users.distinct.order_by_sortable_name
-               else
-                 @context.participating_users_in_context(sort: true).distinct.order_by_sortable_name
-               end
+      if @context.grants_right?(@current_user, :read_as_admin)
+        @users = @context.participating_users.distinct.order_by_sortable_name
+      else
+        @users = @context.participating_users_in_context(sort: true).distinct.order_by_sortable_name
+      end
       @primary_users = { t('roster.group_members', 'Group Members') => @users }
       if (course = @context.context.is_a?(Course) && @context.context)
         @secondary_users = { t('roster.teachers_and_tas', 'Teachers & TAs') => course.participating_instructors.order_by_sortable_name.distinct }
@@ -207,7 +207,7 @@ class ContextController < ApplicationController
 
   def roster_user
     if authorized_action(@context, @current_user, :read_roster)
-      raise ActiveRecord::RecordNotFound unless Api::ID_REGEX.match?(params[:id])
+      raise ActiveRecord::RecordNotFound unless params[:id] =~ Api::ID_REGEX
 
       user_id = Shard.relative_id_for(params[:id], Shard.current, @context.shard)
       if @context.is_a?(Course)
@@ -233,7 +233,7 @@ class ContextController < ApplicationController
       end
 
       @user = @membership.user rescue nil
-      unless @user
+      if !@user
         if @context.is_a?(Course)
           flash[:error] = t('no_user.course', "That user does not exist or is not currently a member of this course")
         elsif @context.is_a?(Group)

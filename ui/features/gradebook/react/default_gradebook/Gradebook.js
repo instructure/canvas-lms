@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import _ from 'underscore'
-import {intersection} from 'lodash'
 import tz from '@canvas/timezone'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -116,8 +115,7 @@ import {
   sectionList,
   getCustomColumnId,
   getAssignmentColumnId,
-  getAssignmentGroupColumnId,
-  findAllAppliedFilterValuesOfType
+  getAssignmentGroupColumnId
 } from './Gradebook.utils'
 import {
   compareAssignmentPointsPossible,
@@ -158,16 +156,8 @@ class Gradebook extends React.Component {
   constructor(props) {
     super(props)
     this.options = {...(props.gradebookEnv || {}), ...props}
-    this.state = {
-      gridColors: statusColors(this.options.colors),
-      modules: [],
-      assignmentGroups: [],
-      sections: this.sections_enabled ? this.options.sections.map(htmlEscape) : [],
-      filters: [],
-      isEssentialDataLoaded: false
-    }
+    this.state = {gridColors: statusColors(this.options.colors)}
     this.gradebookSettingsModalButton = React.createRef()
-    this.onChangeFilters = this.onChangeFilters.bind(this)
     this.getAssignmentOrder = this.getAssignmentOrder.bind(this)
     this.setInitialState = this.setInitialState.bind(this)
     this.bindGridEvents = this.bindGridEvents.bind(this)
@@ -775,7 +765,6 @@ class Gradebook extends React.Component {
 
   updateAssignmentGroups(assignmentGroups, gradingPeriodIds) {
     this.gotAllAssignmentGroups(assignmentGroups)
-    this.setState({assignmentGroups})
     this.setAssignmentsLoaded(gradingPeriodIds)
     this.renderViewOptionsMenu()
     this.renderFilters()
@@ -1221,8 +1210,11 @@ class Gradebook extends React.Component {
       this.filterAssignmentByModule,
       this.filterAssignmentBySearchInput
     ]
-    const matchesAllFilters = assignment => assignmentFilters.every(filter => filter(assignment))
-
+    const matchesAllFilters = assignment => {
+      return assignmentFilters.every(filter => {
+        return filter(assignment)
+      })
+    }
     return assignments.filter(matchesAllFilters)
   }
 
@@ -1246,20 +1238,10 @@ class Gradebook extends React.Component {
   }
 
   filterAssignmentByAssignmentGroup(assignment) {
-    if (!this.options.enhanced_gradebook_filters) {
-      if (!this.isFilteringColumnsByAssignmentGroup()) {
-        return true
-      }
-      return this.getAssignmentGroupToShow() === assignment.assignment_group_id
+    if (!this.isFilteringColumnsByAssignmentGroup()) {
+      return true
     }
-
-    const assignmentGroupIds = findAllAppliedFilterValuesOfType(
-      'assignment-group',
-      this.state.filters
-    )
-    return (
-      assignmentGroupIds.length === 0 || assignmentGroupIds.includes(assignment.assignment_group_id)
-    )
+    return this.getAssignmentGroupToShow() === assignment.assignment_group_id
   }
 
   filterAssignmentByGradingPeriod(assignment) {
@@ -1270,19 +1252,15 @@ class Gradebook extends React.Component {
   }
 
   filterAssignmentByModule(assignment) {
-    if (!this.options.enhanced_gradebook_filters) {
-      const contextModuleFilterSetting = this.getModuleToShow()
-      if (contextModuleFilterSetting === '0') {
-        return true
-      }
-      return (
-        (assignment.module_ids || []).indexOf(this.getFilterColumnsBySetting('contextModuleId')) >=
-        0
-      )
+    let ref1
+    const contextModuleFilterSetting = this.getModuleToShow()
+    if (contextModuleFilterSetting === '0') {
+      return true
     }
-
-    const moduleIds = findAllAppliedFilterValuesOfType('module', this.state.filters)
-    return moduleIds.length === 0 || intersection(assignment.module_ids, moduleIds).length > 0
+    return (
+      (ref1 = this.getFilterColumnsBySetting('contextModuleId')),
+      indexOf.call(assignment.module_ids || [], ref1) >= 0
+    )
   }
 
   handleSubmissionPostedChange(assignment) {
@@ -4200,7 +4178,6 @@ class Gradebook extends React.Component {
 
   updateContextModules(contextModules) {
     this.setContextModules(contextModules)
-    this.setState({modules: contextModules})
     this.setContextModulesLoaded(true)
     this.renderViewOptionsMenu()
     this.renderFilters()
@@ -4534,7 +4511,6 @@ class Gradebook extends React.Component {
       this.assignmentsLoadedForCurrentView() &&
       (!this.gradingPeriodSet || this.contentLoadStates.gradingPeriodAssignmentsLoaded)
     ) {
-      this.setState({isEssentialDataLoaded: true})
       return this._essentialDataLoaded.resolve()
     }
   }
@@ -4542,23 +4518,6 @@ class Gradebook extends React.Component {
   componentDidMount() {
     this.initialize()
     this.onShow()
-  }
-
-  componentDidUpdate(_prevProps, prevState) {
-    if (prevState.filters !== this.state.filters) {
-      this.updateColumns()
-
-      const sectionIds = findAllAppliedFilterValuesOfType('section', this.state.filters)
-      if (sectionIds.length > 0) {
-        this.updateCurrentSection(sectionIds[0])
-      } else {
-        this.updateCurrentSection(null)
-      }
-    }
-  }
-
-  onChangeFilters(filters) {
-    this.setState({filters})
   }
 
   render() {
@@ -4586,15 +4545,9 @@ class Gradebook extends React.Component {
         <Portal node={this.props.gridColorNode}>
           <GridColor colors={this.state.gridColors} />
         </Portal>
-        {this.options.enhanced_gradebook_filters && this.state.isEssentialDataLoaded && (
+        {this.options.enhanced_gradebook_filters && (
           <Portal node={this.props.filterNavNode}>
-            <FilterNav
-              filters={this.state.filters}
-              onChange={this.onChangeFilters}
-              modules={this.state.modules}
-              assignmentGroups={this.state.assignmentGroups}
-              sections={this.state.sections}
-            />
+            <FilterNav />
           </Portal>
         )}
       </>

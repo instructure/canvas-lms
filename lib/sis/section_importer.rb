@@ -75,7 +75,7 @@ module SIS
         raise ImportError, "No section_id given for a section in course #{course_id}" if section_id.blank?
         raise ImportError, "No course_id given for a section #{section_id}" if course_id.blank?
         raise ImportError, "No name given for section #{section_id} in course #{course_id}" if name.blank? && status =~ /\Aactive/i
-        raise ImportError, "Improper status \"#{status}\" for section #{section_id} in course #{course_id}" unless /\Aactive|\Adeleted/i.match?(status)
+        raise ImportError, "Improper status \"#{status}\" for section #{section_id} in course #{course_id}" unless status =~ /\Aactive|\Adeleted/i
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         course = @root_account.all_courses.where(sis_source_id: course_id).take
@@ -96,7 +96,7 @@ module SIS
         if section.course_id != course.id
           if section.nonxlist_course_id
             # this section is crosslisted
-            if (section.nonxlist_course_id != course.id && !section.stuck_sis_fields.include?(:course_id)) || (section.course.workflow_state == 'deleted' && status.start_with?('active'))
+            if (section.nonxlist_course_id != course.id && !section.stuck_sis_fields.include?(:course_id)) || (section.course.workflow_state == 'deleted' && !!(status =~ /\Aactive/))
               # but the course id we were given didn't match the crosslist info
               # we have, so, uncrosslist and move
               @course_ids_to_update_associations.merge [course.id, section.course_id, section.nonxlist_course_id]
@@ -114,9 +114,9 @@ module SIS
         end
 
         section.integration_id = integration_id
-        if /active/i.match?(status)
+        if status =~ /active/i
           section.workflow_state = 'active'
-        elsif /deleted/i.match?(status)
+        elsif status =~ /deleted/i
           section.workflow_state = 'deleted'
           deleted_section_ids << section.id
         end

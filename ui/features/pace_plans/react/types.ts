@@ -102,11 +102,10 @@ export type PacePlansState = PacePlan & {
 }
 export type SectionsState = Sections
 export type ResponsiveSizes = 'small' | 'large'
-export type CategoryErrors = {[category: string]: string}
 
 export interface UIState {
   readonly autoSaving: boolean
-  readonly errors: CategoryErrors
+  readonly errorMessage: string
   readonly divideIntoWeeks: boolean
   readonly selectedContextType: PlanContextTypes
   readonly selectedContextId: string

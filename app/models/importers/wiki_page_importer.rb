@@ -24,7 +24,7 @@ module Importers
     self.item_class = WikiPage
 
     def self.process_migration_course_outline(data, migration)
-      outline = data['course_outline'] || nil
+      outline = data['course_outline'] ? data['course_outline'] : nil
       return unless outline
       return unless migration.import_object?('course_outline', outline['migration_id'])
 
@@ -44,7 +44,7 @@ module Importers
         migration.context.wiki.load_tag_for_master_course_import!(migration.child_subscription_id)
       end
 
-      wikis = data['wikis'] || []
+      wikis = data['wikis'] ? data['wikis'] : []
       wikis.each do |wiki|
         unless wiki
           message = "There was a nil wiki page imported for ContentMigration:#{migration.id}"
@@ -90,7 +90,7 @@ module Importers
           item.set_as_front_page!
         end
       end
-      hide_from_students = hash[:hide_from_students] unless hash[:hide_from_students].nil?
+      hide_from_students = hash[:hide_from_students] if !hash[:hide_from_students].nil?
       state = hash[:workflow_state]
       if state && migration.for_master_course_import?
         item.workflow_state = state
@@ -138,11 +138,11 @@ module Importers
         item.title = hash[:title] unless hash[:root_folder]
         description = ""
         if hash[:header]
-          description += if hash[:header][:is_html]
-                           migration.convert_html(hash[:header][:body], :wiki_page, hash[:migration_id], :body)
-                         else
-                           migration.convert_text(hash[:header][:body] || [""])
-                         end
+          if hash[:header][:is_html]
+            description += migration.convert_html(hash[:header][:body], :wiki_page, hash[:migration_id], :body)
+          else
+            description += migration.convert_text(hash[:header][:body] || [""])
+          end
         end
 
         if hash[:description]
@@ -188,22 +188,22 @@ module Importers
               obj = context.discussion_topics.where(migration_id: sub_item[:linked_resource_id]).first
               contents += "  <li><a href='/courses/#{context.id}/discussion_topics/#{obj.id}'>#{obj.title}</a></li>\n" if obj
             when 'URL_TYPE'
-              contents += if sub_item['title'] && sub_item['description'] && sub_item['title'] != '' && sub_item['description'] != ''
-                            " <li><a href='#{sub_item['url']}'>#{sub_item['title']}</a><ul><li>#{sub_item['description']}</li></ul></li>\n"
-                          else
-                            " <li><a href='#{sub_item['url']}'>#{sub_item['title'] || sub_item['description']}</a></li>\n"
-                          end
+              if sub_item['title'] && sub_item['description'] && sub_item['title'] != '' && sub_item['description'] != ''
+                contents += " <li><a href='#{sub_item['url']}'>#{sub_item['title']}</a><ul><li>#{sub_item['description']}</li></ul></li>\n"
+              else
+                contents += " <li><a href='#{sub_item['url']}'>#{sub_item['title'] || sub_item['description']}</a></li>\n"
+              end
             end
           end
         end
         description += "<ul>\n#{contents}\n</ul>" if contents && contents.length > 0
 
         if hash[:footer]
-          description += if hash[:footer][:is_html]
-                           migration.convert_html(hash[:footer][:body], :wiki_page, hash[:migration_id], :body)
-                         else
-                           migration.convert_text(hash[:footer][:body] || "")
-                         end
+          if hash[:footer][:is_html]
+            description += migration.convert_html(hash[:footer][:body], :wiki_page, hash[:migration_id], :body)
+          else
+            description += migration.convert_text(hash[:footer][:body] || "")
+          end
         end
 
         item.body = description
@@ -239,7 +239,7 @@ module Importers
         item.body = migration.convert_html(hash[:text], :wiki_page, hash[:migration_id], :body)
 
         item.editing_roles = hash[:editing_roles] if hash[:editing_roles].present?
-        item.notify_of_update = hash[:notify_of_update] unless hash[:notify_of_update].nil?
+        item.notify_of_update = hash[:notify_of_update] if !hash[:notify_of_update].nil?
       else # rubocop:disable Lint/DuplicateBranch
         allow_save = false
       end

@@ -396,7 +396,7 @@ class RoleOverridesController < ApplicationController
     role.base_role_type = base_role_type
     role.workflow_state = 'active'
     role.deleted_at = nil
-    unless role.save
+    if !role.save
       if api_request?
         render :json => role.errors, :status => :bad_request
       else
@@ -548,11 +548,11 @@ class RoleOverridesController < ApplicationController
 
   def create
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      roles = if params[:account_roles] || @context == Account.site_admin
-                @context.available_account_roles(true)
-              else
-                @context.available_course_roles(true)
-              end
+      if params[:account_roles] || @context == Account.site_admin
+        roles = @context.available_account_roles(true)
+      else
+        roles = @context.available_course_roles(true)
+      end
       if params[:permissions]
         RoleOverride.permissions.keys.each do |key|
           if params[:permissions][key]

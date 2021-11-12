@@ -264,7 +264,7 @@ class PseudonymsController < ApplicationController
     return unless find_authentication_provider
     return unless update_pseudonym_from_params
 
-    @pseudonym.generate_temporary_password unless params[:pseudonym][:password]
+    @pseudonym.generate_temporary_password if !params[:pseudonym][:password]
     if Pseudonym.unique_constraint_retry { @pseudonym.save_without_session_maintenance }
       respond_to do |format|
         flash[:notice] = t 'notices.account_registered', "Account registered!"
@@ -286,7 +286,12 @@ class PseudonymsController < ApplicationController
 
   def get_user
     user_id = params[:user_id] || params[:user].try(:[], :id)
-    @user = user_id ? api_find(User, user_id) : @current_user
+    @user = case
+            when user_id
+              api_find(User, user_id)
+            else
+              @current_user
+            end
     true
   end
   protected :get_user

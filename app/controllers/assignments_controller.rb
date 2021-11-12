@@ -173,7 +173,7 @@ class AssignmentsController < ApplicationController
   end
 
   def show
-    unless request.format.html?
+    if !request.format.html?
       return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
     end
 
@@ -310,11 +310,11 @@ class AssignmentsController < ApplicationController
           @assigned_assessments = @current_user_submission&.assigned_assessments&.select { |request| request.submission.grants_right?(@current_user, session, :read) } || []
         end
 
-        @external_tools = if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
-                            ContextExternalTool.all_tools_for(@context, :user => @current_user, :placements => :homework_submission)
-                          else
-                            []
-                          end
+        if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
+          @external_tools = ContextExternalTool.all_tools_for(@context, :user => @current_user, :placements => :homework_submission)
+        else
+          @external_tools = []
+        end
 
         context_rights = @context.rights_status(@current_user, session, :read_as_admin, :manage_assignments, :manage_assignments_edit)
         if @context.root_account.feature_enabled?(:granular_permissions_manage_assignments)
@@ -512,7 +512,7 @@ class AssignmentsController < ApplicationController
   def peer_reviews
     @assignment = @context.assignments.active.find(params[:assignment_id])
     if authorized_action(@assignment, @current_user, :grade)
-      unless @assignment.has_peer_reviews?
+      if !@assignment.has_peer_reviews?
         redirect_to named_context_url(@context, :context_assignment_url, @assignment.id)
         return
       end

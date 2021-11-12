@@ -730,9 +730,12 @@ module ApplicationHelper
 
   # return enough group data for the planner to display items associated with groups
   def map_groups_for_planner(groups)
-    groups.map do |g|
-      { id: g.id, assetString: g.asset_string, name: g.name, url: "/groups/#{g.id}" }
-    end
+    mapped =
+      groups.map do |g|
+        { id: g.id, assetString: g.asset_string, name: g.name, url: "/groups/#{g.id}" }
+      end
+
+    mapped
   end
 
   def show_feedback_link?
@@ -832,7 +835,7 @@ module ApplicationHelper
     # for finding which values to show in the theme editor
     return @brand_account if opts[:ignore_parents]
 
-    unless @brand_account
+    if !@brand_account
       if @current_user.present?
         # If we're not viewing a `context` with an account, like if we're on the dashboard or my
         # user profile, show the branding for the lowest account where all my enrollments are. eg:
@@ -955,7 +958,7 @@ module ApplicationHelper
   # date format to screenreader users across the app
   # when telling them how to fill in a datetime field
   def accessible_date_format(format = 'datetime')
-    unless ACCEPTABLE_FORMAT_TYPES.include?(format)
+    if !ACCEPTABLE_FORMAT_TYPES.include?(format)
       raise ArgumentError, "format must be one of #{ACCEPTABLE_FORMAT_TYPES.join(',')}"
     end
 

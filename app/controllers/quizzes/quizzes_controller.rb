@@ -702,7 +702,7 @@ class Quizzes::QuizzesController < ApplicationController
         redirect_to named_context_url(@context, :context_quizzes_url)
         return
       end
-      unless @submission
+      if !@submission
         flash[:notice] = t('notices.no_submission_for_user', "There is no submission available for that user")
         redirect_to named_context_url(@context, :context_quiz_url, @quiz)
         return
@@ -848,14 +848,14 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def setup_attachments
-    @attachments = if @submission
-                     Hash[@submission.attachments.map do |attachment|
-                       [attachment.id, attachment]
-                     end
-                     ]
-                   else
-                     {}
-                   end
+    if @submission
+      @attachments = Hash[@submission.attachments.map do |attachment|
+        [attachment.id, attachment]
+      end
+      ]
+    else
+      @attachments = {}
+    end
   end
 
   def attachment_hash(attachment)
@@ -874,7 +874,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def force_user
-    unless @current_user
+    if !@current_user
       session[:return_to] = course_quiz_path(@context, @quiz)
       redirect_to login_path
     end

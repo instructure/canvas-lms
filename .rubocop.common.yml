@@ -64,13 +64,7 @@ Naming/FileName:
   Exclude:
     - "**/Gemfile.d/~after.rb"
 
-Performance/RegexpMatch:
-  Severity: error
-Performance/StartWith:
-  Severity: error
 Performance/StringInclude:
-  Severity: error
-Performance/StringReplacement:
   Severity: error
 
 Rails/ApplicationRecord:
@@ -132,14 +126,8 @@ Specs/EnsureSpecExtension:
 Style/Alias:
   EnforcedStyle: prefer_alias_method # https://github.com/rubocop/ruby-style-guide/issues/821
   Severity: error
-Style/ColonMethodCall:
-  Severity: error
-Style/ConditionalAssignment:
-  Severity: error
 Style/Documentation:
   Enabled: false # most things don't need to be documented
-Style/EmptyCaseCondition:
-  Severity: error
 Style/Encoding:
   Severity: error
 Style/FrozenStringLiteralComment:
@@ -147,23 +135,13 @@ Style/FrozenStringLiteralComment:
 Style/IfUnlessModifier:
   # see also https://github.com/rubocop/rubocop/discussions/10048
   Enabled: false # can obscure important decisions or put too much code in a line
-Style/IfWithBooleanLiteralBranches:
-  Severity: error
-Style/NegatedIf:
-  Severity: error
 Style/NumericPredicate:
   Enabled: false # `> 0` can be easier to read than `.positive?`
-Style/OrAssignment:
-  Severity: error
 Style/ParenthesesAroundCondition:
   Severity: error
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
-Style/RedundantAssignment:
-  Severity: error
 Style/RedundantBegin:
-  Severity: error
-Style/RedundantCondition:
   Severity: error
 Style/RedundantInterpolation:
   Severity: error
@@ -173,12 +151,8 @@ Style/RedundantParentheses:
   Severity: error
 Style/RedundantRegexpEscape:
   Severity: error
-Style/SlicingWithRange:
-  Severity: error
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
-Style/UnpackFirst:
-  Severity: error
 Style/WhileUntilModifier:
   Enabled: false # nontrivial loops should look like loops
 

@@ -244,7 +244,7 @@ class SubmissionsController < SubmissionsBaseController
 
     return unless verify_api_call_has_attachment if api_request?
 
-    unless api_request?
+    if !api_request?
       if online_upload?
         return unless extensions_allowed?
         return unless has_file_attached?
@@ -305,9 +305,10 @@ class SubmissionsController < SubmissionsBaseController
         log_asset_access(@assignment, "assignments", @assignment_group, 'submit')
         format.html do
           flash[:notice] = t('assignment_submit_success', 'Assignment successfully submitted.')
-          tardiness = if @submission.late?
+          tardiness = case
+                      when @submission.late?
                         2 # late
-                      elsif @submission.cached_due_date.nil?
+                      when @submission.cached_due_date.nil?
                         0 # don't know
                       else
                         1 # on time
@@ -410,11 +411,11 @@ class SubmissionsController < SubmissionsBaseController
   private :auditing_user_role
 
   def lookup_existing_attachments
-    attachment_ids = if params[:submission][:file_ids].is_a?(Array)
-                       params[:submission][:file_ids]
-                     else
-                       (params[:submission][:attachment_ids] || "").split(",")
-                     end
+    if params[:submission][:file_ids].is_a?(Array)
+      attachment_ids = params[:submission][:file_ids]
+    else
+      attachment_ids = (params[:submission][:attachment_ids] || "").split(",")
+    end
 
     attachment_ids = attachment_ids.select(&:present?)
     params[:submission][:attachments] = []

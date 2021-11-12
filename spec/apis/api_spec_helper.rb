@@ -87,7 +87,9 @@ $spec_api_tokens = {}
 def access_token_for_user(user)
   enable_developer_key_account_binding!(DeveloperKey.default)
   token = $spec_api_tokens[user]
-  token ||= $spec_api_tokens[user] = user.access_tokens.create!(:purpose => "test").full_token
+  unless token
+    token = $spec_api_tokens[user] = user.access_tokens.create!(:purpose => "test").full_token
+  end
   token
 end
 

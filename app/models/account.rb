@@ -374,11 +374,11 @@ class Account < ActiveRecord::Base
               val.each do |inner_key, inner_val|
                 inner_key = inner_key.to_sym
                 if opts[:values].include?(inner_key)
-                  new_hash[inner_key] = if opts[:inheritable] && (inner_key == :locked || (inner_key == :value && opts[:boolean]))
-                                          Canvas::Plugin.value_to_boolean(inner_val)
-                                        else
-                                          inner_val.to_s
-                                        end
+                  if opts[:inheritable] && (inner_key == :locked || (inner_key == :value && opts[:boolean]))
+                    new_hash[inner_key] = Canvas::Plugin.value_to_boolean(inner_val)
+                  else
+                    new_hash[inner_key] = inner_val.to_s
+                  end
                 end
               end
             end
@@ -497,7 +497,7 @@ class Account < ActiveRecord::Base
   end
 
   def require_acceptance_of_terms?(user)
-    return false unless terms_required?
+    return false if !terms_required?
     return true if user.nil? || user.new_record?
 
     soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime
@@ -1160,7 +1160,8 @@ class Account < ActiveRecord::Base
 
   def available_custom_roles(include_inactive = false)
     scope = Role.where(:account_id => account_chain_ids)
-    include_inactive ? scope.not_deleted : scope.active
+    scope = include_inactive ? scope.not_deleted : scope.active
+    scope
   end
 
   def available_roles(include_inactive = false)
@@ -1184,8 +1185,8 @@ class Account < ActiveRecord::Base
 
     self.shard.activate do
       role_scope = Role.not_deleted.where(:name => role_name)
-      role_scope = if self.class.connection.adapter_name == 'PostgreSQL'
-                     role_scope.where("account_id = ? OR
+      if self.class.connection.adapter_name == 'PostgreSQL'
+        role_scope = role_scope.where("account_id = ? OR
           account_id IN (
             WITH RECURSIVE t AS (
               SELECT id, parent_account_id FROM #{Account.quoted_table_name} WHERE id = ?
@@ -1194,9 +1195,9 @@ class Account < ActiveRecord::Base
             )
             SELECT id FROM t
           )", self.id, self.id)
-                   else
-                     role_scope.where(:account_id => self.account_chain.map(&:id))
-                   end
+      else
+        role_scope = role_scope.where(:account_id => self.account_chain.map(&:id))
+      end
 
       role_scope.first
     end
@@ -1828,7 +1829,7 @@ class Account < ActiveRecord::Base
     # set the type to custom for any existing custom links that don't have a type set
     # the new ui will set the type ('custom' or 'default') for any new custom links
     # since we now allow reordering the links, the default links get stored in the settings as well
-    unless links.blank?
+    if !links.blank?
       links.each do |link|
         if link[:type].blank?
           link[:type] = 'custom'

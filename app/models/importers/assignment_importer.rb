@@ -27,7 +27,7 @@ module Importers
     self.item_class = Assignment
 
     def self.process_migration(data, migration)
-      assignments = data['assignments'] || []
+      assignments = data['assignments'] ? data['assignments'] : []
 
       create_assignments(assignments, migration)
 
@@ -122,11 +122,11 @@ module Importers
       item.title = I18n.t('untitled assignment') if item.title.blank?
       item.migration_id = hash[:migration_id]
       if new_record || item.deleted? || master_migration
-        item.workflow_state = if item.can_unpublish?
-                                (hash[:workflow_state] || 'published')
-                              else
-                                'published'
-                              end
+        if item.can_unpublish?
+          item.workflow_state = (hash[:workflow_state] || 'published')
+        else
+          item.workflow_state = 'published'
+        end
       end
       if hash[:instructions_in_html] == false
         self.extend TextHelper
@@ -178,9 +178,9 @@ module Importers
       elsif (grading = hash[:grading])
         hash[:due_at] ||= grading[:due_at] || grading[:due_date]
         hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
-        if /numeric|points/i.match?(grading[:grade_type])
+        if grading[:grade_type] =~ /numeric|points/i
           item.points_possible = grading[:points_possible] ? grading[:points_possible].to_f : 10
-        elsif /alphanumeric|letter_grade/i.match?(grading[:grade_type])
+        elsif grading[:grade_type] =~ /alphanumeric|letter_grade/i
           item.grading_type = "letter_grade"
           item.points_possible = grading[:points_possible] ? grading[:points_possible].to_f : 100
         elsif grading[:grade_type] == 'rubric'
@@ -459,7 +459,7 @@ module Importers
             tag.external_data = JSON.parse(hash[:external_tool_data_json])
           end
           tag.content_type = 'ContextExternalTool'
-          unless tag.save
+          if !tag.save
             if tag.errors["url"]
               migration.add_warning(t('errors.import.external_tool_url',
                                       "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.",

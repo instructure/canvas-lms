@@ -55,7 +55,7 @@ module Api::V1
       end
       grader = (json[:grader_id] && json[:grader_id] > 0 && user_cache[json[:grader_id]]) || default_grader
 
-      json.merge(
+      json = json.merge(
         :grader => grader.name,
         :assignment_name => assignment.title,
         :user_name => student.name,
@@ -63,6 +63,7 @@ module Api::V1
         :current_graded_at => submission.graded_at,
         :current_grader => current_grader.name
       )
+      json
     end
 
     def versions_json(course, versions, api_context, opts = {})
@@ -154,12 +155,12 @@ module Api::V1
       end
 
       if (grader_id = options[:grader_id])
-        collection = if grader_id.to_s == '0'
-                       # yes, this is crazy.  autograded submissions have the grader_id of (quiz_id x -1)
-                       collection.where("submissions.grader_id<=0")
-                     else
-                       collection.where(grader_id: grader_id)
-                     end
+        if grader_id.to_s == '0'
+          # yes, this is crazy.  autograded submissions have the grader_id of (quiz_id x -1)
+          collection = collection.where("submissions.grader_id<=0")
+        else
+          collection = collection.where(grader_id: grader_id)
+        end
       end
 
       api_context.paginate(collection)

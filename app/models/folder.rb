@@ -70,13 +70,13 @@ class Folder < ActiveRecord::Base
   end
 
   def populate_root_account_id
-    self.root_account_id = if self.context_type == "User"
-                             0
-                           elsif context_type == 'Account' && context.root_account?
-                             self.context_id
-                           else
-                             self.context.root_account_id
-                           end
+    if self.context_type == "User"
+      self.root_account_id = 0
+    elsif context_type == 'Account' && context.root_account?
+      self.root_account_id = self.context_id
+    else
+      self.root_account_id = self.context.root_account_id
+    end
   end
 
   def protect_root_folder_name
@@ -93,7 +93,7 @@ class Folder < ActiveRecord::Base
   end
 
   def reject_recursive_folder_structures
-    return true unless self.parent_folder_id_changed?
+    return true if !self.parent_folder_id_changed?
 
     seen_folders = Set.new([self])
     folder = self
@@ -165,7 +165,7 @@ class Folder < ActiveRecord::Base
     # TODO i18n
     t :default_folder_name, 'New Folder'
     self.name = 'New Folder' if self.name.blank?
-    self.name = self.name.strip.tr('/', "_")
+    self.name = self.name.strip.gsub(/\//, "_")
     @update_sub_folders = false
     self.parent_folder_id = nil if !self.parent_folder || self.parent_folder.context != self.context || self.parent_folder_id == self.id
     self.context = self.parent_folder.context if self.parent_folder

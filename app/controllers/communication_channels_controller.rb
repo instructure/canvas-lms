@@ -159,10 +159,10 @@ class CommunicationChannelsController < ApplicationController
                         (Account.site_admin.grants_right?(@current_user, :manage_students) || @domain_root_account.grants_right?(@current_user, :manage_students))
 
     if params[:communication_channel][:type] == CommunicationChannel::TYPE_PUSH
-      unless @access_token
+      if !@access_token
         return render :json => { errors: { type: 'Push is only supported when using an access token' } }, status: :bad_request
       end
-      unless @access_token.developer_key.try(:sns_arn)
+      if !@access_token.developer_key.try(:sns_arn)
         return render :json => { errors: { type: 'SNS is not configured for this developer key' } }, status: :bad_request
       end
 

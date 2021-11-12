@@ -36,10 +36,10 @@ import {View} from '@instructure/ui-view'
 import I18n from 'i18n!conversations_2'
 import {colors} from '@instructure/canvas-theme'
 
-export const ConversationListItem = ({...props}) => {
+export const MessageListItem = ({...props}) => {
   const [isHovering, setIsHovering] = useState(false)
 
-  const handleConversationClick = e => {
+  const handleMessageClick = e => {
     e.nativeEvent.stopImmediatePropagation()
     e.stopPropagation()
 
@@ -57,7 +57,7 @@ export const ConversationListItem = ({...props}) => {
     }
   }
 
-  const handleConversationStarClick = e => {
+  const handleMessageStarClick = e => {
     e.nativeEvent.stopImmediatePropagation()
     e.stopPropagation()
 
@@ -108,7 +108,7 @@ export const ConversationListItem = ({...props}) => {
         padding="small x-small"
       >
         <Grid
-          data-testid="conversationListItem-Item"
+          data-testid="messageListItem-Item"
           vAlign="middle"
           colSpacing="none"
           rowSpacing="none"
@@ -118,7 +118,7 @@ export const ConversationListItem = ({...props}) => {
           onMouseLeave={() => {
             setIsHovering(false)
           }}
-          onClick={handleConversationClick}
+          onClick={handleMessageClick}
         >
           <Grid.Row>
             <Grid.Col width="auto">
@@ -131,7 +131,7 @@ export const ConversationListItem = ({...props}) => {
                 margin="0 small 0 0"
               >
                 <Checkbox
-                  data-testid="conversationListItem-Checkbox"
+                  data-testid="messageListItem-Checkbox"
                   label={
                     <ScreenReaderContent>
                       {props.isSelected ? I18n.t('selected') : I18n.t('not selected')}
@@ -225,7 +225,7 @@ export const ConversationListItem = ({...props}) => {
                             screenReaderLabel={
                               props.isStarred ? I18n.t('starred') : I18n.t('not starred')
                             }
-                            onClick={handleConversationStarClick}
+                            onClick={handleMessageStarClick}
                             data-testid="visible-star"
                           />
                         ) : (
@@ -238,7 +238,7 @@ export const ConversationListItem = ({...props}) => {
                               screenReaderLabel={
                                 props.isStarred ? I18n.t('starred') : I18n.t('not starred')
                               }
-                              onClick={handleConversationStarClick}
+                              onClick={handleMessageStarClick}
                             />
                           </ScreenReaderContent>
                         )}
@@ -258,14 +258,12 @@ export const ConversationListItem = ({...props}) => {
                       display="block"
                       textAlign="center"
                       size="small"
-                      onClick={handleConversationClick}
+                      onClick={handleMessageClick}
                     >
-                      {I18n.t('Open Conversation')}
+                      {I18n.t('Open Message')}
                     </Button>
                   ) : (
-                    <ScreenReaderContent tabIndex="0">
-                      {I18n.t('Open Conversation')}
-                    </ScreenReaderContent>
+                    <ScreenReaderContent tabIndex="0">{I18n.t('Open Message')}</ScreenReaderContent>
                   )
                 }}
               </Focusable>
@@ -296,7 +294,7 @@ export const conversationProp = PropTypes.shape({
   conversationParticipantsConnection: PropTypes.object
 })
 
-ConversationListItem.propTypes = {
+MessageListItem.propTypes = {
   conversation: conversationProp,
   id: PropTypes.string,
   isSelected: PropTypes.bool,

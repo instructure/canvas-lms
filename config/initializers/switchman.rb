@@ -203,7 +203,7 @@ Rails.application.config.after_initialize do
       return klass.send(method, *args) if DatabaseServer.all.all? { |db| !db.config[:region] }
 
       regions = Set.new
-      unless run_current_region_asynchronously
+      if !run_current_region_asynchronously
         klass.send(method, *args)
         regions << Shard.current.database_server.config[:region]
       end

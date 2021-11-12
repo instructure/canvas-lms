@@ -1395,7 +1395,7 @@ class DiscussionTopicsController < ApplicationController
   def process_lock_parameters(discussion_topic_hash)
     # Handle locking/unlocking (overrides workflow state if provided). It appears that the locked param as a hash
     # is from old code and is not being used. Verification requested.
-    unless @topic.lock_at_changed?
+    if !@topic.lock_at_changed?
       if params.has_key?(:locked) && !params[:locked].is_a?(Hash)
         should_lock = value_to_boolean(params[:locked])
         if should_lock != @topic.locked?
@@ -1439,11 +1439,11 @@ class DiscussionTopicsController < ApplicationController
     return if discussion_topic_hash[:group_category_id].to_i == @topic.group_category_id
     return unless can_set_group_category?
 
-    discussion_topic_hash[:group_category] = if discussion_topic_hash[:group_category_id]
-                                               @context.group_categories.find(discussion_topic_hash[:group_category_id])
-                                             else
-                                               nil
-                                             end
+    if discussion_topic_hash[:group_category_id]
+      discussion_topic_hash[:group_category] = @context.group_categories.find(discussion_topic_hash[:group_category_id])
+    else
+      discussion_topic_hash[:group_category] = nil
+    end
   end
 
   def can_set_group_category?
@@ -1497,7 +1497,7 @@ class DiscussionTopicsController < ApplicationController
         @topic.transaction do
           att = @topic.attachment
           @topic.attachment = nil
-          @topic.save! unless @topic.new_record?
+          @topic.save! if !@topic.new_record?
           att.destroy
         end
       end
@@ -1552,7 +1552,7 @@ class DiscussionTopicsController < ApplicationController
         hash[:assignment] ||= {}
       end
 
-      unless hash[:assignment].nil?
+      if !hash[:assignment].nil?
         if params[:due_at]
           hash[:assignment][:due_at] = params[:due_at].empty? || params[:due_at] == "null" ? nil : params[:due_at]
         end

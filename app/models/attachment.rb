@@ -464,7 +464,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def after_extension
-    res = self.extension[1..] rescue nil
+    res = self.extension[1..-1] rescue nil
     res = nil if res == "" || res == "unknown"
     res
   end
@@ -586,7 +586,7 @@ class Attachment < ActiveRecord::Base
       self.workflow_state = nil
       self.file_state = 'available'
     end
-    self.md5 = (details[:etag] || "").delete('"')
+    self.md5 = (details[:etag] || "").gsub(/"/, '')
     self.content_type = details[:content_type]
     self.size = details[:content_length]
 
@@ -625,7 +625,7 @@ class Attachment < ActiveRecord::Base
   def ajax_upload_params(local_upload_url, s3_success_url, options = {})
     # Build the data that will be needed for the user to upload to s3
     # without us being the middle-man
-    sanitized_filename = full_filename.tr('+', " ")
+    sanitized_filename = full_filename.gsub(/\+/, " ")
     policy = {
       'expiration' => (options[:expiration] || S3_EXPIRATION_TIME).from_now.utc.iso8601,
       'conditions' => [
@@ -661,7 +661,7 @@ class Attachment < ActiveRecord::Base
     end
     policy['conditions'] += extras
 
-    policy_encoded = Base64.encode64(policy.to_json).delete("\n")
+    policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
     sig_key, sig_val = self.store.sign_policy(policy_encoded, options[:datetime])
 
     res[:id] = id
@@ -692,7 +692,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def unencoded_filename
-    CGI.unescape(self.filename || t(:default_filename, "File"))
+    CGI::unescape(self.filename || t(:default_filename, "File"))
   end
 
   def quota_exemption_key
@@ -755,11 +755,11 @@ class Attachment < ActiveRecord::Base
   def handle_duplicates(method, opts = {})
     return [] unless method.present? && self.folder
 
-    method = if self.folder.for_submissions?
-               :rename
-             else
-               method.to_sym
-             end
+    if self.folder.for_submissions?
+      method = :rename
+    else
+      method = method.to_sym
+    end
 
     if method == :overwrite
       atts = self.shard.activate { self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id).to_a }
@@ -843,7 +843,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def inline_content?
-    self.content_type.start_with?('text') || self.extension == '.html' || self.extension == '.htm' || self.extension == '.swf'
+    self.content_type.match(/\Atext/) || self.extension == '.html' || self.extension == '.htm' || self.extension == '.swf'
   end
 
   def self.shared_secret
@@ -1437,11 +1437,11 @@ class Attachment < ActiveRecord::Base
   def self.build_content_types_sql(types)
     clauses = []
     types.each do |type|
-      clauses << if type.include? '/'
-                   sanitize_sql_array(["(attachments.content_type=?)", type])
-                 else
-                   wildcard('attachments.content_type', type + '/', :type => :right)
-                 end
+      if type.include? '/'
+        clauses << sanitize_sql_array(["(attachments.content_type=?)", type])
+      else
+        clauses << wildcard('attachments.content_type', type + '/', :type => :right)
+      end
     end
     clauses.join(' OR ')
   end
@@ -1907,7 +1907,9 @@ class Attachment < ActiveRecord::Base
   # filenames, in which case it'll test against those, or a block that'll be
   # called repeatedly with a filename until it returns true.
   def self.make_unique_filename(filename, existing_files = [], attempts = 1, &block)
-    block ||= proc { |fname| !existing_files.include?(fname) }
+    unless block
+      block = proc { |fname| !existing_files.include?(fname) }
+    end
 
     return filename if attempts <= 1 && block.call(filename)
 
@@ -1982,7 +1984,7 @@ class Attachment < ActiveRecord::Base
       second_dot = uri.host.rindex('.', first_dot - 1) if first_dot
       return ["file_download", uri.host] unless second_dot
 
-      ["file_download", uri.host[second_dot + 1..]]
+      ["file_download", uri.host[second_dot + 1..-1]]
     end
   end
 
@@ -2118,13 +2120,13 @@ class Attachment < ActiveRecord::Base
   end
 
   def set_publish_state_for_usage_rights
-    self.locked = if self.context &&
-                     (!self.folder || !self.folder.for_submissions?) &&
-                     self.context.respond_to?(:usage_rights_required?) && self.context.usage_rights_required?
-                    self.usage_rights.nil?
-                  else
-                    false
-                  end
+    if self.context &&
+       (!self.folder || !self.folder.for_submissions?) &&
+       self.context.respond_to?(:usage_rights_required?) && self.context.usage_rights_required?
+      self.locked = self.usage_rights.nil?
+    else
+      self.locked = false
+    end
   end
 
   # Download a URL using a GET request and return a new un-saved Attachment

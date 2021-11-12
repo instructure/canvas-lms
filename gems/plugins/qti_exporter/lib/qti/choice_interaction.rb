@@ -73,7 +73,7 @@ module Qti
       if is_either_or
         @question[:answers].each do |a|
           split = a[:text].split(/_|\./)
-          a[:text] = /true/i.match?(split[2]) ? split[0] : split[1]
+          a[:text] = split[2] =~ /true/i ? split[0] : split[1]
         end
       end
     end
@@ -123,18 +123,18 @@ module Qti
               answer[:text] = choice.text.strip
             else
               sanitized = sanitize_html!(choice.at_css('div[class=html]') ? Nokogiri::HTML5.fragment(choice.text) : choice, true)
-              if sanitized.present? && sanitized != CGI.escapeHTML(answer[:text])
+              if sanitized.present? && sanitized != CGI::escapeHTML(answer[:text])
                 answer[:html] = sanitized
               end
             end
           end
 
           if answer[:text] == ""
-            answer[:text] = if /true|false/i.match?(answer[:migration_id])
-                              clear_html(answer[:migration_id])
-                            else
-                              DEFAULT_ANSWER_TEXT
-                            end
+            if answer[:migration_id] =~ /true|false/i
+              answer[:text] = clear_html(answer[:migration_id])
+            else
+              answer[:text] = DEFAULT_ANSWER_TEXT
+            end
           end
           if @flavor == Qti::Flavors::BBLEARN && @question[:question_type] == 'true_false_question' && choice['identifier'] =~ /true|false/i
             answer[:text] = choice['identifier']

@@ -10258,7 +10258,7 @@ describe Assignment do
   end
 
   def setup_differentiated_assignments(opts = {})
-    unless opts[:course]
+    if !opts[:course]
       course_with_teacher(active_all: true)
     end
 

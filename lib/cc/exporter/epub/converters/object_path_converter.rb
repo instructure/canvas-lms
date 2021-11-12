@@ -70,8 +70,8 @@ module CC::Exporter::Epub::Converters
     def object_path_selector
       return [
         "a", [
-          "[href*='#{OBJECT_TOKEN.delete('$')}']",
-          "[href*='#{WIKI_TOKEN.delete('$')}']"
+          "[href*='#{OBJECT_TOKEN.gsub('$', '')}']",
+          "[href*='#{WIKI_TOKEN.gsub('$', '')}']"
         ].join(',')
       ].join
     end

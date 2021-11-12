@@ -254,7 +254,7 @@ class UsersController < ApplicationController
   end
 
   def oauth
-    unless feature_and_service_enabled?(params[:service])
+    if !feature_and_service_enabled?(params[:service])
       flash[:error] = t('service_not_enabled', "That service has not been enabled")
       return redirect_to(user_profile_url(@current_user))
     end
@@ -445,7 +445,7 @@ class UsersController < ApplicationController
       return_url = session[:masquerade_return_to]
       session.delete(:masquerade_return_to)
       @current_user.associate_with_shard(@user.shard, :shadow) if PageView.db?
-      if /.*\/users\/#{@user.id}\/masquerade/.match?(request.referer)
+      if request.referer =~ /.*\/users\/#{@user.id}\/masquerade/
         return return_to(return_url, dashboard_url)
       else
         return return_to(return_url, request.referer || dashboard_url)
@@ -491,7 +491,7 @@ class UsersController < ApplicationController
 
     @show_footer = true
 
-    if %r{\A/dashboard\z}.match?(request.path)
+    if request.path =~ %r{\A/dashboard\z}
       return redirect_to(dashboard_url, :status => :moved_permanently)
     end
 
@@ -2205,7 +2205,7 @@ class UsersController < ApplicationController
         render :json => @user
       end
     else
-      unless session["reported_#{@user.id}".to_sym]
+      if !session["reported_#{@user.id}".to_sym]
         @user.report_avatar_image!
       end
       session["reports_#{@user.id}".to_sym] = true
@@ -2216,7 +2216,7 @@ class UsersController < ApplicationController
   def report_avatar_image
     @user = User.find(params[:user_id])
     key = "reported_#{@user.id}"
-    unless session[key]
+    if !session[key]
       session[key] = true
       @user.report_avatar_image!
     end

@@ -33,7 +33,7 @@ module Qti
     attr_reader :package_root, :identifier, :href, :interaction_type, :title, :question
 
     def initialize(opts)
-      @log = Canvas::Migration.logger
+      @log = Canvas::Migration::logger
       reset_local_ids
       @manifest_node = opts[:manifest_node]
       @migration_type = opts[:interaction_type]
@@ -74,11 +74,11 @@ module Qti
     end
 
     def create_xml_doc
-      @doc = if @manifest_node
-               Nokogiri::XML(File.open(@href))
-             else
-               Nokogiri::XML(@qti_data)
-             end
+      if @manifest_node
+        @doc = Nokogiri::XML(File.open(@href))
+      else
+        @doc = Nokogiri::XML(@qti_data)
+      end
     end
 
     EXCLUDED_QUESTION_TEXT_CLASSES = ["RESPONSE_BLOCK", "RIGHT_MATCH_BLOCK"]
@@ -89,7 +89,7 @@ module Qti
         @question[:question_name] = @title || get_node_att(@doc, 'assessmentItem', 'title')
         # The colons are replaced with dashes in the conversion from QTI 1.2
         @question[:migration_id] = get_node_att(@doc, 'assessmentItem', 'identifier')
-        @question[:migration_id] = @question[:migration_id].tr(':', '-').gsub('identifier=', '') if @question[:migration_id]
+        @question[:migration_id] = @question[:migration_id].gsub(/:/, '-').gsub('identifier=', '') if @question[:migration_id]
 
         if @flavor == Qti::Flavors::D2L
           # In D2L-generated QTI the assessments reference the items by the label instead of the identifier
@@ -126,11 +126,11 @@ module Qti
           @question[:question_text] = ''
           text_nodes.each_with_index do |node, i|
             @question[:question_text] += "\n<br/>\n" if i > 0
-            @question[:question_text] += if node['class'] == 'html'
-                                           sanitize_html_string(node.text)
-                                         else
-                                           sanitize_html!(node)
-                                         end
+            if node['class'] == 'html'
+              @question[:question_text] += sanitize_html_string(node.text)
+            else
+              @question[:question_text] += sanitize_html!(node)
+            end
           end
         elsif @doc.at_css('itemBody associateInteraction prompt')
           @question[:question_text] = "" # apparently they deliberately had a blank question?
@@ -262,15 +262,15 @@ module Qti
     def get_feedback
       @doc.search('modalFeedback').each do |f|
         id = f['identifier']
-        if /wrong|incorrect|(_IC$)/i.match?(id)
+        if id =~ /wrong|incorrect|(_IC$)/i
           extract_feedback!(@question, :incorrect_comments, f)
-        elsif /correct|(_C$)/i.match?(id)
+        elsif id =~ /correct|(_C$)/i
           if f.at_css('div.solution')
             @question[:example_solution] = clear_html(f.text.strip.gsub(/\s+/, " "))
           else
             extract_feedback!(@question, :correct_comments, f)
           end
-        elsif /solution/i.match?(id)
+        elsif id =~ /solution/i
           @question[:example_solution] = clear_html(f.text.strip.gsub(/\s+/, " "))
         elsif (@flavor == Qti::Flavors::D2L && f.text.present?) || id =~ /general_|_all/i
           extract_feedback!(@question, :neutral_comments, f)
@@ -405,7 +405,7 @@ module Qti
       end
       # Sometimes individual answers are assigned general feedback, don't return
       # the identifier if that's the case
-      /general_|_all|wrong|incorrect|correct|(_IC$)|(_C$)/i.match?(id) ? nil : id
+      id =~ /general_|_all|wrong|incorrect|correct|(_IC$)|(_C$)/i ? nil : id
     end
   end
 end

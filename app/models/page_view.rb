@@ -206,13 +206,14 @@ class PageView < ActiveRecord::Base
     @blank_template ||= columns.inject({}) { |h, c| h[c.name] = nil; h }
     attrs = attrs.slice(*@blank_template.keys)
     shard = PageView.global_storage_namespace? ? Shard.birth : Shard.current
-    shard.activate do
+    page_view = shard.activate do
       if new_record
         new { |pv| pv.assign_attributes(attrs) }
       else
         instantiate(@blank_template.merge(attrs))
       end
     end
+    page_view
   end
 
   def self.updates_enabled?
@@ -408,11 +409,11 @@ class PageView < ActiveRecord::Base
     def initialize(skip_deleted_accounts = true, start_at = nil)
       super(start_at || 52.weeks.ago, Rails.logger)
 
-      account_ids = if skip_deleted_accounts
-                      Set.new(Account.root_accounts.active.pluck(:id))
-                    else
-                      Set.new(Account.root_accounts.pluck(:id))
-                    end
+      if skip_deleted_accounts
+        account_ids = Set.new(Account.root_accounts.active.pluck(:id))
+      else
+        account_ids = Set.new(Account.root_accounts.pluck(:id))
+      end
 
       load_migration_data(account_ids)
     end
@@ -423,7 +424,7 @@ class PageView < ActiveRecord::Base
         data = self.migration_data[account_id] = {}
         data.merge!(cassandra.execute("SELECT last_created_at FROM page_views_migration_metadata_per_account WHERE shard_id = ? AND account_id = ?", Shard.current.id.to_s, account_id).fetch.try(:to_hash) || {})
 
-        unless data['last_created_at']
+        if !(data['last_created_at'])
           data['last_created_at'] = self.start_at
         end
         # cassandra returns Time not TimeWithZone objects

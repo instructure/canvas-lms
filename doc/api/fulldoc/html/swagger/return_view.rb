@@ -54,7 +54,7 @@ class ReturnView < ReturnViewNull
   end
 
   def type
-    @line.delete('[').delete(']')
+    @line.gsub('[', '').gsub(']', '')
   end
 
   def to_swagger
