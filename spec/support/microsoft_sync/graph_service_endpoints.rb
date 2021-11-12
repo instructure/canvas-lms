@@ -60,7 +60,8 @@ RSpec.shared_context 'microsoft_sync_graph_service_endpoints' do
 
   after { WebMock.enable_net_connect! }
 
-  let(:service) { MicrosoftSync::GraphService.new('mytenant', extra_tag: 'abc') }
+  let(:http) { MicrosoftSync::GraphService::Http.new('mytenant', extra_tag: 'abc') }
+  let(:endpoints) { described_class.new(http) }
   let(:url) { nil }
   let(:url_variables) { [] }
 
@@ -203,7 +204,7 @@ RSpec.shared_context 'microsoft_sync_graph_service_endpoints' do
   end
 
   shared_examples_for 'a paginated list endpoint' do
-    subject { service.send(method_name, *method_args) }
+    subject { endpoints.send(method_name, *method_args) }
 
     let(:http_method) { :get }
     let(:expected_first_page_results) { [{ 'id' => 'page_item1' }] }
@@ -217,7 +218,7 @@ RSpec.shared_context 'microsoft_sync_graph_service_endpoints' do
       end
 
       context 'when a filter is used' do
-        subject { service.send(method_name, *method_args, filter: { 'abc' => "d'ef" }) }
+        subject { endpoints.send(method_name, *method_args, filter: { 'abc' => "d'ef" }) }
 
         let(:with_params) { { query: { '$filter' => "abc eq 'd''ef'" } } }
 
@@ -226,7 +227,7 @@ RSpec.shared_context 'microsoft_sync_graph_service_endpoints' do
 
       context 'when a filter and select are used' do
         subject do
-          service.send(
+          endpoints.send(
             method_name, *method_args,
             filter: { userPrincipalName: %w[user1@domain.com user2@domain.com] },
             select: %w[id userPrincipalName]
@@ -253,7 +254,7 @@ RSpec.shared_context 'microsoft_sync_graph_service_endpoints' do
 
       let(:all_pages) do
         [].tap do |pages|
-          service.send(method_name, *method_args) do |page|
+          endpoints.send(method_name, *method_args) do |page|
             pages << page
           end
         end
@@ -303,7 +304,7 @@ RSpec.shared_context 'microsoft_sync_graph_service_endpoints' do
 
   shared_examples_for 'an endpoint that uses up quota' do |read_and_write_points_array|
     it 'sends the quota to GraphService::Http#request' do
-      expect(service.http).to receive(:request)
+      expect(endpoints.http).to receive(:request)
         .with(anything, anything, hash_including(quota: read_and_write_points_array))
         .and_call_original
       subject
