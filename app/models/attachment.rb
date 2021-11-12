@@ -1351,7 +1351,9 @@ class Attachment < ActiveRecord::Base
     @hidden = self.file_state == 'hidden' || (self.folder && self.folder.hidden?)
   end
 
-  def published?; !locked?; end
+  def published?
+    !locked?
+  end
 
   def publish!
     self.locked = false
@@ -1852,7 +1854,7 @@ class Attachment < ActiveRecord::Base
       attachment = context.attachments.where(migration_id: id).first
       description += "<li><a href='/courses/#{context.id}/files/#{attachment.id}/download'>#{ERB::Util.h(attachment.display_name)}</a></li>" if attachment
     end
-    description += "</ul>";
+    description += "</ul>"
     description
   end
 
@@ -1888,11 +1890,17 @@ class Attachment < ActiveRecord::Base
   end
 
   # deprecated
-  def self.domain_namespace=(val); self.current_root_account = val; end
+  def self.domain_namespace=(val)
+    self.current_root_account = val
+  end
 
-  def self.domain_namespace; self.current_namespace; end
+  def self.domain_namespace
+    self.current_namespace
+  end
 
-  def self.serialization_methods; [:mime_class, :currently_locked, :crocodoc_available?]; end
+  def self.serialization_methods
+    [:mime_class, :currently_locked, :crocodoc_available?]
+  end
   cattr_accessor :skip_thumbnails
 
   scope :uploadable, -> { where(:workflow_state => 'pending_upload') }
@@ -1900,7 +1908,9 @@ class Attachment < ActiveRecord::Base
   scope :deleted, -> { where(:file_state => 'deleted') }
   scope :by_display_name, -> { order(display_name_order_by_clause('attachments')) }
   scope :by_position_then_display_name, -> { order(:position, display_name_order_by_clause('attachments')) }
-  def self.serialization_excludes; [:uuid, :namespace]; end
+  def self.serialization_excludes
+    [:uuid, :namespace]
+  end
 
   # returns filename, if it's already unique, or returns a modified version of
   # filename that makes it unique. you can either pass existing_files as string

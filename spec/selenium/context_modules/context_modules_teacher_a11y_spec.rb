@@ -93,9 +93,13 @@ describe "context modules" do
       get "/courses/#{@course.id}/modules"
       mod1 = f("#context_module_#{modules[1].id}")
       f(".ig-header-admin .al-trigger", mod1).click
-      f('.edit_module_link', mod1).click; wait_for_ajaximations
+      f('.edit_module_link', mod1).click
+      wait_for_ajaximations
       add_button = f(".add_prerequisite_link")
-      2.times { add_button.click; wait_for_animations }
+      2.times {
+        add_button.click
+        wait_for_animations
+      }
       links = ff(".prerequisites_list .criteria_list .delete_criterion_link")
       expect(links.size).to eq 2
       links[1].click

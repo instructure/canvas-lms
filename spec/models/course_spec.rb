@@ -1654,9 +1654,12 @@ describe Course do
     end
 
     it "allows ordering by user's sortable name" do
-      @user1.sortable_name = 'jonny'; @user1.save
-      @user2.sortable_name = 'bob'; @user2.save
-      @user3.sortable_name = 'richard'; @user3.save
+      @user1.sortable_name = 'jonny'
+      @user1.save
+      @user2.sortable_name = 'bob'
+      @user2.save
+      @user3.sortable_name = 'richard'
+      @user3.save
       users = @course.users_not_in_groups([], order: User.sortable_name_order_by_clause('users'))
       expect(users.map { |u| u.id }).to eq [@user2.id, @user1.id, @user3.id]
     end

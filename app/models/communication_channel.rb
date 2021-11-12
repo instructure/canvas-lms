@@ -472,7 +472,9 @@ class CommunicationChannel < ActiveRecord::Base
   end
   protected :assert_path_type
 
-  def self.serialization_excludes; [:confirmation_code]; end
+  def self.serialization_excludes
+    [:confirmation_code]
+  end
 
   def self.associated_shards(_path)
     [Shard.default]

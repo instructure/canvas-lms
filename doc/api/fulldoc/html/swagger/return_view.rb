@@ -21,9 +21,13 @@
 require 'hash_view'
 
 class ReturnViewNull < HashView
-  def array?; false; end
+  def array?
+    false
+  end
 
-  def type; nil; end
+  def type
+    nil
+  end
 
   def to_hash
     {

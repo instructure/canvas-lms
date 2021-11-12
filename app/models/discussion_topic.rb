@@ -361,7 +361,9 @@ class DiscussionTopic < ActiveRecord::Base
     posters.each { |user| self.context_module_action(user, :contributed) }
   end
 
-  def is_announcement; false end
+  def is_announcement
+    false
+  end
 
   def homeroom_announcement?(_context)
     false

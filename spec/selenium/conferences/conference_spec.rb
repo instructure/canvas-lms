@@ -156,7 +156,7 @@ describe 'Web conferences' do
         cog_menu_item = f('.al-trigger')
         edit_conference(cog_menu_item: cog_menu_item, cancel: false)
 
-        duration_edit_field = f('#web_conference_duration');
+        duration_edit_field = f('#web_conference_duration')
 
         expect(duration_edit_field).to be_displayed # input field w/in editor
         # value is localized

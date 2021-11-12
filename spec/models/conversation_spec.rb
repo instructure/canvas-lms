@@ -455,7 +455,7 @@ describe Conversation do
       end
 
       recipients = create_users(5, return_type: :record)
-      conversation = Conversation.initiate(recipients, false).add_message(sender, 'test', :cc_author => true);
+      conversation = Conversation.initiate(recipients, false).add_message(sender, 'test', :cc_author => true)
 
       # check that our sender recieved a conversation created notification
       expect(conversation.messages_sent).to include("Conversation Created")

@@ -55,7 +55,8 @@ describe "Modules API", type: :request do
                                                :require_sequential_progress => true)
     @module2.prerequisites = "module_#{@module1.id}"
     @wiki_page = @course.wiki_pages.create!(:title => "Front Page", :body => "")
-    @wiki_page.workflow_state = 'active'; @wiki_page.save!
+    @wiki_page.workflow_state = 'active'
+    @wiki_page.save!
     @wiki_page_tag = @module2.add_item(:id => @wiki_page.id, :type => 'wiki_page')
 
     @module3 = @course.context_modules.create(:name => "module3")
@@ -913,7 +914,8 @@ describe "Modules API", type: :request do
 
   context "differentiated assignments" do
     before(:once) do
-      @assignment.only_visible_to_overrides = true; @assignment.save!
+      @assignment.only_visible_to_overrides = true
+      @assignment.save!
       @other_section = @course.course_sections.create! name: "other section"
       create_section_override_for_assignment(@assignment, { course_section: @other_section })
     end

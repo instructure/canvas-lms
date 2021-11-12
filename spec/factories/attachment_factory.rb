@@ -23,7 +23,9 @@ Attachment.class_eval do
   # Marshal.load. since there's only a single spec in the entire suite
   # that wants a non-downloadable attachment, this is going to be a more
   # performant approach
-  def downloadable?; true; end
+  def downloadable?
+    true
+  end
 
   # fix so we can once-ler attachment instances. in order to
   # Marshal.dump, you can't have any singleton methods (which our

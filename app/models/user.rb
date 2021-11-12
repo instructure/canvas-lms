@@ -728,12 +728,16 @@ class User < ActiveRecord::Base
 
   # These methods can be overridden by a plugin if you want to have an approval
   # process or implement additional tracking for new users
-  def registration_approval_required?; false; end
+  def registration_approval_required?
+    false
+  end
 
   def new_registration(form_params = {}); end
 
   # DEPRECATED, override new_registration instead
-  def new_teacher_registration(form_params = {}); new_registration(form_params); end
+  def new_teacher_registration(form_params = {})
+    new_registration(form_params)
+  end
 
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it

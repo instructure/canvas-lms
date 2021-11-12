@@ -1143,7 +1143,11 @@ class Account < ActiveRecord::Base
     account_roles = available_custom_account_roles(include_inactive)
     account_roles << Role.get_built_in_role('AccountAdmin', root_account_id: resolved_root_account_id)
     if user
-      account_roles.select! { |role| au = account_users.new; au.role_id = role.id; au.grants_right?(user, :create) }
+      account_roles.select! { |role|
+        au = account_users.new
+        au.role_id = role.id
+        au.grants_right?(user, :create)
+      }
     end
     account_roles
   end
@@ -1241,7 +1245,11 @@ class Account < ActiveRecord::Base
       shard.activate do
         all_site_admin_account_users_hash = MultiCache.fetch("all_site_admin_account_users3") do
           # this is a plain ruby hash to keep the cached portion as small as possible
-          self.account_users.active.inject({}) { |result, au| result[au.user_id] ||= []; result[au.user_id] << [au.id, au.role_id]; result }
+          self.account_users.active.inject({}) { |result, au|
+            result[au.user_id] ||= []
+            result[au.user_id] << [au.id, au.role_id]
+            result
+          }
         end
         (all_site_admin_account_users_hash[user.id] || []).map do |(id, role_id)|
           au = AccountUser.new

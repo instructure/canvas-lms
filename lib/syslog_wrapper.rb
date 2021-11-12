@@ -24,16 +24,26 @@ require 'syslog'
 class SyslogWrapper
   attr_accessor :level, :datetime_format
 
-  def formatter; nil; end
+  def formatter
+    nil
+  end
 
   @@silencer = true
-  def self.silencer; @@silencer; end
+  def self.silencer
+    @@silencer
+  end
 
-  def silencer; @@silencer; end
+  def silencer
+    @@silencer
+  end
 
-  def self.silencer=(obj); @@silencer = obj; end
+  def self.silencer=(obj)
+    @@silencer = obj
+  end
 
-  def silencer=(obj); @@silencer = obj; end
+  def silencer=(obj)
+    @@silencer = obj
+  end
 
   def silence(temporary_level = Logger::ERROR)
     if silencer
@@ -110,27 +120,51 @@ class SyslogWrapper
   end
   alias_method :log, :add
 
-  def <<(msg); add(@level, msg); end
+  def <<(msg)
+    add(@level, msg)
+  end
 
-  def debug(progname = nil, &block); add(Logger::DEBUG, nil, progname, &block); end
+  def debug(progname = nil, &block)
+    add(Logger::DEBUG, nil, progname, &block)
+  end
 
-  def info(progname = nil, &block); add(Logger::INFO, nil, progname, &block); end
+  def info(progname = nil, &block)
+    add(Logger::INFO, nil, progname, &block)
+  end
 
-  def warn(progname = nil, &block); add(Logger::WARN, nil, progname, &block); end
+  def warn(progname = nil, &block)
+    add(Logger::WARN, nil, progname, &block)
+  end
 
-  def error(progname = nil, &block); add(Logger::ERROR, nil, progname, &block); end
+  def error(progname = nil, &block)
+    add(Logger::ERROR, nil, progname, &block)
+  end
 
-  def fatal(progname = nil, &block); add(Logger::FATAL, nil, progname, &block); end
+  def fatal(progname = nil, &block)
+    add(Logger::FATAL, nil, progname, &block)
+  end
 
-  def unknown(progname = nil, &block); add(Logger::UNKNOWN, nil, progname, &block); end
+  def unknown(progname = nil, &block)
+    add(Logger::UNKNOWN, nil, progname, &block)
+  end
 
-  def debug?; @level <= Logger::DEBUG; end
+  def debug?
+    @level <= Logger::DEBUG
+  end
 
-  def info?; @level <= Logger::INFO; end
+  def info?
+    @level <= Logger::INFO
+  end
 
-  def warn?; @level <= Logger::WARN; end
+  def warn?
+    @level <= Logger::WARN
+  end
 
-  def error?; @level <= Logger::ERROR; end
+  def error?
+    @level <= Logger::ERROR
+  end
 
-  def fatal?; @level <= Logger::FATAL; end
+  def fatal?
+    @level <= Logger::FATAL
+  end
 end

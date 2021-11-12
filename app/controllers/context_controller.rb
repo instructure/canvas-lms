@@ -168,7 +168,10 @@ class ContextController < ApplicationController
       @users = @context.users.where(show_user_services: true).order_by_sortable_name
       @users_hash = {}
       @users_order_hash = {}
-      @users.each_with_index { |u, i| @users_hash[u.id] = u; @users_order_hash[u.id] = i }
+      @users.each_with_index { |u, i|
+        @users_hash[u.id] = u
+        @users_order_hash[u.id] = i
+      }
       @current_user_services = {}
       @current_user.user_services.select { |s| feature_and_service_enabled?(s.service) }.each { |s| @current_user_services[s.service] = s }
       @services = UserService.for_user(@users.except(:select, :order)).sort_by { |s| @users_order_hash[s.user_id] || CanvasSort::Last }

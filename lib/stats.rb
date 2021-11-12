@@ -56,11 +56,17 @@ module Stats
     end
     alias_method :push, :<<
 
-    def size; @items.size; end
+    def size
+      @items.size
+    end
     alias_method :count, :size
-    def empty?; @items.size == 0; end
+    def empty?
+      @items.size == 0
+    end
 
-    def mean; @items.empty? ? nil : (sum.to_f / @items.size); end
+    def mean
+      @items.empty? ? nil : (sum.to_f / @items.size)
+    end
     alias_method :avg, :mean
 
     # population variance
@@ -73,7 +79,9 @@ module Stats
     alias_method :variance, :var
 
     # population standard deviation
-    def stddev; @items.empty? ? nil : Math.sqrt(variance); end
+    def stddev
+      @items.empty? ? nil : Math.sqrt(variance)
+    end
     alias_method :standard_deviation, :stddev
 
     def quartiles

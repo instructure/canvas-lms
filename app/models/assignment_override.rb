@@ -171,9 +171,13 @@ class AssignmentOverride < ActiveRecord::Base
   end
   private :touch_assignment
 
-  def assignment?; !!assignment_id; end
+  def assignment?
+    !!assignment_id
+  end
 
-  def quiz?; !!quiz_id; end
+  def quiz?
+    !!quiz_id
+  end
 
   workflow do
     state :active

@@ -1038,7 +1038,7 @@ class Submission < ActiveRecord::Base
     retry_mins = 2**attempt
     if retry_mins > 240
       # cap the retry max wait to 4 hours
-      retry_mins = 240;
+      retry_mins = 240
     end
     # if attempt <= 0, then that means no retries should be attempted
     delay(run_at: retry_mins.minutes.from_now).check_vericite_status(attempt + 1) if attempt > 0 && needs_retry

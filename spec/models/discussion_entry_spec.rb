@@ -444,8 +444,10 @@ describe DiscussionEntry do
 
     it "allows a complex series of read/unread updates" do
       @s1 = @student
-      student_in_course(:active_all => true); @s2 = @student
-      student_in_course(:active_all => true); @s3 = @student
+      student_in_course(:active_all => true)
+      @s2 = @student
+      student_in_course(:active_all => true)
+      @s3 = @student
 
       @topic.change_read_state("read", @s1)
       @entry.change_read_state("read", @s1)
@@ -479,13 +481,15 @@ describe DiscussionEntry do
       expect(@topic.read?(@s2)).to be_falsey
       expect(@entry.read?(@s2)).to be_falsey
 
-      student_in_course(:active_all => true); @s4 = @student
+      student_in_course(:active_all => true)
+      @s4 = @student
       expect(@topic.unread_count(@s4)).to eq 4
       @topic.change_all_read_state("unread", @s4)
       expect(@topic.read?(@s4)).to be_falsey
       expect(@entry.read?(@s4)).to be_falsey
 
-      student_in_course(:active_all => true); @s5 = @student
+      student_in_course(:active_all => true)
+      @s5 = @student
       @topic.change_all_read_state("read", @s5)
       expect(@topic.unread_count(@s5)).to eq 0
     end

@@ -162,7 +162,10 @@ class AssessmentQuestion < ActiveRecord::Base
 
     deep_translate = lambda do |obj|
       if obj.is_a?(Hash)
-        obj.inject(HashWithIndifferentAccess.new) { |h, (k, v)| h[k] = deep_translate.call(v); h }
+        obj.inject(HashWithIndifferentAccess.new) { |h, (k, v)|
+          h[k] = deep_translate.call(v)
+          h
+        }
       elsif obj.is_a?(Array)
         obj.map { |v| deep_translate.call(v) }
       elsif obj.is_a?(String)

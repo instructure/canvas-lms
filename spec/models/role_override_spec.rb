@@ -549,7 +549,10 @@ describe RoleOverride do
       end
 
       it "allows with account_allows on" do
-        Account.default.tap { |a| a.enable_user_notes = true; a.save! }
+        Account.default.tap { |a|
+          a.enable_user_notes = true
+          a.save!
+        }
         expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to_not eq []
         expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to_not eq []
       end

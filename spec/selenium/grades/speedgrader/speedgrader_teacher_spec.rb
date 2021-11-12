@@ -45,9 +45,12 @@ describe "speed grader" do
       user_logged_in(user: @ta, username: "imata@example.com")
 
       @section = @course.course_sections.create!
-      student_in_course(active_all: true); @student1 = @student
-      student_in_course(active_all: true); @student2 = @student
-      @enrollment.course_section = @section; @enrollment.save
+      student_in_course(active_all: true)
+      @student1 = @student
+      student_in_course(active_all: true)
+      @student2 = @student
+      @enrollment.course_section = @section
+      @enrollment.save
 
       @assignment.submission_types = "online_upload"
       @assignment.save!

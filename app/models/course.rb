@@ -2646,7 +2646,9 @@ class Course < ActiveRecord::Base
     true
   end
 
-  def self.serialization_excludes; [:uuid]; end
+  def self.serialization_excludes
+    [:uuid]
+  end
 
   # helper method to DRY-up some similar methods that all can be cached based on a user's enrollments
   def fetch_on_enrollments(key, user, opts = nil)
@@ -3506,7 +3508,7 @@ class Course < ActiveRecord::Base
         # get its id to move over sections and enrollments.  Setting this course to
         # deleted has to be last otherwise it would set all the enrollments to
         # deleted before they got moved
-        self.uuid = self.sis_source_id = self.sis_batch_id = self.integration_id = nil;
+        self.uuid = self.sis_source_id = self.sis_batch_id = self.integration_id = nil
         self.save!
         Course.process_as_sis { new_course.save! }
         self.course_sections.update_all(:course_id => new_course.id)

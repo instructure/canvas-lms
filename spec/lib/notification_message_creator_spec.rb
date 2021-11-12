@@ -280,15 +280,24 @@ describe NotificationMessageCreator do
 
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
 
-      nps.each { |np| np.frequency = 'never'; np.save! }
+      nps.each { |np|
+        np.frequency = 'never'
+        np.save!
+      }
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
 
-      nps.each { |np| np.frequency = 'daily'; np.save! }
+      nps.each { |np|
+        np.frequency = 'daily'
+        np.save!
+      }
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
 
-      nps.each { |np| np.frequency = 'weekly'; np.save! }
+      nps.each { |np|
+        np.frequency = 'weekly'
+        np.save!
+      }
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
     end

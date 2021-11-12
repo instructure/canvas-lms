@@ -94,7 +94,8 @@ class SortsAssignments
     end
 
     def without_graded_submission(assignments, submissions)
-      assignments ||= []; submissions ||= [];
+      assignments ||= []
+      submissions ||= []
       submissions_by_assignment = submissions.inject({}) do |memo, sub|
         memo[sub.assignment_id] = sub
         memo
