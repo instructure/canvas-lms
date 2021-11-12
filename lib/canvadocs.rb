@@ -247,7 +247,7 @@ module Canvadocs
     end
 
     # Set visibility for students and peer reviewers.
-    if !submission.user_can_read_grade?(current_user)
+    unless submission.user_can_read_grade?(current_user)
       session_params[:restrict_annotations_to_user_filter] = true
       session_params[:user_filter] ||= [
         user_filter_entry(

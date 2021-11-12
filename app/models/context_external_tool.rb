@@ -724,7 +724,7 @@ class ContextExternalTool < ActiveRecord::Base
     url = url.gsub(/[[:space:]]/, '')
     url = "http://" + url unless url.include?('://')
     res = Addressable::URI.parse(url).normalize
-    res.query = res.query.split(/&/).sort.join('&') if !res.query.blank?
+    res.query = res.query.split(/&/).sort.join('&') unless res.query.blank?
     res.to_s
   end
 
@@ -755,7 +755,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def standard_url
-    if !defined?(@standard_url)
+    unless defined?(@standard_url)
       @standard_url = !self.url.blank? && ContextExternalTool.standardize_url(self.url)
     end
     @standard_url
@@ -784,7 +784,7 @@ class ContextExternalTool < ActiveRecord::Base
       url = ContextExternalTool.standardize_url(url)
       return true if url == standard_url
     elsif standard_url.present?
-      if !defined?(@url_params)
+      unless defined?(@url_params)
         res = Addressable::URI.parse(standard_url)
         @url_params = res.query.present? ? res.query.split(/&/) : []
       end

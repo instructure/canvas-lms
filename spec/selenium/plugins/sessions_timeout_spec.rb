@@ -31,11 +31,11 @@ describe "Sessions Timeout" do
 
       it "requires session expiration to be at least 20 minutes" do
         get "/plugins/sessions"
-        if !f("#plugin_setting_disabled").displayed?
+        unless f("#plugin_setting_disabled").displayed?
           f("#accounts_select option:nth-child(2)").click
           expect(f("#plugin_setting_disabled")).to be_displayed
         end
-        if !f(".save_button").enabled?
+        unless f(".save_button").enabled?
           f(".copy_settings_button").click
         end
         f("#plugin_setting_disabled").click

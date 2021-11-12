@@ -1519,7 +1519,7 @@ class Course < ActiveRecord::Base
       AssignmentGroup.select("id, context_id, context_type").where(:context_type => "Course", :context_id => shard_courses)
     end.index_by(&:context_id)
     courses.each do |course|
-      if !groups[course.id]
+      unless groups[course.id]
         course.require_assignment_group rescue nil
       end
     end
@@ -2549,7 +2549,7 @@ class Course < ActiveRecord::Base
               new_folder_id = root_folder.id
             end
             # make sure the file has somewhere to go
-            if !new_folder_id
+            unless new_folder_id
               # gather mapping of needed folders from old course to new course
               old_folders = []
               old_folders << file.folder

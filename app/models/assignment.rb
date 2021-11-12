@@ -444,7 +444,7 @@ class Assignment < ActiveRecord::Base
       errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be changed if graded submissions exist")
     end
     if (moderated_grading_changed? || new_record?) && moderated_grading?
-      if !graded?
+      unless graded?
         errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be enabled for ungraded assignments")
       end
       if has_group_category?
@@ -2087,7 +2087,7 @@ class Assignment < ActiveRecord::Base
   def find_or_create_submission(user)
     Assignment.unique_constraint_retry do
       s = all_submissions.where(user_id: user).first
-      if !s
+      unless s
         s = submissions.build
         user.is_a?(User) ? s.user = user : s.user_id = user
         s.save!

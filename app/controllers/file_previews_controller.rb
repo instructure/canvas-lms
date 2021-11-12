@@ -53,7 +53,7 @@ class FilePreviewsController < ApplicationController
         url = GoogleDocsPreview.url_for(@file)
         redirect_to('//docs.google.com/viewer?' + { embedded: true, url: url }.to_query)
       # images
-      elsif %r{\Aimage/}.match?(@file.content_type)
+      elsif @file.content_type&.start_with?('image/')
         render template: 'file_previews/img_preview', layout: false
       # media files
       elsif %r{\A(audio|video)/}.match?(@file.content_type)

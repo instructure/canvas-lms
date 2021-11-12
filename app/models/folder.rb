@@ -93,7 +93,7 @@ class Folder < ActiveRecord::Base
   end
 
   def reject_recursive_folder_structures
-    return true if !self.parent_folder_id_changed?
+    return true unless self.parent_folder_id_changed?
 
     seen_folders = Set.new([self])
     folder = self

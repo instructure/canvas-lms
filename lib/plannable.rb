@@ -146,7 +146,7 @@ module Plannable
       @columns.flatten.each do |col|
         val = column_value(object, col)
         val = val.utc.strftime("%Y-%m-%d %H:%M:%S.%6N") if val.respond_to?(:strftime)
-        if !val.nil?
+        unless val.nil?
           bookmark << val
           break
         end

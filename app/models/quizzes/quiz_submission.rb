@@ -187,7 +187,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def data
     raise "Cannot view data for uncompleted quiz" unless self.completed?
-    raise "Cannot view data for uncompleted quiz" if !graded?
+    raise "Cannot view data for uncompleted quiz" unless graded?
 
     Utf8Cleaner.recursively_strip_invalid_utf8!(self.submission_data, true)
   end
@@ -546,7 +546,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     # we might be in the middle of a new attempt, in which case we don't want
     # to overwrite the score and fudge points when we save
-    self.reload if !self.completed?
+    self.reload unless self.completed?
 
     self.kept_score = to_be_kept_score
     self.without_versioning(&:save)

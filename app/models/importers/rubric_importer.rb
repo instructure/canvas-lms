@@ -46,7 +46,7 @@ module Importers
       if !item && hash[:external_identifier]
         rubric = context.available_rubric(hash[:external_identifier]) unless migration.cross_institution?
 
-        if !rubric
+        unless rubric
           Rails.logger.warn("The external Rubric couldn't be found for \"#{hash[:title]}\", creating a copy.")
         end
       end

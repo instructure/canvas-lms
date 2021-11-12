@@ -54,7 +54,7 @@ module SIS
 
         course = AbstractCourse.where(root_account_id: @root_account, sis_source_id: abstract_course_id).take
         course ||= AbstractCourse.new
-        if !course.stuck_sis_fields.include?(:enrollment_term_id)
+        unless course.stuck_sis_fields.include?(:enrollment_term_id)
           course.enrollment_term = @root_account.enrollment_terms.where(sis_source_id: term_id).take || @root_account.default_enrollment_term
         end
         course.root_account = @root_account

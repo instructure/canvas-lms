@@ -160,7 +160,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   def infer_position
-    if !self.position
+    unless self.position
       positions = ContextModule.module_positions(self.context)
       self.position = if (max = positions.values.max)
                         max + 1

@@ -46,7 +46,7 @@ class EportfolioEntry < ActiveRecord::Base
   end
 
   def infer_comment_visibility
-    self.show_comments = false if !self.allow_comments
+    self.show_comments = false unless self.allow_comments
     true
   end
   protected :infer_comment_visibility

@@ -42,7 +42,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       # first try to pull the view from the secondary. we can't just do this in the
       # unique_constraint_retry since it begins a transaction.
       view = GuardRail.activate(:secondary) { self.where(discussion_topic_id: discussion_topic).first }
-      if !view
+      unless view
         # if the view wasn't found, drop into the unique_constraint_retry
         # transaction loop on master.
         unique_constraint_retry do
@@ -111,7 +111,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   # if opts[:include_new_entries] is true, it will also return all the entries
   # that have been created or updated since the view was generated.
   def materialized_view_json(opts = {})
-    if !up_to_date?
+    unless up_to_date?
       update_materialized_view(xlog_location: self.class.current_xlog_location)
     end
 
@@ -140,7 +140,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   def update_materialized_view(xlog_location: nil, use_master: false)
     unless use_master
       timeout = Setting.get("discussion_materialized_view_replication_timeout", "60").to_i.seconds
-      if !self.class.wait_for_replication(start: xlog_location, timeout: timeout)
+      unless self.class.wait_for_replication(start: xlog_location, timeout: timeout)
         # failed to replicate - requeue later
         run_at = Setting.get("discussion_materialized_view_replication_failure_retry", "300").to_i.seconds.from_now
         delay(singleton: "materialized_discussion:#{Shard.birth.activate { self.discussion_topic_id }}", run_at: run_at)

@@ -497,7 +497,7 @@ class Account < ActiveRecord::Base
   end
 
   def require_acceptance_of_terms?(user)
-    return false if !terms_required?
+    return false unless terms_required?
     return true if user.nil? || user.new_record?
 
     soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime
@@ -1828,7 +1828,7 @@ class Account < ActiveRecord::Base
     # set the type to custom for any existing custom links that don't have a type set
     # the new ui will set the type ('custom' or 'default') for any new custom links
     # since we now allow reordering the links, the default links get stored in the settings as well
-    if !links.blank?
+    unless links.blank?
       links.each do |link|
         if link[:type].blank?
           link[:type] = 'custom'

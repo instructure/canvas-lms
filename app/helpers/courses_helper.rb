@@ -49,7 +49,7 @@ module CoursesHelper
       else
         icon_data = [t('#courses.recent_event.not_submitted', 'not submitted')] + event_type
       end
-      icon_data[0] = nil if !recent_event.expects_submission?
+      icon_data[0] = nil unless recent_event.expects_submission?
     elsif !student_only && can_do(context, current_user, :manage_grades)
       # no submissions
       icon_data = if !recent_event.has_submitted_submissions?

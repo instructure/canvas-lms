@@ -1357,7 +1357,7 @@ class DiscussionTopic < ActiveRecord::Base
   def users_with_permissions(users)
     permission = self.is_announcement ? :read_announcements : :read_forum
     course = self.course
-    if !course.is_a?(Course)
+    unless course.is_a?(Course)
       return users.select do |u|
         self.is_announcement ? self.context.grants_right?(u, :read_announcements) : self.context.grants_right?(u, :read_forum)
       end
@@ -1376,7 +1376,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def active_participants_with_visibility
-    return active_participants if !self.for_assignment?
+    return active_participants unless self.for_assignment?
 
     users_with_visibility = self.assignment.students_with_visibility.pluck(:id)
 
@@ -1440,7 +1440,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def available_for?(user, opts = {})
-    return false if !published?
+    return false unless published?
     return false if is_announcement && locked?
 
     !locked_for?(user, opts)
@@ -1553,7 +1553,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def entries_for_feed(user, podcast_feed = false)
-    return [] if !user_can_see_posts?(user)
+    return [] unless user_can_see_posts?(user)
     return [] if locked_for?(user, check_policies: true)
 
     entries = discussion_entries.active

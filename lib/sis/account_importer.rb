@@ -53,7 +53,7 @@ module SIS
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         parent = nil
-        if !parent_account_id.blank?
+        unless parent_account_id.blank?
           parent = @accounts_cache[parent_account_id]
           parent ||= @root_account.all_accounts.where(sis_source_id: parent_account_id).take
           raise ImportError, "Parent account didn't exist for #{account_id}" unless parent

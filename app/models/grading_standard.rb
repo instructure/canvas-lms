@@ -92,7 +92,7 @@ class GradingStandard < ActiveRecord::Base
 
   def place_in_scheme(key_name)
     # look for keys with only digits and a single '.'
-    if key_name.to_s&.match?((/\A(\d*[.])?\d+\Z/))
+    if key_name.to_s&.match?(/\A(\d*[.])?\d+\Z/)
       # compare numbers
       # second condition to filter letters so zeros work properly ("A".to_d == 0)
       ordered_scheme.index { |g, _| g.to_d == key_name.to_d && g.to_s.match(/\A(\d*[.])?\d+\Z/) }

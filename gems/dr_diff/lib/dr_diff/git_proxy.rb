@@ -72,7 +72,7 @@ module DrDiff
     end
 
     def wip?
-      /\A(\(|\[)?wip\b/i.match?(first_line) ? true : false
+      /\A(\(|\[)?wip\b/i.match?(first_line)
     end
 
     private

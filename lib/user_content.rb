@@ -69,7 +69,7 @@ module UserContent
       # Strip the ones that shouldn't be there before adding a new one
       node.next_element.remove while node.next_element && node.next_element['class'] == 'hidden-readable'
 
-      if !use_updated_math_rendering
+      unless use_updated_math_rendering
         mathml = UserContent.latex_to_mathml(equation)
         next if mathml.blank?
 

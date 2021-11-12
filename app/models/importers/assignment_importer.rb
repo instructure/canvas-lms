@@ -459,7 +459,7 @@ module Importers
             tag.external_data = JSON.parse(hash[:external_tool_data_json])
           end
           tag.content_type = 'ContextExternalTool'
-          if !tag.save
+          unless tag.save
             if tag.errors["url"]
               migration.add_warning(t('errors.import.external_tool_url',
                                       "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.",

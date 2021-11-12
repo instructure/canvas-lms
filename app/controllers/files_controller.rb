@@ -366,7 +366,7 @@ class FilesController < ApplicationController
   end
 
   def react_files
-    if !request.format.html?
+    unless request.format.html?
       return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
     end
 
@@ -716,7 +716,7 @@ class FilesController < ApplicationController
     # download param because the download param is used all over the place to mean stuff
     # other than actually download the file. Long term we probably ought to audit the files
     # controller, make download mean download, and remove download_frd.
-    if params[:inline] && !params[:download_frd] && attachment.content_type && (attachment.content_type.match(/\Atext/) || attachment.mime_class == 'text' || attachment.mime_class == 'html' || attachment.mime_class == 'code' || attachment.mime_class == 'image')
+    if params[:inline] && !params[:download_frd] && attachment.content_type && (attachment.content_type&.start_with?('text') || attachment.mime_class == 'text' || attachment.mime_class == 'html' || attachment.mime_class == 'code' || attachment.mime_class == 'image')
       send_stored_file(attachment)
     elsif attachment.inline_content? && !params[:download_frd] && !@context.is_a?(AssessmentQuestion)
       if params[:file_path] || !params[:wrap]
@@ -850,7 +850,7 @@ class FilesController < ApplicationController
   # for local file uploads
   def api_create
     @policy, @attachment = Attachment.decode_policy(params[:Policy], params[:Signature])
-    if !@policy
+    unless @policy
       return head :bad_request
     end
 
