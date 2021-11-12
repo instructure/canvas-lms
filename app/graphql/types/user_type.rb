@@ -301,9 +301,18 @@ module Types
     def submission_comments_connection
       return unless object == current_user
 
-      load_association(:all_courses).then do |courses|
-        Submission.where('submission_comments_count > 0').where(course: courses).flat_map { |submission| submission.visible_submission_comments_for(current_user) }
+      submission_comments = []
+      stream_item_instances = current_user.visible_stream_item_instances(only_active_courses: true)
+
+      Shard.partition_by_shard(stream_item_instances, ->(sii) { sii.stream_item_id }) do |shard_stream_items|
+        submission_ids = StreamItem.where(id: shard_stream_items.map(&:stream_item_id),
+                                          asset_type: 'Submission')
+                                   .select('asset_id')
+        submission_comments += SubmissionComment.preload(submission: { assignment: :context })
+                                                .where(submission_id: submission_ids)
       end
+
+      submission_comments
     end
 
     field :comment_bank_items_connection, Types::CommentBankItemType.connection_type, null: true do
