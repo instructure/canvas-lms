@@ -155,7 +155,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   def self.ensure_media_object(media_id, **create_opts)
-    if !by_media_id(media_id).any?
+    unless by_media_id(media_id).any?
       delay(priority: Delayed::LOW_PRIORITY).create_if_id_exists(media_id, **create_opts)
     end
   end
@@ -171,7 +171,7 @@ class MediaObject < ActiveRecord::Base
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.mediaUpdate(self.media_id, :name => self.user_entered_title)
-    if !res[:error]
+    unless res[:error]
       self.title = self.user_entered_title
       self.save
     end
@@ -253,7 +253,7 @@ class MediaObject < ActiveRecord::Base
 
   def podcast_format_details
     data = transcoded_details
-    if !data
+    unless data
       self.retrieve_details
       data = transcoded_details
     end

@@ -21,11 +21,11 @@
 module QuizMathDataFixup
   def fixup_quiz_questions_with_bad_math(quiz_or_bank, check_date: nil, question_bank: false)
     changed = false
-    if question_bank
-      questions = quiz_or_bank.assessment_questions
-    else
-      questions = quiz_or_bank.quiz_questions
-    end
+    questions = if question_bank
+                  quiz_or_bank.assessment_questions
+                else
+                  quiz_or_bank.quiz_questions
+                end
     questions = questions.where('updated_at>?', check_date) if check_date
     questions.find_each do |quiz_question|
       old_data = quiz_question.question_data.to_hash

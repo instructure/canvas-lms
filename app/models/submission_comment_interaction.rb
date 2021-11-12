@@ -22,14 +22,13 @@ class SubmissionCommentInteraction
   # returns an array mapping [user_id, author_id] => time of last submission
   # comment
   def self.in_course_between(course, teacher_or_ids, student_or_ids)
-    result = course.submission_comments
-                   .joins(:submission)
-                   .group([:user_id, :author_id])
-                   .where({
-                            submission_comments: { author_id: teacher_or_ids },
-                            submissions: { user_id: student_or_ids }
-                          })
-                   .maximum(:created_at)
-    result
+    course.submission_comments
+          .joins(:submission)
+          .group([:user_id, :author_id])
+          .where({
+                   submission_comments: { author_id: teacher_or_ids },
+                   submissions: { user_id: student_or_ids }
+                 })
+          .maximum(:created_at)
   end
 end

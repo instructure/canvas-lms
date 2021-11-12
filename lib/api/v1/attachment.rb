@@ -120,7 +120,7 @@ module Api::V1::Attachment
       'lock_at' => attachment.lock_at,
       'hidden_for_user' => hidden_for_user,
       'thumbnail_url' => thumbnail_url,
-      'modified_at' => attachment.modified_at ? attachment.modified_at : attachment.updated_at,
+      'modified_at' => attachment.modified_at || attachment.updated_at,
       'mime_class' => attachment.mime_class,
       'media_entry_id' => attachment.media_entry_id
     )
@@ -384,7 +384,7 @@ module Api::V1::Attachment
         json = { progress: progress_json(progress, current_user, session) }
       else
         on_duplicate = nil if on_duplicate == 'overwrite'
-        quota_exemption = @attachment.quota_exemption_key if !opts[:check_quota]
+        quota_exemption = @attachment.quota_exemption_key unless opts[:check_quota]
         json = @attachment.ajax_upload_params(
           api_v1_files_create_url(
             on_duplicate: on_duplicate,

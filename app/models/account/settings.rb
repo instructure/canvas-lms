@@ -68,7 +68,7 @@ module Account::Settings
       current_hash = acc.settings[setting]
       next if current_hash.nil?
 
-      if !current_hash.is_a?(Hash)
+      unless current_hash.is_a?(Hash)
         current_hash = { :locked => false, :value => current_hash }
       end
       current_hash[:inherited] = true if self != acc

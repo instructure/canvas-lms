@@ -129,11 +129,11 @@ class Login::OtpController < ApplicationController
   end
 
   def destroy
-    if params[:user_id] == 'self'
-      user = @current_user
-    else
-      user = User.find(params[:user_id])
-    end
+    user = if params[:user_id] == 'self'
+             @current_user
+           else
+             User.find(params[:user_id])
+           end
     return unless authorized_action(user, @current_user, :reset_mfa)
 
     user.otp_secret_key = nil

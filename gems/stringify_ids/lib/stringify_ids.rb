@@ -36,7 +36,7 @@ module StringifyIds
     value.keys.each do |key|
       next unless key.is_a?(String) || key.is_a?(Symbol)
 
-      if key =~ /(^|_)id$/i
+      if /(^|_)id$/i.match?(key)
         # id, foo_id, etc.
         value[key] = stringify_id(value[key], opts)
       elsif key =~ /(^|_)ids$/i && value[key].is_a?(Array)

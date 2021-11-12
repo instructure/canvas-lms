@@ -38,7 +38,7 @@ class HostUrl
     end
 
     def domain_config
-      if !@@domain_config
+      unless @@domain_config
         @@domain_config = ConfigFile.load("domain")
         @@domain_config ||= {}
       end
@@ -47,14 +47,14 @@ class HostUrl
 
     # returns "http" or "https" depending on whether this instance of canvas runs over ssl
     def protocol
-      if !@@protocol
-        if domain_config.key?('ssl')
-          is_secure = domain_config['ssl']
-        elsif Attachment.file_store_config.key?('secure')
-          is_secure = Attachment.file_store_config['secure']
-        else
-          is_secure = Rails.env.production?
-        end
+      unless @@protocol
+        is_secure = if domain_config.key?('ssl')
+                      domain_config['ssl']
+                    elsif Attachment.file_store_config.key?('secure')
+                      Attachment.file_store_config['secure']
+                    else
+                      Rails.env.production?
+                    end
 
         @@protocol = is_secure ? "https" : "http"
       end
@@ -71,7 +71,7 @@ class HostUrl
     end
 
     def default_host
-      if !@@default_host
+      unless @@default_host
         @@default_host = domain_config[:domain] if domain_config.has_key?(:domain)
       end
       res = @@default_host

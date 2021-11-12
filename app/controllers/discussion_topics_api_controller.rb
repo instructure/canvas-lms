@@ -139,7 +139,7 @@ class DiscussionTopicsApiController < ApplicationController
       # we assume that json_structure will typically be served to users requesting string IDs
       if !stringify_json_ids? || mobile_brand_config
         entries = JSON.parse(structure)
-        StringifyIds.recursively_stringify_ids(entries, reverse: true) if !stringify_json_ids?
+        StringifyIds.recursively_stringify_ids(entries, reverse: true) unless stringify_json_ids?
         DiscussionTopic::MaterializedView.include_mobile_overrides(entries, mobile_brand_config.css_and_js_overrides) if mobile_brand_config
         structure = entries.to_json
       end
@@ -268,7 +268,7 @@ class DiscussionTopicsApiController < ApplicationController
     end
     # People that can't moderate don't have power to publish separately, so
     # just publish their topics straightaway.
-    if !@context.grants_right?(@current_user, session, :moderate_forum)
+    unless @context.grants_right?(@current_user, session, :moderate_forum)
       new_topic.publish
     end
     if new_topic.save!
@@ -683,7 +683,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def require_initial_post
-    return true if !@topic.initial_post_required?(@current_user, session)
+    return true unless @topic.initial_post_required?(@current_user, session)
 
     # neither the current user nor the enrollment user (if any) has posted yet,
     # so give them the forbidden status

@@ -31,7 +31,7 @@ class KalturaMediaFileHandler
       files << {
         :name => attachment.display_name,
         :url => attachment.public_download_url,
-        :media_type => (attachment.content_type || "").match(/\Avideo/) ? 'video' : 'audio',
+        :media_type => attachment.content_type&.start_with?('video') ? 'video' : 'audio',
         :partner_data => build_partner_data(attachment)
       }
     end
@@ -68,7 +68,7 @@ class KalturaMediaFileHandler
   end
 
   def handle_bulk_upload_response(res, client, wait_for_completion, attachments, root_account_id)
-    if !res[:ready]
+    unless res[:ready]
       if wait_for_completion
         bulk_upload_id = res[:id]
         Rails.logger.debug "waiting for bulk upload id: #{bulk_upload_id}"

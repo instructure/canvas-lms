@@ -108,11 +108,11 @@ class AssessmentQuestionBank < ActiveRecord::Base
 
   def alignments=(alignments)
     # empty string from controller or empty hash
-    if alignments.empty?
-      outcomes = []
-    else
-      outcomes = context.linked_learning_outcomes.where(id: alignments.keys.map(&:to_i)).to_a
-    end
+    outcomes = if alignments.empty?
+                 []
+               else
+                 context.linked_learning_outcomes.where(id: alignments.keys.map(&:to_i)).to_a
+               end
 
     # delete alignments that aren't in the list anymore
     if outcomes.empty?

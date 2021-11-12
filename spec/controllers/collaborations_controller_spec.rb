@@ -232,7 +232,7 @@ describe CollaborationsController do
       collab.context = @course
       collab.save!
       get 'show', params: { :course_id => @course.id, :id => collab.id }
-      url = CGI::escape(collab[:url])
+      url = CGI.escape(collab[:url])
       expect(response).to redirect_to "/courses/#{@course.id}/external_tools/retrieve?display=borderless&url=#{url}"
     end
 

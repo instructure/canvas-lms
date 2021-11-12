@@ -198,11 +198,11 @@ module AssignmentOverrideApplicator
     group_category_id = assignment_or_quiz.group_category_id || assignment_or_quiz.discussion_topic.try(:group_category_id)
     return nil unless group_category_id
 
-    if assignment_or_quiz.context.user_has_been_student?(user)
-      group = user.current_groups.shard(assignment_or_quiz.shard).where(:group_category_id => group_category_id).first
-    else
-      group = assignment_or_quiz.context.groups.where(:group_category_id => group_category_id).first
-    end
+    group = if assignment_or_quiz.context.user_has_been_student?(user)
+              user.current_groups.shard(assignment_or_quiz.shard).where(:group_category_id => group_category_id).first
+            else
+              assignment_or_quiz.context.groups.where(:group_category_id => group_category_id).first
+            end
 
     if group
       if assignment_or_quiz.assignment_overrides.loaded?

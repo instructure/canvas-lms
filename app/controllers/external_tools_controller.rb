@@ -117,11 +117,11 @@ class ExternalToolsController < ApplicationController
   #     ]
   def index
     if authorized_action(@context, @current_user, :read)
-      if params[:include_parents]
-        @tools = ContextExternalTool.all_tools_for(@context, :user => (params[:include_personal] ? @current_user : nil))
-      else
-        @tools = @context.context_external_tools.active
-      end
+      @tools = if params[:include_parents]
+                 ContextExternalTool.all_tools_for(@context, :user => (params[:include_personal] ? @current_user : nil))
+               else
+                 @context.context_external_tools.active
+               end
       @tools = ContextExternalTool.search_by_attribute(@tools, :name, params[:search_term])
 
       @context.shard.activate do
@@ -150,7 +150,7 @@ class ExternalToolsController < ApplicationController
 
   def retrieve
     @tool = ContextExternalTool.find_external_tool(params[:url], @context, nil, nil, params[:client_id])
-    if !@tool
+    unless @tool
       raise InvalidSettingsError, t("#application.errors.invalid_external_tool", "Couldn't find valid settings for this link")
     end
 
@@ -464,7 +464,7 @@ class ExternalToolsController < ApplicationController
       @tool = ContextExternalTool.find_for(id, @context, selection_type, false)
     end
 
-    if !@tool
+    unless @tool
       flash[:error] = t "#application.errors.invalid_external_tool_id", "Couldn't find valid settings for this tool"
       redirect_to named_context_url(@context, :context_url)
     end
@@ -1230,7 +1230,7 @@ class ExternalToolsController < ApplicationController
   private
 
   def external_tools_json_for_courses(courses)
-    json = courses.reduce([]) do |all_results, course|
+    courses.reduce([]) do |all_results, course|
       tabs = course.tabs_available(@current_user, course_subject_tabs: true)
       tool_ids = []
       tabs.select { |t| t[:external] }.each do |t|
@@ -1246,8 +1246,6 @@ class ExternalToolsController < ApplicationController
       end
       all_results.push(*results)
     end
-
-    json
   end
 
   def parse_context_codes

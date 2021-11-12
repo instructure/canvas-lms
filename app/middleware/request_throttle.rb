@@ -163,7 +163,7 @@ class RequestThrottle
     return unless request.request_method_symbol == :post && request.fullpath =~ %r{/api/lti/v1/tools/([^/]+)/(?:ext_)?grade_passback}
 
     tool_id = $1
-    return unless tool_id =~ Api::ID_REGEX
+    return unless Api::ID_REGEX.match?(tool_id)
 
     # yes, a db lookup, but we're only loading it for these two actions,
     # and only if another identifier couldn't be found
@@ -310,7 +310,7 @@ class RequestThrottle
     def get_up_front_cost_for_path(path)
       # if it matches any of the regexes in the setting, return the specified cost
       self.class.up_front_cost_by_path_regex.each do |regex, cost|
-        return cost if regex =~ path
+        return cost if regex&.match?(path)
       end
       self.up_front_cost # otherwise use the default
     end

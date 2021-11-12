@@ -108,7 +108,7 @@ module CC::Importer
 
     def convert_blti_xml(xml)
       doc = create_xml_doc(xml)
-      if !doc.namespaces.to_s.downcase.include? 'imsglobal'
+      unless doc.namespaces.to_s.downcase.include? 'imsglobal'
         raise CCImportError.new(I18n.t("Invalid XML Configuration"))
       end
 
@@ -134,7 +134,7 @@ module CC::Importer
     end
 
     def check_for_unescaped_url(url)
-      if url =~ /(.*[^=]*\?*=)[^&;]*=/
+      if /(.*[^=]*\?*=)[^&;]*=/.match?(url)
         raise CCImportError.new(I18n.t(:invalid_url_in_xml, "Invalid url in xml. Ampersands must be escaped."))
       end
     end

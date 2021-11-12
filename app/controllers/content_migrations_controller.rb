@@ -358,7 +358,7 @@ class ContentMigrationsController < ApplicationController
   def create
     @plugin = find_migration_plugin params[:migration_type]
 
-    if !@plugin
+    unless @plugin
       return render(:json => { :message => t('bad_migration_type', "Invalid migration_type") }, :status => :bad_request)
     end
     unless migration_plugin_supported?(@plugin)

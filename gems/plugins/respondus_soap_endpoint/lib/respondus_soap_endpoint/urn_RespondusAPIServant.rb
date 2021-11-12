@@ -74,11 +74,11 @@ module RespondusSoapEndpoint
         Canvas::Security.encryption_key,
         digest: 'SHA1'
       )
-      if context.blank?
-        @session = {}
-      else
-        @session = @verifier.verify(context)
-      end
+      @session = if context.blank?
+                   {}
+                 else
+                   @verifier.verify(context)
+                 end
 
       # verify that the session was created for this user
       if self.user
@@ -98,7 +98,7 @@ module RespondusSoapEndpoint
 
     def load_user_with_oauth(token)
       token = AccessToken.authenticate(token)
-      if !token.try(:user)
+      unless token.try(:user)
         raise(BadAuthError)
       end
 
@@ -561,7 +561,7 @@ Implemented for: Canvas LMS}]
       }
 
       if item
-        if !item.clear_for_replacement
+        unless item.clear_for_replacement
           raise CantReplaceError
         end
 

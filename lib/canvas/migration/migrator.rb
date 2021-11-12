@@ -111,7 +111,7 @@ module Canvas::Migration
         resource[:type] = r_node['type']
         resource[:href] = r_node['href']
         if resource[:href]
-          resource[:href] = resource[:href].gsub('\\', '/')
+          resource[:href] = resource[:href].tr('\\', '/')
         else
           # it could be embedded in the manifest
           @resource_nodes_for_flat_manifest[id] = r_node
@@ -122,7 +122,7 @@ module Canvas::Migration
         resource[:intended_use] = r_node['intendeduse']
         resource[:files] = []
         r_node.css('file').each do |file_node|
-          resource[:files] << { :href => file_node[:href].gsub('\\', '/') }
+          resource[:files] << { :href => file_node[:href].tr('\\', '/') }
         end
         resource[:dependencies] = []
         r_node.css('dependency').each do |d_node|

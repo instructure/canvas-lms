@@ -37,7 +37,7 @@ module Canvas::Migration
 
       # timestamp can be either a time string in the format "2011-04-30T00:00:00-06:00",
       # or an integer epoch * 1000
-      if timestamp.to_s.match(/^-?[0-9.]+$/)
+      if timestamp.to_s.match?(/^-?[0-9.]+$/)
         timestamp = timestamp.to_i / 1000 rescue 0
         t = nil
         if timestamp > 0
@@ -68,15 +68,15 @@ module Canvas::Migration
     end
 
     def unique_quiz_dir
-      if content_migration
-        if (a = content_migration.attachment)
-          key = "#{a.filename.gsub(/\..*/, '')}_#{content_migration.id}"
-        else
-          key = content_migration.id.to_s
-        end
-      else
-        key = "data_#{rand(10000)}" # should only happen in testing
-      end
+      key = if content_migration
+              if (a = content_migration.attachment)
+                "#{a.filename.gsub(/\..*/, '')}_#{content_migration.id}"
+              else
+                content_migration.id.to_s
+              end
+            else
+              "data_#{rand(10000)}" # should only happen in testing
+            end
       "#{QUIZ_FILE_DIRECTORY}/#{key}"
     end
 
@@ -101,11 +101,11 @@ module Canvas::Migration
     end
 
     def find_export_dir
-      if @settings[:content_migration_id] && @settings[:user_id]
-        slug = "cm_#{@settings[:content_migration_id]}_user_id_#{@settings[:user_id]}_#{@settings[:migration_type]}"
-      else
-        slug = "export_#{rand(10000)}"
-      end
+      slug = if @settings[:content_migration_id] && @settings[:user_id]
+               "cm_#{@settings[:content_migration_id]}_user_id_#{@settings[:user_id]}_#{@settings[:migration_type]}"
+             else
+               "export_#{rand(10000)}"
+             end
 
       path = create_export_dir(slug)
       i = 1
@@ -119,16 +119,16 @@ module Canvas::Migration
 
     def create_export_dir(slug)
       config = ConfigFile.load('external_migration')
-      if config && config[:data_folder]
-        folder = config[:data_folder]
-      else
-        folder = Dir.tmpdir
-      end
+      folder = if config && config[:data_folder]
+                 config[:data_folder]
+               else
+                 Dir.tmpdir
+               end
       File.join(folder, slug)
     end
 
     def make_export_dir
-      FileUtils::mkdir_p @base_export_dir
+      FileUtils.mkdir_p @base_export_dir
     end
 
     # Does a JSON export of the courses
@@ -213,7 +213,7 @@ module Canvas::Migration
         next unless m[:items]
 
         m[:items].each do |i|
-          if i[:linked_resource_type] =~ /assessment|quiz/i
+          if /assessment|quiz/i.match?(i[:linked_resource_type])
             if should_prepend?(:assessments, i[:linked_resource_id], existing_ids)
               i[:item_migration_id] = prepend_id(i[:item_migration_id], prepend_value)
               i[:linked_resource_id] = prepend_id(i[:linked_resource_id], prepend_value)
@@ -249,7 +249,7 @@ module Canvas::Migration
       if outcome[:type] == "learning_outcome_group"
         if selectable_outcomes
           log = { migration_id: outcome[:migration_id], title: outcome[:title], child_groups: child_groups }
-          (parent_children ? parent_children : overview[:learning_outcome_groups]) << log
+          (parent_children || overview[:learning_outcome_groups]) << log
         end
       else
         lo = { migration_id: outcome[:migration_id], title: outcome[:title] }

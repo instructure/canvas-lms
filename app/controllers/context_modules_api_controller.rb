@@ -164,11 +164,11 @@ class ContextModulesApiController < ApplicationController
 
       ActiveRecord::Associations::Preloader.new.preload(modules, content_tags: :content) if includes.include?('items')
 
-      if @student
-        modules_and_progressions = modules.map { |m| [m, m.evaluate_for(@student)] }
-      else
-        modules_and_progressions = modules.map { |m| [m, nil] }
-      end
+      modules_and_progressions = if @student
+                                   modules.map { |m| [m, m.evaluate_for(@student)] }
+                                 else
+                                   modules.map { |m| [m, nil] }
+                                 end
       opts = {}
       if includes.include?('items') && params[:search_term].present?
         SearchTermHelper.validate_search_term(params[:search_term])
@@ -406,11 +406,11 @@ class ContextModulesApiController < ApplicationController
       module_parameters = params.require(:module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
 
       if (ids = params[:module][:prerequisite_module_ids])
-        if ids.blank?
-          module_parameters[:prerequisites] = []
-        else
-          module_parameters[:prerequisites] = ids.map { |id| "module_#{id}" }.join(',')
-        end
+        module_parameters[:prerequisites] = if ids.blank?
+                                              []
+                                            else
+                                              ids.map { |id| "module_#{id}" }.join(',')
+                                            end
       end
 
       if params[:module].has_key?(:published)

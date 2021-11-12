@@ -35,7 +35,7 @@ module Importers
       params = migration.migration_settings[:migration_ids_to_import]
       valid_paths = []
       (data['file_map'] || {}).each_value do |file|
-        path = file['path_name'].starts_with?('/') ? file['path_name'][1..-1] : file['path_name']
+        path = file['path_name'].starts_with?('/') ? file['path_name'][1..] : file['path_name']
         migration.add_attachment_path(path, file['migration_id'])
         if migration.import_object?("attachments", file['migration_id']) || migration.import_object?("files", file['migration_id'])
           if file['errored']
@@ -103,7 +103,7 @@ module Importers
         end
         ActiveRecord::Base.skip_touch_context
 
-        if !migration.for_course_copy?
+        unless migration.for_course_copy?
           Importers::ContextModuleImporter.select_all_linked_module_items(data, migration)
           Importers::GradingStandardImporter.select_course_grading_standard(data, migration)
           # These only need to be processed once

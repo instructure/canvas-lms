@@ -29,7 +29,7 @@ module GroupCategories
 
     def self_signup
       return _self_signup if _self_signup
-      return nil if !enable_self_signup
+      return nil unless enable_self_signup
       return 'restricted' if restrict_self_signup
 
       'enabled'

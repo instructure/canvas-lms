@@ -215,7 +215,7 @@ class PageViewsController < ApplicationController
         options = {
           type: 'text/csv',
           filename: t(:download_filename, 'Pageviews For %{user}',
-                      user: @user.name.to_s.gsub(/ /, '_')) + '.csv', disposition: 'attachment'
+                      user: @user.name.to_s.tr(' ', '_')) + '.csv', disposition: 'attachment'
         }
         send_data(csv, options)
       end

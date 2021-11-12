@@ -33,7 +33,7 @@ module SIS
       # expected columns
       # section_id,course_id,name,status,start_date,end_date
       def process(csv, index = nil, count = nil)
-        count = SIS::SectionImporter.new(@root_account, importer_opts).process do |importer|
+        SIS::SectionImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             start_date = nil
             end_date = nil
@@ -51,7 +51,6 @@ module SIS
             end
           end
         end
-        count
       end
     end
   end

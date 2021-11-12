@@ -201,7 +201,7 @@ describe Conversation do
         end
         @shard2.activate do
           users << user_factory(:name => 'e')
-          conversation.add_participants(users.first, users[-2..-1])
+          conversation.add_participants(users.first, users[-2..])
           expect(conversation.conversation_participants.reload.size).to eq 5
           expect(conversation.conversation_participants.all? { |cp| cp.shard == Shard.default }).to be_truthy
           expect(users.last.all_conversations.last.shard).to eq @shard2

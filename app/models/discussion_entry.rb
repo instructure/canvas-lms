@@ -372,11 +372,11 @@ class DiscussionEntry < ActiveRecord::Base
     Atom::Entry.new do |entry|
       subject = [self.discussion_topic.title]
       subject << self.discussion_topic.context.name if opts[:include_context]
-      if parent_id
-        entry.title = t "#subject_reply_to", "Re: %{subject}", :subject => subject.to_sentence
-      else
-        entry.title = subject.to_sentence
-      end
+      entry.title = if parent_id
+                      t "#subject_reply_to", "Re: %{subject}", :subject => subject.to_sentence
+                    else
+                      subject.to_sentence
+                    end
       entry.authors << Atom::Person.new(:name => author_name)
       entry.updated   = self.updated_at
       entry.published = self.created_at

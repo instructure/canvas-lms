@@ -168,8 +168,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     raise "Cannot view temporary data for completed quiz" unless !self.completed?
     raise "Cannot view temporary data for completed quiz" if graded?
 
-    res = (self.submission_data || {}).with_indifferent_access
-    res
+    (self.submission_data || {}).with_indifferent_access
   end
 
   def question_answered?(id)
@@ -188,7 +187,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def data
     raise "Cannot view data for uncompleted quiz" unless self.completed?
-    raise "Cannot view data for uncompleted quiz" if !graded?
+    raise "Cannot view data for uncompleted quiz" unless graded?
 
     Utf8Cleaner.recursively_strip_invalid_utf8!(self.submission_data, true)
   end
@@ -547,7 +546,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     # we might be in the middle of a new attempt, in which case we don't want
     # to overwrite the score and fudge points when we save
-    self.reload if !self.completed?
+    self.reload unless self.completed?
 
     self.kept_score = to_be_kept_score
     self.without_versioning(&:save)
@@ -664,7 +663,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # taken quiz, even if it's a prior version of the submission. Thank you
   # simply_versioned for making this possible!
   def update_submission_version(version, attrs)
-    version_data = YAML::load(version.yaml)
+    version_data = YAML.load(version.yaml)
     version_data["submission_data"] = self.submission_data if attrs.include?(:submission_data)
     version_data["temporary_user_code"] = "was #{version_data['score']} until #{Time.now}"
     version_data["score"] = self.score if attrs.include?(:score)
@@ -672,8 +671,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     version_data["workflow_state"] = self.workflow_state if attrs.include?(:workflow_state)
     version_data["manually_scored"] = self.manually_scored if attrs.include?(:manually_scored)
     version.yaml = version_data.to_yaml
-    res = version.save
-    res
+    version.save
   end
 
   def context_module_action
@@ -739,11 +737,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     end
 
     # Graded surveys always get the full points
-    if quiz && quiz.graded_survey?
-      self.score = quiz.points_possible
-    else
-      self.score = tally
-    end
+    self.score = if quiz && quiz.graded_survey?
+                   quiz.points_possible
+                 else
+                   tally
+                 end
 
     self.submission_data = res
 

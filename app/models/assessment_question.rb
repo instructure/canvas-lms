@@ -123,7 +123,7 @@ class AssessmentQuestion < ActiveRecord::Base
     path = match_data[2]
     id_or_path = id || path
 
-    if !file_substitutions[id_or_path]
+    unless file_substitutions[id_or_path]
       if id
         file = Attachment.where(context_type: context_type, context_id: context_id, id: id_or_path).first
       elsif path
@@ -208,12 +208,12 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def question_data=(data)
-    if data.is_a?(String)
-      data = ActiveSupport::JSON.decode(data) rescue nil
-    else
-      # we may be modifying this data (translate_links), and only want to work on a copy
-      data = data.try(:dup)
-    end
+    data = if data.is_a?(String)
+             ActiveSupport::JSON.decode(data) rescue nil
+           else
+             # we may be modifying this data (translate_links), and only want to work on a copy
+             data.try(:dup)
+           end
     write_attribute(:question_data, data.to_hash.with_indifferent_access)
   end
 

@@ -25,7 +25,8 @@ import {
   sectionList,
   getCustomColumnId,
   getAssignmentColumnId,
-  getAssignmentGroupColumnId
+  getAssignmentGroupColumnId,
+  findAllAppliedFilterValuesOfType
 } from '../Gradebook.utils'
 import {isDefaultSortOrder, localeSort} from '../Gradebook.sorting'
 import {createGradebook} from './GradebookSpecHelper'
@@ -263,5 +264,35 @@ describe('getAssignmentColumnId', () => {
 describe('getAssignmentGroupColumnId', () => {
   it('returns a unique key for the assignment column', () => {
     expect(getAssignmentGroupColumnId('301')).toStrictEqual('assignment_group_301')
+  })
+})
+
+describe('findAllAppliedFilterValuesOfType', () => {
+  const filters = [
+    {
+      isApplied: true,
+      conditions: [
+        {type: 'module', value: '1'},
+        {type: 'assignment-group', value: '2'},
+        {type: 'assignment-group', value: '7'},
+        {type: 'module', value: '3'}
+      ]
+    },
+    {
+      isApplied: false,
+      conditions: [
+        {type: 'module', value: '4'},
+        {type: 'assignment-group', value: '5'},
+        {type: 'module', value: '6'}
+      ]
+    }
+  ]
+
+  it('only returns applied filters', () => {
+    expect(findAllAppliedFilterValuesOfType('module', filters)).toStrictEqual(['1', '3'])
+  })
+
+  it('only returns selected type', () => {
+    expect(findAllAppliedFilterValuesOfType('assignment-group', filters)).toStrictEqual(['2', '7'])
   })
 })

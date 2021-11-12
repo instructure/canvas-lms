@@ -804,12 +804,12 @@ class CalendarEventsApiController < ApplicationController
     respond_to do |format|
       format.ics do
         name = t('ics_title', "%{course_or_group_name} Calendar (Canvas)", :course_or_group_name => @context.name)
-        description = case
-                      when @context.is_a?(Course)
+        description = case @context
+                      when Course
                         t('ics_description_course', "Calendar events for the course, %{course_name}", :course_name => @context.name)
-                      when @context.is_a?(Group)
+                      when Group
                         t('ics_description_group', "Calendar events for the group, %{group_name}", :group_name => @context.name)
-                      when @context.is_a?(User)
+                      when User
                         t('ics_description_user', "Calendar events for the user, %{user_name}", :user_name => @context.name)
                       else
                         t('ics_description', "Calendar events for %{context_name}", :context_name => @context.name)
@@ -1061,9 +1061,9 @@ class CalendarEventsApiController < ApplicationController
   def validate_dates
     @errors ||= {}
     if params[:start_date].present?
-      if params[:start_date] =~ Api::DATE_REGEX
+      if Api::DATE_REGEX.match?(params[:start_date])
         @start_date ||= Time.zone.parse(params[:start_date]).beginning_of_day
-      elsif params[:start_date] =~ Api::ISO8601_REGEX
+      elsif Api::ISO8601_REGEX.match?(params[:start_date])
         @start_date ||= Time.zone.parse(params[:start_date])
       else # params[:start_date] is not valid
         @errors[:start_date] = t(:invalid_date_or_time, 'Invalid date or invalid datetime for %{attr}', attr: 'start_date')
@@ -1071,9 +1071,9 @@ class CalendarEventsApiController < ApplicationController
     end
 
     if params[:end_date].present?
-      if params[:end_date] =~ Api::DATE_REGEX
+      if Api::DATE_REGEX.match?(params[:end_date])
         @end_date ||= Time.zone.parse(params[:end_date]).end_of_day
-      elsif params[:end_date] =~ Api::ISO8601_REGEX
+      elsif Api::ISO8601_REGEX.match?(params[:end_date])
         @end_date ||= Time.zone.parse(params[:end_date])
       else # params[:end_date] is not valid
         @errors[:end_date] = t(:invalid_date_or_time, 'Invalid date or invalid datetime for %{attr}', attr: 'end_date')
@@ -1222,8 +1222,7 @@ class CalendarEventsApiController < ApplicationController
     }
 
     # in courses with diff assignments on, only show the visible assignments
-    scope = scope.filter_by_visibilities_in_given_courses(student_ids.to_a, courses_to_filter_assignments.map(&:id)).group('assignments.id')
-    scope
+    scope.filter_by_visibilities_in_given_courses(student_ids.to_a, courses_to_filter_assignments.map(&:id)).group('assignments.id')
   end
 
   def calendar_event_scope(user)
@@ -1432,7 +1431,7 @@ class CalendarEventsApiController < ApplicationController
     @errors = {}
     user = @observee || @current_user
     # appointment groups show up here in find-appointment mode; give them a free ride
-    ag_count = (params[:context_codes] || []).count { |code| code =~ /\Aappointment_group_/ }
+    ag_count = (params[:context_codes] || []).count { |code| code.start_with?('appointment_group_') }
     context_limit = @domain_root_account.settings[:calendar_contexts_limit] || 10
     codes = (params[:context_codes] || [user.asset_string])[0, context_limit + ag_count]
     # also accept a more compact comma-separated list of appointment group ids

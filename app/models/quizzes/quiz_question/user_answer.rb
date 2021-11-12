@@ -42,11 +42,11 @@ class Quizzes::QuizQuestion::UserAnswer < Struct.new(:question_id, :points_possi
 
     score = (correct_parts.to_f / total_parts) * points_possible
     if incorrect_parts > 0
-      if incorrect_dock
-        score -= incorrect_dock * incorrect_parts
-      else
-        score -= (incorrect_parts.to_f / total_parts) * points_possible
-      end
+      score -= if incorrect_dock
+                 incorrect_dock * incorrect_parts
+               else
+                 (incorrect_parts.to_f / total_parts) * points_possible
+               end
       score = 0.0 if score < 0
     end
     score

@@ -29,12 +29,11 @@ module Api::V1::CalendarEvent
   include Api::V1::Conferences
 
   def event_json(event, user, session, options = {})
-    hash = if event.is_a?(::CalendarEvent)
-             calendar_event_json(event, user, session, options)
-           else
-             assignment_event_json(event, user, session, options)
-           end
-    hash
+    if event.is_a?(::CalendarEvent)
+      calendar_event_json(event, user, session, options)
+    else
+      assignment_event_json(event, user, session, options)
+    end
   end
 
   def calendar_event_json(event, user, session, options = {})
@@ -72,11 +71,11 @@ module Api::V1::CalendarEvent
 
     # force it to load
     include_child_events = include.include?('child_events')
-    if include_child_events
-      hash["child_events_count"] = event.child_events.length
-    else
-      hash["child_events_count"] = options[:child_events_count] || event.child_events.size
-    end
+    hash["child_events_count"] = if include_child_events
+                                   event.child_events.length
+                                 else
+                                   options[:child_events_count] || event.child_events.size
+                                 end
 
     if event.effective_context_code
       if appointment_group && include_child_events

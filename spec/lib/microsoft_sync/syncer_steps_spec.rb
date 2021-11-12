@@ -718,7 +718,7 @@ describe MicrosoftSync::SyncerSteps do
     context 'when there are no teacher/ta/designer enrollments' do
       it "doesn't check for team existence or create a team" do
         course.enrollments.to_a.each do |e|
-          e.destroy if e.type =~ /^Teacher|Ta|Designer/
+          e.destroy if /^Teacher|Ta|Designer/.match?(e.type)
         end
         expect(graph_service).to_not receive(:team_exists?)
         expect(subject).to eq(MicrosoftSync::StateMachineJob::COMPLETE)

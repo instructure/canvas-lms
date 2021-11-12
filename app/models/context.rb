@@ -280,11 +280,11 @@ module Context
         object = ContextExternalTool.find_external_tool_by_id(params[:id], context)
       end
     when 'context_modules'
-      if %w(item_redirect item_redirect_mastery_paths choose_mastery_path).include?(params[:action])
-        object = context.context_module_tags.find_by(id: params[:id])
-      else
-        object = context.context_modules.find_by(id: params[:id])
-      end
+      object = if %w(item_redirect item_redirect_mastery_paths choose_mastery_path).include?(params[:action])
+                 context.context_module_tags.find_by(id: params[:id])
+               else
+                 context.context_modules.find_by(id: params[:id])
+               end
     when 'media_objects'
       object = media_obj
     when 'context'

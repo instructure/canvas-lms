@@ -170,11 +170,11 @@ class GroupsController < ApplicationController
 
     page = (params[:page] || 1).to_i rescue 1
     per_page = Api.per_page_for(self, default: 15, max: 100)
-    if category && !category.student_organized?
-      groups = category.groups.active
-    else
-      groups = []
-    end
+    groups = if category && !category.student_organized?
+               category.groups.active
+             else
+               []
+             end
 
     users = @context.users_not_in_groups(groups, order: User.sortable_name_order_by_clause('users'))
                     .paginate(page: page, per_page: per_page)
@@ -611,11 +611,11 @@ class GroupsController < ApplicationController
           @group.update(attrs.slice(*SETTABLE_GROUP_ATTRIBUTES))
           if attrs[:members]
             user_ids = Api.value_to_array(attrs[:members]).map(&:to_i).uniq
-            if @group.context
-              users = @group.context.users.where(id: user_ids)
-            else
-              users = User.where(id: user_ids)
-            end
+            users = if @group.context
+                      @group.context.users.where(id: user_ids)
+                    else
+                      User.where(id: user_ids)
+                    end
             @memberships = @group.set_users(users)
           end
         end
@@ -761,11 +761,11 @@ class GroupsController < ApplicationController
 
     include_inactive = params[:exclude_inactive].present? ? !value_to_boolean(params[:exclude_inactive]) : true
 
-    if search_term
-      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session, { include_inactive_enrollments: include_inactive })
-    else
-      users = UserSearch.scope_for(@context, @current_user, { include_inactive_enrollments: include_inactive })
-    end
+    users = if search_term
+              UserSearch.for_user_in_context(search_term, @context, @current_user, session, { include_inactive_enrollments: include_inactive })
+            else
+              UserSearch.scope_for(@context, @current_user, { include_inactive_enrollments: include_inactive })
+            end
 
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_users_url)
