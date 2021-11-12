@@ -469,9 +469,9 @@ module InstFS
           query[:redirect] = true
           query[:no_cache] = true
           uri.query_values = query
-          return uri.to_s
+          uri.to_s
         else
-          return nil
+          nil
         end
       end
     end

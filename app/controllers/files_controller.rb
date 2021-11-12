@@ -245,7 +245,7 @@ class FilesController < ApplicationController
   protected :redirect_to_fallback_url
 
   def index
-    return react_files
+    react_files
   end
 
   # @API List files
@@ -1253,9 +1253,9 @@ class FilesController < ApplicationController
     @context = @attachment.context
     if can_replace_file?
       @attachment.reset_uuid!
-      return render json: attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true })
+      render json: attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true })
     else
-      return render_unauthorized_action
+      render_unauthorized_action
     end
   end
 

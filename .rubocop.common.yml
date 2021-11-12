@@ -159,6 +159,8 @@ Style/ParenthesesAroundCondition:
   Severity: error
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
+Style/PreferredHashMethods:
+  Severity: error
 Style/RedundantAssignment:
   Severity: error
 Style/RedundantBegin:
@@ -172,6 +174,8 @@ Style/RedundantFreeze:
 Style/RedundantParentheses:
   Severity: error
 Style/RedundantRegexpEscape:
+  Severity: error
+Style/RedundantReturn:
   Severity: error
 Style/SlicingWithRange:
   Severity: error

@@ -36,7 +36,7 @@ def select_migration_file(opts = {})
 
   new_filename, fullpath, _data = get_file(filename, opts[:data])
   f('#migrationFileUpload').send_keys(fullpath)
-  return new_filename
+  new_filename
 end
 
 def fill_migration_form(opts = {})

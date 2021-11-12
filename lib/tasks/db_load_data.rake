@@ -13,12 +13,12 @@ def create_notification(values = {})
 end
 
 def telemetry_enabled?
-  return (ENV['TELEMETRY_OPT_IN'] || "").present?
+  (ENV['TELEMETRY_OPT_IN'] || "").present?
 end
 
 def obfuscate_input_or_echo(password = false)
   echo = password ? "*" : true
-  return telemetry_enabled? ? false : echo
+  telemetry_enabled? ? false : echo
 end
 
 namespace :db do

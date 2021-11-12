@@ -542,17 +542,17 @@ class Submission < ActiveRecord::Base
       settings = assignment.turnitin_settings
       type_can_peer_review = false
     end
-    return plagData &&
-           (user_can_read_grade?(user, session, for_plagiarism: true) || (type_can_peer_review && user_can_peer_review_plagiarism?(user))) &&
-           (assignment.context.grants_right?(user, session, :manage_grades) ||
-             case settings[:originality_report_visibility]
-             when 'immediate' then true
-             when 'after_grading' then current_submission_graded?
-             when 'after_due_date'
-                then assignment.due_at && assignment.due_at < Time.now.utc
-             when 'never' then false
-             end
-           )
+    plagData &&
+      (user_can_read_grade?(user, session, for_plagiarism: true) || (type_can_peer_review && user_can_peer_review_plagiarism?(user))) &&
+      (assignment.context.grants_right?(user, session, :manage_grades) ||
+        case settings[:originality_report_visibility]
+        when 'immediate' then true
+        when 'after_grading' then current_submission_graded?
+        when 'after_due_date'
+           then assignment.due_at && assignment.due_at < Time.now.utc
+        when 'never' then false
+        end
+      )
   end
 
   def user_can_peer_review_plagiarism?(user)
@@ -2560,7 +2560,7 @@ class Submission < ActiveRecord::Base
                    end
     return "unread" if has_comments
 
-    return "read"
+    "read"
   end
 
   def read?(current_user)

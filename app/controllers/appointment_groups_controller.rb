@@ -608,7 +608,7 @@ class AppointmentGroupsController < ApplicationController
     # start with the first reservable appointment group
     group = AppointmentGroup.reservable_by(@current_user, params[:context_codes]).current.order(:start_at).first
     anchor = calendar_fragment :view_name => :agenda, :view_start => group && group.start_at.strftime('%Y-%m-%d')
-    return redirect_to calendar2_url(:anchor => anchor)
+    redirect_to calendar2_url(:anchor => anchor)
   end
 
   def web_show

@@ -84,7 +84,7 @@ module Lti
       return unless token.pseudonym && token.pseudonym.id && callback.present?
 
       callbacks = get_logout_callbacks(token.pseudonym)
-      raise BasicLTI::BasicOutcomes::Unauthorized, 'Logout service token has already been used' if callbacks.has_key?(token.nonce)
+      raise BasicLTI::BasicOutcomes::Unauthorized, 'Logout service token has already been used' if callbacks.key?(token.nonce)
 
       callbacks[token.nonce] = callback
       Rails.cache.write(cache_key(token.pseudonym), callbacks, :expires_in => 1.day)

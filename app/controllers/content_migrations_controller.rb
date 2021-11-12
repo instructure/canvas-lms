@@ -408,7 +408,7 @@ class ContentMigrationsController < ApplicationController
   end
 
   def lookup_sis_source_course
-    if params.has_key?(:settings) && params[:settings].has_key?(:source_course_id)
+    if params.key?(:settings) && params[:settings].key?(:source_course_id)
       course = api_find(Course, params[:settings][:source_course_id])
       params[:settings][:source_course_id] = course.id
       course
@@ -572,7 +572,7 @@ class ContentMigrationsController < ApplicationController
           return false unless link_content_export_attachment
         end
 
-        if !params.has_key?(:do_not_run) || !Canvas::Plugin.value_to_boolean(params[:do_not_run])
+        if !params.key?(:do_not_run) || !Canvas::Plugin.value_to_boolean(params[:do_not_run])
           @content_migration.shard.activate do
             @content_migration.queue_migration(@plugin)
           end

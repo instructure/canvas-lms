@@ -295,7 +295,7 @@ class Login::SamlController < ApplicationController
         return
       end
 
-      return redirect_to saml_login_url(id: aac.id)
+      redirect_to saml_login_url(id: aac.id)
     when SAML2::LogoutRequest
 
       if aac.debugging? && aac.debug_get(:logged_in_user_id) == @current_user.id
@@ -333,11 +333,11 @@ class Login::SamlController < ApplicationController
                                                          private_key: private_key,
                                                          sig_alg: aac.sig_alg)
 
-      return redirect_to(forward_url)
+      redirect_to(forward_url)
     else
       error = "Unexpected SAML message: #{message.class}"
       Canvas::Errors.capture_exception(:saml, error, :warn)
-      return render status: :bad_request, plain: error
+      render status: :bad_request, plain: error
     end
   end
 

@@ -413,7 +413,7 @@ class ContextModulesApiController < ApplicationController
                                             end
       end
 
-      if params[:module].has_key?(:published)
+      if params[:module].key?(:published)
         if value_to_boolean(params[:module][:published])
           @module.publish
           @module.publish_items!
@@ -487,10 +487,10 @@ class ContextModulesApiController < ApplicationController
       @context.touch
 
       @module.reload
-      return true
+      true
     else
       @module.errors.add(:position, t(:invalid_position, "Invalid position"))
-      return false
+      false
     end
   end
 
@@ -503,7 +503,7 @@ class ContextModulesApiController < ApplicationController
     elsif @context.grants_right?(@current_user, session, :participate_as_student)
       @student = @current_user
     else
-      return true
+      true
     end
   end
   protected :find_student

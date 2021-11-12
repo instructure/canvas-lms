@@ -82,7 +82,7 @@ describe "Api::V1::Assignment" do
       po = planner_override_model(user: user, plannable: assignment)
       json = api.assignment_json(assignment, user, session,
                                  { include_planner_override: true })
-      expect(json.key?('planner_override')).to be_present
+      expect(json).to have_key('planner_override')
       expect(json['planner_override']['id']).to eq po.id
     end
 
@@ -95,7 +95,7 @@ describe "Api::V1::Assignment" do
 
     it "returns nil for planner override when flag is passed and there is no override" do
       json = api.assignment_json(assignment, user, session, { include_planner_override: true })
-      expect(json.key?('planner_override')).to be_present
+      expect(json).to have_key('planner_override')
       expect(json['planner_override']).to be_nil
     end
 
@@ -288,7 +288,7 @@ describe "Api::V1::Assignment" do
 
         it 'serializes require_lockdown_browser to be true' do
           json = api.assignment_json(assignment, user, session, {})
-          expect(json.key?('require_lockdown_browser')).to be_present
+          expect(json).to have_key('require_lockdown_browser')
           expect(json['require_lockdown_browser']).to be_truthy
         end
       end
@@ -305,7 +305,7 @@ describe "Api::V1::Assignment" do
 
         it 'serializes require_lockdown_browser to be false' do
           json = api.assignment_json(assignment, user, session, {})
-          expect(json.key?('require_lockdown_browser')).to be_present
+          expect(json).to have_key('require_lockdown_browser')
           expect(json['require_lockdown_browser']).to be_falsy
         end
       end
@@ -313,7 +313,7 @@ describe "Api::V1::Assignment" do
       context 'when N.Q respondus setting is off (default)' do
         it 'serializes require_lockdown_browser to be false' do
           json = api.assignment_json(assignment, user, session, {})
-          expect(json.key?('require_lockdown_browser')).to be_present
+          expect(json).to have_key('require_lockdown_browser')
           expect(json['require_lockdown_browser']).to be_falsy
         end
       end

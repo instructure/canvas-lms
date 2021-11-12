@@ -36,13 +36,13 @@ module SchedulerCommon
       f('.ag_contexts_done').click
     end
     if opts[:checkable_options]
-      if opts[:checkable_options].has_key?(:per_slot_option)
+      if opts[:checkable_options].key?(:per_slot_option)
         set_value f('[type=checkbox][name="per_slot_option"]'), true
       end
-      if opts[:checkable_options].has_key?(:participant_visibility)
+      if opts[:checkable_options].key?(:participant_visibility)
         set_value f('[type=checkbox][name="participant_visibility"]'), true
       end
-      if opts[:checkable_options].has_key?(:max_appointments_per_participant_option)
+      if opts[:checkable_options].key?(:max_appointments_per_participant_option)
         set_value f('[type=checkbox][name="max_appointments_per_participant_option"]'), true
       end
     end

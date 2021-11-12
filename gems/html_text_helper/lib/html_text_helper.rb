@@ -42,7 +42,7 @@ require 'canvas_text_helper'
 module HtmlTextHelper
   def self.strip_tags(text)
     text ||= ""
-    text.gsub(/<\/?[^<>\n]*>?/, "").gsub(/&#\d+;/) { |m| puts m; m[2..].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "")
+    text.gsub(/<\/?[^<>\n]*>?/, "").gsub(/&#\d+;/) { |m| m[2..].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "")
   end
 
   def strip_tags(text)
@@ -309,7 +309,7 @@ module HtmlTextHelper
     link += parts[1] if parts[1]
     link
   rescue
-    return ""
+    ""
   end
 
   def self.escape_html(text)

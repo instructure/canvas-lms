@@ -145,7 +145,7 @@ module ContextModulesHelper
     end
 
     module_data[:items_data] = items_data
-    return module_data
+    module_data
   end
 
   def module_item_translated_content_type(item, is_student = false)

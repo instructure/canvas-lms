@@ -234,7 +234,7 @@ module CanvasColor
       val = Color.parse(val)
       return false if val.nil?
 
-      return r == val.r && g == val.g && b == val.b && a == val.a
+      r == val.r && g == val.g && b == val.b && a == val.a
     end
 
     # Setters for individual channels - take 0-255 or '00'-'FF' values

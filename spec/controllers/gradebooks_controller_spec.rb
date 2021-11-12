@@ -247,14 +247,14 @@ describe GradebooksController do
           @student_enrollment.scores.find_by(course_score: true).update!(override_score: nil)
           user_session(@teacher)
           get :grade_summary, params: { course_id: @course.id, id: @student.id }
-          expect(assigns[:js_env].key?(:effective_final_score)).to be false
+          expect(assigns[:js_env]).not_to have_key(:effective_final_score)
         end
 
         it "does not include the effective final score in the ENV if there is no score" do
           invited_student = @course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "invited").user
           user_session(@teacher)
           get :grade_summary, params: { course_id: @course.id, id: invited_student.id }
-          expect(assigns[:js_env].key?(:effective_final_score)).to be false
+          expect(assigns[:js_env]).not_to have_key(:effective_final_score)
         end
 
         it "takes the effective final score for the grading period, if present" do
@@ -281,7 +281,7 @@ describe GradebooksController do
         @course.disable_feature!(:final_grades_override)
         user_session(@teacher)
         get :grade_summary, params: { course_id: @course.id, id: @student.id }
-        expect(assigns[:js_env].key?(:effective_final_score)).to be false
+        expect(assigns[:js_env]).not_to have_key(:effective_final_score)
       end
     end
 

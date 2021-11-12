@@ -43,7 +43,7 @@ module IncomingMailProcessor
         mailbox_class = get_mailbox_class(account)
         mailbox = mailbox_class.new(account.config)
         mailbox.set_timeout_method(&method(:timeout_method))
-        return mailbox
+        mailbox
       end
 
       def error_report_category
@@ -273,7 +273,7 @@ module IncomingMailProcessor
         html_body = self.class.format_message(text_body).first
       end
 
-      return text_body, html_body
+      [text_body, html_body]
     end
 
     def report_stats(incoming_message, mailbox_account)
@@ -328,7 +328,7 @@ module IncomingMailProcessor
       # access some of the fields to make sure they don't raise errors when accessed
       message.subject
 
-      return message, errors
+      [message, errors]
     rescue => e
       @error_reporter.log_exception(self.class.error_report_category, e, {})
       nil

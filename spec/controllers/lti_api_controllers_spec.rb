@@ -49,11 +49,11 @@ describe LtiApiController, type: :request do
       expect(json["error_report_id"]).to be > 0
       data = error_data(json)
 
-      expect(data.key?('oauth_signature')).to be true
-      expect(data.key?('oauth_signature_method')).to be true
-      expect(data.key?('oauth_nonce')).to be true
-      expect(data.key?('oauth_timestamp')).to be true
-      expect(data.key?('generated_signature')).to be true if check_generated_sig
+      expect(data).to have_key('oauth_signature')
+      expect(data).to have_key('oauth_signature_method')
+      expect(data).to have_key('oauth_nonce')
+      expect(data).to have_key('oauth_timestamp')
+      expect(data).to have_key('generated_signature') if check_generated_sig
 
       expect(data['oauth_signature']).to_not be_empty
       expect(data['oauth_signature_method']).to_not be_empty

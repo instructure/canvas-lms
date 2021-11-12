@@ -289,7 +289,7 @@ module Plannable
         visited << [col, val]
       end
       sql = "(" + top_clauses.join(" OR ") + ")"
-      return [sql, *args]
+      [sql, *args]
     end
   end
 end

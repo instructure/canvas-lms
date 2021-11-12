@@ -123,7 +123,7 @@ module Api::V1::StreamItem
   def api_render_stream(opts)
     items = @current_user.shard.activate do
       scope = @current_user.visible_stream_item_instances(opts).preload(:stream_item)
-      if opts.has_key?(:asset_type)
+      if opts.key?(:asset_type)
         is_cross_shard = @current_user.visible_stream_item_instances(opts)
                                       .where("stream_item_id > ?", Shard::IDS_PER_SHARD).exists?
         if is_cross_shard
@@ -136,7 +136,7 @@ module Api::V1::StreamItem
             # just because there are comments doesn't mean the user can see them.
             # we still need to filter after the pagination :(
             scope = scope.where("submissions.workflow_state <> 'deleted' AND submissions.submission_comments_count>0")
-            scope = scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.has_key?(:submission_user_id)
+            scope = scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.key?(:submission_user_id)
           end
         end
       end
@@ -160,7 +160,7 @@ module Api::V1::StreamItem
         # just because there are comments doesn't mean the user can see them.
         # we still need to filter after the pagination :(
         si_scope = si_scope.where("submissions.workflow_state <> 'deleted' AND submissions.submission_comments_count>0")
-        si_scope = si_scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.has_key?(:submission_user_id)
+        si_scope = si_scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.key?(:submission_user_id)
         filtered_ids += si_scope.pluck(:id).map { |id| Shard.relative_id_for(id, Shard.current, @current_user.shard) }
       end
     end

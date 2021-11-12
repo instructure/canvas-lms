@@ -242,10 +242,10 @@ class Conversation < ActiveRecord::Base
       options = { :generated => false,
                   :update_for_sender => true,
                   :only_existing => false }.update(options)
-      options[:update_participants] = !options[:generated]         unless options.has_key?(:update_participants)
-      options[:update_for_skips]    = options[:update_for_sender]  unless options.has_key?(:update_for_skips)
+      options[:update_participants] = !options[:generated]         unless options.key?(:update_participants)
+      options[:update_for_skips]    = options[:update_for_sender]  unless options.key?(:update_for_skips)
       options[:skip_users]        ||= [current_user]
-      options[:reset_unread_counts] = options[:update_participants] unless options.has_key?(:reset_unread_counts)
+      options[:reset_unread_counts] = options[:update_participants] unless options.key?(:reset_unread_counts)
 
       message = body_or_obj.is_a?(ConversationMessage) ?
         body_or_obj :

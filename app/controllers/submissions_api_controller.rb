@@ -622,7 +622,7 @@ class SubmissionsApiController < ApplicationController
         )
       else
         @unauthorized_message = t('#application.errors.submission_unauthorized', "You cannot access this submission.")
-        return render_unauthorized_action
+        render_unauthorized_action
       end
     end
   end

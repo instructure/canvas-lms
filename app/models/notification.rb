@@ -683,7 +683,7 @@ class Notification < Switchman::UnshardedRecord
   end
 
   def type_name
-    return category
+    category
   end
 
   def relevant_to_user?(user)

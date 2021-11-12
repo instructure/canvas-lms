@@ -22,7 +22,7 @@ module Filters::Quizzes
   protected
 
   def require_quiz
-    id = params.has_key?(:quiz_id) ? params[:quiz_id] : params[:id]
+    id = params.key?(:quiz_id) ? params[:quiz_id] : params[:id]
 
     unless (@quiz = @context.quizzes.find(id))
       raise ActiveRecord::RecordNotFound.new('Quiz not found')

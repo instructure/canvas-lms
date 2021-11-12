@@ -126,7 +126,7 @@ module BookmarkedCollection
     end
 
     def validate_definition(definition)
-      raise "expected :type and :null to be specified" unless [:type, :null].all? { |k| definition.has_key?(k) }
+      raise "expected :type and :null to be specified" unless [:type, :null].all? { |k| definition.key?(k) }
 
       definition
     end
@@ -230,7 +230,7 @@ module BookmarkedCollection
       index_sql, *index_args = column_comparison(columns.first, ">=", bookmark.first)
       sql = [sql, index_sql].join(" AND ")
       args.concat(index_args)
-      return [sql, *args]
+      [sql, *args]
     end
   end
 end

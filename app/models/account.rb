@@ -1928,7 +1928,7 @@ class Account < ActiveRecord::Base
     when :none
       self.allowed_services_hash.empty?
     else
-      self.allowed_services_hash.has_key?(service)
+      self.allowed_services_hash.key?(service)
     end
   end
 
@@ -2035,7 +2035,7 @@ class Account < ActiveRecord::Base
   end
 
   def trusted_referer?(referer_url)
-    return if !self.settings.has_key?(:trusted_referers) || self.settings[:trusted_referers].blank?
+    return if !self.settings.key?(:trusted_referers) || self.settings[:trusted_referers].blank?
 
     if (referer_with_port = format_referer(referer_url))
       self.settings[:trusted_referers].split(',').include?(referer_with_port)
@@ -2092,7 +2092,7 @@ class Account < ActiveRecord::Base
   def update_terms_of_service(terms_params)
     terms = TermsOfService.ensure_terms_for_account(self)
     terms.terms_type = terms_params[:terms_type] if terms_params[:terms_type]
-    terms.passive = Canvas::Plugin.value_to_boolean(terms_params[:passive]) if terms_params.has_key?(:passive)
+    terms.passive = Canvas::Plugin.value_to_boolean(terms_params[:passive]) if terms_params.key?(:passive)
 
     if terms.custom?
       TermsOfServiceContent.ensure_content_for_account(self)

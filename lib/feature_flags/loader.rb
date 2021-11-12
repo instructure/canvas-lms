@@ -28,16 +28,18 @@ module FeatureFlags
 
     def self.wrap_translate_text(value)
       return -> { "" } if value.empty?
+
       if value.is_a?(String)
-        return -> { I18n.send(:t, value) }
+        -> { I18n.send(:t, value) }
       elsif value.is_a?(Hash)
         wrapper = value.delete(:wrapper)
         keys = value.keys
         raise "invalid i18n settings while translating: #{value}" if keys.size != 1
+
         if wrapper
-          return -> { I18n.send(:t, keys[0], value[keys[0]], wrapper: { '*' => wrapper }) }
+          -> { I18n.send(:t, keys[0], value[keys[0]], wrapper: { '*' => wrapper }) }
         else
-          return -> { I18n.send(:t, keys[0], value[keys[0]]) }
+          -> { I18n.send(:t, keys[0], value[keys[0]]) }
         end
       else
         raise "unable to handle translation: #{value}"
@@ -88,7 +90,7 @@ module FeatureFlags
         return value ? "on" : "off"
       end
 
-      return value
+      value
     end
   end
 end

@@ -68,7 +68,7 @@ module AddressBook
     # known. if not known, returns an empty hash
     def common_courses(user)
       if user == @sender
-        return {}
+        {}
       else
         known = known_user(user)
         known ? @cache.common_courses(known) : {}
@@ -80,7 +80,7 @@ module AddressBook
     # known. if not known, returns an empty hash
     def common_groups(user)
       if user == @sender
-        return {}
+        {}
       else
         known = known_user(user)
         known ? @cache.common_groups(known) : {}

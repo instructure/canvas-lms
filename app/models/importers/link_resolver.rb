@@ -214,14 +214,14 @@ module Importers
       end
 
       if node['id'] && node['id'] =~ /\Amedia_comment_(.+)\z/
-        return "/media_objects/#{$1}"
+        "/media_objects/#{$1}"
       elsif node['data-media-id'].present?
-        return media_iframe_url(node['data-media-id'], node['data-media-type'])
+        media_iframe_url(node['data-media-id'], node['data-media-type'])
       else
         node.delete('class')
         node.delete('id')
         node.delete('style')
-        return nil
+        nil
       end
     end
   end

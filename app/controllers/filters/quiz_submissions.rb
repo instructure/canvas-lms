@@ -28,7 +28,7 @@ module Filters::QuizSubmissions
   def require_quiz_submission(active: false)
     query = {}
     scope = @quiz ? @quiz.quiz_submissions : Quizzes::QuizSubmission
-    id = if params.has_key?(:quiz_submission_id)
+    id = if params.key?(:quiz_submission_id)
            params[:quiz_submission_id]
          else
            params[:id]

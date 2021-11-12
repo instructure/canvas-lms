@@ -199,7 +199,7 @@ class Auditors::Course
 
     copied_from = self.record(copy, user, 'copied_from', { copied_from: Shard.global_id_for(course) }, opts)
     copied_to = self.record(course, user, 'copied_to', { copied_to: Shard.global_id_for(copy) }, opts)
-    return copied_from, copied_to
+    [copied_from, copied_to]
   end
 
   def self.record_reset(course, new_course, user, opts = {})
@@ -207,7 +207,7 @@ class Auditors::Course
 
     reset_from = self.record(new_course, user, 'reset_from', { reset_from: Shard.global_id_for(course) }, opts)
     reset_to = self.record(course, user, 'reset_to', { reset_to: Shard.global_id_for(new_course) }, opts)
-    return reset_from, reset_to
+    [reset_from, reset_to]
   end
 
   def self.record(course, user, event_type, data = {}, opts = {})

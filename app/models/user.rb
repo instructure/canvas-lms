@@ -521,7 +521,7 @@ class User < ActiveRecord::Base
       account = account_id
       account_id = account.id
     end
-    return account_chain_cache[account_id] if account_chain_cache.has_key?(account_id)
+    return account_chain_cache[account_id] if account_chain_cache.key?(account_id)
 
     account ||= Account.find(account_id)
     return account_chain_cache[account.id] = [account.id] if account.root_account?
@@ -533,7 +533,7 @@ class User < ActiveRecord::Base
     results = {}
     remaining_ids = []
     starting_account_ids.each do |account_id|
-      unless account_chain_cache.has_key? account_id
+      unless account_chain_cache.key? account_id
         remaining_ids << account_id
         next
       end
@@ -662,7 +662,7 @@ class User < ActiveRecord::Base
         key = [aa.user_id, aa.account_id]
         # duplicates. the unique index prevents these now, but this code
         # needs to hang around for the migration itself
-        if current_associations.has_key?(key)
+        if current_associations.key?(key)
           to_delete << aa.id
           next
         end

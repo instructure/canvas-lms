@@ -112,8 +112,9 @@ module Importers
       if migration.migration_settings[:prefer_existing_tools] && (tool = self.check_for_existing_tool(hash, migration))
         return tool
       end
+
       if migration.migration_type == "common_cartridge_importer" && (tool = self.check_for_tool_compaction(hash, migration))
-        return tool
+        tool
       end
     end
 

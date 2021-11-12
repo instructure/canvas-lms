@@ -113,7 +113,7 @@ RSpec.shared_context "caching_helpers", :shared_context => :metadata do
     lgr = collector_class.new
     Rails.logger = lgr
     yield
-    return lgr.captured_message_stack
+    lgr.captured_message_stack
   ensure
     Rails.logger = prev_logger
   end

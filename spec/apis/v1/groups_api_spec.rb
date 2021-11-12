@@ -299,37 +299,37 @@ describe "Groups API", type: :request do
     json = api_call(:get, "#{@community_path}.json?include[]=favorites",
                     @category_path_options.merge(:group_id => @community.to_param, :action => "show",
                                                  :include => ["favorites"]))
-    expect(json.key?("is_favorite")).to be_truthy
+    expect(json).to have_key("is_favorite")
   end
 
   it "includes the group category" do
     @user = @member
     json = api_call(:get, "#{@community_path}.json?include[]=group_category", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :include => ["group_category"]))
-    expect(json.has_key?("group_category")).to be_truthy
+    expect(json).to have_key("group_category")
   end
 
   it 'includes permissions' do
     # Make sure it only returns permissions when asked
     json = api_call(:get, @community_path, @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json'))
-    expect(json.has_key?("permissions")).to be_falsey
+    expect(json).not_to have_key("permissions")
 
     # When its asked to return permissions make sure they are there
     json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => ["permissions"]))
-    expect(json.has_key?("permissions")).to be_truthy
+    expect(json).to have_key("permissions")
   end
 
   it 'includes permission create_discussion_topic' do
     json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => ["permissions"]))
 
-    expect(json.has_key?("permissions")).to be_truthy
-    expect(json["permissions"].has_key?("create_discussion_topic")).to be_truthy
+    expect(json).to have_key("permissions")
+    expect(json["permissions"]).to have_key("create_discussion_topic")
   end
 
   it 'includes permission create_student_announcements' do
     json = api_call(:get, "#{@community_path}.json?include[]=permissions", @category_path_options.merge(:group_id => @community.to_param, :action => "show", :format => 'json', :include => ["permissions"]))
 
-    expect(json.has_key?("permissions")).to be_truthy
-    expect(json["permissions"].has_key?("create_announcement")).to be_truthy
+    expect(json).to have_key("permissions")
+    expect(json["permissions"]).to have_key("create_announcement")
     expect(json['permissions']['create_announcement']).to be_truthy
   end
 

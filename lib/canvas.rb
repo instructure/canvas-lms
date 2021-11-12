@@ -211,7 +211,7 @@ module Canvas
     Canvas::Errors.capture_exception(:service_timeout, e, :warn)
     raise if options[:raise_on_timeout]
 
-    return nil
+    nil
   end
 
   def self.timeout_protection_cutoff(service_name)

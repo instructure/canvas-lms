@@ -199,7 +199,7 @@ module Canvas
       return value if [true, false].include?(value)
       return nil if ignore_unrecognized
 
-      return value.to_i != 0
+      value.to_i != 0
     end
   end
 

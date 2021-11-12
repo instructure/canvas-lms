@@ -55,7 +55,7 @@ module AvatarHelper
     avatar_url, display_name = avatar_image_attrs(user_or_id)
     context_code = opts[:context_code] if opts[:context_code]
     url = nil
-    if opts.has_key? :url
+    if opts.key? :url
       url = opts[:url]
     elsif user_or_id
       url = if context_code

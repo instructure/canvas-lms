@@ -818,7 +818,7 @@ class CoursesController < ApplicationController
       params[:course] ||= {}
       params_for_create = course_params
 
-      if params_for_create.has_key?(:syllabus_body)
+      if params_for_create.key?(:syllabus_body)
         params_for_create[:syllabus_body] = process_incoming_html_content(params_for_create[:syllabus_body])
       end
 
@@ -1751,9 +1751,9 @@ class CoursesController < ApplicationController
     return !!redirect_to(course_url(@context.id)) unless @pending_enrollment
 
     if params[:reject]
-      return reject_enrollment(@pending_enrollment)
+      reject_enrollment(@pending_enrollment)
     elsif params[:accept]
-      return accept_enrollment(@pending_enrollment)
+      accept_enrollment(@pending_enrollment)
     else
       redirect_to course_url(@context.id)
     end
@@ -1785,7 +1785,7 @@ class CoursesController < ApplicationController
       else
         @context_enrollment = enrollment
         enrollment = nil
-        return false
+        false
       end
     elsif (!@current_user && enrollment.user.registered?) || !enrollment.user.email_channel
       session[:return_to] = course_url(@context.id)
@@ -3183,7 +3183,7 @@ class CoursesController < ApplicationController
           redirect_to(course_url(@course))
         end
       end
-      return false
+      false
     else
       result = @course.process_event(event)
       if result
@@ -3565,17 +3565,17 @@ class CoursesController < ApplicationController
 
     # Since course uses write_attribute on settings its not accurate
     # so just ignore it if its in the changes hash
-    changes.delete("settings") if changes.has_key?("settings")
+    changes.delete("settings") if changes.key?("settings")
 
     unless old_settings == new_settings
       settings = Course.settings_options.keys.inject({}) do |results, key|
-        old_value = if old_settings.present? && old_settings.has_key?(key)
+        old_value = if old_settings.present? && old_settings.key?(key)
                       old_settings[key]
                     else
                       nil
                     end
 
-        new_value = if new_settings.present? && new_settings.has_key?(key)
+        new_value = if new_settings.present? && new_settings.key?(key)
                       new_settings[key]
                     else
                       nil

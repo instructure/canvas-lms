@@ -386,7 +386,7 @@ module CC
           end
         end
 
-        return doc.to_s
+        doc.to_s
       end
     end
 
