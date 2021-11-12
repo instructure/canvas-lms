@@ -26,7 +26,7 @@ module Api::V1::Group
   API_GROUP_JSON_OPTS = {
     :only => %w(id name description is_public join_level group_category_id max_membership created_at),
     :methods => %w(members_count storage_quota_mb),
-  }
+  }.freeze
 
   API_GROUP_MEMBERSHIP_JSON_OPTS = {
     :only => %w(id group_id user_id workflow_state moderator created_at).freeze

@@ -22,8 +22,8 @@ require_dependency 'messageable_user'
 
 class MessageableUser
   class Calculator
-    CONTEXT_RECIPIENT = /\A(course|section|group|discussion_topic)_(\d+)(_([a-z]+))?\z/
-    INDIVIDUAL_RECIPIENT = /\A\d+\z/
+    CONTEXT_RECIPIENT = /\A(course|section|group|discussion_topic)_(\d+)(_([a-z]+))?\z/.freeze
+    INDIVIDUAL_RECIPIENT = /\A\d+\z/.freeze
 
     # all work is done within the context of a user. avoid passing it around in
     # every single method call by being an object instead of just a collection

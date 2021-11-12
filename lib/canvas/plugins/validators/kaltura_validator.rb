@@ -19,7 +19,7 @@
 #
 
 module Canvas::Plugins::Validators::KalturaValidator
-  CAN_BE_BLANK = [:cache_play_list_seconds, :rtmp_domain]
+  CAN_BE_BLANK = [:cache_play_list_seconds, :rtmp_domain].freeze
 
   def self.validate(settings, plugin_setting)
     if settings.map(&:last).all?(&:blank?)

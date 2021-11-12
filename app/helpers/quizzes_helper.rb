@@ -21,7 +21,7 @@
 require 'nokogiri'
 
 module QuizzesHelper
-  RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/
+  RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/.freeze
 
   def needs_unpublished_warning?(quiz = @quiz)
     return false unless can_publish(quiz)

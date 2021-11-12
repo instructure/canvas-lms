@@ -49,7 +49,7 @@ class CutyCapt
     :domain_blacklist => [],
     :allowed_schemes => ['http', 'https'],
     :lang => 'en,*;q=0.9'
-  }
+  }.freeze
 
   cattr_writer :config
 

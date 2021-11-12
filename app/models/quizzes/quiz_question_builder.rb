@@ -21,7 +21,7 @@ class Quizzes::QuizQuestionBuilder
   QUIZ_GROUP_ENTRY = 'quiz_group'
   DEFAULT_OPTIONS = {
     shuffle_answers: false
-  }
+  }.freeze
 
   class << self
     def t(*args)

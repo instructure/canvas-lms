@@ -2661,7 +2661,7 @@ class Course < ActiveRecord::Base
     end
   end
 
-  ADMIN_TYPES = %w{TeacherEnrollment TaEnrollment DesignerEnrollment}
+  ADMIN_TYPES = %w{TeacherEnrollment TaEnrollment DesignerEnrollment}.freeze
   def section_visibilities_for(user, opts = {})
     fetch_on_enrollments('section_visibilities_for', user, opts) do
       workflow_not = opts[:excluded_workflows] || 'deleted'

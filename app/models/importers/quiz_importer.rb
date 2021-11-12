@@ -84,7 +84,7 @@ module Importers
       references << quiz_question if quiz_question['question_type'] == 'question_reference'
     end
 
-    QUIZ_QUESTION_KEYS = ['position', 'points_possible']
+    QUIZ_QUESTION_KEYS = ['position', 'points_possible'].freeze
     IGNORABLE_QUESTION_KEYS = QUIZ_QUESTION_KEYS + ['answers', 'assessment_question_migration_id', 'migration_id', 'question_bank_migration_id',
                                                     'question_bank_id', 'is_quiz_question_bank', 'question_bank_name']
 

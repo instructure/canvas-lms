@@ -37,7 +37,7 @@ module Canvas::Migration::Helpers
       ['groups', -> { I18n.t('lib.canvas.migration.groups', 'Student Groups') }],
       ['learning_outcomes', -> { I18n.t('lib.canvas.migration.learning_outcomes', 'Learning Outcomes') }],
       ['attachments', -> { I18n.t('lib.canvas.migration.attachments', 'Files') }],
-    ]
+    ].freeze
 
     def initialize(migration = nil, base_url = nil, global_identifiers:)
       @migration = migration

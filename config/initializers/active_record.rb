@@ -1480,7 +1480,7 @@ end
 
 class ActiveRecord::Migration
   # at least one of these tags is required
-  DEPLOY_TAGS = [:predeploy, :postdeploy]
+  DEPLOY_TAGS = [:predeploy, :postdeploy].freeze
 
   class << self
     def is_postgres?

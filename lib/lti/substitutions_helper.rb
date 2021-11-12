@@ -39,7 +39,7 @@ module Lti
       DesignerEnrollment => LtiOutbound::LTIRoles::Context::CONTENT_DEVELOPER,
       ObserverEnrollment => LtiOutbound::LTIRoles::Context::OBSERVER,
       StudentViewEnrollment => LtiOutbound::LTIRoles::Context::LEARNER
-    }
+    }.freeze
 
     LIS_V2_ROLE_MAP = {
       'user' => 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User',
@@ -56,7 +56,7 @@ module Lti
       ObserverEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor',
       StudentViewEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner',
       Course => 'http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering'
-    }
+    }.freeze
 
     LIS_V2_ROLE_NONE = 'http://purl.imsglobal.org/vocab/lis/v2/person#None'
 

@@ -1776,7 +1776,7 @@ class ApplicationController < ActionController::Base
     session.delete(:course_uuid)
   end
 
-  API_REQUEST_REGEX = %r{\A/api/}
+  API_REQUEST_REGEX = %r{\A/api/}.freeze
   def api_request?
     @api_request ||= !!request.path.match(API_REQUEST_REGEX)
   end

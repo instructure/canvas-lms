@@ -26,7 +26,7 @@ class MediaTrack < ActiveRecord::Base
   validates :locale, format: { with: /\A[A-Za-z\-]+\z/ }
   validates :content, presence: true
 
-  RE_LOOKS_LIKE_TTML = /<tt\s+xml/i
+  RE_LOOKS_LIKE_TTML = /<tt\s+xml/i.freeze
   validates :content, format: {
     without: RE_LOOKS_LIKE_TTML,
     message: 'TTML tracks are not allowed because they are susceptible to xss attacks'

@@ -67,7 +67,7 @@ class RubricAssociation < ActiveRecord::Base
     'Course' => ::Course,
     'Assignment' => ::Assignment,
     'Account' => ::Account,
-  }
+  }.freeze
 
   # takes params[:association_type] and params[:association_id] and finds the
   # valid association object, if possible. Valid types are listed in

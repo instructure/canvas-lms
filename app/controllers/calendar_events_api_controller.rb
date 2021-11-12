@@ -291,7 +291,7 @@ class CalendarEventsApiController < ApplicationController
 
   RECURRING_EVENT_LIMIT = 200
 
-  DEFAULT_INCLUDES = %w[child_events]
+  DEFAULT_INCLUDES = %w[child_events].freeze
 
   # @API List calendar events
   #

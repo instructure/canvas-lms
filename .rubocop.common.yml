@@ -163,6 +163,8 @@ Style/IfUnlessModifier:
   Enabled: false # can obscure important decisions or put too much code in a line
 Style/IfWithBooleanLiteralBranches:
   Severity: error
+Style/MutableConstant:
+  Severity: error
 Style/NegatedIf:
   Severity: error
 Style/NumericPredicate:

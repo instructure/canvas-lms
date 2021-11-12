@@ -22,7 +22,7 @@ require_dependency 'importers'
 module Importers
   class AssignmentImporter < Importer
     # Used to avoid adding duplicate line items when doing a re-import
-    LINE_ITEMS_EQUIVALENCY_FIELDS = %i[extensions label resource_id score_maximum tag]
+    LINE_ITEMS_EQUIVALENCY_FIELDS = %i[extensions label resource_id score_maximum tag].freeze
 
     self.item_class = Assignment
 

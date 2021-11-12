@@ -83,6 +83,6 @@ module Canvas
       ninja
       mustang
       password1
-    }
+    }.freeze
   end
 end

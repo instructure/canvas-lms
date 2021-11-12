@@ -60,10 +60,10 @@ module LocaleSelection
     nil
   end
 
-  QUALITY_VALUE = /;q=([01]\.(\d{0,3})?)/
-  LANGUAGE_RANGE = /([a-zA-Z]{1,8}(-[a-zA-Z]{1,8})*|\*)(#{QUALITY_VALUE})?/
-  SEPARATOR = /\s*,\s*/
-  ACCEPT_LANGUAGE = /\A#{LANGUAGE_RANGE}(#{SEPARATOR}#{LANGUAGE_RANGE})*\z/
+  QUALITY_VALUE = /;q=([01]\.(\d{0,3})?)/.freeze
+  LANGUAGE_RANGE = /([a-zA-Z]{1,8}(-[a-zA-Z]{1,8})*|\*)(#{QUALITY_VALUE})?/.freeze
+  SEPARATOR = /\s*,\s*/.freeze
+  ACCEPT_LANGUAGE = /\A#{LANGUAGE_RANGE}(#{SEPARATOR}#{LANGUAGE_RANGE})*\z/.freeze
 
   def infer_browser_locale(accept_language, locales_with_aliases)
     return nil unless ACCEPT_LANGUAGE.match?(accept_language)

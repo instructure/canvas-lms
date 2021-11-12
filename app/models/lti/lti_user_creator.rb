@@ -28,7 +28,7 @@ module Lti
       ObserverEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER,
       AccountUser => LtiOutbound::LTIRoles::Institution::ADMIN,
       StudentViewEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER
-    }
+    }.freeze
 
     def initialize(canvas_user, canvas_root_account, canvas_tool, canvas_context)
       @canvas_user = canvas_user

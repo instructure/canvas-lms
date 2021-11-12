@@ -526,7 +526,7 @@ Implemented for: Canvas LMS}]
     ASSET_TYPES = {
       'quiz' => /^quizzes:quiz_/,
       'qdb' => /^assessment_question_bank_/,
-    }
+    }.freeze
 
     ATTACHMENT_FOLDER_NAME = 'imported qti files'
 

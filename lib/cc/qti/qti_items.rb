@@ -29,7 +29,7 @@ module CC
                             'multiple_answers_question',
                             'true_false_question',
                             'short_answer_question',
-                            'essay_question']
+                            'essay_question'].freeze
 
       CC_TYPE_PROFILES = {
         'multiple_choice_question' => 'cc.multiple_choice.v0p1',
@@ -37,13 +37,13 @@ module CC
         'true_false_question' => 'cc.true_false.v0p1',
         'short_answer_question' => 'cc.fib.v0p1',
         'essay_question' => 'cc.essay.v0p1'
-      }
+      }.freeze
 
       # These types don't stop processing response conditions once the correct
       # answer is found, so they need to show the incorrect response differently
       MULTI_ANSWER_TYPES = ['matching_question',
                             'multiple_dropdowns_question',
-                            'fill_in_multiple_blanks_question']
+                            'fill_in_multiple_blanks_question'].freeze
 
       def add_ref_or_question(node, question)
         aq = nil
