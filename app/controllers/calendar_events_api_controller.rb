@@ -321,7 +321,7 @@ class CalendarEventsApiController < ApplicationController
   # @argument excludes[] [Array]
   #   Array of attributes to exclude. Possible values are "description", "child_events" and "assignment"
   # @argument important_dates [Boolean]
-  #   Defaults to false
+  #   Defaults to false.
   #   If true, only events with important dates set to true will be returned. This requires the Important Dates
   #   feature flag to be turned on or it will be ignored.
   #
