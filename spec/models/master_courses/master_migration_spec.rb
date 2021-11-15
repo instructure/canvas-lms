@@ -959,7 +959,7 @@ describe MasterCourses::MasterMigration do
       ]
       rub.save!
       rub.associate_with(@copy_from, @copy_from)
-      Rubric.where(:id => rub.id).update_all(:updated_at => 5.minute.from_now)
+      Rubric.where(:id => rub.id).update_all(:updated_at => 5.minutes.from_now)
 
       run_master_migration
 
@@ -993,7 +993,7 @@ describe MasterCourses::MasterMigration do
       ]
       rub.save!
       rub.associate_with(@copy_from, @copy_from)
-      Rubric.where(:id => rub.id).update_all(:updated_at => 5.minute.from_now)
+      Rubric.where(:id => rub.id).update_all(:updated_at => 5.minutes.from_now)
 
       run_master_migration
 

@@ -65,7 +65,7 @@ describe AssignmentsApiController, type: :request do
     override.set = @section
     override.set_type = 'CourseSection'
     override.due_at = Time.zone.now + 2.days
-    override.unlock_at = Time.zone.now + 1.days
+    override.unlock_at = Time.zone.now + 1.day
     override.lock_at = Time.zone.now + 3.days
     override.due_at_overridden = true
     override.lock_at_overridden = true
@@ -557,7 +557,7 @@ describe AssignmentsApiController, type: :request do
         create_section_override_for_assignment(@far_future_assignment, { course_section: @section, due_at: (Time.now + 30.days) })
 
         @upcoming_assignment = @course.assignments.create!(title: "upcoming", only_visible_to_overrides: true)
-        create_section_override_for_assignment(@upcoming_assignment, { course_section: @section, due_at: (Time.now + 1.days) })
+        create_section_override_for_assignment(@upcoming_assignment, { course_section: @section, due_at: (Time.now + 1.day) })
 
         @undated_assignment = @course.assignments.create!(title: "undated", only_visible_to_overrides: true)
         override = create_section_override_for_assignment(@undated_assignment, { course_section: @section, due_at: nil })
@@ -1328,7 +1328,7 @@ describe AssignmentsApiController, type: :request do
       @assignment = @course.assignments.create!(
         :title => "Test Assignment",
         :description => "public stuff",
-        :due_at => Time.zone.now + 1.days,
+        :due_at => Time.zone.now + 1.day,
         :unlock_at => Time.zone.now,
         :lock_at => Time.zone.now + 2.days
       )
@@ -5283,7 +5283,7 @@ describe AssignmentsApiController, type: :request do
         @assignment = @course.assignments.create!(
           :title => "Test Assignment",
           :description => "public stuff",
-          :due_at => Time.zone.now + 1.days,
+          :due_at => Time.zone.now + 1.day,
           :unlock_at => Time.zone.now,
           :lock_at => Time.zone.now + 2.days
         )

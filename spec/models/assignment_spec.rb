@@ -3902,7 +3902,7 @@ describe Assignment do
     it "does not interpret non-11:59pm as all day with non-all-day prior value" do
       @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
       @assignment.save!
-      @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 2.hour
+      @assignment.due_at = fancy_midnight(:zone => 'Alaska') + 2.hours
       @assignment.time_zone_edited = 'Alaska'
       @assignment.save!
       expect(@assignment.all_day).to eq false

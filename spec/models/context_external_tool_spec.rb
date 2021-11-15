@@ -2058,7 +2058,7 @@ describe ContextExternalTool do
           )[:original_visibility]).to eq 'admins'
         end
 
-        Timecop.freeze(time + 2.second) do
+        Timecop.freeze(time + 2.seconds) do
           @user.teacher_enrollments.update_all(:workflow_state => 'deleted')
           # should not have affected the earlier cache
           expect(ContextExternalTool.global_navigation_granted_permissions(
@@ -2096,7 +2096,7 @@ describe ContextExternalTool do
           expect(ContextExternalTool.global_navigation_menu_render_cache_key(@account, { :original_visibility => 'members' })).to eq @member_cache_key
         end
 
-        Timecop.freeze(time + 2.second) do
+        Timecop.freeze(time + 2.seconds) do
           @admin_tool.global_navigation = nil
           @admin_tool.save!
           # should update the admin key

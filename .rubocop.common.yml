@@ -116,6 +116,8 @@ Rails/IndexBy:
   Severity: error
 Rails/IndexWith:
   Severity: error
+Rails/PluralizationGrammar:
+  Severity: error
 Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
 Rails/SquishedSQLHeredocs:

@@ -2090,9 +2090,9 @@ describe User do
       end
 
       it "doesn't show unpublished assignments" do
-        assignment = @course.assignments.create!(:title => "not published", :due_at => 1.days.from_now)
+        assignment = @course.assignments.create!(:title => "not published", :due_at => 1.day.from_now)
         assignment.unpublish
-        assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.days.from_now)
+        assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.day.from_now)
         assignment2.publish
         events = @user.upcoming_events(:end_at => 1.week.from_now)
         expect(events.first).to eq assignment2

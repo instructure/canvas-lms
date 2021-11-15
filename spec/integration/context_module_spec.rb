@@ -125,7 +125,7 @@ describe ContextModule do
           @mod1.save!
         end
 
-        Timecop.freeze(2.second.ago) do
+        Timecop.freeze(2.seconds.ago) do
           @mod2 = @course.context_modules.create!(:name => "dependant module")
           @mod2.prerequisites = "module_#{@mod1.id}"
           @mod2.save!

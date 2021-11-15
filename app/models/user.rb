@@ -2255,7 +2255,7 @@ class User < ActiveRecord::Base
 
     now = Time.zone.now
 
-    opts[:end_at] ||= 1.weeks.from_now
+    opts[:end_at] ||= 1.week.from_now
     opts[:limit] ||= 20
 
     # if we're looking through a lot of courses, we should probably not spend a lot of time
