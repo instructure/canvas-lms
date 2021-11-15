@@ -62,7 +62,7 @@ module ApplicationHelper
   def context_prefix(code)
     return '/{{ context_type_pluralized }}/{{ context_id }}' unless code
 
-    split = code.split(/_/)
+    split = code.split("_")
     id = split.pop
     type = split.join('_')
     "/#{type.pluralize}/#{id}"

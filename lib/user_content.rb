@@ -98,8 +98,8 @@ module UserContent
       obj.css('param').each do |param|
         params[param['key']] = param['value']
       end
-      (obj['style'] || '').split(/;/).each do |attr|
-        key, value = attr.split(/:/).map(&:strip)
+      (obj['style'] || '').split(";").each do |attr|
+        key, value = attr.split(":").map(&:strip)
         styles[key] = value
       end
       width = css_size(obj['width'])

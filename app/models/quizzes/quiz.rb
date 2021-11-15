@@ -228,7 +228,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def valid_ip?(ip)
     require 'ipaddr'
-    ip_filter.split(/,/).any? do |filter|
+    ip_filter.split(",").any? do |filter|
       addr_range = ::IPAddr.new(filter) rescue nil
       addr = ::IPAddr.new(ip) rescue nil
       addr && addr_range && addr_range.include?(addr)
@@ -936,7 +936,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     require 'ipaddr'
     begin
-      self.ip_filter.split(/,/).each { |filter| ::IPAddr.new(filter) }
+      self.ip_filter.split(",").each { |filter| ::IPAddr.new(filter) }
     rescue
       errors.add(:invalid_ip_filter, t('#quizzes.quiz.errors.invalid_ip_filter', "IP filter is not valid"))
     end

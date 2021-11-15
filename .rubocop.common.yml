@@ -77,6 +77,8 @@ Performance/MapCompact:
   Severity: error
 Performance/RedundantMerge:
   Severity: error
+Performance/RedundantSplitRegexpArgument:
+  Severity: error
 Performance/RegexpMatch:
   Severity: error
 Performance/StartWith:

@@ -561,7 +561,7 @@ class ContextExternalTool < ActiveRecord::Base
     return {} if str.nil?
 
     str.split(/[\r\n]+/).each_with_object({}) do |line, hash|
-      key, val = line.split(/=/)
+      key, val = line.split("=")
       hash[key] = val if key.present? && val.present?
     end
   end
@@ -725,7 +725,7 @@ class ContextExternalTool < ActiveRecord::Base
     url = url.gsub(/[[:space:]]/, '')
     url = "http://" + url unless url.include?('://')
     res = Addressable::URI.parse(url).normalize
-    res.query = res.query.split(/&/).sort.join('&') unless res.query.blank?
+    res.query = res.query.split("&").sort.join('&') unless res.query.blank?
     res.to_s
   end
 
@@ -747,7 +747,7 @@ class ContextExternalTool < ActiveRecord::Base
     if domain
       # Somebody tell me if we should be expecting more than
       # 25 dots in a url host...
-      25 - domain.split(/\./).length
+      25 - domain.split(".").length
     elsif url
       25
     else
@@ -787,10 +787,10 @@ class ContextExternalTool < ActiveRecord::Base
     elsif standard_url.present?
       unless defined?(@url_params)
         res = Addressable::URI.parse(standard_url)
-        @url_params = res.query.present? ? res.query.split(/&/) : []
+        @url_params = res.query.present? ? res.query.split("&") : []
       end
       res = Addressable::URI.parse(url).normalize
-      res.query = res.query.split(/&/).select { |p| @url_params.include?(p) }.sort.join('&') if res.query.present?
+      res.query = res.query.split("&").select { |p| @url_params.include?(p) }.sort.join('&') if res.query.present?
       res.query = nil if res.query.blank?
       res.normalize!
       return true if res.to_s == standard_url

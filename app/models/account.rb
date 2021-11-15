@@ -515,7 +515,7 @@ class Account < ActiveRecord::Base
     require 'ipaddr'
     params.each do |key, str|
       ips = []
-      vals = str.split(/,/)
+      vals = str.split(",")
       vals.each do |val|
         ip = IPAddr.new(val) rescue nil
         # right now the ip_filter column on quizzes is just a string,
