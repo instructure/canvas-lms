@@ -87,6 +87,7 @@ describe('CreateCourseModal', () => {
     isModalOpen: true,
     setModalOpen,
     permissions: 'admin',
+    restrictToMCCAccount: false,
     isK5User: true,
     ...overrides
   })
@@ -244,6 +245,17 @@ describe('CreateCourseModal', () => {
       expect(getByText('Orange Elementary')).toBeInTheDocument()
       expect(getByText('Clark HS')).toBeInTheDocument()
     })
+
+    it('fetches accounts from the manually_created_courses_account api if restrictToMCCAccount is true', async () => {
+      fetchMock.get(MCC_ACCOUNT_URL, MCC_ACCOUNT)
+      const {getByLabelText, queryByText} = render(
+        <CreateCourseModal {...getProps({permissions: 'teacher', restrictToMCCAccount: true})} />
+      )
+      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+      expect(
+        queryByText('Which account will this subject be associated with?')
+      ).not.toBeInTheDocument()
+    })
   })
 
   describe('with student permission', () => {
@@ -269,6 +281,17 @@ describe('CreateCourseModal', () => {
         queryByText('Sync enrollments and subject start/end dates from homeroom')
       ).not.toBeInTheDocument()
       expect(queryByText('Select a homeroom')).not.toBeInTheDocument()
+    })
+
+    it('fetches accounts from the manually_created_courses_account api if restrictToMCCAccount is true', async () => {
+      fetchMock.get(MCC_ACCOUNT_URL, MCC_ACCOUNT)
+      const {getByLabelText, queryByText} = render(
+        <CreateCourseModal {...getProps({permissions: 'student', restrictToMCCAccount: true})} />
+      )
+      await waitFor(() => expect(getByLabelText('Subject Name')).toBeInTheDocument())
+      expect(
+        queryByText('Which account will this subject be associated with?')
+      ).not.toBeInTheDocument()
     })
   })
 

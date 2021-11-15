@@ -51,7 +51,8 @@ describe CoursesController do
       expect(assigns[:current_enrollments][0]).to eql(@enrollment)
       expect(assigns[:past_enrollments]).not_to be_nil
       expect(assigns[:future_enrollments]).not_to be_nil
-      expect(assigns[:js_env][:CREATE_COURSES_PERMISSION]).to be_nil
+      expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:PERMISSION]).to be_nil
+      expect(assigns[:js_env][:CREATE_COURSES_PERMISSIONS][:RESTRICT_TO_MCC_ACCOUNT]).to be_falsey
     end
 
     it "does not duplicate enrollments in variables" do
