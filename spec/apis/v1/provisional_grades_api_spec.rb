@@ -33,7 +33,7 @@ describe 'Provisional Grades API', type: :request do
     let_once(:teacher) { teacher_in_course(active_all: true, course: course).user }
     let_once(:ta_1) { ta_in_course(active_all: true, course: course).user }
     let_once(:ta_2) { ta_in_course(active_all: true, course: course).user }
-    let_once(:students) { 3.times.map { |n| student_in_course(active_all: true, course: course, name: "Student #{n}").user } }
+    let_once(:students) { Array.new(3) { |n| student_in_course(active_all: true, course: course, name: "Student #{n}").user } }
 
     let_once(:assignment) do
       course.assignments.create!(

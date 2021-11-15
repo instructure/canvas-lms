@@ -2957,7 +2957,7 @@ describe CoursesController do
 
     it 'returns reasonable json for a few enrollments' do
       user_session(@teacher)
-      user_ids = create_users(3.times.map { { name: "User" } })
+      user_ids = create_users(Array.new(3) { { name: "User" } })
       students = create_enrollments(@course, user_ids, return_type: :record)
       students[0].tap do |enrollment|
         enrollment.grade_publishing_status = "published"
@@ -3010,7 +3010,7 @@ describe CoursesController do
     it "publishes grades and return results" do
       course_with_teacher_logged_in :active_all => true
       @teacher = @user
-      user_ids = create_users(3.times.map { { name: "User" } })
+      user_ids = create_users(Array.new(3) { { name: "User" } })
       students = create_enrollments(@course, user_ids, return_type: :record)
       students[0].tap do |enrollment|
         enrollment.grade_publishing_status = "published"

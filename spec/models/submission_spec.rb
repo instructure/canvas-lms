@@ -4126,7 +4126,7 @@ describe Submission do
       it "loads attachments for many submissions at once" do
         attachments = []
 
-        submissions = 3.times.map do |i|
+        submissions = Array.new(3) do |i|
           student_in_course(active_all: true)
           attachments << [
             attachment_model(filename: "submission#{i}-a.doc", :context => @student),
@@ -4200,7 +4200,7 @@ describe Submission do
       it "loads attachments for many submissions at once and returns a hash" do
         expected_attachments_for_submissions = {}
 
-        submissions = 3.times.map do |i|
+        submissions = Array.new(3) do |i|
           student_in_course(active_all: true)
           attachment = [attachment_model(filename: "submission#{i}.doc", :context => @student)]
           sub = @assignment.submit_homework @student, attachments: attachment
@@ -4507,7 +4507,7 @@ describe Submission do
     before(:once) do
       course_with_teacher active_all: true
       @u1, @u2 = n_students_in_course(2)
-      @a1, @a2 = 2.times.map {
+      @a1, @a2 = Array.new(2) {
         @course.assignments.create! points_possible: 10
       }
       @progress = Progress.create!(context: @course, tag: "submissions_update")

@@ -1574,9 +1574,9 @@ describe FilesController do
     it "returns the same jwt if requested twice" do
       enable_cache do
         user_session @teacher
-        locations = 2.times.map {
+        locations = Array.new(2) do
           get("image_thumbnail", params: { uuid: image.uuid, id: image.id }).location
-        }
+        end
         expect(locations[0]).to eq(locations[1])
       end
     end
@@ -1584,9 +1584,9 @@ describe FilesController do
     it "returns the different jwts if no_cache is passed" do
       enable_cache do
         user_session @teacher
-        locations = 2.times.map {
+        locations = Array.new(2) do
           get("image_thumbnail", params: { uuid: image.uuid, id: image.id, no_cache: true }).location
-        }
+        end
         expect(locations[0]).not_to eq(locations[1])
       end
     end

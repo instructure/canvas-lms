@@ -1226,7 +1226,7 @@ class Course < ActiveRecord::Base
     return if !self_enrollment_enabled? || read_attribute(:self_enrollment_code)
 
     # subset of letters and numbers that are unambiguous
-    alphanums = 'ABCDEFGHJKLMNPRTWXY346789'
+    alphanums = 'ABCDEFGHJKLMNPRTWXY346789'.chars
     code_length = 6
 
     # we're returning a 6-digit base-25(ish) code. that means there are ~250
@@ -1238,9 +1238,7 @@ class Course < ActiveRecord::Base
     # necessary)
     code = nil
     10.times do
-      code = code_length.times.map {
-        alphanums[(rand * alphanums.size).to_i, 1]
-      }.join
+      code = Array.new(code_length) { alphanums.sample }.join
       next if Course.where(self_enrollment_code: code).exists?
 
       self.self_enrollment_code = code

@@ -3328,7 +3328,7 @@ describe DiscussionTopicsController, type: :request do
     course_with_teacher(:active_all => true)
     account_admin_user(account: @course.account) # sets @admin
 
-    ann_ids_ordered_by_posted_at = 10.times.map do |i|
+    ann_ids_ordered_by_posted_at = Array.new(10) do |i|
       ann = Announcement.create!({
                                    context: @course,
                                    message: "Test Message",

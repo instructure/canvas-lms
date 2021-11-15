@@ -153,7 +153,7 @@ RSpec.describe "Api::V1::Outcome" do
 
       it "returns the json for multiple outcome links" do
         course_with_teacher(active_all: true)  # sets @course
-        outcome_links = 10.times.map { new_outcome_link(outcome_params, @course) }
+        outcome_links = Array.new(10) { new_outcome_link(outcome_params, @course) }
         lib.outcome_links_json(outcome_links, nil, nil).each do |ol|
           check_outcome_link_json.call(
             LearningOutcome.find(ol["outcome"]["id"]),

@@ -3627,7 +3627,7 @@ describe CoursesController, type: :request do
 
       it "allows jumping to a user's page based on id" do
         @other_section = @course1.course_sections.create!
-        students = create_users(5.times.map { |i| { name: "User #{i + 1}", sortable_name: "#{i + 1}, User" } }, return_type: :record)
+        students = create_users(Array.new(5) { |i| { name: "User #{i + 1}", sortable_name: "#{i + 1}, User" } }, return_type: :record)
         create_enrollments(@course1, students)
         create_enrollments(@course1, students, section_id: @other_section.id)
         @target = students[4]

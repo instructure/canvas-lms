@@ -38,7 +38,7 @@ module Factories
     period_duration = options[:duration] || 1.month
 
     grading_period_group = Factories::GradingPeriodGroupHelper.new.legacy_create_for_course(course)
-    count.times.map do |n|
+    Array.new(count) do |n|
       grading_period_group.grading_periods.create!(
         title: "Period #{n}",
         start_date: start_dates[n],

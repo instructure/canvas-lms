@@ -269,7 +269,7 @@ describe ContextExternalTool do
     end
 
     it 'sends only 255 chars' do
-      allow(Lti::Asset).to receive(:opaque_identifier_for).and_return(256.times.map { 'a' }.join)
+      allow(Lti::Asset).to receive(:opaque_identifier_for).and_return("a" * 256)
       expect(tool.deployment_id.size).to eq 255
     end
   end

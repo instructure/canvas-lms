@@ -397,10 +397,8 @@ class DiscussionTopicsController < ApplicationController
         fetch_params[:include] = ['sections_user_count', 'sections'] if @context.is_a?(Course)
 
         discussion_topics_fetch_url = send("api_v1_#{@context.class.to_s.downcase}_discussion_topics_path", fetch_params)
-        discussion_topics_urls_to_prefetch = (scope.count / fetch_params[:per_page].to_f).ceil.times.map do |i|
-          discussion_topics_fetch_url.gsub(fetch_params[:page], (i + 1).to_s)
-        end
-        discussion_topics_urls_to_prefetch.each_with_index do |url, i|
+        (scope.count / fetch_params[:per_page].to_f).ceil.times do |i|
+          url = discussion_topics_fetch_url.gsub(fetch_params[:page], (i + 1).to_s)
           prefetch_xhr(url, id: "prefetched_discussion_topic_page_#{i}")
         end
 

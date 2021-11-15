@@ -420,7 +420,7 @@ describe CollaborationsController do
 
       it "adds users if sent" do
         user_session(@teacher)
-        users = 2.times.map { |_| student_in_course(course: @course, active_all: true).user }
+        users = Array.new(2) { student_in_course(course: @course, active_all: true).user }
         lti_user_ids = users.map { |student| Lti::Asset.opaque_identifier_for(student) }
         content_items.first['ext_canvas_visibility'] = { users: lti_user_ids }
         post 'create', params: { :course_id => @course.id, :contentItems => content_items.to_json }
@@ -517,7 +517,7 @@ describe CollaborationsController do
 
       it "adds users if sent" do
         user_session(@teacher)
-        users = 2.times.map { |_| student_in_course(course: @course, active_all: true).user }
+        users = Array.new(2) { student_in_course(course: @course, active_all: true).user }
         lti_user_ids = users.map { |student| Lti::Asset.opaque_identifier_for(student) }
         content_items.first['ext_canvas_visibility'] = { users: lti_user_ids }
         put 'update', params: { id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json }
