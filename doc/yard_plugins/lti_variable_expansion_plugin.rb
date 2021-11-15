@@ -94,7 +94,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
   end
 
   def availability
-    all_availabilities = all_guards.map do |guard|
+    all_availabilities = all_guards.filter_map do |guard|
       case guard
       when 'ALWAYS', 'CONTROLLER_GUARD'
         "always"
@@ -133,7 +133,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
       when 'FILE_UPLOAD_GUARD'
         "when the tool is used to upload a file as an assignment submission"
       end
-    end.compact
+    end
     "**Availability**: *#{all_availabilities.join(' and ')}*  " if all_availabilities.size
   end
 end

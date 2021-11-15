@@ -917,9 +917,9 @@ class EnrollmentsApiController < ApplicationController
       is_approved_parent = user.grants_right?(@current_user, :read_as_parent)
       # otherwise check for read_roster rights on all of the requested
       # user's accounts
-      approved_accounts = user.associated_root_accounts.map do |ra|
+      approved_accounts = user.associated_root_accounts.filter_map do |ra|
         ra.id if is_approved_parent || ra.grants_right?(@current_user, session, :read_roster)
-      end.compact
+      end
 
       # if there aren't any ids in approved_accounts, then the user doesn't have
       # permissions.
@@ -971,7 +971,7 @@ class EnrollmentsApiController < ApplicationController
 
     if state.present?
       if use_course_state
-        conditions = state.map { |s| Enrollment::QueryBuilder.new(s.to_sym).conditions }.compact
+        conditions = state.filter_map { |s| Enrollment::QueryBuilder.new(s.to_sym).conditions }
         clauses << "(#{conditions.join(' OR ')})"
       else
         clauses << 'enrollments.workflow_state IN (:workflow_state)'

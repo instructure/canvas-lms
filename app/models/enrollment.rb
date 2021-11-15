@@ -1411,7 +1411,7 @@ class Enrollment < ActiveRecord::Base
     # overrides, etc. but if it doesn't find anything, start guessing by
     # looking at the enrollment, section, course, then term. if we still didn't
     # find it, fall back to the section or course creation date.
-    enrollment_dates.map(&:first).compact.min ||
+    enrollment_dates.filter_map(&:first).min ||
       start_at ||
       course_section&.start_at ||
       course.start_at ||
@@ -1424,7 +1424,7 @@ class Enrollment < ActiveRecord::Base
     # try and use the enrollment dates logic first, since it knows about
     # overrides, etc. but if it doesn't find anything, start guessing by
     # looking at the enrollment, section, course, then term.
-    enrollment_dates.map(&:last).compact.max ||
+    enrollment_dates.filter_map(&:last).max ||
       end_at ||
       course_section&.end_at ||
       course.conclude_at ||

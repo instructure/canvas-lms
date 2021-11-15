@@ -82,7 +82,7 @@ module ReportSpecHelper
     header = all_parsed.shift
     if all_parsed.present? && !skip_order
       # cast any numbery looking things so we sort them intuitively
-      type_casts = order.map { |k| /\A\d+(\.\d+)?\z/.match?(all_parsed.map { |row| row[k] }.compact.first) ? :to_f : :to_s }
+      type_casts = order.map { |k| /\A\d+(\.\d+)?\z/.match?(all_parsed.filter_map { |row| row[k] }.first) ? :to_f : :to_s }
       all_parsed.sort_by! { |r| r.values_at(*order).each_with_index.map { |v, i| v.send type_casts[i] } }
     end
     all_parsed.unshift(header) if options[:header]

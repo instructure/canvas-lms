@@ -435,7 +435,7 @@ describe CollaborationsController do
         content_items.first['ext_canvas_visibility'] = { groups: [Lti::Asset.opaque_identifier_for(group)] }
         post 'create', params: { :course_id => @course.id, :contentItems => content_items.to_json }
         collaboration = Collaboration.find(assigns[:collaboration].id)
-        expect(collaboration.collaborators.map(&:group_id).compact).to match_array([group.id])
+        expect(collaboration.collaborators.filter_map(&:group_id)).to match_array([group.id])
       end
     end
   end
@@ -532,7 +532,7 @@ describe CollaborationsController do
         content_items.first['ext_canvas_visibility'] = { groups: [Lti::Asset.opaque_identifier_for(group)] }
         put 'update', params: { id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json }
         collaboration = Collaboration.find(assigns[:collaboration].id)
-        expect(collaboration.collaborators.map(&:group_id).compact).to match_array([group.id])
+        expect(collaboration.collaborators.filter_map(&:group_id)).to match_array([group.id])
       end
 
       it "adds each group only once on multiple requests" do
@@ -548,7 +548,7 @@ describe CollaborationsController do
         }
         collaboration = Collaboration.find(assigns[:collaboration].id)
 
-        expect(collaboration.collaborators.map(&:group_id).compact).to match_array([group.id])
+        expect(collaboration.collaborators.filter_map(&:group_id)).to match_array([group.id])
       end
     end
   end

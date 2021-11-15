@@ -91,7 +91,7 @@ module AccountReports
       students = student_grade_scope.where(course_id: runner.batch_items)
 
       students.preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
-        users = student_chunk.map { |e| User.new(id: e.user_id) }.compact
+        users = student_chunk.filter_map { |e| User.new(id: e.user_id) }
         users.uniq!
         users_by_id = users.index_by(&:id)
         courses_by_id = Course.where(id: student_chunk.map(&:course_id)).preload(:grading_standard).index_by(&:id)
@@ -201,7 +201,7 @@ module AccountReports
       students = student_grade_scope.where(course_id: runner.batch_items)
       courses_by_id = Course.where(id: runner.batch_items).preload(:grading_standard).index_by(&:id)
       students.where(course_id: runner.batch_items).preload(:root_account, :sis_pseudonym).find_in_batches do |student_chunk|
-        users = student_chunk.map { |e| User.new(id: e.user_id) }.compact
+        users = student_chunk.filter_map { |e| User.new(id: e.user_id) }
         users.uniq!
         users_by_id = users.index_by(&:id)
         pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)

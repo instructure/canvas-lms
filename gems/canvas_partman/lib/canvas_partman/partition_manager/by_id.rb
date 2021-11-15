@@ -119,7 +119,7 @@ module CanvasPartman
           else
             [reflection.klass]
           end
-        klasses.map { |klass| klass.maximum(klass.primary_key) }.compact.max
+        klasses.filter_map { |klass| klass.maximum(klass.primary_key) }.max
       end
 
       def table_regex

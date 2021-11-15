@@ -918,7 +918,7 @@ class DiscussionTopic < ActiveRecord::Base
   def self.preload_can_unpublish(context, topics, assmnt_ids_with_subs = nil)
     return unless topics.any?
 
-    assmnt_ids_with_subs ||= Assignment.assignment_ids_with_submissions(topics.map(&:assignment_id).compact)
+    assmnt_ids_with_subs ||= Assignment.assignment_ids_with_submissions(topics.filter_map(&:assignment_id))
 
     student_ids = context.all_real_student_enrollments.select(:user_id)
     topic_ids_with_entries = DiscussionEntry.active.where(discussion_topic_id: topics)
@@ -1585,7 +1585,7 @@ class DiscussionTopic < ActiveRecord::Base
     attachments.each do |attachment|
       attachment.podcast_associated_asset = messages_hash[attachment.id.to_s]
     end
-    media_object_ids -= attachments.map(&:media_entry_id).compact # don't include media objects if the file is already included
+    media_object_ids -= attachments.filter_map(&:media_entry_id) # don't include media objects if the file is already included
 
     media_objects = media_object_ids.empty? ? [] : MediaObject.where(media_id: media_object_ids).to_a
     media_objects = media_objects.uniq(&:media_id)
@@ -1604,7 +1604,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def self.to_podcast(elements)
     require 'rss/2.0'
-    elements.map do |elem|
+    elements.filter_map do |elem|
       asset = elem.podcast_associated_asset
       next unless asset
 
@@ -1641,7 +1641,7 @@ class DiscussionTopic < ActiveRecord::Base
         item.enclosure = RSS::Rss::Channel::Item::Enclosure.new(url, size, content_type)
       end
       item
-    end.compact
+    end
   end
 
   def initial_post_required?(user, session = nil)

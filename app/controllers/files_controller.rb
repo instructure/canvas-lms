@@ -1346,7 +1346,7 @@ class FilesController < ApplicationController
       return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, session)
     end
 
-    submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context).map(&:context).compact
+    submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context).filter_map(&:context)
     return true if submissions.any? { |submission| submission.grants_right?(user, session, :read) }
 
     course = api_find(Assignment, params[:assignment_id]).course unless params[:assignment_id].nil?

@@ -47,7 +47,7 @@ class RubricAssessment < ActiveRecord::Base
   after_save :track_outcomes
 
   def track_outcomes
-    outcome_ids = (self.data || []).map { |r| r[:learning_outcome_id] }.compact.uniq
+    outcome_ids = (self.data || []).filter_map { |r| r[:learning_outcome_id] }.uniq
     peer_review = self.assessment_type == "peer_review"
     provisional_grade = self.artifact_type == "ModeratedGrading::ProvisionalGrade"
     update_outcomes = outcome_ids.present? && !peer_review && !provisional_grade

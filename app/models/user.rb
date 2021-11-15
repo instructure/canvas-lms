@@ -1600,14 +1600,14 @@ class User < ActiveRecord::Base
     if Shard.current != self.shard
       # translate asset strings to be relative to current shard
       colors_hash = Hash[
-        colors_hash.map do |asset_string, value|
+        colors_hash.filter_map do |asset_string, value|
           opts = asset_string.split("_")
           id_relative_to_user_shard = opts.pop.to_i
           next if id_relative_to_user_shard > Shard::IDS_PER_SHARD && Shard.shard_for(id_relative_to_user_shard) == self.shard # this is old data and should be ignored
 
           new_id = Shard.relative_id_for(id_relative_to_user_shard, self.shard, Shard.current)
           ["#{opts.join('_')}_#{new_id}", value]
-        end.compact
+        end
       ]
     end
     colors_hash
@@ -2236,7 +2236,7 @@ class User < ActiveRecord::Base
         visible_instances = visible_stream_item_instances(opts)
                             .preload(stream_item: :context)
                             .limit(Setting.get('recent_stream_item_limit', 100))
-        visible_instances.map do |sii|
+        visible_instances.filter_map do |sii|
           si = sii.stream_item
           next if si.blank?
           next if si.asset_type == 'Submission'
@@ -2244,7 +2244,7 @@ class User < ActiveRecord::Base
 
           si.unread = sii.unread?
           si
-        end.compact
+        end
       end
     end
   end

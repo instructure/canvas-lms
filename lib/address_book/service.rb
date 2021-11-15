@@ -156,7 +156,7 @@ module AddressBook
       ids = ids.map { |id| Shard.global_id_for(id) }
       hydrated = User.select(::MessageableUser::SELECT).where(id: ids)
       reverse_lookup = hydrated.index_by(&:global_id)
-      ids.map { |id| reverse_lookup[id] }.compact
+      ids.filter_map { |id| reverse_lookup[id] }
     end
 
     # caches with common contexts for each user in the list, pulling the

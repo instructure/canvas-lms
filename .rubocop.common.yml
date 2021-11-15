@@ -73,6 +73,8 @@ Naming/FileName:
   Exclude:
     - "**/Gemfile.d/~after.rb"
 
+Performance/MapCompact:
+  Severity: error
 Performance/RegexpMatch:
   Severity: error
 Performance/StartWith:

@@ -73,7 +73,7 @@ describe 'Provisional Grades API', type: :request do
     end
 
     def selected_grades
-      assignment.moderated_grading_selections.map(&:provisional_grade).compact
+      assignment.moderated_grading_selections.filter_map(&:provisional_grade)
     end
 
     it "selects multiple provisional grades" do

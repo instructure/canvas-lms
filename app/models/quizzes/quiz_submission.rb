@@ -276,7 +276,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def points_possible_at_submission_time
-    self.questions.map { |q| q[:points_possible].to_f }.compact.sum || 0
+    self.questions.filter_map { |q| q[:points_possible].to_f }.sum || 0
   end
 
   def questions
@@ -377,7 +377,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def quiz_question_ids
-    questions.map { |question| question["id"] }.compact
+    questions.filter_map { |question| question["id"] }
   end
 
   def quiz_questions

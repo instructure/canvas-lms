@@ -89,7 +89,7 @@ module AddressBook
       @cache.null(uncached)
       # implementation is responsible for storing known users into cache
       super(uncached, options)
-      users.map { |user| @cache.fetch(user) }.compact
+      users.filter_map { |user| @cache.fetch(user) }
     end
   end
 end

@@ -65,7 +65,7 @@ module SIS
         ids_to_touch = (batch + UserObserver.where(user_id: batch).pluck(:observer_id)).uniq
         User.touch_and_clear_cache_keys(ids_to_touch, :enrollments) if ids_to_touch.any?
       end
-      i.enrollments_to_add_to_favorites.map(&:id).compact.each_slice(1000) do |sliced_ids|
+      i.enrollments_to_add_to_favorites.filter_map(&:id).each_slice(1000) do |sliced_ids|
         Enrollment.delay(priority: Delayed::LOW_PRIORITY, strand: "batch_add_to_favorites_#{@root_account.global_id}")
                   .batch_add_to_favorites(sliced_ids)
       end

@@ -81,7 +81,7 @@ module Api::V1::ContentShare
   def get_content_type_from_export_settings(settings)
     return nil unless settings.key?('selected_content')
 
-    selected_types = settings['selected_content'].keys.map { |k| EXPORT_TYPES[k] }.compact
+    selected_types = settings['selected_content'].keys.filter_map { |k| EXPORT_TYPES[k] }
     %w(module module_item).each { |k| return k if selected_types.include?(k) }
     # otherwise there should be only one selected type...
     selected_types.first

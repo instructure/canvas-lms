@@ -142,7 +142,7 @@ Rails.application.config.after_initialize do
 
   Switchman::DatabaseServer.class_eval do
     def self.regions
-      @regions ||= all.map { |db| db.config[:region] }.compact.uniq.sort
+      @regions ||= all.filter_map { |db| db.config[:region] }.uniq.sort
     end
 
     def in_region?(region)

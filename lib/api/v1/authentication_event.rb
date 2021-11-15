@@ -81,7 +81,7 @@ module Api::V1::AuthenticationEvent
       User.where(:id => shard_user_ids).to_a
     end
 
-    page_view_ids = events.map(&:request_id).compact
+    page_view_ids = events.filter_map(&:request_id)
     page_views = PageView.find_all_by_id(page_view_ids) if page_view_ids.length > 0
     page_views ||= []
 

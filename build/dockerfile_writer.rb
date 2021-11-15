@@ -86,12 +86,12 @@ class DockerfileWriter
   end
 
   def docker_compose_volume_paths
-    paths = (docker_compose_config["services"]["web"]["volumes"] || []).map do |volume|
+    paths = (docker_compose_config["services"]["web"]["volumes"] || []).filter_map do |volume|
       name, path = volume.split(":")
       next unless /\A[a-z]/.match?(name)
 
       path.sub("/usr/src/app/", "")
-    end.compact
+    end
     paths.sort_by { |path| [path[0] == "/" ? 1 : 0, path] }
   end
 

@@ -222,7 +222,7 @@ class GradeCalculator
   end
 
   def compute_scores_and_group_sums_for_batch(user_ids)
-    user_ids.map do |user_id|
+    user_ids.filter_map do |user_id|
       next unless enrollments_by_user[user_id].first
 
       group_sums = compute_group_sums_for_user(user_id)
@@ -234,7 +234,7 @@ class GradeCalculator
         final: scores[:final],
         final_groups: group_sums[:final].index_by { |group| group[:id] }
       }
-    end.compact
+    end
   end
 
   def assignment_visible_to_student?(assignment_id, user_id)
@@ -803,7 +803,7 @@ class GradeCalculator
       Rails.logger.debug "GRADES: calculating... submissions=#{logged_submissions.inspect}"
 
       kept = drop_assignments(group_submissions, group.rules_hash)
-      dropped_submissions = (group_submissions - kept).map { |s| s[:submission]&.id }.compact
+      dropped_submissions = (group_submissions - kept).filter_map { |s| s[:submission]&.id }
 
       score, possible = kept.reduce([0.0, 0.0]) { |(s_sum, p_sum), s|
         [s_sum.to_d + s[:score].to_d, p_sum.to_d + s[:total].to_d]

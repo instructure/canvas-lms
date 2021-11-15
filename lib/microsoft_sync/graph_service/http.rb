@@ -60,10 +60,10 @@ module MicrosoftSync
         def initialize(msg, responses)
           super(msg)
 
-          @retry_after_seconds = responses.map do |resp|
+          @retry_after_seconds = responses.filter_map do |resp|
             headers = resp['headers']&.transform_keys(&:downcase) || {}
             headers['retry-after'].presence&.to_f
-          end.compact.max
+          end.max
         end
 
         def self.public_message

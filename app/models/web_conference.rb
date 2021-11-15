@@ -551,7 +551,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.plugin_types
-    plugins.map { |plugin|
+    plugins.filter_map { |plugin|
       next unless plugin.enabled? &&
                   (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize rescue nil) &&
                   klass < self.base_class
@@ -563,7 +563,7 @@ class WebConference < ActiveRecord::Base
         :name => plugin.name,
         :plugin => plugin
       ).with_indifferent_access
-    }.compact
+    }
   end
 
   def self.config(context: nil, class_name: nil)

@@ -1238,7 +1238,7 @@ class ExternalToolsController < ApplicationController
         tool_ids << t[:args][1] if t[:args] && t[:args][1]
       end
       @tools = ContextExternalTool.where(:id => tool_ids)
-      @tools = tool_ids.map { |id| @tools.find { |t| t[:id] == id } }.compact
+      @tools = tool_ids.filter_map { |id| @tools.find { |t| t[:id] == id } }
       results = external_tools_json(@tools, course, @current_user, session).map do |result|
         # add some identifying information here to simplify grouping by context for the consumer
         result['context_id'] = course.id

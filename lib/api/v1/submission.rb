@@ -209,7 +209,7 @@ module Api::V1::Submission
     if other_fields.include?('attachments')
       attachments = attempt.versioned_attachments.dup
       attachments << attempt.attachment if attempt.attachment && attempt.attachment.context_type == 'Submission' && attempt.attachment.context_id == attempt.id
-      hash['attachments'] = attachments.map do |attachment|
+      hash['attachments'] = attachments.filter_map do |attachment|
         includes = includes.include?('canvadoc_document_id') ? ['preview_url', 'canvadoc_document_id'] : ['preview_url']
         options = {
           anonymous_instructor_annotations: assignment.anonymous_instructor_annotations?,
@@ -222,7 +222,7 @@ module Api::V1::Submission
         }
 
         attachment_json(attachment, user, {}, options)
-      end.compact unless attachments.blank?
+      end unless attachments.blank?
     end
 
     # include the discussion topic entries

@@ -329,7 +329,7 @@ class OutcomesApiController < ApplicationController
                 .where("submissions.user_id = ?", student_id)
                 .where("submissions.workflow_state <> 'deleted'")
       quiz_alignments = quizzes.map do |quiz|
-        bank_ids = quiz.quiz_questions.map { |qq| qq.assessment_question.try(:assessment_question_bank_id) }.compact.uniq
+        bank_ids = quiz.quiz_questions.filter_map { |qq| qq.assessment_question.try(:assessment_question_bank_id) }.uniq
         outcome_ids = ContentTag.active.where(content_id: bank_ids, content_type: "AssessmentQuestionBank", tag: "explicit_mastery").pluck(:learning_outcome_id)
         outcome_ids.map do |id|
           {

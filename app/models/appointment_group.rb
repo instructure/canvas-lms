@@ -152,14 +152,14 @@ class AppointmentGroup < ActiveRecord::Base
                                                .flatten.map(&:asset_string)
         @new_sub_context_codes -= disallowed_sub_context_codes
 
-        new_sub_contexts = @new_sub_context_codes.map { |code|
+        new_sub_contexts = @new_sub_context_codes.filter_map { |code|
           next unless code =~ /\Acourse_section_(.*)/
 
           cs = CourseSection.where(id: $1).first
           AppointmentGroupSubContext.new(:appointment_group => self,
                                          :sub_context => cs,
                                          :sub_context_code => code)
-        }.compact
+        }
       end
     end
 

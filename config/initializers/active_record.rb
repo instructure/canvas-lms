@@ -114,8 +114,8 @@ class ActiveRecord::Base
   def self.find_all_by_asset_string(strings, asset_types = nil)
     assets = strings.is_a?(Hash) ? strings : parse_asset_string_list(strings)
 
-    assets.map do |klass, ids|
-      next if asset_types && asset_types.exclude?(klass)
+    assets.filter_map do |klass, ids|
+      next if asset_types&.exclude?(klass)
 
       begin
         klass = klass.constantize
@@ -125,7 +125,7 @@ class ActiveRecord::Base
       next unless klass < ActiveRecord::Base
 
       klass.where(id: ids).to_a
-    end.compact.flatten
+    end.flatten
   end
 
   # takes an asset string list, like "course_5,user_7,course_9" and turns it into an
@@ -1804,12 +1804,12 @@ ActiveModel::AttributeMutationTracker.prepend(DupArraysInMutationTracker)
 
 module IgnoreOutOfSequenceMigrationDates
   def current_migration_number(dirname)
-    migration_lookup_at(dirname).map do |file|
+    migration_lookup_at(dirname).filter_map do |file|
       digits = File.basename(file).split("_").first
       next if ActiveRecord::Base.timestamped_migrations && digits.length != 14
 
       digits.to_i
-    end.compact.max.to_i
+    end.max.to_i
   end
 end
 # Thor doesn't call `super` in its `inherited` method, so hook in so that we can hook in later :)

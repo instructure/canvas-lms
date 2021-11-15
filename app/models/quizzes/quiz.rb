@@ -1332,7 +1332,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def self.preload_can_unpublish(quizzes, assmnt_ids_with_subs = nil)
     return unless quizzes.any?
 
-    assmnt_ids_with_subs ||= Assignment.assignment_ids_with_submissions(quizzes.map(&:assignment_id).compact)
+    assmnt_ids_with_subs ||= Assignment.assignment_ids_with_submissions(quizzes.filter_map(&:assignment_id))
 
     # yes, this is a complicated query, but it greatly improves the runtime to do it this way
     filter = Quizzes::QuizSubmission.where("quiz_submissions.quiz_id=s.quiz_id")

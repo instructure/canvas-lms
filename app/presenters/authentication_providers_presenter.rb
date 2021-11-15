@@ -32,13 +32,13 @@ class AuthenticationProvidersPresenter
   end
 
   def new_auth_types
-    AuthenticationProvider.valid_auth_types.map do |auth_type|
+    AuthenticationProvider.valid_auth_types.filter_map do |auth_type|
       klass = AuthenticationProvider.find_sti_class(auth_type)
       next unless klass.enabled?(account)
       next if klass.singleton? && configs.any? { |aac| aac.is_a?(klass) }
 
       klass
-    end.compact
+    end
   end
 
   def needs_unknown_user_url?

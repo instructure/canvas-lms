@@ -513,7 +513,7 @@ class Conversation < ActiveRecord::Base
 
   def subscribed_participants
     ActiveRecord::Associations::Preloader.new.preload(conversation_participants, :user) unless ModelCache[:users]
-    conversation_participants.select(&:subscribed?).map(&:user).compact
+    conversation_participants.select(&:subscribed?).filter_map(&:user)
   end
 
   def reply_from(opts)
