@@ -192,13 +192,13 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def self.find_by_id(id)
+  def self.find_by(id:)
     if PageView.cassandra?
       PageView::EventStream.fetch([id]).first
     elsif PageView.pv4?
       nil
     else
-      where(request_id: id).first
+      super(request_id: id)
     end
   end
 

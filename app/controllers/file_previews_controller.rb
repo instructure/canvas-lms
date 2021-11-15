@@ -25,7 +25,7 @@ class FilePreviewsController < ApplicationController
   # renders (or redirects to) appropriate content for the file, such as
   # canvadocs, crocodoc, inline image, etc.
   def show
-    @file = @context.attachments.not_deleted.find_by_id(params[:file_id])
+    @file = @context.attachments.not_deleted.find_by(id: params[:file_id])
     css_bundle :react_files
     unless @file
       @headers = false

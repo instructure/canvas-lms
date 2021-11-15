@@ -163,8 +163,10 @@ class Attachment < ActiveRecord::Base
       find_with_possibly_replaced(super)
     end
 
-    def find_by_id(id)
-      find_with_possibly_replaced(where(id: id).first)
+    def find_by(**kwargs)
+      return super unless kwargs.keys == [:id]
+
+      find_with_possibly_replaced(super)
     end
 
     def find_all_by_id(ids)
@@ -311,7 +313,7 @@ class Attachment < ActiveRecord::Base
         Attachment.where(:id => self).update_all(:cloned_item_id => self.cloned_item.id) # don't touch it for no reason
       end
     end
-    existing = context.attachments.active.find_by_id(self)
+    existing = context.attachments.active.find_by(id: self)
 
     options[:cloned_item_id] ||= self.cloned_item_id
     options[:migration_id] ||= CC::CCHelper.create_key(self)

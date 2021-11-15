@@ -48,7 +48,7 @@ describe "Importing modules" do
     context = get_import_context('bb8')
     migration = context.content_migrations.create!
     Importers::ContextModuleImporter.import_from_migration(data, context, migration)
-    expect(context.context_module_tags.find_by_migration_id('res00796')).not_to be_deleted
+    expect(context.context_module_tags.find_by(migration_id: 'res00796')).not_to be_deleted
   end
 
   it "links to url objects" do

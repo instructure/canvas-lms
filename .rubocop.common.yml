@@ -110,6 +110,16 @@ Rails/ContentTag:
   Exclude:
     - "**/db/migrate/*" # this cop is for views, not migrations, where it gets confused with outrigger
     - "doc/**/*"
+Rails/DynamicFindBy:
+  AllowedMethods:
+    - find_by_confirmation_code # CommunicationChannel
+    - find_by_signature # AssetSignature
+    - find_by_domain # Account
+    - find_by_name # PluginSetting
+    - find_by_asset_string # ApplicationRecord
+    - find_by_pseudonym_credentials # SessionPersistenceToken
+    - find_by_quiz # Quizzes::OutstandingQuizSubmissionManager
+  Severity: error
 Rails/HasManyOrHasOneDependent:
   Enabled: false # legacy code + most things we soft delete anyway
 Rails/HelperInstanceVariable:
@@ -268,11 +278,6 @@ Lint/UriEscapeUnescape: # TODO
 Naming/VariableNumber: # TODO
   Enabled: false
 
-Rails/DynamicFindBy: # TODO; autocorrect (unsafe)
-  AllowedMethods:
-    - find_by_name # PluginSetting.find_by_name
-    - find_by_asset_string # ApplicationRecord.find_by_asset_string
-  AutoCorrect: false
 Rails/ReadWriteAttribute: # TODO: autocorrect (unsafe)
   Enabled: false # accessors are often defined in terms of read_attribute
 Rails/TimeZone: # TODO: autocorrect (unsafe)

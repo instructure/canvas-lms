@@ -257,7 +257,7 @@ module Importers
       module_id = migration.migration_settings[:insert_into_module_id]
       return unless module_id.present?
 
-      mod = course.context_modules.find_by_id(module_id)
+      mod = course.context_modules.find_by(id: module_id)
       return unless mod
 
       imported_items = migration.imported_migration_items_for_insert_type
@@ -272,7 +272,7 @@ module Importers
       ag_id = migration.migration_settings[:move_to_assignment_group_id]
       return unless ag_id.present?
 
-      ag = course.assignment_groups.find_by_id(ag_id)
+      ag = course.assignment_groups.find_by(id: ag_id)
       return unless ag
 
       assignments = migration.imported_migration_items_by_class(Assignment)
