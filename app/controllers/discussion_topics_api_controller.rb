@@ -761,7 +761,7 @@ class DiscussionTopicsApiController < ApplicationController
     render_state_change_result @topic.change_read_state(new_state, @current_user)
   end
 
-  def get_forced_option()
+  def get_forced_option
     opts = {}
     opts[:forced] = value_to_boolean(params[:forced_read_state]) if params.key?(:forced_read_state)
     opts

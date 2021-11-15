@@ -100,7 +100,7 @@ module IncomingMailProcessor
     # Returns the return value of the block.
     # Raises Timeout::Error if the block takes longer than the default timeout
     #   duration.
-    def default_timeout_method()
+    def default_timeout_method
       Timeout.timeout(default_timeout_duration) do
         yield
       end
