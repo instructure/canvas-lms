@@ -131,7 +131,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
         it "renders the submission body with quiz submission data" do
           params = { assignment_id: assignment.id, course_id: course.id, submission: { comment: "hi" } }.merge(resource_pair)
           put :update, params: params, format: :json
-          submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+          submission_json = JSON.parse(response.body).find { |s| s["submission"]["id"] == submission.id }
           expect(submission_json["submission"]["body"]).to eq submission.reload.body
         end
 
@@ -151,7 +151,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
             assignment.hide_submissions
             params = { assignment_id: assignment.id, course_id: course.id, submission: { comment: "hi" } }.merge(resource_pair)
             put :update, params: params, format: :json
-            submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+            submission_json = JSON.parse(response.body).find { |s| s["submission"]["id"] == submission.id }
             expect(submission_json["submission"]["body"]).to be_nil
           end
 
@@ -167,7 +167,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
             assignment.post_submissions
             params = { assignment_id: assignment.id, course_id: course.id, submission: { comment: "hi" } }.merge(resource_pair)
             put :update, params: params, format: :json
-            submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+            submission_json = JSON.parse(response.body).find { |s| s["submission"]["id"] == submission.id }
             expect(submission_json["submission"]["body"]).to be_present
           end
 
@@ -191,7 +191,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
         it "renders the submission body with quiz submission data" do
           params = { assignment_id: assignment.id, course_id: course.id, submission: { comment: "hi" } }.merge(resource_pair)
           put :update, params: params, format: :json
-          submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+          submission_json = JSON.parse(response.body).find { |s| s["submission"]["id"] == submission.id }
           expect(submission_json["submission"]["body"]).to eq submission.reload.body
         end
 
@@ -210,7 +210,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
           it "renders the submission body when submission is unposted" do
             params = { assignment_id: assignment.id, course_id: course.id, submission: { comment: "hi" } }.merge(resource_pair)
             put :update, params: params, format: :json
-            submission_json = JSON.parse(response.body).select { |s| s["submission"]["id"] == submission.id }.first
+            submission_json = JSON.parse(response.body).find { |s| s["submission"]["id"] == submission.id }
             expect(submission_json["submission"]["body"]).to be_present
           end
 

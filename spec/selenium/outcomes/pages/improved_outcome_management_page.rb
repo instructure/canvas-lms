@@ -253,10 +253,10 @@ module ImprovedOutcomeManagementPage
 
   def select_outcome_group_with_text(text)
     wait_for(method: nil, timeout: 2) { tree_browser.present? }
-    tree_browser_outcome_groups.select { |group| group.text.split("\n")[0] == text }.first
+    tree_browser_outcome_groups.find { |group| group.text.split("\n")[0] == text }
   end
 
   def select_drilldown_outcome_group_with_text(text)
-    drilldown_outcome_groups.select { |group| group.text.split("\n")[0] == text }.first
+    drilldown_outcome_groups.find { |group| group.text.split("\n")[0] == text }
   end
 end

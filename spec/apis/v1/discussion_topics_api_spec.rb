@@ -603,7 +603,7 @@ describe DiscussionTopicsController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
                         { controller: 'discussion_topics', action: 'index', format: 'json', course_id: @course.id.to_s })
 
-        json_topic = json.select { |t| t['group_category_id'] }.first
+        json_topic = json.find { |t| t['group_category_id'] }
 
         expect(json_topic).not_to be nil
         expect(json_topic['group_category_id']).to eq group_topic.group_category_id
