@@ -3196,6 +3196,21 @@ describe CoursesController do
       expect(response).to be_bad_request
     end
 
+    it "does not allow resetting course templates (granular permissions)" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_courses)
+      @course.root_account.role_overrides.create!(
+        role: teacher_role,
+        permission: 'manage_courses_reset',
+        enabled: true
+      )
+      @course.enrollments.each(&:destroy)
+      @course.update!(template: true)
+      user_session(@teacher)
+      post 'reset_content', params: { :course_id => @course.id }
+      assert_status(401)
+      expect(@course.reload).to be_available
+    end
+
     it "logs reset audit event" do
       @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       user_session(@teacher)
