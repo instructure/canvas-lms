@@ -317,8 +317,8 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           row.push(html_to_text(row.pop.to_s))
           row << (answer ? answer[:points] : "")
         end
-        row << submission.submission_data.select { |a| a[:correct] }.length
-        row << submission.submission_data.reject { |a| a[:correct] }.length
+        row << submission.submission_data.count { |a| a[:correct] }
+        row << submission.submission_data.count { |a| !a[:correct] }
         row << submission.score
         csv << row
       end

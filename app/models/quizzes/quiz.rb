@@ -906,7 +906,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     needs_review = false
     # Allow for floating point rounding error comparing to versions created before BigDecimal was used
-    needs_review = true if [old_version.points_possible, self.points_possible].select(&:present?).count == 1 ||
+    needs_review = true if [old_version.points_possible, self.points_possible].count(&:present?) == 1 ||
                            ((old_version.points_possible || 0) - (self.points_possible || 0)).abs > 0.0001
     needs_review = true if (old_version.quiz_data || []).length != (self.quiz_data || []).length
     unless needs_review

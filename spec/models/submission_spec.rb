@@ -2917,7 +2917,7 @@ describe Submission do
         expect(@turnitin_api).to receive(:createOrUpdateAssignment).with(@assignment, @assignment.turnitin_settings).and_return({ :assignment_id => "1234" })
         expect(@turnitin_api).to receive(:enrollStudent).with(@context, @user).and_return(double(:success? => false))
         @submission.submit_to_turnitin
-        expect(Delayed::Job.list_jobs(:future, 100).find_all { |j| j.tag == 'Submission#submit_to_turnitin' }.size).to eq 2
+        expect(Delayed::Job.list_jobs(:future, 100).count { |j| j.tag == 'Submission#submit_to_turnitin' }).to eq 2
       end
 
       it "sets status as failed if something fails on a retry" do
