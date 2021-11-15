@@ -1566,7 +1566,7 @@ module Migrator
         raise("Revert not confirmed")
       end
 
-      $confirmed_migrate_down = true if $1.downcase == 'a'
+      $confirmed_migrate_down = true if $1.casecmp?('a')
     end
 
     super

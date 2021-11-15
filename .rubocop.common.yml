@@ -73,6 +73,9 @@ Naming/FileName:
   Exclude:
     - "**/Gemfile.d/~after.rb"
 
+Performance/Casecmp:
+  Severity: error
+  AutoCorrect: false # prefer using casecmp?(other) instead of casecmp(other).zero?; it handles unicode better
 Performance/Count:
   Severity: error
 Performance/Detect:

@@ -36,7 +36,7 @@ class SSLCommon
 
     def raw_post(url, payload, headers = {}, form_data = nil)
       url = URI.parse(url)
-      http = self.get_http_conn(url.host, url.port, url.scheme.downcase == 'https')
+      http = self.get_http_conn(url.host, url.port, url.scheme.casecmp?('https'))
       req = Net::HTTP::Post.new(url.request_uri, headers)
       req.basic_auth URI.unescape(url.user || ""), URI.unescape(url.password || "") if url.user
       req.form_data = form_data if form_data
@@ -45,7 +45,7 @@ class SSLCommon
 
     def get(url, headers = {})
       url = URI.parse(url)
-      http = self.get_http_conn(url.host, url.port, url.scheme.downcase == 'https')
+      http = self.get_http_conn(url.host, url.port, url.scheme.casecmp?('https'))
       http.get(url.request_uri, headers)
     end
 
