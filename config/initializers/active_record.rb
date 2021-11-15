@@ -720,10 +720,10 @@ end
 
 module UsefulFindInBatches
   # add the strategy param
-  def find_each(start: nil, finish: nil, **kwargs)
-    if block_given?
+  def find_each(start: nil, finish: nil, **kwargs, &block)
+    if block
       find_in_batches(start: start, finish: finish, **kwargs) do |records|
-        records.each { |record| yield record }
+        records.each(&block)
       end
     else
       enum_for(:find_each, start: start, finish: finish, **kwargs) do
@@ -1027,11 +1027,11 @@ module UsefulBatchEnumerator
     super(**kwargs.slice(:of, :start, :finish, :relation))
   end
 
-  def each_record
-    return to_enum(:each_record) unless block_given?
+  def each_record(&block)
+    return to_enum(:each_record) unless block
 
     @relation.to_enum(:in_batches, strategy: @strategy, load: true, **@kwargs).each do |relation|
-      relation.records.each { |record| yield record }
+      relation.records.each(&block)
     end
   end
 
@@ -1075,9 +1075,9 @@ module UsefulBatchEnumerator
     @relation.in_batches(strategy: @strategy, load: true, **@kwargs, &:destroy_all)
   end
 
-  def each
+  def each(&block)
     enum = @relation.to_enum(:in_batches, strategy: @strategy, load: true, **@kwargs)
-    return enum.each { |relation| yield relation } if block_given?
+    return enum.each(&block) if block
 
     enum
   end

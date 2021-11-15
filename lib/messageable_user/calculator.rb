@@ -871,7 +871,7 @@ class MessageableUser
     # the optional methods list is a list of methods to call (not results of a
     # method call, since if there are multiple we want to distinguish them) to
     # get additional objects to include in the per-shard cache keys
-    def shard_cached(key, *methods)
+    def shard_cached(key, *methods, &block)
       @shard_caches ||= {}
       @shard_caches[key] ||=
         begin
@@ -883,7 +883,7 @@ class MessageableUser
               shard_key << method
               shard_key << Digest::MD5.hexdigest(canonical)
             end
-            by_shard[Shard.current] = Rails.cache.fetch(shard_key.cache_key, :expires_in => 1.day) { yield }
+            by_shard[Shard.current] = Rails.cache.fetch(shard_key.cache_key, :expires_in => 1.day, &block)
           end
           by_shard
         end

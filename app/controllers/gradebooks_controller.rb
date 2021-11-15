@@ -1243,9 +1243,9 @@ class GradebooksController < ApplicationController
     ) { |period| period_as_assignment(period, options) }
   end
 
-  def as_assignments(objects = nil, options = {})
+  def as_assignments(objects = nil, options = {}, &block)
     fakes = []
-    fakes.concat(objects.map { |object| yield(object) }) if objects && block_given?
+    fakes.concat(objects.map(&block)) if objects && block
     fakes << total_as_assignment(options) unless options[:exclude_total]
     fakes
   end

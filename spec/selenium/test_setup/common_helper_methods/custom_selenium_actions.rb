@@ -719,17 +719,17 @@ module CustomSeleniumActions
     driver.execute_script("$(#{selector.to_json}).scrollTo(#{target.to_json})")
   end
 
-  def stale_element_protection
+  def stale_element_protection(&block)
     element = yield
-    element.finder_proc = proc { disable_implicit_wait { yield } }
+    element.finder_proc = proc { disable_implicit_wait(&block) }
     element
   end
 
-  def reloadable_collection
+  def reloadable_collection(&block)
     collection = yield
     SeleniumExtensions::ReloadableCollection.new(
       collection,
-      proc { disable_implicit_wait { yield } }
+      proc { disable_implicit_wait(&block) }
     )
   end
 end

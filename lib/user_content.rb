@@ -119,10 +119,8 @@ module UserContent
     end
   end
 
-  def self.find_equation_images(html)
-    html.css('img.equation_image').each do |node|
-      yield node
-    end
+  def self.find_equation_images(html, &block)
+    html.css('img.equation_image').each(&block)
   end
 
   # TODO: try and discover the motivation behind the "huhs"

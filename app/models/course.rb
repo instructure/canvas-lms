@@ -2647,13 +2647,11 @@ class Course < ActiveRecord::Base
   end
 
   # helper method to DRY-up some similar methods that all can be cached based on a user's enrollments
-  def fetch_on_enrollments(key, user, opts = nil)
+  def fetch_on_enrollments(key, user, opts = nil, &block)
     self.shard.activate do
       RequestCache.cache(key, user, self, opts) do
         Rails.cache.fetch_with_batched_keys([key, self.global_asset_string, opts].compact.cache_key, batch_object: user, batched_keys: :enrollments) do
-          GuardRail.activate(:primary) do
-            yield
-          end
+          GuardRail.activate(:primary, &block)
         end
       end
     end

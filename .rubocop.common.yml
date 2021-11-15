@@ -192,6 +192,8 @@ Style/EmptyCaseCondition:
   Severity: error
 Style/Encoding:
   Severity: error
+Style/ExplicitBlockArgument:
+  Severity: error
 Style/FrozenStringLiteralComment:
   Severity: error
 Style/HashConversion:

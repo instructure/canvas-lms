@@ -4383,10 +4383,10 @@ describe CoursesController, type: :request do
   end
 end
 
-def each_copy_option
+def each_copy_option(&block)
   [[:assignments, :assignments], [:external_tools, :context_external_tools], [:files, :attachments],
    [:topics, :discussion_topics], [:calendar_events, :calendar_events], [:quizzes, :quizzes],
-   [:modules, :context_modules], [:outcomes, :created_learning_outcomes]].each { |o| yield o }
+   [:modules, :context_modules], [:outcomes, :created_learning_outcomes]].each(&block)
 end
 
 describe ContentImportsController, type: :request do
