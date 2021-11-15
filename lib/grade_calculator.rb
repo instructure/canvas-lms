@@ -866,7 +866,7 @@ class GradeCalculator
   end
 
   def drop_pointed(submissions, cant_drop, n_highest, n_lowest)
-    max_total = (submissions + cant_drop).map { |s| s[:total] }.max
+    max_total = (submissions + cant_drop).pluck(:total).max
 
     kept = keep_highest(submissions, cant_drop, n_highest, max_total)
     keep_lowest(kept, cant_drop, n_lowest, max_total)
@@ -979,7 +979,7 @@ class GradeCalculator
   end
 
   def gather_dropped_from_group_scores(group_sums)
-    dropped = group_sums.map { |sum| sum[:dropped] }
+    dropped = group_sums.pluck(:dropped)
     dropped.flatten!
     dropped.uniq!
     dropped

@@ -1112,7 +1112,7 @@ describe GradebookImporter do
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
             ",#{@student.id},,5,5",
           )
-          assignment_ids = assignments.map { |a| a[:id] }
+          assignment_ids = assignments.pluck(:id)
           expect(assignment_ids).to_not include @closed_assignment.id
         end
 
@@ -1121,7 +1121,7 @@ describe GradebookImporter do
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
             ",#{@student.id},,5,5",
           )
-          assignment_ids = assignments.map { |a| a[:id] }
+          assignment_ids = assignments.pluck(:id)
           expect(assignment_ids).to include @open_assignment.id
         end
 
@@ -1206,7 +1206,7 @@ describe GradebookImporter do
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
             ",#{@student.id},,5,5"
           )
-          assignment_ids = assignments.map { |a| a[:id] }
+          assignment_ids = assignments.pluck(:id)
           expect(assignment_ids).not_to include @closed_assignment.id
         end
 
@@ -1216,7 +1216,7 @@ describe GradebookImporter do
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
             ",#{@student.id},,5,5"
           )
-          assignment_ids = assignments.map { |a| a[:id] }
+          assignment_ids = assignments.pluck(:id)
           expect(assignment_ids).to include @closed_assignment.id
         end
 
@@ -2010,7 +2010,7 @@ describe GradebookImporter do
           )
 
           output = importer.as_json
-          override_scores_by_student = output[:students].map { |student| student[:override_scores] }
+          override_scores_by_student = output[:students].pluck(:override_scores)
           expect(override_scores_by_student).to all(be_empty)
         end
 
@@ -2046,7 +2046,7 @@ describe GradebookImporter do
           )
 
           output = importer.as_json
-          override_scores_by_student = output[:students].map { |student| student[:override_scores] }
+          override_scores_by_student = output[:students].pluck(:override_scores)
           expect(override_scores_by_student).to all(be_empty)
         end
 
@@ -2059,7 +2059,7 @@ describe GradebookImporter do
           )
 
           output = importer.as_json
-          override_scores_by_student = output[:students].map { |student| student[:override_scores] }
+          override_scores_by_student = output[:students].pluck(:override_scores)
           aggregate_failures do
             expect(override_scores_by_student.length).to eq 3
             expect(override_scores_by_student.map(&:length)).to all(eq(1))

@@ -116,7 +116,7 @@ if Qti.migration_executable
           { :html => nil, :text => "left 3" },
           { :html => nil, :text => "left 4" }
         ]
-        expect(hash[:matches].collect { |m| m[:text] }).to eq ["right 1", "rïght 2", "right 3", "right 4"]
+        expect(hash[:matches].pluck(:text)).to eq ["right 1", "rïght 2", "right 3", "right 4"]
       end
     end
   end

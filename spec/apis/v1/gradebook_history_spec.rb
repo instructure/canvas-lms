@@ -89,7 +89,7 @@ describe Api::V1::GradebookHistory do
     end
 
     it 'has a top level key for each day represented' do
-      dates = @days.map { |d| d[:date] }
+      dates = @days.pluck(:date)
       expect(dates.size).to eq 2
       expect(dates).to include(now.to_date.as_json)
       expect(dates).to include(24.hours.ago.in_time_zone.to_date.as_json)
@@ -116,7 +116,7 @@ describe Api::V1::GradebookHistory do
       harness = GradebookHistoryHarness.new
       harness.instance_variable_set(:@domain_root_account, Account.default)
       days = harness.days_json(course, api_context)
-      expect(days.map { |d| d[:date] }.first).to eq yesterday.to_date.as_json
+      expect(days.pluck(:date).first).to eq yesterday.to_date.as_json
     end
   end
 
@@ -148,7 +148,7 @@ describe Api::V1::GradebookHistory do
     end
 
     it 'returns a grader hash for that day' do
-      expect(@day_hash.map { |g| g[:id] }.sort).to eq [@grader1.id, @grader2.id].sort
+      expect(@day_hash.pluck(:id).sort).to eq [@grader1.id, @grader2.id].sort
     end
   end
 

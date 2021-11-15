@@ -115,7 +115,7 @@ describe Lti::ExternalToolTab do
     )
     allow(tool2).to receive(:id).and_return(9)
     subject = described_class.new(context, nil, [tool2, tool])
-    expect(subject.tabs.map { |t| t[:id] }).to eq [tool.asset_string, tool2.asset_string]
+    expect(subject.tabs.pluck(:id)).to eq [tool.asset_string, tool2.asset_string]
   end
 
   describe "course_navigation" do

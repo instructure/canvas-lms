@@ -348,7 +348,7 @@ describe Quizzes::QuizzesController do
           expect(controller.js_env[:QUIZZES][:assignment]).not_to be_nil
           expect(controller.js_env[:QUIZZES][:assignment].count).to eq(2)
           expect(
-            controller.js_env[:QUIZZES][:assignment].map { |x| x[:id] }
+            controller.js_env[:QUIZZES][:assignment].pluck(:id)
           ).to contain_exactly(course_quizzes[1].id, course_assignments[3].id)
         end
       end

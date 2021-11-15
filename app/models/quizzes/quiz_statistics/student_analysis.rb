@@ -170,9 +170,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   def preload_attachments(submissions)
     ids = submissions.map(&:submission_data).flatten.compact.select do |hash|
       hash[:attachment_ids].present?
-    end.map do |hash|
-      hash[:attachment_ids]
-    end.flatten
+    end.pluck(:attachment_ids).flatten
     @attachments = Attachment.where(:id => ids).index_by(&:id)
   end
 
@@ -277,12 +275,12 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
           answer_item ||= answer
           case question[:question_type]
           when 'fill_in_multiple_blanks_question'
-            blank_ids = question[:answers].map { |a| a[:blank_id] }.uniq
+            blank_ids = question[:answers].pluck(:blank_id).uniq
             row << blank_ids.filter_map { |blank_id| answer["answer_for_#{blank_id}".to_sym].try(:gsub, /,/, '\,') }.join(',')
           when 'multiple_answers_question'
             row << question[:answers].filter_map { |a| answer["answer_#{a[:id]}".to_sym] == '1' ? a[:text].gsub(/,/, '\,') : nil }.join(',')
           when 'multiple_dropdowns_question'
-            blank_ids = question[:answers].map { |a| a[:blank_id] }.uniq
+            blank_ids = question[:answers].pluck(:blank_id).uniq
             answer_ids = blank_ids.map { |blank_id| answer["answer_for_#{blank_id}".to_sym] }
             row << answer_ids.filter_map { |answer_id| (question[:answers].detect { |a| a[:id] == answer_id } || {})[:text].try(:gsub, /,/, '\,') }.join(',')
           when 'calculated_question'
@@ -294,7 +292,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
             list << answer[:text]
             row << list.map { |str| (str || '').gsub(/,/, '\,') }.join(',')
           when 'matching_question'
-            answer_ids = question[:answers].map { |a| a[:id] }
+            answer_ids = question[:answers].pluck(:id)
             answer_and_matches = answer_ids.map { |aid| [aid, answer["answer_#{aid}".to_sym].to_i] }
             row << answer_and_matches.map do |answer_id, match_id|
               res = []
@@ -411,7 +409,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     }
     strip_html_answers(question)
 
-    question[:user_ids] = responses.map { |r| r[:user_id] }
+    question[:user_ids] = responses.pluck(:user_id)
     question[:response_values] = responses.map { |r| strip_tags(r[:text].to_s) }
     question[:responses] = responses.size
 
@@ -421,7 +419,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       :id => "none",
       :weight => 0,
       :text => I18n.t('statistics.no_answer', "No Answer"),
-      :user_ids => question[:user_ids] - question[:answers].map { |a| a[:user_ids] }.flatten
+      :user_ids => question[:user_ids] - question[:answers].pluck(:user_ids).flatten
     } rescue nil
     question[:answers] << none if none && none[:responses] > 0
     question.to_hash.with_indifferent_access

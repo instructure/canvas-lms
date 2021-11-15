@@ -118,6 +118,8 @@ Rails/IndexBy:
   Severity: error
 Rails/IndexWith:
   Severity: error
+Rails/Pluck:
+  Severity: error
 Rails/PluralizationGrammar:
   Severity: error
 Rails/RedundantAllowNil:

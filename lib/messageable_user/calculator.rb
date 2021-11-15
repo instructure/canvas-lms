@@ -761,7 +761,7 @@ class MessageableUser
     end
 
     def uncached_visible_section_ids_in_course(course)
-      course.section_visibilities_for(@user).map { |s| s[:course_section_id] }
+      course.section_visibilities_for(@user).pluck(:course_section_id)
     end
 
     def uncached_observed_student_ids

@@ -3901,7 +3901,7 @@ class Assignment < ActiveRecord::Base
       end
       o
     end
-    override_ids = overrides.map { |ele| ele[:id] }.to_set
+    override_ids = overrides.pluck(:id).to_set
     self.assignment_overrides.reject { |o| override_ids.include? o[:id] } + overrides
   end
 

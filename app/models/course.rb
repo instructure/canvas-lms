@@ -2741,7 +2741,7 @@ class Course < ActiveRecord::Base
       scope
     when :sections, :sections_limited
       scope.where("enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))",
-                  visibilities.map { |s| s[:course_section_id] }, false)
+                  visibilities.pluck(:course_section_id), false)
     when :restricted
       user_ids = visibilities.filter_map { |s| s[:associated_user_id] }
       scope.where(enrollments: { user_id: (user_ids + [user&.id]).compact })
@@ -2782,10 +2782,10 @@ class Course < ActiveRecord::Base
     # See also MessageableUsers (same logic used to get users across multiple courses) (should refactor)
     case visibility
     when :full then scope
-    when :sections then scope.where(enrollments: { course_section_id: visibilities.map { |s| s[:course_section_id] } })
+    when :sections then scope.where(enrollments: { course_section_id: visibilities.pluck(:course_section_id) })
     when :restricted then scope.where(enrollments: { user_id: (visibilities.filter_map { |s| s[:associated_user_id] } + [user]) })
     when :limited then scope.where(enrollments: { type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment'] })
-    when :sections_limited then scope.where(enrollments: { course_section_id: visibilities.map { |s| s[:course_section_id] } })
+    when :sections_limited then scope.where(enrollments: { course_section_id: visibilities.pluck(:course_section_id) })
                                      .where(enrollments: { type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment'] })
     else scope.none
     end
@@ -3185,7 +3185,7 @@ class Course < ActiveRecord::Base
       end
 
       if tabs_that_can_be_marked_hidden_unused.present?
-        ar_types = active_record_types(only_check: tabs_that_can_be_marked_hidden_unused.map { |t| t[:relation] })
+        ar_types = active_record_types(only_check: tabs_that_can_be_marked_hidden_unused.pluck(:relation))
         tabs_that_can_be_marked_hidden_unused.each do |t|
           if !ar_types[t[:relation]] && (!t[:additional_check] || !t[:additional_check].call)
             # that means there are none of this type of thing in the DB

@@ -146,7 +146,7 @@ class Quizzes::QuizQuestionBuilder
       question_name = t('#quizzes.quiz.default_text_only_question_name', 'Spacer')
     when ::Quizzes::QuizQuestion::Q_FILL_IN_MULTIPLE_BLANKS
       text = q[:question_text]
-      variables = q[:answers].map { |a| a[:blank_id] }.uniq
+      variables = q[:answers].pluck(:blank_id).uniq
       variables.each do |variable|
         variable_id = ::AssessmentQuestion.variable_id(variable)
         re = Regexp.new("\\[#{variable}\\]")
@@ -165,7 +165,7 @@ class Quizzes::QuizQuestionBuilder
       q[:question_text] = text
     when ::Quizzes::QuizQuestion::Q_MULTIPLE_DROPDOWNS
       text = q[:question_text]
-      variables = q[:answers].map { |a| a[:blank_id] }.uniq
+      variables = q[:answers].pluck(:blank_id).uniq
       variables.each do |variable|
         variable_id = ::AssessmentQuestion.variable_id(variable)
         variable_answers = q[:answers].select { |a| a[:blank_id] == variable }
@@ -251,7 +251,7 @@ class Quizzes::QuizQuestionBuilder
   end
 
   def mark_picked(questions)
-    @picked[:aq].concat(questions.map { |q| q[:assessment_question_id] }).uniq!
-    @picked[:qq].concat(questions.map { |q| q[:id] })
+    @picked[:aq].concat(questions.pluck(:assessment_question_id)).uniq!
+    @picked[:qq].concat(questions.pluck(:id))
   end
 end

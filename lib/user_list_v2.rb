@@ -148,7 +148,7 @@ class UserListV2
   def add_additional_data_for_duplicates
     return unless @duplicate_results.any?
 
-    duplicate_user_ids = @duplicate_results.map { |set| set.map { |h| h[:user_id] } }.flatten.uniq
+    duplicate_user_ids = @duplicate_results.map { |set| set.pluck(:user_id) }.flatten.uniq
     user_map = User.where(:id => duplicate_user_ids).preload(:pseudonyms).to_a.index_by(&:id)
 
     @duplicate_results.each do |set|
@@ -196,7 +196,7 @@ class UserListV2
         Pseudonym.associated_shards_for_column(:integration_id, address)
     end
 
-    ids = @addresses.map { |a| a[:address] }
+    ids = @addresses.pluck(:address)
     search_for_results(restricted_shards) do |account_ids|
       rows = Pseudonym.active.where(:account_id => account_ids, :sis_user_id => ids).joins(:user, :account)
                       .pluck(:sis_user_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')

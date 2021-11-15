@@ -106,7 +106,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
     # objects for later access:
     erratic_ids = quiz_data.select do |question_data|
       question_data[:id] == question_data[:assessment_question_id]
-    end.map { |question_data| question_data[:id] }
+    end.pluck(:id)
 
     return false if erratic_ids.empty?
 

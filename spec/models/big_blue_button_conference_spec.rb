@@ -247,8 +247,8 @@ describe BigBlueButtonConference do
 
         BigBlueButtonConference.preload_recordings([@bbb, @bbb2])
         [@bbb, @bbb2].each { |c| expect(c).to_not receive(:send_request) } # shouldn't need to send individual requests anymore
-        expect(@bbb.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
-        expect(@bbb2.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting2"])
+        expect(@bbb.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
+        expect(@bbb2.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting2"])
       end
 
       it "makes a separate api call for old conferences" do
@@ -273,8 +273,8 @@ describe BigBlueButtonConference do
 
         BigBlueButtonConference.preload_recordings([@bbb, @bbb2])
         [@bbb, @bbb2].each { |c| expect(c).to_not receive(:send_request) } # shouldn't need to send individual requests anymore
-        expect(@bbb.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
-        expect(@bbb2.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting2"])
+        expect(@bbb.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
+        expect(@bbb2.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting2"])
       end
 
       it "does not make a call for conferences without keys" do
@@ -304,7 +304,7 @@ describe BigBlueButtonConference do
 
         BigBlueButtonConference.preload_recordings([@bbb, @bbb2])
         expect(@bbb2).to_not receive(:send_request)
-        expect(@bbb2.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting2"])
+        expect(@bbb2.recordings.pluck(:recording_id)).to match_array(["somerecordingidformeeting2"])
       end
     end
   end

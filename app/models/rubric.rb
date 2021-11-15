@@ -388,7 +388,7 @@ class Rubric < ActiveRecord::Base
         criterion_rating(rating_data, criterion[:id])
       end
       criterion[:ratings] = ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] }
-      criterion[:points] = criterion[:ratings].map { |r| r[:points] }.max || 0
+      criterion[:points] = criterion[:ratings].pluck(:points).max || 0
 
       # Record both the criterion data and the original ID that was passed in
       # (we'll use the ID when we sort the criteria below)

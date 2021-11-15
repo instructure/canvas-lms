@@ -37,7 +37,7 @@ module Assignments
       end
 
       def visible_section_ids
-        @visible_section_ids ||= section_visibilities.map { |v| v[:course_section_id] }
+        @visible_section_ids ||= section_visibilities.pluck(:course_section_id)
       end
     end
 

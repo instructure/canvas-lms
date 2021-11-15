@@ -235,7 +235,7 @@ module AssignmentOverrideApplicator
           excluded_workflows: ['deleted', 'completed']
         ).select { |v|
           ['StudentEnrollment', 'ObserverEnrollment', 'StudentViewEnrollment'].include? v[:type]
-        }.map { |v| v[:course_section_id] }.uniq
+        }.pluck(:course_section_id).uniq
     end
 
     if assignment_or_quiz.assignment_overrides.loaded?

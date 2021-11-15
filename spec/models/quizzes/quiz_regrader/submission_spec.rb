@@ -177,11 +177,9 @@ describe Quizzes::QuizRegrader::Submission do
     end
 
     it "doesn't change question names" do
-      allow(regrade_submission).to receive_messages(submitted_answer_ids: questions.map { |q| q[:id] })
+      allow(regrade_submission).to receive_messages(submitted_answer_ids: questions.pluck(:id))
 
-      question_names = regrade_submission.rescored_submission.questions.map do |q|
-        q[:question_name]
-      end
+      question_names = regrade_submission.rescored_submission.questions.pluck(:question_name)
 
       expect(question_names.sort).to eq [
         'Question 1',

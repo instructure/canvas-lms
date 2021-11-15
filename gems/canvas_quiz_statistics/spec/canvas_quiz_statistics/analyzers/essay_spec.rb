@@ -156,7 +156,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
                                { points: nil, user_id: 5 }
                              ])
 
-        expect(output[:point_distribution].map { |v| v[:score] }).to eq([nil, 1, 3])
+        expect(output[:point_distribution].pluck(:score)).to eq([nil, 1, 3])
       end
     end
   end

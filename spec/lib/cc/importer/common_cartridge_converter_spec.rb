@@ -582,7 +582,7 @@ describe "non-ASCII attachment names" do
                 "abc.txt",
                 "molé.txt",
                 "xyz.txt"]
-    expect(@converter.course[:file_map].values.map { |v| v[:path_name] }.sort).to eq contents.sort
+    expect(@converter.course[:file_map].values.pluck(:path_name).sort).to eq contents.sort
 
     Zip::File.open File.join(@converter.base_export_dir, "all_files.zip") do |zipfile|
       zipcontents = zipfile.entries.map(&:name)

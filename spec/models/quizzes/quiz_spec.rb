@@ -1025,7 +1025,7 @@ describe Quizzes::Quiz do
     it "creates a submission" do
       submission = @quiz.generate_submission(@user)
       expect(submission.quiz_data.length).to eq 4
-      texts = submission.quiz_data.map { |q| q[:question_text] }
+      texts = submission.quiz_data.pluck(:question_text)
       # one of the bank questions should be duplicated, since the group
       # pick count is 3 and the bank only has 2 questions:
       expect(texts.uniq.count).to eq(3)
@@ -1051,7 +1051,7 @@ describe Quizzes::Quiz do
 
       submission = @quiz.generate_submission(@user)
       expect(submission.quiz_data.length).to eq 3
-      texts = submission.quiz_data.map { |q| q[:question_text] }
+      texts = submission.quiz_data.pluck(:question_text)
       expect(texts.member?('gq1')).to be_truthy
       expect(texts.member?('gq2')).to be_truthy
       expect(texts.member?('qq1')).to be_truthy

@@ -59,7 +59,7 @@ describe ConversationsController do
       get 'index', :format => 'json'
       expect(response).to be_successful
       expect(assigns[:js_env]).to be_nil
-      expect(assigns[:conversations_json].map { |c| c[:id] }).to eq @user.conversations.map(&:conversation_id)
+      expect(assigns[:conversations_json].pluck(:id)).to eq @user.conversations.map(&:conversation_id)
     end
 
     it "works for an admin as well" do
@@ -69,7 +69,7 @@ describe ConversationsController do
 
       get 'index', :format => 'json'
       expect(response).to be_successful
-      expect(assigns[:conversations_json].map { |c| c[:id] }).to eq @user.conversations.map(&:conversation_id)
+      expect(assigns[:conversations_json].pluck(:id)).to eq @user.conversations.map(&:conversation_id)
     end
 
     it "returns all sent conversations" do
@@ -113,15 +113,15 @@ describe ConversationsController do
 
       get 'index', params: { :filter => [@course1.asset_string, @course2.asset_string], :filter_mode => 'or' }, :format => 'json'
       expect(response).to be_successful
-      expect(assigns[:conversations_json].map { |c| c[:id] }.sort).to eql [@c1, @c2, @c3].map(&:conversation_id).sort
+      expect(assigns[:conversations_json].pluck(:id).sort).to eql [@c1, @c2, @c3].map(&:conversation_id).sort
 
       get 'index', params: { :filter => [@course2.asset_string, @user.asset_string], :filter_mode => 'or' }, :format => 'json'
       expect(response).to be_successful
-      expect(assigns[:conversations_json].map { |c| c[:id] }.sort).to eql [@c1, @c2, @c3].map(&:conversation_id).sort
+      expect(assigns[:conversations_json].pluck(:id).sort).to eql [@c1, @c2, @c3].map(&:conversation_id).sort
 
       get 'index', params: { :filter => [@course2.asset_string, @user.asset_string], :filter_mode => 'and' }, :format => 'json'
       expect(response).to be_successful
-      expect(assigns[:conversations_json].map { |c| c[:id] }.sort).to eql [@c2, @c3].map(&:conversation_id).sort
+      expect(assigns[:conversations_json].pluck(:id).sort).to eql [@c2, @c3].map(&:conversation_id).sort
 
       get 'index', params: { :filter => [@course1.asset_string, @course2.asset_string], :filter_mode => 'and' }, :format => 'json'
       expect(response).to be_successful
@@ -822,7 +822,7 @@ describe ConversationsController do
         json = assigns[:conversations_json][:conversations]
         ids = assigns[:conversations_json][:conversation_ids]
         # IDs should match in returned lists
-        expect(ids.sort).to eq json.map { |c| c[:id] }.sort
+        expect(ids.sort).to eq json.pluck(:id).sort
         # IDs returned should match IDs for user's conversations
         expect(ids.sort).to eq @logged_in_user.conversations.map(&:conversation_id).sort
         # Expect 2 elements in both groups

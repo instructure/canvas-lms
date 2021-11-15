@@ -31,14 +31,14 @@ module ConditionalRelease
                                   .pluck(*sub_attrs).map { |r| sub_attrs.zip(r).to_h }.sort_by { |s| s[:user_id] } # turns plucked rows into hashes
 
         assignments_by_id = rule.course.assignments.where(:id => assignment_ids).to_a.index_by(&:id)
-        users_by_id = User.where(:id => all_submission_data.map { |s| s[:user_id] }.uniq).to_a.index_by(&:id)
+        users_by_id = User.where(:id => all_submission_data.pluck(:user_id).uniq).to_a.index_by(&:id)
 
         trigger_submissions = all_submission_data.select { |s| s[:assignment_id] == rule.trigger_assignment_id }
 
         # { user_id => [Submission] }
         follow_on_submissions_hash = {}
         if include_trend_data
-          student_ids = trigger_submissions.map { |s| s[:user_id] }
+          student_ids = trigger_submissions.pluck(:user_id)
           all_previous_assignment_ids = AssignmentSetAction.current_assignments(student_ids, rule.assignment_sets)
                                                            .preload(assignment_set: :assignment_set_associations)
                                                            .each_with_object({}) { |action, acc| acc[action.student_id] = action.assignment_set.assignment_set_associations.map(&:assignment_id) }
