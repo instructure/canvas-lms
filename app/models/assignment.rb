@@ -546,7 +546,7 @@ class Assignment < ActiveRecord::Base
     new_value = new_value.split(/[\s,]+/) if new_value.is_a?(String)
 
     # remove the . if they put it on, and extra whitespace
-    new_value.map! { |v| v.strip.gsub(/\A\./, '').downcase } if new_value.is_a?(Array)
+    new_value.map! { |v| v.strip.delete_prefix('.').downcase } if new_value.is_a?(Array)
 
     write_attribute(:allowed_extensions, new_value)
   end

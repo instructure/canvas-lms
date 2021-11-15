@@ -390,7 +390,7 @@ class MessageableUser
     def messageable_users_in_context_scope(asset_string_or_asset, options = {})
       if asset_string_or_asset.is_a?(String)
         asset_string = asset_string_or_asset
-        return unless asset_string.sub(/_all\z/, '') =~ CONTEXT_RECIPIENT
+        return unless asset_string.delete_suffix('_all') =~ CONTEXT_RECIPIENT
 
         context_type = $1
         context_id_or_object = $2.to_i

@@ -671,7 +671,7 @@ RSpec.configure do |config|
       end
 
       def method_missing(sym, *args, &blk)
-        @ancestor.instance_method(sym).bind(@subject).call(*args, &blk)
+        @ancestor.instance_method(sym).bind_call(@subject, *args, &blk)
       end
     end
 

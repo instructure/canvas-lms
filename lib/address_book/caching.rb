@@ -68,17 +68,17 @@ module AddressBook
       private
 
       def globalize(role_hash)
-        Hash[*role_hash.map do |id, roles|
+        Hash[*role_hash.flat_map do |id, roles|
           id = Shard.global_id_for(id) if id > 0
           [id, roles]
-        end.flatten(1)]
+        end]
       end
 
       def relativize(role_hash)
-        Hash[*role_hash.map do |id, roles|
+        Hash[*role_hash.flat_map do |id, roles|
           id = Shard.relative_id_for(id, Shard.current, Shard.current) if id > 0
           [id, roles]
-        end.flatten(1)]
+        end]
       end
     end
 

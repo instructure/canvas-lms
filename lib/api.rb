@@ -260,7 +260,7 @@ module Api
           raise ArgumentError, "missing scope for collection" unless sis_mapping[:scope]
 
           ids = columns[column]
-          if ids.any? { |id| id.is_a?(Array) }
+          if ids.any?(Array)
             ids_hash = {}
             ids.each do |id|
               id = Array(id)
