@@ -26,6 +26,7 @@ module Importers
     def self.process_migration(data, migration)
       rubrics = data['rubrics'] || []
       migration.outcome_to_id_map ||= {}
+      migration.copied_external_outcome_map ||= {}
       rubrics.each do |rubric|
         if migration.import_object?("rubrics", rubric['migration_id'])
           begin
@@ -77,9 +78,17 @@ module Importers
             elsif (lo = context.created_learning_outcomes.where(migration_id: crit[:learning_outcome_migration_id]).first)
               crit[:learning_outcome_id] = lo.id
             end
-          elsif crit[:learning_outcome_external_identifier].present? && !migration.cross_institution? &&
-                (lo = context.available_outcome(crit[:learning_outcome_external_identifier]))
-            crit[:learning_outcome_id] = lo.id
+          elsif crit[:learning_outcome_external_identifier].present?
+            # link an account outcome
+            lo = context.available_outcome(crit[:learning_outcome_external_identifier]) unless migration.cross_institution?
+
+            # link the copy of an account outcome that isn't available in the destination context
+            unless lo
+              mig_id = migration.copied_external_outcome_map[crit[:learning_outcome_external_identifier]]
+              lo = context.created_learning_outcomes.find_by(migration_id: mig_id) if mig_id
+            end
+
+            crit[:learning_outcome_id] = lo.id if lo
           end
           crit.delete(:learning_outcome_migration_id)
           crit.delete(:learning_outcome_external_identifier)

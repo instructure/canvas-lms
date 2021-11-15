@@ -28,6 +28,7 @@ module Importers
                             migration.context.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
       outcomes = data['learning_outcomes'] || []
       migration.outcome_to_id_map = {}
+      migration.copied_external_outcome_map = {}
       outcomes.each do |outcome|
         import_item = migration.import_object?('learning_outcomes', outcome['migration_id'])
         import_item ||= migration.import_object?('learning_outcome_groups', outcome['migration_id']) if selectable_outcomes
@@ -68,6 +69,7 @@ module Importers
 
         unless outcome
           migration.add_warning(t(:no_context_found, %{The external Learning Outcome couldn't be found for "%{title}", creating a copy.}, :title => hash[:title]))
+          migration.copied_external_outcome_map[hash[:external_identifier]] = hash[:migration_id]
         end
       end
 
