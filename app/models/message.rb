@@ -496,7 +496,7 @@ class Message < ActiveRecord::Base
 
     instance_variable_set(:"@message_content_#{name}",
                           @output_buffer.to_s.strip)
-    @output_buffer = old_output_buffer.sub(/\n\z/, '')
+    @output_buffer = old_output_buffer.delete_suffix("\n")
 
     if old_output_buffer.is_a?(ActiveSupport::SafeBuffer) && old_output_buffer.html_safe?
       @output_buffer = old_output_buffer.class.new(@output_buffer)
@@ -536,7 +536,7 @@ class Message < ActiveRecord::Base
       path = Canvas::MessageHelper.find_message_path(filename)
     end
 
-    @i18n_scope = "messages." + filename.sub(/\.erb\z/, '')
+    @i18n_scope = "messages." + filename.delete_suffix('.erb')
 
     if (File.exist?(path) rescue false)
       File.read(path)

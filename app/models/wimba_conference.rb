@@ -30,7 +30,7 @@ class WimbaConference < WebConference
   def archive_external_url(user, url_id)
     urls = []
     if (res = send_request('listClass', { 'filter00' => 'archive_of', 'filter00value' => wimba_id, 'attribute' => 'longname' }))
-      res.sub(/\A100 OK\n/, '').split(/\n=END RECORD\n?/).each do |match|
+      res.delete_prefix("100 OK\n").split(/\n=END RECORD\n?/).each do |match|
         data = match.split("\n").inject({}) { |hash, line|
           key, hash[key.to_sym] = line.split(/=/, 2)
           hash

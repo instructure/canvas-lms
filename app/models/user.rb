@@ -2270,7 +2270,7 @@ class User < ActiveRecord::Base
     if filter_after_db
       original_count = events.count
       if events.any? { |e| e.context_code.start_with?("course_section_") }
-        section_ids = events.map(&:context_code).grep(/\Acourse_section_\d+\z/).map { |s| s.sub(/\Acourse_section_/, '').to_i }
+        section_ids = events.map(&:context_code).grep(/\Acourse_section_\d+\z/).map { |s| s.delete_prefix('course_section_').to_i }
         section_course_codes = Course.joins(:course_sections).where(:course_sections => { :id => section_ids })
                                      .pluck(:id).map { |id| "course_#{id}" }
         visible_section_codes = self.section_context_codes(section_course_codes)
@@ -2498,7 +2498,7 @@ class User < ActiveRecord::Base
   end
 
   def section_context_codes(context_codes, skip_visibility_filter = false)
-    course_ids = context_codes.grep(/\Acourse_\d+\z/).map { |s| s.sub(/\Acourse_/, '').to_i }
+    course_ids = context_codes.grep(/\Acourse_\d+\z/).map { |s| s.delete_prefix('course_').to_i }
     return [] unless course_ids.present?
 
     section_ids = []

@@ -749,7 +749,7 @@ module UsefulFindInBatches
   end
 
   def in_batches(strategy: nil, start: nil, finish: nil, **kwargs, &block)
-    unless block_given?
+    unless block
       return ActiveRecord::Batches::BatchEnumerator.new(strategy: strategy, start: start, relation: self, **kwargs)
     end
 
@@ -1923,11 +1923,11 @@ ActiveRecord::ConnectionAdapters::Transaction.prepend(PreserveShardAfterTransact
 module ConnectionWithMaxRuntime
   def initialize(*)
     super
-    @created_at = Concurrent.monotonic_time
+    @created_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   end
 
   def runtime
-    Concurrent.monotonic_time - @created_at
+    Process.clock_gettime(Process::CLOCK_MONOTONIC) - @created_at
   end
 end
 ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(ConnectionWithMaxRuntime)

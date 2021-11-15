@@ -941,7 +941,7 @@ class Attachment < ActiveRecord::Base
   # created if necessary.
   def open(opts = {}, &block)
     if instfs_hosted?
-      if block_given?
+      if block
         streaming_download(&block)
       else
         create_tempfile(opts) do |tempfile|

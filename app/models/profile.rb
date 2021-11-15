@@ -86,7 +86,7 @@ class Profile < ActiveRecord::Base
   # some tricks to make it behave like STI with a type column
   def self.inherited(klass)
     super
-    context_type = klass.name.sub(/Profile\z/, '')
+    context_type = klass.name.delete_suffix('Profile')
     klass.class_eval { alias_method context_type.downcase.underscore, :context }
   end
 

@@ -900,23 +900,23 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   end
 
   it "evicts connections on checkout" do
-    allow(Concurrent).to receive(:monotonic_time).and_return(0)
+    allow(Process).to receive(:clock_gettime).and_return(0)
 
     conn1 = pool.connection
     pool.checkin(conn1)
 
-    allow(Concurrent).to receive(:monotonic_time).and_return(60)
+    allow(Process).to receive(:clock_gettime).and_return(60)
     conn2 = pool.connection
     expect(conn2).not_to eql conn1
   end
 
   it "evicts connections on checkin" do
-    allow(Concurrent).to receive(:monotonic_time).and_return(0)
+    allow(Process).to receive(:clock_gettime).and_return(0)
 
     conn1 = pool.connection
     expect(conn1.runtime).to eq 0
 
-    allow(Concurrent).to receive(:monotonic_time).and_return(60)
+    allow(Process).to receive(:clock_gettime).and_return(60)
 
     expect(conn1.runtime).to eq 60
     pool.checkin(conn1)
@@ -925,12 +925,12 @@ describe ActiveRecord::ConnectionAdapters::ConnectionPool do
   end
 
   it "evicts connections if you call flush" do
-    allow(Concurrent).to receive(:monotonic_time).and_return(0)
+    allow(Process).to receive(:clock_gettime).and_return(0)
 
     conn1 = pool.connection
     pool.checkin(conn1)
 
-    allow(Concurrent).to receive(:monotonic_time).and_return(60)
+    allow(Process).to receive(:clock_gettime).and_return(60)
 
     pool.flush
 

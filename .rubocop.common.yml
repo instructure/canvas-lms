@@ -73,35 +73,14 @@ Naming/FileName:
   Exclude:
     - "**/Gemfile.d/~after.rb"
 
+Performance:
+  Severity: error
 Performance/Casecmp:
-  Severity: error
   AutoCorrect: false # prefer using casecmp?(other) instead of casecmp(other).zero?; it handles unicode better
-Performance/Count:
-  Severity: error
-Performance/Detect:
-  Severity: error
-Performance/InefficientHashSearch:
-  Severity: error
-Performance/MapCompact:
-  Severity: error
-Performance/RedundantBlockCall:
-  Severity: error
-Performance/RedundantMerge:
-  Severity: error
-Performance/RedundantSplitRegexpArgument:
-  Severity: error
-Performance/RegexpMatch:
-  Severity: error
-Performance/StartWith:
-  Severity: error
-Performance/StringInclude:
-  Severity: error
-Performance/StringReplacement:
-  Severity: error
-Performance/Sum:
-  Severity: error
-Performance/TimesMap:
-  Severity: error
+Performance/CollectionLiteralInLoop:
+  Severity: info # not auto-correctable; can be a pain to fix and isn't necessarily performance critical
+Performance/MethodObjectAsBlock:
+  Enabled: false # decreases expressiveness
 
 Rails/ActiveRecordAliases:
   Severity: error

@@ -39,7 +39,7 @@ class ProgressRunner
   # @param process_element A block that performs the actually processing on each element.
   #   Passed an individual element as a parameter.
   def do_batch_update(elements, &process_element)
-    raise 'block required' unless block_given?
+    raise 'block required' unless process_element
 
     @progress.start!
     update_every = [elements.size / 20, 4].max
@@ -58,7 +58,7 @@ class ProgressRunner
   # @param block The block to call to format the completed message.
   # @see #default_completed_message
   def completed_message(&block)
-    raise 'block required' unless block_given?
+    raise 'block required' unless block
 
     @completed_message = block
     self
@@ -67,7 +67,7 @@ class ProgressRunner
   # Provide a custom error message formatter. The provided block overrides the default
   # @param block The block to call to format an error message. See #default_error_message
   def error_message(&block)
-    raise 'block required' unless block_given?
+    raise 'block required' unless block
 
     @error_message = block
     self
