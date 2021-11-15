@@ -88,7 +88,7 @@ class CalendarEvent < ActiveRecord::Base
     events = events.values if events.is_a?(Hash)
     next record.errors.add(attr, t('errors.no_updating_user', "Can't update child events unless an updating_user is set")) if events.present? && !record.updating_user
 
-    context_codes = events.map { |e| e[:context_code] }
+    context_codes = events.pluck(:context_code)
     next record.errors.add(attr, t('errors.duplicate_child_event_contexts', "Duplicate child event contexts")) if context_codes != context_codes.uniq
 
     contexts = find_all_by_asset_string(context_codes).group_by(&:asset_string)
@@ -735,7 +735,7 @@ class CalendarEvent < ActiveRecord::Base
 
           event.description.concat("Participants: ")
           current_appts.each { |appt| event.description.concat("\n" + appt[:user]) }
-          comments = current_appts.map { |appt| appt[:comments] }.join(",\n")
+          comments = current_appts.pluck(:comments).join(",\n")
           event.description.concat("\n\n" + comments)
         end
       end

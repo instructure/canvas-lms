@@ -2078,7 +2078,7 @@ describe UsersController do
       get 'admin_split', params: { :user_id => user1.id }
       expect(assigns[:js_env][:ADMIN_SPLIT_URL]).to include "/api/v1/users/#{user1.id}/split"
       expect(assigns[:js_env][:ADMIN_SPLIT_USER][:id]).to eq user1.id
-      expect(assigns[:js_env][:ADMIN_SPLIT_USERS].map { |user| user[:id] }).to eq([user2.id])
+      expect(assigns[:js_env][:ADMIN_SPLIT_USERS].pluck(:id)).to eq([user2.id])
     end
   end
 
@@ -2557,7 +2557,7 @@ describe UsersController do
         @current_user = @user
         get 'user_dashboard'
         courses = assigns[:js_env][:STUDENT_PLANNER_COURSES]
-        expect(courses.map { |c| c[:id] }).to eq [@course.id]
+        expect(courses.pluck(:id)).to eq [@course.id]
       end
 
       it "sets ENV.STUDENT_PLANNER_GROUPS" do
@@ -2567,7 +2567,7 @@ describe UsersController do
         group.add_user(@current_user, 'accepted', true)
         get 'user_dashboard'
         groups = assigns[:js_env][:STUDENT_PLANNER_GROUPS]
-        expect(groups.map { |g| g[:id] }).to eq [group.id]
+        expect(groups.pluck(:id)).to eq [group.id]
       end
     end
 

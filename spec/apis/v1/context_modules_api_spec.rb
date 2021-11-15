@@ -587,7 +587,7 @@ describe "Modules API", type: :request do
 
         expect(json['prerequisite_module_ids'].sort).to eq [@module1.id, @module2.id].sort
         new_module.reload
-        expect(new_module.prerequisites.map { |m| m[:id] }.sort).to eq [@module1.id, @module2.id].sort
+        expect(new_module.prerequisites.pluck(:id).sort).to eq [@module1.id, @module2.id].sort
       end
 
       it "only resets prerequisites if parameter is included and is blank" do
@@ -596,7 +596,7 @@ describe "Modules API", type: :request do
         new_module.save!
 
         new_module.reload
-        expect(new_module.prerequisites.map { |m| m[:id] }.sort).to eq [@module1.id, @module2.id].sort
+        expect(new_module.prerequisites.pluck(:id).sort).to eq [@module1.id, @module2.id].sort
 
         api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{new_module.id}",
                  { :controller => "context_modules_api", :action => "update", :format => "json",
@@ -604,7 +604,7 @@ describe "Modules API", type: :request do
                  { :module => { :name => 'new name',
                                 :require_sequential_progress => true } })
         new_module.reload
-        expect(new_module.prerequisites.map { |m| m[:id] }.sort).to eq [@module1.id, @module2.id].sort
+        expect(new_module.prerequisites.pluck(:id).sort).to eq [@module1.id, @module2.id].sort
 
         api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{new_module.id}",
                  { :controller => "context_modules_api", :action => "update", :format => "json",
@@ -612,7 +612,7 @@ describe "Modules API", type: :request do
                  { :module => { :name => 'new name',
                                 :prerequisite_module_ids => '' } })
         new_module.reload
-        expect(new_module.prerequisites.map { |m| m[:id] }.sort).to be_empty
+        expect(new_module.prerequisites.pluck(:id).sort).to be_empty
       end
     end
 
@@ -688,7 +688,7 @@ describe "Modules API", type: :request do
         expect(json['prerequisite_module_ids'].sort).to eq [module1.id, module2.id].sort
 
         new_module = @course.context_modules.find(json['id'])
-        expect(new_module.prerequisites.map { |m| m[:id] }.sort).to eq [module1.id, module2.id].sort
+        expect(new_module.prerequisites.pluck(:id).sort).to eq [module1.id, module2.id].sort
       end
     end
 

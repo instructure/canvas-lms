@@ -189,7 +189,7 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].pluck(:url)
     expect(links).to match_array [unpublished_link, deleted_link]
   end
 
@@ -210,7 +210,7 @@ describe CourseLinkValidator do
 
     CourseLinkValidator.queue_course(@course)
     run_jobs
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].pluck(:url)
     expect(links).to eq([nonsense_link])
   end
 
@@ -228,7 +228,7 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].pluck(:url)
     expect(links).to match_array [deleted_link]
   end
 
@@ -276,7 +276,7 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].pluck(:url)
     expect(links).to match_array [unpublished_link, deleted_link]
   end
 
@@ -317,7 +317,7 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].pluck(:url)
     expect(links).to match_array [invalid_link1, invalid_link2]
   end
 
@@ -349,7 +349,7 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].pluck(:url)
     expect(links).to match_array [link]
   end
 

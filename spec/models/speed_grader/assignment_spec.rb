@@ -263,10 +263,10 @@ describe SpeedGrader::Assignment do
     it "includes only students and sections with overrides for differentiated assignments" do
       json = SpeedGrader::Assignment.new(@assignment, @teacher).json
 
-      expect(json[:context][:students].map { |s| s[:id] }).to include(@student1.id.to_s)
-      expect(json[:context][:students].map { |s| s[:id] }).not_to include(@student2.id.to_s)
-      expect(json[:context][:active_course_sections].map { |cs| cs[:id] }).to include(@section1.id.to_s)
-      expect(json[:context][:active_course_sections].map { |cs| cs[:id] }).not_to include(@section2.id.to_s)
+      expect(json[:context][:students].pluck(:id)).to include(@student1.id.to_s)
+      expect(json[:context][:students].pluck(:id)).not_to include(@student2.id.to_s)
+      expect(json[:context][:active_course_sections].pluck(:id)).to include(@section1.id.to_s)
+      expect(json[:context][:active_course_sections].pluck(:id)).not_to include(@section2.id.to_s)
     end
 
     it "sorts student view students last" do
@@ -280,10 +280,10 @@ describe SpeedGrader::Assignment do
       @assignment.save!
       json = SpeedGrader::Assignment.new(@assignment, @teacher).json
 
-      expect(json[:context][:students].map { |s| s[:id] }).to include(@student1.id.to_s)
-      expect(json[:context][:students].map { |s| s[:id] }).to include(@student2.id.to_s)
-      expect(json[:context][:active_course_sections].map { |cs| cs[:id] }).to include(@section1.id.to_s)
-      expect(json[:context][:active_course_sections].map { |cs| cs[:id] }).to include(@section2.id.to_s)
+      expect(json[:context][:students].pluck(:id)).to include(@student1.id.to_s)
+      expect(json[:context][:students].pluck(:id)).to include(@student2.id.to_s)
+      expect(json[:context][:active_course_sections].pluck(:id)).to include(@section1.id.to_s)
+      expect(json[:context][:active_course_sections].pluck(:id)).to include(@section2.id.to_s)
     end
   end
 

@@ -636,11 +636,11 @@ describe LearningOutcome do
       @outcome.save!
 
       rubric.reload
-      expect(rubric.data.first[:ratings].map { |r| r[:description] }).to match_array([
-                                                                                       "Exceeds Expectations",
-                                                                                       "Meets Expectations",
-                                                                                       "Does Not Meet Expectations"
-                                                                                     ])
+      expect(rubric.data.first[:ratings].pluck(:description)).to match_array([
+                                                                               "Exceeds Expectations",
+                                                                               "Meets Expectations",
+                                                                               "Does Not Meet Expectations"
+                                                                             ])
     end
   end
 

@@ -129,7 +129,7 @@ describe RubricAssociationsController do
               expect(outcome_criterion[:ratings].length).to eq 2
               expect(outcome_criterion[:points]).to eq 10
               expect(outcome_criterion[:mastery_points]).to eq 10
-              expect(outcome_criterion[:ratings].map { |rating| rating[:description] }).to eq ["best", "worst"]
+              expect(outcome_criterion[:ratings].pluck(:description)).to eq ["best", "worst"]
             end
           end
 

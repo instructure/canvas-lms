@@ -24,7 +24,7 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
   end
 
   def variables
-    @variables ||= @question_data.answers.map { |a| a[:blank_id] }.uniq
+    @variables ||= @question_data.answers.pluck(:blank_id).uniq
   end
 
   def matching_answer?(answer, variable, downcased_response)

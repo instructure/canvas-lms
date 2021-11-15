@@ -30,7 +30,7 @@ module MicrosoftSync::GraphService::SpecHelper
     # Return an array of just the URLs in @stubbed_urls for
     # searching through them more easily.
     def stubbed_url_array
-      @stubbed_urls.map { |item| item[:url] }
+      @stubbed_urls.pluck(:url)
     end
 
     def stub_request(method, url, response, variables, request_params = {})

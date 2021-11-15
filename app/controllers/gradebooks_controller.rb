@@ -658,8 +658,8 @@ class GradebooksController < ApplicationController
       valid_user_ids = Set.new(@context.students_visible_to(@current_user, include: :inactive).pluck(:id))
       submissions.select! { |submission| valid_user_ids.include? submission[:user_id].to_i }
 
-      user_ids = submissions.map { |submission| submission[:user_id] }
-      assignment_ids = submissions.map { |submission| submission[:assignment_id] }
+      user_ids = submissions.pluck(:user_id)
+      assignment_ids = submissions.pluck(:assignment_id)
       users = @context.admin_visible_students.distinct.find(user_ids).index_by(&:id)
       assignments = @context.assignments.active.find(assignment_ids).index_by(&:id)
       # `submissions` is not a collection of ActiveRecord Submission objects,

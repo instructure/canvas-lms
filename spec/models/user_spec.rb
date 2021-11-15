@@ -1375,7 +1375,7 @@ describe User do
       expect(tool.has_placement?(:user_navigation)).to eq false
       user_model
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
-      expect(tabs.map { |t| t[:id] }).not_to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
     end
 
     it "includes configured external tools" do
@@ -1385,7 +1385,7 @@ describe User do
       expect(tool.has_placement?(:user_navigation)).to eq true
       user_model
       tabs = @user.profile.tabs_available(@user, :root_account => Account.default)
-      expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
       expect(tab[:href]).to eq :user_external_tool_path
       expect(tab[:args]).to eq [@user.id, tool.id]

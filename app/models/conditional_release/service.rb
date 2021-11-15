@@ -176,7 +176,7 @@ module ConditionalRelease
         # to get the assignment data in when we're not maintaining back compat
         referenced_assignment_ids = rules_data.map do |rule_hash|
           rule_hash[:assignment_sets].map do |set_hash|
-            set_hash[:assignment_set_associations].map { |assoc_hash| assoc_hash[:assignment_id] }
+            set_hash[:assignment_set_associations].pluck(:assignment_id)
           end
         end.flatten
         referenced_assignments = course.assignments.where(:id => referenced_assignment_ids).to_a.index_by(&:id)

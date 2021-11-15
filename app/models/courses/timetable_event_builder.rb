@@ -75,7 +75,7 @@ module Courses
     # :code can be used to give it a unique identifier for syncing (otherwise will be generated based on the times)
     # :title can be used to give a title to the event (otherwise a the name of the associated course will be used)
     def create_or_update_events(event_hashes)
-      timetable_codes = event_hashes.map { |h| h[:code] }
+      timetable_codes = event_hashes.pluck(:code)
       raise "timetable codes can't be blank" if timetable_codes.any?(&:blank?)
 
       # destroy unused events
@@ -123,7 +123,7 @@ module Courses
       event_hashes.each do |event_hash|
         event_hash[:code] ||= generate_timetable_code_for(event_hash) # ensure timetable codes
       end
-      timetable_codes = event_hashes.map { |h| h[:code] }
+      timetable_codes = event_hashes.pluck(:code)
       add_error("events (or codes) are not unique") unless timetable_codes.uniq.count == timetable_codes.count # too lazy to be specific here too
     end
 

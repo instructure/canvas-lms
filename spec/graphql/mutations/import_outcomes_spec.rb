@@ -135,7 +135,7 @@ describe Mutations::ImportOutcomes do
 
   def assert_tree_exists(groups, db_parent_group)
     group_titles = db_parent_group.child_outcome_groups.active.pluck(:title)
-    expect(group_titles.sort).to eql(groups.map { |g| g[:title] }.sort)
+    expect(group_titles.sort).to eql(groups.pluck(:title).sort)
 
     groups.each do |group|
       outcome_titles = group[:outcomes] || []

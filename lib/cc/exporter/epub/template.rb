@@ -85,7 +85,7 @@ module CC::Exporter::Epub
     end
 
     def display_prerequisites(prerequisites)
-      prerequisites.map { |prerequisite| prerequisite[:title] }.join(', ')
+      prerequisites.pluck(:title).join(', ')
     end
 
     def friendly_date(date)

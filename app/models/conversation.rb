@@ -412,7 +412,7 @@ class Conversation < ActiveRecord::Base
         # some of the participants we're about to insert may have been soft-deleted,
         # so we'll hard-delete them before reinserting. It would probably be better
         # to update them instead, but meh.
-        inserting_user_ids = message_participant_data.map { |d| d[:user_id] }
+        inserting_user_ids = message_participant_data.pluck(:user_id)
         ConversationMessageParticipant.unique_constraint_retry do
           ConversationMessageParticipant.where(
             :conversation_message_id => message.id, :user_id => inserting_user_ids
