@@ -727,7 +727,7 @@ def assert_random_group_assignment(category, course, initial_spread, result_spre
   end
 
   # set up course users
-  user_count = result_spread.inject(:+) + expected_leftover_count
+  user_count = result_spread.sum + expected_leftover_count
   course_users = create_users_in_course(course, user_count, return_type: :record)
 
   # set up initial spread

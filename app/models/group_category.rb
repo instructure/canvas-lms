@@ -474,7 +474,7 @@ class GroupCategory < ActiveRecord::Base
                             counts = User.joins(:not_ended_enrollments)
                                          .where(enrollments: { course_id: context, type: 'StudentEnrollment' })
                                          .distinct('user_id').group('course_section_id').count
-                            @create_group_count = counts.values.map { |count| count / @create_group_member_count.to_f }.map(&:ceil).sum
+                            @create_group_count = counts.values.map { |count| count / @create_group_member_count.to_f }.sum(&:ceil)
                           else
                             (unassigned_users.to_a.length.to_f / @create_group_member_count).ceil
                           end
@@ -660,7 +660,7 @@ class GroupCategory < ActiveRecord::Base
         end
         @group_distributions[section_id] = dist
       end
-      if @group_distributions.values.map(&:count).sum != @groups.count || @group_distributions.any? { |k, v| v.sum != user_counts[k] }
+      if @group_distributions.values.sum(&:count) != @groups.count || @group_distributions.any? { |k, v| v.sum != user_counts[k] }
         raise "user/group count mismatch" # we should make sure this works before going any further
       end
 
