@@ -156,8 +156,8 @@ class CspSettingsController < ApplicationController
   #
   # Must be called on a root account.
   def csp_log
-    return render status: 400, json: { message: 'must be called on a root account' } unless @context.root_account?
-    return render status: 503, json: { message: 'CSP logging is not configured on the server' } unless (ss = @context.csp_logging_config['shared_secret'])
+    return render status: :bad_request, json: { message: 'must be called on a root account' } unless @context.root_account?
+    return render status: :service_unavailable, json: { message: 'CSP logging is not configured on the server' } unless (ss = @context.csp_logging_config['shared_secret'])
 
     render json: CanvasHttp.get("#{@context.csp_logging_config['host']}report/#{@context.global_id}", 'Authorization' => "Bearer #{ss}").body
   end

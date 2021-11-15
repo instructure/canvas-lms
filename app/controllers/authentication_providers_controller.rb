@@ -669,7 +669,7 @@ class AuthenticationProvidersController < ApplicationController
         "invalid or missing auth_type '#{aac_data[:auth_type]}', must be one of #{
           AuthenticationProvider.valid_auth_types.join(',')
         }"
-      return render(status: 400, json: { errors: [{ message: msg }] })
+      return render(status: :bad_request, json: { errors: [{ message: msg }] })
     end
 
     position = aac_data.delete(:position)
@@ -688,7 +688,7 @@ class AuthenticationProvidersController < ApplicationController
         end
         format.json do
           msg = "duplicate provider #{account_config.auth_type}"
-          render json: { errors: [{ message: msg }] }, status: 422
+          render json: { errors: [{ message: msg }] }, status: :unprocessable_entity
         end
       end
       return
@@ -742,7 +742,7 @@ class AuthenticationProvidersController < ApplicationController
                           'Can not change type of authorization config, '\
                           'please delete and create new config.')
              },
-             status: 400)
+             status: :bad_request)
       return
     end
 
@@ -950,7 +950,7 @@ class AuthenticationProvidersController < ApplicationController
   def start_debugging
     ap = @account.authentication_providers.active.find(params[:authentication_provider_id])
 
-    return render(status: 400, json: { errors: ["Unsupported authentication type"] }) unless ap.class.supports_debugging?
+    return render(status: :bad_request, json: { errors: ["Unsupported authentication type"] }) unless ap.class.supports_debugging?
 
     ap.start_debugging
     debug_data(ap)
@@ -959,7 +959,7 @@ class AuthenticationProvidersController < ApplicationController
   def debug_data(ap = nil)
     unless ap
       ap = @account.authentication_providers.active.find(params[:authentication_provider_id])
-      return render(status: 400, json: { errors: ["Provider is not currently debugging"] }) unless ap.debugging?
+      return render(status: :bad_request, json: { errors: ["Provider is not currently debugging"] }) unless ap.debugging?
     end
 
     respond_to do |format|

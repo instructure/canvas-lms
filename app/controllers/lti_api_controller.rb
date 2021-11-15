@@ -85,7 +85,7 @@ class LtiApiController < ApplicationController
     verify_oauth(token.tool)
 
     if request.content_type != "application/json"
-      return head 415
+      return head :unsupported_media_type
     end
 
     Lti::XapiService.log_page_view(token, params)
@@ -144,7 +144,7 @@ class LtiApiController < ApplicationController
     turnitin_processor = Turnitin::OutcomeResponseProcessor.new(@tool, assignment, user, JSON.parse(request.body.read))
     turnitin_processor.delay(max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
                              priority: Delayed::LOW_PRIORITY).process
-    render json: {}, status: 200
+    render json: {}, status: :ok
   end
 
   protected

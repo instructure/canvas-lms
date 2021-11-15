@@ -214,7 +214,7 @@ class AssignmentOverridesController < ApplicationController
     return bad_request(:errors => errors) if errors
 
     if update_assignment_override(@override, data, updating_user: @current_user)
-      render :json => assignment_override_json(@override), :status => 201
+      render :json => assignment_override_json(@override), :status => :created
     else
       bad_request(@override.errors)
     end

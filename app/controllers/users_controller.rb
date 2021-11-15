@@ -1139,7 +1139,7 @@ class UsersController < ApplicationController
 
   def ignore_item
     unless %w[grading submitting reviewing moderation].include?(params[:purpose])
-      return render(:json => { :ignored => false }, :status => 400)
+      return render(:json => { :ignored => false }, :status => :bad_request)
     end
 
     @current_user.ignore_item!(ActiveRecord::Base.find_by_asset_string(params[:asset_string], ['Assignment', 'AssessmentRequest', 'Quizzes::Quiz']),
@@ -2131,7 +2131,7 @@ class UsersController < ApplicationController
         render :json => { 'url' => url }
       end
     else
-      render :status => 404, :plain => t('could_not_find_url', "Could not find download URL")
+      render :status => :not_found, :plain => t('could_not_find_url', "Could not find download URL")
     end
   end
 
@@ -2772,7 +2772,7 @@ class UsersController < ApplicationController
       flash[:error] = t('no_self_registration', "Self registration has not been enabled for this account")
       respond_to do |format|
         format.html { redirect_to root_url }
-        format.json { render :json => {}, :status => 403 }
+        format.json { render :json => {}, :status => :forbidden }
       end
       false
     end

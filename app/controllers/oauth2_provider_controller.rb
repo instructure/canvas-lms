@@ -109,14 +109,14 @@ class OAuth2ProviderController < ApplicationController
   end
 
   def accept
-    return render plain: t("Invalid or missing session for oauth"), status: 400 unless session[:oauth2]
+    return render plain: t("Invalid or missing session for oauth"), status: :bad_request unless session[:oauth2]
 
     redirect_params = Canvas::OAuth::Provider.final_redirect_params(session[:oauth2], @current_user, logged_in_user, remember_access: params[:remember_access])
     redirect_to Canvas::OAuth::Provider.final_redirect(self, redirect_params)
   end
 
   def deny
-    return render plain: t("Invalid or missing session for oauth"), status: 400 unless session[:oauth2]
+    return render plain: t("Invalid or missing session for oauth"), status: :bad_request unless session[:oauth2]
 
     params = { error: "access_denied" }
     params[:state] = session[:oauth2][:state] if session[:oauth2].key? :state
@@ -163,7 +163,7 @@ class OAuth2ProviderController < ApplicationController
       end
       logout_current_user
     end
-    return render :json => { :message => "can't delete OAuth access token when not using an OAuth access token" }, :status => 400 unless @access_token
+    return render :json => { :message => "can't delete OAuth access token when not using an OAuth access token" }, :status => :bad_request unless @access_token
 
     @access_token.destroy
     response = {}
