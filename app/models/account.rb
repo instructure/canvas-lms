@@ -1264,7 +1264,7 @@ class Account < ActiveRecord::Base
         end
       end
     else
-      @account_chain_ids ||= self.account_chain(:include_site_admin => true).map { |a| a.active? ? a.id : nil }.compact
+      @account_chain_ids ||= self.account_chain(:include_site_admin => true).filter_map { |a| a.active? ? a.id : nil }
       Shard.partition_by_shard(@account_chain_ids) do |account_chain_ids|
         if account_chain_ids == [Account.site_admin.id]
           Account.site_admin.account_users_for(user)
@@ -2036,7 +2036,7 @@ class Account < ActiveRecord::Base
 
   def trusted_referers=(value)
     self.settings[:trusted_referers] = unless value.blank?
-                                         value.split(',').map { |referer_url| format_referer(referer_url) }.compact.join(',')
+                                         value.split(',').filter_map { |referer_url| format_referer(referer_url) }.join(',')
                                        end
   end
 

@@ -158,14 +158,14 @@ class EnrollmentState < ActiveRecord::Base
       self.state_started_at = start_at
       self.state_valid_until = end_at # stores the next date trigger
     else
-      global_start_at = ranges.map(&:compact).map(&:min).compact.min
+      global_start_at = ranges.map(&:compact).filter_map(&:min).min
 
       if !global_start_at
         # Not strictly within any range so no translation needed
         self.state = wf_state
       elsif global_start_at < now
         # we've past the end date so no matter what the state was, we're "completed" now
-        self.state_started_at = ranges.map(&:last).compact.min
+        self.state_started_at = ranges.filter_map(&:last).min
         self.state = 'completed'
       elsif self.enrollment.fake_student? # rubocop:disable Lint/DuplicateBranch
         # Allow student view students to use the course before the term starts

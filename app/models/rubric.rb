@@ -205,7 +205,7 @@ class Rubric < ActiveRecord::Base
   end
 
   def data_outcome_ids
-    (data || []).map { |c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
+    (data || []).filter_map { |c| c[:learning_outcome_id] }.map(&:to_i).uniq
   end
 
   def criteria_object

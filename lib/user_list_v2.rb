@@ -250,14 +250,14 @@ class UserListV2
              .where("LOWER(path) IN (?)", email_paths)
              .to_a
 
-      ccs.map do |cc|
+      ccs.filter_map do |cc|
         next unless (p = SisPseudonym.for(cc.user, @root_account, type: :trusted, require_sis: false))
 
         path = cc.path
         # replace the actual path with the original address for SMS
         path = sms_path_header_map[path.split("@").first] if cc.path_type == 'sms'
         [path, cc.user_id, cc.user.uuid, p.account_id, cc.user.name, p.account.name]
-      end.compact
+      end
     end
     @lowercase = true
   end

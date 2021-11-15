@@ -173,7 +173,7 @@ module OutcomesService
 
       def export_artifacts(course, opts)
         page_ids = if opts[:selective]
-                     opts[:exported_assets].map { |asset| (match = asset.match(/wiki_page_(\d+)/)) && match[1] }.compact
+                     opts[:exported_assets].filter_map { |asset| (match = asset.match(/wiki_page_(\d+)/)) && match[1] }
                    else
                      course.wiki_pages.pluck(:id)
                    end

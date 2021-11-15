@@ -94,7 +94,7 @@ module Lti
                                                                .current
                                                                .where(course_id: @canvas_context)
                                                                .preload(:associated_user)
-                                                               .map { |e| e.try(:associated_user).try(:lti_context_id) }.compact
+                                                               .filter_map { |e| e.try(:associated_user).try(:lti_context_id) }
     end
 
     def current_account_enrollments()

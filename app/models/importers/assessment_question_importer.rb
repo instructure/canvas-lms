@@ -66,7 +66,7 @@ module Importers
           bank.mark_as_importing!(migration)
           next if bank.edit_types_locked_for_overwrite_on_import.include?(:content)
 
-          aq_ids = questions.select { |aq| aq["question_bank_migration_id"] == mig_id }.map { |aq| aq["assessment_question_id"] }.compact
+          aq_ids = questions.select { |aq| aq["question_bank_migration_id"] == mig_id }.filter_map { |aq| aq["assessment_question_id"] }
           bank.assessment_questions.active.where.not(:migration_id => aq_ids).update_all(:workflow_state => 'deleted')
         end
       end
@@ -127,7 +127,7 @@ module Importers
       end
 
       if migration.context.is_a?(Course)
-        imported_aq_ids = question_data[:aq_data].values.map { |aq| aq['assessment_question_id'] }.compact
+        imported_aq_ids = question_data[:aq_data].values.filter_map { |aq| aq['assessment_question_id'] }
         imported_aq_ids.each_slice(100) do |sliced_aq_ids|
           migration.context.quiz_questions.generated.where(:assessment_question_id => sliced_aq_ids).update_all(:assessment_question_version => nil)
         end

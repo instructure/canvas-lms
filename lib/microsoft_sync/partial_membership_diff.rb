@@ -97,7 +97,7 @@ module MicrosoftSync
     private
 
     def aads_with_action(action)
-      @user_infos.values.select { |info| info.actions.include?(action) }.map(&:aad_id).compact.uniq
+      @user_infos.values.select { |info| info.actions.include?(action) }.filter_map(&:aad_id).uniq
     end
 
     class UserInfo

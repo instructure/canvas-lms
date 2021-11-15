@@ -191,7 +191,7 @@ class ContextExternalTool < ActiveRecord::Base
       # look at the list of tools that are configured for the account and see if any are asking for permissions checks
       Rails.cache.fetch_with_batched_keys("external_tools/global_navigation/permissions_to_check", batch_object: root_account, batched_keys: :global_navigation) do
         tools = all_global_navigation_tools(root_account)
-        tools.map { |tool| tool.extension_setting(:global_navigation, 'required_permissions')&.split(",")&.map(&:to_sym) }.compact.flatten.uniq
+        tools.filter_map { |tool| tool.extension_setting(:global_navigation, 'required_permissions')&.split(",")&.map(&:to_sym) }.flatten.uniq
       end
     end
 

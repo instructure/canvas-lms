@@ -2380,7 +2380,7 @@ class Assignment < ActiveRecord::Base
   # cap the number we will do
   def too_many_qs_versions?(student_submissions)
     qs_threshold = Setting.get("too_many_quiz_submission_versions", "150").to_i
-    qs_ids = student_submissions.map(&:quiz_submission_id).compact
+    qs_ids = student_submissions.filter_map(&:quiz_submission_id)
     return false if qs_ids.empty?
 
     Version.shard(shard).from(Version
@@ -2446,7 +2446,7 @@ class Assignment < ActiveRecord::Base
 
     visible_student_ids = visible_students_for_speed_grader(user: user, includes: includes).map(&:id).to_set
 
-    reps_and_others = groups_and_ungrouped(user, includes: includes).map do |group_name, group_info|
+    reps_and_others = groups_and_ungrouped(user, includes: includes).filter_map do |group_name, group_info|
       group_students = group_info[:users]
       visible_group_students = group_students.select { |u| visible_student_ids.include?(u.id) }
 
@@ -2466,7 +2466,7 @@ class Assignment < ActiveRecord::Base
       representative.short_name = group_name
 
       [representative, others]
-    end.compact
+    end
 
     sorted_reps_with_others =
       Canvas::ICU.collate_by(reps_and_others) { |rep, _| rep.sortable_name }
@@ -2559,7 +2559,7 @@ class Assignment < ActiveRecord::Base
     zip_extractor = ZipExtractor.new(file.path)
     # Creates a list of hashes, each one with a :user, :filename, and :submission entry.
     @ignored_files = []
-    file_map = zip_extractor.unzip_files.map { |f| infer_comment_context_from_filename(f) }.compact
+    file_map = zip_extractor.unzip_files.filter_map { |f| infer_comment_context_from_filename(f) }
     files_for_user = file_map.group_by { |f| f[:user] }
 
     comments = []
@@ -2839,12 +2839,12 @@ class Assignment < ActiveRecord::Base
 
   # assignments only ever belong to courses, so we can reduce this to just IDs to simplify the db query
   scope :for_context_codes, ->(codes) do
-    ids = codes.map do |code|
+    ids = codes.filter_map do |code|
       type, id = parse_asset_string(code)
       next unless type == 'Course'
 
       id
-    end.compact
+    end
     next none if ids.empty?
 
     for_course(ids)
@@ -3024,7 +3024,7 @@ class Assignment < ActiveRecord::Base
   def readable_submission_types
     return nil unless expects_submission? || expects_external_submission?
 
-    res = (self.submission_types || "").split(",").map { |s| readable_submission_type(s) }.compact
+    res = (self.submission_types || "").split(",").filter_map { |s| readable_submission_type(s) }
     res.to_sentence(:or)
   end
 

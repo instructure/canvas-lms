@@ -215,14 +215,14 @@ module CanvasHttp
       raise UnresolvableUriError, "#{host} cannot be resolved to any address"
     end
 
-    ip_addrs = resolved_addrs.map do |ip|
+    ip_addrs = resolved_addrs.filter_map do |ip|
       ::IPAddr.new(ip)
     rescue IPAddr::InvalidAddressError
       # this should never happen, Resolv should only be passing back IPs, but
       # let's make sure we can see if the impossible occurs
       logger.warn("CANVAS_HTTP WARNING | host: #{host} | invalid_ip: #{ip}")
       nil
-    end.compact
+    end
     unless ip_addrs.any?
       raise UnresolvableUriError, "#{host} resolves to only unparseable IPs..."
     end

@@ -380,8 +380,8 @@ class CalendarEvent < ActiveRecord::Base
 
     if events.present?
       CalendarEvent.where(:id => self)
-                   .update_all(:start_at => events.map(&:start_at).compact.min,
-                               :end_at => events.map(&:end_at).compact.max)
+                   .update_all(:start_at => events.filter_map(&:start_at).min,
+                               :end_at => events.filter_map(&:end_at).max)
       reload
     end
   end

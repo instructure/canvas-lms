@@ -181,7 +181,7 @@ class ContextModulesApiController < ApplicationController
         end
       end
 
-      render :json => modules_and_progressions.map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }.compact
+      render :json => modules_and_progressions.filter_map { |mod, prog| module_json(mod, @student || @current_user, session, prog, includes, opts) }
     end
   end
 

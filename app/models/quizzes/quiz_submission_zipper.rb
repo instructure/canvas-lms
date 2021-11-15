@@ -78,7 +78,7 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
 
   # TODO: Refactor me! This pattern is also used for Student Analysis CSVs.
   def find_attachments
-    ids = submissions.map(&:submission_data).compact.flatten.select do |submission|
+    ids = submissions.filter_map(&:submission_data).flatten.select do |submission|
       submission[:attachment_ids].present?
     end.map do |submission|
       submission[:attachment_ids]
@@ -97,7 +97,7 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
       ).pluck(:user_id)
       submissions = submissions.where(:user_id => visible_student_ids)
     end
-    @submissions = submissions.reject(&:was_preview).map(&:latest_submitted_attempt).compact
+    @submissions = submissions.reject(&:was_preview).filter_map(&:latest_submitted_attempt)
   end
 
   def quiz_zip_filename(quiz)

@@ -202,7 +202,7 @@ module Lti::Messages
       @_current_observee_list ||= @user.observer_enrollments.current
                                        .where(course_id: @context.id)
                                        .preload(:associated_user)
-                                       .map { |e| e.try(:associated_user).try(:lti_id) }.compact
+                                       .filter_map { |e| e.try(:associated_user).try(:lti_id) }
     end
 
     def custom_parameters

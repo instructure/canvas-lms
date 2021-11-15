@@ -265,7 +265,7 @@ describe NotificationMessageCreator do
 
       @a = assignment_model
       messages = NotificationMessageCreator.new(@notification, @a, :to_list => [u1, u2]).create_message
-      expect(messages.map(&:communication_channel).compact).to eq [cc2] # doesn't include u1's cc
+      expect(messages.filter_map(&:communication_channel)).to eq [cc2] # doesn't include u1's cc
     end
 
     it "makes a delayed message for each user policy with a delayed frequency" do

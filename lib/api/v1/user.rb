@@ -116,7 +116,7 @@ module Api::V1::User
 
       if includes.include?('sections')
         json[:sections] = user.enrollments
-                              .map(&:course_section).compact.uniq
+                              .filter_map(&:course_section).uniq
                               .map(&:name).join(", ")
       end
 

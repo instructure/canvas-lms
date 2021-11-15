@@ -556,14 +556,14 @@ class AppointmentGroupsController < ApplicationController
     ag_scope = ag_scope.where(id: ids) if ids.any?
     # FIXME this could be a lot faster if we didn't look at eligibility to sign up.
     # since the UI only cares about the date to jump to, it might not make a difference in many cases
-    events = ag_scope.preload(:appointments => :child_events).to_a.map do |ag|
+    events = ag_scope.preload(:appointments => :child_events).to_a.filter_map do |ag|
       ag.appointments.detect do |appointment|
         appointment.start_at > Time.zone.now &&
           appointment.child_events_for(@current_user).empty? &&
           (appointment.participants_per_appointment.nil? ||
            appointment.child_events.count < appointment.participants_per_appointment)
       end
-    end.compact
+    end
     render :json => events.sort_by(&:start_at)[0..0].map { |event|
       calendar_event_json(event, @current_user, session)
     }

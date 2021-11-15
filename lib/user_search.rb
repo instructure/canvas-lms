@@ -115,15 +115,15 @@ module UserSearch
       if enrollment_role_ids || enrollment_roles
         users_scope = users_scope.joins(:not_removed_enrollments).distinct if context.is_a?(Account)
         roles = if enrollment_role_ids
-                  enrollment_role_ids.map { |id| Role.get_role_by_id(id) }.compact
+                  enrollment_role_ids.filter_map { |id| Role.get_role_by_id(id) }
                 else
-                  enrollment_roles.map do |name|
+                  enrollment_roles.filter_map do |name|
                     if context.is_a?(Account)
                       context.get_course_role_by_name(name)
                     else
                       context.account.get_course_role_by_name(name)
                     end
-                  end.compact
+                  end
                 end
         users_scope = users_scope.where("role_id IN (?)", roles.map(&:id))
       elsif enrollment_types

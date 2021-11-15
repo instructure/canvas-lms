@@ -3634,9 +3634,9 @@ class CoursesController < ApplicationController
     if params[:state]
       states = Array(params[:state])
       states += %w(created claimed) if states.include?('unpublished')
-      conditions = states.map do |state|
+      conditions = states.filter_map do |state|
         Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
-      end.compact.join(" OR ")
+      end.join(" OR ")
       enrollments = user.enrollments.eager_load(:course).where(conditions).shard(user.in_region_associated_shards)
 
       if params[:enrollment_role]

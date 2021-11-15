@@ -383,7 +383,7 @@ class GradeChangeAuditApiController < AuditorApiController
   end
 
   def anonymous_and_muted(events)
-    assignment_ids = events.map { |event| event["attributes"].fetch("assignment_id") }.compact
+    assignment_ids = events.filter_map { |event| event["attributes"].fetch("assignment_id") }
     assignments = api_find_all(Assignment, assignment_ids)
     assignments_anonymous_and_muted = {}
 

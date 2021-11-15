@@ -31,7 +31,7 @@ module Importers
 
       create_assignments(assignments, migration)
 
-      migration_ids = assignments.map { |m| m['assignment_id'] }.compact
+      migration_ids = assignments.filter_map { |m| m['assignment_id'] }
       conn = Assignment.connection
       cases = []
       max = migration.context.assignments.pluck(:position).compact.max || 0

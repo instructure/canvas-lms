@@ -74,7 +74,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   def infer_defaults
     if !self.position && self.quiz
       self.position = if self.quiz_group
-                        (self.quiz_group.quiz_questions.active.map(&:position).compact.max || 0) + 1
+                        (self.quiz_group.quiz_questions.active.filter_map(&:position).max || 0) + 1
                       else
                         self.quiz.root_entries_max_position + 1
                       end

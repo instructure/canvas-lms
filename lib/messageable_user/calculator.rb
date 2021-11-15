@@ -777,7 +777,7 @@ class MessageableUser
     # is acceptable, as this is specific to a course and the enrollments all
     # live on the same shard as the course
     def uncached_observed_student_ids_in_course(course)
-      course.section_visibilities_for(@user).map { |s| s[:associated_user_id] }.compact
+      course.section_visibilities_for(@user).filter_map { |s| s[:associated_user_id] }
     end
 
     def uncached_linked_observer_ids

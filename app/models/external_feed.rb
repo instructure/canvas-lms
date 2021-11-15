@@ -71,7 +71,7 @@ class ExternalFeed < ActiveRecord::Base
   end
 
   def add_rss_entries(rss)
-    items = rss.items.map { |item| add_entry(item, rss, :rss) }.compact
+    items = rss.items.filter_map { |item| add_entry(item, rss, :rss) }
     self.context.add_aggregate_entries(items, self) if self.context.respond_to?(:add_aggregate_entries)
     items
   end
