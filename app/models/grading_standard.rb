@@ -98,7 +98,7 @@ class GradingStandard < ActiveRecord::Base
       ordered_scheme.index { |g, _| g.to_d == key_name.to_d && g.to_s.match(/\A(\d*[.])?\d+\Z/) }
     else
       # compare words
-      ordered_scheme.index { |g, _| g.to_s.downcase == key_name.to_s.downcase }
+      ordered_scheme.index { |g, _| g.to_s.casecmp?(key_name.to_s) }
     end
   end
 

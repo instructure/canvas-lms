@@ -602,7 +602,7 @@ class SisImportsApiController < ApplicationController
           # copy of request with original content type restored
           request2 = Rack::Request.new(env)
           charset = request2.media_type_params['charset']
-          if charset.present? && charset.downcase != 'utf-8'
+          if charset.present? && !charset.casecmp?('utf-8')
             return render :json => { :error => t('errors.invalid_content_type', "Invalid content type, UTF-8 required") }, :status => 400
           end
 

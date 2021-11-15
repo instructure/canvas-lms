@@ -210,7 +210,7 @@ module Qti
               migration_id = migration_id.text.strip()
 
               answer = answers_hash[migration_id]
-              answer ||= answers_hash.values.detect { |a| a[:text] && a[:text].downcase == migration_id.downcase }
+              answer ||= answers_hash.values.detect { |a| a[:text]&.casecmp?(migration_id) }
 
               if answer
                 answer[:weight] = get_response_weight(r_if)
@@ -272,7 +272,7 @@ module Qti
           weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
         end
       when "boolean" # elsif base_value = node.at_css('baseValue[baseType=boolean]')
-        if node.text.downcase == "true"
+        if node.text.casecmp?("true")
           weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
         end
       else

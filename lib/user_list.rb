@@ -185,7 +185,7 @@ class UserList
                .where("(LOWER(unique_id) IN (?) OR sis_user_id IN (?)) AND account_id IN (?)", @addresses.map { |x| x[:address].downcase }, @addresses.map { |x| x[:address] }, account_ids)
                .map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
         addresses = @addresses.select { |a|
-          a[:address].downcase == login[:address].downcase ||
+          a[:address].casecmp?(login[:address]) ||
             (login[:sis_user_id] && (a[:address] == login[:sis_user_id] || a[:sis_user_id] == login[:sis_user_id]))
         }
         addresses.each do |address|
@@ -233,7 +233,7 @@ class UserList
                 end
 
       pseudos.map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
-        addresses = emails.select { |a| a[:address].downcase == login[:address].downcase }
+        addresses = emails.select { |a| a[:address].casecmp?(login[:address]) }
         addresses.each do |address|
           # if all we've seen is unconfirmed, and this one is active, we'll allow this one to overrule
           if address[:workflow_state] == 'unconfirmed' && login[:workflow_state] == 'active'
@@ -305,11 +305,11 @@ class UserList
       if address[:user_id].present?
         (@addresses.find { |a| a[:user_id] == address[:user_id] && a[:shard] == address[:shard] } ? @duplicate_addresses : @addresses) << address
       elsif address[:type] == :email && @search_method == :open
-        (@addresses.find { |a| a[:address].downcase == address[:address].downcase } ? @duplicate_addresses : @addresses) << address
+        (@addresses.find { |a| a[:address].casecmp?(address[:address]) } ? @duplicate_addresses : @addresses) << address
       else
         if @search_method == :preferred && (address[:details] == :non_unique || address[:type] == :email)
           address.delete :user_id
-          (@addresses.find { |a| a[:address].downcase == address[:address].downcase } ? @duplicate_addresses : @addresses) << address
+          (@addresses.find { |a| a[:address].casecmp?(address[:address]) } ? @duplicate_addresses : @addresses) << address
         else
           @errors << { :address => address[:address], :type => address[:type], :details => (address[:details] || :not_found) }
         end
