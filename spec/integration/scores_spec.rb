@@ -110,7 +110,7 @@ module Lti::IMS
           attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
           expect(result.submission.attachments.count).to eq 0
 
-          line_item_params.merge!(Lti::Result::AGS_EXT_SUBMISSION => { content_items: content_items })
+          line_item_params[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: content_items }
           upload_url = nil
           upload_params = nil
           # get params sent to instfs for easier mocking of the instfs return request

@@ -192,12 +192,10 @@ describe TabsController, type: :request do
                                                    :consumer_key => 'key',
                                                    :shared_secret => 'secret',
                                                  })
-      @tool.settings.merge!({
-                              :course_navigation => {
-                                :enabled => 'true',
-                                :url => 'http://www.example.com',
-                              },
-                            })
+      @tool.settings[:course_navigation] = {
+        :enabled => 'true',
+        :url => 'http://www.example.com',
+      }
       @tool.save!
 
       json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
@@ -219,7 +217,7 @@ describe TabsController, type: :request do
       account_admin_user(:active_all => true)
       @account = @user.account
       @tool = @account.context_external_tools.new(name: "Ex", url: "http://example.com", consumer_key: "k", shared_secret: "s")
-      @tool.settings.merge!(account_navigation: { enabled: 'true', url: 'http://example.com' })
+      @tool.settings[:account_navigation] = { enabled: 'true', url: 'http://example.com' }
       @tool.save!
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/tabs",
                       controller: 'tabs', action: 'index', account_id: @account.to_param, format: 'json')
@@ -871,12 +869,10 @@ describe TabsController, type: :request do
                                                     :consumer_key => 'key',
                                                     :shared_secret => 'secret'
                                                   })
-        tool.settings.merge!({
-                               :course_navigation => {
-                                 :default => 'disabled',
-                                 :url => 'http://www.example.com',
-                               },
-                             })
+        tool.settings[:course_navigation] = {
+          :default => 'disabled',
+          :url => 'http://www.example.com',
+        }
         tool.save!
         tools << tool.reload
       end
@@ -902,12 +898,10 @@ describe TabsController, type: :request do
                                                    :consumer_key => 'key',
                                                    :shared_secret => 'secret',
                                                  })
-      @tool.settings.merge!({
-                              :course_navigation => {
-                                :enabled => 'true',
-                                :url => 'http://www.example.com',
-                              },
-                            })
+      @tool.settings[:course_navigation] = {
+        :enabled => 'true',
+        :url => 'http://www.example.com',
+      }
       @tool.save!
       tab_id = "context_external_tool_#{@tool.id}"
 

@@ -3283,10 +3283,8 @@ describe CoursesController do
 
       changed_settings = controller.changed_settings(changes, course.settings)
 
-      changes.merge!(
-        hide_final_grade: false,
-        hide_distribution_graphs: false
-      )
+      changes[:hide_final_grade] = false
+      changes[:hide_distribution_graphs] = false
 
       expect(changed_settings).to eq changes
     end
@@ -3301,10 +3299,8 @@ describe CoursesController do
 
       changed_settings = controller.changed_settings(changes, course.settings, old_values)
 
-      changes.merge!(
-        hide_final_grade: false,
-        hide_distribution_graphs: false
-      )
+      changes[:hide_final_grade] = false
+      changes[:hide_distribution_graphs] = false
 
       expect(changed_settings).to eq changes
     end

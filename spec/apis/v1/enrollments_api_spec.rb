@@ -1964,10 +1964,8 @@ describe EnrollmentsApiController, type: :request do
             'created_at' => e.user.created_at.iso8601,
             'login_id' => e.user.pseudonym ? e.user.pseudonym.unique_id : nil
           }
-          user_json.merge!({
-                             'sis_user_id' => e.user.pseudonym.sis_user_id,
-                             'integration_id' => e.user.pseudonym.integration_id,
-                           })
+          user_json['sis_user_id'] = e.user.pseudonym.sis_user_id
+          user_json['integration_id'] = e.user.pseudonym.integration_id
           h = {
             'root_account_id' => e.root_account_id,
             'limit_privileges_to_course_section' => e.limit_privileges_to_course_section,
@@ -2578,7 +2576,8 @@ describe EnrollmentsApiController, type: :request do
           enrollment = @teacher.enrollments.first
 
           @path.sub!(@enrollment.id.to_s, enrollment.id.to_s)
-          @params.merge!(:id => enrollment.id.to_param, :task => 'delete')
+          @params[:id] = enrollment.id.to_param
+          @params[:task] = 'delete'
 
           raw_api_call(:delete, "#{@path}?task=delete", @params)
 

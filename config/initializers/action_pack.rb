@@ -44,12 +44,12 @@ ActionView::Helpers::FormOptionsHelper.prepend(TimeZoneFormImprovements)
 
 module DataStreamingContentLength
   def send_file(path, _options = {})
-    headers.merge!('Content-Length' => File.size(path).to_s)
+    headers['Content-Length'] = File.size(path).to_s
     super
   end
 
   def send_data(data, _options = {})
-    headers.merge!('Content-Length' => data.bytesize.to_s) if data.respond_to?(:bytesize)
+    headers['Content-Length'] = data.bytesize.to_s if data.respond_to?(:bytesize)
     super
   end
 end

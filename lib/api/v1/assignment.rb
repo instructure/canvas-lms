@@ -230,7 +230,7 @@ module Api::V1::Assignment
         'external_data' => external_tool_tag.external_data
       }
       tool_attributes.merge!(external_tool_tag.attributes.slice('content_type', 'content_id')) if external_tool_tag.content_id
-      tool_attributes.merge!('custom_params' => assignment.primary_resource_link&.custom)
+      tool_attributes['custom_params'] = assignment.primary_resource_link&.custom
       hash['external_tool_tag_attributes'] = tool_attributes
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',

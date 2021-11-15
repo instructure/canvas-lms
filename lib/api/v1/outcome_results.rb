@@ -83,7 +83,7 @@ module Api::V1::OutcomeResults
         rating_percents: percents[o.id],
         context: context
       )
-      hash.merge!(alignments: alignment_asset_string_map[o.id])
+      hash[:alignments] = alignment_asset_string_map[o.id]
       hash
     end
   end

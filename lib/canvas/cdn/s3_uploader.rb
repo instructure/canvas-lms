@@ -93,9 +93,7 @@ module Canvas
       def options_for(path)
         options = { acl: 'public-read', content_type: mime_for(path).to_s }
         if fingerprinted?(path)
-          options.merge!({
-                           cache_control: "public, max-age=#{1.year}"
-                         })
+          options[:cache_control] = "public, max-age=#{1.year}"
         end
 
         options
