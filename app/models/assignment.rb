@@ -2417,7 +2417,7 @@ class Assignment < ActiveRecord::Base
   # for group assignments, returns a single "student" for each
   # group's submission.  the students name will be changed to the group's
   # name.  for non-group assignments this just returns all visible users
-  def representatives(user:, includes: [:inactive], group_id: nil, section_id: nil)
+  def representatives(user:, includes: [:inactive], group_id: nil, section_id: nil, &block)
     return visible_students_for_speed_grader(user: user, includes: includes, group_id: group_id, section_id: section_id) unless grade_as_group?
 
     submissions = self.submissions.to_a
@@ -2470,8 +2470,8 @@ class Assignment < ActiveRecord::Base
 
     sorted_reps_with_others =
       Canvas::ICU.collate_by(reps_and_others) { |rep, _| rep.sortable_name }
-    if block_given?
-      sorted_reps_with_others.each { |r, o| yield r, o }
+    if block
+      sorted_reps_with_others.each(&block)
     end
     sorted_reps_with_others.map(&:first)
   end
@@ -3203,22 +3203,18 @@ class Assignment < ActiveRecord::Base
   # * Assignment
   # * AssignmentOverride and
   # * AssignmentOverrideStudent
-  def self.suspend_due_date_caching
+  def self.suspend_due_date_caching(&block)
     Assignment.suspend_callbacks(:update_cached_due_dates) do
       AssignmentOverride.suspend_callbacks(:update_cached_due_dates) do
-        AssignmentOverrideStudent.suspend_callbacks(:update_cached_due_dates) do
-          yield
-        end
+        AssignmentOverrideStudent.suspend_callbacks(:update_cached_due_dates, &block)
       end
     end
   end
 
   # Suspend callbacks that recalculate grading period grades
-  def self.suspend_grading_period_grade_recalculation
+  def self.suspend_grading_period_grade_recalculation(&block)
     Assignment.suspend_callbacks(:update_grading_period_grades) do
-      AssignmentOverride.suspend_callbacks(:update_grading_period_grades) do
-        yield
-      end
+      AssignmentOverride.suspend_callbacks(:update_grading_period_grades, &block)
     end
   end
 

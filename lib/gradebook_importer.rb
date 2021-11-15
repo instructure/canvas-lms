@@ -693,7 +693,7 @@ class GradebookImporter
     false # nothing unusual, signal to process as a student row
   end
 
-  def csv_stream
+  def csv_stream(&block)
     csv_file = attachment.open(need_local_file: true)
     is_semicolon_delimited = semicolon_delimited?(csv_file)
     csv_parse_options = {
@@ -705,9 +705,7 @@ class GradebookImporter
     # using "foreach" rather than "parse" processes a chunk of the
     # file at a time rather than loading the whole file into memory
     # at once, a boon for memory consumption
-    CSV.foreach(csv_file.path, **csv_parse_options) do |row|
-      yield row
-    end
+    CSV.foreach(csv_file.path, **csv_parse_options, &block)
   end
 
   def add_root_account_to_pseudonym_cache(root_account)

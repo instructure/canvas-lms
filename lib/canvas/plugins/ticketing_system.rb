@@ -61,7 +61,8 @@ module Canvas::Plugins
       #     an error report is created in Canvas
       def register_plugin(plugin_id, options)
         Canvas::Plugin.register(plugin_id, PLUGIN_ID, options)
-        ::ErrorReport.set_callback(:on_send_to_external) do |report|
+        # can't pass through &block because of argument mismatch
+        ::ErrorReport.set_callback(:on_send_to_external) do |report| # rubocop:disable Style/ExplicitBlockArgument
           yield(report)
         end
       end

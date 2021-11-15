@@ -779,18 +779,16 @@ RSpec.configure do |config|
     end
   end
 
-  def track_jobs
-    @jobs_tracking = Delayed::JobTracking.track { yield }
+  def track_jobs(&block)
+    @jobs_tracking = Delayed::JobTracking.track(&block)
   end
 
   def created_jobs
     @jobs_tracking.created
   end
 
-  def expects_job_with_tag(tag, count = 1)
-    track_jobs do
-      yield
-    end
+  def expects_job_with_tag(tag, count = 1, &block)
+    track_jobs(&block)
     expect(created_jobs.count { |j| j.tag == tag }).to eq count
   end
 

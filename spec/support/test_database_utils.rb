@@ -57,14 +57,12 @@ module TestDatabaseUtils
 
     private
 
-    def each_connection
+    def each_connection(&block)
       ::Shard.with_each_shard(::Shard.categories) do
         models = ::ActiveRecord::Base.descendants
         models.reject! { |m| m.shard_category == :unsharded } unless ::Shard.current.default?
         model_connections = models.map(&:connection).uniq
-        model_connections.each do |connection|
-          yield connection
-        end
+        model_connections.each(&block)
       end
     end
 
