@@ -159,7 +159,7 @@
     "fetch-mock": "^6",
     "format-message-cli": "^6",
     "format-message-parse": "^6",
-    "jest": "^24",
+    "jest": "^26",
     "jest-canvas-mock": "^2",
     "jest-environment-jsdom-fourteen": "^0.1.0",
     "jest-junit": "^7",
