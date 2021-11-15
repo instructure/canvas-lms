@@ -998,9 +998,9 @@ describe AccountsController do
         expect(response).to be_successful
 
         external_integration_keys = assigns[:external_integration_keys]
-        expect(external_integration_keys.key?(:external_key0)).to be_truthy
-        expect(external_integration_keys.key?(:external_key1)).to be_truthy
-        expect(external_integration_keys.key?(:external_key2)).to be_truthy
+        expect(external_integration_keys).to have_key(:external_key0)
+        expect(external_integration_keys).to have_key(:external_key1)
+        expect(external_integration_keys).to have_key(:external_key2)
         expect(external_integration_keys[:external_key0]).to eq @eik
       end
 

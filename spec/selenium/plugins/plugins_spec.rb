@@ -76,11 +76,11 @@ describe "plugins ui" do
   end
 
   def multiple_accounts_select
-    if !f("#plugin_setting_disabled").displayed?
+    unless f("#plugin_setting_disabled").displayed?
       f("#accounts_select option:nth-child(2)").click
       expect(f("#plugin_setting_disabled")).to be_displayed
     end
-    if !f(".save_button").enabled?
+    unless f(".save_button").enabled?
       f(".copy_settings_button").click
     end
   end

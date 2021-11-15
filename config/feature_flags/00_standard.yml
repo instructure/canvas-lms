@@ -130,13 +130,9 @@ epub_export:
 feature_flag_filters:
   state: hidden
   applies_to: SiteAdmin
-  display_name: Feature Flag Filters
-  description: Adds additional information and filtering for feature flags
-  enable_at: Date.new(2021, 9, 18)
-  pending_enforcement: true
-  environments:
-    beta:
-      enable_at: Date.new(2021, 8, 23)
+  display_name: Flags tab updates
+  description: This flag updates the title of the feature flags tab to "Feature Options" and adds
+    a "Feature Preview" pill for feature preview projects.
 featured_help_links:
   state: hidden
   applies_to: SiteAdmin
@@ -265,7 +261,7 @@ new_sis_integrations:
       partner products should enable this feature for enhanced assignment data
       validation workflows. When enabled, this feature displays the new SIS
       Integration settings for SIS Sync (Assignment Level Grade Passback) in Account
-      Settings. The Post to SIS feature preview has been incorporated into this new
+      Settings. The Post to SIS feature option has been incorporated into this new
       setting and will be enabled by default.
   applies_to: Account
   root_opt_in: true

@@ -108,7 +108,7 @@ describe Quizzes::QuizGroup do
 
   describe ".update_all_positions!" do
     def group_positions(quiz)
-      quiz.quiz_groups.sort_by { |g| g.position }.map { |g| g.id }
+      quiz.quiz_groups.sort_by(&:position).map(&:id)
     end
 
     before :once do

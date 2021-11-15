@@ -138,7 +138,7 @@ module Importers
 
     def self.import_from_migration(hash, context, migration, bank, **)
       hash = hash.with_indifferent_access
-      hash.delete(:question_bank_migration_id) if hash.has_key?(:question_bank_migration_id)
+      hash.delete(:question_bank_migration_id) if hash.key?(:question_bank_migration_id)
 
       self.prep_for_import(hash, migration, :assessment_question)
 

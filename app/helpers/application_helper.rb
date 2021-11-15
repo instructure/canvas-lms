@@ -684,8 +684,8 @@ module ApplicationHelper
     opts[:indent_width] ||= 3
     opts[:depth] ||= 0
     opts[:options_so_far] ||= []
-    if opts.has_key?(:all_folders)
-      opts[:sub_folders] = opts.delete(:all_folders).to_a.group_by { |f| f.parent_folder_id }
+    if opts.key?(:all_folders)
+      opts[:sub_folders] = opts.delete(:all_folders).to_a.group_by(&:parent_folder_id)
     end
 
     folders.each do |folder|
@@ -730,12 +730,9 @@ module ApplicationHelper
 
   # return enough group data for the planner to display items associated with groups
   def map_groups_for_planner(groups)
-    mapped =
-      groups.map do |g|
-        { id: g.id, assetString: g.asset_string, name: g.name, url: "/groups/#{g.id}" }
-      end
-
-    mapped
+    groups.map do |g|
+      { id: g.id, assetString: g.asset_string, name: g.name, url: "/groups/#{g.id}" }
+    end
   end
 
   def show_feedback_link?
@@ -835,7 +832,7 @@ module ApplicationHelper
     # for finding which values to show in the theme editor
     return @brand_account if opts[:ignore_parents]
 
-    if !@brand_account
+    unless @brand_account
       if @current_user.present?
         # If we're not viewing a `context` with an account, like if we're on the dashboard or my
         # user profile, show the branding for the lowest account where all my enrollments are. eg:
@@ -958,13 +955,14 @@ module ApplicationHelper
   # date format to screenreader users across the app
   # when telling them how to fill in a datetime field
   def accessible_date_format(format = 'datetime')
-    if !ACCEPTABLE_FORMAT_TYPES.include?(format)
+    unless ACCEPTABLE_FORMAT_TYPES.include?(format)
       raise ArgumentError, "format must be one of #{ACCEPTABLE_FORMAT_TYPES.join(',')}"
     end
 
-    if format == 'date'
+    case format
+    when 'date'
       I18n.t('#helpers.accessible_date_only_format', 'YYYY-MM-DD')
-    elsif format == 'time'
+    when 'time'
       I18n.t('#helpers.accessible_time_only_format', 'hh:mm')
     else
       I18n.t('#helpers.accessible_date_format', 'YYYY-MM-DD hh:mm')
@@ -985,7 +983,7 @@ module ApplicationHelper
   # cache key, so that we don't make an overly-long cache key.
   # if you can avoid loading the list at all, that's even better, of course.
   def collection_cache_key(collection)
-    keys = collection.map { |element| element.cache_key }
+    keys = collection.map(&:cache_key)
     Digest::MD5.hexdigest(keys.join('/'))
   end
 
@@ -1064,7 +1062,8 @@ module ApplicationHelper
         @csp_context_is_submission = false
         attachment = @attachment || @context
         if attachment.is_a?(Attachment)
-          if attachment.context_type == 'User'
+          case attachment.context_type
+          when 'User'
             # search for an attachment association
             aas =
               attachment
@@ -1081,10 +1080,10 @@ module ApplicationHelper
               @csp_context_is_submission = true
               courses.first
             end
-          elsif attachment.context_type == 'Submission'
+          when 'Submission'
             @csp_context_is_submission = true
             attachment.submission.assignment.course
-          elsif attachment.context_type == 'Course'
+          when 'Course'
             attachment.course
           else
             brand_config_account

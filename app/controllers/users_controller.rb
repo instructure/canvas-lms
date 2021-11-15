@@ -254,17 +254,18 @@ class UsersController < ApplicationController
   end
 
   def oauth
-    if !feature_and_service_enabled?(params[:service])
+    unless feature_and_service_enabled?(params[:service])
       flash[:error] = t('service_not_enabled', "That service has not been enabled")
       return redirect_to(user_profile_url(@current_user))
     end
     return_to_url = params[:return_to] || user_profile_url(@current_user)
-    if params[:service] == "google_drive"
+    case params[:service]
+    when "google_drive"
       redirect_uri = oauth_success_url(:service => 'google_drive')
       session[:oauth_gdrive_nonce] = SecureRandom.hex
       state = Canvas::Security.create_jwt(redirect_uri: redirect_uri, return_to_url: return_to_url, nonce: session[:oauth_gdrive_nonce])
       redirect_to GoogleDrive::Client.auth_uri(google_drive_client, state)
-    elsif params[:service] == "twitter"
+    when "twitter"
       success_url = oauth_success_url(:service => 'twitter')
       request_token = Twitter::Connection.request_token(success_url)
       OAuthRequest.create(
@@ -445,10 +446,10 @@ class UsersController < ApplicationController
       return_url = session[:masquerade_return_to]
       session.delete(:masquerade_return_to)
       @current_user.associate_with_shard(@user.shard, :shadow) if PageView.db?
-      if request.referer =~ /.*\/users\/#{@user.id}\/masquerade/
-        return return_to(return_url, dashboard_url)
+      if /.*\/users\/#{@user.id}\/masquerade/.match?(request.referer)
+        return_to(return_url, dashboard_url)
       else
-        return return_to(return_url, request.referer || dashboard_url)
+        return_to(return_url, request.referer || dashboard_url)
       end
     else
       js_bundle :act_as_modal
@@ -491,7 +492,7 @@ class UsersController < ApplicationController
 
     @show_footer = true
 
-    if request.path =~ %r{\A/dashboard\z}
+    if %r{\A/dashboard\z}.match?(request.path)
       return redirect_to(dashboard_url, :status => :moved_permanently)
     end
 
@@ -772,10 +773,10 @@ class UsersController < ApplicationController
       # support submission comments in the conversations inbox.
       # please replace this with a more reasonable solution at your earliest convenience
       opts = { paginate_url: :api_v1_user_activity_stream_url }
-      opts[:asset_type] = params[:asset_type] if params.has_key?(:asset_type)
+      opts[:asset_type] = params[:asset_type] if params.key?(:asset_type)
       opts[:context] = Context.find_by_asset_string(params[:context_code]) if params[:context_code]
-      opts[:submission_user_id] = params[:submission_user_id] if params.has_key?(:submission_user_id)
-      opts[:only_active_courses] = value_to_boolean(params[:only_active_courses]) if params.has_key?(:only_active_courses)
+      opts[:submission_user_id] = params[:submission_user_id] if params.key?(:submission_user_id)
+      opts[:only_active_courses] = value_to_boolean(params[:only_active_courses]) if params.key?(:only_active_courses)
       api_render_stream(opts)
     else
       render_unauthorized_action
@@ -2205,7 +2206,7 @@ class UsersController < ApplicationController
         render :json => @user
       end
     else
-      if !session["reported_#{@user.id}".to_sym]
+      unless session["reported_#{@user.id}".to_sym]
         @user.report_avatar_image!
       end
       session["reports_#{@user.id}".to_sym] = true
@@ -2216,7 +2217,7 @@ class UsersController < ApplicationController
   def report_avatar_image
     @user = User.find(params[:user_id])
     key = "reported_#{@user.id}"
-    if !session[key]
+    unless session[key]
       session[key] = true
       @user.report_avatar_image!
     end
@@ -2773,7 +2774,7 @@ class UsersController < ApplicationController
         format.html { redirect_to root_url }
         format.json { render :json => {}, :status => 403 }
       end
-      return false
+      false
     end
   end
 
@@ -3139,7 +3140,7 @@ class UsersController < ApplicationController
       return { errors: parsed['error-codes'] } unless parsed['success']
       return { errors: ['invalid-hostname'] } unless parsed['hostname'] == request.host
 
-      return nil
+      nil
     else
       raise "Error connecting to recaptcha #{response}"
     end

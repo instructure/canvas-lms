@@ -167,7 +167,7 @@ class TermsApiController < ApplicationController
   def require_root_account
     unless @context.root_account?
       render json: { message: 'Terms only belong to root_accounts.' }, status: :bad_request
-      return false
+      false
     end
   end
 

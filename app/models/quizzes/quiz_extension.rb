@@ -67,7 +67,7 @@ class Quizzes::QuizExtension
     end
 
     # false is a valid value, so explicitly check nil
-    if !ext_params[:manually_unlocked].nil?
+    unless ext_params[:manually_unlocked].nil?
       unlocked = [1, "1", true, "true"].include?(ext_params[:manually_unlocked])
       quiz_submission.manually_unlocked = unlocked
     end

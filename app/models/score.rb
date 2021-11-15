@@ -132,7 +132,7 @@ class Score < ActiveRecord::Base
     elsif scc > 1
       errors.add(:base, "may not have multiple scorable associations")
     else
-      return true
+      true
     end
   end
 

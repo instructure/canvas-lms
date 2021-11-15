@@ -149,7 +149,7 @@ class ContentMigrationsController < ApplicationController
 
     scope = @context.content_migrations.where(child_subscription_id: nil).order('id DESC')
     @migrations = Api.paginate(scope, self, api_v1_course_content_migration_list_url(@context))
-    @migrations.each { |mig| mig.check_for_pre_processing_timeout }
+    @migrations.each(&:check_for_pre_processing_timeout)
     content_migration_json_hash = content_migrations_json(@migrations, @current_user, session)
 
     if api_request?
@@ -358,7 +358,7 @@ class ContentMigrationsController < ApplicationController
   def create
     @plugin = find_migration_plugin params[:migration_type]
 
-    if !@plugin
+    unless @plugin
       return render(:json => { :message => t('bad_migration_type', "Invalid migration_type") }, :status => :bad_request)
     end
     unless migration_plugin_supported?(@plugin)
@@ -408,7 +408,7 @@ class ContentMigrationsController < ApplicationController
   end
 
   def lookup_sis_source_course
-    if params.has_key?(:settings) && params[:settings].has_key?(:source_course_id)
+    if params.key?(:settings) && params[:settings].key?(:source_course_id)
       course = api_find(Course, params[:settings][:source_course_id])
       params[:settings][:source_course_id] = course.id
       course
@@ -572,7 +572,7 @@ class ContentMigrationsController < ApplicationController
           return false unless link_content_export_attachment
         end
 
-        if !params.has_key?(:do_not_run) || !Canvas::Plugin.value_to_boolean(params[:do_not_run])
+        if !params.key?(:do_not_run) || !Canvas::Plugin.value_to_boolean(params[:do_not_run])
           @content_migration.shard.activate do
             @content_migration.queue_migration(@plugin)
           end

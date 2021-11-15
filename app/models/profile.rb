@@ -61,7 +61,7 @@ class Profile < ActiveRecord::Base
   def self.data(field, options = {})
     options[:type] ||= :string
     define_method(field) {
-      data.has_key?(field) ? data[field] : data[field] = options[:default]
+      data.key?(field) ? data[field] : data[field] = options[:default]
     }
     define_method("#{field}=") { |value|
       data_before_type_cast[field] = value

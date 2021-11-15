@@ -175,14 +175,7 @@ def tearDownNode(prefix) {
     }
   }
 
-  // junit publishing will set build status to unstable if failed tests found, if so set it back to the original value
-  def preStatus = currentBuild.rawBuild.@result
-
-  junit allowEmptyResults: true, testResults: 'tmp/rspec_results/**/*.xml'
-
-  if (currentBuild.getResult() == 'UNSTABLE' && preStatus != 'UNSTABLE') {
-    currentBuild.rawBuild.@result = preStatus
-  }
+  junit allowEmptyResults: true, testResults: 'tmp/rspec_results/**/*.xml', skipMarkingBuildUnstable: true
 
   if (env.RSPEC_LOG == '1') {
     sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/parallel_runtime/ ./tmp/parallel_runtime_rspec_tests canvas_ --allow-error --clean-dir'

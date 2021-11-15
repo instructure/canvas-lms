@@ -51,7 +51,8 @@ class ContentExportsController < ApplicationController
       export.user = @current_user
       export.workflow_state = 'created'
 
-      if @context.is_a?(Course)
+      case @context
+      when Course
         if params[:export_type] == 'qti'
           export.export_type = ContentExport::QTI
           export.selected_content = params[:copy].to_unsafe_h
@@ -59,7 +60,7 @@ class ContentExportsController < ApplicationController
           export.export_type = ContentExport::COMMON_CARTRIDGE
           export.selected_content = { :everything => true }
         end
-      elsif @context.is_a?(User)
+      when User
         export.export_type = ContentExport::USER_DATA
       end
 

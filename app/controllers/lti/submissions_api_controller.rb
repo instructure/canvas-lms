@@ -218,7 +218,7 @@ module Lti
 
     def attachment_for_submission?(attachment)
       submissions = Submission.bulk_load_versioned_attachments(submission.submission_history + [submission])
-      attachments = submissions.map { |s| s.versioned_attachments }.flatten
+      attachments = submissions.map(&:versioned_attachments).flatten
       attachments.include?(attachment)
     end
 

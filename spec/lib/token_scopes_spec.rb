@@ -17,10 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# We want to force the usage of the fallback scope mapper here, not the generated version
-Object.const_set("ApiScopeMapper", ApiScopeMapperLoader.api_scope_mapper_fallback)
-
 describe TokenScopes do
+  before do
+    # We want to force the usage of the fallback scope mapper here, not the generated version
+    stub_const("ApiScopeMapper", ApiScopeMapperFallback)
+  end
+
   describe ".named_scopes" do
     let!(:user_info_scope) { TokenScopes.named_scopes.find { |s| s[:scope] == TokenScopes::USER_INFO_SCOPE[:scope] } }
 
@@ -40,7 +42,7 @@ describe TokenScopes do
 
     it "doesn't include scopes without a name" do
       TokenScopes.instance_variable_set(:@_named_scopes, nil) # we need to make sure that we generate a new list
-      allow(ApiScopeMapperLoader.load).to receive(:name_for_resource).and_return(nil)
+      allow(ApiScopeMapper).to receive(:name_for_resource).and_return(nil)
       expect(TokenScopes.named_scopes).to eq []
       TokenScopes.instance_variable_set(:@_named_scopes, nil) # we don't want to have this version stored
     end

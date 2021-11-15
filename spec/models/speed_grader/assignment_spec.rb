@@ -921,9 +921,7 @@ describe SpeedGrader::Assignment do
       assignment = quiz.assignment
       assignment.grade_student(@student, grade: 1, grader: @teacher)
       json = SpeedGrader::Assignment.new(assignment, @teacher).json
-      expect(json[:submissions]).to be_all do |s|
-        s.key? 'submission_history'
-      end
+      expect(json[:submissions]).to all(have_key('submission_history'))
     end
 
     context "with quiz_submissions" do

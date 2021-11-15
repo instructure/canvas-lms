@@ -374,7 +374,7 @@ describe Group do
       group1 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
       group2 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_request')
       group3 = @course.groups.create(:group_category => group_category, :join_level => 'invitation_only')
-      expect([group1, group2, group3].map { |g| g.auto_accept? }).to eq [true, false, false]
+      expect([group1, group2, group3].map(&:auto_accept?)).to eq [true, false, false]
     end
 
     it "is false unless the group is student organized or a community" do
@@ -385,7 +385,7 @@ describe Group do
       group1 = @course.groups.create(:group_category => @course.group_categories.create(:name => "random category"), :join_level => jl)
       group2 = @course.groups.create(:group_category => GroupCategory.student_organized_for(@course), :join_level => jl)
       group3 = @account.groups.create(:group_category => GroupCategory.communities_for(@account), :join_level => jl)
-      expect([group1, group2, group3].map { |g| g.auto_accept? }).to eq [false, true, true]
+      expect([group1, group2, group3].map(&:auto_accept?)).to eq [false, true, true]
     end
   end
 
@@ -397,7 +397,7 @@ describe Group do
       group1 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
       group2 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_request')
       group3 = @course.groups.create(:group_category => group_category, :join_level => 'invitation_only')
-      expect([group1, group2, group3].map { |g| g.allow_join_request? }).to eq [true, true, false]
+      expect([group1, group2, group3].map(&:allow_join_request?)).to eq [true, true, false]
     end
 
     it "is false unless the group is student organized or a community" do
@@ -408,7 +408,7 @@ describe Group do
       group1 = @course.groups.create(:group_category => @course.group_categories.create(:name => "random category"), :join_level => jl)
       group2 = @course.groups.create(:group_category => GroupCategory.student_organized_for(@course), :join_level => jl)
       group3 = @account.groups.create(:group_category => GroupCategory.communities_for(@account), :join_level => jl)
-      expect([group1, group2, group3].map { |g| g.allow_join_request? }).to eq [false, true, true]
+      expect([group1, group2, group3].map(&:allow_join_request?)).to eq [false, true, true]
     end
   end
 

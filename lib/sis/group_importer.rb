@@ -47,7 +47,7 @@ module SIS
         raise ImportError, "No name given for group #{group_id}." if name.blank?
         # closed and completed are no longer valid states. Leaving these for
         # backwards compatibility. It is not longer a documented status
-        raise ImportError, "Improper status \"#{status}\" for group #{group_id}." unless status =~ /\A(available|closed|completed|deleted)/i
+        raise ImportError, "Improper status \"#{status}\" for group #{group_id}." unless /\A(available|closed|completed|deleted)/i.match?(status)
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         if course_id && account_id

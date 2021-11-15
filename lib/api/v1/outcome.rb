@@ -88,11 +88,11 @@ module Api::V1::Outcome
         hash['ratings']&.each_with_index do |rating, i|
           rating[:percent] = opts[:rating_percents][i] if i < opts[:rating_percents].length
         end if opts[:rating_percents]
-        if opts[:assessed_outcomes] && outcome.context_type != "Account"
-          hash['assessed'] = opts[:assessed_outcomes].include?(outcome.id)
-        else
-          hash['assessed'] = outcome.assessed?
-        end
+        hash['assessed'] = if opts[:assessed_outcomes] && outcome.context_type != "Account"
+                             opts[:assessed_outcomes].include?(outcome.id)
+                           else
+                             outcome.assessed?
+                           end
       end
     end
   end
@@ -167,11 +167,11 @@ module Api::V1::Outcome
         hash['can_unlink'] = can_manage && outcome_link.can_destroy?
       end
 
-      if opts[:assessed_outcomes]
-        hash['assessed'] = opts[:assessed_outcomes].include?(outcome_link.learning_outcome_content.id)
-      else
-        hash['assessed'] = outcome_link.learning_outcome_content.assessed?(outcome_link[:context_id])
-      end
+      hash['assessed'] = if opts[:assessed_outcomes]
+                           opts[:assessed_outcomes].include?(outcome_link.learning_outcome_content.id)
+                         else
+                           outcome_link.learning_outcome_content.assessed?(outcome_link[:context_id])
+                         end
     end
   end
 end

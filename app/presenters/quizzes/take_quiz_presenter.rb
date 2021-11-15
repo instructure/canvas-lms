@@ -115,7 +115,7 @@ class Quizzes::TakeQuizPresenter
   end
 
   def question_answered?(question)
-    answers.has_key?(question[:id])
+    answers.key?(question[:id])
   end
 
   def question_index(question)

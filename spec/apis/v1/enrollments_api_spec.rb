@@ -1275,7 +1275,7 @@ describe EnrollmentsApiController, type: :request do
             @params[:sis_section_id] = 'SIS123'
             json = api_call(:get, @path, @params)
             json_user_ids = json.map { |user| user["user_id"] }
-            section_user_ids = @course.course_sections.first.enrollments.map { |e| e.user_id }
+            section_user_ids = @course.course_sections.first.enrollments.map(&:user_id)
             expect(json.length).to eq(@course.course_sections.first.enrollments.length)
             expect(json_user_ids).to match_array(section_user_ids)
           end
@@ -1285,7 +1285,7 @@ describe EnrollmentsApiController, type: :request do
             json = api_call(:get, @path, @params)
             expect(json.length).to eq(@course.course_sections.first.enrollments.length)
             json_user_ids = json.map { |user| user["user_id"] }
-            section_user_ids = @course.course_sections.first.enrollments.map { |e| e.user_id }
+            section_user_ids = @course.course_sections.first.enrollments.map(&:user_id)
             expect(json_user_ids).to match_array(section_user_ids)
           end
 
@@ -1306,7 +1306,7 @@ describe EnrollmentsApiController, type: :request do
             json = api_call(:get, @path, @params)
             expect(json.length).to eq(@course.enrollments.length)
             json_user_ids = json.map { |user| user["user_id"] }
-            course_user_ids = @course.enrollments.map { |e| e.user_id }
+            course_user_ids = @course.enrollments.map(&:user_id)
             expect(json_user_ids).to match_array(course_user_ids)
           end
 
@@ -1315,7 +1315,7 @@ describe EnrollmentsApiController, type: :request do
             json = api_call(:get, @path, @params)
             expect(json.length).to eq(@course.enrollments.length)
             json_user_ids = json.map { |user| user["user_id"] }
-            course_user_ids = @course.enrollments.map { |e| e.user_id }
+            course_user_ids = @course.enrollments.map(&:user_id)
             expect(json_user_ids).to match_array(course_user_ids)
           end
 

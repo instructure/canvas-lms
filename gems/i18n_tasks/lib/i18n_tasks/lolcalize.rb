@@ -33,7 +33,7 @@ module I18nTasks
       # don't want to mangle placeholders, wrappers, etc.
       pattern = /(\s*%h?\{[^}]+\}\s*|\s*[\n\\`*_{}\[\]()\#+\-!]+\s*|^\s+)/
       result = str.split(pattern).map do |token|
-        if token =~ pattern
+        if token&.match?(pattern)
           token
         else
           s = +''

@@ -129,7 +129,7 @@ module Exporters
 
     def add_file(zipstream, file)
       path = file.full_display_path
-      path = path[@common_prefix.length..-1] if path.starts_with?(@common_prefix)
+      path = path[@common_prefix.length..] if path.starts_with?(@common_prefix)
       wrote_header = false
       begin
         file.open do |chunk|
@@ -147,7 +147,7 @@ module Exporters
 
     def add_folder(zipstream, folder)
       path = folder.full_name
-      path = path[@common_prefix.length..-1] if path.starts_with?(@common_prefix)
+      path = path[@common_prefix.length..] if path.starts_with?(@common_prefix)
       zipstream.put_next_entry(path + '/')
     end
 

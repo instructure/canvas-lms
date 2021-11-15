@@ -225,13 +225,16 @@ describe CommunicationChannel do
 
   it "only allows email, or sms as path types" do
     communication_channel_model
-    @cc.path_type = 'email'; @cc.save
+    @cc.path_type = 'email'
+    @cc.save
     expect(@cc.path_type).to eql('email')
 
-    @cc.path_type = 'sms'; @cc.save
+    @cc.path_type = 'sms'
+    @cc.save
     expect(@cc.path_type).to eql('sms')
 
-    @cc.path_type = 'not valid'; @cc.save
+    @cc.path_type = 'not valid'
+    @cc.save
     expect(@cc.path_type).to eql('email')
   end
 

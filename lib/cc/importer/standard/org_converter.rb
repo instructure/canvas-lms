@@ -32,7 +32,7 @@ module CC::Importer::Standard
         if item_node['identifierref']
           # item points to a single item
           if (item = process_item(item_node, 0))
-            if !misc_module
+            unless misc_module
               misc_module = { :title => "Misc Module", :migration_id => "misc_module_top_level_items", :items => [] }
               modules << misc_module
             end
@@ -101,22 +101,22 @@ module CC::Importer::Standard
           item[:linked_resource_title] ||= title
           item = nil if item[:url].blank?
         when /\Aimsbasiclti/
-          if (asmnt = find_assignment(resource[:migration_id]))
-            item = {
-              :indent => indent,
-              :linked_resource_type => 'ASSIGNMENT',
-              :linked_resource_id => asmnt[:migration_id],
-              :linked_resource_title => get_node_val(item_node, 'title')
-            }
-          else
-            item = {
-              :indent => indent,
-              :linked_resource_type => 'CONTEXTEXTERNALTOOL',
-              :linked_resource_id => resource[:migration_id],
-              :linked_resource_title => get_node_val(item_node, 'title'),
-              :url => resource[:url]
-            }
-          end
+          item = if (asmnt = find_assignment(resource[:migration_id]))
+                   {
+                     :indent => indent,
+                     :linked_resource_type => 'ASSIGNMENT',
+                     :linked_resource_id => asmnt[:migration_id],
+                     :linked_resource_title => get_node_val(item_node, 'title')
+                   }
+                 else
+                   {
+                     :indent => indent,
+                     :linked_resource_type => 'CONTEXTEXTERNALTOOL',
+                     :linked_resource_id => resource[:migration_id],
+                     :linked_resource_title => get_node_val(item_node, 'title'),
+                     :url => resource[:url]
+                   }
+                 end
         when /\Aimsdt/
           item = {
             :indent => indent,

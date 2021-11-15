@@ -338,7 +338,7 @@ class AccountNotification < ActiveRecord::Base
       user_ids = Set.new
       get_everybody = roles.empty?
 
-      course_roles = roles.select { |role| role.course_role? }.map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
+      course_roles = roles.select(&:course_role?).map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
       if get_everybody || course_roles.any?
         Course.find_ids_in_ranges do |min_id, max_id|
           course_ids = Course.active.where(:id => min_id..max_id, :account_id => all_account_ids).pluck(:id)
@@ -352,7 +352,7 @@ class AccountNotification < ActiveRecord::Base
         end
       end
 
-      account_roles = roles.select { |role| role.account_role? }.map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
+      account_roles = roles.select(&:account_role?).map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
       if get_everybody || account_roles.any?
         AccountUser.find_ids_in_ranges do |min_id, max_id|
           scope = AccountUser.where(:id => min_id..max_id).active.where(:account_id => all_account_ids)

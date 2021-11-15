@@ -45,7 +45,9 @@ class Tableless < ActiveRecord::Base
       columns << ActiveRecord::ConnectionAdapters::Column.new(*args)
     end
 
-    def table_exists?; false; end
+    def table_exists?
+      false
+    end
   end
 
   # Override the save method to prevent exceptions.

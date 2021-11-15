@@ -49,7 +49,9 @@ describe SisBatch do
 
       batch = File.open(path, 'rb') do |tmp|
         # arrrgh attachment.rb
-        def tmp.original_filename; File.basename(path); end
+        def tmp.original_filename
+          File.basename(path)
+        end
         SisBatch.create_with_attachment(@account, 'instructure_csv', tmp, @user || user_factory)
       end
       yield batch if block_given?
@@ -360,7 +362,10 @@ test_1,TC 101,Test Course 101,,term1,deleted
     describe "with non-standard batches" do
       it "only queues one 'process_all_for_account' job and run together" do
         SisBatch.valid_import_types["silly_sis_batch"] = {
-          :callback => lambda { |batch| batch.data[:silliness_complete] = true; batch.finish(true) }
+          :callback => lambda { |batch|
+                         batch.data[:silliness_complete] = true
+                         batch.finish(true)
+                       }
         }
         enable_cache do
           batch1 = @account.sis_batches.create!(:workflow_state => "created", :data => { :import_type => "silly_sis_batch" })
@@ -381,9 +386,7 @@ test_1,TC 101,Test Course 101,,term1,deleted
 
   it "schedules in the future if configured" do
     track_jobs do
-      create_csv_data(['abc']) do |batch|
-        batch.process
-      end
+      create_csv_data(['abc'], &:process)
     end
 
     job = created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
@@ -394,9 +397,7 @@ test_1,TC 101,Test Course 101,,term1,deleted
 
     Setting.set('sis_batch_process_start_delay', '120')
     track_jobs do
-      create_csv_data(['abc']) do |batch|
-        batch.process
-      end
+      create_csv_data(['abc'], &:process)
     end
 
     job = created_jobs.find { |j| j.tag == 'SisBatch.process_all_for_account' }
@@ -789,7 +790,8 @@ s2,test_1,section2,active},
     it "treats crosslisted sections as belonging to their original course" do
       @term1 = @account.enrollment_terms.first
       @term2 = @account.enrollment_terms.create!(:name => 'term2')
-      @term2.sis_source_id = 'term2'; @term2.save!
+      @term2.sis_source_id = 'term2'
+      @term2.save!
       @previous_batch = @account.sis_batches.create!
 
       @course1 = @account.courses.build

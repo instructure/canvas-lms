@@ -694,7 +694,7 @@ module Lti
 
         it 'includes pagination headers' do
           send_request
-          expect(response.headers.key?('Link')).to eq true
+          expect(response.headers).to have_key('Link')
         end
       end
 

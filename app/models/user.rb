@@ -521,7 +521,7 @@ class User < ActiveRecord::Base
       account = account_id
       account_id = account.id
     end
-    return account_chain_cache[account_id] if account_chain_cache.has_key?(account_id)
+    return account_chain_cache[account_id] if account_chain_cache.key?(account_id)
 
     account ||= Account.find(account_id)
     return account_chain_cache[account.id] = [account.id] if account.root_account?
@@ -533,7 +533,7 @@ class User < ActiveRecord::Base
     results = {}
     remaining_ids = []
     starting_account_ids.each do |account_id|
-      unless account_chain_cache.has_key? account_id
+      unless account_chain_cache.key? account_id
         remaining_ids << account_id
         next
       end
@@ -577,8 +577,7 @@ class User < ActiveRecord::Base
     starting_account_ids += (data[:account_users][user.id] || []).map(&:account_id)
     starting_account_ids.uniq!
 
-    result = calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
-    result
+    calculate_account_associations_from_accounts(starting_account_ids, account_chain_cache)
   end
 
   def self.update_account_associations(users_or_user_ids, opts = {})
@@ -601,12 +600,12 @@ class User < ActiveRecord::Base
     user_ids = users_or_user_ids
     user_ids = user_ids.map(&:id) if user_ids.first.is_a?(User)
     shards = [Shard.current]
-    if !precalculated_associations
-      if !users_or_user_ids.first.is_a?(User)
-        users = users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
-      else
-        users = users_or_user_ids
-      end
+    unless precalculated_associations
+      users = if !users_or_user_ids.first.is_a?(User)
+                users_or_user_ids = User.select([:id, :preferences, :workflow_state, :updated_at]).where(id: user_ids).to_a
+              else
+                users_or_user_ids
+              end
 
       if opts[:all_shards]
         shards = Set.new
@@ -663,7 +662,7 @@ class User < ActiveRecord::Base
         key = [aa.user_id, aa.account_id]
         # duplicates. the unique index prevents these now, but this code
         # needs to hang around for the migration itself
-        if current_associations.has_key?(key)
+        if current_associations.key?(key)
           to_delete << aa.id
           next
         end
@@ -729,17 +728,21 @@ class User < ActiveRecord::Base
 
   # These methods can be overridden by a plugin if you want to have an approval
   # process or implement additional tracking for new users
-  def registration_approval_required?; false; end
+  def registration_approval_required?
+    false
+  end
 
   def new_registration(form_params = {}); end
 
   # DEPRECATED, override new_registration instead
-  def new_teacher_registration(form_params = {}); new_registration(form_params); end
+  def new_teacher_registration(form_params = {})
+    new_registration(form_params)
+  end
 
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
     # doesn't already exist
-    self.uuid = CanvasSlug.generate_securish_uuid if !read_attribute(:uuid)
+    self.uuid = CanvasSlug.generate_securish_uuid unless read_attribute(:uuid)
   end
   protected :assign_uuid
 
@@ -837,7 +840,7 @@ class User < ActiveRecord::Base
     end
     # Use prior information on the last name to try and reconstruct it
     prior_surname_parts = nil
-    surname = given_parts.pop(prior_surname_parts.length).join(' ') if !surname && prior_surname.present? && (prior_surname_parts = prior_surname.split) && !prior_surname_parts.empty? && given_parts.length >= prior_surname_parts.length && given_parts[-prior_surname_parts.length..-1] == prior_surname_parts
+    surname = given_parts.pop(prior_surname_parts.length).join(' ') if !surname && prior_surname.present? && (prior_surname_parts = prior_surname.split) && !prior_surname_parts.empty? && given_parts.length >= prior_surname_parts.length && given_parts[-prior_surname_parts.length..] == prior_surname_parts
     # Last resort; last name is just the last word given
     surname = given_parts.pop if !surname && given_parts.length > 1
 
@@ -1053,7 +1056,7 @@ class User < ActiveRecord::Base
   def delete_enrollments(enrollment_scope = self.enrollments, updating_user: nil)
     courses_to_update = enrollment_scope.active.distinct.pluck(:course_id)
     Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
-      enrollment_scope.preload(:course, :enrollment_state).each { |e| e.destroy }
+      enrollment_scope.preload(:course, :enrollment_state).each(&:destroy)
     end
     user_ids = enrollment_scope.pluck(:user_id).uniq
     courses_to_update.each do |course|
@@ -1397,7 +1400,7 @@ class User < ActiveRecord::Base
 
   def gravatar_url(size = 50, fallback = nil, request = nil)
     fallback = self.class.avatar_fallback_url(fallback, request)
-    "https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(self.email) rescue '000'}?s=#{size}&d=#{CGI::escape(fallback)}"
+    "https://secure.gravatar.com/avatar/#{Digest::MD5.hexdigest(self.email) rescue '000'}?s=#{size}&d=#{CGI.escape(fallback)}"
   end
 
   # Public: Set a user's avatar image. This is a convenience method that sets
@@ -1443,11 +1446,11 @@ class User < ActiveRecord::Base
   end
 
   def report_avatar_image!
-    if self.avatar_state == :approved || self.avatar_state == :locked
-      self.avatar_state = 're_reported'
-    else
-      self.avatar_state = 'reported'
-    end
+    self.avatar_state = if self.avatar_state == :approved || self.avatar_state == :locked
+                          're_reported'
+                        else
+                          'reported'
+                        end
     self.save!
   end
 
@@ -1557,7 +1560,7 @@ class User < ActiveRecord::Base
   def clear_avatar_image_url_with_uuid(uuid)
     raise ArgumentError, "'uuid' is required and cannot be blank" if uuid.blank?
 
-    if self.avatar_image_url.to_s.match(/#{uuid}/)
+    if self.avatar_image_url.to_s.match?(/#{uuid}/)
       self.avatar_image_url = nil
       self.save
     end
@@ -1778,7 +1781,7 @@ class User < ActiveRecord::Base
   # it will store the data in a separate table on the db and lighten the load on poor `users`
 
   def uuid
-    if !read_attribute(:uuid)
+    unless read_attribute(:uuid)
       self.update_attribute(:uuid, CanvasSlug.generate_securish_uuid)
     end
     read_attribute(:uuid)
@@ -2535,15 +2538,15 @@ class User < ActiveRecord::Base
   end
 
   def last_completed_module
-    self.context_module_progressions.select { |p| p.completed? }.sort_by { |p| p.completed_at || p.created_at }.last.context_module rescue nil
+    self.context_module_progressions.select(&:completed?).sort_by { |p| p.completed_at || p.created_at }.last.context_module rescue nil
   end
 
   def last_completed_course
-    self.enrollments.select { |e| e.completed? }.sort_by { |e| e.completed_at || e.created_at }.last.course rescue nil
+    self.enrollments.select(&:completed?).sort_by { |e| e.completed_at || e.created_at }.last.course rescue nil
   end
 
   def last_mastered_assignment
-    self.learning_outcome_results.active.sort_by { |r| r.assessed_at || r.created_at }.select { |r| r.mastery? }.map { |r| r.assignment }.last
+    self.learning_outcome_results.active.sort_by { |r| r.assessed_at || r.created_at }.select(&:mastery?).map(&:assignment).last
   end
 
   def profile_pics_folder
@@ -2556,10 +2559,8 @@ class User < ActiveRecord::Base
 
   def initialize_default_folder(name)
     folder = self.active_folders.where(name: name).first
-    unless folder
-      folder = self.folders.create!(:name => name,
+    folder ||= self.folders.create!(:name => name,
                                     :parent_folder => Folder.root_folders(self).find { |f| f.name == Folder::MY_FILES_FOLDER_NAME })
-    end
     folder
   end
 
@@ -2733,11 +2734,11 @@ class User < ActiveRecord::Base
     favorites = self.courses_with_primary_enrollment(:favorite_courses, enrollment_uuid, opts)
                     .select { |c| can_favorite.call(c) }
     # if favoritable courses (classic courses or k5 courses with admin enrollment) exist, show those and all non-favoritable courses
-    if favorites.length > 0
-      @menu_courses = favorites + courses.reject { |c| can_favorite.call(c) }
-    else
-      @menu_courses = courses
-    end
+    @menu_courses = if favorites.length > 0
+                      favorites + courses.reject { |c| can_favorite.call(c) }
+                    else
+                      courses
+                    end
     ActiveRecord::Associations::Preloader.new.preload(@menu_courses, :enrollment_term)
     @menu_courses
   end
@@ -2863,12 +2864,12 @@ class User < ActiveRecord::Base
   def otp_secret_key
     return nil unless otp_secret_key_enc
 
-    Canvas::Security::decrypt_password(otp_secret_key_enc, otp_secret_key_salt, 'otp_secret_key', self.shard.settings[:encryption_key]) if otp_secret_key_enc
+    Canvas::Security.decrypt_password(otp_secret_key_enc, otp_secret_key_salt, 'otp_secret_key', self.shard.settings[:encryption_key]) if otp_secret_key_enc
   end
 
   def otp_secret_key=(key)
     if key
-      self.otp_secret_key_enc, self.otp_secret_key_salt = Canvas::Security::encrypt_password(key, 'otp_secret_key')
+      self.otp_secret_key_enc, self.otp_secret_key_salt = Canvas::Security.encrypt_password(key, 'otp_secret_key')
     else
       self.otp_secret_key_enc = self.otp_secret_key_salt = nil
     end

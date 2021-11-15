@@ -31,7 +31,10 @@ if Qti.migration_executable
         expect(matches.include?(a[:match_id])).to be_truthy
       end
       # compare everything else without the ids
-      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
+      hash[:answers].each { |a|
+        a.delete(:id)
+        a.delete(:match_id)
+      }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq BB9Expected::MATCHING
     end
@@ -46,7 +49,10 @@ if Qti.migration_executable
         expect(matches.include?(a[:match_id])).to be_truthy
       end
       # compare everything else without the ids
-      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
+      hash[:answers].each { |a|
+        a.delete(:id)
+        a.delete(:match_id)
+      }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq BB9Expected::MATCHING
     end
@@ -70,7 +76,10 @@ if Qti.migration_executable
         expect(matches[a[:match_id]]).to eq a[:text].sub('left', 'right')
       end
       # compare everything else without the ids
-      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
+      hash[:answers].each { |a|
+        a.delete(:id)
+        a.delete(:match_id)
+      }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq BB9Expected::MATCHING2
     end

@@ -97,8 +97,7 @@ module ContextModulesCommon
   end
 
   def create_context_module(module_name)
-    context_module = @course.context_modules.create!(:name => module_name, :require_sequential_progress => true)
-    context_module
+    @course.context_modules.create!(:name => module_name, :require_sequential_progress => true)
   end
 
   def go_to_modules
@@ -386,6 +385,6 @@ module ContextModulesCommon
   def get(url)
     @already_waited_for_modules_ui = false
     super
-    wait_for_modules_ui if url =~ %r{\A/courses/\d+/modules\z}
+    wait_for_modules_ui if %r{\A/courses/\d+/modules\z}.match?(url)
   end
 end

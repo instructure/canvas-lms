@@ -137,7 +137,7 @@ class NotificationPolicy < ActiveRecord::Base
     communication_channel.shard.activate do
       unique_constraint_retry do
         np = communication_channel.notification_policies.where(notification_id: notification).first
-        if !np
+        unless np
           np = communication_channel.notification_policies.build(notification: notification)
           frequency ||= if communication_channel == communication_channel.user.communication_channel
                           notification.default_frequency(communication_channel.user)

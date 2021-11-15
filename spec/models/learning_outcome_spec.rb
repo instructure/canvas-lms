@@ -1018,8 +1018,14 @@ describe LearningOutcome do
       )
     end
 
-    let(:c1) { course_with_teacher; @course }
-    let(:c2) { course_with_teacher; @course }
+    let(:c1) {
+      course_with_teacher
+      @course
+    }
+    let(:c2) {
+      course_with_teacher
+      @course
+    }
 
     let(:add_student) do
       ->(*courses) { courses.each { |c| student_in_course(course: c) } }

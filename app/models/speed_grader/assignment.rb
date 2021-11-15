@@ -158,7 +158,10 @@ module SpeedGrader
       res[:too_many_quiz_submissions] = too_many = assignment.too_many_qs_versions?(submissions)
       qs_versions = assignment.quiz_submission_versions(submissions, too_many)
 
-      enrollment_types_by_id = enrollments.inject({}) { |h, e| h[e.user_id] ||= e.type; h }
+      enrollment_types_by_id = enrollments.inject({}) { |h, e|
+        h[e.user_id] ||= e.type
+        h
+      }
 
       if assignment.quiz
         if assignment.quiz.assignment_overrides.to_a.select(&:active?).count == 0
@@ -331,14 +334,15 @@ module SpeedGrader
           provisional_grades = provisional_grades.preload(:scorer)
         end
 
-        if grading_role == :provisional_grader
+        case grading_role
+        when :provisional_grader
           provisional_grades = if grader_comments_hidden?(current_user: current_user, assignment: assignment)
                                  provisional_grades.not_final.where(scorer: current_user)
                                else
                                  select_fields = ModeratedGrading::GRADE_ATTRIBUTES_ONLY.dup.push(:id, :submission_id)
                                  provisional_grades.select(select_fields)
                                end
-        elsif grading_role == :grader
+        when :grader
           provisional_grades = ModeratedGrading::ProvisionalGrade.none
         end
         provisional_grades.order(:id).to_a.group_by(&:submission_id)

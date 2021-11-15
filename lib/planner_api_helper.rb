@@ -35,13 +35,13 @@ module PlannerApiHelper
   def formatted_planner_date(input, val, default = nil, end_of_day: false)
     @errors ||= {}
     if val.present? && val.is_a?(String)
-      if val =~ Api::DATE_REGEX
+      if Api::DATE_REGEX.match?(val)
         if end_of_day
           Time.zone.parse(val).end_of_day
         else
           Time.zone.parse(val).beginning_of_day
         end
-      elsif val =~ Api::ISO8601_REGEX
+      elsif Api::ISO8601_REGEX.match?(val)
         Time.zone.parse(val)
       else
         raise(InvalidDates, I18n.t("Invalid date or datetime for %{field}", field: input))

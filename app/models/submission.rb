@@ -542,17 +542,17 @@ class Submission < ActiveRecord::Base
       settings = assignment.turnitin_settings
       type_can_peer_review = false
     end
-    return plagData &&
-           (user_can_read_grade?(user, session, for_plagiarism: true) || (type_can_peer_review && user_can_peer_review_plagiarism?(user))) &&
-           (assignment.context.grants_right?(user, session, :manage_grades) ||
-             case settings[:originality_report_visibility]
-             when 'immediate' then true
-             when 'after_grading' then current_submission_graded?
-             when 'after_due_date'
-                then assignment.due_at && assignment.due_at < Time.now.utc
-             when 'never' then false
-             end
-           )
+    plagData &&
+      (user_can_read_grade?(user, session, for_plagiarism: true) || (type_can_peer_review && user_can_peer_review_plagiarism?(user))) &&
+      (assignment.context.grants_right?(user, session, :manage_grades) ||
+        case settings[:originality_report_visibility]
+        when 'immediate' then true
+        when 'after_grading' then current_submission_graded?
+        when 'after_due_date'
+           then assignment.due_at && assignment.due_at < Time.now.utc
+        when 'never' then false
+        end
+      )
   end
 
   def user_can_peer_review_plagiarism?(user)
@@ -664,12 +664,12 @@ class Submission < ActiveRecord::Base
   end
 
   def url
-    read_body = read_attribute(:body) && CGI::unescapeHTML(read_attribute(:body))
-    if read_body && read_attribute(:url) && read_body[0..250] == read_attribute(:url)[0..250]
-      @full_url = read_attribute(:body)
-    else
-      @full_url = read_attribute(:url)
-    end
+    read_body = read_attribute(:body) && CGI.unescapeHTML(read_attribute(:body))
+    @full_url = if read_body && read_attribute(:url) && read_body[0..250] == read_attribute(:url)[0..250]
+                  read_attribute(:body)
+                else
+                  read_attribute(:url)
+                end
   end
 
   def plaintext_body
@@ -823,9 +823,10 @@ class Submission < ActiveRecord::Base
   end
 
   def turnitin_assets
-    if self.submission_type == 'online_upload'
-      self.attachments.select { |a| a.turnitinable? }
-    elsif self.submission_type == 'online_text_entry'
+    case self.submission_type
+    when 'online_upload'
+      self.attachments.select(&:turnitinable?)
+    when 'online_text_entry'
       [self]
     else
       []
@@ -935,7 +936,7 @@ class Submission < ActiveRecord::Base
         check_vericite_status(0)
       end
     end
-    if !self.vericite_data_hash.empty?
+    unless self.vericite_data_hash.empty?
       # only set vericite provider flag if the hash isn't empty
       self.vericite_data_hash[:provider] = :vericite
     end
@@ -951,7 +952,7 @@ class Submission < ActiveRecord::Base
   def vericite_recheck_score(data)
     update_scores = false
     # only recheck scores if an old score exists
-    if !data[:similarity_score_time].blank?
+    unless data[:similarity_score_time].blank?
       now = Time.now.to_i
       score_age = Time.now.to_i - data[:similarity_score_time]
       score_cache_time = 1200 # by default cache scores for 20 mins
@@ -964,7 +965,7 @@ class Submission < ActiveRecord::Base
       if score_age > score_cache_time
         # check if we just recently requested this score
         last_checked = 1000 # default to a high number so that if it is not set, it won't effect the outcome
-        if !data[:similarity_score_check_time].blank?
+        unless data[:similarity_score_check_time].blank?
           last_checked = now - data[:similarity_score_check_time]
         end
         # only update if we didn't just ask VeriCite for the scores 20 seconds again (this is in the case of an error, we don't want to keep asking immediately)
@@ -1038,7 +1039,7 @@ class Submission < ActiveRecord::Base
     retry_mins = 2**attempt
     if retry_mins > 240
       # cap the retry max wait to 4 hours
-      retry_mins = 240;
+      retry_mins = 240
     end
     # if attempt <= 0, then that means no retries should be attempted
     delay(run_at: retry_mins.minutes.from_now).check_vericite_status(attempt + 1) if attempt > 0 && needs_retry
@@ -1046,9 +1047,7 @@ class Submission < ActiveRecord::Base
     if data_changed
       self.vericite_data_changed!
       if recheck_score_all
-        self.with_versioning(false) do |t|
-          t.save!
-        end
+        self.with_versioning(false, &:save!)
       else
         self.save
       end
@@ -1091,7 +1090,7 @@ class Submission < ActiveRecord::Base
       self.vericite_data_hash[:assignment_error] = assignment_error if assignment_error.present?
       # self.vericite_data_hash[:student_error] = vericite_enrollment.error_hash if vericite_enrollment.error?
       self.vericite_data_changed!
-      if !self.vericite_data_hash.empty?
+      unless self.vericite_data_hash.empty?
         # only set vericite provider flag if the hash isn't empty
         self.vericite_data_hash[:provider] = :vericite
       end
@@ -1118,7 +1117,7 @@ class Submission < ActiveRecord::Base
     # only save if there were newly submitted attachments
     if update
       delay(run_at: 5.minutes.from_now, **VERICITE_JOB_OPTS).check_vericite_status
-      if !self.vericite_data_hash.empty?
+      unless self.vericite_data_hash.empty?
         # only set vericite provider flag if the hash isn't empty
         self.vericite_data_hash[:provider] = :vericite
       end
@@ -1136,9 +1135,10 @@ class Submission < ActiveRecord::Base
   end
 
   def vericite_assets
-    if self.submission_type == 'online_upload'
-      self.attachments.select { |a| a.vericiteable? }
-    elsif self.submission_type == 'online_text_entry'
+    case self.submission_type
+    when 'online_upload'
+      self.attachments.select(&:vericiteable?)
+    when 'online_text_entry'
       [self]
     else
       []
@@ -1186,7 +1186,7 @@ class Submission < ActiveRecord::Base
 
   def resubmit_to_vericite
     reset_vericite_assets
-    if !self.vericite_data_hash.empty?
+    unless self.vericite_data_hash.empty?
       # only set vericite provider flag if the hash isn't empty
       self.vericite_data_hash[:provider] = :vericite
     end
@@ -1317,7 +1317,7 @@ class Submission < ActiveRecord::Base
   # submitted_at is needed by the SpeedGrader, so it is set to the updated_at value
   def submitted_at
     if submission_type
-      if not read_attribute(:submitted_at)
+      unless read_attribute(:submitted_at)
         write_attribute(:submitted_at, read_attribute(:updated_at))
       end
       read_attribute(:submitted_at).in_time_zone rescue nil
@@ -1458,7 +1458,7 @@ class Submission < ActiveRecord::Base
         score.to_s
     end
 
-    self.grade = nil if !self.score
+    self.grade = nil unless self.score
     # I think the idea of having unpublished scores is unnecessarily confusing.
     # It may be that we want to have that functionality later on, but for now
     # I say it's just confusing.
@@ -1936,8 +1936,8 @@ class Submission < ActiveRecord::Base
     # one student from sneakily getting access to files in another user's comments,
     # since they're all being held on the assignment for now.
     attachments ||= []
-    old_ids = (Array(self.attachment_ids || "").join(",")).split(",").map { |id| id.to_i }
-    write_attribute(:attachment_ids, attachments.select { |a| (a && a.id && old_ids.include?(a.id)) || (a.recently_created? && a.context == self.assignment) || a.context != self.assignment }.map { |a| a.id }.join(","))
+    old_ids = (Array(self.attachment_ids || "").join(",")).split(",").map(&:to_i)
+    write_attribute(:attachment_ids, attachments.select { |a| (a && a.id && old_ids.include?(a.id)) || (a.recently_created? && a.context == self.assignment) || a.context != self.assignment }.map(&:id).join(","))
   end
 
   # someday code-archaeologists will wonder how this method came to be named
@@ -2560,7 +2560,7 @@ class Submission < ActiveRecord::Base
                    end
     return "unread" if has_comments
 
-    return "read"
+    "read"
   end
 
   def read?(current_user)

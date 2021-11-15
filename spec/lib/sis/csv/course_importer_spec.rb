@@ -33,7 +33,7 @@ describe SIS::CSV::CourseImporter do
     )
     expect(Course.count).to eq before_count + 1
 
-    errors = importer.errors.map { |r| r.last }
+    errors = importer.errors.map(&:last)
     expect(errors).to eq ["No course_id given for a course",
                           "Improper status \"inactive\" for course C003",
                           "No short_name given for course C004",
@@ -56,7 +56,7 @@ describe SIS::CSV::CourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,VERY_INVALID_ACCOUNT,,active"
     )
-    errors = importer.errors.map { |r| r.last }
+    errors = importer.errors.map(&:last)
     expect(errors).to eq ["Account not found \"VERY_INVALID_ACCOUNT\" for course test_1"]
   end
 

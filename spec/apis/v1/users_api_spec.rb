@@ -26,9 +26,13 @@ class TestUserApi
   include Api::V1::User
   attr_accessor :services_enabled, :context, :current_user, :params, :request
 
-  def service_enabled?(service); @services_enabled.include? service; end
+  def service_enabled?(service)
+    @services_enabled.include? service
+  end
 
-  def avatar_image_url(*args); "avatar_image_url(#{args.first})"; end
+  def avatar_image_url(*args)
+    "avatar_image_url(#{args.first})"
+  end
 
   def course_student_grades_url(_course_id, _user_id)
     ""
@@ -76,10 +80,10 @@ describe Api::V1::User do
     it 'supports optionally providing the avatar if avatars are enabled' do
       @student.account.set_service_availability(:avatars, false)
       @student.account.save!
-      expect(@test_api.user_json(@student, @admin, {}, ['avatar_url'], @course).has_key?("avatar_url")).to be_falsey
+      expect(@test_api.user_json(@student, @admin, {}, ['avatar_url'], @course)).not_to have_key("avatar_url")
       @student.account.set_service_availability(:avatars, true)
       @student.account.save!
-      expect(@test_api.user_json(@student, @admin, {}, [], @course).has_key?("avatar_url")).to be_falsey
+      expect(@test_api.user_json(@student, @admin, {}, [], @course)).not_to have_key("avatar_url")
       expect(@test_api.user_json(@student, @admin, {}, ['avatar_url'], @course)["avatar_url"]).to match("h:/images/messages/avatar-50.png")
     end
 
@@ -95,7 +99,7 @@ describe Api::V1::User do
     it 'supports optionally including group_ids' do
       @group = @course.groups.create!(:name => "My Group")
       @group.add_user(@student, 'accepted', true)
-      expect(@test_api.user_json(@student, @admin, {}, [], @course).has_key?("group_ids")).to be_falsey
+      expect(@test_api.user_json(@student, @admin, {}, [], @course)).not_to have_key("group_ids")
       expect(@test_api.user_json(@student, @admin, {}, ['group_ids'], @course)["group_ids"]).to eq([@group.id])
     end
 
@@ -1813,7 +1817,10 @@ describe "Users API", type: :request do
       end
 
       it "is able to update a user's profile" do
-        Account.default.tap { |a| a.settings[:enable_profiles] = true; a.save! }
+        Account.default.tap { |a|
+          a.settings[:enable_profiles] = true
+          a.save!
+        }
         new_title = "Burninator"
         new_bio = "burninating the countryside"
         json = api_call(:put, @path, @path_options, {
@@ -1833,7 +1840,10 @@ describe "Users API", type: :request do
       end
 
       it "is able to update a user's profile with email" do
-        Account.default.tap { |a| a.settings[:enable_profiles] = true; a.save! }
+        Account.default.tap { |a|
+          a.settings[:enable_profiles] = true
+          a.save!
+        }
         new_title = "Burninator"
         new_bio = "burninating the countryside"
         email = 'dudd@example.com'
@@ -2019,7 +2029,8 @@ describe "Users API", type: :request do
 
     context "an admin user" do
       it "is able to view other users' settings" do
-        @student.preferences[:collapse_global_nav] = true; @student.save!
+        @student.preferences[:collapse_global_nav] = true
+        @student.save!
         json = api_call(:get, path, path_options)
         expect(json['manual_mark_as_read']).to eq false
         expect(json['collapse_global_nav']).to eq true

@@ -52,7 +52,10 @@ describe UnzipAttachment do
     end
 
     describe 'after processing' do
-      before { unzipper.process; @course.reload }
+      before {
+        unzipper.process
+        @course.reload
+      }
 
       let(:first_attachment) { @course.attachments.where(display_name: 'first_entry.txt').first }
       let(:second_attachment) { @course.attachments.where(display_name: 'second_entry.txt').first }

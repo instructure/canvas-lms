@@ -72,7 +72,10 @@ if Qti.migration_executable
         expect(matches[a[:match_id]]).to eq a[:text].upcase
       end
       # compare everything else without the ids
-      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
+      hash[:answers].each { |a|
+        a.delete(:id)
+        a.delete(:match_id)
+      }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq RespondusExpected::MATCHING
     end
@@ -87,7 +90,10 @@ if Qti.migration_executable
         expect(matches[a[:match_id]]).to eq a[:text].upcase
       end
       # compare everything else without the ids
-      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
+      hash[:answers].each { |a|
+        a.delete(:id)
+        a.delete(:match_id)
+      }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq RespondusExpected::MATCHING
     end

@@ -193,14 +193,14 @@ module Types
       argument :filter, SubmissionFilterInputType, required: false
     end
     def submissions_connection(student_ids: nil, order_by: [], filter: {})
-      if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
-        # TODO: make a preloader for this???
-        allowed_user_ids = course.apply_enrollment_visibility(course.all_student_enrollments, current_user).pluck(:user_id)
-      elsif course.grants_right?(current_user, session, :read_grades)
-        allowed_user_ids = [current_user.id]
-      else
-        allowed_user_ids = []
-      end
+      allowed_user_ids = if course.grants_any_right?(current_user, session, :manage_grades, :view_all_grades)
+                           # TODO: make a preloader for this???
+                           course.apply_enrollment_visibility(course.all_student_enrollments, current_user).pluck(:user_id)
+                         elsif course.grants_right?(current_user, session, :read_grades)
+                           [current_user.id]
+                         else
+                           []
+                         end
 
       if student_ids.present?
         allowed_user_ids &= student_ids.map(&:to_i)

@@ -345,7 +345,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   def crosslisted?
-    return !!self.nonxlist_course_id
+    !!self.nonxlist_course_id
   end
 
   def destroy_course_if_no_more_sections

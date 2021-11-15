@@ -21,7 +21,10 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::ModuleItemType do
-  let_once(:course) { course_with_teacher(active_all: true); @course }
+  let_once(:course) {
+    course_with_teacher(active_all: true)
+    @course
+  }
   let_once(:module1) { course.context_modules.create! name: "module1" }
   let_once(:assign1) { course.assignments.create(title: "a1", workflow_state: "published") }
   let_once(:module_item1) { module1.add_item({ type: 'assignment', id: assign1.id }, nil, position: 1) }

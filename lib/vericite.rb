@@ -218,7 +218,8 @@ module VeriCite
 
         consumer = @account_id
         consumer_secret = @shared_secret
-        if command == :create_assignment
+        case command
+        when :create_assignment
           context_id = course.id
           assignment_id = assignment.id
           assignment_data = VeriCiteClient::AssignmentData.new()
@@ -236,14 +237,14 @@ module VeriCite
           _data, status_code, _headers = vericite_client.assignments_context_id_assignment_id_post(context_id, assignment_id, consumer, consumer_secret, assignment_data)
           # check status code
           response[:return_code] = status_code
-          if !is_response_success?(response)
+          unless is_response_success?(response)
             response[:return_message] = "An error has occurred while creating the VeriCite assignment."
             response[:public_error_message] = response[:return_message]
             fail "Failed to create assignment: #{assignment_id}, site #{context_id}"
           end
           # this is a flag to signal success
           response[:assignment_id] = assignment.id
-        elsif command == :submit_paper
+        when :submit_paper
           context_id = course.id
           assignment_id = assignment.id
           user_id = user.id
@@ -268,7 +269,7 @@ module VeriCite
           data, status_code, _headers = vericite_client.reports_submit_request_context_id_assignment_id_user_id_post(context_id, assignment_id, user_id, consumer, consumer_secret, report_meta_data)
           # check status code
           response[:return_code] = status_code
-          if !is_response_success?(response)
+          unless is_response_success?(response)
             response[:return_message] = "An error has occurred while submitting the paper to VeriCite."
             response[:public_error_message] = response[:return_message]
             fail "Failed to submit paper: #{external_content_data.external_content_id}"
@@ -279,7 +280,7 @@ module VeriCite
           end
           # this is a flag to signal success
           response[:returned_object_id] = external_content_data.external_content_id
-        elsif command == :get_scores
+        when :get_scores
           context_id = course.id
           assignment_id = assignment.id
           user_id = user.id
@@ -297,7 +298,7 @@ module VeriCite
             Rails.cache.write(user_score_cache_key_prefix, true, :expires_in => 5.minutes)
             # check status code
             response[:return_code] = status_code
-            if !is_response_success?(response)
+            unless is_response_success?(response)
               response[:return_message] = "An error has occurred while getting scores from VeriCite."
               response[:public_error_message] = response[:return_message]
               fail "Failed to get scores for site: #{context_id}, assignment: #{assignment_id}, user: #{user_id},  exId: #{args[:oid]}"
@@ -328,7 +329,7 @@ module VeriCite
               end
             end
           end
-        elsif command == :generate_report
+        when :generate_report
           context_id = course.id
           assignment_id_filter = assignment.id
           user_id = user.id
@@ -343,7 +344,7 @@ module VeriCite
           data, status_code, _headers = vericite_client.reports_urls_context_id_get(context_id, assignment_id_filter, consumer, consumer_secret, token_user, token_user_role, { user_id_filter => user_id, external_content_id_filter => args[:oid] })
           # check status code
           response[:return_code] = status_code
-          if !is_response_success?(response)
+          unless is_response_success?(response)
             response[:return_message] = "An error has occurred while getting the report URL from VeriCite."
             response[:public_error_message] = response[:return_message]
             fail "Failed to get the report url for site: #{context_id}, assignment: #{assignment_id}, user: #{user_id},  exId: #{args[:oid]}, token_user: #{token_user}, token_user_role: #{token_user_role}"
@@ -362,7 +363,7 @@ module VeriCite
           # we do not want to return a success code if there was an error
           response[:return_code] = 100
         end
-        if !response.key?(:return_message)
+        unless response.key?(:return_message)
           # we want a generic error message at a minimum
           response[:return_message] = "VeriCite error during #{command} command, error: #{e}"
           response[:public_error_message] = response[:return_message]

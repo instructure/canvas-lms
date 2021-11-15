@@ -372,11 +372,11 @@ class SisBatch < ActiveRecord::Base
   end
 
   def download_zip
-    if self.data[:file_path]
-      @data_file = File.open(self.data[:file_path], 'rb')
-    else
-      @data_file = self.attachment.open(:need_local_file => true)
-    end
+    @data_file = if self.data[:file_path]
+                   File.open(self.data[:file_path], 'rb')
+                 else
+                   self.attachment.open(:need_local_file => true)
+                 end
     @data_file
   end
 
@@ -643,7 +643,7 @@ class SisBatch < ActiveRecord::Base
       row = remove_non_batch_sections(sections, count, row) if sections
       remove_non_batch_courses(courses, count, row) if courses
     rescue SisBatch::Aborted
-      return self.reload
+      self.reload
     end
   end
 

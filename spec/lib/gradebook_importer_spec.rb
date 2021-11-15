@@ -1473,6 +1473,90 @@ describe GradebookImporter do
     end
   end
 
+  describe "student last and first names" do
+    it "does not import when not allowed" do
+      course = course_model
+      user = user_model
+      progress = Progress.create!(tag: "test", context: @user)
+      upload = GradebookUpload.create!(course: course, user: @user, progress: progress)
+      importer = GradebookImporter.new(
+        upload, valid_gradebook_contents_with_last_and_first_names, user, progress
+      )
+
+      expect { importer.parse! }.not_to raise_error
+      expect(progress.message).to eq("Invalid header row")
+      expect(progress.workflow_state).to eq("failed")
+    end
+
+    context "when allowed" do
+      before(:once) do
+        Account.site_admin.enable_feature!(:gradebook_show_first_last_names)
+        course_model
+        @course.root_account.settings[:allow_gradebook_show_first_last_names] = true
+        @course.root_account.save!
+      end
+
+      it "handles students which do not already exist" do
+        importer_with_rows(
+          'LastName,FirstName,ID,Section,Assignment 1,Final Score',
+          '"Blend","Bill",6,My Course,-,',
+          'Points Possible,,,,10,',
+          '"","Todd",4,My Course,-,',
+          '"Cooper","",4,My Course,-,'
+        )
+        expect(@gi.assignments.length).to eq 1
+        expect(@gi.assignments.first.points_possible).to eq 10
+        expect(@gi.students.length).to eq 3
+        expect(@gi.students[0].name).to eq "Bill Blend"
+        expect(@gi.students[1].name).to eq "Todd"
+        expect(@gi.students[2].name).to eq "Cooper"
+      end
+
+      context "enrolled students" do
+        let(:student0) { User.create!(name: "Victor McDade") }
+        let(:student1) { User.create!(name: "Jack Jarvis") }
+        let(:student2) { User.create!(name: "Winston") }
+        let(:student3) { User.create!(name: "Isa") }
+
+        before do
+          @course.enroll_student(student0, enrollment_state: "active")
+          @course.enroll_student(student1, enrollment_state: "active")
+          @course.enroll_student(student2, enrollment_state: "active")
+          @course.enroll_student(student3, enrollment_state: "active")
+        end
+
+        it "recognizes last and first name columns" do
+          importer = importer_with_rows(
+            'LastName,FirstName,ID,Section,Assignment 1,Final Score',
+            'Points Possible,,,,10,',
+            "'McDade','Victor;,#{student0.id},My Course,-,60",
+            "'Jarvis','Jack',#{student1.id},My Course,-,70",
+            "'','Winston',#{student2.id},My Course,-,80",
+            "'Isa','',#{student3.id},My Course,-,90"
+          )
+
+          output = importer.as_json
+
+          aggregate_failures do
+            expect(output[:students].length).to eq 4
+            expect(output[:students][0][:name]).to eq "Victor McDade"
+            expect(output[:students][0][:id]).to eq student0.id
+            expect(output[:students][1][:name]).to eq "Jack Jarvis"
+            expect(output[:students][1][:id]).to eq student1.id
+            expect(output[:students][2][:name]).to eq "Winston"
+            expect(output[:students][2][:id]).to eq student2.id
+            expect(output[:students][3][:name]).to eq "Isa"
+            expect(output[:students][3][:id]).to eq student3.id
+
+            expect(output[:assignments].length).to eq 1
+            expect(output[:assignments].first[:points_possible]).to eq 10
+            expect(output[:assignments].first[:title]).to eq "Assignment 1"
+          end
+        end
+      end
+    end
+  end
+
   describe "override score changes" do
     before(:once) do
       Account.site_admin.enable_feature!(:import_override_scores_in_gradebook)
@@ -2009,6 +2093,10 @@ describe GradebookImporter do
 
   def valid_gradebook_contents
     attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks basic_course.csv)))
+  end
+
+  def valid_gradebook_contents_with_last_and_first_names
+    attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks valid_gradebook_contents_with_last_and_first_names.csv)))
   end
 
   def valid_gradebook_contents_with_sis_login_id

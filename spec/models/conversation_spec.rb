@@ -201,7 +201,7 @@ describe Conversation do
         end
         @shard2.activate do
           users << user_factory(:name => 'e')
-          conversation.add_participants(users.first, users[-2..-1])
+          conversation.add_participants(users.first, users[-2..])
           expect(conversation.conversation_participants.reload.size).to eq 5
           expect(conversation.conversation_participants.all? { |cp| cp.shard == Shard.default }).to be_truthy
           expect(users.last.all_conversations.last.shard).to eq @shard2
@@ -455,7 +455,7 @@ describe Conversation do
       end
 
       recipients = create_users(5, return_type: :record)
-      conversation = Conversation.initiate(recipients, false).add_message(sender, 'test', :cc_author => true);
+      conversation = Conversation.initiate(recipients, false).add_message(sender, 'test', :cc_author => true)
 
       # check that our sender recieved a conversation created notification
       expect(conversation.messages_sent).to include("Conversation Created")
@@ -936,7 +936,7 @@ describe Conversation do
         conversation = Conversation.initiate([@teacher, @student], true)
         conversation.add_message(@teacher, 'first message')
 
-        [@old_course, old_course2].each { |c| c.complete! }
+        [@old_course, old_course2].each(&:complete!)
 
         teacher_course = course_factory
         teacher_course.offer!

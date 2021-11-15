@@ -121,7 +121,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def set_defaults
     self.cant_go_back = false unless self.one_question_at_a_time
-    if !self.show_correct_answers
+    unless self.show_correct_answers
       self.show_correct_answers_last_attempt = false
       self.show_correct_answers_at = nil
       self.hide_correct_answers_at = nil
@@ -144,7 +144,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       self.assignment_id = nil
     end
 
-    if !self.require_lockdown_browser
+    unless self.require_lockdown_browser
       self.require_lockdown_browser_for_results = false
     end
 
@@ -412,7 +412,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     # If the quiz suddenly changes from non-graded to graded,
     # then this will update the existing submissions to reflect quiz
     # scores in the gradebook.
-    self.quiz_submissions.each { |s| s.save! }
+    self.quiz_submissions.each(&:save!)
   end
 
   def update_learning_outcome_results(state)
@@ -441,7 +441,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def update_assignment
     delay_if_production.set_unpublished_question_count if self.id
     if !self.assignment_id && @old_assignment_id
-      self.context_module_tags.preload(:context_module => :content_tags).each { |tag| tag.confirm_valid_module_requirements }
+      self.context_module_tags.preload(:context_module => :content_tags).each(&:confirm_valid_module_requirements)
     end
     if !self.graded? && (@old_assignment_id || self.last_assignment_id)
       ::Assignment.where(
@@ -768,7 +768,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     if opts[:persist] != false
       self.quiz_data = data
 
-      if !self.survey?
+      unless self.survey?
         possible = self.class.count_points_possible(data)
         self.points_possible = [possible, 0].max
       end
@@ -861,15 +861,16 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def hide_results=(val)
-    if val.is_a?(Hash)
-      if val[:last_attempt] == '1'
-        val = 'until_after_last_attempt'
-      elsif val[:never] != '1'
-        val = 'always'
-      else
-        val = nil
-      end
-    elsif val == ""
+    case val
+    when Hash
+      val = if val[:last_attempt] == '1'
+              'until_after_last_attempt'
+            elsif val[:never] != '1'
+              'always'
+            else
+              nil
+            end
+    when ""
       val = nil
     end
     write_attribute(:hide_results, val)
@@ -899,7 +900,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def changed_significantly_since?(version_number)
     @significant_version ||= {}
-    return @significant_version[version_number] if @significant_version.has_key?(version_number)
+    return @significant_version[version_number] if @significant_version.key?(version_number)
 
     old_version = self.versions.get(version_number).model
 
@@ -908,7 +909,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     needs_review = true if [old_version.points_possible, self.points_possible].select(&:present?).count == 1 ||
                            ((old_version.points_possible || 0) - (self.points_possible || 0)).abs > 0.0001
     needs_review = true if (old_version.quiz_data || []).length != (self.quiz_data || []).length
-    if !needs_review
+    unless needs_review
       new_data = self.quiz_data
       old_data = old_version.quiz_data
       new_data.each_with_index do |q, i|
@@ -1418,7 +1419,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     question_regrades = Set.new
     quiz_regrades.where("quiz_regrades.created_at > ? AND quiz_question_regrades.regrade_option != 'disabled'", created_at)
                  .eager_load(:quiz_question_regrades).each do |regrade|
-      ids = regrade.quiz_question_regrades.map { |qqr| qqr.quiz_question_id }
+      ids = regrade.quiz_question_regrades.map(&:quiz_question_id)
       question_regrades.merge(ids)
     end
     question_regrades.count

@@ -2570,6 +2570,37 @@ describe MasterCourses::MasterMigration do
       expect(mod1_to.reload.completion_requirements).to eq([])
     end
 
+    it "preserves prerequisites and requirements set downstream" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+      mod1 = @copy_from.context_modules.create!(name: "module1")
+      mod2 = @copy_from.context_modules.create!(name: "module2")
+      assmt = @copy_from.assignments.create!
+      tag = mod2.add_item type: 'assignment', id: assmt.id
+      run_master_migration
+
+      mod1_to = @copy_to.context_modules.where(migration_id: mig_id(mod1)).take
+      mod2_to = @copy_to.context_modules.where(migration_id: mig_id(mod2)).take
+      tag_to = @copy_to.context_module_tags.where(migration_id: mig_id(tag)).take
+      mod2_to.prerequisites = mod1_to.asset_string
+      mod2_to.completion_requirements = [{ id: tag_to.id, type: 'must_submit' }]
+      mod2_to.requirement_count = 1
+      mod2_to.require_sequential_progress = true
+      mod2_to.save!
+
+      Timecop.travel(5.minutes.from_now) do
+        mod2.name = 'module too'
+        mod2.save!
+        run_master_migration
+      end
+
+      mod2_to.reload
+      expect(mod2_to.completion_requirements).to eq([{ id: tag_to.id, type: 'must_submit' }])
+      expect(mod2_to.prerequisites).to eq([{ id: mod1_to.id, type: "context_module", name: "module1" }])
+      expect(mod2_to.require_sequential_progress).to eq true
+      expect(mod2_to.requirement_count).to eq 1
+    end
+
     it "copies the lack of a module unlock date" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)

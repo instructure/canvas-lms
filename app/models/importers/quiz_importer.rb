@@ -182,7 +182,7 @@ module Importers
       end
       new_record = item.new_record? || item.deleted?
 
-      hash[:due_at] ||= hash[:due_date] if hash.has_key?(:due_date)
+      hash[:due_at] ||= hash[:due_date] if hash.key?(:due_date)
       hash[:due_at] ||= hash[:grading][:due_date] if hash[:grading]
       master_migration = migration&.for_master_course_import? # propagate null dates only for blueprint syncs
       item.lock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:lock_at]) if master_migration || hash[:lock_at]
@@ -270,7 +270,7 @@ module Importers
           migration.add_imported_item(override,
                                       key: [item.migration_id, override.set_type, override.set_id].join('/'))
         end
-        if hash.has_key?(:only_visible_to_overrides) && added_overrides
+        if hash.key?(:only_visible_to_overrides) && added_overrides
           item.only_visible_to_overrides = hash[:only_visible_to_overrides]
         end
       end
