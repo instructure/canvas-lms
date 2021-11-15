@@ -143,6 +143,25 @@ describe 'pace plan page' do
       expect(show_hide_pace_plans_button_text).to eq('Hide Projections')
     end
 
+    it 'shows start and end date fields when Show Projections button is clicked' do
+      visit_pace_plans_page
+
+      click_show_hide_projections_button
+
+      expect(pace_plan_start_date).to be_displayed
+      expect(pace_plan_end_date).to be_displayed
+    end
+
+    it 'does not show date fields when Hide Projections button is clicked' do
+      visit_pace_plans_page
+
+      click_show_hide_projections_button
+      click_show_hide_projections_button
+
+      expect(pace_plan_start_date_exists?).to be_falsey
+      expect(pace_plan_end_date_exists?).to be_falsey
+    end
+
     it 'shows only a projection icon when window size is narrowed' do
       visit_pace_plans_page
 

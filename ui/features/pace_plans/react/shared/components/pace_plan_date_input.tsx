@@ -117,7 +117,7 @@ const PacePlanDateInput = ({
         <View as="div" margin="0 0 small">
           <Text weight="bold">{label}</Text>
         </View>
-        <Flex as="div" height="2.25rem" alignItems="center">
+        <Flex data-testid="paceplan-date-text" as="div" height="2.25rem" alignItems="center">
           {formatDate(dateValue)}
         </Flex>
       </div>
@@ -126,6 +126,7 @@ const PacePlanDateInput = ({
 
   return (
     <CanvasDateInput
+      dataTestid="pace-plan-start-date"
       renderLabel={label}
       formatDate={formatDate}
       onSelectedDateChange={handleDateChange}
