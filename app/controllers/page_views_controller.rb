@@ -193,8 +193,8 @@ class PageViewsController < ApplicationController
     end
     if start_time && end_time && end_time < start_time
       return respond_to do |format|
-        format.json { render json: { error: t('end_time must be after start_time') }, status: 400 }
-        format.any { render plain: t('end_time must be after start_time'), status: 400 }
+        format.json { render json: { error: t('end_time must be after start_time') }, status: :bad_request }
+        format.any { render plain: t('end_time must be after start_time'), status: :bad_request }
       end
     end
 

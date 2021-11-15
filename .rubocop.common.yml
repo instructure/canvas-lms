@@ -114,6 +114,8 @@ Rails/HasManyOrHasOneDependent:
   Enabled: false # legacy code + most things we soft delete anyway
 Rails/HelperInstanceVariable:
   Enabled: false # legacy code
+Rails/HttpStatus:
+  Severity: error
 Rails/IndexBy:
   Severity: error
 Rails/IndexWith:

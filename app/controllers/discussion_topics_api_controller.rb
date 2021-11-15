@@ -212,7 +212,7 @@ class DiscussionTopicsApiController < ApplicationController
       fragments = fragments.map { |k, v| %("#{k}": #{v}) }
       render :json => "{ #{fragments.join(', ')} }"
     else
-      head 503
+      head :service_unavailable
     end
   end
 

@@ -126,7 +126,7 @@ class UserObserveesController < ApplicationController
     if params[:access_token]
       verified_token = AccessToken.authenticate(params[:access_token])
       if verified_token.nil?
-        render json: { errors: [{ 'message' => 'Unknown observee.' }] }, status: 422
+        render json: { errors: [{ 'message' => 'Unknown observee.' }] }, status: :unprocessable_entity
         return
       end
       @student = verified_token.user
@@ -134,7 +134,7 @@ class UserObserveesController < ApplicationController
     elsif params[:pairing_code]
       code = find_observer_pairing_code(params[:pairing_code])
       if code.nil?
-        render json: { errors: [{ 'message' => 'Invalid pairing code.' }] }, status: 422
+        render json: { errors: [{ 'message' => 'Invalid pairing code.' }] }, status: :unprocessable_entity
         return
       end
       @student = code.user
@@ -145,7 +145,7 @@ class UserObserveesController < ApplicationController
 
       common_root_accounts = common_root_accounts_for(observer, observee_pseudonym.user) if observee_pseudonym
       if observee_pseudonym.nil? || common_root_accounts.empty?
-        render json: { errors: [{ 'message' => 'Unknown observee.' }] }, status: 422
+        render json: { errors: [{ 'message' => 'Unknown observee.' }] }, status: :unprocessable_entity
         return
       end
 

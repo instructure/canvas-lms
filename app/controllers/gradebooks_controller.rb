@@ -639,7 +639,7 @@ class GradebooksController < ApplicationController
   def update_submission
     if authorized_action(@context, @current_user, :manage_grades)
       if params[:submissions].blank? && params[:submission].blank?
-        render nothing: true, status: 400
+        render nothing: true, status: :bad_request
         return
       end
 

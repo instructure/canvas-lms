@@ -143,13 +143,13 @@ class SubAccountsController < ApplicationController
       if can_manage_sis
         @sub_account.sis_source_id = params[:account][:sis_account_id]
       else
-        return render json: { message: I18n.t("user not authorized to manage SIS data - account[sis_account_id]") }, status: 401
+        return render json: { message: I18n.t("user not authorized to manage SIS data - account[sis_account_id]") }, status: :unauthorized
       end
     end
     if @sub_account.save
       render :json => account_json(@sub_account, @current_user, session, [])
     else
-      render :json => @sub_account.errors, status: 400
+      render :json => @sub_account.errors, status: :bad_request
     end
   end
 
@@ -159,7 +159,7 @@ class SubAccountsController < ApplicationController
     if @sub_account.update(account_params)
       render :json => account_json(@sub_account, @current_user, session, [])
     else
-      render :json => @sub_account.errors, status: 400
+      render :json => @sub_account.errors, status: :bad_request
     end
   end
 
@@ -171,13 +171,13 @@ class SubAccountsController < ApplicationController
   def destroy
     @sub_account = subaccount_or_self(params[:id])
     if @sub_account.associated_courses.not_deleted.exists?
-      return render json: { message: I18n.t("You can't delete a sub-account that has courses in it.") }, status: 409
+      return render json: { message: I18n.t("You can't delete a sub-account that has courses in it.") }, status: :conflict
     end
     if @sub_account.sub_accounts.exists?
-      return render json: { message: I18n.t("You can't delete a sub-account that has sub-accounts in it.") }, status: 409
+      return render json: { message: I18n.t("You can't delete a sub-account that has sub-accounts in it.") }, status: :conflict
     end
     if @sub_account.root_account?
-      return render json: { message: I18n.t("You can't delete a root_account.") }, status: 401
+      return render json: { message: I18n.t("You can't delete a root_account.") }, status: :unauthorized
     end
 
     @sub_account.destroy

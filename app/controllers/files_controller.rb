@@ -487,7 +487,7 @@ class FilesController < ApplicationController
     get_context
     @attachment = @context ? @context.attachments.not_deleted.find_by(id: params[:id]) : Attachment.not_deleted.find_by(id: params[:id])
     unless @attachment
-      render json: { errors: [{ message: "The specified resource does not exist." }] }, status: 404
+      render json: { errors: [{ message: "The specified resource does not exist." }] }, status: :not_found
       return
     end
     params[:include] = Array(params[:include])
@@ -525,7 +525,7 @@ class FilesController < ApplicationController
       if @attachment.deleted?
         if @current_user.nil? || @attachment.user_id != @current_user.id
           @not_found_message = t('could_not_find_file', "This file has been deleted")
-          render status: 404, template: "shared/errors/404_message", formats: [:html]
+          render status: :not_found, template: "shared/errors/404_message", formats: [:html]
           return
         end
         flash[:notice] = t 'notices.deleted', "The file %{display_name} has been deleted", display_name: @attachment.display_name

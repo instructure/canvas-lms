@@ -808,7 +808,7 @@ class AssignmentsApiController < ApplicationController
 
       if params[:assignment_ids]
         if params[:assignment_ids].length > Api.max_per_page
-          return render json: { message: "Request contains too many assignment_ids.  Limit #{Api.max_per_page}" }, status: 400
+          return render json: { message: "Request contains too many assignment_ids.  Limit #{Api.max_per_page}" }, status: :bad_request
         end
 
         scope = scope.where(id: params[:assignment_ids])
@@ -834,7 +834,7 @@ class AssignmentsApiController < ApplicationController
 
       if params[:assignment_ids] && assignments.length != params[:assignment_ids].length
         invalid_ids = params[:assignment_ids] - assignments.map(&:id).map(&:to_s)
-        return render json: { message: "Invalid assignment_ids: #{invalid_ids.join(',')}" }, status: 400
+        return render json: { message: "Invalid assignment_ids: #{invalid_ids.join(',')}" }, status: :bad_request
       end
 
       submissions = submissions_hash(include_params, assignments, submissions_for_user)

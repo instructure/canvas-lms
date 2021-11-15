@@ -214,7 +214,7 @@ class ContextModulesController < ApplicationController
           end
         end
       end
-      render status: 404, template: 'shared/errors/404_message'
+      render status: :not_found, template: 'shared/errors/404_message'
     end
   end
 
@@ -254,11 +254,11 @@ class ContextModulesController < ApplicationController
             return_to: params[:return_to]
           )
         else
-          render status: 404, template: 'shared/errors/404_message'
+          render status: :not_found, template: 'shared/errors/404_message'
         end
       end
     else
-      render status: 404, template: 'shared/errors/404_message'
+      render status: :not_found, template: 'shared/errors/404_message'
     end
   end
 

@@ -322,7 +322,7 @@ class ContextModuleItemsApiController < ApplicationController
           @tag.context_module_action(@current_user, :read)
           redirect_to @tag.url
         else
-          render(:status => 400, :json => { :message => "incorrect module item type" })
+          render(:status => :bad_request, :json => { :message => "incorrect module item type" })
         end
       end
     end
@@ -412,7 +412,7 @@ class ContextModuleItemsApiController < ApplicationController
       elsif @tag
         render :json => @tag.errors, :status => :bad_request
       else
-        render :status => 400, :json => { :message => t(:invalid_content, "Could not find content") }
+        render :status => :bad_request, :json => { :message => t(:invalid_content, "Could not find content") }
       end
     end
   end
@@ -729,7 +729,7 @@ class ContextModuleItemsApiController < ApplicationController
         )
         render json: json
       else
-        render :status => 400, :json => { :message => t("Item cannot be duplicated") }
+        render :status => :bad_request, :json => { :message => t("Item cannot be duplicated") }
       end
     end
   end
