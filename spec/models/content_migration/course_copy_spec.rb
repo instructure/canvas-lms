@@ -842,5 +842,13 @@ describe ContentMigration do
       page_to = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
       expect(page_to.body).to eq(body % @copy_to.id.to_s)
     end
+
+    it "copies over late policy" do
+      @copy_from.create_late_policy!(missing_submission_deduction_enabled: true, late_submission_deduction: 15.0, late_submission_interval: 'day')
+      run_course_copy
+
+      new_late_policy = @copy_to.late_policy
+      expect(new_late_policy.missing_submission_deduction_enabled).to be_truthy
+    end
   end
 end

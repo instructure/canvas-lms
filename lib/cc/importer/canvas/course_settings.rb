@@ -51,6 +51,7 @@ module CC::Importer::Canvas
       @course[:pace_plans] = convert_pace_plans(settings_doc(PACE_PLANS))
       @course[:rubrics] = convert_rubrics(settings_doc(RUBRICS))
       @course[:calendar_events] = convert_events(settings_doc(EVENTS))
+      @course[:late_policy] = convert_late_policy(settings_doc(LATE_POLICY))
     end
 
     def convert_course_settings(doc)
@@ -210,6 +211,23 @@ module CC::Importer::Canvas
       end
 
       events
+    end
+
+    def convert_late_policy(doc)
+      late_policy = {}
+      return late_policy unless doc
+
+      late_policy_node = doc.at_css('late_policy')
+      late_policy['migration_id'] = late_policy_node['identifier']
+      late_policy['missing_submission_deduction_enabled'] = get_bool_val(late_policy_node, 'missing_submission_deduction_enabled')
+      late_policy['missing_submission_deduction'] = get_node_val(late_policy_node, 'missing_submission_deduction')
+      late_policy['late_submission_deduction_enabled'] = get_bool_val(late_policy_node, 'late_submission_deduction_enabled')
+      late_policy['late_submission_deduction'] = get_node_val(late_policy_node, 'late_submission_deduction')
+      late_policy['late_submission_interval'] = get_node_val(late_policy_node, 'late_submission_interval')
+      late_policy['late_submission_minimum_percent_enabled'] = get_bool_val(late_policy_node, 'late_submission_minimum_percent_enabled')
+      late_policy['late_submission_minimum_percent'] = get_node_val(late_policy_node, 'late_submission_minimum_percent')
+
+      late_policy
     end
   end
 end
