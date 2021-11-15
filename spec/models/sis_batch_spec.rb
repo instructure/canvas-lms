@@ -969,8 +969,8 @@ test_4,TC 104,Test Course 104,,term1,active
       expect(batch.parallel_importers.count).to eq 1
       expect(batch.parallel_importers.completed.count).to eq 1
       # test_1 should not have been toched by this last batch, since it was diff'd out
-      expect(@account.courses.find_by_sis_source_id('test_1').sis_batch_id).to eq b1.id
-      expect(@account.courses.find_by_sis_source_id('test_4').sis_batch_id).to eq batch.id
+      expect(@account.courses.find_by(sis_source_id: 'test_1').sis_batch_id).to eq b1.id
+      expect(@account.courses.find_by(sis_source_id: 'test_4').sis_batch_id).to eq batch.id
 
       # check the generated csv file, inside the new attached zip
       zip = Zip::File.open(batch.generated_diff.open.path)

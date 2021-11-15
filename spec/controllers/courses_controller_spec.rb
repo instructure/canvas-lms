@@ -2007,7 +2007,7 @@ describe CoursesController do
       expect(response).to be_successful
       @course.reload
       expect(@course.students.map(&:name)).to include("Sam")
-      expect(@course.student_enrollments.find_by_role_id(role.id)).to_not be_nil
+      expect(@course.student_enrollments.find_by(role_id: role.id)).to_not be_nil
     end
 
     it "allows TAs to enroll Observers (by default)" do

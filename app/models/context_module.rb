@@ -639,7 +639,7 @@ class ContextModule < ActiveRecord::Base
     when "wiki_page", "page"
       item = opts[:wiki_page] || self.context.wiki_pages.where(id: params[:id]).first
     when "attachment", "file"
-      item = opts[:attachment] || self.context.attachments.not_deleted.find_by_id(params[:id])
+      item = opts[:attachment] || self.context.attachments.not_deleted.find_by(id: params[:id])
     when "assignment"
       item = opts[:assignment] || self.context.assignments.active.where(id: params[:id]).first
       item = item.submittable_object if item.respond_to?(:submittable_object) && item.submittable_object

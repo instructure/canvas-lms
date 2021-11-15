@@ -48,7 +48,7 @@ describe "Roles API", type: :request do
       json = api_call(:post, "/api/v1/accounts/#{account.id}/roles",
                       { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => account.id.to_s },
                       parameters)
-      @role = Role.find_by_id(json["id"])
+      @role = Role.find_by(id: json["id"])
       json
     end
 
@@ -199,7 +199,7 @@ describe "Roles API", type: :request do
                                            'send_messages' => { 'explicit' => 'on', 'locked' => 'yes', 'enabled' => 'off' } } })
       @account.reload
 
-      role = Role.find_by_id(json['id'])
+      role = Role.find_by(id: json['id'])
       overrides = @account.role_overrides.where(:role_id => role.id).index_by(&:permission)
       expect(overrides['read_forum'].enabled).to be_truthy
       expect(overrides['read_forum'].locked).to be_falsey
@@ -435,7 +435,7 @@ describe "Roles API", type: :request do
                           restricted_permission => { :explicit => '1', :enabled => '1' }
                         } })
 
-      @role = Role.find_by_id(json["id"])
+      @role = Role.find_by(id: json["id"])
 
       expect(@account.role_overrides.reload.size).to eq @initial_count + 1 # not 2
       override = @account.role_overrides.where(:permission => restricted_permission, :role_id => @role.id).first
@@ -712,7 +712,7 @@ describe "Roles API", type: :request do
                         { :controller => 'role_overrides', :action => 'add_role', :format => 'json', :account_id => @account.id.to_s },
                         { :role => role_name, :base_role_type => 'StudentEnrollment' })
 
-        role = Role.find_by_id(json["id"])
+        role = Role.find_by(id: json["id"])
         @path = "/api/v1/accounts/#{@account.id}/roles/#{role.id}"
         @path_options[:id] = role.id
         @permissions[:permissions][:read_question_banks][:enabled] = 1

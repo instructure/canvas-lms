@@ -89,7 +89,7 @@ class JobsController < ApplicationController
     case flavor
     when 'id'
       jobs = []
-      jobs << Delayed::Job.find_by_id(params[:q]) if params[:q].present?
+      jobs << Delayed::Job.find_by(id: params[:q]) if params[:q].present?
       jobs = jobs.compact
       jobs_count = jobs.size
     when 'future', 'current', 'failed'

@@ -205,7 +205,7 @@ describe "Admins API", type: :request do
 
       it "removes a custom membership from a user" do
         api_call(:delete, @path + "?role_id=#{@role.id}", @path_opts.merge(role_id: @role.id))
-        expect(@account.account_users.active.find_by_user_id_and_role_id(@new_user.id, @role.id)).to be_nil
+        expect(@account.account_users.active.find_by(user_id: @new_user.id, role_id: @role.id)).to be_nil
       end
 
       it "still works using the deprecated role param" do

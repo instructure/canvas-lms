@@ -48,8 +48,8 @@ class MediaObject < ActiveRecord::Base
     @push_user_title = nil
   end
 
-  def self.find_by_media_id(media_id)
-    unless Rails.env.production?
+  def self.find_by(**kwargs)
+    if kwargs.key?(:media_id) && !Rails.env.production?
       raise "Do not look up MediaObjects by media_id - use the scope by_media_id instead to support migrated content."
     end
 
