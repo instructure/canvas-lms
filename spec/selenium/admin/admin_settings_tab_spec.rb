@@ -611,24 +611,6 @@ describe "admin settings tab" do
     end
   end
 
-  context 'feature flag search and filters' do
-    before do
-      user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
-      course_with_admin_logged_in(account: Account.default, user: user)
-      Account.site_admin.enable_feature!(:feature_flag_filters)
-    end
-
-    it 'allows for searching and deleting a feature flag filter ' do
-      go_to_feature_options(Account.site_admin.id)
-      select_filter_option('Pending Enforcement')
-      pending_enforcement_filter_button_selector = "button[title='Remove Pending Enforcement']"
-
-      expect(f(pending_enforcement_filter_button_selector)).to be_displayed
-      f(pending_enforcement_filter_button_selector).click
-      expect(element_exists?(pending_enforcement_filter_button_selector)).to be_falsey
-    end
-  end
-
   context "Canvas for Elementary (enable_as_k5_mode) setting", ignore_js_errors: true do
     before :once do
       @account = Account.default

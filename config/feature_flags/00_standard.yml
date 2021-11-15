@@ -22,6 +22,7 @@ analytics_2:
       to ON. For full details, please see the *New Analytics user group* in the Canvas
       Community.
   after_state_change_proc: analytics_2_after_state_change_hook
+  beta: true
 anonymous_instructor_annotations:
   type: setting
   state: allowed
@@ -44,7 +45,6 @@ common_cartridge_page_conversion:
   description: If enabled, Common Cartridge importers will convert HTML files into
     Pages
   applies_to: Course
-  beta: true
 commons_favorites:
   state: hidden
   applies_to: RootAccount
@@ -103,7 +103,6 @@ disable_lti_post_only:
     an LTI launch.
   applies_to: RootAccount
   root_opt_in: true
-  beta: true
 embedded_release_notes:
   type: setting
   state: allowed_on
@@ -111,7 +110,6 @@ embedded_release_notes:
   description: Show Instructure-provided release notes filtered by user role in the
     Help Menu. Available to users with admin, teacher (instructor), and observer
     roles. Applicable features for student roles are included in observer notes.
-  pending_enforcement: true
   applies_to: Account
 encrypted_sourcedids:
   type: setting
@@ -208,7 +206,6 @@ javascript_csp:
   description: Enable the Security tab on the settings page to adjust CSP settings
   applies_to: RootAccount
   root_opt_in: true
-  beta: true
   environments:
     production:
       state: hidden
@@ -228,7 +225,6 @@ lti2_rereg:
   description: Enable reregistration for LTI 2
   applies_to: RootAccount
   root_opt_in: true
-  beta: true
 membership_service_for_lti_tools:
   state: hidden
   display_name: Membership Service Configuration
@@ -265,7 +261,6 @@ new_sis_integrations:
       setting and will be enabled by default.
   applies_to: Account
   root_opt_in: true
-  beta: true
 new_user_tutorial:
   type: setting
   state: allowed
