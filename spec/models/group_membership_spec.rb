@@ -339,7 +339,7 @@ describe GroupMembership do
       @membership.group = @group
       @group.group_category = @group_category
 
-      @assignments = 3.times.map { assignment_model(:course => @course) }
+      @assignments = Array.new(3) { assignment_model(:course => @course) }
       @assignments.last.group_category = nil
       @assignments.last.save!
     end

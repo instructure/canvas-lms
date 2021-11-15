@@ -2291,7 +2291,7 @@ describe User do
     end
 
     it "breaks ties with user id" do
-      ids = 5.times.map { User.create!(:name => "Abcde").id }.sort
+      ids = Array.new(5) { User.create!(:name => "Abcde").id }.sort
       expect(User.order_by_sortable_name.where(id: ids).map(&:id)).to eq(ids)
     end
 

@@ -61,7 +61,7 @@ describe Outcomes::ResultAnalytics do
       course_with_student
 
       names = %w[Gamma Alpha Beta]
-      @students = create_users(3.times.map { |i| { name: "User #{i + 1}", sortable_name: "#{names[i]}, User" } }, return_type: :record)
+      @students = create_users(Array.new(3) { |i| { name: "User #{i + 1}", sortable_name: "#{names[i]}, User" } }, return_type: :record)
 
       course_with_user('StudentEnrollment', course: @course, user: @students[0])
       course_with_user('StudentEnrollment', course: @course, user: @students[1])

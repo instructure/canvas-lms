@@ -945,22 +945,22 @@ describe AssignmentOverrideApplicator do
 
   describe "overrides_hash" do
     it "is consistent for the same overrides" do
-      overrides = 5.times.map { assignment_override_model }
+      overrides = Array.new(5) { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides)
       hash2 = AssignmentOverrideApplicator.overrides_hash(overrides)
       expect(hash1).to eq hash2
     end
 
     it "is unique for different overrides" do
-      overrides1 = 5.times.map { assignment_override_model }
-      overrides2 = 5.times.map { assignment_override_model }
+      overrides1 = Array.new(5) { assignment_override_model }
+      overrides2 = Array.new(5) { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides1)
       hash2 = AssignmentOverrideApplicator.overrides_hash(overrides2)
       expect(hash1).not_to eq hash2
     end
 
     it "is unique for different versions of the same overrides" do
-      overrides = 5.times.map { assignment_override_model }
+      overrides = Array.new(5) { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides)
       overrides.first.override_due_at(5.days.from_now)
       overrides.first.save!
@@ -969,7 +969,7 @@ describe AssignmentOverrideApplicator do
     end
 
     it "is unique for different orders of the same overrides" do
-      overrides = 5.times.map { assignment_override_model }
+      overrides = Array.new(5) { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides)
       hash2 = AssignmentOverrideApplicator.overrides_hash(overrides.reverse)
       expect(hash1).not_to eq hash2

@@ -29,9 +29,9 @@ module Canvas
       record.errors.add attr, "repeated" if policy[:max_repeats] && value =~ /(.)\1{#{policy[:max_repeats]},}/
       # long sequence/run of chars
       if policy[:max_sequence]
-        candidates = (value.length - policy[:max_sequence]).times.map { |i|
+        candidates = Array.new(value.length - policy[:max_sequence]) do |i|
           Regexp.new(Regexp.escape(value[i, policy[:max_sequence] + 1]))
-        }
+        end
         record.errors.add attr, "sequence" if candidates.any? { |candidate| SEQUENCES.grep(candidate).present? }
       end
     end

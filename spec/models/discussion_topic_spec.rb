@@ -2603,7 +2603,7 @@ describe DiscussionTopic do
         end
 
         it "properly sorts collections by delayed_post_at and posted_at" do
-          anns = 10.times.map do |i|
+          anns = Array.new(10) do |i|
             ann = new_ann.call
             setter = [:delayed_post_at=, :posted_at=][i % 2]
             ann.send(setter, i.days.ago)

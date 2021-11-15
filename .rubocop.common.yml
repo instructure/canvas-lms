@@ -83,6 +83,8 @@ Performance/StringInclude:
   Severity: error
 Performance/StringReplacement:
   Severity: error
+Performance/TimesMap:
+  Severity: error
 
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord

@@ -71,10 +71,10 @@ describe Api::V1::AssignmentOverride do
       course_with_teacher(active_all: true)
       @a = assignment_model(course: @course, group_category: 'category1')
       @b = assignment_model(course: @course, group_category: 'category2')
-      @a1, @a2 = 2.times.map do
+      @a1, @a2 = Array.new(2) do
         create_section_override_for_assignment @a, course_section: @course.course_sections.create!
       end
-      @b1, @b2, @b3 = 2.times.map do
+      @b1, @b2, @b3 = Array.new(2) do
         create_section_override_for_assignment @b, course_section: @course.course_sections.create!
       end
     end

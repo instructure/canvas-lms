@@ -2011,7 +2011,7 @@ describe DiscussionTopicsController do
       @course.announcements.create!(message: 'asdf')
       course_topic
 
-      topics = 3.times.map { course_topic(pinned: true) }
+      topics = Array.new(3) { course_topic(pinned: true) }
       expect(topics.map(&:position)).to eq [1, 2, 3]
       t1, t2, _ = topics
       post 'reorder', params: { :course_id => @course.id, :order => "#{t2.id},#{t1.id}" }, :format => 'json'

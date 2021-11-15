@@ -315,7 +315,7 @@ describe ConversationMessage do
     end
 
     it "replies only to the message author on conversations2 conversations" do
-      users = 3.times.map { course_with_student(course: @course).user }
+      users = Array.new(3) { course_with_student(course: @course).user }
       conversation = Conversation.initiate(users, false, :context_type => 'Course', :context_id => @course.id)
       conversation.add_message(users[0], "initial message", :root_account_id => Account.default.id)
       cm2 = conversation.add_message(users[1], "subsequent message", :root_account_id => Account.default.id)

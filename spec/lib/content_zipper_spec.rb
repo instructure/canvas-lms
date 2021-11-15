@@ -205,11 +205,11 @@ describe ContentZipper do
     it "only includes one submission per group" do
       teacher_in_course active_all: true
       gc = @course.group_categories.create! name: "Homework Groups"
-      groups = 2.times.map { |i| gc.groups.create! name: "Group #{i}", context: @course }
-      students = 4.times.map {
+      groups = Array.new(2) { |i| gc.groups.create! name: "Group #{i}", context: @course }
+      students = Array.new(4) do
         student_in_course(active_all: true)
         @student
-      }
+      end
       students.each_with_index { |s, i| groups[i % groups.size].add_user(s) }
       a = @course.assignments.create! group_category_id: gc.id,
                                       grade_group_students_individually: false,
