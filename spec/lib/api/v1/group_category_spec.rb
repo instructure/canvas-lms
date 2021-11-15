@@ -40,7 +40,7 @@ describe "Api::V1::GroupCategory" do
     describe 'groups_count' do
       it 'is absent without the includes' do
         json = CategoryHarness.new.group_category_json(category, nil, nil, {})
-        expect(json.keys.include?("groups_count")).to be(false)
+        expect(json.key?("groups_count")).to be(false)
       end
 
       it 'is present with the includes' do
@@ -53,7 +53,7 @@ describe "Api::V1::GroupCategory" do
     describe 'progress_url' do
       it 'is absent without the includes' do
         json = CategoryHarness.new.group_category_json(category, nil, nil, {})
-        expect(json.keys.include?("progress")).to be(false)
+        expect(json.key?("progress")).to be(false)
       end
 
       it 'is present with the includes' do

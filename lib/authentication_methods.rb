@@ -241,9 +241,9 @@ module AuthenticationMethods
       request_become_user = nil
       if params[:become_user_id]
         request_become_user = User.where(id: params[:become_user_id]).first
-      elsif params.keys.include?('me')
+      elsif params.key?('me')
         request_become_user = @current_user
-      elsif params.keys.include?('become_teacher')
+      elsif params.key?('become_teacher')
         course = Course.find(params[:course_id] || params[:id]) rescue nil
         teacher = course.teachers.first if course
         if teacher
@@ -251,7 +251,7 @@ module AuthenticationMethods
         else
           flash[:error] = I18n.t('lib.auth.errors.teacher_not_found', "No teacher found")
         end
-      elsif params.keys.include?('become_student')
+      elsif params.key?('become_student')
         course = Course.find(params[:course_id] || params[:id]) rescue nil
         student = course.students.first if course
         if student

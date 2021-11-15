@@ -48,8 +48,8 @@ describe BrandConfig do
     end
 
     it "inherits effective_variables from its parent" do
-      expect(@subaccount_bc.variables.keys.include?("ic-brand-global-nav-bgd")).to be_truthy
-      expect(@subaccount_bc.variables.keys.include?("ic-brand-primary")).to be_falsey
+      expect(@subaccount_bc.variables.key?("ic-brand-global-nav-bgd")).to be_truthy
+      expect(@subaccount_bc.variables.key?("ic-brand-primary")).to be_falsey
 
       expect(@subaccount_bc.effective_variables["ic-brand-global-nav-bgd"]).to eq "#123"
       expect(@subaccount_bc.effective_variables["ic-brand-primary"]).to eq "#321"

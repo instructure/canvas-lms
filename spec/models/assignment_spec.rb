@@ -7581,6 +7581,8 @@ describe Assignment do
   end
 
   describe "basic validation" do
+    # rubocop:disable Performance/InefficientHashSearch
+    # ActiveModel::BetterErrors::Errors does not respond to #key?
     describe "possible points" do
       it "does not allow a negative value" do
         assignment = Assignment.new(points_possible: -1)
@@ -7619,6 +7621,7 @@ describe Assignment do
         expect(assignment.errors.keys.include?(:points_possible)).to be_falsey
       end
     end
+    # rubocop:enable Performance/InefficientHashSearch
   end
 
   describe '#a2_enabled?' do

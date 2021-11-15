@@ -3933,7 +3933,7 @@ class Course < ActiveRecord::Base
 
   def apply_overridden_course_visibility(visibility)
     self.overridden_course_visibility = if !['institution', 'public', 'course'].include?(visibility) &&
-                                           self.root_account.available_course_visibility_override_options.keys.include?(visibility)
+                                           self.root_account.available_course_visibility_override_options.key?(visibility)
                                           visibility
                                         else
                                           nil

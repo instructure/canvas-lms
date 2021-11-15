@@ -57,7 +57,7 @@ describe CanvasHttp::CircuitBreaker do
       end
 
       def setnx(key, value)
-        @state[key] = value unless @state.keys.include?(key)
+        @state[key] = value unless @state.key?(key)
       end
 
       def setex(key, ttl, value)

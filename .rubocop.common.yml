@@ -77,6 +77,8 @@ Performance/Count:
   Severity: error
 Performance/Detect:
   Severity: error
+Performance/InefficientHashSearch:
+  Severity: error
 Performance/MapCompact:
   Severity: error
 Performance/RedundantMerge:

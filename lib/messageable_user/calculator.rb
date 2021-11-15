@@ -296,7 +296,7 @@ class MessageableUser
       # skipping messageability constraints, do I see the user in that specific
       # course, and if so with which enrollment type(s)?
       if include_course_id && (course = Course.where(id: include_course_id).first)
-        missing_users = users.reject { |user| user.global_common_courses.keys.include?(course.global_id) }
+        missing_users = users.reject { |user| user.global_common_courses.key?(course.global_id) }
         if missing_users.present?
           course.shard.activate do
             reverse_lookup = missing_users.index_by(&:id)
@@ -349,7 +349,7 @@ class MessageableUser
       # skipping messageability constraints, do I see the user in that specific
       # group?
       if include_group_id && (group = Group.where(id: include_group_id).first)
-        missing_users = users.reject { |user| user.global_common_groups.keys.include?(group.global_id) }
+        missing_users = users.reject { |user| user.global_common_groups.key?(group.global_id) }
         if missing_users.present?
           group.shard.activate do
             reverse_lookup = missing_users.index_by(&:id)
