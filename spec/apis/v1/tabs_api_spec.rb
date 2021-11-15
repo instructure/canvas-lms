@@ -883,7 +883,7 @@ describe TabsController, type: :request do
                                                                               :format => 'json', :hidden => false })
       expect(json['hidden']).to be_nil
       expect(@course.reload.tab_configuration[json['position'] - 1]['hidden']).to be_nil
-      expect(@course.reload.tab_configuration.select { |t| t['hidden'] }.count).to eql(tools.count - 1)
+      expect(@course.reload.tab_configuration.count { |t| t['hidden'] }).to eql(tools.count - 1)
     end
 
     it 'allows updating new tabs not in the configuration yet' do

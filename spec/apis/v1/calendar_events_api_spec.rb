@@ -557,7 +557,7 @@ describe CalendarEventsApiController, type: :request do
           expect(ejson.keys).to include 'child_events'
           expect(ejson['child_events'].size).to eql ejson['child_events_count']
           expect(ejson['child_events'].size).to eql 3
-          expect(ejson['child_events'].select { |e| e['url'] }.size).to eql 1
+          expect(ejson['child_events'].count { |e| e['url'] }).to eql 1
           own_reservation = ejson['child_events'].select { |e| e['own_reservation'] }
           expect(own_reservation.size).to eql 1
           expect(own_reservation.first.keys).to match_array((expected_reservation_fields + ['own_reservation', 'user']))

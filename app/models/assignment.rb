@@ -3884,7 +3884,7 @@ class Assignment < ActiveRecord::Base
 
     if AssignmentUtil.due_date_required?(self)
       overrides = gather_override_data(overrides)
-      if overrides.select { |o| !!o[:due_at_overridden] && o[:due_at].blank? && o[:workflow_state] != 'deleted' }.length > 0
+      if overrides.count { |o| !!o[:due_at_overridden] && o[:due_at].blank? && o[:workflow_state] != 'deleted' } > 0
         errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
         return false
       end

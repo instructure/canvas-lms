@@ -88,7 +88,7 @@ describe CourseLinkValidator do
       :wiki_page => page.title
     }
     type_names.each do |type, name|
-      expect(issues.select { |issue| issue[:type] == type }.count).to eq(1)
+      expect(issues.count { |issue| issue[:type] == type }).to eq(1)
       expect(issues.detect { |issue| issue[:type] == type }[:name]).to eq(name)
     end
   end
