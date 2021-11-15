@@ -83,6 +83,7 @@ module CC
     EXTERNAL_FEEDS = "external_feeds.xml"
     GRADING_STANDARDS = "grading_standards.xml"
     EVENTS = "events.xml"
+    LATE_POLICY = "late_policy.xml"
     LEARNING_OUTCOMES = "learning_outcomes.xml"
     MANIFEST = 'imsmanifest.xml'
     MODULE_META = "module_meta.xml"

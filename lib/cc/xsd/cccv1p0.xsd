@@ -139,6 +139,7 @@
         </xs:element>
         <xs:element name="root_account_uuid" type="xs:string" minOccurs="0"/>
         <xs:element name="default_post_policy" type="postPolicyType" minOccurs="0"/>
+        <xs:element name="late_policy" type="latePolicyType" minOccurs="0"/>
       </xs:all>
       <xs:attribute name="identifier" type="xs:ID" use="required"/>
     </xs:complexType>
@@ -869,5 +870,17 @@
       </xs:all>
     </xs:complexType>
   </xs:element>
+
+  <xs:complexType name="latePolicyType">
+    <xs:all minOccurs="0" maxOccurs="1">
+      <xs:element name="missing_submission_deduction_enabled" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="missing_submission_deduction" type="optional_float" minOccurs="0"/>
+      <xs:element name="late_submission_deduction_enabled" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="late_submission_deduction" type="optional_float" minOccurs="0"/>
+      <xs:element name="late_submission_interval" type="xs:string" minOccurs="0"/>
+      <xs:element name="late_submission_minimum_percent_enabled" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="late_submission_minimum_percent" type="optional_float" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
 
 </xs:schema>

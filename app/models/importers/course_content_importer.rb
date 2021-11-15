@@ -90,7 +90,6 @@ module Importers
 
       Importers.disable_live_events! do
         Importers::ContentImporterHelper.add_assessment_id_prepend(course, data, migration)
-
         course.full_migration_hash = data
         course.external_url_hash = {}
         course.migration_results = []
@@ -177,6 +176,7 @@ module Importers
         Importers::CalendarEventImporter.process_migration(data, migration)
         Importers::LtiResourceLinkImporter.process_migration(data, migration)
         Importers::PacePlanImporter.process_migration(data, migration)
+        Importers::LatePolicyImporter.process_migration(data, migration)
 
         everything_selected = !migration.copy_options || migration.is_set?(migration.copy_options[:everything])
         if everything_selected || migration.is_set?(migration.copy_options[:all_course_settings])
