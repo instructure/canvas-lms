@@ -26,7 +26,7 @@ class ExternalFeedEntry < ActiveRecord::Base
   belongs_to :asset, polymorphic: [:discussion_topic]
 
   before_save :infer_defaults
-  validates_presence_of :external_feed_id, :workflow_state
+  validates :external_feed_id, :workflow_state, presence: true
   validates :title, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
   validates :message, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
   validates :source_url, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }

@@ -52,11 +52,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   belongs_to :root_account, class_name: 'Account'
   has_many :ignores, :as => :asset
 
-  validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
-  validates_presence_of :context_id
-  validates_presence_of :context_type
-  validates_numericality_of :points_possible, less_than_or_equal_to: 2000000000, allow_nil: true
+  validates :description, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
+  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :context_id, presence: true
+  validates :context_type, presence: true
+  validates :points_possible, numericality: { less_than_or_equal_to: 2000000000, allow_nil: true }
   validate :validate_quiz_type, :if => :quiz_type_changed?
   validate :validate_ip_filter, :if => :ip_filter_changed?
   validate :validate_hide_results, :if => :hide_results_changed?

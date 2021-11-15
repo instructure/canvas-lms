@@ -27,8 +27,8 @@ class WikiPage < ActiveRecord::Base
   attr_readonly :wiki_id
   attr_accessor :saved_by
 
-  validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
-  validates_presence_of :wiki_id
+  validates :body, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
+  validates :wiki_id, presence: true
   include Canvas::SoftDeletable
   include HasContentTags
   include CopyAuthorizedLinks

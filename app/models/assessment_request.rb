@@ -31,7 +31,7 @@ class AssessmentRequest < ActiveRecord::Base
   has_many :submission_comments, -> { published }
   has_many :ignores, dependent: :destroy, as: :asset
   belongs_to :rubric_assessment
-  validates_presence_of :user_id, :asset_id, :asset_type, :workflow_state
+  validates :user_id, :asset_id, :asset_type, :workflow_state, presence: true
 
   before_save :infer_uuid
   after_save :delete_ignores

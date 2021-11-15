@@ -50,7 +50,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   before_save :create_assessment_question, unless: :generated?
   before_destroy :delete_assessment_question, unless: :generated?
   before_destroy :update_quiz
-  validates_presence_of :quiz_id
+  validates :quiz_id, presence: true
   serialize :question_data
   after_save :update_quiz
 

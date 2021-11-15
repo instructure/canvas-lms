@@ -60,11 +60,11 @@ class Role < ActiveRecord::Base
   before_validation :infer_root_account_id, :if => :belongs_to_account?
 
   validate :ensure_unique_name_for_account, :if => :belongs_to_account?
-  validates_presence_of :name, :workflow_state
-  validates_presence_of :account_id, :if => :belongs_to_account?
+  validates :name, :workflow_state, presence: true
+  validates :account_id, presence: { :if => :belongs_to_account? }
 
-  validates_inclusion_of :base_role_type, :in => BASE_TYPES, :message => 'is invalid'
-  validates_exclusion_of :name, :in => KNOWN_TYPES, :unless => :built_in?, :message => 'is reserved'
+  validates :base_role_type, inclusion: { :in => BASE_TYPES, :message => 'is invalid' }
+  validates :name, exclusion: { :in => KNOWN_TYPES, :unless => :built_in?, :message => 'is reserved' }
   validate :ensure_non_built_in_name
 
   def role_for_root_account_id(target_root_account_id)

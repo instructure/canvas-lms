@@ -30,9 +30,9 @@ class Announcement < DiscussionTopic
   before_save :infer_content
   before_save :respect_context_lock_rules
   after_save :create_alert
-  validates_presence_of :context_id
-  validates_presence_of :context_type
-  validates_presence_of :message
+  validates :context_id, presence: true
+  validates :context_type, presence: true
+  validates :message, presence: true
 
   acts_as_list scope: { context: self, type: 'Announcement' }
 

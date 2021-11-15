@@ -414,8 +414,8 @@ class Attachment < ActiveRecord::Base
   after_create :flag_as_recently_created
   attr_accessor :recently_created
 
-  validates_presence_of :context_id, :context_type, :workflow_state
-  validates_length_of :content_type, :maximum => maximum_string_length, :allow_blank => true
+  validates :context_id, :context_type, :workflow_state, presence: true
+  validates :content_type, length: { :maximum => maximum_string_length, :allow_blank => true }
 
   # related_attachments: our root attachment, anyone who shares our root attachment,
   # and anyone who calls us a root attachment

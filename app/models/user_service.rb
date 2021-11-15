@@ -24,7 +24,7 @@ class UserService < ActiveRecord::Base
   belongs_to :user
   attr_reader :password
 
-  validates_presence_of :user_id, :service, :service_user_id, :workflow_state
+  validates :user_id, :service, :service_user_id, :workflow_state, presence: true
 
   before_save :infer_defaults
   after_save :assert_relations

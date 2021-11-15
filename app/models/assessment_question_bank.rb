@@ -29,7 +29,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   has_many :quiz_groups, class_name: 'Quizzes::QuizGroup'
   before_save :infer_defaults
   after_save :update_alignments
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
+  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true }
   resolves_root_account through: :context
 
   include MasterCourses::Restrictor

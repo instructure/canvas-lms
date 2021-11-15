@@ -34,9 +34,9 @@ class Rubric < ActiveRecord::Base
   has_many :rubric_assessments, :through => :rubric_associations, :dependent => :destroy
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
 
-  validates_presence_of :context_id, :context_type, :workflow_state
-  validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false
+  validates :context_id, :context_type, :workflow_state, presence: true
+  validates :description, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
+  validates :title, length: { :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false }
 
   before_validation :default_values
   before_create :set_root_account_id

@@ -34,7 +34,7 @@ class AccountUser < ActiveRecord::Base
   after_destroy :update_account_associations_later
 
   validate :valid_role?, :unless => :deleted?
-  validates_presence_of :account_id, :user_id, :role_id
+  validates :account_id, :user_id, :role_id, presence: true
 
   resolves_root_account through: :account
   include Role::AssociationHelper

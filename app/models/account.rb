@@ -174,7 +174,7 @@ class Account < ActiveRecord::Base
   alias_method :time_zone, :default_time_zone
 
   validates_locale :default_locale, :allow_nil => true
-  validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
+  validates :name, length: { :maximum => maximum_string_length, :allow_blank => true }
   validate :account_chain_loop, :if => :parent_account_id_changed?
   validate :validate_auth_discovery_url
   validates :workflow_state, presence: true

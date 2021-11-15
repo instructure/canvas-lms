@@ -30,12 +30,12 @@ class WebConference < ActiveRecord::Base
   has_many :attendees, -> { where(web_conference_participants: { participation_type: 'attendee' }) }, through: :web_conference_participants, source: :user
   belongs_to :user
 
-  validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_presence_of :conference_type, :title, :context_id, :context_type, :user_id
+  validates :description, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
+  validates :conference_type, :title, :context_id, :context_type, :user_id, presence: true
   validate :lti_tool_valid, if: -> { conference_type == 'LtiConference' }
 
   MAX_DURATION = 99999999
-  validates_numericality_of :duration, :less_than_or_equal_to => MAX_DURATION, :allow_nil => true
+  validates :duration, numericality: { :less_than_or_equal_to => MAX_DURATION, :allow_nil => true }
 
   before_validation :infer_conference_details
 

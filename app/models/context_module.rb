@@ -46,8 +46,8 @@ class ContextModule < ActiveRecord::Base
   after_save :relock_warning_check
   after_save :clear_discussion_stream_items
   after_save :send_items_to_stream
-  validates_presence_of :workflow_state, :context_id, :context_type
-  validates_presence_of :name, :if => :require_presence_of_name
+  validates :workflow_state, :context_id, :context_type, presence: true
+  validates :name, presence: { :if => :require_presence_of_name }
   attr_accessor :require_presence_of_name
 
   def relock_warning_check

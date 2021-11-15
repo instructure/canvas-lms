@@ -27,7 +27,7 @@ class NotificationEndpoint < ActiveRecord::Base
 
   belongs_to :access_token
 
-  validates_presence_of :token, :access_token
+  validates :token, :access_token, presence: true
 
   before_create :create_platform_endpoint
   after_destroy :delete_platform_endpoint

@@ -26,7 +26,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
 
   before_create :set_root_account_id
 
-  validates_presence_of :discussion_entry_id, :user_id, :workflow_state
+  validates :discussion_entry_id, :user_id, :workflow_state, presence: true
   validate :prevent_creates
 
   validates :report_type, inclusion: { in: %w(inappropriate offensive other),

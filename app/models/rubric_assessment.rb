@@ -37,7 +37,7 @@ class RubricAssessment < ActiveRecord::Base
 
   simply_versioned
 
-  validates_presence_of :assessment_type, :rubric_id, :artifact_id, :artifact_type, :assessor_id
+  validates :assessment_type, :rubric_id, :artifact_id, :artifact_type, :assessor_id, presence: true
 
   before_save :update_artifact_parameters
   before_save :htmlify_rating_comments

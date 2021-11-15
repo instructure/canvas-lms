@@ -43,7 +43,7 @@ class SessionPersistenceToken < ActiveRecord::Base
 
   attr_accessor :uncrypted_token
 
-  validates_presence_of :pseudonym_id, :crypted_token, :token_salt
+  validates :pseudonym_id, :crypted_token, :token_salt, presence: true
 
   def self.generate(pseudonym)
     salt = SecureRandom.hex(8)

@@ -34,7 +34,7 @@ class ContentExport < ActiveRecord::Base
 
   attr_writer :master_migration
 
-  validates_presence_of :context_id, :workflow_state
+  validates :context_id, :workflow_state, presence: true
 
   has_one :job_progress, :class_name => 'Progress', :as => :context, :inverse_of => :context
 

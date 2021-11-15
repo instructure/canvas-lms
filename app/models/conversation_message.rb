@@ -92,7 +92,7 @@ class ConversationMessage < ActiveRecord::Base
     end
   end
 
-  validates_length_of :body, :maximum => maximum_text_length
+  validates :body, length: { :maximum => maximum_text_length }
 
   has_a_broadcast_policy
   set_broadcast_policy do |p|

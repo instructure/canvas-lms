@@ -36,7 +36,7 @@ class ExternalFeed < ActiveRecord::Base
             length: { maximum: maximum_string_length }
 
   VERBOSITIES = %w(full link_only truncate).freeze
-  validates_inclusion_of :verbosity, :in => VERBOSITIES, :allow_nil => true
+  validates :verbosity, inclusion: { :in => VERBOSITIES, :allow_nil => true }
 
   def infer_defaults
     self.consecutive_failures ||= 0

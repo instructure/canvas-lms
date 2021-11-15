@@ -48,11 +48,11 @@ class Enrollment < ActiveRecord::Base
   has_many :course_account_associations, :foreign_key => 'course_id', :primary_key => 'course_id'
   has_many :scores, -> { active }
 
-  validates_presence_of :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state, :role_id
-  validates_inclusion_of :limit_privileges_to_course_section, :in => [true, false]
-  validates_inclusion_of :associated_user_id, :in => [nil],
+  validates :user_id, :course_id, :type, :root_account_id, :course_section_id, :workflow_state, :role_id, presence: true
+  validates :limit_privileges_to_course_section, inclusion: { :in => [true, false] }
+  validates :associated_user_id, inclusion: { :in => [nil],
                                               :unless => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' },
-                                              :message => "only ObserverEnrollments may have an associated_user_id"
+                                              :message => "only ObserverEnrollments may have an associated_user_id" }
   validate :cant_observe_self, :if => lambda { |enrollment| enrollment.type == 'ObserverEnrollment' }
 
   validate :valid_role?

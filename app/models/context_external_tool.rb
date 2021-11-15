@@ -34,12 +34,12 @@ class ContextExternalTool < ActiveRecord::Base
   restrict_columns :content, [:name, :description]
   restrict_columns :settings, [:consumer_key, :shared_secret, :url, :domain, :settings]
 
-  validates_presence_of :context_id, :context_type, :workflow_state
-  validates_presence_of :name, :consumer_key, :shared_secret
-  validates_length_of :name, :maximum => maximum_string_length
-  validates_presence_of :config_url, :if => lambda { |t| t.config_type == "by_url" }
-  validates_presence_of :config_xml, :if => lambda { |t| t.config_type == "by_xml" }
-  validates_length_of :domain, :maximum => 253, :allow_blank => true
+  validates :context_id, :context_type, :workflow_state, presence: true
+  validates :name, :consumer_key, :shared_secret, presence: true
+  validates :name, length: { :maximum => maximum_string_length }
+  validates :config_url, presence: { :if => lambda { |t| t.config_type == "by_url" } }
+  validates :config_xml, presence: { :if => lambda { |t| t.config_type == "by_xml" } }
+  validates :domain, length: { :maximum => 253, :allow_blank => true }
   validate :url_or_domain_is_set
   validate :validate_urls
   serialize :settings

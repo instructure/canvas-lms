@@ -33,7 +33,7 @@ class ContentTag < ActiveRecord::Base
   restrict_columns :state, [:workflow_state]
 
   belongs_to :content, polymorphic: [], exhaustive: false
-  validates_inclusion_of :content_type, :allow_nil => true, :in => CONTENT_TYPES
+  validates :content_type, inclusion: { :allow_nil => true, :in => CONTENT_TYPES }
   belongs_to :context, polymorphic:
       [:course, :learning_outcome_group, :assignment, :account,
        { quiz: 'Quizzes::Quiz' }]
@@ -51,9 +51,9 @@ class ContentTag < ActiveRecord::Base
   # This allows bypassing loading context for validation if we have
   # context_id and context_type set, but still allows validating when
   # context is not yet saved.
-  validates_presence_of :context, :unless => proc { |tag| tag.context_id && tag.context_type }
-  validates_presence_of :workflow_state
-  validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates :context, presence: { :unless => proc { |tag| tag.context_id && tag.context_type } }
+  validates :workflow_state, presence: true
+  validates :comments, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
   before_save :associate_external_tool
   before_save :default_values
   before_save :set_root_account

@@ -43,9 +43,9 @@ class CourseSection < ActiveRecord::Base
   has_many :discussion_topics, :through => :discussion_topic_section_visibilities
 
   before_validation :infer_defaults, :verify_unique_sis_source_id, :verify_unique_integration_id
-  validates_presence_of :course_id, :root_account_id, :workflow_state
-  validates_length_of :sis_source_id, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => false
-  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false
+  validates :course_id, :root_account_id, :workflow_state, presence: true
+  validates :sis_source_id, length: { :maximum => maximum_string_length, :allow_nil => true, :allow_blank => false }
+  validates :name, length: { :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false }
   validate :validate_section_dates
 
   has_many :sis_post_grades_statuses
