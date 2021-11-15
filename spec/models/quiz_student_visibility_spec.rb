@@ -79,12 +79,12 @@ describe "differentiated_assignments" do
     @section_bar = @course.course_sections.create!(:name => 'bar')
   end
 
-  def create_override_for_quiz(quiz, &block)
+  def create_override_for_quiz(quiz)
     ao = AssignmentOverride.new()
     ao.quiz = quiz
     ao.title = "Lorem"
     ao.workflow_state = "active"
-    block.call(ao)
+    yield(ao)
     ao.save!
     quiz.reload
   end

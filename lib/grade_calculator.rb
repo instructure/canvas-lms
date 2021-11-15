@@ -880,13 +880,13 @@ class GradeCalculator
     keep_helper(submissions, cant_drop, keep, max_total, keep_mode: :lowest) { |*args| big_f_worst(*args) }
   end
 
-  # @submissions: set of droppable submissions
-  # @cant_drop: submissions that are not eligible for dropping
-  # @keep: number of submissions to keep from +submissions+
-  # @max_total: the highest number of points possible
-  # @big_f_blk: sorting block for the big_f function
+  # @param submissions [Array<Submission>] set of droppable submissions
+  # @param cant_drop [Array<Submission>] submissions that are not eligible for dropping
+  # @param keep [Integer] number of submissions to keep from +submissions+
+  # @param max_total [Float] the highest number of points possible
+  # @yield sorting block for the big_f function
   # returns +keep+ +submissions+
-  def keep_helper(submissions, cant_drop, keep, max_total, keep_mode: nil, &big_f_blk)
+  def keep_helper(submissions, cant_drop, keep, max_total, keep_mode: nil)
     return submissions if submissions.size <= keep
 
     unpointed, pointed = (submissions + cant_drop).partition { |s|
@@ -918,7 +918,7 @@ class GradeCalculator
       q_low  = grades.first
       q_mid  = (q_low + q_high) / 2
 
-      x, kept = big_f_blk.call(q_mid, submissions, cant_drop, keep)
+      x, kept = yield(q_mid, submissions, cant_drop, keep)
       threshold = 1 / (2 * keep * (max_total**2))
       until q_high - q_low < threshold
         x < 0 ?
@@ -929,7 +929,7 @@ class GradeCalculator
         # bail if we can't can't ever satisfy the threshold (floats!)
         break if q_mid == q_high || q_mid == q_low
 
-        x, kept = big_f_blk.call(q_mid, submissions, cant_drop, keep)
+        x, kept = yield(q_mid, submissions, cant_drop, keep)
       end
     end
 
