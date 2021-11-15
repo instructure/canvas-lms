@@ -24,7 +24,7 @@ module LtiOutbound
 
     attr_reader :substitution_objects
 
-    def initialize()
+    def initialize
       self.substitutions = {}
     end
 
