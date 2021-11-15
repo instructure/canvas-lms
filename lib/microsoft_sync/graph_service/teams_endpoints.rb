@@ -29,7 +29,7 @@ module MicrosoftSync
         request(:get, "teams/#{team_id}", special_cases: TEAM_EXISTS_SPECIAL_CASES) != :not_found
       end
 
-      CREATE_EDUCATION_CLASS_TEAM_SPECIAL_CASES = [
+      CREATE_FOR_EDUCATION_CLASS_SPECIAL_CASES = [
         SpecialCase.new(
           400, /have one or more owners in order to create a Team/i,
           result: MicrosoftSync::Errors::GroupHasNoOwners
@@ -40,7 +40,7 @@ module MicrosoftSync
         )
       ].freeze
 
-      def create_education_class_team(group_id)
+      def create_for_education_class(group_id)
         body = {
           "template@odata.bind" =>
             "https://graph.microsoft.com/v1.0/teamsTemplates('educationClass')",
@@ -49,7 +49,7 @@ module MicrosoftSync
         }
 
         # Use special_cases exceptions so they use statsd "expected" counters
-        request(:post, 'teams', body: body, special_cases: CREATE_EDUCATION_CLASS_TEAM_SPECIAL_CASES)
+        request(:post, 'teams', body: body, special_cases: CREATE_FOR_EDUCATION_CLASS_SPECIAL_CASES)
       end
     end
   end

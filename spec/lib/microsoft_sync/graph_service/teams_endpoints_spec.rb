@@ -21,7 +21,7 @@ describe MicrosoftSync::GraphService::TeamsEndpoints do
   include_context 'microsoft_sync_graph_service_endpoints'
 
   describe '#team_exists?' do
-    subject { service.team_exists?('mygroupid') }
+    subject { endpoints.team_exists?('mygroupid') }
 
     let(:http_method) { :get }
     let(:url) { 'https://graph.microsoft.com/v1.0/teams/mygroupid' }
@@ -50,8 +50,8 @@ describe MicrosoftSync::GraphService::TeamsEndpoints do
     end
   end
 
-  describe '#create_education_class_team' do
-    subject { service.create_education_class_team("Evan's group id") }
+  describe '#create_for_education_class' do
+    subject { endpoints.create_for_education_class("Evan's group id") }
 
     let(:http_method) { :post }
     let(:url) { 'https://graph.microsoft.com/v1.0/teams' }
