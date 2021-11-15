@@ -98,8 +98,8 @@ class ProgressRunner
     end
   end
 
-  def update_element(element, &process_element)
-    process_element.call(element)
+  def update_element(element)
+    yield(element)
     @completed_count += 1
   rescue => e
     (@errors[e.message] ||= []) << element

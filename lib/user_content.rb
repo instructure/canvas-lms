@@ -245,7 +245,7 @@ module UserContent
     end
 
     # if content is nil, it'll query the block for the content if needed (lazy content load)
-    def user_can_view_content?(content = nil, &get_content)
+    def user_can_view_content?(content = nil)
       return false if user.blank? && content.respond_to?(:locked?) && content.locked?
       return true unless user
 
@@ -254,7 +254,7 @@ module UserContent
       @read_as_admin = context.grants_right?(user, :read_as_admin) if @read_as_admin.nil?
       return true if @read_as_admin
 
-      content ||= get_content.call
+      content ||= yield
       allow = true if content.respond_to?(:grants_right?) && content.grants_right?(user, :read)
       allow = false if allow && content.respond_to?(:locked_for?) && content.locked_for?(user)
       allow

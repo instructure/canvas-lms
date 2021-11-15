@@ -28,7 +28,7 @@ module AttachmentFu # :nodoc:
 
       module ClassMethods
         # Yields a block containing an MiniMagick Image for the given binary data.
-        def with_image(file, &block)
+        def with_image(file)
           begin
             binary_data = file.is_a?(MiniMagick::Image) ? file : MiniMagick::Image.open(file) unless !Object.const_defined?(:MiniMagick)
           rescue
@@ -36,7 +36,7 @@ module AttachmentFu # :nodoc:
             logger.debug("Exception working with image: #{$!}")
             binary_data = nil
           end
-          block.call binary_data if block && binary_data
+          yield binary_data if block_given? && binary_data
         ensure
           !binary_data.nil?
         end

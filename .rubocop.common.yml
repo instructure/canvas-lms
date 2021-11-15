@@ -84,6 +84,8 @@ Performance/InefficientHashSearch:
   Severity: error
 Performance/MapCompact:
   Severity: error
+Performance/RedundantBlockCall:
+  Severity: error
 Performance/RedundantMerge:
   Severity: error
 Performance/RedundantSplitRegexpArgument:

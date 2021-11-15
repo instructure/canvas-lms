@@ -451,9 +451,9 @@ class User < ActiveRecord::Base
     courses_for_enrollments(enrollments.current_and_concluded)
   end
 
-  def self.skip_updating_account_associations(&block)
+  def self.skip_updating_account_associations
     @skip_updating_account_associations = true
-    block.call
+    yield
   ensure
     @skip_updating_account_associations = false
   end

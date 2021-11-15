@@ -60,7 +60,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
 
   # Get the IDs of users enrolled in a course which do not have UserMappings
   # for the Course's root account. Works in batches, yielding arrays of user ids.
-  def self.find_enrolled_user_ids_without_mappings(course:, batch_size:, &blk)
+  def self.find_enrolled_user_ids_without_mappings(course:, batch_size:)
     user_ids = GuardRail.activate(:secondary) do
       Enrollment
         .microsoft_sync_relevant
@@ -76,7 +76,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
     end
 
     user_ids.in_groups_of(batch_size) do |batch|
-      blk.call(batch.compact)
+      yield(batch.compact)
     end
   end
 

@@ -59,10 +59,10 @@ module Canvas::Plugins
       #     above in ".register!"
       #   callback -> Block<ErrorReport>, the thing that should run everytime
       #     an error report is created in Canvas
-      def register_plugin(plugin_id, options, &callback)
+      def register_plugin(plugin_id, options)
         Canvas::Plugin.register(plugin_id, PLUGIN_ID, options)
         ::ErrorReport.set_callback(:on_send_to_external) do |report|
-          callback.call(report)
+          yield(report)
         end
       end
 

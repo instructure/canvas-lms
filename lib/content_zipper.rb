@@ -235,9 +235,9 @@ class ContentZipper
   end
 
   # The callback should accept two arguments, the attachment/folder and the folder names
-  def zip_folder(folder, zipfile, folder_names, opts = {}, &callback)
-    if callback && (folder.hidden? || folder.locked)
-      callback.call(folder, folder_names)
+  def zip_folder(folder, zipfile, folder_names, opts = {}, &block)
+    if block && (folder.hidden? || folder.locked)
+      yield(folder, folder_names)
     end
     # @user = nil either means that
     # 1. this is part of a public course, and is being downloaded by somebody
@@ -255,11 +255,11 @@ class ContentZipper
     attachments.select { |a| !@check_user || a.grants_right?(@user, :download) }.each do |attachment|
       attachment.display_name = Attachment.shorten_filename(attachment.display_name)
       # Preventing further unwanted filename alterations during the rest of the process,
-      # namely, in the callback further below. Also, we want to avoid accidental saving of the file
+      # namely, in the block further below. Also, we want to avoid accidental saving of the file
       # with the shortened name
       attachment.readonly!
       path = folder_names.empty? ? attachment.display_name : File.join(folder_names, attachment.display_name)
-      callback&.call(attachment, folder_names)
+      yield(attachment, folder_names) if block
       @context = folder.context
       @logger.debug("  found attachment: #{attachment.unencoded_filename}")
       if add_attachment_to_zip(attachment, zipfile, path)
@@ -274,11 +274,7 @@ class ContentZipper
       !@check_user || f.grants_right?(@user, :read_contents_for_export)
     end.each do |sub_folder|
       new_names = Array.new(folder_names) << sub_folder.name
-      if callback
-        zip_folder(sub_folder, zipfile, new_names, opts, &callback)
-      else
-        zip_folder(sub_folder, zipfile, new_names, opts)
-      end
+      zip_folder(sub_folder, zipfile, new_names, opts, &block)
     end
   end
 

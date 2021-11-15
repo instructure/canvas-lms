@@ -341,13 +341,13 @@ class Course < ActiveRecord::Base
     create_with(account_id: 0, root_account_id: 0, enrollment_term_id: 0, workflow_state: 'deleted').find_or_create_by!(id: 0)
   end
 
-  def self.skip_updating_account_associations(&block)
+  def self.skip_updating_account_associations
     if @skip_updating_account_associations
-      block.call
+      yield
     else
       begin
         @skip_updating_account_associations = true
-        block.call
+        yield
       ensure
         @skip_updating_account_associations = false
       end

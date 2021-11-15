@@ -1727,9 +1727,9 @@ class Attachment < ActiveRecord::Base
     !!@skip_3rd_party_submits
   end
 
-  def self.skip_media_object_creation(&block)
+  def self.skip_media_object_creation
     @skip_media_object_creation = true
-    block.call
+    yield
   ensure
     @skip_media_object_creation = false
   end

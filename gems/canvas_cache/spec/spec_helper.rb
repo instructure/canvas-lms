@@ -104,8 +104,8 @@ RSpec.shared_context "caching_helpers", :shared_context => :metadata do
         @captured_message_stack = []
       end
 
-      def add(_severity, message = nil, progname = nil, &block)
-        message = (message || (block && block.call) || progname).to_s
+      def add(_severity, message = nil, progname = nil)
+        message = (message || (block_given? && yield) || progname).to_s
         @captured_message_stack << message
       end
     end
