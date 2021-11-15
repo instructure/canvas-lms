@@ -443,11 +443,11 @@ class EnrollmentsApiController < ApplicationController
 
       if params[:sis_user_id].present?
         pseudonyms = @domain_root_account.pseudonyms.where(sis_user_id: params[:sis_user_id])
-        enrollments = if value_to_boolean(params[:created_for_sis_id])
-                        enrollments.where(sis_pseudonym: pseudonyms)
-                      else
-                        enrollments.where(user_id: pseudonyms.pluck(:user_id))
-                      end
+        if value_to_boolean(params[:created_for_sis_id])
+          enrollments = enrollments.where(sis_pseudonym: pseudonyms)
+        else
+          enrollments = enrollments.where(user_id: pseudonyms.pluck(:user_id))
+        end
       end
 
       if params[:sis_section_id].present?
@@ -467,13 +467,13 @@ class EnrollmentsApiController < ApplicationController
       end
 
       if params[:grading_period_id].present?
-        grading_period = if @context.is_a? User
-                           @context.courses.lazy.map do |course|
-                             GradingPeriod.for(course).find_by(id: params[:grading_period_id])
-                           end.detect(&:present?)
-                         else
-                           GradingPeriod.for(@context).find_by(id: params[:grading_period_id])
-                         end
+        if @context.is_a? User
+          grading_period = @context.courses.lazy.map do |course|
+            GradingPeriod.for(course).find_by(id: params[:grading_period_id])
+          end.detect(&:present?)
+        else
+          grading_period = GradingPeriod.for(@context).find_by(id: params[:grading_period_id])
+        end
 
         unless grading_period
           render(:json => { error: "invalid grading_period_id" }, :status => :bad_request)
@@ -671,7 +671,7 @@ class EnrollmentsApiController < ApplicationController
       end
     end
 
-    params[:enrollment][:limit_privileges_to_course_section] = value_to_boolean(params[:enrollment][:limit_privileges_to_course_section]) if params[:enrollment].key?(:limit_privileges_to_course_section)
+    params[:enrollment][:limit_privileges_to_course_section] = value_to_boolean(params[:enrollment][:limit_privileges_to_course_section]) if params[:enrollment].has_key?(:limit_privileges_to_course_section)
     params[:enrollment].slice!(:enrollment_state, :section, :limit_privileges_to_course_section, :associated_user_id, :role, :start_at, :end_at, :self_enrolled, :no_notify)
 
     DueDateCacher.with_executing_user(@current_user) do
@@ -906,13 +906,13 @@ class EnrollmentsApiController < ApplicationController
     if user == @current_user
       # if user is requesting for themselves, just return all of their
       # enrollments without any extra checking.
-      enrollments = if params[:state].present?
-                      user.enrollments.where(enrollment_index_conditions(true)).joins(:enrollment_state)
+      if params[:state].present?
+        enrollments = user.enrollments.where(enrollment_index_conditions(true)).joins(:enrollment_state)
                           .where("enrollment_states.state IN (?)", enrollment_states_for_state_param)
-                    else
-                      user.enrollments.current_and_invited.where(enrollment_index_conditions)
+      else
+        enrollments = user.enrollments.current_and_invited.where(enrollment_index_conditions)
                           .joins(:enrollment_state).where("enrollment_states.state<>'completed'")
-                    end
+      end
     else
       is_approved_parent = user.grants_right?(@current_user, :read_as_parent)
       # otherwise check for read_roster rights on all of the requested

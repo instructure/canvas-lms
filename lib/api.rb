@@ -55,7 +55,7 @@ module Api
         when 'default'
           @domain_root_account.default_enrollment_term
         when 'current'
-          unless current_term
+          if !current_term
             current_terms = @domain_root_account
                             .enrollment_terms
                             .active
@@ -167,16 +167,15 @@ module Api
     return lookups['id'], id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
 
     id = id.to_s.strip
-    case id
-    when %r{\Ahex:(lti_[\w_]+|sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z}
+    if id =~ %r{\Ahex:(lti_[\w_]+|sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z}
       sis_column = $1
       sis_id = [$2].pack('H*')
-    when %r{\A(lti_[\w_]+|sis_[\w_]+):(.+)\z}
+    elsif id =~ %r{\A(lti_[\w_]+|sis_[\w_]+):(.+)\z}
       sis_column = $1
       sis_id = $2
-    when ID_REGEX
-      return lookups['id'], (/\A\d+\z/.match?(id) ? id.to_i : id)
-    when UUID_REGEX
+    elsif id =~ ID_REGEX
+      return lookups['id'], (id =~ /\A\d+\z/ ? id.to_i : id)
+    elsif id =~ UUID_REGEX
       return lookups['uuid'], $1
     else
       return nil, nil
@@ -189,7 +188,7 @@ module Api
       sis_id = column[:transform].call(sis_id)
       column = column[:column]
     end
-    [column, sis_id]
+    return column, sis_id
   end
 
   def self.sis_parse_ids(ids, lookups, current_user = nil, root_account: nil)
@@ -205,7 +204,7 @@ module Api
       columns[column] << sis_id
     end
     columns.keys.each { |key| columns[key].uniq! }
-    columns
+    return columns
   end
 
   # remove things that don't look like valid database IDs
@@ -213,7 +212,7 @@ module Api
   # (note that ID_REGEX may be redefined by a plugin!)
   def self.map_non_sis_ids(ids)
     ids.map { |id| id.to_s.strip }.select { |id| id =~ ID_REGEX }.map do |id|
-      /\A\d+\z/.match?(id) ? id.to_i : id
+      id =~ /\A\d+\z/ ? id.to_i : id
     end
   end
 
@@ -352,7 +351,7 @@ module Api
     hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
     links = build_links_from_hash(hash)
     controller.response.headers["Link"] = links.join(',') if links.length > 0
-    [collection, meta]
+    return collection, meta
   end
 
   def self.jsonapi_meta(collection, controller, base_url)
@@ -663,13 +662,13 @@ module Api
     placeholder = "PLACEHOLDER"
 
     placeholders = args.each_with_index.map do |arg, index|
-      arg&.match?(format) ? "#{placeholder}#{index}" : arg
+      arg =~ format ? "#{placeholder}#{index}" : arg
     end
 
     url = send(method, *placeholders)
 
     args.each_with_index do |arg, index|
-      url.sub!("#{placeholder}#{index}", arg) if arg&.match?(format)
+      url.sub!("#{placeholder}#{index}", arg) if arg =~ format
     end
 
     url

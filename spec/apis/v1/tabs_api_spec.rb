@@ -762,10 +762,9 @@ describe TabsController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", { :controller => 'tabs', :action => 'index',
                                                                       :course_id => @course.to_param, :format => 'json' })
         json.each do |t|
-          case t['visibility']
-          when 'public'
+          if t['visibility'] == 'public'
             expect(public_visibility).to include(t['id'])
-          when 'admins'
+          elsif t['visibility'] == 'admins'
             expect(admins_visibility).to include(t['id'])
           else
             expect(true).to be_falsey

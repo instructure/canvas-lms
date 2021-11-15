@@ -74,11 +74,11 @@ module RespondusSoapEndpoint
         Canvas::Security.encryption_key,
         digest: 'SHA1'
       )
-      @session = if context.blank?
-                   {}
-                 else
-                   @verifier.verify(context)
-                 end
+      if context.blank?
+        @session = {}
+      else
+        @session = @verifier.verify(context)
+      end
 
       # verify that the session was created for this user
       if self.user
@@ -98,7 +98,7 @@ module RespondusSoapEndpoint
 
     def load_user_with_oauth(token)
       token = AccessToken.authenticate(token)
-      unless token.try(:user)
+      if !token.try(:user)
         raise(BadAuthError)
       end
 
@@ -203,7 +203,7 @@ module RespondusSoapEndpoint
     #   identification  C_String - {http://www.w3.org/2001/XMLSchema}string
     #
     def identifyServer(_userName, _password, _context)
-      [%{
+      return [%{
 Respondus Generic Server API
 Contract version: 1
 Implemented for: Canvas LMS}]
@@ -263,7 +263,7 @@ Implemented for: Canvas LMS}]
       when "course"
         raise(OtherError, 'Item type incompatible with selection state') unless selection_state.empty?
 
-        @user.cached_currentish_enrollments(preload_courses: true).select(&:participating_admin?).map(&:course).uniq.each do |course|
+        @user.cached_currentish_enrollments(preload_courses: true).select { |e| e.participating_admin? }.map(&:course).uniq.each do |course|
           list.item << NVPair.new(course.name, course.to_param)
         end
       when "quiz", "qdb"
@@ -276,7 +276,7 @@ Implemented for: Canvas LMS}]
       end
       raise(OtherError, "No items found") if list.item.empty? && !["quiz", "qdb"].include?(itemType)
 
-      [list]
+      return [list]
     end
 
     # SYNOPSIS
@@ -318,7 +318,7 @@ Implemented for: Canvas LMS}]
         raise OtherError, "Invalid item type"
       end
 
-      []
+      return []
     end
 
     # SYNOPSIS
@@ -561,7 +561,7 @@ Implemented for: Canvas LMS}]
       }
 
       if item
-        unless item.clear_for_replacement
+        if !item.clear_for_replacement
           raise CantReplaceError
         end
 
@@ -595,7 +595,7 @@ Implemented for: Canvas LMS}]
       session['pending_migration_itemType'] = itemType
 
       if Setting.get('respondus_endpoint.polling_api', 'true') != 'false'
-        poll_for_completion()
+        return poll_for_completion()
       else
         # Deprecated in-line waiting for the migration. We've worked with Respondus
         # to implement an asynchronous, polling solution now.

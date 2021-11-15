@@ -322,7 +322,7 @@ class ContextModuleItemsApiController < ApplicationController
           @tag.context_module_action(@current_user, :read)
           redirect_to @tag.url
         else
-          render(:status => 400, :json => { :message => "incorrect module item type" })
+          return render(:status => 400, :json => { :message => "incorrect module item type" })
         end
       end
     end
@@ -492,7 +492,7 @@ class ContextModuleItemsApiController < ApplicationController
         end
       end
 
-      if params[:module_item].key?(:published)
+      if params[:module_item].has_key?(:published)
         if value_to_boolean(params[:module_item][:published])
           if module_item_publishable?(@tag)
             @tag.publish
@@ -755,10 +755,10 @@ class ContextModuleItemsApiController < ApplicationController
       @context.touch
 
       @tag.reload
-      true
+      return true
     else
       @tag.errors.add(:position, t(:invalid_position, "Invalid position"))
-      false
+      return false
     end
   end
   protected :set_position
@@ -793,7 +793,7 @@ class ContextModuleItemsApiController < ApplicationController
     elsif @context.grants_right?(@current_user, session, :participate_as_student)
       @student = @current_user
     else
-      true
+      return true
     end
   end
   protected :find_student

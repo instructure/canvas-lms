@@ -53,12 +53,11 @@ module EventStream::Backend
     def fetch(ids, strategy: :batch)
       rows = []
       if available? && ids.present?
-        case strategy
-        when :batch
+        if strategy == :batch
           database.execute(fetch_cql, ids, consistency: read_consistency_level).fetch do |row|
             rows << record_type.from_attributes(row.to_hash)
           end
-        when :serial
+        elsif strategy == :serial
           ids.each do |record_id|
             database.execute(fetch_one_cql, record_id, consistency: read_consistency_level).fetch do |row|
               rows << record_type.from_attributes(row.to_hash)

@@ -198,11 +198,11 @@ module AssignmentOverrideApplicator
     group_category_id = assignment_or_quiz.group_category_id || assignment_or_quiz.discussion_topic.try(:group_category_id)
     return nil unless group_category_id
 
-    group = if assignment_or_quiz.context.user_has_been_student?(user)
-              user.current_groups.shard(assignment_or_quiz.shard).where(:group_category_id => group_category_id).first
-            else
-              assignment_or_quiz.context.groups.where(:group_category_id => group_category_id).first
-            end
+    if assignment_or_quiz.context.user_has_been_student?(user)
+      group = user.current_groups.shard(assignment_or_quiz.shard).where(:group_category_id => group_category_id).first
+    else
+      group = assignment_or_quiz.context.groups.where(:group_category_id => group_category_id).first
+    end
 
     if group
       if assignment_or_quiz.assignment_overrides.loaded?
@@ -357,7 +357,7 @@ module AssignmentOverrideApplicator
 
   # turn the list of overrides into a unique but consistent cache key component
   def self.overrides_hash(overrides)
-    canonical = overrides.map(&:cache_key).inspect
+    canonical = overrides.map { |override| override.cache_key }.inspect
     Digest::MD5.hexdigest(canonical)
   end
 

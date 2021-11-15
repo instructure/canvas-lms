@@ -71,7 +71,7 @@ describe NotificationMessageCreator do
       end
       @user.reload
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
-      paths = messages.collect(&:to)
+      paths = messages.collect { |message| message.to }
       expect(paths).to include(a.path)
       expect(paths).to include(b.path)
       expect(paths).to include(c.path)
@@ -280,24 +280,15 @@ describe NotificationMessageCreator do
 
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
 
-      nps.each { |np|
-        np.frequency = 'never'
-        np.save!
-      }
+      nps.each { |np| np.frequency = 'never'; np.save! }
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 0
 
-      nps.each { |np|
-        np.frequency = 'daily'
-        np.save!
-      }
+      nps.each { |np| np.frequency = 'daily'; np.save! }
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
 
-      nps.each { |np|
-        np.frequency = 'weekly'
-        np.save!
-      }
+      nps.each { |np| np.frequency = 'weekly'; np.save! }
       @user.reload
       expect { NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message }.to change(DelayedMessage, :count).by 3
     end

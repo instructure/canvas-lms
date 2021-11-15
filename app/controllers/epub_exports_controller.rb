@@ -108,7 +108,7 @@ class EpubExportsController < ApplicationController
         end
         format.json { render status: 404 }
       end
-      false
+      return false
     end
   end
 

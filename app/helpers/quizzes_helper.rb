@@ -110,7 +110,7 @@ module QuizzesHelper
   end
 
   def render_show_correct_answers(quiz)
-    unless quiz.show_correct_answers
+    if !quiz.show_correct_answers
       return I18n.t('No')
     end
 
@@ -446,7 +446,7 @@ module QuizzesHelper
     # Requires mutliline option to be robust
     res.gsub!(%r{<input.*?name=\\?['"](question_.*?)\\?['"].*?>}m) do |match|
       blank = match.match(RE_EXTRACT_BLANK_ID).to_a[1]
-      blank.delete!('\\')
+      blank.gsub!(/\\/, '')
       answer = answer_list.detect { |entry| entry[:blank_id] == blank } || {}
       answer = h(answer[:answer] || '')
 
@@ -509,11 +509,11 @@ module QuizzesHelper
   end
 
   def duration_in_minutes(duration_seconds)
-    duration_minutes = if duration_seconds < 60
-                         0
-                       else
-                         (duration_seconds / 60).round
-                       end
+    if duration_seconds < 60
+      duration_minutes = 0
+    else
+      duration_minutes = (duration_seconds / 60).round
+    end
     I18n.t(
       { :zero => "less than 1 minute",
         :one => "1 minute",

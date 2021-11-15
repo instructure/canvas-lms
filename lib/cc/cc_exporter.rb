@@ -63,11 +63,11 @@ module CC
 
         create_export_dir
         create_zip_file
-        @manifest = if @qti_only_export
-                      CC::Qti::QtiManifest.new(self)
-                    else
-                      Manifest.new(self, @manifest_opts)
-                    end
+        if @qti_only_export
+          @manifest = CC::Qti::QtiManifest.new(self)
+        else
+          @manifest = Manifest.new(self, @manifest_opts)
+        end
         @manifest.create_document
         @manifest.close
 
@@ -127,7 +127,7 @@ module CC
       return unless external_content.present?
 
       folder = File.join(@export_dir, CCHelper::EXTERNAL_CONTENT_FOLDER)
-      FileUtils.mkdir_p(folder)
+      FileUtils::mkdir_p(folder)
 
       external_content.each do |service_key, data|
         path = File.join(folder, "#{service_key}.json")
@@ -204,12 +204,12 @@ module CC
 
     def create_zip_file
       name = CanvasTextHelper.truncate_text(@course.name.to_url, { :max_length => 200, :ellipsis => '' })
-      @zip_name = if @qti_only_export
-                    "#{name}-quiz-export.zip"
-                  else
-                    "#{name}-export.#{CCHelper::CC_EXTENSION}"
-                  end
-      FileUtils.mkdir_p File.join(@export_dir, ZIP_DIR)
+      if @qti_only_export
+        @zip_name = "#{name}-quiz-export.zip"
+      else
+        @zip_name = "#{name}-export.#{CCHelper::CC_EXTENSION}"
+      end
+      FileUtils::mkdir_p File.join(@export_dir, ZIP_DIR)
       @zip_path = File.join(@export_dir, ZIP_DIR, @zip_name)
       @zip_file = Zip::File.new(@zip_path, Zip::File::CREATE)
     end

@@ -194,13 +194,13 @@ module AcademicBenchmark
 
   def self.ensure_partner_id
     unless AcademicBenchmark.config[:partner_id].present?
-      "Partner ID is not set"
+      return "Partner ID is not set"
     end
   end
 
   def self.ensure_partner_key
     unless AcademicBenchmark.config[:partner_key].present?
-      "Partner key is not set"
+      return "Partner key is not set"
     end
   end
 

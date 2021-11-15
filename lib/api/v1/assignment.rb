@@ -162,7 +162,7 @@ module Api::V1::Assignment
       hash['overrides'] = assignment_overrides_json(assignment.assignment_overrides.select(&:active?), user)
     end
 
-    unless assignment.user_submitted.nil?
+    if !assignment.user_submitted.nil?
       hash['user_submitted'] = assignment.user_submitted
     end
 
@@ -727,12 +727,12 @@ module Api::V1::Assignment
       update_params['time_zone_edited'] = Time.zone.name
     end
 
-    unless assignment.context.try(:turnitin_enabled?)
+    if !assignment.context.try(:turnitin_enabled?)
       update_params.delete("turnitin_enabled")
       update_params.delete("turnitin_settings")
     end
 
-    unless assignment.context.try(:vericite_enabled?)
+    if !assignment.context.try(:vericite_enabled?)
       update_params.delete("vericite_enabled")
       update_params.delete("vericite_settings")
     end
@@ -923,7 +923,7 @@ module Api::V1::Assignment
     raise "needs strong params" unless assignment_params.is_a?(ActionController::Parameters)
 
     if assignment_params[:points_possible].blank?
-      if assignment.new_record? || assignment_params.key?(:points_possible) # only change if they're deliberately updating to blank
+      if assignment.new_record? || assignment_params.has_key?(:points_possible) # only change if they're deliberately updating to blank
         assignment_params[:points_possible] = 0
       end
     end
@@ -980,7 +980,7 @@ module Api::V1::Assignment
     end
 
     assignment.do_notifications!(prepared_update[:old_assignment], prepared_update[:notify_of_update])
-    :created
+    return :created
   end
 
   def update_api_assignment_with_overrides(prepared_update, user)
@@ -1049,10 +1049,9 @@ module Api::V1::Assignment
   def assignment_configuration_tool(assignment_params)
     tool_id = assignment_params['similarityDetectionTool'].split('_').last.to_i
     tool = nil
-    case assignment_params['configuration_tool_type']
-    when 'ContextExternalTool'
+    if assignment_params['configuration_tool_type'] == 'ContextExternalTool'
       tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)
-    when 'Lti::MessageHandler'
+    elsif assignment_params['configuration_tool_type'] == 'Lti::MessageHandler'
       mh = Lti::MessageHandler.find(tool_id)
       mh_context = mh.resource_handler.tool_proxy.context
       tool = mh if mh_context == @context || @context.account_chain.include?(mh_context)

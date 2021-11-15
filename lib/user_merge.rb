@@ -228,10 +228,9 @@ class UserMerge
       value = from_record.value
       if from_user.shard != target_user.shard
         # tl;dr do the same thing as shard_aware_preferences
-        case key
-        when "custom_colors"
+        if key == "custom_colors"
           value = Hash[value.map { |id, color| [translate_course_id_or_asset_string(id), color] }]
-        when "course_nicknames"
+        elsif key == "course_nicknames"
           sub_key = translate_course_id_or_asset_string(sub_key)
         end
       end
@@ -507,10 +506,11 @@ class UserMerge
                    course_section_id: enrollment.course_section_id)
 
     if column == :user_id
-      scope.where(user_id: users, associated_user_id: enrollment.associated_user_id)
+      scope = scope.where(user_id: users, associated_user_id: enrollment.associated_user_id)
     else
-      scope.where(user_id: enrollment.user_id, associated_user_id: users)
+      scope = scope.where(user_id: enrollment.user_id, associated_user_id: users)
     end
+    scope
   end
 
   def enrollment_keeper(scope)
@@ -607,8 +607,7 @@ class UserMerge
       model = table.to_s.classify.constantize
       already_scope = model.where(:user_id => target_user)
       scope = model.where(:user_id => from_user)
-      case model.name
-      when "Submission"
+      if model.name == "Submission"
         # we prefer submissions that have grades then submissions that have
         # a submission... that sort of makes sense.
         # we swap empty objects in cases of collision so that we don't
@@ -626,7 +625,7 @@ class UserMerge
         merge_data.build_more_data(to_move, data: data) unless to_move.empty?
         merge_data.build_more_data(move_back, data: data) unless move_back.empty?
         swap_submission(model, move_back, table, to_move, to_move_ids, 'fk_rails_8d85741475')
-      when "Quizzes::QuizSubmission"
+      elsif model.name == "Quizzes::QuizSubmission"
         subscope = already_scope.to_a
         to_move = model.where(user_id: from_user).joins(:submission).where(submissions: { user_id: target_user }).to_a
         move_back = model.where(user_id: target_user).joins(:submission).where(submissions: { user_id: from_user }).to_a

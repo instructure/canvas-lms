@@ -31,7 +31,7 @@ class PartitionMigrationGenerator < ActiveRecord::Generators::MigrationGenerator
                    desc: 'Name of the model whose partitions will be modified.'
 
   def create_migration_file
-    unless /^[_a-z0-9]+$/.match?(file_name)
+    unless file_name =~ /^[_a-z0-9]+$/
       raise ActiveRecord::IllegalMigrationNameError.new(file_name)
     end
 

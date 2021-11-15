@@ -193,7 +193,7 @@ class ContentTag < ActiveRecord::Base
     return false if self.content_type == 'WikiPage'
     return false unless self.can_have_assignment?
 
-    content && !content.assignment_id.nil?
+    return content && !content.assignment_id.nil?
   end
 
   def duplicate_able?
@@ -220,8 +220,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def content_type_class(is_student = false)
-    case self.content_type
-    when 'Assignment'
+    if self.content_type == 'Assignment'
       if self.content && self.content.submission_types == 'online_quiz'
         is_student ? 'lti-quiz' : 'quiz'
       elsif self.content && self.content.submission_types == 'discussion_topic'
@@ -231,7 +230,7 @@ class ContentTag < ActiveRecord::Base
       else
         'assignment'
       end
-    when 'Quizzes::Quiz'
+    elsif self.content_type == 'Quizzes::Quiz'
       is_student ? 'lti-quiz' : 'quiz'
     else
       self.content_type.underscore
@@ -340,8 +339,8 @@ class ContentTag < ActiveRecord::Base
   end
 
   def self.delete_for(asset)
-    ContentTag.where(content_id: asset, content_type: asset.class.to_s).each(&:destroy)
-    ContentTag.where(context_id: asset, context_type: asset.class.to_s).each(&:destroy)
+    ContentTag.where(content_id: asset, content_type: asset.class.to_s).each { |t| t.destroy }
+    ContentTag.where(context_id: asset, context_type: asset.class.to_s).each { |t| t.destroy }
   end
 
   def can_destroy?
@@ -352,7 +351,7 @@ class ContentTag < ActiveRecord::Base
       other_link = ContentTag.learning_outcome_links.active
                              .where(:context_type => self.context_type, :context_id => self.context_id, :content_id => outcome)
                              .where("id<>?", self).first
-      unless other_link
+      if !other_link
         # and there are alignments to the outcome (in the link's context for
         # foreign links, in any context for native links)
         alignment_conditions = { :learning_outcome_id => outcome.id }
@@ -443,7 +442,7 @@ class ContentTag < ActiveRecord::Base
     module_ids = tags.map(&:context_module_id).compact
 
     # update title
-    tag_ids = tags.select(&:sync_title_to_asset_title?).map(&:id)
+    tag_ids = tags.select { |t| t.sync_title_to_asset_title? }.map(&:id)
     attr_hash = { :updated_at => Time.now.utc }
     { :display_name => :title, :name => :title, :title => :title }.each do |attr, val|
       attr_hash[val] = asset.send(attr) if asset.respond_to?(attr)
@@ -451,7 +450,7 @@ class ContentTag < ActiveRecord::Base
     ContentTag.where(:id => tag_ids).update_all(attr_hash) unless tag_ids.empty?
 
     # update workflow_state
-    tag_ids = tags.select(&:sync_workflow_state_to_asset?).map(&:id)
+    tag_ids = tags.select { |t| t.sync_workflow_state_to_asset? }.map(&:id)
     attr_hash = { :updated_at => Time.now.utc }
 
     workflow_state = asset_workflow_state(asset)
@@ -499,7 +498,7 @@ class ContentTag < ActiveRecord::Base
   def content_asset_string=(val)
     vals = val.split("_")
     id = vals.pop
-    type = Context.asset_type_for_string(vals.join("_").classify)
+    type = Context::asset_type_for_string(vals.join("_").classify)
     if type && id && id.to_i > 0
       self.content_type = type.to_s
       self.content_id = id
@@ -671,12 +670,12 @@ class ContentTag < ActiveRecord::Base
   def set_root_account
     return if self.root_account_id.present?
 
-    self.root_account_id = case self.context
-                           when Account
-                             self.context.resolved_root_account_id
-                           else
-                             self.context&.root_account_id
-                           end
+    case self.context
+    when Account
+      self.root_account_id = self.context.resolved_root_account_id
+    else
+      self.root_account_id = self.context&.root_account_id
+    end
   end
 
   def quiz_lti

@@ -18,7 +18,6 @@
 
 import {
   updateDiscussionTopicEntryCounts,
-  updateDiscussionEntryRootEntryCounts,
   addReplyToDiscussionEntry,
   getSpeedGraderUrl,
   getOptimisticResponse
@@ -117,8 +116,8 @@ export const IsolatedViewContainer = props => {
 
   const updateDiscussionEntryParticipantCache = (cache, result) => {
     const entry = [
-      ...(isolatedEntryOlderDirection.data?.legacyNode.discussionSubentriesConnection.nodes || []),
-      ...(isolatedEntryNewerDirection.data?.legacyNode.discussionSubentriesConnection.nodes || [])
+      ...isolatedEntryOlderDirection.data.legacyNode.discussionSubentriesConnection.nodes,
+      ...isolatedEntryNewerDirection.data.legacyNode.discussionSubentriesConnection.nodes
     ].find(
       oldEntry => oldEntry._id === result.data.updateDiscussionEntryParticipant.discussionEntry._id
     )
@@ -127,14 +126,13 @@ export const IsolatedViewContainer = props => {
       entry.entryParticipant?.read !==
         result.data.updateDiscussionEntryParticipant.discussionEntry.entryParticipant?.read
     ) {
-      const discussionUnreadCountChange = result.data.updateDiscussionEntryParticipant
+      const discussionUnreadCountchange = result.data.updateDiscussionEntryParticipant
         .discussionEntry.entryParticipant?.read
         ? -1
         : 1
       updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
-        unreadCountChange: discussionUnreadCountChange
+        unreadCountChange: discussionUnreadCountchange
       })
-      updateDiscussionEntryRootEntryCounts(cache, result, discussionUnreadCountChange)
     }
   }
 

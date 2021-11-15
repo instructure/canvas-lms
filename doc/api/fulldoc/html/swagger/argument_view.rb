@@ -88,7 +88,7 @@ class ArgumentView < HashView
   end
 
   def enums
-    enum_and_types.first.map { |e| e.delete('"') }
+    enum_and_types.first.map { |e| e.gsub('"', '') }
   end
 
   def types
@@ -127,7 +127,7 @@ class ArgumentView < HashView
   end
 
   def required?
-    types = enum_and_types.last.map(&:downcase)
+    types = enum_and_types.last.map { |t| t.downcase }
     swagger_param_type == 'path' || types.include?('required')
   end
 

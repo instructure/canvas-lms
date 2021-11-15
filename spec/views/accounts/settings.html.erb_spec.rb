@@ -221,7 +221,7 @@ describe "accounts/settings.html.erb" do
     end
 
     def do_render(user, account = nil)
-      account ||= @account
+      account = @account unless account
       view_context(account, user)
       render
     end

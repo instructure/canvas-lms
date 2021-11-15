@@ -94,9 +94,7 @@ class Collaboration < ActiveRecord::Base
 
   # These methods should be implemented in child classes.
 
-  def service_name
-    'Collaboration'
-  end
+  def service_name; 'Collaboration'; end
 
   def delete_document; end
 
@@ -116,9 +114,7 @@ class Collaboration < ActiveRecord::Base
     raise NotImplementedError
   end
 
-  def parse_data
-    nil
-  end
+  def parse_data; nil; end
 
   # Public: Find the class of for the given type.
   #
@@ -187,9 +183,7 @@ class Collaboration < ActiveRecord::Base
   # Public: Declare excluded serialization fields.
   #
   # Returns an array.
-  def self.serialization_excludes
-    [:uuid]
-  end
+  def self.serialization_excludes; [:uuid]; end
 
   # Public: Soft-delete this collaboration.
   #
@@ -319,7 +313,7 @@ class Collaboration < ActiveRecord::Base
       # need to get everyone added to the document, cause we're going to re-add them all
       users_to_remove = collaborators.where("user_id IS NOT NULL").pluck(:user_id)
       group_ids = collaborators.where("group_id IS NOT NULL").pluck(:group_id)
-      unless group_ids.empty?
+      if !group_ids.empty?
         users_to_remove += GroupMembership.where(group_id: group_ids).distinct.pluck(:user_id)
         users_to_remove.uniq!
       end

@@ -23,7 +23,7 @@ require_relative "../graphql_spec_helper"
 
 describe Types::MutationLogType do
   before do
-    unless AuditLogFieldExtension.enabled?
+    if !AuditLogFieldExtension.enabled?
       skip("AuditLog needs to be enabled by configuring dynamodb.yml")
     end
   end

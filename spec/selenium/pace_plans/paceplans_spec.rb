@@ -82,9 +82,9 @@ describe 'pace plan page' do
       visit_pace_plans_page
 
       expect(module_title_text(0)).to include(module_title)
-      expect(module_item_title_text(0)).to start_with(module_assignment_title)
-      expect(module_item_title_text(1)).to start_with(discussion_title)
-      expect(module_item_title_text(2)).to start_with(quiz_title)
+      expect(module_item_title_text(0)).to eq(module_assignment_title)
+      expect(module_item_title_text(1)).to eq(discussion_title)
+      expect(module_item_title_text(2)).to eq(quiz_title)
     end
 
     it 'does not show a module item that is not an assignment' do
@@ -98,7 +98,7 @@ describe 'pace plan page' do
       visit_pace_plans_page
 
       expect(module_items.count).to eq(1)
-      expect(module_item_title_text(0)).to start_with(module_assignment_title)
+      expect(module_item_title_text(0)).to eq(module_assignment_title)
     end
 
     it 'does not show any publish status when no pace plan created yet' do
@@ -141,25 +141,6 @@ describe 'pace plan page' do
       click_show_hide_projections_button
 
       expect(show_hide_pace_plans_button_text).to eq('Hide Projections')
-    end
-
-    it 'shows start and end date fields when Show Projections button is clicked' do
-      visit_pace_plans_page
-
-      click_show_hide_projections_button
-
-      expect(pace_plan_start_date).to be_displayed
-      expect(pace_plan_end_date).to be_displayed
-    end
-
-    it 'does not show date fields when Hide Projections button is clicked' do
-      visit_pace_plans_page
-
-      click_show_hide_projections_button
-      click_show_hide_projections_button
-
-      expect(pace_plan_start_date_exists?).to be_falsey
-      expect(pace_plan_end_date_exists?).to be_falsey
     end
 
     it 'shows only a projection icon when window size is narrowed' do

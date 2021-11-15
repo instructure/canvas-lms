@@ -125,10 +125,9 @@ class CalendarEventsController < ApplicationController
   protected
 
   def feature_context
-    case @context
-    when User
+    if @context.is_a?(User)
       @domain_root_account
-    when Group
+    elsif @context.is_a?(Group)
       @context.context
     else
       @context

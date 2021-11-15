@@ -60,7 +60,5 @@ class ExternalFeedEntry < ActiveRecord::Base
     state :cancelled
   end
 
-  def self.serialization_excludes
-    [:uuid]
-  end
+  def self.serialization_excludes; [:uuid]; end
 end

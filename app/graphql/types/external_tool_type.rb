@@ -77,7 +77,9 @@ module Types
 
     def modules
       load_association(:content_tags).then do |tags|
-        Loaders::AssociationLoader.for(ContentTag, :context_module).load_many(tags).then(&:uniq)
+        Loaders::AssociationLoader.for(ContentTag, :context_module).load_many(tags).then do |modules|
+          modules.uniq
+        end
       end
     end
   end

@@ -282,7 +282,7 @@ class ContentMigration < ActiveRecord::Base
 
   def add_warning(user_message, opts = {})
     Rails.logger.warn("Migration warning: #{user_message}: #{opts.inspect}")
-    unless opts.is_a? Hash
+    if !opts.is_a? Hash
       # convert deprecated behavior to new
       exception_or_info = opts
       opts = {}
@@ -448,9 +448,9 @@ class ContentMigration < ActiveRecord::Base
         end
       end
 
-      true
+      return true
     else
-      false
+      return false
     end
   end
 
@@ -461,7 +461,7 @@ class ContentMigration < ActiveRecord::Base
       self.migration_settings = default_ms.merge(self.migration_settings).with_indifferent_access
     end
 
-    unless self.migration_settings.key?(:overwrite_quizzes)
+    if !self.migration_settings.has_key?(:overwrite_quizzes)
       self.migration_settings[:overwrite_quizzes] = for_course_copy? || for_master_course_import? || (self.migration_type && self.migration_type == 'canvas_cartridge_importer')
     end
     self.migration_settings.reverse_merge!(:prefer_existing_tools => true) if self.migration_type == 'common_cartridge_importer' # default to true
@@ -512,7 +512,7 @@ class ContentMigration < ActiveRecord::Base
     prefix = "#{migration_settings[:id_prepender]}_"
     return nil unless mig_id.start_with? prefix
 
-    mig_id[prefix.length..]
+    mig_id[prefix.length..-1]
   end
 
   def import_object?(asset_type, mig_id)
@@ -537,7 +537,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def is_set?(option)
-    Canvas::Plugin.value_to_boolean option
+    Canvas::Plugin::value_to_boolean option
   end
 
   def capture_job_id
@@ -552,7 +552,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def import_content
-    reset_job_progress(:running) unless import_immediately?
+    reset_job_progress(:running) if !import_immediately?
     self.workflow_state = :importing
     capture_job_id
     self.save
@@ -614,7 +614,7 @@ class ContentMigration < ActiveRecord::Base
 
       process_master_deletions(deletions.slice('AssignmentGroup')) if deletions
 
-      unless self.import_immediately?
+      if !self.import_immediately?
         update_import_progress(100)
       end
       if self.for_master_course_import?

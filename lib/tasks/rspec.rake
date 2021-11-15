@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Don't load rspec if running "rake gems:*"
-unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
+unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
 
   begin
     require 'rspec/core/rake_task'
@@ -195,7 +195,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
       desc "check if spec server is running"
       task :status do
         if File.exist?(daemonized_server_pid)
-          $stderr.puts %Q{spec_server is running (PID: #{File.read(daemonized_server_pid).delete("\n")})}
+          $stderr.puts %Q{spec_server is running (PID: #{File.read(daemonized_server_pid).gsub("\n", "")})}
         else
           $stderr.puts "No server running."
         end

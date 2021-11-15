@@ -101,10 +101,10 @@ const PacePlanDateInput = ({
   }
 
   const handleDateChange = (date: MomentInput) => {
-    const parsedDate = moment(date)
+    const parsedDate = moment(date).startOf('day')
 
     if (parsedDate.isValid()) {
-      onDateChange(parsedDate.toISOString(false).split('T')[0])
+      onDateChange(parsedDate.format('YYYY-MM-DD'))
       setCustomErrors([])
     } else {
       setCustomErrors([I18n.t('The date entered is invalid.')])
@@ -117,7 +117,7 @@ const PacePlanDateInput = ({
         <View as="div" margin="0 0 small">
           <Text weight="bold">{label}</Text>
         </View>
-        <Flex data-testid="paceplan-date-text" as="div" height="2.25rem" alignItems="center">
+        <Flex as="div" height="2.25rem" alignItems="center">
           {formatDate(dateValue)}
         </Flex>
       </div>
@@ -126,7 +126,6 @@ const PacePlanDateInput = ({
 
   return (
     <CanvasDateInput
-      dataTestid="pace-plan-start-date"
       renderLabel={label}
       formatDate={formatDate}
       onSelectedDateChange={handleDateChange}

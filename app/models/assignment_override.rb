@@ -171,13 +171,9 @@ class AssignmentOverride < ActiveRecord::Base
   end
   private :touch_assignment
 
-  def assignment?
-    !!assignment_id
-  end
+  def assignment?; !!assignment_id; end
 
-  def quiz?
-    !!quiz_id
-  end
+  def quiz?; !!quiz_id; end
 
   workflow do
     state :active
@@ -245,10 +241,9 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set
-    case self.set_type
-    when 'ADHOC'
+    if self.set_type == 'ADHOC'
       assignment_override_students.preload(:user).map(&:user)
-    when SET_TYPE_NOOP
+    elsif self.set_type == SET_TYPE_NOOP
       nil
     else
       super
@@ -414,7 +409,7 @@ class AssignmentOverride < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :assignment_due_date_changed
     p.to { applies_to_students }
-    p.whenever(&:notify_change?)
+    p.whenever { |record| record.notify_change? }
     p.filter_asset_by_recipient { |record, user|
       # note that our asset for this message is an Assignment, not an AssignmentOverride
       record.assignment.overridden_for(user)
@@ -423,7 +418,7 @@ class AssignmentOverride < ActiveRecord::Base
 
     p.dispatch :assignment_due_date_override_changed
     p.to { applies_to_admins }
-    p.whenever(&:notify_change?)
+    p.whenever { |record| record.notify_change? }
     p.data { course_broadcast_data }
   end
 

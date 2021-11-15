@@ -36,7 +36,7 @@ module LocaleSelection
     sources = [
       -> { context.locale if context.try(:is_a?, Course) },
       -> { user.locale if user && user.locale },
-      -> { session_locale },
+      -> { session_locale if session_locale },
       -> { Account.recursive_default_locale_for_id(context.account_id) if context.try(:is_a?, Course) },
       -> { Account.recursive_default_locale_for_id(context.id) if context.try(:is_a?, Account) },
       -> { root_account.try(:default_locale) },
@@ -66,7 +66,7 @@ module LocaleSelection
   ACCEPT_LANGUAGE = /\A#{LANGUAGE_RANGE}(#{SEPARATOR}#{LANGUAGE_RANGE})*\z/
 
   def infer_browser_locale(accept_language, locales_with_aliases)
-    return nil unless ACCEPT_LANGUAGE.match?(accept_language)
+    return nil unless accept_language =~ ACCEPT_LANGUAGE
 
     supported_locales = locales_with_aliases.keys
 
