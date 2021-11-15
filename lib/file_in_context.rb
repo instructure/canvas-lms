@@ -37,7 +37,7 @@ class FileInContext
         @queued_files ||= []
         @queued_files += files
       else
-        files.each(&:destroy)
+        files.each { |f| f.destroy }
       end
     end
 

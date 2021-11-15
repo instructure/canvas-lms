@@ -69,7 +69,7 @@ module BasicLTI
         res.code_major = 'unsupported'
         res.description = 'Legacy request could not be handled. ¯\_(ツ)_/¯'
       end
-      res
+      return res
     end
 
     class LtiResponse

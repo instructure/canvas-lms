@@ -233,9 +233,8 @@ class Group < ActiveRecord::Base
 
   def has_member?(user)
     return nil unless user.present?
-
     if self.group_memberships.loaded?
-      self.group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id }
+      return self.group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id }
     else
       self.participating_group_memberships.where(user_id: user).first
     end
@@ -338,7 +337,7 @@ class Group < ActiveRecord::Base
 
   # this method is idempotent
   def add_user(user, new_record_state = nil, moderator = nil)
-    return nil unless user
+    return nil if !user
 
     attrs = { :user => user, :moderator => !!moderator }
     new_record_state ||= case self.join_level
@@ -361,7 +360,7 @@ class Group < ActiveRecord::Base
     end
     # permissions for this user in the group are probably different now
     clear_permissions_cache(user)
-    member
+    return member
   end
 
   def set_users(users)
@@ -638,14 +637,13 @@ class Group < ActiveRecord::Base
     return true if can_participate
     return false unless user.present? && self.context.present?
     return true if self.group_category.try(:communities?)
-    case self.context
-    when Course
+    if self.context.is_a?(Course)
       return self.context.enrollments.not_fake.where(:user_id => user.id).active_by_date.exists?
-    when Account
+    elsif self.context.is_a?(Account)
       return self.context.root_account.user_account_associations.where(:user_id => user.id).exists?
     end
 
-    false
+    return false
   end
 
   def can_join?(user)
@@ -683,7 +681,7 @@ class Group < ActiveRecord::Base
   end
 
   def quota
-    self.storage_quota || self.account.default_group_storage_quota || self.class.default_storage_quota
+    return self.storage_quota || self.account.default_group_storage_quota || self.class.default_storage_quota
   end
 
   def self.default_storage_quota
@@ -720,9 +718,7 @@ class Group < ActiveRecord::Base
     available_tabs
   end
 
-  def self.serialization_excludes
-    [:uuid]
-  end
+  def self.serialization_excludes; [:uuid]; end
 
   def allow_media_comments?
     true

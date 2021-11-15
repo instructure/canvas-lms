@@ -36,8 +36,7 @@ const defaultProps = {
   sections: SORTED_SECTIONS,
   selectedContextId: COURSE.id,
   selectedContextType: 'Course' as const,
-  setSelectedPlanContext: selectPlanContextFn,
-  changeCount: 0
+  setSelectedPlanContext: selectPlanContextFn
 }
 
 afterEach(() => {
@@ -99,57 +98,5 @@ describe('PlanPicker', () => {
     )
     const picker = getByLabelText('Pace Plans') as HTMLInputElement
     expect(picker.value).toBe('Henry Dorsett Case')
-  })
-
-  describe('warning modal', () => {
-    it('is displayed if context changes with unpublished changes', () => {
-      const {getByText, getByLabelText} = render(<PlanPicker {...defaultProps} changeCount={1} />)
-      const picker = getByLabelText('Pace Plans') as HTMLInputElement
-
-      act(() => picker.click())
-      act(() => screen.getByRole('button', {name: 'Students'}).click())
-      act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
-      expect(
-        getByText(/You have unpublished changes to your Course Pace Plan./)
-      ).toBeInTheDocument()
-    })
-
-    it('aborts context change on cancel', () => {
-      const {getByDisplayValue, getByText, getByLabelText} = render(
-        <PlanPicker {...defaultProps} changeCount={1} />
-      )
-      const picker = getByLabelText('Pace Plans') as HTMLInputElement
-
-      act(() => picker.click())
-      act(() => screen.getByRole('button', {name: 'Students'}).click())
-      act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
-      const cancelBtn = getByText('Keep Editing').closest('button')
-      act(() => cancelBtn?.click())
-      expect(getByDisplayValue('Course Pace Plan')).toBeInTheDocument()
-    })
-
-    it('cancels context change on "Keep Editing"', () => {
-      const {getByText, getByLabelText} = render(<PlanPicker {...defaultProps} changeCount={1} />)
-      const picker = getByLabelText('Pace Plans') as HTMLInputElement
-
-      act(() => picker.click())
-      act(() => screen.getByRole('button', {name: 'Students'}).click())
-      act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
-      const cancelBtn = getByText('Keep Editing').closest('button')
-      act(() => cancelBtn?.click())
-      expect(selectPlanContextFn).not.toHaveBeenCalledWith('Molly Millions', '98')
-    })
-
-    it('changes context change on "Discard Changes"', () => {
-      const {getByText, getByLabelText} = render(<PlanPicker {...defaultProps} changeCount={1} />)
-      const picker = getByLabelText('Pace Plans') as HTMLInputElement
-
-      act(() => picker.click())
-      act(() => screen.getByRole('button', {name: 'Students'}).click())
-      act(() => screen.getByRole('menuitem', {name: 'Molly Millions'}).click())
-      const confirmBtn = getByText('Discard Changes').closest('button')
-      act(() => confirmBtn?.click())
-      expect(selectPlanContextFn).toHaveBeenCalledWith('Enrollment', '25')
-    })
   })
 })

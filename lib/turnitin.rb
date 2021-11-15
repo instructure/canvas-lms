@@ -288,14 +288,14 @@ module Turnitin
     def escape_params(params)
       escaped_params = {}
       params.each do |key, value|
-        escaped_params[key] = if value.is_a?(String)
-                                CGI.escape(value).gsub("+", "%20")
-                              # turnitin uses %20 to encode spaces (instead of +)
-                              else
-                                value
-                              end
+        if value.is_a?(String)
+          escaped_params[key] = CGI.escape(value).gsub("+", "%20")
+          # turnitin uses %20 to encode spaces (instead of +)
+        else
+          escaped_params[key] = value
+        end
       end
-      escaped_params
+      return escaped_params
     end
 
     def prepare_params(command, fcmd, args)
@@ -336,7 +336,7 @@ module Turnitin
 
       params[:md5] = request_md5(params)
       params = escape_params(params) if post
-      params
+      return params
     end
 
     def sendRequest(command, fcmd, args)

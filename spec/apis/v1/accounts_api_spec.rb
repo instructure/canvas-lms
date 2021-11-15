@@ -964,7 +964,7 @@ describe "Accounts API", type: :request do
                         { :controller => 'accounts', :action => 'courses_api',
                           :account_id => @a1.to_param, :format => 'json' })
 
-        [@c1, @c2].each(&:reload)
+        [@c1, @c2].each { |c| c.reload }
         expect(json.first['id']).to eq @c1.id
         expect(json.first['name']).to eq 'c1'
         expect(json.first['account_id']).to eq @c1.account_id
@@ -998,7 +998,7 @@ describe "Accounts API", type: :request do
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?include[]=storage_quota_used_mb&include[]=account_name",
                       { :controller => 'accounts', :action => 'courses_api', :account_id => @a1.to_param,
                         :format => 'json', :include => ['storage_quota_used_mb', 'account_name'] }, {})
-      expect(json[0]).to have_key("storage_quota_used_mb")
+      expect(json[0].has_key?("storage_quota_used_mb")).to be_truthy
       expect(json[0]).to have_key("account_name")
     end
 
@@ -1054,7 +1054,7 @@ describe "Accounts API", type: :request do
       c1_hash = json.detect { |h| h['id'] == @c1.id }
       expect(c1_hash['teachers']).to be_present
       c2_hash = json.detect { |h| h['id'] == @c2.id }
-      expect(c2_hash).not_to have_key('teachers')
+      expect(c2_hash.has_key?('teachers')).to eq false
       expect(c2_hash['teacher_count']).to eq 2
     end
 

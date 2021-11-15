@@ -39,7 +39,9 @@ class StudentEnrollment < Enrollment
                             .joins(:context_module)
                             .readonly(false)
                             .where(:context_modules => { :context_type => 'Course', :context_id => self.course_id })
-                            .each(&:mark_as_outdated!)
+                            .each do |prog|
+      prog.mark_as_outdated!
+    end
   end
 
   def update_override_score(override_score:, grading_period_id: nil, updating_user:, record_grade_change: true)

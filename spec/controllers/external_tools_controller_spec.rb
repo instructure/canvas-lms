@@ -611,7 +611,7 @@ describe ExternalToolsController do
           get :show, params: { course_id: @course.id, id: @tool.id, launch_type: 'homework_submission',
                                assignment_id: assignment.id }
           lti_launch = assigns[:lti_launch]
-          expect(lti_launch.params).not_to have_key('ext_content_file_extensions')
+          expect(lti_launch.params.key?('ext_content_file_extensions')).not_to be
         end
 
         it "sets the accept_media_types parameter to '*.*'' if online_upload isn't accepted" do
@@ -1222,7 +1222,7 @@ describe ExternalToolsController do
       get 'resource_selection', params: { :course_id => @course.id, :external_tool_id => tool.id, :editor_button => '1', :selection => html }
       expect(response).to be_successful
       expect(assigns[:tool]).to eq tool
-      expect(assigns[:lti_launch].params['text']).to eq CGI.escape(html)
+      expect(assigns[:lti_launch].params['text']).to eq CGI::escape(html)
     end
 
     it "finds account-level tools" do
@@ -1975,46 +1975,6 @@ describe ExternalToolsController do
       put :update, params: { account_id: @course.root_account.id, external_tool_id: @tool.id, external_tool: { is_rce_favorite: true } }, :format => "json"
       expect(response).to be_successful
       expect(assigns[:tool].is_rce_favorite).to eq true
-    end
-
-    it 'updates placement properties if the enabled key is set to false' do
-      user_session(account_admin_user)
-      @tool = new_valid_tool(@course.root_account)
-      @tool.editor_button = { url: 'https://example.com', icon_url: 'https://example.com', enabled: false }
-      @tool.save!
-
-      put :update,
-          params: {
-            account_id: @course.root_account.id,
-            external_tool_id: @tool.id,
-            external_tool: { editor_button: { url: 'https://new-example.com' } }
-          },
-          format: 'json'
-      tool_updated = ContextExternalTool.find(@tool.id)
-      inactive_placements = tool_updated[:settings][:inactive_placements]
-      editor_button = tool_updated[:settings][:editor_button]
-
-      expect(response).to be_successful
-      expect(inactive_placements).to include(:editor_button)
-      expect(inactive_placements[:editor_button][:url]).to eq 'https://new-example.com'
-      expect(editor_button).to be_nil
-    end
-
-    it 'allows to remove the app placement entirely' do
-      user_session(account_admin_user)
-      @tool = new_valid_tool(@course.root_account)
-      @tool.editor_button = { url: 'https://example.com', icon_url: 'https://example.com', enabled: false }
-      @tool.save!
-
-      put :update,
-          params: {
-            account_id: @course.root_account.id,
-            external_tool_id: @tool.id,
-            external_tool: { editor_button: "null" }
-          },
-          format: 'json'
-      expect(response).to be_successful
-      expect(@tool.reload.editor_button).to eq nil
     end
   end
 

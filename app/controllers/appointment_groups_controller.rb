@@ -351,7 +351,7 @@ class AppointmentGroupsController < ApplicationController
     # we would have a check on update as well but there may be existing ones and
     # it would be very delicate to write one in a way that doesn't accidentally
     # break the ability to edit those.
-    if contexts.any?(&:concluded?)
+    if contexts.any? { |c| c.concluded? }
       return render json: { error: t('cannot create an appointment group for a concluded course') },
                     status: :bad_request
     end
@@ -608,7 +608,7 @@ class AppointmentGroupsController < ApplicationController
     # start with the first reservable appointment group
     group = AppointmentGroup.reservable_by(@current_user, params[:context_codes]).current.order(:start_at).first
     anchor = calendar_fragment :view_name => :agenda, :view_start => group && group.start_at.strftime('%Y-%m-%d')
-    redirect_to calendar2_url(:anchor => anchor)
+    return redirect_to calendar2_url(:anchor => anchor)
   end
 
   def web_show

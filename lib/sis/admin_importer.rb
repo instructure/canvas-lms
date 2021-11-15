@@ -91,11 +91,10 @@ module SIS
       end
 
       def create_or_find_admin(user, state)
-        case state
-        when 'active'
+        if state == 'active'
           admin = @account.account_users.where(user: user, role: @role).first_or_initialize
           admin.workflow_state = state
-        when 'deleted'
+        elsif state == 'deleted'
           admin = @account.account_users.where(user: user, role: @role).where.not(sis_batch_id: nil).take
           return unless admin
 

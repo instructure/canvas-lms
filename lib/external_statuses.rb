@@ -33,8 +33,6 @@ class ExternalStatuses
       end
     end
 
-    def default_external_status
-      DEFAULT_EXTERNAL_STATUS
-    end
+    def default_external_status; DEFAULT_EXTERNAL_STATUS; end
   end
 end

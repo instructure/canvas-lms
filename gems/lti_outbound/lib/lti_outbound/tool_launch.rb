@@ -75,7 +75,7 @@ module LtiOutbound
       hash['resource_link_id'] = link_code
       hash['resource_link_title'] = overrides['resource_link_title'] || tool.name
       hash['user_id'] = user.opaque_identifier
-      hash['text'] = CGI.escape(selected_html) if selected_html
+      hash['text'] = CGI::escape(selected_html) if selected_html
 
       hash['roles'] = user.current_role_types # AccountAdmin, Student, Faculty or Observer
       hash['ext_roles'] = '$Canvas.xuser.allRoles'
@@ -95,12 +95,11 @@ module LtiOutbound
         hash['custom_canvas_user_id'] = '$Canvas.user.id'
         hash['lis_person_sourcedid'] = '$Person.sourcedId' if user.sis_source_id
         hash['custom_canvas_user_login_id'] = '$Canvas.user.loginId'
-        case context
-        when LTICourse
+        if context.is_a?(LTICourse)
           hash['custom_canvas_course_id'] = '$Canvas.course.id'
           hash['custom_canvas_workflow_state'] = '$Canvas.course.workflowState'
           hash['lis_course_offering_sourcedid'] = '$CourseSection.sourcedId' if context.sis_source_id
-        when LTIAccount, LTIUser
+        elsif context.is_a?(LTIAccount) || context.is_a?(LTIUser)
           hash['custom_canvas_account_id'] = '$Canvas.account.id'
           hash['custom_canvas_account_sis_id'] = '$Canvas.account.sisSourceId'
         end
@@ -156,21 +155,20 @@ module LtiOutbound
     end
 
     def set_resource_type_keys
-      case resource_type
-      when 'editor_button'
+      if resource_type == 'editor_button'
         hash['selection_directive'] = 'embed_content' # backwards compatibility
         hash['ext_content_intended_use'] = 'embed'
         hash['ext_content_return_types'] = 'oembed,lti_launch_url,url,image_url,iframe'
         hash['ext_content_return_url'] = return_url
-      when 'resource_selection'
+      elsif resource_type == 'resource_selection'
         hash['selection_directive'] = 'select_link' # backwards compatibility
         hash['ext_content_intended_use'] = 'navigation'
         hash['ext_content_return_types'] = 'lti_launch_url'
         hash['ext_content_return_url'] = return_url
-      when 'homework_submission'
+      elsif resource_type == 'homework_submission'
         hash['ext_content_intended_use'] = 'homework'
         hash['ext_content_return_url'] = return_url
-      when 'migration_selection'
+      elsif resource_type == 'migration_selection'
         hash['ext_content_intended_use'] = 'content_package'
         hash['ext_content_return_types'] = 'file'
         hash['ext_content_file_extensions'] = 'zip,imscc'

@@ -36,7 +36,7 @@ class Csp::Domain < ActiveRecord::Base
     URI.parse(self.domain)
   rescue
     self.errors.add(:domain, "Invalid domain")
-    false
+    return false
   end
 
   def downcase_domain

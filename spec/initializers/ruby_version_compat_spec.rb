@@ -22,7 +22,7 @@ describe 'ruby_version_compat' do
     orig_stdout, orig_stderr = $stdout, $stderr
     $stdout, $stderr = StringIO.new, StringIO.new
     yield
-    [$stdout.string, $stderr.string]
+    return $stdout.string, $stderr.string
   ensure
     $stdout, $stderr = orig_stdout, orig_stderr
   end

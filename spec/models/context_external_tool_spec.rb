@@ -1155,7 +1155,7 @@ describe ContextExternalTool do
 
         expect(hash["custom_a"]).to eq "1"
         expect(hash["custom_b"]).to eq "2"
-        expect(hash).not_to have_key("custom_c")
+        expect(hash.has_key?("custom_c")).to eq false
       end
     end
   end
@@ -1272,13 +1272,13 @@ describe ContextExternalTool do
 
         tool.homework_submission = { enabled: true }
         expect(tool.settings[:homework_submission]).to include({ enabled: true, selection_height: 300 })
-        expect(tool.settings).not_to have_key(:inactive_placements)
+        expect(tool.settings.key?(:inactive_placements)).to be_falsey
       end
 
       it 'moves placement data to inactive placements when disabled' do
         tool.homework_submission = { enabled: false }
         expect(tool.settings[:inactive_placements][:homework_submission]).to include({ enabled: false, selection_height: 300 })
-        expect(tool.settings).not_to have_key(:homework_submission)
+        expect(tool.settings.key?(:homework_submission)).to be_falsey
       end
 
       it 'keeps already inactive placement data when disabled again' do
@@ -1639,7 +1639,7 @@ describe ContextExternalTool do
         it 'accepts `nil` and removes visibility' do
           set_visibility('members')
           set_visibility(nil)
-          expect(tool.file_menu).not_to have_key(:visibility)
+          expect(tool.file_menu.key?(:visibility)).to be false
         end
       end
     end

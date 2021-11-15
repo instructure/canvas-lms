@@ -53,7 +53,11 @@ class FormattedType
   end
 
   def boolean?
-    @example == true || @example == false
+    if @example == true || @example == false
+      true
+    else
+      false
+    end
   end
 
   def string?

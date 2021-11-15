@@ -199,7 +199,7 @@ class MediaTracksController < ApplicationController
       end
       index
     else
-      render_unauthorized_action
+      return render_unauthorized_action
     end
   end
 end

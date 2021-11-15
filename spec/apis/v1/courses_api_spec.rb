@@ -23,17 +23,13 @@ require_relative '../file_uploads_spec_helper'
 
 class TestCourseApi
   include Api::V1::Course
-  def feeds_calendar_url(feed_code)
-    "feed_calendar_url(#{feed_code.inspect})"
-  end
+  def feeds_calendar_url(feed_code); "feed_calendar_url(#{feed_code.inspect})"; end
 
   def course_url(course, **)
     "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"
   end
 
-  def api_user_content(syllabus, course)
-    "api_user_content(#{syllabus}, #{course.id})"
-  end
+  def api_user_content(syllabus, course); return "api_user_content(#{syllabus}, #{course.id})"; end
 end
 
 describe Api::V1::Course do
@@ -1450,10 +1446,7 @@ describe CoursesController, type: :request do
       end
 
       it "doesn't allow creating a published course for unverified users if account requires it" do
-        Account.default.tap { |a|
-          a.settings[:require_confirmed_email] = true
-          a.save!
-        }
+        Account.default.tap { |a| a.settings[:require_confirmed_email] = true; a.save! }
         @course.update_attribute(:workflow_state, "claimed")
 
         json = api_call(:put, @path, @params, { :offer => 1 }, {}, { :expected_status => 401 })
@@ -1928,31 +1921,22 @@ describe CoursesController, type: :request do
     end
 
     context "an authorized user (granular permissions)" do
-      before do
+      it "is able to reset a course" do
         @course.root_account.enable_feature!(:granular_permissions_manage_courses)
         @course.root_account.role_overrides.create!(
           role: teacher_role,
           permission: 'manage_courses_reset',
           enabled: true
         )
-      end
-
-      it "is able to reset a course" do
         expect(Auditors::Course).to receive(:record_reset).once
                                                           .with(@course, anything, @user, anything)
+
         json = api_call(:post, @path, @params)
         @course.reload
         expect(@course.workflow_state).to eql 'deleted'
         new_course = Course.find(json['id'])
         expect(new_course.workflow_state).to eql 'claimed'
         expect(json['workflow_state']).to eql 'unpublished'
-      end
-
-      it "is not able to reset a template course" do
-        @course.enrollments.each(&:destroy)
-        @course.update!(template: true)
-        raw_api_call(:post, @path, @params)
-        expect(response.code).to eql '401'
       end
     end
     context "an unauthorized user" do
@@ -2010,7 +1994,7 @@ describe CoursesController, type: :request do
       end
 
       it 'undeletes courses' do
-        [@course1, @course2].each(&:destroy)
+        [@course1, @course2].each { |c| c.destroy }
         expect(Auditors::Course).to receive(:record_restored).twice
         api_call(:put, @path, @params, { :event => 'undelete', :course_ids => [@course1.id, 'sis_course_id:course2'] })
         run_jobs
@@ -4239,14 +4223,8 @@ describe CoursesController, type: :request do
       @student2 = student_in_course(:active_all => true, :name => "Leonard Hofstadter").user
       @student3 = student_in_course(:active_all => true, :name => "Howard Wolowitz").user
       pseudonym(@student1) # no login info
-      pseudonym(@student2).tap { |p|
-        p.current_login_at = 1.days.ago
-        p.save!
-      }
-      pseudonym(@student3).tap { |p|
-        p.current_login_at = 2.days.ago
-        p.save!
-      }
+      pseudonym(@student2).tap { |p| p.current_login_at = 1.days.ago; p.save! }
+      pseudonym(@student3).tap { |p| p.current_login_at = 2.days.ago; p.save! }
     end
 
     it "includes the last_login information" do

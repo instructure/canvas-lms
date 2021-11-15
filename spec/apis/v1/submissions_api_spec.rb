@@ -1493,7 +1493,7 @@ describe 'Submissions API', type: :request do
                :format => 'json', :course_id => @course.to_param,
                :assignment_id => @assignment.id
              })
-    expect(response.header).to have_key("Link")
+    expect(response.header.has_key?("Link")).to be_truthy
   end
 
   it "returns nothing if no assignments in the course" do

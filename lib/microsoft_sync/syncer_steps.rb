@@ -162,7 +162,9 @@ module MicrosoftSync
       # data in case it was never done.
       new_group_id = remote_ids.first
 
-      new_group_id ||= graph_service_helpers.create_education_class(course)['id']
+      unless new_group_id
+        new_group_id = graph_service_helpers.create_education_class(course)['id']
+      end
 
       StateMachineJob::DelayedNextStep.new(
         :step_update_group_with_course_data, DELAY_BEFORE_UPDATE_GROUP, new_group_id
@@ -291,8 +293,8 @@ module MicrosoftSync
     end
 
     def execute_diff_add_users(diff)
-      diff.additions_in_slices_of(GraphService::GroupsEndpoints::USERS_BATCH_SIZE) do |members_and_owners|
-        skipped = graph_service.groups.add_users_ignore_duplicates(
+      diff.additions_in_slices_of(GraphService::GROUP_USERS_BATCH_SIZE) do |members_and_owners|
+        skipped = graph_service.add_users_to_group_ignore_duplicates(
           group.ms_group_id, **members_and_owners
         )
         log_batch_skipped(:add, skipped)
@@ -304,8 +306,8 @@ module MicrosoftSync
     end
 
     def execute_diff_remove_users(diff)
-      diff.removals_in_slices_of(GraphService::GroupsEndpoints::USERS_BATCH_SIZE) do |members_and_owners|
-        skipped = graph_service.groups.remove_users_ignore_missing(
+      diff.removals_in_slices_of(GraphService::GROUP_USERS_BATCH_SIZE) do |members_and_owners|
+        skipped = graph_service.remove_group_users_ignore_missing(
           group.ms_group_id, **members_and_owners
         )
         log_batch_skipped(:remove, skipped)
@@ -314,7 +316,7 @@ module MicrosoftSync
 
     def step_check_team_exists(_mem_data, _job_state_data)
       if course.enrollments.where(type: MembershipDiff::OWNER_ENROLLMENT_TYPES).any? \
-          && !graph_service.teams.team_exists?(group.ms_group_id)
+        && !graph_service.team_exists?(group.ms_group_id)
         StateMachineJob::DelayedNextStep.new(:step_create_team, DELAY_BEFORE_CREATE_TEAM)
       else
         StateMachineJob::COMPLETE
@@ -324,7 +326,7 @@ module MicrosoftSync
     end
 
     def step_create_team(_mem_data, _job_state_data)
-      graph_service.teams.create_for_education_class(group.ms_group_id)
+      graph_service.create_education_class_team(group.ms_group_id)
       StateMachineJob::COMPLETE
     rescue MicrosoftSync::Errors::TeamAlreadyExists
       StateMachineJob::COMPLETE

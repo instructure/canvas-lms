@@ -18,9 +18,9 @@
 
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
-import {ConversationListItem} from '../ConversationListItem'
+import {MessageListItem} from '../MessageListItem'
 
-describe('ConversationListItem', () => {
+describe('MessageListItem', () => {
   const createProps = overrides => {
     return {
       conversation: {
@@ -75,7 +75,7 @@ describe('ConversationListItem', () => {
 
     const props = createProps({onSelect: onSelectMock})
 
-    const {getByRole} = render(<ConversationListItem {...props} />)
+    const {getByRole} = render(<MessageListItem {...props} />)
 
     const checkbox = getByRole('checkbox')
     fireEvent.click(checkbox)
@@ -86,12 +86,12 @@ describe('ConversationListItem', () => {
     expect(checkbox.checked).toBe(false)
   })
 
-  it('calls onOpen when the conversation is clicked', () => {
+  it('calls onOpen when the message is clicked', () => {
     const onOpenMock = jest.fn()
 
     const props = createProps({onOpen: onOpenMock})
 
-    const {getByText} = render(<ConversationListItem {...props} />)
+    const {getByText} = render(<MessageListItem {...props} />)
 
     const subjectLine = getByText('This is the subject line')
     fireEvent.click(subjectLine)
@@ -103,11 +103,11 @@ describe('ConversationListItem', () => {
 
     const props = createProps({onStar: onStarMock})
 
-    const {queryByTestId, getByText} = render(<ConversationListItem {...props} />)
+    const {queryByTestId, getByText} = render(<MessageListItem {...props} />)
 
     // star not shown by default
     expect(queryByTestId('visible-star')).not.toBeInTheDocument()
-    // star shown when conversation is moused over
+    // star shown when message is moused over
     const subjectLine = getByText('This is the subject line')
     fireEvent.mouseOver(subjectLine)
     expect(queryByTestId('visible-star')).toBeInTheDocument()
@@ -119,7 +119,7 @@ describe('ConversationListItem', () => {
   it('renders the unread badge when the conversation is unread', () => {
     const props = createProps({isUnread: true})
 
-    const container = render(<ConversationListItem {...props} />)
+    const container = render(<MessageListItem {...props} />)
 
     expect(container.getByText('Unread')).toBeInTheDocument()
     expect(container.getByTestId('unread-badge')).toBeInTheDocument()
@@ -128,7 +128,7 @@ describe('ConversationListItem', () => {
   it('renders the read badge when the conversation is read', () => {
     const props = createProps()
 
-    const container = render(<ConversationListItem {...props} />)
+    const container = render(<MessageListItem {...props} />)
 
     expect(container.getByText('Read')).toBeInTheDocument()
     expect(container.getByTestId('read-badge')).toBeInTheDocument()
@@ -139,7 +139,7 @@ describe('ConversationListItem', () => {
 
     const props = createProps({readStateChangeConversationParticipants: changeReadState})
 
-    const container = render(<ConversationListItem {...props} />)
+    const container = render(<MessageListItem {...props} />)
 
     const unreadBadge = container.queryByTestId('read-badge')
     fireEvent.click(unreadBadge)

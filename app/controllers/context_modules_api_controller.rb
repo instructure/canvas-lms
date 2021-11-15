@@ -164,11 +164,11 @@ class ContextModulesApiController < ApplicationController
 
       ActiveRecord::Associations::Preloader.new.preload(modules, content_tags: :content) if includes.include?('items')
 
-      modules_and_progressions = if @student
-                                   modules.map { |m| [m, m.evaluate_for(@student)] }
-                                 else
-                                   modules.map { |m| [m, nil] }
-                                 end
+      if @student
+        modules_and_progressions = modules.map { |m| [m, m.evaluate_for(@student)] }
+      else
+        modules_and_progressions = modules.map { |m| [m, nil] }
+      end
       opts = {}
       if includes.include?('items') && params[:search_term].present?
         SearchTermHelper.validate_search_term(params[:search_term])
@@ -406,14 +406,14 @@ class ContextModulesApiController < ApplicationController
       module_parameters = params.require(:module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
 
       if (ids = params[:module][:prerequisite_module_ids])
-        module_parameters[:prerequisites] = if ids.blank?
-                                              []
-                                            else
-                                              ids.map { |id| "module_#{id}" }.join(',')
-                                            end
+        if ids.blank?
+          module_parameters[:prerequisites] = []
+        else
+          module_parameters[:prerequisites] = ids.map { |id| "module_#{id}" }.join(',')
+        end
       end
 
-      if params[:module].key?(:published)
+      if params[:module].has_key?(:published)
         if value_to_boolean(params[:module][:published])
           @module.publish
           @module.publish_items!
@@ -483,14 +483,14 @@ class ContextModulesApiController < ApplicationController
     if @module.insert_at(params[:module][:position].to_i)
       # see ContextModulesController#reorder
       @context.touch
-      @context.context_modules.not_deleted.each(&:save_without_touching_context)
+      @context.context_modules.not_deleted.each { |m| m.save_without_touching_context }
       @context.touch
 
       @module.reload
-      true
+      return true
     else
       @module.errors.add(:position, t(:invalid_position, "Invalid position"))
-      false
+      return false
     end
   end
 
@@ -503,7 +503,7 @@ class ContextModulesApiController < ApplicationController
     elsif @context.grants_right?(@current_user, session, :participate_as_student)
       @student = @current_user
     else
-      true
+      return true
     end
   end
   protected :find_student

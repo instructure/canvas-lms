@@ -332,7 +332,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def self.valid_type?(type)
-    SIS_TYPES.key?(type)
+    SIS_TYPES.has_key?(type)
   end
 
   def reload(options = nil)
@@ -480,11 +480,11 @@ class Enrollment < ActiveRecord::Base
 
   def update_from(other, skip_broadcasts = false)
     self.course_id = other.course_id
-    self.workflow_state = if self.type == 'ObserverEnrollment' && other.workflow_state == 'invited'
-                            'active'
-                          else
-                            other.workflow_state
-                          end
+    if self.type == 'ObserverEnrollment' && other.workflow_state == 'invited'
+      self.workflow_state = 'active'
+    else
+      self.workflow_state = other.workflow_state
+    end
     self.start_at = other.start_at
     self.end_at = other.end_at
     self.course_section_id = other.course_section_id
@@ -874,7 +874,7 @@ class Enrollment < ActiveRecord::Base
 
   def has_permission_to?(action)
     @permission_lookup ||= {}
-    unless @permission_lookup.key? action
+    unless @permission_lookup.has_key? action
       @permission_lookup[action] = RoleOverride.enabled_for?(course, action, self.role_id, nil)
     end
     @permission_lookup[action].include?(:self)
@@ -1344,10 +1344,11 @@ class Enrollment < ActiveRecord::Base
     clause = User.sortable_name_order_by_clause('users')
     scope = self.order(clause)
     if scope.select_values.present?
-      scope.select(clause)
+      scope = scope.select(clause)
     else
-      scope.select(self.arel_table[Arel.star])
+      scope = scope.select(self.arel_table[Arel.star])
     end
+    scope
   end
 
   def self.top_enrollment_by(key, rank_order = :default)
@@ -1360,12 +1361,12 @@ class Enrollment < ActiveRecord::Base
   def assign_uuid
     # DON'T use ||=, because that will cause an immediate save to the db if it
     # doesn't already exist
-    self.uuid = CanvasSlug.generate_securish_uuid unless read_attribute(:uuid)
+    self.uuid = CanvasSlug.generate_securish_uuid if !read_attribute(:uuid)
   end
   protected :assign_uuid
 
   def uuid
-    unless read_attribute(:uuid)
+    if !read_attribute(:uuid)
       self.update_attribute(:uuid, CanvasSlug.generate_securish_uuid)
     end
     read_attribute(:uuid)
@@ -1396,9 +1397,7 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def self.serialization_excludes
-    [:uuid, :computed_final_score, :computed_current_score]
-  end
+  def self.serialization_excludes; [:uuid, :computed_final_score, :computed_current_score]; end
 
   # enrollment term per-section is deprecated; a section's term is inherited from the
   # course it is currently tied to

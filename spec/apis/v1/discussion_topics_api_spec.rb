@@ -112,8 +112,8 @@ describe Api::V1::DiscussionTopics do
     @me.update! pronouns: "she/her"
 
     expect(
-      @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
-    ).to have_key("user_pronouns")
+      @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil).key?("user_pronouns")
+    ).to eq true
     expect(
       @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)["user_pronouns"]
     ).to eq "she/her"
@@ -540,7 +540,9 @@ describe DiscussionTopicsController, type: :request do
       it "only includes topics with a given scope when specified" do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
-        [@topic, @topic2, @topic3].each(&:save!)
+        [@topic, @topic2, @topic3].each do |topic|
+          topic.save!
+        end
         [@topic2, @topic3].each(&:lock!)
         @topic2.update_attribute(:pinned, true)
 
@@ -2446,7 +2448,7 @@ describe DiscussionTopicsController, type: :request do
       url = +"/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all.json"
       expected_params = { :controller => 'discussion_topics_api', :action => "mark_all_#{new_state}", :format => 'json',
                           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s }
-      if opts.key?(:forced)
+      if opts.has_key?(:forced)
         url << "?forced_read_state=#{opts[:forced]}"
         expected_params[:forced_read_state] = opts[:forced].to_s
       end

@@ -159,7 +159,7 @@ class FilesController < ApplicationController
   before_action { |c| c.active_tab = "files" }
 
   def verify_api_id
-    raise ActiveRecord::RecordNotFound unless Api::ID_REGEX.match?(params[:id])
+    raise ActiveRecord::RecordNotFound unless params[:id] =~ Api::ID_REGEX
   end
 
   def quota
@@ -245,7 +245,7 @@ class FilesController < ApplicationController
   protected :redirect_to_fallback_url
 
   def index
-    react_files
+    return react_files
   end
 
   # @API List files
@@ -351,22 +351,22 @@ class FilesController < ApplicationController
 
   def images
     if authorized_action(@context.attachments.temp_record, @current_user, :read)
-      @images = if Folder.root_folders(@context).first.grants_right?(@current_user, session, :read_contents)
-                  if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
-                    @context.active_images.paginate page: params[:page]
-                  else
-                    @context.active_images.not_hidden.not_locked.where(:folder_id => @context.active_folders.not_hidden.not_locked).paginate :page => params[:page]
-                  end
-                else
-                  [].paginate
-                end
+      if Folder.root_folders(@context).first.grants_right?(@current_user, session, :read_contents)
+        if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
+          @images = @context.active_images.paginate page: params[:page]
+        else
+          @images = @context.active_images.not_hidden.not_locked.where(:folder_id => @context.active_folders.not_hidden.not_locked).paginate :page => params[:page]
+        end
+      else
+        @images = [].paginate
+      end
       headers['X-Total-Pages'] = @images.total_pages.to_s
       render :partial => "shared/wiki_image", :collection => @images
     end
   end
 
   def react_files
-    unless request.format.html?
+    if !request.format.html?
       return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
     end
 
@@ -375,12 +375,11 @@ class FilesController < ApplicationController
       @contexts = [@context]
       get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
       files_contexts = @contexts.map do |context|
-        tool_context = case context
-                       when Course
+        tool_context = if context.is_a?(Course)
                          context
-                       when User
+                       elsif context.is_a?(User)
                          @domain_root_account
-                       when Group
+                       elsif context.is_a?(Group)
                          context.context
                        end
 
@@ -661,7 +660,7 @@ class FilesController < ApplicationController
   def show_relative
     path = params[:file_path]
     file_id = params[:file_id]
-    file_id = nil unless Api::ID_REGEX.match?(file_id.to_s)
+    file_id = nil unless file_id.to_s =~ Api::ID_REGEX
 
     # Manually-invoke verify_authenticity_token for non-Account contexts
     # This is to allow Account-level file downloads to skip request forgery protection
@@ -717,7 +716,7 @@ class FilesController < ApplicationController
     # download param because the download param is used all over the place to mean stuff
     # other than actually download the file. Long term we probably ought to audit the files
     # controller, make download mean download, and remove download_frd.
-    if params[:inline] && !params[:download_frd] && attachment.content_type && (attachment.content_type&.start_with?('text') || attachment.mime_class == 'text' || attachment.mime_class == 'html' || attachment.mime_class == 'code' || attachment.mime_class == 'image')
+    if params[:inline] && !params[:download_frd] && attachment.content_type && (attachment.content_type.match(/\Atext/) || attachment.mime_class == 'text' || attachment.mime_class == 'html' || attachment.mime_class == 'code' || attachment.mime_class == 'image')
       send_stored_file(attachment)
     elsif attachment.inline_content? && !params[:download_frd] && !@context.is_a?(AssessmentQuestion)
       if params[:file_path] || !params[:wrap]
@@ -851,7 +850,7 @@ class FilesController < ApplicationController
   # for local file uploads
   def api_create
     @policy, @attachment = Attachment.decode_policy(params[:Policy], params[:Signature])
-    unless @policy
+    if !@policy
       return head :bad_request
     end
 
@@ -1041,10 +1040,9 @@ class FilesController < ApplicationController
 
   def api_file_status
     @attachment = Attachment.where(id: params[:id], uuid: params[:uuid]).first!
-    case @attachment.file_state
-    when 'available'
+    if @attachment.file_state == 'available'
       render :json => { :upload_status => 'ready', :attachment => attachment_json(@attachment, @current_user) }
-    when 'deleted'
+    elsif @attachment.file_state == 'deleted'
       render :json => { :upload_status => 'pending' }
     else
       render :json => { :upload_status => 'errored', :message => @attachment.upload_error_message }
@@ -1255,9 +1253,9 @@ class FilesController < ApplicationController
     @context = @attachment.context
     if can_replace_file?
       @attachment.reset_uuid!
-      render json: attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true })
+      return render json: attachment_json(@attachment, @current_user, {}, { omit_verifier_in_app: true })
     else
-      render_unauthorized_action
+      return render_unauthorized_action
     end
   end
 

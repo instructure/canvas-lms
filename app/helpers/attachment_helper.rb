@@ -97,7 +97,7 @@ module AttachmentHelper
       send_file_headers!(length: body.length, filename: attachment.filename, disposition: 'inline', type: attachment.content_type_with_encoding)
       render body: body
     elsif must_proxy
-      render 400, text: t("It's not allowed to redirect to HTML files that can't be proxied while Content-Security-Policy is being enforced")
+      return render 400, text: t("It's not allowed to redirect to HTML files that can't be proxied while Content-Security-Policy is being enforced")
     elsif inline
       redirect_to authenticated_inline_url(attachment)
     else
@@ -125,7 +125,7 @@ module AttachmentHelper
     # investigate opportunities to reuse JWTs when the same user requests the
     # same file within a reasonable window of time, so that the URL redirected
     # too can still take advantage of browser caching.
-    unless (attachment.instfs_hosted? && !direct) || attachment.content_type&.start_with?('text') || attachment.extension == '.html' || attachment.extension == '.htm'
+    unless (attachment.instfs_hosted? && !direct) || attachment.content_type.match(/\Atext/) || attachment.extension == '.html' || attachment.extension == '.htm'
       cancel_cache_buster
       # set cache to expire whenever the s3 url does (or one day if local or inline proxy), max-age take seconds, and Expires takes a date
       ttl = direct ? 1.day : attachment.url_ttl

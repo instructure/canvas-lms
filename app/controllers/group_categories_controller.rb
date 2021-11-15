@@ -268,11 +268,12 @@ class GroupCategoriesController < ApplicationController
     if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_add])
       return render(:json => { 'status' => 'unauthorized' }, :status => :unauthorized) if @group_category.protected?
 
-      file_obj = if params.key?(:attachment)
-                   params[:attachment]
-                 else
-                   body_file
-                 end
+      file_obj = nil
+      if params.has_key?(:attachment)
+        file_obj = params[:attachment]
+      else
+        file_obj = body_file
+      end
 
       progress = GroupAndMembershipImporter.create_import_with_attachment(@group_category, file_obj)
       render(:json => progress_json(progress, @current_user, session))
@@ -339,7 +340,7 @@ class GroupCategoriesController < ApplicationController
               @group_category.save!
             end
           else
-            render json: { message: "You must have manage_sis permission to set sis attributes" }, status: :unauthorized
+            return render json: { message: "You must have manage_sis permission to set sis attributes" }, status: :unauthorized
           end
         end
       else
@@ -506,11 +507,11 @@ class GroupCategoriesController < ApplicationController
     exclude_groups = value_to_boolean(params[:unassigned]) ? @group_category.groups.active.pluck(:id) : []
     search_params[:exclude_groups] = exclude_groups
 
-    users = if search_term
-              UserSearch.for_user_in_context(search_term, @context, @current_user, session, search_params)
-            else
-              UserSearch.scope_for(@context, @current_user, search_params)
-            end
+    if search_term
+      users = UserSearch.for_user_in_context(search_term, @context, @current_user, session, search_params)
+    else
+      users = UserSearch.scope_for(@context, @current_user, search_params)
+    end
 
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_category_users_url)
@@ -633,7 +634,7 @@ class GroupCategoriesController < ApplicationController
       memberships = @group_category.assign_unassigned_members(by_section, updating_user: @current_user)
 
       # render the changes
-      json = memberships.group_by(&:group_id).map do |group_id, new_members|
+      json = memberships.group_by { |m| m.group_id }.map do |group_id, new_members|
         { :id => group_id, :new_members => new_members.map { |m| m.user.group_member_json(@context) } }
       end
       render :json => json

@@ -85,7 +85,7 @@ class CutyCapt
   end
 
   def self.enabled?
-    !self.config.nil?
+    return !self.config.nil?
   end
 
   def self.verify_url(url)
@@ -145,7 +145,7 @@ class CutyCapt
         Kernel.exec(*cuty_arguments(config[:path], url, img_file, format, config[:delay], config[:timeout], config[:lang]))
       else
         begin
-          Timeout.timeout(config[:timeout].to_i / 1000) do
+          Timeout::timeout(config[:timeout].to_i / 1000) do
             Process.waitpid(pid)
             unless $?.success?
               logger.error("Capture failed with code: #{$?.exitstatus}")
@@ -184,6 +184,6 @@ class CutyCapt
       # should probably be remedied at some point
       attachment = Attachment.new(:uploaded_data => Rack::Test::UploadedFile.new(file_path, "image/png"))
     end
-    attachment
+    return attachment
   end
 end

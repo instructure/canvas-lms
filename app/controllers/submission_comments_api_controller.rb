@@ -41,7 +41,7 @@ class SubmissionCommentsApiController < ApplicationController
       submission_comment.updating_user = @current_user
       submission_comment.reload unless submission_comment.update(submission_comment_params)
 
-      render json: submission_comment_json(
+      return render json: submission_comment_json(
         submission_comment,
         @current_user
       )
@@ -76,7 +76,7 @@ class SubmissionCommentsApiController < ApplicationController
       submission_comment.updating_user = @current_user
       submission_comment.destroy!
 
-      render json: comment_data
+      return render json: comment_data
     end
   end
 

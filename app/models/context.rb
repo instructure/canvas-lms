@@ -85,7 +85,7 @@ module Context
 
   def self.sorted_rubrics(context)
     associations = RubricAssociation.active.bookmarked.for_context_codes(context.asset_string).preload(:rubric => :context)
-    Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select(&:rubric)) { |r| r.rubric.title || CanvasSort::Last }
+    Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select { |r| r.rubric }) { |r| r.rubric.title || CanvasSort::Last }
   end
 
   def rubric_contexts(user)
@@ -280,11 +280,11 @@ module Context
         object = ContextExternalTool.find_external_tool_by_id(params[:id], context)
       end
     when 'context_modules'
-      object = if %w(item_redirect item_redirect_mastery_paths choose_mastery_path).include?(params[:action])
-                 context.context_module_tags.find_by(id: params[:id])
-               else
-                 context.context_modules.find_by(id: params[:id])
-               end
+      if %w(item_redirect item_redirect_mastery_paths choose_mastery_path).include?(params[:action])
+        object = context.context_module_tags.find_by(id: params[:id])
+      else
+        object = context.context_modules.find_by(id: params[:id])
+      end
     when 'media_objects'
       object = media_obj
     when 'context'

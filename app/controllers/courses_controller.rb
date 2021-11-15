@@ -818,7 +818,7 @@ class CoursesController < ApplicationController
       params[:course] ||= {}
       params_for_create = course_params
 
-      if params_for_create.key?(:syllabus_body)
+      if params_for_create.has_key?(:syllabus_body)
         params_for_create[:syllabus_body] = process_incoming_html_content(params_for_create[:syllabus_body])
       end
 
@@ -1561,11 +1561,11 @@ class CoursesController < ApplicationController
 
       new_settings = {}
 
-      new_settings[:engine_selected] = if key_exists
-                                         update_user_engine_choice(@course, selection_obj)
-                                       else
-                                         { user_id: selection_obj }
-                                       end
+      if key_exists
+        new_settings[:engine_selected] = update_user_engine_choice(@course, selection_obj)
+      else
+        new_settings[:engine_selected] = { user_id: selection_obj }
+      end
       new_settings.reverse_merge!(old_settings)
       @course.settings = new_settings
       @course.save
@@ -1751,9 +1751,9 @@ class CoursesController < ApplicationController
     return !!redirect_to(course_url(@context.id)) unless @pending_enrollment
 
     if params[:reject]
-      reject_enrollment(@pending_enrollment)
+      return reject_enrollment(@pending_enrollment)
     elsif params[:accept]
-      accept_enrollment(@pending_enrollment)
+      return accept_enrollment(@pending_enrollment)
     else
       redirect_to course_url(@context.id)
     end
@@ -1785,7 +1785,7 @@ class CoursesController < ApplicationController
       else
         @context_enrollment = enrollment
         enrollment = nil
-        false
+        return false
       end
     elsif (!@current_user && enrollment.user.registered?) || !enrollment.user.email_channel
       session[:return_to] = course_url(@context.id)
@@ -1935,16 +1935,15 @@ class CoursesController < ApplicationController
       locks_hash = Rails.cache.fetch(['locked_for_results', @current_user, Digest::MD5.hexdigest(params[:assets])].cache_key) do
         locks = {}
         types.each do |type, ids|
-          case type
-          when 'assignment'
+          if type == 'assignment'
             @context.assignments.active.where(id: ids).each do |assignment|
               locks[assignment.asset_string] = assignment.locked_for?(@current_user)
             end
-          when 'quiz'
+          elsif type == 'quiz'
             @context.quizzes.active.include_assignment.where(id: ids).each do |quiz|
               locks[quiz.asset_string] = quiz.locked_for?(@current_user)
             end
-          when 'discussion_topic'
+          elsif type == 'discussion_topic'
             @context.discussion_topics.active.where(id: ids).each do |topic|
               locks[topic.asset_string] = topic.locked_for?(@current_user)
             end
@@ -2052,7 +2051,7 @@ class CoursesController < ApplicationController
           scope = Course
         end
 
-        unless includes.member?("all_courses")
+        if !includes.member?("all_courses")
           scope = scope.not_deleted
         end
         @context = @course = api_find(scope, params[:id])
@@ -2963,11 +2962,11 @@ class CoursesController < ApplicationController
       params[:course][:sis_source_id] = params[:course].delete(:sis_course_id) if api_request?
       if (sis_id = params[:course].delete(:sis_source_id))
         if sis_id != @course.sis_source_id && @course.root_account.grants_right?(@current_user, session, :manage_sis)
-          @course.sis_source_id = if sis_id == ''
-                                    nil
-                                  else
-                                    sis_id
-                                  end
+          if sis_id == ''
+            @course.sis_source_id = nil
+          else
+            @course.sis_source_id = sis_id
+          end
         end
       end
 
@@ -3184,7 +3183,7 @@ class CoursesController < ApplicationController
           redirect_to(course_url(@course))
         end
       end
-      false
+      return false
     else
       result = @course.process_event(event)
       if result
@@ -3251,11 +3250,11 @@ class CoursesController < ApplicationController
   # @returns Progress
   def batch_update
     @account = api_find(Account, params[:account_id])
-    permission = if params[:event] == 'undelete'
-                   :undelete_courses
-                 else
-                   [:manage_courses, :manage_courses_admin]
-                 end
+    if params[:event] == 'undelete'
+      permission = :undelete_courses
+    else
+      permission = [:manage_courses, :manage_courses_admin]
+    end
 
     if authorized_action(@account, @current_user, permission)
       return render(:json => { :message => 'must specify course_ids[]' }, :status => :bad_request) unless params[:course_ids].is_a?(Array)
@@ -3290,7 +3289,7 @@ class CoursesController < ApplicationController
       dt.locked_for?(@current_user, :check_policies => true)
     end)
     @entries.concat WikiPages::ScopedToUser.new(@context, @current_user, @context.wiki_pages.published).scope
-    @entries = @entries.sort_by(&:updated_at)
+    @entries = @entries.sort_by { |e| e.updated_at }
     @entries.each do |entry|
       feed.entries << entry.to_atom(:context => @context)
     end
@@ -3332,11 +3331,8 @@ class CoursesController < ApplicationController
   def reset_content
     get_context
     return unless authorized_action(@context, @current_user, :reset_content)
-
-    if MasterCourses::MasterTemplate.is_master_course?(@context) || @context.template?
-      return render json: {
-        :message => 'cannot reset_content on a blueprint or template course'
-      }, :status => :bad_request
+    if MasterCourses::MasterTemplate.is_master_course?(@context)
+      return render :json => { :message => 'cannot reset_content on a blueprint course' }, :status => :bad_request
     end
 
     @new_course = @context.reset_content
@@ -3379,11 +3375,11 @@ class CoursesController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_as_admin)
 
     assignment_ids = effective_due_dates_params[:assignment_ids]
-    due_dates = if assignment_ids.present?
-                  EffectiveDueDates.for_course(@context, assignment_ids)
-                else
-                  EffectiveDueDates.for_course(@context)
-                end
+    if assignment_ids.present?
+      due_dates = EffectiveDueDates.for_course(@context, assignment_ids)
+    else
+      due_dates = EffectiveDueDates.for_course(@context)
+    end
 
     render json: due_dates.to_hash([
                                      :due_at, :grading_period_id, :in_closed_grading_period
@@ -3569,21 +3565,21 @@ class CoursesController < ApplicationController
 
     # Since course uses write_attribute on settings its not accurate
     # so just ignore it if its in the changes hash
-    changes.delete("settings") if changes.key?("settings")
+    changes.delete("settings") if changes.has_key?("settings")
 
     unless old_settings == new_settings
       settings = Course.settings_options.keys.inject({}) do |results, key|
-        old_value = if old_settings.present? && old_settings.key?(key)
-                      old_settings[key]
-                    else
-                      nil
-                    end
+        if old_settings.present? && old_settings.has_key?(key)
+          old_value = old_settings[key]
+        else
+          old_value = nil
+        end
 
-        new_value = if new_settings.present? && new_settings.key?(key)
-                      new_settings[key]
-                    else
-                      nil
-                    end
+        if new_settings.present? && new_settings.has_key?(key)
+          new_value = new_settings[key]
+        else
+          new_value = nil
+        end
 
         results[key.to_s] = [old_value, new_value] unless old_value == new_value
 
