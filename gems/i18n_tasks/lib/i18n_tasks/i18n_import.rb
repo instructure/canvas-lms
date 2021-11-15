@@ -191,7 +191,7 @@ module I18nTasks
     private
 
     def init_source(translations)
-      raise "Source does not have any English strings" unless translations.keys.include?('en')
+      raise "Source does not have any English strings" unless translations.key?('en')
 
       translations['en'].flatten_keys
     end

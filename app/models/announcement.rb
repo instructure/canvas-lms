@@ -161,7 +161,7 @@ class Announcement < DiscussionTopic
   end
 
   def create_alert
-    return if !saved_changes.keys.include?('workflow_state') || saved_changes['workflow_state'][1] != 'active'
+    return if !saved_changes.key?('workflow_state') || saved_changes['workflow_state'][1] != 'active'
     return if self.context_type != 'Course'
 
     observer_enrollments = self.course.enrollments.active.where(type: 'ObserverEnrollment')
