@@ -286,7 +286,7 @@ describe "assignment rubrics" do
       f('.assess_submission_link').click
       wait_for_animations
       expect(f("span[data-selenium='rubric_total']")).to include_text "0 out of 5"
-      ff(".rating-description").select { |elt| elt.displayed? && elt.text == "Amazing" }[0].click
+      ff(".rating-description").find { |elt| elt.displayed? && elt.text == "Amazing" }.click
       expect(f("span[data-selenium='rubric_total']")).to include_text "5 out of 5"
       scroll_into_view('.save_rubric_button')
       f('.save_rubric_button').click

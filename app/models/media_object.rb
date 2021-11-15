@@ -319,7 +319,7 @@ class MediaObject < ActiveRecord::Base
                                   })
 
     url = self.data.dig(:download_url)
-    url = sources.select { |s| s[:isOriginal] == '1' }.first&.dig(:url) if url.blank?
+    url = sources.find { |s| s[:isOriginal] == '1' }&.dig(:url) if url.blank?
     url = sources.sort_by { |a| a[:bitrate].to_i }.first&.dig(:url) if url.blank?
 
     attachment.clone_url(url, :rename, false) # no check_quota because the bits are in kaltura

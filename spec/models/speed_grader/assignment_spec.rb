@@ -114,7 +114,7 @@ describe SpeedGrader::Assignment do
 
         before do
           json = SpeedGrader::Assignment.new(assignment, teacher).json
-          student_a_submission = json.fetch(:submissions).select { |s| s[:user_id] == first_student.id.to_s }.first
+          student_a_submission = json.fetch(:submissions).find { |s| s[:user_id] == first_student.id.to_s }
           @comments = student_a_submission.fetch(:submission_comments).map do |comment|
             comment.slice(:author_id, :comment)
           end

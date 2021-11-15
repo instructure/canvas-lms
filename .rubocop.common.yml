@@ -75,6 +75,8 @@ Naming/FileName:
 
 Performance/Count:
   Severity: error
+Performance/Detect:
+  Severity: error
 Performance/MapCompact:
   Severity: error
 Performance/RedundantMerge:

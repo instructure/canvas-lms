@@ -709,14 +709,14 @@ describe Group do
 
         it 'returns the plugin names' do
           tabs = @group.tabs_available(@user)
-          expect(tabs.select { |t| t[:css_class] == 'conferences' }[0][:label]).to eq("Big blue button Wimba (Conferences)")
+          expect(tabs.find { |t| t[:css_class] == 'conferences' }[:label]).to eq("Big blue button Wimba (Conferences)")
         end
       end
 
       context 'when WebConferences are not enabled' do
         it "returns Conferences" do
           tabs = @group.tabs_available(@user)
-          expect(tabs.select { |t| t[:css_class] == 'conferences' }[0][:label]).to eq("Conferences")
+          expect(tabs.find { |t| t[:css_class] == 'conferences' }[:label]).to eq("Conferences")
         end
       end
     end
