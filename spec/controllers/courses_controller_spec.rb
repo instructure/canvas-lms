@@ -438,7 +438,7 @@ describe CoursesController do
         enrollment2 = student_in_course user: @student, course: course2, active_all: true
 
         # future date that doesn't count
-        course3 = Account.default.courses.create! start_at: 1.weeks.from_now, conclude_at: 2.weeks.from_now,
+        course3 = Account.default.courses.create! start_at: 1.week.from_now, conclude_at: 2.weeks.from_now,
                                                   restrict_enrollments_to_course_dates: false,
                                                   name: 'C'
         course3.offer!

@@ -1725,7 +1725,7 @@ describe Submission do
 
       it "does not create a message for a soft-concluded student" do
         @course.start_at = 2.weeks.ago
-        @course.conclude_at = 1.weeks.ago
+        @course.conclude_at = 1.week.ago
         @course.restrict_enrollments_to_course_dates = true
         @course.save!
 
@@ -4172,13 +4172,13 @@ describe Submission do
       it "handles submission histories with different attachments" do
         student_in_course(active_all: true)
         attachments = [attachment_model(filename: "submission-a.doc", :context => @student)]
-        Timecop.freeze(10.second.ago) do
+        Timecop.freeze(10.seconds.ago) do
           @assignment.submit_homework(@student, submission_type: 'online_upload',
                                                 attachments: [attachments[0]])
         end
 
         attachments << attachment_model(filename: "submission-b.doc", :context => @student)
-        Timecop.freeze(5.second.ago) do
+        Timecop.freeze(5.seconds.ago) do
           @assignment.submit_homework @student, attachments: [attachments[1]]
         end
 
@@ -7478,7 +7478,7 @@ describe Submission do
       # to the database, we can't call submit_homework multiple times. We are
       # instead just updating the submitted_at time, which triggers the before_save
       # callback.
-      submission.update!(submitted_at: 2.hour.ago)
+      submission.update!(submitted_at: 2.hours.ago)
       submission.update!(submitted_at: 1.hour.ago)
       expect(submission.attempt).to eq 3
     end

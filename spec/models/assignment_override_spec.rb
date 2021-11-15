@@ -490,7 +490,7 @@ describe AssignmentOverride do
 
     it "does not interpret non-11:59pm as all day with non-all-day prior value" do
       @override.due_at = fancy_midnight(:zone => 'Alaska') + 1.hour
-      @override.due_at = fancy_midnight(:zone => 'Alaska') + 2.hour
+      @override.due_at = fancy_midnight(:zone => 'Alaska') + 2.hours
       expect(@override.all_day).to eq false
     end
 

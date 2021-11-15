@@ -130,7 +130,7 @@ describe DiscussionTopicsController do
         term = @course.account.enrollment_terms.create!(
           :name => 'mew',
           :start_at => 6.months.ago(now),
-          :end_at => 1.months.ago(now)
+          :end_at => 1.month.ago(now)
         )
         @course.enrollment_term = term
         @course.update!(start_at: 5.months.ago(now), conclude_at: 2.months.ago(now))

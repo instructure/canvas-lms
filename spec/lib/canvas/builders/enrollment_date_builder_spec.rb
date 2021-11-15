@@ -39,7 +39,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
         @teacher_enrollment.start_at = 2.days.from_now
         @teacher_enrollment.end_at = 4.days.from_now
         @teacher_enrollment.save!
-        @student_enrollment.start_at = 1.days.from_now
+        @student_enrollment.start_at = 1.day.from_now
         @student_enrollment.end_at = 3.days.from_now
         @student_enrollment.save!
       end
@@ -56,7 +56,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
     context "has enrollment dates from section" do
       append_before do
         @section.restrict_enrollments_to_section_dates = true
-        @section.start_at = 1.days.ago
+        @section.start_at = 1.day.ago
         @section.end_at = 3.days.from_now
         @section.save!
 

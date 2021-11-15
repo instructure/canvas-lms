@@ -2741,7 +2741,7 @@ describe Enrollment do
       @course.start_at = 4.days.ago
       @term.start_at = 3.days.ago
       @section.created_at = 2.days.ago
-      @course.created_at = 1.days.ago
+      @course.created_at = 1.day.ago
     end
 
     it "utilizes to enrollment_dates if it has a value" do
@@ -2794,7 +2794,7 @@ describe Enrollment do
       @section = @enrollment.course_section
 
       # 5 different possible times, make sure they're distinct
-      @enrollment_date_end_at = 1.days.ago
+      @enrollment_date_end_at = 1.day.ago
       @enrollment.end_at = 2.days.ago
       @section.end_at = 3.days.ago
       @course.conclude_at = 4.days.ago

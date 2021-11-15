@@ -167,7 +167,7 @@ describe CanvasSecurity do
       end
 
       it "allows 5 minutes of future clock skew" do
-        back_to_the_future_jwt = test_jwt(exp: 1.hour.from_now, nbf: 1.minutes.from_now, iat: 1.minutes.from_now)
+        back_to_the_future_jwt = test_jwt(exp: 1.hour.from_now, nbf: 1.minute.from_now, iat: 1.minute.from_now)
         body = CanvasSecurity.decode_jwt(back_to_the_future_jwt, [key])
         expect(body[:a]).to eq 1
       end

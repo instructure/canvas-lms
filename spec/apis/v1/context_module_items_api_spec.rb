@@ -1132,7 +1132,7 @@ describe "Module Items API", type: :request do
 
     def override_assignment
       @due_at = Time.zone.now + 2.days
-      @unlock_at = Time.zone.now + 1.days
+      @unlock_at = Time.zone.now + 1.day
       @lock_at = Time.zone.now + 3.days
       @override = assignment_override_model(:assignment => @assignment, :due_at => @due_at, :unlock_at => @unlock_at, :lock_at => @lock_at)
       @override_student = @override.assignment_override_students.build
