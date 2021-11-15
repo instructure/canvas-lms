@@ -81,7 +81,7 @@ unless $canvas_tasks_loaded
         end
       end
 
-      combined_time = batch_times.reduce(:+)
+      combined_time = batch_times.sum
 
       puts(
         "Finished compiling assets in #{real_time.round(2)}s. " +

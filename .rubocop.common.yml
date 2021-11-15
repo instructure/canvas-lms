@@ -96,6 +96,8 @@ Performance/StringInclude:
   Severity: error
 Performance/StringReplacement:
   Severity: error
+Performance/Sum:
+  Severity: error
 Performance/TimesMap:
   Severity: error
 

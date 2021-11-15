@@ -24,7 +24,7 @@ module Multipart
     end
 
     def size
-      @streams.map(&:size).sum
+      @streams.sum(&:size)
     end
 
     def read(size = nil, outbuf = +"")
