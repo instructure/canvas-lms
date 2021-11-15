@@ -61,7 +61,7 @@ class EportfolioEntriesController < ApplicationController
       elsif params[:entry_name] && @category
         @page = @category.eportfolio_entries.where(slug: params[:entry_name]).first
       end
-      if !@page
+      unless @page
         flash[:notice] = t('notices.missing_page', "Couldn't find that page")
         redirect_to eportfolio_url(@portfolio.id)
         return

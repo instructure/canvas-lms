@@ -143,7 +143,7 @@ module TextHelper
 
         # we've reached the top and found no more text nodes, break
         if n.is_a?(Nokogiri::HTML::Document)
-          break;
+          break
         else
           current = n.parent.next
         end
@@ -231,7 +231,7 @@ module TextHelper
     inlinify = :auto
     if args.last.is_a?(Hash)
       options = args.last
-      inlinify = options.delete(:inlinify) if options.has_key?(:inlinify)
+      inlinify = options.delete(:inlinify) if options.key?(:inlinify)
       options.each_pair do |key, value|
         next unless value.is_a?(String) && !value.is_a?(MarkdownSafeBuffer) && !value.is_a?(ActiveSupport::SafeBuffer)
         next if key == :wrapper

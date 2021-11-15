@@ -25,7 +25,7 @@ module Account::Settings
         opts[:values] = [:value, :locked]
 
         self.class_eval "def #{setting}; cached_inherited_setting(:#{setting}); end", __FILE__, __LINE__
-      elsif opts && opts[:boolean] && opts.has_key?(:default)
+      elsif opts && opts[:boolean] && opts.key?(:default)
         if opts[:default]
           # if the default is true, we want a nil result to evaluate to true.
           # this prevents us from having to backfill true values into a
@@ -68,7 +68,7 @@ module Account::Settings
       current_hash = acc.settings[setting]
       next if current_hash.nil?
 
-      if !current_hash.is_a?(Hash)
+      unless current_hash.is_a?(Hash)
         current_hash = { :locked => false, :value => current_hash }
       end
       current_hash[:inherited] = true if self != acc
@@ -79,6 +79,6 @@ module Account::Settings
         inherited_hash = current_hash
       end
     end
-    return inherited_hash
+    inherited_hash
   end
 end

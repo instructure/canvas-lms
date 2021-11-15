@@ -42,8 +42,8 @@ module CC
 
           pace_plans_node.pace_plan(identifier: create_key(pace_plan)) do |pace_plan_node|
             pace_plan_node.workflow_state pace_plan.workflow_state
-            pace_plan_node.end_date CCHelper::ims_date(pace_plan.end_date) if pace_plan.end_date
-            pace_plan_node.published_at CCHelper::ims_datetime(pace_plan.published_at) if pace_plan.published_at
+            pace_plan_node.end_date CCHelper.ims_date(pace_plan.end_date) if pace_plan.end_date
+            pace_plan_node.published_at CCHelper.ims_datetime(pace_plan.published_at) if pace_plan.published_at
             pace_plan_node.exclude_weekends pace_plan.exclude_weekends
             pace_plan_node.hard_end_dates pace_plan.hard_end_dates
             pace_plan_node.module_items do |module_items_node|

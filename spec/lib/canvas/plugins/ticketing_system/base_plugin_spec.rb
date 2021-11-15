@@ -21,9 +21,13 @@ require_dependency "canvas/plugins/ticketing_system/base_plugin"
 
 module Canvas::Plugins::TicketingSystem
   class FakePlugin < BasePlugin
-    def plugin_id; "fake_plugin"; end
+    def plugin_id
+      "fake_plugin"
+    end
 
-    def settings; { setting1: 1, setting2: 2 }; end
+    def settings
+      { setting1: 1, setting2: 2 }
+    end
 
     def export_error(report, conf)
       reports << [report, conf]

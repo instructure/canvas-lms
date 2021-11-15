@@ -58,7 +58,7 @@ class ReportSnapshot < ActiveRecord::Base
   end
 
   def data
-    if !@data
+    unless @data
       @data = JSON.parse(read_attribute(:data) || '{}')
       @data['generated_at'] = Time.at(@data['generated_at'].to_i / 1000) if @data['generated_at']
     end

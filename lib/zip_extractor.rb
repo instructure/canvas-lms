@@ -55,7 +55,7 @@ class ZipExtractor
       self.unzipped_files << local_name
     end
     block.call(self.unzipped_files) if block
-    return self.unzipped_files
+    self.unzipped_files
   end
 
   def remove_extracted_files!

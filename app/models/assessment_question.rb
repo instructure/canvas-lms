@@ -123,7 +123,7 @@ class AssessmentQuestion < ActiveRecord::Base
     path = match_data[2]
     id_or_path = id || path
 
-    if !file_substitutions[id_or_path]
+    unless file_substitutions[id_or_path]
       if id
         file = Attachment.where(context_type: context_type, context_id: context_id, id: id_or_path).first
       elsif path
@@ -161,11 +161,15 @@ class AssessmentQuestion < ActiveRecord::Base
     # or gets the relative path at the end of one like: /courses/15395/file_contents/course%20files/unfiled/test.jpg
 
     deep_translate = lambda do |obj|
-      if obj.is_a?(Hash)
-        obj.inject(HashWithIndifferentAccess.new) { |h, (k, v)| h[k] = deep_translate.call(v); h }
-      elsif obj.is_a?(Array)
+      case obj
+      when Hash
+        obj.inject(HashWithIndifferentAccess.new) { |h, (k, v)|
+          h[k] = deep_translate.call(v)
+          h
+        }
+      when Array
         obj.map { |v| deep_translate.call(v) }
-      elsif obj.is_a?(String)
+      when String
         obj.gsub(translate_link_regex) do |match|
           translate_file_link(match, $~)
         end
@@ -208,12 +212,12 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def question_data=(data)
-    if data.is_a?(String)
-      data = ActiveSupport::JSON.decode(data) rescue nil
-    else
-      # we may be modifying this data (translate_links), and only want to work on a copy
-      data = data.try(:dup)
-    end
+    data = if data.is_a?(String)
+             ActiveSupport::JSON.decode(data) rescue nil
+           else
+             # we may be modifying this data (translate_links), and only want to work on a copy
+             data.try(:dup)
+           end
     write_attribute(:question_data, data.to_hash.with_indifferent_access)
   end
 
@@ -341,7 +345,7 @@ class AssessmentQuestion < ActiveRecord::Base
       [:incorrect_comments_html, :incorrect_comments],
       [:neutral_comments_html, :neutral_comments],
     ].each do |html_key, non_html_key|
-      if qdata.has_key?(html_key) && qdata[html_key].blank? && qdata[non_html_key].blank?
+      if qdata.key?(html_key) && qdata[html_key].blank? && qdata[non_html_key].blank?
         data.delete(non_html_key)
       end
     end

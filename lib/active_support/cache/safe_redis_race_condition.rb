@@ -82,7 +82,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
     # if we have old stale data, silently swallow any
     # errors fetching fresh data, and return the stale entry
     Canvas::Errors.capture(e)
-    return @safe_redis_internal_options[:stale_entry].value
+    @safe_redis_internal_options[:stale_entry].value
   ensure
     # only unlock if we have an actual lock nonce, not just "true"
     # that happens on failure

@@ -68,7 +68,7 @@ module DrDiff
 
       command_comments.each do |comment|
         path = comment[:path]
-        path = path[git_dir.length..-1] if git_dir
+        path = path[git_dir.length..] if git_dir
         severe = severe?(comment[:severity], severe_levels)
         next unless heavy ||
                     (severe && severe_anywhere) ||

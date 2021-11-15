@@ -97,11 +97,10 @@ module OutcomeCommon
   end
 
   def state_outcome
-    state_outcome = [
+    [
       'CCSS.ELA-Literacy.CCRA.R - Reading',
       'Craft and Structure'
     ]
-    state_outcome
   end
 
   def course_bulk_outcome_groups_course(num_of_groups, num_of_outcomes)
@@ -216,7 +215,7 @@ module OutcomeCommon
 
   def should_edit_a_learning_outcome_and_delete_a_rating
     edited_title = 'edit outcome'
-    who_to_login == 'teacher' ? @context = @course : @context = account
+    @context = who_to_login == 'teacher' ? @course : account
     outcome_model
     get outcome_url
 
@@ -259,7 +258,7 @@ module OutcomeCommon
   end
 
   def should_delete_a_learning_outcome
-    who_to_login == 'teacher' ? @context = @course : @context = account
+    @context = who_to_login == 'teacher' ? @course : account
     outcome_model
     get outcome_url
     fj('.outcomes-sidebar .outcome-level:first li').click
@@ -400,7 +399,7 @@ module OutcomeCommon
 
   def should_edit_an_outcome_group
     edited_title = 'edited group'
-    who_to_login == 'teacher' ? @context = @course : @context = account
+    @context = who_to_login == 'teacher' ? @course : account
     outcome_group_model
     get outcome_url
 
@@ -425,7 +424,7 @@ module OutcomeCommon
   end
 
   def should_delete_an_outcome_group
-    who_to_login == 'teacher' ? @context = @course : @context = account
+    @context = who_to_login == 'teacher' ? @course : account
     outcome_group_model
     get outcome_url
     fj('.outcomes-sidebar .outcome-level:first li.outcome-group').click

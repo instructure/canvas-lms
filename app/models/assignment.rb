@@ -232,11 +232,11 @@ class Assignment < ActiveRecord::Base
   def get_potentially_conflicting_titles(title_base)
     assignment_titles = Assignment.active.for_course(self.context_id)
                                   .starting_with_title(title_base).pluck("title").to_set
-    if self.wiki_page
-      wiki_titles = self.wiki_page.get_potentially_conflicting_titles(title_base)
-    else
-      wiki_titles = [].to_set
-    end
+    wiki_titles = if self.wiki_page
+                    self.wiki_page.get_potentially_conflicting_titles(title_base)
+                  else
+                    [].to_set
+                  end
     assignment_titles.union(wiki_titles)
   end
 
@@ -285,7 +285,7 @@ class Assignment < ActiveRecord::Base
     # override later.  Just helps to avoid duplicate positions.
     result.position = Assignment.active.where(assignment_group: assignment_group).maximum(:position) + 1
     result.title =
-      opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"), self.title)
+      opts_with_default[:copy_title] || get_copy_title(self, t("Copy"), self.title)
 
     if self.wiki_page && opts_with_default[:duplicate_wiki_page]
       result.wiki_page = self.wiki_page.duplicate({
@@ -444,7 +444,7 @@ class Assignment < ActiveRecord::Base
       errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be changed if graded submissions exist")
     end
     if (moderated_grading_changed? || new_record?) && moderated_grading?
-      if !graded?
+      unless graded?
         errors.add :moderated_grading, I18n.t("Moderated grading setting cannot be enabled for ungraded assignments")
       end
       if has_group_category?
@@ -831,7 +831,7 @@ class Assignment < ActiveRecord::Base
       self.turnitin_settings[:error] = res
     end
     self.save
-    return self.turnitin_settings[:current]
+    self.turnitin_settings[:current]
   end
 
   def turnitin_settings settings = nil
@@ -851,11 +851,11 @@ class Assignment < ActiveRecord::Base
   end
 
   def turnitin_settings=(settings)
-    if vericite_enabled?
-      settings = VeriCite::Client.normalize_assignment_vericite_settings(settings)
-    else
-      settings = Turnitin::Client.normalize_assignment_turnitin_settings(settings)
-    end
+    settings = if vericite_enabled?
+                 VeriCite::Client.normalize_assignment_vericite_settings(settings)
+               else
+                 Turnitin::Client.normalize_assignment_turnitin_settings(settings)
+               end
     unless settings.blank?
       [:created, :error].each do |key|
         settings[key] = self.turnitin_settings[key] if self.turnitin_settings[key]
@@ -883,7 +883,7 @@ class Assignment < ActiveRecord::Base
       self.turnitin_settings[:error] = res
     end
     self.save
-    return self.turnitin_settings[:current]
+    self.turnitin_settings[:current]
   end
 
   def vericite_settings
@@ -904,15 +904,15 @@ class Assignment < ActiveRecord::Base
     if opts[:due_at]
       if opts[:due_at] == opts[:due_at_was]
         # (comparison is modulo time zone) no real change, leave as was
-        return opts[:all_day_was], opts[:all_day_date_was]
+        [opts[:all_day_was], opts[:all_day_date_was]]
       else
         # 'normal' case. compare due_at to fancy midnight and extract its
         # date-part
-        return (opts[:due_at].strftime("%H:%M") == '23:59'), opts[:due_at].to_date
+        [(opts[:due_at].strftime("%H:%M") == '23:59'), opts[:due_at].to_date]
       end
     else
       # no due at = all_day and all_day_date are irrelevant
-      return false, nil
+      [false, nil]
     end
   end
 
@@ -1348,7 +1348,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def time_zone_edited
-    CGI::unescapeHTML(read_attribute(:time_zone_edited) || "")
+    CGI.unescapeHTML(read_attribute(:time_zone_edited) || "")
   end
 
   def restore(from = nil)
@@ -2087,7 +2087,7 @@ class Assignment < ActiveRecord::Base
   def find_or_create_submission(user)
     Assignment.unique_constraint_retry do
       s = all_submissions.where(user_id: user).first
-      if !s
+      unless s
         s = submissions.build
         user.is_a?(User) ? s.user = user : s.user_id = user
         s.save!
@@ -2302,7 +2302,7 @@ class Assignment < ActiveRecord::Base
       end
     end
     touch_context
-    return primary_homework
+    primary_homework
   end
 
   def submission_attributes(opts, group)
@@ -3087,7 +3087,9 @@ class Assignment < ActiveRecord::Base
     [due_at || CanvasSort::Last, Canvas::ICU.collation_key(title)]
   end
 
-  def special_class; nil; end
+  def special_class
+    nil
+  end
 
   def submission_action_string
     if submission_types == "online_quiz"
@@ -3894,7 +3896,7 @@ class Assignment < ActiveRecord::Base
     overrides = overrides.values.reject(&:empty?).flatten if overrides.is_a?(Hash)
     overrides = overrides.map do |o|
       o = o.to_unsafe_h if o.is_a?(ActionController::Parameters)
-      if o.is_a?(Hash) && o.has_key?(:due_at) && !o.has_key?(:due_at_overridden)
+      if o.is_a?(Hash) && o.key?(:due_at) && !o.key?(:due_at_overridden)
         o = o.merge(:due_at_overridden => true) # default to true if provided by api
       end
       o

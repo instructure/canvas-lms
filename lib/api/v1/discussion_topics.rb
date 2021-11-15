@@ -245,7 +245,7 @@ module Api::V1::DiscussionTopics
     allowed_fields  = %w{id created_at updated_at parent_id rating_count rating_sum}
     allowed_methods = []
     allowed_fields << 'editor_id' if entry.deleted? || entry.editor_id
-    allowed_fields << 'user_id'   if !entry.deleted?
+    allowed_fields << 'user_id'   unless entry.deleted?
     allowed_methods << 'user_name' if !entry.deleted? && includes.include?(:user_name)
 
     json = api_json(entry, user, session, only: allowed_fields, methods: allowed_methods)

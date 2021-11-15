@@ -163,7 +163,7 @@ module Csp::AccountHelper
     if config['attachment_specific_file_domain'] == 'true'
       separator = config['attachment_specific_file_domain_separator'] || '.'
       files_host = if separator != '.'
-                     "*.#{files_host[files_host.index('.') + 1..-1]}"
+                     "*.#{files_host[files_host.index('.') + 1..]}"
                    else
                      "*.#{files_host}"
                    end

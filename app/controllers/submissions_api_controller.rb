@@ -431,11 +431,11 @@ class SubmissionsApiController < ApplicationController
     end
 
     if value_to_boolean(params[:post_to_sis])
-      if student_ids.is_a?(Array)
-        student_ids = enrollments.where(user_id: student_ids).where.not(sis_batch_id: nil).select(:user_id)
-      else
-        student_ids = student_ids.where.not(sis_batch_id: nil)
-      end
+      student_ids = if student_ids.is_a?(Array)
+                      enrollments.where(user_id: student_ids).where.not(sis_batch_id: nil).select(:user_id)
+                    else
+                      student_ids.where.not(sis_batch_id: nil)
+                    end
     end
 
     includes = Array(params[:include])
@@ -472,7 +472,7 @@ class SubmissionsApiController < ApplicationController
     assignments_hash = assignments.index_by(&:id)
 
     if params[:submitted_since].present?
-      if params[:submitted_since] !~ Api::ISO8601_REGEX
+      if !Api::ISO8601_REGEX.match?(params[:submitted_since])
         return render(json: { errors: { submitted_since: t('Invalid datetime for submitted_since') } }, status: 400)
       else
         submitted_since_date = Time.zone.parse(params[:submitted_since])
@@ -480,7 +480,7 @@ class SubmissionsApiController < ApplicationController
     end
 
     if params[:graded_since].present?
-      if params[:graded_since] !~ Api::ISO8601_REGEX
+      if !Api::ISO8601_REGEX.match?(params[:graded_since])
         return render(json: { errors: { graded_since: t('Invalid datetime for graded_since') } }, status: 400)
       else
         graded_since_date = Time.zone.parse(params[:graded_since])
@@ -622,7 +622,7 @@ class SubmissionsApiController < ApplicationController
         )
       else
         @unauthorized_message = t('#application.errors.submission_unauthorized', "You cannot access this submission.")
-        return render_unauthorized_action
+        render_unauthorized_action
       end
     end
   end

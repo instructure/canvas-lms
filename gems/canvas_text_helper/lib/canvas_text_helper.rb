@@ -68,7 +68,7 @@ module CanvasTextHelper
   def self.cgi_escape_truncate(string, max_len)
     retval = +''
     string.chars do |char|
-      escape_seq = CGI::escape(char)
+      escape_seq = CGI.escape(char)
       break if retval.length + escape_seq.length > max_len
 
       retval << escape_seq

@@ -173,7 +173,7 @@ class DiscussionEntriesController < ApplicationController
             f.id = polymorphic_url([@context, @topic])
           end
           feed.entries << @topic.to_atom
-          @discussion_entries.sort_by { |e| e.updated_at }.each do |e|
+          @discussion_entries.sort_by(&:updated_at).each do |e|
             feed.entries << e.to_atom
           end
           render :plain => feed.to_xml

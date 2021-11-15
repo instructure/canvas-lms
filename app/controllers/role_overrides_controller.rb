@@ -242,7 +242,7 @@ class RoleOverridesController < ApplicationController
   #     manage_courses_add               -- Courses - add
   #     manage_courses_admin             -- Courses - manage / update
   #     manage_developer_keys            -- Developer keys - manage
-  #     manage_feature_flags             -- Feature Previews - enable / disable
+  #     manage_feature_flags             -- Feature Options - enable / disable
   #     manage_master_courses            -- Blueprint Courses - add / edit / associate / delete
   #     manage_role_overrides            -- Permissions - manage
   #     manage_storage_quotas            -- Storage Quotas - manage
@@ -253,7 +253,7 @@ class RoleOverridesController < ApplicationController
   #     read_course_content              -- Course Content - view
   #     read_course_list                 -- Courses - view list
   #     view_course_changes              -- Courses - view change logs
-  #     view_feature_flags               -- Feature Previews - view
+  #     view_feature_flags               -- Feature Options - view
   #     view_grade_changes               -- Grades - view change logs
   #     view_notifications               -- Notifications - view
   #     view_quiz_answer_audits          -- Quizzes - view submission log
@@ -396,7 +396,7 @@ class RoleOverridesController < ApplicationController
     role.base_role_type = base_role_type
     role.workflow_state = 'active'
     role.deleted_at = nil
-    if !role.save
+    unless role.save
       if api_request?
         render :json => role.errors, :status => :bad_request
       else
@@ -542,17 +542,17 @@ class RoleOverridesController < ApplicationController
       set_permissions_for(@role, @context, params[:permissions])
       render :json => role_json(@context, @role, @current_user, session)
     rescue BadPermissionSettingError => e
-      return render json: { message: e }, status: :bad_request
+      render json: { message: e }, status: :bad_request
     end
   end
 
   def create
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      if params[:account_roles] || @context == Account.site_admin
-        roles = @context.available_account_roles(true)
-      else
-        roles = @context.available_course_roles(true)
-      end
+      roles = if params[:account_roles] || @context == Account.site_admin
+                @context.available_account_roles(true)
+              else
+                @context.available_course_roles(true)
+              end
       if params[:permissions]
         RoleOverride.permissions.keys.each do |key|
           if params[:permissions][key]

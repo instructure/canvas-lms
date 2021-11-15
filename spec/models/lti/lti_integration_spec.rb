@@ -381,7 +381,7 @@ describe "LTI integration tests" do
       adapter.prepare_tool_launch('http://www.yahoo.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456', selected_html: html)
 
       hash = adapter.generate_post_payload
-      expect(hash['text']).to eq CGI::escape(html)
+      expect(hash['text']).to eq CGI.escape(html)
     end
   end
 

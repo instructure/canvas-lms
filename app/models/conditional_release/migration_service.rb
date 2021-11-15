@@ -32,7 +32,7 @@ module ConditionalRelease
         end
 
         # just pretend like we started an export even if we're not actually hitting a service anymore
-        return { :native => true, :course => course, :assignment_ids => assignment_ids }
+        { :native => true, :course => course, :assignment_ids => assignment_ids }
       end
 
       def export_completed?(export_data)

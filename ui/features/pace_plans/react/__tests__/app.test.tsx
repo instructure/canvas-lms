@@ -25,7 +25,6 @@ const pollForPublishStatus = jest.fn()
 const setResponsiveSize = jest.fn()
 
 const defaultProps = {
-  errorMessage: '',
   loadingMessage: '',
   pollForPublishStatus,
   responsiveSize: 'large' as const,
@@ -39,16 +38,6 @@ afterEach(() => {
 })
 
 describe('App', () => {
-  it('renders an error alert if there is an error message', () => {
-    const {getByText} = renderConnected(<App {...defaultProps} errorMessage="Ruh Roh!" />)
-    expect(getByText('Ruh Roh!')).toBeInTheDocument()
-  })
-
-  it('renders a loading indicator if there is a loading message', () => {
-    const {getByText} = renderConnected(<App {...defaultProps} errorMessage="Please wait..." />)
-    expect(getByText('Please wait...')).toBeInTheDocument()
-  })
-
   it('starts polling for published status updates on mount', () => {
     renderConnected(<App {...defaultProps} />)
     expect(pollForPublishStatus).toHaveBeenCalled()

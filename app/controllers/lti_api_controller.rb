@@ -172,7 +172,7 @@ class LtiApiController < ApplicationController
     end
 
     cache_key = "nonce:#{@tool.asset_string}:#{@signature.request.nonce}"
-    unless Lti::Security::check_and_store_nonce(cache_key, timestamp, allowed_delta.seconds)
+    unless Lti::Security.check_and_store_nonce(cache_key, timestamp, allowed_delta.seconds)
       Canvas::Errors::Reporter.raise_canvas_error(BasicLTI::BasicOutcomes::Unauthorized, "Duplicate nonce detected", oauth_error_info)
     end
   end

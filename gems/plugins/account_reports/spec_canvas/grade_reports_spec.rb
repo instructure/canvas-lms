@@ -527,7 +527,7 @@ describe "Default Account Reports" do
         section2 = @course2.course_sections.create! name: "section 2"
         @course2.enroll_student(@user2, section: section2,
                                         workflow_state: "active",
-                                        allow_multiple_enrollments: true).tap { |e| e.accept }
+                                        allow_multiple_enrollments: true).tap(&:accept)
 
         reports = read_report("mgp_grade_export_csv",
                               params: { enrollment_term_id: @default_term.id },

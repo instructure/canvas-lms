@@ -103,6 +103,11 @@ gradebook_assignment_search_and_redesign:
   display_name: Gradebook Assignment Search And Redesign
   description: Search assignments in Gradebook and new design for assignment
     and student search
+remove_missing_status_when_graded:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Remove Missing Status When Graded
+  description: If set, removes the missing status from submissions when graded
 visible_assignments_scope_change:
   state: hidden
   applies_to: SiteAdmin

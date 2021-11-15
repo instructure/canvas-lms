@@ -95,9 +95,7 @@ class Wiki < ActiveRecord::Base
     self.set_front_page_url!(url) if self.has_no_front_page && page
 
     # return an implicitly created page if a page could not be found
-    unless page
-      page = self.wiki_pages.temp_record(:title => url.titleize, :url => url, :context => self.context)
-    end
+    page ||= self.wiki_pages.temp_record(:title => url.titleize, :url => url, :context => self.context)
     page
   end
 

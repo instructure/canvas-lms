@@ -163,7 +163,7 @@ module Lti
 
       not_found
     rescue InvalidDomain => e
-      return render json: { errors: { invalid_launch_url: { message: e.message } } }, status: 400
+      render json: { errors: { invalid_launch_url: { message: e.message } } }, status: 400
     end
 
     def lti2_basic_launch(message_handler, lti_link = nil)

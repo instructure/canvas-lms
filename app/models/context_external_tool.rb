@@ -265,13 +265,12 @@ class ContextExternalTool < ActiveRecord::Base
   def set_extension_setting(type, hash)
     if !hash || !hash.is_a?(Hash)
       settings.delete type
+      remove_from_inactive_placements(type)
       return
     end
 
     hash = hash.with_indifferent_access
     hash[:enabled] = Canvas::Plugin.value_to_boolean(hash[:enabled]) if hash[:enabled]
-    # merge with existing settings so that no caller can complain
-    settings[type] = (settings[type] || {}).with_indifferent_access
 
     extension_keys = [
       :canvas_icon_class,
@@ -299,14 +298,21 @@ class ContextExternalTool < ActiveRecord::Base
       :visibility => lambda { |v| %w{members admins public}.include?(v) || v.nil? }
     }.to_a
 
+    # merge with existing settings so that no caller can complain
+    settings[type] = (settings[type] || {}).with_indifferent_access unless placement_inactive?(type)
+
     extension_keys.each do |key, validator|
-      if hash.has_key?(key) && (!validator || validator.call(hash[key]))
-        settings[type][key] = hash[key]
+      if hash.key?(key) && (!validator || validator.call(hash[key]))
+        if placement_inactive?(type)
+          settings[:inactive_placements][type][key] = hash[key]
+        else
+          settings[type][key] = hash[key]
+        end
       end
     end
 
     # on deactivation, make sure placement data is kept
-    if settings[type].key?(:enabled) && !settings[type][:enabled]
+    if settings[type]&.key?(:enabled) && !settings[type][:enabled]
       # resource_selection is a default placement, which can only be overridden
       # by not_selectable, see scope :placements on line 826
       self.not_selectable = true if type == :resource_selection
@@ -319,17 +325,26 @@ class ContextExternalTool < ActiveRecord::Base
     end
 
     # on reactivation, use the old placement data
-    if settings[type][:enabled] && settings.dig(:inactive_placements, type)
+    old_placement_data = settings.dig(:inactive_placements, type)
+    if old_placement_data&.include?(:enabled) && old_placement_data[:enabled]
       # resource_selection is a default placement, which can only be overridden
       # by not_selectable, see scope :placements on line 826
       self.not_selectable = false if type == :resource_selection
 
-      settings[type] = settings.dig(:inactive_placements, type).merge(settings[type])
-      settings[:inactive_placements].delete(type)
-      settings.delete(:inactive_placements) if settings[:inactive_placements].empty?
+      settings[type] = old_placement_data
+      remove_from_inactive_placements(type)
     end
 
-    settings[type].compact!
+    settings[type]&.compact!
+  end
+
+  def remove_from_inactive_placements(type)
+    settings[:inactive_placements]&.delete(type)
+    settings.delete(:inactive_placements) if settings[:inactive_placements] && settings[:inactive_placements].empty?
+  end
+
+  def placement_inactive?(type)
+    settings.dig(:inactive_placements, type).present?
   end
 
   def has_placement?(type)
@@ -491,11 +506,11 @@ class ContextExternalTool < ActiveRecord::Base
     @config_errors = []
     begin
       converter = CC::Importer::BLTIConverter.new
-      if config_type == 'by_url'
-        tool_hash = converter.retrieve_and_convert_blti_url(config_url)
-      else
-        tool_hash = converter.convert_blti_xml(config_xml)
-      end
+      tool_hash = if config_type == 'by_url'
+                    converter.retrieve_and_convert_blti_url(config_url)
+                  else
+                    converter.convert_blti_xml(config_xml)
+                  end
     rescue CC::Importer::BLTIConverter::CCImportError => e
       tool_hash = { :error => e.message }
     end
@@ -691,13 +706,14 @@ class ContextExternalTool < ActiveRecord::Base
     settings.keys.each do |setting|
       next if [:custom_fields, :environments].include? setting.to_sym
 
-      if settings[setting].is_a?(Hash)
+      case settings[setting]
+      when Hash
         settings[setting].keys.each do |property|
           if settings[setting][property].match?(URI::DEFAULT_PARSER.make_regexp)
             settings[setting][property] = replace_host.call(settings[setting][property], new_domain)
           end
         end
-      elsif settings[setting].match?(URI::DEFAULT_PARSER.make_regexp)
+      when URI::DEFAULT_PARSER.make_regexp
         settings[setting] = replace_host.call(settings[setting], new_domain)
       end
     end
@@ -709,7 +725,7 @@ class ContextExternalTool < ActiveRecord::Base
     url = url.gsub(/[[:space:]]/, '')
     url = "http://" + url unless url.include?('://')
     res = Addressable::URI.parse(url).normalize
-    res.query = res.query.split(/&/).sort.join('&') if !res.query.blank?
+    res.query = res.query.split(/&/).sort.join('&') unless res.query.blank?
     res.to_s
   end
 
@@ -740,7 +756,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def standard_url
-    if !defined?(@standard_url)
+    unless defined?(@standard_url)
       @standard_url = !self.url.blank? && ContextExternalTool.standardize_url(self.url)
     end
     @standard_url
@@ -769,7 +785,7 @@ class ContextExternalTool < ActiveRecord::Base
       url = ContextExternalTool.standardize_url(url)
       return true if url == standard_url
     elsif standard_url.present?
-      if !defined?(@url_params)
+      unless defined?(@url_params)
         res = Addressable::URI.parse(standard_url)
         @url_params = res.query.present? ? res.query.split(/&/) : []
       end
@@ -989,7 +1005,7 @@ class ContextExternalTool < ActiveRecord::Base
   # Given a collection of tools, finds the first with the given LTI version
   # If no matches were detected, returns nil
   def self.find_exact_version_match(sorted_tool_collection)
-    sorted_tool_collection.find { |t| t.uses_preferred_lti_version? }
+    sorted_tool_collection.find(&:uses_preferred_lti_version?)
   end
 
   scope :having_setting, lambda { |setting|
@@ -1077,7 +1093,9 @@ class ContextExternalTool < ActiveRecord::Base
     tools + ContextExternalTool.having_setting(type.to_s).where(context_type: 'Account', context_id: context.account_chain_ids)
   end
 
-  def self.serialization_excludes; [:shared_secret, :settings]; end
+  def self.serialization_excludes
+    [:shared_secret, :settings]
+  end
 
   # sets the custom fields from the main tool settings, and any on individual resource type settings
   def set_custom_fields(resource_type)
@@ -1087,7 +1105,7 @@ class ContextExternalTool < ActiveRecord::Base
     fields.each do |field_set|
       field_set.each do |key, val|
         key = key.to_s.gsub(/[^\w]/, '_').downcase
-        if key.match(/^custom_/)
+        if key.match?(/^custom_/)
           hash[key] = val
         else
           hash["custom_#{key}"] = val
@@ -1193,9 +1211,10 @@ class ContextExternalTool < ActiveRecord::Base
     scope = Assignment.active.joins(:external_tool_tag)
 
     # limit to assignments in the tool's context
-    if context.is_a? Course
+    case context
+    when Course
       scope = scope.where(context_id: context.id)
-    elsif context.is_a? Account
+    when Account
       scope = scope.where(root_account_id: root_account_id, content_tags: { root_account_id: root_account_id })
     end
 

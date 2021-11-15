@@ -24,7 +24,7 @@ describe Attachments::S3Storage do
     let(:access_key_id) { "AKIAIOSFODNN7EXAMPLE" }
     let(:secret_access_key) { "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" }
     let(:datetime) { "20151229T000000Z" }
-    let(:string_to_sign) { <<~STS.gsub("\n", "") }
+    let(:string_to_sign) { <<~STS.delete("\n") }
       eyAiZXhwaXJhdGlvbiI6ICIyMDE1LTEyLTMwVDEyOjAwOjAwLjAwMFoiLA0KICAiY29uZ
       Gl0aW9ucyI6IFsNCiAgICB7ImJ1Y2tldCI6ICJzaWd2NGV4YW1wbGVidWNrZXQifSwNCi
       AgICBbInN0YXJ0cy13aXRoIiwgIiRrZXkiLCAidXNlci91c2VyMS8iXSwNCiAgICB7ImF

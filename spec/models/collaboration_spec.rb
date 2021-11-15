@@ -109,7 +109,7 @@ describe Collaboration do
     end
 
     it "updates existing collaborators" do
-      @collaboration.update_members(@users[0..-1], @groups.map(&:id))
+      @collaboration.update_members(@users[0..], @groups.map(&:id))
       @collaboration.update_members(@users[0..-2])
       @collaboration.reload
       expect(@collaboration.collaborators.map(&:user_id).uniq.count).to eq 3

@@ -55,7 +55,7 @@ module LtiOutbound
     def format_lti_params(prefix, params)
       params.each_with_object({}) do |(k, v), hash|
         key = k.to_s.gsub(/[^\w]/, '_').downcase
-        if key.match(/^#{prefix}_/)
+        if key.match?(/^#{prefix}_/)
           hash[key] = v
         else
           hash["#{prefix}_#{key}"] = v

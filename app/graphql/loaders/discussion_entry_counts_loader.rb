@@ -58,17 +58,19 @@ class Loaders::DiscussionEntryCountsLoader < GraphQL::Batch::Loader
   end
 
   def object_specific_hash(objects)
-    if objects.first.is_a?(DiscussionTopic)
+    case objects.first
+    when DiscussionTopic
       { discussion_topic_id: objects }
-    elsif objects.first.is_a?(DiscussionEntry)
+    when DiscussionEntry
       { root_entry_id: objects }
     end
   end
 
   def object_id_string(object)
-    if object.is_a?(DiscussionTopic)
+    case object
+    when DiscussionTopic
       'discussion_topic_id'
-    elsif object.is_a?(DiscussionEntry)
+    when DiscussionEntry
       'root_entry_id'
     end
   end

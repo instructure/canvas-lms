@@ -73,9 +73,10 @@ class GradebookSettingsController < ApplicationController
   def nilify_strings(hash)
     massaged_hash = {}
     hash.each do |key, value|
-      massaged_hash[key] = if value == 'null'
+      massaged_hash[key] = case value
+                           when 'null'
                              nil
-                           elsif value.is_a? Hash
+                           when Hash
                              nilify_strings(value)
                            else
                              value

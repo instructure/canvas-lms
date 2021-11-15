@@ -389,7 +389,7 @@ describe "Outcomes API", type: :request do
               )
               json = controller.outcome_json(@outcome, @account_user.user, session)
               ["points_possible", "mastery_points", "ratings", "calculation_method", "calculation_int"].each do |key|
-                expect(json.key?(key)).to be false
+                expect(json).not_to have_key(key)
               end
             end
           end

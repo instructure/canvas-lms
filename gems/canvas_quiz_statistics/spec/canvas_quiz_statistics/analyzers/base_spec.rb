@@ -37,9 +37,7 @@ describe CanvasQuizStatistics::Analyzers::Base do
     describe '#metric' do
       it 'defines a metric calculator' do
         class Apple < Base
-          metric :something do |responses|
-            responses.size
-          end
+          metric :something, &:size
         end
 
         expect(Apple.new({}).run([{}, {}])).to eq({ something: 2 })
@@ -49,15 +47,11 @@ describe CanvasQuizStatistics::Analyzers::Base do
 
       it 'does not conflict with other analyzer metrics' do
         class Apple < Base
-          metric :something do |responses|
-            responses.size
-          end
+          metric :something, &:size
         end
 
         class Orange < Base
-          metric :something_else do |responses|
-            responses.size
-          end
+          metric :something_else, &:size
         end
 
         expect(Apple.new({}).run([{}])).to eq({ something: 1 })
@@ -90,17 +84,13 @@ describe CanvasQuizStatistics::Analyzers::Base do
     describe '#inherit_metrics' do
       it 'inherits a parent class metrics' do
         class Apple < Base
-          metric :something do |responses|
-            responses.size
-          end
+          metric :something, &:size
         end
 
         class Orange < Apple
           inherit_metrics :apple_question
 
-          metric :something_else do |responses|
-            responses.size
-          end
+          metric :something_else, &:size
         end
 
         expect(Apple.new({}).run([{}])).to eq({ something: 1 })
@@ -113,17 +103,13 @@ describe CanvasQuizStatistics::Analyzers::Base do
     describe '#inherit' do
       it 'inherits a metric from another question type' do
         class Apple < Base
-          metric :something do |responses|
-            responses.size
-          end
+          metric :something, &:size
         end
 
         class Orange < Apple
           inherit :something, from: :apple
 
-          metric :something_else do |responses|
-            responses.size
-          end
+          metric :something_else, &:size
         end
 
         expect(Apple.new({}).run([{}])).to eq({ something: 1 })

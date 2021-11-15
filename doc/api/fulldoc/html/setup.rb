@@ -67,7 +67,7 @@ module YARD::Templates::Helpers::BaseHelper
     #   # @return api:Assignments:AssignmentOverride An Assignment Override
     #   # => <a href="assignments.html#Assignment">An Assignment Override</a>
     elsif args.first.is_a?(String) && args.first =~ %r{^api:([^:]+):(.*)}
-      scope_name, resource_name = $1.downcase, $2.gsub('+', ' ')
+      scope_name, resource_name = $1.downcase, $2.tr('+', ' ')
       link_url("#{scope_name}.html##{resource_name}", args[1] || resource_name)
     elsif args.first.is_a?(String) && args.first == 'Appendix:' && args.size > 1
       errmsg = "unable to locate referenced appendix '#{args[1]}'"
@@ -80,7 +80,7 @@ module YARD::Templates::Helpers::BaseHelper
 
       if topic
         html_file = "#{topicize topic.first}.html"
-        bookmark = "#{appendix.name.to_s.gsub(' ', '+')}-appendix"
+        bookmark = "#{appendix.name.to_s.tr(' ', '+')}-appendix"
         link_url("#{html_file}##{bookmark}", appendix.title)
       else
         raise errmsg
@@ -128,7 +128,7 @@ module YARD::Templates::Helpers::HtmlHelper
   include CanvasAPI::Deprecatable
 
   def topicize(str)
-    str.gsub(' ', '_').underscore
+    str.tr(' ', '_').underscore
   end
 
   def url_for_file(filename, anchor = nil)
@@ -152,7 +152,7 @@ module YARD::Templates::Helpers::HtmlHelper
     end
 
     html_file = "#{topicize topic.first}.html"
-    bookmark = "#{appendix.name.to_s.gsub(' ', '+')}-appendix"
+    bookmark = "#{appendix.name.to_s.tr(' ', '+')}-appendix"
     link_url("#{html_file}##{bookmark}", appendix.title)
   end
 end

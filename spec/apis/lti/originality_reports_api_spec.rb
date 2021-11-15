@@ -303,7 +303,7 @@ module Lti
       it "does not update originality score if out of range" do
         put @endpoints[:update], params: { originality_report: { originality_score: 150 } }, headers: request_headers
         expect(response.status).to eq 400
-        expect(JSON.parse(response.body)['errors'].key? 'originality_score').to be_truthy
+        expect(JSON.parse(response.body)['errors']).to have_key 'originality_score'
       end
 
       it "allows setting the originality_report to nil" do
@@ -507,7 +507,7 @@ module Lti
         it "does not update originality score if out of range" do
           put @endpoints[:update_alt], params: { originality_report: { originality_score: 150 } }, headers: request_headers
           expect(response.status).to eq 400
-          expect(JSON.parse(response.body)['errors'].key? 'originality_score').to be_truthy
+          expect(JSON.parse(response.body)['errors']).to have_key 'originality_score'
         end
 
         it "allows setting the originality_report to nil" do

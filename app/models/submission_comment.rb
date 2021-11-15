@@ -332,7 +332,7 @@ class SubmissionComment < ActiveRecord::Base
       old_ids.include?(a.id) ||
       a.recently_created ||
       a.ok_for_submission_comment
-    }.map { |a| a.id }.join(","))
+    }.map(&:id).join(","))
   end
 
   def infer_details

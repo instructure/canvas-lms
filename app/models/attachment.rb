@@ -172,9 +172,10 @@ class Attachment < ActiveRecord::Base
     end
 
     def find_with_possibly_replaced(a_or_as)
-      if a_or_as.is_a?(Attachment)
+      case a_or_as
+      when Attachment
         find_attachment_possibly_replaced(a_or_as)
-      elsif a_or_as.is_a?(Array)
+      when Array
         a_or_as.map { |a| find_attachment_possibly_replaced(a) }
       end
     end
@@ -464,7 +465,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def after_extension
-    res = self.extension[1..-1] rescue nil
+    res = self.extension[1..] rescue nil
     res = nil if res == "" || res == "unknown"
     res
   end
@@ -586,7 +587,7 @@ class Attachment < ActiveRecord::Base
       self.workflow_state = nil
       self.file_state = 'available'
     end
-    self.md5 = (details[:etag] || "").gsub(/"/, '')
+    self.md5 = (details[:etag] || "").delete('"')
     self.content_type = details[:content_type]
     self.size = details[:content_length]
 
@@ -625,7 +626,7 @@ class Attachment < ActiveRecord::Base
   def ajax_upload_params(local_upload_url, s3_success_url, options = {})
     # Build the data that will be needed for the user to upload to s3
     # without us being the middle-man
-    sanitized_filename = full_filename.gsub(/\+/, " ")
+    sanitized_filename = full_filename.tr('+', " ")
     policy = {
       'expiration' => (options[:expiration] || S3_EXPIRATION_TIME).from_now.utc.iso8601,
       'conditions' => [
@@ -661,7 +662,7 @@ class Attachment < ActiveRecord::Base
     end
     policy['conditions'] += extras
 
-    policy_encoded = Base64.encode64(policy.to_json).gsub(/\n/, '')
+    policy_encoded = Base64.encode64(policy.to_json).delete("\n")
     sig_key, sig_val = self.store.sign_policy(policy_encoded, options[:datetime])
 
     res[:id] = id
@@ -688,11 +689,11 @@ class Attachment < ActiveRecord::Base
     attachment = Attachment.find(policy['attachment_id'])
     return nil unless [:unattached, :unattached_temporary].include?(attachment.try(:state))
 
-    return policy, attachment
+    [policy, attachment]
   end
 
   def unencoded_filename
-    CGI::unescape(self.filename || t(:default_filename, "File"))
+    CGI.unescape(self.filename || t(:default_filename, "File"))
   end
 
   def quota_exemption_key
@@ -744,7 +745,7 @@ class Attachment < ActiveRecord::Base
   # put the context over quota.)
   def self.over_quota?(context, additional_quota = nil)
     quota = self.get_quota(context)
-    return quota[:quota] < quota[:quota_used] + (additional_quota || 0)
+    quota[:quota] < quota[:quota_used] + (additional_quota || 0)
   end
 
   def self.quota_available(context)
@@ -755,11 +756,11 @@ class Attachment < ActiveRecord::Base
   def handle_duplicates(method, opts = {})
     return [] unless method.present? && self.folder
 
-    if self.folder.for_submissions?
-      method = :rename
-    else
-      method = method.to_sym
-    end
+    method = if self.folder.for_submissions?
+               :rename
+             else
+               method.to_sym
+             end
 
     if method == :overwrite
       atts = self.shard.activate { self.folder.active_file_attachments.where("display_name=? AND id<>?", self.display_name, self.id).to_a }
@@ -813,7 +814,7 @@ class Attachment < ActiveRecord::Base
         end
       end
     end
-    return deleted_attachments
+    deleted_attachments
   end
 
   def copy_access_attributes!(source_attachments)
@@ -843,7 +844,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def inline_content?
-    self.content_type.match(/\Atext/) || self.extension == '.html' || self.extension == '.htm' || self.extension == '.swf'
+    self.content_type.start_with?('text') || self.extension == '.html' || self.extension == '.htm' || self.extension == '.swf'
   end
 
   def self.shared_secret
@@ -1351,7 +1352,9 @@ class Attachment < ActiveRecord::Base
     @hidden = self.file_state == 'hidden' || (self.folder && self.folder.hidden?)
   end
 
-  def published?; !locked?; end
+  def published?
+    !locked?
+  end
 
   def publish!
     self.locked = false
@@ -1437,11 +1440,11 @@ class Attachment < ActiveRecord::Base
   def self.build_content_types_sql(types)
     clauses = []
     types.each do |type|
-      if type.include? '/'
-        clauses << sanitize_sql_array(["(attachments.content_type=?)", type])
-      else
-        clauses << wildcard('attachments.content_type', type + '/', :type => :right)
-      end
+      clauses << if type.include? '/'
+                   sanitize_sql_array(["(attachments.content_type=?)", type])
+                 else
+                   wildcard('attachments.content_type', type + '/', :type => :right)
+                 end
     end
     clauses.join(' OR ')
   end
@@ -1711,9 +1714,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.submit_to_canvadocs(ids)
-    Attachment.where(id: ids).find_each do |a|
-      a.submit_to_canvadocs
-    end
+    Attachment.where(id: ids).find_each(&:submit_to_canvadocs)
   end
 
   def self.skip_3rd_party_submits(skip = true)
@@ -1852,7 +1853,7 @@ class Attachment < ActiveRecord::Base
       attachment = context.attachments.where(migration_id: id).first
       description += "<li><a href='/courses/#{context.id}/files/#{attachment.id}/download'>#{ERB::Util.h(attachment.display_name)}</a></li>" if attachment
     end
-    description += "</ul>";
+    description += "</ul>"
     description
   end
 
@@ -1888,11 +1889,17 @@ class Attachment < ActiveRecord::Base
   end
 
   # deprecated
-  def self.domain_namespace=(val); self.current_root_account = val; end
+  def self.domain_namespace=(val)
+    self.current_root_account = val
+  end
 
-  def self.domain_namespace; self.current_namespace; end
+  def self.domain_namespace
+    self.current_namespace
+  end
 
-  def self.serialization_methods; [:mime_class, :currently_locked, :crocodoc_available?]; end
+  def self.serialization_methods
+    [:mime_class, :currently_locked, :crocodoc_available?]
+  end
   cattr_accessor :skip_thumbnails
 
   scope :uploadable, -> { where(:workflow_state => 'pending_upload') }
@@ -1900,16 +1907,16 @@ class Attachment < ActiveRecord::Base
   scope :deleted, -> { where(:file_state => 'deleted') }
   scope :by_display_name, -> { order(display_name_order_by_clause('attachments')) }
   scope :by_position_then_display_name, -> { order(:position, display_name_order_by_clause('attachments')) }
-  def self.serialization_excludes; [:uuid, :namespace]; end
+  def self.serialization_excludes
+    [:uuid, :namespace]
+  end
 
   # returns filename, if it's already unique, or returns a modified version of
   # filename that makes it unique. you can either pass existing_files as string
   # filenames, in which case it'll test against those, or a block that'll be
   # called repeatedly with a filename until it returns true.
   def self.make_unique_filename(filename, existing_files = [], attempts = 1, &block)
-    unless block
-      block = proc { |fname| !existing_files.include?(fname) }
-    end
+    block ||= proc { |fname| !existing_files.include?(fname) }
 
     return filename if attempts <= 1 && block.call(filename)
 
@@ -1984,7 +1991,7 @@ class Attachment < ActiveRecord::Base
       second_dot = uri.host.rindex('.', first_dot - 1) if first_dot
       return ["file_download", uri.host] unless second_dot
 
-      ["file_download", uri.host[second_dot + 1..-1]]
+      ["file_download", uri.host[second_dot + 1..]]
     end
   end
 
@@ -2120,13 +2127,13 @@ class Attachment < ActiveRecord::Base
   end
 
   def set_publish_state_for_usage_rights
-    if self.context &&
-       (!self.folder || !self.folder.for_submissions?) &&
-       self.context.respond_to?(:usage_rights_required?) && self.context.usage_rights_required?
-      self.locked = self.usage_rights.nil?
-    else
-      self.locked = false
-    end
+    self.locked = if self.context &&
+                     (!self.folder || !self.folder.for_submissions?) &&
+                     self.context.respond_to?(:usage_rights_required?) && self.context.usage_rights_required?
+                    self.usage_rights.nil?
+                  else
+                    false
+                  end
   end
 
   # Download a URL using a GET request and return a new un-saved Attachment

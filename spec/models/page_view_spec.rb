@@ -400,7 +400,7 @@ describe PageView do
 
       it "returns the existing page view" do
         page_views = Array.new(4) { page_view_model }
-        page_view_ids = page_views.map { |page_view| page_view.request_id }
+        page_view_ids = page_views.map(&:request_id)
 
         expect(PageView.find_all_by_id(page_view_ids)).to match_array page_views
       end
@@ -415,7 +415,7 @@ describe PageView do
 
       it "returns the existing page view" do
         page_views = Array.new(4) { page_view_model }
-        page_view_ids = page_views.map { |page_view| page_view.request_id }
+        page_view_ids = page_views.map(&:request_id)
 
         expect(PageView.find_all_by_id(page_view_ids)).to match_array page_views
       end

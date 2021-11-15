@@ -70,7 +70,7 @@ module Qti
     def get_calculated_property(prop_name, is_true_false = false)
       @question[:"#{prop_name}"] = @doc.at_css("calculated #{prop_name}").text if @doc.at_css("calculated #{prop_name}")
       if is_true_false and @question[:"#{prop_name}"]
-        @question[:"#{prop_name}"] = @question[:"#{prop_name}"] == 'true' ? true : false
+        @question[:"#{prop_name}"] = @question[:"#{prop_name}"] == 'true'
       end
     end
 

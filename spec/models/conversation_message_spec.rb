@@ -100,7 +100,7 @@ describe ConversationMessage do
       message_user_ids = message.messages_sent["Conversation Message"].map(&:user_id)
       expect(message_user_ids).not_to include(@teacher.id)
       expect(message_user_ids).to include(@students.first.id)
-      @students[1..-1].each do |student|
+      @students[1..].each do |student|
         expect(message_user_ids).not_to include(student.id)
       end
     end
@@ -328,7 +328,7 @@ describe ConversationMessage do
                              :text => "body"
                            })
       expect(cm3.conversation_message_participants.size).to eq 2
-      expect(cm3.conversation_message_participants.map { |x| x.user_id }.sort).to eq [users[1].id, users[2].id].sort
+      expect(cm3.conversation_message_participants.map(&:user_id).sort).to eq [users[1].id, users[2].id].sort
     end
 
     it "marks conversations as read for the replying author" do

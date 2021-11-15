@@ -60,7 +60,7 @@ class Attachments::LocalStorage
       OpenSSL::HMAC.digest(
         OpenSSL::Digest.new('sha1'), shared_secret(datetime), policy_encoded
       )
-    ).gsub(/\n/, '')
+    ).delete("\n")
     ['Signature', signature]
   end
 

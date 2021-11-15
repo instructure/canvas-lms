@@ -122,9 +122,7 @@ class PseudonymsController < ApplicationController
       # message. Otherwise this form could be used to fish for valid
       # email addresses.
       flash[:notice] = t 'notices.email_sent', "Confirmation email sent to %{email}, make sure to check your spam box", :email => email
-      @ccs.each do |cc|
-        cc.forgot_password!
-      end
+      @ccs.each(&:forgot_password!)
       format.html { redirect_to(canvas_login_url) }
       format.json { render :json => { :requested => true } }
       format.js { render :json => { :requested => true } }
@@ -264,7 +262,7 @@ class PseudonymsController < ApplicationController
     return unless find_authentication_provider
     return unless update_pseudonym_from_params
 
-    @pseudonym.generate_temporary_password if !params[:pseudonym][:password]
+    @pseudonym.generate_temporary_password unless params[:pseudonym][:password]
     if Pseudonym.unique_constraint_retry { @pseudonym.save_without_session_maintenance }
       respond_to do |format|
         flash[:notice] = t 'notices.account_registered', "Account registered!"
@@ -286,12 +284,7 @@ class PseudonymsController < ApplicationController
 
   def get_user
     user_id = params[:user_id] || params[:user].try(:[], :id)
-    @user = case
-            when user_id
-              api_find(User, user_id)
-            else
-              @current_user
-            end
+    @user = user_id ? api_find(User, user_id) : @current_user
     true
   end
   protected :get_user

@@ -99,12 +99,12 @@ class UserList
                                  .options[:with]
       # look for phone numbers by searching for 10 digits, allowing
       # any non-word characters
-      if path =~ /^([^\d\w]*\d[^\d\w]*){10}$/
+      if /^([^\d\w]*\d[^\d\w]*){10}$/.match?(path)
         type = :sms
       elsif path.include?('@') && (email = parse_email(path))
         type = :email
         name, path = email
-      elsif path =~ unique_id_regex
+      elsif path&.match?(unique_id_regex)
         type = :pseudonym
       else
         @errors << { :address => path, :details => :unparseable }
@@ -144,7 +144,7 @@ class UserList
         list = list_in.map(&:strip)
         list.each { |path| parse_single_user(path) }
       else
-        str = list_in.strip.gsub(/“|”/, "\"").gsub(/\n+/, ",").gsub(/\s+/, " ").gsub(/;/, ",") + ","
+        str = list_in.strip.gsub(/“|”/, "\"").gsub(/\n+/, ",").gsub(/\s+/, " ").tr(';', ",") + ","
         chars = str.split("")
         user_start = 0
         in_quotes = false
@@ -212,7 +212,7 @@ class UserList
           address[:shard] = Shard.current
         end
       end
-    end if !@addresses.empty?
+    end unless @addresses.empty?
 
     # Search for matching emails (only if not open registration; otherwise there's no point - we just
     # create temporary users)
@@ -247,7 +247,7 @@ class UserList
           # ccs are not unique; just error out on duplicates
           # we're in a bit of a pickle if open registration is disabled, and there are conflicting
           # e-mails, but none of them are from a pseudonym
-          if address.has_key?(:user_id) && (address[:user_id] != login[:user_id] || address[:shard] != Shard.current)
+          if address.key?(:user_id) && (address[:user_id] != login[:user_id] || address[:shard] != Shard.current)
             address[:user_id] = false
             address[:details] = :non_unique
             address.delete(:name)

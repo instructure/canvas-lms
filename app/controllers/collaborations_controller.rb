@@ -217,14 +217,14 @@ class CollaborationsController < ApplicationController
         if @collaboration.valid_user?(@current_user)
           @collaboration.authorize_user(@current_user)
           log_asset_access(@collaboration, "collaborations", "other", 'participate')
-          if @collaboration.is_a? ExternalToolCollaboration
-            url = external_tool_launch_url(
-              @collaboration.url,
-              @collaboration.resource_link_lookup_uuid
-            )
-          else
-            url = @collaboration.url
-          end
+          url = if @collaboration.is_a? ExternalToolCollaboration
+                  external_tool_launch_url(
+                    @collaboration.url,
+                    @collaboration.resource_link_lookup_uuid
+                  )
+                else
+                  @collaboration.url
+                end
 
           redirect_to url
         elsif @collaboration.is_a?(GoogleDocsCollaboration)
@@ -423,7 +423,7 @@ class CollaborationsController < ApplicationController
     unless Collaboration.any_collaborations_configured?(@context) || @domain_root_account.feature_enabled?(:new_collaborations)
       flash[:error] = t 'errors.not_enabled', "Collaborations have not been enabled for this Canvas site"
       redirect_to named_context_url(@context, :context_url)
-      return false
+      false
     end
   end
 

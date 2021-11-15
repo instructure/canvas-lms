@@ -177,7 +177,7 @@ module Polling
                Api.paginate(polls, self, api_v1_polls_url)
              end
 
-      return json, meta
+      [json, meta]
     end
 
     def serialize_jsonapi(polls, meta = {})

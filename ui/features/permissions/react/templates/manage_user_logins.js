@@ -67,7 +67,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To merge users, the Self Service User Merge feature preview must also be enabled.'
+        'To merge users, the Self Service User Merge feature option must also be enabled.'
       )
     },
     {

@@ -77,7 +77,7 @@ class ControllerView < HashView
   def to_hash
     {
       "name" => name,
-      "methods" => methods.map { |m| m.to_hash },
+      "methods" => methods.map(&:to_hash),
     }
   end
 end

@@ -28,11 +28,11 @@ class LocalCache
     def cache
       unless defined?(@local_cache)
         lc_config = ConfigFile.load("local_cache")
-        if lc_config && lc_config[:store] == "redis"
-          @local_cache = Canvas::Cache::LocalRedisCache.new(lc_config)
-        else
-          @local_cache = Canvas::Cache::FallbackMemoryCache.new
-        end
+        @local_cache = if lc_config && lc_config[:store] == "redis"
+                         Canvas::Cache::LocalRedisCache.new(lc_config)
+                       else
+                         Canvas::Cache::FallbackMemoryCache.new
+                       end
       end
       @local_cache
     end

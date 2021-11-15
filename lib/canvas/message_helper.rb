@@ -75,7 +75,7 @@ module Canvas::MessageHelper
     # 'txt' is the legacy message body. Pull name from first line.
     if args[4].present?
       # txt
-      split_txt = args[4].strip.split("\n").map { |line| line.strip }
+      split_txt = args[4].strip.split("\n").map(&:strip)
       using[:name] ||= split_txt[0]
     end
     raise 'Name is required' unless using[:name]

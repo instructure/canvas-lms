@@ -29,7 +29,7 @@ describe DiscussionTopic do
     user = user_factory(opts)
     user.save!
     course.enroll_user(user, opts[:enrollment_type], opts)
-    return user
+    user
   end
 
   def add_section_to_topic(topic, section, opts = {})
@@ -2213,7 +2213,10 @@ describe DiscussionTopic do
     it "reflects account setting for when lock_all_announcements is enabled" do
       announcement = @course.announcements.create!(message: "Lock this")
       expect(announcement.comments_disabled?).to be_falsey
-      @course.account.tap { |a| a.settings[:lock_all_announcements] = { :value => true, :locked => true }; a.save! }
+      @course.account.tap { |a|
+        a.settings[:lock_all_announcements] = { :value => true, :locked => true }
+        a.save!
+      }
       expect(announcement.reload.comments_disabled?).to be_truthy
     end
 
@@ -2231,7 +2234,10 @@ describe DiscussionTopic do
   describe "update_order" do
     it "handles existing null positions" do
       topics = (1..4).map { discussion_topic_model(pinned: true) }
-      topics.each { |x| x.position = nil; x.save }
+      topics.each { |x|
+        x.position = nil
+        x.save
+      }
 
       new_order = [2, 3, 4, 1]
       ids = new_order.map { |x| topics[x - 1].id }

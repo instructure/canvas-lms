@@ -124,7 +124,7 @@ describe "users" do
     end
 
     def reload_users(users)
-      users.each { |user| user.reload }
+      users.each(&:reload)
     end
 
     def submit_merge

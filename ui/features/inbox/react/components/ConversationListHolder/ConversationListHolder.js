@@ -23,10 +23,10 @@ import React, {useEffect, useState, useContext} from 'react'
 import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
-import {MessageListItem, conversationProp} from './MessageListItem'
+import {ConversationListItem, conversationProp} from './ConversationListItem'
 import {UPDATE_CONVERSATION_PARTICIPANTS} from '../../../graphql/Mutations'
 
-export const MessageListHolder = ({...props}) => {
+export const ConversationListHolder = ({...props}) => {
   const [selectedMessages, setSelectedMessages] = useState([])
   const [rangeClickStart, setRangeClickStart] = useState()
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -155,7 +155,7 @@ export const MessageListHolder = ({...props}) => {
     >
       {props.conversations?.map(conversation => {
         return (
-          <MessageListItem
+          <ConversationListItem
             id={conversation._id}
             conversation={conversation.conversation}
             isStarred={conversation.label === 'starred'}
@@ -181,7 +181,7 @@ const conversationParticipantsProp = PropTypes.shape({
   label: PropTypes.string
 })
 
-MessageListHolder.propTypes = {
+ConversationListHolder.propTypes = {
   conversations: PropTypes.arrayOf(conversationParticipantsProp),
   id: PropTypes.string,
   onOpen: PropTypes.func,
@@ -189,7 +189,7 @@ MessageListHolder.propTypes = {
   onStar: PropTypes.func
 }
 
-MessageListHolder.defaultProps = {
+ConversationListHolder.defaultProps = {
   onOpen: () => {},
   onSelect: () => {},
   onStar: () => {}

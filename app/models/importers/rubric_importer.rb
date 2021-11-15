@@ -24,7 +24,7 @@ module Importers
     self.item_class = Rubric
 
     def self.process_migration(data, migration)
-      rubrics = data['rubrics'] ? data['rubrics'] : []
+      rubrics = data['rubrics'] || []
       migration.outcome_to_id_map ||= {}
       rubrics.each do |rubric|
         if migration.import_object?("rubrics", rubric['migration_id'])
@@ -46,7 +46,7 @@ module Importers
       if !item && hash[:external_identifier]
         rubric = context.available_rubric(hash[:external_identifier]) unless migration.cross_institution?
 
-        if !rubric
+        unless rubric
           Rails.logger.warn("The external Rubric couldn't be found for \"#{hash[:title]}\", creating a copy.")
         end
       end

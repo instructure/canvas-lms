@@ -299,7 +299,7 @@ module Lti
       it "does not include is_rce_favorite when not applicable" do
         account_admin_user(account: account)
         tool
-        expect(subject[0].has_key?("is_rce_favorite")).to be false
+        expect(subject[0]).not_to have_key("is_rce_favorite")
       end
     end
   end
