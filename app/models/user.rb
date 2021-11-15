@@ -1165,7 +1165,7 @@ class User < ActiveRecord::Base
   end
 
   def used_feature(feature)
-    self.update_attribute(:features_used, ((self.features_used || "").split(/,/).map(&:to_s) + [feature.to_s]).uniq.join(','))
+    self.update_attribute(:features_used, ((self.features_used || "").split(",").map(&:to_s) + [feature.to_s]).uniq.join(','))
   end
 
   def used_feature?(feature)
@@ -1428,7 +1428,7 @@ class User < ActiveRecord::Base
     # will just nil the user's avatar).
     return unless val.is_a?(Hash)
 
-    external_avatar_url_patterns = Setting.get('avatar_external_url_patterns', '^https://[a-zA-Z0-9.-]+\.instructure\.com/').split(/,/).map { |re| Regexp.new re }
+    external_avatar_url_patterns = Setting.get('avatar_external_url_patterns', '^https://[a-zA-Z0-9.-]+\.instructure\.com/').split(",").map { |re| Regexp.new re }
 
     if val['url']&.match?(GRAVATAR_PATTERN)
       self.avatar_image_source = 'gravatar'
@@ -1544,7 +1544,7 @@ class User < ActiveRecord::Base
         uri.host = request.host
         uri.port = request.port unless [80, 443].include?(request.port)
       elsif !uri.host
-        uri.host, port = HostUrl.default_host.split(/:/)
+        uri.host, port = HostUrl.default_host.split(":")
         uri.port = Integer(port) if port
       end
       uri.to_s

@@ -95,7 +95,7 @@ class AssetUserAccess < ActiveRecord::Base
 
   def readable_name(include_group_name: true)
     if self.asset_code&.include?(':')
-      split = self.asset_code.split(/:/)
+      split = self.asset_code.split(":")
 
       if split[1].match?(/course_\d+/)
         case split[0]
