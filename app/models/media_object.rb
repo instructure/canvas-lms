@@ -30,7 +30,7 @@ class MediaObject < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :root_account, :class_name => 'Account'
 
-  validates_presence_of :media_id, :workflow_state
+  validates :media_id, :workflow_state, presence: true
   has_many :media_tracks, -> { order(:locale) }, dependent: :destroy
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later

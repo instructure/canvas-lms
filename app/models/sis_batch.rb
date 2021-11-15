@@ -39,8 +39,8 @@ class SisBatch < ActiveRecord::Base
            dependent: :destroy,
            inverse_of: :course
 
-  validates_presence_of :account_id, :workflow_state
-  validates_length_of :diffing_data_set_identifier, maximum: 128
+  validates :account_id, :workflow_state, presence: true
+  validates :diffing_data_set_identifier, length: { maximum: 128 }
 
   attr_accessor :zip_path
 

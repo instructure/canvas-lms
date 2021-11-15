@@ -23,14 +23,14 @@ class Profile < ActiveRecord::Base
 
   serialize :data
 
-  validates_presence_of :root_account
-  validates_presence_of :context
-  validates_length_of :title, :within => 0..255
-  validates_length_of :path, :within => 0..255
-  validates_format_of :path, :with => /\A[a-z0-9-]+\z/
-  validates_uniqueness_of :path, :scope => :root_account_id
-  validates_uniqueness_of :context_id, :scope => :context_type
-  validates_inclusion_of :visibility, :in => %w{public unlisted private}
+  validates :root_account, presence: true
+  validates :context, presence: true
+  validates :title, length: { :within => 0..255 }
+  validates :path, length: { :within => 0..255 }
+  validates :path, format: { :with => /\A[a-z0-9-]+\z/ }
+  validates :path, uniqueness: { :scope => :root_account_id }
+  validates :context_id, uniqueness: { :scope => :context_type }
+  validates :visibility, inclusion: { :in => %w{public unlisted private} }
 
   def title=(title)
     write_attribute(:title, title)

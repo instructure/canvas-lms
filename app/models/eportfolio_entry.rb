@@ -32,10 +32,10 @@ class EportfolioEntry < ActiveRecord::Base
   after_save :check_for_spam, if: -> { eportfolio.needs_spam_review? }
 
   after_save :update_portfolio
-  validates_presence_of :eportfolio_id
-  validates_presence_of :eportfolio_category_id
-  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
-  validates_length_of :slug, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
+  validates :eportfolio_id, presence: true
+  validates :eportfolio_category_id, presence: true
+  validates :name, length: { :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true }
+  validates :slug, length: { :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true }
   has_many :page_comments, -> { preload(:user).order('page_comments.created_at DESC') }, as: :page
 
   serialize :content

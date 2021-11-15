@@ -34,7 +34,7 @@ class Conversation < ActiveRecord::Base
 
   before_save :update_root_account_ids
 
-  validates_length_of :subject, :maximum => maximum_string_length, :allow_nil => true
+  validates :subject, length: { :maximum => maximum_string_length, :allow_nil => true }
 
   attr_accessor :latest_messages_from_stream_item
 

@@ -56,11 +56,11 @@ class CalendarEvent < ActiveRecord::Base
   belongs_to :web_conference, autosave: true
   belongs_to :root_account, class_name: 'Account'
 
-  validates_presence_of :context, :workflow_state
+  validates :context, :workflow_state, presence: true
   validates_associated :context, :if => lambda { |record| record.validate_context }
-  validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :comments, maximum: 255, allow_nil: true, allow_blank: true
+  validates :description, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
+  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true }
+  validates :comments, length: { maximum: 255, allow_blank: true }
   validate :validate_conference_visibility
   before_create :set_root_account
   before_save :default_values

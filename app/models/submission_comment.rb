@@ -50,8 +50,8 @@ class SubmissionComment < ActiveRecord::Base
   has_many :messages, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :viewed_submission_comments, dependent: :destroy
 
-  validates_length_of :comment, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :comment, :minimum => 1, :allow_nil => true, :allow_blank => true
+  validates :comment, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
+  validates :comment, length: { :minimum => 1, :allow_nil => true, :allow_blank => true }
   validates_each :attempt do |record, attr, value|
     next if value.nil?
 

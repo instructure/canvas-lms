@@ -33,7 +33,7 @@ class ContextModuleProgression < ActiveRecord::Base
   serialize :requirements_met, Array
   serialize :incomplete_requirements, Array
 
-  validates_presence_of :user_id, :context_module_id
+  validates :user_id, :context_module_id, presence: true
 
   def completion_requirements
     context_module.try(:completion_requirements) || []

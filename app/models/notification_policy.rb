@@ -23,11 +23,11 @@ class NotificationPolicy < ActiveRecord::Base
   belongs_to :communication_channel
   has_many :delayed_messages, inverse_of: :notification_policy, :dependent => :destroy
 
-  validates_presence_of :communication_channel_id, :frequency
-  validates_inclusion_of :frequency, in: [Notification::FREQ_IMMEDIATELY,
+  validates :communication_channel_id, :frequency, presence: true
+  validates :frequency, inclusion: { in: [Notification::FREQ_IMMEDIATELY,
                                           Notification::FREQ_DAILY,
                                           Notification::FREQ_WEEKLY,
-                                          Notification::FREQ_NEVER]
+                                          Notification::FREQ_NEVER] }
 
   # This is for choosing a policy for another context, so:
   # NotificationPolicy.for(notification) or

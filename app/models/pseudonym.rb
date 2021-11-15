@@ -39,9 +39,9 @@ class Pseudonym < ActiveRecord::Base
 
   CAS_TICKET_TTL = 1.day
 
-  validates_length_of :unique_id, :maximum => MAX_UNIQUE_ID_LENGTH
-  validates_length_of :sis_user_id, :maximum => maximum_string_length, :allow_blank => true
-  validates_presence_of :account_id
+  validates :unique_id, length: { :maximum => MAX_UNIQUE_ID_LENGTH }
+  validates :sis_user_id, length: { :maximum => maximum_string_length, :allow_blank => true }
+  validates :account_id, presence: true
   validate :must_be_root_account
   # allows us to validate the user and pseudonym together, before saving either
   validates_each :user_id do |record, attr, value|

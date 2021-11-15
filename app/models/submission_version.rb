@@ -30,7 +30,7 @@ class SubmissionVersion < ActiveRecord::Base
   # specify the name, we might as well use the whole module/class name
   belongs_to :version, class_name: "SimplyVersioned::Version"
 
-  validates_presence_of :context_id, :version_id, :user_id, :assignment_id
+  validates :context_id, :version_id, :user_id, :assignment_id, presence: true
 
   class << self
     def index_version(version)

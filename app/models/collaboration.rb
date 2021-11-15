@@ -41,9 +41,9 @@ class Collaboration < ActiveRecord::Base
   after_commit :generate_document, on: :create
 
   TITLE_MAX_LENGTH = 255
-  validates_presence_of :title, :workflow_state, :context_id, :context_type
-  validates_length_of :title, :maximum => TITLE_MAX_LENGTH
-  validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates :title, :workflow_state, :context_id, :context_type, presence: true
+  validates :title, length: { :maximum => TITLE_MAX_LENGTH }
+  validates :description, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
 
   serialize :data
 

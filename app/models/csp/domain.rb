@@ -22,8 +22,8 @@ class Csp::Domain < ActiveRecord::Base
 
   belongs_to :account
 
-  validates_presence_of :account_id, :domain
-  validates_length_of :domain, :maximum => maximum_string_length
+  validates :account_id, :domain, presence: true
+  validates :domain, length: { :maximum => maximum_string_length }
 
   validate :validate_domain
 

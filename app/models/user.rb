@@ -392,12 +392,12 @@ class User < ActiveRecord::Base
                 :self_enrollment_course, :validation_root_account, :sortable_name_explicitly_set
   attr_reader :self_enrollment
 
-  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
-  validates_length_of :short_name, :maximum => maximum_string_length, :allow_nil => true
-  validates_length_of :sortable_name, :maximum => maximum_string_length, :allow_nil => true
-  validates_presence_of :name, :if => :require_presence_of_name
+  validates :name, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :short_name, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :sortable_name, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :name, presence: { :if => :require_presence_of_name }
   validates_locale :locale, :browser_locale, :allow_nil => true
-  validates_acceptance_of :terms_of_use, :if => :require_acceptance_of_terms, :allow_nil => false
+  validates :terms_of_use, acceptance: { :if => :require_acceptance_of_terms, :allow_nil => false }
   validates_each :self_enrollment_code do |record, attr, value|
     next unless record.require_self_enrollment_code
 

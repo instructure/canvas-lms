@@ -24,11 +24,11 @@ class Alert < ActiveRecord::Base
 
   serialize :recipients
 
-  validates_presence_of :context_id
-  validates_presence_of :context_type
-  validates_presence_of :criteria
+  validates :context_id, presence: true
+  validates :context_type, presence: true
+  validates :criteria, presence: true
   validates_associated :criteria
-  validates_presence_of :recipients
+  validates :recipients, presence: true
 
   before_save :infer_defaults
 

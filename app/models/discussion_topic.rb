@@ -85,10 +85,10 @@ class DiscussionTopic < ActiveRecord::Base
   belongs_to :user
 
   validates_associated :discussion_topic_section_visibilities
-  validates_presence_of :context_id, :context_type
-  validates_inclusion_of :discussion_type, :in => DiscussionTypes::TYPES
-  validates_length_of :message, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
+  validates :context_id, :context_type, presence: true
+  validates :discussion_type, inclusion: { :in => DiscussionTypes::TYPES }
+  validates :message, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
+  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true }
   validate :validate_draft_state_change, :if => :workflow_state_changed?
   validate :section_specific_topics_must_have_sections
   validate :only_course_topics_can_be_section_specific

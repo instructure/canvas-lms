@@ -510,11 +510,11 @@ class Assignment < ActiveRecord::Base
     self.submission_types == 'external_tool'
   end
 
-  validates_presence_of :context_id, :context_type, :workflow_state
+  validates :context_id, :context_type, :workflow_state, presence: true
 
-  validates_presence_of :title, if: :title_changed?
-  validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :allowed_extensions, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
+  validates :title, presence: { if: :title_changed? }
+  validates :description, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
+  validates :allowed_extensions, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
   validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
   validates :grading_type, inclusion: { in: ALLOWED_GRADING_TYPES }
 

@@ -114,7 +114,8 @@ Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
 Rails/SquishedSQLHeredocs:
   Severity: error
-
+Rails/Validation:
+  Severity: error
 
 RSpec/AnyInstance:
   Enabled: false # while using an instance double would be preferable, it's a pain

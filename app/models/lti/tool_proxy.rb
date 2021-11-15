@@ -36,9 +36,9 @@ module Lti
     serialize :raw_data
     serialize :update_payload
 
-    validates_presence_of :shared_secret, :guid, :product_version, :lti_version, :product_family_id, :workflow_state, :raw_data, :context
-    validates_uniqueness_of :guid
-    validates_inclusion_of :workflow_state, in: ['active', 'deleted', 'disabled']
+    validates :shared_secret, :guid, :product_version, :lti_version, :product_family_id, :workflow_state, :raw_data, :context, presence: true
+    validates :guid, uniqueness: true
+    validates :workflow_state, inclusion: { in: ['active', 'deleted', 'disabled'] }
 
     def active_in_context?(context)
       self.class.find_active_proxies_for_context(context).include?(self)

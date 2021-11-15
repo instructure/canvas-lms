@@ -23,8 +23,8 @@ class MigrationIssue < ActiveRecord::Base
   belongs_to :content_migration
   belongs_to :error_report
 
-  validates_presence_of :issue_type, :content_migration_id, :workflow_state
-  validates_inclusion_of :issue_type, :in => %w(todo warning error)
+  validates :issue_type, :content_migration_id, :workflow_state, presence: true
+  validates :issue_type, inclusion: { :in => %w(todo warning error) }
 
   workflow do
     state :active do
