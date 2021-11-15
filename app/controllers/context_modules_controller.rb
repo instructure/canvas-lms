@@ -208,7 +208,7 @@ class ContextModulesController < ApplicationController
           end
         end
       end
-      render status: 404, template: 'shared/errors/404_message'
+      return render status: 404, template: 'shared/errors/404_message'
     end
   end
 
@@ -266,7 +266,7 @@ class ContextModulesController < ApplicationController
         @tags.shift while @tags.first && @tags.first.content_type == 'ContextModuleSubHeader'
       end
       @tag = params[:last] ? @tags.last : @tags.first
-      unless @tag
+      if !@tag
         flash[:notice] = t 'module_empty', %{There are no items in the module "%{module}"}, :module => @module.name
         redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "module_#{@module.id}")
         return
@@ -417,7 +417,7 @@ class ContextModulesController < ApplicationController
     tags.each do |tag|
       if (req = (mod.completion_requirements || []).detect { |r| r[:id] == tag.id })
         progression.requirements_met ||= []
-        unless progression.requirements_met.any? { |r| r[:id] == req[:id] && r[:type] == req[:type] }
+        if !progression.requirements_met.any? { |r| r[:id] == req[:id] && r[:type] == req[:type] }
           if !before_tag || tag.position <= before_tag.position
             pre = {
               :url => named_context_url(@context, :context_context_modules_item_redirect_url, tag.id),
@@ -441,15 +441,15 @@ class ContextModulesController < ApplicationController
     type, id = ActiveRecord::Base.parse_asset_string params[:code]
     raise ActiveRecord::RecordNotFound if id == 0
 
-    @tag = if type == 'ContentTag'
-             @context.context_module_tags.active.where(id: id).first
-           else
-             @context.context_module_tags.active.where(context_module_id: params[:context_module_id], content_id: id, content_type: type).first
-           end
+    if type == 'ContentTag'
+      @tag = @context.context_module_tags.active.where(id: id).first
+    else
+      @tag = @context.context_module_tags.active.where(context_module_id: params[:context_module_id], content_id: id, content_type: type).first
+    end
     @module = @context.context_modules.active.find(params[:context_module_id])
     @progression = @module.evaluate_for(@current_user)
     @progression.current_position ||= 0 if @progression
-    res = {}
+    res = {};
     if !@progression
       nil
     elsif @progression.locked?
@@ -498,7 +498,7 @@ class ContextModulesController < ApplicationController
     else
       progression.uncollapse!(skip_save: progression.new_record?)
     end
-    progression
+    return progression
   end
 
   def toggle_collapse
@@ -538,7 +538,7 @@ class ContextModulesController < ApplicationController
   def reorder_items
     @module = @context.context_modules.not_deleted.find(params[:context_module_id])
     if authorized_action(@module, @current_user, :update)
-      order = params[:order].split(",").map(&:to_i)
+      order = params[:order].split(",").map { |id| id.to_i }
       tags = @context.context_module_tags.not_deleted.where(id: order)
       affected_module_ids = (tags.map(&:context_module_id) + [@module.id]).uniq.compact
       affected_items = []
@@ -563,7 +563,7 @@ class ContextModulesController < ApplicationController
   def item_details
     if authorized_action(@context, @current_user, :read)
       # namespaced models are separated by : in the url
-      code = params[:id].tr(":", "/").split("_")
+      code = params[:id].gsub(":", "/").split("_")
       id = code.pop.to_i
       type = code.join("_").classify
       @modules = @context.modules_visible_to(@current_user)
@@ -579,7 +579,7 @@ class ContextModulesController < ApplicationController
         end
       else
         result[:current_item] = possible_tags.first
-        unless result[:current_item]
+        if !result[:current_item]
           obj = @context.find_asset(params[:id], [:attachment, :discussion_topic, :assignment, :quiz, :wiki_page, :content_tag])
           if obj.is_a?(ContentTag)
             result[:current_item] = @tags.detect { |t| t.id == obj.id }
@@ -666,7 +666,7 @@ class ContextModulesController < ApplicationController
               @progressions = []
             else
               context_module_ids = @context.context_modules.active.pluck(:id)
-              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids).each(&:evaluate)
+              @progressions = ContextModuleProgression.where(:context_module_id => context_module_ids).each { |p| p.evaluate }
             end
           end
         elsif @context.grants_right?(@current_user, session, :participate_as_student)
@@ -725,7 +725,7 @@ class ContextModulesController < ApplicationController
   private
 
   def preload_assignments_and_quizzes(tags, user_is_admin)
-    assignment_tags = tags.select(&:can_have_assignment?)
+    assignment_tags = tags.select { |ct| ct.can_have_assignment? }
     return unless assignment_tags.any?
 
     content_with_assignments = assignment_tags

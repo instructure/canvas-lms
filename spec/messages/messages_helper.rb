@@ -22,11 +22,10 @@ module MessagesCommon
   def generate_message(notification_name, path_type, *)
     message = super
     expect(message.body).not_to be_nil
-    case path_type
-    when :email
+    if path_type == :email
       expect(message.subject).not_to be_nil
       expect(message.url).not_to be_nil
-    when :twitter
+    elsif path_type == :twitter
       expect(message.main_link).to be_present
     end
     message

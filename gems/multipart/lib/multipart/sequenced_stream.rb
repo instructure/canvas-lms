@@ -33,10 +33,10 @@ module Multipart
         # slurp up all remaining contents, even if that's just "" when eof at
         # beginning
         @streams.each { |stream| outbuf.concat(stream.read.force_encoding("utf-8")) }
-        outbuf
+        return outbuf
       elsif size.zero?
         # return "" (which is already in outbuf) even if eof at beginning
-        outbuf
+        return outbuf
       else
         # size >= 1 and not eof at beginning, read up to size
         read_any = false
@@ -50,7 +50,7 @@ module Multipart
             outbuf.concat(readbuf)
           end
         end
-        read_any ? outbuf : nil
+        return read_any ? outbuf : nil
       end
     end
   end

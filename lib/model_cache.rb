@@ -88,10 +88,7 @@ module ModelCache
   end
 
   def self.with_cache(lookups)
-    @cache = lookups.inject({}) { |h, (k, v)|
-      h[k] = prepare_lookups(v)
-      h
-    }
+    @cache = lookups.inject({}) { |h, (k, v)| h[k] = prepare_lookups(v); h }
     yield
   ensure
     @cache = nil

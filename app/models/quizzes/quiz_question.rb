@@ -73,11 +73,11 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   def infer_defaults
     if !self.position && self.quiz
-      self.position = if self.quiz_group
-                        (self.quiz_group.quiz_questions.active.map(&:position).compact.max || 0) + 1
-                      else
-                        self.quiz.root_entries_max_position + 1
-                      end
+      if self.quiz_group
+        self.position = (self.quiz_group.quiz_questions.active.map(&:position).compact.max || 0) + 1
+      else
+        self.position = self.quiz.root_entries_max_position + 1
+      end
     end
   end
 
@@ -99,10 +99,9 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   #  The user/teacher who's performing the regrade (e.g, updating the question).
   #  Note that this is NOT an id, but an actual instance of a User model.
   def question_data=(in_data)
-    data = case in_data
-           when String
+    data = if in_data.is_a?(String)
              ActiveSupport::JSON.decode(in_data)
-           when Hash
+           elsif in_data.is_a?(Hash)
              in_data.with_indifferent_access
            else
              in_data
@@ -161,7 +160,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
     self.assessment_question = aq
 
-    true
+    return true
   end
 
   def update_assessment_question!(aq, quiz_group_id, duplicate_index)
@@ -173,7 +172,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     self.duplicate_index = duplicate_index
     save! if changed?
 
-    self
+    return self
   end
 
   def validate_blank_questions

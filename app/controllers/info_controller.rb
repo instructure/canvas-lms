@@ -57,10 +57,7 @@ class InfoController < ApplicationController
        Account.connection != Delayed::Job.connection
       Delayed::Job.connection.active?
     end
-    Tempfile.open("heartbeat", ENV['TMPDIR'] || Dir.tmpdir) { |f|
-      f.write("heartbeat")
-      f.flush
-    }
+    Tempfile.open("heartbeat", ENV['TMPDIR'] || Dir.tmpdir) { |f| f.write("heartbeat"); f.flush }
     # consul works; we don't really care about the result, but it should not error trying to
     # get the result
     DynamicSettings.find(tree: :private)['enable_rack_brotli']

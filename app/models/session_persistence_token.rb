@@ -71,7 +71,7 @@ class SessionPersistenceToken < ActiveRecord::Base
     return unless token
     return unless token.valid_token?(persistence_token, uuid)
 
-    token
+    return token
   end
 
   def self.delete_expired(since)
@@ -94,6 +94,6 @@ class SessionPersistenceToken < ActiveRecord::Base
 
   def use!
     destroy
-    pseudonym
+    return pseudonym
   end
 end

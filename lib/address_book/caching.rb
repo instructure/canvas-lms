@@ -47,7 +47,7 @@ module AddressBook
       end
 
       def cached?(user)
-        @entries.key?(key(user))
+        @entries.has_key?(key(user))
       end
 
       def fetch(user)

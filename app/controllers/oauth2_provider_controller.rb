@@ -128,12 +128,11 @@ class OAuth2ProviderController < ApplicationController
     client_id = params[:client_id].presence || basic_user
     secret = params[:client_secret].presence || basic_pass
 
-    granter = case grant_type
-              when "authorization_code"
+    granter = if grant_type == "authorization_code"
                 Canvas::OAuth::GrantTypes::AuthorizationCode.new(client_id, secret, params)
-              when "refresh_token"
+              elsif grant_type == "refresh_token"
                 Canvas::OAuth::GrantTypes::RefreshToken.new(client_id, secret, params)
-              when 'client_credentials'
+              elsif grant_type == 'client_credentials'
                 Canvas::OAuth::GrantTypes::ClientCredentials.new(params, request.host_with_port, request.protocol)
               else
                 Canvas::OAuth::GrantTypes::BaseType.new(client_id, secret, params)
@@ -176,7 +175,7 @@ class OAuth2ProviderController < ApplicationController
   def oauth_error(exception)
     if @should_not_redirect || params[:redirect_uri] == Canvas::OAuth::Provider::OAUTH2_OOB_URI || params[:redirect_uri].blank?
       response['WWW-Authenticate'] = 'Canvas OAuth 2.0' if exception.http_status == 401
-      render(exception.to_render_data)
+      return render(exception.to_render_data)
     else
       redirect_to exception.redirect_uri(params[:redirect_uri])
     end

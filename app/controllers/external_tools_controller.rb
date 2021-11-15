@@ -117,18 +117,18 @@ class ExternalToolsController < ApplicationController
   #     ]
   def index
     if authorized_action(@context, @current_user, :read)
-      @tools = if params[:include_parents]
-                 ContextExternalTool.all_tools_for(@context, :user => (params[:include_personal] ? @current_user : nil))
-               else
-                 @context.context_external_tools.active
-               end
+      if params[:include_parents]
+        @tools = ContextExternalTool.all_tools_for(@context, :user => (params[:include_personal] ? @current_user : nil))
+      else
+        @tools = @context.context_external_tools.active
+      end
       @tools = ContextExternalTool.search_by_attribute(@tools, :name, params[:search_term])
 
       @context.shard.activate do
         @tools = @tools.placements(params[:placement]) if params[:placement]
       end
       if Canvas::Plugin.value_to_boolean(params[:selectable])
-        @tools = @tools.select(&:selectable)
+        @tools = @tools.select { |t| t.selectable }
       end
       respond_to do |format|
         @tools = Api.paginate(@tools, self, tool_pagination_url)
@@ -150,7 +150,7 @@ class ExternalToolsController < ApplicationController
 
   def retrieve
     @tool = ContextExternalTool.find_external_tool(params[:url], @context, nil, nil, params[:client_id])
-    unless @tool
+    if !@tool
       raise InvalidSettingsError, t("#application.errors.invalid_external_tool", "Couldn't find valid settings for this link")
     end
 
@@ -244,10 +244,9 @@ class ExternalToolsController < ApplicationController
     end
 
     launch_type = params[:launch_type]
-    case launch_type
-    when 'module_item'
+    if launch_type == 'module_item'
       generate_module_item_sessionless_launch
-    when 'assessment'
+    elsif launch_type == 'assessment'
       generate_assignment_sessionless_launch
     else
       generate_common_sessionless_launch(options: { launch_url: params[:url] })
@@ -465,7 +464,7 @@ class ExternalToolsController < ApplicationController
       @tool = ContextExternalTool.find_for(id, @context, selection_type, false)
     end
 
-    unless @tool
+    if !@tool
       flash[:error] = t "#application.errors.invalid_external_tool_id", "Couldn't find valid settings for this tool"
       redirect_to named_context_url(@context, :context_url)
     end
@@ -1231,7 +1230,7 @@ class ExternalToolsController < ApplicationController
   private
 
   def external_tools_json_for_courses(courses)
-    courses.reduce([]) do |all_results, course|
+    json = courses.reduce([]) do |all_results, course|
       tabs = course.tabs_available(@current_user, course_subject_tabs: true)
       tool_ids = []
       tabs.select { |t| t[:external] }.each do |t|
@@ -1247,6 +1246,8 @@ class ExternalToolsController < ApplicationController
       end
       all_results.push(*results)
     end
+
+    json
   end
 
   def parse_context_codes
@@ -1426,7 +1427,7 @@ class ExternalToolsController < ApplicationController
     attrs += [:allow_membership_service_access] if @context.root_account.feature_enabled?(:membership_service_for_lti_tools)
 
     attrs.each do |prop|
-      tool.send("#{prop}=", params[prop]) if params.key?(prop)
+      tool.send("#{prop}=", params[prop]) if params.has_key?(prop)
     end
   end
 

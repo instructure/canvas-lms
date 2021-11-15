@@ -160,6 +160,6 @@ class MigrationIssuesController < ApplicationController
 
   def require_content_migration
     @content_migration = @context.content_migrations.find(params[:content_migration_id])
-    authorized_action(@context, @current_user, :manage_content)
+    return authorized_action(@context, @current_user, :manage_content)
   end
 end

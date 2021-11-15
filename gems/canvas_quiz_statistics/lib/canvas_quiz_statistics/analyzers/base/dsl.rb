@@ -122,7 +122,7 @@ module CanvasQuizStatistics::Analyzers::Base::DSL
 
   def metrics_for(question_type)
     target = question_type.to_s
-    target = "#{target}_question" unless /_question$/.match?(target)
+    target = "#{target}_question" unless target =~ /_question$/
 
     self.metrics[target.to_sym]
   end

@@ -23,7 +23,6 @@ import I18n from 'i18n!unpublished_changes_button_props'
 import {getPacePlan, getPlanPublishing, getUnpublishedChangeCount} from '../reducers/pace_plans'
 import {StoreState} from '../types'
 import {connect} from 'react-redux'
-import {getCategoryError} from '../reducers/ui'
 import {Spinner} from '@instructure/ui-spinner'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -33,7 +32,6 @@ type StateProps = {
   changeCount: number
   planPublishing: boolean
   newPlan: boolean
-  publishError?: string
 }
 
 export type UnpublishedChangesIndicatorProps = StateProps & {
@@ -48,7 +46,7 @@ const text = (changeCount: number) => {
 
   return I18n.t(
     {
-      one: '1 unpublished change',
+      one: '%{count} unpublished change',
       other: '%{count} unpublished changes'
     },
     {count: changeCount}
@@ -70,7 +68,6 @@ export const UnpublishedChangesIndicator = ({
   newPlan,
   onClick,
   planPublishing,
-  publishError,
   onUnpublishedNavigation = triggerBrowserWarning
 }: UnpublishedChangesIndicatorProps) => {
   const hasChanges = changeCount > 0
@@ -83,15 +80,6 @@ export const UnpublishedChangesIndicator = ({
   }, [hasChanges, onUnpublishedNavigation])
 
   if (newPlan) return null
-
-  if (publishError !== undefined) {
-    return (
-      <View margin={margin}>
-        <Text color="danger">{I18n.t('Publishing error')}</Text>
-      </View>
-    )
-  }
-
   if (planPublishing) {
     return (
       <View>
@@ -102,23 +90,19 @@ export const UnpublishedChangesIndicator = ({
       </View>
     )
   }
-
   return changeCount ? (
     <CondensedButton data-testid="publish-status-button" onClick={onClick} margin={margin}>
       {text(changeCount)}
     </CondensedButton>
   ) : (
-    <View margin={margin} data-testid="publish-status">
-      {text(changeCount)}
-    </View>
+    <span data-testid="publish-status">{text(changeCount)}</span>
   )
 }
 
 const mapStateToProps = (state: StoreState) => ({
   changeCount: getUnpublishedChangeCount(state),
   planPublishing: getPlanPublishing(state),
-  newPlan: !getPacePlan(state)?.id,
-  publishError: getCategoryError(state, 'publish')
+  newPlan: !getPacePlan(state)?.id
 })
 
 export default connect(mapStateToProps)(UnpublishedChangesIndicator)

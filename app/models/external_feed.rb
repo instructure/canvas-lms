@@ -86,10 +86,9 @@ class ExternalFeed < ActiveRecord::Base
 
   def format_description(desc)
     desc = (desc || "").to_s
-    case self.verbosity
-    when 'link_only'
+    if self.verbosity == 'link_only'
       ""
-    when 'truncate'
+    elsif self.verbosity == 'truncate'
       self.extend TextHelper
       truncate_html(desc, :max_length => 250)
     else
@@ -98,8 +97,7 @@ class ExternalFeed < ActiveRecord::Base
   end
 
   def add_entry(item, feed, feed_type)
-    case feed_type
-    when :rss
+    if feed_type == :rss
       uuid = item.respond_to?(:guid) && item.guid && item.guid.content.to_s
       if uuid && uuid.length > 255
         uuid = Digest::SHA256.hexdigest(uuid)
@@ -138,7 +136,7 @@ class ExternalFeed < ActiveRecord::Base
         :uuid => uuid
       )
       return entry if entry.save
-    when :atom
+    elsif feed_type == :atom
       uuid = item.id || Digest::SHA256.hexdigest("#{item.title}#{item.published.utc.strftime('%Y-%m-%d')}")
       entry = self.external_feed_entries.where(uuid: uuid).first
       entry ||= self.external_feed_entries.where(url: item.links.alternate.to_s).first

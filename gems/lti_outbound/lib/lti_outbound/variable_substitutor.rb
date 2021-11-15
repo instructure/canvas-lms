@@ -34,17 +34,16 @@ module LtiOutbound
 
     def substitute!(data_hash)
       data_hash.each do |k, v|
-        if key?(v)
+        if has_key?(v)
           data_hash[k] = substitution_value(v)
         end
       end
       data_hash
     end
 
-    def key?(key)
-      substitutions.key? key
+    def has_key?(key)
+      substitutions.has_key? key
     end
-    alias_method :has_key?, :key?
 
     private
 

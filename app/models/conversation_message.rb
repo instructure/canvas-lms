@@ -159,7 +159,9 @@ class ConversationMessage < ActiveRecord::Base
     previous_attachment_ids = self.attachment_associations.pluck(:attachment_id)
     deleted_attachment_ids = previous_attachment_ids - attachment_ids
     new_attachment_ids = attachment_ids - previous_attachment_ids
-    self.attachment_associations.where(attachment_id: deleted_attachment_ids).find_each(&:destroy)
+    self.attachment_associations.where(attachment_id: deleted_attachment_ids).find_each do |association|
+      association.destroy
+    end
     if new_attachment_ids.any?
       author.conversation_attachments_folder.attachments.where(id: new_attachment_ids).find_each do |attachment|
         self.attachment_associations.create!(attachment: attachment)
@@ -237,7 +239,7 @@ class ConversationMessage < ActiveRecord::Base
     return if skip_broadcasts
     return unless @generate_user_note
 
-    valid_recipients = recipients.select { |recipient| recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any?(&:enable_user_notes) }
+    valid_recipients = recipients.select { |recipient| recipient.grants_right?(author, :create_user_notes) && recipient.associated_accounts.any? { |a| a.enable_user_notes } }
     return unless valid_recipients.any?
 
     valid_recipients = User.where(:id => valid_recipients) # need to reload to get all the attributes needed for User#save
@@ -333,7 +335,7 @@ class ConversationMessage < ActiveRecord::Base
     # -----
     # context
     content = "<div>#{ERB::Util.h(self.body)}</div>"
-    unless self.attachments.empty?
+    if !self.attachments.empty?
       content += "<ul>"
       self.attachments.each do |attachment|
         href = file_download_url(attachment, :verifier => attachment.uuid,

@@ -192,13 +192,9 @@ module Canvas::Migration::Helpers
       return [] unless course_data['attachments'] && course_data['attachments'].length > 0
 
       remove_name_regex = %r{/[^/]*\z}
-      course_data['attachments'].each { |a|
-        next unless a['path_name']
-
-        a['path_name'].gsub!(remove_name_regex, '')
-      }
+      course_data['attachments'].each { |a| next unless a['path_name']; a['path_name'].gsub!(remove_name_regex, '') }
       folder_groups = course_data['attachments'].group_by { |a| a['path_name'] }
-      sorted = folder_groups.sort_by(&:first)
+      sorted = folder_groups.sort_by { |i| i.first }
       sorted.each do |folder_name, atts|
         if atts.length == 1 && atts[0]['file_name'] == folder_name
           content_list << item_hash('attachments', atts[0])
@@ -241,7 +237,8 @@ module Canvas::Migration::Helpers
           add_url!(hash, "submodules_#{CGI.escape(item['migration_id'])}")
         end
       end
-      add_linked_resource(type, item, hash)
+      hash = add_linked_resource(type, item, hash)
+      hash
     end
 
     def add_linked_resource(type, item, hash)
@@ -304,11 +301,11 @@ module Canvas::Migration::Helpers
 
               scope = scope.select(:assignment_id) if type == 'quizzes'
 
-              scope = if type == 'context_modules' || type == 'context_external_tools' || type == 'groups'
-                        scope.select(:name)
-                      else
-                        scope.select(:title)
-                      end
+              if type == 'context_modules' || type == 'context_external_tools' || type == 'groups'
+                scope = scope.select(:name)
+              else
+                scope = scope.select(:title)
+              end
 
               if scope.klass.respond_to?(:not_deleted)
                 scope = scope.not_deleted

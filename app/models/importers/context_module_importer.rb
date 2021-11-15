@@ -70,7 +70,7 @@ module Importers
     end
 
     def self.process_migration(data, migration)
-      modules = data['modules'] || []
+      modules = data['modules'] ? data['modules'] : []
       migration.last_module_position = migration.context.context_modules.maximum(:position) if migration.is_a?(ContentMigration)
 
       modules.each do |mod|
@@ -139,12 +139,12 @@ module Importers
       item.position = position
       item.context = context
 
-      if hash.key?(:unlock_at) && (migration.for_master_course_import? || hash[:unlock_at].present?)
+      if hash.has_key?(:unlock_at) && (migration.for_master_course_import? || hash[:unlock_at].present?)
         item.unlock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:unlock_at])
       end
 
-      item.require_sequential_progress = hash[:require_sequential_progress] if hash.key?(:require_sequential_progress)
-      item.requirement_count = hash[:requirement_count] if hash.key?(:requirement_count)
+      item.require_sequential_progress = hash[:require_sequential_progress] if hash.has_key?(:require_sequential_progress)
+      item.requirement_count = hash[:requirement_count] if hash.has_key?(:requirement_count)
 
       if hash[:prerequisites]
         preqs = []
@@ -246,14 +246,14 @@ module Importers
                                            :indent => hash[:indent].to_i
                                          }, existing_item, :assignment => ass, :position => context_module.migration_position)
         end
-      elsif /folder|heading|contextmodulesubheader/i.match?((hash[:linked_resource_type] || hash[:type]))
+      elsif (hash[:linked_resource_type] || hash[:type]) =~ /folder|heading|contextmodulesubheader/i
         # just a snippet of text
         item = context_module.add_item({
                                          :title => hash[:title] || hash[:linked_resource_title],
                                          :type => 'context_module_sub_header',
                                          :indent => hash[:indent].to_i
                                        }, existing_item, :position => context_module.migration_position)
-      elsif /url/i.match?(hash[:linked_resource_type])
+      elsif hash[:linked_resource_type] =~ /url/i
         # external url
         if (url = hash[:url])
           if (CanvasHttp.validate_url(hash[:url]) rescue nil)
@@ -383,9 +383,9 @@ module Importers
       new_url = uri.to_s
 
       if new_url.length < MAX_URL_LENGTH
-        new_url
+        return new_url
       else
-        nil
+        return nil
       end
     end
   end

@@ -213,7 +213,5 @@ describe GradesPresenter do
 end
 
 class FakeShard
-  def activate
-    yield
-  end
+  def activate; yield; end
 end

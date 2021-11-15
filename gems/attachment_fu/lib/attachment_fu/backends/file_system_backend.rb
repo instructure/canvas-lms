@@ -92,9 +92,7 @@ module AttachmentFu # :nodoc:
         filename
       end
 
-      def bucket_name
-        "no-bucket"
-      end
+      def bucket_name; "no-bucket"; end
 
       # Creates a temp file from the currently saved file.
       def create_temp_file

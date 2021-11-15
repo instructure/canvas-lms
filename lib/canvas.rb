@@ -89,8 +89,7 @@ module Canvas
   # `sample` reports KB, not B
   if File.directory?("/proc")
     # linux w/ proc fs
-    LINUX_PAGE_SIZE = (size = `getconf PAGESIZE`.to_i
-                       size > 0 ? size : 4096)
+    LINUX_PAGE_SIZE = (size = `getconf PAGESIZE`.to_i; size > 0 ? size : 4096)
     def self.sample_memory
       s = File.read("/proc/#{Process.pid}/statm").to_i rescue 0
       s * LINUX_PAGE_SIZE / 1024
@@ -212,7 +211,7 @@ module Canvas
     Canvas::Errors.capture_exception(:service_timeout, e, :warn)
     raise if options[:raise_on_timeout]
 
-    nil
+    return nil
   end
 
   def self.timeout_protection_cutoff(service_name)

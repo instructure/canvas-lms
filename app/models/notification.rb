@@ -282,7 +282,7 @@ class Notification < Switchman::UnshardedRecord
   end
 
   def category_slug
-    (self.category || "").tr(' ', "_").gsub(/[^\w]/, "").downcase
+    (self.category || "").gsub(/ /, "_").gsub(/[^\w]/, "").downcase
   end
 
   # if user is given, categories that aren't relevant to that user will be
@@ -683,7 +683,7 @@ class Notification < Switchman::UnshardedRecord
   end
 
   def type_name
-    category
+    return category
   end
 
   def relevant_to_user?(user)

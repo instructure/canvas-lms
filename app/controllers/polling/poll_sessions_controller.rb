@@ -275,7 +275,7 @@ module Polling
                Api.paginate(poll_sessions, self, api_url)
              end
 
-      [json, meta]
+      return json, meta
     end
 
     def serialize_jsonapi(poll_sessions, meta = {})

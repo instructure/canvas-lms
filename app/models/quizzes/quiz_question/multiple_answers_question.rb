@@ -54,7 +54,7 @@ class Quizzes::QuizQuestion::MultipleAnswersQuestion < Quizzes::QuizQuestion::Ba
     end
     return nil if total_answers == 0
 
-    correct_answers
+    return correct_answers
   end
 
   # TODO: remove once new stats is on for everybody

@@ -29,8 +29,8 @@ require 'multipart'
 # http://www.kaltura.com/api_v3/testmeDoc/index.php
 module CanvasKaltura
   class SessionType
-    USER = 0
-    ADMIN = 2
+    USER = 0;
+    ADMIN = 2;
   end
 
   class ClientV3
@@ -283,8 +283,8 @@ module CanvasKaltura
     def bulkUploadAdd(files)
       rows = []
       files.each do |file|
-        filename = (file[:name] || "Media File").delete(',')
-        description = (file[:description] || "no description").delete(',')
+        filename = (file[:name] || "Media File").gsub(/,/, "")
+        description = (file[:description] || "no description").gsub(/,/, "")
         url = file[:url]
         rows << [filename, description, file[:tags] || "", url, file[:media_type] || "video", '', '', '', '', '', '', file[:partner_data] || ''] if file[:url]
       end

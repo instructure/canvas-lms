@@ -44,11 +44,11 @@ module LiveAssessments
       outcome_result.possible = possible
       outcome_result.percent = score.to_f / possible.to_f
 
-      outcome_result.mastery = if alignment.mastery_score
-                                 outcome_result.percent >= alignment.mastery_score
-                               else
-                                 nil
-                               end
+      if alignment.mastery_score
+        outcome_result.mastery = outcome_result.percent >= alignment.mastery_score
+      else
+        outcome_result.mastery = nil
+      end
 
       # map actual magic marker result to outcome rubric criterion if we have one
       # this is a hack. the rollups and gradebooks should handle explicit mastery

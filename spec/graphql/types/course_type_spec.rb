@@ -21,10 +21,7 @@
 require_relative "../graphql_spec_helper"
 
 describe Types::CourseType do
-  let_once(:course) {
-    course_with_student(active_all: true)
-    @course
-  }
+  let_once(:course) { course_with_student(active_all: true); @course }
   let(:course_type) { GraphQLTypeTester.new(course, current_user: @student) }
 
   let_once(:other_section) { course.course_sections.create! name: "other section" }
@@ -59,10 +56,7 @@ describe Types::CourseType do
   end
 
   context "sis fields" do
-    let_once(:sis_course) {
-      course.update!(sis_course_id: "SIScourseID")
-      course
-    }
+    let_once(:sis_course) { course.update!(sis_course_id: "SIScourseID"); course }
 
     let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
 
@@ -350,8 +344,12 @@ describe Types::CourseType do
     before(:once) do
       @student1 = @student
       @student2 = student_in_course(active_all: true).user
-      @inactive_user = student_in_course.tap(&:invite).user
-      @concluded_user = student_in_course.tap(&:complete).user
+      @inactive_user = student_in_course.tap { |enrollment|
+        enrollment.invite
+      }.user
+      @concluded_user = student_in_course.tap { |enrollment|
+        enrollment.complete
+      }.user
     end
 
     describe "usersConnection" do

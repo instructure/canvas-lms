@@ -289,12 +289,11 @@ class CommunicationChannel < ActiveRecord::Base
   # Return the 'path' for simple communication channel types like email and sms.
   # For Twitter, return the user's configured user_name for the service.
   def path_description
-    case self.path_type
-    when TYPE_TWITTER
+    if self.path_type == TYPE_TWITTER
       res = self.user.user_services.for_service(TYPE_TWITTER).first.service_user_name rescue nil
       res ||= t :default_twitter_handle, 'Twitter Handle'
       res
-    when TYPE_PUSH
+    elsif self.path_type == TYPE_PUSH
       t 'For All Devices'
     else
       self.path
@@ -368,11 +367,11 @@ class CommunicationChannel < ActiveRecord::Base
   # confirmation code in place.
   def set_confirmation_code(reset = false, expires_at = nil)
     self.confirmation_code = nil if reset
-    self.confirmation_code ||= if self.path_type == TYPE_EMAIL or self.path_type.nil?
-                                 CanvasSlug.generate(nil, 25)
-                               else
-                                 CanvasSlug.generate
-                               end
+    if self.path_type == TYPE_EMAIL or self.path_type.nil?
+      self.confirmation_code ||= CanvasSlug.generate(nil, 25)
+    else
+      self.confirmation_code ||= CanvasSlug.generate
+    end
     self.confirmation_code_expires_at = expires_at if reset
     true
   end
@@ -473,9 +472,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
   protected :assert_path_type
 
-  def self.serialization_excludes
-    [:confirmation_code]
-  end
+  def self.serialization_excludes; [:confirmation_code]; end
 
   def self.associated_shards(_path)
     [Shard.default]
@@ -604,7 +601,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def e164_path
-    return path if /^\+\d+$/.match?(path)
+    return path if path =~ /^\+\d+$/
     return nil unless (match = path.match(/^(?<number>\d+)@(?<domain>.+)$/))
     return nil unless (carrier = CommunicationChannel.sms_carriers[match[:domain]])
 
