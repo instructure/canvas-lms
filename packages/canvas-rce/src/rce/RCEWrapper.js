@@ -600,11 +600,9 @@ class RCEWrapper extends React.Component {
       parseFloat(
         ed.dom.doc.defaultView.getComputedStyle(ed.dom.doc.body).getPropertyValue('font-size')
       ) || 1
-    const imgParent = ed.selection.getNode()?.parentElement
-    const imgSz = imgParent
-      ? parseFloat(
-          ed.dom.doc.defaultView.getComputedStyle(imgParent).getPropertyValue('font-size')
-        ) || 1
+    const sel = ed.selection.getNode()
+    const imgSz = sel
+      ? parseFloat(ed.dom.doc.defaultView.getComputedStyle(sel).getPropertyValue('font-size')) || 1
       : docSz
     let scale = imgSz / docSz
 
