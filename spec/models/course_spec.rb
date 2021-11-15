@@ -5314,6 +5314,12 @@ describe Course, "#sync_homeroom_participation" do
     expect(@course.start_at).to eq @homeroom_course.start_at
     expect(@course.conclude_at).to eq @homeroom_course.conclude_at
   end
+
+  it "doesn't process courses with no linked homeroom" do
+    @course.homeroom_course_id = nil
+    @course.save!
+    expect { Course.sync_with_homeroom }.not_to raise_error
+  end
 end
 
 describe Course, "user_is_instructor?" do

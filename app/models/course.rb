@@ -3409,7 +3409,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.sync_with_homeroom
-    sync_homeroom_enrollments_enabled.find_each(&:sync_with_homeroom)
+    where.not(homeroom_course_id: nil).sync_homeroom_enrollments_enabled.find_each(&:sync_with_homeroom)
   end
 
   def sync_with_homeroom
@@ -3418,6 +3418,8 @@ class Course < ActiveRecord::Base
   end
 
   def sync_homeroom_participation
+    return unless linked_homeroom_course
+
     if linked_homeroom_course.restrict_enrollments_to_course_dates
       self.restrict_enrollments_to_course_dates = true
       self.start_at = linked_homeroom_course.start_at
