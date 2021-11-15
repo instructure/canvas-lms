@@ -3604,13 +3604,17 @@ describe Course, 'grade_publishing' do
 
     context 'should_kick_off_grade_publishing_timeout?' do
       it 'covers all the necessary cases' do
-        @plugin_settings.merge! :success_timeout => "no", :wait_for_success => "yes"
+        @plugin_settings[:success_timeout] = "no"
+        @plugin_settings[:wait_for_success] = "yes"
         expect(@course.should_kick_off_grade_publishing_timeout?).to be_falsey
-        @plugin_settings.merge! :success_timeout => "", :wait_for_success => "no"
+        @plugin_settings[:success_timeout] = ""
+        @plugin_settings[:wait_for_success] = "no"
         expect(@course.should_kick_off_grade_publishing_timeout?).to be_falsey
-        @plugin_settings.merge! :success_timeout => "1", :wait_for_success => "no"
+        @plugin_settings[:success_timeout] = "1"
+        @plugin_settings[:wait_for_success] = "no"
         expect(@course.should_kick_off_grade_publishing_timeout?).to be_falsey
-        @plugin_settings.merge! :success_timeout => "1", :wait_for_success => "yes"
+        @plugin_settings[:success_timeout] = "1"
+        @plugin_settings[:wait_for_success] = "yes"
         expect(@course.should_kick_off_grade_publishing_timeout?).to be_truthy
       end
     end
@@ -3641,7 +3645,8 @@ describe Course, 'grade_publishing' do
 
       it "clears the grade publishing message of unpublishable enrollments" do
         allow(@plugin).to receive(:enabled?).and_return(true)
-        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "test_format"
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
+        @plugin_settings[:format_type] = "test_format"
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
@@ -3676,10 +3681,8 @@ describe Course, 'grade_publishing' do
         @course.grading_standard_enabled = true
         @course.save!
         allow(@plugin).to receive(:enabled?).and_return(true)
-        @plugin_settings.merge!({
-                                  :publish_endpoint => "http://localhost/endpoint",
-                                  :format_type => "instructure_csv"
-                                })
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
+        @plugin_settings[:format_type] = "instructure_csv"
         @checked = false
         allow(Course).to receive(:valid_grade_export_types).and_return(
           {
@@ -3707,10 +3710,8 @@ describe Course, 'grade_publishing' do
         @course.grading_standard_enabled = true
         @course.save!
         allow(@plugin).to receive(:enabled?).and_return(true)
-        @plugin_settings.merge!({
-                                  :publish_endpoint => "http://localhost/endpoint",
-                                  :format_type => "instructure_csv"
-                                })
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
+        @plugin_settings[:format_type] = "instructure_csv"
         @checked = false
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "instructure_csv" => {
@@ -3737,7 +3738,7 @@ describe Course, 'grade_publishing' do
 
       it "makes sure an endpoint is defined" do
         allow(@plugin).to receive(:enabled?).and_return(true)
-        @plugin_settings.merge! :publish_endpoint => ""
+        @plugin_settings[:publish_endpoint] = ""
         expect(lambda { @course.send_final_grades_to_endpoint nil }).to raise_error("endpoint undefined")
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["endpoint undefined"] * 6) + [nil] + (["endpoint undefined"] * 2)
@@ -3750,7 +3751,7 @@ describe Course, 'grade_publishing' do
                                                                                              }))
         @user = user_factory
         allow(@plugin).to receive(:enabled?).and_return(true)
-        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint"
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         expect(lambda { @course.send_final_grades_to_endpoint @user }).to raise_error("publishing disallowed for this publishing user")
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["publishing disallowed for this publishing user"] * 6) + [nil] + (["publishing disallowed for this publishing user"] * 2)
@@ -3763,7 +3764,7 @@ describe Course, 'grade_publishing' do
                                                                                              }))
         @user = user_factory
         allow(@plugin).to receive(:enabled?).and_return(true)
-        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint"
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         expect(lambda { @course.send_final_grades_to_endpoint @user }).to raise_error("grade publishing requires a grading standard")
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["grade publishing requires a grading standard"] * 6) + [nil] + (["grade publishing requires a grading standard"] * 2)
@@ -3771,7 +3772,8 @@ describe Course, 'grade_publishing' do
 
       it "makes sure the format type is supported" do
         allow(@plugin).to receive(:enabled?).and_return(true)
-        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "invalid_Format"
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
+        @plugin_settings[:format_type] = "invalid_Format"
         expect(lambda { @course.send_final_grades_to_endpoint @user }).to raise_error("unknown format type: invalid_Format")
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["unknown format type: invalid_Format"] * 6) + [nil] + (["unknown format type: invalid_Format"] * 2)
@@ -3779,7 +3781,8 @@ describe Course, 'grade_publishing' do
 
       def sample_grade_publishing_request(published_status)
         allow(@plugin).to receive(:enabled?).and_return(true)
-        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "test_format"
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
+        @plugin_settings[:format_type] = "test_format"
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
@@ -3816,28 +3819,33 @@ describe Course, 'grade_publishing' do
       end
 
       it "does not set the status to publishing if a timeout didn't kick off - timeout, wait" do
-        @plugin_settings.merge! :success_timeout => "1", :wait_for_success => "yes"
+        @plugin_settings[:success_timeout] = "1"
+        @plugin_settings[:wait_for_success] = "yes"
         sample_grade_publishing_request("publishing")
       end
 
       it "does not set the status to publishing if a timeout didn't kick off - timeout, no wait" do
-        @plugin_settings.merge! :success_timeout => "2", :wait_for_success => "false"
+        @plugin_settings[:success_timeout] = "2"
+        @plugin_settings[:wait_for_success] = "false"
         sample_grade_publishing_request("published")
       end
 
       it "does not set the status to publishing if a timeout didn't kick off - no timeout, wait" do
-        @plugin_settings.merge! :success_timeout => "no", :wait_for_success => "yes"
+        @plugin_settings[:success_timeout] = "no"
+        @plugin_settings[:wait_for_success] = "yes"
         sample_grade_publishing_request("published")
       end
 
       it "does not set the status to publishing if a timeout didn't kick off - no timeout, no wait" do
-        @plugin_settings.merge! :success_timeout => "false", :wait_for_success => "no"
+        @plugin_settings[:success_timeout] = "false"
+        @plugin_settings[:wait_for_success] = "no"
         sample_grade_publishing_request("published")
       end
 
       it "tries and make all posts even if one of the postings fails" do
         allow(@plugin).to receive(:enabled?).and_return(true)
-        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "test_format"
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
+        @plugin_settings[:format_type] = "test_format"
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
@@ -3870,7 +3878,8 @@ describe Course, 'grade_publishing' do
 
       it "tries and make all posts even if two of the postings fail" do
         allow(@plugin).to receive(:enabled?).and_return(true)
-        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "test_format"
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
+        @plugin_settings[:format_type] = "test_format"
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
@@ -3903,7 +3912,8 @@ describe Course, 'grade_publishing' do
 
       it "fails gracefully when the posting generator fails" do
         allow(@plugin).to receive(:enabled?).and_return(true)
-        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "test_format"
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
+        @plugin_settings[:format_type] = "test_format"
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
@@ -3919,7 +3929,8 @@ describe Course, 'grade_publishing' do
 
       it "passes header parameters to post" do
         allow(@plugin).to receive(:enabled?).and_return(true)
-        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "test_format"
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
+        @plugin_settings[:format_type] = "test_format"
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {
@@ -3947,7 +3958,8 @@ describe Course, 'grade_publishing' do
 
       it 'updates enrollment status if no resource provided' do
         allow(@plugin).to receive(:enabled?).and_return(true)
-        @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "test_format"
+        @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
+        @plugin_settings[:format_type] = "test_format"
         @ase = @student_enrollments.find_all { |e| e.workflow_state == 'active' }
         allow(Course).to receive(:valid_grade_export_types).and_return({
                                                                          "test_format" => {

@@ -70,7 +70,7 @@ module Api::V1::Quiz
   end
 
   def quiz_json(quiz, context, user, session, options = {}, serializer = nil)
-    options.merge!(description_formatter: description_formatter(context, user)) unless options[:description_formatter]
+    options[:description_formatter] = description_formatter(context, user) unless options[:description_formatter]
     if accepts_jsonapi?
       Canvas::APIArraySerializer.new([quiz],
                                      scope: user,

@@ -356,7 +356,7 @@ module Api::V1::Submission
         end
       end
     else
-      json.merge!(anonymous_grader_id: assignment.grader_ids_to_anonymous_ids[json.delete(:scorer_id).to_s])
+      json[:anonymous_grader_id] = assignment.grader_ids_to_anonymous_ids[json.delete(:scorer_id).to_s]
     end
 
     if includes.include?('crocodoc_urls') && assignment.can_view_student_names?(current_user)

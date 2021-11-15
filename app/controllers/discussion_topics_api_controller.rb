@@ -724,7 +724,7 @@ class DiscussionTopicsApiController < ApplicationController
     context = (@current_user || @context)
     attachment_params = {}
     if @topic.for_assignment?
-      attachment_params.merge!(:folder_id => @current_user.submissions_folder(@context))
+      attachment_params[:folder_id] = @current_user.submissions_folder(@context)
       context = @current_user
     end
     attachment = context.attachments.new(attachment_params)

@@ -75,6 +75,8 @@ Naming/FileName:
 
 Performance/MapCompact:
   Severity: error
+Performance/RedundantMerge:
+  Severity: error
 Performance/RegexpMatch:
   Severity: error
 Performance/StartWith:

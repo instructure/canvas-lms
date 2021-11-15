@@ -540,7 +540,7 @@ describe Course do
 
     it "can insert items from one module to an existing module" do
       migration = @course.content_migrations.build
-      @params["copy"].merge!("context_modules" => { "1864019962002" => true })
+      @params["copy"]["context_modules"] = { "1864019962002" => true }
       migration.migration_settings[:migration_ids_to_import] = @params
       migration.migration_settings[:insert_into_module_id] = @module.id
       migration.save!

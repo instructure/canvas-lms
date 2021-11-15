@@ -36,7 +36,7 @@ module DataFixup::PopulateRootAccountIdOnUserObservers
         link.update(updates)
       else
         updates = { :root_account_id => root_account_id }
-        updates.merge!(:workflow_state => 'deleted') if destroy
+        updates[:workflow_state] = 'deleted' if destroy
         shadow&.update(updates)
         link.update(updates)
       end

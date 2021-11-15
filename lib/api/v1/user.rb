@@ -71,8 +71,8 @@ module Api::V1::User
         # that's called sis_source_id.
 
         if user_can_read_sis_data?(current_user, context)
-          json.merge! :sis_user_id => pseudonym&.sis_user_id,
-                      :integration_id => pseudonym&.integration_id
+          json[:sis_user_id] = pseudonym&.sis_user_id
+          json[:integration_id] = pseudonym&.integration_id
         end
 
         if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)

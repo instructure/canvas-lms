@@ -388,7 +388,7 @@ class ApplicationController < ActionController::Base
       :title => tool.label_for(type, I18n.locale),
       :base_url => polymorphic_url([context, :external_tool], url_params),
     }
-    hash.merge!(:tool_id => tool.tool_id) if tool.tool_id.present?
+    hash[:tool_id] = tool.tool_id if tool.tool_id.present?
 
     extension_settings = [:icon_url, :canvas_icon_class] | custom_settings
     extension_settings.each do |setting|
@@ -618,10 +618,8 @@ class ApplicationController < ActionController::Base
         # if for some reason this gets stuck
         # as global state on I18n (cleanup failure), we don't want it to
         # explode trying to access a non-existant request.
-        context_hash.merge!({
-                              session_locale: session[:locale],
-                              accept_language: request.headers['Accept-Language']
-                            })
+        context_hash[:session_locale] = session[:locale]
+        context_hash[:accept_language] = request.headers['Accept-Language']
       else
         logger.warn("[I18N] localizer executed from context-less controller")
       end

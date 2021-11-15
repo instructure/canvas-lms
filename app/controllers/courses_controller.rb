@@ -2147,10 +2147,8 @@ class CoursesController < ApplicationController
                                     })
         # env.COURSE variables that only apply to classic courses
         unless @context.elementary_subject_course?
-          course_env_variables.merge!({
-                                        front_page_title: @context&.wiki&.front_page&.title,
-                                        default_view: default_view
-                                      })
+          course_env_variables[:front_page_title] = @context&.wiki&.front_page&.title
+          course_env_variables[:default_view] = default_view
         end
         js_env({ COURSE: course_env_variables })
 
