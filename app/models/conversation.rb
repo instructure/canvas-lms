@@ -61,11 +61,11 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.private_hash_for(users_or_user_ids, context_code = nil)
-    if users_or_user_ids.first.is_a?(User)
-      user_ids = Shard.birth.activate { users_or_user_ids.map(&:id) }
-    else
-      user_ids = users_or_user_ids
-    end
+    user_ids = if users_or_user_ids.first.is_a?(User)
+                 Shard.birth.activate { users_or_user_ids.map(&:id) }
+               else
+                 users_or_user_ids
+               end
     str = user_ids.uniq.sort.join(',')
     str += "|#{context_code}" if context_code
     Digest::SHA1.hexdigest(str)
@@ -242,10 +242,10 @@ class Conversation < ActiveRecord::Base
       options = { :generated => false,
                   :update_for_sender => true,
                   :only_existing => false }.update(options)
-      options[:update_participants] = !options[:generated]         unless options.has_key?(:update_participants)
-      options[:update_for_skips]    = options[:update_for_sender]  unless options.has_key?(:update_for_skips)
+      options[:update_participants] = !options[:generated]         unless options.key?(:update_participants)
+      options[:update_for_skips]    = options[:update_for_sender]  unless options.key?(:update_for_skips)
       options[:skip_users]        ||= [current_user]
-      options[:reset_unread_counts] = options[:update_participants] unless options.has_key?(:reset_unread_counts)
+      options[:reset_unread_counts] = options[:update_participants] unless options.key?(:reset_unread_counts)
 
       message = body_or_obj.is_a?(ConversationMessage) ?
         body_or_obj :

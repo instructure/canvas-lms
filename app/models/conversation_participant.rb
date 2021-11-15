@@ -374,7 +374,7 @@ class ConversationParticipant < ActiveRecord::Base
   def update(hash)
     # subscribed= can update the workflow_state, but an explicit
     # workflow_state should trump that. so we do this first
-    subscribed = (hash.has_key?(:subscribed) ? hash.delete(:subscribed) : hash.delete('subscribed'))
+    subscribed = (hash.key?(:subscribed) ? hash.delete(:subscribed) : hash.delete('subscribed'))
     self.subscribed = subscribed unless subscribed.nil?
     super
   end

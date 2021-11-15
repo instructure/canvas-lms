@@ -28,7 +28,7 @@ module SIS
       # expected columns
       # abstract_course_id,short_name,long_name,account_id,term_id,status
       def process(csv, index = nil, count = nil)
-        count = SIS::AbstractCourseImporter.new(@root_account, importer_opts).process do |importer|
+        SIS::AbstractCourseImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             importer.add_abstract_course(row['abstract_course_id'], row['short_name'],
                                          row['long_name'], row['status'], row['term_id'],
@@ -37,7 +37,6 @@ module SIS
             SisBatch.add_error(csv, e.to_s, sis_batch: @batch, row: row['lineno'], row_info: row)
           end
         end
-        count
       end
     end
   end

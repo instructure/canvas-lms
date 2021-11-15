@@ -135,7 +135,7 @@ module Canvas::Migration::ExternalContent
       end
 
       private def import_service_for(key)
-        if Lti::ContentMigrationService::KEY_REGEX =~ key
+        if Lti::ContentMigrationService::KEY_REGEX.match?(key)
           Lti::ContentMigrationService.importer_for(key)
         else
           self.registered_services[key]

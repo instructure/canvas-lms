@@ -23,7 +23,9 @@ describe Api::V1::AssignmentOverride do
       include Api::V1::AssignmentOverride
       attr_accessor :current_user
 
-      def session; {} end
+      def session
+        {}
+      end
     end
   end
 

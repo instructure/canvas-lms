@@ -196,13 +196,13 @@ module AdheresToPolicy
     # of the sought rights.
     def parse_args(args)
       session = nil
-      if !args[0].is_a? Symbol
+      unless args[0].is_a? Symbol
         session = args.shift
       end
       args.compact!
       args.uniq!
 
-      return session, args
+      [session, args]
     end
 
     # Internal: Checks the right for a user based on session.

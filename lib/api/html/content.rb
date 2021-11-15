@@ -86,7 +86,7 @@ module Api
           node.replace(tag.as_anchor_node)
         end
 
-        return parsed_html.to_s
+        parsed_html.to_s
       end
 
       # a hash of allowed html attributes that represent urls, like { 'a' => ['href'], 'img' => ['src'] }

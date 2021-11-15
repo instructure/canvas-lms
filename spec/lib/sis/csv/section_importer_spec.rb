@@ -38,7 +38,7 @@ describe SIS::CSV::SectionImporter do
     )
     expect(CourseSection.count).to eq before_count + 1
 
-    errors = importer.errors.map { |r| r.last }
+    errors = importer.errors.map(&:last)
     expect(errors).to eq ["No course_id given for a section S002",
                           "No section_id given for a section in course C001",
                           "Improper status \"inactive\" for section S003 in course C002",
@@ -226,8 +226,8 @@ describe SIS::CSV::SectionImporter do
     expect(s2.start_at).to be_nil
     expect(s2.end_at).to be_nil
 
-    expect(importer.errors.map { |r| r.last }).to eq ["Bad date format for section S002",
-                                                      "Section S003 references course C002 which doesn't exist"]
+    expect(importer.errors.map(&:last)).to eq ["Bad date format for section S002",
+                                               "Section S003 references course C002 which doesn't exist"]
   end
 
   it 'overrides term dates if the start or end dates are set' do
@@ -287,10 +287,10 @@ describe SIS::CSV::SectionImporter do
       "X001,S001,",
       "X001,S001,baleeted"
     )
-    expect(importer.errors.map { |r| r.last }).to eq ["No xlist_course_id given for a cross-listing",
-                                                      "No section_id given for a cross-listing",
-                                                      'Improper status "" for a cross-listing',
-                                                      'Improper status "baleeted" for a cross-listing']
+    expect(importer.errors.map(&:last)).to eq ["No xlist_course_id given for a cross-listing",
+                                               "No section_id given for a cross-listing",
+                                               'Improper status "" for a cross-listing',
+                                               'Improper status "baleeted" for a cross-listing']
     expect(@account.courses.size).to eq 0
   end
 
@@ -807,7 +807,7 @@ describe SIS::CSV::SectionImporter do
       "C002,S001,active"
     )
     check_section_crosslisted 'C002'
-    with_section { |s| s.uncrosslist }
+    with_section(&:uncrosslist)
     check_section_not_crosslisted
     process_csv_data_cleanly(
       "xlist_course_id,section_id,status",

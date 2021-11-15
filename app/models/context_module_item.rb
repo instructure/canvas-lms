@@ -62,6 +62,6 @@ module ContextModuleItem
       tag = tags.first
       return tag if tag
     end
-    return nil
+    nil
   end
 end

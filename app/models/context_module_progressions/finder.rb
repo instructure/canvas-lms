@@ -29,11 +29,11 @@ module ContextModuleProgressions
                               .index_by(&:context_module_id)
 
       modules.map do |mod|
-        if existing_progressions.include?(mod.id)
-          progression = existing_progressions[mod.id]
-        else
-          progression = create_module_progression(mod, user)
-        end
+        progression = if existing_progressions.include?(mod.id)
+                        existing_progressions[mod.id]
+                      else
+                        create_module_progression(mod, user)
+                      end
         progression.context_module = mod
         progression
       end

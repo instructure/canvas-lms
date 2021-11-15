@@ -39,7 +39,7 @@ class Quizzes::QuizRegradeRun < ActiveRecord::Base
   set_broadcast_policy do |policy|
     policy.dispatch :quiz_regrade_finished
     policy.to { teachers }
-    policy.whenever { |run| run.send_messages? }
+    policy.whenever(&:send_messages?)
     policy.data { course_broadcast_data }
   end
 

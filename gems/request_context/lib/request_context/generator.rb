@@ -88,7 +88,7 @@ module RequestContext
       return if value.blank?
 
       meta_headers = Thread.current[:context].try(:[], :meta_headers)
-      return if !meta_headers
+      return unless meta_headers
 
       meta_headers << "#{name}=#{value};"
     end

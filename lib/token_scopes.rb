@@ -87,9 +87,8 @@ class TokenScopes
 
     named_scopes = detailed_scopes.each_with_object([]) do |frozen_scope, arr|
       scope = frozen_scope.dup
-      api_scope_mapper_class = ApiScopeMapperLoader.load
-      scope[:resource] ||= api_scope_mapper_class.lookup_resource(scope[:controller], scope[:action])
-      scope[:resource_name] = api_scope_mapper_class.name_for_resource(scope[:resource])
+      scope[:resource] ||= ApiScopeMapper.lookup_resource(scope[:controller], scope[:action])
+      scope[:resource_name] = ApiScopeMapper.name_for_resource(scope[:resource])
       arr << scope if scope[:resource_name]
       scope
     end

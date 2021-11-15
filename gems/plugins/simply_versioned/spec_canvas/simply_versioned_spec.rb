@@ -221,7 +221,7 @@ describe 'simply_versioned' do
       end
 
       it "can modify a version after loading" do
-        expect(YAML::load(woozel.current_version.yaml)['name']).to eq 'test'
+        expect(YAML.load(woozel.current_version.yaml)['name']).to eq 'test'
         expect(woozel.current_version.model.name).to eq 'test override'
       end
     end

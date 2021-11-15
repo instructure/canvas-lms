@@ -21,7 +21,7 @@
 module Canvas::Plugins::Validators::I18nValidator
   def self.validate(settings, _plugin_setting)
     settings.inject({}) do |result, (i18n, enabled)|
-      result[i18n] = Canvas::Plugin::value_to_boolean(enabled)
+      result[i18n] = Canvas::Plugin.value_to_boolean(enabled)
       result
     end
   end

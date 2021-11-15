@@ -33,7 +33,7 @@ describe SIS::CSV::AccountImporter do
     )
     expect(Account.where.not(:sis_source_id => nil).count).to eq before_count + 1
 
-    errors = importer.errors.map { |r| r.last }
+    errors = importer.errors.map(&:last)
     expect(errors).to match_array ["No account_id given for an account",
                                    "Parent account didn't exist for A002",
                                    "Improper status \"inactive\" for account A003, skipping",
@@ -119,7 +119,7 @@ describe SIS::CSV::AccountImporter do
       "A001,,Humanities,deleted"
     )
 
-    errors = importer.errors.map { |r| r.last }
+    errors = importer.errors.map(&:last)
     expect(errors).to eq ["Cannot delete the sub_account with ID: A001 because it has active sub accounts."]
   end
 
@@ -196,7 +196,7 @@ describe SIS::CSV::AccountImporter do
       "Account_ID,Parent_Account_ID,Name,Status",
       "A001,A002,Humanities,active"
     )
-    errors = importer.errors.map { |r| r.last }
+    errors = importer.errors.map(&:last)
     expect(errors).to eq ["Setting account A001's parent to A002 would create a loop"]
   end
 

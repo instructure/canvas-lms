@@ -447,7 +447,7 @@ class Auditors::GradeChange
 
   def self.for_scope_conditions(conditions, options)
     scope = Auditors::GradeChange.filter_by_assignment(Auditors::ActiveRecord::GradeChangeRecord.where(conditions))
-    EventStream::IndexStrategy::ActiveRecord::for_ar_scope(Auditors::ActiveRecord::GradeChangeRecord, scope, options)
+    EventStream::IndexStrategy::ActiveRecord.for_ar_scope(Auditors::ActiveRecord::GradeChangeRecord, scope, options)
   end
 
   def self.return_override_grades?

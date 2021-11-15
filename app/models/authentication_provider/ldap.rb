@@ -103,9 +103,9 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   end
 
   def ldap_ip
-    return Socket.getaddrinfo(self.auth_host, 'http', nil, Socket::SOCK_STREAM)[0][3]
+    Socket.getaddrinfo(self.auth_host, 'http', nil, Socket::SOCK_STREAM)[0][3]
   rescue SocketError
-    return nil
+    nil
   end
 
   def auth_provider_filter
@@ -139,10 +139,10 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     end
   rescue Timeout::Error
     self.errors.add(:ldap_bind_test, t(:test_bind_timeout, "Timeout when binding"))
-    return false
+    false
   rescue => e
     self.errors.add(:ldap_bind_test, t(:test_bind_failed, "Failed to bind with the following error: %{error}", :error => e.message))
-    return false
+    false
   end
 
   def test_ldap_search
@@ -158,13 +158,13 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     end
   rescue Timeout::Error
     self.errors.add(:ldap_bind_test, t("Timeout when searching"))
-    return false
+    false
   rescue => e
     self.errors.add(
       :ldap_search_test,
       t(:test_search_failed, "Search failed with the following error: %{error}", :error => e)
     )
-    return false
+    false
   end
 
   def test_ldap_login(username, password)
@@ -232,7 +232,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
                                    short_stat: "ldap_error",
                                    tags: { account_id: Shard.global_id_for(account_id), auth_provider_id: self.global_id })
     end
-    return nil
+    nil
   end
 
   def user_logout_redirect(controller, _current_user)

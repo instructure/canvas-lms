@@ -197,7 +197,7 @@ class SectionsController < ApplicationController
   def crosslist_check
     course_id = params[:new_course_id]
     # cross-listing should only be allowed within the same root account
-    @new_course = @section.root_account.all_courses.not_deleted.where(id: course_id).first if course_id =~ Api::ID_REGEX
+    @new_course = @section.root_account.all_courses.not_deleted.where(id: course_id).first if Api::ID_REGEX.match?(course_id)
     @new_course ||= @section.root_account.all_courses.not_deleted.where(sis_source_id: course_id).first if course_id.present?
     allowed = @new_course && @section.grants_right?(@current_user, session, :update) && @new_course.grants_right?(@current_user, session, :manage)
     res = { :allowed => !!allowed }

@@ -167,12 +167,11 @@ class OutcomeImportsApiController < ApplicationController
       params[:import_type] ||= 'instructure_csv'
       raise "invalid import type parameter" unless OutcomeImport.valid_import_type?(params[:import_type])
 
-      file_obj = nil
-      if params.key?(:attachment)
-        file_obj = params[:attachment]
-      else
-        file_obj = body_file
-      end
+      file_obj = if params.key?(:attachment)
+                   params[:attachment]
+                 else
+                   body_file
+                 end
 
       import = OutcomeImport.create_with_attachment(
         @context, params[:import_type], file_obj, @current_user, params[:learning_outcome_group_id]

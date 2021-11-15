@@ -44,7 +44,7 @@ module Utf8Cleaner
       if object.encoding == Encoding::ASCII_8BIT && force_utf8
         object.force_encoding(Encoding::UTF_8)
       end
-      if !object.valid_encoding?
+      unless object.valid_encoding?
         object.replace(self.strip_invalid_utf8(object))
       end
     end

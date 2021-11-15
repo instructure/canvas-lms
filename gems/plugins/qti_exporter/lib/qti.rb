@@ -30,7 +30,7 @@ module Qti
     @migration_executable = EXPECTED_LOCATION
   elsif File.exist?(EXPECTED_LOCATION_ALT)
     @migration_executable = EXPECTED_LOCATION_ALT
-  elsif `#{PYTHON_MIGRATION_EXECUTABLE} --version 2>&1` =~ /qti/i
+  elsif /qti/i.match?(`#{PYTHON_MIGRATION_EXECUTABLE} --version 2>&1`)
     @migration_executable = PYTHON_MIGRATION_EXECUTABLE
   end
 
@@ -54,16 +54,16 @@ module Qti
   end
 
   def self.convert_questions(manifest_path, opts = {})
-    if (path_map = opts[:file_path_map])
-      # used when searching for matching file paths to help find the best matching path
-      sorted_paths = path_map.keys.sort_by { |v| v.length }
-    else
-      sorted_paths = []
-    end
+    sorted_paths = if (path_map = opts[:file_path_map])
+                     # used when searching for matching file paths to help find the best matching path
+                     path_map.keys.sort_by(&:length)
+                   else
+                     []
+                   end
     questions = []
     doc = Nokogiri::XML(File.open(manifest_path))
     doc.css('manifest resources resource[type^=imsqti_item_xmlv2p]').each do |item|
-      q = AssessmentItemConverter::create_instructure_question(opts.merge(:manifest_node => item, :base_dir => File.dirname(manifest_path), :sorted_file_paths => sorted_paths))
+      q = AssessmentItemConverter.create_instructure_question(opts.merge(:manifest_node => item, :base_dir => File.dirname(manifest_path), :sorted_file_paths => sorted_paths))
       questions << q if q
     end
     questions

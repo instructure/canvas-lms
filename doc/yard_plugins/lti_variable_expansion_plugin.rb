@@ -86,7 +86,7 @@ class RegisterExpansionHandler < YARD::Handlers::Ruby::Base
       next unless param
 
       text = param.jump(:tstring_content, :ident).source.to_s
-      guards.push(text) if /_GUARD$/.match text
+      guards.push(text) if /_GUARD$/.match? text
     end
 
     guards.push('ALWAYS') if guards.size == 0

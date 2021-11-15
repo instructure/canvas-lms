@@ -176,6 +176,6 @@ class UsageRightsController < ApplicationController
                     message: I18n.t({ one: "1 file updated", other: "%{count} files updated" }, count: count),
                     file_ids: file_ids
                   })
-    return render json: result
+    render json: result
   end
 end

@@ -111,7 +111,7 @@ class DelayedMessage < ActiveRecord::Base
     return nil if delayed_messages.empty?
 
     user = to.user rescue nil
-    context = delayed_messages.select { |m| m.context }.compact.first.try(:context)
+    context = delayed_messages.select(&:context).compact.first.try(:context)
     return nil unless context # the context for this message has already been deleted
 
     notification = BroadcastPolicy.notification_finder.by_name('Summaries')

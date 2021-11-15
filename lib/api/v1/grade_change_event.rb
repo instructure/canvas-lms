@@ -83,20 +83,20 @@ module Api::V1::GradeChangeEvent
   end
 
   def linked_json(events, user, session)
-    course_ids = events.map { |event| event.course_id }.compact
+    course_ids = events.map(&:course_id).compact
     courses = Course.where(id: course_ids).to_a if course_ids.length > 0
     courses ||= []
 
-    assignment_ids = events.map { |event| event.assignment_id }.compact
+    assignment_ids = events.map(&:assignment_id).compact
     assignments = Assignment.where(id: assignment_ids).to_a if assignment_ids.length > 0
     assignments ||= []
 
-    user_ids = events.map { |event| event.grader_id }.compact
-    user_ids.concat(events.map { |event| event.student_id }.compact)
+    user_ids = events.map(&:grader_id).compact
+    user_ids.concat(events.map(&:student_id).compact)
     users = User.where(id: user_ids).to_a if user_ids.length > 0
     users ||= []
 
-    page_view_ids = events.map { |event| event.request_id }.compact
+    page_view_ids = events.map(&:request_id).compact
     page_views = PageView.find_all_by_id(page_view_ids) if page_view_ids.length > 0
     page_views ||= []
 

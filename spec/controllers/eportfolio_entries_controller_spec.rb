@@ -74,14 +74,28 @@ describe EportfolioEntriesController do
     end
 
     describe "js_env" do
-      it "sets SKIP_ENHANCING_USER_CONTENT to true" do
+      before do
         user_session(@user)
         @category.name = "some category"
         @category.save!
         @entry.name = "some entry"
         @entry.save!
+      end
+
+      it "sets SKIP_ENHANCING_USER_CONTENT to true" do
         get 'show', params: { eportfolio_id: @portfolio.id, category_name: @category.slug, entry_name: @entry.slug }
         expect(assigns.dig(:js_env, :SKIP_ENHANCING_USER_CONTENT)).to be true
+      end
+
+      it "sets SECTION_COUNT_IDX before layout and templates are rendered" do
+        @entry.content = [
+          { section_type: 'rich_text', content: '<p>1</p>' },
+          { section_type: 'rich_text', content: '<p>2</p>' },
+          { section_type: 'rich_text', content: '<p>3</p>' }
+        ]
+        @entry.save!
+        get 'show', params: { eportfolio_id: @portfolio.id, category_name: @category.slug, entry_name: @entry.slug }
+        expect(assigns.dig(:js_env, :SECTION_COUNT_IDX)).to eq 3
       end
     end
 

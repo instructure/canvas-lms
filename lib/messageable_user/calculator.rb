@@ -528,9 +528,10 @@ class MessageableUser
       discussion = discussion_or_id.is_a?(DiscussionTopic) ? discussion_or_id : DiscussionTopic.where(id: discussion_or_id).first
       context = discussion.address_book_context_for(@user)
 
-      if context.is_a?(Course)
+      case context
+      when Course
         messageable_users_in_course_scope(context, nil, options)
-      elsif context.is_a?(Group)
+      when Group
         messageable_users_in_group_scope(context, options)
       else
         messageable_users_in_section_scope(context, nil, options)
@@ -1050,8 +1051,7 @@ class MessageableUser
     end
 
     def marshal_dump
-      ivars = (instance_variables - [:@linked_observer_ids_by_shard]).map { |name| [name, instance_variable_get(name)] }
-      ivars
+      (instance_variables - [:@linked_observer_ids_by_shard]).map { |name| [name, instance_variable_get(name)] }
     end
 
     def marshal_load(ivars)

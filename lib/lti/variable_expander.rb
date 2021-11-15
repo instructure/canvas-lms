@@ -52,7 +52,7 @@ module Lti
     end
 
     def self.expansion_keys
-      self.expansions.keys.map { |c| c.to_s[1..-1] }
+      self.expansions.keys.map { |c| c.to_s[1..] }
     end
 
     def self.default_name_expansions

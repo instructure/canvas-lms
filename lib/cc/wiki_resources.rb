@@ -21,7 +21,7 @@ module CC
   module WikiResources
     def add_wiki_pages
       wiki_folder = File.join(@export_dir, CCHelper::WIKI_FOLDER)
-      FileUtils::mkdir_p wiki_folder
+      FileUtils.mkdir_p wiki_folder
 
       scope = @course.wiki_pages.not_deleted
       # @user is nil if it's kicked off by the system, like a course template

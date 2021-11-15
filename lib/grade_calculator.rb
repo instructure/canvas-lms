@@ -253,14 +253,14 @@ class GradeCalculator
   end
 
   def compute_scores_for_user(user_id, group_sums)
-    if compute_course_scores_from_weighted_grading_periods?
-      scores = calculate_total_from_weighted_grading_periods(user_id)
-    else
-      scores = {
-        current: calculate_total_from_group_scores(group_sums[:current]),
-        final: calculate_total_from_group_scores(group_sums[:final])
-      }
-    end
+    scores = if compute_course_scores_from_weighted_grading_periods?
+               calculate_total_from_weighted_grading_periods(user_id)
+             else
+               {
+                 current: calculate_total_from_group_scores(group_sums[:current]),
+                 final: calculate_total_from_group_scores(group_sums[:final])
+               }
+             end
     Rails.logger.debug "GRADES: calculated: #{scores.inspect}"
     scores
   end
@@ -325,11 +325,11 @@ class GradeCalculator
   def compute_course_scores_from_weighted_grading_periods?
     return @compute_from_weighted_periods if @compute_from_weighted_periods.present?
 
-    if @grading_period || grading_periods_for_course.empty?
-      @compute_from_weighted_periods = false
-    else
-      @compute_from_weighted_periods = grading_periods_for_course.first.grading_period_group.weighted?
-    end
+    @compute_from_weighted_periods = if @grading_period || grading_periods_for_course.empty?
+                                       false
+                                     else
+                                       grading_periods_for_course.first.grading_period_group.weighted?
+                                     end
   end
 
   def grading_periods_for_course

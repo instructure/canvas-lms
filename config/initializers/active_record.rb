@@ -762,7 +762,10 @@ module UsefulFindInBatches
     end
 
     kwargs.delete(:error_on_ignore)
-    activate { |r| r.send("in_batches_with_#{strategy}", start: start, finish: finish, **kwargs, &block); nil }
+    activate { |r|
+      r.send("in_batches_with_#{strategy}", start: start, finish: finish, **kwargs, &block)
+      nil
+    }
   end
 
   def in_batches_needs_temp_table?
@@ -964,7 +967,7 @@ module UsefulFindInBatches
       relation = apply_limits(self, start, finish)
       sql = relation.to_sql
       table = "#{table_name}_in_batches_temp_table_#{sql.hash.abs.to_s(36)}"
-      table = table[-63..-1] if table.length > 63
+      table = table[-63..] if table.length > 63
 
       remaining = connection.update("CREATE TEMPORARY TABLE #{table} AS #{sql}")
 
@@ -1293,7 +1296,7 @@ module UpdateAndDeleteWithJoins
     end
     tables = []
     join_conditions = []
-    joins_sql.strip.split('INNER JOIN')[1..-1].each do |join|
+    joins_sql.strip.split('INNER JOIN')[1..].each do |join|
       # this could probably be improved
       raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z0-9'"_.]+(?:(?:\s+[aA][sS])?\s+[a-zA-Z0-9'"_]+)?)\s+ON\s+(.*)/m
 
@@ -1491,7 +1494,7 @@ class ActiveRecord::Migration
 
   def connection
     if self.class.respond_to?(:connection)
-      return self.class.connection
+      self.class.connection
     else
       @connection || ActiveRecord::Base.connection
     end

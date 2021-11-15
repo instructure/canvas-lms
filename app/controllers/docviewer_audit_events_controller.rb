@@ -76,7 +76,7 @@ class DocviewerAuditEventsController < ApplicationController
   def check_jwt_token
     Canvas::Security.decode_jwt(params[:token], [Canvadoc.jwt_secret])
   rescue
-    return render json: { message: 'JWT signature invalid' }, status: :unauthorized
+    render json: { message: 'JWT signature invalid' }, status: :unauthorized
   end
 
   def docviewer_audit_event_params

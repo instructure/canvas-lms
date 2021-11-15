@@ -104,11 +104,11 @@ module Api::V1::Conferences
 
   def translate_strings(object)
     object.each_with_object({}) do |(k, v), h|
-      if v.is_a? Array
-        h[k] = v.map { |a| translate_strings(a) }
-      else
-        h[k] = v.respond_to?(:call) ? v.call() : v
-      end
+      h[k] = if v.is_a? Array
+               v.map { |a| translate_strings(a) }
+             else
+               v.respond_to?(:call) ? v.call() : v
+             end
     end
   end
 

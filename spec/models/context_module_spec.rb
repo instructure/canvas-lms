@@ -1684,12 +1684,14 @@ describe ContextModule do
       expect(mod1.relock_warning?).to be_falsey # mod2 is not active
 
       mod2.publish!
-      mod1.unpublish!; mod1.publish!
+      mod1.unpublish!
+      mod1.publish!
       expect(mod1.relock_warning?).to be_truthy # now mod2 is active
 
       mod2.prerequisites = ""
       mod2.save!
-      mod1.unpublish!; mod1.publish!
+      mod1.unpublish!
+      mod1.publish!
       expect(mod1.relock_warning?).to be_falsey
     end
 

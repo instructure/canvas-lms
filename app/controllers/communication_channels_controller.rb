@@ -159,10 +159,10 @@ class CommunicationChannelsController < ApplicationController
                         (Account.site_admin.grants_right?(@current_user, :manage_students) || @domain_root_account.grants_right?(@current_user, :manage_students))
 
     if params[:communication_channel][:type] == CommunicationChannel::TYPE_PUSH
-      if !@access_token
+      unless @access_token
         return render :json => { errors: { type: 'Push is only supported when using an access token' } }, status: :bad_request
       end
-      if !@access_token.developer_key.try(:sns_arn)
+      unless @access_token.developer_key.try(:sns_arn)
         return render :json => { errors: { type: 'SNS is not configured for this developer key' } }, status: :bad_request
       end
 
@@ -291,7 +291,7 @@ class CommunicationChannelsController < ApplicationController
               (account_to_pseudonyms_hash[p.account] ||= []) << p
             end
             @merge_opportunities << [user, account_to_pseudonyms_hash.each_value.map do |pseudonyms|
-              pseudonyms.detect { |p| p.sis_user_id } || pseudonyms.sort_by(&:position).first
+              pseudonyms.detect(&:sis_user_id) || pseudonyms.sort_by(&:position).first
             end]
             @merge_opportunities.last.last.sort! { |a, b| Canvas::ICU.compare(a.account.name, b.account.name) }
           end
@@ -554,9 +554,9 @@ class CommunicationChannelsController < ApplicationController
     endpoints = @current_user.notification_endpoints.shard(@current_user).where("lower(token) = ?", params[:push_token].downcase)
     if endpoints&.destroy_all
       @current_user.touch
-      return render json: { success: true }
+      render json: { success: true }
     else
-      return render json: endpoints.errors, status: :bad_request
+      render json: endpoints.errors, status: :bad_request
     end
   end
 

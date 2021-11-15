@@ -35,7 +35,10 @@ describe Quizzes::QuizGroupsController, type: :request do
                { 'Accept' => 'application/vnd.api+json' }, opts)
     end
 
-    let(:new_quiz_group) { @quiz.reload; @quiz.quiz_groups.first }
+    let(:new_quiz_group) {
+      @quiz.reload
+      @quiz.quiz_groups.first
+    }
 
     it "creates a question group for a quiz" do
       api_create_quiz_group('name' => 'testing')
@@ -164,7 +167,7 @@ describe Quizzes::QuizGroupsController, type: :request do
                                 { "type" => "question", "id" => @question2.id }] },
                    { 'Accept' => 'application/vnd.api+json' })
 
-      order = @group.reload.quiz_questions.active.sort_by { |q| q.position }.map { |q| q.id }
+      order = @group.reload.quiz_questions.active.sort_by(&:position).map(&:id)
       expect(order).to eq [@question3.id, @question1.id, @question2.id]
     end
   end

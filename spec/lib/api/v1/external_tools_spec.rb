@@ -97,7 +97,7 @@ describe Api::V1::ExternalTools do
         root_account_tool.is_rce_favorite = true
         root_account_tool.save!
         json = controller.external_tool_json(tool, @course.root_account, account_admin_user, nil)
-        expect(json.has_key?(:is_rce_favorite)).to be false
+        expect(json).not_to have_key(:is_rce_favorite)
       end
     end
   end

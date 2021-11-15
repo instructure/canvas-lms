@@ -202,7 +202,7 @@ module CanvasHttp
     raise(RelativeUriError) if uri.host.nil? || uri.host.strip.empty?
     raise InsecureUriError if check_host && self.insecure_host?(uri.host)
 
-    return value, uri
+    [value, uri]
   end
 
   def self.insecure_host?(host)
@@ -245,7 +245,7 @@ module CanvasHttp
     http.use_ssl = (uri.scheme == 'https')
     http.ssl_timeout = http.open_timeout = open_timeout
     http.read_timeout = read_timeout
-    return http
+    http
   end
 
   def self.open_timeout

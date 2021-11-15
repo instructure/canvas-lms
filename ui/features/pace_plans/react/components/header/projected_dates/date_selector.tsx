@@ -72,7 +72,7 @@ export const PacePlanDateSelector = (props: PacePlanDateSelectorProps) => {
       if (crossesOtherDate)
         errors.push(
           startType
-            ? I18n.t('The start date for the pace plan must be after the end date.')
+            ? I18n.t('The start date for the pace plan must be before the end date.')
             : I18n.t('The end date for the pace plan must be after the start date.')
         )
 

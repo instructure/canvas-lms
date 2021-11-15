@@ -96,7 +96,7 @@ module CanvasCache
 
       crc = @digest[key]
       idx = HashRing.binary_search(@sorted_keys, crc)
-      return [@ring[@sorted_keys[idx]], idx]
+      [@ring[@sorted_keys[idx]], idx]
     end
 
     def iter_nodes(key)
@@ -130,7 +130,7 @@ module CanvasCache
       if upper < 0
         upper = ary.size - 1
       end
-      return upper
+      upper
     end
 
     private

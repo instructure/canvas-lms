@@ -133,7 +133,7 @@ describe('feature_flags::FeatureFlags', () => {
           </div>
         )
         await waitFor(() => {
-          expect(queryAllByTestId('ff-table-heading')[0]).toHaveTextContent('Feature Previews')
+          expect(queryAllByTestId('ff-table-heading')[0]).toHaveTextContent('Feature Options')
           expect(queryAllByTestId('ff-table-heading')[1]).toHaveTextContent('Stable Features')
         })
       })
@@ -149,7 +149,7 @@ describe('feature_flags::FeatureFlags', () => {
         fireEvent.change(searchField, {target: {value: 'Feature 4'}})
         expect(await getAllByText('User')[0]).toBeInTheDocument()
         await waitFor(() => {
-          expect(queryAllByTestId('ff-table-heading')[0]).toHaveTextContent('Feature Previews')
+          expect(queryAllByTestId('ff-table-heading')[0]).toHaveTextContent('Feature Options')
           expect(queryByText('Stable Features')).not.toBeInTheDocument()
           expect(queryByText('Account')).not.toBeInTheDocument()
           expect(queryByText('Course')).not.toBeInTheDocument()
