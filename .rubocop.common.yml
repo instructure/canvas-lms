@@ -101,6 +101,8 @@ Performance/Sum:
 Performance/TimesMap:
   Severity: error
 
+Rails/ActiveRecordAliases:
+  Severity: error
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
 Rails/ContentTag:
