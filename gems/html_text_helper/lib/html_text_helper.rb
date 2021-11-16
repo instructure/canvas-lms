@@ -249,7 +249,7 @@ module HtmlTextHelper
     ) | (
       #{AUTO_LINKIFY_PLACEHOLDER}
     )
-  }xi
+  }xi.freeze
 
   # Converts a plaintext message to html, with newlinification, quotification, and linkification
   def format_message(message, opts = { :url => nil, :notification_id => nil })

@@ -461,7 +461,7 @@ class GradebookImporter
 
   # this method requires non-assignment columns to be stripped from the row
   def parse_assignments(stripped_row)
-    stripped_row.map do |name_and_id|
+    stripped_row.filter_map do |name_and_id|
       title, id = Assignment.title_and_id(name_and_id)
       assignment = @all_assignments[id.to_i] if id.present?
       # backward compat
@@ -474,7 +474,7 @@ class GradebookImporter
       @missing_assignment ||= assignment.new_record?
 
       { assignment: assignment, header_name: name_and_id } if assignment
-    end.compact
+    end
   end
 
   def detect_override_columns(row)
@@ -629,7 +629,7 @@ class GradebookImporter
 
     @gradebook_importer_override_scores.each_value do |changes_for_student|
       includes_course_scores ||= changes_for_student.any?(&:course_score?)
-      grading_period_ids = grading_period_ids.merge(changes_for_student.map(&:grading_period_id).compact)
+      grading_period_ids = grading_period_ids.merge(changes_for_student.filter_map(&:grading_period_id))
     end
 
     {

@@ -27,7 +27,7 @@ module ConditionalRelease
       def begin_export(course, opts)
         assignment_ids = nil
         if opts[:selective]
-          assignment_ids = opts[:exported_assets].map { |asset| (match = asset.match(/assignment_(\d+)/)) && match[1] }.compact
+          assignment_ids = opts[:exported_assets].filter_map { |asset| (match = asset.match(/assignment_(\d+)/)) && match[1] }
           return unless assignment_ids.any?
         end
 

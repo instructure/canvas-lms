@@ -122,7 +122,7 @@ describe Collaboration do
       @collaboration.update_members([@users[0]], @groups)
       @collaboration.reload
 
-      expect(@collaboration.collaborators.map(&:group_id).compact).to eq @groups.map(&:id)
+      expect(@collaboration.collaborators.filter_map(&:group_id)).to eq @groups.map(&:id)
     end
 
     it "doesn't add users outside the course" do

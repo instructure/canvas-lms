@@ -261,7 +261,7 @@ module Lti
 
     def prep_tool_settings(parameters, tool_proxy, resource_link_id)
       params = %w(LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url)
-      if parameters && (parameters.map { |p| p['variable'] }.compact & params).any?
+      if parameters && (parameters.filter_map { |p| p['variable'] } & params).any?
         link = ToolSetting.where(
           tool_proxy_id: tool_proxy.id,
           context_id: @context.id,

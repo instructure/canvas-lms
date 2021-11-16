@@ -162,14 +162,14 @@ class FeatureFlagsController < ApplicationController
       skip_cache = @context.grants_right?(@current_user, session, :manage_feature_flags)
       @context.feature_flags.load if skip_cache
 
-      flags = features.map { |fd|
+      flags = features.filter_map { |fd|
         @context.lookup_feature_flag(fd.feature,
                                      override_hidden: Account.site_admin.grants_right?(@current_user, session, :read),
                                      skip_cache: skip_cache,
                                      # Hide flags that are forced ON at a higher level
                                      # Undocumented flag for frontend use only
                                      hide_inherited_enabled: params[:hide_inherited_enabled])
-      }.compact
+      }
 
       render json: flags.map { |flag| feature_with_flag_json(flag, @context, @current_user, session) }
     end
@@ -190,7 +190,7 @@ class FeatureFlagsController < ApplicationController
   #   ["fancy_wickets", "automatic_essay_grading", "telepathic_navigation"]
   def enabled_features
     if authorized_action(@context, @current_user, :read)
-      features = Feature.applicable_features(@context).map { |fd| @context.lookup_feature_flag(fd.feature) }.compact
+      features = Feature.applicable_features(@context).filter_map { |fd| @context.lookup_feature_flag(fd.feature) }
                         .select(&:enabled?).map(&:feature)
       render json: features
     end

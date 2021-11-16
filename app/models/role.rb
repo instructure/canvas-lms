@@ -21,10 +21,10 @@
 class Role < ActiveRecord::Base
   NULL_ROLE_TYPE = "NoPermissions"
 
-  ENROLLMENT_TYPES = ["StudentEnrollment", "TeacherEnrollment", "TaEnrollment", "DesignerEnrollment", "ObserverEnrollment"]
+  ENROLLMENT_TYPES = ["StudentEnrollment", "TeacherEnrollment", "TaEnrollment", "DesignerEnrollment", "ObserverEnrollment"].freeze
 
   DEFAULT_ACCOUNT_TYPE = 'AccountMembership'
-  ACCOUNT_TYPES = ['AccountAdmin', 'AccountMembership']
+  ACCOUNT_TYPES = ['AccountAdmin', 'AccountMembership'].freeze
 
   BASE_TYPES = (ACCOUNT_TYPES + ENROLLMENT_TYPES + [NULL_ROLE_TYPE]).freeze
   KNOWN_TYPES = (BASE_TYPES +

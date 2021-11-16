@@ -384,7 +384,7 @@ class OutcomeResultsController < ApplicationController
 
     rollups = user_rollups
     @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
-    rollups = @users.map { |u| rollups.find { |r| r.context.id == u.id } }.compact if params[:sort_by] == 'student'
+    rollups = @users.filter_map { |u| rollups.find { |r| r.context.id == u.id } } if params[:sort_by] == 'student'
     json = outcome_results_rollups_json(rollups)
     json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
     json

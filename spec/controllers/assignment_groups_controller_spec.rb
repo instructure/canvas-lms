@@ -473,7 +473,7 @@ describe AssignmentGroupsController do
 
     it 'reorders assignment groups' do
       user_session(@teacher)
-      groups = 3.times.map { course_group }
+      groups = Array.new(3) { course_group }
       expect(groups.map(&:position)).to eq [1, 2, 3]
       g1, g2, _ = groups
       post 'reorder', params: { :course_id => @course.id, :order => "#{g2.id},#{g1.id}" }

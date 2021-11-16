@@ -440,7 +440,7 @@ class ContentTag < ActiveRecord::Base
     tags = tags.select([:id, :tag_type, :content_type, :context_module_id]).to_a
     return if tags.empty?
 
-    module_ids = tags.map(&:context_module_id).compact
+    module_ids = tags.filter_map(&:context_module_id)
 
     # update title
     tag_ids = tags.select(&:sync_title_to_asset_title?).map(&:id)

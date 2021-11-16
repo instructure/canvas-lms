@@ -28,7 +28,7 @@ module Qti
     DEFAULT_CORRECT_WEIGHT = 100
     DEFAULT_INCORRECT_WEIGHT = 0
     DEFAULT_POINTS_POSSIBLE = 1
-    UNSUPPORTED_TYPES = ['File Upload', 'Hot Spot', 'Quiz Bowl', 'WCT_JumbledSentence']
+    UNSUPPORTED_TYPES = ['File Upload', 'Hot Spot', 'Quiz Bowl', 'WCT_JumbledSentence'].freeze
 
     attr_reader :package_root, :identifier, :href, :interaction_type, :title, :question
 
@@ -81,7 +81,7 @@ module Qti
              end
     end
 
-    EXCLUDED_QUESTION_TEXT_CLASSES = ["RESPONSE_BLOCK", "RIGHT_MATCH_BLOCK"]
+    EXCLUDED_QUESTION_TEXT_CLASSES = ["RESPONSE_BLOCK", "RIGHT_MATCH_BLOCK"].freeze
 
     def create_instructure_question
       begin
@@ -172,7 +172,7 @@ module Qti
       'trueFalse' => 'true_false_question',
       /true\/false/i => 'true_false_question',
       'multiple_dropdowns' => 'multiple_dropdowns_question'
-    }
+    }.freeze
 
     def parse_instructure_metadata
       if (meta = @doc.at_css('instructureMetadata'))
@@ -290,7 +290,7 @@ module Qti
       end
     end
 
-    KNOWN_META_CLASSES = ['FORMATTED_TEXT_BLOCK', 'flow_1']
+    KNOWN_META_CLASSES = ['FORMATTED_TEXT_BLOCK', 'flow_1'].freeze
     def has_known_meta_class(node)
       return false unless node.attributes['class']
 

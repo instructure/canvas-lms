@@ -174,7 +174,7 @@ module TatlTael
         end
       end
 
-      ENDING_BLOCK_COMMENT_REGEX = /^(\s+)?(\*+\/)(\s+)?$/
+      ENDING_BLOCK_COMMENT_REGEX = /^(\s+)?(\*+\/)(\s+)?$/.freeze
       def ending_block_comment_only?(line, _ext)
         line =~ ENDING_BLOCK_COMMENT_REGEX
       end

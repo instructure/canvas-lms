@@ -263,20 +263,20 @@ describe UsersController, type: :request do
     # course endpoint
     json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo", :controller => "courses",
                                                                         :action => "todo_items", :format => "json", :course_id => @student_course.to_param
-    expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([])
+    expect(json.filter_map { |el| el['quiz'] && el['quiz']['id'] }).to eql([])
 
     json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo?include[]=ungraded_quizzes",
                     :controller => "courses", :action => "todo_items",
                     :format => "json", :course_id => @student_course.to_param, :include => %w(ungraded_quizzes)
-    expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([survey.id])
+    expect(json.filter_map { |el| el['quiz'] && el['quiz']['id'] }).to eql([survey.id])
 
     # user endpoint
     json = api_call :get, "/api/v1/users/self/todo", :controller => "users", :action => "todo_items", :format => "json"
-    expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([])
+    expect(json.filter_map { |el| el['quiz'] && el['quiz']['id'] }).to eql([])
 
     json = api_call :get, "/api/v1/users/self/todo?include[]=ungraded_quizzes", :controller => "users",
                                                                                 :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)
-    expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([survey.id])
+    expect(json.filter_map { |el| el['quiz'] && el['quiz']['id'] }).to eql([survey.id])
   end
 
   it "doesn't include ungraded quizzes if not assigned to user" do
@@ -291,7 +291,7 @@ describe UsersController, type: :request do
 
     json = api_call :get, "/api/v1/users/self/todo?include[]=ungraded_quizzes", :controller => "users",
                                                                                 :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)
-    expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([survey.id])
+    expect(json.filter_map { |el| el['quiz'] && el['quiz']['id'] }).to eql([survey.id])
   end
 
   it "works correctly when turnitin is enabled" do
@@ -309,12 +309,12 @@ describe UsersController, type: :request do
 
     json = api_call :get, "/api/v1/users/self/todo?include[]=ungraded_quizzes", :controller => "users",
                                                                                 :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)
-    expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([])
+    expect(json.filter_map { |el| el['quiz'] && el['quiz']['id'] }).to eql([])
 
     json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo?include[]=ungraded_quizzes",
                     :controller => "courses", :action => "todo_items",
                     :format => "json", :course_id => @student_course.to_param, :include => %w(ungraded_quizzes)
-    expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([])
+    expect(json.filter_map { |el| el['quiz'] && el['quiz']['id'] }).to eql([])
   end
 
   context 'when the assignment is differentiated/ has overrides' do

@@ -489,12 +489,12 @@ describe AppointmentGroup do
 
     ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :new_appointments => [['2012-01-01 17:00:00', '2012-01-01 18:00:00']])
     appt = ag.appointments.first
-    participants = 3.times.map {
+    participants = Array.new(3) do
       student_in_course(:course => @course, :active_all => true)
       participant = appt.reserve_for(@user, @teacher)
       expect(participant).to be_locked
       participant
-    }
+    end
 
     ag.destroy(@teacher)
     expect(appt.reload).to be_deleted

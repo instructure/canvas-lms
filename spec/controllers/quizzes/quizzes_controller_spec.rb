@@ -834,10 +834,9 @@ describe Quizzes::QuizzesController do
     context 'student_filters' do
       before do
         user_session(@teacher)
-        5.times.map do |i|
+        5.times do |i|
           name = "#{(i + 'a'.ord).chr}_student"
           course_with_student(name: name, course: @course)
-          @student
         end
       end
 

@@ -313,7 +313,7 @@ class SubmissionList
 
   # This method will add regrade details to the existing raw_hash_list
   def add_regrade_info(hash_list)
-    quiz_submission_ids = hash_list.map { |y| y[:quiz_submission_id] }.compact
+    quiz_submission_ids = hash_list.filter_map { |y| y[:quiz_submission_id] }
     return hash_list if quiz_submission_ids.blank?
 
     quiz_submissions = Quizzes::QuizSubmission.where("id IN (?) AND score_before_regrade IS NOT NULL", quiz_submission_ids)

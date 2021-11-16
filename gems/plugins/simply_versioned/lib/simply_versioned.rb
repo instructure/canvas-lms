@@ -44,7 +44,7 @@ module SimplyVersioned
     :on_create => nil,
     :on_update => nil,
     :on_load => nil
-  }
+  }.freeze
 
   module ClassMethods
     # Marks this ActiveRecord model as being versioned. Calls to +create+ or +save+ will,

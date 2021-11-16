@@ -5417,7 +5417,7 @@ describe 'Submissions API', type: :request do
         allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
         json = api_call_as_user(@teacher, :get, @path, @params)
         anonymous_id = @assignment.submission_for_student(@student1).anonymous_id
-        json = json.map { |el| el['provisional_grades'][0] }.compact
+        json = json.filter_map { |el| el['provisional_grades'][0] }
         expect(json[0]['speedgrader_url']).to match_path("http://www.example.com/courses/#{@course.id}/gradebook/speed_grader")
           .and_query({ assignment_id: @assignment.id, anonymous_id: anonymous_id })
         expect(json[0]['scorer_id']).to eq @ta.id
@@ -5434,7 +5434,7 @@ describe 'Submissions API', type: :request do
         allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
         allow_any_instance_of(Assignment).to receive(:can_view_other_grader_identities?).and_return false
         json = api_call_as_user(@teacher, :get, @path, @params)
-        json = json.map { |el| el['provisional_grades'][0] }.compact
+        json = json.filter_map { |el| el['provisional_grades'][0] }
         expect(json[0]['anonymous_grader_id']).to eq @assignment.grader_ids_to_anonymous_ids[@ta.id.to_s]
         expect(json[0]['scorer_id']).to be_nil
       end

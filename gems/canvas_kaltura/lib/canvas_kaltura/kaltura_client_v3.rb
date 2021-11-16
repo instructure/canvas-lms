@@ -67,10 +67,10 @@ module CanvasKaltura
       'mp4' => 'video/mp4',
       'mp3' => 'audio/mp3',
       'flv' => 'video/x-flv'
-    }
+    }.freeze
     # FLVs are least desirable because the mediaelementjs does not stretch them to
     # fill the screen when you enter fullscreen mode
-    PREFERENCE = ['mp4', 'mp3', 'flv', '']
+    PREFERENCE = ['mp4', 'mp3', 'flv', ''].freeze
 
     # see http://www.kaltura.com/api_v3/testmeDoc/index.php?object=KalturaFlavorAssetStatus
     ASSET_STATUSES = {
@@ -85,7 +85,7 @@ module CanvasKaltura
       '5' => :TEMP,
       '8' => :VALIDATING,
       '6' => :WAIT_FOR_CONVERT
-    }
+    }.freeze
 
     def media_sources(entryId)
       cache_key = ['media_sources2', entryId, @cache_play_list_seconds].join('/')

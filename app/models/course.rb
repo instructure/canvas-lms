@@ -1226,7 +1226,7 @@ class Course < ActiveRecord::Base
     return if !self_enrollment_enabled? || read_attribute(:self_enrollment_code)
 
     # subset of letters and numbers that are unambiguous
-    alphanums = 'ABCDEFGHJKLMNPRTWXY346789'
+    alphanums = 'ABCDEFGHJKLMNPRTWXY346789'.chars
     code_length = 6
 
     # we're returning a 6-digit base-25(ish) code. that means there are ~250
@@ -1238,9 +1238,7 @@ class Course < ActiveRecord::Base
     # necessary)
     code = nil
     10.times do
-      code = code_length.times.map {
-        alphanums[(rand * alphanums.size).to_i, 1]
-      }.join
+      code = Array.new(code_length) { alphanums.sample }.join
       next if Course.where(self_enrollment_code: code).exists?
 
       self.self_enrollment_code = code
@@ -1832,7 +1830,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.find_all_by_context_code(codes)
-    ids = codes.map { |c| c.match(/\Acourse_(\d+)\z/)[1] rescue nil }.compact
+    ids = codes.filter_map { |c| c.match(/\Acourse_(\d+)\z/)[1] rescue nil }
     Course.where(:id => ids).preload(:current_enrollments).to_a
   end
 
@@ -1899,7 +1897,7 @@ class Course < ActiveRecord::Base
 
   def account_users_for(user)
     @associated_account_ids ||= (self.associated_accounts + root_account.account_chain(include_site_admin: true))
-                                .uniq.map { |a| a.active? ? a.id : nil }.compact
+                                .uniq.filter_map { |a| a.active? ? a.id : nil }
     Shard.partition_by_shard(@associated_account_ids) do |account_chain_ids|
       if account_chain_ids == [Account.site_admin.id]
         Account.site_admin.account_users_for(user)
@@ -2661,7 +2659,7 @@ class Course < ActiveRecord::Base
     end
   end
 
-  ADMIN_TYPES = %w{TeacherEnrollment TaEnrollment DesignerEnrollment}
+  ADMIN_TYPES = %w{TeacherEnrollment TaEnrollment DesignerEnrollment}.freeze
   def section_visibilities_for(user, opts = {})
     fetch_on_enrollments('section_visibilities_for', user, opts) do
       workflow_not = opts[:excluded_workflows] || 'deleted'
@@ -2745,7 +2743,7 @@ class Course < ActiveRecord::Base
       scope.where("enrollments.course_section_id IN (?) OR (enrollments.limit_privileges_to_course_section=? AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'))",
                   visibilities.map { |s| s[:course_section_id] }, false)
     when :restricted
-      user_ids = visibilities.map { |s| s[:associated_user_id] }.compact
+      user_ids = visibilities.filter_map { |s| s[:associated_user_id] }
       scope.where(enrollments: { user_id: (user_ids + [user&.id]).compact })
     else
       scope.none
@@ -2785,7 +2783,7 @@ class Course < ActiveRecord::Base
     case visibility
     when :full then scope
     when :sections then scope.where(enrollments: { course_section_id: visibilities.map { |s| s[:course_section_id] } })
-    when :restricted then scope.where(enrollments: { user_id: (visibilities.map { |s| s[:associated_user_id] }.compact + [user]) })
+    when :restricted then scope.where(enrollments: { user_id: (visibilities.filter_map { |s| s[:associated_user_id] } + [user]) })
     when :limited then scope.where(enrollments: { type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment'] })
     when :sections_limited then scope.where(enrollments: { course_section_id: visibilities.map { |s| s[:course_section_id] } })
                                      .where(enrollments: { type: ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'StudentViewEnrollment'] })

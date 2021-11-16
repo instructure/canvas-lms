@@ -542,7 +542,7 @@ class ContextModulesController < ApplicationController
       tags = @context.context_module_tags.not_deleted.where(id: order)
       affected_module_ids = (tags.map(&:context_module_id) + [@module.id]).uniq.compact
       affected_items = []
-      items = order.map { |id| tags.detect { |t| t.id == id.to_i } }.compact.uniq
+      items = order.filter_map { |id| tags.detect { |t| t.id == id.to_i } }.uniq
       items.each_with_index do |item, idx|
         item.position = idx + 1
         item.context_module_id = @module.id
@@ -733,7 +733,7 @@ class ContextModulesController < ApplicationController
     ActiveRecord::Associations::Preloader.new.preload(content_with_assignments, :assignment) if content_with_assignments.any?
 
     if user_is_admin && should_preload_override_data?
-      assignments = assignment_tags.map(&:assignment).compact
+      assignments = assignment_tags.filter_map(&:assignment)
       plain_quizzes = assignment_tags.select { |ct| ct.content.is_a?(Quizzes::Quiz) && !ct.content.assignment }.map(&:content)
 
       preload_has_too_many_overrides(assignments, :assignment_id)

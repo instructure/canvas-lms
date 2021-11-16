@@ -32,7 +32,7 @@ class AccountNotification < ActiveRecord::Base
   after_save :queue_message_broadcast
   after_save :clear_cache
 
-  ACCOUNT_SERVICE_NOTIFICATION_FLAGS = %w[account_survey_notifications]
+  ACCOUNT_SERVICE_NOTIFICATION_FLAGS = %w[account_survey_notifications].freeze
   validates_inclusion_of :required_account_service, in: ACCOUNT_SERVICE_NOTIFICATION_FLAGS, allow_nil: true
 
   validates_inclusion_of :months_in_display_cycle, in: 1..48, allow_nil: true

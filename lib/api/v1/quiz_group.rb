@@ -31,7 +31,7 @@ module Api::V1::QuizGroup
       assessment_question_bank_id
       position
     )
-  }
+  }.freeze
 
   API_ALLOWED_QUIZ_INPUT_FIELDS = {
     :only => %w(
@@ -41,7 +41,7 @@ module Api::V1::QuizGroup
       assessment_question_bank_id
       position
     )
-  }
+  }.freeze
 
   def quiz_groups_compound_json(quiz_groups, context, user, session)
     { quiz_groups: quiz_groups_json(quiz_groups, context, user, session) }

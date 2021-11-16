@@ -134,7 +134,7 @@ class CourseProgress
     return unless module_progressions
 
     if module_progressions.is_a? Array
-      module_progressions.map(&:completed_at).compact.max
+      module_progressions.filter_map(&:completed_at).max
     else
       module_progressions.maximum(:completed_at)
     end

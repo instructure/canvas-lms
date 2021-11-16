@@ -27,7 +27,7 @@ class Enrollment < ActiveRecord::Base
     'DesignerEnrollment' => 'designer',
     'StudentEnrollment' => 'student',
     'ObserverEnrollment' => 'observer'
-  }
+  }.freeze
 
   include Workflow
 
@@ -616,7 +616,7 @@ class Enrollment < ActiveRecord::Base
   TYPE_RANKS = {
     :default => ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'],
     :student => ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment']
-  }
+  }.freeze
   TYPE_RANK_HASHES = Hash[TYPE_RANKS.map { |k, v| [k, rank_hash(v)] }]
   def self.type_rank_sql(order = :default)
     # don't call rank_sql during class load
@@ -627,7 +627,7 @@ class Enrollment < ActiveRecord::Base
     TYPE_RANK_HASHES[order][self.class.to_s]
   end
 
-  STATE_RANK = ['active', ['invited', 'creation_pending'], 'completed', 'inactive', 'rejected', 'deleted']
+  STATE_RANK = ['active', ['invited', 'creation_pending'], 'completed', 'inactive', 'rejected', 'deleted'].freeze
   STATE_RANK_HASH = rank_hash(STATE_RANK)
   def self.state_rank_sql
     # don't call rank_sql during class load
@@ -638,7 +638,7 @@ class Enrollment < ActiveRecord::Base
     STATE_RANK_HASH[state.to_s]
   end
 
-  STATE_BY_DATE_RANK = ['active', ['invited', 'creation_pending', 'pending_active', 'pending_invited'], 'completed', 'inactive', 'rejected', 'deleted']
+  STATE_BY_DATE_RANK = ['active', ['invited', 'creation_pending', 'pending_active', 'pending_invited'], 'completed', 'inactive', 'rejected', 'deleted'].freeze
   STATE_BY_DATE_RANK_HASH = rank_hash(STATE_BY_DATE_RANK)
   def self.state_by_date_rank_sql
     @state_by_date_rank_sql ||= rank_sql(STATE_BY_DATE_RANK, 'enrollment_states.state')
@@ -1411,7 +1411,7 @@ class Enrollment < ActiveRecord::Base
     # overrides, etc. but if it doesn't find anything, start guessing by
     # looking at the enrollment, section, course, then term. if we still didn't
     # find it, fall back to the section or course creation date.
-    enrollment_dates.map(&:first).compact.min ||
+    enrollment_dates.filter_map(&:first).min ||
       start_at ||
       course_section&.start_at ||
       course.start_at ||
@@ -1424,7 +1424,7 @@ class Enrollment < ActiveRecord::Base
     # try and use the enrollment dates logic first, since it knows about
     # overrides, etc. but if it doesn't find anything, start guessing by
     # looking at the enrollment, section, course, then term.
-    enrollment_dates.map(&:last).compact.max ||
+    enrollment_dates.filter_map(&:last).max ||
       end_at ||
       course_section&.end_at ||
       course.conclude_at ||

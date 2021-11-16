@@ -291,7 +291,7 @@ class CalendarEventsApiController < ApplicationController
 
   RECURRING_EVENT_LIMIT = 200
 
-  DEFAULT_INCLUDES = %w[child_events]
+  DEFAULT_INCLUDES = %w[child_events].freeze
 
   # @API List calendar events
   #
@@ -856,7 +856,7 @@ class CalendarEventsApiController < ApplicationController
     get_all_pertinent_contexts(include_groups: true, favorites_first: true)
     selected_contexts = @current_user.get_preference(:selected_calendar_contexts) || []
 
-    contexts = @contexts.map do |context|
+    contexts = @contexts.filter_map do |context|
       next if context.try(:concluded?)
 
       context_data = {
@@ -879,7 +879,7 @@ class CalendarEventsApiController < ApplicationController
       end
 
       context_data
-    end.compact # remove any skipped contexts
+    end # remove any skipped contexts
 
     render json: { contexts: StringifyIds.recursively_stringify_ids(contexts) }
   end

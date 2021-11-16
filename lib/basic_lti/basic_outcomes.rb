@@ -37,7 +37,7 @@ module BasicLTI
     # gives instfs about 7 hours to have an outage and eventually take the file
     MAX_ATTEMPTS = 10
 
-    SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}
+    SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}.freeze
 
     def self.decode_source_id(tool, sourceid)
       tool.shard.activate do

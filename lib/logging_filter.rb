@@ -18,12 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module LoggingFilter
-  FILTERED_PARAMETERS = [:password, :auth_password, :access_token, :api_key, :client_secret, :fb_sig_friends]
+  FILTERED_PARAMETERS = [:password, :auth_password, :access_token, :api_key, :client_secret, :fb_sig_friends].freeze
   def self.filtered_parameters
     FILTERED_PARAMETERS
   end
 
-  EXTENDED_FILTERED_PARAMETERS = ["pseudonym[password]", "login[password]", "pseudonym_session[password]"]
+  EXTENDED_FILTERED_PARAMETERS = ["pseudonym[password]", "login[password]", "pseudonym_session[password]"].freeze
   def self.all_filtered_parameters
     FILTERED_PARAMETERS.map(&:to_s) + EXTENDED_FILTERED_PARAMETERS
   end

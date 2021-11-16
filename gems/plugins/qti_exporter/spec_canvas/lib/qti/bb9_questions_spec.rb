@@ -113,7 +113,7 @@ if Qti.migration_executable
                          { :right => "Phobos", :text => "Saturn", :left => "Saturn", :comments => "" },
                          { :right => "Luna", :text => "Earth", :left => "Earth", :comments => "" },
                          { :right => "Ganymede", :text => "Jupiter", :left => "Jupiter", :comments => "" }],
-                 :question_name => "" }
+                 :question_name => "" }.freeze
 
     MATCHING2 = { :answers =>
                     [{ :right => "right 1", :text => "left 1", :left => "left 1", :comments => "" },
@@ -132,6 +132,6 @@ if Qti.migration_executable
                      { :text => "right 2" },
                      { :text => "DISTRACTION" },
                      { :text => "right 4" },
-                     { :text => "right 3" }] }
+                     { :text => "right 3" }] }.freeze
   end
 end

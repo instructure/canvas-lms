@@ -346,10 +346,12 @@ ActiveRecord::Base.class_eval do
 
   class << self
     # so that we don't load up the locales until we need them
-    LOCALE_LIST = []
-    def LOCALE_LIST.include?(item)
-      I18n.available_locales.map(&:to_s).include?(item)
+    class LocalesProxy
+      def include?(item)
+        I18n.available_locales.map(&:to_s).include?(item)
+      end
     end
+    LOCALE_LIST = LocalesProxy.new
 
     def validates_locale(*args)
       options = args.last.is_a?(Hash) ? args.pop : {}

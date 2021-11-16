@@ -3496,8 +3496,8 @@ describe CoursesController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.to_param, :format => 'json' },
                         :enrollment_type => 'student')
-        expect(json.map { |u| u['sis_user_id'] }.compact.sort).to eq ['user2', 'user3'].sort
-        expect(json.map { |u| u['login_id'] }.compact.sort).to eq ['nobody2@example.com', 'nobody3@example.com'].sort
+        expect(json.filter_map { |u| u['sis_user_id'] }.sort).to eq ['user2', 'user3'].sort
+        expect(json.filter_map { |u| u['login_id'] }.sort).to eq ['nobody2@example.com', 'nobody3@example.com'].sort
       end
 
       it "includes user sis id and login id if site admin" do
@@ -3627,7 +3627,7 @@ describe CoursesController, type: :request do
 
       it "allows jumping to a user's page based on id" do
         @other_section = @course1.course_sections.create!
-        students = create_users(5.times.map { |i| { name: "User #{i + 1}", sortable_name: "#{i + 1}, User" } }, return_type: :record)
+        students = create_users(Array.new(5) { |i| { name: "User #{i + 1}", sortable_name: "#{i + 1}, User" } }, return_type: :record)
         create_enrollments(@course1, students)
         create_enrollments(@course1, students, section_id: @other_section.id)
         @target = students[4]
@@ -4253,7 +4253,7 @@ describe CoursesController, type: :request do
       @user = @teacher
       json = api_call(:get, "/api/v1/courses/#{@course.id}/recent_students",
                       { :controller => 'courses', :action => 'recent_students', :course_id => @course.to_param, :format => 'json' })
-      expect(json.map { |el| el['last_login'] }.compact).not_to be_empty
+      expect(json.filter_map { |el| el['last_login'] }).not_to be_empty
     end
 
     it "sorts by last_login" do

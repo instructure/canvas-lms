@@ -39,7 +39,7 @@ module Lti
       DesignerEnrollment => LtiOutbound::LTIRoles::Context::CONTENT_DEVELOPER,
       ObserverEnrollment => LtiOutbound::LTIRoles::Context::OBSERVER,
       StudentViewEnrollment => LtiOutbound::LTIRoles::Context::LEARNER
-    }
+    }.freeze
 
     LIS_V2_ROLE_MAP = {
       'user' => 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User',
@@ -56,7 +56,7 @@ module Lti
       ObserverEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor',
       StudentViewEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner',
       Course => 'http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering'
-    }
+    }.freeze
 
     LIS_V2_ROLE_NONE = 'http://purl.imsglobal.org/vocab/lis/v2/person#None'
 
@@ -215,7 +215,7 @@ module Lti
     end
 
     def previous_lti_context_ids
-      previous_course_ids_and_context_ids.map(&:last).compact.join(',')
+      previous_course_ids_and_context_ids.filter_map(&:last).join(',')
     end
 
     def previous_course_ids
@@ -231,7 +231,7 @@ module Lti
     end
 
     def section_sis_ids
-      course_sections.map(&:sis_source_id).compact.uniq.sort.join(',')
+      course_sections.filter_map(&:sis_source_id).uniq.sort.join(',')
     end
 
     def sis_email

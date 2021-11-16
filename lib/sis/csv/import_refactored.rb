@@ -27,7 +27,7 @@ module SIS
       attr_accessor :root_account, :batch, :finished, :counts,
                     :override_sis_stickiness, :add_sis_stickiness, :clear_sis_stickiness, :logger
 
-      IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i
+      IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i.freeze
 
       # The order of this array is important:
       #  * Account must be imported before Term and Course

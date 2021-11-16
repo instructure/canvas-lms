@@ -41,7 +41,7 @@ class AssessmentQuestion < ActiveRecord::Base
                         "multiple_choice_question", "numerical_question",
                         "text_only_question", "short_answer_question",
                         "multiple_dropdowns_question", "calculated_question",
-                        "essay_question", "true_false_question", "file_upload_question"]
+                        "essay_question", "true_false_question", "file_upload_question"].freeze
 
   serialize :question_data
 

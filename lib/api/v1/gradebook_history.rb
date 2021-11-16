@@ -167,8 +167,8 @@ module Api::V1
 
     private
 
-    PREVIOUS_VERSION_ATTRS = [:grade, :graded_at, :grader]
-    NEW_ATTRS = [:grade, :graded_at, :grader, :score]
+    PREVIOUS_VERSION_ATTRS = [:grade, :graded_at, :grader].freeze
+    NEW_ATTRS = [:grade, :graded_at, :grader, :score].freeze
 
     DEFAULT_GRADER = Struct.new(:name, :id)
 

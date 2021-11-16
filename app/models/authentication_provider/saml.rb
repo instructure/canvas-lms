@@ -264,7 +264,7 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     self.idp_entity_id = entity.entity_id
     self.log_in_url = idp.single_sign_on_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
     self.log_out_url = idp.single_logout_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
-    self.certificate_fingerprint = idp.signing_keys.map(&:fingerprint).compact.join(' ').presence || idp.keys.first&.fingerprint
+    self.certificate_fingerprint = idp.signing_keys.filter_map(&:fingerprint).join(' ').presence || idp.keys.first&.fingerprint
 
     recognized_formats = (idp.name_id_formats & self.class.name_id_formats)
     if recognized_formats.length == 1
@@ -274,8 +274,8 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
       self.identifier_format = SAML2::NameID::Format::UNSPECIFIED
     end
 
-    self.settings[:signing_certificates] = idp.signing_keys.map(&:x509).compact
-    self.settings[:signing_keys] = idp.signing_keys.map(&:key).compact.map(&:to_s)
+    self.settings[:signing_certificates] = idp.signing_keys.filter_map(&:x509)
+    self.settings[:signing_keys] = idp.signing_keys.filter_map(&:key).map(&:to_s)
     case idp.want_authn_requests_signed?
     when true
       # use ||= to not overwrite a specific algorithm that has otherwise been
@@ -464,12 +464,12 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   def self.private_keys
     return {} unless (encryption = config[:encryption])
 
-    ([encryption[:private_key]] + Array(encryption[:additional_private_keys])).map do |key|
+    ([encryption[:private_key]] + Array(encryption[:additional_private_keys])).filter_map do |key|
       path = resolve_saml_key_path(key)
       next unless path
 
       [path, File.read(path)]
-    end.compact.to_h
+    end.to_h
   end
 
   ::Canvas::Reloader.on_reload do

@@ -181,7 +181,7 @@ describe "BookmarkedCollection::MergeProxy" do
     describe "with a merge proc" do
       before do
         @example_class.delete_all
-        @courses = 6.times.map { @example_class.create! }
+        @courses = Array.new(6) { @example_class.create! }
         @scope1 = @example_class.select("id, '1' as scope").where("id<?", @courses[4].id).order(:id)
         @scope2 = @example_class.select("id, '2' as scope").where("id>?", @courses[1].id).order(:id)
 

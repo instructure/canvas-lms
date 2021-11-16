@@ -21,7 +21,7 @@
 # This is used to take a zipped file, unzip it, add directories to a
 # context, and attach the files in the correct directories.
 class UnzipAttachment
-  THINGS_TO_IGNORE_REGEX = /^(__MACOSX|thumbs\.db|\.DS_Store)$/
+  THINGS_TO_IGNORE_REGEX = /^(__MACOSX|thumbs\.db|\.DS_Store)$/.freeze
 
   def self.process(opts = {})
     @ua = new(opts)
@@ -173,7 +173,7 @@ class UnzipAttachment
   end
 
   def last_position
-    @last_position ||= (@context.attachments.active.map(&:position).compact.last || 0)
+    @last_position ||= (@context.attachments.active.filter_map(&:position).last || 0)
   end
 
   def should_skip?(entry)

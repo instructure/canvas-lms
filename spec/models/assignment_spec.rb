@@ -3994,7 +3994,7 @@ describe Assignment do
     @assignment.group_category = group_category(context: @assignment.context)
     @assignment.save!
 
-    overrides = 5.times.map do
+    overrides = Array.new(5) do
       override = @assignment.assignment_overrides.scope.new
       override.set = @assignment.group_category.groups.create!(context: @assignment.context)
       override.save!
@@ -4092,7 +4092,7 @@ describe Assignment do
 
     context "basic assignment" do
       before :once do
-        @users = create_users_in_course(@course, 10.times.map { |i| { name: "user #{i}" } }, return_type: :record)
+        @users = create_users_in_course(@course, Array.new(10) { |i| { name: "user #{i}" } }, return_type: :record)
         @a.reload
         @submissions = @users.map do |u|
           @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
@@ -4176,7 +4176,7 @@ describe Assignment do
     it "assigns multiple peer reviews" do
       @a.reload
       @submissions = []
-      users = create_users_in_course(@course, 4.times.map { |i| { name: "user #{i}" } }, return_type: :record)
+      users = create_users_in_course(@course, Array.new(4) { |i| { name: "user #{i}" } }, return_type: :record)
       users.each do |u|
         @submissions << @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
       end
@@ -4196,7 +4196,7 @@ describe Assignment do
 
     it "assigns late peer reviews" do
       @submissions = []
-      users = create_users_in_course(@course, 5.times.map { |i| { name: "user #{i}" } }, return_type: :record)
+      users = create_users_in_course(@course, Array.new(5) { |i| { name: "user #{i}" } }, return_type: :record)
       users.each do |u|
         # @a.context.reload
         @submissions << @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
@@ -4215,7 +4215,7 @@ describe Assignment do
     it "assigns late peer reviews to each other if there is more than one" do
       @a.reload
       @submissions = []
-      users = create_users_in_course(@course, 10.times.map { |i| { name: "user #{i}" } }, return_type: :record)
+      users = create_users_in_course(@course, Array.new(10) { |i| { name: "user #{i}" } }, return_type: :record)
       users.each do |u|
         @submissions << @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
       end
@@ -4224,7 +4224,7 @@ describe Assignment do
       expect(res.length).to eql(@submissions.length * 2)
 
       @late_submissions = []
-      users = create_users_in_course(@course, 3.times.map { |i| { name: "user #{i}" } }, return_type: :record)
+      users = create_users_in_course(@course, Array.new(3) { |i| { name: "user #{i}" } }, return_type: :record)
       users.each do |u|
         @late_submissions << @a.submit_homework(u, :submission_type => "online_url", :url => "http://www.google.com")
       end
@@ -4236,7 +4236,7 @@ describe Assignment do
       # (as opposed to group assignments)
       group_discussion_assignment
 
-      users = create_users_in_course(@course, 6.times.map { |i| { name: "user #{i}" } }, return_type: :record)
+      users = create_users_in_course(@course, Array.new(6) { |i| { name: "user #{i}" } }, return_type: :record)
       [@group1, @group2].each do |group|
         users.pop(3).each do |user|
           group.add_user(user)
@@ -4261,7 +4261,7 @@ describe Assignment do
         gc = @course.group_categories.create! name: "Groupy McGroupface"
         @a.update group_category_id: gc.id,
                   grade_group_students_individually: false
-        users = create_users_in_course(@course, 8.times.map { |i| { name: "user #{i}" } }, return_type: :record)
+        users = create_users_in_course(@course, Array.new(8) { |i| { name: "user #{i}" } }, return_type: :record)
         ["group_1", "group_2"].each do |group_name|
           group = gc.groups.create! name: group_name, context: @course
           users.pop(4).each { |user| group.add_user(user) }
@@ -4280,7 +4280,7 @@ describe Assignment do
         gc = @course.group_categories.create! name: "Groupy McGroupface"
         @a.update group_category_id: gc.id,
                   grade_group_students_individually: false
-        users = create_users_in_course(@course, 12.times.map { |i| { name: "user #{i}" } }, return_type: :record)
+        users = create_users_in_course(@course, Array.new(12) { |i| { name: "user #{i}" } }, return_type: :record)
 
         ["group_1", "group_2"].each do |group_name|
           group = gc.groups.create! name: group_name, context: @course
@@ -4302,7 +4302,7 @@ describe Assignment do
         gc = @course.group_categories.create! name: "Groupy McGroupface"
         @a.update group_category_id: gc.id,
                   grade_group_students_individually: false
-        users = create_users_in_course(@course, 8.times.map { |i| { name: "user #{i}" } }, return_type: :record)
+        users = create_users_in_course(@course, Array.new(8) { |i| { name: "user #{i}" } }, return_type: :record)
         ["group_1", "group_2"].each do |group_name|
           group = gc.groups.create! name: group_name, context: @course
           users.pop(4).each { |user| group.add_user(user) }
@@ -7865,7 +7865,7 @@ describe Assignment do
   describe "group category validation" do
     before :once do
       @group_category = @course.group_categories.create! name: "groups"
-      @groups = 2.times.map { |i|
+      @groups = Array.new(2) { |i|
         @group_category.groups.create! name: "group #{i}", context: @course
       }
     end

@@ -168,7 +168,7 @@ describe AssignmentOverride do
 
   describe "active scope" do
     before :once do
-      @overrides = 5.times.map { assignment_override_model }
+      @overrides = Array.new(5) { assignment_override_model }
     end
 
     it "includes active overrides" do

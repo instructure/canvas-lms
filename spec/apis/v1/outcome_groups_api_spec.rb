@@ -264,7 +264,7 @@ describe "Outcome Groups API", type: :request do
       @account = Account.default
       @account_user = @user.account_users.create(:account => @account)
       @group = @account.root_outcome_group
-      @links = 3.times.map { create_outcome }
+      @links = Array.new(3) { create_outcome }
     end
 
     it "returns active links" do

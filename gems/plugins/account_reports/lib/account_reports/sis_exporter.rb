@@ -494,8 +494,8 @@ module AccountReports
         # because it often is big enough that the secondary
         # kills it mid-run (http://www.postgresql.org/docs/9.0/static/hot-standby.html)
         enrol.preload(:root_account, :sis_pseudonym, :role).find_in_batches(strategy: :id) do |batch|
-          users = batch.map { |e| User.new(id: e.user_id) }.compact
-          users += batch.map { |e| User.new(id: e.associated_user_id) unless e.associated_user_id.nil? }.compact
+          users = batch.filter_map { |e| User.new(id: e.user_id) }
+          users += batch.filter_map { |e| User.new(id: e.associated_user_id) unless e.associated_user_id.nil? }
           users.uniq!
           users_by_id = users.index_by(&:id)
           pseudonyms = preload_logins_for_users(users, include_deleted: @include_deleted)
@@ -791,7 +791,7 @@ module AccountReports
 
       generate_and_run_report headers do |csv|
         gm.find_in_batches do |batch|
-          users = batch.map { |au| User.new(id: au.user_id) }.compact.uniq
+          users = batch.filter_map { |au| User.new(id: au.user_id) }.uniq
           users_by_id = users.index_by(&:id)
           sis_ids = preload_logins_for_users(users, include_deleted: @include_deleted)
 
@@ -973,7 +973,7 @@ module AccountReports
         admins = admin_query_options(admins)
         generate_and_run_report headers do |csv|
           admins.find_in_batches do |batch|
-            users = batch.map { |au| User.new(id: au.user_id) }.compact.uniq
+            users = batch.filter_map { |au| User.new(id: au.user_id) }.uniq
             users_by_id = users.index_by(&:id)
             sis_ids = preload_logins_for_users(users, include_deleted: @include_deleted)
 

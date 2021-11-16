@@ -65,7 +65,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
         pid = Process.fork
         unless pid
           child = true
-          t.send(spec_files_attr, spec_files.map { |x| x[j] }.compact)
+          t.send(spec_files_attr, spec_files.filter_map { |x| x[j] })
           break
         end
         processes << pid

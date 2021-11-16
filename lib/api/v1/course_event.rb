@@ -81,18 +81,18 @@ module Api::V1::CourseEvent
   end
 
   def linked_json(events, user, session)
-    course_ids = events.map(&:course_id).compact
-    course_ids.concat(events.map do |event|
+    course_ids = events.filter_map(&:course_id)
+    course_ids.concat(events.filter_map do |event|
       event.event_data[event.event_type] if event.event_data
-    end.compact)
+    end)
     courses = Course.where(id: course_ids).to_a if course_ids.length > 0
     courses ||= []
 
-    page_view_ids = events.map(&:request_id).compact
+    page_view_ids = events.filter_map(&:request_id)
     page_views = PageView.find_all_by_id(page_view_ids) if page_view_ids.length > 0
     page_views ||= []
 
-    user_ids = events.map(&:user_id).compact
+    user_ids = events.filter_map(&:user_id)
     users = User.where(id: user_ids).to_a if user_ids.length > 0
     users ||= []
 

@@ -128,7 +128,7 @@ module I18nTasks
       end
     end
 
-    LIST_ITEM_PATTERN = /^ {0,3}(\d+\.|\*|\+|-)\s/
+    LIST_ITEM_PATTERN = /^ {0,3}(\d+\.|\*|\+|-)\s/.freeze
 
     def markdown_and_wrappers(str)
       # Since underscores can be wrappers, and underscores can also be inside

@@ -2730,7 +2730,7 @@ describe Course, "tabs_available" do
       tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
       expect(tab_ids).to eql(default_tab_ids)
       expect(tab_ids.length).to be > 0
-      expect(@course.tabs_available(@user).map { |t| t[:label] }.compact.length).to eql(tab_ids.length)
+      expect(@course.tabs_available(@user).filter_map { |t| t[:label] }.length).to eql(tab_ids.length)
     end
 
     it "handles hidden_unused correctly for discussions" do

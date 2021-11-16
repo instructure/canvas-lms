@@ -567,13 +567,13 @@ describe Mutations::ImportOutcomes do
 
       assert_tree_exists([{
                            title: "Group C",
-                           outcomes: 3.times.map { |i| "#{i} Group C outcome" },
+                           outcomes: Array.new(3) { |i| "#{i} Group C outcome" },
                            groups: [{
                              title: "Group D",
-                             outcomes: 5.times.map { |i| "#{i} Group D outcome" }
+                             outcomes: Array.new(5) { |i| "#{i} Group D outcome" }
                            }, {
                              title: "Group E",
-                             outcomes: 5.times.map { |i| "#{i} Group E outcome" }
+                             outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
                            }]
                          }], @course.root_outcome_group)
     end
@@ -592,13 +592,13 @@ describe Mutations::ImportOutcomes do
                            title: "Group F",
                            groups: [{
                              title: "Group C",
-                             outcomes: 3.times.map { |i| "#{i} Group C outcome" },
+                             outcomes: Array.new(3) { |i| "#{i} Group C outcome" },
                              groups: [{
                                title: "Group D",
-                               outcomes: 5.times.map { |i| "#{i} Group D outcome" }
+                               outcomes: Array.new(5) { |i| "#{i} Group D outcome" }
                              }, {
                                title: "Group E",
-                               outcomes: 5.times.map { |i| "#{i} Group E outcome" }
+                               outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
                              }]
                            }]
                          }], @course.root_outcome_group)
@@ -627,13 +627,13 @@ describe Mutations::ImportOutcomes do
 
       assert_tree_exists([{
                            title: "Group C",
-                           outcomes: 3.times.map { |i| "#{i} Group C outcome" },
+                           outcomes: Array.new(3) { |i| "#{i} Group C outcome" },
                            groups: [{
                              title: "Group D",
-                             outcomes: 5.times.map { |i| "#{i} Group D outcome" }
+                             outcomes: Array.new(5) { |i| "#{i} Group D outcome" }
                            }, {
                              title: "Group E",
-                             outcomes: 6.times.map { |i| "#{i} Group E outcome" },
+                             outcomes: Array.new(6) { |i| "#{i} Group E outcome" },
                              groups: [{
                                title: "Group F",
                                outcomes: ["0 Group F outcome"],
@@ -648,17 +648,17 @@ describe Mutations::ImportOutcomes do
 
       assert_tree_exists([{
                            title: "Group C",
-                           outcomes: 3.times.map { |i| "#{i} Group C outcome" },
+                           outcomes: Array.new(3) { |i| "#{i} Group C outcome" },
                            groups: [{
                              title: "Group D",
-                             outcomes: 5.times.map { |i| "#{i} Group D outcome" }
+                             outcomes: Array.new(5) { |i| "#{i} Group D outcome" }
                            }, {
                              title: "Group E",
-                             outcomes: 5.times.map { |i| "#{i} Group E outcome" }
+                             outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
                            }]
                          }, {
                            title: "Group B",
-                           outcomes: 5.times.map { |i| "#{i} Group B outcome" }
+                           outcomes: Array.new(5) { |i| "#{i} Group B outcome" }
                          }], @course.root_outcome_group)
     end
 
@@ -710,21 +710,21 @@ describe Mutations::ImportOutcomes do
       it "import Root Group A with 1 outcome to Account" do
         assert_tree_exists([{
                              title: "Group A",
-                             outcomes: 5.times.map { |i| "#{i} Group A outcome" },
+                             outcomes: Array.new(5) { |i| "#{i} Group A outcome" },
                              groups: [{
                                title: "Group C",
-                               outcomes: 3.times.map { |i| "#{i} Group C outcome" },
+                               outcomes: Array.new(3) { |i| "#{i} Group C outcome" },
                                groups: [{
                                  title: "Group D",
-                                 outcomes: 5.times.map { |i| "#{i} Group D outcome" }
+                                 outcomes: Array.new(5) { |i| "#{i} Group D outcome" }
                                }, {
                                  title: "Group E",
-                                 outcomes: 5.times.map { |i| "#{i} Group E outcome" }
+                                 outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
                                }]
                              }]
                            }, {
                              title: "Group B",
-                             outcomes: 5.times.map { |i| "#{i} Group B outcome" }
+                             outcomes: Array.new(5) { |i| "#{i} Group B outcome" }
                            }, {
                              title: "Root Group A",
                              outcomes: ["0 Root Group A outcome"]
@@ -790,21 +790,21 @@ describe Mutations::ImportOutcomes do
       it "imports correctly" do
         assert_tree_exists([{
                              title: "Group A",
-                             outcomes: 5.times.map { |i| "#{i} Group A outcome" },
+                             outcomes: Array.new(5) { |i| "#{i} Group A outcome" },
                              groups: [{
                                title: "Group C",
-                               outcomes: 3.times.map { |i| "#{i} Group C outcome" },
+                               outcomes: Array.new(3) { |i| "#{i} Group C outcome" },
                                groups: [{
                                  title: "Group D",
-                                 outcomes: 5.times.map { |i| "#{i} Group D outcome" }
+                                 outcomes: Array.new(5) { |i| "#{i} Group D outcome" }
                                }, {
                                  title: "Group E",
-                                 outcomes: 5.times.map { |i| "#{i} Group E outcome" }
+                                 outcomes: Array.new(5) { |i| "#{i} Group E outcome" }
                                }]
                              }]
                            }, {
                              title: "Group B",
-                             outcomes: 5.times.map { |i| "#{i} Group B outcome" }
+                             outcomes: Array.new(5) { |i| "#{i} Group B outcome" }
                            }, {
                              title: "Root Group A",
                              groups: [{

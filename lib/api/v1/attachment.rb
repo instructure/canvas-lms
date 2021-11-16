@@ -232,7 +232,7 @@ module Api::V1::Attachment
   end
 
   def filenames(params)
-    [:name, :filename, :url].map { |param| params[param] }.compact
+    [:name, :filename, :url].filter_map { |param| params[param] }
   end
 
   def valid_mime_type?(mime_type)
@@ -240,10 +240,10 @@ module Api::V1::Attachment
   end
 
   def valid_mime_types(params)
-    filenames(params).map do |filename|
+    filenames(params).filter_map do |filename|
       mime_type = Attachment.mimetype(filename)
       mime_type if valid_mime_type?(mime_type)
-    end.compact
+    end
   end
 
   def validate_on_duplicate(params)

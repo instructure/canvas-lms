@@ -26,7 +26,7 @@ class KalturaMediaFileHandler
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     files = []
-    root_account_id = attachments.map(&:root_account_id).compact.first
+    root_account_id = attachments.filter_map(&:root_account_id).first
     attachments.select { |a| !a.media_object }.each do |attachment|
       files << {
         :name => attachment.display_name,

@@ -22,8 +22,8 @@ require_dependency 'messageable_user'
 
 class MessageableUser
   class Calculator
-    CONTEXT_RECIPIENT = /\A(course|section|group|discussion_topic)_(\d+)(_([a-z]+))?\z/
-    INDIVIDUAL_RECIPIENT = /\A\d+\z/
+    CONTEXT_RECIPIENT = /\A(course|section|group|discussion_topic)_(\d+)(_([a-z]+))?\z/.freeze
+    INDIVIDUAL_RECIPIENT = /\A\d+\z/.freeze
 
     # all work is done within the context of a user. avoid passing it around in
     # every single method call by being an object instead of just a collection
@@ -777,7 +777,7 @@ class MessageableUser
     # is acceptable, as this is specific to a course and the enrollments all
     # live on the same shard as the course
     def uncached_observed_student_ids_in_course(course)
-      course.section_visibilities_for(@user).map { |s| s[:associated_user_id] }.compact
+      course.section_visibilities_for(@user).filter_map { |s| s[:associated_user_id] }
     end
 
     def uncached_linked_observer_ids

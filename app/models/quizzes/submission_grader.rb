@@ -112,7 +112,7 @@ module Quizzes
       return unless @submission.user_id
 
       versioned_submission = versioned_submission(@submission, attempt)
-      question_ids = (versioned_submission&.quiz_data || []).map { |q| q[:assessment_question_id] }.compact.uniq
+      question_ids = (versioned_submission&.quiz_data || []).filter_map { |q| q[:assessment_question_id] }.uniq
       questions, alignments = questions_and_alignments(question_ids)
       return if questions.empty? || alignments.empty?
 

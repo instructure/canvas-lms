@@ -21,7 +21,7 @@
 require 'atom'
 
 class User < ActiveRecord::Base
-  GRAVATAR_PATTERN = /^https?:\/\/[a-zA-Z0-9.-]+\.gravatar\.com\//
+  GRAVATAR_PATTERN = /^https?:\/\/[a-zA-Z0-9.-]+\.gravatar\.com\//.freeze
   MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS = 5
 
   include ManyRootAccounts
@@ -805,7 +805,7 @@ class User < ActiveRecord::Base
   end
 
   # Feel free to add, but the "authoritative" list (http://en.wikipedia.org/wiki/Title_(name)) is quite large
-  SUFFIXES = /^(Sn?r\.?|Senior|Jn?r\.?|Junior|II|III|IV|V|VI|Esq\.?|Esquire)$/i
+  SUFFIXES = /^(Sn?r\.?|Senior|Jn?r\.?|Junior|II|III|IV|V|VI|Esq\.?|Esquire)$/i.freeze
 
   # see also user_sortable_name.js
   def self.name_parts(name, prior_surname: nil, likely_already_surname_first: false)
@@ -1503,7 +1503,7 @@ class User < ActiveRecord::Base
     Canvas::Security.verify_hmac_sha1(sig, user_id.to_s, truncate: 10) ? user_id : nil
   end
 
-  AVATAR_SETTINGS = ['enabled', 'enabled_pending', 'sis_only', 'disabled']
+  AVATAR_SETTINGS = ['enabled', 'enabled_pending', 'sis_only', 'disabled'].freeze
   def avatar_url(size = nil, avatar_setting = nil, fallback = nil, request = nil, use_fallback = true)
     return fallback if avatar_setting == 'disabled'
 
@@ -1600,14 +1600,14 @@ class User < ActiveRecord::Base
     if Shard.current != self.shard
       # translate asset strings to be relative to current shard
       colors_hash = Hash[
-        colors_hash.map do |asset_string, value|
+        colors_hash.filter_map do |asset_string, value|
           opts = asset_string.split("_")
           id_relative_to_user_shard = opts.pop.to_i
           next if id_relative_to_user_shard > Shard::IDS_PER_SHARD && Shard.shard_for(id_relative_to_user_shard) == self.shard # this is old data and should be ignored
 
           new_id = Shard.relative_id_for(id_relative_to_user_shard, self.shard, Shard.current)
           ["#{opts.join('_')}_#{new_id}", value]
-        end.compact
+        end
       ]
     end
     colors_hash
@@ -2236,7 +2236,7 @@ class User < ActiveRecord::Base
         visible_instances = visible_stream_item_instances(opts)
                             .preload(stream_item: :context)
                             .limit(Setting.get('recent_stream_item_limit', 100))
-        visible_instances.map do |sii|
+        visible_instances.filter_map do |sii|
           si = sii.stream_item
           next if si.blank?
           next if si.asset_type == 'Submission'
@@ -2244,7 +2244,7 @@ class User < ActiveRecord::Base
 
           si.unread = sii.unread?
           si
-        end.compact
+        end
       end
     end
   end

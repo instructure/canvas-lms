@@ -27,7 +27,7 @@ module Importers
       :discussion_topic => DiscussionTopic,
       :quiz => Quizzes::Quiz,
       :wiki_page => WikiPage
-    }
+    }.freeze
 
     include LinkParser::Helpers
 

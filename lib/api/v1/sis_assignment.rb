@@ -99,7 +99,7 @@ module Api::V1::SisAssignment
     overrides = active_assignment_overrides_for(assignment)
     raise UnloadedAssociationError if overrides.nil?
 
-    overrides.map { |o| assignment_user_override_json(o) }.compact
+    overrides.filter_map { |o| assignment_user_override_json(o) }
   end
 
   def assignment_user_override_json(override)

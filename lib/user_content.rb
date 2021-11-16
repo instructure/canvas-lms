@@ -165,7 +165,7 @@ module UserContent
       'file_contents' => nil,
       'modules' => :ContextModule,
       'items' => :ContentTag
-    }
+    }.freeze
     DefaultAllowedTypes = AssetTypes.keys
 
     def initialize(context, user, contextless_types: [])
