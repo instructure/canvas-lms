@@ -110,7 +110,7 @@ module DataFixup
     def self.schedule_next_job
       _, wait_time = Setting.get('trigger_plagiarism_resubmit', '100,180').split(',').map(&:to_i)
       Delayed::Job.where(strand: "plagiarism_event_resend", locked_at: nil)
-                  .order(:id).first&.update_attributes(run_at: wait_time.seconds.from_now)
+                  .order(:id).first&.update(run_at: wait_time.seconds.from_now)
     end
 
     # Retriggers the plagiarism resubmit event for the given
