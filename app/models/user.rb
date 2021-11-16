@@ -294,12 +294,12 @@ class User < ActiveRecord::Base
   # course observers, you take the difference between all active observers and active observers with associated users
   scope :observing_full_course, lambda { |course_ids|
     active_observer_scope = joins(:enrollments).where(enrollments: { type: 'ObserverEnrollment', course_id: course_ids, workflow_state: 'active' })
-    users_observing_students = active_observer_scope.where("enrollments.associated_user_id IS NOT NULL").pluck(:id)
+    users_observing_students = active_observer_scope.where.not(enrollments: { associated_user_id: nil }).pluck(:id)
 
     if users_observing_students == [] || users_observing_students == nil
       active_observer_scope
     else
-      active_observer_scope.where("users.id NOT IN (?)", users_observing_students)
+      active_observer_scope.where.not(users: { id: users_observing_students })
     end
   }
 
@@ -1092,7 +1092,7 @@ class User < ActiveRecord::Base
 
         account_users = root_account.account_users.where(user_id: self).to_a +
                         self.account_users.shard(root_account).where(:account_id => root_account.all_accounts).to_a
-        has_other_root_accounts = self.associated_accounts.shard(self).where('accounts.id <> ?', root_account).exists?
+        has_other_root_accounts = self.associated_accounts.shard(self).where.not(accounts: { id: root_account }).exists?
         group_memberships_scope = self.group_memberships.active.shard(root_account.shard).joins(:group).where(:groups => { :root_account_id => root_account })
 
         eportfolio_scope = self.eportfolios.active if self.shard == root_account.shard
@@ -1343,7 +1343,7 @@ class User < ActiveRecord::Base
   def allows_user_to_remove_from_account?(account, other_user)
     Pseudonym.new(account: account, user: self).grants_right?(other_user, :delete) &&
       (Pseudonym.new(account: account, user: self).grants_right?(other_user, :manage_sis) ||
-       !account.pseudonyms.active.where(user_id: self).where('sis_user_id IS NOT NULL').exists?)
+       !account.pseudonyms.active.where(user_id: self).where.not(sis_user_id: nil).exists?)
   end
 
   def self.infer_id(obj)
@@ -1567,7 +1567,7 @@ class User < ActiveRecord::Base
   end
 
   scope :with_avatar_state, lambda { |state|
-    scope = where("avatar_image_url IS NOT NULL").order("avatar_image_updated_at DESC")
+    scope = where.not(avatar_image_url: nil).order("avatar_image_updated_at DESC")
     if state == 'any'
       scope.where("avatar_state IS NOT NULL AND avatar_state<>'none'")
     else

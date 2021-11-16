@@ -938,7 +938,7 @@ class Course < ActiveRecord::Base
     GuardRail.activate(:secondary) do
       scope = current_enrollments
               .where(:course_id => self, :user_id => user_id)
-              .where("course_section_id IS NOT NULL")
+              .where.not(course_section_id: nil)
       section_ids = scope.distinct.pluck(:course_section_id)
 
       instructor_enrollment_scope = self.instructor_enrollments.active_by_date

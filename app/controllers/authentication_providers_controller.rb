@@ -1028,7 +1028,7 @@ class AuthenticationProvidersController < ApplicationController
   def deselect_parent_registration(data, aac = nil)
     if data[:parent_registration] == 'true' || data[:parent_registration] == '1'
       auth_providers = @account.authentication_providers
-      auth_providers = auth_providers.where('id <> ?', aac) if aac
+      auth_providers = auth_providers.where.not(id: aac) if aac
       auth_providers.update_all(parent_registration: false)
     end
   end

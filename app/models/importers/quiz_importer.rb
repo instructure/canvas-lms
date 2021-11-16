@@ -348,7 +348,7 @@ module Importers
 
       unless question_data[:qq_ids][item.migration_id]
         question_data[:qq_ids][item.migration_id] = {}
-        existing_questions = item.quiz_questions.active.where("migration_id IS NOT NULL").pluck(:id, :migration_id)
+        existing_questions = item.quiz_questions.active.where.not(migration_id: nil).pluck(:id, :migration_id)
         existing_questions.each do |id, mig_id|
           question_data[:qq_ids][item.migration_id][mig_id] = id
         end

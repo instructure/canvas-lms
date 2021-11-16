@@ -79,16 +79,16 @@ module Assignments
       # ignore submissions this user has graded
       graded_sub_ids = assignment.submissions.joins(:provisional_grades)
                                  .where(moderated_grading_provisional_grades: { final: false, scorer_id: user.id })
-                                 .where("moderated_grading_provisional_grades.score IS NOT NULL").pluck(:id)
+                                 .where.not(moderated_grading_provisional_grades: { score: nil }).pluck(:id)
 
       moderation_set_student_ids = assignment.moderated_grading_selections.pluck(:student_id)
 
       # ignore submissions that don't need any more provisional grades
       pg_scope = assignment.submissions.joins(:provisional_grades)
                            .where(moderated_grading_provisional_grades: { final: false })
-                           .where("moderated_grading_provisional_grades.scorer_id <> ?", user.id)
+                           .where.not(moderated_grading_provisional_grades: { scorer_id: user.id })
                            .group("submissions.id", "submissions.user_id")
-      pg_scope = pg_scope.where("submissions.id NOT IN (?)", graded_sub_ids) if graded_sub_ids.any?
+      pg_scope = pg_scope.where.not(submissions: { id: graded_sub_ids }) if graded_sub_ids.any?
       pg_scope.count.each do |key, count|
         sub_id, user_id = key
         graded_sub_ids << sub_id if count >= (moderation_set_student_ids.include?(user_id) ? 2 : 1)
@@ -96,7 +96,7 @@ module Assignments
 
       scope = (level == :sections) ? section_filtered_submissions : all_submissions
       if graded_sub_ids.any?
-        scope.where("submissions.id NOT IN (?)", graded_sub_ids).distinct.count(:id)
+        scope.where.not(submissions: { id: graded_sub_ids }).distinct.count(:id)
       else
         scope.distinct.count(:id)
       end

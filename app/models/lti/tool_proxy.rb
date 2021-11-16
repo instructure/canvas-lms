@@ -55,7 +55,7 @@ module Lti
     end
 
     def self.find_installed_proxies_for_context(context)
-      find_all_proxies_for_context(context).where('lti_tool_proxies.workflow_state <> ?', 'deleted')
+      find_all_proxies_for_context(context).where.not(lti_tool_proxies: { workflow_state: 'deleted' })
     end
 
     def self.find_all_proxies_for_context(context)

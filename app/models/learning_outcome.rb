@@ -204,7 +204,7 @@ class LearningOutcome < ActiveRecord::Base
 
   def self.update_alignments(asset, context, new_outcome_ids)
     old_outcome_ids = asset.learning_outcome_alignments
-                           .where("learning_outcome_id IS NOT NULL")
+                           .where.not(learning_outcome_id: nil)
                            .pluck(:learning_outcome_id)
                            .uniq
 

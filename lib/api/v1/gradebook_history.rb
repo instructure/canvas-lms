@@ -146,7 +146,7 @@ module Api::V1
         date = options[:date]
         collection = collection.where("graded_at<? AND graded_at>?", date.end_of_day, date.beginning_of_day)
       else
-        collection = collection.where("graded_at IS NOT NULL")
+        collection = collection.where.not(graded_at: nil)
       end
 
       if (assignment_id = options[:assignment_id])

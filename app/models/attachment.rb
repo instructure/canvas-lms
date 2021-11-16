@@ -727,7 +727,7 @@ class Attachment < ActiveRecord::Base
               excluded_attachment_ids += context.attachments.joins(:attachment_associations).where(attachment_associations: { context_type: "Submission" }).pluck(:id)
             end
             excluded_attachment_ids += context.attachments.where(folder_id: context.submissions_folders).pluck(:id)
-            attachment_scope = attachment_scope.where("id NOT IN (?)", excluded_attachment_ids) if excluded_attachment_ids.any?
+            attachment_scope = attachment_scope.where.not(id: excluded_attachment_ids) if excluded_attachment_ids.any?
           end
 
           min = self.minimum_size_for_quota
@@ -776,7 +776,7 @@ class Attachment < ActiveRecord::Base
         self.shard.activate do
           iter_count = 1
           while !valid_name
-            existing_names = self.folder.active_file_attachments.where("id <> ?", self.id).pluck(:display_name)
+            existing_names = self.folder.active_file_attachments.where.not(id: self.id).pluck(:display_name)
             new_name = opts[:name] || self.display_name
             self.display_name = Attachment.make_unique_filename(new_name, existing_names, iter_count)
 

@@ -202,7 +202,7 @@ module Importers
       end
 
       if quiz_ids.any?
-        Quizzes::Quiz.where(:id => quiz_ids.uniq).where("quiz_data IS NOT NULL").find_each do |quiz|
+        Quizzes::Quiz.where(:id => quiz_ids.uniq).where.not(quiz_data: nil).find_each do |quiz|
           if recursively_sub_placeholders!(quiz['quiz_data'], links)
             Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz['quiz_data'])
           end
@@ -228,7 +228,7 @@ module Importers
         Quizzes::QuizQuestion.where(:id => qq.id).update_all(:question_data => qq['question_data'])
       end
 
-      quiz = Quizzes::Quiz.where(:id => qq.quiz_id).where("quiz_data IS NOT NULL").first
+      quiz = Quizzes::Quiz.where(:id => qq.quiz_id).where.not(quiz_data: nil).first
       if quiz
         if recursively_sub_placeholders!(quiz['quiz_data'], links)
           Quizzes::Quiz.where(:id => quiz.id).update_all(:quiz_data => quiz['quiz_data'])

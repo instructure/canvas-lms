@@ -366,7 +366,7 @@ class Group < ActiveRecord::Base
     user_ids = users.map(&:id)
     memberships = []
     transaction do
-      self.group_memberships.where("user_id NOT IN (?)", user_ids).destroy_all
+      self.group_memberships.where.not(user_id: user_ids).destroy_all
       users.each do |user|
         memberships << invite_user(user)
       end

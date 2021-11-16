@@ -1046,7 +1046,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   end
 
   def has_student_submissions?
-    self.quiz_submissions.not_settings_only.where("user_id IS NOT NULL").exists?
+    self.quiz_submissions.not_settings_only.where.not(user_id: nil).exists?
   end
 
   # clear out all questions so that the quiz can be replaced. this is currently
@@ -1336,7 +1336,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     # yes, this is a complicated query, but it greatly improves the runtime to do it this way
     filter = Quizzes::QuizSubmission.where("quiz_submissions.quiz_id=s.quiz_id")
-                                    .not_settings_only.where("user_id IS NOT NULL")
+                                    .not_settings_only.where.not(user_id: nil)
     values = quizzes.map { |q| "(#{q.id})" }.join(", ")
     constant_table = "( VALUES #{values} ) AS s(quiz_id)"
 

@@ -48,7 +48,7 @@ module DataFixup::PopulateRootAccountIdOnAttachments
   def self.from_namespace(batch_min, batch_max)
     attachments = Attachment
                   .where(id: batch_min..batch_max, root_account_id: nil)
-                  .where('namespace is not null') # ignore the poor, orphaned attachments (deleted?)
+                  .where.not(namespace: nil) # ignore the poor, orphaned attachments (deleted?)
 
     return if attachments.empty? # no droids here, move along
 
