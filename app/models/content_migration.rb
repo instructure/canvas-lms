@@ -41,7 +41,8 @@ class ContentMigration < ActiveRecord::Base
 
   DATE_FORMAT = "%m/%d/%Y"
 
-  attr_accessor :outcome_to_id_map, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :last_module_position, :skipped_master_course_items
+  attr_accessor :outcome_to_id_map, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :last_module_position,
+                :skipped_master_course_items, :copied_external_outcome_map
   attr_writer :imported_migration_items
 
   has_a_broadcast_policy

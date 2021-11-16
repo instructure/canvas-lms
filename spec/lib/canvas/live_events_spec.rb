@@ -1976,4 +1976,28 @@ describe Canvas::LiveEvents do
       end
     end
   end
+
+  describe 'heartbeat' do
+    context 'when database region is not set (local/open source)' do
+      it 'sets region to not_configured' do
+        expect_event('heartbeat', { region: 'not_configured', environment: 'test', region_code: 'not_configured' })
+        Canvas::LiveEvents.heartbeat
+      end
+    end
+
+    context 'when Canvas.region is set' do
+      let(:region) { 'us-east-1' }
+      let(:region_code) { 'prod-iad' }
+
+      before do
+        allow(Canvas).to receive(:region).and_return(region)
+        allow(Canvas).to receive(:region_code).and_return(region_code)
+      end
+
+      it 'sets region to Canvas.region' do
+        expect_event('heartbeat', { region: region, environment: 'test', region_code: region_code })
+        Canvas::LiveEvents.heartbeat
+      end
+    end
+  end
 end
