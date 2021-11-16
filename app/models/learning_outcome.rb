@@ -445,7 +445,7 @@ class LearningOutcome < ActiveRecord::Base
       tag_type: 'learning_outcome',
       context: context
     ) do |_a|
-      InstStatsd::Statsd.increment('learning_outcome.align')
+      InstStatsd::Statsd.increment('learning_outcome.align', tags: { type: asset.class.name })
     end
   end
 
