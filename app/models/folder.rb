@@ -53,8 +53,8 @@ class Folder < ActiveRecord::Base
   after_destroy :clean_up_children
   after_save :touch_context
   before_save :infer_hidden_state
-  validates_presence_of :context_id, :context_type
-  validates_length_of :name, :maximum => maximum_string_length
+  validates :context_id, :context_type, presence: true
+  validates :name, length: { :maximum => maximum_string_length }
   validate :protect_root_folder_name, :if => :name_changed?
   validate :reject_recursive_folder_structures, on: :update
   validate :restrict_submission_folder_context

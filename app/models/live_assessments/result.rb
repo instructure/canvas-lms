@@ -24,8 +24,8 @@ module LiveAssessments
     belongs_to :user
     belongs_to :assessment, class_name: 'LiveAssessments::Assessment'
 
-    validates_presence_of :assessor_id, :assessment_id, :assessed_at
-    validates_inclusion_of :passed, :in => [true, false]
+    validates :assessor_id, :assessment_id, :assessed_at, presence: true
+    validates :passed, inclusion: { :in => [true, false] }
 
     scope :for_user, lambda { |user| where(:user_id => user) }
 

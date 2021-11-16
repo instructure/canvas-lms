@@ -40,7 +40,7 @@ class PageView < ActiveRecord::Base
   # if we ever do either of the above, we'll need to remove this, and figure out
   # where such page views should belong (currently page views end up on the user's
   # shard)
-  validates_presence_of :user_id
+  validates :user_id, presence: true
 
   def self.generate(request, attributes = {})
     self.new(attributes).tap do |p|

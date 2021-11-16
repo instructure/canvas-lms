@@ -21,7 +21,7 @@
 module PermissionsHelper
   def manageable_enrollments_by_permission(permission, enrollments = nil)
     permission = permission.to_sym
-    raise "invalid permission" unless RoleOverride.permissions.keys.include?(permission)
+    raise "invalid permission" unless RoleOverride.permissions.key?(permission)
 
     enrollments ||= participating_enrollments
     ActiveRecord::Associations::Preloader.new.preload(enrollments, :course)

@@ -128,7 +128,7 @@ module UserSearch
         users_scope = users_scope.where("role_id IN (?)", roles.map(&:id))
       elsif enrollment_types
         enrollment_types = enrollment_types.map { |e| "#{e.camelize}Enrollment" }
-        if enrollment_types.any? { |et| !Enrollment.readable_types.keys.include?(et) }
+        if enrollment_types.any? { |et| !Enrollment.readable_types.key?(et) }
           raise ArgumentError, 'Invalid Enrollment Type'
         end
 

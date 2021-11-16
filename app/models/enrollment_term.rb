@@ -31,7 +31,7 @@ class EnrollmentTerm < ActiveRecord::Base
   has_many :enrollments, :through => :courses
   has_many :course_sections
 
-  validates_presence_of :root_account_id, :workflow_state
+  validates :root_account_id, :workflow_state, presence: true
   validate :prevent_default_term_name_change
   validate :check_if_deletable
   validate :consistent_account_associations

@@ -280,7 +280,7 @@ module Interfaces::SubmissionInterface
     load_association(:submission_drafts).then do |drafts|
       # Submission.attempt can be in either 0 or nil which mean the same thing
       target_attempt = (object.attempt || 0) + 1
-      drafts.select { |draft| draft.submission_attempt == target_attempt }.first
+      drafts.find { |draft| draft.submission_attempt == target_attempt }
     end
   end
 

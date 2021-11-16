@@ -510,11 +510,11 @@ class Assignment < ActiveRecord::Base
     self.submission_types == 'external_tool'
   end
 
-  validates_presence_of :context_id, :context_type, :workflow_state
+  validates :context_id, :context_type, :workflow_state, presence: true
 
-  validates_presence_of :title, if: :title_changed?
-  validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :allowed_extensions, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
+  validates :title, presence: { if: :title_changed? }
+  validates :description, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
+  validates :allowed_extensions, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
   validate :frozen_atts_not_altered, :if => :frozen?, :on => :update
   validates :grading_type, inclusion: { in: ALLOWED_GRADING_TYPES }
 
@@ -3884,7 +3884,7 @@ class Assignment < ActiveRecord::Base
 
     if AssignmentUtil.due_date_required?(self)
       overrides = gather_override_data(overrides)
-      if overrides.select { |o| !!o[:due_at_overridden] && o[:due_at].blank? && o[:workflow_state] != 'deleted' }.length > 0
+      if overrides.count { |o| !!o[:due_at_overridden] && o[:due_at].blank? && o[:workflow_state] != 'deleted' } > 0
         errors.add(:due_at, I18n.t("cannot be blank for any assignees when Post to Sis is checked"))
         return false
       end

@@ -74,13 +74,13 @@ module Qti
       if remove_extraneous_nodes
         while true
           node.children.each do |child|
-            break unless (child.text? && child.text =~ /\A\s+\z/) || (child.element? && child.name.downcase == 'br')
+            break unless (child.text? && child.text =~ /\A\s+\z/) || (child.element? && child.name.casecmp?('br'))
 
             child.remove
           end
 
           node.children.reverse_each do |child|
-            break unless (child.text? && child.text =~ /\A\s+\z/) || (child.element? && child.name.downcase == 'br')
+            break unless (child.text? && child.text =~ /\A\s+\z/) || (child.element? && child.name.casecmp?('br'))
 
             child.remove
           end
@@ -145,7 +145,7 @@ module Qti
       end
 
       text = clear_html(node.text.gsub(/\s+/, " ")).strip
-      html_node = node.at_css('div.html') || (node.name.downcase == 'div' && node['class'] =~ /\bhtml\b/) || @flavor == Qti::Flavors::ANGEL
+      html_node = node.at_css('div.html') || (node.name.casecmp?('div') && node['class'] =~ /\bhtml\b/) || @flavor == Qti::Flavors::ANGEL
       is_html = (html_node && @flavor == Qti::Flavors::CANVAS)
       # heuristic for detecting html: the sanitized html node is more than just a container for a single text node
       sanitized = sanitize_html!(html_node ? Nokogiri::HTML5.fragment(node.text) : node, true) { |s| is_html ||= !(s.children.size == 1 && s.children.first.is_a?(Nokogiri::XML::Text)) }

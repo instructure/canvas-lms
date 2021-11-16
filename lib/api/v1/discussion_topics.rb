@@ -189,7 +189,7 @@ module Api::V1::DiscussionTopics
     fields[:topic_children] = child_topic_data.map(&:first)
     fields[:group_topic_children] = child_topic_data.map { |id, group_id| { id: id, group_id: group_id } }
 
-    fields.merge!({ context_code: topic.context_code }) if opts[:include_context_code]
+    fields[:context_code] = topic.context_code if opts[:include_context_code]
 
     locked_json(fields, topic, user, 'topic', check_policies: true, deep_check_if_needed: true)
     can_view = !fields[:lock_info].is_a?(Hash) || fields[:lock_info][:can_view]
@@ -276,7 +276,10 @@ module Api::V1::DiscussionTopics
     return {} unless entry.attachment
 
     url_options = {}
-    url_options.merge!(host: Api::PLACEHOLDER_HOST, protocol: Api::PLACEHOLDER_PROTOCOL) if respond_to?(:use_placeholder_host?) && use_placeholder_host? unless respond_to?(:request)
+    if respond_to?(:use_placeholder_host?) && use_placeholder_host?
+      url_options[:host] = Api::PLACEHOLDER_HOST
+      url_options[:protocol] = Api::PLACEHOLDER_PROTOCOL
+    end unless respond_to?(:request)
     json = { attachment: attachment_json(entry.attachment, user, url_options) }
     json[:attachments] = [json[:attachment]]
 

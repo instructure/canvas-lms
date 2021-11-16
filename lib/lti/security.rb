@@ -81,8 +81,8 @@ module Lti
       # want to revert the escapage and return the hash of post parameters ready
       # for embedding in a html view
       hash = {}
-      request.body.split(/&/).each do |param|
-        key, val = param.split(/=/).map { |v| CGI.unescape(v) }
+      request.body.split("&").each do |param|
+        key, val = param.split("=").map { |v| CGI.unescape(v) }
         hash[key] = val
       end
 

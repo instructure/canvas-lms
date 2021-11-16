@@ -39,7 +39,7 @@ class RubricAssociation < ActiveRecord::Base
 
   has_a_broadcast_policy
 
-  validates_presence_of :purpose, :rubric_id, :association_id, :association_type, :context_id, :context_type
+  validates :purpose, :rubric_id, :association_id, :association_type, :context_id, :context_type, presence: true
   validates :workflow_state, inclusion: { in: ["active", "deleted"] }
 
   before_create :set_root_account_id

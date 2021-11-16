@@ -34,17 +34,17 @@ class AssignmentOverride < ActiveRecord::Base
   belongs_to :quiz, class_name: 'Quizzes::Quiz', inverse_of: :assignment_overrides
   belongs_to :set, polymorphic: [:group, :course_section], exhaustive: false
   has_many :assignment_override_students, -> { where(workflow_state: 'active') }, :inverse_of => :assignment_override, :dependent => :destroy, :validate => false
-  validates_presence_of :assignment_version, :if => :assignment
-  validates_presence_of :title, :workflow_state
+  validates :assignment_version, presence: { :if => :assignment }
+  validates :title, :workflow_state, presence: true
   validates :set_type, inclusion: ['CourseSection', 'Group', 'ADHOC', SET_TYPE_NOOP]
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
+  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true }
   concrete_set = lambda { |override| ['CourseSection', 'Group'].include?(override.set_type) }
 
-  validates_presence_of :set, :set_id, :if => concrete_set
-  validates_uniqueness_of :set_id, :scope => [:assignment_id, :set_type, :workflow_state],
-                                   :if => lambda { |override| override.assignment? && override.active? && concrete_set.call(override) }
-  validates_uniqueness_of :set_id, :scope => [:quiz_id, :set_type, :workflow_state],
-                                   :if => lambda { |override| override.quiz? && override.active? && concrete_set.call(override) }
+  validates :set, :set_id, presence: { :if => concrete_set }
+  validates :set_id, uniqueness: { :scope => [:assignment_id, :set_type, :workflow_state],
+                                   :if => lambda { |override| override.assignment? && override.active? && concrete_set.call(override) } }
+  validates :set_id, uniqueness: { :scope => [:quiz_id, :set_type, :workflow_state],
+                                   :if => lambda { |override| override.quiz? && override.active? && concrete_set.call(override) } }
 
   before_create :set_root_account_id
 
@@ -274,7 +274,7 @@ class AssignmentOverride < ActiveRecord::Base
       send("#{field}=", nil)
     end
 
-    validates_inclusion_of "#{field}_overridden", :in => [false, true]
+    validates "#{field}_overridden", inclusion: { :in => [false, true] }
     before_validation do |override|
       if override.send("#{field}_overridden").nil?
         override.send("#{field}_overridden=", false)

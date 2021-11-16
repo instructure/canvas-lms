@@ -40,7 +40,7 @@ class EnrollmentState < ActiveRecord::Base
 
   attr_accessor :skip_touch_user, :user_needs_touch, :is_direct_recalculation
 
-  validates_presence_of :enrollment_id
+  validates :enrollment_id, presence: true
 
   resolves_root_account through: :enrollment
 

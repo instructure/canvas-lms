@@ -32,8 +32,8 @@ class AssessmentQuestion < ActiveRecord::Base
   acts_as_list :scope => :assessment_question_bank
   before_validation :infer_defaults
   after_save :translate_links_if_changed
-  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
-  validates_presence_of :workflow_state, :assessment_question_bank_id
+  validates :name, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :workflow_state, :assessment_question_bank_id, presence: true
   resolves_root_account through: :context
 
   ALL_QUESTION_TYPES = ["multiple_answers_question", "fill_in_multiple_blanks_question",

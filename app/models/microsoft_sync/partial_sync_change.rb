@@ -23,8 +23,8 @@ class MicrosoftSync::PartialSyncChange < ApplicationRecord
   belongs_to :course
   belongs_to :user
 
-  validates_presence_of :user, :course, :enrollment_type
-  validates_uniqueness_of :user_id, scope: %i[course_id enrollment_type]
+  validates :user, :course, :enrollment_type, presence: true
+  validates :user_id, uniqueness: { scope: %i[course_id enrollment_type] }
 
   resolves_root_account through: :course
 

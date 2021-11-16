@@ -195,8 +195,8 @@ class ConversationParticipant < ActiveRecord::Base
   before_update :update_unread_count_for_update
   before_destroy :update_unread_count_for_destroy
 
-  validates_presence_of :conversation_id, :user_id, :workflow_state
-  validates_inclusion_of :label, :in => ['starred'], :allow_nil => true
+  validates :conversation_id, :user_id, :workflow_state, presence: true
+  validates :label, inclusion: { :in => ['starred'], :allow_nil => true }
 
   def as_json(options = {})
     latest = last_message

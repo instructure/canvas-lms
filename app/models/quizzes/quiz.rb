@@ -52,11 +52,11 @@ class Quizzes::Quiz < ActiveRecord::Base
   belongs_to :root_account, class_name: 'Account'
   has_many :ignores, :as => :asset
 
-  validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
-  validates_presence_of :context_id
-  validates_presence_of :context_type
-  validates_numericality_of :points_possible, less_than_or_equal_to: 2000000000, allow_nil: true
+  validates :description, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
+  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :context_id, presence: true
+  validates :context_type, presence: true
+  validates :points_possible, numericality: { less_than_or_equal_to: 2000000000, allow_nil: true }
   validate :validate_quiz_type, :if => :quiz_type_changed?
   validate :validate_ip_filter, :if => :ip_filter_changed?
   validate :validate_hide_results, :if => :hide_results_changed?
@@ -228,7 +228,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def valid_ip?(ip)
     require 'ipaddr'
-    ip_filter.split(/,/).any? do |filter|
+    ip_filter.split(",").any? do |filter|
       addr_range = ::IPAddr.new(filter) rescue nil
       addr = ::IPAddr.new(ip) rescue nil
       addr && addr_range && addr_range.include?(addr)
@@ -906,7 +906,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     needs_review = false
     # Allow for floating point rounding error comparing to versions created before BigDecimal was used
-    needs_review = true if [old_version.points_possible, self.points_possible].select(&:present?).count == 1 ||
+    needs_review = true if [old_version.points_possible, self.points_possible].count(&:present?) == 1 ||
                            ((old_version.points_possible || 0) - (self.points_possible || 0)).abs > 0.0001
     needs_review = true if (old_version.quiz_data || []).length != (self.quiz_data || []).length
     unless needs_review
@@ -936,7 +936,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
     require 'ipaddr'
     begin
-      self.ip_filter.split(/,/).each { |filter| ::IPAddr.new(filter) }
+      self.ip_filter.split(",").each { |filter| ::IPAddr.new(filter) }
     rescue
       errors.add(:invalid_ip_filter, t('#quizzes.quiz.errors.invalid_ip_filter', "IP filter is not valid"))
     end

@@ -71,10 +71,8 @@ shared_examples_for "file uploads api" do
     end
 
     unless options[:no_doc_preview]
-      json.merge!({
-                    'canvadoc_session_url' => nil,
-                    'crocodoc_session_url' => nil
-                  })
+      json['canvadoc_session_url'] = nil
+      json['crocodoc_session_url'] = nil
     end
 
     json

@@ -258,7 +258,7 @@ describe 'quizzes question banks' do
 
       @bank.reload
       wait_for_ajaximations
-      expect(@bank.assessment_questions.select { |aq| !aq.deleted? }.length).to eq 59
+      expect(@bank.assessment_questions.count { |aq| !aq.deleted? }).to eq 59
     end
 
     it 'allows editing quiz questions that belong to a quiz bank', priority: "1", test_id: 217531 do

@@ -40,7 +40,7 @@ class CommunicationChannel < ActiveRecord::Base
   before_save :set_root_account_ids
   before_save :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
-  validates_presence_of :path, :path_type, :user, :workflow_state
+  validates :path, :path_type, :user, :workflow_state, presence: true
   validate :under_user_cc_limit, if: -> { new_record? }
   validate :uniqueness_of_path
   validate :validate_email, if: lambda { |cc| cc.path_type == TYPE_EMAIL && cc.new_record? }

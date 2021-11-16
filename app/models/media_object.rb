@@ -30,7 +30,7 @@ class MediaObject < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :root_account, :class_name => 'Account'
 
-  validates_presence_of :media_id, :workflow_state
+  validates :media_id, :workflow_state, presence: true
   has_many :media_tracks, -> { order(:locale) }, dependent: :destroy
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later
@@ -215,7 +215,7 @@ class MediaObject < ActiveRecord::Base
       self.duration = entry[:duration].to_i
       self.data[:plays] = entry[:plays].to_i
       self.data[:download_url] = entry[:downloadUrl]
-      tags = (entry[:tags] || "").split(/,/).map(&:strip)
+      tags = (entry[:tags] || "").split(",").map(&:strip)
       old_id = tags.detect { |t| t.include?('old_id_') }
       self.old_media_id = old_id.sub(/old_id_/, '') if old_id
     end
@@ -319,7 +319,7 @@ class MediaObject < ActiveRecord::Base
                                   })
 
     url = self.data.dig(:download_url)
-    url = sources.select { |s| s[:isOriginal] == '1' }.first&.dig(:url) if url.blank?
+    url = sources.find { |s| s[:isOriginal] == '1' }&.dig(:url) if url.blank?
     url = sources.sort_by { |a| a[:bitrate].to_i }.first&.dig(:url) if url.blank?
 
     attachment.clone_url(url, :rename, false) # no check_quota because the bits are in kaltura

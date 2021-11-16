@@ -55,8 +55,8 @@ class DiscussionEntry < ActiveRecord::Base
   after_create :create_participants
   after_create :clear_planner_cache_for_participants
   after_create :update_topic
-  validates_length_of :message, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_presence_of :discussion_topic_id
+  validates :message, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
+  validates :discussion_topic_id, presence: true
   before_validation :set_depth, :on => :create
   validate :validate_depth, on: :create
   validate :discussion_not_deleted, on: :create

@@ -168,14 +168,12 @@ class UsageRightsController < ApplicationController
     file_ids = folders.flat_map { |folder| enumerate_contents(folder) }
     file_ids += @context.attachments.not_deleted.where(id: Array(params[:file_ids]).map(&:to_i)).pluck(:id)
     update_attrs = { usage_rights_id: usage_rights&.id }
-    update_attrs.merge!(locked: false) if usage_rights.present? && value_to_boolean(params[:publish])
+    update_attrs[:locked] = false if usage_rights.present? && value_to_boolean(params[:publish])
 
     count = @context.attachments.not_deleted.where(id: file_ids).update_all(update_attrs)
     result = usage_rights ? usage_rights_json(usage_rights, @current_user) : {}
-    result.merge!({
-                    message: I18n.t({ one: "1 file updated", other: "%{count} files updated" }, count: count),
-                    file_ids: file_ids
-                  })
+    result[:message] = I18n.t({ one: "1 file updated", other: "%{count} files updated" }, count: count)
+    result[:file_ids] = file_ids
     render json: result
   end
 end

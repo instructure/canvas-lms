@@ -414,8 +414,8 @@ class Attachment < ActiveRecord::Base
   after_create :flag_as_recently_created
   attr_accessor :recently_created
 
-  validates_presence_of :context_id, :context_type, :workflow_state
-  validates_length_of :content_type, :maximum => maximum_string_length, :allow_blank => true
+  validates :context_id, :context_type, :workflow_state, presence: true
+  validates :content_type, length: { :maximum => maximum_string_length, :allow_blank => true }
 
   # related_attachments: our root attachment, anyone who shares our root attachment,
   # and anyone who calls us a root attachment
@@ -1821,7 +1821,7 @@ class Attachment < ActiveRecord::Base
 
   def matches_full_path?(path)
     f_path = full_path
-    f_path == path || URI.unescape(f_path) == path || f_path.downcase == path.downcase || URI.unescape(f_path).downcase == path.downcase
+    f_path == path || URI.unescape(f_path) == path || f_path.casecmp?(path) || URI.unescape(f_path).casecmp?(path)
   rescue
     false
   end
@@ -1832,7 +1832,7 @@ class Attachment < ActiveRecord::Base
 
   def matches_full_display_path?(path)
     fd_path = full_display_path
-    fd_path == path || URI.unescape(fd_path) == path || fd_path.downcase == path.downcase || URI.unescape(fd_path).downcase == path.downcase
+    fd_path == path || URI.unescape(fd_path) == path || fd_path.casecmp?(path) || URI.unescape(fd_path).casecmp?(path)
   rescue
     false
   end
@@ -1840,7 +1840,7 @@ class Attachment < ActiveRecord::Base
   def self.matches_name?(name, match)
     return false unless name
 
-    name == match || URI.unescape(name) == match || name.downcase == match.downcase || URI.unescape(name).downcase == match.downcase
+    name == match || URI.unescape(name) == match || name.casecmp?(match) || URI.unescape(name).casecmp?(match)
   rescue
     false
   end

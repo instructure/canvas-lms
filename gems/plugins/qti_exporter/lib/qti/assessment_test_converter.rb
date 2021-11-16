@@ -132,7 +132,7 @@ module Qti
             @quiz[:allowed_attempts] = max >= 1 ? max : -1
           end
           if (show = control['showSolution'])
-            @quiz[:show_correct_answers] = show.downcase == "true"
+            @quiz[:show_correct_answers] = show.casecmp?("true")
           end
         end
 

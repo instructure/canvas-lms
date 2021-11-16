@@ -164,7 +164,7 @@ module SpeedGrader
       }
 
       if assignment.quiz
-        if assignment.quiz.assignment_overrides.to_a.select(&:active?).count == 0
+        if assignment.quiz.assignment_overrides.to_a.count(&:active?) == 0
           assignment.quiz.has_no_overrides = true
         else
           assignment.quiz.context.preload_user_roles!

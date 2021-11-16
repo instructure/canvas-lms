@@ -226,7 +226,7 @@ describe 'CommunicationChannels API', type: :request do
 
       context 'not configured push' do
         it 'complains about sns not being configured' do
-          @post_params.merge!(communication_channel: { token: 'registration_token', type: 'push' })
+          @post_params[:communication_channel] = { token: 'registration_token', type: 'push' }
           raw_api_call(:post, @path, @path_options, @post_params)
 
           expect(response.code).to eql '400'

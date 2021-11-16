@@ -96,7 +96,7 @@ describe UserObserveesController, type: :request do
     end
 
     if opts[:avatars]
-      params.merge!(include: ["avatar_url"])
+      params[:include] = ["avatar_url"]
     end
     api_call_as_user(
       opts[:api_user] || allowed_admin,

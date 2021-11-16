@@ -48,16 +48,16 @@ class AppointmentGroup < ActiveRecord::Base
     appointment_group_sub_contexts.map(&:sub_context)
   end
 
-  validates_presence_of :workflow_state
+  validates :workflow_state, presence: true
   before_validation :default_values
   before_validation :update_contexts_and_sub_contexts
   before_save :update_cached_values
   after_save :update_appointments
 
-  validates_length_of :title, :maximum => maximum_string_length
-  validates_length_of :location_name, :maximum => maximum_string_length
-  validates_length_of :description, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
-  validates_inclusion_of :participant_visibility, :in => ['private', 'protected'] # presumably we might add public if we decide to show appointments on the public calendar feed
+  validates :title, length: { :maximum => maximum_string_length }
+  validates :location_name, length: { :maximum => maximum_string_length }
+  validates :description, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
+  validates :participant_visibility, inclusion: { :in => ['private', 'protected'] } # presumably we might add public if we decide to show appointments on the public calendar feed
   validates_each :appointments do |record, attr, value|
     next unless record.new_appointments.present? || record.validation_event_override
 

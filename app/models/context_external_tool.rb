@@ -34,12 +34,12 @@ class ContextExternalTool < ActiveRecord::Base
   restrict_columns :content, [:name, :description]
   restrict_columns :settings, [:consumer_key, :shared_secret, :url, :domain, :settings]
 
-  validates_presence_of :context_id, :context_type, :workflow_state
-  validates_presence_of :name, :consumer_key, :shared_secret
-  validates_length_of :name, :maximum => maximum_string_length
-  validates_presence_of :config_url, :if => lambda { |t| t.config_type == "by_url" }
-  validates_presence_of :config_xml, :if => lambda { |t| t.config_type == "by_xml" }
-  validates_length_of :domain, :maximum => 253, :allow_blank => true
+  validates :context_id, :context_type, :workflow_state, presence: true
+  validates :name, :consumer_key, :shared_secret, presence: true
+  validates :name, length: { :maximum => maximum_string_length }
+  validates :config_url, presence: { :if => lambda { |t| t.config_type == "by_url" } }
+  validates :config_xml, presence: { :if => lambda { |t| t.config_type == "by_xml" } }
+  validates :domain, length: { :maximum => 253, :allow_blank => true }
   validate :url_or_domain_is_set
   validate :validate_urls
   serialize :settings
@@ -561,7 +561,7 @@ class ContextExternalTool < ActiveRecord::Base
     return {} if str.nil?
 
     str.split(/[\r\n]+/).each_with_object({}) do |line, hash|
-      key, val = line.split(/=/)
+      key, val = line.split("=")
       hash[key] = val if key.present? && val.present?
     end
   end
@@ -725,7 +725,7 @@ class ContextExternalTool < ActiveRecord::Base
     url = url.gsub(/[[:space:]]/, '')
     url = "http://" + url unless url.include?('://')
     res = Addressable::URI.parse(url).normalize
-    res.query = res.query.split(/&/).sort.join('&') unless res.query.blank?
+    res.query = res.query.split("&").sort.join('&') unless res.query.blank?
     res.to_s
   end
 
@@ -747,7 +747,7 @@ class ContextExternalTool < ActiveRecord::Base
     if domain
       # Somebody tell me if we should be expecting more than
       # 25 dots in a url host...
-      25 - domain.split(/\./).length
+      25 - domain.split(".").length
     elsif url
       25
     else
@@ -787,10 +787,10 @@ class ContextExternalTool < ActiveRecord::Base
     elsif standard_url.present?
       unless defined?(@url_params)
         res = Addressable::URI.parse(standard_url)
-        @url_params = res.query.present? ? res.query.split(/&/) : []
+        @url_params = res.query.present? ? res.query.split("&") : []
       end
       res = Addressable::URI.parse(url).normalize
-      res.query = res.query.split(/&/).select { |p| @url_params.include?(p) }.sort.join('&') if res.query.present?
+      res.query = res.query.split("&").select { |p| @url_params.include?(p) }.sort.join('&') if res.query.present?
       res.query = nil if res.query.blank?
       res.normalize!
       return true if res.to_s == standard_url
@@ -811,7 +811,7 @@ class ContextExternalTool < ActiveRecord::Base
     url = ContextExternalTool.standardize_url(url)
     host = Addressable::URI.parse(url).host
     if domain
-      domain.downcase == host.downcase
+      domain.casecmp?(host)
     elsif standard_url
       Addressable::URI.parse(standard_url).host == host
     else

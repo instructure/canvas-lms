@@ -26,8 +26,8 @@ class UsageRights < ActiveRecord::Base
   belongs_to :context, polymorphic: [:course, :group, :user]
 
   before_validation :infer_license
-  validates_inclusion_of :use_justification, in: USE_JUSTIFICATIONS
-  validates_inclusion_of :license, in: licenses.keys, allow_nil: true
+  validates :use_justification, inclusion: { in: USE_JUSTIFICATIONS }
+  validates :license, inclusion: { in: licenses.keys, allow_nil: true }
 
   def infer_license
     if license.blank?

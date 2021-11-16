@@ -230,7 +230,7 @@ module Api::V1::Assignment
         'external_data' => external_tool_tag.external_data
       }
       tool_attributes.merge!(external_tool_tag.attributes.slice('content_type', 'content_id')) if external_tool_tag.content_id
-      tool_attributes.merge!('custom_params' => assignment.primary_resource_link&.custom)
+      tool_attributes['custom_params'] = assignment.primary_resource_link&.custom
       hash['external_tool_tag_attributes'] = tool_attributes
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',
@@ -325,7 +325,7 @@ module Api::V1::Assignment
 
     if opts[:include_all_dates] && assignment.assignment_overrides
       override_count = assignment.assignment_overrides.loaded? ?
-        assignment.assignment_overrides.select(&:active?).count : assignment.assignment_overrides.active.count
+        assignment.assignment_overrides.count(&:active?) : assignment.assignment_overrides.active.count
       if override_count < Setting.get('assignment_all_dates_too_many_threshold', '25').to_i
         hash['all_dates'] = assignment.dates_hash_visible_to(user)
       else

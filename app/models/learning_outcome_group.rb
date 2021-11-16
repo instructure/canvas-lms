@@ -36,9 +36,9 @@ class LearningOutcomeGroup < ActiveRecord::Base
   before_save :infer_defaults
   resolves_root_account through: ->(group) { group.context_id ? group.context.resolved_root_account_id : 0 }
   validates :vendor_guid, length: { maximum: maximum_string_length, allow_nil: true }
-  validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
-  validates_presence_of :title, :workflow_state
+  validates :description, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
+  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true }
+  validates :title, :workflow_state, presence: true
   sanitize_field :description, CanvasSanitize::SANITIZE
 
   attr_accessor :building_default

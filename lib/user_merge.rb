@@ -318,7 +318,7 @@ class UserMerge
 
   def detect_conflicting_cc(source_cc)
     target_user.communication_channels.detect do |c|
-      c.path.downcase == source_cc.path.downcase && c.path_type == source_cc.path_type
+      c.path.casecmp?(source_cc.path) && c.path_type == source_cc.path_type
     end
   end
 

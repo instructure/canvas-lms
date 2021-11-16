@@ -588,7 +588,7 @@ class UsersController < ApplicationController
     published, unpublished = dashboard_courses.partition { |course| course[:published] }
     Rails.cache.write(['last_known_dashboard_cards_published_count', @current_user.global_id].cache_key, published.count)
     Rails.cache.write(['last_known_dashboard_cards_unpublished_count', @current_user.global_id].cache_key, unpublished.count)
-    Rails.cache.write(['last_known_k5_cards_count', @current_user.global_id].cache_key, dashboard_courses.reject { |c| c[:isHomeroom] }.count)
+    Rails.cache.write(['last_known_k5_cards_count', @current_user.global_id].cache_key, dashboard_courses.count { |c| !c[:isHomeroom] })
     render json: dashboard_courses
   end
 

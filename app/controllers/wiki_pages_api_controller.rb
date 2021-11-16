@@ -625,8 +625,8 @@ class WikiPagesApiController < ApplicationController
 
       if editing_roles
         existing_editing_roles = (@page.editing_roles || '').split(',')
-        editing_roles_changed = existing_editing_roles.reject { |role| editing_roles.include?(role) }.length > 0
-        editing_roles_changed |= editing_roles.reject { |role| existing_editing_roles.include?(role) }.length > 0
+        editing_roles_changed = existing_editing_roles.count { |role| editing_roles.exclude?(role) } > 0
+        editing_roles_changed |= editing_roles.count { |role| existing_editing_roles.exclude?(role) } > 0
         rejected_fields << :editing_roles if editing_roles_changed
       end
 

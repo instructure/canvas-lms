@@ -392,12 +392,12 @@ class User < ActiveRecord::Base
                 :self_enrollment_course, :validation_root_account, :sortable_name_explicitly_set
   attr_reader :self_enrollment
 
-  validates_length_of :name, :maximum => maximum_string_length, :allow_nil => true
-  validates_length_of :short_name, :maximum => maximum_string_length, :allow_nil => true
-  validates_length_of :sortable_name, :maximum => maximum_string_length, :allow_nil => true
-  validates_presence_of :name, :if => :require_presence_of_name
+  validates :name, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :short_name, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :sortable_name, length: { :maximum => maximum_string_length, :allow_nil => true }
+  validates :name, presence: { :if => :require_presence_of_name }
   validates_locale :locale, :browser_locale, :allow_nil => true
-  validates_acceptance_of :terms_of_use, :if => :require_acceptance_of_terms, :allow_nil => false
+  validates :terms_of_use, acceptance: { :if => :require_acceptance_of_terms, :allow_nil => false }
   validates_each :self_enrollment_code do |record, attr, value|
     next unless record.require_self_enrollment_code
 
@@ -1165,7 +1165,7 @@ class User < ActiveRecord::Base
   end
 
   def used_feature(feature)
-    self.update_attribute(:features_used, ((self.features_used || "").split(/,/).map(&:to_s) + [feature.to_s]).uniq.join(','))
+    self.update_attribute(:features_used, ((self.features_used || "").split(",").map(&:to_s) + [feature.to_s]).uniq.join(','))
   end
 
   def used_feature?(feature)
@@ -1428,7 +1428,7 @@ class User < ActiveRecord::Base
     # will just nil the user's avatar).
     return unless val.is_a?(Hash)
 
-    external_avatar_url_patterns = Setting.get('avatar_external_url_patterns', '^https://[a-zA-Z0-9.-]+\.instructure\.com/').split(/,/).map { |re| Regexp.new re }
+    external_avatar_url_patterns = Setting.get('avatar_external_url_patterns', '^https://[a-zA-Z0-9.-]+\.instructure\.com/').split(",").map { |re| Regexp.new re }
 
     if val['url']&.match?(GRAVATAR_PATTERN)
       self.avatar_image_source = 'gravatar'
@@ -1544,7 +1544,7 @@ class User < ActiveRecord::Base
         uri.host = request.host
         uri.port = request.port unless [80, 443].include?(request.port)
       elsif !uri.host
-        uri.host, port = HostUrl.default_host.split(/:/)
+        uri.host, port = HostUrl.default_host.split(":")
         uri.port = Integer(port) if port
       end
       uri.to_s

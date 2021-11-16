@@ -31,15 +31,15 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   GRACEFUL_FINISHED_AT_DRIFT_PERIOD = 5.minutes
 
-  validates_presence_of :quiz_id
-  validates_numericality_of :extra_time, greater_than_or_equal_to: 0,
+  validates :quiz_id, presence: true
+  validates :extra_time, numericality: { greater_than_or_equal_to: 0,
                                          less_than_or_equal_to: 10080, # one week
-                                         allow_nil: true
-  validates_numericality_of :extra_attempts, greater_than_or_equal_to: 0,
+                                         allow_nil: true }
+  validates :extra_attempts, numericality: { greater_than_or_equal_to: 0,
                                              less_than_or_equal_to: 1000,
-                                             allow_nil: true
-  validates_numericality_of :quiz_points_possible, less_than_or_equal_to: 2000000000,
-                                                   allow_nil: true
+                                             allow_nil: true }
+  validates :quiz_points_possible, numericality: { less_than_or_equal_to: 2000000000,
+                                                   allow_nil: true }
 
   before_validation :update_quiz_points_possible
   before_validation :rectify_finished_at_drift, :if => :end_at?

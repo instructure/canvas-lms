@@ -33,10 +33,10 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   before_validation :default_values
   before_validation :clean_up_assignment_if_override_student_orphaned
 
-  validates_presence_of :assignment_override, :user
-  validates_uniqueness_of :user_id, scope: [:assignment_id, :quiz_id],
+  validates :assignment_override, :user, presence: true
+  validates :user_id, uniqueness: { scope: [:assignment_id, :quiz_id],
                                     conditions: -> { where.not(workflow_state: 'deleted') },
-                                    message: 'already belongs to an assignment override'
+                                    message: 'already belongs to an assignment override' }
 
   validate :assignment_override, if: :active? do |record|
     if record.assignment_override && record.assignment_override.set_type != 'ADHOC'

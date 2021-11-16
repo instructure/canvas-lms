@@ -23,7 +23,7 @@ module LiveAssessments
     belongs_to :user
     belongs_to :assessment, class_name: 'LiveAssessments::Assessment'
 
-    validates_presence_of :user, :assessment
+    validates :user, :assessment, presence: true
 
     def create_outcome_result(alignment)
       # we don't delete results right now

@@ -139,7 +139,7 @@ class Notification < Switchman::UnshardedRecord
 
   scope :to_show_in_feed, -> { where("messages.category='TestImmediately' OR messages.notification_name IN (?)", TYPES_TO_SHOW_IN_FEED) }
 
-  validates_uniqueness_of :name
+  validates :name, uniqueness: true
 
   after_create { self.class.reset_cache! }
 
