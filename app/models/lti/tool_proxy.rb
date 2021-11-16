@@ -31,7 +31,7 @@ module Lti
     after_save :manage_subscription
     before_destroy :delete_subscription
 
-    scope :active, -> { where("lti_tool_proxies.workflow_state = ?", 'active') }
+    scope :active, -> { where(lti_tool_proxies: { workflow_state: 'active' }) }
 
     serialize :raw_data
     serialize :update_payload
@@ -51,7 +51,7 @@ module Lti
     end
 
     def self.find_active_proxies_for_context(context)
-      find_all_proxies_for_context(context).where('lti_tool_proxies.workflow_state = ?', 'active')
+      find_all_proxies_for_context(context).where(lti_tool_proxies: { workflow_state: 'active' })
     end
 
     def self.find_installed_proxies_for_context(context)
@@ -94,9 +94,9 @@ module Lti
               # changed the order to go from the special ordering set up (to make sure we're going from the course to the
               # root account in order of parent accounts) and then takes the most recently installed tool
               order('ordering, lti_tool_proxies.id DESC')
-                  .where('lti_tool_proxies.workflow_state = ?', 'active')
+                  .where(lti_tool_proxies: { workflow_state: 'active' })
                   .where('lti_product_families.vendor_code = ? AND lti_product_families.product_code = ?', vendor_code, product_code)
-                  .where('lti_resource_handlers.resource_type_code = ?', resource_type_code)
+                  .where(lti_resource_handlers: { resource_type_code: resource_type_code })
       # You can disable a tool_binding somewhere in the account chain, and anything below that that reenables it should be
       # available, but nothing above it, so we're getting rid of anything that is disabled and above
       tools.split { |tool| !tool.binding_enabled }.first

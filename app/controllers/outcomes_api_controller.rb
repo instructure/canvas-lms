@@ -326,7 +326,7 @@ class OutcomesApiController < ApplicationController
                 .select(:title, :id, :assignment_id).preload(:quiz_questions)
                 .joins(assignment: :submissions)
                 .where(context: course)
-                .where("submissions.user_id = ?", student_id)
+                .where(submissions: { user_id: student_id })
                 .where("submissions.workflow_state <> 'deleted'")
       quiz_alignments = quizzes.map do |quiz|
         bank_ids = quiz.quiz_questions.filter_map { |qq| qq.assessment_question.try(:assessment_question_bank_id) }.uniq

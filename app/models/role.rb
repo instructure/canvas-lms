@@ -248,7 +248,7 @@ class Role < ActiveRecord::Base
   def self.custom_roles_and_counts_for_course(course, user, include_inactive = false)
     users_scope = course.users_visible_to(user)
     built_in_role_ids = Role.built_in_course_roles(root_account_id: course.root_account_id).map(&:id)
-    base_counts = users_scope.where('enrollments.role_id IN (?)', built_in_role_ids)
+    base_counts = users_scope.where(enrollments: { role_id: built_in_role_ids })
                              .group('enrollments.type').select('users.id').distinct.count
     role_counts = users_scope.where('enrollments.role_id NOT IN (?)', built_in_role_ids)
                              .group('enrollments.role_id').select('users.id').distinct.count

@@ -1515,7 +1515,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # returns visible students for differentiated assignments
   def visible_students_with_da(context_students)
     quiz_students = context_students.joins(:quiz_student_visibilities)
-                                    .where('quiz_id = ?', self.id)
+                                    .where(quiz_student_visibilities: { quiz_id: id })
 
     # empty quiz_students means the quiz is for everyone
     return quiz_students if quiz_students.present?

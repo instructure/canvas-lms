@@ -181,7 +181,7 @@ module Api::V1::StreamItem
         if full_counts.keys.any? { |k| k[0] == 'DiscussionTopic' }
           ann_counts = base_scope.where(:stream_items => { :asset_type => "DiscussionTopic" })
                                  .joins("INNER JOIN #{DiscussionTopic.quoted_table_name} ON discussion_topics.id=stream_items.asset_id")
-                                 .where("discussion_topics.type = ?", "Announcement").except(:order).group('stream_item_instances.workflow_state').count
+                                 .where(discussion_topics: { type: "Announcement" }).except(:order).group('stream_item_instances.workflow_state').count
 
           ann_counts.each do |wf_state, ann_count|
             full_counts[['Announcement', nil, wf_state]] = ann_count
@@ -241,7 +241,7 @@ module Api::V1::StreamItem
       if total_counts.keys.any? { |k| k[0] == 'DiscussionTopic' }
         ann_scope = StreamItem.where(:stream_items => { :asset_type => "DiscussionTopic" })
                               .joins(:discussion_topic)
-                              .where("discussion_topics.type = ?", "Announcement")
+                              .where(discussion_topics: { type: "Announcement" })
         ann_total = ann_scope.where(:id => stream_item_ids).count
 
         if ann_total > 0

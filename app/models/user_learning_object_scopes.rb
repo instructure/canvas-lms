@@ -372,7 +372,7 @@ module UserLearningObjectScopes
       scope = assignment_scope.active
                               .expecting_submission
                               .where(final_grader: self, moderated_grading: true)
-                              .where("assignments.grades_published_at IS NULL")
+                              .where(assignments: { grades_published_at: nil })
                               .where(id: ModeratedGrading::ProvisionalGrade.joins(:submission)
           .where("submissions.assignment_id=assignments.id")
           .where(Submission.needs_grading_conditions).distinct.select(:assignment_id))

@@ -70,7 +70,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
           ON mappings.user_id=enrollments.user_id
           AND mappings.root_account_id=#{course.root_account_id.to_i}
         })
-        .where('mappings.id IS NULL')
+        .where(mappings: { id: nil })
         .select(:user_id).distinct.limit(MAX_ENROLLMENT_MEMBERS)
         .pluck(:user_id)
     end

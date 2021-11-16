@@ -1637,7 +1637,7 @@ class User < ActiveRecord::Base
     if preferences[:course_nicknames] == UserPreferenceValue::EXTERNAL
       self.shard.activate do
         scope = user_preference_values.where(:key => :course_nicknames)
-        scope = scope.where("sub_key IN (?)", courses.map(&:id).map(&:to_json)) if courses
+        scope = scope.where(sub_key: courses) if courses
         Hash[scope.pluck(:sub_key, :value)]
       end
     else
@@ -1884,7 +1884,7 @@ class User < ActiveRecord::Base
           end
 
           unless options[:include_completed_courses]
-            scope = scope.joins(:all_enrollments => :enrollment_state).where("enrollment_states.restricted_access = ?", false)
+            scope = scope.joins(:all_enrollments => :enrollment_state).where(enrollment_states: { restricted_access: false })
                          .where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')")
           end
 
