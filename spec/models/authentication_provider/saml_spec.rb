@@ -176,7 +176,7 @@ describe AuthenticationProvider::SAML do
     end
 
     it "interprets relative paths from the config dir" do
-      expect(AuthenticationProvider::SAML.resolve_saml_key_path('initializers')).to eq Rails.root.join('config', 'initializers').to_s
+      expect(AuthenticationProvider::SAML.resolve_saml_key_path('initializers')).to eq Rails.root.join('config/initializers').to_s
     end
   end
 

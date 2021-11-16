@@ -110,8 +110,8 @@ describe BigBlueButtonConference do
   end
 
   describe 'plugin setting recording_enabled is enabled' do
-    let(:get_recordings_fixture) { File.read(Rails.root.join('spec', 'fixtures', 'files', 'conferences', 'big_blue_button_get_recordings_two.json')) }
-    let(:get_recordings_bulk_fixture) { File.read(Rails.root.join('spec', 'fixtures', 'files', 'conferences', 'big_blue_button_get_recordings_bulk.json')) }
+    let(:get_recordings_fixture) { Rails.root.join('spec/fixtures/files/conferences/big_blue_button_get_recordings_two.json').read }
+    let(:get_recordings_bulk_fixture) { Rails.root.join('spec/fixtures/files/conferences/big_blue_button_get_recordings_bulk.json').read }
 
     before do
       allow(WebConference).to receive(:plugins).and_return([

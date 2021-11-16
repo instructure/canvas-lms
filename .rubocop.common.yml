@@ -120,6 +120,8 @@ Rails/DynamicFindBy:
     - find_by_pseudonym_credentials # SessionPersistenceToken
     - find_by_quiz # Quizzes::OutstandingQuizSubmissionManager
   Severity: error
+Rails/FilePath:
+  Severity: error
 Rails/HasManyOrHasOneDependent:
   Enabled: false # legacy code + most things we soft delete anyway
 Rails/HelperInstanceVariable:

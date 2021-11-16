@@ -1680,7 +1680,7 @@ class ApplicationController < ActionController::Base
       template = exception.error_template if exception.respond_to?(:error_template)
       unless template
         template = "shared/errors/#{status.to_s[0, 3]}_message"
-        erbpath = Rails.root.join('app', 'views', "#{template}.html.erb")
+        erbpath = Rails.root.join("app/views/#{template}.html.erb")
         template = "shared/errors/500_message" unless erbpath.file?
       end
 

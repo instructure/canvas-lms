@@ -39,7 +39,7 @@ module Lti
         {
           lti_message_type: 'ContentItemSelection',
           lti_version: 'LTI-1p0',
-          content_items: File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'content_items.json')),
+          content_items: Rails.root.join('spec/fixtures/lti/content_items.json').read,
           data: Canvas::Security.create_jwt({ content_item_id: "3" }),
           lti_msg: '',
           lti_log: '',

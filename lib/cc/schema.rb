@@ -25,7 +25,7 @@ module CC
     def self.for_version(version)
       return nil unless whitelist.include?(version)
 
-      Rails.root + "#{XSD_DIRECTORY}/#{version}.xsd"
+      Rails.root.join("#{XSD_DIRECTORY}/#{version}.xsd")
     end
 
     def self.whitelist

@@ -1535,7 +1535,7 @@ module MigratorCache
   end
 
   def migrations_paths
-    @@migrations_paths ||= [File.join(Rails.root, "db/migrate")]
+    @@migrations_paths ||= [Rails.root.join("db/migrate")]
   end
 end
 ActiveRecord::Migrator.singleton_class.prepend(MigratorCache)
@@ -1577,7 +1577,7 @@ module Migrator
 end
 ActiveRecord::Migrator.prepend(Migrator)
 
-ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems', 'plugins', '*', 'db', 'migrate')]
+ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems/plugins/*/db/migrate')]
 
 ActiveRecord::Tasks::DatabaseTasks.migrations_paths = ActiveRecord::Migrator.migrations_paths
 

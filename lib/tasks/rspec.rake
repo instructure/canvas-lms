@@ -110,21 +110,21 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
     [:models, :services, :controllers, :views, :helpers, :lib, :selenium].each do |sub|
       desc "Run the code examples in spec/#{sub}"
       klass.new(sub) do |t|
-        t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
+        t.spec_opts = ['--options', Shellwords.escape(Rails.root.join("spec/spec.opts"))]
         t.send(spec_files_attr, FileList["spec/#{sub}/**/*_spec.rb"])
       end
     end
 
     desc "Run the code examples in {gems,vendor}/plugins (except RSpec's own)"
     klass.new(:coverage) do |t|
-      t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
+      t.spec_opts = ['--options', Shellwords.escape(Rails.root.join("spec/spec.opts"))]
       t.send(spec_files_attr, FileList['{gems,vendor}/plugins/*/spec_canvas/**/*_spec.rb'].exclude(%r'spec_canvas/selenium') + FileList['spec/**/*_spec.rb'].exclude(%r'spec/selenium'))
     end
 
     namespace :plugins do
       desc "Runs the examples for rspec_on_rails"
       klass.new(:rspec_on_rails) do |t|
-        t.spec_opts = ['--options', "\"#{Rails.root}/spec/spec.opts\""]
+        t.spec_opts = ['--options', Shellwords.escape(Rails.root.join("spec/spec.opts"))]
         t.send(spec_files_attr, FileList['vendor/plugins/rspec-rails/spec/**/*/*_spec.rb'])
       end
     end
@@ -153,11 +153,11 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
         desc "Load fixtures (from spec/fixtures) into the current environment's database.  Load specific fixtures using FIXTURES=x,y. Load from subdirectory in test/fixtures using FIXTURES_DIR=z."
         task :load => :environment do
           ActiveRecord::Base.establish_connection(Rails.env)
-          base_dir = File.join(Rails.root, 'spec', 'fixtures')
-          fixtures_dir = ENV['FIXTURES_DIR'] ? File.join(base_dir, ENV['FIXTURES_DIR']) : base_dir
+          base_dir = Rails.root.join('spec,fixtures')
+          fixtures_dir = ENV['FIXTURES_DIR'] ? base_dir.join(ENV['FIXTURES_DIR']) : base_dir
 
           require 'active_record/fixtures'
-          (ENV['FIXTURES'] ? ENV['FIXTURES'].split(",").map { |f| File.join(fixtures_dir, f) } : Dir.glob(File.join(fixtures_dir, '*.{yml,csv}'))).each do |fixture_file|
+          (ENV['FIXTURES'] ? ENV['FIXTURES'].split(",").map { |f| fixtures_dir.join(f) } : Dir.glob(fixtures_dir.join('*.{yml,csv}'))).each do |fixture_file|
             Fixtures.create_fixtures(File.dirname(fixture_file), File.basename(fixture_file, '.*'))
           end
         end
@@ -165,7 +165,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
     end
 
     namespace :server do
-      daemonized_server_pid = File.expand_path("#{Rails.root}/tmp/pids/spec_server.pid")
+      daemonized_server_pid = Rails.root.join("tmp/pids/spec_server.pid").expand_path
 
       desc "start spec_server."
       task :start do
