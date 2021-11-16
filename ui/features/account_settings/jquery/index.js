@@ -60,16 +60,21 @@ export function addUsersLink(event) {
 }
 
 $(document).ready(function () {
+  const settingsTabs = document
+    .getElementById('account_settings_tabs')
+    ?.querySelectorAll('ul>li>a[id^="tab"]')
   // find the index of tab whose id matches the URL's hash
   const initialTab =
     ENV.FEATURES && ENV.FEATURES.remember_settings_tab
-      ? Array.from(
-          document
-            .getElementById('account_settings_tabs')
-            ?.querySelectorAll('ul>li>a[id^="tab"]') || []
-        ).findIndex(t => `#${t.id}` === `${window.location.hash}-link`)
+      ? Array.from(settingsTabs || []).findIndex(t => `#${t.id}` === `${window.location.hash}-link`)
       : -1
 
+  if (ENV.FEATURES && ENV.FEATURES.remember_settings_tab && !window.location.hash) {
+    // Sync the location hash with window.history, this fixes some issues with the browser back
+    // button when going back to or from the settings tab
+    const defaultTab = settingsTabs[0]?.href
+    window.history.replaceState(null, null, defaultTab)
+  }
   function checkFutureListingSetting() {
     if ($('#account_settings_restrict_student_future_view_value').is(':checked')) {
       $('.future_listing').show()
@@ -151,7 +156,10 @@ $(document).ready(function () {
     $('#account_settings_tabs').on('tabsactivate', (event, ui) => {
       try {
         const hash = new URL(ui.newTab.context.href).hash
-        window.location.hash = hash
+        if (window.location.hash !== hash) {
+          window.history.pushState(null, null, hash)
+        }
+        ui.newTab.focus(0)
       } catch (_ignore) {
         // get here if `new URL` throws, but it shouldn't, and
         // there's really nothing we need to do about it

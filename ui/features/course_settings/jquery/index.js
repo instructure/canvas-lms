@@ -168,15 +168,25 @@ $(document).ready(function () {
     $tabBar = $('#course_details_tabs')
 
   if (ENV.FEATURES && ENV.FEATURES.remember_settings_tab) {
+    const settingsTabs = $tabBar[0].querySelectorAll('ul>li>a[href*="#tab"]')
     // find the index of the tab whose href matches the URL's hash
-    const initialTab = Array.from(
-      $tabBar[0].querySelectorAll('ul>li>a[href*="#tab"]') || []
-    ).findIndex(t => `#${t.id}` === `${window.location.hash}-link`)
+    const initialTab = Array.from(settingsTabs || []).findIndex(
+      t => `#${t.id}` === `${window.location.hash}-link`
+    )
+    // Sync the location hash with window.history, this fixes some issues with the browser back
+    // button when going back to or from the details tab
+    if (!window.location.hash) {
+      const defaultTab = settingsTabs[0]?.href
+      window.history.replaceState(null, null, defaultTab)
+    }
     $tabBar
       .on('tabsactivate', (event, ui) => {
         try {
           const hash = new URL(ui.newTab.context.href).hash
-          window.location.hash = hash
+          if (window.location.hash !== hash) {
+            window.history.pushState(null, null, hash)
+          }
+          ui.newTab.focus(0)
         } catch (_ignore) {
           // if the URL can't be parsed, so be it.
         }
