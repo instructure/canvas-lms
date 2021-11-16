@@ -1599,16 +1599,14 @@ class User < ActiveRecord::Base
     colors_hash = get_preference(:custom_colors) || {}
     if Shard.current != self.shard
       # translate asset strings to be relative to current shard
-      colors_hash = Hash[
-        colors_hash.filter_map do |asset_string, value|
-          opts = asset_string.split("_")
-          id_relative_to_user_shard = opts.pop.to_i
-          next if id_relative_to_user_shard > Shard::IDS_PER_SHARD && Shard.shard_for(id_relative_to_user_shard) == self.shard # this is old data and should be ignored
+      colors_hash = colors_hash.filter_map do |asset_string, value|
+        opts = asset_string.split("_")
+        id_relative_to_user_shard = opts.pop.to_i
+        next if id_relative_to_user_shard > Shard::IDS_PER_SHARD && Shard.shard_for(id_relative_to_user_shard) == self.shard # this is old data and should be ignored
 
-          new_id = Shard.relative_id_for(id_relative_to_user_shard, self.shard, Shard.current)
-          ["#{opts.join('_')}_#{new_id}", value]
-        end
-      ]
+        new_id = Shard.relative_id_for(id_relative_to_user_shard, self.shard, Shard.current)
+        ["#{opts.join('_')}_#{new_id}", value]
+      end.to_h
     end
     colors_hash
   end
@@ -1638,7 +1636,7 @@ class User < ActiveRecord::Base
       self.shard.activate do
         scope = user_preference_values.where(:key => :course_nicknames)
         scope = scope.where(sub_key: courses) if courses
-        Hash[scope.pluck(:sub_key, :value)]
+        scope.pluck(:sub_key, :value).to_h
       end
     else
       preferences[:course_nicknames] || {}

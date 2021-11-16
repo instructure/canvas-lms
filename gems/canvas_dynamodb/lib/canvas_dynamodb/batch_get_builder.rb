@@ -32,7 +32,7 @@ module CanvasDynamoDB
     end
 
     def request_items(tables)
-      Hash[tables.map { |k, v| [k, { keys: v }] }]
+      tables.map { |k, v| [k, { keys: v }] }.to_h
     end
 
     def execute

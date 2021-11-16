@@ -2438,7 +2438,7 @@ class Assignment < ActiveRecord::Base
     user_ids_who_arent_excused = submissions.reject(&:excused?).map(&:user_id).to_set
 
     enrollment_state =
-      Hash[self.context.all_accepted_student_enrollments.pluck(:user_id, :workflow_state)]
+      self.context.all_accepted_student_enrollments.pluck(:user_id, :workflow_state).to_h
 
     # prefer active over inactive, inactive over everything else
     enrollment_priority = { 'active' => 1, 'inactive' => 2 }
@@ -2698,7 +2698,7 @@ class Assignment < ActiveRecord::Base
     { student_ids: student_ids,
       submissions: submissions,
       submission_ids: Set.new(submissions.pluck(:id)),
-      assessor_id_map: Hash[submissions.map { |s| [s.id, s.assessment_requests.map(&:assessor_asset_id)] }] }
+      assessor_id_map: submissions.map { |s| [s.id, s.assessment_requests.map(&:assessor_asset_id)] }.to_h }
   end
 
   def sorted_review_candidates(peer_review_params, current_submission, candidate_set)

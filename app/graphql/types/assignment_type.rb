@@ -37,9 +37,7 @@ module Types
       value "deleted"
     end
 
-    GRADING_TYPES = Hash[
-      Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES)
-    ]
+    GRADING_TYPES = Assignment::ALLOWED_GRADING_TYPES.zip(Assignment::ALLOWED_GRADING_TYPES).to_h
 
     class AssignmentGradingType < Types::BaseEnum
       graphql_name "GradingType"

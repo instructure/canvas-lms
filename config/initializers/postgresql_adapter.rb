@@ -143,7 +143,7 @@ module PostgreSQLAdapterExtensions
       inddef = row[3]
       oid = row[4]
 
-      columns = Hash[query(<<~SQL.squish, "SCHEMA")]
+      columns = query(<<~SQL.squish, "SCHEMA").to_h
         SELECT a.attnum, a.attname
         FROM pg_attribute a
         WHERE a.attrelid = #{oid}

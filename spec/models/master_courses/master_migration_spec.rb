@@ -567,7 +567,7 @@ describe MasterCourses::MasterMigration do
       run_master_migration
 
       q_to = @copy_to.quizzes.where(:migration_id => mig_id(q)).first
-      copied_answers = Hash[q_to.quiz_questions.to_a.map { |qq| [qq.id, qq.question_data.to_hash["answers"]] }]
+      copied_answers = q_to.quiz_questions.to_a.map { |qq| [qq.id, qq.question_data.to_hash["answers"]] }.to_h
       expect(copied_answers.values.flatten.all? { |a| a["id"] != 0 }).to be_truthy
       q.quiz_questions.each do |qq|
         qq_to = q_to.quiz_questions.where(:migration_id => mig_id(qq)).first

@@ -347,7 +347,7 @@ describe PermissionsHelper do
 
   describe "precalculate_permissions_for_courses" do
     def exclude_reads(permissions_hash)
-      Hash[permissions_hash.map { |k, v| [k, v.except(:read, :read_grades, :read_as_admin, :participate_as_student)] }]
+      permissions_hash.map { |k, v| [k, v.except(:read, :read_grades, :read_as_admin, :participate_as_student)] }.to_h
     end
 
     it "returns other course-level (non-standard) permission values for active enrollments" do

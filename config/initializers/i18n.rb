@@ -131,7 +131,7 @@ module I18nliner
     def infer_pluralization_hash(default, *args)
       if default.is_a?(Array) && default.all? { |a| a.is_a?(Array) && a.size == 2 && a.first.is_a?(Symbol) }
         # this was a pluralization hash but rails 4 made it an array in the view helpers
-        return Hash[default]
+        return default.to_h
       end
 
       super

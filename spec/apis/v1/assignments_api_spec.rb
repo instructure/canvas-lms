@@ -2566,7 +2566,7 @@ describe AssignmentsApiController, type: :request do
         }]
 
         overrides.concat(opts[:additional_overrides]) if opts[:additional_overrides]
-        overrides_hash = Hash[(0...overrides.size).zip overrides]
+        overrides_hash = ((0...overrides.size).zip overrides).to_h
 
         api_params = {
           :controller => 'assignments_api',

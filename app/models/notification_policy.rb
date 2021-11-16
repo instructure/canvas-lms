@@ -157,7 +157,7 @@ class NotificationPolicy < ActiveRecord::Base
 
   # frequencies is an optional hash; key is notification_name (underscore)
   def self.find_all_for(communication_channel, frequencies = {}, context_type: nil)
-    frequencies = Hash[frequencies.map { |name, frequency| [BroadcastPolicy.notification_finder.by_name(name.titleize), frequency] }]
+    frequencies = frequencies.map { |name, frequency| [BroadcastPolicy.notification_finder.by_name(name.titleize), frequency] }.to_h
     communication_channel.shard.activate do
       policies = communication_channel.notification_policies.to_a
       Notification.all_cached.each do |notification|

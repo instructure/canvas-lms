@@ -443,7 +443,7 @@ namespace :i18n do
   def parsed_languages(languages)
     if languages.present?
       if languages.include?('>')
-        Hash[languages.split(',').map { |lang| lang.split('>') }]
+        languages.split(',').map { |lang| lang.split('>') }.to_h
       else
         languages.split(',')
       end
