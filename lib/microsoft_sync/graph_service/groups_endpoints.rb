@@ -53,12 +53,10 @@ module MicrosoftSync
         ),
       ].freeze
 
-      # Returns nil if all removed, or a hash with a list of :members and/or :owners that did
-      # not exist in the group (e.g. {owners: ['a', 'b'], members: ['c']} or {owners: ['a']}
+      # Returns a GroupMembershipChangeResult
       # NOTE: Microsoft API does not distinguish between a group not existing, a
       # user not existing, and an owner not existing in the group. If the group
-      # doesn't exist, this will return the full lists of members and owners
-      # passed in.
+      # doesn't exist, all members and owners will be listed in the change result.
       def remove_users_ignore_missing(group_id, members: [], owners: [])
         check_group_users_args(members, owners)
 
@@ -67,19 +65,19 @@ module MicrosoftSync
           group_remove_user_requests(group_id, owners, 'owners')
         quota = [reqs.count, reqs.count]
 
-        ignored_request_ids = run_batch(
+        ignored_request_hash = run_batch(
           'group_remove_users',
           reqs,
           quota: quota,
           special_cases: BATCH_REMOVE_USERS_SPECIAL_CASES
-        ).keys
-        split_request_ids_to_hash(ignored_request_ids)
+        )
+        create_membership_change_result(ignored_request_hash)
       end
 
       BATCH_ADD_USERS_SPECIAL_CASES = [
         SpecialCase.new(
           400, /One or more added object references already exist/i,
-          result: :ignored
+          result: :already_in_group
         ),
         SpecialCase.new(
           403, /would exceed the maximum quota count.*for forward-link.*owners/i,
@@ -89,21 +87,26 @@ module MicrosoftSync
           403, /would exceed the maximum quota count.*for forward-link.*members/i,
           result: Errors::MembersQuotaExceeded
         ),
+        SpecialCase.new(404, result: GroupMembershipChangeResult::NONEXISTENT_USER) do |response|
+          # Error message must have user id (see group_add_user_requests) to match.
+          aad_id = response.batch_request_id.gsub(/^members_|^owners_/, '')
+          regex = /#{Regexp.escape aad_id}.* does not exist or one of its queried reference/
+          response.body =~ regex
+        end,
       ].freeze
 
-      # Returns {owners: ['a', 'b', 'c'], members: ['d', 'e', 'f']} if there are owners
-      # or members not added. If all were added successfully, returns nil.
+      # Returns a GroupMembershipChangeResult
       def add_users_via_batch(group_id, members, owners)
         reqs =
           group_add_user_requests(group_id, members, 'members') +
           group_add_user_requests(group_id, owners, 'owners')
-        ignored_request_ids = run_batch(
+        ignored_request_hash = run_batch(
           'group_add_users',
           reqs,
           quota: [reqs.count, reqs.count],
           special_cases: BATCH_ADD_USERS_SPECIAL_CASES
-        ).keys
-        split_request_ids_to_hash(ignored_request_ids)
+        )
+        create_membership_change_result(ignored_request_hash)
       end
 
       ADD_USERS_SPECIAL_CASES = [
@@ -118,17 +121,16 @@ module MicrosoftSync
         # push the total number over the maximum (100). In that case, fallback to
         # batch requests, which do not have this problem.
         SpecialCase.new(
-          403, /would exceed the maximum quota count.*for forward-link.*owners/i,
+          403, /would exceed the maximum quota count.*for forward-link.*(owners|members)/i,
           result: :fallback_to_batch
         ),
-        SpecialCase.new(
-          403, /would exceed the maximum quota count.*for forward-link.*members/i,
-          result: :fallback_to_batch
-        ),
+        # There is one additional dynamic special case in add_users_special_cases()
       ].freeze
 
-      # Returns nil if all added, or a hash with a list of :members and/or :owners that already
-      # existed in the group (e.g. {owners: ['a', 'b'], members: ['c']} or {owners: ['a']}
+      # Returns nil or a blank GroupMembershipChangeResult if all users were
+      # added successfully. Returns a GroupMembershipChangeResult batch to
+      # return if there are any non-fatal issues (e.g. some users existed in
+      # the group already)
       def add_users_ignore_duplicates(group_id, members: [], owners: [])
         check_group_users_args(members, owners)
 
@@ -143,7 +145,7 @@ module MicrosoftSync
           :patch, "groups/#{group_id}",
           body: body,
           quota: [1, write_quota],
-          special_cases: ADD_USERS_SPECIAL_CASES
+          special_cases: add_users_special_cases(group_id)
         )
 
         if response == :fallback_to_batch
@@ -151,19 +153,34 @@ module MicrosoftSync
         end
       end
 
-      # Maps requests ids, e.g. ["members_a", "members_b", "owners_a"]
-      # to a hash like {members: %w[a b], owners: %w[a]}
-      def split_request_ids_to_hash(req_ids)
-        return nil if req_ids.blank?
-
-        req_ids
-          .group_by { |id| id.split("_").first.to_sym }
-          .transform_values { |ids| ids.map { |id| id.split("_").last } }
-      end
-
       private
 
+      def add_users_special_cases(group_id)
+        ADD_USERS_SPECIAL_CASES + [
+          # 404 referencing some ID which is NOT the group ID. Probably one of
+          # the user(s) don't exist. Fallback to batch to deal with each user
+          # separately, in case multiple do not exist.
+          # If the group doesn't exist, we won't match here, so we'll.
+          # raise an HTTPNotFound as normal.
+          SpecialCase.new(
+            404, /does not exist or one of its queried reference/, result: :fallback_to_batch
+          ) { |response| !response.body.include?(group_id) }
+        ]
+      end
+
       # ==== Helpers for removing and adding in batch ===
+
+      # Expects a hash like {"members_1234" => :ignored, "owners_89ab" => :ignored}
+      def create_membership_change_result(batch_result_hash)
+        res = GroupMembershipChangeResult.new
+
+        batch_result_hash.each do |request_id, special_case_value|
+          members_or_owners, user_id = request_id.split("_")
+          res.add_issue(members_or_owners, user_id, special_case_value)
+        end
+
+        res
+      end
 
       def check_group_users_args(members, owners)
         raise ArgumentError, 'Missing members/owners' if members.empty? && owners.empty?

@@ -56,6 +56,8 @@ module MicrosoftSync
     STATSD_NAME = 'microsoft_sync.syncer_steps'
     STATSD_NAME_SKIPPED_BATCHES = "#{STATSD_NAME}.skipped_batches"
     STATSD_NAME_SKIPPED_TOTAL = "#{STATSD_NAME}.skipped_total"
+    STATSD_NAME_DELETED_MAPPINGS_FOR_MISSING_USERS = \
+      "#{STATSD_NAME}.deleted_mappings_for_missing_users"
 
     # Can happen when User disables sync on account-level when jobs are running:
     class TenantMissingOrSyncDisabled < Errors::GracefulCancelError
@@ -232,12 +234,12 @@ module MicrosoftSync
       retry_object_for_error(e)
     end
 
-    def log_batch_skipped(type, users)
-      return unless users # GraphService batch functions return nil if all succesful
+    def log_batch_skipped(type, change_result)
+      return if change_result.blank?
 
-      n_total = users.values.map(&:length).sum
+      n_total = change_result.total_unsuccessful
       Rails.logger.warn("#{self.class.name} (#{group.global_id}): " \
-                        "Skipping redundant #{type} for #{n_total}: #{users.to_json}")
+                        "Skipping #{type} for #{n_total}: #{change_result.to_json}")
       InstStatsd::Statsd.increment("#{STATSD_NAME_SKIPPED_BATCHES}.#{type}",
                                    tags: { sync_type: sync_type })
       InstStatsd::Statsd.count("#{STATSD_NAME_SKIPPED_TOTAL}.#{type}", n_total,
@@ -290,12 +292,22 @@ module MicrosoftSync
       raise
     end
 
+    def delete_mappings_if_users_missing(change_result)
+      bad_aads = change_result&.nonexistent_user_ids
+      if bad_aads.present?
+        Rails.logger.warn "Deleting mappings for AADs: #{bad_aads}"
+        InstStatsd::Statsd.count(STATSD_NAME_DELETED_MAPPINGS_FOR_MISSING_USERS, bad_aads.count)
+        UserMapping.where(root_account_id: course.root_account_id, aad_id: bad_aads).delete_all
+      end
+    end
+
     def execute_diff_add_users(diff)
       diff.additions_in_slices_of(GraphService::GroupsEndpoints::USERS_BATCH_SIZE) do |members_and_owners|
-        skipped = graph_service.groups.add_users_ignore_duplicates(
+        change_result = graph_service.groups.add_users_ignore_duplicates(
           group.ms_group_id, **members_and_owners
         )
-        log_batch_skipped(:add, skipped)
+        log_batch_skipped(:add, change_result)
+        delete_mappings_if_users_missing(change_result)
       end
     rescue Errors::MembersQuotaExceeded
       raise_and_disable_group(MaxMemberEnrollmentsReached)
@@ -305,10 +317,10 @@ module MicrosoftSync
 
     def execute_diff_remove_users(diff)
       diff.removals_in_slices_of(GraphService::GroupsEndpoints::USERS_BATCH_SIZE) do |members_and_owners|
-        skipped = graph_service.groups.remove_users_ignore_missing(
+        change_result = graph_service.groups.remove_users_ignore_missing(
           group.ms_group_id, **members_and_owners
         )
-        log_batch_skipped(:remove, skipped)
+        log_batch_skipped(:remove, change_result)
       end
     end
 

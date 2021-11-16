@@ -350,7 +350,8 @@ module MicrosoftSync
         grouped = responses.group_by do |subresponse|
           special_case_value = SpecialCase.match(
             special_cases,
-            status_code: subresponse['status'], body: subresponse['body'].to_json
+            status_code: subresponse['status'], body: subresponse['body'].to_json,
+            batch_request_id: subresponse['id']
           )
 
           if special_case_value

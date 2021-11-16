@@ -598,10 +598,21 @@ describe MicrosoftSync::SyncerSteps do
       it_behaves_like 'max user enrollments reached', 'owners'
     end
 
-    context 'when some users to be added already exist in the group' do
+    def membership_change_result_double(total_unsuccessful = 0, to_json = '', nonexistent_users = [])
+      instance_double(
+        MicrosoftSync::GraphService::GroupMembershipChangeResult,
+        to_json: to_json,
+        total_unsuccessful: total_unsuccessful,
+        blank?: total_unsuccessful == 0,
+        present?: total_unsuccessful != 0,
+        nonexistent_user_ids: nonexistent_users,
+      )
+    end
+
+    context 'when some users to be added are already in the group' do
       it 'logs and increments statsd metrics' do
         expect(graph_service.groups).to receive(:add_users_ignore_duplicates)
-          .twice.and_return(members: %w[o3], owners: %w[o1 o2])
+          .twice.and_return(membership_change_result_double(3, 'debuginfo'))
         allow(graph_service.groups).to receive(:remove_users_ignore_missing)
 
         allow(Rails.logger).to receive(:warn)
@@ -610,22 +621,57 @@ describe MicrosoftSync::SyncerSteps do
 
         subject
 
-        expect(Rails.logger).to have_received(:warn).twice
-                                                    .with(/Skipping redundant add for 3: .*(o3.*o2|o2.*o3)/)
-        expect(InstStatsd::Statsd).to have_received(:increment).twice
-                                                               .with("microsoft_sync.syncer_steps.skipped_batches.add",
-                                                                     tags: { sync_type: sync_type_statsd_tag })
-        expect(InstStatsd::Statsd).to have_received(:count).twice
-                                                           .with("microsoft_sync.syncer_steps.skipped_total.add", 3,
-                                                                 tags: { sync_type: sync_type_statsd_tag })
+        expect(Rails.logger).to have_received(:warn).twice.with(
+          /Skipping add for 3: .*debuginfo/
+        )
+        expect(InstStatsd::Statsd).to have_received(:increment).twice.with(
+          "microsoft_sync.syncer_steps.skipped_batches.add",
+          tags: { sync_type: sync_type_statsd_tag }
+        )
+        expect(InstStatsd::Statsd).to have_received(:count).twice.with(
+          "microsoft_sync.syncer_steps.skipped_total.add", 3,
+          tags: { sync_type: sync_type_statsd_tag }
+        )
       end
     end
 
-    context "when some users to be removed don't exist in the group" do
+    context "when some users to be added don't exist at all on Microsoft's side" do
+      before do
+        %w[aad0 aad1 aad2].each do |aad|
+          MicrosoftSync::UserMapping.create(
+            root_account_id: course.root_account_id, aad_id: aad, user: user_model
+          )
+        end
+
+        allow(graph_service.groups).to receive(:remove_users_ignore_missing)
+        allow(Rails.logger).to receive(:warn)
+        allow(InstStatsd::Statsd).to receive(:count).and_call_original
+      end
+
+      it 'deletes the mappings for them and increments a counter' do
+        expect(graph_service.groups).to receive(:add_users_ignore_duplicates).once
+        expect(graph_service.groups).to receive(:add_users_ignore_duplicates)
+          .once.and_return(membership_change_result_double(3, 'debuginfo', %w[aad0 aad2]))
+
+        subject
+
+        expect(MicrosoftSync::UserMapping.where('aad_id like ?', 'aad%').pluck(:aad_id)).to \
+          eq(['aad1'])
+        expect(Rails.logger).to have_received(:warn).with(/Deleting mappings for AADs.*aad2/)
+        expect(InstStatsd::Statsd).to have_received(:count).with(
+          "microsoft_sync.syncer_steps.deleted_mappings_for_missing_users", 2
+        )
+      end
+    end
+
+    context "when some users to be removed aren't in the group" do
       it 'logs and increments statsd metrics' do
-        allow(graph_service.groups).to receive(:add_users_ignore_duplicates)
-        expect(graph_service.groups).to receive(:remove_users_ignore_missing)
-          .twice.and_return(owners: %w[m2 m3])
+        allow(graph_service.groups).to \
+          receive(:add_users_ignore_duplicates)
+          .and_return(membership_change_result_double)
+        expect(graph_service.groups).to \
+          receive(:remove_users_ignore_missing)
+          .twice.and_return(membership_change_result_double(2, 'debuginfo'))
 
         allow(Rails.logger).to receive(:warn)
         allow(InstStatsd::Statsd).to receive(:increment).and_call_original
@@ -633,14 +679,17 @@ describe MicrosoftSync::SyncerSteps do
 
         subject
 
-        expect(Rails.logger).to have_received(:warn).twice
-                                                    .with(/Skipping redundant remove for 2: .*(m2.*m3|m3.*m2)/)
-        expect(InstStatsd::Statsd).to have_received(:increment).twice
-                                                               .with("microsoft_sync.syncer_steps.skipped_batches.remove",
-                                                                     tags: { sync_type: sync_type_statsd_tag })
-        expect(InstStatsd::Statsd).to have_received(:count).twice
-                                                           .with("microsoft_sync.syncer_steps.skipped_total.remove", 2,
-                                                                 tags: { sync_type: sync_type_statsd_tag })
+        expect(Rails.logger).to have_received(:warn).twice.with(
+          /Skipping remove for 2.*debuginfo/
+        )
+        expect(InstStatsd::Statsd).to have_received(:increment).twice.with(
+          "microsoft_sync.syncer_steps.skipped_batches.remove",
+          tags: { sync_type: sync_type_statsd_tag }
+        )
+        expect(InstStatsd::Statsd).to have_received(:count).twice.with(
+          "microsoft_sync.syncer_steps.skipped_total.remove", 2,
+          tags: { sync_type: sync_type_statsd_tag }
+        )
       end
     end
 
