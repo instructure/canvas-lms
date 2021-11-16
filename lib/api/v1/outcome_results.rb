@@ -22,6 +22,7 @@ require 'csv'
 
 module Api::V1::OutcomeResults
   include Api::V1::Outcome
+  include Outcomes::OutcomeFriendlyDescriptionResolver
 
   # Public: Serializes OutcomeResults
   #
@@ -75,13 +76,26 @@ module Api::V1::OutcomeResults
     outcomes.map(&:id).each_slice(100) do |outcome_ids|
       assessed_outcomes += LearningOutcomeResult.active.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
     end
+    friendly_descriptions = {}
+    if context.root_account.feature_enabled?(:improved_outcomes_management) && Account.site_admin.feature_enabled?(:outcomes_friendly_description)
+      account = @context.is_a?(Account) ? @context : @context.account
+      course = @context.is_a?(Course) ? @context : nil
+
+      friendly_descriptions_array = outcomes.map(&:id).each_slice(100).flat_map do |outcome_ids|
+        resolve_friendly_descriptions(account, course, outcome_ids).map { |description| [description.learning_outcome_id, description.description] }
+      end
+
+      friendly_descriptions = friendly_descriptions_array.to_h
+    end
+
     outcomes.map do |o|
       hash = outcome_json(
         o,
         @current_user, session,
         assessed_outcomes: assessed_outcomes,
         rating_percents: percents[o.id],
-        context: context
+        context: context,
+        friendly_descriptions: friendly_descriptions
       )
       hash[:alignments] = alignment_asset_string_map[o.id]
       hash
