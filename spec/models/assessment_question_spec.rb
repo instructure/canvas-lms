@@ -125,7 +125,7 @@ describe AssessmentQuestion do
 
     @question = @bank.assessment_questions.create!(:question_data => data)
 
-    @attachment_clones = Hash[@attachments.map { |k, ary| [k, ary.map { |a| @question.attachments.where(root_attachment_id: a).first }] }]
+    @attachment_clones = @attachments.map { |k, ary| [k, ary.map { |a| @question.attachments.where(root_attachment_id: a).first }] }.to_h
 
     @attachment_clones.each do |key, ary|
       string = eval "@question.question_data#{key}"

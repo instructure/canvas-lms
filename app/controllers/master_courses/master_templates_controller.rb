@@ -442,7 +442,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
     mc_tag = @template.content_tag_for(item)
     if value_to_boolean(params[:restricted])
-      custom_restrictions = params[:restrictions] && Hash[params[:restrictions].to_unsafe_h.map { |k, v| [k.to_sym, value_to_boolean(v)] }]
+      custom_restrictions = params[:restrictions] && params[:restrictions].to_unsafe_h.map { |k, v| [k.to_sym, value_to_boolean(v)] }.to_h
       mc_tag.restrictions = custom_restrictions || @template.default_restrictions_for(item)
       mc_tag.use_default_restrictions = !custom_restrictions
     else
@@ -682,7 +682,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   end
 
   def get_exceptions_by_subscription(subscriptions)
-    results = Hash[@mm.migration_results.where(:child_subscription_id => subscriptions).where.not(:results => nil).pluck(:child_subscription_id, :results)]
+    results = @mm.migration_results.where(:child_subscription_id => subscriptions).where.not(:results => nil).pluck(:child_subscription_id, :results).to_h
 
     exceptions = {}
     subscriptions.each do |sub|

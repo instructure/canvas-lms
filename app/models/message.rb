@@ -196,7 +196,7 @@ class Message < ActiveRecord::Base
   def save_using_update_all
     self.shard.activate do
       self.updated_at = Time.now.utc
-      updates = Hash[self.changes_to_save.map { |k, v| [k, v.last] }]
+      updates = self.changes_to_save.map { |k, v| [k, v.last] }.to_h
       self.class.in_partition(attributes).where(:id => self.id, :created_at => self.created_at).update_all(updates)
       self.clear_changes_information
     end

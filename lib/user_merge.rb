@@ -230,7 +230,7 @@ class UserMerge
         # tl;dr do the same thing as shard_aware_preferences
         case key
         when "custom_colors"
-          value = Hash[value.map { |id, color| [translate_course_id_or_asset_string(id), color] }]
+          value = value.map { |id, color| [translate_course_id_or_asset_string(id), color] }.to_h
         when "course_nicknames"
           sub_key = translate_course_id_or_asset_string(sub_key)
         end

@@ -44,9 +44,7 @@ describe ActiveRecord::Base do
       # updated_at
       expect(account.courses.count_by_date).to eql({ start_times.first.to_date => 10 })
 
-      expect(account.courses.count_by_date(:column => :start_at)).to eql Hash[
-        start_times.each_with_index.map { |t, i| [t.to_date, i + 1] }
-      ]
+      expect(account.courses.count_by_date(:column => :start_at)).to eql start_times.each_with_index.map { |t, i| [t.to_date, i + 1] }.to_h
     end
 
     it "justs do the last 20 days by default" do
@@ -61,9 +59,7 @@ describe ActiveRecord::Base do
       # updated_at
       expect(account.courses.count_by_date).to eql({ start_times.first.to_date => 10 })
 
-      expect(account.courses.count_by_date(:column => :start_at)).to eql Hash[
-        start_times[0..1].each_with_index.map { |t, i| [t.to_date, i + 1] }
-      ]
+      expect(account.courses.count_by_date(:column => :start_at)).to eql start_times[0..1].each_with_index.map { |t, i| [t.to_date, i + 1] }.to_h
     end
   end
 

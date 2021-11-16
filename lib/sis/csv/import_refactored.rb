@@ -189,7 +189,7 @@ module SIS
         if @run_immediately
           run_all_importers
         else
-          @parallel_importers = Hash[@parallel_importers.map { |k, v| [k, v.map(&:id)] }] # save as ids in handler
+          @parallel_importers = @parallel_importers.map { |k, v| [k, v.map(&:id)] }.to_h # save as ids in handler
           remove_instance_variable(:@csvs) # don't need anymore
           queue_next_importer_set
         end

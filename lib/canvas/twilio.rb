@@ -61,7 +61,7 @@ module Canvas::Twilio
         numbers_by_country[lookup_country(number.phone_number)] << number.phone_number
       end
 
-      Hash[numbers_by_country]
+      numbers_by_country.to_h
     end
   end
 

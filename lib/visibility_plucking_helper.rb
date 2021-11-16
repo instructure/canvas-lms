@@ -50,7 +50,7 @@ module VisibilityPluckingHelper
 
     def empty_id_hash(ids)
       # [1,2,3] => {1:[],2:[],3:[]}
-      Hash[ids.zip(ids.map { [] })]
+      ids.zip(ids.map { [] }).to_h
     end
 
     def check_args(opts, key)

@@ -192,8 +192,8 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   def self.preload_index_data(templates)
     child_counts = MasterCourses::ChildSubscription.active.where(:master_template_id => templates)
                                                    .joins(:child_course).where.not(:courses => { :workflow_state => "deleted" }).group(:master_template_id).count
-    last_export_times = Hash[MasterCourses::MasterMigration.where(:master_template_id => templates, :workflow_state => "completed")
-                                                           .order(:master_template_id, id: :desc).pluck(Arel.sql("DISTINCT ON (master_template_id) master_template_id, imports_completed_at"))]
+    last_export_times = MasterCourses::MasterMigration.where(:master_template_id => templates, :workflow_state => "completed")
+                                                      .order(:master_template_id, id: :desc).pluck(Arel.sql("DISTINCT ON (master_template_id) master_template_id, imports_completed_at")).to_h
 
     templates.each do |template|
       template.child_course_count = child_counts[template.id] || 0

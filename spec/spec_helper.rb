@@ -134,9 +134,9 @@ module ActionView::TestCase::Behavior
     if self.is_a?(RSpec::Rails::HelperExampleGroup)
       # the original implementation. we can't call super because
       # we replaced the whole original method
-      return Hash[_user_defined_ivars.map do |ivar|
+      return _user_defined_ivars.map do |ivar|
         [ivar[1..].to_sym, instance_variable_get(ivar)]
-      end]
+      end.to_h
     end
     {}
   end
