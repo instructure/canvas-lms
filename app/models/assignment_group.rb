@@ -51,7 +51,7 @@ class AssignmentGroup < ActiveRecord::Base
   }, class_name: 'Assignment'
 
   validates :context_id, :context_type, :workflow_state, presence: true
-  validates :rules, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
+  validates :rules, length: { maximum: maximum_text_length }, allow_blank: true
   validates :default_assignment_name, length: { maximum: maximum_string_length }, allow_nil: true
   validates :name, length: { maximum: maximum_string_length }, allow_nil: true
 

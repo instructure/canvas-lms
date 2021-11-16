@@ -36,10 +36,10 @@ class LearningOutcome < ActiveRecord::Base
   before_save :infer_root_account_ids
   after_save :propagate_changes_to_rubrics
 
-  validates :description, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :description, length: { maximum: maximum_text_length, allow_blank: true }
   validates :short_description, length: { maximum: maximum_string_length }
   validates :vendor_guid, length: { maximum: maximum_string_length, allow_nil: true }
-  validates :display_name, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }
+  validates :display_name, length: { maximum: maximum_string_length, allow_blank: true }
   validates :calculation_method, inclusion: {
     in: OutcomeCalculationMethod::CALCULATION_METHODS,
     message: -> {
