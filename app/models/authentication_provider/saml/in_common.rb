@@ -31,7 +31,7 @@ class AuthenticationProvider::SAML::InCommon < AuthenticationProvider::SAML::Fed
     protected
 
     def cert
-      Rails.root.join("config", "saml", "inc-md-cert.pem").read
+      Rails.root.join("config/saml/inc-md-cert.pem").read
     end
   end
 end

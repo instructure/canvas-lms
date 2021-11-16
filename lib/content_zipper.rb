@@ -174,7 +174,7 @@ class ContentZipper
           add_attachment_to_zip(a.attachment, zipfile, a.unencoded_filename)
           update_progress(zip_attachment, index, count)
         end
-        content = File.open(Rails.root.join('public', 'images', 'logo.png'), 'rb').read rescue nil
+        content = Rails.root.join('public/images/logo.png').read rescue nil
         zipfile.get_output_stream("logo.png") { |f| f.write content } if content
       end
       mark_successful!

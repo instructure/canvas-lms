@@ -1517,7 +1517,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.file_removed_path
-    Rails.root.join('public', 'file_removed', 'file_removed.pdf')
+    Rails.root.join('public/file_removed/file_removed.pdf')
   end
 
   # find the file_removed file on instfs (or upload it)

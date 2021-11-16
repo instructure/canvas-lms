@@ -340,11 +340,11 @@ RSpec::Expectations.configuration.on_potential_false_positives = :raise
 require 'rspec_junit_formatter'
 
 RSpec.configure do |config|
-  config.example_status_persistence_file_path = Rails.root.join('tmp', "rspec#{ENV.fetch('PARALLEL_INDEX', '0').to_i}")
+  config.example_status_persistence_file_path = Rails.root.join("tmp/rspec#{ENV.fetch('PARALLEL_INDEX', '0').to_i}")
   config.fail_if_no_examples = true
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures = false
-  config.fixture_path = Rails.root.join('spec', 'fixtures')
+  config.fixture_path = Rails.root.join('spec/fixtures')
   config.infer_spec_type_from_file_location!
   config.raise_errors_for_deprecations!
   config.color = true
@@ -911,7 +911,7 @@ module I18nStubs
 end
 LazyPresumptuousI18nBackend.prepend(I18nStubs)
 
-Dir[Rails.root + '{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb'].sort.each { |file| require file }
+Dir[Rails.root.join('{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb')].sort.each { |file| require file }
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|

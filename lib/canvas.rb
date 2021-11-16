@@ -126,8 +126,8 @@ module Canvas
   def self.revision
     return @revision if defined?(@revision)
 
-    @revision = if File.file?(Rails.root + "VERSION")
-                  File.readlines(Rails.root + "VERSION").first.try(:strip)
+    @revision = if Rails.root.join("VERSION").file?
+                  Rails.root.join("VERSION").readlines.first.try(:strip)
                 else
                   nil
                 end

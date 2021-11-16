@@ -35,7 +35,7 @@ class RouteView < HashView
 
   def file_path
     filepath = "app/controllers/#{@method_view.controller}_controller.rb"
-    filepath = nil unless File.file?(File.join(Rails.root, filepath))
+    filepath = nil unless Rails.root.join(filepath).file?
     filepath
   end
 

@@ -24,7 +24,7 @@ end
 namespace :db do
   desc "Generate security.yml key"
   task :generate_security_key do
-    security_conf_path = Rails.root.join('config', 'security.yml')
+    security_conf_path = Rails.root.join('config/security.yml')
     security_conf = YAML.load_file(security_conf_path)
     if security_conf[Rails.env]["encryption_key"].to_s.length < 20
       security_conf[Rails.env]["encryption_key"] = SecureRandom.hex(64)
@@ -45,7 +45,7 @@ namespace :db do
 
   desc "Make sure all message templates have notifications in the db"
   task :evaluate_notification_templates => :load_environment do
-    Dir.glob(Rails.root.join('app', 'messages', '*.erb')) do |filename|
+    Dir.glob(Rails.root.join('app/messages/*.erb')) do |filename|
       filename = File.split(filename)[1]
       name = filename.split(".")[0]
       unless name[0, 1] == "_"

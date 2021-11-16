@@ -140,7 +140,7 @@ module BrandableCSS
     def skip_migration_check?
       # our canvas_rspec build doesn't even run `yarn install` or `gulp rev` so since
       # they are not expecting all the frontend assets to work, this check isn't useful
-      Rails.env.test? && !Rails.root.join('public', 'dist', 'rev-manifest.json').exist?
+      Rails.env.test? && !Rails.root.join('public/dist/rev-manifest.json').exist?
     end
 
     def default_variables_md5
