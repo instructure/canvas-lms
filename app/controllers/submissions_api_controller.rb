@@ -389,7 +389,7 @@ class SubmissionsApiController < ApplicationController
       # can view observees
       allowed_student_ids = @context.observer_enrollments
                                     .where(:user_id => @current_user.id, :workflow_state => 'active')
-                                    .where("associated_user_id IS NOT NULL")
+                                    .where.not(associated_user_id: nil)
                                     .pluck(:associated_user_id)
 
       # can view self?

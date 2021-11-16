@@ -571,7 +571,7 @@ class ContentExport < ActiveRecord::Base
   end
 
   scope :active, -> { where("content_exports.workflow_state<>'deleted'") }
-  scope :not_for_copy, -> { where("content_exports.export_type NOT IN (?)", [COURSE_COPY, MASTER_COURSE_COPY]) }
+  scope :not_for_copy, -> { where.not(content_exports: { export_type: [COURSE_COPY, MASTER_COURSE_COPY] }) }
   scope :common_cartridge, -> { where(export_type: COMMON_CARTRIDGE) }
   scope :qti, -> { where(export_type: QTI) }
   scope :quizzes2, -> { where(export_type: QUIZZES2) }

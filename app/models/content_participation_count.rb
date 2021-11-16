@@ -84,7 +84,7 @@ class ContentParticipationCount < ActiveRecord::Base
         subs_with_grades = Submission.active.graded
                                      .joins(:assignment)
                                      .where(submission_conditions)
-                                     .where("submissions.score IS NOT NULL")
+                                     .where.not(submissions: { score: nil })
                                      .pluck(:id)
         subs_with_comments = Submission.active
                                        .joins(:assignment, :submission_comments)

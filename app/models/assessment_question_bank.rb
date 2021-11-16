@@ -119,7 +119,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
       learning_outcome_alignments.update_all(:workflow_state => 'deleted')
     else
       learning_outcome_alignments
-        .where("learning_outcome_id NOT IN (?)", outcomes)
+        .where.not(learning_outcome_id: outcomes)
         .update_all(:workflow_state => 'deleted')
     end
 

@@ -1320,7 +1320,7 @@ class CalendarEventsApiController < ApplicationController
 
   def mark_submitted_assignments(user, assignments)
     Shard.partition_by_shard(assignments) do |shard_assignments|
-      submitted_ids = Submission.active.where("submission_type IS NOT NULL")
+      submitted_ids = Submission.active.where.not(submission_type: nil)
                                 .where(user_id: user, assignment_id: shard_assignments)
                                 .pluck(:assignment_id)
       shard_assignments.each do |assignment|

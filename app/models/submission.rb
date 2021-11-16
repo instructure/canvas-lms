@@ -1993,7 +1993,7 @@ class Submission < ActiveRecord::Base
 
   scope :in_workflow_state, lambda { |provided_state| where(:workflow_state => provided_state) }
 
-  scope :having_submission, -> { where("submissions.submission_type IS NOT NULL") }
+  scope :having_submission, -> { where.not(submissions: { submission_type: nil }) }
   scope :without_submission, -> { where(submission_type: nil, workflow_state: "unsubmitted") }
   scope :not_placeholder, -> {
     active.where("submissions.submission_type IS NOT NULL or submissions.excused or submissions.score IS NOT NULL or submissions.workflow_state = 'graded'")

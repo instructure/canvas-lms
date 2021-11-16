@@ -430,7 +430,7 @@ class Assignment < ActiveRecord::Base
 
     ModeratedGrading::ProvisionalGrade
       .where(submission_id: self.submissions.having_submission.select(:id))
-      .where('score IS NOT NULL').exists?
+      .where.not(score: nil).exists?
   end
 
   def graded_submissions_exist?
@@ -3297,7 +3297,7 @@ class Assignment < ActiveRecord::Base
     elsif attribute_present? :student_submission_count
       student_submission_count.to_i > 0
     else
-      submissions.having_submission.where("user_id IS NOT NULL").exists?
+      submissions.having_submission.where.not(user_id: nil).exists?
     end
   end
   attr_writer :has_student_submissions

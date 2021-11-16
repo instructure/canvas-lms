@@ -80,7 +80,7 @@ class Role < ActiveRecord::Base
   def ensure_unique_name_for_account
     if self.active?
       scope = Role.where("name = ? AND account_id = ? AND workflow_state = ?", self.name, self.account_id, 'active')
-      if self.new_record? ? scope.exists? : scope.where("id <> ?", self.id).exists?
+      if self.new_record? ? scope.exists? : scope.where.not(id: self.id).exists?
         self.errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
         false
       end
@@ -250,7 +250,7 @@ class Role < ActiveRecord::Base
     built_in_role_ids = Role.built_in_course_roles(root_account_id: course.root_account_id).map(&:id)
     base_counts = users_scope.where(enrollments: { role_id: built_in_role_ids })
                              .group('enrollments.type').select('users.id').distinct.count
-    role_counts = users_scope.where('enrollments.role_id NOT IN (?)', built_in_role_ids)
+    role_counts = users_scope.where.not(enrollments: { role_id: built_in_role_ids })
                              .group('enrollments.role_id').select('users.id').distinct.count
 
     @enrollment_types = Role.all_enrollment_roles_for_account(course.account, include_inactive)

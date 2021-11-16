@@ -542,7 +542,7 @@ class MessageableUser
       if global_exclude_ids.present?
         target_shard = scope.shard_value
         exclude_ids = global_exclude_ids.map { |id| Shard.relative_id_for(id, Shard.current, target_shard) }
-        scope = scope.where(["users.id NOT IN (?)", exclude_ids])
+        scope = scope.where.not(users: { id: exclude_ids })
       end
 
       if search.present? && (parts = search.strip.split(/\s+/)).present?

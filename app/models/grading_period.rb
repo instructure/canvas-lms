@@ -255,7 +255,7 @@ class GradingPeriod < ActiveRecord::Base
     if new_record?
       grading_periods
     else
-      grading_periods.where("id <> ?", id)
+      grading_periods.where.not(id: id)
     end
   end
 

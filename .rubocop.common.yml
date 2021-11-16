@@ -123,6 +123,8 @@ Rails/WhereEquals:
 Rails/WhereExists:
   EnforcedStyle: where
   Severity: error
+Rails/WhereNot:
+  Severity: error
 
 RSpec/AnyInstance:
   Enabled: false # while using an instance double would be preferable, it's a pain

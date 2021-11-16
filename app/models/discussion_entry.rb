@@ -256,7 +256,7 @@ class DiscussionEntry < ActiveRecord::Base
     transaction do
       # get a list of users who have not read the entry yet
       users = discussion_topic.discussion_topic_participants
-                              .where(['user_id NOT IN (?)', discussion_entry_participants.read.pluck(:user_id)]).pluck(:user_id)
+                              .where.not(user_id: discussion_entry_participants.read.pluck(:user_id)).pluck(:user_id)
       # decrement unread_entry_count for topic participants
       if users.present?
         DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id, :user_id => users)

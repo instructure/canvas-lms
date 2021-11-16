@@ -2005,7 +2005,7 @@ class Account < ActiveRecord::Base
 
   scope :root_accounts, -> { where(root_account_id: [0, nil]).where.not(id: 0) }
   scope :non_root_accounts, -> { where.not(root_account_id: [0, nil]) }
-  scope :processing_sis_batch, -> { where("accounts.current_sis_batch_id IS NOT NULL").order(:updated_at) }
+  scope :processing_sis_batch, -> { where.not(accounts: { current_sis_batch_id: nil }).order(:updated_at) }
   scope :name_like, lambda { |name| where(wildcard('accounts.name', name)) }
   scope :active, -> { where("accounts.workflow_state<>'deleted'") }
 
