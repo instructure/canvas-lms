@@ -641,7 +641,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       @submissions_from_users = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).not_settings_only.to_a
 
-      @submissions_from_users = Hash[@submissions_from_users.map { |s| [s.user_id, s] }]
+      @submissions_from_users = @submissions_from_users.index_by(&:user_id)
 
       # include logged out submissions
       @submissions_from_logged_out = @quiz.quiz_submissions.logged_out.not_settings_only
@@ -849,10 +849,8 @@ class Quizzes::QuizzesController < ApplicationController
 
   def setup_attachments
     @attachments = if @submission
-                     Hash[@submission.attachments.map do |attachment|
-                       [attachment.id, attachment]
-                     end
-                     ]
+                     @submission.attachments.index_by(&:id)
+
                    else
                      {}
                    end

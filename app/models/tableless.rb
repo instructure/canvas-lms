@@ -36,7 +36,7 @@ class Tableless < ActiveRecord::Base
     end
 
     def columns_hash
-      @columns_hash ||= Hash[columns.map { |c| [c.name, c] }]
+      @columns_hash ||= columns.index_by(&:name)
     end
 
     def column(name, sql_type = nil, default = nil, null = true)

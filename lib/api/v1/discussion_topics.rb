@@ -50,7 +50,7 @@ module Api::V1::DiscussionTopics
 
     fields_with_id = fields.unshift(:id)
     root_topics_array = DiscussionTopic.select(fields_with_id).find(root_topic_ids)
-    root_topics_array.map { |root_topic| [root_topic.id, root_topic] }.to_h
+    root_topics_array.index_by(&:id)
   end
 
   # Public: Serialize an array of DiscussionTopic objects for returning as JSON.
