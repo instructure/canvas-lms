@@ -51,7 +51,6 @@ import FinalGradeOverrides from './FinalGradeOverrides/index'
 import GradebookGrid from './GradebookGrid/index'
 import AssignmentRowCellPropFactory from './GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCellPropFactory'
 import TotalGradeOverrideCellPropFactory from './GradebookGrid/editors/TotalGradeOverrideCellEditor/TotalGradeOverrideCellPropFactory'
-import PerformanceControls from './PerformanceControls'
 import PostPolicies from './PostPolicies/index'
 import GradebookMenu from '@canvas/gradebook-menu'
 import ViewOptionsMenu from './components/ViewOptionsMenu'
@@ -373,7 +372,6 @@ class Gradebook extends React.Component {
     this.toggleViewUngradedAsZero = this.toggleViewUngradedAsZero.bind(this)
     this.setAssignmentsLoaded = this.setAssignmentsLoaded.bind(this)
     this.setAssignmentGroupsLoaded = this.setAssignmentGroupsLoaded.bind(this)
-    this.setContextModulesLoaded = this.setContextModulesLoaded.bind(this)
     this.setCustomColumnsLoaded = this.setCustomColumnsLoaded.bind(this)
     this.setGradingPeriodAssignmentsLoaded = this.setGradingPeriodAssignmentsLoaded.bind(this)
     this.setStudentIdsLoaded = this.setStudentIdsLoaded.bind(this)
@@ -472,7 +470,8 @@ class Gradebook extends React.Component {
     })
     this.dataLoader = new DataLoader({
       gradebook: this,
-      performanceControls: new PerformanceControls(camelize(this.options.performance_controls)),
+      dispatch: props.dispatch,
+      performanceControls: props.performanceControls,
       loadAssignmentsByGradingPeriod: this.options.load_assignments_by_grading_period_enabled
     })
     this.gridData = {
@@ -1990,7 +1989,7 @@ class Gradebook extends React.Component {
     // this menu when we have the filters in place. Until then, keep rendering
     // it so we can still filter when we have the flag on.
 
-    const mountPoint = document.querySelector("[data-component='ViewOptionsMenu']")
+    const mountPoint = this.props.viewOptionsMenuNode
     return (this.viewOptionsMenu = renderComponent(
       ViewOptionsMenu,
       mountPoint,
@@ -2072,7 +2071,7 @@ class Gradebook extends React.Component {
       this.updateAssignmentGroupFilterVisibility()
     }
     this.updateGradingPeriodFilterVisibility()
-    if (this.contentLoadStates.contextModulesLoaded) {
+    if (!this.props.isModulesLoading) {
       this.updateModulesFilterVisibility()
     }
     this.renderSearchFilters()
@@ -3779,10 +3778,6 @@ class Gradebook extends React.Component {
     return (this.contentLoadStates.assignmentGroupsLoaded = loaded)
   }
 
-  setContextModulesLoaded(loaded) {
-    return (this.contentLoadStates.contextModulesLoaded = loaded)
-  }
-
   setCustomColumnsLoaded(loaded) {
     return (this.contentLoadStates.customColumnsLoaded = loaded)
   }
@@ -4201,7 +4196,6 @@ class Gradebook extends React.Component {
   updateContextModules(contextModules) {
     this.setContextModules(contextModules)
     this.setState({modules: contextModules})
-    this.setContextModulesLoaded(true)
     this.renderViewOptionsMenu()
     this.renderFilters()
     return this._updateEssentialDataLoaded()
@@ -4528,7 +4522,7 @@ class Gradebook extends React.Component {
   _updateEssentialDataLoaded() {
     if (
       this.contentLoadStates.studentIdsLoaded &&
-      this.contentLoadStates.contextModulesLoaded &&
+      !this.props.isModulesLoading &&
       this.contentLoadStates.customColumnsLoaded &&
       this.contentLoadStates.assignmentGroupsLoaded &&
       this.assignmentsLoadedForCurrentView() &&
@@ -4544,7 +4538,14 @@ class Gradebook extends React.Component {
     this.onShow()
   }
 
-  componentDidUpdate(_prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      prevProps.isModulesLoading !== this.props.isModulesLoading &&
+      !this.props.isModulesLoading
+    ) {
+      this.updateContextModules(this.props.modules)
+    }
+
     if (prevState.filters !== this.state.filters) {
       this.updateColumns()
 
