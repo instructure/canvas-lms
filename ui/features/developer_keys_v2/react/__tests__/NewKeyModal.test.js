@@ -157,249 +157,143 @@ function modalMountNode() {
   return document.querySelector('#fixtures')
 }
 
-it('it opens the modal if isOpen prop is true', () => {
-  const wrapper = shallow(
-    <DeveloperKeyModal
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={createDeveloperKeyState}
-      actions={fakeActions}
-      store={{dispatch: () => {}}}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-      ctx={{params: {contextId: '1'}}}
-    />
-  )
-  expect(wrapper.find('Modal').prop('open')).toEqual(true)
-})
+const modal = extraProps => (
+  <DeveloperKeyModal
+    availableScopes={{}}
+    availableScopesPending={false}
+    closeModal={() => {}}
+    ctx={{params: {contextId: '1'}}}
+    mountNode={modalMountNode}
+    selectedScopes={selectedScopes}
+    store={{dispatch: () => Promise.resolve()}}
+    {...extraProps}
+  />
+)
 
-it('it closes the modal if isOpen prop is false', () => {
-  const wrapper = shallow(
-    <DeveloperKeyModal
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={closedDeveloperKeyState}
-      actions={fakeActions}
-      store={{dispatch: () => {}}}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-      ctx={{params: {contextId: '1'}}}
-    />
-  )
-  expect(wrapper.find('Modal').prop('open')).toEqual(false)
-})
-
-it('it sends the contents of the form saving', () => {
-  const createOrEditSpy = jest.fn()
-
-  const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
-  const fakeStore = {
-    dispatch: () => Promise.resolve()
-  }
-  const developerKey2 = {
-    ...developerKey,
-    require_scopes: true,
-    scopes: ['test'],
-    test_cluster_only: true
-  }
-  const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
-
-  const wrapper = mount(
-    <DeveloperKeyModal
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={editDeveloperKeyState2}
-      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
-      actions={mergedFakeActions}
-      store={fakeStore}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-      ctx={{params: {contextId: '1'}}}
-    />
-  )
-
-  wrapper.instance().submitForm()
-
-  const [[sentFormData]] = createOrEditSpy.mock.calls
-
-  const developer_key = sentFormData.developer_key
-
-  expect(developer_key.name).toEqual(developerKey.name)
-  expect(developer_key.email).toEqual(developerKey.email)
-  expect(developer_key.redirect_uri).toEqual(developerKey.redirect_uri)
-  expect(developer_key.redirect_uris).toEqual(developerKey.redirect_uris)
-  expect(developer_key.vendor_code).toEqual(developerKey.vendor_code)
-  expect(developer_key.icon_url).toEqual(developerKey.icon_url)
-  expect(developer_key.notes).toEqual(developerKey.notes)
-  expect(developer_key.require_scopes).toEqual(true)
-  expect(developer_key.test_cluster_only).toEqual(true)
-
-  wrapper.unmount()
-})
-
-it('sends form content without scopes and require_scopes set to false when not require_scopes', () => {
-  const createOrEditSpy = jest.fn()
-
-  const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
-  const fakeStore = {
-    dispatch: () => Promise.resolve()
+describe('isOpen prop', () => {
+  function modalWithState(createOrEditDeveloperKeyState) {
+    return shallow(
+      modal({
+        createLtiKeyState,
+        createOrEditDeveloperKeyState,
+        actions: fakeActions
+      })
+    )
   }
 
-  const wrapper = mount(
-    <DeveloperKeyModal
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={editDeveloperKeyState}
-      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
-      actions={mergedFakeActions}
-      store={fakeStore}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-      ctx={{params: {contextId: '1'}}}
-    />
-  )
+  it('opens the modal if isOpen prop is true', () => {
+    const wrapper = modalWithState(createDeveloperKeyState)
+    expect(wrapper.find('Modal').prop('open')).toEqual(true)
+  })
 
-  wrapper.instance().submitForm()
-
-  const [[sentFormData]] = createOrEditSpy.mock.calls
-
-  const developer_key = sentFormData.developer_key
-
-  expect(developer_key.name).toEqual(developerKey.name)
-  expect(developer_key.email).toEqual(developerKey.email)
-  expect(developer_key.redirect_uri).toEqual(developerKey.redirect_uri)
-  expect(developer_key.redirect_uris).toEqual(developerKey.redirect_uris)
-  expect(developer_key.vendor_code).toEqual(developerKey.vendor_code)
-  expect(developer_key.icon_url).toEqual(developerKey.icon_url)
-  expect(developer_key.notes).toEqual(developerKey.notes)
-  expect(developer_key.require_scopes).toEqual(false)
-  expect(developer_key.test_cluster_only).toEqual(false)
-
-  wrapper.unmount()
+  it('closes the modal if isOpen prop is false', () => {
+    const wrapper = modalWithState(closedDeveloperKeyState)
+    expect(wrapper.find('Modal').prop('open')).toEqual(false)
+  })
 })
 
-it('it adds each selected scope to the form data', () => {
-  const createOrEditSpy = jest.fn()
-  const dispatchSpy = () => Promise.resolve()
-  const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
-  const fakeStore = {dispatch: dispatchSpy}
-  const developerKey2 = {...developerKey, require_scopes: true, scopes: ['test']}
-  const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
-  const wrapper = mount(
-    <DeveloperKeyModal
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={editDeveloperKeyState2}
-      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
-      actions={mergedFakeActions}
-      store={fakeStore}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-      ctx={{params: {contextId: '1'}}}
-    />
-  )
-  wrapper.instance().submitForm()
-  const [[sentFormData]] = createOrEditSpy.mock.calls
-  const developer_key = sentFormData.developer_key
-  expect(developer_key.scopes).toEqual(selectedScopes)
+describe('submitting the form', () => {
+  function submitForm(createOrEditDeveloperKeyState) {
+    const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: jest.fn()}
+    const wrapper = mount(
+      modal({
+        actions: mergedFakeActions,
+        createLtiKeyState,
+        createOrEditDeveloperKeyState,
+        listDeveloperKeyScopesState
+      })
+    )
 
-  wrapper.unmount()
+    wrapper.instance().submitForm()
+    const [[sentFormData]] = mergedFakeActions.createOrEditDeveloperKey.mock.calls
+    const sentDevKey = sentFormData.developer_key
+    wrapper.unmount()
+
+    return sentDevKey
+  }
+
+  it('sends the contents of the form saving', () => {
+    const developerKey2 = {
+      ...developerKey,
+      require_scopes: true,
+      scopes: ['test'],
+      test_cluster_only: true
+    }
+    const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
+
+    const sentDevKey = submitForm(editDeveloperKeyState2)
+    expect(sentDevKey).toEqual({
+      ...developerKey,
+      scopes: selectedScopes,
+      require_scopes: true,
+      test_cluster_only: true
+    })
+  })
+
+  it('sends form content without scopes and require_scopes set to false when not require_scopes', () => {
+    const sentDevKey = submitForm(editDeveloperKeyState)
+    expect(sentDevKey).toEqual({
+      ...developerKey,
+      require_scopes: false,
+      test_cluster_only: false
+    })
+  })
+
+  it('adds each selected scope to the form data', () => {
+    const developerKey2 = {...developerKey, require_scopes: true, scopes: ['test']}
+    const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
+    const sentDevKey = submitForm(editDeveloperKeyState2)
+    expect(sentDevKey.scopes).toEqual(selectedScopes)
+  })
+
+  it('removes testClusterOnly from the form data if it is undefined', () => {
+    const developerKey2 = {...developerKey, require_scopes: true, scopes: ['test']}
+    delete developerKey2.test_cluster_only
+    const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
+    const sentDevKey = submitForm(editDeveloperKeyState2)
+    expect(sentDevKey.test_cluster_only).toBeFalsy()
+  })
 })
 
-it('it removes testClusterOnly from the form data if it is undefined', () => {
-  const createOrEditSpy = jest.fn()
-  const dispatchSpy = () => Promise.resolve()
-  const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
-  const fakeStore = {dispatch: dispatchSpy}
-  const developerKey2 = {...developerKey, require_scopes: true, scopes: ['test']}
-  delete developerKey2.test_cluster_only
-  const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
-  const wrapper = mount(
-    <DeveloperKeyModal
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={editDeveloperKeyState2}
-      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
-      actions={mergedFakeActions}
-      store={fakeStore}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-      ctx={{params: {contextId: '1'}}}
-    />
-  )
-  wrapper.instance().submitForm()
-  const [[sentFormData]] = createOrEditSpy.mock.calls
-  const developer_key = sentFormData.developer_key
-  expect(developer_key.test_cluster_only).toBeFalsy()
+describe('scope selection', () => {
+  it('flashes an error if no scopes are selected', () => {
+    const flashStub = jest.spyOn($, 'flashError')
+    const createOrEditSpy = jest.fn()
+    const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
+    const developerKey2 = {...developerKey, require_scopes: true, scopes: []}
+    const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
+    const wrapper = mount(
+      modal({
+        createLtiKeyState,
+        createOrEditDeveloperKeyState: editDeveloperKeyState2,
+        listDeveloperKeyScopesState,
+        selectedScopes: [],
+        actions: mergedFakeActions
+      })
+    )
+    wrapper.instance().submitForm()
+    expect(flashStub).toHaveBeenCalledWith('At least one scope must be selected.')
 
-  wrapper.unmount()
-})
+    wrapper.unmount()
+  })
 
-it('flashes an error if no scopes are selected', () => {
-  const flashStub = jest.spyOn($, 'flashError')
-  const createOrEditSpy = jest.fn()
-  const dispatchSpy = () => Promise.resolve()
-  const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
-  const fakeStore = {dispatch: dispatchSpy}
-  const developerKey2 = {...developerKey, require_scopes: true, scopes: []}
-  const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
-  const wrapper = mount(
-    <DeveloperKeyModal
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={editDeveloperKeyState2}
-      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
-      actions={mergedFakeActions}
-      store={fakeStore}
-      mountNode={modalMountNode}
-      selectedScopes={[]}
-      ctx={{params: {contextId: '1'}}}
-    />
-  )
-  wrapper.instance().submitForm()
-  expect(flashStub).toHaveBeenCalledWith('At least one scope must be selected.')
+  it('allows saving if the key previously had scopes', () => {
+    const flashStub = jest.spyOn($, 'flashError')
+    const keyWithScopes = {...developerKey, require_scopes: true, scopes: selectedScopes}
+    const editKeyWithScopesState = {...editDeveloperKeyState, developerKey: keyWithScopes}
+    const wrapper = mount(
+      modal({
+        createLtiKeyState,
+        createOrEditDeveloperKeyState: editKeyWithScopesState,
+        listDeveloperKeyScopesState,
+        actions: fakeActions
+      })
+    )
 
-  wrapper.unmount()
-})
-
-it('allows saving if the key previously had scopes', () => {
-  const flashStub = jest.spyOn($, 'flashError')
-  const dispatchSpy = () => Promise.resolve()
-  const fakeStore = {dispatch: dispatchSpy}
-  const keyWithScopes = {...developerKey, require_scopes: true, scopes: selectedScopes}
-  const editKeyWithScopesState = {...editDeveloperKeyState, developerKey: keyWithScopes}
-  const wrapper = mount(
-    <DeveloperKeyModal
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      createOrEditDeveloperKeyState={editKeyWithScopesState}
-      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
-      actions={fakeActions}
-      store={fakeStore}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-      ctx={{params: {contextId: '1'}}}
-    />
-  )
-
-  wrapper.instance().submitForm()
-  expect(flashStub).not.toHaveBeenCalled()
-  wrapper.unmount()
+    wrapper.instance().submitForm()
+    expect(flashStub).not.toHaveBeenCalled()
+    wrapper.unmount()
+  })
 })
 
 it('clears the lti key state when modal is closed', () => {
@@ -410,18 +304,11 @@ it('clears the lti key state when modal is closed', () => {
   })
 
   const wrapper = mount(
-    <DeveloperKeyModal
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={createDeveloperKeyState}
-      actions={actions}
-      store={{dispatch: () => {}}}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-      ctx={{params: {contextId: '1'}}}
-    />
+    modal({
+      createLtiKeyState,
+      createOrEditDeveloperKeyState: createDeveloperKeyState,
+      actions
+    })
   )
   wrapper.instance().closeModal()
   expect(ltiStub).toHaveBeenCalled()
@@ -431,25 +318,17 @@ it('clears the lti key state when modal is closed', () => {
 it('flashes an error if redirect_uris is empty', () => {
   const flashStub = jest.spyOn($, 'flashError')
   const createOrEditSpy = jest.fn()
-  const dispatchSpy = () => Promise.resolve()
   const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
-  const fakeStore = {dispatch: dispatchSpy}
   const developerKey2 = {...developerKey, require_scopes: true, scopes: [], redirect_uris: ''}
   const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
   const wrapper = mount(
-    <DeveloperKeyModal
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={editDeveloperKeyState2}
-      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
-      actions={mergedFakeActions}
-      store={fakeStore}
-      mountNode={modalMountNode}
-      selectedScopes={[]}
-      ctx={{params: {contextId: '1'}}}
-    />
+    modal({
+      createLtiKeyState,
+      createOrEditDeveloperKeyState: editDeveloperKeyState2,
+      listDeveloperKeyScopesState,
+      actions: mergedFakeActions,
+      selectedScopes: []
+    })
   )
   wrapper.instance().saveLtiToolConfiguration()
   expect(flashStub).toHaveBeenCalledWith('A redirect_uri is required, please supply one.')
@@ -464,21 +343,14 @@ it('renders the saved toolConfiguration if it is present in state', () => {
   })
 
   const wrapper = mount(
-    <DeveloperKeyModal
-      createLtiKeyState={{...createLtiKeyState, configurationMethod: 'manual'}}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={{
+    modal({
+      createLtiKeyState: {...createLtiKeyState, configurationMethod: 'manual'},
+      createOrEditDeveloperKeyState: {
         ...createDeveloperKeyState,
         ...{developerKey: {...developerKey, tool_configuration: validToolConfig}, isLtiKey: true}
-      }}
-      actions={actions}
-      store={{dispatch: () => {}}}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-      ctx={{params: {contextId: '1'}}}
-    />
+      },
+      actions
+    })
   )
   wrapper.instance().saveLtiToolConfiguration()
   expect(wrapper.state().toolConfiguration.oidc_initiation_url).toEqual(
@@ -495,18 +367,11 @@ it('clears state on modal close', () => {
   })
 
   const wrapper = mount(
-    <DeveloperKeyModal
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      createOrEditDeveloperKeyState={createDeveloperKeyState}
-      actions={actions}
-      store={{dispatch: () => {}}}
-      mountNode={modalMountNode}
-      selectedScopes={selectedScopes}
-      ctx={{params: {contextId: '1'}}}
-    />
+    modal({
+      createLtiKeyState,
+      createOrEditDeveloperKeyState: createDeveloperKeyState,
+      actions
+    })
   )
   const text = 'I should show up in the text'
   wrapper.instance().setState({toolConfiguration: {oidc_initiation_url: text}})
@@ -519,22 +384,15 @@ it('hasRedirectUris', () => {
   developerKey.redirect_uris = null
 
   const wrapper = mount(
-    <DeveloperKeyModal
-      createOrEditDeveloperKeyState={{
+    modal({
+      createOrEditDeveloperKeyState: {
         ...createDeveloperKeyState,
         ...{developerKey: {...developerKey}, isLtiKey: true}
-      }}
-      mountNode={modalMountNode}
+      },
       // generic required props:
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      actions={fakeActions}
-      store={{dispatch: () => {}}}
-      selectedScopes={selectedScopes}
-      ctx={{params: {contextId: '1'}}}
-    />
+      createLtiKeyState,
+      actions: fakeActions
+    })
   )
 
   expect(wrapper.instance().hasRedirectUris).toEqual(null)
@@ -548,22 +406,15 @@ it('hasRedirectUris', () => {
 
 it('update `redirect_uris` when updating the tool configuration', () => {
   const wrapper = mount(
-    <DeveloperKeyModal
-      createOrEditDeveloperKeyState={{
+    modal({
+      createOrEditDeveloperKeyState: {
         ...createDeveloperKeyState,
         ...{developerKey: {...developerKey}, isLtiKey: true}
-      }}
-      mountNode={modalMountNode}
+      },
       // generic required props:
-      createLtiKeyState={createLtiKeyState}
-      availableScopes={{}}
-      availableScopesPending={false}
-      closeModal={() => {}}
-      actions={fakeActions}
-      store={{dispatch: () => {}}}
-      selectedScopes={selectedScopes}
-      ctx={{params: {contextId: '1'}}}
-    />
+      createLtiKeyState,
+      actions: fakeActions
+    })
   )
 
   wrapper.instance().updateConfigurationMethod('json')
@@ -581,24 +432,18 @@ it('update `redirect_uris` when updating the tool configuration', () => {
 it('does not flash an error if configurationMethod is url', () => {
   const flashStub = jest.spyOn($, 'flashError')
   const saveLtiToolConfigurationSpy = jest.fn()
-  const dispatchSpy = () => Promise.resolve()
   const actions = Object.assign(fakeActions, {
     saveLtiToolConfiguration: () => () => ({then: saveLtiToolConfigurationSpy})
   })
   const wrapper = mount(
-    <DeveloperKeyModal
-      createLtiKeyState={{}}
-      availableScopes={{}}
-      availableScopesPending={false}
-      createOrEditDeveloperKeyState={editDeveloperKeyState}
-      listDeveloperKeyScopesState={listDeveloperKeyScopesState}
-      actions={actions}
-      store={{dispatch: dispatchSpy}}
-      state={{}}
-      mountNode={modalMountNode}
-      selectedScopes={[]}
-      ctx={{params: {contextId: '1'}}}
-    />
+    modal({
+      createLtiKeyState: {},
+      createOrEditDeveloperKeyState: editDeveloperKeyState,
+      listDeveloperKeyScopesState,
+      actions,
+      selectedScopes: [],
+      state: {}
+    })
   )
 
   wrapper.instance().updateConfigurationMethod('url')
