@@ -342,7 +342,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     due_at_changed? ||
       workflow_state_changed? ||
       only_visible_to_overrides_changed? ||
-      (assignment.nil? && next_quiz_type == "assignment")
+      (assignment.nil? && ["assignment", "graded_survey"].include?(next_quiz_type))
   end
 
   def assignment?
