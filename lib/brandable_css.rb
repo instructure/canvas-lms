@@ -368,8 +368,8 @@ module BrandableCSS
     end
 
     def all_fingerprints_for(bundle_path)
-      variants.each_with_object({}) do |variant, object|
-        object[variant] = cache_for(bundle_path, variant)
+      variants.index_with do |variant|
+        cache_for(bundle_path, variant)
       end
     end
   end

@@ -154,7 +154,7 @@ module PostgreSQLAdapterExtensions
 
       # add info on sort order for columns (only desc order is explicitly specified, asc is the default)
       desc_order_columns = inddef.scan(/(\w+) DESC/).flatten
-      orders = desc_order_columns.any? ? Hash[desc_order_columns.map { |order_column| [order_column, :desc] }] : {}
+      orders = desc_order_columns.any? ? desc_order_columns.index_with { :desc } : {}
 
       ActiveRecord::ConnectionAdapters::IndexDefinition.new(table_name, index_name, unique, column_names, orders: orders)
     end

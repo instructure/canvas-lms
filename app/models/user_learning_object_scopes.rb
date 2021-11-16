@@ -31,7 +31,7 @@ module UserLearningObjectScopes
   def _params_hash(parent_binding)
     caller_method = method(caller_locations(1, 1).first.base_label)
     caller_param_names = caller_method.parameters.map(&:last)
-    param_values = caller_param_names.each_with_object({}) { |v, h| h[v] = parent_binding.local_variable_get(v) }
+    param_values = caller_param_names.index_with { |v| parent_binding.local_variable_get(v) }
     opts = param_values[:opts]
     param_values = param_values.except(:opts).merge(opts) if opts
     param_values

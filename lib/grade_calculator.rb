@@ -202,7 +202,7 @@ class GradeCalculator
   def create_course_grade_live_event(old_score, score)
     return if LIVE_EVENT_FIELDS.all? { |f| old_score.send(f) == score.send(f) }
 
-    old_score_values = LIVE_EVENT_FIELDS.map { |f| [f, old_score.send(f)] }.to_h
+    old_score_values = LIVE_EVENT_FIELDS.index_with { |f| old_score.send(f) }
     Canvas::LiveEvents.course_grade_change(score, old_score_values, old_score.enrollment)
   end
 

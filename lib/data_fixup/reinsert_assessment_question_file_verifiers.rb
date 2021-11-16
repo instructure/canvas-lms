@@ -25,7 +25,7 @@ module DataFixup::ReinsertAssessmentQuestionFileVerifiers
     end
     updates = {}
     if links.any?
-      att_id_map = Hash[links.map { |l| [l, l.match(/\/assessment_questions\/\d+\/files\/(\d+)/)[1].to_i] }]
+      att_id_map = links.index_with { |l| l.match(/\/assessment_questions\/\d+\/files\/(\d+)/)[1].to_i }
       uuid_map = Hash[Attachment.where(:id => att_id_map.values, :context_type => "AssessmentQuestion").pluck(:id, :uuid)]
       links.each do |link|
         uuid = uuid_map[att_id_map[link]]

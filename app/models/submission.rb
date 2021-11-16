@@ -1817,7 +1817,7 @@ class Submission < ActiveRecord::Base
   def self.bulk_load_attachments_for_submissions(submissions, preloads: nil)
     submissions = Array(submissions)
     attachment_ids_by_submission =
-      Hash[submissions.map { |s| [s, s.attachment_associations.map(&:attachment_id)] }]
+      submissions.index_with { |s| s.attachment_associations.map(&:attachment_id) }
     bulk_attachment_ids = attachment_ids_by_submission.values.flatten.uniq
     if bulk_attachment_ids.empty?
       attachments_by_id = {}

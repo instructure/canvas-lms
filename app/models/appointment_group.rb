@@ -420,10 +420,9 @@ class AppointmentGroup < ActiveRecord::Base
   ].freeze
 
   def update_appointments
-    changed = Hash[
+    changed =
       EVENT_ATTRIBUTES.select { |attr| saved_change_to_attribute?(attr) }
-                      .map { |attr| [attr, send(attr)] }
-    ]
+                      .index_with { |attr| send(attr) }
 
     if @contexts_changed
       changed[:root_account_id] = self.context&.root_account_id
