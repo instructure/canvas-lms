@@ -883,7 +883,7 @@ module Api::V1::Assignment
     else
       # assignment id -> specific submission. never return an array when
       # include[]=observed_users was _not_ supplied
-      hash = Hash[subs_list.map { |s| [s.assignment_id, s] }]
+      hash = subs_list.index_by(&:assignment_id)
     end
     hash
   end

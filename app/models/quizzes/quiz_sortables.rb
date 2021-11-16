@@ -52,8 +52,8 @@ class Quizzes::QuizSortables
   end
 
   def all_objects_hash
-    @quiz_objects_hash ||= all_objects.each_with_object({}) do |obj, hash|
-      hash["#{obj.class.name.demodulize.underscore}_#{obj.id}"] = obj
+    @quiz_objects_hash ||= all_objects.index_by do |obj|
+      "#{obj.class.name.demodulize.underscore}_#{obj.id}"
     end
   end
 

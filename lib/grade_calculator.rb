@@ -421,8 +421,8 @@ class GradeCalculator
 
   def group_score_rows
     enrollments_by_user.keys.map do |user_id|
-      current_group_scores = @current_groups[user_id].map { |group| [group[:global_id], group] }.to_h
-      final_group_scores = @final_groups[user_id].map { |group| [group[:global_id], group] }.to_h
+      current_group_scores = @current_groups[user_id].index_by { |group| group[:global_id] }
+      final_group_scores = @final_groups[user_id].index_by { |group| group[:global_id] }
       @groups.map do |group|
         agid = group.global_id
         current = current_group_scores[agid]
@@ -763,9 +763,8 @@ class GradeCalculator
     end
 
     assignments_by_group_id = visible_assignments.group_by(&:assignment_group_id)
-    submissions_by_assignment_id = Hash[
-      submissions.map { |s| [s.assignment_id, s] }
-    ]
+    submissions_by_assignment_id =
+      submissions.index_by(&:assignment_id)
 
     @groups.map do |group|
       assignments = assignments_by_group_id[group.id] || []
