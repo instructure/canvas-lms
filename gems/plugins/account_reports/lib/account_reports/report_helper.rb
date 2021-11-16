@@ -458,7 +458,7 @@ module AccountReports::ReportHelper
     csvs = {}
     activate_report_db(replica: replica) do
       files.each do |file, headers_for_file|
-        csvs[file] = if @account_report.account_report_rows.exists?(file: file)
+        csvs[file] = if @account_report.account_report_rows.where(file: file).exists?
                        generate_and_run_report(headers_for_file) do |csv|
                          @account_report.account_report_rows.where(file: file)
                                         .order(:account_report_runner_id, :row_number)

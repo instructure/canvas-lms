@@ -429,7 +429,7 @@ module SpeedGrader
       group_id = current_user.get_preference(:gradebook_settings, course.global_id)&.dig('filter_rows_by', 'student_group_id')
 
       # If we selected a group that is now deleted, don't use it
-      Group.active.exists?(id: group_id) ? group_id : nil
+      Group.active.where(id: group_id).exists? ? group_id : nil
     end
 
     def section_id_filter

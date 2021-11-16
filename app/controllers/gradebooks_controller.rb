@@ -983,7 +983,7 @@ class GradebooksController < ApplicationController
     if params[:selected_section_id]
       section_to_show = if params[:selected_section_id] == 'all'
                           nil
-                        elsif @context.active_course_sections.exists?(id: params[:selected_section_id])
+                        elsif @context.active_course_sections.where(id: params[:selected_section_id]).exists?
                           params[:selected_section_id]
                         end
 
