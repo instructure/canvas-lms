@@ -97,7 +97,7 @@ module Lti
                                                                .filter_map { |e| e.try(:associated_user).try(:lti_context_id) }
     end
 
-    def current_account_enrollments()
+    def current_account_enrollments
       @current_account_enrollments ||= if @canvas_context.respond_to?(:account_chain) && !@canvas_context.account_chain.empty?
                                          @canvas_user.account_users.active.where(account_id: @canvas_context.account_chain).distinct.to_a
                                        else

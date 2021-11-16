@@ -227,7 +227,7 @@ class MediaObject < ActiveRecord::Base
         self.max_size = [self.max_size || 0, asset[:size].to_i].max
       end
     end
-    self.total_size = [self.max_size || 0, assets.map { |a| (a[:size] || 0).to_i }.sum].max
+    self.total_size = [self.max_size || 0, assets.sum { |a| (a[:size] || 0).to_i }].max
     self.save
     ensure_attachment
     self.data

@@ -69,7 +69,7 @@
 #           "type": "boolean"
 #         },
 #         "beta": {
-#           "description": "Whether the feature is a beta feature. If true, the feature may not be fully polished and may be subject to change in the future.",
+#           "description": "Whether the feature is a feature preview. If true, opting in includes ongoing updates outside the regular release schedule.",
 #           "example": true,
 #           "type": "boolean"
 #         },
@@ -198,7 +198,7 @@ class FeatureFlagsController < ApplicationController
 
   # @API List environment features
   #
-  # Return a hash of global feature settings that pertain to the
+  # Return a hash of global feature options that pertain to the
   # Canvas user interface. This is the same information supplied to the
   # web interface as +ENV.FEATURES+.
   #

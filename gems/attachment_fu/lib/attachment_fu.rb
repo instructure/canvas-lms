@@ -323,7 +323,7 @@ module AttachmentFu # :nodoc:
     end
 
     # nil placeholder in case this field is used in a form.
-    def uploaded_data()
+    def uploaded_data
       nil
     end
 

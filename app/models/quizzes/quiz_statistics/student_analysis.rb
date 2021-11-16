@@ -420,7 +420,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
 
     question = Quizzes::QuizQuestion::Base.from_question_data(question).stats(responses)
     none = {
-      :responses => question[:responses] - question[:answers].map { |a| a[:responses] || 0 }.sum,
+      :responses => question[:responses] - question[:answers].sum { |a| a[:responses] || 0 },
       :id => "none",
       :weight => 0,
       :text => I18n.t('statistics.no_answer', "No Answer"),

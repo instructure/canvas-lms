@@ -29,7 +29,7 @@ module Lti
       @context_external_tool = context_external_tool
     end
 
-    def convert()
+    def convert
       LtiOutbound::LTITool.new.tap do |lti_tool|
         lti_tool.name = @context_external_tool.name
         lti_tool.consumer_key = @context_external_tool.consumer_key

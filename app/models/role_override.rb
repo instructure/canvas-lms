@@ -285,7 +285,7 @@ class RoleOverride < ActiveRecord::Base
         :available_to => %w(AccountAdmin AccountMembership),
       },
       :view_feature_flags => {
-        :label => lambda { t("View feature settings at an account level") },
+        :label => lambda { t("View feature options at an account level") },
         :label_v2 => lambda { t("Feature Options - view") },
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)

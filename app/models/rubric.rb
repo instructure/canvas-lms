@@ -401,7 +401,7 @@ class Rubric < ActiveRecord::Base
   end
 
   def total_points_from_criteria(criteria)
-    criteria.reject { |c| c[:ignore_for_scoring] }.map { |c| c[:points] }.reduce(:+)
+    criteria.reject { |c| c[:ignore_for_scoring] }.sum { |c| c[:points] }
   end
 
   # undo innocuous changes introduced by migrations which break `will_change_with_update?`

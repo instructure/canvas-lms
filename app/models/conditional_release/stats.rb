@@ -140,7 +140,7 @@ module ConditionalRelease
         new_scores = Array.wrap(new_score_or_scores).compact
         return unless old_score && new_scores.present?
 
-        average = new_scores.reduce(&:+) / new_scores.length
+        average = new_scores.sum / new_scores.length
         percentage_points_improvement = average - old_score
         return 1 if percentage_points_improvement >= 0.03
         return -1 if percentage_points_improvement <= -0.03

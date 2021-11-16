@@ -121,7 +121,7 @@ module AccountReports
       end
     end
 
-    def unused_courses()
+    def unused_courses
       courses = root_account.all_courses.active
                             .select("courses.id, courses.name, courses.course_code,
                 courses.sis_source_id, courses.created_at,

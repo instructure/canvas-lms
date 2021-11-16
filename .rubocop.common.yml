@@ -96,6 +96,8 @@ Performance/StringInclude:
   Severity: error
 Performance/StringReplacement:
   Severity: error
+Performance/Sum:
+  Severity: error
 Performance/TimesMap:
   Severity: error
 
@@ -167,6 +169,8 @@ Style/CaseLikeIf:
 Style/ColonMethodCall:
   Severity: error
 Style/ConditionalAssignment:
+  Severity: error
+Style/DefWithParentheses:
   Severity: error
 Style/Documentation:
   Enabled: false # most things don't need to be documented
