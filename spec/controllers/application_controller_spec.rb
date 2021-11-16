@@ -2354,7 +2354,7 @@ describe WikiPagesController do
       get 'index', params: { :course_id => @course.id }
 
       expect(controller.js_env).to include(:WIKI_RIGHTS)
-      expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eq Hash[@course.wiki.check_policy(@teacher).map { |right| [right, true] }]
+      expect(controller.js_env[:WIKI_RIGHTS].symbolize_keys).to eq(@course.wiki.check_policy(@teacher).index_with { true })
     end
   end
 end

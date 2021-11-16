@@ -1645,7 +1645,7 @@ class UsersController < ApplicationController
     when request.get?
       return unless authorized_action(user, @current_user, :read)
 
-      render json: BOOLEAN_PREFS.each_with_object({}) { |pref, h| h[pref] = !!user.preferences[pref] }
+      render json: BOOLEAN_PREFS.index_with { |pref| !!user.preferences[pref] }
     when request.put?
       return unless authorized_action(user, @current_user, [:manage, :manage_user_details])
 
@@ -1656,7 +1656,7 @@ class UsersController < ApplicationController
       respond_to do |format|
         format.json {
           if user.save
-            render json: BOOLEAN_PREFS.each_with_object({}) { |pref, h| h[pref] = !!user.preferences[pref] }
+            render json: BOOLEAN_PREFS.index_with { |pref| !!user.preferences[pref] }
           else
             render(json: user.errors, status: :bad_request)
           end

@@ -489,7 +489,7 @@ describe "assignments" do
 
     context "frozen assignment" do
       before do
-        stub_freezer_plugin Hash[Assignment::FREEZABLE_ATTRIBUTES.map { |a| [a, "true"] }]
+        stub_freezer_plugin(Assignment::FREEZABLE_ATTRIBUTES.index_with { "true" })
         default_group = @course.assignment_groups.create!(:name => "default")
         @frozen_assign = frozen_assignment(default_group)
       end
