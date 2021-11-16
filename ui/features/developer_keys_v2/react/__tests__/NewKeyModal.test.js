@@ -404,29 +404,39 @@ it('hasRedirectUris', () => {
   wrapper.unmount()
 })
 
-it('update `redirect_uris` when updating the tool configuration', () => {
-  const wrapper = mount(
-    modal({
-      createOrEditDeveloperKeyState: {
-        ...createDeveloperKeyState,
-        ...{developerKey: {...developerKey}, isLtiKey: true}
-      },
-      // generic required props:
-      createLtiKeyState,
-      actions: fakeActions
-    })
-  )
+describe('redirect_uris automatic setting', () => {
+  let wrapper
 
-  wrapper.instance().updateConfigurationMethod('json')
-  wrapper.instance().updateToolConfiguration({})
+  beforeEach(() => {
+    wrapper = mount(
+      modal({
+        createOrEditDeveloperKeyState: {
+          ...createDeveloperKeyState,
+          ...{developerKey: {...developerKey}, isLtiKey: true}
+        },
+        // generic required props:
+        createLtiKeyState,
+        actions: fakeActions
+      })
+    )
 
-  expect(wrapper.state().developerKey.redirect_uris).toBeFalsy()
+    wrapper.instance().updateConfigurationMethod('json')
+    wrapper.instance().updateToolConfiguration({})
+  })
 
-  wrapper.instance().updateToolConfiguration(validToolConfig)
+  afterEach(() => wrapper.unmount())
 
-  expect(wrapper.state().developerKey.redirect_uris).toEqual(validToolConfig.target_link_uri)
+  it('updates `redirect_uris` when updating the tool configuration', () => {
+    expect(wrapper.state().developerKey.redirect_uris).toBeFalsy()
+    wrapper.instance().updateToolConfiguration(validToolConfig)
+    expect(wrapper.state().developerKey.redirect_uris).toEqual(validToolConfig.target_link_uri)
+  })
 
-  wrapper.unmount()
+  it('does not update `redirect_uris` if already set when updating the tool configuration', () => {
+    wrapper.instance().updateDeveloperKey('redirect_uris', 'already-filled')
+    wrapper.instance().updateToolConfiguration(validToolConfig)
+    expect(wrapper.state().developerKey.redirect_uris).toEqual('already-filled')
+  })
 })
 
 it('does not flash an error if configurationMethod is url', () => {
