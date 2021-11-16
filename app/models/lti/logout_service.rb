@@ -81,7 +81,7 @@ module Lti
     end
 
     def self.register_logout_callback(token, callback)
-      return unless token.pseudonym && token.pseudonym.id && callback.present?
+      return unless token.pseudonym&.id && callback.present?
 
       callbacks = get_logout_callbacks(token.pseudonym)
       raise BasicLTI::BasicOutcomes::Unauthorized, 'Logout service token has already been used' if callbacks.key?(token.nonce)
@@ -91,7 +91,7 @@ module Lti
     end
 
     def self.queue_callbacks(pseudonym)
-      return unless pseudonym && pseudonym.id
+      return unless pseudonym&.id
 
       callbacks = get_logout_callbacks(pseudonym)
       return unless callbacks.any?

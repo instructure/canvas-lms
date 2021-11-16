@@ -74,7 +74,7 @@ class ContentTag < ActiveRecord::Base
   acts_as_list :scope => :context_module
 
   set_policy do
-    given { |user, session| self.context && self.context.grants_right?(user, session, :manage_content) }
+    given { |user, session| self.context&.grants_right?(user, session, :manage_content) }
     can :delete
   end
 
@@ -181,7 +181,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def confirm_valid_module_requirements
-    self.context_module && self.context_module.confirm_valid_requirements
+    self.context_module&.confirm_valid_requirements
   end
 
   def scoreable?
@@ -303,7 +303,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def asset_context_matches?
-    self.content && self.content.respond_to?(:context) && self.content.context == context
+    self.content.respond_to?(:context) && self.content.context == context
   end
 
   def update_asset_name!(user = nil)
@@ -327,7 +327,7 @@ class ContentTag < ActiveRecord::Base
   def update_asset_workflow_state!
     return unless self.sync_workflow_state_to_asset?
     return unless self.asset_context_matches?
-    return unless self.content && self.content.respond_to?(:publish!)
+    return unless self.content.respond_to?(:publish!)
 
     # update the asset and also update _other_ content tags that point at it
     if self.unpublished? && self.content.published? && self.content.can_unpublish?
@@ -381,7 +381,7 @@ class ContentTag < ActiveRecord::Base
       raise LastLinkToOutcomeNotDestroyed.new "Outcome '#{aligned_outcome}' cannot be deleted because it is aligned to content."
     end
 
-    context_module.remove_completion_requirement(id) if context_module
+    context_module&.remove_completion_requirement(id)
 
     self.workflow_state = 'deleted'
     self.save!
@@ -480,7 +480,7 @@ class ContentTag < ActiveRecord::Base
 
   def context_module_action(user, action, points = nil)
     GuardRail.activate(:primary) do
-      self.context_module.update_for(user, action, self, points) if self.context_module
+      self.context_module&.update_for(user, action, self, points)
     end
   end
 

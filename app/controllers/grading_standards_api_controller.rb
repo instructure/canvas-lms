@@ -187,10 +187,8 @@ class GradingStandardsApiController < ApplicationController
     grading_standard_params = params.permit('title')
     grading_standard_params['standard_data'] = {}
     grading_standard_params['standard_data'].permit!
-    if params['grading_scheme_entry']
-      params['grading_scheme_entry'].each_with_index do |scheme, index|
-        grading_standard_params['standard_data']["scheme_#{index}"] = scheme.permit(:name, :value)
-      end
+    params['grading_scheme_entry']&.each_with_index do |scheme, index|
+      grading_standard_params['standard_data']["scheme_#{index}"] = scheme.permit(:name, :value)
     end
     grading_standard_params
   end

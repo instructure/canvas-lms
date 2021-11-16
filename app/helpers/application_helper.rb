@@ -308,7 +308,7 @@ module ApplicationHelper
   def css_variant(opts = {})
     variant = use_responsive_layout? ? 'responsive_layout' : 'new_styles'
     use_high_contrast =
-      (@current_user && @current_user.prefers_high_contrast?) || opts[:force_high_contrast]
+      @current_user&.prefers_high_contrast? || opts[:force_high_contrast]
     variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast') +
       (I18n.rtl? ? '_rtl' : '')
   end
@@ -427,7 +427,7 @@ module ApplicationHelper
 
   def embedded_chat_url
     chat_tool = active_external_tool_by_id('chat')
-    return unless chat_tool && chat_tool.url && chat_tool.custom_fields['mini_view_url']
+    return unless chat_tool&.url && chat_tool.custom_fields['mini_view_url']
 
     uri = URI.parse(chat_tool.url)
     uri.path = chat_tool.custom_fields['mini_view_url']
@@ -436,7 +436,7 @@ module ApplicationHelper
 
   def embedded_chat_enabled
     chat_tool = active_external_tool_by_id('chat')
-    chat_tool && chat_tool.url && chat_tool.custom_fields['mini_view_url'] &&
+    chat_tool&.url && chat_tool.custom_fields['mini_view_url'] &&
       Canvas::Plugin.value_to_boolean(chat_tool.custom_fields['embedded_chat_enabled'])
   end
 
@@ -640,7 +640,7 @@ module ApplicationHelper
   end
 
   def inline_media_comment_link(comment = nil)
-    if comment && comment.media_comment_id
+    if comment&.media_comment_id
       raw "<a href=\"#\" class=\"instructure_inline_media_comment no-underline\" #{dataify(comment, :media_comment_id, :media_comment_type)} >&nbsp;</a>"
     end
   end

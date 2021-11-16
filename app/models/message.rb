@@ -402,7 +402,7 @@ class Message < ActiveRecord::Base
       context = context.root_account if context.respond_to?(:root_account)
 
       # Going through SisPseudonym.for is important since the account could change
-      if context && context.respond_to?(:root_account)
+      if context.respond_to?(:root_account)
         p = SisPseudonym.for(user, context, type: :implicit, require_sis: false)
         context = p.account if p
       else
@@ -602,7 +602,7 @@ class Message < ActiveRecord::Base
       # they can only change it if they are registered in the first place
       # do not show this for emails telling users to register
       if footer_message.present? && !self.notification&.registration?
-        self.body = <<-END.strip_heredoc
+        self.body = <<~TEXT.strip_heredoc
           #{self.body}
 
 
@@ -612,7 +612,7 @@ class Message < ActiveRecord::Base
           ________________________________________
 
           #{footer_message}
-        END
+        TEXT
       end
     end
 
@@ -671,7 +671,7 @@ class Message < ActiveRecord::Base
     # Set the timezone back to what it originally was
     Time.zone = original_time_zone if original_time_zone.present?
 
-    hacked_course.apply_nickname_for!(nil) if hacked_course
+    hacked_course&.apply_nickname_for!(nil)
 
     @i18n_scope = nil
   end
@@ -1169,7 +1169,7 @@ class Message < ActiveRecord::Base
                     elsif asset.respond_to?(:course) && asset.course.is_a?(Course)
                       asset.course
                     end
-    hacked_course.apply_nickname_for!(user) if hacked_course
+    hacked_course&.apply_nickname_for!(user)
     hacked_course
   end
 end

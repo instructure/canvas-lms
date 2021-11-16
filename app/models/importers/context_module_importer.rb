@@ -326,7 +326,7 @@ module Importers
         end
       elsif resource_class == DiscussionTopic
         topic = context_module.context.discussion_topics.where(migration_id: hash[:linked_resource_id]).first if hash[:linked_resource_id]
-        if topic && topic.is_announcement
+        if topic&.is_announcement
           migration.add_warning(t("The announcement \"%{title}\" could not be linked to the module \"%{mod_title}\"", :title => hash[:title], :mod_title => context_module.name))
         elsif topic
           item = context_module.add_item({
@@ -367,10 +367,8 @@ module Importers
         item.save!
         items << item
       end
-      if hash[:sub_items]
-        hash[:sub_items].each do |tag_hash|
-          items.concat self.add_module_item_from_migration(context_module, tag_hash, level + 1, context, item_map, migration)
-        end
+      hash[:sub_items]&.each do |tag_hash|
+        items.concat self.add_module_item_from_migration(context_module, tag_hash, level + 1, context, item_map, migration)
       end
       items
     end

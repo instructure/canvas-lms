@@ -198,7 +198,7 @@ class LearningOutcome < ActiveRecord::Base
                                   context_type: context.class_name,
                                   id: alignment_id
                                 }).first
-    tag.destroy if tag
+    tag&.destroy
     tag
   end
 
@@ -465,10 +465,10 @@ class LearningOutcome < ActiveRecord::Base
               .active
               .distinct
               .where(content_id: id)
-              .select(<<-SQL)
-        root_account_id,
-        (CASE WHEN context_type='LearningOutcomeGroup' THEN NULL ELSE context_type END) context_type,
-        (CASE WHEN context_type='LearningOutcomeGroup' THEN NULL ELSE context_id END) context_id
+              .select(<<~SQL.squish)
+                root_account_id,
+                (CASE WHEN context_type='LearningOutcomeGroup' THEN NULL ELSE context_type END) context_type,
+                (CASE WHEN context_type='LearningOutcomeGroup' THEN NULL ELSE context_id END) context_id
               SQL
               .map do |ct|
       Outcomes::LearningOutcomeGroupChildren.new(ct.context).clear_total_outcomes_cache

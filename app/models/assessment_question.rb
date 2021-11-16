@@ -130,7 +130,7 @@ class AssessmentQuestion < ActiveRecord::Base
         path = URI.unescape(id_or_path)
         file = Folder.find_attachment_in_context_with_path(assessment_question_bank.context, path)
       end
-      if file && file.replacement_attachment_id
+      if file&.replacement_attachment_id
         file = file.replacement_attachment
       end
       begin
@@ -142,7 +142,7 @@ class AssessmentQuestion < ActiveRecord::Base
                      " AssessmentQuestion#translate_links: "\
                      "id: #{self.id} error_report: #{er_id}")
       end
-      new_file.save if new_file
+      new_file&.save
       file_substitutions[id_or_path] = new_file
     end
     if (sub = file_substitutions[id_or_path])
@@ -155,7 +155,7 @@ class AssessmentQuestion < ActiveRecord::Base
 
   def translate_links
     # we can't translate links unless this question has a context (through a bank)
-    return unless assessment_question_bank && assessment_question_bank.context
+    return unless assessment_question_bank&.context
 
     # This either matches the id from a url like: /courses/15395/files/11454/download
     # or gets the relative path at the end of one like: /courses/15395/file_contents/course%20files/unfiled/test.jpg

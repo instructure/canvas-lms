@@ -476,13 +476,13 @@ describe ContentMigration do
       @bank = @copy_from.assessment_question_banks.create!(:title => 'Test Bank')
       @attachment = attachment_with_context(@copy_from)
       @attachment2 = @attachment = Attachment.create!(:filename => 'test.jpg', :display_name => "test.jpg", :uploaded_data => StringIO.new('psych!'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
-      data = { 'question_type' => 'text_only_question', "name" => "Hi", "question_text" => <<-HTML.strip }
-      File ref:<img src="/courses/#{@copy_from.id}/files/#{@attachment.id}/download">
-      different file ref: <img src="/courses/#{@copy_from.id}/file_contents/course%20files/unfiled/test.jpg">
-      media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
-      equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_216" alt="Log_216">
-      link to some other course: <a href="/courses/#{@copy_from.id + @copy_to.id}">Cool Course</a>
-      canvas image: <img style="max-width: 723px;" src="/images/preview.png" alt="">
+      data = { 'question_type' => 'text_only_question', "name" => "Hi", "question_text" => <<~HTML.strip }
+        File ref:<img src="/courses/#{@copy_from.id}/files/#{@attachment.id}/download">
+        different file ref: <img src="/courses/#{@copy_from.id}/file_contents/course%20files/unfiled/test.jpg">
+        media object: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
+        equation: <img class="equation_image" title="Log_216" src="/equation_images/Log_216" alt="Log_216">
+        link to some other course: <a href="/courses/#{@copy_from.id + @copy_to.id}">Cool Course</a>
+        canvas image: <img style="max-width: 723px;" src="/images/preview.png" alt="">
       HTML
       @question = @bank.assessment_questions.create!(:question_data => data)
       expect(@question.reload.question_data['question_text']).to match %r{/assessment_questions/}
@@ -540,7 +540,7 @@ describe ContentMigration do
     end
 
     it "copies quiz question mathml equation image references correctly" do
-      qtext = <<-HTML.strip
+      qtext = <<~HTML.strip
         equation: <p>
           <img class="equation_image" title="\\sum" src="/equation_images/%255Csum"
             alt="LaTeX: \\sum" data-equation-content="\\sum" x-canvaslms-safe-mathml="&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot;&gt;
@@ -560,12 +560,12 @@ describe ContentMigration do
     end
 
     it "does more terrible equation stuff" do
-      qtext = <<-HTML.strip
-            hmm: <p><img class="equation_image"
-      data-equation-content="h\\left( x \\right) = \\left\\{ {\\begin{array}{*{20}{c}}
-      {{x^2} + 4x - 1}&amp;{{\\rm{for}}}&amp;{ - 7 \\le x \\le - 1}\\\\
-      { - 3x + p}&amp;{{\\rm{for}}}&amp;{ - 1 &lt; x \\le 6}
-      \\end{array}} \\right."></p>
+      qtext = <<~HTML.strip
+              hmm: <p><img class="equation_image"
+        data-equation-content="h\\left( x \\right) = \\left\\{ {\\begin{array}{*{20}{c}}
+        {{x^2} + 4x - 1}&amp;{{\\rm{for}}}&amp;{ - 7 \\le x \\le - 1}\\\\
+        { - 3x + p}&amp;{{\\rm{for}}}&amp;{ - 1 &lt; x \\le 6}
+        \\end{array}} \\right."></p>
       HTML
 
       data = { 'question_name' => 'test question 1', 'question_type' => 'essay_question', 'question_text' => qtext }

@@ -264,7 +264,8 @@ module Lti
         # this course. From there we get the unique list of courses, ordering by
         # which has the migration with the latest timestamp.
         results = Course.connection.with_statement_timeout do
-          Course.from("(WITH RECURSIVE all_contexts AS (
+          Course.from(<<~SQL.squish)
+            (WITH RECURSIVE all_contexts AS (
               SELECT context_id, source_course_id
               FROM #{ContentMigration.quoted_table_name}
               WHERE context_id=#{@context.id}
@@ -282,7 +283,8 @@ module Lti
               SELECT x.context_id
               FROM all_contexts x))
             ORDER BY courses.lti_context_id, ct.finished_at DESC
-            ) as courses")
+            ) as courses
+          SQL
                 .where.not(lti_context_id: nil).order(finished_at: :desc).limit(limit + 1).pluck(:lti_context_id)
         end
 

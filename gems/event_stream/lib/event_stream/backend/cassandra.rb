@@ -35,11 +35,11 @@ module EventStream::Backend
     end
 
     def database_name
-      database && database.keyspace
+      database&.keyspace
     end
 
     def database_fingerprint
-      database && database.fingerprint
+      database&.fingerprint
     end
 
     def fetch_cql

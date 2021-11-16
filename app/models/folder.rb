@@ -236,7 +236,7 @@ class Folder < ActiveRecord::Base
   def hidden?
     return @hidden if defined?(@hidden)
 
-    @hidden = self.workflow_state == 'hidden' || (self.parent_folder && self.parent_folder.hidden?)
+    @hidden = self.workflow_state == 'hidden' || self.parent_folder&.hidden?
   end
 
   def hidden
@@ -254,7 +254,7 @@ class Folder < ActiveRecord::Base
   def public?
     return @public if defined?(@public)
 
-    @public = self.workflow_state == 'public' || (self.parent_folder && self.parent_folder.public?)
+    @public = self.workflow_state == 'public' || self.parent_folder&.public?
   end
 
   def mime_class
@@ -366,7 +366,7 @@ class Folder < ActiveRecord::Base
   def self.is_locked?(folder_id)
     RequestCache.cache('folder_is_locked', folder_id) do
       folder = Folder.where(:id => folder_id).first
-      folder && folder.locked?
+      folder&.locked?
     end
   end
 

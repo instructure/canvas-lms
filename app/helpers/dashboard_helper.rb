@@ -43,18 +43,18 @@ module DashboardHelper
 
   def welcome_message
     if @current_user.has_future_enrollment?
-      t('#users.welcome.unpublished_courses_message', <<-BODY)
+      t('#users.welcome.unpublished_courses_message', <<~TEXT)
         You've enrolled in one or more courses that have not started yet. Once
         those courses are available, you will see information about them here
         and in the navigation on the left side. In the meantime, feel free to sign up for
         more courses or set up your profile.
-      BODY
+      TEXT
     else
-      t('#users.welcome.no_courses_message', <<-BODY)
+      t('#users.welcome.no_courses_message', <<~TEXT)
         You don't have any courses, so this page won't be very exciting for now.
         Once you've created or signed up for courses, you'll start to see
         conversations from all of your classes.
-      BODY
+      TEXT
     end
   end
 

@@ -385,7 +385,7 @@ class Enrollment < ActiveRecord::Base
       # or it may be a deletion/unenrollment from a section but not from the course as a whole (still enrolled in another section)
       if !is_deleted || other_section_enrollment_exists?
         # don't bother unless the group's category has section restrictions
-        next unless group.group_category && group.group_category.restricted_self_signup?
+        next unless group.group_category&.restricted_self_signup?
 
         # skip if the user is the only user in the group. there's no one to have
         # a conflicting section.
@@ -404,7 +404,7 @@ class Enrollment < ActiveRecord::Base
       # by leaving the section he/she is completely leaving the course so remove the
       # user from any group related to the course.
       membership = group.group_memberships.where(user_id: self.user_id).first
-      membership.destroy if membership
+      membership&.destroy
     end
   end
   protected :audit_groups_for_deleted_enrollments
@@ -456,7 +456,7 @@ class Enrollment < ActiveRecord::Base
     enrollment = linked_enrollment_for(observer)
     # we don't want to "undelete" observer enrollments that have been
     # explicitly deleted
-    return nil if enrollment && enrollment.deleted? && workflow_state_before_last_save != 'deleted'
+    return nil if enrollment&.deleted? && workflow_state_before_last_save != 'deleted'
 
     enrollment
   end
@@ -584,7 +584,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def associated_user_name
-    self.associated_user && self.associated_user.short_name
+    self.associated_user&.short_name
   end
 
   def assert_section
@@ -609,7 +609,7 @@ class Enrollment < ActiveRecord::Base
     return @long_name if @long_name
 
     @long_name = self.course_name(display_user)
-    @long_name = t('#enrollment.with_section', "%{course_name}, %{section_name}", :course_name => @long_name, :section_name => self.course_section.display_name) if self.course_section && self.course_section.display_name && self.course_section.display_name != self.course_name(display_user)
+    @long_name = t('#enrollment.with_section', "%{course_name}, %{section_name}", :course_name => @long_name, :section_name => self.course_section.display_name) if self.course_section&.display_name && self.course_section.display_name != self.course_name(display_user)
     @long_name
   end
 
@@ -1413,10 +1413,10 @@ class Enrollment < ActiveRecord::Base
     # find it, fall back to the section or course creation date.
     enrollment_dates.map(&:first).compact.min ||
       start_at ||
-      (course_section && course_section.start_at) ||
+      course_section&.start_at ||
       course.start_at ||
-      (course.enrollment_term && course.enrollment_term.start_at) ||
-      (course_section && course_section.created_at) ||
+      course.enrollment_term&.start_at ||
+      course_section&.created_at ||
       course.created_at
   end
 
@@ -1426,9 +1426,9 @@ class Enrollment < ActiveRecord::Base
     # looking at the enrollment, section, course, then term.
     enrollment_dates.map(&:last).compact.max ||
       end_at ||
-      (course_section && course_section.end_at) ||
+      course_section&.end_at ||
       course.conclude_at ||
-      (course.enrollment_term && course.enrollment_term.end_at)
+      course.enrollment_term&.end_at
   end
 
   def self.cross_shard_invitations?

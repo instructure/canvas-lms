@@ -630,7 +630,7 @@ class UsersController < ApplicationController
       end
 
       if (@show_recent_feedback = @current_user.student_enrollments.active.exists?)
-        @recent_feedback = (@current_user && @current_user.recent_feedback) || []
+        @recent_feedback = @current_user&.recent_feedback || []
       end
     end
 

@@ -681,7 +681,7 @@ class ContextModuleItemsApiController < ApplicationController
   def mark_item_read
     if authorized_action(@context, @current_user, :read)
       get_module_item
-      content = (@item.content && @item.content.respond_to?(:locked_for?)) ? @item.content : @item
+      content = @item.content.respond_to?(:locked_for?) ? @item.content : @item
       return render :json => { :message => t('The module item is locked.') }, :status => :forbidden if content.locked_for?(@current_user)
 
       @item.context_module_action(@current_user, :read)

@@ -307,11 +307,11 @@ module AssignmentOverrideApplicator
 
     self.setup_overridden_clone(unoverridden_assignment_or_quiz,
                                 overrides) do |cloned_assignment_or_quiz|
-      if overrides && overrides.any?
+      if overrides&.any?
         self.collapsed_overrides(unoverridden_assignment_or_quiz, overrides).each do |field, value|
           # for any times in the value set, bring them back from raw UTC into the
           # current Time.zone before placing them in the assignment
-          value = value.in_time_zone if value && value.respond_to?(:in_time_zone) && !value.is_a?(Date)
+          value = value.in_time_zone if value.respond_to?(:in_time_zone) && !value.is_a?(Date)
           cloned_assignment_or_quiz.write_attribute(field, value)
         end
       end
@@ -346,7 +346,7 @@ module AssignmentOverrideApplicator
             # force times to un-zoned UTC -- this will be a cached value and should
             # not care about the TZ of the user that cached it. the user's TZ will
             # be applied before it's returned.
-            value = value.utc if value && value.respond_to?(:utc) && !value.is_a?(Date)
+            value = value.utc if value.respond_to?(:utc) && !value.is_a?(Date)
             overridden_data[field] = value
           end
         end

@@ -290,7 +290,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
             row << answer_ids.map { |answer_id| (question[:answers].detect { |a| a[:id] == answer_id } || {})[:text].try(:gsub, /,/, '\,') }.compact.join(',')
           when 'calculated_question'
             list = question[:answers].take(1).flat_map do |ans|
-              ans[:variables] && ans[:variables].map do |variable|
+              ans[:variables]&.map do |variable|
                 [variable[:name], variable[:value].to_s].map { |str| str.gsub(/=>/, '\=>') }.join('=>')
               end
             end

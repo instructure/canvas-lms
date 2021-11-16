@@ -105,7 +105,7 @@ class RubricAssessment < ActiveRecord::Base
     end
 
     # attempt
-    if self.artifact && self.artifact.is_a?(Submission)
+    if self.artifact.is_a?(Submission)
       result.attempt = self.artifact.attempt || 1
       result.submitted_at = self.artifact.submitted_at
     else
@@ -217,15 +217,14 @@ class RubricAssessment < ActiveRecord::Base
     }
     can :read
 
-    given { |user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :manage) }
+    given { |user, session| self.rubric_association&.grants_right?(user, session, :manage) }
     can :create and can :read and can :delete
 
-    given { |user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :view_rubric_assessments) }
+    given { |user, session| self.rubric_association&.grants_right?(user, session, :view_rubric_assessments) }
     can :read
 
     given { |user, session|
-      self.rubric_association &&
-        self.rubric_association.grants_right?(user, session, :manage) &&
+      self.rubric_association&.grants_right?(user, session, :manage) &&
         (self.rubric_association.association_object.context.grants_right?(self.assessor, :manage_rubrics) rescue false)
     }
     can :update

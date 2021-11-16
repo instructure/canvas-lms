@@ -227,12 +227,12 @@ describe CalendarEvent do
       end
 
       it "returns a plain-text description" do
-        calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => <<-HTML)
-      <p>
-        This assignment is due December 16th. <b>Please</b> do the reading.
-        <br/>
-        <a href="www.example.com">link!</a>
-      </p>
+        calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => <<~HTML)
+          <p>
+            This assignment is due December 16th. <b>Please</b> do the reading.
+            <br/>
+            <a href="www.example.com">link!</a>
+          </p>
         HTML
         ev = @event.to_ics(in_own_calendar: false)
         expect(ev.description).to match_ignoring_whitespace("This assignment is due December 16th. Please do the reading.  [link!](www.example.com)")

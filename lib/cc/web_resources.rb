@@ -144,7 +144,7 @@ module CC
         end
       end
 
-      files_file.close if files_file
+      files_file&.close
       rel_path
     end
 

@@ -674,10 +674,8 @@ class Account < ActiveRecord::Base
       end
     end
     res = [[("&nbsp;&nbsp;" * indent).html_safe + self.name, self.id]]
-    if preloaded_accounts[self.id]
-      preloaded_accounts[self.id].each do |account|
-        res += account.sub_accounts_as_options(indent + 1, preloaded_accounts)
-      end
+    preloaded_accounts[self.id]&.each do |account|
+      res += account.sub_accounts_as_options(indent + 1, preloaded_accounts)
     end
     res
   end
@@ -963,7 +961,7 @@ class Account < ActiveRecord::Base
       guard_rail_env = Account.connection.open_transactions == 0 ? :secondary : GuardRail.environment
       GuardRail.activate(guard_rail_env) do
         chain.concat(Shard.shard_for(starting_account_id).activate do
-          Account.find_by_sql(<<~SQL)
+          Account.find_by_sql(<<~SQL.squish)
             WITH RECURSIVE t AS (
               SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
               UNION
@@ -988,7 +986,7 @@ class Account < ActiveRecord::Base
 
         if starting_account_id
           GuardRail.activate(:secondary) do
-            ids = Account.connection.select_values(<<~SQL)
+            ids = Account.connection.select_values(<<~SQL.squish)
               WITH RECURSIVE t AS (
                 SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
                 UNION
@@ -1010,7 +1008,7 @@ class Account < ActiveRecord::Base
     if connection.adapter_name == 'PostgreSQL'
       original_shard = Shard.current
       Shard.partition_by_shard(starting_account_ids) do |sliced_acc_ids|
-        ids = Account.connection.select_values(<<~SQL)
+        ids = Account.connection.select_values(<<~SQL.squish)
           WITH RECURSIVE t AS (
             SELECT * FROM #{Account.quoted_table_name} WHERE id IN (#{sliced_acc_ids.join(", ")})
             UNION
@@ -1173,12 +1171,12 @@ class Account < ActiveRecord::Base
 
   def get_account_role_by_name(role_name)
     role = get_role_by_name(role_name)
-    return role if role && role.account_role?
+    return role if role&.account_role?
   end
 
   def get_course_role_by_name(role_name)
     role = get_role_by_name(role_name)
-    return role if role && role.course_role?
+    return role if role&.course_role?
   end
 
   def get_role_by_name(role_name)
@@ -1527,7 +1525,7 @@ class Account < ActiveRecord::Base
     def define_special_account(key, name = nil)
       name ||= key.to_s.titleize
       self.special_account_list << key
-      instance_eval <<-RUBY, __FILE__, __LINE__ + 1
+      instance_eval <<~RUBY, __FILE__, __LINE__ + 1
         def self.#{key}(force_create = false)
           get_special_account(:#{key}, #{name.inspect}, force_create)
         end

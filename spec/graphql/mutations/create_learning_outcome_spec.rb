@@ -61,10 +61,10 @@ describe Mutations::CreateLearningOutcome do
   end
 
   it "creates a learning outcome" do
-    query = <<~QUERY
+    query = <<~GQL
       groupId: #{@course_group.id}
       title: "Spec Learning Outcome via Mutation"
-    QUERY
+    GQL
     result = execute_with_input(query)
     expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'createLearningOutcome', 'errors')).to be_nil
@@ -84,10 +84,10 @@ describe Mutations::CreateLearningOutcome do
   end
 
   it "creates a global outcome" do
-    query = <<~QUERY
+    query = <<~GQL
       groupId: #{@global_group.id}
       title: "Spec Learning Outcome via Mutation"
-    QUERY
+    GQL
     result = execute_with_input(query, user_executing: @site_admin)
     expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'createLearningOutcome', 'errors')).to be_nil
@@ -108,13 +108,13 @@ describe Mutations::CreateLearningOutcome do
 
   context "creates non required fields if supplied for" do
     it "display_name, vendor_guid, description" do
-      query = <<~QUERY
+      query = <<~GQL
         groupId: #{@course_group.id}
         title: "Spec Learning Outcome via Mutation"
         displayName: "Display name for spec"
         vendorGuid: "ven_guid_1"
         description: "Learning Outcome via Mutation Description"
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect(result.dig('errors')).to be_nil
       expect(result.dig('data', 'createLearningOutcome', 'errors')).to be_nil
@@ -137,36 +137,36 @@ describe Mutations::CreateLearningOutcome do
     end
 
     it "group id is required" do
-      query = <<~QUERY
+      query = <<~GQL
         title: "Spec Learning Outcome via Mutation"
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, 'Argument \'groupId\' on InputObject \'CreateLearningOutcomeInput\' is required.')
     end
 
     it "non-global outcomes require manage_outcome permission" do
-      query = <<~QUERY
+      query = <<~GQL
         groupId: #{@course_group.id}
         title: "Spec Learning Outcome via Mutation"
-      QUERY
+      GQL
       result = execute_with_input(query, user_executing: @student)
       expect_error(result, 'insufficient permission')
     end
 
     it "global outcomes require manage_global_outcome permission" do
-      query = <<~QUERY
+      query = <<~GQL
         groupId: #{@global_group.id}
         title: "Spec Learning Outcome via Mutation"
-      QUERY
+      GQL
       result = execute_with_input(query, user_executing: @admin)
       expect_error(result, 'insufficient permission')
     end
 
     it "invalid group id" do
-      query = <<~QUERY
+      query = <<~GQL
         groupId: 0
         title: "Spec Learning Outcome via Mutation"
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, 'group not found')
     end
@@ -174,18 +174,18 @@ describe Mutations::CreateLearningOutcome do
     it "deleted group" do
       another_group = @course.learning_outcome_groups.create!(title: 'Delete me')
       another_group.delete
-      query = <<~QUERY
+      query = <<~GQL
         groupId: #{another_group.id}
         title: "Spec Learning Outcome via Mutation"
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, 'group not found')
     end
 
     it "title is required" do
-      query = <<~QUERY
+      query = <<~GQL
         groupId: #{@course_group.id}
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, 'Argument \'title\' on InputObject \'CreateLearningOutcomeInput\' is required.')
     end
@@ -194,10 +194,10 @@ describe Mutations::CreateLearningOutcome do
   context 'transactions' do
     it 'rolls back outcome creation if linking to group fails' do
       expect_any_instance_of(LearningOutcomeGroup).to receive(:add_outcome).and_raise('Boom!')
-      query = <<~QUERY
+      query = <<~GQL
         groupId: #{@course_group.id}
         title: "Spec Learning Outcome via Mutation"
-      QUERY
+      GQL
       expect { execute_with_input(query) }.to raise_error('Boom!').and change { LearningOutcome.count }.by(0)
     end
   end

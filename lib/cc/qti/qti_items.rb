@@ -84,7 +84,7 @@ module CC
 
       def qq_mig_id(question)
         qq_id = question['id']
-        if @manifest && @manifest.exporter.for_master_migration
+        if @manifest&.exporter&.for_master_migration
           create_key("quizzes/quiz_question_#{Shard.global_id_for(qq_id)}") # curse you namespacing
         else
           create_key("quiz_question_#{qq_id}")
@@ -93,7 +93,7 @@ module CC
 
       def aq_mig_id(question)
         aq_id = question['assessment_question_id']
-        if @manifest && @manifest.exporter.for_master_migration
+        if @manifest&.exporter&.for_master_migration
           aq_id = Shard.global_id_for(aq_id)
         end
         create_key("assessment_question_#{aq_id}")

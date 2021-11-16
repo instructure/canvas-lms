@@ -34,7 +34,7 @@ describe "i18n js" do
       # everything except %N %6N %9N %U %V %W %Z
       format = "%a %A %b %B %d %-d %D %e %F %h %H %I %j %k %l %L %m %M %n %3N %p %P %r %R %s %S %t %T %u %v %w %y %Y %z %%"
       date = Time.now
-      expect(driver.execute_script(<<-JS).upcase).to eq date.strftime(format).upcase
+      expect(driver.execute_script(<<~JS).upcase).to eq date.strftime(format).upcase
         var date = new Date(#{date.strftime('%s')} * 1000 + #{date.strftime('%L').gsub(/^0+/, '')});
         return I18n.strftime(date, '#{format}');
       JS
@@ -51,7 +51,7 @@ describe "i18n js" do
         [locale.to_s, I18n.backend.send(:translations)[locale].slice(*core_keys)]
       end].deep_stringify_keys
 
-      expect(driver.execute_script(<<-JS)).to eq core_translations
+      expect(driver.execute_script(<<~JS)).to eq core_translations
         var core = {};
         var coreKeys = #{core_keys.map(&:to_s).inspect};
         Object.keys(I18n.translations).forEach(function(locale) {

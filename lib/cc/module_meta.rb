@@ -119,7 +119,7 @@ module CC
           end
         end
       end
-      meta_file.close if meta_file
+      meta_file&.close
       rel_path
     end
   end

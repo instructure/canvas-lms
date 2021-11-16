@@ -71,7 +71,7 @@ module Canvas::Migration
           cm.save
           cm.update_import_progress(100)
         rescue => e
-          cm.fail_with_error!(e) if cm
+          cm&.fail_with_error!(e)
         end
       end
 

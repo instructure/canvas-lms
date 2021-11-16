@@ -107,9 +107,9 @@ class ErrorReport < ActiveRecord::Base
           Rails.logger.error("Failed creating ErrorReport: #{e.inspect}")
           Rails.logger.error("Original error: #{opts[:message]}")
           Rails.logger.error("Original exception: #{opts[:exception_message]}") if opts[:exception_message]
-          @exception.backtrace.each do |line|
+          @exception&.backtrace&.each do |line|
             Rails.logger.error("Trace: #{line}")
-          end if @exception
+          end
         end
         report
       end

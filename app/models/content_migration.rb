@@ -455,7 +455,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def set_default_settings
-    if self.context && self.context.respond_to?(:root_account) &&
+    if self.context.respond_to?(:root_account) &&
        (account = self.context.root_account) &&
        (default_ms = account.settings[:default_migration_settings])
       self.migration_settings = default_ms.merge(self.migration_settings).with_indifferent_access
@@ -797,7 +797,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def clear_migration_data
-    @zip_file.close if @zip_file
+    @zip_file&.close
     @zip_file = nil
   end
 

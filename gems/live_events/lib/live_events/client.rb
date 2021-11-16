@@ -125,7 +125,7 @@ module LiveEvents
 
       # We don't care too much about the partition key, but it seems safe to
       # let it be the user_id when that's available.
-      partition_key ||= (ctx["user_id"] && ctx["user_id"].try(:to_s)) || rand(1000).to_s
+      partition_key ||= ctx["user_id"]&.try(:to_s) || rand(1000).to_s
 
       pusher = @worker || LiveEvents.worker
 

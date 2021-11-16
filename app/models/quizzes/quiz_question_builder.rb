@@ -150,7 +150,7 @@ class Quizzes::QuizQuestionBuilder
       variables.each do |variable|
         variable_id = ::AssessmentQuestion.variable_id(variable)
         re = Regexp.new("\\[#{variable}\\]")
-        text = text.sub re, <<-HTML
+        text = text.sub re, <<~HTML
           <input
             class='question_input'
             type='text'
@@ -175,7 +175,7 @@ class Quizzes::QuizQuestionBuilder
           "<option value='#{a[:id]}'>#{CGI.escapeHTML(answer_text)}</option>"
         end
 
-        select = <<-HTML
+        select = <<~HTML
           <select class='question_input' name='question_#{q[:id]}_#{variable_id}'>
             <option value=''>
               #{ERB::Util.h(t('#quizzes.quiz.default_question_input', "[ Select ]"))}

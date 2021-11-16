@@ -80,12 +80,10 @@ module ConditionalRelease
           next unless valid_id?(trigger_id)
 
           rule = course.conditional_release_rules.active.where(:trigger_assignment_id => trigger_id).first
-          if rule
-            # TODO: yes this is lazy as hell but mostly blame the jerk that originally wrote the conditional_release importer
-            # if it becomes an issue, someday we could make these first-class migration objects (and even include some blueprint logic)
-            # but today is not that day
-            rule.scoring_ranges.destroy_all
-          end
+          # TODO: yes this is lazy as hell but mostly blame the jerk that originally wrote the conditional_release importer
+          # if it becomes an issue, someday we could make these first-class migration objects (and even include some blueprint logic)
+          # but today is not that day
+          rule&.scoring_ranges&.destroy_all
           rule ||= course.conditional_release_rules.new(:trigger_assignment_id => trigger_id)
 
           ranges = rule_hash['scoring_ranges'].map do |range_hash|

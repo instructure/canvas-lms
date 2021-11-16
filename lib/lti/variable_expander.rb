@@ -88,8 +88,8 @@ module Lti
     ASSIGNMENT_GUARD = -> { @assignment }
     FILE_UPLOAD_GUARD = -> { !!@assignment && @assignment.submission_types.split(',').include?('online_upload') }
     COLLABORATION_GUARD = -> { @collaboration }
-    MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object }
-    USAGE_RIGHTS_GUARD = -> { @attachment && @attachment.usage_rights }
+    MEDIA_OBJECT_GUARD = -> { @attachment&.media_object }
+    USAGE_RIGHTS_GUARD = -> { @attachment&.usage_rights }
     MEDIA_OBJECT_ID_GUARD = -> { @attachment && (@attachment.media_object || @attachment.media_entry_id) }
     LTI1_GUARD = -> { @tool.is_a?(ContextExternalTool) }
     MASQUERADING_GUARD = -> { !!@controller && @controller.logged_in_user != @current_user }
@@ -121,7 +121,7 @@ module Lti
     def [](key)
       k = (key[0] == '$' && key) || "$#{key}"
       expansion, args = self.class.find_expansion(k)
-      expansion.expand(self, *args) if expansion
+      expansion&.expand(self, *args)
     end
 
     def expand_variables!(var_hash)
@@ -1585,7 +1585,7 @@ module Lti
     end
 
     def lti_1_3?
-      @tool && @tool.respond_to?(:use_1_3?) && @tool.use_1_3?
+      @tool.respond_to?(:use_1_3?) && @tool.use_1_3?
     end
   end
 end

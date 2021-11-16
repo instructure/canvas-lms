@@ -163,7 +163,7 @@ class Login::SamlController < ApplicationController
              pseudonym.works_for_account?(target_account, true)
             token = SessionToken.new(pseudonym.global_id,
                                      current_user_id: pseudonym.global_user_id).to_s
-            uri.query.concat('&') if uri.query
+            uri.query&.concat('&')
             uri.query ||= ''
             uri.query.concat("session_token=#{token}")
             session[:return_to] = uri.to_s

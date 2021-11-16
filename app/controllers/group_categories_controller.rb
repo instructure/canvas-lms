@@ -418,12 +418,15 @@ class GroupCategoriesController < ApplicationController
         csv_string = CSV.generate do |csv|
           section_names = @context.course_sections.select(:id, :name).index_by(&:id)
           users = @context.participating_students
-                          .select("users.id, users.sortable_name,
-                  -- we just want any that have an sis_pseudonym_id populated
-                  MAX (enrollments.sis_pseudonym_id) AS sis_pseudonym_id,
-                  -- grab all the section_ids to get the section names
-                  ARRAY_AGG (enrollments.course_section_id) AS course_section_ids")
-                          .where("enrollments.type='StudentEnrollment'").order("users.sortable_name").group(:id)
+                          .select(<<~SQL.squish)
+                            users.id, users.sortable_name,
+                            /* we just want any that have an sis_pseudonym_id populated */
+                            MAX (enrollments.sis_pseudonym_id) AS sis_pseudonym_id,
+                            /* grab all the section_ids to get the section names */
+                            ARRAY_AGG (enrollments.course_section_id) AS course_section_ids
+                          SQL
+                          .where("enrollments.type='StudentEnrollment'")
+                          .order("users.sortable_name").group(:id)
           gms_by_user_id = GroupMembership.active.where(group_id: @group_category.groups.active.select(:id))
                                           .joins(:group).select(:user_id, :name, :sis_source_id, :group_id).index_by(&:user_id)
           csv << export_headers(include_sis_id, gms_by_user_id.any?)

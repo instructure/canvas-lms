@@ -2917,14 +2917,14 @@ describe "Users API", type: :request do
       expect(json['props_token']).to be_present
       expect(json['expires_at']).to be_present
 
-      public_key = OpenSSL::PKey::EC.new(<<~PUBLIC)
+      public_key = OpenSSL::PKey::EC.new(<<~PEM)
         -----BEGIN PUBLIC KEY-----
         MIGbMBAGByqGSM49AgEGBSuBBAAjA4GGAAQAl7Lj7fG0+JySG4NPsBqUyYBhazI0
         fbIPPioXwGOEaDzRUDoBs7S3ppDwt3aMotMCRJT0dBVj7ZRTIm0KpJcfy5gAsHh9
         qmWGlRyEJlGTMvXD6DkJAFfZcQqc66tmY1vEREbaDGOjGWeWegmkHjJoj+ZyJkE1
         tSz8dIduYbgQ9SrJRsE=
         -----END PUBLIC KEY-----
-      PUBLIC
+      PEM
       body = Canvas::Security.decode_jwt(json['auth_token'], [public_key])
       expect(body[:iss]).to eq "IOS_key"
     end

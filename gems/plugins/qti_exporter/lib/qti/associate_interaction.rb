@@ -236,7 +236,7 @@ module Qti
         answer[:comments] = ""
         resp_id = ci['responseIdentifier']
         match_node = @doc.at_css("responseCondition match baseValue[identifier=#{resp_id}]")
-        choice_id = match_node && match_node.inner_text
+        choice_id = match_node&.inner_text
         match_index = nil
         if choice_id
           ci.css('simpleChoice').each_with_index do |sc, j|

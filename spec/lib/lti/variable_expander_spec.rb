@@ -1301,7 +1301,7 @@ module Lti
           exp_hash = { test: '$Canvas.term.startAt' }
           variable_expander.expand_variables!(exp_hash)
 
-          unless term && term.start_at
+          unless term&.start_at
             expect(exp_hash[:test]).to eq '$Canvas.term.startAt'
           end
         end
@@ -1330,7 +1330,7 @@ module Lti
           exp_hash = { test: '$Canvas.term.name' }
           variable_expander.expand_variables!(exp_hash)
 
-          unless term && term.name
+          unless term&.name
             expect(exp_hash[:test]).to eq '$Canvas.term.name'
           end
         end

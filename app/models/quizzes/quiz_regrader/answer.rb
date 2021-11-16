@@ -85,7 +85,7 @@ class Quizzes::QuizRegrader::Answer
 
       # update points_possible if we are part of a quiz group
       group = question.quiz_group
-      if group && group.pick_count
+      if group&.pick_count
         @question_data[:points_possible] = group.question_points
       end
     end

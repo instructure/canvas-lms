@@ -224,11 +224,11 @@ module AuthenticationMethods
         return redirect_to(login_url(:needs_cookies => '1'))
       end
 
-      @current_user = @current_pseudonym && @current_pseudonym.user
+      @current_user = @current_pseudonym&.user
     end
 
     logger.info "[AUTH] inital load: pseud -> #{@current_pseudonym&.id}, user -> #{@current_user&.id}"
-    if @current_user && @current_user.unavailable?
+    if @current_user&.unavailable?
       logger.info "[AUTH] Invalid request: User is currently UNAVAILABLE"
       @current_pseudonym = nil
       @current_user = nil

@@ -53,7 +53,7 @@ class UnzipAttachment
     @rename_files = !!opts[:rename_files]
     @migration_id_map = opts[:migration_id_map] || {}
 
-    raise ArgumentError, "Must provide a context." unless self.context && self.context.is_a_context?
+    raise ArgumentError, "Must provide a context." unless self.context&.is_a_context?
     raise ArgumentError, "Must provide a filename." unless self.filename
     raise ArgumentError, "Must provide a context files folder." unless self.context_files_folder
   end
@@ -126,7 +126,7 @@ class UnzipAttachment
           f.unlink
           raise
         rescue => e
-          @logger.warn "Couldn't unzip archived file #{f.path}: #{e.message}" if @logger
+          @logger&.warn "Couldn't unzip archived file #{f.path}: #{e.message}"
         end
       end
       update_attachment_positions(id_positions)

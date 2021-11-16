@@ -134,7 +134,7 @@ module Assignments
     end
 
     def all_submissions
-      string = <<~SQL
+      string = <<~SQL.squish
         submissions.assignment_id = ?
           AND e.course_id = ?
           AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')

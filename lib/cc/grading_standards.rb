@@ -59,7 +59,7 @@ module CC
         end
       end
 
-      standards_file.close if standards_file
+      standards_file&.close
       rel_path
     end
   end

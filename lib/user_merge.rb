@@ -180,7 +180,7 @@ class UserMerge
     @merge_data.save!
   rescue => e
     @merge_data&.update_attribute(:workflow_state, 'failed')
-    @merge_data.items.create!(user: target_user, item_type: 'merge_error', item: e.backtrace.unshift(e.message)) if @merge_data
+    @merge_data&.items&.create!(user: target_user, item_type: 'merge_error', item: e.backtrace.unshift(e.message))
     Canvas::Errors.capture(e, type: :user_merge, merge_data_id: @merge_data&.id, from_user_id: from_user&.id, target_user_id: target_user&.id)
     raise
   end

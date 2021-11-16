@@ -33,20 +33,20 @@ module Types
 
     class SelfSignupPolicyType < BaseEnum
       graphql_name "SelfSignupPolicy"
-      description <<~DESC
+      description <<~MD
         Determines if/how a student may join a group. A student can belong to
         only one group per group set at a time.
-      DESC
+      MD
 
       value "enabled", "students may join any group", value: "enabled"
       value "restricted", "students may join a group in their section", value: "restricted"
       value "disabled", "self signup is not allowed"
     end
 
-    field :member_limit, Integer, <<~DESC, method: :group_limit, null: true
+    field :member_limit, Integer, <<~MD, method: :group_limit, null: true
       Sets a cap on the number of members in the group.  Only applies when
       self-signup is enabled.
-    DESC
+    MD
 
     field :self_signup, SelfSignupPolicyType, null: false
     def self_signup

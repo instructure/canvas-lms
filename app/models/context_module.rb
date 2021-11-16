@@ -107,10 +107,8 @@ class ContextModule < ActiveRecord::Base
         # don't queue a job unless necessary
         delay_if_production(strand: "module_reeval_#{self.global_context_id}").evaluate_all_progressions
       end
-      if @discussion_topics_to_recalculate
-        @discussion_topics_to_recalculate.each do |dt|
-          dt.delay_if_production(strand: "module_reeval_#{self.global_context_id}").recalculate_context_module_actions!
-        end
+      @discussion_topics_to_recalculate&.each do |dt|
+        dt.delay_if_production(strand: "module_reeval_#{self.global_context_id}").recalculate_context_module_actions!
       end
     end
   end
@@ -918,7 +916,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   VALID_COMPLETION_EVENTS.each do |event|
-    self.class_eval <<-CODE
+    self.class_eval <<~RUBY, __FILE__, __LINE__ + 1
       def #{event}=(value)
         if Canvas::Plugin.value_to_boolean(value)
           self.completion_events |= [:#{event}]
@@ -930,7 +928,7 @@ class ContextModule < ActiveRecord::Base
       def #{event}?
         completion_events.include?(:#{event})
       end
-    CODE
+    RUBY
   end
 
   def completion_event_callbacks

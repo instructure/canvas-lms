@@ -52,9 +52,9 @@ describe Mutations::DeleteConversationMessages do
 
   it "removes the message from the participant's view" do
     message.root_account_ids = [sender.account.id]
-    query = <<~QUERY
+    query = <<~GQL
       ids: [#{message.id}]
-    QUERY
+    GQL
     expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 1
     result = execute_with_input(query)
     expect(result.dig('errors')).to be_nil
@@ -65,17 +65,17 @@ describe Mutations::DeleteConversationMessages do
 
   context "errors" do
     it "fails if the message doesn't exist" do
-      query = <<~QUERY
+      query = <<~GQL
         ids: [#{ConversationMessage.maximum(:id)&.next || 0}]
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, 'Unable to find ConversationMessage')
     end
 
     it "fails if the requesting user is not a participant" do
-      query = <<~QUERY
+      query = <<~GQL
         ids: [#{message.id}]
-      QUERY
+      GQL
       result = execute_with_input(query, user_executing: user_model)
       expect_error(result, 'Insufficient permissions')
     end
@@ -88,9 +88,9 @@ describe Mutations::DeleteConversationMessages do
       it "removes messages from the view" do
         message.root_account_ids = [sender.account.id]
         message2.root_account_ids = [sender.account.id]
-        query = <<~QUERY
+        query = <<~GQL
           ids: [#{message.id}, #{message2.id}]
-        QUERY
+        GQL
         expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 2
         result = execute_with_input(query)
         expect(result.dig('errors')).to be_nil
@@ -104,9 +104,9 @@ describe Mutations::DeleteConversationMessages do
       let(:invalid_id) { ConversationMessage.maximum(:id)&.next || 0 }
 
       it "bails without deleting any messages" do
-        query = <<~QUERY
+        query = <<~GQL
           ids: [#{message.id}, #{invalid_id}]
-        QUERY
+        GQL
         expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 1
         result = execute_with_input(query)
         expect_error(result, 'Unable to find ConversationMessage')
@@ -120,9 +120,9 @@ describe Mutations::DeleteConversationMessages do
       let(:message2) { ConversationMessage.find_by(conversation: conv2, author: sender) }
 
       it "bails without deleting any messages" do
-        query = <<~QUERY
+        query = <<~GQL
           ids: [#{message.id}, #{message2.id}]
-        QUERY
+        GQL
         expect(sender.all_conversations.find_by(conversation: message.conversation).messages.length).to eq 1
         expect(sender.all_conversations.find_by(conversation: message2.conversation).messages.length).to eq 1
         result = execute_with_input(query)

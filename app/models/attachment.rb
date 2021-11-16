@@ -501,7 +501,7 @@ class Attachment < ActiveRecord::Base
     self.file_state ||= "available"
     self.assert_file_extension
     self.folder_id = nil if !self.folder || self.folder.context != self.context
-    self.folder_id = nil if self.folder && self.folder.deleted? && !self.deleted?
+    self.folder_id = nil if self.folder&.deleted? && !self.deleted?
     self.folder_id ||= Folder.unfiled_folder(self.context).id rescue nil
     self.folder_id ||= Folder.root_folders(context).first.id rescue nil
     if self.root_attachment && self.new_record?
@@ -999,7 +999,7 @@ class Attachment < ActiveRecord::Base
     if self.thumbnail || geometry.present?
       to_use = thumbnail_for_size(geometry) || self.thumbnail
       to_use.cached_s3_url
-    elsif self.media_object && self.media_object.media_id
+    elsif self.media_object&.media_id
       CanvasKaltura::ClientV3.new.thumbnail_url(self.media_object.media_id,
                                                 :width => options[:width] || 140,
                                                 :height => options[:height] || 100,
@@ -1137,7 +1137,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def filename
-    read_attribute(:filename) || (self.root_attachment && self.root_attachment.filename)
+    read_attribute(:filename) || self.root_attachment&.filename
   end
 
   def filename=(name)
@@ -1349,7 +1349,7 @@ class Attachment < ActiveRecord::Base
   def hidden?
     return @hidden if defined?(@hidden)
 
-    @hidden = self.file_state == 'hidden' || (self.folder && self.folder.hidden?)
+    @hidden = self.file_state == 'hidden' || self.folder&.hidden?
   end
 
   def published?
@@ -2021,10 +2021,8 @@ class Attachment < ActiveRecord::Base
     self.file_state = 'available'
     self.save!
 
-    if opts[:progress]
-      # the UI only needs the id from here
-      opts[:progress].set_results({ id: self.id })
-    end
+    # the UI only needs the id from here
+    opts[:progress]&.set_results({ id: self.id })
 
     handle_duplicates(duplicate_handling || 'overwrite')
     nil # the rescue returns true if the file failed and is retryable, nil if successful
@@ -2107,7 +2105,7 @@ class Attachment < ActiveRecord::Base
 
   def self.copy_attachments_to_submissions_folder(assignment_context, attachments)
     attachments.map do |attachment|
-      if attachment.folder && attachment.folder.for_submissions? &&
+      if attachment.folder&.for_submissions? &&
          !attachment.associated_with_submission?
         # if it's already in a submissions folder and has not been submitted previously, we can leave it there
         attachment

@@ -207,7 +207,7 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   Lti::ResourcePlacement::PLACEMENTS.each do |type|
-    class_eval <<-RUBY, __FILE__, __LINE__ + 1
+    class_eval <<~RUBY, __FILE__, __LINE__ + 1
       def #{type}(setting=nil)
         # expose inactive placements to API
         extension_setting(:#{type}, setting) || extension_setting(:inactive_placements, :#{type})

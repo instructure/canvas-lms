@@ -178,7 +178,7 @@ class RubricsController < ApplicationController
         @rubric.rubric_id = original_rubric_id
         @rubric.user = @current_user
       end
-      if params[:rubric] && (@rubric.grants_right?(@current_user, session, :update) || (@association && @association.grants_right?(@current_user, session, :update))) # authorized_action(@rubric, @current_user, :update)
+      if params[:rubric] && (@rubric.grants_right?(@current_user, session, :update) || @association&.grants_right?(@current_user, session, :update)) # authorized_action(@rubric, @current_user, :update)
         @association = @rubric.update_with_association(@current_user, params[:rubric], @context, association_params)
         @rubric = @association.rubric if @association
       end

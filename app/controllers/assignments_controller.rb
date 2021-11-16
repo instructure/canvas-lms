@@ -574,7 +574,7 @@ class AssignmentsController < ApplicationController
     @assignment.updating_user = @current_user
 
     respond_to do |format|
-      if @assignment && @assignment.send(method)
+      if @assignment&.send(method)
         format.json { render json: @assignment.as_json(methods: :anonymize_students) }
       else
         format.json { render :json => @assignment, :status => :bad_request }

@@ -791,7 +791,7 @@ class AssetUserAccessLog
   # log inserts into update tuples.  When we're on pulsar
   # for AUA log compaction completely, this query can be removed.
   def self.aggregation_query(partition_model, log_id_bookmark, batch_upper_boundary)
-    <<~SQL
+    <<~SQL.squish
       SELECT asset_user_access_id AS aua_id,
         COUNT(asset_user_access_id) AS view_count,
         MAX(created_at) AS max_updated_at,
@@ -809,7 +809,7 @@ class AssetUserAccessLog
   # in order to get the postgres process back into GLOBALLY consistent postgres iterator
   # state for the shard.
   def self.pulsar_ripcord_aggregation_query(partition_model, log_id_bookmark, batch_upper_boundary, root_account_max_ids_map, pg_partition_index)
-    query_prefix = <<~SQL
+    query_prefix = <<~SQL.squish
       SELECT aua_log.asset_user_access_id AS aua_id,
         COUNT(aua_log.asset_user_access_id) AS view_count,
         MAX(aua_log.created_at) AS max_updated_at,
@@ -828,10 +828,10 @@ class AssetUserAccessLog
       # and don't have the opportunity to zero out the temporary ripcord
       # state, we still need to respect iterator advances in the global state.
       # That means we need to also bound each RA group by the max value seen IN THAT ROOT ACCOUNT.
-      <<~ROOT_ACCOUNT_SUBCLAUSE
+      <<~SQL.squish
         ( aua.root_account_id = #{root_account_id} AND
           aua_log.id > #{lower_ra_boundary} )
-      ROOT_ACCOUNT_SUBCLAUSE
+      SQL
     end.join(" OR ")
     <<~SQL.squish
       #{query_prefix} ( #{root_account_conditions} )

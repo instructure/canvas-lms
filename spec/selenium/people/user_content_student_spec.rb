@@ -26,10 +26,10 @@ describe "user_content" do
 
   context "as a student" do
     let(:message_body) do
-      <<~MESSAGE
+      <<~HTML
         <p>flash:</p>
         <p><object width="425" height="350" data="/javascripts/swfobject/test.swf" type="application/x-shockwave-flash"><param name="wmode" value="transparent" /><param name="src" value="/javascripts/swfobject/test.swf" /></object></p>
-      MESSAGE
+      HTML
     end
 
     before do

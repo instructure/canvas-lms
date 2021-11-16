@@ -212,14 +212,12 @@ class RubricAssociation < ActiveRecord::Base
 
   def update_rubric
     cnt = self.rubric.rubric_associations.for_grading.length rescue 0
-    if self.rubric
-      self.rubric.with_versioning(false) do
-        self.rubric.read_only = cnt > 1
-        self.rubric.association_count = cnt
-        self.rubric.save
+    self.rubric&.with_versioning(false) do
+      self.rubric.read_only = cnt > 1
+      self.rubric.association_count = cnt
+      self.rubric.save
 
-        self.rubric.destroy if cnt == 0 && self.rubric.rubric_associations.count == 0 && !self.rubric.public
-      end
+      self.rubric.destroy if cnt == 0 && self.rubric.rubric_associations.count == 0 && !self.rubric.public
     end
   end
   protected :update_rubric

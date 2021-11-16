@@ -57,11 +57,11 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect} text to be absent but was instead present.
 
         Actual text was: "#{element.text}".
-      FAILURE_MESSAGE
+      TEXT
     end
   end
 
@@ -73,11 +73,11 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect} text to be present but was instead blank.
 
         Actual text was: "#{element.text}".
-      FAILURE_MESSAGE
+      TEXT
     end
   end
 
@@ -95,19 +95,19 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect} text to include "#{text}".
 
         Actual text was: "#{element.text}".
-      FAILURE_MESSAGE
+      TEXT
     end
 
     failure_message_when_negated do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect} text not to include "#{text}".
 
         Actual text was: "#{element.text}".
-      FAILURE_MESSAGE
+      TEXT
     end
   end
 
@@ -131,19 +131,19 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect} to have value "#{value_attribute}".
 
         Actual value was: "#{element.attribute('value')}".
-      FAILURE_MESSAGE
+      TEXT
     end
 
     failure_message_when_negated do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect} not to have value "#{value_attribute}".
 
         Actual value was: "#{element.attribute('value')}".
-      FAILURE_MESSAGE
+      TEXT
     end
   end
 
@@ -251,19 +251,19 @@ module CustomSeleniumRSpecMatchers
     end
 
     failure_message do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect}'s aria-disabled attribute to be true.
 
         Actual aria-disabled attribute value: "#{element.attribute('aria-disabled')}".
-      FAILURE_MESSAGE
+      TEXT
     end
 
     failure_message_when_negated do |element|
-      <<~FAILURE_MESSAGE
+      <<~TEXT
         Expected #{element.inspect}'s aria-disabled attribute to be false.
 
         Actual aria-disabled attribute value: "#{element.attribute('aria-disabled')}"
-      FAILURE_MESSAGE
+      TEXT
     end
   end
 

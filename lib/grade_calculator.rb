@@ -576,7 +576,7 @@ class GradeCalculator
                       end
 
     # Update existing course and grading period Scores or create them if needed.
-    Score.connection.execute("
+    Score.connection.execute(<<~SQL.squish)
       INSERT INTO #{Score.quoted_table_name}
           (
             enrollment_id, grading_period_id,
@@ -600,9 +600,9 @@ class GradeCalculator
           #{columns_to_insert_or_update[:update_values].join(', ')},
           updated_at = excluded.updated_at,
           root_account_id = #{@course.root_account_id},
-          -- if workflow_state was previously deleted for some reason, update it to active
+          /* if workflow_state was previously deleted for some reason, update it to active */
           workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
-    ")
+    SQL
   rescue ActiveRecord::Deadlocked => e
     Canvas::Errors.capture_exception(:grade_calcuator, e, :warn)
     raise Delayed::RetriableError, "Deadlock in upserting course or grading period scores"

@@ -92,10 +92,10 @@ module CC
       canvas_export_file = File.open(path, 'w')
 
       # Fun panda joke!
-      canvas_export_file << <<~JOKE
+      canvas_export_file << <<~TEXT
         Q: What did the panda say when he was forced out of his natural habitat?
         A: This is un-BEAR-able
-      JOKE
+      TEXT
       canvas_export_file.close
     end
 
@@ -181,7 +181,7 @@ module CC
           c.default_post_policy { |policy| policy.post_manually(@course.default_post_policy.post_manually?) }
         end
       end
-      course_file.close if course_file
+      course_file&.close
       rel_path
     end
   end

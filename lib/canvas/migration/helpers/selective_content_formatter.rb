@@ -81,10 +81,8 @@ module Canvas::Migration::Helpers
         data["learning_outcomes"] ||= data["outcomes"]
 
         # skip auto generated quiz question banks for canvas imports
-        if data['assessment_question_banks']
-          data['assessment_question_banks'].select! do |item|
-            !(item['for_quiz'] && @migration && (@migration.for_course_copy? || (@migration.migration_type == 'canvas_cartridge_importer')))
-          end
+        data['assessment_question_banks']&.select! do |item|
+          !(item['for_quiz'] && @migration && (@migration.for_course_copy? || (@migration.migration_type == 'canvas_cartridge_importer')))
         end
 
         att.close
@@ -167,19 +165,17 @@ module Canvas::Migration::Helpers
     # Returns all the assignments in their assignment groups
     def assignment_data(content_list, course_data)
       added_asmnts = []
-      if course_data['assignment_groups']
-        course_data['assignment_groups'].each do |group|
-          item = item_hash('assignment_groups', group)
-          sub_items = []
-          course_data['assignments'].select { |a| a['assignment_group_migration_id'] == group['migration_id'] }.each do |asmnt|
-            sub_items << item_hash('assignments', asmnt)
-            added_asmnts << asmnt['migration_id']
-          end
-          if sub_items.any?
-            item['sub_items'] = sub_items
-          end
-          content_list << item
+      course_data['assignment_groups']&.each do |group|
+        item = item_hash('assignment_groups', group)
+        sub_items = []
+        course_data['assignments'].select { |a| a['assignment_group_migration_id'] == group['migration_id'] }.each do |asmnt|
+          sub_items << item_hash('assignments', asmnt)
+          added_asmnts << asmnt['migration_id']
         end
+        if sub_items.any?
+          item['sub_items'] = sub_items
+        end
+        content_list << item
       end
       course_data['assignments'].each do |asmnt|
         next if added_asmnts.member? asmnt['migration_id']

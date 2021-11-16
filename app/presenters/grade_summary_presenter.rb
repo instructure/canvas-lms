@@ -124,7 +124,7 @@ class GradeSummaryPresenter
   end
 
   def student
-    @student ||= (student_enrollment && student_enrollment.user)
+    @student ||= student_enrollment&.user
   end
 
   def student_name

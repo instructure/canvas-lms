@@ -71,14 +71,14 @@ module TestDatabaseUtils
     def get_table_names(connection)
       # use custom SQL to exclude tables from extensions
       schema = connection.shard.name
-      table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
-         SELECT relname
-         FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
-         WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'}
-           AND relkind='r'
-           AND NOT EXISTS (
-             SELECT 1 FROM pg_depend WHERE deptype='e' AND objid=pg_class.oid
-           )
+      table_names = connection.query(<<~SQL.squish, 'SCHEMA').map(&:first)
+        SELECT relname
+        FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
+        WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'}
+          AND relkind='r'
+          AND NOT EXISTS (
+            SELECT 1 FROM pg_depend WHERE deptype='e' AND objid=pg_class.oid
+          )
       SQL
       table_names.delete('schema_migrations')
       table_names.delete('switchman_shards')
@@ -104,10 +104,10 @@ module TestDatabaseUtils
 
     def get_sequences(connection)
       schema = connection.shard.name
-      sequences = connection.query(<<-SQL, 'SCHEMA').map(&:first)
-         SELECT relname
-         FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
-         WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'} AND relkind='S'
+      sequences = connection.query(<<~SQL.squish, 'SCHEMA').map(&:first)
+        SELECT relname
+        FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
+        WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'} AND relkind='S'
       SQL
       sequences.delete('switchman_shards_id_seq')
       sequences

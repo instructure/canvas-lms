@@ -25,10 +25,10 @@ module Canvas
 
   def self.active_record_foreign_key_check(name, type, options)
     if name.to_s =~ /_id\z/ && type.to_s == 'integer' && options[:limit].to_i < 8
-      raise ArgumentError, <<-EOS
+      raise ArgumentError, <<~TEXT
         All foreign keys need to be at least 8-byte integers. #{name}
         looks like a foreign key, please add this option: `:limit => 8`
-      EOS
+      TEXT
     end
   end
 

@@ -46,9 +46,9 @@ describe Mutations::DeleteCommentBankItem do
   end
 
   it "deletes a comment bank item with legacy id" do
-    query = <<~QUERY
+    query = <<~GQL
       id: #{@comment_bank_item.id}
-    QUERY
+    GQL
     result = execute_with_input(query)
     expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'deleteCommentBankItem', 'errors')).to be_nil
@@ -56,9 +56,9 @@ describe Mutations::DeleteCommentBankItem do
   end
 
   it "deletes a comment bank item with relay id" do
-    query = <<~QUERY
+    query = <<~GQL
       id: #{GraphQLHelpers.relay_or_legacy_id_prepare_func('CommentBankItem').call(@comment_bank_item.id.to_s)}
-    QUERY
+    GQL
     result = execute_with_input(query)
     expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'deleteCommentBankItem', 'errors')).to be_nil
@@ -73,26 +73,26 @@ describe Mutations::DeleteCommentBankItem do
     end
 
     it "requires delete permission" do
-      query = <<~QUERY
+      query = <<~GQL
         id: #{@comment_bank_item.id}
-      QUERY
+      GQL
       result = execute_with_input(query, user_executing: user_model)
       expect_error(result, 'not found')
     end
 
     it "invalid id" do
-      query = <<~QUERY
+      query = <<~GQL
         id: 0
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, 'Unable to find CommentBankItem')
     end
 
     it "does not destroy a record twice" do
       @comment_bank_item.destroy
-      query = <<~QUERY
+      query = <<~GQL
         id: #{@comment_bank_item.id}
-      QUERY
+      GQL
       result = execute_with_input(query)
       expect_error(result, 'Unable to find CommentBankItem')
     end

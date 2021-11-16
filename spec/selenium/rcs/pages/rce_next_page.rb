@@ -1086,15 +1086,15 @@ module RCENextPage
   end
 
   def select_text_of_element_by_id(id)
-    script = <<-JS
-    const id = arguments[0]
-    const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
-    const rng = win.document.createRange()
-    rng.setStart(win.document.getElementById(id).firstChild, 0)
-    rng.setEnd(win.document.getElementById(id).firstChild, 9)
-    const sel = win.getSelection()
-    sel.removeAllRanges()
-    sel.addRange(rng)
+    script = <<~JS
+      const id = arguments[0]
+      const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
+      const rng = win.document.createRange()
+      rng.setStart(win.document.getElementById(id).firstChild, 0)
+      rng.setEnd(win.document.getElementById(id).firstChild, 9)
+      const sel = win.getSelection()
+      sel.removeAllRanges()
+      sel.addRange(rng)
     JS
 
     driver.execute_script script, id

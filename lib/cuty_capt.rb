@@ -92,13 +92,13 @@ class CutyCapt
     config = self.config
 
     uri = URI.parse(url)
-    unless config[:allowed_schemes] && config[:allowed_schemes].include?(uri.scheme)
+    unless config[:allowed_schemes]&.include?(uri.scheme)
       logger.warn("Skipping non-http[s] URL: #{url}")
       return false
     end
 
     dns_host = Resolv::DNS::Name.create(uri.host)
-    if config[:domain_blacklist] && config[:domain_blacklist].any? { |bl_host| dns_host == bl_host || dns_host.subdomain_of?(bl_host) }
+    if config[:domain_blacklist]&.any? { |bl_host| dns_host == bl_host || dns_host.subdomain_of?(bl_host) }
       logger.warn("Skipping url because of blacklisted domain: #{url}")
       return false
     end

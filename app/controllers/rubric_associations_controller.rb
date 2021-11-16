@@ -146,7 +146,7 @@ class RubricAssociationsController < ApplicationController
   def can_manage_rubrics_or_association_object?(association, association_object)
     return true if association ||
                    @context.grants_right?(@current_user, session, :manage_rubrics) ||
-                   (association_object && association_object.grants_right?(@current_user, session, :update))
+                   association_object&.grants_right?(@current_user, session, :update)
 
     render_unauthorized_action
     false

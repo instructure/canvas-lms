@@ -70,7 +70,7 @@ class CourseProgress
     if read_only
       @current_positions ||= begin
         prog = module_progressions.detect { |p| p.context_module_id == current_module.id }
-        prog && prog.current_position
+        prog&.current_position
       end
     else
       @current_position ||= current_module.evaluate_for(user).current_position
@@ -123,7 +123,7 @@ class CourseProgress
   end
 
   def in_progress?
-    current_module && current_module.require_sequential_progress
+    current_module&.require_sequential_progress
   end
 
   def completed?

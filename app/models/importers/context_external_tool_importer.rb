@@ -82,7 +82,7 @@ module Importers
       end
 
       item.save! if persist
-      migration.add_imported_item(item) if migration
+      migration&.add_imported_item(item)
       item
     end
 

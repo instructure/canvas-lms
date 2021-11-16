@@ -770,7 +770,7 @@ class Course < ActiveRecord::Base
                      course_account_associations.map(&:account).uniq
                    else
                      shard.activate do
-                       Account.find_by_sql(<<~SQL)
+                       Account.find_by_sql(<<~SQL.squish)
                          WITH depths AS (
                            SELECT account_id, MIN(depth)
                            FROM #{CourseAccountAssociation.quoted_table_name}
@@ -1279,7 +1279,7 @@ class Course < ActiveRecord::Base
   # to ensure permissions on the root folder are updated after hiding or showing the files tab
   def touch_root_folder_if_necessary
     if tab_configuration_changed?
-      files_tab_was_hidden = tab_configuration_was && tab_configuration_was.any? { |h| !h.blank? && h['id'] == TAB_FILES && h['hidden'] }
+      files_tab_was_hidden = tab_configuration_was&.any? { |h| !h.blank? && h['id'] == TAB_FILES && h['hidden'] }
       Folder.root_folders(self).each(&:touch) if files_tab_was_hidden != tab_hidden?(TAB_FILES)
     end
     true
@@ -1689,7 +1689,7 @@ class Course < ActiveRecord::Base
     can :delete
 
     # Student view student
-    given { |user| user && user.fake_student? && current_enrollments.for_user(user).exists? }
+    given { |user| user&.fake_student? && current_enrollments.for_user(user).exists? }
     can :read and can :participate_as_student and can :read_grades and can :read_outcomes
 
     # Prior users
@@ -2357,7 +2357,7 @@ class Course < ActiveRecord::Base
     enrollment.accept(:force)
     unless opts[:skip_pseudonym]
       new_pseudonym = user.find_or_initialize_pseudonym_for_account(root_account)
-      new_pseudonym.save if new_pseudonym && new_pseudonym.changed?
+      new_pseudonym.save if new_pseudonym&.changed?
     end
     enrollment
   end
@@ -2534,7 +2534,7 @@ class Course < ActiveRecord::Base
 
         if !ce || ce.export_object?(file)
           begin
-            migration_id = ce && ce.create_key(file)
+            migration_id = ce&.create_key(file)
             new_file = file.clone_for(self, nil, :overwrite => true, :migration_id => migration_id, :migration => cm, :match_on_migration_id => cm.for_master_course_import?)
             cm.add_attachment_path(file.full_display_path.gsub(/\A#{root_folder_name}/, ''), new_file.migration_id)
             new_folder_id = merge_mapped_id(file.folder)
@@ -2549,7 +2549,7 @@ class Course < ActiveRecord::Base
               old_folders << file.folder
               new_folders = []
               new_folders << old_folders.last.clone_for(self, nil, options.merge({ :include_subcontent => false }))
-              while old_folders.last.parent_folder && old_folders.last.parent_folder.parent_folder_id
+              while old_folders.last.parent_folder&.parent_folder_id
                 old_folders << old_folders.last.parent_folder
                 new_folders << old_folders.last.clone_for(self, nil, options.merge({ :include_subcontent => false }))
               end
@@ -3304,7 +3304,7 @@ class Course < ActiveRecord::Base
       opts[:default] ||= false
       cast_expression = "Canvas::Plugin.value_to_boolean(val)"
     end
-    class_eval <<-CODE, __FILE__, __LINE__ + 1
+    class_eval <<~RUBY, __FILE__, __LINE__ + 1
       def #{setting}
         if Course.settings_options[#{setting.inspect}][:inherited]
           inherited = RequestCache.cache('inherited_course_setting', #{setting.inspect}, self.global_account_id) do
@@ -3330,7 +3330,7 @@ class Course < ActiveRecord::Base
           settings_frd[#{setting.inspect}] = new_val
         end
       end
-    CODE
+    RUBY
     alias_method "#{setting}?", setting if opts[:boolean]
     if opts[:alias]
       alias_method opts[:alias], setting
@@ -3712,7 +3712,7 @@ class Course < ActiveRecord::Base
   end
 
   %w{student_count teacher_count primary_enrollment_type primary_enrollment_role_id primary_enrollment_rank primary_enrollment_state primary_enrollment_date invitation}.each do |method|
-    class_eval <<-RUBY
+    class_eval <<~RUBY
       def #{method}
         read_attribute(:#{method}) || @#{method}
       end
@@ -3778,7 +3778,7 @@ class Course < ActiveRecord::Base
   def nickname_for(user, fallback = :name, prefer_friendly_name: true)
     return friendly_name if prefer_friendly_name && friendly_name.present?
 
-    nickname = preloaded_nickname? ? @preloaded_nickname : (user && user.course_nickname(self))
+    nickname = preloaded_nickname? ? @preloaded_nickname : user&.course_nickname(self)
     nickname ||= self.send(fallback) if fallback
     nickname
   end

@@ -100,8 +100,7 @@ class GroupMembership < ActiveRecord::Base
     p.dispatch :new_student_organized_group
     p.to { self.group.context.participating_admins }
     p.whenever { |record|
-      record.group.context &&
-        record.group.context.is_a?(Course) &&
+      record.group.context.is_a?(Course) &&
         record.just_created &&
         record.group.group_memberships.count == 1 &&
         record.group.student_organized?
@@ -139,7 +138,7 @@ class GroupMembership < ActiveRecord::Base
   protected :ensure_mutually_exclusive_membership
 
   def restricted_self_signup?
-    self.group.group_category && self.group.group_category.restricted_self_signup?
+    self.group.group_category&.restricted_self_signup?
   end
 
   def has_common_section_with_me?

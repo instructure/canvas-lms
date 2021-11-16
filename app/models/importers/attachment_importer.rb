@@ -39,23 +39,19 @@ module Importers
           end
         end
 
-        if data[:locked_folders]
-          data[:locked_folders].each do |path|
-            # TODO i18n
-            if (f = migration.context.active_folders.where(full_name: "course files/#{path}").first)
-              f.locked = true
-              f.save
-            end
+        data[:locked_folders]&.each do |path|
+          # TODO i18n
+          if (f = migration.context.active_folders.where(full_name: "course files/#{path}").first)
+            f.locked = true
+            f.save
           end
         end
 
-        if data[:hidden_folders]
-          data[:hidden_folders].each do |path|
-            # TODO i18n
-            if (f = migration.context.active_folders.where(full_name: "course files/#{path}").first)
-              f.workflow_state = 'hidden'
-              f.save
-            end
+        data[:hidden_folders]&.each do |path|
+          # TODO i18n
+          if (f = migration.context.active_folders.where(full_name: "course files/#{path}").first)
+            f.workflow_state = 'hidden'
+            f.save
           end
         end
       end

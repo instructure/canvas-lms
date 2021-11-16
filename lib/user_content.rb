@@ -236,10 +236,10 @@ module UserContent
           klass = klass.to_s.constantize if klass
           match = UriMatch.new(url, type, klass, obj_id, rest, prefix)
           handler = @handlers[type] || @default_handler
-          (handler && handler.call(match)) || url
+          handler&.call(match) || url
         else
           match = UriMatch.new(url, type)
-          (@unknown_handler && @unknown_handler.call(match)) || url
+          @unknown_handler&.call(match) || url
         end
       end
     end

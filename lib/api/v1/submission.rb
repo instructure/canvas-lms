@@ -180,7 +180,7 @@ module Api::V1::Submission
       hash['grade_matches_current_submission'] = hash['grade_matches_current_submission'] != false
     end
 
-    unless (params[:exclude_response_fields] && params[:exclude_response_fields].include?('preview_url')) || assignment.anonymize_students?
+    unless params[:exclude_response_fields]&.include?('preview_url') || assignment.anonymize_students?
       preview_args = { 'preview' => '1' }
       preview_args['version'] = quiz_submission_version || attempt.quiz_submission_version || attempt.version_number
       hash['preview_url'] = course_assignment_submission_url(context, assignment, attempt[:user_id], preview_args)

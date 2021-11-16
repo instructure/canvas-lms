@@ -232,7 +232,7 @@ class CommunicationChannelsController < ApplicationController
       @communication_channel = cc
       @user = cc.user
       @enrollment = @user.enrollments.where(uuid: params[:enrollment], workflow_state: 'invited').first if params[:enrollment].present?
-      @course = @enrollment && @enrollment.course
+      @course = @enrollment&.course
       @root_account = @course.root_account if @course
       @root_account ||= @user.pseudonyms.first.try(:account) if @user.pre_registered?
       @root_account ||= @user.enrollments.first.try(:root_account) if @user.creation_pending?
@@ -307,11 +307,11 @@ class CommunicationChannelsController < ApplicationController
         @user.transaction do
           @current_user.transaction do
             cc.confirm
-            @enrollment.accept if @enrollment
+            @enrollment&.accept
             UserMerge.from(@user).into(@current_user, merger: @current_user, source: 'cc_confirmation') if @user != @current_user
             # create a new pseudonym if necessary and possible
             pseudonym = @current_user.find_or_initialize_pseudonym_for_account(@root_account, @domain_root_account)
-            pseudonym.save! if pseudonym && pseudonym.changed?
+            pseudonym.save! if pseudonym&.changed?
           end
         end
       elsif @current_user && @current_user != @user && @enrollment && @user.registered?
@@ -406,7 +406,7 @@ class CommunicationChannelsController < ApplicationController
           @pseudonym.save!
 
           if cc.confirm
-            @enrollment.accept if @enrollment
+            @enrollment&.accept
             reset_session_saving_keys(:return_to)
             @user.register
 

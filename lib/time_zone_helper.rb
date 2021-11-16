@@ -30,7 +30,7 @@ module TimeZoneHelper
         @time_zone_attributes_module = Module.new
         include(@time_zone_attributes_module)
       end
-      @time_zone_attributes_module.class_eval <<-CODE, __FILE__, __LINE__ + 1
+      @time_zone_attributes_module.class_eval <<~RUBY, __FILE__, __LINE__ + 1
         def #{attr}
           value = super
           value ||= self.class.time_zone_attribute_defaults[#{attr.inspect}] or return
@@ -43,7 +43,7 @@ module TimeZoneHelper
           end
           super(value.try(:name))
         end
-      CODE
+      RUBY
     end
   end
 

@@ -67,11 +67,11 @@ end
 class SubmissionRubricAssessmentFilterInputType < Types::BaseInputObject
   graphql_name 'SubmissionRubricAssessmentFilterInput'
 
-  argument :for_attempt, Integer, <<~DESC, required: false, default_value: nil
+  argument :for_attempt, Integer, <<~MD, required: false, default_value: nil
     What submission attempt the rubric assessment should be returned for. If not
     specified, it will return the rubric assessment for the current submisssion
     or submission history.
-  DESC
+  MD
 end
 
 module Interfaces::SubmissionInterface
