@@ -94,7 +94,11 @@ module LiveEvents
 
     def stream_client=(s_client)
       @old_stream_client = @stream_client
-      @stream_client = s_client
+      @stream_client = if s_client.is_a? Proc
+                         s_client.call(settings)
+                       else
+                         s_client
+                       end
     end
 
     private
