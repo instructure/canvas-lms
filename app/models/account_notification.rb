@@ -96,6 +96,8 @@ class AccountNotification < ActiveRecord::Base
       end
 
       user_role_ids = {}
+      # because we are going through all the current announcements, we cache the
+      # results of the sub_account chain to not have to calculate ids again.
       sub_account_ids_map = {}
 
       current.select! do |announcement|
@@ -109,6 +111,19 @@ class AccountNotification < ActiveRecord::Base
         role_ids = announcement.account_notification_roles.map { |anr| anr.role&.role_for_root_account_id(root_account.id)&.id }
 
         unless role_ids.empty? || user_role_ids.key?(announcement.account_id)
+          unless announcement.account.root_account?
+            announcement.shard.activate do
+              # we need to store the local account ids. The ids for the
+              # sub_accounts are relative to the announcements shard, but we use
+              # store the announcements for the user's shards which could be
+              # many. This also avoids storing the same local_id and using the
+              # wrong chain.
+              global_account_id = Shard.global_id_for(announcement.account_id)
+              sub_account_ids_map[global_account_id] ||=
+                Account.sub_account_ids_recursive(announcement.account_id) + [announcement.account_id]
+            end
+          end
+
           # choose enrollments and account users to inspect
           if announcement.account.site_admin?
             enrollments = user.enrollments.shard(user.in_region_associated_shards).active_or_pending_by_date.distinct.select(:role_id).to_a
@@ -119,10 +134,9 @@ class AccountNotification < ActiveRecord::Base
                 enrollments = Enrollment.where(user_id: user).active_or_pending_by_date
                                         .where(root_account_id: announcement.account_id).select(:role_id).to_a
               else
-                sub_account_ids_map[announcement.account_id] ||=
-                  Account.sub_account_ids_recursive(announcement.account_id) + [announcement.account_id]
+                global_account_id = Shard.global_id_for(announcement.account_id)
                 enrollments = Enrollment.where(user_id: user).active_or_pending_by_date.joins(:course)
-                                        .where(:courses => { :account_id => sub_account_ids_map[announcement.account_id] }).select(:role_id).to_a
+                                        .where(:courses => { :account_id => sub_account_ids_map[global_account_id] }).select(:role_id).to_a
               end
               account_users = announcement.account.root_account.cached_all_account_users_for(user)
             end
