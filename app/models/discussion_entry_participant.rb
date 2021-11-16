@@ -50,7 +50,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   end
 
   def self.entry_ratings(entry_ids, user)
-    ratings = self.where(:user_id => user, :discussion_entry_id => entry_ids).where('rating IS NOT NULL')
+    ratings = self.where(:user_id => user, :discussion_entry_id => entry_ids).where.not(rating: nil)
     Hash[ratings.map { |x| [x.discussion_entry_id, x.rating] }]
   end
 

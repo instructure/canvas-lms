@@ -34,7 +34,7 @@ module Quizzes
     end
 
     def unsubmitted_students
-      all_students_with_visibility.where('users.id NOT IN (?)', non_preview_user_ids)
+      all_students_with_visibility.where.not(users: { id: non_preview_user_ids })
     end
 
     def all_students
@@ -52,7 +52,7 @@ module Quizzes
     def non_preview_quiz_submissions
       # This could optionally check for temporary_user_code<>NULL, but
       # that's not indexed and we're checking user_id anyway in the queries above.
-      quiz_submissions.where('quiz_submissions.user_id IS NOT NULL')
+      quiz_submissions.where.not(quiz_submissions: { user_id: nil })
     end
 
     private

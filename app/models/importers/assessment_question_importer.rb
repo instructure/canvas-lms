@@ -43,7 +43,7 @@ module Importers
       existing_questions = migration.context.assessment_questions
                                     .except(:select)
                                     .select("assessment_questions.id, assessment_questions.migration_id")
-                                    .where("assessment_questions.migration_id IS NOT NULL").reorder(nil)
+                                    .where.not(assessment_questions: { migration_id: nil }).reorder(nil)
                                     .index_by(&:migration_id)
       questions.each do |q|
         existing_question = existing_questions[q['migration_id']]

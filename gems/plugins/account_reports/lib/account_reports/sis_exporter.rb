@@ -848,7 +848,7 @@ module AccountReports
                 nxc.sis_source_id AS nxc_sis_id")
                        .joins("INNER JOIN #{Course.quoted_table_name} ON course_sections.course_id = courses.id
                INNER JOIN #{Course.quoted_table_name} nxc ON course_sections.nonxlist_course_id = nxc.id")
-                       .where("course_sections.nonxlist_course_id IS NOT NULL")
+                       .where.not(course_sections: { nonxlist_course_id: nil })
 
       xl = xlist_query_options(xl)
       generate_and_run_report headers do |csv|

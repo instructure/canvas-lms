@@ -430,7 +430,7 @@ class Assignment < ActiveRecord::Base
 
     ModeratedGrading::ProvisionalGrade
       .where(submission_id: self.submissions.having_submission.select(:id))
-      .where('score IS NOT NULL').exists?
+      .where.not(score: nil).exists?
   end
 
   def graded_submissions_exist?
@@ -2834,7 +2834,7 @@ class Assignment < ActiveRecord::Base
   }
 
   scope :by_assignment_group_id, lambda { |group_id|
-    where('assignment_group_id = ?', group_id.to_s)
+    where(assignment_group_id: group_id.to_s)
   }
 
   # assignments only ever belong to courses, so we can reduce this to just IDs to simplify the db query
@@ -3297,7 +3297,7 @@ class Assignment < ActiveRecord::Base
     elsif attribute_present? :student_submission_count
       student_submission_count.to_i > 0
     else
-      submissions.having_submission.where("user_id IS NOT NULL").exists?
+      submissions.having_submission.where.not(user_id: nil).exists?
     end
   end
   attr_writer :has_student_submissions

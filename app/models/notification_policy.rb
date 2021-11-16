@@ -118,7 +118,7 @@ class NotificationPolicy < ActiveRecord::Base
 
   # Updates notification policies for a given category in a given communication channel
   def self.find_or_update_for_category(communication_channel, category, frequency = nil)
-    notifs = Notification.where("category = ?", category)
+    notifs = Notification.where(category: category)
     raise ActiveRecord::RecordNotFound unless notifs.exists?
 
     notifs.map do |notif|

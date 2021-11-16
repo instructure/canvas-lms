@@ -118,6 +118,13 @@ Rails/SquishedSQLHeredocs:
   Severity: error
 Rails/Validation:
   Severity: error
+Rails/WhereEquals:
+  Severity: error
+Rails/WhereExists:
+  EnforcedStyle: where
+  Severity: error
+Rails/WhereNot:
+  Severity: error
 
 RSpec/AnyInstance:
   Enabled: false # while using an instance double would be preferable, it's a pain
@@ -250,9 +257,6 @@ Rails/ReadWriteAttribute: # TODO: autocorrect (unsafe)
   Enabled: false # accessors are often defined in terms of read_attribute
 Rails/TimeZone: # TODO: autocorrect (unsafe)
   Enabled: false
-Rails/WhereExists: # TODO: autocorrect(unsafe)
-  EnforcedStyle: where
-  AutoCorrect: false
 
 RSpec/BeEql: # TODO: autocorrect
   Enabled: false

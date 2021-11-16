@@ -71,7 +71,7 @@ module SpeedGrader
     end
 
     def group_containing_student(student_id:)
-      return initial_group if initial_group.present? && initial_group.group_memberships.active.exists?(user_id: student_id)
+      return initial_group if initial_group.present? && initial_group.group_memberships.active.where(user_id: student_id).exists?
 
       Group.active.joins(:group_memberships)
            .where(context_id: course.id, context_type: "Course")

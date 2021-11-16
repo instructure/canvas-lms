@@ -34,12 +34,12 @@ class ConversationParticipant < ActiveRecord::Base
 
   after_destroy :destroy_conversation_message_participants
 
-  scope :visible, -> { where("last_message_at IS NOT NULL") }
+  scope :visible, -> { where.not(last_message_at: nil) }
   scope :default, -> { where(:workflow_state => ['read', 'unread']) }
   scope :unread, -> { where(:workflow_state => 'unread') }
   scope :archived, -> { where(:workflow_state => 'archived') }
   scope :starred, -> { where(:label => 'starred') }
-  scope :sent, -> { where("visible_last_authored_at IS NOT NULL").order("visible_last_authored_at DESC, conversation_id DESC") }
+  scope :sent, -> { where.not(visible_last_authored_at: nil).order("visible_last_authored_at DESC, conversation_id DESC") }
   scope :for_masquerading_user, lambda { |masquerading_user, user_being_viewed|
     # site admins can see everything
     next all if masquerading_user.account_users.active.map(&:account_id).include?(Account.site_admin.id)

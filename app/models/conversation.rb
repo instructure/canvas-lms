@@ -365,7 +365,7 @@ class Conversation < ActiveRecord::Base
       cps = cps.visible if options[:only_existing]
 
       unless options[:new_message]
-        cps = cps.where("user_id NOT IN (?)", skip_participants.map(&:user_id)) if skip_participants.present?
+        cps = cps.where.not(user_id: skip_participants.map(&:user_id)) if skip_participants.present?
       end
 
       cps = cps.where(:user_id => (options[:only_users] + [message.author]).map(&:id)) if options[:only_users]
@@ -495,7 +495,7 @@ class Conversation < ActiveRecord::Base
         maybe_update_timestamp('visible_last_authored_at', message.created_at, ["user_id = ?", message.author_id])
       ]
       updates << "workflow_state = CASE WHEN workflow_state = 'archived' THEN 'read' ELSE workflow_state END" if update_for_skips
-      conversation_participants.where("user_id IN (?)", skip_ids).update_all(updates.join(", "))
+      conversation_participants.where(user_id: skip_ids).update_all(updates.join(", "))
 
       if message.has_attachments?
         self.has_attachments = true

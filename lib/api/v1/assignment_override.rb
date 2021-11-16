@@ -91,7 +91,7 @@ module Api::V1::AssignmentOverride
   end
 
   def find_group(assignment, group_id, group_category_id = nil)
-    scope = Group.active.where(:context_type => 'Course').where("group_category_id IS NOT NULL")
+    scope = Group.active.where(:context_type => 'Course').where.not(group_category_id: nil)
     if assignment
       scope = scope.where(
         context_id: assignment.context_id,

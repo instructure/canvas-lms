@@ -404,7 +404,7 @@ class CommunicationChannel < ActiveRecord::Base
     # Add twitter and yo (in that order) if the user's account is setup for them.
     rank_order << TYPE_TWITTER if twitter_service
     rank_order << TYPE_SLACK if user.associated_root_accounts.any? { |a| a.settings[:encrypted_slack_key] }
-    self.unretired.where('communication_channels.path_type IN (?)', rank_order)
+    self.unretired.where(communication_channels: { path_type: rank_order })
         .order(Arel.sql("#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc")).to_a
   end
 

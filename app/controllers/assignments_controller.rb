@@ -253,7 +253,7 @@ class AssignmentsController < ApplicationController
           # If this is a group assignment and we had previously filtered by a
           # group that isn't part of this assignment's group set, behave as if
           # no group is selected.
-          if selected_group_id.present? && Group.active.exists?(group_category_id: eligible_categories.pluck(:id), id: selected_group_id)
+          if selected_group_id.present? && Group.active.where(group_category_id: eligible_categories.pluck(:id), id: selected_group_id).exists?
             env[:selected_student_group_id] = selected_group_id
           end
         end
@@ -346,7 +346,7 @@ class AssignmentsController < ApplicationController
         @can_grade = @assignment.grants_right?(@current_user, session, :grade)
         if @can_view_grades || @can_grade
           visible_student_ids = @context.apply_enrollment_visibility(@context.all_student_enrollments, @current_user).pluck(:user_id)
-          @current_student_submissions = @assignment.submissions.where("submissions.submission_type IS NOT NULL").where(:user_id => visible_student_ids).to_a
+          @current_student_submissions = @assignment.submissions.where.not(submissions: { submission_type: nil }).where(:user_id => visible_student_ids).to_a
         end
 
         # this will set @user_has_google_drive
