@@ -495,7 +495,7 @@ class Conversation < ActiveRecord::Base
         maybe_update_timestamp('visible_last_authored_at', message.created_at, ["user_id = ?", message.author_id])
       ]
       updates << "workflow_state = CASE WHEN workflow_state = 'archived' THEN 'read' ELSE workflow_state END" if update_for_skips
-      conversation_participants.where("user_id IN (?)", skip_ids).update_all(updates.join(", "))
+      conversation_participants.where(user_id: skip_ids).update_all(updates.join(", "))
 
       if message.has_attachments?
         self.has_attachments = true

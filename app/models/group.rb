@@ -307,7 +307,7 @@ class Group < ActiveRecord::Base
 
   scope :active, -> { where("groups.workflow_state<>'deleted'") }
   scope :by_name, -> { order(Bookmarker.order_by) }
-  scope :uncategorized, -> { where("groups.group_category_id IS NULL") }
+  scope :uncategorized, -> { where(groups: { group_category_id: nil }) }
 
   def potential_collaborators
     if context.is_a?(Course)
@@ -386,9 +386,9 @@ class Group < ActiveRecord::Base
     return if users.empty?
 
     user_ids = users.map(&:id)
-    old_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids).to_a
+    old_group_memberships = self.group_memberships.where(user_id: user_ids).to_a
     bulk_insert_group_memberships(users, options)
-    all_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids)
+    all_group_memberships = self.group_memberships.where(user_id: user_ids)
     new_group_memberships = all_group_memberships - old_group_memberships
     new_group_memberships.sort_by!(&:user_id)
     users.sort_by!(&:id)

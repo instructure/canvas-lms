@@ -724,7 +724,7 @@ class Attachment < ActiveRecord::Base
           if context.is_a?(User) || context.is_a?(Group)
             excluded_attachment_ids = []
             if context.is_a?(User)
-              excluded_attachment_ids += context.attachments.joins(:attachment_associations).where("attachment_associations.context_type = ?", "Submission").pluck(:id)
+              excluded_attachment_ids += context.attachments.joins(:attachment_associations).where(attachment_associations: { context_type: "Submission" }).pluck(:id)
             end
             excluded_attachment_ids += context.attachments.where(folder_id: context.submissions_folders).pluck(:id)
             attachment_scope = attachment_scope.where("id NOT IN (?)", excluded_attachment_ids) if excluded_attachment_ids.any?
@@ -795,7 +795,7 @@ class Attachment < ActiveRecord::Base
         Canvas::Errors.capture_exception(:attachment, e, :warn)
         # Failed to uniquely rename attachment, slapping on a UUID and moving on
         self.display_name = self.display_name + SecureRandom.uuid
-        Attachment.where("id = ?", self).limit(1).update_all(display_name: display_name)
+        Attachment.where(id: self).limit(1).update_all(display_name: display_name)
       end
     elsif method == :overwrite && atts.any?
       shard.activate do

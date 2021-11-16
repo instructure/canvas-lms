@@ -223,7 +223,7 @@ class Auditors::GradeChange
 
     # If we *are* specifically searching for override grades, swap out the
     # placeholder ID for a real NULL check.
-    scope.unscope(where: :assignment_id).where("assignment_id IS NULL")
+    scope.unscope(where: :assignment_id).where(assignment_id: nil)
   end
 
   Stream = Audits.stream do

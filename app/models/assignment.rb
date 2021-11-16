@@ -2834,7 +2834,7 @@ class Assignment < ActiveRecord::Base
   }
 
   scope :by_assignment_group_id, lambda { |group_id|
-    where('assignment_group_id = ?', group_id.to_s)
+    where(assignment_group_id: group_id.to_s)
   }
 
   # assignments only ever belong to courses, so we can reduce this to just IDs to simplify the db query

@@ -477,7 +477,7 @@ class UserMerge
     # find all the modules progressions and delete the most restrictive
     # context_module_progressions
     ContextModuleProgression
-      .where("context_module_progressions.user_id = ?", from_user.id)
+      .where(context_module_progressions: { user_id: from_user.id })
       .where("EXISTS (SELECT *
                      FROM #{ContextModuleProgression.quoted_table_name} cmp2
                      WHERE context_module_progressions.context_module_id=cmp2.context_module_id

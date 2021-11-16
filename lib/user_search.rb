@@ -125,7 +125,7 @@ module UserSearch
                     end
                   end
                 end
-        users_scope = users_scope.where("role_id IN (?)", roles.map(&:id))
+        users_scope = users_scope.where(enrollments: { role_id: roles.map(&:id) })
       elsif enrollment_types
         enrollment_types = enrollment_types.map { |e| "#{e.camelize}Enrollment" }
         if enrollment_types.any? { |et| !Enrollment.readable_types.key?(et) }

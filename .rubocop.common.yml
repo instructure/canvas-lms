@@ -118,6 +118,8 @@ Rails/SquishedSQLHeredocs:
   Severity: error
 Rails/Validation:
   Severity: error
+Rails/WhereEquals:
+  Severity: error
 Rails/WhereExists:
   EnforcedStyle: where
   Severity: error

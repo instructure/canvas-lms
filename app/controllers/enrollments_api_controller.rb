@@ -908,7 +908,7 @@ class EnrollmentsApiController < ApplicationController
       # enrollments without any extra checking.
       enrollments = if params[:state].present?
                       user.enrollments.where(enrollment_index_conditions(true)).joins(:enrollment_state)
-                          .where("enrollment_states.state IN (?)", enrollment_states_for_state_param)
+                          .where(enrollment_states: { state: enrollment_states_for_state_param })
                     else
                       user.enrollments.current_and_invited.where(enrollment_index_conditions)
                           .joins(:enrollment_state).where("enrollment_states.state<>'completed'")
