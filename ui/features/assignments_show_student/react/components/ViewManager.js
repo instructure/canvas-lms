@@ -240,7 +240,10 @@ class ViewManager extends React.Component {
     return (
       <StudentViewContext.Provider
         value={{
-          allowChangesToSubmission: ENV.enrollment_state === 'active' && !ENV.ISOBSERVER,
+          allowChangesToSubmission:
+            ENV.enrollment_state === 'active' &&
+            !ENV.ISOBSERVER &&
+            submission.gradingStatus !== 'excused',
           cancelDraftAction: this.onCancelDraft,
           isLatestAttempt: !this.hasNextSubmission(),
           latestSubmission: this.getLatestSubmission(),
