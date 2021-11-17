@@ -266,7 +266,7 @@ NewKeyForm.propTypes = {
   updateToolConfiguration: PropTypes.func,
   updateToolConfigurationUrl: PropTypes.func,
   updateDeveloperKey: PropTypes.func.isRequired,
-  toolConfigurationUrl: PropTypes.string.isRequired,
+  toolConfigurationUrl: PropTypes.string,
   configurationMethod: PropTypes.string.isRequired,
   updateConfigurationMethod: PropTypes.func.isRequired
 }

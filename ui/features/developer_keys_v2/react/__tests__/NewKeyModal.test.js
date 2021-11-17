@@ -18,10 +18,25 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
-import DeveloperKeyModal from 'ui/features/developer_keys_v2/react/NewKeyModal.js'
+import DeveloperKeyModal from '../NewKeyModal'
 import $ from '@canvas/rails-flash-notifications'
 
-QUnit.module('NewKeyModal')
+let oldEnv
+
+beforeEach(() => {
+  oldEnv = window.ENV
+  window.ENV = {
+    ...window.ENV,
+    validLtiPlacements: [],
+    validLtiScopes: {}
+  }
+})
+
+afterEach(() => {
+  window.ENV = oldEnv
+})
+
+afterEach(() => jest.restoreAllMocks())
 
 const selectedScopes = [
   'url:POST|/api/v1/accounts/:account_id/account_notifications',
@@ -30,9 +45,12 @@ const selectedScopes = [
 
 const fakeActions = {
   createOrEditDeveloperKey: () => {},
+  developerKeysModalClose: () => {},
   editDeveloperKey: () => {},
+  listDeveloperKeyScopesSet: () => {},
   resetLtiState: () => {},
-  developerKeysModalClose: () => {}
+  saveLtiToolConfiguration: () => {},
+  updateLtiKey: () => {}
 }
 
 const developerKey = {
@@ -95,8 +113,7 @@ const validToolConfig = {
   public_jwk: {
     kty: 'RSA',
     e: 'AQAB',
-    n:
-      'vESXFmlzHz-nhZXTkjo29SBpamCzkd7SnpMXgdFEWjLfDeOu0D3JivEEUQ4U67xUBMY9voiJsG2oydMXjgkmGliUIVg-rhyKdBUJu5v6F659FwCj60A8J8qcstIkZfBn3yyOPVwp1FHEUSNvtbDLSRIHFPv-kh8gYyvqz130hE37qAVcaNME7lkbDmH1vbxi3D3A8AxKtiHs8oS41ui2MuSAN9MDb7NjAlFkf2iXlSVxAW5xSek4nHGr4BJKe_13vhLOvRUCTN8h8z-SLORWabxoNIkzuAab0NtfO_Qh0rgoWFC9T69jJPAPsXMDCn5oQ3xh_vhG0vltSSIzHsZ8pw',
+    n: 'vESXFmlzHz-nhZXTkjo29SBpamCzkd7SnpMXgdFEWjLfDeOu0D3JivEEUQ4U67xUBMY9voiJsG2oydMXjgkmGliUIVg-rhyKdBUJu5v6F659FwCj60A8J8qcstIkZfBn3yyOPVwp1FHEUSNvtbDLSRIHFPv-kh8gYyvqz130hE37qAVcaNME7lkbDmH1vbxi3D3A8AxKtiHs8oS41ui2MuSAN9MDb7NjAlFkf2iXlSVxAW5xSek4nHGr4BJKe_13vhLOvRUCTN8h8z-SLORWabxoNIkzuAab0NtfO_Qh0rgoWFC9T69jJPAPsXMDCn5oQ3xh_vhG0vltSSIzHsZ8pw',
     kid: '-1302712033',
     alg: 'RS256',
     use: 'sig'
@@ -109,22 +126,24 @@ const createLtiKeyState = {
 }
 
 const createDeveloperKeyState = {
+  isLtiKey: false,
+  editing: false,
+  developerKeyCreateOrEditPending: false,
   developerKeyCreateOrEditSuccessful: false,
   developerKeyCreateOrEditFailed: false,
+
   developerKeyModalOpen: true,
   developerKey: {id: 22}
 }
 
 const editDeveloperKeyState = {
-  developerKeyCreateOrEditSuccessful: false,
-  developerKeyCreateOrEditFailed: false,
+  ...createDeveloperKeyState,
   developerKeyModalOpen: true,
   developerKey
 }
 
 const closedDeveloperKeyState = {
-  developerKeyCreateOrEditSuccessful: false,
-  developerKeyCreateOrEditFailed: false,
+  ...createDeveloperKeyState,
   developerKeyModalOpen: false,
   developerKey
 }
@@ -138,7 +157,7 @@ function modalMountNode() {
   return document.querySelector('#fixtures')
 }
 
-test('it opens the modal if isOpen prop is true', () => {
+it('it opens the modal if isOpen prop is true', () => {
   const wrapper = shallow(
     <DeveloperKeyModal
       createLtiKeyState={createLtiKeyState}
@@ -153,10 +172,10 @@ test('it opens the modal if isOpen prop is true', () => {
       ctx={{params: {contextId: '1'}}}
     />
   )
-  equal(wrapper.find('Modal').prop('open'), true)
+  expect(wrapper.find('Modal').prop('open')).toEqual(true)
 })
 
-test('it closes the modal if isOpen prop is false', () => {
+it('it closes the modal if isOpen prop is false', () => {
   const wrapper = shallow(
     <DeveloperKeyModal
       createLtiKeyState={createLtiKeyState}
@@ -171,16 +190,15 @@ test('it closes the modal if isOpen prop is false', () => {
       ctx={{params: {contextId: '1'}}}
     />
   )
-  equal(wrapper.find('Modal').prop('open'), false)
+  expect(wrapper.find('Modal').prop('open')).toEqual(false)
 })
 
-test('it sends the contents of the form saving', () => {
-  const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.stub().resolves()
+it('it sends the contents of the form saving', () => {
+  const createOrEditSpy = jest.fn()
 
   const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
   const fakeStore = {
-    dispatch: dispatchSpy
+    dispatch: () => Promise.resolve()
   }
   const developerKey2 = {
     ...developerKey,
@@ -208,30 +226,29 @@ test('it sends the contents of the form saving', () => {
 
   wrapper.instance().submitForm()
 
-  const [[sentFormData]] = createOrEditSpy.args
+  const [[sentFormData]] = createOrEditSpy.mock.calls
 
   const developer_key = sentFormData.developer_key
 
-  equal(developer_key.name, developerKey.name)
-  equal(developer_key.email, developerKey.email)
-  equal(developer_key.redirect_uri, developerKey.redirect_uri)
-  equal(developer_key.redirect_uris, developerKey.redirect_uris)
-  equal(developer_key.vendor_code, developerKey.vendor_code)
-  equal(developer_key.icon_url, developerKey.icon_url)
-  equal(developer_key.notes, developerKey.notes)
-  equal(developer_key.require_scopes, true)
-  equal(developer_key.test_cluster_only, true)
+  expect(developer_key.name).toEqual(developerKey.name)
+  expect(developer_key.email).toEqual(developerKey.email)
+  expect(developer_key.redirect_uri).toEqual(developerKey.redirect_uri)
+  expect(developer_key.redirect_uris).toEqual(developerKey.redirect_uris)
+  expect(developer_key.vendor_code).toEqual(developerKey.vendor_code)
+  expect(developer_key.icon_url).toEqual(developerKey.icon_url)
+  expect(developer_key.notes).toEqual(developerKey.notes)
+  expect(developer_key.require_scopes).toEqual(true)
+  expect(developer_key.test_cluster_only).toEqual(true)
 
   wrapper.unmount()
 })
 
-test('sends form content without scopes and require_scopes set to false when not require_scopes', () => {
-  const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.stub().resolves()
+it('sends form content without scopes and require_scopes set to false when not require_scopes', () => {
+  const createOrEditSpy = jest.fn()
 
   const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
   const fakeStore = {
-    dispatch: dispatchSpy
+    dispatch: () => Promise.resolve()
   }
 
   const wrapper = mount(
@@ -252,26 +269,26 @@ test('sends form content without scopes and require_scopes set to false when not
 
   wrapper.instance().submitForm()
 
-  const [[sentFormData]] = createOrEditSpy.args
+  const [[sentFormData]] = createOrEditSpy.mock.calls
 
   const developer_key = sentFormData.developer_key
 
-  equal(developer_key.name, developerKey.name)
-  equal(developer_key.email, developerKey.email)
-  equal(developer_key.redirect_uri, developerKey.redirect_uri)
-  equal(developer_key.redirect_uris, developerKey.redirect_uris)
-  equal(developer_key.vendor_code, developerKey.vendor_code)
-  equal(developer_key.icon_url, developerKey.icon_url)
-  equal(developer_key.notes, developerKey.notes)
-  equal(developer_key.require_scopes, false)
-  equal(developer_key.test_cluster_only, false)
+  expect(developer_key.name).toEqual(developerKey.name)
+  expect(developer_key.email).toEqual(developerKey.email)
+  expect(developer_key.redirect_uri).toEqual(developerKey.redirect_uri)
+  expect(developer_key.redirect_uris).toEqual(developerKey.redirect_uris)
+  expect(developer_key.vendor_code).toEqual(developerKey.vendor_code)
+  expect(developer_key.icon_url).toEqual(developerKey.icon_url)
+  expect(developer_key.notes).toEqual(developerKey.notes)
+  expect(developer_key.require_scopes).toEqual(false)
+  expect(developer_key.test_cluster_only).toEqual(false)
 
   wrapper.unmount()
 })
 
-test('it adds each selected scope to the form data', () => {
-  const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.stub().resolves()
+it('it adds each selected scope to the form data', () => {
+  const createOrEditSpy = jest.fn()
+  const dispatchSpy = () => Promise.resolve()
   const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
   const fakeStore = {dispatch: dispatchSpy}
   const developerKey2 = {...developerKey, require_scopes: true, scopes: ['test']}
@@ -292,16 +309,16 @@ test('it adds each selected scope to the form data', () => {
     />
   )
   wrapper.instance().submitForm()
-  const [[sentFormData]] = createOrEditSpy.args
+  const [[sentFormData]] = createOrEditSpy.mock.calls
   const developer_key = sentFormData.developer_key
-  deepEqual(developer_key.scopes, selectedScopes)
+  expect(developer_key.scopes).toEqual(selectedScopes)
 
   wrapper.unmount()
 })
 
-test('it removes testClusterOnly from the form data if it is undefined', () => {
-  const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.stub().resolves()
+it('it removes testClusterOnly from the form data if it is undefined', () => {
+  const createOrEditSpy = jest.fn()
+  const dispatchSpy = () => Promise.resolve()
   const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
   const fakeStore = {dispatch: dispatchSpy}
   const developerKey2 = {...developerKey, require_scopes: true, scopes: ['test']}
@@ -323,17 +340,17 @@ test('it removes testClusterOnly from the form data if it is undefined', () => {
     />
   )
   wrapper.instance().submitForm()
-  const [[sentFormData]] = createOrEditSpy.args
+  const [[sentFormData]] = createOrEditSpy.mock.calls
   const developer_key = sentFormData.developer_key
-  notOk(developer_key.test_cluster_only)
+  expect(developer_key.test_cluster_only).toBeFalsy()
 
   wrapper.unmount()
 })
 
-test('flashes an error if no scopes are selected', () => {
-  const flashStub = sinon.stub($, 'flashError')
-  const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.stub().resolves()
+it('flashes an error if no scopes are selected', () => {
+  const flashStub = jest.spyOn($, 'flashError')
+  const createOrEditSpy = jest.fn()
+  const dispatchSpy = () => Promise.resolve()
   const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
   const fakeStore = {dispatch: dispatchSpy}
   const developerKey2 = {...developerKey, require_scopes: true, scopes: []}
@@ -354,15 +371,14 @@ test('flashes an error if no scopes are selected', () => {
     />
   )
   wrapper.instance().submitForm()
-  ok(flashStub.calledWith('At least one scope must be selected.'))
-  flashStub.restore()
+  expect(flashStub).toHaveBeenCalledWith('At least one scope must be selected.')
 
   wrapper.unmount()
 })
 
-test('allows saving if the key previously had scopes', () => {
-  const flashStub = sinon.stub($, 'flashError')
-  const dispatchSpy = sinon.stub().resolves()
+it('allows saving if the key previously had scopes', () => {
+  const flashStub = jest.spyOn($, 'flashError')
+  const dispatchSpy = () => Promise.resolve()
   const fakeStore = {dispatch: dispatchSpy}
   const keyWithScopes = {...developerKey, require_scopes: true, scopes: selectedScopes}
   const editKeyWithScopesState = {...editDeveloperKeyState, developerKey: keyWithScopes}
@@ -382,13 +398,12 @@ test('allows saving if the key previously had scopes', () => {
   )
 
   wrapper.instance().submitForm()
-  notOk(flashStub.called)
-  flashStub.restore()
+  expect(flashStub).not.toHaveBeenCalled()
   wrapper.unmount()
 })
 
-test('clears the lti key state when modal is closed', () => {
-  const ltiStub = sinon.spy()
+it('clears the lti key state when modal is closed', () => {
+  const ltiStub = jest.fn()
   const actions = Object.assign(fakeActions, {
     developerKeysModalClose: () => {},
     resetLtiState: ltiStub
@@ -409,14 +424,14 @@ test('clears the lti key state when modal is closed', () => {
     />
   )
   wrapper.instance().closeModal()
-  ok(ltiStub.called)
+  expect(ltiStub).toHaveBeenCalled()
   wrapper.unmount()
 })
 
-test('flashes an error if redirect_uris is empty', () => {
-  const flashStub = sinon.stub($, 'flashError')
-  const createOrEditSpy = sinon.spy()
-  const dispatchSpy = sinon.stub().resolves()
+it('flashes an error if redirect_uris is empty', () => {
+  const flashStub = jest.spyOn($, 'flashError')
+  const createOrEditSpy = jest.fn()
+  const dispatchSpy = () => Promise.resolve()
   const mergedFakeActions = {...fakeActions, createOrEditDeveloperKey: createOrEditSpy}
   const fakeStore = {dispatch: dispatchSpy}
   const developerKey2 = {...developerKey, require_scopes: true, scopes: [], redirect_uris: ''}
@@ -437,14 +452,13 @@ test('flashes an error if redirect_uris is empty', () => {
     />
   )
   wrapper.instance().saveLtiToolConfiguration()
-  ok(flashStub.calledWith('A redirect_uri is required, please supply one.'))
-  flashStub.restore()
+  expect(flashStub).toHaveBeenCalledWith('A redirect_uri is required, please supply one.')
 
   wrapper.unmount()
 })
 
-test('renders the saved toolConfiguration if it is present in state', () => {
-  const ltiStub = sinon.spy()
+it('renders the saved toolConfiguration if it is present in state', () => {
+  const ltiStub = jest.fn()
   const actions = Object.assign(fakeActions, {
     saveLtiToolConfiguration: () => () => ({then: ltiStub})
   })
@@ -467,16 +481,15 @@ test('renders the saved toolConfiguration if it is present in state', () => {
     />
   )
   wrapper.instance().saveLtiToolConfiguration()
-  strictEqual(
-    wrapper.state().toolConfiguration.oidc_initiation_url,
+  expect(wrapper.state().toolConfiguration.oidc_initiation_url).toEqual(
     validToolConfig.oidc_initiation_url
   )
-  ok(ltiStub.calledOnce)
+  expect(ltiStub).toHaveBeenCalledTimes(1)
   wrapper.unmount()
 })
 
-test('clears state on modal close', () => {
-  const ltiStub = sinon.spy()
+it('clears state on modal close', () => {
+  const ltiStub = jest.fn()
   const actions = Object.assign(fakeActions, {
     updateLtiKey: ltiStub
   })
@@ -498,11 +511,11 @@ test('clears state on modal close', () => {
   const text = 'I should show up in the text'
   wrapper.instance().setState({toolConfiguration: {oidc_initiation_url: text}})
   wrapper.instance().closeModal()
-  notOk(wrapper.state('toolConfiguration'))
+  expect(wrapper.state('toolConfiguration')).toBeFalsy()
   wrapper.unmount()
 })
 
-test('hasRedirectUris', () => {
+it('hasRedirectUris', () => {
   developerKey.redirect_uris = null
 
   const wrapper = mount(
@@ -511,52 +524,64 @@ test('hasRedirectUris', () => {
         ...createDeveloperKeyState,
         ...{developerKey: {...developerKey}, isLtiKey: true}
       }}
-      actions={{}}
-      store={{}}
-      state={{}}
       mountNode={modalMountNode}
+      // generic required props:
+      createLtiKeyState={createLtiKeyState}
+      availableScopes={{}}
+      availableScopesPending={false}
+      closeModal={() => {}}
+      actions={fakeActions}
+      store={{dispatch: () => {}}}
+      selectedScopes={selectedScopes}
+      ctx={{params: {contextId: '1'}}}
     />
   )
 
-  strictEqual(wrapper.instance().hasRedirectUris, null)
+  expect(wrapper.instance().hasRedirectUris).toEqual(null)
 
   wrapper.instance().updateToolConfiguration(validToolConfig)
 
-  strictEqual(wrapper.instance().hasRedirectUris, true)
+  expect(wrapper.instance().hasRedirectUris).toEqual(true)
 
   wrapper.unmount()
 })
 
-test('update `redirect_uris` when updating the tool configuration', () => {
+it('update `redirect_uris` when updating the tool configuration', () => {
   const wrapper = mount(
     <DeveloperKeyModal
       createOrEditDeveloperKeyState={{
         ...createDeveloperKeyState,
         ...{developerKey: {...developerKey}, isLtiKey: true}
       }}
-      actions={{}}
-      store={{}}
-      state={{}}
       mountNode={modalMountNode}
+      // generic required props:
+      createLtiKeyState={createLtiKeyState}
+      availableScopes={{}}
+      availableScopesPending={false}
+      closeModal={() => {}}
+      actions={fakeActions}
+      store={{dispatch: () => {}}}
+      selectedScopes={selectedScopes}
+      ctx={{params: {contextId: '1'}}}
     />
   )
 
   wrapper.instance().updateConfigurationMethod('json')
   wrapper.instance().updateToolConfiguration({})
 
-  notOk(wrapper.state().developerKey.redirect_uris)
+  expect(wrapper.state().developerKey.redirect_uris).toBeFalsy()
 
   wrapper.instance().updateToolConfiguration(validToolConfig)
 
-  strictEqual(wrapper.state().developerKey.redirect_uris, validToolConfig.target_link_uri)
+  expect(wrapper.state().developerKey.redirect_uris).toEqual(validToolConfig.target_link_uri)
 
   wrapper.unmount()
 })
 
-test('does not flashes an error if configurationMethod is url', () => {
-  const flashStub = sinon.stub($, 'flashError')
-  const saveLtiToolConfigurationSpy = sinon.spy()
-  const dispatchSpy = sinon.stub().resolves()
+it('does not flash an error if configurationMethod is url', () => {
+  const flashStub = jest.spyOn($, 'flashError')
+  const saveLtiToolConfigurationSpy = jest.fn()
+  const dispatchSpy = () => Promise.resolve()
   const actions = Object.assign(fakeActions, {
     saveLtiToolConfiguration: () => () => ({then: saveLtiToolConfigurationSpy})
   })
@@ -580,9 +605,8 @@ test('does not flashes an error if configurationMethod is url', () => {
   wrapper.instance().updateToolConfigurationUrl('http://foo.com')
   wrapper.instance().saveLtiToolConfiguration()
 
-  ok(saveLtiToolConfigurationSpy.called)
-  notOk(flashStub.calledWith('A redirect_uri is required, please supply one.'))
+  expect(saveLtiToolConfigurationSpy).toHaveBeenCalled()
+  expect(flashStub).not.toHaveBeenCalledWith('A redirect_uri is required, please supply one.')
 
-  flashStub.restore()
   wrapper.unmount()
 })
