@@ -237,7 +237,7 @@ module CC
           end
 
           CanvasHttp.get(url) do |http_response|
-            raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i) unless http_response.code.to_i == 200
+            raise CanvasHttp::InvalidResponseCodeError, http_response.code.to_i unless http_response.code.to_i == 200
 
             @zip_file.get_output_stream(path) do |stream|
               http_response.read_body(stream)

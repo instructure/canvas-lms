@@ -35,7 +35,7 @@ class Quizzes::QuizRegrader::Answer
     @regrade_option = question_regrade.regrade_option
 
     unless REGRADE_OPTIONS.include?(regrade_option)
-      raise ArgumentError.new("Regrade option not valid!")
+      raise ArgumentError, "Regrade option not valid!"
     end
   end
 

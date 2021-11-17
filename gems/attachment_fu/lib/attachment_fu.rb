@@ -261,7 +261,7 @@ module AttachmentFu # :nodoc:
 
     # Creates or updates the thumbnail for the current attachment.
     def create_or_update_thumbnail(temp_file, file_name_suffix, *size)
-      thumbnailable? || raise(ThumbnailError.new("Can't create a thumbnail if the content type is not an image or there is no parent_id column"))
+      thumbnailable? || raise(ThumbnailError, "Can't create a thumbnail if the content type is not an image or there is no parent_id column")
       find_or_initialize_thumbnail(file_name_suffix).tap do |thumb|
         thumb.attributes = {
           :content_type => content_type,

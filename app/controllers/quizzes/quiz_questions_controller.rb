@@ -408,7 +408,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
 
   def require_question
     unless (@question = @quiz.quiz_questions.active.find(params[:id]))
-      raise ActiveRecord::RecordNotFound.new('Quiz Question not found')
+      raise ActiveRecord::RecordNotFound, 'Quiz Question not found'
     end
   end
 

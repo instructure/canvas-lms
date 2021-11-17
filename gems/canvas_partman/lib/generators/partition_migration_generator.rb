@@ -32,7 +32,7 @@ class PartitionMigrationGenerator < ActiveRecord::Generators::MigrationGenerator
 
   def create_migration_file
     unless /^[_a-z0-9]+$/.match?(file_name)
-      raise ActiveRecord::IllegalMigrationNameError.new(file_name)
+      raise ActiveRecord::IllegalMigrationNameError, file_name
     end
 
     migration_template 'migration.rb.erb',

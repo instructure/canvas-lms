@@ -925,9 +925,9 @@ class ApplicationController < ActionController::Base
         store_location
         redirect_to login_url
       elsif params[:context_id]
-        raise ActiveRecord::RecordNotFound.new("Cannot find #{params[:context_type] || 'Context'} for ID: #{params[:context_id]}")
+        raise ActiveRecord::RecordNotFound, "Cannot find #{params[:context_type] || 'Context'} for ID: #{params[:context_id]}"
       else
-        raise ActiveRecord::RecordNotFound.new("Context is required, but none found")
+        raise ActiveRecord::RecordNotFound, "Context is required, but none found"
       end
     end
     @context != nil
@@ -949,7 +949,7 @@ class ApplicationController < ActionController::Base
 
   def require_context_type(klass)
     unless require_context && @context.is_a?(klass)
-      raise ActiveRecord::RecordNotFound.new("Context must be of type '#{klass}'")
+      raise ActiveRecord::RecordNotFound, "Context must be of type '#{klass}'"
     end
 
     true
@@ -2580,7 +2580,7 @@ class ApplicationController < ActionController::Base
   end
 
   def not_found
-    raise ActionController::RoutingError.new('Not Found')
+    raise ActionController::RoutingError, 'Not Found'
   end
 
   def set_js_rights(objtypes = nil)

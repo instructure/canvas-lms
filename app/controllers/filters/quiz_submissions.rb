@@ -45,7 +45,7 @@ module Filters::QuizSubmissions
     end
 
     unless (@quiz_submission = scope.where(query).first)
-      raise ActiveRecord::RecordNotFound.new('Quiz Submission not found')
+      raise ActiveRecord::RecordNotFound, 'Quiz Submission not found'
     end
 
     @quiz_submission.ensure_question_reference_integrity!
@@ -58,7 +58,7 @@ module Filters::QuizSubmissions
 
   def retrieve_quiz_submission_attempt!(attempt)
     unless (@quiz_submission = @quiz_submission.model_for_attempt(attempt.to_i))
-      raise ActiveRecord::RecordNotFound.new('Unable to find a submission with that attempt')
+      raise ActiveRecord::RecordNotFound, 'Unable to find a submission with that attempt'
     end
   end
 
