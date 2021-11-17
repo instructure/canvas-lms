@@ -59,8 +59,8 @@ import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import ImportantDates from './ImportantDates'
-import ObserverOptions, {ObserverListShape} from '@canvas/k5/react/ObserverOptions'
-import {savedObservedId} from '@canvas/k5/ObserverGetObservee'
+import ObserverOptions, {ObserverListShape} from '@canvas/observer-picker'
+import {savedObservedId} from '@canvas/observer-picker/ObserverGetObservee'
 
 const DASHBOARD_TABS = [
   {

@@ -19,18 +19,20 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!observer_options'
-import {savedObservedId, saveObservedId} from '../ObserverGetObservee'
 
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
 import {IconUserLine, IconAddLine} from '@instructure/ui-icons'
 import {Avatar} from '@instructure/ui-avatar'
 import {Text} from '@instructure/ui-text'
-import {parseObserverList, parseObservedUsersResponse} from './utils'
+
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
-import AddStudentModal from './AddStudentModal'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
+
+import {savedObservedId, saveObservedId} from '../ObserverGetObservee'
+import AddStudentModal from './AddStudentModal'
+import {parseObserverList, parseObservedUsersResponse} from './utils'
 
 const ObserverOptions = ({
   observerList,
