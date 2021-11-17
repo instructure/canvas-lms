@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-$:.push File.expand_path("../lib", __FILE__)
-
-require 'qti_exporter/version'
+require_relative 'lib/qti_exporter/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "qti_exporter"

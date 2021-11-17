@@ -195,6 +195,7 @@ path 'gems' do
   gem 'paginated_collection'
   gem 'request_context'
   gem 'stringify_ids'
+  gem 'turnitin_api'
   gem 'twitter'
   gem 'utf8_cleaner'
   gem 'workflow'

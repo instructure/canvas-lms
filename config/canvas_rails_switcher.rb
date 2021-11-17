@@ -27,7 +27,7 @@
 unless defined?(CANVAS_RAILS6_0)
   if ENV['CANVAS_RAILS6_1']
     CANVAS_RAILS6_0 = ENV['CANVAS_RAILS6_1'] != '1'
-  elsif File.exist?(File.expand_path("../RAILS6_1", __FILE__))
+  elsif File.exist?(File.expand_path('RAILS6_1', __dir__))
     CANVAS_RAILS6_0 = false
   else
     begin
@@ -38,7 +38,7 @@ unless defined?(CANVAS_RAILS6_0)
       require 'net/http'
       require 'yaml'
 
-      environment = YAML.load(File.read(File.expand_path("../consul.yml", __FILE__))).dig(ENV['RAILS_ENV'] || 'development', 'environment')
+      environment = YAML.load(File.read(File.expand_path('consul.yml', __dir__))).dig(ENV['RAILS_ENV'] || 'development', 'environment')
 
       keys = [
         ["private/canvas", environment, $canvas_cluster, "rails6.1"].compact.join("/"),

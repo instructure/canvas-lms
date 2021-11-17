@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-$:.push File.expand_path("../lib", __FILE__)
-
 Gem::Specification.new do |spec|
   spec.name          = "academic_benchmark"
   spec.version       = "1.1.0"
