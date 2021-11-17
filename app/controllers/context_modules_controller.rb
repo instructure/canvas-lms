@@ -238,7 +238,7 @@ class ContextModulesController < ApplicationController
       assignment: 'assignments',
       quiz: 'quizzes/quizzes',
       discussion_topic: 'discussion_topics',
-      :'lti-quiz' => 'assignments'
+      :"lti-quiz" => 'assignments'
     }
 
     if @tag

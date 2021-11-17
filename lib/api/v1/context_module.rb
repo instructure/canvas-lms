@@ -35,7 +35,7 @@ module Api::V1::ContextModule
     Attachment: 'file',
     DiscussionTopic: 'topic',
     Quiz: 'quiz',
-    'Quizzes::Quiz': 'quiz',
+    "Quizzes::Quiz": 'quiz',
     WikiPage: 'page'
   }.freeze
 

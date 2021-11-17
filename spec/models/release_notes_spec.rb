@@ -23,7 +23,7 @@
 # to ensure values are persisted correctly
 describe ReleaseNote do
   around do |example|
-    override_dynamic_settings(private: { canvas: { 'release_notes.yml': {
+    override_dynamic_settings(private: { canvas: { "release_notes.yml": {
       ddb_endpoint: ENV.fetch('DDB_ENDPOINT', 'http://dynamodb:8000/'),
       ddb_table_name: "canvas_test_release_notes#{ENV.fetch('PARALLEL_INDEX', '')}"
     }.to_json } }) do

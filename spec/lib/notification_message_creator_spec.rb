@@ -635,7 +635,7 @@ describe NotificationMessageCreator do
     end
 
     it "respects user locales" do
-      I18n.backend.stub(:'en-SHOUTY' => { messages: { test_name: { email: { subject: "THIS IS *5*!!!!?!11eleventy1" } } } }) do
+      I18n.backend.stub(:"en-SHOUTY" => { messages: { test_name: { email: { subject: "THIS IS *5*!!!!?!11eleventy1" } } } }) do
         @user.locale = 'en-SHOUTY'
         @user.save(validate: false)
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message

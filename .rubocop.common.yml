@@ -240,6 +240,9 @@ Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
 Style/PreferredHashMethods:
   Severity: error
+Style/QuotedSymbols:
+  EnforcedStyle: double_quotes # once Style/StringLiterals is enabled, we can remove this since it will inherit
+  Severity: error
 Style/RedundantAssignment:
   Severity: error
 Style/RedundantBegin:
@@ -369,10 +372,6 @@ Style/StringLiterals:
   Enabled: false # TODO: autocorrect
 Style/SymbolArray: # TODO: autocorrect
   Enabled: false
-Style/QuotedSymbols:
-  # once Style/StringLiterals is enabled, we can remove this since it will inherit
-  EnforcedStyle: double_quotes
-  AutoCorrect: false
 Style/TrailingCommaInArguments: # TODO: autocorrect
   Enabled: false
 Style/TrailingCommaInArrayLiteral: # TODO: autocorrect

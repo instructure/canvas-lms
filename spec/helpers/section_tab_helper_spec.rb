@@ -300,12 +300,12 @@ describe SectionTabHelper do
 
       it 'does not include aria-current if tab is not active' do
         tag = SectionTabHelperSpec::SectionTabTag.new(new_window_tab, course)
-        expect(tag.a_attributes[:'aria-current']).to eq nil
+        expect(tag.a_attributes[:"aria-current"]).to eq nil
       end
 
       it 'includes aria-current if tab is active' do
         tag = SectionTabHelperSpec::SectionTabTag.new(new_window_tab, course, new_window_tab[:css_class])
-        expect(tag.a_attributes[:'aria-current']).to eq 'page'
+        expect(tag.a_attributes[:"aria-current"]).to eq 'page'
       end
     end
 

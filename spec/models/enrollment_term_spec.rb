@@ -88,7 +88,7 @@ describe EnrollmentTerm do
     term = @account.default_enrollment_term
 
     translations = {
-      :'en-BACKW' => {
+      :"en-BACKW" => {
         account: {
           default_term_name: "mreT tluafeD"
         }
