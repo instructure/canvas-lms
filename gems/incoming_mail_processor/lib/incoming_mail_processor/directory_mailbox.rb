@@ -19,8 +19,9 @@
 #
 
 require 'fileutils'
-require File.expand_path('configurable_timeout', __dir__)
 require 'zlib'
+
+require_relative 'configurable_timeout'
 
 module IncomingMailProcessor
   class DirectoryMailbox
