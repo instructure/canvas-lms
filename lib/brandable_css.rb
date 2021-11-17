@@ -177,7 +177,7 @@ module BrandableCSS
 
       # while in our sass, we want `url(/images/foo.png)`,
       # the Rails Asset Helpers expect us to not have the '/images/', eg: <%= image_tag('foo.png') %>
-      default = default.sub(/^\/images\//, '') if config['type'] == 'image'
+      default = default.sub(%r{^/images/}, '') if config['type'] == 'image'
       handle_urls(default, config, css_urls)
     end
 

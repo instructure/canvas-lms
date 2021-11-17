@@ -66,7 +66,7 @@ describe Importers::CalendarEventImporter do
   end
 
   def check_paragraph_link(s, type = nil)
-    md = s.match %r(^<p><a href=['"]([^'"]*)['"])
+    md = s.match(/^<p><a href=['"]([^'"]*)['"]/)
     expect(md).not_to be_nil
     expect(md[1]).to match %r(courses/\d+/#{type}/\d+) if type
   end

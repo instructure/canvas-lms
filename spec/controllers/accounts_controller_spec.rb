@@ -446,9 +446,9 @@ describe AccountsController do
         }
       } }
       @account.reload
-      expect(@account.allowed_services).to match(%r{\+test1})
-      expect(@account.allowed_services).not_to match(%r{\+test2})
-      expect(@account.allowed_services).to match(%r{\+test3})
+      expect(@account.allowed_services).to match(/\+test1/)
+      expect(@account.allowed_services).not_to match(/\+test2/)
+      expect(@account.allowed_services).to match(/\+test3/)
     end
 
     it "updates 'default_dashboard_view'" do
@@ -1164,7 +1164,7 @@ describe AccountsController do
       expect(response.body).to match(/"help_link_icon":"paperclip"/)
       expect(response.body).to match(/"id":"link1"/)
       expect(response.body).to match(/"type":"custom"/)
-      expect(response.body).to match(/"url":"https:\/\/canvas.instructure.com\/guides"/)
+      expect(response.body).to match(%r{"url":"https://canvas.instructure.com/guides"})
     end
 
     it "returns the help links as student" do

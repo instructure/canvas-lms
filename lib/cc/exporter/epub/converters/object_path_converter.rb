@@ -44,7 +44,7 @@ module CC::Exporter::Epub::Converters
     end
 
     def href_for_tag(tag)
-      match = tag['href'].match(/([a-z]+)\/(.+)/)
+      match = tag['href'].match(%r{([a-z]+)/(.+)})
       return nil unless match.present?
 
       if sort_by_content

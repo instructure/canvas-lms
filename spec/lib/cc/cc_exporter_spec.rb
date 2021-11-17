@@ -949,8 +949,8 @@ describe "Common Cartridge exporting" do
         assignment_html = @manifest_doc.at_css("file[href$='#{mig_id(assignment)}/assignment-1.html']")
         html_content = @zip_file.read(assignment_html["href"])
 
-        expect(html_content.match(/\$CANVAS_OBJECT_REFERENCE\$\/modules\/#{mig_id(cm1)}/)).not_to be_nil
-        expect(html_content.match(/\$CANVAS_OBJECT_REFERENCE\$\/modules\/#{mig_id(cm2)}/)).not_to be_nil
+        expect(html_content.match(%r{\$CANVAS_OBJECT_REFERENCE\$/modules/#{mig_id(cm1)}})).not_to be_nil
+        expect(html_content.match(%r{\$CANVAS_OBJECT_REFERENCE\$/modules/#{mig_id(cm2)}})).not_to be_nil
       end
     end
 

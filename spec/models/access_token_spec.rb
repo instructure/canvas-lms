@@ -248,27 +248,27 @@ describe AccessToken do
     end
 
     it "returns regexes that correspond to the http method" do
-      expect(token.url_scopes_for_method('GET')).to match_array [/^\/api\/v1\/accounts(?:\.[^\/]+|)$/]
+      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/api/v1/accounts(?:\.[^/]+|)$}]
     end
 
     it "accounts for format segments" do
       token = AccessToken.new(scopes: %w{url:GET|/blah})
-      expect(token.url_scopes_for_method('GET')).to match_array [/^\/blah(?:\.[^\/]+|)$/]
+      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/blah(?:\.[^/]+|)$}]
     end
 
     it "accounts for glob segments" do
       token = AccessToken.new(scopes: %w{url:GET|/*blah})
-      expect(token.url_scopes_for_method('GET')).to match_array [/^\/.+(?:\.[^\/]+|)$/]
+      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/.+(?:\.[^/]+|)$}]
     end
 
     it "accounts for dynamic segments" do
       token = AccessToken.new(scopes: %w{url:GET|/courses/:id})
-      expect(token.url_scopes_for_method('GET')).to match_array [/^\/courses\/[^\/]+(?:\.[^\/]+|)$/]
+      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/courses/[^/]+(?:\.[^/]+|)$}]
     end
 
     it "accounts for optional segments" do
       token = AccessToken.new(scopes: %w{url:GET|/courses(/:course_id)(/*blah)})
-      expect(token.url_scopes_for_method('GET')).to match_array [/^\/courses(?:\/[^\/]+|)(?:\/.+|)(?:\.[^\/]+|)$/]
+      expect(token.url_scopes_for_method('GET')).to match_array [%r{^/courses(?:/[^/]+|)(?:/.+|)(?:\.[^/]+|)$}]
     end
   end
 

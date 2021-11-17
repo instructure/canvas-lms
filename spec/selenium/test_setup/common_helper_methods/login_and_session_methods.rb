@@ -19,7 +19,7 @@
 
 module LoginAndSessionMethods
   def create_session(pseudonym)
-    if caller.grep(/onceler\/recorder.*record!/).present?
+    if caller.grep(%r{onceler/recorder.*record!}).present?
       raise "don't double sessions in a `before(:once)` block; do it in a `before(:each)` so the stubbing works for all examples and not just the first one"
     end
 

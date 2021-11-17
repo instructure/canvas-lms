@@ -73,11 +73,11 @@ describe BigBlueButtonConference do
 
     it "recreates the conference" do
       allow(@conference).to receive(:send_request).with(:create, anything).and_return({ createTime: @create_time })
-      expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
+      expect(@conference.craft_url(@user)).to match(%r{\Ahttps://bbb\.instructure\.com/bigbluebutton/api/join})
       # load a new instance to clear out @conference_active
       @conference = WebConference.find(@conference.id)
       allow(@conference).to receive(:send_request).with(:create, anything).and_return({ createTime: @create_time })
-      expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
+      expect(@conference.craft_url(@user)).to match(%r{\Ahttps://bbb\.instructure\.com/bigbluebutton/api/join})
     end
 
     it "does not recreate the conference if it is active" do
@@ -86,7 +86,7 @@ describe BigBlueButtonConference do
                                                                                             })
       @conference.initiate_conference
       expect(@conference).to be_active
-      expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
+      expect(@conference.craft_url(@user)).to match(%r{\Ahttps://bbb\.instructure\.com/bigbluebutton/api/join})
     end
 
     it "has a well formed user string as for recording_user_ready" do

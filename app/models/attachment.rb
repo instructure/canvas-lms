@@ -916,7 +916,7 @@ class Attachment < ActiveRecord::Base
 
   def content_type_with_text_match
     # treats all text/X files as text/plain (except text/html)
-    (content_type.to_s.match(/^text\/.*/) && content_type.to_s != "text/html") ? "text/plain" : content_type
+    (content_type.to_s.match(%r{^text/.*}) && content_type.to_s != "text/html") ? "text/plain" : content_type
   end
 
   # Returns an IO-like object containing the contents of the attachment file.

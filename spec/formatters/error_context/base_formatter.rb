@@ -215,7 +215,7 @@ module ErrorContext
     end
 
     def spec_path
-      @spec_path ||= RerunArgument.for(example).sub(/\A[.\/]+/, "")
+      @spec_path ||= RerunArgument.for(example).sub(%r{\A[./]+}, "")
     end
 
     def errors_path

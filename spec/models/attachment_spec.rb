@@ -65,12 +65,12 @@ describe Attachment do
 
     it "returns http as the protocol by default" do
       attachment_with_context(@course)
-      expect(@attachment.public_url).to match(/^http:\/\//)
+      expect(@attachment.public_url).to match(%r{^http://})
     end
 
     it "returns the protocol if specified" do
       attachment_with_context(@course)
-      expect(@attachment.public_url(:secure => true)).to match(/^https:\/\//)
+      expect(@attachment.public_url(:secure => true)).to match(%r{^https://})
     end
 
     context "for a quiz submission upload" do
@@ -120,7 +120,7 @@ describe Attachment do
 
     it "gives back a signed s3 url" do
       a = attachment_model
-      expect(a.public_url(expires_in: 1.day)).to match(/^https:\/\//)
+      expect(a.public_url(expires_in: 1.day)).to match(%r{^https://})
       a.destroy_permanently!
     end
   end

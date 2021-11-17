@@ -781,7 +781,7 @@ describe "Canvas Cartridge importing" do
     expect(page_2.url).to eq page.url
     expect(page_2.editing_roles).to eq page.editing_roles
     expect(page_2.notify_of_update).to eq page.notify_of_update
-    expect(page_2.body).to eq (body_with_link % [@copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id]).gsub(/png" \/>/, 'png">')
+    expect(page_2.body).to eq (body_with_link % [@copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, @copy_to.id, mod2.id, @copy_to.id, to_att.id]).gsub(%r{png" />}, 'png">')
     expect(page_2.unpublished?).to eq true
   end
 
@@ -803,7 +803,7 @@ describe "Canvas Cartridge importing" do
     page_2 = @copy_to.wiki_pages.where(migration_id: migration_id).first
     expect(page_2.title).to eq page.title
     expect(page_2.url).to eq page.url
-    expect(page_2.body).to match(/\/courses\/#{@copy_to.id}\/external_tools\/retrieve/)
+    expect(page_2.body).to match(%r{/courses/#{@copy_to.id}/external_tools/retrieve})
   end
 
   it "imports assignments" do

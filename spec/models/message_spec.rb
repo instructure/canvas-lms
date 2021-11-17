@@ -27,7 +27,7 @@ describe Message do
       au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, au)
       template = msg.get_template('alert.email.erb')
-      expect(template).to match(%r{An alert has been triggered})
+      expect(template).to match(/An alert has been triggered/)
     end
   end
 

@@ -59,7 +59,7 @@ module SpecTimeLimit
         [:target, example.metadata[:custom_timeout].to_i]
       elsif ENV.fetch("SELENIUM_REMOTE_URL", "undefined remote url").include? "saucelabs"
         [:status_quo, SAUCELABS_ABSOLUTE_TIMEOUT]
-      elsif example.file_path.match?(/\.\/spec\/selenium\/.*rcs/) # files in ./spec/selenium/**/rcs
+      elsif example.file_path.match?(%r{\./spec/selenium/.*rcs}) # files in ./spec/selenium/**/rcs
         [:target, SIDEBAR_LOADING_TIMEOUT]
       elsif example.file_path.include? "./spec/selenium/performance/"
         [:status_quo, PERFORMANCE_TIMEOUT]

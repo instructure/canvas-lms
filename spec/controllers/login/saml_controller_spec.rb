@@ -269,7 +269,7 @@ describe Login::SamlController do
     session[:parent_registration] = { observee: { unique_id: 'foo@example.com' } }
     post :create, params: { :SAMLResponse => "foo" }
     expect(response).to be_redirect
-    expect(response.location).to match(/example.com\/logout/)
+    expect(response.location).to match(%r{example.com/logout})
   end
 
   context "with relay state" do

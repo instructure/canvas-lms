@@ -444,7 +444,7 @@ module QuizzesHelper
       entry[:blank_id] = AssessmentQuestion.variable_id(entry[:blank_id])
     end
     # Requires mutliline option to be robust
-    res.gsub!(%r{<input.*?name=\\?['"](question_.*?)\\?['"].*?>}m) do |match|
+    res.gsub!(/<input.*?name=\\?['"](question_.*?)\\?['"].*?>/m) do |match|
       blank = match.match(RE_EXTRACT_BLANK_ID).to_a[1]
       blank.delete!('\\')
       answer = answer_list.detect { |entry| entry[:blank_id] == blank } || {}
@@ -455,10 +455,10 @@ module QuizzesHelper
         #  Replace the {{question_IDNUM_VARIABLEID}} template text with the user's answer text.
         match = match.sub(/\{\{question_.*?\}\}/, answer.to_s).
                 # Match on "/>" but only when at the end of the string and insert "readonly" if set to be readonly
-                sub(/\/*>\Z/, readonly_markup)
+                sub(%r{/*>\Z}, readonly_markup)
       end
       # add labelling to input element regardless
-      match.sub(/\/*>\Z/, "#{label_attr} />")
+      match.sub(%r{/*>\Z}, "#{label_attr} />")
     end
 
     if answer_list.empty?

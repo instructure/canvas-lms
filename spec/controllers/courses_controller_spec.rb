@@ -3096,7 +3096,7 @@ describe CoursesController do
       expect(feed).not_to be_nil
       expect(feed.entries).not_to be_empty
       expect(feed.links.first.rel).to match(/self/)
-      expect(feed.links.first.href).to match(/http:\/\//)
+      expect(feed.links.first.href).to match(%r{http://})
     end
 
     it "includes an author for each entry" do

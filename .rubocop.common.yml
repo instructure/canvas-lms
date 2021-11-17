@@ -244,6 +244,8 @@ Style/RedundantRegexpEscape:
   Severity: error
 Style/RedundantReturn:
   Severity: error
+Style/RegexpLiteral:
+  Severity: error
 Style/RescueStandardError:
   EnforcedStyle: implicit
   Severity: error
@@ -334,8 +336,6 @@ Style/PercentLiteralDelimiters: # TODO: autocorrect
 Style/PercentQLiterals: # TODO: autocorrect
   Enabled: false
 Style/RedundantSelf: # TODO: autocorrect
-  Enabled: false
-Style/RegexpLiteral: # TODO: autocorrect
   Enabled: false
 Style/RescueModifier: # TODO
   Severity: warning

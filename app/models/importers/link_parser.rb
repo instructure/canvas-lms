@@ -64,7 +64,7 @@ module Importers
       return unless node[attr].present?
 
       if attr == 'value' &&
-         !(node[attr] =~ %r{IMS(?:-|_)CC(?:-|_)FILEBASE} || node[attr].include?('CANVAS_COURSE_REFERENCE'))
+         !(node[attr] =~ /IMS(?:-|_)CC(?:-|_)FILEBASE/ || node[attr].include?('CANVAS_COURSE_REFERENCE'))
         return
       end
 
@@ -155,7 +155,7 @@ module Importers
             (attr == 'src' && node.name == 'iframe' && node['data-media-id'])
         # Course copy media reference, leave it alone
         resolved
-      elsif attr == 'src' && (info_match = url.match(/\Adata:(?<mime_type>[-\w]+\/[-\w+.]+)?;base64,(?<image>.*)/m))
+      elsif attr == 'src' && (info_match = url.match(%r{\Adata:(?<mime_type>[-\w]+/[-\w+.]+)?;base64,(?<image>.*)}m))
         link_embedded_image(info_match)
       elsif # rubocop:disable Lint/DuplicateBranch
             # Equation image, leave it alone

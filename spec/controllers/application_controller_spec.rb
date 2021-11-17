@@ -2558,7 +2558,7 @@ RSpec.describe ApplicationController, '#render_unauthorized_action' do
   describe 'pdf format' do
     let(:format) { :pdf }
 
-    specify { expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/) }
+    specify { expect(response.headers.fetch('Content-Type')).to match(%r{\Atext/html}) }
     specify { expect(response).to have_http_status :unauthorized }
     specify { expect(response).to render_template('shared/unauthorized') }
   end
@@ -2566,7 +2566,7 @@ RSpec.describe ApplicationController, '#render_unauthorized_action' do
   describe 'html format' do
     let(:format) { :html }
 
-    specify { expect(response.headers.fetch('Content-Type')).to match(/\Atext\/html/) }
+    specify { expect(response.headers.fetch('Content-Type')).to match(%r{\Atext/html}) }
     specify { expect(response).to have_http_status :unauthorized }
     specify { expect(response).to render_template('shared/unauthorized') }
   end
@@ -2574,7 +2574,7 @@ RSpec.describe ApplicationController, '#render_unauthorized_action' do
   describe 'json format' do
     let(:format) { :json }
 
-    specify { expect(response.headers['Content-Type']).to match(/\Aapplication\/json/) }
+    specify { expect(response.headers['Content-Type']).to match(%r{\Aapplication/json}) }
     specify { expect(response).to have_http_status :unauthorized }
     specify { expect(json_parse.fetch('status')).to eq 'unauthorized' }
   end

@@ -671,7 +671,7 @@ class Submission < ActiveRecord::Base
 
   def plaintext_body
     self.extend HtmlTextHelper
-    strip_tags((self.body || "").gsub(/<\s*br\s*\/>/, "\n<br/>").gsub(/<\/p>/, "</p>\n"))
+    strip_tags((self.body || "").gsub(%r{<\s*br\s*/>}, "\n<br/>").gsub(%r{</p>}, "</p>\n"))
   end
 
   TURNITIN_STATUS_RETRY = 11
