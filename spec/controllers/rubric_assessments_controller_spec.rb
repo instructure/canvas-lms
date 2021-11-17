@@ -78,6 +78,23 @@ describe RubricAssessmentsController do
       expect(response_json.dig("artifact", "submission_comments").first).to_not have_key("author_name")
     end
 
+    it "returns anonymized user comments when anonymous grading and moderated grading are enabled" do
+      course_with_teacher_logged_in(active_all: true)
+      @student = factory_with_protected_attributes(User, name: "Some Student", workflow_state: "registered")
+      @course.enroll_student(@student).accept!
+      @assignment = @course.assignments.create!(title: "Some Assignment", anonymous_grading: true, moderated_grading: true, grader_count: 1, final_grader: @teacher)
+      rubric_assessment_model(user: @student, assessor: @teacher, context: @course, association_object: @assignment, purpose: "grading")
+      submission = @rubric_assessment.artifact
+      submission.submission_comments.create!(author: @student, comment: "A Comment")
+
+      put "update", params: { provisional: true, course_id: @course.id, rubric_association_id: @rubric_association.id, id: @rubric_assessment.id, rubric_assessment: { user_id: @user.to_param, assessment_type: "no_reason" } }
+      response_json = JSON.parse(response.body)
+      expect(response_json.dig("artifact", "submission_comments").first).to have_key("anonymous_id")
+      expect(response_json.dig("artifact", "submission_comments").first["anonymous_id"]).to eq(submission.anonymous_id)
+      expect(response_json.dig("artifact", "submission_comments").first).to_not have_key("author_id")
+      expect(response_json.dig("artifact", "submission_comments").first).to_not have_key("author_name")
+    end
+
     context "setting a provisional grade to be final" do
       before(:once) do
         @course = Course.create!
@@ -223,6 +240,7 @@ describe RubricAssessmentsController do
         it "claims a moderated grading slot for the submitter" do
           user_session(provisional_grader)
           put(:update, params: update_params(assessor: provisional_grader))
+          assert_status(200)
 
           expect(slotted_grader_ids).to match_array([provisional_grader.id])
         end
