@@ -19,7 +19,7 @@
 #
 
 require 'fileutils'
-require File.expand_path('../configurable_timeout', __FILE__)
+require File.expand_path('configurable_timeout', __dir__)
 require 'zlib'
 
 module IncomingMailProcessor

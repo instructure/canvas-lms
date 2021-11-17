@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-lib = File.expand_path('../lib', __FILE__)
-$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'rubocop_canvas/version'
+require_relative 'lib/rubocop_canvas/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "rubocop-canvas"

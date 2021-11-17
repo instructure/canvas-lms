@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require File.join(%W[#{File.dirname(__FILE__)} lib canvas_partman version])
+require_relative "lib/canvas_partman/version"
 
 Gem::Specification.new do |spec|
   spec.name          = 'canvas_partman'

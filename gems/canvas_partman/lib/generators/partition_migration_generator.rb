@@ -24,7 +24,7 @@ require 'rails/generators/active_record'
 require 'rails/generators/active_record/migration/migration_generator'
 
 class PartitionMigrationGenerator < ActiveRecord::Generators::MigrationGenerator
-  source_root File.expand_path("../templates", __FILE__)
+  source_root File.expand_path('templates', __dir__)
 
   remove_argument :attributes
   argument :model, type: :string, required: false,
