@@ -226,7 +226,7 @@ module Canvas
 
     error_count = redis.get(redis_key)
     if error_count.to_i >= cutoff
-      raise TimeoutCutoff.new(error_count)
+      raise TimeoutCutoff, error_count
     end
 
     begin
@@ -260,7 +260,7 @@ module Canvas
 
     protection_activated_key = "#{redis_key}:protection_activated"
     protection_activated = redis.get(protection_activated_key)
-    raise TimeoutCutoff.new(cutoff) if protection_activated
+    raise TimeoutCutoff, cutoff if protection_activated
 
     counter_window = timeout_protection_failure_counter_window(service_name)
     min_samples = timeout_protection_failure_min_samples(service_name)
@@ -276,7 +276,7 @@ module Canvas
       error_ttl = timeout_protection_error_ttl(service_name)
       redis.set(protection_activated_key, "true")
       redis.expire(protection_activated_key, error_ttl)
-      raise TimeoutCutoff.new(failure_rate)
+      raise TimeoutCutoff, failure_rate
     end
 
     begin

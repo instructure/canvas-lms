@@ -78,7 +78,7 @@ module SimplyVersioned
 
     def simply_versioned(options = {})
       bad_keys = options.keys - SimplyVersioned::DEFAULTS.keys
-      raise SimplyVersioned::BadOptions.new(bad_keys) unless bad_keys.empty?
+      raise SimplyVersioned::BadOptions, bad_keys unless bad_keys.empty?
 
       options.reverse_merge!(DEFAULTS)
       options[:exclude] = Array(options[:exclude]).map(&:to_s)

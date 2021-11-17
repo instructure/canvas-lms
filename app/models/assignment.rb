@@ -1915,15 +1915,15 @@ class Assignment < ActiveRecord::Base
   end
 
   def grade_student(original_student, opts = {})
-    raise GradeError.new("Student is required") unless original_student
+    raise GradeError, "Student is required" unless original_student
     unless context.includes_user?(original_student, context.admin_visible_student_enrollments) # allows inactive users to be graded
-      raise GradeError.new("Student must be enrolled in the course as a student to be graded")
+      raise GradeError, "Student must be enrolled in the course as a student to be graded"
     end
-    raise GradeError.new("Grader must be enrolled as a course admin") if opts[:grader] && !self.context.grants_right?(opts[:grader], :manage_grades)
+    raise GradeError, "Grader must be enrolled as a course admin" if opts[:grader] && !self.context.grants_right?(opts[:grader], :manage_grades)
 
     opts[:excused] = Canvas::Plugin.value_to_boolean(opts.delete(:excuse)) if opts.key? :excuse
-    raise GradeError.new("Cannot simultaneously grade and excuse an assignment") if opts[:excused] && (opts[:grade] || opts[:score])
-    raise GradeError.new("Provisional grades require a grader") if opts[:provisional] && opts[:grader].nil?
+    raise GradeError, "Cannot simultaneously grade and excuse an assignment" if opts[:excused] && (opts[:grade] || opts[:score])
+    raise GradeError, "Provisional grades require a grader" if opts[:provisional] && opts[:grader].nil?
 
     opts.delete(:id)
     group, students = group_students(original_student)

@@ -50,7 +50,7 @@ module AttachmentFu # :nodoc:
         if image? && !@resized
           with_image do |img|
             max_image_size = attachment_options[:thumbnail_max_image_size_pixels]
-            raise ThumbnailError.new("source image too large") if max_image_size && img[:width] * img[:height] > max_image_size
+            raise ThumbnailError, "source image too large" if max_image_size && img[:width] * img[:height] > max_image_size
 
             resize_image_or_thumbnail! img
             self.width = img[:width] if respond_to?(:width)

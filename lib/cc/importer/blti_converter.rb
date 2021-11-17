@@ -109,14 +109,14 @@ module CC::Importer
     def convert_blti_xml(xml)
       doc = create_xml_doc(xml)
       unless doc.namespaces.to_s.downcase.include? 'imsglobal'
-        raise CCImportError.new(I18n.t("Invalid XML Configuration"))
+        raise CCImportError, I18n.t("Invalid XML Configuration")
       end
 
       begin
         tool = convert_blti_link(doc)
         check_for_unescaped_url_properties(tool) if tool
       rescue Nokogiri::XML::XPath::SyntaxError
-        raise CCImportError.new(I18n.t(:invalid_xml_syntax, "Invalid xml syntax"))
+        raise CCImportError, I18n.t(:invalid_xml_syntax, "Invalid xml syntax")
       end
       tool
     end
@@ -135,7 +135,7 @@ module CC::Importer
 
     def check_for_unescaped_url(url)
       if /(.*[^=]*\?*=)[^&;]*=/.match?(url)
-        raise CCImportError.new(I18n.t(:invalid_url_in_xml, "Invalid url in xml. Ampersands must be escaped."))
+        raise CCImportError, I18n.t(:invalid_url_in_xml, "Invalid url in xml. Ampersands must be escaped.")
       end
     end
 
@@ -144,7 +144,7 @@ module CC::Importer
       config_xml = response.body
       convert_blti_xml(config_xml)
     rescue Timeout::Error
-      raise CCImportError.new(I18n.t(:retrieve_timeout, "could not retrieve configuration, the server response timed out"))
+      raise CCImportError, I18n.t(:retrieve_timeout, "could not retrieve configuration, the server response timed out")
     end
 
     def get_custom_properties(node)

@@ -960,7 +960,7 @@ class Attachment < ActiveRecord::Base
   private def streaming_download(dest = nil, &block)
     retries ||= 0
     CanvasHttp.get(public_url) do |response|
-      raise FailedResponse.new("Expected 200, got #{response.code}: #{response.body}") unless response.code.to_i == 200
+      raise FailedResponse, "Expected 200, got #{response.code}: #{response.body}" unless response.code.to_i == 200
 
       response.read_body(dest, &block)
     end

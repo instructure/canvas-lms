@@ -266,6 +266,8 @@ Style/QuotedSymbols:
   Severity: error
 Style/RedundantArgument:
   Severity: error
+Style/RaiseArgs:
+  Severity: error
 Style/RedundantAssignment:
   Severity: error
 Style/RedundantBegin:

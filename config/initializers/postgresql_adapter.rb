@@ -161,8 +161,8 @@ module PostgreSQLAdapterExtensions
   end
 
   def index_exists?(_table_name, columns, _options = {})
-    raise ArgumentError.new("if you're identifying an index by name only, you should use index_name_exists?") if columns.is_a?(Hash) && columns[:name]
-    raise ArgumentError.new("columns should be a string, a symbol, or an array of those ") unless columns.is_a?(String) || columns.is_a?(Symbol) || columns.is_a?(Array)
+    raise ArgumentError, "if you're identifying an index by name only, you should use index_name_exists?" if columns.is_a?(Hash) && columns[:name]
+    raise ArgumentError, "columns should be a string, a symbol, or an array of those " unless columns.is_a?(String) || columns.is_a?(Symbol) || columns.is_a?(Array)
 
     super
   end
@@ -186,7 +186,7 @@ module PostgreSQLAdapterExtensions
         table = ActiveRecord::ConnectionAdapters::PostgreSQL::Name.new(provided_index.schema, table.identifier) unless table.schema.present?
 
         if provided_index.schema.present? && table.schema != provided_index.schema
-          raise ArgumentError.new("Index schema '#{provided_index.schema}' does not match table schema '#{table.schema}'")
+          raise ArgumentError, "Index schema '#{provided_index.schema}' does not match table schema '#{table.schema}'"
         end
       end
 
@@ -197,7 +197,7 @@ module PostgreSQLAdapterExtensions
       algorithm =
         if options.is_a?(Hash) && options.key?(:algorithm)
           index_algorithms.fetch(options[:algorithm]) do
-            raise ArgumentError.new("Algorithm must be one of the following: #{index_algorithms.keys.map(&:inspect).join(', ')}")
+            raise ArgumentError, "Algorithm must be one of the following: #{index_algorithms.keys.map(&:inspect).join(', ')}"
           end
         end
       algorithm = nil if open_transactions > 0

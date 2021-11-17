@@ -453,13 +453,13 @@ module Api::V1::AssignmentOverride
       assignment.errors.add(:base, error)
     end
 
-    raise ActiveRecord::RecordInvalid.new(assignment) if assignment.errors.any?
+    raise ActiveRecord::RecordInvalid, assignment if assignment.errors.any?
 
     if prepared_overrides[:overrides_to_delete].any?
       assignment.assignment_overrides.where(id: prepared_overrides[:overrides_to_delete]).destroy_all
     end
 
-    raise ActiveRecord::RecordInvalid.new(assignment) unless assignment.valid?
+    raise ActiveRecord::RecordInvalid, assignment unless assignment.valid?
 
     prepared_overrides[:overrides_to_create].each(&:save!)
     prepared_overrides[:overrides_to_update].each(&:save!)

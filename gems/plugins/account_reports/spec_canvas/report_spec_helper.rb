@@ -47,7 +47,7 @@ module ReportSpecHelper
     if AccountReport.available_reports[type]
       AccountReports.generate_report(account_report)
     else
-      raise ReportSpecHelperError.new("report is not properly configured in engine.")
+      raise ReportSpecHelperError, "report is not properly configured in engine."
     end
     run_jobs
     account_report.reload

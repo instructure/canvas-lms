@@ -100,7 +100,7 @@ module Canvas
       @sideloads = options.fetch(:includes, []).map(&:to_s)
       @serializer_options = options.fetch(:serializer_options, {})
       unless controller
-        raise ArgumentError.new("You must pass a controller to APISerializer!")
+        raise ArgumentError, "You must pass a controller to APISerializer!"
       end
     end
 
