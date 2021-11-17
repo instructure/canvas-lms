@@ -44,6 +44,63 @@ describe('Notification Preferences', () => {
     expect(getByText('Enable Notifications for Course01')).toBeInTheDocument()
   })
 
+  it('renders notification times with a close button', () => {
+    window.ENV = {
+      NOTIFICATION_PREFERENCES_OPTIONS: {
+        daily_notification_time: ' 6pm',
+        weekly_notification_range: {
+          weekday: 'Saturday',
+          start_time: ' 7pm',
+          end_time: ' 9pm'
+        }
+      }
+    }
+    const props = defaultProps()
+    const {getByTestId} = render(<NotificationPreferences {...props} />)
+
+    const notification_times = getByTestId('notification_times')
+    expect(notification_times).not.toBeNull()
+    expect(notification_times.textContent).toEqual(
+      'Daily notifications will be delivered around  6pm. Weekly notifications will be delivered Saturday between  7pm and  9pm.Close'
+    )
+  })
+
+  it('does not render notification times if env: weekly_notification_range is not set', () => {
+    window.ENV = {
+      NOTIFICATION_PREFERENCES_OPTIONS: {
+        send_scores_in_emails_text: null,
+        allowed_push_categories: [],
+        daily_notification_time: ' 6pm'
+      }
+    }
+
+    const props = defaultProps()
+    const {queryByTestId} = render(<NotificationPreferences {...props} />)
+
+    const notification_times = queryByTestId('notification_times')
+    expect(notification_times).toBeNull()
+  })
+
+  it('does not render notification times if env: daily_notification_time is not set', () => {
+    window.ENV = {
+      NOTIFICATION_PREFERENCES_OPTIONS: {
+        send_scores_in_emails_text: null,
+        allowed_push_categories: [],
+        weekly_notification_range: {
+          weekday: 'Saturday',
+          start_time: ' 7pm',
+          end_time: '9pm'
+        }
+      }
+    }
+
+    const props = defaultProps()
+    const {queryByTestId} = render(<NotificationPreferences {...props} />)
+
+    const notification_times = queryByTestId('notification_times')
+    expect(notification_times).toBeNull()
+  })
+
   it('renders the appropriate alert text for course context', () => {
     const props = defaultProps()
     const {getByText} = render(<NotificationPreferences {...props} />)
