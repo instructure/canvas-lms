@@ -156,26 +156,30 @@ class RubricAssessmentsController < ApplicationController
             include_root: false
           )
 
-          if @asset.is_a?(Submission)
-            json[:artifact][:submission_comments] = anonymous_moderated_submission_comments_json(
-              assignment: @asset.assignment,
-              course: @asset.course,
-              current_user: @current_user,
-              avatars: service_enabled?(:avatars),
-              submission_comments: @asset.visible_submission_comments_for(@current_user),
-              submissions: [@asset]
-            )
-          end
-
-          if @asset.is_a?(ModeratedGrading::ProvisionalGrade)
+          case @asset
+          when Submission
+            submission = @asset
+          when ModeratedGrading::ProvisionalGrade
+            submission = @asset.submission
             json[:artifact] = @asset.submission
-                                    .as_json(Submission.json_serialization_full_parameters(include_root: false))
+                                    .as_json(Submission.json_serialization_full_parameters(except: [:submission_comments], include_root: false))
                                     .merge(@asset.grade_attributes)
 
             if @association_object.moderated_grading? && !@association_object.can_view_other_grader_identities?(@current_user)
               current_user_moderation_grader = @association_object.moderation_graders.find_by(user: @current_user)
               json[:anonymous_assessor_id] = current_user_moderation_grader.anonymous_id
             end
+          end
+
+          if submission.present?
+            json[:artifact][:submission_comments] = anonymous_moderated_submission_comments_json(
+              assignment: submission.assignment,
+              course: submission.assignment.course,
+              current_user: @current_user,
+              avatars: service_enabled?(:avatars),
+              submission_comments: submission.visible_submission_comments_for(@current_user),
+              submissions: [submission]
+            )
           end
 
           render json: json
