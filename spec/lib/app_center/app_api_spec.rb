@@ -46,7 +46,7 @@ describe AppCenter::AppApi do
           'meta' => { "next" => "https://www.example.com/api/v1/apps?offset=60" },
           'current_offset' => 0,
           'limit' => 50,
-          'objects' => %w(object1 object2 object3 object4)
+          'objects' => %w[object1 object2 object3 object4]
         }.to_json
       )
       response
@@ -87,7 +87,7 @@ describe AppCenter::AppApi do
     end
 
     it "can omit next page" do
-      message = { "objects" => %w(object1 object2 object3 object4), "meta" => {} }
+      message = { "objects" => %w[object1 object2 object3 object4], "meta" => {} }
       allow(response).to receive(:body).and_return(message.to_json)
       endpoint = '/?myparam=value'
       per_page = 5

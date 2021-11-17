@@ -45,7 +45,7 @@ describe SpeedGrader::Assignment do
         @course.assignments.create!(
           group_category_id: category.id,
           grade_group_students_individually: false,
-          submission_types: %w(text_entry)
+          submission_types: %w[text_entry]
         )
       end
       let(:homework_params) do
@@ -711,7 +711,7 @@ describe SpeedGrader::Assignment do
         @assignment = @course.assignments.create!(
           group_category_id: @group_category.id,
           grade_group_students_individually: false,
-          submission_types: %w(text_entry)
+          submission_types: %w[text_entry]
         )
       end
 
@@ -1028,12 +1028,12 @@ describe SpeedGrader::Assignment do
       let(:submission) { Submission.find_or_initialize_by(assignment: @assignment, user: @student) }
 
       let(:urls) do
-        %w(
+        %w[
           https://abcdef.com/uuurrrlll00
           https://abcdef.com/uuurrrlll01
           https://abcdef.com/uuurrrlll02
           https://abcdef.com/uuurrrlll03
-        )
+        ]
       end
 
       let(:url_grades) do

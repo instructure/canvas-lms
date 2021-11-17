@@ -239,19 +239,19 @@ describe "Outcome Results API", type: :request do
         api_call(:get, outcome_rollups_url(outcome_course),
                  controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
         json = JSON.parse(response.body)
-        expect(json.keys.sort).to eq %w(meta rollups)
+        expect(json.keys.sort).to eq %w[meta rollups]
         expect(json['rollups'].size).to eq 1
         json['rollups'].each do |rollup|
-          expect(rollup.keys.sort).to eq %w(links scores)
-          expect(rollup['links'].keys.sort).to eq %w(section user)
+          expect(rollup.keys.sort).to eq %w[links scores]
+          expect(rollup['links'].keys.sort).to eq %w[section user]
           expect(rollup['links']['section']).to eq @course.course_sections.first.id.to_s
           expect(rollup['links']['user']).to eq outcome_student.id.to_s
           expect(rollup['scores'].size).to eq 1
           rollup['scores'].each do |score|
-            expect(score.keys.sort).to eq %w(count hide_points links score submitted_at title)
+            expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
             expect(score['count']).to eq 1
             expect(score['score']).to eq first_outcome_rating[:points]
-            expect(score['links'].keys.sort).to eq %w(outcome)
+            expect(score['links'].keys.sort).to eq %w[outcome]
             expect(score['links']['outcome']).to eq outcome_object.id.to_s
           end
         end
@@ -496,23 +496,23 @@ describe "Outcome Results API", type: :request do
           api_call(:get, outcome_rollups_url(outcome_course, user_ids: student_id_str, include: ['users']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, user_ids: student_id_str, include: ['users'])
           json = JSON.parse(response.body)
-          expect(json.keys.sort).to eq %w(linked meta rollups)
+          expect(json.keys.sort).to eq %w[linked meta rollups]
           expect(json['rollups'].size).to eq 2
           json['rollups'].each do |rollup|
-            expect(rollup.keys.sort).to eq %w(links scores)
-            expect(rollup['links'].keys.sort).to eq %w(section user)
+            expect(rollup.keys.sort).to eq %w[links scores]
+            expect(rollup['links'].keys.sort).to eq %w[section user]
             expect(rollup['links']['section']).to eq @course.course_sections.first.id.to_s
             expect(student_ids).to be_include(rollup['links']['user'])
             expect(rollup['scores'].size).to eq 1
             rollup['scores'].each do |score|
-              expect(score.keys.sort).to eq %w(count hide_points links score submitted_at title)
+              expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
               expect(score['count']).to eq 1
               expect([0, 1]).to be_include(score['score'])
-              expect(score['links'].keys.sort).to eq %w(outcome)
+              expect(score['links'].keys.sort).to eq %w[outcome]
               expect(score['links']['outcome']).to eq outcome_object.id.to_s
             end
           end
-          expect(json['linked'].keys.sort).to eq %w(users)
+          expect(json['linked'].keys.sort).to eq %w[users]
           expect(json['linked']['users'].size).to eq 2
         end
 
@@ -555,23 +555,23 @@ describe "Outcome Results API", type: :request do
           api_call(:get, outcome_rollups_url(outcome_course, section_id: outcome_course_sections[0].id, include: ['users']),
                    controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s, section_id: outcome_course_sections[0].id.to_s, include: ['users'])
           json = JSON.parse(response.body)
-          expect(json.keys.sort).to eq %w(linked meta rollups)
+          expect(json.keys.sort).to eq %w[linked meta rollups]
           expect(json['rollups'].size).to eq 2
           json['rollups'].each do |rollup|
-            expect(rollup.keys.sort).to eq %w(links scores)
-            expect(rollup['links'].keys.sort).to eq %w(section user)
+            expect(rollup.keys.sort).to eq %w[links scores]
+            expect(rollup['links'].keys.sort).to eq %w[section user]
             expect(rollup['links']['section']).to eq outcome_course_sections[0].id.to_s
             expect(outcome_course_sections[0].student_ids.map(&:to_s)).to be_include(rollup['links']['user'])
             expect(rollup['scores'].size).to eq 1
             rollup['scores'].each do |score|
-              expect(score.keys.sort).to eq %w(count hide_points links score submitted_at title)
+              expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
               expect(score['count']).to eq 1
               expect([0, 2]).to be_include(score['score'])
-              expect(score['links'].keys.sort).to eq %w(outcome)
+              expect(score['links'].keys.sort).to eq %w[outcome]
               expect(score['links']['outcome']).to eq outcome_object.id.to_s
             end
           end
-          expect(json['linked'].keys.sort).to eq %w(users)
+          expect(json['linked'].keys.sort).to eq %w[users]
           expect(json['linked']['users'].size).to eq outcome_course_sections[0].students.count
         end
       end
@@ -706,17 +706,17 @@ describe "Outcome Results API", type: :request do
                  controller: 'outcome_results', action: 'rollups', format: 'json',
                  course_id: outcome_course.id.to_s, aggregate: 'course')
         json = JSON.parse(response.body)
-        expect(json.keys.sort).to eq %w(rollups)
+        expect(json.keys.sort).to eq %w[rollups]
         expect(json['rollups'].size).to eq 1
         json['rollups'].each do |rollup|
-          expect(rollup.keys.sort).to eq %w(links scores)
+          expect(rollup.keys.sort).to eq %w[links scores]
           expect(rollup['links']['course']).to eq @course.id.to_s
           expect(rollup['scores'].size).to eq 1
           rollup['scores'].each do |score|
-            expect(score.keys.sort).to eq %w(count hide_points links score submitted_at title)
+            expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
             expect(score['count']).to eq 1
             expect(score['score']).to eq first_outcome_rating[:points]
-            expect(score['links'].keys.sort).to eq %w(outcome)
+            expect(score['links'].keys.sort).to eq %w[outcome]
           end
         end
       end
@@ -731,17 +731,17 @@ describe "Outcome Results API", type: :request do
                    course_id: outcome_course.id.to_s, aggregate: 'course',
                    user_ids: student_id_str)
           json = JSON.parse(response.body)
-          expect(json.keys.sort).to eq %w(rollups)
+          expect(json.keys.sort).to eq %w[rollups]
           expect(json['rollups'].size).to eq 1
           json['rollups'].each do |rollup|
-            expect(rollup.keys.sort).to eq %w(links scores)
+            expect(rollup.keys.sort).to eq %w[links scores]
             expect(rollup['links']['course']).to eq @course.id.to_s
             expect(rollup['scores'].size).to eq 1
             rollup['scores'].each do |score|
-              expect(score.keys.sort).to eq %w(count hide_points links score submitted_at title)
+              expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
               expect(score['count']).to eq 2
               expect(score['score']).to eq 0.5
-              expect(score['links'].keys.sort).to eq %w(outcome)
+              expect(score['links'].keys.sort).to eq %w[outcome]
             end
           end
         end
@@ -756,17 +756,17 @@ describe "Outcome Results API", type: :request do
                    course_id: outcome_course.id.to_s, aggregate: 'course',
                    section_id: outcome_course_sections[0].id.to_s)
           json = JSON.parse(response.body)
-          expect(json.keys.sort).to eq %w(rollups)
+          expect(json.keys.sort).to eq %w[rollups]
           expect(json['rollups'].size).to eq 1
           json['rollups'].each do |rollup|
-            expect(rollup.keys.sort).to eq %w(links scores)
+            expect(rollup.keys.sort).to eq %w[links scores]
             expect(rollup['links']['course']).to eq outcome_course.id.to_s
             expect(rollup['scores'].size).to eq 1
             rollup['scores'].each do |score|
-              expect(score.keys.sort).to eq %w(count hide_points links score submitted_at title)
+              expect(score.keys.sort).to eq %w[count hide_points links score submitted_at title]
               expect(score['count']).to eq outcome_course_sections[0].enrollments.count
               expect(score['score']).to eq 1
-              expect(score['links'].keys.sort).to eq %w(outcome)
+              expect(score['links'].keys.sort).to eq %w[outcome]
             end
           end
         end
@@ -825,13 +825,13 @@ describe "Outcome Results API", type: :request do
       api_call(:get, outcome_rollups_url(outcome_course),
                controller: 'outcome_results', action: 'rollups', format: 'json', course_id: outcome_course.id.to_s)
       json = JSON.parse(response.body)
-      expect(json.keys.sort).to eq %w(meta rollups)
+      expect(json.keys.sort).to eq %w[meta rollups]
       expect(json['rollups'].size).to eq 2
       expect(json['rollups'].collect { |x| x['links']['user'] }.sort).to eq [student.id.to_s, student2.id.to_s].sort
       json['rollups'].each do |rollup|
-        expect(rollup.keys.sort).to eq %w(links scores)
+        expect(rollup.keys.sort).to eq %w[links scores]
         expect(rollup['scores'].size).to eq 1
-        expect(rollup['links'].keys.sort).to eq %w(section user)
+        expect(rollup['links'].keys.sort).to eq %w[section user]
       end
     end
   end

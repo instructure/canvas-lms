@@ -70,7 +70,7 @@ describe 'Submissions API', type: :request do
                       { :controller => 'submissions_api', :action => 'index',
                         :format => 'json', :section_id => @default_section.id.to_s,
                         :assignment_id => @a1.id.to_s },
-                      { :include => %w(submission_history submission_comments rubric_assessment) })
+                      { :include => %w[submission_history submission_comments rubric_assessment] })
       expect(json.size).to eq 0
 
       json = api_call(:get,
@@ -78,7 +78,7 @@ describe 'Submissions API', type: :request do
                       { :controller => 'submissions_api', :action => 'index',
                         :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
                         :assignment_id => @a1.id.to_s },
-                      { :include => %w(submission_history submission_comments rubric_assessment) })
+                      { :include => %w[submission_history submission_comments rubric_assessment] })
       expect(json.size).to eq 1
       expect(json.first['user_id']).to eq @student1.id
 
@@ -339,7 +339,7 @@ describe 'Submissions API', type: :request do
                       { :controller => 'submissions_api', :action => 'index',
                         :format => 'json', :section_id => @section.id.to_s,
                         :assignment_id => @a1.id.to_s },
-                      { :include => %w(user) })
+                      { :include => %w[user] })
       expect(json.size).to eq 1
       expect(json[0]['user']).not_to be_nil
       expect(json[0]['user']['id']).to eq(@student1.id)
@@ -352,7 +352,7 @@ describe 'Submissions API', type: :request do
                       { :controller => 'submissions_api', :action => 'index',
                         :format => 'json', :section_id => @section.id.to_s,
                         :assignment_id => @a1.id.to_s },
-                      { :include => %w(visibility), :student_ids => [@student1.id] })
+                      { :include => %w[visibility], :student_ids => [@student1.id] })
       expect(json[0]["assignment_visible"]).to eq true
     end
 
@@ -390,7 +390,7 @@ describe 'Submissions API', type: :request do
                       { :controller => 'submissions_api', :action => 'update',
                         :format => 'json', :section_id => @section.id.to_s,
                         :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                      { :submission => { :posted_grade => '75%' }, :include => %w(visibility) })
+                      { :submission => { :posted_grade => '75%' }, :include => %w[visibility] })
       expect(json["assignment_visible"]).to eq true
       expect(json["all_submissions"][0]["assignment_visible"]).to eq true
     end
@@ -413,7 +413,7 @@ describe 'Submissions API', type: :request do
                       { :controller => 'submissions_api', :action => 'show',
                         :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
                         :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                      { :include => %w(submission_history submission_comments rubric_assessment) })
+                      { :include => %w[submission_history submission_comments rubric_assessment] })
       expect(json['user_id']).to eq @student1.id
     end
 
@@ -430,9 +430,9 @@ describe 'Submissions API', type: :request do
                       { :controller => 'submissions_api', :action => 'show',
                         :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
                         :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                      { :include => %w(submission_comments rubric_assessment) })
+                      { :include => %w[submission_comments rubric_assessment] })
 
-      %w(score published_grade published_score grade).each do |a|
+      %w[score published_grade published_score grade].each do |a|
         expect(json[a]).to be_nil
       end
 
@@ -446,7 +446,7 @@ describe 'Submissions API', type: :request do
                       { :controller => 'submissions_api', :action => 'show',
                         :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
                         :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                      { :include => %w(submission_comments rubric_assessment) })
+                      { :include => %w[submission_comments rubric_assessment] })
       expect(json["submission_comments"].size).to eq 2
       expect(json["grade"]).to eq "5"
 
@@ -458,7 +458,7 @@ describe 'Submissions API', type: :request do
                       { :controller => 'submissions_api', :action => 'show',
                         :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
                         :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                      { :include => %w(submission_comments rubric_assessment) })
+                      { :include => %w[submission_comments rubric_assessment] })
       expect(json["submission_comments"].size).to eq 2
       expect(json["grade"]).to eq "5"
     end
@@ -477,7 +477,7 @@ describe 'Submissions API', type: :request do
                          { :controller => 'submissions_api', :action => 'show',
                            :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
                            :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                         { :include => %w(submission_comments) })
+                         { :include => %w[submission_comments] })
       end
 
       it 'returns only published comments' do
@@ -523,7 +523,7 @@ describe 'Submissions API', type: :request do
                       { :controller => 'submissions_api', :action => 'show',
                         :format => 'json', :section_id => 'sis_section_id:my-section-sis-id',
                         :assignment_id => @a1.id.to_s, :user_id => @student1.id.to_s },
-                      { :include => %w(submission_comments rubric_assessment) })
+                      { :include => %w[submission_comments rubric_assessment] })
 
       expect(json['rubric_assessment']).to be_nil
     end
@@ -649,7 +649,7 @@ describe 'Submissions API', type: :request do
                     { :controller => 'submissions_api', :action => 'show',
                       :format => 'json', :course_id => @course.id.to_s,
                       :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
-                    { :exclude_response_fields => %w(discussion_entries) })
+                    { :exclude_response_fields => %w[discussion_entries] })
     expect(json['discussion_entries']).to be_nil
   end
 
@@ -733,7 +733,7 @@ describe 'Submissions API', type: :request do
                     { :controller => 'submissions_api', :action => 'index',
                       :format => 'json', :course_id => @course.id.to_s,
                       :assignment_id => @assignment.id.to_s },
-                    { :include => %w(submission_comments) })
+                    { :include => %w[submission_comments] })
 
     expect(json.first["submission_comments"].size).to eq 1
     comment = json.first["submission_comments"].first
@@ -777,7 +777,7 @@ describe 'Submissions API', type: :request do
                       :assignment_ids => [@assignment.to_param],
                       :student_ids => [reviewed.to_param]
                     }, {
-                      :include => %w(submission_comments)
+                      :include => %w[submission_comments]
                     })
 
     comment_json = json.first['submission_comments'].first
@@ -850,7 +850,7 @@ describe 'Submissions API', type: :request do
                     "/api/v1/courses/#{@course.id}/students/submissions.json",
                     { :controller => 'submissions_api', :action => 'for_students',
                       :format => 'json', :course_id => @course.to_param },
-                    { :student_ids => [@student.to_param], :include => %w(submission_history), :grouped => 1 })
+                    { :student_ids => [@student.to_param], :include => %w[submission_history], :grouped => 1 })
     expect(json.first["submissions"].first["submission_history"]).to be_present
 
     # ungrouped
@@ -858,7 +858,7 @@ describe 'Submissions API', type: :request do
                     "/api/v1/courses/#{@course.id}/students/submissions.json",
                     { :controller => 'submissions_api', :action => 'for_students',
                       :format => 'json', :course_id => @course.to_param },
-                    { :student_ids => [@student.to_param], :include => %w(submission_history) })
+                    { :student_ids => [@student.to_param], :include => %w[submission_history] })
 
     expect(json.first["submission_history"]).to be_present
   end
@@ -887,7 +887,7 @@ describe 'Submissions API', type: :request do
                     { :controller => 'submissions_api', :action => 'index',
                       :format => 'json', :course_id => @course.id.to_s,
                       :assignment_id => @assignment.id.to_s },
-                    { :include => %w(submission_comments) })
+                    { :include => %w[submission_comments] })
 
     expect(json.first["submission_comments"].size).to eq 1
     comment = json.first["submission_comments"].first
@@ -908,7 +908,7 @@ describe 'Submissions API', type: :request do
                     { :controller => 'submissions_api', :action => 'index',
                       :format => 'json', :course_id => @course.id.to_s,
                       :assignment_id => a1.id.to_s },
-                    { :include => %w(submission_history submission_comments rubric_assessment) })
+                    { :include => %w[submission_history submission_comments rubric_assessment] })
 
     preview_url = json.first['preview_url']
     expect(Rack::Utils.parse_query(URI(preview_url).query)['version'].to_i).to eq sub.quiz_submission_version
@@ -937,7 +937,7 @@ describe 'Submissions API', type: :request do
                     { :controller => 'submissions_api', :action => 'index',
                       :format => 'json', :course_id => @course.id.to_s,
                       :assignment_id => quiz.assignment.id.to_s },
-                    { :include => %w(submission_history) })
+                    { :include => %w[submission_history] })
     expect(json.first['submission_history'].count).to eq 2
     expect(json.first['submission_history'].first.include? "submission_data").to be_truthy
     expect(json.first['submission_history'][0]['preview_url']).to include '&version=2'
@@ -958,7 +958,7 @@ describe 'Submissions API', type: :request do
                     { :controller => 'submissions_api', :action => 'index',
                       :format => 'json', :course_id => @course.id.to_s,
                       :assignment_id => @quiz.assignment.id.to_s },
-                    { :include => %w(submission_history) })
+                    { :include => %w[submission_history] })
     submission_dates = json.first['submission_history'].map { |hash| hash['submitted_at'] }
     expect(submission_dates.first).not_to eq(submission_dates.last)
   end
@@ -985,7 +985,7 @@ describe 'Submissions API', type: :request do
                     { :controller => "submissions_api", :action => "show",
                       :format => "json", :course_id => @course.id.to_s,
                       :assignment_id => a1.id.to_s, :user_id => student1.id.to_s },
-                    { :include => %w(submission_comments) })
+                    { :include => %w[submission_comments] })
 
     expect(json).to eql({
                           "id" => sub1.id,
@@ -1045,7 +1045,7 @@ describe 'Submissions API', type: :request do
                  { :controller => "submissions_api", :action => "show",
                    :format => "json", :course_id => @course.id.to_s,
                    :assignment_id => a1.id.to_s, :user_id => student1.id.to_s },
-                 { :include => %w(submission_comments) })
+                 { :include => %w[submission_comments] })
     assert_status(401)
   end
 
@@ -1093,7 +1093,7 @@ describe 'Submissions API', type: :request do
                     { :controller => 'submissions_api', :action => 'index',
                       :format => 'json', :course_id => @course.id.to_s,
                       :assignment_id => a1.id.to_s },
-                    { :include => %w(submission_history submission_comments rubric_assessment) })
+                    { :include => %w[submission_history submission_comments rubric_assessment] })
     url = json[0]['attachments'][0]['url']
     get(url)
     follow_redirect! while response.redirect?
@@ -1119,7 +1119,7 @@ describe 'Submissions API', type: :request do
                     { :controller => 'submissions_api', :action => 'index',
                       :format => 'json', :course_id => @course.id.to_s,
                       :assignment_id => a1.id.to_s },
-                    { :include => %w(submission_history submission_comments rubric_assessment) })
+                    { :include => %w[submission_history submission_comments rubric_assessment] })
     url = json[0]['media_comment']['url']
     get(url)
     expect(response).to be_redirect
@@ -1166,7 +1166,7 @@ describe 'Submissions API', type: :request do
                     { :controller => 'submissions_api', :action => 'index',
                       :format => 'json', :course_id => @course.id.to_s,
                       :assignment_id => a1.id.to_s },
-                    { :include => %w(submission_history submission_comments rubric_assessment) })
+                    { :include => %w[submission_history submission_comments rubric_assessment] })
 
     sub1.reload
     sub2.reload
@@ -2263,7 +2263,7 @@ describe 'Submissions API', type: :request do
       end
 
       def call_to_submissions_show(opts = {})
-        includes = %w(submission_comments rubric_assessment)
+        includes = %w[submission_comments rubric_assessment]
         includes.concat(opts[:includes]) if opts[:includes]
         helper_method = opts[:as_student] ? [:api_call_as_user, @student] : [:api_call]
         args = helper_method + [:get,
@@ -2296,7 +2296,7 @@ describe 'Submissions API', type: :request do
                              "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
                              { :controller => 'submissions_api', :action => 'show',
                                :format => 'json', :course_id => @course.to_param, :assignment_id => @assignment.id.to_s, :user_id => @student.id.to_s },
-                             { :include => %w(submission_comments rubric_assessment) }, {}, expected_status: 401)
+                             { :include => %w[submission_comments rubric_assessment] }, {}, expected_status: 401)
           end
 
           it "returns the submission if it is graded" do
@@ -2326,7 +2326,7 @@ describe 'Submissions API', type: :request do
                         { :controller => 'submissions_api', :action => 'show',
                           :format => 'json', :course_id => @course.id.to_s,
                           :assignment_id => @assignment1.id.to_s, :user_id => @student.id.to_s },
-                        { :include => %w(full_rubric_assessment) })
+                        { :include => %w[full_rubric_assessment] })
         expect(json).not_to have_key 'full_rubric_assessment'
       end
 
@@ -2345,7 +2345,7 @@ describe 'Submissions API', type: :request do
                                   { :controller => 'submissions_api', :action => 'show',
                                     :format => 'json', :course_id => @course.id.to_s,
                                     :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
-                                  { :include => %w(full_rubric_assessment) })
+                                  { :include => %w[full_rubric_assessment] })
           expect(json).to have_key 'full_rubric_assessment'
           expect(json['full_rubric_assessment']).to have_key 'data'
           expect(json['full_rubric_assessment']).to have_key 'assessor_name'
@@ -2358,7 +2358,7 @@ describe 'Submissions API', type: :request do
                                   { :controller => 'submissions_api', :action => 'show',
                                     :format => 'json', :course_id => @course.id.to_s,
                                     :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
-                                  { :include => %w(full_rubric_assessment) })
+                                  { :include => %w[full_rubric_assessment] })
           expect(json['full_rubric_assessment']).not_to be_nil
         end
 
@@ -2370,7 +2370,7 @@ describe 'Submissions API', type: :request do
                            { :controller => 'submissions_api', :action => 'show',
                              :format => 'json', :course_id => @course.id.to_s,
                              :assignment_id => @assignment2.id.to_s, :user_id => @student.id.to_s },
-                           { :include => %w(full_rubric_assessment) }, {}, expected_status: 401)
+                           { :include => %w[full_rubric_assessment] }, {}, expected_status: 401)
         end
       end
     end
@@ -4438,12 +4438,16 @@ describe 'Submissions API', type: :request do
 
       it "creates a online text submission" do
         @assignment.update(:submission_types => 'online_text_entry')
-        json = do_submit(:submission_type => 'online_text_entry', :body => %{<p>
-          This is <i>some</i> text. The <script src='evil.com'></script> sanitization will take effect.
-        </p>})
-        expect(json['body']).to eq %{<p>
-          This is <i>some</i> text. The  sanitization will take effect.
-        </p>}
+        json = do_submit(:submission_type => 'online_text_entry', :body => <<~HTML)
+          <p>
+            This is <i>some</i> text. The <script src='evil.com'></script> sanitization will take effect.
+          </p>
+        HTML
+        expect(json['body']).to eq <<~HTML
+          <p>
+            This is <i>some</i> text. The  sanitization will take effect.
+          </p>
+        HTML
         expect(json['body']).to eq @submission.body
       end
 
@@ -5561,7 +5565,7 @@ describe 'Submissions API', type: :request do
       end
 
       it 'includes the group_id and group_name if include[]=group is passed' do
-        params[:include] = %w/group/
+        params[:include] = %w[group]
         json = api_call_as_user(teacher, :get, path, params)
         expect(json.first.fetch('group').fetch('id')).to eq group.id
         expect(json.first.fetch('group').fetch('name')).to eq group.name

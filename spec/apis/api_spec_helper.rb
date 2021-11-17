@@ -164,7 +164,7 @@ end
 # response from the api for that field, which will be verified for correctness.
 def should_translate_user_content(course, include_verifiers = true)
   attachment = attachment_model(:context => course)
-  content = %{
+  content = <<~HTML
     <p>
       Hello, students.<br>
       This will explain everything: <img id="1" src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
@@ -173,7 +173,7 @@ def should_translate_user_content(course, include_verifiers = true)
       Also, watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
       And refer to this <a href="/courses/#{course.id}/pages/awesome-page">awesome wiki page</a>.
     </p>
-  }
+  HTML
   html = yield content
   check_document(html, course, attachment, include_verifiers)
 

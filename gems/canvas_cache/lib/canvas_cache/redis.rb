@@ -249,7 +249,7 @@ module CanvasCache
         response
       end
 
-      SET_COMMANDS = %i{set setex}.freeze
+      SET_COMMANDS = %i[set setex].freeze
       def log_request_response(request, response, start_time)
         return if request.nil? # redis client does internal keepalives and connection commands
         return if CanvasCache::Redis.log_style == 'off'

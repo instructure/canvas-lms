@@ -1605,28 +1605,28 @@ describe "Accounts API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@a.id}/courses?blueprint=true",
                         { :controller => 'accounts', :action => 'courses_api', :account_id => @a.to_param,
                           :format => 'json', :blueprint => true })
-        expect(json.map { |c| c['name'] }).to match_array %w(MasterCourse)
+        expect(json.map { |c| c['name'] }).to match_array %w[MasterCourse]
       end
 
       it 'filters out blueprint courses' do
         json = api_call(:get, "/api/v1/accounts/#{@a.id}/courses?blueprint=false",
                         { :controller => 'accounts', :action => 'courses_api', :account_id => @a.to_param,
                           :format => 'json', :blueprint => false })
-        expect(json.map { |c| c['name'] }).to match_array %w(ChildCourse OtherCourse)
+        expect(json.map { |c| c['name'] }).to match_array %w[ChildCourse OtherCourse]
       end
 
       it 'filters in associated courses' do
         json = api_call(:get, "/api/v1/accounts/#{@a.id}/courses?blueprint_associated=true",
                         { :controller => 'accounts', :action => 'courses_api', :account_id => @a.to_param,
                           :format => 'json', :blueprint_associated => true })
-        expect(json.map { |c| c['name'] }).to match_array %w(ChildCourse)
+        expect(json.map { |c| c['name'] }).to match_array %w[ChildCourse]
       end
 
       it 'filters out associated courses' do
         json = api_call(:get, "/api/v1/accounts/#{@a.id}/courses?blueprint_associated=false",
                         { :controller => 'accounts', :action => 'courses_api', :account_id => @a.to_param,
                           :format => 'json', :blueprint_associated => false })
-        expect(json.map { |c| c['name'] }).to match_array %w(MasterCourse OtherCourse)
+        expect(json.map { |c| c['name'] }).to match_array %w[MasterCourse OtherCourse]
       end
     end
   end
@@ -1635,14 +1635,14 @@ describe "Accounts API", type: :request do
     it "returns permissions" do
       json = api_call(:get, "/api/v1/accounts/#{@a1.id}/permissions?permissions[]=become_user&permissions[]=manage_blarghs",
                       :controller => 'accounts', :action => 'permissions', :account_id => @a1.to_param,
-                      :format => 'json', :permissions => %w(become_user manage_blarghs))
+                      :format => 'json', :permissions => %w[become_user manage_blarghs])
       expect(json).to eq({ "become_user" => true, "manage_blarghs" => false })
     end
 
     it "requires :read permission on the account" do
       api_call(:get, "/api/v1/accounts/#{@a3.id}/permissions?permissions[]=become_user",
                { :controller => 'accounts', :action => 'permissions', :account_id => @a3.to_param, :format => 'json',
-                 :permissions => %w(become_user) }, {}, {}, { :expected_status => 401 })
+                 :permissions => %w[become_user] }, {}, {}, { :expected_status => 401 })
     end
   end
 

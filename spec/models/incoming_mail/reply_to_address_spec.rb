@@ -56,7 +56,7 @@ describe IncomingMail::ReplyToAddress do
         expect(message).to receive(:global_id).twice.and_return(@shard1.global_id_for(42))
         created_at = Time.now.utc
         expect(message).to receive(:created_at).and_return(created_at)
-        IncomingMail::ReplyToAddress.address_pool = %w{canvas@example.com}
+        IncomingMail::ReplyToAddress.address_pool = %w[canvas@example.com]
 
         short_id = Shard.short_id_for(@shard1.global_id_for(42))
 
@@ -74,7 +74,7 @@ describe IncomingMail::ReplyToAddress do
         expect(message).to receive(:global_id).twice.and_return(@shard1.global_id_for(Shard::IDS_PER_SHARD - 1))
         created_at = 50.years.from_now
         expect(message).to receive(:created_at).and_return(created_at)
-        IncomingMail::ReplyToAddress.address_pool = %w{canvas@example.com}
+        IncomingMail::ReplyToAddress.address_pool = %w[canvas@example.com]
 
         expect(IncomingMail::ReplyToAddress.new(message).address.split('@').first.length < 64).to be_truthy
       end
@@ -103,7 +103,7 @@ describe IncomingMail::ReplyToAddress do
 
   describe 'self.address_pool=' do
     it 'persists an address pool' do
-      pool = %w{canvas@example.com canvas2@example.com}
+      pool = %w[canvas@example.com canvas2@example.com]
       IncomingMail::ReplyToAddress.address_pool = pool
 
       expect(IncomingMail::ReplyToAddress.instance_variable_get(:@address_pool)).to eq pool
@@ -116,7 +116,7 @@ describe IncomingMail::ReplyToAddress do
 
       expect(message).to receive(:id).twice.and_return(14)
       expect(message2).to receive(:id).twice.and_return(15)
-      IncomingMail::ReplyToAddress.address_pool = %w{canvas@example.com canvas2@example.com}
+      IncomingMail::ReplyToAddress.address_pool = %w[canvas@example.com canvas2@example.com]
 
       expect(IncomingMail::ReplyToAddress.address_from_pool(message)).to  eq 'canvas@example.com'
       expect(IncomingMail::ReplyToAddress.address_from_pool(message2)).to eq 'canvas2@example.com'
@@ -135,7 +135,7 @@ describe IncomingMail::ReplyToAddress do
       message = double()
 
       expect(message).to receive(:id).and_return(nil)
-      IncomingMail::ReplyToAddress.address_pool = %w{canvas@example.com}
+      IncomingMail::ReplyToAddress.address_pool = %w[canvas@example.com]
 
       expect(IncomingMail::ReplyToAddress.address_from_pool(message)).to eq 'canvas@example.com'
     end

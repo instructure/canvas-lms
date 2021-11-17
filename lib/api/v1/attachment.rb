@@ -247,7 +247,7 @@ module Api::V1::Attachment
   end
 
   def validate_on_duplicate(params)
-    if params[:on_duplicate] && !%w(rename overwrite).include?(params[:on_duplicate])
+    if params[:on_duplicate] && !%w[rename overwrite].include?(params[:on_duplicate])
       render status: :bad_request, json: {
         message: 'invalid on_duplicate option'
       }

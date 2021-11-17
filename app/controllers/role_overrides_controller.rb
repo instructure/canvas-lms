@@ -133,8 +133,8 @@ class RoleOverridesController < ApplicationController
   def api_index
     if authorized_action(@context, @current_user, :manage_role_overrides)
       route = polymorphic_url([:api, :v1, @context, :roles])
-      states = params[:state].to_a.reject { |s| %w(active inactive).exclude?(s) }
-      states = %w(active) if states.empty?
+      states = params[:state].to_a.reject { |s| %w[active inactive].exclude?(s) }
+      states = %w[active] if states.empty?
 
       roles = []
       roles += Role.visible_built_in_roles(root_account_id: @context.resolved_root_account_id) if states.include?('active')
@@ -576,7 +576,7 @@ class RoleOverridesController < ApplicationController
   # Could be generalized for other use cases by adding to the whitelist
 
   def check_account_permission
-    whitelist = %w(manage_catalog)
+    whitelist = %w[manage_catalog]
     permission = params[:permission]
 
     if whitelist.include?(permission)

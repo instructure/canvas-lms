@@ -425,7 +425,7 @@ class ContentMigration < ActiveRecord::Base
     running_cutoff = Setting.get('content_migration_job_block_hours', '4').to_i.hours.ago # at some point just let the jobs keep going
 
     if self.context && self.context.content_migrations
-                           .where(:workflow_state => %w{created queued pre_processing pre_processed exporting importing}).where("id < ?", self.id)
+                           .where(:workflow_state => %w[created queued pre_processing pre_processed exporting importing]).where("id < ?", self.id)
                            .where("started_at > ?", running_cutoff).exists?
 
       # there's another job already going so punt
@@ -1041,16 +1041,16 @@ class ContentMigration < ActiveRecord::Base
   def handle_import_in_progress_notice
     return unless context.is_a?(Course) && is_set?(migration_settings[:import_in_progress_notice])
 
-    if (just_created || (saved_change_to_workflow_state? && %w{created queued}.include?(workflow_state_before_last_save))) &&
-       %w(pre_processing pre_processed exporting importing).include?(workflow_state)
+    if (just_created || (saved_change_to_workflow_state? && %w[created queued].include?(workflow_state_before_last_save))) &&
+       %w[pre_processing pre_processed exporting importing].include?(workflow_state)
       context.add_content_notice(:import_in_progress, 4.hours)
-    elsif saved_change_to_workflow_state? && %w(pre_process_error exported imported failed).include?(workflow_state)
+    elsif saved_change_to_workflow_state? && %w[pre_process_error exported imported failed].include?(workflow_state)
       context.remove_content_notice(:import_in_progress)
     end
   end
 
   def check_for_blocked_migration
-    if self.saved_change_to_workflow_state? && %w(pre_process_error exported imported failed).include?(workflow_state)
+    if self.saved_change_to_workflow_state? && %w[pre_process_error exported imported failed].include?(workflow_state)
       if self.context && (next_cm = self.context.content_migrations.where(:workflow_state => 'queued').order(:id).first)
         job_id = next_cm.job_progress.try(:delayed_job_id)
         if job_id && (job = Delayed::Job.where(:id => job_id, :locked_at => nil).first)

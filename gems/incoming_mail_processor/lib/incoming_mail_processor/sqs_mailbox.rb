@@ -28,7 +28,7 @@ module IncomingMailProcessor
 
     attr_reader :config
 
-    POLL_PARAMS = %i{idle_timeout wait_time_seconds visibility_timeout}.freeze
+    POLL_PARAMS = %i[idle_timeout wait_time_seconds visibility_timeout].freeze
 
     def initialize(opts = {})
       @config = opts

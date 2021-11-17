@@ -236,7 +236,7 @@ describe "users" do
 
       get '/register'
 
-      %w{teacher student parent}.each do |type|
+      %w[teacher student parent].each do |type|
         f("#signup_#{type}").click
         form = fj('.ui-dialog:visible form')
         expect(form).not_to contain_css('input[name="user[terms_of_use]"]')
@@ -251,7 +251,7 @@ describe "users" do
 
       get '/register'
 
-      %w{teacher student parent}.each do |type|
+      %w[teacher student parent].each do |type|
         f("#signup_#{type}").click
         form = fj('.ui-dialog:visible form')
         expect(form).not_to contain_css('input[name="user[terms_of_use]"]')
@@ -264,7 +264,7 @@ describe "users" do
 
       get "/register"
 
-      %w{teacher student parent}.each do |type|
+      %w[teacher student parent].each do |type|
         f("#signup_#{type}").click
         form = fj('.ui-dialog:visible form')
         input = f('input[name="user[terms_of_use]"]', form)

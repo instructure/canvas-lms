@@ -147,8 +147,8 @@ class ContentExportsApiController < ApplicationController
   # @returns ContentExport
   def create
     if authorized_action(@context, @current_user, :read)
-      valid_types = %w(zip)
-      valid_types += %w(qti common_cartridge quizzes2) if @context.is_a?(Course)
+      valid_types = %w[zip]
+      valid_types += %w[qti common_cartridge quizzes2] if @context.is_a?(Course)
       return render json: { message: 'invalid export_type' }, status: :bad_request unless valid_types.include?(params[:export_type])
 
       export = create_content_export_from_api(params, @context, @current_user)

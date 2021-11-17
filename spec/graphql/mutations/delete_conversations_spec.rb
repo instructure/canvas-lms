@@ -51,7 +51,7 @@ describe Mutations::DeleteConversations do
     result = execute_with_input(query)
     expect(result['errors']).to be_nil
     expect(result.dig('data', 'deleteConversations', 'errors')).to be_nil
-    expect(result.dig('data', 'deleteConversations', 'conversationIds')).to match_array %W(#{conv.id})
+    expect(result.dig('data', 'deleteConversations', 'conversationIds')).to match_array %W[#{conv.id}]
     expect(sender.all_conversations.find_by(conversation: conv).messages.length).to eq 0
   end
 
@@ -92,7 +92,7 @@ describe Mutations::DeleteConversations do
         result = execute_with_input(query)
         expect(result['errors']).to be_nil
         expect(result.dig('data', 'deleteConversations', 'errors')).to be_nil
-        expect(result.dig('data', 'deleteConversations', 'conversationIds')).to match_array %W(#{conv.id} #{conv2.id})
+        expect(result.dig('data', 'deleteConversations', 'conversationIds')).to match_array %W[#{conv.id} #{conv2.id}]
         expect(sender.all_conversations.find_by(conversation: conv).messages.length).to eq 0
         expect(sender.all_conversations.find_by(conversation: conv2).messages.length).to eq 0
       end
@@ -117,7 +117,7 @@ describe Mutations::DeleteConversations do
         result = execute_with_input(query)
         expect_error(result, another_conv.id, 'Insufficient permissions')
         expect_error(result, invalid_id, 'Unable to find Conversation')
-        expect(result.dig('data', 'deleteConversations', 'conversationIds')).to match_array %W(#{conv.id})
+        expect(result.dig('data', 'deleteConversations', 'conversationIds')).to match_array %W[#{conv.id}]
         expect(sender.all_conversations.find_by(conversation: conv).messages.length).to eq 0
       end
     end

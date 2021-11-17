@@ -200,7 +200,7 @@ describe "speed grader submissions" do
       end
       expect(f('#submission_not_newest_notice')).to be_displayed
 
-      f(%Q{#students_selectmenu option[value="#{submission2.user.id}"]}).click
+      f(%Q(#students_selectmenu option[value="#{submission2.user.id}"])).click
 
       in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
         wait_for_ajaximations

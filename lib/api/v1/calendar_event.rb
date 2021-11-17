@@ -49,7 +49,7 @@ module Api::V1::CalendarEvent
       event,
       user,
       session,
-      :only => %w(id created_at updated_at start_at end_at all_day all_day_date title workflow_state comments)
+      :only => %w[id created_at updated_at start_at end_at all_day all_day_date title workflow_state comments]
     )
 
     if user
@@ -180,7 +180,7 @@ module Api::V1::CalendarEvent
 
   def assignment_event_json(assignment, user, session, options = {})
     excludes = options[:excludes] || []
-    target_fields = %w(created_at updated_at title all_day all_day_date workflow_state)
+    target_fields = %w[created_at updated_at title all_day all_day_date workflow_state]
     target_fields << 'description' unless excludes.include?('description')
     hash = api_json(assignment, user, session, only: target_fields)
     hash['description'] = api_user_content(hash['description'], assignment.context) unless excludes.include?('description')
@@ -218,7 +218,7 @@ module Api::V1::CalendarEvent
       group,
       user,
       session,
-      :only => %w{id created_at description end_at max_appointments_per_participant min_appointments_per_participant participants_per_appointment start_at title updated_at workflow_state participant_visibility}, :methods => :sub_context_codes
+      :only => %w[id created_at description end_at max_appointments_per_participant min_appointments_per_participant participants_per_appointment start_at title updated_at workflow_state participant_visibility], :methods => :sub_context_codes
     )
 
     if user

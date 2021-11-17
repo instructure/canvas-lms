@@ -194,7 +194,7 @@ describe Loaders::DiscussionEntryLoader do
           current_user: @teacher,
           filter: 'drafts'
         ).load(@discussion).then do |discussion_entries|
-          expect(discussion_entries.map(&:message)).to match_array(%w(hey howdy))
+          expect(discussion_entries.map(&:message)).to match_array(%w[hey howdy])
         end
       end
     end
@@ -207,7 +207,7 @@ describe Loaders::DiscussionEntryLoader do
           current_user: @teacher,
           filter: 'drafts'
         ).load(@discussion).then do |discussion_entries|
-          expect(discussion_entries.map(&:message)).to match_array(%w(howdy))
+          expect(discussion_entries.map(&:message)).to match_array(%w[howdy])
         end
       end
     end

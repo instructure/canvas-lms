@@ -633,7 +633,7 @@ describe "API Authentication", type: :request do
       auth_header = { 'HTTP_AUTHORIZATION' => "Bearer #{expired_services_jwt}" }
       get "/api/v1/courses", headers: auth_header
       assert_status(401)
-      expect(response['WWW-Authenticate']).to eq %{Bearer realm="canvas-lms"}
+      expect(response['WWW-Authenticate']).to eq %(Bearer realm="canvas-lms")
     end
 
     it "requires an active pseudonym" do
@@ -711,25 +711,25 @@ describe "API Authentication", type: :request do
     it "errors if the access token is expired or non-existent" do
       get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer blahblah" }
       assert_status(401)
-      expect(response['WWW-Authenticate']).to eq %{Bearer realm="canvas-lms"}
+      expect(response['WWW-Authenticate']).to eq %(Bearer realm="canvas-lms")
       @token.update_attribute(:expires_at, 1.hour.ago)
       get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }
       assert_status(401)
-      expect(response['WWW-Authenticate']).to eq %{Bearer realm="canvas-lms"}
+      expect(response['WWW-Authenticate']).to eq %(Bearer realm="canvas-lms")
     end
 
     it "errors if the developer key is inactive" do
       @token.developer_key.deactivate!
       get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }
       assert_status(401)
-      expect(response['WWW-Authenticate']).to eq %{Bearer realm="canvas-lms"}
+      expect(response['WWW-Authenticate']).to eq %(Bearer realm="canvas-lms")
     end
 
     it "requires an active pseudonym for the access token user" do
       @user.pseudonym.destroy
       get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }
       assert_status(401)
-      expect(response['WWW-Authenticate']).to eq %{Bearer realm="canvas-lms"}
+      expect(response['WWW-Authenticate']).to eq %(Bearer realm="canvas-lms")
       json = JSON.parse(response.body)
       expect(json['errors'].first['message']).to eq "Invalid access token."
     end
@@ -737,7 +737,7 @@ describe "API Authentication", type: :request do
     it "errors if no access token is given and authorization is required" do
       get "/api/v1/courses"
       assert_status(401)
-      expect(response['WWW-Authenticate']).to eq %{Bearer realm="canvas-lms"}
+      expect(response['WWW-Authenticate']).to eq %(Bearer realm="canvas-lms")
       json = json_parse
       expect(json["errors"].first["message"]).to eq "user authorization required"
     end

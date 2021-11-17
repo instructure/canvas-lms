@@ -45,29 +45,29 @@ module Lti
         {
           id: TOOL_SETTINGS_SERVICE,
           endpoint: 'api/lti/tool_settings/tool_proxy/{tool_proxy_id}',
-          format: %w(
+          format: %w[
             application/vnd.ims.lti.v2.toolsettings+json
             application/vnd.ims.lti.v2.toolsettings.simple+json
-          ).freeze,
-          action: %w(GET PUT).freeze
+          ].freeze,
+          action: %w[GET PUT].freeze
         }.freeze,
         {
           id: TOOL_PROXY_BINDING_SERVICE,
           endpoint: 'api/lti/tool_settings/bindings/{binding_id}',
-          format: %w(
+          format: %w[
             application/vnd.ims.lti.v2.toolsettings+json'
             application/vnd.ims.lti.v2.toolsettings.simple+json
-          ).freeze,
-          action: %w(GET PUT).freeze
+          ].freeze,
+          action: %w[GET PUT].freeze
         }.freeze,
         {
           id: LTI_LINK_SETTINGS,
           endpoint: 'api/lti/tool_proxy/{tool_proxy_guid}/courses/{course_id}/resource_link_id/{resource_link_id}/tool_setting',
-          format: %w(
+          format: %w[
             application/vnd.ims.lti.v2.toolsettings+json
             application/vnd.ims.lti.v2.toolsettings.simple+json
-          ).freeze,
-          action: %w(GET PUT).freeze
+          ].freeze,
+          action: %w[GET PUT].freeze
         }.freeze
       ].freeze
 
@@ -92,7 +92,7 @@ module Lti
       private
 
       def tool_setting_json(tool_setting, bubble)
-        if %w(all distinct).include?(bubble)
+        if %w[all distinct].include?(bubble)
           graph = []
           distinct = bubble == 'distinct' ? [] : nil
           while tool_setting

@@ -159,7 +159,7 @@ class TermsApiController < ApplicationController
   # @returns EnrollmentTerm
   def show
     term = api_find(@context.enrollment_terms, params[:id])
-    render json: enrollment_term_json(term, @current_user, session, nil, %w{overrides})
+    render json: enrollment_term_json(term, @current_user, session, nil, %w[overrides])
   end
 
   protected

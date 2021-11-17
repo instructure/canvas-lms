@@ -151,7 +151,7 @@ class ExternalContentController < ApplicationController
       message = IMS::LTI::Models::Messages::Message.generate(request.GET && request.POST)
       message.content_items
     else
-      filtered_params = params.permit(*%w(url text title return_type content_type height width))
+      filtered_params = params.permit(*%w[url text title return_type content_type height width])
       [Lti::ContentItemConverter.convert_resource_selection(filtered_params)]
     end
   end

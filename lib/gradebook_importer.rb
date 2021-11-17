@@ -21,10 +21,10 @@
 require 'csv'
 
 class GradebookImporter
-  ASSIGNMENT_PRELOADED_FIELDS = %i/
+  ASSIGNMENT_PRELOADED_FIELDS = %i[
     id title points_possible grading_type updated_at context_id context_type group_category_id
     created_at due_at only_visible_to_overrides moderated_grading grades_published_at final_grader_id
-  /.freeze
+  ].freeze
 
   class NegativeId
     class << self
@@ -696,7 +696,7 @@ class GradebookImporter
     csv_file = attachment.open(need_local_file: true)
     is_semicolon_delimited = semicolon_delimited?(csv_file)
     csv_parse_options = {
-      converters: %i(nil decimal_comma_to_period),
+      converters: %i[nil decimal_comma_to_period],
       skip_lines: /^[;, ]+$/,
       col_sep: is_semicolon_delimited ? ";" : ","
     }

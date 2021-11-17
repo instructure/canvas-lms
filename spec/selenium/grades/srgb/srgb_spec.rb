@@ -345,7 +345,7 @@ describe "Screenreader Gradebook" do
     it 'keeps the assignment arrangement choice between reloads' do
       SRGB.visit(@course.id)
 
-      %w/assignment_group alpha due_date/.each do |assignment_order|
+      %w[assignment_group alpha due_date].each do |assignment_order|
         SRGB.sort_assignments_by(assignment_order)
         refresh_page
 

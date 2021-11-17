@@ -22,7 +22,7 @@ require 'atom'
 require 'anonymity'
 
 class Submission < ActiveRecord::Base
-  self.ignored_columns = %w{has_admin_comment has_rubric_assessment process_attempts context_code}
+  self.ignored_columns = %w[has_admin_comment has_rubric_assessment process_attempts context_code]
 
   include Canvas::GradeValidations
   include CustomValidations
@@ -906,7 +906,7 @@ class Submission < ActiveRecord::Base
   end
 
   def turnitinable?
-    %w(online_upload online_text_entry).include?(submission_type) &&
+    %w[online_upload online_text_entry].include?(submission_type) &&
       assignment.turnitin_enabled?
   end
 
@@ -1193,7 +1193,7 @@ class Submission < ActiveRecord::Base
   end
 
   def vericiteable?
-    %w(online_upload online_text_entry).include?(submission_type) &&
+    %w[online_upload online_text_entry].include?(submission_type) &&
       assignment.vericite_enabled?
   end
 
@@ -1956,7 +1956,7 @@ class Submission < ActiveRecord::Base
 
   def grade_change_audit(force_audit: self.assignment_changed_not_sub, skip_insert: false)
     newly_graded = self.saved_change_to_workflow_state? && self.workflow_state == 'graded'
-    grade_changed = (self.saved_changes.keys & %w(grade score excused)).present?
+    grade_changed = (self.saved_changes.keys & %w[grade score excused]).present?
     return true unless newly_graded || grade_changed || force_audit
 
     if grade_change_event_author_id.present?
@@ -2486,7 +2486,7 @@ class Submission < ActiveRecord::Base
 
   def filter_attributes_for_user(hash, user, session)
     unless user_can_read_grade?(user, session)
-      %w(score grade published_score published_grade entered_score entered_grade).each do |secret_attr|
+      %w[score grade published_score published_grade entered_score entered_grade].each do |secret_attr|
         hash.delete secret_attr
       end
     end

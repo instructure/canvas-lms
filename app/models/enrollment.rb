@@ -349,7 +349,7 @@ class Enrollment < ActiveRecord::Base
     return if self.fake_student?
 
     if id_before_last_save.nil? || being_restored?
-      return if %w{creation_pending deleted}.include?(self.user.workflow_state)
+      return if %w[creation_pending deleted].include?(self.user.workflow_state)
 
       associations = User.calculate_account_associations_from_accounts([self.course.account_id, self.course_section.course.account_id, self.course_section.nonxlist_course.try(:account_id)].compact.uniq)
       self.user.update_account_associations(:incremental => true, :precalculated_associations => associations)
@@ -510,7 +510,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def cancel_future_appointments
-    if saved_change_to_workflow_state? && %w{completed deleted}.include?(workflow_state)
+    if saved_change_to_workflow_state? && %w[completed deleted].include?(workflow_state)
       unless self.course.current_enrollments.where(:user_id => self.user_id).exists? # ignore if they have another still valid enrollment
         course.appointment_participants.active.current.for_context_codes(user.asset_string).update_all(:workflow_state => 'deleted')
       end
@@ -752,7 +752,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def recalculate_enrollment_state
-    if (self.saved_changes.keys & %w{workflow_state start_at end_at}).any?
+    if (self.saved_changes.keys & %w[workflow_state start_at end_at]).any?
       @enrollment_dates = nil
       self.enrollment_state.state_is_current = false
       self.enrollment_state.is_direct_recalculation = true
@@ -763,7 +763,7 @@ class Enrollment < ActiveRecord::Base
 
   def state_based_on_date
     RequestCache.cache('enrollment_state_based_on_date', self, self.workflow_state, self.saved_changes?) do
-      if %w{invited active completed}.include?(self.workflow_state)
+      if %w[invited active completed].include?(self.workflow_state)
         self.enrollment_state.get_effective_state
       else
         self.workflow_state.to_sym
@@ -1148,7 +1148,7 @@ class Enrollment < ActiveRecord::Base
 
   def find_score(id_opts = nil)
     id_opts ||= Score.params_for_course
-    valid_keys = %i(course_score grading_period grading_period_id assignment_group assignment_group_id)
+    valid_keys = %i[course_score grading_period grading_period_id assignment_group assignment_group_id]
     return nil if id_opts.except(*valid_keys).any?
 
     result = if scores.loaded?

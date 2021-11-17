@@ -716,7 +716,7 @@ describe TabsController, type: :request do
       end
 
       it 'correctly labels navigation items as unused' do
-        unused_tabs = %w{announcements assignments pages files outcomes quizzes modules}
+        unused_tabs = %w[announcements assignments pages files outcomes quizzes modules]
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", { :controller => 'tabs', :action => 'index',
                                                                       :course_id => @course.to_param, :format => 'json' })
         json.each do |t|
@@ -749,8 +749,8 @@ describe TabsController, type: :request do
 
       it 'correctly sets visibility' do
         hidden_tabs = [3, 8, 5]
-        public_visibility = %w{home people syllabus}
-        admins_visibility = %w{announcements assignments pages files outcomes rubrics quizzes modules settings discussions grades}
+        public_visibility = %w[home people syllabus]
+        admins_visibility = %w[announcements assignments pages files outcomes rubrics quizzes modules settings discussions grades]
         @course.tab_configuration = @tab_ids.map do |n|
           hash = { 'id' => n }
           hash['hidden'] = true if hidden_tabs.include?(n)

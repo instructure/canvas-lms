@@ -242,6 +242,8 @@ Style/OrAssignment:
   Severity: error
 Style/ParenthesesAroundCondition:
   Severity: error
+Style/PercentLiteralDelimiters:
+  Severity: error
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
 Style/PreferredHashMethods:
@@ -362,8 +364,6 @@ Style/MethodCallWithoutArgsParentheses: # TODO: autocorrect
 Style/NumericLiterals: # TODO: autocorrect
   Enabled: false
 Style/ParallelAssignment: # TODO: autocorrect (with probable exceptions)
-  Enabled: false
-Style/PercentLiteralDelimiters: # TODO: autocorrect
   Enabled: false
 Style/PercentQLiterals: # TODO: autocorrect
   Enabled: false

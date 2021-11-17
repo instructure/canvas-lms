@@ -57,7 +57,7 @@ describe "content exports" do
 
       run_export do
         f("input[value=qti]").click
-        f(%{.quiz_item[name="copy[quizzes][#{CC::CCHelper.create_key(q2, global: true)}]"]}).click
+        f(%(.quiz_item[name="copy[quizzes][#{CC::CCHelper.create_key(q2, global: true)}]"])).click
       end
 
       expect(@export.export_type).to eq 'qti'

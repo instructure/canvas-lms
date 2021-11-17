@@ -24,7 +24,7 @@ module LtiAdvantage::Serializers
     NRPS_CLAIM_URL = 'https://purl.imsglobal.org/spec/lti-nrps/claim/namesroleservice'
     AGS_CLAIM_URL = 'https://purl.imsglobal.org/spec/lti-ags/claim/endpoint'
 
-    STANDARD_IMS_CLAIMS = %w(
+    STANDARD_IMS_CLAIMS = %w[
       context
       custom
       deployment_id
@@ -39,12 +39,12 @@ module LtiAdvantage::Serializers
       target_link_uri
       lti11_legacy_user_id
       lti1p1
-    ).freeze
+    ].freeze
 
-    DEEP_LINKING_CLAIMS = %w(
+    DEEP_LINKING_CLAIMS = %w[
       deep_linking_settings
       content_items
-    ).freeze
+    ].freeze
 
     NAMES_AND_ROLES_SERVICE_CLAIM = 'names_and_roles_service'
     ASSIGNMENT_AND_GRADE_SERVICE_CLAIM = 'assignment_and_grade_service'

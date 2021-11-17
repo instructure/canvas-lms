@@ -367,8 +367,8 @@ class Course < ActiveRecord::Base
   def update_enrollment_states_if_necessary
     return if saved_change_to_id # new object, nothing to possibly invalidate
 
-    if (saved_changes.keys & %w{restrict_enrollments_to_course_dates account_id enrollment_term_id}).any? ||
-       (self.restrict_enrollments_to_course_dates? && (saved_changes.keys & %w{start_at conclude_at}).any?) ||
+    if (saved_changes.keys & %w[restrict_enrollments_to_course_dates account_id enrollment_term_id]).any? ||
+       (self.restrict_enrollments_to_course_dates? && (saved_changes.keys & %w[start_at conclude_at]).any?) ||
        (self.saved_change_to_workflow_state? && (completed? || self.workflow_state_before_last_save == 'completed'))
       # a lot of things can change the date logic here :/
 
@@ -519,7 +519,7 @@ class Course < ActiveRecord::Base
 
   def validate_default_view
     if self.default_view_changed?
-      if !%w{assignments feed modules syllabus wiki}.include?(self.default_view)
+      if !%w[assignments feed modules syllabus wiki].include?(self.default_view)
         self.errors.add(:default_view, t("Home page is not valid"))
         return false
       elsif self.default_view == 'wiki' && !(self.wiki_id && self.wiki.has_front_page?)
@@ -868,8 +868,8 @@ class Course < ActiveRecord::Base
       none :
       where("EXISTS (?)", CourseAccountAssociation.where("course_account_associations.course_id=courses.id AND course_account_associations.account_id IN (?)", account_ids))
   }
-  scope :published, -> { where(workflow_state: %w(available completed)) }
-  scope :unpublished, -> { where(workflow_state: %w(created claimed)) }
+  scope :published, -> { where(workflow_state: %w[available completed]) }
+  scope :unpublished, -> { where(workflow_state: %w[created claimed]) }
 
   scope :deleted, -> { where(:workflow_state => 'deleted') }
 
@@ -1027,7 +1027,7 @@ class Course < ActiveRecord::Base
   def user_has_been_instructor?(user)
     return unless user
     if @user_ids_by_enroll_type
-      return preloaded_user_has_been?(user, %w{TaEnrollment TeacherEnrollment})
+      return preloaded_user_has_been?(user, %w[TaEnrollment TeacherEnrollment])
     end
 
     # enrollments should be on the course's shard
@@ -1039,7 +1039,7 @@ class Course < ActiveRecord::Base
   def user_has_been_admin?(user)
     return unless user
     if @user_ids_by_enroll_type
-      return preloaded_user_has_been?(user, %w{TaEnrollment TeacherEnrollment DesignerEnrollment})
+      return preloaded_user_has_been?(user, %w[TaEnrollment TeacherEnrollment DesignerEnrollment])
     end
 
     fetch_on_enrollments('user_has_been_admin', user) do
@@ -1061,7 +1061,7 @@ class Course < ActiveRecord::Base
   def user_has_been_student?(user)
     return unless user
     if @user_ids_by_enroll_type
-      return preloaded_user_has_been?(user, %w{StudentEnrollment StudentViewEnrollment})
+      return preloaded_user_has_been?(user, %w[StudentEnrollment StudentViewEnrollment])
     end
 
     fetch_on_enrollments('user_has_been_student', user) do
@@ -1974,7 +1974,7 @@ class Course < ActiveRecord::Base
     end
     overall_status = "error"
     overall_status = "unpublished" unless found_statuses.size > 0
-    overall_status = %w{error unpublished pending publishing published unpublishable}.detect { |s| found_statuses.include?(s) } || overall_status
+    overall_status = %w[error unpublished pending publishing published unpublishable].detect { |s| found_statuses.include?(s) } || overall_status
     [enrollments, overall_status]
   end
 
@@ -2656,7 +2656,7 @@ class Course < ActiveRecord::Base
     end
   end
 
-  ADMIN_TYPES = %w{TeacherEnrollment TaEnrollment DesignerEnrollment}.freeze
+  ADMIN_TYPES = %w[TeacherEnrollment TaEnrollment DesignerEnrollment].freeze
   def section_visibilities_for(user, opts = {})
     fetch_on_enrollments('section_visibilities_for', user, opts) do
       workflow_not = opts[:excluded_workflows] || 'deleted'
@@ -3706,7 +3706,7 @@ class Course < ActiveRecord::Base
     end
   end
 
-  %w{student_count teacher_count primary_enrollment_type primary_enrollment_role_id primary_enrollment_rank primary_enrollment_state primary_enrollment_date invitation}.each do |method|
+  %w[student_count teacher_count primary_enrollment_type primary_enrollment_role_id primary_enrollment_rank primary_enrollment_state primary_enrollment_date invitation].each do |method|
     class_eval <<~RUBY
       def #{method}
         read_attribute(:#{method}) || @#{method}

@@ -87,7 +87,7 @@ module Api::V1::StreamItem
       when 'Submission'
         submission = stream_item.asset
         assignment = submission.assignment
-        includes = %w|submission_comments assignment course html_url user|
+        includes = %w[submission_comments assignment course html_url user]
         json = submission_json(submission, assignment, current_user, session, nil, includes, params)
         json.delete('id')
         hash.merge! json

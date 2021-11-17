@@ -440,7 +440,7 @@ describe "Common Cartridge exporting" do
 
     it "does not get confused by attachments with absolute paths" do
       @att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
-      @q1 = @course.quizzes.create(:title => 'quiz1', :description => %Q{<img src="https://example.com/files/#{@att.id}/download?download_frd=1">})
+      @q1 = @course.quizzes.create(:title => 'quiz1', :description => %Q(<img src="https://example.com/files/#{@att.id}/download?download_frd=1">))
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       run_export
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_meta.xml"))
@@ -481,7 +481,7 @@ describe "Common Cartridge exporting" do
 
     it "deals with file URLs in anchor bodies" do
       @att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
-      link_thing = %{<a href="/courses/#{@course.id}/files/#{@att.id}/download?wrap=1">/courses/#{@course.id}/files/#{@att.id}/download?wrap=1</a>}
+      link_thing = %(<a href="/courses/#{@course.id}/files/#{@att.id}/download?wrap=1">/courses/#{@course.id}/files/#{@att.id}/download?wrap=1</a>)
       @course.syllabus_body = link_thing
       @course.save!
       @ag = @course.assignment_groups.create!(:name => 'group1')
@@ -593,7 +593,7 @@ describe "Common Cartridge exporting" do
 
     it "exports CC 1.3 assignments" do
       @file = Attachment.create!(:filename => 'test.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
-      @course.assignments.create! name: 'test assignment', description: %Q{<a href="/courses/#{@course.id}/files/#{@file.id}/preview">what?</a>}, points_possible: 11,
+      @course.assignments.create! name: 'test assignment', description: %Q(<a href="/courses/#{@course.id}/files/#{@file.id}/preview">what?</a>), points_possible: 11,
                                   submission_types: 'online_text_entry,online_upload,online_url'
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       @ce.save!
@@ -612,7 +612,7 @@ describe "Common Cartridge exporting" do
       expect(assignment_xml_doc.at_css('text').attribute('texttype').value).to eq 'text/html'
       expect(assignment_xml_doc.at_css('gradable').text).to eq 'true'
       expect(assignment_xml_doc.at_css('gradable').attribute('points_possible').value).to eq '11.0'
-      expect(assignment_xml_doc.css('submission_formats format').map { |fmt| fmt.attribute('type').value }).to match_array %w(html file url)
+      expect(assignment_xml_doc.css('submission_formats format').map { |fmt| fmt.attribute('type').value }).to match_array %w[html file url]
 
       # validate presence of canvas extension node
       extension_node = assignment_xml_doc.at_css('extensions').elements.first
@@ -620,7 +620,7 @@ describe "Common Cartridge exporting" do
       expect(extension_node.namespace.href).to eq 'http://canvas.instructure.com/xsd/cccv1p0'
 
       # validate fallback html manifest resource
-      variant_tag = @manifest_doc.at_css(%Q{resource[identifier="#{assignment_id}_fallback"]}).elements.first
+      variant_tag = @manifest_doc.at_css(%Q(resource[identifier="#{assignment_id}_fallback"])).elements.first
       expect(variant_tag.name).to eq 'variant'
       expect(variant_tag.attribute('identifierref').value).to eql assignment_id
       expect(variant_tag.next_element.name).to eq 'file'
@@ -930,8 +930,8 @@ describe "Common Cartridge exporting" do
                                                 prerequisites: [{ :id => cm1.id, :type => "context_module", :name => cm1.name }]
                                               })
         cm2.publish
-        cm1link = %{<a href="/courses/#{@course.id}/modules/#{cm1.id}">Mod 1</a>}
-        cm2link = %{<a href="/courses/#{@course.id}/modules/#{cm2.id}">Mod 2</a>}
+        cm1link = %(<a href="/courses/#{@course.id}/modules/#{cm1.id}">Mod 1</a>)
+        cm2link = %(<a href="/courses/#{@course.id}/modules/#{cm2.id}">Mod 2</a>)
         assignment = @course.assignments.create!({
                                                    title: 'Assignment 1',
                                                    description: "go to module 1 at #{cm1link} and module 2 at #{cm2link}"

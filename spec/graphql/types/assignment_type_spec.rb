@@ -188,7 +188,7 @@ describe Types::AssignmentType do
 
   context "description" do
     before do
-      assignment.update description: %|Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>|
+      assignment.update description: %(Hi <img src="/courses/#{course.id}/files/12/download"<h1>Content</h1>)
     end
 
     it "includes description when lock settings allow" do

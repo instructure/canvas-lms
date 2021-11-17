@@ -105,7 +105,7 @@ class EnrollmentState < ActiveRecord::Base
   end
 
   def pending?
-    %w{pending_active pending_invited creation_pending}.include?(self.state)
+    %w[pending_active pending_invited creation_pending].include?(self.state)
   end
 
   def recalculate_state
@@ -113,7 +113,7 @@ class EnrollmentState < ActiveRecord::Base
     self.state_started_at = nil
 
     wf_state = self.enrollment.workflow_state
-    invited_or_active = %w{invited active}.include?(wf_state)
+    invited_or_active = %w[invited active].include?(wf_state)
 
     if invited_or_active
       if self.enrollment.course.completed?
@@ -254,7 +254,7 @@ class EnrollmentState < ActiveRecord::Base
     enrollment.enrollment_state.ensure_current_state
   end
 
-  INVALIDATEABLE_STATES = %w{pending_invited pending_active invited active completed inactive}.freeze # don't worry about creation_pending or rejected, etc
+  INVALIDATEABLE_STATES = %w[pending_invited pending_active invited active completed inactive].freeze # don't worry about creation_pending or rejected, etc
   def self.invalidate_states(enrollment_scope)
     EnrollmentState.where(:enrollment_id => enrollment_scope, :state => INVALIDATEABLE_STATES)
                    .update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?", false])
@@ -280,7 +280,7 @@ class EnrollmentState < ActiveRecord::Base
   end
 
   def self.enrollments_for_account_ids(account_ids)
-    Enrollment.joins(:course).where(:courses => { :account_id => account_ids }).where(:type => %w{StudentEnrollment ObserverEnrollment})
+    Enrollment.joins(:course).where(:courses => { :account_id => account_ids }).where(:type => %w[StudentEnrollment ObserverEnrollment])
   end
 
   ENROLLMENT_BATCH_SIZE = 1_000
@@ -327,7 +327,7 @@ class EnrollmentState < ActiveRecord::Base
 
   def self.invalidate_access_for_course(course, changed_keys)
     states_to_update = access_states_to_update(changed_keys)
-    scope = course.enrollments.where(:type => %w{StudentEnrollment ObserverEnrollment})
+    scope = course.enrollments.where(:type => %w[StudentEnrollment ObserverEnrollment])
     if invalidate_access(scope, states_to_update) > 0
       process_states_for(enrollments_needing_calculation(scope))
     end

@@ -2156,7 +2156,7 @@ describe ConversationsController, type: :request do
     # it "should mark conversations as subscribed"
     # it "should mark conversations as unsubscribed"
     it "archives conversations" do
-      conversations = %w(archived read unread).map do |state|
+      conversations = %w[archived read unread].map do |state|
         conversation(@me, @bob, :workflow_state => state)
       end
       expect(@me.reload.unread_conversations_count).to eql(1)

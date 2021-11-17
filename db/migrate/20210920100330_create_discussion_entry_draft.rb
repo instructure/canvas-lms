@@ -30,15 +30,15 @@ class CreateDiscussionEntryDraft < ActiveRecord::Migration[6.0]
       t.text :message
       t.boolean :include_reply_preview, null: false, default: false
       t.timestamps
-      t.index %i(discussion_topic_id user_id),
+      t.index %i[discussion_topic_id user_id],
               name: 'unique_index_on_topic_and_user',
               where: 'discussion_entry_id IS NULL AND root_entry_id IS NULL',
               unique: true
-      t.index %i(root_entry_id user_id),
+      t.index %i[root_entry_id user_id],
               name: 'unique_index_on_root_entry_and_user',
               where: 'discussion_entry_id IS NULL',
               unique: true
-      t.index %i(discussion_entry_id user_id),
+      t.index %i[discussion_entry_id user_id],
               name: 'unique_index_on_entry_and_user',
               unique: true
     end

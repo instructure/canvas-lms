@@ -1534,12 +1534,12 @@ class ApplicationController < ActionController::Base
 
     @access = AssetUserAccess.log(user, @context, @accessed_asset) if @context
 
-    if @page_view.nil? && %w{participate submit}.include?(@accessed_asset[:level]) && page_views_enabled?
+    if @page_view.nil? && %w[participate submit].include?(@accessed_asset[:level]) && page_views_enabled?
       generate_page_view(user)
     end
 
     if @page_view
-      @page_view.participated = %w{participate submit}.include?(@accessed_asset[:level])
+      @page_view.participated = %w[participate submit].include?(@accessed_asset[:level])
       @page_view.asset_user_access = @access
     end
 

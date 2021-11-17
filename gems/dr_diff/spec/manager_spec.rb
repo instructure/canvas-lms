@@ -23,8 +23,8 @@ module DrDiff
   describe Manager do
     describe ".files" do
       let(:git_files_output) do
-        %{lib/dr_diff.rb
-spec/dr_diff_spec.rb}
+        %(lib/dr_diff.rb
+spec/dr_diff_spec.rb)
       end
 
       let(:file_list) { git_files_output.split("\n") }

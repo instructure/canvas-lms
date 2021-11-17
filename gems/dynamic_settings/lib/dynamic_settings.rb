@@ -28,7 +28,7 @@ require 'dynamic_settings/fallback_proxy'
 require 'dynamic_settings/prefix_proxy'
 
 module DynamicSettings
-  CONSUL_READ_OPTIONS = %i{recurse stale}.freeze
+  CONSUL_READ_OPTIONS = %i[recurse stale].freeze
   KV_NAMESPACE = "config/canvas"
   CACHE_KEY_PREFIX = "dynamic_settings/"
 

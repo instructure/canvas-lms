@@ -425,7 +425,7 @@ class AssignmentGroupsController < ApplicationController
     if params[:exclude_assignment_submission_types].present?
       exclude_types = params[:exclude_assignment_submission_types]
       exclude_types = Array.wrap(exclude_types) &
-                      %w(online_quiz discussion_topic wiki_page external_tool)
+                      %w[online_quiz discussion_topic wiki_page external_tool]
       assignments = assignments.where.not(submission_types: exclude_types)
     end
 

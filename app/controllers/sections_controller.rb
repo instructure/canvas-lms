@@ -318,7 +318,7 @@ class SectionsController < ApplicationController
           add_crumb(@section.name, named_context_url(@context, :context_section_url, @section))
           @enrollments_count = @section.enrollments.not_fake.where(:workflow_state => 'active').count
           @completed_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => 'completed').count
-          @pending_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => %w{invited pending}).count
+          @pending_enrollments_count = @section.enrollments.not_fake.where(:workflow_state => %w[invited pending]).count
           @student_enrollments_count = @section.enrollments.not_fake.where(:type => 'StudentEnrollment').count
           js_env
           if @context.grants_right?(@current_user, session, :manage)

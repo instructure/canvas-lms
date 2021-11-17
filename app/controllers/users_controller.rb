@@ -421,7 +421,7 @@ class UsersController < ApplicationController
     end
     page_opts[:total_entries] = nil unless @context.root_account.allow_last_page_on_users?
 
-    includes = (params[:include] || []) & %w{avatar_url email last_login time_zone uuid}
+    includes = (params[:include] || []) & %w[avatar_url email last_login time_zone uuid]
     includes << 'last_login' if params[:sort] == 'last_login' && !includes.include?('last_login')
     GuardRail.activate(:secondary) do
       users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
@@ -1310,7 +1310,7 @@ class UsersController < ApplicationController
           render status: status
         end
         format.json do
-          render json: user_json(@user, @current_user, session, %w{locale avatar_url},
+          render json: user_json(@user, @current_user, session, %w[locale avatar_url],
                                  @current_user.pseudonym.account),
                  status: status
         end
@@ -1606,7 +1606,7 @@ class UsersController < ApplicationController
     create_user
   end
 
-  BOOLEAN_PREFS = %i(manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled elementary_dashboard_disabled).freeze
+  BOOLEAN_PREFS = %i[manual_mark_as_read collapse_global_nav hide_dashcard_color_overlays release_notes_badge_disabled comment_library_suggestions_enabled elementary_dashboard_disabled].freeze
 
   # @API Update user settings.
   # Update an existing user's settings.
@@ -1681,8 +1681,8 @@ class UsersController < ApplicationController
       return render(json: { :message => "This endpoint only works against the current user" }, status: :unauthorized)
     end
 
-    valid_names = %w{home modules pages assignments quizzes settings files people announcements
-                     grades discussions syllabus collaborations import conferences}
+    valid_names = %w[home modules pages assignments quizzes settings files people announcements
+                     grades discussions syllabus collaborations import conferences]
 
     # Check if the page_name is valid
     unless valid_names.include?(params[:page_name])
@@ -2030,7 +2030,7 @@ class UsersController < ApplicationController
                           @user.grants_right?(@current_user, :update_avatar) &&
                           @user.grants_right?(@current_user, :manage_user_details)
 
-    includes = %w{locale avatar_url email time_zone}
+    includes = %w[locale avatar_url email time_zone]
     if (title = user_params.delete(:title))
       @user.profile.title = title
       includes << "title"
@@ -2408,7 +2408,7 @@ class UsersController < ApplicationController
         render(:json => user_json(into_user,
                                   @current_user,
                                   session,
-                                  %w{locale},
+                                  %w[locale],
                                   destination_account))
       end
     end
@@ -2869,7 +2869,7 @@ class UsersController < ApplicationController
   end
 
   def api_show_includes
-    includes = %w{locale avatar_url permissions email effective_locale}
+    includes = %w[locale avatar_url permissions email effective_locale]
     includes += Array.wrap(params[:include]) & ['uuid', 'last_login']
     includes
   end
@@ -2928,7 +2928,7 @@ class UsersController < ApplicationController
 
     notify_policy = Users::CreationNotifyPolicy.new(manage_user_logins, params[:pseudonym])
 
-    includes = %w{locale}
+    includes = %w[locale]
 
     cc_params = params[:communication_channel]
 

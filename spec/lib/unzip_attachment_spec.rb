@@ -20,7 +20,7 @@
 
 describe UnzipAttachment do
   def fixture_filename(filename)
-    File.expand_path(File.join(File.dirname(__FILE__), %W(.. fixtures #{filename})))
+    File.expand_path(File.join(File.dirname(__FILE__), %W[.. fixtures #{filename}]))
   end
 
   def add_folder_to_course(name)
@@ -116,14 +116,14 @@ describe UnzipAttachment do
       filename = fixture_filename('alphabet_soup.zip')
       Zip::File.open(filename) do |zip|
         # make sure the files aren't read from the zip in alphabetical order (so it's not alphabetized by chance)
-        expect(zip.entries.map(&:name)).to eql(%w(f.txt d/e.txt d/d.txt c.txt b.txt a.txt))
+        expect(zip.entries.map(&:name)).to eql(%w[f.txt d/e.txt d/d.txt c.txt b.txt a.txt])
       end
 
       ua = UnzipAttachment.new(:course => @course, :filename => filename)
       ua.process
 
       expect(@course.attachments.count).to eq 6
-      %w(a b c d e f).each_with_index do |letter, index|
+      %w[a b c d e f].each_with_index do |letter, index|
         expect(@course.attachments.where(position: index).first.display_name).to eq "#{letter}.txt"
       end
     end

@@ -78,7 +78,7 @@ describe "assignments" do
       AssignmentCreateEditPage.edit_assignment_name @assignment_title
     end
 
-    %w(points percent pass_fail letter_grade gpa_scale).each do |grading_option|
+    %w[points percent pass_fail letter_grade gpa_scale].each do |grading_option|
       it "can create an assignment with #{grading_option} grading option", priority: '2', test_id: 209976 do
         AssignmentCreateEditPage.select_grading_type grading_option, :value
         AssignmentCreateEditPage.enter_points_possible '5'

@@ -57,7 +57,7 @@ module Canvas
     end
 
     # per http://www.prweb.com/releases/2012/10/prweb10046001.htm
-    COMMON_PASSWORDS = %w{
+    COMMON_PASSWORDS = %w[
       password
       123456
       12345678
@@ -83,6 +83,6 @@ module Canvas
       ninja
       mustang
       password1
-    }.freeze
+    ].freeze
   end
 end

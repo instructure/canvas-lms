@@ -272,7 +272,7 @@ module Importers
         if gs
           item.grading_standard = gs if gs
         else
-          migration.add_warning(t('errors.import.grading_standard_not_found', %{The assignment "%{title}" referenced a grading scheme that was not found in the target course's account chain.}, :title => hash[:title]))
+          migration.add_warning(t('errors.import.grading_standard_not_found', %(The assignment "%{title}" referenced a grading scheme that was not found in the target course's account chain.), :title => hash[:title]))
         end
       end
       if quiz

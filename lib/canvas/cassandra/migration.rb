@@ -36,11 +36,11 @@ module Canvas
         end
 
         def cassandra_table_exists?(table)
-          cql = %{
+          cql = <<~SQL.squish
             SELECT *
             FROM #{table}
             LIMIT 1
-          }
+          SQL
           cassandra.execute(cql)
           true
         rescue CassandraCQL::Error::InvalidRequestException
@@ -48,11 +48,11 @@ module Canvas
         end
 
         def cassandra_column_exists?(table, column)
-          cql = %{
+          cql = <<~SQL.squish
             SELECT #{column}
             FROM #{table}
             LIMIT 1
-          }
+          SQL
           cassandra.execute(cql)
           true
         rescue CassandraCQL::Error::InvalidRequestException

@@ -31,7 +31,7 @@ class UserListV2
   # - only search on particular columns
   # - don't worry about whether we can create users or not: they either exist or they don't
 
-  SEARCH_TYPES = %w{unique_id sis_user_id cc_path}.freeze
+  SEARCH_TYPES = %w[unique_id sis_user_id cc_path].freeze
 
   def initialize(list_in, root_account: Account.default, search_type: nil, current_user: nil, can_read_sis: false)
     @errors = []

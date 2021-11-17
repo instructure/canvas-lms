@@ -21,8 +21,8 @@ module ConditionalRelease
   class AssignmentSetAction < ActiveRecord::Base
     include Deletion
 
-    validates :action, inclusion: { in: %w(assign unassign) }
-    validates :source, inclusion: { in: %w(grade_change select_assignment_set) }
+    validates :action, inclusion: { in: %w[assign unassign] }
+    validates :source, inclusion: { in: %w[grade_change select_assignment_set] }
     validates :student_id, presence: true
     validates :actor_id, presence: true
     validates :assignment_set_id, presence: true

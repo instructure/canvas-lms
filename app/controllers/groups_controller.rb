@@ -150,10 +150,10 @@ class GroupsController < ApplicationController
   include Context
   include K5Mode
 
-  SETTABLE_GROUP_ATTRIBUTES = %w(
+  SETTABLE_GROUP_ATTRIBUTES = %w[
     name description join_level is_public group_category avatar_attachment
     storage_quota_mb max_membership leader
-  ).freeze
+  ].freeze
 
   include TextHelper
 

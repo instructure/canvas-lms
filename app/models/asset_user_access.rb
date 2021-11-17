@@ -265,8 +265,8 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   def log_action(level)
-    increment(:view_score) if %w{view participate}.include?(level)
-    increment(:participate_score) if %w{participate submit}.include?(level)
+    increment(:view_score) if %w[view participate].include?(level)
+    increment(:participate_score) if %w[participate submit].include?(level)
 
     if self.action_level != 'participate'
       self.action_level = (level == 'submit') ? 'participate' : level

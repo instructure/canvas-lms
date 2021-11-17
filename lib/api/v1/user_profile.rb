@@ -72,11 +72,11 @@ module Api::V1::UserProfile
 
   def user_service_json(user_service, current_user, session)
     api_json(user_service, current_user, session,
-             :only => %w(service visible),
+             :only => %w[service visible],
              :methods => %(service_user_link))
   end
 
   def user_profile_link_json(link, current_user, session)
-    api_json(link, current_user, session, :only => %w(url title))
+    api_json(link, current_user, session, :only => %w[url title])
   end
 end

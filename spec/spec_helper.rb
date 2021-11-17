@@ -660,7 +660,7 @@ RSpec.configure do |config|
 
   # inspired by http://blog.jayfields.com/2007/08/ruby-calling-methods-of-specific.html
   module AttachmentStorageSwitcher
-    BACKENDS = %w{FileSystem S3}.map { |backend| AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
+    BACKENDS = %w[FileSystem S3].map { |backend| AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
 
     class As # :nodoc:
       private(*instance_methods.reject { |m| m =~ /(^__|^\W|^binding$|^untaint$)/ })

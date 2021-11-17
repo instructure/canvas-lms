@@ -487,13 +487,13 @@ class OutcomeResultsController < ApplicationController
 
   def verify_aggregate_parameter
     aggregate = params[:aggregate]
-    reject! "invalid aggregate parameter value" if aggregate && !%w(course).include?(aggregate)
+    reject! "invalid aggregate parameter value" if aggregate && !%w[course].include?(aggregate)
     true
   end
 
   def verify_aggregate_stat_parameter
     aggregate_stat = params[:aggregate_stat]
-    reject! "invalid aggregate_stat parameter value" if aggregate_stat && !%w(mean median).include?(aggregate_stat)
+    reject! "invalid aggregate_stat parameter value" if aggregate_stat && !%w[mean median].include?(aggregate_stat)
     true
   end
 
@@ -501,14 +501,14 @@ class OutcomeResultsController < ApplicationController
     return true unless params[:sort_by]
 
     sort_by = params[:sort_by]
-    reject! "invalid sort_by parameter value" if sort_by && !%w(student outcome).include?(sort_by)
+    reject! "invalid sort_by parameter value" if sort_by && !%w[student outcome].include?(sort_by)
     if sort_by == 'outcome'
       sort_outcome_id = params[:sort_outcome_id]
       reject! "missing required sort_outcome_id parameter value" unless sort_outcome_id
       reject! "invalid sort_outcome_id parameter value" unless /\A\d+\z/.match?(sort_outcome_id)
     end
     sort_order = params[:sort_order]
-    reject! "invalid sort_order parameter value" if sort_by && sort_order && !%w(asc desc).include?(sort_order)
+    reject! "invalid sort_order parameter value" if sort_by && sort_order && !%w[asc desc].include?(sort_order)
     true
   end
 

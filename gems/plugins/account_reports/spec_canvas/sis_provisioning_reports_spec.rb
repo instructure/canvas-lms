@@ -320,11 +320,11 @@ describe "Default Account Reports" do
 
     header = case format
              when 'sis'
-               %w(user_id integration_id authentication_provider_id login_id password first_name last_name
-                  full_name sortable_name short_name email status)
+               %w[user_id integration_id authentication_provider_id login_id password first_name last_name
+                  full_name sortable_name short_name email status]
              when 'provisioning'
-               %w(canvas_user_id user_id integration_id authentication_provider_id login_id first_name last_name
-                  full_name sortable_name short_name email status created_by_sis)
+               %w[canvas_user_id user_id integration_id authentication_provider_id login_id first_name last_name
+                  full_name sortable_name short_name email status created_by_sis]
              end
     header << 'pronouns' if @report.should_add_pronouns?
     header

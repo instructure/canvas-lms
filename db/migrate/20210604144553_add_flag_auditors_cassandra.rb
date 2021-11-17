@@ -33,9 +33,9 @@ class AddFlagAuditorsCassandra < ActiveRecord::Migration[6.0]
   end
 
   def self.indexes
-    %w(
+    %w[
       feature_flag_changes_by_feature_flag
-    )
+    ]
   end
 
   def self.up
@@ -72,8 +72,8 @@ class AddFlagAuditorsCassandra < ActiveRecord::Migration[6.0]
 
   def self.down
     indexes.each do |index_name|
-      cassandra.execute %{DROP TABLE #{index_name};}
+      cassandra.execute %(DROP TABLE #{index_name};)
     end
-    cassandra.execute %{DROP TABLE feature_flags;}
+    cassandra.execute %(DROP TABLE feature_flags;)
   end
 end

@@ -176,7 +176,7 @@ describe CustomGradebookColumnsApiController, type: :request do
 
   describe 'reorder' do
     it 'works' do
-      names = %w(A B C)
+      names = %w[A B C]
       c1, c2, c3 = Array.new(3) do |i|
         c = @course.custom_gradebook_columns.build(title: names.shift)
         c.position = i

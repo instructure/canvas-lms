@@ -120,7 +120,7 @@ describe "Roles API", type: :request do
 
         it "lists inactive roles" do
           json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles?state[]=inactive",
-                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :state => %w(inactive) })
+                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :state => %w[inactive] })
           expect(json.size).to eq 1
           expect(json[0]['role']).to eq 'inactive_role'
         end
@@ -134,7 +134,7 @@ describe "Roles API", type: :request do
 
         it "accepts multiple states" do
           json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles?state[]=inactive&state[]=active",
-                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :state => %w(inactive active) })
+                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :state => %w[inactive active] })
           expect(json.size).to eq 7
           expect(json.map { |role| role['role'] }).to be_include 'inactive_role'
         end

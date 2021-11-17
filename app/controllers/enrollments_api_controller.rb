@@ -931,7 +931,7 @@ class EnrollmentsApiController < ApplicationController
       # by default, return active and invited courses. don't use the existing
       # current_and_invited_enrollments scope because it won't return enrollments
       # on unpublished courses.
-      enrollments = enrollments.where(workflow_state: %w{active invited}) if params[:state].blank?
+      enrollments = enrollments.where(workflow_state: %w[active invited]) if params[:state].blank?
     end
 
     terms = @domain_root_account.enrollment_terms.active
@@ -989,14 +989,14 @@ class EnrollmentsApiController < ApplicationController
 
   def enrollment_states_for_state_param
     states = Array(params[:state]).uniq
-    states.concat(%w(active invited)) if states.delete 'current_and_invited'
-    states.concat(%w(active invited creation_pending pending_active pending_invited)) if states.delete 'current_and_future'
-    states.concat(%w(active completed)) if states.delete 'current_and_concluded'
+    states.concat(%w[active invited]) if states.delete 'current_and_invited'
+    states.concat(%w[active invited creation_pending pending_active pending_invited]) if states.delete 'current_and_future'
+    states.concat(%w[active completed]) if states.delete 'current_and_concluded'
     states.uniq
   end
 
   def check_sis_permissions(sis_context)
-    sis_filters = %w(sis_account_id sis_course_id sis_section_id sis_user_id)
+    sis_filters = %w[sis_account_id sis_course_id sis_section_id sis_user_id]
     if (params.keys & sis_filters).present?
       unless sis_context.grants_any_right?(@current_user, :read_sis, :manage_sis)
         return false

@@ -19,7 +19,7 @@
 #
 
 class SisPostGradesStatus < ActiveRecord::Base
-  ALLOWED_STATUSES = %w{success warning failed}.freeze
+  ALLOWED_STATUSES = %w[success warning failed].freeze
   belongs_to :course
   belongs_to :course_section
   belongs_to :user

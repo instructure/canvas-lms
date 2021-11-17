@@ -55,7 +55,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
     before :once do
       course_with_teacher :active_all => true
 
-      simple_quiz_with_submissions %w{T T T}, %w{T T T}, %w{T F F}, %w{T F T},
+      simple_quiz_with_submissions %w[T T T], %w[T T T], %w[T F F], %w[T F T],
                                    :user => @user,
                                    :course => @course
 

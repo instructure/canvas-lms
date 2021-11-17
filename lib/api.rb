@@ -420,7 +420,7 @@ module Api
 
   PAGINATION_PARAMS = [:current, :next, :prev, :first, :last].freeze
   LINK_PRIORITY = [:next, :last, :prev, :current, :first].freeze
-  EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key).freeze
+  EXCLUDE_IN_PAGINATION_LINKS = %w[page per_page access_token api_key].freeze
   def self.build_links(base_url, opts = {})
     links = build_links_hash(base_url, opts)
     build_links_from_hash(links)

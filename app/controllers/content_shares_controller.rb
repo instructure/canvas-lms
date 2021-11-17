@@ -93,8 +93,8 @@ class ContentSharesController < ApplicationController
 
   before_action :require_user
   before_action :get_user_param
-  before_action :require_current_user, :except => %w(show index unread_count)
-  before_action :get_receivers, :only => %w(create add_users)
+  before_action :require_current_user, :except => %w[show index unread_count]
+  before_action :get_receivers, :only => %w[create add_users]
 
   def get_user_param
     @user = api_find(User, params[:user_id])

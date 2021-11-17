@@ -897,7 +897,7 @@ describe "Groups API", type: :request do
     end
 
     it "returns users in a group" do
-      expected_keys = %w{id name sortable_name short_name}
+      expected_keys = %w[id name sortable_name short_name]
       json = api_call(:get, "/api/v1/groups/#{@community.id}/users",
                       { :controller => 'groups', :action => 'users', :group_id => @community.to_param, :format => 'json' })
       expect(json.count).to eq 2
@@ -921,7 +921,7 @@ describe "Groups API", type: :request do
     end
 
     it "returns a list of users" do
-      expected_keys = %w{id name sortable_name short_name}
+      expected_keys = %w[id name sortable_name short_name]
 
       json = api_call(:get, api_url, api_route, { :search_term => 'value' })
 
@@ -1033,7 +1033,7 @@ describe "Groups API", type: :request do
     it "sanitizes html and process links" do
       @user = @teacher
       attachment_model(:context => @group)
-      html = %{<p><a href="/files/#{@attachment.id}/download?verifier=huehuehuehue">Click!</a><script></script></p>}
+      html = %(<p><a href="/files/#{@attachment.id}/download?verifier=huehuehuehue">Click!</a><script></script></p>)
       json = api_call(:post, "/api/v1/groups/#{@group.id}/preview_html",
                       { :controller => 'groups', :action => 'preview_html', :group_id => @group.to_param, :format => 'json' },
                       { :html => html })
@@ -1061,14 +1061,14 @@ describe "Groups API", type: :request do
       @group.add_user(@student)
       json = api_call(:get, "/api/v1/groups/#{@group.id}/permissions?permissions[]=send_messages&permissions[]=manage_blarghs",
                       :controller => 'groups', :action => 'permissions', :group_id => @group.to_param,
-                      :format => 'json', :permissions => %w(send_messages manage_blarghs))
+                      :format => 'json', :permissions => %w[send_messages manage_blarghs])
       expect(json).to eq({ "send_messages" => true, "manage_blarghs" => false })
     end
 
     it "requires :read permission on the group" do
       api_call(:get, "/api/v1/groups/#{@group.id}/permissions?permissions[]=send_messages",
                { :controller => 'groups', :action => 'permissions', :group_id => @group.to_param, :format => 'json',
-                 :permissions => %w(send_messages) }, {}, {}, { :expected_status => 401 })
+                 :permissions => %w[send_messages] }, {}, {}, { :expected_status => 401 })
     end
   end
 end

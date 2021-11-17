@@ -196,7 +196,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
       if req[:type] == 'must_view'
         calc.add_view_requirement(req)
-      elsif %w(must_contribute must_mark_done).include? req[:type]
+      elsif %w[must_contribute must_mark_done].include? req[:type]
         # must_contribute is handled by ContextModule#update_for
         calc.check_action!(req, false)
       elsif req[:type] == 'must_submit'
@@ -204,7 +204,7 @@ class ContextModuleProgression < ActiveRecord::Base
           if sub.workflow_state == 'graded' && sub.attempt.nil?
             # is a manual grade - doesn't count for submission
             false
-          elsif %w(submitted graded complete pending_review).include?(sub.workflow_state)
+          elsif %w[submitted graded complete pending_review].include?(sub.workflow_state)
             true
           end
         })

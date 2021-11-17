@@ -129,7 +129,7 @@ module Lti
       end
     end
 
-    INDEX_MENU_TOOL_TYPES = %w{
+    INDEX_MENU_TOOL_TYPES = %w[
       assignment_index_menu
       assignment_group_menu
       discussion_topic_index_menu
@@ -138,7 +138,7 @@ module Lti
       module_group_menu
       quiz_index_menu
       wiki_index_menu
-    }.freeze
+    ].freeze
 
     def placement_params(placement, assignment: nil)
       case placement
@@ -161,19 +161,19 @@ module Lti
     end
 
     def migration_selection_params
-      accept_media_types = %w(
+      accept_media_types = %w[
         application/vnd.ims.imsccv1p1
         application/vnd.ims.imsccv1p2
         application/vnd.ims.imsccv1p3
         application/zip
         application/xml
-      )
+      ]
 
       {
         accept_media_types: accept_media_types.join(','),
         accept_presentation_document_targets: 'download',
         accept_copy_advice: true,
-        ext_content_file_extensions: %w(zip imscc mbz xml).join(','),
+        ext_content_file_extensions: %w[zip imscc mbz xml].join(','),
         accept_unsigned: true,
         auto_create: false
       }
@@ -181,8 +181,8 @@ module Lti
 
     def editor_button_params
       {
-        accept_media_types: %w(image/* text/html application/vnd.ims.lti.v1.ltilink */*).join(','),
-        accept_presentation_document_targets: %w(embed frame iframe window).join(','),
+        accept_media_types: %w[image/* text/html application/vnd.ims.lti.v1.ltilink */*].join(','),
+        accept_presentation_document_targets: %w[embed frame iframe window].join(','),
         accept_unsigned: true,
         accept_multiple: true,
         auto_create: false
@@ -192,7 +192,7 @@ module Lti
     def lti_launch_selection_params
       {
         accept_media_types: 'application/vnd.ims.lti.v1.ltilink',
-        accept_presentation_document_targets: %w(frame window).join(','),
+        accept_presentation_document_targets: %w[frame window].join(','),
         accept_unsigned: true,
         auto_create: false
       }

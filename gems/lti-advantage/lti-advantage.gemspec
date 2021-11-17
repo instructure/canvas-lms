@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
           "public gem pushes."
   end
 
-  spec.files         = Dir.glob("{lib,spec}/**/*") + %w(test.sh)
+  spec.files         = Dir.glob("{lib,spec}/**/*") + %w[test.sh]
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]

@@ -245,7 +245,7 @@ module Lti
 
     describe '#enabled_capability_params' do
       let(:enabled_capability) {
-        %w(TestCapability.Foo
+        %w[TestCapability.Foo
            ToolConsumerInstance.guid
            CourseSection.sourcedId
            Membership.role
@@ -259,7 +259,7 @@ module Lti
            User.image
            Message.documentTarget
            Message.locale
-           Context.id)
+           Context.id]
       }
 
       it 'does not use expansions that do not have default names' do

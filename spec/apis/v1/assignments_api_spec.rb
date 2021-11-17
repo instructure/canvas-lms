@@ -195,28 +195,28 @@ describe AssignmentsApiController, type: :request do
         # [assignment_groups.position, assignments.position]
         json = api_get_assignments_index_from_course(@course)
         order = json.map { |a| a['name'] }
-        expect(order).to eq %w(assignment2
+        expect(order).to eq %w[assignment2
                                assignment1
                                assignment6
                                assignment3
                                assignment5
                                assignment8
                                assignment7
-                               assignment4)
+                               assignment4]
       end
 
       it 'only returns post_to_sis assignments' do
         Assignment.where(assignment_group_id: [@group1, @group2]).update_all(post_to_sis: true)
         json = api_get_assignments_index_from_course(@course, post_to_sis: true)
         post_to_sis = json.map { |a| a['name'] }
-        expect(post_to_sis).to eq %w(assignment2 assignment1 assignment6 assignment3 assignment5)
+        expect(post_to_sis).to eq %w[assignment2 assignment1 assignment6 assignment3 assignment5]
       end
 
       it 'only returns assignments that do not have post_to_sis' do
         Assignment.where(assignment_group_id: [@group1, @group2]).update_all(post_to_sis: true)
         json = api_get_assignments_index_from_course(@course, post_to_sis: false)
         post_to_sis = json.map { |a| a['name'] }
-        expect(post_to_sis).to eq %w(assignment8 assignment7 assignment4)
+        expect(post_to_sis).to eq %w[assignment8 assignment7 assignment4]
       end
 
       it 'fails for post_to_sis assignments when user cannot manage assignments' do
@@ -239,14 +239,14 @@ describe AssignmentsApiController, type: :request do
         # [assignment_groups.position, assignments.position]
         json = api_get_assignments_index_from_course(@course, order_by: 'name')
         order = json.map { |a| a['name'] }
-        expect(order).to eq %w(assignment1
+        expect(order).to eq %w[assignment1
                                assignment2
                                assignment3
                                assignment4
                                assignment5
                                assignment6
                                assignment7
-                               assignment8)
+                               assignment8]
       end
 
       context 'by due date' do
@@ -258,7 +258,7 @@ describe AssignmentsApiController, type: :request do
           @student2 = student_in_course(name: 'student2', active_all: true, section: @section2).user
 
           due_at = 1.month.ago
-          @course.assignments.where(title: %w(assignment1 assignment4 assignment7)).each do |a|
+          @course.assignments.where(title: %w[assignment1 assignment4 assignment7]).each do |a|
             a.due_at = due_at
             a.save!
           end
@@ -267,7 +267,7 @@ describe AssignmentsApiController, type: :request do
                                     due_at: 2.months.from_now)
 
           due_at = 1.month.from_now
-          @course.assignments.where(title: %w(assignment2 assignment3 assignment5)).each do |a|
+          @course.assignments.where(title: %w[assignment2 assignment3 assignment5]).each do |a|
             a.due_at = due_at
             a.save!
           end
@@ -283,19 +283,19 @@ describe AssignmentsApiController, type: :request do
 
         it "sorts the returned list of assignments by latest due date for teachers (nulls last)" do
           json = api_get_assignments_user_index(@teacher, @course, @teacher, order_by: 'due_at')
-          order = %w(assignment1 assignment7 assignment2 assignment5 assignment4 assignment3 assignment6 assignment8)
+          order = %w[assignment1 assignment7 assignment2 assignment5 assignment4 assignment3 assignment6 assignment8]
           expect(json.map { |a| a['name'] }).to eq order
           expect(json.sort_by { |a| [a['due_at'] || CanvasSort::Last, a['name']] }.map { |a| a['name'] }).to eq order
         end
 
         it "sorts the returned list of assignments by overridden due date for students (nulls last)" do
           json = api_get_assignments_user_index(@student1, @course, @teacher, order_by: 'due_at')
-          order = %w(assignment1 assignment7 assignment2 assignment3 assignment5 assignment4 assignment6 assignment8)
+          order = %w[assignment1 assignment7 assignment2 assignment3 assignment5 assignment4 assignment6 assignment8]
           expect(json.map { |a| a['name'] }).to eq order
           expect(json.sort_by { |a| [a['due_at'] || CanvasSort::Last, a['name']] }.map { |a| a['name'] }).to eq order
 
           json = api_get_assignments_user_index(@student2, @course, @teacher, order_by: 'due_at')
-          order = %w(assignment3 assignment1 assignment4 assignment7 assignment2 assignment5 assignment6 assignment8)
+          order = %w[assignment3 assignment1 assignment4 assignment7 assignment2 assignment5 assignment6 assignment8]
           expect(json.map { |a| a['name'] }).to eq order
           expect(json.sort_by { |a| [a['due_at'] || CanvasSort::Last, a['name']] }.map { |a| a['name'] }).to eq order
         end
@@ -5939,7 +5939,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "does not update integration_data when lacking permission" do
-      json = %{{"key": "value"}}
+      json = %({"key": "value"})
       params = ActionController::Parameters.new({ "integration_data" => json })
 
       update_from_params(@assignment, params, @user)
@@ -5947,7 +5947,7 @@ describe AssignmentsApiController, type: :request do
     end
 
     it "updates integration_data with permission" do
-      json = %{{"key": "value"}}
+      json = %({"key": "value"})
       params = ActionController::Parameters.new({ "integration_data" => json })
       account_admin_user_with_role_changes(
         :role_changes => { :manage_sis => true }
@@ -6613,7 +6613,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "sets can_edit on each date if requested" do
-        json = api_get_assignments_index_from_course(@course, include: %w(all_dates can_edit))
+        json = api_get_assignments_index_from_course(@course, include: %w[all_dates can_edit])
         a0_json = json.detect { |a| a['id'] == @a0.id }
         expect(a0_json['can_edit']).to eq true
         expect(a0_json['all_dates'].map { |d| d['can_edit'] }).to eq [true]
@@ -6638,7 +6638,7 @@ describe AssignmentsApiController, type: :request do
 
       it "allows account admins to edit whatever they want" do
         account_admin_user
-        json = api_get_assignments_index_from_course(@course, include: %w(all_dates can_edit))
+        json = api_get_assignments_index_from_course(@course, include: %w[all_dates can_edit])
         a0_json = json.detect { |a| a['id'] == @a0.id }
         expect(a0_json['can_edit']).to eq true
         expect(a0_json['all_dates'].map { |d| d['can_edit'] }).to eq [true]
@@ -6679,7 +6679,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "sets can_edit on each date if requested" do
-        json = api_get_assignments_index_from_course(@course, include: %w(all_dates can_edit))
+        json = api_get_assignments_index_from_course(@course, include: %w[all_dates can_edit])
 
         a0_json = json.detect { |a| a['id'] == @a0.id }
         expect(a0_json['can_edit']).to eq false

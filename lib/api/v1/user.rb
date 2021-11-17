@@ -24,8 +24,8 @@ module Api::V1::User
   include AvatarHelper
 
   API_USER_JSON_OPTS = {
-    :only => %w(id name created_at).freeze,
-    :methods => %w(sortable_name short_name).freeze
+    :only => %w[id name created_at].freeze,
+    :methods => %w[sortable_name short_name].freeze
   }.freeze
 
   def user_json_preloads(users, preload_email = false, opts = {})
@@ -298,7 +298,7 @@ module Api::V1::User
         json[:sis_user_id] = pseudonym.try(:sis_user_id)
       end
       json[:html_url] = course_user_url(enrollment.course_id, enrollment.user_id)
-      user_includes = includes & %w{avatar_url group_ids uuid}
+      user_includes = includes & %w[avatar_url group_ids uuid]
 
       json[:user] = user_json(enrollment.user, user, session, user_includes, @context, nil, []) if includes.include?(:user)
       if includes.include?('locked')

@@ -31,7 +31,7 @@ class PageView < ActiveRecord::Base
   before_save :cap_interaction_seconds
   belongs_to :context, polymorphic: [:course, :account, :group, :user, :user_profile], polymorphic_prefix: true
 
-  CONTEXT_TYPES = %w{Course Account Group User UserProfile}.freeze
+  CONTEXT_TYPES = %w[Course Account Group User UserProfile].freeze
 
   attr_accessor :is_update
 
@@ -101,7 +101,7 @@ class PageView < ActiveRecord::Base
   end
 
   # the list of columns we display to users, export to csv, etc
-  EXPORTED_COLUMNS = %w(request_id user_id url context_id context_type asset_id asset_type controller action interaction_seconds created_at user_request render_time user_agent participated account_id real_user_id http_method remote_ip).freeze
+  EXPORTED_COLUMNS = %w[request_id user_id url context_id context_type asset_id asset_type controller action interaction_seconds created_at user_request render_time user_agent participated account_id real_user_id http_method remote_ip].freeze
 
   def self.page_views_enabled?
     !!page_view_method

@@ -45,9 +45,9 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
     # you can also do SPEC_OPTS='-e "test name"' but this is a little easier I
     # suppose.
     if ENV['SINGLE_TEST']
-      t.spec_opts += ['-e', %{"#{ENV['SINGLE_TEST']}"}]
+      t.spec_opts += ['-e', %("#{ENV['SINGLE_TEST']}")]
     end
-    spec_files = FileList['{gems,vendor}/plugins/*/spec_canvas/**/*_spec.rb'].exclude(%r'spec_canvas/selenium') + FileList['spec/**/*_spec.rb'].exclude(%r'spec/selenium')
+    spec_files = FileList['{gems,vendor}/plugins/*/spec_canvas/**/*_spec.rb'].exclude(%r{spec_canvas/selenium}) + FileList['spec/**/*_spec.rb'].exclude(%r{spec/selenium})
     Gem.loaded_specs.values.each do |spec|
       path = spec.full_gem_path
       spec_canvas_path = File.expand_path(path + "/spec_canvas")
@@ -118,7 +118,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
     desc "Run the code examples in {gems,vendor}/plugins (except RSpec's own)"
     klass.new(:coverage) do |t|
       t.spec_opts = ['--options', Shellwords.escape(Rails.root.join("spec/spec.opts"))]
-      t.send(spec_files_attr, FileList['{gems,vendor}/plugins/*/spec_canvas/**/*_spec.rb'].exclude(%r'spec_canvas/selenium') + FileList['spec/**/*_spec.rb'].exclude(%r'spec/selenium'))
+      t.send(spec_files_attr, FileList['{gems,vendor}/plugins/*/spec_canvas/**/*_spec.rb'].exclude(%r{spec_canvas/selenium}) + FileList['spec/**/*_spec.rb'].exclude(%r{spec/selenium}))
     end
 
     namespace :plugins do
@@ -132,13 +132,13 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
     # Setup specs for stats
     task :statsetup do
       require 'rails/code_statistics'
-      ::STATS_DIRECTORIES << %w(Model\ specs spec/models) if File.exist?('spec/models')
-      ::STATS_DIRECTORIES << %w(Service\ specs spec/services) if File.exist?('spec/services')
-      ::STATS_DIRECTORIES << %w(View\ specs spec/views) if File.exist?('spec/views')
-      ::STATS_DIRECTORIES << %w(Controller\ specs spec/controllers) if File.exist?('spec/controllers')
-      ::STATS_DIRECTORIES << %w(Helper\ specs spec/helpers) if File.exist?('spec/helpers')
-      ::STATS_DIRECTORIES << %w(Library\ specs spec/lib) if File.exist?('spec/lib')
-      ::STATS_DIRECTORIES << %w(Routing\ specs spec/lib) if File.exist?('spec/routing')
+      ::STATS_DIRECTORIES << %w[Model\ specs spec/models] if File.exist?('spec/models')
+      ::STATS_DIRECTORIES << %w[Service\ specs spec/services] if File.exist?('spec/services')
+      ::STATS_DIRECTORIES << %w[View\ specs spec/views] if File.exist?('spec/views')
+      ::STATS_DIRECTORIES << %w[Controller\ specs spec/controllers] if File.exist?('spec/controllers')
+      ::STATS_DIRECTORIES << %w[Helper\ specs spec/helpers] if File.exist?('spec/helpers')
+      ::STATS_DIRECTORIES << %w[Library\ specs spec/lib] if File.exist?('spec/lib')
+      ::STATS_DIRECTORIES << %w[Routing\ specs spec/lib] if File.exist?('spec/routing')
       ::CodeStatistics::TEST_TYPES << "Model specs" if File.exist?('spec/models')
       ::CodeStatistics::TEST_TYPES << "Service specs" if File.exist?('spec/services')
       ::CodeStatistics::TEST_TYPES << "View specs" if File.exist?('spec/views')

@@ -40,8 +40,8 @@ class Attachment < ActiveRecord::Base
     PERMITTED_ATTRIBUTES
   end
 
-  EXCLUDED_COPY_ATTRIBUTES = %w{id root_attachment_id uuid folder_id user_id
-                                filename namespace workflow_state root_account_id}.freeze
+  EXCLUDED_COPY_ATTRIBUTES = %w[id root_attachment_id uuid folder_id user_id
+                                filename namespace workflow_state root_account_id].freeze
 
   CLONING_ERROR_TYPE = 'attachment_clone_url'
 
@@ -201,7 +201,7 @@ class Attachment < ActiveRecord::Base
     end
   end
 
-  RELATIVE_CONTEXT_TYPES = %w(Course Group User Account).freeze
+  RELATIVE_CONTEXT_TYPES = %w[Course Group User Account].freeze
   # returns true if the context is a type that supports relative file paths
   def self.relative_context?(context_class)
     RELATIVE_CONTEXT_TYPES.include?(context_class.to_s)
@@ -228,7 +228,7 @@ class Attachment < ActiveRecord::Base
       @after_attachment_saved_workflow_state = nil
     end
 
-    if %w(pending_upload processing).include?(workflow_state)
+    if %w[pending_upload processing].include?(workflow_state)
       # we don't call .process here so that we don't have to go through another whole save cycle
       self.workflow_state = 'processed'
     end
@@ -1958,7 +1958,7 @@ class Attachment < ActiveRecord::Base
   end
   protected :automatic_thumbnail_sizes
 
-  DYNAMIC_THUMBNAIL_SIZES = %w(640x>).freeze
+  DYNAMIC_THUMBNAIL_SIZES = %w[640x>].freeze
 
   # the list of allowed thumbnail sizes to be generated dynamically
   def self.dynamic_thumbnail_sizes

@@ -377,16 +377,16 @@ module BasicLTI
 
       def handle_read_result(_, assignment, user)
         @submission = assignment.submission_for_student(user)
-        self.body = %{
-        <readResultResponse>
-          <result>
-            <resultScore>
-              <language>en</language>
-              <textString>#{submission_score}</textString>
-            </resultScore>
-          </result>
-        </readResultResponse>
-      }
+        self.body = <<~XML
+          <readResultResponse>
+            <result>
+              <resultScore>
+                <language>en</language>
+                <textString>#{submission_score}</textString>
+              </resultScore>
+            </result>
+          </readResultResponse>
+        XML
         true
       end
 

@@ -1123,18 +1123,18 @@ class CoursesController < ApplicationController
                              end
           enrollments_by_user = enrollment_scope.group_by(&:user_id)
         else
-          confirmed_user_ids = @context.enrollments.where.not(:workflow_state => %w{invited creation_pending rejected})
+          confirmed_user_ids = @context.enrollments.where.not(:workflow_state => %w[invited creation_pending rejected])
                                        .where(:user_id => users).distinct.pluck(:user_id)
         end
 
         render :json => users.map { |u|
           enrollments = enrollments_by_user[u.id] || [] if includes.include?('enrollments')
           user_unconfirmed = if enrollments
-                               enrollments.all? { |e| %w{invited creation_pending rejected}.include?(e.workflow_state) }
+                               enrollments.all? { |e| %w[invited creation_pending rejected].include?(e.workflow_state) }
                              else
                                !confirmed_user_ids.include?(u.id)
                              end
-          excludes = user_unconfirmed ? %w{pseudonym personal_info} : []
+          excludes = user_unconfirmed ? %w[pseudonym personal_info] : []
           if @context.sections_hidden_on_roster_page?(current_user: @current_user)
             excludes.append('course_section_id')
           end
@@ -3264,7 +3264,7 @@ class CoursesController < ApplicationController
       update_params = params.permit(:event).to_unsafe_h
       return render(:json => { :message => 'need to specify event' }, :status => :bad_request) unless update_params[:event]
 
-      return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w(offer conclude delete undelete).include? update_params[:event]
+      return render(:json => { :message => 'invalid event' }, :status => :bad_request) unless %w[offer conclude delete undelete].include? update_params[:event]
 
       progress = Course.batch_update(@account, @current_user, @course_ids, update_params, :api)
       render :json => progress_json(progress, @current_user, session)
@@ -3462,7 +3462,7 @@ class CoursesController < ApplicationController
     end
 
     # NOTE: Similar to #user_progress, this endpoint should remain on the primary db
-    users = Api.paginate(UserSearch.scope_for(@context, @current_user, :enrollment_type => %w(Student)), self, api_v1_course_bulk_user_progress_url)
+    users = Api.paginate(UserSearch.scope_for(@context, @current_user, :enrollment_type => %w[Student]), self, api_v1_course_bulk_user_progress_url)
     cmps = ContextModuleProgression.where(user_id: users.map(&:id))
                                    .joins(:context_module)
                                    .where(context_modules: { context: @context, context_type: 'Course' })
@@ -3629,7 +3629,7 @@ class CoursesController < ApplicationController
 
     if params[:state]
       states = Array(params[:state])
-      states += %w(created claimed) if states.include?('unpublished')
+      states += %w[created claimed] if states.include?('unpublished')
       conditions = states.filter_map do |state|
         Enrollment::QueryBuilder.new(nil, course_workflow_state: state, enforce_course_workflow_state: true).conditions
       end.join(" OR ")
@@ -3732,7 +3732,7 @@ class CoursesController < ApplicationController
     end
     enrollments_by_course = Api.paginate(enrollments_by_course, self, paginate_url) if api_request?
     courses = enrollments_by_course.map(&:first).map(&:course)
-    preloads = %i/account root_account/
+    preloads = %i[account root_account]
     preload_teachers(courses) if includes.include?('teachers')
     preloads << :grading_standard if includes.include?('total_scores')
     preloads << :account if includes.include?('subaccount') || includes.include?('account')
