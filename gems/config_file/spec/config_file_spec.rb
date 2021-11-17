@@ -33,10 +33,8 @@ describe ConfigFile do
     end
 
     it "caches objects" do
-      file = instance_double("Pathname")
-      expect(Rails.root).to receive(:join).with("config/my_config.yml").and_return(file)
-      expect(file).to receive(:file?).and_return(true)
-      expect(file).to receive(:read).and_return('test: {}')
+      expect(File).to receive(:exist?).and_return(true)
+      expect(File).to receive(:read).and_return('test: {}')
       hit_block = 0
       result1 = ConfigFile.cache_object('my_config') do |config|
         hit_block += 1
@@ -54,10 +52,8 @@ describe ConfigFile do
     end
 
     it "caches YAML even if it has to load multiple objects" do
-      file = instance_double("Pathname")
-      expect(Rails.root).to receive(:join).with("config/my_config.yml").and_return(file)
-      expect(file).to receive(:file?).and_return(true)
-      expect(file).to receive(:read).once.and_return("test: a\nenv2: b")
+      expect(File).to receive(:exist?).once.and_return(true)
+      expect(File).to receive(:read).once.and_return("test: a\nenv2: b")
       hit_block = 0
       result1 = ConfigFile.cache_object('my_config') do |config|
         hit_block += 1

@@ -40,7 +40,7 @@ class EnrollmentState < ActiveRecord::Base
 
   attr_accessor :skip_touch_user, :user_needs_touch, :is_direct_recalculation
 
-  validates :enrollment_id, presence: true
+  validates_presence_of :enrollment_id
 
   resolves_root_account through: :enrollment
 
@@ -158,14 +158,14 @@ class EnrollmentState < ActiveRecord::Base
       self.state_started_at = start_at
       self.state_valid_until = end_at # stores the next date trigger
     else
-      global_start_at = ranges.map(&:compact).filter_map(&:min).min
+      global_start_at = ranges.map(&:compact).map(&:min).compact.min
 
       if !global_start_at
         # Not strictly within any range so no translation needed
         self.state = wf_state
       elsif global_start_at < now
         # we've past the end date so no matter what the state was, we're "completed" now
-        self.state_started_at = ranges.filter_map(&:last).min
+        self.state_started_at = ranges.map(&:last).compact.min
         self.state = 'completed'
       elsif self.enrollment.fake_student? # rubocop:disable Lint/DuplicateBranch
         # Allow student view students to use the course before the term starts
@@ -173,18 +173,18 @@ class EnrollmentState < ActiveRecord::Base
       else
         # the course has yet to begin for the enrollment
         self.state_valid_until = global_start_at # store the date when that will change
-        self.state = if self.enrollment.view_restrictable?
-                       # these enrollment states mean they still can't participate yet even if they've accepted it,
-                       # but should be able to view just like an invited enrollment
-                       if wf_state == 'active'
-                         'pending_active'
-                       else
-                         'pending_invited'
-                       end
-                     else
-                       # admin user restricted by term dates
-                       'inactive'
-                     end
+        if self.enrollment.view_restrictable?
+          # these enrollment states mean they still can't participate yet even if they've accepted it,
+          # but should be able to view just like an invited enrollment
+          if wf_state == 'active'
+            self.state = 'pending_active'
+          else
+            self.state = 'pending_invited'
+          end
+        else
+          # admin user restricted by term dates
+          self.state = 'inactive'
+        end
       end
     end
   end
@@ -193,17 +193,18 @@ class EnrollmentState < ActiveRecord::Base
   # you can still access the course in a "view-only" mode
   # but courses/accounts can disable this
   def recalculate_access
-    self.restricted_access = if self.enrollment.view_restrictable?
-                               if self.pending?
-                                 self.enrollment.restrict_future_view?
-                               elsif self.state == 'completed'
-                                 self.enrollment.restrict_past_view?
-                               else
-                                 false
-                               end
-                             else
-                               false
-                             end
+    if self.enrollment.view_restrictable?
+      self.restricted_access =
+        if self.pending?
+          self.enrollment.restrict_future_view?
+        elsif self.state == 'completed'
+          self.enrollment.restrict_past_view?
+        else
+          false
+        end
+    else
+      self.restricted_access = false
+    end
     self.access_is_current = true
   end
 

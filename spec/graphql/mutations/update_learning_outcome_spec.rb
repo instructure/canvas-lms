@@ -31,13 +31,13 @@ describe Mutations::UpdateLearningOutcome do
   let!(:record) { outcome_model(context: @course) }
 
   def variables(args = {})
-    <<~YAML
+    <<~VARS
       id: #{args[:id] || record.id},
       title: "#{args[:title] || 'Outcome 1 edited'}",
       displayName: "#{args[:display_name] || 'Outcome display name 1'}",
       description: "#{args[:description] || 'Outcome description 1'}",
       vendorGuid: "#{args[:vendor_guid] || 'vg--1'}"
-    YAML
+    VARS
   end
 
   def execute_with_input(update_input, user_executing: @admin)

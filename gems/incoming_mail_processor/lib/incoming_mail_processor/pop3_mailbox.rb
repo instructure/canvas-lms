@@ -26,7 +26,7 @@ module IncomingMailProcessor
   class Pop3Mailbox
     include ConfigurableTimeout
 
-    UsedPopMethods = [:start, :mails, :finish].freeze
+    UsedPopMethods = [:start, :mails, :finish]
 
     attr_accessor :server, :port, :ssl, :username, :password
 

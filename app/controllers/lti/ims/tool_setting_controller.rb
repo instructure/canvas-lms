@@ -203,7 +203,7 @@ module Lti
         if valid && request.content_type == 'application/vnd.ims.lti.v2.toolsettings+json'
           valid = json['@graph'].count == 1
         elsif valid && request.content_type == 'application/vnd.ims.lti.v2.toolsettings.simple+json'
-          valid = !json.key?('@graph')
+          valid = !json.keys.include?('@graph')
         end
         valid
       end

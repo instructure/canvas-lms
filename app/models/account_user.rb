@@ -34,7 +34,7 @@ class AccountUser < ActiveRecord::Base
   after_destroy :update_account_associations_later
 
   validate :valid_role?, :unless => :deleted?
-  validates :account_id, :user_id, :role_id, presence: true
+  validates_presence_of :account_id, :user_id, :role_id
 
   resolves_root_account through: :account
   include Role::AssociationHelper
@@ -106,14 +106,14 @@ class AccountUser < ActiveRecord::Base
   set_broadcast_policy do |p|
     p.dispatch :new_account_user
     p.to { |record| record.account.users }
-    p.whenever(&:just_created)
+    p.whenever { |record| record.just_created }
 
     p.dispatch :account_user_registration
-    p.to(&:user)
+    p.to { |record| record.user }
     p.whenever { @account_user_registration }
 
     p.dispatch :account_user_notification
-    p.to(&:user)
+    p.to { |record| record.user }
     p.whenever { @account_user_notification }
   end
 

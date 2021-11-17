@@ -87,9 +87,9 @@ describe "instfs file uploads" do
     if downloaded_data != false
       temp_md5 = Digest::MD5.hexdigest(downloaded_data)
       original_md5 = Digest::MD5.hexdigest File.read(original_file_path)
-      temp_md5 == original_md5
+      return temp_md5 == original_md5
     else
-      false
+      return false
     end
   end
 

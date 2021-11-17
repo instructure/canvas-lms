@@ -285,14 +285,14 @@ class RoleOverride < ActiveRecord::Base
         :available_to => %w(AccountAdmin AccountMembership),
       },
       :view_feature_flags => {
-        :label => lambda { t("View feature options at an account level") },
-        :label_v2 => lambda { t("Feature Options - view") },
+        :label => lambda { t("View feature settings at an account level") },
+        :label_v2 => lambda { t("Feature Previews - view") },
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
       },
       :manage_feature_flags => {
         :label => lambda { t('permissions.manage_feature_flags', "Enable or disable features at an account level") },
-        :label_v2 => lambda { t("Feature Options - enable / disable") },
+        :label_v2 => lambda { t("Feature Previews - enable / disable") },
         :true_for => %w(AccountAdmin),
         :available_to => %w(AccountAdmin AccountMembership)
       },
@@ -1818,10 +1818,9 @@ class RoleOverride < ActiveRecord::Base
       # override.enabled.nil? is no longer possible, but is important for the migration that removes nils
       if override.new_record? || override.enabled.nil?
         if last_override
-          case generated_permission[:enabled]
-          when [:descendants]
+          if generated_permission[:enabled] == [:descendants]
             generated_permission[:enabled] = [:self, :descendants]
-          when [:self]
+          elsif generated_permission[:enabled] == [:self]
             generated_permission[:enabled] = nil
           end
         end

@@ -804,10 +804,7 @@ describe Account do
       account.role_overrides.create!(:permission => 'read_reports', :role => (k == :site_admin ? @sa_role : @root_role), :enabled => true)
       account.role_overrides.create!(:permission => 'reset_any_mfa', :role => @sa_role, :enabled => true)
       # clear caches
-      account.tap { |a|
-        a.settings[:mfa_settings] = :optional
-        a.save!
-      }
+      account.tap { |a| a.settings[:mfa_settings] = :optional; a.save! }
       v[:account] = Account.find(account.id)
     end
     AdheresToPolicy::Cache.clear
@@ -1058,14 +1055,11 @@ describe Account do
     end
 
     it "allows ordering by user's sortable name" do
-      @user1.sortable_name = 'jonny'
-      @user1.save
-      @user2.sortable_name = 'bob'
-      @user2.save
-      @user3.sortable_name = 'richard'
-      @user3.save
+      @user1.sortable_name = 'jonny'; @user1.save
+      @user2.sortable_name = 'bob'; @user2.save
+      @user3.sortable_name = 'richard'; @user3.save
       users = @account.users_not_in_groups([], order: User.sortable_name_order_by_clause('users'))
-      expect(users.map(&:id)).to eq [@user2.id, @user1.id, @user3.id]
+      expect(users.map { |u| u.id }).to eq [@user2.id, @user1.id, @user3.id]
     end
   end
 
@@ -1077,28 +1071,28 @@ describe Account do
     it "includes 'Developer Keys' for the authorized users of the site_admin account" do
       account_admin_user(:account => Account.site_admin)
       tabs = Account.site_admin.tabs_available(@admin)
-      expect(tabs.pluck(:id)).to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.map { |t| t[:id] }).to be_include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = Account.site_admin.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.map { |t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "includes 'Developer Keys' for the admin users of an account" do
       account = Account.create!
       account_admin_user(:account => account)
       tabs = account.tabs_available(@admin)
-      expect(tabs.pluck(:id)).to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.map { |t| t[:id] }).to be_include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = account.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.map { |t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "does not include 'Developer Keys' for non-site_admin accounts" do
       tabs = @account.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.map { |t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
 
       tabs = @account.root_account.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(Account::TAB_DEVELOPER_KEYS)
+      expect(tabs.map { |t| t[:id] }).not_to be_include(Account::TAB_DEVELOPER_KEYS)
     end
 
     it "does not include external tools if not configured for account navigation" do
@@ -1107,7 +1101,7 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to eq false
       tabs = @account.tabs_available(nil)
-      expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
+      expect(tabs.map { |t| t[:id] }).not_to be_include(tool.asset_string)
     end
 
     it "includes active external tools if configured on the account" do
@@ -1130,7 +1124,7 @@ describe Account do
       tools.each { |t| expect(t.has_placement?(:account_navigation)).to eq true }
 
       tabs = @account.tabs_available
-      tab_ids = tabs.pluck(:id)
+      tab_ids = tabs.map { |t| t[:id] }
       expect(tab_ids).to be_include(tool1.asset_string)
       expect(tab_ids).not_to be_include(tool2.asset_string)
       tab = tabs.detect { |t| t[:id] == tool1.asset_string }
@@ -1145,7 +1139,7 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to eq true
       tabs = @account.tabs_available(nil)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
       tab = tabs.detect { |t| t[:id] == tool.asset_string }
       expect(tab[:label]).to eq tool.settings[:account_navigation][:text]
       expect(tab[:href]).to eq :account_external_tool_path
@@ -1159,11 +1153,11 @@ describe Account do
       tool.save!
       expect(tool.has_placement?(:account_navigation)).to eq true
       tabs = @account.tabs_available(@teacher)
-      expect(tabs.pluck(:id)).to_not be_include(tool.asset_string)
+      expect(tabs.map { |t| t[:id] }).to_not be_include(tool.asset_string)
 
       admin = account_admin_user(:account => @account)
       tabs = @account.tabs_available(admin)
-      expect(tabs.pluck(:id)).to be_include(tool.asset_string)
+      expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
     end
 
     it "uses localized labels" do
@@ -1205,7 +1199,7 @@ describe Account do
     it 'uses :manage_assignments to determine question bank tab visibility' do
       account_admin_user_with_role_changes(acccount: @account, role_changes: { manage_assignments: true, manage_grades: false })
       tabs = @account.tabs_available(@admin)
-      expect(tabs.pluck(:id)).to be_include(Account::TAB_QUESTION_BANKS)
+      expect(tabs.map { |t| t[:id] }).to be_include(Account::TAB_QUESTION_BANKS)
     end
 
     describe "'ePortfolio Moderation' tab" do

@@ -75,7 +75,7 @@ module Lti
         if success
           render json: '{"status": "Success"}'
         else
-          render json: '{"status": "Failed"}', status: :failed_dependency
+          render json: '{"status": "Failed"}', status: 424
         end
       end
     end

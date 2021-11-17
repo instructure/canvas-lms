@@ -37,7 +37,7 @@ module Canvas::Migration::Helpers
       ['groups', -> { I18n.t('lib.canvas.migration.groups', 'Student Groups') }],
       ['learning_outcomes', -> { I18n.t('lib.canvas.migration.learning_outcomes', 'Learning Outcomes') }],
       ['attachments', -> { I18n.t('lib.canvas.migration.attachments', 'Files') }],
-    ].freeze
+    ]
 
     def initialize(migration = nil, base_url = nil, global_identifiers:)
       @migration = migration
@@ -81,8 +81,10 @@ module Canvas::Migration::Helpers
         data["learning_outcomes"] ||= data["outcomes"]
 
         # skip auto generated quiz question banks for canvas imports
-        data['assessment_question_banks']&.select! do |item|
-          !(item['for_quiz'] && @migration && (@migration.for_course_copy? || (@migration.migration_type == 'canvas_cartridge_importer')))
+        if data['assessment_question_banks']
+          data['assessment_question_banks'].select! do |item|
+            !(item['for_quiz'] && @migration && (@migration.for_course_copy? || (@migration.migration_type == 'canvas_cartridge_importer')))
+          end
         end
 
         att.close
@@ -165,17 +167,19 @@ module Canvas::Migration::Helpers
     # Returns all the assignments in their assignment groups
     def assignment_data(content_list, course_data)
       added_asmnts = []
-      course_data['assignment_groups']&.each do |group|
-        item = item_hash('assignment_groups', group)
-        sub_items = []
-        course_data['assignments'].select { |a| a['assignment_group_migration_id'] == group['migration_id'] }.each do |asmnt|
-          sub_items << item_hash('assignments', asmnt)
-          added_asmnts << asmnt['migration_id']
+      if course_data['assignment_groups']
+        course_data['assignment_groups'].each do |group|
+          item = item_hash('assignment_groups', group)
+          sub_items = []
+          course_data['assignments'].select { |a| a['assignment_group_migration_id'] == group['migration_id'] }.each do |asmnt|
+            sub_items << item_hash('assignments', asmnt)
+            added_asmnts << asmnt['migration_id']
+          end
+          if sub_items.any?
+            item['sub_items'] = sub_items
+          end
+          content_list << item
         end
-        if sub_items.any?
-          item['sub_items'] = sub_items
-        end
-        content_list << item
       end
       course_data['assignments'].each do |asmnt|
         next if added_asmnts.member? asmnt['migration_id']
@@ -188,13 +192,9 @@ module Canvas::Migration::Helpers
       return [] unless course_data['attachments'] && course_data['attachments'].length > 0
 
       remove_name_regex = %r{/[^/]*\z}
-      course_data['attachments'].each { |a|
-        next unless a['path_name']
-
-        a['path_name'].gsub!(remove_name_regex, '')
-      }
+      course_data['attachments'].each { |a| next unless a['path_name']; a['path_name'].gsub!(remove_name_regex, '') }
       folder_groups = course_data['attachments'].group_by { |a| a['path_name'] }
-      sorted = folder_groups.sort_by(&:first)
+      sorted = folder_groups.sort_by { |i| i.first }
       sorted.each do |folder_name, atts|
         if atts.length == 1 && atts[0]['file_name'] == folder_name
           content_list << item_hash('attachments', atts[0])
@@ -237,7 +237,8 @@ module Canvas::Migration::Helpers
           add_url!(hash, "submodules_#{CGI.escape(item['migration_id'])}")
         end
       end
-      add_linked_resource(type, item, hash)
+      hash = add_linked_resource(type, item, hash)
+      hash
     end
 
     def add_linked_resource(type, item, hash)
@@ -300,11 +301,11 @@ module Canvas::Migration::Helpers
 
               scope = scope.select(:assignment_id) if type == 'quizzes'
 
-              scope = if type == 'context_modules' || type == 'context_external_tools' || type == 'groups'
-                        scope.select(:name)
-                      else
-                        scope.select(:title)
-                      end
+              if type == 'context_modules' || type == 'context_external_tools' || type == 'groups'
+                scope = scope.select(:name)
+              else
+                scope = scope.select(:title)
+              end
 
               if scope.klass.respond_to?(:not_deleted)
                 scope = scope.not_deleted

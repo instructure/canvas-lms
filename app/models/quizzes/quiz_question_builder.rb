@@ -21,7 +21,7 @@ class Quizzes::QuizQuestionBuilder
   QUIZ_GROUP_ENTRY = 'quiz_group'
   DEFAULT_OPTIONS = {
     shuffle_answers: false
-  }.freeze
+  }
 
   class << self
     def t(*args)
@@ -146,11 +146,11 @@ class Quizzes::QuizQuestionBuilder
       question_name = t('#quizzes.quiz.default_text_only_question_name', 'Spacer')
     when ::Quizzes::QuizQuestion::Q_FILL_IN_MULTIPLE_BLANKS
       text = q[:question_text]
-      variables = q[:answers].pluck(:blank_id).uniq
+      variables = q[:answers].map { |a| a[:blank_id] }.uniq
       variables.each do |variable|
         variable_id = ::AssessmentQuestion.variable_id(variable)
         re = Regexp.new("\\[#{variable}\\]")
-        text = text.sub re, <<~HTML
+        text = text.sub re, <<-HTML
           <input
             class='question_input'
             type='text'
@@ -165,7 +165,7 @@ class Quizzes::QuizQuestionBuilder
       q[:question_text] = text
     when ::Quizzes::QuizQuestion::Q_MULTIPLE_DROPDOWNS
       text = q[:question_text]
-      variables = q[:answers].pluck(:blank_id).uniq
+      variables = q[:answers].map { |a| a[:blank_id] }.uniq
       variables.each do |variable|
         variable_id = ::AssessmentQuestion.variable_id(variable)
         variable_answers = q[:answers].select { |a| a[:blank_id] == variable }
@@ -175,7 +175,7 @@ class Quizzes::QuizQuestionBuilder
           "<option value='#{a[:id]}'>#{CGI.escapeHTML(answer_text)}</option>"
         end
 
-        select = <<~HTML
+        select = <<-HTML
           <select class='question_input' name='question_#{q[:id]}_#{variable_id}'>
             <option value=''>
               #{ERB::Util.h(t('#quizzes.quiz.default_question_input', "[ Select ]"))}
@@ -251,7 +251,7 @@ class Quizzes::QuizQuestionBuilder
   end
 
   def mark_picked(questions)
-    @picked[:aq].concat(questions.pluck(:assessment_question_id)).uniq!
-    @picked[:qq].concat(questions.pluck(:id))
+    @picked[:aq].concat(questions.map { |q| q[:assessment_question_id] }).uniq!
+    @picked[:qq].concat(questions.map { |q| q[:id] })
   end
 end

@@ -26,14 +26,8 @@ describe MicrosoftSync::SyncerSteps do
   end
   let(:group) { MicrosoftSync::Group.create(course: course) }
   let(:graph_service_helpers) do
-    instance_double(
-      MicrosoftSync::GraphServiceHelpers,
-      graph_service: instance_double(
-        MicrosoftSync::GraphService,
-        teams: instance_double(MicrosoftSync::GraphService::TeamsEndpoints),
-        groups: instance_double(MicrosoftSync::GraphService::GroupsEndpoints)
-      )
-    )
+    instance_double(MicrosoftSync::GraphServiceHelpers,
+                    graph_service: instance_double(MicrosoftSync::GraphService))
   end
   let(:graph_service) { graph_service_helpers.graph_service }
   let(:tenant) { 'mytenant123' }
@@ -424,7 +418,7 @@ describe MicrosoftSync::SyncerSteps do
           raise "max batchsize stubbed at #{batch_size}" if uluvs.length > batch_size
 
           # ULUV "abc@def.com" -> AAD "abc-mail-aad"
-          uluvs.index_with { |uluv| uluv.gsub(/@.*/, "-#{remote_attr}-aad") }
+          uluvs.map { |uluv| [uluv, uluv.gsub(/@.*/, "-#{remote_attr}-aad")] }.to_h
         end
       end
 
@@ -555,24 +549,24 @@ describe MicrosoftSync::SyncerSteps do
     before do
       allow(diff).to \
         receive(:additions_in_slices_of)
-        .with(MicrosoftSync::GraphService::GroupsEndpoints::USERS_BATCH_SIZE)
+        .with(MicrosoftSync::GraphService::GROUP_USERS_BATCH_SIZE)
         .and_yield(owners: %w[o3], members: %w[o1 o2])
         .and_yield(members: %w[o3])
       allow(diff).to \
         receive(:removals_in_slices_of)
-        .with(MicrosoftSync::GraphService::GroupsEndpoints::USERS_BATCH_SIZE)
+        .with(MicrosoftSync::GraphService::GROUP_USERS_BATCH_SIZE)
         .and_yield(owners: %w[o1], members: %w[m1 m2])
         .and_yield(members: %w[m3])
     end
 
     it 'adds/removes users based on the diff' do
-      expect(graph_service.groups).to receive(:add_users_ignore_duplicates)
+      expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
         .with('mygroup', owners: %w[o3], members: %w[o1 o2])
-      expect(graph_service.groups).to receive(:add_users_ignore_duplicates)
+      expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
         .with('mygroup', members: %w[o3])
-      expect(graph_service.groups).to receive(:remove_users_ignore_missing)
+      expect(graph_service).to receive(:remove_group_users_ignore_missing)
         .with('mygroup', members: %w[m1 m2], owners: %w[o1])
-      expect(graph_service.groups).to receive(:remove_users_ignore_missing)
+      expect(graph_service).to receive(:remove_group_users_ignore_missing)
         .with('mygroup', members: %w[m3])
 
       subject
@@ -580,8 +574,8 @@ describe MicrosoftSync::SyncerSteps do
 
     context 'when the Microsoft API says there are too many members in a group' do
       before do
-        allow(graph_service.groups).to receive(:remove_users_ignore_missing)
-        allow(graph_service.groups).to receive(:add_users_ignore_duplicates)
+        allow(graph_service).to receive(:remove_group_users_ignore_missing)
+        allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
           .and_raise(MicrosoftSync::Errors::MembersQuotaExceeded)
       end
 
@@ -590,30 +584,19 @@ describe MicrosoftSync::SyncerSteps do
 
     context 'when the Microsoft API says there are too many owners in a group' do
       before do
-        allow(graph_service.groups).to receive(:remove_users_ignore_missing)
-        allow(graph_service.groups).to receive(:add_users_ignore_duplicates)
+        allow(graph_service).to receive(:remove_group_users_ignore_missing)
+        allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
           .and_raise(MicrosoftSync::Errors::OwnersQuotaExceeded)
       end
 
       it_behaves_like 'max user enrollments reached', 'owners'
     end
 
-    def membership_change_result_double(total_unsuccessful = 0, to_json = '', nonexistent_users = [])
-      instance_double(
-        MicrosoftSync::GraphService::GroupMembershipChangeResult,
-        to_json: to_json,
-        total_unsuccessful: total_unsuccessful,
-        blank?: total_unsuccessful == 0,
-        present?: total_unsuccessful != 0,
-        nonexistent_user_ids: nonexistent_users,
-      )
-    end
-
-    context 'when some users to be added are already in the group' do
+    context 'when some users to be added already exist in the group' do
       it 'logs and increments statsd metrics' do
-        expect(graph_service.groups).to receive(:add_users_ignore_duplicates)
-          .twice.and_return(membership_change_result_double(3, 'debuginfo'))
-        allow(graph_service.groups).to receive(:remove_users_ignore_missing)
+        expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+          .twice.and_return(members: %w[o3], owners: %w[o1 o2])
+        allow(graph_service).to receive(:remove_group_users_ignore_missing)
 
         allow(Rails.logger).to receive(:warn)
         allow(InstStatsd::Statsd).to receive(:increment).and_call_original
@@ -621,57 +604,22 @@ describe MicrosoftSync::SyncerSteps do
 
         subject
 
-        expect(Rails.logger).to have_received(:warn).twice.with(
-          /Skipping add for 3: .*debuginfo/
-        )
-        expect(InstStatsd::Statsd).to have_received(:increment).twice.with(
-          "microsoft_sync.syncer_steps.skipped_batches.add",
-          tags: { sync_type: sync_type_statsd_tag }
-        )
-        expect(InstStatsd::Statsd).to have_received(:count).twice.with(
-          "microsoft_sync.syncer_steps.skipped_total.add", 3,
-          tags: { sync_type: sync_type_statsd_tag }
-        )
+        expect(Rails.logger).to have_received(:warn).twice
+                                                    .with(/Skipping redundant add for 3: .*(o3.*o2|o2.*o3)/)
+        expect(InstStatsd::Statsd).to have_received(:increment).twice
+                                                               .with("microsoft_sync.syncer_steps.skipped_batches.add",
+                                                                     tags: { sync_type: sync_type_statsd_tag })
+        expect(InstStatsd::Statsd).to have_received(:count).twice
+                                                           .with("microsoft_sync.syncer_steps.skipped_total.add", 3,
+                                                                 tags: { sync_type: sync_type_statsd_tag })
       end
     end
 
-    context "when some users to be added don't exist at all on Microsoft's side" do
-      before do
-        %w[aad0 aad1 aad2].each do |aad|
-          MicrosoftSync::UserMapping.create(
-            root_account_id: course.root_account_id, aad_id: aad, user: user_model
-          )
-        end
-
-        allow(graph_service.groups).to receive(:remove_users_ignore_missing)
-        allow(Rails.logger).to receive(:warn)
-        allow(InstStatsd::Statsd).to receive(:count).and_call_original
-      end
-
-      it 'deletes the mappings for them and increments a counter' do
-        expect(graph_service.groups).to receive(:add_users_ignore_duplicates).once
-        expect(graph_service.groups).to receive(:add_users_ignore_duplicates)
-          .once.and_return(membership_change_result_double(3, 'debuginfo', %w[aad0 aad2]))
-
-        subject
-
-        expect(MicrosoftSync::UserMapping.where('aad_id like ?', 'aad%').pluck(:aad_id)).to \
-          eq(['aad1'])
-        expect(Rails.logger).to have_received(:warn).with(/Deleting mappings for AADs.*aad2/)
-        expect(InstStatsd::Statsd).to have_received(:count).with(
-          "microsoft_sync.syncer_steps.deleted_mappings_for_missing_users", 2
-        )
-      end
-    end
-
-    context "when some users to be removed aren't in the group" do
+    context "when some users to be removed don't exist in the group" do
       it 'logs and increments statsd metrics' do
-        allow(graph_service.groups).to \
-          receive(:add_users_ignore_duplicates)
-          .and_return(membership_change_result_double)
-        expect(graph_service.groups).to \
-          receive(:remove_users_ignore_missing)
-          .twice.and_return(membership_change_result_double(2, 'debuginfo'))
+        allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+        expect(graph_service).to receive(:remove_group_users_ignore_missing)
+          .twice.and_return(owners: %w[m2 m3])
 
         allow(Rails.logger).to receive(:warn)
         allow(InstStatsd::Statsd).to receive(:increment).and_call_original
@@ -679,25 +627,22 @@ describe MicrosoftSync::SyncerSteps do
 
         subject
 
-        expect(Rails.logger).to have_received(:warn).twice.with(
-          /Skipping remove for 2.*debuginfo/
-        )
-        expect(InstStatsd::Statsd).to have_received(:increment).twice.with(
-          "microsoft_sync.syncer_steps.skipped_batches.remove",
-          tags: { sync_type: sync_type_statsd_tag }
-        )
-        expect(InstStatsd::Statsd).to have_received(:count).twice.with(
-          "microsoft_sync.syncer_steps.skipped_total.remove", 2,
-          tags: { sync_type: sync_type_statsd_tag }
-        )
+        expect(Rails.logger).to have_received(:warn).twice
+                                                    .with(/Skipping redundant remove for 2: .*(m2.*m3|m3.*m2)/)
+        expect(InstStatsd::Statsd).to have_received(:increment).twice
+                                                               .with("microsoft_sync.syncer_steps.skipped_batches.remove",
+                                                                     tags: { sync_type: sync_type_statsd_tag })
+        expect(InstStatsd::Statsd).to have_received(:count).twice
+                                                           .with("microsoft_sync.syncer_steps.skipped_total.remove", 2,
+                                                                 tags: { sync_type: sync_type_statsd_tag })
       end
     end
 
     context "when the last owner is removed but a new owner is added" do
       it "adds the new owner but raises the error still" do
-        expect(graph_service.groups).to receive(:remove_users_ignore_missing)
+        expect(graph_service).to receive(:remove_group_users_ignore_missing)
           .and_raise(MicrosoftSync::Errors::MissingOwners)
-        expect(graph_service.groups).to receive(:add_users_ignore_duplicates).twice
+        expect(graph_service).to receive(:add_users_to_group_ignore_duplicates).twice
         expect { subject }.to raise_error(MicrosoftSync::Errors::MissingOwners)
       end
     end
@@ -705,8 +650,8 @@ describe MicrosoftSync::SyncerSteps do
     context 'when there is an error in adding classes (e.g. too many users)' do
       it 'still removes users' do
         err_class = Class.new(StandardError)
-        expect(graph_service.groups).to receive(:remove_users_ignore_missing).twice
-        expect(graph_service.groups).to receive(:add_users_ignore_duplicates)
+        expect(graph_service).to receive(:remove_group_users_ignore_missing).twice
+        expect(graph_service).to receive(:add_users_to_group_ignore_duplicates)
           .and_raise(err_class)
         expect { subject }.to raise_error(err_class)
       end
@@ -731,8 +676,8 @@ describe MicrosoftSync::SyncerSteps do
                       retry_args: { step: :step_generate_diff }
 
       it 'goes to the step_check_team_exists on success' do
-        allow(graph_service.groups).to receive(:add_users_ignore_duplicates)
-        allow(graph_service.groups).to receive(:remove_users_ignore_missing)
+        allow(graph_service).to receive(:add_users_to_group_ignore_duplicates)
+        allow(graph_service).to receive(:remove_group_users_ignore_missing)
         expect_next_step(subject, :step_check_team_exists)
       end
     end
@@ -773,23 +718,23 @@ describe MicrosoftSync::SyncerSteps do
     context 'when there are no teacher/ta/designer enrollments' do
       it "doesn't check for team existence or create a team" do
         course.enrollments.to_a.each do |e|
-          e.destroy if /^Teacher|Ta|Designer/.match?(e.type)
+          e.destroy if e.type =~ /^Teacher|Ta|Designer/
         end
-        expect(graph_service.teams).to_not receive(:team_exists?)
+        expect(graph_service).to_not receive(:team_exists?)
         expect(subject).to eq(MicrosoftSync::StateMachineJob::COMPLETE)
       end
     end
 
     context 'when the team already exists' do
       it "returns COMPLETE" do
-        expect(graph_service.teams).to receive(:team_exists?).with('mygroupid').and_return(true)
+        expect(graph_service).to receive(:team_exists?).with('mygroupid').and_return(true)
         expect(subject).to eq(MicrosoftSync::StateMachineJob::COMPLETE)
       end
     end
 
     context "when the team doesn't exist" do
       it "moves on to step_create_team after a delay" do
-        expect(graph_service.teams).to receive(:team_exists?).with('mygroupid').and_return(false)
+        expect(graph_service).to receive(:team_exists?).with('mygroupid').and_return(false)
         expect_delayed_next_step(subject, :step_create_team, 24.seconds)
       end
     end
@@ -803,14 +748,14 @@ describe MicrosoftSync::SyncerSteps do
     it_behaves_like 'a step that returns retry on intermittent error', except_404: true
 
     it 'creates the team' do
-      expect(graph_service.teams).to receive(:create_for_education_class).with('mygroupid')
+      expect(graph_service).to receive(:create_education_class_team).with('mygroupid')
       expect(subject).to eq(MicrosoftSync::StateMachineJob::COMPLETE)
     end
 
     context 'when the Microsoft API errors with "group has no owners"' do
       it "retries in (30, 90, 270 seconds)" do
-        expect(graph_service.teams).to receive(:create_for_education_class).with('mygroupid')
-                                                                           .and_raise(MicrosoftSync::Errors::GroupHasNoOwners)
+        expect(graph_service).to receive(:create_education_class_team).with('mygroupid')
+                                                                      .and_raise(MicrosoftSync::Errors::GroupHasNoOwners)
         expect_retry(
           subject,
           error_class: MicrosoftSync::Errors::GroupHasNoOwners,
@@ -821,8 +766,8 @@ describe MicrosoftSync::SyncerSteps do
 
     context "when the Microsoft API errors with a 404 (e.g., group doesn't exist)" do
       it "retries in (30, 90, 270 seconds)" do
-        expect(graph_service.teams).to \
-          receive(:create_for_education_class).with('mygroupid').and_raise(new_http_error(404))
+        expect(graph_service).to \
+          receive(:create_education_class_team).with('mygroupid').and_raise(new_http_error(404))
         expect_retry(
           subject,
           error_class: MicrosoftSync::Errors::HTTPNotFound,
@@ -833,9 +778,9 @@ describe MicrosoftSync::SyncerSteps do
 
     context 'when the Microsoft API errors with some other error' do
       it "bubbles up the error" do
-        expect(graph_service.teams).to \
-          receive(:create_for_education_class).with('mygroupid')
-                                              .and_raise(new_http_error(400))
+        expect(graph_service).to \
+          receive(:create_education_class_team).with('mygroupid')
+                                               .and_raise(new_http_error(400))
         expect { subject }.to raise_error(MicrosoftSync::Errors::HTTPBadRequest)
       end
     end
@@ -934,7 +879,7 @@ describe MicrosoftSync::SyncerSteps do
 
           allow(graph_service_helpers).to receive(:users_uluvs_to_aads) do |remote_attr, uluvs|
             # ULUV "abc@def.com" -> AAD "abc-mail-aad"
-            uluvs.index_with { |uluv| uluv.gsub(/@.*/, "-#{remote_attr}-aad") }.to_h
+            uluvs.map { |uluv| [uluv, uluv.gsub(/@.*/, "-#{remote_attr}-aad")] }.to_h
           end
 
           allow(MicrosoftSync::PartialMembershipDiff).to receive(:new).and_return(diff)

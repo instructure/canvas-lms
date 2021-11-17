@@ -61,7 +61,7 @@ describe Mutations::CreateOutcomeProficiency do
   end
 
   let(:good_query) do
-    <<~GQL
+    <<~QUERY
       contextType: "Account"
       contextId: #{@account.id}
       proficiencyRatings: [
@@ -72,7 +72,7 @@ describe Mutations::CreateOutcomeProficiency do
           points: 1.0
         }
       ]
-    GQL
+    QUERY
   end
 
   it "creates an outcome proficiency" do
@@ -114,21 +114,21 @@ describe Mutations::CreateOutcomeProficiency do
     end
 
     it "invalid context type" do
-      query = <<~GQL
+      query = <<~QUERY
         contextType: "Foobar"
         contextId: 1
         proficiencyRatings: []
-      GQL
+      QUERY
       result = execute_with_input(query)
       expect_error(result, 'invalid context type')
     end
 
     it "invalid context id" do
-      query = <<~GQL
+      query = <<~QUERY
         contextType: "Account"
         contextId: -1
         proficiencyRatings: []
-      GQL
+      QUERY
       result = execute_with_input(query)
       expect_error(result, 'context not found')
     end

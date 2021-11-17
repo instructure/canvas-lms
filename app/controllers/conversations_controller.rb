@@ -303,11 +303,7 @@ class ConversationsController < ApplicationController
         end
         hash[:CAN_ADD_NOTES_FOR_COURSES] = course_note_permissions
       end
-      js_env({
-               CONVERSATIONS: hash,
-               apollo_caching: Account.site_admin.feature_enabled?(:apollo_caching),
-               conversation_cache_key: Base64.encode64("#{@current_user.uuid}jamDN74lLSmfnmo74Hb6snyBnmc6q")
-             })
+      js_env(CONVERSATIONS: hash)
       if @domain_root_account.feature_enabled?(:react_inbox)
         css_bundle :canvas_inbox
         js_bundle :inbox
@@ -315,7 +311,7 @@ class ConversationsController < ApplicationController
         return
       end
 
-      render :index_new
+      return render :index_new
     end
   end
 
@@ -730,11 +726,11 @@ class ConversationsController < ApplicationController
       participants.map { |p| deleted_conversation_json(p, @current_user, session) }
     }
 
-    conversation_messages = if params['conversation_id']
-                              Conversation.find(params['conversation_id']).shard.activate { query.call }
-                            else
-                              query.call
-                            end
+    if params['conversation_id']
+      conversation_messages = Conversation.find(params['conversation_id']).shard.activate { query.call }
+    else
+      conversation_messages = query.call
+    end
 
     render :json => conversation_messages
   end
@@ -945,7 +941,7 @@ class ConversationsController < ApplicationController
   def remove_messages
     if params[:remove]
       @conversation.remove_messages(*@conversation.messages.where(id: params[:remove]).to_a)
-      if @conversation.conversation_message_participants.where.not(workflow_state: 'deleted').length == 0
+      if @conversation.conversation_message_participants.where('workflow_state <> ?', 'deleted').length == 0
         @conversation.update_attribute(:last_message_at, nil)
       end
       render :json => conversation_json(@conversation, @current_user, session)
@@ -1054,7 +1050,7 @@ class ConversationsController < ApplicationController
       content += "#{ERB::Util.h(audience_names[0...participant_list_cutoff].join(", "))} #{ERB::Util.h(others_string)}"
     end
 
-    unless audience_context_names.empty?
+    if !audience_context_names.empty?
       content += " (#{ERB::Util.h(audience_context_names.to_sentence)})"
     end
     content += "</div>"
@@ -1073,7 +1069,7 @@ class ConversationsController < ApplicationController
 
   def infer_scope
     filter_mode = (params[:filter_mode].respond_to?(:to_sym) && params[:filter_mode].to_sym) || :or
-    return render_error('filter_mode', 'invalid') unless [:or, :and].include?(filter_mode)
+    return render_error('filter_mode', 'invalid') if ![:or, :and].include?(filter_mode)
 
     @conversations_scope = case params[:scope]
                            when 'unread'
@@ -1118,7 +1114,7 @@ class ConversationsController < ApplicationController
   end
 
   def include_private_conversation_enrollments
-    if params.key? :include_private_conversation_enrollments
+    if params.has_key? :include_private_conversation_enrollments
       value_to_boolean(params[:include_private_conversation_enrollments])
     else
       api_request?

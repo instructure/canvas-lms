@@ -108,12 +108,12 @@ describe "differentiated_assignments" do
     @group_bar = @course.groups.create!(:name => 'bar group')
   end
 
-  def create_override_for_assignment(assignment)
+  def create_override_for_assignment(assignment, &block)
     ao = AssignmentOverride.new()
     ao.assignment = assignment
     ao.title = "Lorem"
     ao.workflow_state = "active"
-    yield(ao)
+    block.call(ao)
     ao.save!
     assignment.reload
   end

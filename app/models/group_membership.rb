@@ -100,7 +100,8 @@ class GroupMembership < ActiveRecord::Base
     p.dispatch :new_student_organized_group
     p.to { self.group.context.participating_admins }
     p.whenever { |record|
-      record.group.context.is_a?(Course) &&
+      record.group.context &&
+        record.group.context.is_a?(Course) &&
         record.just_created &&
         record.group.group_memberships.count == 1 &&
         record.group.student_organized?
@@ -138,7 +139,7 @@ class GroupMembership < ActiveRecord::Base
   protected :ensure_mutually_exclusive_membership
 
   def restricted_self_signup?
-    self.group.group_category&.restricted_self_signup?
+    self.group.group_category && self.group.group_category.restricted_self_signup?
   end
 
   def has_common_section_with_me?
@@ -206,9 +207,7 @@ class GroupMembership < ActiveRecord::Base
   end
   alias_method :active?, :accepted?
 
-  def self.serialization_excludes
-    [:uuid]
-  end
+  def self.serialization_excludes; [:uuid]; end
 
   # true iff 'active' and the pair of user and group's course match one of the
   # provided enrollments

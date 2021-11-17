@@ -143,7 +143,7 @@ module TextHelper
 
         # we've reached the top and found no more text nodes, break
         if n.is_a?(Nokogiri::HTML::Document)
-          break
+          break;
         else
           current = n.parent.next
         end
@@ -201,7 +201,7 @@ module TextHelper
     # which we don't want
     res = doc.at_css('body').inner_html rescue nil
     res ||= doc.root.children.first.inner_html rescue ""
-    res&.html_safe
+    res && res.html_safe
   end
 
   def self.make_subject_reply_to(subject)
@@ -231,7 +231,7 @@ module TextHelper
     inlinify = :auto
     if args.last.is_a?(Hash)
       options = args.last
-      inlinify = options.delete(:inlinify) if options.key?(:inlinify)
+      inlinify = options.delete(:inlinify) if options.has_key?(:inlinify)
       options.each_pair do |key, value|
         next unless value.is_a?(String) && !value.is_a?(MarkdownSafeBuffer) && !value.is_a?(ActiveSupport::SafeBuffer)
         next if key == :wrapper

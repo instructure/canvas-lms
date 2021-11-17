@@ -33,7 +33,7 @@ describe SIS::CSV::CourseImporter do
     )
     expect(Course.count).to eq before_count + 1
 
-    errors = importer.errors.map(&:last)
+    errors = importer.errors.map { |r| r.last }
     expect(errors).to eq ["No course_id given for a course",
                           "Improper status \"inactive\" for course C003",
                           "No short_name given for course C004",
@@ -56,7 +56,7 @@ describe SIS::CSV::CourseImporter do
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,VERY_INVALID_ACCOUNT,,active"
     )
-    errors = importer.errors.map(&:last)
+    errors = importer.errors.map { |r| r.last }
     expect(errors).to eq ["Account not found \"VERY_INVALID_ACCOUNT\" for course test_1"]
   end
 
@@ -632,9 +632,9 @@ describe SIS::CSV::CourseImporter do
       "test_2,TC 102,Test Course 102,,,active,blended",
       "test_3,TC 103,Test Course 103,,,active,on_campus"
     )
-    expect(Course.find_by(sis_source_id: 'test_1').course_format).to eq 'online'
-    expect(Course.find_by(sis_source_id: 'test_2').course_format).to eq 'blended'
-    expect(Course.find_by(sis_source_id: 'test_3').course_format).to eq 'on_campus'
+    expect(Course.find_by_sis_source_id('test_1').course_format).to eq 'online'
+    expect(Course.find_by_sis_source_id('test_2').course_format).to eq 'blended'
+    expect(Course.find_by_sis_source_id('test_3').course_format).to eq 'on_campus'
 
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status,course_format",
@@ -642,15 +642,15 @@ describe SIS::CSV::CourseImporter do
       "test_2,TC 102,Test Course 102,,,active,\"\"",
       "test_3,TC 103,Test Course 103,,,active,blended"
     )
-    expect(Course.find_by(sis_source_id: 'test_1').course_format).not_to be_present
-    expect(Course.find_by(sis_source_id: 'test_2').course_format).not_to be_present
-    expect(Course.find_by(sis_source_id: 'test_3').course_format).to eq 'blended'
+    expect(Course.find_by_sis_source_id('test_1').course_format).not_to be_present
+    expect(Course.find_by_sis_source_id('test_2').course_format).not_to be_present
+    expect(Course.find_by_sis_source_id('test_3').course_format).to eq 'blended'
 
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_3,TC 103,Test Course 103,,,active"
     )
-    expect(Course.find_by(sis_source_id: 'test_3').course_format).to eq 'blended'
+    expect(Course.find_by_sis_source_id('test_3').course_format).to eq 'blended'
   end
 
   it 'rejects invalid course_format' do

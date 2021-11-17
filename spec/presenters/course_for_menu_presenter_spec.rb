@@ -93,17 +93,17 @@ describe CourseForMenuPresenter do
 
     it 'sets the published value' do
       cs_presenter = CourseForMenuPresenter.new(course, user, account)
-      expect(cs_presenter.to_h).to have_key(:published)
+      expect(cs_presenter.to_h.key?(:published)).to eq true
     end
 
     it 'sets additional keys' do
       cs_presenter = CourseForMenuPresenter.new(course, user, account)
       h = cs_presenter.to_h
-      expect(h).to have_key(:published)
-      expect(h).to have_key(:canChangeCoursePublishState)
-      expect(h).to have_key(:defaultView)
-      expect(h).to have_key(:pagesUrl)
-      expect(h).to have_key(:frontPageTitle)
+      expect(h.key?(:published)).to eq true
+      expect(h.key?(:canChangeCoursePublishState)).to eq true
+      expect(h.key?(:defaultView)).to eq true
+      expect(h.key?(:pagesUrl)).to eq true
+      expect(h.key?(:frontPageTitle)).to eq true
     end
 
     context 'isK5Subject' do
@@ -173,7 +173,7 @@ describe CourseForMenuPresenter do
 
         cs_presenter = CourseForMenuPresenter.new(course2, user, account)
         h = cs_presenter.to_h
-        expect(h).to have_key(:published)
+        expect(h.key?(:published)).to eq true
       end
     end
   end

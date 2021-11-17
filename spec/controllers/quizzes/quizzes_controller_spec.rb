@@ -348,7 +348,7 @@ describe Quizzes::QuizzesController do
           expect(controller.js_env[:QUIZZES][:assignment]).not_to be_nil
           expect(controller.js_env[:QUIZZES][:assignment].count).to eq(2)
           expect(
-            controller.js_env[:QUIZZES][:assignment].pluck(:id)
+            controller.js_env[:QUIZZES][:assignment].map { |x| x[:id] }
           ).to contain_exactly(course_quizzes[1].id, course_assignments[3].id)
         end
       end
@@ -834,9 +834,10 @@ describe Quizzes::QuizzesController do
     context 'student_filters' do
       before do
         user_session(@teacher)
-        5.times do |i|
+        5.times.map do |i|
           name = "#{(i + 'a'.ord).chr}_student"
           course_with_student(name: name, course: @course)
+          @student
         end
       end
 

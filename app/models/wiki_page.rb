@@ -27,8 +27,8 @@ class WikiPage < ActiveRecord::Base
   attr_readonly :wiki_id
   attr_accessor :saved_by
 
-  validates :body, length: { :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true }
-  validates :wiki_id, presence: true
+  validates_length_of :body, :maximum => maximum_long_text_length, :allow_nil => true, :allow_blank => true
+  validates_presence_of :wiki_id
   include Canvas::SoftDeletable
   include HasContentTags
   include CopyAuthorizedLinks
@@ -127,10 +127,7 @@ class WikiPage < ActiveRecord::Base
 
     if self.title == "Front Page" && self.new_record?
       baddies = self.context.wiki_pages.not_deleted.where(title: "Front Page").select { |p| p.url != "front-page" }
-      baddies.each { |p|
-        p.title = to_cased_title.call(p.url)
-        p.save_without_broadcasting!
-      }
+      baddies.each { |p| p.title = to_cased_title.call(p.url); p.save_without_broadcasting! }
     end
     if self.context.wiki_pages.not_deleted.where(title: self.title).where.not(:id => self.id).first
       real_title = self.title.gsub(/-(\d*)\z/, '') # remove any "-#" at the end
@@ -376,12 +373,12 @@ class WikiPage < ActiveRecord::Base
 
   def participants
     res = []
-    if context&.available?
-      res += if !self.active?
-               context.participating_admins
-             else
-               context.participants(by_date: true)
-             end
+    if context && context.available?
+      if !self.active?
+        res += context.participating_admins
+      else
+        res += context.participants(by_date: true)
+      end
     end
     res.flatten.uniq
   end
@@ -406,7 +403,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   def user_name
-    user&.name || t('unknown_user_name', "Unknown")
+    (user && user.name) || t('unknown_user_name', "Unknown")
   end
 
   def to_param
@@ -458,7 +455,7 @@ class WikiPage < ActiveRecord::Base
     end
     # if this works without throwing another error, we've
     # cleaned up the yaml successfully
-    YAML.load(new_string)
+    YAML::load(new_string)
     new_string
   end
 
@@ -475,7 +472,7 @@ class WikiPage < ActiveRecord::Base
     opts_with_default = default_opts.merge(opts)
     result = WikiPage.new({
                             :title =>
-                              opts_with_default[:copy_title] || get_copy_title(self, t("Copy"), self.title),
+                              opts_with_default[:copy_title] ? opts_with_default[:copy_title] : get_copy_title(self, t("Copy"), self.title),
                             :wiki_id => self.wiki_id,
                             :context_id => self.context_id,
                             :context_type => self.context_type,
@@ -500,13 +497,13 @@ class WikiPage < ActiveRecord::Base
   end
 
   def initialize_wiki_page(user)
-    self.workflow_state = if wiki.grants_right?(user, :publish_page)
-                            # Leave the page unpublished if the user is allowed to publish it later
-                            'unpublished'
-                          else
-                            # If they aren't, publish it automatically
-                            'active'
-                          end
+    if wiki.grants_right?(user, :publish_page)
+      # Leave the page unpublished if the user is allowed to publish it later
+      self.workflow_state = 'unpublished'
+    else
+      # If they aren't, publish it automatically
+      self.workflow_state = 'active'
+    end
 
     self.editing_roles = (context.default_wiki_editing_roles rescue nil) || default_roles
 

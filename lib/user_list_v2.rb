@@ -148,7 +148,7 @@ class UserListV2
   def add_additional_data_for_duplicates
     return unless @duplicate_results.any?
 
-    duplicate_user_ids = @duplicate_results.map { |set| set.pluck(:user_id) }.flatten.uniq
+    duplicate_user_ids = @duplicate_results.map { |set| set.map { |h| h[:user_id] } }.flatten.uniq
     user_map = User.where(:id => duplicate_user_ids).preload(:pseudonyms).to_a.index_by(&:id)
 
     @duplicate_results.each do |set|
@@ -196,7 +196,7 @@ class UserListV2
         Pseudonym.associated_shards_for_column(:integration_id, address)
     end
 
-    ids = @addresses.pluck(:address)
+    ids = @addresses.map { |a| a[:address] }
     search_for_results(restricted_shards) do |account_ids|
       rows = Pseudonym.active.where(:account_id => account_ids, :sis_user_id => ids).joins(:user, :account)
                       .pluck(:sis_user_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
@@ -250,14 +250,14 @@ class UserListV2
              .where("LOWER(path) IN (?)", email_paths)
              .to_a
 
-      ccs.filter_map do |cc|
+      ccs.map do |cc|
         next unless (p = SisPseudonym.for(cc.user, @root_account, type: :trusted, require_sis: false))
 
         path = cc.path
         # replace the actual path with the original address for SMS
         path = sms_path_header_map[path.split("@").first] if cc.path_type == 'sms'
         [path, cc.user_id, cc.user.uuid, p.account_id, cc.user.name, p.account.name]
-      end
+      end.compact
     end
     @lowercase = true
   end

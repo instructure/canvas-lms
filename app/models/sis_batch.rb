@@ -39,8 +39,8 @@ class SisBatch < ActiveRecord::Base
            dependent: :destroy,
            inverse_of: :course
 
-  validates :account_id, :workflow_state, presence: true
-  validates :diffing_data_set_identifier, length: { maximum: 128 }
+  validates_presence_of :account_id, :workflow_state
+  validates_length_of :diffing_data_set_identifier, maximum: 128
 
   attr_accessor :zip_path
 
@@ -276,7 +276,7 @@ class SisBatch < ActiveRecord::Base
     return true if val == self.progress
 
     self.progress = val
-    state = SisBatch.connection.select_value(<<~SQL.squish)
+    state = SisBatch.connection.select_value(<<~SQL)
       UPDATE #{SisBatch.quoted_table_name} SET progress=#{val} WHERE id=#{self.id} RETURNING workflow_state
     SQL
     raise SisBatch::Aborted if state == 'aborted'
@@ -372,11 +372,11 @@ class SisBatch < ActiveRecord::Base
   end
 
   def download_zip
-    @data_file = if self.data[:file_path]
-                   File.open(self.data[:file_path], 'rb')
-                 else
-                   self.attachment.open(:need_local_file => true)
-                 end
+    if self.data[:file_path]
+      @data_file = File.open(self.data[:file_path], 'rb')
+    else
+      @data_file = self.attachment.open(:need_local_file => true)
+    end
     @data_file
   end
 
@@ -643,7 +643,7 @@ class SisBatch < ActiveRecord::Base
       row = remove_non_batch_sections(sections, count, row) if sections
       remove_non_batch_courses(courses, count, row) if courses
     rescue SisBatch::Aborted
-      self.reload
+      return self.reload
     end
   end
 
@@ -916,7 +916,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_sql(type, data)
-    <<~SQL.squish
+    <<~SQL
       UPDATE #{type.constantize.quoted_table_name} AS t
         SET workflow_state = x.workflow_state,
             updated_at = NOW()

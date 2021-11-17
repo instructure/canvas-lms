@@ -37,7 +37,7 @@ module Lti
     end
 
     def app_definitions(collection, opts = {})
-      collection.filter_map do |o|
+      collection.map do |o|
         case o
         when ContextExternalTool
           hash = external_tool_definition(o)
@@ -48,7 +48,7 @@ module Lti
         when ToolProxy
           tool_proxy_definition(o)
         end
-      end
+      end.compact
     end
 
     private

@@ -41,7 +41,7 @@ module RubricContext
         end
       end
 
-      nil
+      return nil
     end
 
     def available_rubrics

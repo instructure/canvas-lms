@@ -86,11 +86,11 @@ module AuthenticationMethods
       # these will happen for some configurations (no consul)
       # and for some normal use cases (old token, access token),
       # so we can return and move on
-      nil
+      return
     end
   end
 
-  ALLOWED_SCOPE_INCLUDES = %w{uuid}.freeze
+  ALLOWED_SCOPE_INCLUDES = %w{uuid}
 
   def filter_includes(key)
     # no funny business
@@ -224,11 +224,11 @@ module AuthenticationMethods
         return redirect_to(login_url(:needs_cookies => '1'))
       end
 
-      @current_user = @current_pseudonym&.user
+      @current_user = @current_pseudonym && @current_pseudonym.user
     end
 
     logger.info "[AUTH] inital load: pseud -> #{@current_pseudonym&.id}, user -> #{@current_user&.id}"
-    if @current_user&.unavailable?
+    if @current_user && @current_user.unavailable?
       logger.info "[AUTH] Invalid request: User is currently UNAVAILABLE"
       @current_pseudonym = nil
       @current_user = nil
@@ -241,9 +241,9 @@ module AuthenticationMethods
       request_become_user = nil
       if params[:become_user_id]
         request_become_user = User.where(id: params[:become_user_id]).first
-      elsif params.key?('me')
+      elsif params.keys.include?('me')
         request_become_user = @current_user
-      elsif params.key?('become_teacher')
+      elsif params.keys.include?('become_teacher')
         course = Course.find(params[:course_id] || params[:id]) rescue nil
         teacher = course.teachers.first if course
         if teacher
@@ -251,7 +251,7 @@ module AuthenticationMethods
         else
           flash[:error] = I18n.t('lib.auth.errors.teacher_not_found', "No teacher found")
         end
-      elsif params.key?('become_student')
+      elsif params.keys.include?('become_student')
         course = Course.find(params[:course_id] || params[:id]) rescue nil
         student = course.students.first if course
         if student
@@ -322,7 +322,7 @@ module AuthenticationMethods
     if @authenticated_with_jwt
       render(
         json: { error: "cannot generate a JWT when authorized by a JWT" },
-        status: :forbidden
+        status: 403
       )
     end
   end
@@ -336,9 +336,9 @@ module AuthenticationMethods
       return nil
     end
     return nil unless uri.path && uri.path[0] == '/'
-    return "#{request.protocol}#{request.host_with_port}#{uri.path.sub(%r{/download$}, '')}" if %r{/files/(\d+~)?\d+/download$}.match?(uri.path)
+    return "#{request.protocol}#{request.host_with_port}#{uri.path.sub(%r{/download$}, '')}" if uri.path =~ %r{/files/(\d+~)?\d+/download$}
 
-    "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
+    return "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
   end
 
   def return_to(url, fallback)

@@ -28,7 +28,7 @@ module Messages
     end
 
     def self.log(*args)
-      logger&.info(*args)
+      logger.info(*args) if logger
     end
 
     def self.processed?

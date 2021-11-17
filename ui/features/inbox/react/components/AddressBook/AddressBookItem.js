@@ -30,19 +30,19 @@ export const AddressBookItem = ({
   iconAfter,
   isSelected,
   hasPopup,
-  onSelect,
-  onHover
+  onSelect
 }) => {
+  const [isHover, setHover] = useState(false)
   return (
     <View
       as="div"
-      background={isSelected ? 'brand' : null}
+      background={isHover || isSelected ? 'brand' : null}
       padding="xx-small"
       onMouseEnter={() => {
-        onHover(true)
+        setHover(true)
       }}
       onMouseLeave={() => {
-        onHover(false)
+        setHover(false)
       }}
     >
       <li
@@ -53,7 +53,7 @@ export const AddressBookItem = ({
         onMouseDown={() => {
           onSelect()
         }}
-        data-selected={isSelected}
+        data-selected={isSelected || isHover}
       >
         <Flex as="div" width="100%" margin="xxx-small none xxx-small xxx-small">
           {iconBefore && (
@@ -63,7 +63,7 @@ export const AddressBookItem = ({
           )}
           <Flex.Item align="center" shouldGrow shouldShrink>
             <TruncateText>
-              <Text color={isSelected ? 'primary-inverse' : null}>{children}</Text>
+              <Text color={isHover || isSelected ? 'primary-inverse' : null}>{children}</Text>
             </TruncateText>
           </Flex.Item>
           {iconAfter && (
@@ -105,11 +105,7 @@ AddressBookItem.propTypes = {
   /**
    * Function to be returned on click
    */
-  onSelect: PropTypes.func,
-  /**
-   * Function to execute on item hover
-   */
-  onHover: PropTypes.func
+  onSelect: PropTypes.func
 }
 
 export default AddressBookItem

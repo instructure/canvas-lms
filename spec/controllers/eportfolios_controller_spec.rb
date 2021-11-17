@@ -99,10 +99,7 @@ describe EportfoliosController do
     end
 
     it "prevents creation for unverified users if account requires it" do
-      Account.default.tap { |a|
-        a.settings[:require_confirmed_email] = true
-        a.save!
-      }
+      Account.default.tap { |a| a.settings[:require_confirmed_email] = true; a.save! }
 
       user_session(@user)
       post 'create', params: { :eportfolio => { :name => "some portfolio" } }

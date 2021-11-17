@@ -22,7 +22,6 @@ require 'csv'
 
 module Api::V1::OutcomeResults
   include Api::V1::Outcome
-  include Outcomes::OutcomeFriendlyDescriptionResolver
 
   # Public: Serializes OutcomeResults
   #
@@ -76,28 +75,15 @@ module Api::V1::OutcomeResults
     outcomes.map(&:id).each_slice(100) do |outcome_ids|
       assessed_outcomes += LearningOutcomeResult.active.distinct.where(learning_outcome_id: outcome_ids).pluck(:learning_outcome_id)
     end
-    friendly_descriptions = {}
-    if context.root_account.feature_enabled?(:improved_outcomes_management) && Account.site_admin.feature_enabled?(:outcomes_friendly_description)
-      account = @context.is_a?(Account) ? @context : @context.account
-      course = @context.is_a?(Course) ? @context : nil
-
-      friendly_descriptions_array = outcomes.map(&:id).each_slice(100).flat_map do |outcome_ids|
-        resolve_friendly_descriptions(account, course, outcome_ids).map { |description| [description.learning_outcome_id, description.description] }
-      end
-
-      friendly_descriptions = friendly_descriptions_array.to_h
-    end
-
     outcomes.map do |o|
       hash = outcome_json(
         o,
         @current_user, session,
         assessed_outcomes: assessed_outcomes,
         rating_percents: percents[o.id],
-        context: context,
-        friendly_descriptions: friendly_descriptions
+        context: context
       )
-      hash[:alignments] = alignment_asset_string_map[o.id]
+      hash.merge!(alignments: alignment_asset_string_map[o.id])
       hash
     end
   end
@@ -239,7 +225,7 @@ module Api::V1::OutcomeResults
       row << I18n.t(:student_id, 'Student ID')
       outcomes.each do |outcome|
         pathParts = outcome_paths.find { |x| x[:id] == outcome.id }[:parts]
-        path = pathParts.pluck(:name).join(' > ')
+        path = pathParts.map { |x| x[:name] }.join(' > ')
         row << I18n.t(:outcome_path_result, "%{path} result", :path => path)
         row << I18n.t(:outcome_path_mastery_points, "%{path} mastery points", :path => path)
       end

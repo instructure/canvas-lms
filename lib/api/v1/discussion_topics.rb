@@ -50,7 +50,7 @@ module Api::V1::DiscussionTopics
 
     fields_with_id = fields.unshift(:id)
     root_topics_array = DiscussionTopic.select(fields_with_id).find(root_topic_ids)
-    root_topics_array.index_by(&:id)
+    root_topics_array.map { |root_topic| [root_topic.id, root_topic] }.to_h
   end
 
   # Public: Serialize an array of DiscussionTopic objects for returning as JSON.
@@ -189,7 +189,7 @@ module Api::V1::DiscussionTopics
     fields[:topic_children] = child_topic_data.map(&:first)
     fields[:group_topic_children] = child_topic_data.map { |id, group_id| { id: id, group_id: group_id } }
 
-    fields[:context_code] = topic.context_code if opts[:include_context_code]
+    fields.merge!({ context_code: topic.context_code }) if opts[:include_context_code]
 
     locked_json(fields, topic, user, 'topic', check_policies: true, deep_check_if_needed: true)
     can_view = !fields[:lock_info].is_a?(Hash) || fields[:lock_info][:can_view]
@@ -245,7 +245,7 @@ module Api::V1::DiscussionTopics
     allowed_fields  = %w{id created_at updated_at parent_id rating_count rating_sum}
     allowed_methods = []
     allowed_fields << 'editor_id' if entry.deleted? || entry.editor_id
-    allowed_fields << 'user_id'   unless entry.deleted?
+    allowed_fields << 'user_id'   if !entry.deleted?
     allowed_methods << 'user_name' if !entry.deleted? && includes.include?(:user_name)
 
     json = api_json(entry, user, session, only: allowed_fields, methods: allowed_methods)
@@ -276,10 +276,7 @@ module Api::V1::DiscussionTopics
     return {} unless entry.attachment
 
     url_options = {}
-    if respond_to?(:use_placeholder_host?) && use_placeholder_host?
-      url_options[:host] = Api::PLACEHOLDER_HOST
-      url_options[:protocol] = Api::PLACEHOLDER_PROTOCOL
-    end unless respond_to?(:request)
+    url_options.merge!(host: Api::PLACEHOLDER_HOST, protocol: Api::PLACEHOLDER_PROTOCOL) if respond_to?(:use_placeholder_host?) && use_placeholder_host? unless respond_to?(:request)
     json = { attachment: attachment_json(entry.attachment, user, url_options) }
     json[:attachments] = [json[:attachment]]
 

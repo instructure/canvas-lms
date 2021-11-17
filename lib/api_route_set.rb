@@ -125,8 +125,8 @@ class ApiRouteSet
     # unfortunately, this means that api v1 can't match a sis id that ends with
     # .json -- but see the api docs for info on sending hex-encoded sis ids,
     # which allows any string.
-    ID_REGEX = %r{(?:[^/?.]|\.(?!json(?:\z|[/?])))+}.freeze
-    ID_PARAM = %r{^:(id|[\w]+_id)$}.freeze
+    ID_REGEX = %r{(?:[^/?.]|\.(?!json(?:\z|[/?])))+}
+    ID_PARAM = %r{^:(id|[\w]+_id)$}
 
     def self.prefix
       "/api/v1"
@@ -138,7 +138,7 @@ class ApiRouteSet
 
     def route(method, path, opts)
       opts[:constraints] ||= {}
-      path.split('/').each { |segment| opts[:constraints][segment[1..].to_sym] = ID_REGEX if segment.match(ID_PARAM) }
+      path.split('/').each { |segment| opts[:constraints][segment[1..-1].to_sym] = ID_REGEX if segment.match(ID_PARAM) }
       super(method, path, opts)
     end
   end

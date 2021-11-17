@@ -152,7 +152,7 @@ class MigrationIssuesController < ApplicationController
         render :json => issue.errors, :status => :bad_request
       end
     else
-      render(:json => { :message => t('errors.valid_workflow_state', "Must send a valid workflow state") }, :status => :forbidden)
+      render(:json => { :message => t('errors.valid_workflow_state', "Must send a valid workflow state") }, :status => 403)
     end
   end
 
@@ -160,6 +160,6 @@ class MigrationIssuesController < ApplicationController
 
   def require_content_migration
     @content_migration = @context.content_migrations.find(params[:content_migration_id])
-    authorized_action(@context, @current_user, :manage_content)
+    return authorized_action(@context, @current_user, :manage_content)
   end
 end

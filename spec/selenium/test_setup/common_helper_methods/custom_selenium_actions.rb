@@ -268,7 +268,8 @@ module CustomSeleniumActions
 
   def first_selected_option(select_element)
     select = Selenium::WebDriver::Support::Select.new(select_element)
-    select.first_selected_option
+    option = select.first_selected_option
+    option
   end
 
   def dialog_for(node)
@@ -719,17 +720,17 @@ module CustomSeleniumActions
     driver.execute_script("$(#{selector.to_json}).scrollTo(#{target.to_json})")
   end
 
-  def stale_element_protection(&block)
+  def stale_element_protection
     element = yield
-    element.finder_proc = proc { disable_implicit_wait(&block) }
+    element.finder_proc = proc { disable_implicit_wait { yield } }
     element
   end
 
-  def reloadable_collection(&block)
+  def reloadable_collection
     collection = yield
     SeleniumExtensions::ReloadableCollection.new(
       collection,
-      proc { disable_implicit_wait(&block) }
+      proc { disable_implicit_wait { yield } }
     )
   end
 end

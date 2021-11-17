@@ -19,7 +19,7 @@
 
 module Quizzes
   class QuizStatisticsSerializer < Canvas::APISerializer
-    SubmissionStatisticsExtractor = /^submission_(.+)/.freeze
+    SubmissionStatisticsExtractor = /^submission_(.+)/
 
     # Utilizes both Student and Item analysis to generate a compound document of
     # quiz statistics.

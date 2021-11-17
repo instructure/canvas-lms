@@ -30,8 +30,7 @@ import {pacePlanActions} from './pace_plans'
 export enum Constants {
   START_AUTO_SAVING = 'UI/START_AUTO_SAVING',
   AUTO_SAVE_COMPLETED = 'UI/AUTO_SAVE_COMPLETED',
-  SET_CATEGORY_ERROR = 'UI/SET_CATEGORY_ERROR',
-  CLEAR_CATEGORY_ERROR = 'UI/CLEAR_CATEGORY_ERROR',
+  SET_ERROR_MESSAGE = 'UI/SET_ERROR_MESSAGE',
   TOGGLE_DIVIDE_INTO_WEEKS = 'UI/TOGGLE_DIVIDE_INTO_WEEKS',
   TOGGLE_SHOW_PROJECTIONS = 'UI/TOGGLE_SHOW_PROJECTIONS',
   SET_SELECTED_PLAN_CONTEXT = 'UI/SET_SELECTED_PLAN_CONTEXT',
@@ -46,9 +45,7 @@ export enum Constants {
 export const regularActions = {
   startAutoSave: () => createAction(Constants.START_AUTO_SAVING),
   autoSaveCompleted: () => createAction(Constants.AUTO_SAVE_COMPLETED),
-  setCategoryError: (category: string, error?: string) =>
-    createAction(Constants.SET_CATEGORY_ERROR, {category, error: error || ''}),
-  clearCategoryError: (category: string) => createAction(Constants.CLEAR_CATEGORY_ERROR, category),
+  setErrorMessage: (message: string) => createAction(Constants.SET_ERROR_MESSAGE, message),
   toggleDivideIntoWeeks: () => createAction(Constants.TOGGLE_DIVIDE_INTO_WEEKS),
   toggleShowProjections: () => createAction(Constants.TOGGLE_SHOW_PROJECTIONS),
   showLoadingOverlay: (message: string) => createAction(Constants.SHOW_LOADING_OVERLAY, message),

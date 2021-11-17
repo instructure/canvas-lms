@@ -40,7 +40,8 @@ class GradingPeriodGroup < ActiveRecord::Base
     can :read
 
     given do |user|
-      root_account&.associated_user?(user)
+      root_account &&
+        root_account.associated_user?(user)
     end
     can :read
 
@@ -50,7 +51,8 @@ class GradingPeriodGroup < ActiveRecord::Base
     can :update and can :delete
 
     given do |user|
-      root_account&.grants_right?(user, :manage)
+      root_account &&
+        root_account.grants_right?(user, :manage)
     end
     can :create
   end
@@ -112,9 +114,9 @@ class GradingPeriodGroup < ActiveRecord::Base
       errors.add(:account_id, t("cannot be present when course_id is present"))
     elsif root_account && !root_account.root_account?
       errors.add(:account_id, t("must belong to a root account"))
-    elsif root_account&.deleted?
+    elsif root_account && root_account.deleted?
       errors.add(:account_id, t("must belong to an active root account"))
-    elsif course&.deleted?
+    elsif course && course.deleted?
       errors.add(:course_id, t("must belong to an active course"))
     end
   end

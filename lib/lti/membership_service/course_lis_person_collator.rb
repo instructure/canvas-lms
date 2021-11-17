@@ -38,7 +38,7 @@ module Lti
                       else
                         user.not_ended_enrollments.where(course: context)
                       end
-        enrollments.filter_map do |enrollment|
+        enrollments.map do |enrollment|
           case enrollment.type
           when 'TeacherEnrollment'
             ::IMS::LIS::Roles::Context::URNs::Instructor
@@ -51,7 +51,7 @@ module Lti
           when 'ObserverEnrollment'
             ::IMS::LIS::Roles::Context::URNs::Learner_NonCreditLearner
           end
-        end.uniq
+        end.compact.uniq
       end
     end
   end

@@ -51,7 +51,7 @@ class SpecFriendlyWebServer
       max_time = Time.zone.now + timeout
       while Time.zone.now < max_time
         response = HTTParty.get("http://#{bind_address}:#{port}/health_check") rescue nil
-        if response&.success?
+        if response && response.success?
           SeleniumDriverSetup.disallow_requests!
           puts " Done!"
           return
@@ -65,7 +65,7 @@ class SpecFriendlyWebServer
     end
 
     def shutdown
-      @server&.stop
+      @server.stop if @server
       @server = nil
     end
   end

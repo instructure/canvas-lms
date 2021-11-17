@@ -42,8 +42,8 @@ class ExternalContentController < ApplicationController
     @retrieved_data = {}
     if params[:service] == 'equella'
       params.each do |key, value|
-        if key.to_s.start_with?('eq_')
-          @retrieved_data[key.to_s.delete_prefix('eq_')] = value
+        if key.to_s.match(/\Aeq_/)
+          @retrieved_data[key.to_s.gsub(/\Aeq_/, "")] = value
         end
       end
     elsif params[:return_type] == 'oembed'

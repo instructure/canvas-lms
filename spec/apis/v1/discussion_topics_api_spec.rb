@@ -112,8 +112,8 @@ describe Api::V1::DiscussionTopics do
     @me.update! pronouns: "she/her"
 
     expect(
-      @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)
-    ).to have_key("user_pronouns")
+      @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil).key?("user_pronouns")
+    ).to eq true
     expect(
       @test_api.discussion_topic_api_json(@topic, @topic.context, @me, nil)["user_pronouns"]
     ).to eq "she/her"
@@ -540,7 +540,9 @@ describe DiscussionTopicsController, type: :request do
       it "only includes topics with a given scope when specified" do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
-        [@topic, @topic2, @topic3].each(&:save!)
+        [@topic, @topic2, @topic3].each do |topic|
+          topic.save!
+        end
         [@topic2, @topic3].each(&:lock!)
         @topic2.update_attribute(:pinned, true)
 
@@ -603,7 +605,7 @@ describe DiscussionTopicsController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json",
                         { controller: 'discussion_topics', action: 'index', format: 'json', course_id: @course.id.to_s })
 
-        json_topic = json.find { |t| t['group_category_id'] }
+        json_topic = json.select { |t| t['group_category_id'] }.first
 
         expect(json_topic).not_to be nil
         expect(json_topic['group_category_id']).to eq group_topic.group_category_id
@@ -2446,7 +2448,7 @@ describe DiscussionTopicsController, type: :request do
       url = +"/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all.json"
       expected_params = { :controller => 'discussion_topics_api', :action => "mark_all_#{new_state}", :format => 'json',
                           :course_id => @course.id.to_s, :topic_id => @topic.id.to_s }
-      if opts.key?(:forced)
+      if opts.has_key?(:forced)
         url << "?forced_read_state=#{opts[:forced]}"
         expected_params[:forced_read_state] = opts[:forced].to_s
       end
@@ -3005,7 +3007,7 @@ describe DiscussionTopicsController, type: :request do
     override = @assignment.assignment_overrides.build
     override.set = @section
     override.title = "extension"
-    override.due_at = 2.days.from_now
+    override.due_at = 2.day.from_now
     override.due_at_overridden = true
     override.save!
 
@@ -3328,7 +3330,7 @@ describe DiscussionTopicsController, type: :request do
     course_with_teacher(:active_all => true)
     account_admin_user(account: @course.account) # sets @admin
 
-    ann_ids_ordered_by_posted_at = Array.new(10) do |i|
+    ann_ids_ordered_by_posted_at = 10.times.map do |i|
       ann = Announcement.create!({
                                    context: @course,
                                    message: "Test Message",

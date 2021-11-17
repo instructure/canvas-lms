@@ -38,8 +38,7 @@ describe Canvas::ICU do
 
     describe ".collation_key" do
       it "returns something that's comparable" do
-        a = "a"
-        b = "b"
+        a = "a"; b = "b"
         a_prime = Canvas::ICU.collation_key(a)
         expect(a.object_id).not_to eq a_prime.object_id
         b_prime = Canvas::ICU.collation_key(b)
@@ -157,7 +156,7 @@ describe Canvas::ICU do
       end
 
       def collate(values)
-        ActiveRecord::Base.connection.select_values <<~SQL.squish
+        ActiveRecord::Base.connection.select_values <<-SQL
           SELECT col FROM ( VALUES #{values.map { |v| "(#{ActiveRecord::Base.connection.quote(v)})" }.join(", ")} ) AS s(col)
           ORDER BY #{ActiveRecord::Base.best_unicode_collation_key('col')}
         SQL

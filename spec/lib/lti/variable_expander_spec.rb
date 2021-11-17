@@ -225,7 +225,7 @@ module Lti
 
     describe '#self.expansion_keys' do
       let(:expected_keys) do
-        VariableExpander.expansions.keys.map { |c| c.to_s[1..] }
+        VariableExpander.expansions.keys.map { |c| c.to_s[1..-1] }
       end
 
       it 'includes all expansion keys' do
@@ -1301,7 +1301,7 @@ module Lti
           exp_hash = { test: '$Canvas.term.startAt' }
           variable_expander.expand_variables!(exp_hash)
 
-          unless term&.start_at
+          unless term && term.start_at
             expect(exp_hash[:test]).to eq '$Canvas.term.startAt'
           end
         end
@@ -1330,7 +1330,7 @@ module Lti
           exp_hash = { test: '$Canvas.term.name' }
           variable_expander.expand_variables!(exp_hash)
 
-          unless term&.name
+          unless term && term.name
             expect(exp_hash[:test]).to eq '$Canvas.term.name'
           end
         end
