@@ -30,7 +30,7 @@ module Api::V1::QuizQuestion
       assessment_question_id
       quiz_group_id
     )
-  }
+  }.freeze
 
   API_ALLOWED_QUESTION_DATA_OUTPUT_FIELDS = %w(
     question_name
@@ -51,7 +51,7 @@ module Api::V1::QuizQuestion
     formula_decimal_places
     matches
     matching_answer_incorrect_matches
-  )
+  ).freeze
 
   # @param [Quizzes::Quiz#quiz_data] quiz_data
   #   If you specify a quiz_data construct from a submission (or a quiz), then
@@ -146,10 +146,8 @@ module Api::V1::QuizQuestion
     # need the answer text for multiple choice - only info necessary though
     # multiple_dropdown needs blank_id
     # formula questions need variables
-    if question_data[:answers]
-      question_data[:answers].each do |record|
-        record.keep_if { |k, _| %w(id text html blank_id variables).include?(k.to_s) }
-      end
+    question_data[:answers]&.each do |record|
+      record.keep_if { |k, _| %w(id text html blank_id variables).include?(k.to_s) }
     end
 
     question_data

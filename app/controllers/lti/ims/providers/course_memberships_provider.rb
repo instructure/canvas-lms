@@ -126,7 +126,7 @@ module Lti::IMS::Providers
       end
 
       def lti_roles
-        @_lti_roles ||= enrollments.map { |e| Lti::SubstitutionsHelper::LIS_V2_LTI_ADVANTAGE_ROLE_MAP[e.class] }.compact.flatten.uniq
+        @_lti_roles ||= enrollments.filter_map { |e| Lti::SubstitutionsHelper::LIS_V2_LTI_ADVANTAGE_ROLE_MAP[e.class] }.flatten.uniq
       end
     end
 

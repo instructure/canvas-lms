@@ -73,7 +73,7 @@ module Qti
       if is_either_or
         @question[:answers].each do |a|
           split = a[:text].split(/_|\./)
-          a[:text] = split[2] =~ /true/i ? split[0] : split[1]
+          a[:text] = /true/i.match?(split[2]) ? split[0] : split[1]
         end
       end
     end
@@ -123,18 +123,18 @@ module Qti
               answer[:text] = choice.text.strip
             else
               sanitized = sanitize_html!(choice.at_css('div[class=html]') ? Nokogiri::HTML5.fragment(choice.text) : choice, true)
-              if sanitized.present? && sanitized != CGI::escapeHTML(answer[:text])
+              if sanitized.present? && sanitized != CGI.escapeHTML(answer[:text])
                 answer[:html] = sanitized
               end
             end
           end
 
           if answer[:text] == ""
-            if answer[:migration_id] =~ /true|false/i
-              answer[:text] = clear_html(answer[:migration_id])
-            else
-              answer[:text] = DEFAULT_ANSWER_TEXT
-            end
+            answer[:text] = if /true|false/i.match?(answer[:migration_id])
+                              clear_html(answer[:migration_id])
+                            else
+                              DEFAULT_ANSWER_TEXT
+                            end
           end
           if @flavor == Qti::Flavors::BBLEARN && @question[:question_type] == 'true_false_question' && choice['identifier'] =~ /true|false/i
             answer[:text] = choice['identifier']
@@ -210,7 +210,7 @@ module Qti
               migration_id = migration_id.text.strip()
 
               answer = answers_hash[migration_id]
-              answer ||= answers_hash.values.detect { |a| a[:text] && a[:text].downcase == migration_id.downcase }
+              answer ||= answers_hash.values.detect { |a| a[:text]&.casecmp?(migration_id) }
 
               if answer
                 answer[:weight] = get_response_weight(r_if)
@@ -262,16 +262,17 @@ module Qti
 
     def get_base_value(node)
       weight = AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT
-      if node['baseType'] == "float" # base_value = node.at_css('baseValue[baseType=float]')
+      case node['baseType']
+      when "float" # base_value = node.at_css('baseValue[baseType=float]')
         if node.text =~ /score\.max/i or node.text.to_f > 0
           weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
         end
-      elsif node['baseType'] == "integer" # elsif base_value = node.at_css('baseValue[baseType=integer]')
+      when "integer" # elsif base_value = node.at_css('baseValue[baseType=integer]')
         if node.text.to_i > 0
           weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
         end
-      elsif node['baseType'] == "boolean" # elsif base_value = node.at_css('baseValue[baseType=boolean]')
-        if node.text.downcase == "true"
+      when "boolean" # elsif base_value = node.at_css('baseValue[baseType=boolean]')
+        if node.text.casecmp?("true")
           weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
         end
       else

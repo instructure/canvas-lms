@@ -271,11 +271,11 @@ if Qti.migration_executable
         FileUtils.cp(fname, @copy.path)
         Zip::File.open(@copy.path) do |zf|
           zf.file.open("settings.xml", +'w') do |f|
-            f.write <<-XML
-          <settings>
-            <setting name='hasSettings'>true</setting>
-            <setting name='publishNow'>true</setting>
-          </settings>
+            f.write <<~XML
+              <settings>
+                <setting name='hasSettings'>true</setting>
+                <setting name='publishNow'>true</setting>
+              </settings>
             XML
           end
         end

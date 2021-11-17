@@ -23,13 +23,17 @@ require_relative '../file_uploads_spec_helper'
 
 class TestCourseApi
   include Api::V1::Course
-  def feeds_calendar_url(feed_code); "feed_calendar_url(#{feed_code.inspect})"; end
+  def feeds_calendar_url(feed_code)
+    "feed_calendar_url(#{feed_code.inspect})"
+  end
 
   def course_url(course, **)
     "course_url(Course.find(#{course.id}), :host => #{HostUrl.context_host(@course1)})"
   end
 
-  def api_user_content(syllabus, course); return "api_user_content(#{syllabus}, #{course.id})"; end
+  def api_user_content(syllabus, course)
+    "api_user_content(#{syllabus}, #{course.id})"
+  end
 end
 
 describe Api::V1::Course do
@@ -1446,7 +1450,10 @@ describe CoursesController, type: :request do
       end
 
       it "doesn't allow creating a published course for unverified users if account requires it" do
-        Account.default.tap { |a| a.settings[:require_confirmed_email] = true; a.save! }
+        Account.default.tap { |a|
+          a.settings[:require_confirmed_email] = true
+          a.save!
+        }
         @course.update_attribute(:workflow_state, "claimed")
 
         json = api_call(:put, @path, @params, { :offer => 1 }, {}, { :expected_status => 401 })
@@ -1921,22 +1928,31 @@ describe CoursesController, type: :request do
     end
 
     context "an authorized user (granular permissions)" do
-      it "is able to reset a course" do
+      before do
         @course.root_account.enable_feature!(:granular_permissions_manage_courses)
         @course.root_account.role_overrides.create!(
           role: teacher_role,
           permission: 'manage_courses_reset',
           enabled: true
         )
+      end
+
+      it "is able to reset a course" do
         expect(Auditors::Course).to receive(:record_reset).once
                                                           .with(@course, anything, @user, anything)
-
         json = api_call(:post, @path, @params)
         @course.reload
         expect(@course.workflow_state).to eql 'deleted'
         new_course = Course.find(json['id'])
         expect(new_course.workflow_state).to eql 'claimed'
         expect(json['workflow_state']).to eql 'unpublished'
+      end
+
+      it "is not able to reset a template course" do
+        @course.enrollments.each(&:destroy)
+        @course.update!(template: true)
+        raw_api_call(:post, @path, @params)
+        expect(response.code).to eql '401'
       end
     end
     context "an unauthorized user" do
@@ -1994,7 +2010,7 @@ describe CoursesController, type: :request do
       end
 
       it 'undeletes courses' do
-        [@course1, @course2].each { |c| c.destroy }
+        [@course1, @course2].each(&:destroy)
         expect(Auditors::Course).to receive(:record_restored).twice
         api_call(:put, @path, @params, { :event => 'undelete', :course_ids => [@course1.id, 'sis_course_id:course2'] })
         run_jobs
@@ -3480,8 +3496,8 @@ describe CoursesController, type: :request do
         json = api_call(:get, "/api/v1/courses/#{@course1.id}/users.json",
                         { :controller => 'courses', :action => 'users', :course_id => @course1.to_param, :format => 'json' },
                         :enrollment_type => 'student')
-        expect(json.map { |u| u['sis_user_id'] }.compact.sort).to eq ['user2', 'user3'].sort
-        expect(json.map { |u| u['login_id'] }.compact.sort).to eq ['nobody2@example.com', 'nobody3@example.com'].sort
+        expect(json.filter_map { |u| u['sis_user_id'] }.sort).to eq ['user2', 'user3'].sort
+        expect(json.filter_map { |u| u['login_id'] }.sort).to eq ['nobody2@example.com', 'nobody3@example.com'].sort
       end
 
       it "includes user sis id and login id if site admin" do
@@ -3611,7 +3627,7 @@ describe CoursesController, type: :request do
 
       it "allows jumping to a user's page based on id" do
         @other_section = @course1.course_sections.create!
-        students = create_users(5.times.map { |i| { name: "User #{i + 1}", sortable_name: "#{i + 1}, User" } }, return_type: :record)
+        students = create_users(Array.new(5) { |i| { name: "User #{i + 1}", sortable_name: "#{i + 1}, User" } }, return_type: :record)
         create_enrollments(@course1, students)
         create_enrollments(@course1, students, section_id: @other_section.id)
         @target = students[4]
@@ -4223,15 +4239,21 @@ describe CoursesController, type: :request do
       @student2 = student_in_course(:active_all => true, :name => "Leonard Hofstadter").user
       @student3 = student_in_course(:active_all => true, :name => "Howard Wolowitz").user
       pseudonym(@student1) # no login info
-      pseudonym(@student2).tap { |p| p.current_login_at = 1.days.ago; p.save! }
-      pseudonym(@student3).tap { |p| p.current_login_at = 2.days.ago; p.save! }
+      pseudonym(@student2).tap { |p|
+        p.current_login_at = 1.day.ago
+        p.save!
+      }
+      pseudonym(@student3).tap { |p|
+        p.current_login_at = 2.days.ago
+        p.save!
+      }
     end
 
     it "includes the last_login information" do
       @user = @teacher
       json = api_call(:get, "/api/v1/courses/#{@course.id}/recent_students",
                       { :controller => 'courses', :action => 'recent_students', :course_id => @course.to_param, :format => 'json' })
-      expect(json.map { |el| el['last_login'] }.compact).not_to be_empty
+      expect(json.filter_map { |el| el['last_login'] }).not_to be_empty
     end
 
     it "sorts by last_login" do
@@ -4361,10 +4383,10 @@ describe CoursesController, type: :request do
   end
 end
 
-def each_copy_option
+def each_copy_option(&block)
   [[:assignments, :assignments], [:external_tools, :context_external_tools], [:files, :attachments],
    [:topics, :discussion_topics], [:calendar_events, :calendar_events], [:quizzes, :quizzes],
-   [:modules, :context_modules], [:outcomes, :created_learning_outcomes]].each { |o| yield o }
+   [:modules, :context_modules], [:outcomes, :created_learning_outcomes]].each(&block)
 end
 
 describe ContentImportsController, type: :request do

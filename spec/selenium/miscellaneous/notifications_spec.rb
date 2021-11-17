@@ -28,7 +28,7 @@ describe "Notifications" do
 
   context "admin" do
     before :once do
-      Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+      Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
       course_with_student(active_all: true)
       setup_comm_channel(@student, 'student@example.com')
       @teacher = user_with_pseudonym(username: 'teacher@example.com', active_all: 1)

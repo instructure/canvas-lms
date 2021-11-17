@@ -103,7 +103,7 @@ export const AddressBook = ({
       textInputRef?.current?.setAttribute('disabled', true)
       setIsMenuOpen(false)
     }
-  }, [selectedUsers, limitTagCount])
+  }, [selectedUsers, limitTagCount, textInputRef])
 
   // Provide selected IDs via callabck
   useEffect(() => {
@@ -122,11 +122,17 @@ export const AddressBook = ({
         iconBefore={isBackButton ? <IconArrowOpenStartLine /> : null}
         key={`address-book-item-${user.id}`}
         as="div"
-        isSelected={selectedItem?.id === user.id && focusType === KEYBOARD_FOCUS_TYPE}
+        isSelected={selectedItem?.id === user.id}
         hasPopup={!!isCourse}
         id={`address-book-menu-item-${user.id}`}
         onSelect={() => {
           selectHandler(user, isCourse, isBackButton)
+        }}
+        onHover={() => {
+          if (focusType !== MOUSE_FOCUS_TYPE) {
+            setFocusType(MOUSE_FOCUS_TYPE)
+          }
+          setSelectedItem(user)
         }}
       >
         {user.name}
@@ -213,7 +219,7 @@ export const AddressBook = ({
   const renderedSelectedTags = useMemo(() => {
     return selectedUsers.map(user => {
       return (
-        <span data-testid="address-book-tag">
+        <span data-testid="address-book-tag" key={`address-book-tag-${user.id}`}>
           <Tag
             text={
               <AccessibleContent alt={`${I18n.t('Remove')} ${user.name}`}>
@@ -332,35 +338,63 @@ export const AddressBook = ({
       <div ref={componentViewRef}>
         <Flex>
           <Flex.Item padding="none xxx-small none none" shouldGrow shouldShrink>
-            <TextInput
-              renderLabel={
-                <ScreenReaderContent>{I18n.t('Address Book Input')}</ScreenReaderContent>
+            <Popover
+              on="focus"
+              offsetY={4}
+              placement="bottom start"
+              isShowingContent={isMenuOpen}
+              renderTrigger={
+                <TextInput
+                  renderLabel={
+                    <ScreenReaderContent>{I18n.t('Address Book Input')}</ScreenReaderContent>
+                  }
+                  renderBeforeInput={selectedUsers.length === 0 ? null : renderedSelectedTags}
+                  placeholder="Test"
+                  onFocus={() => {
+                    if (!isLimitReached) {
+                      setIsMenuOpen(true)
+                    }
+                  }}
+                  onBlur={() => setIsMenuOpen(false)}
+                  onKeyDown={inputKeyHandler}
+                  aria-expanded={isMenuOpen}
+                  aria-activedescendant={`address-book-menu-item-${selectedItem?.id}`}
+                  type="search"
+                  aria-owns={popoverInstanceId.current}
+                  aria-label={I18n.t('Address Book')}
+                  aria-autocomplete="list"
+                  inputRef={ref => {
+                    textInputRef.current = ref
+                  }}
+                  value={inputValue}
+                  onChange={e => {
+                    setInputValue(e.target.value)
+                    onTextChange(e.target.value)
+                  }}
+                  data-testid="address-book-input"
+                />
               }
-              renderBeforeInput={selectedUsers.length === 0 ? null : renderedSelectedTags}
-              placeholder="Test"
-              onFocus={() => {
-                if (!isLimitReached) {
-                  setIsMenuOpen(true)
-                }
-              }}
-              onBlur={() => setIsMenuOpen(false)}
-              onKeyDown={inputKeyHandler}
-              aria-expanded={isMenuOpen}
-              aria-activedescendant={`address-book-menu-item-${selectedItem?.id}`}
-              type="search"
-              aria-owns={popoverInstanceId.current}
-              aria-label={I18n.t('Address Book')}
-              aria-autocomplete="list"
-              inputRef={ref => {
-                textInputRef.current = ref
-              }}
-              value={inputValue}
-              onChange={e => {
-                setInputValue(e.target.value)
-                onTextChange(e.target.value)
-              }}
-              data-testid="address-book-input"
-            />
+            >
+              <View as="div" width={popoverWidth} maxHeight="80vh" overflowY="auto">
+                {isLoading && renderLoading()}
+                {!isLoading && (
+                  <ul
+                    role="menu"
+                    aria-label={I18n.t('Address Book Menu')}
+                    id={popoverInstanceId.current}
+                    style={{
+                      paddingInlineStart: '0px',
+                      marginBlockStart: '0px',
+                      marginBlockEnd: '0px',
+                      margin: '0'
+                    }}
+                    data-testid="address-book-popover"
+                  >
+                    {renderedItems}
+                  </ul>
+                )}
+              </View>
+            </Popover>
           </Flex.Item>
           <Flex.Item>
             <IconButton
@@ -375,37 +409,6 @@ export const AddressBook = ({
             </IconButton>
           </Flex.Item>
         </Flex>
-
-        <Popover
-          on="focus"
-          placement="bottom start"
-          offsetY={-14}
-          offsetX={-14}
-          isShowingContent={isMenuOpen}
-        >
-          <View as="div" width={popoverWidth}>
-            {isLoading && renderLoading()}
-            {!isLoading && (
-              <ul
-                role="menu"
-                aria-label={I18n.t('Address Book Menu')}
-                id={popoverInstanceId.current}
-                style={{
-                  paddingInlineStart: '0px',
-                  marginBlockStart: '0px',
-                  marginBlockEnd: '0px',
-                  margin: '0'
-                }}
-                data-testid="address-book-popover"
-                onMouseEnter={() => {
-                  setFocusType(MOUSE_FOCUS_TYPE)
-                }}
-              >
-                {renderedItems}
-              </ul>
-            )}
-          </View>
-        </Popover>
       </div>
     </View>
   )

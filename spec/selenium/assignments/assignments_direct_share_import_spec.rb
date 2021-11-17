@@ -62,7 +62,8 @@ describe 'assignments' do
 
   let(:copy_assignment_to_course2) {
     course_search_dropdown.click
-    wait_for_ajaximations
+    course_search_dropdown.send_keys('course')
+    wait_for_search_dropdown
     course_dropdown_item(@course2.name).click
     copy_button.click
     run_jobs
@@ -70,6 +71,8 @@ describe 'assignments' do
 
   let(:select_course) {
     course_search_dropdown.click
+    course_search_dropdown.send_keys('course')
+    wait_for_search_dropdown
     course_dropdown_item(@course2.name).click
   }
 
@@ -83,6 +86,8 @@ describe 'assignments' do
 
   let(:select_course_in_tray) {
     course_search_dropdown.click
+    course_search_dropdown.send_keys('course')
+    wait_for_search_dropdown
     course_dropdown_item(@course2.name).click
   }
 
@@ -128,7 +133,8 @@ describe 'assignments' do
 
       it 'copy tray lists user managed courses' do
         course_search_dropdown.click
-        wait_for_ajaximations
+        course_search_dropdown.send_keys('course')
+        wait_for_search_dropdown
 
         expect(course_dropdown_list[0].text).to include 'First Course1'
         expect(course_dropdown_list[0].text).to include 'Second Course2'
@@ -136,9 +142,12 @@ describe 'assignments' do
 
       it 'copy tray does not list concluded courses' do
         course_search_dropdown.click
-        wait_for_ajaximations
+        course_search_dropdown.send_keys('course')
+        wait_for_search_dropdown
 
-        expect(course_dropdown_list[0].text).not_to include 'Third Course3'
+        course_dropdown_list.each do |item|
+          expect(item.text).not_to include 'Third Course3'
+        end
       end
 
       it 'copy tray lists course modules' do
@@ -183,7 +192,7 @@ describe 'assignments' do
         user_session(@teacher2)
       end
 
-      it 'received item appears and can be managed as expected', custom_timeout: 30 do
+      it 'received item appears and can be managed as expected', custom_timeout: 45 do
         # Item appears
         visit_content_share_page
         expect(received_table_rows[1].text).to include @assignment1.name
@@ -193,7 +202,8 @@ describe 'assignments' do
         # Expected courses are present in the dropdown
         import_content_share.click
         course_search_dropdown.click
-        wait_for_ajaximations
+        course_search_dropdown.send_keys('course')
+        wait_for_search_dropdown
         expect(course_dropdown_list[0].text).to include @course2.name
         expect(course_dropdown_list[0].text).not_to include @course3.name
 

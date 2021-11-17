@@ -50,7 +50,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   before_save :create_assessment_question, unless: :generated?
   before_destroy :delete_assessment_question, unless: :generated?
   before_destroy :update_quiz
-  validates_presence_of :quiz_id
+  validates :quiz_id, presence: true
   serialize :question_data
   after_save :update_quiz
 
@@ -73,11 +73,11 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   def infer_defaults
     if !self.position && self.quiz
-      if self.quiz_group
-        self.position = (self.quiz_group.quiz_questions.active.map(&:position).compact.max || 0) + 1
-      else
-        self.position = self.quiz.root_entries_max_position + 1
-      end
+      self.position = if self.quiz_group
+                        (self.quiz_group.quiz_questions.active.filter_map(&:position).max || 0) + 1
+                      else
+                        self.quiz.root_entries_max_position + 1
+                      end
     end
   end
 
@@ -99,9 +99,10 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   #  The user/teacher who's performing the regrade (e.g, updating the question).
   #  Note that this is NOT an id, but an actual instance of a User model.
   def question_data=(in_data)
-    data = if in_data.is_a?(String)
+    data = case in_data
+           when String
              ActiveSupport::JSON.decode(in_data)
-           elsif in_data.is_a?(Hash)
+           when Hash
              in_data.with_indifferent_access
            else
              in_data
@@ -142,25 +143,25 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   end
 
   def delete_assessment_question
-    if self.assessment_question && self.assessment_question.editable_by?(self)
+    if self.assessment_question&.editable_by?(self)
       self.assessment_question.destroy
     end
   end
 
   def create_assessment_question
-    return if self.question_data && self.question_data.is_type?(:text_only)
+    return if self.question_data&.is_type?(:text_only)
 
     aq = self.assessment_question || AssessmentQuestion.new
 
     if aq.editable_by?(self)
       aq.question_data = self.question_data
-      aq.initial_context = self.quiz.context if self.quiz && self.quiz.context
+      aq.initial_context = self.quiz.context if self.quiz&.context
       aq.save! if aq.new_record?
     end
 
     self.assessment_question = aq
 
-    return true
+    true
   end
 
   def update_assessment_question!(aq, quiz_group_id, duplicate_index)
@@ -172,7 +173,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     self.duplicate_index = duplicate_index
     save! if changed?
 
-    return self
+    self
   end
 
   def validate_blank_questions

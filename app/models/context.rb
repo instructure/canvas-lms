@@ -85,7 +85,7 @@ module Context
 
   def self.sorted_rubrics(context)
     associations = RubricAssociation.active.bookmarked.for_context_codes(context.asset_string).preload(:rubric => :context)
-    Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select { |r| r.rubric }) { |r| r.rubric.title || CanvasSort::Last }
+    Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select(&:rubric)) { |r| r.rubric.title || CanvasSort::Last }
   end
 
   def rubric_contexts(user)
@@ -96,7 +96,7 @@ module Context
       context_codes = sharded_course_ids.map { |id| "course_#{id}" }
       if Shard.current == self.shard
         context = self
-        while (context && context.respond_to?(:account)) || context.respond_to?(:parent_account)
+        while context.respond_to?(:account) || context.respond_to?(:parent_account)
           context = context.respond_to?(:account) ? context.account : context.parent_account
           context_codes << context.asset_string if context
         end
@@ -159,9 +159,7 @@ module Context
     # otherwise compute it and store it in the cache
     value_to_cache = nil
     ActiveRecord::Base.uncached do
-      value_to_cache = types_to_check.each_with_object({}) do |(key, type_to_check), memo|
-        memo[key] = type_to_check.call
-      end
+      value_to_cache = types_to_check.transform_values(&:call)
     end
     Rails.cache.write(cache_key, value_to_cache)
     @active_record_types[only_check] = value_to_cache
@@ -266,7 +264,7 @@ module Context
       object = rel_path && Folder.find_attachment_in_context_with_path(course, CGI.unescape(rel_path))
       file_id = params[:file_id] || params[:id]
       file_id ||= uri.query && CGI.parse(uri.query).send(:[], "preview")&.first
-      object ||= context.attachments.find_by_id(file_id) # attachments.find_by_id uses the replacement hackery
+      object ||= context.attachments.find_by(id: file_id) # attachments.find_by(id:) uses the replacement hackery
     when 'wiki_pages'
       object = context.wiki.find_page(CGI.unescape(params[:id]), include_deleted: true)
       if !object && params[:id].to_s.include?("+") # maybe it really is a "+"
@@ -280,11 +278,11 @@ module Context
         object = ContextExternalTool.find_external_tool_by_id(params[:id], context)
       end
     when 'context_modules'
-      if %w(item_redirect item_redirect_mastery_paths choose_mastery_path).include?(params[:action])
-        object = context.context_module_tags.find_by(id: params[:id])
-      else
-        object = context.context_modules.find_by(id: params[:id])
-      end
+      object = if %w(item_redirect item_redirect_mastery_paths choose_mastery_path).include?(params[:action])
+                 context.context_module_tags.find_by(id: params[:id])
+               else
+                 context.context_modules.find_by(id: params[:id])
+               end
     when 'media_objects'
       object = media_obj
     when 'context'

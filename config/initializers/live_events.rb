@@ -22,7 +22,7 @@ class StubbedClient
     events = records.map { |e| JSON.parse(e[:data]).dig('attributes', 'event_name') }.join(' | ')
     puts "Events #{events} put to stream #{stream_name}: #{records}"
     OpenStruct.new(
-      records: records.map { OpenStruct.new(error_code: 'failure', error_message: 'this fails') }
+      records: records.map { OpenStruct.new(error_code: nil) }
     )
   end
 
@@ -44,7 +44,7 @@ Rails.configuration.to_prepare do
       nil
     end
   }
-  LiveEvents.stream_client = StubbedClient if ENV['STUB_LIVE_EVENTS_KINESIS']
+  LiveEvents.stream_client =  ->(settings) { StubbedClient if settings['stub_kinesis'] }
   # sometimes this async worker thread grabs a connection on a Setting read or similar.
   # We need it to be released or the main thread can have a real problem.
   LiveEvents.on_work_unit_end = -> { ActiveRecord::Base.clear_active_connections! }

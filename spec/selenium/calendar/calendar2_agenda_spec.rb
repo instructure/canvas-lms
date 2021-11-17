@@ -25,7 +25,7 @@ describe "calendar2" do
   include Calendar2Common
 
   before(:once) do
-    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+    Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
   before do
@@ -250,7 +250,7 @@ describe "calendar2" do
         s1 = @course.course_sections.create!(name: 'Section1')
         s2 = @course.course_sections.create!(name: 'Section2')
         s1_date = rand(2...9).day.from_now
-        s2_date = s1_date + 1.days
+        s2_date = s1_date + 1.day
         @override = create_section_override_for_assignment(assignment, course_section: s1, due_at: s1_date)
         @override = create_section_override_for_assignment(assignment, course_section: s2, due_at: s2_date)
 

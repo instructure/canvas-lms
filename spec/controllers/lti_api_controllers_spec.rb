@@ -49,11 +49,11 @@ describe LtiApiController, type: :request do
       expect(json["error_report_id"]).to be > 0
       data = error_data(json)
 
-      expect(data.key?('oauth_signature')).to be true
-      expect(data.key?('oauth_signature_method')).to be true
-      expect(data.key?('oauth_nonce')).to be true
-      expect(data.key?('oauth_timestamp')).to be true
-      expect(data.key?('generated_signature')).to be true if check_generated_sig
+      expect(data).to have_key('oauth_signature')
+      expect(data).to have_key('oauth_signature_method')
+      expect(data).to have_key('oauth_nonce')
+      expect(data).to have_key('oauth_timestamp')
+      expect(data).to have_key('generated_signature') if check_generated_sig
 
       expect(data['oauth_signature']).to_not be_empty
       expect(data['oauth_signature_method']).to_not be_empty
@@ -103,7 +103,10 @@ describe LtiApiController, type: :request do
 
   it "adds xml to an error report if the xml is invalid according to spec" do
     body = %{<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
-    expect(Canvas::Errors).to receive(:capture) { |_, opts| expect(opts[:extra][:xml]).to be_present; {} }
+    expect(Canvas::Errors).to receive(:capture) { |_, opts|
+                                expect(opts[:extra][:xml]).to be_present
+                                {}
+                              }
     make_call('body' => body)
   end
 
@@ -166,21 +169,21 @@ describe LtiApiController, type: :request do
 
     score_xml = ''
     if score
-      score_xml = <<-XML
-          <resultScore>
-            <language>en</language>
-            <textString>#{score}</textString>
-          </resultScore>
+      score_xml = <<~XML
+        <resultScore>
+          <language>en</language>
+          <textString>#{score}</textString>
+        </resultScore>
       XML
     end
 
     raw_score_xml = ''
     if raw_score
-      raw_score_xml = <<-XML
-          <resultTotalScore>
-            <language>en</language>
-            <textString>#{raw_score}</textString>
-          </resultTotalScore>
+      raw_score_xml = <<~XML
+        <resultTotalScore>
+          <language>en</language>
+          <textString>#{raw_score}</textString>
+        </resultTotalScore>
       XML
     end
 
@@ -320,7 +323,7 @@ describe LtiApiController, type: :request do
     end
 
     it "sets complex submission text" do
-      text = CGI::escapeHTML("<p>stuff</p>")
+      text = CGI.escapeHTML("<p>stuff</p>")
       make_call('body' => replace_result(score: '0.6', sourceid: nil, result_data: { :text => "<![CDATA[#{text}]]>" }))
       check_success
 
@@ -401,10 +404,10 @@ describe LtiApiController, type: :request do
       comments    = submissions.first.submission_comments
       expect(submissions.count).to eq 1
       expect(comments.count).to eq 1
-      expect(comments.first.comment).to eq <<~NO_POINTS.strip
+      expect(comments.first.comment).to eq <<~TEXT.strip
         An external tool attempted to grade this assignment as 75%, but was unable
         to because the assignment has no points possible.
-      NO_POINTS
+      TEXT
     end
 
     it "rejects out of bound scores" do

@@ -55,7 +55,7 @@ module Api
         when 'default'
           @domain_root_account.default_enrollment_term
         when 'current'
-          if !current_term
+          unless current_term
             current_terms = @domain_root_account
                             .enrollment_terms
                             .active
@@ -157,9 +157,9 @@ module Api
 
   MAX_ID = ((2**63) - 1)
   MAX_ID_LENGTH = MAX_ID.to_s.length
-  MAX_ID_RANGE = (-MAX_ID...MAX_ID)
-  ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}
-  UUID_REGEX = %r{\Auuid:(\w{40,})\z}
+  MAX_ID_RANGE = (-MAX_ID...MAX_ID).freeze
+  ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}.freeze
+  UUID_REGEX = %r{\Auuid:(\w{40,})\z}.freeze
 
   def self.sis_parse_id(id, lookups, _current_user = nil,
                         root_account: nil)
@@ -167,15 +167,16 @@ module Api
     return lookups['id'], id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
 
     id = id.to_s.strip
-    if id =~ %r{\Ahex:(lti_[\w_]+|sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z}
+    case id
+    when %r{\Ahex:(lti_[\w_]+|sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z}
       sis_column = $1
       sis_id = [$2].pack('H*')
-    elsif id =~ %r{\A(lti_[\w_]+|sis_[\w_]+):(.+)\z}
+    when %r{\A(lti_[\w_]+|sis_[\w_]+):(.+)\z}
       sis_column = $1
       sis_id = $2
-    elsif id =~ ID_REGEX
-      return lookups['id'], (id =~ /\A\d+\z/ ? id.to_i : id)
-    elsif id =~ UUID_REGEX
+    when ID_REGEX
+      return lookups['id'], (/\A\d+\z/.match?(id) ? id.to_i : id)
+    when UUID_REGEX
       return lookups['uuid'], $1
     else
       return nil, nil
@@ -188,7 +189,7 @@ module Api
       sis_id = column[:transform].call(sis_id)
       column = column[:column]
     end
-    return column, sis_id
+    [column, sis_id]
   end
 
   def self.sis_parse_ids(ids, lookups, current_user = nil, root_account: nil)
@@ -204,7 +205,7 @@ module Api
       columns[column] << sis_id
     end
     columns.keys.each { |key| columns[key].uniq! }
-    return columns
+    columns
   end
 
   # remove things that don't look like valid database IDs
@@ -212,7 +213,7 @@ module Api
   # (note that ID_REGEX may be redefined by a plugin!)
   def self.map_non_sis_ids(ids)
     ids.map { |id| id.to_s.strip }.select { |id| id =~ ID_REGEX }.map do |id|
-      id =~ /\A\d+\z/ ? id.to_i : id
+      /\A\d+\z/.match?(id) ? id.to_i : id
     end
   end
 
@@ -259,7 +260,7 @@ module Api
           raise ArgumentError, "missing scope for collection" unless sis_mapping[:scope]
 
           ids = columns[column]
-          if ids.any? { |id| id.is_a?(Array) }
+          if ids.any?(Array)
             ids_hash = {}
             ids.each do |id|
               id = Array(id)
@@ -351,7 +352,7 @@ module Api
     hash = build_links_hash(base_url, meta_for_pagination(controller, collection))
     links = build_links_from_hash(hash)
     controller.response.headers["Link"] = links.join(',') if links.length > 0
-    return collection, meta
+    [collection, meta]
   end
 
   def self.jsonapi_meta(collection, controller, base_url)
@@ -419,7 +420,7 @@ module Api
 
   PAGINATION_PARAMS = [:current, :next, :prev, :first, :last].freeze
   LINK_PRIORITY = [:next, :last, :prev, :current, :first].freeze
-  EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key)
+  EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key).freeze
   def self.build_links(base_url, opts = {})
     links = build_links_hash(base_url, opts)
     build_links_from_hash(links)
@@ -617,10 +618,10 @@ module Api
                     (?<minute>[0-5][0-9]):
                     (?<second>60|[0-5][0-9])
                     (?<fraction>\.[0-9]+)?
-                    (?<timezone>Z|[+-](?:2[0-3]|[0-1][0-9]):[0-5][0-9])?$/x
+                    (?<timezone>Z|[+-](?:2[0-3]|[0-1][0-9]):[0-5][0-9])?$/x.freeze
 
   # regex for valid dates
-  DATE_REGEX = /^\d{4}[- \/.](0[1-9]|1[012])[- \/.](0[1-9]|[12][0-9]|3[01])$/
+  DATE_REGEX = /^\d{4}[- \/.](0[1-9]|1[012])[- \/.](0[1-9]|[12][0-9]|3[01])$/.freeze
 
   # regex for shard-aware ID
   ID = '(?:\d+~)?\d+'
@@ -662,13 +663,13 @@ module Api
     placeholder = "PLACEHOLDER"
 
     placeholders = args.each_with_index.map do |arg, index|
-      arg =~ format ? "#{placeholder}#{index}" : arg
+      arg&.match?(format) ? "#{placeholder}#{index}" : arg
     end
 
     url = send(method, *placeholders)
 
     args.each_with_index do |arg, index|
-      url.sub!("#{placeholder}#{index}", arg) if arg =~ format
+      url.sub!("#{placeholder}#{index}", arg) if arg&.match?(format)
     end
 
     url

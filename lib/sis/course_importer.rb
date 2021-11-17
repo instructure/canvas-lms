@@ -66,7 +66,7 @@ module SIS
         raise ImportError, "No course_id given for a course" if course_id.blank?
         raise ImportError, "No short_name given for course #{course_id}" if short_name.blank? && abstract_course_id.blank?
         raise ImportError, "No long_name given for course #{course_id}" if long_name.blank? && abstract_course_id.blank?
-        raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless status =~ /\A(active|deleted|completed|unpublished|published)/i
+        raise ImportError, "Improper status \"#{status}\" for course #{course_id}" unless /\A(active|deleted|completed|unpublished|published)/i.match?(status)
         raise ImportError, "Invalid course_format \"#{course_format}\" for course #{course_id}" unless course_format.blank? || course_format =~ /\A(online|on_campus|blended|not_set)/i
 
         valid_grade_passback_settings = (Setting.get('valid_grade_passback_settings', 'nightly_sync,disabled').split(',') << 'not_set')
@@ -105,7 +105,7 @@ module SIS
 
           course.integration_id = integration_id
           course.sis_source_id = course_id
-          active_state = (status.downcase == 'published') ? 'available' : 'claimed'
+          active_state = status.casecmp?('published') ? 'available' : 'claimed'
           unless course.stuck_sis_fields.include?(:workflow_state)
             if %w(active unpublished published).include?(status.downcase)
               case course.workflow_state
@@ -121,10 +121,10 @@ module SIS
                 course.workflow_state = active_state
                 state_changes << :published if active_state == 'available'
               end
-            elsif status =~ /deleted/i
+            elsif /deleted/i.match?(status)
               course.workflow_state = 'deleted'
               state_changes << :deleted
-            elsif status =~ /completed/i
+            elsif /completed/i.match?(status)
               course.workflow_state = 'completed'
               state_changes << :concluded
             end

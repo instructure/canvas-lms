@@ -28,7 +28,7 @@ module DataFixup::AddPostPoliciesToAssignments
               .find_ids_in_batches do |submission_ids|
       Submission.joins(:assignment)
                 .where(id: submission_ids)
-                .where(<<~SQL)
+                .where(<<~SQL.squish)
                   CASE assignments.muted
                     WHEN TRUE
                       THEN posted_at IS NOT NULL

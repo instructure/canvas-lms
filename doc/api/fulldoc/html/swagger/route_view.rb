@@ -35,7 +35,7 @@ class RouteView < HashView
 
   def file_path
     filepath = "app/controllers/#{@method_view.controller}_controller.rb"
-    filepath = nil unless File.file?(File.join(Rails.root, filepath))
+    filepath = nil unless Rails.root.join(filepath).file?
     filepath
   end
 
@@ -50,7 +50,7 @@ class RouteView < HashView
   end
 
   def path_variables
-    api_path.scan(%r{:(\w+)}).map { |v| v.first }
+    api_path.scan(%r{:(\w+)}).map(&:first)
   end
 
   def swagger_path
@@ -70,7 +70,7 @@ class RouteView < HashView
   end
 
   def query_arg_names
-    query_args.map { |arg| arg.name }
+    query_args.map(&:name)
   end
 
   def path_args
@@ -84,7 +84,7 @@ class RouteView < HashView
   end
 
   def parameters
-    arguments.map { |arg| arg.to_swagger }
+    arguments.map(&:to_swagger)
   end
 
   def response_fields

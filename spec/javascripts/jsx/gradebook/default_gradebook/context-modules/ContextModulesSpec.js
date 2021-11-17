@@ -56,30 +56,10 @@ QUnit.module('Gradebook > Context Modules', suiteHooks => {
       )
     })
 
-    test('sets the context modules loaded status to true', () => {
-      gradebook.updateContextModules(contextModules)
-      strictEqual(gradebook.contentLoadStates.contextModulesLoaded, true)
-    })
-
-    test('renders the view options menu', () => {
+    test('renders the view options menu after storing the context modules', () => {
       sinon.spy(gradebook, 'renderViewOptionsMenu')
       gradebook.updateContextModules(contextModules)
       strictEqual(gradebook.renderViewOptionsMenu.callCount, 1)
-    })
-
-    test('renders the view options menu after storing the context modules', () => {
-      sinon.stub(gradebook, 'renderViewOptionsMenu').callsFake(() => {
-        const storedModules = gradebook.courseContent.contextModules
-        strictEqual(storedModules.length, 2)
-      })
-      gradebook.updateContextModules(contextModules)
-    })
-
-    test('renders the view options menu after updating the context modules loaded status', () => {
-      sinon.stub(gradebook, 'renderViewOptionsMenu').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.contextModulesLoaded, true)
-      })
-      gradebook.updateContextModules(contextModules)
     })
 
     test('renders filters', () => {
@@ -96,24 +76,16 @@ QUnit.module('Gradebook > Context Modules', suiteHooks => {
       gradebook.updateContextModules(contextModules)
     })
 
-    test('renders filters after updating the context modules loaded status', () => {
-      sinon.stub(gradebook, 'renderFilters').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.contextModulesLoaded, true)
-      })
+    test('renders filters after updating the context modules', () => {
+      sinon.spy(gradebook, 'renderFilters')
       gradebook.updateContextModules(contextModules)
+      strictEqual(gradebook.renderFilters.callCount, 1)
     })
 
     test('updates essential data load status', () => {
       sinon.spy(gradebook, '_updateEssentialDataLoaded')
       gradebook.updateContextModules(contextModules)
       strictEqual(gradebook._updateEssentialDataLoaded.callCount, 1)
-    })
-
-    test('updates essential data load status after updating the context modules loaded status', () => {
-      sinon.stub(gradebook, '_updateEssentialDataLoaded').callsFake(() => {
-        strictEqual(gradebook.contentLoadStates.contextModulesLoaded, true)
-      })
-      gradebook.updateContextModules(contextModules)
     })
 
     test('updates essential data load status after rendering filters', () => {

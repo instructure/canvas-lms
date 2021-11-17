@@ -400,7 +400,7 @@ describe PageView do
 
       it "returns the existing page view" do
         page_views = Array.new(4) { page_view_model }
-        page_view_ids = page_views.map { |page_view| page_view.request_id }
+        page_view_ids = page_views.map(&:request_id)
 
         expect(PageView.find_all_by_id(page_view_ids)).to match_array page_views
       end
@@ -415,7 +415,7 @@ describe PageView do
 
       it "returns the existing page view" do
         page_views = Array.new(4) { page_view_model }
-        page_view_ids = page_views.map { |page_view| page_view.request_id }
+        page_view_ids = page_views.map(&:request_id)
 
         expect(PageView.find_all_by_id(page_view_ids)).to match_array page_views
       end
@@ -426,7 +426,7 @@ describe PageView do
     end
   end
 
-  describe ".find_by_id" do
+  describe ".find_by" do
     context "db-backed" do
       before :once do
         Setting.set('enable_page_views', 'db')
@@ -434,11 +434,11 @@ describe PageView do
 
       it "returns the existing page view" do
         pv = page_view_model
-        expect(PageView.find_by_id(pv.request_id)).to eq pv
+        expect(PageView.find_by(id: pv.request_id)).to eq pv
       end
 
       it "returns nothing with unknown request id" do
-        expect(PageView.find_by_id('unknown')).to be_nil
+        expect(PageView.find_by(id: 'unknown')).to be_nil
       end
     end
 
@@ -447,11 +447,11 @@ describe PageView do
 
       it "returns the existing page view" do
         pv = page_view_model
-        expect(PageView.find_by_id(pv.request_id)).to eq pv
+        expect(PageView.find_by(id: pv.request_id)).to eq pv
       end
 
       it "returns nothing with unknown request id" do
-        expect(PageView.find_by_id('unknown')).to be_nil
+        expect(PageView.find_by(id: 'unknown')).to be_nil
       end
     end
   end

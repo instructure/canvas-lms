@@ -81,7 +81,7 @@ unless $canvas_tasks_loaded
         end
       end
 
-      combined_time = batch_times.reduce(:+)
+      combined_time = batch_times.sum
 
       puts(
         "Finished compiling assets in #{real_time.round(2)}s. " +
@@ -206,7 +206,7 @@ unless $canvas_tasks_loaded
       method = :select!
       if region[0] == '-'
         method = :reject!
-        region = region[1..-1]
+        region = region[1..]
       end
       if region == 'self'
         servers.send(method, &:in_current_region?)

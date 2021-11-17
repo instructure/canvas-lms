@@ -41,7 +41,8 @@ class ContentMigration < ActiveRecord::Base
 
   DATE_FORMAT = "%m/%d/%Y"
 
-  attr_accessor :outcome_to_id_map, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :last_module_position, :skipped_master_course_items
+  attr_accessor :outcome_to_id_map, :attachment_path_id_lookup, :attachment_path_id_lookup_lower, :last_module_position,
+                :skipped_master_course_items, :copied_external_outcome_map
   attr_writer :imported_migration_items
 
   has_a_broadcast_policy
@@ -282,7 +283,7 @@ class ContentMigration < ActiveRecord::Base
 
   def add_warning(user_message, opts = {})
     Rails.logger.warn("Migration warning: #{user_message}: #{opts.inspect}")
-    if !opts.is_a? Hash
+    unless opts.is_a? Hash
       # convert deprecated behavior to new
       exception_or_info = opts
       opts = {}
@@ -448,20 +449,20 @@ class ContentMigration < ActiveRecord::Base
         end
       end
 
-      return true
+      true
     else
-      return false
+      false
     end
   end
 
   def set_default_settings
-    if self.context && self.context.respond_to?(:root_account) &&
+    if self.context.respond_to?(:root_account) &&
        (account = self.context.root_account) &&
        (default_ms = account.settings[:default_migration_settings])
       self.migration_settings = default_ms.merge(self.migration_settings).with_indifferent_access
     end
 
-    if !self.migration_settings.has_key?(:overwrite_quizzes)
+    unless self.migration_settings.key?(:overwrite_quizzes)
       self.migration_settings[:overwrite_quizzes] = for_course_copy? || for_master_course_import? || (self.migration_type && self.migration_type == 'canvas_cartridge_importer')
     end
     self.migration_settings.reverse_merge!(:prefer_existing_tools => true) if self.migration_type == 'common_cartridge_importer' # default to true
@@ -512,7 +513,7 @@ class ContentMigration < ActiveRecord::Base
     prefix = "#{migration_settings[:id_prepender]}_"
     return nil unless mig_id.start_with? prefix
 
-    mig_id[prefix.length..-1]
+    mig_id[prefix.length..]
   end
 
   def import_object?(asset_type, mig_id)
@@ -537,7 +538,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def is_set?(option)
-    Canvas::Plugin::value_to_boolean option
+    Canvas::Plugin.value_to_boolean option
   end
 
   def capture_job_id
@@ -552,7 +553,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def import_content
-    reset_job_progress(:running) if !import_immediately?
+    reset_job_progress(:running) unless import_immediately?
     self.workflow_state = :importing
     capture_job_id
     self.save
@@ -614,7 +615,7 @@ class ContentMigration < ActiveRecord::Base
 
       process_master_deletions(deletions.slice('AssignmentGroup')) if deletions
 
-      if !self.import_immediately?
+      unless self.import_immediately?
         update_import_progress(100)
       end
       if self.for_master_course_import?
@@ -797,7 +798,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def clear_migration_data
-    @zip_file.close if @zip_file
+    @zip_file&.close
     @zip_file = nil
   end
 
@@ -831,7 +832,7 @@ class ContentMigration < ActiveRecord::Base
       # this is for a course copy so it needs to combine the progress of the export and import
       # The export will count for 40% of progress
       # The importing step (so the value of progress on this object)will be 60%
-      mig_prog = mig_prog * 0.6
+      mig_prog *= 0.6
 
       if self.content_export
         export_prog = self.content_export.progress || 0

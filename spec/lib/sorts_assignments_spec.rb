@@ -23,9 +23,9 @@ describe SortsAssignments do
     allow(Time).to receive(:now).and_return(@time_now)
   end
 
-  let(:due_yesterday) { double({ :id => 1, :due_at => 1.days.ago }) }
+  let(:due_yesterday) { double({ :id => 1, :due_at => 1.day.ago }) }
   let(:due_today) { double({ :id => 2, :due_at => @time_now }) }
-  let(:due_tomorrow) { double({ :id => 3, :due_at => 1.days.from_now }) }
+  let(:due_tomorrow) { double({ :id => 3, :due_at => 1.day.from_now }) }
   let(:no_due_date) { double({ :id => 4, :due_at => nil }) }
   let(:due_in_one_week) { double({ :id => 5, :due_at => 1.week.from_now }) }
   let(:due_in_two_weeks) { double({ :id => 6, :due_at => 2.weeks.from_now }) }
@@ -100,7 +100,7 @@ describe SortsAssignments do
 
   describe "down_to" do
     it "and_return all assignments after the given time" do
-      expect(SortsAssignments.down_to(assignments, 1.days.ago)).to match_array(
+      expect(SortsAssignments.down_to(assignments, 1.day.ago)).to match_array(
         [
           due_today,
           due_tomorrow,
@@ -111,7 +111,7 @@ describe SortsAssignments do
     end
 
     it "does not include assignments with a due_at equal to the given time" do
-      expect(SortsAssignments.down_to(assignments, 1.days.ago)).not_to include(
+      expect(SortsAssignments.down_to(assignments, 1.day.ago)).not_to include(
         due_yesterday
       )
     end

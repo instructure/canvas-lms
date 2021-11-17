@@ -155,7 +155,7 @@ describe "Gradebook - Assignment Column" do
       Gradebook::Cells.open_tray(@course.students.first, @assignment)
       Gradebook::GradeDetailTray.speedgrader_link.click
 
-      expect(Gradebook.overlay_info_screen.text.split(/\n/)).to include(
+      expect(Gradebook.overlay_info_screen.text.split("\n")).to include(
         'Anonymous Mode On:',
         'Unable to access specific student. Go to assignment in SpeedGrader?'
       )

@@ -34,14 +34,14 @@ describe "legacyNode" do
     before(:once) do
       @calc_method = outcome_calculation_method_model(@course)
 
-      @query = <<-GQL
-      query {
-        outcomeCalculationMethod: legacyNode(type: OutcomeCalculationMethod, _id: "#{@calc_method.id}") {
-          ... on OutcomeCalculationMethod {
-            _id
+      @query = <<~GQL
+        query {
+          outcomeCalculationMethod: legacyNode(type: OutcomeCalculationMethod, _id: "#{@calc_method.id}") {
+            ... on OutcomeCalculationMethod {
+              _id
+            }
           }
         }
-      }
       GQL
     end
 
@@ -66,14 +66,14 @@ describe "legacyNode" do
     before(:once) do
       @proficiency = outcome_proficiency_model(@course.account)
 
-      @query = <<-GQL
-      query {
-        outcomeProficiency: legacyNode(type: OutcomeProficiency, _id: "#{@proficiency.id}") {
-          ... on OutcomeProficiency {
-            _id
+      @query = <<~GQL
+        query {
+          outcomeProficiency: legacyNode(type: OutcomeProficiency, _id: "#{@proficiency.id}") {
+            ... on OutcomeProficiency {
+              _id
+            }
           }
         }
-      }
       GQL
     end
 
@@ -99,14 +99,14 @@ describe "legacyNode" do
     before(:once) do
       @enrollment = @student.enrollments.first
 
-      @query = <<-GQL
-      query {
-        enrollment: legacyNode(type: Enrollment, _id: "#{@enrollment.id}") {
-          ... on Enrollment {
-            _id
+      @query = <<~GQL
+        query {
+          enrollment: legacyNode(type: Enrollment, _id: "#{@enrollment.id}") {
+            ... on Enrollment {
+              _id
+            }
           }
         }
-      }
       GQL
     end
 

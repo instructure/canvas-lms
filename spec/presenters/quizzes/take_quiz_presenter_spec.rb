@@ -327,9 +327,9 @@ describe Quizzes::TakeQuizPresenter do
 
       p = Quizzes::TakeQuizPresenter.new(quiz, submission, params)
 
-      expect(p.answers.has_key?(question1[:id])).to be_truthy
-      expect(p.answers.has_key?(question2[:id])).to be_truthy
-      expect(p.answers.has_key?(question3[:id])).to be_falsey
+      expect(p.answers).to have_key(question1[:id])
+      expect(p.answers).to have_key(question2[:id])
+      expect(p.answers).not_to have_key(question3[:id])
     end
 
     it 'rejects zeroes for an answer' do
@@ -338,7 +338,7 @@ describe Quizzes::TakeQuizPresenter do
                                                                 })
 
       p = Quizzes::TakeQuizPresenter.new(quiz, submission, params)
-      expect(p.answers.has_key?(question1[:id])).to be_falsey
+      expect(p.answers).not_to have_key(question1[:id])
     end
   end
 end

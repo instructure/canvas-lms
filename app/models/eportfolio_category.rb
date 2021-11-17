@@ -27,8 +27,8 @@ class EportfolioCategory < ActiveRecord::Base
   before_save :infer_unique_slug
   after_save :check_for_spam, if: -> { eportfolio.needs_spam_review? }
 
-  validates_presence_of :eportfolio_id
-  validates_length_of :name, :maximum => maximum_string_length, :allow_blank => true
+  validates :eportfolio_id, presence: true
+  validates :name, length: { :maximum => maximum_string_length, :allow_blank => true }
 
   acts_as_list :scope => :eportfolio
 

@@ -77,7 +77,7 @@ class LearningOutcomeQuestionResult < ActiveRecord::Base
   private
 
   def update_version_data(version)
-    version_data = YAML::load(version.yaml)
+    version_data = YAML.load(version.yaml)
     version_data["score"] = self.score
     version_data["mastery"] = self.mastery
     version_data["possible"] = self.possible

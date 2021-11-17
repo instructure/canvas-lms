@@ -100,7 +100,7 @@ describe ConversationMessage do
       message_user_ids = message.messages_sent["Conversation Message"].map(&:user_id)
       expect(message_user_ids).not_to include(@teacher.id)
       expect(message_user_ids).to include(@students.first.id)
-      @students[1..-1].each do |student|
+      @students[1..].each do |student|
         expect(message_user_ids).not_to include(student.id)
       end
     end
@@ -315,7 +315,7 @@ describe ConversationMessage do
     end
 
     it "replies only to the message author on conversations2 conversations" do
-      users = 3.times.map { course_with_student(course: @course).user }
+      users = Array.new(3) { course_with_student(course: @course).user }
       conversation = Conversation.initiate(users, false, :context_type => 'Course', :context_id => @course.id)
       conversation.add_message(users[0], "initial message", :root_account_id => Account.default.id)
       cm2 = conversation.add_message(users[1], "subsequent message", :root_account_id => Account.default.id)
@@ -328,7 +328,7 @@ describe ConversationMessage do
                              :text => "body"
                            })
       expect(cm3.conversation_message_participants.size).to eq 2
-      expect(cm3.conversation_message_participants.map { |x| x.user_id }.sort).to eq [users[1].id, users[2].id].sort
+      expect(cm3.conversation_message_participants.map(&:user_id).sort).to eq [users[1].id, users[2].id].sort
     end
 
     it "marks conversations as read for the replying author" do

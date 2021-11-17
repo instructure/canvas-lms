@@ -29,7 +29,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
   has_many :quiz_groups, class_name: 'Quizzes::QuizGroup'
   before_save :infer_defaults
   after_save :update_alignments
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
+  validates :title, length: { :maximum => maximum_string_length, :allow_nil => true }
   resolves_root_account through: :context
 
   include MasterCourses::Restrictor
@@ -108,18 +108,18 @@ class AssessmentQuestionBank < ActiveRecord::Base
 
   def alignments=(alignments)
     # empty string from controller or empty hash
-    if alignments.empty?
-      outcomes = []
-    else
-      outcomes = context.linked_learning_outcomes.where(id: alignments.keys.map(&:to_i)).to_a
-    end
+    outcomes = if alignments.empty?
+                 []
+               else
+                 context.linked_learning_outcomes.where(id: alignments.keys.map(&:to_i)).to_a
+               end
 
     # delete alignments that aren't in the list anymore
     if outcomes.empty?
       learning_outcome_alignments.update_all(:workflow_state => 'deleted')
     else
       learning_outcome_alignments
-        .where("learning_outcome_id NOT IN (?)", outcomes)
+        .where.not(learning_outcome_id: outcomes)
         .update_all(:workflow_state => 'deleted')
     end
 

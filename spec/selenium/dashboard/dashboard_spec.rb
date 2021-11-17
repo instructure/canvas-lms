@@ -76,7 +76,7 @@ describe "dashboard" do
 
     # so we can click the link w/o a page load
     def disable_recent_activity_header_course_link
-      driver.execute_script <<-JS
+      driver.execute_script <<~JS
         $('.stream-announcement .links a').attr('href', '#');
       JS
     end
@@ -189,7 +189,7 @@ describe "dashboard" do
       # appointment group publish notification and signup notification
       appointment_participant_model(:course => @course, :participant => @group, :updating_user => @other_student)
       # appointment group update notification
-      @appointment_group.update(:new_appointments => [[Time.now.utc + 2.hour, Time.now.utc + 3.hour]])
+      @appointment_group.update(:new_appointments => [[Time.now.utc + 2.hours, Time.now.utc + 3.hours]])
 
       get "/"
       expect(ffj(".topic_message .communication_message.dashboard_notification").size).to eq 3

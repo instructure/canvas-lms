@@ -207,11 +207,11 @@ describe AccountsController do
       post 'add_account_user', params: { :account_id => @account.id, :role_id => role.id, :user_list => 'testadmin@example.com' }
       expect(response).to be_successful
 
-      new_admin = CommunicationChannel.find_by_path('testadmin@example.com').user
+      new_admin = CommunicationChannel.find_by(path: 'testadmin@example.com').user
       expect(new_admin).to_not be_nil
       @account.reload
       expect(@account.account_users.map(&:user)).to be_include(new_admin)
-      expect(@account.account_users.find_by_role_id(role.id).user).to eq new_admin
+      expect(@account.account_users.find_by(role_id: role.id).user).to eq new_admin
     end
 
     it "allows adding an existing user to a sub account" do
@@ -998,9 +998,9 @@ describe AccountsController do
         expect(response).to be_successful
 
         external_integration_keys = assigns[:external_integration_keys]
-        expect(external_integration_keys.key?(:external_key0)).to be_truthy
-        expect(external_integration_keys.key?(:external_key1)).to be_truthy
-        expect(external_integration_keys.key?(:external_key2)).to be_truthy
+        expect(external_integration_keys).to have_key(:external_key0)
+        expect(external_integration_keys).to have_key(:external_key1)
+        expect(external_integration_keys).to have_key(:external_key2)
         expect(external_integration_keys[:external_key0]).to eq @eik
       end
 

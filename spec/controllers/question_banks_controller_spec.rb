@@ -28,7 +28,10 @@ describe QuestionBanksController do
   end
 
   describe "GET / (#index)" do
-    before { create_course_with_two_question_banks!; user_session(@teacher) }
+    before {
+      create_course_with_two_question_banks!
+      user_session(@teacher)
+    }
 
     it "only includes active question banks" do
       @bank3 = @course.account.assessment_question_banks.create!

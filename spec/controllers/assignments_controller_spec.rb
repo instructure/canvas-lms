@@ -545,7 +545,7 @@ describe AssignmentsController do
       it "includes moderation graders in GRADERS" do
         get :show_moderate, params: { course_id: @course.id, assignment_id: @assignment.id }
         moderation_grader_ids = @assignment.moderation_graders.map(&:id)
-        expect(env[:GRADERS].map { |grader| grader[:id] }).to match_array(moderation_grader_ids)
+        expect(env[:GRADERS].pluck(:id)).to match_array(moderation_grader_ids)
       end
 
       it "does not include the final grader in GRADERS" do

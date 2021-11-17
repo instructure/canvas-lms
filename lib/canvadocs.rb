@@ -145,7 +145,7 @@ module Canvadocs
       request["Authorization"] = "Token #{token}"
       response = @http.request(request)
 
-      unless response.code =~ /\A20./
+      unless /\A20./.match?(response.code)
         err_message = "HTTP Error #{response.code}: #{response.body}"
         klass = Canvadocs::HttpError
         klass = Canvadocs::ServerError if response.code.to_s == "500"
@@ -171,7 +171,7 @@ module Canvadocs
     #
     # Returns a Net::HTTP::Get object for the path with query params
     def format_get(path, params)
-      query = params.map { |k, v| "#{k}=#{CGI::escape(v.to_s)}" }.join("&")
+      query = params.map { |k, v| "#{k}=#{CGI.escape(v.to_s)}" }.join("&")
       Net::HTTP::Get.new("#{path}?#{query}")
     end
 
@@ -247,7 +247,7 @@ module Canvadocs
     end
 
     # Set visibility for students and peer reviewers.
-    if !submission.user_can_read_grade?(current_user)
+    unless submission.user_can_read_grade?(current_user)
       session_params[:restrict_annotations_to_user_filter] = true
       session_params[:user_filter] ||= [
         user_filter_entry(

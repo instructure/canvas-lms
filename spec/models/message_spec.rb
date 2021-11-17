@@ -42,9 +42,9 @@ describe Message do
     end
 
     it 'sanitizes html' do
-      expect_any_instance_of(Message).to receive(:load_html_template).and_return [<<-ZOMGXSS, 'template.html.erb']
+      expect_any_instance_of(Message).to receive(:load_html_template).and_return [<<~HTML, 'template.html.erb']
         <b>Your content</b>: <%= "<script>alert()</script>" %>
-      ZOMGXSS
+      HTML
       user         = user_factory(active_all: true)
       account_user = AccountUser.create!(:account => account_model, :user => user)
       message      = generate_message(:account_user_notification, :email, account_user)

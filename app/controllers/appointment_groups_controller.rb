@@ -351,7 +351,7 @@ class AppointmentGroupsController < ApplicationController
     # we would have a check on update as well but there may be existing ones and
     # it would be very delicate to write one in a way that doesn't accidentally
     # break the ability to edit those.
-    if contexts.any? { |c| c.concluded? }
+    if contexts.any?(&:concluded?)
       return render json: { error: t('cannot create an appointment group for a concluded course') },
                     status: :bad_request
     end
@@ -556,14 +556,14 @@ class AppointmentGroupsController < ApplicationController
     ag_scope = ag_scope.where(id: ids) if ids.any?
     # FIXME this could be a lot faster if we didn't look at eligibility to sign up.
     # since the UI only cares about the date to jump to, it might not make a difference in many cases
-    events = ag_scope.preload(:appointments => :child_events).to_a.map do |ag|
+    events = ag_scope.preload(:appointments => :child_events).to_a.filter_map do |ag|
       ag.appointments.detect do |appointment|
         appointment.start_at > Time.zone.now &&
           appointment.child_events_for(@current_user).empty? &&
           (appointment.participants_per_appointment.nil? ||
            appointment.child_events.count < appointment.participants_per_appointment)
       end
-    end.compact
+    end
     render :json => events.sort_by(&:start_at)[0..0].map { |event|
       calendar_event_json(event, @current_user, session)
     }
@@ -607,8 +607,8 @@ class AppointmentGroupsController < ApplicationController
   def web_index
     # start with the first reservable appointment group
     group = AppointmentGroup.reservable_by(@current_user, params[:context_codes]).current.order(:start_at).first
-    anchor = calendar_fragment :view_name => :agenda, :view_start => group && group.start_at.strftime('%Y-%m-%d')
-    return redirect_to calendar2_url(:anchor => anchor)
+    anchor = calendar_fragment :view_name => :agenda, :view_start => group&.start_at&.strftime('%Y-%m-%d')
+    redirect_to calendar2_url(:anchor => anchor)
   end
 
   def web_show
@@ -631,8 +631,8 @@ class AppointmentGroupsController < ApplicationController
                # For the calendar to correctly pop-up the event we should use the parent event if the
                # event is a user event and the user does not own the event.
                # i.e. teacher viewing appointment slot filled by student.
-               event = event.parent_event if event && event.user && event.user != @current_user
-               event = nil unless event && event.grants_right?(@current_user, :read)
+               event = event.parent_event if event&.user && event.user != @current_user
+               event = nil unless event&.grants_right?(@current_user, :read)
                args[:view_start] = (event || @group).start_at.strftime('%Y-%m-%d')
                if event
                  calendar_args[:event_id] = event.id

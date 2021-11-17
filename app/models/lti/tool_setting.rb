@@ -23,7 +23,7 @@ module Lti
     belongs_to :tool_proxy
     belongs_to :context, polymorphic: [:course, :account, :attachment_association]
 
-    validates_presence_of :context, if: :has_resource_link_id?
+    validates :context, presence: { if: :has_resource_link_id? }
 
     serialize :custom
     serialize :custom_parameters

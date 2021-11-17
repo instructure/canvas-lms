@@ -30,8 +30,8 @@ class Eportfolio < ActiveRecord::Base
 
   SPAM_MODERATIONS = %w[marked_as_safe marked_as_spam].freeze
 
-  validates_presence_of :user_id
-  validates_length_of :name, maximum: maximum_string_length, allow_blank: true
+  validates :user_id, presence: true
+  validates :name, length: { maximum: maximum_string_length, allow_blank: true }
   # flagged_as_possible_spam => our internal filters have flagged this as spam, but
   # an admin has not manually marked this as spam.
   # marked_as_safe => an admin has manually marked this as safe.

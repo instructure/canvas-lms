@@ -24,11 +24,8 @@ jest.mock('../../../actions')
 jest.useFakeTimers()
 
 function createReadyAnimation() {
-  const {
-    continueLoadingInitialItems,
-    startLoadingFutureSaga,
-    gotDaysSuccess
-  } = require.requireActual('../../../actions')
+  const {continueLoadingInitialItems, startLoadingFutureSaga, gotDaysSuccess} =
+    jest.requireActual('../../../actions')
   const result = createAnimation(ContinueInitialLoad)
   result.animation.acceptAction(continueLoadingInitialItems())
   result.animation.acceptAction(startLoadingFutureSaga())

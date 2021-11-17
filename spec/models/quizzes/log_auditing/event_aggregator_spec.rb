@@ -22,7 +22,7 @@ describe Quizzes::LogAuditing::EventAggregator do
   def build_course_quiz_qs
     teacher_in_course
     @quiz = Quizzes::Quiz.create!(:title => 'quiz', :context => @course)
-    @questions = 2.times.map do
+    @questions = Array.new(2) do
       @quiz.quiz_questions.create!(:question_data => short_answer_question_data)
     end
     @qs = @quiz.generate_submission(student_in_course.user)

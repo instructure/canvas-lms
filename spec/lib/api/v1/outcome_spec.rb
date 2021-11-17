@@ -78,7 +78,7 @@ RSpec.describe "Api::V1::Outcome" do
           expect(outcome['display_name']).to eq(outcome_params[:display_name])
           expect(outcome['description']).to eq(outcome_params[:description])
           expect(outcome['vendor_guid']).to eq(outcome_params[:vendor_guid])
-          expect(outcome['assessed']).to eq(LearningOutcome.find(outcome['id']).assessed? ? true : false)
+          expect(outcome['assessed']).to eq(LearningOutcome.find(outcome['id']).assessed?)
           expect(outcome['has_updateable_rubrics']).to eq(
             LearningOutcome.find(outcome['id']).updateable_rubrics?
           )
@@ -124,7 +124,7 @@ RSpec.describe "Api::V1::Outcome" do
           end
 
           it "ignores the resolved_outcome_proficiency and resolved_calculation_method of the provided context" do
-            opts.merge!(context: @course)
+            opts[:context] = @course
             check_outcome_json.call(lib.outcome_json(new_outcome(({ **outcome_params, :context => @course })), nil, nil, opts))
           end
         end
@@ -153,7 +153,7 @@ RSpec.describe "Api::V1::Outcome" do
 
       it "returns the json for multiple outcome links" do
         course_with_teacher(active_all: true)  # sets @course
-        outcome_links = 10.times.map { new_outcome_link(outcome_params, @course) }
+        outcome_links = Array.new(10) { new_outcome_link(outcome_params, @course) }
         lib.outcome_links_json(outcome_links, nil, nil).each do |ol|
           check_outcome_link_json.call(
             LearningOutcome.find(ol["outcome"]["id"]),

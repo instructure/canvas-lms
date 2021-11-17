@@ -99,6 +99,10 @@ export type CanvasDateInputProps = {
    * A function which validates whether or not a date should render with the `disabled` interaction style.
    */
   dateIsDisabled?: (date: Moment) => boolean
+  /**
+   * data test id for test selection
+   */
+  dataTestid?: string
 }
 
 /**
@@ -120,7 +124,8 @@ export default function CanvasDateInput({
   invalidDateMessage,
   layout = 'stacked',
   width,
-  dateIsDisabled
+  dateIsDisabled,
+  dataTestid
 }: CanvasDateInputProps) {
   const todayMoment = moment().tz(timezone)
   const selectedMoment = selectedDate ? moment.tz(selectedDate, timezone) : null
@@ -386,6 +391,7 @@ export default function CanvasDateInput({
       interaction={interaction}
       layout={layout}
       width={width}
+      data-testid={dataTestid}
     >
       {renderDays()}
     </DateInput>

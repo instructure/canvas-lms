@@ -98,7 +98,10 @@ describe "new groups" do
       wait_for_ajaximations
       click_option('.move-select .move-select__group select', @testgroup[1].name.to_s)
       button = f('.move-select button[type="submit"]')
-      keep_trying_until { button.click; true }
+      keep_trying_until {
+        button.click
+        true
+      }
       wait_for_ajaximations
 
       # Verifies the student count updates
@@ -286,7 +289,10 @@ describe "new groups" do
       wait_for_ajaximations
 
       button = f('.move-select button[type="submit"]')
-      keep_trying_until { button.click; true } # have to wait for instUI animations
+      keep_trying_until {
+        button.click
+        true
+      } # have to wait for instUI animations
       wait_for_ajaximations
 
       expect(f(".group[data-id=\"#{@testgroup[0].id}\"] span.show-group-full")).not_to be_displayed

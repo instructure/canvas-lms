@@ -26,7 +26,7 @@ module DataFixup::AddRoleOverridesForNewPermission
   def self.run(base_permission, new_permission, skip_validation: false, base_role_type: nil)
     unless skip_validation
       [base_permission, new_permission].each do |perm|
-        raise "#{perm} is not a valid permission" unless RoleOverride.permissions.keys.include?(perm.to_sym)
+        raise "#{perm} is not a valid permission" unless RoleOverride.permissions.key?(perm.to_sym)
       end
     end
 

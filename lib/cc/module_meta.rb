@@ -60,7 +60,7 @@ module CC
             m_node.title cm.name
             m_node.workflow_state cm.workflow_state
             m_node.position cm.position
-            m_node.unlock_at CCHelper::ims_datetime(cm.unlock_at) if cm.unlock_at
+            m_node.unlock_at CCHelper.ims_datetime(cm.unlock_at) if cm.unlock_at
             m_node.require_sequential_progress cm.require_sequential_progress.to_s unless cm.require_sequential_progress.nil?
             m_node.requirement_count cm.requirement_count if cm.requirement_count
             m_node.locked cm.locked_for?(@user).present?
@@ -119,7 +119,7 @@ module CC
           end
         end
       end
-      meta_file.close if meta_file
+      meta_file&.close
       rel_path
     end
   end

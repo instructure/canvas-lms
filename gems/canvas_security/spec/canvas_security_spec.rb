@@ -167,7 +167,7 @@ describe CanvasSecurity do
       end
 
       it "allows 5 minutes of future clock skew" do
-        back_to_the_future_jwt = test_jwt(exp: 1.hour.from_now, nbf: 1.minutes.from_now, iat: 1.minutes.from_now)
+        back_to_the_future_jwt = test_jwt(exp: 1.hour.from_now, nbf: 1.minute.from_now, iat: 1.minute.from_now)
         body = CanvasSecurity.decode_jwt(back_to_the_future_jwt, [key])
         expect(body[:a]).to eq 1
       end
@@ -212,7 +212,7 @@ describe CanvasSecurity do
 
     it 'loads config as erb from config/security.yml' do
       config = "test:\n  encryption_key: <%= ENV['ENCRYPTION_KEY'] %>"
-      expect(File).to receive(:read).with(Rails.root + 'config/security.yml').and_return(config)
+      expect(File).to receive(:read).with(Rails.root.join('config/security.yml').to_s).and_return(config)
       expect(ENV).to receive(:[]).with('ENCRYPTION_KEY').and_return('secret')
       expect(CanvasSecurity.config).to eq('encryption_key' => 'secret')
     end

@@ -50,6 +50,8 @@ export interface PacePlanItem {
   readonly id: string
   readonly duration: number
   readonly assignment_title: string
+  readonly assignment_link: string
+  readonly points_possible?: number | null
   readonly position: number
   readonly module_item_id: string
   readonly module_item_type: string
@@ -102,10 +104,11 @@ export type PacePlansState = PacePlan & {
 }
 export type SectionsState = Sections
 export type ResponsiveSizes = 'small' | 'large'
+export type CategoryErrors = {[category: string]: string}
 
 export interface UIState {
   readonly autoSaving: boolean
-  readonly errorMessage: string
+  readonly errors: CategoryErrors
   readonly divideIntoWeeks: boolean
   readonly selectedContextType: PlanContextTypes
   readonly selectedContextId: string

@@ -87,7 +87,7 @@ module CC::Exporter::WebZip
     def filter_and_clean_files(files)
       export_files = filter_for_export_safe_items(files, :attachments)
       cleanup_files = files - export_files
-      cleanup_files.select { |file_data| file_data[:exists] }.map { |file_data| file_data[:path_to_file] }.uniq.each { |path| File.delete(path) }
+      cleanup_files.select { |file_data| file_data[:exists] }.pluck(:path_to_file).uniq.each { |path| File.delete(path) }
       export_files
     end
 
@@ -252,7 +252,7 @@ module CC::Exporter::WebZip
           name: mod.name,
           status: user_module_status(mod),
           unlockDate: unlock_date,
-          prereqs: mod.prerequisites.map { |pre| pre[:id] }.select { |id| active_module_ids.include?(id) },
+          prereqs: mod.prerequisites.pluck(:id).select { |id| active_module_ids.include?(id) },
           requirement: requirement_type(mod),
           sequential: mod.require_sequential_progress || false,
           exportId: create_key(mod),

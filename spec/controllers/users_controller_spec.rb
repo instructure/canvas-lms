@@ -155,7 +155,10 @@ describe UsersController do
 
       allow(Canvas::Plugin).to receive(:find).and_return(settings_mock)
       allow(SecureRandom).to receive(:hex).and_return('abc123')
-      expect(GoogleDrive::Client).to receive(:auth_uri) { |_c, s| state = s; "http://example.com/redirect" }
+      expect(GoogleDrive::Client).to receive(:auth_uri) { |_c, s|
+                                       state = s
+                                       "http://example.com/redirect"
+                                     }
 
       get :oauth, params: { service: "google_drive", return_to: "http://example.com" }
 
@@ -1864,7 +1867,7 @@ describe UsersController do
 
       teacher_enrollments = assigns[:presenter].teacher_enrollments
       expect(teacher_enrollments).not_to be_nil
-      teachers = teacher_enrollments.map { |e| e.user }
+      teachers = teacher_enrollments.map(&:user)
       expect(teachers).to be_include(@teacher)
       expect(teachers).not_to be_include(@designer)
     end
@@ -2075,7 +2078,7 @@ describe UsersController do
       get 'admin_split', params: { :user_id => user1.id }
       expect(assigns[:js_env][:ADMIN_SPLIT_URL]).to include "/api/v1/users/#{user1.id}/split"
       expect(assigns[:js_env][:ADMIN_SPLIT_USER][:id]).to eq user1.id
-      expect(assigns[:js_env][:ADMIN_SPLIT_USERS].map { |user| user[:id] }).to eq([user2.id])
+      expect(assigns[:js_env][:ADMIN_SPLIT_USERS].pluck(:id)).to eq([user2.id])
     end
   end
 
@@ -2435,7 +2438,10 @@ describe UsersController do
 
   describe "#invite_users" do
     it 'does not work without ability to manage students or admins on course' do
-      Account.default.tap { |a| a.settings[:open_registration] = true; a.save! }
+      Account.default.tap { |a|
+        a.settings[:open_registration] = true
+        a.save!
+      }
       course_with_student_logged_in(:active_all => true)
 
       post 'invite_users', params: { :course_id => @course.id }
@@ -2551,7 +2557,7 @@ describe UsersController do
         @current_user = @user
         get 'user_dashboard'
         courses = assigns[:js_env][:STUDENT_PLANNER_COURSES]
-        expect(courses.map { |c| c[:id] }).to eq [@course.id]
+        expect(courses.pluck(:id)).to eq [@course.id]
       end
 
       it "sets ENV.STUDENT_PLANNER_GROUPS" do
@@ -2561,7 +2567,7 @@ describe UsersController do
         group.add_user(@current_user, 'accepted', true)
         get 'user_dashboard'
         groups = assigns[:js_env][:STUDENT_PLANNER_GROUPS]
-        expect(groups.map { |g| g[:id] }).to eq [group.id]
+        expect(groups.pluck(:id)).to eq [group.id]
       end
     end
 

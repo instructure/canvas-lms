@@ -145,8 +145,8 @@ describe Outcomes::CSVImporter do
 
       criteria = by_guid['c'].rubric_criterion
       ratings = criteria[:ratings].sort_by { |r| r[:points] }
-      expect(ratings.map { |r| r[:points] }).to eq([1, 2, 3])
-      expect(ratings.map { |r| r[:description] }).to eq(['Good', 'Better', 'Betterest'])
+      expect(ratings.pluck(:points)).to eq([1, 2, 3])
+      expect(ratings.pluck(:description)).to eq(['Good', 'Better', 'Betterest'])
 
       expect(by_guid['d'].rubric_criterion[:ratings].length).to eq(2)
       expect(by_guid['e'].rubric_criterion[:ratings].length).to eq(2)

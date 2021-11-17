@@ -42,11 +42,11 @@ module CC
       @migration_config = ConfigFile.load('external_migration')
       @migration_config ||= { :keep_after_complete => false }
       @for_course_copy = opts[:for_course_copy]
-      @qti_only_export = @content_export && @content_export.qti_export?
+      @qti_only_export = @content_export&.qti_export?
       @manifest_opts = opts.slice(:version)
       @deletions = opts[:deletions]
 
-      @for_master_migration = true if @content_export && @content_export.for_master_migration?
+      @for_master_migration = true if @content_export&.for_master_migration?
     end
 
     def self.export(content_export, opts = {})
@@ -63,11 +63,11 @@ module CC
 
         create_export_dir
         create_zip_file
-        if @qti_only_export
-          @manifest = CC::Qti::QtiManifest.new(self)
-        else
-          @manifest = Manifest.new(self, @manifest_opts)
-        end
+        @manifest = if @qti_only_export
+                      CC::Qti::QtiManifest.new(self)
+                    else
+                      Manifest.new(self, @manifest_opts)
+                    end
         @manifest.create_document
         @manifest.close
 
@@ -127,7 +127,7 @@ module CC
       return unless external_content.present?
 
       folder = File.join(@export_dir, CCHelper::EXTERNAL_CONTENT_FOLDER)
-      FileUtils::mkdir_p(folder)
+      FileUtils.mkdir_p(folder)
 
       external_content.each do |service_key, data|
         path = File.join(folder, "#{service_key}.json")
@@ -140,7 +140,7 @@ module CC
     end
 
     def set_progress(progress)
-      @content_export.fast_update_progress(progress) if @content_export
+      @content_export&.fast_update_progress(progress)
     end
 
     def errors
@@ -160,7 +160,7 @@ module CC
     end
 
     def add_exported_asset(obj)
-      @content_export && @content_export.add_exported_asset(obj)
+      @content_export&.add_exported_asset(obj)
     end
 
     def export_symbol?(obj)
@@ -204,12 +204,12 @@ module CC
 
     def create_zip_file
       name = CanvasTextHelper.truncate_text(@course.name.to_url, { :max_length => 200, :ellipsis => '' })
-      if @qti_only_export
-        @zip_name = "#{name}-quiz-export.zip"
-      else
-        @zip_name = "#{name}-export.#{CCHelper::CC_EXTENSION}"
-      end
-      FileUtils::mkdir_p File.join(@export_dir, ZIP_DIR)
+      @zip_name = if @qti_only_export
+                    "#{name}-quiz-export.zip"
+                  else
+                    "#{name}-export.#{CCHelper::CC_EXTENSION}"
+                  end
+      FileUtils.mkdir_p File.join(@export_dir, ZIP_DIR)
       @zip_path = File.join(@export_dir, ZIP_DIR, @zip_name)
       @zip_file = Zip::File.new(@zip_path, Zip::File::CREATE)
     end

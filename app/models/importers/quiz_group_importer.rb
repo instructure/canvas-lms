@@ -39,9 +39,10 @@ module Importers
           bank_context = nil
 
           unless migration.cross_institution?
-            if hash[:question_bank_context] =~ /account_(\d*)/
+            case hash[:question_bank_context]
+            when /account_(\d*)/
               bank_context = Account.where(id: $1).first
-            elsif hash[:question_bank_context] =~ /course_(\d*)/
+            when /course_(\d*)/
               bank_context = Course.where(id: $1).first
             end
 

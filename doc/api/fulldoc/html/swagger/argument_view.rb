@@ -88,7 +88,7 @@ class ArgumentView < HashView
   end
 
   def enums
-    enum_and_types.first.map { |e| e.gsub('"', '') }
+    enum_and_types.first.map { |e| e.delete('"') }
   end
 
   def types
@@ -112,14 +112,14 @@ class ArgumentView < HashView
 
   def swagger_type
     type = (types.first || 'string')
-    type = "number" if type.downcase == "float"
+    type = "number" if type.casecmp?("float")
     builtin?(type) ? type.downcase : type
   end
 
   def swagger_format
     type = (types.first || 'string')
     return "int64" if swagger_type == "integer"
-    return "float" if type.downcase == "float"
+    return "float" if type.casecmp?("float")
   end
 
   def optional?
@@ -127,7 +127,7 @@ class ArgumentView < HashView
   end
 
   def required?
-    types = enum_and_types.last.map { |t| t.downcase }
+    types = enum_and_types.last.map(&:downcase)
     swagger_param_type == 'path' || types.include?('required')
   end
 

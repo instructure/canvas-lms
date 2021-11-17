@@ -29,11 +29,11 @@ describe UserContent, type: :request do
   end
 
   it "translates course file download links to directly-downloadable urls" do
-    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
-    <p>
-      Hello, students.<br>
-      This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
-    </p>
+    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<~HTML)
+      <p>
+        Hello, students.<br>
+        This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
+      </p>
     HTML
 
     json = api_call(:get,
@@ -49,11 +49,11 @@ describe UserContent, type: :request do
     @group = @course.groups.create!(:name => "course group")
     attachment_model(:context => @group)
     @group.add_user(@teacher)
-    @group_topic = @group.discussion_topics.create!(:title => "group topic", :user => @teacher, :message => <<-HTML)
-    <p>
-      Hello, students.<br>
-      This will explain everything: <img src="/groups/#{@group.id}/files/#{@attachment.id}/download" alt="important">
-    </p>
+    @group_topic = @group.discussion_topics.create!(:title => "group topic", :user => @teacher, :message => <<~HTML)
+      <p>
+        Hello, students.<br>
+        This will explain everything: <img src="/groups/#{@group.id}/files/#{@attachment.id}/download" alt="important">
+      </p>
     HTML
 
     json = api_call(:get,
@@ -70,11 +70,11 @@ describe UserContent, type: :request do
     attachment2 = Attachment.create!(:folder => @attachment.folder, :context => @attachment.context, :filename => @attachment.filename, :uploaded_data => StringIO.new("first"))
     expect(@context.attachments.find(@attachment.id).id).to eq attachment2.id
 
-    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
-    <p>
-      Hello, students.<br>
-      This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
-    </p>
+    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<~HTML)
+      <p>
+        Hello, students.<br>
+        This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
+      </p>
     HTML
 
     json = api_call(:get,
@@ -88,11 +88,11 @@ describe UserContent, type: :request do
 
   it "does not corrupt absolute links" do
     attachment_model(:context => @course)
-    @topic = @course.discussion_topics.create!(:title => "course topic", :user => @teacher, :message => <<-HTML)
-    <p>
-      Hello, students.<br>
-      This will explain everything: <img src="http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
-    </p>
+    @topic = @course.discussion_topics.create!(:title => "course topic", :user => @teacher, :message => <<~HTML)
+      <p>
+        Hello, students.<br>
+        This will explain everything: <img src="http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download" alt="important">
+      </p>
     HTML
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
@@ -104,11 +104,11 @@ describe UserContent, type: :request do
 
   it "does not remove wrap parameter on file download links" do
     attachment_model(:context => @course)
-    @topic = @course.discussion_topics.create!(:title => "course topic", :user => @teacher, :message => <<-HTML)
-    <p>
-      Hello, students.<br>
-      This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1" alt="important">
-    </p>
+    @topic = @course.discussion_topics.create!(:title => "course topic", :user => @teacher, :message => <<~HTML)
+      <p>
+        Hello, students.<br>
+        This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1" alt="important">
+      </p>
     HTML
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
@@ -119,11 +119,11 @@ describe UserContent, type: :request do
   end
 
   it "translates file preview links to directly-downloadable preview urls" do
-    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
-    <p>
-      Hello, students.<br>
-      This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/preview" alt="important">
-    </p>
+    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<~HTML)
+      <p>
+        Hello, students.<br>
+        This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/preview" alt="important">
+      </p>
     HTML
 
     json = api_call(:get,
@@ -136,11 +136,11 @@ describe UserContent, type: :request do
   end
 
   it "translates media comment links to embedded video tags" do
-    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
-    <p>
-      Hello, students.<br>
-      Watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
-    </p>
+    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<~HTML)
+      <p>
+        Hello, students.<br>
+        Watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
+      </p>
     HTML
 
     json = api_call(:get,
@@ -164,11 +164,11 @@ describe UserContent, type: :request do
   end
 
   it "translates media comment audio tags" do
-    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
-    <p>
-      Hello, students.<br>
-      Listen up: <a href="/media_objects/abcde" class="instructure_inline_media_comment audio_comment" id="media_comment_abcde"><img></a>
-    </p>
+    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<~HTML)
+      <p>
+        Hello, students.<br>
+        Listen up: <a href="/media_objects/abcde" class="instructure_inline_media_comment audio_comment" id="media_comment_abcde"><img></a>
+      </p>
     HTML
 
     json = api_call(:get,
@@ -188,11 +188,11 @@ describe UserContent, type: :request do
   end
 
   it "does not translate links in content not viewable by user" do
-    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
-    <p>
-      Hello, students.<br>
-      This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/preview" alt="important">
-    </p>
+    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<~HTML)
+      <p>
+        Hello, students.<br>
+        This will explain everything: <img src="/courses/#{@course.id}/files/#{@attachment.id}/preview" alt="important">
+      </p>
     HTML
 
     # put a student in the course. this will be the active user during the API
@@ -212,15 +212,15 @@ describe UserContent, type: :request do
   end
 
   it "prepends the hostname to all absolute-path links" do
-    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
-    <p>
-      Hello, students.<br>
-      <img src='/equation_images/1234'>
-      <a href='/help'>click for teh help</a>
-      <a href='//example.com/quiz'>a quiz</a>
-      <a href='http://example.com/test1'>moar</a>
-      <a href='invalid url'>broke</a>
-    </p>
+    @assignment = @course.assignments.create!(:title => "first assignment", :description => <<~HTML)
+      <p>
+        Hello, students.<br>
+        <img src='/equation_images/1234'>
+        <a href='/help'>click for teh help</a>
+        <a href='//example.com/quiz'>a quiz</a>
+        <a href='http://example.com/test1'>moar</a>
+        <a href='invalid url'>broke</a>
+      </p>
     HTML
 
     json = api_call(:get,
@@ -253,27 +253,27 @@ describe UserContent, type: :request do
     context "course context" do
       it "processes links to each type of object" do
         @wiki_page = @course.wiki_pages.build(:title => "title")
-        @wiki_page.body = <<-HTML
-        <p>
-          <a href='/courses/#{@course.id}/assignments'>assignments index</a>
-          <a href='/courses/#{@course.id}/assignments/9~123'>assignment</a>
-          <a href='/courses/#{@course.id}/wiki'>wiki index</a>
-          <a href='/courses/#{@course.id}/wiki/test-wiki-page'>wiki page</a>
-          <a href='/courses/#{@course.id}/wiki/test-wiki-page-2?titleize=0'>wiki page</a>
-          <a href='/courses/#{@course.id}/pages'>wiki index</a>
-          <a href='/courses/#{@course.id}/pages/test-wiki-page'>wiki page</a>
-          <a href='/courses/#{@course.id}/pages/test-wiki%20page-2?titleize=0'>wiki page</a>
-          <a href='/courses/#{@course.id}/discussion_topics'>discussion index</a>
-          <a href='/courses/#{@course.id}/discussion_topics/456'>discussion topic</a>
-          <a href='/courses/#{@course.id}/files'>files index</a>
-          <a href='/courses/#{@course.id}/files/789/download?verifier=lolcats'>files index</a>
-          <a href='/files/789/download?verifier=lolcats'>file</a>
-          <a href='/courses/#{@course.id}/quizzes'>quiz index</a>
-          <a href='/courses/#{@course.id}/quizzes/999'>quiz</a>
-          <a href='/courses/#{@course.id}/modules'>modules index</a>
-          <a href='/courses/#{@course.id}/modules/1024'>module</a>
-          <a href='/courses/#{@course.id}/external_tools/retrieve?url=http://lti-tool-provider.example.com/lti_tool'>LTI Launch</a>
-        </p>
+        @wiki_page.body = <<~HTML
+          <p>
+            <a href='/courses/#{@course.id}/assignments'>assignments index</a>
+            <a href='/courses/#{@course.id}/assignments/9~123'>assignment</a>
+            <a href='/courses/#{@course.id}/wiki'>wiki index</a>
+            <a href='/courses/#{@course.id}/wiki/test-wiki-page'>wiki page</a>
+            <a href='/courses/#{@course.id}/wiki/test-wiki-page-2?titleize=0'>wiki page</a>
+            <a href='/courses/#{@course.id}/pages'>wiki index</a>
+            <a href='/courses/#{@course.id}/pages/test-wiki-page'>wiki page</a>
+            <a href='/courses/#{@course.id}/pages/test-wiki%20page-2?titleize=0'>wiki page</a>
+            <a href='/courses/#{@course.id}/discussion_topics'>discussion index</a>
+            <a href='/courses/#{@course.id}/discussion_topics/456'>discussion topic</a>
+            <a href='/courses/#{@course.id}/files'>files index</a>
+            <a href='/courses/#{@course.id}/files/789/download?verifier=lolcats'>files index</a>
+            <a href='/files/789/download?verifier=lolcats'>file</a>
+            <a href='/courses/#{@course.id}/quizzes'>quiz index</a>
+            <a href='/courses/#{@course.id}/quizzes/999'>quiz</a>
+            <a href='/courses/#{@course.id}/modules'>modules index</a>
+            <a href='/courses/#{@course.id}/modules/1024'>module</a>
+            <a href='/courses/#{@course.id}/external_tools/retrieve?url=http://lti-tool-provider.example.com/lti_tool'>LTI Launch</a>
+          </p>
         HTML
         @wiki_page.workflow_state = 'active'
         @wiki_page.save!
@@ -312,17 +312,17 @@ describe UserContent, type: :request do
       it "processes links to each type of object" do
         group_with_user(:active_all => true)
         @wiki_page = @group.wiki_pages.build(:title => "title")
-        @wiki_page.body = <<-HTML
-        <p>
-          <a href='/groups/#{@group.id}/wiki'>wiki index</a>
-          <a href='/groups/#{@group.id}/wiki/some-page'>wiki page</a>
-          <a href='/groups/#{@group.id}/pages'>wiki index</a>
-          <a href='/groups/#{@group.id}/pages/some-page'>wiki page</a>
-          <a href='/groups/#{@group.id}/discussion_topics'>discussion index</a>
-          <a href='/groups/#{@group.id}/discussion_topics/1~123'>discussion topic</a>
-          <a href='/groups/#{@group.id}/files'>files index</a>
-          <a href='/groups/#{@group.id}/files/789/preview'>file</a>
-        </p>
+        @wiki_page.body = <<~HTML
+          <p>
+            <a href='/groups/#{@group.id}/wiki'>wiki index</a>
+            <a href='/groups/#{@group.id}/wiki/some-page'>wiki page</a>
+            <a href='/groups/#{@group.id}/pages'>wiki index</a>
+            <a href='/groups/#{@group.id}/pages/some-page'>wiki page</a>
+            <a href='/groups/#{@group.id}/discussion_topics'>discussion index</a>
+            <a href='/groups/#{@group.id}/discussion_topics/1~123'>discussion topic</a>
+            <a href='/groups/#{@group.id}/files'>files index</a>
+            <a href='/groups/#{@group.id}/files/789/preview'>file</a>
+          </p>
         HTML
         @wiki_page.workflow_state = 'active'
         @wiki_page.save!
@@ -349,9 +349,9 @@ describe UserContent, type: :request do
 
     context "user context" do
       it "processes links to each type of object" do
-        @topic = @course.discussion_topics.create!(:message => <<-HTML)
-            <a href='/users/#{@teacher.id}/files'>file index</a>
-            <a href='/users/#{@teacher.id}/files/789/preview'>file</a>
+        @topic = @course.discussion_topics.create!(:message => <<~HTML)
+          <a href='/users/#{@teacher.id}/files'>file index</a>
+          <a href='/users/#{@teacher.id}/files/789/preview'>file</a>
         HTML
 
         json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
@@ -374,12 +374,12 @@ describe UserContent, type: :request do
 
     it "adds the expected href to instructure_inline_media_comment anchors" do
       factory_with_protected_attributes(MediaObject, media_id: 'test2', media_type: 'audio')
-      html = tester.process_incoming_html_content(<<-HTML)
-      <a id='something-else' href='/blah'>no touchy</a>
-      <a class='instructure_inline_media_comment audio_comment'>no id</a>
-      <a id='media_comment_test1' class='instructure_inline_media_comment audio_comment'>with id</a>
-      <a id='media_comment_test2' class='instructure_inline_media_comment'>id, no type</a>
-      <a id='media_comment_test3' class='instructure_inline_media_comment'>id, no type, missing object</a>
+      html = tester.process_incoming_html_content(<<~HTML)
+        <a id='something-else' href='/blah'>no touchy</a>
+        <a class='instructure_inline_media_comment audio_comment'>no id</a>
+        <a id='media_comment_test1' class='instructure_inline_media_comment audio_comment'>with id</a>
+        <a id='media_comment_test2' class='instructure_inline_media_comment'>id, no type</a>
+        <a id='media_comment_test3' class='instructure_inline_media_comment'>id, no type, missing object</a>
       HTML
 
       doc = Nokogiri::HTML5.fragment(html)
@@ -396,11 +396,11 @@ describe UserContent, type: :request do
     end
 
     it "translates video and audio instructure_inline_media_comment tags" do
-      html = tester.process_incoming_html_content(<<-HTML)
-      <video src='/other'></video>
-      <video class='instructure_inline_media_comment' src='/some/redirect/url'>no media id</video>
-      <video class='instructure_inline_media_comment' src='/some/redirect/url' data-media_comment_id='test1'>with media id</video>
-      <audio class='instructure_inline_media_comment' src='/some/redirect/url' data-media_comment_id='test2'>with media id</video>
+      html = tester.process_incoming_html_content(<<~HTML)
+        <video src='/other'></video>
+        <video class='instructure_inline_media_comment' src='/some/redirect/url'>no media id</video>
+        <video class='instructure_inline_media_comment' src='/some/redirect/url' data-media_comment_id='test1'>with media id</video>
+        <audio class='instructure_inline_media_comment' src='/some/redirect/url' data-media_comment_id='test2'>with media id</video>
       HTML
 
       doc = Nokogiri::HTML5.fragment(html)
@@ -476,7 +476,7 @@ describe UserContent, type: :request do
   describe ".api_bulk_load_user_content_attachments" do
     it "returns a hash of assignment_id => assignment" do
       a1, a2, a3 = attachment_model, attachment_model, attachment_model
-      html1, html2 = <<-HTML1, <<-HTML2
+      html1, html2 = <<~HTML1, <<~HTML2
         <a href="/courses/#{@course.id}/files/#{a1.id}/download">uh...</a>
         <img src="/courses/#{@course.id}/files/#{a2.id}/download">
       HTML1

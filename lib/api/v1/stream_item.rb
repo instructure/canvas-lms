@@ -123,7 +123,7 @@ module Api::V1::StreamItem
   def api_render_stream(opts)
     items = @current_user.shard.activate do
       scope = @current_user.visible_stream_item_instances(opts).preload(:stream_item)
-      if opts.has_key?(:asset_type)
+      if opts.key?(:asset_type)
         is_cross_shard = @current_user.visible_stream_item_instances(opts)
                                       .where("stream_item_id > ?", Shard::IDS_PER_SHARD).exists?
         if is_cross_shard
@@ -136,7 +136,7 @@ module Api::V1::StreamItem
             # just because there are comments doesn't mean the user can see them.
             # we still need to filter after the pagination :(
             scope = scope.where("submissions.workflow_state <> 'deleted' AND submissions.submission_comments_count>0")
-            scope = scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.has_key?(:submission_user_id)
+            scope = scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.key?(:submission_user_id)
           end
         end
       end
@@ -160,7 +160,7 @@ module Api::V1::StreamItem
         # just because there are comments doesn't mean the user can see them.
         # we still need to filter after the pagination :(
         si_scope = si_scope.where("submissions.workflow_state <> 'deleted' AND submissions.submission_comments_count>0")
-        si_scope = si_scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.has_key?(:submission_user_id)
+        si_scope = si_scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.key?(:submission_user_id)
         filtered_ids += si_scope.pluck(:id).map { |id| Shard.relative_id_for(id, Shard.current, @current_user.shard) }
       end
     end
@@ -181,7 +181,7 @@ module Api::V1::StreamItem
         if full_counts.keys.any? { |k| k[0] == 'DiscussionTopic' }
           ann_counts = base_scope.where(:stream_items => { :asset_type => "DiscussionTopic" })
                                  .joins("INNER JOIN #{DiscussionTopic.quoted_table_name} ON discussion_topics.id=stream_items.asset_id")
-                                 .where("discussion_topics.type = ?", "Announcement").except(:order).group('stream_item_instances.workflow_state').count
+                                 .where(discussion_topics: { type: "Announcement" }).except(:order).group('stream_item_instances.workflow_state').count
 
           ann_counts.each do |wf_state, ann_count|
             full_counts[['Announcement', nil, wf_state]] = ann_count
@@ -241,7 +241,7 @@ module Api::V1::StreamItem
       if total_counts.keys.any? { |k| k[0] == 'DiscussionTopic' }
         ann_scope = StreamItem.where(:stream_items => { :asset_type => "DiscussionTopic" })
                               .joins(:discussion_topic)
-                              .where("discussion_topics.type = ?", "Announcement")
+                              .where(discussion_topics: { type: "Announcement" })
         ann_total = ann_scope.where(:id => stream_item_ids).count
 
         if ann_total > 0

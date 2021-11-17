@@ -96,9 +96,9 @@ class GoogleDocsCollaboration < Collaboration
                  nil
                end
 
-      user_ids = new_users.map do |user|
+      user_ids = new_users.filter_map do |user|
         google_user_service(user, GOOGLE_DRIVE_SERVICE).service_user_id rescue nil
-      end.compact
+      end
 
       google_adapter_for_user.acl_add(self.document_id, user_ids, domain)
     end
@@ -121,7 +121,7 @@ class GoogleDocsCollaboration < Collaboration
 
   def google_user_service(user, service_domain = GOOGLE_DRIVE_SERVICE)
     google_services = user.user_services.where(service_domain: service_domain).to_a
-    google_services.find { |s| s.service_user_id }
+    google_services.find(&:service_user_id)
   end
 
   def google_drive_for_user

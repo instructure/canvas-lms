@@ -222,9 +222,11 @@ module DatesOverridable
   def due_date_hash
     hash = { :due_at => due_at, :unlock_at => unlock_at, :lock_at => lock_at }
     if self.is_a?(Assignment)
-      hash.merge!({ :all_day => all_day, :all_day_date => all_day_date })
+      hash[:all_day] = all_day
+      hash[:all_day_date] = all_day_date
     elsif self.assignment
-      hash.merge!({ :all_day => assignment.all_day, :all_day_date => assignment.all_day_date })
+      hash[:all_day] = assignment.all_day
+      hash[:all_day_date] = assignment.all_day_date
     end
 
     if @applied_overrides && (override = @applied_overrides.find { |o| o.due_at == due_at })

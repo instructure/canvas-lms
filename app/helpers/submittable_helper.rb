@@ -40,7 +40,7 @@ module SubmittableHelper
     if assignment_params
       if assignment_params.key?(:set_assignment) &&
          !value_to_boolean(assignment_params[:set_assignment])
-        if submittable.assignment && submittable.assignment.grants_right?(@current_user, session, :update)
+        if submittable.assignment&.grants_right?(@current_user, session, :update)
           assignment = submittable.assignment
           submittable.assignment = nil
           submittable.save!

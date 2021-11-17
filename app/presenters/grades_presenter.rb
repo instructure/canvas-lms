@@ -23,7 +23,7 @@ class GradesPresenter
   end
 
   def student_enrollments
-    @student_enrollments ||= current_enrollments.select { |e| e.student? }.index_by { |e| e.course }
+    @student_enrollments ||= current_enrollments.select(&:student?).index_by(&:course)
   end
 
   def observed_enrollments
@@ -54,7 +54,7 @@ class GradesPresenter
   end
 
   def teacher_enrollments
-    @teacher_enrollments ||= current_enrollments.select { |e| e.instructor? }.index_by { |e| e.course }.values
+    @teacher_enrollments ||= current_enrollments.select(&:instructor?).index_by(&:course).values
   end
 
   def prior_enrollments

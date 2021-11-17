@@ -26,7 +26,9 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   include Api::V1::DiscussionTopics
   include Api
   include Rails.application.routes.url_helpers
-  def use_placeholder_host?; true; end
+  def use_placeholder_host?
+    true
+  end
 
   serialize :participants_array, Array
   serialize :entry_ids_array, Array
@@ -42,7 +44,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       # first try to pull the view from the secondary. we can't just do this in the
       # unique_constraint_retry since it begins a transaction.
       view = GuardRail.activate(:secondary) { self.where(discussion_topic_id: discussion_topic).first }
-      if !view
+      unless view
         # if the view wasn't found, drop into the unique_constraint_retry
         # transaction loop on master.
         unique_constraint_retry do
@@ -111,7 +113,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
   # if opts[:include_new_entries] is true, it will also return all the entries
   # that have been created or updated since the view was generated.
   def materialized_view_json(opts = {})
-    if !up_to_date?
+    unless up_to_date?
       update_materialized_view(xlog_location: self.class.current_xlog_location)
     end
 
@@ -124,23 +126,23 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
         @for_mobile = true if opts[:include_mobile_overrides]
 
         new_entries = all_entries.count != entry_ids.count ? all_entries.where.not(:id => entry_ids).to_a : []
-        participant_ids = (Set.new(participant_ids) + new_entries.map(&:user_id).compact + new_entries.map(&:editor_id).compact).to_a
+        participant_ids = (Set.new(participant_ids) + new_entries.filter_map(&:user_id) + new_entries.filter_map(&:editor_id)).to_a
         entry_ids = (Set.new(entry_ids) + new_entries.map(&:id)).to_a
         new_entries_json_structure = discussion_entry_api_json(new_entries, discussion_topic.context, nil, nil, [])
       else
         new_entries_json_structure = []
       end
 
-      return json_structure, participant_ids, entry_ids, new_entries_json_structure
+      [json_structure, participant_ids, entry_ids, new_entries_json_structure]
     else
-      return nil
+      nil
     end
   end
 
   def update_materialized_view(xlog_location: nil, use_master: false)
     unless use_master
       timeout = Setting.get("discussion_materialized_view_replication_timeout", "60").to_i.seconds
-      if !self.class.wait_for_replication(start: xlog_location, timeout: timeout)
+      unless self.class.wait_for_replication(start: xlog_location, timeout: timeout)
         # failed to replicate - requeue later
         run_at = Setting.get("discussion_materialized_view_replication_failure_retry", "300").to_i.seconds.from_now
         delay(singleton: "materialized_discussion:#{Shard.birth.activate { self.discussion_topic_id }}", run_at: run_at)
@@ -189,7 +191,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
       end
     end
     StringifyIds.recursively_stringify_ids(view)
-    return view.to_json, user_ids.to_a, entry_lookup.keys
+    [view.to_json, user_ids.to_a, entry_lookup.keys]
   end
 
   def in_app?

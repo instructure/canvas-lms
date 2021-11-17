@@ -63,7 +63,7 @@ module Lti
 
         it "has a default 'exp' of 1 hour" do
           Timecop.freeze do
-            expect(Canvas::Security.decode_jwt(access_token.to_s)['exp']).to eq 1.hours.from_now.to_i
+            expect(Canvas::Security.decode_jwt(access_token.to_s)['exp']).to eq 1.hour.from_now.to_i
           end
         end
 

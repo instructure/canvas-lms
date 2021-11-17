@@ -99,7 +99,7 @@ module ConditionalRelease
       end
 
       context 'with trend data' do
-        let(:trends) { @rollup.dig(:ranges, 0, :students).map { |s| s[:trend] } }
+        let(:trends) { @rollup.dig(:ranges, 0, :students).pluck(:trend) }
 
         it 'has trend == nil if no follow on assignments have been completed' do
           set_user_submissions(1, 'foo', [[@trigger, 32, 40]])
@@ -177,7 +177,7 @@ module ConditionalRelease
         details = Stats.student_details(@rule, @student_id).with_indifferent_access
         expect(details.dig(:trigger_assignment, :score)).to eq 0.9
         expect(details[:follow_on_assignments].map { |f| f[:assignment][:id] }).to match_array [@a1, @a2, @a3, @a4, @a5].map(&:id)
-        expect(details[:follow_on_assignments].map { |f| f[:score] }).to match_array [nil, nil, 0.8, nil, nil]
+        expect(details[:follow_on_assignments].pluck(:score)).to match_array [nil, nil, 0.8, nil, nil]
       end
 
       it 'matches assignment info and submission info' do
@@ -186,7 +186,7 @@ module ConditionalRelease
         expected_assignment_set([@student_id], @as2)
 
         details = Stats.student_details(@rule, @student_id).with_indifferent_access
-        details_by_id = details[:follow_on_assignments].each_with_object({}) { |f, acc| acc[f.dig(:assignment, :id)] = f }
+        details_by_id = details[:follow_on_assignments].index_by { |f| f.dig(:assignment, :id) }
         expect(details_by_id.map { |k, v| [k, v.dig(:submission, :score)] }).to match_array [
           [@b1.id, 3], [@b2.id, 88], [@b3.id, nil], [@b4.id, 93], [@b5.id, nil]
         ]

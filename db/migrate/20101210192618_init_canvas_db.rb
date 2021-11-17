@@ -2919,7 +2919,7 @@ class InitCanvasDb < ActiveRecord::Migration[4.2]
     add_index :submissions, :group_id, where: "group_id IS NOT NULL"
     add_index :submissions, :quiz_submission_id, where: "quiz_submission_id IS NOT NULL"
     add_index :submissions, [:assignment_id, :user_id]
-    add_index :submissions, :assignment_id, where: <<-SQL
+    add_index :submissions, :assignment_id, where: <<~SQL.squish
       submission_type IS NOT NULL
       AND (workflow_state = 'pending_review'
         OR (workflow_state = 'submitted'

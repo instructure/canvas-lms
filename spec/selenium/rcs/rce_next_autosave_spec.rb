@@ -224,7 +224,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       stub_rcs_config
     end
 
-    def account_with_admin_logged_in()
+    def account_with_admin_logged_in
       @account = Account.default
       account_admin_user
       user_session(@admin)

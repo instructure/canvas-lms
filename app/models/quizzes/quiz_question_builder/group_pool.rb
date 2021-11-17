@@ -41,7 +41,7 @@ class Quizzes::QuizQuestionBuilder
       duplicate_index = 1
       while questions.count < count
         duplicates = @questions.shuffle.slice(0, count - questions.count)
-        sources = AssessmentQuestion.where(id: duplicates.map { |q| q[:assessment_question_id] }).to_a
+        sources = AssessmentQuestion.where(id: duplicates.pluck(:assessment_question_id)).to_a
         break if sources.empty?
 
         duplicates = AssessmentQuestion.find_or_create_quiz_questions(

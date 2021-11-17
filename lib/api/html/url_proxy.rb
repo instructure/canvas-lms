@@ -161,7 +161,7 @@ module Api
           return_type = api_route[0]
           helper = api_route[1]
           args = { :protocol => protocol, :host => host }
-          args.merge! Hash[api_route.slice(2, match.captures.size).zip match.captures]
+          args.merge! (api_route.slice(2, match.captures.size).zip match.captures).to_h
           # transpose IDs in the URL
           transpose_ids(args) if context.shard != target_shard
           if args[:url] && (return_type == 'SessionlessLaunchUrl' || (return_type == "Page" && url.include?("titleize=0")))

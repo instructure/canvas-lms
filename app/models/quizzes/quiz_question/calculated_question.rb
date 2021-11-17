@@ -23,7 +23,7 @@ class Quizzes::QuizQuestion::CalculatedQuestion < Quizzes::QuizQuestion::Numeric
     answer = @question_data.answers.first
     return [] unless answer
 
-    return [{ :id => answer[:id], :numerical_answer_type => "exact_answer", :exact => answer[:answer], :margin => @question_data[:answer_tolerance] }]
+    [{ :id => answer[:id], :numerical_answer_type => "exact_answer", :exact => answer[:answer], :margin => @question_data[:answer_tolerance] }]
   end
 
   # TODO: remove once new stats is on for everybody

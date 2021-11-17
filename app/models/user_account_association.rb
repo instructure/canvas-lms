@@ -26,7 +26,7 @@ class UserAccountAssociation < ActiveRecord::Base
 
   after_commit :update_user_root_account_ids
 
-  validates_presence_of :user_id, :account_id
+  validates :user_id, :account_id, presence: true
 
   resolves_root_account through: :account
 

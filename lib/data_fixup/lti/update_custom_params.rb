@@ -60,12 +60,10 @@ module DataFixup::Lti::UpdateCustomParams
       failures
     end
 
-    def search(domains, subdomain_matching, validate_domain)
+    def search(domains, subdomain_matching, validate_domain, &block)
       validate_domains!(domains) if validate_domain
       Switchman::Shard.with_each_shard do
-        select_by_domains(domains, subdomain_matching).find_each do |tool|
-          yield tool
-        end
+        select_by_domains(domains, subdomain_matching).find_each(&block)
       end
     end
 
@@ -81,10 +79,9 @@ module DataFixup::Lti::UpdateCustomParams
       # we allow one \w*. before the provided domain
       subdomain_match = subdomain_matching ? '(\\w*\\.)?' : ''
 
-      tools = ContextExternalTool.active.where(
+      ContextExternalTool.active.where(
         '"context_external_tools".url ~ ANY (array[?])', domains.map { |d| "^https?://#{subdomain_match}#{d}/" }
       )
-      tools
     end
   end
 end

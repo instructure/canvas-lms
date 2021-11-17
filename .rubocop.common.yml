@@ -60,26 +60,78 @@ Migration/Tagged:
     - cassandra
     - dynamodb
 
+Naming/HeredocDelimiterCase:
+  Severity: error
+Naming/HeredocDelimiterNaming:
+  Severity: error
+  ForbiddenDelimiters:
+    # negative regex - these are the _allowed_ delimiters
+    # any you add should describe the format of the data, not describe
+    # what the data is for. this allows editors to syntax highlight
+    - ^(?!AST|BASE64|CSV|GQL|HTML|JS|MD|PEM|REGEX|RUBY|SQL|SRT|TEXT|XML|YAML).+$
 Naming/FileName:
   Exclude:
     - "**/Gemfile.d/~after.rb"
 
-Performance/StringInclude:
+Performance:
   Severity: error
+Performance/Casecmp:
+  AutoCorrect: false # prefer using casecmp?(other) instead of casecmp(other).zero?; it handles unicode better
+Performance/CollectionLiteralInLoop:
+  Severity: info # not auto-correctable; can be a pain to fix and isn't necessarily performance critical
+Performance/MethodObjectAsBlock:
+  Enabled: false # decreases expressiveness
 
+Rails/ActiveRecordAliases:
+  Severity: error
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
-Rails/HasManyOrHasOneDependent:
-  Enabled: false # legacy code + most things we soft delete anyway
-Rails/HelperInstanceVariable:
-  Enabled: false # legacy code
-Rails/SkipsModelValidations:
-  Enabled: false # Canvas skips validations in many places for optimization reasons
 Rails/ContentTag:
   Severity: error
   Exclude:
     - "**/db/migrate/*" # this cop is for views, not migrations, where it gets confused with outrigger
     - "doc/**/*"
+Rails/DynamicFindBy:
+  AllowedMethods:
+    - find_by_confirmation_code # CommunicationChannel
+    - find_by_signature # AssetSignature
+    - find_by_domain # Account
+    - find_by_name # PluginSetting
+    - find_by_asset_string # ApplicationRecord
+    - find_by_pseudonym_credentials # SessionPersistenceToken
+    - find_by_quiz # Quizzes::OutstandingQuizSubmissionManager
+  Severity: error
+Rails/FilePath:
+  Severity: error
+Rails/HasManyOrHasOneDependent:
+  Enabled: false # legacy code + most things we soft delete anyway
+Rails/HelperInstanceVariable:
+  Enabled: false # legacy code
+Rails/HttpStatus:
+  Severity: error
+Rails/IndexBy:
+  Severity: error
+Rails/IndexWith:
+  Severity: error
+Rails/Pluck:
+  Severity: error
+Rails/PluralizationGrammar:
+  Severity: error
+Rails/RedundantAllowNil:
+  Severity: error
+Rails/SkipsModelValidations:
+  Enabled: false # Canvas skips validations in many places for optimization reasons
+Rails/SquishedSQLHeredocs:
+  Severity: error
+Rails/Validation:
+  Severity: error
+Rails/WhereEquals:
+  Severity: error
+Rails/WhereExists:
+  EnforcedStyle: where
+  Severity: error
+Rails/WhereNot:
+  Severity: error
 
 RSpec/AnyInstance:
   Enabled: false # while using an instance double would be preferable, it's a pain
@@ -126,22 +178,54 @@ Specs/EnsureSpecExtension:
 Style/Alias:
   EnforcedStyle: prefer_alias_method # https://github.com/rubocop/ruby-style-guide/issues/821
   Severity: error
+Style/CaseLikeIf:
+  Severity: error
+Style/ColonMethodCall:
+  Severity: error
+Style/ConditionalAssignment:
+  Severity: error
+Style/DefWithParentheses:
+  Severity: error
 Style/Documentation:
   Enabled: false # most things don't need to be documented
+Style/EmptyCaseCondition:
+  Severity: error
 Style/Encoding:
   Severity: error
+Style/ExplicitBlockArgument:
+  Severity: error
 Style/FrozenStringLiteralComment:
+  Severity: error
+Style/HashConversion:
+  Severity: error
+Style/HashTransformKeys:
+  Severity: error
+Style/HashTransformValues:
   Severity: error
 Style/IfUnlessModifier:
   # see also https://github.com/rubocop/rubocop/discussions/10048
   Enabled: false # can obscure important decisions or put too much code in a line
+Style/IfWithBooleanLiteralBranches:
+  Severity: error
+Style/MutableConstant:
+  Severity: error
+Style/NegatedIf:
+  Severity: error
 Style/NumericPredicate:
   Enabled: false # `> 0` can be easier to read than `.positive?`
+Style/OrAssignment:
+  Severity: error
 Style/ParenthesesAroundCondition:
   Severity: error
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
+Style/PreferredHashMethods:
+  Severity: error
+Style/RedundantAssignment:
+  Severity: error
 Style/RedundantBegin:
+  Severity: error
+Style/RedundantCondition:
   Severity: error
 Style/RedundantInterpolation:
   Severity: error
@@ -151,8 +235,24 @@ Style/RedundantParentheses:
   Severity: error
 Style/RedundantRegexpEscape:
   Severity: error
+Style/RedundantReturn:
+  Severity: error
+Style/SafeNavigation:
+  Severity: error
+Style/SelfAssignment:
+  Severity: error
+Style/Semicolon:
+  Severity: error
+Style/SingleLineMethods:
+  Severity: error
+Style/SlicingWithRange:
+  Severity: error
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
+Style/SymbolProc:
+  Severity: error
+Style/UnpackFirst:
+  Severity: error
 Style/WhileUntilModifier:
   Enabled: false # nontrivial loops should look like loops
 
@@ -165,18 +265,10 @@ Lint/UriEscapeUnescape: # TODO
 Naming/VariableNumber: # TODO
   Enabled: false
 
-Rails/DynamicFindBy: # TODO; autocorrect (unsafe)
-  AllowedMethods:
-    - find_by_name # PluginSetting.find_by_name
-    - find_by_asset_string # ApplicationRecord.find_by_asset_string
-  AutoCorrect: false
 Rails/ReadWriteAttribute: # TODO: autocorrect (unsafe)
   Enabled: false # accessors are often defined in terms of read_attribute
 Rails/TimeZone: # TODO: autocorrect (unsafe)
   Enabled: false
-Rails/WhereExists: # TODO: autocorrect(unsafe)
-  EnforcedStyle: where
-  AutoCorrect: false
 
 RSpec/BeEql: # TODO: autocorrect
   Enabled: false

@@ -47,7 +47,7 @@ describe Lti::Security do
 
       it "doesn't copy query params" do
         signed_params = Lti::Security.signed_post_params(params, launch_url, consumer_key, consumer_secret, true)
-        expect(signed_params.key?('test')).to eq false
+        expect(signed_params).not_to have_key('test')
       end
 
       it "logs the oauth base string" do

@@ -59,7 +59,7 @@ class ObjectView < HashView
   end
 
   def clean_json_parts
-    clean_json_text_parts.map { |text| JSON::parse(text) }
+    clean_json_text_parts.map { |text| JSON.parse(text) }
   end
 
   def parts

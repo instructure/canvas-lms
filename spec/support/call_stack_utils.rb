@@ -29,7 +29,7 @@ module CallStackUtils
     super exception.class, exception.message, exception.backtrace
   end
 
-  APP_IGNORE_REGEX = %r{/spec/(support|selenium/test_setup/)}
+  APP_IGNORE_REGEX = %r{/spec/(support|selenium/test_setup/)}.freeze
   def self.prune_backtrace!(bt)
     line_regex = RSpec.configuration.in_project_source_dir_regex
     # remove things until we get to the frd error cause
@@ -46,7 +46,7 @@ module CallStackUtils
       # for our custom matchers/validators/finders/etc., prune their lines
       # from the top of the stack so that you get a pretty/useful error
       # message and backtrace
-      if exception_class_name =~ /\A(RSpec::|Selenium::WebDriver::Error::|SeleniumExtensions::|GreatExpectations::)/
+      if /\A(RSpec::|Selenium::WebDriver::Error::|SeleniumExtensions::|GreatExpectations::)/.match?(exception_class_name)
         CallStackUtils.prune_backtrace! bt
       end
       bt

@@ -235,6 +235,7 @@ describe ContentMigration do
                "migration_id" => "id1072dcf40e801c6468d9eaa5774e56d" }
 
       @cm.outcome_to_id_map = {}
+      @cm.copied_external_outcome_map = {}
       Importers::LearningOutcomeImporter.import_from_migration(hash, @cm)
 
       expect(@cm.warnings).to eq ["The external Learning Outcome couldn't be found for \"root outcome\", creating a copy."]
@@ -324,6 +325,39 @@ describe ContentMigration do
       expect(to_rub.data[0]["learning_outcome_id"]).to eq lo.id
       expect(to_rub.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eq [lo.id, new_lo2.id].sort
       expect(to_assign.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eq [lo.id, new_lo2.id].sort
+    end
+
+    it "links copied account outcomes to rubrics in a cross-account copy" do
+      sub1 = Account.default.sub_accounts.create!(name: 'A')
+      @copy_from.account = sub1
+      @copy_from.save!
+
+      lo = create_outcome(sub1)
+      rub = Rubric.new(:context => @copy_from)
+      rub.data = [
+        {
+          :points => 3,
+          :description => "foo",
+          :id => 1,
+          :ratings => [{ :points => 3, :description => "Expeeds Excitations", :criterion_id => 1, :id => 2 }],
+          :learning_outcome_id => lo.id
+        }
+      ]
+      rub.save!
+      rub.associate_with(@copy_from, @copy_from)
+
+      sub2 = Account.default.sub_accounts.create!(name: 'B')
+      @copy_to.account = sub2
+      @copy_to.save!
+
+      warnings = [%{The external Learning Outcome couldn't be found for "#{lo.short_description}", creating a copy.}]
+      run_course_copy(warnings)
+
+      rub_to = @copy_to.rubrics.find_by(migration_id: mig_id(rub))
+      loa = rub_to.learning_outcome_alignments.take
+      lo_to = loa.learning_outcome
+      expect(lo_to.short_description).to eq lo.short_description
+      expect(lo_to.context).to eq @copy_to
     end
 
     it "still associates rubrics and assignments and copy rubric association properties" do

@@ -43,7 +43,7 @@ describe "/quizzes/quizzes/_quiz_submission" do
 
     it "sets the IS_SURVEY value in the js env" do
       render :partial => "quizzes/quizzes/quiz_submission"
-      expect(controller.js_env.key?(:IS_SURVEY)).to eq(true)
+      expect(controller.js_env).to have_key(:IS_SURVEY)
     end
   end
 
