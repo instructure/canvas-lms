@@ -260,7 +260,7 @@ module Lti::IMS
 
     def verify_valid_submitted_at
       submitted_at = params.dig(Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
-      submitted_at_date = submitted_at.present? ? (Time.zone.parse(submitted_at) rescue nil) : nil
+      submitted_at_date = submitted_at.present? ? (Time.zone.iso8601(submitted_at) rescue nil) : nil
       future_buffer = Setting.get('ags_submitted_at_future_buffer', 1.minute.to_s).to_i.seconds
 
       if submitted_at.present? && submitted_at_date.nil?
@@ -412,7 +412,7 @@ module Lti::IMS
     end
 
     def timestamp
-      @_timestamp = Time.zone.parse(params[:timestamp]) rescue nil
+      @_timestamp = Time.zone.iso8601(params[:timestamp]) rescue nil
     end
 
     def result_url
@@ -439,7 +439,7 @@ module Lti::IMS
 
     def submitted_at
       submitted_at = scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
-      submitted_at.present? ? (Time.zone.parse(submitted_at) rescue nil) : nil
+      submitted_at.present? ? (Time.zone.iso8601(submitted_at) rescue nil) : nil
     end
 
     def file_content_items
