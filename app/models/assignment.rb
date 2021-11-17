@@ -2742,7 +2742,7 @@ class Assignment < ActiveRecord::Base
         child_topic = self.discussion_topic.child_topic_for(current_submission.user)
         if child_topic
           other_member_ids = child_topic.discussion_entries.except(:order).active.distinct.pluck(:user_id)
-          candidate_set = candidate_set & peer_review_params[:submissions].select { |s| other_member_ids.include?(s.user_id) }.map(&:id)
+          candidate_set &= peer_review_params[:submissions].select { |s| other_member_ids.include?(s.user_id) }.map(&:id)
         end
       end
     end

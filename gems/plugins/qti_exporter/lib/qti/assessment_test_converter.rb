@@ -275,7 +275,7 @@ module Qti
       begin
         weight = weight.to_f
         if @opts[:flavor] == Qti::Flavors::WEBCT
-          weight = weight * 100
+          weight *= 100
         end
       rescue
         weight = DEFAULT_POINTS_POSSIBLE

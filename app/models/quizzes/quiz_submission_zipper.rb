@@ -70,7 +70,7 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
 
   def question_attachment_filename(question, attach, user)
     name = user.last_name_first.gsub(/_(\d+)_/, '-\1-')
-    name = name + user.id.to_s
+    name += user.id.to_s
     name = name.tr(' ', "_").gsub(/[^-\w]/, "").downcase
     name = "#{name}_question_#{question[:question_id]}_#{attach.id}_#{attach.display_name}"
     [attach, name]

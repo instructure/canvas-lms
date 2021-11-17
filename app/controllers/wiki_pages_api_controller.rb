@@ -639,7 +639,7 @@ class WikiPagesApiController < ApplicationController
     end
 
     # check rejected fields
-    rejected_fields = rejected_fields - allowed_fields
+    rejected_fields -= allowed_fields
     unless rejected_fields.empty?
       @page.errors.add(:published, t(:cannot_update_published, 'You are not allowed to update the published state of this wiki page')) if rejected_fields.include?(:published)
       @page.errors.add(:title, t(:cannot_update_title, 'You are not allowed to update the title of this wiki page')) if rejected_fields.include?(:title)

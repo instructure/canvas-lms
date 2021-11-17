@@ -146,7 +146,7 @@ describe ContentMigrationsController, type: :request do
 
   describe 'show' do
     before :once do
-      @migration_url = @migration_url + "/#{@migration.id}"
+      @migration_url += "/#{@migration.id}"
       @params = @params.merge(:action => 'show', :id => @migration.id.to_param)
     end
 
