@@ -83,7 +83,7 @@ gem 'i18nliner', '0.1.2'
 gem 'icalendar', '2.7.0', require: false
 gem 'diplomat', '2.5.1', require: false
 gem 'ims-lti', '2.3.0', require: 'ims'
-gem 'inst_access', '0.1.0'
+gem 'inst_access', '0.1.1'
 gem 'inst_statsd', '2.2.0'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
