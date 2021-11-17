@@ -10409,6 +10409,58 @@ QUnit.module('Gradebook', suiteHooks => {
     $container.remove()
   })
 
+  QUnit.module('Gradebook#studentSearchMatcher', hooks => {
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+      const students = [
+        {
+          id: '1303',
+          name: 'Joe Dirt',
+          sis_user_id: 'meteor',
+          enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
+        }
+      ]
+      gradebook.courseContent.students.setStudentIds(['1303'])
+      gradebook.gotChunkOfStudents(students)
+    })
+
+    test('returns true if the search term is a substring of the student name', () => {
+      const option = {id: '1303', label: 'Joe Dirt'}
+      ok(gradebook.studentSearchMatcher(option, 'Dir'))
+    })
+
+    test('returns false if the search term is not a substring of the student name', () => {
+      const option = {id: '1303', label: 'Joe Dirt'}
+      notOk(gradebook.studentSearchMatcher(option, 'Dirz'))
+    })
+
+    test('returns true if the search term matches the SIS ID exactly', () => {
+      const option = {id: '1303', label: 'Joe Dirt'}
+      ok(gradebook.studentSearchMatcher(option, 'meteor'))
+    })
+
+    test('returns false if the search term is a substring of the SIS ID, but does not match exactly', () => {
+      const option = {id: '1303', label: 'Joe Dirt'}
+      notOk(gradebook.studentSearchMatcher(option, 'meteo'))
+    })
+  })
+
+  QUnit.module('Gradebook#assignmentSearchMatcher', hooks => {
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+    })
+
+    test('returns true if the search term is a substring of the assignment name', () => {
+      const option = {id: '122', label: 'Science Lab II'}
+      ok(gradebook.assignmentSearchMatcher(option, 'Lab'))
+    })
+
+    test('returns false if the search term is not a substring of the assignment name', () => {
+      const option = {id: '122', label: 'Science Lab II'}
+      notOk(gradebook.assignmentSearchMatcher(option, 'Lib'))
+    })
+  })
+
   QUnit.module('#_updateEssentialDataLoaded()', () => {
     function createInitializedGradebook(options) {
       gradebook = createGradebook(options)
