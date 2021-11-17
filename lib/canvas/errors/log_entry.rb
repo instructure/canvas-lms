@@ -67,7 +67,7 @@ module Canvas
         entry << "\n#{e.class}"
         begin
           entry << " (#{e.message}):" if e.respond_to?(:message)
-        rescue StandardError => new_err
+        rescue => new_err
           entry << "\n***[WARNING]: Unable to extract error message due to #{new_err}"
         end
         entry << "\n"

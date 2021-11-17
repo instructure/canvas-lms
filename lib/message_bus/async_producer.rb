@@ -139,7 +139,7 @@ module MessageBus
       Rails.application.executor.wrap do
         Shard.lookup(shard_id).activate do
           status = produce_message(namespace, topic_name, message)
-        rescue StandardError => e
+        rescue => e
           # if we errored, we didn't actually process the message
           # put it back on the queue to try to get to it later.
           # Does this screw up ordering?  yes, absolutely, but ruby queues are one-way.

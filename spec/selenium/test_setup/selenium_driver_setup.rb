@@ -108,7 +108,7 @@ module SeleniumDriverSetup
         ].each(&:join)
       rescue Selenium::WebDriver::Error::WebDriverError
         driver.quit if saucelabs_test_run?
-      rescue StandardError
+      rescue
         puts "selenium startup failed: #{$ERROR_INFO}"
         puts "exiting :'("
         # if either one fails, it's before any specs run, so we can bail
@@ -128,7 +128,7 @@ module SeleniumDriverSetup
         driver.close
         driver.quit
       end
-    rescue StandardError
+    rescue
       nil
     end
 

@@ -46,7 +46,7 @@ class OutcomesAcademicBenchmarkImportApiController < ApplicationController
       else
         render json: { error: err_msg }
       end
-    rescue StandardError => e
+    rescue => e
       render json: { error: "#{err_msg}: #{e.message}" }
     end
   end

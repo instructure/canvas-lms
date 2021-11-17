@@ -273,7 +273,7 @@ module CustomSeleniumActions
 
   def dialog_for(node)
     node.find_element(:xpath, "ancestor-or-self::div[contains(@class, 'ui-dialog')]")
-  rescue StandardError
+  rescue
     false
   end
 

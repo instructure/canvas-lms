@@ -35,7 +35,7 @@ module Lti
         new(aud: aud, sub: decoded_jwt[:sub], jwt: jwt, shard_id: decoded_jwt[:shard_id])
       rescue Canvas::Security::TokenExpired => e
         raise InvalidTokenError, 'token has expired', e.backtrace
-      rescue StandardError => e
+      rescue => e
         raise InvalidTokenError, e
       end
 
@@ -59,7 +59,7 @@ module Lti
         raise
       rescue Canvas::Security::TokenExpired => e
         raise InvalidTokenError, 'token has expired', e.backtrace
-      rescue StandardError => e
+      rescue => e
         raise InvalidTokenError, e
       end
 

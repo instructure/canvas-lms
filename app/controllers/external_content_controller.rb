@@ -101,7 +101,7 @@ class ExternalContentController < ApplicationController
       res = CanvasHttp.get(oembed_object_uri.to_s)
       data = JSON.parse(res.body)
       content_item = Lti::ContentItemConverter.convert_oembed(data)
-    rescue StandardError
+    rescue
       content_item = {}
     end
     render :json => [content_item]
