@@ -154,7 +154,7 @@ module Canvas::Plugins::TicketingSystem
 
       it "maps an env hash to a json string" do
         report.http_env = { one: "two", three: "four" }
-        expect(delegate.pretty_http_env).to eq(%Q(one: "two"\nthree: "four"))
+        expect(delegate.pretty_http_env).to eq(%(one: "two"\nthree: "four"))
       end
     end
   end

@@ -213,7 +213,7 @@ describe "shared/_select_content_dialog" do
     view_context
     render partial: 'shared/select_content_dialog'
     page = Nokogiri(response.body)
-    expect(page.css(%Q(#quizs_select .module_item_select option[value="quiz_#{existing_quiz.id}"]))).not_to be_empty
+    expect(page.css(%(#quizs_select .module_item_select option[value="quiz_#{existing_quiz.id}"]))).not_to be_empty
     expect(page.css('#quizs_select .module_item_select option[value="new"]')).to be_empty
     expect(page.css('#assignments_select .module_item_select option[value="new"]')).to be_empty
   end
