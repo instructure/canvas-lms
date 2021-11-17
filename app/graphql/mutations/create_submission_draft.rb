@@ -91,7 +91,7 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
     { submission_draft: submission_draft }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
-  rescue ActiveRecord::RecordInvalid => invalid
+  rescue ActiveRecord::RecordInvalid => e
     # activerecord validation is not robust to race condition
     #   multiple concurrent requests may penetrate activerecord validations
     #   and save dup records for a combination of submission_id and attempt
@@ -109,7 +109,7 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
         retry
       end
     end
-    errors_for(invalid.record)
+    errors_for(e.record)
   rescue SubmissionError => e
     validation_error(e.message)
   end

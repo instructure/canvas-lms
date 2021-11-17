@@ -84,8 +84,8 @@ module EventStream::Backend
         stream.database.send(:"#{operation}_record", stream.table, { stream.id_column => record.id }, stream.operation_payload(operation, record), ttl_seconds)
         stream.run_callbacks(operation, record)
       end
-    rescue => exception
-      stream.run_callbacks(:error, operation, record, exception)
+    rescue => e
+      stream.run_callbacks(:error, operation, record, e)
       raise if stream.raise_on_error
     end
 

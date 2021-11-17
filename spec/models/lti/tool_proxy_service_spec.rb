@@ -244,8 +244,8 @@ module Lti
           tp_json['tool_profile']['resource_handler'][0]['message'][0]['enabled_capability'] = ['Canvas.placements.invalid']
           begin
             tool_proxy = tool_proxy_service.process_tool_proxy_json(json: tp_json.to_json, context: account, guid: tool_proxy_guid)
-          rescue Lti::Errors::InvalidToolProxyError => proxy_error
-            puts proxy_error.message
+          rescue Lti::Errors::InvalidToolProxyError => e
+            puts e.message
           end
           expect(tool_proxy).to eq nil
         end

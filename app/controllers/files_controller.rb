@@ -957,10 +957,10 @@ class FilesController < ApplicationController
         begin
           homework_service.submit(params[:eula_agreement_timestamp], params[:comment])
           homework_service.success!
-        rescue => error
-          error_id = Canvas::Errors.capture_exception(self.class.name, error)[:error_report]
+        rescue => e
+          error_id = Canvas::Errors.capture_exception(self.class.name, e)[:error_report]
           message = "Unexpected error, ID: #{error_id || 'unknown'}"
-          logger.error "Error submitting a file: #{error} - #{error.backtrace}"
+          logger.error "Error submitting a file: #{e} - #{e.backtrace}"
           homework_service.failed!(message)
         end
       elsif progress.running?

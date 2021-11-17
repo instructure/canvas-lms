@@ -97,10 +97,10 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
     }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
-  rescue ActiveRecord::RecordInvalid => invalid
-    errors_for(invalid.record)
-  rescue ::Mutations::UpdateNotificationPreferences::ValidationError => error
-    validation_error(error.message)
+  rescue ActiveRecord::RecordInvalid => e
+    errors_for(e.record)
+  rescue ::Mutations::UpdateNotificationPreferences::ValidationError => e
+    validation_error(e.message)
   end
 
   def validate_input(input)

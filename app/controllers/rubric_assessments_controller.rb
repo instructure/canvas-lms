@@ -180,9 +180,9 @@ class RubricAssessmentsController < ApplicationController
 
           render json: json
         end
-      rescue Assignment::GradeError => error
-        json = { errors: { base: error.to_s, error_code: error.error_code } }
-        render json: json, status: error.status_code || :bad_request
+      rescue Assignment::GradeError => e
+        json = { errors: { base: e.to_s, error_code: e.error_code } }
+        render json: json, status: e.status_code || :bad_request
       end
     end
   end
