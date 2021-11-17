@@ -299,7 +299,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def default_restrictions_by_type_for_api
-    default_restrictions_by_type.map { |k, v| [k.constantize.table_name.singularize, v] }.to_h
+    default_restrictions_by_type.transform_keys { |k| k.constantize.table_name.singularize }
   end
 
   def self.create_associations_from_sis(root_account, associations, messages, migrating_user = nil)

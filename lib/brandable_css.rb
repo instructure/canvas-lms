@@ -99,12 +99,12 @@ module BrandableCSS
     end
 
     def variables_map_with_image_urls
-      @variables_map_with_image_urls ||= variables_map.each_with_object({}) do |(key, config), memo|
-        memo[key] = if config['type'] == 'image'
-                      config.merge('default' => ActionController::Base.helpers.image_url(config['default']))
-                    else
-                      config
-                    end
+      @variables_map_with_image_urls ||= variables_map.transform_values do |config|
+        if config['type'] == 'image'
+          config.merge('default' => ActionController::Base.helpers.image_url(config['default']))
+        else
+          config
+        end
       end.freeze
     end
 
@@ -295,8 +295,8 @@ module BrandableCSS
 
       file = APP_ROOT.join(CONFIG['paths']['bundles_with_deps'])
       if file.exist?
-        @combined_checksums = JSON.parse(file.read).each_with_object({}) do |(k, v), memo|
-          memo[k] = v.symbolize_keys.slice(:combinedChecksum, :includesNoVariables)
+        @combined_checksums = JSON.parse(file.read).transform_values do |v|
+          v.symbolize_keys.slice(:combinedChecksum, :includesNoVariables)
         end.freeze
       elsif defined?(Rails) && Rails.env.production?
         raise "#{file.expand_path} does not exist. You need to run brandable_css before you can serve css."

@@ -195,7 +195,7 @@ class DiscussionTopicsApiController < ApplicationController
 
       if @topic.allow_rating?
         entry_ratings  = DiscussionEntryParticipant.entry_ratings(entry_ids, @current_user)
-        entry_ratings  = entry_ratings.map { |k, v| [k.to_s, v] }.to_h if stringify_json_ids?
+        entry_ratings  = entry_ratings.transform_keys(&:to_s) if stringify_json_ids?
       end
 
       # as an optimization, the view structure is pre-serialized as a json
