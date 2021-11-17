@@ -241,6 +241,9 @@ Style/RedundantRegexpEscape:
   Severity: error
 Style/RedundantReturn:
   Severity: error
+Style/RescueStandardError:
+  EnforcedStyle: implicit
+  Severity: error
 Style/SafeNavigation:
   Severity: error
 Style/SelfAssignment:
@@ -334,9 +337,6 @@ Style/RegexpLiteral: # TODO: autocorrect
 Style/RescueModifier: # TODO
   Severity: warning
   AutoCorrect: false
-Style/RescueStandardError: # TODO: autocorrect
-  EnforcedStyle: implicit
-  Enabled: false
 Style/ReturnNil: # TODO: autocorrect (investigate violations)
   Enabled: false
 Style/SignalException: # TODO: autocorrect

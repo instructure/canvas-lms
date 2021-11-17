@@ -30,7 +30,7 @@ module Lti::IMS::AccessTokenHelper
     raise Lti::OAuth2::InvalidTokenError 'Developer Key is not active or available in this environment' if developer_key && !developer_key.usable?
   rescue Lti::OAuth2::InvalidTokenError
     raise
-  rescue StandardError => e
+  rescue => e
     raise Lti::OAuth2::InvalidTokenError, e
   end
 

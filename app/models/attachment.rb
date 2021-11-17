@@ -2028,7 +2028,7 @@ class Attachment < ActiveRecord::Base
 
     handle_duplicates(duplicate_handling || 'overwrite')
     nil # the rescue returns true if the file failed and is retryable, nil if successful
-  rescue StandardError => e
+  rescue => e
     failed_retryable = false
     self.file_state = 'errored'
     self.workflow_state = 'errored'

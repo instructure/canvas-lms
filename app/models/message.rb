@@ -1088,7 +1088,7 @@ class Message < ActiveRecord::Base
             from_recipient_country: true
           )
         end
-      rescue StandardError => e
+      rescue => e
         logger.error "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
         Canvas::Errors.capture(
           e,
@@ -1116,7 +1116,7 @@ class Message < ActiveRecord::Base
       notification_endpoint.destroy unless notification_endpoint.push_json(sns_json)
     end
     complete_dispatch
-  rescue StandardError => e
+  rescue => e
     @exception = e
     error_string = "Exception: #{e.class}: #{e.message}\n\t#{e.backtrace.join("\n\t")}"
     logger.error error_string

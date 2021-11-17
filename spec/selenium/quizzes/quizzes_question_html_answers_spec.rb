@@ -75,7 +75,7 @@ describe 'quizzes question with html answers' do
     )
     begin
       dismiss_flash_messages
-    rescue StandardError
+    rescue
       nil
     end # in non-prod environments images that fail to load will cause a flash message
     click_questions_tab
