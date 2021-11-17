@@ -186,11 +186,15 @@ Style/ConditionalAssignment:
   Severity: error
 Style/DefWithParentheses:
   Severity: error
+Style/Dir:
+  Severity: error
 Style/Documentation:
   Enabled: false # most things don't need to be documented
 Style/EmptyCaseCondition:
   Severity: error
 Style/Encoding:
+  Severity: error
+Style/ExpandPathArguments:
   Severity: error
 Style/ExplicitBlockArgument:
   Severity: error
@@ -298,8 +302,6 @@ Style/BlockDelimiters: # TODO: autocorrect
 Style/ClassAndModuleChildren: # TODO: autocorrect (unsafe)
   Enabled: false
 Style/DoubleNegation: # TODO: autocorrect (unsafe)
-  Enabled: false
-Style/Dir: # TODO: autocorrect
   Enabled: false
 Style/EmptyElse: # TODO: autocorrect
   Enabled: false

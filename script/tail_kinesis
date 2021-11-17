@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-require File.expand_path('../../config/boot', __FILE__)
+require File.expand_path('../config/boot', __dir__)
 
 require 'aws-sdk-kinesis'
 require 'json'
