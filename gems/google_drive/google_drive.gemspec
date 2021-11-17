@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "1.0.0"
   spec.authors       = ["Brad Humphrey"]
   spec.email         = ["brad@instructure.com"]
-  spec.summary       = %q{Google Drive}
+  spec.summary       = 'Google Drive'
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w(test.sh)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

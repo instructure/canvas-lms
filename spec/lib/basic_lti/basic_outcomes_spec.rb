@@ -66,7 +66,7 @@ describe BasicLTI::BasicOutcomes do
   end
 
   let(:xml) do
-    Nokogiri::XML.parse %Q{
+    Nokogiri::XML.parse <<~XML
       <?xml version = "1.0" encoding = "UTF-8"?>
       <imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
         <imsx_POXHeader>
@@ -94,7 +94,7 @@ describe BasicLTI::BasicOutcomes do
           </replaceResultRequest>
         </imsx_POXBody>
       </imsx_POXEnvelopeRequest>
-    }
+    XML
   end
 
   context "Exceptions" do

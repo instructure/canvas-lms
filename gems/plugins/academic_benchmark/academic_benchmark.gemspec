@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Simon Williams"]
   spec.email         = ["simon@instructure.com"]
   spec.homepage      = "http://www.instructure.com"
-  spec.summary       = %q{Academic Benchmark outcome importer}
+  spec.summary       = 'Academic Benchmark outcome importer'
 
   spec.files = Dir["{app,config,db,lib}/**/*"]
   spec.test_files = Dir["spec_canvas/**/*"]

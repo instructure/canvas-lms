@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Cody Cutrer"]
   spec.email         = ["cody@instructure.com"]
   spec.homepage      = "http://www.instructure.com"
-  spec.summary       = %q{QTI Exporter}
+  spec.summary       = 'QTI Exporter'
 
   spec.files = Dir["{app,lib}/**/*"]
   spec.test_files = Dir["spec_canvas/**/*"]

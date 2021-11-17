@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "0.0.1"
   spec.authors       = ["Raphael Weiner"]
   spec.email         = ["rweiner@pivotallabs.com"]
-  spec.summary       = %q{Multipart helper to prepare an HTTP POST request with file upload}
+  spec.summary       = 'Multipart helper to prepare an HTTP POST request with file upload'
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w(test.sh)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

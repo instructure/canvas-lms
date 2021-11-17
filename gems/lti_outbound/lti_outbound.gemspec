@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = '0.0.1'
   spec.authors       = ['Brian Palmer']
   spec.email         = ['brianp@instructure.com']
-  spec.summary       = %q{LTI consumer service}
+  spec.summary       = 'LTI consumer service'
   spec.homepage      = 'https://github.com/instructure/canvas-lms'
   spec.license       = 'AGPL'
 

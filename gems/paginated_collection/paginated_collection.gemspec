@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "1.0.0"
   spec.authors       = ["Brian Palmer"]
   spec.email         = ["brianp@instructure.com"]
-  spec.summary       = %q{Paginated Collection gem}
+  spec.summary       = 'Paginated Collection gem'
 
   spec.files         = Dir.glob("{lib}/**/*") + %w(Rakefile)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

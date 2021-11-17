@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Instructure"]
   spec.email         = ["opensource@instructure.com"]
 
-  spec.summary       = %q{Ruby library for creating IMS LTI tool providers and consumers}
+  spec.summary       = 'Ruby library for creating IMS LTI tool providers and consumers'
   spec.homepage      = "http://github.com/instructure/lti-advantage"
   spec.license       = "MIT"
 

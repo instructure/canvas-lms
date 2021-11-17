@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.version       = TurnitinApi::VERSION
   spec.authors       = ["Brad Horrocks"]
   spec.email         = ["bhorrocks@instructure.com"]
-  spec.summary       = %q{Turnitin integration at your fingertips}
+  spec.summary       = 'Turnitin integration at your fingertips'
   spec.license       = "MIT"
 
   spec.files         = Dir['{lib}/**/*'] + ['LICENSE.txt', 'README.md', 'Changelog.txt']

@@ -71,7 +71,7 @@ module Api
         it "changes media tags into anchors" do
           string = "<audio class='instructure_inline_media_comment' data-media_comment_id=123/>"
           html = Content.new(string).modified_html
-          expect(html).to eq(%Q{<a class=\"instructure_inline_media_comment audio_comment\" id=\"media_comment_123/\" href=\"/media_objects/123/\"></a>})
+          expect(html).to eq('<a class="instructure_inline_media_comment audio_comment" id="media_comment_123/" href="/media_objects/123/"></a>')
         end
       end
 

@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = '0.0.1'
   spec.authors       = ["Raphael Weiner", "Stephan Hagemann"]
   spec.email         = ["rweiner@pivotallabs.com", "stephan@pivotallabs.com"]
-  spec.summary       = %q{The canvas sanitizer gem}
+  spec.summary       = 'The canvas sanitizer gem'
 
   spec.files         = Dir.glob("{lib}/**/*") + %w(Rakefile README.md)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

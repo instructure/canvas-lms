@@ -239,14 +239,14 @@ describe HtmlTextHelper do
     end
 
     it "converts relative links to absolute links" do
-      original_html = %q{ <a href="/relative/link">Relative link</a> }
+      original_html = ' <a href="/relative/link">Relative link</a> '
       html          = th.html_to_simple_html(original_html, base_url: 'http://example.com')
 
       expect(html).to match(%r{http://example.com/relative/link})
     end
 
     it "resolves doubleslashes" do
-      original_html = %q{ <a href="/relative/link">Relative link</a> }
+      original_html = ' <a href="/relative/link">Relative link</a> '
       html          = th.html_to_simple_html(original_html, base_url: 'http://example.com/')
 
       expect(html).to match(%r{http://example.com/relative/link})
@@ -254,7 +254,7 @@ describe HtmlTextHelper do
 
     it "respects passed in tags and attributes" do
       original_html =
-        %q{ <a href="/relative/link">Relative link</a><table border=1>foo</table><tr border=1>bar</tr></table> }
+        ' <a href="/relative/link">Relative link</a><table border=1>foo</table><tr border=1>bar</tr></table> '
       html = th.html_to_simple_html(original_html, base_url: 'http://example.com',
                                                    :tags => ['table'], :attributes => { 'table' => ['border'] })
       expect(html).to match(%r{http://example.com/relative/link})
