@@ -1051,7 +1051,7 @@ class AccountsController < ApplicationController
           if @account.feature_enabled?(:google_docs_domain_restriction) &&
              @account.root_account? &&
              !@account.site_admin?
-            @account.settings[:google_docs_domain] = google_docs_domain.present? ? google_docs_domain : nil
+            @account.settings[:google_docs_domain] = google_docs_domain.presence
           end
 
           @account.enable_user_notes = enable_user_notes if enable_user_notes

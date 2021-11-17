@@ -2204,7 +2204,7 @@ class Submission < ActiveRecord::Base
   end
 
   def participating_instructors
-    commenting_instructors.present? ? commenting_instructors : context.participating_instructors.to_a.uniq
+    commenting_instructors.presence || context.participating_instructors.to_a.uniq
   end
 
   def possible_participants_ids
