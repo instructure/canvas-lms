@@ -46,8 +46,11 @@ Lint/NonLocalExitFromIterator:
   Enabled: false # SnR is too low because of how often this construct is used
 Lint/SafeNavigationConsistency:
   Enabled: false # https://github.com/rubocop/rubocop/issues/9816
+Lint/UnusedBlockArgument:
+  AutoCorrect: false # force the engineer to think about how come it's unused, instead of silently _ prefixing it
 Lint/UnusedMethodArgument:
   AllowUnusedKeywordArguments: true # there's no way to mark a kwarg as unused
+  AutoCorrect: false # force the engineer to think about how come it's unused, instead of silently _ prefixing it
 
 Metrics:
   Enabled: false # SnR is just too low to have this enabled
