@@ -389,11 +389,11 @@ describe "Rubrics API", type: :request do
         new_title = "some new title"
         awesome = 'Awesome'
         ratings = {
-          '0': { points: 9000, description: awesome },
-          '1': { points: 100, description: 'not good' }
+          "0" => { points: 9000, description: awesome },
+          "1" => { points: 100, description: 'not good' }
         }
         above = 'above 9000'
-        criteria = { '0': { id: 1, points: points, description: above, long_description: "he's above 9000!", ratings: ratings } }
+        criteria = { "0" => { id: 1, points: points, description: above, long_description: "he's above 9000!", ratings: ratings } }
         response = update_rubric_api_call(@course, { rubric: { title: new_title, criteria: criteria } })
         rubric = response['rubric']
         expect(rubric['title']).to eq new_title
@@ -409,21 +409,21 @@ describe "Rubrics API", type: :request do
         points2 = 2001.0
         total_points = points0 + points1 + points2
         criteria1ratings = {
-          '0': { points: points0, description: 'awesome' },
-          '1': { points: 100, description: 'not good' }
+          "0" => { points: points0, description: 'awesome' },
+          "1" => { points: 100, description: 'not good' }
         }
         criteria2ratings = {
-          '0': { points: points1, description: 'awesome' },
-          '1': { points: 100, description: 'not good' }
+          "0" => { points: points1, description: 'awesome' },
+          "1" => { points: 100, description: 'not good' }
         }
         criteria3ratings = {
-          '0': { points: points2, description: 'awesome' },
-          '1': { points: 100, description: 'not good' }
+          "0" => { points: points2, description: 'awesome' },
+          "1" => { points: 100, description: 'not good' }
         }
         criteria = {
-          '0': { id: 1, points: points0, description: 'description', long_description: "long description", ratings: criteria1ratings },
-          '1': { id: 2, points: points1, description: 'description', long_description: "long description", ratings: criteria2ratings },
-          '2': { id: 3, points: points2, description: 'description', long_description: "long description", ratings: criteria3ratings },
+          "0" => { id: 1, points: points0, description: 'description', long_description: "long description", ratings: criteria1ratings },
+          "1" => { id: 2, points: points1, description: 'description', long_description: "long description", ratings: criteria2ratings },
+          "2" => { id: 3, points: points2, description: 'description', long_description: "long description", ratings: criteria3ratings },
         }
         response = update_rubric_api_call(@course, { rubric: { criteria: criteria } })
         rubric = response['rubric']
@@ -441,12 +441,12 @@ describe "Rubrics API", type: :request do
           :vendor_guid => "vendorguid9000"
         )
         rating = {
-          '0': { points: 9000, description: 'awesome' },
-          '1': { points: 1000, description: 'meh' },
-          '2': { points: 100, description: 'not good' }
+          "0" => { points: 9000, description: 'awesome' },
+          "1" => { points: 1000, description: 'meh' },
+          "2" => { points: 100, description: 'not good' }
         }
         criteria = {
-          '0': { id: 1, points: 9000, learning_outcome_id: outcome.id, description: 'description', long_description: "long description", ratings: rating },
+          "0" => { id: 1, points: 9000, learning_outcome_id: outcome.id, description: 'description', long_description: "long description", ratings: rating },
         }
         response = update_rubric_api_call(@course, { rubric: { criteria: criteria } })
         expect(response['rubric']['criteria'][0]['learning_outcome_id']).to eq outcome.id

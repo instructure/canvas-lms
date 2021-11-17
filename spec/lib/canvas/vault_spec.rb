@@ -85,9 +85,9 @@ module Canvas
                     foo: 'bar'
                   },
                   lease_duration: 3600,
-                }.to_json, headers: { 'content-type': 'application/json' })
+                }.to_json, headers: { "content-type": 'application/json' })
         stub_request(:get, "#{addr}/v1/bad/test/path")
-          .to_return(status: 404, headers: { 'content-type': 'application/json' })
+          .to_return(status: 404, headers: { "content-type": 'application/json' })
       end
 
       it 'Caches the read' do
@@ -171,7 +171,7 @@ module Canvas
                        .to_return(status: 200, body: {
                          data: credential_data,
                          lease_duration: lease_duration,
-                       }.to_json, headers: { 'content-type': 'application/json' })
+                       }.to_json, headers: { "content-type": 'application/json' })
         end
 
         it "will queue if the lock is taken and there is no value in the cache" do

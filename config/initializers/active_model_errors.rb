@@ -114,7 +114,7 @@ module ActiveModel
         str = base.class.human_attribute_name(attribute, default: str)
 
         keys = [
-          :'full_messages.format',
+          :"full_messages.format",
           '%{attribute} %{message}'
         ]
 

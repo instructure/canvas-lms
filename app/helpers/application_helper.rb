@@ -770,7 +770,7 @@ module ApplicationHelper
   end
 
   def help_link_data
-    { 'track-category': 'help system', 'track-label': 'help button' }
+    { "track-category": 'help system', "track-label": 'help button' }
   end
 
   def help_link

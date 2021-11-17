@@ -63,9 +63,9 @@ module OutcomesService
 
     def link_attributes(learning_outcome_link)
       {
-        '$canvas_learning_outcome_link_id': learning_outcome_link.id,
-        '$canvas_learning_outcome_group_id': learning_outcome_link.associated_asset_id,
-        '$canvas_learning_outcome_id': learning_outcome_link.content_id
+        "$canvas_learning_outcome_link_id": learning_outcome_link.id,
+        "$canvas_learning_outcome_group_id": learning_outcome_link.associated_asset_id,
+        "$canvas_learning_outcome_id": learning_outcome_link.content_id
       }
     end
   end

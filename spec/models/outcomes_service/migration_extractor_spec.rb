@@ -45,7 +45,7 @@ describe OutcomesService::MigrationExtractor do
         expect(outcomes.length).to eq 1
         outcome = outcomes[0]
         expect(outcome).to include(
-          '$canvas_learning_outcome_id': course_outcome.id,
+          "$canvas_learning_outcome_id": course_outcome.id,
           rubric_criterion: be_an_instance_of(Hash)
         )
         expect(outcome).to_not have_key(:migration_id_2)
@@ -79,7 +79,7 @@ describe OutcomesService::MigrationExtractor do
       expect(groups.count).to eq 1
       group = groups[0]
       expect(group).to include(
-        '$canvas_learning_outcome_group_id': @course.root_outcome_group.id,
+        "$canvas_learning_outcome_group_id": @course.root_outcome_group.id,
         parent_outcome_group_id: nil
       )
       expect(group).to_not have_key(:id)
@@ -111,9 +111,9 @@ describe OutcomesService::MigrationExtractor do
         links = subject.learning_outcome_links
         expect(links.length).to eq 1
         expect(links[0]).to eq(
-          '$canvas_learning_outcome_link_id': @course.root_outcome_group.child_outcome_links.first.id,
-          '$canvas_learning_outcome_group_id': @course.root_outcome_group.id,
-          '$canvas_learning_outcome_id': course_outcome.id,
+          "$canvas_learning_outcome_link_id": @course.root_outcome_group.child_outcome_links.first.id,
+          "$canvas_learning_outcome_group_id": @course.root_outcome_group.id,
+          "$canvas_learning_outcome_id": course_outcome.id,
         )
       end
 
