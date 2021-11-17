@@ -141,7 +141,7 @@ class EportfolioEntry < ActiveRecord::Base
   def infer_unique_slug
     pages = self.eportfolio_category.eportfolio_entries rescue []
     self.name ||= t(:default_name, "Page Name")
-    self.slug = self.name.gsub(/[\s]+/, "_").gsub(/[^\w\d]/, "")
+    self.slug = self.name.gsub(/\s+/, "_").gsub(/[^\w\d]/, "")
     pages = pages.where("id<>?", self) unless self.new_record?
     match_cnt = pages.where(:slug => self.slug).count
     if match_cnt > 0

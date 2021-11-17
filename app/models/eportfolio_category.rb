@@ -35,7 +35,7 @@ class EportfolioCategory < ActiveRecord::Base
   def infer_unique_slug
     categories = self.eportfolio.eportfolio_categories
     self.name ||= t(:default_section, "Section Name")
-    self.slug = self.name.gsub(/[\s]+/, "_").gsub(/[^\w\d]/, "")
+    self.slug = self.name.gsub(/\s+/, "_").gsub(/[^\w\d]/, "")
     categories = categories.where("id<>?", self) unless self.new_record?
     match_cnt = categories.where(:slug => self.slug).count
     if match_cnt > 0
