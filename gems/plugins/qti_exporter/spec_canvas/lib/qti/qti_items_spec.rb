@@ -39,7 +39,7 @@ if Qti.migration_executable
       manifest_node = get_manifest_node('terrible_qti')
       hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node => manifest_node, :base_dir => file_path)
 
-      expect(hash[:answers].map { |a| a[:text] }).to match_array(['True', 'False', 'Not Sure'])
+      expect(hash[:answers].pluck(:text)).to match_array(['True', 'False', 'Not Sure'])
       expect(hash[:question_text]).to_not include("Not Sure")
     end
 
@@ -57,9 +57,9 @@ if Qti.migration_executable
       manifest_node = get_manifest_node('inline_choice_interaction')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node => manifest_node, :base_dir => file_path)
 
-      expect(hash[:answers].select { |a| a[:blank_id] == "RESPONSE" }.map { |a| a[:text] }).to match_array(["pen", "pan", "ten"])
-      expect(hash[:answers].select { |a| a[:blank_id] == "RESPONSE_1" }.map { |a| a[:text] }).to match_array(["apple", "ant", "ape"])
-      expect(hash[:answers].select { |a| a[:weight] == 100 }.map { |a| a[:text] }).to match_array(["pen", "apple"])
+      expect(hash[:answers].select { |a| a[:blank_id] == "RESPONSE" }.pluck(:text)).to match_array(["pen", "pan", "ten"])
+      expect(hash[:answers].select { |a| a[:blank_id] == "RESPONSE_1" }.pluck(:text)).to match_array(["apple", "ant", "ape"])
+      expect(hash[:answers].select { |a| a[:weight] == 100 }.pluck(:text)).to match_array(["pen", "apple"])
       expect(hash[:question_text]).to include("I have a [RESPONSE]")
       expect(hash[:question_text]).to include("I have an [RESPONSE_1]")
     end
@@ -73,10 +73,10 @@ if Qti.migration_executable
       expect(hash[:question_text]).to_not include("sillynode")
       expect(hash[:question_text]).to include("I have a whole bunch of html that is <p>super nested</p> and stuff <br></br>")
 
-      expect(hash[:answers].select { |a| a[:blank_id] == "RESPONSE" }.map { |a| a[:text] }).to match_array(["pen", "pan", "ten"])
-      expect(hash[:answers].select { |a| a[:blank_id] == "RESPONSE_1" }.map { |a| a[:text] }).to match_array(["apple", "ant", "ape"])
+      expect(hash[:answers].select { |a| a[:blank_id] == "RESPONSE" }.pluck(:text)).to match_array(["pen", "pan", "ten"])
+      expect(hash[:answers].select { |a| a[:blank_id] == "RESPONSE_1" }.pluck(:text)).to match_array(["apple", "ant", "ape"])
       # also make sure we get correct answers even when they reuse the choice identifiers
-      expect(hash[:answers].select { |a| a[:weight] == 100 }.map { |a| a[:text] }).to match_array(["pen", "apple"])
+      expect(hash[:answers].select { |a| a[:weight] == 100 }.pluck(:text)).to match_array(["pen", "apple"])
       expect(hash[:question_text]).to include("I have a [RESPONSE]")
       expect(hash[:question_text]).to include("I have an [RESPONSE_1]")
     end

@@ -83,7 +83,7 @@ module SpecTimeLimit
     # changes to things it depends on. but that's where the status_quo stuff
     # helps us out
     def commit_modifies_spec?(example)
-      commit_files.include?(example.metadata[:file_path].sub(/\A\.\//, ''))
+      commit_files.include?(example.metadata[:file_path].delete_prefix('./'))
     end
 
     def commit_files

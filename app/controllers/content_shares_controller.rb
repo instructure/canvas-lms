@@ -264,7 +264,7 @@ class ContentSharesController < ApplicationController
     if @content_share.update(update_params)
       render json: content_share_json(@content_share, @current_user, session)
     else
-      render json: @content_share.errors.to_json, :status => 400
+      render json: @content_share.errors.to_json, :status => :bad_request
     end
   end
 

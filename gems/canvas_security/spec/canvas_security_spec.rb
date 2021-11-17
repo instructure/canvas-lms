@@ -212,7 +212,7 @@ describe CanvasSecurity do
 
     it 'loads config as erb from config/security.yml' do
       config = "test:\n  encryption_key: <%= ENV['ENCRYPTION_KEY'] %>"
-      expect(File).to receive(:read).with(Rails.root + 'config/security.yml').and_return(config)
+      expect(File).to receive(:read).with(Rails.root.join('config/security.yml').to_s).and_return(config)
       expect(ENV).to receive(:[]).with('ENCRYPTION_KEY').and_return('secret')
       expect(CanvasSecurity.config).to eq('encryption_key' => 'secret')
     end

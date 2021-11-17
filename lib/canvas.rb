@@ -24,7 +24,7 @@ module Canvas
   mattr_accessor :protected_attribute_error
 
   def self.active_record_foreign_key_check(name, type, options)
-    if name.to_s =~ /_id\z/ && type.to_s == 'integer' && options[:limit].to_i < 8
+    if name.to_s.end_with?('_id') && type.to_s == 'integer' && options[:limit].to_i < 8
       raise ArgumentError, <<~TEXT
         All foreign keys need to be at least 8-byte integers. #{name}
         looks like a foreign key, please add this option: `:limit => 8`
@@ -126,8 +126,8 @@ module Canvas
   def self.revision
     return @revision if defined?(@revision)
 
-    @revision = if File.file?(Rails.root + "VERSION")
-                  File.readlines(Rails.root + "VERSION").first.try(:strip)
+    @revision = if Rails.root.join("VERSION").file?
+                  Rails.root.join("VERSION").readlines.first.try(:strip)
                 else
                   nil
                 end

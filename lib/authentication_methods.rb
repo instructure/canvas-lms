@@ -322,7 +322,7 @@ module AuthenticationMethods
     if @authenticated_with_jwt
       render(
         json: { error: "cannot generate a JWT when authorized by a JWT" },
-        status: 403
+        status: :forbidden
       )
     end
   end

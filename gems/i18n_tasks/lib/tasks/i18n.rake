@@ -68,7 +68,7 @@ namespace :i18n do
       moment_locale
     }.freeze
 
-    File.open(Rails.root.join(yaml_file), "w") do |file|
+    Rails.root.join(yaml_file).open("w") do |file|
       file.write(
         {
           'en' => deep_sort_hash_by_keys(
@@ -100,10 +100,10 @@ namespace :i18n do
     require 'active_record'
     require 'will_paginate'
     I18n.load_path.unshift(*WillPaginate::I18n.load_path)
-    I18n.load_path += Dir[Rails.root.join('gems', 'plugins', '*', 'config', 'locales', '*.{rb,yml}')]
-    I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
-    I18n.load_path += Dir[Rails.root.join('config', 'locales', 'locales.yml')]
-    I18n.load_path += Dir[Rails.root.join('config', 'locales', 'community.csv')]
+    I18n.load_path += Dir[Rails.root.join('gems/plugins/*/config/locales/*.{rb,yml}')]
+    I18n.load_path += Dir[Rails.root.join('config/locales/*.{rb,yml}')]
+    I18n.load_path += Dir[Rails.root.join('config/locales/locales.yml')]
+    I18n.load_path += Dir[Rails.root.join('config/locales/community.csv')]
 
     I18n::Backend::Simple.include I18nTasks::CsvBackend
     I18n::Backend::Simple.include I18n::Backend::Fallbacks
@@ -544,7 +544,7 @@ namespace :i18n do
       exit
     end
 
-    Dir.chdir(Rails.root.join("config", "locales"))
+    Dir.chdir(Rails.root.join("config/locales"))
     locales_data = YAML.safe_load(open("locales.yml"))
 
     Dir.each_child(".") do |filename|

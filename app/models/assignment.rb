@@ -546,7 +546,7 @@ class Assignment < ActiveRecord::Base
     new_value = new_value.split(/[\s,]+/) if new_value.is_a?(String)
 
     # remove the . if they put it on, and extra whitespace
-    new_value.map! { |v| v.strip.gsub(/\A\./, '').downcase } if new_value.is_a?(Array)
+    new_value.map! { |v| v.strip.delete_prefix('.').downcase } if new_value.is_a?(Array)
 
     write_attribute(:allowed_extensions, new_value)
   end
@@ -2417,7 +2417,7 @@ class Assignment < ActiveRecord::Base
   # for group assignments, returns a single "student" for each
   # group's submission.  the students name will be changed to the group's
   # name.  for non-group assignments this just returns all visible users
-  def representatives(user:, includes: [:inactive], group_id: nil, section_id: nil)
+  def representatives(user:, includes: [:inactive], group_id: nil, section_id: nil, &block)
     return visible_students_for_speed_grader(user: user, includes: includes, group_id: group_id, section_id: section_id) unless grade_as_group?
 
     submissions = self.submissions.to_a
@@ -2470,8 +2470,8 @@ class Assignment < ActiveRecord::Base
 
     sorted_reps_with_others =
       Canvas::ICU.collate_by(reps_and_others) { |rep, _| rep.sortable_name }
-    if block_given?
-      sorted_reps_with_others.each { |r, o| yield r, o }
+    if block
+      sorted_reps_with_others.each(&block)
     end
     sorted_reps_with_others.map(&:first)
   end
@@ -2742,7 +2742,7 @@ class Assignment < ActiveRecord::Base
         child_topic = self.discussion_topic.child_topic_for(current_submission.user)
         if child_topic
           other_member_ids = child_topic.discussion_entries.except(:order).active.distinct.pluck(:user_id)
-          candidate_set = candidate_set & peer_review_params[:submissions].select { |s| other_member_ids.include?(s.user_id) }.map(&:id)
+          candidate_set &= peer_review_params[:submissions].select { |s| other_member_ids.include?(s.user_id) }.map(&:id)
         end
       end
     end
@@ -3203,22 +3203,18 @@ class Assignment < ActiveRecord::Base
   # * Assignment
   # * AssignmentOverride and
   # * AssignmentOverrideStudent
-  def self.suspend_due_date_caching
+  def self.suspend_due_date_caching(&block)
     Assignment.suspend_callbacks(:update_cached_due_dates) do
       AssignmentOverride.suspend_callbacks(:update_cached_due_dates) do
-        AssignmentOverrideStudent.suspend_callbacks(:update_cached_due_dates) do
-          yield
-        end
+        AssignmentOverrideStudent.suspend_callbacks(:update_cached_due_dates, &block)
       end
     end
   end
 
   # Suspend callbacks that recalculate grading period grades
-  def self.suspend_grading_period_grade_recalculation
+  def self.suspend_grading_period_grade_recalculation(&block)
     Assignment.suspend_callbacks(:update_grading_period_grades) do
-      AssignmentOverride.suspend_callbacks(:update_grading_period_grades) do
-        yield
-      end
+      AssignmentOverride.suspend_callbacks(:update_grading_period_grades, &block)
     end
   end
 
@@ -3901,7 +3897,7 @@ class Assignment < ActiveRecord::Base
       end
       o
     end
-    override_ids = overrides.map { |ele| ele[:id] }.to_set
+    override_ids = overrides.pluck(:id).to_set
     self.assignment_overrides.reject { |o| override_ids.include? o[:id] } + overrides
   end
 

@@ -411,7 +411,7 @@ module CanvasColor
     def from_hex(val)
       if val.is_a?(String)
         # Double up if single char form
-        val = val + val if val.size == 1
+        val += val if val.size == 1
         # Convert to integer
         val = val.hex
       end

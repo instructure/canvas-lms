@@ -154,9 +154,9 @@ module Api::V1::Submission
     other_fields = SUBMISSION_OTHER_FIELDS
 
     if params[:response_fields]
-      json_fields = json_fields & params[:response_fields]
-      json_methods = json_methods & params[:response_fields]
-      other_fields = other_fields & params[:response_fields]
+      json_fields &= params[:response_fields]
+      json_methods &= params[:response_fields]
+      other_fields &= params[:response_fields]
     end
     if params[:exclude_response_fields]
       json_fields -= params[:exclude_response_fields]

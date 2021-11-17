@@ -33,8 +33,8 @@ module Stats
       enumerable.each { |item| self << item }
     end
 
-    def each
-      @items.each { |i| yield i }
+    def each(&block)
+      @items.each(&block)
     end
 
     def <<(item)

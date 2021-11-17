@@ -2669,7 +2669,7 @@ describe Course, "tabs_available" do
     end
 
     it "returns the defaults if nothing specified" do
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).to eql(default_tab_ids)
       expect(tab_ids.length).to eql(default_tab_ids.length)
     end
@@ -2690,8 +2690,8 @@ describe Course, "tabs_available" do
 
     it "overwrites the order of tabs if configured" do
       @course.tab_configuration = [{ id: Course::TAB_COLLABORATIONS }]
-      available_tabs = @course.tabs_available(@user).map { |tab| tab[:id] }
-      custom_tabs    = @course.tab_configuration.map     { |tab| tab[:id] }
+      available_tabs = @course.tabs_available(@user).pluck(:id)
+      custom_tabs    = @course.tab_configuration.pluck(:id)
       expected_tabs  = (custom_tabs + default_tab_ids).uniq
       # Home tab always comes first
       home_tab = default_tab_ids[0]
@@ -2726,8 +2726,8 @@ describe Course, "tabs_available" do
 
     it "removes ids for tabs not in the default list" do
       @course.tab_configuration = [{ 'id' => 912 }]
-      expect(@course.tabs_available(@user).map { |t| t[:id] }).not_to be_include(912)
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      expect(@course.tabs_available(@user).pluck(:id)).not_to be_include(912)
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).to eql(default_tab_ids)
       expect(tab_ids.length).to be > 0
       expect(@course.tabs_available(@user).filter_map { |t| t[:label] }.length).to eql(tab_ids.length)
@@ -2752,13 +2752,13 @@ describe Course, "tabs_available" do
 
     it "does not hide tabs for completed teacher enrollments" do
       @user.enrollments.where(:course_id => @course).first.complete!
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).to eql(default_tab_ids)
     end
 
     it "does not include Announcements without read_announcements rights" do
       @course.account.role_overrides.create!(:role => teacher_role, :permission => 'read_announcements', :enabled => false)
-      tab_ids = @course.uncached_tabs_available(@teacher, include_hidden_unused: true).map { |t| t[:id] }
+      tab_ids = @course.uncached_tabs_available(@teacher, include_hidden_unused: true).pluck(:id)
       expect(tab_ids).to_not include(Course::TAB_ANNOUNCEMENTS)
     end
 
@@ -2771,7 +2771,7 @@ describe Course, "tabs_available" do
         href: :course_users_path,
         hidden: true
       }]
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).to be_include(Course::TAB_PEOPLE)
     end
 
@@ -2779,7 +2779,7 @@ describe Course, "tabs_available" do
       admin = account_admin_user
       course = course_factory
       course.update!(template: true)
-      tab_ids = course.tabs_available(admin).map { |t| t[:id] }
+      tab_ids = course.tabs_available(admin).pluck(:id)
       expect(tab_ids).not_to include(Course::TAB_PEOPLE)
     end
 
@@ -2790,7 +2790,7 @@ describe Course, "tabs_available" do
         { id: Course::TAB_HOME, hidden: true }
       ]
       available_tabs = @course.tabs_available(@user)
-      expect(available_tabs.map { |tab| tab[:id] }[0]).to eq(Course::TAB_HOME)
+      expect(available_tabs.pluck(:id)[0]).to eq(Course::TAB_HOME)
       expect(available_tabs.select { |t| t[:hidden] }).to be_empty
     end
 
@@ -2807,7 +2807,7 @@ describe Course, "tabs_available" do
         }
       )
 
-      tabs = @course.tabs_available(@user, include_external: true).map { |tab| tab[:label] }
+      tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
 
       expect(tabs).to be_include("Item Banks")
     end
@@ -2823,7 +2823,7 @@ describe Course, "tabs_available" do
         end
 
         it 'hides most tabs for homeroom courses' do
-          tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+          tab_ids = @course.tabs_available(@user).pluck(:id)
           expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_FILES, Course::TAB_SETTINGS]
         end
 
@@ -2845,7 +2845,7 @@ describe Course, "tabs_available" do
             }
           )
           @course.tab_configuration = [{ :id => Course::TAB_ANNOUNCEMENTS }, { :id => 'context_external_tool_8' }]
-          tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+          tab_ids = @course.tabs_available(@user).pluck(:id)
           expect(tab_ids).to eq [Course::TAB_ANNOUNCEMENTS, Course::TAB_SYLLABUS, Course::TAB_PEOPLE, Course::TAB_FILES, Course::TAB_SETTINGS]
         end
       end
@@ -2858,7 +2858,7 @@ describe Course, "tabs_available" do
         it "returns default course tabs without home if course_subject_tabs option is not passed" do
           course_elementary_nav_tabs = default_tab_ids.reject { |id| id == Course::TAB_HOME }
           length = course_elementary_nav_tabs.length
-          tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+          tab_ids = @course.tabs_available(@user).pluck(:id)
           expect(tab_ids).to eql(course_elementary_nav_tabs)
           expect(tab_ids.length).to eql(length)
         end
@@ -2871,8 +2871,8 @@ describe Course, "tabs_available" do
         context "with course_subject_tabs option" do
           it "returns subject tabs only by default" do
             length = Course.course_subject_tabs.length
-            tab_ids = @course.tabs_available(@user, course_subject_tabs: true).map { |t| t[:id] }
-            expect(tab_ids).to eql(Course.course_subject_tabs.map { |t| t[:id] })
+            tab_ids = @course.tabs_available(@user, course_subject_tabs: true).pluck(:id)
+            expect(tab_ids).to eql(Course.course_subject_tabs.pluck(:id))
             expect(tab_ids.length).to eql(length)
           end
 
@@ -2885,7 +2885,7 @@ describe Course, "tabs_available" do
               { id: Course::TAB_SETTINGS },
               { id: Course::TAB_GROUPS },
             ]
-            available_tabs = @course.tabs_available(@user, course_subject_tabs: true).map { |tab| tab[:id] }
+            available_tabs = @course.tabs_available(@user, course_subject_tabs: true).pluck(:id)
             expected_tabs = [
               Course::TAB_HOME,
               Course::TAB_SCHEDULE,
@@ -2920,13 +2920,13 @@ describe Course, "tabs_available" do
               { id: t2.asset_string, hidden: true }
             ]
             available_tabs = @course.tabs_available(@user, course_subject_tabs: true, include_external: true, for_reordering: true)
-            expected_tab_ids = Course.course_subject_tabs.map { |t| t[:id] } + [t1.asset_string, t2.asset_string]
-            expect(available_tabs.map { |t| t[:id] }).to eql(expected_tab_ids)
+            expected_tab_ids = Course.course_subject_tabs.pluck(:id) + [t1.asset_string, t2.asset_string]
+            expect(available_tabs.pluck(:id)).to eql(expected_tab_ids)
           end
 
           it "includes modules tab even if there's no modules" do
             course_with_student_logged_in(:active_all => true)
-            tab_ids = @course.tabs_available(@student, course_subject_tabs: true).map { |t| t[:id] }
+            tab_ids = @course.tabs_available(@student, course_subject_tabs: true).pluck(:id)
             expect(tab_ids).to eq [Course::TAB_HOME, Course::TAB_SCHEDULE, Course::TAB_MODULES, Course::TAB_GRADES]
           end
 
@@ -2998,14 +2998,14 @@ describe Course, "tabs_available" do
 
     it "returns K-6 tabs if feature flag is enabled for students" do
       @course.enable_feature!(:canvas_k6_theme)
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).to eq [Course::TAB_HOME, Course::TAB_GRADES]
     ensure
       @course.disable_feature!(:canvas_k6_theme)
     end
 
     it "hides unused tabs if not an admin" do
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).not_to be_include(Course::TAB_SETTINGS)
       expect(tab_ids.length).to be > 0
     end
@@ -3019,12 +3019,12 @@ describe Course, "tabs_available" do
         href: :course_users_path,
         hidden: true
       }]
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).not_to be_include(Course::TAB_PEOPLE)
     end
 
     it "shows grades tab for students" do
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).to be_include(Course::TAB_GRADES)
     end
 
@@ -3048,7 +3048,7 @@ describe Course, "tabs_available" do
       t2.workflow_state = "deleted"
       t2.save!
 
-      tabs = @course.tabs_available.map { |tab| tab[:id] }
+      tabs = @course.tabs_available.pluck(:id)
 
       expect(tabs).to be_include(t1.asset_string)
       expect(tabs).not_to be_include(t2.asset_string)
@@ -3067,7 +3067,7 @@ describe Course, "tabs_available" do
         }
       )
 
-      tabs = @course.tabs_available(@user, include_external: true).map { |tab| tab[:label] }
+      tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
 
       expect(tabs).not_to be_include("Item Banks")
     end
@@ -3170,7 +3170,7 @@ describe Course, "tabs_available" do
         }
       )
 
-      tabs = @course.tabs_available(nil, :include_external => false).map { |tab| tab[:id] }
+      tabs = @course.tabs_available(nil, :include_external => false).pluck(:id)
 
       expect(tabs).not_to be_include(t1.asset_string)
     end
@@ -3209,24 +3209,24 @@ describe Course, "tabs_available" do
       @oe.associated_user_id = nil
       @oe.save!
       @user.reload
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).not_to be_include(Course::TAB_GRADES)
     end
 
     it "shows grades tab for observers if they are linked to a student" do
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).to be_include(Course::TAB_GRADES)
     end
 
     it "shows discussion tab for observers by default" do
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).to be_include(Course::TAB_DISCUSSIONS)
     end
 
     it "does not show discussion tab for observers without read_forum" do
       RoleOverride.create!(:context => @course.account, :permission => 'read_forum',
                            :role => observer_role, :enabled => false)
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).not_to be_include(Course::TAB_DISCUSSIONS)
     end
 
@@ -3251,36 +3251,36 @@ describe Course, "tabs_available" do
     end
 
     it "does not show announcements tabs without a current user" do
-      tab_ids = @course.tabs_available(nil).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(nil).pluck(:id)
       expect(tab_ids).not_to include(Course::TAB_ANNOUNCEMENTS)
     end
 
     it "does not show announcements to a user not enrolled in the class" do
       user_factory
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).not_to include(Course::TAB_ANNOUNCEMENTS)
     end
 
     it "shows the announcements tab to an enrolled user" do
       @course.enroll_student(user_factory).accept!
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).to include(Course::TAB_ANNOUNCEMENTS)
     end
 
     it "does not show outcomes tabs without a current user" do
-      tab_ids = @course.tabs_available(nil).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(nil).pluck(:id)
       expect(tab_ids).not_to include(Course::TAB_OUTCOMES)
     end
 
     it "does not show outcomes to a user not enrolled in the class" do
       user_factory
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).not_to include(Course::TAB_OUTCOMES)
     end
 
     it "shows the outcomes tab to an enrolled user" do
       @course.enroll_student(user_factory).accept!
-      tab_ids = @course.tabs_available(@user).map { |t| t[:id] }
+      tab_ids = @course.tabs_available(@user).pluck(:id)
       expect(tab_ids).to include(Course::TAB_OUTCOMES)
     end
   end
@@ -4558,7 +4558,7 @@ describe Course, 'tabs_available' do
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
-    expect(tabs.map { |t| t[:id] }).not_to be_include(tool.asset_string)
+    expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
   end
 
   it "includes external tools if configured on the course" do
@@ -4569,7 +4569,7 @@ describe Course, 'tabs_available' do
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
-    expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+    expect(tabs.pluck(:id)).to be_include(tool.asset_string)
     tab = tabs.detect { |t| t[:id] == tool.asset_string }
     expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
     expect(tab[:href]).to eq :course_external_tool_path
@@ -4587,7 +4587,7 @@ describe Course, 'tabs_available' do
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
-    expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+    expect(tabs.pluck(:id)).to be_include(tool.asset_string)
     tab = tabs.detect { |t| t[:id] == tool.asset_string }
     expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
     expect(tab[:href]).to eq :course_external_tool_path
@@ -4605,7 +4605,7 @@ describe Course, 'tabs_available' do
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
-    expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+    expect(tabs.pluck(:id)).to be_include(tool.asset_string)
     tab = tabs.detect { |t| t[:id] == tool.asset_string }
     expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
     expect(tab[:href]).to eq :course_external_tool_path
@@ -4626,11 +4626,11 @@ describe Course, 'tabs_available' do
     @student.register!
     @course.enroll_student(@student).accept
     tabs = @course.tabs_available(nil)
-    expect(tabs.map { |t| t[:id] }).not_to be_include(tool.asset_string)
+    expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
     tabs = @course.tabs_available(@student)
-    expect(tabs.map { |t| t[:id] }).not_to be_include(tool.asset_string)
+    expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
     tabs = @course.tabs_available(@teacher)
-    expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+    expect(tabs.pluck(:id)).to be_include(tool.asset_string)
     tab = tabs.detect { |t| t[:id] == tool.asset_string }
     expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
     expect(tab[:href]).to eq :course_external_tool_path
@@ -4651,11 +4651,11 @@ describe Course, 'tabs_available' do
     @student.register!
     @course.enroll_student(@student).accept
     tabs = @course.tabs_available(nil)
-    expect(tabs.map { |t| t[:id] }).not_to be_include(tool.asset_string)
+    expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
     tabs = @course.tabs_available(@student)
-    expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+    expect(tabs.pluck(:id)).to be_include(tool.asset_string)
     tabs = @course.tabs_available(@teacher)
-    expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+    expect(tabs.pluck(:id)).to be_include(tool.asset_string)
     tab = tabs.detect { |t| t[:id] == tool.asset_string }
     expect(tab[:label]).to eq tool.settings[:course_navigation][:text]
     expect(tab[:href]).to eq :course_external_tool_path
@@ -4683,16 +4683,16 @@ describe Course, 'tabs_available' do
     @teacher = user_model
     @course.enroll_teacher(@teacher).accept
     tabs = @course.tabs_available(@teacher)
-    expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+    expect(tabs.pluck(:id)).to be_include(tool.asset_string)
 
     @course.tab_configuration = Course.default_tabs.map { |t| { :id => t[:id] } }.insert(1, { :id => tool.asset_string, :hidden => true })
     @course.save!
     @course = Course.find(@course.id)
     tabs = @course.tabs_available(@teacher)
-    expect(tabs.map { |t| t[:id] }).not_to be_include(tool.asset_string)
+    expect(tabs.pluck(:id)).not_to be_include(tool.asset_string)
 
     tabs = @course.tabs_available(@teacher, :for_reordering => true)
-    expect(tabs.map { |t| t[:id] }).to be_include(tool.asset_string)
+    expect(tabs.pluck(:id)).to be_include(tool.asset_string)
   end
 
   it "uses extension default values" do
@@ -4730,11 +4730,11 @@ describe Course, 'tabs_available' do
     tool = analytics_2_tool_factory
 
     tabs = @course.external_tool_tabs({}, User.new)
-    expect(tabs.map { |t| t[:id] }).not_to include(tool.asset_string)
+    expect(tabs.pluck(:id)).not_to include(tool.asset_string)
 
     @course.enable_feature!(:analytics_2)
     tabs = @course.external_tool_tabs({}, User.new)
-    expect(tabs.map { |t| t[:id] }).to include(tool.asset_string)
+    expect(tabs.pluck(:id)).to include(tool.asset_string)
   end
 end
 

@@ -105,7 +105,7 @@ module Canvas
 
           RequestCache.cache("rev-manifest") do
             benchmark("reading rev-manifest") do
-              file = Rails.root.join('public', 'dist', 'rev-manifest.json')
+              file = Rails.root.join('public/dist/rev-manifest.json')
               if file.exist?
                 Rails.logger.debug "reading rev-manifest.json"
                 @gulp_manifest = JSON.parse(file.read).freeze

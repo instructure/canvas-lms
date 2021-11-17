@@ -241,7 +241,7 @@ module CC
             end
           else
             obj = if @course && match.obj_class == Attachment
-                    @course.attachments.find_by_id(match.obj_id)
+                    @course.attachments.find_by(id: match.obj_id)
                   else
                     match.obj_class.where(id: match.obj_id).first
                   end
@@ -402,7 +402,7 @@ module CC
       else
         asset = client.flavorAssetGetOriginalAsset(obj.media_id)
       end
-      attachment = course && obj.attachment_id && course.attachments.not_deleted.find_by_id(obj.attachment_id)
+      attachment = course && obj.attachment_id && course.attachments.not_deleted.find_by(id: obj.attachment_id)
       path = if attachment
                # if the media object is associated with a file in the course, use the file's path in the export, to avoid exporting it twice
                attachment.full_display_path.sub(/^#{Regexp.quote(Folder::ROOT_FOLDER_NAME)}/, '')

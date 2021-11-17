@@ -278,7 +278,7 @@ module SearchHelper
     end
 
     # bulk count users in the remainder
-    asset_strings = result.map { |context| context[:asset_string] }
+    asset_strings = result.pluck(:asset_string)
     user_counts = @current_user.address_book.count_in_contexts(asset_strings)
 
     # build up the final representations

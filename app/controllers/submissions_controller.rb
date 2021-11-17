@@ -457,7 +457,7 @@ class SubmissionsController < SubmissionsBaseController
     # that'll take some further investigation/testing.
     submission_type = params[:submission][:submission_type]
     unless allowed_api_submission_type?(submission_type)
-      render(:json => { :message => "Invalid submission[submission_type] given" }, :status => 400)
+      render(:json => { :message => "Invalid submission[submission_type] given" }, :status => :bad_request)
       return false
     end
 
@@ -470,7 +470,7 @@ class SubmissionsController < SubmissionsBaseController
       render(:json => {
                :message => "Invalid parameters for submission_type #{submission_type}. " +
                  "Required: #{API_SUBMISSION_TYPES[submission_type].map { |p| "submission[#{p}]" }.join(", ")}"
-             }, :status => 400)
+             }, :status => :bad_request)
       return false
     end
     params[:submission][:comment] = params[:comment].try(:delete, :text_comment)
@@ -608,7 +608,7 @@ class SubmissionsController < SubmissionsBaseController
     # Homework submission is done by API request, but I saw other parts of code
     # that are handling HTML and JSON format. So, I kept the same logic here...
     if api_request?
-      render(json: { message: message }, status: 400)
+      render(json: { message: message }, status: :bad_request)
     else
       flash[:error] = message
       redirect_to named_context_url(@context, :context_assignment_url, @assignment)

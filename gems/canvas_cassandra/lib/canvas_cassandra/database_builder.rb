@@ -25,7 +25,7 @@ module CanvasCassandra
       raise ArgumentError, "config name required" if config_name.blank?
 
       config = ConfigFile.load('cassandra', environment)
-      config = config && config[config_name]
+      config &&= config[config_name]
       config && config['servers'] && config['keyspace']
     end
 
@@ -40,7 +40,7 @@ module CanvasCassandra
       key = [config_name, environment]
       @connections.fetch(key) do
         config = ConfigFile.load('cassandra', environment).dup
-        config = config && config[config_name]
+        config &&= config[config_name]
         unless config
           @connections[key] = nil
           return nil

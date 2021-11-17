@@ -100,7 +100,7 @@ module ContextModulesHelper
   end
 
   def prerequisite_list(prerequisites)
-    prerequisites.map { |p| p[:name] }.join(', ')
+    prerequisites.pluck(:name).join(', ')
   end
 
   def module_item_unpublishable?(item)

@@ -64,7 +64,7 @@ describe CanvasQuizStatistics::Analyzers::Base do
         it 'invokes the context builder and parse dependency' do
           class Apple < Base
             def build_context(responses)
-              { colors: responses.map { |r| r[:color] } }
+              { colors: responses.pluck(:color) }
             end
 
             metric something: [:colors] do |_responses, colors|

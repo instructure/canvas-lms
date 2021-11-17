@@ -58,7 +58,7 @@ describe MigrationIssuesController, type: :request do
 
   describe 'show' do
     before do
-      @issue_url = @issue_url + "/#{@issue.id}"
+      @issue_url += "/#{@issue.id}"
       @params = @params.merge(:action => 'show', :id => @issue.id.to_param)
     end
 
@@ -96,7 +96,7 @@ describe MigrationIssuesController, type: :request do
 
   describe 'update' do
     before do
-      @issue_url = @issue_url + "/#{@issue.id}"
+      @issue_url += "/#{@issue.id}"
       @params = @params.merge(:action => 'update', :id => @issue.id.to_param)
       @body_params = { :workflow_state => 'resolved' }
     end

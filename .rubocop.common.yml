@@ -73,33 +73,14 @@ Naming/FileName:
   Exclude:
     - "**/Gemfile.d/~after.rb"
 
+Performance:
+  Severity: error
 Performance/Casecmp:
-  Severity: error
   AutoCorrect: false # prefer using casecmp?(other) instead of casecmp(other).zero?; it handles unicode better
-Performance/Count:
-  Severity: error
-Performance/Detect:
-  Severity: error
-Performance/InefficientHashSearch:
-  Severity: error
-Performance/MapCompact:
-  Severity: error
-Performance/RedundantMerge:
-  Severity: error
-Performance/RedundantSplitRegexpArgument:
-  Severity: error
-Performance/RegexpMatch:
-  Severity: error
-Performance/StartWith:
-  Severity: error
-Performance/StringInclude:
-  Severity: error
-Performance/StringReplacement:
-  Severity: error
-Performance/Sum:
-  Severity: error
-Performance/TimesMap:
-  Severity: error
+Performance/CollectionLiteralInLoop:
+  Severity: info # not auto-correctable; can be a pain to fix and isn't necessarily performance critical
+Performance/MethodObjectAsBlock:
+  Enabled: false # decreases expressiveness
 
 Rails/ActiveRecordAliases:
   Severity: error
@@ -110,15 +91,33 @@ Rails/ContentTag:
   Exclude:
     - "**/db/migrate/*" # this cop is for views, not migrations, where it gets confused with outrigger
     - "doc/**/*"
+Rails/DynamicFindBy:
+  AllowedMethods:
+    - find_by_confirmation_code # CommunicationChannel
+    - find_by_signature # AssetSignature
+    - find_by_domain # Account
+    - find_by_name # PluginSetting
+    - find_by_asset_string # ApplicationRecord
+    - find_by_pseudonym_credentials # SessionPersistenceToken
+    - find_by_quiz # Quizzes::OutstandingQuizSubmissionManager
+  Severity: error
+Rails/FilePath:
+  Severity: error
 Rails/HasManyOrHasOneDependent:
   Enabled: false # legacy code + most things we soft delete anyway
 Rails/HelperInstanceVariable:
   Enabled: false # legacy code
+Rails/HttpStatus:
+  Severity: error
 Rails/IndexBy:
   Severity: error
 Rails/IndexWith:
   Severity: error
+Rails/Pluck:
+  Severity: error
 Rails/PluralizationGrammar:
+  Severity: error
+Rails/RedundantAllowNil:
   Severity: error
 Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
@@ -193,6 +192,8 @@ Style/EmptyCaseCondition:
   Severity: error
 Style/Encoding:
   Severity: error
+Style/ExplicitBlockArgument:
+  Severity: error
 Style/FrozenStringLiteralComment:
   Severity: error
 Style/HashConversion:
@@ -238,6 +239,8 @@ Style/RedundantReturn:
   Severity: error
 Style/SafeNavigation:
   Severity: error
+Style/SelfAssignment:
+  Severity: error
 Style/Semicolon:
   Severity: error
 Style/SingleLineMethods:
@@ -262,11 +265,6 @@ Lint/UriEscapeUnescape: # TODO
 Naming/VariableNumber: # TODO
   Enabled: false
 
-Rails/DynamicFindBy: # TODO; autocorrect (unsafe)
-  AllowedMethods:
-    - find_by_name # PluginSetting.find_by_name
-    - find_by_asset_string # ApplicationRecord.find_by_asset_string
-  AutoCorrect: false
 Rails/ReadWriteAttribute: # TODO: autocorrect (unsafe)
   Enabled: false # accessors are often defined in terms of read_attribute
 Rails/TimeZone: # TODO: autocorrect (unsafe)

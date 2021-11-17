@@ -33,9 +33,7 @@ shared_examples 'allow Quiz LTI placement when the correct Feature Flags are ena
     expect(Account.site_admin.feature_enabled?(:new_quizzes_account_course_level_item_banks)).to eq(true)
     expect(context.feature_enabled?(:quizzes_next)).to eq(true)
     expect(quiz_lti_tool.quiz_lti?).to eq(true)
-    expect(available_section_tabs.to_a.map do |tab|
-      tab[:id]
-    end).to include("context_external_tool_#{quiz_lti_tool.id}")
+    expect(available_section_tabs.to_a.pluck(:id)).to include("context_external_tool_#{quiz_lti_tool.id}")
   end
 
   it 'does not include Quiz LTI placement if new_quizzes_account_course_level_item_banks is not enabled' do
@@ -45,9 +43,7 @@ shared_examples 'allow Quiz LTI placement when the correct Feature Flags are ena
     expect(context.feature_enabled?(:quizzes_next)).to eq(true)
     expect(Account.site_admin.feature_enabled?(:new_quizzes_account_course_level_item_banks)).to eq(false)
     expect(quiz_lti_tool.quiz_lti?).to eq(true)
-    expect(available_section_tabs.to_a.map do |tab|
-      tab[:id]
-    end).not_to include("context_external_tool_#{quiz_lti_tool.id}")
+    expect(available_section_tabs.to_a.pluck(:id)).not_to include("context_external_tool_#{quiz_lti_tool.id}")
   end
 
   it 'does not include Quiz LTI placement if next_quizzes is not enabled' do
@@ -56,9 +52,7 @@ shared_examples 'allow Quiz LTI placement when the correct Feature Flags are ena
     expect(Account.site_admin.feature_enabled?(:new_quizzes_account_course_level_item_banks)).to eq(true)
     expect(domain_root_account.feature_enabled?(:quizzes_next)).to eq(false)
     expect(quiz_lti_tool.quiz_lti?).to eq(true)
-    expect(available_section_tabs.to_a.map do |tab|
-      tab[:id]
-    end).not_to include("context_external_tool_#{quiz_lti_tool.id}")
+    expect(available_section_tabs.to_a.pluck(:id)).not_to include("context_external_tool_#{quiz_lti_tool.id}")
   end
 end
 
@@ -127,49 +121,41 @@ describe SectionTabHelper do
         context 'and tabs include TAB_CONFERENCES' do
           it 'includes TAB_CONFERENCES if WebConference.config' do
             allow(WebConference).to receive(:config).and_return({})
-            expect(available_section_tabs.to_a.map do |tab|
-              tab[:id]
-            end).to include(Course::TAB_CONFERENCES)
+            expect(available_section_tabs.to_a.pluck(:id)).to include(Course::TAB_CONFERENCES)
           end
 
           it 'does not include TAB_CONFERENCES if !WebConference.config' do
-            expect(available_section_tabs.to_a.map do |tab|
-              tab[:id]
-            end).to_not include(Course::TAB_CONFERENCES)
+            expect(available_section_tabs.to_a.pluck(:id)).to_not include(Course::TAB_CONFERENCES)
           end
         end
 
         context 'and tabs include TAB_COLLABORATIONS' do
           it 'includes TAB_COLLABORATIONS if Collaboration.any_collaborations_configured?' do
             allow(Collaboration).to receive(:any_collaborations_configured?).and_return(true)
-            expect(available_section_tabs.to_a.map do |tab|
-              tab[:id]
-            end).to include(Course::TAB_COLLABORATIONS)
+            expect(available_section_tabs.to_a.pluck(:id)).to include(Course::TAB_COLLABORATIONS)
           end
 
           it 'does not include TAB_COLLABORATIONS if !Collaboration.any_collaborations_configured?' do
-            expect(available_section_tabs.to_a.map do |tab|
-              tab[:id]
-            end).to_not include(Course::TAB_COLLABORATIONS)
+            expect(available_section_tabs.to_a.pluck(:id)).to_not include(Course::TAB_COLLABORATIONS)
           end
 
           it 'does not include TAB_COLLABORATIONS when new_collaborations feature flag has been enabled' do
             domain_root_account.set_feature_flag!(:new_collaborations, "on")
             allow(Collaboration).to receive(:any_collaborations_configured?).and_return(true)
-            expect(available_section_tabs.to_a.map { |tab| tab[:id] }).not_to include(Course::TAB_COLLABORATIONS)
+            expect(available_section_tabs.to_a.pluck(:id)).not_to include(Course::TAB_COLLABORATIONS)
           end
         end
 
         context 'and tabs include TAB_COLLABORATIONS_NEW' do
           it 'includes TAB_COLLABORATIONS_NEW if new_collaborations feature flag has been enabled' do
             domain_root_account.set_feature_flag!(:new_collaborations, "on")
-            expect(available_section_tabs.to_a.map { |tab| tab[:id] }).to include(Course::TAB_COLLABORATIONS_NEW)
+            expect(available_section_tabs.to_a.pluck(:id)).to include(Course::TAB_COLLABORATIONS_NEW)
             domain_root_account.set_feature_flag!(:new_collaborations, "off")
           end
 
           it 'does not include TAB_COLLABORATIONS if new_collaborations feature flas has been disabled' do
             domain_root_account.set_feature_flag!(:new_collaborations, "off")
-            expect(available_section_tabs.to_a.map { |tab| tab[:id] }).not_to include(Course::TAB_COLLABORATIONS_NEW)
+            expect(available_section_tabs.to_a.pluck(:id)).not_to include(Course::TAB_COLLABORATIONS_NEW)
           end
         end
 
@@ -247,9 +233,7 @@ describe SectionTabHelper do
           it 'includes non-Quiz_LTI placement ignoring quizzes FFs' do
             expect(Account.site_admin.feature_enabled?(:new_quizzes_account_course_level_item_banks)).to eq(false)
             expect(domain_root_account.feature_enabled?(:quizzes_next)).to eq(false)
-            expect(available_section_tabs.to_a.map do |tab|
-              tab[:id]
-            end).to include("context_external_tool_0")
+            expect(available_section_tabs.to_a.pluck(:id)).to include("context_external_tool_0")
           end
         end
       end

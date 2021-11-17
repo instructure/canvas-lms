@@ -926,7 +926,7 @@ class Submission < ActiveRecord::Base
       self.vericite_data_hash.each_value do |data|
         next unless data.is_a?(Hash) && data[:object_id]
 
-        update_scores = update_scores || vericite_recheck_score(data)
+        update_scores ||= vericite_recheck_score(data)
       end
       # we have found at least one score that is stale, call VeriCite and save the results
       if update_scores
@@ -995,7 +995,7 @@ class Submission < ActiveRecord::Base
       # check to see if the score is stale, if so, delete it and fetch again
       recheck_score = vericite_recheck_score(data)
       # keep track whether all scores are updates or if any are new
-      recheck_score_all = recheck_score_all && recheck_score
+      recheck_score_all &&= recheck_score
       # look up scores if:
       if recheck_score || data[:similarity_score].blank?
         if attempt < VERICITE_STATUS_RETRY

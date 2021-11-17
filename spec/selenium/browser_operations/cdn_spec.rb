@@ -54,7 +54,7 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
           next unless includes_no_variables
 
           msg = "all variants should output the same css if a bundle doesn't pull in the variables file"
-          unique_fingerprints = fingerprints.map { |f| f[:combinedChecksum] }.uniq
+          unique_fingerprints = fingerprints.pluck(:combinedChecksum).uniq
           expect(unique_fingerprints.length).to eq(1), msg
         end
       end

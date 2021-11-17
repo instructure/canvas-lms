@@ -91,15 +91,15 @@ class Message < ActiveRecord::Base
 
   # Validations
   validate :prevent_updates
-  validates :body, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :html_body, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :transmission_errors, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :to, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :from, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :url, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :subject, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :from_name, length: { maximum: maximum_text_length }, allow_nil: true, allow_blank: true
-  validates :reply_to_name, length: { maximum: maximum_string_length }, allow_nil: true, allow_blank: true
+  validates :body, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :html_body, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :transmission_errors, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :to, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :from, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :url, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :subject, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :from_name, length: { maximum: maximum_text_length }, allow_blank: true
+  validates :reply_to_name, length: { maximum: maximum_string_length }, allow_blank: true
 
   def prevent_updates
     unless self.new_record?
@@ -496,7 +496,7 @@ class Message < ActiveRecord::Base
 
     instance_variable_set(:"@message_content_#{name}",
                           @output_buffer.to_s.strip)
-    @output_buffer = old_output_buffer.sub(/\n\z/, '')
+    @output_buffer = old_output_buffer.delete_suffix("\n")
 
     if old_output_buffer.is_a?(ActiveSupport::SafeBuffer) && old_output_buffer.html_safe?
       @output_buffer = old_output_buffer.class.new(@output_buffer)
@@ -536,7 +536,7 @@ class Message < ActiveRecord::Base
       path = Canvas::MessageHelper.find_message_path(filename)
     end
 
-    @i18n_scope = "messages." + filename.sub(/\.erb\z/, '')
+    @i18n_scope = "messages." + filename.delete_suffix('.erb')
 
     if (File.exist?(path) rescue false)
       File.read(path)

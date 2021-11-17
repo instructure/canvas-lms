@@ -135,7 +135,6 @@ describe "course copy" do
   end
 
   it "is not able to submit invalid course dates" do
-    skip("LS-2782 -- dates not registering even after tab out")
     course_with_admin_logged_in
 
     get "/courses/#{@course.id}/copy"

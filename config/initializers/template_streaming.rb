@@ -51,7 +51,7 @@ module StreamingViewExtensions
   end
 
   def provide(name, content = nil, &block)
-    if block_given?
+    if block
       content = capture(&block) || '' # still carry on even if the block doesn't return anything
       provide(name, content)
     else

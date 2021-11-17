@@ -60,12 +60,10 @@ module DataFixup::Lti::UpdateCustomParams
       failures
     end
 
-    def search(domains, subdomain_matching, validate_domain)
+    def search(domains, subdomain_matching, validate_domain, &block)
       validate_domains!(domains) if validate_domain
       Switchman::Shard.with_each_shard do
-        select_by_domains(domains, subdomain_matching).find_each do |tool|
-          yield tool
-        end
+        select_by_domains(domains, subdomain_matching).find_each(&block)
       end
     end
 

@@ -139,7 +139,7 @@ module Turnitin
         settings[:exclude_value] = case settings[:exclude_type]
                                    when '0'; ''
                                    when '1'; [exclude_value, 1].max.to_s
-                                   when '2'; (0..100).include?(exclude_value) ? exclude_value.to_s : '0'
+                                   when '2'; (0..100).cover?(exclude_value) ? exclude_value.to_s : '0'
                                    end
       end
       settings

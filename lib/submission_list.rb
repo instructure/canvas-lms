@@ -351,7 +351,7 @@ class SubmissionList
 
   # A unique list of all grader ids
   def all_grader_ids
-    @all_grader_ids ||= raw_hash_list.map { |e| e[:grader_id] }.uniq.compact
+    @all_grader_ids ||= raw_hash_list.pluck(:grader_id).uniq.compact
   end
 
   # A complete list of all graders that have graded submissions for this
@@ -370,7 +370,7 @@ class SubmissionList
 
   # A unique list of all student ids
   def all_student_ids
-    @all_student_ids ||= raw_hash_list.map { |e| e[:user_id] }.uniq.compact
+    @all_student_ids ||= raw_hash_list.pluck(:user_id).uniq.compact
   end
 
   # A complete list of all students that have submissions for this course
@@ -389,7 +389,7 @@ class SubmissionList
 
   # A unique list of all assignment ids
   def all_assignment_ids
-    @all_assignment_ids ||= raw_hash_list.map { |e| e[:assignment_id] }.uniq.compact
+    @all_assignment_ids ||= raw_hash_list.pluck(:assignment_id).uniq.compact
   end
 
   # A complete list of assignments that have submissions for this course

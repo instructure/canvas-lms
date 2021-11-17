@@ -24,7 +24,7 @@ NetLdapExtensions.apply
 
 class AuthenticationProvider < ActiveRecord::Base
   include Workflow
-  validates :auth_filter, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :auth_filter, length: { maximum: maximum_text_length, allow_blank: true }
 
   workflow do
     state :active

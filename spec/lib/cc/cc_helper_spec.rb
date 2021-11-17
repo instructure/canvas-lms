@@ -227,7 +227,7 @@ describe CC::CCHelper do
         <a href="/courses/#{@othercourse.id}/wiki/front-page">Other course's front page</a>
       HTML
       doc = Nokogiri::HTML5(@exporter.html_content(html))
-      urls = doc.css('a').map { |attr| attr[:href] }
+      urls = doc.css('a').pluck(:href)
       expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/front-page"
       expect(urls[1]).to eq "http://www.example.com:8080/courses/#{@othercourse.id}/wiki/front-page"
     end
@@ -241,7 +241,7 @@ describe CC::CCHelper do
         <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
       HTML
       doc = Nokogiri::HTML5(@exporter.html_content(html))
-      urls = doc.css('a').map { |attr| attr[:href] }
+      urls = doc.css('a').pluck(:href)
       expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/#{page.url}"
     end
 
@@ -254,7 +254,7 @@ describe CC::CCHelper do
         <a href="/courses/#{@course.id}/wiki/#{page.url}">This course's wiki page</a>
       HTML
       doc = Nokogiri::HTML5(@exporter.html_content(html))
-      urls = doc.css('a').map { |attr| attr[:href] }
+      urls = doc.css('a').pluck(:href)
       expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/#{page.url}"
     end
 

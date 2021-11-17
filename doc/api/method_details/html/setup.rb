@@ -43,5 +43,5 @@ def get_routes
   @routes = ApiRouteSet.api_methods_for_controller_and_action(@controller, @action)
   @route = @routes.first
   @controller_path = "app/controllers/#{@route.requirements[:controller]}_controller.rb"
-  @controller_path = nil unless File.file?(Rails.root + @controller_path)
+  @controller_path = nil unless Rails.root.join(@controller_path).file?
 end

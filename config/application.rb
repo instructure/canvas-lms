@@ -102,7 +102,7 @@ module CanvasRails
     # Run "rake -D time" for a list of tasks for finding time zone names. Comment line to use default local time.
     config.time_zone = 'UTC'
 
-    log_config = File.exist?(Rails.root + 'config/logging.yml') && Rails.application.config_for(:logging).with_indifferent_access
+    log_config = Rails.root.join('config/logging.yml').file? && Rails.application.config_for(:logging).with_indifferent_access
     log_config = { 'logger' => 'rails', 'log_level' => 'debug' }.merge(log_config || {})
     opts = {}
     require 'canvas_logger'
@@ -128,7 +128,7 @@ module CanvasRails
       log_path = config.paths['log'].first
 
       if ENV['RUNNING_AS_DAEMON'] == 'true'
-        log_path = Rails.root + 'log/delayed_job.log'
+        log_path = Rails.root.join('log/delayed_job.log')
       end
 
       config.logger = CanvasLogger.new(log_path, log_level, opts)
@@ -145,9 +145,9 @@ module CanvasRails
 
     # prevent directory->module inference in these directories from wreaking
     # havoc on the app (e.g. stylesheets/base -> ::Base)
-    config.eager_load_paths -= %W(#{Rails.root}/app/coffeescripts
-                                  #{Rails.root}/app/stylesheets
-                                  #{Rails.root}/ui)
+    config.eager_load_paths -= [Rails.root.join("app/coffeescripts"),
+                                Rails.root.join("app/stylesheets"),
+                                Rails.root.join("ui")]
 
     config.middleware.use Rack::Chunked
     config.middleware.use Rack::Deflater, if: ->(*) {
@@ -157,8 +157,8 @@ module CanvasRails
       ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_brotli", failsafe: true]
     }
 
-    config.i18n.load_path << Rails.root.join('config', 'locales', 'locales.yml')
-    config.i18n.load_path << Rails.root.join('config', 'locales', 'community.csv')
+    config.i18n.load_path << Rails.root.join('config/locales/locales.yml')
+    config.i18n.load_path << Rails.root.join('config/locales/community.csv')
 
     config.to_prepare do
       require_dependency 'canvas/plugins/default_plugins'
@@ -252,9 +252,6 @@ module CanvasRails
     end
 
     Autoextend.hook(:"Thor::Option", PatchThorWarning, method: :prepend)
-
-    # Extend any base classes, even gem classes
-    Dir.glob("#{Rails.root}/lib/ext/**/*.rb").sort.each { |file| require file }
 
     # tell Rails to use the native XML parser instead of REXML
     ActiveSupport::XmlMini.backend = 'Nokogiri'

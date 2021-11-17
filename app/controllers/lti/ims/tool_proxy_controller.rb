@@ -50,7 +50,7 @@ module Lti
       skip_before_action :load_user, only: [:create, :show, :re_reg]
 
       rescue_from Lti::Errors::InvalidToolProxyError, ::IMS::LTI::Errors::InvalidToolConsumerProfile do |exception|
-        render json: exception.as_json, status: 400
+        render json: exception.as_json, status: :bad_request
       end
 
       def show
@@ -131,7 +131,7 @@ module Lti
         tp.save
         render json: json, status: :created, content_type: 'application/vnd.ims.lti.v2.toolproxy.id+json'
       rescue JSON::ParserError
-        render json: { error: 'Invalid request' }, status: 400
+        render json: { error: 'Invalid request' }, status: :bad_request
       end
 
       private

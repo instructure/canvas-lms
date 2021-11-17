@@ -251,7 +251,7 @@ class AppointmentGroup < ActiveRecord::Base
       if appointment_group_sub_contexts.present? && appointment_group_sub_contexts.first.sub_context_type == 'CourseSection'
         sub_context_ids = appointment_group_sub_contexts.map(&:sub_context_id)
         user_visible_section_ids = contexts.map { |c|
-          c.section_visibilities_for(user).map { |v| v[:course_section_id] }
+          c.section_visibilities_for(user).pluck(:course_section_id)
         }.flatten
         next true if (sub_context_ids - user_visible_section_ids).empty?
       end

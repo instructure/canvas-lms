@@ -257,7 +257,7 @@ class MediaObjectsController < ApplicationController
                                                             :width => width,
                                                             :height => height,
                                                             :type => type),
-                  :status => 301
+                  :status => :moved_permanently
     else
       render :plain => t(:media_objects_not_configured, "Media Objects not configured")
     end

@@ -90,7 +90,7 @@ describe Mutations::MarkSubmissionCommentsRead do
       result.dig(:data, :markSubmissionCommentsRead, :submissionComments).count
     ).to eq 2
     expect(
-      result.dig(:data, :markSubmissionCommentsRead, :submissionComments).map { |x| x[:_id] }
+      result.dig(:data, :markSubmissionCommentsRead, :submissionComments).pluck(:_id)
     ).to eq [@student_comment.id.to_s, student_comment2.id.to_s]
     expect(ViewedSubmissionComment.count).to eq 2
     expect(@student_comment.read?(@teacher)).to eq true

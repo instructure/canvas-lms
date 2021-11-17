@@ -390,7 +390,7 @@ class MessageableUser
     def messageable_users_in_context_scope(asset_string_or_asset, options = {})
       if asset_string_or_asset.is_a?(String)
         asset_string = asset_string_or_asset
-        return unless asset_string.sub(/_all\z/, '') =~ CONTEXT_RECIPIENT
+        return unless asset_string.delete_suffix('_all') =~ CONTEXT_RECIPIENT
 
         context_type = $1
         context_id_or_object = $2.to_i
@@ -761,7 +761,7 @@ class MessageableUser
     end
 
     def uncached_visible_section_ids_in_course(course)
-      course.section_visibilities_for(@user).map { |s| s[:course_section_id] }
+      course.section_visibilities_for(@user).pluck(:course_section_id)
     end
 
     def uncached_observed_student_ids
@@ -871,7 +871,7 @@ class MessageableUser
     # the optional methods list is a list of methods to call (not results of a
     # method call, since if there are multiple we want to distinguish them) to
     # get additional objects to include in the per-shard cache keys
-    def shard_cached(key, *methods)
+    def shard_cached(key, *methods, &block)
       @shard_caches ||= {}
       @shard_caches[key] ||=
         begin
@@ -883,7 +883,7 @@ class MessageableUser
               shard_key << method
               shard_key << Digest::MD5.hexdigest(canonical)
             end
-            by_shard[Shard.current] = Rails.cache.fetch(shard_key.cache_key, :expires_in => 1.day) { yield }
+            by_shard[Shard.current] = Rails.cache.fetch(shard_key.cache_key, :expires_in => 1.day, &block)
           end
           by_shard
         end

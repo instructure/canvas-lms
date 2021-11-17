@@ -51,7 +51,7 @@ describe "speed grader - discussion submissions" do
     # create discussion entries
     @first_message = 'first student message'
     @second_message = 'second student message'
-    @discussion_topic = DiscussionTopic.find_by_assignment_id(@assignment.id)
+    @discussion_topic = DiscussionTopic.find_by(assignment_id: @assignment.id)
     entry = @discussion_topic.discussion_entries
                              .create!(user: student, message: @first_message)
     entry.update_topic

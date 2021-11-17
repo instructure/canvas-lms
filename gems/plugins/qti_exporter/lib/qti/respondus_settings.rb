@@ -74,9 +74,9 @@ module Qti
 
     protected
 
-    def apply_if_set(assessment, key, setting_name, &block)
+    def apply_if_set(assessment, key, setting_name)
       if (setting = read_setting(setting_name))
-        assessment[key] = block ? block.call(setting) : setting
+        assessment[key] = block_given? ? yield(setting) : setting
       end
     end
 

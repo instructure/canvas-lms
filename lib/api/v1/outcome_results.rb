@@ -239,7 +239,7 @@ module Api::V1::OutcomeResults
       row << I18n.t(:student_id, 'Student ID')
       outcomes.each do |outcome|
         pathParts = outcome_paths.find { |x| x[:id] == outcome.id }[:parts]
-        path = pathParts.map { |x| x[:name] }.join(' > ')
+        path = pathParts.pluck(:name).join(' > ')
         row << I18n.t(:outcome_path_result, "%{path} result", :path => path)
         row << I18n.t(:outcome_path_mastery_points, "%{path} mastery points", :path => path)
       end

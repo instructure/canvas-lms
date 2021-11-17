@@ -214,7 +214,7 @@ class ContextModulesController < ApplicationController
           end
         end
       end
-      render status: 404, template: 'shared/errors/404_message'
+      render status: :not_found, template: 'shared/errors/404_message'
     end
   end
 
@@ -254,11 +254,11 @@ class ContextModulesController < ApplicationController
             return_to: params[:return_to]
           )
         else
-          render status: 404, template: 'shared/errors/404_message'
+          render status: :not_found, template: 'shared/errors/404_message'
         end
       end
     else
-      render status: 404, template: 'shared/errors/404_message'
+      render status: :not_found, template: 'shared/errors/404_message'
     end
   end
 
@@ -464,11 +464,11 @@ class ContextModulesController < ApplicationController
       previous_modules = @context.context_modules.active.where('position<?', @module.position).ordered.to_a
       previous_modules.reverse!
       valid_previous_modules = []
-      prereq_ids = @module.prerequisites.select { |p| p[:type] == 'context_module' }.map { |p| p[:id] }
+      prereq_ids = @module.prerequisites.select { |p| p[:type] == 'context_module' }.pluck(:id)
       previous_modules.each do |mod|
         if prereq_ids.include?(mod.id)
           valid_previous_modules << mod
-          prereq_ids += mod.prerequisites.select { |p| p[:type] == 'context_module' }.map { |p| p[:id] }
+          prereq_ids += mod.prerequisites.select { |p| p[:type] == 'context_module' }.pluck(:id)
         end
       end
       valid_previous_modules.reverse!

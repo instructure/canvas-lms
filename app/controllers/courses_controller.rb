@@ -3798,7 +3798,7 @@ class CoursesController < ApplicationController
   end
 
   def offline_web_exports
-    return render status: 404, template: 'shared/errors/404_message' unless allow_web_export_download?
+    return render status: :not_found, template: 'shared/errors/404_message' unless allow_web_export_download?
 
     if authorized_action(WebZipExport.new(course: @context), @current_user, :create)
       title = t('Exported Package History')
@@ -3811,7 +3811,7 @@ class CoursesController < ApplicationController
   end
 
   def start_offline_web_export
-    return render status: 404, template: 'shared/errors/404_message' unless allow_web_export_download?
+    return render status: :not_found, template: 'shared/errors/404_message' unless allow_web_export_download?
 
     if authorized_action(WebZipExport.new(course: @context), @current_user, :create)
       @service = EpubExports::CreateService.new(@context, @current_user, :web_zip_export)

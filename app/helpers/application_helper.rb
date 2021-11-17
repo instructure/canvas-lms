@@ -140,7 +140,7 @@ module ApplicationHelper
   end
 
   def message_user_path(user, context = nil)
-    context = context || @context
+    context ||= @context
 
     # If context is a group that belongs to a course, use the course as the context instead
     context = context.context if context.is_a?(Group) && context.context.is_a?(Course)
@@ -723,7 +723,7 @@ module ApplicationHelper
   def cache(name = {}, options = {}, &block)
     unless options && options[:no_locale]
       name = name.cache_key if name.respond_to?(:cache_key)
-      name = name + "/#{I18n.locale}" if name.is_a?(String)
+      name += "/#{I18n.locale}" if name.is_a?(String)
     end
     super
   end

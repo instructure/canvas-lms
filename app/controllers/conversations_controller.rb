@@ -303,7 +303,11 @@ class ConversationsController < ApplicationController
         end
         hash[:CAN_ADD_NOTES_FOR_COURSES] = course_note_permissions
       end
-      js_env(CONVERSATIONS: hash)
+      js_env({
+               CONVERSATIONS: hash,
+               apollo_caching: Account.site_admin.feature_enabled?(:apollo_caching),
+               conversation_cache_key: Base64.encode64("#{@current_user.uuid}jamDN74lLSmfnmo74Hb6snyBnmc6q")
+             })
       if @domain_root_account.feature_enabled?(:react_inbox)
         css_bundle :canvas_inbox
         js_bundle :inbox

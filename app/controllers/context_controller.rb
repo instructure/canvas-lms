@@ -35,13 +35,13 @@ class ContextController < ApplicationController
   # views.
   def object_snippet
     if HostUrl.has_file_host? && !HostUrl.is_file_host?(request.host_with_port)
-      return head 400
+      return head :bad_request
     end
 
     @snippet = params[:object_data] || ""
 
     unless Canvas::Security.verify_hmac_sha1(params[:s], @snippet)
-      return head 400
+      return head :bad_request
     end
 
     # http://blogs.msdn.com/b/ieinternals/archive/2011/01/31/controlling-the-internet-explorer-xss-filter-with-the-x-xss-protection-http-header.aspx

@@ -187,7 +187,7 @@ class Quizzes::TakeQuizPresenter
   private
 
   def first_unread_question
-    question_ids = all_questions.map { |question| question[:id] }
+    question_ids = all_questions.pluck(:id)
     first_unread = question_ids.detect do |question_id|
       !submission_data[:"_question_#{question_id}_read"]
     end

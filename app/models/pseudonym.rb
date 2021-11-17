@@ -445,7 +445,7 @@ class Pseudonym < ActiveRecord::Base
   def valid_ssha?(plaintext_password)
     return false if plaintext_password.blank? || self.sis_ssha.blank?
 
-    decoded = Base64.decode64(self.sis_ssha.sub(/\A\{SSHA\}/, ""))
+    decoded = Base64.decode64(self.sis_ssha.delete_prefix('{SSHA}'))
     digest = decoded[0, 40]
     salt = decoded[40..]
     return false unless digest && salt

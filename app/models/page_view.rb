@@ -192,13 +192,13 @@ class PageView < ActiveRecord::Base
     end
   end
 
-  def self.find_by_id(id)
+  def self.find_by(id:)
     if PageView.cassandra?
       PageView::EventStream.fetch([id]).first
     elsif PageView.pv4?
       nil
     else
-      where(request_id: id).first
+      super(request_id: id)
     end
   end
 
@@ -328,7 +328,7 @@ class PageView < ActiveRecord::Base
   end
 
   class << self
-    def transaction(*args)
+    def transaction(*args, &block)
       if PageView.cassandra?
         # Rails 3 autosave associations re-assign the attributes;
         # for sharding to work, the page view's shard has to be
@@ -336,9 +336,7 @@ class PageView < ActiveRecord::Base
         # done by the transaction, which we're skipping. so
         # manually do that here
         if current_scope
-          current_scope.activate do
-            yield
-          end
+          current_scope.activate(&block)
         else
           yield
         end

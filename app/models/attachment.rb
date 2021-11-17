@@ -163,8 +163,10 @@ class Attachment < ActiveRecord::Base
       find_with_possibly_replaced(super)
     end
 
-    def find_by_id(id)
-      find_with_possibly_replaced(where(id: id).first)
+    def find_by(**kwargs)
+      return super unless kwargs.keys == [:id]
+
+      find_with_possibly_replaced(super)
     end
 
     def find_all_by_id(ids)
@@ -311,7 +313,7 @@ class Attachment < ActiveRecord::Base
         Attachment.where(:id => self).update_all(:cloned_item_id => self.cloned_item.id) # don't touch it for no reason
       end
     end
-    existing = context.attachments.active.find_by_id(self)
+    existing = context.attachments.active.find_by(id: self)
 
     options[:cloned_item_id] ||= self.cloned_item_id
     options[:migration_id] ||= CC::CCHelper.create_key(self)
@@ -939,7 +941,7 @@ class Attachment < ActiveRecord::Base
   # created if necessary.
   def open(opts = {}, &block)
     if instfs_hosted?
-      if block_given?
+      if block
         streaming_download(&block)
       else
         create_tempfile(opts) do |tempfile|
@@ -1515,7 +1517,7 @@ class Attachment < ActiveRecord::Base
   end
 
   def self.file_removed_path
-    Rails.root.join('public', 'file_removed', 'file_removed.pdf')
+    Rails.root.join('public/file_removed/file_removed.pdf')
   end
 
   # find the file_removed file on instfs (or upload it)
@@ -1725,9 +1727,9 @@ class Attachment < ActiveRecord::Base
     !!@skip_3rd_party_submits
   end
 
-  def self.skip_media_object_creation(&block)
+  def self.skip_media_object_creation
     @skip_media_object_creation = true
-    block.call
+    yield
   ensure
     @skip_media_object_creation = false
   end

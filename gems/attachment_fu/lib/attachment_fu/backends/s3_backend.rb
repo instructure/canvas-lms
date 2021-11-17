@@ -155,7 +155,7 @@ module AttachmentFu # :nodoc:
       end
 
       def self.load_s3_config(path = nil)
-        s3_config_path = path || (Rails.root + 'config/amazon_s3.yml')
+        s3_config_path = path || Rails.root.join('config/amazon_s3.yml')
         YAML.load(ERB.new(File.read(s3_config_path)).result)[Rails.env].symbolize_keys
       end
 

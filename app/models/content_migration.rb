@@ -832,7 +832,7 @@ class ContentMigration < ActiveRecord::Base
       # this is for a course copy so it needs to combine the progress of the export and import
       # The export will count for 40% of progress
       # The importing step (so the value of progress on this object)will be 60%
-      mig_prog = mig_prog * 0.6
+      mig_prog *= 0.6
 
       if self.content_export
         export_prog = self.content_export.progress || 0

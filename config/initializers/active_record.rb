@@ -720,10 +720,10 @@ end
 
 module UsefulFindInBatches
   # add the strategy param
-  def find_each(start: nil, finish: nil, **kwargs)
-    if block_given?
+  def find_each(start: nil, finish: nil, **kwargs, &block)
+    if block
       find_in_batches(start: start, finish: finish, **kwargs) do |records|
-        records.each { |record| yield record }
+        records.each(&block)
       end
     else
       enum_for(:find_each, start: start, finish: finish, **kwargs) do
@@ -749,7 +749,7 @@ module UsefulFindInBatches
   end
 
   def in_batches(strategy: nil, start: nil, finish: nil, **kwargs, &block)
-    unless block_given?
+    unless block
       return ActiveRecord::Batches::BatchEnumerator.new(strategy: strategy, start: start, relation: self, **kwargs)
     end
 
@@ -1027,11 +1027,11 @@ module UsefulBatchEnumerator
     super(**kwargs.slice(:of, :start, :finish, :relation))
   end
 
-  def each_record
-    return to_enum(:each_record) unless block_given?
+  def each_record(&block)
+    return to_enum(:each_record) unless block
 
     @relation.to_enum(:in_batches, strategy: @strategy, load: true, **@kwargs).each do |relation|
-      relation.records.each { |record| yield record }
+      relation.records.each(&block)
     end
   end
 
@@ -1075,9 +1075,9 @@ module UsefulBatchEnumerator
     @relation.in_batches(strategy: @strategy, load: true, **@kwargs, &:destroy_all)
   end
 
-  def each
+  def each(&block)
     enum = @relation.to_enum(:in_batches, strategy: @strategy, load: true, **@kwargs)
-    return enum.each { |relation| yield relation } if block_given?
+    return enum.each(&block) if block
 
     enum
   end
@@ -1535,7 +1535,7 @@ module MigratorCache
   end
 
   def migrations_paths
-    @@migrations_paths ||= [File.join(Rails.root, "db/migrate")]
+    @@migrations_paths ||= [Rails.root.join("db/migrate")]
   end
 end
 ActiveRecord::Migrator.singleton_class.prepend(MigratorCache)
@@ -1577,7 +1577,7 @@ module Migrator
 end
 ActiveRecord::Migrator.prepend(Migrator)
 
-ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems', 'plugins', '*', 'db', 'migrate')]
+ActiveRecord::Migrator.migrations_paths.concat Dir[Rails.root.join('gems/plugins/*/db/migrate')]
 
 ActiveRecord::Tasks::DatabaseTasks.migrations_paths = ActiveRecord::Migrator.migrations_paths
 
@@ -1923,11 +1923,11 @@ ActiveRecord::ConnectionAdapters::Transaction.prepend(PreserveShardAfterTransact
 module ConnectionWithMaxRuntime
   def initialize(*)
     super
-    @created_at = Concurrent.monotonic_time
+    @created_at = Process.clock_gettime(Process::CLOCK_MONOTONIC)
   end
 
   def runtime
-    Concurrent.monotonic_time - @created_at
+    Process.clock_gettime(Process::CLOCK_MONOTONIC) - @created_at
   end
 end
 ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(ConnectionWithMaxRuntime)

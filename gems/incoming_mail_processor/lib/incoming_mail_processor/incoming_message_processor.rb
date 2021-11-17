@@ -104,10 +104,8 @@ module IncomingMailProcessor
         MailboxClasses.fetch(account.protocol)
       end
 
-      def timeout_method
-        Canvas.timeout_protection("incoming_message_processor", raise_on_timeout: true) do
-          yield
-        end
+      def timeout_method(&block)
+        Canvas.timeout_protection("incoming_message_processor", raise_on_timeout: true, &block)
       end
 
       def configure_settings(config)

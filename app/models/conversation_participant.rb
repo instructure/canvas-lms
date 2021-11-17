@@ -98,7 +98,7 @@ class ConversationParticipant < ActiveRecord::Base
       scope_shard = s
     end
     scope_shard ||= Shard.current
-    exterior_user_ids = tags.map { |t| t.sub(/\Auser_/, '').to_i }
+    exterior_user_ids = tags.map { |t| t.delete_prefix('user_').to_i }
 
     # which users have conversations on which shards?
     users_by_conversation_shard =
@@ -442,7 +442,7 @@ class ConversationParticipant < ActiveRecord::Base
                                # closest one after it)
                                times = messages.map(&:created_at)
                                older = times.reject! { |t| t <= last_message_at } || []
-                               older.first || times.reverse.first
+                               older.first || times.last
                              end
       self.has_attachments = messages.with_attachments.exists?
       self.has_media_objects = messages.with_media_comments.exists?

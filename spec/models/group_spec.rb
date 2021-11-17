@@ -722,7 +722,7 @@ describe Group do
     end
 
     it "lets members see everything" do
-      expect(@group.tabs_available(@student).map { |t| t[:id] }).to eql [
+      expect(@group.tabs_available(@student).pluck(:id)).to eql [
         Group::TAB_HOME,
         Group::TAB_ANNOUNCEMENTS,
         Group::TAB_PAGES,
@@ -736,7 +736,7 @@ describe Group do
     end
 
     it "lets admins see everything" do
-      expect(@group.tabs_available(@teacher).map { |t| t[:id] }).to eql [
+      expect(@group.tabs_available(@teacher).pluck(:id)).to eql [
         Group::TAB_HOME,
         Group::TAB_ANNOUNCEMENTS,
         Group::TAB_PAGES,
@@ -750,7 +750,7 @@ describe Group do
     end
 
     it "does not let nobodies see conferences" do
-      expect(@group.tabs_available(nil).map { |t| t[:id] }).not_to include Group::TAB_CONFERENCES
+      expect(@group.tabs_available(nil).pluck(:id)).not_to include Group::TAB_CONFERENCES
     end
   end
 

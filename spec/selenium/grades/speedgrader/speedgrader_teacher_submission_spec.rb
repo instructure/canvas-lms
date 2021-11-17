@@ -382,7 +382,7 @@ describe "speed grader submissions" do
         wait_for_ajaximations
         expect_new_page_load { f('#grade_container .turnitin_resubmit_button').click }
         wait_for_ajaximations
-        expect(Delayed::Job.find_by_tag('Submission#submit_to_turnitin')).not_to be_nil
+        expect(Delayed::Job.find_by(tag: 'Submission#submit_to_turnitin')).not_to be_nil
         expect(f('#grade_container .submission_pending')).not_to be_nil
       end
     end

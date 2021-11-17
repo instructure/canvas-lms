@@ -443,8 +443,8 @@ describe "admin settings tab" do
       click_submit
 
       new_help_links = Account.default.help_links
-      expect(new_help_links.map { |x| x[:id] }).to_not include(Account.default.help_links_builder.default_links.first[:id].to_s)
-      expect(new_help_links.map { |x| x[:id] }).to include(Account.default.help_links_builder.default_links.last[:id].to_s)
+      expect(new_help_links.pluck(:id)).to_not include(Account.default.help_links_builder.default_links.first[:id].to_s)
+      expect(new_help_links.pluck(:id)).to include(Account.default.help_links_builder.default_links.last[:id].to_s)
       expect(new_help_links.last).to include(help_link)
     end
 

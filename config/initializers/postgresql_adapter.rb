@@ -23,10 +23,10 @@ class QuotedValue < String
 end
 
 module PostgreSQLAdapterExtensions
-  def receive_timeout_wrapper
+  def receive_timeout_wrapper(&block)
     return yield unless @config[:receive_timeout]
 
-    Timeout.timeout(@config[:receive_timeout], PG::ConnectionBad, "receive timeout") { yield }
+    Timeout.timeout(@config[:receive_timeout], PG::ConnectionBad, "receive timeout", &block)
   end
 
   %I{begin_db_transaction create_savepoint active?}.each do |method|

@@ -334,7 +334,7 @@ class ProfileController < ApplicationController
       @user.preferences[:read_notification_privacy_info] = Time.now.utc.to_s
       @user.save
 
-      return head 208
+      return head :already_reported
     end
 
     respond_to do |format|
@@ -500,7 +500,7 @@ class ProfileController < ApplicationController
 
   def qr_mobile_login
     unless instructure_misc_plugin_available? && !!@domain_root_account&.mobile_qr_login_is_enabled?
-      head 404
+      head :not_found
       return
     end
 

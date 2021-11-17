@@ -29,7 +29,7 @@ module Lti
     let(:tool_proxy_service) { ToolProxyService.new }
 
     describe '#process_tool_proxy_json' do
-      let(:tool_proxy_fixture) { File.read(File.join(Rails.root, 'spec', 'fixtures', 'lti', 'tool_proxy.json')) }
+      let(:tool_proxy_fixture) { Rails.root.join('spec/fixtures/lti/tool_proxy.json').read }
       let(:tool_proxy_guid) { 'guid' }
       let(:account) { Account.new }
 

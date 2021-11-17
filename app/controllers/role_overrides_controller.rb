@@ -607,7 +607,7 @@ class RoleOverridesController < ApplicationController
         render :json => {
           :message => "role not found"
         },
-               :status => 404
+               :status => :not_found
       else
         redirect_to named_context_url(@context, :context_permissions_url,
                                       :account_roles => params[:account_roles])
