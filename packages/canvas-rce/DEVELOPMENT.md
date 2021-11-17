@@ -83,7 +83,7 @@ specification.
 
 Translations for TinyMCE are not shipped with the `tinymce` npm package. When
 upgrading to a new version be sure to download the latest language packs. Visit
-https://www.tinymce.com/download/language-packages/ and select all languages. It
+<https://www.tiny.cloud/get-tiny/language-packages/> and select all languages. It
 is easier to just download all and only commit the changes to existing files
 than try to only select the locales currently used. Download the file and
 extract all of th `.js` files to `./src/translations/tinymce/`.
