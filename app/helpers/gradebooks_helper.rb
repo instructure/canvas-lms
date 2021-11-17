@@ -92,7 +92,7 @@ module GradebooksHelper
   end
 
   def display_grade(grade)
-    grade.blank? ? '-' : grade
+    grade.presence || '-'
   end
 
   def graded_by_title(graded_at, grader_name)

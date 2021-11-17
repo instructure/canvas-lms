@@ -99,7 +99,7 @@ module Lti
       case return_type
       when 'file'
         mime = opts[:content_type]
-        mime.present? ? mime : lookup_mime(opts[:text], opts[:url])
+        mime.presence || lookup_mime(opts[:text], opts[:url])
       when 'image_url'
         lookup_mime(opts[:text], opts[:url]) || 'image'
       when 'lti_launch_url'

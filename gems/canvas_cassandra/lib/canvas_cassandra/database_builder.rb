@@ -87,7 +87,7 @@ module CanvasCassandra
       setting_key = 'event_stream.read_consistency'
       setting_value = settings_store.get("#{setting_key}.#{database_name}", nil) || settings_store.get(setting_key, nil)
 
-      setting_value if setting_value.present?
+      setting_value.presence
     end
 
     def self.settings_store

@@ -469,7 +469,7 @@ class AssignmentOverridesController < ApplicationController
       render json: assignment_overrides_json(overrides, @current_user)
     else
       errors = overrides.map do |override|
-        override.errors if override.errors.present?
+        override.errors.presence
       end
       errors = ['unknown error'] unless errors.compact.present?
       bad_request(errors: errors)

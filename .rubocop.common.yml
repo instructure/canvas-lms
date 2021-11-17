@@ -122,6 +122,8 @@ Rails/Pluck:
   Severity: error
 Rails/PluralizationGrammar:
   Severity: error
+Rails/Presence:
+  Severity: error
 Rails/RedundantAllowNil:
   Severity: error
 Rails/SkipsModelValidations:
