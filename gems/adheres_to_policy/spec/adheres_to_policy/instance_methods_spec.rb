@@ -125,13 +125,13 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       set_policy do
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :read
 
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :write
 
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :update
       end
     end
@@ -152,13 +152,13 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       set_policy do
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :read, :write
 
         given { |_| raise "don't execute me" }
         can :write
 
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :update
       end
     end
@@ -179,7 +179,7 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       set_policy do
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :read
 
         given { |_| raise "don't execute me" }
@@ -206,10 +206,10 @@ describe AdheresToPolicy::InstanceMethods do
       end
 
       set_policy do
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :read
 
-        given { |_| @total = @total + 1 }
+        given { |_| @total += 1 }
         can :write
 
         given { |_| raise "me either" }
@@ -314,7 +314,7 @@ describe AdheresToPolicy::InstanceMethods do
         end
 
         set_policy do
-          given { |arg1| @total = @total + arg1 }
+          given { |arg1| @total += arg1 }
           can :read
 
           given { |arg1, arg2| @total = @total + arg1 + arg2[:count] }

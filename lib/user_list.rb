@@ -132,7 +132,7 @@ class UserList
 
     def quote_ends(chars, i)
       loop do
-        i = i + 1
+        i += 1
         return false if i >= chars.size
         return false if chars[i] == '@'
         return true if chars[i] == '"'

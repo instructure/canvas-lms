@@ -81,7 +81,7 @@ describe "grades" do
     @submission.save!
 
     # second assigmnent data
-    due_date = due_date + 1.day
+    due_date += 1.day
     @second_assignment = assignment_model({
                                             course: @course,
                                             title: 'second assignment',
@@ -108,7 +108,7 @@ describe "grades" do
                                                     })
 
     # third assignment data
-    due_date = due_date + 1.day
+    due_date += 1.day
     @third_assignment = assignment_model({ title: 'third assignment', due_at: due_date, course: @course })
   end
 

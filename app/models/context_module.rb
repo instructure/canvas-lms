@@ -896,7 +896,7 @@ class ContextModule < ActiveRecord::Base
 
   def migration_position
     @migration_position_counter ||= 0
-    @migration_position_counter = @migration_position_counter + 1
+    @migration_position_counter += 1
   end
   attr_accessor :item_migration_position
 
