@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = "0.0.1"
   spec.authors       = ["Brent Burgoyne"]
   spec.email         = ["brent@instructure.com"]
-  spec.summary       = %q{DynamoDB wrapper for Canvas LMS}
+  spec.summary       = 'DynamoDB wrapper for Canvas LMS'
   spec.homepage      = "https://github.com/instructure/canvas-lms"
   spec.license       = "AGPL"
 

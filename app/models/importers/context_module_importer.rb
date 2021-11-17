@@ -292,7 +292,7 @@ module Importers
           external_tool_url = migration.process_domain_substitutions(external_tool_url)
           if external_tool_id.nil?
             migration.add_warning(t(:foreign_lti_tool,
-                                    %q{The account External Tool for module item "%{title}" must be configured before the item can be launched},
+                                    'The account External Tool for module item "%{title}" must be configured before the item can be launched',
                                     :title => title))
           end
 

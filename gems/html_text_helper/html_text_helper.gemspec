@@ -5,7 +5,7 @@ Gem::Specification.new do |spec|
   spec.version       = '0.0.1'
   spec.authors       = ["Zach Pendleton", "Stephan Hagemann"]
   spec.email         = ["zachp@instructure.com", "stephan@pivotallabs.com"]
-  spec.summary       = %q{Html text helpers}
+  spec.summary       = 'Html text helpers'
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w(test.sh)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }

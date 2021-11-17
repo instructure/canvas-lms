@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.version       = CsvDiff::VERSION
   spec.authors       = ["Brian Palmer"]
   spec.email         = ["brianp@instructure.com"]
-  spec.summary       = %q{Generate CSV diffs}
+  spec.summary       = 'Generate CSV diffs'
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w(test.sh)
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})

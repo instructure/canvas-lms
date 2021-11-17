@@ -252,6 +252,8 @@ Style/RedundantFreeze:
   Severity: error
 Style/RedundantParentheses:
   Severity: error
+Style/RedundantPercentQ:
+  Severity: error
 Style/RedundantRegexpCharacterClass:
   Severity: error
 Style/RedundantRegexpEscape:
