@@ -131,6 +131,7 @@ describe "Discussion Topic Show" do
         driver.action.send_keys(:enter).perform
         wait_for_ajaximations
         driver.action.send_keys("HI!").perform
+        wait_for_ajaximations
         fj("button:contains('Reply')").click
         wait_for_ajaximations
         expect(fj("p:contains('@JeffreyHI!')")).to be_present
