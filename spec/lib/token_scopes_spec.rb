@@ -69,7 +69,7 @@ describe TokenScopes do
 
       it "formats the scopes with url:http_verb|api_path" do
         generated_scopes.each do |scope|
-          expect(/^url:(?:GET|OPTIONS|POST|PUT|PATCH|DELETE)\|\/api\/.+/ =~ scope).not_to be_nil
+          expect(%r{^url:(?:GET|OPTIONS|POST|PUT|PATCH|DELETE)\|/api/.+} =~ scope).not_to be_nil
         end
       end
 

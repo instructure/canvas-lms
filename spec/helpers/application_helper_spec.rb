@@ -158,7 +158,7 @@ describe ApplicationHelper do
 
       it 'builds a whole time tag with a useful title showing the timezone offset if theres a context' do
         tag = friendly_datetime(Time.now, context: context)
-        expect(tag).to match(/^<time.*<\/time>$/)
+        expect(tag).to match(%r{^<time.*</time>$})
         expect(tag).to match(/data-html-tooltip-title=/)
         expect(tag).to match(/Local: Mar 13 at  1:12am/)
         expect(tag).to match(/Course: Mar 13 at  3:12am/)
@@ -166,7 +166,7 @@ describe ApplicationHelper do
 
       it 'can produce an alternate tag type' do
         tag = friendly_datetime(Time.now, context: context, tag_type: :span)
-        expect(tag).to match(/^<span.*<\/span>$/)
+        expect(tag).to match(%r{^<span.*</span>$})
         expect(tag).to match(/data-html-tooltip-title=/)
         expect(tag).to match(/Local: Mar 13 at  1:12am/)
         expect(tag).to match(/Course: Mar 13 at  3:12am/)

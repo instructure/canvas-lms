@@ -90,7 +90,7 @@ module Canvas
 
         def url_for(source)
           # remove the leading slash if there is one
-          source = source.sub(/^\//, '')
+          source = source.sub(%r{^/}, '')
           if webpack_request?(source)
             webpack_url_for(source)
           else

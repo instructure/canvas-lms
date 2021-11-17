@@ -126,7 +126,7 @@ class ApiRouteSet
     # .json -- but see the api docs for info on sending hex-encoded sis ids,
     # which allows any string.
     ID_REGEX = %r{(?:[^/?.]|\.(?!json(?:\z|[/?])))+}.freeze
-    ID_PARAM = %r{^:(id|[\w]+_id)$}.freeze
+    ID_PARAM = /^:(id|[\w]+_id)$/.freeze
 
     def self.prefix
       "/api/v1"

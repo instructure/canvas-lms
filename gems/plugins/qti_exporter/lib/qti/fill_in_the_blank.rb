@@ -183,7 +183,7 @@ module Qti
     def process_respondus
       @doc.css('responseCondition stringMatch baseValue[baseType=string]').each do |val_node|
         if (blank_id = val_node['identifier'])
-          blank_id = blank_id.sub(%r{^RESPONSE_-([^-]*)-}, '\1')
+          blank_id = blank_id.sub(/^RESPONSE_-([^-]*)-/, '\1')
           @question[:answers] << {
             :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT,
             :id => unique_local_id,

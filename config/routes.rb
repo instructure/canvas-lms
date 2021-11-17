@@ -163,9 +163,9 @@ CanvasRails::Application.routes.draw do
     end
 
     get 'wiki' => 'wiki_pages#front_page', as: :wiki
-    get 'wiki/:id' => 'wiki_pages#show_redirect', id: /[^\/]+/
-    get 'wiki/:id/revisions' => 'wiki_pages#revisions_redirect', id: /[^\/]+/
-    get 'wiki/:id/revisions/:revision_id' => 'wiki_pages#revisions_redirect', id: /[^\/]+/
+    get 'wiki/:id' => 'wiki_pages#show_redirect', id: %r{[^/]+}
+    get 'wiki/:id/revisions' => 'wiki_pages#revisions_redirect', id: %r{[^/]+}
+    get 'wiki/:id/revisions/:revision_id' => 'wiki_pages#revisions_redirect', id: %r{[^/]+}
   end
 
   concern :conferences do

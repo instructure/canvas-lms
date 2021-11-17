@@ -150,7 +150,7 @@ describe "Rubrics API", type: :request do
 
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
-    expect(links.all? { |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/rubrics/ }).to be_truthy
+    expect(links.all? { |l| l =~ %r{api/v1/#{type}s/#{context.id}/rubrics} }).to be_truthy
     expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2/)
     expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1/)
     expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
@@ -160,7 +160,7 @@ describe "Rubrics API", type: :request do
 
     expect(json.length).to eq 2
     links = response.headers['Link'].split(",")
-    expect(links.all? { |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/rubrics/ }).to be_truthy
+    expect(links.all? { |l| l =~ %r{api/v1/#{type}s/#{context.id}/rubrics} }).to be_truthy
     expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2/)
     expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1/)
     expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)

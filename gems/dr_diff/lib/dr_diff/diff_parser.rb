@@ -73,7 +73,7 @@ module DrDiff
     def code_line?(line)
       return false if file_line?(line)
       return false if line_range?(line)
-      return false if /^--- a\/.*\./.match?(line)
+      return false if %r{^--- a/.*\.}.match?(line)
       return false if /^index .*\d\d\d$/.match?(line)
       return false if /^diff --git/.match?(line)
 
@@ -85,7 +85,7 @@ module DrDiff
     end
 
     def file_line?(line)
-      line =~ /^\+\+\+ b\//
+      line =~ %r{^\+\+\+ b/}
     rescue ArgumentError => e
       puts("UNABLE TO DIGEST THIS LINE: |#{line}|")
       puts(e)
@@ -97,7 +97,7 @@ module DrDiff
     end
 
     def path_from_file_line(line)
-      line.split(/\s/).last.gsub(/^b\//, "")
+      line.split(/\s/).last.gsub(%r{^b/}, "")
     end
 
     def range_from_file_line(line)

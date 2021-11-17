@@ -433,7 +433,7 @@ describe 'RequestThrottle' do
 
         it "uses regexes to predict up front costs by path if set" do
           hash = {
-            /\A\/files\/\d+\/download/ => 1,
+            %r{\A/files/\d+/download} => 1,
             "equation_images\/" => 2
           }
           expect(RequestThrottle).to receive(:dynamic_settings).and_return({ 'up_front_cost_by_path_regex' => hash })

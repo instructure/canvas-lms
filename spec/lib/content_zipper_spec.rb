@@ -134,7 +134,7 @@ describe ContentZipper do
       Zip::File.foreach(attachment.full_filename) do |f|
         if f.file?
           expect(f.name).to match(/some9991234guy/)
-          expect(f.get_input_stream.read).to match(%r{This submission was a url})
+          expect(f.get_input_stream.read).to match(/This submission was a url/)
           expect(f.get_input_stream.read).to be_include("http://www.instructure.com/")
         end
       end

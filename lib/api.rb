@@ -158,8 +158,8 @@ module Api
   MAX_ID = ((2**63) - 1)
   MAX_ID_LENGTH = MAX_ID.to_s.length
   MAX_ID_RANGE = (-MAX_ID...MAX_ID).freeze
-  ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}.freeze
-  UUID_REGEX = %r{\Auuid:(\w{40,})\z}.freeze
+  ID_REGEX = /\A\d{1,#{MAX_ID_LENGTH}}\z/.freeze
+  UUID_REGEX = /\Auuid:(\w{40,})\z/.freeze
 
   def self.sis_parse_id(id, lookups, _current_user = nil,
                         root_account: nil)
@@ -168,10 +168,10 @@ module Api
 
     id = id.to_s.strip
     case id
-    when %r{\Ahex:(lti_[\w_]+|sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z}
+    when /\Ahex:(lti_[\w_]+|sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z/
       sis_column = $1
       sis_id = [$2].pack('H*')
-    when %r{\A(lti_[\w_]+|sis_[\w_]+):(.+)\z}
+    when /\A(lti_[\w_]+|sis_[\w_]+):(.+)\z/
       sis_column = $1
       sis_id = $2
     when ID_REGEX
@@ -466,7 +466,7 @@ module Api
 
   def self.parse_pagination_links(link_header)
     link_header.split(",").map do |link|
-      url, rel = link.match(%r{^<([^>]+)>; rel="([^"]+)"}).captures
+      url, rel = link.match(/^<([^>]+)>; rel="([^"]+)"/).captures
       uri = URI.parse(url)
       raise(ArgumentError, "pagination url is not an absolute uri: #{url}") unless uri.is_a?(URI::HTTP)
 
@@ -621,7 +621,7 @@ module Api
                     (?<timezone>Z|[+-](?:2[0-3]|[0-1][0-9]):[0-5][0-9])?$/x.freeze
 
   # regex for valid dates
-  DATE_REGEX = /^\d{4}[- \/.](0[1-9]|1[012])[- \/.](0[1-9]|[12][0-9]|3[01])$/.freeze
+  DATE_REGEX = %r{^\d{4}[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$}.freeze
 
   # regex for shard-aware ID
   ID = '(?:\d+~)?\d+'

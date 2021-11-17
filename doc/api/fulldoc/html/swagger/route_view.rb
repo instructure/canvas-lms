@@ -50,13 +50,13 @@ class RouteView < HashView
   end
 
   def path_variables
-    api_path.scan(%r{:(\w+)}).map(&:first)
+    api_path.scan(/:(\w+)/).map(&:first)
   end
 
   def swagger_path
     api_path
       .gsub(%r{^/api}, '')
-      .gsub(%r{:(\w+)}, '{\1}')
+      .gsub(/:(\w+)/, '{\1}')
   end
 
   def verb

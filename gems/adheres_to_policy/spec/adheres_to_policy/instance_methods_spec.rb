@@ -238,8 +238,8 @@ describe AdheresToPolicy::InstanceMethods do
     end
 
     it "clear the permissions cache" do
-      expect(Rails.cache).to receive(:delete).with(/\/read$/)
-      expect(Rails.cache).to receive(:delete).with(/\/write$/)
+      expect(Rails.cache).to receive(:delete).with(%r{/read$})
+      expect(Rails.cache).to receive(:delete).with(%r{/write$})
 
       sample = sample_class.new
       expect(sample.grants_right?(1, :read)).to eq true
@@ -419,12 +419,12 @@ describe AdheresToPolicy::InstanceMethods do
         end
 
         actor = actor_class.new
-        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(/>\/permissions_key\/read$/)
+        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(%r{>/permissions_key/read$})
 
         session.delete(:permissions_key)
-        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(/>\/default\/read$/)
+        expect(actor.call_permission_cache_key_for(nil, session, :read)).to match(%r{>/default/read$})
 
-        expect(actor.call_permission_cache_key_for(nil, nil, :read)).to match(/>\/read$/)
+        expect(actor.call_permission_cache_key_for(nil, nil, :read)).to match(%r{>/read$})
       end
 
       it 'must not use the rails cache for permissions included in the configured blacklist' do

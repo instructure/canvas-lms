@@ -156,7 +156,7 @@ describe UserContent, type: :request do
     expect(video['data-media_comment_id']).to eq 'qwerty'
     expect(video['poster']).to match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
     expect(video['src']).to match(%r{http://www.example.com/courses/#{@course.id}/media_download})
-    expect(video['src']).to match(%r{entryId=qwerty})
+    expect(video['src']).to match(/entryId=qwerty/)
     # we leave width/height out of it, since browsers tend to have good
     # defaults and it makes it easier to set via client css rules
     expect(video['width']).to be_nil
@@ -184,7 +184,7 @@ describe UserContent, type: :request do
     expect(audio['data-media_comment_id']).to eq 'abcde'
     expect(audio['poster']).to be_blank
     expect(audio['src']).to match(%r{http://www.example.com/courses/#{@course.id}/media_download})
-    expect(audio['src']).to match(%r{entryId=abcde})
+    expect(audio['src']).to match(/entryId=abcde/)
   end
 
   it "does not translate links in content not viewable by user" do

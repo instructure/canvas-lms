@@ -86,7 +86,7 @@ describe ContentMigration do
       new_topic = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
       expect(new_topic).not_to be_nil
       expect(new_topic.message).to eq topic.message
-      expect(@copy_to.syllabus_body).to match(/\/courses\/#{@copy_to.id}\/discussion_topics\/#{new_topic.id}/)
+      expect(@copy_to.syllabus_body).to match(%r{/courses/#{@copy_to.id}/discussion_topics/#{new_topic.id}})
     end
 
     it "copies course syllabus when the everything option is selected" do

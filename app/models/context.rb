@@ -288,7 +288,7 @@ module Context
     when 'context'
       object = context.users.find(params[:id]) if params[:action] == 'roster_user' && params[:id]
     else
-      object = context.try(params[:controller].sub(/^.+\//, ''))&.find_by(id: params[:id])
+      object = context.try(params[:controller].sub(%r{^.+/}, ''))&.find_by(id: params[:id])
     end
     object
   rescue

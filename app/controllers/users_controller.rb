@@ -446,7 +446,7 @@ class UsersController < ApplicationController
       return_url = session[:masquerade_return_to]
       session.delete(:masquerade_return_to)
       @current_user.associate_with_shard(@user.shard, :shadow) if PageView.db?
-      if /.*\/users\/#{@user.id}\/masquerade/.match?(request.referer)
+      if %r{.*/users/#{@user.id}/masquerade}.match?(request.referer)
         return_to(return_url, dashboard_url)
       else
         return_to(return_url, request.referer || dashboard_url)

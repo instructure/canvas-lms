@@ -197,7 +197,7 @@ class CanvasUnzip
                   normalize_name(entry.name, 'cp437')
                 when :tar
                   # there is no standard. this seems like a reasonable fallback to me
-                  normalize_name(entry.full_name.sub(/^\.\//, ''), 'iso-8859-1')
+                  normalize_name(entry.full_name.sub(%r{^\./}, ''), 'iso-8859-1')
                 end
     end
 

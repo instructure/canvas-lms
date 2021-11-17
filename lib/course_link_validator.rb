@@ -218,7 +218,7 @@ class CourseLinkValidator
       begin
         if ImportedHtmlConverter.relative_url?(url) || (self.domain_regex && url.match(self.domain_regex))
           result = if valid_route?(url)
-                     if url.match(/\/courses\/(\d+)/) && self.course.id.to_s != $1
+                     if url.match(%r{/courses/(\d+)}) && self.course.id.to_s != $1
                        :course_mismatch
                      else
                        check_object_status(url)
@@ -260,7 +260,7 @@ class CourseLinkValidator
 
     object ||= Context.find_asset_by_url(url)
     unless object
-      return :missing_item unless [nil, 'syllabus'].include?(url.match(/\/courses\/\d+\/\w+\/(.+)/)&.[](1))
+      return :missing_item unless [nil, 'syllabus'].include?(url.match(%r{/courses/\d+/\w+/(.+)})&.[](1))
       return :missing_item if url.include?('/media_objects_iframe/')
 
       return nil

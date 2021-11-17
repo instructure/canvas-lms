@@ -547,7 +547,7 @@ describe Login::CanvasController do
 
       post :create, params: params, session: { :oauth2 => provider.session_hash }
       expect(response).to be_redirect
-      expect(response.location).to match(/https:\/\/example.com/)
+      expect(response.location).to match(%r{https://example.com})
     end
 
     it 'redirects to the redirect uri with the provided state' do
@@ -556,7 +556,7 @@ describe Login::CanvasController do
 
       post :create, params: params, session: { :oauth2 => provider.session_hash.merge(state: "supersekrit") }
       expect(response).to be_redirect
-      expect(response.location).to match(/https:\/\/example.com/)
+      expect(response.location).to match(%r{https://example.com})
       expect(response.location).to match(/state=supersekrit/)
     end
 
@@ -575,7 +575,7 @@ describe Login::CanvasController do
 
       post :create, params: params, session: { :oauth2 => provider.session_hash }
       expect(response).to be_redirect
-      expect(response.location).to match(/https:\/\/example.com/)
+      expect(response.location).to match(%r{https://example.com})
     end
   end
 end

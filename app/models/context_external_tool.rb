@@ -803,7 +803,7 @@ class ContextExternalTool < ActiveRecord::Base
     url = ContextExternalTool.standardize_url(url)
     host = Addressable::URI.parse(url).normalize.host rescue nil
     port = Addressable::URI.parse(url).normalize.port rescue nil
-    d = domain.downcase.gsub(/http[s]?:\/\//, '')
+    d = domain.downcase.gsub(%r{http[s]?://}, '')
     !!(host && ('.' + host + (port ? ":#{port}" : '')).match(/\.#{d}\z/))
   end
 

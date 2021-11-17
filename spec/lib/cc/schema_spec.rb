@@ -28,7 +28,7 @@ module CC
       end
 
       it 'returns the full filepath for valid file names' do
-        expect(Schema.for_version('cccv1p0').to_s).to match(/lib\/cc\/xsd\/cccv1p0\.xsd/)
+        expect(Schema.for_version('cccv1p0').to_s).to match(%r{lib/cc/xsd/cccv1p0\.xsd})
       end
     end
   end

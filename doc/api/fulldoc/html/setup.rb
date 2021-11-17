@@ -43,7 +43,7 @@ module YARD::Templates::Helpers::BaseHelper
     #   # => <a href="assignments.html#method.assignments_api.destroy">destruction</a>
     #
     # @note Action links inside the All Resources section will be relative.
-    if args.first.is_a?(String) && args.first =~ %r{^api:([^#]+)#(.*)}
+    if args.first.is_a?(String) && args.first =~ /^api:([^#]+)#(.*)/
       topic, controller = *lookup_topic($1.to_s)
       if topic
         html_file = "#{topicize topic.first}.html"
@@ -66,7 +66,7 @@ module YARD::Templates::Helpers::BaseHelper
     # @example Explicit resource reference with an overriden title
     #   # @return api:Assignments:AssignmentOverride An Assignment Override
     #   # => <a href="assignments.html#Assignment">An Assignment Override</a>
-    elsif args.first.is_a?(String) && args.first =~ %r{^api:([^:]+):(.*)}
+    elsif args.first.is_a?(String) && args.first =~ /^api:([^:]+):(.*)/
       scope_name, resource_name = $1.downcase, $2.tr('+', ' ')
       link_url("#{scope_name}.html##{resource_name}", args[1] || resource_name)
     elsif args.first.is_a?(String) && args.first == 'Appendix:' && args.size > 1
@@ -299,7 +299,7 @@ def build_json_objects_map
   options[:resources].each do |r, cs|
     cs.each do |controller|
       (controller.tags(:object) + controller.tags(:model)).each do |obj|
-        name, json = obj.text.split(%r{\n+}, 2).map(&:strip)
+        name, json = obj.text.split(/\n+/, 2).map(&:strip)
         obj_map[name] = topicize r
         resource_obj_list[r] ||= []
         resource_obj_list[r] << [name, json]

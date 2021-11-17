@@ -208,7 +208,7 @@ describe "dashboard" do
 
       it "displays course name in course menu", priority: "1", test_id: 215586 do
         f('#global_nav_courses_link').click
-        expect(driver.current_url).not_to match(/\/courses$/)
+        expect(driver.current_url).not_to match(%r{/courses$})
         expect(fj("[aria-label='Courses tray'] h2:contains('Courses')")).to be_displayed
         wait_for_ajax_requests
         expect(fj("[aria-label='Courses tray'] a:contains('#{@course.name}')")).to be_displayed
@@ -330,7 +330,7 @@ describe "dashboard" do
       get "/"
       wait_for_ajaximations
 
-      expect(f('.recent_feedback a')).to have_attribute("href", /courses\/#{@course.id}\/assignments\/#{assign.id}\/submissions\/#{@student.id}/)
+      expect(f('.recent_feedback a')).to have_attribute("href", %r{courses/#{@course.id}/assignments/#{assign.id}/submissions/#{@student.id}})
       f('.recent_feedback a').click
       wait_for_ajaximations
 
