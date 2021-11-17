@@ -426,7 +426,7 @@ describe UserContent, type: :request do
       end
 
       def confirm_url_stability(url)
-        link = %Q(<a href="#{url}">what</a>)
+        link = %(<a href="#{url}">what</a>)
         html = tester.process_incoming_html_content(link)
         doc = Nokogiri::HTML5.fragment(html)
         expect(doc.at_css('a')['href']).to eq url
@@ -450,7 +450,7 @@ describe UserContent, type: :request do
       end
 
       def confirm_url_stability(url)
-        link = %Q(<a href="#{url}">what</a>a>)
+        link = %(<a href="#{url}">what</a>a>)
         html = tester.process_incoming_html_content(link)
         doc = Nokogiri::HTML5.fragment(html)
         expect(doc.at_css('a')['href']).to eq url

@@ -440,7 +440,7 @@ describe "Common Cartridge exporting" do
 
     it "does not get confused by attachments with absolute paths" do
       @att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
-      @q1 = @course.quizzes.create(:title => 'quiz1', :description => %Q(<img src="https://example.com/files/#{@att.id}/download?download_frd=1">))
+      @q1 = @course.quizzes.create(:title => 'quiz1', :description => %(<img src="https://example.com/files/#{@att.id}/download?download_frd=1">))
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       run_export
       doc = Nokogiri::XML.parse(@zip_file.read("#{mig_id(@q1)}/assessment_meta.xml"))
@@ -593,7 +593,7 @@ describe "Common Cartridge exporting" do
 
     it "exports CC 1.3 assignments" do
       @file = Attachment.create!(:filename => 'test.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
-      @course.assignments.create! name: 'test assignment', description: %Q(<a href="/courses/#{@course.id}/files/#{@file.id}/preview">what?</a>), points_possible: 11,
+      @course.assignments.create! name: 'test assignment', description: %(<a href="/courses/#{@course.id}/files/#{@file.id}/preview">what?</a>), points_possible: 11,
                                   submission_types: 'online_text_entry,online_upload,online_url'
       @ce.export_type = ContentExport::COMMON_CARTRIDGE
       @ce.save!
@@ -620,7 +620,7 @@ describe "Common Cartridge exporting" do
       expect(extension_node.namespace.href).to eq 'http://canvas.instructure.com/xsd/cccv1p0'
 
       # validate fallback html manifest resource
-      variant_tag = @manifest_doc.at_css(%Q(resource[identifier="#{assignment_id}_fallback"])).elements.first
+      variant_tag = @manifest_doc.at_css(%(resource[identifier="#{assignment_id}_fallback"])).elements.first
       expect(variant_tag.name).to eq 'variant'
       expect(variant_tag.attribute('identifierref').value).to eql assignment_id
       expect(variant_tag.next_element.name).to eq 'file'

@@ -409,7 +409,7 @@ describe CanvasKaltura::ClientV3 do
       }]
 
       expect(@kaltura).to receive(:bulkUploadCsv).with(
-        %Q(the_name,the_desc,the_tags,the_url,the_media_type,"","","","","","",the_partner_data\n)
+        %(the_name,the_desc,the_tags,the_url,the_media_type,"","","","","","",the_partner_data\n)
       )
 
       @kaltura.bulkUploadAdd(files)

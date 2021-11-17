@@ -474,8 +474,8 @@ describe OAuth2ProviderController do
       let(:redis) do
         redis = double('Redis')
         allow(redis).to receive(:get)
-        allow(redis).to receive(:get).with(valid_code_redis_key).and_return(%Q({"client_id": #{key.id}, "user": #{user.id}}))
-        allow(redis).to receive(:del).with(valid_code_redis_key).and_return(%Q({"client_id": #{key.id}, "user": #{user.id}}))
+        allow(redis).to receive(:get).with(valid_code_redis_key).and_return(%({"client_id": #{key.id}, "user": #{user.id}}))
+        allow(redis).to receive(:del).with(valid_code_redis_key).and_return(%({"client_id": #{key.id}, "user": #{user.id}}))
         redis
       end
 

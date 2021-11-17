@@ -186,7 +186,7 @@ describe QuizzesHelper do
 
   context 'fill_in_multiple_blanks_question' do
     before do
-      @question_text = %q(<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value={{question_1}}' />)
+      @question_text = %(<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value={{question_1}}' />)
       @answer_list = []
       @answers = []
 
@@ -205,7 +205,7 @@ describe QuizzesHelper do
         :answers => @answers
       )
 
-      expect(html).to eq %q(<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=red' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />)
+      expect(html).to eq %(<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=red' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />)
     end
 
     it 'sanitizes user input' do
@@ -220,7 +220,7 @@ describe QuizzesHelper do
         :answers => @answers
       )
 
-      expect(html).to eq %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
+      expect(html).to eq %|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=&gt;&lt;script&gt;alert()&lt;/script&gt;&lt;img' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
       expect(html).to be_html_safe
     end
 

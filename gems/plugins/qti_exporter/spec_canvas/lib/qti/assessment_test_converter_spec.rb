@@ -41,7 +41,7 @@ describe Qti::AssessmentTestConverter do
   def test_section(select)
     Nokogiri::XML(<<~XML).at_css('testPart')
       <testPart identifier="BaseTestPart">
-      #{select && %Q(<selection select="#{select}">)}
+      #{select && %(<selection select="#{select}">)}
       </testPart>
     XML
   end
