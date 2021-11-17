@@ -291,7 +291,7 @@ describe PlannerController do
         end
 
         it "includes objects from concluded courses if specified" do
-          get :index, params: { include: %w{concluded} }
+          get :index, params: { include: %w[concluded] }
           response_json = json_parse(response.body)
           items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
           expect(items).to include ['assignment', @a1.id]

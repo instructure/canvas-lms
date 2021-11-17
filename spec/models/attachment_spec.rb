@@ -1211,11 +1211,11 @@ describe Attachment do
 
   describe "make_unique_filename" do
     it "finds a unique name for files" do
-      existing_files = %w(a.txt b.txt c.txt)
+      existing_files = %w[a.txt b.txt c.txt]
       expect(Attachment.make_unique_filename("d.txt", existing_files)).to eq "d.txt"
       expect(existing_files).not_to be_include(Attachment.make_unique_filename("b.txt", existing_files))
 
-      existing_files = %w(/a/b/a.txt /a/b/b.txt /a/b/c.txt)
+      existing_files = %w[/a/b/a.txt /a/b/b.txt /a/b/c.txt]
       expect(Attachment.make_unique_filename("/a/b/d.txt", existing_files)).to eq "/a/b/d.txt"
       new_name = Attachment.make_unique_filename("/a/b/b.txt", existing_files)
       expect(existing_files).not_to be_include(new_name)

@@ -759,7 +759,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def replies_locked_for?(user)
-    return false unless %w{Course Group}.include?(self.context_type)
+    return false unless %w[Course Group].include?(self.context_type)
 
     course = self.context.is_a?(Course) ? self.context : self.context.context
 

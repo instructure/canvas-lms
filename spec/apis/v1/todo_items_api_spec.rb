@@ -267,7 +267,7 @@ describe UsersController, type: :request do
 
     json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo?include[]=ungraded_quizzes",
                     :controller => "courses", :action => "todo_items",
-                    :format => "json", :course_id => @student_course.to_param, :include => %w(ungraded_quizzes)
+                    :format => "json", :course_id => @student_course.to_param, :include => %w[ungraded_quizzes]
     expect(json.filter_map { |el| el['quiz'] && el['quiz']['id'] }).to eql([survey.id])
 
     # user endpoint
@@ -275,7 +275,7 @@ describe UsersController, type: :request do
     expect(json.filter_map { |el| el['quiz'] && el['quiz']['id'] }).to eql([])
 
     json = api_call :get, "/api/v1/users/self/todo?include[]=ungraded_quizzes", :controller => "users",
-                                                                                :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)
+                                                                                :action => "todo_items", :format => "json", :include => %w[ungraded_quizzes]
     expect(json.filter_map { |el| el['quiz'] && el['quiz']['id'] }).to eql([survey.id])
   end
 
@@ -290,7 +290,7 @@ describe UsersController, type: :request do
     survey2.assignment_overrides.create!(:set => section)
 
     json = api_call :get, "/api/v1/users/self/todo?include[]=ungraded_quizzes", :controller => "users",
-                                                                                :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)
+                                                                                :action => "todo_items", :format => "json", :include => %w[ungraded_quizzes]
     expect(json.filter_map { |el| el['quiz'] && el['quiz']['id'] }).to eql([survey.id])
   end
 
@@ -308,12 +308,12 @@ describe UsersController, type: :request do
     past_survey.publish!
 
     json = api_call :get, "/api/v1/users/self/todo?include[]=ungraded_quizzes", :controller => "users",
-                                                                                :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)
+                                                                                :action => "todo_items", :format => "json", :include => %w[ungraded_quizzes]
     expect(json.filter_map { |el| el['quiz'] && el['quiz']['id'] }).to eql([])
 
     json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo?include[]=ungraded_quizzes",
                     :controller => "courses", :action => "todo_items",
-                    :format => "json", :course_id => @student_course.to_param, :include => %w(ungraded_quizzes)
+                    :format => "json", :course_id => @student_course.to_param, :include => %w[ungraded_quizzes]
     expect(json.filter_map { |el| el['quiz'] && el['quiz']['id'] }).to eql([])
   end
 
@@ -341,7 +341,7 @@ describe UsersController, type: :request do
     it "includes assignments/quizzes with no due_at (users controller)" do
       json = api_call(:get, "/api/v1/users/self/todo?include[]=ungraded_quizzes",
                       :controller => "users", :action => "todo_items",
-                      :format => "json", :include => %w(ungraded_quizzes))
+                      :format => "json", :include => %w[ungraded_quizzes])
       expect(json.count).to be(2)
     end
 
@@ -349,7 +349,7 @@ describe UsersController, type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/todo?include[]=ungraded_quizzes",
                       :controller => "courses", :action => "todo_items",
                       :format => "json", :course_id => @course.to_param,
-                      :include => %w(ungraded_quizzes))
+                      :include => %w[ungraded_quizzes])
       expect(json.count).to be(2)
     end
   end

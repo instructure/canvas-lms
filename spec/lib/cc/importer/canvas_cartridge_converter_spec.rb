@@ -323,15 +323,15 @@ describe "Canvas Cartridge importing" do
   end
 
   it "imports v1 grading standards" do
-    doc = Nokogiri::XML(%{
-<?xml version="1.0" encoding="UTF-8"?>
-<gradingStandards xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">
-  <gradingStandard identifier="i293372c956d13a7d48d913a7d971e35d" version="1">
-    <title>Standard eh</title>
-    <data>[["A", 1], ["A-", 0.92], ["B+", 0.88], ["B", 0.84], ["B!-", 0.82], ["C+", 0.79], ["C", 0.76], ["C-", 0.73], ["D+", 0.69], ["D", 0.66], ["D-", 0.63], ["F", 0.6]]</data>
-  </gradingStandard>
-</gradingStandards>
-    })
+    doc = Nokogiri::XML(<<~XML)
+      <?xml version="1.0" encoding="UTF-8"?>
+      <gradingStandards xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">
+        <gradingStandard identifier="i293372c956d13a7d48d913a7d971e35d" version="1">
+          <title>Standard eh</title>
+          <data>[["A", 1], ["A-", 0.92], ["B+", 0.88], ["B", 0.84], ["B!-", 0.82], ["C+", 0.79], ["C", 0.76], ["C-", 0.73], ["D+", 0.69], ["D", 0.66], ["D-", 0.63], ["F", 0.6]]</data>
+        </gradingStandard>
+      </gradingStandards>
+    XML
     hash = @converter.convert_grading_standards(doc)
     # import json into new course
     Importers::GradingStandardImporter.process_migration({ 'grading_standards' => hash }, @migration)
@@ -555,7 +555,7 @@ describe "Canvas Cartridge importing" do
       expect(mod3_2.content_tags.length).to eq 2
       expect(mod3_2.content_tags[0].url).to eq "http://a.example.com/"
       expect(mod3_2.content_tags[1].url).to eq "http://b.example.com/"
-      expect(@migration.old_warnings_format.first.first).to eq %{Import Error: Module Item - "Example 3"}
+      expect(@migration.old_warnings_format.first.first).to eq %(Import Error: Module Item - "Example 3")
 
       mod4_2 = @copy_to.context_modules.where(migration_id: CC::CCHelper.create_key(mod4)).first
       expect(mod4_2.content_tags.first.title).to eq att_tag.title
@@ -671,10 +671,12 @@ describe "Canvas Cartridge importing" do
     allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(:media_id => media_id))
 
     path = CGI.escape(att.full_path)
-    body_with_links = %{<p>Watup? <strong>eh?</strong>
+    body_with_links = <<~HTML
+      <p>Watup? <strong>eh?</strong>
       <a href="%24IMS-CC-FILEBASE%24/#{path}" class="instructure_inline_media_comment">wroks</a>
       <a href="%24IMS-CC-FILEBASE%24/#{path}">no wroks</a>
-      </p>}
+      </p>
+    HTML
 
     hash = {
       :migration_id => 'mig',
@@ -705,7 +707,7 @@ describe "Canvas Cartridge importing" do
     allow_any_instance_of(Attachment).to receive(:media_object).and_return(double(:media_id => media_id))
 
     path = CGI.escape(att.full_path)
-    body = %{<p>WHAT<iframe style="width: 400px; height: 225px; display: inline-block;" title="Video player for video.mp4" data-media-type="video" src="%24IMS-CC-FILEBASE%24/#{path}" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-old-mediaid"></iframe></p>}
+    body = %(<p>WHAT<iframe style="width: 400px; height: 225px; display: inline-block;" title="Video player for video.mp4" data-media-type="video" src="%24IMS-CC-FILEBASE%24/#{path}" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-old-mediaid"></iframe></p>)
 
     hash = {
       :migration_id => 'mig',
@@ -744,7 +746,7 @@ describe "Canvas Cartridge importing" do
     path = to_att.full_display_path.gsub('course files/', '')
     @migration.attachment_path_id_lookup = { path => to_att.migration_id }
 
-    body_with_link = %{<p>Watup? <strong>eh?</strong>
+    body_with_link = %(<p>Watup? <strong>eh?</strong>
       <a href=\"/courses/%s/assignments\">Assignments</a>
       <a href=\"/courses/%s/file_contents/course%%20files/tbe_banner.jpg\">Some file</a>
       <a href=\"/courses/%s/#{@copy_to.wiki.path}/assignments\">Assignments wiki link</a>
@@ -754,7 +756,7 @@ describe "Canvas Cartridge importing" do
       <div>
         <div><img src="http://www.instructure.com/images/header-logo.png"></div>
         <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-      </div>}
+      </div>)
     page = @copy_from.wiki_pages.create!(:title => "some page", :body => body_with_link % [@copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, @copy_from.id, mod.id, @copy_from.id, from_att.id], :editing_roles => "teachers", :notify_of_update => true)
     page.workflow_state = 'unpublished'
     @copy_from.save!
@@ -816,11 +818,11 @@ describe "Canvas Cartridge importing" do
                                                                        "description" => "yes",
                                                                        "grading_type" => "yes" })
 
-    body_with_link = %{<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
+    body_with_link = %(<p>Watup? <strong>eh?</strong><a href="/courses/%s/assignments">Assignments</a></p>
 <div>
   <div><img src="http://www.instructure.com/images/header-logo.png"></div>
   <div><img src="http://www.instructure.com/images/header-logo.png"></div>
-</div>}
+</div>)
     asmnt = @copy_from.assignments.new
     asmnt.title = "Nothing Assignment"
     asmnt.description = body_with_link % @copy_from.id

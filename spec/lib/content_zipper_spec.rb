@@ -213,7 +213,7 @@ describe ContentZipper do
       students.each_with_index { |s, i| groups[i % groups.size].add_user(s) }
       a = @course.assignments.create! group_category_id: gc.id,
                                       grade_group_students_individually: false,
-                                      submission_types: %w(text_entry)
+                                      submission_types: %w[text_entry]
       a.submit_homework(students.first, body: "group 1 submission")
       a.submit_homework(students.second, body: "group 2 submission")
 

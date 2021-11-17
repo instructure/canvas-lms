@@ -89,7 +89,7 @@ class Linter
   def severe_levels
     return @severe_levels if @severe_levels
 
-    boyscout_mode ? %w(info warn error fatal) : %w(warn error fatal)
+    boyscout_mode ? %w[info warn error fatal] : %w[warn error fatal]
   end
 
   private

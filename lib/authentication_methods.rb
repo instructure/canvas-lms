@@ -90,7 +90,7 @@ module AuthenticationMethods
     end
   end
 
-  ALLOWED_SCOPE_INCLUDES = %w{uuid}.freeze
+  ALLOWED_SCOPE_INCLUDES = %w[uuid].freeze
 
   def filter_includes(key)
     # no funny business
@@ -237,7 +237,7 @@ module AuthenticationMethods
     # required by the user throttling middleware
     session[:user_id] = @current_user.global_id if @current_user
 
-    if @current_user && %w(become_user_id me become_teacher become_student).any? { |k| params.key?(k) }
+    if @current_user && %w[become_user_id me become_teacher become_student].any? { |k| params.key?(k) }
       request_become_user = nil
       if params[:become_user_id]
         request_become_user = User.where(id: params[:become_user_id]).first
@@ -394,7 +394,7 @@ module AuthenticationMethods
   end
 
   def add_www_authenticate_header
-    response['WWW-Authenticate'] = %{Bearer realm="canvas-lms"}
+    response['WWW-Authenticate'] = %(Bearer realm="canvas-lms")
   end
 
   # Reset the session, and copy the specified keys over to the new session.

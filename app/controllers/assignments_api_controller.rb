@@ -1448,7 +1448,7 @@ class AssignmentsApiController < ApplicationController
       return if @context.students_visible_to(@current_user).include?(@user)
     end
     # self, observer
-    authorized_action(@user, @current_user, %i(read_as_parent read))
+    authorized_action(@user, @current_user, %i[read_as_parent read])
   end
 
   def needs_grading_permission?

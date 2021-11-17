@@ -61,7 +61,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
 
     connection.execute("CREATE INDEX get_delayed_jobs_index ON #{Delayed::Backend::ActiveRecord::Job.quoted_table_name} (priority, run_at) WHERE locked_at IS NULL AND queue = 'canvas_queue' AND next_in_strand = 't'")
     add_index :delayed_jobs, [:tag]
-    add_index :delayed_jobs, %w(strand id), :name => 'index_delayed_jobs_on_strand'
+    add_index :delayed_jobs, %w[strand id], :name => 'index_delayed_jobs_on_strand'
     add_index :delayed_jobs, :locked_by, :where => "locked_by IS NOT NULL"
     add_index :delayed_jobs, %w[run_at tag]
     add_index :delayed_jobs, :shard_id

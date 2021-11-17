@@ -40,7 +40,7 @@ RSpec.shared_context "lti2_api_spec_helper", :shared_context => :metadata do
   let(:raw_data) do
     rsp = ::IMS::LTI::Models::RestServiceProfile.new(
       service: "http://example.com/endpoint##{service_name}",
-      action: %w(get put delete post)
+      action: %w[get put delete post]
     )
     ims_tp = ::IMS::LTI::Models::ToolProxy.new
     security_contract = ::IMS::LTI::Models::SecurityContract.new(tool_service: rsp)

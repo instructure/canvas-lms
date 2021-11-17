@@ -486,26 +486,26 @@ describe ContextModule do
     it "appends items to the end of a module" do
       @module.insert_items([@attach, @assign, @page, @quiz, @topic, @tool])
       expect(@module.content_tags.ordered.pluck(:title)).to eq(
-        %w(one two three attach assign page quiz topic tool)
+        %w[one two three attach assign page quiz topic tool]
       )
     end
 
     it 'appends items to the beginning of a module' do
       @module.insert_items([@attach, @assign, @page, @quiz, @topic, @tool], 1)
-      expect(@module.content_tags.pluck(:title)).to eq(%w(attach assign page quiz topic tool one two three))
+      expect(@module.content_tags.pluck(:title)).to eq(%w[attach assign page quiz topic tool one two three])
     end
 
     it "inserts items into a module" do
       @module.insert_items([@attach, @assign, @page, @quiz, @topic, @tool], 2)
       expect(@module.content_tags.ordered.pluck(:title)).to eq(
-        %w(one attach assign page quiz topic tool two three)
+        %w[one attach assign page quiz topic tool two three]
       )
     end
 
     it "adds things to an empty module" do
       empty = @course.context_modules.create! name: 'empty'
       empty.insert_items([@attach, @assign])
-      expect(empty.content_tags.ordered.pluck(:title)).to eq(%w(attach assign))
+      expect(empty.content_tags.ordered.pluck(:title)).to eq(%w[attach assign])
     end
 
     it "sets the indent to 0" do
@@ -517,14 +517,14 @@ describe ContextModule do
     it "doesn't add weird things to a module" do
       @module.insert_items([@attach, user_model, 'foo', @assign])
       expect(@module.content_tags.ordered.pluck(:title)).to eq(
-        %w(one two three attach assign)
+        %w[one two three attach assign]
       )
     end
 
     it 'adds the item in the correct position when the existing items do not start at 1' do
       @module.content_tags.update_all(['position = position + ?', 3])
       @module.insert_items([@attach, @assign], 3)
-      expect(@module.content_tags.pluck(:title)).to eq(%w(one two attach assign three))
+      expect(@module.content_tags.pluck(:title)).to eq(%w[one two attach assign three])
     end
 
     it 'adds the item in the correct position when the existing items have duplicate positions' do
@@ -532,13 +532,13 @@ describe ContextModule do
       @module.insert_items([@attach, @assign], 2)
       expect(@module.content_tags.find_by(position: 2).title).to eq @attach.title
       expect(@module.content_tags.find_by(position: 3).title).to eq @assign.title
-      expect(@module.content_tags.pluck(:title)).to eq(%w(one attach assign two three))
+      expect(@module.content_tags.pluck(:title)).to eq(%w[one attach assign two three])
     end
 
     it 'ignores deleted items in the position calculation' do
       @module.content_tags.find_by(title: 'two').destroy
       @module.insert_items([@attach, @assign], 3)
-      expect(@module.content_tags.not_deleted.pluck(:title)).to eq(%w(one three attach assign))
+      expect(@module.content_tags.not_deleted.pluck(:title)).to eq(%w[one three attach assign])
     end
 
     it "respects the added items' published state" do
@@ -553,7 +553,7 @@ describe ContextModule do
     it "adds the submittable object when given a graded discussion topic or quiz's assignment" do
       m = @course.context_modules.create!
       m.insert_items([@quiz.assignment.reload, @topic.assignment.reload])
-      expect(m.content_tags.map(&:content_type)).to eq(%w(Quizzes::Quiz DiscussionTopic))
+      expect(m.content_tags.map(&:content_type)).to eq(%w[Quizzes::Quiz DiscussionTopic])
       expect(m.content_tags.map(&:content_id)).to eq([@quiz.id, @topic.id])
     end
 
@@ -650,7 +650,7 @@ describe ContextModule do
       tehmod.workflow_state = 'active'
       tehmod.save!
 
-      othermods = %w(active unpublished deleted).collect do |state|
+      othermods = %w[active unpublished deleted].collect do |state|
         mod = @course.context_modules.build :name => "other module in state #{state}"
         mod.workflow_state = state
         mod.save!

@@ -122,7 +122,7 @@ describe Quizzes::QuizReportsController, type: :request do
     before :once do
       teacher_in_course(:active_all => true)
       @me = @user
-      simple_quiz_with_submissions %w{T T T}, %w{T T T}, %w{T F F}, %w{T F T}, :user => @user, :course => @course
+      simple_quiz_with_submissions %w[T T T], %w[T T T], %w[T F F], %w[T F T], :user => @user, :course => @course
       @user = @me
     end
 
@@ -213,7 +213,7 @@ describe Quizzes::QuizReportsController, type: :request do
     before :once do
       teacher_in_course(:active_all => true)
 
-      simple_quiz_with_submissions %w{T T T}, %w{T T T}, %w{T F F}, %w{T F T}, {
+      simple_quiz_with_submissions %w[T T T], %w[T T T], %w[T F F], %w[T F T], {
         user: @teacher,
         course: @course
       }

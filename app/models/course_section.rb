@@ -406,7 +406,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   def update_enrollment_states_if_necessary
-    if self.saved_change_to_restrict_enrollments_to_section_dates? || (self.restrict_enrollments_to_section_dates? && (saved_changes.keys & %w{start_at end_at}).any?)
+    if self.saved_change_to_restrict_enrollments_to_section_dates? || (self.restrict_enrollments_to_section_dates? && (saved_changes.keys & %w[start_at end_at]).any?)
       EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", self.global_root_account_id])
                      .invalidate_states_for_course_or_section(self)
     end

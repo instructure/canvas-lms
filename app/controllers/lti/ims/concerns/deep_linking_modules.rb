@@ -30,8 +30,8 @@ module Lti::IMS::Concerns
       end
     end
 
-    CREATE_NEW_MODULE_PLACEMENTS = %w(course_assignments_menu module_index_menu_modal).freeze
-    ALLOW_LINE_ITEM_PLACEMENTS = %w(course_assignments_menu module_index_menu_modal).freeze
+    CREATE_NEW_MODULE_PLACEMENTS = %w[course_assignments_menu module_index_menu_modal].freeze
+    ALLOW_LINE_ITEM_PLACEMENTS = %w[course_assignments_menu module_index_menu_modal].freeze
 
     def content_items_for_modules
       @content_items_for_modules ||= lti_resource_links.reject { |item| item.key? :lineItem }

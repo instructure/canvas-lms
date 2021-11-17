@@ -363,7 +363,7 @@ describe UserContent, type: :request do
           "http://www.example.com/api/v1/users/#{@teacher.id}/files/789"
         ]
         expect(doc.css('a').collect { |att| att['data-api-returntype'] }).to eq(
-          %w(Folder File)
+          %w[Folder File]
         )
       end
     end
@@ -426,7 +426,7 @@ describe UserContent, type: :request do
       end
 
       def confirm_url_stability(url)
-        link = %Q{<a href="#{url}">what</a>}
+        link = %Q(<a href="#{url}">what</a>)
         html = tester.process_incoming_html_content(link)
         doc = Nokogiri::HTML5.fragment(html)
         expect(doc.at_css('a')['href']).to eq url
@@ -450,7 +450,7 @@ describe UserContent, type: :request do
       end
 
       def confirm_url_stability(url)
-        link = %Q{<a href="#{url}">what</a>a>}
+        link = %Q(<a href="#{url}">what</a>a>)
         html = tester.process_incoming_html_content(link)
         doc = Nokogiri::HTML5.fragment(html)
         expect(doc.at_css('a')['href']).to eq url
@@ -493,7 +493,7 @@ describe UserContent, type: :request do
   describe "latex_to_mathml" do
     it "returns mathml on success" do
       valid_latex = '\frac{a}{b}'
-      expect(UserContent.latex_to_mathml(valid_latex)).to eql(%{<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mfrac><mrow><mi>a</mi></mrow><mrow><mi>b</mi></mrow></mfrac></math>})
+      expect(UserContent.latex_to_mathml(valid_latex)).to eql(%(<math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"><mfrac><mrow><mi>a</mi></mrow><mrow><mi>b</mi></mrow></mfrac></math>))
     end
 
     it "returns empty string on parse error" do

@@ -33,7 +33,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Item do
   end
 
   before(:once) {
-    simple_quiz_with_submissions %w{T T A}, %w{T T A}, %w{T F A}, %w{T T B}, %w{T T}
+    simple_quiz_with_submissions %w[T T A], %w[T T A], %w[T F A], %w[T T B], %w[T T]
   }
 
   let(:item) {
@@ -106,7 +106,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Item do
   end
 
   let(:no_dev_item) do
-    simple_quiz_with_submissions %w|T T|, %w|T T|, %w|T T|, %w|T T|
+    simple_quiz_with_submissions %w[T T], %w[T T], %w[T T], %w[T T]
     @summary = Quizzes::QuizStatistics::ItemAnalysis::Summary.new(@quiz)
     @summary.sorted_items.last
   end

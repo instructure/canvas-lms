@@ -82,7 +82,7 @@ class SisImportErrorsApiController < ApplicationController
   #
   # @returns [SisImportError]
   def index
-    if authorized_action(@account, @current_user, %i(import_sis manage_sis))
+    if authorized_action(@account, @current_user, %i[import_sis manage_sis])
       scope = @account.sis_batch_errors.order('created_at DESC')
       if params[:id]
         batch = @account.sis_batches.find(params[:id])

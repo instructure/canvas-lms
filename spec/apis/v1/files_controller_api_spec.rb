@@ -541,7 +541,7 @@ describe "Files API", type: :request do
     it "lists files in alphabetical order" do
       json = api_call(:get, @files_path, @files_path_options, {})
       res = json.map { |f| f['display_name'] }
-      expect(res).to eq %w{atest3.txt mtest2.txt ztest.txt}
+      expect(res).to eq %w[atest3.txt mtest2.txt ztest.txt]
       json.map { |f| f['url'] }.each { |url| expect(url).to include 'verifier=' }
     end
 
@@ -564,7 +564,7 @@ describe "Files API", type: :request do
     it "lists files in saved order if flag set" do
       json = api_call(:get, @files_path + "?sort_by=position", @files_path_options.merge(:sort_by => 'position'), {})
       res = json.map { |f| f['display_name'] }
-      expect(res).to eq %w{ztest.txt atest3.txt mtest2.txt}
+      expect(res).to eq %w[ztest.txt atest3.txt mtest2.txt]
     end
 
     it "does not list locked file if not authed" do
@@ -624,7 +624,7 @@ describe "Files API", type: :request do
     it "only returns names if requested" do
       json = api_call(:get, @files_path, @files_path_options, { :only => ['names'] })
       res = json.map { |f| f['display_name'] }
-      expect(res).to eq %w{atest3.txt mtest2.txt ztest.txt}
+      expect(res).to eq %w[atest3.txt mtest2.txt ztest.txt]
       expect(json.any? { |f| f['url'] }).to be_falsey
     end
 
@@ -638,14 +638,14 @@ describe "Files API", type: :request do
       it "matches one content-type" do
         json = api_call(:get, @files_path + "?content_types=image", @files_path_options.merge(:content_types => 'image'), {})
         res = json.map { |f| f['display_name'] }
-        expect(res).to eq %w(thing.gif thing.png)
+        expect(res).to eq %w[thing.gif thing.png]
       end
 
       it "matches multiple content-types" do
         json = api_call(:get, @files_path + "?content_types[]=text&content_types[]=image/gif",
                         @files_path_options.merge(:content_types => ['text', 'image/gif']))
         res = json.map { |f| f['display_name'] }
-        expect(res).to eq %w(thing.gif thing.txt)
+        expect(res).to eq %w[thing.gif thing.txt]
       end
     end
 
@@ -781,13 +781,13 @@ describe "Files API", type: :request do
       it "lists files in alphabetical order" do
         json = api_call(:get, @files_path, @files_path_options, {})
         res = json.map { |f| f['display_name'] }
-        expect(res).to eq %w{atest3.txt mtest2.txt ztest.txt}
+        expect(res).to eq %w[atest3.txt mtest2.txt ztest.txt]
       end
 
       it "lists files in saved order if flag set" do
         json = api_call(:get, @files_path + "?sort_by=position", @files_path_options.merge(:sort_by => 'position'), {})
         res = json.map { |f| f['display_name'] }
-        expect(res).to eq %w{ztest.txt atest3.txt mtest2.txt}
+        expect(res).to eq %w[ztest.txt atest3.txt mtest2.txt]
       end
 
       it "sorts by size" do
@@ -801,7 +801,7 @@ describe "Files API", type: :request do
         Timecop.freeze(1.hour.ago) { @a1.touch }
         json = api_call(:get, @files_path + "?sort=updated_at", @files_path_options.merge(sort: 'updated_at'))
         res = json.map { |f| f['display_name'] }
-        expect(res).to eq %w{mtest2.txt ztest.txt atest3.txt}
+        expect(res).to eq %w[mtest2.txt ztest.txt atest3.txt]
       end
 
       it "sorts by content_type" do
@@ -885,14 +885,14 @@ describe "Files API", type: :request do
       it "matches one content-type" do
         json = api_call(:get, @files_path + "?content_types=image", @files_path_options.merge(:content_types => 'image'), {})
         res = json.map { |f| f['display_name'] }
-        expect(res).to eq %w(thing.gif thing.png)
+        expect(res).to eq %w[thing.gif thing.png]
       end
 
       it "matches multiple content-types" do
         json = api_call(:get, @files_path + "?content_types[]=text&content_types[]=image/gif",
                         @files_path_options.merge(:content_types => ['text', 'image/gif']))
         res = json.map { |f| f['display_name'] }
-        expect(res).to eq %w(thing.gif thing.txt)
+        expect(res).to eq %w[thing.gif thing.txt]
       end
     end
 
@@ -1067,10 +1067,10 @@ describe "Files API", type: :request do
     end
 
     def should_be_locked(json)
-      prohibited_fields = %w(
+      prohibited_fields = %w[
         canvadoc_session_url
         crocodoc_session_url
-      )
+      ]
 
       expect(json['url']).to eq ""
       expect(json['thumbnail_url']).to eq ""

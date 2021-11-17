@@ -147,7 +147,7 @@ module FilesCommon
     link = f(".links a.download_zip_link")
     wait_for_ajaximations
     expect(link).to be_displayed
-    expect(link).to have_attribute('href', %r"/courses/#{@course.id}/folders/\d+/download")
+    expect(link).to have_attribute('href', %r{/courses/#{@course.id}/folders/\d+/download})
   end
 
   def confirm_delete_on_dialog

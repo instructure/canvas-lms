@@ -298,7 +298,7 @@ describe Role do
       end
 
       describe "does all the addable/deleteable by user stuff right" do
-        roles_to_test = %w(designer observer ta teacher student)
+        roles_to_test = %w[designer observer ta teacher student]
         role_names = {
           "designer" => "DesignerEnrollment",
           "observer" => "ObserverEnrollment",

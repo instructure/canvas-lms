@@ -476,12 +476,12 @@ describe Api::V1::Submission do
       end
 
       let(:urls) do
-        %w(
+        %w[
           https://abcdef.com/uuurrrlll00
           https://abcdef.com/uuurrrlll01
           https://abcdef.com/uuurrrlll02
           https://abcdef.com/uuurrrlll03
-        )
+        ]
       end
 
       let(:url_grades) do

@@ -165,7 +165,7 @@ class ConversationsController < ApplicationController
   # batch up all delayed jobs to make this more responsive to the user
   batch_jobs_in_actions :only => :create
 
-  API_ALLOWED_FIELDS = %w{workflow_state subscribed starred}.freeze
+  API_ALLOWED_FIELDS = %w[workflow_state subscribed starred].freeze
 
   # @API List conversations
   # Returns the paginated list of conversations for the current user, most
@@ -975,7 +975,7 @@ class ConversationsController < ApplicationController
     conversation_ids = params[:conversation_ids]
     update_params = params.permit(:event).to_unsafe_h
 
-    allowed_events = %w(mark_as_read mark_as_unread star unstar archive destroy)
+    allowed_events = %w[mark_as_read mark_as_unread star unstar archive destroy]
     return render(:json => { :message => 'conversation_ids not specified' }, :status => :bad_request) unless params[:conversation_ids].is_a?(Array)
     return render(:json => { :message => 'conversation batch size limit (500) exceeded' }, :status => :bad_request) unless params[:conversation_ids].size <= 500
     return render(:json => { :message => 'event not specified' }, :status => :bad_request) unless update_params[:event]

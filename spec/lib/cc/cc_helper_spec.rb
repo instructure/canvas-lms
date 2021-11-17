@@ -113,16 +113,16 @@ describe CC::CCHelper do
 
     it "ignores media links with no media comment id" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :media_object_flavor => 'flash video')
-      html = %{<a class="youtubed instructure_inline_media_comment" href="http://www.youtube.com/watch?v=dCIP3x5mFmw">McDerp Enterprises</a>}
+      html = %(<a class="youtubed instructure_inline_media_comment" href="http://www.youtube.com/watch?v=dCIP3x5mFmw">McDerp Enterprises</a>)
       translated = @exporter.html_content(html)
       expect(translated).to eq html
     end
 
     it "translates new RCE media iframes" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
-      html = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>}
+      html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
       translated = @exporter.html_content(html)
-      expect(translated).to include %{src="$IMS-CC-FILEBASE$/media_objects/abcde.mp4"}
+      expect(translated).to include %(src="$IMS-CC-FILEBASE$/media_objects/abcde.mp4")
       expect(@exporter.media_object_infos[@obj.id]).not_to be_nil
       expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq 'one'
     end
@@ -133,9 +133,9 @@ describe CC::CCHelper do
       @obj.attachment = att
       @obj.save!
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
-      html = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>}
+      html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
       translated = @exporter.html_content(html)
-      expect(translated).to include %{src="$IMS-CC-FILEBASE$/something/lolcats.mp4"}
+      expect(translated).to include %(src="$IMS-CC-FILEBASE$/something/lolcats.mp4")
     end
 
     it "does not link media to file in another course" do
@@ -147,14 +147,14 @@ describe CC::CCHelper do
       @obj.save!
       @course = temp
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
-      html = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>}
+      html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>)
       translated = @exporter.html_content(html)
-      expect(translated).to include %{src="$IMS-CC-FILEBASE$/media_objects/abcde.mp4"}
+      expect(translated).to include %(src="$IMS-CC-FILEBASE$/media_objects/abcde.mp4")
     end
 
     it "ignores new RCE media iframes with an unknown media id" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
-      html = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/deadbeef?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="deadbeef"></iframe>}
+      html = %(<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/deadbeef?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="deadbeef"></iframe>)
       translated = @exporter.html_content(html)
       expect(translated).to eq html
       expect(@exporter.media_object_infos).to be_empty
@@ -171,7 +171,7 @@ describe CC::CCHelper do
 
     it "exports html with a utf-8 charset" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
-      html = %{<div>My Title\u0278</div>}
+      html = %(<div>My Title\u0278</div>)
       exported = @exporter.html_page(html, "my title page")
       doc = Nokogiri::HTML5(exported)
       expect(doc.encoding.upcase).to eq 'UTF-8'
@@ -205,14 +205,14 @@ describe CC::CCHelper do
 
     it "interprets links to the files page as normal course pages" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
-      html = %{<a href="/courses/#{@course.id}/files">File page index</a>}
+      html = %(<a href="/courses/#{@course.id}/files">File page index</a>)
       translated = @exporter.html_content(html)
       expect(translated).to match %r{\$CANVAS_COURSE_REFERENCE\$/files}
     end
 
     it "interprets links to the home page as normal course pages" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
-      html = %{<a href="/courses/#{@course.id}">Home page index</a>}
+      html = %(<a href="/courses/#{@course.id}">Home page index</a>)
       translated = @exporter.html_content(html)
       expect(translated).to match %r{\$CANVAS_COURSE_REFERENCE\$/}
     end
@@ -279,12 +279,12 @@ describe CC::CCHelper do
       assignment = @course.assignments.create!(:name => "Thing")
       mod = @course.context_modules.create!(:name => "Stuff")
       tag = mod.content_tags.create! content: assignment, context: @course
-      html = %Q{
+      html = <<~HTML
         <a href="/courses/#{@course.id}/pages/something?embedded=true">Something</a>
         <a href="/courses/#{@course.id}/pages/LinkByTitle?embedded=true">Something</a>
         <a href="/courses/#{@course.id}/assignments/#{assignment.id}?bamboozled=true">Thing</a>
         <a href="/courses/#{@course.id}/modules/items/#{tag.id}?seriously=0">i-Tem</a>
-      }
+      HTML
       translated = @exporter.html_content(html)
       expect(translated).to include "$WIKI_REFERENCE$/pages/something?embedded=true"
       expect(translated).to include "$WIKI_REFERENCE$/pages/#{other_page.url}?embedded=true"

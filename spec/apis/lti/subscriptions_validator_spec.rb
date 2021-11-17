@@ -90,13 +90,13 @@ module Lti
         end
 
         it 'allows subscription if vnd.instructure.webhooks.assignment.quiz_submitted enabled' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
+          tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.quiz_submitted]
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.not_to raise_error
         end
 
         it 'raises MissingCapability if missing capabilities' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.submission_created)
+          tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.submission_created]
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
         end
@@ -134,7 +134,7 @@ module Lti
         end
 
         it 'raises MissingCapability if missing capabilities' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
+          tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.quiz_submitted]
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
         end
@@ -172,13 +172,13 @@ module Lti
         end
 
         it 'allows subscription if vnd.instructure.webhooks.assignment.attachment_created' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.attachment_created)
+          tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.attachment_created]
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.not_to raise_error
         end
 
         it 'raises MissingCapability if missing capabilities' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
+          tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.quiz_submitted]
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
         end
@@ -216,13 +216,13 @@ module Lti
         end
 
         it 'allows subscription if vnd.instructure.webhooks.assignment.submission_created' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.submission_created)
+          tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.submission_created]
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.not_to raise_error
         end
 
         it 'raises MissingCapability if missing capabilities' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
+          tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.quiz_submitted]
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
         end
@@ -260,13 +260,13 @@ module Lti
         end
 
         it 'allows subscription if vnd.instructure.webhooks.assignment.submission_updated' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.submission_updated)
+          tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.submission_updated]
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.not_to raise_error
         end
 
         it 'raises MissingCapability if missing capabilities' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
+          tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.quiz_submitted]
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
         end
@@ -304,13 +304,13 @@ module Lti
         end
 
         it 'allows subscription if vnd.instructure.webhooks.assignment.submission_created' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.plagiarism_resubmit)
+          tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.plagiarism_resubmit]
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.not_to raise_error
         end
 
         it 'raises MissingCapability if missing capabilities' do
-          tool_proxy[:raw_data]['enabled_capability'] = %w(vnd.instructure.webhooks.assignment.quiz_submitted)
+          tool_proxy[:raw_data]['enabled_capability'] = %w[vnd.instructure.webhooks.assignment.quiz_submitted]
           validator = SubscriptionsValidator.new(subscription, tool_proxy)
           expect { validator.check_required_capabilities! }.to raise_error SubscriptionsValidator::MissingCapability
         end

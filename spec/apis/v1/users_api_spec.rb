@@ -994,7 +994,7 @@ describe "Users API", type: :request do
 
     it "returns a list of users filtered by search_term" do
       @account = Account.default
-      expected_keys = %w{id name sortable_name short_name}
+      expected_keys = %w[id name sortable_name short_name]
 
       users = []
       [['Test User1', 'test@example.com'], ['Test User2', 'test2@example.com'], ['Test User3', 'test3@example.com']].each_with_index do |u, i|

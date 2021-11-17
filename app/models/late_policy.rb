@@ -19,7 +19,7 @@
 #
 
 class LatePolicy < ActiveRecord::Base
-  POINT_DEDUCTIBLE_GRADING_TYPES = %w(points percent letter_grade gpa_scale).freeze
+  POINT_DEDUCTIBLE_GRADING_TYPES = %w[points percent letter_grade gpa_scale].freeze
 
   belongs_to :course, inverse_of: :late_policy
 
@@ -31,7 +31,7 @@ class LatePolicy < ActiveRecord::Base
             numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
   validates :late_submission_interval,
             presence: true,
-            inclusion: { in: %w(day hour) }
+            inclusion: { in: %w[day hour] }
 
   before_save :set_root_account_id
   after_save :update_late_submissions, if: :late_policy_attributes_changed?

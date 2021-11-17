@@ -777,8 +777,8 @@ describe ContentExportsApiController, type: :request do
         expect(export.attachment.display_name).to eql 'course_files_export.zip'
         tf = export.attachment.open need_local_file: true
         Zip::File.open(tf) do |zf|
-          expect(zf.entries.select { |entry| entry.ftype == :file }.map(&:name)).to match_array %w(file1.txt hidden.txt teh_folder/file2.txt)
-          expect(zf.entries.select { |entry| entry.ftype == :directory }.map(&:name)).to match_array %w(teh_folder/ teh_folder/empty_folder/)
+          expect(zf.entries.select { |entry| entry.ftype == :file }.map(&:name)).to match_array %w[file1.txt hidden.txt teh_folder/file2.txt]
+          expect(zf.entries.select { |entry| entry.ftype == :directory }.map(&:name)).to match_array %w[teh_folder/ teh_folder/empty_folder/]
         end
       end
 
@@ -794,7 +794,7 @@ describe ContentExportsApiController, type: :request do
         expect(export.attachment.display_name).to eql 'course_files_export.zip'
         tf = export.attachment.open need_local_file: true
         Zip::File.open(tf) do |zf|
-          expect(zf.entries.map(&:name)).to match_array %w(teh_folder/ teh_folder/file2.txt teh_folder/empty_folder/ file3.txt)
+          expect(zf.entries.map(&:name)).to match_array %w[teh_folder/ teh_folder/file2.txt teh_folder/empty_folder/ file3.txt]
         end
       end
 
@@ -815,7 +815,7 @@ describe ContentExportsApiController, type: :request do
         expect(export.settings["errors"].map(&:first)).to include("Skipped file file1.txt due to error")
         tf = export.attachment.open need_local_file: true
         Zip::File.open(tf) do |zf|
-          expect(zf.entries.select { |entry| entry.ftype == :file }.map(&:name)).to match_array %w(hidden.txt teh_folder/file2.txt)
+          expect(zf.entries.select { |entry| entry.ftype == :file }.map(&:name)).to match_array %w[hidden.txt teh_folder/file2.txt]
         end
       end
 
@@ -850,7 +850,7 @@ describe ContentExportsApiController, type: :request do
           expect(export.attachment).to be_present
           tf = export.attachment.open need_local_file: true
           Zip::File.open(tf) do |zf|
-            expect(zf.entries.map(&:name)).to match_array %w(file1.txt)
+            expect(zf.entries.map(&:name)).to match_array %w[file1.txt]
           end
         end
 
@@ -865,7 +865,7 @@ describe ContentExportsApiController, type: :request do
           expect(export.attachment).to be_present
           tf = export.attachment.open need_local_file: true
           Zip::File.open(tf) do |zf|
-            expect(zf.entries.map(&:name)).to match_array %w(file1.txt)
+            expect(zf.entries.map(&:name)).to match_array %w[file1.txt]
           end
         end
 

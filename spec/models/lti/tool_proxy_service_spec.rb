@@ -219,7 +219,7 @@ module Lti
         it 'creates default placements when none are specified' do
           tool_proxy = tool_proxy_service.process_tool_proxy_json(json: tool_proxy_fixture, context: account, guid: tool_proxy_guid)
           rh = tool_proxy.resources.first
-          expect(rh.message_handlers.first.placements).to include_placements %w(assignment_selection link_selection)
+          expect(rh.message_handlers.first.placements).to include_placements %w[assignment_selection link_selection]
         end
 
         it "doesn't include defaults placements when one is provided" do

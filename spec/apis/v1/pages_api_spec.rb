@@ -133,7 +133,7 @@ describe "Pages API", type: :request do
       it "lists pages, including hidden ones", priority: "1", test_id: 126789 do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/pages",
                         :controller => 'wiki_pages_api', :action => 'index', :format => 'json', :course_id => @course.to_param)
-        expect(json.map { |entry| entry.slice(*%w(hide_from_students url created_at updated_at title front_page)) }).to eq(
+        expect(json.map { |entry| entry.slice(*%w[hide_from_students url created_at updated_at title front_page]) }).to eq(
           [{ "hide_from_students" => false, "url" => @front_page.url, "created_at" => @front_page.created_at.as_json, "updated_at" => @front_page.revised_at.as_json, "title" => @front_page.title, "front_page" => true },
            { "hide_from_students" => true, "url" => @hidden_page.url, "created_at" => @hidden_page.created_at.as_json, "updated_at" => @hidden_page.revised_at.as_json, "title" => @hidden_page.title, "front_page" => false }]
         )
@@ -349,7 +349,7 @@ describe "Pages API", type: :request do
 
     describe "revisions" do
       before :once do
-        @timestamps = %w(2013-01-01 2013-01-02 2013-01-03).map { |d| Time.zone.parse(d) }
+        @timestamps = %w[2013-01-01 2013-01-02 2013-01-03].map { |d| Time.zone.parse(d) }
         course_with_ta :course => @course, :active_all => true
         Timecop.freeze(@timestamps[0]) do      # rev 1
           @vpage = @course.wiki_pages.build :title => 'version test page'
@@ -1068,7 +1068,7 @@ describe "Pages API", type: :request do
     it "lists pages, excluding hidden ones" do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/pages",
                       :controller => 'wiki_pages_api', :action => 'index', :format => 'json', :course_id => @course.id.to_s)
-      expect(json.map { |entry| entry.slice(*%w(hide_from_students url created_at updated_at title)) }).to eq(
+      expect(json.map { |entry| entry.slice(*%w[hide_from_students url created_at updated_at title]) }).to eq(
         [{ "hide_from_students" => false, "url" => @front_page.url, "created_at" => @front_page.created_at.as_json, "updated_at" => @front_page.revised_at.as_json, "title" => @front_page.title }]
       )
     end
@@ -1543,7 +1543,7 @@ describe "Pages API", type: :request do
                    course_id: @course.id, url: page.url, revision_id: 1)
     end
 
-    let(:calls) { %i(get_show put_update get_revisions get_show_revision post_revert) }
+    let(:calls) { %i[get_show put_update get_revisions get_show_revision post_revert] }
 
     def calls_succeed(page, opts = { except: [] })
       get_index

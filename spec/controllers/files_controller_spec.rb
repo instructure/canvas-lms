@@ -1509,7 +1509,7 @@ describe FilesController do
 
   describe "public_url" do
     before :once do
-      assignment_model :course => @course, :submission_types => %w(online_upload)
+      assignment_model :course => @course, :submission_types => %w[online_upload]
       attachment_model :context => @student
       @submission = @assignment.submit_homework @student, :attachments => [@attachment]
     end

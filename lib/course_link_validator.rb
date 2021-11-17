@@ -307,7 +307,7 @@ class CourseLinkValidator
 
     begin
       response = CanvasHttp.head(url, { "Accept-Encoding" => "gzip" }, redirect_limit: 9, redirect_spy: redirect_proc)
-      if %w{404 405}.include?(response.code)
+      if %w[404 405].include?(response.code)
         response = CanvasHttp.get(url, { "Accept-Encoding" => "gzip" }, redirect_limit: 9, redirect_spy: redirect_proc) do
           # don't read the response body
         end

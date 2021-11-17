@@ -174,7 +174,7 @@ shared_examples_for "lti services" do
     end
 
     context 'with missing access token claims' do
-      let(:access_token_jwt_hash) { super().delete_if { |k| %i(sub aud exp iat jti iss).include?(k) } }
+      let(:access_token_jwt_hash) { super().delete_if { |k| %i[sub aud exp iat jti iss].include?(k) } }
 
       it_behaves_like 'mime_type check'
 

@@ -60,7 +60,7 @@ module Lti
     end
 
     def membership_service_params
-      keys = %w(role page per_page)
+      keys = %w[role page per_page]
       params.select { |k, _| keys.include?(k) }
     end
 

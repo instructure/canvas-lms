@@ -61,7 +61,7 @@ module Lti::IMS
           current_user: Lti::IMS::Providers::MembershipsProvider.unwrap(enrollment.user),
           tool: page[:tool],
           enrollment: enrollment,
-          variable_whitelist: %w(
+          variable_whitelist: %w[
             Person.name.full
             Person.name.display
             Person.name.family
@@ -82,7 +82,7 @@ module Lti::IMS
             Canvas.user.sisIntegrationId
             Canvas.xapi.url
             Caliper.url
-          )
+          ]
         }
       )
     end

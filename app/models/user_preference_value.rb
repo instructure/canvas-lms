@@ -177,7 +177,7 @@ class UserPreferenceValue < ActiveRecord::Base
     end
 
     # --- here are some hacks so we can split up the gradebook column size setting better ---
-    SHARED_GRADEBOOK_COLUMNS = %w{student secondary_identifier total_grade}.freeze
+    SHARED_GRADEBOOK_COLUMNS = %w[student secondary_identifier total_grade].freeze
     # whether we can split the column size setting into a per-course hash or in a shared one
     def shared_gradebook_column?(column)
       SHARED_GRADEBOOK_COLUMNS.include?(column)

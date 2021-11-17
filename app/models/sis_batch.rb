@@ -742,7 +742,7 @@ class SisBatch < ActiveRecord::Base
   def write_errors_to_file
     file = temp_error_file_path
     CSV.open(file, "w") do |csv|
-      csv << %w(sis_import_id file message row)
+      csv << %w[sis_import_id file message row]
       self.sis_batch_errors.find_each do |error|
         row = []
         row << error.sis_batch_id
@@ -879,8 +879,8 @@ class SisBatch < ActiveRecord::Base
     restore_progress&.start
     self.update_attribute(:workflow_state, 'restoring')
     roll_back = self.roll_back_data
-    roll_back = roll_back.where(updated_workflow_state: %w(retired deleted)) if undelete_only
-    roll_back = roll_back.where(updated_workflow_state: %w(completed)) if unconclude_only
+    roll_back = roll_back.where(updated_workflow_state: %w[retired deleted]) if undelete_only
+    roll_back = roll_back.where(updated_workflow_state: %w[completed]) if unconclude_only
     roll_back = roll_back.where(batch_mode_delete: batch_mode) if batch_mode
     types = roll_back.active.distinct.order(:context_type).pluck(:context_type)
     total = roll_back.active.count if restore_progress

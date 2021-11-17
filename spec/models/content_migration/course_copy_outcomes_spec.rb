@@ -350,7 +350,7 @@ describe ContentMigration do
       @copy_to.account = sub2
       @copy_to.save!
 
-      warnings = [%{The external Learning Outcome couldn't be found for "#{lo.short_description}", creating a copy.}]
+      warnings = [%(The external Learning Outcome couldn't be found for "#{lo.short_description}", creating a copy.)]
       run_course_copy(warnings)
 
       rub_to = @copy_to.rubrics.find_by(migration_id: mig_id(rub))

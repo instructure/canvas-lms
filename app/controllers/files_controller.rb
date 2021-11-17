@@ -632,7 +632,7 @@ class FilesController < ApplicationController
           end
 
           json_include = if @attachment.context.is_a?(User) || @attachment.context.is_a?(Course)
-                           { include: %w(enhanced_preview_url) }
+                           { include: %w[enhanced_preview_url] }
                          else
                            {}
                          end
@@ -1159,7 +1159,7 @@ class FilesController < ApplicationController
       end
 
       if (@attachment.folder_id_changed? || @attachment.display_name_changed?) && @attachment.folder.active_file_attachments.where(display_name: @attachment.display_name).where("id<>?", @attachment.id).exists?
-        return render json: { message: "file already exists; use on_duplicate='overwrite' or 'rename'" }, status: :conflict unless %w(overwrite rename).include?(params[:on_duplicate])
+        return render json: { message: "file already exists; use on_duplicate='overwrite' or 'rename'" }, status: :conflict unless %w[overwrite rename].include?(params[:on_duplicate])
 
         on_duplicate = params[:on_duplicate].to_sym
       end

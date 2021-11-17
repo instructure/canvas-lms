@@ -148,7 +148,7 @@ class NotificationMessageCreator
     policy = effective_policy_for(user, channel)
     # if the policy is not daily or weekly, it is either immediate which was
     # picked up before in build_immediate_message_for, or it's never.
-    return unless %w(daily weekly).include?(policy&.frequency)
+    return unless %w[daily weekly].include?(policy&.frequency)
 
     build_summary_for(user, policy) if policy
   end

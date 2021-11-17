@@ -22,7 +22,7 @@ module DataFixup::PopulateRootAccountIdOnAssetUserAccesses
     # all other context types are handled in PopulateRootAccountIdOnModels
     to_transform = AssetUserAccess.where(id: min..max, context_type: "User")
 
-    asset_types = %w(attachment calendar_event group course)
+    asset_types = %w[attachment calendar_event group course]
 
     # find any other asset types besides these and "user" (which the backfill fills with 0)
     types_string = [*asset_types, "user"].map { |t| "'%#{t}%'" }.join(',')

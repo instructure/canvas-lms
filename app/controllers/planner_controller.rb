@@ -335,7 +335,7 @@ class PlannerController < ApplicationController
   end
 
   def set_params
-    includes = Array.wrap(params[:include]) & %w{concluded}
+    includes = Array.wrap(params[:include]) & %w[concluded]
     @per_page = params[:per_page] || 50
     @page = params[:page] || 'first'
     @include_concluded = includes.include? 'concluded'

@@ -929,7 +929,7 @@ class SubmissionsApiController < ApplicationController
       @submission.reload
       bulk_load_attachments_and_previews([@submission])
 
-      includes = %w(submission_comments)
+      includes = %w[submission_comments]
       includes.concat(Array.wrap(params[:include]) & ['visibility'])
       includes << 'provisional_grades' if submission[:provisional]
 

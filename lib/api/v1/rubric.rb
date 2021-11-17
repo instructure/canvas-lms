@@ -24,7 +24,7 @@ module Api::V1::Rubric
   include Api::V1::RubricAssociation
 
   API_ALLOWED_RUBRIC_OUTPUT_FIELDS = {
-    only: %w(
+    only: %w[
       id
       title
       context_id
@@ -36,7 +36,7 @@ module Api::V1::Rubric
       free_form_criterion_comments
       hide_score_total
       data
-    )
+    ]
   }.freeze
 
   def rubrics_json(rubrics, user, session, opts = {})

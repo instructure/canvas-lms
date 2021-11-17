@@ -202,7 +202,7 @@ describe "shared/_select_content_dialog" do
     render partial: 'shared/select_content_dialog'
     page = Nokogiri(response.body)
     options = page.css("#wiki_pages_select .module_item_select option")
-    expect(%w(unpublished_page published_page) - options.map(&:text)).to be_empty
+    expect(%w[unpublished_page published_page] - options.map(&:text)).to be_empty
   end
 
   it "does not offer to create assignments or quizzes if the user doesn't have permission" do
@@ -213,7 +213,7 @@ describe "shared/_select_content_dialog" do
     view_context
     render partial: 'shared/select_content_dialog'
     page = Nokogiri(response.body)
-    expect(page.css(%Q{#quizs_select .module_item_select option[value="quiz_#{existing_quiz.id}"]})).not_to be_empty
+    expect(page.css(%Q(#quizs_select .module_item_select option[value="quiz_#{existing_quiz.id}"]))).not_to be_empty
     expect(page.css('#quizs_select .module_item_select option[value="new"]')).to be_empty
     expect(page.css('#assignments_select .module_item_select option[value="new"]')).to be_empty
   end

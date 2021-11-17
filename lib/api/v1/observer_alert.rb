@@ -23,7 +23,7 @@ module Api::V1::ObserverAlert
   include ApplicationHelper
 
   API_ALLOWED_OUTPUT_FIELDS = {
-    :only => %w(
+    :only => %w[
       id
       title
       user_id
@@ -34,7 +34,7 @@ module Api::V1::ObserverAlert
       context_id
       workflow_state
       action_date
-    ).freeze
+    ].freeze
   }.freeze
 
   def observer_alert_json(alert, user, session, _opts = {})

@@ -61,7 +61,7 @@ describe 'Account Reports API', type: :request do
       report = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
                         { report: @report.report_type, controller: 'account_reports', action: 'create',
                           format: 'json', account_id: @admin.account.id.to_s })
-      keys = %w(id progress parameters current_line status report created_at started_at ended_at file_url)
+      keys = %w[id progress parameters current_line status report created_at started_at ended_at file_url]
       expect(report['status']).to eq 'created'
       expect(keys - report.keys).to be_empty
     end

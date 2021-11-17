@@ -292,7 +292,7 @@ module SIS
           end
 
           @courses_to_touch_ids.add(enrollment.course_id)
-          if enrollment.should_update_user_account_association? && !%w{creation_pending deleted}.include?(user.workflow_state)
+          if enrollment.should_update_user_account_association? && !%w[creation_pending deleted].include?(user.workflow_state)
             if enrollment.new_record? && !@update_account_association_user_ids.include?(user.id)
               @incrementally_update_account_associations_user_ids.add(user.id)
             else
@@ -447,8 +447,8 @@ module SIS
       end
 
       def enrollment_needs_due_date_recaching?(enrollment)
-        unless %w(active inactive).include? enrollment.workflow_state_before_last_save
-          return %w(active inactive).include? enrollment.workflow_state
+        unless %w[active inactive].include? enrollment.workflow_state_before_last_save
+          return %w[active inactive].include? enrollment.workflow_state
         end
 
         false

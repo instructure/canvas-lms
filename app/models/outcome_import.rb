@@ -42,7 +42,7 @@ class OutcomeImport < ApplicationRecord
     state :failed
   end
 
-  IMPORT_TYPES = %w(instructure_csv).freeze
+  IMPORT_TYPES = %w[instructure_csv].freeze
 
   def self.valid_import_type?(type)
     IMPORT_TYPES.include? type

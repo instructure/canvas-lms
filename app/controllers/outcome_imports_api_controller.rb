@@ -195,7 +195,7 @@ class OutcomeImportsApiController < ApplicationController
   #
   # @returns OutcomeImport
   def show
-    if authorized_action(@context, @current_user, %i(import_outcomes manage_outcomes))
+    if authorized_action(@context, @current_user, %i[import_outcomes manage_outcomes])
       begin
         @import = if params[:id] == 'latest'
                     @context.latest_outcome_import or raise ActiveRecord::RecordNotFound

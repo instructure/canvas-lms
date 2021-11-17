@@ -119,7 +119,7 @@ module CC
         md.imsmd :lom do |lom|
           lom.imsmd :general do |general|
             general.imsmd :title do |title|
-              title.imsmd :string, %{QTI Quiz Export for course "#{course.name}"}
+              title.imsmd :string, %(QTI Quiz Export for course "#{course.name}")
             end
           end
           lom.imsmd :lifeCycle do |general|

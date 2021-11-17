@@ -96,13 +96,13 @@ describe LtiApiController, type: :request do
   end
 
   it "responds 'unsupported' for any unknown xml body" do
-    body = %{<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
+    body = %(<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>)
     make_call('body' => body)
     check_failure
   end
 
   it "adds xml to an error report if the xml is invalid according to spec" do
-    body = %{<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
+    body = %(<imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>)
     expect(Canvas::Errors).to receive(:capture) { |_, opts|
                                 expect(opts[:extra][:xml]).to be_present
                                 {}
@@ -116,7 +116,7 @@ describe LtiApiController, type: :request do
   end
 
   it "fail when the XML encoding is invalid" do
-    body = %{<?xml version="1.0" encoding="utf8"?><imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>}
+    body = %(<?xml version="1.0" encoding="utf8"?><imsx_POXEnvelopeRequest xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0"></imsx_POXEnvelopeRequest>)
     make_call('body' => body)
     check_failure('unsupported', 'Invalid XML: unknown encoding name - utf8')
   end

@@ -337,7 +337,7 @@ if Qti.migration_executable
       expect(d['answers'].map { |a| a['weight'] }).to eq [0, 100, 0]
       expect(d['answers'].map { |a| a['comments'] }).to eq ['nope', 'yes!', nil]
       attachment = @course.attachments.detect { |a| a.filename == 'smiley.jpg' }
-      expect(d['answers'].map { |a| a['comments_html'] }).to eq [nil, %{yes! <img src="/courses/#{@course.id}/files/#{attachment.id}/preview" alt="">}, nil]
+      expect(d['answers'].map { |a| a['comments_html'] }).to eq [nil, %(yes! <img src="/courses/#{@course.id}/files/#{attachment.id}/preview" alt="">), nil]
     end
 
     it "imports respondus question types" do

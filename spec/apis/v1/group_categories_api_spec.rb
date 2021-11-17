@@ -199,7 +199,7 @@ describe "Group Categories API", type: :request do
       end
 
       it "returns users in a group_category" do
-        expected_keys = %w{id name sortable_name short_name}
+        expected_keys = %w[id name sortable_name short_name]
         json = api_call(:get, api_url, api_route)
         expect(json.count).to eq 8
         json.each do |user|
@@ -221,7 +221,7 @@ describe "Group Categories API", type: :request do
       end
 
       it "returns a list of users" do
-        expected_keys = %w{id name sortable_name short_name}
+        expected_keys = %w[id name sortable_name short_name]
 
         json = api_call(:get, api_url, api_route, { :search_term => 'waldo' })
 
@@ -233,7 +233,7 @@ describe "Group Categories API", type: :request do
       end
 
       it "returns a list of unassigned users" do
-        expected_keys = %w{id name sortable_name short_name}
+        expected_keys = %w[id name sortable_name short_name]
 
         json = api_call(:get, api_url, api_route, { :search_term => 'antisocial', :unassigned => 'true' })
 

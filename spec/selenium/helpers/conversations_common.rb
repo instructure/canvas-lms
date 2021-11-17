@@ -95,7 +95,7 @@ module ConversationsCommon
 
   def set_bootstrap_select_value(element, new_value)
     f('.dropdown-toggle', element).click()
-    f(%{.text[data-value="#{new_value}"]}, element).click()
+    f(%(.text[data-value="#{new_value}"]), element).click()
   end
 
   def select_view(new_view)

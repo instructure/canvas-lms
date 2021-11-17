@@ -912,13 +912,13 @@ describe GradebookImporter do
 
     describe "simplified json output" do
       let(:top_level_keys) do
-        %i{
+        %i[
           assignments custom_columns missing_objects original_submissions
           students unchanged_assignments warning_messages
-        }
+        ]
       end
 
-      let(:student_keys) { %i{custom_column_data id last_name_first name previous_id submissions} }
+      let(:student_keys) { %i[custom_column_data id last_name_first name previous_id submissions] }
 
       it "has only the specified keys" do
         expect(hash.keys).to match_array(top_level_keys)
@@ -2092,19 +2092,19 @@ describe GradebookImporter do
   end
 
   def valid_gradebook_contents
-    attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks basic_course.csv)))
+    attachment_with_file(File.join(File.dirname(__FILE__), %w[.. fixtures gradebooks basic_course.csv]))
   end
 
   def valid_gradebook_contents_with_last_and_first_names
-    attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks valid_gradebook_contents_with_last_and_first_names.csv)))
+    attachment_with_file(File.join(File.dirname(__FILE__), %w[.. fixtures gradebooks valid_gradebook_contents_with_last_and_first_names.csv]))
   end
 
   def valid_gradebook_contents_with_sis_login_id
-    attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks basic_course_with_sis_login_id.csv)))
+    attachment_with_file(File.join(File.dirname(__FILE__), %w[.. fixtures gradebooks basic_course_with_sis_login_id.csv]))
   end
 
   def invalid_gradebook_contents
-    attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks wat.csv)))
+    attachment_with_file(File.join(File.dirname(__FILE__), %w[.. fixtures gradebooks wat.csv]))
   end
 
   def attachment_with

@@ -103,7 +103,7 @@ class OutcomesController < ApplicationController
     @outcome.tie_to(@context)
     render :json => @outcome.as_json(
       :methods => :artifacts_count_for_tied_context,
-      :user_content => %w(description)
+      :user_content => %w[description]
     )
   end
 

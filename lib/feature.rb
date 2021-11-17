@@ -29,7 +29,7 @@ class Feature
     @state = 'allowed'
     opts.each do |key, val|
       next unless ATTRS.include?(key)
-      next if key == :state && !%w(hidden off allowed on allowed_on).include?(val)
+      next if key == :state && !%w[hidden off allowed on allowed_on].include?(val)
 
       instance_variable_set "@#{key}", val
     end
@@ -132,9 +132,9 @@ class Feature
   STATE_DISABLED = 'disabled'
 
   VALID_STATES = [STATE_ON, STATE_DEFAULT_OFF, STATE_DEFAULT_ON, STATE_HIDDEN, STATE_DISABLED].freeze
-  VALID_APPLIES_TO = %w(Course Account RootAccount User SiteAdmin).freeze
-  VALID_ENVS = %i(development ci beta test production).freeze
-  VALID_TYPES = %w(feature_option setting).freeze
+  VALID_APPLIES_TO = %w[Course Account RootAccount User SiteAdmin].freeze
+  VALID_ENVS = %i[development ci beta test production].freeze
+  VALID_TYPES = %w[feature_option setting].freeze
 
   DISABLED_FEATURE = Feature.new.freeze
 

@@ -75,13 +75,13 @@ describe Lti::PrivacyLevelExpander do
       let(:helper) { Lti::PrivacyLevelExpander.new(placement, variable_expander) }
 
       it 'includes all supported parameters if privacy level is public' do
-        expected_params = %w(com.instructure.contextLabel
+        expected_params = %w[com.instructure.contextLabel
                              Person.sourcedId
                              CourseOffering.sourcedId
                              Person.email.primary
                              Person.name.given
                              Person.name.full
-                             Person.name.family)
+                             Person.name.family]
         expect(helper.supported_parameters).to match_array expected_params
       end
     end
@@ -97,10 +97,10 @@ describe Lti::PrivacyLevelExpander do
       let(:helper) { Lti::PrivacyLevelExpander.new(placement, variable_expander) }
 
       it 'inlcudes anonymous and name only params if privacy level is name only' do
-        expected_params = %w(com.instructure.contextLabel
+        expected_params = %w[com.instructure.contextLabel
                              Person.name.given
                              Person.name.full
-                             Person.name.family)
+                             Person.name.family]
         expect(helper.supported_parameters).to match_array expected_params
       end
     end
@@ -116,8 +116,8 @@ describe Lti::PrivacyLevelExpander do
       let(:helper) { Lti::PrivacyLevelExpander.new(placement, variable_expander) }
 
       it 'includes anonymous and email only params if privacy level is email only' do
-        expected_params = %w(com.instructure.contextLabel
-                             Person.email.primary)
+        expected_params = %w[com.instructure.contextLabel
+                             Person.email.primary]
         expect(helper.supported_parameters).to match_array expected_params
       end
     end
@@ -133,7 +133,7 @@ describe Lti::PrivacyLevelExpander do
       let(:helper) { Lti::PrivacyLevelExpander.new(placement, variable_expander) }
 
       it 'includes anonymouse parameters only if privacy level is anonymous' do
-        expected_params = %w(com.instructure.contextLabel)
+        expected_params = %w[com.instructure.contextLabel]
         expect(helper.supported_parameters).to match_array expected_params
       end
     end

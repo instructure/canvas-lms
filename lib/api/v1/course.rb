@@ -106,7 +106,7 @@ module Api::V1::Course
       hash['term'] = enrollment_term_json(course.enrollment_term, user, session, enrollments, []) if includes.include?('term')
       if includes.include?('grading_periods')
         hash['grading_periods'] = course.enrollment_term&.grading_period_group&.grading_periods&.map do |gp|
-          api_json(gp, user, session, :only => %w(id title start_date end_date workflow_state))
+          api_json(gp, user, session, :only => %w[id title start_date end_date workflow_state])
         end
       end
       if includes.include?('course_progress')
@@ -119,7 +119,7 @@ module Api::V1::Course
         hash['sections'] = if enrollments.any?
                              section_enrollments_json(enrollments)
                            else
-                             course.course_sections.map { |section| section.attributes.slice(*%w(id name start_at end_at)) }
+                             course.course_sections.map { |section| section.attributes.slice(*%w[id name start_at end_at]) }
                            end
       end
       hash['total_students'] = course.student_count || course.student_enrollments.not_fake.distinct.count(:user_id) if includes.include?('total_students')
@@ -165,7 +165,7 @@ module Api::V1::Course
   end
 
   def copy_status_json(import, course, user, session)
-    hash = api_json(import, user, session, :only => %w(id progress created_at workflow_state integration_id))
+    hash = api_json(import, user, session, :only => %w[id progress created_at workflow_state integration_id])
 
     # the type of object for course copy changed but we don't want the api to change
     # so map the workflow states to the old ones
@@ -215,7 +215,7 @@ module Api::V1::Course
   def preload_teachers(courses)
     threshold = params[:teacher_limit].presence&.to_i
     if threshold
-      scope = TeacherEnrollment.where.not(:workflow_state => %w{deleted rejected}).where(:course_id => courses).distinct.select(:user_id, :course_id)
+      scope = TeacherEnrollment.where.not(:workflow_state => %w[deleted rejected]).where(:course_id => courses).distinct.select(:user_id, :course_id)
       teacher_counts = Enrollment.from("(#{scope.to_sql}) AS t").group("t.course_id").count
       to_preload = []
       courses.each do |course|

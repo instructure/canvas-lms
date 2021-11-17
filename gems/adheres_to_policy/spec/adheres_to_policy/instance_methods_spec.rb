@@ -36,7 +36,7 @@ describe AdheresToPolicy::InstanceMethods do
   let(:user_class) { Class.new }
 
   it "has setup a series of methods on the instance" do
-    %w(rights_status granted_rights grants_right? grants_any_right? grants_all_rights?).each do |method|
+    %w[rights_status granted_rights grants_right? grants_any_right? grants_all_rights?].each do |method|
       expect(some_class.new).to respond_to(method)
     end
   end

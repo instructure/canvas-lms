@@ -77,6 +77,6 @@ class ObjectView < HashView
   end
 
   def self.strip_comments(str)
-    str.gsub(%r(//[^\n"]+$), '')
+    str.gsub(%r{//[^\n"]+$}, '')
   end
 end

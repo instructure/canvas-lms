@@ -317,18 +317,18 @@ module CanvasSanitize # :nodoc:
         'visibility', 'white-space', 'width',
         'z-index', 'zoom'
       ] +
-      %w{area auto-columns auto-flow auto-rows column gap row template}.map { |i| "grid-#{i}" } +
-      %w{areas columns rows}.map { |i| "grid-template-#{i}" } +
-      %w{end gap start}.map { |i| "grid-column-#{i}" } +
-      %w{end gap start}.map { |i| "grid-row-#{i}" } +
-      %w{attachment color image position repeat}.map { |i| "background-#{i}" } +
-      %w{x y}.map { |i| "background-position-#{i}" } +
-      %w{bottom collapse color left right spacing style top width}.map { |i| "border-#{i}" } +
-      %w{bottom left right top}.map { |i| %w{color style width}.map { |j| "border-#{i}-#{j}" } }.flatten +
-      %w{family size stretch style variant width}.map { |i| "font-#{i}" } +
-      %w{image position type}.map { |i| "list-style-#{i}" } +
-      %w{bottom left right top offset}.map { |i| "margin-#{i}" } +
-      %w{bottom left right top}.map { |i| "padding-#{i}" }
+      %w[area auto-columns auto-flow auto-rows column gap row template].map { |i| "grid-#{i}" } +
+      %w[areas columns rows].map { |i| "grid-template-#{i}" } +
+      %w[end gap start].map { |i| "grid-column-#{i}" } +
+      %w[end gap start].map { |i| "grid-row-#{i}" } +
+      %w[attachment color image position repeat].map { |i| "background-#{i}" } +
+      %w[x y].map { |i| "background-position-#{i}" } +
+      %w[bottom collapse color left right spacing style top width].map { |i| "border-#{i}" } +
+      %w[bottom left right top].map { |i| %w[color style width].map { |j| "border-#{i}-#{j}" } }.flatten +
+      %w[family size stretch style variant width].map { |i| "font-#{i}" } +
+      %w[image position type].map { |i| "list-style-#{i}" } +
+      %w[bottom left right top offset].map { |i| "margin-#{i}" } +
+      %w[bottom left right top].map { |i| "padding-#{i}" }
                   ).to_set.freeze,
       protocols: DEFAULT_PROTOCOLS
     }

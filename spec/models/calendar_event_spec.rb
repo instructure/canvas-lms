@@ -241,7 +241,7 @@ describe CalendarEvent do
 
       it "does not add verifiers to files unless course or attachment is public" do
         attachment_model(:context => course_factory)
-        html = %{<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>}
+        html = %(<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>)
         calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => html)
         ev = @event.to_ics(in_own_calendar: false)
         expect(ev.description).to_not include("verifier")
@@ -271,7 +271,7 @@ describe CalendarEvent do
 
         @course.media_objects.create!(:media_id => '0_12345678')
         event = @course.default_section.calendar_events.create!(:start_at => "Sep 3 2008 12:00am",
-                                                                :description => %{<p><a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">media comment</a></p>})
+                                                                :description => %(<p><a id="media_comment_0_12345678" class="instructure_inline_media_comment video_comment" href="/media_objects/0_12345678">media comment</a></p>))
         event.effective_context_code = @course.asset_string
         event.save!
 

@@ -65,11 +65,11 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
       Enrollment
         .microsoft_sync_relevant
         .where(course_id: course.id)
-        .joins(%{
+        .joins(<<~SQL.squish)
           LEFT JOIN #{quoted_table_name} AS mappings
           ON mappings.user_id=enrollments.user_id
           AND mappings.root_account_id=#{course.root_account_id.to_i}
-        })
+        SQL
         .where(mappings: { id: nil })
         .select(:user_id).distinct.limit(MAX_ENROLLMENT_MEMBERS)
         .pluck(:user_id)
@@ -131,11 +131,11 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
     Enrollment
       .microsoft_sync_relevant
       .where(course_id: course.id)
-      .joins(%{
+      .joins(<<~SQL.squish)
         JOIN #{quoted_table_name} AS mappings
         ON mappings.user_id=enrollments.user_id
         AND mappings.root_account_id=#{course.root_account_id.to_i}
-      })
+      SQL
       .select(:id, :type, 'mappings.aad_id as aad_id')
   end
 

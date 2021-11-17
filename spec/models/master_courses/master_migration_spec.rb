@@ -2910,8 +2910,8 @@ describe MasterCourses::MasterMigration do
         page = @copy_from.wiki_pages.create!(:title => "some page")
         page_tag = mod1.add_item({ :id => page.id, :type => 'wiki_page', :indent => 1 })
 
-        body = %{<p>Link to assignment module item: <a href="/courses/%s/assignments/%s?module_item_id=%s">some assignment</a></p>
-          <p>Link to page module item: <a href="/courses/%s/pages/%s?module_item_id=%s">some page</a></p>}
+        body = %(<p>Link to assignment module item: <a href="/courses/%s/assignments/%s?module_item_id=%s">some assignment</a></p>
+          <p>Link to page module item: <a href="/courses/%s/pages/%s?module_item_id=%s">some page</a></p>)
         topic = @copy_from.discussion_topics.create!(:title => "some topic",
                                                      :message => body % [@copy_from.id, asmnt.id, assmt_tag.id, @copy_from.id, page.url, page_tag.id])
 

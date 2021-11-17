@@ -26,9 +26,9 @@ module Api::V1::ContextModule
   include Api::V1::Locked
   include Api::V1::Assignment
 
-  MODULE_JSON_ATTRS = %w(id position name unlock_at).freeze
+  MODULE_JSON_ATTRS = %w[id position name unlock_at].freeze
 
-  MODULE_ITEM_JSON_ATTRS = %w(id position title indent).freeze
+  MODULE_ITEM_JSON_ATTRS = %w[id position title indent].freeze
 
   ITEM_TYPE = {
     Assignment: 'assignment',
@@ -97,7 +97,7 @@ module Api::V1::ContextModule
 
     # add content_id, if applicable
     # (note that wiki page ids are not exposed by the api)
-    unless %w(WikiPage ContextModuleSubHeader ExternalUrl).include? content_tag.content_type
+    unless %w[WikiPage ContextModuleSubHeader ExternalUrl].include? content_tag.content_type
       hash['content_id'] = content_tag.content_id
     end
 

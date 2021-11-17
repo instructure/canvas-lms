@@ -103,7 +103,7 @@ module GoogleDrive
     def preferred_mime_types
       # Order is important
       # we return the first matching mime type
-      %w{
+      %w[
         application/vnd.openxmlformats-officedocument.wordprocessingml.document
         application/vnd.oasis.opendocument.text
         application/vnd.openxmlformats-officedocument.presentationml.presentation
@@ -111,7 +111,7 @@ module GoogleDrive
         application/x-vnd.oasis.opendocument.spreadsheet
         application/pdf
         application/zip
-      }
+      ]
     end
   end
 end

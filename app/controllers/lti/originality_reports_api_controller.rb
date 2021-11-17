@@ -293,7 +293,7 @@ module Lti
     end
 
     def lti_link_attributes
-      [tool_setting: %i(resource_url resource_type_code)].freeze
+      [tool_setting: %i[resource_url resource_type_code]].freeze
     end
 
     def assignment

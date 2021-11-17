@@ -33,7 +33,7 @@ module Api::V1::ContentShare
   }.freeze
 
   def content_share_json(content_share, user, session, opts = {})
-    json = api_json(content_share, user, session, opts.merge(only: %w(id name created_at updated_at user_id read_state)))
+    json = api_json(content_share, user, session, opts.merge(only: %w[id name created_at updated_at user_id read_state]))
     json['sender'] = content_share.respond_to?(:sender) && content_share.sender ? user_display_json(content_share.sender) : nil
     json['receivers'] = content_share.respond_to?(:receivers) ? content_share.receivers.map { |rec| user_display_json(rec) } : []
     if content_share.content_export
@@ -82,7 +82,7 @@ module Api::V1::ContentShare
     return nil unless settings.key?('selected_content')
 
     selected_types = settings['selected_content'].keys.filter_map { |k| EXPORT_TYPES[k] }
-    %w(module module_item).each { |k| return k if selected_types.include?(k) }
+    %w[module module_item].each { |k| return k if selected_types.include?(k) }
     # otherwise there should be only one selected type...
     selected_types.first
   end

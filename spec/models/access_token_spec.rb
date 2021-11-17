@@ -204,7 +204,7 @@ describe AccessToken do
   describe "token scopes" do
     let_once(:token) do
       token = AccessToken.new
-      token.scopes = %w{https://canvas.instructure.com/login/oauth2/auth/user_profile https://canvas.instructure.com/login/oauth2/auth/accounts}
+      token.scopes = %w[https://canvas.instructure.com/login/oauth2/auth/user_profile https://canvas.instructure.com/login/oauth2/auth/accounts]
       token
     end
 
@@ -237,13 +237,13 @@ describe AccessToken do
   context "url scopes" do
     let(:token) do
       token = AccessToken.new
-      token.scopes = %w{
+      token.scopes = %w[
         blah/scope
         url:GET|/api/v1/accounts
         url:POST|/api/v1/courses
         url:PUT|/api/v1/courses/:id
         url:DELETE|/api/v1/courses/:course_id/assignments/:id
-      }
+      ]
       token
     end
 
@@ -252,22 +252,22 @@ describe AccessToken do
     end
 
     it "accounts for format segments" do
-      token = AccessToken.new(scopes: %w{url:GET|/blah})
+      token = AccessToken.new(scopes: %w[url:GET|/blah])
       expect(token.url_scopes_for_method('GET')).to match_array [%r{^/blah(?:\.[^/]+|)$}]
     end
 
     it "accounts for glob segments" do
-      token = AccessToken.new(scopes: %w{url:GET|/*blah})
+      token = AccessToken.new(scopes: %w[url:GET|/*blah])
       expect(token.url_scopes_for_method('GET')).to match_array [%r{^/.+(?:\.[^/]+|)$}]
     end
 
     it "accounts for dynamic segments" do
-      token = AccessToken.new(scopes: %w{url:GET|/courses/:id})
+      token = AccessToken.new(scopes: %w[url:GET|/courses/:id])
       expect(token.url_scopes_for_method('GET')).to match_array [%r{^/courses/[^/]+(?:\.[^/]+|)$}]
     end
 
     it "accounts for optional segments" do
-      token = AccessToken.new(scopes: %w{url:GET|/courses(/:course_id)(/*blah)})
+      token = AccessToken.new(scopes: %w[url:GET|/courses(/:course_id)(/*blah)])
       expect(token.url_scopes_for_method('GET')).to match_array [%r{^/courses(?:/[^/]+|)(?:/.+|)(?:\.[^/]+|)$}]
     end
   end

@@ -7064,7 +7064,7 @@ describe Assignment do
       @students = create_users_in_course(@course, 3, return_type: :record)
 
       @assignment = @course.assignments.create! name: "zip upload test",
-                                                submission_types: %w(online_upload)
+                                                submission_types: %w[online_upload]
     end
 
     def zip_submissions
@@ -7164,7 +7164,7 @@ describe Assignment do
 
     describe "newly-created comments" do
       before do
-        @assignment = @course.assignments.create!(name: "Mute Comment Test", submission_types: %w(online_upload))
+        @assignment = @course.assignments.create!(name: "Mute Comment Test", submission_types: %w[online_upload])
       end
 
       let(:added_comment) { @assignment.submission_for_student(@student).submission_comments.last }

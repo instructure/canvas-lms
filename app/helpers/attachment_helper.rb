@@ -49,7 +49,7 @@ module AttachmentHelper
       attrs[:attachment_preview_processing] = true
     end
     attrs.map { |attr, val|
-      %|data-#{attr}="#{ERB::Util.html_escape(val)}"|
+      %(data-#{attr}="#{ERB::Util.html_escape(val)}")
     }.join(" ").html_safe
   end
 

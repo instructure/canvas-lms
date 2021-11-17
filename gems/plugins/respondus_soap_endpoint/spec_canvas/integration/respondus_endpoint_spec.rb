@@ -72,10 +72,10 @@ describe "Respondus SOAP API", type: :request do
   it "identifies the server without user credentials" do
     soap_response = soap_request('IdentifyServer', '', '', '')
     expect(soap_response.first).to eq "Success"
-    expect(soap_response.last).to eq %{
+    expect(soap_response.last).to eq %(
 Respondus Generic Server API
 Contract version: 1
-Implemented for: Canvas LMS}
+Implemented for: Canvas LMS)
   end
 
   it "authenticates an existing user" do

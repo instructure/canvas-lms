@@ -146,7 +146,7 @@ class ContextExternalTool < ActiveRecord::Base
 
     def visible?(visibility, user, context, session = nil)
       visibility = visibility.to_s
-      return true unless %w(public members admins).include?(visibility)
+      return true unless %w[public members admins].include?(visibility)
       return true if visibility == 'public'
       return true if visibility == 'members' &&
                      context.grants_any_right?(user, session, :participate_as_student, :read_as_admin)
@@ -295,7 +295,7 @@ class ContextExternalTool < ActiveRecord::Base
       extension_keys += custom_keys
     end
     extension_keys += {
-      :visibility => lambda { |v| %w{members admins public}.include?(v) || v.nil? }
+      :visibility => lambda { |v| %w[members admins public].include?(v) || v.nil? }
     }.to_a
 
     # merge with existing settings so that no caller can complain

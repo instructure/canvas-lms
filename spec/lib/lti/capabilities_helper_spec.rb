@@ -71,10 +71,10 @@ module Lti
 
     let(:variable_expander) { Lti::VariableExpander.new(root_account, account, controller, current_user: user, tool: tool) }
 
-    let(:invalid_enabled_caps) { %w(InvalidCap.Foo AnotherInvalid.Bar) }
-    let(:valid_enabled_caps) { %w(ToolConsumerInstance.guid Membership.role CourseSection.sourcedId) }
+    let(:invalid_enabled_caps) { %w[InvalidCap.Foo AnotherInvalid.Bar] }
+    let(:valid_enabled_caps) { %w[ToolConsumerInstance.guid Membership.role CourseSection.sourcedId] }
     let(:supported_capabilities) {
-      %w(ToolConsumerInstance.guid
+      %w[ToolConsumerInstance.guid
          Canvas.term.name
          CourseSection.sourcedId
          Membership.role
@@ -115,7 +115,7 @@ module Lti
          com.instructure.Person.pronouns
          com.instructure.User.observees
          com.instructure.User.sectionNames
-         com.instructure.Observee.sisIds)
+         com.instructure.Observee.sisIds]
     }
 
     describe '#supported_capabilities' do
@@ -137,7 +137,7 @@ module Lti
     end
 
     describe '#capability_params_hash' do
-      let(:valid_keys) { %w(tool_consumer_instance_guid roles lis_course_section_sourcedid) }
+      let(:valid_keys) { %w[tool_consumer_instance_guid roles lis_course_section_sourcedid] }
 
       it 'does not include a name (key) for invalid capabilities' do
         params_hash = CapabilitiesHelper.capability_params_hash(invalid_enabled_caps + valid_enabled_caps, variable_expander)

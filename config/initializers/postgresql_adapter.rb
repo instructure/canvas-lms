@@ -29,7 +29,7 @@ module PostgreSQLAdapterExtensions
     Timeout.timeout(@config[:receive_timeout], PG::ConnectionBad, "receive timeout", &block)
   end
 
-  %I{begin_db_transaction create_savepoint active?}.each do |method|
+  %I[begin_db_transaction create_savepoint active?].each do |method|
     class_eval <<~RUBY, __FILE__, __LINE__ + 1
       def #{method}(*)
         receive_timeout_wrapper { super }

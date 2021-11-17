@@ -6376,17 +6376,17 @@ describe Course, '#modules_visible_to' do
   end
 
   it "shows published modules to students" do
-    expect(@course.modules_visible_to(@student).map(&:name)).to match_array %w(published)
+    expect(@course.modules_visible_to(@student).map(&:name)).to match_array %w[published]
   end
 
   it "shows all modules to teachers" do
-    expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w(published unpublished)
+    expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w[published unpublished]
   end
 
   it "shows all modules to teachers even when course is concluded" do
     @course.complete!
     expect(@course.grants_right?(@teacher, :manage_content)).to eq(false)
-    expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w(published unpublished)
+    expect(@course.modules_visible_to(@teacher).map(&:name)).to match_array %w[published unpublished]
   end
 end
 
@@ -6400,16 +6400,16 @@ describe Course, '#module_items_visible_to' do
   end
 
   it "shows published items to students" do
-    expect(@course.module_items_visible_to(@student).map(&:title)).to match_array %w(published)
+    expect(@course.module_items_visible_to(@student).map(&:title)).to match_array %w[published]
   end
 
   it "shows all items to teachers" do
-    expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w(published unpublished)
+    expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w[published unpublished]
   end
 
   it "shows all items to teachers even when course is concluded" do
     @course.complete!
-    expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w(published unpublished)
+    expect(@course.module_items_visible_to(@teacher).map(&:title)).to match_array %w[published unpublished]
   end
 
   context "with section specific discussions" do

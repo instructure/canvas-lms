@@ -29,7 +29,7 @@ module CC::Exporter::Epub::Converters
         cc_path = @package_root.item_path res.at_css('file')['href']
 
         canvas_id = get_node_att(res, 'dependency', 'identifierref')
-        if canvas_id && (meta_res = @manifest.at_css(%{resource[identifier="#{canvas_id}"]}))
+        if canvas_id && (meta_res = @manifest.at_css(%(resource[identifier="#{canvas_id}"])))
           canvas_path = @package_root.item_path meta_res.at_css('file')['href']
           meta_node = open_file_xml(canvas_path)
         else

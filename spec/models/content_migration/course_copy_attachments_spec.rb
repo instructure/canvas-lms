@@ -52,7 +52,7 @@ describe ContentMigration do
       expect(new_attachment).not_to be_nil
       expect(new_attachment.full_path).to eq "course files/dummy.txt"
       expect(new_attachment.folder).to eq to_root
-      expect(@copy_to.syllabus_body).to eq %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
+      expect(@copy_to.syllabus_body).to eq %(<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>)
     end
 
     it "copies files into the correct folders when the folders share the same name" do
@@ -108,8 +108,8 @@ describe ContentMigration do
       att2 = Attachment.create!(:filename => 'second.jpg', :uploaded_data => StringIO.new('ohais'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       Attachment.create!(:filename => 'third.jpg', :uploaded_data => StringIO.new('3333'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
 
-      asmnt_des = %{<a href="/courses/%s/files/%s/preview">First file</a>}
-      wiki_body = %{<img src="/courses/%s/files/%s/preview">}
+      asmnt_des = %(<a href="/courses/%s/files/%s/preview">First file</a>)
+      wiki_body = %(<img src="/courses/%s/files/%s/preview">)
       asmnt = @copy_from.assignments.create!(:points_possible => 40, :grading_type => 'points', :description => (asmnt_des % [@copy_from.id, att.id]), :title => "assignment")
       wiki = @copy_from.wiki_pages.create!(:title => "wiki", :body => (wiki_body % [@copy_from.id, att2.id]))
 
@@ -152,11 +152,11 @@ describe ContentMigration do
     it "preserves new-RCE mediahref iframes" do
       att = @copy_from.attachments.create!(:filename => 'videro.mov', :uploaded_data => StringIO.new('...'), :folder => Folder.root_folders(@copy_from).first)
       page = @copy_from.wiki_pages.create!(:title => "watch this y'all", :body =>
-        %Q{<iframe data-media-type="video" src="/media_objects_iframe?mediahref=/courses/#{@copy_from.id}/files/#{att.id}/download" data-media-id="#{att.id}"/>})
+        %Q(<iframe data-media-type="video" src="/media_objects_iframe?mediahref=/courses/#{@copy_from.id}/files/#{att.id}/download" data-media-id="#{att.id}"/>))
       run_course_copy
       att_to = @copy_to.attachments.where(migration_id: mig_id(att)).take
       page_to = @copy_to.wiki_pages.where(migration_id: mig_id(page)).take
-      expect(page_to.body).to include %Q{src="/media_objects_iframe?mediahref=/courses/#{@copy_to.id}/files/#{att_to.id}/download"}
+      expect(page_to.body).to include %Q(src="/media_objects_iframe?mediahref=/courses/#{@copy_to.id}/files/#{att_to.id}/download")
     end
 
     it "references existing usage rights on course copy" do
@@ -231,7 +231,7 @@ describe ContentMigration do
       expect(att1_rights).not_to eq(ur1) # check it was actually copied
       expect(att1_rights).to eq(att2_rights) # check de-duplication
 
-      attrs = %w(use_justification legal_copyright license)
+      attrs = %w[use_justification legal_copyright license]
       expect(att1_rights.attributes.slice(*attrs)).to eq({ "use_justification" => 'used_by_permission', "legal_copyright" => '(C) 2014 Incom Corp Ltd.', "license" => 'private' })
       expect(att3_rights.attributes.slice(*attrs)).to eq({ "use_justification" => 'creative_commons', "legal_copyright" => '(C) 2014 Koensayr Manufacturing Inc.', "license" => 'cc_by_nd' })
     end

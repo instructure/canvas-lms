@@ -170,7 +170,7 @@ shared_examples_for "file uploads api" do
     expect(response).to be_successful
     attachment.reload
     json = json_parse(response.body)
-    expect(json).to eq attachment_json(attachment, { include: %w(enhanced_preview_url) })
+    expect(json).to eq attachment_json(attachment, { include: %w[enhanced_preview_url] })
 
     expect(attachment.file_state).to eq 'available'
     expect(attachment.content_type).to eq "application/msword"

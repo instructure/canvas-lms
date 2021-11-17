@@ -198,7 +198,7 @@ describe "Wiki Pages" do
       before :once do
         account_model
         course_with_teacher :account => @account, :active_all => true
-        @timestamps = %w(2015-01-01 2015-01-02 2015-01-03).map { |d| Time.zone.parse(d) }
+        @timestamps = %w[2015-01-01 2015-01-02 2015-01-03].map { |d| Time.zone.parse(d) }
 
         Timecop.freeze(@timestamps[0]) do      # rev 1
           @vpage = @course.wiki_pages.build :title => 'bar'

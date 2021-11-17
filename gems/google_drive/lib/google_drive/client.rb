@@ -39,7 +39,7 @@ module GoogleDrive
       client.authorization.redirect_uri = client_secrets['redirect_uri']
       client.authorization.refresh_token = refresh_token if refresh_token
       client.authorization.access_token = access_token if access_token
-      client.authorization.scope = %w{https://www.googleapis.com/auth/drive}
+      client.authorization.scope = %w[https://www.googleapis.com/auth/drive]
       client
     end
 

@@ -23,7 +23,7 @@ module SIS
     # note these are account-level groups, not course groups
     class LoginImporter < CSVBaseImporter
       def self.login_csv?(row)
-        (row & %w{existing_user_id existing_integration_id existing_canvas_user_id}).any?
+        (row & %w[existing_user_id existing_integration_id existing_canvas_user_id]).any?
       end
 
       def self.identifying_fields

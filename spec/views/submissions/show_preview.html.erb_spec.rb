@@ -92,7 +92,7 @@ describe "/submissions/show_preview" do
       assign(:submission, submission)
       @student.mark_submission_annotations_unread!(submission)
       render template: "submissions/show_preview", locals: { anonymize_students: assignment.anonymize_students? }
-      expect(response.body).to include %{<span class="submission_annotation unread_indicator"}
+      expect(response.body).to include %(<span class="submission_annotation unread_indicator")
     end
 
     it "renders an iframe with a src to canvadoc sessions controller when assignment is a student annotation" do

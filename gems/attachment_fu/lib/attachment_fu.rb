@@ -23,7 +23,7 @@ require 'attachment_fu/backends/file_system_backend'
 require 'attachment_fu/backends/s3_backend'
 
 module AttachmentFu # :nodoc:
-  @@default_processors = %w(MiniMagick)
+  @@default_processors = %w[MiniMagick]
   # Instructure: I (ryan shaw) just copied and pasted this from http://github.com/technoweenie/attachment_fu/blob/master/lib/technoweenie/attachment_fu.rb
   @@content_types      = [
     'image/jpeg',

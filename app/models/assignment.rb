@@ -42,9 +42,9 @@ class Assignment < ActiveRecord::Base
 
   self.ignored_columns = %i[context_code]
 
-  ALLOWED_GRADING_TYPES = %w(points percent letter_grade gpa_scale pass_fail not_graded).freeze
-  OFFLINE_SUBMISSION_TYPES = %i(on_paper external_tool none not_graded wiki_page).freeze
-  SUBMITTABLE_TYPES = %w(online_quiz discussion_topic wiki_page).freeze
+  ALLOWED_GRADING_TYPES = %w[points percent letter_grade gpa_scale pass_fail not_graded].freeze
+  OFFLINE_SUBMISSION_TYPES = %i[on_paper external_tool none not_graded wiki_page].freeze
+  SUBMITTABLE_TYPES = %w[online_quiz discussion_topic wiki_page].freeze
   LTI_EULA_SERVICE = 'vnd.Canvas.Eula'
   AUDITABLE_ATTRIBUTES = %w[
     muted
@@ -456,7 +456,7 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  API_NEEDED_FIELDS = %w(
+  API_NEEDED_FIELDS = %w[
     id
     title
     context_id
@@ -504,7 +504,7 @@ class Assignment < ActiveRecord::Base
     grader_comments_visible_to_graders
     grader_names_visible_to_final_grader
     grader_count
-  ).freeze
+  ].freeze
 
   def external_tool?
     self.submission_types == 'external_tool'
@@ -1387,7 +1387,7 @@ class Assignment < ActiveRecord::Base
   def process_if_quiz
     if self.submission_types == "online_quiz"
       self.points_possible = quiz.points_possible if quiz&.available?
-      copy_attrs = %w(due_at lock_at unlock_at)
+      copy_attrs = %w[due_at lock_at unlock_at]
       if quiz && @saved_by != :quiz &&
          copy_attrs.any? { |attr| changes[attr] }
         copy_attrs.each { |attr| quiz.send "#{attr}=", send(attr) }
@@ -1674,7 +1674,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.assignment_type?(type)
-    %w(quiz attendance discussion_topic wiki_page external_tool).include? type.to_s
+    %w[quiz attendance discussion_topic wiki_page external_tool].include? type.to_s
   end
 
   def self.get_submission_type(assignment_type)
@@ -1715,7 +1715,7 @@ class Assignment < ActiveRecord::Base
 
   def each_submission_type
     if block_given?
-      submittable_types = %i(discussion_topic quiz)
+      submittable_types = %i[discussion_topic quiz]
       submittable_types << :wiki_page if self.context.try(:feature_enabled?, :conditional_release)
       submittable_types.each do |asg_type|
         submittable = self.send(asg_type)
@@ -1761,7 +1761,7 @@ class Assignment < ActiveRecord::Base
     can :submit
 
     given do |user, session|
-      (submittable_type? || %w(discussion_topic online_quiz).include?(submission_types)) &&
+      (submittable_type? || %w[discussion_topic online_quiz].include?(submission_types)) &&
         context.grants_right?(user, session, :participate_as_student) &&
         visible_to_user?(user)
     end
@@ -2968,10 +2968,10 @@ class Assignment < ActiveRecord::Base
   }
 
   scope :expecting_submission, -> do
-    where.not(submission_types: [nil, ''] + %w(none not_graded on_paper wiki_page))
+    where.not(submission_types: [nil, ''] + %w[none not_graded on_paper wiki_page])
   end
 
-  scope :gradeable, -> { where.not(submission_types: %w(not_graded wiki_page)) }
+  scope :gradeable, -> { where.not(submission_types: %w[not_graded wiki_page]) }
 
   scope :active, -> { where.not(workflow_state: 'deleted') }
   scope :before, lambda { |date| where("assignments.created_at<?", date) }
@@ -3063,11 +3063,11 @@ class Assignment < ActiveRecord::Base
   def expects_submission?
     submission_types.present? &&
       !expects_external_submission? &&
-      !%w(none not_graded wiki_page).include?(submission_types)
+      !%w[none not_graded wiki_page].include?(submission_types)
   end
 
   def expects_external_submission?
-    %w(on_paper external_tool).include?(submission_types)
+    %w[on_paper external_tool].include?(submission_types)
   end
 
   def non_digital_submission?
@@ -3142,9 +3142,9 @@ class Assignment < ActiveRecord::Base
   end
   protected :infer_comment_context_from_filename
 
-  FREEZABLE_ATTRIBUTES = %w{title description lock_at points_possible grading_type
+  FREEZABLE_ATTRIBUTES = %w[title description lock_at points_possible grading_type
                             submission_types assignment_group_id allowed_extensions
-                            group_category_id notify_of_update peer_reviews workflow_state}.freeze
+                            group_category_id notify_of_update peer_reviews workflow_state].freeze
   def frozen?
     !!(self.freeze_on_copy && self.copied &&
        PluginSetting.settings_for_plugin(:assignment_freezer))

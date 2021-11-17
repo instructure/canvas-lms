@@ -25,28 +25,28 @@ module Api::V1::SisAssignment
   end
 
   API_SIS_ASSIGNMENT_JSON_OPTS = {
-    only: %i(id created_at due_at unlock_at lock_at points_possible sis_assignment_id integration_id integration_data include_in_final_grade).freeze,
-    methods: %i(name submission_types_array).freeze
+    only: %i[id created_at due_at unlock_at lock_at points_possible sis_assignment_id integration_id integration_data include_in_final_grade].freeze,
+    methods: %i[name submission_types_array].freeze
   }.freeze
 
   API_SIS_ASSIGNMENT_GROUP_JSON_OPTS = {
-    only: %i(id name sis_source_id integration_data group_weight).freeze
+    only: %i[id name sis_source_id integration_data group_weight].freeze
   }.freeze
 
   API_SIS_ASSIGNMENT_COURSE_SECTION_JSON_OPTS = {
-    only: %i(id name sis_source_id integration_id).freeze
+    only: %i[id name sis_source_id integration_id].freeze
   }.freeze
 
   API_SIS_ASSIGNMENT_COURSE_JSON_OPTS = {
-    only: %i(id name sis_source_id integration_id).freeze
+    only: %i[id name sis_source_id integration_id].freeze
   }.freeze
 
   API_SIS_ASSIGNMENT_OVERRIDES_JSON_OPTS = {
-    only: %i(id title due_at unlock_at lock_at).freeze
+    only: %i[id title due_at unlock_at lock_at].freeze
   }.freeze
 
   API_SIS_ASSIGNMENT_STUDENT_OVERRIDES_JSON_OPTS = {
-    only: %i(user_id).freeze
+    only: %i[user_id].freeze
   }.freeze
 
   def sis_assignments_json(assignments, includes = {})

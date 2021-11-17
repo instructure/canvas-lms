@@ -272,7 +272,7 @@ class ContextModulesController < ApplicationController
       end
       @tag = params[:last] ? @tags.last : @tags.first
       unless @tag
-        flash[:notice] = t 'module_empty', %{There are no items in the module "%{module}"}, :module => @module.name
+        flash[:notice] = t 'module_empty', %(There are no items in the module "%{module}"), :module => @module.name
         redirect_to named_context_url(@context, :context_context_modules_url, :anchor => "module_#{@module.id}")
         return
       end
@@ -400,7 +400,7 @@ class ContextModulesController < ApplicationController
 
       if is_child_course || is_master_course
         tag_ids = GuardRail.activate(:secondary) do
-          tag_scope = @context.module_items_visible_to(@current_user).where(:content_type => %w{Assignment Attachment DiscussionTopic Quizzes::Quiz WikiPage})
+          tag_scope = @context.module_items_visible_to(@current_user).where(:content_type => %w[Assignment Attachment DiscussionTopic Quizzes::Quiz WikiPage])
           tag_scope = tag_scope.where(:id => params[:tag_id]) if params[:tag_id]
           tag_scope.pluck(:id)
         end
@@ -647,7 +647,7 @@ class ContextModulesController < ApplicationController
     @tag = @context.context_module_tags.not_deleted.find(params[:id])
     if authorized_action(@tag.context_module, @current_user, :update)
       @tag.title = params[:content_tag][:title] if params[:content_tag] && params[:content_tag][:title]
-      @tag.url = params[:content_tag][:url] if %w(ExternalUrl ContextExternalTool).include?(@tag.content_type) && params[:content_tag] && params[:content_tag][:url]
+      @tag.url = params[:content_tag][:url] if %w[ExternalUrl ContextExternalTool].include?(@tag.content_type) && params[:content_tag] && params[:content_tag][:url]
       @tag.indent = params[:content_tag][:indent] if params[:content_tag] && params[:content_tag][:indent]
       @tag.new_tab = params[:content_tag][:new_tab] if params[:content_tag] && params[:content_tag][:new_tab]
 

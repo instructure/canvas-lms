@@ -78,7 +78,7 @@ describe ArgumentView do
   end
 
   context "with types, enums, description" do
-    let(:view) { ArgumentView.new %{arg [Optional, String, "val1"|"val2"] argument} }
+    let(:view) { ArgumentView.new %(arg [Optional, String, "val1"|"val2"] argument) }
 
     it "has enums" do
       expect(view.enums).to eq ["val1", "val2"]
@@ -94,7 +94,7 @@ describe ArgumentView do
   end
 
   context "with optional arg" do
-    let(:view) { ArgumentView.new %{arg [String]} }
+    let(:view) { ArgumentView.new %(arg [String]) }
 
     it "is optional" do
       expect(view.optional?).to be_truthy
@@ -102,7 +102,7 @@ describe ArgumentView do
   end
 
   context "with required arg" do
-    let(:view) { ArgumentView.new %{arg [Required, String]} }
+    let(:view) { ArgumentView.new %(arg [Required, String]) }
 
     it "is required" do
       expect(view.required?).to be_truthy

@@ -19,7 +19,7 @@
 #
 
 module GoogleDocsPreview
-  PREVIEWABLE_TYPES = %w{
+  PREVIEWABLE_TYPES = %w[
     application/vnd.openxmlformats-officedocument.wordprocessingml.template
     application/vnd.oasis.opendocument.spreadsheet
     application/vnd.sun.xml.writer
@@ -43,7 +43,7 @@ module GoogleDocsPreview
     application/postscript
     application/pdf
     application/vnd.ms-powerpoint
-  }.freeze
+  ].freeze
 
   def self.previewable?(account, attachment)
     account&.service_enabled?(:google_docs_previews) &&

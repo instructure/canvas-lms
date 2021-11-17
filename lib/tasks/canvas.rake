@@ -217,7 +217,7 @@ unless $canvas_tasks_loaded
     block.call(servers)
   end
 
-  %w{db:pending_migrations db:skipped_migrations db:migrate:predeploy db:migrate:tagged}.each do |task_name|
+  %w[db:pending_migrations db:skipped_migrations db:migrate:predeploy db:migrate:tagged].each do |task_name|
     Switchman::Rake.shardify_task(task_name, categories: -> { Shard.categories })
   end
 

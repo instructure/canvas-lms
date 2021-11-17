@@ -22,7 +22,7 @@ module Api::V1::RubricAssociation
   include Api::V1::Json
 
   API_ALLOWED_RUBRIC_ASSOCIATION_OUTPUT_FIELDS = {
-    only: %w(
+    only: %w[
       id
       rubric_id
       association_type
@@ -33,7 +33,7 @@ module Api::V1::RubricAssociation
       hide_score_total
       hide_points
       hide_outcome_results
-    )
+    ]
   }.freeze
 
   def rubric_associations_json(rubric_associations, user, session, opts = {})

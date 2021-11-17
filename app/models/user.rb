@@ -566,7 +566,7 @@ class User < ActiveRecord::Base
   #   Through account_users
   #      User -> AccountUser -> Account
   def self.calculate_account_associations(user, data, account_chain_cache)
-    return [] if %w{creation_pending deleted}.include?(user.workflow_state) || user.fake_student?
+    return [] if %w[creation_pending deleted].include?(user.workflow_state) || user.fake_student?
 
     enrollments = data[:enrollments][user.id] || []
     sections = enrollments.map { |e| data[:sections][e.course_section_id] }
@@ -2043,8 +2043,8 @@ class User < ActiveRecord::Base
     return @_has_student_enrollment if defined?(@_has_student_enrollment)
 
     @_has_student_enrollment = Rails.cache.fetch_with_batched_keys(['has_student_enrollment', ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
-      self.enrollments.shard(in_region_associated_shards).where(:type => %w{StudentEnrollment StudentViewEnrollment})
-          .where.not(:workflow_state => %w{rejected inactive deleted}).exists?
+      self.enrollments.shard(in_region_associated_shards).where(:type => %w[StudentEnrollment StudentViewEnrollment])
+          .where.not(:workflow_state => %w[rejected inactive deleted]).exists?
     end
   end
 
@@ -2053,8 +2053,8 @@ class User < ActiveRecord::Base
     return @_non_student_enrollment if defined?(@_non_student_enrollment)
 
     @_non_student_enrollment = Rails.cache.fetch_with_batched_keys(['has_non_student_enrollment', ApplicationController.region].cache_key, batch_object: self, batched_keys: :enrollments) do
-      self.enrollments.shard(in_region_associated_shards).where.not(type: %w{StudentEnrollment StudentViewEnrollment ObserverEnrollment})
-          .where.not(workflow_state: %w{rejected inactive deleted}).exists?
+      self.enrollments.shard(in_region_associated_shards).where.not(type: %w[StudentEnrollment StudentViewEnrollment ObserverEnrollment])
+          .where.not(workflow_state: %w[rejected inactive deleted]).exists?
     end
   end
 
@@ -2078,13 +2078,13 @@ class User < ActiveRecord::Base
 
   def participating_student_current_and_concluded_course_ids
     cached_course_ids('student_current_and_concluded') do |enrollments|
-      enrollments.current_and_concluded.not_inactive_by_date_ignoring_access.where(type: %w{StudentEnrollment StudentViewEnrollment})
+      enrollments.current_and_concluded.not_inactive_by_date_ignoring_access.where(type: %w[StudentEnrollment StudentViewEnrollment])
     end
   end
 
   def participating_student_course_ids
     cached_course_ids('participating_student') do |enrollments|
-      enrollments.current.active_by_date.where(type: %w{StudentEnrollment StudentViewEnrollment})
+      enrollments.current.active_by_date.where(type: %w[StudentEnrollment StudentViewEnrollment])
     end
   end
 
@@ -2418,7 +2418,7 @@ class User < ActiveRecord::Base
 
     Rails.cache.fetch([self, include_concluded_codes, 'conversation_context_codes4'].cache_key, :expires_in => 1.day) do
       Shard.birth.activate do
-        associations = %w{courses concluded_courses current_groups}
+        associations = %w[courses concluded_courses current_groups]
         associations.slice!(1) unless include_concluded_codes
 
         associations.inject([]) do |result, association|
@@ -2769,7 +2769,7 @@ class User < ActiveRecord::Base
       if type != 'StudentEnrollment' && course.grants_right?(self, session, :manage_admin_users)
         return true
       end
-      if %w{StudentEnrollment ObserverEnrollment}.include?(type) && course.grants_right?(self, session, :manage_students)
+      if %w[StudentEnrollment ObserverEnrollment].include?(type) && course.grants_right?(self, session, :manage_students)
         return true
       end
     end
@@ -2993,7 +2993,7 @@ class User < ActiveRecord::Base
     # Convert the string "StudentEnrollment" to "student".
     # Return only valid matching types. Otherwise, nil.
     type = type.to_s.downcase.sub(/(view)?enrollment/, '')
-    %w{student teacher ta observer}.include?(type) ? type : nil
+    %w[student teacher ta observer].include?(type) ? type : nil
   end
 
   def self.preload_shard_associations(users)
