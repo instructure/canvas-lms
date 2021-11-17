@@ -32,7 +32,7 @@ describe Mutations::UpdateOutcomeProficiency do
   let!(:original_record) { outcome_proficiency_model(@account) }
 
   let(:good_query) do
-    <<~GQL
+    <<~QUERY
       id: #{original_record.id}
       proficiencyRatings: [
         {
@@ -42,7 +42,7 @@ describe Mutations::UpdateOutcomeProficiency do
           points: 1.0
         }
       ]
-    GQL
+    QUERY
   end
 
   def execute_with_input(update_input, user_executing: @admin)

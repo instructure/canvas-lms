@@ -202,7 +202,7 @@ class GradeCalculator
   def create_course_grade_live_event(old_score, score)
     return if LIVE_EVENT_FIELDS.all? { |f| old_score.send(f) == score.send(f) }
 
-    old_score_values = LIVE_EVENT_FIELDS.index_with { |f| old_score.send(f) }
+    old_score_values = LIVE_EVENT_FIELDS.map { |f| [f, old_score.send(f)] }.to_h
     Canvas::LiveEvents.course_grade_change(score, old_score_values, old_score.enrollment)
   end
 
@@ -222,7 +222,7 @@ class GradeCalculator
   end
 
   def compute_scores_and_group_sums_for_batch(user_ids)
-    user_ids.filter_map do |user_id|
+    user_ids.map do |user_id|
       next unless enrollments_by_user[user_id].first
 
       group_sums = compute_group_sums_for_user(user_id)
@@ -234,7 +234,7 @@ class GradeCalculator
         final: scores[:final],
         final_groups: group_sums[:final].index_by { |group| group[:id] }
       }
-    end
+    end.compact
   end
 
   def assignment_visible_to_student?(assignment_id, user_id)
@@ -253,14 +253,14 @@ class GradeCalculator
   end
 
   def compute_scores_for_user(user_id, group_sums)
-    scores = if compute_course_scores_from_weighted_grading_periods?
-               calculate_total_from_weighted_grading_periods(user_id)
-             else
-               {
-                 current: calculate_total_from_group_scores(group_sums[:current]),
-                 final: calculate_total_from_group_scores(group_sums[:final])
-               }
-             end
+    if compute_course_scores_from_weighted_grading_periods?
+      scores = calculate_total_from_weighted_grading_periods(user_id)
+    else
+      scores = {
+        current: calculate_total_from_group_scores(group_sums[:current]),
+        final: calculate_total_from_group_scores(group_sums[:final])
+      }
+    end
     Rails.logger.debug "GRADES: calculated: #{scores.inspect}"
     scores
   end
@@ -325,11 +325,11 @@ class GradeCalculator
   def compute_course_scores_from_weighted_grading_periods?
     return @compute_from_weighted_periods if @compute_from_weighted_periods.present?
 
-    @compute_from_weighted_periods = if @grading_period || grading_periods_for_course.empty?
-                                       false
-                                     else
-                                       grading_periods_for_course.first.grading_period_group.weighted?
-                                     end
+    if @grading_period || grading_periods_for_course.empty?
+      @compute_from_weighted_periods = false
+    else
+      @compute_from_weighted_periods = grading_periods_for_course.first.grading_period_group.weighted?
+    end
   end
 
   def grading_periods_for_course
@@ -421,8 +421,8 @@ class GradeCalculator
 
   def group_score_rows
     enrollments_by_user.keys.map do |user_id|
-      current_group_scores = @current_groups[user_id].index_by { |group| group[:global_id] }
-      final_group_scores = @final_groups[user_id].index_by { |group| group[:global_id] }
+      current_group_scores = @current_groups[user_id].map { |group| [group[:global_id], group] }.to_h
+      final_group_scores = @final_groups[user_id].map { |group| [group[:global_id], group] }.to_h
       @groups.map do |group|
         agid = group.global_id
         current = current_group_scores[agid]
@@ -576,7 +576,7 @@ class GradeCalculator
                       end
 
     # Update existing course and grading period Scores or create them if needed.
-    Score.connection.execute(<<~SQL.squish)
+    Score.connection.execute("
       INSERT INTO #{Score.quoted_table_name}
           (
             enrollment_id, grading_period_id,
@@ -600,9 +600,9 @@ class GradeCalculator
           #{columns_to_insert_or_update[:update_values].join(', ')},
           updated_at = excluded.updated_at,
           root_account_id = #{@course.root_account_id},
-          /* if workflow_state was previously deleted for some reason, update it to active */
+          -- if workflow_state was previously deleted for some reason, update it to active
           workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
-    SQL
+    ")
   rescue ActiveRecord::Deadlocked => e
     Canvas::Errors.capture_exception(:grade_calcuator, e, :warn)
     raise Delayed::RetriableError, "Deadlock in upserting course or grading period scores"
@@ -763,8 +763,9 @@ class GradeCalculator
     end
 
     assignments_by_group_id = visible_assignments.group_by(&:assignment_group_id)
-    submissions_by_assignment_id =
-      submissions.index_by(&:assignment_id)
+    submissions_by_assignment_id = Hash[
+      submissions.map { |s| [s.assignment_id, s] }
+    ]
 
     @groups.map do |group|
       assignments = assignments_by_group_id[group.id] || []
@@ -802,7 +803,7 @@ class GradeCalculator
       Rails.logger.debug "GRADES: calculating... submissions=#{logged_submissions.inspect}"
 
       kept = drop_assignments(group_submissions, group.rules_hash)
-      dropped_submissions = (group_submissions - kept).filter_map { |s| s[:submission]&.id }
+      dropped_submissions = (group_submissions - kept).map { |s| s[:submission]&.id }.compact
 
       score, possible = kept.reduce([0.0, 0.0]) { |(s_sum, p_sum), s|
         [s_sum.to_d + s[:score].to_d, p_sum.to_d + s[:total].to_d]

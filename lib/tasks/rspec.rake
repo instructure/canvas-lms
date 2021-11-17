@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Don't load rspec if running "rake gems:*"
-unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
+unless Rails.env.production? || ARGV.any? { |a| a =~ /\Agems/ }
 
   begin
     require 'rspec/core/rake_task'
@@ -17,14 +17,14 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
               require File.expand_path(File.dirname(__FILE__) + "/../../config/environment")
 
               # ... otherwise, do this:
-              raise <<~TEXT
+              raise <<~MSG
 
                 #{"*" * 80}
                 *  You are trying to run an rspec rake task defined in
                 *  #{__FILE__},
                 *  but rspec can not be found in vendor/gems or system gems.
                 #{"*" * 80}
-              TEXT
+              MSG
             end
           end
         end
@@ -65,7 +65,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
         pid = Process.fork
         unless pid
           child = true
-          t.send(spec_files_attr, spec_files.filter_map { |x| x[j] })
+          t.send(spec_files_attr, spec_files.map { |x| x[j] }.compact)
           break
         end
         processes << pid
@@ -157,7 +157,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
           fixtures_dir = ENV['FIXTURES_DIR'] ? File.join(base_dir, ENV['FIXTURES_DIR']) : base_dir
 
           require 'active_record/fixtures'
-          (ENV['FIXTURES'] ? ENV['FIXTURES'].split(",").map { |f| File.join(fixtures_dir, f) } : Dir.glob(File.join(fixtures_dir, '*.{yml,csv}'))).each do |fixture_file|
+          (ENV['FIXTURES'] ? ENV['FIXTURES'].split(/,/).map { |f| File.join(fixtures_dir, f) } : Dir.glob(File.join(fixtures_dir, '*.{yml,csv}'))).each do |fixture_file|
             Fixtures.create_fixtures(File.dirname(fixture_file), File.basename(fixture_file, '.*'))
           end
         end
@@ -195,7 +195,7 @@ unless Rails.env.production? || ARGV.any? { |a| a.start_with?('gems') }
       desc "check if spec server is running"
       task :status do
         if File.exist?(daemonized_server_pid)
-          $stderr.puts %Q{spec_server is running (PID: #{File.read(daemonized_server_pid).delete("\n")})}
+          $stderr.puts %Q{spec_server is running (PID: #{File.read(daemonized_server_pid).gsub("\n", "")})}
         else
           $stderr.puts "No server running."
         end

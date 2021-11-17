@@ -47,7 +47,7 @@ module AddressBook
       end
 
       def cached?(user)
-        @entries.key?(key(user))
+        @entries.has_key?(key(user))
       end
 
       def fetch(user)
@@ -89,7 +89,7 @@ module AddressBook
       @cache.null(uncached)
       # implementation is responsible for storing known users into cache
       super(uncached, options)
-      users.filter_map { |user| @cache.fetch(user) }
+      users.map { |user| @cache.fetch(user) }.compact
     end
   end
 end

@@ -59,10 +59,9 @@ module Audits
 
     def configured?
       strategy = backend_strategy
-      case strategy
-      when :cassandra
+      if strategy == :cassandra
         return CanvasCassandra::DatabaseBuilder.configured?('auditors')
-      when :active_record
+      elsif strategy == :active_record
         return Rails.configuration.database_configuration[Rails.env].present?
       end
 

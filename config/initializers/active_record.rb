@@ -114,8 +114,8 @@ class ActiveRecord::Base
   def self.find_all_by_asset_string(strings, asset_types = nil)
     assets = strings.is_a?(Hash) ? strings : parse_asset_string_list(strings)
 
-    assets.filter_map do |klass, ids|
-      next if asset_types&.exclude?(klass)
+    assets.map do |klass, ids|
+      next if asset_types && asset_types.exclude?(klass)
 
       begin
         klass = klass.constantize
@@ -125,7 +125,7 @@ class ActiveRecord::Base
       next unless klass < ActiveRecord::Base
 
       klass.where(id: ids).to_a
-    end.flatten
+    end.compact.flatten
   end
 
   # takes an asset string list, like "course_5,user_7,course_9" and turns it into an
@@ -198,7 +198,7 @@ class ActiveRecord::Base
       return
     end
 
-    asset_string_backcompat_module.class_eval <<~RUBY, __FILE__, __LINE__ + 1
+    asset_string_backcompat_module.class_eval <<-CODE, __FILE__, __LINE__ + 1
       def #{association_version_name}_#{method}
         res = super
         if !res && #{string_version_name}.present?
@@ -209,7 +209,7 @@ class ActiveRecord::Base
         end
         res
       end
-    RUBY
+    CODE
   end
 
   def export_columns
@@ -436,9 +436,9 @@ class ActiveRecord::Base
 
     return result if result.keys.first.is_a?(Date)
 
-    result.transform_keys do |date|
-      Time.zone.parse(date).to_date
-    end
+    Hash[result.map { |date, count|
+      [Time.zone.parse(date).to_date, count]
+    }]
   end
 
   def self.rank_sql(ary, col)
@@ -461,7 +461,7 @@ class ActiveRecord::Base
     result = if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
                sql = +''
                sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if include_nil
-               sql << <<~SQL.squish
+               sql << <<~SQL
                  WITH RECURSIVE t AS (
                    SELECT MIN(#{column}) AS #{column} FROM #{quoted_table_name}
                    UNION ALL
@@ -551,7 +551,7 @@ class ActiveRecord::Base
       specific_classes = specifics.map(&:last).sort
       validates reflection.foreign_type, inclusion: { in: specific_classes }, allow_nil: true
 
-      @polymorph_module.class_eval <<~RUBY, __FILE__, __LINE__ + 1
+      @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
         def #{reflection.name}=(record)
           if record && [#{specific_classes.join(', ')}].none? { |klass| record.is_a?(klass) }
             message = "one of #{specific_classes.join(', ')} expected, got \#{record.class}"
@@ -577,21 +577,21 @@ class ActiveRecord::Base
 
       correct_type = "#{reflection.foreign_type} && self.class.send(:compute_type, #{reflection.foreign_type}) <= #{class_name}"
 
-      @polymorph_module.class_eval <<~RUBY, __FILE__, __LINE__ + 1
-        def #{prefix}#{name}
-          #{reflection.name} if #{correct_type}
-        end
+      @polymorph_module.class_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def #{prefix}#{name}
+        #{reflection.name} if #{correct_type}
+      end
 
-        def #{prefix}#{name}=(record)
-          # we don't want to unset it if it's currently some other type, i.e.
-          # foo.bar = Bar.new
-          # foo.baz = nil
-          # foo.bar.should_not be_nil
-          return if record.nil? && !(#{correct_type})
-          association(:#{prefix}#{name}).send(:raise_on_type_mismatch!, record) if record
+      def #{prefix}#{name}=(record)
+        # we don't want to unset it if it's currently some other type, i.e.
+        # foo.bar = Bar.new
+        # foo.baz = nil
+        # foo.bar.should_not be_nil
+        return if record.nil? && !(#{correct_type})
+        association(:#{prefix}#{name}).send(:raise_on_type_mismatch!, record) if record
 
-          self.#{reflection.name} = record
-        end
+        self.#{reflection.name} = record
+      end
 
       RUBY
     end
@@ -762,10 +762,7 @@ module UsefulFindInBatches
     end
 
     kwargs.delete(:error_on_ignore)
-    activate { |r|
-      r.send("in_batches_with_#{strategy}", start: start, finish: finish, **kwargs, &block)
-      nil
-    }
+    activate { |r| r.send("in_batches_with_#{strategy}", start: start, finish: finish, **kwargs, &block); nil }
   end
 
   def in_batches_needs_temp_table?
@@ -967,7 +964,7 @@ module UsefulFindInBatches
       relation = apply_limits(self, start, finish)
       sql = relation.to_sql
       table = "#{table_name}_in_batches_temp_table_#{sql.hash.abs.to_s(36)}"
-      table = table[-63..] if table.length > 63
+      table = table[-63..-1] if table.length > 63
 
       remaining = connection.update("CREATE TEMPORARY TABLE #{table} AS #{sql}")
 
@@ -1296,7 +1293,7 @@ module UpdateAndDeleteWithJoins
     end
     tables = []
     join_conditions = []
-    joins_sql.strip.split('INNER JOIN')[1..].each do |join|
+    joins_sql.strip.split('INNER JOIN')[1..-1].each do |join|
       # this could probably be improved
       raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z0-9'"_.]+(?:(?:\s+[aA][sS])?\s+[a-zA-Z0-9'"_]+)?)\s+ON\s+(.*)/m
 
@@ -1424,7 +1421,7 @@ ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
     keys = records.first.keys
     quoted_keys = keys.map { |k| quote_column_name(k) }.join(', ')
     records.each do |record|
-      execute <<~SQL.squish
+      execute <<~SQL
         INSERT INTO #{quote_table_name(table_name)}
           (#{quoted_keys})
         VALUES
@@ -1480,7 +1477,7 @@ end
 
 class ActiveRecord::Migration
   # at least one of these tags is required
-  DEPLOY_TAGS = [:predeploy, :postdeploy].freeze
+  DEPLOY_TAGS = [:predeploy, :postdeploy]
 
   class << self
     def is_postgres?
@@ -1494,7 +1491,7 @@ class ActiveRecord::Migration
 
   def connection
     if self.class.respond_to?(:connection)
-      self.class.connection
+      return self.class.connection
     else
       @connection || ActiveRecord::Base.connection
     end
@@ -1566,7 +1563,7 @@ module Migrator
         raise("Revert not confirmed")
       end
 
-      $confirmed_migrate_down = true if $1.casecmp?('a')
+      $confirmed_migrate_down = true if $1.downcase == 'a'
     end
 
     super
@@ -1661,7 +1658,7 @@ module ExistenceInversions
     # these methods purposely pull the flag from the incoming args,
     # and assign to the outgoing args, not relying on it getting
     # passed through. and sometimes they even modify args.
-    class_eval <<~RUBY, __FILE__, __LINE__ + 1
+    class_eval <<-RUBY, __FILE__, __LINE__ + 1
       def invert_add_#{type}(args)
         orig_args = args.dup
         result = super
@@ -1760,7 +1757,7 @@ module SkipTouchCallbacks
     end
 
     def touch_callbacks_skipped?(name)
-      @skip_touch_callbacks&.include?(name) ||
+      (@skip_touch_callbacks && @skip_touch_callbacks.include?(name)) ||
         (self.superclass < ActiveRecord::Base && self.superclass.touch_callbacks_skipped?(name))
     end
   end
@@ -1804,12 +1801,12 @@ ActiveModel::AttributeMutationTracker.prepend(DupArraysInMutationTracker)
 
 module IgnoreOutOfSequenceMigrationDates
   def current_migration_number(dirname)
-    migration_lookup_at(dirname).filter_map do |file|
+    migration_lookup_at(dirname).map do |file|
       digits = File.basename(file).split("_").first
       next if ActiveRecord::Base.timestamped_migrations && digits.length != 14
 
       digits.to_i
-    end.max.to_i
+    end.compact.max.to_i
   end
 end
 # Thor doesn't call `super` in its `inherited` method, so hook in so that we can hook in later :)

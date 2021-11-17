@@ -77,8 +77,7 @@ module GoogleDrive
 
         result = client_execute(:uri => @uri)
 
-        case result.status
-        when 200
+        if result.status == 200
           file_name = file['title']
           name_extension = file_name[/\.([a-z]+$)/, 1]
           file_extension = name_extension || file_extension_from_header(result.headers, entry)
@@ -87,7 +86,7 @@ module GoogleDrive
           file_name += ".#{file_extension}" unless name_extension
           content_type = result.headers['Content-Type'].sub(/; charset=[^;]+/, '')
           return [result, file_name, file_extension, content_type]
-        when 307
+        elsif result.status == 307
           @uri = result.response['Location']
           redirect_limit -= 1
         else
@@ -280,7 +279,8 @@ module GoogleDrive
     def file_extension_from_header(headers, entry)
       file_extension = (entry.extension && !entry.extension.empty? && entry.extension) || 'unknown'
 
-      if headers['content-disposition']&.match(/filename=["']?[^;"'.]+\.(?<file_extension>[^;"']+)["']?/)
+      if headers['content-disposition'] &&
+         headers['content-disposition'].match(/filename=["']?[^;"'.]+\.(?<file_extension>[^;"']+)["']?/)
         file_extension = Regexp.last_match[:file_extension]
       end
 

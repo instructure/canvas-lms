@@ -47,7 +47,7 @@ module SIS
         raise ImportError, "No name given for group #{group_id}." if name.blank?
         # closed and completed are no longer valid states. Leaving these for
         # backwards compatibility. It is not longer a documented status
-        raise ImportError, "Improper status \"#{status}\" for group #{group_id}." unless /\A(available|closed|completed|deleted)/i.match?(status)
+        raise ImportError, "Improper status \"#{status}\" for group #{group_id}." unless status =~ /\A(available|closed|completed|deleted)/i
         return if @batch.skip_deletes? && status =~ /deleted/i
 
         if course_id && account_id
@@ -93,7 +93,7 @@ module SIS
         # no account_id, course_id, or group_category, assign context to root_account
         context ||= @root_account
 
-        if group&.group_memberships&.exists?
+        if group && group.group_memberships.exists?
           unless context.id == group.context_id && context.class.base_class.name == group.context_type
             raise ImportError, "Cannot move group #{group_id} because it has group_memberships." if group.context.is_a?(Course) || context.is_a?(Course)
           end

@@ -37,7 +37,7 @@ class RubricAssessment < ActiveRecord::Base
 
   simply_versioned
 
-  validates :assessment_type, :rubric_id, :artifact_id, :artifact_type, :assessor_id, presence: true
+  validates_presence_of :assessment_type, :rubric_id, :artifact_id, :artifact_type, :assessor_id
 
   before_save :update_artifact_parameters
   before_save :htmlify_rating_comments
@@ -47,7 +47,7 @@ class RubricAssessment < ActiveRecord::Base
   after_save :track_outcomes
 
   def track_outcomes
-    outcome_ids = (self.data || []).filter_map { |r| r[:learning_outcome_id] }.uniq
+    outcome_ids = (self.data || []).map { |r| r[:learning_outcome_id] }.compact.uniq
     peer_review = self.assessment_type == "peer_review"
     provisional_grade = self.artifact_type == "ModeratedGrading::ProvisionalGrade"
     update_outcomes = outcome_ids.present? && !peer_review && !provisional_grade
@@ -105,7 +105,7 @@ class RubricAssessment < ActiveRecord::Base
     end
 
     # attempt
-    if self.artifact.is_a?(Submission)
+    if self.artifact && self.artifact.is_a?(Submission)
       result.attempt = self.artifact.attempt || 1
       result.submitted_at = self.artifact.submitted_at
     else
@@ -217,14 +217,15 @@ class RubricAssessment < ActiveRecord::Base
     }
     can :read
 
-    given { |user, session| self.rubric_association&.grants_right?(user, session, :manage) }
+    given { |user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :manage) }
     can :create and can :read and can :delete
 
-    given { |user, session| self.rubric_association&.grants_right?(user, session, :view_rubric_assessments) }
+    given { |user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :view_rubric_assessments) }
     can :read
 
     given { |user, session|
-      self.rubric_association&.grants_right?(user, session, :manage) &&
+      self.rubric_association &&
+        self.rubric_association.grants_right?(user, session, :manage) &&
         (self.rubric_association.association_object.context.grants_right?(self.assessor, :manage_rubrics) rescue false)
     }
     can :update

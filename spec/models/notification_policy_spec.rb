@@ -29,7 +29,7 @@ describe NotificationPolicy do
       @student = factory_with_protected_attributes(User, :name => "student", :workflow_state => "registered")
       e = @course.enroll_student(@student)
       e.accept!
-      Notification.all.each(&:destroy)
+      Notification.all.each { |n| n.destroy }
       Notification.reset_cache!
       @notif = Notification.create!(:name => "Assignment Created", :subject => "Test", :category => 'TestNever')
     end
@@ -223,8 +223,7 @@ describe NotificationPolicy do
       n2 = notification_policy_model(trifecta_opts.merge(:notification => notify2))
       params = { :category => 'multi_category', :channel_id => @communication_channel.id, :frequency => Notification::FREQ_IMMEDIATELY }
       NotificationPolicy.setup_for(@user, params)
-      n1.reload
-      n2.reload
+      n1.reload; n2.reload
       expect(n1.frequency).to eq Notification::FREQ_IMMEDIATELY
       expect(n2.frequency).to eq Notification::FREQ_IMMEDIATELY
     end

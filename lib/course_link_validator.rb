@@ -30,7 +30,7 @@ class CourseLinkValidator
   # creates a new validation job
   def self.queue_course(course)
     progress = current_progress(course)
-    return progress if progress&.pending?
+    return progress if progress && progress.pending?
 
     progress ||= Progress.new(:tag => TAG, :context => course)
     progress.reset!
@@ -217,15 +217,15 @@ class CourseLinkValidator
     unless (result = self.visited_urls[url])
       begin
         if ImportedHtmlConverter.relative_url?(url) || (self.domain_regex && url.match(self.domain_regex))
-          result = if valid_route?(url)
-                     if url.match(/\/courses\/(\d+)/) && self.course.id.to_s != $1
-                       :course_mismatch
-                     else
-                       check_object_status(url)
-                     end
-                   else
-                     :unreachable
-                   end
+          if valid_route?(url)
+            if url.match(/\/courses\/(\d+)/) && self.course.id.to_s != $1
+              result = :course_mismatch
+            else
+              result = check_object_status(url)
+            end
+          else
+            result = :unreachable
+          end
         else
           unless reachable_url?(url)
             result = :unreachable
@@ -302,7 +302,7 @@ class CourseLinkValidator
       # flickr does a redirect to this file when a photo is deleted/not found;
       # treat this as a broken image instead of following the redirect
       url = response['Location']
-      raise RuntimeError("photo unavailable") if url&.match?(@unavailable_photo_redirect_pattern)
+      raise RuntimeError("photo unavailable") if url =~ @unavailable_photo_redirect_pattern
     end
 
     begin

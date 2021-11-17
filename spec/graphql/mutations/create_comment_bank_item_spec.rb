@@ -51,10 +51,10 @@ describe Mutations::CreateCommentBankItem do
   end
 
   let(:valid_query) do
-    <<~GQL
+    <<~QUERY
       courseId: #{@course.id}
       comment: "this is my assignment comment"
-    GQL
+    QUERY
   end
 
   it "creates a comment bank item for the current_user" do
@@ -69,10 +69,10 @@ describe Mutations::CreateCommentBankItem do
   end
 
   it "allows relay id for course_id" do
-    query = <<~GQL
+    query = <<~QUERY
       courseId: #{GraphQLHelpers.relay_or_legacy_id_prepare_func('Course').call(@course.id.to_s)},
       comment: "assignment comment"
-    GQL
+    QUERY
     courseId = execute_with_input(query).dig('data', 'createCommentBankItem', 'commentBankItem', 'courseId')
     expect(courseId).to eq @course.id.to_s
   end
@@ -85,10 +85,10 @@ describe Mutations::CreateCommentBankItem do
     end
 
     it "invalid course id" do
-      query = <<~GQL
+      query = <<~QUERY
         courseId: 0,
         comment: "comment"
-      GQL
+      QUERY
       result = execute_with_input(query)
       expect_error(result, 'Course not found')
     end
@@ -100,10 +100,10 @@ describe Mutations::CreateCommentBankItem do
     end
 
     it "invalid permissions" do
-      query = <<~GQL
+      query = <<~QUERY
         courseId: #{@course.id},
         comment: "comment"
-      GQL
+      QUERY
       result = execute_with_input(query, user_executing: @student)
       expect_error(result, 'not found')
     end

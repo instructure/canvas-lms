@@ -33,7 +33,7 @@ class Quizzes::QuizStatistics < ActiveRecord::Base
 
   REPORTS = %w[student_analysis item_analysis].freeze
 
-  validates :report_type, inclusion: { :in => REPORTS }
+  validates_inclusion_of :report_type, :in => REPORTS
 
   after_initialize do
     self.includes_all_versions ||= false

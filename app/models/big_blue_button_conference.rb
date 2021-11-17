@@ -128,8 +128,8 @@ class BigBlueButtonConference < WebConference
       # the admin passwords in the ui in case moderators need them for any
       # admin-specific functionality within the BBB ui (or we could provide
       # ui for them to specify the password/key)
-      settings[:user_key] = Array.new(8) { chars.sample }.join
-      settings[:admin_key] = Array.new(8) { chars.sample }.join until settings[:admin_key] && settings[:admin_key] != settings[:user_key]
+      settings[:user_key] = 8.times.map { chars[chars.size * rand] }.join
+      settings[:admin_key] = 8.times.map { chars[chars.size * rand] }.join until settings[:admin_key] && settings[:admin_key] != settings[:user_key]
     end
     settings[:record] &&= config[:recording_enabled]
     settings[:domain] ||= config[:domain] # save the domain
@@ -235,7 +235,7 @@ class BigBlueButtonConference < WebConference
     filtered_conferences = conferences.select { |c| c.conference_key && c.settings[:record] }
     return unless filtered_conferences.any?
 
-    fallback_conferences, current_conferences = filtered_conferences.partition(&:use_fallback_config?)
+    fallback_conferences, current_conferences = filtered_conferences.partition { |c| c.use_fallback_config? }
     fetch_and_preload_recordings(fallback_conferences, use_fallback_config: true) if fallback_conferences.any?
     fetch_and_preload_recordings(current_conferences, use_fallback_config: false) if current_conferences.any?
   end

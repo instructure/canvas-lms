@@ -22,11 +22,11 @@ module Qti
     def initialize(opts)
       super(opts)
       @type = opts[:custom_type]
-      @question[:question_type] = if @type == 'multiple_dropdowns_question' || @type == 'inline_choice'
-                                    'multiple_dropdowns_question'
-                                  else
-                                    'fill_in_multiple_blanks_question'
-                                  end
+      if @type == 'multiple_dropdowns_question' || @type == 'inline_choice'
+        @question[:question_type] = 'multiple_dropdowns_question'
+      else
+        @question[:question_type] = 'fill_in_multiple_blanks_question'
+      end
     end
 
     def parse_question_data
@@ -54,11 +54,11 @@ module Qti
       create_xml_doc
       body = ""
       @doc.at_css('itemBody').children.each do |child|
-        body += if child.name == 'textEntryInteraction'
-                  " [#{child['responseIdentifier']}] "
-                else
-                  child.text.gsub(']]>', '').gsub('<div></div>', '').strip
-                end
+        if child.name == 'textEntryInteraction'
+          body += " [#{child['responseIdentifier']}] "
+        else
+          body += child.text.gsub(']]>', '').gsub('<div></div>', '').strip
+        end
       end
       @question[:question_text] = body
 
@@ -127,8 +127,7 @@ module Qti
 
     def recursively_clean_inline_body_and_get_answers(node, answer_hash)
       node.children.each do |child|
-        case child.name
-        when 'inlineChoiceInteraction'
+        if child.name == 'inlineChoiceInteraction'
           response_id = child['responseIdentifier']
           answer_hash[response_id] = {}
           child.search('inlineChoice').each do |choice|
@@ -142,7 +141,7 @@ module Qti
             answer_hash[response_id][choice_id] = answer
           end
           child.replace(Nokogiri::XML::Text.new("[#{response_id}]", @doc))
-        when 'text'
+        elsif child.name == 'text'
           child.content = child.text.gsub(']]>', '').gsub('<div></div>', '')
         else
           recursively_clean_inline_body_and_get_answers(child, answer_hash)
@@ -157,10 +156,9 @@ module Qti
           next if node.name == 'text'
 
           text = ''
-          case node.name
-          when 'div'
+          if node.name == 'div'
             text = sanitize_html_string(node.text, true)
-          when 'extendedTextInteraction'
+          elsif node.name == 'extendedTextInteraction'
             id = node['responseIdentifier']
             text = " [#{id}] "
           end

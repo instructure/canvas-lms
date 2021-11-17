@@ -123,7 +123,7 @@ module SeleniumDriverSetup
     end
 
     def shutdown
-      server&.shutdown
+      server.shutdown if server
       if driver
         driver.close
         driver.quit
@@ -410,7 +410,7 @@ module SeleniumDriverSetup
 
       puts "found available port: #{app_host_and_port}"
     ensure
-      s&.close()
+      s.close() if s
     end
 
     def start_webserver
@@ -429,7 +429,7 @@ module SeleniumDriverSetup
       end.to_app
     end
 
-    ASSET_PATH = %r{\A/(dist|fonts|images|javascripts)/.*\.[a-z0-9]+\z}.freeze
+    ASSET_PATH = %r{\A/(dist|fonts|images|javascripts)/.*\.[a-z0-9]+\z}
     def asset_request?(url)
       url =~ ASSET_PATH
     end

@@ -52,10 +52,7 @@ def api_call(method, path, params, body_params = {}, headers = {}, opts = {})
 
     body = response.body
     if body.respond_to?(:call)
-      StringIO.new.tap { |sio|
-        body.call(nil, sio)
-        body = sio.string
-      }
+      StringIO.new.tap { |sio| body.call(nil, sio); body = sio.string }
     end
     # Check that the body doesn't have any duplicate keys. this can happen if
     # you add both a string and a symbol to the hash before calling to_json on
@@ -90,7 +87,9 @@ $spec_api_tokens = {}
 def access_token_for_user(user)
   enable_developer_key_account_binding!(DeveloperKey.default)
   token = $spec_api_tokens[user]
-  token ||= $spec_api_tokens[user] = user.access_tokens.create!(:purpose => "test").full_token
+  unless token
+    token = $spec_api_tokens[user] = user.access_tokens.create!(:purpose => "test").full_token
+  end
   token
 end
 
@@ -115,7 +114,7 @@ def raw_api_call(method, path, params, body_params = {}, headers = {}, opts = {}
         allow_any_instantiation_of(p).to receive(:works_for_account?).and_return(true)
       end
     end
-    allow(LoadAccount).to receive(:default_domain_root_account).and_return(opts[:domain_root_account]) if opts.key?(:domain_root_account)
+    allow(LoadAccount).to receive(:default_domain_root_account).and_return(opts[:domain_root_account]) if opts.has_key?(:domain_root_account)
     __send__(method, path, headers: headers, params: params.except(*route_params.keys).merge(body_params))
   end
 end

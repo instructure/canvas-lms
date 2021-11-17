@@ -489,12 +489,12 @@ describe AppointmentGroup do
 
     ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :new_appointments => [['2012-01-01 17:00:00', '2012-01-01 18:00:00']])
     appt = ag.appointments.first
-    participants = Array.new(3) do
+    participants = 3.times.map {
       student_in_course(:course => @course, :active_all => true)
       participant = appt.reserve_for(@user, @teacher)
       expect(participant).to be_locked
       participant
-    end
+    }
 
     ag.destroy(@teacher)
     expect(appt.reload).to be_deleted
@@ -573,7 +573,7 @@ describe AppointmentGroup do
     end
 
     it "respects the current_only option" do
-      @ag.update(:new_appointments => [[(Time.zone.now - 2.hours).to_s, (Time.zone.now - 1.hour).to_s]])
+      @ag.update(:new_appointments => [[(Time.zone.now - 2.hour).to_s, (Time.zone.now - 1.hour).to_s]])
       expect(@ag.available_slots(current_only: true)).to eql 4
     end
   end

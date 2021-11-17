@@ -38,7 +38,7 @@ module Services
           return false
         end
       end
-      true
+      return true
     end
   end
 end

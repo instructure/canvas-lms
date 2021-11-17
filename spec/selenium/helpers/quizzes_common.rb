@@ -282,8 +282,7 @@ module QuizzesCommon
     wait_for_ajaximations
     tab = f("a[href='#questions_tab']")
     keep_trying_until do
-      tab.click
-      true
+      tab.click; true
     end
   end
 

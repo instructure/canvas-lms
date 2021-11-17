@@ -105,8 +105,7 @@ PactConfig::Consumers::ALL.each do |consumer|
           # Submit an online_upload for course 2, and an online_text_entry for course 3
           submission_type = test_submission_types[i]
           submission =
-            case submission_type
-            when 'online_upload'
+            if submission_type == 'online_upload'
               assignment.submit_homework(
                 mstudent, {
                   submission_type: 'online_upload',
@@ -115,7 +114,7 @@ PactConfig::Consumers::ALL.each do |consumer|
                   ]
                 }
               )
-            when 'online_url'
+            elsif submission_type == 'online_url'
               assignment.submit_homework(mstudent, { submission_type: "online_url", url: "someurl" })
             else
               # assume online_text_entry by default

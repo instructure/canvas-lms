@@ -39,7 +39,7 @@ module Lti
       DesignerEnrollment => LtiOutbound::LTIRoles::Context::CONTENT_DEVELOPER,
       ObserverEnrollment => LtiOutbound::LTIRoles::Context::OBSERVER,
       StudentViewEnrollment => LtiOutbound::LTIRoles::Context::LEARNER
-    }.freeze
+    }
 
     LIS_V2_ROLE_MAP = {
       'user' => 'http://purl.imsglobal.org/vocab/lis/v2/system/person#User',
@@ -56,7 +56,7 @@ module Lti
       ObserverEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor',
       StudentViewEnrollment => 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner',
       Course => 'http://purl.imsglobal.org/vocab/lis/v2/course#CourseOffering'
-    }.freeze
+    }
 
     LIS_V2_ROLE_NONE = 'http://purl.imsglobal.org/vocab/lis/v2/person#None'
 
@@ -215,7 +215,7 @@ module Lti
     end
 
     def previous_lti_context_ids
-      previous_course_ids_and_context_ids.filter_map(&:last).join(',')
+      previous_course_ids_and_context_ids.map(&:last).compact.join(',')
     end
 
     def previous_course_ids
@@ -231,7 +231,7 @@ module Lti
     end
 
     def section_sis_ids
-      course_sections.filter_map(&:sis_source_id).uniq.sort.join(',')
+      course_sections.map(&:sis_source_id).compact.uniq.sort.join(',')
     end
 
     def sis_email
@@ -264,8 +264,7 @@ module Lti
         # this course. From there we get the unique list of courses, ordering by
         # which has the migration with the latest timestamp.
         results = Course.connection.with_statement_timeout do
-          Course.from(<<~SQL.squish)
-            (WITH RECURSIVE all_contexts AS (
+          Course.from("(WITH RECURSIVE all_contexts AS (
               SELECT context_id, source_course_id
               FROM #{ContentMigration.quoted_table_name}
               WHERE context_id=#{@context.id}
@@ -283,8 +282,7 @@ module Lti
               SELECT x.context_id
               FROM all_contexts x))
             ORDER BY courses.lti_context_id, ct.finished_at DESC
-            ) as courses
-          SQL
+            ) as courses")
                 .where.not(lti_context_id: nil).order(finished_at: :desc).limit(limit + 1).pluck(:lti_context_id)
         end
 

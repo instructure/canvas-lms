@@ -31,10 +31,7 @@ if Qti.migration_executable
         expect(matches.include?(a[:match_id])).to be_truthy
       end
       # compare everything else without the ids
-      hash[:answers].each { |a|
-        a.delete(:id)
-        a.delete(:match_id)
-      }
+      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq BB9Expected::MATCHING
     end
@@ -49,10 +46,7 @@ if Qti.migration_executable
         expect(matches.include?(a[:match_id])).to be_truthy
       end
       # compare everything else without the ids
-      hash[:answers].each { |a|
-        a.delete(:id)
-        a.delete(:match_id)
-      }
+      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq BB9Expected::MATCHING
     end
@@ -76,10 +70,7 @@ if Qti.migration_executable
         expect(matches[a[:match_id]]).to eq a[:text].sub('left', 'right')
       end
       # compare everything else without the ids
-      hash[:answers].each { |a|
-        a.delete(:id)
-        a.delete(:match_id)
-      }
+      hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
       hash[:matches].each { |m| m.delete(:match_id) }
       expect(hash).to eq BB9Expected::MATCHING2
     end
@@ -113,7 +104,7 @@ if Qti.migration_executable
                          { :right => "Phobos", :text => "Saturn", :left => "Saturn", :comments => "" },
                          { :right => "Luna", :text => "Earth", :left => "Earth", :comments => "" },
                          { :right => "Ganymede", :text => "Jupiter", :left => "Jupiter", :comments => "" }],
-                 :question_name => "" }.freeze
+                 :question_name => "" }
 
     MATCHING2 = { :answers =>
                     [{ :right => "right 1", :text => "left 1", :left => "left 1", :comments => "" },
@@ -132,6 +123,6 @@ if Qti.migration_executable
                      { :text => "right 2" },
                      { :text => "DISTRACTION" },
                      { :text => "right 4" },
-                     { :text => "right 3" }] }.freeze
+                     { :text => "right 3" }] }
   end
 end

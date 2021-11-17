@@ -23,9 +23,7 @@ Attachment.class_eval do
   # Marshal.load. since there's only a single spec in the entire suite
   # that wants a non-downloadable attachment, this is going to be a more
   # performant approach
-  def downloadable?
-    true
-  end
+  def downloadable?; true; end
 
   # fix so we can once-ler attachment instances. in order to
   # Marshal.dump, you can't have any singleton methods (which our
@@ -53,7 +51,7 @@ module Factories
 
   def valid_attachment_attributes(opts = {})
     @context = opts[:context] || @context || @course || course_model(:reusable => true)
-    if opts.key?(:folder)
+    if opts.has_key?(:folder)
       folder = opts[:folder]
     else
       if @context.respond_to?(:folders)

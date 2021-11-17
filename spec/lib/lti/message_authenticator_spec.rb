@@ -103,7 +103,7 @@ module Lti
 
       it "returns the same value if called multiple times" do
         enable_cache do
-          expect(Array.new(2) { subject.valid? }).to eq [true, true]
+          expect(2.times.map { |_| subject.valid? }).to eq [true, true]
         end
       end
 

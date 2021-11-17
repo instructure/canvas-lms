@@ -173,8 +173,10 @@ class AssignmentGroup < ActiveRecord::Base
     rule_string = ""
     rule_string += "drop_lowest:#{incoming_hash['drop_lowest']}\n" if incoming_hash['drop_lowest']
     rule_string += "drop_highest:#{incoming_hash['drop_highest']}\n" if incoming_hash['drop_highest']
-    incoming_hash['never_drop']&.each do |r|
-      rule_string += "never_drop:#{r}\n"
+    if incoming_hash['never_drop']
+      incoming_hash['never_drop'].each do |r|
+        rule_string += "never_drop:#{r}\n"
+      end
     end
     self.rules = rule_string
   end

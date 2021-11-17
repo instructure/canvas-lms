@@ -58,7 +58,7 @@ module CC
         end
       end
 
-      outcomes_file&.close
+      outcomes_file.close if outcomes_file
       rel_path
     end
 

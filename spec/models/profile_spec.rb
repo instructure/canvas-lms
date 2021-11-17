@@ -28,9 +28,7 @@ describe Profile do
       class Foo < ActiveRecord::Base
         self.table_name = :users
         prepend Profile::Association
-        def root_account
-          Account.default
-        end
+        def root_account; Account.default; end
       end
     end
     # rubocop:enable Lint/ConstantDefinitionInBlock, RSpec/LeakyConstantDeclaration

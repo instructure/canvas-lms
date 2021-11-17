@@ -47,6 +47,6 @@ class ObjectPartView < HashView
   end
 
   def properties
-    property_pairs.to_h
+    Hash[property_pairs]
   end
 end

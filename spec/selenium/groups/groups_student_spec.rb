@@ -268,7 +268,9 @@ describe "student groups" do
         wait_for_ajaximations
 
         students = ffj(".checkbox")
-        students.each(&:click)
+        students.each do |student|
+          student.click
+        end
 
         fj('button.confirm-dialog-confirm-btn').click
         wait_for_ajaximations

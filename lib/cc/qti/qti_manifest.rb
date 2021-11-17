@@ -47,7 +47,7 @@ module CC
       end
 
       def close
-        @file&.close
+        @file.close if @file
         @document = nil
         @file
       end

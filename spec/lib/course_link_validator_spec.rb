@@ -60,11 +60,10 @@ describe CourseLinkValidator do
 
     issues = CourseLinkValidator.current_progress(@course).results[:issues]
     issues.each do |issue|
-      case issue[:type]
-      when :course_card_image
+      if issue[:type] == :course_card_image
         expect(issue[:content_url]).to eq "/courses/#{@course.id}/settings"
         expect(issue[:invalid_links]).to include({ :reason => :unreachable, :url => bad_url, :image => true })
-      when :module
+      elsif issue[:type] == :module
         expect(issue[:content_url]).to eq "/courses/#{@course.id}/modules#module_#{mod.id}"
         expect(issue[:invalid_links]).to include({ :reason => :unreachable, :link_text => 'pls view', :url => bad_url })
       else
@@ -88,7 +87,7 @@ describe CourseLinkValidator do
       :wiki_page => page.title
     }
     type_names.each do |type, name|
-      expect(issues.count { |issue| issue[:type] == type }).to eq(1)
+      expect(issues.select { |issue| issue[:type] == type }.count).to eq(1)
       expect(issues.detect { |issue| issue[:type] == type }[:name]).to eq(name)
     end
   end

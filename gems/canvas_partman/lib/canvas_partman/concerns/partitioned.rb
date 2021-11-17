@@ -41,11 +41,10 @@ module CanvasPartman::Concerns
       def partitioning_strategy=(value)
         raise ArgumentError unless [:by_date, :by_id].include?(value)
 
-        case value
-        when :by_date
+        if value == :by_date
           self.partitioning_field = "created_at"
           self.partitioning_interval = :months
-        when :by_id
+        elsif value == :by_id
           self.partitioning_field = nil
           self.partition_size = 1_000_000
         end
@@ -171,13 +170,13 @@ module CanvasPartman::Concerns
         attr = attributes.detect { |(k, _v)| (k.is_a?(String) ? k : k.name) == partitioning_field }
 
         if attr.nil? || attr[1].nil?
-          raise ArgumentError.new <<~TEXT
+          raise ArgumentError.new <<-ERROR
             Partition resolution failure!!!
             Expected "#{partitioning_field}" attribute to be present in set and
             have a value, but was or did not:
 
             #{attributes}
-          TEXT
+          ERROR
         end
 
         if partitioning_strategy == :by_date

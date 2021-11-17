@@ -131,7 +131,7 @@ module I18nliner
     def infer_pluralization_hash(default, *args)
       if default.is_a?(Array) && default.all? { |a| a.is_a?(Array) && a.size == 2 && a.first.is_a?(Symbol) }
         # this was a pluralization hash but rails 4 made it an array in the view helpers
-        return default.to_h
+        return Hash[default]
       end
 
       super
@@ -148,7 +148,7 @@ end
 module I18nUtilities
   def before_label(text_or_key, default_value = nil, *args)
     if default_value
-      text_or_key = "labels.#{text_or_key}" unless text_or_key.to_s.start_with?('#')
+      text_or_key = "labels.#{text_or_key}" unless text_or_key.to_s =~ /\A#/
       text_or_key = respond_to?(:t) ? t(text_or_key, default_value, *args) : I18n.t(text_or_key, default_value, *args)
     end
     I18n.t("#before_label_wrapper", "%{text}:", :text => text_or_key)
@@ -161,11 +161,11 @@ module I18nUtilities
     end
     text = method if text.nil? && method.is_a?(Symbol)
     if text.is_a?(Symbol)
-      text = "labels.#{text}" unless text.to_s.start_with?('#')
+      text = "labels.#{text}" unless text.to_s =~ /\A#/
       text = t(text, options.delete(:en))
     end
     text = before_label(text) if options.delete(:before)
-    [text, options]
+    return text, options
   end
 
   def n(*args)
@@ -346,12 +346,10 @@ ActiveRecord::Base.class_eval do
 
   class << self
     # so that we don't load up the locales until we need them
-    class LocalesProxy
-      def include?(item)
-        I18n.available_locales.map(&:to_s).include?(item)
-      end
+    LOCALE_LIST = []
+    def LOCALE_LIST.include?(item)
+      I18n.available_locales.map(&:to_s).include?(item)
     end
-    LOCALE_LIST = LocalesProxy.new
 
     def validates_locale(*args)
       options = args.last.is_a?(Hash) ? args.pop : {}

@@ -162,18 +162,18 @@ module Api::V1::Assignment
       hash['overrides'] = assignment_overrides_json(assignment.assignment_overrides.select(&:active?), user)
     end
 
-    unless assignment.user_submitted.nil?
+    if !assignment.user_submitted.nil?
       hash['user_submitted'] = assignment.user_submitted
     end
 
     hash['omit_from_final_grade'] = assignment.omit_from_final_grade?
 
-    if assignment.context&.turnitin_enabled?
+    if assignment.context && assignment.context.turnitin_enabled?
       hash['turnitin_enabled'] = assignment.turnitin_enabled
       hash['turnitin_settings'] = turnitin_settings_json(assignment)
     end
 
-    if assignment.context&.vericite_enabled?
+    if assignment.context && assignment.context.vericite_enabled?
       hash['vericite_enabled'] = assignment.vericite_enabled
       hash['vericite_settings'] = vericite_settings_json(assignment)
     end
@@ -230,7 +230,7 @@ module Api::V1::Assignment
         'external_data' => external_tool_tag.external_data
       }
       tool_attributes.merge!(external_tool_tag.attributes.slice('content_type', 'content_id')) if external_tool_tag.content_id
-      tool_attributes['custom_params'] = assignment.primary_resource_link&.custom
+      tool_attributes.merge!('custom_params' => assignment.primary_resource_link&.custom)
       hash['external_tool_tag_attributes'] = tool_attributes
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',
@@ -325,7 +325,7 @@ module Api::V1::Assignment
 
     if opts[:include_all_dates] && assignment.assignment_overrides
       override_count = assignment.assignment_overrides.loaded? ?
-        assignment.assignment_overrides.count(&:active?) : assignment.assignment_overrides.active.count
+        assignment.assignment_overrides.select(&:active?).count : assignment.assignment_overrides.active.count
       if override_count < Setting.get('assignment_all_dates_too_many_threshold', '25').to_i
         hash['all_dates'] = assignment.dates_hash_visible_to(user)
       else
@@ -727,12 +727,12 @@ module Api::V1::Assignment
       update_params['time_zone_edited'] = Time.zone.name
     end
 
-    unless assignment.context.try(:turnitin_enabled?)
+    if !assignment.context.try(:turnitin_enabled?)
       update_params.delete("turnitin_enabled")
       update_params.delete("turnitin_settings")
     end
 
-    unless assignment.context.try(:vericite_enabled?)
+    if !assignment.context.try(:vericite_enabled?)
       update_params.delete("vericite_enabled")
       update_params.delete("vericite_settings")
     end
@@ -883,7 +883,7 @@ module Api::V1::Assignment
     else
       # assignment id -> specific submission. never return an array when
       # include[]=observed_users was _not_ supplied
-      hash = subs_list.index_by(&:assignment_id)
+      hash = Hash[subs_list.map { |s| [s.assignment_id, s] }]
     end
     hash
   end
@@ -923,7 +923,7 @@ module Api::V1::Assignment
     raise "needs strong params" unless assignment_params.is_a?(ActionController::Parameters)
 
     if assignment_params[:points_possible].blank?
-      if assignment.new_record? || assignment_params.key?(:points_possible) # only change if they're deliberately updating to blank
+      if assignment.new_record? || assignment_params.has_key?(:points_possible) # only change if they're deliberately updating to blank
         assignment_params[:points_possible] = 0
       end
     end
@@ -980,7 +980,7 @@ module Api::V1::Assignment
     end
 
     assignment.do_notifications!(prepared_update[:old_assignment], prepared_update[:notify_of_update])
-    :created
+    return :created
   end
 
   def update_api_assignment_with_overrides(prepared_update, user)
@@ -1049,10 +1049,9 @@ module Api::V1::Assignment
   def assignment_configuration_tool(assignment_params)
     tool_id = assignment_params['similarityDetectionTool'].split('_').last.to_i
     tool = nil
-    case assignment_params['configuration_tool_type']
-    when 'ContextExternalTool'
+    if assignment_params['configuration_tool_type'] == 'ContextExternalTool'
       tool = ContextExternalTool.find_external_tool_by_id(tool_id, context)
-    when 'Lti::MessageHandler'
+    elsif assignment_params['configuration_tool_type'] == 'Lti::MessageHandler'
       mh = Lti::MessageHandler.find(tool_id)
       mh_context = mh.resource_handler.tool_proxy.context
       tool = mh if mh_context == @context || @context.account_chain.include?(mh_context)

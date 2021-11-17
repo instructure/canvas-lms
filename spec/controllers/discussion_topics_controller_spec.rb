@@ -130,7 +130,7 @@ describe DiscussionTopicsController do
         term = @course.account.enrollment_terms.create!(
           :name => 'mew',
           :start_at => 6.months.ago(now),
-          :end_at => 1.month.ago(now)
+          :end_at => 1.months.ago(now)
         )
         @course.enrollment_term = term
         @course.update!(start_at: 5.months.ago(now), conclude_at: 2.months.ago(now))
@@ -1154,14 +1154,14 @@ describe DiscussionTopicsController do
       shared_examples_for 'no usage rights returned' do
         it 'does not return usage rights on discussion topic attachment' do
           get :edit, params: { course_id: @course.id, id: @topic_with_file.id }
-          expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES]['attachments'][0]).not_to have_key('usage_rights')
+          expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES]['attachments'][0].key?('usage_rights')).to be false
         end
       end
 
       shared_examples_for 'usage rights returned' do
         it 'returns usage rights on discussion topic attachment' do
           get :edit, params: { course_id: @course.id, id: @topic_with_file.id }
-          expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES]['attachments'][0]).to have_key('usage_rights')
+          expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES]['attachments'][0].key?('usage_rights')).to be true
         end
       end
 
@@ -1579,7 +1579,7 @@ describe DiscussionTopicsController do
       expect(topic).to be_published
       expect(topic.assignment).to be_published
       expect(@student.email_channel.messages).to be_empty
-      expect(@student.recent_stream_items.map(&:data)).not_to include topic
+      expect(@student.recent_stream_items.map { |item| item.data }).not_to include topic
     end
 
     it 'does dispatch new topic notification when not hidden' do
@@ -2011,7 +2011,7 @@ describe DiscussionTopicsController do
       @course.announcements.create!(message: 'asdf')
       course_topic
 
-      topics = Array.new(3) { course_topic(pinned: true) }
+      topics = 3.times.map { course_topic(pinned: true) }
       expect(topics.map(&:position)).to eq [1, 2, 3]
       t1, t2, _ = topics
       post 'reorder', params: { :course_id => @course.id, :order => "#{t2.id},#{t1.id}" }, :format => 'json'
