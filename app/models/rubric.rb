@@ -34,9 +34,9 @@ class Rubric < ActiveRecord::Base
   has_many :rubric_assessments, :through => :rubric_associations, :dependent => :destroy
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
 
-  validates_presence_of :context_id, :context_type, :workflow_state
-  validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
-  validates_length_of :title, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false
+  validates :context_id, :context_type, :workflow_state, presence: true
+  validates :description, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
+  validates :title, length: { :maximum => maximum_string_length, :allow_nil => false, :allow_blank => false }
 
   before_validation :default_values
   before_create :set_root_account_id
@@ -97,27 +97,27 @@ class Rubric < ActiveRecord::Base
   end
 
   def self.with_at_most_one_association
-    joins(<<~JOINS)
+    joins(<<~SQL.squish)
       LEFT JOIN #{RubricAssociation.quoted_table_name} associations_for_count
       ON rubrics.id = associations_for_count.rubric_id
       AND associations_for_count.purpose = 'grading'
       AND associations_for_count.workflow_state = 'active'
-    JOINS
+    SQL
       .group('rubrics.id')
       .having('COUNT(rubrics.id) < 2')
   end
 
   def self.unassessed
-    joins(<<~JOINS)
+    joins(<<~SQL.squish)
       LEFT JOIN #{RubricAssociation.quoted_table_name} associations_for_unassessed
       ON rubrics.id = associations_for_unassessed.rubric_id
       AND associations_for_unassessed.purpose = 'grading'
       AND associations_for_unassessed.workflow_state = 'active'
-    JOINS
-      .joins(<<~JOINS)
+    SQL
+      .joins(<<~SQL.squish)
         LEFT JOIN #{RubricAssessment.quoted_table_name} assessments_for_unassessed
         ON associations_for_unassessed.id = assessments_for_unassessed.rubric_association_id
-      JOINS
+      SQL
       .where(assessments_for_unassessed: { id: nil })
   end
 
@@ -205,7 +205,7 @@ class Rubric < ActiveRecord::Base
   end
 
   def data_outcome_ids
-    (data || []).map { |c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
+    (data || []).filter_map { |c| c[:learning_outcome_id] }.map(&:to_i).uniq
   end
 
   def criteria_object
@@ -401,7 +401,7 @@ class Rubric < ActiveRecord::Base
   end
 
   def total_points_from_criteria(criteria)
-    criteria.reject { |c| c[:ignore_for_scoring] }.map { |c| c[:points] }.reduce(:+)
+    criteria.reject { |c| c[:ignore_for_scoring] }.sum { |c| c[:points] }
   end
 
   # undo innocuous changes introduced by migrations which break `will_change_with_update?`

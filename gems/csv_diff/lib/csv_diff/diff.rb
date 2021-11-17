@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
+# rubocop:disable Rails/SquishedSQLHeredocs Rails isn't in this gem
 module CsvDiff
   # We need to know which key(s) comprise the id, to properly detect deletes
   # vs updates. Other than that, we don't need to care what the data is, just
@@ -76,10 +77,10 @@ module CsvDiff
 
     def find_updates
       # find both creates and updates where the pk is the same
-      @db.execute(<<-SQL) do |(data)|
-            select current.data from current
-            left join previous on previous.key = current.key
-            where current.data <> previous.data or previous.key is null
+      @db.execute(<<~SQL) do |(data)|
+        select current.data from current
+        left join previous on previous.key = current.key
+        where current.data <> previous.data or previous.key is null
       SQL
         row = Marshal.load(data)
         @row_count += 1
@@ -88,10 +89,10 @@ module CsvDiff
     end
 
     def find_deletes(headers, cb)
-      @db.execute(<<-SQL) do |(data)|
-            select previous.data from previous
-            left join current on previous.key = current.key
-            where current.key is null
+      @db.execute(<<~SQL) do |(data)|
+        select previous.data from previous
+        left join current on previous.key = current.key
+        where current.key is null
       SQL
         row = CSV::Row.new(headers, Marshal.load(data))
         # Allow the caller to munge the row to indicate deletion.
@@ -128,3 +129,4 @@ module CsvDiff
     end
   end
 end
+# rubocop:enable Rails/SquishedSQLHeredocs

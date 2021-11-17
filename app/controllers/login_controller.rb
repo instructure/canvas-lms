@@ -144,7 +144,7 @@ class LoginController < ApplicationController
     token = SessionToken.new(login_pseudonym.global_id,
                              current_user_id: @real_current_user ? @current_user.global_id : nil,
                              used_remember_me_token: true).to_s
-    return_to.query.concat('&') if return_to.query
+    return_to.query&.concat('&')
     return_to.query = '' unless return_to.query
     return_to.query.concat("session_token=#{token}")
 

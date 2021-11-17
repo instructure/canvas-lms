@@ -83,7 +83,7 @@ module CC::Exporter::Epub::Converters
       attr_reader :data, :original_path
 
       def to_h
-        return {
+        {
           identifier: data['identifier'],
           local_path: local_path,
           file_name: File.basename(local_path),

@@ -35,11 +35,11 @@ module EventStream::Backend
     end
 
     def database_name
-      database && database.keyspace
+      database&.keyspace
     end
 
     def database_fingerprint
-      database && database.fingerprint
+      database&.fingerprint
     end
 
     def fetch_cql
@@ -53,11 +53,12 @@ module EventStream::Backend
     def fetch(ids, strategy: :batch)
       rows = []
       if available? && ids.present?
-        if strategy == :batch
+        case strategy
+        when :batch
           database.execute(fetch_cql, ids, consistency: read_consistency_level).fetch do |row|
             rows << record_type.from_attributes(row.to_hash)
           end
-        elsif strategy == :serial
+        when :serial
           ids.each do |record_id|
             database.execute(fetch_one_cql, record_id, consistency: read_consistency_level).fetch do |row|
               rows << record_type.from_attributes(row.to_hash)

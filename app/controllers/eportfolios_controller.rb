@@ -107,7 +107,6 @@ class EportfoliosController < ApplicationController
       elsif @portfolio.public
         content_for_head helpers.auto_discovery_link_tag(:atom, feeds_eportfolio_path(@portfolio.id, :atom), { :title => t('titles.feed', "Eportfolio Atom Feed") })
       end
-      js_env({ SECTION_COUNT_IDX: @page.content_sections.count })
     end
   end
 
@@ -255,6 +254,6 @@ class EportfoliosController < ApplicationController
 
   def stale_zip_file?
     @attachment.created_at < 1.hour.ago ||
-      @attachment.created_at < (@portfolio.eportfolio_entries.map(&:updated_at).compact.max || @attachment.created_at)
+      @attachment.created_at < (@portfolio.eportfolio_entries.filter_map(&:updated_at).max || @attachment.created_at)
   end
 end

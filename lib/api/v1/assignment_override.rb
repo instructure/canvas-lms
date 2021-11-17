@@ -29,15 +29,15 @@ module Api::V1::AssignmentOverride
     api_json(override, @current_user, session, :only => fields).tap do |json|
       case override.set_type
       when 'ADHOC'
-        if override.preloaded_student_ids
-          json[:student_ids] = override.preloaded_student_ids
-        else
-          json[:student_ids] = if visible_users.present?
+        json[:student_ids] = if override.preloaded_student_ids
+                               override.preloaded_student_ids
+                             else
+                               if visible_users.present?
                                  override.assignment_override_students.where(user_id: visible_users).pluck(:user_id)
                                else
                                  override.assignment_override_students.pluck(:user_id)
                                end
-        end
+                             end
       when 'Group'
         json[:group_id] = override.set_id
       when 'CourseSection'
@@ -91,7 +91,7 @@ module Api::V1::AssignmentOverride
   end
 
   def find_group(assignment, group_id, group_category_id = nil)
-    scope = Group.active.where(:context_type => 'Course').where("group_category_id IS NOT NULL")
+    scope = Group.active.where(:context_type => 'Course').where.not(group_category_id: nil)
     if assignment
       scope = scope.where(
         context_id: assignment.context_id,
@@ -215,7 +215,7 @@ module Api::V1::AssignmentOverride
     end
 
     errors = nil if errors.empty?
-    return override_data, errors
+    [override_data, errors]
   end
 
   def check_property(object, prop, present, errors, message)
@@ -393,7 +393,7 @@ module Api::V1::AssignmentOverride
       ov.set_type == 'ADHOC' &&
         !ov.visible_student_overrides(visible_user_ids)
     }.map(&:id)
-    return invisible_user_ids, invisible_override_ids
+    [invisible_user_ids, invisible_override_ids]
   end
 
   def update_override_with_invisible_data(override_params, override, invisible_override_ids, invisible_user_ids)

@@ -31,15 +31,15 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   GRACEFUL_FINISHED_AT_DRIFT_PERIOD = 5.minutes
 
-  validates_presence_of :quiz_id
-  validates_numericality_of :extra_time, greater_than_or_equal_to: 0,
+  validates :quiz_id, presence: true
+  validates :extra_time, numericality: { greater_than_or_equal_to: 0,
                                          less_than_or_equal_to: 10080, # one week
-                                         allow_nil: true
-  validates_numericality_of :extra_attempts, greater_than_or_equal_to: 0,
+                                         allow_nil: true }
+  validates :extra_attempts, numericality: { greater_than_or_equal_to: 0,
                                              less_than_or_equal_to: 1000,
-                                             allow_nil: true
-  validates_numericality_of :quiz_points_possible, less_than_or_equal_to: 2000000000,
-                                                   allow_nil: true
+                                             allow_nil: true }
+  validates :quiz_points_possible, numericality: { less_than_or_equal_to: 2000000000,
+                                                   allow_nil: true }
 
   before_validation :update_quiz_points_possible
   before_validation :rectify_finished_at_drift, :if => :end_at?
@@ -168,8 +168,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     raise "Cannot view temporary data for completed quiz" unless !self.completed?
     raise "Cannot view temporary data for completed quiz" if graded?
 
-    res = (self.submission_data || {}).with_indifferent_access
-    res
+    (self.submission_data || {}).with_indifferent_access
   end
 
   def question_answered?(id)
@@ -188,7 +187,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   def data
     raise "Cannot view data for uncompleted quiz" unless self.completed?
-    raise "Cannot view data for uncompleted quiz" if !graded?
+    raise "Cannot view data for uncompleted quiz" unless graded?
 
     Utf8Cleaner.recursively_strip_invalid_utf8!(self.submission_data, true)
   end
@@ -233,7 +232,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
          quiz_submissions.workflow_state = 'completed'
          AND quiz_submissions.submission_data IS NOT NULL
        )", { time: Time.now }).to_a
-    resp.select! { |qs| qs.needs_grading? }
+    resp.select!(&:needs_grading?)
     resp
   end
 
@@ -277,7 +276,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def points_possible_at_submission_time
-    self.questions.map { |q| q[:points_possible].to_f }.compact.sum || 0
+    self.questions.filter_map { |q| q[:points_possible].to_f }.sum || 0
   end
 
   def questions
@@ -378,7 +377,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def quiz_question_ids
-    questions.map { |question| question["id"] }.compact
+    questions.filter_map { |question| question["id"] }
   end
 
   def quiz_questions
@@ -444,7 +443,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def update_assignment_submission
     return if self.manually_scored || @skip_after_save_score_updates
 
-    if self.quiz && self.quiz.for_assignment? && assignment && !self.submission && self.user_id
+    if self.quiz&.for_assignment? && assignment && !self.submission && self.user_id
       self.submission = assignment.find_or_create_submission(self.user_id)
     end
     if self.completed? && self.submission
@@ -467,7 +466,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   end
 
   def save_assignment_submission
-    @assignment_submission.save! if @assignment_submission
+    @assignment_submission&.save!
   end
 
   def scores_for_versions(exclude_version_id)
@@ -547,7 +546,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
     # we might be in the middle of a new attempt, in which case we don't want
     # to overwrite the score and fudge points when we save
-    self.reload if !self.completed?
+    self.reload unless self.completed?
 
     self.kept_score = to_be_kept_score
     self.without_versioning(&:save)
@@ -664,7 +663,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   # taken quiz, even if it's a prior version of the submission. Thank you
   # simply_versioned for making this possible!
   def update_submission_version(version, attrs)
-    version_data = YAML::load(version.yaml)
+    version_data = YAML.load(version.yaml)
     version_data["submission_data"] = self.submission_data if attrs.include?(:submission_data)
     version_data["temporary_user_code"] = "was #{version_data['score']} until #{Time.now}"
     version_data["score"] = self.score if attrs.include?(:score)
@@ -672,8 +671,7 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     version_data["workflow_state"] = self.workflow_state if attrs.include?(:workflow_state)
     version_data["manually_scored"] = self.manually_scored if attrs.include?(:manually_scored)
     version.yaml = version_data.to_yaml
-    res = version.save
-    res
+    version.save
   end
 
   def context_module_action
@@ -739,11 +737,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     end
 
     # Graded surveys always get the full points
-    if quiz && quiz.graded_survey?
-      self.score = quiz.points_possible
-    else
-      self.score = tally
-    end
+    self.score = if quiz && quiz.graded_survey?
+                   quiz.points_possible
+                 else
+                   tally
+                 end
 
     self.submission_data = res
 

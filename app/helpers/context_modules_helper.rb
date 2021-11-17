@@ -59,11 +59,11 @@ module ContextModulesHelper
 
   def add_mastery_paths_to_cache_key(cache_key, context, user)
     if user && cyoe_enabled?(context)
-      if context.user_is_student?(user)
-        rules = cyoe_rules(context, user, @session)
-      else
-        rules = ConditionalRelease::Service.active_rules(context, user, @session)
-      end
+      rules = if context.user_is_student?(user)
+                cyoe_rules(context, user, @session)
+              else
+                ConditionalRelease::Service.active_rules(context, user, @session)
+              end
       cache_key += '/mastery:' + Digest::MD5.hexdigest(rules.to_s)
     end
     cache_key
@@ -89,7 +89,7 @@ module ContextModulesHelper
     elsif item.content_type == 'WikiPage'
       item.content.url
     else
-      (item.content && item.content.respond_to?(:published?) ? item.content.id : item.id)
+      (item.content.respond_to?(:published?) ? item.content.id : item.id)
     end
   end
 
@@ -145,7 +145,7 @@ module ContextModulesHelper
     end
 
     module_data[:items_data] = items_data
-    return module_data
+    module_data
   end
 
   def module_item_translated_content_type(item, is_student = false)

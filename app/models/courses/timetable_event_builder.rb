@@ -28,7 +28,7 @@ module Courses
 
       @course = course
       @course_section = course_section
-      @event_context = course_section ? course_section : course
+      @event_context = course_section || course
     end
 
     # generates individual events from a simplified "timetable" between the course/section start and end dates
@@ -93,7 +93,7 @@ module Courses
       end
     end
 
-    ALLOWED_TIMETABLE_KEYS = [:weekdays, :course_start_at, :course_end_at, :start_time, :end_time, :location_name]
+    ALLOWED_TIMETABLE_KEYS = [:weekdays, :course_start_at, :course_end_at, :start_time, :end_time, :location_name].freeze
     def process_and_validate_timetables(timetable_hashes)
       timetable_hashes.each do |hash|
         hash.slice!(*ALLOWED_TIMETABLE_KEYS)
@@ -105,8 +105,8 @@ module Courses
         add_error("invalid end time(s)")
       end
 
-      default_start_at = (course_section && course_section.start_at) || course.start_at || course.enrollment_term.start_at
-      default_end_at = (course_section && course_section.end_at) || course.conclude_at || course.enrollment_term.end_at
+      default_start_at = course_section&.start_at || course.start_at || course.enrollment_term.start_at
+      default_end_at = course_section&.end_at || course.conclude_at || course.enrollment_term.end_at
 
       timetable_hashes.each do |hash|
         hash[:course_start_at] ||= default_start_at

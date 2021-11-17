@@ -187,7 +187,7 @@ describe "assignments" do
       it "allows submission when within override locks" do
         @assignment.update(:submission_types => 'online_text_entry')
         # Change unlock dates to be valid for submission
-        @override.unlock_at = Time.now.utc - 1.days # available now
+        @override.unlock_at = Time.now.utc - 1.day # available now
         @override.save!
 
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"

@@ -2090,9 +2090,9 @@ describe User do
       end
 
       it "doesn't show unpublished assignments" do
-        assignment = @course.assignments.create!(:title => "not published", :due_at => 1.days.from_now)
+        assignment = @course.assignments.create!(:title => "not published", :due_at => 1.day.from_now)
         assignment.unpublish
-        assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.days.from_now)
+        assignment2 = @course.assignments.create!(:title => "published", :due_at => 1.day.from_now)
         assignment2.publish
         events = @user.upcoming_events(:end_at => 1.week.from_now)
         expect(events.first).to eq assignment2
@@ -2291,7 +2291,7 @@ describe User do
     end
 
     it "breaks ties with user id" do
-      ids = 5.times.map { User.create!(:name => "Abcde").id }.sort
+      ids = Array.new(5) { User.create!(:name => "Abcde").id }.sort
       expect(User.order_by_sortable_name.where(id: ids).map(&:id)).to eq(ids)
     end
 

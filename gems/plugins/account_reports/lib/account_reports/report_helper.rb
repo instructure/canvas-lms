@@ -135,11 +135,13 @@ module AccountReports::ReportHelper
 
   def add_course_sub_account_scope(scope, table = 'courses')
     if account != root_account
-      scope.where("EXISTS (SELECT course_id
-                           FROM #{CourseAccountAssociation.quoted_table_name} caa
-                           WHERE caa.account_id = ?
-                           AND caa.course_id=#{table}.id
-                           AND caa.course_section_id IS NULL)", account)
+      scope.where(<<~SQL.squish, account)
+        EXISTS (SELECT course_id
+                FROM #{CourseAccountAssociation.quoted_table_name} caa
+                WHERE caa.account_id = ?
+                AND caa.course_id=#{table}.id
+                AND caa.course_section_id IS NULL)
+      SQL
     else
       scope
     end
@@ -456,7 +458,7 @@ module AccountReports::ReportHelper
     csvs = {}
     activate_report_db(replica: replica) do
       files.each do |file, headers_for_file|
-        csvs[file] = if @account_report.account_report_rows.exists?(file: file)
+        csvs[file] = if @account_report.account_report_rows.where(file: file).exists?
                        generate_and_run_report(headers_for_file) do |csv|
                          @account_report.account_report_rows.where(file: file)
                                         .order(:account_report_runner_id, :row_number)

@@ -114,7 +114,7 @@ describe SpeedGrader::Assignment do
 
         before do
           json = SpeedGrader::Assignment.new(assignment, teacher).json
-          student_a_submission = json.fetch(:submissions).select { |s| s[:user_id] == first_student.id.to_s }.first
+          student_a_submission = json.fetch(:submissions).find { |s| s[:user_id] == first_student.id.to_s }
           @comments = student_a_submission.fetch(:submission_comments).map do |comment|
             comment.slice(:author_id, :comment)
           end
@@ -921,9 +921,7 @@ describe SpeedGrader::Assignment do
       assignment = quiz.assignment
       assignment.grade_student(@student, grade: 1, grader: @teacher)
       json = SpeedGrader::Assignment.new(assignment, @teacher).json
-      expect(json[:submissions]).to be_all do |s|
-        s.key? 'submission_history'
-      end
+      expect(json[:submissions]).to all(have_key('submission_history'))
     end
 
     context "with quiz_submissions" do

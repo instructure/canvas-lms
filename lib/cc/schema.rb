@@ -20,7 +20,7 @@
 module CC
   class Schema
     XSD_DIRECTORY = "lib/cc/xsd"
-    REGEX = /\.xsd$/
+    REGEX = /\.xsd$/.freeze
 
     def self.for_version(version)
       return nil unless whitelist.include?(version)
@@ -30,7 +30,7 @@ module CC
 
     def self.whitelist
       @whitelist ||= Dir.entries(XSD_DIRECTORY).inject([]) do |memo, entry|
-        memo << entry.gsub(REGEX, '') if entry =~ REGEX
+        memo << entry.gsub(REGEX, '') if REGEX.match?(entry)
         memo
       end
     end

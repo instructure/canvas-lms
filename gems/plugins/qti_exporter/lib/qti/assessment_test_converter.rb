@@ -28,7 +28,7 @@ module Qti
     attr_reader :package_root, :identifier, :href, :interaction_type, :title, :quiz
 
     def initialize(manifest_node, base_dir, opts = {})
-      @log = Canvas::Migration::logger
+      @log = Canvas::Migration.logger
       @manifest_node = manifest_node
       @package_root = PackageRoot.new(base_dir)
       @href = @package_root.item_path(@manifest_node['href'])
@@ -47,21 +47,21 @@ module Qti
         # Get manifest data
         if (md = @manifest_node.at_css("instructureMetadata"))
           if (item = get_node_att(md, 'instructureField[name=show_score]', 'value'))
-            @quiz[:show_score] = item =~ /true/i ? true : false
+            @quiz[:show_score] = /true/i.match?(item)
           end
           if (item = get_node_att(md, 'instructureField[name=quiz_type]', 'value') ||
              get_node_att(md, 'instructureField[name=bb8_assessment_type]', 'value'))
             # known possible values: Self-assessment, Survey, Examination (practice is instructure default)
             # BB8: Test, Pool
-            @quiz[:quiz_type] = "assignment" if item =~ /examination|test|quiz/i
-            if item =~ /pool/i
+            @quiz[:quiz_type] = "assignment" if /examination|test|quiz/i.match?(item)
+            if /pool/i.match?(item)
               # if it's pool we don't need to make a quiz object.
               return nil
             end
           end
           if (item = get_node_att(md, 'instructureField[name=which_attempt_to_keep]', 'value'))
             # known possible values: Highest, First, Last (highest is instructure default)
-            @quiz[:which_attempt_to_keep] = "keep_latest" if item =~ /last/i
+            @quiz[:which_attempt_to_keep] = "keep_latest" if /last/i.match?(item)
           end
           if (item = get_node_att(md, 'instructureField[name=max_score]', 'value'))
             @quiz[:points_possible] = item
@@ -126,13 +126,13 @@ module Qti
       if (part = doc.at_css('testPart[identifier=BaseTestPart]') || doc.at_css('testPart'))
         if (control = part.at_css('itemSessionControl'))
           if (max = control['maxAttempts'])
-            max = -1 if max =~ /unlimited/i
+            max = -1 if /unlimited/i.match?(max)
             max = max.to_i
             # -1 means no limit in instructure, 0 means no limit in QTI
             @quiz[:allowed_attempts] = max >= 1 ? max : -1
           end
           if (show = control['showSolution'])
-            @quiz[:show_correct_answers] = show.downcase == "true"
+            @quiz[:show_correct_answers] = show.casecmp?("true")
           end
         end
 
@@ -144,20 +144,18 @@ module Qti
     end
 
     def self.parse_time_limit(time_limit)
-      limit = 0
       time_indicator = time_limit[0..0].downcase if time_limit.length > 0
-      if time_indicator == 'd'
-        limit = 24 * 60 * time_limit[1..-1].to_i
-      elsif time_indicator == 'h'
-        limit = 60 * time_limit[1..-1].to_i
-      elsif time_indicator == 'm'
-        limit = time_limit[1..-1].to_i
+      case time_indicator
+      when 'd'
+        24 * 60 * time_limit[1..].to_i
+      when 'h'
+        60 * time_limit[1..].to_i
+      when 'm'
+        time_limit[1..].to_i
       else
         # instructure uses minutes, QTI uses seconds
-        limit = time_limit.to_i / 60
+        time_limit.to_i / 60
       end
-
-      limit
     end
 
     def self.parse_pick_count(section)
@@ -173,7 +171,7 @@ module Qti
       questions_list = @quiz[:questions]
 
       if (shuffle = get_node_att(section, 'ordering', 'shuffle'))
-        @quiz[:shuffle_answers] = true if shuffle =~ /true/i
+        @quiz[:shuffle_answers] = true if /true/i.match?(shuffle)
       end
       if (select = AssessmentTestConverter.parse_pick_count(section))
         group = { :questions => [], :pick_count => select, :question_type => 'question_group', :title => section['title'] }
@@ -207,9 +205,10 @@ module Qti
       end
 
       section.children.each do |child|
-        if child.name == "assessmentSection"
+        case child.name
+        when "assessmentSection"
           process_section(child)
-        elsif child.name == "assessmentItemRef"
+        when "assessmentItemRef"
           process_question(child, questions_list)
         end
       end
@@ -259,7 +258,7 @@ module Qti
       questions_list << question
       @quiz[:question_count] += 1
       # The colons are replaced with dashes in the conversion from QTI 1.2
-      question[:migration_id] = item_ref['identifier'].gsub(/:/, '-')
+      question[:migration_id] = item_ref['identifier'].tr(':', '-')
       # D2L references questions by label instead of ident
       if @opts[:flavor] == Qti::Flavors::D2L && item_ref['label'].present?
         question[:migration_id] = item_ref['label']

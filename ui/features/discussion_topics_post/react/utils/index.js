@@ -69,12 +69,30 @@ export const updateDiscussionTopicEntryCounts = (
   }
 }
 
+export const updateDiscussionEntryRootEntryCounts = (cache, result, unreadCountChange) => {
+  const discussionEntryOptions = {
+    id: btoa(
+      'DiscussionEntry-' + result.data.updateDiscussionEntryParticipant.discussionEntry.rootEntryId
+    ),
+    fragment: DiscussionEntry.fragment,
+    fragmentName: 'DiscussionEntry'
+  }
+
+  const data = JSON.parse(JSON.stringify(cache.readFragment(discussionEntryOptions)))
+  data.rootEntryParticipantCounts.unreadCount += unreadCountChange
+
+  cache.writeFragment({
+    ...discussionEntryOptions,
+    data
+  })
+}
+
 export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) => {
   try {
     // Creates an object containing the data that needs to be updated
     // Writes that new data to the cache using the id of the object
     const discussionEntryOptions = {
-      id: variables.discussionEntryID,
+      id: btoa('DiscussionEntry-' + variables.discussionEntryID),
       fragment: DiscussionEntry.fragment,
       fragmentName: 'DiscussionEntry'
     }

@@ -25,7 +25,7 @@ module CanvasTime
       return super unless args.starts_with?("pre1900:")
 
       # 8 puts us after the colon in "pre1900:"
-      iso8601(args[8..-1])
+      iso8601(args[8..])
     end
   end
 

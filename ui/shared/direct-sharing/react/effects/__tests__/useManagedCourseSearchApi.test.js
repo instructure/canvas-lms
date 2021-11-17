@@ -44,7 +44,7 @@ describe('useManagedCourseSearchApi', () => {
     setupManagedCoursesResponse()
     const success = jest.fn()
     const error = jest.fn()
-    renderHook(() => useManagedCourseSearchApi({error, success}))
+    renderHook(() => useManagedCourseSearchApi({error, success, params: {term: 'game'}}))
     await fetchMock.flush(true)
     expect(error).not.toHaveBeenCalled()
     expect(success).toHaveBeenCalledWith([
@@ -55,32 +55,41 @@ describe('useManagedCourseSearchApi', () => {
 
   it('passes "include" query param if "includeConcluded" is truthy', async () => {
     setupManagedCoursesResponse()
-    renderHook(() => useManagedCourseSearchApi({}, true))
+    renderHook(() => useManagedCourseSearchApi({params: {term: 'game'}}, true))
     await fetchMock.flush(true)
-    expect(fetchMock.lastCall()[0]).toBe('/users/self/manageable_courses?include=concluded')
+    expect(fetchMock.lastCall()[0]).toBe(
+      '/users/self/manageable_courses?term=game&include=concluded'
+    )
   })
 
   it('does not pass an "include" query param if "includeConcluded" is falsy', async () => {
     setupManagedCoursesResponse()
-    renderHook(() => useManagedCourseSearchApi({}, false))
+    renderHook(() => useManagedCourseSearchApi({params: {term: 'game'}}, false))
     await fetchMock.flush(true)
-    expect(fetchMock.lastCall()[0]).toBe('/users/self/manageable_courses')
+    expect(fetchMock.lastCall()[0]).toBe('/users/self/manageable_courses?term=game')
   })
 
   it('passes "include" query param properly in addition to existing params', async () => {
-    const params = {search_term: 'Course'}
+    const params = {term: 'Course'}
     setupManagedCoursesResponse()
     renderHook(() => useManagedCourseSearchApi({params}, true))
     await fetchMock.flush(true)
     expect(fetchMock.lastCall()[0]).toBe(
-      '/users/self/manageable_courses?search_term=Course&include=concluded'
+      '/users/self/manageable_courses?term=Course&include=concluded'
     )
   })
 
-  it('does not set "include" query parameter if no arguments are passed', async () => {
+  it('does not make network request if search term is not included', async () => {
     setupManagedCoursesResponse()
     renderHook(useManagedCourseSearchApi)
     await fetchMock.flush(true)
-    expect(fetchMock.lastCall()[0]).toBe('/users/self/manageable_courses')
+    expect(fetchMock.calls().length).toBe(0)
+  })
+
+  it('does not make network request if search term is only one character', async () => {
+    setupManagedCoursesResponse()
+    renderHook(() => useManagedCourseSearchApi({params: {term: 'a'}}))
+    await fetchMock.flush(true)
+    expect(fetchMock.calls().length).toBe(0)
   })
 })

@@ -23,7 +23,7 @@ require 'set'
 
 class ContentZipper
   def initialize(options = {})
-    @check_user = options.has_key?(:check_user) ? options[:check_user] : true
+    @check_user = options.key?(:check_user) ? options[:check_user] : true
     @logger = Rails.logger
   end
   attr_writer :user
@@ -188,8 +188,7 @@ class ContentZipper
     @submissions_hash = submissions_hash
     av = ActionView::Base.with_view_paths(ActionController::Base.view_paths)
     av.extend TextHelper
-    res = av.render(:partial => "eportfolios/static_page", :locals => { :page => page, :portfolio => portfolio, :static_attachments => static_attachments, :submissions_hash => submissions_hash })
-    res
+    av.render(:partial => "eportfolios/static_page", :locals => { :page => page, :portfolio => portfolio, :static_attachments => static_attachments, :submissions_hash => submissions_hash })
   end
 
   def self.zip_base_folder(*args)
@@ -228,7 +227,7 @@ class ContentZipper
   # make a tmp directory and yield a filename under that directory to the block
   # given. the tmp directory is deleted when the block returns.
   def make_zip_tmpdir(filename)
-    filename = File.basename(filename.gsub(/ /, "_").gsub(/[^\w-]/, ""))
+    filename = File.basename(filename.tr(' ', "_").gsub(/[^\w-]/, ""))
     Dir.mktmpdir do |dirname|
       zip_name = File.join(dirname, "#{filename}.zip")
       yield zip_name
@@ -260,7 +259,7 @@ class ContentZipper
       # with the shortened name
       attachment.readonly!
       path = folder_names.empty? ? attachment.display_name : File.join(folder_names, attachment.display_name)
-      callback.call(attachment, folder_names) if callback
+      callback&.call(attachment, folder_names)
       @context = folder.context
       @logger.debug("  found attachment: #{attachment.unencoded_filename}")
       if add_attachment_to_zip(attachment, zipfile, path)
@@ -325,7 +324,7 @@ class ContentZipper
       @logger.error("  skipping #{attachment.full_filename} with error: #{e.message}")
       return false
     ensure
-      handle.close if handle
+      handle&.close
     end
 
     true
@@ -418,10 +417,11 @@ class ContentZipper
   end
 
   def add_text_or_url(type, to_zip, called)
-    if type == :text
+    case type
+    when :text
       filename = "#{called}_text.html"
       display_page = "text_entry_page.html.erb"
-    elsif type == :url
+    when :url
       filename = "#{called}_link.html"
       display_page = "redirect_page.html.erb"
     end

@@ -106,7 +106,7 @@ module CustomValidators
   end
 
   def assert_error_box(selector)
-    box = driver.execute_script <<-JS, selector
+    box = driver.execute_script <<~JS, selector
       var $result = $(arguments[0]).data('associated_error_box');
       return $result ? $result.toArray() : []
     JS

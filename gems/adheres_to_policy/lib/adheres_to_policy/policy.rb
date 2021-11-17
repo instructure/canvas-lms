@@ -60,7 +60,7 @@ module AdheresToPolicy
         @conditions[right] << condition unless @conditions[right].include?(condition)
       end
 
-      @parent_policy.add_rights(rights, condition) if @parent_policy
+      @parent_policy&.add_rights(rights, condition)
     end
 
     # Stores a nested set of conditions and permissions. This can be used like:

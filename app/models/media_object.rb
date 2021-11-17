@@ -30,7 +30,7 @@ class MediaObject < ActiveRecord::Base
   belongs_to :attachment
   belongs_to :root_account, :class_name => 'Account'
 
-  validates_presence_of :media_id, :workflow_state
+  validates :media_id, :workflow_state, presence: true
   has_many :media_tracks, -> { order(:locale) }, dependent: :destroy
   after_create :retrieve_details_later
   after_save :update_title_on_kaltura_later
@@ -57,7 +57,7 @@ class MediaObject < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user| (self.user && self.user == user) || (self.context && self.context.grants_right?(user, :manage_content)) }
+    given { |user| (self.user && self.user == user) || self.context&.grants_right?(user, :manage_content) }
     can :add_captions and can :delete_captions
   end
 
@@ -151,11 +151,11 @@ class MediaObject < ActiveRecord::Base
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     info = client.mediaGet(media_id)
-    return !!info&.dig(:id)
+    !!info&.dig(:id)
   end
 
   def self.ensure_media_object(media_id, **create_opts)
-    if !by_media_id(media_id).any?
+    unless by_media_id(media_id).any?
       delay(priority: Delayed::LOW_PRIORITY).create_if_id_exists(media_id, **create_opts)
     end
   end
@@ -171,7 +171,7 @@ class MediaObject < ActiveRecord::Base
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.mediaUpdate(self.media_id, :name => self.user_entered_title)
-    if !res[:error]
+    unless res[:error]
       self.title = self.user_entered_title
       self.save
     end
@@ -215,7 +215,7 @@ class MediaObject < ActiveRecord::Base
       self.duration = entry[:duration].to_i
       self.data[:plays] = entry[:plays].to_i
       self.data[:download_url] = entry[:downloadUrl]
-      tags = (entry[:tags] || "").split(/,/).map(&:strip)
+      tags = (entry[:tags] || "").split(",").map(&:strip)
       old_id = tags.detect { |t| t.include?('old_id_') }
       self.old_media_id = old_id.sub(/old_id_/, '') if old_id
     end
@@ -227,7 +227,7 @@ class MediaObject < ActiveRecord::Base
         self.max_size = [self.max_size || 0, asset[:size].to_i].max
       end
     end
-    self.total_size = [self.max_size || 0, assets.map { |a| (a[:size] || 0).to_i }.sum].max
+    self.total_size = [self.max_size || 0, assets.sum { |a| (a[:size] || 0).to_i }].max
     self.save
     ensure_attachment
     self.data
@@ -253,7 +253,7 @@ class MediaObject < ActiveRecord::Base
 
   def podcast_format_details
     data = transcoded_details
-    if !data
+    unless data
       self.retrieve_details
       data = transcoded_details
     end
@@ -277,7 +277,7 @@ class MediaObject < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.attachment.destroy if self.attachment
+    self.attachment&.destroy
     save!
   end
 
@@ -319,7 +319,7 @@ class MediaObject < ActiveRecord::Base
                                   })
 
     url = self.data.dig(:download_url)
-    url = sources.select { |s| s[:isOriginal] == '1' }.first&.dig(:url) if url.blank?
+    url = sources.find { |s| s[:isOriginal] == '1' }&.dig(:url) if url.blank?
     url = sources.sort_by { |a| a[:bitrate].to_i }.first&.dig(:url) if url.blank?
 
     attachment.clone_url(url, :rename, false) # no check_quota because the bits are in kaltura

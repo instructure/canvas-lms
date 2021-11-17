@@ -1112,12 +1112,12 @@ describe AssignmentOverridesController, type: :request do
   context 'batch operations' do
     before :once do
       course_with_teacher(:active_all => true)
-      @a, @b = 2.times.map { assignment_model(:course => @course) }
-      @a1, @a2 = 2.times.map do
+      @a, @b = Array.new(2) { assignment_model(:course => @course) }
+      @a1, @a2 = Array.new(2) do
         student_in_course
         create_adhoc_override_for_assignment(@a, @student)
       end
-      @b1, @b2, @b3 = 3.times.map do
+      @b1, @b2, @b3 = Array.new(3) do
         create_section_override_for_assignment(@b, course_section: @course.course_sections.create!)
       end
       @user = @teacher

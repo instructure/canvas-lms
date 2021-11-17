@@ -114,11 +114,11 @@ module Qti
         match = {}
         @question[:matches] << match
         match_map[sc['identifier']] = match
-        if sc['identifier'] =~ /(\d+)/
-          match[:match_id] = $1.to_i
-        else
-          match[:match_id] = unique_local_id
-        end
+        match[:match_id] = if sc['identifier'] =~ /(\d+)/
+                             $1.to_i
+                           else
+                             unique_local_id
+                           end
         match[:text] = sc.text.strip
       end
     end
@@ -218,9 +218,9 @@ module Qti
       right = @doc.css('div.RIGHT_MATCH_BLOCK div').size
       return unless left > 0 && right > 0
 
-      return @doc.css('div.RESPONSE_BLOCK div').size == left &&
-             @doc.css('responseProcessing responseCondition match').size == left &&
-             @doc.css('div.RESPONSE_BLOCK choiceInteraction simpleChoice').size == left * right
+      @doc.css('div.RESPONSE_BLOCK div').size == left &&
+        @doc.css('responseProcessing responseCondition match').size == left &&
+        @doc.css('div.RESPONSE_BLOCK choiceInteraction simpleChoice').size == left * right
     end
 
     def get_all_answers_for_crazy_n_squared_match_by_index_thing
@@ -236,7 +236,7 @@ module Qti
         answer[:comments] = ""
         resp_id = ci['responseIdentifier']
         match_node = @doc.at_css("responseCondition match baseValue[identifier=#{resp_id}]")
-        choice_id = match_node && match_node.inner_text
+        choice_id = match_node&.inner_text
         match_index = nil
         if choice_id
           ci.css('simpleChoice').each_with_index do |sc, j|
@@ -285,7 +285,7 @@ module Qti
           @doc.css("match variable[identifier=#{resp_id}]").each do |variable|
             match = variable.parent
             response_if = match.parent
-            if response_if.name =~ /response(Else)?If/
+            if /response(Else)?If/.match?(response_if.name)
               if response_if.at_css('setOutcomeValue[identifier$=_CORRECT]')
                 match_id = get_node_val(match, 'baseValue', '').strip
                 answer[:match_id] = match_map[match_id]

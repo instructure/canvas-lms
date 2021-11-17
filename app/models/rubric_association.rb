@@ -39,7 +39,7 @@ class RubricAssociation < ActiveRecord::Base
 
   has_a_broadcast_policy
 
-  validates_presence_of :purpose, :rubric_id, :association_id, :association_type, :context_id, :context_type
+  validates :purpose, :rubric_id, :association_id, :association_type, :context_id, :context_type, presence: true
   validates :workflow_state, inclusion: { in: ["active", "deleted"] }
 
   before_create :set_root_account_id
@@ -67,7 +67,7 @@ class RubricAssociation < ActiveRecord::Base
     'Course' => ::Course,
     'Assignment' => ::Assignment,
     'Account' => ::Account,
-  }
+  }.freeze
 
   # takes params[:association_type] and params[:association_id] and finds the
   # valid association object, if possible. Valid types are listed in
@@ -212,14 +212,12 @@ class RubricAssociation < ActiveRecord::Base
 
   def update_rubric
     cnt = self.rubric.rubric_associations.for_grading.length rescue 0
-    if self.rubric
-      self.rubric.with_versioning(false) do
-        self.rubric.read_only = cnt > 1
-        self.rubric.association_count = cnt
-        self.rubric.save
+    self.rubric&.with_versioning(false) do
+      self.rubric.read_only = cnt > 1
+      self.rubric.association_count = cnt
+      self.rubric.save
 
-        self.rubric.destroy if cnt == 0 && self.rubric.rubric_associations.count == 0 && !self.rubric.public
-      end
+      self.rubric.destroy if cnt == 0 && self.rubric.rubric_associations.count == 0 && !self.rubric.public
     end
   end
   protected :update_rubric
@@ -240,7 +238,7 @@ class RubricAssociation < ActiveRecord::Base
   protected :link_to_assessments
 
   def unsubmitted_users
-    self.context.students - self.rubric_assessments.map { |a| a.user } - self.assessment_requests.map { |a| a.user }
+    self.context.students - self.rubric_assessments.map(&:user) - self.assessment_requests.map(&:user)
   end
 
   def self.generate(current_user, rubric, context, params)

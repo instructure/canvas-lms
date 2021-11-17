@@ -128,9 +128,10 @@ module Plannable
 
     # Grabs the value to use for the bookmark & comparison
     def column_value(object, col)
-      if col.is_a?(Array)
+      case col
+      when Array
         object.attributes.values_at(*col).compact.first # coalesce nulls
-      elsif col.is_a?(Hash)
+      when Hash
         association_value(object, col)
       else
         object.attributes[col]
@@ -146,7 +147,7 @@ module Plannable
       @columns.flatten.each do |col|
         val = column_value(object, col)
         val = val.utc.strftime("%Y-%m-%d %H:%M:%S.%6N") if val.respond_to?(:strftime)
-        if !val.nil?
+        unless val.nil?
           bookmark << val
           break
         end
@@ -289,7 +290,7 @@ module Plannable
         visited << [col, val]
       end
       sql = "(" + top_clauses.join(" OR ") + ")"
-      return [sql, *args]
+      [sql, *args]
     end
   end
 end

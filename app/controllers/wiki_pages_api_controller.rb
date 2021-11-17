@@ -247,11 +247,11 @@ class WikiPagesApiController < ApplicationController
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
       # omit body from selection, since it's not included in index results
       scope = @context.wiki_pages.select(WikiPage.column_names - ['body']).preload(:user)
-      if params.has_key?(:published)
-        scope = value_to_boolean(params[:published]) ? scope.published : scope.unpublished
-      else
-        scope = scope.not_deleted
-      end
+      scope = if params.key?(:published)
+                value_to_boolean(params[:published]) ? scope.published : scope.unpublished
+              else
+                scope.not_deleted
+              end
 
       @context.shard.activate do
         scope = WikiPages::ScopedToUser.new(@context.wiki, @current_user, scope).scope
@@ -474,7 +474,7 @@ class WikiPagesApiController < ApplicationController
   # @returns PageRevision
   def show_revision
     GuardRail.activate(:secondary) do
-      if params.has_key?(:revision_id)
+      if params.key?(:revision_id)
         permission = :read_revisions
         revision = @page.versions.where(number: params[:revision_id].to_i).first!
       else
@@ -482,7 +482,7 @@ class WikiPagesApiController < ApplicationController
         revision = @page.versions.current
       end
       if authorized_action(@page, @current_user, permission)
-        include_content = if params.has_key?(:summary)
+        include_content = if params.key?(:summary)
                             !value_to_boolean(params[:summary])
                           else
                             true
@@ -553,11 +553,11 @@ class WikiPagesApiController < ApplicationController
 
       # attempt to find an existing page
       @url = params[:url]
-      if is_front_page_action?
-        @page = @wiki.front_page
-      else
-        @page = @wiki.find_page(@url)
-      end
+      @page = if is_front_page_action?
+                @wiki.front_page
+              else
+                @wiki.find_page(@url)
+              end
     end
 
     # create a new page if the page was not found
@@ -590,14 +590,14 @@ class WikiPagesApiController < ApplicationController
     # normalize parameters
     page_params = params[:wiki_page] ? params[:wiki_page].permit(*%w(title body notify_of_update published front_page editing_roles)) : {}
 
-    if page_params.has_key?(:published)
+    if page_params.key?(:published)
       published_value = page_params.delete(:published)
       if published_value != ''
         workflow_state = value_to_boolean(published_value) ? 'active' : 'unpublished'
       end
     end
 
-    if page_params.has_key?(:editing_roles)
+    if page_params.key?(:editing_roles)
       editing_roles = page_params[:editing_roles].split(',').map(&:strip)
       invalid_roles = editing_roles.reject { |role| %w(teachers students members public).include?(role) }
       unless invalid_roles.empty?
@@ -608,7 +608,7 @@ class WikiPagesApiController < ApplicationController
       page_params[:editing_roles] = editing_roles.join(',')
     end
 
-    if page_params.has_key?(:front_page)
+    if page_params.key?(:front_page)
       @set_as_front_page = value_to_boolean(page_params.delete(:front_page))
       @set_front_page = true if @was_front_page != @set_as_front_page
     end
@@ -625,8 +625,8 @@ class WikiPagesApiController < ApplicationController
 
       if editing_roles
         existing_editing_roles = (@page.editing_roles || '').split(',')
-        editing_roles_changed = existing_editing_roles.reject { |role| editing_roles.include?(role) }.length > 0
-        editing_roles_changed |= editing_roles.reject { |role| existing_editing_roles.include?(role) }.length > 0
+        editing_roles_changed = existing_editing_roles.count { |role| editing_roles.exclude?(role) } > 0
+        editing_roles_changed |= editing_roles.count { |role| existing_editing_roles.exclude?(role) } > 0
         rejected_fields << :editing_roles if editing_roles_changed
       end
 
@@ -653,7 +653,7 @@ class WikiPagesApiController < ApplicationController
     valid_front_page = true
     if change_front_page || workflow_state
       new_front_page = change_front_page ? @set_as_front_page : @page.is_front_page?
-      new_workflow_state = workflow_state ? workflow_state : @page.workflow_state
+      new_workflow_state = workflow_state || @page.workflow_state
       valid_front_page = false if new_front_page && new_workflow_state != 'active'
       if new_front_page && new_workflow_state != 'active'
         valid_front_page = false
@@ -712,6 +712,6 @@ class WikiPagesApiController < ApplicationController
 
     @page.set_as_front_page! if !@wiki.has_front_page? && @page.is_front_page? && !@page.deleted?
 
-    return true
+    true
   end
 end

@@ -33,7 +33,7 @@ class ContentTag < ActiveRecord::Base
   restrict_columns :state, [:workflow_state]
 
   belongs_to :content, polymorphic: [], exhaustive: false
-  validates_inclusion_of :content_type, :allow_nil => true, :in => CONTENT_TYPES
+  validates :content_type, inclusion: { :allow_nil => true, :in => CONTENT_TYPES }
   belongs_to :context, polymorphic:
       [:course, :learning_outcome_group, :assignment, :account,
        { quiz: 'Quizzes::Quiz' }]
@@ -51,9 +51,9 @@ class ContentTag < ActiveRecord::Base
   # This allows bypassing loading context for validation if we have
   # context_id and context_type set, but still allows validating when
   # context is not yet saved.
-  validates_presence_of :context, :unless => proc { |tag| tag.context_id && tag.context_type }
-  validates_presence_of :workflow_state
-  validates_length_of :comments, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
+  validates :context, presence: { :unless => proc { |tag| tag.context_id && tag.context_type } }
+  validates :workflow_state, presence: true
+  validates :comments, length: { :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true }
   before_save :associate_external_tool
   before_save :default_values
   before_save :set_root_account
@@ -74,7 +74,7 @@ class ContentTag < ActiveRecord::Base
   acts_as_list :scope => :context_module
 
   set_policy do
-    given { |user, session| self.context && self.context.grants_right?(user, session, :manage_content) }
+    given { |user, session| self.context&.grants_right?(user, session, :manage_content) }
     can :delete
   end
 
@@ -181,7 +181,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def confirm_valid_module_requirements
-    self.context_module && self.context_module.confirm_valid_requirements
+    self.context_module&.confirm_valid_requirements
   end
 
   def scoreable?
@@ -193,7 +193,7 @@ class ContentTag < ActiveRecord::Base
     return false if self.content_type == 'WikiPage'
     return false unless self.can_have_assignment?
 
-    return content && !content.assignment_id.nil?
+    content && !content.assignment_id.nil?
   end
 
   def duplicate_able?
@@ -220,7 +220,8 @@ class ContentTag < ActiveRecord::Base
   end
 
   def content_type_class(is_student = false)
-    if self.content_type == 'Assignment'
+    case self.content_type
+    when 'Assignment'
       if self.content && self.content.submission_types == 'online_quiz'
         is_student ? 'lti-quiz' : 'quiz'
       elsif self.content && self.content.submission_types == 'discussion_topic'
@@ -230,7 +231,7 @@ class ContentTag < ActiveRecord::Base
       else
         'assignment'
       end
-    elsif self.content_type == 'Quizzes::Quiz'
+    when 'Quizzes::Quiz'
       is_student ? 'lti-quiz' : 'quiz'
     else
       self.content_type.underscore
@@ -302,7 +303,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def asset_context_matches?
-    self.content && self.content.respond_to?(:context) && self.content.context == context
+    self.content.respond_to?(:context) && self.content.context == context
   end
 
   def update_asset_name!(user = nil)
@@ -326,7 +327,7 @@ class ContentTag < ActiveRecord::Base
   def update_asset_workflow_state!
     return unless self.sync_workflow_state_to_asset?
     return unless self.asset_context_matches?
-    return unless self.content && self.content.respond_to?(:publish!)
+    return unless self.content.respond_to?(:publish!)
 
     # update the asset and also update _other_ content tags that point at it
     if self.unpublished? && self.content.published? && self.content.can_unpublish?
@@ -339,8 +340,8 @@ class ContentTag < ActiveRecord::Base
   end
 
   def self.delete_for(asset)
-    ContentTag.where(content_id: asset, content_type: asset.class.to_s).each { |t| t.destroy }
-    ContentTag.where(context_id: asset, context_type: asset.class.to_s).each { |t| t.destroy }
+    ContentTag.where(content_id: asset, content_type: asset.class.to_s).each(&:destroy)
+    ContentTag.where(context_id: asset, context_type: asset.class.to_s).each(&:destroy)
   end
 
   def can_destroy?
@@ -351,7 +352,7 @@ class ContentTag < ActiveRecord::Base
       other_link = ContentTag.learning_outcome_links.active
                              .where(:context_type => self.context_type, :context_id => self.context_id, :content_id => outcome)
                              .where("id<>?", self).first
-      if !other_link
+      unless other_link
         # and there are alignments to the outcome (in the link's context for
         # foreign links, in any context for native links)
         alignment_conditions = { :learning_outcome_id => outcome.id }
@@ -380,7 +381,7 @@ class ContentTag < ActiveRecord::Base
       raise LastLinkToOutcomeNotDestroyed.new "Outcome '#{aligned_outcome}' cannot be deleted because it is aligned to content."
     end
 
-    context_module.remove_completion_requirement(id) if context_module
+    context_module&.remove_completion_requirement(id)
 
     self.workflow_state = 'deleted'
     self.save!
@@ -439,10 +440,10 @@ class ContentTag < ActiveRecord::Base
     tags = tags.select([:id, :tag_type, :content_type, :context_module_id]).to_a
     return if tags.empty?
 
-    module_ids = tags.map(&:context_module_id).compact
+    module_ids = tags.filter_map(&:context_module_id)
 
     # update title
-    tag_ids = tags.select { |t| t.sync_title_to_asset_title? }.map(&:id)
+    tag_ids = tags.select(&:sync_title_to_asset_title?).map(&:id)
     attr_hash = { :updated_at => Time.now.utc }
     { :display_name => :title, :name => :title, :title => :title }.each do |attr, val|
       attr_hash[val] = asset.send(attr) if asset.respond_to?(attr)
@@ -450,7 +451,7 @@ class ContentTag < ActiveRecord::Base
     ContentTag.where(:id => tag_ids).update_all(attr_hash) unless tag_ids.empty?
 
     # update workflow_state
-    tag_ids = tags.select { |t| t.sync_workflow_state_to_asset? }.map(&:id)
+    tag_ids = tags.select(&:sync_workflow_state_to_asset?).map(&:id)
     attr_hash = { :updated_at => Time.now.utc }
 
     workflow_state = asset_workflow_state(asset)
@@ -479,7 +480,7 @@ class ContentTag < ActiveRecord::Base
 
   def context_module_action(user, action, points = nil)
     GuardRail.activate(:primary) do
-      self.context_module.update_for(user, action, self, points) if self.context_module
+      self.context_module&.update_for(user, action, self, points)
     end
   end
 
@@ -498,7 +499,7 @@ class ContentTag < ActiveRecord::Base
   def content_asset_string=(val)
     vals = val.split("_")
     id = vals.pop
-    type = Context::asset_type_for_string(vals.join("_").classify)
+    type = Context.asset_type_for_string(vals.join("_").classify)
     if type && id && id.to_i > 0
       self.content_type = type.to_s
       self.content_id = id
@@ -670,12 +671,12 @@ class ContentTag < ActiveRecord::Base
   def set_root_account
     return if self.root_account_id.present?
 
-    case self.context
-    when Account
-      self.root_account_id = self.context.resolved_root_account_id
-    else
-      self.root_account_id = self.context&.root_account_id
-    end
+    self.root_account_id = case self.context
+                           when Account
+                             self.context.resolved_root_account_id
+                           else
+                             self.context&.root_account_id
+                           end
   end
 
   def quiz_lti

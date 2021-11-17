@@ -21,10 +21,12 @@
 require_relative '../api_spec_helper'
 
 describe ScopesApiController, type: :request do
-  before { enable_default_developer_key! }
+  before do
+    # We want to force the usage of the fallback scope mapper here, not the generated version
+    stub_const('ApiScopeMapper', ApiScopeMapperFallback)
 
-  # We want to force the usage of the fallback scope mapper here, not the generated version
-  Object.const_set("ApiScopeMapper", ApiScopeMapperLoader.api_scope_mapper_fallback)
+    enable_default_developer_key!
+  end
 
   describe "index" do
     before do

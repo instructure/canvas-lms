@@ -31,7 +31,10 @@ class WimbaConference < WebConference
     urls = []
     if (res = send_request('listClass', { 'filter00' => 'archive_of', 'filter00value' => wimba_id, 'attribute' => 'longname' }))
       res.sub(/\A100 OK\n/, '').split(/\n=END RECORD\n?/).each do |match|
-        data = match.split(/\n/).inject({}) { |hash, line| key, hash[key.to_sym] = line.split(/=/, 2); hash }
+        data = match.split("\n").inject({}) { |hash, line|
+          key, hash[key.to_sym] = line.split(/=/, 2)
+          hash
+        }
         unless data[:longname] && data[:class_id]
           logger.error "wimba error reading archive list"
           break
@@ -62,7 +65,7 @@ class WimbaConference < WebConference
     url = "http://#{server}/admin/api/api.pl"
     query_string = "function=#{action}"
     opts.each do |key, val|
-      query_string += "&#{CGI::escape(key)}=#{CGI::escape(val.to_s)}"
+      query_string += "&#{CGI.escape(key)}=#{CGI.escape(val.to_s)}"
     end
     url + "?" + query_string
   end
@@ -160,12 +163,12 @@ class WimbaConference < WebConference
 
   def join_url(user, room_id = wimba_id)
     (token = get_auth_token(user)) &&
-      "http://#{server}/launcher.cgi.pl?hzA=#{CGI::escape(token)}&room=#{CGI::escape(room_id)}"
+      "http://#{server}/launcher.cgi.pl?hzA=#{CGI.escape(token)}&room=#{CGI.escape(room_id)}"
   end
 
   def settings_url(user, room_id = wimba_id)
     (token = get_auth_token(user)) &&
-      "http://#{server}/admin/class/create_manage_frameset.html.epl?hzA=#{CGI::escape(token)}&class_id=#{CGI::escape(room_id)}"
+      "http://#{server}/admin/class/create_manage_frameset.html.epl?hzA=#{CGI.escape(token)}&class_id=#{CGI.escape(room_id)}"
   end
 
   def get_auth_token(user)
@@ -208,7 +211,7 @@ class WimbaConference < WebConference
   end
 
   def init_session
-    if !@auth_cookie
+    unless @auth_cookie
       send_request('Init') or return false
     end
 

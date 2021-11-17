@@ -96,7 +96,7 @@ class SubmissionList
   attr_reader :list
 
   def initialize(course)
-    raise ArgumentError, "Must provide a course." unless course && course.is_a?(Course)
+    raise ArgumentError, "Must provide a course." unless course.is_a?(Course)
 
     @course = course
     process
@@ -298,7 +298,7 @@ class SubmissionList
   # A list of all versions in YAML format
   def yaml_list
     @yaml_list ||= self.course.submissions.not_placeholder.preload(:versions).map do |s|
-      s.versions.map { |v| v.yaml }
+      s.versions.map(&:yaml)
     end.flatten
   end
 
@@ -313,7 +313,7 @@ class SubmissionList
 
   # This method will add regrade details to the existing raw_hash_list
   def add_regrade_info(hash_list)
-    quiz_submission_ids = hash_list.map { |y| y[:quiz_submission_id] }.compact
+    quiz_submission_ids = hash_list.filter_map { |y| y[:quiz_submission_id] }
     return hash_list if quiz_submission_ids.blank?
 
     quiz_submissions = Quizzes::QuizSubmission.where("id IN (?) AND score_before_regrade IS NOT NULL", quiz_submission_ids)
@@ -330,14 +330,14 @@ class SubmissionList
   # Still a list of unsorted, unfiltered hashes, but the meta data is inserted at this point
   def full_hash_list
     @full_hash_list ||= self.raw_hash_list.map do |h|
-      h[:grader] = if h.has_key? :score_before_regrade
+      h[:grader] = if h.key? :score_before_regrade
                      I18n.t('gradebooks.history.regraded', "Regraded")
                    elsif h[:grader_id] && grader_map[h[:grader_id]]
                      grader_map[h[:grader_id]].name
                    else
                      I18n.t('gradebooks.history.graded_on_submission', 'Graded on submission')
                    end
-      h[:safe_grader_id] = h[:grader_id] ? h[:grader_id] : 0
+      h[:safe_grader_id] = h[:grader_id] || 0
       h[:assignment_name] = self.assignment_map[h[:assignment_id]].title
       h[:student_user_id] = h[:user_id]
       h[:student_name] = self.student_map[h[:user_id]].name

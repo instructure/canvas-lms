@@ -481,7 +481,7 @@ describe ConversationsController, type: :request do
       json = api_call(:get, "/api/v1/conversations.json?scope=starred",
                       { :controller => 'conversations', :action => 'index', :format => 'json', :scope => 'starred' })
       expect(json.size).to eq 3
-      expect(json.map { |c| c["id"] }.sort).to eq [@c1, @c2, @c3].map { |c| c.conversation_id }.sort
+      expect(json.map { |c| c["id"] }.sort).to eq [@c1, @c2, @c3].map(&:conversation_id).sort
     end
 
     it "does not include unstarred conversations in starred scope regardless of if read or archived" do
@@ -1804,7 +1804,7 @@ describe ConversationsController, type: :request do
       real_conversation.context = @course
       real_conversation.save!
 
-      @joe.enrollments.each { |e| e.destroy }
+      @joe.enrollments.each(&:destroy)
       @user = @billy
       api_call(:post, "/api/v1/conversations/#{real_conversation.id}/add_message",
                { :controller => 'conversations', :action => 'add_message', :id => real_conversation.id.to_s, :format => 'json' },

@@ -276,7 +276,7 @@ class ContentSharesController < ApplicationController
 
     unless @receivers.any?
       render(json: { message: 'No valid receiving users found' }, status: :bad_request)
-      return false
+      false
     end
 
     # TODO verify we're allowed to send content to these users, once we decide how to do that

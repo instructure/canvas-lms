@@ -21,10 +21,10 @@
 class Role < ActiveRecord::Base
   NULL_ROLE_TYPE = "NoPermissions"
 
-  ENROLLMENT_TYPES = ["StudentEnrollment", "TeacherEnrollment", "TaEnrollment", "DesignerEnrollment", "ObserverEnrollment"]
+  ENROLLMENT_TYPES = ["StudentEnrollment", "TeacherEnrollment", "TaEnrollment", "DesignerEnrollment", "ObserverEnrollment"].freeze
 
   DEFAULT_ACCOUNT_TYPE = 'AccountMembership'
-  ACCOUNT_TYPES = ['AccountAdmin', 'AccountMembership']
+  ACCOUNT_TYPES = ['AccountAdmin', 'AccountMembership'].freeze
 
   BASE_TYPES = (ACCOUNT_TYPES + ENROLLMENT_TYPES + [NULL_ROLE_TYPE]).freeze
   KNOWN_TYPES = (BASE_TYPES +
@@ -60,11 +60,11 @@ class Role < ActiveRecord::Base
   before_validation :infer_root_account_id, :if => :belongs_to_account?
 
   validate :ensure_unique_name_for_account, :if => :belongs_to_account?
-  validates_presence_of :name, :workflow_state
-  validates_presence_of :account_id, :if => :belongs_to_account?
+  validates :name, :workflow_state, presence: true
+  validates :account_id, presence: { :if => :belongs_to_account? }
 
-  validates_inclusion_of :base_role_type, :in => BASE_TYPES, :message => 'is invalid'
-  validates_exclusion_of :name, :in => KNOWN_TYPES, :unless => :built_in?, :message => 'is reserved'
+  validates :base_role_type, inclusion: { :in => BASE_TYPES, :message => 'is invalid' }
+  validates :name, exclusion: { :in => KNOWN_TYPES, :unless => :built_in?, :message => 'is reserved' }
   validate :ensure_non_built_in_name
 
   def role_for_root_account_id(target_root_account_id)
@@ -80,9 +80,9 @@ class Role < ActiveRecord::Base
   def ensure_unique_name_for_account
     if self.active?
       scope = Role.where("name = ? AND account_id = ? AND workflow_state = ?", self.name, self.account_id, 'active')
-      if self.new_record? ? scope.exists? : scope.where("id <> ?", self.id).exists?
+      if self.new_record? ? scope.exists? : scope.where.not(id: self.id).exists?
         self.errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
-        return false
+        false
       end
     end
   end
@@ -90,7 +90,7 @@ class Role < ActiveRecord::Base
   def ensure_non_built_in_name
     if !self.built_in? && Role.built_in_roles(root_account_id: self.root_account_id).map(&:label).include?(self.name)
       self.errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
-      return false
+      false
     end
   end
 
@@ -131,11 +131,11 @@ class Role < ActiveRecord::Base
   end
 
   def self.built_in_course_roles(root_account_id:)
-    built_in_roles(root_account_id: root_account_id).select { |role| role.course_role? }
+    built_in_roles(root_account_id: root_account_id).select(&:course_role?)
   end
 
   def self.visible_built_in_roles(root_account_id:)
-    built_in_roles(root_account_id: root_account_id).select { |role| role.visible? }
+    built_in_roles(root_account_id: root_account_id).select(&:visible?)
   end
 
   def self.get_role_by_id(id)
@@ -151,7 +151,7 @@ class Role < ActiveRecord::Base
 
   def ==(other_role)
     if other_role.is_a?(Role) && self.built_in? && other_role.built_in?
-      return self.name == other_role.name # be equivalent even if they're on different shards/root_accounts
+      self.name == other_role.name # be equivalent even if they're on different shards/root_accounts
     else
       super
     end
@@ -248,9 +248,9 @@ class Role < ActiveRecord::Base
   def self.custom_roles_and_counts_for_course(course, user, include_inactive = false)
     users_scope = course.users_visible_to(user)
     built_in_role_ids = Role.built_in_course_roles(root_account_id: course.root_account_id).map(&:id)
-    base_counts = users_scope.where('enrollments.role_id IN (?)', built_in_role_ids)
+    base_counts = users_scope.where(enrollments: { role_id: built_in_role_ids })
                              .group('enrollments.type').select('users.id').distinct.count
-    role_counts = users_scope.where('enrollments.role_id NOT IN (?)', built_in_role_ids)
+    role_counts = users_scope.where.not(enrollments: { role_id: built_in_role_ids })
                              .group('enrollments.role_id').select('users.id').distinct.count
 
     @enrollment_types = Role.all_enrollment_roles_for_account(course.account, include_inactive)

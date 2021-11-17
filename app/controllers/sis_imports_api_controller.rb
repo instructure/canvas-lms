@@ -567,7 +567,7 @@ class SisImportsApiController < ApplicationController
   def create
     if authorized_action(@account, @current_user, :import_sis)
       params[:import_type] ||= 'instructure_csv'
-      raise "invalid import type parameter" unless SisBatch.valid_import_types.has_key?(params[:import_type])
+      raise "invalid import type parameter" unless SisBatch.valid_import_types.key?(params[:import_type])
 
       if !api_request? && @account.current_sis_batch.try(:importing?)
         return render :json => { :error => true, :error_message => t(:sis_import_in_process_notice, "An SIS import is already in process."), :batch_in_progress => true },
@@ -575,7 +575,7 @@ class SisImportsApiController < ApplicationController
       end
 
       file_obj = nil
-      if params.has_key?(:attachment)
+      if params.key?(:attachment)
         file_obj = params[:attachment]
       else
         file_obj = request.body
@@ -602,7 +602,7 @@ class SisImportsApiController < ApplicationController
           # copy of request with original content type restored
           request2 = Rack::Request.new(env)
           charset = request2.media_type_params['charset']
-          if charset.present? && charset.downcase != 'utf-8'
+          if charset.present? && !charset.casecmp?('utf-8')
             return render :json => { :error => t('errors.invalid_content_type', "Invalid content type, UTF-8 required") }, :status => 400
           end
 

@@ -187,13 +187,13 @@ describe Folder do
     not_locked = [
       Folder.root_folders(@course).first,
       @course.folders.create!(:name => "not locked 1", :locked => false),
-      @course.folders.create!(:name => "not locked 2", :lock_at => 1.days.from_now),
-      @course.folders.create!(:name => "not locked 3", :lock_at => 2.days.ago, :unlock_at => 1.days.ago)
+      @course.folders.create!(:name => "not locked 2", :lock_at => 1.day.from_now),
+      @course.folders.create!(:name => "not locked 3", :lock_at => 2.days.ago, :unlock_at => 1.day.ago)
     ]
     locked = [
       @course.folders.create!(:name => "locked 1", :locked => true),
-      @course.folders.create!(:name => "locked 2", :lock_at => 1.days.ago),
-      @course.folders.create!(:name => "locked 3", :lock_at => 1.days.ago, :unlock_at => 1.days.from_now)
+      @course.folders.create!(:name => "locked 2", :lock_at => 1.day.ago),
+      @course.folders.create!(:name => "locked 3", :lock_at => 1.day.ago, :unlock_at => 1.day.from_now)
     ]
     expect(@course.folders.map(&:id).sort).to eq (not_locked + locked).map(&:id).sort
     expect(@course.folders.not_locked.map(&:id).sort).to eq (not_locked).map(&:id).sort

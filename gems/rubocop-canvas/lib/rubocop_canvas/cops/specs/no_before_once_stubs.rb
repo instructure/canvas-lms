@@ -47,7 +47,6 @@ module RuboCop
           return unless STUB_METHODS.include? method_name
           return unless node.ancestors.find do |ancestor|
             child = ancestor.children && ancestor.children[0]
-            child &&
             child.is_a?(::RuboCop::AST::Node) &&
             child.to_a[1] == BLOCK_METHOD &&
             child.to_a[2] &&

@@ -631,7 +631,12 @@ module Canvas::LiveEvents
   end
 
   def self.quiz_export_complete(content_export)
-    payload = content_export.settings[:quizzes2]
+    # when importing content export packages, migration_ids are obtained
+    # from content_migrations, a content_migration and content_export can share
+    # the same ID.
+    # The "content-export-" prefix prevents from saving the same migration_id on
+    # records that belong to different migrations
+    payload = (content_export.settings[:quizzes2] || {}).merge({ content_export_id: "content-export-#{content_export.global_id}" })
     post_event_stringified('quiz_export_complete', payload, amended_context(content_export.context))
   end
 
@@ -969,5 +974,14 @@ module Canvas::LiveEvents
       learning_outcome_id: description.learning_outcome_id,
       root_account_id: description.root_account_id
     }
+  end
+
+  def self.heartbeat
+    data = {
+      environment: Canvas.environment,
+      region_code: Canvas.region_code || 'not_configured',
+      region: Canvas.region || 'not_configured'
+    }
+    post_event_stringified('heartbeat', data)
   end
 end

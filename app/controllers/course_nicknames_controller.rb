@@ -70,10 +70,10 @@ class CourseNicknamesController < ApplicationController
     @current_user.shard.activate do
       courses = Course.where(:id => value_records.map(&:sub_key)).to_a.index_by(&:id)
       nicknames_json =
-        value_records.map do |record|
+        value_records.filter_map do |record|
           course = courses[record.sub_key]
           course && record.value && course_nickname_json(@current_user, course, record.value)
-        end.compact
+        end
 
       render(:json => nicknames_json)
     end

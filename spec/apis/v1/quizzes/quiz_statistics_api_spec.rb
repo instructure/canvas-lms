@@ -75,7 +75,7 @@ describe Quizzes::QuizStatisticsController, type: :request do
 
     it 'renders' do
       json = api_index
-      expect(json.has_key?('quiz_statistics')).to be_truthy
+      expect(json).to have_key('quiz_statistics')
       expect(json['quiz_statistics'].size).to eq 1
       expect(json['quiz_statistics'][0].keys).not_to eq []
       expect(json['quiz_statistics'][0]).to have_key('links')

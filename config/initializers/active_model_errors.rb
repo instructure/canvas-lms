@@ -110,7 +110,7 @@ module ActiveModel
       def full_message(attribute, message)
         return message if attribute == :base
 
-        str = attribute.to_s.gsub('.', '_').humanize
+        str = attribute.to_s.tr('.', '_').humanize
         str = base.class.human_attribute_name(attribute, default: str)
 
         keys = [

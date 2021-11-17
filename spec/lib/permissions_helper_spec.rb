@@ -347,7 +347,7 @@ describe PermissionsHelper do
 
   describe "precalculate_permissions_for_courses" do
     def exclude_reads(permissions_hash)
-      Hash[permissions_hash.map { |k, v| [k, v.except(:read, :read_grades, :read_as_admin, :participate_as_student)] }]
+      permissions_hash.transform_values { |v| v.except(:read, :read_grades, :read_as_admin, :participate_as_student) }
     end
 
     it "returns other course-level (non-standard) permission values for active enrollments" do
@@ -451,7 +451,7 @@ describe PermissionsHelper do
       @course2 = course_factory(:account => sub_account)
       account_admin_user(:active_all => true)
       result = @user.precalculate_permissions_for_courses([@course1, @course2], SectionTabHelper::PERMISSIONS_TO_PRECALCULATE)
-      expected = Hash[SectionTabHelper::PERMISSIONS_TO_PRECALCULATE.map { |p| [p, true] }] # should be true for everything
+      expected = SectionTabHelper::PERMISSIONS_TO_PRECALCULATE.index_with { true } # should be true for everything
       expect(result).to eq({ @course1.global_id => expected, @course2.global_id => expected })
     end
 

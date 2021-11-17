@@ -22,8 +22,8 @@ require_dependency 'messageable_user'
 
 class MessageableUser
   class Calculator
-    CONTEXT_RECIPIENT = /\A(course|section|group|discussion_topic)_(\d+)(_([a-z]+))?\z/
-    INDIVIDUAL_RECIPIENT = /\A\d+\z/
+    CONTEXT_RECIPIENT = /\A(course|section|group|discussion_topic)_(\d+)(_([a-z]+))?\z/.freeze
+    INDIVIDUAL_RECIPIENT = /\A\d+\z/.freeze
 
     # all work is done within the context of a user. avoid passing it around in
     # every single method call by being an object instead of just a collection
@@ -239,7 +239,7 @@ class MessageableUser
     end
 
     def self.secondary(method)
-      secondary_module.module_eval <<-RUBY, __FILE__, __LINE__ + 1
+      secondary_module.module_eval <<~RUBY, __FILE__, __LINE__ + 1
         def #{method}(*)
           GuardRail.activate(:secondary) { super }
         end
@@ -296,7 +296,7 @@ class MessageableUser
       # skipping messageability constraints, do I see the user in that specific
       # course, and if so with which enrollment type(s)?
       if include_course_id && (course = Course.where(id: include_course_id).first)
-        missing_users = users.reject { |user| user.global_common_courses.keys.include?(course.global_id) }
+        missing_users = users.reject { |user| user.global_common_courses.key?(course.global_id) }
         if missing_users.present?
           course.shard.activate do
             reverse_lookup = missing_users.index_by(&:id)
@@ -349,7 +349,7 @@ class MessageableUser
       # skipping messageability constraints, do I see the user in that specific
       # group?
       if include_group_id && (group = Group.where(id: include_group_id).first)
-        missing_users = users.reject { |user| user.global_common_groups.keys.include?(group.global_id) }
+        missing_users = users.reject { |user| user.global_common_groups.key?(group.global_id) }
         if missing_users.present?
           group.shard.activate do
             reverse_lookup = missing_users.index_by(&:id)
@@ -528,9 +528,10 @@ class MessageableUser
       discussion = discussion_or_id.is_a?(DiscussionTopic) ? discussion_or_id : DiscussionTopic.where(id: discussion_or_id).first
       context = discussion.address_book_context_for(@user)
 
-      if context.is_a?(Course)
+      case context
+      when Course
         messageable_users_in_course_scope(context, nil, options)
-      elsif context.is_a?(Group)
+      when Group
         messageable_users_in_group_scope(context, options)
       else
         messageable_users_in_section_scope(context, nil, options)
@@ -541,7 +542,7 @@ class MessageableUser
       if global_exclude_ids.present?
         target_shard = scope.shard_value
         exclude_ids = global_exclude_ids.map { |id| Shard.relative_id_for(id, Shard.current, target_shard) }
-        scope = scope.where(["users.id NOT IN (?)", exclude_ids])
+        scope = scope.where.not(users: { id: exclude_ids })
       end
 
       if search.present? && (parts = search.strip.split(/\s+/)).present?
@@ -776,7 +777,7 @@ class MessageableUser
     # is acceptable, as this is specific to a course and the enrollments all
     # live on the same shard as the course
     def uncached_observed_student_ids_in_course(course)
-      course.section_visibilities_for(@user).map { |s| s[:associated_user_id] }.compact
+      course.section_visibilities_for(@user).filter_map { |s| s[:associated_user_id] }
     end
 
     def uncached_linked_observer_ids
@@ -837,7 +838,7 @@ class MessageableUser
                               .select("group_memberships.group_id AS group_id")
                               .distinct
                               .joins(:user, :group)
-                              .joins(<<~SQL)
+                              .joins(<<~SQL.squish)
                                 INNER JOIN #{Enrollment.quoted_table_name} ON
                                   enrollments.user_id=users.id AND
                                   enrollments.course_id=groups.context_id
@@ -1050,8 +1051,7 @@ class MessageableUser
     end
 
     def marshal_dump
-      ivars = (instance_variables - [:@linked_observer_ids_by_shard]).map { |name| [name, instance_variable_get(name)] }
-      ivars
+      (instance_variables - [:@linked_observer_ids_by_shard]).map { |name| [name, instance_variable_get(name)] }
     end
 
     def marshal_load(ivars)

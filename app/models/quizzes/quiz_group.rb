@@ -28,9 +28,9 @@ class Quizzes::QuizGroup < ActiveRecord::Base
   belongs_to :assessment_question_bank
   has_many :quiz_questions, :class_name => 'Quizzes::QuizQuestion', :dependent => :destroy
 
-  validates_presence_of :quiz_id
-  validates_length_of :name, maximum: maximum_string_length, allow_nil: true
-  validates_numericality_of :pick_count, :question_points, allow_nil: true
+  validates :quiz_id, presence: true
+  validates :name, length: { maximum: maximum_string_length, allow_nil: true }
+  validates :pick_count, :question_points, numericality: { allow_nil: true }
 
   before_validation :set_default_pick_count
   before_save :infer_position
@@ -66,7 +66,7 @@ class Quizzes::QuizGroup < ActiveRecord::Base
       "name" => self.name,
       "pick_count" => self.pick_count,
       "question_points" => self.question_points,
-      "questions" => self.assessment_question_bank_id ? [] : self.quiz_questions.active.map { |q| q.data },
+      "questions" => self.assessment_question_bank_id ? [] : self.quiz_questions.active.map(&:data),
       "assessment_question_bank_id" => self.assessment_question_bank_id
     }.with_indifferent_access
   end

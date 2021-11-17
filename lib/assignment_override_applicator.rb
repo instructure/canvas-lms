@@ -198,11 +198,11 @@ module AssignmentOverrideApplicator
     group_category_id = assignment_or_quiz.group_category_id || assignment_or_quiz.discussion_topic.try(:group_category_id)
     return nil unless group_category_id
 
-    if assignment_or_quiz.context.user_has_been_student?(user)
-      group = user.current_groups.shard(assignment_or_quiz.shard).where(:group_category_id => group_category_id).first
-    else
-      group = assignment_or_quiz.context.groups.where(:group_category_id => group_category_id).first
-    end
+    group = if assignment_or_quiz.context.user_has_been_student?(user)
+              user.current_groups.shard(assignment_or_quiz.shard).where(:group_category_id => group_category_id).first
+            else
+              assignment_or_quiz.context.groups.where(:group_category_id => group_category_id).first
+            end
 
     if group
       if assignment_or_quiz.assignment_overrides.loaded?
@@ -307,11 +307,11 @@ module AssignmentOverrideApplicator
 
     self.setup_overridden_clone(unoverridden_assignment_or_quiz,
                                 overrides) do |cloned_assignment_or_quiz|
-      if overrides && overrides.any?
+      if overrides&.any?
         self.collapsed_overrides(unoverridden_assignment_or_quiz, overrides).each do |field, value|
           # for any times in the value set, bring them back from raw UTC into the
           # current Time.zone before placing them in the assignment
-          value = value.in_time_zone if value && value.respond_to?(:in_time_zone) && !value.is_a?(Date)
+          value = value.in_time_zone if value.respond_to?(:in_time_zone) && !value.is_a?(Date)
           cloned_assignment_or_quiz.write_attribute(field, value)
         end
       end
@@ -346,7 +346,7 @@ module AssignmentOverrideApplicator
             # force times to un-zoned UTC -- this will be a cached value and should
             # not care about the TZ of the user that cached it. the user's TZ will
             # be applied before it's returned.
-            value = value.utc if value && value.respond_to?(:utc) && !value.is_a?(Date)
+            value = value.utc if value.respond_to?(:utc) && !value.is_a?(Date)
             overridden_data[field] = value
           end
         end
@@ -357,7 +357,7 @@ module AssignmentOverrideApplicator
 
   # turn the list of overrides into a unique but consistent cache key component
   def self.overrides_hash(overrides)
-    canonical = overrides.map { |override| override.cache_key }.inspect
+    canonical = overrides.map(&:cache_key).inspect
     Digest::MD5.hexdigest(canonical)
   end
 

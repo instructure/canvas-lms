@@ -290,9 +290,9 @@ class AuthenticationProvider < ActiveRecord::Base
         role_names = value.is_a?(String) ? value.split(',').map(&:strip) : value
         account = pseudonym.account
         existing_account_users = account.account_users.merge(user.account_users).preload(:role).to_a
-        roles = role_names.map do |role_name|
+        roles = role_names.filter_map do |role_name|
           account.get_account_role_by_name(role_name)
-        end.compact
+        end
         roles_to_add = roles - existing_account_users.map(&:role)
         account_users_to_delete = existing_account_users.select { |au| au.active? && !roles.include?(au.role) }
         account_users_to_activate = existing_account_users.select { |au| au.deleted? && roles.include?(au.role) }

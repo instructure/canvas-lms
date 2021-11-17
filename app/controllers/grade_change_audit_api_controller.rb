@@ -252,7 +252,7 @@ class GradeChangeAuditApiController < AuditorApiController
   # @returns [GradeChangeEvent]
   #
   def query
-    unless Auditors::read_from_postgres?
+    unless Auditors.read_from_postgres?
       return render json: { message: "Advanced query is unsupported on this instance" }, status: :not_implemented
     end
 
@@ -274,10 +274,13 @@ class GradeChangeAuditApiController < AuditorApiController
     end
 
     conditions = {}
-    conditions.merge!(context_id: course.id, context_type: 'Course') if course
-    conditions.merge!(student_id: student.id) if student
-    conditions.merge!(grader_id: grader.id) if grader
-    conditions.merge!(assignment_id: assignment.id) if assignment
+    if course
+      conditions[:context_id] = course.id
+      conditions[:context_type] = 'Course'
+    end
+    conditions[:student_id] = student.id if student
+    conditions[:grader_id] = grader.id if grader
+    conditions[:assignment_id] = assignment.id if assignment
     if conditions.empty?
       return render json: { message: "Must specify at least one query condition" }, status: :bad_request
     end
@@ -383,7 +386,7 @@ class GradeChangeAuditApiController < AuditorApiController
   end
 
   def anonymous_and_muted(events)
-    assignment_ids = events.map { |event| event["attributes"].fetch("assignment_id") }.compact
+    assignment_ids = events.filter_map { |event| event["attributes"].fetch("assignment_id") }
     assignments = api_find_all(Assignment, assignment_ids)
     assignments_anonymous_and_muted = {}
 

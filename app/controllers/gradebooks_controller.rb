@@ -122,7 +122,7 @@ class GradebooksController < ApplicationController
       json
     end
 
-    grading_period = @grading_periods && @grading_periods.find { |period| period[:id] == gp_id }
+    grading_period = @grading_periods&.find { |period| period[:id] == gp_id }
 
     ags_json = light_weight_ags_json(@presenter.groups, { student: @presenter.student })
     root_account = @context.root_account
@@ -831,7 +831,7 @@ class GradebooksController < ApplicationController
   end
 
   def speed_grader
-    if !@context.allows_speed_grader?
+    unless @context.allows_speed_grader?
       flash[:notice] = t(:speed_grader_disabled, 'SpeedGrader is disabled for this course')
       return redirect_to(course_gradebook_path(@context))
     end
@@ -983,7 +983,7 @@ class GradebooksController < ApplicationController
     if params[:selected_section_id]
       section_to_show = if params[:selected_section_id] == 'all'
                           nil
-                        elsif @context.active_course_sections.exists?(id: params[:selected_section_id])
+                        elsif @context.active_course_sections.where(id: params[:selected_section_id]).exists?
                           params[:selected_section_id]
                         end
 

@@ -48,7 +48,9 @@ describe 'Submissions Comment API', type: :request do
     end
 
     include_examples "file uploads api"
-    def has_query_exemption?; true; end
+    def has_query_exemption?
+      true
+    end
 
     def preflight(preflight_params)
       api_call :post,

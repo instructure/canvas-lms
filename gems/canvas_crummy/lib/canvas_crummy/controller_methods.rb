@@ -45,7 +45,7 @@ module CanvasCrummy
           name_value = instance.instance_eval(&name_value) if name_value.is_a? Proc
           name_value = instance.instance_variable_get("@#{name_value}") if name_value.is_a? Symbol
           record = instance.instance_variable_get("@#{name_value}") unless url_value or block_given?
-          if record and record.respond_to? :to_param
+          if record
             name_value, url_value = record.to_s, instance.url_for(record)
           end
 

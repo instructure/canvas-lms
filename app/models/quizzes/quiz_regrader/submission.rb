@@ -43,7 +43,7 @@ class Quizzes::QuizRegrader::Submission
 
   def rescored_submission
     previous_score = submission.score_before_regrade || submission.score
-    submission.score += answers_to_grade.map(&:regrade!).inject(&:+) || 0
+    submission.score += answers_to_grade.sum(&:regrade!)
     submission.score_before_regrade = previous_score
     submission.quiz_data = regraded_question_data
     submission

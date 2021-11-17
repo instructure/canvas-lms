@@ -18,24 +18,24 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class AccountNotification < ActiveRecord::Base
-  validates_presence_of :start_at, :end_at, :subject, :message, :account_id
+  validates :start_at, :end_at, :subject, :message, :account_id, presence: true
   validate :validate_dates
   validate :send_message_not_set_for_site_admin
   belongs_to :account, :touch => true
   belongs_to :user
   has_many :account_notification_roles, dependent: :destroy
-  validates_length_of :message, :maximum => maximum_text_length, :allow_nil => false, :allow_blank => false
-  validates_length_of :subject, :maximum => maximum_string_length
+  validates :message, length: { :maximum => maximum_text_length, :allow_nil => false, :allow_blank => false }
+  validates :subject, length: { :maximum => maximum_string_length }
   sanitize_field :message, CanvasSanitize::SANITIZE
 
   after_save :create_alert
   after_save :queue_message_broadcast
   after_save :clear_cache
 
-  ACCOUNT_SERVICE_NOTIFICATION_FLAGS = %w[account_survey_notifications]
-  validates_inclusion_of :required_account_service, in: ACCOUNT_SERVICE_NOTIFICATION_FLAGS, allow_nil: true
+  ACCOUNT_SERVICE_NOTIFICATION_FLAGS = %w[account_survey_notifications].freeze
+  validates :required_account_service, inclusion: { in: ACCOUNT_SERVICE_NOTIFICATION_FLAGS, allow_nil: true }
 
-  validates_inclusion_of :months_in_display_cycle, in: 1..48, allow_nil: true
+  validates :months_in_display_cycle, inclusion: { in: 1..48, allow_nil: true }
 
   def validate_dates
     if self.start_at && self.end_at
@@ -338,7 +338,7 @@ class AccountNotification < ActiveRecord::Base
       user_ids = Set.new
       get_everybody = roles.empty?
 
-      course_roles = roles.select { |role| role.course_role? }.map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
+      course_roles = roles.select(&:course_role?).map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
       if get_everybody || course_roles.any?
         Course.find_ids_in_ranges do |min_id, max_id|
           course_ids = Course.active.where(:id => min_id..max_id, :account_id => all_account_ids).pluck(:id)
@@ -352,7 +352,7 @@ class AccountNotification < ActiveRecord::Base
         end
       end
 
-      account_roles = roles.select { |role| role.account_role? }.map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
+      account_roles = roles.select(&:account_role?).map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
       if get_everybody || account_roles.any?
         AccountUser.find_ids_in_ranges do |min_id, max_id|
           scope = AccountUser.where(:id => min_id..max_id).active.where(:account_id => all_account_ids)

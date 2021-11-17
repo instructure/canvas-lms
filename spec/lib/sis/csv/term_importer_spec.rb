@@ -32,7 +32,7 @@ describe SIS::CSV::TermImporter do
     )
     expect(EnrollmentTerm.where.not(:sis_source_id => nil).count).to eq before_count + 1
 
-    errors = importer.errors.map { |r| r.last }
+    errors = importer.errors.map(&:last)
     expect(errors).to eq ["No term_id given for a term",
                           "Improper status \"inactive\" for term T002",
                           "No name given for term T003"]
@@ -60,7 +60,7 @@ describe SIS::CSV::TermImporter do
     expect(t2.start_at).to be_nil
     expect(t2.end_at).to be_nil
 
-    expect(importer.errors.map { |r| r.last }).to eq ["Bad date format for term T002"]
+    expect(importer.errors.map(&:last)).to eq ["Bad date format for term T002"]
   end
 
   it 'supports stickiness' do
@@ -120,7 +120,7 @@ describe SIS::CSV::TermImporter do
 
     t1.reload
     expect(t1).to_not be_deleted
-    expect(importer.errors.map { |r| r.last }.first).to include "Cannot delete a term with active courses"
+    expect(importer.errors.map(&:last).first).to include "Cannot delete a term with active courses"
 
     @course.destroy
 

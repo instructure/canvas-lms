@@ -84,7 +84,7 @@ module Importers
       references << quiz_question if quiz_question['question_type'] == 'question_reference'
     end
 
-    QUIZ_QUESTION_KEYS = ['position', 'points_possible']
+    QUIZ_QUESTION_KEYS = ['position', 'points_possible'].freeze
     IGNORABLE_QUESTION_KEYS = QUIZ_QUESTION_KEYS + ['answers', 'assessment_question_migration_id', 'migration_id', 'question_bank_migration_id',
                                                     'question_bank_id', 'is_quiz_question_bank', 'question_bank_name']
 
@@ -182,7 +182,7 @@ module Importers
       end
       new_record = item.new_record? || item.deleted?
 
-      hash[:due_at] ||= hash[:due_date] if hash.has_key?(:due_date)
+      hash[:due_at] ||= hash[:due_date] if hash.key?(:due_date)
       hash[:due_at] ||= hash[:grading][:due_date] if hash[:grading]
       master_migration = migration&.for_master_course_import? # propagate null dates only for blueprint syncs
       item.lock_at = Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[:lock_at]) if master_migration || hash[:lock_at]
@@ -240,7 +240,7 @@ module Importers
         if hash[:assignment][:migration_id] && !hash[:assignment][:migration_id].start_with?(MasterCourses::MIGRATION_ID_PREFIX)
           item.assignment ||= Quizzes::Quiz.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:assignment][:migration_id]).first
         end
-        item.assignment = nil if item.assignment && item.assignment.quiz && item.assignment.quiz.id != item.id
+        item.assignment = nil if item.assignment&.quiz && item.assignment.quiz.id != item.id
         item.assignment ||= context.assignments.temp_record
         item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
       elsif !item.assignment && (grading = hash[:grading])
@@ -270,7 +270,7 @@ module Importers
           migration.add_imported_item(override,
                                       key: [item.migration_id, override.set_type, override.set_id].join('/'))
         end
-        if hash.has_key?(:only_visible_to_overrides) && added_overrides
+        if hash.key?(:only_visible_to_overrides) && added_overrides
           item.only_visible_to_overrides = hash[:only_visible_to_overrides]
         end
       end
@@ -309,7 +309,7 @@ module Importers
       item.root_entries(true) if !item.available? && !item.survey? # reload items so we get accurate points
       item.notify_of_update = false
       item.save
-      item.assignment.save_without_broadcasting if item.assignment && item.assignment.changed?
+      item.assignment.save_without_broadcasting if item.assignment&.changed?
       if recache_due_dates
         migration.find_imported_migration_item(Assignment, item.assignment.migration_id)&.needs_update_cached_due_dates = true
       end
@@ -348,7 +348,7 @@ module Importers
 
       unless question_data[:qq_ids][item.migration_id]
         question_data[:qq_ids][item.migration_id] = {}
-        existing_questions = item.quiz_questions.active.where("migration_id IS NOT NULL").pluck(:id, :migration_id)
+        existing_questions = item.quiz_questions.active.where.not(migration_id: nil).pluck(:id, :migration_id)
         existing_questions.each do |id, mig_id|
           question_data[:qq_ids][item.migration_id][mig_id] = id
         end

@@ -25,9 +25,9 @@ module Polling
     has_many :poll_submissions, class_name: 'Polling::PollSubmission', dependent: :destroy
     has_many :poll_sessions, class_name: 'Polling::PollSession', dependent: :destroy
 
-    validates_presence_of :question, :user
-    validates_length_of :question, maximum: 255, allow_nil: true
-    validates_length_of :description, maximum: 255, allow_nil: true
+    validates :question, :user, presence: true
+    validates :question, length: { maximum: 255, allow_nil: true }
+    validates :description, length: { maximum: 255, allow_nil: true }
 
     set_policy do
       given { |user| self.user.present? && self.user == user }

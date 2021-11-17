@@ -47,11 +47,11 @@ module PaginatedCollection
 
     def execute_pager(pager)
       pager = @block.call(pager)
-      if !pager.respond_to?(:current_page)
+      unless pager.respond_to?(:current_page)
         raise(ArgumentError, "The PaginatedCollection block needs to return a WillPaginate-style object")
       end
 
-      return pager
+      pager
     end
   end
 end

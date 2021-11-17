@@ -36,7 +36,7 @@ module AcademicBenchmarks
           vendor_guid: guid,
           is_global_standard: true,
           type: 'learning_outcome_group',
-          outcomes: children.map { |c| c.build_outcomes(ratings, self) }.compact
+          outcomes: children.filter_map { |c| c.build_outcomes(ratings, self) }
         }
       end
     end

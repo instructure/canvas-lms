@@ -48,7 +48,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis::Summary do
 
       it "distributes the students accordingly" do
         buckets = summary.buckets
-        total = buckets.values.map(&:size).sum
+        total = buckets.values.sum(&:size)
         top, middle, bottom = buckets[:top].size / total.to_f, buckets[:middle].size / total.to_f, buckets[:bottom].size / total.to_f
 
         # because of the small sample size, this is slightly off, but close enough for gvt work

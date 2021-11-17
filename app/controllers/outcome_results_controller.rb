@@ -328,7 +328,7 @@ class OutcomeResultsController < ApplicationController
         send_data(
           outcome_results_rollups_csv(@current_user, @context, user_rollups, @outcomes, @outcome_paths),
           :type => "text/csv",
-          :filename => t('outcomes_filename', "Outcomes").gsub(/ /, "_") + "-" + @context.name.to_s.gsub(/ /, "_") + ".csv",
+          :filename => t('outcomes_filename', "Outcomes").tr(' ', "_") + "-" + @context.name.to_s.tr(' ', "_") + ".csv",
           :disposition => "attachment"
         )
       end
@@ -384,7 +384,7 @@ class OutcomeResultsController < ApplicationController
 
     rollups = user_rollups
     @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
-    rollups = @users.map { |u| rollups.find { |r| r.context.id == u.id } }.compact if params[:sort_by] == 'student'
+    rollups = @users.filter_map { |u| rollups.find { |r| r.context.id == u.id } } if params[:sort_by] == 'student'
     json = outcome_results_rollups_json(rollups)
     json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
     json
@@ -419,9 +419,8 @@ class OutcomeResultsController < ApplicationController
     filter_users_by_excludes(true)
     @results = find_results(all_users: false).preload(:user)
     aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context, params[:aggregate_stat])]
-    json = aggregate_outcome_results_rollups_json(aggregate_rollups)
+    aggregate_outcome_results_rollups_json(aggregate_rollups)
     # no pagination, so no meta field
-    json
   end
 
   def linked_include_collections
@@ -506,7 +505,7 @@ class OutcomeResultsController < ApplicationController
     if sort_by == 'outcome'
       sort_outcome_id = params[:sort_outcome_id]
       reject! "missing required sort_outcome_id parameter value" unless sort_outcome_id
-      reject! "invalid sort_outcome_id parameter value" unless sort_outcome_id =~ /\A\d+\z/
+      reject! "invalid sort_outcome_id parameter value" unless /\A\d+\z/.match?(sort_outcome_id)
     end
     sort_order = params[:sort_order]
     reject! "invalid sort_order parameter value" if sort_by && sort_order && !%w(asc desc).include?(sort_order)
@@ -579,7 +578,7 @@ class OutcomeResultsController < ApplicationController
   end
 
   def outcome_group_prefix(group)
-    if !group.parent_outcome_group
+    unless group.parent_outcome_group
       return []
     end
 

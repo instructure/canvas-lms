@@ -34,12 +34,12 @@ class ConversationParticipant < ActiveRecord::Base
 
   after_destroy :destroy_conversation_message_participants
 
-  scope :visible, -> { where("last_message_at IS NOT NULL") }
+  scope :visible, -> { where.not(last_message_at: nil) }
   scope :default, -> { where(:workflow_state => ['read', 'unread']) }
   scope :unread, -> { where(:workflow_state => 'unread') }
   scope :archived, -> { where(:workflow_state => 'archived') }
   scope :starred, -> { where(:label => 'starred') }
-  scope :sent, -> { where("visible_last_authored_at IS NOT NULL").order("visible_last_authored_at DESC, conversation_id DESC") }
+  scope :sent, -> { where.not(visible_last_authored_at: nil).order("visible_last_authored_at DESC, conversation_id DESC") }
   scope :for_masquerading_user, lambda { |masquerading_user, user_being_viewed|
     # site admins can see everything
     next all if masquerading_user.account_users.active.map(&:account_id).include?(Account.site_admin.id)
@@ -128,7 +128,7 @@ class ConversationParticipant < ActiveRecord::Base
       user_ids = users_by_conversation_shard[Shard.current]
 
       shard_conditions = if options[:mode] == :or || user_ids.size == 1
-                           [<<~SQL, user_ids]
+                           [<<~SQL.squish, user_ids]
                              EXISTS (
                                SELECT *
                                FROM #{ConversationParticipant.quoted_table_name} cp
@@ -137,7 +137,7 @@ class ConversationParticipant < ActiveRecord::Base
                              )
                            SQL
                          else
-                           [<<~SQL, user_ids, user_ids.size]
+                           [<<~SQL.squish, user_ids, user_ids.size]
                              (
                                SELECT COUNT(*)
                                FROM #{ConversationParticipant.quoted_table_name} cp
@@ -195,8 +195,8 @@ class ConversationParticipant < ActiveRecord::Base
   before_update :update_unread_count_for_update
   before_destroy :update_unread_count_for_destroy
 
-  validates_presence_of :conversation_id, :user_id, :workflow_state
-  validates_inclusion_of :label, :in => ['starred'], :allow_nil => true
+  validates :conversation_id, :user_id, :workflow_state, presence: true
+  validates :label, inclusion: { :in => ['starred'], :allow_nil => true }
 
   def as_json(options = {})
     latest = last_message
@@ -374,7 +374,7 @@ class ConversationParticipant < ActiveRecord::Base
   def update(hash)
     # subscribed= can update the workflow_state, but an explicit
     # workflow_state should trump that. so we do this first
-    subscribed = (hash.has_key?(:subscribed) ? hash.delete(:subscribed) : hash.delete('subscribed'))
+    subscribed = (hash.key?(:subscribed) ? hash.delete(:subscribed) : hash.delete('subscribed'))
     self.subscribed = subscribed unless subscribed.nil?
     super
   end

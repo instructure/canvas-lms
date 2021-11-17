@@ -18,13 +18,13 @@
 #
 module CanvasCassandra
   class Database
-    CONSISTENCY_CLAUSE = %r{%CONSISTENCY% ?}
+    CONSISTENCY_CLAUSE = %r{%CONSISTENCY% ?}.freeze
 
     def initialize(fingerprint, servers, opts, logger)
       thrift_opts = {}
-      thrift_opts[:retries] = opts.delete(:retries) if opts.has_key?(:retries)
-      thrift_opts[:connect_timeout] = opts.delete(:connect_timeout) if opts.has_key?(:connect_timeout)
-      thrift_opts[:timeout] = opts.delete(:timeout) if opts.has_key?(:timeout)
+      thrift_opts[:retries] = opts.delete(:retries) if opts.key?(:retries)
+      thrift_opts[:connect_timeout] = opts.delete(:connect_timeout) if opts.key?(:connect_timeout)
+      thrift_opts[:timeout] = opts.delete(:timeout) if opts.key?(:timeout)
 
       @db = CassandraCQL::Database.new(servers, opts, thrift_opts)
       @fingerprint = fingerprint
@@ -51,11 +51,11 @@ module CanvasCassandra
           query = query.sub(CONSISTENCY_CLAUSE, "USING CONSISTENCY #{consistency_text} ")
         end
 
-        if @db.use_cql3? && consistency
-          result = @db.execute_with_consistency(query, consistency, *args)
-        else
-          result = @db.execute(query, *args)
-        end
+        result = if @db.use_cql3? && consistency
+                   @db.execute_with_consistency(query, consistency, *args)
+                 else
+                   @db.execute(query, *args)
+                 end
       end
 
       @logger.debug("  #{"CQL (%.2fms)" % [ms]}  #{sanitize(query, args)} #{opts.inspect} [#{fingerprint}]")
@@ -204,7 +204,7 @@ module CanvasCassandra
         where_args << v
         "#{k} = ?"
       end.join(" AND ")
-      return where_clause, where_args
+      [where_clause, where_args]
     end
 
     def available?
@@ -248,7 +248,10 @@ module CanvasCassandra
           args << ttl_seconds
           statement << " USING TTL ?"
         end
-        update_cql = updates.map { |key, val| args << val; "#{key} = ?" }.join(", ")
+        update_cql = updates.map { |key, val|
+          args << val
+          "#{key} = ?"
+        }.join(", ")
         statement << " SET #{update_cql} WHERE #{where_clause}"
         args.concat where_args
         args.concat [execute_options]

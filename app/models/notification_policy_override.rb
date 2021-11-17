@@ -56,7 +56,7 @@ class NotificationPolicyOverride < ActiveRecord::Base
       if values.size > 0
         # if the user has no communication channels, there really isn't anything
         # to do here for them.
-        connection.execute(<<~SQL)
+        connection.execute(<<~SQL.squish)
           INSERT INTO #{NotificationPolicyOverride.quoted_table_name}
             (context_id, context_type, communication_channel_id, workflow_state, created_at, updated_at)
             VALUES #{sanitize_sql(values.join(","))}

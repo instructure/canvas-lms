@@ -545,7 +545,7 @@ describe ContentMigrationsController, type: :request do
       end
 
       it "errors if course quota exceeded" do
-        @post_params.merge!(:pre_attachment => { :name => "test.zip", :size => 1.gigabyte })
+        @post_params[:pre_attachment] = { :name => "test.zip", :size => 1.gigabyte }
         json = api_call(:post, @migration_url, @params, @post_params)
         expect(json['pre_attachment']).to eq({ "message" => "file size exceeds quota", "error" => true })
         expect(json["workflow_state"]).to eq 'failed'

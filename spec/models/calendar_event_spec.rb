@@ -227,12 +227,12 @@ describe CalendarEvent do
       end
 
       it "returns a plain-text description" do
-        calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => <<-HTML)
-      <p>
-        This assignment is due December 16th. <b>Please</b> do the reading.
-        <br/>
-        <a href="www.example.com">link!</a>
-      </p>
+        calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => <<~HTML)
+          <p>
+            This assignment is due December 16th. <b>Please</b> do the reading.
+            <br/>
+            <a href="www.example.com">link!</a>
+          </p>
         HTML
         ev = @event.to_ics(in_own_calendar: false)
         expect(ev.description).to match_ignoring_whitespace("This assignment is due December 16th. Please do the reading.  [link!](www.example.com)")
@@ -658,10 +658,10 @@ describe CalendarEvent do
       appointment.participants_per_appointment = 3
       appointment.save!
 
-      s1, s2, s3 = 3.times.map {
+      s1, s2, s3 = Array.new(3) do
         student_in_course(:course => @course, :active_all => true)
         @user
-      }
+      end
 
       expect(appointment.reserve_for(@student1, @student1)).not_to be_nil
       expect(appointment.reserve_for(s1, s1)).not_to be_nil

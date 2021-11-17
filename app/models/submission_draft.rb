@@ -46,7 +46,7 @@ class SubmissionDraft < ActiveRecord::Base
         value, = CanvasHttp.validate_url(self.url)
         self.send("url=", value)
       rescue
-        return
+        nil
       end
     end
   end

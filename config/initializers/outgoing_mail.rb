@@ -29,7 +29,7 @@ config = {
 }.merge((ConfigFile.load("outgoing_mail").dup || {}).symbolize_keys)
 
 [:authentication, :delivery_method].each do |key|
-  config[key] = config[key].to_sym if config.has_key?(key)
+  config[key] = config[key].to_sym if config.key?(key)
 end
 
 Rails.configuration.to_prepare do
@@ -46,7 +46,7 @@ end
 # delivery_method can be :smtp, :sendmail, :letter_opener, or :test
 ActionMailer::Base.delivery_method = config[:delivery_method]
 
-ActionMailer::Base.perform_deliveries = config[:perform_deliveries] if config.has_key?(:perform_deliveries)
+ActionMailer::Base.perform_deliveries = config[:perform_deliveries] if config.key?(:perform_deliveries)
 
 case config[:delivery_method]
 when :smtp

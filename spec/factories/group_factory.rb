@@ -30,7 +30,7 @@ module Factories
     }
   end
 
-  VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment]
+  VALID_GROUP_ATTRIBUTES = [:name, :context, :max_membership, :group_category, :join_level, :description, :is_public, :avatar_attachment].freeze
 
   def group(opts = {})
     context = opts[:group_context] || opts[:context] || Account.default

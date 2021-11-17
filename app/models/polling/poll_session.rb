@@ -24,7 +24,7 @@ module Polling
     belongs_to :course_section
     belongs_to :poll, class_name: 'Polling::Poll'
     has_many :poll_submissions, class_name: 'Polling::PollSubmission', dependent: :destroy
-    validates_presence_of :poll, :course
+    validates :poll, :course, presence: true
     validate :section_belongs_to_course
 
     set_policy do

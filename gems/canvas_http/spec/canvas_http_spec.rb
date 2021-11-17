@@ -30,7 +30,7 @@ describe "CanvasHttp" do
     fake_logger = Class.new do
       attr_reader :messages
 
-      def initialize()
+      def initialize
         @messages = []
         super
       end

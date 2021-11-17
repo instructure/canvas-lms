@@ -318,7 +318,7 @@ describe SearchController, type: :request do
 
     context "pagination" do
       it "paginates even if no type is specified" do
-        create_users_in_course(@course, 4.times.map { { name: "cletus", sortable_name: "cletus" } })
+        create_users_in_course(@course, Array.new(4) { { name: "cletus", sortable_name: "cletus" } })
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&per_page=3",
                         { :controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :per_page => '3' })
@@ -327,7 +327,7 @@ describe SearchController, type: :request do
       end
 
       it "paginates users and return proper pagination headers" do
-        create_users_in_course(@course, 4.times.map { { name: "cletus", sortable_name: "cletus" } })
+        create_users_in_course(@course, Array.new(4) { { name: "cletus", sortable_name: "cletus" } })
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=3",
                         { :controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :type => 'user', :per_page => '3' })
@@ -357,7 +357,7 @@ describe SearchController, type: :request do
       end
 
       it "paginates contexts and return proper pagination headers" do
-        create_courses(4.times.map { { name: "ofcourse" } }, enroll_user: @user)
+        create_courses(Array.new(4) { { name: "ofcourse" } }, enroll_user: @user)
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=ofcourse&type=context&per_page=3",
                         { :controller => 'search', :action => 'recipients', :format => 'json', :search => 'ofcourse', :type => 'context', :per_page => '3' })
@@ -387,7 +387,7 @@ describe SearchController, type: :request do
       end
 
       it "ignores invalid per_page" do
-        create_users_in_course(@course, 11.times.map { { name: "cletus", sortable_name: "cletus" } })
+        create_users_in_course(@course, Array.new(11) { { name: "cletus", sortable_name: "cletus" } })
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=-1",
                         { :controller => 'search', :action => 'recipients', :format => 'json', :search => 'cletus', :type => 'user', :per_page => '-1' })
@@ -418,7 +418,7 @@ describe SearchController, type: :request do
 
       it "paginates combined context/user results" do
         # 6 courses, 6 users, 12 items total
-        courses = create_courses(6.times.map { { name: "term" } }, enroll_user: @user, return_type: :record)
+        courses = create_courses(Array.new(6) { { name: "term" } }, enroll_user: @user, return_type: :record)
         course_ids = courses.map(&:asset_string)
         user_ids = []
         courses.each do |course|

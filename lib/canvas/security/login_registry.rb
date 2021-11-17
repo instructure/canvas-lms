@@ -70,7 +70,7 @@ module Canvas::Security
       total_allowed = Setting.get('login_attempts_total', '20').to_i
       ip_allowed = Setting.get('login_attempts_per_ip', '10').to_i
       total, from_this_ip = Canvas.redis.hmget(login_attempts_key(pseudonym), 'total', ip)
-      return (!total || total.to_i < total_allowed) && (!from_this_ip || from_this_ip.to_i < ip_allowed)
+      (!total || total.to_i < total_allowed) && (!from_this_ip || from_this_ip.to_i < ip_allowed)
     end
 
     # log a successful login, resetting the failed login attempts counter

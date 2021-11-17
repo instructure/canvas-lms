@@ -173,7 +173,7 @@ describe ContentMigration do
         tag_to.reload
         expect(tag_to).to be_published
 
-        tag_to.content.destroy if tag_to.content
+        tag_to.content&.destroy
       end
       mod_to.destroy
 

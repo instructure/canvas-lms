@@ -80,7 +80,7 @@ module Api
       def media_id
         if tag_is_an_anchor?
           media_comment_regex = %r{^media_comment_}
-          return '' unless tag['id'] && tag['id'].match(media_comment_regex)
+          return '' unless tag['id']&.match(media_comment_regex)
 
           tag['id'].sub(media_comment_regex, '')
         else

@@ -21,7 +21,7 @@
 # This is used to take a zipped file, unzip it, add directories to a
 # context, and attach the files in the correct directories.
 class UnzipAttachment
-  THINGS_TO_IGNORE_REGEX = /^(__MACOSX|thumbs\.db|\.DS_Store)$/
+  THINGS_TO_IGNORE_REGEX = /^(__MACOSX|thumbs\.db|\.DS_Store)$/.freeze
 
   def self.process(opts = {})
     @ua = new(opts)
@@ -53,7 +53,7 @@ class UnzipAttachment
     @rename_files = !!opts[:rename_files]
     @migration_id_map = opts[:migration_id_map] || {}
 
-    raise ArgumentError, "Must provide a context." unless self.context && self.context.is_a_context?
+    raise ArgumentError, "Must provide a context." unless self.context&.is_a_context?
     raise ArgumentError, "Must provide a filename." unless self.filename
     raise ArgumentError, "Must provide a context files folder." unless self.context_files_folder
   end
@@ -126,7 +126,7 @@ class UnzipAttachment
           f.unlink
           raise
         rescue => e
-          @logger.warn "Couldn't unzip archived file #{f.path}: #{e.message}" if @logger
+          @logger&.warn "Couldn't unzip archived file #{f.path}: #{e.message}"
         end
       end
       update_attachment_positions(id_positions)
@@ -173,7 +173,7 @@ class UnzipAttachment
   end
 
   def last_position
-    @last_position ||= (@context.attachments.active.map(&:position).compact.last || 0)
+    @last_position ||= (@context.attachments.active.filter_map(&:position).last || 0)
   end
 
   def should_skip?(entry)
@@ -289,7 +289,7 @@ class ZipFileStats
   private
 
   def process!
-    CanvasUnzip::extract_archive(filename) do |entry|
+    CanvasUnzip.extract_archive(filename) do |entry|
       @file_count += 1
       @total_size += [entry.size, Attachment.minimum_size_for_quota].max
       @paths << entry.name

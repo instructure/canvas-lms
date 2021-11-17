@@ -78,7 +78,7 @@ module MasterCourses::Restrictor
     end
 
     def mark_as_importing!(cm)
-      @importing_migration = cm if cm && cm.master_course_subscription
+      @importing_migration = cm if cm&.master_course_subscription
     end
 
     def skip_downstream_changes!
@@ -134,11 +134,11 @@ module MasterCourses::Restrictor
       changed_columns << "manually_deleted"
     end
     if changed_columns.any?
-      if self.is_a?(Assignment) && (submittable = self.submittable_object)
-        tag_content = submittable # mark on the owner's tag
-      else
-        tag_content = self
-      end
+      tag_content = if self.is_a?(Assignment) && (submittable = self.submittable_object)
+                      submittable # mark on the owner's tag
+                    else
+                      self
+                    end
       MasterCourses::ChildContentTag.transaction do
         child_tag = MasterCourses::ChildContentTag.where(content: tag_content).lock.first
         if child_tag
@@ -219,7 +219,7 @@ module MasterCourses::Restrictor
   end
 
   def is_child_content?
-    self.migration_id && self.migration_id.start_with?(MasterCourses::MIGRATION_ID_PREFIX)
+    self.migration_id&.start_with?(MasterCourses::MIGRATION_ID_PREFIX)
   end
 
   def child_content_restrictions

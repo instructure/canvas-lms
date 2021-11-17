@@ -25,9 +25,9 @@ class Progress < ActiveRecord::Base
        { context_user: 'User', quiz_statistics: 'Quizzes::QuizStatistics' }]
   belongs_to :user
 
-  validates_presence_of :context_id
-  validates_presence_of :context_type
-  validates_presence_of :tag
+  validates :context_id, presence: true
+  validates :context_type, presence: true
+  validates :tag, presence: true
 
   serialize :results
   attr_reader :total

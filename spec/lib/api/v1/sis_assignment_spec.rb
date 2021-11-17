@@ -166,8 +166,8 @@ describe Api::V1::SisAssignment do
     it "includes unlock_at and lock_at attributes" do
       result = generator.sis_assignments_json([assignment_1])
 
-      expect(result[0].key?('unlock_at')).to eq(true)
-      expect(result[0].key?('lock_at')).to eq(true)
+      expect(result[0]).to have_key('unlock_at')
+      expect(result[0]).to have_key('lock_at')
     end
 
     it "includes unlock_at and lock_at attributes in section overrides" do
@@ -176,8 +176,8 @@ describe Api::V1::SisAssignment do
 
       result = generator.sis_assignments_json([assignment_1])
 
-      expect(result[0]['sections'][0]['override'].key?('unlock_at')).to eq(true)
-      expect(result[0]['sections'][0]['override'].key?('lock_at')).to eq(true)
+      expect(result[0]['sections'][0]['override']).to have_key('unlock_at')
+      expect(result[0]['sections'][0]['override']).to have_key('lock_at')
     end
 
     it "can return an empty due_at" do

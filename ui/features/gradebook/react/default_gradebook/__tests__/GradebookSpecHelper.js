@@ -17,12 +17,20 @@
  */
 
 import Gradebook from '../Gradebook'
+import PerformanceControls from '../PerformanceControls'
+import {RequestDispatch} from '@canvas/network'
+import {camelize} from 'convert-case'
+
+const performance_controls = {
+  students_chunk_size: 2 // students per page
+}
 
 export const defaultGradebookProps = {
   gradebookMenuNode: document.createElement('div'),
   settingsModalButtonContainer: document.createElement('div'),
   gridColorNode: document.createElement('div'),
   filterNavNode: document.createElement('div'),
+  viewOptionsMenuNode: document.createElement('div'),
 
   allow_separate_first_last_names: true,
   api_max_per_page: 50,
@@ -68,13 +76,16 @@ export const defaultGradebookProps = {
     }
   ],
   has_modules: true,
+  isModulesLoading: false,
+  modules: [
+    {id: '1', name: 'Module 1', position: 1},
+    {id: '2', name: 'Another Module', position: 2},
+    {id: '3', name: 'Module 2', position: 3}
+  ],
   latePolicyStatusDisabled: false,
   locale: 'en',
   new_gradebook_development_enabled: true,
   outcome_gradebook_enabled: false,
-  performanceControls: {
-    active_request_limit: 10
-  },
   post_grades_ltis: [],
   publish_to_sis_enabled: false,
   sections: [],
@@ -90,9 +101,19 @@ export const defaultGradebookProps = {
 }
 
 export function createGradebook(options = {}) {
+  const performanceControls = new PerformanceControls({
+    ...performance_controls,
+    ...camelize(options.performance_controls)
+  })
+  const dispatch = new RequestDispatch({
+    activeRequestLimit: performanceControls.activeRequestLimit
+  })
+
   const gradebook = new Gradebook({
     ...defaultGradebookProps,
-    ...options
+    ...options,
+    performanceControls,
+    dispatch
   })
 
   gradebook.keyboardNav = {

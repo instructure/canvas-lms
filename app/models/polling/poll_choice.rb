@@ -25,7 +25,7 @@ module Polling
     belongs_to :poll, class_name: 'Polling::Poll'
     has_many :poll_submissions, class_name: 'Polling::PollSubmission', dependent: :destroy
 
-    validates_presence_of :poll, :text
-    validates_length_of :text, maximum: 255, allow_nil: true
+    validates :poll, :text, presence: true
+    validates :text, length: { maximum: 255, allow_nil: true }
   end
 end

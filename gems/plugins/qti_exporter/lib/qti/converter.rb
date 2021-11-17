@@ -33,7 +33,7 @@ module Qti
       http://www.imsglobal.org/xsd/imsqti_v2p1
       http://www.imsglobal.org/xsd/qti/qtiv2p0
       http://www.imsglobal.org/xsd/qti/qtiv2p1
-    ]
+    ].freeze
     IMS_MD = "http://www.imsglobal.org/xsd/imsmd_v1p2"
     QTI_2_OUTPUT_PATH = "qti_2_1"
 
@@ -58,7 +58,10 @@ module Qti
       end
 
       convert_files
-      path_map = @course[:file_map].values.inject({}) { |h, v| h[v[:path_name]] = v[:migration_id]; h }
+      path_map = @course[:file_map].values.inject({}) { |h, v|
+        h[v[:path_name]] = v[:migration_id]
+        h
+      }
       @course[:assessment_questions] = convert_questions(:file_path_map => path_map, :flavor => @flavor)
       @course[:assessments] = convert_assessments(@course[:assessment_questions][:assessment_questions])
 

@@ -63,7 +63,7 @@ module ActiveRecord
           multi_key_types, key_types = key_types.partition { |type| Canvas::CacheRegister.can_use_multi_cache_redis? && self.prefer_multi_cache_for_key_type?(type) }
 
           ::Shard.partition_by_shard(Array(ids_or_records)) do |sharded_ids_or_records|
-            base_keys = sharded_ids_or_records.map { |item| base_cache_register_key_for(item) }.compact
+            base_keys = sharded_ids_or_records.filter_map { |item| base_cache_register_key_for(item) }
             next if base_keys.empty?
 
             if key_types.any?

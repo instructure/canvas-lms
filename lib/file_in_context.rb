@@ -37,7 +37,7 @@ class FileInContext
         @queued_files ||= []
         @queued_files += files
       else
-        files.each { |f| f.destroy }
+        files.each(&:destroy)
       end
     end
 
@@ -73,7 +73,7 @@ class FileInContext
 
       @attachment
     ensure
-      uploaded_data.close if uploaded_data
+      uploaded_data&.close
     end
   end
 end

@@ -39,7 +39,7 @@ module SeleniumExtensions
         # If there is an alert open, the calling code needs to accept it, so we won't be reloading
         # as part of this event. Once the alert is accepted or discarded, we will then wait for
         # page reloads or outstanding AJAX requests.
-        return
+        nil
       end
     end
   end

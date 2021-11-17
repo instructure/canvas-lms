@@ -112,7 +112,7 @@ module Submittable
   end
 
   def restore_old_assignment
-    return nil unless self.old_assignment && self.old_assignment.deleted?
+    return nil unless self.old_assignment&.deleted?
 
     self.old_assignment.workflow_state = 'published'
     name = self.class.name.underscore

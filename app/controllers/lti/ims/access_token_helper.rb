@@ -47,7 +47,7 @@ module Lti::IMS::AccessTokenHelper
   def oauth2_request?
     pattern = /^Bearer /
     header = request.headers["Authorization"]
-    header && header.match?(pattern)
+    header&.match?(pattern)
   end
 
   def tool_proxy

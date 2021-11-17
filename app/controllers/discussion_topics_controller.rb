@@ -336,7 +336,7 @@ class DiscussionTopicsController < ApplicationController
 
     scope = scope.unread_for(@current_user) if params[:filter_by] == "unread"
 
-    states = params[:scope].split(',').map { |s| s.strip } if params[:scope]
+    states = params[:scope].split(',').map(&:strip) if params[:scope]
     if states.present?
       if (states.include?('pinned') && states.include?('unpinned')) ||
          (states.include?('locked') && states.include?('unlocked'))
@@ -397,10 +397,8 @@ class DiscussionTopicsController < ApplicationController
         fetch_params[:include] = ['sections_user_count', 'sections'] if @context.is_a?(Course)
 
         discussion_topics_fetch_url = send("api_v1_#{@context.class.to_s.downcase}_discussion_topics_path", fetch_params)
-        discussion_topics_urls_to_prefetch = (scope.count / fetch_params[:per_page].to_f).ceil.times.map do |i|
-          discussion_topics_fetch_url.gsub(fetch_params[:page], (i + 1).to_s)
-        end
-        discussion_topics_urls_to_prefetch.each_with_index do |url, i|
+        (scope.count / fetch_params[:per_page].to_f).ceil.times do |i|
+          url = discussion_topics_fetch_url.gsub(fetch_params[:page], (i + 1).to_s)
           prefetch_xhr(url, id: "prefetched_discussion_topic_page_#{i}")
         end
 
@@ -553,9 +551,10 @@ class DiscussionTopicsController < ApplicationController
       end
 
     sections =
-      if section_visibilities == :none
+      case section_visibilities
+      when :none
         []
-      elsif section_visibilities == :all
+      when :all
         @context.course_sections.active.to_a
       else
         @context.course_sections.select { |s| s.active? && section_visibilities.include?(s.id) }
@@ -1087,7 +1086,7 @@ class DiscussionTopicsController < ApplicationController
     @entries.concat(@context.discussion_topics
                             .select { |dt| dt.visible_for?(@current_user) })
     @entries.concat @context.discussion_entries.active
-    @entries = @entries.sort_by { |e| e.updated_at }
+    @entries = @entries.sort_by(&:updated_at)
     @entries.each do |entry|
       feed.entries << entry.to_atom
     end
@@ -1171,9 +1170,10 @@ class DiscussionTopicsController < ApplicationController
     visibilities = @context.course_section_visibility(@current_user)
 
     invalid_sections =
-      if visibilities == :all
+      case visibilities
+      when :all
         []
-      elsif visibilities == :none
+      when :none
         @topic.course_sections.map(&:id)
       else
         @topic.course_sections.map(&:id) - visibilities
@@ -1242,7 +1242,7 @@ class DiscussionTopicsController < ApplicationController
     @topic.current_user = @current_user
     @topic.content_being_saved_by(@current_user)
 
-    if discussion_topic_hash.has_key?(:message)
+    if discussion_topic_hash.key?(:message)
       discussion_topic_hash[:message] = process_incoming_html_content(discussion_topic_hash[:message])
     end
 
@@ -1322,7 +1322,7 @@ class DiscussionTopicsController < ApplicationController
       else
         errors = @topic.errors.as_json[:errors]
         errors.merge!(@topic.root_topic.errors.as_json[:errors]) if @topic.root_topic
-        errors['published'] = errors.delete(:workflow_state) if errors.has_key?(:workflow_state)
+        errors['published'] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
         render :json => { errors: errors }, :status => :bad_request
       end
     end
@@ -1356,8 +1356,8 @@ class DiscussionTopicsController < ApplicationController
   def prefer_assignment_availability_dates(discussion_topic_hash)
     return unless params[:assignment]
 
-    discussion_topic_hash['delayed_post_at'] = nil if params[:assignment].has_key?(:unlock_at)
-    discussion_topic_hash['lock_at'] = nil if params[:assignment].has_key?(:lock_at)
+    discussion_topic_hash['delayed_post_at'] = nil if params[:assignment].key?(:unlock_at)
+    discussion_topic_hash['lock_at'] = nil if params[:assignment].key?(:lock_at)
   end
 
   # Internal: detetermines if the delayed_post_at or lock_at dates were changed
@@ -1395,8 +1395,8 @@ class DiscussionTopicsController < ApplicationController
   def process_lock_parameters(discussion_topic_hash)
     # Handle locking/unlocking (overrides workflow state if provided). It appears that the locked param as a hash
     # is from old code and is not being used. Verification requested.
-    if !@topic.lock_at_changed?
-      if params.has_key?(:locked) && !params[:locked].is_a?(Hash)
+    unless @topic.lock_at_changed?
+      if params.key?(:locked) && !params[:locked].is_a?(Hash)
         should_lock = value_to_boolean(params[:locked])
         if should_lock != @topic.locked?
           if should_lock
@@ -1411,7 +1411,7 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def process_published_parameters
-    if params.has_key?(:published)
+    if params.key?(:published)
       should_publish = value_to_boolean(params[:published])
       if should_publish != @topic.published?
         if should_publish
@@ -1430,20 +1430,20 @@ class DiscussionTopicsController < ApplicationController
   end
 
   def process_group_parameters(discussion_topic_hash)
-    if params[:assignment] && params[:assignment].has_key?(:group_category_id)
+    if params[:assignment]&.key?(:group_category_id)
       id = params[:assignment].delete(:group_category_id)
       discussion_topic_hash[:group_category_id] ||= id
     end
-    return unless discussion_topic_hash.has_key?(:group_category_id)
+    return unless discussion_topic_hash.key?(:group_category_id)
     return if discussion_topic_hash[:group_category_id].nil? && @topic.group_category_id.nil?
     return if discussion_topic_hash[:group_category_id].to_i == @topic.group_category_id
     return unless can_set_group_category?
 
-    if discussion_topic_hash[:group_category_id]
-      discussion_topic_hash[:group_category] = @context.group_categories.find(discussion_topic_hash[:group_category_id])
-    else
-      discussion_topic_hash[:group_category] = nil
-    end
+    discussion_topic_hash[:group_category] = if discussion_topic_hash[:group_category_id]
+                                               @context.group_categories.find(discussion_topic_hash[:group_category_id])
+                                             else
+                                               nil
+                                             end
   end
 
   def can_set_group_category?
@@ -1493,11 +1493,11 @@ class DiscussionTopicsController < ApplicationController
       return if attachment && attachment.size > 1.kilobytes &&
                 quota_exceeded(@context, named_context_url(@context, :context_discussion_topics_url))
 
-      if (params.has_key?(:remove_attachment) || attachment) && @topic.attachment
+      if (params.key?(:remove_attachment) || attachment) && @topic.attachment
         @topic.transaction do
           att = @topic.attachment
           @topic.attachment = nil
-          @topic.save! if !@topic.new_record?
+          @topic.save! unless @topic.new_record?
           att.destroy
         end
       end
@@ -1552,7 +1552,7 @@ class DiscussionTopicsController < ApplicationController
         hash[:assignment] ||= {}
       end
 
-      if !hash[:assignment].nil?
+      unless hash[:assignment].nil?
         if params[:due_at]
           hash[:assignment][:due_at] = params[:due_at].empty? || params[:due_at] == "null" ? nil : params[:due_at]
         end

@@ -198,13 +198,13 @@ class LearningOutcome < ActiveRecord::Base
                                   context_type: context.class_name,
                                   id: alignment_id
                                 }).first
-    tag.destroy if tag
+    tag&.destroy
     tag
   end
 
   def self.update_alignments(asset, context, new_outcome_ids)
     old_outcome_ids = asset.learning_outcome_alignments
-                           .where("learning_outcome_id IS NOT NULL")
+                           .where.not(learning_outcome_id: nil)
                            .pluck(:learning_outcome_id)
                            .uniq
 
@@ -349,11 +349,11 @@ class LearningOutcome < ActiveRecord::Base
   def artifacts_count_for_tied_context
     codes = [@tied_context.asset_string]
     if @tied_context.is_a?(Account)
-      if @tied_context == context
-        codes = "all"
-      else
-        codes = @tied_context.all_courses.select(:id).map(&:asset_string)
-      end
+      codes = if @tied_context == context
+                "all"
+              else
+                @tied_context.all_courses.select(:id).map(&:asset_string)
+              end
     end
     self.learning_outcome_results.active.for_context_codes(codes).count
   end
@@ -452,11 +452,10 @@ class LearningOutcome < ActiveRecord::Base
   def determine_tag_type(mastery_type)
     case mastery_type
     when 'points', 'points_mastery'
-      new_mastery_type = 'points_mastery'
+      'points_mastery'
     else
-      new_mastery_type = 'explicit_mastery'
+      'explicit_mastery'
     end
-    new_mastery_type
   end
 
   def clear_total_outcomes_cache
@@ -466,10 +465,10 @@ class LearningOutcome < ActiveRecord::Base
               .active
               .distinct
               .where(content_id: id)
-              .select(<<-SQL)
-        root_account_id,
-        (CASE WHEN context_type='LearningOutcomeGroup' THEN NULL ELSE context_type END) context_type,
-        (CASE WHEN context_type='LearningOutcomeGroup' THEN NULL ELSE context_id END) context_id
+              .select(<<~SQL.squish)
+                root_account_id,
+                (CASE WHEN context_type='LearningOutcomeGroup' THEN NULL ELSE context_type END) context_type,
+                (CASE WHEN context_type='LearningOutcomeGroup' THEN NULL ELSE context_id END) context_id
               SQL
               .map do |ct|
       Outcomes::LearningOutcomeGroupChildren.new(ct.context).clear_total_outcomes_cache

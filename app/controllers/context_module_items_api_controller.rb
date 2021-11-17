@@ -322,7 +322,7 @@ class ContextModuleItemsApiController < ApplicationController
           @tag.context_module_action(@current_user, :read)
           redirect_to @tag.url
         else
-          return render(:status => 400, :json => { :message => "incorrect module item type" })
+          render(:status => 400, :json => { :message => "incorrect module item type" })
         end
       end
     end
@@ -492,7 +492,7 @@ class ContextModuleItemsApiController < ApplicationController
         end
       end
 
-      if params[:module_item].has_key?(:published)
+      if params[:module_item].key?(:published)
         if value_to_boolean(params[:module_item][:published])
           if module_item_publishable?(@tag)
             @tag.publish
@@ -681,7 +681,7 @@ class ContextModuleItemsApiController < ApplicationController
   def mark_item_read
     if authorized_action(@context, @current_user, :read)
       get_module_item
-      content = (@item.content && @item.content.respond_to?(:locked_for?)) ? @item.content : @item
+      content = @item.content.respond_to?(:locked_for?) ? @item.content : @item
       return render :json => { :message => t('The module item is locked.') }, :status => :forbidden if content.locked_for?(@current_user)
 
       @item.context_module_action(@current_user, :read)
@@ -755,10 +755,10 @@ class ContextModuleItemsApiController < ApplicationController
       @context.touch
 
       @tag.reload
-      return true
+      true
     else
       @tag.errors.add(:position, t(:invalid_position, "Invalid position"))
-      return false
+      false
     end
   end
   protected :set_position
@@ -793,7 +793,7 @@ class ContextModuleItemsApiController < ApplicationController
     elsif @context.grants_right?(@current_user, session, :participate_as_student)
       @student = @current_user
     else
-      return true
+      true
     end
   end
   protected :find_student

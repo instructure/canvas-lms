@@ -33,7 +33,7 @@ describe Autoextend do
       end
 
       # not found via autoloading? maybe it's a migration
-      if !extension.used
+      unless extension.used
         ActiveRecord::Base.connection.migration_context.migrations.map(&:disable_ddl_transaction)
       end
 

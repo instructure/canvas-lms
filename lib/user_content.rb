@@ -69,7 +69,7 @@ module UserContent
       # Strip the ones that shouldn't be there before adding a new one
       node.next_element.remove while node.next_element && node.next_element['class'] == 'hidden-readable'
 
-      if !use_updated_math_rendering
+      unless use_updated_math_rendering
         mathml = UserContent.latex_to_mathml(equation)
         next if mathml.blank?
 
@@ -98,8 +98,8 @@ module UserContent
       obj.css('param').each do |param|
         params[param['key']] = param['value']
       end
-      (obj['style'] || '').split(/;/).each do |attr|
-        key, value = attr.split(/:/).map(&:strip)
+      (obj['style'] || '').split(";").each do |attr|
+        key, value = attr.split(":").map(&:strip)
         styles[key] = value
       end
       width = css_size(obj['width'])
@@ -111,7 +111,7 @@ module UserContent
       height ||= css_size(styles['height'])
       height ||= '300px'
 
-      snippet = Base64.encode64(obj.to_s).gsub("\n", '')
+      snippet = Base64.encode64(obj.to_s).delete("\n")
       hmac = Canvas::Security.hmac_sha1(snippet)
       uc = Node.new(width, height, snippet, hmac)
 
@@ -165,7 +165,7 @@ module UserContent
       'file_contents' => nil,
       'modules' => :ContextModule,
       'items' => :ContentTag
-    }
+    }.freeze
     DefaultAllowedTypes = AssetTypes.keys
 
     def initialize(context, user, contextless_types: [])
@@ -236,10 +236,10 @@ module UserContent
           klass = klass.to_s.constantize if klass
           match = UriMatch.new(url, type, klass, obj_id, rest, prefix)
           handler = @handlers[type] || @default_handler
-          (handler && handler.call(match)) || url
+          handler&.call(match) || url
         else
           match = UriMatch.new(url, type)
-          (@unknown_handler && @unknown_handler.call(match)) || url
+          @unknown_handler&.call(match) || url
         end
       end
     end
@@ -257,7 +257,7 @@ module UserContent
       content ||= get_content.call
       allow = true if content.respond_to?(:grants_right?) && content.grants_right?(user, :read)
       allow = false if allow && content.respond_to?(:locked_for?) && content.locked_for?(user)
-      return allow
+      allow
     end
   end
 end

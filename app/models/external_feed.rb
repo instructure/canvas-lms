@@ -36,7 +36,7 @@ class ExternalFeed < ActiveRecord::Base
             length: { maximum: maximum_string_length }
 
   VERBOSITIES = %w(full link_only truncate).freeze
-  validates_inclusion_of :verbosity, :in => VERBOSITIES, :allow_nil => true
+  validates :verbosity, inclusion: { :in => VERBOSITIES, :allow_nil => true }
 
   def infer_defaults
     self.consecutive_failures ||= 0
@@ -71,8 +71,8 @@ class ExternalFeed < ActiveRecord::Base
   end
 
   def add_rss_entries(rss)
-    items = rss.items.map { |item| add_entry(item, rss, :rss) }.compact
-    self.context.add_aggregate_entries(items, self) if self.context && self.context.respond_to?(:add_aggregate_entries)
+    items = rss.items.filter_map { |item| add_entry(item, rss, :rss) }
+    self.context.add_aggregate_entries(items, self) if self.context.respond_to?(:add_aggregate_entries)
     items
   end
 
@@ -80,15 +80,16 @@ class ExternalFeed < ActiveRecord::Base
     items = []
     atom.each_entry { |item| items << add_entry(item, atom, :atom) }
     items.compact!
-    self.context.add_aggregate_entries(items, self) if self.context && self.context.respond_to?(:add_aggregate_entries)
+    self.context.add_aggregate_entries(items, self) if self.context.respond_to?(:add_aggregate_entries)
     items
   end
 
   def format_description(desc)
     desc = (desc || "").to_s
-    if self.verbosity == 'link_only'
+    case self.verbosity
+    when 'link_only'
       ""
-    elsif self.verbosity == 'truncate'
+    when 'truncate'
       self.extend TextHelper
       truncate_html(desc, :max_length => 250)
     else
@@ -97,7 +98,8 @@ class ExternalFeed < ActiveRecord::Base
   end
 
   def add_entry(item, feed, feed_type)
-    if feed_type == :rss
+    case feed_type
+    when :rss
       uuid = item.respond_to?(:guid) && item.guid && item.guid.content.to_s
       if uuid && uuid.length > 255
         uuid = Digest::SHA256.hexdigest(uuid)
@@ -106,7 +108,7 @@ class ExternalFeed < ActiveRecord::Base
 
       entry = self.external_feed_entries.where(uuid: uuid).first
       entry ||= self.external_feed_entries.where(url: item.link).first
-      description = entry && entry.message
+      description = entry&.message
       if !description || description.empty?
         description = "<a href='#{ERB::Util.h(item.link)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
         description += format_description(item.description || item.title)
@@ -136,12 +138,12 @@ class ExternalFeed < ActiveRecord::Base
         :uuid => uuid
       )
       return entry if entry.save
-    elsif feed_type == :atom
+    when :atom
       uuid = item.id || Digest::SHA256.hexdigest("#{item.title}#{item.published.utc.strftime('%Y-%m-%d')}")
       entry = self.external_feed_entries.where(uuid: uuid).first
       entry ||= self.external_feed_entries.where(url: item.links.alternate.to_s).first
       author = item.authors.first || OpenObject.new
-      description = entry && entry.message
+      description = entry&.message
       if !description || description.empty?
         description = "<a href='#{ERB::Util.h(item.links.alternate.to_s)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
         description += format_description(item.content || item.title)

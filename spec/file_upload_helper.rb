@@ -21,8 +21,7 @@
 module FileUploadHelper
   def create_fixture_attachment(attachment_context, fixture_filename)
     data = fixture_file_upload(fixture_filename)
-    file = attachment_context.attachments.create!(display_name: 'some file', uploaded_data: data)
-    file
+    attachment_context.attachments.create!(display_name: 'some file', uploaded_data: data)
   end
 
   def get_file_link(file, link_text = 'Link')

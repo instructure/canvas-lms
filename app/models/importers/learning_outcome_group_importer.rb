@@ -110,21 +110,19 @@ module Importers
     end
 
     def self.process_children(hash, item, migration, skip_import = false)
-      if hash[:outcomes]
-        hash[:outcomes].each do |child|
-          if child[:type] == 'learning_outcome_group'
-            child[:parent_group] = item
-            Importers::LearningOutcomeGroupImporter.import_from_migration(
-              child,
-              migration,
-              nil,
-              skip_import && !migration.import_object?('learning_outcome_groups', child['migration_id'])
-            )
-          else
-            child[:learning_outcome_group] = item
-            if !skip_import || migration.import_object?('learning_outcomes', child['migration_id'])
-              Importers::LearningOutcomeImporter.import_from_migration(child, migration)
-            end
+      hash[:outcomes]&.each do |child|
+        if child[:type] == 'learning_outcome_group'
+          child[:parent_group] = item
+          Importers::LearningOutcomeGroupImporter.import_from_migration(
+            child,
+            migration,
+            nil,
+            skip_import && !migration.import_object?('learning_outcome_groups', child['migration_id'])
+          )
+        else
+          child[:learning_outcome_group] = item
+          if !skip_import || migration.import_object?('learning_outcomes', child['migration_id'])
+            Importers::LearningOutcomeImporter.import_from_migration(child, migration)
           end
         end
       end

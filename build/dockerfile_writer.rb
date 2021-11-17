@@ -47,11 +47,11 @@ class DockerfileWriter
   end
 
   def generation_message
-    <<~STR
+    <<~RUBY
       # GENERATED FILE, DO NOT MODIFY!
       # To update this file please edit the relevant template and run the generation
       # task `build/dockerfile_writer.rb --env #{env} --compose-file #{compose_files.join(',')} --in #{in_file} --out #{out_file}`
-    STR
+    RUBY
   end
 
   def set_file_suffix(suffix)
@@ -86,12 +86,12 @@ class DockerfileWriter
   end
 
   def docker_compose_volume_paths
-    paths = (docker_compose_config["services"]["web"]["volumes"] || []).map do |volume|
+    paths = (docker_compose_config["services"]["web"]["volumes"] || []).filter_map do |volume|
       name, path = volume.split(":")
-      next unless name =~ /\A[a-z]/
+      next unless /\A[a-z]/.match?(name)
 
       path.sub("/usr/src/app/", "")
-    end.compact
+    end
     paths.sort_by { |path| [path[0] == "/" ? 1 : 0, path] }
   end
 

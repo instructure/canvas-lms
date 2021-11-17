@@ -30,7 +30,7 @@ module PostgreSQLAdapterExtensions
   end
 
   %I{begin_db_transaction create_savepoint active?}.each do |method|
-    class_eval <<-RUBY, __FILE__, __LINE__ + 1
+    class_eval <<~RUBY, __FILE__, __LINE__ + 1
       def #{method}(*)
         receive_timeout_wrapper { super }
       end
@@ -124,7 +124,7 @@ module PostgreSQLAdapterExtensions
   def indexes(table_name)
     schema = shard.name
 
-    result = query(<<~SQL, 'SCHEMA')
+    result = query(<<~SQL.squish, 'SCHEMA')
        SELECT distinct i.relname, d.indisunique, d.indkey, pg_get_indexdef(d.indexrelid), t.oid
        FROM pg_class t
        INNER JOIN pg_index d ON t.oid = d.indrelid
@@ -143,7 +143,7 @@ module PostgreSQLAdapterExtensions
       inddef = row[3]
       oid = row[4]
 
-      columns = Hash[query(<<~SQL, "SCHEMA")]
+      columns = query(<<~SQL.squish, "SCHEMA").to_h
         SELECT a.attnum, a.attname
         FROM pg_attribute a
         WHERE a.attrelid = #{oid}
@@ -154,7 +154,7 @@ module PostgreSQLAdapterExtensions
 
       # add info on sort order for columns (only desc order is explicitly specified, asc is the default)
       desc_order_columns = inddef.scan(/(\w+) DESC/).flatten
-      orders = desc_order_columns.any? ? Hash[desc_order_columns.map { |order_column| [order_column, :desc] }] : {}
+      orders = desc_order_columns.any? ? desc_order_columns.index_with { :desc } : {}
 
       ActiveRecord::ConnectionAdapters::IndexDefinition.new(table_name, index_name, unique, column_names, orders: orders)
     end
@@ -295,7 +295,7 @@ module PostgreSQLAdapterExtensions
   def icu_collations
     return [] if postgresql_version < 120000
 
-    @collations ||= select_rows <<~SQL, "SCHEMA"
+    @collations ||= select_rows <<~SQL.squish, "SCHEMA"
       SELECT nspname, collname
       FROM pg_collation
       INNER JOIN pg_namespace ON collnamespace=pg_namespace.oid

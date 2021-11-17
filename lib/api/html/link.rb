@@ -38,10 +38,10 @@ module Api
 
       private
 
-      APPLICABLE_CONTEXT_TYPES = ["Course", "Group", "Account"]
-      SKIP_CONTEXT_TYPES = ["User"]
-      FILE_LINK_REGEX = %r{/files/(\d+)/(?:download|preview)}
-      VERIFIER_REGEX = %r{(\?)verifier=[^&]*&?|&verifier=[^&]*}
+      APPLICABLE_CONTEXT_TYPES = ["Course", "Group", "Account"].freeze
+      SKIP_CONTEXT_TYPES = ["User"].freeze
+      FILE_LINK_REGEX = %r{/files/(\d+)/(?:download|preview)}.freeze
+      VERIFIER_REGEX = %r{(\?)verifier=[^&]*&?|&verifier=[^&]*}.freeze
 
       def strip_host(link)
         return link if @host.nil?

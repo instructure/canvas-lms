@@ -489,7 +489,7 @@ describe "assignments" do
 
     context "frozen assignment" do
       before do
-        stub_freezer_plugin Hash[Assignment::FREEZABLE_ATTRIBUTES.map { |a| [a, "true"] }]
+        stub_freezer_plugin(Assignment::FREEZABLE_ATTRIBUTES.index_with { "true" })
         default_group = @course.assignment_groups.create!(:name => "default")
         @frozen_assign = frozen_assignment(default_group)
       end
@@ -558,7 +558,7 @@ describe "assignments" do
       drag_with_js("#assignment_#{as[0].id}", 0, 50)
       wait_for_ajaximations
 
-      as.each { |a| a.reload }
+      as.each(&:reload)
       expect(as.collect(&:position)).to eq [2, 1, 3, 4]
     end
 
@@ -582,7 +582,7 @@ describe "assignments" do
         drag_with_js("#assignment_#{as[0].id} .draggable-handle", 0, 50)
         wait_for_ajaximations
 
-        as.each { |a| a.reload }
+        as.each(&:reload)
         expect(as.collect(&:position)).to eq [2, 1, 3, 4]
       end
     end

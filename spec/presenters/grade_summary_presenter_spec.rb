@@ -312,9 +312,9 @@ describe GradeSummaryPresenter do
     end
 
     it "doesn't return submissions for deleted assignments" do
-      a1, a2 = 2.times.map {
+      a1, a2 = Array.new(2) do
         @course.assignments.create! points_possible: 10
-      }
+      end
       a1.grade_student @student, grade: 10, grader: @teacher
       a2.grade_student @student, grade: 10, grader: @teacher
 

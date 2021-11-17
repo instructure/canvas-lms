@@ -57,7 +57,7 @@ class SubAccountsController < ApplicationController
     @query = (params[:account] && params[:account][:name]) || params[:term]
     if @query
       @accounts = []
-      if @context && @context.is_a?(Account)
+      if @context.is_a?(Account)
         @accounts = @context.all_accounts.active.name_like(@query).limit(100).to_a
         @accounts << @context if value_to_boolean(params[:include_self]) && @context.name.downcase.include?(@query.downcase)
         @accounts.sort_by! { |a| Canvas::ICU.collation_key(a.name) }
@@ -128,11 +128,11 @@ class SubAccountsController < ApplicationController
   #
   # @returns Account
   def create
-    if params[:account][:parent_account_id]
-      parent_id = params[:account].delete(:parent_account_id)
-    else
-      parent_id = params[:account_id]
-    end
+    parent_id = if params[:account][:parent_account_id]
+                  params[:account].delete(:parent_account_id)
+                else
+                  params[:account_id]
+                end
     @parent_account = subaccount_or_self(parent_id)
     return unless authorized_action(@parent_account, @current_user, :manage_account_settings)
 

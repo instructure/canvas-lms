@@ -47,7 +47,7 @@ class Loaders::AssociationLoader < GraphQL::Batch::Loader
 
   def load(record)
     if record.association(@association).loaded?
-      return Promise.resolve(record.send(@association))
+      Promise.resolve(record.send(@association))
     else
       super
     end

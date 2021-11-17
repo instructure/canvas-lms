@@ -21,7 +21,7 @@
 require 'nokogiri'
 
 module QuizzesHelper
-  RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/
+  RE_EXTRACT_BLANK_ID = /['"]question_\w+_(.*?)['"]/.freeze
 
   def needs_unpublished_warning?(quiz = @quiz)
     return false unless can_publish(quiz)
@@ -110,7 +110,7 @@ module QuizzesHelper
   end
 
   def render_show_correct_answers(quiz)
-    if !quiz.show_correct_answers
+    unless quiz.show_correct_answers
       return I18n.t('No')
     end
 
@@ -446,7 +446,7 @@ module QuizzesHelper
     # Requires mutliline option to be robust
     res.gsub!(%r{<input.*?name=\\?['"](question_.*?)\\?['"].*?>}m) do |match|
       blank = match.match(RE_EXTRACT_BLANK_ID).to_a[1]
-      blank.gsub!(/\\/, '')
+      blank.delete!('\\')
       answer = answer_list.detect { |entry| entry[:blank_id] == blank } || {}
       answer = h(answer[:answer] || '')
 
@@ -509,11 +509,11 @@ module QuizzesHelper
   end
 
   def duration_in_minutes(duration_seconds)
-    if duration_seconds < 60
-      duration_minutes = 0
-    else
-      duration_minutes = (duration_seconds / 60).round
-    end
+    duration_minutes = if duration_seconds < 60
+                         0
+                       else
+                         (duration_seconds / 60).round
+                       end
     I18n.t(
       { :zero => "less than 1 minute",
         :one => "1 minute",
@@ -552,7 +552,7 @@ module QuizzesHelper
   end
 
   def take_quiz_url
-    user_id = @current_user && @current_user.id
+    user_id = @current_user&.id
     course_quiz_take_path(@context, @quiz, user_id: user_id)
   end
 
