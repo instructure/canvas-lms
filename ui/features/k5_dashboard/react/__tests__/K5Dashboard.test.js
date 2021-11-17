@@ -23,7 +23,7 @@ import {act, render, screen, waitFor} from '@testing-library/react'
 import {resetDashboardCards} from '@canvas/dashboard-card'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
-import {OBSERVER_COOKIE_PREFIX} from '@canvas/k5/ObserverGetObservee'
+import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObservee'
 import {cloneDeep} from 'lodash'
 
 import {MOCK_TODOS} from './mocks'
@@ -32,9 +32,9 @@ import {
   MOCK_CARDS,
   MOCK_CARDS_2,
   MOCK_EVENTS,
-  MOCK_OBSERVER_LIST,
   MOCK_PLANNER_ITEM
 } from '@canvas/k5/react/__tests__/fixtures'
+import {MOCK_OBSERVER_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
 import K5Dashboard from '../K5Dashboard'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
