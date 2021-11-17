@@ -497,7 +497,7 @@ describe Conversation do
     end
 
     it "sets last_authored_at and visible_last_authored_at on deleted conversations even if update_for_sender=false" do
-      expected_times = [Time.now.utc - 1.hours, Time.now.utc].map { |t| Time.at(t.to_i).utc }
+      expected_times = [Time.now.utc - 1.hour, Time.now.utc].map { |t| Time.at(t.to_i).utc }
 
       convo = nil
       Timecop.freeze(expected_times.first) do

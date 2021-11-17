@@ -101,6 +101,8 @@ Performance/Sum:
 Performance/TimesMap:
   Severity: error
 
+Rails/ActiveRecordAliases:
+  Severity: error
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
 Rails/ContentTag:
@@ -112,6 +114,12 @@ Rails/HasManyOrHasOneDependent:
   Enabled: false # legacy code + most things we soft delete anyway
 Rails/HelperInstanceVariable:
   Enabled: false # legacy code
+Rails/IndexBy:
+  Severity: error
+Rails/IndexWith:
+  Severity: error
+Rails/PluralizationGrammar:
+  Severity: error
 Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
 Rails/SquishedSQLHeredocs:
@@ -186,6 +194,12 @@ Style/EmptyCaseCondition:
 Style/Encoding:
   Severity: error
 Style/FrozenStringLiteralComment:
+  Severity: error
+Style/HashConversion:
+  Severity: error
+Style/HashTransformKeys:
+  Severity: error
+Style/HashTransformValues:
   Severity: error
 Style/IfUnlessModifier:
   # see also https://github.com/rubocop/rubocop/discussions/10048

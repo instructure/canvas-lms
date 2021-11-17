@@ -141,12 +141,12 @@ module CanvasPartman
         case base_class.partitioning_interval
         when :weeks
           [
-            0.week.from_now(date).beginning_of_week,
+            0.weeks.from_now(date).beginning_of_week,
             1.week.from_now(date).beginning_of_week
           ]
         when :months
           [
-            0.month.from_now(date).beginning_of_month,
+            0.months.from_now(date).beginning_of_month,
             1.month.from_now(date).beginning_of_month
           ]
         when :years

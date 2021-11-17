@@ -67,9 +67,7 @@ module Quizzes::QuizRegrader
 
     # quiz question regrades keyed by question id
     def question_regrades
-      @questions ||= @quiz.current_quiz_question_regrades.each_with_object({}) do |qr, hash|
-        hash[qr.quiz_question_id] = qr
-      end
+      @questions ||= @quiz.current_quiz_question_regrades.index_by(&:quiz_question_id)
     end
   end
 end

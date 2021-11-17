@@ -66,12 +66,12 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     #  "answers"=> [{"id"=>6782},...],
     #  "assessment_question_id"=>1022,
     # }, ...}
-    questions = Hash[
+    questions =
       (quiz.quiz_data || []).map { |q| q[:questions] || q }
                             .flatten
                             .select { |q| q[:answers] }
-                            .map { |q| [q[:id], q] }
-    ]
+                            .index_by { |q| q[:id] }
+
     stats = {}
     found_ids = {}
     score_counter = Stats::Counter.new
@@ -128,10 +128,10 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     end
 
     assessment_questions = if questions_hash.any? { |_, q| q[:assessment_question_id] }
-                             Hash[
-                               AssessmentQuestion.where(:id => questions_hash.keys)
-                                                 .map { |aq| [aq.id, aq] }
-                             ]
+
+                             AssessmentQuestion.where(:id => questions_hash.keys)
+                                               .index_by(&:id)
+
                            else
                              {}
                            end
@@ -173,10 +173,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     end.map do |hash|
       hash[:attachment_ids]
     end.flatten
-    @attachments = Hash[Attachment.where(:id => ids).map do |a|
-      [a.id, a]
-    end
-    ]
+    @attachments = Attachment.where(:id => ids).index_by(&:id)
   end
 
   def attachment_csv(answer)

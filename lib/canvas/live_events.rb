@@ -631,7 +631,12 @@ module Canvas::LiveEvents
   end
 
   def self.quiz_export_complete(content_export)
-    payload = content_export.settings[:quizzes2]
+    # when importing content export packages, migration_ids are obtained
+    # from content_migrations, a content_migration and content_export can share
+    # the same ID.
+    # The "content-export-" prefix prevents from saving the same migration_id on
+    # records that belong to different migrations
+    payload = (content_export.settings[:quizzes2] || {}).merge({ content_export_id: "content-export-#{content_export.global_id}" })
     post_event_stringified('quiz_export_complete', payload, amended_context(content_export.context))
   end
 

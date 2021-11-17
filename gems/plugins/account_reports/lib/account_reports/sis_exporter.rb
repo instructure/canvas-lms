@@ -287,9 +287,9 @@ module AccountReports
         courses.find_in_batches do |batch|
           blueprint_map = {}
           root_account.shard.activate do
-            sub_data = Hash[MasterCourses::ChildSubscription.active.where(:child_course_id => batch).pluck(:child_course_id, :master_template_id)]
-            template_data = Hash[MasterCourses::MasterTemplate.active.for_full_course.where(:id => sub_data.values).pluck(:id, :course_id)] if sub_data.present?
-            course_sis_data = Hash[Course.where(:id => template_data.values).where.not(:sis_source_id => nil).pluck(:id, :sis_source_id)] if template_data.present?
+            sub_data = MasterCourses::ChildSubscription.active.where(:child_course_id => batch).pluck(:child_course_id, :master_template_id).to_h
+            template_data = MasterCourses::MasterTemplate.active.for_full_course.where(:id => sub_data.values).pluck(:id, :course_id).to_h if sub_data.present?
+            course_sis_data = Course.where(:id => template_data.values).where.not(:sis_source_id => nil).pluck(:id, :sis_source_id).to_h if template_data.present?
             if course_sis_data.present?
               sub_data.each do |child_course_id, template_id|
                 sis_id = course_sis_data[template_data[template_id]]

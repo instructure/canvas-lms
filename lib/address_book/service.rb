@@ -84,7 +84,7 @@ module AddressBook
       end
 
       def update(user_ids, cursors)
-        @cursors = Hash[user_ids.zip(cursors)]
+        @cursors = user_ids.zip(cursors).to_h
         @more = !!@cursors[user_ids.last]
       end
 

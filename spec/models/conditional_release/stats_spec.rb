@@ -186,7 +186,7 @@ module ConditionalRelease
         expected_assignment_set([@student_id], @as2)
 
         details = Stats.student_details(@rule, @student_id).with_indifferent_access
-        details_by_id = details[:follow_on_assignments].each_with_object({}) { |f, acc| acc[f.dig(:assignment, :id)] = f }
+        details_by_id = details[:follow_on_assignments].index_by { |f| f.dig(:assignment, :id) }
         expect(details_by_id.map { |k, v| [k, v.dig(:submission, :score)] }).to match_array [
           [@b1.id, 3], [@b2.id, 88], [@b3.id, nil], [@b4.id, 93], [@b5.id, nil]
         ]

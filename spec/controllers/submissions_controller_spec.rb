@@ -762,7 +762,7 @@ describe SubmissionsController do
         assignment = course.assignments.create!(
           title: "some assignment",
           submission_types: "online_url",
-          due_at: 1.days.ago
+          due_at: 1.day.ago
         )
 
         post 'create', params: {

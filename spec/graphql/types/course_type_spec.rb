@@ -108,7 +108,7 @@ describe Types::CourseType do
         course.enrollment_term.update grading_period_group: gpg
         @term1 = gpg.grading_periods.create! title: "past grading period",
                                              start_date: 2.weeks.ago,
-                                             end_date: 1.weeks.ago
+                                             end_date: 1.week.ago
         @term2 = gpg.grading_periods.create! title: "current grading period",
                                              start_date: 2.days.ago,
                                              end_date: 2.days.from_now

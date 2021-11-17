@@ -1156,6 +1156,10 @@ describe Canvas::LiveEvents do
           @context = context
         end
 
+        def global_id
+          123_456_789
+        end
+
         def settings
           {
             quizzes2: {
@@ -1169,7 +1173,7 @@ describe Canvas::LiveEvents do
     let(:content_export) { export_class.new(course_model) }
 
     it 'triggers a live event with content export settings and amended context details' do
-      fake_export_context = { key1: 'val1', key2: 'val2' }
+      fake_export_context = { key1: 'val1', key2: 'val2', content_export_id: "content-export-123456789" }
 
       expect_event(
         'quiz_export_complete',

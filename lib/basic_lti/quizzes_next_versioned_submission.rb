@@ -187,7 +187,7 @@ module BasicLTI
 
           matches.captures.first.to_i # ordered by the first lti parameter
         end
-        sorted_list.each_with_object({}) { |k, a| a[k] = attempts[k] }
+        sorted_list.index_with { |k| attempts[k] }
       end
     end
 

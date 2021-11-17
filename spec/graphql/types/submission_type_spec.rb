@@ -469,7 +469,7 @@ describe Types::SubmissionType do
         purpose: 'grading'
       )
 
-      @assignment.submit_homework(@student, body: 'foo', submitted_at: 2.hour.ago)
+      @assignment.submit_homework(@student, body: 'foo', submitted_at: 2.hours.ago)
 
       rubric_assessment_model(
         user: @student,

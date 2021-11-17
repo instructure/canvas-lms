@@ -424,7 +424,7 @@ describe MicrosoftSync::SyncerSteps do
           raise "max batchsize stubbed at #{batch_size}" if uluvs.length > batch_size
 
           # ULUV "abc@def.com" -> AAD "abc-mail-aad"
-          uluvs.map { |uluv| [uluv, uluv.gsub(/@.*/, "-#{remote_attr}-aad")] }.to_h
+          uluvs.index_with { |uluv| uluv.gsub(/@.*/, "-#{remote_attr}-aad") }
         end
       end
 
@@ -934,7 +934,7 @@ describe MicrosoftSync::SyncerSteps do
 
           allow(graph_service_helpers).to receive(:users_uluvs_to_aads) do |remote_attr, uluvs|
             # ULUV "abc@def.com" -> AAD "abc-mail-aad"
-            uluvs.map { |uluv| [uluv, uluv.gsub(/@.*/, "-#{remote_attr}-aad")] }.to_h
+            uluvs.index_with { |uluv| uluv.gsub(/@.*/, "-#{remote_attr}-aad") }.to_h
           end
 
           allow(MicrosoftSync::PartialMembershipDiff).to receive(:new).and_return(diff)

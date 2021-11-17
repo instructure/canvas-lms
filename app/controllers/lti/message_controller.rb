@@ -245,7 +245,7 @@ module Lti
       end
       account_ids = @context.account_chain.map(&:id)
       bindings = ToolProxyBinding.where(context_type: 'Account', context_id: account_ids, tool_proxy_id: tool_proxy.id)
-      binding_lookup = bindings.each_with_object({}) { |binding, hash| hash[binding.context_id] = binding }
+      binding_lookup = bindings.index_by(&:context_id)
       sorted_bindings = account_ids.map { |account_id| binding_lookup[account_id] }
       sorted_bindings.first
     end

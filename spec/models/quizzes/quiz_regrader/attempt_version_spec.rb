@@ -29,10 +29,10 @@ describe Quizzes::QuizRegrader::AttemptVersion do
   end
 
   let(:question_regrades) do
-    1.upto(3).each_with_object({}) do |i, hash|
-      hash[i] = double(:quiz_question => double(:id => i, :question_data => { :id => i }, :quiz_group => question_group),
-                       :question_data => { :id => i },
-                       :regrade_option => regrade_options[i])
+    1.upto(3).index_with do |i|
+      double(:quiz_question => double(:id => i, :question_data => { :id => i }, :quiz_group => question_group),
+             :question_data => { :id => i },
+             :regrade_option => regrade_options[i])
     end
   end
 

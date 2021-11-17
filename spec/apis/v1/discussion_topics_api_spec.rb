@@ -3005,7 +3005,7 @@ describe DiscussionTopicsController, type: :request do
     override = @assignment.assignment_overrides.build
     override.set = @section
     override.title = "extension"
-    override.due_at = 2.day.from_now
+    override.due_at = 2.days.from_now
     override.due_at_overridden = true
     override.save!
 

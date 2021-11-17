@@ -242,7 +242,7 @@ class Quizzes::QuizzesController < ApplicationController
       @stored_params = (@submission.temporary_data rescue nil) if params[:take] && @submission && (@submission.untaken? || @submission.preview?)
       @stored_params ||= {}
       hash = {
-        ATTACHMENTS: Hash[@attachments.map { |_, a| [a.id, attachment_hash(a)] }],
+        ATTACHMENTS: @attachments.map { |_, a| [a.id, attachment_hash(a)] }.to_h,
         CONTEXT_ACTION_SOURCE: :quizzes,
         COURSE_ID: @context.id,
         LOCKDOWN_BROWSER: @quiz.require_lockdown_browser?,
@@ -322,9 +322,9 @@ class Quizzes::QuizzesController < ApplicationController
         flash[:notice] = t('notices.has_submissions_already', "Keep in mind, some students have already taken or started taking this quiz")
       end
 
-      regrade_options = Hash[@quiz.current_quiz_question_regrades.map do |qqr|
+      regrade_options = @quiz.current_quiz_question_regrades.map do |qqr|
         [qqr.quiz_question_id, qqr.regrade_option]
-      end]
+      end.to_h
       sections = @context.course_sections.active
 
       max_name_length_required_for_account = AssignmentUtil.name_length_required_for_account?(@context)
@@ -641,7 +641,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       @submissions_from_users = @quiz.quiz_submissions.for_user_ids(students.map(&:id)).not_settings_only.to_a
 
-      @submissions_from_users = Hash[@submissions_from_users.map { |s| [s.user_id, s] }]
+      @submissions_from_users = @submissions_from_users.index_by(&:user_id)
 
       # include logged out submissions
       @submissions_from_logged_out = @quiz.quiz_submissions.logged_out.not_settings_only
@@ -849,10 +849,8 @@ class Quizzes::QuizzesController < ApplicationController
 
   def setup_attachments
     @attachments = if @submission
-                     Hash[@submission.attachments.map do |attachment|
-                       [attachment.id, attachment]
-                     end
-                     ]
+                     @submission.attachments.index_by(&:id)
+
                    else
                      {}
                    end

@@ -344,8 +344,8 @@ class CalendarEvent < ActiveRecord::Base
   def sync_child_events
     locked_changes = LOCKED_ATTRIBUTES.select { |attr| saved_change_to_attribute?(attr) }
     cascaded_changes = CASCADED_ATTRIBUTES.select { |attr| saved_change_to_attribute?(attr) }
-    child_events.are_locked.update_all Hash[locked_changes.map { |attr| [attr, send(attr)] }] if locked_changes.present?
-    child_events.are_unlocked.update_all Hash[cascaded_changes.map { |attr| [attr, send(attr)] }] if cascaded_changes.present?
+    child_events.are_locked.update_all(locked_changes.index_with { |attr| send(attr) }) if locked_changes.present?
+    child_events.are_unlocked.update_all(cascaded_changes.index_with { |attr| send(attr) }) if cascaded_changes.present?
   end
 
   def sync_conference

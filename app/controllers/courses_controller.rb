@@ -3061,7 +3061,7 @@ class CoursesController < ApplicationController
           parsed_restrictions_by_type = {}
           mc_restrictions_by_type.to_unsafe_h.each do |type, restrictions|
             class_name = type == "quiz" ? "Quizzes::Quiz" : type.camelcase
-            parsed_restrictions_by_type[class_name] = Hash[restrictions.map { |k, v| [k.to_sym, value_to_boolean(v)] }]
+            parsed_restrictions_by_type[class_name] = restrictions.map { |k, v| [k.to_sym, value_to_boolean(v)] }.to_h
           end
           template.default_restrictions_by_type = parsed_restrictions_by_type
         end

@@ -1756,7 +1756,7 @@ class Submission < ActiveRecord::Base
       attachment_ids << s.attachment_id if s.attachment_id
       [[s, index], attachment_ids]
     end
-    Hash[submissions_with_index_and_attachment_ids]
+    submissions_with_index_and_attachment_ids.to_h
   end
   private_class_method :group_attachment_ids_by_submission_and_index
 
@@ -1817,7 +1817,7 @@ class Submission < ActiveRecord::Base
   def self.bulk_load_attachments_for_submissions(submissions, preloads: nil)
     submissions = Array(submissions)
     attachment_ids_by_submission =
-      Hash[submissions.map { |s| [s, s.attachment_associations.map(&:attachment_id)] }]
+      submissions.index_with { |s| s.attachment_associations.map(&:attachment_id) }
     bulk_attachment_ids = attachment_ids_by_submission.values.flatten.uniq
     if bulk_attachment_ids.empty?
       attachments_by_id = {}
@@ -1830,7 +1830,7 @@ class Submission < ActiveRecord::Base
     attachments_by_submission = submissions.map do |s|
       [s, attachments_by_id.values_at(*attachment_ids_by_submission[s]).flatten.compact.uniq]
     end
-    Hash[attachments_by_submission]
+    attachments_by_submission.to_h
   end
 
   def includes_attachment?(attachment)

@@ -42,7 +42,7 @@ describe TextHelper do
 
     it "is formatted properly" do
       time = Time.zone.now
-      time += 1.minutes if time.min == 0
+      time += 1.minute if time.min == 0
       expect(th.time_string(time)).to eq I18n.l(time, :format => :tiny)
     end
 

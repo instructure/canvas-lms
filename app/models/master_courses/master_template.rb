@@ -192,8 +192,8 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   def self.preload_index_data(templates)
     child_counts = MasterCourses::ChildSubscription.active.where(:master_template_id => templates)
                                                    .joins(:child_course).where.not(:courses => { :workflow_state => "deleted" }).group(:master_template_id).count
-    last_export_times = Hash[MasterCourses::MasterMigration.where(:master_template_id => templates, :workflow_state => "completed")
-                                                           .order(:master_template_id, id: :desc).pluck(Arel.sql("DISTINCT ON (master_template_id) master_template_id, imports_completed_at"))]
+    last_export_times = MasterCourses::MasterMigration.where(:master_template_id => templates, :workflow_state => "completed")
+                                                      .order(:master_template_id, id: :desc).pluck(Arel.sql("DISTINCT ON (master_template_id) master_template_id, imports_completed_at")).to_h
 
     templates.each do |template|
       template.child_course_count = child_counts[template.id] || 0
@@ -299,7 +299,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def default_restrictions_by_type_for_api
-    default_restrictions_by_type.map { |k, v| [k.constantize.table_name.singularize, v] }.to_h
+    default_restrictions_by_type.transform_keys { |k| k.constantize.table_name.singularize }
   end
 
   def self.create_associations_from_sis(root_account, associations, messages, migrating_user = nil)
