@@ -132,16 +132,16 @@ module MicrosoftSync
         result
       rescue ExpectedErrorWrapper => e
         raise e.wrapped_exception
-      rescue => error
-        response_code = response&.code&.to_s || error.class.name.tr(':', '_')
+      rescue => e
+        response_code = response&.code&.to_s || e.class.name.tr(':', '_')
 
-        if intermittent_non_throttled?(error) && retries > 0
+        if intermittent_non_throttled?(e) && retries > 0
           retries -= 1
           log_and_increment(method, path, statsd_tags, :retried, response_code)
           retry
         end
 
-        log_and_increment(method, path, statsd_tags, statsd_name_for_error(error), response_code)
+        log_and_increment(method, path, statsd_tags, statsd_name_for_error(e), response_code)
         raise
       end
 

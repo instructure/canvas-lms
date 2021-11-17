@@ -453,10 +453,10 @@ class ConversationsController < ApplicationController
         render :json => [conversation_json(@conversation.reload, @current_user, session, :include_indirect_participants => true, :messages => [message])], :status => :created
       end
     end
-  rescue ActiveRecord::RecordInvalid => err
-    render :json => err.record.errors, :status => :bad_request
-  rescue ConversationsHelper::InvalidContextError => err
-    render json: { message: err.message }, status: :bad_request
+  rescue ActiveRecord::RecordInvalid => e
+    render :json => e.record.errors, :status => :bad_request
+  rescue ConversationsHelper::InvalidContextError => e
+    render json: { message: e.message }, status: :bad_request
   end
 
   # @API Get running batches

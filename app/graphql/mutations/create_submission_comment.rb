@@ -67,8 +67,8 @@ class Mutations::CreateSubmissionComment < Mutations::BaseMutation
     comment = assignment.add_submission_comment(submission.user, opts).first
     comment.mark_read!(current_user)
     { submission_comment: comment }
-  rescue ActiveRecord::RecordInvalid => invalid
-    errors_for(invalid.record)
+  rescue ActiveRecord::RecordInvalid => e
+    errors_for(e.record)
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
   end

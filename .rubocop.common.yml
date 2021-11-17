@@ -75,6 +75,8 @@ Naming/HeredocDelimiterNaming:
 Naming/FileName:
   Exclude:
     - "**/Gemfile.d/~after.rb"
+Naming/RescuedExceptionsVariableName:
+  Severity: error
 
 Performance:
   Severity: error

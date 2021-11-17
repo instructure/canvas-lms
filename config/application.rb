@@ -206,9 +206,9 @@ module CanvasRails
           raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00
 
           break
-        rescue ::PG::Error => error
-          if error.message.include?("does not exist")
-            raise ActiveRecord::NoDatabaseError.new(error.message)
+        rescue ::PG::Error => e
+          if e.message.include?("does not exist")
+            raise ActiveRecord::NoDatabaseError.new(e.message)
           elsif index == hosts.length - 1
             raise
           end
