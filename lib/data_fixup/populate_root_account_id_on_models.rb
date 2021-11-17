@@ -315,9 +315,7 @@ module DataFixup::PopulateRootAccountIdOnModels
     # we want a hash of tables with their associated column names
     case association
     when Hash
-      association.each_with_object({}) do |(assoc, column), memo|
-        memo[assoc.to_sym] = column
-      end
+      association.transform_keys(&:to_sym)
     when Array
       association.reduce({}) { |memo, assoc| memo.merge(hash_association(assoc)) }
     when String, Symbol

@@ -617,7 +617,7 @@ class Enrollment < ActiveRecord::Base
     :default => ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment'],
     :student => ['StudentEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'StudentViewEnrollment', 'ObserverEnrollment']
   }.freeze
-  TYPE_RANK_HASHES = TYPE_RANKS.map { |k, v| [k, rank_hash(v)] }.to_h
+  TYPE_RANK_HASHES = TYPE_RANKS.transform_values { |v| rank_hash(v) }
   def self.type_rank_sql(order = :default)
     # don't call rank_sql during class load
     rank_sql(TYPE_RANKS[order], 'enrollments.type')

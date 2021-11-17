@@ -209,7 +209,7 @@ module MicrosoftSync
       # looking up the same ULUV multiple times; but this should be very rare
       users_and_uluvs.each_slice(GraphServiceHelpers::USERS_ULUVS_TO_AADS_BATCH_SIZE) do |slice|
         uluv_to_aad = graph_service_helpers.users_uluvs_to_aads(remote_attr, slice.map(&:last))
-        user_id_to_aad = slice.map { |user_id, uluv| [user_id, uluv_to_aad[uluv]] }.to_h.compact
+        user_id_to_aad = slice.to_h.transform_values { |uluv| uluv_to_aad[uluv] }.compact
         # NOTE: root_account here must be the same (values loaded into memory at the same time)
         # as passed into UsersUluvsFinder AND as used in #tenant, for the "have settings changed?"
         # check to work. For example, using course.root_account here would NOT be correct.

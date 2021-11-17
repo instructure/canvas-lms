@@ -110,7 +110,7 @@ module CC::Importer::Standard
       end
       if meta_doc.at_css("similarity_detection_tool")
         node = meta_doc.at_css("similarity_detection_tool")
-        similarity_settings = node.attributes.each_with_object({}) { |(k, v), h| h[k] = v.value }
+        similarity_settings = node.attributes.transform_values(&:value)
         assignment[:similarity_detection_tool] = similarity_settings
       end
 

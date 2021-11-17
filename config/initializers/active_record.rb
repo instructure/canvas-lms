@@ -436,9 +436,9 @@ class ActiveRecord::Base
 
     return result if result.keys.first.is_a?(Date)
 
-    result.map { |date, count|
-      [Time.zone.parse(date).to_date, count]
-    }.to_h
+    result.transform_keys do |date|
+      Time.zone.parse(date).to_date
+    end
   end
 
   def self.rank_sql(ary, col)

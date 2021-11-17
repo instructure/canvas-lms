@@ -159,9 +159,7 @@ module Context
     # otherwise compute it and store it in the cache
     value_to_cache = nil
     ActiveRecord::Base.uncached do
-      value_to_cache = types_to_check.each_with_object({}) do |(key, type_to_check), memo|
-        memo[key] = type_to_check.call
-      end
+      value_to_cache = types_to_check.transform_values(&:call)
     end
     Rails.cache.write(cache_key, value_to_cache)
     @active_record_types[only_check] = value_to_cache
