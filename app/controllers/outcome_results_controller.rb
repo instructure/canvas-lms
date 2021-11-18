@@ -379,7 +379,32 @@ class OutcomeResultsController < ApplicationController
     @users = @users.select { |u| userids_with_results.include? u.id }
   end
 
+  def current_user_enrollments
+    @context.enrollments.where(user_id: @current_user).pluck(:type)
+  end
+
+  def student_lmgb_view?
+    user_id_params = Api.value_to_array(params[:user_ids]).map(&:to_i)
+    current_user_enrollments.include?("StudentEnrollment") && (user_id_params == [@current_user.id])
+  end
+
+  def observer_lmgb_view?
+    return false unless params["user_ids"]
+
+    observer_linked_student_ids = ObserverEnrollment.observed_student_ids(@context, @current_user)
+    user_id_params = Api.value_to_array(params[:user_ids]).map(&:to_i)
+    observer_viewing_linked_students = (user_id_params - observer_linked_student_ids).empty?
+    current_user_enrollments.include?("ObserverEnrollment") && observer_viewing_linked_students
+  end
+
+  def handle_inst_statsd_outcomes_page_views
+    if student_lmgb_view? || observer_lmgb_view?
+      InstStatsd::Statsd.increment("outcomes_page_views", tags: { type: "student_lmgb" })
+    end
+  end
+
   def user_rollups_json
+    handle_inst_statsd_outcomes_page_views
     return user_rollups_sorted_by_score_json if params[:sort_by] == "outcome" && params[:sort_outcome_id]
 
     rollups = user_rollups

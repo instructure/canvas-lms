@@ -45,6 +45,11 @@ describe OutcomeResultsController do
     @student
   end
 
+  let_once(:observer) do
+    observer_in_course(active_all: true, course: outcome_course, name: "Observer")
+    @observer
+  end
+
   let_once(:outcome_rubric) do
     create_outcome_rubric
   end
@@ -196,6 +201,62 @@ describe OutcomeResultsController do
                                aggregate_stat: "powerlaw" },
                      format: "json"
       expect(response).not_to be_successful
+    end
+
+    context "student lmgb usage tracking" do
+      def fetch_student_lmgb_data
+        get "rollups", params: { context_id: @course.id,
+                                 course_id: @course.id,
+                                 context_type: "Course",
+                                 user_ids: [@student.id],
+                                 outcome_ids: [@outcome.id] },
+                       format: "json"
+      end
+
+      it "increments statsd if a student is viewing their own sLMGB results" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        user_session(@student)
+        fetch_student_lmgb_data
+        expect(response).to be_successful
+        expect(InstStatsd::Statsd).to have_received(:increment).with(
+          "outcomes_page_views",
+          tags: { type: "student_lmgb" }
+        ).once
+      end
+
+      it "increments statsd if an observer is viewing a linked student\"s sLMGB results" do
+        @observer.enrollments.find_by(course_id: @course.id).update!(associated_user_id: @student)
+        allow(InstStatsd::Statsd).to receive(:increment)
+        user_session(@observer)
+        fetch_student_lmgb_data
+        expect(response).to be_successful
+        expect(InstStatsd::Statsd).to have_received(:increment).with(
+          "outcomes_page_views",
+          tags: { type: "student_lmgb" }
+        ).once
+      end
+
+      it "doesnt increment statsd if an observer is viewing a non-linked student\"s sLMGB results" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        user_session(@observer)
+        fetch_student_lmgb_data
+        expect(response).not_to be_successful
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with(
+          "outcomes_page_views",
+          tags: { type: "student_lmgb" }
+        )
+      end
+
+      it "doesnt increment a statsd if a teacher is viewing a student\"s sLMGB results" do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        user_session(@teacher)
+        fetch_student_lmgb_data
+        expect(response).to be_successful
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with(
+          "outcomes_page_views",
+          tags: { type: "student_lmgb" }
+        )
+      end
     end
 
     context "with manual post policy assignment" do
