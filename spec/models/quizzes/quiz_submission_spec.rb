@@ -1355,6 +1355,7 @@ describe Quizzes::QuizSubmission do
         end
       end
     end
+
     describe "#needs_grading" do
       before :once do
         student_in_course

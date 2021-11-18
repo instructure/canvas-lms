@@ -1864,6 +1864,7 @@ describe CalendarEventsApiController, type: :request do
             expect(json.size).to eql 1
           end
         end
+
         context 'in a section only' do
           it "shows events for all active assignment" do
             json = api_call_as_user(@observer, :get, "/api/v1/calendar_events?type=assignment&start_date=2011-01-08&end_date=2099-01-08&context_codes[]=course_#{@course.id}", {

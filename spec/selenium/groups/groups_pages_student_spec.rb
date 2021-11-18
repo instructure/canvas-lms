@@ -482,6 +482,7 @@ describe "groups" do
       end
     end
     #-------------------------------------------------------------------------------------------------------------------
+
     describe "collaborations page" do
       before do
         setup_google_drive

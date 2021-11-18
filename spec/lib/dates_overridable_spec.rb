@@ -235,6 +235,7 @@ shared_examples_for "an object whose dates are overridable" do
         expect(overridable.reload.has_active_overrides?).to eq true
       end
     end
+
     context "when it has deleted overrides" do
       it "returns false" do
         override.destroy

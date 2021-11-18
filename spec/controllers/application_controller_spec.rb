@@ -460,6 +460,7 @@ RSpec.describe ApplicationController do
       expect(controller.send(:response_code_for_rescue, e)).to eq(502)
     end
   end
+
   describe "#reject!" do
     it "sets the message and status in the error json" do
       expect { controller.reject!('test message', :not_found) }.to(raise_error(RequestError) do |e|

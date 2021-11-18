@@ -605,6 +605,7 @@ describe ContentTag do
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).not_to include(@tag)
       end
     end
+
     context "discussions" do
       def attach_assignment_to_discussion
         @assignment = @course.assignments.create!(:title => "some discussion assignment", only_visible_to_overrides: true)
@@ -638,6 +639,7 @@ describe ContentTag do
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).not_to include(@tag)
       end
     end
+
     context "quizzes" do
       before do
         @quiz = @course.quizzes.create!(only_visible_to_overrides: true)
@@ -658,6 +660,7 @@ describe ContentTag do
         expect(ContentTag.visible_to_students_in_course_with_da(@student.id, @course.id)).not_to include(@tag)
       end
     end
+
     context "other" do
       it "properly returns wiki pages" do
         @page = @course.wiki_pages.create!(:title => "some page")

@@ -1411,6 +1411,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         expect(f('body')).to contain_css(menubar_menu_item_css('User Documents'))
       end
     end
+
     describe 'Insert content toolbar button default actions' do
       it 'does the right thing when clicking the toolbar button' do
         double('CanvasKaltura::ClientV3')

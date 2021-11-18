@@ -66,6 +66,7 @@ describe Quizzes::OutstandingQuizSubmissionManager do
       expect(@outstanding.find_by_quiz.size).to eq 0
     end
   end
+
   describe '#grade_by_course' do
     it 'grades ungraded quizzes for active courses' do
       student = student_in_course(active_all: true).user

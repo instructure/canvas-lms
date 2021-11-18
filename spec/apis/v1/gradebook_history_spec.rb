@@ -40,6 +40,7 @@ end
 
 describe Api::V1::GradebookHistory do
   subject(:gradebook_history) { GradebookHistoryHarness.new }
+
   let(:course) { double }
   let(:controller) do
     double(
