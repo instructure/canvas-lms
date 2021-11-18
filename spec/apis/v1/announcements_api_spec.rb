@@ -127,7 +127,7 @@ describe "Announcements API", type: :request do
                                             :start_date => start_date, :end_date => end_date, :per_page => 1))
       expect(json.length).to eq 1
       next_link = response.headers['Link'].split(",").detect { |link| link.include?('rel="next"') }
-      expect(next_link).to match(/\/api\/v1\/announcements/)
+      expect(next_link).to match(%r{/api/v1/announcements})
       expect(next_link).to include "page=2"
     end
 

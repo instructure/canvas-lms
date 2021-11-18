@@ -67,7 +67,7 @@ module LuckySneaks
       name = /[\w:_-]+/
       value = /([A-Za-z0-9]+|('[^']*?'|"[^"]*?"))/
       attr = /(#{name}(\s*=\s*#{value})?)/
-      rx = /<[!\/?\[]?(#{name}|--)(\s+(#{attr}(\s+#{attr})*))?\s*([!\/?\]]+|--)?>/
+      rx = %r{<[!/?\[]?(#{name}|--)(\s+(#{attr}(\s+#{attr})*))?\s*([!/?\]]+|--)?>}
       leave_whitespace ? gsub(rx, "").strip : gsub(rx, "").gsub(/\s+/, " ").strip
     end
 
@@ -154,12 +154,12 @@ module LuckySneaks
         /(\s|^)¥(\d*)(\s|$)/u => '\2 yen',
         /\s*\*\s*/ => "star",
         /\s*%\s*/ => "percent",
-        /\s*(\\|\/)\s*/ => "slash",
+        %r{\s*(\\|/)\s*} => "slash",
       }.each do |found, replaced|
         replaced = " #{replaced} " unless replaced.include?('\\1')
         dummy.gsub!(found, replaced)
       end
-      dummy = dummy.gsub(/(^|\w)'(\w|$)/, '\1\2').gsub(/[.,:;()\[\]\/?!\^'"_]/, " ")
+      dummy = dummy.gsub(/(^|\w)'(\w|$)/, '\1\2').gsub(%r{[.,:;()\[\]/?!\^'"_]}, " ")
     end
 
     # Replace runs of whitespace in string. Defaults to a single space but any replacement

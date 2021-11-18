@@ -67,7 +67,7 @@ describe AvatarHelper do
       end
 
       it "sets the href to the given url" do
-        expect(avatar(user, url: "/test_url")).to match(/href="\/test_url"/)
+        expect(avatar(user, url: "/test_url")).to match(%r{href="/test_url"})
       end
 
       it "links to the context user's page when given a context_code" do

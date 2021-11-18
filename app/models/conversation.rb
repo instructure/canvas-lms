@@ -451,16 +451,12 @@ class Conversation < ActiveRecord::Base
 
   def infer_new_tags_for(participant, all_new_tags)
     active_tags   = participant.user.conversation_context_codes(false)
-    context_codes = active_tags.present? ? active_tags : participant.user.conversation_context_codes
+    context_codes = active_tags.presence || participant.user.conversation_context_codes
     visible_codes = all_new_tags & context_codes
 
-    new_tags = if visible_codes.present?
-                 # limit available codes to codes the user can see
-                 visible_codes
-               else
-                 # otherwise, use all of the available tags.
-                 current_context_strings & context_codes
-               end
+    # limit available codes to codes the user can see
+    # otherwise, use all of the available tags
+    new_tags = visible_codes.presence || (current_context_strings & context_codes)
 
     message_tags = if self.private?
                      if new_tags.present?

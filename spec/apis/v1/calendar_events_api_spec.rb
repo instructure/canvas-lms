@@ -1423,7 +1423,7 @@ describe CalendarEventsApiController, type: :request do
                           }
                         })
         conference = CalendarEvent.find(json['id']).web_conference
-        expect(conference.settings[:default_return_url]).to match(/\/courses\/#{@course.id}$/)
+        expect(conference.settings[:default_return_url]).to match(%r{/courses/#{@course.id}$})
         expect(conference.user).to eq @user
       end
 

@@ -996,7 +996,7 @@ describe Api do
                                 :first => 1,
                                 :last => 10,
                               })
-      expect(links.all? { |l| l =~ /www.example.com\/\?/ }).to be_truthy
+      expect(links.all? { |l| l =~ %r{www.example.com/\?} }).to be_truthy
       expect(links.find { |l| l.include?('rel="current"') }).to match(/page=8&per_page=10>/)
       expect(links.find { |l| l.include?('rel="next"') }).to match(/page=4&per_page=10>/)
       expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=10>/)
@@ -1042,7 +1042,7 @@ describe Api do
                                 :first => 1,
                                 :last => 10,
                               })
-      expect(links.all? { |l| l =~ /www.example.com\/\?/ }).to be_truthy
+      expect(links.all? { |l| l =~ %r{www.example.com/\?} }).to be_truthy
       expect(links.find { |l| l.include?('rel="current"') }).to be_nil
       expect(links.find { |l| l.include?('rel="next"') }).to match(/page=4&per_page=10>/)
       expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2&per_page=10>/)

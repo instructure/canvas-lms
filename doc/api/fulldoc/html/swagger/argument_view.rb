@@ -61,7 +61,7 @@ class ArgumentView < HashView
     # This regex is impossible to read, basically we're splitting the string up
     # into the first [bracketed] section, which might contain internal brackets,
     # and then the rest of the string.
-    md = str.strip.match(%r{\A(\[[\w ,\[\]|"]+\])?\s*(.+)?}m)
+    md = str.strip.match(/\A(\[[\w ,\[\]|"]+\])?\s*(.+)?/m)
     [md[1] || DEFAULT_TYPE, md[2] || DEFAULT_DESC]
   end
 

@@ -258,8 +258,8 @@ describe HtmlTextHelper do
       html = th.html_to_simple_html(original_html, base_url: 'http://example.com',
                                                    :tags => ['table'], :attributes => { 'table' => ['border'] })
       expect(html).to match(%r{http://example.com/relative/link})
-      expect(html).to match(%r{table border})
-      expect(html).not_to match(%r{tr border})
+      expect(html).to match(/table border/)
+      expect(html).not_to match(/tr border/)
     end
   end
 

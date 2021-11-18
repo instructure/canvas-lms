@@ -52,8 +52,8 @@ module IncomingMail
                              })
           true
         end
-      rescue IncomingMail::Errors::ReplyFrom => error
-        bounce_message(original_message, incoming_message, error, outgoing_from_address, from_channel)
+      rescue IncomingMail::Errors::ReplyFrom => e
+        bounce_message(original_message, incoming_message, e, outgoing_from_address, from_channel)
       rescue => e
         Canvas::Errors.capture_exception("IncomingMailProcessor", e)
       end

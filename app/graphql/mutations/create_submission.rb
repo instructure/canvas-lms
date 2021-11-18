@@ -139,8 +139,8 @@ class Mutations::CreateSubmission < Mutations::BaseMutation
     { submission: submission }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
-  rescue ActiveRecord::RecordInvalid => invalid
-    errors_for(invalid.record)
+  rescue ActiveRecord::RecordInvalid => e
+    errors_for(e.record)
   end
 
   private

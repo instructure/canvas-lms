@@ -75,6 +75,8 @@ Naming/HeredocDelimiterNaming:
 Naming/FileName:
   Exclude:
     - "**/Gemfile.d/~after.rb"
+Naming/RescuedExceptionsVariableName:
+  Severity: error
 
 Performance:
   Severity: error
@@ -119,6 +121,8 @@ Rails/IndexWith:
 Rails/Pluck:
   Severity: error
 Rails/PluralizationGrammar:
+  Severity: error
+Rails/Presence:
   Severity: error
 Rails/RedundantAllowNil:
   Severity: error
@@ -240,9 +244,13 @@ Style/RedundantFreeze:
   Severity: error
 Style/RedundantParentheses:
   Severity: error
+Style/RedundantRegexpCharacterClass:
+  Severity: error
 Style/RedundantRegexpEscape:
   Severity: error
 Style/RedundantReturn:
+  Severity: error
+Style/RegexpLiteral:
   Severity: error
 Style/RescueStandardError:
   EnforcedStyle: implicit
@@ -334,8 +342,6 @@ Style/PercentLiteralDelimiters: # TODO: autocorrect
 Style/PercentQLiterals: # TODO: autocorrect
   Enabled: false
 Style/RedundantSelf: # TODO: autocorrect
-  Enabled: false
-Style/RegexpLiteral: # TODO: autocorrect
   Enabled: false
 Style/RescueModifier: # TODO
   Severity: warning

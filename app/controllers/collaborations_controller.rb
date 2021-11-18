@@ -233,8 +233,8 @@ class CollaborationsController < ApplicationController
           flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
           redirect_to named_context_url(@context, :context_collaborations_url)
         end
-      rescue GoogleDrive::ConnectionException => drive_exception
-        Canvas::Errors.capture(drive_exception, {}, :warn)
+      rescue GoogleDrive::ConnectionException => e
+        Canvas::Errors.capture(e, {}, :warn)
         flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
         redirect_to named_context_url(@context, :context_collaborations_url)
       end
@@ -336,13 +336,13 @@ class CollaborationsController < ApplicationController
           format.json { render :json => @collaboration.errors, :status => :bad_request }
         end
       end
-    rescue GoogleDrive::ConnectionException => error
-      Rails.logger.warn error
+    rescue GoogleDrive::ConnectionException => e
+      Rails.logger.warn e
       flash[:error] = t 'errors.update_failed', "Collaboration update failed" # generic failure message
-      if error.message.include?('File not found')
+      if e.message.include?('File not found')
         flash[:error] = t 'google_drive.file_not_found', "Collaboration file not found"
       end
-      raise error unless error.message.include?('File not found')
+      raise e unless e.message.include?('File not found')
 
       redirect_to named_context_url(@context, :context_collaborations_url)
     end

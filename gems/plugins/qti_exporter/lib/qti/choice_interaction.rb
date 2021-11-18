@@ -46,7 +46,7 @@ module Qti
     private
 
     def is_either_or
-      @migration_type =~ /either\/or/i
+      @migration_type =~ %r{either/or}i
     end
 
     def process_true_false_question

@@ -587,12 +587,12 @@ class CalendarEventsApiController < ApplicationController
                                          cancel_existing: value_to_boolean(params[:cancel_existing]),
                                          comments: params['comments'])
         render :json => event_json(reservation, @current_user, session)
-      rescue CalendarEvent::ReservationError => err
+      rescue CalendarEvent::ReservationError => e
         reservations = participant ? @event.appointment_group.reservations_for(participant) : []
         render :json => [{
           :attribute => 'reservation',
           :type => 'calendar_event',
-          :message => err.message,
+          :message => e.message,
           :reservations => reservations.map { |r| event_json(r, @current_user, session) }
         }],
                :status => :bad_request

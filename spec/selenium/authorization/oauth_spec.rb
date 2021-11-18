@@ -46,10 +46,10 @@ describe "oauth2 flow" do
 
       it "shows the confirmation dialog without requiring login" do
         get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
-        expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
+        expect(f('#modal-box').text).to match(/Specs is requesting access to your account/)
         expect_new_page_load { f('#modal-box .Button--primary').click() }
         expect(driver.current_url).to match(%r{/login/oauth2/auth\?})
-        code = driver.current_url.match(%r{code=([^?&]+)})[1]
+        code = driver.current_url.match(/code=([^?&]+)/)[1]
         expect(code).to be_present
       end
     end
@@ -68,10 +68,10 @@ describe "oauth2 flow" do
           f('[name="user[terms_of_use]"]').click
           submit_form form
         }
-        expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
+        expect(f('#modal-box').text).to match(/Specs is requesting access to your account/)
         expect_new_page_load { f('#modal-box .Button--primary').click() }
         expect(driver.current_url).to match(%r{/login/oauth2/auth\?})
-        code = driver.current_url.match(%r{code=([^?&]+)})[1]
+        code = driver.current_url.match(/code=([^?&]+)/)[1]
         expect(code).to be_present
       end
     end
@@ -85,7 +85,7 @@ describe "oauth2 flow" do
 
     it "shows no icon if icon_url is not set on the developer key" do
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
-      expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
+      expect(f('#modal-box').text).to match(/Specs is requesting access to your account/)
       expect(f("#content")).not_to contain_css('.icon_url')
     end
 
@@ -93,7 +93,7 @@ describe "oauth2 flow" do
       @key.icon_url = "/images/delete.png"
       @key.save!
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
-      expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
+      expect(f('#modal-box').text).to match(/Specs is requesting access to your account/)
       expect(f('.ic-Login-confirmation__auth-icon')).to be_displayed
     end
 
@@ -126,7 +126,7 @@ describe "oauth2 flow" do
       f('input[type=submit]').click
       f('body') # wait until the redirect page loads
 
-      code = driver.current_url.match(%r{code=([^?&]+)})[1]
+      code = driver.current_url.match(/code=([^?&]+)/)[1]
       integration_test = ActionDispatch::IntegrationTest.new(self)
       integration_test.post "/login/oauth2/token", params: {
         grant_type: 'authorization_code',

@@ -67,8 +67,8 @@ module Canvas
         entry << "\n#{e.class}"
         begin
           entry << " (#{e.message}):" if e.respond_to?(:message)
-        rescue => new_err
-          entry << "\n***[WARNING]: Unable to extract error message due to #{new_err}"
+        rescue => e
+          entry << "\n***[WARNING]: Unable to extract error message due to #{e}"
         end
         entry << "\n"
         entry << e.annoted_source_code.to_s if e.respond_to?(:annoted_source_code)

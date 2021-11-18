@@ -155,7 +155,7 @@ def check_document(html, course, attachment, include_verifiers)
   expect(video).to be_present
   expect(video['poster']).to match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
   expect(video['src']).to match(%r{http://www.example.com/courses/#{course.id}/media_download})
-  expect(video['src']).to match(%r{entryId=qwerty})
+  expect(video['src']).to match(/entryId=qwerty/)
   expect(doc.css('a').last['data-api-endpoint']).to match(%r{http://www.example.com/api/v1/courses/#{course.id}/pages/awesome-page})
   expect(doc.css('a').last['data-api-returntype']).to eq 'Page'
 end

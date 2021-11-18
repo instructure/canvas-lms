@@ -164,10 +164,10 @@ class GradeChangeAuditApiController < AuditorApiController
   def for_course
     begin
       course = Course.find(params[:course_id])
-    rescue ActiveRecord::RecordNotFound => not_found
+    rescue ActiveRecord::RecordNotFound => e
       return render_unauthorized_action unless admin_authorized?
 
-      raise not_found
+      raise e
     end
 
     return render_unauthorized_action unless course_authorized?(course)
@@ -294,10 +294,10 @@ class GradeChangeAuditApiController < AuditorApiController
   def for_course_and_other_parameters
     begin
       course = Course.find(params[:course_id])
-    rescue ActiveRecord::RecordNotFound => not_found
+    rescue ActiveRecord::RecordNotFound => e
       return render_unauthorized_action unless admin_authorized?
 
-      raise not_found
+      raise e
     end
 
     return render_unauthorized_action unless course_authorized?(course)

@@ -42,7 +42,7 @@ module Api::V1::MasterCourses
   end
 
   def changed_asset_json(asset, action, locked, migration_id = nil, exceptions = {})
-    asset_type = asset.class_name.underscore.sub(/^.+\//, '')
+    asset_type = asset.class_name.underscore.sub(%r{^.+/}, '')
     url = case asset.class_name
           when 'Attachment'
             course_file_url(:course_id => asset.context.id, :id => asset.id)

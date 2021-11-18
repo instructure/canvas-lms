@@ -37,7 +37,7 @@ module BasicLTI
     # gives instfs about 7 hours to have an outage and eventually take the file
     MAX_ATTEMPTS = 10
 
-    SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}.freeze
+    SOURCE_ID_REGEX = /^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$/.freeze
 
     def self.decode_source_id(tool, sourceid)
       tool.shard.activate do
@@ -92,7 +92,7 @@ module BasicLTI
 
       def operation_ref_identifier
         tag = @lti_request&.at_css('imsx_POXBody *:first').try(:name)
-        tag&.sub(%r{Request$}, '')
+        tag&.sub(/Request$/, '')
       end
 
       def result_score

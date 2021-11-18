@@ -195,9 +195,9 @@ module Lti::IMS
           json[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: content_items }
         rescue Net::ReadTimeout, CanvasHttp::CircuitBreakerError
           return render_error('failed to communicate with file service', :gateway_timeout)
-        rescue CanvasHttp::InvalidResponseCodeError => err
-          err_message = "uploading to file service failed with #{err.code}: #{err.body}"
-          return render_error(err_message, :bad_request) if err.code == 400
+        rescue CanvasHttp::InvalidResponseCodeError => e
+          err_message = "uploading to file service failed with #{e.code}: #{e.body}"
+          return render_error(err_message, :bad_request) if e.code == 400
 
           # 5xx and other unexpected errors
           return render_error(err_message, :internal_server_error)

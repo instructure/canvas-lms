@@ -607,7 +607,7 @@ describe "Files API", type: :request do
       json = api_call(:get, "/api/v1/folders/#{@root.id}/files?per_page=3", @files_path_options.merge(:id => @root.id.to_param, :per_page => '3'), {})
       expect(json.length).to eq 3
       links = response.headers['Link'].split(",")
-      expect(links.all? { |l| l =~ /api\/v1\/folders\/#{@root.id}\/files/ }).to be_truthy
+      expect(links.all? { |l| l =~ %r{api/v1/folders/#{@root.id}/files} }).to be_truthy
       expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2/)
       expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1/)
       expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
@@ -615,7 +615,7 @@ describe "Files API", type: :request do
       json = api_call(:get, "/api/v1/folders/#{@root.id}/files?per_page=3&page=3", @files_path_options.merge(:id => @root.id.to_param, :per_page => '3', :page => '3'), {})
       expect(json.length).to eq 1
       links = response.headers['Link'].split(",")
-      expect(links.all? { |l| l =~ /api\/v1\/folders\/#{@root.id}\/files/ }).to be_truthy
+      expect(links.all? { |l| l =~ %r{api/v1/folders/#{@root.id}/files} }).to be_truthy
       expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2/)
       expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1/)
       expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
@@ -861,7 +861,7 @@ describe "Files API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/files?per_page=3", @files_path_options.merge(:per_page => '3'), {})
       expect(json.length).to eq 3
       links = response.headers['Link'].split(",")
-      expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/files/ }).to be_truthy
+      expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/files} }).to be_truthy
       expect(links.find { |l| l.include?('rel="next"') }).to match(/page=2/)
       expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1/)
       expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)
@@ -869,7 +869,7 @@ describe "Files API", type: :request do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/files?per_page=3&page=3", @files_path_options.merge(:per_page => '3', :page => '3'), {})
       expect(json.length).to eq 1
       links = response.headers['Link'].split(",")
-      expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/files/ }).to be_truthy
+      expect(links.all? { |l| l =~ %r{api/v1/courses/#{@course.id}/files} }).to be_truthy
       expect(links.find { |l| l.include?('rel="prev"') }).to match(/page=2/)
       expect(links.find { |l| l.include?('rel="first"') }).to match(/page=1/)
       expect(links.find { |l| l.include?('rel="last"') }).to match(/page=3/)

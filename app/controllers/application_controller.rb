@@ -1980,27 +1980,27 @@ class ApplicationController < ActionController::Base
     # but we still use the assignment#new page to create the quiz.
     # also handles launch from existing quiz on quizzes page.
     if ref.present? && @assignment&.quiz_lti?
-      if (ref.include?('assignments/new') || ref =~ /courses\/(\d+\/quizzes.?|.*\?quiz_lti)/) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
+      if (ref.include?('assignments/new') || ref =~ %r{courses/(\d+/quizzes.?|.*\?quiz_lti)}) && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
         return polymorphic_url([@context, :quizzes])
       end
 
-      if /courses\/\d+\/gradebook/i.match?(ref)
+      if %r{courses/\d+/gradebook}i.match?(ref)
         return polymorphic_url([@context, :gradebook])
       end
 
-      if /courses\/\d+$/i.match?(ref)
+      if %r{courses/\d+$}i.match?(ref)
         return polymorphic_url([@context])
       end
 
-      if /courses\/(\d+\/modules.?|.*\?module_item_id=)/.match?(ref)
+      if %r{courses/(\d+/modules.?|.*\?module_item_id=)}.match?(ref)
         return polymorphic_url([@context, :context_modules])
       end
 
-      if /\/courses\/.*\?quiz_lti/.match?(ref)
+      if %r{/courses/.*\?quiz_lti}.match?(ref)
         return polymorphic_url([@context, :quizzes])
       end
 
-      if /courses\/\d+\/assignments/.match?(ref)
+      if %r{courses/\d+/assignments}.match?(ref)
         return polymorphic_url([@context, :assignments])
       end
     end

@@ -2585,7 +2585,7 @@ describe DiscussionTopic do
       @attachment.podcast_associated_asset = @topic
 
       rss = DiscussionTopic.to_podcast([@attachment])
-      expect(rss.first.enclosure.url).to match(%r{download.mp4})
+      expect(rss.first.enclosure.url).to match(/download.mp4/)
     end
   end
 

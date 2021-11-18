@@ -6,7 +6,7 @@ require_relative './linter'
 linter_options = {
   linter_name: "eslint",
   # ignore packages subdirectory
-  file_regex: /^(?!(?:packages\/)).*\.js$/,
+  file_regex: %r{^(?!(?:packages/)).*\.js$},
   format: "eslint",
   command: "node_modules/.bin/eslint",
   campsite_mode: false,
@@ -32,7 +32,7 @@ cwd = Dir.pwd
 package_dirs.each do |d|
   puts "working sub-package dir #{d}"
   Dir.chdir d
-  linter_options[:file_regex] = /#{d}\/.*\.js$/
+  linter_options[:file_regex] = %r{#{d}/.*\.js$}
   eslint = Linter.new(linter_options)
   eslint.run
   Dir.chdir cwd

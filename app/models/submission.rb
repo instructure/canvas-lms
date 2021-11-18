@@ -671,7 +671,7 @@ class Submission < ActiveRecord::Base
 
   def plaintext_body
     self.extend HtmlTextHelper
-    strip_tags((self.body || "").gsub(/<\s*br\s*\/>/, "\n<br/>").gsub(/<\/p>/, "</p>\n"))
+    strip_tags((self.body || "").gsub(%r{<\s*br\s*/>}, "\n<br/>").gsub(%r{</p>}, "</p>\n"))
   end
 
   TURNITIN_STATUS_RETRY = 11
@@ -2204,7 +2204,7 @@ class Submission < ActiveRecord::Base
   end
 
   def participating_instructors
-    commenting_instructors.present? ? commenting_instructors : context.participating_instructors.to_a.uniq
+    commenting_instructors.presence || context.participating_instructors.to_a.uniq
   end
 
   def possible_participants_ids

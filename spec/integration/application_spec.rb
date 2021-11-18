@@ -77,7 +77,7 @@ describe "site-wide" do
     it "sets action information in API requests" do
       course_with_teacher_logged_in
       get "/api/v1/courses/#{@course.id}"
-      expect(response[x_canvas_meta]).to match(%r{o=courses;n=show;})
+      expect(response[x_canvas_meta]).to match(/o=courses;n=show;/)
     end
 
     it "sets controller#action information in API requests on 500" do
@@ -86,16 +86,16 @@ describe "site-wide" do
       get "/api/v1/courses"
 
       assert_status(500)
-      expect(response[x_canvas_meta]).to match(%r{o=courses;n=index;})
+      expect(response[x_canvas_meta]).to match(/o=courses;n=index;/)
     end
 
     it "sets page view information in user requests" do
       course_with_teacher_logged_in
       Setting.set('enable_page_views', 'db')
       get "/courses/#{@course.id}"
-      expect(response[x_canvas_meta]).to match(%r{o=courses;n=show;})
-      expect(response[x_canvas_meta]).to match(%r{t=Course;})
-      expect(response[x_canvas_meta]).to match(%r{x=5.0;})
+      expect(response[x_canvas_meta]).to match(/o=courses;n=show;/)
+      expect(response[x_canvas_meta]).to match(/t=Course;/)
+      expect(response[x_canvas_meta]).to match(/x=5.0;/)
     end
   end
 
@@ -136,13 +136,13 @@ describe "site-wide" do
   context "breadcrumbs" do
     it "is absent for error pages" do
       get "/apagethatdoesnotexist"
-      expect(response.body).not_to match(%r{id="breadcrumbs"})
+      expect(response.body).not_to match(/id="breadcrumbs"/)
     end
 
     it "is absent for error pages with user info" do
       course_with_teacher
       get "/users/#{@user.id}/files/apagethatdoesnotexist"
-      expect(response.body.to_s).not_to match(%r{id="breadcrumbs"})
+      expect(response.body.to_s).not_to match(/id="breadcrumbs"/)
     end
   end
 
