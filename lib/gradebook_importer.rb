@@ -183,12 +183,11 @@ class GradebookImporter
     end
 
     # cache the score on the existing object
-    original_submissions_by_student = @original_submissions.inject({}) do |r, s|
+    original_submissions_by_student = @original_submissions.each_with_object({}) do |s, r|
       r[s[:user_id]] ||= {}
       r[s[:user_id]][s[:assignment_id]] ||= {}
       r[s[:user_id]][s[:assignment_id]][:score] = s[:score]
       r[s[:user_id]][s[:assignment_id]][:gradeable] = s[:gradeable]
-      r
     end
 
     @students.each do |student|

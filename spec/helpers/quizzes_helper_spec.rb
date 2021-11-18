@@ -397,7 +397,7 @@ describe QuizzesHelper do
     end
 
     context "show_correct_answers_at is set" do
-      it 'shows date of ' do
+      it 'shows date of' do
         time = 1.day.from_now
         quiz = double({
                         show_correct_answers: true,
@@ -409,7 +409,7 @@ describe QuizzesHelper do
     end
 
     context "hide_correct_answers_at is set" do
-      it 'shows date of ' do
+      it 'shows date of' do
         time = 1.day.from_now
         quiz = double({
                         show_correct_answers: true,
@@ -421,7 +421,7 @@ describe QuizzesHelper do
     end
 
     context "show_correct_answers_at and hide_correct_answers_at are set" do
-      it 'shows date of ' do
+      it 'shows date of' do
         time = 1.day.from_now
         time2 = 1.week.from_now
 

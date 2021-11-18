@@ -74,12 +74,11 @@ module Quizzes::LogAuditing
     # constructs submission data from events, including the parsing of flagged
     # to indicate that they are 'marked' or 'flagged'
     def build_submission_data_from_events(events)
-      events.reduce({}) do |submission_data, event|
+      events.each_with_object({}) do |event, submission_data|
         case event.event_type
         when Quizzes::QuizSubmissionEvent::EVT_QUESTION_FLAGGED
           submission_data["question_#{event.event_data['quiz_question_id']}_marked"] = event.event_data['flagged']
         end
-        submission_data
       end
     end
 

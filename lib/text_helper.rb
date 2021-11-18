@@ -247,7 +247,7 @@ module TextHelper
     string = ERB::Util.h(string) unless string.html_safe?
     result = Redcarpet::Markdown.new(Redcarpet::Render::XHTML.new).render(string).strip
     # Strip wrapping <p></p> if inlinify == :auto && they completely wrap the result && there are not multiple <p>'s
-    result.gsub!(%r{</?p>}, '') if inlinify == :auto && result =~ %r{\A<p>.*</p>\z}m && !(result =~ /.*<p>.*<p>.*/m)
+    result.gsub!(%r{</?p>}, '') if inlinify == :auto && result =~ %r{\A<p>.*</p>\z}m && result !~ /.*<p>.*<p>.*/m
     result.strip.html_safe
   end
 

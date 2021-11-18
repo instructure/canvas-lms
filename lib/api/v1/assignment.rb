@@ -948,7 +948,7 @@ module Api::V1::Assignment
     return invalid unless assignment_editable_fields_valid?(updated_assignment, user)
     return invalid unless assignment_final_grader_valid?(updated_assignment, context)
 
-    external_tool_tag_attributes = assignment_params.dig(:external_tool_tag_attributes)
+    external_tool_tag_attributes = assignment_params[:external_tool_tag_attributes]
     if external_tool_tag_attributes&.include?(:custom_params)
       custom_params = external_tool_tag_attributes[:custom_params]
       unless custom_params_valid?(custom_params)
@@ -1064,7 +1064,7 @@ module Api::V1::Assignment
     assignment.assignment_configuration_tool_lookups.present? &&
       assignment_params['submission_types']&.present? &&
       (
-        !assignment.submission_types.split(',').any? { |t| assignment_params['submission_types'].include?(t) } ||
+        assignment.submission_types.split(',').none? { |t| assignment_params['submission_types'].include?(t) } ||
         assignment_params['submission_types'].blank?
       )
   end

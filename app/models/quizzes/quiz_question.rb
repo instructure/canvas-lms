@@ -180,7 +180,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     return if self.question_data && !(self.question_data.is_type?(:fill_in_multiple_blanks) || self.question_data.is_type?(:short_answer))
 
     qd = self.question_data
-    qd.answers = qd.answers.select { |answer| !answer['text'].empty? }
+    qd.answers = qd.answers.reject { |answer| answer['text'].empty? }
     self.question_data = qd
     self.question_data_will_change!
     true

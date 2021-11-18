@@ -31,7 +31,7 @@ module ContextModulesHelper
     DiscussionTopic: I18n.t('Discussion Topic'),
     ExternalUrl: I18n.t('External Url'),
     Quiz: I18n.t('Quiz'),
-    'Quizzes::Quiz': I18n.t('Quiz'),
+    "Quizzes::Quiz": I18n.t('Quiz'),
     WikiPage: I18n.t('Page')
   }.freeze
 

@@ -749,7 +749,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "fails (400) if the update is invalid" do
-      too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join('')
+      too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join
       raw_api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
                    { :controller => 'outcome_groups_api',
                      :action => 'update',
@@ -1348,7 +1348,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     it "fails (400) if the new outcome is invalid" do
-      too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join('')
+      too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join
       raw_api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                    { :controller => 'outcome_groups_api',
                      :action => 'link',

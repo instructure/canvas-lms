@@ -101,7 +101,7 @@ RSpec.describe Mutations::AddConversationMessage do
     conversation
     result = run_mutation(conversation_id: @conversation.conversation_id, body: 'This is a neat message', recipients: [@teacher.id.to_s])
 
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     expect(result.dig('data', 'addConversationMessage', 'errors')).to be nil
     expect(
       result.dig('data', 'addConversationMessage', 'conversationMessage', 'body')
@@ -116,7 +116,7 @@ RSpec.describe Mutations::AddConversationMessage do
     @course.account.role_overrides.create!(permission: :send_messages, role: student_role, enabled: false)
 
     result = run_mutation(conversation_id: @conversation.conversation_id, body: 'need some perms yo', recipients: [@teacher.id.to_s])
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     expect(result.dig('data', 'addConversationMessage', 'conversationMessage')).to be nil
     expect(
       result.dig('data', 'addConversationMessage', 'errors', 0, 'message')
@@ -128,7 +128,7 @@ RSpec.describe Mutations::AddConversationMessage do
     conversation
     result = run_mutation(conversation_id: @conversation.conversation_id, body: 'This should be delayed', recipients: [@teacher.id.to_s])
 
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     # a nil result with no errors implies that the message was delayed and will be processed later
     expect(result.dig('data', 'addConversationMessage', 'conversationMessage')).to be nil
     expect(@conversation.reload.messages.count(:all)).to eq 1
@@ -141,13 +141,13 @@ RSpec.describe Mutations::AddConversationMessage do
     conversation(users: [@teacher])
 
     result = run_mutation({ conversation_id: @conversation.conversation_id, body: 'Have a note', recipients: [@student.id.to_s] }, @teacher)
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     cm = ConversationMessage.find(result.dig('data', 'addConversationMessage', 'conversationMessage', '_id'))
     student = cm.recipients.first
     expect(student.user_notes.size).to eq 0
 
     result = run_mutation({ conversation_id: @conversation.conversation_id, body: 'Have a note', recipients: [@student.id.to_s], user_note: true }, @teacher)
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     cm = ConversationMessage.find(result.dig('data', 'addConversationMessage', 'conversationMessage', '_id'))
     student = cm.recipients.first
     expect(student.user_notes.size).to eq 1
@@ -159,7 +159,7 @@ RSpec.describe Mutations::AddConversationMessage do
     @course.update!(workflow_state: 'completed')
 
     result = run_mutation(conversation_id: @conversation.conversation_id, body: 'uh uh uh', recipients: [@student.id.to_s])
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     expect(result.dig('data', 'addConversationMessage', 'conversationMessage')).to be nil
     expect(
       result.dig('data', 'addConversationMessage', 'errors', 0, 'message')
@@ -171,7 +171,7 @@ RSpec.describe Mutations::AddConversationMessage do
     @course.update!(workflow_state: 'completed')
 
     result = run_mutation({ conversation_id: @conversation.conversation_id, body: 'I have the power', recipients: [@student.id.to_s] }, @teacher)
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     expect(
       result.dig('data', 'addConversationMessage', 'conversationMessage', 'body')
     ).to eq 'I have the power'

@@ -126,7 +126,7 @@ class WikiPage < ActiveRecord::Base
     # TODO i18n (see wiki.rb)
 
     if self.title == "Front Page" && self.new_record?
-      baddies = self.context.wiki_pages.not_deleted.where(title: "Front Page").select { |p| p.url != "front-page" }
+      baddies = self.context.wiki_pages.not_deleted.where(title: "Front Page").reject { |p| p.url == "front-page" }
       baddies.each { |p|
         p.title = to_cased_title.call(p.url)
         p.save_without_broadcasting!
@@ -430,7 +430,7 @@ class WikiPage < ActiveRecord::Base
     return unless wiki_pages.any?
 
     front_page_url = context.wiki.get_front_page_url
-    wiki_pages.each { |wp| wp.can_unpublish = !(wp.url == front_page_url) }
+    wiki_pages.each { |wp| wp.can_unpublish = wp.url != front_page_url }
   end
 
   def self.reinterpret_version_yaml(yaml_string)

@@ -827,7 +827,7 @@ describe AssignmentGroupsController do
       course_group
     end
 
-    it 'requires  authorization' do
+    it 'requires authorization' do
       delete 'destroy', params: { :course_id => @course.id, :id => @group.id }
       assert_unauthorized
     end

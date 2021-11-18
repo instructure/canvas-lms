@@ -124,7 +124,7 @@ shared_context 'advantage services context' do
   def remove_access_token_scope(default_scopes, to_remove)
     scopes_to_remove = [to_remove].flatten
     default_scopes
-      .split(' ')
+      .split
       .reject { |s| scopes_to_remove.include? s }
       .join(' ')
   end

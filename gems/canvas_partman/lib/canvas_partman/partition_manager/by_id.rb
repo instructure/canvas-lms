@@ -40,7 +40,7 @@ module CanvasPartman
           partition = ids.first.last / base_class.partition_size
           partition_table = [base_class.table_name, partition].join('_')
           # make sure we're only moving rows for one partition at a time
-          ids.reject! { |(_id, partitioning_field)| partitioning_field / base_class.partition_size != partition }
+          ids.select! { |(_id, partitioning_field)| partitioning_field / base_class.partition_size == partition }
           base_class.connection.execute(<<~SQL.squish)
             WITH x AS (
               DELETE FROM ONLY #{base_class.quoted_table_name}

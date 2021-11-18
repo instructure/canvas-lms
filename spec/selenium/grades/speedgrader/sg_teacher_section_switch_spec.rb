@@ -29,7 +29,7 @@ describe "In speedgrader" do
   include SpeedGraderCommon
   include GroupsCommon
 
-  context "as a teacher in course with unlimited sections " do
+  context "as a teacher in course with unlimited sections" do
     before do
       @teacher_enrollment = course_with_teacher(course: @course, active_all: true)
       user_logged_in(user: @teacher)

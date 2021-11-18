@@ -44,9 +44,8 @@ namespace :i18n do
       sort = ->(node) do
         case node
         when Hash
-          node.keys.sort.reduce({}) do |acc, key|
-            acc[key] = sort[node[key]]
-            acc
+          node.keys.sort.index_with do |key|
+            sort[node[key]]
           end
         else
           node
@@ -155,9 +154,8 @@ namespace :i18n do
 
     # in addition to getting the non-en stuff into each scope_file, we need to get the core
     # formats and stuff for all languages (en included) into the common scope_file
-    core_translations = I18n.available_locales.inject({}) { |h1, locale|
+    core_translations = I18n.available_locales.each_with_object({}) { |locale, h1|
       h1[locale.to_s] = all_translations[locale].slice(*I18nTasks::Utils::CORE_KEYS)
-      h1
     }
     dump_translations.call('_core_en', { 'en' => core_translations.delete('en') })
     dump_translations.call('_core', core_translations)
@@ -286,9 +284,8 @@ namespace :i18n do
       puts "Exporting #{last_export[:data] ? "new/changed" : "all"} en translations..."
       current_strings = YAML.safe_load(File.read(base_filename)).flatten_keys
       new_strings = last_export[:data] ?
-        current_strings.inject({}) { |h, (k, v)|
+        current_strings.each_with_object({}) { |(k, v), h|
           h[k] = v unless last_export[:data][k] == v
-          h
         } :
         current_strings
       File.open(export_filename, "w") { |f| f.write new_strings.expand_keys.to_yaml(line_width: -1) }

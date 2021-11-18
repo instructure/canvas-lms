@@ -2067,9 +2067,8 @@ class ApplicationController < ActionController::Base
 
   def conversations_path(params = {})
     if @current_user
-      query_string = params.slice(:context_id, :user_id, :user_name).inject([]) do |res, (k, v)|
+      query_string = params.slice(:context_id, :user_id, :user_name).each_with_object([]) do |(k, v), res|
         res << "#{k}=#{v}"
-        res
       end.join('&')
       "/conversations?#{query_string}"
     else
@@ -2514,7 +2513,7 @@ class ApplicationController < ActionController::Base
   helper_method :flash_notices
 
   def unsupported_browser
-    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', t(:'#community.basics_browser_requirements')))
+    t("Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers.", :wrapper => view_context.link_to('\1', t(:"#community.basics_browser_requirements")))
   end
 
   def browser_supported?

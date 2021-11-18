@@ -1068,7 +1068,7 @@ describe ExternalToolsController do
         expect(assigns[:lti_launch].params['accept_unsigned']).to eq "false"
       end
 
-      it "adds a data element with a jwt that contains the id if a content_item_id param is present " do
+      it "adds a data element with a jwt that contains the id if a content_item_id param is present" do
         u = user_factory(active_all: true)
         account.account_users.create!(user: u)
         user_session u
@@ -1080,7 +1080,7 @@ describe ExternalToolsController do
         expect(json_data[:content_item_id]).to eq collab.id.to_s
       end
 
-      it "adds a data element with a jwt that contains the consumer_key if a content_item_id param is present " do
+      it "adds a data element with a jwt that contains the consumer_key if a content_item_id param is present" do
         u = user_factory(active_all: true)
         account.account_users.create!(user: u)
         user_session u

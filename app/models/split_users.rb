@@ -133,7 +133,7 @@ class SplitUsers
                        favorite: :user_id,
                        ignore: :user_id,
                        user_past_lti_id: :user_id,
-                       'Polling::Poll': :user_id }.freeze
+                       "Polling::Poll": :user_id }.freeze
 
   def restore_merge_items
     Shard.with_each_shard(restored_user.associated_shards + restored_user.associated_shards(:weak) + restored_user.associated_shards(:shadow)) do
@@ -363,7 +363,7 @@ class SplitUsers
 
   def handle_submissions(records)
     [[:submissions, 'fk_rails_8d85741475'],
-     [:'quizzes/quiz_submissions', 'fk_rails_04850db4b4']].each do |table, foreign_key|
+     [:"quizzes/quiz_submissions", 'fk_rails_04850db4b4']].each do |table, foreign_key|
       model = table.to_s.classify.constantize
 
       ids_by_shard = records.where(context_type: model.to_s, previous_user_id: restored_user).pluck(:context_id).group_by { |id| Shard.shard_for(id) }

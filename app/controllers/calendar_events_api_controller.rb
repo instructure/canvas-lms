@@ -1270,12 +1270,12 @@ class CalendarEventsApiController < ApplicationController
       ActiveRecord::Associations::Preloader.new.preload(events, [:rubric, :rubric_association])
       # improves locked_json performance
 
-      student_events = events.select { |e| !e.context.grants_right?(user, session, :read_as_admin) }
+      student_events = events.reject { |e| e.context.grants_right?(user, session, :read_as_admin) }
       Assignment.preload_context_module_tags(student_events) if student_events.any?
     end
 
     courses_user_has_been_enrolled_in = DatesOverridable.precache_enrollments_for_multiple_assignments(events, user)
-    events = events.inject([]) do |assignments, assignment|
+    events = events.each_with_object([]) do |assignment, assignments|
       if courses_user_has_been_enrolled_in[:student].include?(assignment.context_id)
         assignment = assignment.overridden_for(user)
         assignment.infer_all_day(Time.zone)
@@ -1303,7 +1303,6 @@ class CalendarEventsApiController < ApplicationController
           end
         end
       end
-      assignments
     end
 
     if !@all_events && !@undated

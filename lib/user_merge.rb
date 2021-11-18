@@ -76,7 +76,7 @@ class UserMerge
         conversation_ids: from_user.all_conversations.shard(from_user).pluck(:id),
         ignore_ids: from_user.ignores.shard(from_user).pluck(:id),
         user_past_lti_id_ids: from_user.past_lti_ids.shard(from_user).pluck(:id),
-        'Polling::Poll_ids': from_user.polls.shard(from_user).pluck(:id) }.each do |k, ids|
+        "Polling::Poll_ids": from_user.polls.shard(from_user).pluck(:id) }.each do |k, ids|
         merge_data.items.create!(user: from_user, item_type: k, item: ids) unless ids.empty?
       end
     end
@@ -205,7 +205,7 @@ class UserMerge
     %i{custom_colors course_nicknames}.each do |pref|
       preferences.delete(pref)
       new_pref = {}
-      from_user.preferences.dig(pref)&.each do |key, value|
+      from_user.preferences[pref]&.each do |key, value|
         new_key = translate_course_id_or_asset_string(key)
         new_pref[new_key] = value
       end
@@ -598,7 +598,7 @@ class UserMerge
   def handle_submissions
     [
       [:assignment_id, :submissions],
-      [:quiz_id, :'quizzes/quiz_submissions']
+      [:quiz_id, :"quizzes/quiz_submissions"]
     ].each do |unique_id, table|
       # Submissions are a special case since there's a unique index
       # on the table, and if both the old user and the new user

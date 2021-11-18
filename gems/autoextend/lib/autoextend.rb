@@ -214,7 +214,7 @@ module Autoextend::ActiveSupport
         constant = Object.const_get(constant_name, false)
         next unless constant.is_a?(Module)
 
-        Autoextend.const_added(constant, source: :'ActiveSupport::Dependencies', recursive: true)
+        Autoextend.const_added(constant, source: :"ActiveSupport::Dependencies", recursive: true)
       end
     end
 

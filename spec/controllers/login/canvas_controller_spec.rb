@@ -162,7 +162,7 @@ describe Login::CanvasController do
     expect(assigns[:pseudonym_session].record).to eq pseudonym2
   end
 
-  it "password auth should work with extra whitespace around unique id " do
+  it "password auth should work with extra whitespace around unique id" do
     post 'create', params: { :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwertyuiop' } }
     expect(response).to be_redirect
     expect(response).to redirect_to(dashboard_url(:login_success => 1))

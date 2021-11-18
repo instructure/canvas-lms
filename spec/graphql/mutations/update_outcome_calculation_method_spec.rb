@@ -62,14 +62,14 @@ describe Mutations::UpdateOutcomeCalculationMethod do
       calculationInt: null
     GQL
     result = execute_with_input(query)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'updateOutcomeCalculationMethod', 'errors')).to be_nil
     result = result.dig('data', 'updateOutcomeCalculationMethod', 'outcomeCalculationMethod')
-    record = OutcomeCalculationMethod.find(result.dig('_id'))
-    expect(result.dig('contextType')).to eq 'Course'
-    expect(result.dig('contextId')).to eq @course.id.to_s
-    expect(result.dig('calculationMethod')).to eq 'highest'
-    expect(result.dig('calculationInt')).to be_nil
+    record = OutcomeCalculationMethod.find(result['_id'])
+    expect(result['contextType']).to eq 'Course'
+    expect(result['contextId']).to eq @course.id.to_s
+    expect(result['calculationMethod']).to eq 'highest'
+    expect(result['calculationInt']).to be_nil
     expect(record.calculation_method).to eq 'highest'
     expect(record.calculation_int).to be_nil
     expect(record.context).to eq @course
@@ -84,7 +84,7 @@ describe Mutations::UpdateOutcomeCalculationMethod do
     GQL
     result = execute_with_input(query)
     result = result.dig('data', 'updateOutcomeCalculationMethod', 'outcomeCalculationMethod')
-    record = OutcomeCalculationMethod.find(result.dig('_id'))
+    record = OutcomeCalculationMethod.find(result['_id'])
     expect(record.id).to eq original_record.id
     expect(record.calculation_method).to eq 'highest'
     expect(record.calculation_int).to be_nil
@@ -92,7 +92,7 @@ describe Mutations::UpdateOutcomeCalculationMethod do
 
   context 'errors' do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'updateOutcomeCalculationMethod', 'errors')
+      errors = result['errors'] || result.dig('data', 'updateOutcomeCalculationMethod', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(/#{message}/)
     end

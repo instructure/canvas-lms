@@ -627,7 +627,7 @@ describe Course do
 end
 
 def from_file_path(path, course)
-  list = path.split("/").select { |f| !f.empty? }
+  list = path.split("/").reject(&:empty?)
   filename = list.pop
   folder = Folder.assert_path(list.join('/'), course)
   file = folder.file_attachments.build(:display_name => filename, :filename => filename, :content_type => "text/plain")

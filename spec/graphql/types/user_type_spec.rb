@@ -744,7 +744,7 @@ describe Types::UserType do
       ).to eq ["TeacherEnrollment"]
     end
 
-    it "returns all roles if no role types are specified " do
+    it "returns all roles if no role types are specified" do
       expect(
         teacher_ta_type.resolve(%|courseRoles(courseId: #{@course.id})|)
       ).to include("TaEnrollment", "TeacherEnrollment")

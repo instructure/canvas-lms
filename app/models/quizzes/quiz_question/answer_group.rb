@@ -56,9 +56,8 @@ class Quizzes::QuizQuestion::AnswerGroup
 
   def self.generate(question)
     answers = if question[:answers].is_a? Hash
-                question[:answers].reduce([]) do |arr, (key, value)|
+                question[:answers].each_with_object([]) do |(key, value), arr|
                   arr[key.to_i] = value
-                  arr
                 end
               else
                 question[:answers] || []

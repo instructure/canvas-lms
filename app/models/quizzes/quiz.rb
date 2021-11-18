@@ -549,7 +549,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def active_quiz_questions_without_group
     if self.quiz_questions.loaded?
-      active_quiz_questions.select { |q| !q.quiz_group_id }
+      active_quiz_questions.reject(&:quiz_group_id)
     else
       active_quiz_questions.where(quiz_group_id: nil).to_a
     end

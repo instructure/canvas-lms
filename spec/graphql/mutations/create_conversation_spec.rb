@@ -131,7 +131,7 @@ RSpec.describe Mutations::CreateConversation do
     enrollment.save
     result = run_mutation(recipients: [new_user.id.to_s], body: 'yo')
 
-    expect(result.dig('errors')).to be nil
+    expect(result['errors']).to be nil
     expect(
       result.dig('data', 'createConversation', 'conversations', 0, 'conversation', 'conversationMessagesConnection', 'nodes', 0, 'body')
     ).to eq 'yo'

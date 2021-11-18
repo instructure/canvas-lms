@@ -160,6 +160,8 @@ RSpec/ExampleLength:
   Enabled: false # this is a Metrics-style cop
 RSpec/ExampleWording:
   Severity: error
+RSpec/ExcessiveDocstringSpacing:
+  Severity: error
 RSpec/ExpectInHook:
   Enabled: false # follows RSpec/MultipleExpectations
 RSpec/HookArgument:
@@ -201,6 +203,8 @@ Style/Dir:
   Severity: error
 Style/Documentation:
   Enabled: false # most things don't need to be documented
+Style/EachWithObject:
+  Severity: error
 Style/EmptyCaseCondition:
   Severity: error
 Style/Encoding:
@@ -216,6 +220,8 @@ Style/HashConversion:
 Style/HashTransformKeys:
   Severity: error
 Style/HashTransformValues:
+  Severity: error
+Style/InverseMethods:
   Severity: error
 Style/IfUnlessModifier:
   # see also https://github.com/rubocop/rubocop/discussions/10048
@@ -239,6 +245,11 @@ Style/ParenthesesAroundCondition:
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
 Style/PreferredHashMethods:
+  Severity: error
+Style/QuotedSymbols:
+  EnforcedStyle: double_quotes # once Style/StringLiterals is enabled, we can remove this since it will inherit
+  Severity: error
+Style/RedundantArgument:
   Severity: error
 Style/RedundantAssignment:
   Severity: error
@@ -270,6 +281,8 @@ Style/SafeNavigation:
 Style/SelfAssignment:
   Severity: error
 Style/Semicolon:
+  Severity: error
+Style/SingleArgumentDig:
   Severity: error
 Style/SingleLineMethods:
   Severity: error
@@ -369,10 +382,6 @@ Style/StringLiterals:
   Enabled: false # TODO: autocorrect
 Style/SymbolArray: # TODO: autocorrect
   Enabled: false
-Style/QuotedSymbols:
-  # once Style/StringLiterals is enabled, we can remove this since it will inherit
-  EnforcedStyle: double_quotes
-  AutoCorrect: false
 Style/TrailingCommaInArguments: # TODO: autocorrect
   Enabled: false
 Style/TrailingCommaInArrayLiteral: # TODO: autocorrect

@@ -88,9 +88,8 @@ module ModelCache
   end
 
   def self.with_cache(lookups)
-    @cache = lookups.inject({}) { |h, (k, v)|
-      h[k] = prepare_lookups(v)
-      h
+    @cache = lookups.transform_values { |v|
+      prepare_lookups(v)
     }
     yield
   ensure
@@ -111,9 +110,8 @@ module ModelCache
     return records if records.is_a?(Hash)
     return {} if records.empty?
 
-    keys[records.first.class.name].inject({}) do |h, k|
-      h[k] = records.index_by(&k)
-      h
+    keys[records.first.class.name].index_with do |k|
+      records.index_by(&k)
     end
   end
 

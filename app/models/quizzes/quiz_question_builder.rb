@@ -89,7 +89,7 @@ class Quizzes::QuizQuestionBuilder
 
     # initially, exclude all the questions defined locally in the quiz from bank
     # selections:
-    mark_picked(quiz_data.select { |d| d[:entry_type] != QUIZ_GROUP_ENTRY })
+    mark_picked(quiz_data.reject { |d| d[:entry_type] == QUIZ_GROUP_ENTRY })
 
     quiz_data.reduce([]) do |submission_questions, descriptor|
       # pulling from question bank

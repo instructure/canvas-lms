@@ -58,9 +58,8 @@ module Qti
       end
 
       convert_files
-      path_map = @course[:file_map].values.inject({}) { |h, v|
+      path_map = @course[:file_map].values.each_with_object({}) { |v, h|
         h[v[:path_name]] = v[:migration_id]
-        h
       }
       @course[:assessment_questions] = convert_questions(:file_path_map => path_map, :flavor => @flavor)
       @course[:assessments] = convert_assessments(@course[:assessment_questions][:assessment_questions])

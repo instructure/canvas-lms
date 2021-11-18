@@ -83,7 +83,7 @@ module AddressBook
     end
 
     def known_users(users, options = {})
-      uncached = users.select { |user| !cached?(user) }
+      uncached = users.reject { |user| cached?(user) }
       # flag excluded users as "not known" so we don't recheck them
       # individually in the future
       @cache.null(uncached)

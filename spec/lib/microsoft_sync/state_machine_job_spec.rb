@@ -694,7 +694,7 @@ module MicrosoftSync
               it_behaves_like 'restarting when a retrying job has stalled'
             end
 
-            context "when the retrying job's run_at is after 1 day in the past " do
+            context "when the retrying job's run_at is after 1 day in the past" do
               let(:retrying_job_run_at) { (1.day - 1.second).ago }
 
               it 'enqueues a new job' do

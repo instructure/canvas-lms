@@ -232,7 +232,7 @@ describe Lti::LtiOutboundAdapter do
       expect(payload['firstname']).to be_nil
     end
 
-    it "does not copy query params to the post body if post_only is set and  oauth_compliant tool setting is enabled" do
+    it "does not copy query params to the post body if post_only is set and oauth_compliant tool setting is enabled" do
       allow(account).to receive(:all_account_users_for).with(user).and_return([])
       tool.settings = { oauth_compliant: true, post_only: true }
       adapter.prepare_tool_launch(return_url, variable_expander)

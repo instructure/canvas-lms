@@ -664,7 +664,7 @@ class AssignmentsController < ApplicationController
 
       assignment_groups = @context.assignment_groups.active
       group_categories = @context.group_categories
-                                 .select { |c| !c.student_organized? }
+                                 .reject(&:student_organized?)
                                  .map { |c| { :id => c.id, :name => c.name } }
 
       # if assignment has student submissions and is attached to a deleted group category,

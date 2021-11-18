@@ -66,16 +66,16 @@ describe Mutations::CreateLearningOutcome do
       title: "Spec Learning Outcome via Mutation"
     GQL
     result = execute_with_input(query)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'createLearningOutcome', 'errors')).to be_nil
     result = result.dig('data', 'createLearningOutcome', 'learningOutcome')
-    record = LearningOutcome.find(result.dig('_id'))
-    expect(result.dig('contextType')).to eq 'Course'
-    expect(result.dig('contextId')).to eq @course.id.to_s
-    expect(result.dig('title')).to eq 'Spec Learning Outcome via Mutation'
-    expect(result.dig('description')).to be_nil
-    expect(result.dig('vendorGuid')).to be_nil
-    expect(result.dig('displayName')).to be_nil
+    record = LearningOutcome.find(result['_id'])
+    expect(result['contextType']).to eq 'Course'
+    expect(result['contextId']).to eq @course.id.to_s
+    expect(result['title']).to eq 'Spec Learning Outcome via Mutation'
+    expect(result['description']).to be_nil
+    expect(result['vendorGuid']).to be_nil
+    expect(result['displayName']).to be_nil
     expect(record.title).to eq 'Spec Learning Outcome via Mutation'
     expect(record.description).to be_nil
     expect(record.vendor_guid).to be_nil
@@ -89,16 +89,16 @@ describe Mutations::CreateLearningOutcome do
       title: "Spec Learning Outcome via Mutation"
     GQL
     result = execute_with_input(query, user_executing: @site_admin)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'createLearningOutcome', 'errors')).to be_nil
     result = result.dig('data', 'createLearningOutcome', 'learningOutcome')
-    record = LearningOutcome.find(result.dig('_id'))
-    expect(result.dig('contextType')).to be_nil
-    expect(result.dig('contextId')).to be_nil
-    expect(result.dig('title')).to eq 'Spec Learning Outcome via Mutation'
-    expect(result.dig('description')).to be_nil
-    expect(result.dig('vendorGuid')).to be_nil
-    expect(result.dig('displayName')).to be_nil
+    record = LearningOutcome.find(result['_id'])
+    expect(result['contextType']).to be_nil
+    expect(result['contextId']).to be_nil
+    expect(result['title']).to eq 'Spec Learning Outcome via Mutation'
+    expect(result['description']).to be_nil
+    expect(result['vendorGuid']).to be_nil
+    expect(result['displayName']).to be_nil
     expect(record.title).to eq 'Spec Learning Outcome via Mutation'
     expect(record.description).to be_nil
     expect(record.vendor_guid).to be_nil
@@ -116,22 +116,22 @@ describe Mutations::CreateLearningOutcome do
         description: "Learning Outcome via Mutation Description"
       GQL
       result = execute_with_input(query)
-      expect(result.dig('errors')).to be_nil
+      expect(result['errors']).to be_nil
       expect(result.dig('data', 'createLearningOutcome', 'errors')).to be_nil
       result = result.dig('data', 'createLearningOutcome', 'learningOutcome')
-      record = LearningOutcome.find(result.dig('_id'))
-      expect(result.dig('displayName')).to eq 'Display name for spec'
+      record = LearningOutcome.find(result['_id'])
+      expect(result['displayName']).to eq 'Display name for spec'
       expect(record.display_name).to eq 'Display name for spec'
-      expect(result.dig('vendorGuid')).to eq 'ven_guid_1'
+      expect(result['vendorGuid']).to eq 'ven_guid_1'
       expect(record.vendor_guid).to eq 'ven_guid_1'
-      expect(result.dig('description')).to eq 'Learning Outcome via Mutation Description'
+      expect(result['description']).to eq 'Learning Outcome via Mutation Description'
       expect(record.description).to eq 'Learning Outcome via Mutation Description'
     end
   end
 
   context 'errors' do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'createLearningOutcome', 'errors')
+      errors = result['errors'] || result.dig('data', 'createLearningOutcome', 'errors')
       expect(errors).not_to be_nil
       expect(errors.first['message']).to include message
     end

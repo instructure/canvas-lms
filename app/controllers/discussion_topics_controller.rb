@@ -575,7 +575,8 @@ class DiscussionTopicsController < ApplicationController
       PERMISSIONS: {
         manage_files: @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
       },
-      REACT_DISCUSSIONS_POST: @context.feature_enabled?(:react_discussions_post)
+      REACT_DISCUSSIONS_POST: @context.feature_enabled?(:react_discussions_post),
+      ANONYMOUS_DISCUSSIONS: Account.site_admin.feature_enabled?(:discussion_anonymity)
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
@@ -1281,7 +1282,7 @@ class DiscussionTopicsController < ApplicationController
         @topic.update(discussion_topic_hash)
         @topic.root_topic.try(:save)
       end
-      if !@topic.errors.any? && !@topic.root_topic.try(:errors).try(:any?)
+      if @topic.errors.none? && !@topic.root_topic.try(:errors).try(:any?)
         log_asset_access(@topic, 'topics', 'topics', 'participate')
 
         apply_positioning_parameters

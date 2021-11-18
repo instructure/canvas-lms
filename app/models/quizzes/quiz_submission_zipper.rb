@@ -81,10 +81,7 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
     ids = submissions.filter_map(&:submission_data).flatten.select do |submission|
       submission[:attachment_ids].present?
     end.pluck(:attachment_ids).flatten
-    Attachment.where(:id => ids).inject({}) do |hash, attachment|
-      hash[attachment.id] = attachment
-      hash
-    end
+    Attachment.where(:id => ids).index_by(&:id)
   end
 
   def find_submissions

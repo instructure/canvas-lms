@@ -85,7 +85,7 @@ describe TatlTael::Linters::CopyrightLinter do
       path = changes.first.path
       path_parts = path.split(".")
       type = path_parts.last
-      corrected_path = [path_parts.first, "--auto-corrected"].join("")
+      corrected_path = [path_parts.first, "--auto-corrected"].join
 
       # copy the corrected fixture into our fake fs
       real_path = fixture_path_for(type, corrected_path)

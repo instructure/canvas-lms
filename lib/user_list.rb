@@ -74,7 +74,7 @@ class UserList
       User.where(id: shard_existing.pluck(:user_id))
     end
 
-    non_existing = @addresses.select { |a| !a[:user_id] }
+    non_existing = @addresses.reject { |a| a[:user_id] }
     non_existing_users = non_existing.map do |a|
       user = User.new(:name => a[:name] || a[:address])
       cc = user.communication_channels.build(:path => a[:address], :path_type => 'email')

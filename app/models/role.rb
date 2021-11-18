@@ -298,7 +298,7 @@ class Role < ActiveRecord::Base
     granular_admin = context.root_account.feature_enabled?(:granular_permissions_manage_users)
     manageable = self.manageable_roles_by_user(user, context) unless granular_admin
     addable, deleteable = self.add_delete_roles_by_user(user, context) if granular_admin
-    role_data.inject([]) { |roles, role|
+    role_data.each_with_object([]) { |role, roles|
       is_manageable = manageable.include?(role[:base_role_name]) unless granular_admin
       is_addable = addable.include?(role[:base_role_name]) if granular_admin
       is_deleteable = deleteable.include?(role[:base_role_name]) if granular_admin
@@ -318,7 +318,6 @@ class Role < ActiveRecord::Base
         end
         roles << custom_role
       end
-      roles
     }
   end
 

@@ -39,9 +39,8 @@ module Api::V1::EnrollmentTerm
   end
 
   protected def date_overrides_json(term)
-    term.enrollment_dates_overrides.select { |o| o.start_at || o.end_at }.inject({}) do |json, override|
+    term.enrollment_dates_overrides.select { |o| o.start_at || o.end_at }.each_with_object({}) do |override, json|
       json[override.enrollment_type] = override.attributes.slice('start_at', 'end_at')
-      json
     end
   end
 end

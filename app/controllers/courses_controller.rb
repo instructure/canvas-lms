@@ -3570,7 +3570,7 @@ class CoursesController < ApplicationController
     changes.delete("settings") if changes.key?("settings")
 
     unless old_settings == new_settings
-      settings = Course.settings_options.keys.inject({}) do |results, key|
+      settings = Course.settings_options.keys.each_with_object({}) do |key, results|
         old_value = if old_settings.present? && old_settings.key?(key)
                       old_settings[key]
                     else
@@ -3584,8 +3584,6 @@ class CoursesController < ApplicationController
                     end
 
         results[key.to_s] = [old_value, new_value] unless old_value == new_value
-
-        results
       end
       changes.merge!(settings)
     end
@@ -3684,12 +3682,12 @@ class CoursesController < ApplicationController
     # in pure ruby
     if include_observed || !params[:state]
       if params[:enrollment_role]
-        enrollments.reject! { |e| e.role.name != params[:enrollment_role] }
+        enrollments.select! { |e| e.role.name == params[:enrollment_role] }
       elsif params[:enrollment_role_id]
-        enrollments.reject! { |e| e.role_id != params[:enrollment_role_id].to_i }
+        enrollments.select! { |e| e.role_id == params[:enrollment_role_id].to_i }
       elsif params[:enrollment_type]
         e_type = "#{params[:enrollment_type].capitalize}Enrollment"
-        enrollments.reject! { |e| e.class.name != e_type }
+        enrollments.select! { |e| e.class.name == e_type }
       end
 
       if params[:enrollment_state] && params[:enrollment_state] != "active"

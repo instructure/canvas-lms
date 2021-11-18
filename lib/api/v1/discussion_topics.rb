@@ -71,12 +71,10 @@ module Api::V1::DiscussionTopics
       opts[:context_user_count] = GuardRail.activate(:secondary) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
     end
     ActiveRecord::Associations::Preloader.new.preload(topics, [:user, :attachment, :root_topic, :context])
-    topics.inject([]) do |result, topic|
+    topics.each_with_object([]) do |topic, result|
       if topic.visible_for?(user)
         result << discussion_topic_api_json(topic, context || topic.context, user, session, opts, root_topics)
       end
-
-      result
     end
   end
 

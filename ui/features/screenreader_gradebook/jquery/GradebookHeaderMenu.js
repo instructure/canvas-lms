@@ -28,13 +28,16 @@ import re_upload_submissions_form from '@canvas/grading/jst/re_upload_submission
 import _ from 'underscore'
 import authenticity_token from '@canvas/authenticity-token'
 import MessageStudentsWhoHelper from '@canvas/grading/messageStudentsWhoHelper'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import MessageStudentsWithObserversDialog from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import 'jqueryui/dialog'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
 import 'jquery-kyle-menu'
 
-const isAdmin = function() {
+const isAdmin = function () {
   return ENV.current_user_roles.includes('admin')
 }
 
@@ -198,8 +201,23 @@ export default class GradebookHeaderMenu {
         submitted_at: sub != null ? sub.submitted_at : undefined
       }
     })
-    const settings = MessageStudentsWhoHelper.settings(assignment, students)
-    return messageStudents(settings)
+
+    if (opts.show_message_students_with_observers_dialog) {
+      const mountPoint = document.querySelector(
+        "[data-component='MessageStudentsWithObserversModal']"
+      )
+      const dialog = React.createElement(MessageStudentsWithObserversDialog, {
+        assignment,
+        onClose: () => {
+          ReactDOM.unmountComponentAtNode(mountPoint)
+        },
+        students
+      })
+      ReactDOM.render(dialog, mountPoint)
+    } else {
+      const settings = MessageStudentsWhoHelper.settings(assignment, students)
+      return messageStudents(settings)
+    }
   }
 
   setDefaultGrade(
@@ -279,7 +297,7 @@ export default class GradebookHeaderMenu {
           resizable: false,
           autoOpen: false
         })
-        .submit(function() {
+        .submit(function () {
           const data = $(this).getFormData()
           if (!data.submissions_zip) {
             return false

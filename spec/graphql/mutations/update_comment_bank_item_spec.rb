@@ -57,12 +57,12 @@ describe Mutations::UpdateCommentBankItem do
       comment: "updated comment!"
     GQL
     result = execute_with_input(query)
-    expect(result.dig('errors')).to be_nil
+    expect(result['errors']).to be_nil
     expect(result.dig('data', 'updateCommentBankItem', 'errors')).to be_nil
     result = result.dig('data', 'updateCommentBankItem', 'commentBankItem')
-    expect(result.dig('courseId')).to eq @course.id.to_s
-    expect(result.dig('userId')).to eq @admin.id.to_s
-    expect(result.dig('comment')).to eq "updated comment!"
+    expect(result['courseId']).to eq @course.id.to_s
+    expect(result['userId']).to eq @admin.id.to_s
+    expect(result['comment']).to eq "updated comment!"
   end
 
   it "allows relay id for comment bank item id" do
@@ -76,7 +76,7 @@ describe Mutations::UpdateCommentBankItem do
 
   context 'errors' do
     def expect_error(result, message)
-      errors = result.dig('errors') || result.dig('data', 'updateCommentBankItem', 'errors')
+      errors = result['errors'] || result.dig('data', 'updateCommentBankItem', 'errors')
       expect(errors).not_to be_nil
       expect(errors[0]['message']).to match(/#{message}/)
     end

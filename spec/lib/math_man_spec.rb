@@ -31,7 +31,7 @@ describe MathMan do
     Canvas::DynamicSettings.fallback_data = {
       config: {
         canvas: {
-          'math-man': {
+          "math-man": {
             base_url: service_url,
           }
         }

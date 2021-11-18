@@ -300,7 +300,7 @@ describe "Gradebook editing grades" do
       expect(class_attribute_fetched).to include "Grid__ReadOnlyCell"
     end
 
-    it "is allowed if grades are posted ", priority: "1" do # test_id: 3503489
+    it "is allowed if grades are posted", priority: "1" do # test_id: 3503489
       @moderated_assignment.update!(grades_published_at: Time.zone.now)
       @moderated_assignment.unmute!
       refresh_page
