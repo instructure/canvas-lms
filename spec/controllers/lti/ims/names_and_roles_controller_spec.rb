@@ -100,7 +100,7 @@ describe Lti::IMS::NamesAndRolesController do
         expect(response_links).to have_correct_pagination_urls
       end
 
-      context 'and when the page index parameter is too large ' do
+      context 'and when the page index parameter is too large' do
         let(:rqst_page) { total_items + 1 } # cant have more pages than there are items
         let(:rsp_page) { rqst_page }
         let(:effective_page_size) { 30 } # don't know why, Api just does this

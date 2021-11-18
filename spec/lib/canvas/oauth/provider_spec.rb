@@ -122,7 +122,7 @@ module Canvas::OAuth
         expect(Provider.new(developer_key.id, "", ['userinfo']).authorized_token?(user)).to eq false
       end
 
-      it 'ignores tokens for out of band requests ' do
+      it 'ignores tokens for out of band requests' do
         user.access_tokens.create!(:developer_key => developer_key, :scopes => ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"], :remember_access => true)
         expect(Provider.new(developer_key.id, Canvas::OAuth::Provider::OAUTH2_OOB_URI, ['userinfo']).authorized_token?(user)).to eq false
       end

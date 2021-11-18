@@ -160,6 +160,8 @@ RSpec/ExampleLength:
   Enabled: false # this is a Metrics-style cop
 RSpec/ExampleWording:
   Severity: error
+RSpec/ExcessiveDocstringSpacing:
+  Severity: error
 RSpec/ExpectInHook:
   Enabled: false # follows RSpec/MultipleExpectations
 RSpec/HookArgument:

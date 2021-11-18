@@ -1439,7 +1439,7 @@ describe User do
       expect(@user.reload.avatar_image_url).to eq nil
     end
 
-    it "does not allow external  urls that do not match avatar_external_url_patterns to be assigned (3510111291#instructure.com)" do
+    it "does not allow external urls that do not match avatar_external_url_patterns to be assigned (3510111291#instructure.com)" do
       @user.avatar_image = { 'type' => 'external', 'url' => 'https://3510111291#sdf.instructure.com/image' }
       @user.save!
       expect(@user.reload.avatar_image_url).to eq nil
@@ -2224,7 +2224,7 @@ describe User do
       expect(User.avatar_key("161612461246")).to eq "161612461246-#{Canvas::Security.hmac_sha1('161612461246')[0, 10]}"
     end
 
-    it " should return '0' for an invalid user id" do
+    it "returns '0' for an invalid user id" do
       expect(User.avatar_key(nil)).to eq "0"
       expect(User.avatar_key("")).to eq "0"
       expect(User.avatar_key(0)).to eq "0"

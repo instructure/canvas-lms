@@ -274,7 +274,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
         end
       end
 
-      describe 'GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show) ' do
+      describe 'GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show)' do
         it "is unauthorized" do
           @question = @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
 

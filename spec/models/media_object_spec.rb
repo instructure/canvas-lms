@@ -265,7 +265,7 @@ describe MediaObject do
       expect(mo.title).to eq "Kaltura Title"
     end
 
-    it "ensures retrieve_details adds '/' to media_type " do
+    it "ensures retrieve_details adds '/' to media_type" do
       mo = media_object
       mo.retrieve_details
       expect(mo.media_type).to eql "video/*"

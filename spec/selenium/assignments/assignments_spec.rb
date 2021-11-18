@@ -824,7 +824,7 @@ describe "assignments" do
       expect(f('#unauthorized_message')).to be_displayed
     end
 
-    it "does not show the moderation page if it is not a moderated assignment ", priority: "2", test_id: 609653 do
+    it "does not show the moderation page if it is not a moderated assignment", priority: "2", test_id: 609653 do
       @assignment.update_attribute(:moderated_grading, false)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
       expect(f('#content h1').text).to eql "Whoops... Looks like nothing is here!"

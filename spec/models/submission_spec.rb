@@ -2350,7 +2350,7 @@ describe Submission do
         end
 
         OriginalityReport::ORDERED_VALID_WORKFLOW_STATES.each do |state|
-          context " and both reports have a workflow_state of #{state}" do
+          context "and both reports have a workflow_state of #{state}" do
             let(:preferred_state) { state }
             let(:other_state) { state }
 
@@ -4406,7 +4406,7 @@ describe Submission do
       end
 
       context "preferred_plugins" do
-        it "does not send o365  as preferred plugins by default" do
+        it "does not send o365 as preferred plugins by default" do
           @assignment.submit_homework(@student1,
                                       submission_type: "online_upload",
                                       attachments: [@attachment])
