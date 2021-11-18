@@ -5006,6 +5006,18 @@ QUnit.module('SpeedGrader', rootHooks => {
           const {submission} = SpeedGrader.EG.setOrUpdateSubmission(alphaSubmission)
           deepEqual(submission.submission_history[0].versioned_attachments, versionedAttachments)
         })
+
+        test('does not thoughtlessly alter the submission field of the first attempt of the existing submission object if the passed-in submission has no attempt field', () => {
+          alphaSubmission.submission_history[0].submission = {grade: 'please spare me'}
+
+          const fakeSubmission = {
+            ...alphaSubmission,
+            score: '10'
+          }
+          SpeedGrader.EG.setOrUpdateSubmission(fakeSubmission)
+
+          strictEqual(alphaSubmission.submission_history[0].submission.grade, 'please spare me')
+        })
       })
 
       QUnit.module('#renderAttachment', hooks => {
