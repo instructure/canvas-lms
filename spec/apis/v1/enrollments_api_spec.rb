@@ -1061,6 +1061,18 @@ describe EnrollmentsApiController, type: :request do
             expect(student_grade.call(json)).to eq 0
           end
 
+          it "is authorized when requesting enrollments for a specific user in a course" do
+            @course.enroll_user(
+              observer,
+              "ObserverEnrollment",
+              associated_user_id: @student.id,
+              enrollment_state: "active"
+            )
+            @params[:user_id] = @student.id
+            api_call_as_user(observer, :get, @path, @params)
+            expect(response).to be_successful
+          end
+
           it "includes observee grades when observed_users are requested" do
             @course.enroll_user(observer, "ObserverEnrollment", associated_user_id: @student.id)
             @params[:include] = ["observed_users"]
