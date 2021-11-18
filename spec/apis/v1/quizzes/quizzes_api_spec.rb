@@ -38,7 +38,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       api_call(
         :get,
         "/api/v1/courses/#{@course.id}/quizzes/#{locked_item.id}",
-        { :controller => 'quizzes/quizzes_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :id => locked_item.id.to_s },
+        { :controller => 'quizzes/quizzes_api', :action => 'show', :format => 'json', :course_id => @course.id.to_s, :id => locked_item.id.to_s }
       )
     end
 

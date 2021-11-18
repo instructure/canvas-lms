@@ -216,7 +216,7 @@ describe "calendar2" do
         event_start = @user.time_zone.local(local_now.year, local_now.month, 15, 22, 0, 0)
         @course.assignments.create!(
           title: 'test assignment',
-          due_at: event_start,
+          due_at: event_start
         )
         get "/calendar2"
         f('.fc-event').click

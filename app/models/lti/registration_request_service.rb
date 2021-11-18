@@ -29,7 +29,7 @@ module Lti
       registration_request = ::IMS::LTI::Models::Messages::RegistrationRequest.new(
         lti_version: ::IMS::LTI::Models::LTIModel::LTI_VERSION_2P0,
         launch_presentation_document_target: ::IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME,
-        tc_profile_url: tc_profile_url,
+        tc_profile_url: tc_profile_url
       )
       reg_key, reg_password = registration_request.generate_key_and_password
       registration_request.tool_proxy_guid = reg_key

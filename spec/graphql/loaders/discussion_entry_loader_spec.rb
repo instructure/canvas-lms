@@ -121,7 +121,7 @@ describe Loaders::DiscussionEntryLoader do
 
     GraphQL::Batch.batch do
       Loaders::DiscussionEntryLoader.for(
-        current_user: @teacher,
+        current_user: @teacher
       ).load(@de2).then { |discussion_entries|
         expect(discussion_entries.map(&:id)).to match_array [@de4.id, de5.id]
       }

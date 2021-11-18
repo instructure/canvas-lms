@@ -45,7 +45,7 @@ describe "/submissions/show" do
       add_user_to_group(@user, @group, true)
       @assignment = @course.assignments.create!(assignment_valid_attributes.merge(
                                                   group_category: @group_category,
-                                                  grade_group_students_individually: true,
+                                                  grade_group_students_individually: true
                                                 ))
       @submission = @assignment.submit_homework(@user)
     end

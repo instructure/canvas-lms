@@ -627,7 +627,7 @@ class ContextModulesController < ApplicationController
         content_details: content_details(@tag, @current_user),
         assignment_id: @tag.assignment.try(:id),
         is_cyoe_able: cyoe_able?(@tag),
-        is_duplicate_able: @tag.duplicate_able?,
+        is_duplicate_able: @tag.duplicate_able?
       )
       @context.touch
       render json: json

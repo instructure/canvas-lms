@@ -3538,7 +3538,7 @@ describe AssignmentsApiController, type: :request do
             course_id: @course.id,
             id: assignment.to_param
           },
-          { assignment: { final_grader_id: @teacher.id } },
+          { assignment: { final_grader_id: @teacher.id } }
         )
         expect(json_parse(response.body)['final_grader_id']).to eq @teacher.id
       end
@@ -3560,7 +3560,7 @@ describe AssignmentsApiController, type: :request do
             course_id: @course.id,
             id: assignment.to_param
           },
-          { assignment: { final_grader_id: @teacher.id } },
+          { assignment: { final_grader_id: @teacher.id } }
         )
         error = json_parse(response.body)['errors']['final_grader_id'].first
         expect(error['message']).to eq 'user does not have permission to select final grade'
@@ -3580,7 +3580,7 @@ describe AssignmentsApiController, type: :request do
             course_id: @course.id,
             id: assignment.to_param
           },
-          { assignment: { final_grader_id: deactivated_teacher.id } },
+          { assignment: { final_grader_id: deactivated_teacher.id } }
         )
         error = json_parse(response.body)['errors']['final_grader_id'].first
         expect(error['message']).to eq 'course has no active instructors with this ID'
@@ -3599,7 +3599,7 @@ describe AssignmentsApiController, type: :request do
             course_id: @course.id,
             id: assignment.to_param
           },
-          { assignment: { final_grader_id: user_not_enrolled_in_course.id } },
+          { assignment: { final_grader_id: user_not_enrolled_in_course.id } }
         )
         error = json_parse(response.body)['errors']['final_grader_id'].first
         expect(error['message']).to eq 'course has no active instructors with this ID'
@@ -3619,7 +3619,7 @@ describe AssignmentsApiController, type: :request do
           course_id: @course.id,
           id: assignment.to_param
         },
-        { assignment: { grader_count: 4 } },
+        { assignment: { grader_count: 4 } }
       )
       expect(json_parse(response.body)['grader_count']).to eq 4
     end
@@ -3637,7 +3637,7 @@ describe AssignmentsApiController, type: :request do
           course_id: @course.id,
           id: assignment.to_param
         },
-        { assignment: { graders_anonymous_to_graders: true } },
+        { assignment: { graders_anonymous_to_graders: true } }
       )
       expect(json_parse(response.body)['graders_anonymous_to_graders']).to be true
     end
@@ -3655,7 +3655,7 @@ describe AssignmentsApiController, type: :request do
           course_id: @course.id,
           id: assignment.to_param
         },
-        { assignment: { grader_comments_visible_to_graders: false } },
+        { assignment: { grader_comments_visible_to_graders: false } }
       )
       expect(json_parse(response.body)['grader_comments_visible_to_graders']).to be false
     end
@@ -3673,7 +3673,7 @@ describe AssignmentsApiController, type: :request do
           course_id: @course.id,
           id: assignment.to_param
         },
-        { assignment: { grader_names_visible_to_final_grader: false } },
+        { assignment: { grader_names_visible_to_final_grader: false } }
       )
       expect(json_parse(response.body)['grader_names_visible_to_final_grader']).to eq false
     end

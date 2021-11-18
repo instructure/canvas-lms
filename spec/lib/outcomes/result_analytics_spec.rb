@@ -558,16 +558,16 @@ describe Outcomes::ResultAnalytics do
       res1 = create_quiz_outcome_results(o1, "name, o1",
                                          { percent: 0.6, possible: 1.0, association_id: 1 },
                                          { assessed_at: time - 1.day, percent: 0.7, possible: 1.0, association_id: 2 },
-                                         { assessed_at: time - 2.days, percent: 0.4, possible: 1.0, association_id: 3 },)
+                                         { assessed_at: time - 2.days, percent: 0.4, possible: 1.0, association_id: 3 })
       res2 = create_quiz_outcome_results(o2, "name, o2",
                                          { percent: 0.6, possible: 2.0, association_id: 1 },
-                                         { assessed_at: time - 1.day, percent: 0.7, possible: 3.0, association_id: 2 },)
+                                         { assessed_at: time - 1.day, percent: 0.7, possible: 3.0, association_id: 2 })
       res3 = create_quiz_outcome_results(o3, "name, o3",
                                          { percent: 0.6, possible: 1.0, association_id: 1 },
-                                         { assessed_at: time - 1.day, percent: 0.6, possible: 1.0, association_id: 1 }.merge(assignment_params),)
+                                         { assessed_at: time - 1.day, percent: 0.6, possible: 1.0, association_id: 1 }.merge(assignment_params))
       res4 = create_quiz_outcome_results(o4, "name, o4",
                                          { percent: 0.6, possible: 2.0, association_id: 1 },
-                                         { assessed_at: time - 1.day, percent: 0.7, possible: 3.0, association_id: 1 }.merge(assignment_params),)
+                                         { assessed_at: time - 1.day, percent: 0.7, possible: 3.0, association_id: 1 }.merge(assignment_params))
       results = [res1, res2, res3, res4].flatten
       rollups = ra.rollup_user_results(results)
       expect(rollups.map(&:score)).to eq [2.91, 3.18, 3.0, 3.18]
@@ -626,7 +626,7 @@ describe Outcomes::ResultAnalytics do
                                          { percent: 0.4, possible: 1.0, association_id: 1 },
                                          { assessed_at: time - 1.day, percent: 0.5, possible: 1.0, association_id: 2 },
                                          { assessed_at: time - 1.day, percent: 0.6, possible: 1.0, association_id: 2 },
-                                         { assessed_at: time - 1.day, percent: 0.8, possible: 1.0, association_id: 2 },)
+                                         { assessed_at: time - 1.day, percent: 0.8, possible: 1.0, association_id: 2 })
 
       # quiz 1 results should be 1.55 (0.6 * 0.3 * 5) + (0.1 * 0.5 * 5) + (0.4 * 0.2 * 5)
       # quiz 2 results should be 2.95 (0.5 * 0.5 * 5) + (0.8 * 0.2 * 5) + (0.6 * 0.3 * 5)
@@ -636,7 +636,7 @@ describe Outcomes::ResultAnalytics do
                                          { percent: 0.4, possible: 2.0, association_id: 1 },
                                          { assessed_at: time - 1.day, percent: 0.5, possible: 5.0, association_id: 2 },
                                          { assessed_at: time - 1.day, percent: 0.8, possible: 2.0, association_id: 2 },
-                                         { assessed_at: time - 1.day, percent: 0.6, possible: 3.0, association_id: 2 },)
+                                         { assessed_at: time - 1.day, percent: 0.6, possible: 3.0, association_id: 2 })
       results = [res1, res2].flatten
       rollups = ra.rollup_user_results(results)
       expect(rollups.map(&:score)).to eq [2.83, 1.55]
@@ -651,7 +651,7 @@ describe Outcomes::ResultAnalytics do
                                         { percent: 0.4, possible: 1.0, association_id: 1 },
                                         { assessed_at: time - 1.day, percent: 0.5, possible: 1.0, association_id: 2 },
                                         { assessed_at: time - 1.day, percent: 0.6, possible: 1.0, association_id: 2 },
-                                        { assessed_at: time - 1.day, percent: 0.8, possible: 1.0, association_id: 2 },)
+                                        { assessed_at: time - 1.day, percent: 0.8, possible: 1.0, association_id: 2 })
 
       results = [res].flatten
       rollups = ra.rollup_user_results(results)
@@ -667,7 +667,7 @@ describe Outcomes::ResultAnalytics do
                                         { percent: 0.4, possible: 1.0, association_id: 1 },
                                         { assessed_at: time - 1.day, percent: 0.5, possible: 1.0, association_id: 2 },
                                         { assessed_at: time - 1.day, percent: 0.6, possible: 1.0, association_id: 2 },
-                                        { assessed_at: time - 1.day, percent: 0.8, possible: 1.0, association_id: 2 },)
+                                        { assessed_at: time - 1.day, percent: 0.8, possible: 1.0, association_id: 2 })
 
       results = [res].flatten
       rollups = ra.rollup_user_results(results)

@@ -194,7 +194,7 @@ describe "Module Items API", type: :request do
       it "includes item details" do
         expect(assignment_details).to include(
           'points_possible' => @assignment.points_possible,
-          'locked_for_user' => false,
+          'locked_for_user' => false
         )
       end
     end
@@ -337,7 +337,7 @@ describe "Module Items API", type: :request do
       it "includes item details" do
         expect(assignment_details).to include(
           'points_possible' => @assignment.points_possible,
-          'locked_for_user' => false,
+          'locked_for_user' => false
         )
       end
     end
@@ -1218,7 +1218,7 @@ describe "Module Items API", type: :request do
           'points_possible' => @assignment.points_possible,
           'due_at' => @due_at.iso8601,
           'unlock_at' => @unlock_at.iso8601,
-          'lock_at' => @lock_at.iso8601,
+          'lock_at' => @lock_at.iso8601
         )
       end
 
@@ -1228,7 +1228,7 @@ describe "Module Items API", type: :request do
         expect(assignment_details).to include 'lock_info'
         expect(assignment_details['lock_info']).to include(
           'asset_string' => @assignment.asset_string,
-          'unlock_at' => @unlock_at.iso8601,
+          'unlock_at' => @unlock_at.iso8601
         )
       end
 
@@ -1429,7 +1429,7 @@ describe "Module Items API", type: :request do
           'points_possible' => @assignment.points_possible,
           'due_at' => @due_at.iso8601,
           'unlock_at' => @unlock_at.iso8601,
-          'lock_at' => @lock_at.iso8601,
+          'lock_at' => @lock_at.iso8601
         )
       end
 
@@ -1439,7 +1439,7 @@ describe "Module Items API", type: :request do
         expect(assignment_details).to include 'lock_info'
         expect(assignment_details['lock_info']).to include(
           'asset_string' => @assignment.asset_string,
-          'unlock_at' => @unlock_at.iso8601,
+          'unlock_at' => @unlock_at.iso8601
         )
       end
     end
@@ -1543,7 +1543,7 @@ describe "Module Items API", type: :request do
                  :format => "json",
                  :course_id => @course.to_param,
                  :module_id => @module.to_param,
-                 :id => @tag.to_param,)
+                 :id => @tag.to_param)
       end
 
       def mark_not_done_api_call
@@ -1554,7 +1554,7 @@ describe "Module Items API", type: :request do
                  :format => "json",
                  :course_id => @course.to_param,
                  :module_id => @module.to_param,
-                 :id => @tag.to_param,)
+                 :id => @tag.to_param)
       end
 
       describe "PUT" do

@@ -41,7 +41,7 @@ describe Types::EnrollmentType do
     it "uses the current grading period by default" do
       expect(
         enrollment_type.resolve(
-          "grades { gradingPeriod { _id } }",
+          "grades { gradingPeriod { _id } }"
         )
       ).to eq @gp1.id.to_s
     end

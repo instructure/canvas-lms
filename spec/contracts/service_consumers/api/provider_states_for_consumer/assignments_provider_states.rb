@@ -126,7 +126,7 @@ PactConfig::Consumers::ALL.each do |consumer|
           # Add a submission comment to the submission
           submission.submission_comments.create!(
             author: mstudent,
-            comment: "a comment",
+            comment: "a comment"
             # this had no effect at all
             # attachments: [
             #   attachment_model(filename: 'comment_attachment.txt', context: mstudent, content_type: 'text/html')
@@ -154,7 +154,7 @@ PactConfig::Consumers::ALL.each do |consumer|
             :context_id => mcourse.id,
             :context_type => "Course",
             :points_possible => 10,
-            :public => true,
+            :public => true
           )
           rubric.save!
           # Unbelievable -- The only way I could see to apply rubric criteria to the assignment was

@@ -33,7 +33,7 @@ describe Types::AssignmentGroupType do
       @group.context.recompute_student_scores
       @other_assignment = @course.assignments.create!(
         name: "other",
-        assignment_group: @other_group,
+        assignment_group: @other_group
       )
 
       @group.scores.eager_load(:enrollment, :course).all.each do |score|

@@ -104,7 +104,7 @@ describe SIS::CSV::TermImporter do
   it 'does not delete terms with active courses' do
     process_csv_data(
       "term_id,name,status,start_date,end_date",
-      "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00",
+      "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00"
     )
 
     t1 = @account.enrollment_terms.where(sis_source_id: 'T001').first
@@ -115,7 +115,7 @@ describe SIS::CSV::TermImporter do
 
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
-      "T001,Winter11,deleted,2011-1-05 00:00:00,2011-4-14 00:00:00",
+      "T001,Winter11,deleted,2011-1-05 00:00:00,2011-4-14 00:00:00"
     )
 
     t1.reload
@@ -126,7 +126,7 @@ describe SIS::CSV::TermImporter do
 
     process_csv_data(
       "term_id,name,status,start_date,end_date",
-      "T001,Winter11,deleted,2011-1-05 00:00:00,2011-4-14 00:00:00",
+      "T001,Winter11,deleted,2011-1-05 00:00:00,2011-4-14 00:00:00"
     )
 
     t1.reload

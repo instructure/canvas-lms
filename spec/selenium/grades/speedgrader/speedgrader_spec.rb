@@ -178,7 +178,7 @@ describe 'Speedgrader' do
 
         rubric = @course.rubrics.build(
           title: 'Everything is Awesome',
-          points_possible: 20,
+          points_possible: 20
         )
         rubric.data = rubric_data
         rubric.save!

@@ -72,7 +72,7 @@ module Lti
       ::IMS::LTI::Models::ContentItemPlacement.new(
         display_height: opts[:height],
         display_width: opts[:width],
-        presentation_document_target: presentation_document_target(return_type),
+        presentation_document_target: presentation_document_target(return_type)
       )
     end
 

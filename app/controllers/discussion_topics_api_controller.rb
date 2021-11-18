@@ -63,7 +63,7 @@ class DiscussionTopicsApiController < ApplicationController
                                             include_all_dates: include_params.include?('all_dates'),
                                             :include_sections => include_params.include?('sections'),
                                             :include_sections_user_count => include_params.include?('sections_user_count'),
-                                            :include_overrides => include_params.include?('overrides'),).first)
+                                            :include_overrides => include_params.include?('overrides')).first)
   end
 
   # @API Get the full topic

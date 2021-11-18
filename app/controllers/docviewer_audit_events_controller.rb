@@ -52,7 +52,7 @@ class DocviewerAuditEventsController < ApplicationController
         annotation_id: event_params[:annotation_id],
         context: event_params[:context],
         related_annotation_id: event_params[:related_annotation_id]
-      },
+      }
     )
 
     respond_to do |format|

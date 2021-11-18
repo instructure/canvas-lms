@@ -65,7 +65,7 @@ module Api::V1::Conferences
   def default_conference_json(context, user, session)
     conference = context.web_conferences.build(
       :title => I18n.t(:default_conference_title, "%{course_name} Conference", :course_name => context.name),
-      :duration => WebConference::DEFAULT_DURATION,
+      :duration => WebConference::DEFAULT_DURATION
     )
 
     conference.as_json(
@@ -73,7 +73,7 @@ module Api::V1::Conferences
         user: user,
         session: session,
       },
-      url: named_context_url(context, :context_conferences_url),
+      url: named_context_url(context, :context_conferences_url)
     )
   end
 

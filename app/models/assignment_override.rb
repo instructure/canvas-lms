@@ -212,7 +212,7 @@ class AssignmentOverride < ActiveRecord::Base
     end
 
     scope.where(
-      assignment_override_students: { user_id: visible_ids },
+      assignment_override_students: { user_id: visible_ids }
     )
   end
 

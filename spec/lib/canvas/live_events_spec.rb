@@ -684,7 +684,7 @@ describe Canvas::LiveEvents do
         expect_event(
           'submission_updated',
           hash_including(
-            posted_at: post_time,
+            posted_at: post_time
           ),
           course_context
         )

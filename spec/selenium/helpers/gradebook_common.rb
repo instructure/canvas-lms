@@ -47,7 +47,7 @@ module GradebookCommon
       test_course.assignments.create!(
         title: 'Percent Assignment',
         grading_type: 'percent',
-        points_possible: 10,
+        points_possible: 10
       )
     end
     let(:assignment_3) do
@@ -275,7 +275,7 @@ module GradebookCommon
         late_submission_deduction: 10.0,
         late_submission_interval: 'day',
         late_submission_minimum_percent_enabled: true,
-        late_submission_minimum_percent: 50.0,
+        late_submission_minimum_percent: 50.0
       )
     end
 
