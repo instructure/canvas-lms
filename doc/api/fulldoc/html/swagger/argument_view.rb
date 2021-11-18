@@ -123,7 +123,7 @@ class ArgumentView < HashView
   end
 
   def optional?
-    not required?
+    !required?
   end
 
   def required?

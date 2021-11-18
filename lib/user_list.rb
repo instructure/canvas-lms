@@ -149,7 +149,7 @@ class UserList
         user_start = 0
         in_quotes = false
         chars.each_with_index do |char, i|
-          if not in_quotes
+          if !in_quotes
             case char
             when ','
               user_line = str[user_start, i - user_start].strip

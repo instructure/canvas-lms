@@ -197,7 +197,7 @@ class ConversationMessage < ActiveRecord::Base
 
   def new_recipients
     return [] unless conversation
-    return [] unless generated? and event_data[:event_type] == :users_added
+    return [] unless generated? && event_data[:event_type] == :users_added
 
     recipients.select { |u| event_data[:user_ids].include?(u.id) }
   end

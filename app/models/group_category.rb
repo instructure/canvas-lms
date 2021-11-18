@@ -150,7 +150,7 @@ class GroupCategory < ActiveRecord::Base
     end
 
     def role_category_for_context(role, context)
-      return unless context and protected_role_for_context?(role, context)
+      return unless context && protected_role_for_context?(role, context)
 
       category = context.group_categories.where(role: role).first ||
                  context.group_categories.build(name: name_for_role(role),

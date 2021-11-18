@@ -217,7 +217,7 @@ module SIS
           @course_roles_by_account_id[@course.account_id] ||= @course.account.available_course_roles
 
           # commit pending incremental account associations
-          incrementally_update_account_associations if @section != @last_section and !@incrementally_update_account_associations_user_ids.empty?
+          incrementally_update_account_associations if @section != @last_section && !@incrementally_update_account_associations_user_ids.empty?
 
           associated_user_id = nil
 

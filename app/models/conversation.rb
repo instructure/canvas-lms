@@ -461,7 +461,7 @@ class Conversation < ActiveRecord::Base
     message_tags = if self.private?
                      if new_tags.present?
                        new_tags
-                     elsif participant.message_count > 0 and (last_message = participant.last_message)
+                     elsif participant.message_count > 0 && (last_message = participant.last_message)
                        last_message.tags
                      end
                    end

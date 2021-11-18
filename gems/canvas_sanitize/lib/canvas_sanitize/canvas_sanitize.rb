@@ -391,7 +391,7 @@ module CanvasSanitize # :nodoc:
         # Doesn't try to sanitize nil
         f = self.send(field)
         next unless f
-        next unless f.is_a?(String) or f.is_a?(IO)
+        next unless f.is_a?(String) || f.is_a?(IO)
 
         val = Sanitize.clean(f, config)
         self.send((field.to_s + "="), val)
