@@ -62,7 +62,7 @@ class ReturnView < ReturnViewNull
   end
 
   def to_swagger
-    if array? and type
+    if array? && type
       {
         "type" => "array",
         "items" => {

@@ -1261,7 +1261,7 @@ class Course < ActiveRecord::Base
   end
 
   def update_show_total_grade_as_on_weighting_scheme_change
-    if group_weighting_scheme_changed? and self.group_weighting_scheme == 'percent'
+    if group_weighting_scheme_changed? && self.group_weighting_scheme == 'percent'
       self.show_total_grade_as_points = false
     end
     true

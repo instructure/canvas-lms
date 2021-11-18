@@ -227,7 +227,7 @@ module Importers
         description += "</ul>"
         item.body = description
         return nil if topic_count == 0
-      elsif hash[:title] and hash[:text]
+      elsif hash[:title] && hash[:text]
         # it's an actual wiki page
         item.title = hash[:title].presence || item.url.presence || "unnamed page"
         if item.title.length > WikiPage::TITLE_LENGTH

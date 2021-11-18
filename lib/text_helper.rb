@@ -137,7 +137,7 @@ module TextHelper
         # we are the last child, we need to ascend until we are
         # either done or find a sibling to continue on to
         n = current
-        while !n.is_a?(Nokogiri::HTML::Document) and n.parent.next.nil?
+        while !n.is_a?(Nokogiri::HTML::Document) && n.parent.next.nil?
           n = n.parent
         end
 

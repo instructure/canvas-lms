@@ -81,7 +81,7 @@ module Qti
     def set_question_type
       correct_answers = 0
       @question[:answers].each do |ans|
-        correct_answers += 1 if ans[:weight] and ans[:weight] > 0
+        correct_answers += 1 if ans[:weight] && ans[:weight] > 0
       end
 
       # If the question is worth zero points its correct answer's weight might
@@ -141,7 +141,7 @@ module Qti
           end
 
           @question[:answers] << answer
-          if ci['responseIdentifier'] and @question[:question_type] == 'multiple_dropdowns_question'
+          if ci['responseIdentifier'] && @question[:question_type] == 'multiple_dropdowns_question'
             answer[:blank_id] = ci['responseIdentifier']
             answers_hash["#{answer[:blank_id]}_#{answer[:migration_id]}"] = answer
           else
@@ -178,7 +178,7 @@ module Qti
         elsif @doc.at_css('instructureField[name="bb_question_type"][value="Multiple Answer"]') &&
               @doc.at_css('responseIf > and > match')
           process_blackboard_9_multiple_answers(answers_hash)
-        elsif cond.at_css('match variable[identifier=RESP_MC]') or cond.at_css('match variable[identifier=response]')
+        elsif cond.at_css('match variable[identifier=RESP_MC]') || cond.at_css('match variable[identifier=response]')
           migration_id = cond.at_css('match baseValue[baseType=identifier]').text.strip
           migration_id = migration_id.sub('.', '_') if is_either_or
           answer = answers_hash[migration_id] || answers_hash.values.detect { |a| a[:text] == migration_id }
@@ -264,7 +264,7 @@ module Qti
       weight = AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT
       case node['baseType']
       when "float" # base_value = node.at_css('baseValue[baseType=float]')
-        if node.text =~ /score\.max/i or node.text.to_f > 0
+        if node.text =~ /score\.max/i || node.text.to_f > 0
           weight = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
         end
       when "integer" # elsif base_value = node.at_css('baseValue[baseType=integer]')

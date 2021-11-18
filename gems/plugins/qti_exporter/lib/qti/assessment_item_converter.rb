@@ -145,7 +145,7 @@ module Qti
           end
         end
 
-        if @migration_type and UNSUPPORTED_TYPES.member?(@migration_type)
+        if @migration_type && UNSUPPORTED_TYPES.member?(@migration_type)
           @question[:question_type] = @migration_type
           @question[:unsupported] = true
         elsif !%w[text_only_question file_upload_question].include?(@migration_type)

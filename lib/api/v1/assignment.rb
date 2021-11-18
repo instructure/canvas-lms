@@ -628,7 +628,7 @@ module Api::V1::Assignment
   def assignment_group_id_valid?(assignment, assignment_params)
     ag_id = assignment_params["assignment_group_id"].presence
     # if ag_id is a non-numeric string, ag_id.to_i will == 0
-    if ag_id and ag_id.to_i <= 0
+    if ag_id && ag_id.to_i <= 0
       assignment.errors.add('assignment[assignment_group_id]', I18n.t(:not_a_number, "must be a positive number"))
       false
     else

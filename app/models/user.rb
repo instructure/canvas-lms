@@ -981,7 +981,7 @@ class User < ActiveRecord::Base
   end
 
   def email=(e)
-    if e.is_a?(CommunicationChannel) and e.user_id == self.id
+    if e.is_a?(CommunicationChannel) && e.user_id == self.id
       cc = e
     else
       cc = self.communication_channels.email.by_path(e).first ||
@@ -1529,7 +1529,7 @@ class User < ActiveRecord::Base
   end
 
   def self.avatar_fallback_url(fallback = nil, request = nil)
-    if fallback and (uri = URI.parse(fallback) rescue nil)
+    if fallback && (uri = URI.parse(fallback) rescue nil)
       # something got built without request context, so we want to inherit that
       # context now that we have a request
       if uri.host == 'localhost'
@@ -2827,7 +2827,7 @@ class User < ActiveRecord::Base
   end
 
   def private?
-    not public?
+    !public?
   end
 
   def profile

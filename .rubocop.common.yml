@@ -191,6 +191,8 @@ Specs/EnsureSpecExtension:
 Style/Alias:
   EnforcedStyle: prefer_alias_method # https://github.com/rubocop/ruby-style-guide/issues/821
   Severity: error
+Style/AndOr:
+  Severity: error
 Style/BarePercentLiterals:
   Severity: error
 Style/CaseLikeIf:
@@ -241,6 +243,8 @@ Style/NegatedUnless:
 Style/NegatedWhile:
   Severity: error
 Style/NestedParenthesizedCalls:
+  Severity: error
+Style/Not:
   Severity: error
 Style/NumericPredicate:
   Enabled: false # `> 0` can be easier to read than `.positive?`
